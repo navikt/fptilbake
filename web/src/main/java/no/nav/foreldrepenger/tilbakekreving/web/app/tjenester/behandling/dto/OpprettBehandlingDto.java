@@ -1,0 +1,90 @@
+package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto;
+
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
+
+import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
+import no.nav.vedtak.sikkerhet.abac.AbacDto;
+import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
+import no.nav.vedtak.util.InputValideringRegex;
+
+public class OpprettBehandlingDto implements AbacDto {
+
+    @NotNull
+    @Digits(integer = 50, fraction = 0)
+    String saksnummer;
+
+    @NotNull
+    @Digits(integer = 50, fraction = 0)
+    String aktørId;
+
+    @NotNull
+    @Min(0)
+    @Max(Long.MAX_VALUE)
+    Long eksternBehandlingId; // revurdert behandlingId fra fpsak
+
+    @NotNull
+    @Pattern(regexp = InputValideringRegex.KODEVERK)
+    @Size(max = 20)
+    private String behandlingType;
+
+    @Pattern(regexp = InputValideringRegex.KODEVERK)
+    @Size(max = 20)
+    private String behandlingArsakType;
+
+    public OpprettBehandlingDto() {
+        // For CDI
+    }
+
+    public String getSaksnummer() {
+        return saksnummer;
+    }
+
+    public void setSaksnummer(String saksnummer) {
+        this.saksnummer = saksnummer;
+    }
+
+    public String getAktørId() {
+        return aktørId;
+    }
+
+    public void setAktørId(String aktørId) {
+        this.aktørId = aktørId;
+    }
+
+    public Long getEksternBehandlingId() {
+        return eksternBehandlingId;
+    }
+
+    public void setEksternBehandlingId(Long eksternBehandlingId) {
+        this.eksternBehandlingId = eksternBehandlingId;
+    }
+
+    public String getBehandlingType() {
+        return behandlingType;
+    }
+
+    public void setBehandlingType(String behandlingType) {
+        this.behandlingType = behandlingType;
+    }
+
+    public String getBehandlingArsakType() {
+        return behandlingArsakType;
+    }
+
+    public void setBehandlingArsakType(String behandlingArsakType) {
+        this.behandlingArsakType = behandlingArsakType;
+    }
+
+    @Override
+    public AbacDataAttributter abacAttributter() {
+        return AbacDataAttributter.opprett()
+                .leggTil(StandardAbacAttributtType.AKTØR_ID, aktørId)
+                .leggTil(StandardAbacAttributtType.SAKSNUMMER, saksnummer);
+    }
+
+}

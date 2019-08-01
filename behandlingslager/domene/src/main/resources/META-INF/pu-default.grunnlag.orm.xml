@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://xmlns.jcp.org/xml/ns/persistence/orm"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence/orm
+      http://xmlns.jcp.org/xml/ns/persistence/orm_2_1.xsd"
+                 version="2.1">
+
+    <sequence-generator name="SEQ_KRAVGRUNNLAG_XML" allocation-size="50" sequence-name="SEQ_KRAVGRUNNLAG_XML"/>
+    <sequence-generator name="SEQ_KRAV_GRUNNLAG_431" allocation-size="50" sequence-name="SEQ_KRAV_GRUNNLAG_431"/>
+    <sequence-generator name="SEQ_KRAV_GRUNNLAG_PERIODE_432" allocation-size="50" sequence-name="SEQ_KRAV_GRUNNLAG_PERIODE_432"/>
+    <sequence-generator name="SEQ_KRAV_GRUNNLAG_BELOP_433" allocation-size="50" sequence-name="SEQ_KRAV_GRUNNLAG_BELOP_433"/>
+    <sequence-generator name="SEQ_KRAV_VEDTAK_STATUS_437" allocation-size="50" sequence-name="SEQ_KRAV_VEDTAK_STATUS_437"/>
+    <sequence-generator name="SEQ_GR_KRAV_GRUNNLAG" allocation-size="50" sequence-name="SEQ_GR_KRAV_GRUNNLAG"/>
+
+    <entity class="no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType"/>
+
+        <entity class="no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagXml"/>
+
+    <entity class="no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagBelop433"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatus437"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagAggregate"/>
+</entity-mappings>

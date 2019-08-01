@@ -1,0 +1,319 @@
+import groovy.json.JsonSlurperClassic
+
+
+timestamps {
+    def username = ''
+    def password = ''
+    def deploy = false
+    def build = false
+    def owasp = false
+    def skipUTests = '-DskipUTs'
+    def skipITests = '-DskipITs'
+    def brunit = '-Pbrunit,copyBlazeTestFiles'
+    def secScan = false
+    def hasCredentials = false
+    def fasitCredentialId = ''
+    def deployVersion = ''
+    def pomVersion = ''
+    def miljo = ''
+    def dbEmptyUser = env.es_database_user
+    def agent = ''
+
+    try {
+        deploy = Boolean.valueOf(DEPLOY)
+        hasCredentials = true
+        fasitCredentialId = env.FASIT_CRED
+        deployVersion = env.DEPLOY_VERSION
+        if (!deployVersion.endsWith("-SNAPSHOT")) {
+            miljo = 't11'
+        }
+
+    } catch (MissingPropertyException e) {
+        deploy = false
+    }
+
+    try {
+        def _skipUTests = Boolean.valueOf(SKIPUTESTS)
+        if (!_skipUTests) {
+            skipUTests = ''
+        }
+
+    } catch (MissingPropertyException e) {
+        skipUTests = ''
+    }
+
+    try {
+        def _skipITests = Boolean.valueOf(SKIPITESTS)
+        if (!_skipITests) {
+            skipITests = ''
+        }
+
+    } catch (MissingPropertyException e) {
+        skipITests = ''
+    }
+
+    try {
+        def _brunit = Boolean.valueOf(BRUNIT)
+        if (!_brunit) {
+            brunit = ''
+        }
+
+    } catch (MissingPropertyException e) {
+    }
+
+    try {
+        owasp = Boolean.valueOf(OWASP)
+        agent = 'A1'
+
+    } catch (MissingPropertyException e) {
+    }
+
+    try {
+        build = Boolean.valueOf(BUILD)
+
+    } catch (MissingPropertyException e) {
+    }
+
+    try {
+        if (env.MILJO != "null") {
+            miljo = env.MILJO
+        }
+
+    } catch (MissingPropertyException e) {
+    }
+
+    try {
+        secScan = Boolean.valueOf(SECSCAN)
+        hasCredentials = true
+        fasitCredentialId = env.FASIT_CRED
+
+    } catch (MissingPropertyException e) {
+    }
+
+    node ("SONAR") {
+        try {
+            env.LANG = "nb_NO.UTF-8"
+
+            stage("Init") {
+                printStage("Init")
+                env.JAVA_HOME = "${tool 'java-11'}"
+                env.PATH = "${tool 'maven-3.5.3'}/bin:${env.PATH}"
+                env.ORACLE_HOME = "/u01/app/oracle/product/11.2.0/xe"
+                step([$class: 'WsCleanup'])
+                checkout scm
+
+                if (hasCredentials) {
+                    withCredentials([[$class          : 'UsernamePasswordMultiBinding', credentialsId: fasitCredentialId,
+                                      usernameVariable: 'SAVEDUSERNAME', passwordVariable: 'SAVEDPASSWORD']]) {
+                        username = env.SAVEDUSERNAME
+                        password = env.SAVEDPASSWORD
+                    }
+                }
+            }
+
+            def artifactId = readFile('pom.xml') =~ '<artifactId>(.+)</artifactId>'
+            artifactId = artifactId[0][1]
+
+            if (deployVersion.isEmpty()) {
+                def version = readFile('pom.xml') =~ '<version>(.+)</version>'
+                pomVersion = version[0][1]
+                deployVersion = pomVersion
+            }
+
+            if (build) {
+
+                stage("Build") {
+
+                    printStage("Build")
+                    configFileProvider(
+                            [configFile(fileId: 'navMavenSettings', variable: 'MAVEN_SETTINGS')]) {
+                        sh 'export APPDATA=web/klient/node/node_modules/npm/bin; mvn -s $MAVEN_SETTINGS ' + skipUTests + ' ' + skipITests + ' ' + brunit + ' -Des.database.user=' + dbEmptyUser + ' clean deploy'
+                    }
+
+                    if (!skipITests) {
+                        publishHTML(target: [
+                                allowMissing         : true,
+                                alwaysLinkToLastBuild: false,
+                                keepAll              : true,
+                                reportDir            : '**/target/failsafe-reports',
+                                reportFiles          : '*.html',
+                                reportName           : "Failsafe Report"
+                        ])
+                    }
+                }
+
+                info("Build");
+                if (!secScan && !deploy) {
+                    hipchatBUILD("<b>${artifactId}:${deployVersion}</b>")
+                }
+            }
+
+            if (deploy) {
+
+                stage("Deploy") {
+                    printStage("Deploy")
+
+                    configFileProvider(
+                            [configFile(fileId: 'navMavenSettings', variable: 'MAVEN_SETTINGS')]) {
+                        wrap([$class: 'MaskPasswordsBuildWrapper']) {
+                            sh 'mvn -s $MAVEN_SETTINGS -Denv=' + miljo + ' -Dapps=' + artifactId + ':' + deployVersion + ' -Dusername=' + username + ' -Dpassword=' + password + ' no.nav.maven.plugins:aura-maven-plugin:RELEASE:verify no.nav.maven.plugins:aura-maven-plugin:6.1.90:deploy'
+                        }
+                    }
+                    def appUrl = getAppUrl(miljo, artifactId)
+                    def ret = "<a href=" + appUrl + ">" + appUrl + "</a>"
+                    info(miljo)
+
+                    hipchatDEPLOY(build, "<b>${artifactId}:${deployVersion}</b> til miljø <b>" + miljo + "</b><br>Try me: " + ret)
+                }
+            }
+
+            if (secScan) {
+
+                stage('xCoCo') {
+                    printStage("xCoCo")
+                    configFileProvider(
+                            [configFile(fileId: 'navMavenSettingsUtenProxy', variable: 'MAVEN_SETTINGS')]) {
+                        sh "export APPDATA=web/klient/node/node_modules/npm/bin; mvn -P runSonar,runYarnCoverage -s $MAVEN_SETTINGS clean verify -Dmaven.root=${env.WORKSPACE} -Dmaven.test.failure.ignore=true -Des.database.user=${dbEmptyUser}"
+                    }
+                }
+
+
+                stage('Sonar Scan') {
+                    printStage("Sonar")
+                    configFileProvider(
+                            [configFile(fileId: 'navMavenSettingsUtenProxy', variable: 'MAVEN_SETTINGS')]) {
+                        wrap([$class: 'MaskPasswordsBuildWrapper']) {
+                            sh "mvn -B -P runSonar -s $MAVEN_SETTINGS sonar:sonar -Dmaven.root=${env.WORKSPACE} -Dsonar.host.url=http://a34apvl063.devillo.no:9000/sonarqube/ -Dsonar.login=${username} -Dsonar.password=${password}"
+                        }
+                    }
+                }
+
+                publishHTML(target: [
+                        allowMissing         : true,
+                        alwaysLinkToLastBuild: false,
+                        keepAll              : true,
+                        reportDir            : 'web/klient/coverage',
+                        reportFiles          : 'index.html',
+                        reportName           : "JS CoCo"
+                ])
+
+                hipchatSecScan("<b>${artifactId}:${deployVersion}</b>");
+            }
+
+            if (owasp) {
+                stage('OWASP Dep. Check') {
+                    printStage("OWASP Dep.Check")
+                    configFileProvider(
+                            [configFile(fileId: 'navMavenSettings', variable: 'MAVEN_SETTINGS')]) {
+                        sh 'mvn -s $MAVEN_SETTINGS org.owasp:dependency-check-maven:1.4.4:aggregate -DmavenSettingsProxyId=utviklerproxy -Dhttps.protocols=TLSv1.1,TLSv1.2'
+                    }
+                    info("OWASP included")
+                }
+
+                stage('Licence Analyser') {
+                    printStage("Licence Analyser")
+                    configFileProvider(
+                            [configFile(fileId: 'navMavenSettings', variable: 'MAVEN_SETTINGS')]) {
+                        sh 'mvn -s $MAVEN_SETTINGS project-info-reports:dependency-management -DmavenSettingsProxyId=utviklerproxy -X'
+                    }
+                }
+
+                publishHTML(target: [
+                        allowMissing         : true,
+                        alwaysLinkToLastBuild: true,
+                        keepAll              : true,
+                        reportDir            : 'target',
+                        reportFiles          : 'dependency-check-report.html, site/dependency-management.html',
+                        reportName           : "Dependency-Check"
+                ])
+            }
+
+            artifactId = null
+            deployVersion = null
+
+        } catch(error) {
+            if (deploy) {
+                info(miljo)
+            }
+            def mailToDevs = !secScan
+            hipchatFAIL(error, currentBuild, mailToDevs)
+            throw error
+        }
+    }
+}
+
+
+@NonCPS
+String showChangeLogs() {
+    def changeLogSets = currentBuild.rawBuild.changeSets
+    def ret = "Jenkins build: <a href='${env.BUILD_URL}'>${env.BUILD_URL}</a>"
+    for (int i = 0; i < changeLogSets.size(); i++) {
+        def entries = changeLogSets[i].items
+        for (int j = 0; j < entries.length; j++) {
+            def entry = entries[j]
+            ret = ret +  "<br>${entry.author}: ${entry.msg} "
+        }
+    }
+    return ret
+}
+
+void hipchatSecScan(msg) {
+    hipchat("☢ SecScan: " + msg, 'GREEN')
+}
+void hipchatINFO(msg) {
+    hipchat("❗ Info: " + msg, 'YELLOW')
+}
+void hipchatDEPLOY(build, msg) {
+    if (build) {
+        hipchat("☕✔ Build & Deploy: " + msg, 'PURPLE')
+    } else {
+        hipchat("\u2714 Deployed: " + msg, 'PURPLE')
+    }
+}
+@NonCPS
+void hipchatFAIL(error, currentBuild, sendMail) {
+    hipchat("❌ Failed", 'RED')
+    def causes = currentBuild.rawBuild.getCauses()
+    println("causes" + causes)
+    def cause = ""
+    if (!causes.isEmpty()) {
+        cause = causes[0].getShortDescription()
+        println("cause" + cause)
+    }
+
+}
+void hipchatBUILD(msg) {
+    hipchat("☕ Build: " + msg, 'GREEN')
+}
+void hipchat(msg, color) {
+    hcMsg = msg + "<br>" + showChangeLogs()
+    hipchatSend color: color, message: hcMsg, notify: true, v2enabled: true
+}
+void info(msg) {
+    ansiColor('xterm') {
+        println "\033[45m\033[37m " + msg + " \033[0m"
+    }
+    currentBuild.description = msg
+}
+void printStage(stage) {
+    ansiColor('xterm') {
+        println "\033[46m Entered stage " + stage + " \033[0m"
+    }
+}
+String getAppUrl(miljo, artifactId) {
+    clusterUrl = 'https://fasit.adeo.no/api/v2/environments/' + miljo + '/clusters'
+    response = httpRequest clusterUrl
+    content = response.content
+    json = new JsonSlurperClassic ().parseText(content)
+
+    for (item in json) {
+        applications = item.applications
+        for (app in applications) {
+            name = app.name
+            if (name == artifactId) {
+                return item.loadbalancerurl + '/fpsak'
+            }
+        }
+    }
+    return 'ERROR'
+}

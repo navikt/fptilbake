@@ -1,0 +1,313 @@
+package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+
+import org.junit.Test;
+
+import com.google.common.collect.Lists;
+
+import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
+import no.nav.foreldrepenger.tilbakekreving.behandling.dto.FeilutbetalingPerioderDto;
+import no.nav.foreldrepenger.tilbakekreving.behandling.dto.ForeldelsePeriodeDto;
+import no.nav.foreldrepenger.tilbakekreving.behandling.dto.PeriodeDto;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.Feilutbetaling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingAggregate;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingPeriodeÅrsak;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.UtsettelseArbeid;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.UtsettelseÅrsakType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkOpplysningType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagDel;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseAggregate;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelsePeriode;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagAggregate;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMock;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMockUtil;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
+
+public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
+
+    public static final LocalDate FØRSTE_DATO = LocalDate.of(2019, 1, 31);
+    private static final LocalDate FOM_1 = LocalDate.of(2016, 3, 10);
+    private static final LocalDate TOM_1 = LocalDate.of(2016, 4, 06);
+
+    @Test
+    public void skal_lagreVurdertForeldelseGrunnlag() {
+        LocalDate sisteDato = LocalDate.of(2019, 2, 19);
+        vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(INTERN_BEHANDLING_ID, Collections.singletonList(
+            new ForeldelsePeriodeDto(FØRSTE_DATO, sisteDato,
+                ForeldelseVurderingType.FORELDET, "ABC")));
+
+        Optional<VurdertForeldelseAggregate> vurdertForeldelseAggregateOptional = vurdertForeldelseRepository.finnVurdertForeldelseForBehandling(INTERN_BEHANDLING_ID);
+        assertThat(vurdertForeldelseAggregateOptional).isPresent();
+        VurdertForeldelseAggregate vurdertForeldelseAggregate = vurdertForeldelseAggregateOptional.get();
+        assertThat(vurdertForeldelseAggregate.getVurdertForeldelse()).isNotNull();
+        List<VurdertForeldelsePeriode> vurdertForeldelsePerioder = Lists.newArrayList(vurdertForeldelseAggregate.getVurdertForeldelse().getVurdertForeldelsePerioder());
+        assertThat(vurdertForeldelsePerioder).isNotEmpty();
+        assertThat(vurdertForeldelsePerioder.size()).isEqualTo(1);
+        assertThat(vurdertForeldelsePerioder.get(0).getForeldelseVurderingType()).isEqualByComparingTo(ForeldelseVurderingType.FORELDET);
+        assertThat(vurdertForeldelsePerioder.get(0).getPeriode().getTom()).isEqualTo(LocalDate.of(2019, 2, 19));
+        assertThat(vurdertForeldelsePerioder.get(0).getBegrunnelse()).isEqualTo("ABC");
+
+        // test historikkinnslag
+        Historikkinnslag historikkinnslag = fellesHistorikkInnslagAssert();
+        assertThat(historikkinnslag.getHistorikkinnslagDeler().size()).isEqualTo(1);
+        HistorikkinnslagDel historikkinnslagDel = historikkinnslag.getHistorikkinnslagDeler().get(0);
+        assertThat(getTilVerdi(historikkinnslagDel.getOpplysning(HistorikkOpplysningType.PERIODE_FOM))).isEqualTo(formatDate(FØRSTE_DATO));
+        assertThat(getTilVerdi(historikkinnslagDel.getOpplysning(HistorikkOpplysningType.PERIODE_TOM))).isEqualTo(formatDate(sisteDato));
+        assertThat(historikkinnslagDel.getBegrunnelse().get()).isEqualTo("ABC");
+        assertThat(historikkinnslagDel.getSkjermlenke().get()).isEqualTo(SkjermlenkeType.FORELDELSE.getKode());
+        assertThat(getTilVerdi(historikkinnslagDel.getEndretFelt(HistorikkEndretFeltType.FORELDELSE)))
+            .isEqualTo(finnForeldelseVurderingType(ForeldelseVurderingType.FORELDET).getNavn());
+        assertThat(getFraVerdi(historikkinnslagDel.getEndretFelt(HistorikkEndretFeltType.FORELDELSE)))
+            .isEqualTo(null);
+    }
+
+    @Test
+    public void skal_lagreVurdertForeldelseGrunnlag_medflereManueltPeriode() {
+        LocalDate førstePeriodeSisteDato = LocalDate.of(2019, 2, 4);
+        LocalDate andrePeriodeFørsteDato = LocalDate.of(2019, 2, 4);
+        LocalDate andrePeriodeSisteDato = LocalDate.of(2019, 2, 11);
+
+        vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(INTERN_BEHANDLING_ID, Lists.newArrayList(
+            new ForeldelsePeriodeDto(FØRSTE_DATO, førstePeriodeSisteDato,
+                ForeldelseVurderingType.FORELDET, "ABC"),
+            new ForeldelsePeriodeDto(andrePeriodeFørsteDato, andrePeriodeSisteDato,
+                ForeldelseVurderingType.TILLEGGSFRIST, "CDE")));
+
+        Optional<VurdertForeldelseAggregate> vurdertForeldelseAggregateOptional = vurdertForeldelseRepository.finnVurdertForeldelseForBehandling(INTERN_BEHANDLING_ID);
+        assertThat(vurdertForeldelseAggregateOptional).isPresent();
+        VurdertForeldelseAggregate vurdertForeldelseAggregate = vurdertForeldelseAggregateOptional.get();
+        assertThat(vurdertForeldelseAggregate.getVurdertForeldelse()).isNotNull();
+        List<VurdertForeldelsePeriode> vurdertForeldelsePerioder = Lists.newArrayList(vurdertForeldelseAggregate.getVurdertForeldelse().getVurdertForeldelsePerioder());
+        assertThat(vurdertForeldelsePerioder).isNotEmpty();
+        vurdertForeldelsePerioder.sort(Comparator.comparing(VurdertForeldelsePeriode::getFom));
+        assertThat(vurdertForeldelsePerioder.size()).isEqualTo(2);
+
+        assertThat(vurdertForeldelsePerioder.get(0).getForeldelseVurderingType()).isEqualByComparingTo(ForeldelseVurderingType.FORELDET);
+        assertThat(vurdertForeldelsePerioder.get(0).getPeriode().getTom()).isEqualTo(LocalDate.of(2019, 2, 4));
+        assertThat(vurdertForeldelsePerioder.get(0).getBegrunnelse()).isEqualTo("ABC");
+
+        assertThat(vurdertForeldelsePerioder.get(1).getForeldelseVurderingType()).isEqualByComparingTo(ForeldelseVurderingType.TILLEGGSFRIST);
+        assertThat(vurdertForeldelsePerioder.get(1).getBegrunnelse()).isEqualTo("CDE");
+
+        // test historikkinnslag
+        Historikkinnslag historikkinnslag = fellesHistorikkInnslagAssert();
+        assertThat(historikkinnslag.getHistorikkinnslagDeler().size()).isEqualTo(2);
+
+        HistorikkinnslagDel førsteDel = historikkinnslag.getHistorikkinnslagDeler().get(0);
+        assertThat(getTilVerdi(førsteDel.getOpplysning(HistorikkOpplysningType.PERIODE_FOM))).isEqualTo(formatDate(FØRSTE_DATO));
+        assertThat(getTilVerdi(førsteDel.getOpplysning(HistorikkOpplysningType.PERIODE_TOM))).isEqualTo(formatDate(førstePeriodeSisteDato));
+        assertThat(førsteDel.getBegrunnelse().get()).isEqualTo("ABC");
+        assertThat(førsteDel.getSkjermlenke().get()).isEqualTo(SkjermlenkeType.FORELDELSE.getKode());
+        assertThat(getTilVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.FORELDELSE)))
+            .isEqualTo(finnForeldelseVurderingType(ForeldelseVurderingType.FORELDET).getNavn());
+        assertThat(getFraVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.FORELDELSE)))
+            .isEqualTo(null);
+
+        HistorikkinnslagDel andreDel = historikkinnslag.getHistorikkinnslagDeler().get(1);
+        assertThat(getTilVerdi(andreDel.getOpplysning(HistorikkOpplysningType.PERIODE_FOM))).isEqualTo(formatDate(andrePeriodeFørsteDato));
+        assertThat(getTilVerdi(andreDel.getOpplysning(HistorikkOpplysningType.PERIODE_TOM))).isEqualTo(formatDate(andrePeriodeSisteDato));
+        assertThat(andreDel.getBegrunnelse().get()).isEqualTo("CDE");
+        assertThat(andreDel.getSkjermlenke().get()).isEqualTo(SkjermlenkeType.FORELDELSE.getKode());
+        assertThat(getTilVerdi(andreDel.getEndretFelt(HistorikkEndretFeltType.FORELDELSE)))
+            .isEqualTo(finnForeldelseVurderingType(ForeldelseVurderingType.TILLEGGSFRIST).getNavn());
+        assertThat(getFraVerdi(andreDel.getEndretFelt(HistorikkEndretFeltType.FORELDELSE)))
+            .isEqualTo(null);
+    }
+
+    @Test
+    public void henteVurdertForeldelse_nårForeldretPeriode_dekkerMellomToGrunnlagPeriode() {
+
+        KravgrunnlagMock mockMedFeilPostering = new KravgrunnlagMock(FOM_1, LocalDate.of(2016, 3, 23), KlasseType.FEIL,
+            BigDecimal.valueOf(10000), BigDecimal.ZERO);
+        KravgrunnlagMock mockMedFeilPostering2 = new KravgrunnlagMock(LocalDate.of(2016, 3, 24),
+            TOM_1, KlasseType.FEIL, BigDecimal.valueOf(12000), BigDecimal.ZERO);
+        KravgrunnlagMock mockMedYtelPostering = new KravgrunnlagMock(FOM_1, TOM_1, KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(22000));
+
+        Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedFeilPostering2, mockMedYtelPostering));
+        KravgrunnlagAggregate kravgrunnlagAggregate = KravgrunnlagAggregate.builder()
+            .medGrunnlagØkonomi(kravgrunnlag431)
+            .medBehandlingId(INTERN_BEHANDLING_ID).build();
+
+        grunnlagRepository.lagre(kravgrunnlagAggregate);
+        vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(INTERN_BEHANDLING_ID, Lists.newArrayList(
+            new ForeldelsePeriodeDto(FOM_1, LocalDate.of(2016, 3, 28),
+                ForeldelseVurderingType.FORELDET, "ABC")));
+
+        FeilutbetalingPerioderDto perioderDto = vurdertForeldelseTjeneste.henteVurdertForeldelse(INTERN_BEHANDLING_ID);
+
+        assertThat(perioderDto.getPerioder().size()).isEqualTo(1);
+        perioderDto.getPerioder().sort(Comparator.comparing(PeriodeDto::getFom));
+        assertThat(perioderDto.getPerioder().get(0).getFom()).isEqualTo(FOM_1);
+        assertThat(perioderDto.getPerioder().get(0).getTom()).isEqualTo(LocalDate.of(2016, 3, 28));
+        assertThat(perioderDto.getPerioder().get(0).getForeldelseVurderingType()).isEqualTo(ForeldelseVurderingType.FORELDET);
+        assertThat(perioderDto.getPerioder().get(0).getBelop()).isEqualByComparingTo(BigDecimal.valueOf(13600.0));
+    }
+
+    @Test
+    public void henteVurdertForeldelse_nårForeldretPeriode_dekkerMellomEnGrunnlagPeriode() {
+        KravgrunnlagMock mockMedFeilPostering = new KravgrunnlagMock(FOM_1, LocalDate.of(2016, 3, 23), KlasseType.FEIL,
+            BigDecimal.valueOf(10000), BigDecimal.ZERO);
+        KravgrunnlagMock mockMedFeilPostering2 = new KravgrunnlagMock(LocalDate.of(2016, 3, 24),
+            TOM_1, KlasseType.FEIL, BigDecimal.valueOf(12000), BigDecimal.ZERO);
+        KravgrunnlagMock mockMedYtelPostering = new KravgrunnlagMock(FOM_1, TOM_1, KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(22000));
+
+        Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedFeilPostering2, mockMedYtelPostering));
+        KravgrunnlagAggregate kravgrunnlagAggregate = KravgrunnlagAggregate.builder()
+            .medGrunnlagØkonomi(kravgrunnlag431)
+            .medBehandlingId(INTERN_BEHANDLING_ID).build();
+
+        grunnlagRepository.lagre(kravgrunnlagAggregate);
+        vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(INTERN_BEHANDLING_ID, Lists.newArrayList(
+            new ForeldelsePeriodeDto(FOM_1, LocalDate.of(2016, 3, 20),
+                ForeldelseVurderingType.FORELDET, "ABC")));
+
+        FeilutbetalingPerioderDto perioderDto = vurdertForeldelseTjeneste.henteVurdertForeldelse(INTERN_BEHANDLING_ID);
+
+        assertThat(perioderDto.getPerioder().size()).isEqualTo(1);
+        perioderDto.getPerioder().sort(Comparator.comparing(PeriodeDto::getFom));
+        assertThat(perioderDto.getPerioder().get(0).getFom()).isEqualTo(FOM_1);
+        assertThat(perioderDto.getPerioder().get(0).getTom()).isEqualTo(LocalDate.of(2016, 3, 20));
+        assertThat(perioderDto.getPerioder().get(0).getForeldelseVurderingType()).isEqualTo(ForeldelseVurderingType.FORELDET);
+        assertThat(perioderDto.getPerioder().get(0).getBelop()).isEqualByComparingTo(BigDecimal.valueOf(7000));
+    }
+
+    @Test
+    public void henteVurdertForeldelse_medFlereForeldretPeriode() {
+        KravgrunnlagMock mockMedFeilPostering = new KravgrunnlagMock(FOM_1, LocalDate.of(2016, 3, 15), KlasseType.FEIL,
+            BigDecimal.valueOf(4000), BigDecimal.ZERO);
+        KravgrunnlagMock mockMedFeilPostering2 = new KravgrunnlagMock(LocalDate.of(2016, 3, 16),
+            LocalDate.of(2016, 3, 24), KlasseType.FEIL, BigDecimal.valueOf(14000), BigDecimal.ZERO);
+
+        KravgrunnlagMock mockMedFeilPostering3 = new KravgrunnlagMock(LocalDate.of(2016, 3, 26),
+            LocalDate.of(2016, 4, 03), KlasseType.FEIL, BigDecimal.valueOf(5000), BigDecimal.ZERO);
+        KravgrunnlagMock mockMedFeilPostering4 = new KravgrunnlagMock(LocalDate.of(2016, 4, 4),
+            TOM_1, KlasseType.FEIL, BigDecimal.valueOf(6000), BigDecimal.ZERO);
+
+        KravgrunnlagMock mockMedYtelPostering = new KravgrunnlagMock(FOM_1, TOM_1, KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(29000));
+
+        Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedFeilPostering2,
+            mockMedFeilPostering3, mockMedFeilPostering4, mockMedYtelPostering));
+        KravgrunnlagAggregate kravgrunnlagAggregate = KravgrunnlagAggregate.builder()
+            .medGrunnlagØkonomi(kravgrunnlag431)
+            .medBehandlingId(INTERN_BEHANDLING_ID).build();
+
+        grunnlagRepository.lagre(kravgrunnlagAggregate);
+        vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(INTERN_BEHANDLING_ID, Lists.newArrayList(
+            new ForeldelsePeriodeDto(FOM_1, LocalDate.of(2016, 3, 20),
+                ForeldelseVurderingType.FORELDET, "ABC"),
+            new ForeldelsePeriodeDto(LocalDate.of(2016, 3, 21), LocalDate.of(2016, 3, 24),
+                ForeldelseVurderingType.FORELDET, "CDE"),
+            new ForeldelsePeriodeDto(LocalDate.of(2016, 3, 26), TOM_1,
+                ForeldelseVurderingType.TILLEGGSFRIST, "EFG")));
+
+        FeilutbetalingPerioderDto perioderDto = vurdertForeldelseTjeneste.henteVurdertForeldelse(INTERN_BEHANDLING_ID);
+
+        assertThat(perioderDto.getPerioder().size()).isEqualTo(3);
+        perioderDto.getPerioder().sort(Comparator.comparing(PeriodeDto::getFom));
+        assertThat(perioderDto.getPerioder().get(0).getFom()).isEqualTo(FOM_1);
+        assertThat(perioderDto.getPerioder().get(0).getTom()).isEqualTo(LocalDate.of(2016, 3, 20));
+        assertThat(perioderDto.getPerioder().get(0).getForeldelseVurderingType()).isEqualTo(ForeldelseVurderingType.FORELDET);
+        assertThat(perioderDto.getPerioder().get(0).getBelop()).isEqualByComparingTo(BigDecimal.valueOf(10000));
+
+        assertThat(perioderDto.getPerioder().get(1).getFom()).isEqualTo(LocalDate.of(2016, 3, 21));
+        assertThat(perioderDto.getPerioder().get(1).getTom()).isEqualTo(LocalDate.of(2016, 3, 24));
+        assertThat(perioderDto.getPerioder().get(1).getForeldelseVurderingType()).isEqualTo(ForeldelseVurderingType.FORELDET);
+        assertThat(perioderDto.getPerioder().get(1).getBelop()).isEqualByComparingTo(BigDecimal.valueOf(8000));
+
+        assertThat(perioderDto.getPerioder().get(2).getFom()).isEqualTo(LocalDate.of(2016, 3, 26));
+        assertThat(perioderDto.getPerioder().get(2).getTom()).isEqualTo(TOM_1);
+        assertThat(perioderDto.getPerioder().get(2).getForeldelseVurderingType()).isEqualTo(ForeldelseVurderingType.TILLEGGSFRIST);
+        assertThat(perioderDto.getPerioder().get(2).getBelop()).isEqualByComparingTo(BigDecimal.valueOf(11000));
+    }
+
+    @Test
+    public void hentInitPerioder() {
+
+        LocalDate sisteDagFørstePeriode = LocalDate.of(2016, 3, 28);
+        LocalDate førsteDagAndrePeriode = LocalDate.of(2016, 3, 30);
+
+        KravgrunnlagMock mockMedFeilPostering = new KravgrunnlagMock(FOM_1, LocalDate.of(2016, 3, 23), KlasseType.FEIL,
+            BigDecimal.valueOf(10000), BigDecimal.ZERO);
+        KravgrunnlagMock mockMedFeilPostering2 = new KravgrunnlagMock(LocalDate.of(2016, 3, 24),
+            sisteDagFørstePeriode, KlasseType.FEIL, BigDecimal.valueOf(12000), BigDecimal.ZERO);
+        KravgrunnlagMock mockMedFeilPostering3 = new KravgrunnlagMock(førsteDagAndrePeriode,
+            TOM_1, KlasseType.FEIL, BigDecimal.valueOf(15000), BigDecimal.ZERO);
+
+        KravgrunnlagMock mockMedYtelPostering = new KravgrunnlagMock(FOM_1, TOM_1, KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(37000));
+
+        Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedFeilPostering2, mockMedFeilPostering3, mockMedYtelPostering));
+        KravgrunnlagAggregate kravgrunnlagAggregate = KravgrunnlagAggregate.builder()
+            .medGrunnlagØkonomi(kravgrunnlag431)
+            .medBehandlingId(INTERN_BEHANDLING_ID).build();
+        grunnlagRepository.lagre(kravgrunnlagAggregate);
+
+        Feilutbetaling feilutbetaling = new Feilutbetaling();
+
+        feilutbetaling.leggTilFeilutbetaltPeriode(formPeriodeÅrsak(FOM_1, sisteDagFørstePeriode,
+            UtsettelseÅrsakType.ARBEID.getKode(), UtsettelseArbeid.UTSETTELSE_ARBEID_HELTID.getKode(), feilutbetaling));
+
+        feilutbetaling.leggTilFeilutbetaltPeriode(formPeriodeÅrsak(førsteDagAndrePeriode, TOM_1,
+            UtsettelseÅrsakType.ARBEID.getKode(), UtsettelseArbeid.UTSETTELSE_ARBEID_DELTID.getKode(), feilutbetaling));
+
+        FeilutbetalingAggregate feilutbetalingAggregate = FeilutbetalingAggregate.builder()
+            .medBehandlingId(INTERN_BEHANDLING_ID)
+            .medFeilutbetaling(feilutbetaling).build();
+
+        feilutbetalingRepository.lagre(feilutbetalingAggregate);
+
+        FeilutbetalingPerioderDto feilutbetalingPerioder = vurdertForeldelseTjeneste.hentFaktaPerioder(INTERN_BEHANDLING_ID);
+        assertThat(feilutbetalingPerioder.getPerioder().size()).isEqualTo(2);
+
+        List<PeriodeDto> perioder = feilutbetalingPerioder.getPerioder();
+        perioder.sort(Comparator.comparing(PeriodeDto::getFom));
+
+        assertThat(perioder.get(0).getBelop()).isEqualTo(BigDecimal.valueOf(22000));
+        assertThat(perioder.get(0).getFom()).isEqualTo(FOM_1);
+        assertThat(perioder.get(0).getTom()).isEqualTo(sisteDagFørstePeriode);
+
+        assertThat(perioder.get(1).getBelop()).isEqualTo(BigDecimal.valueOf(15000));
+        assertThat(perioder.get(1).getFom()).isEqualTo(førsteDagAndrePeriode);
+        assertThat(perioder.get(1).getTom()).isEqualTo(TOM_1);
+    }
+
+    private FeilutbetalingPeriodeÅrsak formPeriodeÅrsak(LocalDate fom, LocalDate tom, String årsak, String underÅrsak, Feilutbetaling feilutbetaling) {
+        return FeilutbetalingPeriodeÅrsak.builder()
+            .medPeriode(fom, tom)
+            .medÅrsakKodeverk(årsak)
+            .medÅrsak(årsak)
+            .medUnderÅrsakKodeverk(underÅrsak)
+            .medUnderÅrsak(underÅrsak)
+            .medFeilutbetalinger(feilutbetaling).build();
+    }
+
+    private ForeldelseVurderingType finnForeldelseVurderingType(ForeldelseVurderingType foreldelseVurderingType) {
+        return repoProvider.getKodeverkRepository().finn(ForeldelseVurderingType.class, foreldelseVurderingType);
+    }
+
+    private Historikkinnslag fellesHistorikkInnslagAssert() {
+        List<Historikkinnslag> historikkInnslager = historikkRepository.hentHistorikkForSaksnummer(SAKSNUMMER);
+        assertThat(historikkInnslager).isNotEmpty();
+        assertThat(historikkInnslager.size()).isEqualTo(1);
+        Historikkinnslag historikkinnslag = historikkInnslager.get(0);
+        assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.FORELDELSE);
+        assertThat(historikkinnslag.getAktør()).isEqualByComparingTo(HistorikkAktør.SAKSBEHANDLER);
+        assertThat(historikkinnslag.getBehandlingId()).isEqualTo(INTERN_BEHANDLING_ID);
+        return historikkinnslag;
+    }
+
+}

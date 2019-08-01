@@ -1,0 +1,1 @@
+update aksjonspunkt_def set tilbakehopp_ved_gjenopptakelse = 'N' where kode = '7002' and vurderingspunkt = 'TBKGSTEG.UT' AND tilbakehopp_ved_gjenopptakelse = 'J';

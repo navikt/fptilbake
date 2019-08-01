@@ -1,0 +1,99 @@
+image: "repo.adeo.no:5443/fptilbake"
+team: teamforeldrepenger
+replicas:
+  min: 1
+  max: 3
+  cpuThresholdPercentage: 80
+port: 8080
+healthcheck:
+  liveness:
+    path: /fptilbake/internal/isAlive
+    initialDelay: 30
+    timeout: 5
+    periodSeconds: 10
+    failureThreshold: 27
+  readiness:
+    path: /fptilbake/internal/isReady
+    initialDelay: 30
+    timeout: 5
+    periodSeconds: 10
+    failureThreshold: 27
+preStopHookPath: /fptilbake/internal/preStop
+resources:
+  limits:
+    cpu: 1000m
+    memory: "1024Mi"
+  requests:
+    cpu: 200m
+    memory: "256Mi"
+ingress:
+  enabled: true
+fasitResources:
+  used:
+    - alias: defaultDS
+      resourceType: datasource
+    - alias: appdynamics
+      resourceType: ApplicationProperties
+    - alias: loadbalancer:fptilbake
+      resourceType: loadbalancerconfig
+      propertyMap:
+        url: LOADBALANCER_FQDN
+
+    #sikkerhet
+    - alias: srvfptilbake
+      resourceType: credential
+      propertyMap:
+        username: SYSTEMBRUKER_USERNAME
+        password: SYSTEMBRUKER_PASSWORD
+    - alias: fptilbake-oidc
+      resourceType: OpenIdConnect
+      propertyMap:
+        agentName: oidc_OpenAM.agentName
+        password: oidc_OpenAM.password
+        hostUrl: oidc_OpenAM.hostUrl
+        issuerUrl: oidc_OpenAM.issuerUrl
+        jwksUrl: oidc_OpenAM.jwksUrl
+    - alias: securityTokenService
+      resourceType: baseUrl
+    - alias: abac.pdp.endpoint
+      resourceType: restservice
+    - alias: fpsak_pip_aktoer_for_sak
+      resourceType: restservice
+
+    # integrasjoner
+    - alias: virksomhet:Person_v3
+      resourceType: webserviceendpoint
+      propertyMap:
+        endpointUrl: PERSON_V3_URL
+    - alias: tilbakekrevingService
+      resourceType: webserviceendpoint
+      propertyMap:
+        endpointUrl: TILBAKEKREVING_V1_URL
+    - alias: Aktoer_v2
+      resourceType: webserviceendpoint
+      propertyMap:
+        endpointUrl: AKTOER_V2_URL
+    - alias: ldap
+      resourceType: ldap
+    - alias: Journal_v3
+      resourceType: webserviceendpoint
+      propertyMap:
+        endpointUrl: JOURNAL_V3_URL
+    - alias: Dokumentproduksjon_v2
+      resourceType: webserviceendpoint
+      propertyMap:
+        endpointUrl: DOKUMENTPRODUKSJON_V2_URL
+    - alias: kafka-brokers
+      resourceType: baseUrl
+      propertyMap:
+        url: BOOTSTRAP_SERVERS
+    - alias: fp-tilkjentytelse-v1-topic
+      resourceType: baseUrl
+  # Køer
+    - alias: mqGateway02
+      resourceType: queuemanager
+  #FIXME PFP-7717 endre til fptilbake_channel når det kan bestilles i Basta
+    - alias: fpsak_channel
+      resourceType: channel
+    - alias: fptilbake_kravgrunnlag
+      resourceType: queue

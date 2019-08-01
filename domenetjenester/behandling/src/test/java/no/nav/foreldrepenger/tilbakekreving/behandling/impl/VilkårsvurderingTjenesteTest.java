@@ -1,0 +1,390 @@
+package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+
+import org.junit.Test;
+
+import com.google.common.collect.Lists;
+
+import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
+import no.nav.foreldrepenger.tilbakekreving.behandling.dto.DetaljertFeilutbetalingPeriodeDto;
+import no.nav.foreldrepenger.tilbakekreving.behandling.dto.ForeldelsePeriodeDto;
+import no.nav.foreldrepenger.tilbakekreving.behandling.dto.RedusertBeløpDto;
+import no.nav.foreldrepenger.tilbakekreving.behandling.dto.YtelseDto;
+import no.nav.foreldrepenger.tilbakekreving.behandling.dto.vilkår.VilkårResultatAnnetDto;
+import no.nav.foreldrepenger.tilbakekreving.behandling.dto.vilkår.VilkårResultatGodTroDto;
+import no.nav.foreldrepenger.tilbakekreving.behandling.dto.vilkår.VilkårsvurderingPerioderDto;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.Feilutbetaling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingAggregate;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingPeriodeÅrsak;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.UtsettelseArbeid;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.UtsettelseÅrsakType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingAggregateEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingPeriodeEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
+import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagAggregate;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMock;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMockUtil;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
+
+public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
+
+    private static final String AKTIVITET_FISKER = "Fisker";
+    private static final String AKTIVITET_ARBEIDSLEDIG = "Arbeidsledig";
+    private static final String AKTIVITET_SJØMANN = "Sjømann";
+    private static final LocalDate SISTE_DAG_I_FORELDELSE_PERIODE = LocalDate.of(2016, 4, 28);
+    private static final LocalDate FØRSTE_DAG_I_FORELDELSE_PERIODE = LocalDate.of(2016, 4, 29);
+
+    @Test
+    public void hentDetaljertFeilutbetalingPerioder_nårPerioderErForeldet() {
+        formGrunnlag();
+        formFeilutbetalingPeriodeMedÅrsak();
+
+        vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(INTERN_BEHANDLING_ID, Lists.newArrayList(
+            new ForeldelsePeriodeDto(FOM, SISTE_DAG_I_FORELDELSE_PERIODE,
+                ForeldelseVurderingType.FORELDET, "ABC"),
+            new ForeldelsePeriodeDto(FØRSTE_DAG_I_FORELDELSE_PERIODE, TOM,
+                ForeldelseVurderingType.IKKE_FORELDET, "CDE")));
+
+        List<DetaljertFeilutbetalingPeriodeDto> perioder = vilkårsvurderingTjeneste.hentDetaljertFeilutbetalingPerioder(INTERN_BEHANDLING_ID);
+        assertThat(perioder).isNotEmpty();
+        assertThat(perioder.size()).isEqualTo(2);
+        perioder.sort(Comparator.comparing(DetaljertFeilutbetalingPeriodeDto::getFom));
+
+        DetaljertFeilutbetalingPeriodeDto førstePeriode = perioder.get(0);
+        assertThat(førstePeriode.getOppfyltValg()).isEqualByComparingTo(VilkårResultat.UDEFINERT);
+        assertThat(førstePeriode.getFom()).isEqualTo(FOM);
+        assertThat(førstePeriode.getTom()).isEqualTo(SISTE_DAG_I_FORELDELSE_PERIODE);
+        assertThat(førstePeriode.getÅrsak().getÅrsakKode()).isEqualTo(UtsettelseÅrsakType.ARBEID.getKode());
+        assertThat(førstePeriode.getÅrsak().getUnderÅrsaker().get(0).getUnderÅrsakKode()).isEqualTo(UtsettelseArbeid.UTSETTELSE_ARBEID_HELTID.getKode());
+        assertThat(førstePeriode.getFeilutbetaling()).isEqualByComparingTo(BigDecimal.valueOf(31000));
+        assertThat(førstePeriode.isForeldet()).isTrue();
+
+        assertThat(førstePeriode.getYtelser().size()).isEqualTo(2);
+        førstePeriode.getYtelser().sort(Comparator.comparing(YtelseDto::getAktivitet));
+        assertThat(førstePeriode.getYtelser().get(0).getAktivitet()).isEqualTo(AKTIVITET_ARBEIDSLEDIG);
+        assertThat(førstePeriode.getYtelser().get(0).getBelop()).isEqualByComparingTo(BigDecimal.valueOf(11000));
+        assertThat(førstePeriode.getYtelser().get(1).getAktivitet()).isEqualTo(AKTIVITET_FISKER);
+        assertThat(førstePeriode.getYtelser().get(1).getBelop()).isEqualByComparingTo(BigDecimal.valueOf(20000));
+        assertThat(førstePeriode.getRedusertBeloper().size()).isEqualTo(0);
+
+        DetaljertFeilutbetalingPeriodeDto andrePeriode = perioder.get(1);
+        assertThat(andrePeriode.getOppfyltValg()).isEqualByComparingTo(VilkårResultat.UDEFINERT);
+        assertThat(andrePeriode.getFom()).isEqualTo(FØRSTE_DAG_I_FORELDELSE_PERIODE);
+        assertThat(andrePeriode.getTom()).isEqualTo(TOM);
+        assertThat(andrePeriode.getÅrsak().getÅrsakKode()).isEqualTo(UtsettelseÅrsakType.ARBEID.getKode());
+        assertThat(andrePeriode.getÅrsak().getUnderÅrsaker().get(0).getUnderÅrsakKode()).isEqualTo(UtsettelseArbeid.UTSETTELSE_ARBEID_HELTID.getKode());
+        assertThat(andrePeriode.getFeilutbetaling()).isEqualByComparingTo(BigDecimal.valueOf(20000));
+        assertThat(andrePeriode.isForeldet()).isFalse();
+
+        assertThat(andrePeriode.getYtelser().size()).isEqualTo(2);
+        andrePeriode.getYtelser().sort(Comparator.comparing(YtelseDto::getAktivitet));
+        assertThat(andrePeriode.getYtelser().get(0).getAktivitet()).isEqualTo(AKTIVITET_FISKER);
+        assertThat(andrePeriode.getYtelser().get(0).getBelop()).isEqualByComparingTo(BigDecimal.valueOf(1000));
+        assertThat(andrePeriode.getYtelser().get(1).getAktivitet()).isEqualTo(AKTIVITET_SJØMANN);
+        assertThat(andrePeriode.getYtelser().get(1).getBelop()).isEqualByComparingTo(BigDecimal.valueOf(19000));
+        assertThat(andrePeriode.getRedusertBeloper().size()).isEqualTo(0);
+    }
+
+    @Test
+    public void hentDetaljertFeilutbetalingPerioder_nårPerioderErIkkeVurderesForForeldet() {
+        formGrunnlag();
+        formFeilutbetalingPeriodeMedÅrsak();
+
+        List<DetaljertFeilutbetalingPeriodeDto> perioder = vilkårsvurderingTjeneste.hentDetaljertFeilutbetalingPerioder(INTERN_BEHANDLING_ID);
+        assertThat(perioder).isNotEmpty();
+        assertThat(perioder.size()).isEqualTo(1);
+        DetaljertFeilutbetalingPeriodeDto periode = perioder.get(0);
+        assertThat(periode.getFom()).isEqualTo(FOM);
+        assertThat(periode.getTom()).isEqualTo(TOM);
+        assertThat(periode.getOppfyltValg()).isEqualByComparingTo(VilkårResultat.UDEFINERT);
+        assertThat(periode.getFeilutbetaling()).isEqualByComparingTo(BigDecimal.valueOf(51000));
+        assertThat(periode.getÅrsak().getÅrsakKode()).isEqualTo(UtsettelseÅrsakType.ARBEID.getKode());
+        assertThat(periode.getÅrsak().getUnderÅrsaker().get(0).getUnderÅrsakKode()).isEqualTo(UtsettelseArbeid.UTSETTELSE_ARBEID_HELTID.getKode());
+        assertThat(periode.isForeldet()).isFalse();
+
+        assertThat(periode.getYtelser().size()).isEqualTo(3);
+        periode.getYtelser().sort(Comparator.comparing(YtelseDto::getAktivitet));
+        assertThat(periode.getYtelser().get(0).getAktivitet()).isEqualTo(AKTIVITET_ARBEIDSLEDIG);
+        assertThat(periode.getYtelser().get(0).getBelop()).isEqualByComparingTo(BigDecimal.valueOf(11000));
+        assertThat(periode.getYtelser().get(1).getAktivitet()).isEqualTo(AKTIVITET_FISKER);
+        assertThat(periode.getYtelser().get(1).getBelop()).isEqualByComparingTo(BigDecimal.valueOf(21000));
+        assertThat(periode.getYtelser().get(2).getAktivitet()).isEqualTo(AKTIVITET_SJØMANN);
+        assertThat(periode.getYtelser().get(2).getBelop()).isEqualByComparingTo(BigDecimal.valueOf(19000));
+        assertThat(periode.getRedusertBeloper().size()).isEqualTo(0);
+    }
+
+    @Test
+    public void hentDetaljertFeilutbetalingPerioder_nårPerioderErIkkeVurderesForForeldet_medRedusertBeløp() {
+        KravgrunnlagMock mockMedFeilPostering = new KravgrunnlagMock(FOM, LocalDate.of(2016, 3, 31), KlasseType.FEIL,
+            BigDecimal.valueOf(11000), BigDecimal.ZERO);
+        KravgrunnlagMock mockMedYtelPostering = new KravgrunnlagMock(FOM, LocalDate.of(2016, 3, 31),
+            KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(11000));
+        mockMedYtelPostering.setKlasseKode(KlasseKode.FPADATAL);
+        KravgrunnlagMock mockMedTrekPostering = new KravgrunnlagMock(FOM, LocalDate.of(2016, 3, 31),
+            KlasseType.TREK, BigDecimal.valueOf(5000), BigDecimal.ZERO);
+        mockMedTrekPostering.setKlasseKode(KlasseKode.FPADATAL);
+
+        KravgrunnlagMock mockMedFeilPostering1 = new KravgrunnlagMock(LocalDate.of(2016, 4, 1), LocalDate.of(2016, 4, 30), KlasseType.FEIL,
+            BigDecimal.valueOf(21000), BigDecimal.ZERO);
+        KravgrunnlagMock mockMedYtelPostering1 = new KravgrunnlagMock(LocalDate.of(2016, 4, 1), LocalDate.of(2016, 4, 30),
+            KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(21000));
+        mockMedYtelPostering1.setKlasseKode(KlasseKode.FPADSNDFI);
+        KravgrunnlagMock mockMedYtelPostering2 = new KravgrunnlagMock(LocalDate.of(2016, 4, 1), LocalDate.of(2016, 4, 30),
+            KlasseType.YTEL, BigDecimal.valueOf(3000), BigDecimal.ZERO);
+        mockMedYtelPostering2.setKlasseKode(KlasseKode.FPADSNDFI);
+
+        Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedFeilPostering1,
+            mockMedYtelPostering, mockMedYtelPostering1, mockMedYtelPostering2, mockMedTrekPostering));
+        KravgrunnlagAggregate kravgrunnlagAggregate = KravgrunnlagAggregate.builder()
+            .medGrunnlagØkonomi(kravgrunnlag431)
+            .medBehandlingId(INTERN_BEHANDLING_ID).build();
+        grunnlagRepository.lagre(kravgrunnlagAggregate);
+
+        formFeilutbetalingPeriodeMedÅrsak();
+
+        List<DetaljertFeilutbetalingPeriodeDto> perioder = vilkårsvurderingTjeneste.hentDetaljertFeilutbetalingPerioder(INTERN_BEHANDLING_ID);
+        assertThat(perioder).isNotEmpty();
+        assertThat(perioder.size()).isEqualTo(1);
+        DetaljertFeilutbetalingPeriodeDto periode = perioder.get(0);
+        assertThat(periode.getFeilutbetaling()).isEqualByComparingTo(BigDecimal.valueOf(32000));
+        assertThat(periode.getÅrsak().getÅrsakKode()).isEqualTo(UtsettelseÅrsakType.ARBEID.getKode());
+        assertThat(periode.getÅrsak().getUnderÅrsaker().get(0).getUnderÅrsakKode()).isEqualTo(UtsettelseArbeid.UTSETTELSE_ARBEID_HELTID.getKode());
+        assertThat(periode.isForeldet()).isFalse();
+
+        assertThat(periode.getRedusertBeloper().size()).isEqualTo(2);
+        periode.getRedusertBeloper().sort(Comparator.comparing(RedusertBeløpDto::getBelop));
+        RedusertBeløpDto førsteRedusertBeløp = periode.getRedusertBeloper().get(0);
+        assertThat(førsteRedusertBeløp.getBelop()).isEqualByComparingTo(BigDecimal.valueOf(3000l));
+        assertThat(førsteRedusertBeløp.isErTrekk()).isEqualTo(false);
+
+        RedusertBeløpDto andreRedusertBeløp = periode.getRedusertBeloper().get(1);
+        assertThat(andreRedusertBeløp.getBelop()).isEqualByComparingTo(BigDecimal.valueOf(5000l));
+        assertThat(andreRedusertBeløp.isErTrekk()).isEqualTo(true);
+    }
+
+    @Test
+    public void lagreVilkårsvurdering_medGodTroOgForsettAktsomhet() {
+        List<VilkårsvurderingPerioderDto> vilkårPerioder = Lists.newArrayList(
+            formVilkårsvurderingPerioderDto(VilkårResultat.GOD_TRO, FOM, LocalDate.of(2016, 3, 31), null),
+            formVilkårsvurderingPerioderDto(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER, LocalDate.of(2016, 4, 1), TOM, Aktsomhet.FORSETT));
+        vilkårsvurderingTjeneste.lagreVilkårsvurdering(INTERN_BEHANDLING_ID, vilkårPerioder);
+
+        Optional<VilkårVurderingAggregateEntitet> aggregateEntitet = repoProvider.getVilkårsvurderingRepository().finnVilkårsvurderingForBehandlingId(INTERN_BEHANDLING_ID);
+        assertThat(aggregateEntitet).isNotEmpty();
+        assertThat(aggregateEntitet.get().isAktiv()).isTrue();
+        VilkårVurderingEntitet vilkårEntitet = aggregateEntitet.get().getManuellVilkår();
+        List<VilkårVurderingPeriodeEntitet> periodene = new ArrayList<>(vilkårEntitet.getPerioder());
+        assertThat(periodene.size()).isEqualTo(2);
+        periodene.sort(PERIODE_FOM_COMPARATOR);
+
+        VilkårVurderingPeriodeEntitet førstePeriode = periodene.get(0);
+        assertThat(førstePeriode.getPeriode()).isEqualTo(Periode.of(FOM, LocalDate.of(2016, 3, 31)));
+        assertThat(førstePeriode.getAktsomhet()).isNull();
+        assertThat(førstePeriode.getGodTro().isBeløpErIBehold()).isTrue();
+        assertThat(førstePeriode.getGodTro().getBeløpTilbakekreves()).isEqualByComparingTo(BigDecimal.valueOf(1000.00));
+
+        VilkårVurderingPeriodeEntitet andrePeriode = periodene.get(1);
+        assertThat(andrePeriode.getPeriode()).isEqualTo(Periode.of(LocalDate.of(2016, 4, 1), TOM));
+        assertThat(andrePeriode.getGodTro()).isNull();
+        assertThat(andrePeriode.getAktsomhet().getAktsomhet()).isEqualByComparingTo(Aktsomhet.FORSETT);
+    }
+
+    @Test
+    public void lagreVilkårsvurdering_medSimpelOgGrøvtAktsomhet() {
+        List<VilkårsvurderingPerioderDto> vilkårPerioder = Lists.newArrayList(
+            formVilkårsvurderingPerioderDto(VilkårResultat.FORSTO_BURDE_FORSTÅTT, FOM, LocalDate.of(2016, 3, 31), Aktsomhet.SIMPEL_UAKTSOM),
+            formVilkårsvurderingPerioderDto(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER, LocalDate.of(2016, 4, 1), TOM, Aktsomhet.GROVT_UAKTSOM));
+        vilkårsvurderingTjeneste.lagreVilkårsvurdering(INTERN_BEHANDLING_ID, vilkårPerioder);
+
+        Optional<VilkårVurderingAggregateEntitet> aggregateEntitet = repoProvider.getVilkårsvurderingRepository().finnVilkårsvurderingForBehandlingId(INTERN_BEHANDLING_ID);
+        assertThat(aggregateEntitet).isNotEmpty();
+        assertThat(aggregateEntitet.get().isAktiv()).isTrue();
+        VilkårVurderingEntitet vilkårEntitet = aggregateEntitet.get().getManuellVilkår();
+        List<VilkårVurderingPeriodeEntitet> periodene = new ArrayList<>(vilkårEntitet.getPerioder());
+        periodene.sort(PERIODE_FOM_COMPARATOR);
+
+        assertThat(periodene.size()).isEqualTo(2);
+
+        VilkårVurderingPeriodeEntitet førstePeriode = periodene.get(0);
+        assertThat(førstePeriode.getPeriode()).isEqualTo(Periode.of(FOM, LocalDate.of(2016, 3, 31)));
+        assertThat(førstePeriode.getGodTro()).isNull();
+        assertThat(førstePeriode.getAktsomhet().getAktsomhet()).isEqualByComparingTo(Aktsomhet.SIMPEL_UAKTSOM);
+        assertThat(førstePeriode.getAktsomhet().getManueltTilbakekrevesBeløp()).isEqualByComparingTo(BigDecimal.valueOf(2000.00));
+        assertThat(førstePeriode.getAktsomhet().getSærligGrunnerTilReduksjon()).isTrue();
+        assertThat(førstePeriode.getAktsomhet().getSærligGrunner().size()).isEqualTo(2);
+
+        VilkårVurderingPeriodeEntitet andrePeriode = periodene.get(1);
+        assertThat(andrePeriode.getPeriode()).isEqualTo(Periode.of(LocalDate.of(2016, 4, 1), TOM));
+        assertThat(andrePeriode.getGodTro()).isNull();
+        assertThat(andrePeriode.getAktsomhet().getAktsomhet()).isEqualByComparingTo(Aktsomhet.GROVT_UAKTSOM);
+        assertThat(andrePeriode.getAktsomhet().getAndelSomTilbakekreves()).isEqualByComparingTo(100);
+        assertThat(andrePeriode.getAktsomhet().getSærligGrunnerTilReduksjon()).isFalse();
+        assertThat(andrePeriode.getAktsomhet().getIleggRenter()).isTrue();
+        assertThat(andrePeriode.getAktsomhet().getSærligGrunner().size()).isEqualTo(2);
+    }
+
+    @Test
+    public void lagreVilkårsvurdering_medSimpelOgGrøvtAktsomhet_nårEnPeriodeErForeldet() {
+        formGrunnlag();
+        formFeilutbetalingPeriodeMedÅrsak();
+
+        vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(INTERN_BEHANDLING_ID, Lists.newArrayList(
+            new ForeldelsePeriodeDto(FOM, SISTE_DAG_I_FORELDELSE_PERIODE,
+                ForeldelseVurderingType.FORELDET, "ABC"),
+            new ForeldelsePeriodeDto(FØRSTE_DAG_I_FORELDELSE_PERIODE, TOM,
+                ForeldelseVurderingType.IKKE_FORELDET, "CDE")));
+
+        List<VilkårsvurderingPerioderDto> vilkårPerioder = Lists.newArrayList(
+            formVilkårsvurderingPerioderDto(VilkårResultat.FORSTO_BURDE_FORSTÅTT, FOM, SISTE_DAG_I_FORELDELSE_PERIODE, Aktsomhet.SIMPEL_UAKTSOM),
+            formVilkårsvurderingPerioderDto(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER, FØRSTE_DAG_I_FORELDELSE_PERIODE, TOM, Aktsomhet.GROVT_UAKTSOM));
+        vilkårsvurderingTjeneste.lagreVilkårsvurdering(INTERN_BEHANDLING_ID, vilkårPerioder);
+
+        Optional<VilkårVurderingAggregateEntitet> aggregateEntitet = repoProvider.getVilkårsvurderingRepository().finnVilkårsvurderingForBehandlingId(INTERN_BEHANDLING_ID);
+        assertThat(aggregateEntitet).isNotEmpty();
+        assertThat(aggregateEntitet.get().isAktiv()).isTrue();
+        VilkårVurderingEntitet vilkårEntitet = aggregateEntitet.get().getManuellVilkår();
+        assertThat(vilkårEntitet.getPerioder().size()).isEqualTo(1);
+
+        VilkårVurderingPeriodeEntitet periode = vilkårEntitet.getPerioder().get(0);
+        assertThat(periode.getPeriode()).isEqualTo(Periode.of(FØRSTE_DAG_I_FORELDELSE_PERIODE, TOM));
+        assertThat(periode.getGodTro()).isNull();
+        assertThat(periode.getAktsomhet().getAktsomhet()).isEqualByComparingTo(Aktsomhet.GROVT_UAKTSOM);
+        assertThat(periode.getAktsomhet().getAndelSomTilbakekreves()).isEqualByComparingTo(100);
+        assertThat(periode.getAktsomhet().getSærligGrunnerTilReduksjon()).isFalse();
+        assertThat(periode.getAktsomhet().getIleggRenter()).isTrue();
+        assertThat(periode.getAktsomhet().getSærligGrunner().size()).isEqualTo(2);
+    }
+
+    @Test
+    public void hentVilkårsvurdering_medGodTroOgForsettAktsomhet() {
+        List<VilkårsvurderingPerioderDto> vilkårPerioder = Lists.newArrayList(
+            formVilkårsvurderingPerioderDto(VilkårResultat.GOD_TRO, FOM, LocalDate.of(2016, 3, 31), null),
+            formVilkårsvurderingPerioderDto(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER, LocalDate.of(2016, 4, 1), TOM, Aktsomhet.FORSETT));
+        vilkårsvurderingTjeneste.lagreVilkårsvurdering(INTERN_BEHANDLING_ID, vilkårPerioder);
+
+        formGrunnlag();
+
+        List<VilkårsvurderingPerioderDto> perioder = vilkårsvurderingTjeneste.hentVilkårsvurdering(INTERN_BEHANDLING_ID);
+        assertThat(perioder.size()).isEqualTo(2);
+        perioder.sort(Comparator.comparing(VilkårsvurderingPerioderDto::getFom));
+
+        VilkårsvurderingPerioderDto førstePeriode = perioder.get(0);
+        assertThat(førstePeriode.getFom()).isEqualTo(FOM);
+        assertThat(førstePeriode.getTom()).isEqualTo(LocalDate.of(2016, 3, 31));
+        assertThat(førstePeriode.getVilkårResultat()).isEqualByComparingTo(VilkårResultat.GOD_TRO);
+        assertThat(førstePeriode.getFeilutbetalingBelop()).isEqualByComparingTo(BigDecimal.valueOf(11000.00));
+
+        VilkårResultatGodTroDto godTroDto = (VilkårResultatGodTroDto) førstePeriode.getVilkarResultatInfo();
+        assertThat(godTroDto.getErBelopetIBehold()).isTrue();
+        assertThat(godTroDto.getTilbakekrevesBelop()).isEqualByComparingTo(BigDecimal.valueOf(1000.00));
+
+        VilkårsvurderingPerioderDto andrePeriode = perioder.get(1);
+        assertThat(andrePeriode.getFom()).isEqualTo(LocalDate.of(2016, 4, 1));
+        assertThat(andrePeriode.getTom()).isEqualTo(TOM);
+        assertThat(andrePeriode.getVilkårResultat()).isEqualByComparingTo(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER);
+        assertThat(andrePeriode.getFeilutbetalingBelop()).isEqualByComparingTo(BigDecimal.valueOf(40000.00));
+
+        VilkårResultatAnnetDto annetDto = (VilkårResultatAnnetDto) andrePeriode.getVilkarResultatInfo();
+        assertThat(annetDto.getAktsomhet()).isEqualByComparingTo(Aktsomhet.FORSETT);
+        assertThat(annetDto.getAktsomhetInfo()).isNull();
+    }
+
+    @Test
+    public void hentVilkårsvurdering_medSimpelOgGrøvtAktsomhet() {
+        List<VilkårsvurderingPerioderDto> vilkårPerioder = Lists.newArrayList(
+            formVilkårsvurderingPerioderDto(VilkårResultat.FORSTO_BURDE_FORSTÅTT, FOM, LocalDate.of(2016, 3, 31), Aktsomhet.SIMPEL_UAKTSOM),
+            formVilkårsvurderingPerioderDto(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER, LocalDate.of(2016, 4, 1), TOM, Aktsomhet.GROVT_UAKTSOM));
+        vilkårsvurderingTjeneste.lagreVilkårsvurdering(INTERN_BEHANDLING_ID, vilkårPerioder);
+
+        formGrunnlag();
+
+        List<VilkårsvurderingPerioderDto> perioder = vilkårsvurderingTjeneste.hentVilkårsvurdering(INTERN_BEHANDLING_ID);
+        assertThat(perioder.size()).isEqualTo(2);
+        perioder.sort(Comparator.comparing(VilkårsvurderingPerioderDto::getFom));
+
+        VilkårsvurderingPerioderDto førstePeriode = perioder.get(0);
+        assertThat(førstePeriode.getFom()).isEqualTo(FOM);
+        assertThat(førstePeriode.getTom()).isEqualTo(LocalDate.of(2016, 3, 31));
+        assertThat(førstePeriode.getVilkårResultat()).isEqualByComparingTo(VilkårResultat.FORSTO_BURDE_FORSTÅTT);
+        assertThat(førstePeriode.getFeilutbetalingBelop()).isEqualByComparingTo(BigDecimal.valueOf(11000.00));
+
+        VilkårResultatAnnetDto annetDto = (VilkårResultatAnnetDto) førstePeriode.getVilkarResultatInfo();
+        assertThat(annetDto.getAktsomhet()).isEqualByComparingTo(Aktsomhet.SIMPEL_UAKTSOM);
+        assertThat(annetDto.getAktsomhetInfo().getTilbakekrevesBelop()).isEqualByComparingTo(BigDecimal.valueOf(2000.00));
+        assertThat(annetDto.getAktsomhetInfo().isHarGrunnerTilReduksjon()).isTrue();
+        assertThat(annetDto.getAktsomhetInfo().getSærligeGrunner().size()).isEqualTo(2);
+
+        VilkårsvurderingPerioderDto andrePeriode = perioder.get(1);
+        assertThat(andrePeriode.getFom()).isEqualTo(LocalDate.of(2016, 4, 1));
+        assertThat(andrePeriode.getTom()).isEqualTo(TOM);
+        assertThat(andrePeriode.getVilkårResultat()).isEqualByComparingTo(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER);
+        assertThat(andrePeriode.getFeilutbetalingBelop()).isEqualByComparingTo(BigDecimal.valueOf(40000.00));
+
+        annetDto = (VilkårResultatAnnetDto) andrePeriode.getVilkarResultatInfo();
+        assertThat(annetDto.getAktsomhet()).isEqualByComparingTo(Aktsomhet.GROVT_UAKTSOM);
+        assertThat(annetDto.getAktsomhetInfo().getAndelTilbakekreves()).isEqualByComparingTo(100);
+        assertThat(annetDto.getAktsomhetInfo().isHarGrunnerTilReduksjon()).isFalse();
+        assertThat(annetDto.getAktsomhetInfo().isIleggRenter()).isTrue();
+        assertThat(annetDto.getAktsomhetInfo().getSærligeGrunner().size()).isEqualTo(2);
+
+    }
+
+    private void formGrunnlag() {
+        KravgrunnlagMock mockMedFeilPostering = new KravgrunnlagMock(FOM, LocalDate.of(2016, 3, 31), KlasseType.FEIL,
+            BigDecimal.valueOf(11000), BigDecimal.ZERO);
+        KravgrunnlagMock mockMedYtelPostering = new KravgrunnlagMock(FOM, LocalDate.of(2016, 3, 31),
+            KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(11000));
+        mockMedYtelPostering.setKlasseKode(KlasseKode.FPADATAL);
+
+        KravgrunnlagMock mockMedFeilPostering1 = new KravgrunnlagMock(LocalDate.of(2016, 4, 1), LocalDate.of(2016, 4, 30), KlasseType.FEIL,
+            BigDecimal.valueOf(21000), BigDecimal.ZERO);
+        KravgrunnlagMock mockMedYtelPostering1 = new KravgrunnlagMock(LocalDate.of(2016, 4, 1), LocalDate.of(2016, 4, 30),
+            KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(21000));
+        mockMedYtelPostering1.setKlasseKode(KlasseKode.FPADSNDFI);
+
+        KravgrunnlagMock mockMedFeilPostering2 = new KravgrunnlagMock(LocalDate.of(2016, 5, 1), TOM, KlasseType.FEIL,
+            BigDecimal.valueOf(19000), BigDecimal.ZERO);
+        KravgrunnlagMock mockMedYtelPostering2 = new KravgrunnlagMock(LocalDate.of(2016, 5, 1), TOM,
+            KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(19000));
+        mockMedYtelPostering2.setKlasseKode(KlasseKode.FPADATSJO);
+
+        Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedFeilPostering1, mockMedFeilPostering2,
+            mockMedYtelPostering, mockMedYtelPostering1, mockMedYtelPostering2));
+        KravgrunnlagAggregate kravgrunnlagAggregate = KravgrunnlagAggregate.builder()
+            .medGrunnlagØkonomi(kravgrunnlag431)
+            .medBehandlingId(INTERN_BEHANDLING_ID).build();
+        grunnlagRepository.lagre(kravgrunnlagAggregate);
+    }
+
+    private void formFeilutbetalingPeriodeMedÅrsak() {
+        Feilutbetaling feilutbetaling = new Feilutbetaling();
+        FeilutbetalingPeriodeÅrsak feilutbetalingPeriodeÅrsak = FeilutbetalingPeriodeÅrsak.builder()
+            .medPeriode(FOM, TOM)
+            .medÅrsak(UtsettelseÅrsakType.ARBEID.getKode()).medÅrsakKodeverk(UtsettelseÅrsakType.ARBEID.getKodeverk())
+            .medUnderÅrsak(UtsettelseArbeid.UTSETTELSE_ARBEID_HELTID.getKode()).medUnderÅrsakKodeverk(UtsettelseArbeid.UTSETTELSE_ARBEID_HELTID.getKodeverk())
+            .medFeilutbetalinger(feilutbetaling)
+            .build();
+        feilutbetaling.leggTilFeilutbetaltPeriode(feilutbetalingPeriodeÅrsak);
+
+        FeilutbetalingAggregate feilutbetalingAggregate = FeilutbetalingAggregate.builder()
+            .medBehandlingId(INTERN_BEHANDLING_ID)
+            .medFeilutbetaling(feilutbetaling).build();
+        feilutbetalingRepository.lagre(feilutbetalingAggregate);
+    }
+
+    private static Comparator<VilkårVurderingPeriodeEntitet> PERIODE_FOM_COMPARATOR = Comparator.comparing(o -> o.getPeriode().getFom());
+}

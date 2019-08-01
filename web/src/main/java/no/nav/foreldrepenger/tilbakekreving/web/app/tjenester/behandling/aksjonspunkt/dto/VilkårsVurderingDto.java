@@ -1,0 +1,33 @@
+package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto;
+
+import java.util.List;
+
+import javax.validation.Valid;
+import javax.validation.constraints.Size;
+
+import com.fasterxml.jackson.annotation.JsonTypeName;
+
+import no.nav.foreldrepenger.tilbakekreving.behandling.dto.vilkår.VilkårsvurderingPerioderDto;
+
+@JsonTypeName(VilkårsVurderingDto.AKSJONSPUNKT_KODE)
+public class VilkårsVurderingDto extends BekreftetAksjonspunktDto {
+
+    static final String AKSJONSPUNKT_KODE = "5002";
+
+    @Size(min = 1)
+    @Valid
+    private List<VilkårsvurderingPerioderDto> vilkarsVurdertePerioder;
+
+    @Override
+    public String getKode() {
+        return AKSJONSPUNKT_KODE;
+    }
+
+    public List<VilkårsvurderingPerioderDto> getVilkarsVurdertePerioder() {
+        return vilkarsVurdertePerioder;
+    }
+
+    public void setVilkarsVurdertePerioder(List<VilkårsvurderingPerioderDto> vilkarsVurdertePerioder) {
+        this.vilkarsVurdertePerioder = vilkarsVurdertePerioder;
+    }
+}

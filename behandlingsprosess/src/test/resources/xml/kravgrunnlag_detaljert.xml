@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<urn:detaljertKravgrunnlagMelding xmlns:urn="urn:no:nav:tilbakekreving:kravgrunnlag:detalj:v1"
+                                  xmlns:mmel="urn:no:nav:tilbakekreving:typer:v1">
+    <urn:detaljertKravgrunnlag>
+        <urn:kravgrunnlagId>123456789</urn:kravgrunnlagId>
+        <urn:vedtakId>100</urn:vedtakId>
+        <urn:kodeStatusKrav>string</urn:kodeStatusKrav>
+        <urn:kodeFagomraade>string</urn:kodeFagomraade>
+        <urn:fagsystemId>string</urn:fagsystemId>
+        <!--Optional:-->
+        <urn:datoVedtakFagsystem>2007-10-26</urn:datoVedtakFagsystem>
+        <!--Optional:-->
+        <urn:vedtakIdOmgjort>100</urn:vedtakIdOmgjort>
+        <urn:vedtakGjelderId>12345678901</urn:vedtakGjelderId>
+        <urn:typeGjelderId>PERSON</urn:typeGjelderId>
+        <urn:utbetalesTilId>12345678901</urn:utbetalesTilId>
+        <urn:typeUtbetId>PERSON</urn:typeUtbetId>
+        <!--Optional:-->
+        <urn:kodeHjemmel>string</urn:kodeHjemmel>
+        <!--Optional:-->
+        <urn:renterBeregnes>J</urn:renterBeregnes>
+        <urn:enhetAnsvarlig>string</urn:enhetAnsvarlig>
+        <urn:enhetBosted>string</urn:enhetBosted>
+        <urn:enhetBehandl>string</urn:enhetBehandl>
+        <urn:kontrollfelt>string</urn:kontrollfelt>
+        <urn:saksbehId>string</urn:saksbehId>
+        <!--Optional:-->
+        <urn:referanse>string</urn:referanse>
+        <!--1 or more repetitions:-->
+        <urn:tilbakekrevingsPeriode>
+            <urn:periode>
+                <mmel:fom>2018-11-01+01:00</mmel:fom>
+                <mmel:tom>2013-05-22+02:00</mmel:tom>
+            </urn:periode>
+            <!--1 or more repetitions:-->
+            <urn:tilbakekrevingsBelop>
+                <urn:kodeKlasse>s</urn:kodeKlasse>
+                <urn:typeKlasse>TREK</urn:typeKlasse>
+                <!--Optional:-->
+                <urn:belopOpprUtbet>1000.00</urn:belopOpprUtbet>
+                <urn:belopNy>1000.00</urn:belopNy>
+                <!--Optional:-->
+                <urn:belopTilbakekreves>1000.00</urn:belopTilbakekreves>
+                <!--Optional:-->
+                <urn:belopUinnkrevd>1000.00</urn:belopUinnkrevd>
+                <!--Optional:-->
+                <urn:kodeResultat>string</urn:kodeResultat>
+                <!--Optional:-->
+                <urn:kodeAArsak>string</urn:kodeAArsak>
+                <!--Optional:-->
+                <urn:kodeSkyld>string</urn:kodeSkyld>
+            </urn:tilbakekrevingsBelop>
+        </urn:tilbakekrevingsPeriode>
+    </urn:detaljertKravgrunnlag>
+</urn:detaljertKravgrunnlagMelding>

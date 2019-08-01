@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://xmlns.jcp.org/xml/ns/persistence/orm"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence/orm
+      http://xmlns.jcp.org/xml/ns/persistence/orm_2_1.xsd"
+                 version="2.1">
+
+    <sequence-generator name="SEQ_GR_VILKAAR" allocation-size="50" sequence-name="SEQ_GR_VILKAAR"/>
+    <sequence-generator name="SEQ_VILKAAR" allocation-size="50" sequence-name="SEQ_VILKAAR"/>
+    <sequence-generator name="SEQ_VILKAAR_PERIODE" allocation-size="50" sequence-name="SEQ_VILKAAR_PERIODE"/>
+    <sequence-generator name="SEQ_VILKAAR_AKTSOMHET" allocation-size="50" sequence-name="SEQ_VILKAAR_AKTSOMHET"/>
+    <sequence-generator name="SEQ_VILKAAR_SAERLIG_GRUNN" allocation-size="50" sequence-name="SEQ_VILKAAR_SAERLIG_GRUNN"/>
+
+
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Inntektskategori"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.NavOppfulgt"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.SærligGrunn"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat"/>
+
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingAggregateEntitet"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingEntitet"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingPeriodeEntitet"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingGodTroEntitet"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingAktsomhetEntitet"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingSærligGrunnEntitet"/>
+</entity-mappings>

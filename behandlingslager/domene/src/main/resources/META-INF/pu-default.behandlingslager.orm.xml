@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://xmlns.jcp.org/xml/ns/persistence/orm"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence/orm
+      http://xmlns.jcp.org/xml/ns/persistence/orm_2_1.xsd"
+                 version="2.1">
+
+    <sequence-generator name="SEQ_AKSJONSPUNKT" allocation-size="50" sequence-name="SEQ_AKSJONSPUNKT"/>
+    <sequence-generator name="SEQ_BEHANDLING" allocation-size="50" sequence-name="SEQ_BEHANDLING"/>
+    <sequence-generator name="SEQ_BEHANDLING_STEG_TILSTAND" allocation-size="50" sequence-name="SEQ_BEHANDLING_STEG_TILSTAND"/>
+    <sequence-generator name="SEQ_BEHANDLING_TYPE_STEG_SEKV" allocation-size="50" sequence-name="SEQ_BEHANDLING_STEG_TYPE_SEKV"/>
+    <sequence-generator name="SEQ_BRUKER" allocation-size="50" sequence-name="SEQ_BRUKER"/>
+    <sequence-generator name="SEQ_FAGSAK_PROSESS_TASK" allocation-size="50" sequence-name="SEQ_FAGSAK_PROSESS_TASK"/>
+
+    <sequence-generator name="SEQ_VURDER_PAA_NYTT_AARSAK" allocation-size="50" sequence-name="SEQ_VURDER_PAA_NYTT_AARSAK"/>
+    <sequence-generator name="SEQ_TOTRINNSVURDERING" allocation-size="50" sequence-name="SEQ_TOTRINNSVURDERING"/>
+    <sequence-generator name="SEQ_TOTRINNRESULTATGRUNNLAG" allocation-size="50" sequence-name="SEQ_TOTRINNRESULTATGRUNNLAG"/>
+    <sequence-generator name="SEQ_VURDER_AARSAK_TTVURDERING" allocation-size="50" sequence-name="SEQ_VURDER_AARSAK_TTVURDERING"/>
+    <sequence-generator name="SEQ_MOTTAKER_VARSEL_RESPONS" allocation-size="50" sequence-name="SEQ_MOTTAKER_VARSEL_RESPONS"/>
+    <sequence-generator name="SEQ_VURDERT_FORELDELSE" allocation-size="50" sequence-name="SEQ_VURDERT_FORELDELSE"/>
+    <sequence-generator name="SEQ_GR_VURDERT_FORELDELSE" allocation-size="50" sequence-name="SEQ_GR_VURDERT_FORELDELSE"/>
+    <sequence-generator name="SEQ_FORELDELSE_PERIODE" allocation-size="50" sequence-name="SEQ_FORELDELSE_PERIODE"/>
+    <sequence-generator name="SEQ_FEILUTBETALING_AARSAK_DEF" allocation-size="50" sequence-name="SEQ_FEILUTBETALING_AARSAK_DEF"/>
+    <sequence-generator name="SEQ_FEILUTBET_PERIODE_AARSAK" allocation-size="50" sequence-name="SEQ_FEILUTBET_PERIODE_AARSAK"/>
+    <sequence-generator name="SEQ_EKSTERN_BEHANDLING" allocation-size="50" sequence-name="SEQ_EKSTERN_BEHANDLING"/>
+    <sequence-generator name="SEQ_VARSELBREV_DATA" allocation-size="50" sequence-name="SEQ_VARSELBREV_DATA"/>
+    <sequence-generator name="SEQ_VEDTAK_XML" allocation-size="50" sequence-name="SEQ_VEDTAK_XML"/>
+
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker"/>
+
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VarselbrevSporing"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevSporing"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevPeriode"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevOppsummering"/>
+
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsessTask"/>
+
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegTilstand"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingTypeStegSekvens"/>
+
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.VurderPåNyttÅrsak"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.VurderingspunktDefinisjon"/>
+
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling"/>
+
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.Totrinnsvurdering"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.Totrinnresultatgrunnlag"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.VurderÅrsakTotrinnsvurdering"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårType"/>
+
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.varselrespons.Varselrespons"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode"/>
+
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelse"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseAggregate"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelsePeriode"/>
+
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagDel"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagDokumentLink"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagFelt"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagFeltType"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltVerdiType"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkBegrunnelseType"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkOpplysningType"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkResultatType"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.RelasjonsRolleType"/>
+
+    <!--###################-->
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.AdresseType"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktStatus"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktType"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.arkiv.ArkivFilType"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Begrunnelse"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegStatus"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.DokumentKategori"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.DokumentTypeId"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakStatus"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodelisteRelasjon"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.konfig.KonfigVerdiGruppe"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.konfig.KonfigVerdiType"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Landkoder"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.MottakKanal"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.NavBrukerKjønn"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.PersonstatusType"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Poststed"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.ReaktiveringStatus"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.opptjening.ReferanseType"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Region"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.SivilstandType"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Tema"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.VariantFormat"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.VurderÅrsak"/>
+
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.konfig.KonfigVerdiEntitet"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.konfig.KonfigVerdiKode"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingÅrsakDefinisjon"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingPeriodeÅrsak"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.Feilutbetaling"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingAggregate"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.AnnetÅrsakType"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.BarnAlder"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.UttakKvote"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.GraderingÅrsakType"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.UtbetalingSystemFeilType"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.RettType"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.OpphorÅrsakType"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.ForeldesUttak"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.OmsorgType"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.AktivitetKrav"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.StonadPeriode"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.OpptjeningType"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.BeregningsGrunnlagTilstand"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.MedlemskapVilkåretType"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.UtsettelseÅrsakType"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.UtsettelseArbeid"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.UtsettelseSykdom"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.UtsettelseInnleggelse"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.MedlemskapVilkår"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.EndringUttakKvote"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.StonadPeriodeType"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.Opptjening"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.MorsAktivitetType"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.Opphor"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.UtbetalingSystemFeil"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.ÅrsakUdefinert"/>
+
+    <entity class="no.nav.foreldrepenger.tilbakekreving.sporing.VedtakXml"/>
+
+
+</entity-mappings>

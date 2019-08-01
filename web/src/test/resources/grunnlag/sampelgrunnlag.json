@@ -1,0 +1,109 @@
+{
+  "kravGrunnlag": {
+    "vedtakId": 207406,
+    "kravgrunnlagId":152806,
+    "kravStatusKode": "NY",
+    "fagOmrådeKode": "FP",
+    "fagSystemId": "10000000000000000",
+    "vedtakFagSystemDato": "2019-03-14",
+    "omgjortVedtakId": null,
+    "gjelderVedtakId": "12345678901",
+    "gjelderType": "PERSON",
+    "utbetalesTilId": "12345678901",
+    "utbetGjelderType": "PERSON",
+    "hjemmelKode": "1234239042304",
+    "beregnesRenter": "N",
+    "ansvarligEnhet": "8020",
+    "bostedEnhet": "8020",
+    "behandlendeEnhet": "8020",
+    "kontrollFelt": "42354353453454",
+    "saksBehId": "Z991036",
+    "referanse": "23423423423",
+    "perioder": [
+      {
+        "fom": "2016-03-16",
+        "tom": "2016-03-31",
+        "posteringer": [
+          {
+            "klasseKode": "FPATAL",
+            "klasseType": "FEIL",
+            "opprUtbetBelop": 0,
+            "nyBelop": 11000,
+            "tilbakekrevesBelop": 0,
+            "uinnkrevdBelop": 0,
+            "resultatKode": "",
+            "årsakKode": "",
+            "skyldKode": ""
+          },
+          {
+            "klasseKode": "FPATORD",
+            "klasseType": "YTEL",
+            "opprUtbetBelop": 11000,
+            "nyBelop": 0,
+            "tilbakekrevesBelop": 11000,
+            "uinnkrevdBelop": 0,
+            "resultatKode": "",
+            "årsakKode": "",
+            "skyldKode": ""
+          }
+        ]
+      },
+      {
+        "fom": "2016-04-01",
+        "tom": "2016-04-30",
+        "posteringer": [
+          {
+            "klasseKode": "FPATAL",
+            "klasseType": "FEIL",
+            "opprUtbetBelop": 0,
+            "nyBelop": 21000,
+            "tilbakekrevesBelop": 0,
+            "uinnkrevdBelop": 0,
+            "resultatKode": "",
+            "årsakKode": "",
+            "skyldKode": ""
+          },
+          {
+            "klasseKode": "FPATORD",
+            "klasseType": "YTEL",
+            "opprUtbetBelop": 21000,
+            "nyBelop": 0,
+            "tilbakekrevesBelop": 21000,
+            "uinnkrevdBelop": 0,
+            "resultatKode": "",
+            "årsakKode": "",
+            "skyldKode": ""
+          }
+        ]
+      },
+      {
+        "fom": "2016-05-01",
+        "tom": "2016-05-26",
+        "posteringer": [
+          {
+            "klasseKode": "FPATAL",
+            "klasseType": "FEIL",
+            "opprUtbetBelop": 0,
+            "nyBelop": 19000,
+            "tilbakekrevesBelop": 0,
+            "uinnkrevdBelop": 0,
+            "resultatKode": "",
+            "årsakKode": "",
+            "skyldKode": ""
+          },
+          {
+            "klasseKode": "FPATORD",
+            "klasseType": "YTEL",
+            "opprUtbetBelop": 19000,
+            "nyBelop": 0,
+            "tilbakekrevesBelop": 19000,
+            "uinnkrevdBelop": 0,
+            "resultatKode": "",
+            "årsakKode": "",
+            "skyldKode": ""
+          }
+        ]
+      }
+    ]
+  }
+}

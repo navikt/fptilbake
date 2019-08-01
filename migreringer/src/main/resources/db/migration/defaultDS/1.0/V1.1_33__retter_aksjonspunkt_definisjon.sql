@@ -1,0 +1,3 @@
+update AKSJONSPUNKT_DEF
+set FRIST_PERIODE = 'P4W'
+where KODE = '7001' and FRIST_PERIODE = 'PT4W';
