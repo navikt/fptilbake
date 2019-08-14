@@ -22,8 +22,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.Feilutbetaling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingAggregate;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingPeriodeÅrsak;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.UtsettelseArbeid;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.UtsettelseÅrsakType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagFelt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.SærligGrunn;
@@ -44,12 +44,12 @@ public class FellesTestOppsett extends TestOppsett {
     protected static final LocalDate TOM = LocalDate.of(2016, 5, 31);
     protected static final Long SUM_FEIL_UTBETALT = 23000L;
     protected static final Long SUM_INNTREKK = 1000L;
-    protected static final String ÅRSAK = "UTSETTELSE_ARBEID";
-    protected static final String UNDER_ÅRSAK = "UTSETTELSE_ARBEID_HELTID";
+    protected static final String ÅRSAK = "UTTAK_UTSETTELSE_TYPE";
+    protected static final String UNDER_ÅRSAK = "ARBEID_HELTID";
     protected static final String BEGRUNNELSE = "ABC";
 
-    protected static final String ÅRSAK_KODEVERK = UtsettelseÅrsakType.DISCRIMINATOR;
-    protected static final String UNDER_ÅRSAK_KODEVERK = UtsettelseArbeid.DISCRIMINATOR;
+    protected static final String ÅRSAK_KODEVERK = HendelseType.DISCRIMINATOR;
+    protected static final String UNDER_ÅRSAK_KODEVERK = HendelseUnderType.DISCRIMINATOR;
 
     protected static final Period defaultVentetid = Period.ofWeeks(4);
 

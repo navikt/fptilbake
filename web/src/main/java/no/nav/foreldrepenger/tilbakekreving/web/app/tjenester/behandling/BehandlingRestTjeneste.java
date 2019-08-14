@@ -122,7 +122,7 @@ public class BehandlingRestTjeneste {
         long eksternBehandlingId = opprettBehandlingDto.getEksternBehandlingId();
         BehandlingType behandlingType = BehandlingType.fraKode(opprettBehandlingDto.getBehandlingType());
         if (BehandlingType.TILBAKEKREVING.equals(behandlingType)) {
-            behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternBehandlingId, aktørId, behandlingType);
+            behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternBehandlingId, aktørId, opprettBehandlingDto.getFagsakYtelseType(),behandlingType);
             return Redirect.tilFagsakPollStatus(saksnummer, Optional.empty());
         } else if (BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandlingType)) {
             Behandling revurdering = revurderingTjeneste.opprettRevurdering(saksnummer, eksternBehandlingId, opprettBehandlingDto.getBehandlingArsakType());
@@ -265,7 +265,12 @@ public class BehandlingRestTjeneste {
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response hentBehandlingResultat(@NotNull @QueryParam("behandlingId") @Valid BehandlingIdDto idDto) {
 
-        UtvidetBehandlingDto dto = behandlingDtoTjeneste.hentUtvidetBehandlingResultat(idDto.getBehandlingId());
+        var behandlingId = idDto.getBehandlingId();
+        var behandling = behandlingsprosessTjeneste.hentBehandling(behandlingId);
+
+        AsyncPollingStatus taskStatus = behandlingsprosessTjeneste.sjekkProsessTaskPågårForBehandling(behandling, null).orElse(null);
+
+        UtvidetBehandlingDto dto = behandlingDtoTjeneste.hentUtvidetBehandlingResultat(idDto.getBehandlingId(),taskStatus);
 
         Response.ResponseBuilder responseBuilder = Response.ok().entity(dto);
         return responseBuilder.build();

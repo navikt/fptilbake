@@ -22,6 +22,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Ak
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.SærligGrunn;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.domene.PeriodeMedBrevtekst;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.PeriodeMedTekstDto;
+import no.nav.vedtak.util.FPDateUtil;
 
 public class VedtaksbrevUtil {
 
@@ -98,6 +99,9 @@ public class VedtaksbrevUtil {
     }
 
     public static LocalDateTime finnNyesteVarselbrevTidspunkt(List<VarselbrevSporing> utsendteVarselbrev) {
+        if(utsendteVarselbrev.isEmpty()){
+            return FPDateUtil.nå();
+        }
         LocalDateTime nyesteVarselSendt = utsendteVarselbrev.get(0).getOpprettetTidspunkt();
         for (VarselbrevSporing varselbrevData : utsendteVarselbrev) {
             if (varselbrevData.getOpprettetTidspunkt().isAfter(nyesteVarselSendt)) {

@@ -15,6 +15,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBrukerRep
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.TpsTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
@@ -37,7 +38,7 @@ public class FagsakTjeneste {
         this.navBrukerRepository = navBrukerRepository;
     }
 
-    public Fagsak finnEllerOpprettFagsak(long fagsakId, Saksnummer saksnummer, AktørId aktørId) {
+    public Fagsak finnEllerOpprettFagsak(long fagsakId, Saksnummer saksnummer, AktørId aktørId, FagsakYtelseType fagsakYtelseType) {
         List<Fagsak> fagsaker = fagsakRepository.hentForBruker(aktørId);
         Fagsak fagsak = fagsaker.stream()
                 .filter(s -> s.getSaksnummer().equals(saksnummer))
@@ -47,6 +48,7 @@ public class FagsakTjeneste {
         if (fagsak == null) {
             NavBruker bruker = hentNavBruker(aktørId);
             fagsak = Fagsak.opprettNy(fagsakId, saksnummer, bruker);
+            fagsak.setFagsakYtelseType(fagsakYtelseType);
             try {
                 fagsakRepository.lagre(fagsak);
             } catch (PersistenceException e) { // NOSONAR

@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiConsumer;
+import no.nav.tilbakekreving.kravgrunnlag.annuller.v1.AnnullerKravgrunnlagDto;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagBelopDto;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagDto;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagPeriodeDto;
@@ -39,6 +40,11 @@ class ØkonomiConsumerMockImpl implements ØkonomiConsumer {
     public DetaljertKravgrunnlagDto hentKravgrunnlag(Long behandlingId, HentKravgrunnlagDetaljDto kravgrunnlagDetalj) {
         logger.info("Hent detaljertKravgrunnlag for behandlingId={}", behandlingId);
         return hentGrunnlag();
+    }
+
+    @Override
+    public void anullereKravgrunnlag(Long behandlingId, AnnullerKravgrunnlagDto annullerKravgrunnlag) {
+        logger.info("AnnulereKravgrunnlag sendt til oppdragsystemet for behandlingId={}", behandlingId);
     }
 
     private DetaljertKravgrunnlagDto hentGrunnlag() {

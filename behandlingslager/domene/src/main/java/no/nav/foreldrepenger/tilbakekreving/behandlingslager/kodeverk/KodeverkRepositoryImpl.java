@@ -3,8 +3,6 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk;
 import static java.util.stream.Collectors.joining;
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkFeil.FEILFACTORY;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,6 +26,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.persistence.Table;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -43,6 +42,7 @@ import no.nav.vedtak.util.LRUCache;
 public class KodeverkRepositoryImpl implements KodeverkRepository {
 
     private static final long CACHE_ELEMENT_LIVE_TIME = TimeUnit.MILLISECONDS.convert(1, TimeUnit.MINUTES);
+    private static final String KEY_KODEVERK = "kodeverk";
     LRUCache<String, Kodeliste> kodelisteCache = new LRUCache<>(1000, CACHE_ELEMENT_LIVE_TIME);
     private EntityManager entityManager;
     private KodeverkTabellRepository kodeverkTabellRepository;
@@ -64,8 +64,8 @@ public class KodeverkRepositoryImpl implements KodeverkRepository {
     public <V extends Kodeliste> Optional<V> finnOptional(Class<V> cls, String kode) {
         CriteriaQuery<V> criteria = createCriteria(cls, Collections.singletonList(kode));
         List<V> list = entityManager.createQuery(criteria)
-                .setHint(QueryHints.HINT_READONLY, "true")
-                .getResultList();
+            .setHint(QueryHints.HINT_READONLY, "true")
+            .getResultList();
         if (list.isEmpty()) {
             return Optional.empty();
         } else {
@@ -157,15 +157,15 @@ public class KodeverkRepositoryImpl implements KodeverkRepository {
         CriteriaQuery<V> criteria = entityManager.getCriteriaBuilder().createQuery(cls);
         criteria.select(criteria.from(cls));
         return detachKodeverk(entityManager.createQuery(criteria)
-                .setHint(QueryHints.HINT_READONLY, "true")
-                .getResultList());
+            .setHint(QueryHints.HINT_READONLY, "true")
+            .getResultList());
     }
 
     private <V extends Kodeliste> List<V> finnListeFraEm(Class<V> cls, List<String> koder) {
         CriteriaQuery<V> criteria = createCriteria(cls, koder);
         List<V> result = entityManager.createQuery(criteria)
-                .setHint(QueryHints.HINT_READONLY, "true")
-                .getResultList();
+            .setHint(QueryHints.HINT_READONLY, "true")
+            .getResultList();
         return detachKodeverk(result);
     }
 
@@ -173,8 +173,8 @@ public class KodeverkRepositoryImpl implements KodeverkRepository {
         try {
             CriteriaQuery<V> criteria = createCriteria(cls, "offisiellKode", offisiellKoder);
             List<V> result = entityManager.createQuery(criteria)
-                    .setHint(QueryHints.HINT_READONLY, "true")
-                    .getResultList();
+                .setHint(QueryHints.HINT_READONLY, "true")
+                .getResultList();
             return detachKodeverk(result);
         } catch (NoResultException e) {
             String koder = offisiellKoder.stream().collect(joining(","));
@@ -186,8 +186,8 @@ public class KodeverkRepositoryImpl implements KodeverkRepository {
         CriteriaQuery<V> criteria = createCriteria(cls, Collections.singletonList(kode));
         try {
             V result = entityManager.createQuery(criteria)
-                    .setHint(QueryHints.HINT_READONLY, "true")
-                    .getSingleResult();
+                .setHint(QueryHints.HINT_READONLY, "true")
+                .getSingleResult();
             return detachKodeverk(result);
         } catch (NoResultException e) {
             throw FEILFACTORY.kanIkkeFinneKodeverk(cls.getSimpleName(), kode, e).toException();
@@ -198,8 +198,8 @@ public class KodeverkRepositoryImpl implements KodeverkRepository {
         CriteriaQuery<V> criteria = createCriteria(cls, "offisiellKode", Collections.singletonList(offisiellKode));
         try {
             V result = entityManager.createQuery(criteria)
-                    .setHint(QueryHints.HINT_READONLY, "true")
-                    .getSingleResult();
+                .setHint(QueryHints.HINT_READONLY, "true")
+                .getSingleResult();
             return detachKodeverk(result);
         } catch (NoResultException e) {
             throw FEILFACTORY.kanIkkeFinneKodeverkForOffisiellKode(cls.getSimpleName(), offisiellKode, e).toException();
@@ -219,20 +219,14 @@ public class KodeverkRepositoryImpl implements KodeverkRepository {
         String kodeverk = discVal.value();
         Root<V> from = criteria.from(cls);
         criteria.where(builder.and(
-                builder.equal(from.get("kodeverk"), kodeverk), //$NON-NLS-1$
-                from.get(felt).in(koder))); // $NON-NLS-1$
+            builder.equal(from.get(KEY_KODEVERK), kodeverk), //$NON-NLS-1$
+            from.get(felt).in(koder))); // $NON-NLS-1$
         return criteria;
     }
 
     @Override
     public <V extends Kodeliste, K extends Kodeliste> Map<V, Set<K>> hentKodeRelasjonForKodeverk(Class<V> kodeliste1, Class<K> kodeliste2) {
-        String kodeverk;
-        try {
-            Method getKodeverk = kodeliste1.getMethod("getKodeverk");
-            kodeverk = ((String) getKodeverk.invoke(kodeliste1.newInstance()));
-        } catch (IllegalAccessException | InvocationTargetException | InstantiationException | NoSuchMethodException e) {
-            throw new IllegalArgumentException("Fant ikke kodeverk for kodeverk=" + kodeliste1, e);
-        }
+        String kodeverk = kodeliste1.getAnnotation(DiscriminatorValue.class).value();
         List<KodelisteRelasjon> relasjoner = hentKodelisteRelasjonFor(kodeverk);
         Map<String, List<V>> vMap = hentAlle(kodeliste1).stream().collect(Collectors.groupingBy(Kodeliste::getKode));
         Map<String, List<K>> kMap = hentAlle(kodeliste2).stream().collect(Collectors.groupingBy(Kodeliste::getKode));
@@ -271,11 +265,11 @@ public class KodeverkRepositoryImpl implements KodeverkRepository {
         String kodeverk = discVal.value();
 
         Query query = entityManager.createNativeQuery(
-                "SELECT kl_kode " +
-                        "FROM kodeliste_navn_i18n " +
-                        "WHERE kl_kodeverk = ? " +
-                        "AND navn = ? " +
-                        "AND sprak = ?");
+            "SELECT kl_kode " +
+                "FROM kodeliste_navn_i18n " +
+                "WHERE kl_kodeverk = ? " +
+                "AND navn = ? " +
+                "AND sprak = ?");
         query.setParameter(1, kodeverk);
         query.setParameter(2, navn);
         query.setParameter(3, språk);
@@ -305,24 +299,50 @@ public class KodeverkRepositoryImpl implements KodeverkRepository {
         return retval;
     }
 
+    @Override
+    public <V extends KodelisteRelasjon> List<V> henteKodelisteRelasjon(String kodeverk, String kode) {
+        TypedQuery<KodelisteRelasjon> query = entityManager.createQuery(
+            "from KodelisteRelasjon where kodeverk1=:kodeverk and kode1=:kode", KodelisteRelasjon.class);
+        query.setParameter(KEY_KODEVERK, kodeverk);
+        query.setParameter("kode", kode);
+        return (List<V>) query.getResultList();
+    }
+
+    @Override
+    public <V extends Kodeliste> List<V> hentKodeliste(List<String> kodeverker) {
+        TypedQuery<Kodeliste> query = entityManager.createQuery(
+            "from Kodeliste where kodeverk in(:kodeverker)", Kodeliste.class);
+        query.setParameter("kodeverker", kodeverker);
+        return (List<V>) query.getResultList();
+    }
+
+    @Override
+    public <V extends Kodeliste> V hentKodeliste(String kodeverk, String kode) {
+        TypedQuery<Kodeliste> query = entityManager.createQuery(
+            "from Kodeliste where kodeverk=:kodeverk and kode=:kode", Kodeliste.class);
+        query.setParameter(KEY_KODEVERK, kodeverk);
+        query.setParameter("kode", kode);
+        return (V) query.getSingleResult();
+    }
+
     private Query getLandkodeMappingQuery() {
         String språk = Kodeliste.hentLoggedInBrukerSpråk();
         //FIXME (maur) Bør trolig gjøres om til ql og kan trolig lages litt enklere.
         return entityManager.createNativeQuery(
-                "SELECT k3.kl_kode AS land_3bokstav, " +
-                        "(SELECT k2.kl_kode FROM kodeliste_navn_i18n k2 " +
-                        "WHERE k2.kl_kodeverk = 'LANDKODE_ISO2' " +
-                        "AND k2.sprak = :sprakParam1 " +
-                        "AND k2.navn = k3.navn ) AS land_2bokstav " +
-                        "FROM kodeliste_navn_i18n k3 " +
-                        "WHERE k3.kl_kodeverk = 'LANDKODER' " +
-                        "AND k3.sprak = :sprakParam2 " +
-                        "AND EXISTS (SELECT k2.kl_kode " +
-                        "FROM kodeliste_navn_i18n k2 " +
-                        "WHERE k2.kl_kodeverk = 'LANDKODE_ISO2' " +
-                        "AND k2.navn = k3.navn)")
-                .setParameter("sprakParam1", språk)
-                .setParameter("sprakParam2", språk);
+            "SELECT k3.kl_kode AS land_3bokstav, " +
+                "(SELECT k2.kl_kode FROM kodeliste_navn_i18n k2 " +
+                "WHERE k2.kl_kodeverk = 'LANDKODE_ISO2' " +
+                "AND k2.sprak = :sprakParam1 " +
+                "AND k2.navn = k3.navn ) AS land_2bokstav " +
+                "FROM kodeliste_navn_i18n k3 " +
+                "WHERE k3.kl_kodeverk = 'LANDKODER' " +
+                "AND k3.sprak = :sprakParam2 " +
+                "AND EXISTS (SELECT k2.kl_kode " +
+                "FROM kodeliste_navn_i18n k2 " +
+                "WHERE k2.kl_kodeverk = 'LANDKODE_ISO2' " +
+                "AND k2.navn = k3.navn)")
+            .setParameter("sprakParam1", språk)
+            .setParameter("sprakParam2", språk);
     }
 
     @Override
@@ -364,10 +384,10 @@ public class KodeverkRepositoryImpl implements KodeverkRepository {
 
     private List<KodelisteRelasjon> hentKodelisteRelasjonFor(String kodeverk) {
         Query query = entityManager.createNativeQuery(
-                "SELECT kodeverk1, kode1, kodeverk2, kode2, gyldig_fom, gyldig_tom " +
-                        "FROM kodeliste_relasjon " +
-                        "WHERE gyldig_fom <= SYSDATE AND gyldig_tom > SYSDATE " +
-                        "AND KODEVERK1 = ?");
+            "SELECT kodeverk1, kode1, kodeverk2, kode2, gyldig_fom, gyldig_tom " +
+                "FROM kodeliste_relasjon " +
+                "WHERE gyldig_fom <= SYSDATE AND gyldig_tom > SYSDATE " +
+                "AND KODEVERK1 = ?");
 
         query.setParameter(1, kodeverk);
 
@@ -384,9 +404,9 @@ public class KodeverkRepositoryImpl implements KodeverkRepository {
 
         for (Object[] kr : koderelasjoner) {
             retval.add(new KodelisteRelasjon((String) kr[kodeverk1Nr], (String) kr[kode1Nr],
-                    (String) kr[kodeverk2Nr], (String) kr[kode2Nr],
-                    ((Timestamp) kr[fomNr]).toLocalDateTime().toLocalDate(),
-                    ((Timestamp) kr[tomNr]).toLocalDateTime().toLocalDate()));
+                (String) kr[kodeverk2Nr], (String) kr[kode2Nr],
+                ((Timestamp) kr[fomNr]).toLocalDateTime().toLocalDate(),
+                ((Timestamp) kr[tomNr]).toLocalDateTime().toLocalDate()));
         }
         return retval;
     }

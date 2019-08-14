@@ -33,6 +33,10 @@ public class UtvidetBehandlingDto extends BehandlingDto {
     @JsonProperty("originalBehandlingId")
     private Long originalBehandlingId;
 
+    /** Eventuelt async status på tasks. */
+    @JsonProperty("taskStatus")
+    private AsyncPollingStatus taskStatus;
+
     public boolean isBehandlingPåVent() {
         return behandlingPåVent;
     }
@@ -59,6 +63,10 @@ public class UtvidetBehandlingDto extends BehandlingDto {
 
     public Long getOriginalBehandlingId() {
         return originalBehandlingId;
+    }
+
+    public AsyncPollingStatus getTaskStatus() {
+        return taskStatus;
     }
 
     void setBehandlingPåVent(boolean behandlingPåVent) {
@@ -95,5 +103,9 @@ public class UtvidetBehandlingDto extends BehandlingDto {
 
     public void setOriginalBehandlingId(Long originalBehandlingId) {
         this.originalBehandlingId = originalBehandlingId;
+    }
+
+    public void setTaskStatus(AsyncPollingStatus taskStatus) {
+        this.taskStatus = taskStatus;
     }
 }

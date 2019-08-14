@@ -9,6 +9,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.NavBrukerKjønn;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
@@ -43,7 +44,7 @@ public class TestUtility {
         long eksBehId = genererEksternBehandlingId();
         Saksnummer saksnummer = genererSaksnummer();
 
-        long intBehId = behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer, fagsakId, eksBehId, aktørId, BEHANDLING_TYPE);
+        long intBehId = behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer, fagsakId, eksBehId, aktørId,FagsakYtelseType.FORELDREPENGER,BEHANDLING_TYPE);
 
         Behandling behandling = behandlingTjeneste.hentBehandling(intBehId);
 

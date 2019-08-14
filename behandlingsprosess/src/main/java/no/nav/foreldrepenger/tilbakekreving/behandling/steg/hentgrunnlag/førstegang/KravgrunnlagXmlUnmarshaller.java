@@ -3,8 +3,6 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.først
 import javax.xml.bind.JAXBException;
 import javax.xml.stream.XMLStreamException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlag;
@@ -18,11 +16,9 @@ import no.nav.vedtak.felles.integrasjon.felles.ws.JaxbHelper;
 
 class KravgrunnlagXmlUnmarshaller {
 
-    private static final Logger log = LoggerFactory.getLogger(KravgrunnlagXmlUnmarshaller.class);
-
     private static final String XSD_PLASSERING = "xsd/no/nav/melding/virksomhet/tilbakekreving/kravgrunnlag_detalj.xsd";
 
-    public static DetaljertKravgrunnlag unmarshall(Long kravgrunnlagXmlId, String xml) {
+    public static DetaljertKravgrunnlag unmarshall(Long mottattXmlId, String xml) {
 
         try {
             DetaljertKravgrunnlagMelding melding = JaxbHelper.unmarshalAndValidateXMLWithStAX(DetaljertKravgrunnlagMelding.class, xml, XSD_PLASSERING);
@@ -30,16 +26,13 @@ class KravgrunnlagXmlUnmarshaller {
             if (kravgrunnlag != null) {
                 return kravgrunnlag;
             }
-            throw KravgrunnlagXmlUnmarshallFeil.FACTORY.meldingUtenKravgrunnlag(kravgrunnlagXmlId).toException();
+            throw KravgrunnlagXmlUnmarshallFeil.FACTORY.meldingUtenKravgrunnlag(mottattXmlId).toException();
         } catch (JAXBException e) {
-            log.warn("JAXBException");
-            throw KravgrunnlagXmlUnmarshallFeil.FACTORY.unmarshallingFeilet(kravgrunnlagXmlId, e).toException();
+            throw KravgrunnlagXmlUnmarshallFeil.FACTORY.unmarshallingFeilet(mottattXmlId, e).toException();
         } catch (XMLStreamException e) {
-            log.warn("XMLStreamException");
-            throw KravgrunnlagXmlUnmarshallFeil.FACTORY.unmarshallingFeilet(kravgrunnlagXmlId, e).toException();
+            throw KravgrunnlagXmlUnmarshallFeil.FACTORY.unmarshallingFeilet(mottattXmlId, e).toException();
         } catch (SAXException e) {
-            log.warn("SAXException");
-            throw KravgrunnlagXmlUnmarshallFeil.FACTORY.unmarshallingFeilet(kravgrunnlagXmlId, e).toException();
+            throw KravgrunnlagXmlUnmarshallFeil.FACTORY.unmarshallingFeilet(mottattXmlId, e).toException();
         }
     }
 

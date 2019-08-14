@@ -52,6 +52,11 @@ public class Fagsak extends BaseEntitet {
     @Column(name = "versjon", nullable = false)
     private long versjon;
 
+    @ManyToOne(optional = false)
+    @JoinColumnOrFormula(column = @JoinColumn(name = "ytelse_type", referencedColumnName = "kode", nullable = false))
+    @JoinColumnOrFormula(formula = @JoinFormula(referencedColumnName = "kodeverk", value = "'" + FagsakYtelseType.DISCRIMINATOR + "'"))
+    private FagsakYtelseType fagsakYtelseType = FagsakYtelseType.FORELDREPENGER;
+
     Fagsak() {
         // Hibernate
     }
@@ -112,6 +117,14 @@ public class Fagsak extends BaseEntitet {
 
     private void setFagsakStatus(FagsakStatus fagsakStatus) {
         this.fagsakStatus = fagsakStatus;
+    }
+
+    public FagsakYtelseType getFagsakYtelseType() {
+        return fagsakYtelseType;
+    }
+
+    public void setFagsakYtelseType(FagsakYtelseType fagsakYtelseType) {
+        this.fagsakYtelseType = fagsakYtelseType;
     }
 
     @Override

@@ -7,11 +7,14 @@ import javax.xml.ws.soap.SOAPFaultException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import no.nav.okonomi.tilbakekrevingservice.KravgrunnlagAnnulerRequest;
+import no.nav.okonomi.tilbakekrevingservice.KravgrunnlagAnnulerResponse;
 import no.nav.okonomi.tilbakekrevingservice.KravgrunnlagHentDetaljRequest;
 import no.nav.okonomi.tilbakekrevingservice.KravgrunnlagHentDetaljResponse;
 import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingPortType;
 import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakRequest;
 import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakResponse;
+import no.nav.tilbakekreving.kravgrunnlag.annuller.v1.AnnullerKravgrunnlagDto;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagDto;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.HentKravgrunnlagDetaljDto;
 import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsvedtakDto;
@@ -56,6 +59,19 @@ public class ØkonomiConsumerImpl implements ØkonomiConsumer {
         return respons.getDetaljertkravgrunnlag();
     }
 
+    @Override
+    public void anullereKravgrunnlag(Long behandlingId, AnnullerKravgrunnlagDto annullerKravgrunnlag) {
+        logger.info("Starter Anullerekravgrunnlag for behandlingId=", behandlingId);
+        KravgrunnlagAnnulerResponse respons = anullereGrunnlag(annullerKravgrunnlag);
+        MmelDto kvittering = respons.getMmel();
+        validerKvitteringForAnnulereGrunnlag(behandlingId, kvittering);
+        logger.info("AnnulereKravgrunnlag sendt til oppdragssystemet. BehandlingId={} Alvorlighetsgrad='{}' infomelding='{}'",
+            behandlingId,
+            kvittering.getAlvorlighetsgrad(),
+            kvittering.getBeskrMelding());
+    }
+
+
     private TilbakekrevingsvedtakResponse iverksett(TilbakekrevingsvedtakDto vedtak) {
         TilbakekrevingsvedtakRequest request = new TilbakekrevingsvedtakRequest();
         request.setTilbakekrevingsvedtak(vedtak);
@@ -76,6 +92,16 @@ public class ØkonomiConsumerImpl implements ØkonomiConsumer {
         }
     }
 
+    private KravgrunnlagAnnulerResponse anullereGrunnlag(AnnullerKravgrunnlagDto annullerKravgrunnlag) {
+        KravgrunnlagAnnulerRequest annulerRequest = new KravgrunnlagAnnulerRequest();
+        annulerRequest.setAnnullerkravgrunnlag(annullerKravgrunnlag);
+        try {
+            return port.kravgrunnlagAnnuler(annulerRequest);
+        } catch (SOAPFaultException e) { // NOSONAR
+            throw SoapWebServiceFeil.FACTORY.soapFaultIwebserviceKall(SERVICE_IDENTIFIER, e).toException();
+        }
+    }
+
     private void validerKvitteringForIverksettelse(Long behandlingId, MmelDto mmel) {
         String alvorlighetsgrad = mmel.getAlvorlighetsgrad();
         if (!KVITTERING_OK_KODE.contains(alvorlighetsgrad)) {
@@ -87,6 +113,13 @@ public class ØkonomiConsumerImpl implements ØkonomiConsumer {
         String alvorlighetsgrad = mmel.getAlvorlighetsgrad();
         if (!KVITTERING_OK_KODE.contains(alvorlighetsgrad)) {
             throw ØkonomiConsumerFeil.FACTORY.fikkFeilkodeVedHentingAvKravgrunnlag(behandlingId, ØkonomiConsumerFeil.formaterKvitterign(mmel)).toException();
+        }
+    }
+
+    private void validerKvitteringForAnnulereGrunnlag(Long behandlingId, MmelDto mmel) {
+        String alvorlighetsgrad = mmel.getAlvorlighetsgrad();
+        if (!KVITTERING_OK_KODE.contains(alvorlighetsgrad)) {
+            throw ØkonomiConsumerFeil.FACTORY.fikkFeilkodeVedAnnulereKravgrunnlag(behandlingId, ØkonomiConsumerFeil.formaterKvitterign(mmel)).toException();
         }
     }
 

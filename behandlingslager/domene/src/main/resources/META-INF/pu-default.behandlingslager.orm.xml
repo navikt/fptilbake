@@ -110,36 +110,9 @@
 
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.konfig.KonfigVerdiEntitet"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.konfig.KonfigVerdiKode"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingÅrsakDefinisjon"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingPeriodeÅrsak"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.Feilutbetaling"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingAggregate"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.AnnetÅrsakType"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.BarnAlder"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.UttakKvote"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.GraderingÅrsakType"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.UtbetalingSystemFeilType"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.RettType"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.OpphorÅrsakType"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.ForeldesUttak"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.OmsorgType"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.AktivitetKrav"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.StonadPeriode"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.OpptjeningType"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.BeregningsGrunnlagTilstand"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.MedlemskapVilkåretType"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.UtsettelseÅrsakType"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.UtsettelseArbeid"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.UtsettelseSykdom"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.UtsettelseInnleggelse"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.MedlemskapVilkår"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.EndringUttakKvote"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.StonadPeriodeType"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.Opptjening"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.MorsAktivitetType"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.Opphor"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.UtbetalingSystemFeil"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.ÅrsakUdefinert"/>
 
     <entity class="no.nav.foreldrepenger.tilbakekreving.sporing.VedtakXml"/>
 

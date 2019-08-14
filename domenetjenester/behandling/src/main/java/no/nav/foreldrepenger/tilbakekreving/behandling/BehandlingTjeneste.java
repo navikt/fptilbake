@@ -8,6 +8,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BehandlingFeilutbe
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 
@@ -19,9 +20,10 @@ public interface BehandlingTjeneste {
 
     void endreBehandlingPåVent(Long behandlingId, LocalDate frist, Venteårsak venteårsak);
 
-    Long opprettBehandlingManuell(Saksnummer saksnummer, long eksternBehandlingId, AktørId aktørId, BehandlingType behandlingType);
+    Long opprettBehandlingManuell(Saksnummer saksnummer, long eksternBehandlingId, AktørId aktørId, String fagsakYtelseType, BehandlingType behandlingType);
 
-    Long opprettBehandlingAutomatisk(Saksnummer saksnummer, long fagsakId, long eksternbehandlingId, AktørId aktørId, BehandlingType behandlingType);
+    Long opprettBehandlingAutomatisk(Saksnummer saksnummer, long fagsakId, long eksternbehandlingId,
+                                     AktørId aktørId, FagsakYtelseType fagsakYtelseType, BehandlingType behandlingType);
 
     void kanEndreBehandling(Long behandlingId, Long versjon);
 

@@ -63,7 +63,7 @@ public class KravgrunnlagAsyncJmsConsumer extends InternalQueueConsumer {
          * håndterer ved å sende videre som Event, for å unngå sirkulær avhengighet
          */
         String meldingsinnhold = message.getText();
-        KravgrunnlagMottattEvent event = new KravgrunnlagMottattEvent(meldingsinnhold);
+        XmlMottattEvent event = new XmlMottattEvent(meldingsinnhold);
         beanManager.fireEvent(event);
     }
 
