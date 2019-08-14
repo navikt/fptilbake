@@ -6,6 +6,7 @@ import javax.inject.Inject;
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
@@ -40,11 +41,14 @@ public class OpprettBehandlingTask implements ProsessTaskHandler {
         Saksnummer saksnummer = dataWrapper.getSaksnummer();
         AktørId aktørId = dataWrapper.getAktørId();
         BehandlingType behandlingType = dataWrapper.getBehandlingType();
+        FagsakYtelseType fagsakYtelseType = dataWrapper.getFagsakYtelseType();
 
-        opprettBehandling(saksnummer, eksternFagsakId, eksternBehandlingId, aktørId, behandlingType);
+        opprettBehandling(saksnummer, eksternFagsakId, eksternBehandlingId, aktørId, fagsakYtelseType, behandlingType);
     }
 
-    private void opprettBehandling(Saksnummer saksnummer, long fagsakId, long eksternBehandlingId, AktørId aktørId, BehandlingType behandlingType) {
-        behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer, fagsakId, eksternBehandlingId, aktørId, behandlingType);
+    private void opprettBehandling(Saksnummer saksnummer, long fagsakId, long eksternBehandlingId,
+                                   AktørId aktørId, FagsakYtelseType fagsakYtelseType,
+                                   BehandlingType behandlingType) {
+        behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer, fagsakId, eksternBehandlingId, aktørId, fagsakYtelseType, behandlingType);
     }
 }

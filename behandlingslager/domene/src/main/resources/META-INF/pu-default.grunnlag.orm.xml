@@ -16,7 +16,7 @@
     <entity class="no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType"/>
 
-        <entity class="no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagXml"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.grunnlag.ØkonomiXmlMottatt"/>
 
     <entity class="no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432"/>

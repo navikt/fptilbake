@@ -72,7 +72,7 @@ public class BehandlingDtoTjeneste {
         return dto;
     }
 
-    public UtvidetBehandlingDto hentUtvidetBehandlingResultat(long behandlingId) {
+    public UtvidetBehandlingDto hentUtvidetBehandlingResultat(long behandlingId, AsyncPollingStatus taskStatus) {
         Behandling behandling = behandlingTjeneste.hentBehandling(behandlingId);
 
         UtvidetBehandlingDto dto = new UtvidetBehandlingDto();
@@ -84,6 +84,10 @@ public class BehandlingDtoTjeneste {
         dto.setAnsvarligSaksbehandler(behandling.getAnsvarligSaksbehandler());
 
         settResourceLinks(behandling, dto);
+
+        if (taskStatus != null && !taskStatus.isPending()) {
+            dto.setTaskStatus(taskStatus);
+        }
 
         return dto;
     }

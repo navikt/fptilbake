@@ -29,6 +29,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
@@ -44,7 +45,7 @@ public class BehandlingRestTjenesteTest {
     public static final String GYLDIG_SAKSNR = "123456";
     public static final String UGYLDIG_SAKSNR = "(#2141##";
     public static final long EKSTERN_BEHANDLING_ID = 123456L;
-    public static final String VARSELTEKST = "varseltekst";
+    public static final String YTELSE_TYPE = FagsakYtelseType.FORELDREPENGER.getKode();
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -62,7 +63,7 @@ public class BehandlingRestTjenesteTest {
 
     @Test
     public void test_opprett_behandling_skal_feile_med_ugyldig_aktørId() throws URISyntaxException {
-        OpprettBehandlingDto dto = opprettBehandlingDto(UGYLDIG_AKTØR_ID, GYLDIG_SAKSNR, EKSTERN_BEHANDLING_ID, VARSELTEKST);
+        OpprettBehandlingDto dto = opprettBehandlingDto(UGYLDIG_AKTØR_ID, GYLDIG_SAKSNR, EKSTERN_BEHANDLING_ID, YTELSE_TYPE);
 
         expectedException.expect(IllegalArgumentException.class); // ved rest-kall vil jax validering slå inn og resultere i en FeltFeil
         expectedException.expectMessage("Ugyldig aktørId");
@@ -72,7 +73,7 @@ public class BehandlingRestTjenesteTest {
 
     @Test
     public void test_opprett_behandling_skal_feile_med_ugyldig_saksnummer() throws URISyntaxException {
-        OpprettBehandlingDto dto = opprettBehandlingDto(GYLDIG_AKTØR_ID, UGYLDIG_SAKSNR, EKSTERN_BEHANDLING_ID, VARSELTEKST);
+        OpprettBehandlingDto dto = opprettBehandlingDto(GYLDIG_AKTØR_ID, UGYLDIG_SAKSNR, EKSTERN_BEHANDLING_ID, YTELSE_TYPE);
 
         expectedException.expect(IllegalArgumentException.class); // ved rest-kall vil jax validering slå inn og resultere i en FeltFeil
         expectedException.expectMessage("Ugyldig saksnummer");
@@ -82,9 +83,9 @@ public class BehandlingRestTjenesteTest {
 
     @Test
     public void test_skal_opprette_ny_behandling() throws URISyntaxException {
-        behandlingRestTjeneste.opprettBehandling(opprettBehandlingDto(GYLDIG_AKTØR_ID, GYLDIG_SAKSNR, EKSTERN_BEHANDLING_ID, VARSELTEKST));
+        behandlingRestTjeneste.opprettBehandling(opprettBehandlingDto(GYLDIG_AKTØR_ID, GYLDIG_SAKSNR, EKSTERN_BEHANDLING_ID, YTELSE_TYPE));
 
-        verify(behandlingTjenesteMock).opprettBehandlingManuell(any(Saksnummer.class), anyLong(), any(AktørId.class), any(BehandlingType.class));
+        verify(behandlingTjenesteMock).opprettBehandlingManuell(any(Saksnummer.class), anyLong(), any(AktørId.class),anyString(), any(BehandlingType.class));
     }
 
     @Test
@@ -93,7 +94,7 @@ public class BehandlingRestTjenesteTest {
         when(revurderingTjenesteMock.opprettRevurdering(any(Saksnummer.class), anyLong(), anyString()))
             .thenReturn(mockBehandling());
 
-        OpprettBehandlingDto opprettBehandlingDto = opprettBehandlingDto(GYLDIG_AKTØR_ID, GYLDIG_SAKSNR, EKSTERN_BEHANDLING_ID, VARSELTEKST);
+        OpprettBehandlingDto opprettBehandlingDto = opprettBehandlingDto(GYLDIG_AKTØR_ID, GYLDIG_SAKSNR, EKSTERN_BEHANDLING_ID, YTELSE_TYPE);
         opprettBehandlingDto.setBehandlingType(BehandlingType.REVURDERING_TILBAKEKREVING.getKode());
         opprettBehandlingDto.setBehandlingArsakType(BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR.getKode());
 
@@ -114,12 +115,13 @@ public class BehandlingRestTjenesteTest {
         verify(henleggBehandlingTjenesteMock).henleggBehandling(EKSTERN_BEHANDLING_ID, årsak, begrunnelse);
     }
 
-    private OpprettBehandlingDto opprettBehandlingDto(String aktørId, String saksnr, long eksternBehandlingId, String varseltekst) {
+    private OpprettBehandlingDto opprettBehandlingDto(String aktørId, String saksnr, long eksternBehandlingId, String ytelseType) {
         OpprettBehandlingDto dto = new OpprettBehandlingDto();
         dto.setAktørId(aktørId);
         dto.setSaksnummer(saksnr);
         dto.setEksternBehandlingId(eksternBehandlingId);
         dto.setBehandlingType(BehandlingType.TILBAKEKREVING.getKode());
+        dto.setFagsakYtelseType(ytelseType);
         return dto;
     }
 

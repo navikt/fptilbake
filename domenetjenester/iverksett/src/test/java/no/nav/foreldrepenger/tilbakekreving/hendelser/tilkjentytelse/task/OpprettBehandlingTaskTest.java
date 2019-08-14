@@ -47,7 +47,8 @@ public class OpprettBehandlingTaskTest {
         opprettBehandlingTask.doTask(taskDataWrapper.getProsessTaskData());
 
         // verify
-        verify(mockBehandlingTjeneste).opprettBehandlingAutomatisk(any(Saksnummer.class), anyLong(), anyLong(), any(AktørId.class), any(BehandlingType.class));
+        verify(mockBehandlingTjeneste).opprettBehandlingAutomatisk(any(Saksnummer.class), anyLong(), anyLong(),
+            any(AktørId.class), any(FagsakYtelseType.class), any(BehandlingType.class));
     }
 
     @Test

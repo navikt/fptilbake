@@ -97,7 +97,7 @@ public class BehandlingDtoTjenesteTest {
         Behandling behandling = lagBehandling(BehandlingStegType.FAKTA_FEILUTBETALING, BehandlingStatus.UTREDES);
         when(behandlingTjeneste.hentBehandling(anyLong())).thenReturn(behandling);
 
-        UtvidetBehandlingDto utvidetBehandlingDto = behandlingDtoTjeneste.hentUtvidetBehandlingResultat(1L);
+        UtvidetBehandlingDto utvidetBehandlingDto = behandlingDtoTjeneste.hentUtvidetBehandlingResultat(1L,null);
         assertUtvidetBehandlingDto(utvidetBehandlingDto);
 
         assertThat(utvidetBehandlingDto.getLinks()).isNotEmpty();
@@ -112,7 +112,7 @@ public class BehandlingDtoTjenesteTest {
         Behandling behandling = lagBehandling(BehandlingStegType.FORELDELSEVURDERINGSTEG, BehandlingStatus.UTREDES);
         when(behandlingTjeneste.hentBehandling(anyLong())).thenReturn(behandling);
 
-        UtvidetBehandlingDto utvidetBehandlingDto = behandlingDtoTjeneste.hentUtvidetBehandlingResultat(1L);
+        UtvidetBehandlingDto utvidetBehandlingDto = behandlingDtoTjeneste.hentUtvidetBehandlingResultat(1L,null);
         assertUtvidetBehandlingDto(utvidetBehandlingDto);
 
         assertThat(utvidetBehandlingDto.getLinks()).isNotEmpty();
@@ -126,7 +126,7 @@ public class BehandlingDtoTjenesteTest {
         Behandling behandling = lagBehandling(BehandlingStegType.VTILBSTEG, BehandlingStatus.UTREDES);
         when(behandlingTjeneste.hentBehandling(anyLong())).thenReturn(behandling);
 
-        UtvidetBehandlingDto utvidetBehandlingDto = behandlingDtoTjeneste.hentUtvidetBehandlingResultat(1L);
+        UtvidetBehandlingDto utvidetBehandlingDto = behandlingDtoTjeneste.hentUtvidetBehandlingResultat(1L,null);
         assertUtvidetBehandlingDto(utvidetBehandlingDto);
 
         assertThat(utvidetBehandlingDto.getLinks()).isNotEmpty();
@@ -141,7 +141,7 @@ public class BehandlingDtoTjenesteTest {
         Behandling behandling = lagBehandling(BehandlingStegType.FORESLÅ_VEDTAK, BehandlingStatus.UTREDES);
         when(behandlingTjeneste.hentBehandling(anyLong())).thenReturn(behandling);
 
-        UtvidetBehandlingDto utvidetBehandlingDto = behandlingDtoTjeneste.hentUtvidetBehandlingResultat(1L);
+        UtvidetBehandlingDto utvidetBehandlingDto = behandlingDtoTjeneste.hentUtvidetBehandlingResultat(1L,null);
         assertUtvidetBehandlingDto(utvidetBehandlingDto);
 
         assertThat(utvidetBehandlingDto.getLinks()).isNotEmpty();

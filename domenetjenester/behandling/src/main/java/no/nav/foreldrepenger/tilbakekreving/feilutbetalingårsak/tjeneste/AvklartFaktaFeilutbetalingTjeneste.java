@@ -20,6 +20,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkOpplysningType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.UnderÅrsakDto;
 import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkinnslagDelDto;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
@@ -33,6 +34,7 @@ public class AvklartFaktaFeilutbetalingTjeneste {
     private static final String UNDERÅRSAK_KODEVERK = "UNDERÅRSAK_KODEVERK";
 
     private FeilutbetalingRepository feilutbetalingRepository;
+    private KodeverkRepository kodeverkRepository;
     private HistorikkTjenesteAdapter historikkTjenesteAdapter;
 
     AvklartFaktaFeilutbetalingTjeneste() {
@@ -40,8 +42,10 @@ public class AvklartFaktaFeilutbetalingTjeneste {
     }
 
     @Inject
-    public AvklartFaktaFeilutbetalingTjeneste(FeilutbetalingRepository feilutbetalingRepository, HistorikkTjenesteAdapter historikkTjenesteAdapter) {
+    public AvklartFaktaFeilutbetalingTjeneste(FeilutbetalingRepository feilutbetalingRepository, KodeverkRepository kodeverkRepository,
+                                              HistorikkTjenesteAdapter historikkTjenesteAdapter) {
         this.feilutbetalingRepository = feilutbetalingRepository;
+        this.kodeverkRepository = kodeverkRepository;
         this.historikkTjenesteAdapter = historikkTjenesteAdapter;
     }
 
@@ -138,7 +142,7 @@ public class AvklartFaktaFeilutbetalingTjeneste {
         if (sjekkHvisÅrsakEllerUnderÅrsakEndret(faktaFeilutbetalingDto, sjekkOgReturnereUnderårsak(underÅrsakDto, UNDERÅRSAK_KODE), forrigePeiodeÅrsak)) {
             mapFellesVerdier(tekstBuilder, begrunnelse, faktaFeilutbetalingDto);
             tekstBuilder.medEndretFelt(HistorikkEndretFeltType.HENDELSE_ÅRSAK,
-                feilutbetalingRepository.henteKodeliste(forrigePeiodeÅrsak.getÅrsakKodeverk(), forrigePeiodeÅrsak.getÅrsak()).getNavn(),
+                kodeverkRepository.hentKodeliste(forrigePeiodeÅrsak.getÅrsakKodeverk(), forrigePeiodeÅrsak.getÅrsak()).getNavn(),
                 faktaFeilutbetalingDto.getÅrsak().getÅrsak());
             tekstBuilder.medEndretFelt(HistorikkEndretFeltType.HENDELSE_UNDER_ÅRSAK,
                 hentForrigeUnderÅrsak(forrigePeiodeÅrsak.getUnderÅrsakKodeverk(), forrigePeiodeÅrsak.getUnderÅrsak()),
@@ -158,7 +162,7 @@ public class AvklartFaktaFeilutbetalingTjeneste {
         if (StringUtils.nullOrEmpty(underÅrsakKode)) {
             return null;
         }
-        return feilutbetalingRepository.henteKodeliste(underÅrsakKodeverk, underÅrsakKode).getNavn();
+        return kodeverkRepository.hentKodeliste(underÅrsakKodeverk, underÅrsakKode).getNavn();
     }
 
     private boolean sjekkHvisÅrsakEllerUnderÅrsakEndret(FaktaFeilutbetalingDto faktaFeilutbetalingDto, String underÅrsakKode,

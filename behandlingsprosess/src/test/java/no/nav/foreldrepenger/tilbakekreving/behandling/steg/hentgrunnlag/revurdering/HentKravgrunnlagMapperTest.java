@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,8 +15,8 @@ import org.mockito.Mockito;
 
 import com.google.common.collect.Lists;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
-import no.nav.foreldrepenger.tilbakekreving.domene.person.TpsAdapter;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
@@ -34,16 +33,15 @@ import no.nav.tilbakekreving.typer.v1.TypeGjelderDto;
 import no.nav.tilbakekreving.typer.v1.TypeKlasseDto;
 import no.nav.vedtak.felles.integrasjon.felles.ws.DateUtil;
 
-public class HentKravgrunnlagMapperTest {
+public class HentKravgrunnlagMapperTest extends FellesTestOppsett {
 
     private static final String ENHET = "8020";
 
-    private TpsAdapter tpsTjeneste = Mockito.mock(TpsAdapter.class);
-    private HentKravgrunnlagMapper mapper = new HentKravgrunnlagMapper(tpsTjeneste);
+    private HentKravgrunnlagMapper mapper = new HentKravgrunnlagMapper(tpsAdapterWrapper);
 
     @Test
     public void skal_mapTilDomene_fraHentgrunnlagrespons(){
-        Mockito.when(tpsTjeneste.hentAktørIdForPersonIdent(PersonIdent.fra("12345678901"))).thenReturn(Optional.of(new AktørId(999999L)));
+        Mockito.when(tpsAdapterMock.hentAktørIdForPersonIdent(PersonIdent.fra("12345678901"))).thenReturn(Optional.of(new AktørId(999999L)));
 
         Kravgrunnlag431 kravgrunnlag431 = mapper.mapTilDomene(hentGrunnlag());
         assertThat(kravgrunnlag431).isNotNull();

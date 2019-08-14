@@ -89,6 +89,7 @@ public class VurdertForeldelseTjeneste {
     public FeilutbetalingPerioderDto hentFaktaPerioder(Long behandlingId) {
         Optional<FeilutbetalingAggregate> feilutbetalingAggregate = feilutbetalingRepository.finnFeilutbetaling(behandlingId);
         FeilutbetalingPerioderDto perioderDto = new FeilutbetalingPerioderDto();
+        perioderDto.setBehandlingId(behandlingId);
         List<PeriodeDto> perioder = new ArrayList<>();
         if (feilutbetalingAggregate.isPresent() && !feilutbetalingAggregate.get().getFeilutbetaling().getFeilutbetaltPerioder().isEmpty()) {
             for (FeilutbetalingPeriodeÅrsak feilutbetalingPeriodeÅrsak : feilutbetalingAggregate.get().getFeilutbetaling().getFeilutbetaltPerioder()) {

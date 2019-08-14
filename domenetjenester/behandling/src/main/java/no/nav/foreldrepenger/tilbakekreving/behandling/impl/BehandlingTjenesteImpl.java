@@ -38,6 +38,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingAggregate;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingPeriodeÅrsak;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
@@ -150,15 +151,20 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
     }
 
     @Override
-    public Long opprettBehandlingManuell(Saksnummer saksnummer, long eksternBehandlingId, AktørId aktørId, BehandlingType behandlingType) {
+    public Long opprettBehandlingManuell(Saksnummer saksnummer, long eksternBehandlingId,
+                                         AktørId aktørId, String ytelseType,
+                                         BehandlingType behandlingType) {
         Long fagsakId = fpsakKlient.hentFagsakId(eksternBehandlingId);
+        FagsakYtelseType fagsakYtelseType = FagsakYtelseType.fraKode(ytelseType);
 
-        return opprettFørstegangsbehandling(saksnummer, fagsakId, eksternBehandlingId, aktørId, behandlingType);
+        return opprettFørstegangsbehandling(saksnummer, fagsakId, eksternBehandlingId, aktørId, fagsakYtelseType, behandlingType);
     }
 
     @Override
-    public Long opprettBehandlingAutomatisk(Saksnummer saksnummer, long fagsakId, long eksternBehandlingId, AktørId aktørId, BehandlingType behandlingType) {
-        return opprettFørstegangsbehandling(saksnummer, fagsakId, eksternBehandlingId, aktørId, behandlingType);
+    public Long opprettBehandlingAutomatisk(Saksnummer saksnummer, long fagsakId, long eksternBehandlingId,
+                                            AktørId aktørId, FagsakYtelseType fagsakYtelseType,
+                                            BehandlingType behandlingType) {
+        return opprettFørstegangsbehandling(saksnummer, fagsakId, eksternBehandlingId, aktørId, fagsakYtelseType, behandlingType);
     }
 
     @Override
@@ -212,10 +218,12 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
         }
     }
 
-    private Long opprettFørstegangsbehandling(Saksnummer saksnummer, long fagsakId, long eksternBehandlingId, AktørId aktørId, BehandlingType behandlingType) {
+    private Long opprettFørstegangsbehandling(Saksnummer saksnummer, long fagsakId, long eksternBehandlingId,
+                                              AktørId aktørId, FagsakYtelseType fagsakYtelseType,
+                                              BehandlingType behandlingType) {
         logger.info("Oppretter behandling for fagsak [id: {} saksnummer: {} ] for ekstern behandling [ {} ]", fagsakId, saksnummer, eksternBehandlingId);
 
-        Fagsak fagsak = fagsakTjeneste.finnEllerOpprettFagsak(fagsakId, saksnummer, aktørId);
+        Fagsak fagsak = fagsakTjeneste.finnEllerOpprettFagsak(fagsakId, saksnummer, aktørId, fagsakYtelseType);
 
         Behandling behandling = Behandling.nyBehandlingFor(fagsak, behandlingType).build();
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);

@@ -2,65 +2,62 @@ package no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.tjeneste;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingÅrsakDefinisjon;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.ÅrsakUdefinert;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodelisteRelasjon;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
+import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.FeiltubetalingÅrsakerYtelseTypeDto;
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.FeilutbetalingÅrsakDto;
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.UnderÅrsakDto;
 
 @ApplicationScoped
 public class FeilutbetalingÅrsakTjeneste {
 
-    private FeilutbetalingRepository feilutbetalingRepository;
+    private KodeverkRepository kodeverkRepository;
 
     FeilutbetalingÅrsakTjeneste() {
         // For CDI
     }
 
     @Inject
-    public FeilutbetalingÅrsakTjeneste(FeilutbetalingRepository feilutbetalingRepository) {
-        this.feilutbetalingRepository = feilutbetalingRepository;
+    public FeilutbetalingÅrsakTjeneste(KodeverkRepository kodeverkRepository) {
+        this.kodeverkRepository = kodeverkRepository;
     }
 
-    public List<FeilutbetalingÅrsakDto> hentAlleÅrsaker() {
-        List<FeilutbetalingÅrsakDefinisjon> feilutbetalingÅrsaker = feilutbetalingRepository.henteAlleÅrsaker();
-        List<FeilutbetalingÅrsakDto> årsaker = new ArrayList<>();
-        if (!feilutbetalingÅrsaker.isEmpty()) {
-            List<Kodeliste> kodelister = feilutbetalingRepository.henteKodeliste(feilutbetalingÅrsaker.stream()
-                    .map(def -> def.getÅrsak())
-                    .collect(Collectors.toList()));
-            for (Kodeliste kodeliste : kodelister) {
+    public List<FeiltubetalingÅrsakerYtelseTypeDto> hentFeilutbetalingårsaker() {
+        List<FeiltubetalingÅrsakerYtelseTypeDto> resultat = new ArrayList<>();
+
+        Map<FagsakYtelseType, Set<HendelseType>> hendelseTypePrYtelseType = kodeverkRepository.hentKodeRelasjonForKodeverk(FagsakYtelseType.class, HendelseType.class);
+        Map<HendelseType, Set<HendelseUnderType>> hendelseUndertypePrHendelseType = kodeverkRepository.hentKodeRelasjonForKodeverk(HendelseType.class, HendelseUnderType.class);
+
+        for (Map.Entry<FagsakYtelseType, Set<HendelseType>> entry : hendelseTypePrYtelseType.entrySet()) {
+            FagsakYtelseType ytelseType = entry.getKey();
+            Set<HendelseType> hendelseTyper = entry.getValue();
+
+            List<FeilutbetalingÅrsakDto> dtoer = new ArrayList<>();
+            for (HendelseType hendelseType : hendelseTyper) {
                 FeilutbetalingÅrsakDto feilutbetalingÅrsakDto = new FeilutbetalingÅrsakDto();
-                feilutbetalingÅrsakDto.setÅrsakKode(kodeliste.getKode());
-                feilutbetalingÅrsakDto.setÅrsak(kodeliste.getNavn());
-                feilutbetalingÅrsakDto.setKodeverk(kodeliste.getKodeverk());
-                List<KodelisteRelasjon> kodelisteRelasjoner = feilutbetalingRepository.henteKodelisteRelasjon(kodeliste.getKodeverk(), kodeliste.getKode());
-                formUnderÅrsak(feilutbetalingÅrsakDto, kodelisteRelasjoner);
-
-                årsaker.add(feilutbetalingÅrsakDto);
+                feilutbetalingÅrsakDto.setÅrsakKode(hendelseType.getKode());
+                feilutbetalingÅrsakDto.setÅrsak(hendelseType.getNavn());
+                feilutbetalingÅrsakDto.setKodeverk(hendelseType.getKodeverk());
+                if (hendelseUndertypePrHendelseType.containsKey(hendelseType)) {
+                    for (HendelseUnderType hendelseUnderType : hendelseUndertypePrHendelseType.get(hendelseType)) {
+                        feilutbetalingÅrsakDto.leggTilUnderÅrsaker(new UnderÅrsakDto(hendelseUnderType.getNavn(), hendelseUnderType.getKode(), hendelseUnderType.getKodeverk()));
+                    }
+                }
+                dtoer.add(feilutbetalingÅrsakDto);
             }
+
+            resultat.add(new FeiltubetalingÅrsakerYtelseTypeDto(ytelseType, dtoer));
         }
-        return årsaker;
+
+        return resultat;
     }
 
-    private void formUnderÅrsak(FeilutbetalingÅrsakDto feilutbetalingÅrsakDto, List<KodelisteRelasjon> kodelisteRelasjoner) {
-        List<String> underÅrsakKodeverker = kodelisteRelasjoner.stream()
-                .filter(kodelisteRelasjon -> !kodelisteRelasjon.getKode2().equals(ÅrsakUdefinert.UDEFINERT.getKode()))
-                .map(kodelisteRelasjon -> kodelisteRelasjon.getKodeverk2())
-                .collect(Collectors.toList());
-        if (!underÅrsakKodeverker.isEmpty()) {
-            List<Kodeliste> underÅrsakKodelister = feilutbetalingRepository.henteKodeliste(underÅrsakKodeverker);
-            for (Kodeliste underÅrsakKodeListe : underÅrsakKodelister) {
-                feilutbetalingÅrsakDto.leggTilUnderÅrsaker(new UnderÅrsakDto(underÅrsakKodeListe.getNavn(), underÅrsakKodeListe.getKode(),
-                        underÅrsakKodeListe.getKodeverk()));
-            }
-        }
-    }
 }

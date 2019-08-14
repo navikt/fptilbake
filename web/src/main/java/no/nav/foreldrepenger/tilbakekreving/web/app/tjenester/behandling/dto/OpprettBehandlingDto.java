@@ -36,6 +36,10 @@ public class OpprettBehandlingDto implements AbacDto {
     @Size(max = 20)
     private String behandlingArsakType;
 
+    @Pattern(regexp = InputValideringRegex.KODEVERK)
+    @Size(max = 20)
+    private String fagsakYtelseType;
+
     public OpprettBehandlingDto() {
         // For CDI
     }
@@ -78,6 +82,14 @@ public class OpprettBehandlingDto implements AbacDto {
 
     public void setBehandlingArsakType(String behandlingArsakType) {
         this.behandlingArsakType = behandlingArsakType;
+    }
+
+    public String getFagsakYtelseType() {
+        return fagsakYtelseType;
+    }
+
+    public void setFagsakYtelseType(String fagsakYtelseType) {
+        this.fagsakYtelseType = fagsakYtelseType;
     }
 
     @Override

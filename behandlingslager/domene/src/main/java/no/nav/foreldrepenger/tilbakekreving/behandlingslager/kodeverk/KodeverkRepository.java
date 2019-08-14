@@ -71,4 +71,19 @@ public interface KodeverkRepository {
 
     Map<String, String> hentLandkodeISO2TilLandkoderMap();
 
+    /**
+     * Hent kodelisteRelasjon basert på kodeverk1 og kode1
+     */
+    <V extends KodelisteRelasjon> List<V> henteKodelisteRelasjon(String kodeverk, String kode);
+
+    /**
+     * Hent alle kodeliste basert på liste av kodeverk
+     */
+    <V extends Kodeliste> List<V> hentKodeliste(List<String> kodeverker);
+
+    /**
+     * Hent kodeliste basert på kodeverk og kode
+     */
+    <V extends Kodeliste> V hentKodeliste(String kodeverk, String kode);
+
 }

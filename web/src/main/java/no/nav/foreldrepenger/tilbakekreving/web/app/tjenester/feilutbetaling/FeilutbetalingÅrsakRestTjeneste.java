@@ -2,7 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.feilutbetaling;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.READ;
-import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursResourceAttributt.FAGSAK;
+import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursResourceAttributt.APPLIKASJON;
 
 import java.util.List;
 
@@ -17,6 +17,7 @@ import org.eclipse.jetty.http.HttpStatus;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
+import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.FeiltubetalingÅrsakerYtelseTypeDto;
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.FeilutbetalingÅrsakDto;
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.tjeneste.FeilutbetalingÅrsakTjeneste;
 import no.nav.vedtak.felles.jpa.Transaction;
@@ -41,10 +42,10 @@ public class FeilutbetalingÅrsakRestTjeneste {
     }
 
     @GET
-    @ApiOperation(value = "Henter feilutbetaling årsaker")
-    @ApiResponse(code = HttpStatus.OK_200,message = "OK", response = FeilutbetalingÅrsakDto.class)
-    @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
-    public List<FeilutbetalingÅrsakDto> hentAlleFeilutbetalingÅrsaker() {
-        return feilutbetalingÅrsakTjeneste.hentAlleÅrsaker();
+    @ApiOperation(value = "Henter kodeverk for årsak med underårsaker for feilutbetaling")
+    @ApiResponse(code = HttpStatus.OK_200, message = "OK", response = FeilutbetalingÅrsakDto.class)
+    @BeskyttetRessurs(action = READ, ressurs = APPLIKASJON)
+    public List<FeiltubetalingÅrsakerYtelseTypeDto> hentAlleFeilutbetalingÅrsaker() {
+        return feilutbetalingÅrsakTjeneste.hentFeilutbetalingårsaker();
     }
 }

@@ -33,6 +33,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingPeriodeÅrsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.InntektskategoriKlassekodeMapper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingAggregateEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingEntitet;
@@ -58,6 +59,7 @@ public class VilkårsvurderingTjeneste {
     private KravgrunnlagRepository grunnlagRepository;
     private FeilutbetalingRepository feilutbetalingRepository;
     private VilkårsvurderingRepository vilkårsvurderingRepository;
+    private KodeverkRepository kodeverkRepository;
     private BehandlingRepositoryProvider behandlingRepositoryProvider;
     private VilkårsvurderingHistorikkInnslagTjeneste vilkårsvurderingHistorikkInnslagTjeneste;
 
@@ -73,6 +75,7 @@ public class VilkårsvurderingTjeneste {
         this.grunnlagRepository = behandlingRepositoryProvider.getGrunnlagRepository();
         this.feilutbetalingRepository = behandlingRepositoryProvider.getFeilutbetalingRepository();
         this.vilkårsvurderingRepository = behandlingRepositoryProvider.getVilkårsvurderingRepository();
+        this.kodeverkRepository = behandlingRepositoryProvider.getKodeverkRepository();
         this.vilkårsvurderingHistorikkInnslagTjeneste = vilkårsvurderingHistorikkInnslagTjeneste;
     }
 
@@ -88,8 +91,6 @@ public class VilkårsvurderingTjeneste {
             } else { // hvis perioder er ikke vurderes for foreldelse
                 feilutbetalingPerioder.addAll(henteFeilutbetalingPerioderFraFaktaOmFeilutbetaling(behandlingId, feilutbetaltPerioder));
             }
-        } else {
-            throw new IllegalArgumentException("Utvikler feil: Fakta om feilutbetaling må eksistere for behandlingId=" + behandlingId);
         }
 
         return feilutbetalingPerioder;
@@ -214,10 +215,10 @@ public class VilkårsvurderingTjeneste {
         FeilutbetalingÅrsakDto årsakDto = new FeilutbetalingÅrsakDto();
         årsakDto.setKodeverk(feilutbetalingPeriodeÅrsak.getÅrsakKodeverk());
         årsakDto.setÅrsakKode(feilutbetalingPeriodeÅrsak.getÅrsak());
-        Kodeliste kodeliste = feilutbetalingRepository.henteKodeliste(feilutbetalingPeriodeÅrsak.getÅrsakKodeverk(), feilutbetalingPeriodeÅrsak.getÅrsak());
+        Kodeliste kodeliste = kodeverkRepository.hentKodeliste(feilutbetalingPeriodeÅrsak.getÅrsakKodeverk(), feilutbetalingPeriodeÅrsak.getÅrsak());
         årsakDto.setÅrsak(kodeliste.getNavn());
         if (feilutbetalingPeriodeÅrsak.getUnderÅrsakKodeverk() != null) {
-            Kodeliste underÅrsakKodeListe = feilutbetalingRepository.henteKodeliste(feilutbetalingPeriodeÅrsak.getUnderÅrsakKodeverk(), feilutbetalingPeriodeÅrsak.getUnderÅrsak());
+            Kodeliste underÅrsakKodeListe = kodeverkRepository.hentKodeliste(feilutbetalingPeriodeÅrsak.getUnderÅrsakKodeverk(), feilutbetalingPeriodeÅrsak.getUnderÅrsak());
             årsakDto.leggTilUnderÅrsaker(new UnderÅrsakDto(underÅrsakKodeListe.getNavn(), feilutbetalingPeriodeÅrsak.getUnderÅrsak(),
                 feilutbetalingPeriodeÅrsak.getUnderÅrsakKodeverk()));
         }

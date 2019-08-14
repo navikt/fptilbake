@@ -1,19 +1,14 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.revurdering;
 
-import static no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType.ORGANISASJON;
-
 import java.time.LocalDate;
-import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TpsAdapterWrapper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
-import no.nav.foreldrepenger.tilbakekreving.domene.person.TpsAdapter;
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagBelop433;
@@ -25,24 +20,19 @@ import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagBelopDt
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagDto;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagPeriodeDto;
 import no.nav.tilbakekreving.typer.v1.TypeKlasseDto;
-import no.nav.vedtak.feil.Feil;
-import no.nav.vedtak.feil.FeilFactory;
-import no.nav.vedtak.feil.LogLevel;
-import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
-import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
 import no.nav.vedtak.felles.integrasjon.felles.ws.DateUtil;
 
 @ApplicationScoped
 public class HentKravgrunnlagMapper {
-    private TpsAdapter tps;
+    private TpsAdapterWrapper tpsAdapterWrapper;
 
     HentKravgrunnlagMapper() {
         //for CDI proxy
     }
 
     @Inject
-    public HentKravgrunnlagMapper(TpsAdapter tps) {
-        this.tps = tps;
+    public HentKravgrunnlagMapper(TpsAdapterWrapper tpsAdapterWrapper) {
+        this.tpsAdapterWrapper = tpsAdapterWrapper;
     }
 
     public Kravgrunnlag431 mapTilDomene(DetaljertKravgrunnlagDto dto) {
@@ -67,9 +57,9 @@ public class HentKravgrunnlagMapper {
             .medFagSystemId(dto.getFagsystemId())
             .medVedtakFagSystemDato(konverter(dto.getDatoVedtakFagsystem()))
             .medOmgjortVedtakId(dto.getVedtakIdOmgjort() != null ? dto.getVedtakIdOmgjort().longValue() : null)
-            .medGjelderVedtakId(hentAktørIdEllerOrganisajonNummer(dto.getVedtakGjelderId(), gjelderType))
+            .medGjelderVedtakId(tpsAdapterWrapper.hentAktørIdEllerOrganisajonNummer(dto.getVedtakGjelderId(), gjelderType))
             .medGjelderType(gjelderType)
-            .medUtbetalesTilId(hentAktørIdEllerOrganisajonNummer(dto.getUtbetalesTilId(), utbetalingGjelderType))
+            .medUtbetalesTilId(tpsAdapterWrapper.hentAktørIdEllerOrganisajonNummer(dto.getUtbetalesTilId(), utbetalingGjelderType))
             .medUtbetIdType(utbetalingGjelderType)
             .medHjemmelKode(dto.getKodeHjemmel())
             .medBeregnesRenter(dto.getRenterBeregnes() != null ? dto.getRenterBeregnes().value() : null)
@@ -135,22 +125,4 @@ public class HentKravgrunnlagMapper {
         }
     }
 
-    private String hentAktørIdEllerOrganisajonNummer(String fnrEllerOrgNo, GjelderType gjelderType) {
-        if (gjelderType.equals(ORGANISASJON)) {
-            return fnrEllerOrgNo;
-        } else {
-            Optional<AktørId> aktørId = tps.hentAktørIdForPersonIdent(PersonIdent.fra(fnrEllerOrgNo));
-            return aktørId
-                .map(AktørId::getId)
-                .orElseThrow(() -> KravgrunnlagMapperFeil.FACTORY.fantIkkePersonIdentMedFnr().toException());
-        }
-    }
-
-    public interface KravgrunnlagMapperFeil extends DeklarerteFeil {
-
-        KravgrunnlagMapperFeil FACTORY = FeilFactory.create(KravgrunnlagMapperFeil.class);
-
-        @TekniskFeil(feilkode = "FPT-107927", feilmelding = "Klarte ikke mappe om kravgrunnlag - Fant ikke person med fnr", logLevel = LogLevel.WARN)
-        Feil fantIkkePersonIdentMedFnr();
-    }
 }

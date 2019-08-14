@@ -1,15 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.VurderÅrsak;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkTabellRepository;
-import org.mockito.Mockito;
-
-import javax.persistence.NoResultException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -23,6 +13,19 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import javax.persistence.NoResultException;
+
+import org.mockito.Mockito;
+
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.VurderÅrsak;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodelisteRelasjon;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkTabellRepository;
 
 /**
  * Støtte for enhetstester som trenger kodeverk/liste instanser med mer fullstendig tilstand enn konstantene
@@ -222,6 +225,21 @@ public class KodeverkTestHelper {
             HashMap<String, String> landkoder = new HashMap<>();
             landkoder.put("GE", "TYSKLAND");
             return landkoder;
+        }
+
+        @Override
+        public <V extends KodelisteRelasjon> List<V> henteKodelisteRelasjon(String kodeverk, String kode) {
+            return (List<V>) new ArrayList<KodelisteRelasjon>();
+        }
+
+        @Override
+        public <V extends Kodeliste> List<V> hentKodeliste(List<String> kodeverker) {
+            return (List<V>) new ArrayList<Kodeliste>();
+        }
+
+        @Override
+        public <V extends Kodeliste> V hentKodeliste(String kodeverk, String kode) {
+            return null;
         }
 
         @Override

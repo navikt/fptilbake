@@ -22,8 +22,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermle
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.Feilutbetaling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingAggregate;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingPeriodeÅrsak;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.UtsettelseArbeid;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.UtsettelseÅrsakType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.FpHendelseUnderTyper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkOpplysningType;
@@ -259,10 +259,10 @@ public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
         Feilutbetaling feilutbetaling = new Feilutbetaling();
 
         feilutbetaling.leggTilFeilutbetaltPeriode(formPeriodeÅrsak(FOM_1, sisteDagFørstePeriode,
-            UtsettelseÅrsakType.ARBEID.getKode(), UtsettelseArbeid.UTSETTELSE_ARBEID_HELTID.getKode(), feilutbetaling));
+            HendelseType.FP_UTTAK_UTSETTELSE_TYPE.getKode(), FpHendelseUnderTyper.ARBEID_HELTID.getKode(), feilutbetaling));
 
         feilutbetaling.leggTilFeilutbetaltPeriode(formPeriodeÅrsak(førsteDagAndrePeriode, TOM_1,
-            UtsettelseÅrsakType.ARBEID.getKode(), UtsettelseArbeid.UTSETTELSE_ARBEID_DELTID.getKode(), feilutbetaling));
+            HendelseType.FP_UTTAK_UTSETTELSE_TYPE.getKode(), FpHendelseUnderTyper.ARBEID_HELTID.getKode(), feilutbetaling));
 
         FeilutbetalingAggregate feilutbetalingAggregate = FeilutbetalingAggregate.builder()
             .medBehandlingId(INTERN_BEHANDLING_ID)

@@ -24,7 +24,6 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import no.nav.foreldrepenger.domene.dokumentarkiv.journal.JournalTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.impl.HenleggBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingModell;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegKonfigurasjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
@@ -47,8 +46,11 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRe
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.vedtak.exception.TekniskException;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 import no.nav.vedtak.konfig.KonfigVerdi;
 
@@ -85,6 +87,12 @@ public class HenleggBehandlingTjenesteTest {
     @Mock
     private BehandlingresultatRepository behandlingresultatRepository;
 
+    @Mock
+    private KravgrunnlagRepository kravgrunnlagRepositoryMock;
+
+    @Mock
+    private ProsessTaskRepository prosessTaskRepositoryMock;
+
     @Inject
     private AksjonspunktRepository aksjonspunktRepository;
 
@@ -115,27 +123,26 @@ public class HenleggBehandlingTjenesteTest {
         when(repositoryProviderMock.getKodeverkRepository()).thenReturn(kodeverkRepository);
         when(repositoryProviderMock.getHistorikkRepository()).thenReturn(historikkRepositoryMock);
         when(repositoryProviderMock.getBehandlingresultatRepository()).thenReturn(behandlingresultatRepository);
+        when(repositoryProviderMock.getGrunnlagRepository()).thenReturn(kravgrunnlagRepositoryMock);
         when(repositoryProviderMock.getBehandlingRepository().finnBehandlingStegType(IVERKSETT_VEDTAK.getKode())).thenReturn(behandlingStegType);
         BehandlingskontrollTjenesteImpl behandlingskontrollTjenesteImpl = new BehandlingskontrollTjenesteImpl(repositoryProviderMock,
-                behandlingModellRepository, null);
+            behandlingModellRepository, null);
         when(behandlingModellRepository.getBehandlingStegKonfigurasjon()).thenReturn(BehandlingStegKonfigurasjon.lagDummy());
         when(behandlingModellRepository.getModell(any())).thenReturn(modell);
         when(modell.erStegAFørStegB(any(), any())).thenReturn(true);
 
         historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepositoryMock, mock(JournalTjeneste.class), mock(PersoninfoAdapter.class));
 
-        henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repositoryProviderMock,
-                behandlingskontrollTjenesteImpl, historikkinnslagTjeneste);
+        henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repositoryProviderMock, prosessTaskRepositoryMock,
+            behandlingskontrollTjenesteImpl, historikkinnslagTjeneste);
     }
 
     @Test
     public void skal_henlegge_behandling_uten_brev() {
         // Arrange
         BehandlingResultatType behandlingsresultat = BehandlingResultatType.HENLAGT_FEILOPPRETTET;
-
         // Act
         henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), behandlingsresultat, "begrunnelse");
-
         // Assert
         verify(historikkRepositoryMock).lagre(any(Historikkinnslag.class));
         verify(repositoryProviderMock.getBehandlingRepository(), atLeast(2)).lagre(eq(behandling), any(BehandlingLås.class));
@@ -158,16 +165,15 @@ public class HenleggBehandlingTjenesteTest {
     }
 
     @Test
-    public void skal_henlegge_behandling_ved_dødsfall() {
-        // Arrange
-        BehandlingResultatType behandlingsresultat = BehandlingResultatType.HENLAGT_BRUKER_DØD;
+    public void skal_henlegge_behandling_med_annuelere_kravgrunnlag (){
+        BehandlingResultatType behandlingsresultat = BehandlingResultatType.HENLAGT_FEILOPPRETTET;
+        when(kravgrunnlagRepositoryMock.harGrunnlagForBehandlingId(behandling.getId())).thenReturn(true);
 
-        // Act
         henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), behandlingsresultat, "begrunnelse");
 
-        // Assert
         verify(historikkRepositoryMock).lagre(any(Historikkinnslag.class));
         verify(repositoryProviderMock.getBehandlingRepository(), atLeast(2)).lagre(eq(behandling), any(BehandlingLås.class));
+        verify(prosessTaskRepositoryMock,atLeastOnce()).lagre(any(ProsessTaskData.class));
     }
 
     @Test
@@ -179,7 +185,7 @@ public class HenleggBehandlingTjenesteTest {
 
         manipulerInternBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VARSEL);
 
-        BehandlingResultatType behandlingsresultat = BehandlingResultatType.HENLAGT_SØKNAD_TRUKKET;
+        BehandlingResultatType behandlingsresultat = BehandlingResultatType.HENLAGT_FEILOPPRETTET;
 
         // Act
         henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), behandlingsresultat, "begrunnelse");
@@ -189,7 +195,7 @@ public class HenleggBehandlingTjenesteTest {
     public void kan_henlegge_behandling_der_vedtak_er_foreslått() {
         // Arrange
         Behandlingsresultat.builder().medBehandlingResultatType(BehandlingResultatType.INNVILGET).medBehandling(behandling);
-        BehandlingResultatType behandlingsresultat = BehandlingResultatType.HENLAGT_SØKNAD_TRUKKET;
+        BehandlingResultatType behandlingsresultat = BehandlingResultatType.HENLAGT_FEILOPPRETTET;
 
         // Act
         henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), behandlingsresultat, "begrunnelse");
@@ -199,7 +205,7 @@ public class HenleggBehandlingTjenesteTest {
     public void kan_ikke_henlegge_behandling_der_vedtak_er_fattet() {
         // Arrange
         Behandlingsresultat.builder().medBehandlingResultatType(BehandlingResultatType.INNVILGET).medBehandling(behandling);
-        BehandlingResultatType behandlingsresultat = BehandlingResultatType.HENLAGT_SØKNAD_TRUKKET;
+        BehandlingResultatType behandlingsresultat = BehandlingResultatType.HENLAGT_FEILOPPRETTET;
         manipulerInternBehandling.forceOppdaterBehandlingSteg(behandling, IVERKSETT_VEDTAK);
 
         expectedException.expect(TekniskException.class);
@@ -213,7 +219,7 @@ public class HenleggBehandlingTjenesteTest {
     public void kan_ikke_henlegge_behandling_som_allerede_er_henlagt() {
         // Arrange
         Behandlingsresultat.builder().medBehandlingResultatType(BehandlingResultatType.HENLAGT_FEILOPPRETTET).medBehandling(behandling);
-        BehandlingResultatType behandlingsresultat = BehandlingResultatType.HENLAGT_SØKNAD_TRUKKET;
+        BehandlingResultatType behandlingsresultat = BehandlingResultatType.HENLAGT_FEILOPPRETTET;
 
         expectedException.expect(TekniskException.class);
         expectedException.expectMessage("FPT-143308");
