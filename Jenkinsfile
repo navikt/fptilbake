@@ -1,3 +1,4 @@
-@Library('vl-jenkins_i')_
+@Library('vl-jenkins')_
 
-naisPipeline{}
+naisPipeline()
+
