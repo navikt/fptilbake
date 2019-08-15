@@ -192,7 +192,7 @@ public abstract class Kodeliste extends KodeverkBaseEntitet implements Comparabl
         return gyldigTilOgMed;
     }
 
-    protected String getEkstraData() {
+    public String getEkstraData() {
         return ekstraData;
     }
 

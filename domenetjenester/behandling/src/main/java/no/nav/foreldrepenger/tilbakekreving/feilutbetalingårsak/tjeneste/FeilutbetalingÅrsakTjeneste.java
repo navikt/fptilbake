@@ -1,9 +1,11 @@
 package no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.tjeneste;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -47,7 +49,9 @@ public class FeilutbetalingÅrsakTjeneste {
                 feilutbetalingÅrsakDto.setÅrsak(hendelseType.getNavn());
                 feilutbetalingÅrsakDto.setKodeverk(hendelseType.getKodeverk());
                 if (hendelseUndertypePrHendelseType.containsKey(hendelseType)) {
-                    for (HendelseUnderType hendelseUnderType : hendelseUndertypePrHendelseType.get(hendelseType)) {
+                    // sortere basert på forhåndsdefinert rekkefølge
+                    List<HendelseUnderType> hendelseUnderTyper = sortereHendelseUnderTyper(hendelseUndertypePrHendelseType.get(hendelseType));
+                    for (HendelseUnderType hendelseUnderType : hendelseUnderTyper) {
                         feilutbetalingÅrsakDto.leggTilUnderÅrsaker(new UnderÅrsakDto(hendelseUnderType.getNavn(), hendelseUnderType.getKode(), hendelseUnderType.getKodeverk()));
                     }
                 }
@@ -58,6 +62,14 @@ public class FeilutbetalingÅrsakTjeneste {
         }
 
         return resultat;
+    }
+
+    private List<HendelseUnderType> sortereHendelseUnderTyper(Set<HendelseUnderType> hendelseUnderTyper) {
+        return hendelseUnderTyper
+            .stream()
+            .filter(hendelseUnderType -> null != hendelseUnderType.getEkstraData())
+            .sorted(Comparator.comparing(hendelseUnderType -> Long.valueOf(hendelseUnderType.getEkstraData())))
+            .collect(Collectors.toList());
     }
 
 }
