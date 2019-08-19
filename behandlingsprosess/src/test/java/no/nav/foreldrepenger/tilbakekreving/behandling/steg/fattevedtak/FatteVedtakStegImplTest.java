@@ -109,11 +109,7 @@ public class FatteVedtakStegImplTest {
         assertThat(behandleStegResultat.getTransisjon()).isEqualTo(FellesTransisjoner.TILBAKEFØRT_TIL_AKSJONSPUNKT);
         Optional<BehandlingVedtak> vedtak = repositoryProvider.getBehandlingVedtakRepository()
                 .hentBehandlingvedtakForBehandlingId(behandling.getId());
-        assertThat(vedtak).isPresent();
-        BehandlingVedtak behandlingVedtak = vedtak.get();
-        assertThat(behandlingVedtak.getIverksettingStatus()).isEqualByComparingTo(IverksettingStatus.IKKE_IVERKSATT);
-        assertThat(behandlingVedtak.getVedtakResultatType()).isEqualByComparingTo(VedtakResultatType.DELVIS_TILBAKEBETALING);
-        assertThat(behandlingVedtak.getBehandlingsresultat().getBehandlingResultatType()).isEqualByComparingTo(BehandlingResultatType.AVSLÅTT);
+        assertThat(vedtak).isEmpty();
     }
 
     private Behandling lagBehandling(Fagsak fagsak) {

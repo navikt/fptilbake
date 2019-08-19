@@ -64,10 +64,8 @@ public class FatteVedtakStegImpl implements FatteVedtakSteg {
         Collection<Totrinnsvurdering> totrinnsvurderinger = totrinnRepository.hentTotrinnsvurderinger(behandling);
         if (sendesTilbakeTilSaksbehandler(totrinnsvurderinger)) {
             List<AksjonspunktDefinisjon> aksjonspunktDefinisjoner = totrinnsvurderinger.stream()
-                    .filter(totrinnsvurdering -> !TRUE.equals(totrinnsvurdering.isGodkjent()))
-                    .map(Totrinnsvurdering::getAksjonspunktDefinisjon).collect(Collectors.toList());
-            opprettBehandlingVedtak(behandling, BehandlingResultatType.AVSLÅTT);
-
+                .filter(totrinnsvurdering -> !TRUE.equals(totrinnsvurdering.isGodkjent()))
+                .map(Totrinnsvurdering::getAksjonspunktDefinisjon).collect(Collectors.toList());
             return BehandleStegResultat.tilbakeførtMedAksjonspunkter(aksjonspunktDefinisjoner);
         } else {
             opprettBehandlingVedtak(behandling, BehandlingResultatType.INNVILGET);
@@ -77,21 +75,21 @@ public class FatteVedtakStegImpl implements FatteVedtakSteg {
 
     private boolean sendesTilbakeTilSaksbehandler(Collection<Totrinnsvurdering> totrinnsvurderinger) {
         return totrinnsvurderinger.stream()
-                .anyMatch(totrinnsvurdering -> !TRUE.equals(totrinnsvurdering.isGodkjent()));
+            .anyMatch(totrinnsvurdering -> !TRUE.equals(totrinnsvurdering.isGodkjent()));
     }
 
     private void opprettBehandlingVedtak(Behandling behandling, BehandlingResultatType behandlingResultatType) {
         Behandlingsresultat behandlingsresultat = Behandlingsresultat.builder().medBehandling(behandling)
-                .medBehandlingResultatType(behandlingResultatType).build();
+            .medBehandlingResultatType(behandlingResultatType).build();
         behandlingresultatRepository.lagre(behandlingsresultat);
         BeregningResultat beregningResultat = beregningTjeneste.beregn(behandling.getId());
 
         BehandlingVedtak behandlingVedtak = BehandlingVedtak.builder()
-                .medAnsvarligSaksbehandler(finnSaksBehandler(behandling))
-                .medBehandlingsresultat(behandlingsresultat)
-                .medIverksettingStatus(IverksettingStatus.IKKE_IVERKSATT)
-                .medVedtaksdato(FPDateUtil.iDag())
-                .medVedtakResultat(beregningResultat.getVedtakResultatType()).build();
+            .medAnsvarligSaksbehandler(finnSaksBehandler(behandling))
+            .medBehandlingsresultat(behandlingsresultat)
+            .medIverksettingStatus(IverksettingStatus.IKKE_IVERKSATT)
+            .medVedtaksdato(FPDateUtil.iDag())
+            .medVedtakResultat(beregningResultat.getVedtakResultatType()).build();
 
         behandlingVedtakRepository.lagre(behandlingVedtak);
     }
