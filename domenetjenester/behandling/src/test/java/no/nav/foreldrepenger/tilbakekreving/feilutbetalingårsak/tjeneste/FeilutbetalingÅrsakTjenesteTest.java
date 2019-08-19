@@ -52,7 +52,7 @@ public class FeilutbetalingÅrsakTjenesteTest {
             HendelseType.FP_ANNET_HENDELSE_TYPE.getKode()
         );
 
-        assertThat(mapAvResultat.get(HendelseType.FP_MEDLEMSKAP_TYPE.getKode())).containsOnly(
+        assertThat(mapAvResultat.get(HendelseType.FP_MEDLEMSKAP_TYPE.getKode())).containsExactly(
             FpHendelseUnderTyper.UTVANDRET.getKode(),
             FpHendelseUnderTyper.IKKE_OPPHOLDSTILLATLSE.getKode(),
             FpHendelseUnderTyper.MEDLEM_I_ANNET_LAND.getKode(),
@@ -60,24 +60,24 @@ public class FeilutbetalingÅrsakTjenesteTest {
             FpHendelseUnderTyper.MER_OPPHOLD.getKode()
         );
 
-        assertThat(mapAvResultat.get(HendelseType.FP_OPPTJENING_TYPE.getKode())).containsOnly(
+        assertThat(mapAvResultat.get(HendelseType.FP_OPPTJENING_TYPE.getKode())).containsExactly(
             FpHendelseUnderTyper.IKKE_INNTEKT.getKode(),
             FpHendelseUnderTyper.IKKE_YRKESAKTIV.getKode()
         );
 
-        assertThat(mapAvResultat.get(HendelseType.FP_BEREGNING_TYPE.getKode())).containsOnly(
-            FpHendelseUnderTyper.INNTEKT_UNDER.getKode(),
-            FpHendelseUnderTyper.ENDRING_GRUNNLAG.getKode()
+        assertThat(mapAvResultat.get(HendelseType.FP_BEREGNING_TYPE.getKode())).containsExactly(
+            FpHendelseUnderTyper.ENDRING_GRUNNLAG.getKode(),
+            FpHendelseUnderTyper.INNTEKT_UNDER.getKode()
         );
 
-        assertThat(mapAvResultat.get(HendelseType.FP_STONADSPERIODEN_TYPE.getKode())).containsOnly(
+        assertThat(mapAvResultat.get(HendelseType.FP_STONADSPERIODEN_TYPE.getKode())).containsExactly(
             FpHendelseUnderTyper.ENDRET_DEKNINGSGRAD.getKode(),
             FpHendelseUnderTyper.FEIL_FLERBARNSDAGER.getKode(),
             FpHendelseUnderTyper.OPPHOR_BARN_DOD.getKode(),
             FpHendelseUnderTyper.OPPHOR_MOTTAKER_DOD.getKode()
         );
 
-        assertThat(mapAvResultat.get(HendelseType.FP_UTTAK_GENERELT_TYPE.getKode())).containsOnly(
+        assertThat(mapAvResultat.get(HendelseType.FP_UTTAK_GENERELT_TYPE.getKode())).containsExactly(
             FpHendelseUnderTyper.STONADSPERIODE_OVER_3.getKode(),
             FpHendelseUnderTyper.NY_STONADSPERIODE.getKode(),
             FpHendelseUnderTyper.IKKE_OMSORG.getKode(),
@@ -86,7 +86,7 @@ public class FeilutbetalingÅrsakTjenesteTest {
             FpHendelseUnderTyper.STONADSPERIODE_MANGEL.getKode()
         );
 
-        assertThat(mapAvResultat.get(HendelseType.FP_UTTAK_UTSETTELSE_TYPE.getKode())).containsOnly(
+        assertThat(mapAvResultat.get(HendelseType.FP_UTTAK_UTSETTELSE_TYPE.getKode())).containsExactly(
             FpHendelseUnderTyper.LOVBESTEMT_FERIE.getKode(),
             FpHendelseUnderTyper.ARBEID_HELTID.getKode(),
             FpHendelseUnderTyper.MOTTAKER_HELT_AVHENGIG.getKode(),
@@ -94,12 +94,12 @@ public class FeilutbetalingÅrsakTjenesteTest {
             FpHendelseUnderTyper.BARN_INNLAGT.getKode()
         );
 
-        assertThat(mapAvResultat.get(HendelseType.FP_UTTAK_KVOTENE_TYPE.getKode())).containsOnly(
+        assertThat(mapAvResultat.get(HendelseType.FP_UTTAK_KVOTENE_TYPE.getKode())).containsExactly(
             FpHendelseUnderTyper.KVO_MOTTAKER_HELT_AVHENGIG.getKode(),
             FpHendelseUnderTyper.KVO_MOTTAKER_INNLAGT.getKode()
         );
 
-        assertThat(mapAvResultat.get(HendelseType.FP_VILKAAR_GENERELLE_TYPE.getKode())).containsOnly(
+        assertThat(mapAvResultat.get(HendelseType.FP_VILKAAR_GENERELLE_TYPE.getKode())).containsExactly(
             FpHendelseUnderTyper.MOR_IKKE_ARBEID.getKode(),
             FpHendelseUnderTyper.MOR_IKKE_STUDERT.getKode(),
             FpHendelseUnderTyper.MOR_IKKE_ARBEID_OG_STUDER.getKode(),
@@ -109,7 +109,7 @@ public class FeilutbetalingÅrsakTjenesteTest {
             FpHendelseUnderTyper.MOR_IKKE_I_KP.getKode()
         );
 
-        assertThat(mapAvResultat.get(HendelseType.FP_ANNET_HENDELSE_TYPE.getKode())).containsOnly(
+        assertThat(mapAvResultat.get(HendelseType.FP_ANNET_HENDELSE_TYPE.getKode())).containsExactly(
             FpHendelseUnderTyper.OKONOMI_DOBBELUTBETALING.getKode(),
             FpHendelseUnderTyper.OKONOMI_UTBETALT.getKode(),
             FpHendelseUnderTyper.OKONOMI_FEIL_TREKK.getKode(),
@@ -151,42 +151,43 @@ public class FeilutbetalingÅrsakTjenesteTest {
             HendelseType.SVP_ANNET_TYPE.getKode()
         );
 
-        assertThat(mapAvResultat.get(HendelseType.SVP_MEDLEMSKAP.getKode())).containsOnly(
+        assertThat(mapAvResultat.get(HendelseType.SVP_MEDLEMSKAP.getKode())).containsExactly(
             SvpHendelseUnderTyper.SVP_UTVANDRET.getKode(),
-            SvpHendelseUnderTyper.SVP_IKKE_OPPHOLDSTILLATLSE.getKode(),
             SvpHendelseUnderTyper.SVP_MEDLEM_I_ANNET_LAND.getKode(),
+            SvpHendelseUnderTyper.SVP_IKKE_OPPHOLDSTILLATLSE.getKode(),
             SvpHendelseUnderTyper.SVP_IKKE_JOBBET.getKode(),
             SvpHendelseUnderTyper.SVP_MER_OPPHOLD.getKode()
         );
 
-        assertThat(mapAvResultat.get(HendelseType.SVP_FAKTA_TYPE.getKode())).containsOnly(
+        assertThat(mapAvResultat.get(HendelseType.SVP_FAKTA_TYPE.getKode())).containsExactly(
             SvpHendelseUnderTyper.SVP_ENDRING_TERMINDATO.getKode(),
             SvpHendelseUnderTyper.SVP_TIDLIG_FODSEL.getKode(),
             SvpHendelseUnderTyper.SVP_IKKE_HELSEFARLIG.getKode()
         );
 
-        assertThat(mapAvResultat.get(HendelseType.SVP_ARBEIDSGIVERS_FORHOLD_TYPE.getKode())).containsOnly(
+        assertThat(mapAvResultat.get(HendelseType.SVP_ARBEIDSGIVERS_FORHOLD_TYPE.getKode())).containsExactly(
             SvpHendelseUnderTyper.SVP_TILRETTELEGGING_FULLT_MULIG.getKode(),
             SvpHendelseUnderTyper.SVP_TILRETTELEGGING_DELVIS_MULIG.getKode(),
             SvpHendelseUnderTyper.SVP_TILRETTELEGGING_IKKE_MULIG.getKode()
         );
 
-        assertThat(mapAvResultat.get(HendelseType.SVP_ARBEIDSFORHOLD_TYPE.getKode())).containsOnly(
-            SvpHendelseUnderTyper.SVP_FEIL_ARBEIDSKATEGORI.getKode(),
-            SvpHendelseUnderTyper.SVP_FEIL_ARBEIDSFORHOLD.getKode()
+        assertThat(mapAvResultat.get(HendelseType.SVP_ARBEIDSFORHOLD_TYPE.getKode())).containsExactly(
+            SvpHendelseUnderTyper.SVP_FEIL_ARBEIDSFORHOLD.getKode(),
+            SvpHendelseUnderTyper.SVP_FEIL_ARBEIDSKATEGORI.getKode()
         );
 
-        assertThat(mapAvResultat.get(HendelseType.SVP_OPPTJENING_TYPE.getKode())).containsOnly(
+        assertThat(mapAvResultat.get(HendelseType.SVP_OPPTJENING_TYPE.getKode())).containsExactly(
             SvpHendelseUnderTyper.SVP_IKKE_ARBEID.getKode(),
             SvpHendelseUnderTyper.SVP_IKKE_TAP.getKode()
         );
 
-        assertThat(mapAvResultat.get(HendelseType.SVP_BEREGNING_TYPE.getKode())).containsOnly(
-            SvpHendelseUnderTyper.SVP_INNTEKT_UNDER.getKode(),
-            SvpHendelseUnderTyper.SVP_ENDRING_GRUNNLAG.getKode()
+        assertThat(mapAvResultat.get(HendelseType.SVP_BEREGNING_TYPE.getKode())).containsExactly(
+            SvpHendelseUnderTyper.SVP_ENDRING_GRUNNLAG.getKode(),
+            SvpHendelseUnderTyper.SVP_INNTEKT_UNDER.getKode()
+
         );
 
-        assertThat(mapAvResultat.get(HendelseType.SVP_UTTAK_TYPE.getKode())).containsOnly(
+        assertThat(mapAvResultat.get(HendelseType.SVP_UTTAK_TYPE.getKode())).containsExactly(
             SvpHendelseUnderTyper.SVP_ENDRING_PROSENT.getKode(),
             SvpHendelseUnderTyper.SVP_ENDRING_PERIODE.getKode()
         );
