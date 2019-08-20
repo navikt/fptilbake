@@ -46,8 +46,8 @@ public class BehandlingDtoTjeneste {
         List<Behandling> behandlinger = behandlingTjeneste.hentBehandlinger(saksnummer);
 
         return behandlinger.stream()
-                .map(this::lagBehandlingDto)
-                .collect(Collectors.toList());
+            .map(this::lagBehandlingDto)
+            .collect(Collectors.toList());
     }
 
     private BehandlingDto lagBehandlingDto(Behandling behandling) {
@@ -82,6 +82,7 @@ public class BehandlingDtoTjeneste {
         getFristDatoBehandlingPåVent(behandling).ifPresent(dto::setFristBehandlingPåVent);
         getVenteÅrsak(behandling).ifPresent(dto::setVenteÅrsakKode);
         dto.setAnsvarligSaksbehandler(behandling.getAnsvarligSaksbehandler());
+        dto.setBehandlingHenlagt(behandlingTjeneste.erBehandlingHenlagt(behandling));
 
         settResourceLinks(behandling, dto);
 

@@ -31,4 +31,6 @@ public interface BehandlingTjeneste {
 
     Optional<BehandlingFeilutbetalingFakta> hentBehandlingFeilutbetalingFakta(Long behandlingId);
 
+    boolean erBehandlingHenlagt(Behandling behandling);
+
 }
