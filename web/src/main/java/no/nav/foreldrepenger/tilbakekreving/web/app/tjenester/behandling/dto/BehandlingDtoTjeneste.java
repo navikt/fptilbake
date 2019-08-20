@@ -123,7 +123,7 @@ public class BehandlingDtoTjeneste {
             settGrunnlagLink(dto);
             settForeldelseLink(behandling.getId(), dto);
             settVilkårsvurderingsperioderLinks(behandling.getId(), dto);
-        } else if (BehandlingStegType.FORESLÅ_VEDTAK.equals(bst) || BehandlingStegType.FATTE_VEDTAK.equals(bst) || bst == null) {
+        } else if (BehandlingStegType.FORESLÅ_VEDTAK.equals(bst) || BehandlingStegType.FATTE_VEDTAK.equals(bst) || BehandlingStegType.IVERKSETT_VEDTAK.equals(bst) || bst == null) {
             settBehandlingFaktaLink(behandling.getId(), dto);
             settGrunnlagLink(dto);
             settForeldelseLink(behandling.getId(), dto);
