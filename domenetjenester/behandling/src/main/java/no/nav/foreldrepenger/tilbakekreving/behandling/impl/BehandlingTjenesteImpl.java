@@ -30,12 +30,14 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositor
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandlingsresultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingresultatRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
@@ -69,6 +71,7 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
     private BehandlingRepositoryProvider behandlingRepositoryProvider;
     private BehandlingRepository behandlingRepository;
     private EksternBehandlingRepository eksternBehandlingRepository;
+    private BehandlingresultatRepository behandlingresultatRepository;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste;
     private KravgrunnlagRepository grunnlagRepository;
@@ -103,6 +106,7 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
         this.behandlingRepository = behandlingRepositoryProvider.getBehandlingRepository();
         this.grunnlagRepository = behandlingRepositoryProvider.getGrunnlagRepository();
         this.eksternBehandlingRepository = behandlingRepositoryProvider.getEksternBehandlingRepository();
+        this.behandlingresultatRepository = behandlingRepositoryProvider.getBehandlingresultatRepository();
     }
 
     @Override
@@ -203,6 +207,13 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
         }
         return Optional.empty();
     }
+
+    @Override
+    public boolean erBehandlingHenlagt(Behandling behandling) {
+        Optional<Behandlingsresultat> behandlingsresultat = behandlingresultatRepository.hent(behandling);
+        return behandlingsresultat.isPresent() && behandlingsresultat.get().erBehandlingHenlagt();
+    }
+
 
     private void formFeilutbetalingÅrsak(Long behandlingId, UtbetaltPeriode utbetaltPeriode) {
         Optional<FeilutbetalingAggregate> feilutbetalingAggregate = behandlingRepositoryProvider.getFeilutbetalingRepository()
