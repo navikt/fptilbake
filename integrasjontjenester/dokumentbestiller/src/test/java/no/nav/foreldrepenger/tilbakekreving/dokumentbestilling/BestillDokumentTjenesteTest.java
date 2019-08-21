@@ -67,23 +67,8 @@ import no.nav.tjeneste.virksomhet.dokumentproduksjon.v2.meldinger.ProduserIkkere
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.integrasjon.dokument.produksjon.DokumentproduksjonConsumer;
 
-public class BestillDokumentTjenesteTest {
+public class BestillDokumentTjenesteTest extends DokumentBestillerTestOppsett {
 
-    private static final long FPSAK_BEHANDLING_ID = 99051L;
-    private static final String DUMMY_FØDSELSNUMMER = "31018143212";
-    @Rule
-    public UnittestRepositoryRule repositoryRule = new UnittestRepositoryRule();
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
-
-    private EntityManager entityManager = repositoryRule.getEntityManager();
-
-    private BrevdataRepository brevdataRepository = new BrevdataRepositoryImpl(entityManager);
-    private BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProviderImpl(entityManager);
-    private KodeverkRepository kodeverkRepository = repositoryProvider.getKodeverkRepository();
-    private BehandlingRepository behandlingRepository = repositoryProvider.getBehandlingRepository();
-    private EksternBehandlingRepository eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
 
     private BrevMetadataMapper brevMetadataMapper = new BrevMetadataMapper(kodeverkRepository);
 
@@ -102,21 +87,8 @@ public class BestillDokumentTjenesteTest {
     private BestillDokumentTjeneste bestillDokumentTjeneste = new BestillDokumentTjeneste(dokumentproduksjonConsumerMock, vedtaksbrevTjenesteMock,
         varselbrevTjeneste, brevMetadataMapper, historikkinnslagTjenesteMock, brevdataRepository);
 
-    private Fagsak fagsak;
-    private Behandling behandling;
-    private EksternBehandling eksternBehandling;
-
     @Before
     public void setup() throws Exception {
-        fagsak = TestFagsakUtil.opprettFagsak();
-        repositoryProvider.getFagsakRepository().lagre(fagsak);
-        behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).build();
-        BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(behandling);
-        behandlingRepository.lagre(behandling, behandlingLås);
-        eksternBehandling = new EksternBehandling(behandling, FPSAK_BEHANDLING_ID);
-        eksternBehandlingRepository.lagre(eksternBehandling);
-
-
         when(behandlingTjenesteMock.hentBehandling(anyLong())).thenReturn(behandling);
         when(fpsakKlientMock.hentBehandlingsinfo(eksternBehandling.getEksternId(), fagsak.getSaksnummer().getVerdi()))
             .thenReturn(Optional.of(lagMockEksternBehandlingsinfoDto(fagsak)));
