@@ -9,8 +9,8 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.yaml.snakeyaml.util.UriEncoder;
 
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.BehandlingIdDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.BehandlingResourceLinkDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.FagsakDto;
@@ -59,7 +59,7 @@ public class FpsakKlient {
         return eksternBehandlingsinfoDto.getFagsakId();
     }
 
-    public boolean finnesBehandlingIFpsak(Long behandlingId){
+    public boolean finnesBehandlingIFpsak(Long behandlingId) {
         return hentBehandling(behandlingId).isPresent();
     }
 
@@ -68,7 +68,7 @@ public class FpsakKlient {
 
         eksternBehandlingsinfoDtoOptional.ifPresent(eksternBehandlingsinfo -> {
             eksternBehandlingsinfo.getLinks().forEach(resourceLink -> {
-                final Optional<PersonopplysningDto> personopplysningDto = hentPersonopplysninger(behandlingId, saksnummer, resourceLink);
+                final Optional<PersonopplysningDto> personopplysningDto = hentPersonopplysninger(resourceLink);
                 personopplysningDto.ifPresent(eksternBehandlingsinfo::setPersonopplysningDto);
             });
 
@@ -93,15 +93,10 @@ public class FpsakKlient {
         return get(endpoint, EksternBehandlingsinfoDto.class);
     }
 
-    private Optional<PersonopplysningDto> hentPersonopplysninger(long behandlingId, String saksnummer, BehandlingResourceLinkDto resourceLink) {
+    private Optional<PersonopplysningDto> hentPersonopplysninger(BehandlingResourceLinkDto resourceLink) {
         if (FILTER_REL_PERSONOPPLYSNINGER.equals(resourceLink.getRel())) {
-            URI endpoint = resourceLinkUri(resourceLink);
-
-            BehandlingIdDto dto = new BehandlingIdDto();
-            dto.setBehandlingId(behandlingId);
-            dto.setSaksnummer(saksnummer);
-
-            return post(endpoint, dto, PersonopplysningDto.class);
+            URI endpoint = URI.create(baseUri() + resourceLink.getHref());
+            return get(endpoint, PersonopplysningDto.class);
         }
         return Optional.empty();
     }
@@ -120,24 +115,14 @@ public class FpsakKlient {
         return restClient.getReturnsOptional(endpoint, tClass);
     }
 
-    private <T> Optional<T> post(URI endpoint, Object dto, Class<T> tClass) {
-        return restClient.postReturnsOptional(endpoint, dto, tClass);
-    }
-
     private URI createUri(String endpoint, String paramName, String paramValue) {
         UriBuilder builder = UriBuilder.fromUri(apiUri())
-                .path(endpoint);
+            .path(endpoint);
 
         if (notNullOrEmpty(paramName) && notNullOrEmpty(paramValue)) {
             builder.queryParam(paramName, paramValue);
         }
         return builder.build();
-    }
-
-    private URI resourceLinkUri(BehandlingResourceLinkDto resourceLink) {
-        return UriBuilder.fromUri(baseUri())
-                .path(resourceLink.getHref())
-                .build();
     }
 
     private URI apiUri() {

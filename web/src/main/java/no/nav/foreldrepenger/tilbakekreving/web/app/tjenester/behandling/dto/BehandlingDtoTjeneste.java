@@ -112,8 +112,7 @@ public class BehandlingDtoTjeneste {
     private void settResourceLinks(Behandling behandling, UtvidetBehandlingDto dto) {
         dto.leggTil(ResourceLink.get("/fptilbake/api/behandling/aksjonspunkt?behandlingId=" + behandling.getId(), "aksjonspunkter", null));
 
-        BehandlingIdDto behandlingIdDto = new BehandlingIdDto(behandling.getId());
-        dto.leggTil(ResourceLink.post("/fpsak/api/brev/maler", "brev-maler", behandlingIdDto));
+        dto.leggTil(ResourceLink.get("/fptilbake/api/brev/maler?behandlingId="+behandling.getId(), "brev-maler", null));
 
         BehandlingStegType bst = behandling.getAktivtBehandlingSteg();
 
