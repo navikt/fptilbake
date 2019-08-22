@@ -1,17 +1,13 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.dokumentbestiller.DokumentMalRestriksjon;
-
 public class BrevmalDto {
     private String kode;
     private String navn;
-    private DokumentMalRestriksjon restriksjon;
     private boolean tilgjengelig;
 
-    public BrevmalDto(String kode, String navn, DokumentMalRestriksjon restriksjon, boolean tilgjengelig) {
+    public BrevmalDto(String kode, String navn, boolean tilgjengelig) {
         this.kode = kode;
         this.navn = navn;
-        this.restriksjon = restriksjon;
         this.tilgjengelig = tilgjengelig;
     }
 
@@ -29,14 +25,6 @@ public class BrevmalDto {
 
     public void setNavn(String navn) {
         this.navn = navn;
-    }
-
-    public DokumentMalRestriksjon getRestriksjon() {
-        return restriksjon;
-    }
-
-    public void setRestriksjon(DokumentMalRestriksjon restriksjon) {
-        this.restriksjon = restriksjon;
     }
 
     public boolean getTilgjengelig() {

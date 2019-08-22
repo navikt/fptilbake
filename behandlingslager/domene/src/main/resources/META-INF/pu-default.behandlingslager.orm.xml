@@ -117,7 +117,6 @@
     <entity class="no.nav.foreldrepenger.tilbakekreving.sporing.VedtakXml"/>
 
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.dokumentbestiller.DokumentMalType"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.dokumentbestiller.DokumentMalRestriksjon"/>
 
 
 </entity-mappings>

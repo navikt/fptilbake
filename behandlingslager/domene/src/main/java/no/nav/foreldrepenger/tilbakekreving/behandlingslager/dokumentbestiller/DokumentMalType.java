@@ -1,55 +1,27 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.dokumentbestiller;
 
-import javax.persistence.Column;
-import javax.persistence.Convert;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 
-import org.hibernate.annotations.JoinColumnOrFormula;
-import org.hibernate.annotations.JoinColumnsOrFormulas;
-import org.hibernate.annotations.JoinFormula;
-
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkTabell;
-import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
 
 @Entity(name = "DokumentMalType")
-@Table(name = "DOKUMENT_MAL_TYPE")
-public class DokumentMalType extends KodeverkTabell {
+@DiscriminatorValue(DokumentMalType.DISCRIMINATOR)
+public class DokumentMalType extends Kodeliste {
 
-    @Convert(converter = BooleanToStringConverter.class)
-    @Column(name = "generisk", nullable = false)
-    private boolean generisk = true;
+    public static final String DISCRIMINATOR = "DOKUMENT_MAL_TYPE";
 
-    @ManyToOne(optional = false)
-    @JoinColumnsOrFormulas({
-        @JoinColumnOrFormula(column = @JoinColumn(name = "DOKUMENT_MAL_RESTRIKSJON", referencedColumnName = "kode", nullable = false)),
-        @JoinColumnOrFormula(formula = @JoinFormula(referencedColumnName = "kodeverk", value = "'"
-            + DokumentMalRestriksjon.DISCRIMINATOR + "'"))})
-    private DokumentMalRestriksjon dokumentMalRestriksjon = DokumentMalRestriksjon.INGEN;
-
-    @Column(name = "doksys_kode", nullable = false, updatable = false, insertable = false)
-    private String doksysKode;
-
-    public static final String INNHENT_DOK = "INNHEN";
-    public static final String FRITEKST_DOK = "FRITKS";
-    public static final String VARSEL_DOK = "VARS";
-    public static final String KORRIGERT_VARSEL_DOK = "KORRIGVARS";
+    public static final DokumentMalType INNHENT_DOK = new DokumentMalType("INNHEN");
+    public static final DokumentMalType FRITEKST_DOK = new DokumentMalType("FRITKS");
+    public static final DokumentMalType VARSEL_DOK = new DokumentMalType("VARS");
+    public static final DokumentMalType KORRIGERT_VARSEL_DOK = new DokumentMalType("KORRIGVARS");
 
     DokumentMalType() {
         // Hibernate trenger default konstruktør
     }
 
-    public String getDoksysKode() {
-        return doksysKode;
+    DokumentMalType(String kode) {
+        super(kode, DISCRIMINATOR);
     }
 
-    public DokumentMalRestriksjon getDokumentMalRestriksjon() {
-        return dokumentMalRestriksjon;
-    }
-
-    public boolean erGenerisk() {
-        return generisk;
-    }
 }
