@@ -83,6 +83,7 @@ public class BehandlingDtoTjeneste {
         getVenteÅrsak(behandling).ifPresent(dto::setVenteÅrsakKode);
         dto.setAnsvarligSaksbehandler(behandling.getAnsvarligSaksbehandler());
         dto.setBehandlingHenlagt(behandlingTjeneste.erBehandlingHenlagt(behandling));
+        dto.setSpråkkode(behandling.getFagsak().getNavBruker().getSpråkkode());
 
         settResourceLinks(behandling, dto);
 
@@ -110,6 +111,9 @@ public class BehandlingDtoTjeneste {
 
     private void settResourceLinks(Behandling behandling, UtvidetBehandlingDto dto) {
         dto.leggTil(ResourceLink.get("/fptilbake/api/behandling/aksjonspunkt?behandlingId=" + behandling.getId(), "aksjonspunkter", null));
+
+        dto.leggTil(ResourceLink.get("/fptilbake/api/brev/maler?behandlingId="+behandling.getId(), "brev-maler", null));
+
         BehandlingStegType bst = behandling.getAktivtBehandlingSteg();
 
         if (BehandlingStegType.FAKTA_FEILUTBETALING.equals(bst)) {
@@ -132,7 +136,6 @@ public class BehandlingDtoTjeneste {
             settBehandlingsresultatLink(behandling.getId(), dto);
             settVedtaksbrevdataLink(behandling.getId(), dto);
         }
-
         settTotrinnskontrollLinks(behandling, dto);
     }
 

@@ -96,4 +96,9 @@ public class BrevdataRepositoryImpl implements BrevdataRepository {
             }
         }
     }
+
+    @Override
+    public boolean harVarselBrevSendtForBehandlingId(Long behandlingId) {
+        return !hentVarselbrevData(behandlingId).isEmpty();
+    }
 }

@@ -15,6 +15,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.konfig.FellesKlasserForRest;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.batch.BatchRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.BehandlingFaktaRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.BehandlingRestTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.BrevRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.ForeldelseRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.TilbakekrevingResulattRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.TotrinnskontrollRestTjeneste;
@@ -83,6 +84,7 @@ public class ApplicationConfig extends Application {
         classes.add(VilkårsvurderingRestTjeneste.class);
         classes.add(TilbakekrevingResulattRestTjeneste.class);
         classes.add(TotrinnskontrollRestTjeneste.class);
+        classes.add(BrevRestTjeneste.class);
 
         return Collections.unmodifiableSet(classes);
     }

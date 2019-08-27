@@ -24,4 +24,6 @@ public interface BrevdataRepository {
     void slettOppsummering(Long behandlingId);
 
     void slettPerioderMedFritekster(Long behandlingId);
+
+    boolean harVarselBrevSendtForBehandlingId(Long behandlingId);
 }
