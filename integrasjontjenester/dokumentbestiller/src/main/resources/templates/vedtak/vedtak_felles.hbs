@@ -1,0 +1,11 @@
+{{#* inline "ytelse-navn"}}{{lookup-map ytelsetype FP="foreldrepenger" SVP="svangerskapspenger" ES="engangsstønad"}}{{/inline}}
+{{#* inline "ytelse-produkt"}}{{lookup-map ytelsetype FP="foreldrepengene" SVP="svangerskapspengene" ES="engangsstønaden"}}{{/inline}}
+{{#* inline "barnet-ditt"}}{{eq antall-barn 1 yes="barnet ditt" no="barna dine"}}{{/inline}}
+{{#* inline "barnet"}}{{eq antall-barn 1 yes="barnet" no="barna"}}{{/inline}}
+{{#* inline "sitt-barn"}}{{eq antall-barn 1 yes="sitt barn" no="sine barn"}}{{/inline}}
+{{#* inline "det-samme-barnet"}}{{eq antall-barn 1 yes="det samme barnet" no="de samme barna"}}{{/inline}}
+{{#* inline "familie-hendelse"}}{{#if er-adopsjon}}da du overtok omsorgen for {{> barnet-ditt}}{{else}}da {{> barnet-ditt}} ble født{{/if}}{{/inline}}
+{{#* inline "skulle-forstått"}}{{lookup-map aktsomhet-resultat SIMPEL_UAKTSOM="burde forstått" GROVT_UAKTSOM="må ha forstått"}}{{/inline}}
+{{#* inline "hovedoverskrift"}}_{{/inline}}
+{{#* inline "underoverskrift_start"}}_{{/inline}}
+{{#* inline "underoverskrift_slutt"}}{{/inline}}

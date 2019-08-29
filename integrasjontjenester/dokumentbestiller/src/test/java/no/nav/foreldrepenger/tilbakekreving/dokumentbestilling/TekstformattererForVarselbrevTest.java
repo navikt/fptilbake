@@ -1,24 +1,24 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.assertj.core.api.Assertions;
+import org.junit.Test;
+
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.domene.BrevMetadata;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.domene.PeriodeMedBrevtekst;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.domene.VarselbrevSamletInfo;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.domene.VedtaksbrevSamletInfo;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.domene.handlebars.BaseDokument;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.domene.handlebars.VarselbrevDokument;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.KodeDto;
 import no.nav.vedtak.util.FPDateUtil;
-import org.assertj.core.api.Assertions;
-import org.junit.Test;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-
-public class TekstformattererTest {
+public class TekstformattererForVarselbrevTest {
 
     private KodeDto foreldrepengerkode = new KodeDto("FAGSAK_YTELSE", "FP", "Foreldrepenger");
     private KodeDto engangsstønadkode = new KodeDto("FAGSAK_YTELSE", "ES", "Engangsstønad");
@@ -26,9 +26,6 @@ public class TekstformattererTest {
 
     private final LocalDate JANUAR_1_2019 = LocalDate.of(2019, 1, 1);
     private final LocalDate JANUAR_30_2019 = LocalDate.of(2019, 1, 30);
-    private final LocalDate FEBRUAR_1_2019 = LocalDate.of(2019, 2, 1);
-    private final LocalDate FEBRUAR_15_2019 = LocalDate.of(2019, 2, 15);
-    private final LocalDate FEBRUAR_20_2018 = LocalDate.of(2018, 2, 20);
 
     @Test
     public void skal_generere_varseltekst_for_flere_perioder() {
@@ -46,7 +43,7 @@ public class TekstformattererTest {
             .medMetadata(metadata)
             .build();
 
-        String varselbrevMedFlerePerioder = Tekstformatterer.lagVarselbrevFritekst(varselbrevSamletInfo);
+        String varselbrevMedFlerePerioder = TekstformattererVarselbrev.lagVarselbrevFritekst(varselbrevSamletInfo);
         System.out.println(varselbrevMedFlerePerioder);
     }
 
@@ -67,7 +64,7 @@ public class TekstformattererTest {
             .medMetadata(metadata)
             .build();
 
-        String varselbrevForEngangsstønad = Tekstformatterer.lagVarselbrevFritekst(varselbrevSamletInfo);
+        String varselbrevForEngangsstønad = TekstformattererVarselbrev.lagVarselbrevFritekst(varselbrevSamletInfo);
         System.out.println(varselbrevForEngangsstønad);
     }
 
@@ -87,50 +84,8 @@ public class TekstformattererTest {
             .medMetadata(metadata)
             .build();
 
-        String varselbrevForForeldrepenger = Tekstformatterer.lagVarselbrevFritekst(varselbrevSamletInfo);
+        String varselbrevForForeldrepenger = TekstformattererVarselbrev.lagVarselbrevFritekst(varselbrevSamletInfo);
         System.out.println(varselbrevForForeldrepenger);
-    }
-
-    @Test
-    public void skal_generere_brødtekst_i_vedtaksbrev() {
-        BrevMetadata brevMetadata = new BrevMetadata.Builder()
-            .medFagsaktype(svangerskapspengerkode)
-            .medSprakkode(Språkkode.nb)
-            .medFagsaktypenavnPåSpråk("eingongsstønad")
-            .build();
-
-        VedtaksbrevSamletInfo vedtaksbrevSamletInfo = new VedtaksbrevSamletInfo.Builder()
-            .medSumFeilutbetaling(595959L)
-            .medSumBeløpSomSkalTilbakekreves(777L)
-            .medVarselbrevSendtUt(LocalDate.of(2020, 4, 4))
-            .medBrevMetadata(brevMetadata)
-            .medPerioderMedBrevtekst(lagPerioderMedTekst())
-            .build();
-
-        String varselbrevMedFlerePerioder = Tekstformatterer.lagVedtaksbrevFritekst(vedtaksbrevSamletInfo);
-        System.out.println(varselbrevMedFlerePerioder);
-    }
-
-    private List<PeriodeMedBrevtekst> lagPerioderMedTekst() {
-        PeriodeMedBrevtekst periode1 = new PeriodeMedBrevtekst.Builder()
-            .medFom(JANUAR_1_2019)
-            .medTom(JANUAR_30_2019)
-            .medGenerertFaktaAvsnitt("Personen har handlet i god tro. ")
-            .medGenerertVilkårAvsnitt("vilkår her")
-            .medGenerertSærligeGrunnerAvsnitt("særlige grunner her")
-            .medFritekstFakta("fritekst fakta")
-            .medFritekstVilkår("fritekst vilkår")
-            .build();
-        PeriodeMedBrevtekst periode2 = new PeriodeMedBrevtekst.Builder()
-            .medFom(FEBRUAR_1_2019)
-            .medTom(FEBRUAR_15_2019)
-            .medGenerertFaktaAvsnitt("Personen har handlet i god tro. ")
-            .medGenerertVilkårAvsnitt("vilkår her")
-            .medGenerertSærligeGrunnerAvsnitt("særlige grunner her")
-            .medFritekstFakta("fritekst fakta")
-            .medFritekstSærligeGrunner("fritekst særlige grunner")
-            .build();
-        return Arrays.asList(periode1, periode2);
     }
 
     @Test
@@ -150,16 +105,16 @@ public class TekstformattererTest {
             .build();
 
         LocalDateTime dagensDato = LocalDateTime.of(2018, 5, 6, 1, 1);
-        VarselbrevDokument varselbrev = Tekstformatterer.mapTilVarselbrevDokument(varselbrevSamletInfo, dagensDato);
+        VarselbrevDokument varselbrev = TekstformattererVarselbrev.mapTilVarselbrevDokument(varselbrevSamletInfo, dagensDato);
 
-        Assertions.assertThat(varselbrev.getEndringsdato()).isEqualTo(LocalDate.of(2018, 5, 6));
-        Assertions.assertThat(varselbrev.getFristdatoForTilbakemelding()).isEqualTo(LocalDate.of(2018, 5, 27));
-        Assertions.assertThat(varselbrev.getVarseltekstFraSaksbehandler()).isEqualTo("Dette er fritekst skrevet av saksbehandler.");
-        Assertions.assertThat(varselbrev.getDatoerHvisSammenhengendePeriode().getFom()).isEqualTo(LocalDate.of(2019, 3, 3));
-        Assertions.assertThat(varselbrev.getDatoerHvisSammenhengendePeriode().getTom()).isEqualTo(LocalDate.of(2020, 3, 3));
-        Assertions.assertThat(varselbrev.getFagsaktypeNavn()).isEqualTo("foreldrepenger");
-        Assertions.assertThat(varselbrev.getBelop()).isEqualTo(595959L);
-        Assertions.assertThat(varselbrev.getFeilutbetaltePerioder()).isNotNull();
+        assertThat(varselbrev.getEndringsdato()).isEqualTo(LocalDate.of(2018, 5, 6));
+        assertThat(varselbrev.getFristdatoForTilbakemelding()).isEqualTo(LocalDate.of(2018, 5, 27));
+        assertThat(varselbrev.getVarseltekstFraSaksbehandler()).isEqualTo("Dette er fritekst skrevet av saksbehandler.");
+        assertThat(varselbrev.getDatoerHvisSammenhengendePeriode().getFom()).isEqualTo(LocalDate.of(2019, 3, 3));
+        assertThat(varselbrev.getDatoerHvisSammenhengendePeriode().getTom()).isEqualTo(LocalDate.of(2020, 3, 3));
+        assertThat(varselbrev.getFagsaktypeNavn()).isEqualTo("foreldrepenger");
+        assertThat(varselbrev.getBelop()).isEqualTo(595959L);
+        assertThat(varselbrev.getFeilutbetaltePerioder()).isNotNull();
     }
 
     @Test
@@ -177,8 +132,8 @@ public class TekstformattererTest {
             .medMetadata(brevMetadata)
             .build();
 
-        VarselbrevDokument varselbrev = Tekstformatterer.mapTilVarselbrevDokument(varselbrevSamletInfo, FPDateUtil.nå());
-        Assertions.assertThat(varselbrev.getDatoerHvisSammenhengendePeriode()).isNull();
+        VarselbrevDokument varselbrev = TekstformattererVarselbrev.mapTilVarselbrevDokument(varselbrevSamletInfo, FPDateUtil.nå());
+        assertThat(varselbrev.getDatoerHvisSammenhengendePeriode()).isNull();
     }
 
     private List<Periode> mockFeilutbetalingerMedFlerePerioder() {
@@ -189,9 +144,9 @@ public class TekstformattererTest {
 
     @Test
     public void skal_finne_riktig_språk() {
-        Assertions.assertThat(Tekstformatterer.finnRiktigSpråk(Språkkode.en)).isEqualTo(BaseDokument.Lokale.BOKMÅL);
-        Assertions.assertThat(Tekstformatterer.finnRiktigSpråk(Språkkode.nn)).isEqualTo(BaseDokument.Lokale.NYNORSK);
-        Assertions.assertThat(Tekstformatterer.finnRiktigSpråk(Språkkode.nb)).isEqualTo(BaseDokument.Lokale.BOKMÅL);
+        assertThat(TekstformattererVarselbrev.finnRiktigSpråk(Språkkode.en)).isEqualTo(BaseDokument.Lokale.BOKMÅL);
+        assertThat(TekstformattererVarselbrev.finnRiktigSpråk(Språkkode.nn)).isEqualTo(BaseDokument.Lokale.NYNORSK);
+        assertThat(TekstformattererVarselbrev.finnRiktigSpråk(Språkkode.nb)).isEqualTo(BaseDokument.Lokale.BOKMÅL);
     }
 
     public List<Periode> mockFeilutbetalingerMedKunEnPeriode() {
@@ -232,12 +187,6 @@ public class TekstformattererTest {
 
     private List<Periode> mockUtbetalingEnPeriode() {
         return List.of(new Periode(JANUAR_1_2019, JANUAR_30_2019));
-    }
-
-    private List<Periode> mockUtbetalingFlerePerioderMedManglendeFomDato() {
-        Periode periode1 = new Periode(FEBRUAR_1_2019, null);
-        Periode periode2 = new Periode(FEBRUAR_15_2019, FEBRUAR_20_2018);
-        return List.of(periode1, periode2);
     }
 
     @Test

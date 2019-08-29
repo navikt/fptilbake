@@ -3,7 +3,6 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
-import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -26,20 +25,17 @@ import no.nav.foreldrepenger.integrasjon.dokument.fritekstbrev.FritekstbrevConst
 import no.nav.foreldrepenger.integrasjon.dokument.fritekstbrev.ObjectFactory;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevdataRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VarselbrevSporing;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevOppsummering;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevSporing;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.domene.VarselbrevSamletInfo;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.domene.VedtaksbrevSamletInfo;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.ForhåndvisningVedtaksbrevTekstDto;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.domene.VedtaksbrevData;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Avsnitt;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.HentForhåndsvisningVarselbrevDto;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.HentForhåndvisningVedtaksbrevPdfDto;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.PeriodeMedTekstDto;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.util.BrevMetadataMapper;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.util.BrevUtil;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.util.DokumentbestillingsinfoMapper;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.util.VedtaksbrevUtil;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.util.TittelOverskriftUtil;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
@@ -106,15 +102,11 @@ public class BestillDokumentTjeneste {
     }
 
     public void sendVedtaksbrev(Long fagsakId, String aktørId, Long behandlingId) {
-        VedtaksbrevSamletInfo vedtaksbrevSamletInfo = vedtaksbrevTjeneste.lagVedtaksbrev(
-            behandlingId,
-            hentOppsummeringHvisAlleredeEksisterer(behandlingId),
-            hentFriteksterTilPerioderHvisEksisterer(behandlingId));
+        VedtaksbrevData vedtaksbrevData = vedtaksbrevTjeneste.hentDataForVedtaksbrev(behandlingId);
 
-        Element ferdigXml = lagXmlDokumentVedtaksbrev(vedtaksbrevSamletInfo);
+        Element ferdigXml = lagXmlDokumentVedtaksbrev(vedtaksbrevData);
 
-        Dokumentbestillingsinformasjon dokumentbestillingsinfo = DokumentbestillingsinfoMapper
-            .opprettDokumentbestillingsinformasjon(vedtaksbrevSamletInfo.getBrevMetadata());
+        Dokumentbestillingsinformasjon dokumentbestillingsinfo = DokumentbestillingsinfoMapper.opprettDokumentbestillingsinformasjon(vedtaksbrevData.getMetadata());
         ProduserIkkeredigerbartDokumentResponse produserIkkeredigerbartDokumentResponse = sendBrevbestilling(ferdigXml, dokumentbestillingsinfo);
 
         String journalpostId = produserIkkeredigerbartDokumentResponse.getJournalpostId();
@@ -124,11 +116,17 @@ public class BestillDokumentTjeneste {
         lagreInfoOmVedtaksbrev(behandlingId, journalpostId, dokumentId);
     }
 
-    public byte[] hentForhåndsvisningVedtaksbrevSomPdf(HentForhåndvisningVedtaksbrevPdfDto vedtaksbrevPdfDto) {
-        VedtaksbrevSamletInfo vedtaksbrevSamletInfo = vedtaksbrevTjeneste.lagVedtaksbrev(vedtaksbrevPdfDto.getBehandlingId(),
-            vedtaksbrevPdfDto.getOppsummeringstekst(), vedtaksbrevPdfDto.getPerioderMedTekst());
-        Element ferdigXml = lagXmlDokumentVedtaksbrev(vedtaksbrevSamletInfo);
+    public byte[] hentForhåndsvisningVedtaksbrevSomPdf(HentForhåndvisningVedtaksbrevPdfDto dto) {
+        VedtaksbrevData vedtaksbrevData = vedtaksbrevTjeneste.hentDataForVedtaksbrev(dto.getBehandlingId(), dto.getOppsummeringstekst(), dto.getPerioderMedTekst());
+
+        Element ferdigXml = lagXmlDokumentVedtaksbrev(vedtaksbrevData);
         return sendForhåndsvisningRequest(ferdigXml);
+    }
+
+    public List<Avsnitt> hentForhåndsvisningVedtaksbrevSomTekst(Long behandlingId) {
+        VedtaksbrevData vedtaksbrevData = vedtaksbrevTjeneste.hentDataForVedtaksbrev(behandlingId);
+        String hovedoverskrift = TittelOverskriftUtil.finnOverskriftVedtaksbrev(vedtaksbrevData.getMetadata().getFagsaktypenavnPåSpråk());
+        return TekstformattererVedtaksbrev.lagVedtaksbrevDeltIAvsnitt(vedtaksbrevData.getVedtaksbrevData(), hovedoverskrift);
     }
 
     public byte[] hentForhåndsvisningVarselbrev(HentForhåndsvisningVarselbrevDto hentForhåndsvisningVarselbrevDto) {
@@ -203,9 +201,9 @@ public class BestillDokumentTjeneste {
         return lagXml(fritekstXml, fellesXml);
     }
 
-    private Element lagXmlDokumentVedtaksbrev(VedtaksbrevSamletInfo vedtaksbrevSamletInfo) {
-        FagType fritekstXml = lagFritekstXmlVedtaksbrev(vedtaksbrevSamletInfo);
-        FellesType fellesXml = brevMetadataMapper.leggTilMetadataIDokumentet(vedtaksbrevSamletInfo.getBrevMetadata());
+    private Element lagXmlDokumentVedtaksbrev(VedtaksbrevData vedtaksbrevData) {
+        FagType fritekstXml = lagFritekstXmlVedtaksbrev(vedtaksbrevData);
+        FellesType fellesXml = brevMetadataMapper.leggTilMetadataIDokumentet(vedtaksbrevData.getMetadata());
         return lagXml(fritekstXml, fellesXml);
     }
 
@@ -223,16 +221,16 @@ public class BestillDokumentTjeneste {
         }
     }
 
-    private FagType lagFritekstXmlVedtaksbrev(VedtaksbrevSamletInfo vedtaksbrevSamletInfo) {
-        String brødtekst = Tekstformatterer.lagVedtaksbrevFritekst(vedtaksbrevSamletInfo);
+    private FagType lagFritekstXmlVedtaksbrev(VedtaksbrevData vedtaksbrevData) {
+        String brødtekst = TekstformattererVedtaksbrev.lagVedtaksbrevFritekst(vedtaksbrevData.getVedtaksbrevData());
         return brevMetadataMapper.settFritekstdelAvVedtaksbrev(
             brødtekst,
             objectFactory,
-            vedtaksbrevSamletInfo.getBrevMetadata().getFagsaktypenavnPåSpråk());
+            vedtaksbrevData.getMetadata().getFagsaktypenavnPåSpråk());
     }
 
     private FagType lagFritekstXmlVarselbrev(VarselbrevSamletInfo varselbrevSamletInfo) {
-        String brødtekst = Tekstformatterer.lagVarselbrevFritekst(varselbrevSamletInfo);
+        String brødtekst = TekstformattererVarselbrev.lagVarselbrevFritekst(varselbrevSamletInfo);
         return brevMetadataMapper.settFritekstdelAvVarselbrev(
             brødtekst,
             objectFactory,
@@ -251,32 +249,16 @@ public class BestillDokumentTjeneste {
         return BrevUtil.fjernNamespaceFra(brevXmlMedNamespace);
     }
 
-    public ForhåndvisningVedtaksbrevTekstDto hentForhåndsvisningVedtaksbrevSomTekst(Long behandlingId) {
-        String oppsummering = hentOppsummeringHvisAlleredeEksisterer(behandlingId);
-        List<PeriodeMedTekstDto> fritekstFraSaksbehandlerForPerioder = hentFriteksterTilPerioderHvisEksisterer(behandlingId);
-        return vedtaksbrevTjeneste.lagTekstutkastAvVedtaksbrev(behandlingId, oppsummering, fritekstFraSaksbehandlerForPerioder);
-    }
-
-    List<PeriodeMedTekstDto> hentFriteksterTilPerioderHvisEksisterer(Long behandlingId) {
-        List<VedtaksbrevPeriode> eksisterendePerioderForBrev = brevdataRepository.hentVedtaksbrevPerioderMedTekst(behandlingId);
-        return VedtaksbrevUtil.mapFritekstFraDb(eksisterendePerioderForBrev);
-    }
-
-    private String hentOppsummeringHvisAlleredeEksisterer(Long behandlingId) {
-        Optional<VedtaksbrevOppsummering> vedtaksbrevOppsummeringOpt = brevdataRepository.hentVedtaksbrevOppsummering(behandlingId);
-        return vedtaksbrevOppsummeringOpt.map(VedtaksbrevOppsummering::getOppsummeringFritekst).orElse(null);
-    }
-
     public void sendVedtaksbrevTest(HentForhåndvisningVedtaksbrevPdfDto vedtaksbrevPdfDto) {
-        VedtaksbrevSamletInfo vedtaksbrevSamletInfo = vedtaksbrevTjeneste.lagVedtaksbrev(
+        VedtaksbrevData vedtaksbrevData = vedtaksbrevTjeneste.hentDataForVedtaksbrev(
             vedtaksbrevPdfDto.getBehandlingId(),
             vedtaksbrevPdfDto.getOppsummeringstekst(),
             vedtaksbrevPdfDto.getPerioderMedTekst());
 
-        Element ferdigXml = lagXmlDokumentVedtaksbrev(vedtaksbrevSamletInfo);
+        Element ferdigXml = lagXmlDokumentVedtaksbrev(vedtaksbrevData);
 
         Dokumentbestillingsinformasjon dokumentbestillingsinfo = DokumentbestillingsinfoMapper
-            .opprettDokumentbestillingsinformasjon(vedtaksbrevSamletInfo.getBrevMetadata());
+            .opprettDokumentbestillingsinformasjon(vedtaksbrevData.getMetadata());
         sendBrevbestilling(ferdigXml, dokumentbestillingsinfo);
     }
 }

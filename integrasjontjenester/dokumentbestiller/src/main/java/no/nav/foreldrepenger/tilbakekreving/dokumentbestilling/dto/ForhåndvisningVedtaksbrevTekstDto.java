@@ -10,16 +10,7 @@ public class ForhåndvisningVedtaksbrevTekstDto {
         return avsnittsliste;
     }
 
-    public static class Builder {
-        private ForhåndvisningVedtaksbrevTekstDto dto = new ForhåndvisningVedtaksbrevTekstDto();
-
-        public Builder medAvsnittsliste(List<Avsnitt> avsnittsliste) {
-            this.dto.avsnittsliste = avsnittsliste;
-            return this;
-        }
-
-        public ForhåndvisningVedtaksbrevTekstDto build() {
-            return dto;
-        }
+    public ForhåndvisningVedtaksbrevTekstDto(List<Avsnitt> avsnittsliste) {
+        this.avsnittsliste = avsnittsliste;
     }
 }

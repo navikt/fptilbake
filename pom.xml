@@ -337,6 +337,12 @@
 
             <!-- NAV -->
             <dependency>
+                <groupId>no.nav.foreldrepenger.kontrakter</groupId>
+                <artifactId>dokumentbestiller-v1</artifactId>
+                <version>2.0_20190205180510_7b6a6b5</version>
+                <classifier>jaxb</classifier>
+            </dependency>
+            <dependency>
                 <groupId>no.nav.modig</groupId>
                 <artifactId>modig-core-test</artifactId>
                 <version>1.0.0</version>
@@ -642,6 +648,18 @@
             </dependency>
 
             <!-- 3dje parts biblioteker -->
+
+            <dependency>
+                <groupId>com.github.jknack</groupId>
+                <artifactId>handlebars</artifactId>
+                <version>4.1.2</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.jknack</groupId>
+                <artifactId>handlebars-jackson2</artifactId>
+                <version>4.1.2</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
