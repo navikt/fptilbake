@@ -1,8 +1,9 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto;
 
+import java.util.UUID;
+
+import javax.validation.Valid;
 import javax.validation.constraints.Digits;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -16,16 +17,14 @@ public class OpprettBehandlingDto implements AbacDto {
 
     @NotNull
     @Digits(integer = 50, fraction = 0)
-    String saksnummer;
+    private String saksnummer;
 
     @NotNull
     @Digits(integer = 50, fraction = 0)
-    String aktørId;
+    private String aktørId;
 
-    @NotNull
-    @Min(0)
-    @Max(Long.MAX_VALUE)
-    Long eksternBehandlingId; // revurdert behandlingId fra fpsak
+    @Valid
+    private UUID eksternUuid;
 
     @NotNull
     @Pattern(regexp = InputValideringRegex.KODEVERK)
@@ -60,12 +59,12 @@ public class OpprettBehandlingDto implements AbacDto {
         this.aktørId = aktørId;
     }
 
-    public Long getEksternBehandlingId() {
-        return eksternBehandlingId;
+    public UUID getEksternUuid() {
+        return eksternUuid;
     }
 
-    public void setEksternBehandlingId(Long eksternBehandlingId) {
-        this.eksternBehandlingId = eksternBehandlingId;
+    public void setEksternUuid(String eksternUuid) {
+        this.eksternUuid = UUID.fromString(eksternUuid);
     }
 
     public String getBehandlingType() {

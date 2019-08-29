@@ -1,49 +1,69 @@
 package no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse;
 
+import java.util.UUID;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class TilkjentYtelseMelding {
 
-    private Long fagsakId;
-    private long behandlingId;
+    @JsonProperty("fagsakYtelseType")
+    private String fagsakYtelseType;
+    @JsonProperty("gsakSaksnummer")
+    private String saksnummer;
     @JsonProperty("aktoerId")
     private String aktørId;
     @JsonProperty("ivSystem")
     private String iverksettingSystem = "fpsak";
+    @JsonProperty("behandlingId")
+    private Long behandlingId;
+    @JsonProperty("behandlingUuid")
+    private UUID behandlingUuid;
 
-    public Long getFagsakId() {
-        return fagsakId;
+    public String getFagsakYtelseType() {
+        return fagsakYtelseType;
     }
 
-    public TilkjentYtelseMelding setFagsakId(Long fagsakId) {
-        this.fagsakId = fagsakId;
-        return this;
+    public void setFagsakYtelseType(String fagsakYtelseType) {
+        this.fagsakYtelseType = fagsakYtelseType;
     }
 
-    public long getBehandlingId() {
-        return behandlingId;
+    public String getSaksnummer() {
+        return saksnummer;
     }
 
-    public TilkjentYtelseMelding setBehandlingId(Long behandlingId) {
-        this.behandlingId = behandlingId;
-        return this;
+    public void setSaksnummer(String saksnummer) {
+        this.saksnummer = saksnummer;
     }
 
     public String getAktørId() {
         return aktørId;
     }
 
-    public TilkjentYtelseMelding setAktørId(String aktørId) {
+    public void setAktørId(String aktørId) {
         this.aktørId = aktørId;
-        return this;
     }
 
     public String getIverksettingSystem() {
         return iverksettingSystem;
     }
 
-    public TilkjentYtelseMelding setIverksettingSystem(String iverksettingSystem) {
+    public void setIverksettingSystem(String iverksettingSystem) {
         this.iverksettingSystem = iverksettingSystem;
-        return this;
+    }
+
+    public Long getBehandlingId() {
+        return behandlingId;
+    }
+
+    public void setBehandlingId(Long behandlingId) {
+        this.behandlingId = behandlingId;
+    }
+
+    public UUID getBehandlingUuid() {
+        return behandlingUuid;
+    }
+
+    public void setBehandlingUuid(UUID behandlingUuid) {
+        this.behandlingUuid = behandlingUuid;
     }
 }

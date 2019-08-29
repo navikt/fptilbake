@@ -64,6 +64,7 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
 
         KravOgVedtakstatus kravOgVedtakstatus = KravVedtakStatusXmlUnmarshaller.unmarshall(mottattXmlId, råXml);
         KravVedtakStatus437 kravVedtakStatus437 = statusMapper.mapTilDomene(kravOgVedtakstatus);
+        String saksnummer = statusMapper.finnSaksnummer(kravOgVedtakstatus);
 
         String eksternBehandlingId = statusMapper.finnBehandlngId(kravOgVedtakstatus);
         økonomiMottattXmlRepository.oppdaterMedEksternBehandlingId(eksternBehandlingId, mottattXmlId);
@@ -74,7 +75,7 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
             kravVedtakStatusTjeneste.håndteresMottakAvKravVedtakStatus(internId, kravVedtakStatus437);
             logger.info("Leste kravVedtakStatus med id={} eksternBehandlingId={} internBehandlingId={}", mottattXmlId, eksternBehandlingId, internId);
         }  else {
-            validerBehandlingsEksistens(eksternBehandlingId);
+            validerBehandlingsEksistens(eksternBehandlingId,saksnummer);
             logger.info("Ignorerte kravVedtakStatus med id={} eksternBehandlingId={}. Fantes ikke tilbakekrevingsbehandling", mottattXmlId, eksternBehandlingId);
         }
 
@@ -89,11 +90,11 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
         return Optional.empty();
     }
 
-    private void validerBehandlingsEksistens(String eksternBehandlingId) {
+    private void validerBehandlingsEksistens(String eksternBehandlingId,String saksnummer) {
         if (!erGyldigTall(eksternBehandlingId)) {
             throw LesKravvedtakStatusTask.LesKravvedtakStatusTaskFeil.FACTORY.behandlingFinnesIkkeIFpsak(eksternBehandlingId).toException();
         }
-        if (!erBehandlingFinnesIFpsak(eksternBehandlingId)) {
+        if (!erBehandlingFinnesIFpsak(saksnummer)) {
             throw LesKravvedtakStatusTask.LesKravvedtakStatusTaskFeil.FACTORY.behandlingFinnesIkkeIFpsak(Long.valueOf(eksternBehandlingId)).toException();
         }
     }

@@ -132,9 +132,10 @@ public class BestillDokumentTjeneste {
 
     public byte[] hentForhåndsvisningVarselbrev(HentForhåndsvisningVarselbrevDto hentForhåndsvisningVarselbrevDto) {
         VarselbrevSamletInfo varselbrevSamletInfo = varselbrevTjeneste.lagVarselbrevForForhåndsvisning(
-            hentForhåndsvisningVarselbrevDto.getBehandlingId(),
+            hentForhåndsvisningVarselbrevDto.getBehandlingUuId(),
             hentForhåndsvisningVarselbrevDto.getSaksnummer(),
-            hentForhåndsvisningVarselbrevDto.getVarseltekst());
+            hentForhåndsvisningVarselbrevDto.getVarseltekst(),
+            hentForhåndsvisningVarselbrevDto.getFagsakYtelseType());
 
         Element ferdigXml = lagXmlDokumentVarselbrev(varselbrevSamletInfo);
         return sendForhåndsvisningRequest(ferdigXml);

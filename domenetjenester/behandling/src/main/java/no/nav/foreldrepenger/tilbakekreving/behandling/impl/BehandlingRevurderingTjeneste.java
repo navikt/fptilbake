@@ -2,6 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -55,20 +56,20 @@ public class BehandlingRevurderingTjeneste {
         this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
     }
 
-    public Behandling opprettRevurdering(Saksnummer saksnummer, long eksternBehandlingId, String behandlingÅrsak) {
+    public Behandling opprettRevurdering(Saksnummer saksnummer, UUID eksternUuid, String behandlingÅrsak) {
 
         BehandlingÅrsakType behandlingÅrsakType = hentBehandlingÅrsakType(behandlingÅrsak);
 
         Fagsak fagsak = fagsakRepository.hentEksaktFagsakForGittSaksnummer(saksnummer);
 
-        validerHarIkkeÅpenBehandling(saksnummer, eksternBehandlingId);
+        validerHarIkkeÅpenBehandling(saksnummer, eksternUuid);
 
         repositoryProvider.getFagsakRepository().oppdaterFagsakStatus(fagsak.getId(), FagsakStatus.UNDER_BEHANDLING);
-        return opprettManuellRevurdering(fagsak, behandlingÅrsakType, eksternBehandlingId);
+        return opprettManuellRevurdering(fagsak, behandlingÅrsakType, eksternUuid);
     }
 
-    public boolean kanOppretteRevurdering(long eksternBehandlingId) {
-        List<EksternBehandling> alleKnyttetBehandlinger = eksternBehandlingRepository.hentAlleBehandlingerMedEksternId(eksternBehandlingId);
+    public boolean kanOppretteRevurdering(UUID eksternUuid) {
+        List<EksternBehandling> alleKnyttetBehandlinger = eksternBehandlingRepository.hentAlleBehandlingerMedEksternUuid(eksternUuid);
         for (EksternBehandling eksternBehandling : alleKnyttetBehandlinger) {
             if (harÅpenBehandling(eksternBehandling.getInternId())) {
                 return false;
@@ -81,11 +82,12 @@ public class BehandlingRevurderingTjeneste {
         return kodeverkRepository.finn(BehandlingÅrsakType.class, behandlingÅrsak);
     }
 
-    private Behandling opprettManuellRevurdering(Fagsak fagsak, BehandlingÅrsakType behandlingÅrsakType, long eksternBehandlingId) {
-        EksternBehandling eksternBehandlingForSisteTbkBehandling = eksternBehandlingRepository.finnForSisteAvsluttetTbkBehandling(eksternBehandlingId)
+    private Behandling opprettManuellRevurdering(Fagsak fagsak, BehandlingÅrsakType behandlingÅrsakType, UUID eksternUuid) {
+        EksternBehandling eksternBehandlingForSisteTbkBehandling = eksternBehandlingRepository.finnForSisteAvsluttetTbkBehandling(eksternUuid)
             .orElseThrow(() -> RevurderingFeil.FACTORY.tjenesteFinnerIkkeBehandlingForRevurdering(fagsak.getId()).toException());
 
         Behandling origBehandling = behandlingRepository.hentBehandling(eksternBehandlingForSisteTbkBehandling.getInternId());
+        Long eksternBehandlingId = eksternBehandlingForSisteTbkBehandling.getEksternId(); // eksternBehandling må være samme som siste når vi opprette revurdering
 
         Behandling revurdering = opprettRevurderingsBehandling(behandlingÅrsakType, origBehandling);
         BehandlingLås lås = behandlingRepository.taSkriveLås(revurdering);
@@ -95,7 +97,7 @@ public class BehandlingRevurderingTjeneste {
         repositoryProvider.getAksjonspunktRepository().leggTilAksjonspunkt(revurdering, AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING,
             BehandlingStegType.FAKTA_FEILUTBETALING);
 
-        opprettRelasjonMedEksternBehandling(eksternBehandlingId, revurdering);
+        opprettRelasjonMedEksternBehandling(eksternBehandlingId, revurdering,eksternUuid);
 
         // lag historikkinnslag for Revurdering opprettet
         lagHistorikkInnslagForOpprettetRevurdering(revurdering, behandlingÅrsakType);
@@ -113,8 +115,8 @@ public class BehandlingRevurderingTjeneste {
         return revurdering;
     }
 
-    private void validerHarIkkeÅpenBehandling(Saksnummer saksnummer, long eksternBehandlingId) {
-        if (!kanOppretteRevurdering(eksternBehandlingId)) {
+    private void validerHarIkkeÅpenBehandling(Saksnummer saksnummer, UUID eksternUuid) {
+        if (!kanOppretteRevurdering(eksternUuid)) {
             throw RevurderingFeil.FACTORY.kanIkkeOppretteRevurdering(saksnummer).toException();
         }
     }
@@ -124,8 +126,8 @@ public class BehandlingRevurderingTjeneste {
         return !behandling.erAvsluttet();
     }
 
-    private void opprettRelasjonMedEksternBehandling(long eksternBehandlingId, Behandling revurdering) {
-        EksternBehandling eksternBehandling = new EksternBehandling(revurdering, eksternBehandlingId);
+    private void opprettRelasjonMedEksternBehandling(long eksternBehandlingId, Behandling revurdering, UUID eksternUuid) {
+        EksternBehandling eksternBehandling = new EksternBehandling(revurdering, eksternBehandlingId, eksternUuid);
         eksternBehandlingRepository.lagre(eksternBehandling);
     }
 

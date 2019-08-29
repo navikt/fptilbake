@@ -14,38 +14,21 @@ import java.time.Period;
 import java.util.List;
 import java.util.Optional;
 
-import javax.persistence.EntityManager;
-
 import org.assertj.core.util.Lists;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.AdresseType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevdataRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevdataRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VarselbrevSporing;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.NavBrukerKjønn;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.PersonstatusType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProviderImpl;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.TestFagsakUtil;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.HentForhåndsvisningVarselbrevDto;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.util.BrevMetadataMapper;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.TpsTjeneste;
@@ -90,7 +73,7 @@ public class BestillDokumentTjenesteTest extends DokumentBestillerTestOppsett {
     @Before
     public void setup() throws Exception {
         when(behandlingTjenesteMock.hentBehandling(anyLong())).thenReturn(behandling);
-        when(fpsakKlientMock.hentBehandlingsinfo(eksternBehandling.getEksternId(), fagsak.getSaksnummer().getVerdi()))
+        when(fpsakKlientMock.hentBehandlingsinfo(eksternBehandling.getEksternUuid()))
             .thenReturn(Optional.of(lagMockEksternBehandlingsinfoDto(fagsak)));
         Personinfo personinfo = lagMockPersonInfo(fagsak.getAktørId());
         when(tpsTjenesteMock.hentBrukerForAktør(fagsak.getAktørId())).thenReturn(Optional.of(personinfo));
@@ -127,7 +110,7 @@ public class BestillDokumentTjenesteTest extends DokumentBestillerTestOppsett {
 
     @Test
     public void sendVarselbrev_nårFantIkke_behandlingIFpsak() {
-        when(fpsakKlientMock.hentBehandlingsinfo(eksternBehandling.getEksternId(), fagsak.getSaksnummer().getVerdi()))
+        when(fpsakKlientMock.hentBehandlingsinfo(eksternBehandling.getEksternUuid()))
             .thenReturn(Optional.empty());
         expectedException.expect(TekniskException.class);
         expectedException.expectMessage("FPT-841932");
@@ -156,9 +139,10 @@ public class BestillDokumentTjenesteTest extends DokumentBestillerTestOppsett {
     @Test
     public void hentForhåndsvisningVarselbrev() {
         HentForhåndsvisningVarselbrevDto forhåndsvisningVarselbrevDto = new HentForhåndsvisningVarselbrevDto();
-        forhåndsvisningVarselbrevDto.setBehandlingId(FPSAK_BEHANDLING_ID);
+        forhåndsvisningVarselbrevDto.setBehandlingUuId(FPSAK_BEHANDLING_UUID);
         forhåndsvisningVarselbrevDto.setSaksnummer(fagsak.getSaksnummer().getVerdi());
         forhåndsvisningVarselbrevDto.setVarseltekst("");
+        forhåndsvisningVarselbrevDto.setFagsakYtelseType(FagsakYtelseType.FORELDREPENGER.getKode());
         byte[] respons = bestillDokumentTjeneste.hentForhåndsvisningVarselbrev(forhåndsvisningVarselbrevDto);
         assertThat(respons).isNotEmpty();
     }
@@ -167,6 +151,7 @@ public class BestillDokumentTjenesteTest extends DokumentBestillerTestOppsett {
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto = new EksternBehandlingsinfoDto();
         eksternBehandlingsinfoDto.setFagsakId(fagsak.getId());
         eksternBehandlingsinfoDto.setId(FPSAK_BEHANDLING_ID);
+        eksternBehandlingsinfoDto.setUuid(FPSAK_BEHANDLING_UUID);
         eksternBehandlingsinfoDto.setSaksnummer(fagsak.getSaksnummer().getVerdi());
         eksternBehandlingsinfoDto.setBehandlendeEnhetId("8020");
         eksternBehandlingsinfoDto.setAnsvarligSaksbehandler("Z9901136");

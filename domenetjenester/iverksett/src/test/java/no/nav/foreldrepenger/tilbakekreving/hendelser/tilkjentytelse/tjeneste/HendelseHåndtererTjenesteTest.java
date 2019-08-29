@@ -1,7 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.tjeneste;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -13,18 +13,14 @@ import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.tilbakekrevingsvalg.VidereBehandling;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.TilbakekrevingDataDto;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.TilbakekrevingValgDto;
+import no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.TilkjentYtelseTestOppsett;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 
-public class HendelseHåndtererTjenesteTest {
-
-    private static final String SAKSNUMMER = "21435";
-    private static final String FAGSAK_YTELSE_TYPE = "FP";
-    private static final String AKTØR_ID = "4535353532";
-    private static final Long FAGSAK_ID = 1234L;
-    private static final Long BEHANDLING_ID = 1535235L;
+public class HendelseHåndtererTjenesteTest extends TilkjentYtelseTestOppsett {
 
     private HendelseHåndtererTjeneste hendelseHåndtererTjeneste;
 
@@ -38,22 +34,22 @@ public class HendelseHåndtererTjenesteTest {
 
     @Test
     public void skal_opprette_prosesstask_når_relevant_hendelse_er_mottatt() {
-        String videreBehandling = VidereBehandling.TILBAKEKREV_I_INFOTRYGD.getKode();
-        TilbakekrevingDataDto tbkDataDto = new TilbakekrevingDataDto(SAKSNUMMER, FAGSAK_YTELSE_TYPE, videreBehandling);
-        when(restKlient.hentTilbakekrevingData(anyLong())).thenReturn(Optional.of(tbkDataDto));
+        VidereBehandling videreBehandling = VidereBehandling.TILBAKEKREV_I_INFOTRYGD;
+        TilbakekrevingValgDto tbkDataDto = new TilbakekrevingValgDto(videreBehandling);
+        when(restKlient.hentTilbakekrevingValg(anyString())).thenReturn(Optional.of(tbkDataDto));
 
-        hendelseHåndtererTjeneste.håndterHendelse(FAGSAK_ID, BEHANDLING_ID, AKTØR_ID);
+        hendelseHåndtererTjeneste.håndterHendelse(hendelseTaskDataWrapper);
 
         verify(taskRepository, atLeastOnce()).lagre(any(ProsessTaskData.class));
     }
 
     @Test
     public void skal_ignorere_hendelse_hvis_ikke_relevant() {
-        String videreBehandling = VidereBehandling.IGNORER_TILBAKEKREVING.getKode();
-        TilbakekrevingDataDto tbkDataDto = new TilbakekrevingDataDto(SAKSNUMMER, FAGSAK_YTELSE_TYPE, videreBehandling);
-        when(restKlient.hentTilbakekrevingData(anyLong())).thenReturn(Optional.of(tbkDataDto));
+        VidereBehandling videreBehandling = VidereBehandling.IGNORER_TILBAKEKREVING;
+        TilbakekrevingValgDto tbkDataDto = new TilbakekrevingValgDto(videreBehandling);
+        when(restKlient.hentTilbakekrevingValg(anyString())).thenReturn(Optional.of(tbkDataDto));
 
-        hendelseHåndtererTjeneste.håndterHendelse(FAGSAK_ID, BEHANDLING_ID, AKTØR_ID);
+        hendelseHåndtererTjeneste.håndterHendelse(hendelseTaskDataWrapper);
 
         verifyZeroInteractions(taskRepository);
     }

@@ -1,24 +1,17 @@
 package no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.task;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
+import no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.TilkjentYtelseTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.tjeneste.HendelseHåndtererTjeneste;
 
-public class HåndterHendelseTaskTest {
-
-    private static final Long FAGSAK_ID = 1244L;
-    private static final Long BEHANDLING_ID = 24533L;
-    private static final String AKTØR_ID = "83923535";
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+public class HåndterHendelseTaskTest extends TilkjentYtelseTestOppsett {
 
     HendelseHåndtererTjeneste hendelseHåndterer = mock(HendelseHåndtererTjeneste.class);
     HåndterHendelseTask håndterHendelseTask;
@@ -31,13 +24,13 @@ public class HåndterHendelseTaskTest {
     @Test
     public void test_skal_kalle_hendelseHåndterer() {
         //
-        HendelseTaskDataWrapper taskDataWrapper = HendelseTaskDataWrapper.lagWrapperForHendelseHåndtering(FAGSAK_ID, BEHANDLING_ID, AKTØR_ID);
+        HendelseTaskDataWrapper taskDataWrapper = HendelseTaskDataWrapper.lagWrapperForHendelseHåndtering(opprettTilkjentYtelseMelding());
 
         // act
         håndterHendelseTask.doTask(taskDataWrapper.getProsessTaskData());
 
         // verify
-        verify(hendelseHåndterer, atLeastOnce()).håndterHendelse(FAGSAK_ID, BEHANDLING_ID, AKTØR_ID);
+        verify(hendelseHåndterer, atLeastOnce()).håndterHendelse(any(HendelseTaskDataWrapper.class));
     }
 
 }

@@ -91,7 +91,7 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
     }
 
     private Fagsak lagFagsak(NavBruker bruker) {
-        return Fagsak.opprettNy(fagsakId, eksternSaksnummer, bruker);
+        return Fagsak.opprettNy(eksternSaksnummer, bruker);
     }
 
     public S medDefaultKravgrunnlag() {
@@ -332,8 +332,7 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
     }
 
     protected void lagFagsak(FagsakRepository fagsakRepo) {
-        Long fagsakId = fagsakRepo.lagre(fagsak); // NOSONAR //$NON-NLS-1$
-        fagsak.setId(fagsakId);
+        fagsakRepo.lagre(fagsak); // NOSONAR //$NON-NLS-1$
     }
 
 

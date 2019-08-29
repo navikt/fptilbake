@@ -5,6 +5,7 @@ import static no.nav.vedtak.felles.jpa.HibernateVerktøy.hentUniktResultat;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -20,6 +21,7 @@ import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
 public class EksternBehandlingRepositoryImpl implements EksternBehandlingRepository {
 
     private static final String EKSTERN_ID = "eksternId";
+    private static final String EKSTERN_UUID = "eksternUuid";
     private EntityManager entityManager;
 
     EksternBehandlingRepositoryImpl() {
@@ -58,20 +60,20 @@ public class EksternBehandlingRepositoryImpl implements EksternBehandlingReposit
     }
 
     @Override
-    public List<EksternBehandling> hentAlleBehandlingerMedEksternId(long eksternBehandlingId) {
-        TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where ekstern_id=:eksternId and aktiv='J'", EksternBehandling.class);
-        query.setParameter(EKSTERN_ID, eksternBehandlingId);
+    public List<EksternBehandling> hentAlleBehandlingerMedEksternUuid(UUID eksternUuid) {
+        TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where eksternUuid=:eksternUuid and aktiv='J'", EksternBehandling.class);
+        query.setParameter(EKSTERN_UUID, eksternUuid);
         return query.getResultList();
     }
 
     @Override
-    public Optional<EksternBehandling> finnForSisteAvsluttetTbkBehandling(long eksternBehandlingId){
+    public Optional<EksternBehandling> finnForSisteAvsluttetTbkBehandling(UUID eksternUuid){
         TypedQuery<EksternBehandling> query = entityManager.createQuery("select eks from EksternBehandling eks , Behandling beh where eks.internId=beh.id " +
-            "and eks.eksternId=:eksternId and beh.behandlingType=:behandlingType " +
+            "and eks.eksternUuid=:eksternUuid and beh.behandlingType=:behandlingType " +
             "and beh.status = :behandlingStatus and eks.aktiv='J' " +
             "ORDER BY beh.opprettetTidspunkt DESC", EksternBehandling.class);
 
-        query.setParameter(EKSTERN_ID, eksternBehandlingId);
+        query.setParameter(EKSTERN_UUID, eksternUuid);
         query.setParameter("behandlingType", BehandlingType.TILBAKEKREVING);
         query.setParameter("behandlingStatus", BehandlingStatus.AVSLUTTET);
         List<EksternBehandling> eksternBehandlinger =  query.getResultList();

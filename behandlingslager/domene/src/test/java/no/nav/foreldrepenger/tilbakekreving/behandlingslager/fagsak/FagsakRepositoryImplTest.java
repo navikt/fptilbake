@@ -82,7 +82,7 @@ public class FagsakRepositoryImplTest {
         NavBruker bruker = NavBruker.opprettNy(aktørId, Språkkode.nb);
 
         // Opprett fagsak
-        Fagsak fagsak = TestFagsakUtil.opprettFagsak(eksternSystemId, saksnummer, bruker);
+        Fagsak fagsak = TestFagsakUtil.opprettFagsak(saksnummer, bruker);
         fagsak.setSaksnummer(saksnummer);
         repository.lagre(fagsak);
         repository.flushAndClear();

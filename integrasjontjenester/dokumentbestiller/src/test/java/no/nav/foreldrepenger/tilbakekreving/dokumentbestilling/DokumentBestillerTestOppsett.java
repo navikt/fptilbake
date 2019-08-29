@@ -1,5 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling;
 
+import java.util.UUID;
+
 import javax.persistence.EntityManager;
 
 import org.junit.Before;
@@ -24,6 +26,7 @@ import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 public class DokumentBestillerTestOppsett {
 
     protected static final long FPSAK_BEHANDLING_ID = 99051L;
+    protected static final UUID FPSAK_BEHANDLING_UUID = UUID.randomUUID();
     protected static final String DUMMY_FØDSELSNUMMER = "31018143212";
 
     @Rule
@@ -52,7 +55,7 @@ public class DokumentBestillerTestOppsett {
         behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).build();
         BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(behandling);
         behandlingRepository.lagre(behandling, behandlingLås);
-        eksternBehandling = new EksternBehandling(behandling, FPSAK_BEHANDLING_ID);
+        eksternBehandling = new EksternBehandling(behandling, FPSAK_BEHANDLING_ID,FPSAK_BEHANDLING_UUID);
         eksternBehandlingRepository.lagre(eksternBehandling);
     }
 }

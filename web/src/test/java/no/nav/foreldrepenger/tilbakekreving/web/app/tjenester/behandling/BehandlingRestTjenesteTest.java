@@ -1,7 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
@@ -9,6 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.net.URISyntaxException;
+import java.util.UUID;
 
 import javax.ws.rs.core.Response;
 
@@ -44,7 +44,7 @@ public class BehandlingRestTjenesteTest {
     public static final String UGYLDIG_AKTØR_ID = "%&#123124";
     public static final String GYLDIG_SAKSNR = "123456";
     public static final String UGYLDIG_SAKSNR = "(#2141##";
-    public static final long EKSTERN_BEHANDLING_ID = 123456L;
+    public static final String EKSTERN_BEHANDLING_UUID = UUID.randomUUID().toString();
     public static final String YTELSE_TYPE = FagsakYtelseType.FORELDREPENGER.getKode();
 
     @Rule
@@ -63,7 +63,7 @@ public class BehandlingRestTjenesteTest {
 
     @Test
     public void test_opprett_behandling_skal_feile_med_ugyldig_aktørId() throws URISyntaxException {
-        OpprettBehandlingDto dto = opprettBehandlingDto(UGYLDIG_AKTØR_ID, GYLDIG_SAKSNR, EKSTERN_BEHANDLING_ID, YTELSE_TYPE);
+        OpprettBehandlingDto dto = opprettBehandlingDto(UGYLDIG_AKTØR_ID, GYLDIG_SAKSNR, EKSTERN_BEHANDLING_UUID, YTELSE_TYPE);
 
         expectedException.expect(IllegalArgumentException.class); // ved rest-kall vil jax validering slå inn og resultere i en FeltFeil
         expectedException.expectMessage("Ugyldig aktørId");
@@ -73,7 +73,7 @@ public class BehandlingRestTjenesteTest {
 
     @Test
     public void test_opprett_behandling_skal_feile_med_ugyldig_saksnummer() throws URISyntaxException {
-        OpprettBehandlingDto dto = opprettBehandlingDto(GYLDIG_AKTØR_ID, UGYLDIG_SAKSNR, EKSTERN_BEHANDLING_ID, YTELSE_TYPE);
+        OpprettBehandlingDto dto = opprettBehandlingDto(GYLDIG_AKTØR_ID, UGYLDIG_SAKSNR, EKSTERN_BEHANDLING_UUID, YTELSE_TYPE);
 
         expectedException.expect(IllegalArgumentException.class); // ved rest-kall vil jax validering slå inn og resultere i en FeltFeil
         expectedException.expectMessage("Ugyldig saksnummer");
@@ -83,24 +83,24 @@ public class BehandlingRestTjenesteTest {
 
     @Test
     public void test_skal_opprette_ny_behandling() throws URISyntaxException {
-        behandlingRestTjeneste.opprettBehandling(opprettBehandlingDto(GYLDIG_AKTØR_ID, GYLDIG_SAKSNR, EKSTERN_BEHANDLING_ID, YTELSE_TYPE));
+        behandlingRestTjeneste.opprettBehandling(opprettBehandlingDto(GYLDIG_AKTØR_ID, GYLDIG_SAKSNR, EKSTERN_BEHANDLING_UUID, YTELSE_TYPE));
 
-        verify(behandlingTjenesteMock).opprettBehandlingManuell(any(Saksnummer.class), anyLong(), any(AktørId.class),anyString(), any(BehandlingType.class));
+        verify(behandlingTjenesteMock).opprettBehandlingManuell(any(Saksnummer.class), any(UUID.class), any(AktørId.class),anyString(), any(BehandlingType.class));
     }
 
     @Test
     public void test_skal_opprette_ny_behandling_for_revurdering() throws URISyntaxException {
         when(behandlingskontrollAsynkTjenesteMock.asynkProsesserBehandling(any(Behandling.class))).thenReturn("1");
-        when(revurderingTjenesteMock.opprettRevurdering(any(Saksnummer.class), anyLong(), anyString()))
+        when(revurderingTjenesteMock.opprettRevurdering(any(Saksnummer.class), any(UUID.class), anyString()))
             .thenReturn(mockBehandling());
 
-        OpprettBehandlingDto opprettBehandlingDto = opprettBehandlingDto(GYLDIG_AKTØR_ID, GYLDIG_SAKSNR, EKSTERN_BEHANDLING_ID, YTELSE_TYPE);
+        OpprettBehandlingDto opprettBehandlingDto = opprettBehandlingDto(GYLDIG_AKTØR_ID, GYLDIG_SAKSNR, EKSTERN_BEHANDLING_UUID, YTELSE_TYPE);
         opprettBehandlingDto.setBehandlingType(BehandlingType.REVURDERING_TILBAKEKREVING.getKode());
         opprettBehandlingDto.setBehandlingArsakType(BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR.getKode());
 
         Response response = behandlingRestTjeneste.opprettBehandling(opprettBehandlingDto);
 
-        verify(revurderingTjenesteMock, atLeastOnce()).opprettRevurdering(any(Saksnummer.class), anyLong(), anyString());
+        verify(revurderingTjenesteMock, atLeastOnce()).opprettRevurdering(any(Saksnummer.class), any(UUID.class), anyString());
         Assertions.assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_ACCEPTED);
     }
 
@@ -110,16 +110,16 @@ public class BehandlingRestTjenesteTest {
         BehandlingResultatType årsak = BehandlingResultatType.HENLAGT_FEILOPPRETTET;
         String begrunnelse = "begrunnelse";
 
-        behandlingRestTjeneste.henleggBehandling(opprettHenleggBehandlingDto(EKSTERN_BEHANDLING_ID, versjon, årsak, begrunnelse));
+        behandlingRestTjeneste.henleggBehandling(opprettHenleggBehandlingDto(1234l, versjon, årsak, begrunnelse));
 
-        verify(henleggBehandlingTjenesteMock).henleggBehandling(EKSTERN_BEHANDLING_ID, årsak, begrunnelse);
+        verify(henleggBehandlingTjenesteMock).henleggBehandling(1234l, årsak, begrunnelse);
     }
 
-    private OpprettBehandlingDto opprettBehandlingDto(String aktørId, String saksnr, long eksternBehandlingId, String ytelseType) {
+    private OpprettBehandlingDto opprettBehandlingDto(String aktørId, String saksnr, String eksternUuid, String ytelseType) {
         OpprettBehandlingDto dto = new OpprettBehandlingDto();
         dto.setAktørId(aktørId);
         dto.setSaksnummer(saksnr);
-        dto.setEksternBehandlingId(eksternBehandlingId);
+        dto.setEksternUuid(eksternUuid);
         dto.setBehandlingType(BehandlingType.TILBAKEKREVING.getKode());
         dto.setFagsakYtelseType(ytelseType);
         return dto;
@@ -136,7 +136,7 @@ public class BehandlingRestTjenesteTest {
 
     private Behandling mockBehandling() {
         return Behandling.nyBehandlingFor(
-            Fagsak.opprettNy(1l, new Saksnummer(GYLDIG_SAKSNR), NavBruker.opprettNy(new AktørId(GYLDIG_AKTØR_ID), Språkkode.nb)),
+            Fagsak.opprettNy( new Saksnummer(GYLDIG_SAKSNR), NavBruker.opprettNy(new AktørId(GYLDIG_AKTØR_ID), Språkkode.nb)),
             BehandlingType.REVURDERING_TILBAKEKREVING).build();
     }
 

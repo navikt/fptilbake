@@ -32,6 +32,7 @@ public class LesKravgrunnlagTaskTest extends FellesTestOppsett {
     private Long kravgrunnlagId;
     private static final Long FPSAK_BEHANDLING_ID = 100000001L;
 
+
     @Before
     public void setup() {
         kravgrunnlagId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_YTEL.xml"));
@@ -53,7 +54,7 @@ public class LesKravgrunnlagTaskTest extends FellesTestOppsett {
 
     @Test
     public void skal_utføre_leskravgrunnlag_task_nårBehandlingFinnesIkkeIFpsak() {
-        when(fpsakKlientMock.finnesBehandlingIFpsak(FPSAK_BEHANDLING_ID)).thenReturn(false);
+        when(fpsakKlientMock.finnesBehandlingIFpsak(fagsak.getSaksnummer().getVerdi())).thenReturn(false);
 
         expectedException.expectMessage("FPT-587195");
         lesKravgrunnlagTask.doTask(lagProsessTaskData());
@@ -75,7 +76,7 @@ public class LesKravgrunnlagTaskTest extends FellesTestOppsett {
     }
 
     private void lagEksternBehandling() {
-        EksternBehandling eksternBehandling = new EksternBehandling(behandling, FPSAK_BEHANDLING_ID);
+        EksternBehandling eksternBehandling = new EksternBehandling(behandling, FPSAK_BEHANDLING_ID,FPSAK_BEHANDLING_UUID);
         eksternBehandlingRepository.lagre(eksternBehandling);
     }
 }

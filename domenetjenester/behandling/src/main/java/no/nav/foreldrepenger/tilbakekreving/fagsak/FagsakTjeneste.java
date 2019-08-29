@@ -1,6 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.fagsak;
 
-import java.util.List;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -27,36 +26,28 @@ public class FagsakTjeneste {
     private FagsakRepository fagsakRepository;
     private NavBrukerRepository navBrukerRepository;
 
-    FagsakTjeneste(){
+    FagsakTjeneste() {
         // For CDI
     }
 
     @Inject
-    public FagsakTjeneste(TpsTjeneste tpsTjeneste, FagsakRepository fagsakRepository, NavBrukerRepository navBrukerRepository){
+    public FagsakTjeneste(TpsTjeneste tpsTjeneste, FagsakRepository fagsakRepository, NavBrukerRepository navBrukerRepository) {
         this.tpsTjeneste = tpsTjeneste;
         this.fagsakRepository = fagsakRepository;
         this.navBrukerRepository = navBrukerRepository;
     }
 
-    public Fagsak finnEllerOpprettFagsak(long fagsakId, Saksnummer saksnummer, AktørId aktørId, FagsakYtelseType fagsakYtelseType) {
-        List<Fagsak> fagsaker = fagsakRepository.hentForBruker(aktørId);
-        Fagsak fagsak = fagsaker.stream()
-                .filter(s -> s.getSaksnummer().equals(saksnummer))
-                .findFirst()
-                .orElse(null);
-
-        if (fagsak == null) {
-            NavBruker bruker = hentNavBruker(aktørId);
-            fagsak = Fagsak.opprettNy(fagsakId, saksnummer, bruker);
-            fagsak.setFagsakYtelseType(fagsakYtelseType);
-            try {
-                fagsakRepository.lagre(fagsak);
-            } catch (PersistenceException e) { // NOSONAR
-                if (e.getCause() instanceof ConstraintViolationException) {
-                    throw BehandlingFeil.FACTORY.saksnummerKnyttetTilAnnenBruker(saksnummer).toException();
-                } else {
-                    throw e;
-                }
+    public Fagsak opprettFagsak(Saksnummer saksnummer, AktørId aktørId, FagsakYtelseType fagsakYtelseType) {
+        NavBruker bruker = hentNavBruker(aktørId);
+        Fagsak fagsak = Fagsak.opprettNy(saksnummer, bruker);
+        fagsak.setFagsakYtelseType(fagsakYtelseType);
+        try {
+            fagsakRepository.lagre(fagsak);
+        } catch (PersistenceException e) { // NOSONAR
+            if (e.getCause() instanceof ConstraintViolationException) {
+                throw BehandlingFeil.FACTORY.saksnummerKnyttetTilAnnenBruker(saksnummer).toException();
+            } else {
+                throw e;
             }
         }
         return fagsak;

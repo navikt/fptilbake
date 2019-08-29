@@ -6,6 +6,8 @@ import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.domene.BrevMetadata;
@@ -43,7 +45,7 @@ public class VarselbrevUtil {
             .medFagsaktypenavnPåSpråk(ytelseNavn.getNavnPåBrukersSpråk())
             .medFagsaktype(eksternBehandlingsinfoDto.getFagsaktype())
             .medSprakkode(personinfo.getForetrukketSpråk())
-            .medAnsvarligSaksbehandler(eksternBehandlingsinfoDto.getAnsvarligSaksbehandler())
+            .medAnsvarligSaksbehandler(StringUtils.isNotEmpty(eksternBehandlingsinfoDto.getAnsvarligSaksbehandler()) ? eksternBehandlingsinfoDto.getAnsvarligSaksbehandler() : "VL")
             .medTittel(TittelOverskriftUtil.finnTittelVarselbrev(ytelseNavn.getNavnPåBokmål()))
             .build();
 

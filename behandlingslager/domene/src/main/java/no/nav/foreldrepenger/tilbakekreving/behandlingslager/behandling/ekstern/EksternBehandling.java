@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern;
 
 import java.util.Objects;
+import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Convert;
@@ -9,6 +10,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.NaturalId;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.vedtak.felles.jpa.BaseEntitet;
@@ -32,16 +35,22 @@ public class EksternBehandling extends BaseEntitet {
     @Column(name = "aktiv", nullable = false)
     private Boolean aktiv = true;
 
+    @NaturalId
+    @Column(name = "ekstern_uuid")
+    private UUID eksternUuid;
+
     EksternBehandling() {
         // Hibernate
     }
 
-    public EksternBehandling(Behandling behandling, Long eksternId) {
+    public EksternBehandling(Behandling behandling, Long eksternId, UUID eksternUuid) {
         Objects.requireNonNull(behandling, "behandlingId");
         Objects.requireNonNull(eksternId, "eksternId");
+        Objects.requireNonNull(eksternUuid, "eksternUuid");
 
         this.internId = behandling.getId();
         this.eksternId = eksternId;
+        this.eksternUuid = eksternUuid;
     }
 
     public Long getId() {
@@ -62,6 +71,14 @@ public class EksternBehandling extends BaseEntitet {
 
     public void setInaktiv() {
         aktiv = false;
+    }
+
+    public UUID getEksternUuid() {
+        return eksternUuid;
+    }
+
+    public void setEksternUuid(UUID eksternUuid) {
+        this.eksternUuid = eksternUuid;
     }
 
     @Override
