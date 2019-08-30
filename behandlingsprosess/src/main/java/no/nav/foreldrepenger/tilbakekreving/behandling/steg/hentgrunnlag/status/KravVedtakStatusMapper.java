@@ -15,21 +15,17 @@ public class KravVedtakStatusMapper {
 
     private TpsAdapterWrapper tpsAdapterWrapper;
 
-    KravVedtakStatusMapper(){
+    KravVedtakStatusMapper() {
         // for CDI proxy
     }
 
     @Inject
-    public KravVedtakStatusMapper(TpsAdapterWrapper tpsAdapterWrapper){
+    public KravVedtakStatusMapper(TpsAdapterWrapper tpsAdapterWrapper) {
         this.tpsAdapterWrapper = tpsAdapterWrapper;
     }
 
     public String finnBehandlngId(KravOgVedtakstatus kravOgVedtakstatus) {
         return kravOgVedtakstatus.getReferanse();
-    }
-
-    public String finnSaksnummer(KravOgVedtakstatus kravOgVedtakstatus) {
-        return kravOgVedtakstatus.getFagsystemId().substring(0,kravOgVedtakstatus.getFagsystemId().length()-3);
     }
 
     public KravVedtakStatus437 mapTilDomene(KravOgVedtakstatus kravOgVedtakstatus) {
@@ -41,6 +37,6 @@ public class KravVedtakStatusMapper {
             .medFagSystemId(kravOgVedtakstatus.getFagsystemId())
             .medReferanse(kravOgVedtakstatus.getReferanse())
             .medGjelderType(gjelderType)
-            .medGjelderVedtakId(tpsAdapterWrapper.hentAktørIdEllerOrganisajonNummer(kravOgVedtakstatus.getVedtakGjelderId(),gjelderType)).build();
+            .medGjelderVedtakId(tpsAdapterWrapper.hentAktørIdEllerOrganisajonNummer(kravOgVedtakstatus.getVedtakGjelderId(), gjelderType)).build();
     }
 }

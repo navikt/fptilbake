@@ -1,8 +1,8 @@
 package no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.task;
 
-import static no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.TaskProperties.BEHANDLING_ID;
 import static no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.TaskProperties.BEHANDLING_TYPE;
-import static no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.TaskProperties.BEHANDLING_UUID;
+import static no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.TaskProperties.EKSTERN_BEHANDLING_ID;
+import static no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.TaskProperties.EKSTERN_BEHANDLING_UUID;
 import static no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.TaskProperties.FAGSAK_YTELSE_TYPE;
 import static no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.TaskProperties.SAKSNUMMER;
 
@@ -28,7 +28,7 @@ public class HendelseTaskDataWrapper {
     }
 
     public long getBehandlingId() {
-        return prosessTaskData.getBehandlingId();
+        return Long.valueOf(prosessTaskData.getPropertyValue(EKSTERN_BEHANDLING_ID));
     }
 
     public AktørId getAktørId() {
@@ -52,26 +52,26 @@ public class HendelseTaskDataWrapper {
     }
 
     public String getBehandlingUuid() {
-        return prosessTaskData.getPropertyValue(BEHANDLING_UUID);
+        return prosessTaskData.getPropertyValue(EKSTERN_BEHANDLING_UUID);
     }
 
-    public void setFagsakYtelseType(String fagsakYtelseType) {
-        prosessTaskData.setProperty(FAGSAK_YTELSE_TYPE, fagsakYtelseType);
+    public void setFagsakYtelseType(FagsakYtelseType fagsakYtelseType) {
+        prosessTaskData.setProperty(FAGSAK_YTELSE_TYPE, fagsakYtelseType.getKode());
     }
 
-    public void setSaksnummer(String saksnummer) {
-        prosessTaskData.setProperty(SAKSNUMMER, saksnummer);
+    public void setSaksnummer(Saksnummer saksnummer) {
+        prosessTaskData.setProperty(SAKSNUMMER, saksnummer.getVerdi());
     }
 
 
-    public void setBehandlingType(String behandlingType) {
-        prosessTaskData.setProperty(BEHANDLING_TYPE, behandlingType);
+    public void setBehandlingType(BehandlingType behandlingType) {
+        prosessTaskData.setProperty(BEHANDLING_TYPE, behandlingType.getKode());
     }
 
     public void validerTaskDataHåndterHendelse() {
         Objects.requireNonNull(prosessTaskData.getAktørId());
-        Objects.requireNonNull(prosessTaskData.getPropertyValue(BEHANDLING_UUID));
-        Objects.requireNonNull(prosessTaskData.getBehandlingId());
+        Objects.requireNonNull(prosessTaskData.getPropertyValue(EKSTERN_BEHANDLING_UUID));
+        Objects.requireNonNull(prosessTaskData.getPropertyValue(EKSTERN_BEHANDLING_ID));
         Objects.requireNonNull(prosessTaskData.getPropertyValue(SAKSNUMMER));
         Objects.requireNonNull(prosessTaskData.getPropertyValue(FAGSAK_YTELSE_TYPE));
     }
@@ -85,20 +85,20 @@ public class HendelseTaskDataWrapper {
 
     public static HendelseTaskDataWrapper lagWrapperForHendelseHåndtering(TilkjentYtelseMelding melding) {
         ProsessTaskData td = new ProsessTaskData(HåndterHendelseTask.TASKTYPE);
-        td.setAktørId(melding.getAktørId());
-        td.setProperty(BEHANDLING_ID,String.valueOf(melding.getBehandlingId()));
-        td.setProperty(BEHANDLING_UUID, melding.getBehandlingUuid().toString());
-        td.setProperty(SAKSNUMMER,melding.getSaksnummer());
+        td.setAktørId(melding.getAktørId().getId());
+        td.setProperty(EKSTERN_BEHANDLING_ID,String.valueOf(melding.getBehandlingId()));
+        td.setProperty(EKSTERN_BEHANDLING_UUID, melding.getBehandlingUuid().toString());
+        td.setProperty(SAKSNUMMER,melding.getSaksnummer().getVerdi());
         td.setProperty(FAGSAK_YTELSE_TYPE,melding.getFagsakYtelseType());
 
         return new HendelseTaskDataWrapper(td);
     }
 
-    public static HendelseTaskDataWrapper lagWrapperForOpprettBehandling(String behandlingUuid, long behandlingId, String aktørId) {
+    public static HendelseTaskDataWrapper lagWrapperForOpprettBehandling(String behandlingUuid, long behandlingId, AktørId aktørId) {
         ProsessTaskData td = new ProsessTaskData(OpprettBehandlingTask.TASKTYPE);
-        td.setAktørId(aktørId);
-        td.setProperty(BEHANDLING_ID,String.valueOf(behandlingId));
-        td.setProperty(BEHANDLING_UUID, behandlingUuid);
+        td.setAktørId(aktørId.getId());
+        td.setProperty(EKSTERN_BEHANDLING_ID,String.valueOf(behandlingId));
+        td.setProperty(EKSTERN_BEHANDLING_UUID, behandlingUuid);
         return new HendelseTaskDataWrapper(td);
     }
 

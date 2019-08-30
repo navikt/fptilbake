@@ -139,10 +139,10 @@ public class BestillDokumentTjenesteTest extends DokumentBestillerTestOppsett {
     @Test
     public void hentForhåndsvisningVarselbrev() {
         HentForhåndsvisningVarselbrevDto forhåndsvisningVarselbrevDto = new HentForhåndsvisningVarselbrevDto();
-        forhåndsvisningVarselbrevDto.setBehandlingUuId(FPSAK_BEHANDLING_UUID);
+        forhåndsvisningVarselbrevDto.setBehandlingUuid(FPSAK_BEHANDLING_UUID);
         forhåndsvisningVarselbrevDto.setSaksnummer(fagsak.getSaksnummer().getVerdi());
         forhåndsvisningVarselbrevDto.setVarseltekst("");
-        forhåndsvisningVarselbrevDto.setFagsakYtelseType(FagsakYtelseType.FORELDREPENGER.getKode());
+        forhåndsvisningVarselbrevDto.setFagsakYtelseType(FagsakYtelseType.FORELDREPENGER);
         byte[] respons = bestillDokumentTjeneste.hentForhåndsvisningVarselbrev(forhåndsvisningVarselbrevDto);
         assertThat(respons).isNotEmpty();
     }

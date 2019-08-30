@@ -9,7 +9,6 @@ import java.util.function.Function;
 import javax.validation.Valid;
 import javax.ws.rs.core.Context;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -18,13 +17,8 @@ public class RestApiInputValideringAnnoteringTest extends RestApiTester {
     private Function<Method, String> printKlasseOgMetodeNavn = (method -> String.format("%s.%s", method.getDeclaringClass(), method.getName()));
 
     @Before
-    public void setup() {
-        System.setProperty("loadbalancer.url", "http://localhost:8050");
-    }
-
-    @After
-    public void cleanup() {
-        System.clearProperty("loadbalancer.url");
+    public void setup(){
+        System.setProperty("loadbalancer.url","http://localhost:8030");
     }
 
     /**

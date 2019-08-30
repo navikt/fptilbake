@@ -59,7 +59,7 @@ public class VarselbrevUtil {
     }
 
     public static VarselbrevSamletInfo sammenstillInfoFraFagsystemerForhåndvisningVarselbrev(
-        String saksnummer,
+        Saksnummer saksnummer,
         String varseltekst,
         Adresseinfo adresseinfo,
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto,
@@ -72,7 +72,7 @@ public class VarselbrevUtil {
             .medBehandlendeEnhetNavn(eksternBehandlingsinfoDto.getBehandlendeEnhetNavn())
             .medSakspartId(eksternBehandlingsinfoDto.getPersonopplysningDto().getFødselsnummer())
             .medMottakerAdresse(adresseinfo)
-            .medSaksnummer(saksnummer)
+            .medSaksnummer(saksnummer.getVerdi())
             .medSakspartNavn(eksternBehandlingsinfoDto.getPersonopplysningDto().getNavn())
             .medFagsaktype(eksternBehandlingsinfoDto.getFagsaktype())
             .medSprakkode(eksternBehandlingsinfoDto.getSprakkode())

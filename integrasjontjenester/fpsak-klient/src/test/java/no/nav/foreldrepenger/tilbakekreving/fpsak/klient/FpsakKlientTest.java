@@ -37,12 +37,12 @@ public class FpsakKlientTest {
     private static final String VARSELTEKST = "varseltekst";
     private static final UUID BEHANDLING_UUID = UUID.randomUUID();
 
-    private static final String BASE_URI= "http://fpsak";
-    private static final URI BEHANDLING_URI = URI.create(BASE_URI+"/fpsak/api/behandling/backend-root?uuid=" + BEHANDLING_UUID);
-    private static final URI BEHANDLING_ALLE_URI = URI.create(BASE_URI+"/fpsak/api/behandlinger/alle?saksnummer=" + SAKSNUMMER);
-    private static final URI PERSONOPPLYSNING_URI = URI.create(BASE_URI+"/fpsak/api/behandling/person/personopplysninger?uuid=" + BEHANDLING_UUID);
-    private static final URI VARSELTEKST_URI = URI.create(BASE_URI+"/fpsak/api/behandling/tilbakekreving/varseltekst?uuid=" + BEHANDLING_UUID);
-    private static final URI TILBAKEKREVING_VALG_URI = URI.create(BASE_URI+"/fpsak/api/behandling/tilbakekreving/valg?uuid=" + BEHANDLING_UUID);
+    private static final String BASE_URI = "http://fpsak";
+    private static final URI BEHANDLING_URI = URI.create(BASE_URI + "/fpsak/api/behandling/backend-root?uuid=" + BEHANDLING_UUID);
+    private static final URI BEHANDLING_ALLE_URI = URI.create(BASE_URI + "/fpsak/api/behandlinger/alle?saksnummer=" + SAKSNUMMER);
+    private static final URI PERSONOPPLYSNING_URI = URI.create(BASE_URI + "/fpsak/api/behandling/person/personopplysninger?uuid=" + BEHANDLING_UUID);
+    private static final URI VARSELTEKST_URI = URI.create(BASE_URI + "/fpsak/api/behandling/tilbakekreving/varseltekst?uuid=" + BEHANDLING_UUID);
+    private static final URI TILBAKEKREVING_VALG_URI = URI.create(BASE_URI + "/fpsak/api/behandling/tilbakekreving/valg?uuid=" + BEHANDLING_UUID);
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -56,8 +56,8 @@ public class FpsakKlientTest {
         EksternBehandlingsinfoDto returnDto = dokumentinfoDto();
 
         when(oidcRestClientMock.getReturnsOptional(BEHANDLING_URI, EksternBehandlingsinfoDto.class)).thenReturn(Optional.of(returnDto));
-        when(oidcRestClientMock.getReturnsOptional(PERSONOPPLYSNING_URI,PersonopplysningDto.class)).thenReturn(Optional.of(personopplysningDto()));
-        when(oidcRestClientMock.getReturnsOptional(VARSELTEKST_URI,String.class)).thenReturn(Optional.of(VARSELTEKST));
+        when(oidcRestClientMock.getReturnsOptional(PERSONOPPLYSNING_URI, PersonopplysningDto.class)).thenReturn(Optional.of(personopplysningDto()));
+        when(oidcRestClientMock.getReturnsOptional(VARSELTEKST_URI, String.class)).thenReturn(Optional.of(VARSELTEKST));
 
         Optional<EksternBehandlingsinfoDto> dokumentinfoDto = klient.hentBehandlingsinfo(BEHANDLING_UUID);
 
@@ -76,7 +76,7 @@ public class FpsakKlientTest {
     }
 
     @Test
-    public void skal_returnere_hvis_finnes_behandling_i_fpsak(){
+    public void skal_returnere_hvis_finnes_behandling_i_fpsak() {
         EksternBehandlinger eksternBehandlinger = new EksternBehandlinger();
         eksternBehandlinger.getEksternBehandlingerInfo().add(dokumentinfoDto());
         when(oidcRestClientMock.getReturnsOptional(BEHANDLING_ALLE_URI, EksternBehandlinger.class)).thenReturn(Optional.of(eksternBehandlinger));
@@ -86,7 +86,7 @@ public class FpsakKlientTest {
     }
 
     @Test
-    public void skal_returnere_tom_hvis_finnes_ikke_behandling_i_fpsak(){
+    public void skal_returnere_tom_hvis_finnes_ikke_behandling_i_fpsak() {
         when(oidcRestClientMock.getReturnsOptional(BEHANDLING_ALLE_URI, EksternBehandlinger.class)).thenReturn(Optional.empty());
 
         boolean erFinnesIFpsak = klient.finnesBehandlingIFpsak(SAKSNUMMER);
@@ -94,7 +94,7 @@ public class FpsakKlientTest {
     }
 
     @Test
-    public void skal_returnere_tilbakekreving_valg(){
+    public void skal_returnere_tilbakekreving_valg() {
         TilbakekrevingValgDto tilbakekrevingValgDto = new TilbakekrevingValgDto(VidereBehandling.TILBAKEKREV_I_INFOTRYGD);
         when(oidcRestClientMock.getReturnsOptional(BEHANDLING_URI, EksternBehandlingsinfoDto.class)).thenReturn(Optional.of(dokumentinfoDto()));
         when(oidcRestClientMock.getReturnsOptional(TILBAKEKREVING_VALG_URI, TilbakekrevingValgDto.class)).thenReturn(Optional.of(tilbakekrevingValgDto));
@@ -105,7 +105,7 @@ public class FpsakKlientTest {
     }
 
     @Test
-    public void skal_returnere_tom_tilbakekreving_valg(){
+    public void skal_returnere_tom_tilbakekreving_valg() {
         when(oidcRestClientMock.getReturnsOptional(BEHANDLING_URI, EksternBehandlingsinfoDto.class)).thenReturn(Optional.of(dokumentinfoDto()));
         when(oidcRestClientMock.getReturnsOptional(TILBAKEKREVING_VALG_URI, TilbakekrevingValgDto.class)).thenReturn(Optional.empty());
 
@@ -153,17 +153,17 @@ public class FpsakKlientTest {
 
     private List<BehandlingResourceLinkDto> resourcelinks() {
         BehandlingResourceLinkDto personOpplysningerRessursLink = new BehandlingResourceLinkDto();
-        personOpplysningerRessursLink.setHref("/fpsak/api/behandling/person/personopplysninger?uuid="+BEHANDLING_UUID.toString());
+        personOpplysningerRessursLink.setHref("/fpsak/api/behandling/person/personopplysninger?uuid=" + BEHANDLING_UUID.toString());
         personOpplysningerRessursLink.setRel("soeker-personopplysninger");
 
         BehandlingResourceLinkDto tilbakekrevingvalgRessursLink = new BehandlingResourceLinkDto();
-        tilbakekrevingvalgRessursLink.setHref("/fpsak/api/behandling/tilbakekreving/valg?uuid="+BEHANDLING_UUID.toString());
+        tilbakekrevingvalgRessursLink.setHref("/fpsak/api/behandling/tilbakekreving/valg?uuid=" + BEHANDLING_UUID.toString());
         tilbakekrevingvalgRessursLink.setRel("tilbakekreving-valg");
 
         BehandlingResourceLinkDto varselTekstRessursLink = new BehandlingResourceLinkDto();
-        varselTekstRessursLink.setHref("/fpsak/api/behandling/tilbakekreving/varseltekst?uuid="+BEHANDLING_UUID.toString());
+        varselTekstRessursLink.setHref("/fpsak/api/behandling/tilbakekreving/varseltekst?uuid=" + BEHANDLING_UUID.toString());
         varselTekstRessursLink.setRel("tilbakekrevingsvarsel-fritekst");
-        return Lists.newArrayList(personOpplysningerRessursLink,tilbakekrevingvalgRessursLink,varselTekstRessursLink);
+        return Lists.newArrayList(personOpplysningerRessursLink, tilbakekrevingvalgRessursLink, varselTekstRessursLink);
     }
 
 }

@@ -8,6 +8,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.ValidKodeverk;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.AbacDto;
 import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
@@ -17,20 +19,19 @@ public class HentForhåndsvisningVarselbrevDto implements AbacDto {
 
     @NotNull
     @Valid
-    private UUID behandlingUuId;
+    private UUID behandlingUuid;
 
     @NotNull
     @Digits(integer = 18, fraction = 0)
-    private String saksnummer;
+    private String saksnummer; // TODO bør bruke egen DTO
 
     @Size(max = 1500, message = "Varseltekst er for lang")
     @Pattern(regexp = InputValideringRegex.FRITEKST)
     private String varseltekst;
 
     @NotNull
-    @Size(max = 100, message = "FagsakYtelseType er for lang")
-    @Pattern(regexp = InputValideringRegex.KODEVERK)
-    private String fagsakYtelseType;
+    @ValidKodeverk
+    private FagsakYtelseType fagsakYtelseType;
 
     public String getSaksnummer() {
         return saksnummer;
@@ -40,12 +41,12 @@ public class HentForhåndsvisningVarselbrevDto implements AbacDto {
         this.saksnummer = saksnummer;
     }
 
-    public UUID getBehandlingUuId() {
-        return behandlingUuId;
+    public UUID getBehandlingUuid() {
+        return behandlingUuid;
     }
 
-    public void setBehandlingUuId(UUID behandlingUuId) {
-        this.behandlingUuId = behandlingUuId;
+    public void setBehandlingUuid(UUID behandlingUuid) {
+        this.behandlingUuid = behandlingUuid;
     }
 
     public String getVarseltekst() {
@@ -56,11 +57,11 @@ public class HentForhåndsvisningVarselbrevDto implements AbacDto {
         this.varseltekst = varseltekst;
     }
 
-    public String getFagsakYtelseType() {
+    public FagsakYtelseType getFagsakYtelseType() {
         return fagsakYtelseType;
     }
 
-    public void setFagsakYtelseType(String fagsakYtelseType) {
+    public void setFagsakYtelseType(FagsakYtelseType fagsakYtelseType) {
         this.fagsakYtelseType = fagsakYtelseType;
     }
 

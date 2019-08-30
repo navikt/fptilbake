@@ -23,6 +23,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.util.BrevUtil;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.util.TittelOverskriftUtil;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.TpsTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.KodeDto;
@@ -72,10 +73,10 @@ public class FellesInfoTilBrevTjeneste {
         return brukersSvarfrist.getDays() / 7;
     }
 
-    public EksternBehandlingsinfoDto hentBehandlingFpsak(UUID eksternUuid, String saksnummer) {
+    public EksternBehandlingsinfoDto hentBehandlingFpsak(UUID eksternUuid, Saksnummer saksnummer) {
         Optional<EksternBehandlingsinfoDto> dokumentinfoDto = fpsakKlient.hentBehandlingsinfo(eksternUuid);
         if (!dokumentinfoDto.isPresent()) {
-            throw DokumentbestillingFeil.FACTORY.fantIkkeBehandlingIFpsak(saksnummer).toException();
+            throw DokumentbestillingFeil.FACTORY.fantIkkeBehandlingIFpsak(saksnummer.getVerdi()).toException();
         }
         return dokumentinfoDto.get();
     }
@@ -123,8 +124,7 @@ public class FellesInfoTilBrevTjeneste {
     }
 
     BrevMetadata lagMetadataForVedtaksbrev(Behandling behandling, Long totalTilbakekrevingBeløp, UUID eksternUuid) {
-        String saksnummer = behandling.getFagsak().getSaksnummer().getVerdi();
-        EksternBehandlingsinfoDto eksternBehandlingsinfo = hentBehandlingFpsak(eksternUuid, saksnummer);
+        EksternBehandlingsinfoDto eksternBehandlingsinfo = hentBehandlingFpsak(eksternUuid,  behandling.getFagsak().getSaksnummer());
         eksternBehandlingsinfo.setFagsaktype(henteFagsakYtelseType(behandling)); // vi kan sette samme fagsakType fordi det ikke kan endret.
         String aktørId = eksternBehandlingsinfo.getPersonopplysningDto().getAktoerId();
         Personinfo personinfo = hentPerson(aktørId);

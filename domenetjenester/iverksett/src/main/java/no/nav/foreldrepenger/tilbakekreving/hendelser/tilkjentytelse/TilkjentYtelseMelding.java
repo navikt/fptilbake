@@ -4,6 +4,9 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
+
 public class TilkjentYtelseMelding {
 
     @JsonProperty("fagsakYtelseType")
@@ -27,16 +30,16 @@ public class TilkjentYtelseMelding {
         this.fagsakYtelseType = fagsakYtelseType;
     }
 
-    public String getSaksnummer() {
-        return saksnummer;
+    public Saksnummer getSaksnummer() {
+        return new Saksnummer(saksnummer);
     }
 
     public void setSaksnummer(String saksnummer) {
         this.saksnummer = saksnummer;
     }
 
-    public String getAktørId() {
-        return aktørId;
+    public AktørId getAktørId() {
+        return new AktørId(aktørId);
     }
 
     public void setAktørId(String aktørId) {

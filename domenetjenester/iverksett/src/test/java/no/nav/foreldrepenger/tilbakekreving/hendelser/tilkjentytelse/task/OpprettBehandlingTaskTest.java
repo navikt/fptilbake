@@ -30,10 +30,10 @@ public class OpprettBehandlingTaskTest extends TilkjentYtelseTestOppsett {
 
     @Test
     public void test_skal_kalle_opprettBehandlingAutomatisk() {
-        HendelseTaskDataWrapper taskDataWrapper = HendelseTaskDataWrapper.lagWrapperForOpprettBehandling(BEHANDLING_UUID.toString(), BEHANDLING_ID, AKTØR_ID);
+        HendelseTaskDataWrapper taskDataWrapper = HendelseTaskDataWrapper.lagWrapperForOpprettBehandling(EKSTERN_BEHANDLING_UUID.toString(), EKSTERN_BEHANDLING_ID, AKTØR_ID);
         taskDataWrapper.setSaksnummer(SAKSNUMMER);
-        taskDataWrapper.setFagsakYtelseType(FAGSAK_YTELSE_TYPE.getKode());
-        taskDataWrapper.setBehandlingType(BehandlingType.TILBAKEKREVING.getKode());
+        taskDataWrapper.setFagsakYtelseType(FAGSAK_YTELSE_TYPE);
+        taskDataWrapper.setBehandlingType(BehandlingType.TILBAKEKREVING);
 
         // act
         opprettBehandlingTask.doTask(taskDataWrapper.getProsessTaskData());
@@ -45,7 +45,7 @@ public class OpprettBehandlingTaskTest extends TilkjentYtelseTestOppsett {
 
     @Test
     public void test_skal_feile_på_manglende_task_property() {
-        HendelseTaskDataWrapper taskDataWrapper = HendelseTaskDataWrapper.lagWrapperForOpprettBehandling(BEHANDLING_UUID.toString(), BEHANDLING_ID, AKTØR_ID);
+        HendelseTaskDataWrapper taskDataWrapper = HendelseTaskDataWrapper.lagWrapperForOpprettBehandling(EKSTERN_BEHANDLING_UUID.toString(), EKSTERN_BEHANDLING_ID, AKTØR_ID);
 
         expectedException.expect(NullPointerException.class);
 

@@ -41,6 +41,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.util.BrevUtil;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.util.DokumentbestillingsinfoMapper;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.util.VedtaksbrevUtil;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.tjeneste.virksomhet.dokumentproduksjon.v2.binding.ProduserIkkeredigerbartDokumentDokumentErRedigerbart;
 import no.nav.tjeneste.virksomhet.dokumentproduksjon.v2.binding.ProduserIkkeredigerbartDokumentDokumentErVedlegg;
@@ -132,8 +133,8 @@ public class BestillDokumentTjeneste {
 
     public byte[] hentForhåndsvisningVarselbrev(HentForhåndsvisningVarselbrevDto hentForhåndsvisningVarselbrevDto) {
         VarselbrevSamletInfo varselbrevSamletInfo = varselbrevTjeneste.lagVarselbrevForForhåndsvisning(
-            hentForhåndsvisningVarselbrevDto.getBehandlingUuId(),
-            hentForhåndsvisningVarselbrevDto.getSaksnummer(),
+            hentForhåndsvisningVarselbrevDto.getBehandlingUuid(),
+            new Saksnummer(hentForhåndsvisningVarselbrevDto.getSaksnummer()),
             hentForhåndsvisningVarselbrevDto.getVarseltekst(),
             hentForhåndsvisningVarselbrevDto.getFagsakYtelseType());
 

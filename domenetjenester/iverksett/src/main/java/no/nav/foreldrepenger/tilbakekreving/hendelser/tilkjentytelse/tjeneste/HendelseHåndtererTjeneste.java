@@ -50,11 +50,11 @@ public class HendelseHåndtererTjeneste {
     private void lagOpprettBehandlingTask(HendelseTaskDataWrapper hendelseTaskDataWrapper) {
         HendelseTaskDataWrapper taskData = HendelseTaskDataWrapper.lagWrapperForOpprettBehandling(hendelseTaskDataWrapper.getBehandlingUuid(),
             hendelseTaskDataWrapper.getBehandlingId(),
-            hendelseTaskDataWrapper.getAktørId().getId());
+            hendelseTaskDataWrapper.getAktørId());
 
-        taskData.setSaksnummer(hendelseTaskDataWrapper.getSaksnummer().getVerdi());
-        taskData.setFagsakYtelseType(hendelseTaskDataWrapper.getFagsakYtelseType().getKode());
-        taskData.setBehandlingType(BehandlingType.TILBAKEKREVING.getKode());
+        taskData.setSaksnummer(hendelseTaskDataWrapper.getSaksnummer());
+        taskData.setFagsakYtelseType(hendelseTaskDataWrapper.getFagsakYtelseType());
+        taskData.setBehandlingType(BehandlingType.TILBAKEKREVING);
 
         taskRepository.lagre(taskData.getProsessTaskData());
     }

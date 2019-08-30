@@ -8,6 +8,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.AbacDto;
 import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
@@ -17,11 +18,11 @@ public class OpprettBehandlingDto implements AbacDto {
 
     @NotNull
     @Digits(integer = 50, fraction = 0)
-    private String saksnummer;
+    private String saksnummer; // TODO bør bruke egen DTO
 
     @NotNull
     @Digits(integer = 50, fraction = 0)
-    private String aktørId;
+    private String aktørId; // TODO bør bruke egen DTO
 
     @Valid
     private UUID eksternUuid;
@@ -29,15 +30,15 @@ public class OpprettBehandlingDto implements AbacDto {
     @NotNull
     @Pattern(regexp = InputValideringRegex.KODEVERK)
     @Size(max = 20)
-    private String behandlingType;
+    private String behandlingType; // TODO bør bruke egen DTO
 
     @Pattern(regexp = InputValideringRegex.KODEVERK)
     @Size(max = 20)
-    private String behandlingArsakType;
+    private String behandlingArsakType; // TODO bør bruke egen DTO
 
     @Pattern(regexp = InputValideringRegex.KODEVERK)
     @Size(max = 20)
-    private String fagsakYtelseType;
+    private String fagsakYtelseType; // TODO bør bruke egen DTO
 
     public OpprettBehandlingDto() {
         // For CDI

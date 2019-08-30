@@ -64,7 +64,6 @@ public class BehandlingRestTjenesteTest {
     @Test
     public void test_opprett_behandling_skal_feile_med_ugyldig_aktørId() throws URISyntaxException {
         OpprettBehandlingDto dto = opprettBehandlingDto(UGYLDIG_AKTØR_ID, GYLDIG_SAKSNR, EKSTERN_BEHANDLING_UUID, YTELSE_TYPE);
-
         expectedException.expect(IllegalArgumentException.class); // ved rest-kall vil jax validering slå inn og resultere i en FeltFeil
         expectedException.expectMessage("Ugyldig aktørId");
 

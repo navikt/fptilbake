@@ -14,6 +14,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBrukerRep
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.TpsTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
@@ -41,6 +42,31 @@ public class FagsakTjeneste {
         NavBruker bruker = hentNavBruker(aktørId);
         Fagsak fagsak = Fagsak.opprettNy(saksnummer, bruker);
         fagsak.setFagsakYtelseType(fagsakYtelseType);
+
+        //Hent forrige fagsak hvis finnes
+        Optional<Fagsak> forrigeFagsak = finnFagsak(saksnummer);
+        if (forrigeFagsak.isPresent()) {
+            fagsak = forrigeFagsak.get();
+            fagsakRepository.oppdaterFagsakStatus(fagsak.getId(), FagsakStatus.OPPRETTET);
+            lagreFagsak(forrigeFagsak.get(), saksnummer);
+        }
+        lagreFagsak(fagsak, saksnummer);
+        return fagsak;
+    }
+
+    private NavBruker hentNavBruker(AktørId aktørId) {
+        NavBruker navBruker;
+        Optional<NavBruker> navBrukerOptional = navBrukerRepository.hent(aktørId);
+        if (!navBrukerOptional.isPresent()) {
+            Personinfo personinfo = tpsTjeneste.hentBrukerForAktør(aktørId).orElseThrow(() -> BehandlingFeil.FACTORY.fantIkkePersonMedAktørId().toException());
+            navBruker = NavBruker.opprettNy(personinfo.getAktørId(), personinfo.getForetrukketSpråk());
+        } else {
+            navBruker = navBrukerOptional.get();
+        }
+        return navBruker;
+    }
+
+    private Fagsak lagreFagsak(Fagsak fagsak, Saksnummer saksnummer) {
         try {
             fagsakRepository.lagre(fagsak);
         } catch (PersistenceException e) { // NOSONAR
@@ -53,16 +79,7 @@ public class FagsakTjeneste {
         return fagsak;
     }
 
-    private NavBruker hentNavBruker(AktørId aktørId) {
-        NavBruker navBruker;
-        Optional<NavBruker> navBrukerOptional = navBrukerRepository.hent(aktørId);
-
-        if (!navBrukerOptional.isPresent()) {
-            Personinfo personinfo = tpsTjeneste.hentBrukerForAktør(aktørId).orElseThrow(() -> BehandlingFeil.FACTORY.fantIkkePersonMedAktørId().toException());
-            navBruker = NavBruker.opprettNy(personinfo.getAktørId(), personinfo.getForetrukketSpråk());
-        } else {
-            navBruker = navBrukerOptional.get();
-        }
-        return navBruker;
+    private Optional<Fagsak> finnFagsak(Saksnummer saksnummer) {
+        return fagsakRepository.hentSakGittSaksnummer(saksnummer);
     }
 }

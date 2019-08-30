@@ -2,6 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving;
 
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -81,7 +82,10 @@ public class TestUtility {
     }
 
     private UUID genererEksternUuid() {
-        return UUID.randomUUID();
+        byte[] data = new byte[16];
+        Random r = new Random();
+        r.nextBytes(data);
+        return UUID.nameUUIDFromBytes(data);
     }
 
     public static class SakDetaljer {

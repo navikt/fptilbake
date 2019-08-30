@@ -118,12 +118,12 @@ public class BehandlingRestTjeneste {
     @Path("/opprett")
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     public Response opprettBehandling(@Valid @NotNull OpprettBehandlingDto opprettBehandlingDto) throws URISyntaxException {
-        AktørId aktørId = new AktørId(opprettBehandlingDto.getAktørId());
         Saksnummer saksnummer = new Saksnummer(opprettBehandlingDto.getSaksnummer());
         UUID eksternUuid = opprettBehandlingDto.getEksternUuid();
+        AktørId aktørId = new AktørId(opprettBehandlingDto.getAktørId());
         BehandlingType behandlingType = BehandlingType.fraKode(opprettBehandlingDto.getBehandlingType());
         if (BehandlingType.TILBAKEKREVING.equals(behandlingType)) {
-            behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternUuid, aktørId, opprettBehandlingDto.getFagsakYtelseType(),behandlingType);
+            behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternUuid, aktørId, opprettBehandlingDto.getFagsakYtelseType(), behandlingType);
             return Redirect.tilFagsakPollStatus(saksnummer, Optional.empty());
         } else if (BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandlingType)) {
             Behandling revurdering = revurderingTjeneste.opprettRevurdering(saksnummer, eksternUuid, opprettBehandlingDto.getBehandlingArsakType());
@@ -271,7 +271,7 @@ public class BehandlingRestTjeneste {
 
         AsyncPollingStatus taskStatus = behandlingsprosessTjeneste.sjekkProsessTaskPågårForBehandling(behandling, null).orElse(null);
 
-        UtvidetBehandlingDto dto = behandlingDtoTjeneste.hentUtvidetBehandlingResultat(idDto.getBehandlingId(),taskStatus);
+        UtvidetBehandlingDto dto = behandlingDtoTjeneste.hentUtvidetBehandlingResultat(idDto.getBehandlingId(), taskStatus);
 
         Response.ResponseBuilder responseBuilder = Response.ok().entity(dto);
         return responseBuilder.build();

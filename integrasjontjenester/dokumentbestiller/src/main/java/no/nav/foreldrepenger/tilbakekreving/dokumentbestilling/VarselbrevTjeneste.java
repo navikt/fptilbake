@@ -48,7 +48,7 @@ public class VarselbrevTjeneste {
 
         //Henter data fra fpsak
         Saksnummer saksnummer = behandling.getFagsak().getSaksnummer();
-        EksternBehandlingsinfoDto eksternBehandlingsinfoDto = fellesInfoTilBrevTjeneste.hentBehandlingFpsak(eksternBehandling.getEksternUuid(), saksnummer.getVerdi());
+        EksternBehandlingsinfoDto eksternBehandlingsinfoDto = fellesInfoTilBrevTjeneste.hentBehandlingFpsak(eksternBehandling.getEksternUuid(), saksnummer);
         eksternBehandlingsinfoDto.setFagsaktype(fellesInfoTilBrevTjeneste.henteFagsakYtelseType(behandling));
         //Henter data fra tps
         String aktørId = behandling.getAktørId().getId();
@@ -73,17 +73,19 @@ public class VarselbrevTjeneste {
                 ytelseNavn);
     }
 
-    public VarselbrevSamletInfo lagVarselbrevForForhåndsvisning(UUID behandlingUuId, String saksnummer, String varseltekst, String fagsakYtleseType) {
+    public VarselbrevSamletInfo lagVarselbrevForForhåndsvisning(UUID behandlingUuId, Saksnummer saksnummer, String varseltekst, FagsakYtelseType fagsakYtleseType) {
 
         EksternBehandlingsinfoDto eksternBehandlingsinfo = fellesInfoTilBrevTjeneste.hentBehandlingFpsak(behandlingUuId, saksnummer);
-        FagsakYtelseType type = FagsakYtelseType.fraKode(fagsakYtleseType);
-        eksternBehandlingsinfo.setFagsaktype(new KodeDto(type.getKodeverk(),type.getKode(),type.getNavn()));
+        eksternBehandlingsinfo.setFagsaktype(new KodeDto(fagsakYtleseType.getKodeverk(),fagsakYtleseType.getKode(),fagsakYtleseType.getNavn()));
 
         String aktørId = eksternBehandlingsinfo.getPersonopplysningDto().getAktoerId();
         Personinfo personinfo = fellesInfoTilBrevTjeneste.hentPerson(aktørId);
         Adresseinfo adresseinfo = fellesInfoTilBrevTjeneste.hentAdresse(personinfo, aktørId);
         FeilutbetaltePerioderDto feilutbetaltePerioderDto = fellesInfoTilBrevTjeneste.hentFeilutbetaltePerioder(eksternBehandlingsinfo.getId());
 
+        if(eksternBehandlingsinfo.getSprakkode() == null){
+            eksternBehandlingsinfo.setSprakkode(Språkkode.nb);
+        }
         Språkkode mottakersSpråkkode = eksternBehandlingsinfo.getSprakkode();
         YtelseNavn ytelseNavn = fellesInfoTilBrevTjeneste.hentYtelsenavn(eksternBehandlingsinfo.getFagsaktype(), mottakersSpråkkode);
 

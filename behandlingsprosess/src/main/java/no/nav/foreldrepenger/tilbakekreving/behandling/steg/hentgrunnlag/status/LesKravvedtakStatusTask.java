@@ -41,15 +41,15 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
     private KravVedtakStatusMapper statusMapper;
 
 
-    LesKravvedtakStatusTask () {
+    LesKravvedtakStatusTask() {
         // for CDI proxy
     }
 
     @Inject
     public LesKravvedtakStatusTask(ØkonomiMottattXmlRepository økonomiMottattXmlRepository, EksternBehandlingRepository eksternBehandlingRepository,
-                                   ProsessTaskRepository prosessTaskRepository,KravVedtakStatusTjeneste kravVedtakStatusTjeneste,
-                                   KravVedtakStatusMapper statusMapper,FpsakKlient fpsakKlient) {
-        super(prosessTaskRepository,fpsakKlient);
+                                   ProsessTaskRepository prosessTaskRepository, KravVedtakStatusTjeneste kravVedtakStatusTjeneste,
+                                   KravVedtakStatusMapper statusMapper, FpsakKlient fpsakKlient) {
+        super(prosessTaskRepository, fpsakKlient);
         this.økonomiMottattXmlRepository = økonomiMottattXmlRepository;
         this.eksternBehandlingRepository = eksternBehandlingRepository;
 
@@ -64,7 +64,7 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
 
         KravOgVedtakstatus kravOgVedtakstatus = KravVedtakStatusXmlUnmarshaller.unmarshall(mottattXmlId, råXml);
         KravVedtakStatus437 kravVedtakStatus437 = statusMapper.mapTilDomene(kravOgVedtakstatus);
-        String saksnummer = statusMapper.finnSaksnummer(kravOgVedtakstatus);
+        String saksnummer = finnSaksnummer(kravOgVedtakstatus.getFagsystemId());
 
         String eksternBehandlingId = statusMapper.finnBehandlngId(kravOgVedtakstatus);
         økonomiMottattXmlRepository.oppdaterMedEksternBehandlingId(eksternBehandlingId, mottattXmlId);
@@ -74,8 +74,8 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
             Long internId = behandlingKobling.get().getInternId();
             kravVedtakStatusTjeneste.håndteresMottakAvKravVedtakStatus(internId, kravVedtakStatus437);
             logger.info("Leste kravVedtakStatus med id={} eksternBehandlingId={} internBehandlingId={}", mottattXmlId, eksternBehandlingId, internId);
-        }  else {
-            validerBehandlingsEksistens(eksternBehandlingId,saksnummer);
+        } else {
+            validerBehandlingsEksistens(eksternBehandlingId, saksnummer);
             logger.info("Ignorerte kravVedtakStatus med id={} eksternBehandlingId={}. Fantes ikke tilbakekrevingsbehandling", mottattXmlId, eksternBehandlingId);
         }
 
@@ -90,7 +90,7 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
         return Optional.empty();
     }
 
-    private void validerBehandlingsEksistens(String eksternBehandlingId,String saksnummer) {
+    private void validerBehandlingsEksistens(String eksternBehandlingId, String saksnummer) {
         if (!erGyldigTall(eksternBehandlingId)) {
             throw LesKravvedtakStatusTask.LesKravvedtakStatusTaskFeil.FACTORY.behandlingFinnesIkkeIFpsak(eksternBehandlingId).toException();
         }
