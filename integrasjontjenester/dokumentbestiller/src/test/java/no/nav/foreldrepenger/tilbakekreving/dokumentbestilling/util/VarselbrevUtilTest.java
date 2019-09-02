@@ -1,5 +1,13 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.util;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Period;
+import java.util.List;
+
+import org.assertj.core.api.Assertions;
+import org.junit.Test;
+
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.AdresseType;
@@ -15,13 +23,6 @@ import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.KodeDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.PersonopplysningDto;
 import no.nav.foreldrepenger.tilbakekreving.simulering.kontrakt.FeilutbetaltePerioderDto;
 import no.nav.foreldrepenger.tilbakekreving.simulering.kontrakt.PeriodeDto;
-import org.assertj.core.api.Assertions;
-import org.junit.Test;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.Period;
-import java.util.List;
 
 public class VarselbrevUtilTest {
 
@@ -31,7 +32,7 @@ public class VarselbrevUtilTest {
 
     @Test
     public void skal_sammenstille_data_fra_fpsak_fpoppdrag_og_tps_for_forhåndsvisning() {
-        String saksnummer = "11111111";
+        Saksnummer saksnummer = new Saksnummer("11111111");
         String varseltekst = "Dette ser ikke bra ut as";
         FeilutbetaltePerioderDto feilutbetaltePerioderDto = lagFeilutbetaltePerioderMock(9999999999L);
 
@@ -66,7 +67,7 @@ public class VarselbrevUtilTest {
         Assertions.assertThat(varselbrev.getBrevMetadata().getBehandlendeEnhetNavn()).isEqualTo(eksternBehandlingsinfoDto.getBehandlendeEnhetNavn());
         Assertions.assertThat(varselbrev.getBrevMetadata().getFagsaktype()).isEqualTo(eksternBehandlingsinfoDto.getFagsaktype());
         Assertions.assertThat(varselbrev.getFritekstFraSaksbehandler()).isEqualTo(varseltekst);
-        Assertions.assertThat(varselbrev.getBrevMetadata().getSaksnummer()).isEqualTo(saksnummer);
+        Assertions.assertThat(varselbrev.getBrevMetadata().getSaksnummer()).isEqualTo(saksnummer.getVerdi());
         Assertions.assertThat(varselbrev.getBrevMetadata().getAnsvarligSaksbehandler()).isEqualTo(eksternBehandlingsinfoDto.getAnsvarligSaksbehandler());
         Assertions.assertThat(varselbrev.getBrevMetadata().getSpråkkode()).isEqualTo(eksternBehandlingsinfoDto.getSprakkode());
         Assertions.assertThat(varselbrev.getSumFeilutbetaling()).isEqualTo(feilutbetaltePerioderDto.getSumFeilutbetaling());

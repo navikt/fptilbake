@@ -52,8 +52,8 @@ public class BehandlingRepositoryImplTest {
 
     @Test
     public void skal_finne_behandlinger_på_saksnummer() {
-        Fagsak fagsak1 = Fagsak.opprettNy(1000L, new Saksnummer("GSAK1000"), bruker);
-        Fagsak fagsak2 = Fagsak.opprettNy(1001L, new Saksnummer("GSAK1001"), bruker);
+        Fagsak fagsak1 = Fagsak.opprettNy(new Saksnummer("GSAK1000"), bruker);
+        Fagsak fagsak2 = Fagsak.opprettNy(new Saksnummer("GSAK1001"), bruker);
         fagsakRepository.lagre(fagsak1);
         fagsakRepository.lagre(fagsak2);
 

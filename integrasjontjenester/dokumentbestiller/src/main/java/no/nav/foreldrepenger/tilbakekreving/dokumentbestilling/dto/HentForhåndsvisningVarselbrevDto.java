@@ -1,31 +1,37 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto;
 
+import java.util.UUID;
+
+import javax.validation.Valid;
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
+
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.ValidKodeverk;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.AbacDto;
 import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
 import no.nav.vedtak.util.InputValideringRegex;
 
-import javax.validation.constraints.Digits;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
-
 public class HentForhåndsvisningVarselbrevDto implements AbacDto {
 
     @NotNull
-    @Min(0)
-    @Max(Long.MAX_VALUE)
-    private Long behandlingId;
+    @Valid
+    private UUID behandlingUuid;
 
     @NotNull
     @Digits(integer = 18, fraction = 0)
-    private String saksnummer;
+    private String saksnummer; // TODO bør bruke egen DTO
 
     @Size(max = 1500, message = "Varseltekst er for lang")
     @Pattern(regexp = InputValideringRegex.FRITEKST)
     private String varseltekst;
+
+    @NotNull
+    @ValidKodeverk
+    private FagsakYtelseType fagsakYtelseType;
 
     public String getSaksnummer() {
         return saksnummer;
@@ -35,12 +41,12 @@ public class HentForhåndsvisningVarselbrevDto implements AbacDto {
         this.saksnummer = saksnummer;
     }
 
-    public Long getBehandlingId() {
-        return behandlingId;
+    public UUID getBehandlingUuid() {
+        return behandlingUuid;
     }
 
-    public void setBehandlingId(Long behandlingId) {
-        this.behandlingId = behandlingId;
+    public void setBehandlingUuid(UUID behandlingUuid) {
+        this.behandlingUuid = behandlingUuid;
     }
 
     public String getVarseltekst() {
@@ -49,6 +55,14 @@ public class HentForhåndsvisningVarselbrevDto implements AbacDto {
 
     public void setVarseltekst(String varseltekst) {
         this.varseltekst = varseltekst;
+    }
+
+    public FagsakYtelseType getFagsakYtelseType() {
+        return fagsakYtelseType;
+    }
+
+    public void setFagsakYtelseType(FagsakYtelseType fagsakYtelseType) {
+        this.fagsakYtelseType = fagsakYtelseType;
     }
 
     @Override

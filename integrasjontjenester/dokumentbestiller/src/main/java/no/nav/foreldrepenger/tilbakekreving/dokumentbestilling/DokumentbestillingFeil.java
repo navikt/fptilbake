@@ -12,8 +12,8 @@ public interface DokumentbestillingFeil extends DeklarerteFeil {
     @TekniskFeil(feilkode = "FPT-089912", feilmelding = "Fant ikke person med aktørId %s i tps", logLevel = LogLevel.WARN)
     Feil fantIkkeAdresseForAktørId(String aktørId);
 
-    @TekniskFeil(feilkode = "FPT-841932", feilmelding = "Fant ikke behandling med behandlingId %s fpsak", logLevel = LogLevel.WARN)
-    Feil fantIkkeBehandlingIFpsak(Long behandlingId);
+    @TekniskFeil(feilkode = "FPT-841932", feilmelding = "Fant ikke behandling med saksnummer %s i fpsak", logLevel = LogLevel.WARN)
+    Feil fantIkkeBehandlingIFpsak(String saksnummer);
 
     @TekniskFeil(feilkode = "FPT-748279", feilmelding = "Fant ikke behandling med behandlingId %s fpoppdrag", logLevel = LogLevel.WARN)
     Feil fantIkkeBehandlingIFpoppdrag(Long behandlingId);

@@ -15,12 +15,12 @@ public class KravVedtakStatusMapper {
 
     private TpsAdapterWrapper tpsAdapterWrapper;
 
-    KravVedtakStatusMapper(){
+    KravVedtakStatusMapper() {
         // for CDI proxy
     }
 
     @Inject
-    public KravVedtakStatusMapper(TpsAdapterWrapper tpsAdapterWrapper){
+    public KravVedtakStatusMapper(TpsAdapterWrapper tpsAdapterWrapper) {
         this.tpsAdapterWrapper = tpsAdapterWrapper;
     }
 
@@ -37,6 +37,6 @@ public class KravVedtakStatusMapper {
             .medFagSystemId(kravOgVedtakstatus.getFagsystemId())
             .medReferanse(kravOgVedtakstatus.getReferanse())
             .medGjelderType(gjelderType)
-            .medGjelderVedtakId(tpsAdapterWrapper.hentAktørIdEllerOrganisajonNummer(kravOgVedtakstatus.getVedtakGjelderId(),gjelderType)).build();
+            .medGjelderVedtakId(tpsAdapterWrapper.hentAktørIdEllerOrganisajonNummer(kravOgVedtakstatus.getVedtakGjelderId(), gjelderType)).build();
     }
 }

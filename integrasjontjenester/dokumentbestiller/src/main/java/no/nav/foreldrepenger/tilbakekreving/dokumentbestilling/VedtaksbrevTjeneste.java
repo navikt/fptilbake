@@ -1,5 +1,14 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultatPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingBeregningTjeneste;
@@ -7,8 +16,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.dto.vilkår.Vilkårsvurde
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.vilkårsvurdering.VilkårsvurderingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BeregningResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VarselbrevSporing;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevdataRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VarselbrevSporing;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.domene.BrevMetadata;
@@ -20,13 +29,6 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.PeriodeMedTek
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.util.AvsnittUtil;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.util.VedtaksbrevUtil;
 import no.nav.foreldrepenger.tilbakekreving.simulering.kontrakt.FeilutbetaltePerioderDto;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 
 @ApplicationScoped
@@ -62,6 +64,7 @@ public class VedtaksbrevTjeneste {
                                                 List<PeriodeMedTekstDto> fritekstFraSaksbehandlerForPerioder) {
 
         EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandlingId);
+        UUID eksternUuid = eksternBehandling.getEksternUuid();
         Long behandlingIdIFpsak = eksternBehandling.getEksternId();
         Behandling behandling = behandlingTjeneste.hentBehandling(behandlingId);
         FeilutbetaltePerioderDto feilutbetaltePerioderDto = fellesInfoTilBrevTjeneste.hentFeilutbetaltePerioder(behandlingIdIFpsak);
@@ -74,7 +77,7 @@ public class VedtaksbrevTjeneste {
         List<VarselbrevSporing> varselbrevData = brevdataRepository.hentVarselbrevData(behandlingId);
         LocalDateTime nyesteVarselbrevTidspunkt = VedtaksbrevUtil.finnNyesteVarselbrevTidspunkt(varselbrevData);
 
-        BrevMetadata brevMetadata = fellesInfoTilBrevTjeneste.lagMetadataForVedtaksbrev(behandling, totalTilbakekrevingBeløp, behandlingIdIFpsak);
+        BrevMetadata brevMetadata = fellesInfoTilBrevTjeneste.lagMetadataForVedtaksbrev(behandling, totalTilbakekrevingBeløp, eksternUuid);
 
         return new VedtaksbrevSamletInfo.Builder()
             .medBrevMetadata(brevMetadata)

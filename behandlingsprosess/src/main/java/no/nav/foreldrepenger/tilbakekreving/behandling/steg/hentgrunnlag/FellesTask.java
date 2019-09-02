@@ -10,11 +10,11 @@ public abstract class FellesTask {
     private ProsessTaskRepository prosessTaskRepository;
     private FpsakKlient fpsakKlient;
 
-    protected FellesTask(){
+    protected FellesTask() {
         // for CDI proxy
     }
 
-    public FellesTask(ProsessTaskRepository taskRepository,FpsakKlient fpsakKlient) {
+    public FellesTask(ProsessTaskRepository taskRepository, FpsakKlient fpsakKlient) {
         this.prosessTaskRepository = taskRepository;
         this.fpsakKlient = fpsakKlient;
     }
@@ -31,8 +31,12 @@ public abstract class FellesTask {
         return referanse != null && referanse.matches("^\\d*$");
     }
 
-    public boolean erBehandlingFinnesIFpsak(String eksternBehandlingId) {
-        return fpsakKlient.finnesBehandlingIFpsak(Long.valueOf(eksternBehandlingId));
+    public boolean erBehandlingFinnesIFpsak(String saksnummer) {
+        return fpsakKlient.finnesBehandlingIFpsak(saksnummer);
+    }
+
+    public String finnSaksnummer(String fagsystemId) {
+        return fagsystemId.substring(0, fagsystemId.length() - 3);
     }
 
 }

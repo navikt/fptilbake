@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -69,6 +70,8 @@ public class FellesTestOppsett {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 
+    protected static final UUID FPSAK_BEHANDLING_UUID = UUID.randomUUID();
+
     private ProsessTaskEventPubliserer eventPublisererMock = mock(ProsessTaskEventPubliserer.class);
     private BehandlingskontrollEventPubliserer behandlingskontrollEventPublisererMock = mock(BehandlingskontrollEventPubliserer.class);
     protected final TpsAdapter tpsAdapterMock = mock(TpsAdapter.class);
@@ -94,7 +97,6 @@ public class FellesTestOppsett {
 
     public Fagsak fagsak;
     public Behandling behandling;
-
 
     @Before
     public void init() {

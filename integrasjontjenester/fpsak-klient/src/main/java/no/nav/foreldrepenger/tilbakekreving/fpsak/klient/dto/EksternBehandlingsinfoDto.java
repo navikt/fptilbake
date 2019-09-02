@@ -2,6 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -11,6 +12,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkko
 public class EksternBehandlingsinfoDto {
 
     private Long id;
+    private UUID uuid;
     private String saksnummer;
     private Long fagsakId;
     private String behandlendeEnhetId;
@@ -22,20 +24,20 @@ public class EksternBehandlingsinfoDto {
     private KodeDto fagsaktype;
     private String varseltekst;
 
-    public String getVarseltekst() {
-        return varseltekst;
+    public Long getId() {
+        return id;
     }
 
-    public void setVarseltekst(String varseltekst) {
-        this.varseltekst = varseltekst;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public KodeDto getFagsaktype() {
-        return fagsaktype;
+    public UUID getUuid() {
+        return uuid;
     }
 
-    public void setFagsaktype(KodeDto fagsaktype) {
-        this.fagsaktype = fagsaktype;
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
     }
 
     public String getSaksnummer() {
@@ -52,30 +54,6 @@ public class EksternBehandlingsinfoDto {
 
     public void setFagsakId(Long fagsakId) {
         this.fagsakId = fagsakId;
-    }
-
-    public PersonopplysningDto getPersonopplysningDto() {
-        return personopplysningDto;
-    }
-
-    public void setPersonopplysningDto(PersonopplysningDto personopplysningDto) {
-        this.personopplysningDto = personopplysningDto;
-    }
-
-    public Språkkode getSprakkode() {
-        return sprakkode;
-    }
-
-    public void setSprakkode(Språkkode sprakkode) {
-        this.sprakkode = sprakkode;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getBehandlendeEnhetId() {
@@ -102,11 +80,43 @@ public class EksternBehandlingsinfoDto {
         this.ansvarligSaksbehandler = ansvarligSaksbehandler;
     }
 
+    public Språkkode getSprakkode() {
+        return sprakkode;
+    }
+
+    public void setSprakkode(Språkkode sprakkode) {
+        this.sprakkode = sprakkode;
+    }
+
     public List<BehandlingResourceLinkDto> getLinks() {
         return links;
     }
 
     public void setLinks(List<BehandlingResourceLinkDto> links) {
         this.links = links;
+    }
+
+    public PersonopplysningDto getPersonopplysningDto() {
+        return personopplysningDto;
+    }
+
+    public void setPersonopplysningDto(PersonopplysningDto personopplysningDto) {
+        this.personopplysningDto = personopplysningDto;
+    }
+
+    public KodeDto getFagsaktype() {
+        return fagsaktype;
+    }
+
+    public void setFagsaktype(KodeDto fagsaktype) {
+        this.fagsaktype = fagsaktype;
+    }
+
+    public String getVarseltekst() {
+        return varseltekst;
+    }
+
+    public void setVarseltekst(String varseltekst) {
+        this.varseltekst = varseltekst;
     }
 }

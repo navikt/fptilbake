@@ -2,6 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposit
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 
@@ -26,15 +27,15 @@ public interface EksternBehandlingRepository {
     Optional<EksternBehandling> hentFraEksternId(long eksternBehandlingId);
 
     /**
-     * Finner alle behandlinger som knyttet med behandlingId fra ekstern system
-     * @param eksternBehandlingId
+     * Finner alle behandlinger som knyttet med uuid fra ekstern system
+     * @param eksternUuid
      */
-    List<EksternBehandling> hentAlleBehandlingerMedEksternId(long eksternBehandlingId);
+    List<EksternBehandling> hentAlleBehandlingerMedEksternUuid(UUID eksternUuid);
 
     /**
-     * Finner siste avsluttet TilbakekkrevingBehandling basert på eksternBehandlingId
-     * @param eksternBehandlingId
+     * Finner siste avsluttet TilbakekkrevingBehandling basert på eksternUuid
+     * @param eksternUuid
      * @return
      */
-    Optional<EksternBehandling> finnForSisteAvsluttetTbkBehandling(long eksternBehandlingId);
+    Optional<EksternBehandling> finnForSisteAvsluttetTbkBehandling(UUID eksternUuid);
 }

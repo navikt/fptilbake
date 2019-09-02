@@ -135,11 +135,12 @@ public class VurdertForeldelseTjeneste {
     }
 
     public Map<Periode, BigDecimal> beregnFeilutbetaltBeløpForPerioder(Long behandlingId, List<Periode> perioder) {
-        KravgrunnlagAggregate aggregate = grunnlagRepository.finnEksaktGrunnlagForBehandlingId(behandlingId);
-
         var map = new HashMap<Periode, BigDecimal>();
-        for (Periode periode : perioder) {
-            map.put(periode, beregnFeilutbetaltBeløp(aggregate, periode));
+        Optional<KravgrunnlagAggregate> aggregate = grunnlagRepository.finnGrunnlagForBehandlingId(behandlingId);
+        if (aggregate.isPresent()) {
+            for (Periode periode : perioder) {
+                map.put(periode, beregnFeilutbetaltBeløp(aggregate.get(), periode));
+            }
         }
         return map;
     }

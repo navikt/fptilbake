@@ -1,5 +1,15 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling;
 
+import java.time.Period;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
+import org.apache.commons.lang3.StringUtils;
+
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -13,6 +23,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.util.BrevUtil;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.util.TittelOverskriftUtil;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.TpsTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.KodeDto;
@@ -20,12 +31,6 @@ import no.nav.foreldrepenger.tilbakekreving.simulering.klient.FpOppdragRestKlien
 import no.nav.foreldrepenger.tilbakekreving.simulering.kontrakt.FeilutbetaltePerioderDto;
 import no.nav.vedtak.felles.jpa.Transaction;
 import no.nav.vedtak.konfig.KonfigVerdi;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import java.time.Period;
-import java.util.List;
-import java.util.Optional;
 
 @ApplicationScoped
 @Transaction
@@ -68,10 +73,10 @@ public class FellesInfoTilBrevTjeneste {
         return brukersSvarfrist.getDays() / 7;
     }
 
-    public EksternBehandlingsinfoDto hentBehandlingFpsak(Long behandlingId, String saksnummer) {
-        Optional<EksternBehandlingsinfoDto> dokumentinfoDto = fpsakKlient.hentBehandlingsinfo(behandlingId, saksnummer);
+    public EksternBehandlingsinfoDto hentBehandlingFpsak(UUID eksternUuid, Saksnummer saksnummer) {
+        Optional<EksternBehandlingsinfoDto> dokumentinfoDto = fpsakKlient.hentBehandlingsinfo(eksternUuid);
         if (!dokumentinfoDto.isPresent()) {
-            throw DokumentbestillingFeil.FACTORY.fantIkkeBehandlingIFpsak(behandlingId).toException();
+            throw DokumentbestillingFeil.FACTORY.fantIkkeBehandlingIFpsak(saksnummer.getVerdi()).toException();
         }
         return dokumentinfoDto.get();
     }
@@ -105,7 +110,7 @@ public class FellesInfoTilBrevTjeneste {
         String ytelsePåBokmål = finnFagsaktypeNavnPåRiktigSpråk(ytelsetype, Språkkode.nb);
         ytelseNavn.setNavnPåBokmål(ytelsePåBokmål);
 
-        if (!språkkode.equals(Språkkode.nb)) {
+        if (språkkode != null && !språkkode.equals(Språkkode.nb)) {
             ytelseNavn.setNavnPåBrukersSpråk(finnFagsaktypeNavnPåRiktigSpråk(ytelsetype, språkkode));
         } else {
             ytelseNavn.setNavnPåBrukersSpråk(ytelsePåBokmål);
@@ -113,16 +118,21 @@ public class FellesInfoTilBrevTjeneste {
         return ytelseNavn;
     }
 
-    BrevMetadata lagMetadataForVedtaksbrev(Behandling behandling, Long totalTilbakekrevingBeløp, Long behandlingIdIFpsak) {
-        String saksnummer = behandling.getFagsak().getSaksnummer().getVerdi();
-        EksternBehandlingsinfoDto eksternBehandlingsinfo = hentBehandlingFpsak(behandlingIdIFpsak, saksnummer);
+    public KodeDto henteFagsakYtelseType(Behandling behandling){
+        FagsakYtelseType fagsakYtelseType = behandling.getFagsak().getFagsakYtelseType();
+        return new KodeDto(fagsakYtelseType.getKodeverk(),fagsakYtelseType.getKode(),fagsakYtelseType.getNavn());
+    }
+
+    BrevMetadata lagMetadataForVedtaksbrev(Behandling behandling, Long totalTilbakekrevingBeløp, UUID eksternUuid) {
+        EksternBehandlingsinfoDto eksternBehandlingsinfo = hentBehandlingFpsak(eksternUuid,  behandling.getFagsak().getSaksnummer());
+        eksternBehandlingsinfo.setFagsaktype(henteFagsakYtelseType(behandling)); // vi kan sette samme fagsakType fordi det ikke kan endret.
         String aktørId = eksternBehandlingsinfo.getPersonopplysningDto().getAktoerId();
         Personinfo personinfo = hentPerson(aktørId);
         Adresseinfo adresseinfo = hentAdresse(personinfo, aktørId);
         YtelseNavn ytelseNavn = hentYtelsenavn(eksternBehandlingsinfo.getFagsaktype(), eksternBehandlingsinfo.getSprakkode());
 
         return new BrevMetadata.Builder()
-            .medAnsvarligSaksbehandler(behandling.getAnsvarligBeslutter())
+            .medAnsvarligSaksbehandler(StringUtils.isNotEmpty(behandling.getAnsvarligSaksbehandler()) ? behandling.getAnsvarligSaksbehandler() : "VL")
             .medBehandlendeEnhetId("4833") //FIXME fjern hardkoding
             .medBehandlendeEnhetNavn("NAV Familie- og pensjonsytelser Oslo 1") //FIXME fjern hardkoding
             .medMottakerAdresse(adresseinfo)

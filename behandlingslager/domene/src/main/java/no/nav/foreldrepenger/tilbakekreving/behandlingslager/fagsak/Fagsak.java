@@ -8,6 +8,8 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -28,7 +30,7 @@ import no.nav.vedtak.felles.jpa.BaseEntitet;
 public class Fagsak extends BaseEntitet {
 
     @Id
-    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_FAGSAK")
     private Long id;
 
     @ManyToOne(cascade = {CascadeType.ALL}, optional = false)
@@ -61,22 +63,17 @@ public class Fagsak extends BaseEntitet {
         // Hibernate
     }
 
-    private Fagsak(long fagsakId, Saksnummer saksnummer, NavBruker bruker) {
-        this.id = fagsakId;
+    private Fagsak(Saksnummer saksnummer, NavBruker bruker) {
         this.saksnummer = saksnummer;
         this.navBruker = bruker;
     }
 
-    public static Fagsak opprettNy(long fagsakId, Saksnummer saksnummer, NavBruker bruker) {
-        return new Fagsak(fagsakId, saksnummer, bruker);
+    public static Fagsak opprettNy(Saksnummer saksnummer, NavBruker bruker) {
+        return new Fagsak(saksnummer, bruker);
     }
 
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public Saksnummer getSaksnummer() {

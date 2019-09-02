@@ -1,11 +1,17 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling;
 
+import java.util.UUID;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.domene.VarselbrevSamletInfo;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.domene.YtelseNavn;
@@ -14,9 +20,6 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.KodeDto;
 import no.nav.foreldrepenger.tilbakekreving.simulering.kontrakt.FeilutbetaltePerioderDto;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 
 
 @ApplicationScoped
@@ -45,8 +48,8 @@ public class VarselbrevTjeneste {
 
         //Henter data fra fpsak
         Saksnummer saksnummer = behandling.getFagsak().getSaksnummer();
-        EksternBehandlingsinfoDto eksternBehandlingsinfoDto = fellesInfoTilBrevTjeneste.hentBehandlingFpsak(behandlingIdIFpsak, saksnummer.getVerdi());
-
+        EksternBehandlingsinfoDto eksternBehandlingsinfoDto = fellesInfoTilBrevTjeneste.hentBehandlingFpsak(eksternBehandling.getEksternUuid(), saksnummer);
+        eksternBehandlingsinfoDto.setFagsaktype(fellesInfoTilBrevTjeneste.henteFagsakYtelseType(behandling));
         //Henter data fra tps
         String aktørId = behandling.getAktørId().getId();
         Personinfo personinfo = fellesInfoTilBrevTjeneste.hentPerson(aktørId);
@@ -70,18 +73,21 @@ public class VarselbrevTjeneste {
                 ytelseNavn);
     }
 
-    public VarselbrevSamletInfo lagVarselbrevForForhåndsvisning(Long behandlingId, String saksnummer, String varseltekst) {
-        EksternBehandlingsinfoDto eksternBehandlingsinfo = fellesInfoTilBrevTjeneste.hentBehandlingFpsak(behandlingId, saksnummer);
+    public VarselbrevSamletInfo lagVarselbrevForForhåndsvisning(UUID behandlingUuId, Saksnummer saksnummer, String varseltekst, FagsakYtelseType fagsakYtleseType) {
+
+        EksternBehandlingsinfoDto eksternBehandlingsinfo = fellesInfoTilBrevTjeneste.hentBehandlingFpsak(behandlingUuId, saksnummer);
+        eksternBehandlingsinfo.setFagsaktype(new KodeDto(fagsakYtleseType.getKodeverk(),fagsakYtleseType.getKode(),fagsakYtleseType.getNavn()));
 
         String aktørId = eksternBehandlingsinfo.getPersonopplysningDto().getAktoerId();
         Personinfo personinfo = fellesInfoTilBrevTjeneste.hentPerson(aktørId);
         Adresseinfo adresseinfo = fellesInfoTilBrevTjeneste.hentAdresse(personinfo, aktørId);
-        FeilutbetaltePerioderDto feilutbetaltePerioderDto = fellesInfoTilBrevTjeneste.hentFeilutbetaltePerioder(behandlingId);
+        FeilutbetaltePerioderDto feilutbetaltePerioderDto = fellesInfoTilBrevTjeneste.hentFeilutbetaltePerioder(eksternBehandlingsinfo.getId());
 
+        if(eksternBehandlingsinfo.getSprakkode() == null){
+            eksternBehandlingsinfo.setSprakkode(Språkkode.nb);
+        }
         Språkkode mottakersSpråkkode = eksternBehandlingsinfo.getSprakkode();
-        KodeDto ytelsetype = eksternBehandlingsinfo.getFagsaktype();
-        YtelseNavn ytelseNavn = fellesInfoTilBrevTjeneste.hentYtelsenavn(ytelsetype, mottakersSpråkkode);
-
+        YtelseNavn ytelseNavn = fellesInfoTilBrevTjeneste.hentYtelsenavn(eksternBehandlingsinfo.getFagsaktype(), mottakersSpråkkode);
 
         return VarselbrevUtil.sammenstillInfoFraFagsystemerForhåndvisningVarselbrev(
                 saksnummer,

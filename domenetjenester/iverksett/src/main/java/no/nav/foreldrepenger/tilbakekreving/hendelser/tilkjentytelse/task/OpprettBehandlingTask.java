@@ -1,5 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.task;
 
+import java.util.UUID;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -36,19 +38,19 @@ public class OpprettBehandlingTask implements ProsessTaskHandler {
         HendelseTaskDataWrapper dataWrapper = new HendelseTaskDataWrapper(taskData);
         dataWrapper.validerTaskDataOpprettBehandling();
 
-        long eksternFagsakId = dataWrapper.getFagsakId();
+        String externBehandlingUuid = dataWrapper.getBehandlingUuid();
         long eksternBehandlingId = dataWrapper.getBehandlingId();
         Saksnummer saksnummer = dataWrapper.getSaksnummer();
         AktørId aktørId = dataWrapper.getAktørId();
         BehandlingType behandlingType = dataWrapper.getBehandlingType();
         FagsakYtelseType fagsakYtelseType = dataWrapper.getFagsakYtelseType();
 
-        opprettBehandling(saksnummer, eksternFagsakId, eksternBehandlingId, aktørId, fagsakYtelseType, behandlingType);
+        opprettBehandling(saksnummer, UUID.fromString(externBehandlingUuid), eksternBehandlingId, aktørId, fagsakYtelseType, behandlingType);
     }
 
-    private void opprettBehandling(Saksnummer saksnummer, long fagsakId, long eksternBehandlingId,
+    private void opprettBehandling(Saksnummer saksnummer, UUID eksternUuid, long eksternBehandlingId,
                                    AktørId aktørId, FagsakYtelseType fagsakYtelseType,
                                    BehandlingType behandlingType) {
-        behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer, fagsakId, eksternBehandlingId, aktørId, fagsakYtelseType, behandlingType);
+        behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer, eksternUuid, eksternBehandlingId, aktørId, fagsakYtelseType, behandlingType);
     }
 }

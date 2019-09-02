@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse;
 
 import java.util.List;
+import java.util.Objects;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -9,9 +10,9 @@ import org.apache.kafka.clients.consumer.CommitFailedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.task.HendelseTaskDataWrapper;
 import no.nav.foreldrepenger.tilbakekreving.kafka.poller.PostTransactionHandler;
 import no.nav.foreldrepenger.tilbakekreving.kafka.util.KafkaConsumerFeil;
-import no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.task.HendelseTaskDataWrapper;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 
 @ApplicationScoped
@@ -64,9 +65,17 @@ public class TilkjentYtelseReader {
     }
 
     private void lagHåndterHendelseProsessTask(TilkjentYtelseMelding melding) {
-        HendelseTaskDataWrapper dataWrapper = HendelseTaskDataWrapper.lagWrapperForHendelseHåndtering(melding.getFagsakId(), melding.getBehandlingId(), melding.getAktørId());
-
+        validereMelding(melding);
+        HendelseTaskDataWrapper dataWrapper = HendelseTaskDataWrapper.lagWrapperForHendelseHåndtering(melding);
         prosessTaskRepository.lagre(dataWrapper.getProsessTaskData());
+    }
+
+    private void validereMelding(TilkjentYtelseMelding melding) {
+        Objects.requireNonNull(melding.getAktørId());
+        Objects.requireNonNull(melding.getBehandlingId());
+        Objects.requireNonNull(melding.getBehandlingUuid());
+        Objects.requireNonNull(melding.getSaksnummer());
+        Objects.requireNonNull(melding.getFagsakYtelseType());
     }
 
 }

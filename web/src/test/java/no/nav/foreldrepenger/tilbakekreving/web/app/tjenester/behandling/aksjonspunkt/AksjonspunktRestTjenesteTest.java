@@ -89,7 +89,7 @@ public class AksjonspunktRestTjenesteTest {
                 behandlingTjeneste,
                 aksjonspunktTjenesteMock);
 
-        Fagsak fagsak = Fagsak.opprettNy(FAGSAK_ID, SAKSNUMMER, NAV_BRUKER);
+        Fagsak fagsak = Fagsak.opprettNy(SAKSNUMMER, NAV_BRUKER);
         behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).build();
     }
 

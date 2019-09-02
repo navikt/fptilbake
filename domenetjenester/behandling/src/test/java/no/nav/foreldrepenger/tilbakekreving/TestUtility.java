@@ -2,6 +2,8 @@ package no.nav.foreldrepenger.tilbakekreving;
 
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.Random;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
@@ -43,13 +45,14 @@ public class TestUtility {
         long fagsakId = genererFagsakId();
         long eksBehId = genererEksternBehandlingId();
         Saksnummer saksnummer = genererSaksnummer();
+        UUID eksternUuid = genererEksternUuid();
 
-        long intBehId = behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer, fagsakId, eksBehId, aktørId,FagsakYtelseType.FORELDREPENGER,BEHANDLING_TYPE);
+        long intBehId = behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer, eksternUuid, eksBehId, aktørId,FagsakYtelseType.FORELDREPENGER,BEHANDLING_TYPE);
 
         Behandling behandling = behandlingTjeneste.hentBehandling(intBehId);
 
         // opprett SakDetaljer
-        return new SakDetaljer(fagsakId, saksnummer, intBehId, eksBehId, aktørId, BEHANDLING_TYPE, behandling);
+        return new SakDetaljer(fagsakId, saksnummer, intBehId, eksBehId, eksternUuid, aktørId, BEHANDLING_TYPE, behandling);
     }
 
     public Optional<Personinfo> lagPersonInfo(AktørId aktørId) {
@@ -78,20 +81,30 @@ public class TestUtility {
         return GEN_EBEH_ID.getAndIncrement();
     }
 
+    private UUID genererEksternUuid() {
+        byte[] data = new byte[16];
+        Random r = new Random();
+        r.nextBytes(data);
+        return UUID.nameUUIDFromBytes(data);
+    }
+
     public static class SakDetaljer {
         private Long fagsakId;
         private Saksnummer saksnummer;
         private Long internBehandlingId;
         private Long eksternBehandlingId;
+        private UUID eksternUuid;
         private AktørId aktørId;
         private BehandlingType behandlingType;
         private Behandling behandling;
 
-        public SakDetaljer(Long fagsakId, Saksnummer saksnummer, Long internBehandlingId, Long eksternBehandlingId, AktørId aktørId, BehandlingType behandlingType, Behandling behandling) {
+        public SakDetaljer(Long fagsakId, Saksnummer saksnummer, Long internBehandlingId, Long eksternBehandlingId,
+                           UUID eksternUuid, AktørId aktørId, BehandlingType behandlingType, Behandling behandling) {
             this.fagsakId = fagsakId;
             this.saksnummer = saksnummer;
             this.internBehandlingId = internBehandlingId;
             this.eksternBehandlingId = eksternBehandlingId;
+            this.eksternUuid = eksternUuid;
             this.aktørId = aktørId;
             this.behandlingType = behandlingType;
             this.behandling = behandling;
@@ -111,6 +124,10 @@ public class TestUtility {
 
         public Long getEksternBehandlingId() {
             return eksternBehandlingId;
+        }
+
+        public UUID getEksternUuid() {
+            return eksternUuid;
         }
 
         public AktørId getAktørId() {

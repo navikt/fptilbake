@@ -48,7 +48,7 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
     public LesKravgrunnlagTask(ØkonomiMottattXmlRepository økonomiMottattXmlRepository, KravgrunnlagTjeneste kravgrunnlagTjeneste,
                                ProsessTaskRepository taskRepository, KravgrunnlagMapper kravgrunnlagMapper,
                                EksternBehandlingRepository eksternBehandlingRepository, FpsakKlient fpsakKlient) {
-        super(taskRepository,fpsakKlient);
+        super(taskRepository, fpsakKlient);
 
         this.økonomiMottattXmlRepository = økonomiMottattXmlRepository;
         this.kravgrunnlagTjeneste = kravgrunnlagTjeneste;
@@ -63,6 +63,7 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
         String råXml = økonomiMottattXmlRepository.hentMottattXml(mottattXmlId);
         DetaljertKravgrunnlag kravgrunnlagDto = KravgrunnlagXmlUnmarshaller.unmarshall(mottattXmlId, råXml);
         String eksternBehandlingId = kravgrunnlagMapper.finnBehandlngId(kravgrunnlagDto);
+        String saksnummer = finnSaksnummer(kravgrunnlagDto.getFagsystemId());
         Kravgrunnlag431 kravgrunnlag = kravgrunnlagMapper.mapTilDomene(kravgrunnlagDto);
 
         økonomiMottattXmlRepository.oppdaterMedEksternBehandlingId(eksternBehandlingId, mottattXmlId);
@@ -74,7 +75,7 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
             kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(internId, kravgrunnlag);
             logger.info("Leste kravgrunnlag med id={} eksternBehandlingId={} internBehandlingId={}", mottattXmlId, eksternBehandlingId, internId);
         } else {
-            validerBehandlingsEksistens(eksternBehandlingId);
+            validerBehandlingsEksistens(eksternBehandlingId, saksnummer);
             logger.info("Ignorerte kravgrunnlag med id={} eksternBehandlingId={}. Fantes ikke tilbakekrevingsbehandling", mottattXmlId, eksternBehandlingId);
         }
         opprettProsesstaskForÅSletteXml(mottattXmlId);
@@ -88,11 +89,11 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
         return Optional.empty();
     }
 
-    private void validerBehandlingsEksistens(String eksternBehandlingId) {
+    private void validerBehandlingsEksistens(String eksternBehandlingId, String saksnummer) {
         if (!erGyldigTall(eksternBehandlingId)) {
             throw LesKravgrunnlagTaskFeil.FACTORY.behandlingFinnesIkkeIFpsak(eksternBehandlingId).toException();
         }
-        if (!erBehandlingFinnesIFpsak(eksternBehandlingId)) {
+        if (!erBehandlingFinnesIFpsak(saksnummer)) {
             throw LesKravgrunnlagTaskFeil.FACTORY.behandlingFinnesIkkeIFpsak(Long.valueOf(eksternBehandlingId)).toException();
         }
     }
