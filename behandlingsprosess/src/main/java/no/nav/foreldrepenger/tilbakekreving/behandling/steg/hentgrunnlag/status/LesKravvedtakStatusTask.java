@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.status;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -10,10 +11,14 @@ import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.FellesTask;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TaskProperty;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatus437;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagAggregate;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.ØkonomiMottattXmlRepository;
 import no.nav.tilbakekreving.status.v1.KravOgVedtakstatus;
 import no.nav.vedtak.feil.Feil;
@@ -36,6 +41,7 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
 
     private ØkonomiMottattXmlRepository økonomiMottattXmlRepository;
     private EksternBehandlingRepository eksternBehandlingRepository;
+    private BehandlingRepository behandlingRepository;
 
     private KravVedtakStatusTjeneste kravVedtakStatusTjeneste;
     private KravVedtakStatusMapper statusMapper;
@@ -46,12 +52,13 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
     }
 
     @Inject
-    public LesKravvedtakStatusTask(ØkonomiMottattXmlRepository økonomiMottattXmlRepository, EksternBehandlingRepository eksternBehandlingRepository,
-                                   ProsessTaskRepository prosessTaskRepository, KravVedtakStatusTjeneste kravVedtakStatusTjeneste,
-                                   KravVedtakStatusMapper statusMapper, FpsakKlient fpsakKlient) {
-        super(prosessTaskRepository, fpsakKlient);
+    public LesKravvedtakStatusTask(ØkonomiMottattXmlRepository økonomiMottattXmlRepository, BehandlingRepositoryProvider repositoryProvider,
+                                   ProsessTaskRepository prosessTaskRepository,KravVedtakStatusTjeneste kravVedtakStatusTjeneste,
+                                   KravVedtakStatusMapper statusMapper,FpsakKlient fpsakKlient) {
+        super(prosessTaskRepository,repositoryProvider.getGrunnlagRepository(),fpsakKlient);
         this.økonomiMottattXmlRepository = økonomiMottattXmlRepository;
-        this.eksternBehandlingRepository = eksternBehandlingRepository;
+        this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
+        this.behandlingRepository = repositoryProvider.getBehandlingRepository();
 
         this.kravVedtakStatusTjeneste = kravVedtakStatusTjeneste;
         this.statusMapper = statusMapper;
@@ -68,6 +75,9 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
 
         String eksternBehandlingId = statusMapper.finnBehandlngId(kravOgVedtakstatus);
         økonomiMottattXmlRepository.oppdaterMedEksternBehandlingId(eksternBehandlingId, mottattXmlId);
+
+        long vedtakId = statusMapper.finnVedtakId(kravOgVedtakstatus);
+        oppdatereEksternBehandling(vedtakId,eksternBehandlingId);
 
         Optional<EksternBehandling> behandlingKobling = hentKoblingTilInternBehandling(eksternBehandlingId);
         if (behandlingKobling.isPresent()) {
@@ -97,6 +107,25 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
         if (!erBehandlingFinnesIFpsak(saksnummer)) {
             throw LesKravvedtakStatusTask.LesKravvedtakStatusTaskFeil.FACTORY.behandlingFinnesIkkeIFpsak(Long.valueOf(eksternBehandlingId)).toException();
         }
+    }
+
+    private void oppdatereEksternBehandling(long vedtakId,String eksternBehandlingId){
+        Optional<KravgrunnlagAggregate> aggregate = finnGrunnlagForVedtakId(vedtakId);
+        if(aggregate.isPresent()){
+            logger.info("Grunnlag finnes allerede for vedtakId={}",vedtakId);
+            Long behandlingId = aggregate.get().getBehandlingId();
+            Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
+            UUID eksternUUID = hentUUIDFraEksternBehandling(behandlingId);
+
+            logger.info("Oppdatere eksternBehandling for behandlingId={} med ny eksternId={}",behandlingId,eksternBehandlingId);
+            EksternBehandling eksternBehandling = new EksternBehandling(behandling,Long.valueOf(eksternBehandlingId), eksternUUID);
+            eksternBehandlingRepository.lagre(eksternBehandling);
+        }
+    }
+
+    private UUID hentUUIDFraEksternBehandling(long behandlingId){
+        EksternBehandling forrigeEksternBehandling = eksternBehandlingRepository.hentFraInternId(behandlingId);
+        return forrigeEksternBehandling.getEksternUuid();
     }
 
     public interface LesKravvedtakStatusTaskFeil extends DeklarerteFeil {

@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.FellesTask;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TaskProperty;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
@@ -47,13 +48,13 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
     @Inject
     public LesKravgrunnlagTask(ØkonomiMottattXmlRepository økonomiMottattXmlRepository, KravgrunnlagTjeneste kravgrunnlagTjeneste,
                                ProsessTaskRepository taskRepository, KravgrunnlagMapper kravgrunnlagMapper,
-                               EksternBehandlingRepository eksternBehandlingRepository, FpsakKlient fpsakKlient) {
-        super(taskRepository, fpsakKlient);
-
+                               BehandlingRepositoryProvider repositoryProvider, FpsakKlient fpsakKlient) {
+        super(taskRepository, repositoryProvider.getGrunnlagRepository(), fpsakKlient);
         this.økonomiMottattXmlRepository = økonomiMottattXmlRepository;
+        this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
+
         this.kravgrunnlagTjeneste = kravgrunnlagTjeneste;
         this.kravgrunnlagMapper = kravgrunnlagMapper;
-        this.eksternBehandlingRepository = eksternBehandlingRepository;
     }
 
     @Override
