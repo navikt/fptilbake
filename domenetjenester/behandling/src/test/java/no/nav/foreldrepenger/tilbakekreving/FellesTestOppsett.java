@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.Before;
 
@@ -77,6 +78,7 @@ public class FellesTestOppsett extends TestOppsett {
     protected Long FAGSAK_ID;
     protected Long INTERN_BEHANDLING_ID;
     protected Long EKSTERN_BEHANDLING_ID;
+    protected UUID EKSTERN_BEHANDLING_UUID;
 
     public Behandling BEHANDLING;
 
@@ -153,6 +155,7 @@ public class FellesTestOppsett extends TestOppsett {
         FAGSAK_ID = sakDetaljer.getFagsakId();
         INTERN_BEHANDLING_ID = sakDetaljer.getInternBehandlingId();
         EKSTERN_BEHANDLING_ID = sakDetaljer.getEksternBehandlingId();
+        EKSTERN_BEHANDLING_UUID = sakDetaljer.getEksternUuid();
         BEHANDLING = sakDetaljer.getBehandling();
     }
 }

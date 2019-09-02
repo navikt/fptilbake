@@ -9,8 +9,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.tilbakekrevingsvalg.VidereBehandling;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.TilbakekrevingDataDto;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.TilbakekrevingValgDto;
 import no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.task.HendelseTaskDataWrapper;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 
@@ -32,24 +33,28 @@ public class HendelseHåndtererTjeneste {
         this.restKlient = restKlient;
     }
 
-    public void håndterHendelse(long fagsakId, long behandlingId, String aktørId) {
-        Optional<TilbakekrevingDataDto> tbkDataOpt = restKlient.hentTilbakekrevingData(behandlingId);
+    public void håndterHendelse(HendelseTaskDataWrapper hendelseTaskDataWrapper) {
+        long behandlingId = hendelseTaskDataWrapper.getBehandlingId();
+        Optional<TilbakekrevingValgDto> tbkDataOpt = restKlient.hentTilbakekrevingValg(hendelseTaskDataWrapper.getBehandlingUuid());
 
         if (tbkDataOpt.isPresent() && erRelevantHendelse(tbkDataOpt.get())) {
             logger.info("Registrert ny relevant hendelse for ekstern behandlingId={}", behandlingId);
-            lagOpprettBehandlingTask(fagsakId, behandlingId, aktørId, tbkDataOpt.get());
+            lagOpprettBehandlingTask(hendelseTaskDataWrapper);
         }
     }
 
-    private boolean erRelevantHendelse(TilbakekrevingDataDto tbkData) {
-        return VidereBehandling.TILBAKEKREV_I_INFOTRYGD.getKode().equals(tbkData.getVidereBehandling());
+    private boolean erRelevantHendelse(TilbakekrevingValgDto tbkData) {
+        return VidereBehandling.TILBAKEKREV_I_INFOTRYGD.equals(tbkData.getVidereBehandling());
     }
 
-    private void lagOpprettBehandlingTask(long fagsakId, long behandlingId, String aktørId, TilbakekrevingDataDto tbkData) {
-        HendelseTaskDataWrapper taskData = HendelseTaskDataWrapper.lagWrapperForOpprettBehandling(fagsakId, behandlingId, aktørId);
-        taskData.setSaksnummer(tbkData.getSaksnummer());
-        taskData.setFagsakYtelseType(tbkData.getFagsakYtelseType());
-        taskData.setBehandlingType(BehandlingType.TILBAKEKREVING.getKode());
+    private void lagOpprettBehandlingTask(HendelseTaskDataWrapper hendelseTaskDataWrapper) {
+        HendelseTaskDataWrapper taskData = HendelseTaskDataWrapper.lagWrapperForOpprettBehandling(hendelseTaskDataWrapper.getBehandlingUuid(),
+            hendelseTaskDataWrapper.getBehandlingId(),
+            hendelseTaskDataWrapper.getAktørId());
+
+        taskData.setSaksnummer(hendelseTaskDataWrapper.getSaksnummer());
+        taskData.setFagsakYtelseType(hendelseTaskDataWrapper.getFagsakYtelseType());
+        taskData.setBehandlingType(BehandlingType.TILBAKEKREVING);
 
         taskRepository.lagre(taskData.getProsessTaskData());
     }

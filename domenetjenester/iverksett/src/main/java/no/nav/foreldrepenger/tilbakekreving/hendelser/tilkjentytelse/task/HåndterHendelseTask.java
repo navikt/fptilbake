@@ -32,10 +32,6 @@ public class HåndterHendelseTask implements ProsessTaskHandler {
         HendelseTaskDataWrapper dataWrapper = new HendelseTaskDataWrapper(taskData);
         dataWrapper.validerTaskDataHåndterHendelse();
 
-        hendelseHåndterer.håndterHendelse(
-                dataWrapper.getFagsakId(),
-                dataWrapper.getBehandlingId(),
-                dataWrapper.getAktørId().getId()
-        );
+        hendelseHåndterer.håndterHendelse(dataWrapper);
     }
 }

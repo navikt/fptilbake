@@ -66,20 +66,28 @@ public class KravgrunnlagRepository {
         return hentEksaktResultat(query);
     }
 
-    private TypedQuery<KravgrunnlagAggregate> formFinngrunnlagQuery(Long behandlingId) {
-        TypedQuery<KravgrunnlagAggregate> query = entityManager.createQuery("from KravgrunnlagAggregate aggr " +
-            "where aggr.behandlingId=:behandlingId and aggr.aktiv=:aktiv", KravgrunnlagAggregate.class);
-        query.setParameter(BEHANDLING_ID, behandlingId);
-        query.setParameter(AKTIV, true);
-        return query;
-    }
-
     public boolean harGrunnlagForBehandlingId(Long behandlingId) {
         TypedQuery<Long> query = entityManager.createQuery("select count(1) from KravgrunnlagAggregate aggr " +
             "where aggr.behandlingId=:behandlingId and aggr.aktiv=:aktiv", Long.class);
         query.setParameter(BEHANDLING_ID, behandlingId);
         query.setParameter(AKTIV, true);
         return query.getSingleResult() > 0;
+    }
+
+    public Optional<KravgrunnlagAggregate> finnGrunnlagForVedtakId(Long vedtakId) {
+        TypedQuery<KravgrunnlagAggregate> query = entityManager.createQuery("from KravgrunnlagAggregate aggr " +
+            "where aggr.grunnlagØkonomi.vedtakId=:vedtakId and aggr.aktiv=:aktiv", KravgrunnlagAggregate.class);
+        query.setParameter("vedtakId", vedtakId);
+        query.setParameter(AKTIV, true);
+        return hentUniktResultat(query);
+    }
+
+    private TypedQuery<KravgrunnlagAggregate> formFinngrunnlagQuery(Long behandlingId) {
+        TypedQuery<KravgrunnlagAggregate> query = entityManager.createQuery("from KravgrunnlagAggregate aggr " +
+            "where aggr.behandlingId=:behandlingId and aggr.aktiv=:aktiv", KravgrunnlagAggregate.class);
+        query.setParameter(BEHANDLING_ID, behandlingId);
+        query.setParameter(AKTIV, true);
+        return query;
     }
 
     public EntityManager getEntityManager() {

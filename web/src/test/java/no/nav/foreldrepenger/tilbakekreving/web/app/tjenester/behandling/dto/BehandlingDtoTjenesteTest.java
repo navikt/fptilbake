@@ -153,12 +153,12 @@ public class BehandlingDtoTjenesteTest {
 
     private Behandling mockBehandling() {
         return Behandling.nyBehandlingFor(
-            Fagsak.opprettNy(1l, saksnummer, NavBruker.opprettNy(new AktørId(GYLDIG_AKTØR_ID), Språkkode.nb)),
+            Fagsak.opprettNy( saksnummer, NavBruker.opprettNy(new AktørId(GYLDIG_AKTØR_ID), Språkkode.nb)),
             BehandlingType.TILBAKEKREVING).build();
     }
 
     private Behandling lagBehandling(BehandlingStegType behandlingStegType, BehandlingStatus behandlingStatus) {
-        Long fagsakId = fagsakRepository.lagre(Fagsak.opprettNy(1l, saksnummer,
+        Long fagsakId = fagsakRepository.lagre(Fagsak.opprettNy(saksnummer,
             NavBruker.opprettNy(new AktørId(GYLDIG_AKTØR_ID), Språkkode.nb)));
         Fagsak fagsak = fagsakRepository.finnEksaktFagsak(fagsakId);
         Behandling behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).build();

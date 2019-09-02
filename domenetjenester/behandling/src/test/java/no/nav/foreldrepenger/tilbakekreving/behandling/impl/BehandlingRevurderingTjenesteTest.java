@@ -32,7 +32,7 @@ public class BehandlingRevurderingTjenesteTest extends FellesTestOppsett {
         expectedException.expect(FunksjonellException.class);
         expectedException.expectMessage("FPT-663487");
 
-        revurderingTjeneste.opprettRevurdering(SAKSNUMMER, EKSTERN_BEHANDLING_ID, BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR.getKode());
+        revurderingTjeneste.opprettRevurdering(SAKSNUMMER, EKSTERN_BEHANDLING_UUID, BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR.getKode());
     }
 
     @Test
@@ -40,7 +40,7 @@ public class BehandlingRevurderingTjenesteTest extends FellesTestOppsett {
         expectedException.expect(TekniskException.class);
         expectedException.expectMessage("FPT-314678");
 
-        revurderingTjeneste.opprettRevurdering(SAKSNUMMER, EKSTERN_BEHANDLING_ID, null);
+        revurderingTjeneste.opprettRevurdering(SAKSNUMMER, EKSTERN_BEHANDLING_UUID, null);
     }
 
     @Test
@@ -48,7 +48,7 @@ public class BehandlingRevurderingTjenesteTest extends FellesTestOppsett {
         expectedException.expect(TekniskException.class);
         expectedException.expectMessage("FPT-429884");
 
-        revurderingTjeneste.opprettRevurdering(null, EKSTERN_BEHANDLING_ID, BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR.getKode());
+        revurderingTjeneste.opprettRevurdering(null, EKSTERN_BEHANDLING_UUID, BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR.getKode());
     }
 
     @Test
@@ -57,9 +57,9 @@ public class BehandlingRevurderingTjenesteTest extends FellesTestOppsett {
         BehandlingLås behandlingLås = repoProvider.getBehandlingRepository().taSkriveLås(BEHANDLING);
         behandlingRepository.lagre(BEHANDLING, behandlingLås);
 
-        Behandling revurdering = revurderingTjeneste.opprettRevurdering(SAKSNUMMER, EKSTERN_BEHANDLING_ID, BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR.getKode());
+        Behandling revurdering = revurderingTjeneste.opprettRevurdering(SAKSNUMMER, EKSTERN_BEHANDLING_UUID, BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR.getKode());
         assertThat(revurdering).isNotNull();
-        assertThat(revurdering.getFagsakId()).isEqualTo(FAGSAK_ID);
+        assertThat(revurdering.getFagsakId()).isNotNull();
         assertThat(revurdering.getStatus()).isEqualByComparingTo(BehandlingStatus.OPPRETTET);
         assertThat(revurdering.getType()).isEqualByComparingTo(BehandlingType.REVURDERING_TILBAKEKREVING);
 

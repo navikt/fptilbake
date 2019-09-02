@@ -3,6 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposit
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -18,6 +19,7 @@ import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 
 public class EksternBehandlingRepositoryImplTest {
 
+    private static final UUID EKSTERN_UUID = UUID.randomUUID();
     @Rule
     public UnittestRepositoryRule repoRule = new UnittestRepositoryRule();
 
@@ -31,7 +33,7 @@ public class EksternBehandlingRepositoryImplTest {
         Behandling behandling = opprettBehandling();
         Long behandlingId = behandling.getId();
 
-        EksternBehandling eksternData = new EksternBehandling(behandling, 5555L);
+        EksternBehandling eksternData = new EksternBehandling(behandling, 5555L, EKSTERN_UUID);
         eksternBehandlingRepository.lagre(eksternData);
 
         EksternBehandling result = eksternBehandlingRepository.hentFraInternId(behandlingId);
@@ -39,6 +41,7 @@ public class EksternBehandlingRepositoryImplTest {
         assertThat(result).isNotNull();
         assertThat(result.getInternId()).isEqualTo(behandlingId);
         assertThat(result.getEksternId()).isEqualTo(5555L);
+        assertThat(result.getEksternUuid()).isEqualTo(EKSTERN_UUID);
     }
 
     @Test
@@ -46,7 +49,7 @@ public class EksternBehandlingRepositoryImplTest {
         Behandling behandling = opprettBehandling();
         long eksternId = 5555L;
 
-        EksternBehandling eksternBehandling = new EksternBehandling(behandling, eksternId);
+        EksternBehandling eksternBehandling = new EksternBehandling(behandling, eksternId, EKSTERN_UUID);
         eksternBehandlingRepository.lagre(eksternBehandling);
 
         Optional<EksternBehandling> result = eksternBehandlingRepository.hentFraEksternId(eksternId);

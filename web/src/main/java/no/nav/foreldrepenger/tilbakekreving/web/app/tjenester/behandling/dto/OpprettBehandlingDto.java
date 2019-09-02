@@ -1,12 +1,14 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto;
 
+import java.util.UUID;
+
+import javax.validation.Valid;
 import javax.validation.constraints.Digits;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.AbacDto;
 import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
@@ -16,29 +18,27 @@ public class OpprettBehandlingDto implements AbacDto {
 
     @NotNull
     @Digits(integer = 50, fraction = 0)
-    String saksnummer;
+    private String saksnummer; // TODO bør bruke egen DTO
 
     @NotNull
     @Digits(integer = 50, fraction = 0)
-    String aktørId;
+    private String aktørId; // TODO bør bruke egen DTO
+
+    @Valid
+    private UUID eksternUuid;
 
     @NotNull
-    @Min(0)
-    @Max(Long.MAX_VALUE)
-    Long eksternBehandlingId; // revurdert behandlingId fra fpsak
-
-    @NotNull
     @Pattern(regexp = InputValideringRegex.KODEVERK)
     @Size(max = 20)
-    private String behandlingType;
+    private String behandlingType; // TODO bør bruke egen DTO
 
     @Pattern(regexp = InputValideringRegex.KODEVERK)
     @Size(max = 20)
-    private String behandlingArsakType;
+    private String behandlingArsakType; // TODO bør bruke egen DTO
 
     @Pattern(regexp = InputValideringRegex.KODEVERK)
     @Size(max = 20)
-    private String fagsakYtelseType;
+    private String fagsakYtelseType; // TODO bør bruke egen DTO
 
     public OpprettBehandlingDto() {
         // For CDI
@@ -60,12 +60,12 @@ public class OpprettBehandlingDto implements AbacDto {
         this.aktørId = aktørId;
     }
 
-    public Long getEksternBehandlingId() {
-        return eksternBehandlingId;
+    public UUID getEksternUuid() {
+        return eksternUuid;
     }
 
-    public void setEksternBehandlingId(Long eksternBehandlingId) {
-        this.eksternBehandlingId = eksternBehandlingId;
+    public void setEksternUuid(String eksternUuid) {
+        this.eksternUuid = UUID.fromString(eksternUuid);
     }
 
     public String getBehandlingType() {

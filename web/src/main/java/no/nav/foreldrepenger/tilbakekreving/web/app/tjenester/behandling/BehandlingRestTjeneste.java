@@ -9,6 +9,7 @@ import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursResourceAttributt.VEN
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.annotation.Nullable;
 import javax.enterprise.context.RequestScoped;
@@ -117,15 +118,15 @@ public class BehandlingRestTjeneste {
     @Path("/opprett")
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     public Response opprettBehandling(@Valid @NotNull OpprettBehandlingDto opprettBehandlingDto) throws URISyntaxException {
-        AktørId aktørId = new AktørId(opprettBehandlingDto.getAktørId());
         Saksnummer saksnummer = new Saksnummer(opprettBehandlingDto.getSaksnummer());
-        long eksternBehandlingId = opprettBehandlingDto.getEksternBehandlingId();
+        UUID eksternUuid = opprettBehandlingDto.getEksternUuid();
+        AktørId aktørId = new AktørId(opprettBehandlingDto.getAktørId());
         BehandlingType behandlingType = BehandlingType.fraKode(opprettBehandlingDto.getBehandlingType());
         if (BehandlingType.TILBAKEKREVING.equals(behandlingType)) {
-            behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternBehandlingId, aktørId, opprettBehandlingDto.getFagsakYtelseType(),behandlingType);
+            behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternUuid, aktørId, opprettBehandlingDto.getFagsakYtelseType(), behandlingType);
             return Redirect.tilFagsakPollStatus(saksnummer, Optional.empty());
         } else if (BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandlingType)) {
-            Behandling revurdering = revurderingTjeneste.opprettRevurdering(saksnummer, eksternBehandlingId, opprettBehandlingDto.getBehandlingArsakType());
+            Behandling revurdering = revurderingTjeneste.opprettRevurdering(saksnummer, eksternUuid, opprettBehandlingDto.getBehandlingArsakType());
             String gruppe = behandlingskontrollAsynkTjeneste.asynkProsesserBehandling(revurdering);
             return Redirect.tilBehandlingPollStatus(revurdering.getId(), Optional.of(gruppe));
         }
@@ -141,7 +142,7 @@ public class BehandlingRestTjeneste {
     })
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     public Response kanOppretteRevurdering(@Valid @NotNull OpprettBehandlingDto opprettBehandlingDto) {
-        boolean result = revurderingTjeneste.kanOppretteRevurdering(opprettBehandlingDto.getEksternBehandlingId());
+        boolean result = revurderingTjeneste.kanOppretteRevurdering(opprettBehandlingDto.getEksternUuid());
         return Response.ok(result).build();
     }
 
@@ -270,7 +271,7 @@ public class BehandlingRestTjeneste {
 
         AsyncPollingStatus taskStatus = behandlingsprosessTjeneste.sjekkProsessTaskPågårForBehandling(behandling, null).orElse(null);
 
-        UtvidetBehandlingDto dto = behandlingDtoTjeneste.hentUtvidetBehandlingResultat(idDto.getBehandlingId(),taskStatus);
+        UtvidetBehandlingDto dto = behandlingDtoTjeneste.hentUtvidetBehandlingResultat(idDto.getBehandlingId(), taskStatus);
 
         Response.ResponseBuilder responseBuilder = Response.ok().entity(dto);
         return responseBuilder.build();

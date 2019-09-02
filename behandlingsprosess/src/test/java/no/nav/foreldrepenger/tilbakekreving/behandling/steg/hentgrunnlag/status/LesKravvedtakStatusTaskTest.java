@@ -1,7 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.status;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.HenleggBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.FellesTestOppsett;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.LesKravgrunnlagTask;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandlingsresultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
@@ -34,7 +35,7 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
     private HenleggBehandlingTjeneste henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repositoryProvider, prosessTaskRepository, behandlingskontrollTjeneste, historikkinnslagTjeneste);
     private KravVedtakStatusTjeneste kravVedtakStatusTjeneste = new KravVedtakStatusTjeneste(kravVedtakStatusRepository, behandlingRepository, henleggBehandlingTjeneste, behandlingskontrollTjeneste);
     private KravVedtakStatusMapper kravVedtakStatusMapper = new KravVedtakStatusMapper(tpsAdapterWrapper);
-    private LesKravvedtakStatusTask lesKravvedtakStatusTask = new LesKravvedtakStatusTask(mottattXmlRepository, eksternBehandlingRepository, prosessTaskRepository,
+    private LesKravvedtakStatusTask lesKravvedtakStatusTask = new LesKravvedtakStatusTask(mottattXmlRepository, repositoryProvider, prosessTaskRepository,
         kravVedtakStatusTjeneste, kravVedtakStatusMapper, fpsakKlientMock);
 
     private Long mottattXmlId;
@@ -42,7 +43,7 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
 
     @Before
     public void setup() {
-        EksternBehandling eksternBehandling = new EksternBehandling(behandling, FPSAK_BEHANDLING_ID);
+        EksternBehandling eksternBehandling = new EksternBehandling(behandling, FPSAK_BEHANDLING_ID,FPSAK_BEHANDLING_UUID);
         eksternBehandlingRepository.lagre(eksternBehandling);
     }
 
@@ -109,20 +110,20 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_utføre_leskravvedtakstatus_task_for_behandling_som_finnes_ikke_iFpsak(){
+    public void skal_utføre_leskravvedtakstatus_task_for_behandling_som_finnes_ikke_iFpsak() {
         // den xml-en har behandlngId som finnes ikke i EksternBehandling
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_ugyldig.xml"));
-        when(fpsakKlientMock.finnesBehandlingIFpsak(anyLong())).thenReturn(false);
+        when(fpsakKlientMock.finnesBehandlingIFpsak(anyString())).thenReturn(false);
 
         expectedException.expectMessage("FPT-587196");
         lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LesKravvedtakStatusTask.TASKTYPE));
     }
 
     @Test
-    public void skal_utføre_leskravvedtakstatus_task_når_fptilbake_har_ingen_åpenBehandling(){
+    public void skal_utføre_leskravvedtakstatus_task_når_fptilbake_har_ingen_åpenBehandling() {
         // den xml-en har behandlngId som finnes ikke i EksternBehandling
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_ugyldig.xml"));
-        when(fpsakKlientMock.finnesBehandlingIFpsak(anyLong())).thenReturn(true);
+        when(fpsakKlientMock.finnesBehandlingIFpsak(anyString())).thenReturn(true);
 
         lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LesKravvedtakStatusTask.TASKTYPE));
 
@@ -130,11 +131,37 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_utføre_leskravvedtakstatus_task_for_behandling_som_er_ugyldig(){
+    public void skal_utføre_leskravvedtakstatus_task_for_behandling_som_er_ugyldig() {
         // den xml-en har behandlngId som finnes ikke i EksternBehandling
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_ugyldigreferanse.xml"));
 
         expectedException.expectMessage("FPT-675364");
         lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LesKravvedtakStatusTask.TASKTYPE));
+    }
+
+    @Test
+    public void skal_utføre_leskravvedtakstatus_task_for_behandling_som_allerede_har_grunnlag() {
+        repoRule.getEntityManager().createQuery("delete from EksternBehandling").executeUpdate();
+        EksternBehandling eksternBehandling = new EksternBehandling(behandling, 100000001L,FPSAK_BEHANDLING_UUID);
+        eksternBehandlingRepository.lagre(eksternBehandling);
+
+        mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_FEIL.xml"));
+        lesKravgrunnlagTask.doTask(lagProsessTaskData(mottattXmlId, LesKravgrunnlagTask.TASKTYPE));
+
+        mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_SPER.xml"));
+        lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LesKravvedtakStatusTask.TASKTYPE));
+
+        eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandling.getId());
+        assertThat(eksternBehandling.getEksternId()).isEqualTo(FPSAK_BEHANDLING_ID);
+
+        assertThat(mottattXmlRepository.finnForEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID))).isPresent();
+        assertThat(behandling.isBehandlingPåVent()).isTrue();
+        assertThat(behandling.getAksjonspunktFor(AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)).isNotNull();
+        assertThat(behandling.getVenteårsak()).isEqualByComparingTo(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
+
+        Optional<KravVedtakStatusAggregate> aggregate = kravVedtakStatusRepository.finnForBehandlingId(behandling.getId());
+        assertThat(aggregate).isPresent();
+        KravVedtakStatus437 kravVedtakStatus437 = aggregate.get().getKravVedtakStatus();
+        assertThat(kravVedtakStatus437.getKravStatusKode()).isEqualByComparingTo(KravStatusKode.SPERRET);
     }
 }

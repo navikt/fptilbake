@@ -3,6 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.behandling;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BehandlingFeilutbetalingFakta;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -20,9 +21,9 @@ public interface BehandlingTjeneste {
 
     void endreBehandlingPåVent(Long behandlingId, LocalDate frist, Venteårsak venteårsak);
 
-    Long opprettBehandlingManuell(Saksnummer saksnummer, long eksternBehandlingId, AktørId aktørId, String fagsakYtelseType, BehandlingType behandlingType);
+    Long opprettBehandlingManuell(Saksnummer saksnummer, UUID eksternUuid, AktørId aktørId, String fagsakYtelseType, BehandlingType behandlingType);
 
-    Long opprettBehandlingAutomatisk(Saksnummer saksnummer, long fagsakId, long eksternbehandlingId,
+    Long opprettBehandlingAutomatisk(Saksnummer saksnummer, UUID eksternUuid, long eksternbehandlingId,
                                      AktørId aktørId, FagsakYtelseType fagsakYtelseType, BehandlingType behandlingType);
 
     void kanEndreBehandling(Long behandlingId, Long versjon);
@@ -32,5 +33,7 @@ public interface BehandlingTjeneste {
     Optional<BehandlingFeilutbetalingFakta> hentBehandlingFeilutbetalingFakta(Long behandlingId);
 
     boolean erBehandlingHenlagt(Behandling behandling);
+
+    long hentEksternBehandling(UUID eksternUuid);
 
 }

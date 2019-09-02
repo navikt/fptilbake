@@ -2,6 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.fpsak.klient;
 
 import java.net.URI;
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -9,13 +10,12 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.yaml.snakeyaml.util.UriEncoder;
 
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.BehandlingResourceLinkDto;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlinger;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.FagsakDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.PersonopplysningDto;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.TilbakekrevingDataDto;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.TilbakekrevingValgDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.VarseltekstDto;
 import no.nav.vedtak.felles.integrasjon.rest.OidcRestClient;
 import no.nav.vedtak.konfig.PropertyUtil;
@@ -29,16 +29,15 @@ public class FpsakKlient {
     private static final String FPSAK_OVERRIDE_URL = "fpsak.override.url";
     private static final String FPSAK_API_PATH = "/fpsak/api";
 
-    private static final String BEHANDLING_EP = "/behandlinger";
-    private static final String FAGSAK_EP = "/fagsak";
-
-    private static final String TILBAKEKREVING_EP = "/behandling/tilbakekreving";
-    private static final String TILBAKEKREVING_DATA_EP = TILBAKEKREVING_EP + "/data";
-    private static final String TILBAKEKREVING_VARSELTEKST_EP = TILBAKEKREVING_EP + "/varseltekst";
+    private static final String BEHANDLING_EP = "/behandling/backend-root";
+    private static final String BEHANDLING_ALLE_EP = "/behandlinger/alle";
 
     private static final String FILTER_REL_PERSONOPPLYSNINGER = "soeker-personopplysninger";
+    private static final String FILTER_REL_TILBAKEKREVINGVALG = "tilbakekreving-valg";
+    private static final String FILTER_REL_VARSELFRITEKST = "tilbakekrevingsvarsel-fritekst";
 
-    private static final String PARAM_NAME_BEHANDLING_ID = "behandlingId";
+    private static final String PARAM_NAME_BEHANDLING_UUID = "uuid";
+    private static final String PARAM_NAME_SAKSNUMMER = "saksnummer";
 
     private OidcRestClient restClient;
 
@@ -51,46 +50,51 @@ public class FpsakKlient {
         this.restClient = restClient;
     }
 
-    public Long hentFagsakId(long behandlingId) {
-        Optional<EksternBehandlingsinfoDto> eksternBehandlingOptional = hentBehandling(behandlingId);
-
-        EksternBehandlingsinfoDto eksternBehandlingsinfoDto = eksternBehandlingOptional.orElseThrow(() -> FpsakKlientFeil.FACTORY.fantIkkeBehandlingIFpsak(behandlingId).toException());
-
-        return eksternBehandlingsinfoDto.getFagsakId();
+    public boolean finnesBehandlingIFpsak(String saksnummer) {
+        Optional<EksternBehandlinger> eksternBehandlinger = hentBehandlingForSaksnummer(saksnummer);
+        return eksternBehandlinger.map(behandlinger -> behandlinger.getEksternBehandlingerInfo().stream()
+            .anyMatch(eksternBehandlingsinfoDto -> saksnummer.equals(eksternBehandlingsinfoDto.getSaksnummer()))).orElse(false);
     }
 
-    public boolean finnesBehandlingIFpsak(Long behandlingId) {
-        return hentBehandling(behandlingId).isPresent();
-    }
-
-    public Optional<EksternBehandlingsinfoDto> hentBehandlingsinfo(long behandlingId, String saksnummer) {
-        Optional<EksternBehandlingsinfoDto> eksternBehandlingsinfoDtoOptional = hentBehandling(behandlingId);
+    public Optional<EksternBehandlingsinfoDto> hentBehandlingsinfo(UUID eksternUuid) {
+        Optional<EksternBehandlingsinfoDto> eksternBehandlingsinfoDtoOptional = hentBehandling(eksternUuid);
 
         eksternBehandlingsinfoDtoOptional.ifPresent(eksternBehandlingsinfo -> {
-            eksternBehandlingsinfo.getLinks().forEach(resourceLink -> {
-                final Optional<PersonopplysningDto> personopplysningDto = hentPersonopplysninger(resourceLink);
+            eksternBehandlingsinfo.getLinks().forEach(personopplysningRessursLink -> {
+                final Optional<PersonopplysningDto> personopplysningDto = hentPersonopplysninger(personopplysningRessursLink);
                 personopplysningDto.ifPresent(eksternBehandlingsinfo::setPersonopplysningDto);
             });
 
-            Optional<FagsakDto> fagsakDto = hentFagsakType(saksnummer);
-            fagsakDto.ifPresent(fagsakType -> eksternBehandlingsinfo.setFagsaktype(fagsakType.getSakstype()));
-
-            Optional<String> varseltekstDto = hentVarseltekst(behandlingId);
-            varseltekstDto.ifPresent(eksternBehandlingsinfo::setVarseltekst);
+            eksternBehandlingsinfo.getLinks().forEach(varselRessursLink -> {
+                final Optional<VarseltekstDto> varseltekstDto = hentVarseltekst(varselRessursLink);
+                varseltekstDto.ifPresent(varselTekst -> eksternBehandlingsinfo.setVarseltekst(varselTekst.getVarseltekst()));
+            });
 
         });
         return eksternBehandlingsinfoDtoOptional;
     }
 
-    public Optional<String> hentVarseltekst(long behandlingId) {
-        URI endpointUri = createUri(TILBAKEKREVING_VARSELTEKST_EP, PARAM_NAME_BEHANDLING_ID, String.valueOf(behandlingId));
-        Optional<VarseltekstDto> varseltekstDto = get(endpointUri, VarseltekstDto.class);
-        return varseltekstDto.map(VarseltekstDto::getVarseltekst);
+    public Optional<EksternBehandlingsinfoDto> hentBehandling(UUID eksternUuid) {
+        URI endpoint = createUri(BEHANDLING_EP, PARAM_NAME_BEHANDLING_UUID, eksternUuid.toString());
+        return get(endpoint, EksternBehandlingsinfoDto.class);
     }
 
-    private Optional<EksternBehandlingsinfoDto> hentBehandling(long behandlingId) {
-        URI endpoint = createUri(BEHANDLING_EP, PARAM_NAME_BEHANDLING_ID, String.valueOf(behandlingId));
-        return get(endpoint, EksternBehandlingsinfoDto.class);
+    public Optional<TilbakekrevingValgDto> hentTilbakekrevingValg(String eksternUuid) {
+        Optional<EksternBehandlingsinfoDto> eksternBehandlingsinfoDtoOptional = hentBehandling(UUID.fromString(eksternUuid));
+        if (eksternBehandlingsinfoDtoOptional.isPresent()) {
+            Optional<BehandlingResourceLinkDto> ressursLink = eksternBehandlingsinfoDtoOptional.get().getLinks().stream()
+                .filter(resourceLink -> FILTER_REL_TILBAKEKREVINGVALG.equals(resourceLink.getRel())).findAny();
+            if (ressursLink.isPresent()) {
+                return hentTilbakekrevingValg(ressursLink.get());
+            }
+        }
+        return Optional.empty();
+    }
+
+
+    private Optional<EksternBehandlinger> hentBehandlingForSaksnummer(String saksnummer) {
+        URI endpoint = createUri(BEHANDLING_ALLE_EP, PARAM_NAME_SAKSNUMMER, saksnummer);
+        return get(endpoint, EksternBehandlinger.class);
     }
 
     private Optional<PersonopplysningDto> hentPersonopplysninger(BehandlingResourceLinkDto resourceLink) {
@@ -101,15 +105,19 @@ public class FpsakKlient {
         return Optional.empty();
     }
 
-    private Optional<FagsakDto> hentFagsakType(String saksnummer) {
-        URI endpoint = createUri(FAGSAK_EP, "saksnummer", saksnummer);
-        return get(endpoint, FagsakDto.class);
+    private Optional<VarseltekstDto> hentVarseltekst(BehandlingResourceLinkDto resourceLink) {
+        if (FILTER_REL_VARSELFRITEKST.equals(resourceLink.getRel())) {
+            URI endpoint = URI.create(baseUri() + resourceLink.getHref());
+            return get(endpoint, VarseltekstDto.class);
+        }
+        return Optional.empty();
     }
 
-    public Optional<TilbakekrevingDataDto> hentTilbakekrevingData(long behandlingId) {
-        URI endpoint = createUri(TILBAKEKREVING_DATA_EP, PARAM_NAME_BEHANDLING_ID, String.valueOf(behandlingId));
-        return get(endpoint, TilbakekrevingDataDto.class);
+    private Optional<TilbakekrevingValgDto> hentTilbakekrevingValg(BehandlingResourceLinkDto resourceLink) {
+        URI endpoint = URI.create(baseUri() + resourceLink.getHref());
+        return get(endpoint, TilbakekrevingValgDto.class);
     }
+
 
     private <T> Optional<T> get(URI endpoint, Class<T> tClass) {
         return restClient.getReturnsOptional(endpoint, tClass);
@@ -141,4 +149,5 @@ public class FpsakKlient {
     private boolean notNullOrEmpty(String str) {
         return (str != null && !str.isEmpty());
     }
+
 }

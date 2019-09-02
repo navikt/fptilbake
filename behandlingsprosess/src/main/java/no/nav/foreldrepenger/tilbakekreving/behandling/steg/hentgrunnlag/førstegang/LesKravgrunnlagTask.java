@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.FellesTask;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TaskProperty;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
@@ -47,13 +48,13 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
     @Inject
     public LesKravgrunnlagTask(ØkonomiMottattXmlRepository økonomiMottattXmlRepository, KravgrunnlagTjeneste kravgrunnlagTjeneste,
                                ProsessTaskRepository taskRepository, KravgrunnlagMapper kravgrunnlagMapper,
-                               EksternBehandlingRepository eksternBehandlingRepository, FpsakKlient fpsakKlient) {
-        super(taskRepository,fpsakKlient);
-
+                               BehandlingRepositoryProvider repositoryProvider, FpsakKlient fpsakKlient) {
+        super(taskRepository, repositoryProvider.getGrunnlagRepository(), fpsakKlient);
         this.økonomiMottattXmlRepository = økonomiMottattXmlRepository;
+        this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
+
         this.kravgrunnlagTjeneste = kravgrunnlagTjeneste;
         this.kravgrunnlagMapper = kravgrunnlagMapper;
-        this.eksternBehandlingRepository = eksternBehandlingRepository;
     }
 
     @Override
@@ -63,6 +64,7 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
         String råXml = økonomiMottattXmlRepository.hentMottattXml(mottattXmlId);
         DetaljertKravgrunnlag kravgrunnlagDto = KravgrunnlagXmlUnmarshaller.unmarshall(mottattXmlId, råXml);
         String eksternBehandlingId = kravgrunnlagMapper.finnBehandlngId(kravgrunnlagDto);
+        String saksnummer = finnSaksnummer(kravgrunnlagDto.getFagsystemId());
         Kravgrunnlag431 kravgrunnlag = kravgrunnlagMapper.mapTilDomene(kravgrunnlagDto);
 
         økonomiMottattXmlRepository.oppdaterMedEksternBehandlingId(eksternBehandlingId, mottattXmlId);
@@ -74,7 +76,7 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
             kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(internId, kravgrunnlag);
             logger.info("Leste kravgrunnlag med id={} eksternBehandlingId={} internBehandlingId={}", mottattXmlId, eksternBehandlingId, internId);
         } else {
-            validerBehandlingsEksistens(eksternBehandlingId);
+            validerBehandlingsEksistens(eksternBehandlingId, saksnummer);
             logger.info("Ignorerte kravgrunnlag med id={} eksternBehandlingId={}. Fantes ikke tilbakekrevingsbehandling", mottattXmlId, eksternBehandlingId);
         }
         opprettProsesstaskForÅSletteXml(mottattXmlId);
@@ -88,11 +90,11 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
         return Optional.empty();
     }
 
-    private void validerBehandlingsEksistens(String eksternBehandlingId) {
+    private void validerBehandlingsEksistens(String eksternBehandlingId, String saksnummer) {
         if (!erGyldigTall(eksternBehandlingId)) {
             throw LesKravgrunnlagTaskFeil.FACTORY.behandlingFinnesIkkeIFpsak(eksternBehandlingId).toException();
         }
-        if (!erBehandlingFinnesIFpsak(eksternBehandlingId)) {
+        if (!erBehandlingFinnesIFpsak(saksnummer)) {
             throw LesKravgrunnlagTaskFeil.FACTORY.behandlingFinnesIkkeIFpsak(Long.valueOf(eksternBehandlingId)).toException();
         }
     }

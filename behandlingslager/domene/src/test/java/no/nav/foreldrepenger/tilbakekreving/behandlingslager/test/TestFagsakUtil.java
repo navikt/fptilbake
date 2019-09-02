@@ -16,28 +16,20 @@ public class TestFagsakUtil {
     public static final Saksnummer SAKSNUMMER = new Saksnummer("124355");
 
     public static Fagsak opprettFagsak() {
-        return opprettFagsak(genererFagsakId(), genererSaksnummer(), genererBruker());
+        return opprettFagsak(genererSaksnummer(), genererBruker());
     }
 
     public static Fagsak opprettFagsak(NavBruker bruker) {
-        return opprettFagsak(genererFagsakId(), SAKSNUMMER, bruker);
+        return opprettFagsak(SAKSNUMMER, bruker);
     }
 
     public static Fagsak opprettFagsak(Saksnummer saksnummer, NavBruker bruker) {
-        return opprettFagsak(genererFagsakId(), saksnummer, bruker);
-    }
-
-    public static Fagsak opprettFagsak(long fagsakId, Saksnummer saksnummer, NavBruker bruker) {
-        return Fagsak.opprettNy(fagsakId, saksnummer, bruker);
+        return Fagsak.opprettNy(saksnummer, bruker);
     }
 
     public static NavBruker genererBruker() {
         AktørId aktørId = new AktørId(nyId());
         return NavBruker.opprettNy(aktørId, Språkkode.nb);
-    }
-
-    public static Long genererFagsakId() {
-        return FAKE_FID.getAndIncrement();
     }
 
     public static Saksnummer genererSaksnummer() {

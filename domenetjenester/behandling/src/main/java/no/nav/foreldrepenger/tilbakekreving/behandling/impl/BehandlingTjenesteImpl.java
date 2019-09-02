@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -50,6 +51,7 @@ import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.Feilutbetal
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.UnderÅrsakDto;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagAggregate;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagBelop433;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432;
@@ -155,20 +157,20 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
     }
 
     @Override
-    public Long opprettBehandlingManuell(Saksnummer saksnummer, long eksternBehandlingId,
+    public Long opprettBehandlingManuell(Saksnummer saksnummer, UUID eksternUuid,
                                          AktørId aktørId, String ytelseType,
                                          BehandlingType behandlingType) {
-        Long fagsakId = fpsakKlient.hentFagsakId(eksternBehandlingId);
         FagsakYtelseType fagsakYtelseType = FagsakYtelseType.fraKode(ytelseType);
+        Long eksternBehandlingId = hentEksternBehandling(eksternUuid);
 
-        return opprettFørstegangsbehandling(saksnummer, fagsakId, eksternBehandlingId, aktørId, fagsakYtelseType, behandlingType);
+        return opprettFørstegangsbehandling(saksnummer, eksternUuid, eksternBehandlingId, aktørId, fagsakYtelseType, behandlingType);
     }
 
     @Override
-    public Long opprettBehandlingAutomatisk(Saksnummer saksnummer, long fagsakId, long eksternBehandlingId,
+    public Long opprettBehandlingAutomatisk(Saksnummer saksnummer, UUID eksternUuid, long eksternBehandlingId,
                                             AktørId aktørId, FagsakYtelseType fagsakYtelseType,
                                             BehandlingType behandlingType) {
-        return opprettFørstegangsbehandling(saksnummer, fagsakId, eksternBehandlingId, aktørId, fagsakYtelseType, behandlingType);
+        return opprettFørstegangsbehandling(saksnummer, eksternUuid, eksternBehandlingId, aktørId, fagsakYtelseType, behandlingType);
     }
 
     @Override
@@ -214,6 +216,15 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
         return behandlingsresultat.isPresent() && behandlingsresultat.get().erBehandlingHenlagt();
     }
 
+    @Override
+    public long hentEksternBehandling(UUID eksternUuid) {
+        Optional<EksternBehandlingsinfoDto> eksternBehandlingsInfo = fpsakKlient.hentBehandling(eksternUuid);
+        if(eksternBehandlingsInfo.isPresent()){
+            return eksternBehandlingsInfo.get().getId();
+        }
+        throw BehandlingFeil.FACTORY.fantIkkeEksternBehandlingForUuid(eksternUuid.toString()).toException();
+    }
+
 
     private void formFeilutbetalingÅrsak(Long behandlingId, UtbetaltPeriode utbetaltPeriode) {
         Optional<FeilutbetalingAggregate> feilutbetalingAggregate = behandlingRepositoryProvider.getFeilutbetalingRepository()
@@ -229,18 +240,18 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
         }
     }
 
-    private Long opprettFørstegangsbehandling(Saksnummer saksnummer, long fagsakId, long eksternBehandlingId,
+    private Long opprettFørstegangsbehandling(Saksnummer saksnummer, UUID eksternUuid, long eksternBehandlingId,
                                               AktørId aktørId, FagsakYtelseType fagsakYtelseType,
                                               BehandlingType behandlingType) {
-        logger.info("Oppretter behandling for fagsak [id: {} saksnummer: {} ] for ekstern behandling [ {} ]", fagsakId, saksnummer, eksternBehandlingId);
+        logger.info("Oppretter Tilbakekrevingbehandling for [saksnummer: {} ] for ekstern Uuid [ {} ]", saksnummer, eksternUuid.toString());
 
-        Fagsak fagsak = fagsakTjeneste.finnEllerOpprettFagsak(fagsakId, saksnummer, aktørId, fagsakYtelseType);
+        Fagsak fagsak = fagsakTjeneste.opprettFagsak(saksnummer, aktørId, fagsakYtelseType);
 
         Behandling behandling = Behandling.nyBehandlingFor(fagsak, behandlingType).build();
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
         Long behandlingId = behandlingRepository.lagre(behandling, lås);
 
-        EksternBehandling eksternBehandling = new EksternBehandling(behandling, eksternBehandlingId);
+        EksternBehandling eksternBehandling = new EksternBehandling(behandling, eksternBehandlingId,eksternUuid);
         eksternBehandlingRepository.lagre(eksternBehandling);
 
         historikkinnslagTjeneste.opprettHistorikkinnslagForOpprettetBehandling(behandling); // FIXME: sjekk om journalpostId skal hentes ///
