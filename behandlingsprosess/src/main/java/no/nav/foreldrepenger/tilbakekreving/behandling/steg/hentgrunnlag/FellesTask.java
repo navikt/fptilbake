@@ -36,8 +36,8 @@ public abstract class FellesTask {
         return referanse != null && referanse.matches("^\\d*$");
     }
 
-    protected boolean erBehandlingFinnesIFpsak(String saksnummer) {
-        return fpsakKlient.finnesBehandlingIFpsak(saksnummer);
+    protected boolean erBehandlingFinnesIFpsak(String saksnummer, String eksternBehandlingId) {
+        return fpsakKlient.finnesBehandlingIFpsak(saksnummer,Long.valueOf(eksternBehandlingId));
     }
 
     protected String finnSaksnummer(String fagsystemId) {

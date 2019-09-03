@@ -16,12 +16,16 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.tilbakekrevingsvalg.VidereBehandling;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.BehandlingResourceLinkDto;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlinger;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.KodeDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.PersonadresseDto;
@@ -77,19 +81,20 @@ public class FpsakKlientTest {
 
     @Test
     public void skal_returnere_hvis_finnes_behandling_i_fpsak() {
-        EksternBehandlinger eksternBehandlinger = new EksternBehandlinger();
-        eksternBehandlinger.getEksternBehandlingerInfo().add(dokumentinfoDto());
-        when(oidcRestClientMock.getReturnsOptional(BEHANDLING_ALLE_URI, EksternBehandlinger.class)).thenReturn(Optional.of(eksternBehandlinger));
+        EksternBehandlingsinfoDto eksternBehandlingInfo = dokumentinfoDto();
+        JsonNode jsonNode = new ObjectMapper().convertValue(Lists.newArrayList(eksternBehandlingInfo), JsonNode.class);
+        when(oidcRestClientMock.get(BEHANDLING_ALLE_URI, JsonNode.class)).thenReturn(jsonNode);
 
-        boolean erFinnesIFpsak = klient.finnesBehandlingIFpsak(SAKSNUMMER);
+        boolean erFinnesIFpsak = klient.finnesBehandlingIFpsak(SAKSNUMMER, BEHANDLING_ID);
         assertThat(erFinnesIFpsak).isTrue();
     }
 
     @Test
     public void skal_returnere_tom_hvis_finnes_ikke_behandling_i_fpsak() {
-        when(oidcRestClientMock.getReturnsOptional(BEHANDLING_ALLE_URI, EksternBehandlinger.class)).thenReturn(Optional.empty());
+        JsonNode jsonNode = new ObjectMapper().convertValue(Lists.newArrayList(), JsonNode.class);
+        when(oidcRestClientMock.get(BEHANDLING_ALLE_URI, JsonNode.class)).thenReturn(jsonNode);
 
-        boolean erFinnesIFpsak = klient.finnesBehandlingIFpsak(SAKSNUMMER);
+        boolean erFinnesIFpsak = klient.finnesBehandlingIFpsak(SAKSNUMMER, BEHANDLING_ID);
         assertThat(erFinnesIFpsak).isFalse();
     }
 
@@ -120,7 +125,6 @@ public class FpsakKlientTest {
         dto.setPersonopplysningDto(personopplysningDto());
         dto.setBehandlendeEnhetId("4214");
         dto.setBehandlendeEnhetNavn("enhetnavn");
-        dto.setSprakkode(Språkkode.nb);
         dto.setAnsvarligSaksbehandler("saksbehandler");
         dto.setId(BEHANDLING_ID);
         dto.setLinks(resourcelinks());
