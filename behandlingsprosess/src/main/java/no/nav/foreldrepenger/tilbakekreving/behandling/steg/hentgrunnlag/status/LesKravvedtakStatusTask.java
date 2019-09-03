@@ -104,7 +104,7 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
         if (!erGyldigTall(eksternBehandlingId)) {
             throw LesKravvedtakStatusTask.LesKravvedtakStatusTaskFeil.FACTORY.behandlingFinnesIkkeIFpsak(eksternBehandlingId).toException();
         }
-        if (!erBehandlingFinnesIFpsak(saksnummer)) {
+        if (!erBehandlingFinnesIFpsak(saksnummer,eksternBehandlingId)) {
             throw LesKravvedtakStatusTask.LesKravvedtakStatusTaskFeil.FACTORY.behandlingFinnesIkkeIFpsak(Long.valueOf(eksternBehandlingId)).toException();
         }
     }
