@@ -82,6 +82,7 @@ public class FpsakKlientTest {
     @Test
     public void skal_returnere_hvis_finnes_behandling_i_fpsak() {
         EksternBehandlingsinfoDto eksternBehandlingInfo = dokumentinfoDto();
+
         JsonNode jsonNode = new ObjectMapper().convertValue(Lists.newArrayList(eksternBehandlingInfo), JsonNode.class);
         when(oidcRestClientMock.get(BEHANDLING_ALLE_URI, JsonNode.class)).thenReturn(jsonNode);
 

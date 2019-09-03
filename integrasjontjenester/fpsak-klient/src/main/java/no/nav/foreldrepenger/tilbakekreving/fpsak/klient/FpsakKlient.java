@@ -56,6 +56,7 @@ public class FpsakKlient {
         this.restClient = restClient;
     }
 
+
     public boolean finnesBehandlingIFpsak(String saksnummer, Long eksternBehandlingId) {
         List<EksternBehandlingsinfoDto> eksternBehandlinger = hentBehandlingForSaksnummer(saksnummer);
         if (!eksternBehandlinger.isEmpty()) {
