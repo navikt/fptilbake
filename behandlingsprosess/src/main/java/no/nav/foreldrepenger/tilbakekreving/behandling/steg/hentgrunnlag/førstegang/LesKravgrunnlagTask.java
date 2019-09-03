@@ -94,7 +94,7 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
         if (!erGyldigTall(eksternBehandlingId)) {
             throw LesKravgrunnlagTaskFeil.FACTORY.behandlingFinnesIkkeIFpsak(eksternBehandlingId).toException();
         }
-        if (!erBehandlingFinnesIFpsak(saksnummer)) {
+        if (!erBehandlingFinnesIFpsak(saksnummer,eksternBehandlingId)) {
             throw LesKravgrunnlagTaskFeil.FACTORY.behandlingFinnesIkkeIFpsak(Long.valueOf(eksternBehandlingId)).toException();
         }
     }

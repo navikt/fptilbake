@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.status;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -113,7 +114,7 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
     public void skal_utføre_leskravvedtakstatus_task_for_behandling_som_finnes_ikke_iFpsak() {
         // den xml-en har behandlngId som finnes ikke i EksternBehandling
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_ugyldig.xml"));
-        when(fpsakKlientMock.finnesBehandlingIFpsak(anyString())).thenReturn(false);
+        when(fpsakKlientMock.finnesBehandlingIFpsak(anyString(),anyLong())).thenReturn(false);
 
         expectedException.expectMessage("FPT-587196");
         lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LesKravvedtakStatusTask.TASKTYPE));
@@ -123,7 +124,7 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
     public void skal_utføre_leskravvedtakstatus_task_når_fptilbake_har_ingen_åpenBehandling() {
         // den xml-en har behandlngId som finnes ikke i EksternBehandling
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_ugyldig.xml"));
-        when(fpsakKlientMock.finnesBehandlingIFpsak(anyString())).thenReturn(true);
+        when(fpsakKlientMock.finnesBehandlingIFpsak(anyString(),anyLong())).thenReturn(true);
 
         lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LesKravvedtakStatusTask.TASKTYPE));
 

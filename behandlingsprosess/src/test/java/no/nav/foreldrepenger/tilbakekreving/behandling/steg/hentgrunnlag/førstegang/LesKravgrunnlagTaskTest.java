@@ -42,7 +42,7 @@ public class LesKravgrunnlagTaskTest extends FellesTestOppsett {
 
     @Test
     public void skal_utføre_leskravgrunnlag_task_nårBehandlingFinnesIkkeIFpsak() {
-        when(fpsakKlientMock.finnesBehandlingIFpsak(fagsak.getSaksnummer().getVerdi())).thenReturn(false);
+        when(fpsakKlientMock.finnesBehandlingIFpsak(fagsak.getSaksnummer().getVerdi(),FPSAK_BEHANDLING_ID)).thenReturn(false);
 
         expectedException.expectMessage("FPT-587195");
         lesKravgrunnlagTask.doTask(lagProsessTaskData());

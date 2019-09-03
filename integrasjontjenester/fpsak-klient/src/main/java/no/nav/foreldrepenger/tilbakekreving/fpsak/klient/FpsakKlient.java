@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.fpsak.klient;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -12,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.BehandlingResourceLinkDto;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlinger;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.PersonopplysningDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.TilbakekrevingValgDto;
@@ -50,10 +50,13 @@ public class FpsakKlient {
         this.restClient = restClient;
     }
 
-    public boolean finnesBehandlingIFpsak(String saksnummer) {
-        Optional<EksternBehandlinger> eksternBehandlinger = hentBehandlingForSaksnummer(saksnummer);
-        return eksternBehandlinger.map(behandlinger -> behandlinger.getEksternBehandlingerInfo().stream()
-            .anyMatch(eksternBehandlingsinfoDto -> saksnummer.equals(eksternBehandlingsinfoDto.getSaksnummer()))).orElse(false);
+    public boolean finnesBehandlingIFpsak(String saksnummer,Long eksternBehandlingId) {
+        List<EksternBehandlingsinfoDto> eksternBehandlinger = hentBehandlingForSaksnummer(saksnummer);
+        if (!eksternBehandlinger.isEmpty()) {
+            return eksternBehandlinger.stream()
+                .anyMatch(eksternBehandlingsinfoDto -> eksternBehandlingId.equals(eksternBehandlingsinfoDto.getId()));
+        }
+        return false;
     }
 
     public Optional<EksternBehandlingsinfoDto> hentBehandlingsinfo(UUID eksternUuid) {
@@ -92,9 +95,9 @@ public class FpsakKlient {
     }
 
 
-    private Optional<EksternBehandlinger> hentBehandlingForSaksnummer(String saksnummer) {
+    private List<EksternBehandlingsinfoDto> hentBehandlingForSaksnummer(String saksnummer) {
         URI endpoint = createUri(BEHANDLING_ALLE_EP, PARAM_NAME_SAKSNUMMER, saksnummer);
-        return get(endpoint, EksternBehandlinger.class);
+        return restClient.get(endpoint, List.class);
     }
 
     private Optional<PersonopplysningDto> hentPersonopplysninger(BehandlingResourceLinkDto resourceLink) {
