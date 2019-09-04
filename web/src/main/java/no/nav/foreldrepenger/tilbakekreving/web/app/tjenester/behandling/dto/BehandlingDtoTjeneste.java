@@ -70,7 +70,7 @@ public class BehandlingDtoTjeneste {
         }
 
         dto.leggTil(new ResourceLink("/fptilbake/api/brev/maler?behandlingId=" + behandling.getId(), "brev-maler", ResourceLink.HttpMethod.GET));
-        dto.leggTil(new ResourceLink("/fptilbake/api/brev/bestill", "brev-bestil", ResourceLink.HttpMethod.POST));
+        dto.leggTil(new ResourceLink("/fptilbake/api/brev/bestill", "brev-bestill", ResourceLink.HttpMethod.POST));
 
         return dto;
     }
