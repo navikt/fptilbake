@@ -25,7 +25,7 @@ public class BehandlingType extends Kodeliste {
      * for å hente offisiell kode for et Nav kodeverk).
      */
     public static final BehandlingType TILBAKEKREVING = new BehandlingType("BT-007"); //$NON-NLS-1$
-    public static final BehandlingType REVURDERING_TILBAKEKREVING = new BehandlingType("BT-008"); //$NON-NLS-1$
+    public static final BehandlingType REVURDERING_TILBAKEKREVING = new BehandlingType("BT-009"); //$NON-NLS-1$
     /**
      * Alle kodeverk må ha en verdi, det kan ikke være null i databasen. Denne koden gjør samme nytten.
      */
