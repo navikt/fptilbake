@@ -63,10 +63,10 @@ public class BehandlingDtoTjeneste {
 
         // Totrinnsbehandling
         if (BehandlingStatus.FATTER_VEDTAK.equals(behandling.getStatus())) {
-            dto.leggTil(new ResourceLink("/fptilbake/api/behandling/totrinnskontroll/arsaker", "totrinnskontroll-arsaker", ResourceLink.HttpMethod.POST));
+            dto.leggTil(new ResourceLink("/fptilbake/api/behandling/totrinnskontroll/arsaker?behandlingId=" + behandling.getId(), "totrinnskontroll-arsaker", ResourceLink.HttpMethod.GET));
             dto.leggTil(new ResourceLink("/fptilbake/api/behandling/aksjonspunkt", "bekreft-totrinnsaksjonspunkt", ResourceLink.HttpMethod.POST));
         } else if (BehandlingStatus.UTREDES.equals(behandling.getStatus())) {
-            dto.leggTil(new ResourceLink("/fptilbake/api/behandling/totrinnskontroll/arsaker_read_only", "totrinnskontroll-arsaker-readOnly", ResourceLink.HttpMethod.POST));
+            dto.leggTil(new ResourceLink("/fptilbake/api/behandling/totrinnskontroll/arsaker_read_only?behandlingId=" + behandling.getId(), "totrinnskontroll-arsaker-readOnly", ResourceLink.HttpMethod.GET));
         }
 
         dto.leggTil(new ResourceLink("/fptilbake/api/brev/maler?behandlingId=" + behandling.getId(), "brev-maler", ResourceLink.HttpMethod.GET));
