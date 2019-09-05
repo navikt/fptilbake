@@ -53,9 +53,9 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
 
     @Inject
     public LesKravvedtakStatusTask(ØkonomiMottattXmlRepository økonomiMottattXmlRepository, BehandlingRepositoryProvider repositoryProvider,
-                                   ProsessTaskRepository prosessTaskRepository,KravVedtakStatusTjeneste kravVedtakStatusTjeneste,
-                                   KravVedtakStatusMapper statusMapper,FpsakKlient fpsakKlient) {
-        super(prosessTaskRepository,repositoryProvider.getGrunnlagRepository(),fpsakKlient);
+                                   ProsessTaskRepository prosessTaskRepository, KravVedtakStatusTjeneste kravVedtakStatusTjeneste,
+                                   KravVedtakStatusMapper statusMapper, FpsakKlient fpsakKlient) {
+        super(prosessTaskRepository, repositoryProvider.getGrunnlagRepository(), fpsakKlient);
         this.økonomiMottattXmlRepository = økonomiMottattXmlRepository;
         this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
@@ -77,7 +77,7 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
         økonomiMottattXmlRepository.oppdaterMedEksternBehandlingId(eksternBehandlingId, mottattXmlId);
 
         long vedtakId = statusMapper.finnVedtakId(kravOgVedtakstatus);
-        oppdatereEksternBehandling(vedtakId,eksternBehandlingId);
+        oppdatereEksternBehandling(vedtakId, eksternBehandlingId);
 
         Optional<EksternBehandling> behandlingKobling = hentKoblingTilInternBehandling(eksternBehandlingId);
         if (behandlingKobling.isPresent()) {
@@ -104,26 +104,33 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
         if (!erGyldigTall(eksternBehandlingId)) {
             throw LesKravvedtakStatusTask.LesKravvedtakStatusTaskFeil.FACTORY.behandlingFinnesIkkeIFpsak(eksternBehandlingId).toException();
         }
-        if (!erBehandlingFinnesIFpsak(saksnummer,eksternBehandlingId)) {
+        if (!erBehandlingFinnesIFpsak(saksnummer, eksternBehandlingId)) {
             throw LesKravvedtakStatusTask.LesKravvedtakStatusTaskFeil.FACTORY.behandlingFinnesIkkeIFpsak(Long.valueOf(eksternBehandlingId)).toException();
         }
     }
 
-    private void oppdatereEksternBehandling(long vedtakId,String eksternBehandlingId){
+    private void oppdatereEksternBehandling(long vedtakId, String eksternBehandlingId) {
         Optional<KravgrunnlagAggregate> aggregate = finnGrunnlagForVedtakId(vedtakId);
-        if(aggregate.isPresent()){
-            logger.info("Grunnlag finnes allerede for vedtakId={}",vedtakId);
-            Long behandlingId = aggregate.get().getBehandlingId();
-            Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-            UUID eksternUUID = hentUUIDFraEksternBehandling(behandlingId);
+        if (aggregate.isPresent()) {
+            logger.info("Grunnlag finnes allerede for vedtakId={}", vedtakId);
+            KravgrunnlagAggregate kravgrunnlagAggregate = aggregate.get();
+            String referense = kravgrunnlagAggregate.getGrunnlagØkonomi().getReferanse();
+            if (!referense.equals(eksternBehandlingId)) {
+                Long behandlingId = kravgrunnlagAggregate.getBehandlingId();
+                Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
+                UUID eksternUUID = hentUUIDFraEksternBehandling(behandlingId);
 
-            logger.info("Oppdatere eksternBehandling for behandlingId={} med ny eksternId={}",behandlingId,eksternBehandlingId);
-            EksternBehandling eksternBehandling = new EksternBehandling(behandling,Long.valueOf(eksternBehandlingId), eksternUUID);
-            eksternBehandlingRepository.lagre(eksternBehandling);
+                logger.info("Oppdatere eksternBehandling for behandlingId={} med ny eksternId={}", behandlingId, eksternBehandlingId);
+                EksternBehandling eksternBehandling = new EksternBehandling(behandling, Long.valueOf(eksternBehandlingId), eksternUUID);
+                eksternBehandlingRepository.lagre(eksternBehandling);
+            } else {
+                logger.info("Samme eksternBehandlingId={} finnes. Ikke oppdatere eksternBehandling", eksternBehandlingId);
+            }
+
         }
     }
 
-    private UUID hentUUIDFraEksternBehandling(long behandlingId){
+    private UUID hentUUIDFraEksternBehandling(long behandlingId) {
         EksternBehandling forrigeEksternBehandling = eksternBehandlingRepository.hentFraInternId(behandlingId);
         return forrigeEksternBehandling.getEksternUuid();
     }

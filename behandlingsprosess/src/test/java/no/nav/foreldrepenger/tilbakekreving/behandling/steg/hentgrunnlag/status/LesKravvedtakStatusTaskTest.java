@@ -27,6 +27,7 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatus437;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatusAggregate;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatusRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.ØkonomiXmlMottatt;
 
 public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
 
@@ -44,7 +45,7 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
 
     @Before
     public void setup() {
-        EksternBehandling eksternBehandling = new EksternBehandling(behandling, FPSAK_BEHANDLING_ID,FPSAK_BEHANDLING_UUID);
+        EksternBehandling eksternBehandling = new EksternBehandling(behandling, FPSAK_BEHANDLING_ID, FPSAK_BEHANDLING_UUID);
         eksternBehandlingRepository.lagre(eksternBehandling);
     }
 
@@ -114,7 +115,7 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
     public void skal_utføre_leskravvedtakstatus_task_for_behandling_som_finnes_ikke_iFpsak() {
         // den xml-en har behandlngId som finnes ikke i EksternBehandling
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_ugyldig.xml"));
-        when(fpsakKlientMock.finnesBehandlingIFpsak(anyString(),anyLong())).thenReturn(false);
+        when(fpsakKlientMock.finnesBehandlingIFpsak(anyString(), anyLong())).thenReturn(false);
 
         expectedException.expectMessage("FPT-587196");
         lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LesKravvedtakStatusTask.TASKTYPE));
@@ -124,7 +125,7 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
     public void skal_utføre_leskravvedtakstatus_task_når_fptilbake_har_ingen_åpenBehandling() {
         // den xml-en har behandlngId som finnes ikke i EksternBehandling
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_ugyldig.xml"));
-        when(fpsakKlientMock.finnesBehandlingIFpsak(anyString(),anyLong())).thenReturn(true);
+        when(fpsakKlientMock.finnesBehandlingIFpsak(anyString(), anyLong())).thenReturn(true);
 
         lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LesKravvedtakStatusTask.TASKTYPE));
 
@@ -143,7 +144,7 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
     @Test
     public void skal_utføre_leskravvedtakstatus_task_for_behandling_som_allerede_har_grunnlag() {
         repoRule.getEntityManager().createQuery("delete from EksternBehandling").executeUpdate();
-        EksternBehandling eksternBehandling = new EksternBehandling(behandling, 100000001L,FPSAK_BEHANDLING_UUID);
+        EksternBehandling eksternBehandling = new EksternBehandling(behandling, 100000001L, FPSAK_BEHANDLING_UUID);
         eksternBehandlingRepository.lagre(eksternBehandling);
 
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_FEIL.xml"));
@@ -156,6 +157,29 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         assertThat(eksternBehandling.getEksternId()).isEqualTo(FPSAK_BEHANDLING_ID);
 
         assertThat(mottattXmlRepository.finnForEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID))).isPresent();
+        assertThat(behandling.isBehandlingPåVent()).isTrue();
+        assertThat(behandling.getAksjonspunktFor(AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)).isNotNull();
+        assertThat(behandling.getVenteårsak()).isEqualByComparingTo(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
+
+        Optional<KravVedtakStatusAggregate> aggregate = kravVedtakStatusRepository.finnForBehandlingId(behandling.getId());
+        assertThat(aggregate).isPresent();
+        KravVedtakStatus437 kravVedtakStatus437 = aggregate.get().getKravVedtakStatus();
+        assertThat(kravVedtakStatus437.getKravStatusKode()).isEqualByComparingTo(KravStatusKode.SPERRET);
+    }
+
+    @Test
+    public void skal_utføre_leskravvedtakstatus_task_for_behandling_som_allerede_har_grunnlag_med_samme_referanse() {
+        mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_FEIL_samme_referanse.xml"));
+        lesKravgrunnlagTask.doTask(lagProsessTaskData(mottattXmlId, LesKravgrunnlagTask.TASKTYPE));
+
+        mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_SPER.xml"));
+        lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LesKravvedtakStatusTask.TASKTYPE));
+
+        EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandling.getId());
+        assertThat(eksternBehandling.getEksternId()).isEqualTo(FPSAK_BEHANDLING_ID);
+
+        List<ØkonomiXmlMottatt> xmlMottatt = mottattXmlRepository.finnAlleForEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID));
+        assertThat(xmlMottatt.size()).isEqualTo(2);
         assertThat(behandling.isBehandlingPåVent()).isTrue();
         assertThat(behandling.getAksjonspunktFor(AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)).isNotNull();
         assertThat(behandling.getVenteårsak()).isEqualByComparingTo(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
