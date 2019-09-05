@@ -63,11 +63,14 @@ public class BehandlingDtoTjeneste {
 
         // Totrinnsbehandling
         if (BehandlingStatus.FATTER_VEDTAK.equals(behandling.getStatus())) {
-            dto.leggTil(new ResourceLink("/fptilbake/api/behandling/totrinnskontroll/arsaker", "totrinnskontroll-arsaker", ResourceLink.HttpMethod.POST));
+            dto.leggTil(new ResourceLink("/fptilbake/api/behandling/totrinnskontroll/arsaker?behandlingId=" + behandling.getId(), "totrinnskontroll-arsaker", ResourceLink.HttpMethod.GET));
             dto.leggTil(new ResourceLink("/fptilbake/api/behandling/aksjonspunkt", "bekreft-totrinnsaksjonspunkt", ResourceLink.HttpMethod.POST));
         } else if (BehandlingStatus.UTREDES.equals(behandling.getStatus())) {
-            dto.leggTil(new ResourceLink("/fptilbake/api/behandling/totrinnskontroll/arsaker_read_only", "totrinnskontroll-arsaker-readOnly", ResourceLink.HttpMethod.POST));
+            dto.leggTil(new ResourceLink("/fptilbake/api/behandling/totrinnskontroll/arsaker_read_only?behandlingId=" + behandling.getId(), "totrinnskontroll-arsaker-readOnly", ResourceLink.HttpMethod.GET));
         }
+
+        dto.leggTil(new ResourceLink("/fptilbake/api/brev/maler?behandlingId=" + behandling.getId(), "brev-maler", ResourceLink.HttpMethod.GET));
+        dto.leggTil(new ResourceLink("/fptilbake/api/brev/bestill", "brev-bestill", ResourceLink.HttpMethod.POST));
 
         return dto;
     }
@@ -112,8 +115,6 @@ public class BehandlingDtoTjeneste {
     private void settResourceLinks(Behandling behandling, UtvidetBehandlingDto dto) {
         dto.leggTil(ResourceLink.get("/fptilbake/api/behandling/aksjonspunkt?behandlingId=" + behandling.getId(), "aksjonspunkter", null));
 
-        dto.leggTil(ResourceLink.get("/fptilbake/api/brev/maler?behandlingId="+behandling.getId(), "brev-maler", null));
-
         BehandlingStegType bst = behandling.getAktivtBehandlingSteg();
 
         if (BehandlingStegType.FAKTA_FEILUTBETALING.equals(bst)) {
@@ -136,7 +137,6 @@ public class BehandlingDtoTjeneste {
             settBehandlingsresultatLink(behandling.getId(), dto);
             settVedtaksbrevdataLink(behandling.getId(), dto);
         }
-        settTotrinnskontrollLinks(behandling, dto);
     }
 
     private void settBehandlingFaktaLink(long behandlingId, UtvidetBehandlingDto dto) {
@@ -162,16 +162,6 @@ public class BehandlingDtoTjeneste {
 
     private void settBehandlingsresultatLink(long behandlingId, UtvidetBehandlingDto dto) {
         dto.leggTil(ResourceLink.get("/fptilbake/api/beregning/resultat?behandlingId=" + behandlingId, "beregningsresultat", null));
-    }
-
-    // TODO (TOR) Fjern dette når GUI er oppdatert
-    private void settTotrinnskontrollLinks(Behandling behandling, UtvidetBehandlingDto dto) {
-        BehandlingIdDto idDto = new BehandlingIdDto(behandling.getId());
-        if (BehandlingStatus.FATTER_VEDTAK.equals(behandling.getStatus())) {
-            dto.leggTil(ResourceLink.post("/fptilbake/api/behandling/totrinnskontroll/arsaker", "totrinnskontroll-arsaker", idDto));
-        } else if (BehandlingStatus.UTREDES.equals(behandling.getStatus())) {
-            dto.leggTil(ResourceLink.post("/fptilbake/api/behandling/totrinnskontroll/arsaker_read_only", "totrinnskontroll-arsaker-readOnly", idDto));
-        }
     }
 
     private void settVedtaksbrevdataLink(Long idDto, UtvidetBehandlingDto dto) {
