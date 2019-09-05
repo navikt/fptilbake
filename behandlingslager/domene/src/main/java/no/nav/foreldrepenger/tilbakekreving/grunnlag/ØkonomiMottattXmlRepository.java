@@ -3,6 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.grunnlag;
 import static no.nav.vedtak.felles.jpa.HibernateVerktøy.hentUniktResultat;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -41,10 +42,16 @@ public class ØkonomiMottattXmlRepository {
         entityManager.remove(entity);
     }
 
-    public Optional<ØkonomiXmlMottatt> finnForEksternBehandlingId(String eksternBehandlingId){
-        TypedQuery<ØkonomiXmlMottatt> query = entityManager.createQuery("from ØkonomiXmlMottatt where eksternBehandlingId=:eksternBehandlingId",ØkonomiXmlMottatt.class);
+    public Optional<ØkonomiXmlMottatt> finnForEksternBehandlingId(String eksternBehandlingId) {
+        TypedQuery<ØkonomiXmlMottatt> query = entityManager.createQuery("from ØkonomiXmlMottatt where eksternBehandlingId=:eksternBehandlingId", ØkonomiXmlMottatt.class);
         query.setParameter("eksternBehandlingId", eksternBehandlingId);
         return hentUniktResultat(query);
+    }
+
+    public List<ØkonomiXmlMottatt> finnAlleForEksternBehandlingId(String eksternBehandlingId) {
+        TypedQuery<ØkonomiXmlMottatt> query = entityManager.createQuery("from ØkonomiXmlMottatt where eksternBehandlingId=:eksternBehandlingId", ØkonomiXmlMottatt.class);
+        query.setParameter("eksternBehandlingId", eksternBehandlingId);
+        return query.getResultList();
     }
 
     private ØkonomiXmlMottatt finnMottattXml(Long mottattXmlId) {
