@@ -1,12 +1,13 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling;
 
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
+
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
-
-import javax.enterprise.context.Dependent;
-import javax.inject.Inject;
 
 @Dependent
 @ProsessTask(SendVarselbrevTask.TASKTYPE)
@@ -15,15 +16,18 @@ public class SendVarselbrevTask implements ProsessTaskHandler {
 
     public static final String TASKTYPE = "brev.sendVarsel";
 
-    private BestillDokumentTjeneste bestillDokumentTjeneste;
+    private VarselbrevTjeneste varselbrevTjeneste;
 
     @Inject
-    public SendVarselbrevTask(BestillDokumentTjeneste bestillDokumentTjeneste) {
-        this.bestillDokumentTjeneste = bestillDokumentTjeneste;
+    public SendVarselbrevTask(VarselbrevTjeneste varselbrevTjeneste) {
+        this.varselbrevTjeneste = varselbrevTjeneste;
     }
 
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
-        bestillDokumentTjeneste.sendVarselbrev(prosessTaskData.getFagsakId(), prosessTaskData.getAktørId(), prosessTaskData.getBehandlingId());
+        AktørId aktørId = new AktørId(prosessTaskData.getAktørId());
+        Long fagsakId = prosessTaskData.getFagsakId();
+        Long behandlingId = prosessTaskData.getBehandlingId();
+        varselbrevTjeneste.sendVarselbrev(fagsakId, aktørId, behandlingId);
     }
 }

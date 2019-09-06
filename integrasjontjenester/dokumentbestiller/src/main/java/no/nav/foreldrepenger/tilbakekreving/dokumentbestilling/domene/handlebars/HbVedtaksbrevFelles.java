@@ -64,6 +64,10 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
         return new HbVedtaksbrevFelles.Builder();
     }
 
+    public FagsakYtelseType getYtelsetype() {
+        return ytelsetype;
+    }
+
     public void setFritekstOppsummering(String fritekstOppsummering) {
         this.fritekstOppsummering = fritekstOppsummering;
     }

@@ -112,17 +112,4 @@ public class BrevMetadataMapper {
         return adresse;
     }
 
-    public FagType settFritekstdelAvVarselbrev(String brødtekst, ObjectFactory objectFactory, String fagsaktypePåSpråk) {
-        final FagType fagType = objectFactory.createFagType();
-        fagType.setHovedoverskrift(TittelOverskriftUtil.finnOverskriftVarselbrev(fagsaktypePåSpråk));
-        fagType.setBrødtekst(brødtekst);
-        return fagType;
-    }
-
-    public FagType settFritekstdelAvVedtaksbrev(String brødtekst, ObjectFactory objectFactory, String fagsaktypePåSpråk) {
-        final FagType fagType = objectFactory.createFagType();
-        fagType.setHovedoverskrift(TittelOverskriftUtil.finnOverskriftVedtaksbrev(fagsaktypePåSpråk));
-        fagType.setBrødtekst(brødtekst);
-        return fagType;
-    }
 }

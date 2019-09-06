@@ -21,6 +21,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.Bre
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VarselbrevSporing;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevOppsummering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevPeriode;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevSporing;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.Feilutbetaling;
@@ -46,13 +47,21 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.domene.handlebars
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.domene.handlebars.HbVedtaksbrevFelles;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.domene.handlebars.HbVedtaksbrevPeriode;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.domene.handlebars.VedtakHjemmel;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Avsnitt;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.HentForhåndvisningVedtaksbrevPdfDto;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.PeriodeMedTekstDto;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.i18n.KodeTilSpråkTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.util.TittelOverskriftUtil;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.util.VedtaksbrevUtil;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
+import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 
 
 @ApplicationScoped
 public class VedtaksbrevTjeneste {
+
+    private static final String TITTEL_VEDTAKSBREV_HISTORIKKINNSLAG = "Vedtaksbrev Tilbakekreving";
 
     private EksternBehandlingRepository eksternBehandlingRepository;
     private TilbakekrevingBeregningTjeneste tilbakekrevingBeregningTjeneste;
@@ -63,6 +72,9 @@ public class VedtaksbrevTjeneste {
     private KodeverkRepository kodeverkRepository;
     private VilkårsvurderingRepository vilkårsvurderingRepository;
     private VurdertForeldelseRepository foreldelseRepository;
+    private BestillDokumentTjeneste bestillDokumentTjeneste;
+    private KodeTilSpråkTjeneste kodeTilSpråkTjeneste;
+    private HistorikkinnslagTjeneste historikkinnslagTjeneste;
 
     @Inject
     public VedtaksbrevTjeneste(EksternBehandlingRepository eksternBehandlingRepository,
@@ -72,7 +84,7 @@ public class VedtaksbrevTjeneste {
                                BrevdataRepository brevdataRepository,
                                FeilutbetalingRepository faktaRepository,
                                KodeverkRepository kodeverkRepository,
-                               VilkårsvurderingRepository vilkårsvurderingRepository, VurdertForeldelseRepository foreldelseRepository) {
+                               VilkårsvurderingRepository vilkårsvurderingRepository, VurdertForeldelseRepository foreldelseRepository, BestillDokumentTjeneste bestillDokumentTjeneste, KodeTilSpråkTjeneste kodeTilSpråkTjeneste, HistorikkinnslagTjeneste historikkinnslagTjeneste) {
         this.eksternBehandlingRepository = eksternBehandlingRepository;
         this.tilbakekrevingBeregningTjeneste = tilbakekrevingBeregningTjeneste;
         this.behandlingTjeneste = behandlingTjeneste;
@@ -82,9 +94,62 @@ public class VedtaksbrevTjeneste {
         this.kodeverkRepository = kodeverkRepository;
         this.vilkårsvurderingRepository = vilkårsvurderingRepository;
         this.foreldelseRepository = foreldelseRepository;
+        this.bestillDokumentTjeneste = bestillDokumentTjeneste;
+        this.kodeTilSpråkTjeneste = kodeTilSpråkTjeneste;
+        this.historikkinnslagTjeneste = historikkinnslagTjeneste;
     }
 
     public VedtaksbrevTjeneste() {
+    }
+
+    public void sendVedtaksbrev(Long fagsakId, AktørId aktørId, Long behandlingId) {
+        VedtaksbrevData vedtaksbrevData = hentDataForVedtaksbrev(behandlingId);
+        FritekstbrevData data = new FritekstbrevData.Builder()
+            .medOverskrift(TittelOverskriftUtil.finnOverskriftVedtaksbrev(vedtaksbrevData.getMetadata().getFagsaktypenavnPåSpråk()))
+            .medBrevtekst(TekstformattererVedtaksbrev.lagVedtaksbrevFritekst(vedtaksbrevData.getVedtaksbrevData()))
+            .medMetadata(vedtaksbrevData.getMetadata())
+            .build();
+
+        JournalpostIdOgDokumentId dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data);
+
+        opprettHistorikkinnslag(behandlingId, dokumentreferanse, fagsakId, aktørId);
+        lagreInfoOmVedtaksbrev(behandlingId, dokumentreferanse);
+    }
+
+    public byte[] hentForhåndsvisningVedtaksbrevSomPdf(HentForhåndvisningVedtaksbrevPdfDto dto) {
+        VedtaksbrevData vedtaksbrevData = hentDataForVedtaksbrev(dto.getBehandlingId(), dto.getOppsummeringstekst(), dto.getPerioderMedTekst());
+        FritekstbrevData data = new FritekstbrevData.Builder()
+            .medOverskrift(TittelOverskriftUtil.finnOverskriftVedtaksbrev(vedtaksbrevData.getMetadata().getFagsaktypenavnPåSpråk()))
+            .medBrevtekst(TekstformattererVedtaksbrev.lagVedtaksbrevFritekst(vedtaksbrevData.getVedtaksbrevData()))
+            .medMetadata(vedtaksbrevData.getMetadata())
+            .build();
+
+        return bestillDokumentTjeneste.hentForhåndsvisningFritekstbrev(data);
+    }
+
+    public List<Avsnitt> hentForhåndsvisningVedtaksbrevSomTekst(Long behandlingId) {
+        VedtaksbrevData vedtaksbrevData = hentDataForVedtaksbrev(behandlingId);
+        String hovedoverskrift = TittelOverskriftUtil.finnOverskriftVedtaksbrev(vedtaksbrevData.getMetadata().getFagsaktypenavnPåSpråk());
+        return TekstformattererVedtaksbrev.lagVedtaksbrevDeltIAvsnitt(vedtaksbrevData.getVedtaksbrevData(), hovedoverskrift);
+    }
+
+    private void opprettHistorikkinnslag(Long behandlingId, JournalpostIdOgDokumentId dokumentreferanse, Long fagsakId, AktørId aktørId) {
+        historikkinnslagTjeneste.opprettHistorikkinnslagForBrevsending(
+            dokumentreferanse.getJournalpostId(),
+            dokumentreferanse.getDokumentId(),
+            fagsakId,
+            behandlingId,
+            aktørId,
+            TITTEL_VEDTAKSBREV_HISTORIKKINNSLAG);
+    }
+
+    private void lagreInfoOmVedtaksbrev(Long behandlingId, JournalpostIdOgDokumentId dokumentreferanse) {
+        VedtaksbrevSporing vedtaksbrevSporing = new VedtaksbrevSporing.Builder()
+            .medBehandlingId(behandlingId)
+            .medDokumentId(dokumentreferanse.getDokumentId())
+            .medJournalpostId(dokumentreferanse.getJournalpostId())
+            .build();
+        brevdataRepository.lagreVedtaksbrevData(vedtaksbrevSporing);
     }
 
     public VedtaksbrevData hentDataForVedtaksbrev(Long behandlingId) {
