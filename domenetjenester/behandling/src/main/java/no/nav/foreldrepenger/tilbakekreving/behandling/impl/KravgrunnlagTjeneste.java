@@ -4,30 +4,37 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagAggregate;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 
 @ApplicationScoped
 public class KravgrunnlagTjeneste {
 
     private KravgrunnlagRepository kravgrunnlagRepository;
     private GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste;
+    private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
 
     KravgrunnlagTjeneste() {
         // For CDI
     }
 
     @Inject
-    public KravgrunnlagTjeneste(KravgrunnlagRepository kravgrunnlagRepository, GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste) {
+    public KravgrunnlagTjeneste(KravgrunnlagRepository kravgrunnlagRepository, GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste, BehandlingskontrollTjeneste behandlingskontrollTjeneste) {
         this.kravgrunnlagRepository = kravgrunnlagRepository;
         this.gjenopptaBehandlingTjeneste = gjenopptaBehandlingTjeneste;
+        this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
     }
 
     public void lagreTilbakekrevingsgrunnlagFraØkonomi(Long behandlingId, Kravgrunnlag431 kravgrunnlag431) {
-        KravgrunnlagAggregate kravgrunnlagAggregate = KravgrunnlagAggregate.builder().medBehandlingId(behandlingId)
-            .medGrunnlagØkonomi(kravgrunnlag431).build();
-        kravgrunnlagRepository.lagre(kravgrunnlagAggregate);
+        if (KravStatusKode.ENDRET.equals(kravgrunnlag431.getKravStatusKode())) {
+            BehandlingskontrollKontekst kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandlingId);
+            behandlingskontrollTjeneste.behandlingTilbakeføringTilTidligereBehandlingSteg(kontekst, BehandlingStegType.FAKTA_FEILUTBETALING);
+        }
+        kravgrunnlagRepository.lagre(behandlingId, kravgrunnlag431);
         gjenopptaBehandlingTjeneste.fortsettBehandlingMedGrunnlag(behandlingId);
     }
 
