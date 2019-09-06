@@ -70,7 +70,7 @@ public class BehandlingDtoTjenesteTest {
         BehandlingDto behandlingDto = assertBehandlingDto(behandling, behandlingDtoListe);
 
         assertThat(behandlingDto.getLinks()).isNotEmpty();
-        assertThat(behandlingDto.getLinks().size()).isEqualTo(6);
+        assertThat(behandlingDto.getLinks().size()).isEqualTo(8);
         List<ResourceLink> lenker = behandlingDto.getLinks();
         assertThat(lenker.stream().filter(resourceLink -> resourceLink.getRel().equals("totrinnskontroll-arsaker-readOnly")).findFirst()).isPresent();
         assertThat(lenker.stream().filter(resourceLink -> resourceLink.getRel().equals("totrinnskontroll-arsaker")).findFirst()).isEmpty();
@@ -86,7 +86,7 @@ public class BehandlingDtoTjenesteTest {
         BehandlingDto behandlingDto = assertBehandlingDto(behandling, behandlingDtoListe);
 
         assertThat(behandlingDto.getLinks()).isNotEmpty();
-        assertThat(behandlingDto.getLinks().size()).isEqualTo(7);
+        assertThat(behandlingDto.getLinks().size()).isEqualTo(9);
         List<ResourceLink> lenker = behandlingDto.getLinks();
         assertThat(lenker.stream().filter(resourceLink -> resourceLink.getRel().equals("totrinnskontroll-arsaker-readOnly")).findFirst()).isEmpty();
         assertThat(lenker.stream().filter(resourceLink -> resourceLink.getRel().equals("totrinnskontroll-arsaker")).findFirst()).isPresent();
@@ -101,7 +101,7 @@ public class BehandlingDtoTjenesteTest {
         assertUtvidetBehandlingDto(utvidetBehandlingDto);
 
         assertThat(utvidetBehandlingDto.getLinks()).isNotEmpty();
-        assertThat(utvidetBehandlingDto.getLinks().size()).isEqualTo(5);
+        assertThat(utvidetBehandlingDto.getLinks().size()).isEqualTo(3);
         List<ResourceLink> lenker = utvidetBehandlingDto.getLinks();
         assertThat(lenker.stream().filter(resourceLink -> resourceLink.getRel().equals("feilutbetalingFakta")).findFirst()).isPresent();
         assertThat(lenker.stream().filter(resourceLink -> resourceLink.getRel().equals("feilutbetalingAarsak")).findFirst()).isPresent();
@@ -116,7 +116,7 @@ public class BehandlingDtoTjenesteTest {
         assertUtvidetBehandlingDto(utvidetBehandlingDto);
 
         assertThat(utvidetBehandlingDto.getLinks()).isNotEmpty();
-        assertThat(utvidetBehandlingDto.getLinks().size()).isEqualTo(6);
+        assertThat(utvidetBehandlingDto.getLinks().size()).isEqualTo(4);
         List<ResourceLink> lenker = utvidetBehandlingDto.getLinks();
         assertThat(lenker.stream().filter(resourceLink -> resourceLink.getRel().equals("perioderForeldelse")).findFirst()).isPresent();
     }
@@ -130,7 +130,7 @@ public class BehandlingDtoTjenesteTest {
         assertUtvidetBehandlingDto(utvidetBehandlingDto);
 
         assertThat(utvidetBehandlingDto.getLinks()).isNotEmpty();
-        assertThat(utvidetBehandlingDto.getLinks().size()).isEqualTo(8);
+        assertThat(utvidetBehandlingDto.getLinks().size()).isEqualTo(6);
         List<ResourceLink> lenker = utvidetBehandlingDto.getLinks();
         assertThat(lenker.stream().filter(resourceLink -> resourceLink.getRel().equals("vilkarvurderingsperioder")).findFirst()).isPresent();
         assertThat(lenker.stream().filter(resourceLink -> resourceLink.getRel().equals("vilkarvurdering")).findFirst()).isPresent();
@@ -145,7 +145,7 @@ public class BehandlingDtoTjenesteTest {
         assertUtvidetBehandlingDto(utvidetBehandlingDto);
 
         assertThat(utvidetBehandlingDto.getLinks()).isNotEmpty();
-        assertThat(utvidetBehandlingDto.getLinks().size()).isEqualTo(10);
+        assertThat(utvidetBehandlingDto.getLinks().size()).isEqualTo(8);
         List<ResourceLink> lenker = utvidetBehandlingDto.getLinks();
         assertThat(lenker.stream().filter(resourceLink -> resourceLink.getRel().equals("vedtaksbrev")).findFirst()).isPresent();
         assertThat(lenker.stream().filter(resourceLink -> resourceLink.getRel().equals("beregningsresultat")).findFirst()).isPresent();
