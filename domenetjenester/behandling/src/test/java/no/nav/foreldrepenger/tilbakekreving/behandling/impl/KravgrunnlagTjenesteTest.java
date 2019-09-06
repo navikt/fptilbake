@@ -34,7 +34,10 @@ public class KravgrunnlagTjenesteTest extends FellesTestOppsett {
     private static final String ENHET = "8020";
 
     private GjenopptaBehandlingTjeneste mockGjenopptaBehandlingTjeneste = mock(GjenopptaBehandlingTjeneste.class);
-    private KravgrunnlagTjeneste kravgrunnlagTjeneste = new KravgrunnlagTjeneste(grunnlagRepository, mockGjenopptaBehandlingTjeneste);
+    private KravgrunnlagTjeneste kravgrunnlagTjeneste = new KravgrunnlagTjeneste(grunnlagRepository, mockGjenopptaBehandlingTjeneste, behandlingskontrollTjeneste);
+
+    private static final LocalDate fom = LocalDate.of(2016, 3, 15);
+    private static final LocalDate tom = LocalDate.of(2016, 3, 18);
 
     @Before
     public void setup() {
@@ -43,31 +46,67 @@ public class KravgrunnlagTjenesteTest extends FellesTestOppsett {
 
     @Test
     public void lagreTilbakekrevingsgrunnlagFraØkonomi() {
-        LocalDate fom = LocalDate.of(2016, 3, 15);
-        LocalDate tom = LocalDate.of(2016, 3, 18);
+        Kravgrunnlag431 kravgrunnlag = formKravgrunnlagDto(KravStatusKode.NYTT);
+        formPerioder(fom, tom, kravgrunnlag);
+        kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(INTERN_BEHANDLING_ID, kravgrunnlag);
 
+        assertKravgrunnlag();
+    }
 
-        Kravgrunnlag431 kravgrunnlag = formKravgrunnlagDto();
+    @Test
+    public void lagreTilbakekrevingsgrunnlagFraØkonomi_medEndretGrunnlag() {
+        Kravgrunnlag431 kravgrunnlag = formKravgrunnlagDto(KravStatusKode.ENDRET);
+        formPerioder(fom, tom, kravgrunnlag);
+        kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(INTERN_BEHANDLING_ID, kravgrunnlag);
+
+        assertKravgrunnlag();
+    }
+
+    private Kravgrunnlag431 formKravgrunnlagDto(KravStatusKode kravStatusKode) {
+        return Kravgrunnlag431.builder()
+            .medEksternKravgrunnlagId("123")
+            .medVedtakId(10000L)
+            .medFagomraadeKode(FagOmrådeKode.FORELDREPENGER)
+            .medKravStatusKode(kravStatusKode)
+            .medGjelderVedtakId(AKTØR_ID.getId())
+            .medGjelderType(GjelderType.PERSON)
+            .medUtbetalesTilId(AKTØR_ID.getId())
+            .medUtbetIdType(GjelderType.PERSON)
+            .medFagSystemId("10000000000000000")
+            .medAnsvarligEnhet(ENHET)
+            .medBostedEnhet(ENHET)
+            .medBehandlendeEnhet(ENHET)
+            .medSaksBehId("Z991036")
+            .medFeltKontroll("42354353453454")
+            .build();
+    }
+
+    private void formPerioder(LocalDate fom, LocalDate tom, Kravgrunnlag431 kravgrunnlag) {
         IntStream.range(4, 6).forEach(j -> {
             KravgrunnlagPeriode432 periode = KravgrunnlagPeriode432.builder()
                 .medKravgrunnlag431(kravgrunnlag)
                 .medPeriode(fom.plusDays(j), tom.plusDays(j))
                 .build();
             kravgrunnlag.leggTilPeriode(periode);
-            IntStream.range(0, 2).forEach(i -> {
-                KravgrunnlagBelop433 beløp = KravgrunnlagBelop433.builder()
-                    .medKravgrunnlagPeriode432(periode)
-                    .medKlasseKode(KlasseKode.FPATORD)
-                    .medKlasseType(i == 0 ? KlasseType.FEIL : KlasseType.YTEL)
-                    .medNyBelop(i == 0 ? BigDecimal.valueOf(11000) : BigDecimal.ZERO)
-                    .medTilbakekrevesBelop(i > 0 ? BigDecimal.valueOf(11000) : BigDecimal.ZERO)
-                    .medResultatKode("VED")
-                    .build();
-                periode.leggTilBeløp(beløp);
-            });
+            formBeløper(periode);
         });
-        kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(INTERN_BEHANDLING_ID, kravgrunnlag);
+    }
 
+    private void formBeløper(KravgrunnlagPeriode432 periode) {
+        IntStream.range(0, 2).forEach(i -> {
+            KravgrunnlagBelop433 beløp = KravgrunnlagBelop433.builder()
+                .medKravgrunnlagPeriode432(periode)
+                .medKlasseKode(KlasseKode.FPATORD)
+                .medKlasseType(i == 0 ? KlasseType.FEIL : KlasseType.YTEL)
+                .medNyBelop(i == 0 ? BigDecimal.valueOf(11000) : BigDecimal.ZERO)
+                .medTilbakekrevesBelop(i > 0 ? BigDecimal.valueOf(11000) : BigDecimal.ZERO)
+                .medResultatKode("VED")
+                .build();
+            periode.leggTilBeløp(beløp);
+        });
+    }
+
+    private void assertKravgrunnlag() {
         Optional<KravgrunnlagAggregate> kravgrunnlagAggregate = grunnlagRepository.finnGrunnlagForBehandlingId(INTERN_BEHANDLING_ID);
         assertThat(kravgrunnlagAggregate).isNotEmpty();
         KravgrunnlagAggregate aggregate = kravgrunnlagAggregate.get();
@@ -89,23 +128,5 @@ public class KravgrunnlagTjenesteTest extends FellesTestOppsett {
         assertThat(kravgrunnlagBeloper.get(0).getNyBelop()).isEqualByComparingTo(kravgrunnlagBeloper.get(1).getTilbakekrevesBelop());
     }
 
-    private Kravgrunnlag431 formKravgrunnlagDto() {
-        return Kravgrunnlag431.builder()
-            .medEksternKravgrunnlagId("123")
-            .medVedtakId(10000L)
-            .medFagomraadeKode(FagOmrådeKode.FORELDREPENGER)
-            .medKravStatusKode(KravStatusKode.NYTT)
-            .medGjelderVedtakId(AKTØR_ID.getId())
-            .medGjelderType(GjelderType.PERSON)
-            .medUtbetalesTilId(AKTØR_ID.getId())
-            .medUtbetIdType(GjelderType.PERSON)
-            .medFagSystemId("10000000000000000")
-            .medAnsvarligEnhet(ENHET)
-            .medBostedEnhet(ENHET)
-            .medBehandlendeEnhet(ENHET)
-            .medSaksBehId("Z991036")
-            .medFeltKontroll("42354353453454")
-            .build();
-    }
 
 }
