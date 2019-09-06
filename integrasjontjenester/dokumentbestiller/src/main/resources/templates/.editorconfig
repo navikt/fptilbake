@@ -1,0 +1,3 @@
+# unngår at editor auto-inserter newline i templatene, siden det påvirker resultatet
+[*.hbs]
+insert_final_newline = false

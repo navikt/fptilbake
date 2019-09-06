@@ -1,22 +1,10 @@
-{{i18n "introduksjon1" bundle="vedtaksbrev" locale=locale}} {{datoformat varselbrevSendtDato }} {{i18n "introduksjon2" feilutbetaltBeloep beloepSomSkalTilbakekreves bundle="vedtaksbrev" locale=locale}}
-{{oppsummeringFritekst}}
-{{#each feilutbetalingsperioderMedTekst }}{{i18n "periodeoverskrift" bundle="vedtaksbrev" locale=locale}} {{datoformat periode.fom }} {{i18n "tom" bundle="vedtaksbrev" locale=locale}} {{ datoformat periode.tom }}
-{{generertFaktaAvsnitt}}
-{{fritekstFaktaAvsnitt}}
-{{generertVilkaarAvsnitt}}
-{{fritekstVilkaarAvsnitt}}
-{{generertSaerligeGrunnerAvsnitt}}
-{{fritekstSaerligeGrunnerAvsnitt}}
+{{> templates/vedtak/vedtak_felles}}
+{{> templates/vedtak/vedtak_start}}
+{{#each perioder }}
+{{> templates/vedtak/periode_overskrift}}
+{{> templates/vedtak/periode_fakta}}
+{{> templates/vedtak/periode_vilkår}}
+{{> templates/vedtak/periode_særlige_grunner}}
+{{> templates/vedtak/periode_slutt}}
 {{/each}}
-
-{{i18n "hjemmel" bundle="vedtaksbrev" locale=locale}}
-{{i18n "tilbakebetalingoverskrift" bundle="vedtaksbrev" locale=locale}}
-{{i18n "tilbakebetaling" bundle="vedtaksbrev" locale=locale}}
-{{i18n "klageoverskrift" bundle="vedtaksbrev" locale=locale}}
-{{i18n "klage" antallUkerKlagefrist bundle="vedtaksbrev" locale=locale}}
-{{i18n "innsynoverskrift" bundle="vedtaksbrev" locale=locale}}
-{{i18n "innsyn" bundle="vedtaksbrev" locale=locale}}
-{{i18n "sporsmaaloverskrift" bundle="vedtaksbrev" locale=locale}}
-{{i18n "sporsmaal" kontakttelefonnummer bundle="vedtaksbrev" locale=locale}}
-
-{{i18n "hilsen" bundle="vedtaksbrev" locale=locale}}
+{{> templates/vedtak/vedtak_slutt}}

@@ -4,32 +4,27 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Helper;
 import com.github.jknack.handlebars.Template;
+import com.github.jknack.handlebars.helper.ConditionalHelpers;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.domene.PeriodeMedBrevtekst;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.domene.ReturadresseKonfigurasjon;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.domene.VarselbrevSamletInfo;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.domene.VedtaksbrevSamletInfo;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.domene.handlebars.BaseDokument;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.domene.handlebars.FeilutbetalingsperiodeMedTekst;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.domene.handlebars.VarselbrevDokument;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.domene.handlebars.VedtaksbrevDokument;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.util.BrevUtil;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.KodeDto;
 import no.nav.vedtak.util.FPDateUtil;
 
-class Tekstformatterer {
+class TekstformattererVarselbrev {
 
-    private Tekstformatterer(){
+    private TekstformattererVarselbrev() {
         // for static access
     }
 
@@ -46,24 +41,14 @@ class Tekstformatterer {
         }
     }
 
-    static String lagVedtaksbrevFritekst(VedtaksbrevSamletInfo vedtaksbrevSamletInfo) {
-        try {
-            Template template = opprettHandlebarsTemplate("/templates/vedtak");
-            VedtaksbrevDokument vedtaksbrevDokument = mapTilVedtaksbrevDokument(
-                vedtaksbrevSamletInfo);
-
-            return template.apply(vedtaksbrevDokument);
-        } catch (IOException e) {
-            throw DokumentbestillingFeil.FACTORY.feilVedTekstgenerering(e).toException();
-        }
-    }
-
     private static Template opprettHandlebarsTemplate(String filsti) throws IOException {
         Handlebars handlebars = new Handlebars();
-        handlebars.setCharset(Charset.forName("latin1"));
+
+        handlebars.setCharset(Charset.forName("latin1")); //TODO begge maler skal bruke UTF-8
         handlebars.setInfiniteLoops(false);
         handlebars.setPrettyPrint(true);
         handlebars.registerHelper("datoformat", datoformatHelper());
+        handlebars.registerHelpers(ConditionalHelpers.class);
         return handlebars.compile(filsti);
     }
 
@@ -119,36 +104,4 @@ class Tekstformatterer {
         return varselbrevDokument;
     }
 
-    private static VedtaksbrevDokument mapTilVedtaksbrevDokument(VedtaksbrevSamletInfo vedtaksbrevSamletInfo) {
-        VedtaksbrevDokument vedtaksbrevDokument = new VedtaksbrevDokument();
-        vedtaksbrevDokument.setAntallUkerKlagefrist(vedtaksbrevSamletInfo.getAntallUkerKlagefrist());
-        vedtaksbrevDokument.setFeilutbetaltBeloep(vedtaksbrevSamletInfo.getSumFeilutbetaling());
-        vedtaksbrevDokument.setBeloepSomSkalTilbakekreves(vedtaksbrevSamletInfo.getSumBeløpSomSkalTilbakekreves());
-        vedtaksbrevDokument.setKontakttelefonnummer(ReturadresseKonfigurasjon.getBrevTelefonnummerKlageEnhet());
-        vedtaksbrevDokument.setFagsaktypeNavn(vedtaksbrevSamletInfo.getBrevMetadata().getFagsaktypenavnPåSpråk());
-        settFagsaktype(vedtaksbrevDokument, vedtaksbrevSamletInfo.getBrevMetadata().getFagsaktype());
-        vedtaksbrevDokument.setLocale(finnRiktigSpråk(vedtaksbrevSamletInfo.getBrevMetadata().getSpråkkode()));
-        vedtaksbrevDokument.setFeilutbetalingsperioderMedTekst(mapPerioderMedTekst(vedtaksbrevSamletInfo.getPerioderMedBrevtekst()));
-        vedtaksbrevDokument.setVarselbrevSendtDato(vedtaksbrevSamletInfo.getVarselbrevSendtUt());
-        vedtaksbrevDokument.setOppsummeringFritekst(vedtaksbrevSamletInfo.getOppsummeringFritekst());
-        vedtaksbrevDokument.valider();
-        return vedtaksbrevDokument;
-    }
-
-    private static List<FeilutbetalingsperiodeMedTekst> mapPerioderMedTekst(List<PeriodeMedBrevtekst> perioderMedBrevtekst) {
-        return perioderMedBrevtekst.stream()
-            .sorted(Comparator.comparing(PeriodeMedBrevtekst::getFom))
-            .map(vilkårsperiode -> {
-                FeilutbetalingsperiodeMedTekst feilutbetalingsperiodeMedTekst = new FeilutbetalingsperiodeMedTekst();
-                Periode periode = new Periode(vilkårsperiode.getFom(), vilkårsperiode.getTom());
-                feilutbetalingsperiodeMedTekst.setPeriode(periode);
-                feilutbetalingsperiodeMedTekst.setGenerertFaktaAvsnitt(vilkårsperiode.getGenerertFaktaAvsnitt());
-                feilutbetalingsperiodeMedTekst.setGenerertVilkaarAvsnitt(vilkårsperiode.getGenerertVilkårAvsnitt());
-                feilutbetalingsperiodeMedTekst.setGenerertSaerligeGrunnerAvsnitt(vilkårsperiode.getGenerertSærligeGrunnerAvsnitt());
-                feilutbetalingsperiodeMedTekst.setFritekstFaktaAvsnitt(vilkårsperiode.getFritekstFakta());
-                feilutbetalingsperiodeMedTekst.setFritekstVilkaarAvsnitt(vilkårsperiode.getFritekstVilkår());
-                feilutbetalingsperiodeMedTekst.setFritekstSaerligeGrunnerAvsnitt(vilkårsperiode.getFritekstSærligeGrunner());
-                return feilutbetalingsperiodeMedTekst;
-            }).collect(Collectors.toList());
-    }
 }

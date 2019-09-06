@@ -1,0 +1,15 @@
+{{#switch hovedresultat}}
+  {{#case "FULL_TILBAKEBETALING"}}
+Vi varslet deg {{varslet-dato}} om at du har fått utbetalt for mye. Du må betale tilbake {{totalt-tilbakekreves-beløp-med-renter}} kroner, som er hele det feilutbetalte beløpet.{{#if totalt-rentebeløp}} Dette beløpet er med renter.{{/if}}
+  {{/case}}
+  {{#case "DELVIS_TILBAKEBETALING"}}
+Vi varslet deg {{varslet-dato}} om at du har fått {{varslet-beløp}} kroner for mye. Du må betale tilbake {{totalt-tilbakekreves-beløp-med-renter}} kroner, som er deler av det feilutbetalte beløpet.{{#if totalt-rentebeløp}} Dette beløpet er med renter.{{/if}}
+  {{/case}}
+  {{#case "INGEN_TILBAKEBETALING"}}
+Vi varslet deg {{varslet-dato}} om at du har fått {{varslet-beløp}} kroner for mye. Vi har behandlet saken din og du må ikke betale tilbake det feilutbetalte beløpet.
+  {{/case}}
+{{/switch}}
+{{#if fritekst-oppsummering}}
+
+{{fritekst-oppsummering}}
+{{/if}}

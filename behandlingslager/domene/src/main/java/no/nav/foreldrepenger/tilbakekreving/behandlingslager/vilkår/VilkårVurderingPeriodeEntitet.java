@@ -24,6 +24,7 @@ import org.hibernate.annotations.JoinFormula;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.NavOppfulgt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Vurdering;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.vedtak.felles.jpa.BaseEntitet;
 
@@ -154,7 +155,6 @@ public class VilkårVurderingPeriodeEntitet extends BaseEntitet {
     public Aktsomhet getAktsomhetResultat() {
         return aktsomhet != null ? aktsomhet.getAktsomhet() : null;
     }
-
 
     public static Builder builder() {
         return new Builder();

@@ -50,8 +50,8 @@ public class DetaljertKravgrunnlagDto implements AbacDto {
     private Long omgjortVedtakId;
 
     @NotNull
-    @Size(max = 11)
-    @Pattern(regexp = "^(0|[1-9][0-9]*)$")
+    @Size(min = 11, max = 11)
+    @Pattern(regexp = "^[0-9]*$")
     private String gjelderVedtakId;
 
     @NotNull
@@ -60,8 +60,8 @@ public class DetaljertKravgrunnlagDto implements AbacDto {
     private String gjelderType;
 
     @NotNull
-    @Size(max = 11)
-    @Pattern(regexp = "^(0|[1-9][0-9]*)$")
+    @Size(min = 11, max = 11)
+    @Pattern(regexp = "^[0-9]*$")
     private String utbetalesTilId;
 
     @NotNull
