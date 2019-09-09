@@ -19,6 +19,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Ak
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelse;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelsePeriode;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.VedtakHjemmel;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
 public class VedtakHjemmelTest {

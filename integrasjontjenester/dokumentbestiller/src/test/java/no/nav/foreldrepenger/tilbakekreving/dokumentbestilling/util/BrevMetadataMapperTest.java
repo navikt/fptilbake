@@ -14,8 +14,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Landkode
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodelisteNavnI18N;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.domene.BrevMetadata;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.util.BrevMetadataMapper;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMetadataMapper;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
