@@ -58,8 +58,6 @@ public class TilbakekrevingBeregningTjeneste {
         return beregningResultat;
     }
 
-
-
     private VilkårVurderingEntitet hentVilkårsvurdering(Long behandlingId) {
         VilkårVurderingEntitet vurderingUtenPerioder = new VilkårVurderingEntitet();
         return repositoryProvider.getVilkårsvurderingRepository().finnVilkårsvurderingForBehandlingId(behandlingId)

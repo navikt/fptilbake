@@ -47,7 +47,7 @@ class TilbakekrevingBeregnerVilkår {
     }
 
     private static BigDecimal beregnRentebeløp(BigDecimal beløp, boolean renter) {
-        return renter ? beløp.multiply(RENTEFAKTOR).setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO;
+        return renter ? beløp.multiply(RENTEFAKTOR).setScale(0, RoundingMode.HALF_UP) : BigDecimal.ZERO;
     }
 
     private static BigDecimal finnBeløpUtenRenter(BigDecimal kravgrunnlagBeløp, BigDecimal andel, BigDecimal manueltBeløp) {
@@ -55,10 +55,9 @@ class TilbakekrevingBeregnerVilkår {
             return manueltBeløp;
         }
         if (andel != null) {
-            return kravgrunnlagBeløp.multiply(andel).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+            return kravgrunnlagBeløp.multiply(andel).divide(BigDecimal.valueOf(100), 0, RoundingMode.HALF_UP);
         }
         throw new IllegalArgumentException("Utvikler-feil: Forventer at utledetandel eller manuelt beløp er satt begge manglet");
-
     }
 
     private static boolean finnRenter(VilkårVurderingPeriodeEntitet vurdering) {
