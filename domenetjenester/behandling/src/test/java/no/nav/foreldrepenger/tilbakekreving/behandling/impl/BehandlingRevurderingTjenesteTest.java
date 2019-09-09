@@ -80,8 +80,4 @@ public class BehandlingRevurderingTjenesteTest extends FellesTestOppsett {
         assertThat(historikkinnslag.getAktør()).isEqualByComparingTo(HistorikkAktør.VEDTAKSLØSNINGEN);
     }
 
-    @Test
-    public void kanOppretteRevurdering() {
-
-    }
 }

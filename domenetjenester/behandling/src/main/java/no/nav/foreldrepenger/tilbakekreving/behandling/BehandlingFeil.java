@@ -31,8 +31,10 @@ public interface BehandlingFeil extends DeklarerteFeil {
     @TekniskFeil(feilkode = "FPT-7428496", feilmelding = "Fant ingen ekstern behandling i Fpsak for Uuid %s", logLevel = LogLevel.WARN)
     Feil fantIkkeEksternBehandlingForUuid(String uuId);
 
-
     @FunksjonellFeil(feilkode = "FPT-992332", feilmelding = "BehandlingId %s er ikke satt på vent, og ventefrist kan derfor ikke oppdateres", løsningsforslag = "Forsett saksbehandlingen", logLevel = WARN)
     Feil kanIkkeEndreVentefristForBehandlingIkkePaVent(Long behandlingId);
+
+    @FunksjonellFeil(feilkode = "FPT-663486", feilmelding = "saksnummer %s oppfyller ikke kravene for tilbakekreving", løsningsforslag = "", logLevel = LogLevel.WARN)
+    Feil kanIkkeOppretteTilbakekrevingBehandling(Saksnummer saksnummer);
 
 }
