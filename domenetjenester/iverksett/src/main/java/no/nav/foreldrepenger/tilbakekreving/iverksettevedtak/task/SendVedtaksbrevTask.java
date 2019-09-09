@@ -6,9 +6,8 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.BestillDokumentTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.VedtaksbrevTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
@@ -22,21 +21,21 @@ public class SendVedtaksbrevTask implements ProsessTaskHandler {
 
     private static final Logger log = LoggerFactory.getLogger(SendVedtaksbrevTask.class);
 
-    private BestillDokumentTjeneste bestillDokumentTjeneste;
+    private VedtaksbrevTjeneste vedtaksbrevTjeneste;
 
     SendVedtaksbrevTask() {
         // for CDI proxy
     }
 
     @Inject
-    public SendVedtaksbrevTask(BestillDokumentTjeneste bestillDokumentTjeneste, BehandlingRepositoryProvider repositoryProvider) {
-        this.bestillDokumentTjeneste = bestillDokumentTjeneste;
+    public SendVedtaksbrevTask(VedtaksbrevTjeneste vedtaksbrevTjeneste) {
+        this.vedtaksbrevTjeneste = vedtaksbrevTjeneste;
     }
 
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
         Long behandlingId = prosessTaskData.getBehandlingId();
-        bestillDokumentTjeneste.sendVedtaksbrev(prosessTaskData.getFagsakId(), prosessTaskData.getAktørId(), behandlingId);
+        vedtaksbrevTjeneste.sendVedtaksbrev(behandlingId);
         log.info("Utført for behandling: {}", behandlingId);
     }
 }

@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VarselbrevSporing;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.dokumentbestiller.DokumentMalType;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.brevmaler.DokumentBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.BrevmalDto;
 
 public class DokumentBehandlingTjenesteTest extends DokumentBestillerTestOppsett {

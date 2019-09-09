@@ -22,7 +22,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varselrespons.Varselrespons;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.SendVarselbrevTask;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.SendVarselbrevTask;
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;

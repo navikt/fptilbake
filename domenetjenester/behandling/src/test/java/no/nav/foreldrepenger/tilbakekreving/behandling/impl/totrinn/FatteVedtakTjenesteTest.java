@@ -21,15 +21,15 @@ public class FatteVedtakTjenesteTest extends FellesTestOppsett {
 
     @Test
     public void opprettTotrinnsVurdering_nårAksjonspunktErGodkjent() {
-        repoProvider.getAksjonspunktRepository().leggTilAksjonspunkt(BEHANDLING, AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING);
+        repoProvider.getAksjonspunktRepository().leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING);
         VedtakAksjonspunktData vedtakAksjonspunktData = new VedtakAksjonspunktData(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING, true, null, null);
-        fatteVedtakTjeneste.opprettTotrinnsVurdering(BEHANDLING, Collections.singletonList(vedtakAksjonspunktData));
+        fatteVedtakTjeneste.opprettTotrinnsVurdering(behandling, Collections.singletonList(vedtakAksjonspunktData));
 
-        List<Totrinnsvurdering> totrinnsvurderinger = List.copyOf(totrinnTjeneste.hentTotrinnsvurderinger(BEHANDLING));
+        List<Totrinnsvurdering> totrinnsvurderinger = List.copyOf(totrinnTjeneste.hentTotrinnsvurderinger(behandling));
         assertThat(totrinnsvurderinger).isNotEmpty();
         assertThat(totrinnsvurderinger.size()).isEqualTo(1);
         Totrinnsvurdering totrinnsvurdering = totrinnsvurderinger.get(0);
-        assertThat(totrinnsvurdering.getBehandling()).isEqualTo(BEHANDLING);
+        assertThat(totrinnsvurdering.getBehandling()).isEqualTo(behandling);
         assertThat(totrinnsvurdering.isGodkjent()).isTrue();
         assertThat(totrinnsvurdering.isAktiv()).isTrue();
         assertThat(totrinnsvurdering.getAksjonspunktDefinisjon().getKode()).isEqualTo(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING.getKode());
@@ -40,16 +40,16 @@ public class FatteVedtakTjenesteTest extends FellesTestOppsett {
 
     @Test
     public void opprettTotrinnsVurdering_nårAksjonspunktErIkkeGodkjent() {
-        repoProvider.getAksjonspunktRepository().leggTilAksjonspunkt(BEHANDLING, AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING);
+        repoProvider.getAksjonspunktRepository().leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING);
         VedtakAksjonspunktData vedtakAksjonspunktData = new VedtakAksjonspunktData(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING, false,
                 "feil fakta", Collections.singleton(VurderÅrsak.FEIL_FAKTA.getKode()));
-        fatteVedtakTjeneste.opprettTotrinnsVurdering(BEHANDLING, Collections.singletonList(vedtakAksjonspunktData));
+        fatteVedtakTjeneste.opprettTotrinnsVurdering(behandling, Collections.singletonList(vedtakAksjonspunktData));
 
-        List<Totrinnsvurdering> totrinnsvurderinger = List.copyOf(totrinnTjeneste.hentTotrinnsvurderinger(BEHANDLING));
+        List<Totrinnsvurdering> totrinnsvurderinger = List.copyOf(totrinnTjeneste.hentTotrinnsvurderinger(behandling));
         assertThat(totrinnsvurderinger).isNotEmpty();
         assertThat(totrinnsvurderinger.size()).isEqualTo(1);
         Totrinnsvurdering totrinnsvurdering = totrinnsvurderinger.get(0);
-        assertThat(totrinnsvurdering.getBehandling()).isEqualTo(BEHANDLING);
+        assertThat(totrinnsvurdering.getBehandling()).isEqualTo(behandling);
         assertThat(totrinnsvurdering.isGodkjent()).isFalse();
         assertThat(totrinnsvurdering.isAktiv()).isTrue();
         assertThat(totrinnsvurdering.getAksjonspunktDefinisjon().getKode()).isEqualTo(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING.getKode());

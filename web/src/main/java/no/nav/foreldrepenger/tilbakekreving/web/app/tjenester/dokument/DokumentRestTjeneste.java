@@ -19,7 +19,8 @@ import com.codahale.metrics.annotation.Timed;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.BestillDokumentTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.VarselbrevTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.VedtaksbrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Avsnitt;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.ForhåndvisningVedtaksbrevTekstDto;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.HentForhåndsvisningVarselbrevDto;
@@ -33,11 +34,13 @@ import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 @ApplicationScoped
 public class DokumentRestTjeneste {
 
-    private BestillDokumentTjeneste bestillDokumentTjeneste;
+    private VarselbrevTjeneste varselbrevTjeneste;
+    private VedtaksbrevTjeneste vedtaksbrevTjeneste;
 
     @Inject
-    public DokumentRestTjeneste(BestillDokumentTjeneste bestillDokumentTjeneste) {
-        this.bestillDokumentTjeneste = bestillDokumentTjeneste;
+    public DokumentRestTjeneste(VarselbrevTjeneste varselbrevTjeneste, VedtaksbrevTjeneste vedtaksbrevTjeneste) {
+        this.varselbrevTjeneste = varselbrevTjeneste;
+        this.vedtaksbrevTjeneste = vedtaksbrevTjeneste;
     }
 
     public DokumentRestTjeneste() {
@@ -53,7 +56,7 @@ public class DokumentRestTjeneste {
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response hentForhåndsvisningVarselbrev(
         @ApiParam("Inneholder kode til brevmal og data som skal flettes inn i brevet") @Valid HentForhåndsvisningVarselbrevDto hentForhåndsvisningVarselbrevDto) { // NOSONAR
-        byte[] dokument = bestillDokumentTjeneste.hentForhåndsvisningVarselbrev(hentForhåndsvisningVarselbrevDto);
+        byte[] dokument = varselbrevTjeneste.hentForhåndsvisningVarselbrev(hentForhåndsvisningVarselbrevDto);
         Response.ResponseBuilder responseBuilder = Response.ok(dokument);
         responseBuilder.type("application/pdf");
         responseBuilder.header("Content-Disposition", "filename=dokument.pdf");
@@ -68,7 +71,8 @@ public class DokumentRestTjeneste {
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response sendVarsel(@Valid SendVarselbrevDto sendVarselbrevDto) { // NOSONAR
-        bestillDokumentTjeneste.sendVarselbrev(sendVarselbrevDto.getFagsakId(), sendVarselbrevDto.getAktørId(), sendVarselbrevDto.getBehandlingId());
+        Long behandlingId = sendVarselbrevDto.getBehandlingId();
+        varselbrevTjeneste.sendVarselbrev(behandlingId);
         return Response.ok().build();
     }
 
@@ -80,7 +84,7 @@ public class DokumentRestTjeneste {
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public ForhåndvisningVedtaksbrevTekstDto hentVedtaksbrevForRedigering(@Valid BehandlingIdDto behandlingIdDto) { // NOSONAR
-        List<Avsnitt> avsnittene = bestillDokumentTjeneste.hentForhåndsvisningVedtaksbrevSomTekst(behandlingIdDto.getBehandlingId());
+        List<Avsnitt> avsnittene = vedtaksbrevTjeneste.hentForhåndsvisningVedtaksbrevSomTekst(behandlingIdDto.getBehandlingId());
         return new ForhåndvisningVedtaksbrevTekstDto(avsnittene);
     }
 
@@ -92,22 +96,11 @@ public class DokumentRestTjeneste {
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response hentForhåndsvisningVedtaksbrev(@Valid HentForhåndvisningVedtaksbrevPdfDto vedtaksbrevPdfDto) { // NOSONAR
-        byte[] dokument = bestillDokumentTjeneste.hentForhåndsvisningVedtaksbrevSomPdf(vedtaksbrevPdfDto);
+        byte[] dokument = vedtaksbrevTjeneste.hentForhåndsvisningVedtaksbrevSomPdf(vedtaksbrevPdfDto);
         Response.ResponseBuilder responseBuilder = Response.ok(dokument);
         responseBuilder.type("application/pdf");
         responseBuilder.header("Content-Disposition", "filename=dokument.pdf");
         return responseBuilder.build();
     }
 
-    @POST
-    @Timed
-    @Path("/send-vedtak-test")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Genererer vedtaksbrev og sender det til Dokumentproduksjon. Kun til testing.")
-    @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
-    @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public Response sendVarsel(@Valid HentForhåndvisningVedtaksbrevPdfDto vedtaksbrevPdfDto) { // NOSONAR
-        bestillDokumentTjeneste.sendVedtaksbrevTest(vedtaksbrevPdfDto);
-        return Response.ok().build();
-    }
 }

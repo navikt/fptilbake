@@ -85,23 +85,16 @@ public class HistorikkinnslagTjeneste {
         }
     }
 
-    public void opprettHistorikkinnslagForBrevsending(
-        JournalpostId journalpostId,
-        String dokumentId,
-        Long fagsakId,
-        Long behandlingId,
-        AktørId aktørId,
-        String tittel) {
-
+    public void opprettHistorikkinnslagForBrevsending(Behandling behandling, JournalpostId journalpostId, String dokumentId, String tittel) {
         HistorikkinnslagDokumentLink dokumentLink = new HistorikkinnslagDokumentLink();
         dokumentLink.setJournalpostId(journalpostId);
         dokumentLink.setDokumentId(dokumentId);
         dokumentLink.setLinkTekst(tittel);
 
         opprettHistorikkinnslag(
-            behandlingId,
-            aktørId,
-            fagsakId,
+            behandling.getId(),
+            behandling.getAktørId(),
+            behandling.getFagsakId(),
             HistorikkinnslagType.BREV_SENT,
             HistorikkAktør.VEDTAKSLØSNINGEN,
             Collections.singletonList(dokumentLink));
