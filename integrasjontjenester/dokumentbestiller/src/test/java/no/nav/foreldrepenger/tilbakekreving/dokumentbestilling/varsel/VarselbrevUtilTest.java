@@ -20,6 +20,7 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.KodeDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.PersonopplysningDto;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfoDto;
 import no.nav.foreldrepenger.tilbakekreving.simulering.kontrakt.FeilutbetaltePerioderDto;
 import no.nav.foreldrepenger.tilbakekreving.simulering.kontrakt.PeriodeDto;
 
@@ -47,17 +48,21 @@ public class VarselbrevUtilTest {
         PersonopplysningDto personopplysningDto = new PersonopplysningDto();
         personopplysningDto.setNavn("Fiona");
         personopplysningDto.setFødselsnummer("12345678900");
-        eksternBehandlingsinfoDto.setPersonopplysningDto(personopplysningDto);
 
         YtelseNavn ytelseNavn = new YtelseNavn();
         ytelseNavn.setNavnPåBrukersSpråk("eingongsstønad");
         ytelseNavn.setNavnPåBokmål("engangsstønad");
 
+        SamletEksternBehandlingInfoDto behandingsinfo = SamletEksternBehandlingInfoDto.builder()
+            .setGrunninformasjon(eksternBehandlingsinfoDto)
+            .setPersonopplysninger(personopplysningDto)
+            .build();
+
         VarselbrevSamletInfo varselbrev = VarselbrevUtil.sammenstillInfoFraFagsystemerForhåndvisningVarselbrev(
             saksnummer,
             varseltekst,
             adresseinfo,
-            eksternBehandlingsinfoDto,
+            behandingsinfo,
             feilutbetaltePerioderDto,
             Period.ofWeeks(3),
             ytelseNavn);
@@ -73,8 +78,8 @@ public class VarselbrevUtilTest {
         Assertions.assertThat(varselbrev.getBrevMetadata().getFagsaktypenavnPåSpråk()).isEqualTo("eingongsstønad");
         Assertions.assertThat(varselbrev.getBrevMetadata().getTittel()).isEqualTo("Varsel tilbakebetaling engangsstønad");
 
-        Assertions.assertThat(varselbrev.getBrevMetadata().getSakspartNavn()).isEqualTo(eksternBehandlingsinfoDto.getPersonopplysningDto().getNavn());
-        Assertions.assertThat(varselbrev.getBrevMetadata().getSakspartId()).isEqualTo(eksternBehandlingsinfoDto.getPersonopplysningDto().getFødselsnummer());
+        Assertions.assertThat(varselbrev.getBrevMetadata().getSakspartNavn()).isEqualTo(behandingsinfo.getPersonopplysninger().getNavn());
+        Assertions.assertThat(varselbrev.getBrevMetadata().getSakspartId()).isEqualTo(behandingsinfo.getPersonopplysninger().getFødselsnummer());
 
         Assertions.assertThat(varselbrev.getFeilutbetaltePerioder().get(0).getFom()).isEqualTo(feilutbetaltePerioderDto.getPerioder().get(0).getFom());
         Assertions.assertThat(varselbrev.getFeilutbetaltePerioder().get(0).getTom()).isEqualTo(feilutbetaltePerioderDto.getPerioder().get(0).getTom());
@@ -88,7 +93,6 @@ public class VarselbrevUtilTest {
         Personinfo personinfo = byggStandardPerson("Fiona", "12345678900", Språkkode.nn);
 
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto = new EksternBehandlingsinfoDto();
-        eksternBehandlingsinfoDto.setVarseltekst("Dette ser ikke bra ut as");
         eksternBehandlingsinfoDto.setAnsvarligSaksbehandler("Line Saksbehandler");
         eksternBehandlingsinfoDto.setFagsaktype(svangerskapspengerkode);
         eksternBehandlingsinfoDto.setBehandlendeEnhetId("behandlendeEnhetId 1234");
@@ -98,8 +102,13 @@ public class VarselbrevUtilTest {
         ytelseNavn.setNavnPåBrukersSpråk("svangerskapspengar");
         ytelseNavn.setNavnPåBokmål("svangerskapspenger");
 
+        SamletEksternBehandlingInfoDto behandingsinfo = SamletEksternBehandlingInfoDto.builder()
+            .setGrunninformasjon(eksternBehandlingsinfoDto)
+            .setVarseltekst("Dette ser ikke bra ut as")
+            .build();
+
         VarselbrevSamletInfo varselbrev = VarselbrevUtil.sammenstillInfoFraFagsystemerForSending(
-            eksternBehandlingsinfoDto,
+            behandingsinfo,
             Saksnummer.infotrygd("11111111"),
             adresseinfo,
             personinfo,

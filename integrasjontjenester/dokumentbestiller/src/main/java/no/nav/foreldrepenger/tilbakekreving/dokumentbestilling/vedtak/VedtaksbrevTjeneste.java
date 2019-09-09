@@ -34,6 +34,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingAggregateEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingAktsomhetEntitet;
@@ -59,7 +60,8 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Avsnitt;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.HentForhåndvisningVedtaksbrevPdfDto;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.PeriodeMedTekstDto;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.KodeDto;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfoDto;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.vedtak.felles.jpa.Transaction;
 
@@ -218,20 +220,21 @@ public class VedtaksbrevTjeneste {
     }
 
     BrevMetadata lagMetadataForVedtaksbrev(Behandling behandling, Long totalTilbakekrevingBeløp, UUID eksternUuid) {
-        EksternBehandlingsinfoDto eksternBehandlingsinfo = eksternDataForBrevTjeneste.hentBehandlingFpsak(eksternUuid, behandling.getFagsak().getSaksnummer());
-        String aktørId = eksternBehandlingsinfo.getPersonopplysningDto().getAktoerId();
+        SamletEksternBehandlingInfoDto eksternBehandlingsinfo = eksternDataForBrevTjeneste.hentBehandlingFpsak(eksternUuid, behandling.getFagsak().getSaksnummer());
+        String aktørId = eksternBehandlingsinfo.getPersonopplysninger().getAktoerId();
+        KodeDto fagsakType = eksternBehandlingsinfo.getGrunninformasjon().getFagsaktype();
+        Språkkode språkkode = eksternBehandlingsinfo.getGrunninformasjon().getSprakkode();
 
-        eksternBehandlingsinfo.setFagsaktype(eksternDataForBrevTjeneste.henteFagsakYtelseType(behandling)); // vi kan sette samme fagsakType fordi det ikke kan endret.
         Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(aktørId);
         Adresseinfo adresseinfo = eksternDataForBrevTjeneste.hentAdresse(personinfo, aktørId);
-        YtelseNavn ytelseNavn = eksternDataForBrevTjeneste.hentYtelsenavn(eksternBehandlingsinfo.getFagsaktype(), eksternBehandlingsinfo.getSprakkode());
+        YtelseNavn ytelseNavn = eksternDataForBrevTjeneste.hentYtelsenavn(fagsakType, språkkode);
 
         return new BrevMetadata.Builder()
             .medAnsvarligSaksbehandler(StringUtils.isNotEmpty(behandling.getAnsvarligSaksbehandler()) ? behandling.getAnsvarligSaksbehandler() : "VL")
             .medBehandlendeEnhetId(behandling.getBehandlendeEnhetId())
             .medBehandlendeEnhetNavn(behandling.getBehandlendeEnhetNavn())
             .medMottakerAdresse(adresseinfo)
-            .medFagsaktype(eksternBehandlingsinfo.getFagsaktype())
+            .medFagsaktype(fagsakType)
             .medSaksnummer(behandling.getFagsak().getSaksnummer().getVerdi())
             .medFagsaktypenavnPåSpråk(ytelseNavn.getNavnPåBrukersSpråk())
             .medSakspartId(personinfo.getPersonIdent().getIdent())

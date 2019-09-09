@@ -19,8 +19,8 @@ import no.nav.foreldrepenger.tilbakekreving.domene.person.TpsTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.KodeDto;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfoDto;
 import no.nav.foreldrepenger.tilbakekreving.simulering.klient.FpOppdragRestKlient;
 import no.nav.foreldrepenger.tilbakekreving.simulering.kontrakt.FeilutbetaltePerioderDto;
 import no.nav.vedtak.felles.jpa.Transaction;
@@ -67,12 +67,12 @@ public class EksternDataForBrevTjeneste {
         return brukersSvarfrist.getDays() / 7;
     }
 
-    public EksternBehandlingsinfoDto hentBehandlingFpsak(UUID eksternUuid, Saksnummer saksnummer) {
-        Optional<EksternBehandlingsinfoDto> dokumentinfoDto = fpsakKlient.hentBehandlingsinfo(eksternUuid);
-        if (!dokumentinfoDto.isPresent()) {
+    public SamletEksternBehandlingInfoDto hentBehandlingFpsak(UUID eksternUuid, Saksnummer saksnummer) {
+        SamletEksternBehandlingInfoDto behandlingsinfo = fpsakKlient.hentBehandlingsinfo(eksternUuid);
+        if (behandlingsinfo.getGrunninformasjon() == null) {
             throw EksternDataForBrevFeil.FACTORY.fantIkkeBehandlingIFpsak(saksnummer.getVerdi()).toException();
         }
-        return dokumentinfoDto.get();
+        return behandlingsinfo;
     }
 
     public Personinfo hentPerson(String aktørId) {
@@ -112,9 +112,9 @@ public class EksternDataForBrevTjeneste {
         return ytelseNavn;
     }
 
-    public KodeDto henteFagsakYtelseType(Behandling behandling){
+    public KodeDto henteFagsakYtelseType(Behandling behandling) {
         FagsakYtelseType fagsakYtelseType = behandling.getFagsak().getFagsakYtelseType();
-        return new KodeDto(fagsakYtelseType.getKodeverk(),fagsakYtelseType.getKode(),fagsakYtelseType.getNavn());
+        return new KodeDto(fagsakYtelseType.getKodeverk(), fagsakYtelseType.getKode(), fagsakYtelseType.getNavn());
     }
 
 }
