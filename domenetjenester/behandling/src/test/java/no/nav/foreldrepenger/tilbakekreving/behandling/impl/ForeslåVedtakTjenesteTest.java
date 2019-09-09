@@ -29,15 +29,15 @@ public class ForeslåVedtakTjenesteTest extends FellesTestOppsett {
     public void lagHistorikkInnslagForForeslåVedtak() {
         BeregningResultat beregningResultat = new BeregningResultat();
         beregningResultat.setVedtakResultatType(VedtakResultatType.FULL_TILBAKEBETALING);
-        when(beregningTjeneste.beregn(INTERN_BEHANDLING_ID)).thenReturn(beregningResultat);
+        when(beregningTjeneste.beregn(internBehandlingId)).thenReturn(beregningResultat);
 
-        foreslåVedtakTjeneste.lagHistorikkInnslagForForeslåVedtak(INTERN_BEHANDLING_ID);
+        foreslåVedtakTjeneste.lagHistorikkInnslagForForeslåVedtak(internBehandlingId);
 
-        List<Historikkinnslag> historikkInnslager = historikkRepository.hentHistorikkForSaksnummer(SAKSNUMMER);
+        List<Historikkinnslag> historikkInnslager = historikkRepository.hentHistorikkForSaksnummer(saksnummer);
         assertThat(historikkInnslager).isNotEmpty();
         assertThat(historikkInnslager.size()).isEqualTo(1);
         Historikkinnslag historikkinnslag = historikkInnslager.get(0);
-        assertThat(historikkinnslag.getBehandlingId()).isEqualTo(INTERN_BEHANDLING_ID);
+        assertThat(historikkinnslag.getBehandlingId()).isEqualTo(internBehandlingId);
         assertThat(historikkinnslag.getAktør()).isEqualByComparingTo(HistorikkAktør.SAKSBEHANDLER);
         assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.FORSLAG_VEDTAK);
 

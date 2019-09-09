@@ -42,7 +42,6 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
     private String fritekstOppsummering;
     @JsonProperty("lovhjemmel-vedtak")
     private String lovhjemmelVedtak;
-
     @JsonProperty("fire-rettsgebyr")
     @JsonSerialize(using = BigDecimalHeltallSerialiserer.class)
     private BigDecimal fireRettsgebyr = BigDecimal.valueOf(4600);  //FIXME fjerne hardkoding
@@ -50,7 +49,7 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
     @JsonSerialize(using = BigDecimalHeltallSerialiserer.class)
     private BigDecimal halvtGrunnbeløp = BigDecimal.valueOf(49929);  //FIXME fjerne hardkoding
     @JsonProperty("klagefrist-uker")
-    private Integer klagefristUker = 4;  //TODO fjerne hardkoding
+    private Integer klagefristUker;
     @JsonProperty("kontakt-nav-telefon")
     private String kontaktNavTelefon = "55 55 33 33"; //TODO fjerne hardkoding
     @JsonProperty("kontakt-nav-innkreving-telefon")

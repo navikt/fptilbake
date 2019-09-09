@@ -12,6 +12,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevdataRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevSporing;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
@@ -20,7 +21,6 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.domene.YtelseNavn
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.HentForhåndsvisningVarselbrevDto;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.util.TittelOverskriftUtil;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.util.VarselbrevUtil;
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.KodeDto;
@@ -33,6 +33,7 @@ public class VarselbrevTjeneste {
 
     private static final String TITTEL_VARSELBREV_HISTORIKKINNSLAG = "Varselbrev Tilbakekreving";
 
+    private BehandlingRepository behandlingRepository;
     private FellesInfoTilBrevTjeneste fellesInfoTilBrevTjeneste;
     private BehandlingTjeneste behandlingTjeneste;
     private EksternBehandlingRepository eksternBehandlingRepository;
@@ -41,7 +42,14 @@ public class VarselbrevTjeneste {
     private BrevdataRepository brevdataRepository;
 
     @Inject
-    public VarselbrevTjeneste(FellesInfoTilBrevTjeneste fellesInfoTilBrevTjeneste, BehandlingTjeneste behandlingTjeneste, EksternBehandlingRepository eksternBehandlingRepository, BestillDokumentTjeneste bestillDokumentTjeneste, HistorikkinnslagTjeneste historikkinnslagTjeneste, BrevdataRepository brevdataRepository) {
+    public VarselbrevTjeneste(BehandlingRepository behandlingRepository,
+                              FellesInfoTilBrevTjeneste fellesInfoTilBrevTjeneste,
+                              BehandlingTjeneste behandlingTjeneste,
+                              EksternBehandlingRepository eksternBehandlingRepository,
+                              BestillDokumentTjeneste bestillDokumentTjeneste,
+                              HistorikkinnslagTjeneste historikkinnslagTjeneste,
+                              BrevdataRepository brevdataRepository) {
+        this.behandlingRepository = behandlingRepository;
         this.fellesInfoTilBrevTjeneste = fellesInfoTilBrevTjeneste;
         this.behandlingTjeneste = behandlingTjeneste;
         this.eksternBehandlingRepository = eksternBehandlingRepository;
@@ -53,7 +61,7 @@ public class VarselbrevTjeneste {
     public VarselbrevTjeneste() {
     }
 
-    public void sendVarselbrev(Long fagsakId, AktørId aktørId, Long behandlingId) {
+    public void sendVarselbrev(Long behandlingId) {
         VarselbrevSamletInfo varselbrevSamletInfo = lagVarselbrevForSending(behandlingId);
         String overskrift = TittelOverskriftUtil.finnOverskriftVarselbrev(varselbrevSamletInfo.getBrevMetadata().getFagsaktypenavnPåSpråk());
         String brevtekst = TekstformattererVarselbrev.lagVarselbrevFritekst(varselbrevSamletInfo);
@@ -62,8 +70,9 @@ public class VarselbrevTjeneste {
             .medBrevtekst(brevtekst)
             .medMetadata(varselbrevSamletInfo.getBrevMetadata())
             .build();
+        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         JournalpostIdOgDokumentId dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data);
-        opprettHistorikkinnslag(behandlingId, dokumentreferanse, fagsakId, aktørId);
+        opprettHistorikkinnslag(behandling, dokumentreferanse);
         lagreInfoOmVedtaksbrev(behandlingId, dokumentreferanse);
     }
 
@@ -85,13 +94,11 @@ public class VarselbrevTjeneste {
         return bestillDokumentTjeneste.hentForhåndsvisningFritekstbrev(data);
     }
 
-    private void opprettHistorikkinnslag(Long behandlingId, JournalpostIdOgDokumentId dokumentreferanse, Long fagsakId, AktørId aktørId) {
+    private void opprettHistorikkinnslag(Behandling behandling, JournalpostIdOgDokumentId dokumentreferanse) {
         historikkinnslagTjeneste.opprettHistorikkinnslagForBrevsending(
+            behandling,
             dokumentreferanse.getJournalpostId(),
             dokumentreferanse.getDokumentId(),
-            fagsakId,
-            behandlingId,
-            aktørId,
             TITTEL_VARSELBREV_HISTORIKKINNSLAG);
     }
 

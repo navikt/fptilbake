@@ -24,25 +24,25 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
 
     @Test
     public void skalReturnereTomFeilutbetalingFaktaNårGrunnlagIkkeFinnes() {
-        Optional<BehandlingFeilutbetalingFakta> feilutbetalingFakta = behandlingTjeneste.hentBehandlingFeilutbetalingFakta(INTERN_BEHANDLING_ID);
+        Optional<BehandlingFeilutbetalingFakta> feilutbetalingFakta = behandlingTjeneste.hentBehandlingFeilutbetalingFakta(internBehandlingId);
         assertThat(feilutbetalingFakta).isEmpty();
     }
 
     @Test
     public void skalFeileNårSimuleringIkkeFinnes() {
-        when(mockSimuleringIntegrasjonTjeneste.hentResultat(EKSTERN_BEHANDLING_ID)).thenReturn(Optional.empty());
+        when(mockSimuleringIntegrasjonTjeneste.hentResultat(eksternBehandlingId)).thenReturn(Optional.empty());
 
         KravgrunnlagMock mock = lagKravgrunnlag(LocalDate.now(), LocalDate.now(), KlasseType.FEIL, BigDecimal.ZERO, BigDecimal.ZERO);
         Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mock));
         KravgrunnlagAggregate kravgrunnlagAggregate = KravgrunnlagAggregate.builder()
                 .medGrunnlagØkonomi(kravgrunnlag431)
-                .medBehandlingId(INTERN_BEHANDLING_ID).build();
+                .medBehandlingId(internBehandlingId).build();
         grunnlagRepository.lagre(kravgrunnlagAggregate);
 
         expectedException.expect(TekniskException.class);
         expectedException.expectMessage("FPT-7428495");
 
-        behandlingTjeneste.hentBehandlingFeilutbetalingFakta(INTERN_BEHANDLING_ID);
+        behandlingTjeneste.hentBehandlingFeilutbetalingFakta(internBehandlingId);
     }
 
     @Test
@@ -53,10 +53,10 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
         Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedYtelPostering));
         KravgrunnlagAggregate kravgrunnlagAggregate = KravgrunnlagAggregate.builder()
                 .medGrunnlagØkonomi(kravgrunnlag431)
-                .medBehandlingId(INTERN_BEHANDLING_ID).build();
+                .medBehandlingId(internBehandlingId).build();
 
         grunnlagRepository.lagre(kravgrunnlagAggregate);
-        Optional<BehandlingFeilutbetalingFakta> feilutbetalingFakta = behandlingTjeneste.hentBehandlingFeilutbetalingFakta(INTERN_BEHANDLING_ID);
+        Optional<BehandlingFeilutbetalingFakta> feilutbetalingFakta = behandlingTjeneste.hentBehandlingFeilutbetalingFakta(internBehandlingId);
 
         assertThat(feilutbetalingFakta).isNotEmpty();
         BehandlingFeilutbetalingFakta fakta = feilutbetalingFakta.get();
@@ -81,10 +81,10 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
                 mockMedFeilPostering3, mockMedYtelPostering));
         KravgrunnlagAggregate kravgrunnlagAggregate = KravgrunnlagAggregate.builder()
                 .medGrunnlagØkonomi(kravgrunnlag431)
-                .medBehandlingId(INTERN_BEHANDLING_ID).build();
+                .medBehandlingId(internBehandlingId).build();
 
         grunnlagRepository.lagre(kravgrunnlagAggregate);
-        Optional<BehandlingFeilutbetalingFakta> feilutbetalingFakta = behandlingTjeneste.hentBehandlingFeilutbetalingFakta(INTERN_BEHANDLING_ID);
+        Optional<BehandlingFeilutbetalingFakta> feilutbetalingFakta = behandlingTjeneste.hentBehandlingFeilutbetalingFakta(internBehandlingId);
 
         assertThat(feilutbetalingFakta).isNotEmpty();
         BehandlingFeilutbetalingFakta fakta = feilutbetalingFakta.get();
@@ -114,10 +114,10 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
                 mockMedFeilPostering3, mockMedYtelPostering));
         KravgrunnlagAggregate kravgrunnlagAggregate = KravgrunnlagAggregate.builder()
                 .medGrunnlagØkonomi(kravgrunnlag431)
-                .medBehandlingId(INTERN_BEHANDLING_ID).build();
+                .medBehandlingId(internBehandlingId).build();
 
         grunnlagRepository.lagre(kravgrunnlagAggregate);
-        Optional<BehandlingFeilutbetalingFakta> feilutbetalingFakta = behandlingTjeneste.hentBehandlingFeilutbetalingFakta(INTERN_BEHANDLING_ID);
+        Optional<BehandlingFeilutbetalingFakta> feilutbetalingFakta = behandlingTjeneste.hentBehandlingFeilutbetalingFakta(internBehandlingId);
 
         assertThat(feilutbetalingFakta).isNotEmpty();
         BehandlingFeilutbetalingFakta fakta = feilutbetalingFakta.get();

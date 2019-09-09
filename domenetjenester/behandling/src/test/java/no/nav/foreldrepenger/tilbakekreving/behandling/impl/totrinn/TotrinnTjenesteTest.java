@@ -43,44 +43,44 @@ public class TotrinnTjenesteTest extends FellesTestOppsett {
         Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedYtelPostering));
         KravgrunnlagAggregate kravgrunnlagAggregate = KravgrunnlagAggregate.builder()
                 .medGrunnlagØkonomi(kravgrunnlag431)
-                .medBehandlingId(INTERN_BEHANDLING_ID).build();
+                .medBehandlingId(internBehandlingId).build();
         grunnlagRepository.lagre(kravgrunnlagAggregate);
 
         repoProvider.getFeilutbetalingRepository().lagre(formFeilutbetalingAggregate());
-        vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(INTERN_BEHANDLING_ID, Collections.singletonList(
+        vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, Collections.singletonList(
                 new ForeldelsePeriodeDto(FOM, TOM,
                         ForeldelseVurderingType.FORELDET, "ABC")));
         List<VilkårsvurderingPerioderDto> vilkårPerioder = Lists.newArrayList(
                 formVilkårsvurderingPerioderDto(VilkårResultat.GOD_TRO, FOM, TOM, Aktsomhet.FORSETT));
-        vilkårsvurderingTjeneste.lagreVilkårsvurdering(INTERN_BEHANDLING_ID, vilkårPerioder);
+        vilkårsvurderingTjeneste.lagreVilkårsvurdering(internBehandlingId, vilkårPerioder);
 
-        totrinnTjeneste.settNyttTotrinnsgrunnlag(BEHANDLING);
+        totrinnTjeneste.settNyttTotrinnsgrunnlag(behandling);
 
-        Optional<Totrinnresultatgrunnlag> totrinnresultatgrunnlag = totrinnTjeneste.hentTotrinngrunnlagHvisEksisterer(BEHANDLING);
+        Optional<Totrinnresultatgrunnlag> totrinnresultatgrunnlag = totrinnTjeneste.hentTotrinngrunnlagHvisEksisterer(behandling);
         assertThat(totrinnresultatgrunnlag).isNotEmpty();
         Totrinnresultatgrunnlag resultat = totrinnresultatgrunnlag.get();
-        assertThat(resultat.getBehandling().getId()).isEqualTo(INTERN_BEHANDLING_ID);
-        assertThat(resultat.getFaktaFeilutbetalingId()).isEqualTo(repoProvider.getFeilutbetalingRepository().finnFeilutbetaling(INTERN_BEHANDLING_ID).get().getId());
-        assertThat(resultat.getVurderForeldelseId()).isEqualTo(repoProvider.getVurdertForeldelseRepository().finnVurdertForeldelseForBehandling(INTERN_BEHANDLING_ID).get().getId());
-        assertThat(resultat.getVurderVilkårId()).isEqualTo(repoProvider.getVilkårsvurderingRepository().finnVilkårsvurderingForBehandlingId(INTERN_BEHANDLING_ID).get().getId());
+        assertThat(resultat.getBehandling().getId()).isEqualTo(internBehandlingId);
+        assertThat(resultat.getFaktaFeilutbetalingId()).isEqualTo(repoProvider.getFeilutbetalingRepository().finnFeilutbetaling(internBehandlingId).get().getId());
+        assertThat(resultat.getVurderForeldelseId()).isEqualTo(repoProvider.getVurdertForeldelseRepository().finnVurdertForeldelseForBehandling(internBehandlingId).get().getId());
+        assertThat(resultat.getVurderVilkårId()).isEqualTo(repoProvider.getVilkårsvurderingRepository().finnVilkårsvurderingForBehandlingId(internBehandlingId).get().getId());
     }
 
     @Test
     public void settNyeTotrinnaksjonspunktvurderinger() {
         Totrinnsvurdering totrinnsvurdering = Totrinnsvurdering.builder().medGodkjent(true)
                 .medAksjonspunktDefinisjon(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING)
-                .medBehandling(BEHANDLING)
+                .medBehandling(behandling)
                 .build();
-        totrinnTjeneste.settNyeTotrinnaksjonspunktvurderinger(BEHANDLING, Collections.singletonList(totrinnsvurdering));
+        totrinnTjeneste.settNyeTotrinnaksjonspunktvurderinger(behandling, Collections.singletonList(totrinnsvurdering));
 
-        List<Totrinnsvurdering> totrinnsvurderinger = (List<Totrinnsvurdering>) totrinnTjeneste.hentTotrinnsvurderinger(BEHANDLING);
+        List<Totrinnsvurdering> totrinnsvurderinger = (List<Totrinnsvurdering>) totrinnTjeneste.hentTotrinnsvurderinger(behandling);
         assertThat(totrinnsvurderinger).isNotEmpty();
         assertThat(totrinnsvurderinger.size()).isEqualTo(1);
         totrinnsvurdering = totrinnsvurderinger.get(0);
         assertThat(totrinnsvurdering.getVurderÅrsaker()).isEmpty();
         assertThat(totrinnsvurdering.isGodkjent()).isTrue();
         assertThat(totrinnsvurdering.getAksjonspunktDefinisjon()).isEqualToComparingFieldByField(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING);
-        assertThat(totrinnsvurdering.getBehandling()).isEqualToComparingFieldByField(BEHANDLING);
+        assertThat(totrinnsvurdering.getBehandling()).isEqualToComparingFieldByField(behandling);
         assertThat(totrinnsvurdering.getBegrunnelse()).isNull();
     }
 }

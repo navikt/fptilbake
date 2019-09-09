@@ -26,7 +26,6 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Forhåndvisni
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.HentForhåndsvisningVarselbrevDto;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.HentForhåndvisningVedtaksbrevPdfDto;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.SendVarselbrevDto;
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 
@@ -72,10 +71,8 @@ public class DokumentRestTjeneste {
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response sendVarsel(@Valid SendVarselbrevDto sendVarselbrevDto) { // NOSONAR
-        Long fagsakId = sendVarselbrevDto.getFagsakId();
         Long behandlingId = sendVarselbrevDto.getBehandlingId();
-        AktørId aktørId = new AktørId(sendVarselbrevDto.getAktørId());
-        varselbrevTjeneste.sendVarselbrev(fagsakId, aktørId, behandlingId);
+        varselbrevTjeneste.sendVarselbrev(behandlingId);
         return Response.ok().build();
     }
 

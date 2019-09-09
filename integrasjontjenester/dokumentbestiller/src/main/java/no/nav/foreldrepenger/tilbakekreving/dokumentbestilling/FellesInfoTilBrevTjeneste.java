@@ -123,26 +123,4 @@ public class FellesInfoTilBrevTjeneste {
         return new KodeDto(fagsakYtelseType.getKodeverk(),fagsakYtelseType.getKode(),fagsakYtelseType.getNavn());
     }
 
-    BrevMetadata lagMetadataForVedtaksbrev(Behandling behandling, Long totalTilbakekrevingBeløp, UUID eksternUuid) {
-        EksternBehandlingsinfoDto eksternBehandlingsinfo = hentBehandlingFpsak(eksternUuid,  behandling.getFagsak().getSaksnummer());
-        eksternBehandlingsinfo.setFagsaktype(henteFagsakYtelseType(behandling)); // vi kan sette samme fagsakType fordi det ikke kan endret.
-        String aktørId = eksternBehandlingsinfo.getPersonopplysningDto().getAktoerId();
-        Personinfo personinfo = hentPerson(aktørId);
-        Adresseinfo adresseinfo = hentAdresse(personinfo, aktørId);
-        YtelseNavn ytelseNavn = hentYtelsenavn(eksternBehandlingsinfo.getFagsaktype(), eksternBehandlingsinfo.getSprakkode());
-
-        return new BrevMetadata.Builder()
-            .medAnsvarligSaksbehandler(StringUtils.isNotEmpty(behandling.getAnsvarligSaksbehandler()) ? behandling.getAnsvarligSaksbehandler() : "VL")
-            .medBehandlendeEnhetId("4833") //FIXME fjern hardkoding
-            .medBehandlendeEnhetNavn("NAV Familie- og pensjonsytelser Oslo 1") //FIXME fjern hardkoding
-            .medMottakerAdresse(adresseinfo)
-            .medFagsaktype(eksternBehandlingsinfo.getFagsaktype())
-            .medSaksnummer(behandling.getFagsak().getSaksnummer().getVerdi())
-            .medFagsaktypenavnPåSpråk(ytelseNavn.getNavnPåBrukersSpråk())
-            .medSakspartId(personinfo.getPersonIdent().getIdent())
-            .medSakspartNavn(personinfo.getNavn())
-            .medSprakkode(personinfo.getForetrukketSpråk())
-            .medTittel(TittelOverskriftUtil.finnTittelVedtaksbrev(ytelseNavn.getNavnPåBokmål(), totalTilbakekrevingBeløp > 0))
-            .build();
-    }
 }

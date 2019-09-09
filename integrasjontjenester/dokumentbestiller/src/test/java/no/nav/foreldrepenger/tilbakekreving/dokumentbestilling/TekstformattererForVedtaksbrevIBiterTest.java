@@ -42,6 +42,7 @@ public class TekstformattererForVedtaksbrevIBiterTest {
             .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(23002))
             .medTotaltRentebeløp(BigDecimal.ZERO)
             .medVarsletDato(LocalDate.of(2020, 4, 4))
+            .medKlagefristUker(4)
             .build();
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
             HbVedtaksbrevPeriode.builder()
@@ -88,6 +89,7 @@ public class TekstformattererForVedtaksbrevIBiterTest {
             .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(23002))
             .medTotaltRentebeløp(BigDecimal.ZERO)
             .medVarsletDato(LocalDate.of(2020, 4, 4))
+            .medKlagefristUker(4)
             .build();
         HbVedtaksbrevPeriode periode = HbVedtaksbrevPeriode.builder()
             .medPeriode(januar)

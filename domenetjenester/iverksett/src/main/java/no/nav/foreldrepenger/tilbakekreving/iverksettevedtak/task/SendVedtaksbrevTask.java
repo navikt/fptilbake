@@ -6,10 +6,8 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Aktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.VedtaksbrevTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
@@ -37,9 +35,7 @@ public class SendVedtaksbrevTask implements ProsessTaskHandler {
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
         Long behandlingId = prosessTaskData.getBehandlingId();
-        AktørId aktørId = new AktørId(prosessTaskData.getAktørId());
-        Long fagsakId = prosessTaskData.getFagsakId();
-        vedtaksbrevTjeneste.sendVedtaksbrev(fagsakId, aktørId, behandlingId);
+        vedtaksbrevTjeneste.sendVedtaksbrev(behandlingId);
         log.info("Utført for behandling: {}", behandlingId);
     }
 }

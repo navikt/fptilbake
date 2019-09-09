@@ -53,13 +53,13 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         formGrunnlag();
         formFeilutbetalingPeriodeMedÅrsak();
 
-        vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(INTERN_BEHANDLING_ID, Lists.newArrayList(
+        vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, Lists.newArrayList(
             new ForeldelsePeriodeDto(FOM, SISTE_DAG_I_FORELDELSE_PERIODE,
                 ForeldelseVurderingType.FORELDET, "ABC"),
             new ForeldelsePeriodeDto(FØRSTE_DAG_I_FORELDELSE_PERIODE, TOM,
                 ForeldelseVurderingType.IKKE_FORELDET, "CDE")));
 
-        List<DetaljertFeilutbetalingPeriodeDto> perioder = vilkårsvurderingTjeneste.hentDetaljertFeilutbetalingPerioder(INTERN_BEHANDLING_ID);
+        List<DetaljertFeilutbetalingPeriodeDto> perioder = vilkårsvurderingTjeneste.hentDetaljertFeilutbetalingPerioder(internBehandlingId);
         assertThat(perioder).isNotEmpty();
         assertThat(perioder.size()).isEqualTo(2);
         perioder.sort(Comparator.comparing(DetaljertFeilutbetalingPeriodeDto::getFom));
@@ -104,7 +104,7 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         formGrunnlag();
         formFeilutbetalingPeriodeMedÅrsak();
 
-        List<DetaljertFeilutbetalingPeriodeDto> perioder = vilkårsvurderingTjeneste.hentDetaljertFeilutbetalingPerioder(INTERN_BEHANDLING_ID);
+        List<DetaljertFeilutbetalingPeriodeDto> perioder = vilkårsvurderingTjeneste.hentDetaljertFeilutbetalingPerioder(internBehandlingId);
         assertThat(perioder).isNotEmpty();
         assertThat(perioder.size()).isEqualTo(1);
         DetaljertFeilutbetalingPeriodeDto periode = perioder.get(0);
@@ -151,12 +151,12 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
             mockMedYtelPostering, mockMedYtelPostering1, mockMedYtelPostering2, mockMedTrekPostering));
         KravgrunnlagAggregate kravgrunnlagAggregate = KravgrunnlagAggregate.builder()
             .medGrunnlagØkonomi(kravgrunnlag431)
-            .medBehandlingId(INTERN_BEHANDLING_ID).build();
+            .medBehandlingId(internBehandlingId).build();
         grunnlagRepository.lagre(kravgrunnlagAggregate);
 
         formFeilutbetalingPeriodeMedÅrsak();
 
-        List<DetaljertFeilutbetalingPeriodeDto> perioder = vilkårsvurderingTjeneste.hentDetaljertFeilutbetalingPerioder(INTERN_BEHANDLING_ID);
+        List<DetaljertFeilutbetalingPeriodeDto> perioder = vilkårsvurderingTjeneste.hentDetaljertFeilutbetalingPerioder(internBehandlingId);
         assertThat(perioder).isNotEmpty();
         assertThat(perioder.size()).isEqualTo(1);
         DetaljertFeilutbetalingPeriodeDto periode = perioder.get(0);
@@ -181,9 +181,9 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         List<VilkårsvurderingPerioderDto> vilkårPerioder = Lists.newArrayList(
             formVilkårsvurderingPerioderDto(VilkårResultat.GOD_TRO, FOM, LocalDate.of(2016, 3, 31), null),
             formVilkårsvurderingPerioderDto(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER, LocalDate.of(2016, 4, 1), TOM, Aktsomhet.FORSETT));
-        vilkårsvurderingTjeneste.lagreVilkårsvurdering(INTERN_BEHANDLING_ID, vilkårPerioder);
+        vilkårsvurderingTjeneste.lagreVilkårsvurdering(internBehandlingId, vilkårPerioder);
 
-        Optional<VilkårVurderingAggregateEntitet> aggregateEntitet = repoProvider.getVilkårsvurderingRepository().finnVilkårsvurderingForBehandlingId(INTERN_BEHANDLING_ID);
+        Optional<VilkårVurderingAggregateEntitet> aggregateEntitet = repoProvider.getVilkårsvurderingRepository().finnVilkårsvurderingForBehandlingId(internBehandlingId);
         assertThat(aggregateEntitet).isNotEmpty();
         assertThat(aggregateEntitet.get().isAktiv()).isTrue();
         VilkårVurderingEntitet vilkårEntitet = aggregateEntitet.get().getManuellVilkår();
@@ -208,9 +208,9 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         List<VilkårsvurderingPerioderDto> vilkårPerioder = Lists.newArrayList(
             formVilkårsvurderingPerioderDto(VilkårResultat.FORSTO_BURDE_FORSTÅTT, FOM, LocalDate.of(2016, 3, 31), Aktsomhet.SIMPEL_UAKTSOM),
             formVilkårsvurderingPerioderDto(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER, LocalDate.of(2016, 4, 1), TOM, Aktsomhet.GROVT_UAKTSOM));
-        vilkårsvurderingTjeneste.lagreVilkårsvurdering(INTERN_BEHANDLING_ID, vilkårPerioder);
+        vilkårsvurderingTjeneste.lagreVilkårsvurdering(internBehandlingId, vilkårPerioder);
 
-        Optional<VilkårVurderingAggregateEntitet> aggregateEntitet = repoProvider.getVilkårsvurderingRepository().finnVilkårsvurderingForBehandlingId(INTERN_BEHANDLING_ID);
+        Optional<VilkårVurderingAggregateEntitet> aggregateEntitet = repoProvider.getVilkårsvurderingRepository().finnVilkårsvurderingForBehandlingId(internBehandlingId);
         assertThat(aggregateEntitet).isNotEmpty();
         assertThat(aggregateEntitet.get().isAktiv()).isTrue();
         VilkårVurderingEntitet vilkårEntitet = aggregateEntitet.get().getManuellVilkår();
@@ -242,7 +242,7 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         formGrunnlag();
         formFeilutbetalingPeriodeMedÅrsak();
 
-        vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(INTERN_BEHANDLING_ID, Lists.newArrayList(
+        vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, Lists.newArrayList(
             new ForeldelsePeriodeDto(FOM, SISTE_DAG_I_FORELDELSE_PERIODE,
                 ForeldelseVurderingType.FORELDET, "ABC"),
             new ForeldelsePeriodeDto(FØRSTE_DAG_I_FORELDELSE_PERIODE, TOM,
@@ -251,9 +251,9 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         List<VilkårsvurderingPerioderDto> vilkårPerioder = Lists.newArrayList(
             formVilkårsvurderingPerioderDto(VilkårResultat.FORSTO_BURDE_FORSTÅTT, FOM, SISTE_DAG_I_FORELDELSE_PERIODE, Aktsomhet.SIMPEL_UAKTSOM),
             formVilkårsvurderingPerioderDto(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER, FØRSTE_DAG_I_FORELDELSE_PERIODE, TOM, Aktsomhet.GROVT_UAKTSOM));
-        vilkårsvurderingTjeneste.lagreVilkårsvurdering(INTERN_BEHANDLING_ID, vilkårPerioder);
+        vilkårsvurderingTjeneste.lagreVilkårsvurdering(internBehandlingId, vilkårPerioder);
 
-        Optional<VilkårVurderingAggregateEntitet> aggregateEntitet = repoProvider.getVilkårsvurderingRepository().finnVilkårsvurderingForBehandlingId(INTERN_BEHANDLING_ID);
+        Optional<VilkårVurderingAggregateEntitet> aggregateEntitet = repoProvider.getVilkårsvurderingRepository().finnVilkårsvurderingForBehandlingId(internBehandlingId);
         assertThat(aggregateEntitet).isNotEmpty();
         assertThat(aggregateEntitet.get().isAktiv()).isTrue();
         VilkårVurderingEntitet vilkårEntitet = aggregateEntitet.get().getManuellVilkår();
@@ -274,11 +274,11 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         List<VilkårsvurderingPerioderDto> vilkårPerioder = Lists.newArrayList(
             formVilkårsvurderingPerioderDto(VilkårResultat.GOD_TRO, FOM, LocalDate.of(2016, 3, 31), null),
             formVilkårsvurderingPerioderDto(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER, LocalDate.of(2016, 4, 1), TOM, Aktsomhet.FORSETT));
-        vilkårsvurderingTjeneste.lagreVilkårsvurdering(INTERN_BEHANDLING_ID, vilkårPerioder);
+        vilkårsvurderingTjeneste.lagreVilkårsvurdering(internBehandlingId, vilkårPerioder);
 
         formGrunnlag();
 
-        List<VilkårsvurderingPerioderDto> perioder = vilkårsvurderingTjeneste.hentVilkårsvurdering(INTERN_BEHANDLING_ID);
+        List<VilkårsvurderingPerioderDto> perioder = vilkårsvurderingTjeneste.hentVilkårsvurdering(internBehandlingId);
         assertThat(perioder.size()).isEqualTo(2);
         perioder.sort(Comparator.comparing(VilkårsvurderingPerioderDto::getFom));
 
@@ -308,11 +308,11 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         List<VilkårsvurderingPerioderDto> vilkårPerioder = Lists.newArrayList(
             formVilkårsvurderingPerioderDto(VilkårResultat.FORSTO_BURDE_FORSTÅTT, FOM, LocalDate.of(2016, 3, 31), Aktsomhet.SIMPEL_UAKTSOM),
             formVilkårsvurderingPerioderDto(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER, LocalDate.of(2016, 4, 1), TOM, Aktsomhet.GROVT_UAKTSOM));
-        vilkårsvurderingTjeneste.lagreVilkårsvurdering(INTERN_BEHANDLING_ID, vilkårPerioder);
+        vilkårsvurderingTjeneste.lagreVilkårsvurdering(internBehandlingId, vilkårPerioder);
 
         formGrunnlag();
 
-        List<VilkårsvurderingPerioderDto> perioder = vilkårsvurderingTjeneste.hentVilkårsvurdering(INTERN_BEHANDLING_ID);
+        List<VilkårsvurderingPerioderDto> perioder = vilkårsvurderingTjeneste.hentVilkårsvurdering(internBehandlingId);
         assertThat(perioder.size()).isEqualTo(2);
         perioder.sort(Comparator.comparing(VilkårsvurderingPerioderDto::getFom));
 
@@ -366,7 +366,7 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
             mockMedYtelPostering, mockMedYtelPostering1, mockMedYtelPostering2));
         KravgrunnlagAggregate kravgrunnlagAggregate = KravgrunnlagAggregate.builder()
             .medGrunnlagØkonomi(kravgrunnlag431)
-            .medBehandlingId(INTERN_BEHANDLING_ID).build();
+            .medBehandlingId(internBehandlingId).build();
         grunnlagRepository.lagre(kravgrunnlagAggregate);
     }
 
@@ -381,7 +381,7 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         feilutbetaling.leggTilFeilutbetaltPeriode(feilutbetalingPeriodeÅrsak);
 
         FeilutbetalingAggregate feilutbetalingAggregate = FeilutbetalingAggregate.builder()
-            .medBehandlingId(INTERN_BEHANDLING_ID)
+            .medBehandlingId(internBehandlingId)
             .medFeilutbetaling(feilutbetaling).build();
         feilutbetalingRepository.lagre(feilutbetalingAggregate);
     }
