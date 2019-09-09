@@ -23,10 +23,10 @@ public class HistorikkTjenesteAdapterTest extends FellesTestOppsett {
     public void opprettHistorikkInnslag() {
         HistorikkInnslagTekstBuilder tekstBuilder = historikkTjenesteAdapter.tekstBuilder();
         tekstBuilder.medSkjermlenke(SkjermlenkeType.UDEFINERT).medBegrunnelse(HistorikkBegrunnelseType.SAKSBEH_START_PA_NYTT)
-                .medHendelse(HistorikkinnslagType.FAKTA_ENDRET, INTERN_BEHANDLING_ID)
+                .medHendelse(HistorikkinnslagType.FAKTA_ENDRET, internBehandlingId)
                 .medEndretFelt(HistorikkEndretFeltType.BEHANDLING, "behandling", 1, 2);
-        historikkTjenesteAdapter.opprettHistorikkInnslag(BEHANDLING, HistorikkinnslagType.FAKTA_ENDRET);
-        List<HistorikkinnslagDto> historikkinnslager = historikkTjenesteAdapter.hentAlleHistorikkInnslagForSak(SAKSNUMMER);
+        historikkTjenesteAdapter.opprettHistorikkInnslag(behandling, HistorikkinnslagType.FAKTA_ENDRET);
+        List<HistorikkinnslagDto> historikkinnslager = historikkTjenesteAdapter.hentAlleHistorikkInnslagForSak(saksnummer);
         assertThat(historikkinnslager).isNotEmpty();
         assertThat(historikkinnslager.size()).isEqualTo(1);
         HistorikkinnslagDto historikkinnslagDto = historikkinnslager.get(0);

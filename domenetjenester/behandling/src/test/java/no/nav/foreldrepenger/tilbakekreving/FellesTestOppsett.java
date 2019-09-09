@@ -48,12 +48,17 @@ public class FellesTestOppsett extends TestOppsett {
     protected static final String ÅRSAK = "UTTAK_UTSETTELSE_TYPE";
     protected static final String UNDER_ÅRSAK = "ARBEID_HELTID";
     protected static final String BEGRUNNELSE = "ABC";
-
     protected static final String ÅRSAK_KODEVERK = HendelseType.DISCRIMINATOR;
     protected static final String UNDER_ÅRSAK_KODEVERK = HendelseUnderType.DISCRIMINATOR;
-
     protected static final Period defaultVentetid = Period.ofWeeks(4);
 
+    protected AktørId aktørId;
+    protected Saksnummer saksnummer;
+    protected Long fagsakId;
+    protected Long internBehandlingId;
+    protected Long eksternBehandlingId;
+    protected UUID eksternBehandlingUuid;
+    protected Behandling behandling;
 
     protected FagsakTjeneste fagsakTjeneste = new FagsakTjeneste(
         mockTpsTjeneste,
@@ -73,23 +78,14 @@ public class FellesTestOppsett extends TestOppsett {
 
     private SimuleringResultatDto simResDto = new SimuleringResultatDto(SUM_FEIL_UTBETALT, SUM_INNTREKK);
 
-    protected AktørId AKTØR_ID;
-    protected Saksnummer SAKSNUMMER;
-    protected Long FAGSAK_ID;
-    protected Long INTERN_BEHANDLING_ID;
-    protected Long EKSTERN_BEHANDLING_ID;
-    protected UUID EKSTERN_BEHANDLING_UUID;
-
-    public Behandling BEHANDLING;
-
     @Before
     public void init() {
-        AKTØR_ID = testUtility.genererAktørId();
-        when(mockTpsTjeneste.hentBrukerForAktør(AKTØR_ID)).thenReturn(testUtility.lagPersonInfo(AKTØR_ID));
+        aktørId = testUtility.genererAktørId();
+        when(mockTpsTjeneste.hentBrukerForAktør(aktørId)).thenReturn(testUtility.lagPersonInfo(aktørId));
 
-        TestUtility.SakDetaljer sakDetaljer = testUtility.opprettFørstegangsBehandling(AKTØR_ID);
+        TestUtility.SakDetaljer sakDetaljer = testUtility.opprettFørstegangsBehandling(aktørId);
         mapSakDetaljer(sakDetaljer);
-        when(mockSimuleringIntegrasjonTjeneste.hentResultat(EKSTERN_BEHANDLING_ID)).thenReturn(Optional.of(simResDto));
+        when(mockSimuleringIntegrasjonTjeneste.hentResultat(eksternBehandlingId)).thenReturn(Optional.of(simResDto));
     }
 
     protected String formatDate(LocalDate localDate) {
@@ -121,7 +117,7 @@ public class FellesTestOppsett extends TestOppsett {
             .medFeilutbetalinger(feilutbetaling).build();
         feilutbetaling.leggTilFeilutbetaltPeriode(periodeÅrsak);
         return FeilutbetalingAggregate.builder()
-            .medBehandlingId(INTERN_BEHANDLING_ID)
+            .medBehandlingId(internBehandlingId)
             .medFeilutbetaling(feilutbetaling).build();
     }
 
@@ -150,12 +146,12 @@ public class FellesTestOppsett extends TestOppsett {
     }
 
     private void mapSakDetaljer(TestUtility.SakDetaljer sakDetaljer) {
-        AKTØR_ID = sakDetaljer.getAktørId();
-        SAKSNUMMER = sakDetaljer.getSaksnummer();
-        FAGSAK_ID = sakDetaljer.getFagsakId();
-        INTERN_BEHANDLING_ID = sakDetaljer.getInternBehandlingId();
-        EKSTERN_BEHANDLING_ID = sakDetaljer.getEksternBehandlingId();
-        EKSTERN_BEHANDLING_UUID = sakDetaljer.getEksternUuid();
-        BEHANDLING = sakDetaljer.getBehandling();
+        aktørId = sakDetaljer.getAktørId();
+        saksnummer = sakDetaljer.getSaksnummer();
+        fagsakId = sakDetaljer.getFagsakId();
+        internBehandlingId = sakDetaljer.getInternBehandlingId();
+        eksternBehandlingId = sakDetaljer.getEksternBehandlingId();
+        eksternBehandlingUuid = sakDetaljer.getEksternUuid();
+        behandling = sakDetaljer.getBehandling();
     }
 }

@@ -219,7 +219,7 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
     @Override
     public long hentEksternBehandling(UUID eksternUuid) {
         Optional<EksternBehandlingsinfoDto> eksternBehandlingsInfo = fpsakKlient.hentBehandling(eksternUuid);
-        if(eksternBehandlingsInfo.isPresent()){
+        if (eksternBehandlingsInfo.isPresent()) {
             return eksternBehandlingsInfo.get().getId();
         }
         throw BehandlingFeil.FACTORY.fantIkkeEksternBehandlingForUuid(eksternUuid.toString()).toException();
@@ -245,13 +245,15 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
                                               BehandlingType behandlingType) {
         logger.info("Oppretter Tilbakekrevingbehandling for [saksnummer: {} ] for ekstern Uuid [ {} ]", saksnummer, eksternUuid.toString());
 
+        validateHarIkkeÅpenTilbakekrevingBehandling(saksnummer);
+
         Fagsak fagsak = fagsakTjeneste.opprettFagsak(saksnummer, aktørId, fagsakYtelseType);
 
         Behandling behandling = Behandling.nyBehandlingFor(fagsak, behandlingType).build();
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
         Long behandlingId = behandlingRepository.lagre(behandling, lås);
 
-        EksternBehandling eksternBehandling = new EksternBehandling(behandling, eksternBehandlingId,eksternUuid);
+        EksternBehandling eksternBehandling = new EksternBehandling(behandling, eksternBehandlingId, eksternUuid);
         eksternBehandlingRepository.lagre(eksternBehandling);
 
         historikkinnslagTjeneste.opprettHistorikkinnslagForOpprettetBehandling(behandling); // FIXME: sjekk om journalpostId skal hentes ///
@@ -350,6 +352,21 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
             return false;
         }
         return antallDager != 2 || sisteDag.getDayOfWeek() != DayOfWeek.SATURDAY;
+    }
+
+    private void validateHarIkkeÅpenTilbakekrevingBehandling(Saksnummer saksnummer) {
+        if (harÅpenBehandling(saksnummer)) {
+            throw BehandlingFeil.FACTORY.kanIkkeOppretteTilbakekrevingBehandling(saksnummer).toException();
+        }
+    }
+
+    private boolean harÅpenBehandling(Saksnummer saksnummer) {
+        List<Behandling> behandlinger = hentBehandlinger(saksnummer);
+        if (behandlinger.isEmpty()) {
+            return false;
+        }
+        return behandlinger.stream().anyMatch(behandling -> !behandling.erAvsluttet()
+            && BehandlingType.TILBAKEKREVING.equals(behandling.getType()));
     }
 
 }

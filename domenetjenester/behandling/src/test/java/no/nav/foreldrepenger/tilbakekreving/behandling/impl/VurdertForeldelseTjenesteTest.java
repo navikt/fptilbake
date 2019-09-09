@@ -47,11 +47,11 @@ public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
     @Test
     public void skal_lagreVurdertForeldelseGrunnlag() {
         LocalDate sisteDato = LocalDate.of(2019, 2, 19);
-        vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(INTERN_BEHANDLING_ID, Collections.singletonList(
+        vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, Collections.singletonList(
             new ForeldelsePeriodeDto(FØRSTE_DATO, sisteDato,
                 ForeldelseVurderingType.FORELDET, "ABC")));
 
-        Optional<VurdertForeldelseAggregate> vurdertForeldelseAggregateOptional = vurdertForeldelseRepository.finnVurdertForeldelseForBehandling(INTERN_BEHANDLING_ID);
+        Optional<VurdertForeldelseAggregate> vurdertForeldelseAggregateOptional = vurdertForeldelseRepository.finnVurdertForeldelseForBehandling(internBehandlingId);
         assertThat(vurdertForeldelseAggregateOptional).isPresent();
         VurdertForeldelseAggregate vurdertForeldelseAggregate = vurdertForeldelseAggregateOptional.get();
         assertThat(vurdertForeldelseAggregate.getVurdertForeldelse()).isNotNull();
@@ -82,13 +82,13 @@ public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
         LocalDate andrePeriodeFørsteDato = LocalDate.of(2019, 2, 4);
         LocalDate andrePeriodeSisteDato = LocalDate.of(2019, 2, 11);
 
-        vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(INTERN_BEHANDLING_ID, Lists.newArrayList(
+        vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, Lists.newArrayList(
             new ForeldelsePeriodeDto(FØRSTE_DATO, førstePeriodeSisteDato,
                 ForeldelseVurderingType.FORELDET, "ABC"),
             new ForeldelsePeriodeDto(andrePeriodeFørsteDato, andrePeriodeSisteDato,
                 ForeldelseVurderingType.TILLEGGSFRIST, "CDE")));
 
-        Optional<VurdertForeldelseAggregate> vurdertForeldelseAggregateOptional = vurdertForeldelseRepository.finnVurdertForeldelseForBehandling(INTERN_BEHANDLING_ID);
+        Optional<VurdertForeldelseAggregate> vurdertForeldelseAggregateOptional = vurdertForeldelseRepository.finnVurdertForeldelseForBehandling(internBehandlingId);
         assertThat(vurdertForeldelseAggregateOptional).isPresent();
         VurdertForeldelseAggregate vurdertForeldelseAggregate = vurdertForeldelseAggregateOptional.get();
         assertThat(vurdertForeldelseAggregate.getVurdertForeldelse()).isNotNull();
@@ -141,14 +141,14 @@ public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
         Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedFeilPostering2, mockMedYtelPostering));
         KravgrunnlagAggregate kravgrunnlagAggregate = KravgrunnlagAggregate.builder()
             .medGrunnlagØkonomi(kravgrunnlag431)
-            .medBehandlingId(INTERN_BEHANDLING_ID).build();
+            .medBehandlingId(internBehandlingId).build();
 
         grunnlagRepository.lagre(kravgrunnlagAggregate);
-        vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(INTERN_BEHANDLING_ID, Lists.newArrayList(
+        vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, Lists.newArrayList(
             new ForeldelsePeriodeDto(FOM_1, LocalDate.of(2016, 3, 28),
                 ForeldelseVurderingType.FORELDET, "ABC")));
 
-        FeilutbetalingPerioderDto perioderDto = vurdertForeldelseTjeneste.henteVurdertForeldelse(INTERN_BEHANDLING_ID);
+        FeilutbetalingPerioderDto perioderDto = vurdertForeldelseTjeneste.henteVurdertForeldelse(internBehandlingId);
 
         assertThat(perioderDto.getPerioder().size()).isEqualTo(1);
         perioderDto.getPerioder().sort(Comparator.comparing(PeriodeDto::getFom));
@@ -169,14 +169,14 @@ public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
         Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedFeilPostering2, mockMedYtelPostering));
         KravgrunnlagAggregate kravgrunnlagAggregate = KravgrunnlagAggregate.builder()
             .medGrunnlagØkonomi(kravgrunnlag431)
-            .medBehandlingId(INTERN_BEHANDLING_ID).build();
+            .medBehandlingId(internBehandlingId).build();
 
         grunnlagRepository.lagre(kravgrunnlagAggregate);
-        vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(INTERN_BEHANDLING_ID, Lists.newArrayList(
+        vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, Lists.newArrayList(
             new ForeldelsePeriodeDto(FOM_1, LocalDate.of(2016, 3, 20),
                 ForeldelseVurderingType.FORELDET, "ABC")));
 
-        FeilutbetalingPerioderDto perioderDto = vurdertForeldelseTjeneste.henteVurdertForeldelse(INTERN_BEHANDLING_ID);
+        FeilutbetalingPerioderDto perioderDto = vurdertForeldelseTjeneste.henteVurdertForeldelse(internBehandlingId);
 
         assertThat(perioderDto.getPerioder().size()).isEqualTo(1);
         perioderDto.getPerioder().sort(Comparator.comparing(PeriodeDto::getFom));
@@ -204,10 +204,10 @@ public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
             mockMedFeilPostering3, mockMedFeilPostering4, mockMedYtelPostering));
         KravgrunnlagAggregate kravgrunnlagAggregate = KravgrunnlagAggregate.builder()
             .medGrunnlagØkonomi(kravgrunnlag431)
-            .medBehandlingId(INTERN_BEHANDLING_ID).build();
+            .medBehandlingId(internBehandlingId).build();
 
         grunnlagRepository.lagre(kravgrunnlagAggregate);
-        vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(INTERN_BEHANDLING_ID, Lists.newArrayList(
+        vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, Lists.newArrayList(
             new ForeldelsePeriodeDto(FOM_1, LocalDate.of(2016, 3, 20),
                 ForeldelseVurderingType.FORELDET, "ABC"),
             new ForeldelsePeriodeDto(LocalDate.of(2016, 3, 21), LocalDate.of(2016, 3, 24),
@@ -215,7 +215,7 @@ public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
             new ForeldelsePeriodeDto(LocalDate.of(2016, 3, 26), TOM_1,
                 ForeldelseVurderingType.TILLEGGSFRIST, "EFG")));
 
-        FeilutbetalingPerioderDto perioderDto = vurdertForeldelseTjeneste.henteVurdertForeldelse(INTERN_BEHANDLING_ID);
+        FeilutbetalingPerioderDto perioderDto = vurdertForeldelseTjeneste.henteVurdertForeldelse(internBehandlingId);
 
         assertThat(perioderDto.getPerioder().size()).isEqualTo(3);
         perioderDto.getPerioder().sort(Comparator.comparing(PeriodeDto::getFom));
@@ -253,7 +253,7 @@ public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
         Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedFeilPostering2, mockMedFeilPostering3, mockMedYtelPostering));
         KravgrunnlagAggregate kravgrunnlagAggregate = KravgrunnlagAggregate.builder()
             .medGrunnlagØkonomi(kravgrunnlag431)
-            .medBehandlingId(INTERN_BEHANDLING_ID).build();
+            .medBehandlingId(internBehandlingId).build();
         grunnlagRepository.lagre(kravgrunnlagAggregate);
 
         Feilutbetaling feilutbetaling = new Feilutbetaling();
@@ -265,12 +265,12 @@ public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
             HendelseType.FP_UTTAK_UTSETTELSE_TYPE.getKode(), FpHendelseUnderTyper.ARBEID_HELTID.getKode(), feilutbetaling));
 
         FeilutbetalingAggregate feilutbetalingAggregate = FeilutbetalingAggregate.builder()
-            .medBehandlingId(INTERN_BEHANDLING_ID)
+            .medBehandlingId(internBehandlingId)
             .medFeilutbetaling(feilutbetaling).build();
 
         feilutbetalingRepository.lagre(feilutbetalingAggregate);
 
-        FeilutbetalingPerioderDto feilutbetalingPerioder = vurdertForeldelseTjeneste.hentFaktaPerioder(INTERN_BEHANDLING_ID);
+        FeilutbetalingPerioderDto feilutbetalingPerioder = vurdertForeldelseTjeneste.hentFaktaPerioder(internBehandlingId);
         assertThat(feilutbetalingPerioder.getPerioder().size()).isEqualTo(2);
 
         List<PeriodeDto> perioder = feilutbetalingPerioder.getPerioder();
@@ -300,13 +300,13 @@ public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
     }
 
     private Historikkinnslag fellesHistorikkInnslagAssert() {
-        List<Historikkinnslag> historikkInnslager = historikkRepository.hentHistorikkForSaksnummer(SAKSNUMMER);
+        List<Historikkinnslag> historikkInnslager = historikkRepository.hentHistorikkForSaksnummer(saksnummer);
         assertThat(historikkInnslager).isNotEmpty();
         assertThat(historikkInnslager.size()).isEqualTo(1);
         Historikkinnslag historikkinnslag = historikkInnslager.get(0);
         assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.FORELDELSE);
         assertThat(historikkinnslag.getAktør()).isEqualByComparingTo(HistorikkAktør.SAKSBEHANDLER);
-        assertThat(historikkinnslag.getBehandlingId()).isEqualTo(INTERN_BEHANDLING_ID);
+        assertThat(historikkinnslag.getBehandlingId()).isEqualTo(internBehandlingId);
         return historikkinnslag;
     }
 

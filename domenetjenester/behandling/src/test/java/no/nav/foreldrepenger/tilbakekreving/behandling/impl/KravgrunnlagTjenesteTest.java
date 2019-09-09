@@ -41,14 +41,14 @@ public class KravgrunnlagTjenesteTest extends FellesTestOppsett {
 
     @Before
     public void setup() {
-        when(mockTpsTjeneste.hentAktørForFnr(new PersonIdent(SSN))).thenReturn(Optional.of(AKTØR_ID));
+        when(mockTpsTjeneste.hentAktørForFnr(new PersonIdent(SSN))).thenReturn(Optional.of(aktørId));
     }
 
     @Test
     public void lagreTilbakekrevingsgrunnlagFraØkonomi() {
         Kravgrunnlag431 kravgrunnlag = formKravgrunnlagDto(KravStatusKode.NYTT);
         formPerioder(fom, tom, kravgrunnlag);
-        kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(INTERN_BEHANDLING_ID, kravgrunnlag);
+        kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(internBehandlingId, kravgrunnlag);
 
         assertKravgrunnlag();
     }
@@ -57,7 +57,7 @@ public class KravgrunnlagTjenesteTest extends FellesTestOppsett {
     public void lagreTilbakekrevingsgrunnlagFraØkonomi_medEndretGrunnlag() {
         Kravgrunnlag431 kravgrunnlag = formKravgrunnlagDto(KravStatusKode.ENDRET);
         formPerioder(fom, tom, kravgrunnlag);
-        kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(INTERN_BEHANDLING_ID, kravgrunnlag);
+        kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(internBehandlingId, kravgrunnlag);
 
         assertKravgrunnlag();
     }
@@ -68,9 +68,9 @@ public class KravgrunnlagTjenesteTest extends FellesTestOppsett {
             .medVedtakId(10000L)
             .medFagomraadeKode(FagOmrådeKode.FORELDREPENGER)
             .medKravStatusKode(kravStatusKode)
-            .medGjelderVedtakId(AKTØR_ID.getId())
+            .medGjelderVedtakId(aktørId.getId())
             .medGjelderType(GjelderType.PERSON)
-            .medUtbetalesTilId(AKTØR_ID.getId())
+            .medUtbetalesTilId(aktørId.getId())
             .medUtbetIdType(GjelderType.PERSON)
             .medFagSystemId("10000000000000000")
             .medAnsvarligEnhet(ENHET)
@@ -107,14 +107,14 @@ public class KravgrunnlagTjenesteTest extends FellesTestOppsett {
     }
 
     private void assertKravgrunnlag() {
-        Optional<KravgrunnlagAggregate> kravgrunnlagAggregate = grunnlagRepository.finnGrunnlagForBehandlingId(INTERN_BEHANDLING_ID);
+        Optional<KravgrunnlagAggregate> kravgrunnlagAggregate = grunnlagRepository.finnGrunnlagForBehandlingId(internBehandlingId);
         assertThat(kravgrunnlagAggregate).isNotEmpty();
         KravgrunnlagAggregate aggregate = kravgrunnlagAggregate.get();
-        assertThat(aggregate.getBehandlingId()).isEqualTo(INTERN_BEHANDLING_ID);
+        assertThat(aggregate.getBehandlingId()).isEqualTo(internBehandlingId);
         assertThat(aggregate.isAktiv()).isTrue();
         assertThat(aggregate.getGrunnlagØkonomi()).isNotNull();
-        assertThat(aggregate.getGrunnlagØkonomi().getGjelderVedtakId()).isEqualTo(AKTØR_ID.getId());
-        assertThat(aggregate.getGrunnlagØkonomi().getUtbetalesTilId()).isEqualTo(AKTØR_ID.getId());
+        assertThat(aggregate.getGrunnlagØkonomi().getGjelderVedtakId()).isEqualTo(aktørId.getId());
+        assertThat(aggregate.getGrunnlagØkonomi().getUtbetalesTilId()).isEqualTo(aktørId.getId());
         List<KravgrunnlagPeriode432> kravgrunnlagPerioder = new ArrayList<>(aggregate.getGrunnlagØkonomi().getPerioder());
 
         assertThat(kravgrunnlagPerioder).isNotEmpty();

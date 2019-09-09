@@ -2,8 +2,8 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.util;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.AdresseType;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.domene.BrevMetadata;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.util.DokumentbestillingsinfoMapper;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.DokumentbestillingsinfoMapper;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.tjeneste.virksomhet.dokumentproduksjon.v2.informasjon.Dokumentbestillingsinformasjon;
 import no.nav.tjeneste.virksomhet.dokumentproduksjon.v2.informasjon.NorskPostadresse;

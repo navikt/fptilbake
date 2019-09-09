@@ -1,18 +1,21 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
-import no.nav.foreldrepenger.domene.dokumentarkiv.journal.JournalMetadata;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+
+import java.util.List;
+
+import org.junit.Test;
+
 import no.nav.foreldrepenger.domene.dokumentarkiv.journal.JournalTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.DokumentKategori;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.DokumentTypeId;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.MottakKanal;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.VariantFormat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagDokumentLink;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.arkiv.ArkivFilType;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.TpsAdapter;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.impl.PersoninfoAdapterImpl;
@@ -21,16 +24,6 @@ import no.nav.foreldrepenger.tilbakekreving.domene.person.impl.TpsOversetter;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.vedtak.felles.integrasjon.aktør.klient.AktørConsumerMedCache;
 import no.nav.vedtak.felles.integrasjon.person.PersonConsumer;
-import org.junit.Test;
-
-import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 
 public class HistorikkinnslagTjenesteTest extends FellesTestOppsett {
 
@@ -47,13 +40,12 @@ public class HistorikkinnslagTjenesteTest extends FellesTestOppsett {
 
     @Test
     public void skal_opprette_historikkinnslag_for_utsendt_brev() {
-        historikkinnslagTjeneste.opprettHistorikkinnslagForBrevsending(
-                JOURNALPOST_ID, DOKUMENT_ID, BEHANDLING.getFagsakId(), BEHANDLING.getId(), BEHANDLING.getAktørId(), "Vedtaksbrev");
+        historikkinnslagTjeneste.opprettHistorikkinnslagForBrevsending(behandling, JOURNALPOST_ID, DOKUMENT_ID, "Vedtaksbrev");
 
-        List<Historikkinnslag> historikkinnslager = historikkRepository.hentHistorikk(BEHANDLING.getId());
-        assertThat(historikkinnslager).isNotEmpty();
+        List<Historikkinnslag> historikkinnslagene = historikkRepository.hentHistorikk(behandling.getId());
+        assertThat(historikkinnslagene).isNotEmpty();
 
-        Historikkinnslag historikkinnslag = historikkinnslager.get(0);
+        Historikkinnslag historikkinnslag = historikkinnslagene.get(0);
         assertThat(historikkinnslag.getAktør()).isEqualByComparingTo(HistorikkAktør.VEDTAKSLØSNINGEN);
         assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.BREV_SENT);
         assertThat(historikkinnslag.getDokumentLinker()).isNotEmpty();
@@ -63,32 +55,16 @@ public class HistorikkinnslagTjenesteTest extends FellesTestOppsett {
 
     @Test
     public void opprettHistorikkinnslagForOpprettetTilbakekreving() {
-        historikkinnslagTjeneste.opprettHistorikkinnslagForOpprettetBehandling(BEHANDLING);
+        historikkinnslagTjeneste.opprettHistorikkinnslagForOpprettetBehandling(behandling);
 
-        List<Historikkinnslag> historikkinnslager = historikkRepository.hentHistorikk(BEHANDLING.getId());
-        assertThat(historikkinnslager).isNotEmpty();
+        List<Historikkinnslag> historikkinnslagene = historikkRepository.hentHistorikk(behandling.getId());
+        assertThat(historikkinnslagene).isNotEmpty();
 
-        Historikkinnslag historikkinnslag = historikkinnslager.get(0);
+        Historikkinnslag historikkinnslag = historikkinnslagene.get(0);
         assertThat(historikkinnslag.getAktør()).isEqualByComparingTo(HistorikkAktør.VEDTAKSLØSNINGEN);
         assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.TBK_OPPR);
         assertThat(historikkinnslag.getDokumentLinker()).isEmpty();
         verify(mockJournalTjeneste, never()).hentMetadata(null);
     }
 
-    private JournalMetadata<DokumentTypeId> byggJournalMetadata(JournalpostId journalpostId, String dokumentId, ArkivFilType arkivFiltype, boolean hoveddokument,
-                                                                VariantFormat variantFormat) {
-        JournalMetadata.Builder<DokumentTypeId> builderHoveddok = JournalMetadata.builder();
-        builderHoveddok.medJournalpostId(journalpostId);
-        builderHoveddok.medDokumentId(dokumentId);
-        builderHoveddok.medVariantFormat(variantFormat);
-        builderHoveddok.medMottakKanal(MottakKanal.EIA);
-        builderHoveddok.medDokumentType(DokumentTypeId.SØKNAD_ENGANGSSTØNAD_FØDSEL);
-        builderHoveddok.medDokumentKategori(DokumentKategori.SØKNAD);
-        builderHoveddok.medArkivFilType(arkivFiltype);
-        builderHoveddok.medErHoveddokument(hoveddokument);
-        builderHoveddok.medForsendelseMottatt(LocalDate.now());
-        builderHoveddok.medBrukerIdentListe(Collections.singletonList("01234567890"));
-        JournalMetadata<DokumentTypeId> journalMetadataHoveddokument = builderHoveddok.build();
-        return journalMetadataHoveddokument;
-    }
 }

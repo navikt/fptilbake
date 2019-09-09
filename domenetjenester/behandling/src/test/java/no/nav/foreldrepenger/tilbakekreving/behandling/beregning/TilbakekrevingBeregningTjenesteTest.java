@@ -46,11 +46,11 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
     public void skal_beregne_tilbakekrevingsbeløp_for_periode_som_ikke_er_foreldet() {
         Periode periode = new Periode(LocalDate.of(2019, 5, 1), LocalDate.of(2019, 5, 3));
 
-        lagKravgrunnlag(INTERN_BEHANDLING_ID, periode);
-        lagForeldelse(INTERN_BEHANDLING_ID, periode, ForeldelseVurderingType.IKKE_FORELDET);
-        lagVilkårsvurderingMedForsett(INTERN_BEHANDLING_ID, periode);
+        lagKravgrunnlag(internBehandlingId, periode);
+        lagForeldelse(internBehandlingId, periode, ForeldelseVurderingType.IKKE_FORELDET);
+        lagVilkårsvurderingMedForsett(internBehandlingId, periode);
 
-        BeregningResultat beregningResultat = tjeneste.beregn(INTERN_BEHANDLING_ID);
+        BeregningResultat beregningResultat = tjeneste.beregn(internBehandlingId);
         List<BeregningResultatPeriode> resultat = beregningResultat.getBeregningResultatPerioder();
 
         assertThat(resultat).hasSize(1);
@@ -70,10 +70,10 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
     public void skal_beregne_tilbakekrevingsbeløp_for_periode_som_gjelder_ikke_er_foreldelse() {
         Periode periode = new Periode(LocalDate.of(2019, 5, 1), LocalDate.of(2019, 5, 3));
 
-        lagKravgrunnlag(INTERN_BEHANDLING_ID, periode);
-        lagVilkårsvurderingMedForsett(INTERN_BEHANDLING_ID, periode);
+        lagKravgrunnlag(internBehandlingId, periode);
+        lagVilkårsvurderingMedForsett(internBehandlingId, periode);
 
-        BeregningResultat beregningResultat = tjeneste.beregn(INTERN_BEHANDLING_ID);
+        BeregningResultat beregningResultat = tjeneste.beregn(internBehandlingId);
         List<BeregningResultatPeriode> resultat = beregningResultat.getBeregningResultatPerioder();
 
         assertThat(resultat).hasSize(1);
@@ -93,10 +93,10 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
     public void skal_beregne_tilbakekrevingsbeløp_for_periode_som_er_foreldet() {
         Periode periode = new Periode(LocalDate.of(2019, 5, 1), LocalDate.of(2019, 5, 3));
 
-        lagKravgrunnlag(INTERN_BEHANDLING_ID, periode);
-        lagForeldelse(INTERN_BEHANDLING_ID, periode, ForeldelseVurderingType.FORELDET);
+        lagKravgrunnlag(internBehandlingId, periode);
+        lagForeldelse(internBehandlingId, periode, ForeldelseVurderingType.FORELDET);
 
-        BeregningResultat beregningResultat = tjeneste.beregn(INTERN_BEHANDLING_ID);
+        BeregningResultat beregningResultat = tjeneste.beregn(internBehandlingId);
         List<BeregningResultatPeriode> resultat = beregningResultat.getBeregningResultatPerioder();
 
         assertThat(resultat).hasSize(1);
