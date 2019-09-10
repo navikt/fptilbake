@@ -107,9 +107,8 @@ public class BehandlingDtoTjeneste {
         dto.setAvsluttet(behandling.getAvsluttetDato());
         dto.setStatus(behandling.getStatus());
         dto.setToTrinnsBehandling(true);
-        //FIXME fjern hardkoding
-        dto.setBehandlendeEnhetId("4833");
-        dto.setBehandlendeEnhetNavn("NAV Familie- og pensjonsytelser Oslo 1");
+        dto.setBehandlendeEnhetId(behandling.getBehandlendeEnhetId());
+        dto.setBehandlendeEnhetNavn(behandling.getBehandlendeEnhetNavn());
     }
 
     private void settResourceLinks(Behandling behandling, UtvidetBehandlingDto dto) {

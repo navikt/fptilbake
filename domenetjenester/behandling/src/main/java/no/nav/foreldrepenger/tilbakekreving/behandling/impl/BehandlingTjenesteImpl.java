@@ -161,9 +161,8 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
                                          AktørId aktørId, String ytelseType,
                                          BehandlingType behandlingType) {
         FagsakYtelseType fagsakYtelseType = FagsakYtelseType.fraKode(ytelseType);
-        Long eksternBehandlingId = hentEksternBehandling(eksternUuid);
 
-        return opprettFørstegangsbehandling(saksnummer, eksternUuid, eksternBehandlingId, aktørId, fagsakYtelseType, behandlingType);
+        return opprettFørstegangsbehandling(saksnummer, eksternUuid, null, aktørId, fagsakYtelseType, behandlingType);
     }
 
     @Override
@@ -216,11 +215,10 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
         return behandlingsresultat.isPresent() && behandlingsresultat.get().erBehandlingHenlagt();
     }
 
-    @Override
-    public long hentEksternBehandling(UUID eksternUuid) {
+    private EksternBehandlingsinfoDto hentEksternBehandling(UUID eksternUuid) {
         Optional<EksternBehandlingsinfoDto> eksternBehandlingsInfo = fpsakKlient.hentBehandling(eksternUuid);
         if (eksternBehandlingsInfo.isPresent()) {
-            return eksternBehandlingsInfo.get().getId();
+            return eksternBehandlingsInfo.get();
         }
         throw BehandlingFeil.FACTORY.fantIkkeEksternBehandlingForUuid(eksternUuid.toString()).toException();
     }
@@ -240,16 +238,22 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
         }
     }
 
-    private Long opprettFørstegangsbehandling(Saksnummer saksnummer, UUID eksternUuid, long eksternBehandlingId,
+    private Long opprettFørstegangsbehandling(Saksnummer saksnummer, UUID eksternUuid, Long eksternBehandlingId,
                                               AktørId aktørId, FagsakYtelseType fagsakYtelseType,
                                               BehandlingType behandlingType) {
         logger.info("Oppretter Tilbakekrevingbehandling for [saksnummer: {} ] for ekstern Uuid [ {} ]", saksnummer, eksternUuid.toString());
 
         validateHarIkkeÅpenTilbakekrevingBehandling(saksnummer);
 
+        EksternBehandlingsinfoDto eksternBehandlingsinfoDto = hentEksternBehandling(eksternUuid);
+        eksternBehandlingId = hentEksternBehandlingIdHvisFinnesIkke(eksternBehandlingId, eksternBehandlingsinfoDto);
+
         Fagsak fagsak = fagsakTjeneste.opprettFagsak(saksnummer, aktørId, fagsakYtelseType);
 
         Behandling behandling = Behandling.nyBehandlingFor(fagsak, behandlingType).build();
+        behandling.setBehandlendeEnhetId(eksternBehandlingsinfoDto.getBehandlendeEnhetId());
+        behandling.setBehandlendeEnhetNavn(eksternBehandlingsinfoDto.getBehandlendeEnhetNavn());
+
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
         Long behandlingId = behandlingRepository.lagre(behandling, lås);
 
@@ -367,6 +371,13 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
         }
         return behandlinger.stream().anyMatch(behandling -> !behandling.erAvsluttet()
             && BehandlingType.TILBAKEKREVING.equals(behandling.getType()));
+    }
+
+    private Long hentEksternBehandlingIdHvisFinnesIkke(Long eksternBehandlingId, EksternBehandlingsinfoDto eksternBehandlingsinfoDto) {
+        if (eksternBehandlingId == null) {
+            eksternBehandlingId = eksternBehandlingsinfoDto.getId();
+        }
+        return eksternBehandlingId;
     }
 
 }

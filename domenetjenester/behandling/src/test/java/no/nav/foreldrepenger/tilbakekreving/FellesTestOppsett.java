@@ -1,5 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
@@ -32,6 +33,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Vi
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fagsak.FagsakTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.simulering.kontrakt.SimuleringResultatDto;
 
 /**
@@ -82,6 +84,7 @@ public class FellesTestOppsett extends TestOppsett {
     public void init() {
         aktørId = testUtility.genererAktørId();
         when(mockTpsTjeneste.hentBrukerForAktør(aktørId)).thenReturn(testUtility.lagPersonInfo(aktørId));
+        when(mockFpsakKlient.hentBehandling(any(UUID.class))).thenReturn(lagEksternBehandlingInfoDto());
 
         TestUtility.SakDetaljer sakDetaljer = testUtility.opprettFørstegangsBehandling(aktørId);
         mapSakDetaljer(sakDetaljer);
@@ -153,5 +156,13 @@ public class FellesTestOppsett extends TestOppsett {
         eksternBehandlingId = sakDetaljer.getEksternBehandlingId();
         eksternBehandlingUuid = sakDetaljer.getEksternUuid();
         behandling = sakDetaljer.getBehandling();
+    }
+
+    private Optional<EksternBehandlingsinfoDto> lagEksternBehandlingInfoDto() {
+        EksternBehandlingsinfoDto eksternBehandlingsinfoDto = new EksternBehandlingsinfoDto();
+        eksternBehandlingsinfoDto.setId(10001L);
+        eksternBehandlingsinfoDto.setBehandlendeEnhetId("4833");
+        eksternBehandlingsinfoDto.setBehandlendeEnhetNavn("NAV Familie- og pensjonsytelser Oslo 1");
+        return Optional.of(eksternBehandlingsinfoDto);
     }
 }

@@ -34,6 +34,4 @@ public interface BehandlingTjeneste {
 
     boolean erBehandlingHenlagt(Behandling behandling);
 
-    long hentEksternBehandling(UUID eksternUuid);
-
 }
