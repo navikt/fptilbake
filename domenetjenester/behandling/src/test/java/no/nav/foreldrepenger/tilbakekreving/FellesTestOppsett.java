@@ -53,6 +53,8 @@ public class FellesTestOppsett extends TestOppsett {
     protected static final String ÅRSAK_KODEVERK = HendelseType.DISCRIMINATOR;
     protected static final String UNDER_ÅRSAK_KODEVERK = HendelseUnderType.DISCRIMINATOR;
     protected static final Period defaultVentetid = Period.ofWeeks(4);
+    protected static final String BEHANDLENDE_ENHET_ID = "4833";
+    protected static final String BEHANDLENDE_ENHET_NAVN = "NAV Familie- og pensjonsytelser Oslo 1";
 
     protected AktørId aktørId;
     protected Saksnummer saksnummer;
@@ -161,8 +163,8 @@ public class FellesTestOppsett extends TestOppsett {
     private Optional<EksternBehandlingsinfoDto> lagEksternBehandlingInfoDto() {
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto = new EksternBehandlingsinfoDto();
         eksternBehandlingsinfoDto.setId(10001L);
-        eksternBehandlingsinfoDto.setBehandlendeEnhetId("4833");
-        eksternBehandlingsinfoDto.setBehandlendeEnhetNavn("NAV Familie- og pensjonsytelser Oslo 1");
+        eksternBehandlingsinfoDto.setBehandlendeEnhetId(BEHANDLENDE_ENHET_ID);
+        eksternBehandlingsinfoDto.setBehandlendeEnhetNavn(BEHANDLENDE_ENHET_NAVN);
         return Optional.of(eksternBehandlingsinfoDto);
     }
 }
