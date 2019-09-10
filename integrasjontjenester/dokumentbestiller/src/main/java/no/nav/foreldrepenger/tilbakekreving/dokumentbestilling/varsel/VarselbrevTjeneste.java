@@ -23,8 +23,9 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.Frit
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.JournalpostIdOgDokumentId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.KodeDto;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.simulering.kontrakt.FeilutbetaltePerioderDto;
 import no.nav.vedtak.felles.jpa.Transaction;
@@ -123,17 +124,16 @@ public class VarselbrevTjeneste {
 
         //Henter data fra fpsak
         Saksnummer saksnummer = behandling.getFagsak().getSaksnummer();
-        EksternBehandlingsinfoDto eksternBehandlingsinfoDto = eksternDataForBrevTjeneste.hentBehandlingFpsak(eksternBehandling.getEksternUuid(), saksnummer);
-        eksternBehandlingsinfoDto.setFagsaktype(eksternDataForBrevTjeneste.henteFagsakYtelseType(behandling));
+        SamletEksternBehandlingInfo eksternBehandlingsinfoDto = eksternDataForBrevTjeneste.hentBehandlingFpsak(eksternBehandling.getEksternUuid(), Tillegsinformasjon.PERSONOPPLYSNINGER, Tillegsinformasjon.VARSELTEKST);
         //Henter data fra tps
         String aktørId = behandling.getAktørId().getId();
         Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(aktørId);
         Adresseinfo adresseinfo = eksternDataForBrevTjeneste.hentAdresse(personinfo, aktørId);
 
         //Henter fagsaktypenavn på riktig språk
-        Språkkode mottakersSpråkkode = eksternBehandlingsinfoDto.getSprakkode();
-        KodeDto ytelsetype = eksternBehandlingsinfoDto.getFagsaktype();
-        YtelseNavn ytelseNavn = eksternDataForBrevTjeneste.hentYtelsenavn(ytelsetype, mottakersSpråkkode);
+        Språkkode mottakersSpråkkode = eksternBehandlingsinfoDto.getGrunninformasjon().getSprakkode();
+        FagsakYtelseType fagsakYtelseType = behandling.getFagsak().getFagsakYtelseType();
+        YtelseNavn ytelseNavn = eksternDataForBrevTjeneste.hentYtelsenavn(fagsakYtelseType, mottakersSpråkkode);
 
         //Henter data fra fpoppdrag
         FeilutbetaltePerioderDto feilutbetaltePerioderDto = eksternDataForBrevTjeneste.hentFeilutbetaltePerioder(behandlingIdIFpsak);
@@ -145,24 +145,24 @@ public class VarselbrevTjeneste {
             personinfo,
             feilutbetaltePerioderDto,
             eksternDataForBrevTjeneste.getBrukersSvarfrist(),
+            fagsakYtelseType,
             ytelseNavn);
     }
 
     public VarselbrevSamletInfo lagVarselbrevForForhåndsvisning(UUID behandlingUuId, Saksnummer saksnummer, String varseltekst, FagsakYtelseType fagsakYtleseType) {
+        SamletEksternBehandlingInfo eksternBehandlingsinfo = eksternDataForBrevTjeneste.hentBehandlingFpsak(behandlingUuId, Tillegsinformasjon.PERSONOPPLYSNINGER, Tillegsinformasjon.VARSELTEKST);
 
-        EksternBehandlingsinfoDto eksternBehandlingsinfo = eksternDataForBrevTjeneste.hentBehandlingFpsak(behandlingUuId, saksnummer);
-        eksternBehandlingsinfo.setFagsaktype(new KodeDto(fagsakYtleseType.getKodeverk(), fagsakYtleseType.getKode(), fagsakYtleseType.getNavn()));
-
-        String aktørId = eksternBehandlingsinfo.getPersonopplysningDto().getAktoerId();
+        String aktørId = eksternBehandlingsinfo.getAktørId().getId();
         Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(aktørId);
         Adresseinfo adresseinfo = eksternDataForBrevTjeneste.hentAdresse(personinfo, aktørId);
-        FeilutbetaltePerioderDto feilutbetaltePerioderDto = eksternDataForBrevTjeneste.hentFeilutbetaltePerioder(eksternBehandlingsinfo.getId());
+        EksternBehandlingsinfoDto grunninformasjon = eksternBehandlingsinfo.getGrunninformasjon();
+        FeilutbetaltePerioderDto feilutbetaltePerioderDto = eksternDataForBrevTjeneste.hentFeilutbetaltePerioder(grunninformasjon.getId());
 
-        if (eksternBehandlingsinfo.getSprakkode() == null) {
-            eksternBehandlingsinfo.setSprakkode(Språkkode.nb);
+        if (grunninformasjon.getSprakkode() == null) {
+            grunninformasjon.setSprakkode(Språkkode.nb);
         }
-        Språkkode mottakersSpråkkode = eksternBehandlingsinfo.getSprakkode();
-        YtelseNavn ytelseNavn = eksternDataForBrevTjeneste.hentYtelsenavn(eksternBehandlingsinfo.getFagsaktype(), mottakersSpråkkode);
+        Språkkode mottakersSpråkkode = grunninformasjon.getSprakkode();
+        YtelseNavn ytelseNavn = eksternDataForBrevTjeneste.hentYtelsenavn(fagsakYtleseType, mottakersSpråkkode);
 
         return VarselbrevUtil.sammenstillInfoFraFagsystemerForhåndvisningVarselbrev(
             saksnummer,
@@ -171,6 +171,7 @@ public class VarselbrevTjeneste {
             eksternBehandlingsinfo,
             feilutbetaltePerioderDto,
             eksternDataForBrevTjeneste.getBrukersSvarfrist(),
+            fagsakYtleseType,
             ytelseNavn);
     }
 }

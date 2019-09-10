@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.KodeDto;
 
@@ -17,7 +18,7 @@ public class BrevMetadata {
 
     private String saksnummer;
     private Språkkode språkkode;
-    private KodeDto fagsaktype;
+    private FagsakYtelseType fagsaktype;
     private String fagsaktypenavnPåSpråk;
 
     private String tittel;
@@ -58,7 +59,7 @@ public class BrevMetadata {
         return språkkode;
     }
 
-    public KodeDto getFagsaktype() {
+    public FagsakYtelseType getFagsaktype() {
         return fagsaktype;
     }
 
@@ -108,7 +109,7 @@ public class BrevMetadata {
             this.metadata.saksnummer = saksnummer;
             return this;
         }
-        public Builder medFagsaktype(KodeDto fagsaktype) {
+        public Builder medFagsaktype(FagsakYtelseType fagsaktype) {
             this.metadata.fagsaktype = fagsaktype;
             return this;
         }

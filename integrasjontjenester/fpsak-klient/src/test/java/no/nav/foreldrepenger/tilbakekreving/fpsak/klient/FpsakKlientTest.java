@@ -20,17 +20,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.tilbakekrevingsvalg.VidereBehandling;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.BehandlingResourceLinkDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.KodeDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.PersonadresseDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.PersonopplysningDto;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.TilbakekrevingValgDto;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.VarseltekstDto;
 import no.nav.vedtak.felles.integrasjon.rest.OidcRestClient;
 
 public class FpsakKlientTest {
@@ -61,22 +59,21 @@ public class FpsakKlientTest {
 
         when(oidcRestClientMock.getReturnsOptional(BEHANDLING_URI, EksternBehandlingsinfoDto.class)).thenReturn(Optional.of(returnDto));
         when(oidcRestClientMock.getReturnsOptional(PERSONOPPLYSNING_URI, PersonopplysningDto.class)).thenReturn(Optional.of(personopplysningDto()));
-        when(oidcRestClientMock.getReturnsOptional(VARSELTEKST_URI, String.class)).thenReturn(Optional.of(VARSELTEKST));
+        when(oidcRestClientMock.getReturnsOptional(VARSELTEKST_URI, VarseltekstDto.class)).thenReturn(Optional.of(new VarseltekstDto(VARSELTEKST)));
 
-        Optional<EksternBehandlingsinfoDto> dokumentinfoDto = klient.hentBehandlingsinfo(BEHANDLING_UUID);
+        SamletEksternBehandlingInfo dokumentinfoDto = klient.hentBehandlingsinfo(BEHANDLING_UUID, Tillegsinformasjon.PERSONOPPLYSNINGER, Tillegsinformasjon.VARSELTEKST);
 
-        assertThat(dokumentinfoDto).hasValue(returnDto);
-        assertThat(dokumentinfoDto.get().getPersonopplysningDto()).isNotNull();
-        assertThat(dokumentinfoDto.get().getVarseltekst()).isEqualTo(VARSELTEKST);
+        assertThat(dokumentinfoDto.getGrunninformasjon()).isEqualTo(returnDto);
+        assertThat(dokumentinfoDto.getPersonopplysninger()).isNotNull();
+        assertThat(dokumentinfoDto.getVarseltekst()).isEqualTo(VARSELTEKST);
     }
 
     @Test
-    public void skal_returnere_tom_optional_når_dokumentinfo_ikke_finnes() {
+    public void skal_returnere_null_grunninformasjon_når_dokumentinfo_ikke_finnes() {
         when(oidcRestClientMock.getReturnsOptional(any(), any())).thenReturn(Optional.empty());
 
-        Optional<EksternBehandlingsinfoDto> resultat = klient.hentBehandlingsinfo(BEHANDLING_UUID);
-
-        assertThat(resultat).isEmpty();
+        SamletEksternBehandlingInfo resultat = klient.hentBehandlingsinfo(BEHANDLING_UUID, Tillegsinformasjon.PERSONOPPLYSNINGER, Tillegsinformasjon.VARSELTEKST);
+        assertThat(resultat.getGrunninformasjon()).isNull();
     }
 
     @Test
@@ -119,11 +116,8 @@ public class FpsakKlientTest {
         assertThat(valgDto).isEmpty();
     }
 
-
     private EksternBehandlingsinfoDto dokumentinfoDto() {
         EksternBehandlingsinfoDto dto = new EksternBehandlingsinfoDto();
-        dto.setFagsaktype(new KodeDto("kv", "kode", "navn"));
-        dto.setPersonopplysningDto(personopplysningDto());
         dto.setBehandlendeEnhetId("4214");
         dto.setBehandlendeEnhetNavn("enhetnavn");
         dto.setAnsvarligSaksbehandler("saksbehandler");
@@ -131,7 +125,6 @@ public class FpsakKlientTest {
         dto.setLinks(resourcelinks());
         dto.setSaksnummer(SAKSNUMMER);
         dto.setFagsakId(FAGSAK_ID);
-        dto.setVarseltekst(VARSELTEKST);
         return dto;
     }
 

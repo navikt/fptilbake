@@ -20,9 +20,6 @@ public class EksternBehandlingsinfoDto {
     private String ansvarligSaksbehandler;
     private Språkkode sprakkode;
     private List<BehandlingResourceLinkDto> links = new ArrayList<>();
-    private PersonopplysningDto personopplysningDto;
-    private KodeDto fagsaktype;
-    private String varseltekst;
 
     public Long getId() {
         return id;
@@ -96,27 +93,4 @@ public class EksternBehandlingsinfoDto {
         this.links = links;
     }
 
-    public PersonopplysningDto getPersonopplysningDto() {
-        return personopplysningDto;
-    }
-
-    public void setPersonopplysningDto(PersonopplysningDto personopplysningDto) {
-        this.personopplysningDto = personopplysningDto;
-    }
-
-    public KodeDto getFagsaktype() {
-        return fagsaktype;
-    }
-
-    public void setFagsaktype(KodeDto fagsaktype) {
-        this.fagsaktype = fagsaktype;
-    }
-
-    public String getVarseltekst() {
-        return varseltekst;
-    }
-
-    public void setVarseltekst(String varseltekst) {
-        this.varseltekst = varseltekst;
-    }
 }

@@ -29,11 +29,13 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.Ved
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.Feilutbetaling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingPeriodeÅrsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingAggregateEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingAktsomhetEntitet;
@@ -46,20 +48,22 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.An
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelse;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseAggregate;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseRepository;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.EksternDataForBrevTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevData;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.JournalpostIdOgDokumentId;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.YtelseNavn;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevData;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevFelles;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevPeriode;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Avsnitt;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.HentForhåndvisningVedtaksbrevPdfDto;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.PeriodeMedTekstDto;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.EksternDataForBrevTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.YtelseNavn;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevData;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.JournalpostIdOgDokumentId;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevData;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevFelles;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevPeriode;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.Tillegsinformasjon;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SøknadType;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.vedtak.felles.jpa.Transaction;
 
@@ -172,6 +176,8 @@ public class VedtaksbrevTjeneste {
         UUID fpsakBehandlingUuid = eksternBehandling.getEksternUuid();
         Behandling behandling = behandlingTjeneste.hentBehandling(behandlingId);
 
+        SamletEksternBehandlingInfo fpsakBehandlingInfo = eksternDataForBrevTjeneste.hentBehandlingFpsak(fpsakBehandlingUuid, Tillegsinformasjon.PERSONOPPLYSNINGER, Tillegsinformasjon.SØKNAD);
+
         Long varsletFeilutbetaling = eksternDataForBrevTjeneste.hentFeilutbetaltePerioder(fpsakBehandlingId).getSumFeilutbetaling(); //TODO gjelder bare orginalt varsel
 
         BeregningResultat beregnetResultat = tilbakekrevingBeregningTjeneste.beregn(behandlingId);
@@ -181,7 +187,7 @@ public class VedtaksbrevTjeneste {
         List<VarselbrevSporing> varselbrevData = brevdataRepository.hentVarselbrevData(behandlingId);
         LocalDateTime nyesteVarselbrevTidspunkt = VedtaksbrevUtil.finnNyesteVarselbrevTidspunkt(varselbrevData);
 
-        BrevMetadata brevMetadata = lagMetadataForVedtaksbrev(behandling, totalTilbakekrevingBeløp, fpsakBehandlingUuid);
+        BrevMetadata brevMetadata = lagMetadataForVedtaksbrev(behandling, totalTilbakekrevingBeløp, fpsakBehandlingInfo);
         Feilutbetaling fakta = faktaRepository.finnFeilutbetaling(behandlingId)
             .orElseThrow()
             .getFeilutbetaling();
@@ -193,20 +199,21 @@ public class VedtaksbrevTjeneste {
             .map(VurdertForeldelseAggregate::getVurdertForeldelse)
             .orElse(null);
 
+        SøknadType søknadType = fpsakBehandlingInfo.getSøknadType();
         HbVedtaksbrevFelles.Builder builder = HbVedtaksbrevFelles.builder()
             .medYtelsetype(behandling.getFagsak().getFagsakYtelseType())
             .medVarsletDato(nyesteVarselbrevTidspunkt.toLocalDate())
             .medVarsletBeløp(BigDecimal.valueOf(varsletFeilutbetaling))
-            .medAntallBarn(1) //FIXME hent fra fpsak
-            .medErFødsel(true) //FIXME hent fra fpsak
+            .medAntallBarn(fpsakBehandlingInfo.getAntallBarnSøktFor())
+            .medErFødsel(SøknadType.FØDSEL == søknadType)
+            .medErAdopsjon(SøknadType.ADOPSJON == søknadType)
             .medFritekstOppsummering(oppsummeringFritekst)
             .medLovhjemmelVedtak(VedtakHjemmel.lagHjemmelstekst(beregnetResultat.getVedtakResultatType(), foreldelse, vilkårPerioder))
             .medTotaltTilbakekrevesBeløp(summer(resulatPerioder, BeregningResultatPeriode::getTilbakekrevingBeløpUtenRenter))
             .medTotaltRentebeløp(summer(resulatPerioder, BeregningResultatPeriode::getRenteBeløp))
             .medTotaltTilbakekrevesBeløpMedRenter(summer(resulatPerioder, BeregningResultatPeriode::getTilbakekrevingBeløp))
             .medHovedresultat(beregnetResultat.getVedtakResultatType())
-            .medKlagefristUker(eksternDataForBrevTjeneste.antallUkerKlagefrist())
-            ;
+            .medKlagefristUker(eksternDataForBrevTjeneste.antallUkerKlagefrist());
 
         List<HbVedtaksbrevPeriode> perioder = resulatPerioder.stream()
             .map(brp -> lagBrevdataPeriode(brp, fakta, vilkårPerioder, perioderFritekst))
@@ -217,21 +224,21 @@ public class VedtaksbrevTjeneste {
         return new VedtaksbrevData(data, brevMetadata);
     }
 
-    BrevMetadata lagMetadataForVedtaksbrev(Behandling behandling, Long totalTilbakekrevingBeløp, UUID eksternUuid) {
-        EksternBehandlingsinfoDto eksternBehandlingsinfo = eksternDataForBrevTjeneste.hentBehandlingFpsak(eksternUuid, behandling.getFagsak().getSaksnummer());
-        String aktørId = eksternBehandlingsinfo.getPersonopplysningDto().getAktoerId();
+    BrevMetadata lagMetadataForVedtaksbrev(Behandling behandling, Long totalTilbakekrevingBeløp, SamletEksternBehandlingInfo eksternBehandlingsinfo) {
+        String aktørId = eksternBehandlingsinfo.getPersonopplysninger().getAktoerId();
+        FagsakYtelseType fagsakType = behandling.getFagsak().getFagsakYtelseType();
+        Språkkode språkkode = eksternBehandlingsinfo.getGrunninformasjon().getSprakkode();
 
-        eksternBehandlingsinfo.setFagsaktype(eksternDataForBrevTjeneste.henteFagsakYtelseType(behandling)); // vi kan sette samme fagsakType fordi det ikke kan endret.
         Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(aktørId);
         Adresseinfo adresseinfo = eksternDataForBrevTjeneste.hentAdresse(personinfo, aktørId);
-        YtelseNavn ytelseNavn = eksternDataForBrevTjeneste.hentYtelsenavn(eksternBehandlingsinfo.getFagsaktype(), eksternBehandlingsinfo.getSprakkode());
+        YtelseNavn ytelseNavn = eksternDataForBrevTjeneste.hentYtelsenavn(fagsakType, språkkode);
 
         return new BrevMetadata.Builder()
             .medAnsvarligSaksbehandler(StringUtils.isNotEmpty(behandling.getAnsvarligSaksbehandler()) ? behandling.getAnsvarligSaksbehandler() : "VL")
             .medBehandlendeEnhetId(behandling.getBehandlendeEnhetId())
             .medBehandlendeEnhetNavn(behandling.getBehandlendeEnhetNavn())
             .medMottakerAdresse(adresseinfo)
-            .medFagsaktype(eksternBehandlingsinfo.getFagsaktype())
+            .medFagsaktype(fagsakType)
             .medSaksnummer(behandling.getFagsak().getSaksnummer().getVerdi())
             .medFagsaktypenavnPåSpråk(ytelseNavn.getNavnPåBrukersSpråk())
             .medSakspartId(personinfo.getPersonIdent().getIdent())

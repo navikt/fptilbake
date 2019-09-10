@@ -14,6 +14,7 @@ public class PersonopplysningDto {
     private String navn;
     @JsonProperty("fnr")
     private String fødselsnummer;
+    private List<PersonopplysningDto> barnSoktFor = new ArrayList<>();
     private List<PersonadresseDto> adresser = new ArrayList<>();
 
     public String getFødselsnummer() {
@@ -54,5 +55,13 @@ public class PersonopplysningDto {
 
     public void setAktoerId(String aktoerId) {
         this.aktoerId = aktoerId;
+    }
+
+    public List<PersonopplysningDto> getBarnSoktFor() {
+        return barnSoktFor;
+    }
+
+    public void setBarnSoktFor(List<PersonopplysningDto> barnSoktFor) {
+        this.barnSoktFor = barnSoktFor;
     }
 }

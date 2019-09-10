@@ -10,11 +10,13 @@ import org.apache.commons.lang3.StringUtils;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.YtelseNavn;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.simulering.kontrakt.FeilutbetaltePerioderDto;
 import no.nav.foreldrepenger.tilbakekreving.simulering.kontrakt.PeriodeDto;
 import no.nav.vedtak.util.FPDateUtil;
@@ -26,25 +28,27 @@ public class VarselbrevUtil {
     }
 
     public static VarselbrevSamletInfo sammenstillInfoFraFagsystemerForSending(
-        EksternBehandlingsinfoDto eksternBehandlingsinfoDto,
+        SamletEksternBehandlingInfo eksternBehandlingsinfoDto,
         Saksnummer saksnummer,
         Adresseinfo adresseinfo,
         Personinfo personinfo,
         FeilutbetaltePerioderDto feilutbetaltePerioderDto,
         Period ventetid,
+        FagsakYtelseType fagsakYtelseType,
         YtelseNavn ytelseNavn) {
 
+        EksternBehandlingsinfoDto grunninformasjon = eksternBehandlingsinfoDto.getGrunninformasjon();
         BrevMetadata metadata = new BrevMetadata.Builder()
-            .medBehandlendeEnhetId(eksternBehandlingsinfoDto.getBehandlendeEnhetId())
-            .medBehandlendeEnhetNavn(eksternBehandlingsinfoDto.getBehandlendeEnhetNavn())
+            .medBehandlendeEnhetId(grunninformasjon.getBehandlendeEnhetId())
+            .medBehandlendeEnhetNavn(grunninformasjon.getBehandlendeEnhetNavn())
             .medSakspartId(personinfo.getPersonIdent().getIdent())
             .medMottakerAdresse(adresseinfo)
             .medSaksnummer(saksnummer.getVerdi())
             .medSakspartNavn(personinfo.getNavn())
             .medFagsaktypenavnPåSpråk(ytelseNavn.getNavnPåBrukersSpråk())
-            .medFagsaktype(eksternBehandlingsinfoDto.getFagsaktype())
+            .medFagsaktype(fagsakYtelseType)
             .medSprakkode(personinfo.getForetrukketSpråk())
-            .medAnsvarligSaksbehandler(StringUtils.isNotEmpty(eksternBehandlingsinfoDto.getAnsvarligSaksbehandler()) ? eksternBehandlingsinfoDto.getAnsvarligSaksbehandler() : "VL")
+            .medAnsvarligSaksbehandler(StringUtils.isNotEmpty(grunninformasjon.getAnsvarligSaksbehandler()) ? grunninformasjon.getAnsvarligSaksbehandler() : "VL")
             .medTittel(VarselbrevOverskrift.finnTittelVarselbrev(ytelseNavn.getNavnPåBokmål()))
             .build();
 
@@ -61,22 +65,24 @@ public class VarselbrevUtil {
         Saksnummer saksnummer,
         String varseltekst,
         Adresseinfo adresseinfo,
-        EksternBehandlingsinfoDto eksternBehandlingsinfoDto,
+        SamletEksternBehandlingInfo eksternBehandlingsinfo,
         FeilutbetaltePerioderDto feilutbetaltePerioderDto,
         Period ventetid,
+        FagsakYtelseType fagsakYtelseType,
         YtelseNavn ytelseNavn) {
 
+        EksternBehandlingsinfoDto grunninformasjon = eksternBehandlingsinfo.getGrunninformasjon();
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
-            .medBehandlendeEnhetId(eksternBehandlingsinfoDto.getBehandlendeEnhetId())
-            .medBehandlendeEnhetNavn(eksternBehandlingsinfoDto.getBehandlendeEnhetNavn())
-            .medSakspartId(eksternBehandlingsinfoDto.getPersonopplysningDto().getFødselsnummer())
+            .medBehandlendeEnhetId(grunninformasjon.getBehandlendeEnhetId())
+            .medBehandlendeEnhetNavn(grunninformasjon.getBehandlendeEnhetNavn())
+            .medSakspartId(eksternBehandlingsinfo.getPersonopplysninger().getFødselsnummer())
             .medMottakerAdresse(adresseinfo)
             .medSaksnummer(saksnummer.getVerdi())
-            .medSakspartNavn(eksternBehandlingsinfoDto.getPersonopplysningDto().getNavn())
-            .medFagsaktype(eksternBehandlingsinfoDto.getFagsaktype())
-            .medSprakkode(eksternBehandlingsinfoDto.getSprakkode())
+            .medSakspartNavn(eksternBehandlingsinfo.getPersonopplysninger().getNavn())
+            .medFagsaktype(fagsakYtelseType)
+            .medSprakkode(grunninformasjon.getSprakkode())
             .medFagsaktypenavnPåSpråk(ytelseNavn.getNavnPåBrukersSpråk())
-            .medAnsvarligSaksbehandler(eksternBehandlingsinfoDto.getAnsvarligSaksbehandler())
+            .medAnsvarligSaksbehandler(grunninformasjon.getAnsvarligSaksbehandler())
             .medTittel(VarselbrevOverskrift.finnTittelVarselbrev(ytelseNavn.getNavnPåBokmål()))
             .build();
 
