@@ -35,12 +35,16 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.ResponseHeader;
 import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingsTjenesteProvider;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlendeEnhetTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingRevurderingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.HenleggBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollAsynkTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.OrganisasjonsEnhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.BehandlingsprosessApplikasjonTjeneste;
@@ -48,6 +52,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.Asy
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingDtoTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.ByttBehandlendeEnhetDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.GjenopptaBehandlingDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.HenleggBehandlingDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.OpprettBehandlingDto;
@@ -77,26 +82,25 @@ public class BehandlingRestTjeneste {
     private HenleggBehandlingTjeneste henleggBehandlingTjeneste;
     private BehandlingRevurderingTjeneste revurderingTjeneste;
     private BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste;
+    private BehandlendeEnhetTjeneste behandlendeEnhetTjeneste;
 
     public BehandlingRestTjeneste() {
         // CDI
     }
 
     @Inject
-    public BehandlingRestTjeneste(BehandlingTjeneste behandlingTjeneste,
-                                  GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste,
+    public BehandlingRestTjeneste(BehandlingsTjenesteProvider behandlingsTjenesteProvider,
                                   BehandlingDtoTjeneste behandlingDtoTjeneste,
                                   BehandlingsprosessApplikasjonTjeneste behandlingsprosessTjeneste,
-                                  HenleggBehandlingTjeneste henleggBehandlingTjeneste,
-                                  BehandlingRevurderingTjeneste revurderingTjeneste,
                                   BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste) {
-        this.behandlingTjeneste = behandlingTjeneste;
-        this.gjenopptaBehandlingTjeneste = gjenopptaBehandlingTjeneste;
+        this.behandlingTjeneste = behandlingsTjenesteProvider.getBehandlingTjeneste();
+        this.gjenopptaBehandlingTjeneste = behandlingsTjenesteProvider.getGjenopptaBehandlingTjeneste();
         this.behandlingDtoTjeneste = behandlingDtoTjeneste;
         this.behandlingsprosessTjeneste = behandlingsprosessTjeneste;
-        this.henleggBehandlingTjeneste = henleggBehandlingTjeneste;
-        this.revurderingTjeneste = revurderingTjeneste;
+        this.henleggBehandlingTjeneste = behandlingsTjenesteProvider.getHenleggBehandlingTjeneste();
+        this.revurderingTjeneste = behandlingsTjenesteProvider.getRevurderingTjeneste();
         this.behandlingskontrollAsynkTjeneste = behandlingskontrollAsynkTjeneste;
+        this.behandlendeEnhetTjeneste = behandlingsTjenesteProvider.getEnhetTjeneste();
     }
 
     @GET
@@ -275,6 +279,22 @@ public class BehandlingRestTjeneste {
 
         Response.ResponseBuilder responseBuilder = Response.ok().entity(dto);
         return responseBuilder.build();
+    }
+
+    @POST
+    @Path("/bytt-enhet")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Bytte behandlende enhet")
+    @BeskyttetRessurs(action = UPDATE, ressurs = FAGSAK)
+    @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
+    public void byttBehandlendeEnhet(@ApiParam("Ny enhet som skal byttes") @Valid ByttBehandlendeEnhetDto dto) {
+        Long behandlingId = dto.getBehandlingId();
+        Long behandlingVersjon = dto.getBehandlingVersjon();
+        behandlingTjeneste.kanEndreBehandling(behandlingId, behandlingVersjon);
+
+        String enhetId = dto.getEnhetId();
+        String enhetNavn = dto.getEnhetNavn();
+        behandlendeEnhetTjeneste.byttBehandlendeEnhet(behandlingId, new OrganisasjonsEnhet(enhetId, enhetNavn), HistorikkAktør.SAKSBEHANDLER);
     }
 
 }

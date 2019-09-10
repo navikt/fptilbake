@@ -28,6 +28,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.Behandlingskontr
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.OrganisasjonsEnhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
@@ -251,8 +252,8 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
         Fagsak fagsak = fagsakTjeneste.opprettFagsak(saksnummer, aktørId, fagsakYtelseType);
 
         Behandling behandling = Behandling.nyBehandlingFor(fagsak, behandlingType).build();
-        behandling.setBehandlendeEnhetId(eksternBehandlingsinfoDto.getBehandlendeEnhetId());
-        behandling.setBehandlendeEnhetNavn(eksternBehandlingsinfoDto.getBehandlendeEnhetNavn());
+        OrganisasjonsEnhet organisasjonsEnhet = new OrganisasjonsEnhet(eksternBehandlingsinfoDto.getBehandlendeEnhetId(),eksternBehandlingsinfoDto.getBehandlendeEnhetNavn());
+        behandling.setBehandlendeOrganisasjonsEnhet(organisasjonsEnhet);
 
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
         Long behandlingId = behandlingRepository.lagre(behandling, lås);

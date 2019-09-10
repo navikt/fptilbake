@@ -8,6 +8,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.OrganisasjonsEnhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
@@ -97,7 +98,7 @@ public class BehandlingRevurderingTjeneste {
         repositoryProvider.getAksjonspunktRepository().leggTilAksjonspunkt(revurdering, AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING,
             BehandlingStegType.FAKTA_FEILUTBETALING);
 
-        opprettRelasjonMedEksternBehandling(eksternBehandlingId, revurdering,eksternUuid);
+        opprettRelasjonMedEksternBehandling(eksternBehandlingId, revurdering, eksternUuid);
 
         // lag historikkinnslag for Revurdering opprettet
         lagHistorikkInnslagForOpprettetRevurdering(revurdering, behandlingÅrsakType);
@@ -109,9 +110,11 @@ public class BehandlingRevurderingTjeneste {
         BehandlingType behandlingType = kodeverkRepository.finn(BehandlingType.class, BehandlingType.REVURDERING_TILBAKEKREVING);
         BehandlingÅrsak.Builder revurderingÅrsak = BehandlingÅrsak.builder(behandlingÅrsakType)
             .medOriginalBehandling(origBehandling);
+        OrganisasjonsEnhet organisasjonsEnhet = new OrganisasjonsEnhet(origBehandling.getBehandlendeEnhetId(), origBehandling.getBehandlendeEnhetNavn());
         Behandling revurdering = Behandling.fraTidligereBehandling(origBehandling, behandlingType)
             .medOpprettetDato(LocalDateTime.now())
             .medBehandlingÅrsak(revurderingÅrsak).build();
+        revurdering.setBehandlendeOrganisasjonsEnhet(organisasjonsEnhet);
         return revurdering;
     }
 

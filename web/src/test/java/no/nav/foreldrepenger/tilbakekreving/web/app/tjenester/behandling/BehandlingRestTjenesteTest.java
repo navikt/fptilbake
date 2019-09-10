@@ -20,6 +20,8 @@ import org.junit.rules.ExpectedException;
 
 import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingsTjenesteProvider;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlendeEnhetTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingRevurderingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.HenleggBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollAsynkTjeneste;
@@ -57,9 +59,12 @@ public class BehandlingRestTjenesteTest {
     private HenleggBehandlingTjeneste henleggBehandlingTjenesteMock = mock(HenleggBehandlingTjeneste.class);
     private BehandlingRevurderingTjeneste revurderingTjenesteMock = mock(BehandlingRevurderingTjeneste.class);
     private BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjenesteMock = mock(BehandlingskontrollAsynkTjeneste.class);
+    private BehandlendeEnhetTjeneste behandlendeEnhetTjenesteMock = mock(BehandlendeEnhetTjeneste.class);
+    private BehandlingsTjenesteProvider behandlingsTjenesteProvider = new BehandlingsTjenesteProvider(behandlingTjenesteMock,gjenopptaBehandlingTjenesteMock,
+        henleggBehandlingTjenesteMock,revurderingTjenesteMock,behandlendeEnhetTjenesteMock);
 
-    private BehandlingRestTjeneste behandlingRestTjeneste = new BehandlingRestTjeneste(behandlingTjenesteMock, gjenopptaBehandlingTjenesteMock,
-        behandlingDtoTjenesteMock, behandlingsprosessTjeneste, henleggBehandlingTjenesteMock, revurderingTjenesteMock, behandlingskontrollAsynkTjenesteMock);
+    private BehandlingRestTjeneste behandlingRestTjeneste = new BehandlingRestTjeneste(behandlingsTjenesteProvider, behandlingDtoTjenesteMock,
+        behandlingsprosessTjeneste, behandlingskontrollAsynkTjenesteMock);
 
     @Test
     public void test_opprett_behandling_skal_feile_med_ugyldig_aktørId() throws URISyntaxException {

@@ -58,6 +58,8 @@ public class BehandlingRevurderingTjenesteTest extends FellesTestOppsett {
         assertThat(revurdering.getFagsakId()).isNotNull();
         assertThat(revurdering.getStatus()).isEqualByComparingTo(BehandlingStatus.OPPRETTET);
         assertThat(revurdering.getType()).isEqualByComparingTo(BehandlingType.REVURDERING_TILBAKEKREVING);
+        assertThat(revurdering.getBehandlendeEnhetId()).isNotEmpty();
+        assertThat(revurdering.getBehandlendeEnhetNavn()).isNotEmpty();
 
         assertThat(revurdering.getBehandlingÅrsaker()).isNotEmpty();
         BehandlingÅrsak behandlingÅrsak = revurdering.getBehandlingÅrsaker().get(0);
