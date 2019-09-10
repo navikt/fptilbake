@@ -9,19 +9,19 @@ import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.handlebars.dto.BaseDokument;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.handlebars.dto.VarselbrevDokument;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.KodeDto;
 import no.nav.vedtak.util.FPDateUtil;
 
 public class TekstformattererForVarselbrevTest {
 
-    private KodeDto foreldrepengerkode = new KodeDto("FAGSAK_YTELSE", "FP", "Foreldrepenger");
-    private KodeDto engangsstønadkode = new KodeDto("FAGSAK_YTELSE", "ES", "Engangsstønad");
-    private KodeDto svangerskapspengerkode = new KodeDto("FAGSAK_YTELSE", "SVP", "Svangerskapspenger");
+    private FagsakYtelseType foreldrepengerkode = FagsakYtelseType.FORELDREPENGER;
+    private FagsakYtelseType engangsstønadkode = FagsakYtelseType.ENGANGSTØNAD;
+    private FagsakYtelseType svangerskapspengerkode = FagsakYtelseType.SVANGERSKAPSPENGER;
 
     private final LocalDate JANUAR_1_2019 = LocalDate.of(2019, 1, 1);
     private final LocalDate JANUAR_30_2019 = LocalDate.of(2019, 1, 30);

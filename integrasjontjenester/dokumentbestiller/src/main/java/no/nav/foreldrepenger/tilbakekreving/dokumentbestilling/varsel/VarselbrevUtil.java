@@ -10,12 +10,13 @@ import org.apache.commons.lang3.StringUtils;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.YtelseNavn;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfoDto;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.simulering.kontrakt.FeilutbetaltePerioderDto;
 import no.nav.foreldrepenger.tilbakekreving.simulering.kontrakt.PeriodeDto;
 import no.nav.vedtak.util.FPDateUtil;
@@ -27,12 +28,13 @@ public class VarselbrevUtil {
     }
 
     public static VarselbrevSamletInfo sammenstillInfoFraFagsystemerForSending(
-        SamletEksternBehandlingInfoDto eksternBehandlingsinfoDto,
+        SamletEksternBehandlingInfo eksternBehandlingsinfoDto,
         Saksnummer saksnummer,
         Adresseinfo adresseinfo,
         Personinfo personinfo,
         FeilutbetaltePerioderDto feilutbetaltePerioderDto,
         Period ventetid,
+        FagsakYtelseType fagsakYtelseType,
         YtelseNavn ytelseNavn) {
 
         EksternBehandlingsinfoDto grunninformasjon = eksternBehandlingsinfoDto.getGrunninformasjon();
@@ -44,7 +46,7 @@ public class VarselbrevUtil {
             .medSaksnummer(saksnummer.getVerdi())
             .medSakspartNavn(personinfo.getNavn())
             .medFagsaktypenavnPåSpråk(ytelseNavn.getNavnPåBrukersSpråk())
-            .medFagsaktype(grunninformasjon.getFagsaktype())
+            .medFagsaktype(fagsakYtelseType)
             .medSprakkode(personinfo.getForetrukketSpråk())
             .medAnsvarligSaksbehandler(StringUtils.isNotEmpty(grunninformasjon.getAnsvarligSaksbehandler()) ? grunninformasjon.getAnsvarligSaksbehandler() : "VL")
             .medTittel(VarselbrevOverskrift.finnTittelVarselbrev(ytelseNavn.getNavnPåBokmål()))
@@ -63,9 +65,10 @@ public class VarselbrevUtil {
         Saksnummer saksnummer,
         String varseltekst,
         Adresseinfo adresseinfo,
-        SamletEksternBehandlingInfoDto eksternBehandlingsinfo,
+        SamletEksternBehandlingInfo eksternBehandlingsinfo,
         FeilutbetaltePerioderDto feilutbetaltePerioderDto,
         Period ventetid,
+        FagsakYtelseType fagsakYtelseType,
         YtelseNavn ytelseNavn) {
 
         EksternBehandlingsinfoDto grunninformasjon = eksternBehandlingsinfo.getGrunninformasjon();
@@ -76,7 +79,7 @@ public class VarselbrevUtil {
             .medMottakerAdresse(adresseinfo)
             .medSaksnummer(saksnummer.getVerdi())
             .medSakspartNavn(eksternBehandlingsinfo.getPersonopplysninger().getNavn())
-            .medFagsaktype(grunninformasjon.getFagsaktype())
+            .medFagsaktype(fagsakYtelseType)
             .medSprakkode(grunninformasjon.getSprakkode())
             .medFagsaktypenavnPåSpråk(ytelseNavn.getNavnPåBrukersSpråk())
             .medAnsvarligSaksbehandler(grunninformasjon.getAnsvarligSaksbehandler())

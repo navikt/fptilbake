@@ -2,6 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.fpsak.klient;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -21,9 +22,9 @@ import com.fasterxml.jackson.databind.ObjectReader;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.BehandlingResourceLinkDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.PersonopplysningDto;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfoDto;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SoknadDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.TilbakekrevingValgDto;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.VarseltekstDto;
 import no.nav.vedtak.felles.integrasjon.rest.OidcRestClient;
 import no.nav.vedtak.konfig.PropertyUtil;
@@ -39,10 +40,6 @@ public class FpsakKlient {
 
     private static final String BEHANDLING_EP = "/behandling/backend-root";
     private static final String BEHANDLING_ALLE_EP = "/behandlinger/alle";
-
-    private static final String FILTER_REL_PERSONOPPLYSNINGER = "soeker-personopplysninger";
-    private static final String FILTER_REL_TILBAKEKREVINGVALG = "tilbakekreving-valg";
-    private static final String FILTER_REL_VARSELFRITEKST = "tilbakekrevingsvarsel-fritekst";
 
     private static final String PARAM_NAME_BEHANDLING_UUID = "uuid";
     private static final String PARAM_NAME_SAKSNUMMER = "saksnummer";
@@ -67,23 +64,28 @@ public class FpsakKlient {
         return false;
     }
 
-    public SamletEksternBehandlingInfoDto hentBehandlingsinfo(UUID eksternUuid) {
-        SamletEksternBehandlingInfoDto.Builder builder = SamletEksternBehandlingInfoDto.builder();
+    public SamletEksternBehandlingInfo hentBehandlingsinfo(UUID eksternUuid, Tillegsinformasjon... tillegsinformasjon) {
+        List<Tillegsinformasjon> ekstrainfo = Arrays.asList(tillegsinformasjon);
+        SamletEksternBehandlingInfo.Builder builder = SamletEksternBehandlingInfo.builder(ekstrainfo);
         Optional<EksternBehandlingsinfoDto> eksternBehandlingsinfoDtoOptional = hentBehandling(eksternUuid);
 
         eksternBehandlingsinfoDtoOptional.ifPresent(eksternBehandlingsinfo -> {
             builder.setGrunninformasjon(eksternBehandlingsinfo);
-
             List<BehandlingResourceLinkDto> lenker = eksternBehandlingsinfo.getLinks();
             for (BehandlingResourceLinkDto lenke : lenker) {
-                if (lenke.getRel().equals(Tillegsinformasjon.PERSONOPPLYSNINGER.getFpsakRelasjonNavn())) {
+                if (ekstrainfo.contains(Tillegsinformasjon.PERSONOPPLYSNINGER) && lenke.getRel().equals(Tillegsinformasjon.PERSONOPPLYSNINGER.getFpsakRelasjonNavn())) {
                     builder.setPersonopplysninger(hentPersonopplysninger(lenke));
                 }
-                if (lenke.getRel().equals(Tillegsinformasjon.VARSELTEKST.getFpsakRelasjonNavn())) {
+                if (ekstrainfo.contains(Tillegsinformasjon.VARSELTEKST) && lenke.getRel().equals(Tillegsinformasjon.VARSELTEKST.getFpsakRelasjonNavn())) {
                     hentVarseltekst(lenke).ifPresent(builder::setVarseltekst);
                 }
+                if (ekstrainfo.contains(Tillegsinformasjon.SØKNAD) && lenke.getRel().equals(Tillegsinformasjon.SØKNAD.getFpsakRelasjonNavn())) {
+                    builder.setFamiliehendelse(hentSøknad(lenke));
+                }
+                if (ekstrainfo.contains(Tillegsinformasjon.TILBAKEKREVINGSVALG) && lenke.getRel().equals(Tillegsinformasjon.TILBAKEKREVINGSVALG.getFpsakRelasjonNavn())) {
+                    hentTilbakekrevingValg(lenke).ifPresent(builder::setTilbakekrevingvalg);
+                }
             }
-
         });
         return builder.build();
     }
@@ -97,7 +99,7 @@ public class FpsakKlient {
         Optional<EksternBehandlingsinfoDto> eksternBehandlingsinfoDtoOptional = hentBehandling(UUID.fromString(eksternUuid));
         if (eksternBehandlingsinfoDtoOptional.isPresent()) {
             Optional<BehandlingResourceLinkDto> ressursLink = eksternBehandlingsinfoDtoOptional.get().getLinks().stream()
-                .filter(resourceLink -> FILTER_REL_TILBAKEKREVINGVALG.equals(resourceLink.getRel())).findAny();
+                .filter(resourceLink -> Tillegsinformasjon.TILBAKEKREVINGSVALG.getFpsakRelasjonNavn().equals(resourceLink.getRel())).findAny();
             if (ressursLink.isPresent()) {
                 return hentTilbakekrevingValg(ressursLink.get());
             }
@@ -132,6 +134,12 @@ public class FpsakKlient {
         URI endpoint = URI.create(baseUri() + resourceLink.getHref());
         return get(endpoint, VarseltekstDto.class);
 
+    }
+
+    private SoknadDto hentSøknad(BehandlingResourceLinkDto resourceLink) {
+        URI endpoint = URI.create(baseUri() + resourceLink.getHref());
+        return get(endpoint, SoknadDto.class)
+            .orElseThrow(() -> new IllegalArgumentException("Forventet å finne søknad på lenken: " + endpoint));
     }
 
     private Optional<TilbakekrevingValgDto> hentTilbakekrevingValg(BehandlingResourceLinkDto resourceLink) {

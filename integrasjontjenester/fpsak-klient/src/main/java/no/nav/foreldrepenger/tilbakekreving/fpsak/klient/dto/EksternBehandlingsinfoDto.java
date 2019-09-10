@@ -20,7 +20,6 @@ public class EksternBehandlingsinfoDto {
     private String ansvarligSaksbehandler;
     private Språkkode sprakkode;
     private List<BehandlingResourceLinkDto> links = new ArrayList<>();
-    private KodeDto fagsaktype;
 
     public Long getId() {
         return id;
@@ -94,11 +93,4 @@ public class EksternBehandlingsinfoDto {
         this.links = links;
     }
 
-    public KodeDto getFagsaktype() {
-        return fagsaktype;
-    }
-
-    public void setFagsaktype(KodeDto fagsaktype) {
-        this.fagsaktype = fagsaktype;
-    }
 }

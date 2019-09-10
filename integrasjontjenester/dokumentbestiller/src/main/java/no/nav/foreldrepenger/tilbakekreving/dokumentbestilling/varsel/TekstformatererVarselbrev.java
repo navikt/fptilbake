@@ -63,15 +63,15 @@ class TekstformatererVarselbrev {
     }
 
 
-    private static void settFagsaktype(BaseDokument baseDokument, KodeDto fagsaktype) {
-        if (FagsakYtelseType.ENGANGSTØNAD.getKode().equals(fagsaktype.getKode())) {
+    private static void settFagsaktype(BaseDokument baseDokument, FagsakYtelseType fagsaktype) {
+        if (FagsakYtelseType.ENGANGSTØNAD.equals(fagsaktype)) {
             baseDokument.setEngangsstonad(true);
-        } else if (FagsakYtelseType.FORELDREPENGER.getKode().equals(fagsaktype.getKode())) {
+        } else if (FagsakYtelseType.FORELDREPENGER.equals(fagsaktype)) {
             baseDokument.setForeldrepenger(true);
-        } else if (FagsakYtelseType.SVANGERSKAPSPENGER.getKode().equals(fagsaktype.getKode())) {
+        } else if (FagsakYtelseType.SVANGERSKAPSPENGER.equals(fagsaktype)) {
             baseDokument.setSvangerskapspenger(true);
         } else {
-            throw new IllegalArgumentException("Utviklerfeil - Kunne ikke finne fagsaktype: " + fagsaktype.getKode());
+            throw new IllegalArgumentException("Utviklerfeil - Kunne ikke finne fagsaktype: " + fagsaktype);
         }
     }
 

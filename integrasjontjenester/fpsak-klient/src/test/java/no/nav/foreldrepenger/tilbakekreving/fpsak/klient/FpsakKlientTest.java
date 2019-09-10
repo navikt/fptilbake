@@ -26,7 +26,7 @@ import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsi
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.KodeDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.PersonadresseDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.PersonopplysningDto;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfoDto;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.TilbakekrevingValgDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.VarseltekstDto;
 import no.nav.vedtak.felles.integrasjon.rest.OidcRestClient;
@@ -61,7 +61,7 @@ public class FpsakKlientTest {
         when(oidcRestClientMock.getReturnsOptional(PERSONOPPLYSNING_URI, PersonopplysningDto.class)).thenReturn(Optional.of(personopplysningDto()));
         when(oidcRestClientMock.getReturnsOptional(VARSELTEKST_URI, VarseltekstDto.class)).thenReturn(Optional.of(new VarseltekstDto(VARSELTEKST)));
 
-        SamletEksternBehandlingInfoDto dokumentinfoDto = klient.hentBehandlingsinfo(BEHANDLING_UUID);
+        SamletEksternBehandlingInfo dokumentinfoDto = klient.hentBehandlingsinfo(BEHANDLING_UUID, Tillegsinformasjon.PERSONOPPLYSNINGER, Tillegsinformasjon.VARSELTEKST);
 
         assertThat(dokumentinfoDto.getGrunninformasjon()).isEqualTo(returnDto);
         assertThat(dokumentinfoDto.getPersonopplysninger()).isNotNull();
@@ -72,7 +72,7 @@ public class FpsakKlientTest {
     public void skal_returnere_null_grunninformasjon_når_dokumentinfo_ikke_finnes() {
         when(oidcRestClientMock.getReturnsOptional(any(), any())).thenReturn(Optional.empty());
 
-        SamletEksternBehandlingInfoDto resultat = klient.hentBehandlingsinfo(BEHANDLING_UUID);
+        SamletEksternBehandlingInfo resultat = klient.hentBehandlingsinfo(BEHANDLING_UUID, Tillegsinformasjon.PERSONOPPLYSNINGER, Tillegsinformasjon.VARSELTEKST);
         assertThat(resultat.getGrunninformasjon()).isNull();
     }
 
@@ -118,7 +118,6 @@ public class FpsakKlientTest {
 
     private EksternBehandlingsinfoDto dokumentinfoDto() {
         EksternBehandlingsinfoDto dto = new EksternBehandlingsinfoDto();
-        dto.setFagsaktype(new KodeDto("kv", "kode", "navn"));
         dto.setBehandlendeEnhetId("4214");
         dto.setBehandlendeEnhetNavn("enhetnavn");
         dto.setAnsvarligSaksbehandler("saksbehandler");

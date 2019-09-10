@@ -17,10 +17,10 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodelisteN
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.TpsTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.KodeDto;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfoDto;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.simulering.klient.FpOppdragRestKlient;
 import no.nav.foreldrepenger.tilbakekreving.simulering.kontrakt.FeilutbetaltePerioderDto;
 import no.nav.vedtak.felles.jpa.Transaction;
@@ -57,7 +57,7 @@ public class EksternDataForBrevTjeneste {
         return brukersSvarfrist;
     }
 
-    public String finnFagsaktypeNavnPåRiktigSpråk(KodeDto fagsaktype, Språkkode sprakkode) {
+    public String finnFagsaktypeNavnPåRiktigSpråk(FagsakYtelseType fagsaktype, Språkkode sprakkode) {
         FagsakYtelseType fagsakYtelseType = kodeverkRepository.finn(FagsakYtelseType.class, fagsaktype.getKode());
         List<KodelisteNavnI18N> kodelisteNavnI18NList = fagsakYtelseType.getKodelisteNavnI18NList();
         return BrevSpråkUtil.finnFagsaktypenavnPåAngittSpråk(kodelisteNavnI18NList, sprakkode);
@@ -67,10 +67,10 @@ public class EksternDataForBrevTjeneste {
         return brukersSvarfrist.getDays() / 7;
     }
 
-    public SamletEksternBehandlingInfoDto hentBehandlingFpsak(UUID eksternUuid, Saksnummer saksnummer) {
-        SamletEksternBehandlingInfoDto behandlingsinfo = fpsakKlient.hentBehandlingsinfo(eksternUuid);
+    public SamletEksternBehandlingInfo hentBehandlingFpsak(UUID eksternUuid, Tillegsinformasjon... tillegsinformasjon) {
+        SamletEksternBehandlingInfo behandlingsinfo = fpsakKlient.hentBehandlingsinfo(eksternUuid, tillegsinformasjon);
         if (behandlingsinfo.getGrunninformasjon() == null) {
-            throw EksternDataForBrevFeil.FACTORY.fantIkkeBehandlingIFpsak(saksnummer.getVerdi()).toException();
+            throw EksternDataForBrevFeil.FACTORY.fantIkkeBehandlingIFpsak(eksternUuid.toString()).toException();
         }
         return behandlingsinfo;
     }
@@ -99,7 +99,7 @@ public class EksternDataForBrevTjeneste {
         return feilutbetaltePerioderDto.get();
     }
 
-    public YtelseNavn hentYtelsenavn(KodeDto ytelsetype, Språkkode språkkode) {
+    public YtelseNavn hentYtelsenavn(FagsakYtelseType ytelsetype, Språkkode språkkode) {
         YtelseNavn ytelseNavn = new YtelseNavn();
         String ytelsePåBokmål = finnFagsaktypeNavnPåRiktigSpråk(ytelsetype, Språkkode.nb);
         ytelseNavn.setNavnPåBokmål(ytelsePåBokmål);

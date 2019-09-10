@@ -12,23 +12,24 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.AdresseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.NavBrukerKjønn;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.YtelseNavn;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.KodeDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.PersonopplysningDto;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfoDto;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.simulering.kontrakt.FeilutbetaltePerioderDto;
 import no.nav.foreldrepenger.tilbakekreving.simulering.kontrakt.PeriodeDto;
 
 public class VarselbrevUtilTest {
 
-    private KodeDto foreldrepengerkode = new KodeDto("FAGSAK_YTELSE", "FP", "");
-    private KodeDto engangsstønadkode = new KodeDto("FAGSAK_YTELSE", "ES", "");
-    private KodeDto svangerskapspengerkode = new KodeDto("FAGSAK_YTELSE", "SVP", "");
+    private FagsakYtelseType foreldrepengerkode = FagsakYtelseType.FORELDREPENGER;
+    private FagsakYtelseType engangsstønadkode = FagsakYtelseType.ENGANGSTØNAD;
+    private FagsakYtelseType svangerskapspengerkode = FagsakYtelseType.SVANGERSKAPSPENGER;
 
     @Test
     public void skal_sammenstille_data_fra_fpsak_fpoppdrag_og_tps_for_forhåndsvisning() {
@@ -40,7 +41,6 @@ public class VarselbrevUtilTest {
         eksternBehandlingsinfoDto.setBehandlendeEnhetId("behandlendeenhetId 556677");
         eksternBehandlingsinfoDto.setBehandlendeEnhetNavn("behandlende enhet i Bærum");
         eksternBehandlingsinfoDto.setSprakkode(Språkkode.nn);
-        eksternBehandlingsinfoDto.setFagsaktype(engangsstønadkode);
         eksternBehandlingsinfoDto.setAnsvarligSaksbehandler("Saksbehandler Bodil");
 
         Adresseinfo adresseinfo = lagStandardNorskAdresse();
@@ -53,7 +53,7 @@ public class VarselbrevUtilTest {
         ytelseNavn.setNavnPåBrukersSpråk("eingongsstønad");
         ytelseNavn.setNavnPåBokmål("engangsstønad");
 
-        SamletEksternBehandlingInfoDto behandingsinfo = SamletEksternBehandlingInfoDto.builder()
+        SamletEksternBehandlingInfo behandingsinfo = SamletEksternBehandlingInfo.builder(Tillegsinformasjon.PERSONOPPLYSNINGER, Tillegsinformasjon.VARSELTEKST)
             .setGrunninformasjon(eksternBehandlingsinfoDto)
             .setPersonopplysninger(personopplysningDto)
             .build();
@@ -65,11 +65,12 @@ public class VarselbrevUtilTest {
             behandingsinfo,
             feilutbetaltePerioderDto,
             Period.ofWeeks(3),
+            FagsakYtelseType.ENGANGSTØNAD,
             ytelseNavn);
 
         Assertions.assertThat(varselbrev.getBrevMetadata().getBehandlendeEnhetId()).isEqualTo(eksternBehandlingsinfoDto.getBehandlendeEnhetId());
         Assertions.assertThat(varselbrev.getBrevMetadata().getBehandlendeEnhetNavn()).isEqualTo(eksternBehandlingsinfoDto.getBehandlendeEnhetNavn());
-        Assertions.assertThat(varselbrev.getBrevMetadata().getFagsaktype()).isEqualTo(eksternBehandlingsinfoDto.getFagsaktype());
+        Assertions.assertThat(varselbrev.getBrevMetadata().getFagsaktype()).isEqualTo(FagsakYtelseType.ENGANGSTØNAD);
         Assertions.assertThat(varselbrev.getFritekstFraSaksbehandler()).isEqualTo(varseltekst);
         Assertions.assertThat(varselbrev.getBrevMetadata().getSaksnummer()).isEqualTo(saksnummer.getVerdi());
         Assertions.assertThat(varselbrev.getBrevMetadata().getAnsvarligSaksbehandler()).isEqualTo(eksternBehandlingsinfoDto.getAnsvarligSaksbehandler());
@@ -94,7 +95,6 @@ public class VarselbrevUtilTest {
 
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto = new EksternBehandlingsinfoDto();
         eksternBehandlingsinfoDto.setAnsvarligSaksbehandler("Line Saksbehandler");
-        eksternBehandlingsinfoDto.setFagsaktype(svangerskapspengerkode);
         eksternBehandlingsinfoDto.setBehandlendeEnhetId("behandlendeEnhetId 1234");
         eksternBehandlingsinfoDto.setBehandlendeEnhetNavn("behandlende enhet i Rogaland");
 
@@ -102,7 +102,7 @@ public class VarselbrevUtilTest {
         ytelseNavn.setNavnPåBrukersSpråk("svangerskapspengar");
         ytelseNavn.setNavnPåBokmål("svangerskapspenger");
 
-        SamletEksternBehandlingInfoDto behandingsinfo = SamletEksternBehandlingInfoDto.builder()
+        SamletEksternBehandlingInfo behandingsinfo = SamletEksternBehandlingInfo.builder(Tillegsinformasjon.PERSONOPPLYSNINGER, Tillegsinformasjon.VARSELTEKST)
             .setGrunninformasjon(eksternBehandlingsinfoDto)
             .setVarseltekst("Dette ser ikke bra ut as")
             .build();
@@ -114,6 +114,7 @@ public class VarselbrevUtilTest {
             personinfo,
             feilutbetaltePerioderDto,
             Period.ofWeeks(3),
+            FagsakYtelseType.SVANGERSKAPSPENGER,
             ytelseNavn);
 
         Assertions.assertThat(varselbrev.getBrevMetadata().getBehandlendeEnhetId()).isEqualTo("behandlendeEnhetId 1234");
