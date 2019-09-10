@@ -55,6 +55,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.Pro
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.Redirect;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.SettBehandlingPåVentDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.UtvidetBehandlingDto;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.UuidDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.SaksnummerDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.SøkestrengDto;
 import no.nav.vedtak.felles.jpa.Transaction;
@@ -133,16 +134,15 @@ public class BehandlingRestTjeneste {
         return Response.ok().build();
     }
 
-    @POST
-    @Timed
-    @Path("/revurdering/opprettes")
+    @GET
+    @Path("/revurdering/kan-opprettes")
     @ApiOperation(value = "Sjekk om revurdering kan opprettes")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "OK"),
     })
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
-    public Response kanOppretteRevurdering(@Valid @NotNull OpprettBehandlingDto opprettBehandlingDto) {
-        boolean result = revurderingTjeneste.kanOppretteRevurdering(opprettBehandlingDto.getEksternUuid());
+    public Response kanOppretteRevurdering(@QueryParam("uuid") @NotNull @Valid UuidDto uuidDto) {
+        boolean result = revurderingTjeneste.kanOppretteRevurdering(uuidDto.getUuid());
         return Response.ok(result).build();
     }
 
