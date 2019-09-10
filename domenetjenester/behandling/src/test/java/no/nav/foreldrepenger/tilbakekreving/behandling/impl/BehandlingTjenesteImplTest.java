@@ -1,7 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
@@ -9,7 +8,6 @@ import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
@@ -21,7 +19,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagAggregate;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMock;
@@ -30,11 +27,6 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.vedtak.exception.TekniskException;
 
 public class BehandlingTjenesteImplTest extends FellesTestOppsett {
-
-    @Before
-    public void setup(){
-        when(mockFpsakKlient.hentBehandling(any(UUID.class))).thenReturn(lagEksternBehandlingInfoDto());
-    }
 
     @Test
     public void skalReturnereTomFeilutbetalingFaktaNårGrunnlagIkkeFinnes() {
@@ -49,8 +41,8 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
         KravgrunnlagMock mock = lagKravgrunnlag(LocalDate.now(), LocalDate.now(), KlasseType.FEIL, BigDecimal.ZERO, BigDecimal.ZERO);
         Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mock));
         KravgrunnlagAggregate kravgrunnlagAggregate = KravgrunnlagAggregate.builder()
-                .medGrunnlagØkonomi(kravgrunnlag431)
-                .medBehandlingId(internBehandlingId).build();
+            .medGrunnlagØkonomi(kravgrunnlag431)
+            .medBehandlingId(internBehandlingId).build();
         grunnlagRepository.lagre(kravgrunnlagAggregate);
 
         expectedException.expect(TekniskException.class);
@@ -66,8 +58,8 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
 
         Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedYtelPostering));
         KravgrunnlagAggregate kravgrunnlagAggregate = KravgrunnlagAggregate.builder()
-                .medGrunnlagØkonomi(kravgrunnlag431)
-                .medBehandlingId(internBehandlingId).build();
+            .medGrunnlagØkonomi(kravgrunnlag431)
+            .medBehandlingId(internBehandlingId).build();
 
         grunnlagRepository.lagre(kravgrunnlagAggregate);
         Optional<BehandlingFeilutbetalingFakta> feilutbetalingFakta = behandlingTjeneste.hentBehandlingFeilutbetalingFakta(internBehandlingId);
@@ -84,18 +76,18 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
     @Test
     public void skalHenteFeilutbetalingFaktaMedFlerePerioder() {
         KravgrunnlagMock mockMedFeilPostering = lagKravgrunnlag(FOM, LocalDate.of(2016, 03, 31), KlasseType.FEIL,
-                BigDecimal.valueOf(10000), BigDecimal.ZERO);
+            BigDecimal.valueOf(10000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedFeilPostering2 = lagKravgrunnlag(LocalDate.of(2016, 04, 01), LocalDate.of(2016, 04, 15),
-                KlasseType.FEIL, BigDecimal.valueOf(12000), BigDecimal.ZERO);
+            KlasseType.FEIL, BigDecimal.valueOf(12000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedFeilPostering3 = lagKravgrunnlag(LocalDate.of(2016, 04, 22), TOM,
-                KlasseType.FEIL, BigDecimal.valueOf(15000), BigDecimal.ZERO);
+            KlasseType.FEIL, BigDecimal.valueOf(15000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedYtelPostering = lagKravgrunnlag(FOM, TOM, KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(37000));
 
         Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedFeilPostering2,
-                mockMedFeilPostering3, mockMedYtelPostering));
+            mockMedFeilPostering3, mockMedYtelPostering));
         KravgrunnlagAggregate kravgrunnlagAggregate = KravgrunnlagAggregate.builder()
-                .medGrunnlagØkonomi(kravgrunnlag431)
-                .medBehandlingId(internBehandlingId).build();
+            .medGrunnlagØkonomi(kravgrunnlag431)
+            .medBehandlingId(internBehandlingId).build();
 
         grunnlagRepository.lagre(kravgrunnlagAggregate);
         Optional<BehandlingFeilutbetalingFakta> feilutbetalingFakta = behandlingTjeneste.hentBehandlingFeilutbetalingFakta(internBehandlingId);
@@ -117,18 +109,18 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
     @Test
     public void skalHenteFeilutbetalingFaktaMedFlerePerioderOgSisteDagIHelgen() {
         KravgrunnlagMock mockMedFeilPostering = lagKravgrunnlag(FOM, LocalDate.of(2016, 03, 26), KlasseType.FEIL,
-                BigDecimal.valueOf(10000), BigDecimal.ZERO);
+            BigDecimal.valueOf(10000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedFeilPostering2 = lagKravgrunnlag(LocalDate.of(2016, 03, 28), LocalDate.of(2016, 04, 15),
-                KlasseType.FEIL, BigDecimal.valueOf(12000), BigDecimal.ZERO);
+            KlasseType.FEIL, BigDecimal.valueOf(12000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedFeilPostering3 = lagKravgrunnlag(LocalDate.of(2016, 04, 19), TOM,
-                KlasseType.FEIL, BigDecimal.valueOf(15000), BigDecimal.ZERO);
+            KlasseType.FEIL, BigDecimal.valueOf(15000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedYtelPostering = lagKravgrunnlag(FOM, TOM, KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(37000));
 
         Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedFeilPostering2,
-                mockMedFeilPostering3, mockMedYtelPostering));
+            mockMedFeilPostering3, mockMedYtelPostering));
         KravgrunnlagAggregate kravgrunnlagAggregate = KravgrunnlagAggregate.builder()
             .medGrunnlagØkonomi(kravgrunnlag431)
-                .medBehandlingId(internBehandlingId).build();
+            .medBehandlingId(internBehandlingId).build();
 
         grunnlagRepository.lagre(kravgrunnlagAggregate);
         Optional<BehandlingFeilutbetalingFakta> feilutbetalingFakta = behandlingTjeneste.hentBehandlingFeilutbetalingFakta(internBehandlingId);
@@ -191,11 +183,7 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
         return new KravgrunnlagMock(fom, tom, klasseType, nyBeløp, tilbakeBeløp);
     }
 
-    private Optional<EksternBehandlingsinfoDto> lagEksternBehandlingInfoDto() {
-        EksternBehandlingsinfoDto eksternBehandlingsinfoDto = new EksternBehandlingsinfoDto();
-        eksternBehandlingsinfoDto.setId(10001L);
-        return Optional.of(eksternBehandlingsinfoDto);
-    }
+
 
 
     private void fellesFaktaResponsSjekk(BehandlingFeilutbetalingFakta fakta) {
@@ -211,5 +199,7 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
         assertThat(behandling).isNotNull();
         assertThat(behandling.getFagsak().getFagsakYtelseType()).isEqualByComparingTo(FagsakYtelseType.FORELDREPENGER);
         assertThat(behandling.getType()).isEqualByComparingTo(BehandlingType.TILBAKEKREVING);
+        assertThat(behandling.getBehandlendeEnhetId()).isNotEmpty();
+        assertThat(behandling.getBehandlendeEnhetNavn()).isNotEmpty();
     }
 }
