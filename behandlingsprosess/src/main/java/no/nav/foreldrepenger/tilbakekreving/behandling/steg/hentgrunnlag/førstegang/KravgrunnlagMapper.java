@@ -39,7 +39,7 @@ public class KravgrunnlagMapper {
         return kravgrunnlagDto.getReferanse();
     }
 
-        public Kravgrunnlag431 mapTilDomene(DetaljertKravgrunnlag dto) {
+    public Kravgrunnlag431 mapTilDomene(DetaljertKravgrunnlag dto) {
         Kravgrunnlag431 kravgrunnlag431 = formKravgrunnlag431(dto);
         for (DetaljertKravgrunnlagPeriode periodeDto : dto.getTilbakekrevingsPeriode()) {
             KravgrunnlagPeriode432 kravgrunnlagPeriode432 = formKravgrunnlagPeriode432(kravgrunnlag431, periodeDto);
