@@ -76,9 +76,9 @@ public class TekstformatererVedtaksbrevTest {
         );
         HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
 
-        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data).replaceAll("\r\n", "\n");
+        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
         String fasit = les("/vedtaksbrev/FP_tvillinger.txt");
-        assertThat(generertBrev).isEqualTo(fasit);
+        assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 
     @Test
@@ -132,10 +132,10 @@ public class TekstformatererVedtaksbrevTest {
 
         HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
 
-        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data).replaceAll("\r\n", "\n");
+        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
         ;
         String fasit = les("/vedtaksbrev/FP_fritekst_overalt.txt");
-        assertThat(generertBrev).isEqualTo(fasit);
+        assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 
     @Test
@@ -169,10 +169,10 @@ public class TekstformatererVedtaksbrevTest {
 
         HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
 
-        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data).replaceAll("\r\n", "\n");
+        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
         ;
         String fasit = les("/vedtaksbrev/SVP_forsett.txt");
-        assertThat(generertBrev).isEqualTo(fasit);
+        assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 
     @Test
@@ -208,9 +208,9 @@ public class TekstformatererVedtaksbrevTest {
 
         HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
 
-        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data).replaceAll("\r\n", "\n");
+        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
         String fasit = les("/vedtaksbrev/ES_fødsel_god_tro.txt");
-        assertThat(generertBrev).isEqualTo(fasit);
+        assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 
     @Test
@@ -245,18 +245,17 @@ public class TekstformatererVedtaksbrevTest {
 
         HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
 
-        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data).replaceAll("\r\n", "\n");
-        ;
+        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
         String fasit = les("/vedtaksbrev/ES_adopsjon_grovt_uaktsom.txt");
-        assertThat(generertBrev).isEqualTo(fasit);
+        assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 
     private String les(String filnavn) throws IOException {
         try (InputStream resource = getClass().getResourceAsStream(filnavn);
              Scanner scanner = new Scanner(resource, "UTF-8")) {
             scanner.useDelimiter("\\A");
-            return scanner.hasNext() ? scanner.next() : null;
+            return scanner.hasNext() ?scanner.next() : null;
         }
-
     }
+
 }
