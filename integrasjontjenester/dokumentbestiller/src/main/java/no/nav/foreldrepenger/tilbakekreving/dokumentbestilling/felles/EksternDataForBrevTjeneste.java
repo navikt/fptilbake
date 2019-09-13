@@ -63,10 +63,6 @@ public class EksternDataForBrevTjeneste {
         return BrevSpråkUtil.finnFagsaktypenavnPåAngittSpråk(kodelisteNavnI18NList, sprakkode);
     }
 
-    public int antallUkerKlagefrist() {
-        return brukersSvarfrist.getDays() / 7;
-    }
-
     public SamletEksternBehandlingInfo hentBehandlingFpsak(UUID eksternUuid, Tillegsinformasjon... tillegsinformasjon) {
         SamletEksternBehandlingInfo behandlingsinfo = fpsakKlient.hentBehandlingsinfo(eksternUuid, tillegsinformasjon);
         if (behandlingsinfo.getGrunninformasjon() == null) {
