@@ -213,7 +213,7 @@ public class VedtaksbrevTjeneste {
             .medTotaltRentebeløp(summer(resulatPerioder, BeregningResultatPeriode::getRenteBeløp))
             .medTotaltTilbakekrevesBeløpMedRenter(summer(resulatPerioder, BeregningResultatPeriode::getTilbakekrevingBeløp))
             .medHovedresultat(beregnetResultat.getVedtakResultatType())
-            .medKlagefristUker(eksternDataForBrevTjeneste.antallUkerKlagefrist());
+            .medKlagefristUker(6);
 
         List<HbVedtaksbrevPeriode> perioder = resulatPerioder.stream()
             .map(brp -> lagBrevdataPeriode(brp, fakta, vilkårPerioder, perioderFritekst))

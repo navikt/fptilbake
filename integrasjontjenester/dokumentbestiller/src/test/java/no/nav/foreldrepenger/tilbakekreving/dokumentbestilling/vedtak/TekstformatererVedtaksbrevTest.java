@@ -46,7 +46,7 @@ public class TekstformatererVedtaksbrevTest {
             .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(23002))
             .medTotaltRentebeløp(BigDecimal.ZERO)
             .medVarsletDato(LocalDate.of(2020, 4, 4))
-            .medKlagefristUker(4)
+            .medKlagefristUker(6)
             .build();
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
             HbVedtaksbrevPeriode.builder()
@@ -76,7 +76,7 @@ public class TekstformatererVedtaksbrevTest {
         );
         HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
 
-        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
+        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data).replaceAll("\r\n", "\n");
         String fasit = les("/vedtaksbrev/FP_tvillinger.txt");
         assertThat(generertBrev).isEqualTo(fasit);
     }
@@ -95,7 +95,7 @@ public class TekstformatererVedtaksbrevTest {
             .medTotaltRentebeløp(BigDecimal.ZERO)
             .medVarsletDato(LocalDate.of(2019, 1, 3))
             .medFritekstOppsummering("Skynd deg å betale, vi trenger pengene med en gang!")
-            .medKlagefristUker(4)
+            .medKlagefristUker(6)
             .build();
 
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
@@ -132,7 +132,8 @@ public class TekstformatererVedtaksbrevTest {
 
         HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
 
-        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
+        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data).replaceAll("\r\n", "\n");
+        ;
         String fasit = les("/vedtaksbrev/FP_fritekst_overalt.txt");
         assertThat(generertBrev).isEqualTo(fasit);
     }
@@ -150,7 +151,7 @@ public class TekstformatererVedtaksbrevTest {
             .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(11000))
             .medTotaltRentebeløp(BigDecimal.valueOf(1000))
             .medVarsletDato(LocalDate.of(2020, 4, 4))
-            .medKlagefristUker(4)
+            .medKlagefristUker(6)
             .build();
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
             HbVedtaksbrevPeriode.builder()
@@ -168,7 +169,8 @@ public class TekstformatererVedtaksbrevTest {
 
         HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
 
-        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
+        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data).replaceAll("\r\n", "\n");
+        ;
         String fasit = les("/vedtaksbrev/SVP_forsett.txt");
         assertThat(generertBrev).isEqualTo(fasit);
     }
@@ -186,7 +188,7 @@ public class TekstformatererVedtaksbrevTest {
             .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.ZERO)
             .medTotaltRentebeløp(BigDecimal.ZERO)
             .medVarsletDato(LocalDate.of(2020, 4, 4))
-            .medKlagefristUker(4)
+            .medKlagefristUker(6)
             .build();
 
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
@@ -206,7 +208,7 @@ public class TekstformatererVedtaksbrevTest {
 
         HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
 
-        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
+        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data).replaceAll("\r\n", "\n");
         String fasit = les("/vedtaksbrev/ES_fødsel_god_tro.txt");
         assertThat(generertBrev).isEqualTo(fasit);
     }
@@ -224,7 +226,7 @@ public class TekstformatererVedtaksbrevTest {
             .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(550000))
             .medTotaltRentebeløp(BigDecimal.valueOf(50000))
             .medVarsletDato(LocalDate.of(2020, 4, 4))
-            .medKlagefristUker(4)
+            .medKlagefristUker(6)
             .build();
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
             HbVedtaksbrevPeriode.builder()
@@ -243,7 +245,8 @@ public class TekstformatererVedtaksbrevTest {
 
         HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
 
-        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
+        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data).replaceAll("\r\n", "\n");
+        ;
         String fasit = les("/vedtaksbrev/ES_adopsjon_grovt_uaktsom.txt");
         assertThat(generertBrev).isEqualTo(fasit);
     }
