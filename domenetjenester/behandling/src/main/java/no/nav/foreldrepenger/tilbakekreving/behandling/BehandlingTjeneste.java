@@ -21,7 +21,7 @@ public interface BehandlingTjeneste {
 
     void endreBehandlingPåVent(Long behandlingId, LocalDate frist, Venteårsak venteårsak);
 
-    Long opprettBehandlingManuell(Saksnummer saksnummer, UUID eksternUuid, String fagsakYtelseType, BehandlingType behandlingType);
+    Long opprettBehandlingManuell(Saksnummer saksnummer, UUID eksternUuid, FagsakYtelseType fagsakYtelseType, BehandlingType behandlingType);
 
     Long opprettBehandlingAutomatisk(Saksnummer saksnummer, UUID eksternUuid, long eksternbehandlingId,
                                      AktørId aktørId, FagsakYtelseType fagsakYtelseType, BehandlingType behandlingType);

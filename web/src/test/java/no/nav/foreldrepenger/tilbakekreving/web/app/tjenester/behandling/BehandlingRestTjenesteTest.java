@@ -1,7 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -43,11 +42,10 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.Opp
 public class BehandlingRestTjenesteTest {
 
     public static final String GYLDIG_AKTØR_ID = "12345678901";
-    public static final String UGYLDIG_AKTØR_ID = "%&#123124";
     public static final String GYLDIG_SAKSNR = "123456";
     public static final String UGYLDIG_SAKSNR = "(#2141##";
     public static final String EKSTERN_BEHANDLING_UUID = UUID.randomUUID().toString();
-    public static final String YTELSE_TYPE = FagsakYtelseType.FORELDREPENGER.getKode();
+    private static final FagsakYtelseType FP_YTELSE_TYPE = FagsakYtelseType.FORELDREPENGER;
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -68,7 +66,7 @@ public class BehandlingRestTjenesteTest {
 
     @Test
     public void test_opprett_behandling_skal_feile_med_ugyldig_saksnummer() throws URISyntaxException {
-        OpprettBehandlingDto dto = opprettBehandlingDto(UGYLDIG_SAKSNR, EKSTERN_BEHANDLING_UUID, YTELSE_TYPE);
+        OpprettBehandlingDto dto = opprettBehandlingDto(UGYLDIG_SAKSNR, EKSTERN_BEHANDLING_UUID, FP_YTELSE_TYPE);
 
         expectedException.expect(IllegalArgumentException.class); // ved rest-kall vil jax validering slå inn og resultere i en FeltFeil
         expectedException.expectMessage("Ugyldig saksnummer");
@@ -78,24 +76,24 @@ public class BehandlingRestTjenesteTest {
 
     @Test
     public void test_skal_opprette_ny_behandling() throws URISyntaxException {
-        behandlingRestTjeneste.opprettBehandling(opprettBehandlingDto(GYLDIG_SAKSNR, EKSTERN_BEHANDLING_UUID, YTELSE_TYPE));
+        behandlingRestTjeneste.opprettBehandling(opprettBehandlingDto(GYLDIG_SAKSNR, EKSTERN_BEHANDLING_UUID, FP_YTELSE_TYPE));
 
-        verify(behandlingTjenesteMock).opprettBehandlingManuell(any(Saksnummer.class), any(UUID.class),anyString(), any(BehandlingType.class));
+        verify(behandlingTjenesteMock).opprettBehandlingManuell(any(Saksnummer.class), any(UUID.class),any(FagsakYtelseType.class), any(BehandlingType.class));
     }
 
     @Test
     public void test_skal_opprette_ny_behandling_for_revurdering() throws URISyntaxException {
         when(behandlingskontrollAsynkTjenesteMock.asynkProsesserBehandling(any(Behandling.class))).thenReturn("1");
-        when(revurderingTjenesteMock.opprettRevurdering(any(Saksnummer.class), any(UUID.class), anyString()))
+        when(revurderingTjenesteMock.opprettRevurdering(any(Saksnummer.class), any(UUID.class), any(BehandlingÅrsakType.class),any(BehandlingType.class)))
             .thenReturn(mockBehandling());
 
-        OpprettBehandlingDto opprettBehandlingDto = opprettBehandlingDto(GYLDIG_SAKSNR, EKSTERN_BEHANDLING_UUID, YTELSE_TYPE);
-        opprettBehandlingDto.setBehandlingType(BehandlingType.REVURDERING_TILBAKEKREVING.getKode());
-        opprettBehandlingDto.setBehandlingArsakType(BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR.getKode());
+        OpprettBehandlingDto opprettBehandlingDto = opprettBehandlingDto(GYLDIG_SAKSNR, EKSTERN_BEHANDLING_UUID, FP_YTELSE_TYPE);
+        opprettBehandlingDto.setBehandlingType(BehandlingType.REVURDERING_TILBAKEKREVING);
+        opprettBehandlingDto.setBehandlingArsakType(BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR);
 
         Response response = behandlingRestTjeneste.opprettBehandling(opprettBehandlingDto);
 
-        verify(revurderingTjenesteMock, atLeastOnce()).opprettRevurdering(any(Saksnummer.class), any(UUID.class), anyString());
+        verify(revurderingTjenesteMock, atLeastOnce()).opprettRevurdering(any(Saksnummer.class), any(UUID.class), any(BehandlingÅrsakType.class),any(BehandlingType.class));
         Assertions.assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_ACCEPTED);
     }
 
@@ -110,11 +108,11 @@ public class BehandlingRestTjenesteTest {
         verify(henleggBehandlingTjenesteMock).henleggBehandling(1234l, årsak, begrunnelse);
     }
 
-    private OpprettBehandlingDto opprettBehandlingDto(String saksnr, String eksternUuid, String ytelseType) {
+    private OpprettBehandlingDto opprettBehandlingDto(String saksnr, String eksternUuid, FagsakYtelseType ytelseType) {
         OpprettBehandlingDto dto = new OpprettBehandlingDto();
         dto.setSaksnummer(saksnr);
         dto.setEksternUuid(eksternUuid);
-        dto.setBehandlingType(BehandlingType.TILBAKEKREVING.getKode());
+        dto.setBehandlingType(BehandlingType.TILBAKEKREVING);
         dto.setFagsakYtelseType(ytelseType);
         return dto;
     }
