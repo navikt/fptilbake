@@ -4,13 +4,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 
 public interface SvpHendelseUnderTyper {
 
-    //MedlemskapVilkår
-    HendelseUnderType SVP_UTVANDRET = new HendelseUnderType("SVP_UTVANDRET");
-    HendelseUnderType SVP_IKKE_OPPHOLDSTILLATLSE = new HendelseUnderType("SVP_IKKE_OPPHOLDSTILLATLSE");
-    HendelseUnderType SVP_MEDLEM_I_ANNET_LAND = new HendelseUnderType("SVP_MEDLEM_I_ANNET_LAND");
-    HendelseUnderType SVP_IKKE_JOBBET = new HendelseUnderType("SVP_IKKE_JOBBET");
-    HendelseUnderType SVP_MER_OPPHOLD = new HendelseUnderType("SVP_MER_OPPHOLD");
-
     //Fakta
     HendelseUnderType SVP_ENDRING_TERMINDATO = new HendelseUnderType("SVP_ENDRING_TERMINDATO");
     HendelseUnderType SVP_TIDLIG_FODSEL = new HendelseUnderType("SVP_TIDLIG_FODSEL");

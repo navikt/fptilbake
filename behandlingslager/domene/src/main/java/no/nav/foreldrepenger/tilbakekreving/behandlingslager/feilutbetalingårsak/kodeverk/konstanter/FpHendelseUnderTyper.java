@@ -5,13 +5,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 
 public interface FpHendelseUnderTyper {
 
-    // Medlemskap
-    HendelseUnderType UTVANDRET = new HendelseUnderType("UTVANDRET");
-    HendelseUnderType IKKE_OPPHOLDSTILLATLSE = new HendelseUnderType("IKKE_OPPHOLDSTILLATLSE");
-    HendelseUnderType MEDLEM_I_ANNET_LAND = new HendelseUnderType("MEDLEM_I_ANNET_LAND");
-    HendelseUnderType IKKE_JOBBET = new HendelseUnderType("IKKE_JOBBET");
-    HendelseUnderType MER_OPPHOLD = new HendelseUnderType("MER_OPPHOLD");
-
     //Opptjening
     HendelseUnderType IKKE_INNTEKT = new HendelseUnderType("IKKE_INNTEKT");
     HendelseUnderType IKKE_YRKESAKTIV = new HendelseUnderType("IKKE_YRKESAKTIV");
