@@ -156,14 +156,14 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
     @Test
     public void skal_opprette_behandling_manell() {
         behandling.avsluttBehandling();
-        Long behandlingId = behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternBehandlingUuid, aktørId, FagsakYtelseType.FORELDREPENGER.getKode(), BehandlingType.TILBAKEKREVING);
+        Long behandlingId = behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternBehandlingUuid, FagsakYtelseType.FORELDREPENGER.getKode(), BehandlingType.TILBAKEKREVING);
         fellesBehandlingAssert(behandlingId);
     }
 
     @Test
     public void skal_opprette_behandling_manell_med_allerede_åpen_behandling() {
         expectedException.expectMessage("FPT-663486");
-        behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternBehandlingUuid, aktørId, FagsakYtelseType.FORELDREPENGER.getKode(), BehandlingType.TILBAKEKREVING);
+        behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternBehandlingUuid, FagsakYtelseType.FORELDREPENGER.getKode(), BehandlingType.TILBAKEKREVING);
     }
 
     @Test
@@ -174,7 +174,7 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
         behandlingRepository.lagre(behandling, behandlingLås);
         revurderingTjeneste.opprettRevurdering(saksnummer, eksternBehandlingUuid, BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR.getKode());
 
-        Long behandlingId = behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternUUID, aktørId, FagsakYtelseType.FORELDREPENGER.getKode(), BehandlingType.TILBAKEKREVING);
+        Long behandlingId = behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternUUID, FagsakYtelseType.FORELDREPENGER.getKode(), BehandlingType.TILBAKEKREVING);
         fellesBehandlingAssert(behandlingId);
     }
 

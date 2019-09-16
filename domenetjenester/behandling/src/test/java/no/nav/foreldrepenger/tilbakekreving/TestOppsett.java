@@ -10,6 +10,7 @@ import org.junit.rules.ExpectedException;
 import no.nav.foreldrepenger.domene.dokumentarkiv.DokumentArkivTjeneste;
 import no.nav.foreldrepenger.domene.dokumentarkiv.impl.DokumentArkivTjenesteImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingRevurderingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FeilutbetalingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurdertForeldelseTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.vilkårsvurdering.VilkårsvurderingHistorikkInnslagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.vilkårsvurdering.VilkårsvurderingTjeneste;
@@ -83,5 +84,7 @@ public class TestOppsett {
     protected VilkårsvurderingTjeneste vilkårsvurderingTjeneste = new VilkårsvurderingTjeneste(vurdertForeldelseTjeneste, repoProvider, vilkårsvurderingHistorikkInnslagTjeneste);
 
     protected BehandlingRevurderingTjeneste revurderingTjeneste = new BehandlingRevurderingTjeneste(repoProvider);
+
+    protected FeilutbetalingTjeneste feilutbetalingTjeneste = new FeilutbetalingTjeneste(repoProvider);
 
 }

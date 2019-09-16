@@ -2,10 +2,12 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
 import java.util.Optional;
 
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.felles.Virkedager;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagBelop433;
 
 public class BeregnBeløpUtil {
 
@@ -32,5 +34,13 @@ public class BeregnBeløpUtil {
         BigDecimal grunnlagBelopPerUkeDager = BeregnBeløpUtil.beregnBeløpPrVirkedag(tilbakekrevesBeløp, periode);
         BigDecimal ytelseBeløp = BeregnBeløpUtil.beregnBeløp(feilutbetalingPeriode, periode, grunnlagBelopPerUkeDager);
         return ytelseBeløp.setScale(0, RoundingMode.HALF_UP);
+    }
+
+    public static BigDecimal beregnBelop(List<KravgrunnlagBelop433> beloper433) {
+        BigDecimal belopPerPeriode = BigDecimal.ZERO;
+        for (KravgrunnlagBelop433 belop433 : beloper433) {
+            belopPerPeriode = belopPerPeriode.add(belop433.getNyBelop());
+        }
+        return belopPerPeriode;
     }
 }

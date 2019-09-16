@@ -45,7 +45,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.BehandlingsprosessApplikasjonTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.AsyncPollingStatus;
@@ -125,10 +124,9 @@ public class BehandlingRestTjeneste {
     public Response opprettBehandling(@Valid @NotNull OpprettBehandlingDto opprettBehandlingDto) throws URISyntaxException {
         Saksnummer saksnummer = new Saksnummer(opprettBehandlingDto.getSaksnummer());
         UUID eksternUuid = opprettBehandlingDto.getEksternUuid();
-        AktørId aktørId = new AktørId(opprettBehandlingDto.getAktørId());
         BehandlingType behandlingType = BehandlingType.fraKode(opprettBehandlingDto.getBehandlingType());
         if (BehandlingType.TILBAKEKREVING.equals(behandlingType)) {
-            behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternUuid, aktørId, opprettBehandlingDto.getFagsakYtelseType(), behandlingType);
+            behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternUuid,  opprettBehandlingDto.getFagsakYtelseType(), behandlingType);
             return Redirect.tilFagsakPollStatus(saksnummer, Optional.empty());
         } else if (BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandlingType)) {
             Behandling revurdering = revurderingTjeneste.opprettRevurdering(saksnummer, eksternUuid, opprettBehandlingDto.getBehandlingArsakType());

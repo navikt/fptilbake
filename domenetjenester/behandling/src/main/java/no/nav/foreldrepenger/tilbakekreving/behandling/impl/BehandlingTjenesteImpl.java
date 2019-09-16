@@ -1,24 +1,20 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
+import static no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingUtil.bestemFristForBehandlingVent;
+
 import java.math.BigDecimal;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.threeten.extra.Days;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingFeil;
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
@@ -43,27 +39,22 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingAggregate;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingPeriodeÅrsak;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fagsak.FagsakTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.FeilutbetalingÅrsakDto;
-import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.UnderÅrsakDto;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagAggregate;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagBelop433;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.simulering.kontrakt.SimuleringResultatDto;
 import no.nav.foreldrepenger.tilbakekreving.simulering.tjeneste.SimuleringIntegrasjonTjeneste;
 import no.nav.vedtak.felles.jpa.Transaction;
 import no.nav.vedtak.konfig.KonfigVerdi;
-import no.nav.vedtak.util.FPDateUtil;
 
 @ApplicationScoped
 @Transaction
@@ -71,7 +62,6 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
 
     private static final Logger logger = LoggerFactory.getLogger(BehandlingTjenesteImpl.class);
 
-    private BehandlingRepositoryProvider behandlingRepositoryProvider;
     private BehandlingRepository behandlingRepository;
     private EksternBehandlingRepository eksternBehandlingRepository;
     private BehandlingresultatRepository behandlingresultatRepository;
@@ -81,6 +71,7 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
     private SimuleringIntegrasjonTjeneste simuleringIntegrasjonTjeneste;
     private FagsakTjeneste fagsakTjeneste;
     private HistorikkinnslagTjeneste historikkinnslagTjeneste;
+    private FeilutbetalingTjeneste feilutbetalingTjeneste;
     private FpsakKlient fpsakKlient;
 
     private Period defaultVentefrist;
@@ -90,19 +81,20 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
     }
 
     @Inject
-    public BehandlingTjenesteImpl(BehandlingRepositoryProvider behandlingRepositoryProvider,
+    public BehandlingTjenesteImpl(BehandlingRepositoryProvider behandlingRepositoryProvider, //NOSONAR
                                   BehandlingskontrollProvider behandlingskontrollProvider,
                                   SimuleringIntegrasjonTjeneste simuleringIntegrasjonTjeneste,
                                   FagsakTjeneste fagsakTjeneste,
                                   HistorikkinnslagTjeneste historikkinnslagTjeneste,
+                                  FeilutbetalingTjeneste feilutbetalingTjeneste,
                                   FpsakKlient fpsakKlient,
                                   @KonfigVerdi("frist.brukerrespons.varsel") Period defaultVentefrist) {
-        this.behandlingRepositoryProvider = behandlingRepositoryProvider;
         this.behandlingskontrollTjeneste = behandlingskontrollProvider.getBehandlingskontrollTjeneste();
         this.behandlingskontrollAsynkTjeneste = behandlingskontrollProvider.getBehandlingskontrollAsynkTjeneste();
         this.simuleringIntegrasjonTjeneste = simuleringIntegrasjonTjeneste;
         this.fagsakTjeneste = fagsakTjeneste;
         this.historikkinnslagTjeneste = historikkinnslagTjeneste;
+        this.feilutbetalingTjeneste = feilutbetalingTjeneste;
         this.fpsakKlient = fpsakKlient;
         this.defaultVentefrist = defaultVentefrist;
 
@@ -134,24 +126,6 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
         doSetBehandlingPåVent(behandlingId, aksjonspunktDefinisjon, frist, venteårsak);
     }
 
-    private void doSetBehandlingPåVent(Long behandlingId, AksjonspunktDefinisjon apDef, LocalDate frist, Venteårsak venteårsak) {
-        LocalDateTime fristTid = bestemFristForBehandlingVent(frist);
-
-        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-
-        BehandlingStegType behandlingStegFunnet = behandling.getAksjonspunktMedDefinisjonOptional(apDef)
-            .map(Aksjonspunkt::getBehandlingStegFunnet)
-            .orElse(null); // Dersom autopunkt ikke allerede er opprettet, så er det ikke tilknyttet steg
-        behandlingskontrollTjeneste.settBehandlingPåVent(behandling, apDef, behandlingStegFunnet, fristTid, venteårsak);
-
-    }
-
-    private LocalDateTime bestemFristForBehandlingVent(LocalDate frist) {
-        return frist != null
-            ? LocalDateTime.of(frist, FPDateUtil.nå().toLocalTime())
-            : FPDateUtil.nå().plus(defaultVentefrist);
-    }
-
     @Override
     public Behandling hentBehandling(Long behandlingId) {
         return behandlingRepository.hentBehandling(behandlingId);
@@ -159,11 +133,11 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
 
     @Override
     public Long opprettBehandlingManuell(Saksnummer saksnummer, UUID eksternUuid,
-                                         AktørId aktørId, String ytelseType,
-                                         BehandlingType behandlingType) {
+                                         String ytelseType, BehandlingType behandlingType) {
+
         FagsakYtelseType fagsakYtelseType = FagsakYtelseType.fraKode(ytelseType);
 
-        return opprettFørstegangsbehandling(saksnummer, eksternUuid, null, aktørId, fagsakYtelseType, behandlingType);
+        return opprettFørstegangsbehandling(saksnummer, eksternUuid, null, null, fagsakYtelseType, behandlingType);
     }
 
     @Override
@@ -191,20 +165,20 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
         }
         if (grunnlagAggregate.isPresent() && grunnlagAggregate.get().getGrunnlagØkonomi() != null) {
             // vi skal bare vise posteringer med feilutbetalt periode
-            List<KravgrunnlagPeriode432> feilutbetaltPerioder = finnPerioderMedFeilutbetaltPosteringer(grunnlagAggregate.get().getGrunnlagØkonomi().getPerioder());
+            List<KravgrunnlagPeriode432> feilutbetaltPerioder = feilutbetalingTjeneste.finnPerioderMedFeilutbetaltPosteringer(grunnlagAggregate.get().getGrunnlagØkonomi().getPerioder());
             SimuleringResultatDto simuleringResultat = resultat.get();
             BigDecimal aktuellFeilUtbetaltBeløp = BigDecimal.ZERO;
-            List<UtbetaltPeriode> utbetaltPerioder = finnesLogiskPeriode(feilutbetaltPerioder);
+            List<UtbetaltPeriode> utbetaltPerioder = feilutbetalingTjeneste.finnesLogiskPeriode(feilutbetaltPerioder);
             LocalDate totalPeriodeFom = null;
             LocalDate totalPeriodeTom = null;
             for (UtbetaltPeriode utbetaltPeriode : utbetaltPerioder) {
                 aktuellFeilUtbetaltBeløp = aktuellFeilUtbetaltBeløp.add(utbetaltPeriode.getBelop());
-                formFeilutbetalingÅrsak(behandlingId, utbetaltPeriode);
+                feilutbetalingTjeneste.formFeilutbetalingÅrsak(behandlingId, utbetaltPeriode);
                 totalPeriodeFom = totalPeriodeFom == null || totalPeriodeFom.isAfter(utbetaltPeriode.getFom()) ? utbetaltPeriode.getFom() : totalPeriodeFom;
                 totalPeriodeTom = totalPeriodeTom == null || totalPeriodeTom.isBefore(utbetaltPeriode.getTom()) ? utbetaltPeriode.getTom() : totalPeriodeTom;
             }
 
-            return Optional.of(lagBehandlingFeilUtbetalingFakta(simuleringResultat, aktuellFeilUtbetaltBeløp, utbetaltPerioder,
+            return Optional.of(feilutbetalingTjeneste.lagBehandlingFeilUtbetalingFakta(simuleringResultat, aktuellFeilUtbetaltBeløp, utbetaltPerioder,
                 new Periode(totalPeriodeFom, totalPeriodeTom)));
         }
         return Optional.empty();
@@ -216,6 +190,22 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
         return behandlingsresultat.isPresent() && behandlingsresultat.get().erBehandlingHenlagt();
     }
 
+    private void doSetBehandlingPåVent(Long behandlingId, AksjonspunktDefinisjon apDef, LocalDate frist, Venteårsak venteårsak) {
+        LocalDateTime fristTid = bestemFristForBehandlingVent(frist,defaultVentefrist);
+
+        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
+
+        BehandlingStegType behandlingStegFunnet = behandling.getAksjonspunktMedDefinisjonOptional(apDef)
+            .map(Aksjonspunkt::getBehandlingStegFunnet)
+            .orElse(null); // Dersom autopunkt ikke allerede er opprettet, så er det ikke tilknyttet steg
+        behandlingskontrollTjeneste.settBehandlingPåVent(behandling, apDef, behandlingStegFunnet, fristTid, venteårsak);
+
+    }
+
+    private SamletEksternBehandlingInfo hentEksternBehandlingMedAktørId(UUID eksternUuid) {
+        return fpsakKlient.hentBehandlingsinfo(eksternUuid, Tillegsinformasjon.PERSONOPPLYSNINGER);
+    }
+
     private EksternBehandlingsinfoDto hentEksternBehandling(UUID eksternUuid) {
         Optional<EksternBehandlingsinfoDto> eksternBehandlingsInfo = fpsakKlient.hentBehandling(eksternUuid);
         if (eksternBehandlingsInfo.isPresent()) {
@@ -225,34 +215,27 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
     }
 
 
-    private void formFeilutbetalingÅrsak(Long behandlingId, UtbetaltPeriode utbetaltPeriode) {
-        Optional<FeilutbetalingAggregate> feilutbetalingAggregate = behandlingRepositoryProvider.getFeilutbetalingRepository()
-            .finnFeilutbetaling(behandlingId);
-        if (feilutbetalingAggregate.isPresent()) {
-            Optional<FeilutbetalingPeriodeÅrsak> feilutbetalingPeriodeÅrsak = feilutbetalingAggregate.get()
-                .getFeilutbetaling()
-                .getFeilutbetaltPerioder()
-                .stream()
-                .filter(periodeÅrsak -> utbetaltPeriode.tilPeriode().equals(periodeÅrsak.getPeriode()))
-                .findFirst();
-            utbetaltPeriode.setFeilutbetalingÅrsakDto(mapFra(feilutbetalingPeriodeÅrsak));
-        }
-    }
-
     private Long opprettFørstegangsbehandling(Saksnummer saksnummer, UUID eksternUuid, Long eksternBehandlingId,
                                               AktørId aktørId, FagsakYtelseType fagsakYtelseType,
                                               BehandlingType behandlingType) {
-        logger.info("Oppretter Tilbakekrevingbehandling for [saksnummer: {} ] for ekstern Uuid [ {} ]", saksnummer, eksternUuid.toString());
+        logger.info("Oppretter Tilbakekrevingbehandling for [saksnummer: {} ] for ekstern Uuid [ {} ]", saksnummer, eksternUuid);
 
         validateHarIkkeÅpenTilbakekrevingBehandling(saksnummer);
 
-        EksternBehandlingsinfoDto eksternBehandlingsinfoDto = hentEksternBehandling(eksternUuid);
+        EksternBehandlingsinfoDto eksternBehandlingsinfoDto;
+        if (aktørId == null) {
+            SamletEksternBehandlingInfo samletEksternBehandlingInfo = hentEksternBehandlingMedAktørId(eksternUuid);
+            aktørId = samletEksternBehandlingInfo.getAktørId();
+            eksternBehandlingsinfoDto = samletEksternBehandlingInfo.getGrunninformasjon();
+        } else {
+            eksternBehandlingsinfoDto = hentEksternBehandling(eksternUuid);
+        }
         eksternBehandlingId = hentEksternBehandlingIdHvisFinnesIkke(eksternBehandlingId, eksternBehandlingsinfoDto);
 
         Fagsak fagsak = fagsakTjeneste.opprettFagsak(saksnummer, aktørId, fagsakYtelseType);
 
         Behandling behandling = Behandling.nyBehandlingFor(fagsak, behandlingType).build();
-        OrganisasjonsEnhet organisasjonsEnhet = new OrganisasjonsEnhet(eksternBehandlingsinfoDto.getBehandlendeEnhetId(),eksternBehandlingsinfoDto.getBehandlendeEnhetNavn());
+        OrganisasjonsEnhet organisasjonsEnhet = new OrganisasjonsEnhet(eksternBehandlingsinfoDto.getBehandlendeEnhetId(), eksternBehandlingsinfoDto.getBehandlendeEnhetNavn());
         behandling.setBehandlendeOrganisasjonsEnhet(organisasjonsEnhet);
 
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
@@ -268,96 +251,6 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
         return behandlingId;
     }
 
-    // FIXME: flytt hjelpemetoder for Feilutbetalingfakta til egen klasse
-    private BehandlingFeilutbetalingFakta lagBehandlingFeilUtbetalingFakta(SimuleringResultatDto simuleringResultat, BigDecimal aktuellFeilUtbetaltBeløp,
-                                                                           List<UtbetaltPeriode> utbetaltPerioder,
-                                                                           Periode totalPeriode) {
-        return BehandlingFeilutbetalingFakta.builder()
-            .medPerioder(utbetaltPerioder)
-            .medAktuellFeilUtbetaltBeløp(aktuellFeilUtbetaltBeløp)
-            .medTidligereVarsletBeløp(new BigDecimal(simuleringResultat.getSumFeilutbetaling()).abs())
-            .medTotalPeriodeFom(totalPeriode.getFom())
-            .medTotalPeriodeTom(totalPeriode.getTom())
-            // FIXME:må hente ekte data fra repository.Dette bør fikse med en annen brukerstorien
-            .medDatoForRevurderingsvedtak(LocalDate.of(2019, 1, 4))
-            .medDatoForVarselSendt(LocalDate.of(2019, 1, 4))
-            // FIXME: Der teksten kommer fra, er ikke ferdiggjort. Hardcoded for nå
-            .medÅrsakRevurdering("Endring fra bruker Inntekstmelding Nyeregisteropplysninger")
-            .medResultatFeilutbetaling("Innviliget:Endring i beregning og uttak.Feilutbetaling med tilbakekreving")
-            .build();
-    }
-
-    private FeilutbetalingÅrsakDto mapFra(Optional<FeilutbetalingPeriodeÅrsak> årsak) {
-        FeilutbetalingÅrsakDto feilutbetalingÅrsakDto = new FeilutbetalingÅrsakDto();
-        if (årsak.isPresent()) {
-            FeilutbetalingPeriodeÅrsak feilutbetalingPeriodeÅrsak = årsak.get();
-            feilutbetalingÅrsakDto.setÅrsakKode(feilutbetalingPeriodeÅrsak.getÅrsak());
-            if (StringUtils.isNotEmpty(feilutbetalingPeriodeÅrsak.getUnderÅrsak()))
-                feilutbetalingÅrsakDto.leggTilUnderÅrsaker(new UnderÅrsakDto(null, feilutbetalingPeriodeÅrsak.getUnderÅrsak(),
-                    feilutbetalingPeriodeÅrsak.getUnderÅrsakKodeverk()));
-        }
-        return feilutbetalingÅrsakDto;
-    }
-
-    private List<KravgrunnlagPeriode432> finnPerioderMedFeilutbetaltPosteringer(List<KravgrunnlagPeriode432> allePerioder) {
-        List<KravgrunnlagPeriode432> feilutbetaltPerioder = new ArrayList<>();
-        for (KravgrunnlagPeriode432 kravgrunnlagPeriode432 : allePerioder) {
-            List<KravgrunnlagBelop433> posteringer = kravgrunnlagPeriode432.getKravgrunnlagBeloper433().stream()
-                .filter(belop433 -> belop433.getKlasseType().equals(KlasseType.FEIL)).collect(Collectors.toList());
-            if (!posteringer.isEmpty()) {
-                kravgrunnlagPeriode432.setKravgrunnlagBeloper433(posteringer);
-                feilutbetaltPerioder.add(kravgrunnlagPeriode432);
-            }
-        }
-        return feilutbetaltPerioder;
-    }
-
-    private List<UtbetaltPeriode> finnesLogiskPeriode(List<KravgrunnlagPeriode432> feilutbetaltPerioder) {
-        LocalDate førsteDag = null;
-        LocalDate sisteDag = null;
-        BigDecimal belopPerPeriode = BigDecimal.ZERO;
-        feilutbetaltPerioder.sort(Comparator.comparing(KravgrunnlagPeriode432::getFom));
-        List<UtbetaltPeriode> beregnetPerioider = new ArrayList<>();
-        for (KravgrunnlagPeriode432 kgPeriode : feilutbetaltPerioder) {
-            // for første gang
-            Periode periode = kgPeriode.getPeriode();
-            if (førsteDag == null && sisteDag == null) {
-                førsteDag = periode.getFom();
-                sisteDag = periode.getTom();
-            } else {
-                // beregn forskjellen mellom to perioder
-                int antallDager = Days.between(sisteDag, periode.getFom()).getAmount();
-                // hvis forskjellen er mer enn 1 dager eller siste dag er i helgen
-                if (antallDager > 1 && sjekkAvvikHvisSisteDagIHelgen(sisteDag, antallDager)) {
-                    // lag ny perioder hvis forskjellen er mer enn 1 dager
-                    beregnetPerioider.add(UtbetaltPeriode.lagPeriode(førsteDag, sisteDag, belopPerPeriode));
-                    førsteDag = periode.getFom();
-                    belopPerPeriode = BigDecimal.ZERO;
-                }
-                sisteDag = periode.getTom();
-            }
-            belopPerPeriode = belopPerPeriode.add(beregnBelop(kgPeriode.getKravgrunnlagBeloper433()));
-        }
-        if (belopPerPeriode != BigDecimal.ZERO) {
-            beregnetPerioider.add(UtbetaltPeriode.lagPeriode(førsteDag, sisteDag, belopPerPeriode));
-        }
-        return beregnetPerioider;
-    }
-
-    private BigDecimal beregnBelop(List<KravgrunnlagBelop433> beloper433) {
-        BigDecimal belopPerPeriode = BigDecimal.ZERO;
-        for (KravgrunnlagBelop433 belop433 : beloper433) {
-            belopPerPeriode = belopPerPeriode.add(belop433.getNyBelop());
-        }
-        return belopPerPeriode;
-    }
-
-    private boolean sjekkAvvikHvisSisteDagIHelgen(LocalDate sisteDag, int antallDager) {
-        if (antallDager == 3 && sisteDag.getDayOfWeek() == DayOfWeek.FRIDAY) {
-            return false;
-        }
-        return antallDager != 2 || sisteDag.getDayOfWeek() != DayOfWeek.SATURDAY;
-    }
 
     private void validateHarIkkeÅpenTilbakekrevingBehandling(Saksnummer saksnummer) {
         if (harÅpenBehandling(saksnummer)) {
