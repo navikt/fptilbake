@@ -9,6 +9,7 @@
     {{#if (eq aktsomhet-resultat "SIMPEL_UAKTSOM")}}
 Du har fått vite om du har rett til foreldrepenger og hvor mye du har rett til. Selv om du har meldt fra til oss, kan vi kreve tilbake det du har fått for mye dersom du burde forstått at beløpet var feil.
 {{> fritekst}}
+
 Ut fra informasjonen du har fått, burde du etter vår vurdering forstått at du fikk for mye utbetalt. Derfor kan vi kreve tilbake.
     {{/if}}
     {{#if (eq aktsomhet-resultat "GROVT_UAKTSOM")}}
@@ -21,20 +22,22 @@ Ut fra informasjonen du har fått, må du etter vår vurdering ha forstått at d
 {{#if (eq vilkår-resultat "FEIL_OPPLYSNINGER")}}
     {{#if (eq aktsomhet-resultat "SIMPEL_UAKTSOM")}}
 Du har fått vite om du har rett til foreldrepenger og hvor mye du har rett til. Etter vår vurdering burde du forstått at opplysningene du ga oss var uriktige. Derfor kan vi kreve pengene tilbake.
+{{> fritekst}}
     {{/if}}
     {{#if (eq aktsomhet-resultat "GROVT_UAKTSOM")}}
 Du har fått vite om du har rett til foreldrepenger og hvor mye du har rett til. Etter vår vurdering må du ha forstått at opplysningene du ga oss var uriktige. Derfor kan vi kreve pengene tilbake.
-    {{/if}}
 {{> fritekst}}
+    {{/if}}
 {{/if}}
 {{#if (eq vilkår-resultat "MANGELFULL_OPPLYSNING")}}
     {{#if (eq aktsomhet-resultat "SIMPEL_UAKTSOM")}}
 Du har fått vite om du har rett til foreldrepenger og hvor mye du har rett til. Etter vår vurdering burde du forstått at du ikke ga oss alle opplysningene vi trengte tidsnok for å sikre at du fikk riktig utbetaling. Derfor kan vi kreve pengene tilbake.
+{{> fritekst}}
     {{/if}}
     {{#if (eq aktsomhet-resultat "GROVT_UAKTSOM")}}
 Du har fått vite om du har rett til foreldrepenger og hvor mye du har rett til. Etter vår vurdering må du ha forstått at du ikke ga oss alle opplysningene vi trengte tidsnok for å sikre at du fikk riktig utbetaling. Derfor kan vi kreve pengene tilbake.
-    {{/if}}
 {{> fritekst}}
+    {{/if}}
 {{/if}}
 {{#if (eq vilkår-resultat "GOD_TRO")}}
     {{#if beløp-i-behold}}

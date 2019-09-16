@@ -31,6 +31,8 @@ public class TekstformatererVedtaksbrevTest {
 
     private final Periode januar = Periode.of(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 1, 31));
     private final Periode februar = Periode.of(LocalDate.of(2019, 2, 1), LocalDate.of(2019, 2, 28));
+    private final Periode mars = Periode.of(LocalDate.of(2019, 3, 1), LocalDate.of(2019, 3, 31));
+    private final Periode april = Periode.of(LocalDate.of(2019, 4, 1), LocalDate.of(2019, 4, 30));
     private final Periode førsteNyttårsdag = Periode.of(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 1, 1));
 
     @Test
@@ -89,9 +91,9 @@ public class TekstformatererVedtaksbrevTest {
             .medHovedresultat(VedtakResultatType.DELVIS_TILBAKEBETALING)
             .medLovhjemmelVedtak("Folketrygdloven § 22-15")
             .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
-            .medVarsletBeløp(BigDecimal.valueOf(1234567891))
-            .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(1234567890))
-            .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(1234567890))
+            .medVarsletBeløp(BigDecimal.valueOf(1234567893))
+            .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(1234567892))
+            .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(1234567892))
             .medTotaltRentebeløp(BigDecimal.ZERO)
             .medVarsletDato(LocalDate.of(2019, 1, 3))
             .medFritekstOppsummering("Skynd deg å betale, vi trenger pengene med en gang!")
@@ -127,13 +129,37 @@ public class TekstformatererVedtaksbrevTest {
                 .medTilbakekrevesBeløp(BigDecimal.valueOf(1))
                 .medFritekstFakta("Her har økonomisystemet gjort noe helt feil.")
                 .medFritekstVilkår("Vi skjønner at du ikke har oppdaget beløpet, siden du hadde så mye annet på konto.")
+                .build(),
+            HbVedtaksbrevPeriode.builder()
+                .medPeriode(mars)
+                .medHendelsetype(HendelseType.FP_UTTAK_GRADERT_TYPE)
+                .medHendelseUndertype(FpHendelseUnderTyper.GRADERT_UTTAK)
+                .medVilkårResultat(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER)
+                .medAktsomhetResultat(Aktsomhet.SIMPEL_UAKTSOM)
+                .medRiktigBeløp(BigDecimal.valueOf(0))
+                .medUtbetaltBeløp(BigDecimal.valueOf(1))
+                .medFeilutbetaltBeløp(BigDecimal.valueOf(1))
+                .medTilbakekrevesBeløp(BigDecimal.valueOf(1))
+                .medFritekstVilkår("Her burde du passet mer på!")
+                .build(),
+            HbVedtaksbrevPeriode.builder()
+                .medPeriode(april)
+                .medHendelsetype(HendelseType.FP_UTTAK_KVOTENE_TYPE)
+                .medHendelseUndertype(FpHendelseUnderTyper.KVO_MOTTAKER_INNLAGT)
+                .medVilkårResultat(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER)
+                .medAktsomhetResultat(Aktsomhet.FORSETT)
+                .medRiktigBeløp(BigDecimal.valueOf(0))
+                .medUtbetaltBeløp(BigDecimal.valueOf(1))
+                .medFeilutbetaltBeløp(BigDecimal.valueOf(1))
+                .medTilbakekrevesBeløp(BigDecimal.valueOf(1))
+                .medFritekstVilkår("Dette gjordet du med vilje!")
                 .build()
         );
 
         HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
 
         String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
-        ;
+        System.out.println(generertBrev);
         String fasit = les("/vedtaksbrev/FP_fritekst_overalt.txt");
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
@@ -170,7 +196,6 @@ public class TekstformatererVedtaksbrevTest {
         HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
 
         String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
-        ;
         String fasit = les("/vedtaksbrev/SVP_forsett.txt");
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }

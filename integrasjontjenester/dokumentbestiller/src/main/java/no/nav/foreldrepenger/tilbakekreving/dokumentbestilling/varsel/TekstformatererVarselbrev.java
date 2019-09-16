@@ -20,7 +20,6 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.Returadres
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.handlebars.dto.BaseDokument;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.handlebars.dto.VarselbrevDokument;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.KodeDto;
 import no.nav.vedtak.util.FPDateUtil;
 
 class TekstformatererVarselbrev {
