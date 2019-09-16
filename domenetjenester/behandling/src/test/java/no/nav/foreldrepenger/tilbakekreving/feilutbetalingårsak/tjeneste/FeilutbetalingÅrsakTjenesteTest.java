@@ -14,6 +14,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.FpHendelseUnderTyper;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.MedlemskapHendelseUndertyper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.SvpHendelseUnderTyper;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.FeiltubetalingÅrsakerYtelseTypeDto;
@@ -38,7 +39,7 @@ public class FeilutbetalingÅrsakTjenesteTest {
         ));
 
         assertThat(mapAvResultat.keySet()).containsOnly(
-            HendelseType.FP_MEDLEMSKAP_TYPE.getKode(),
+            HendelseType.MEDLEMSKAP_TYPE.getKode(),
             HendelseType.FP_OPPTJENING_TYPE.getKode(),
             HendelseType.FP_BEREGNING_TYPE.getKode(),
             HendelseType.FP_STONADSPERIODEN_TYPE.getKode(),
@@ -52,12 +53,12 @@ public class FeilutbetalingÅrsakTjenesteTest {
             HendelseType.FP_ANNET_HENDELSE_TYPE.getKode()
         );
 
-        assertThat(mapAvResultat.get(HendelseType.FP_MEDLEMSKAP_TYPE.getKode())).containsExactly(
-            FpHendelseUnderTyper.UTVANDRET.getKode(),
-            FpHendelseUnderTyper.IKKE_OPPHOLDSTILLATLSE.getKode(),
-            FpHendelseUnderTyper.MEDLEM_I_ANNET_LAND.getKode(),
-            FpHendelseUnderTyper.IKKE_JOBBET.getKode(),
-            FpHendelseUnderTyper.MER_OPPHOLD.getKode()
+        assertThat(mapAvResultat.get(HendelseType.MEDLEMSKAP_TYPE.getKode())).containsExactly(
+            MedlemskapHendelseUndertyper.UTVANDRET.getKode(),
+            MedlemskapHendelseUndertyper.IKKE_BOSATT.getKode(),
+            MedlemskapHendelseUndertyper.IKKE_OPPHOLDSRETT_EØS.getKode(),
+            MedlemskapHendelseUndertyper.IKKE_LOVLIG_OPPHOLD.getKode(),
+            MedlemskapHendelseUndertyper.MEDLEM_I_ANNET_LAND.getKode()
         );
 
         assertThat(mapAvResultat.get(HendelseType.FP_OPPTJENING_TYPE.getKode())).containsExactly(
@@ -140,7 +141,7 @@ public class FeilutbetalingÅrsakTjenesteTest {
         ));
 
         assertThat(mapAvResultat.keySet()).containsOnly(
-            HendelseType.SVP_MEDLEMSKAP.getKode(),
+            HendelseType.MEDLEMSKAP_TYPE.getKode(),
             HendelseType.SVP_FAKTA_TYPE.getKode(),
             HendelseType.SVP_ARBEIDSGIVERS_FORHOLD_TYPE.getKode(),
             HendelseType.SVP_ARBEIDSFORHOLD_TYPE.getKode(),
@@ -151,12 +152,12 @@ public class FeilutbetalingÅrsakTjenesteTest {
             HendelseType.SVP_ANNET_TYPE.getKode()
         );
 
-        assertThat(mapAvResultat.get(HendelseType.SVP_MEDLEMSKAP.getKode())).containsExactly(
-            SvpHendelseUnderTyper.SVP_UTVANDRET.getKode(),
-            SvpHendelseUnderTyper.SVP_MEDLEM_I_ANNET_LAND.getKode(),
-            SvpHendelseUnderTyper.SVP_IKKE_OPPHOLDSTILLATLSE.getKode(),
-            SvpHendelseUnderTyper.SVP_IKKE_JOBBET.getKode(),
-            SvpHendelseUnderTyper.SVP_MER_OPPHOLD.getKode()
+        assertThat(mapAvResultat.get(HendelseType.MEDLEMSKAP_TYPE.getKode())).containsExactly(
+            MedlemskapHendelseUndertyper.UTVANDRET.getKode(),
+            MedlemskapHendelseUndertyper.IKKE_BOSATT.getKode(),
+            MedlemskapHendelseUndertyper.IKKE_OPPHOLDSRETT_EØS.getKode(),
+            MedlemskapHendelseUndertyper.IKKE_LOVLIG_OPPHOLD.getKode(),
+            MedlemskapHendelseUndertyper.MEDLEM_I_ANNET_LAND.getKode()
         );
 
         assertThat(mapAvResultat.get(HendelseType.SVP_FAKTA_TYPE.getKode())).containsExactly(

@@ -11,7 +11,7 @@ public class HendelseType extends Kodeliste {
 
     public static final String DISCRIMINATOR = "HENDELSE_TYPE";
 
-    public static final HendelseType FP_MEDLEMSKAP_TYPE = new HendelseType("MEDLEMSKAP_TYPE");
+    public static final HendelseType MEDLEMSKAP_TYPE = new HendelseType("MEDLEMSKAP");
     public static final HendelseType FP_OPPTJENING_TYPE = new HendelseType("OPPTJENING_TYPE");
     public static final HendelseType FP_BEREGNING_TYPE = new HendelseType("BEREGNING_TYPE");
     public static final HendelseType FP_STONADSPERIODEN_TYPE = new HendelseType("STONADSPERIODEN_TYPE");
@@ -34,7 +34,6 @@ public class HendelseType extends Kodeliste {
     public static final HendelseType ES_FEIL_UTBETALING_TYPE = new HendelseType("ES_FEIL_UTBETALING_TYPE");
     public static final HendelseType ES_ANNET_TYPE = new HendelseType("ES_ANNET_TYPE");
 
-    public static final HendelseType SVP_MEDLEMSKAP = new HendelseType("SVP_MEDLEMSKAP");
     public static final HendelseType SVP_FAKTA_TYPE = new HendelseType("SVP_FAKTA_TYPE");
     public static final HendelseType SVP_ARBEIDSGIVERS_FORHOLD_TYPE = new HendelseType("SVP_ARBEIDSGIVERS_FORHOLD_TYPE");
     public static final HendelseType SVP_ARBEIDSFORHOLD_TYPE = new HendelseType("SVP_ARBEIDSFORHOLD_TYPE");
