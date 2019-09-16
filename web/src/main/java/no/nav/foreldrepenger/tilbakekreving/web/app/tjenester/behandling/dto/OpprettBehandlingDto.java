@@ -8,7 +8,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.AbacDto;
 import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
@@ -19,10 +18,6 @@ public class OpprettBehandlingDto implements AbacDto {
     @NotNull
     @Digits(integer = 50, fraction = 0)
     private String saksnummer; // TODO bør bruke egen DTO
-
-    @NotNull
-    @Digits(integer = 50, fraction = 0)
-    private String aktørId; // TODO bør bruke egen DTO
 
     @Valid
     private UUID eksternUuid;
@@ -50,14 +45,6 @@ public class OpprettBehandlingDto implements AbacDto {
 
     public void setSaksnummer(String saksnummer) {
         this.saksnummer = saksnummer;
-    }
-
-    public String getAktørId() {
-        return aktørId;
-    }
-
-    public void setAktørId(String aktørId) {
-        this.aktørId = aktørId;
     }
 
     public UUID getEksternUuid() {
@@ -95,7 +82,6 @@ public class OpprettBehandlingDto implements AbacDto {
     @Override
     public AbacDataAttributter abacAttributter() {
         return AbacDataAttributter.opprett()
-                .leggTil(StandardAbacAttributtType.AKTØR_ID, aktørId)
                 .leggTil(StandardAbacAttributtType.SAKSNUMMER, saksnummer);
     }
 

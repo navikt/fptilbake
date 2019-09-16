@@ -67,17 +67,8 @@ public class BehandlingRestTjenesteTest {
         behandlingsprosessTjeneste, behandlingskontrollAsynkTjenesteMock);
 
     @Test
-    public void test_opprett_behandling_skal_feile_med_ugyldig_aktørId() throws URISyntaxException {
-        OpprettBehandlingDto dto = opprettBehandlingDto(UGYLDIG_AKTØR_ID, GYLDIG_SAKSNR, EKSTERN_BEHANDLING_UUID, YTELSE_TYPE);
-        expectedException.expect(IllegalArgumentException.class); // ved rest-kall vil jax validering slå inn og resultere i en FeltFeil
-        expectedException.expectMessage("Ugyldig aktørId");
-
-        behandlingRestTjeneste.opprettBehandling(dto);
-    }
-
-    @Test
     public void test_opprett_behandling_skal_feile_med_ugyldig_saksnummer() throws URISyntaxException {
-        OpprettBehandlingDto dto = opprettBehandlingDto(GYLDIG_AKTØR_ID, UGYLDIG_SAKSNR, EKSTERN_BEHANDLING_UUID, YTELSE_TYPE);
+        OpprettBehandlingDto dto = opprettBehandlingDto(UGYLDIG_SAKSNR, EKSTERN_BEHANDLING_UUID, YTELSE_TYPE);
 
         expectedException.expect(IllegalArgumentException.class); // ved rest-kall vil jax validering slå inn og resultere i en FeltFeil
         expectedException.expectMessage("Ugyldig saksnummer");
@@ -87,9 +78,9 @@ public class BehandlingRestTjenesteTest {
 
     @Test
     public void test_skal_opprette_ny_behandling() throws URISyntaxException {
-        behandlingRestTjeneste.opprettBehandling(opprettBehandlingDto(GYLDIG_AKTØR_ID, GYLDIG_SAKSNR, EKSTERN_BEHANDLING_UUID, YTELSE_TYPE));
+        behandlingRestTjeneste.opprettBehandling(opprettBehandlingDto(GYLDIG_SAKSNR, EKSTERN_BEHANDLING_UUID, YTELSE_TYPE));
 
-        verify(behandlingTjenesteMock).opprettBehandlingManuell(any(Saksnummer.class), any(UUID.class), any(AktørId.class),anyString(), any(BehandlingType.class));
+        verify(behandlingTjenesteMock).opprettBehandlingManuell(any(Saksnummer.class), any(UUID.class),anyString(), any(BehandlingType.class));
     }
 
     @Test
@@ -98,7 +89,7 @@ public class BehandlingRestTjenesteTest {
         when(revurderingTjenesteMock.opprettRevurdering(any(Saksnummer.class), any(UUID.class), anyString()))
             .thenReturn(mockBehandling());
 
-        OpprettBehandlingDto opprettBehandlingDto = opprettBehandlingDto(GYLDIG_AKTØR_ID, GYLDIG_SAKSNR, EKSTERN_BEHANDLING_UUID, YTELSE_TYPE);
+        OpprettBehandlingDto opprettBehandlingDto = opprettBehandlingDto(GYLDIG_SAKSNR, EKSTERN_BEHANDLING_UUID, YTELSE_TYPE);
         opprettBehandlingDto.setBehandlingType(BehandlingType.REVURDERING_TILBAKEKREVING.getKode());
         opprettBehandlingDto.setBehandlingArsakType(BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR.getKode());
 
@@ -119,9 +110,8 @@ public class BehandlingRestTjenesteTest {
         verify(henleggBehandlingTjenesteMock).henleggBehandling(1234l, årsak, begrunnelse);
     }
 
-    private OpprettBehandlingDto opprettBehandlingDto(String aktørId, String saksnr, String eksternUuid, String ytelseType) {
+    private OpprettBehandlingDto opprettBehandlingDto(String saksnr, String eksternUuid, String ytelseType) {
         OpprettBehandlingDto dto = new OpprettBehandlingDto();
-        dto.setAktørId(aktørId);
         dto.setSaksnummer(saksnr);
         dto.setEksternUuid(eksternUuid);
         dto.setBehandlingType(BehandlingType.TILBAKEKREVING.getKode());

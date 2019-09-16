@@ -33,7 +33,10 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Vi
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fagsak.FagsakTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.PersonopplysningDto;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.simulering.kontrakt.SimuleringResultatDto;
 
 /**
@@ -75,6 +78,7 @@ public class FellesTestOppsett extends TestOppsett {
         mockSimuleringIntegrasjonTjeneste,
         fagsakTjeneste,
         mockHistorikkTjeneste,
+        feilutbetalingTjeneste,
         mockFpsakKlient,
         defaultVentetid);
 
@@ -87,6 +91,7 @@ public class FellesTestOppsett extends TestOppsett {
         aktørId = testUtility.genererAktørId();
         when(mockTpsTjeneste.hentBrukerForAktør(aktørId)).thenReturn(testUtility.lagPersonInfo(aktørId));
         when(mockFpsakKlient.hentBehandling(any(UUID.class))).thenReturn(lagEksternBehandlingInfoDto());
+        when(mockFpsakKlient.hentBehandlingsinfo(any(UUID.class), any(Tillegsinformasjon.class))).thenReturn(lagSamletEksternBehandlingInfo());
 
         TestUtility.SakDetaljer sakDetaljer = testUtility.opprettFørstegangsBehandling(aktørId);
         mapSakDetaljer(sakDetaljer);
@@ -166,5 +171,17 @@ public class FellesTestOppsett extends TestOppsett {
         eksternBehandlingsinfoDto.setBehandlendeEnhetId(BEHANDLENDE_ENHET_ID);
         eksternBehandlingsinfoDto.setBehandlendeEnhetNavn(BEHANDLENDE_ENHET_NAVN);
         return Optional.of(eksternBehandlingsinfoDto);
+    }
+
+    private PersonopplysningDto lagPersonOpplysningDto() {
+        PersonopplysningDto personopplysningDto = new PersonopplysningDto();
+        personopplysningDto.setAktoerId(aktørId.getId());
+        return personopplysningDto;
+    }
+
+    private SamletEksternBehandlingInfo lagSamletEksternBehandlingInfo() {
+        return SamletEksternBehandlingInfo.builder(Tillegsinformasjon.PERSONOPPLYSNINGER)
+            .setGrunninformasjon(lagEksternBehandlingInfoDto().get())
+            .setPersonopplysninger(lagPersonOpplysningDto()).build();
     }
 }
