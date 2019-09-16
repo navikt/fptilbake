@@ -16,6 +16,7 @@ import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.context.JavaBeanValueResolver;
 import com.github.jknack.handlebars.context.MapValueResolver;
 import com.github.jknack.handlebars.helper.ConditionalHelpers;
+import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Avsnitt;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Underavsnitt;
@@ -35,14 +36,14 @@ import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
 class TekstformatererVedtaksbrev {
     private static Map<String, Template> TEMPLATE_CACHE = new HashMap<>();
 
-    private static String PARTIAL_PERIODE_OVERSKRIFT = "templates/vedtak/periode_overskrift";
-    private static String PARTIAL_PERIODE_FAKTA = "templates/vedtak/periode_fakta";
-    private static String PARTIAL_PERIODE_VILKÅR = "templates/vedtak/periode_vilkår";
-    private static String PARTIAL_PERIODE_SÆRLIGE_GRUNNER = "templates/vedtak/periode_særlige_grunner";
-    private static String PARTIAL_PERIODE_SLUTT = "templates/vedtak/periode_slutt";
-    private static String PARTIAL_VEDTAK_START = "templates/vedtak/vedtak_start";
-    private static String PARTIAL_VEDTAK_SLUTT = "templates/vedtak/vedtak_slutt";
-    private static String PARTIAL_VEDTAK_FELLES = "templates/vedtak/vedtak_felles";
+    private static String PARTIAL_PERIODE_OVERSKRIFT = "vedtak/periode_overskrift";
+    private static String PARTIAL_PERIODE_FAKTA = "vedtak/periode_fakta";
+    private static String PARTIAL_PERIODE_VILKÅR = "vedtak/periode_vilkår";
+    private static String PARTIAL_PERIODE_SÆRLIGE_GRUNNER = "vedtak/periode_særlige_grunner";
+    private static String PARTIAL_PERIODE_SLUTT = "vedtak/periode_slutt";
+    private static String PARTIAL_VEDTAK_START = "vedtak/vedtak_start";
+    private static String PARTIAL_VEDTAK_SLUTT = "vedtak/vedtak_slutt";
+    private static String PARTIAL_VEDTAK_FELLES = "vedtak/vedtak_felles";
     private static String FRITEKST_MARKERING = "\\\\//";
 
     private static final ObjectMapper OM = ObjectMapperForUtvekslingAvDataMedHandlebars.INSTANCE;
@@ -208,7 +209,7 @@ class TekstformatererVedtaksbrev {
     }
 
     static String lagVedtaksbrevFritekst(HbVedtaksbrevData vedtaksbrevData) {
-        Template template = getTemplate("/templates/vedtak");
+        Template template = getTemplate("vedtak");
         return applyTemplate(template, vedtaksbrevData);
     }
 
@@ -281,7 +282,11 @@ class TekstformatererVedtaksbrev {
     }
 
     private static Handlebars opprettHandlebarsKonfigurasjon() {
-        Handlebars handlebars = new Handlebars();
+        ClassPathTemplateLoader loader = new ClassPathTemplateLoader();
+        loader.setCharset(Charset.forName("UTF-8"));
+        loader.setPrefix("/templates/");
+        loader.setSuffix(".hbs");
+        Handlebars handlebars = new Handlebars(loader);
 
         handlebars.setCharset(Charset.forName("UTF-8"));
         handlebars.setInfiniteLoops(false);
@@ -291,7 +296,6 @@ class TekstformatererVedtaksbrev {
         handlebars.registerHelper("case", new CustomHelpers.CaseHelper());
         handlebars.registerHelper("var", new CustomHelpers.VariableHelper());
         handlebars.registerHelper("lookup-map", new CustomHelpers.MapLookupHelper());
-
         handlebars.registerHelpers(ConditionalHelpers.class);
         return handlebars;
     }
