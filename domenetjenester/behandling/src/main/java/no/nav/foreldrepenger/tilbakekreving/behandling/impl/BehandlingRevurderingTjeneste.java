@@ -26,7 +26,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.vedtak.feil.Feil;
 import no.nav.vedtak.feil.FeilFactory;
@@ -40,7 +39,6 @@ public class BehandlingRevurderingTjeneste {
 
     private BehandlingRepositoryProvider repositoryProvider;
     private BehandlingRepository behandlingRepository;
-    private KodeverkRepository kodeverkRepository;
     private FagsakRepository fagsakRepository;
     private EksternBehandlingRepository eksternBehandlingRepository;
 
@@ -52,21 +50,18 @@ public class BehandlingRevurderingTjeneste {
     public BehandlingRevurderingTjeneste(BehandlingRepositoryProvider repositoryProvider) {
         this.repositoryProvider = repositoryProvider;
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
-        this.kodeverkRepository = repositoryProvider.getKodeverkRepository();
         this.fagsakRepository = repositoryProvider.getFagsakRepository();
         this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
     }
 
-    public Behandling opprettRevurdering(Saksnummer saksnummer, UUID eksternUuid, String behandlingÅrsak) {
-
-        BehandlingÅrsakType behandlingÅrsakType = hentBehandlingÅrsakType(behandlingÅrsak);
+    public Behandling opprettRevurdering(Saksnummer saksnummer, UUID eksternUuid, BehandlingÅrsakType behandlingÅrsakType,BehandlingType behandlingType) {
 
         Fagsak fagsak = fagsakRepository.hentEksaktFagsakForGittSaksnummer(saksnummer);
 
         validerHarIkkeÅpenBehandling(saksnummer, eksternUuid);
 
         repositoryProvider.getFagsakRepository().oppdaterFagsakStatus(fagsak.getId(), FagsakStatus.UNDER_BEHANDLING);
-        return opprettManuellRevurdering(fagsak, behandlingÅrsakType, eksternUuid);
+        return opprettManuellRevurdering(fagsak, behandlingÅrsakType, eksternUuid,behandlingType);
     }
 
     public boolean kanOppretteRevurdering(UUID eksternUuid) {
@@ -79,18 +74,14 @@ public class BehandlingRevurderingTjeneste {
         return true;
     }
 
-    private BehandlingÅrsakType hentBehandlingÅrsakType(String behandlingÅrsak) {
-        return kodeverkRepository.finn(BehandlingÅrsakType.class, behandlingÅrsak);
-    }
-
-    private Behandling opprettManuellRevurdering(Fagsak fagsak, BehandlingÅrsakType behandlingÅrsakType, UUID eksternUuid) {
+    private Behandling opprettManuellRevurdering(Fagsak fagsak, BehandlingÅrsakType behandlingÅrsakType, UUID eksternUuid,BehandlingType behandlingType) {
         EksternBehandling eksternBehandlingForSisteTbkBehandling = eksternBehandlingRepository.finnForSisteAvsluttetTbkBehandling(eksternUuid)
             .orElseThrow(() -> RevurderingFeil.FACTORY.tjenesteFinnerIkkeBehandlingForRevurdering(fagsak.getId()).toException());
 
         Behandling origBehandling = behandlingRepository.hentBehandling(eksternBehandlingForSisteTbkBehandling.getInternId());
         Long eksternBehandlingId = eksternBehandlingForSisteTbkBehandling.getEksternId(); // eksternBehandling må være samme som siste når vi opprette revurdering
 
-        Behandling revurdering = opprettRevurderingsBehandling(behandlingÅrsakType, origBehandling);
+        Behandling revurdering = opprettRevurderingsBehandling(behandlingÅrsakType, origBehandling,behandlingType);
         BehandlingLås lås = behandlingRepository.taSkriveLås(revurdering);
         behandlingRepository.lagre(revurdering, lås);
 
@@ -106,8 +97,7 @@ public class BehandlingRevurderingTjeneste {
         return revurdering;
     }
 
-    private Behandling opprettRevurderingsBehandling(BehandlingÅrsakType behandlingÅrsakType, Behandling origBehandling) {
-        BehandlingType behandlingType = kodeverkRepository.finn(BehandlingType.class, BehandlingType.REVURDERING_TILBAKEKREVING);
+    private Behandling opprettRevurderingsBehandling(BehandlingÅrsakType behandlingÅrsakType, Behandling origBehandling,BehandlingType behandlingType) {
         BehandlingÅrsak.Builder revurderingÅrsak = BehandlingÅrsak.builder(behandlingÅrsakType)
             .medOriginalBehandling(origBehandling);
         OrganisasjonsEnhet organisasjonsEnhet = new OrganisasjonsEnhet(origBehandling.getBehandlendeEnhetId(), origBehandling.getBehandlendeEnhetNavn());

@@ -133,9 +133,7 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
 
     @Override
     public Long opprettBehandlingManuell(Saksnummer saksnummer, UUID eksternUuid,
-                                         String ytelseType, BehandlingType behandlingType) {
-
-        FagsakYtelseType fagsakYtelseType = FagsakYtelseType.fraKode(ytelseType);
+                                         FagsakYtelseType fagsakYtelseType, BehandlingType behandlingType) {
 
         return opprettFørstegangsbehandling(saksnummer, eksternUuid, null, null, fagsakYtelseType, behandlingType);
     }

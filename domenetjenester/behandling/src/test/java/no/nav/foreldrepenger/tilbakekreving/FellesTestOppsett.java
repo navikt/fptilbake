@@ -21,6 +21,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.dto.vilkår.VilkårResult
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.vilkår.VilkårsvurderingPerioderDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjenesteImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.Feilutbetaling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingAggregate;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingPeriodeÅrsak;
@@ -58,6 +59,7 @@ public class FellesTestOppsett extends TestOppsett {
     protected static final Period defaultVentetid = Period.ofWeeks(4);
     protected static final String BEHANDLENDE_ENHET_ID = "4833";
     protected static final String BEHANDLENDE_ENHET_NAVN = "NAV Familie- og pensjonsytelser Oslo 1";
+    protected static final BehandlingType REVURDERING_BEHANDLING_TYPE = BehandlingType.REVURDERING_TILBAKEKREVING;
 
     protected AktørId aktørId;
     protected Saksnummer saksnummer;

@@ -124,12 +124,12 @@ public class BehandlingRestTjeneste {
     public Response opprettBehandling(@Valid @NotNull OpprettBehandlingDto opprettBehandlingDto) throws URISyntaxException {
         Saksnummer saksnummer = new Saksnummer(opprettBehandlingDto.getSaksnummer());
         UUID eksternUuid = opprettBehandlingDto.getEksternUuid();
-        BehandlingType behandlingType = BehandlingType.fraKode(opprettBehandlingDto.getBehandlingType());
+        BehandlingType behandlingType = opprettBehandlingDto.getBehandlingType();
         if (BehandlingType.TILBAKEKREVING.equals(behandlingType)) {
             behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternUuid,  opprettBehandlingDto.getFagsakYtelseType(), behandlingType);
             return Redirect.tilFagsakPollStatus(saksnummer, Optional.empty());
         } else if (BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandlingType)) {
-            Behandling revurdering = revurderingTjeneste.opprettRevurdering(saksnummer, eksternUuid, opprettBehandlingDto.getBehandlingArsakType());
+            Behandling revurdering = revurderingTjeneste.opprettRevurdering(saksnummer, eksternUuid, opprettBehandlingDto.getBehandlingArsakType(),behandlingType);
             String gruppe = behandlingskontrollAsynkTjeneste.asynkProsesserBehandling(revurdering);
             return Redirect.tilBehandlingPollStatus(revurdering.getId(), Optional.of(gruppe));
         }

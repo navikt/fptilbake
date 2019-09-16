@@ -9,7 +9,6 @@ import org.junit.Test;
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
@@ -28,15 +27,7 @@ public class BehandlingRevurderingTjenesteTest extends FellesTestOppsett {
         expectedException.expect(FunksjonellException.class);
         expectedException.expectMessage("FPT-663487");
 
-        revurderingTjeneste.opprettRevurdering(saksnummer, eksternBehandlingUuid, BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR.getKode());
-    }
-
-    @Test
-    public void opprettRevurdering_nårBehandlingÅrsakErUgyldig() {
-        expectedException.expect(TekniskException.class);
-        expectedException.expectMessage("FPT-314678");
-
-        revurderingTjeneste.opprettRevurdering(saksnummer, eksternBehandlingUuid, null);
+        revurderingTjeneste.opprettRevurdering(saksnummer, eksternBehandlingUuid, BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR, REVURDERING_BEHANDLING_TYPE);
     }
 
     @Test
@@ -44,7 +35,7 @@ public class BehandlingRevurderingTjenesteTest extends FellesTestOppsett {
         expectedException.expect(TekniskException.class);
         expectedException.expectMessage("FPT-429884");
 
-        revurderingTjeneste.opprettRevurdering(null, eksternBehandlingUuid, BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR.getKode());
+        revurderingTjeneste.opprettRevurdering(null, eksternBehandlingUuid, BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR, REVURDERING_BEHANDLING_TYPE);
     }
 
     @Test
@@ -53,11 +44,11 @@ public class BehandlingRevurderingTjenesteTest extends FellesTestOppsett {
         BehandlingLås behandlingLås = repoProvider.getBehandlingRepository().taSkriveLås(behandling);
         behandlingRepository.lagre(behandling, behandlingLås);
 
-        Behandling revurdering = revurderingTjeneste.opprettRevurdering(saksnummer, eksternBehandlingUuid, BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR.getKode());
+        Behandling revurdering = revurderingTjeneste.opprettRevurdering(saksnummer, eksternBehandlingUuid, BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR, REVURDERING_BEHANDLING_TYPE);
         assertThat(revurdering).isNotNull();
         assertThat(revurdering.getFagsakId()).isNotNull();
         assertThat(revurdering.getStatus()).isEqualByComparingTo(BehandlingStatus.OPPRETTET);
-        assertThat(revurdering.getType()).isEqualByComparingTo(BehandlingType.REVURDERING_TILBAKEKREVING);
+        assertThat(revurdering.getType()).isEqualByComparingTo(REVURDERING_BEHANDLING_TYPE);
         assertThat(revurdering.getBehandlendeEnhetId()).isNotEmpty();
         assertThat(revurdering.getBehandlendeEnhetNavn()).isNotEmpty();
 
