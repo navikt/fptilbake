@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
 import org.threeten.extra.Days;
@@ -39,6 +40,7 @@ public class FeilutbetalingTjeneste {
         // for CDI proxy
     }
 
+    @Inject
     public FeilutbetalingTjeneste(BehandlingRepositoryProvider repositoryProvider){
         this.feilutbetalingRepository = repositoryProvider.getFeilutbetalingRepository();
     }

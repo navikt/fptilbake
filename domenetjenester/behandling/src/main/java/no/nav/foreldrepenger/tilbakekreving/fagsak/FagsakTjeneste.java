@@ -48,7 +48,6 @@ public class FagsakTjeneste {
         if (forrigeFagsak.isPresent()) {
             fagsak = forrigeFagsak.get();
             fagsakRepository.oppdaterFagsakStatus(fagsak.getId(), FagsakStatus.OPPRETTET);
-            lagreFagsak(forrigeFagsak.get(), saksnummer);
         }
         lagreFagsak(fagsak, saksnummer);
         return fagsak;
