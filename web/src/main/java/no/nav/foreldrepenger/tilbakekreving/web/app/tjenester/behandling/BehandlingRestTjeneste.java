@@ -44,6 +44,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Organisasjon
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.BehandlingsprosessApplikasjonTjeneste;
@@ -59,7 +60,6 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.Pro
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.Redirect;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.SettBehandlingPåVentDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.UtvidetBehandlingDto;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.UuidDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.SaksnummerDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.SøkestrengDto;
 import no.nav.vedtak.felles.jpa.Transaction;
@@ -126,10 +126,10 @@ public class BehandlingRestTjeneste {
         UUID eksternUuid = opprettBehandlingDto.getEksternUuid();
         BehandlingType behandlingType = opprettBehandlingDto.getBehandlingType();
         if (BehandlingType.TILBAKEKREVING.equals(behandlingType)) {
-            behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternUuid,  opprettBehandlingDto.getFagsakYtelseType(), behandlingType);
-            return Redirect.tilFagsakPollStatus(saksnummer, Optional.empty());
+            Long behandlingId = behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternUuid, opprettBehandlingDto.getFagsakYtelseType(), behandlingType);
+            return Redirect.tilBehandlingPollStatus(behandlingId, Optional.empty());
         } else if (BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandlingType)) {
-            Behandling revurdering = revurderingTjeneste.opprettRevurdering(saksnummer, eksternUuid, opprettBehandlingDto.getBehandlingArsakType(),behandlingType);
+            Behandling revurdering = revurderingTjeneste.opprettRevurdering(saksnummer, eksternUuid, opprettBehandlingDto.getBehandlingArsakType(), behandlingType);
             String gruppe = behandlingskontrollAsynkTjeneste.asynkProsesserBehandling(revurdering);
             return Redirect.tilBehandlingPollStatus(revurdering.getId(), Optional.of(gruppe));
         }
@@ -143,8 +143,9 @@ public class BehandlingRestTjeneste {
         @ApiResponse(code = 200, message = "OK"),
     })
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
-    public Response kanOppretteRevurdering(@QueryParam("uuid") @NotNull @Valid UuidDto uuidDto) {
-        boolean result = revurderingTjeneste.kanOppretteRevurdering(uuidDto.getUuid());
+    public Response kanOppretteRevurdering(@NotNull @QueryParam("behandlingId") @Valid BehandlingIdDto idDto) {
+        EksternBehandling eksternBehandling = revurderingTjeneste.hentEksternBehandling(idDto.getBehandlingId());
+        boolean result = revurderingTjeneste.kanOppretteRevurdering(eksternBehandling.getEksternUuid());
         return Response.ok(result).build();
     }
 

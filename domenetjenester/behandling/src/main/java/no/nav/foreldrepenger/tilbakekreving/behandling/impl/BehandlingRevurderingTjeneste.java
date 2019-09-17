@@ -74,6 +74,10 @@ public class BehandlingRevurderingTjeneste {
         return true;
     }
 
+    public EksternBehandling hentEksternBehandling(long behandlingId){
+        return eksternBehandlingRepository.hentFraInternId(behandlingId);
+    }
+
     private Behandling opprettManuellRevurdering(Fagsak fagsak, BehandlingÅrsakType behandlingÅrsakType, UUID eksternUuid,BehandlingType behandlingType) {
         EksternBehandling eksternBehandlingForSisteTbkBehandling = eksternBehandlingRepository.finnForSisteAvsluttetTbkBehandling(eksternUuid)
             .orElseThrow(() -> RevurderingFeil.FACTORY.tjenesteFinnerIkkeBehandlingForRevurdering(fagsak.getId()).toException());
