@@ -141,8 +141,8 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
 
     @Test
     public void skal_opprette_behandling_automatisk() {
-        behandling.avsluttBehandling();
-        Long behandlingId = behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer, eksternBehandlingUuid, eksternBehandlingId, aktørId, FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING);
+        avsluttBehandling();
+        Long behandlingId = behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer, UUID.randomUUID(), eksternBehandlingId, aktørId, FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING);
         fellesBehandlingAssert(behandlingId);
     }
 
@@ -155,8 +155,8 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
 
     @Test
     public void skal_opprette_behandling_manell() {
-        behandling.avsluttBehandling();
-        Long behandlingId = behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternBehandlingUuid, FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING);
+        avsluttBehandling();
+        Long behandlingId = behandlingTjeneste.opprettBehandlingManuell(saksnummer, UUID.randomUUID(), FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING);
         fellesBehandlingAssert(behandlingId);
     }
 
@@ -169,22 +169,53 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
     @Test
     public void skal_opprette_behandling_manell_med_allerede_åpen_revurdeing_behandling() {
         UUID eksternUUID = UUID.randomUUID();
-        behandling.avsluttBehandling();
-        BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(behandling);
-        behandlingRepository.lagre(behandling, behandlingLås);
-        revurderingTjeneste.opprettRevurdering(saksnummer, eksternBehandlingUuid, BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR,BehandlingType.REVURDERING_TILBAKEKREVING);
+        avsluttBehandling();
+        revurderingTjeneste.opprettRevurdering(saksnummer, eksternBehandlingUuid, BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR, BehandlingType.REVURDERING_TILBAKEKREVING);
 
         Long behandlingId = behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternUUID, FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING);
         fellesBehandlingAssert(behandlingId);
+    }
+
+    @Test
+    public void skal_opprette_behandling_manell_med_allerede_avsluttet_behandling_med_samme_fpsak_revurdering() {
+        avsluttBehandling();
+        expectedException.expectMessage("FPT-663488");
+
+        behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternBehandlingUuid, FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING);
+    }
+
+    @Test
+    public void kan_opprette_behandling_med_åpen_behandling_finnes(){
+        boolean result = behandlingTjeneste.kanOppretteBehandling(saksnummer,eksternBehandlingUuid);
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    public void kan_opprette_behandling_med_allerede_avsluttet_behandling_med_samme_fpsak_revurdering(){
+        avsluttBehandling();
+
+        boolean result = behandlingTjeneste.kanOppretteBehandling(saksnummer,eksternBehandlingUuid);
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    public void kan_opprette_behandling(){
+        avsluttBehandling();
+
+        boolean result = behandlingTjeneste.kanOppretteBehandling(saksnummer,UUID.randomUUID());
+        assertThat(result).isTrue();
+    }
+
+    private void avsluttBehandling() {
+        behandling.avsluttBehandling();
+        BehandlingLås behandlingLås = repoProvider.getBehandlingRepository().taSkriveLås(behandling);
+        behandlingRepository.lagre(behandling, behandlingLås);
     }
 
 
     private KravgrunnlagMock lagKravgrunnlag(LocalDate fom, LocalDate tom, KlasseType klasseType, BigDecimal nyBeløp, BigDecimal tilbakeBeløp) {
         return new KravgrunnlagMock(fom, tom, klasseType, nyBeløp, tilbakeBeløp);
     }
-
-
-
 
     private void fellesFaktaResponsSjekk(BehandlingFeilutbetalingFakta fakta) {
         assertThat(fakta.getTidligereVarseltBeløp()).isEqualByComparingTo(BigDecimal.valueOf(23000));
