@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -20,9 +21,11 @@ public class EksternBehandlingsinfoDto {
     private String behandlendeEnhetNavn;
     private String ansvarligSaksbehandler;
     private Språkkode sprakkode;
+    @JsonProperty("originalVedtaksDato")
     private LocalDate vedtakDato;
     private BehandlingsresultatDto behandlingsresultat;
-    private List<BehandlingÅrsakDto> behandlingÅrsaker;
+    @JsonProperty("behandlingArsaker")
+    private List<BehandlingÅrsakDto> behandlingÅrsaker = new ArrayList<>();
     private List<BehandlingResourceLinkDto> links = new ArrayList<>();
 
     public Long getId() {
