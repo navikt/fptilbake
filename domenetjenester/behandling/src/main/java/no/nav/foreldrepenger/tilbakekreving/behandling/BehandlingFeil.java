@@ -2,6 +2,8 @@ package no.nav.foreldrepenger.tilbakekreving.behandling;
 
 import static no.nav.vedtak.feil.LogLevel.WARN;
 
+import java.util.UUID;
+
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.vedtak.feil.Feil;
 import no.nav.vedtak.feil.FeilFactory;
@@ -36,5 +38,8 @@ public interface BehandlingFeil extends DeklarerteFeil {
 
     @FunksjonellFeil(feilkode = "FPT-663486", feilmelding = "saksnummer %s oppfyller ikke kravene for tilbakekreving", løsningsforslag = "", logLevel = LogLevel.WARN)
     Feil kanIkkeOppretteTilbakekrevingBehandling(Saksnummer saksnummer);
+
+    @FunksjonellFeil(feilkode = "FPT-663488", feilmelding = "tilbakekreving finnes allerede for eksternUuid %s ", løsningsforslag = "", logLevel = LogLevel.WARN)
+    Feil kanIkkeOppretteTilbakekrevingBehandling(UUID eksternUuid);
 
 }

@@ -188,8 +188,13 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
         return behandlingsresultat.isPresent() && behandlingsresultat.get().erBehandlingHenlagt();
     }
 
+    @Override
+    public boolean kanOppretteBehandling(Saksnummer saksnummer, UUID eksternUuid){
+        return !(harÅpenBehandling(saksnummer) || harTilbakekrevingAlleredeFinnes(eksternUuid));
+    }
+
     private void doSetBehandlingPåVent(Long behandlingId, AksjonspunktDefinisjon apDef, LocalDate frist, Venteårsak venteårsak) {
-        LocalDateTime fristTid = bestemFristForBehandlingVent(frist,defaultVentefrist);
+        LocalDateTime fristTid = bestemFristForBehandlingVent(frist, defaultVentefrist);
 
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
 
@@ -204,7 +209,7 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
         return fpsakKlient.hentBehandlingsinfo(eksternUuid, Tillegsinformasjon.PERSONOPPLYSNINGER);
     }
 
-    private EksternBehandlingsinfoDto hentEksternBehandling(UUID eksternUuid) {
+    private EksternBehandlingsinfoDto hentEksternBehandlingFraFpsak(UUID eksternUuid) {
         Optional<EksternBehandlingsinfoDto> eksternBehandlingsInfo = fpsakKlient.hentBehandling(eksternUuid);
         if (eksternBehandlingsInfo.isPresent()) {
             return eksternBehandlingsInfo.get();
@@ -218,7 +223,7 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
                                               BehandlingType behandlingType) {
         logger.info("Oppretter Tilbakekrevingbehandling for [saksnummer: {} ] for ekstern Uuid [ {} ]", saksnummer, eksternUuid);
 
-        validateHarIkkeÅpenTilbakekrevingBehandling(saksnummer);
+        validateHarIkkeÅpenTilbakekrevingBehandling(saksnummer,eksternUuid);
 
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto;
         if (aktørId == null) {
@@ -226,7 +231,7 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
             aktørId = samletEksternBehandlingInfo.getAktørId();
             eksternBehandlingsinfoDto = samletEksternBehandlingInfo.getGrunninformasjon();
         } else {
-            eksternBehandlingsinfoDto = hentEksternBehandling(eksternUuid);
+            eksternBehandlingsinfoDto = hentEksternBehandlingFraFpsak(eksternUuid);
         }
         eksternBehandlingId = hentEksternBehandlingIdHvisFinnesIkke(eksternBehandlingId, eksternBehandlingsinfoDto);
 
@@ -250,9 +255,12 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
     }
 
 
-    private void validateHarIkkeÅpenTilbakekrevingBehandling(Saksnummer saksnummer) {
+    private void validateHarIkkeÅpenTilbakekrevingBehandling(Saksnummer saksnummer, UUID eksternUuid) {
         if (harÅpenBehandling(saksnummer)) {
             throw BehandlingFeil.FACTORY.kanIkkeOppretteTilbakekrevingBehandling(saksnummer).toException();
+        }
+        if (harTilbakekrevingAlleredeFinnes(eksternUuid)) {
+            throw BehandlingFeil.FACTORY.kanIkkeOppretteTilbakekrevingBehandling(eksternUuid).toException();
         }
     }
 
@@ -263,6 +271,10 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
         }
         return behandlinger.stream().anyMatch(behandling -> !behandling.erAvsluttet()
             && BehandlingType.TILBAKEKREVING.equals(behandling.getType()));
+    }
+
+    private boolean harTilbakekrevingAlleredeFinnes(UUID eksternUuid) {
+        return eksternBehandlingRepository.finnForSisteAvsluttetTbkBehandling(eksternUuid).isPresent();
     }
 
     private Long hentEksternBehandlingIdHvisFinnesIkke(Long eksternBehandlingId, EksternBehandlingsinfoDto eksternBehandlingsinfoDto) {
