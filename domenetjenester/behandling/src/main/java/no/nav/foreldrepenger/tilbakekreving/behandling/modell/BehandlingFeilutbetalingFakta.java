@@ -4,33 +4,24 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.BehandlingsresultatDto;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.BehandlingÅrsakDto;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.TilbakekrevingValgDto;
+
 public class BehandlingFeilutbetalingFakta {
 
-    private String årsakRevurdering;
-    private String resultatRevurdering;
-    private String resultatFeilutbetaling;
     private BigDecimal tidligereVarseltBeløp;
     private BigDecimal aktuellFeilUtbetaltBeløp;
-    private LocalDate datoForVarselSendt;
     private LocalDate datoForRevurderingsvedtak;
     private LocalDate totalPeriodeFom;
     private LocalDate totalPeriodeTom;
     private List<UtbetaltPeriode> perioder;
+    private BehandlingsresultatDto behandlingsresultat;
+    private List<BehandlingÅrsakDto> behandlingÅrsaker;
+    private TilbakekrevingValgDto tilbakekrevingValg;
 
     private BehandlingFeilutbetalingFakta() {
         // bygges med builder
-    }
-
-    public String getÅrsakRevurdering() {
-        return årsakRevurdering;
-    }
-
-    public String getResultatRevurdering() {
-        return resultatRevurdering;
-    }
-
-    public String getResultatFeilutbetaling() {
-        return resultatFeilutbetaling;
     }
 
     public BigDecimal getTidligereVarseltBeløp() {
@@ -39,10 +30,6 @@ public class BehandlingFeilutbetalingFakta {
 
     public BigDecimal getAktuellFeilUtbetaltBeløp() {
         return aktuellFeilUtbetaltBeløp;
-    }
-
-    public LocalDate getDatoForVarselSendt() {
-        return datoForVarselSendt;
     }
 
     public LocalDate getDatoForRevurderingsvedtak() {
@@ -61,6 +48,18 @@ public class BehandlingFeilutbetalingFakta {
         return perioder;
     }
 
+    public BehandlingsresultatDto getBehandlingsresultat() {
+        return behandlingsresultat;
+    }
+
+    public List<BehandlingÅrsakDto> getBehandlingÅrsaker() {
+        return behandlingÅrsaker;
+    }
+
+    public TilbakekrevingValgDto getTilbakekrevingValg() {
+        return tilbakekrevingValg;
+    }
+
     public static Builder builder() {
         return new Builder();
     }
@@ -73,21 +72,6 @@ public class BehandlingFeilutbetalingFakta {
             this.behandlingFeilutbetalingFakta = new BehandlingFeilutbetalingFakta();
         }
 
-        public Builder medÅrsakRevurdering(String årsakRevurdering) {
-            this.behandlingFeilutbetalingFakta.årsakRevurdering = årsakRevurdering;
-            return this;
-        }
-
-        public Builder medResultatRevurdering(String resultatRevurdering) {
-            this.behandlingFeilutbetalingFakta.resultatRevurdering = resultatRevurdering;
-            return this;
-        }
-
-        public Builder medResultatFeilutbetaling(String resultatFeilutbetaling) {
-            this.behandlingFeilutbetalingFakta.resultatFeilutbetaling = resultatFeilutbetaling;
-            return this;
-        }
-
         public Builder medTidligereVarsletBeløp(BigDecimal tidligereVarsletBeløp) {
             this.behandlingFeilutbetalingFakta.tidligereVarseltBeløp = tidligereVarsletBeløp;
             return this;
@@ -95,11 +79,6 @@ public class BehandlingFeilutbetalingFakta {
 
         public Builder medAktuellFeilUtbetaltBeløp(BigDecimal aktuellFeilUtbetaltBeløp) {
             this.behandlingFeilutbetalingFakta.aktuellFeilUtbetaltBeløp = aktuellFeilUtbetaltBeløp;
-            return this;
-        }
-
-        public Builder medDatoForVarselSendt(LocalDate datoForVarselSendt) {
-            this.behandlingFeilutbetalingFakta.datoForVarselSendt = datoForVarselSendt;
             return this;
         }
 
@@ -120,6 +99,21 @@ public class BehandlingFeilutbetalingFakta {
 
         public Builder medPerioder(List<UtbetaltPeriode> perioder) {
             this.behandlingFeilutbetalingFakta.perioder = perioder;
+            return this;
+        }
+
+        public Builder medBehandlingsResultat(BehandlingsresultatDto behandlingsresultat) {
+            this.behandlingFeilutbetalingFakta.behandlingsresultat = behandlingsresultat;
+            return this;
+        }
+
+        public Builder medBehandlingÅrsaker(List<BehandlingÅrsakDto> behandlingÅrsaker) {
+            this.behandlingFeilutbetalingFakta.behandlingÅrsaker = behandlingÅrsaker;
+            return this;
+        }
+
+        public Builder medTilbakekrevingValg(TilbakekrevingValgDto tilbakekrevingValg) {
+            this.behandlingFeilutbetalingFakta.tilbakekrevingValg = tilbakekrevingValg;
             return this;
         }
 

@@ -1,5 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -19,6 +20,9 @@ public class EksternBehandlingsinfoDto {
     private String behandlendeEnhetNavn;
     private String ansvarligSaksbehandler;
     private Språkkode sprakkode;
+    private LocalDate vedtakDato;
+    private BehandlingsresultatDto behandlingsresultat;
+    private List<BehandlingÅrsakDto> behandlingÅrsaker;
     private List<BehandlingResourceLinkDto> links = new ArrayList<>();
 
     public Long getId() {
@@ -83,6 +87,30 @@ public class EksternBehandlingsinfoDto {
 
     public void setSprakkode(Språkkode sprakkode) {
         this.sprakkode = sprakkode;
+    }
+
+    public LocalDate getVedtakDato() {
+        return vedtakDato;
+    }
+
+    public void setVedtakDato(LocalDate vedtakDato) {
+        this.vedtakDato = vedtakDato;
+    }
+
+    public BehandlingsresultatDto getBehandlingsresultat() {
+        return behandlingsresultat;
+    }
+
+    public void setBehandlingsresultat(BehandlingsresultatDto behandlingsresultat) {
+        this.behandlingsresultat = behandlingsresultat;
+    }
+
+    public List<BehandlingÅrsakDto> getBehandlingÅrsaker() {
+        return behandlingÅrsaker;
+    }
+
+    public void setBehandlingÅrsaker(List<BehandlingÅrsakDto> behandlingÅrsaker) {
+        this.behandlingÅrsaker = behandlingÅrsaker;
     }
 
     public List<BehandlingResourceLinkDto> getLinks() {

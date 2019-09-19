@@ -102,7 +102,7 @@ public class FpsakKlientTest {
         when(oidcRestClientMock.getReturnsOptional(BEHANDLING_URI, EksternBehandlingsinfoDto.class)).thenReturn(Optional.of(dokumentinfoDto()));
         when(oidcRestClientMock.getReturnsOptional(TILBAKEKREVING_VALG_URI, TilbakekrevingValgDto.class)).thenReturn(Optional.of(tilbakekrevingValgDto));
 
-        Optional<TilbakekrevingValgDto> valgDto = klient.hentTilbakekrevingValg(BEHANDLING_UUID.toString());
+        Optional<TilbakekrevingValgDto> valgDto = klient.hentTilbakekrevingValg(BEHANDLING_UUID);
         assertThat(valgDto).isPresent();
         assertThat(valgDto.get().getVidereBehandling()).isEqualByComparingTo(VidereBehandling.TILBAKEKREV_I_INFOTRYGD);
     }
@@ -112,7 +112,7 @@ public class FpsakKlientTest {
         when(oidcRestClientMock.getReturnsOptional(BEHANDLING_URI, EksternBehandlingsinfoDto.class)).thenReturn(Optional.of(dokumentinfoDto()));
         when(oidcRestClientMock.getReturnsOptional(TILBAKEKREVING_VALG_URI, TilbakekrevingValgDto.class)).thenReturn(Optional.empty());
 
-        Optional<TilbakekrevingValgDto> valgDto = klient.hentTilbakekrevingValg(BEHANDLING_UUID.toString());
+        Optional<TilbakekrevingValgDto> valgDto = klient.hentTilbakekrevingValg(BEHANDLING_UUID);
         assertThat(valgDto).isEmpty();
     }
 

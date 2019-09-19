@@ -14,6 +14,9 @@ public class VidereBehandling extends Kodeliste {
     public static final VidereBehandling TILBAKEKREV_I_INFOTRYGD = new VidereBehandling("TILBAKEKR_INFOTRYGD");
     public static final VidereBehandling IGNORER_TILBAKEKREVING = new VidereBehandling("TILBAKEKR_IGNORER");
     public static final VidereBehandling INNTREKK = new VidereBehandling("TILBAKEKR_INNTREKK");
+    public static final VidereBehandling TILBAKEKR_OPPDATER = new VidereBehandling("TILBAKEKR_OPPDATER");
+
+    public static final VidereBehandling UDEFINERT = new VidereBehandling("-");
 
     VidereBehandling(){
         // for hibernate
