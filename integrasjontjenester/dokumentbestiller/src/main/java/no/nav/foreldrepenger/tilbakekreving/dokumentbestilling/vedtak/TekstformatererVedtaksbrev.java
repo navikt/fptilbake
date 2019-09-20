@@ -221,6 +221,10 @@ class TekstformatererVedtaksbrev {
         return konverterMedPartialTemplate(PARTIAL_PERIODE_VILKÅR, periode);
     }
 
+    static String lagSærligeGrunnerTekst(HbVedtaksbrevPeriodeOgFelles periode) {
+        return konverterMedPartialTemplate(PARTIAL_PERIODE_SÆRLIGE_GRUNNER, periode);
+    }
+
     private static String konverterMedPartialTemplate(String partial, HandlebarsData vedtaksbrevPeriode) {
         Template template = getTemplateFraPartial(partial);
         return applyTemplate(template, vedtaksbrevPeriode);

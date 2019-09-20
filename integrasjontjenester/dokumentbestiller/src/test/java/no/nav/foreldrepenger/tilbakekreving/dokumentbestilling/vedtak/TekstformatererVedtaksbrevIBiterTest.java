@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Test;
@@ -102,7 +103,6 @@ public class TekstformatererVedtaksbrevIBiterTest {
             .medRiktigBeløp(BigDecimal.valueOf(10000))
             .medFeilutbetaltBeløp(BigDecimal.valueOf(30001))
             .medTilbakekrevesBeløp(BigDecimal.valueOf(20002))
-            .medFritekstVilkår("Du er heldig som slapp å betale alt!")
             .build();
         HbVedtaksbrevPeriodeOgFelles data = new HbVedtaksbrevPeriodeOgFelles(felles, periode);
 
@@ -139,6 +139,74 @@ public class TekstformatererVedtaksbrevIBiterTest {
 
         String generertTekst = TekstformatererVedtaksbrev.lagVilkårTekst(data);
         assertThat(generertTekst).contains("_Hvordan har vi kommet fram til at du ikke må betale tilbake?");
+    }
+
+    @Test
+    public void skal_ha_riktig_tekst_for_særlige_grunner_når_det_ikke_er_reduksjon_av_beløp() {
+        HbVedtaksbrevFelles felles = HbVedtaksbrevFelles.builder()
+            .medErFødsel(true)
+            .medAntallBarn(1)
+            .medHovedresultat(VedtakResultatType.FULL_TILBAKEBETALING)
+            .medLovhjemmelVedtak("foo")
+            .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
+            .medVarsletBeløp(BigDecimal.valueOf(1000))
+            .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(1000))
+            .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(1100))
+            .medTotaltRentebeløp(BigDecimal.valueOf(100))
+            .medVarsletDato(LocalDate.of(2020, 4, 4))
+            .medKlagefristUker(4)
+            .build();
+        HbVedtaksbrevPeriode periode = HbVedtaksbrevPeriode.builder()
+            .medPeriode(januar)
+            .medHendelsetype(HendelseType.FP_UTTAK_GRADERT_TYPE)
+            .medHendelseUndertype(FpHendelseUnderTyper.GRADERT_UTTAK)
+            .medVilkårResultat(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER)
+            .medAktsomhetResultat(Aktsomhet.GROVT_UAKTSOM)
+            .medRiktigBeløp(BigDecimal.ZERO)
+            .medFeilutbetaltBeløp(BigDecimal.valueOf(1000))
+            .medTilbakekrevesBeløp(BigDecimal.valueOf(1000))
+            .medRenterBeløp(BigDecimal.valueOf(100))
+            .medSærligeGrunner(Collections.singletonList(SærligGrunn.GRAD_AV_UAKTSOMHET))
+            .build();
+        HbVedtaksbrevPeriodeOgFelles data = new HbVedtaksbrevPeriodeOgFelles(felles, periode);
+
+        String generertTekst = TekstformatererVedtaksbrev.lagSærligeGrunnerTekst(data);
+        assertThat(generertTekst).contains("Selv om du må ha forstått at du fikk for mye utbetalt, har vi vurdert om det er grunner til å redusere beløpet. Vi har kommet fram til at du må betale tilbake hele beløpet.");
+    }
+
+    @Test
+    public void skal_ha_riktig_tekst_for_særlige_grunner_når_det_er_reduksjon_av_beløp() {
+        HbVedtaksbrevFelles felles = HbVedtaksbrevFelles.builder()
+            .medErFødsel(true)
+            .medAntallBarn(1)
+            .medHovedresultat(VedtakResultatType.FULL_TILBAKEBETALING)
+            .medLovhjemmelVedtak("foo")
+            .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
+            .medVarsletBeløp(BigDecimal.valueOf(1000))
+            .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(1000))
+            .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(1100))
+            .medTotaltRentebeløp(BigDecimal.valueOf(100))
+            .medVarsletDato(LocalDate.of(2020, 4, 4))
+            .medKlagefristUker(4)
+            .build();
+        HbVedtaksbrevPeriode periode = HbVedtaksbrevPeriode.builder()
+            .medPeriode(januar)
+            .medHendelsetype(HendelseType.FP_UTTAK_GRADERT_TYPE)
+            .medHendelseUndertype(FpHendelseUnderTyper.GRADERT_UTTAK)
+            .medVilkårResultat(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER)
+            .medAktsomhetResultat(Aktsomhet.GROVT_UAKTSOM)
+            .medRiktigBeløp(BigDecimal.ZERO)
+            .medFeilutbetaltBeløp(BigDecimal.valueOf(1000))
+            .medTilbakekrevesBeløp(BigDecimal.valueOf(500))
+            .medRenterBeløp(BigDecimal.valueOf(0))
+            .medSærligeGrunner(Collections.singletonList(SærligGrunn.GRAD_AV_UAKTSOMHET))
+            .build();
+        HbVedtaksbrevPeriodeOgFelles data = new HbVedtaksbrevPeriodeOgFelles(felles, periode);
+
+        String generertTekst = TekstformatererVedtaksbrev.lagSærligeGrunnerTekst(data);
+        assertThat(generertTekst)
+            .contains("Vi har lagt vekt på at du må ha forstått at du fikk penger du ikke har rett til. Vi vurderer likevel at uaktsomheten din har vært så liten at vi har redusert beløpet du må betale tilbake.")
+            .contains("Du må betale 500 kroner");
     }
 
     @Test
