@@ -47,6 +47,7 @@ import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.TilbakekrevingValgDto;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagAggregate;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
@@ -158,6 +159,9 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
         Optional<KravgrunnlagAggregate> grunnlagAggregate = grunnlagRepository.finnGrunnlagForBehandlingId(behandlingId);
         EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandlingId);
         Optional<SimuleringResultatDto> resultat = simuleringIntegrasjonTjeneste.hentResultat(eksternBehandling.getEksternId());
+        UUID eksternUuid = eksternBehandling.getEksternUuid();
+        EksternBehandlingsinfoDto eksternBehandlingsinfoDto = hentEksternBehandlingFraFpsak(eksternUuid);
+        Optional<TilbakekrevingValgDto> tilbakekrevingValg = fpsakKlient.hentTilbakekrevingValg(eksternUuid);
         if (!resultat.isPresent()) {
             throw BehandlingFeil.FACTORY.fantIkkeSimuleringResultatForBehandlingId(behandlingId).toException();
         }
@@ -175,9 +179,8 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
                 totalPeriodeFom = totalPeriodeFom == null || totalPeriodeFom.isAfter(utbetaltPeriode.getFom()) ? utbetaltPeriode.getFom() : totalPeriodeFom;
                 totalPeriodeTom = totalPeriodeTom == null || totalPeriodeTom.isBefore(utbetaltPeriode.getTom()) ? utbetaltPeriode.getTom() : totalPeriodeTom;
             }
-
             return Optional.of(feilutbetalingTjeneste.lagBehandlingFeilUtbetalingFakta(simuleringResultat, aktuellFeilUtbetaltBeløp, utbetaltPerioder,
-                new Periode(totalPeriodeFom, totalPeriodeTom)));
+                new Periode(totalPeriodeFom, totalPeriodeTom),eksternBehandlingsinfoDto,tilbakekrevingValg));
         }
         return Optional.empty();
     }

@@ -26,6 +26,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.FeilutbetalingÅrsakDto;
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.UnderÅrsakDto;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.TilbakekrevingValgDto;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagBelop433;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
@@ -59,20 +61,18 @@ public class FeilutbetalingTjeneste {
     }
 
     public BehandlingFeilutbetalingFakta lagBehandlingFeilUtbetalingFakta(SimuleringResultatDto simuleringResultat, BigDecimal aktuellFeilUtbetaltBeløp,
-                                                                           List<UtbetaltPeriode> utbetaltPerioder,
-                                                                           Periode totalPeriode) {
+                                                                          List<UtbetaltPeriode> utbetaltPerioder, Periode totalPeriode,
+                                                                          EksternBehandlingsinfoDto eksternBehandlingsinfoDto, Optional<TilbakekrevingValgDto> tilbakekrevingValgDto) {
         return BehandlingFeilutbetalingFakta.builder()
             .medPerioder(utbetaltPerioder)
             .medAktuellFeilUtbetaltBeløp(aktuellFeilUtbetaltBeløp)
             .medTidligereVarsletBeløp(new BigDecimal(simuleringResultat.getSumFeilutbetaling()).abs())
             .medTotalPeriodeFom(totalPeriode.getFom())
             .medTotalPeriodeTom(totalPeriode.getTom())
-            // FIXME:må hente ekte data fra repository.Dette bør fikse med en annen brukerstorien
-            .medDatoForRevurderingsvedtak(LocalDate.of(2019, 1, 4))
-            .medDatoForVarselSendt(LocalDate.of(2019, 1, 4))
-            // FIXME: Der teksten kommer fra, er ikke ferdiggjort. Hardcoded for nå
-            .medÅrsakRevurdering("Endring fra bruker Inntekstmelding Nyeregisteropplysninger")
-            .medResultatFeilutbetaling("Innviliget:Endring i beregning og uttak.Feilutbetaling med tilbakekreving")
+            .medDatoForRevurderingsvedtak(eksternBehandlingsinfoDto.getVedtakDato())
+            .medBehandlingsResultat(eksternBehandlingsinfoDto.getBehandlingsresultat())
+            .medBehandlingÅrsaker(eksternBehandlingsinfoDto.getBehandlingÅrsaker())
+            .medTilbakekrevingValg(tilbakekrevingValgDto.orElse(null))
             .build();
     }
 

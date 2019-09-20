@@ -1,7 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.tjeneste;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -9,6 +8,7 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -36,7 +36,7 @@ public class HendelseHåndtererTjenesteTest extends TilkjentYtelseTestOppsett {
     public void skal_opprette_prosesstask_når_relevant_hendelse_er_mottatt() {
         VidereBehandling videreBehandling = VidereBehandling.TILBAKEKREV_I_INFOTRYGD;
         TilbakekrevingValgDto tbkDataDto = new TilbakekrevingValgDto(videreBehandling);
-        when(restKlient.hentTilbakekrevingValg(anyString())).thenReturn(Optional.of(tbkDataDto));
+        when(restKlient.hentTilbakekrevingValg(any(UUID.class))).thenReturn(Optional.of(tbkDataDto));
 
         hendelseHåndtererTjeneste.håndterHendelse(hendelseTaskDataWrapper);
 
@@ -47,7 +47,7 @@ public class HendelseHåndtererTjenesteTest extends TilkjentYtelseTestOppsett {
     public void skal_ignorere_hendelse_hvis_ikke_relevant() {
         VidereBehandling videreBehandling = VidereBehandling.IGNORER_TILBAKEKREVING;
         TilbakekrevingValgDto tbkDataDto = new TilbakekrevingValgDto(videreBehandling);
-        when(restKlient.hentTilbakekrevingValg(anyString())).thenReturn(Optional.of(tbkDataDto));
+        when(restKlient.hentTilbakekrevingValg(any(UUID.class))).thenReturn(Optional.of(tbkDataDto));
 
         hendelseHåndtererTjeneste.håndterHendelse(hendelseTaskDataWrapper);
 

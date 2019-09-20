@@ -24,6 +24,8 @@ public class BehandlingResultatType extends Kodeliste {
     public static final BehandlingResultatType HENLAGT_KRAVGRUNNLAG_NULLSTILT = new BehandlingResultatType("HENLAGT_KRAVGRUNNLAG_NULLSTILT"); //$NON-NLS-1$
     public static final BehandlingResultatType FORELDREPENGER_ENDRET = new BehandlingResultatType("FORELDREPENGER_ENDRET"); //$NON-NLS-1$
     public static final BehandlingResultatType INGEN_ENDRING = new BehandlingResultatType("INGEN_ENDRING"); //$NON-NLS-1$
+    public static final BehandlingResultatType MANGLER_BEREGNINGSREGLER = new BehandlingResultatType("MANGLER_BEREGNINGSREGLER"); //$NON-NLS-1$
+    public static final BehandlingResultatType MERGET_OG_HENLAGT = new BehandlingResultatType("MERGET_OG_HENLAGT"); //$NON-NLS-1$
     // Klage
     public static final BehandlingResultatType KLAGE_AVVIST = new BehandlingResultatType("KLAGE_AVVIST"); //$NON-NLS-1$
     public static final BehandlingResultatType KLAGE_MEDHOLD = new BehandlingResultatType("KLAGE_MEDHOLD"); //$NON-NLS-1$

@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.tjeneste;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -35,7 +36,7 @@ public class HendelseHåndtererTjeneste {
 
     public void håndterHendelse(HendelseTaskDataWrapper hendelseTaskDataWrapper) {
         long behandlingId = hendelseTaskDataWrapper.getBehandlingId();
-        Optional<TilbakekrevingValgDto> tbkDataOpt = restKlient.hentTilbakekrevingValg(hendelseTaskDataWrapper.getBehandlingUuid());
+        Optional<TilbakekrevingValgDto> tbkDataOpt = restKlient.hentTilbakekrevingValg(UUID.fromString(hendelseTaskDataWrapper.getBehandlingUuid()));
 
         if (tbkDataOpt.isPresent() && erRelevantHendelse(tbkDataOpt.get())) {
             logger.info("Registrert ny relevant hendelse for ekstern behandlingId={}", behandlingId);
