@@ -14,9 +14,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.SærligGrunn;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Vurdering;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.BigDecimalHeltallSerialiserer;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.HandlebarsData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.KodelisteSomKodeSerialiserer;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.BigDecimalHeltallSerialiserer;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.LocalDateTilStrengMedNorskFormatSerialiserer;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.vedtak.util.Objects;
@@ -230,6 +230,7 @@ public class HbVedtaksbrevPeriode implements HandlebarsData {
             Objects.check(kladd.vilkårResultat != null, "vilkårResultat er ikke satt");
             Objects.check(kladd.hendelsetype != null, "hendelsetype er ikke satt");
             Objects.check(kladd.hendelseundertype != null, "hendelseundertype er ikke satt");
+            Objects.check(kladd.tilbakekrevesBeløp != null, "tilbakekrevesbeløp er ikke satt");
             return kladd;
         }
 

@@ -4,7 +4,7 @@
 {{fritekst-vilkår}}
 {{/if}}
 {{/inline}}
-{{> underoverskrift_start}}Hvordan har vi kommet fram til at du {{eq tilbakekreves-beløp 0 yes="ikke " no=""}}må betale tilbake?{{> underoverskrift_slutt}}
+{{> underoverskrift_start}}Hvordan har vi kommet fram til at du {{#if tilbakekreves-beløp}}{{else}}ikke {{/if}}må betale tilbake?{{> underoverskrift_slutt}}
 {{#if (eq vilkår-resultat "FORSTO_BURDE_FORSTAATT")}}
     {{#if (eq aktsomhet-resultat "SIMPEL_UAKTSOM")}}
 Du har fått vite om du har rett til foreldrepenger og hvor mye du har rett til. Selv om du har meldt fra til oss, kan vi kreve tilbake det du har fått for mye dersom du burde forstått at beløpet var feil.
