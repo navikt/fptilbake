@@ -84,6 +84,40 @@ public class TekstformatererVedtaksbrevTest {
     }
 
     @Test
+    public void skal_generere_vedtaksbrev_for_FP_og_god_tro_uten_tilbakekreving() throws Exception {
+        HbVedtaksbrevFelles vedtaksbrevData = HbVedtaksbrevFelles.builder()
+            .medErFødsel(true)
+            .medAntallBarn(1)
+            .medHovedresultat(VedtakResultatType.INGEN_TILBAKEBETALING)
+            .medLovhjemmelVedtak("Folketrygdloven § 22-15")
+            .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
+            .medVarsletBeløp(BigDecimal.valueOf(10000))
+            .medTotaltTilbakekrevesBeløp(BigDecimal.ZERO)
+            .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.ZERO)
+            .medTotaltRentebeløp(BigDecimal.ZERO)
+            .medVarsletDato(LocalDate.of(2020, 4, 4))
+            .medKlagefristUker(6)
+            .build();
+        List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
+            HbVedtaksbrevPeriode.builder()
+                .medPeriode(januar)
+                .medHendelsetype(HendelseType.FP_UTTAK_GRADERT_TYPE)
+                .medHendelseUndertype(FpHendelseUnderTyper.GRADERT_UTTAK)
+                .medVilkårResultat(VilkårResultat.GOD_TRO)
+                .medAktsomhetResultat(AnnenVurdering.GOD_TRO)
+                .medRiktigBeløp(BigDecimal.ZERO)
+                .medFeilutbetaltBeløp(BigDecimal.valueOf(1000))
+                .medTilbakekrevesBeløp(BigDecimal.ZERO)
+                .build()
+        );
+        HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
+
+        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
+        String fasit = les("/vedtaksbrev/FP_ingen_tilbakekreving.txt");
+        assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
+    }
+
+    @Test
     public void skal_generere_vedtaksbrev_for_FP_og_adopsjon_med_mye_fritekst() throws Exception {
         HbVedtaksbrevFelles vedtaksbrevData = HbVedtaksbrevFelles.builder()
             .medErAdopsjon(true)
@@ -159,7 +193,6 @@ public class TekstformatererVedtaksbrevTest {
         HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
 
         String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
-        System.out.println(generertBrev);
         String fasit = les("/vedtaksbrev/FP_fritekst_overalt.txt");
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }

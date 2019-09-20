@@ -14,14 +14,15 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.FpHendelseUnderTyper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.AnnenVurdering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.SærligGrunn;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Avsnitt;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Underavsnitt;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevFelles;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevPeriode;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevPeriodeOgFelles;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Avsnitt;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Underavsnitt;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
 public class TekstformatererVedtaksbrevIBiterTest {
@@ -110,6 +111,37 @@ public class TekstformatererVedtaksbrevIBiterTest {
     }
 
     @Test
+    public void skal_si_at_du_ikke_trenger_betale_tilbake_når_det_er_god_tro_og_beløp_ikke_er_i_behold() {
+        HbVedtaksbrevFelles felles = HbVedtaksbrevFelles.builder()
+            .medErFødsel(true)
+            .medAntallBarn(1)
+            .medHovedresultat(VedtakResultatType.DELVIS_TILBAKEBETALING)
+            .medLovhjemmelVedtak("foo")
+            .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
+            .medVarsletBeløp(BigDecimal.valueOf(1000))
+            .medTotaltTilbakekrevesBeløp(BigDecimal.ZERO)
+            .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.ZERO)
+            .medTotaltRentebeløp(BigDecimal.ZERO)
+            .medVarsletDato(LocalDate.of(2020, 4, 4))
+            .medKlagefristUker(4)
+            .build();
+        HbVedtaksbrevPeriode periode = HbVedtaksbrevPeriode.builder()
+            .medPeriode(januar)
+            .medHendelsetype(HendelseType.FP_UTTAK_GRADERT_TYPE)
+            .medHendelseUndertype(FpHendelseUnderTyper.GRADERT_UTTAK)
+            .medVilkårResultat(VilkårResultat.GOD_TRO)
+            .medAktsomhetResultat(AnnenVurdering.GOD_TRO)
+            .medRiktigBeløp(BigDecimal.ZERO)
+            .medFeilutbetaltBeløp(BigDecimal.valueOf(1000))
+            .medTilbakekrevesBeløp(BigDecimal.ZERO)
+            .build();
+        HbVedtaksbrevPeriodeOgFelles data = new HbVedtaksbrevPeriodeOgFelles(felles, periode);
+
+        String generertTekst = TekstformatererVedtaksbrev.lagVilkårTekst(data);
+        assertThat(generertTekst).contains("_Hvordan har vi kommet fram til at du ikke må betale tilbake?");
+    }
+
+    @Test
     public void skal_parse_tekst_til_avsnitt() {
         Avsnitt resultat = TekstformatererVedtaksbrev.parseTekst("_Hovedoverskrift i brevet\n\nBrødtekst første avsnitt\n\nBrødtekst andre avsnitt\n\n_underoverskrift\n\nBrødtekst tredje avsnitt\n\n_Avsluttende overskrift uten etterfølgende tekst\n\\\\//", new Avsnitt.Builder(), null).build();
         assertThat(resultat.getOverskrift()).isEqualTo("Hovedoverskrift i brevet");
@@ -134,7 +166,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
         Avsnitt resultat = TekstformatererVedtaksbrev.parseTekst("_Hovedoverskrift i brevet\n\nBrødtekst første avsnitt\n\\\\//\n\nBrødtekst andre avsnitt\n\n_underoverskrift\n\nBrødtekst tredje avsnitt\n\n_Avsluttende overskrift uten etterfølgende tekst", new Avsnitt.Builder(), null).build();
         assertThat(resultat.getOverskrift()).isEqualTo("Hovedoverskrift i brevet");
         List<Underavsnitt> underavsnitt = resultat.getUnderavsnittsliste();
-            assertThat(underavsnitt).hasSize(4);
+        assertThat(underavsnitt).hasSize(4);
         assertThat(underavsnitt.get(0).getOverskrift()).isNull();
         assertThat(underavsnitt.get(0).getBrødtekst()).isEqualTo("Brødtekst første avsnitt");
         assertThat(underavsnitt.get(0).isFritekstTillatt()).isTrue();
@@ -162,7 +194,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
         assertThat(underavsnitt.get(1).getOverskrift()).isNull();
         assertThat(underavsnitt.get(1).getBrødtekst()).isEqualTo("Brødtekst første avsnitt");
         assertThat(underavsnitt.get(1).isFritekstTillatt()).isFalse();
-        assertThat(underavsnitt.get(2).getOverskrift()).isEqualTo("underoverskrift 2" );
+        assertThat(underavsnitt.get(2).getOverskrift()).isEqualTo("underoverskrift 2");
         assertThat(underavsnitt.get(2).getBrødtekst()).isEqualTo("Brødtekst andre avsnitt");
         assertThat(underavsnitt.get(2).isFritekstTillatt()).isFalse();
     }
