@@ -32,10 +32,10 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurd
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingPeriodeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Inntektskategori;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagAggregate;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMock;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMockUtil;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
@@ -149,10 +149,7 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
 
         Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedFeilPostering1,
             mockMedYtelPostering, mockMedYtelPostering1, mockMedYtelPostering2, mockMedTrekPostering));
-        KravgrunnlagAggregate kravgrunnlagAggregate = KravgrunnlagAggregate.builder()
-            .medGrunnlagØkonomi(kravgrunnlag431)
-            .medBehandlingId(internBehandlingId).build();
-        grunnlagRepository.lagre(kravgrunnlagAggregate);
+        grunnlagRepository.lagre(internBehandlingId, kravgrunnlag431);
 
         formFeilutbetalingPeriodeMedÅrsak();
 
@@ -175,6 +172,40 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         assertThat(andreRedusertBeløp.getBelop()).isEqualByComparingTo(BigDecimal.valueOf(5000l));
         assertThat(andreRedusertBeløp.isErTrekk()).isEqualTo(true);
     }
+
+    @Test
+    public void hentDetaljertFeilutbetalingPerioder_medFlereYtelserMedSammeInntekstKategori() {
+        KravgrunnlagMock mockMedFeilPostering = new KravgrunnlagMock(FOM, LocalDate.of(2016, 3, 31), KlasseType.FEIL,
+            BigDecimal.valueOf(11000), BigDecimal.ZERO);
+        KravgrunnlagMock mockMedYtelPostering = new KravgrunnlagMock(FOM, LocalDate.of(2016, 3, 31),
+            KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(11000));
+        mockMedYtelPostering.setKlasseKode(KlasseKode.FPADATAL);
+
+        KravgrunnlagMock mockMedFeilPostering1 = new KravgrunnlagMock(LocalDate.of(2016, 4, 1), LocalDate.of(2016, 4, 30), KlasseType.FEIL,
+            BigDecimal.valueOf(21000), BigDecimal.ZERO);
+        KravgrunnlagMock mockMedYtelPostering1 = new KravgrunnlagMock(LocalDate.of(2016, 4, 1), LocalDate.of(2016, 4, 30),
+            KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(21000));
+        mockMedYtelPostering1.setKlasseKode(KlasseKode.FPADATAL);
+        KravgrunnlagMock mockMedYtelPostering2 = new KravgrunnlagMock(LocalDate.of(2016, 4, 1), LocalDate.of(2016, 4, 30),
+            KlasseType.YTEL, BigDecimal.valueOf(3000), BigDecimal.ZERO);
+        mockMedYtelPostering2.setKlasseKode(KlasseKode.FPADATAL);
+
+        Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedFeilPostering1,
+            mockMedYtelPostering, mockMedYtelPostering1, mockMedYtelPostering2));
+        grunnlagRepository.lagre(internBehandlingId, kravgrunnlag431);
+
+        formFeilutbetalingPeriodeMedÅrsak();
+
+        List<DetaljertFeilutbetalingPeriodeDto> perioder = vilkårsvurderingTjeneste.hentDetaljertFeilutbetalingPerioder(internBehandlingId);
+        assertThat(perioder).isNotEmpty();
+        assertThat(perioder.size()).isEqualTo(1);
+        DetaljertFeilutbetalingPeriodeDto periode = perioder.get(0);
+        assertThat(periode.getYtelser().size()).isEqualTo(1);
+        YtelseDto ytelseDto = periode.getYtelser().get(0);
+        assertThat(ytelseDto.getAktivitet()).isEqualTo(kodeverkRepository.finn(Inntektskategori.class, Inntektskategori.ARBEIDSLEDIG).getNavn());
+        assertThat(ytelseDto.getBelop()).isEqualTo(BigDecimal.valueOf(32000));
+    }
+
 
     @Test
     public void lagreVilkårsvurdering_medGodTroOgForsettAktsomhet() {
@@ -364,10 +395,7 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
 
         Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedFeilPostering1, mockMedFeilPostering2,
             mockMedYtelPostering, mockMedYtelPostering1, mockMedYtelPostering2));
-        KravgrunnlagAggregate kravgrunnlagAggregate = KravgrunnlagAggregate.builder()
-            .medGrunnlagØkonomi(kravgrunnlag431)
-            .medBehandlingId(internBehandlingId).build();
-        grunnlagRepository.lagre(kravgrunnlagAggregate);
+        grunnlagRepository.lagre(internBehandlingId, kravgrunnlag431);
     }
 
     private void formFeilutbetalingPeriodeMedÅrsak() {

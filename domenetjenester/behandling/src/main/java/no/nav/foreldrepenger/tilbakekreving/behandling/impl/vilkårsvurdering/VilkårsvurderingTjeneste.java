@@ -7,6 +7,7 @@ import static no.nav.foreldrepenger.tilbakekreving.behandling.impl.vilkårsvurde
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -117,17 +118,13 @@ public class VilkårsvurderingTjeneste {
             }
             vilkårVurderingEntitet.leggTilPeriode(periodeEntitet);
         }
-        VilkårVurderingAggregateEntitet aggregateEntitet = VilkårVurderingAggregateEntitet.builder()
-            .medBehandlingId(behandlingId)
-            .medManuellVilkår(vilkårVurderingEntitet)
-            .build();
 
         Optional<VilkårVurderingAggregateEntitet> forrigeEntitet = vilkårsvurderingRepository.finnVilkårsvurderingForBehandlingId(behandlingId);
         VilkårVurderingEntitet forrigeVurdering = forrigeEntitet.isPresent() ? forrigeEntitet.get().getManuellVilkår() : null;
 
         vilkårsvurderingHistorikkInnslagTjeneste.lagHistorikkInnslag(behandlingId, forrigeVurdering, vilkårVurderingEntitet);
 
-        vilkårsvurderingRepository.lagre(aggregateEntitet);
+        vilkårsvurderingRepository.lagre(behandlingId, vilkårVurderingEntitet);
     }
 
     public List<VilkårsvurderingPerioderDto> hentVilkårsvurdering(Long behandlingId) {
@@ -157,7 +154,8 @@ public class VilkårsvurderingTjeneste {
 
             DetaljertFeilutbetalingPeriodeDto periodeDto = new DetaljertFeilutbetalingPeriodeDto(periode.getFom(), periode.getTom(),
                 årsak, periode.getBelop());
-            periodeDto.setYtelser(henteYtelse(behandlingId, new Periode(periode.getFom(), periode.getTom())));
+            List<YtelseDto> ytelser = henteYtelse(behandlingId, new Periode(periode.getFom(), periode.getTom()));
+            periodeDto.setYtelser(oppsummereYtelser(ytelser));
             periodeDto.setRedusertBeloper(henteRedusertBeløper(behandlingId, new Periode(periode.getFom(), periode.getTom())));
             periodeDto.setForeldet(ForeldelseVurderingType.FORELDET.equals(periode.getForeldelseVurderingType()));
 
@@ -176,7 +174,8 @@ public class VilkårsvurderingTjeneste {
             Periode periode = periodeÅrsak.getPeriode();
             BigDecimal beløp = beløpForPerioder.get(periode);
             DetaljertFeilutbetalingPeriodeDto periodeDto = new DetaljertFeilutbetalingPeriodeDto(periode, mapTil(periodeÅrsak), beløp);
-            periodeDto.setYtelser(henteYtelse(behandlingId, periode));
+            List<YtelseDto> ytelser = henteYtelse(behandlingId, periode);
+            periodeDto.setYtelser(oppsummereYtelser(ytelser));
             periodeDto.setRedusertBeloper(henteRedusertBeløper(behandlingId, periode));
             feilutbetalingPerioder.add(periodeDto);
         }
@@ -303,6 +302,21 @@ public class VilkårsvurderingTjeneste {
     private BigDecimal hentNyFeilutbetaltBelop(long behandlingId, Periode periode) {
         Map<Periode, BigDecimal> result = foreldelseTjeneste.beregnFeilutbetaltBeløpForPerioder(behandlingId, Lists.newArrayList(periode));
         return result.get(periode);
+    }
+
+    private List<YtelseDto> oppsummereYtelser(List<YtelseDto> ytelser) {
+        Map<String, BigDecimal> oppsummertYtelseMap = new HashMap<>();
+        for (YtelseDto ytelseDto : ytelser) {
+            if (oppsummertYtelseMap.containsKey(ytelseDto.getAktivitet())) {
+                BigDecimal beløp = ytelseDto.getBelop().add(oppsummertYtelseMap.get(ytelseDto.getAktivitet()));
+                ytelseDto.setBelop(beløp);
+            }
+            oppsummertYtelseMap.put(ytelseDto.getAktivitet(), ytelseDto.getBelop());
+        }
+        return oppsummertYtelseMap.entrySet().stream()
+            .map(ytelseMap -> new YtelseDto(ytelseMap.getKey(), ytelseMap.getValue()))
+            .collect(Collectors.toList());
+
     }
 
 }
