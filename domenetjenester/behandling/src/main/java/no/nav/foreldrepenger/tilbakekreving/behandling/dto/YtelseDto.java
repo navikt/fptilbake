@@ -8,6 +8,15 @@ public class YtelseDto {
 
     private BigDecimal belop;
 
+    public YtelseDto(){
+
+    }
+
+    public YtelseDto(String aktivitet, BigDecimal belop){
+        this.aktivitet = aktivitet;
+        this.belop = belop;
+    }
+
     public String getAktivitet() {
         return aktivitet;
     }

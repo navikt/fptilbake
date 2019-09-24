@@ -48,6 +48,7 @@ public class VilkårsvurderingRepository {
             .medAktiv(true)
             .build();
         entityManager.persist(aggregatEntitet);
+        entityManager.flush();
     }
 
     private void disableForrigeVurdering(Long behandlingId) {
