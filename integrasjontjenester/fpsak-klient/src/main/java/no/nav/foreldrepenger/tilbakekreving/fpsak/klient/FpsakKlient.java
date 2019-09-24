@@ -18,6 +18,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.BehandlingResourceLinkDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
@@ -45,6 +47,14 @@ public class FpsakKlient {
     private static final String PARAM_NAME_SAKSNUMMER = "saksnummer";
 
     private OidcRestClient restClient;
+
+    private static ObjectMapper mapper;
+
+    static {
+        mapper = new ObjectMapper();
+        mapper.registerModule(new Jdk8Module());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    }
 
     FpsakKlient() {
         // CDI
@@ -115,9 +125,7 @@ public class FpsakKlient {
     }
 
     private List<EksternBehandlingsinfoDto> lesResponsFraJsonNode(String saksnummer, JsonNode jsonNode) {
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectReader reader = mapper.readerFor(new TypeReference<List<EksternBehandlingsinfoDto>>() {
-        });
+        ObjectReader reader = mapper.readerFor(new TypeReference<List<EksternBehandlingsinfoDto>>() {});
         try {
             return reader.readValue(jsonNode);
         } catch (IOException e) {
