@@ -1,4 +1,8 @@
+{{#if (neq 1 antall-perioder)}}
+{{> hovedoverskrift}}{{#if lovhjemmel-flertall}}Lovhjemlene{{else}}Lovhjemmelen{{/if}} vi har brukt
+{{else}}
 
+{{/if}}
 Vedtaket er gjort etter {{lovhjemmel-vedtak}}.
 {{#if unntas-innkreving-pga-lavt-beløp}}
 

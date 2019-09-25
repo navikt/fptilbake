@@ -11,12 +11,16 @@ public class HbVedtaksbrevData implements HandlebarsData {
     @JsonUnwrapped
     private HbVedtaksbrevFelles felles;
 
+    @JsonProperty("antall-perioder")
+    private int antallPerioder;
+
     @JsonProperty("perioder")
     private List<HbVedtaksbrevPeriode> perioder;
 
     public HbVedtaksbrevData(HbVedtaksbrevFelles felle, List<HbVedtaksbrevPeriode> perioder) {
         this.felles = felle;
         this.perioder = perioder;
+        this.antallPerioder = perioder.size();
     }
 
     public HbVedtaksbrevFelles getFelles() {

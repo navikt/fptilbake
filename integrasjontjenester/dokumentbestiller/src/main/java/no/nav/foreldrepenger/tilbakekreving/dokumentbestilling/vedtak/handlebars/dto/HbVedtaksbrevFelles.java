@@ -8,9 +8,9 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.BigDecimalHeltallSerialiserer;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.HandlebarsData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.KodelisteSomKodeSerialiserer;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.BigDecimalHeltallSerialiserer;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.LocalDateTilStrengMedNorskFormatSerialiserer;
 import no.nav.vedtak.util.Objects;
 
@@ -46,6 +46,8 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
     private String fritekstOppsummering;
     @JsonProperty("lovhjemmel-vedtak")
     private String lovhjemmelVedtak;
+    @JsonProperty("lovhjemmel-flertall")
+    private boolean lovhjemmelFlertall;
     @JsonProperty("fire-rettsgebyr")
     @JsonSerialize(using = BigDecimalHeltallSerialiserer.class)
     private BigDecimal fireRettsgebyr = BigDecimal.valueOf(4600);  //FIXME fjerne hardkoding
@@ -142,7 +144,7 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
         }
 
         public Builder medTotaltTilbakekrevesBeløpMedRenter(BigDecimal totaltTilbakekrevesBeløpMedRenter) {
-            kladd.totaltTilbakekrevesBeløpMedRenter=totaltTilbakekrevesBeløpMedRenter;
+            kladd.totaltTilbakekrevesBeløpMedRenter = totaltTilbakekrevesBeløpMedRenter;
             return this;
         }
 
@@ -157,7 +159,12 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
         }
 
         public Builder medLovhjemmelVedtak(String lovhjemmelVedtak) {
+            return medLovhjemmelVedtak(lovhjemmelVedtak, " og ");
+        }
+
+        public Builder medLovhjemmelVedtak(String lovhjemmelVedtak, String skilletegnMellomHjemler) {
             kladd.lovhjemmelVedtak = lovhjemmelVedtak;
+            kladd.lovhjemmelFlertall = lovhjemmelVedtak.contains(skilletegnMellomHjemler);
             return this;
         }
 
