@@ -48,6 +48,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.Vilkårsvur
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.AnnenVurdering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelse;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseAggregate;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelsePeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseRepository;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Avsnitt;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.HentForhåndvisningVedtaksbrevPdfDto;
@@ -213,7 +214,7 @@ public class VedtaksbrevTjeneste {
             .medKlagefristUker(KLAGEFRIST_UKER);
 
         List<HbVedtaksbrevPeriode> perioder = resulatPerioder.stream()
-            .map(brp -> lagBrevdataPeriode(brp, fakta, vilkårPerioder, perioderFritekst))
+            .map(brp -> lagBrevdataPeriode(brp, fakta, vilkårPerioder, foreldelse, perioderFritekst))
             .collect(Collectors.toList());
 
         HbVedtaksbrevData data = new HbVedtaksbrevData(vedtakDataBuilder.build(), perioder);
@@ -254,7 +255,7 @@ public class VedtaksbrevTjeneste {
             .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    private HbVedtaksbrevPeriode lagBrevdataPeriode(BeregningResultatPeriode resultatPeriode, Feilutbetaling fakta, List<VilkårVurderingPeriodeEntitet> vilkårPerioder, List<PeriodeMedTekstDto> perioderFritekst) {
+    private HbVedtaksbrevPeriode lagBrevdataPeriode(BeregningResultatPeriode resultatPeriode, Feilutbetaling fakta, List<VilkårVurderingPeriodeEntitet> vilkårPerioder, VurdertForeldelse foreldelse, List<PeriodeMedTekstDto> perioderFritekst) {
         Periode periode = resultatPeriode.getPeriode();
 
         HbVedtaksbrevPeriode.Builder builder = HbVedtaksbrevPeriode.builder()
@@ -296,16 +297,30 @@ public class VedtaksbrevTjeneste {
                 builder.medAktsomhetResultat(AnnenVurdering.GOD_TRO);
                 builder.medBeløpIBehold(resultatPeriode.getManueltSattTilbakekrevingsbeløp());
             }
-        } else {
-            builder.medAktsomhetResultat(AnnenVurdering.FORELDET);
-            builder.medForeldelseErVurdert(true);
-            builder.medForeldetBeløp(resultatPeriode.getFeilutbetaltBeløp().subtract(resultatPeriode.getTilbakekrevingBeløp()));
-            //FIXME fyll ut resterende felter for foreldelse
         }
 
-
+        VurdertForeldelsePeriode foreldelsePeriode = finnForeldelsePeriode(foreldelse, periode);
+        if (foreldelsePeriode != null) {
+            if (foreldelsePeriode.erForeldet()) {
+                builder.medAktsomhetResultat(AnnenVurdering.FORELDET);
+                builder.medForeldetBeløp(resultatPeriode.getFeilutbetaltBeløp().subtract(resultatPeriode.getTilbakekrevingBeløp()));
+            }
+            builder.medForeldelsevurdering(foreldelsePeriode.getForeldelseVurderingType());
+        }
         return builder.build();
     }
+
+    private VurdertForeldelsePeriode finnForeldelsePeriode(VurdertForeldelse foreldelse, Periode periode) {
+        if (foreldelse == null) {
+            return null;
+        }
+        return foreldelse.getVurdertForeldelsePerioder()
+            .stream()
+            .filter(p -> p.getPeriode().omslutter(periode))
+            .findAny()
+            .orElseThrow(() -> new IllegalArgumentException("Fant ikke VurdertForeldelse-periode som omslutter periode " + periode));
+    }
+
 
     private PeriodeMedTekstDto finnPeriodeFritekster(Periode periode, List<PeriodeMedTekstDto> perioder) {
         for (PeriodeMedTekstDto fritekstPeriode : perioder) {

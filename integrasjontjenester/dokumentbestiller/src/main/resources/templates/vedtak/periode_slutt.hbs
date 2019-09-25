@@ -1,18 +1,3 @@
-{{#if foreldelse-vurdert}}
-    {{#if foreldelse-tilleggsfrist-anvendt}}
-
-Fristen for å kreve tilbake {{> ytelse-produkt}} er tre år fra det tidspunktet feilutbetalingen skjedde. Vi kan utvide fristen med ytterligere 10 år hvis det ikke var mulig for NAV å oppdage feilen tidligere. Fra tidspunktet vi oppdaget feilen, har vi ett år på å kreve pengene tilbake.
-
-Fordi vi oppdaget feilutbetalingen [dato], og har behandlet saken din innen ett år, er foreldelsesfristen [dato]. Derfor må du betale tilbake fra og med {{fom}} til og med {{tom}}.
-    {{else}}
-
-Fristen for å kreve tilbake {{> ytelse-produkt}} er tre år og starter fra det tidspunktet feilutbetalingen skjedde.
-
-Foreldelsesfristen er [dato]. Vi kan ikke kreve tilbake penger som er blitt utbetalt mer enn tre år før denne datoen.
-
-Du skal derfor ikke betale tilbake {{foreldet-beløp}} kroner før skatt, som er feilutbetalt fra og med {{fom}} til og med {{tom}}.
-    {{/if}}
-{{/if}}
 {{#if renter-beløp}}
 
     {{#switch aktsomhet-resultat}}

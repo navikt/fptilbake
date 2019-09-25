@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.junit.Test;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.FpHendelseUnderTyper;
@@ -49,6 +50,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(januar)
+                .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
                 .medHendelsetype(HendelseType.FP_UTTAK_GRADERT_TYPE)
                 .medHendelseUndertype(FpHendelseUnderTyper.GRADERT_UTTAK)
                 .medVilkårResultat(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER)
@@ -61,6 +63,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
                 .build(),
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(februar)
+                .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
                 .medHendelsetype(HendelseType.FP_ANNET_HENDELSE_TYPE)
                 .medHendelseUndertype(FpHendelseUnderTyper.OKONOMI_DOBBELUTBETALING)
                 .medVilkårResultat(VilkårResultat.FORSTO_BURDE_FORSTÅTT)
@@ -95,6 +98,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
             .build();
         HbVedtaksbrevPeriode periode = HbVedtaksbrevPeriode.builder()
             .medPeriode(januar)
+            .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
             .medHendelsetype(HendelseType.FP_UTTAK_GRADERT_TYPE)
             .medHendelseUndertype(FpHendelseUnderTyper.GRADERT_UTTAK)
             .medVilkårResultat(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER)
@@ -127,6 +131,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
             .build();
         HbVedtaksbrevPeriode periode = HbVedtaksbrevPeriode.builder()
             .medPeriode(januar)
+            .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
             .medHendelsetype(HendelseType.FP_UTTAK_GRADERT_TYPE)
             .medHendelseUndertype(FpHendelseUnderTyper.GRADERT_UTTAK)
             .medVilkårResultat(VilkårResultat.GOD_TRO)
@@ -158,6 +163,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
             .build();
         HbVedtaksbrevPeriode periode = HbVedtaksbrevPeriode.builder()
             .medPeriode(januar)
+            .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
             .medHendelsetype(HendelseType.FP_UTTAK_GRADERT_TYPE)
             .medHendelseUndertype(FpHendelseUnderTyper.GRADERT_UTTAK)
             .medVilkårResultat(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER)
@@ -191,6 +197,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
             .build();
         HbVedtaksbrevPeriode periode = HbVedtaksbrevPeriode.builder()
             .medPeriode(januar)
+            .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
             .medHendelsetype(HendelseType.FP_UTTAK_GRADERT_TYPE)
             .medHendelseUndertype(FpHendelseUnderTyper.GRADERT_UTTAK)
             .medVilkårResultat(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER)

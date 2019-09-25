@@ -12,6 +12,7 @@ import java.util.Scanner;
 
 import org.junit.Test;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.EsHendelseUnderTyper;
@@ -53,6 +54,7 @@ public class TekstformatererVedtaksbrevTest {
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(januar)
+                .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
                 .medHendelsetype(HendelseType.FP_UTTAK_GRADERT_TYPE)
                 .medHendelseUndertype(FpHendelseUnderTyper.GRADERT_UTTAK)
                 .medVilkårResultat(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER)
@@ -65,6 +67,7 @@ public class TekstformatererVedtaksbrevTest {
                 .build(),
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(februar)
+                .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
                 .medHendelsetype(HendelseType.FP_ANNET_HENDELSE_TYPE)
                 .medHendelseUndertype(FpHendelseUnderTyper.OKONOMI_DOBBELUTBETALING)
                 .medVilkårResultat(VilkårResultat.FORSTO_BURDE_FORSTÅTT)
@@ -101,6 +104,7 @@ public class TekstformatererVedtaksbrevTest {
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(januar)
+                .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
                 .medHendelsetype(HendelseType.FP_UTTAK_GRADERT_TYPE)
                 .medHendelseUndertype(FpHendelseUnderTyper.GRADERT_UTTAK)
                 .medVilkårResultat(VilkårResultat.GOD_TRO)
@@ -137,6 +141,7 @@ public class TekstformatererVedtaksbrevTest {
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(januar)
+                .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
                 .medHendelsetype(HendelseType.FP_ANNET_HENDELSE_TYPE)
                 .medHendelseUndertype(FpHendelseUnderTyper.ANNET_FRITEKST)
                 .medVilkårResultat(VilkårResultat.FORSTO_BURDE_FORSTÅTT)
@@ -152,6 +157,7 @@ public class TekstformatererVedtaksbrevTest {
                 .build(),
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(februar)
+                .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
                 .medHendelsetype(HendelseType.FP_ANNET_HENDELSE_TYPE)
                 .medHendelseUndertype(FpHendelseUnderTyper.OKONOMI_UTBETALT)
                 .medVilkårResultat(VilkårResultat.GOD_TRO)
@@ -166,6 +172,7 @@ public class TekstformatererVedtaksbrevTest {
                 .build(),
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(mars)
+                .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
                 .medHendelsetype(HendelseType.FP_UTTAK_GRADERT_TYPE)
                 .medHendelseUndertype(FpHendelseUnderTyper.GRADERT_UTTAK)
                 .medVilkårResultat(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER)
@@ -178,6 +185,7 @@ public class TekstformatererVedtaksbrevTest {
                 .build(),
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(april)
+                .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
                 .medHendelsetype(HendelseType.FP_UTTAK_KVOTENE_TYPE)
                 .medHendelseUndertype(FpHendelseUnderTyper.KVO_MOTTAKER_INNLAGT)
                 .medVilkårResultat(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER)
@@ -215,6 +223,7 @@ public class TekstformatererVedtaksbrevTest {
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(januar)
+                .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
                 .medHendelsetype(HendelseType.SVP_FAKTA_TYPE)
                 .medHendelseUndertype(SvpHendelseUnderTyper.SVP_IKKE_HELSEFARLIG)
                 .medVilkårResultat(VilkårResultat.FORSTO_BURDE_FORSTÅTT)
@@ -252,6 +261,7 @@ public class TekstformatererVedtaksbrevTest {
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(førsteNyttårsdag)
+                .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
                 .medHendelsetype(HendelseType.ES_FODSELSVILKAARET_TYPE)
                 .medHendelseUndertype(EsHendelseUnderTyper.ES_MOTTAKER_FAR_MEDMOR)
                 .medVilkårResultat(VilkårResultat.GOD_TRO)
@@ -289,6 +299,7 @@ public class TekstformatererVedtaksbrevTest {
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(førsteNyttårsdag)
+                .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
                 .medHendelsetype(HendelseType.ES_ADOPSJONSVILKAARET_TYPE)
                 .medHendelseUndertype(EsHendelseUnderTyper.ES_BARN_OVER_15)
                 .medVilkårResultat(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER)
@@ -308,11 +319,56 @@ public class TekstformatererVedtaksbrevTest {
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 
+    @Test
+    public void skal_generere_vedtaksbrev_for_FP_med_og_uten_foreldelse() throws Exception {
+        HbVedtaksbrevFelles vedtaksbrevData = HbVedtaksbrevFelles.builder()
+            .medErFødsel(true)
+            .medAntallBarn(1)
+            .medHovedresultat(VedtakResultatType.INGEN_TILBAKEBETALING)
+            .medLovhjemmelVedtak("Folketrygdloven § 22-15")
+            .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
+            .medVarsletBeløp(BigDecimal.valueOf(2000))
+            .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(1000))
+            .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(1000))
+            .medTotaltRentebeløp(BigDecimal.ZERO)
+            .medVarsletDato(LocalDate.of(2020, 4, 4))
+            .medKlagefristUker(6)
+            .build();
+        List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
+            HbVedtaksbrevPeriode.builder()
+                .medPeriode(januar)
+                .medForeldelsevurdering(ForeldelseVurderingType.FORELDET)
+                .medHendelsetype(HendelseType.FP_UTTAK_GRADERT_TYPE)
+                .medHendelseUndertype(FpHendelseUnderTyper.GRADERT_UTTAK)
+                .medAktsomhetResultat(AnnenVurdering.FORELDET)
+                .medRiktigBeløp(BigDecimal.ZERO)
+                .medFeilutbetaltBeløp(BigDecimal.valueOf(1000))
+                .medTilbakekrevesBeløp(BigDecimal.ZERO)
+                .build(),
+            HbVedtaksbrevPeriode.builder()
+                .medPeriode(februar)
+                .medForeldelsevurdering(ForeldelseVurderingType.TILLEGGSFRIST)
+                .medHendelsetype(HendelseType.FP_UTTAK_GRADERT_TYPE)
+                .medHendelseUndertype(FpHendelseUnderTyper.GRADERT_UTTAK)
+                .medVilkårResultat(VilkårResultat.GOD_TRO)
+                .medAktsomhetResultat(AnnenVurdering.GOD_TRO)
+                .medRiktigBeløp(BigDecimal.ZERO)
+                .medFeilutbetaltBeløp(BigDecimal.valueOf(1000))
+                .medTilbakekrevesBeløp(BigDecimal.valueOf(1000))
+                .build()
+        );
+        HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
+
+        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
+        String fasit = les("/vedtaksbrev/FP_foreldelse.txt");
+        assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
+    }
+
     private String les(String filnavn) throws IOException {
         try (InputStream resource = getClass().getResourceAsStream(filnavn);
              Scanner scanner = new Scanner(resource, "UTF-8")) {
             scanner.useDelimiter("\\A");
-            return scanner.hasNext() ?scanner.next() : null;
+            return scanner.hasNext() ? scanner.next() : null;
         }
     }
 

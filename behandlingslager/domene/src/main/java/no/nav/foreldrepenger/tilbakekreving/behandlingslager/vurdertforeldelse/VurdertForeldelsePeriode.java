@@ -62,8 +62,7 @@ public class VurdertForeldelsePeriode extends BaseEntitet {
     }
 
     public boolean erForeldet() {
-        return ForeldelseVurderingType.FORELDET.equals(foreldelseVurderingType)
-            || ForeldelseVurderingType.TILLEGGSFRIST.equals(foreldelseVurderingType);
+        return ForeldelseVurderingType.FORELDET.equals(foreldelseVurderingType);
     }
 
     public Periode getPeriode() {
