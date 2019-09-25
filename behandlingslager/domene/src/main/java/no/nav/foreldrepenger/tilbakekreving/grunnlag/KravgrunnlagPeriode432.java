@@ -1,5 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.grunnlag;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,6 +40,9 @@ public class KravgrunnlagPeriode432 extends BaseEntitet {
     })
     private Periode periode;
 
+    @Column(name = "belop_skatt_mnd")
+    private BigDecimal beløpSkattMnd = BigDecimal.ZERO;
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "krav_grunnlag_431_id", nullable = false, updatable = false)
     private Kravgrunnlag431 kravgrunnlag431;
@@ -56,6 +60,10 @@ public class KravgrunnlagPeriode432 extends BaseEntitet {
 
     public LocalDate getFom() {
         return periode.getFom();
+    }
+
+    public BigDecimal getBeløpSkattMnd() {
+        return beløpSkattMnd;
     }
 
     public Kravgrunnlag431 getKravgrunnlag431() {
@@ -92,6 +100,11 @@ public class KravgrunnlagPeriode432 extends BaseEntitet {
             return this;
         }
 
+        public Builder medBeløpSkattMnd(BigDecimal beløpSkattMnd) {
+            this.kladd.beløpSkattMnd = beløpSkattMnd;
+            return this;
+        }
+
         public Builder medKravgrunnlag431(Kravgrunnlag431 kravgrunnlag431) {
             this.kladd.kravgrunnlag431 = kravgrunnlag431;
             return this;
@@ -109,6 +122,7 @@ public class KravgrunnlagPeriode432 extends BaseEntitet {
         return getClass().getSimpleName() + "<" + //$NON-NLS-1$
             (id != null ? "id=" + id + ", " : "") //$NON-NLS-1$ //$NON-NLS-2$
             + "periode=" + periode + ", " //$NON-NLS-1$ //$NON-NLS-2$
+            + "beløpSkattMnd=" + beløpSkattMnd + ", " //$NON-NLS-1$ //$NON-NLS-2$
             + ">";//$NON-NLS-1$
     }
 }

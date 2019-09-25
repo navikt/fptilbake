@@ -124,6 +124,7 @@ public class GrunnlagRestTestTjeneste {
     private KravgrunnlagPeriode432 formKravgrunnlagPeriode432(Kravgrunnlag431 kravgrunnlag431, DetaljertKravgrunnlagPeriodeDto periodeDto) {
         return KravgrunnlagPeriode432.builder()
             .medPeriode(Periode.of(periodeDto.getFom(), periodeDto.getTom()))
+            .medBeløpSkattMnd(periodeDto.getBeløpSkattMnd())
             .medKravgrunnlag431(kravgrunnlag431)
             .build();
     }
@@ -136,6 +137,7 @@ public class GrunnlagRestTestTjeneste {
             .medNyBelop(postering.getNyBelop())
             .medTilbakekrevesBelop(postering.getTilbakekrevesBelop())
             .medUinnkrevdBelop(postering.getUinnkrevdBelop())
+            .medSkattProsent(postering.getSkattProsent())
             .medResultatKode(postering.getResultatKode())
             .medÅrsakKode(postering.getÅrsakKode())
             .medSkyldKode(postering.getSkyldKode())

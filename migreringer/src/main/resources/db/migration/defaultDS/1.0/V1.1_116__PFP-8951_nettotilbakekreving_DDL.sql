@@ -1,0 +1,7 @@
+ALTER TABLE KRAV_GRUNNLAG_BELOP_433 ADD SKATT_PROSENT NUMBER(7,4);
+
+COMMENT ON COLUMN KRAV_GRUNNLAG_BELOP_433.SKATT_PROSENT is 'Angir gjeldende skatt prosent som skal trekke fra brutto tilbakekrevingsbeløp for nettotilbakekreving';
+
+ALTER TABLE KRAV_GRUNNLAG_PERIODE_432 ADD BELOP_SKATT_MND NUMBER(12,2);
+
+COMMENT ON COLUMN KRAV_GRUNNLAG_PERIODE_432.BELOP_SKATT_MND is 'Angir total skatt beløp per måned';
