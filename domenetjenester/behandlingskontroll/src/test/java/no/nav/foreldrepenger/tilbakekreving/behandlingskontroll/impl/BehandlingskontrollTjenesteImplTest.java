@@ -191,7 +191,7 @@ public class BehandlingskontrollTjenesteImplTest {
 
         Assertions.assertThat(behandling.getAktivtBehandlingSteg()).isEqualTo(STEG_2);
         Assertions.assertThat(behandling.getStatus()).isEqualTo(BehandlingStatus.UTREDES);
-        Assertions.assertThat(behandling.getBehandlingStegStatus()).isEqualTo(BehandlingStegStatus.INNGANG);
+        Assertions.assertThat(behandling.getBehandlingStegStatus()).isEqualTo(BehandlingStegStatus.UTGANG);
         Assertions.assertThat(behandling.getBehandlingStegTilstand()).isNotNull();
 
         Assertions.assertThat(behandling.getBehandlingStegTilstand(STEG_2)).isPresent();
@@ -200,7 +200,7 @@ public class BehandlingskontrollTjenesteImplTest {
         sjekkBehandlingStegTilstandHistorikk(behandling, STEG_3,
                 BehandlingStegStatus.TILBAKEFØRT);
         sjekkBehandlingStegTilstandHistorikk(behandling, STEG_2,
-                BehandlingStegStatus.INNGANG);
+                BehandlingStegStatus.UTGANG);
 
     }
 

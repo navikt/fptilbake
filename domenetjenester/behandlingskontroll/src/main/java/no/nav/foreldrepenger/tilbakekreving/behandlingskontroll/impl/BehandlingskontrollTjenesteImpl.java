@@ -198,7 +198,7 @@ public class BehandlingskontrollTjenesteImpl implements BehandlingskontrollTjene
     public void behandlingTilbakeføringTilTidligereBehandlingSteg(BehandlingskontrollKontekst kontekst,
                                                                   BehandlingStegType tidligereStegType) {
 
-        final BehandlingStegStatus startStatusForNyttSteg = getStatusKonfigurasjon().getInngang();
+        final BehandlingStegStatus startStatusForNyttSteg = getStatusKonfigurasjon().getUtgang();
         Behandling behandling = behandlingRepository.hentBehandling(kontekst.getBehandlingId());
 
         BehandlingStegType stegType = behandling.getAktivtBehandlingSteg();
