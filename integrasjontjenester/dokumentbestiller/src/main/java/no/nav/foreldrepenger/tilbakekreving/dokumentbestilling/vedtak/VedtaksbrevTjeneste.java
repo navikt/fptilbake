@@ -21,6 +21,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BeregningResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevdataRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VarselbrevSporing;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevOppsummering;
@@ -306,6 +307,8 @@ public class VedtaksbrevTjeneste {
                 builder.medForeldetBeløp(resultatPeriode.getFeilutbetaltBeløp().subtract(resultatPeriode.getTilbakekrevingBeløp()));
             }
             builder.medForeldelsevurdering(foreldelsePeriode.getForeldelseVurderingType());
+        } else {
+            builder.medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT);
         }
         return builder.build();
     }
@@ -331,7 +334,8 @@ public class VedtaksbrevTjeneste {
         return null;
     }
 
-    private VilkårVurderingPeriodeEntitet finnVilkårvurdering(Periode periode, List<VilkårVurderingPeriodeEntitet> vilkårPerioder) {
+    private VilkårVurderingPeriodeEntitet finnVilkårvurdering(Periode
+                                                                  periode, List<VilkårVurderingPeriodeEntitet> vilkårPerioder) {
         for (VilkårVurderingPeriodeEntitet vurdering : vilkårPerioder) {
             if (vurdering.getPeriode().omslutter(periode)) {
                 return vurdering;
