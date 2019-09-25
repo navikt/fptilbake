@@ -1,12 +1,10 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultatPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.FritekstType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VarselbrevSporing;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevPeriode;
@@ -20,7 +18,7 @@ public class VedtaksbrevUtil {
     }
 
     public static LocalDateTime finnNyesteVarselbrevTidspunkt(List<VarselbrevSporing> utsendteVarselbrev) {
-        if(utsendteVarselbrev.isEmpty()){
+        if (utsendteVarselbrev.isEmpty()) {
             return FPDateUtil.nå();
         }
         LocalDateTime nyesteVarselSendt = utsendteVarselbrev.get(0).getOpprettetTidspunkt();
@@ -30,12 +28,6 @@ public class VedtaksbrevUtil {
             }
         }
         return nyesteVarselSendt;
-    }
-
-    public static Long finnTotaltTilbakekrevingsbeløp(List<BeregningResultatPeriode> beregningResultatPerioder) {
-        BigDecimal totalTilbakekrevingBeløp = beregningResultatPerioder.stream().map(BeregningResultatPeriode::getTilbakekrevingBeløp)
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
-        return totalTilbakekrevingBeløp.longValue();
     }
 
     public static List<PeriodeMedTekstDto> mapFritekstFraDb(List<VedtaksbrevPeriode> eksisterendePerioderForBrev) {

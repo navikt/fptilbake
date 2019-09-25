@@ -9,6 +9,7 @@ import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.SærligGrunn;
@@ -47,10 +48,9 @@ public class HbVedtaksbrevPeriode implements HandlebarsData {
     @JsonSerialize(using = KodelisteSomKodeSerialiserer.class)
     private Vurdering aktsomhetResultat;
 
-    @JsonProperty("foreldelse-vurdert")
-    private boolean foreldelseErVurdert = false;
-    @JsonProperty("foreldelse-tilleggsfrist-anvendt")
-    private Boolean foreldelseAnvendtTilleggsfrist;
+    @JsonSerialize(using = KodelisteSomKodeSerialiserer.class)
+    @JsonProperty("foreldelsevurdering")
+    private ForeldelseVurderingType foreldelsevurdering;
     @JsonProperty("foreldet-beløp")
     @JsonSerialize(using = BigDecimalHeltallSerialiserer.class)
     private BigDecimal foreldetBeløp;
@@ -156,13 +156,8 @@ public class HbVedtaksbrevPeriode implements HandlebarsData {
             return this;
         }
 
-        public Builder medForeldelseErVurdert(boolean foreldelseErVurdert) {
-            kladd.foreldelseErVurdert = foreldelseErVurdert;
-            return this;
-        }
-
-        public Builder medForeldelseAnvendtTilleggsfrist(boolean foreldelseAnvendtTilleggsfrist) {
-            kladd.foreldelseAnvendtTilleggsfrist = foreldelseAnvendtTilleggsfrist;
+        public Builder medForeldelsevurdering(ForeldelseVurderingType foreldelsevurdering) {
+            kladd.foreldelsevurdering = foreldelsevurdering;
             return this;
         }
 
@@ -227,7 +222,11 @@ public class HbVedtaksbrevPeriode implements HandlebarsData {
         public HbVedtaksbrevPeriode build() {
             Objects.check(kladd.fom != null, "fra og med dato er ikke satt");
             Objects.check(kladd.tom != null, "til og med dato er ikke satt");
-            Objects.check(kladd.vilkårResultat != null, "vilkårResultat er ikke satt");
+            Objects.check(kladd.foreldelsevurdering != null, "foreldelsevurdering er ikke satt");
+            if (ForeldelseVurderingType.IKKE_VURDERT.equals(kladd.foreldelsevurdering) ||
+                ForeldelseVurderingType.IKKE_FORELDET.equals(kladd.foreldelsevurdering)) {
+                Objects.check(kladd.vilkårResultat != null, "vilkårResultat er ikke satt");
+            }
             Objects.check(kladd.hendelsetype != null, "hendelsetype er ikke satt");
             Objects.check(kladd.hendelseundertype != null, "hendelseundertype er ikke satt");
             Objects.check(kladd.tilbakekrevesBeløp != null, "tilbakekrevesbeløp er ikke satt");

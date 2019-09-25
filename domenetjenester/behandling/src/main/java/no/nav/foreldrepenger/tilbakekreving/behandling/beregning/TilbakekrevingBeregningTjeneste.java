@@ -3,6 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.beregning;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -83,6 +84,7 @@ public class TilbakekrevingBeregningTjeneste {
         List<BeregningResultatPeriode> resulat = new ArrayList<>();
         resulat.addAll(beregnForForeldedePerioder(vurdertForeldelse, perioderMedBeløp));
         resulat.addAll(beregnForIkkeForeldedePerioder(vilkårsvurdering, perioderMedBeløp));
+        resulat.sort(Comparator.comparing(b -> b.getPeriode().getFom()));
         return resulat;
     }
 
