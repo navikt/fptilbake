@@ -218,7 +218,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
 
     @Test
     public void skal_parse_tekst_til_avsnitt() {
-        Avsnitt resultat = TekstformatererVedtaksbrev.parseTekst("_Hovedoverskrift i brevet\n\nBrødtekst første avsnitt\n\nBrødtekst andre avsnitt\n\n_underoverskrift\n\nBrødtekst tredje avsnitt\n\n_Avsluttende overskrift uten etterfølgende tekst\n\\\\//", new Avsnitt.Builder(), null).build();
+        Avsnitt resultat = TekstformatererVedtaksbrev.parseTekst("_Hovedoverskrift i brevet\n\nBrødtekst første avsnitt\n\nBrødtekst andre avsnitt\n\n_underoverskrift\n\nBrødtekst tredje avsnitt\n\n_Avsluttende overskrift uten etterfølgende tekst\n" + TekstformatererVedtaksbrev.markerFritekst(null), new Avsnitt.Builder(), null).build();
         assertThat(resultat.getOverskrift()).isEqualTo("Hovedoverskrift i brevet");
         List<Underavsnitt> underavsnitt = resultat.getUnderavsnittsliste();
         assertThat(underavsnitt).hasSize(4);
@@ -238,7 +238,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
 
     @Test
     public void skal_plassere_fritekstfelt_etter_første_avsnitt_når_det_er_valgt() {
-        Avsnitt resultat = TekstformatererVedtaksbrev.parseTekst("_Hovedoverskrift i brevet\n\nBrødtekst første avsnitt\n\\\\//\n\nBrødtekst andre avsnitt\n\n_underoverskrift\n\nBrødtekst tredje avsnitt\n\n_Avsluttende overskrift uten etterfølgende tekst", new Avsnitt.Builder(), null).build();
+        Avsnitt resultat = TekstformatererVedtaksbrev.parseTekst("_Hovedoverskrift i brevet\n\nBrødtekst første avsnitt\n" + TekstformatererVedtaksbrev.markerFritekst(null) + "\nBrødtekst andre avsnitt\n\n_underoverskrift\n\nBrødtekst tredje avsnitt\n\n_Avsluttende overskrift uten etterfølgende tekst", new Avsnitt.Builder(), null).build();
         assertThat(resultat.getOverskrift()).isEqualTo("Hovedoverskrift i brevet");
         List<Underavsnitt> underavsnitt = resultat.getUnderavsnittsliste();
         assertThat(underavsnitt).hasSize(4);
@@ -259,7 +259,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
     @Test
     public void skal_plassere_fritekstfelt_etter_overskriften_når_det_er_valgt() {
         Avsnitt.Builder avsnittbuilder = new Avsnitt.Builder().medOverskrift("Hovedoverskrift");
-        Avsnitt resultat = TekstformatererVedtaksbrev.parseTekst("_underoverskrift 1\n\\\\//\n\nBrødtekst første avsnitt\n\n_underoverskrift 2\n\nBrødtekst andre avsnitt", avsnittbuilder, null).build();
+        Avsnitt resultat = TekstformatererVedtaksbrev.parseTekst("_underoverskrift 1\n" + TekstformatererVedtaksbrev.markerFritekst(null) + "\nBrødtekst første avsnitt\n\n_underoverskrift 2\n\nBrødtekst andre avsnitt", avsnittbuilder, null).build();
         assertThat(resultat.getOverskrift()).isEqualTo("Hovedoverskrift");
         List<Underavsnitt> underavsnitt = resultat.getUnderavsnittsliste();
         assertThat(underavsnitt).hasSize(3);
@@ -273,5 +273,21 @@ public class TekstformatererVedtaksbrevIBiterTest {
         assertThat(underavsnitt.get(2).getBrødtekst()).isEqualTo("Brødtekst andre avsnitt");
         assertThat(underavsnitt.get(2).isFritekstTillatt()).isFalse();
     }
+
+    @Test
+    public void skal_parse_fritekstfelt_med_eksisterende_fritekst() {
+        Avsnitt.Builder avsnittbuilder = new Avsnitt.Builder().medOverskrift("Hovedoverskrift");
+        Avsnitt resultat = TekstformatererVedtaksbrev.parseTekst("_underoverskrift 1\n"
+                + TekstformatererVedtaksbrev.markerFritekst("fritekst linje 1\n\nfritekst linje2")
+            , avsnittbuilder, null).build();
+        assertThat(resultat.getOverskrift()).isEqualTo("Hovedoverskrift");
+        List<Underavsnitt> underavsnitt = resultat.getUnderavsnittsliste();
+        //assertThat(underavsnitt).hasSize(1);
+        assertThat(underavsnitt.get(0).getOverskrift()).isEqualTo("underoverskrift 1");
+        assertThat(underavsnitt.get(0).getBrødtekst()).isNull();
+        assertThat(underavsnitt.get(0).isFritekstTillatt()).isTrue();
+        assertThat(underavsnitt.get(0).getFritekst()).isEqualTo("fritekst linje 1\n\nfritekst linje2");
+    }
+
 
 }

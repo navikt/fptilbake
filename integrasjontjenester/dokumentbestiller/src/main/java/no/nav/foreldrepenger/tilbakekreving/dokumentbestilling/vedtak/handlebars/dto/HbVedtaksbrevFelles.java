@@ -73,6 +73,10 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
         return ytelsetype;
     }
 
+    public String getFritekstOppsummering() {
+        return fritekstOppsummering;
+    }
+
     public void setFritekstOppsummering(String fritekstOppsummering) {
         this.fritekstOppsummering = fritekstOppsummering;
     }
