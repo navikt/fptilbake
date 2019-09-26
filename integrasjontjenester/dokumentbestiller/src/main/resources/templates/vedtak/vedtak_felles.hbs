@@ -6,6 +6,7 @@
 {{#* inline "det-samme-barnet"}}{{eq antall-barn 1 yes="det samme barnet" no="de samme barna"}}{{/inline}}
 {{#* inline "familie-hendelse"}}{{#if er-adopsjon}}da du overtok omsorgen for {{> barnet-ditt}}{{else}}da {{> barnet-ditt}} ble født{{/if}}{{/inline}}
 {{#* inline "skulle-forstått"}}{{lookup-map aktsomhet-resultat SIMPEL_UAKTSOM="burde forstått" GROVT_UAKTSOM="må ha forstått"}}{{/inline}}
+{{#* inline "før-skatt"}}{{#if (neq ytelsetype "ES")}} før skatt{{/if}}{{/inline}}
 {{#* inline "hovedoverskrift"}}_{{/inline}}
 {{#* inline "underoverskrift_start"}}_{{/inline}}
 {{#* inline "underoverskrift_slutt"}}{{/inline}}
