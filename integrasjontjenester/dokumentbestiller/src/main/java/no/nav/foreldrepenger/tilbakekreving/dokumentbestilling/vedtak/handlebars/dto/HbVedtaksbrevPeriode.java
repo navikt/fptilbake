@@ -67,6 +67,9 @@ public class HbVedtaksbrevPeriode implements HandlebarsData {
     @JsonProperty("tilbakekreves-beløp")
     @JsonSerialize(using = BigDecimalHeltallSerialiserer.class)
     private BigDecimal tilbakekrevesBeløp;
+    @JsonProperty("tilbakekreves-beløp-med-renter")
+    @JsonSerialize(using = BigDecimalHeltallSerialiserer.class)
+    private BigDecimal tilbakekrevesBeløpMedRenter;
     @JsonProperty("renter-beløp")
     @JsonSerialize(using = BigDecimalHeltallSerialiserer.class)
     private BigDecimal renterBeløp;
@@ -230,6 +233,11 @@ public class HbVedtaksbrevPeriode implements HandlebarsData {
             Objects.check(kladd.hendelsetype != null, "hendelsetype er ikke satt");
             Objects.check(kladd.hendelseundertype != null, "hendelseundertype er ikke satt");
             Objects.check(kladd.tilbakekrevesBeløp != null, "tilbakekrevesbeløp er ikke satt");
+
+            kladd.tilbakekrevesBeløpMedRenter = kladd.renterBeløp != null
+                ? kladd.tilbakekrevesBeløp.add(kladd.renterBeløp)
+                : kladd.tilbakekrevesBeløp;
+
             return kladd;
         }
 
