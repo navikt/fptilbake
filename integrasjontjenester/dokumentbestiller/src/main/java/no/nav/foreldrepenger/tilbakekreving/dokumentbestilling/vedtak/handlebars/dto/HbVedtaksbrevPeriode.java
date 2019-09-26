@@ -103,12 +103,24 @@ public class HbVedtaksbrevPeriode implements HandlebarsData {
         this.fritekstFakta = fritekstFakta;
     }
 
+    public String getFritekstFakta() {
+        return fritekstFakta;
+    }
+
     public void setFritekstSærligeGrunner(String fritekstSærligeGrunner) {
         this.fritekstSærligeGrunner = fritekstSærligeGrunner;
     }
 
+    public String getFritekstSærligeGrunner() {
+        return fritekstSærligeGrunner;
+    }
+
     public void setFritekstVilkår(String fritekstVilkår) {
         this.fritekstVilkår = fritekstVilkår;
+    }
+
+    public String getFritekstVilkår() {
+        return fritekstVilkår;
     }
 
     public static Builder builder() {
