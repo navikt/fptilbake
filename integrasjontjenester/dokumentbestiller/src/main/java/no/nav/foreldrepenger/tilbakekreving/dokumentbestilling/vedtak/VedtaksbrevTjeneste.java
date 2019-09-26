@@ -264,7 +264,7 @@ public class VedtaksbrevTjeneste {
             .medHendelsetype(finnHendelseType(periode, fakta))
             .medHendelseUndertype(finnHendelseUnderType(periode, fakta))
             .medFeilutbetaltBeløp(resultatPeriode.getFeilutbetaltBeløp())
-            .medTilbakekrevesBeløp(resultatPeriode.getTilbakekrevingBeløp())
+            .medTilbakekrevesBeløp(resultatPeriode.getTilbakekrevingBeløpUtenRenter())
             //.medRiktigBeløp(FIXME - legg til i BeregningResultatPeriode)
             //.medUtbetaltBeløp(FIXME- legg til i BeregningResultatPeriode)
             .medRenterBeløp(resultatPeriode.getRenteBeløp());
