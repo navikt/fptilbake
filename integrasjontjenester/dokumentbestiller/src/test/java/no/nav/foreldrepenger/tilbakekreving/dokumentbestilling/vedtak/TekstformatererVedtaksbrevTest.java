@@ -324,7 +324,7 @@ public class TekstformatererVedtaksbrevTest {
         HbVedtaksbrevFelles vedtaksbrevData = HbVedtaksbrevFelles.builder()
             .medErFødsel(true)
             .medAntallBarn(1)
-            .medHovedresultat(VedtakResultatType.INGEN_TILBAKEBETALING)
+            .medHovedresultat(VedtakResultatType.DELVIS_TILBAKEBETALING)
             .medLovhjemmelVedtak("Folketrygdloven § 22-15")
             .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
             .medVarsletBeløp(BigDecimal.valueOf(2000))
