@@ -27,6 +27,7 @@ class TilbakekrevingBeregnerVilkår {
         boolean renter = finnRenter(vilkårVurdering);
         BigDecimal andel = finnAndelAvBeløp(vilkårVurdering);
         BigDecimal manueltBeløp = finnManueltSattBeløp(vilkårVurdering);
+        boolean ignoreresPgaLavtBeløp = Boolean.FALSE.equals(vilkårVurdering.tilbakekrevesSmåbeløp());
 
         BeregningResultatPeriode resulat = new BeregningResultatPeriode();
         resulat.setPeriode(periode);
@@ -36,7 +37,9 @@ class TilbakekrevingBeregnerVilkår {
         resulat.setAndelAvBeløp(andel);
         resulat.setManueltSattTilbakekrevingsbeløp(manueltBeløp);
 
-        BigDecimal beløpUtenRenter = finnBeløpUtenRenter(kravgrunnlagBeløp, andel, manueltBeløp);
+        BigDecimal beløpUtenRenter = ignoreresPgaLavtBeløp
+            ? BigDecimal.ZERO
+            : finnBeløpUtenRenter(kravgrunnlagBeløp, andel, manueltBeløp);
         BigDecimal rentebeløp = beregnRentebeløp(beløpUtenRenter, renter);
         BigDecimal totalBeløp = beløpUtenRenter.add(rentebeløp);
 

@@ -64,6 +64,22 @@ public class TilbakekrevingBeregnerVilkårTest {
     }
 
     @Test
+    public void skal_ikke_kreve_noe_når_sjette_ledd_benyttes_for_å_ikke_gjøre_innkreving_av_småbeløp() {
+        vurdering.setAktsomhet(VilkårVurderingAktsomhetEntitet.builder()
+            .medAktsomhet(Aktsomhet.SIMPEL_UAKTSOM)
+            .medBegrunnelse("foo")
+            .medPeriode(vurdering)
+            .medSærligGrunnerTilReduksjon(false)
+            .medTilbakekrevSmåBeløp(false)
+            .build());
+
+        //assert
+        BeregningResultatPeriode resultat = TilbakekrevingBeregnerVilkår.beregn(vurdering, BigDecimal.valueOf(522));
+        assertThat(resultat.getTilbakekrevingBeløp()).isEqualByComparingTo(BigDecimal.ZERO);
+        assertThat(resultat.getVurdering()).isEqualByComparingTo(Aktsomhet.SIMPEL_UAKTSOM);
+    }
+
+    @Test
     public void skal_kreve_tilbake_deler_ved_grov_uaktsomhet_når_særlige_grunner_er_valgt_og_ilegge_renter_når_det_er_valgt() {
         vurdering.setAktsomhet(VilkårVurderingAktsomhetEntitet.builder()
             .medAktsomhet(Aktsomhet.GROVT_UAKTSOM)
