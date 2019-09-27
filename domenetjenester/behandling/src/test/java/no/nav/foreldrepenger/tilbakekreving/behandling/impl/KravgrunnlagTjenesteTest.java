@@ -34,7 +34,7 @@ public class KravgrunnlagTjenesteTest extends FellesTestOppsett {
     private static final String ENHET = "8020";
 
     private GjenopptaBehandlingTjeneste mockGjenopptaBehandlingTjeneste = mock(GjenopptaBehandlingTjeneste.class);
-    private KravgrunnlagTjeneste kravgrunnlagTjeneste = new KravgrunnlagTjeneste(grunnlagRepository, mockGjenopptaBehandlingTjeneste, behandlingskontrollTjeneste);
+    private KravgrunnlagTjeneste kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repoProvider, mockGjenopptaBehandlingTjeneste, behandlingskontrollTjeneste);
 
     private static final LocalDate fom = LocalDate.of(2016, 3, 15);
     private static final LocalDate tom = LocalDate.of(2016, 3, 18);
