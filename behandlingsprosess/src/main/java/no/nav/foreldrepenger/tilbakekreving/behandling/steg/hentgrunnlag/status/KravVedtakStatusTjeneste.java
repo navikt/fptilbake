@@ -59,7 +59,7 @@ public class KravVedtakStatusTjeneste {
     private void settBehandlingPåVent(Long behandlingId) {
         LocalDateTime fristDato = FPDateUtil.nå().plusMonths(3);
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-        behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, BehandlingStegType.VTILBSTEG, fristDato, Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
+        behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, BehandlingStegType.TBKGSTEG, fristDato, Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
     }
 
     public interface KravVedtakStatusTjenesteFeil extends DeklarerteFeil {
