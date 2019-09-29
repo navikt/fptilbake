@@ -17,6 +17,7 @@ import no.nav.abac.xacml.StandardAttributter;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakStatus;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.TilbakekrevingAbacAttributtType;
 import no.nav.foreldrepenger.tilbakekreving.pip.PipBehandlingData;
 import no.nav.foreldrepenger.tilbakekreving.pip.PipRepository;
@@ -85,6 +86,19 @@ public class PdpRequestBuilderImplTest {
         assertThat(request.getString(NavAttributter.RESOURCE_FORELDREPENGER_SAK_ANSVARLIG_SAKSBEHANDLER)).isNull();
         assertThat(request.getString(NavAttributter.RESOURCE_FORELDREPENGER_SAK_SAKSSTATUS)).isEqualTo(AbacFagsakStatus.UNDER_BEHANDLING.getEksternKode());
         assertThat(request.getString(NavAttributter.RESOURCE_FORELDREPENGER_SAK_BEHANDLINGSSTATUS)).isEqualTo(AbacBehandlingStatus.OPPRETTET.getEksternKode());
+        assertThat(request.getString(StandardAttributter.ACTION_ID)).isEqualTo(BeskyttetRessursActionAttributt.READ.getEksternKode());
+    }
+
+    @Test
+    public void skal_hente_aktører_fra_fpsak_når_input_er_saksnummer() {
+        AbacAttributtSamling attributter = byggAbacAttributtsamling().leggTil(
+            AbacDataAttributter.opprett().leggTil(StandardAbacAttributtType.SAKSNUMMER, SAKSNUMMER));
+
+        when(fpsakPipKlient.hentAktørIderSomString(new Saksnummer(SAKSNUMMER))).thenReturn(Set.of(PERSON2));
+
+        PdpRequest request = requestBuilder.lagPdpRequest(attributter);
+        assertThat(request.getListOfString(NavAttributter.RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE)).containsOnly(PERSON2);
+        assertThat(request.getString(NavAttributter.RESOURCE_FORELDREPENGER_SAK_ANSVARLIG_SAKSBEHANDLER)).isNull();
         assertThat(request.getString(StandardAttributter.ACTION_ID)).isEqualTo(BeskyttetRessursActionAttributt.READ.getEksternKode());
     }
 

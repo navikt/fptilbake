@@ -16,6 +16,7 @@ import no.nav.abac.xacml.NavAttributter;
 import no.nav.abac.xacml.StandardAttributter;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakStatus;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.TilbakekrevingAbacAttributtType;
 import no.nav.foreldrepenger.tilbakekreving.pip.PipBehandlingData;
 import no.nav.foreldrepenger.tilbakekreving.pip.PipRepository;
@@ -169,21 +170,27 @@ public class PdpRequestBuilderImpl implements PdpRequestBuilder {
         throw PdpRequestBuilderFeil.FACTORY.ugyldigInputFlereBehandlingUuid(behandlingUuider).toException();
     }
 
-    private Set<String> utledAktørIder(AbacAttributtSamling attributter) {
-        return attributter.getAktørIder();
-    }
-
     private Set<String> utledAktørIder(AbacAttributtSamling attributter, PipBehandlingData behandlingData) {
         Set<String> resultat = new HashSet<>();
-        resultat.addAll(utledAktørIder(attributter));
+        resultat.addAll(attributter.getAktørIder());
         if (behandlingData != null) {
             resultat.addAll(behandlingData.getAktørIdSomStrenger());
+        }
+        Set<String> saksnumre = attributter.getSaksnummre();
+        if (saksnumre.size() == 1) {
+            resultat.addAll(fpsakPipKlient.hentAktørIderSomString(new Saksnummer(saksnumre.iterator().next())));
+        }
+        if (saksnumre.size() > 1) {
+            throw PdpRequestBuilderFeil.FACTORY.ugyldigInputFlereSaksnumre(saksnumre).toException();
         }
         return resultat;
     }
 
     public interface PdpRequestBuilderFeil extends DeklarerteFeil {
         PdpRequestBuilderFeil FACTORY = FeilFactory.create(PdpRequestBuilderFeil.class);
+
+        @TekniskFeil(feilkode = "FPT-898315", feilmelding = "Ugyldig input. Støtter bare 0 eller 1 sak, men har %s", logLevel = LogLevel.WARN)
+        Feil ugyldigInputFlereSaksnumre(Collection<String> saksnumre);
 
         @TekniskFeil(feilkode = "FPT-426124", feilmelding = "Ugyldig input. Støtter bare 0 eller 1 behandling, men har %s", logLevel = LogLevel.WARN)
         Feil ugyldigInputFlereBehandlingIder(Collection<Long> behandlingId);
