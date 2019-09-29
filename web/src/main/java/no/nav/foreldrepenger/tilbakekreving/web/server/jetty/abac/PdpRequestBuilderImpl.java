@@ -27,10 +27,12 @@ import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
 import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
 import no.nav.vedtak.sikkerhet.abac.AbacAttributtSamling;
 import no.nav.vedtak.sikkerhet.abac.AbacBehandlingStatus;
+import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.AbacFagsakStatus;
 import no.nav.vedtak.sikkerhet.abac.PdpKlient;
 import no.nav.vedtak.sikkerhet.abac.PdpRequest;
 import no.nav.vedtak.sikkerhet.abac.PdpRequestBuilder;
+import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
 import no.nav.vedtak.util.MdcExtendedLogContext;
 
 /**
@@ -78,6 +80,12 @@ public class PdpRequestBuilderImpl implements PdpRequestBuilder {
 
         Set<String> aktørIder = utledAktørIder(attributter, behandlingData);
         Set<String> aksjonspunkttype = pipRepository.hentAksjonspunkttypeForAksjonspunktkoder(attributter.getAksjonspunktKode());
+
+        //legger til utledede attributter til AbacAttributtSamling, slik at de kan bli logget til sporingslogg
+        AbacDataAttributter utlededeAttributter = AbacDataAttributter.opprett();
+        utlededeAttributter.leggTil(StandardAbacAttributtType.AKTØR_ID, aktørIder);
+        fpsakBehandlingId.ifPresent(utlededeAttributter::leggTilBehandlingsUUID);
+        attributter.leggTil(utlededeAttributter);
 
         return behandlingData != null
             ? lagPdpRequest(attributter, aktørIder, aksjonspunkttype, behandlingData)
