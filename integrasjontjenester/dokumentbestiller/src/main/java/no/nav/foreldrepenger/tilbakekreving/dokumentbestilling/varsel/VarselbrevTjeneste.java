@@ -83,7 +83,6 @@ public class VarselbrevTjeneste {
     public byte[] hentForhåndsvisningVarselbrev(HentForhåndsvisningVarselbrevDto hentForhåndsvisningVarselbrevDto) {
         VarselbrevSamletInfo varselbrevSamletInfo = lagVarselbrevForForhåndsvisning(
             hentForhåndsvisningVarselbrevDto.getBehandlingUuid(),
-            new Saksnummer(hentForhåndsvisningVarselbrevDto.getSaksnummer()),
             hentForhåndsvisningVarselbrevDto.getVarseltekst(),
             hentForhåndsvisningVarselbrevDto.getFagsakYtelseType());
 
@@ -149,7 +148,7 @@ public class VarselbrevTjeneste {
             ytelseNavn);
     }
 
-    public VarselbrevSamletInfo lagVarselbrevForForhåndsvisning(UUID behandlingUuId, Saksnummer saksnummer, String varseltekst, FagsakYtelseType fagsakYtleseType) {
+    public VarselbrevSamletInfo lagVarselbrevForForhåndsvisning(UUID behandlingUuId, String varseltekst, FagsakYtelseType fagsakYtleseType) {
         SamletEksternBehandlingInfo eksternBehandlingsinfo = eksternDataForBrevTjeneste.hentBehandlingFpsak(behandlingUuId, Tillegsinformasjon.PERSONOPPLYSNINGER, Tillegsinformasjon.VARSELTEKST);
 
         String aktørId = eksternBehandlingsinfo.getAktørId().getId();
@@ -163,9 +162,8 @@ public class VarselbrevTjeneste {
         }
         Språkkode mottakersSpråkkode = grunninformasjon.getSprakkode();
         YtelseNavn ytelseNavn = eksternDataForBrevTjeneste.hentYtelsenavn(fagsakYtleseType, mottakersSpråkkode);
-
         return VarselbrevUtil.sammenstillInfoFraFagsystemerForhåndvisningVarselbrev(
-            saksnummer,
+            eksternBehandlingsinfo.getSaksnummer(),
             varseltekst,
             adresseinfo,
             eksternBehandlingsinfo,

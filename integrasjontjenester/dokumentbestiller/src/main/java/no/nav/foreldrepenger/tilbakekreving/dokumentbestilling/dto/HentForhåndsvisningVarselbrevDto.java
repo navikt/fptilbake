@@ -3,16 +3,15 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto;
 import java.util.UUID;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.ValidKodeverk;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.TilbakekrevingAbacAttributtType;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.AbacDto;
-import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
 import no.nav.vedtak.util.InputValideringRegex;
 
 public class HentForhåndsvisningVarselbrevDto implements AbacDto {
@@ -21,10 +20,6 @@ public class HentForhåndsvisningVarselbrevDto implements AbacDto {
     @Valid
     private UUID behandlingUuid;
 
-    @NotNull
-    @Digits(integer = 18, fraction = 0)
-    private String saksnummer; // TODO bør bruke egen DTO
-
     @Size(max = 1500, message = "Varseltekst er for lang")
     @Pattern(regexp = InputValideringRegex.FRITEKST)
     private String varseltekst;
@@ -32,14 +27,6 @@ public class HentForhåndsvisningVarselbrevDto implements AbacDto {
     @NotNull
     @ValidKodeverk
     private FagsakYtelseType fagsakYtelseType;
-
-    public String getSaksnummer() {
-        return saksnummer;
-    }
-
-    public void setSaksnummer(String saksnummer) {
-        this.saksnummer = saksnummer;
-    }
 
     public UUID getBehandlingUuid() {
         return behandlingUuid;
@@ -67,6 +54,6 @@ public class HentForhåndsvisningVarselbrevDto implements AbacDto {
 
     @Override
     public AbacDataAttributter abacAttributter() {
-        return AbacDataAttributter.opprett().leggTil(StandardAbacAttributtType.SAKSNUMMER, getSaksnummer());
+        return AbacDataAttributter.opprett().leggTil(TilbakekrevingAbacAttributtType.FPSAK_BEHANDLING_UUID, behandlingUuid.toString());
     }
 }
