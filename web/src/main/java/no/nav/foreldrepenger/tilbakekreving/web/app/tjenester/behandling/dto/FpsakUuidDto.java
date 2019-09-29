@@ -3,17 +3,19 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto;
 import java.util.UUID;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.TilbakekrevingAbacAttributtType;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.AbacDto;
 
-public class UuidDto implements AbacDto {
+public class FpsakUuidDto implements AbacDto {
 
-
+    @NotNull
     @Valid
     private UUID uuid;
 
-    public UuidDto(String uuid) {
+    public FpsakUuidDto(String uuid) {
         this.uuid = UUID.fromString(uuid);
     }
 
@@ -27,6 +29,6 @@ public class UuidDto implements AbacDto {
 
     @Override
     public AbacDataAttributter abacAttributter() {
-        return AbacDataAttributter.opprett();
+        return AbacDataAttributter.opprett().leggTil(TilbakekrevingAbacAttributtType.FPSAK_BEHANDLING_UUID, uuid.toString());
     }
 }

@@ -53,6 +53,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.Beh
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingDtoTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.ByttBehandlendeEnhetDto;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.FpsakUuidDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.GjenopptaBehandlingDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.HenleggBehandlingDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.KanBehandlingOpprettesDto;
@@ -61,7 +62,6 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.Pro
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.Redirect;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.SettBehandlingPåVentDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.UtvidetBehandlingDto;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.UuidDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.SaksnummerDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.SøkestrengDto;
 import no.nav.vedtak.felles.jpa.Transaction;
@@ -146,11 +146,11 @@ public class BehandlingRestTjeneste {
     })
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     public Response kanOpprettesBehandling(@NotNull @QueryParam("saksnummer") @Valid SaksnummerDto saksnummerDto,
-                                           @NotNull @QueryParam("uuid") @Valid UuidDto uuidDto,
+                                           @NotNull @QueryParam("uuid") @Valid FpsakUuidDto fpsakUuidDto,
                                            @QueryParam("behandlingId") @Valid BehandlingIdDto idDto) {
         KanBehandlingOpprettesDto kanBehandlingOpprettesDto = new KanBehandlingOpprettesDto();
         Saksnummer saksnummer = new Saksnummer(saksnummerDto.getVerdi());
-        UUID eksternUUID = uuidDto.getUuid();
+        UUID eksternUUID = fpsakUuidDto.getUuid();
 
         boolean result = behandlingTjeneste.kanOppretteBehandling(saksnummer, eksternUUID);
         kanBehandlingOpprettesDto.setKanBehandlingOpprettes(result);

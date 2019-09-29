@@ -5,6 +5,7 @@ import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
@@ -13,10 +14,12 @@ import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
 
 public class FeilutbetalingPerioderDto implements AbacDto {
 
+    @NotNull
     @Min(value = 0)
     @Max(value = Long.MAX_VALUE)
     private Long behandlingId;
 
+    @NotNull
     @Size(min = 1, max = 100)
     @Valid
     private List<PeriodeDto> perioder;
@@ -39,8 +42,6 @@ public class FeilutbetalingPerioderDto implements AbacDto {
 
     @Override
     public AbacDataAttributter abacAttributter() {
-        return getBehandlingId() != null ?
-                AbacDataAttributter.opprett().leggTil(StandardAbacAttributtType.BEHANDLING_ID, getBehandlingId()) :
-                AbacDataAttributter.opprett();
+        return AbacDataAttributter.opprett().leggTil(StandardAbacAttributtType.BEHANDLING_ID, behandlingId);
     }
 }

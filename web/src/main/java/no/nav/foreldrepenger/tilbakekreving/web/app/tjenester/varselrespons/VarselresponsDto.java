@@ -14,6 +14,7 @@ import no.nav.vedtak.sikkerhet.abac.AbacDto;
 public class VarselresponsDto implements AbacDto {
 
     @Valid
+    @NotNull
     private BehandlingIdDto behandlingId;
 
     @NotNull

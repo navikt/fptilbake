@@ -41,7 +41,8 @@ public class VarselresponsRestTjeneste {
     private VarselresponsTjeneste responsTjeneste;
     private GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste;
 
-    public VarselresponsRestTjeneste() {}
+    public VarselresponsRestTjeneste() {
+    }
 
     @Inject
     public VarselresponsRestTjeneste(VarselresponsTjeneste responsTjeneste, GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste) {
@@ -52,7 +53,7 @@ public class VarselresponsRestTjeneste {
     @POST
     @ApiOperation(value = "Lagrer respons fra bruker")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Respons registrert")
+        @ApiResponse(code = 200, message = "Respons registrert")
     })
     @Path(value = "/registrer")
     @BeskyttetRessurs(action = UPDATE, ressurs = FAGSAK)
@@ -65,12 +66,12 @@ public class VarselresponsRestTjeneste {
     @GET
     @ApiOperation(value = "Henter respons for behandling")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Respons lagret", response = VarselresponsDto.class),
-            @ApiResponse(code = 404, message = "Response finnes ikke")
+        @ApiResponse(code = 200, message = "Respons lagret", response = VarselresponsDto.class),
+        @ApiResponse(code = 404, message = "Response finnes ikke")
     })
     @Path(value = "/hent-respons")
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
-    public Response finnRespons(@Valid @QueryParam("behandlingId") BehandlingIdDto behandlingIdDto) {
+    public Response finnRespons(@Valid @NotNull @QueryParam("behandlingId") BehandlingIdDto behandlingIdDto) {
         Optional<VarselresponsDto> responsDto = responsTjeneste.hentRespons(behandlingIdDto.getBehandlingId()).map(VarselresponsDto::fraDomene);
         if (responsDto.isPresent()) {
             return Response.ok(responsDto.get()).build();

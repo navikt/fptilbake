@@ -39,10 +39,10 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.BehandlingsprosessApplikasjonTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingDtoTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.FpsakUuidDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.HenleggBehandlingDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.KanBehandlingOpprettesDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.OpprettBehandlingDto;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.UuidDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.SaksnummerDto;
 
 public class BehandlingRestTjenesteTest {
@@ -71,7 +71,7 @@ public class BehandlingRestTjenesteTest {
         behandlingsprosessTjeneste, behandlingskontrollAsynkTjenesteMock);
 
     private static SaksnummerDto saksnummerDto = new SaksnummerDto(GYLDIG_SAKSNR);
-    private static UuidDto uuidDto = new UuidDto(EKSTERN_BEHANDLING_UUID);
+    private static FpsakUuidDto fpsakUuidDto = new FpsakUuidDto(EKSTERN_BEHANDLING_UUID);
     private static BehandlingIdDto behandlingIdDto = new BehandlingIdDto(1l);
 
     @Test
@@ -122,7 +122,7 @@ public class BehandlingRestTjenesteTest {
     public void test_kan_behandling_opprettes_med_tilbakekreving() {
         when(behandlingTjenesteMock.kanOppretteBehandling(any(Saksnummer.class), any(UUID.class))).thenReturn(true);
 
-        Response response = behandlingRestTjeneste.kanOpprettesBehandling(saksnummerDto, uuidDto, null);
+        Response response = behandlingRestTjeneste.kanOpprettesBehandling(saksnummerDto, fpsakUuidDto, null);
         assertThat(response.getEntity()).isNotNull();
         KanBehandlingOpprettesDto kanBehandlingOpprettesDto = (KanBehandlingOpprettesDto) response.getEntity();
         assertThat(kanBehandlingOpprettesDto.isKanBehandlingOpprettes()).isTrue();
@@ -135,7 +135,7 @@ public class BehandlingRestTjenesteTest {
         when(revurderingTjenesteMock.hentEksternBehandling(anyLong())).thenReturn(opprettEksternBehandling());
         when(revurderingTjenesteMock.kanOppretteRevurdering(any(UUID.class))).thenReturn(true);
 
-        Response response = behandlingRestTjeneste.kanOpprettesBehandling(saksnummerDto, uuidDto, behandlingIdDto);
+        Response response = behandlingRestTjeneste.kanOpprettesBehandling(saksnummerDto, fpsakUuidDto, behandlingIdDto);
         assertThat(response.getEntity()).isNotNull();
         KanBehandlingOpprettesDto kanBehandlingOpprettesDto = (KanBehandlingOpprettesDto) response.getEntity();
         assertThat(kanBehandlingOpprettesDto.isKanBehandlingOpprettes()).isFalse();
@@ -148,7 +148,7 @@ public class BehandlingRestTjenesteTest {
         when(revurderingTjenesteMock.hentEksternBehandling(anyLong())).thenReturn(opprettEksternBehandling());
         when(revurderingTjenesteMock.kanOppretteRevurdering(any(UUID.class))).thenReturn(true);
 
-        Response response = behandlingRestTjeneste.kanOpprettesBehandling(saksnummerDto, uuidDto, behandlingIdDto);
+        Response response = behandlingRestTjeneste.kanOpprettesBehandling(saksnummerDto, fpsakUuidDto, behandlingIdDto);
         assertThat(response.getEntity()).isNotNull();
         KanBehandlingOpprettesDto kanBehandlingOpprettesDto = (KanBehandlingOpprettesDto) response.getEntity();
         assertThat(kanBehandlingOpprettesDto.isKanBehandlingOpprettes()).isTrue();
