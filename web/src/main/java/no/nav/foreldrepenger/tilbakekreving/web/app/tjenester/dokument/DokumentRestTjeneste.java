@@ -19,13 +19,12 @@ import com.codahale.metrics.annotation.Timed;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.VarselbrevTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.VedtaksbrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Avsnitt;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.ForhåndvisningVedtaksbrevTekstDto;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.HentForhåndsvisningVarselbrevDto;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.HentForhåndvisningVedtaksbrevPdfDto;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.SendVarselbrevDto;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.VarselbrevTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.VedtaksbrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 
@@ -61,19 +60,6 @@ public class DokumentRestTjeneste {
         responseBuilder.type("application/pdf");
         responseBuilder.header("Content-Disposition", "filename=dokument.pdf");
         return responseBuilder.build();
-    }
-
-    @POST
-    @Timed
-    @Path("/send-varsel")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Genererer varselbrev og sender det til Dokumentproduksjon. Kun til testing.")
-    @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
-    @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public Response sendVarsel(@Valid SendVarselbrevDto sendVarselbrevDto) { // NOSONAR
-        Long behandlingId = sendVarselbrevDto.getBehandlingId();
-        varselbrevTjeneste.sendVarselbrev(behandlingId);
-        return Response.ok().build();
     }
 
     @POST

@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.Tillegsinformasjon;
 import no.nav.vedtak.util.Objects;
 
@@ -46,6 +47,10 @@ public class SamletEksternBehandlingInfo {
 
     public SøknadType getSøknadType(){
         return getSøknad().getSøknadType();
+    }
+
+    public Saksnummer getSaksnummer(){
+        return new Saksnummer(getGrunninformasjon().getSaksnummer());
     }
 
     public int getAntallBarnSøktFor(){

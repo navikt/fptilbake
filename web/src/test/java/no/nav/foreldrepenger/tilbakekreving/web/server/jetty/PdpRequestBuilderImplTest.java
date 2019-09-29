@@ -5,6 +5,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -12,11 +14,16 @@ import org.junit.rules.ExpectedException;
 
 import no.nav.abac.xacml.NavAttributter;
 import no.nav.abac.xacml.StandardAttributter;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakStatus;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.TilbakekrevingAbacAttributtType;
 import no.nav.foreldrepenger.tilbakekreving.pip.PipBehandlingData;
 import no.nav.foreldrepenger.tilbakekreving.pip.PipRepository;
-import no.nav.foreldrepenger.tilbakekreving.pip.fpinfo.intern.FpsakPipKlient;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.FpsakPipKlient;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.PdpRequestBuilderImpl;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.PipDto;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.sikkerhet.abac.AbacAttributtSamling;
 import no.nav.vedtak.sikkerhet.abac.AbacBehandlingStatus;
@@ -31,6 +38,7 @@ public class PdpRequestBuilderImplTest {
 
     private static final String DUMMY_ID_TOKEN = "dummyheader.dymmypayload.dummysignaturee";
     private static final String SAKSNUMMER = "5555";
+    private static final UUID UUID = java.util.UUID.randomUUID();
     private static final Long BEHANDLING_ID = 1234L;
     private static final String SAK_STATUS = "OPPR";
     private static final String PERSON1 = "8888888";
@@ -47,7 +55,7 @@ public class PdpRequestBuilderImplTest {
     private PdpRequestBuilderImpl requestBuilder = new PdpRequestBuilderImpl(pipRepository, fpsakPipKlient);
 
     @Test
-    public void skal_hente_behandling_og_fagsak_informasjon_når_saksnummer_er_input_med_saksbehandler() {
+    public void skal_hente_behandling_og_fagsak_informasjon_når_input_er_behandling_id() {
         AbacAttributtSamling attributter = byggAbacAttributtsamling().leggTil(
             AbacDataAttributter.opprett().leggTil(StandardAbacAttributtType.BEHANDLING_ID, BEHANDLING_ID));
 
@@ -59,6 +67,38 @@ public class PdpRequestBuilderImplTest {
         assertThat(request.getString(NavAttributter.RESOURCE_FORELDREPENGER_SAK_ANSVARLIG_SAKSBEHANDLER)).isEqualTo(SAKSBEHANDLER);
         assertThat(request.getString(NavAttributter.RESOURCE_FORELDREPENGER_SAK_SAKSSTATUS)).isEqualTo(AbacFagsakStatus.OPPRETTET.getEksternKode());
         assertThat(request.getString(NavAttributter.RESOURCE_FORELDREPENGER_SAK_BEHANDLINGSSTATUS)).isEqualTo(AbacBehandlingStatus.UTREDES.getEksternKode());
+        assertThat(request.getString(StandardAttributter.ACTION_ID)).isEqualTo(BeskyttetRessursActionAttributt.READ.getEksternKode());
+    }
+
+    @Test
+    public void skal_hente_behandlinginfo_fra_fpsak_når_input_er_fpsak_behandlingid() {
+        AbacAttributtSamling attributter = byggAbacAttributtsamling().leggTil(
+            AbacDataAttributter.opprett().leggTil(TilbakekrevingAbacAttributtType.FPSAK_BEHANDLING_UUID, UUID.toString()));
+
+        PipDto pipDto = new PipDto();
+        pipDto.setAktørIder(Set.of(new AktørId(PERSON1)));
+        pipDto.setBehandlingStatus(BehandlingStatus.OPPRETTET.getKode());
+        pipDto.setFagsakStatus(FagsakStatus.UNDER_BEHANDLING.getKode());
+        when(fpsakPipKlient.hentPipdataForFpsakBehandling(UUID)).thenReturn(pipDto);
+
+        PdpRequest request = requestBuilder.lagPdpRequest(attributter);
+        assertThat(request.getListOfString(NavAttributter.RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE)).containsOnly(PERSON1);
+        assertThat(request.getString(NavAttributter.RESOURCE_FORELDREPENGER_SAK_ANSVARLIG_SAKSBEHANDLER)).isNull();
+        assertThat(request.getString(NavAttributter.RESOURCE_FORELDREPENGER_SAK_SAKSSTATUS)).isEqualTo(AbacFagsakStatus.UNDER_BEHANDLING.getEksternKode());
+        assertThat(request.getString(NavAttributter.RESOURCE_FORELDREPENGER_SAK_BEHANDLINGSSTATUS)).isEqualTo(AbacBehandlingStatus.OPPRETTET.getEksternKode());
+        assertThat(request.getString(StandardAttributter.ACTION_ID)).isEqualTo(BeskyttetRessursActionAttributt.READ.getEksternKode());
+    }
+
+    @Test
+    public void skal_hente_aktører_fra_fpsak_når_input_er_saksnummer() {
+        AbacAttributtSamling attributter = byggAbacAttributtsamling().leggTil(
+            AbacDataAttributter.opprett().leggTil(StandardAbacAttributtType.SAKSNUMMER, SAKSNUMMER));
+
+        when(fpsakPipKlient.hentAktørIderSomString(new Saksnummer(SAKSNUMMER))).thenReturn(Set.of(PERSON2));
+
+        PdpRequest request = requestBuilder.lagPdpRequest(attributter);
+        assertThat(request.getListOfString(NavAttributter.RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE)).containsOnly(PERSON2);
+        assertThat(request.getString(NavAttributter.RESOURCE_FORELDREPENGER_SAK_ANSVARLIG_SAKSBEHANDLER)).isNull();
         assertThat(request.getString(StandardAttributter.ACTION_ID)).isEqualTo(BeskyttetRessursActionAttributt.READ.getEksternKode());
     }
 
@@ -87,6 +127,21 @@ public class PdpRequestBuilderImplTest {
             AbacDataAttributter.opprett()
                 .leggTil(StandardAbacAttributtType.BEHANDLING_ID, BEHANDLING_ID)
                 .leggTil(StandardAbacAttributtType.BEHANDLING_ID, 85392L));
+
+        requestBuilder.lagPdpRequest(attributter);
+    }
+
+    @Test
+    public void skal_kaste_feil_ved_både_behandlingId_og_behandlingUuid() {
+        expectedException.expect(TekniskException.class);
+        expectedException.expectMessage("FPT-317633");
+        expectedException.expectMessage(BEHANDLING_ID.toString());
+        expectedException.expectMessage(UUID.toString());
+
+        AbacAttributtSamling attributter = byggAbacAttributtsamling().leggTil(
+            AbacDataAttributter.opprett()
+                .leggTil(StandardAbacAttributtType.BEHANDLING_ID, BEHANDLING_ID)
+                .leggTil(TilbakekrevingAbacAttributtType.FPSAK_BEHANDLING_UUID, UUID.toString()));
 
         requestBuilder.lagPdpRequest(attributter);
     }

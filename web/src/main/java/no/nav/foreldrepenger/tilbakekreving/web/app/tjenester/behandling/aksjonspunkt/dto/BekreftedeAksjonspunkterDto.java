@@ -16,6 +16,7 @@ import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
 public class BekreftedeAksjonspunkterDto implements AbacDto {
 
     @Valid
+    @NotNull
     private BehandlingIdDto behandlingId;
 
     @NotNull
@@ -51,7 +52,7 @@ public class BekreftedeAksjonspunkterDto implements AbacDto {
     @Override
     public AbacDataAttributter abacAttributter() {
         AbacDataAttributter abac = AbacDataAttributter.opprett().leggTil(
-                StandardAbacAttributtType.BEHANDLING_ID, getBehandlingId().getBehandlingId());
+            StandardAbacAttributtType.BEHANDLING_ID, getBehandlingId().getBehandlingId());
         bekreftedeAksjonspunktDtoer.forEach(apDto -> abac.leggTil(apDto.abacAttributter()));
         return abac;
     }
