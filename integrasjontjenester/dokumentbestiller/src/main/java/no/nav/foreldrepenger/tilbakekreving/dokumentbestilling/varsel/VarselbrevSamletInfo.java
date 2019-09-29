@@ -1,10 +1,10 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel;
 
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
-import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
-
 import java.time.LocalDate;
 import java.util.List;
+
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
+import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
 public class VarselbrevSamletInfo {
 
