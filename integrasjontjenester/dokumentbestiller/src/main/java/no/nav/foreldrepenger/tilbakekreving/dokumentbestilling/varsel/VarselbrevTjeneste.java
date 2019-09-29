@@ -1,9 +1,13 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
@@ -35,6 +39,7 @@ import no.nav.vedtak.felles.jpa.Transaction;
 @Transaction
 public class VarselbrevTjeneste {
 
+    private static final Logger logger = LoggerFactory.getLogger(VarselbrevTjeneste.class);
     private static final String TITTEL_VARSELBREV_HISTORIKKINNSLAG = "Varselbrev Tilbakekreving";
 
     private BehandlingRepository behandlingRepository;
@@ -67,6 +72,17 @@ public class VarselbrevTjeneste {
 
     public void sendVarselbrev(Long behandlingId) {
         VarselbrevSamletInfo varselbrevSamletInfo = lagVarselbrevForSending(behandlingId);
+        if (varselbrevSamletInfo.getFritekstFraSaksbehandler() == null || varselbrevSamletInfo.getFritekstFraSaksbehandler().isEmpty()) {
+            LocalDate estimertSluttPåPrøveperiode = LocalDate.of(2019, 12, 1);
+            if (LocalDate.now().isBefore(estimertSluttPåPrøveperiode)) {
+                logger.info("Sendte ikke varselbrev for behandlingId={} siden saksbehandler ikke har skrevet fritekst (påkrevet). Dette er OK i prøveperioden.", behandlingId);
+                return;
+            } else {
+                throw new IllegalStateException("Mangler fritekst i varselbrevet for behandling=" + behandlingId);
+            }
+        }
+
+
         String overskrift = VarselbrevOverskrift.finnOverskriftVarselbrev(varselbrevSamletInfo.getBrevMetadata().getFagsaktypenavnPåSpråk());
         String brevtekst = TekstformatererVarselbrev.lagVarselbrevFritekst(varselbrevSamletInfo);
         FritekstbrevData data = new FritekstbrevData.Builder()
