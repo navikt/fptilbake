@@ -14,12 +14,10 @@ public interface SvpHendelseUnderTyper {
     HendelseUnderType SVP_TILRETTELEGGING_DELVIS_MULIG = new HendelseUnderType("SVP_TILRETTELEGGING_DELVIS_MULIG");
     HendelseUnderType SVP_TILRETTELEGGING_IKKE_MULIG = new HendelseUnderType("SVP_TILRETTELEGGING_IKKE_MULIG");
 
-    HendelseUnderType SVP_FEIL_ARBEIDSFORHOLD = new HendelseUnderType("SVP_FEIL_ARBEIDSFORHOLD");
-    HendelseUnderType SVP_FEIL_ARBEIDSKATEGORI = new HendelseUnderType("SVP_FEIL_ARBEIDSKATEGORI");
+    HendelseUnderType SVP_MANGLER_ARBEIDSFORHOLD = new HendelseUnderType("MANGLER_ARBEIDSFORHOLD");
 
     //Opptjening
     HendelseUnderType SVP_IKKE_ARBEID = new HendelseUnderType("SVP_IKKE_ARBEID");
-    HendelseUnderType SVP_IKKE_TAP = new HendelseUnderType("SVP_IKKE_TAP");
 
     //Beregning
     HendelseUnderType SVP_INNTEKT_UNDER = new HendelseUnderType("SVP_INNTEKT_UNDER");
@@ -29,7 +27,11 @@ public interface SvpHendelseUnderTyper {
     HendelseUnderType SVP_ENDRING_PROSENT = new HendelseUnderType("SVP_ENDRING_PROSENT");
     HendelseUnderType SVP_ENDRING_PERIODE = new HendelseUnderType("SVP_ENDRING_PERIODE");
 
-    //Annet
+    //opphør
+    HendelseUnderType MOTTAKER_DØD = new HendelseUnderType("MOTTAKER_DØD");
+    HendelseUnderType MOTTAKER_IKKE_GRAVID = new HendelseUnderType("MOTTAKER_IKKE_GRAVID");
+
+    //inntekt
     HendelseUnderType SVP_INNTEKT_IKKE_TAP = new HendelseUnderType("SVP_INNTEKT_IKKE_TAP");
 
 }

@@ -150,6 +150,7 @@ public class FeilutbetalingÅrsakTjenesteTest {
         assertThat(mapAvResultat.keySet()).containsOnly(
             HendelseType.MEDLEMSKAP_TYPE.getKode(),
             HendelseType.ØKONOMI_FEIL.getKode(),
+            HendelseType.SVP_OPPHØR.getKode(),
             HendelseType.SVP_FAKTA_TYPE.getKode(),
             HendelseType.SVP_ARBEIDSGIVERS_FORHOLD_TYPE.getKode(),
             HendelseType.SVP_ARBEIDSFORHOLD_TYPE.getKode(),
@@ -175,6 +176,11 @@ public class FeilutbetalingÅrsakTjenesteTest {
             ØkonomiUndertyper.FEIL_FERIEPENGER.getKode()
         );
 
+        assertThat(mapAvResultat.get(HendelseType.SVP_OPPHØR.getKode())).containsExactly(
+            SvpHendelseUnderTyper.MOTTAKER_DØD.getKode(),
+            SvpHendelseUnderTyper.MOTTAKER_IKKE_GRAVID.getKode()
+        );
+
         assertThat(mapAvResultat.get(HendelseType.SVP_FAKTA_TYPE.getKode())).containsExactly(
             SvpHendelseUnderTyper.SVP_ENDRING_TERMINDATO.getKode(),
             SvpHendelseUnderTyper.SVP_TIDLIG_FODSEL.getKode(),
@@ -188,13 +194,11 @@ public class FeilutbetalingÅrsakTjenesteTest {
         );
 
         assertThat(mapAvResultat.get(HendelseType.SVP_ARBEIDSFORHOLD_TYPE.getKode())).containsExactly(
-            SvpHendelseUnderTyper.SVP_FEIL_ARBEIDSFORHOLD.getKode(),
-            SvpHendelseUnderTyper.SVP_FEIL_ARBEIDSKATEGORI.getKode()
+            SvpHendelseUnderTyper.SVP_MANGLER_ARBEIDSFORHOLD.getKode()
         );
 
         assertThat(mapAvResultat.get(HendelseType.SVP_OPPTJENING_TYPE.getKode())).containsExactly(
-            SvpHendelseUnderTyper.SVP_IKKE_ARBEID.getKode(),
-            SvpHendelseUnderTyper.SVP_IKKE_TAP.getKode()
+            SvpHendelseUnderTyper.SVP_IKKE_ARBEID.getKode()
         );
 
         assertThat(mapAvResultat.get(HendelseType.SVP_BEREGNING_TYPE.getKode())).containsExactly(
