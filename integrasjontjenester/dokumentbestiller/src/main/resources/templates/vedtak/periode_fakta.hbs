@@ -368,9 +368,6 @@ Du fikk innvilget svangerskapspenger i denne perioden. Du kan kun få svangerska
     {{/case}}
     {{#case "SVP_OPPTJENING_TYPE"}}
         {{#switch hendelseundertype}}
-        {{#case "SVP_IKKE_TAP"}}
-Du har ikke hatt arbeidsinntekt eller inntekt som er likestilt med lønn. Derfor har du ikke rett til svangerskapspenger.
-        {{/case}}
         {{#case "SVP_IKKE_ARBEID"}}
 Du har ikke hatt arbeidsinntekt eller inntekt som er likestilt med lønn i minst fire uker før du må slutte å jobbe. Derfor har du ikke rett til svangerskapspenger.
 
@@ -380,11 +377,18 @@ Du har fått {{feilutbetalt-beløp}} kroner for mye utbetalt i denne perioden.
     {{/case}}
     {{#case "SVP_ARBEIDSFORHOLD_TYPE"}}
         {{#switch hendelseundertype}}
-        {{#case "SVP_FEIL_ARBEIDSFORHOLD"}}
-Du fikk innvilget svangerskapspenger for jobben din hos [navn på arbeidsgiver} i denne perioden. Du skulle ha fått svangerskapspenger for jobben din hos [navn på arbeidsgiver}. Derfor har du fått {{feilutbetalt-beløp}} kroner for mye utbetalt i denne perioden.
+        {{#case "MANGLER_ARBEIDSFORHOLD"}}
+Du har ikke rett til svangerskapspenger fra og med {{fom}} til og med {{tom}} fordi du ikke er ansatt hos [arbeidsgiver navn] i denne perioden.
         {{/case}}
-        {{#case "SVP_FEIL_ARBEIDSKATEGORI"}}
-Du fikk innvilget svangerskapspenger for jobben din hos [navn på arbeidsgiver} i denne perioden. Du skulle ha fått svangerskapspenger for arbeidet ditt som [frilanser/selvstendig næringsdrivende]. Derfor har du fått {{feilutbetalt-beløp}} kroner for mye utbetalt i denne perioden.
+        {{/switch}}
+    {{/case}}
+    {{#case "OPPHØR"}}
+        {{#switch hendelseundertype}}
+        {{#case "MOTTAKER_DØD"}}
+Vi har fått melding om at [søkers navn] døde [opphørsdato]. Svangerskapspengene skulle vært stanset [opphørsdato]. Fordi svangerskapspengene er blitt utbetalt etter denne datoen, er det utbetalt {{feilutbetalt-beløp}} kroner for mye.
+        {{/case}}
+        {{#case "MOTTAKER_IKKE_GRAVID"}}
+Vi har fått melding om at du ikke lenger er gravid. Svangerskapspengene skulle vært stanset fra og med [opphørsdato]. Fordi svangerskapspengene er blitt utbetalt etter denne datoen, har du fått {{feilutbetalt-beløp}} kroner for mye utbetalt.
         {{/case}}
         {{/switch}}
     {{/case}}
