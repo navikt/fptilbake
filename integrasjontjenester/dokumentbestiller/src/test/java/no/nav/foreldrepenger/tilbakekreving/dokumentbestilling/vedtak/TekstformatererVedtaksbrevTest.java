@@ -16,8 +16,10 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Foreldel
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.EsHendelseUnderTyper;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.FellesUndertyper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.FpHendelseUnderTyper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.SvpHendelseUnderTyper;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.ØkonomiUndertyper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.AnnenVurdering;
@@ -55,8 +57,8 @@ public class TekstformatererVedtaksbrevTest {
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(januar)
                 .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
-                .medHendelsetype(HendelseType.FP_UTTAK_GRADERT_TYPE)
-                .medHendelseUndertype(FpHendelseUnderTyper.GRADERT_UTTAK)
+                .medHendelsetype(HendelseType.FP_ANNET_HENDELSE_TYPE)
+                .medHendelseUndertype(FellesUndertyper.REFUSJON_ARBEIDSGIVER)
                 .medVilkårResultat(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER)
                 .medAktsomhetResultat(Aktsomhet.SIMPEL_UAKTSOM)
                 .medSærligeGrunner(Arrays.asList(SærligGrunn.TID_FRA_UTBETALING, SærligGrunn.STØRRELSE_BELØP))
@@ -68,8 +70,8 @@ public class TekstformatererVedtaksbrevTest {
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(februar)
                 .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
-                .medHendelsetype(HendelseType.FP_ANNET_HENDELSE_TYPE)
-                .medHendelseUndertype(FpHendelseUnderTyper.OKONOMI_DOBBELUTBETALING)
+                .medHendelsetype(HendelseType.ØKONOMI_FEIL)
+                .medHendelseUndertype(ØkonomiUndertyper.DOBBELTUTBETALING)
                 .medVilkårResultat(VilkårResultat.FORSTO_BURDE_FORSTÅTT)
                 .medAktsomhetResultat(Aktsomhet.SIMPEL_UAKTSOM)
                 .medSærligeGrunner(Arrays.asList(SærligGrunn.HELT_ELLER_DELVIS_NAVS_FEIL, SærligGrunn.STØRRELSE_BELØP))
@@ -143,7 +145,7 @@ public class TekstformatererVedtaksbrevTest {
                 .medPeriode(januar)
                 .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
                 .medHendelsetype(HendelseType.FP_ANNET_HENDELSE_TYPE)
-                .medHendelseUndertype(FpHendelseUnderTyper.ANNET_FRITEKST)
+                .medHendelseUndertype(FellesUndertyper.ANNET_FRITEKST)
                 .medVilkårResultat(VilkårResultat.FORSTO_BURDE_FORSTÅTT)
                 .medAktsomhetResultat(Aktsomhet.GROVT_UAKTSOM)
                 .medSærligeGrunner(Arrays.asList(SærligGrunn.HELT_ELLER_DELVIS_NAVS_FEIL, SærligGrunn.STØRRELSE_BELØP, SærligGrunn.TID_FRA_UTBETALING))
@@ -158,8 +160,8 @@ public class TekstformatererVedtaksbrevTest {
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(februar)
                 .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
-                .medHendelsetype(HendelseType.FP_ANNET_HENDELSE_TYPE)
-                .medHendelseUndertype(FpHendelseUnderTyper.OKONOMI_UTBETALT)
+                .medHendelsetype(HendelseType.ØKONOMI_FEIL)
+                .medHendelseUndertype(ØkonomiUndertyper.FOR_MYE_UTBETALT)
                 .medVilkårResultat(VilkårResultat.GOD_TRO)
                 .medAktsomhetResultat(AnnenVurdering.GOD_TRO)
                 .medBeløpIBehold(BigDecimal.valueOf(1))

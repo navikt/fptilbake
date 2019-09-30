@@ -14,6 +14,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Foreldel
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.FpHendelseUnderTyper;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.ØkonomiUndertyper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.AnnenVurdering;
@@ -64,8 +65,8 @@ public class TekstformatererVedtaksbrevIBiterTest {
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(februar)
                 .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
-                .medHendelsetype(HendelseType.FP_ANNET_HENDELSE_TYPE)
-                .medHendelseUndertype(FpHendelseUnderTyper.OKONOMI_DOBBELUTBETALING)
+                .medHendelsetype(HendelseType.ØKONOMI_FEIL)
+                .medHendelseUndertype(ØkonomiUndertyper.DOBBELTUTBETALING)
                 .medVilkårResultat(VilkårResultat.FORSTO_BURDE_FORSTÅTT)
                 .medAktsomhetResultat(Aktsomhet.SIMPEL_UAKTSOM)
                 .medSærligeGrunner(Arrays.asList(SærligGrunn.HELT_ELLER_DELVIS_NAVS_FEIL, SærligGrunn.STØRRELSE_BELØP))
@@ -78,7 +79,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
         HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
 
         List<Avsnitt> resultat = TekstformatererVedtaksbrev.lagVedtaksbrevDeltIAvsnitt(data, "Du må betale tilbake foreldrepengene");
-        System.out.println(resultat);
+        //FIXME fullfør test
     }
 
     @Test

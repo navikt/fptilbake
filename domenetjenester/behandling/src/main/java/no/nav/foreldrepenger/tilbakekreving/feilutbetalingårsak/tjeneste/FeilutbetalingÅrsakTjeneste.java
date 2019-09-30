@@ -65,9 +65,13 @@ public class FeilutbetalingÅrsakTjeneste {
     }
 
     private List<HendelseUnderType> sortereHendelseUnderTyper(Set<HendelseUnderType> hendelseUnderTyper) {
+        Set<HendelseUnderType> manglerSortering = hendelseUnderTyper.stream().filter(h -> h.getEkstraData() == null).collect(Collectors.toSet());
+        if (!manglerSortering.isEmpty()) {
+            throw new IllegalStateException("Utvikler-feil: hendelse-undertype mangler sorteringsfelt (settes i ekstra-data), gjelder " + manglerSortering);
+        }
+
         return hendelseUnderTyper
             .stream()
-            .filter(hendelseUnderType -> null != hendelseUnderType.getEkstraData())
             .sorted(Comparator.comparing(hendelseUnderType -> Long.valueOf(hendelseUnderType.getEkstraData())))
             .collect(Collectors.toList());
     }

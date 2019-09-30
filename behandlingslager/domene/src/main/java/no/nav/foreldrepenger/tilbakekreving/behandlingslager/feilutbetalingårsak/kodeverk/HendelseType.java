@@ -12,6 +12,7 @@ public class HendelseType extends Kodeliste {
     public static final String DISCRIMINATOR = "HENDELSE_TYPE";
 
     public static final HendelseType MEDLEMSKAP_TYPE = new HendelseType("MEDLEMSKAP");
+    public static final HendelseType ØKONOMI_FEIL = new HendelseType("OKONOMI_FEIL");
     public static final HendelseType FP_OPPTJENING_TYPE = new HendelseType("OPPTJENING_TYPE");
     public static final HendelseType FP_BEREGNING_TYPE = new HendelseType("BEREGNING_TYPE");
     public static final HendelseType FP_STONADSPERIODEN_TYPE = new HendelseType("STONADSPERIODEN_TYPE");

@@ -19,6 +19,22 @@ Du er ikke medlem av folketrygden fordi du i følge folkeregisteret flyttet fra 
 
 Derfor har du fått {{feilutbetalt-beløp}} kroner for mye utbetalt i denne perioden.
 {{/inline}}
+{{#* inline "fakta-økonomi-feil"}}
+        {{#switch hendelseundertype}}
+        {{#case "OKONOMI_DOBBELUTBETALING"}}
+Vi har gjort en feil og utbetalt {{> ytelse-navn}} to ganger i denne perioden. Du skulle hatt {{riktig-beløp}} kroner, men du fikk {{utbetalt-beløp}} kroner. Derfor har du fått {{feilutbetalt-beløp}} kroner for mye utbetalt.
+        {{/case}}
+        {{#case "OKONOMI_UTBETALT"}}
+Vi har gjort en feil og utbetalt for mye i {{> ytelse-navn}} i denne perioden. Du skulle hatt {{riktig-beløp}} kroner, men du fikk {{utbetalt-beløp}} kroner. Derfor har du fått {{feilutbetalt-beløp}} kroner for mye utbetalt.
+        {{/case}}
+        {{#case "OKONOMI_FEIL_TREKK"}}
+I denne perioden har vi ikke trukket fra hele skattetrekket på beløpet vi har utbetalt. Du skulle fått {{riktig-beløp}} kroner, men du fikk {{utbetalt-beløp}} kroner. Derfor har du fått {{feilutbetalt-beløp}} kroner for mye utbetalt.
+        {{/case}}
+        {{#case "OKONOMI_FEIL_FERIEPENGER"}}
+I denne perioden har vi utbetalt for mye i feriepenger. Du skulle fått {{riktig-beløp}} kroner, men du fikk {{utbetalt-beløp}} kroner. Derfor har du fått {{feilutbetalt-beløp}} kroner for mye utbetalt.
+        {{/case}}
+        {{/switch}}
+{{/inline}}
 {{#* inline "fakta-beregning"}}
         {{#switch hendelseundertype}}
         {{#case "INNTEKT_UNDER" "SVP_INNTEKT_UNDER"}}
@@ -28,6 +44,9 @@ Du har kun rett til {{> ytelse-navn}} dersom du har tjent mer enn {{halvt-grunnb
 Vi beregnet {{> ytelse-produkt}} dine til [beløp] kroner i året{{> før-skatt}}. Beregningen ble deretter endret [dato] til [beløp] kroner i året{{> før-skatt}}. Du har derfor fått {{feilutbetalt-beløp}} kroner for mye utbetalt i denne perioden.
         {{/case}}
         {{/switch}}
+{{/inline}}
+{{#* inline "fakta-arbeidsgiver-refusjon"}}
+I denne perioden har du både fått utbetalt foreldrepenger fra oss og lønn fra arbeidsgiver. Det er arbeidsgiveren din som har rett til foreldrepengene fordi de utbetaler deg full lønn i samme periode. Derfor har du fått {{feilutbetalt-beløp}} kroner for mye utbetalt.
 {{/inline}}
 {{#switch ytelsetype}}
 {{#case "ES"}}
@@ -73,6 +92,9 @@ Du har fått {{feilutbetalt-beløp}} kroner for mye utbetalt.
         {{#switch hendelseundertype}}
         {{#case "ES_STONAD_FLERE_GANGER"}}
 Du har kun rett til én engangsstønad per barn. Fordi du har fått utbetalt engangsstønad flere ganger for {{> det-samme-barnet}}, har du fått {{feilutbetalt-beløp}} kroner for mye utbetalt.
+        {{/case}}
+        {{#case "ØKONOMI_UTBETALT_FOR_MYE"}}
+Vi har gjort en feil og utbetalt for mye i engangsstønad. Du skulle hatt {{riktig-beløp}} kroner, men du fikk {{utbetalt-beløp}} kroner. Derfor har du fått {{feilutbetalt-beløp}} kroner for mye utbetalt.
         {{/case}}
         {{/switch}}
     {{/case}}
@@ -127,7 +149,10 @@ Du har ikke rett til både engangsstønad og foreldrepenger. Derfor har du fått
         {{/switch}}
     {{/case}}
     {{#case "ES_ANNET_TYPE"}}
-        {{!-- ingenting her --}}
+        {{#switch hendelseundertype}}
+        {{#case "ANNET_FRITEKST"}}
+        {{/case}}
+        {{/switch}}
     {{/case}}
     {{#case "ES_FODSELSVILKAARET_TYPE"}}
         {{#switch hendelseundertype}}
@@ -147,6 +172,9 @@ Du har ikke rett til foreldrepenger i denne perioden. Derfor har du fått [belø
     {{#switch hendelsetype}}
     {{#case "MEDLEMSKAP"}}
         {{> fakta-medlemskap}}
+    {{/case}}
+    {{#case "OKONOMI_FEIL"}}
+        {{> fakta-økonomi-feil}}
     {{/case}}
     {{#case "BEREGNING_TYPE"}}
         {{> fakta-beregning}}
@@ -282,14 +310,8 @@ Du har jobbet samtidig som at du har fått utbetalt foreldrepenger. Fordi du har
     {{/case}}
     {{#case "FP_ANNET_HENDELSE_TYPE"}}
         {{#switch hendelseundertype}}
-        {{#case "OKONOMI_DOBBELUTBETALING"}}
-Vi har gjort en feil og utbetalt foreldrepenger to ganger i denne perioden. Du skulle hatt {{riktig-beløp}} kroner, men du fikk {{utbetalt-beløp}} kroner. Derfor har du fått {{feilutbetalt-beløp}} kroner for mye utbetalt.
-        {{/case}}
-        {{#case "OKONOMI_UTBETALT"}}
-Vi har gjort en feil og utbetalt for mye i foreldrepenger i denne perioden. Du skulle hatt {{riktig-beløp}} kroner, men du fikk {{utbetalt-beløp}} kroner. Derfor har du fått {{feilutbetalt-beløp}} kroner for mye utbetalt.
-        {{/case}}
-        {{#case "OKONOMI_FEIL_TREKK"}}
-I denne perioden har vi ikke trukket fra hele skattetrekket på beløpet vi har utbetalt. Du skulle fått {{riktig-beløp}} kroner, men du fikk {{utbetalt-beløp}} kroner. Derfor har du fått {{feilutbetalt-beløp}} kroner for mye utbetalt.
+        {{#case "REFUSJON_ARBGIVER"}}
+{{> fakta-arbeidsgiver-refusjon}}
         {{/case}}
         {{#case "ANNET_FRITEKST"}}
         {{/case}}
@@ -304,6 +326,9 @@ Arbeidsgiver kunne tilpasse eller endre arbeidsoppgavene dine uten at det var fa
     {{#switch hendelsetype}}
     {{#case "MEDLEMSKAP"}}
         {{> fakta-medlemskap}}
+    {{/case}}
+    {{#case "OKONOMI_FEIL"}}
+        {{> fakta-økonomi-feil}}
     {{/case}}
     {{#case "SVP_BEREGNING_TYPE"}}
         {{> fakta-beregning}}
@@ -364,13 +389,19 @@ Du fikk innvilget svangerskapspenger for jobben din hos [navn på arbeidsgiver} 
         {{/switch}}
     {{/case}}
     {{#case "SVP_ANNET_TYPE"}}
-        {{!--bare fritekst--}}
+        {{#switch hendelseundertype}}
+        {{#case "REFUSJON_ARBGIVER"}}
+{{> fakta-arbeidsgiver-refusjon}}
+        {{/case}}
+        {{#case "ANNET_FRITEKST"}}
+        {{/case}}
+        {{/switch}}
     {{/case}}
     {{/switch}}
 {{/case}}
 {{/switch}}
 {{#if fritekst-fakta}}
-   {{#if (and (neq hendelseundertype "SVP_ANNET_TYPE") (neq hendelseundertype "ANNET_FRITEKST"))}}
+   {{#if (neq hendelseundertype "ANNET_FRITEKST")}}
 
    {{/if}}
 {{fritekst-fakta}}
