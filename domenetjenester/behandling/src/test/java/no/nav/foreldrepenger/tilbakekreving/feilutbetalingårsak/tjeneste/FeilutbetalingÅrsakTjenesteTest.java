@@ -13,9 +13,11 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositor
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProviderImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.FellesUndertyper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.FpHendelseUnderTyper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.MedlemskapHendelseUndertyper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.SvpHendelseUnderTyper;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.ØkonomiUndertyper;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.FeiltubetalingÅrsakerYtelseTypeDto;
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.FeilutbetalingÅrsakDto;
@@ -40,6 +42,7 @@ public class FeilutbetalingÅrsakTjenesteTest {
 
         assertThat(mapAvResultat.keySet()).containsOnly(
             HendelseType.MEDLEMSKAP_TYPE.getKode(),
+            HendelseType.ØKONOMI_FEIL.getKode(),
             HendelseType.FP_OPPTJENING_TYPE.getKode(),
             HendelseType.FP_BEREGNING_TYPE.getKode(),
             HendelseType.FP_STONADSPERIODEN_TYPE.getKode(),
@@ -51,6 +54,12 @@ public class FeilutbetalingÅrsakTjenesteTest {
             HendelseType.FP_UTTAK_ALENEOMSORG_TYPE.getKode(),
             HendelseType.FP_UTTAK_GRADERT_TYPE.getKode(),
             HendelseType.FP_ANNET_HENDELSE_TYPE.getKode()
+        );
+        assertThat(mapAvResultat.get(HendelseType.ØKONOMI_FEIL.getKode())).containsExactly(
+            ØkonomiUndertyper.DOBBELTUTBETALING.getKode(),
+            ØkonomiUndertyper.FOR_MYE_UTBETALT.getKode(),
+            ØkonomiUndertyper.FEIL_TREKK.getKode(),
+            ØkonomiUndertyper.FEIL_FERIEPENGER.getKode()
         );
 
         assertThat(mapAvResultat.get(HendelseType.MEDLEMSKAP_TYPE.getKode())).containsExactly(
@@ -111,10 +120,8 @@ public class FeilutbetalingÅrsakTjenesteTest {
         );
 
         assertThat(mapAvResultat.get(HendelseType.FP_ANNET_HENDELSE_TYPE.getKode())).containsExactly(
-            FpHendelseUnderTyper.OKONOMI_DOBBELUTBETALING.getKode(),
-            FpHendelseUnderTyper.OKONOMI_UTBETALT.getKode(),
-            FpHendelseUnderTyper.OKONOMI_FEIL_TREKK.getKode(),
-            FpHendelseUnderTyper.ANNET_FRITEKST.getKode()
+            FellesUndertyper.REFUSJON_ARBEIDSGIVER.getKode(),
+            FellesUndertyper.ANNET_FRITEKST.getKode()
         );
 
         assertThat(mapAvResultat.get(HendelseType.FP_KUN_RETT_TYPE.getKode())).containsOnly(
@@ -142,6 +149,7 @@ public class FeilutbetalingÅrsakTjenesteTest {
 
         assertThat(mapAvResultat.keySet()).containsOnly(
             HendelseType.MEDLEMSKAP_TYPE.getKode(),
+            HendelseType.ØKONOMI_FEIL.getKode(),
             HendelseType.SVP_FAKTA_TYPE.getKode(),
             HendelseType.SVP_ARBEIDSGIVERS_FORHOLD_TYPE.getKode(),
             HendelseType.SVP_ARBEIDSFORHOLD_TYPE.getKode(),
@@ -158,6 +166,13 @@ public class FeilutbetalingÅrsakTjenesteTest {
             MedlemskapHendelseUndertyper.IKKE_OPPHOLDSRETT_EØS.getKode(),
             MedlemskapHendelseUndertyper.IKKE_LOVLIG_OPPHOLD.getKode(),
             MedlemskapHendelseUndertyper.MEDLEM_I_ANNET_LAND.getKode()
+        );
+
+        assertThat(mapAvResultat.get(HendelseType.ØKONOMI_FEIL.getKode())).containsExactly(
+            ØkonomiUndertyper.DOBBELTUTBETALING.getKode(),
+            ØkonomiUndertyper.FOR_MYE_UTBETALT.getKode(),
+            ØkonomiUndertyper.FEIL_TREKK.getKode(),
+            ØkonomiUndertyper.FEIL_FERIEPENGER.getKode()
         );
 
         assertThat(mapAvResultat.get(HendelseType.SVP_FAKTA_TYPE.getKode())).containsExactly(
@@ -198,10 +213,10 @@ public class FeilutbetalingÅrsakTjenesteTest {
         );
 
         assertThat(mapAvResultat.get(HendelseType.SVP_ANNET_TYPE.getKode())).containsOnly(
-
+            FellesUndertyper.REFUSJON_ARBEIDSGIVER.getKode(),
+            FellesUndertyper.ANNET_FRITEKST.getKode()
         );
     }
-
 
     private List<FeilutbetalingÅrsakDto> hentÅrsakerForYtelseType(FagsakYtelseType fagsakYtelseType) {
         return feilutbetalingÅrsakTjeneste.hentFeilutbetalingårsaker()

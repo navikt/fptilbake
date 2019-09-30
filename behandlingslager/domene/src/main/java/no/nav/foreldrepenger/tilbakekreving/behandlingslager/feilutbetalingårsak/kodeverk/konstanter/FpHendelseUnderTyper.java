@@ -56,10 +56,5 @@ public interface FpHendelseUnderTyper {
     //UttakGradert
     HendelseUnderType GRADERT_UTTAK = new HendelseUnderType("GRADERT_UTTAK");
 
-    //Annet
-    HendelseUnderType OKONOMI_DOBBELUTBETALING = new HendelseUnderType("OKONOMI_DOBBELUTBETALING");
-    HendelseUnderType OKONOMI_UTBETALT = new HendelseUnderType("OKONOMI_UTBETALT");
-    HendelseUnderType OKONOMI_FEIL_TREKK = new HendelseUnderType("OKONOMI_FEIL_TREKK");
-    HendelseUnderType ANNET_FRITEKST = new HendelseUnderType("ANNET_FRITEKST");
 
 }
