@@ -295,6 +295,22 @@ public class BehandlingRestTjeneste {
         return responseBuilder.build();
     }
 
+    @GET
+    @Path("/tilbakekreving/aapen")
+    @Timed
+    @ApiOperation(value = "Sjekk hvis tilbakekrevingbehandling er åpen", notes = ("Returnerer true hvis det finnes en åpen tilbakekrevingbehandling"))
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Returnerer true eller false", response = Response.class),
+    })
+    @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
+    public Response harÅpenTilbakekrevingBehandling(@NotNull @QueryParam("saksnummer") @Valid SaksnummerDto saksnummerDto) {
+        List<Behandling> behandlinger = behandlingTjeneste.hentBehandlinger(new Saksnummer(saksnummerDto.getVerdi()));
+        boolean result = behandlinger.stream()
+            .filter(behandling -> BehandlingType.TILBAKEKREVING.equals(behandling.getType()))
+            .anyMatch(behandling -> !behandling.erAvsluttet());
+        return Response.ok().entity(result).build();
+    }
+
     @POST
     @Path("/bytt-enhet")
     @Consumes(MediaType.APPLICATION_JSON)
