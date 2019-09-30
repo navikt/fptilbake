@@ -46,7 +46,7 @@ Vi beregnet {{> ytelse-produkt}} dine til [beløp] kroner i året{{> før-skatt}
         {{/switch}}
 {{/inline}}
 {{#* inline "fakta-arbeidsgiver-refusjon"}}
-I denne perioden har du både fått utbetalt foreldrepenger fra oss og lønn fra arbeidsgiver. Det er arbeidsgiveren din som har rett til foreldrepengene fordi de utbetaler deg full lønn i samme periode. Derfor har du fått {{feilutbetalt-beløp}} kroner for mye utbetalt.
+I denne perioden har du både fått utbetalt {{> ytelse-navn}} fra oss og lønn fra arbeidsgiver. Det er arbeidsgiveren din som har rett til {{> ytelse-produkt}} fordi de utbetaler deg full lønn i samme periode. Derfor har du fått {{feilutbetalt-beløp}} kroner for mye utbetalt.
 {{/inline}}
 {{#switch ytelsetype}}
 {{#case "ES"}}
