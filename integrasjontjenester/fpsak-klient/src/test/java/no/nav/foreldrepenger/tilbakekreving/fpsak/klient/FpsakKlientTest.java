@@ -123,7 +123,6 @@ public class FpsakKlientTest {
         dto.setAnsvarligSaksbehandler("saksbehandler");
         dto.setId(BEHANDLING_ID);
         dto.setLinks(resourcelinks());
-        dto.setSaksnummer(SAKSNUMMER);
         dto.setFagsakId(FAGSAK_ID);
         return dto;
     }

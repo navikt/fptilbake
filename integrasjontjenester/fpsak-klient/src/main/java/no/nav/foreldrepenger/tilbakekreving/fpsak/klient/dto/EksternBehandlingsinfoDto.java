@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -15,7 +15,6 @@ public class EksternBehandlingsinfoDto {
 
     private Long id;
     private UUID uuid;
-    private String saksnummer;
     private Long fagsakId;
     private String behandlendeEnhetId;
     private String behandlendeEnhetNavn;
@@ -42,14 +41,6 @@ public class EksternBehandlingsinfoDto {
 
     public void setUuid(UUID uuid) {
         this.uuid = uuid;
-    }
-
-    public String getSaksnummer() {
-        return saksnummer;
-    }
-
-    public void setSaksnummer(String saksnummer) {
-        this.saksnummer = saksnummer;
     }
 
     public Long getFagsakId() {

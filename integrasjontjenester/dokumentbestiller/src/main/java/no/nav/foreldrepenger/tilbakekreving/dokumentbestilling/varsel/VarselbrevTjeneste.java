@@ -165,7 +165,7 @@ public class VarselbrevTjeneste {
     }
 
     public VarselbrevSamletInfo lagVarselbrevForForhåndsvisning(UUID behandlingUuId, String varseltekst, FagsakYtelseType fagsakYtleseType) {
-        SamletEksternBehandlingInfo eksternBehandlingsinfo = eksternDataForBrevTjeneste.hentBehandlingFpsak(behandlingUuId, Tillegsinformasjon.PERSONOPPLYSNINGER, Tillegsinformasjon.VARSELTEKST);
+        SamletEksternBehandlingInfo eksternBehandlingsinfo = eksternDataForBrevTjeneste.hentBehandlingFpsak(behandlingUuId, Tillegsinformasjon.PERSONOPPLYSNINGER, Tillegsinformasjon.VARSELTEKST, Tillegsinformasjon.FAGSAK);
 
         String aktørId = eksternBehandlingsinfo.getAktørId().getId();
         Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(aktørId);

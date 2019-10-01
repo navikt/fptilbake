@@ -24,6 +24,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.BehandlingResourceLinkDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.FagsakDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.PersonopplysningDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SoknadDto;
@@ -97,6 +98,9 @@ public class FpsakKlient {
                 if (ekstrainfo.contains(Tillegsinformasjon.TILBAKEKREVINGSVALG) && lenke.getRel().equals(Tillegsinformasjon.TILBAKEKREVINGSVALG.getFpsakRelasjonNavn())) {
                     hentTilbakekrevingValg(lenke).ifPresent(builder::setTilbakekrevingvalg);
                 }
+                if (ekstrainfo.contains(Tillegsinformasjon.FAGSAK) && lenke.getRel().equals(Tillegsinformasjon.FAGSAK.getFpsakRelasjonNavn())) {
+                    builder.setFagsak(hentFagsak(lenke));
+                }
             }
         });
         return builder.build();
@@ -127,7 +131,8 @@ public class FpsakKlient {
     }
 
     private List<EksternBehandlingsinfoDto> lesResponsFraJsonNode(String saksnummer, JsonNode jsonNode) {
-        ObjectReader reader = mapper.readerFor(new TypeReference<List<EksternBehandlingsinfoDto>>() {});
+        ObjectReader reader = mapper.readerFor(new TypeReference<List<EksternBehandlingsinfoDto>>() {
+        });
         try {
             return reader.readValue(jsonNode);
         } catch (IOException e) {
@@ -157,6 +162,11 @@ public class FpsakKlient {
         return get(endpoint, TilbakekrevingValgDto.class);
     }
 
+    private FagsakDto hentFagsak(BehandlingResourceLinkDto resourceLink) {
+        URI endpoint = URI.create(baseUri() + resourceLink.getHref());
+        return get(endpoint, FagsakDto.class)
+            .orElseThrow(() -> new IllegalArgumentException("Forventet å finne fagsak på lenken: " + endpoint));
+    }
 
     private <T> Optional<T> get(URI endpoint, Class<T> tClass) {
         return restClient.getReturnsOptional(endpoint, tClass);
