@@ -20,8 +20,8 @@ import org.threeten.extra.Days;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BehandlingFeilutbetalingFakta;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.UtbetaltPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingAggregate;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.FeilutbetalingÅrsakDto;
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.UnderÅrsakDto;
@@ -38,20 +38,19 @@ public class FeilutbetalingTjeneste {
 
     private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository;
 
-    FeilutbetalingTjeneste(){
+    FeilutbetalingTjeneste() {
         // for CDI proxy
     }
 
     @Inject
-    public FeilutbetalingTjeneste(BehandlingRepositoryProvider repositoryProvider){
+    public FeilutbetalingTjeneste(BehandlingRepositoryProvider repositoryProvider) {
         this.faktaFeilutbetalingRepository = repositoryProvider.getFaktaFeilutbetalingRepository();
     }
 
-    public void formFeilutbetalingÅrsak(Long behandlingId, UtbetaltPeriode utbetaltPeriode) {
-        Optional<FaktaFeilutbetalingAggregate> feilutbetalingAggregate = faktaFeilutbetalingRepository.finnFeilutbetaling(behandlingId);
-        if (feilutbetalingAggregate.isPresent()) {
-            Optional<FaktaFeilutbetalingPeriode> feilutbetalingPeriodeÅrsak = feilutbetalingAggregate.get()
-                .getFaktaFeilutbetaling()
+    public void hentFeilutbetalingÅrsak(Long behandlingId, UtbetaltPeriode utbetaltPeriode) {
+        Optional<FaktaFeilutbetaling> fakta = faktaFeilutbetalingRepository.finnFaktaOmFeilutbetaling(behandlingId);
+        if (fakta.isPresent()) {
+            Optional<FaktaFeilutbetalingPeriode> feilutbetalingPeriodeÅrsak = fakta.get()
                 .getFeilutbetaltPerioder()
                 .stream()
                 .filter(periodeÅrsak -> utbetaltPeriode.tilPeriode().equals(periodeÅrsak.getPeriode()))

@@ -190,7 +190,7 @@ public class VedtaksbrevTjeneste {
         List<VarselbrevSporing> varselbrevData = brevdataRepository.hentVarselbrevData(behandlingId);
         LocalDateTime nyesteVarselbrevTidspunkt = VedtaksbrevUtil.finnNyesteVarselbrevTidspunkt(varselbrevData);
 
-        FaktaFeilutbetaling fakta = faktaRepository.finnFeilutbetaling(behandlingId).orElseThrow().getFaktaFeilutbetaling();
+        FaktaFeilutbetaling fakta = faktaRepository.finnFaktaOmFeilutbetaling(behandlingId).orElseThrow();
         List<VilkårVurderingPeriodeEntitet> vilkårPerioder = vilkårsvurderingRepository.finnVilkårsvurderingForBehandlingId(behandlingId)
             .map(VilkårVurderingAggregateEntitet::getManuellVilkår)
             .map(VilkårVurderingEntitet::getPerioder)

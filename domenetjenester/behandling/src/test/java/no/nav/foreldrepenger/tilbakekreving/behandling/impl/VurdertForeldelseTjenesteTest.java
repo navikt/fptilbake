@@ -262,11 +262,7 @@ public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
         faktaFeilutbetaling.leggTilFeilutbetaltPeriode(lagPeriode(FOM_1, sisteDagFørstePeriode, HendelseType.FP_UTTAK_UTSETTELSE_TYPE, FpHendelseUnderTyper.ARBEID_HELTID, faktaFeilutbetaling));
         faktaFeilutbetaling.leggTilFeilutbetaltPeriode(lagPeriode(førsteDagAndrePeriode, TOM_1, HendelseType.FP_UTTAK_UTSETTELSE_TYPE, FpHendelseUnderTyper.ARBEID_HELTID, faktaFeilutbetaling));
 
-        FaktaFeilutbetalingAggregate faktaFeilutbetalingAggregate = FaktaFeilutbetalingAggregate.builder()
-            .medBehandlingId(internBehandlingId)
-            .medFeilutbetaling(faktaFeilutbetaling).build();
-
-        faktaFeilutbetalingRepository.lagre(faktaFeilutbetalingAggregate);
+        faktaFeilutbetalingRepository.lagre(internBehandlingId, faktaFeilutbetaling);
 
         FeilutbetalingPerioderDto feilutbetalingPerioder = vurdertForeldelseTjeneste.hentFaktaPerioder(internBehandlingId);
         assertThat(feilutbetalingPerioder.getPerioder().size()).isEqualTo(2);

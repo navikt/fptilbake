@@ -9,7 +9,6 @@ import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingAggregate;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.TotrinnRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.Totrinnresultatgrunnlag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.Totrinnsvurdering;
@@ -34,19 +33,19 @@ public class TotrinnTjeneste {
 
     public void settNyttTotrinnsgrunnlag(Behandling behandling) {
         Long behandlingId = behandling.getId();
-        Optional<FaktaFeilutbetalingAggregate> feilutbetalingAggregate = repositoryProvider.getFaktaFeilutbetalingRepository().finnFeilutbetaling(behandlingId);
+        Optional<Long> faktaAggregateId = repositoryProvider.getFaktaFeilutbetalingRepository().finnFaktaFeilutbetalingAggregateId(behandlingId);
         Optional<VurdertForeldelseAggregate> foreldelseAggregate = repositoryProvider.getVurdertForeldelseRepository().finnVurdertForeldelseForBehandling(behandlingId);
         Optional<VilkårVurderingAggregateEntitet> vilkårVurderingAggregateEntitet = repositoryProvider.getVilkårsvurderingRepository().finnVilkårsvurderingForBehandlingId(behandlingId);
 
-        Long feilUtbetalingId = feilutbetalingAggregate.map(FaktaFeilutbetalingAggregate::getId).orElseThrow();
+        Long feilUtbetalingId = faktaAggregateId.orElseThrow();
         Long foreldelseId = foreldelseAggregate.map(VurdertForeldelseAggregate::getId).orElse(null);
         Long vilkårId = vilkårVurderingAggregateEntitet.map(VilkårVurderingAggregateEntitet::getId).orElse(null);
 
         Totrinnresultatgrunnlag totrinnresultatgrunnlag = Totrinnresultatgrunnlag.builder()
-                .medBehandling(behandling)
-                .medFeilutbetalingId(feilUtbetalingId)
-                .medForeldelseId(foreldelseId)
-                .medVilkårId(vilkårId).build();
+            .medBehandling(behandling)
+            .medFeilutbetalingId(feilUtbetalingId)
+            .medForeldelseId(foreldelseId)
+            .medVilkårId(vilkårId).build();
         totrinnRepository.lagreOgFlush(behandling, totrinnresultatgrunnlag);
     }
 

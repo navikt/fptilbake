@@ -58,7 +58,7 @@ public class AvklartFaktaFeilutbetalingTjeneste {
         // brukte denne objekt for å opprette bare en historikkinnslagDel når saksbehandler endret bare begrunnelse
         HistorikkinnslagDelDto historikkinnslagDelDto = new HistorikkinnslagDelDto();
 
-        Optional<FaktaFeilutbetalingAggregate> forrigeFeilutbetalingAggregate = faktaFeilutbetalingRepository.finnFeilutbetaling(behandling.getId());
+        Optional<FaktaFeilutbetaling> forrigeFakta = faktaFeilutbetalingRepository.finnFaktaOmFeilutbetaling(behandling.getId());
 
         FaktaFeilutbetaling faktaFeilutbetaling = new FaktaFeilutbetaling();
         boolean behovForHistorikkInnslag = false;
@@ -78,14 +78,11 @@ public class AvklartFaktaFeilutbetalingTjeneste {
             faktaFeilutbetaling.leggTilFeilutbetaltPeriode(faktaFeilutbetalingPeriode);
 
             // lag historikkinnslagDeler
-            boolean harEndret = lagHistorikkInnslagDeler(behandling, historikkinnslag, begrunnelse, forrigeFeilutbetalingAggregate, faktaFeilutbetalingDto, underÅrsakDto, historikkinnslagDelDto);
+            boolean harEndret = lagHistorikkInnslagDeler(behandling, historikkinnslag, begrunnelse, forrigeFakta, faktaFeilutbetalingDto, underÅrsakDto, historikkinnslagDelDto);
             behovForHistorikkInnslag = !behovForHistorikkInnslag ? harEndret : behovForHistorikkInnslag;
         }
-        FaktaFeilutbetalingAggregate faktaFeilutbetalingAggregate = FaktaFeilutbetalingAggregate.builder()
-            .medFeilutbetaling(faktaFeilutbetaling)
-            .medBehandlingId(behandling.getId()).build();
 
-        faktaFeilutbetalingRepository.lagre(faktaFeilutbetalingAggregate);
+        faktaFeilutbetalingRepository.lagre(behandling.getId(), faktaFeilutbetaling);
 
         if (behovForHistorikkInnslag) {
             historikkTjenesteAdapter.lagInnslag(historikkinnslag);
@@ -93,13 +90,13 @@ public class AvklartFaktaFeilutbetalingTjeneste {
     }
 
     private boolean lagHistorikkInnslagDeler(Behandling behandling, Historikkinnslag historikkinnslag, String begrunnelse,
-                                             Optional<FaktaFeilutbetalingAggregate> forrigeFeilutbetalingAggregate,
+                                             Optional<FaktaFeilutbetaling> forrigeFakta,
                                              FaktaFeilutbetalingDto faktaFeilutbetalingDto,
                                              UnderÅrsakDto underÅrsakDto, HistorikkinnslagDelDto historikkinnslagDelDto) {
         boolean harEndret = false;
         HistorikkInnslagTekstBuilder tekstBuilder = historikkTjenesteAdapter.tekstBuilder();
-        if (forrigeFeilutbetalingAggregate.isPresent()) {
-            List<FaktaFeilutbetalingPeriode> feilutbetalingPerioder = forrigeFeilutbetalingAggregate.get().getFaktaFeilutbetaling().getFeilutbetaltPerioder();
+        if (forrigeFakta.isPresent()) {
+            List<FaktaFeilutbetalingPeriode> feilutbetalingPerioder = forrigeFakta.get().getFeilutbetaltPerioder();
             Optional<FaktaFeilutbetalingPeriode> forrigeFeilutbetalingPeriodeÅrsak = feilutbetalingPerioder.stream()
                 .filter(fpå -> fpå.getPeriode().equals(faktaFeilutbetalingDto.tilPeriode()))
                 .findFirst();

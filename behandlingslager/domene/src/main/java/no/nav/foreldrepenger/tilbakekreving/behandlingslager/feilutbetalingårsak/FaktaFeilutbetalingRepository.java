@@ -25,25 +25,39 @@ public class FaktaFeilutbetalingRepository {
         this.entityManager = entityManager;
     }
 
-    public Optional<FaktaFeilutbetalingAggregate> finnFeilutbetaling(Long behandlingId) {
+    public Optional<FaktaFeilutbetaling> finnFaktaOmFeilutbetaling(Long behandlingId) {
+        return finnFeilutbetaling(behandlingId).map(FaktaFeilutbetalingAggregate::getFaktaFeilutbetaling);
+    }
+
+    public Optional<Long> finnFaktaFeilutbetalingAggregateId(Long behandingId) {
+        return finnFeilutbetaling(behandingId).map(FaktaFeilutbetalingAggregate::getId);
+    }
+
+    private Optional<FaktaFeilutbetalingAggregate> finnFeilutbetaling(Long behandlingId) {
         TypedQuery<FaktaFeilutbetalingAggregate> query = entityManager.createQuery(
-                "from FaktaFeilutbetalingAggregate where behandlingId=:behandlingId and aktiv=:aktiv", FaktaFeilutbetalingAggregate.class);
+            "from FaktaFeilutbetalingAggregate where behandlingId=:behandlingId and aktiv=:aktiv", FaktaFeilutbetalingAggregate.class);
         query.setParameter("behandlingId", behandlingId);
         query.setParameter("aktiv", true);
         return hentUniktResultat(query);
     }
 
-    public void lagre(FaktaFeilutbetalingAggregate faktaFeilutbetalingAggregate) {
-        Optional<FaktaFeilutbetalingAggregate> forrigeAggregate = finnFeilutbetaling(faktaFeilutbetalingAggregate.getBehandlingId());
+    public void lagre(Long behandlingId, FaktaFeilutbetaling faktaFeilutbetaling) {
+        Optional<FaktaFeilutbetalingAggregate> forrigeAggregate = finnFeilutbetaling(behandlingId);
         if (forrigeAggregate.isPresent()) {
             forrigeAggregate.get().disable();
             entityManager.persist(forrigeAggregate.get());
         }
-        entityManager.persist(faktaFeilutbetalingAggregate.getFaktaFeilutbetaling());
-        for (FaktaFeilutbetalingPeriode periodeÅrsak : faktaFeilutbetalingAggregate.getFaktaFeilutbetaling().getFeilutbetaltPerioder()) {
-            entityManager.persist(periodeÅrsak);
+        FaktaFeilutbetalingAggregate aggregate = new FaktaFeilutbetalingAggregate.Builder()
+            .medBehandlingId(behandlingId)
+            .medFeilutbetaling(faktaFeilutbetaling)
+            .build();
+        entityManager.persist(faktaFeilutbetaling);
+        for (FaktaFeilutbetalingPeriode faktaPeriode : faktaFeilutbetaling.getFeilutbetaltPerioder()) {
+            entityManager.persist(faktaPeriode);
         }
-        entityManager.persist(faktaFeilutbetalingAggregate);
+        entityManager.persist(aggregate);
+
+        //TODO unngå flush, det er kun nyttig i test
         entityManager.flush();
     }
 

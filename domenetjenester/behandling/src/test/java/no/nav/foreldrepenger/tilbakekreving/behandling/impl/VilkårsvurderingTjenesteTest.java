@@ -51,7 +51,7 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
     @Test
     public void hentDetaljertFeilutbetalingPerioder_nårPerioderErForeldet() {
         formGrunnlag();
-        formFeilutbetalingPeriodeMedÅrsak();
+        lagreFaktaTestdata();
 
         vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, Lists.newArrayList(
             new ForeldelsePeriodeDto(FOM, SISTE_DAG_I_FORELDELSE_PERIODE,
@@ -102,7 +102,7 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
     @Test
     public void hentDetaljertFeilutbetalingPerioder_nårPerioderErIkkeVurderesForForeldet() {
         formGrunnlag();
-        formFeilutbetalingPeriodeMedÅrsak();
+        lagreFaktaTestdata();
 
         List<DetaljertFeilutbetalingPeriodeDto> perioder = vilkårsvurderingTjeneste.hentDetaljertFeilutbetalingPerioder(internBehandlingId);
         assertThat(perioder).isNotEmpty();
@@ -151,7 +151,7 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
             mockMedYtelPostering, mockMedYtelPostering1, mockMedYtelPostering2, mockMedTrekPostering));
         grunnlagRepository.lagre(internBehandlingId, kravgrunnlag431);
 
-        formFeilutbetalingPeriodeMedÅrsak();
+        lagreFaktaTestdata();
 
         List<DetaljertFeilutbetalingPeriodeDto> perioder = vilkårsvurderingTjeneste.hentDetaljertFeilutbetalingPerioder(internBehandlingId);
         assertThat(perioder).isNotEmpty();
@@ -194,7 +194,7 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
             mockMedYtelPostering, mockMedYtelPostering1, mockMedYtelPostering2));
         grunnlagRepository.lagre(internBehandlingId, kravgrunnlag431);
 
-        formFeilutbetalingPeriodeMedÅrsak();
+        lagreFaktaTestdata();
 
         List<DetaljertFeilutbetalingPeriodeDto> perioder = vilkårsvurderingTjeneste.hentDetaljertFeilutbetalingPerioder(internBehandlingId);
         assertThat(perioder).isNotEmpty();
@@ -271,7 +271,7 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
     @Test
     public void lagreVilkårsvurdering_medSimpelOgGrøvtAktsomhet_nårEnPeriodeErForeldet() {
         formGrunnlag();
-        formFeilutbetalingPeriodeMedÅrsak();
+        lagreFaktaTestdata();
 
         vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, Lists.newArrayList(
             new ForeldelsePeriodeDto(FOM, SISTE_DAG_I_FORELDELSE_PERIODE,
@@ -398,7 +398,7 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         grunnlagRepository.lagre(internBehandlingId, kravgrunnlag431);
     }
 
-    private void formFeilutbetalingPeriodeMedÅrsak() {
+    private void lagreFaktaTestdata() {
         FaktaFeilutbetaling faktaFeilutbetaling = new FaktaFeilutbetaling();
         FaktaFeilutbetalingPeriode faktaFeilutbetalingPeriode = FaktaFeilutbetalingPeriode.builder()
             .medPeriode(FOM, TOM)
@@ -408,10 +408,7 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
             .build();
         faktaFeilutbetaling.leggTilFeilutbetaltPeriode(faktaFeilutbetalingPeriode);
 
-        FaktaFeilutbetalingAggregate faktaFeilutbetalingAggregate = FaktaFeilutbetalingAggregate.builder()
-            .medBehandlingId(internBehandlingId)
-            .medFeilutbetaling(faktaFeilutbetaling).build();
-        faktaFeilutbetalingRepository.lagre(faktaFeilutbetalingAggregate);
+        faktaFeilutbetalingRepository.lagre(internBehandlingId, faktaFeilutbetaling);
     }
 
     private static Comparator<VilkårVurderingPeriodeEntitet> PERIODE_FOM_COMPARATOR = Comparator.comparing(o -> o.getPeriode().getFom());

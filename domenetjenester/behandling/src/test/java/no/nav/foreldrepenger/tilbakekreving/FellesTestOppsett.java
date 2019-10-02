@@ -23,7 +23,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjenesteIm
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingAggregate;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
@@ -117,7 +116,7 @@ public class FellesTestOppsett extends TestOppsett {
         return null;
     }
 
-    protected FaktaFeilutbetalingAggregate formFeilutbetalingAggregate() {
+    protected FaktaFeilutbetaling lagFaktaFeilutbetaling() {
         FaktaFeilutbetaling faktaFeilutbetaling = new FaktaFeilutbetaling();
         FaktaFeilutbetalingPeriode periodeÅrsak = FaktaFeilutbetalingPeriode.builder()
             .medHendelseType(HENDELSE_TYPE)
@@ -125,9 +124,7 @@ public class FellesTestOppsett extends TestOppsett {
             .medPeriode(FOM, TOM)
             .medFeilutbetalinger(faktaFeilutbetaling).build();
         faktaFeilutbetaling.leggTilFeilutbetaltPeriode(periodeÅrsak);
-        return FaktaFeilutbetalingAggregate.builder()
-            .medBehandlingId(internBehandlingId)
-            .medFeilutbetaling(faktaFeilutbetaling).build();
+        return faktaFeilutbetaling;
     }
 
     protected VilkårsvurderingPerioderDto formVilkårsvurderingPerioderDto(VilkårResultat resultat, LocalDate fom, LocalDate tom, Aktsomhet aktsomhet) {

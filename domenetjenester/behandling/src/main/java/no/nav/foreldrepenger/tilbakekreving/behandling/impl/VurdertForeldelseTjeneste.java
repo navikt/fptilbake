@@ -19,7 +19,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.dto.PeriodeDto;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingAggregate;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
@@ -87,12 +87,12 @@ public class VurdertForeldelseTjeneste {
     }
 
     public FeilutbetalingPerioderDto hentFaktaPerioder(Long behandlingId) {
-        Optional<FaktaFeilutbetalingAggregate> feilutbetalingAggregate = faktaFeilutbetalingRepository.finnFeilutbetaling(behandlingId);
+        Optional<FaktaFeilutbetaling> fakta = faktaFeilutbetalingRepository.finnFaktaOmFeilutbetaling(behandlingId);
         FeilutbetalingPerioderDto perioderDto = new FeilutbetalingPerioderDto();
         perioderDto.setBehandlingId(behandlingId);
         List<PeriodeDto> perioder = new ArrayList<>();
-        if (feilutbetalingAggregate.isPresent() && !feilutbetalingAggregate.get().getFaktaFeilutbetaling().getFeilutbetaltPerioder().isEmpty()) {
-            for (FaktaFeilutbetalingPeriode faktaFeilutbetalingPeriode : feilutbetalingAggregate.get().getFaktaFeilutbetaling().getFeilutbetaltPerioder()) {
+        if (fakta.isPresent() && !fakta.get().getFeilutbetaltPerioder().isEmpty()) {
+            for (FaktaFeilutbetalingPeriode faktaFeilutbetalingPeriode : fakta.get().getFeilutbetaltPerioder()) {
                 PeriodeDto periode = new PeriodeDto();
                 periode.setPeriode(faktaFeilutbetalingPeriode.getPeriode());
                 periode.setForeldelseVurderingType(ForeldelseVurderingType.UDEFINERT);

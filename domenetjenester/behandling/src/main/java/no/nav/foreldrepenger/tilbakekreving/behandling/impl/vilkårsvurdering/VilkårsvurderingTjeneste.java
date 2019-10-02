@@ -30,6 +30,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BeregnBeløpUtil;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurdertForeldelseTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingAggregate;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
@@ -82,10 +83,10 @@ public class VilkårsvurderingTjeneste {
 
     public List<DetaljertFeilutbetalingPeriodeDto> hentDetaljertFeilutbetalingPerioder(Long behandlingId) {
         List<DetaljertFeilutbetalingPeriodeDto> feilutbetalingPerioder = new ArrayList<>();
-        Optional<FaktaFeilutbetalingAggregate> feilutbetalingAggregate = faktaFeilutbetalingRepository.finnFeilutbetaling(behandlingId);
+        Optional<FaktaFeilutbetaling> feilutbetalingAggregate = faktaFeilutbetalingRepository.finnFaktaOmFeilutbetaling(behandlingId);
 
         if (feilutbetalingAggregate.isPresent()) {
-            List<FaktaFeilutbetalingPeriode> feilutbetaltPerioder = feilutbetalingAggregate.get().getFaktaFeilutbetaling().getFeilutbetaltPerioder();
+            List<FaktaFeilutbetalingPeriode> feilutbetaltPerioder = feilutbetalingAggregate.get().getFeilutbetaltPerioder();
             // hvis perioder er vurdert for foreldelse
             if (foreldelseTjeneste.harForeldetPeriodeForBehandlingId(behandlingId)) {
                 feilutbetalingPerioder.addAll(henteFeilutbetalingPerioderFraForeldelse(behandlingId, feilutbetaltPerioder));
