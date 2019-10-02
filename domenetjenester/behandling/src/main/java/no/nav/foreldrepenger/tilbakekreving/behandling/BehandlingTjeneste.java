@@ -36,4 +36,6 @@ public interface BehandlingTjeneste {
 
     boolean kanOppretteBehandling(Saksnummer saksnummer, UUID eksternUuid);
 
+    void oppdaterBehandlingMedEksternReferanse(Saksnummer saksnummer, long eksternBehandlingId, UUID eksternUuid);
+
 }

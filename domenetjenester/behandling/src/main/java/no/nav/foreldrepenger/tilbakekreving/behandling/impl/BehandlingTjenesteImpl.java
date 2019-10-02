@@ -180,7 +180,7 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
                 totalPeriodeTom = totalPeriodeTom == null || totalPeriodeTom.isBefore(utbetaltPeriode.getTom()) ? utbetaltPeriode.getTom() : totalPeriodeTom;
             }
             return Optional.of(feilutbetalingTjeneste.lagBehandlingFeilUtbetalingFakta(simuleringResultat, aktuellFeilUtbetaltBeløp, utbetaltPerioder,
-                new Periode(totalPeriodeFom, totalPeriodeTom),eksternBehandlingsinfoDto,tilbakekrevingValg));
+                new Periode(totalPeriodeFom, totalPeriodeTom), eksternBehandlingsinfoDto, tilbakekrevingValg));
         }
         return Optional.empty();
     }
@@ -192,8 +192,26 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
     }
 
     @Override
-    public boolean kanOppretteBehandling(Saksnummer saksnummer, UUID eksternUuid){
+    public boolean kanOppretteBehandling(Saksnummer saksnummer, UUID eksternUuid) {
         return !(harÅpenBehandling(saksnummer) || harTilbakekrevingAlleredeFinnes(eksternUuid));
+    }
+
+    @Override
+    public void oppdaterBehandlingMedEksternReferanse(Saksnummer saksnummer, long eksternBehandlingId, UUID eksternUuid) {
+        List<Behandling> behandlinger = behandlingRepository.hentAlleBehandlingerForSaksnummer(saksnummer);
+        if (behandlinger.isEmpty()) {
+            throw BehandlingFeil.FACTORY.fantIngenTilbakekrevingBehandlingForSaksnummer(saksnummer).toException();
+        }
+        Optional<Behandling> åpenTilbakekrevingBehandling = behandlinger.stream()
+            .filter(behandling -> !behandling.erAvsluttet())
+            .filter(behandling -> BehandlingType.TILBAKEKREVING.equals(behandling.getType()))
+            .findAny();
+
+        if (åpenTilbakekrevingBehandling.isPresent()) {
+            Behandling behandling = åpenTilbakekrevingBehandling.get();
+            EksternBehandling eksternBehandling = new EksternBehandling(behandling, eksternBehandlingId, eksternUuid);
+            eksternBehandlingRepository.lagre(eksternBehandling);
+        }
     }
 
     private void doSetBehandlingPåVent(Long behandlingId, AksjonspunktDefinisjon apDef, LocalDate frist, Venteårsak venteårsak) {
@@ -226,7 +244,7 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
                                               BehandlingType behandlingType) {
         logger.info("Oppretter Tilbakekrevingbehandling for [saksnummer: {} ] for ekstern Uuid [ {} ]", saksnummer, eksternUuid);
 
-        validateHarIkkeÅpenTilbakekrevingBehandling(saksnummer,eksternUuid);
+        validateHarIkkeÅpenTilbakekrevingBehandling(saksnummer, eksternUuid);
 
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto;
         if (aktørId == null) {

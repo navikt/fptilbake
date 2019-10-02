@@ -30,8 +30,7 @@ public class OpprettBehandlingTaskTest extends TilkjentYtelseTestOppsett {
 
     @Test
     public void test_skal_kalle_opprettBehandlingAutomatisk() {
-        HendelseTaskDataWrapper taskDataWrapper = HendelseTaskDataWrapper.lagWrapperForOpprettBehandling(EKSTERN_BEHANDLING_UUID.toString(), EKSTERN_BEHANDLING_ID, AKTØR_ID);
-        taskDataWrapper.setSaksnummer(SAKSNUMMER);
+        HendelseTaskDataWrapper taskDataWrapper = HendelseTaskDataWrapper.lagWrapperForOpprettBehandling(EKSTERN_BEHANDLING_UUID.toString(), EKSTERN_BEHANDLING_ID, AKTØR_ID,SAKSNUMMER);
         taskDataWrapper.setFagsakYtelseType(FAGSAK_YTELSE_TYPE);
         taskDataWrapper.setBehandlingType(BehandlingType.TILBAKEKREVING);
 
@@ -45,7 +44,7 @@ public class OpprettBehandlingTaskTest extends TilkjentYtelseTestOppsett {
 
     @Test
     public void test_skal_feile_på_manglende_task_property() {
-        HendelseTaskDataWrapper taskDataWrapper = HendelseTaskDataWrapper.lagWrapperForOpprettBehandling(EKSTERN_BEHANDLING_UUID.toString(), EKSTERN_BEHANDLING_ID, AKTØR_ID);
+        HendelseTaskDataWrapper taskDataWrapper = HendelseTaskDataWrapper.lagWrapperForOpprettBehandling(EKSTERN_BEHANDLING_UUID.toString(), EKSTERN_BEHANDLING_ID, AKTØR_ID,SAKSNUMMER);
 
         expectedException.expect(NullPointerException.class);
 

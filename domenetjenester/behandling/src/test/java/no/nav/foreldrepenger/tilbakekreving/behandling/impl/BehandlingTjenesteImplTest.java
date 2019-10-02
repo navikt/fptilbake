@@ -20,10 +20,12 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KonsekvensForYtelsen;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.tilbakekrevingsvalg.VidereBehandling;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.BehandlingsresultatDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.BehandlingÅrsakDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
@@ -40,7 +42,7 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
     private static final LocalDate NOW = LocalDate.now();
 
     @Before
-    public void setup(){
+    public void setup() {
         when(mockFpsakKlient.hentTilbakekrevingValg(eksternBehandlingUuid)).thenReturn(Optional.of(new TilbakekrevingValgDto(VidereBehandling.TILBAKEKREV_I_INFOTRYGD)));
         when(mockFpsakKlient.hentBehandling(eksternBehandlingUuid)).thenReturn(Optional.of(lagEksternBehandlingsInfo()));
     }
@@ -202,25 +204,44 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
     }
 
     @Test
-    public void kan_opprette_behandling_med_åpen_behandling_finnes(){
-        boolean result = behandlingTjeneste.kanOppretteBehandling(saksnummer,eksternBehandlingUuid);
+    public void kan_opprette_behandling_med_åpen_behandling_finnes() {
+        boolean result = behandlingTjeneste.kanOppretteBehandling(saksnummer, eksternBehandlingUuid);
         assertThat(result).isFalse();
     }
 
     @Test
-    public void kan_opprette_behandling_med_allerede_avsluttet_behandling_med_samme_fpsak_revurdering(){
+    public void kan_opprette_behandling_med_allerede_avsluttet_behandling_med_samme_fpsak_revurdering() {
         avsluttBehandling();
 
-        boolean result = behandlingTjeneste.kanOppretteBehandling(saksnummer,eksternBehandlingUuid);
+        boolean result = behandlingTjeneste.kanOppretteBehandling(saksnummer, eksternBehandlingUuid);
         assertThat(result).isFalse();
     }
 
     @Test
-    public void kan_opprette_behandling(){
+    public void kan_opprette_behandling() {
         avsluttBehandling();
 
-        boolean result = behandlingTjeneste.kanOppretteBehandling(saksnummer,UUID.randomUUID());
+        boolean result = behandlingTjeneste.kanOppretteBehandling(saksnummer, UUID.randomUUID());
         assertThat(result).isTrue();
+    }
+
+    @Test
+    public void skal_oppdatere_behandling_medEksternReferanse() {
+        UUID eksternUuid = testUtility.genererEksternUuid();
+        long eksternBehandlingId = 5l;
+        behandlingTjeneste.oppdaterBehandlingMedEksternReferanse(saksnummer,eksternBehandlingId, eksternUuid);
+
+        EksternBehandling eksternBehandling = repoProvider.getEksternBehandlingRepository().hentFraInternId(behandling.getId());
+        assertThat(eksternBehandling.getEksternUuid()).isEqualByComparingTo(eksternUuid);
+        assertThat(eksternBehandling.getEksternId()).isEqualByComparingTo(eksternBehandlingId);
+    }
+
+    @Test
+    public void skal_oppdatere_behandling_medEksternReferanse_med_ugyldig_saksnummer() {
+        UUID eksternUuid = testUtility.genererEksternUuid();
+        expectedException.expectMessage("FPT-663490");
+
+        behandlingTjeneste.oppdaterBehandlingMedEksternReferanse(new Saksnummer("1233434"),5l,  eksternUuid);
     }
 
     private void avsluttBehandling() {
@@ -256,7 +277,7 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
         assertThat(behandling.getBehandlendeEnhetNavn()).isNotEmpty();
     }
 
-    private EksternBehandlingsinfoDto lagEksternBehandlingsInfo(){
+    private EksternBehandlingsinfoDto lagEksternBehandlingsInfo() {
         EksternBehandlingsinfoDto eksternBehandlingsinfo = new EksternBehandlingsinfoDto();
         eksternBehandlingsinfo.setSprakkode(Språkkode.nb);
         eksternBehandlingsinfo.setUuid(eksternBehandlingUuid);
@@ -264,7 +285,7 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
 
         BehandlingsresultatDto behandlingsresultatDto = new BehandlingsresultatDto();
         behandlingsresultatDto.setType(BehandlingResultatType.OPPHØR);
-        behandlingsresultatDto.setKonsekvenserForYtelsen(Lists.newArrayList(KonsekvensForYtelsen.ENDRING_I_BEREGNING,KonsekvensForYtelsen.FORELDREPENGER_OPPHØRER));
+        behandlingsresultatDto.setKonsekvenserForYtelsen(Lists.newArrayList(KonsekvensForYtelsen.ENDRING_I_BEREGNING, KonsekvensForYtelsen.FORELDREPENGER_OPPHØRER));
         eksternBehandlingsinfo.setBehandlingsresultat(behandlingsresultatDto);
 
         BehandlingÅrsakDto behandlingÅrsakDto = new BehandlingÅrsakDto();
