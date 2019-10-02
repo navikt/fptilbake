@@ -22,7 +22,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBrukerRep
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBrukerRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProviderImpl;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.TotrinnRepository;
@@ -63,7 +63,7 @@ public class TestOppsett {
     protected KodeverkRepository kodeverkRepository = repoProvider.getKodeverkRepository();
     protected KravgrunnlagRepository grunnlagRepository = repoProvider.getGrunnlagRepository();
     protected HistorikkRepository historikkRepository = repoProvider.getHistorikkRepository();
-    protected FeilutbetalingRepository feilutbetalingRepository = repoProvider.getFeilutbetalingRepository();
+    protected FaktaFeilutbetalingRepository faktaFeilutbetalingRepository = repoProvider.getFaktaFeilutbetalingRepository();
     protected VurdertForeldelseRepository vurdertForeldelseRepository = repoProvider.getVurdertForeldelseRepository();
     protected VilkårsvurderingRepository vilkårsvurderingRepository = new VilkårsvurderingRepository(em);
     protected TotrinnRepository totrinnRepository = new TotrinnRepository(em);
@@ -77,7 +77,7 @@ public class TestOppsett {
 
     protected HistorikkTjenesteAdapter historikkTjenesteAdapter = new HistorikkTjenesteAdapter(historikkRepository, historikkInnslagKonverter, dokumentArkivTjeneste);
 
-    protected VurdertForeldelseTjeneste vurdertForeldelseTjeneste = new VurdertForeldelseTjeneste(vurdertForeldelseRepository, repoProvider, feilutbetalingRepository, historikkTjenesteAdapter);
+    protected VurdertForeldelseTjeneste vurdertForeldelseTjeneste = new VurdertForeldelseTjeneste(vurdertForeldelseRepository, repoProvider, faktaFeilutbetalingRepository, historikkTjenesteAdapter);
 
     protected VilkårsvurderingHistorikkInnslagTjeneste vilkårsvurderingHistorikkInnslagTjeneste = new VilkårsvurderingHistorikkInnslagTjeneste(historikkTjenesteAdapter, repoProvider);
 

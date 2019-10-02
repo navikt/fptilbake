@@ -20,9 +20,9 @@ import org.threeten.extra.Days;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BehandlingFeilutbetalingFakta;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.UtbetaltPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingAggregate;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingPeriodeÅrsak;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingAggregate;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.FeilutbetalingÅrsakDto;
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.UnderÅrsakDto;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
@@ -36,7 +36,7 @@ import no.nav.foreldrepenger.tilbakekreving.simulering.kontrakt.SimuleringResult
 @ApplicationScoped
 public class FeilutbetalingTjeneste {
 
-    private FeilutbetalingRepository feilutbetalingRepository;
+    private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository;
 
     FeilutbetalingTjeneste(){
         // for CDI proxy
@@ -44,14 +44,14 @@ public class FeilutbetalingTjeneste {
 
     @Inject
     public FeilutbetalingTjeneste(BehandlingRepositoryProvider repositoryProvider){
-        this.feilutbetalingRepository = repositoryProvider.getFeilutbetalingRepository();
+        this.faktaFeilutbetalingRepository = repositoryProvider.getFaktaFeilutbetalingRepository();
     }
 
     public void formFeilutbetalingÅrsak(Long behandlingId, UtbetaltPeriode utbetaltPeriode) {
-        Optional<FeilutbetalingAggregate> feilutbetalingAggregate = feilutbetalingRepository.finnFeilutbetaling(behandlingId);
+        Optional<FaktaFeilutbetalingAggregate> feilutbetalingAggregate = faktaFeilutbetalingRepository.finnFeilutbetaling(behandlingId);
         if (feilutbetalingAggregate.isPresent()) {
-            Optional<FeilutbetalingPeriodeÅrsak> feilutbetalingPeriodeÅrsak = feilutbetalingAggregate.get()
-                .getFeilutbetaling()
+            Optional<FaktaFeilutbetalingPeriode> feilutbetalingPeriodeÅrsak = feilutbetalingAggregate.get()
+                .getFaktaFeilutbetaling()
                 .getFeilutbetaltPerioder()
                 .stream()
                 .filter(periodeÅrsak -> utbetaltPeriode.tilPeriode().equals(periodeÅrsak.getPeriode()))
@@ -76,14 +76,14 @@ public class FeilutbetalingTjeneste {
             .build();
     }
 
-    private FeilutbetalingÅrsakDto mapFra(Optional<FeilutbetalingPeriodeÅrsak> årsak) {
+    private FeilutbetalingÅrsakDto mapFra(Optional<FaktaFeilutbetalingPeriode> årsak) {
         FeilutbetalingÅrsakDto feilutbetalingÅrsakDto = new FeilutbetalingÅrsakDto();
         if (årsak.isPresent()) {
-            FeilutbetalingPeriodeÅrsak feilutbetalingPeriodeÅrsak = årsak.get();
-            feilutbetalingÅrsakDto.setÅrsakKode(feilutbetalingPeriodeÅrsak.getÅrsak());
-            if (StringUtils.isNotEmpty(feilutbetalingPeriodeÅrsak.getUnderÅrsak()))
-                feilutbetalingÅrsakDto.leggTilUnderÅrsaker(new UnderÅrsakDto(null, feilutbetalingPeriodeÅrsak.getUnderÅrsak(),
-                    feilutbetalingPeriodeÅrsak.getUnderÅrsakKodeverk()));
+            FaktaFeilutbetalingPeriode faktaFeilutbetalingPeriode = årsak.get();
+            feilutbetalingÅrsakDto.setÅrsakKode(faktaFeilutbetalingPeriode.getÅrsak());
+            if (StringUtils.isNotEmpty(faktaFeilutbetalingPeriode.getUnderÅrsak()))
+                feilutbetalingÅrsakDto.leggTilUnderÅrsaker(new UnderÅrsakDto(null, faktaFeilutbetalingPeriode.getUnderÅrsak(),
+                    faktaFeilutbetalingPeriode.getUnderÅrsakKodeverk()));
         }
         return feilutbetalingÅrsakDto;
     }

@@ -46,7 +46,7 @@ public class TotrinnTjenesteTest extends FellesTestOppsett {
                 .medBehandlingId(internBehandlingId).build();
         grunnlagRepository.lagre(kravgrunnlagAggregate);
 
-        repoProvider.getFeilutbetalingRepository().lagre(formFeilutbetalingAggregate());
+        repoProvider.getFaktaFeilutbetalingRepository().lagre(formFeilutbetalingAggregate());
         vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, Collections.singletonList(
                 new ForeldelsePeriodeDto(FOM, TOM,
                         ForeldelseVurderingType.FORELDET, "ABC")));
@@ -60,7 +60,7 @@ public class TotrinnTjenesteTest extends FellesTestOppsett {
         assertThat(totrinnresultatgrunnlag).isNotEmpty();
         Totrinnresultatgrunnlag resultat = totrinnresultatgrunnlag.get();
         assertThat(resultat.getBehandling().getId()).isEqualTo(internBehandlingId);
-        assertThat(resultat.getFaktaFeilutbetalingId()).isEqualTo(repoProvider.getFeilutbetalingRepository().finnFeilutbetaling(internBehandlingId).get().getId());
+        assertThat(resultat.getFaktaFeilutbetalingId()).isEqualTo(repoProvider.getFaktaFeilutbetalingRepository().finnFeilutbetaling(internBehandlingId).get().getId());
         assertThat(resultat.getVurderForeldelseId()).isEqualTo(repoProvider.getVurdertForeldelseRepository().finnVurdertForeldelseForBehandling(internBehandlingId).get().getId());
         assertThat(resultat.getVurderVilkårId()).isEqualTo(repoProvider.getVilkårsvurderingRepository().finnVilkårsvurderingForBehandlingId(internBehandlingId).get().getId());
     }

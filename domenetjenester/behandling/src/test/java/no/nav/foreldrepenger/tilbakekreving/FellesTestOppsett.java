@@ -22,11 +22,12 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.dto.vilkår.Vilkårsvurde
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjenesteImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.Feilutbetaling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingAggregate;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingPeriodeÅrsak;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingAggregate;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.FpHendelseUnderTyper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagFelt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.SærligGrunn;
@@ -51,11 +52,9 @@ public class FellesTestOppsett extends TestOppsett {
     protected static final LocalDate TOM = LocalDate.of(2016, 5, 31);
     protected static final Long SUM_FEIL_UTBETALT = 23000L;
     protected static final Long SUM_INNTREKK = 1000L;
-    protected static final String ÅRSAK = "UTTAK_UTSETTELSE_TYPE";
-    protected static final String UNDER_ÅRSAK = "ARBEID_HELTID";
+    protected static final HendelseType HENDELSE_TYPE = HendelseType.FP_UTTAK_UTSETTELSE_TYPE;
+    protected static final HendelseUnderType HENDELSE_UNDERTYPE = FpHendelseUnderTyper.ARBEID_HELTID;
     protected static final String BEGRUNNELSE = "ABC";
-    protected static final String ÅRSAK_KODEVERK = HendelseType.DISCRIMINATOR;
-    protected static final String UNDER_ÅRSAK_KODEVERK = HendelseUnderType.DISCRIMINATOR;
     protected static final Period defaultVentetid = Period.ofWeeks(4);
     protected static final String BEHANDLENDE_ENHET_ID = "4833";
     protected static final String BEHANDLENDE_ENHET_NAVN = "NAV Familie- og pensjonsytelser Oslo 1";
@@ -118,19 +117,17 @@ public class FellesTestOppsett extends TestOppsett {
         return null;
     }
 
-    protected FeilutbetalingAggregate formFeilutbetalingAggregate() {
-        Feilutbetaling feilutbetaling = new Feilutbetaling();
-        FeilutbetalingPeriodeÅrsak periodeÅrsak = FeilutbetalingPeriodeÅrsak.builder()
-            .medÅrsak(ÅRSAK)
-            .medÅrsakKodeverk(ÅRSAK_KODEVERK)
-            .medUnderÅrsak(UNDER_ÅRSAK)
-            .medUnderÅrsakKodeverk(UNDER_ÅRSAK_KODEVERK)
+    protected FaktaFeilutbetalingAggregate formFeilutbetalingAggregate() {
+        FaktaFeilutbetaling faktaFeilutbetaling = new FaktaFeilutbetaling();
+        FaktaFeilutbetalingPeriode periodeÅrsak = FaktaFeilutbetalingPeriode.builder()
+            .medHendelseType(HENDELSE_TYPE)
+            .medHendelseUndertype(HENDELSE_UNDERTYPE)
             .medPeriode(FOM, TOM)
-            .medFeilutbetalinger(feilutbetaling).build();
-        feilutbetaling.leggTilFeilutbetaltPeriode(periodeÅrsak);
-        return FeilutbetalingAggregate.builder()
+            .medFeilutbetalinger(faktaFeilutbetaling).build();
+        faktaFeilutbetaling.leggTilFeilutbetaltPeriode(periodeÅrsak);
+        return FaktaFeilutbetalingAggregate.builder()
             .medBehandlingId(internBehandlingId)
-            .medFeilutbetaling(feilutbetaling).build();
+            .medFeilutbetaling(faktaFeilutbetaling).build();
     }
 
     protected VilkårsvurderingPerioderDto formVilkårsvurderingPerioderDto(VilkårResultat resultat, LocalDate fom, LocalDate tom, Aktsomhet aktsomhet) {

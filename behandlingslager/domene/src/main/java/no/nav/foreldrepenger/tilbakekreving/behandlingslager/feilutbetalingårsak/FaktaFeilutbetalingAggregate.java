@@ -13,26 +13,26 @@ import javax.persistence.Table;
 import no.nav.vedtak.felles.jpa.BaseEntitet;
 import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
 
-@Entity(name = "FeilutbetalingAggregate")
-@Table(name = "GR_FEILUTBETALING")
-public class FeilutbetalingAggregate extends BaseEntitet {
+@Entity(name = "FaktaFeilutbetalingAggregate")
+@Table(name = "GR_FAKTA_FEILUTBETALING")
+public class FaktaFeilutbetalingAggregate extends BaseEntitet {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_GR_FEILUTBETALING")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_GR_FAKTA_FEILUTBETALING")
     private Long id;
 
     @Column(name = "behandling_id", nullable = false, updatable = false)
     private Long behandlingId;
 
     @OneToOne(optional = false)
-    @JoinColumn(name = "feilutbetaling_id", nullable = false, updatable = false)
-    private Feilutbetaling feilutbetaling;
+    @JoinColumn(name = "fakta_feilutbetaling_id", nullable = false, updatable = false)
+    private FaktaFeilutbetaling faktaFeilutbetaling;
 
     @Convert(converter = BooleanToStringConverter.class)
     @Column(name = "aktiv", nullable = false)
     private boolean aktiv = true;
 
-    FeilutbetalingAggregate() {
+    FaktaFeilutbetalingAggregate() {
         // for hibernate
     }
 
@@ -44,8 +44,8 @@ public class FeilutbetalingAggregate extends BaseEntitet {
         return behandlingId;
     }
 
-    public Feilutbetaling getFeilutbetaling() {
-        return feilutbetaling;
+    public FaktaFeilutbetaling getFaktaFeilutbetaling() {
+        return faktaFeilutbetaling;
     }
 
     public boolean isAktiv() {
@@ -61,19 +61,19 @@ public class FeilutbetalingAggregate extends BaseEntitet {
     }
 
     public static class Builder {
-        private FeilutbetalingAggregate kladd = new FeilutbetalingAggregate();
+        private FaktaFeilutbetalingAggregate kladd = new FaktaFeilutbetalingAggregate();
 
         public Builder medBehandlingId(Long behandlingId) {
             this.kladd.behandlingId = behandlingId;
             return this;
         }
 
-        public Builder medFeilutbetaling(Feilutbetaling feilutbetaling) {
-            this.kladd.feilutbetaling = feilutbetaling;
+        public Builder medFeilutbetaling(FaktaFeilutbetaling faktaFeilutbetaling) {
+            this.kladd.faktaFeilutbetaling = faktaFeilutbetaling;
             return this;
         }
 
-        public FeilutbetalingAggregate build() {
+        public FaktaFeilutbetalingAggregate build() {
             return kladd;
         }
     }

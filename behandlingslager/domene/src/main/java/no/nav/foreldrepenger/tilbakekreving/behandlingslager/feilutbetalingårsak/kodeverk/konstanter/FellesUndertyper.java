@@ -4,6 +4,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 
 public interface FellesUndertyper {
 
+    HendelseUnderType IKKE_SATT = new HendelseUnderType("-");
+
     HendelseUnderType ANNET_FRITEKST = new HendelseUnderType("ANNET_FRITEKST");
     HendelseUnderType REFUSJON_ARBEIDSGIVER = new HendelseUnderType("REFUSJON_ARBGIVER");
 }

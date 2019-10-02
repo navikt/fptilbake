@@ -30,9 +30,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BeregnBeløpUtil;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurdertForeldelseTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingAggregate;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingPeriodeÅrsak;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingAggregate;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.InntektskategoriKlassekodeMapper;
@@ -58,7 +58,7 @@ public class VilkårsvurderingTjeneste {
 
     private VurdertForeldelseTjeneste foreldelseTjeneste;
     private KravgrunnlagRepository grunnlagRepository;
-    private FeilutbetalingRepository feilutbetalingRepository;
+    private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository;
     private VilkårsvurderingRepository vilkårsvurderingRepository;
     private KodeverkRepository kodeverkRepository;
     private BehandlingRepositoryProvider behandlingRepositoryProvider;
@@ -74,7 +74,7 @@ public class VilkårsvurderingTjeneste {
         this.foreldelseTjeneste = foreldelseTjeneste;
         this.behandlingRepositoryProvider = behandlingRepositoryProvider;
         this.grunnlagRepository = behandlingRepositoryProvider.getGrunnlagRepository();
-        this.feilutbetalingRepository = behandlingRepositoryProvider.getFeilutbetalingRepository();
+        this.faktaFeilutbetalingRepository = behandlingRepositoryProvider.getFaktaFeilutbetalingRepository();
         this.vilkårsvurderingRepository = behandlingRepositoryProvider.getVilkårsvurderingRepository();
         this.kodeverkRepository = behandlingRepositoryProvider.getKodeverkRepository();
         this.vilkårsvurderingHistorikkInnslagTjeneste = vilkårsvurderingHistorikkInnslagTjeneste;
@@ -82,10 +82,10 @@ public class VilkårsvurderingTjeneste {
 
     public List<DetaljertFeilutbetalingPeriodeDto> hentDetaljertFeilutbetalingPerioder(Long behandlingId) {
         List<DetaljertFeilutbetalingPeriodeDto> feilutbetalingPerioder = new ArrayList<>();
-        Optional<FeilutbetalingAggregate> feilutbetalingAggregate = feilutbetalingRepository.finnFeilutbetaling(behandlingId);
+        Optional<FaktaFeilutbetalingAggregate> feilutbetalingAggregate = faktaFeilutbetalingRepository.finnFeilutbetaling(behandlingId);
 
         if (feilutbetalingAggregate.isPresent()) {
-            List<FeilutbetalingPeriodeÅrsak> feilutbetaltPerioder = feilutbetalingAggregate.get().getFeilutbetaling().getFeilutbetaltPerioder();
+            List<FaktaFeilutbetalingPeriode> feilutbetaltPerioder = feilutbetalingAggregate.get().getFaktaFeilutbetaling().getFeilutbetaltPerioder();
             // hvis perioder er vurdert for foreldelse
             if (foreldelseTjeneste.harForeldetPeriodeForBehandlingId(behandlingId)) {
                 feilutbetalingPerioder.addAll(henteFeilutbetalingPerioderFraForeldelse(behandlingId, feilutbetaltPerioder));
@@ -145,7 +145,7 @@ public class VilkårsvurderingTjeneste {
         return perioder;
     }
 
-    private List<DetaljertFeilutbetalingPeriodeDto> henteFeilutbetalingPerioderFraForeldelse(Long behandlingId, List<FeilutbetalingPeriodeÅrsak> faktaFeilutbetalingPerioder) {
+    private List<DetaljertFeilutbetalingPeriodeDto> henteFeilutbetalingPerioderFraForeldelse(Long behandlingId, List<FaktaFeilutbetalingPeriode> faktaFeilutbetalingPerioder) {
         List<DetaljertFeilutbetalingPeriodeDto> feilutbetalingPerioder = new ArrayList<>();
         FeilutbetalingPerioderDto feilutbetalingPerioderDto = foreldelseTjeneste.henteVurdertForeldelse(behandlingId);
 
@@ -164,13 +164,13 @@ public class VilkårsvurderingTjeneste {
         return feilutbetalingPerioder;
     }
 
-    private List<DetaljertFeilutbetalingPeriodeDto> henteFeilutbetalingPerioderFraFaktaOmFeilutbetaling(Long behandlingId, List<FeilutbetalingPeriodeÅrsak> faktaFeilutbetalingPerioder) {
+    private List<DetaljertFeilutbetalingPeriodeDto> henteFeilutbetalingPerioderFraFaktaOmFeilutbetaling(Long behandlingId, List<FaktaFeilutbetalingPeriode> faktaFeilutbetalingPerioder) {
         List<DetaljertFeilutbetalingPeriodeDto> feilutbetalingPerioder = new ArrayList<>();
 
-        List<Periode> råPerioder = faktaFeilutbetalingPerioder.stream().map(FeilutbetalingPeriodeÅrsak::getPeriode).collect(Collectors.toList());
+        List<Periode> råPerioder = faktaFeilutbetalingPerioder.stream().map(FaktaFeilutbetalingPeriode::getPeriode).collect(Collectors.toList());
         Map<Periode, BigDecimal> beløpForPerioder = foreldelseTjeneste.beregnFeilutbetaltBeløpForPerioder(behandlingId, råPerioder);
 
-        for (FeilutbetalingPeriodeÅrsak periodeÅrsak : faktaFeilutbetalingPerioder) {
+        for (FaktaFeilutbetalingPeriode periodeÅrsak : faktaFeilutbetalingPerioder) {
             Periode periode = periodeÅrsak.getPeriode();
             BigDecimal beløp = beløpForPerioder.get(periode);
             DetaljertFeilutbetalingPeriodeDto periodeDto = new DetaljertFeilutbetalingPeriodeDto(periode, mapTil(periodeÅrsak), beløp);
@@ -200,8 +200,8 @@ public class VilkårsvurderingTjeneste {
         return false;
     }
 
-    private FeilutbetalingÅrsakDto henteÅrsak(List<FeilutbetalingPeriodeÅrsak> faktaFeilutbetalingPerioder, Periode foreldetPeriode) {
-        for (FeilutbetalingPeriodeÅrsak feilutbetalingPeriodeÅrsak : faktaFeilutbetalingPerioder) {
+    private FeilutbetalingÅrsakDto henteÅrsak(List<FaktaFeilutbetalingPeriode> faktaFeilutbetalingPerioder, Periode foreldetPeriode) {
+        for (FaktaFeilutbetalingPeriode feilutbetalingPeriodeÅrsak : faktaFeilutbetalingPerioder) {
             Periode faktaFeilutbetalingPeriode = feilutbetalingPeriodeÅrsak.getPeriode();
             if (faktaFeilutbetalingPeriode.overlapper(foreldetPeriode)) {
                 return mapTil(feilutbetalingPeriodeÅrsak);
@@ -210,16 +210,16 @@ public class VilkårsvurderingTjeneste {
         return new FeilutbetalingÅrsakDto();
     }
 
-    private FeilutbetalingÅrsakDto mapTil(FeilutbetalingPeriodeÅrsak feilutbetalingPeriodeÅrsak) {
+    private FeilutbetalingÅrsakDto mapTil(FaktaFeilutbetalingPeriode faktaFeilutbetalingPeriode) {
         FeilutbetalingÅrsakDto årsakDto = new FeilutbetalingÅrsakDto();
-        årsakDto.setKodeverk(feilutbetalingPeriodeÅrsak.getÅrsakKodeverk());
-        årsakDto.setÅrsakKode(feilutbetalingPeriodeÅrsak.getÅrsak());
-        Kodeliste kodeliste = kodeverkRepository.hentKodeliste(feilutbetalingPeriodeÅrsak.getÅrsakKodeverk(), feilutbetalingPeriodeÅrsak.getÅrsak());
+        årsakDto.setKodeverk(faktaFeilutbetalingPeriode.getÅrsakKodeverk());
+        årsakDto.setÅrsakKode(faktaFeilutbetalingPeriode.getÅrsak());
+        Kodeliste kodeliste = kodeverkRepository.hentKodeliste(faktaFeilutbetalingPeriode.getÅrsakKodeverk(), faktaFeilutbetalingPeriode.getÅrsak());
         årsakDto.setÅrsak(kodeliste.getNavn());
-        if (feilutbetalingPeriodeÅrsak.getUnderÅrsakKodeverk() != null) {
-            Kodeliste underÅrsakKodeListe = kodeverkRepository.hentKodeliste(feilutbetalingPeriodeÅrsak.getUnderÅrsakKodeverk(), feilutbetalingPeriodeÅrsak.getUnderÅrsak());
-            årsakDto.leggTilUnderÅrsaker(new UnderÅrsakDto(underÅrsakKodeListe.getNavn(), feilutbetalingPeriodeÅrsak.getUnderÅrsak(),
-                feilutbetalingPeriodeÅrsak.getUnderÅrsakKodeverk()));
+        if (faktaFeilutbetalingPeriode.getUnderÅrsakKodeverk() != null) {
+            Kodeliste underÅrsakKodeListe = kodeverkRepository.hentKodeliste(faktaFeilutbetalingPeriode.getUnderÅrsakKodeverk(), faktaFeilutbetalingPeriode.getUnderÅrsak());
+            årsakDto.leggTilUnderÅrsaker(new UnderÅrsakDto(underÅrsakKodeListe.getNavn(), faktaFeilutbetalingPeriode.getUnderÅrsak(),
+                faktaFeilutbetalingPeriode.getUnderÅrsakKodeverk()));
         }
         return årsakDto;
     }

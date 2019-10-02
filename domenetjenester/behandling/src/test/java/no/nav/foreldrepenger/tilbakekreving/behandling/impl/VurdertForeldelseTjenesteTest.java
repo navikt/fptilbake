@@ -19,10 +19,11 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.dto.ForeldelsePeriodeDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.PeriodeDto;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.Feilutbetaling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingAggregate;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingPeriodeÅrsak;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingAggregate;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.FpHendelseUnderTyper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType;
@@ -256,19 +257,16 @@ public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
             .medBehandlingId(internBehandlingId).build();
         grunnlagRepository.lagre(kravgrunnlagAggregate);
 
-        Feilutbetaling feilutbetaling = new Feilutbetaling();
+        FaktaFeilutbetaling faktaFeilutbetaling = new FaktaFeilutbetaling();
 
-        feilutbetaling.leggTilFeilutbetaltPeriode(formPeriodeÅrsak(FOM_1, sisteDagFørstePeriode,
-            HendelseType.FP_UTTAK_UTSETTELSE_TYPE.getKode(), FpHendelseUnderTyper.ARBEID_HELTID.getKode(), feilutbetaling));
+        faktaFeilutbetaling.leggTilFeilutbetaltPeriode(lagPeriode(FOM_1, sisteDagFørstePeriode, HendelseType.FP_UTTAK_UTSETTELSE_TYPE, FpHendelseUnderTyper.ARBEID_HELTID, faktaFeilutbetaling));
+        faktaFeilutbetaling.leggTilFeilutbetaltPeriode(lagPeriode(førsteDagAndrePeriode, TOM_1, HendelseType.FP_UTTAK_UTSETTELSE_TYPE, FpHendelseUnderTyper.ARBEID_HELTID, faktaFeilutbetaling));
 
-        feilutbetaling.leggTilFeilutbetaltPeriode(formPeriodeÅrsak(førsteDagAndrePeriode, TOM_1,
-            HendelseType.FP_UTTAK_UTSETTELSE_TYPE.getKode(), FpHendelseUnderTyper.ARBEID_HELTID.getKode(), feilutbetaling));
-
-        FeilutbetalingAggregate feilutbetalingAggregate = FeilutbetalingAggregate.builder()
+        FaktaFeilutbetalingAggregate faktaFeilutbetalingAggregate = FaktaFeilutbetalingAggregate.builder()
             .medBehandlingId(internBehandlingId)
-            .medFeilutbetaling(feilutbetaling).build();
+            .medFeilutbetaling(faktaFeilutbetaling).build();
 
-        feilutbetalingRepository.lagre(feilutbetalingAggregate);
+        faktaFeilutbetalingRepository.lagre(faktaFeilutbetalingAggregate);
 
         FeilutbetalingPerioderDto feilutbetalingPerioder = vurdertForeldelseTjeneste.hentFaktaPerioder(internBehandlingId);
         assertThat(feilutbetalingPerioder.getPerioder().size()).isEqualTo(2);
@@ -285,14 +283,12 @@ public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
         assertThat(perioder.get(1).getTom()).isEqualTo(TOM_1);
     }
 
-    private FeilutbetalingPeriodeÅrsak formPeriodeÅrsak(LocalDate fom, LocalDate tom, String årsak, String underÅrsak, Feilutbetaling feilutbetaling) {
-        return FeilutbetalingPeriodeÅrsak.builder()
+    private FaktaFeilutbetalingPeriode lagPeriode(LocalDate fom, LocalDate tom, HendelseType årsak, HendelseUnderType underårsak, FaktaFeilutbetaling faktaFeilutbetaling) {
+        return FaktaFeilutbetalingPeriode.builder()
             .medPeriode(fom, tom)
-            .medÅrsakKodeverk(årsak)
-            .medÅrsak(årsak)
-            .medUnderÅrsakKodeverk(underÅrsak)
-            .medUnderÅrsak(underÅrsak)
-            .medFeilutbetalinger(feilutbetaling).build();
+            .medHendelseType(årsak)
+            .medHendelseUndertype(underårsak)
+            .medFeilutbetalinger(faktaFeilutbetaling).build();
     }
 
     private ForeldelseVurderingType finnForeldelseVurderingType(ForeldelseVurderingType foreldelseVurderingType) {
