@@ -261,7 +261,6 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
         eksternBehandlingsinfo.setSprakkode(Språkkode.nb);
         eksternBehandlingsinfo.setUuid(eksternBehandlingUuid);
         eksternBehandlingsinfo.setVedtakDato(NOW);
-        eksternBehandlingsinfo.setSaksnummer(saksnummer.getVerdi());
 
         BehandlingsresultatDto behandlingsresultatDto = new BehandlingsresultatDto();
         behandlingsresultatDto.setType(BehandlingResultatType.OPPHØR);

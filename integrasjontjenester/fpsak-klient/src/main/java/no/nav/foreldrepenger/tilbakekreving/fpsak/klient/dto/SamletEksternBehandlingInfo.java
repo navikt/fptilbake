@@ -16,6 +16,7 @@ public class SamletEksternBehandlingInfo {
     private String varseltekst;
     private TilbakekrevingValgDto tilbakekrevingsvalg;
     private SoknadDto søknad;
+    private FagsakDto fagsak;
 
     public EksternBehandlingsinfoDto getGrunninformasjon() {
         return grunninformasjon;
@@ -41,19 +42,24 @@ public class SamletEksternBehandlingInfo {
         return søknad;
     }
 
+    private FagsakDto getFagsak() {
+        Objects.check(tilleggsinformasjonHentet.contains(Tillegsinformasjon.FAGSAK), "Utvikler-feil: har ikke hentet fagsak");
+        return fagsak;
+    }
+
     public AktørId getAktørId() {
         return new AktørId(getPersonopplysninger().getAktoerId());
     }
 
-    public SøknadType getSøknadType(){
+    public SøknadType getSøknadType() {
         return getSøknad().getSøknadType();
     }
 
-    public Saksnummer getSaksnummer(){
-        return new Saksnummer(getGrunninformasjon().getSaksnummer());
+    public Saksnummer getSaksnummer() {
+        return getFagsak().getSaksnummer();
     }
 
-    public int getAntallBarnSøktFor(){
+    public int getAntallBarnSøktFor() {
         return getPersonopplysninger().getBarnSoktFor().size();
     }
 
@@ -64,6 +70,7 @@ public class SamletEksternBehandlingInfo {
     public static Builder builder(Tillegsinformasjon... tilleggsinformasjonHentet) {
         return builder(Arrays.asList(tilleggsinformasjonHentet));
     }
+
     public static Builder builder(Collection<Tillegsinformasjon> tilleggsinformasjonHentet) {
         return new Builder(tilleggsinformasjonHentet);
     }
@@ -97,6 +104,11 @@ public class SamletEksternBehandlingInfo {
 
         public Builder setTilbakekrevingvalg(TilbakekrevingValgDto tilbakekrevingvalg) {
             kladd.tilbakekrevingsvalg = tilbakekrevingvalg;
+            return this;
+        }
+
+        public Builder setFagsak(FagsakDto fagsak) {
+            kladd.fagsak = fagsak;
             return this;
         }
 
