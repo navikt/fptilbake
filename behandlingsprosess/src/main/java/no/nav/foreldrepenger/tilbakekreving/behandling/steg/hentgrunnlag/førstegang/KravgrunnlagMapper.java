@@ -39,10 +39,6 @@ public class KravgrunnlagMapper {
         return kravgrunnlagDto.getReferanse();
     }
 
-    public String finnSaksnummer(DetaljertKravgrunnlag kravgrunnlagDto) {
-        return kravgrunnlagDto.getFagsystemId().substring(0,kravgrunnlagDto.getFagsystemId().length()-3);
-    }
-
     public Kravgrunnlag431 mapTilDomene(DetaljertKravgrunnlag dto) {
         Kravgrunnlag431 kravgrunnlag431 = formKravgrunnlag431(dto);
         for (DetaljertKravgrunnlagPeriode periodeDto : dto.getTilbakekrevingsPeriode()) {
