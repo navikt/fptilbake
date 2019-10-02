@@ -27,8 +27,6 @@ import no.nav.foreldrepenger.tilbakekreving.simulering.kontrakt.PeriodeDto;
 
 public class VarselbrevUtilTest {
 
-    private FagsakYtelseType foreldrepengerkode = FagsakYtelseType.FORELDREPENGER;
-    private FagsakYtelseType engangsstønadkode = FagsakYtelseType.ENGANGSTØNAD;
     private FagsakYtelseType svangerskapspengerkode = FagsakYtelseType.SVANGERSKAPSPENGER;
 
     @Test
@@ -74,7 +72,7 @@ public class VarselbrevUtilTest {
         Assertions.assertThat(varselbrev.getFritekstFraSaksbehandler()).isEqualTo(varseltekst);
         Assertions.assertThat(varselbrev.getBrevMetadata().getSaksnummer()).isEqualTo(saksnummer.getVerdi());
         Assertions.assertThat(varselbrev.getBrevMetadata().getAnsvarligSaksbehandler()).isEqualTo(eksternBehandlingsinfoDto.getAnsvarligSaksbehandler());
-        Assertions.assertThat(varselbrev.getBrevMetadata().getSpråkkode()).isEqualTo(eksternBehandlingsinfoDto.getSprakkode());
+        Assertions.assertThat(varselbrev.getBrevMetadata().getSpråkkode()).isEqualTo(eksternBehandlingsinfoDto.getSpråkkodeEllerDefault());
         Assertions.assertThat(varselbrev.getSumFeilutbetaling()).isEqualTo(feilutbetaltePerioderDto.getSumFeilutbetaling());
         Assertions.assertThat(varselbrev.getBrevMetadata().getFagsaktypenavnPåSpråk()).isEqualTo("eingongsstønad");
         Assertions.assertThat(varselbrev.getBrevMetadata().getTittel()).isEqualTo("Varsel tilbakebetaling engangsstønad");

@@ -146,7 +146,7 @@ public class VarselbrevTjeneste {
         Adresseinfo adresseinfo = eksternDataForBrevTjeneste.hentAdresse(personinfo, aktørId);
 
         //Henter fagsaktypenavn på riktig språk
-        Språkkode mottakersSpråkkode = eksternBehandlingsinfoDto.getGrunninformasjon().getSprakkode();
+        Språkkode mottakersSpråkkode = eksternBehandlingsinfoDto.getGrunninformasjon().getSpråkkodeEllerDefault();
         FagsakYtelseType fagsakYtelseType = behandling.getFagsak().getFagsakYtelseType();
         YtelseNavn ytelseNavn = eksternDataForBrevTjeneste.hentYtelsenavn(fagsakYtelseType, mottakersSpråkkode);
 
@@ -172,11 +172,7 @@ public class VarselbrevTjeneste {
         Adresseinfo adresseinfo = eksternDataForBrevTjeneste.hentAdresse(personinfo, aktørId);
         EksternBehandlingsinfoDto grunninformasjon = eksternBehandlingsinfo.getGrunninformasjon();
         FeilutbetaltePerioderDto feilutbetaltePerioderDto = eksternDataForBrevTjeneste.hentFeilutbetaltePerioder(grunninformasjon.getId());
-
-        if (grunninformasjon.getSprakkode() == null) {
-            grunninformasjon.setSprakkode(Språkkode.nb);
-        }
-        Språkkode mottakersSpråkkode = grunninformasjon.getSprakkode();
+        Språkkode mottakersSpråkkode = grunninformasjon.getSpråkkodeEllerDefault();
         YtelseNavn ytelseNavn = eksternDataForBrevTjeneste.hentYtelsenavn(fagsakYtleseType, mottakersSpråkkode);
         return VarselbrevUtil.sammenstillInfoFraFagsystemerForhåndvisningVarselbrev(
             eksternBehandlingsinfo.getSaksnummer(),
