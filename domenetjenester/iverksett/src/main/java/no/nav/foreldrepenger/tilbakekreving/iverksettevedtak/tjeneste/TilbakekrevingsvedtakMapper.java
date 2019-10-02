@@ -6,6 +6,7 @@ import java.util.List;
 
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsbelopDto;
 import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsperiodeDto;
 import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsvedtakDto;
@@ -56,14 +57,16 @@ public class TilbakekrevingsvedtakMapper {
 
     private static TilbakekrevingsbelopDto lagDto(TilbakekrevingBeløp b) {
         TilbakekrevingsbelopDto dto = new TilbakekrevingsbelopDto();
+        dto.setKodeKlasse(b.getKlassekode());
         dto.setBelopTilbakekreves(b.getTilbakekrevBeløp());
         dto.setBelopUinnkrevd(b.getUinnkrevdBeløp());
         dto.setBelopOpprUtbet(b.getUtbetaltBeløp());
         dto.setBelopNy(b.getNyttBeløp());
-        dto.setKodeKlasse(b.getKlassekode());
-        dto.setKodeResultat(b.getKodeResultat().getKode());
-        dto.setKodeAarsak("ANNET"); // fast verdi
-        dto.setKodeSkyld("IKKE_FORDELT"); // fast verdi
+        if (KlasseType.YTEL.equals(b.getKlasseType())) {
+            dto.setKodeResultat(b.getKodeResultat().getKode());
+            dto.setKodeAarsak("ANNET"); // fast verdi
+            dto.setKodeSkyld("IKKE_FORDELT"); // fast verdi
+        }
         //FIXME setKlasseType mangler
         return dto;
     }
