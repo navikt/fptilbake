@@ -74,7 +74,7 @@ public class VarselbrevUtilTest {
         Assertions.assertThat(varselbrev.getFritekstFraSaksbehandler()).isEqualTo(varseltekst);
         Assertions.assertThat(varselbrev.getBrevMetadata().getSaksnummer()).isEqualTo(saksnummer.getVerdi());
         Assertions.assertThat(varselbrev.getBrevMetadata().getAnsvarligSaksbehandler()).isEqualTo(eksternBehandlingsinfoDto.getAnsvarligSaksbehandler());
-        Assertions.assertThat(varselbrev.getBrevMetadata().getSpråkkode()).isEqualTo(eksternBehandlingsinfoDto.getSprakkode());
+        Assertions.assertThat(varselbrev.getBrevMetadata().getSpråkkode()).isEqualTo(eksternBehandlingsinfoDto.getSpråkkode());
         Assertions.assertThat(varselbrev.getSumFeilutbetaling()).isEqualTo(feilutbetaltePerioderDto.getSumFeilutbetaling());
         Assertions.assertThat(varselbrev.getBrevMetadata().getFagsaktypenavnPåSpråk()).isEqualTo("eingongsstønad");
         Assertions.assertThat(varselbrev.getBrevMetadata().getTittel()).isEqualTo("Varsel tilbakebetaling engangsstønad");

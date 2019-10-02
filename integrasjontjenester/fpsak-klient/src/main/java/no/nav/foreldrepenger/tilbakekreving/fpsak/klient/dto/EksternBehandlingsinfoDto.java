@@ -3,6 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -75,8 +76,14 @@ public class EksternBehandlingsinfoDto {
         this.ansvarligSaksbehandler = ansvarligSaksbehandler;
     }
 
-    public Språkkode getSprakkode() {
-        return sprakkode;
+    public Optional<Språkkode> getSpråkkode() {
+        return Språkkode.UDEFINERT.equals(sprakkode)
+            ? Optional.empty()
+            : Optional.ofNullable(sprakkode);
+    }
+
+    public Språkkode getSpråkkodeEllerDefault() {
+        return getSpråkkode().orElse(Språkkode.DEFAULT);
     }
 
     public void setSprakkode(Språkkode sprakkode) {

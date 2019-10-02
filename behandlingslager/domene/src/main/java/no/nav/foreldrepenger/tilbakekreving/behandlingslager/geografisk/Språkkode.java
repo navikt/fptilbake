@@ -15,6 +15,8 @@ public class Språkkode extends Kodeliste {
     public static final Språkkode en = new Språkkode("EN"); //$NON-NLS-1$
     public static final Språkkode UDEFINERT = new Språkkode("-");  //$NON-NLS-1$
 
+    public static final Språkkode DEFAULT = nb;
+
     Språkkode() {
     }
 
