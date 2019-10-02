@@ -3,14 +3,12 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.steg.sendvarsel;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
 
 import javax.inject.Inject;
 
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,6 +32,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.TestFagsakUtil;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
 @RunWith(CdiRunner.class)
@@ -54,7 +53,6 @@ public class VarselStegImplTest {
     private HistorikkRepository historikkRepository = new HistorikkRepository(repoRule.getEntityManager());
     private VarselresponsTjeneste varselresponsTjeneste = mock(VarselresponsTjeneste.class);
 
-    @Ignore //TODO: må fikses. Feiler på bygg av et visst klokkeslett. Brukerhistorie: PFP-7795
     @Test
     public void skal_sette_behandling_på_vent() {
         Fagsak fagsak = TestFagsakUtil.opprettFagsak();
@@ -71,7 +69,7 @@ public class VarselStegImplTest {
         behandling = behandlingRepository.hentBehandling(behandling.getId());
         assertThat(behandling.isBehandlingPåVent()).isTrue();
         Aksjonspunkt ap = behandling.getAksjonspunktFor(AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING);
-        assertThat(ap.getFristTid()).isEqualToIgnoringSeconds(LocalDateTime.now().plusWeeks(4).plusDays(1));
+        assertThat(ap.getFristTid().toLocalDate()).isEqualTo(LocalDate.now().plusWeeks(4).plusDays(1));
 
         List<Historikkinnslag> historikkinnslager = historikkRepository.hentHistorikk(behandling.getId());
         assertThat(historikkinnslager).isNotEmpty();
@@ -80,7 +78,7 @@ public class VarselStegImplTest {
         assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.BEH_VENT);
     }
 
-    private Behandling lagBehandling(Fagsak fagsak){
+    private Behandling lagBehandling(Fagsak fagsak) {
         Behandling behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).build();
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
         Long behandlingId = behandlingRepository.lagre(behandling, lås);
@@ -89,10 +87,10 @@ public class VarselStegImplTest {
 
     private VarselSteg steg() {
         return new VarselStegImpl(
-                behandlingRepository,
-                behandlingskontrollTjeneste,
-                varselresponsTjeneste,
-                prosessTaskRepository,
-                Period.ofWeeks(4));
+            behandlingRepository,
+            behandlingskontrollTjeneste,
+            varselresponsTjeneste,
+            prosessTaskRepository,
+            Period.ofWeeks(4));
     }
 }
