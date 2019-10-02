@@ -13,7 +13,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakLåsRe
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakLåsRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepositoryImpl;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepositoryImpl;
@@ -40,7 +40,7 @@ public class BehandlingRepositoryProviderImpl implements BehandlingRepositoryPro
     private BehandlingLåsRepository behandlingLåsRepository;
     private FagsakLåsRepository fagsakLåsRepository;
     private KravgrunnlagRepository grunnlagRepository;
-    private FeilutbetalingRepository feilutbetalingRepository;
+    private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository;
     private EksternBehandlingRepository eksternBehandlingRepository;
     private VurdertForeldelseRepository vurdertForeldelseRepository;
     private VilkårsvurderingRepository vilkårsvurderingRepository;
@@ -65,7 +65,7 @@ public class BehandlingRepositoryProviderImpl implements BehandlingRepositoryPro
         this.behandlingLåsRepository = new BehandlingLåsRepositoryImpl(entityManager);
         this.fagsakLåsRepository = new FagsakLåsRepositoryImpl(entityManager);
         this.grunnlagRepository = new KravgrunnlagRepository(entityManager);
-        this.feilutbetalingRepository = new FeilutbetalingRepository(entityManager);
+        this.faktaFeilutbetalingRepository = new FaktaFeilutbetalingRepository(entityManager);
         this.eksternBehandlingRepository = new EksternBehandlingRepositoryImpl(entityManager);
         this.vurdertForeldelseRepository = new VurdertForeldelseRepositoryImpl(entityManager);
         this.vilkårsvurderingRepository = new VilkårsvurderingRepository(entityManager);
@@ -123,8 +123,8 @@ public class BehandlingRepositoryProviderImpl implements BehandlingRepositoryPro
     }
 
     @Override
-    public FeilutbetalingRepository getFeilutbetalingRepository() {
-        return feilutbetalingRepository;
+    public FaktaFeilutbetalingRepository getFaktaFeilutbetalingRepository() {
+        return faktaFeilutbetalingRepository;
     }
 
     @Override

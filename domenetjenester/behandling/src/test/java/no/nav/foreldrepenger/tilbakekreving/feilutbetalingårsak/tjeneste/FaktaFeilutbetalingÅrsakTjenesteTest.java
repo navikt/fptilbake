@@ -23,7 +23,7 @@ import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.Feiltubetal
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.FeilutbetalingÅrsakDto;
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.UnderÅrsakDto;
 
-public class FeilutbetalingÅrsakTjenesteTest {
+public class FaktaFeilutbetalingÅrsakTjenesteTest {
 
     @Rule
     public UnittestRepositoryRule repositoryRule = new UnittestRepositoryRule();

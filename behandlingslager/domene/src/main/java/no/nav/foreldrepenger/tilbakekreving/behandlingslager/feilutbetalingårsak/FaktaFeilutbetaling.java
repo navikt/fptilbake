@@ -14,26 +14,26 @@ import javax.persistence.Table;
 
 import no.nav.vedtak.felles.jpa.BaseEntitet;
 
-@Entity(name = "Feilutbetaling")
-@Table(name = "FEILUTBETALING")
-public class Feilutbetaling extends BaseEntitet {
+@Entity(name = "FaktaFeilutbetaling")
+@Table(name = "FAKTA_FEILUTBETALING")
+public class FaktaFeilutbetaling extends BaseEntitet {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_FEILUTBETALING")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_FAKTA_FEILUTBETALING")
     private Long id;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "feilutbetalinger")
-    private List<FeilutbetalingPeriodeÅrsak> feilutbetaltPerioder = new ArrayList<>();
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "faktaFeilutbetaling")
+    private List<FaktaFeilutbetalingPeriode> feilutbetaltPerioder = new ArrayList<>();
 
     public Long getId() {
         return id;
     }
 
-    public List<FeilutbetalingPeriodeÅrsak> getFeilutbetaltPerioder() {
+    public List<FaktaFeilutbetalingPeriode> getFeilutbetaltPerioder() {
         return Collections.unmodifiableList(feilutbetaltPerioder);
     }
 
-    public void leggTilFeilutbetaltPeriode(FeilutbetalingPeriodeÅrsak feilutbetalingPeriodeÅrsak) {
-        feilutbetaltPerioder.add(feilutbetalingPeriodeÅrsak);
+    public void leggTilFeilutbetaltPeriode(FaktaFeilutbetalingPeriode faktaFeilutbetalingPeriode) {
+        feilutbetaltPerioder.add(faktaFeilutbetalingPeriode);
     }
 }

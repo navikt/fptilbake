@@ -21,8 +21,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingAggregate;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingPeriodeÅrsak;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingAggregate;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
@@ -41,12 +42,12 @@ public class AvklartFaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
     private HistorikkInnslagKonverter historikkInnslagKonverter = new HistorikkInnslagKonverter(kodeverkRepository, repoProvider.getAksjonspunktRepository());
     private HistorikkTjenesteAdapter historikkTjenesteAdapter = new HistorikkTjenesteAdapter(historikkRepository, historikkInnslagKonverter, mockDokumentArkivTjeneste);
 
-    private AvklartFaktaFeilutbetalingTjeneste avklartFaktaFeilutbetalingTjeneste = new AvklartFaktaFeilutbetalingTjeneste(feilutbetalingRepository,kodeverkRepository ,historikkTjenesteAdapter);
+    private AvklartFaktaFeilutbetalingTjeneste avklartFaktaFeilutbetalingTjeneste = new AvklartFaktaFeilutbetalingTjeneste(faktaFeilutbetalingRepository, kodeverkRepository, historikkTjenesteAdapter);
 
     private Behandling nyBehandling;
 
     @Before
-    public void setup(){
+    public void setup() {
         ScenarioSimple scenario = ScenarioSimple.simple();
         scenario.medBehandlingType(BehandlingType.TILBAKEKREVING);
         scenario.leggTilAksjonspunkt(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING, BehandlingStegType.FAKTA_FEILUTBETALING);
@@ -59,16 +60,16 @@ public class AvklartFaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
 
         avklartFaktaFeilutbetalingTjeneste.lagreÅrsakForFeilutbetalingPeriode(nyBehandling, Arrays.asList(faktaFeilutbetalingDto), BEGRUNNELSE);
 
-        Optional<FeilutbetalingAggregate> feilutbetalingAggregate = feilutbetalingRepository.finnFeilutbetaling(nyBehandling.getId());
+        Optional<FaktaFeilutbetaling> feilutbetalingAggregate = faktaFeilutbetalingRepository.finnFaktaOmFeilutbetaling(nyBehandling.getId());
         assertThat(feilutbetalingAggregate).isNotEmpty();
 
-        List<FeilutbetalingPeriodeÅrsak> feilutbetalingPerioder = feilutbetalingAggregate.get().getFeilutbetaling().getFeilutbetaltPerioder();
+        List<FaktaFeilutbetalingPeriode> feilutbetalingPerioder = feilutbetalingAggregate.get().getFeilutbetaltPerioder();
         assertThat(feilutbetalingPerioder.size()).isEqualTo(1);
 
-        FeilutbetalingPeriodeÅrsak feilutbetalingPeriodeÅrsak = feilutbetalingPerioder.get(0);
-        assertThat(feilutbetalingPeriodeÅrsak.getÅrsak()).isEqualTo(ÅRSAK);
-        assertThat(feilutbetalingPeriodeÅrsak.getPeriode()).isEqualTo(Periode.of(FOM, TOM));
-        assertThat(feilutbetalingPeriodeÅrsak.getUnderÅrsak()).isEqualTo(UNDER_ÅRSAK);
+        FaktaFeilutbetalingPeriode faktaPeriode = feilutbetalingPerioder.get(0);
+        assertThat(faktaPeriode.getPeriode()).isEqualTo(Periode.of(FOM, TOM));
+        assertThat(faktaPeriode.getHendelseType()).isEqualTo(HENDELSE_TYPE);
+        assertThat(faktaPeriode.getHendelseUndertype()).isEqualTo(HENDELSE_UNDERTYPE);
 
         testHistorikkInnslag();
     }
@@ -76,23 +77,23 @@ public class AvklartFaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
     @Test
     public void lagreÅrsakForFeilutbetalingPeriode_medIngenUnderÅrsak() {
         FeilutbetalingÅrsakDto feilutbetalingÅrsakDto = new FeilutbetalingÅrsakDto();
-        feilutbetalingÅrsakDto.setÅrsak(ÅRSAK);
-        feilutbetalingÅrsakDto.setÅrsakKode(ÅRSAK);
-        feilutbetalingÅrsakDto.setKodeverk(ÅRSAK_KODEVERK);
+        feilutbetalingÅrsakDto.setÅrsak(HENDELSE_TYPE.getNavn());
+        feilutbetalingÅrsakDto.setÅrsakKode(HENDELSE_TYPE.getKode());
+        feilutbetalingÅrsakDto.setKodeverk(HENDELSE_TYPE.getKodeverk());
         FaktaFeilutbetalingDto faktaFeilutbetalingDto = new FaktaFeilutbetalingDto(FOM, TOM, feilutbetalingÅrsakDto);
 
         avklartFaktaFeilutbetalingTjeneste.lagreÅrsakForFeilutbetalingPeriode(nyBehandling, Arrays.asList(faktaFeilutbetalingDto), "ABC");
 
-        Optional<FeilutbetalingAggregate> feilutbetalingAggregate = feilutbetalingRepository.finnFeilutbetaling(nyBehandling.getId());
+        Optional<FaktaFeilutbetaling> feilutbetalingAggregate = faktaFeilutbetalingRepository.finnFaktaOmFeilutbetaling(nyBehandling.getId());
         assertThat(feilutbetalingAggregate).isNotEmpty();
 
-        List<FeilutbetalingPeriodeÅrsak> feilutbetalingPerioder = feilutbetalingAggregate.get().getFeilutbetaling().getFeilutbetaltPerioder();
+        List<FaktaFeilutbetalingPeriode> feilutbetalingPerioder = feilutbetalingAggregate.get().getFeilutbetaltPerioder();
         assertThat(feilutbetalingPerioder.size()).isEqualTo(1);
 
-        FeilutbetalingPeriodeÅrsak feilutbetalingPeriodeÅrsak = feilutbetalingPerioder.get(0);
-        assertThat(feilutbetalingPeriodeÅrsak.getÅrsak()).isEqualTo(ÅRSAK);
-        assertThat(feilutbetalingPeriodeÅrsak.getPeriode()).isEqualTo(Periode.of(FOM, TOM));
-        assertThat(feilutbetalingPeriodeÅrsak.getUnderÅrsak()).isNullOrEmpty();
+        FaktaFeilutbetalingPeriode faktaPeriode = feilutbetalingPerioder.get(0);
+        assertThat(faktaPeriode.getPeriode()).isEqualTo(Periode.of(FOM, TOM));
+        assertThat(faktaPeriode.getHendelseType()).isEqualTo(HENDELSE_TYPE);
+        assertThat(faktaPeriode.getHendelseUndertype()).isNull();
 
         testHistorikkInnslag();
     }
@@ -104,31 +105,31 @@ public class AvklartFaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
         LocalDate sisteDagIPeriode = LocalDate.now();
 
         FeilutbetalingÅrsakDto feilutbetalingÅrsakDto = new FeilutbetalingÅrsakDto();
-        feilutbetalingÅrsakDto.setÅrsak(ÅRSAK);
-        feilutbetalingÅrsakDto.setÅrsakKode(ÅRSAK);
-        feilutbetalingÅrsakDto.setKodeverk(ÅRSAK_KODEVERK);
+        feilutbetalingÅrsakDto.setÅrsak(HENDELSE_TYPE.getNavn());
+        feilutbetalingÅrsakDto.setÅrsakKode(HENDELSE_TYPE.getKode());
+        feilutbetalingÅrsakDto.setKodeverk(HENDELSE_TYPE.getKodeverk());
         feilutbetalingÅrsakDto.leggTilUnderÅrsaker(arbeidDelTid);
 
         avklartFaktaFeilutbetalingTjeneste.lagreÅrsakForFeilutbetalingPeriode(nyBehandling,
             Arrays.asList(faktaFeilutbetalingDto,
                 new FaktaFeilutbetalingDto(TOM, sisteDagIPeriode, feilutbetalingÅrsakDto)), BEGRUNNELSE);
 
-        Optional<FeilutbetalingAggregate> feilutbetalingAggregate = feilutbetalingRepository.finnFeilutbetaling(nyBehandling.getId());
+        Optional<FaktaFeilutbetaling> feilutbetalingAggregate = faktaFeilutbetalingRepository.finnFaktaOmFeilutbetaling(nyBehandling.getId());
         assertThat(feilutbetalingAggregate).isNotEmpty();
 
-        List<FeilutbetalingPeriodeÅrsak> feilutbetalingPerioder = new ArrayList<>(feilutbetalingAggregate.get().getFeilutbetaling().getFeilutbetaltPerioder());
+        List<FaktaFeilutbetalingPeriode> feilutbetalingPerioder = new ArrayList<>(feilutbetalingAggregate.get().getFeilutbetaltPerioder());
         assertThat(feilutbetalingPerioder.size()).isEqualTo(2);
         feilutbetalingPerioder.sort(Comparator.comparing(fpå -> fpå.getPeriode().getFom()));
 
-        FeilutbetalingPeriodeÅrsak førstePeriode = feilutbetalingPerioder.get(0);
-        assertThat(førstePeriode.getÅrsak()).isEqualTo(ÅRSAK);
+        FaktaFeilutbetalingPeriode førstePeriode = feilutbetalingPerioder.get(0);
         assertThat(førstePeriode.getPeriode().getFom()).isEqualTo(FOM);
-        assertThat(førstePeriode.getUnderÅrsak()).isEqualTo(UNDER_ÅRSAK);
+        assertThat(førstePeriode.getHendelseType()).isEqualTo(HENDELSE_TYPE);
+        assertThat(førstePeriode.getHendelseUndertype()).isEqualTo(HENDELSE_UNDERTYPE);
 
-        FeilutbetalingPeriodeÅrsak andrePeriode = feilutbetalingPerioder.get(1);
-        assertThat(andrePeriode.getÅrsak()).isEqualTo(ÅRSAK);
+        FaktaFeilutbetalingPeriode andrePeriode = feilutbetalingPerioder.get(1);
         assertThat(andrePeriode.getPeriode().getFom()).isEqualTo(TOM);
-        assertThat(andrePeriode.getUnderÅrsak()).isEqualTo(UNDER_ÅRSAK);
+        assertThat(andrePeriode.getHendelseType()).isEqualTo(HENDELSE_TYPE);
+        assertThat(andrePeriode.getHendelseUndertype()).isEqualTo(HENDELSE_UNDERTYPE);
 
         List<HistorikkinnslagDto> historikkinnslager = testHistorikkInnslag();
         assertThat(historikkinnslager.get(0).getHistorikkinnslagDeler()).isNotEmpty();
@@ -138,28 +139,28 @@ public class AvklartFaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
     @Test
     public void lagreÅrsakForFeilutbetalingPeriode_nårForrigeÅrsakAlleredeFinnes() {
 
-        feilutbetalingRepository.lagre(formFeilutbetalingAggregate());
+        faktaFeilutbetalingRepository.lagre(internBehandlingId, lagFaktaFeilutbetaling());
 
         UnderÅrsakDto arbeidHeltid = new UnderÅrsakDto("Arbeid heltid", "ARBEID_HELTID", "UTTAK_UTSETTELSE");
         FeilutbetalingÅrsakDto feilutbetalingÅrsakDto = new FeilutbetalingÅrsakDto();
-        feilutbetalingÅrsakDto.setÅrsak(ÅRSAK);
-        feilutbetalingÅrsakDto.setÅrsakKode(ÅRSAK);
-        feilutbetalingÅrsakDto.setKodeverk(ÅRSAK_KODEVERK);
+        feilutbetalingÅrsakDto.setÅrsak(HENDELSE_TYPE.getNavn());
+        feilutbetalingÅrsakDto.setÅrsakKode(HENDELSE_TYPE.getKode());
+        feilutbetalingÅrsakDto.setKodeverk(HENDELSE_TYPE.getKodeverk());
         feilutbetalingÅrsakDto.leggTilUnderÅrsaker(arbeidHeltid);
 
         avklartFaktaFeilutbetalingTjeneste.lagreÅrsakForFeilutbetalingPeriode(nyBehandling,
             Arrays.asList(new FaktaFeilutbetalingDto(FOM, TOM, feilutbetalingÅrsakDto)), BEGRUNNELSE);
 
-        Optional<FeilutbetalingAggregate> aggregate = feilutbetalingRepository.finnFeilutbetaling(nyBehandling.getId());
+        Optional<FaktaFeilutbetaling> aggregate = faktaFeilutbetalingRepository.finnFaktaOmFeilutbetaling(nyBehandling.getId());
         assertThat(aggregate).isNotEmpty();
 
-        List<FeilutbetalingPeriodeÅrsak> feilutbetalingPerioder = aggregate.get().getFeilutbetaling().getFeilutbetaltPerioder();
+        List<FaktaFeilutbetalingPeriode> feilutbetalingPerioder = aggregate.get().getFeilutbetaltPerioder();
         assertThat(feilutbetalingPerioder.size()).isEqualTo(1);
 
-        FeilutbetalingPeriodeÅrsak feilutbetalingPeriodeÅrsak = feilutbetalingPerioder.get(0);
-        assertThat(feilutbetalingPeriodeÅrsak.getÅrsak()).isEqualTo(ÅRSAK);
-        assertThat(feilutbetalingPeriodeÅrsak.getPeriode()).isEqualTo(Periode.of(FOM, TOM));
-        assertThat(feilutbetalingPeriodeÅrsak.getUnderÅrsak()).isEqualTo(arbeidHeltid.getUnderÅrsakKode());
+        FaktaFeilutbetalingPeriode faktaPeriode = feilutbetalingPerioder.get(0);
+        assertThat(faktaPeriode.getPeriode()).isEqualTo(Periode.of(FOM, TOM));
+        assertThat(faktaPeriode.getHendelseType()).isEqualTo(HENDELSE_TYPE);
+        assertThat(faktaPeriode.getHendelseUndertype()).isEqualTo(HENDELSE_UNDERTYPE);
 
         List<HistorikkinnslagDto> historikkinnslager = testHistorikkInnslag();
         List<HistorikkinnslagEndretFeltDto> endredeFelter = historikkinnslager.get(0).getHistorikkinnslagDeler().get(0).getEndredeFelter();
@@ -171,9 +172,9 @@ public class AvklartFaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
     private FaktaFeilutbetalingDto formFaktaFeilutbetaling() {
         UnderÅrsakDto arbeidHelTid = new UnderÅrsakDto("Arbeid heltid", "ARBEID_HELTID", "UTTAK_UTSETTELSE");
         FeilutbetalingÅrsakDto feilutbetalingÅrsakDto = new FeilutbetalingÅrsakDto();
-        feilutbetalingÅrsakDto.setÅrsak(ÅRSAK);
-        feilutbetalingÅrsakDto.setÅrsakKode(ÅRSAK);
-        feilutbetalingÅrsakDto.setKodeverk(ÅRSAK_KODEVERK);
+        feilutbetalingÅrsakDto.setÅrsak(HENDELSE_TYPE.getNavn());
+        feilutbetalingÅrsakDto.setÅrsakKode(HENDELSE_TYPE.getKode());
+        feilutbetalingÅrsakDto.setKodeverk(HENDELSE_TYPE.getKodeverk());
         feilutbetalingÅrsakDto.leggTilUnderÅrsaker(arbeidHelTid);
         return new FaktaFeilutbetalingDto(FOM, TOM, feilutbetalingÅrsakDto);
     }

@@ -19,9 +19,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.dto.PeriodeDto;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingAggregate;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingPeriodeÅrsak;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
@@ -50,7 +50,7 @@ public class VurdertForeldelseTjeneste {
     private VurdertForeldelseRepository vurdertForeldelseRepository;
     private BehandlingRepositoryProvider repositoryProvider;
     private KravgrunnlagRepository grunnlagRepository;
-    private FeilutbetalingRepository feilutbetalingRepository;
+    private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository;
     private HistorikkTjenesteAdapter historikkTjenesteAdapter;
     private VilkårsvurderingRepository vilkårsvurderingRepository;
 
@@ -60,11 +60,11 @@ public class VurdertForeldelseTjeneste {
 
     @Inject
     public VurdertForeldelseTjeneste(VurdertForeldelseRepository vurdertForeldelseRepository, BehandlingRepositoryProvider repositoryProvider,
-                                     FeilutbetalingRepository feilutbetalingRepository, HistorikkTjenesteAdapter historikkTjenesteAdapter) {
+                                     FaktaFeilutbetalingRepository faktaFeilutbetalingRepository, HistorikkTjenesteAdapter historikkTjenesteAdapter) {
         this.vurdertForeldelseRepository = vurdertForeldelseRepository;
         this.repositoryProvider = repositoryProvider;
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
-        this.feilutbetalingRepository = feilutbetalingRepository;
+        this.faktaFeilutbetalingRepository = faktaFeilutbetalingRepository;
         this.vilkårsvurderingRepository = repositoryProvider.getVilkårsvurderingRepository();
         this.historikkTjenesteAdapter = historikkTjenesteAdapter;
     }
@@ -87,14 +87,14 @@ public class VurdertForeldelseTjeneste {
     }
 
     public FeilutbetalingPerioderDto hentFaktaPerioder(Long behandlingId) {
-        Optional<FeilutbetalingAggregate> feilutbetalingAggregate = feilutbetalingRepository.finnFeilutbetaling(behandlingId);
+        Optional<FaktaFeilutbetaling> fakta = faktaFeilutbetalingRepository.finnFaktaOmFeilutbetaling(behandlingId);
         FeilutbetalingPerioderDto perioderDto = new FeilutbetalingPerioderDto();
         perioderDto.setBehandlingId(behandlingId);
         List<PeriodeDto> perioder = new ArrayList<>();
-        if (feilutbetalingAggregate.isPresent() && !feilutbetalingAggregate.get().getFeilutbetaling().getFeilutbetaltPerioder().isEmpty()) {
-            for (FeilutbetalingPeriodeÅrsak feilutbetalingPeriodeÅrsak : feilutbetalingAggregate.get().getFeilutbetaling().getFeilutbetaltPerioder()) {
+        if (fakta.isPresent() && !fakta.get().getFeilutbetaltPerioder().isEmpty()) {
+            for (FaktaFeilutbetalingPeriode faktaFeilutbetalingPeriode : fakta.get().getFeilutbetaltPerioder()) {
                 PeriodeDto periode = new PeriodeDto();
-                periode.setPeriode(feilutbetalingPeriodeÅrsak.getPeriode());
+                periode.setPeriode(faktaFeilutbetalingPeriode.getPeriode());
                 periode.setForeldelseVurderingType(ForeldelseVurderingType.UDEFINERT);
                 perioder.add(periode);
             }

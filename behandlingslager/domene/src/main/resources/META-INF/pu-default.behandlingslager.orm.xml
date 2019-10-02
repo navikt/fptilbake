@@ -110,9 +110,9 @@
 
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.konfig.KonfigVerdiEntitet"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.konfig.KonfigVerdiKode"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingPeriodeÅrsak"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.Feilutbetaling"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingAggregate"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingAggregate"/>
 
     <entity class="no.nav.foreldrepenger.tilbakekreving.sporing.VedtakXml"/>
 

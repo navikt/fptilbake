@@ -23,9 +23,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.dto.vilkår.VilkårResult
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.vilkår.VilkårsvurderingPerioderDto;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.Feilutbetaling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingAggregate;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingPeriodeÅrsak;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingAggregate;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.FpHendelseUnderTyper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingAggregateEntitet;
@@ -51,7 +51,7 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
     @Test
     public void hentDetaljertFeilutbetalingPerioder_nårPerioderErForeldet() {
         formGrunnlag();
-        formFeilutbetalingPeriodeMedÅrsak();
+        lagreFaktaTestdata();
 
         vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, Lists.newArrayList(
             new ForeldelsePeriodeDto(FOM, SISTE_DAG_I_FORELDELSE_PERIODE,
@@ -102,7 +102,7 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
     @Test
     public void hentDetaljertFeilutbetalingPerioder_nårPerioderErIkkeVurderesForForeldet() {
         formGrunnlag();
-        formFeilutbetalingPeriodeMedÅrsak();
+        lagreFaktaTestdata();
 
         List<DetaljertFeilutbetalingPeriodeDto> perioder = vilkårsvurderingTjeneste.hentDetaljertFeilutbetalingPerioder(internBehandlingId);
         assertThat(perioder).isNotEmpty();
@@ -151,7 +151,7 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
             mockMedYtelPostering, mockMedYtelPostering1, mockMedYtelPostering2, mockMedTrekPostering));
         grunnlagRepository.lagre(internBehandlingId, kravgrunnlag431);
 
-        formFeilutbetalingPeriodeMedÅrsak();
+        lagreFaktaTestdata();
 
         List<DetaljertFeilutbetalingPeriodeDto> perioder = vilkårsvurderingTjeneste.hentDetaljertFeilutbetalingPerioder(internBehandlingId);
         assertThat(perioder).isNotEmpty();
@@ -194,7 +194,7 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
             mockMedYtelPostering, mockMedYtelPostering1, mockMedYtelPostering2));
         grunnlagRepository.lagre(internBehandlingId, kravgrunnlag431);
 
-        formFeilutbetalingPeriodeMedÅrsak();
+        lagreFaktaTestdata();
 
         List<DetaljertFeilutbetalingPeriodeDto> perioder = vilkårsvurderingTjeneste.hentDetaljertFeilutbetalingPerioder(internBehandlingId);
         assertThat(perioder).isNotEmpty();
@@ -271,7 +271,7 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
     @Test
     public void lagreVilkårsvurdering_medSimpelOgGrøvtAktsomhet_nårEnPeriodeErForeldet() {
         formGrunnlag();
-        formFeilutbetalingPeriodeMedÅrsak();
+        lagreFaktaTestdata();
 
         vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, Lists.newArrayList(
             new ForeldelsePeriodeDto(FOM, SISTE_DAG_I_FORELDELSE_PERIODE,
@@ -398,20 +398,17 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         grunnlagRepository.lagre(internBehandlingId, kravgrunnlag431);
     }
 
-    private void formFeilutbetalingPeriodeMedÅrsak() {
-        Feilutbetaling feilutbetaling = new Feilutbetaling();
-        FeilutbetalingPeriodeÅrsak feilutbetalingPeriodeÅrsak = FeilutbetalingPeriodeÅrsak.builder()
+    private void lagreFaktaTestdata() {
+        FaktaFeilutbetaling faktaFeilutbetaling = new FaktaFeilutbetaling();
+        FaktaFeilutbetalingPeriode faktaFeilutbetalingPeriode = FaktaFeilutbetalingPeriode.builder()
             .medPeriode(FOM, TOM)
-            .medÅrsak(HendelseType.FP_UTTAK_UTSETTELSE_TYPE.getKode()).medÅrsakKodeverk(HendelseType.FP_UTTAK_UTSETTELSE_TYPE.getKodeverk())
-            .medUnderÅrsak(FpHendelseUnderTyper.ARBEID_HELTID.getKode()).medUnderÅrsakKodeverk(FpHendelseUnderTyper.ARBEID_HELTID.getKodeverk())
-            .medFeilutbetalinger(feilutbetaling)
+            .medHendelseType(HendelseType.FP_UTTAK_UTSETTELSE_TYPE)
+            .medHendelseUndertype(FpHendelseUnderTyper.ARBEID_HELTID)
+            .medFeilutbetalinger(faktaFeilutbetaling)
             .build();
-        feilutbetaling.leggTilFeilutbetaltPeriode(feilutbetalingPeriodeÅrsak);
+        faktaFeilutbetaling.leggTilFeilutbetaltPeriode(faktaFeilutbetalingPeriode);
 
-        FeilutbetalingAggregate feilutbetalingAggregate = FeilutbetalingAggregate.builder()
-            .medBehandlingId(internBehandlingId)
-            .medFeilutbetaling(feilutbetaling).build();
-        feilutbetalingRepository.lagre(feilutbetalingAggregate);
+        faktaFeilutbetalingRepository.lagre(internBehandlingId, faktaFeilutbetaling);
     }
 
     private static Comparator<VilkårVurderingPeriodeEntitet> PERIODE_FOM_COMPARATOR = Comparator.comparing(o -> o.getPeriode().getFom());

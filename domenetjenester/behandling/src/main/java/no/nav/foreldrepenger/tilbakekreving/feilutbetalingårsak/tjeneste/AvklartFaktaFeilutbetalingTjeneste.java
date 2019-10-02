@@ -10,10 +10,10 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.dto.FaktaFeilutbetalingDt
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.Feilutbetaling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingAggregate;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingPeriodeÅrsak;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingAggregate;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
@@ -33,7 +33,7 @@ public class AvklartFaktaFeilutbetalingTjeneste {
     private static final String UNDERÅRSAK = "UNDERÅRSAK";
     private static final String UNDERÅRSAK_KODEVERK = "UNDERÅRSAK_KODEVERK";
 
-    private FeilutbetalingRepository feilutbetalingRepository;
+    private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository;
     private KodeverkRepository kodeverkRepository;
     private HistorikkTjenesteAdapter historikkTjenesteAdapter;
 
@@ -42,9 +42,9 @@ public class AvklartFaktaFeilutbetalingTjeneste {
     }
 
     @Inject
-    public AvklartFaktaFeilutbetalingTjeneste(FeilutbetalingRepository feilutbetalingRepository, KodeverkRepository kodeverkRepository,
+    public AvklartFaktaFeilutbetalingTjeneste(FaktaFeilutbetalingRepository faktaFeilutbetalingRepository, KodeverkRepository kodeverkRepository,
                                               HistorikkTjenesteAdapter historikkTjenesteAdapter) {
-        this.feilutbetalingRepository = feilutbetalingRepository;
+        this.faktaFeilutbetalingRepository = faktaFeilutbetalingRepository;
         this.kodeverkRepository = kodeverkRepository;
         this.historikkTjenesteAdapter = historikkTjenesteAdapter;
     }
@@ -58,9 +58,9 @@ public class AvklartFaktaFeilutbetalingTjeneste {
         // brukte denne objekt for å opprette bare en historikkinnslagDel når saksbehandler endret bare begrunnelse
         HistorikkinnslagDelDto historikkinnslagDelDto = new HistorikkinnslagDelDto();
 
-        Optional<FeilutbetalingAggregate> forrigeFeilutbetalingAggregate = feilutbetalingRepository.finnFeilutbetaling(behandling.getId());
+        Optional<FaktaFeilutbetaling> forrigeFakta = faktaFeilutbetalingRepository.finnFaktaOmFeilutbetaling(behandling.getId());
 
-        Feilutbetaling feilutbetaling = new Feilutbetaling();
+        FaktaFeilutbetaling faktaFeilutbetaling = new FaktaFeilutbetaling();
         boolean behovForHistorikkInnslag = false;
         for (FaktaFeilutbetalingDto faktaFeilutbetalingDto : feilutbetalingFaktas) {
             UnderÅrsakDto underÅrsakDto = null;
@@ -69,25 +69,20 @@ public class AvklartFaktaFeilutbetalingTjeneste {
                 // Fordi vi har bare et underÅrsak som saksbehandler kan velge
                 underÅrsakDto = underÅrsaker.get(0);
             }
-            FeilutbetalingPeriodeÅrsak feilutbetalingPeriodeÅrsak = FeilutbetalingPeriodeÅrsak.builder()
+            FaktaFeilutbetalingPeriode faktaFeilutbetalingPeriode = FaktaFeilutbetalingPeriode.builder()
                 .medPeriode(faktaFeilutbetalingDto.getFom(), faktaFeilutbetalingDto.getTom())
-                .medÅrsak(faktaFeilutbetalingDto.getÅrsak().getÅrsakKode())
-                .medÅrsakKodeverk(faktaFeilutbetalingDto.getÅrsak().getKodeverk())
-                .medUnderÅrsak(sjekkOgReturnereUnderårsak(underÅrsakDto, UNDERÅRSAK_KODE))
-                .medUnderÅrsakKodeverk(sjekkOgReturnereUnderårsak(underÅrsakDto, UNDERÅRSAK_KODEVERK))
-                .medFeilutbetalinger(feilutbetaling)
+                .medÅrsak(faktaFeilutbetalingDto.getÅrsak().getÅrsakKode(), kodeverkRepository)
+                .medUnderÅrsak(sjekkOgReturnereUnderårsak(underÅrsakDto, UNDERÅRSAK_KODE), kodeverkRepository)
+                .medFeilutbetalinger(faktaFeilutbetaling)
                 .build();
-            feilutbetaling.leggTilFeilutbetaltPeriode(feilutbetalingPeriodeÅrsak);
+            faktaFeilutbetaling.leggTilFeilutbetaltPeriode(faktaFeilutbetalingPeriode);
 
             // lag historikkinnslagDeler
-            boolean harEndret = lagHistorikkInnslagDeler(behandling, historikkinnslag, begrunnelse, forrigeFeilutbetalingAggregate, faktaFeilutbetalingDto, underÅrsakDto, historikkinnslagDelDto);
+            boolean harEndret = lagHistorikkInnslagDeler(behandling, historikkinnslag, begrunnelse, forrigeFakta, faktaFeilutbetalingDto, underÅrsakDto, historikkinnslagDelDto);
             behovForHistorikkInnslag = !behovForHistorikkInnslag ? harEndret : behovForHistorikkInnslag;
         }
-        FeilutbetalingAggregate feilutbetalingAggregate = FeilutbetalingAggregate.builder()
-            .medFeilutbetaling(feilutbetaling)
-            .medBehandlingId(behandling.getId()).build();
 
-        feilutbetalingRepository.lagre(feilutbetalingAggregate);
+        faktaFeilutbetalingRepository.lagre(behandling.getId(), faktaFeilutbetaling);
 
         if (behovForHistorikkInnslag) {
             historikkTjenesteAdapter.lagInnslag(historikkinnslag);
@@ -95,14 +90,14 @@ public class AvklartFaktaFeilutbetalingTjeneste {
     }
 
     private boolean lagHistorikkInnslagDeler(Behandling behandling, Historikkinnslag historikkinnslag, String begrunnelse,
-                                             Optional<FeilutbetalingAggregate> forrigeFeilutbetalingAggregate,
+                                             Optional<FaktaFeilutbetaling> forrigeFakta,
                                              FaktaFeilutbetalingDto faktaFeilutbetalingDto,
                                              UnderÅrsakDto underÅrsakDto, HistorikkinnslagDelDto historikkinnslagDelDto) {
         boolean harEndret = false;
         HistorikkInnslagTekstBuilder tekstBuilder = historikkTjenesteAdapter.tekstBuilder();
-        if (forrigeFeilutbetalingAggregate.isPresent()) {
-            List<FeilutbetalingPeriodeÅrsak> feilutbetalingPerioder = forrigeFeilutbetalingAggregate.get().getFeilutbetaling().getFeilutbetaltPerioder();
-            Optional<FeilutbetalingPeriodeÅrsak> forrigeFeilutbetalingPeriodeÅrsak = feilutbetalingPerioder.stream()
+        if (forrigeFakta.isPresent()) {
+            List<FaktaFeilutbetalingPeriode> feilutbetalingPerioder = forrigeFakta.get().getFeilutbetaltPerioder();
+            Optional<FaktaFeilutbetalingPeriode> forrigeFeilutbetalingPeriodeÅrsak = feilutbetalingPerioder.stream()
                 .filter(fpå -> fpå.getPeriode().equals(faktaFeilutbetalingDto.tilPeriode()))
                 .findFirst();
             if (forrigeFeilutbetalingPeriodeÅrsak.isPresent()) {
@@ -136,7 +131,7 @@ public class AvklartFaktaFeilutbetalingTjeneste {
             .medOpplysning(HistorikkOpplysningType.PERIODE_TOM, faktaFeilutbetalingDto.getTom());
     }
 
-    private boolean håndtereEndretÅrsak(Behandling behandling, FeilutbetalingPeriodeÅrsak forrigePeiodeÅrsak, FaktaFeilutbetalingDto faktaFeilutbetalingDto,
+    private boolean håndtereEndretÅrsak(Behandling behandling, FaktaFeilutbetalingPeriode forrigePeiodeÅrsak, FaktaFeilutbetalingDto faktaFeilutbetalingDto,
                                         UnderÅrsakDto underÅrsakDto, String begrunnelse,
                                         HistorikkInnslagTekstBuilder tekstBuilder, HistorikkinnslagDelDto historikkinnslagDelDto) {
         if (sjekkHvisÅrsakEllerUnderÅrsakEndret(faktaFeilutbetalingDto, sjekkOgReturnereUnderårsak(underÅrsakDto, UNDERÅRSAK_KODE), forrigePeiodeÅrsak)) {
@@ -166,7 +161,7 @@ public class AvklartFaktaFeilutbetalingTjeneste {
     }
 
     private boolean sjekkHvisÅrsakEllerUnderÅrsakEndret(FaktaFeilutbetalingDto faktaFeilutbetalingDto, String underÅrsakKode,
-                                                        FeilutbetalingPeriodeÅrsak forrigePeriodeÅrsak) {
+                                                        FaktaFeilutbetalingPeriode forrigePeriodeÅrsak) {
         boolean erEndret = false;
         if (faktaFeilutbetalingDto.tilPeriode().isEqual(forrigePeriodeÅrsak.getPeriode())) {
             erEndret = !forrigePeriodeÅrsak.getÅrsak().equals(faktaFeilutbetalingDto.getÅrsak().getÅrsakKode());

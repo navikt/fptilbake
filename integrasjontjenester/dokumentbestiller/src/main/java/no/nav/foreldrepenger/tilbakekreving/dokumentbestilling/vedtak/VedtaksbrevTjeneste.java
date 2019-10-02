@@ -31,9 +31,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.Feilutbetaling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingPeriodeÅrsak;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FeilutbetalingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
@@ -84,7 +84,7 @@ public class VedtaksbrevTjeneste {
     private BehandlingTjeneste behandlingTjeneste;
     private EksternDataForBrevTjeneste eksternDataForBrevTjeneste;
     private BrevdataRepository brevdataRepository;
-    private FeilutbetalingRepository faktaRepository;
+    private FaktaFeilutbetalingRepository faktaRepository;
     private KodeverkRepository kodeverkRepository;
     private VilkårsvurderingRepository vilkårsvurderingRepository;
     private VurdertForeldelseRepository foreldelseRepository;
@@ -98,7 +98,7 @@ public class VedtaksbrevTjeneste {
                                BehandlingTjeneste behandlingTjeneste,
                                EksternDataForBrevTjeneste eksternDataForBrevTjeneste,
                                BrevdataRepository brevdataRepository,
-                               FeilutbetalingRepository faktaRepository,
+                               FaktaFeilutbetalingRepository faktaRepository,
                                KodeverkRepository kodeverkRepository,
                                VilkårsvurderingRepository vilkårsvurderingRepository,
                                VurdertForeldelseRepository foreldelseRepository,
@@ -190,7 +190,7 @@ public class VedtaksbrevTjeneste {
         List<VarselbrevSporing> varselbrevData = brevdataRepository.hentVarselbrevData(behandlingId);
         LocalDateTime nyesteVarselbrevTidspunkt = VedtaksbrevUtil.finnNyesteVarselbrevTidspunkt(varselbrevData);
 
-        Feilutbetaling fakta = faktaRepository.finnFeilutbetaling(behandlingId).orElseThrow().getFeilutbetaling();
+        FaktaFeilutbetaling fakta = faktaRepository.finnFaktaOmFeilutbetaling(behandlingId).orElseThrow();
         List<VilkårVurderingPeriodeEntitet> vilkårPerioder = vilkårsvurderingRepository.finnVilkårsvurderingForBehandlingId(behandlingId)
             .map(VilkårVurderingAggregateEntitet::getManuellVilkår)
             .map(VilkårVurderingEntitet::getPerioder)
@@ -256,7 +256,7 @@ public class VedtaksbrevTjeneste {
             .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    private HbVedtaksbrevPeriode lagBrevdataPeriode(BeregningResultatPeriode resultatPeriode, Feilutbetaling fakta, List<VilkårVurderingPeriodeEntitet> vilkårPerioder, VurdertForeldelse foreldelse, List<PeriodeMedTekstDto> perioderFritekst) {
+    private HbVedtaksbrevPeriode lagBrevdataPeriode(BeregningResultatPeriode resultatPeriode, FaktaFeilutbetaling fakta, List<VilkårVurderingPeriodeEntitet> vilkårPerioder, VurdertForeldelse foreldelse, List<PeriodeMedTekstDto> perioderFritekst) {
         Periode periode = resultatPeriode.getPeriode();
 
         HbVedtaksbrevPeriode.Builder builder = HbVedtaksbrevPeriode.builder()
@@ -344,8 +344,8 @@ public class VedtaksbrevTjeneste {
         return null; //skjer ved foreldet periode
     }
 
-    private HendelseType finnHendelseType(Periode periode, Feilutbetaling fakta) {
-        for (FeilutbetalingPeriodeÅrsak faktaPeriode : fakta.getFeilutbetaltPerioder()) {
+    private HendelseType finnHendelseType(Periode periode, FaktaFeilutbetaling fakta) {
+        for (FaktaFeilutbetalingPeriode faktaPeriode : fakta.getFeilutbetaltPerioder()) {
             if (faktaPeriode.getPeriode().omslutter(periode)) {
                 //FIXME entitet skal tilby HendelseType direkte
                 return kodeverkRepository.finn(HendelseType.class, faktaPeriode.getÅrsak());
@@ -354,8 +354,8 @@ public class VedtaksbrevTjeneste {
         throw new IllegalArgumentException("Fant ikke fakta-periode som omslutter periode " + periode);
     }
 
-    private HendelseUnderType finnHendelseUnderType(Periode periode, Feilutbetaling fakta) {
-        for (FeilutbetalingPeriodeÅrsak faktaPeriode : fakta.getFeilutbetaltPerioder()) {
+    private HendelseUnderType finnHendelseUnderType(Periode periode, FaktaFeilutbetaling fakta) {
+        for (FaktaFeilutbetalingPeriode faktaPeriode : fakta.getFeilutbetaltPerioder()) {
             if (faktaPeriode.getPeriode().omslutter(periode)) {
                 //FIXME entitet skal tilby HendelseType direkte
                 return kodeverkRepository.finn(HendelseUnderType.class, faktaPeriode.getUnderÅrsak());

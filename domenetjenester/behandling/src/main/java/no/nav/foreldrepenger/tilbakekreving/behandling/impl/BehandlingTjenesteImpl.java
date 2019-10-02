@@ -175,7 +175,7 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
             LocalDate totalPeriodeTom = null;
             for (UtbetaltPeriode utbetaltPeriode : utbetaltPerioder) {
                 aktuellFeilUtbetaltBeløp = aktuellFeilUtbetaltBeløp.add(utbetaltPeriode.getBelop());
-                feilutbetalingTjeneste.formFeilutbetalingÅrsak(behandlingId, utbetaltPeriode);
+                feilutbetalingTjeneste.hentFeilutbetalingÅrsak(behandlingId, utbetaltPeriode);
                 totalPeriodeFom = totalPeriodeFom == null || totalPeriodeFom.isAfter(utbetaltPeriode.getFom()) ? utbetaltPeriode.getFom() : totalPeriodeFom;
                 totalPeriodeTom = totalPeriodeTom == null || totalPeriodeTom.isBefore(utbetaltPeriode.getTom()) ? utbetaltPeriode.getTom() : totalPeriodeTom;
             }
