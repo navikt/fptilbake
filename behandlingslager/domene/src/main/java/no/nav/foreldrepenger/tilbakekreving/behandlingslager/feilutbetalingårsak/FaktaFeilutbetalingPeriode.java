@@ -124,7 +124,7 @@ public class FaktaFeilutbetalingPeriode extends BaseEntitet {
         }
 
         public Builder medHendelseUndertype(HendelseUnderType hendelseUndertype) {
-            this.kladd.hendelseUndertype = hendelseUndertype;
+            this.kladd.hendelseUndertype = hendelseUndertype != null ? hendelseUndertype : FellesUndertyper.IKKE_SATT;
             return this;
         }
 

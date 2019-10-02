@@ -18,7 +18,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.FeiltubetalingÅrsakerYtelseTypeDto;
-import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.FeilutbetalingÅrsakDto;
+import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTypeDto;
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.tjeneste.FeilutbetalingÅrsakTjeneste;
 import no.nav.vedtak.felles.jpa.Transaction;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
@@ -43,7 +43,7 @@ public class FeilutbetalingÅrsakRestTjeneste {
 
     @GET
     @ApiOperation(value = "Henter kodeverk for årsak med underårsaker for feilutbetaling")
-    @ApiResponse(code = HttpStatus.OK_200, message = "OK", response = FeilutbetalingÅrsakDto.class)
+    @ApiResponse(code = HttpStatus.OK_200, message = "OK", response = HendelseTypeDto.class)
     @BeskyttetRessurs(action = READ, ressurs = APPLIKASJON)
     public List<FeiltubetalingÅrsakerYtelseTypeDto> hentAlleFeilutbetalingÅrsaker() {
         return feilutbetalingÅrsakTjeneste.hentFeilutbetalingårsaker();

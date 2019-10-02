@@ -67,8 +67,8 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         assertThat(førstePeriode.getOppfyltValg()).isEqualByComparingTo(VilkårResultat.UDEFINERT);
         assertThat(førstePeriode.getFom()).isEqualTo(FOM);
         assertThat(førstePeriode.getTom()).isEqualTo(SISTE_DAG_I_FORELDELSE_PERIODE);
-        assertThat(førstePeriode.getÅrsak().getÅrsakKode()).isEqualTo(HendelseType.FP_UTTAK_UTSETTELSE_TYPE.getKode());
-        assertThat(førstePeriode.getÅrsak().getUnderÅrsaker().get(0).getUnderÅrsakKode()).isEqualTo(FpHendelseUnderTyper.ARBEID_HELTID.getKode());
+        assertThat(førstePeriode.getHendelseType()).isEqualTo(HendelseType.FP_UTTAK_UTSETTELSE_TYPE);
+        assertThat(førstePeriode.getHendelseUndertype()).isEqualTo(FpHendelseUnderTyper.ARBEID_HELTID);
         assertThat(førstePeriode.getFeilutbetaling()).isEqualByComparingTo(BigDecimal.valueOf(31000));
         assertThat(førstePeriode.isForeldet()).isTrue();
 
@@ -84,8 +84,8 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         assertThat(andrePeriode.getOppfyltValg()).isEqualByComparingTo(VilkårResultat.UDEFINERT);
         assertThat(andrePeriode.getFom()).isEqualTo(FØRSTE_DAG_I_FORELDELSE_PERIODE);
         assertThat(andrePeriode.getTom()).isEqualTo(TOM);
-        assertThat(andrePeriode.getÅrsak().getÅrsakKode()).isEqualTo(HendelseType.FP_UTTAK_UTSETTELSE_TYPE.getKode());
-        assertThat(andrePeriode.getÅrsak().getUnderÅrsaker().get(0).getUnderÅrsakKode()).isEqualTo(FpHendelseUnderTyper.ARBEID_HELTID.getKode());
+        assertThat(førstePeriode.getHendelseType()).isEqualTo(HendelseType.FP_UTTAK_UTSETTELSE_TYPE);
+        assertThat(førstePeriode.getHendelseUndertype()).isEqualTo(FpHendelseUnderTyper.ARBEID_HELTID);
         assertThat(andrePeriode.getFeilutbetaling()).isEqualByComparingTo(BigDecimal.valueOf(20000));
         assertThat(andrePeriode.isForeldet()).isFalse();
 
@@ -111,8 +111,8 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         assertThat(periode.getTom()).isEqualTo(TOM);
         assertThat(periode.getOppfyltValg()).isEqualByComparingTo(VilkårResultat.UDEFINERT);
         assertThat(periode.getFeilutbetaling()).isEqualByComparingTo(BigDecimal.valueOf(51000));
-        assertThat(periode.getÅrsak().getÅrsakKode()).isEqualTo(HendelseType.FP_UTTAK_UTSETTELSE_TYPE.getKode());
-        assertThat(periode.getÅrsak().getUnderÅrsaker().get(0).getUnderÅrsakKode()).isEqualTo(FpHendelseUnderTyper.ARBEID_HELTID.getKode());
+        assertThat(periode.getHendelseType()).isEqualTo(HendelseType.FP_UTTAK_UTSETTELSE_TYPE);
+        assertThat(periode.getHendelseUndertype()).isEqualTo(FpHendelseUnderTyper.ARBEID_HELTID);
         assertThat(periode.isForeldet()).isFalse();
 
         assertThat(periode.getYtelser().size()).isEqualTo(3);
@@ -157,8 +157,8 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         assertThat(perioder.size()).isEqualTo(1);
         DetaljertFeilutbetalingPeriodeDto periode = perioder.get(0);
         assertThat(periode.getFeilutbetaling()).isEqualByComparingTo(BigDecimal.valueOf(32000));
-        assertThat(periode.getÅrsak().getÅrsakKode()).isEqualTo(HendelseType.FP_UTTAK_UTSETTELSE_TYPE.getKode());
-        assertThat(periode.getÅrsak().getUnderÅrsaker().get(0).getUnderÅrsakKode()).isEqualTo(FpHendelseUnderTyper.ARBEID_HELTID.getKode());
+        assertThat(periode.getHendelseType()).isEqualTo(HendelseType.FP_UTTAK_UTSETTELSE_TYPE);
+        assertThat(periode.getHendelseUndertype()).isEqualTo(FpHendelseUnderTyper.ARBEID_HELTID);
         assertThat(periode.isForeldet()).isFalse();
 
         assertThat(periode.getRedusertBeloper().size()).isEqualTo(2);

@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.apache.commons.lang3.StringUtils;
 import org.threeten.extra.Days;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BehandlingFeilutbetalingFakta;
@@ -23,8 +22,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositor
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
-import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.FeilutbetalingÅrsakDto;
-import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.UnderÅrsakDto;
+import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTypeDto;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.TilbakekrevingValgDto;
@@ -75,14 +73,12 @@ public class FeilutbetalingTjeneste {
             .build();
     }
 
-    private FeilutbetalingÅrsakDto mapFra(Optional<FaktaFeilutbetalingPeriode> årsak) {
-        FeilutbetalingÅrsakDto feilutbetalingÅrsakDto = new FeilutbetalingÅrsakDto();
+    private HendelseTypeDto mapFra(Optional<FaktaFeilutbetalingPeriode> årsak) {
+        HendelseTypeDto feilutbetalingÅrsakDto = new HendelseTypeDto();
         if (årsak.isPresent()) {
             FaktaFeilutbetalingPeriode faktaFeilutbetalingPeriode = årsak.get();
-            feilutbetalingÅrsakDto.setÅrsakKode(faktaFeilutbetalingPeriode.getÅrsak());
-            if (StringUtils.isNotEmpty(faktaFeilutbetalingPeriode.getUnderÅrsak()))
-                feilutbetalingÅrsakDto.leggTilUnderÅrsaker(new UnderÅrsakDto(null, faktaFeilutbetalingPeriode.getUnderÅrsak(),
-                    faktaFeilutbetalingPeriode.getUnderÅrsakKodeverk()));
+            feilutbetalingÅrsakDto.setHendelseType(faktaFeilutbetalingPeriode.getHendelseType());
+            feilutbetalingÅrsakDto.setHendelseUndertype(faktaFeilutbetalingPeriode.getHendelseUndertype());
         }
         return feilutbetalingÅrsakDto;
     }

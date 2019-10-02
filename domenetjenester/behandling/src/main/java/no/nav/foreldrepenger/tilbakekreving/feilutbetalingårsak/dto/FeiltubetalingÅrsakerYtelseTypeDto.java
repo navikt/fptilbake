@@ -6,32 +6,33 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelse
 
 public class FeiltubetalingÅrsakerYtelseTypeDto {
 
-    private String ytelseType;
 
-    private List<FeilutbetalingÅrsakDto> feilutbetalingÅrsaker;
+    private FagsakYtelseType ytelseType;
+
+    private List<HendelseTypeMedNavnDto> feilutbetalingÅrsaker;
 
     FeiltubetalingÅrsakerYtelseTypeDto() {
         //for Jackson
     }
 
-    public FeiltubetalingÅrsakerYtelseTypeDto(FagsakYtelseType ytelseType, List<FeilutbetalingÅrsakDto> feilutbetalingÅrsaker) {
-        this.ytelseType = ytelseType.getKode();
+    public FeiltubetalingÅrsakerYtelseTypeDto(FagsakYtelseType ytelseType, List<HendelseTypeMedNavnDto> feilutbetalingÅrsaker) {
+        this.ytelseType = ytelseType;
         this.feilutbetalingÅrsaker = feilutbetalingÅrsaker;
     }
 
-    public String getYtelseType() {
+    public FagsakYtelseType getYtelseType() {
         return ytelseType;
     }
 
-    public void setYtelseType(String ytelseType) {
+    public void setYtelseType(FagsakYtelseType ytelseType) {
         this.ytelseType = ytelseType;
     }
 
-    public List<FeilutbetalingÅrsakDto> getFeilutbetalingÅrsaker() {
+    public List<HendelseTypeMedNavnDto> getFeilutbetalingÅrsaker() {
         return feilutbetalingÅrsaker;
     }
 
-    public void setFeilutbetalingÅrsaker(List<FeilutbetalingÅrsakDto> feilutbetalingÅrsaker) {
+    public void setFeilutbetalingÅrsaker(List<HendelseTypeMedNavnDto> feilutbetalingÅrsaker) {
         this.feilutbetalingÅrsaker = feilutbetalingÅrsaker;
     }
 }

@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
-import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.FeilutbetalingÅrsakDto;
+import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTypeDto;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
 public class DetaljertFeilutbetalingPeriodeDto extends FaktaFeilutbetalingDto {
@@ -25,13 +25,13 @@ public class DetaljertFeilutbetalingPeriodeDto extends FaktaFeilutbetalingDto {
         // for CDI
     }
 
-    public DetaljertFeilutbetalingPeriodeDto(LocalDate fom, LocalDate tom, FeilutbetalingÅrsakDto feilutbetalingÅrsakDto,
+    public DetaljertFeilutbetalingPeriodeDto(LocalDate fom, LocalDate tom, HendelseTypeDto feilutbetalingÅrsakDto,
                                              BigDecimal feilutbetaling) {
         super(fom, tom, feilutbetalingÅrsakDto);
         this.feilutbetaling = feilutbetaling;
     }
 
-    public DetaljertFeilutbetalingPeriodeDto(Periode periode, FeilutbetalingÅrsakDto feilutbetalingÅrsakDto,
+    public DetaljertFeilutbetalingPeriodeDto(Periode periode, HendelseTypeDto feilutbetalingÅrsakDto,
                                              BigDecimal feilutbetaling) {
         super(periode.getFom(), periode.getTom(), feilutbetalingÅrsakDto);
         this.feilutbetaling = feilutbetaling;

@@ -31,10 +31,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurdertForeldelseTje
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingAggregate;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.InntektskategoriKlassekodeMapper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingAggregateEntitet;
@@ -43,8 +41,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurd
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Inntektskategori;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
-import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.FeilutbetalingÅrsakDto;
-import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.UnderÅrsakDto;
+import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTypeDto;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagAggregate;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagBelop433;
@@ -151,7 +148,7 @@ public class VilkårsvurderingTjeneste {
         FeilutbetalingPerioderDto feilutbetalingPerioderDto = foreldelseTjeneste.henteVurdertForeldelse(behandlingId);
 
         for (PeriodeDto periode : feilutbetalingPerioderDto.getPerioder()) {
-            FeilutbetalingÅrsakDto årsak = henteÅrsak(faktaFeilutbetalingPerioder, new Periode(periode.getFom(), periode.getTom()));
+            HendelseTypeDto årsak = henteÅrsak(faktaFeilutbetalingPerioder, new Periode(periode.getFom(), periode.getTom()));
 
             DetaljertFeilutbetalingPeriodeDto periodeDto = new DetaljertFeilutbetalingPeriodeDto(periode.getFom(), periode.getTom(),
                 årsak, periode.getBelop());
@@ -201,27 +198,20 @@ public class VilkårsvurderingTjeneste {
         return false;
     }
 
-    private FeilutbetalingÅrsakDto henteÅrsak(List<FaktaFeilutbetalingPeriode> faktaFeilutbetalingPerioder, Periode foreldetPeriode) {
+    private HendelseTypeDto henteÅrsak(List<FaktaFeilutbetalingPeriode> faktaFeilutbetalingPerioder, Periode foreldetPeriode) {
         for (FaktaFeilutbetalingPeriode feilutbetalingPeriodeÅrsak : faktaFeilutbetalingPerioder) {
             Periode faktaFeilutbetalingPeriode = feilutbetalingPeriodeÅrsak.getPeriode();
             if (faktaFeilutbetalingPeriode.overlapper(foreldetPeriode)) {
                 return mapTil(feilutbetalingPeriodeÅrsak);
             }
         }
-        return new FeilutbetalingÅrsakDto();
+        return new HendelseTypeDto();
     }
 
-    private FeilutbetalingÅrsakDto mapTil(FaktaFeilutbetalingPeriode faktaFeilutbetalingPeriode) {
-        FeilutbetalingÅrsakDto årsakDto = new FeilutbetalingÅrsakDto();
-        årsakDto.setKodeverk(faktaFeilutbetalingPeriode.getÅrsakKodeverk());
-        årsakDto.setÅrsakKode(faktaFeilutbetalingPeriode.getÅrsak());
-        Kodeliste kodeliste = kodeverkRepository.hentKodeliste(faktaFeilutbetalingPeriode.getÅrsakKodeverk(), faktaFeilutbetalingPeriode.getÅrsak());
-        årsakDto.setÅrsak(kodeliste.getNavn());
-        if (faktaFeilutbetalingPeriode.getUnderÅrsakKodeverk() != null) {
-            Kodeliste underÅrsakKodeListe = kodeverkRepository.hentKodeliste(faktaFeilutbetalingPeriode.getUnderÅrsakKodeverk(), faktaFeilutbetalingPeriode.getUnderÅrsak());
-            årsakDto.leggTilUnderÅrsaker(new UnderÅrsakDto(underÅrsakKodeListe.getNavn(), faktaFeilutbetalingPeriode.getUnderÅrsak(),
-                faktaFeilutbetalingPeriode.getUnderÅrsakKodeverk()));
-        }
+    private HendelseTypeDto mapTil(FaktaFeilutbetalingPeriode faktaFeilutbetalingPeriode) {
+        HendelseTypeDto årsakDto = new HendelseTypeDto();
+        årsakDto.setHendelseType(faktaFeilutbetalingPeriode.getHendelseType());
+        årsakDto.setHendelseUndertype(faktaFeilutbetalingPeriode.getHendelseUndertype());
         return årsakDto;
     }
 

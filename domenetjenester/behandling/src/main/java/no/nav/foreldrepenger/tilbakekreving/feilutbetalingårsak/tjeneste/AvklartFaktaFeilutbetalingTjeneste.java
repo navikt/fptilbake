@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.tjeneste;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -11,30 +12,23 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingAggregate;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkOpplysningType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
-import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.UnderÅrsakDto;
 import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkinnslagDelDto;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
-import no.nav.vedtak.util.StringUtils;
 
 @ApplicationScoped
 public class AvklartFaktaFeilutbetalingTjeneste {
 
-    private static final String UNDERÅRSAK_KODE = "UNDERÅRSAK_KODE";
-    private static final String UNDERÅRSAK = "UNDERÅRSAK";
-    private static final String UNDERÅRSAK_KODEVERK = "UNDERÅRSAK_KODEVERK";
-
     private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository;
-    private KodeverkRepository kodeverkRepository;
     private HistorikkTjenesteAdapter historikkTjenesteAdapter;
 
     AvklartFaktaFeilutbetalingTjeneste() {
@@ -42,10 +36,9 @@ public class AvklartFaktaFeilutbetalingTjeneste {
     }
 
     @Inject
-    public AvklartFaktaFeilutbetalingTjeneste(FaktaFeilutbetalingRepository faktaFeilutbetalingRepository, KodeverkRepository kodeverkRepository,
+    public AvklartFaktaFeilutbetalingTjeneste(FaktaFeilutbetalingRepository faktaFeilutbetalingRepository,
                                               HistorikkTjenesteAdapter historikkTjenesteAdapter) {
         this.faktaFeilutbetalingRepository = faktaFeilutbetalingRepository;
-        this.kodeverkRepository = kodeverkRepository;
         this.historikkTjenesteAdapter = historikkTjenesteAdapter;
     }
 
@@ -63,22 +56,16 @@ public class AvklartFaktaFeilutbetalingTjeneste {
         FaktaFeilutbetaling faktaFeilutbetaling = new FaktaFeilutbetaling();
         boolean behovForHistorikkInnslag = false;
         for (FaktaFeilutbetalingDto faktaFeilutbetalingDto : feilutbetalingFaktas) {
-            UnderÅrsakDto underÅrsakDto = null;
-            List<UnderÅrsakDto> underÅrsaker = faktaFeilutbetalingDto.getÅrsak().getUnderÅrsaker();
-            if (!underÅrsaker.isEmpty()) {
-                // Fordi vi har bare et underÅrsak som saksbehandler kan velge
-                underÅrsakDto = underÅrsaker.get(0);
-            }
             FaktaFeilutbetalingPeriode faktaFeilutbetalingPeriode = FaktaFeilutbetalingPeriode.builder()
                 .medPeriode(faktaFeilutbetalingDto.getFom(), faktaFeilutbetalingDto.getTom())
-                .medÅrsak(faktaFeilutbetalingDto.getÅrsak().getÅrsakKode(), kodeverkRepository)
-                .medUnderÅrsak(sjekkOgReturnereUnderårsak(underÅrsakDto, UNDERÅRSAK_KODE), kodeverkRepository)
+                .medHendelseType(faktaFeilutbetalingDto.getHendelseType())
+                .medHendelseUndertype(faktaFeilutbetalingDto.getHendelseUndertype())
                 .medFeilutbetalinger(faktaFeilutbetaling)
                 .build();
             faktaFeilutbetaling.leggTilFeilutbetaltPeriode(faktaFeilutbetalingPeriode);
 
             // lag historikkinnslagDeler
-            boolean harEndret = lagHistorikkInnslagDeler(behandling, historikkinnslag, begrunnelse, forrigeFakta, faktaFeilutbetalingDto, underÅrsakDto, historikkinnslagDelDto);
+            boolean harEndret = lagHistorikkInnslagDeler(behandling, historikkinnslag, begrunnelse, forrigeFakta, faktaFeilutbetalingDto, historikkinnslagDelDto);
             behovForHistorikkInnslag = !behovForHistorikkInnslag ? harEndret : behovForHistorikkInnslag;
         }
 
@@ -92,7 +79,7 @@ public class AvklartFaktaFeilutbetalingTjeneste {
     private boolean lagHistorikkInnslagDeler(Behandling behandling, Historikkinnslag historikkinnslag, String begrunnelse,
                                              Optional<FaktaFeilutbetaling> forrigeFakta,
                                              FaktaFeilutbetalingDto faktaFeilutbetalingDto,
-                                             UnderÅrsakDto underÅrsakDto, HistorikkinnslagDelDto historikkinnslagDelDto) {
+                                             HistorikkinnslagDelDto historikkinnslagDelDto) {
         boolean harEndret = false;
         HistorikkInnslagTekstBuilder tekstBuilder = historikkTjenesteAdapter.tekstBuilder();
         if (forrigeFakta.isPresent()) {
@@ -101,15 +88,14 @@ public class AvklartFaktaFeilutbetalingTjeneste {
                 .filter(fpå -> fpå.getPeriode().equals(faktaFeilutbetalingDto.tilPeriode()))
                 .findFirst();
             if (forrigeFeilutbetalingPeriodeÅrsak.isPresent()) {
-                harEndret = håndtereEndretÅrsak(behandling, forrigeFeilutbetalingPeriodeÅrsak.get(), faktaFeilutbetalingDto, underÅrsakDto,
-                    begrunnelse, tekstBuilder, historikkinnslagDelDto);
+                harEndret = håndtereEndretÅrsak(behandling, forrigeFeilutbetalingPeriodeÅrsak.get(), faktaFeilutbetalingDto, begrunnelse, tekstBuilder, historikkinnslagDelDto);
             } else { // det betyr perioder har endret
-                opprettNyHistorikkinnslagDel(begrunnelse, faktaFeilutbetalingDto, underÅrsakDto, tekstBuilder);
+                opprettNyHistorikkinnslagDel(begrunnelse, faktaFeilutbetalingDto, tekstBuilder);
                 harEndret = true;
             }
 
         } else {
-            opprettNyHistorikkinnslagDel(begrunnelse, faktaFeilutbetalingDto, underÅrsakDto, tekstBuilder);
+            opprettNyHistorikkinnslagDel(begrunnelse, faktaFeilutbetalingDto, tekstBuilder);
             harEndret = true;
         }
         if (harEndret) {
@@ -118,10 +104,10 @@ public class AvklartFaktaFeilutbetalingTjeneste {
         return harEndret;
     }
 
-    private void opprettNyHistorikkinnslagDel(String begrunnelse, FaktaFeilutbetalingDto faktaFeilutbetalingDto, UnderÅrsakDto underÅrsakDto, HistorikkInnslagTekstBuilder tekstBuilder) {
+    private void opprettNyHistorikkinnslagDel(String begrunnelse, FaktaFeilutbetalingDto faktaFeilutbetalingDto, HistorikkInnslagTekstBuilder tekstBuilder) {
         mapFellesVerdier(tekstBuilder, begrunnelse, faktaFeilutbetalingDto);
-        tekstBuilder.medEndretFelt(HistorikkEndretFeltType.HENDELSE_ÅRSAK, null, faktaFeilutbetalingDto.getÅrsak().getÅrsak());
-        tekstBuilder.medEndretFelt(HistorikkEndretFeltType.HENDELSE_UNDER_ÅRSAK, null, sjekkOgReturnereUnderårsak(underÅrsakDto, UNDERÅRSAK));
+        tekstBuilder.medEndretFelt(HistorikkEndretFeltType.HENDELSE_ÅRSAK, null, faktaFeilutbetalingDto.getHendelseType());
+        tekstBuilder.medEndretFelt(HistorikkEndretFeltType.HENDELSE_UNDER_ÅRSAK, null, faktaFeilutbetalingDto.getHendelseUndertype());
     }
 
     private void mapFellesVerdier(HistorikkInnslagTekstBuilder tekstBuilder, String begrunnelse, FaktaFeilutbetalingDto faktaFeilutbetalingDto) {
@@ -131,17 +117,13 @@ public class AvklartFaktaFeilutbetalingTjeneste {
             .medOpplysning(HistorikkOpplysningType.PERIODE_TOM, faktaFeilutbetalingDto.getTom());
     }
 
-    private boolean håndtereEndretÅrsak(Behandling behandling, FaktaFeilutbetalingPeriode forrigePeiodeÅrsak, FaktaFeilutbetalingDto faktaFeilutbetalingDto,
-                                        UnderÅrsakDto underÅrsakDto, String begrunnelse,
+    private boolean håndtereEndretÅrsak(Behandling behandling, FaktaFeilutbetalingPeriode forrigePeiodeÅrsak, FaktaFeilutbetalingDto faktaFeilutbetalingDto, String begrunnelse,
                                         HistorikkInnslagTekstBuilder tekstBuilder, HistorikkinnslagDelDto historikkinnslagDelDto) {
-        if (sjekkHvisÅrsakEllerUnderÅrsakEndret(faktaFeilutbetalingDto, sjekkOgReturnereUnderårsak(underÅrsakDto, UNDERÅRSAK_KODE), forrigePeiodeÅrsak)) {
+
+        if (sjekkHvisÅrsakEllerUnderÅrsakEndret(faktaFeilutbetalingDto, forrigePeiodeÅrsak)) {
             mapFellesVerdier(tekstBuilder, begrunnelse, faktaFeilutbetalingDto);
-            tekstBuilder.medEndretFelt(HistorikkEndretFeltType.HENDELSE_ÅRSAK,
-                kodeverkRepository.hentKodeliste(forrigePeiodeÅrsak.getÅrsakKodeverk(), forrigePeiodeÅrsak.getÅrsak()).getNavn(),
-                faktaFeilutbetalingDto.getÅrsak().getÅrsak());
-            tekstBuilder.medEndretFelt(HistorikkEndretFeltType.HENDELSE_UNDER_ÅRSAK,
-                hentForrigeUnderÅrsak(forrigePeiodeÅrsak.getUnderÅrsakKodeverk(), forrigePeiodeÅrsak.getUnderÅrsak()),
-                sjekkOgReturnereUnderårsak(underÅrsakDto, UNDERÅRSAK));
+            tekstBuilder.medEndretFelt(HistorikkEndretFeltType.HENDELSE_ÅRSAK, forrigePeiodeÅrsak.getHendelseType(), faktaFeilutbetalingDto.getHendelseType());
+            tekstBuilder.medEndretFelt(HistorikkEndretFeltType.HENDELSE_UNDER_ÅRSAK, forrigePeiodeÅrsak.getHendelseUndertype(), faktaFeilutbetalingDto.getHendelseUndertype());
             return true;
         } else if (historikkinnslagDelDto.getBegrunnelseFritekst() == null && harBegrunnelseEndret(behandling, begrunnelse)) {
             tekstBuilder.medSkjermlenke(SkjermlenkeType.FAKTA_OM_FEILUTBETALING)
@@ -153,36 +135,17 @@ public class AvklartFaktaFeilutbetalingTjeneste {
         return false;
     }
 
-    private String hentForrigeUnderÅrsak(String underÅrsakKodeverk, String underÅrsakKode) {
-        if (StringUtils.nullOrEmpty(underÅrsakKode)) {
-            return null;
-        }
-        return kodeverkRepository.hentKodeliste(underÅrsakKodeverk, underÅrsakKode).getNavn();
-    }
-
-    private boolean sjekkHvisÅrsakEllerUnderÅrsakEndret(FaktaFeilutbetalingDto faktaFeilutbetalingDto, String underÅrsakKode,
+    private boolean sjekkHvisÅrsakEllerUnderÅrsakEndret(FaktaFeilutbetalingDto faktaFeilutbetalingDto,
                                                         FaktaFeilutbetalingPeriode forrigePeriodeÅrsak) {
         boolean erEndret = false;
+        HendelseType nyHendelseType = faktaFeilutbetalingDto.getHendelseType();
+        HendelseUnderType nyHendelseUndertype = faktaFeilutbetalingDto.getHendelseUndertype();
+
         if (faktaFeilutbetalingDto.tilPeriode().isEqual(forrigePeriodeÅrsak.getPeriode())) {
-            erEndret = !forrigePeriodeÅrsak.getÅrsak().equals(faktaFeilutbetalingDto.getÅrsak().getÅrsakKode());
-            if (!erEndret && !StringUtils.nullOrEmpty(forrigePeriodeÅrsak.getUnderÅrsak())) {
-                erEndret = !forrigePeriodeÅrsak.getUnderÅrsak().equals(underÅrsakKode);
-            }
+            erEndret = !Objects.equals(forrigePeriodeÅrsak.getHendelseType(), nyHendelseType) ||
+                !Objects.equals(forrigePeriodeÅrsak.getHendelseUndertype(), nyHendelseUndertype);
         }
         return erEndret;
-    }
-
-    private String sjekkOgReturnereUnderårsak(UnderÅrsakDto underÅrsakDto, String felt) {
-        switch (felt) {
-            case UNDERÅRSAK_KODE:
-                return underÅrsakDto != null ? underÅrsakDto.getUnderÅrsakKode() : null;
-            case UNDERÅRSAK:
-                return underÅrsakDto != null ? underÅrsakDto.getUnderÅrsak() : null;
-            case UNDERÅRSAK_KODEVERK:
-                return underÅrsakDto != null ? underÅrsakDto.getKodeverk() : null;
-            default:
-                return null;
-        }
     }
 
     private boolean harBegrunnelseEndret(Behandling behandling, String begrunnelse) {

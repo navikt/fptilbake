@@ -15,8 +15,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.FeiltubetalingÅrsakerYtelseTypeDto;
-import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.FeilutbetalingÅrsakDto;
-import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.UnderÅrsakDto;
+import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTypeMedNavnDto;
 
 @ApplicationScoped
 public class FeilutbetalingÅrsakTjeneste {
@@ -42,22 +41,12 @@ public class FeilutbetalingÅrsakTjeneste {
             FagsakYtelseType ytelseType = entry.getKey();
             Set<HendelseType> hendelseTyper = entry.getValue();
 
-            List<FeilutbetalingÅrsakDto> dtoer = new ArrayList<>();
+            List<HendelseTypeMedNavnDto> dtoer = new ArrayList<>();
             for (HendelseType hendelseType : hendelseTyper) {
-                FeilutbetalingÅrsakDto feilutbetalingÅrsakDto = new FeilutbetalingÅrsakDto();
-                feilutbetalingÅrsakDto.setÅrsakKode(hendelseType.getKode());
-                feilutbetalingÅrsakDto.setÅrsak(hendelseType.getNavn());
-                feilutbetalingÅrsakDto.setKodeverk(hendelseType.getKodeverk());
-                if (hendelseUndertypePrHendelseType.containsKey(hendelseType)) {
-                    // sortere basert på forhåndsdefinert rekkefølge
-                    List<HendelseUnderType> hendelseUnderTyper = sortereHendelseUnderTyper(hendelseUndertypePrHendelseType.get(hendelseType));
-                    for (HendelseUnderType hendelseUnderType : hendelseUnderTyper) {
-                        feilutbetalingÅrsakDto.leggTilUnderÅrsaker(new UnderÅrsakDto(hendelseUnderType.getNavn(), hendelseUnderType.getKode(), hendelseUnderType.getKodeverk()));
-                    }
-                }
-                dtoer.add(feilutbetalingÅrsakDto);
+                Set<HendelseUnderType> undertyper = hendelseUndertypePrHendelseType.get(hendelseType);
+                List<HendelseUnderType> sorterteUndertyper = sortereHendelseUnderTyper(undertyper);
+                dtoer.add(new HendelseTypeMedNavnDto(hendelseType, sorterteUndertyper));
             }
-
             resultat.add(new FeiltubetalingÅrsakerYtelseTypeDto(ytelseType, dtoer));
         }
 

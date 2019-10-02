@@ -5,7 +5,7 @@ import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.FeilutbetalingÅrsakDto;
+import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTypeDto;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -14,7 +14,7 @@ public class UtbetaltPeriode {
     private LocalDate fom;
     private LocalDate tom;
     private BigDecimal belop;
-    private FeilutbetalingÅrsakDto feilutbetalingÅrsakDto;
+    private HendelseTypeDto feilutbetalingÅrsakDto;
 
     private UtbetaltPeriode() {
         // bruk statisk metode for å lage utbetalt periode
@@ -36,11 +36,11 @@ public class UtbetaltPeriode {
         return Periode.of(fom, tom);
     }
 
-    public FeilutbetalingÅrsakDto getFeilutbetalingÅrsakDto() {
+    public HendelseTypeDto getFeilutbetalingÅrsakDto() {
         return feilutbetalingÅrsakDto;
     }
 
-    public void setFeilutbetalingÅrsakDto(FeilutbetalingÅrsakDto feilutbetalingÅrsakDto) {
+    public void setFeilutbetalingÅrsakDto(HendelseTypeDto feilutbetalingÅrsakDto) {
         this.feilutbetalingÅrsakDto = feilutbetalingÅrsakDto;
     }
 
