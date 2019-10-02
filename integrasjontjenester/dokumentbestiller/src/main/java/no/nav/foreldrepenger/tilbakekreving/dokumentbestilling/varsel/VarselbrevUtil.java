@@ -80,7 +80,7 @@ public class VarselbrevUtil {
             .medSaksnummer(saksnummer.getVerdi())
             .medSakspartNavn(eksternBehandlingsinfo.getPersonopplysninger().getNavn())
             .medFagsaktype(fagsakYtelseType)
-            .medSprakkode(grunninformasjon.getSprakkode())
+            .medSprakkode(grunninformasjon.getSpråkkodeEllerDefault())
             .medFagsaktypenavnPåSpråk(ytelseNavn.getNavnPåBrukersSpråk())
             .medAnsvarligSaksbehandler(grunninformasjon.getAnsvarligSaksbehandler())
             .medTittel(VarselbrevOverskrift.finnTittelVarselbrev(ytelseNavn.getNavnPåBokmål()))

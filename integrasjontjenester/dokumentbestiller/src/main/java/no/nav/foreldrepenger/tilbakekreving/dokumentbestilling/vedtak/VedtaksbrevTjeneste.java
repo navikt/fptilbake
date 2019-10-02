@@ -226,7 +226,7 @@ public class VedtaksbrevTjeneste {
     BrevMetadata lagMetadataForVedtaksbrev(Behandling behandling, VedtakResultatType vedtakResultatType, SamletEksternBehandlingInfo eksternBehandlingsinfo) {
         String aktørId = eksternBehandlingsinfo.getPersonopplysninger().getAktoerId();
         FagsakYtelseType fagsakType = behandling.getFagsak().getFagsakYtelseType();
-        Språkkode språkkode = eksternBehandlingsinfo.getGrunninformasjon().getSprakkode();
+        Språkkode språkkode = eksternBehandlingsinfo.getGrunninformasjon().getSpråkkodeEllerDefault();
 
         Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(aktørId);
         Adresseinfo adresseinfo = eksternDataForBrevTjeneste.hentAdresse(personinfo, aktørId);
