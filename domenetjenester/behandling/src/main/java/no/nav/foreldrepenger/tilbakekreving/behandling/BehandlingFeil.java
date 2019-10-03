@@ -42,4 +42,8 @@ public interface BehandlingFeil extends DeklarerteFeil {
     @FunksjonellFeil(feilkode = "FPT-663488", feilmelding = "tilbakekreving finnes allerede for eksternUuid %s ", løsningsforslag = "", logLevel = LogLevel.WARN)
     Feil kanIkkeOppretteTilbakekrevingBehandling(UUID eksternUuid);
 
+    @FunksjonellFeil(feilkode = "FPT-663490", feilmelding = "Fant ingen tilbakekreving behandling for saksnummer %s ", løsningsforslag = "", logLevel = LogLevel.WARN)
+    Feil fantIngenTilbakekrevingBehandlingForSaksnummer(Saksnummer saksnummer);
+
+
 }

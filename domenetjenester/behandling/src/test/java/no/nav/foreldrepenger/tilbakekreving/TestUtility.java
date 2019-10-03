@@ -68,6 +68,13 @@ public class TestUtility {
         return Optional.of(personinfo);
     }
 
+    public UUID genererEksternUuid() {
+        byte[] data = new byte[16];
+        Random r = new Random();
+        r.nextBytes(data);
+        return UUID.nameUUIDFromBytes(data);
+    }
+
     private Long genererFagsakId() {
         return GEN_SAK_ID.getAndIncrement();
     }
@@ -79,13 +86,6 @@ public class TestUtility {
 
     private Long genererEksternBehandlingId() {
         return GEN_EBEH_ID.getAndIncrement();
-    }
-
-    private UUID genererEksternUuid() {
-        byte[] data = new byte[16];
-        Random r = new Random();
-        r.nextBytes(data);
-        return UUID.nameUUIDFromBytes(data);
     }
 
     public static class SakDetaljer {

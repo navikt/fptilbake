@@ -82,7 +82,7 @@ public class FellesTestOppsett extends TestOppsett {
         mockFpsakKlient,
         defaultVentetid);
 
-    private TestUtility testUtility = new TestUtility(behandlingTjeneste);
+    protected TestUtility testUtility = new TestUtility(behandlingTjeneste);
 
     private SimuleringResultatDto simResDto = new SimuleringResultatDto(SUM_FEIL_UTBETALT, SUM_INNTREKK);
 

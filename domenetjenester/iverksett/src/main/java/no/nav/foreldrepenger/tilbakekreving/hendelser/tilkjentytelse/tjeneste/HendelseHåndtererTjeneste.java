@@ -38,24 +38,43 @@ public class HendelseHåndtererTjeneste {
         long behandlingId = hendelseTaskDataWrapper.getBehandlingId();
         Optional<TilbakekrevingValgDto> tbkDataOpt = restKlient.hentTilbakekrevingValg(UUID.fromString(hendelseTaskDataWrapper.getBehandlingUuid()));
 
-        if (tbkDataOpt.isPresent() && erRelevantHendelse(tbkDataOpt.get())) {
-            logger.info("Registrert ny relevant hendelse for ekstern behandlingId={}", behandlingId);
-            lagOpprettBehandlingTask(hendelseTaskDataWrapper);
+        if (tbkDataOpt.isPresent()) {
+            TilbakekrevingValgDto tbkData = tbkDataOpt.get();
+            if(erRelevantHendelseForOpprettTilbakekreving(tbkData)){
+                logger.info("Hendelse={} er relevant for tilbakekreving opprett for ekstern behandlingId={}", tbkData.getVidereBehandling(), behandlingId);
+                lagOpprettBehandlingTask(hendelseTaskDataWrapper);
+            }else if(erRelevantHendelseForOppdatereTilbakekreving(tbkData)){
+                logger.info("Hendelse={} er relevant for å oppdatere eksistende tilbakekreving med ekstern behandlingId={}", tbkData.getVidereBehandling(), behandlingId);
+                lagOppdaterBehandlingTask(hendelseTaskDataWrapper);
+            }
         }
     }
 
-    private boolean erRelevantHendelse(TilbakekrevingValgDto tbkData) {
+    private boolean erRelevantHendelseForOpprettTilbakekreving(TilbakekrevingValgDto tbkData) {
         return VidereBehandling.TILBAKEKREV_I_INFOTRYGD.equals(tbkData.getVidereBehandling());
+    }
+
+    private boolean erRelevantHendelseForOppdatereTilbakekreving(TilbakekrevingValgDto tbkData) {
+        return VidereBehandling.TILBAKEKR_OPPDATER.equals(tbkData.getVidereBehandling());
     }
 
     private void lagOpprettBehandlingTask(HendelseTaskDataWrapper hendelseTaskDataWrapper) {
         HendelseTaskDataWrapper taskData = HendelseTaskDataWrapper.lagWrapperForOpprettBehandling(hendelseTaskDataWrapper.getBehandlingUuid(),
             hendelseTaskDataWrapper.getBehandlingId(),
-            hendelseTaskDataWrapper.getAktørId());
+            hendelseTaskDataWrapper.getAktørId(),
+            hendelseTaskDataWrapper.getSaksnummer());
 
-        taskData.setSaksnummer(hendelseTaskDataWrapper.getSaksnummer());
         taskData.setFagsakYtelseType(hendelseTaskDataWrapper.getFagsakYtelseType());
         taskData.setBehandlingType(BehandlingType.TILBAKEKREVING);
+
+        taskRepository.lagre(taskData.getProsessTaskData());
+    }
+
+    private void lagOppdaterBehandlingTask(HendelseTaskDataWrapper hendelseTaskDataWrapper) {
+        HendelseTaskDataWrapper taskData = HendelseTaskDataWrapper.lagWrapperForOppdaterBehandling(hendelseTaskDataWrapper.getBehandlingUuid(),
+            hendelseTaskDataWrapper.getBehandlingId(),
+            hendelseTaskDataWrapper.getAktørId(),
+            hendelseTaskDataWrapper.getSaksnummer());
 
         taskRepository.lagre(taskData.getProsessTaskData());
     }

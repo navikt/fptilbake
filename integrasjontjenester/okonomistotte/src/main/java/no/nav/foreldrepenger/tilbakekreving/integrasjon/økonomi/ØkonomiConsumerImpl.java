@@ -61,7 +61,7 @@ public class ØkonomiConsumerImpl implements ØkonomiConsumer {
 
     @Override
     public void anullereKravgrunnlag(Long behandlingId, AnnullerKravgrunnlagDto annullerKravgrunnlag) {
-        logger.info("Starter Anullerekravgrunnlag for behandlingId=", behandlingId);
+        logger.info("Starter Anullerekravgrunnlag for behandlingId={}", behandlingId);
         KravgrunnlagAnnulerResponse respons = anullereGrunnlag(annullerKravgrunnlag);
         MmelDto kvittering = respons.getMmel();
         validerKvitteringForAnnulereGrunnlag(behandlingId, kvittering);

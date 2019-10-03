@@ -82,24 +82,40 @@ public class HendelseTaskDataWrapper {
         Objects.requireNonNull(getFagsakYtelseType());
     }
 
+    public void validerTaskDataOppdaterBehandling() {
+        Objects.requireNonNull(prosessTaskData.getAktørId());
+        Objects.requireNonNull(prosessTaskData.getPropertyValue(EKSTERN_BEHANDLING_UUID));
+        Objects.requireNonNull(prosessTaskData.getPropertyValue(EKSTERN_BEHANDLING_ID));
+        Objects.requireNonNull(prosessTaskData.getPropertyValue(SAKSNUMMER));
+    }
+
 
     public static HendelseTaskDataWrapper lagWrapperForHendelseHåndtering(TilkjentYtelseMelding melding) {
-        ProsessTaskData td = new ProsessTaskData(HåndterHendelseTask.TASKTYPE);
-        td.setAktørId(melding.getAktørId().getId());
-        td.setProperty(EKSTERN_BEHANDLING_ID,String.valueOf(melding.getBehandlingId()));
-        td.setProperty(EKSTERN_BEHANDLING_UUID, melding.getBehandlingUuid().toString());
-        td.setProperty(SAKSNUMMER,melding.getSaksnummer().getVerdi());
-        td.setProperty(FAGSAK_YTELSE_TYPE,melding.getFagsakYtelseType());
+        ProsessTaskData td = lagProsessTaskDataMedFellesProperty(HåndterHendelseTask.TASKTYPE, melding.getAktørId(), melding.getBehandlingId(),
+            melding.getBehandlingUuid().toString(), melding.getSaksnummer());
+        td.setProperty(FAGSAK_YTELSE_TYPE, melding.getFagsakYtelseType());
 
         return new HendelseTaskDataWrapper(td);
     }
 
-    public static HendelseTaskDataWrapper lagWrapperForOpprettBehandling(String behandlingUuid, long behandlingId, AktørId aktørId) {
-        ProsessTaskData td = new ProsessTaskData(OpprettBehandlingTask.TASKTYPE);
+    public static HendelseTaskDataWrapper lagWrapperForOpprettBehandling(String behandlingUuid, long behandlingId, AktørId aktørId, Saksnummer saksnummer) {
+        ProsessTaskData td = lagProsessTaskDataMedFellesProperty(OpprettBehandlingTask.TASKTYPE, aktørId, behandlingId,
+            behandlingUuid, saksnummer);
+        return new HendelseTaskDataWrapper(td);
+    }
+
+    public static HendelseTaskDataWrapper lagWrapperForOppdaterBehandling(String behandlingUuid, long behandlingId, AktørId aktørId, Saksnummer saksnummer) {
+        ProsessTaskData td = lagProsessTaskDataMedFellesProperty(OppdaterBehandlingTask.TASKTYPE, aktørId, behandlingId,
+            behandlingUuid, saksnummer);
+        return new HendelseTaskDataWrapper(td);
+    }
+
+    private static ProsessTaskData lagProsessTaskDataMedFellesProperty(String taskType, AktørId aktørId, long behandlingId, String behandlingUuid, Saksnummer saksnummer) {
+        ProsessTaskData td = new ProsessTaskData(taskType);
         td.setAktørId(aktørId.getId());
-        td.setProperty(EKSTERN_BEHANDLING_ID,String.valueOf(behandlingId));
-        td.setProperty(EKSTERN_BEHANDLING_UUID, behandlingUuid);
-        return new HendelseTaskDataWrapper(td);
+        td.setProperty(EKSTERN_BEHANDLING_ID, String.valueOf(behandlingId));
+        td.setProperty(EKSTERN_BEHANDLING_UUID, behandlingUuid.toString());
+        td.setProperty(SAKSNUMMER, saksnummer.getVerdi());
+        return td;
     }
-
 }
