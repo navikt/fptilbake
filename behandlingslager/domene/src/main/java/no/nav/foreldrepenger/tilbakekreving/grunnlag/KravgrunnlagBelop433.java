@@ -47,6 +47,9 @@ public class KravgrunnlagBelop433 extends BaseEntitet {
     @Column(name = "uinnkrevd_belop")
     private BigDecimal uinnkrevdBelop = BigDecimal.ZERO;
 
+    @Column(name = "skatt_prosent")
+    private BigDecimal skattProsent = BigDecimal.ZERO;
+
     @Column(name = "resultat_kode")
     private String resultatKode;
 
@@ -90,6 +93,10 @@ public class KravgrunnlagBelop433 extends BaseEntitet {
 
     public BigDecimal getUinnkrevdBelop() {
         return uinnkrevdBelop;
+    }
+
+    public BigDecimal getSkattProsent() {
+        return skattProsent;
     }
 
     public String getResultatKode() {
@@ -172,6 +179,11 @@ public class KravgrunnlagBelop433 extends BaseEntitet {
             return this;
         }
 
+        public Builder medSkattProsent(BigDecimal skattProsent) {
+            this.kladd.skattProsent = skattProsent;
+            return this;
+        }
+
         public Builder medResultatKode(String resultatKode) {
             this.kladd.resultatKode = resultatKode;
             return this;
@@ -210,6 +222,7 @@ public class KravgrunnlagBelop433 extends BaseEntitet {
             + "nyBelop=" + nyBelop + "," //$NON-NLS-1$ //$NON-NLS-2$
             + "tilbakekrevesBelop=" + tilbakekrevesBelop + "," //$NON-NLS-1$ //$NON-NLS-2$
             + "uinnkrevdBelop=" + uinnkrevdBelop + "," //$NON-NLS-1$ //$NON-NLS-2$
+            + "skattProsent=" + skattProsent + "," //$NON-NLS-1$ //$NON-NLS-2$
             + "resultatKode=" + resultatKode + "," //$NON-NLS-1$ //$NON-NLS-2$
             + "årsakKode=" + årsakKode + "," //$NON-NLS-1$ //$NON-NLS-2$
             + "skyldKode=" + skyldKode + "," //$NON-NLS-1$ //$NON-NLS-2$

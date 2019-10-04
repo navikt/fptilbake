@@ -2,8 +2,6 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.dto;
 
 import java.math.BigDecimal;
 
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -29,32 +27,29 @@ public class DetaljertKravgrunnlagBelopDto implements AbacDto {
 
     @Min(-999999999)
     @Max(Long.MAX_VALUE)
-    @DecimalMin("-999999999.00")
-    @DecimalMax("999999999.99")
     @Digits(integer = 9, fraction = 2)
     private BigDecimal opprUtbetBelop;
 
     @NotNull
     @Min(-999999999)
     @Max(Long.MAX_VALUE)
-    @DecimalMin("-999999999.00")
-    @DecimalMax("999999999.99")
     @Digits(integer = 9, fraction = 2)
     private BigDecimal nyBelop;
 
     @Min(-999999999)
     @Max(Long.MAX_VALUE)
-    @DecimalMin("-999999999.00")
-    @DecimalMax("999999999.99")
     @Digits(integer = 9, fraction = 2)
     private BigDecimal tilbakekrevesBelop;
 
     @Min(-999999999)
     @Max(Long.MAX_VALUE)
-    @DecimalMin("-999999999.00")
-    @DecimalMax("999999999.99")
     @Digits(integer = 9, fraction = 2)
     private BigDecimal uinnkrevdBelop;
+
+    @Min(-999999999)
+    @Max(Long.MAX_VALUE)
+    @Digits(integer = 7, fraction = 4)
+    private BigDecimal skattProsent;
 
     @Size(max = 20)
     @Pattern(regexp = InputValideringRegex.FRITEKST)
@@ -114,6 +109,14 @@ public class DetaljertKravgrunnlagBelopDto implements AbacDto {
 
     public void setUinnkrevdBelop(BigDecimal uinnkrevdBelop) {
         this.uinnkrevdBelop = uinnkrevdBelop;
+    }
+
+    public BigDecimal getSkattProsent() {
+        return skattProsent;
+    }
+
+    public void setSkattProsent(BigDecimal skattProsent) {
+        this.skattProsent = skattProsent;
     }
 
     public String getResultatKode() {

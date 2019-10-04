@@ -57,16 +57,19 @@ public class HentKravgrunnlagMapperTest extends FellesTestOppsett {
 
         KravgrunnlagPeriode432 førstePeriode = perioder.get(0);
         førstePeriode.getPeriode().equals(Periode.of(LocalDate.of(2016, 3, 16),LocalDate.of(2016, 3, 31)));
+        assertThat(førstePeriode.getBeløpSkattMnd()).isEqualByComparingTo(BigDecimal.valueOf(600.00));
         assertThat(førstePeriode.getKravgrunnlagBeloper433()).isNotEmpty();
         assertThat(førstePeriode.getKravgrunnlagBeloper433().size()).isEqualTo(2);
 
         KravgrunnlagPeriode432 andrePeriode = perioder.get(1);
         andrePeriode.getPeriode().equals(Periode.of(LocalDate.of(2016, 4, 1),LocalDate.of(2016, 4, 30)));
+        assertThat(andrePeriode.getBeløpSkattMnd()).isEqualByComparingTo(BigDecimal.valueOf(300.00));
         assertThat(andrePeriode.getKravgrunnlagBeloper433()).isNotEmpty();
         assertThat(andrePeriode.getKravgrunnlagBeloper433().size()).isEqualTo(2);
 
         KravgrunnlagPeriode432 tredjePeriode = perioder.get(2);
         tredjePeriode.getPeriode().equals(Periode.of(LocalDate.of(2016, 5, 1),LocalDate.of(2016, 5, 26)));
+        assertThat(tredjePeriode.getBeløpSkattMnd()).isEqualByComparingTo(BigDecimal.valueOf(2100.00));
         assertThat(tredjePeriode.getKravgrunnlagBeloper433()).isNotEmpty();
         assertThat(tredjePeriode.getKravgrunnlagBeloper433().size()).isEqualTo(2);
     }
@@ -103,6 +106,7 @@ public class HentKravgrunnlagMapperTest extends FellesTestOppsett {
         periode.setFom(konvertDato(LocalDate.of(2016, 3, 16)));
         periode.setTom(konvertDato(LocalDate.of(2016, 3, 31)));
         kravgrunnlagPeriode1.setPeriode(periode);
+        kravgrunnlagPeriode1.setBelopSkattMnd(BigDecimal.valueOf(600.00));
         kravgrunnlagPeriode1.getTilbakekrevingsBelop().add(hentBeløp(BigDecimal.valueOf(6000.00), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TypeKlasseDto.FEIL));
         kravgrunnlagPeriode1.getTilbakekrevingsBelop().add(hentBeløp(BigDecimal.ZERO, BigDecimal.valueOf(6000.00), BigDecimal.valueOf(6000.00), BigDecimal.ZERO, TypeKlasseDto.YTEL));
 
@@ -111,6 +115,7 @@ public class HentKravgrunnlagMapperTest extends FellesTestOppsett {
         periode.setFom(konvertDato(LocalDate.of(2016, 4, 01)));
         periode.setTom(konvertDato(LocalDate.of(2016, 4, 30)));
         kravgrunnlagPeriode2.setPeriode(periode);
+        kravgrunnlagPeriode2.setBelopSkattMnd(BigDecimal.valueOf(300.00));
         kravgrunnlagPeriode2.getTilbakekrevingsBelop().add(hentBeløp(BigDecimal.valueOf(3000.00), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TypeKlasseDto.FEIL));
         kravgrunnlagPeriode2.getTilbakekrevingsBelop().add(hentBeløp(BigDecimal.ZERO, BigDecimal.valueOf(3000.00), BigDecimal.valueOf(3000.00), BigDecimal.ZERO, TypeKlasseDto.YTEL));
 
@@ -119,6 +124,7 @@ public class HentKravgrunnlagMapperTest extends FellesTestOppsett {
         periode.setFom(konvertDato(LocalDate.of(2016, 5, 1)));
         periode.setTom(konvertDato(LocalDate.of(2016, 5, 26)));
         kravgrunnlagPeriode3.setPeriode(periode);
+        kravgrunnlagPeriode3.setBelopSkattMnd(BigDecimal.valueOf(2100.00));
         kravgrunnlagPeriode3.getTilbakekrevingsBelop().add(hentBeløp(BigDecimal.valueOf(21000.00), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TypeKlasseDto.FEIL));
         kravgrunnlagPeriode3.getTilbakekrevingsBelop().add(hentBeløp(BigDecimal.ZERO, BigDecimal.valueOf(21000.00), BigDecimal.valueOf(21000.00), BigDecimal.ZERO, TypeKlasseDto.YTEL));
 
@@ -134,6 +140,7 @@ public class HentKravgrunnlagMapperTest extends FellesTestOppsett {
         detaljertKravgrunnlagBelop.setBelopTilbakekreves(tilbakekrevesBeløp);
         detaljertKravgrunnlagBelop.setBelopUinnkrevd(uInnkrevdBeløp);
         detaljertKravgrunnlagBelop.setKodeKlasse("FPATAL");
+        detaljertKravgrunnlagBelop.setSkattProsent(BigDecimal.valueOf(10.0000));
 
         return detaljertKravgrunnlagBelop;
     }

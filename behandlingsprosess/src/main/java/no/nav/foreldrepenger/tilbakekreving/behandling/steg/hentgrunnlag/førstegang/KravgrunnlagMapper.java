@@ -83,6 +83,7 @@ public class KravgrunnlagMapper {
         LocalDate tom = konverter(dto.getPeriode().getTom());
         return KravgrunnlagPeriode432.builder()
             .medPeriode(Periode.of(fom, tom))
+            .medBeløpSkattMnd(dto.getBelopSkattMnd())
             .medKravgrunnlag431(kravgrunnlag431)
             .build();
     }
@@ -96,6 +97,7 @@ public class KravgrunnlagMapper {
             .medNyBelop(dto.getBelopNy())
             .medTilbakekrevesBelop(dto.getBelopTilbakekreves())
             .medUinnkrevdBelop(dto.getBelopUinnkrevd())
+            .medSkattProsent(dto.getSkattProsent())
             .medResultatKode(dto.getKodeResultat())
             .medÅrsakKode(dto.getKodeAArsak())
             .medSkyldKode(dto.getKodeSkyld())
