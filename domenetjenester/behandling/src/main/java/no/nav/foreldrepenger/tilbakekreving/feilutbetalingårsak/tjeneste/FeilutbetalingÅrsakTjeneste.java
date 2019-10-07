@@ -14,8 +14,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelse
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
-import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.FeiltubetalingÅrsakerYtelseTypeDto;
-import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTypeMedNavnDto;
+import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTyperPrYtelseTypeDto;
+import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTypeMedUndertyperDto;
 
 @ApplicationScoped
 public class FeilutbetalingÅrsakTjeneste {
@@ -31,8 +31,8 @@ public class FeilutbetalingÅrsakTjeneste {
         this.kodeverkRepository = kodeverkRepository;
     }
 
-    public List<FeiltubetalingÅrsakerYtelseTypeDto> hentFeilutbetalingårsaker() {
-        List<FeiltubetalingÅrsakerYtelseTypeDto> resultat = new ArrayList<>();
+    public List<HendelseTyperPrYtelseTypeDto> hentFeilutbetalingårsaker() {
+        List<HendelseTyperPrYtelseTypeDto> resultat = new ArrayList<>();
 
         Map<FagsakYtelseType, Set<HendelseType>> hendelseTypePrYtelseType = kodeverkRepository.hentKodeRelasjonForKodeverk(FagsakYtelseType.class, HendelseType.class);
         Map<HendelseType, Set<HendelseUnderType>> hendelseUndertypePrHendelseType = kodeverkRepository.hentKodeRelasjonForKodeverk(HendelseType.class, HendelseUnderType.class);
@@ -41,13 +41,13 @@ public class FeilutbetalingÅrsakTjeneste {
             FagsakYtelseType ytelseType = entry.getKey();
             Set<HendelseType> hendelseTyper = entry.getValue();
 
-            List<HendelseTypeMedNavnDto> dtoer = new ArrayList<>();
+            List<HendelseTypeMedUndertyperDto> dtoer = new ArrayList<>();
             for (HendelseType hendelseType : hendelseTyper) {
                 Set<HendelseUnderType> undertyper = hendelseUndertypePrHendelseType.get(hendelseType);
                 List<HendelseUnderType> sorterteUndertyper = sortereHendelseUnderTyper(undertyper);
-                dtoer.add(new HendelseTypeMedNavnDto(hendelseType, sorterteUndertyper));
+                dtoer.add(new HendelseTypeMedUndertyperDto(hendelseType, sorterteUndertyper));
             }
-            resultat.add(new FeiltubetalingÅrsakerYtelseTypeDto(ytelseType, dtoer));
+            resultat.add(new HendelseTyperPrYtelseTypeDto(ytelseType, dtoer));
         }
 
         return resultat;

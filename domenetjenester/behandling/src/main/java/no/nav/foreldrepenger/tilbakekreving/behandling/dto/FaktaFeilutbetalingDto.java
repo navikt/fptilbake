@@ -6,23 +6,23 @@ import javax.validation.Valid;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
-import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTypeDto;
+import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTypeMedUndertypeDto;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
-public class FaktaFeilutbetalingDto {
+class FaktaFeilutbetalingDto {
 
     private LocalDate fom;
 
     private LocalDate tom;
 
     @Valid
-    private HendelseTypeDto årsak;
+    private HendelseTypeMedUndertypeDto årsak;
 
     FaktaFeilutbetalingDto() {
         // For CDI
     }
 
-    public FaktaFeilutbetalingDto(LocalDate fom, LocalDate tom, HendelseTypeDto feilutbetalingÅrsakDto) {
+    public FaktaFeilutbetalingDto(LocalDate fom, LocalDate tom, HendelseTypeMedUndertypeDto feilutbetalingÅrsakDto) {
         this.fom = fom;
         this.tom = tom;
         this.årsak = feilutbetalingÅrsakDto;

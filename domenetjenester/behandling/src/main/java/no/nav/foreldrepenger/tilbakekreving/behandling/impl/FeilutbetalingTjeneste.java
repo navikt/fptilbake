@@ -22,7 +22,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositor
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
-import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTypeDto;
+import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTypeMedUndertypeDto;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.TilbakekrevingValgDto;
@@ -73,14 +73,12 @@ public class FeilutbetalingTjeneste {
             .build();
     }
 
-    private HendelseTypeDto mapFra(Optional<FaktaFeilutbetalingPeriode> årsak) {
-        HendelseTypeDto feilutbetalingÅrsakDto = new HendelseTypeDto();
+    private HendelseTypeMedUndertypeDto mapFra(Optional<FaktaFeilutbetalingPeriode> årsak) {
         if (årsak.isPresent()) {
             FaktaFeilutbetalingPeriode faktaFeilutbetalingPeriode = årsak.get();
-            feilutbetalingÅrsakDto.setHendelseType(faktaFeilutbetalingPeriode.getHendelseType());
-            feilutbetalingÅrsakDto.setHendelseUndertype(faktaFeilutbetalingPeriode.getHendelseUndertype());
+            return new HendelseTypeMedUndertypeDto(faktaFeilutbetalingPeriode.getHendelseType(), faktaFeilutbetalingPeriode.getHendelseUndertype());
         }
-        return feilutbetalingÅrsakDto;
+        return null;
     }
 
     public List<KravgrunnlagPeriode432> finnPerioderMedFeilutbetaltPosteringer(List<KravgrunnlagPeriode432> allePerioder) {

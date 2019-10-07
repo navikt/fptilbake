@@ -41,7 +41,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurd
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Inntektskategori;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
-import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTypeDto;
+import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTypeMedUndertypeDto;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagAggregate;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagBelop433;
@@ -58,7 +58,6 @@ public class VilkårsvurderingTjeneste {
     private KravgrunnlagRepository grunnlagRepository;
     private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository;
     private VilkårsvurderingRepository vilkårsvurderingRepository;
-    private KodeverkRepository kodeverkRepository;
     private BehandlingRepositoryProvider behandlingRepositoryProvider;
     private VilkårsvurderingHistorikkInnslagTjeneste vilkårsvurderingHistorikkInnslagTjeneste;
 
@@ -74,7 +73,6 @@ public class VilkårsvurderingTjeneste {
         this.grunnlagRepository = behandlingRepositoryProvider.getGrunnlagRepository();
         this.faktaFeilutbetalingRepository = behandlingRepositoryProvider.getFaktaFeilutbetalingRepository();
         this.vilkårsvurderingRepository = behandlingRepositoryProvider.getVilkårsvurderingRepository();
-        this.kodeverkRepository = behandlingRepositoryProvider.getKodeverkRepository();
         this.vilkårsvurderingHistorikkInnslagTjeneste = vilkårsvurderingHistorikkInnslagTjeneste;
     }
 
@@ -148,7 +146,7 @@ public class VilkårsvurderingTjeneste {
         FeilutbetalingPerioderDto feilutbetalingPerioderDto = foreldelseTjeneste.henteVurdertForeldelse(behandlingId);
 
         for (PeriodeDto periode : feilutbetalingPerioderDto.getPerioder()) {
-            HendelseTypeDto årsak = henteÅrsak(faktaFeilutbetalingPerioder, new Periode(periode.getFom(), periode.getTom()));
+            HendelseTypeMedUndertypeDto årsak = hentHendelseType(faktaFeilutbetalingPerioder, new Periode(periode.getFom(), periode.getTom()));
 
             DetaljertFeilutbetalingPeriodeDto periodeDto = new DetaljertFeilutbetalingPeriodeDto(periode.getFom(), periode.getTom(),
                 årsak, periode.getBelop());
@@ -198,21 +196,18 @@ public class VilkårsvurderingTjeneste {
         return false;
     }
 
-    private HendelseTypeDto henteÅrsak(List<FaktaFeilutbetalingPeriode> faktaFeilutbetalingPerioder, Periode foreldetPeriode) {
+    private HendelseTypeMedUndertypeDto hentHendelseType(List<FaktaFeilutbetalingPeriode> faktaFeilutbetalingPerioder, Periode foreldetPeriode) {
         for (FaktaFeilutbetalingPeriode feilutbetalingPeriodeÅrsak : faktaFeilutbetalingPerioder) {
             Periode faktaFeilutbetalingPeriode = feilutbetalingPeriodeÅrsak.getPeriode();
             if (faktaFeilutbetalingPeriode.overlapper(foreldetPeriode)) {
                 return mapTil(feilutbetalingPeriodeÅrsak);
             }
         }
-        return new HendelseTypeDto();
+        return null;
     }
 
-    private HendelseTypeDto mapTil(FaktaFeilutbetalingPeriode faktaFeilutbetalingPeriode) {
-        HendelseTypeDto årsakDto = new HendelseTypeDto();
-        årsakDto.setHendelseType(faktaFeilutbetalingPeriode.getHendelseType());
-        årsakDto.setHendelseUndertype(faktaFeilutbetalingPeriode.getHendelseUndertype());
-        return årsakDto;
+    private HendelseTypeMedUndertypeDto mapTil(FaktaFeilutbetalingPeriode faktaFeilutbetalingPeriode) {
+        return new HendelseTypeMedUndertypeDto(faktaFeilutbetalingPeriode.getHendelseType(), faktaFeilutbetalingPeriode.getHendelseUndertype());
     }
 
     private List<YtelseDto> henteYtelse(Long behandlingId, Periode feilutbetalingPeriode) {

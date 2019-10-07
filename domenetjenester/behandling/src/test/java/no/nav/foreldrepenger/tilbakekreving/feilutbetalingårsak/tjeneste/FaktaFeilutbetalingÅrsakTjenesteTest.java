@@ -20,8 +20,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.SvpHendelseUnderTyper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.ØkonomiUndertyper;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
-import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.FeiltubetalingÅrsakerYtelseTypeDto;
-import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTypeMedNavnDto;
+import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTyperPrYtelseTypeDto;
+import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTypeMedUndertyperDto;
 
 public class FaktaFeilutbetalingÅrsakTjenesteTest {
 
@@ -33,11 +33,11 @@ public class FaktaFeilutbetalingÅrsakTjenesteTest {
 
     @Test
     public void skal_ha_riktige_årsaker_og_underårsaker_for_foreldrepenger() {
-        List<HendelseTypeMedNavnDto> feilutbetalingÅrsaker = hentÅrsakerForYtelseType(FagsakYtelseType.FORELDREPENGER);
+        List<HendelseTypeMedUndertyperDto> feilutbetalingÅrsaker = hentÅrsakerForYtelseType(FagsakYtelseType.FORELDREPENGER);
 
         Map<HendelseType, List<HendelseUnderType>> mapAvResultat = feilutbetalingÅrsaker.stream().collect(Collectors.toMap(
-            HendelseTypeMedNavnDto::getHendelseType,
-            HendelseTypeMedNavnDto::getHendelseUndertyper)
+            HendelseTypeMedUndertyperDto::getHendelseType,
+            HendelseTypeMedUndertyperDto::getHendelseUndertyper)
         );
 
         assertThat(mapAvResultat.keySet()).containsOnly(
@@ -140,11 +140,11 @@ public class FaktaFeilutbetalingÅrsakTjenesteTest {
 
     @Test
     public void skal_ha_riktige_årsaker_og_underårsaker_for_svangerskapspenger() {
-        List<HendelseTypeMedNavnDto> feilutbetalingÅrsaker = hentÅrsakerForYtelseType(FagsakYtelseType.SVANGERSKAPSPENGER);
+        List<HendelseTypeMedUndertyperDto> feilutbetalingÅrsaker = hentÅrsakerForYtelseType(FagsakYtelseType.SVANGERSKAPSPENGER);
 
         Map<HendelseType, List<HendelseUnderType>> mapAvResultat = feilutbetalingÅrsaker.stream().collect(Collectors.toMap(
-            HendelseTypeMedNavnDto::getHendelseType,
-            HendelseTypeMedNavnDto::getHendelseUndertyper)
+            HendelseTypeMedUndertyperDto::getHendelseType,
+            HendelseTypeMedUndertyperDto::getHendelseUndertyper)
         );
 
         assertThat(mapAvResultat.keySet()).containsOnly(
@@ -222,11 +222,11 @@ public class FaktaFeilutbetalingÅrsakTjenesteTest {
         );
     }
 
-    private List<HendelseTypeMedNavnDto> hentÅrsakerForYtelseType(FagsakYtelseType fagsakYtelseType) {
+    private List<HendelseTypeMedUndertyperDto> hentÅrsakerForYtelseType(FagsakYtelseType fagsakYtelseType) {
         return feilutbetalingÅrsakTjeneste.hentFeilutbetalingårsaker()
             .stream()
             .filter(v -> v.getYtelseType().equals(fagsakYtelseType))
-            .map(FeiltubetalingÅrsakerYtelseTypeDto::getFeilutbetalingÅrsaker)
+            .map(HendelseTyperPrYtelseTypeDto::getHendelseTyper)
             .findFirst()
             .orElseThrow(() -> new IllegalArgumentException("Ukjent ytelseType:" + fagsakYtelseType));
     }

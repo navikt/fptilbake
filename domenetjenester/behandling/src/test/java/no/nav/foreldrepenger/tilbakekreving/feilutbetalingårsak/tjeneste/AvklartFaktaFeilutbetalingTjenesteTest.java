@@ -26,7 +26,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
-import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTypeDto;
+import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTypeMedUndertypeDto;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkInnslagKonverter;
 import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkinnslagDto;
@@ -74,8 +74,7 @@ public class AvklartFaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
 
     @Test
     public void lagreÅrsakForFeilutbetalingPeriode_medIngenUnderÅrsak() {
-        HendelseTypeDto feilutbetalingÅrsakDto = new HendelseTypeDto();
-        feilutbetalingÅrsakDto.setHendelseType(HENDELSE_TYPE);
+        HendelseTypeMedUndertypeDto feilutbetalingÅrsakDto = new HendelseTypeMedUndertypeDto(HENDELSE_TYPE, HENDELSE_UNDERTYPE);
         FaktaFeilutbetalingDto faktaFeilutbetalingDto = new FaktaFeilutbetalingDto(FOM, TOM, feilutbetalingÅrsakDto);
 
         avklartFaktaFeilutbetalingTjeneste.lagreÅrsakForFeilutbetalingPeriode(nyBehandling, Arrays.asList(faktaFeilutbetalingDto), "ABC");
@@ -100,9 +99,7 @@ public class AvklartFaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
 
         LocalDate sisteDagIPeriode = LocalDate.now();
 
-        HendelseTypeDto feilutbetalingÅrsakDto = new HendelseTypeDto();
-        feilutbetalingÅrsakDto.setHendelseType(HENDELSE_TYPE);
-        feilutbetalingÅrsakDto.setHendelseUndertype(HENDELSE_UNDERTYPE);
+        HendelseTypeMedUndertypeDto feilutbetalingÅrsakDto = new HendelseTypeMedUndertypeDto(HENDELSE_TYPE, HENDELSE_UNDERTYPE);
 
         avklartFaktaFeilutbetalingTjeneste.lagreÅrsakForFeilutbetalingPeriode(nyBehandling,
             Arrays.asList(faktaFeilutbetalingDto,
@@ -135,9 +132,7 @@ public class AvklartFaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
 
         faktaFeilutbetalingRepository.lagre(internBehandlingId, lagFaktaFeilutbetaling());
 
-        HendelseTypeDto feilutbetalingÅrsakDto = new HendelseTypeDto();
-        feilutbetalingÅrsakDto.setHendelseType(HENDELSE_TYPE);
-        feilutbetalingÅrsakDto.setHendelseUndertype(HENDELSE_UNDERTYPE);
+        HendelseTypeMedUndertypeDto feilutbetalingÅrsakDto = new HendelseTypeMedUndertypeDto(HENDELSE_TYPE, HENDELSE_UNDERTYPE);
 
         avklartFaktaFeilutbetalingTjeneste.lagreÅrsakForFeilutbetalingPeriode(nyBehandling,
             Arrays.asList(new FaktaFeilutbetalingDto(FOM, TOM, feilutbetalingÅrsakDto)), BEGRUNNELSE);
@@ -161,9 +156,7 @@ public class AvklartFaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
     }
 
     private FaktaFeilutbetalingDto formFaktaFeilutbetaling() {
-        HendelseTypeDto feilutbetalingÅrsakDto = new HendelseTypeDto();
-        feilutbetalingÅrsakDto.setHendelseType(HENDELSE_TYPE);
-        feilutbetalingÅrsakDto.setHendelseUndertype(HENDELSE_UNDERTYPE);
+        HendelseTypeMedUndertypeDto feilutbetalingÅrsakDto = new HendelseTypeMedUndertypeDto(HENDELSE_TYPE, HENDELSE_UNDERTYPE);
         return new FaktaFeilutbetalingDto(FOM, TOM, feilutbetalingÅrsakDto);
     }
 

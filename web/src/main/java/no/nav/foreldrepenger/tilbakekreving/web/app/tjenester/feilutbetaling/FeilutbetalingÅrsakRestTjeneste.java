@@ -17,8 +17,8 @@ import org.eclipse.jetty.http.HttpStatus;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
-import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.FeiltubetalingÅrsakerYtelseTypeDto;
-import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTypeDto;
+import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTyperPrYtelseTypeDto;
+import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTypeMedUndertypeDto;
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.tjeneste.FeilutbetalingÅrsakTjeneste;
 import no.nav.vedtak.felles.jpa.Transaction;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
@@ -43,9 +43,9 @@ public class FeilutbetalingÅrsakRestTjeneste {
 
     @GET
     @ApiOperation(value = "Henter kodeverk for årsak med underårsaker for feilutbetaling")
-    @ApiResponse(code = HttpStatus.OK_200, message = "OK", response = HendelseTypeDto.class)
+    @ApiResponse(code = HttpStatus.OK_200, message = "OK", response = HendelseTypeMedUndertypeDto.class)
     @BeskyttetRessurs(action = READ, ressurs = APPLIKASJON)
-    public List<FeiltubetalingÅrsakerYtelseTypeDto> hentAlleFeilutbetalingÅrsaker() {
+    public List<HendelseTyperPrYtelseTypeDto> hentAlleFeilutbetalingÅrsaker() {
         return feilutbetalingÅrsakTjeneste.hentFeilutbetalingårsaker();
     }
 }
