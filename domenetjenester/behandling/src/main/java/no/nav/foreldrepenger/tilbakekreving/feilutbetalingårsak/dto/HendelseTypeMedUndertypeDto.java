@@ -16,6 +16,9 @@ public class HendelseTypeMedUndertypeDto {
     //nullable
     private HendelseUnderType hendelseUndertype;
 
+    public HendelseTypeMedUndertypeDto() {
+    }
+
     public HendelseTypeMedUndertypeDto(@NotNull @ValidKodeverk HendelseType hendelseType, @ValidKodeverk HendelseUnderType hendelseUndertype) {
         this.hendelseType = hendelseType;
         this.hendelseUndertype = hendelseUndertype;

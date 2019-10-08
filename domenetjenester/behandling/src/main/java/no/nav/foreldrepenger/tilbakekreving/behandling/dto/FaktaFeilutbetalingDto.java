@@ -48,4 +48,7 @@ public class FaktaFeilutbetalingDto {
         return årsak.getHendelseUndertype();
     }
 
+    public HendelseTypeMedUndertypeDto getÅrsak() {
+        return årsak;
+    }
 }
