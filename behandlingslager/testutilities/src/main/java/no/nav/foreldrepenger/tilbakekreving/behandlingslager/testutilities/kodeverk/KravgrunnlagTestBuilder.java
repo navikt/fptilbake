@@ -34,6 +34,7 @@ public class KravgrunnlagTestBuilder {
         private int beløpNytt;
         private int utbetaltBeløp;
         private int tilbakekrevBeløp;
+        private int skattProsent;
 
         public KgBeløp(KlasseType klasseType) {
             this.klasseType = klasseType;
@@ -87,6 +88,11 @@ public class KravgrunnlagTestBuilder {
             return this;
         }
 
+        public KgBeløp medSkattProsent(int skattProsent){
+            this.skattProsent = skattProsent;
+            return this;
+        }
+
         public KravgrunnlagBelop433 mapTilØkonomi(KravgrunnlagPeriode432 periode) {
             KravgrunnlagBelop433.Builder builder = KravgrunnlagBelop433.builder();
             builder.medKlasseType(klasseType);
@@ -95,6 +101,7 @@ public class KravgrunnlagTestBuilder {
             builder.medKravgrunnlagPeriode432(periode);
             builder.medOpprUtbetBelop(BigDecimal.valueOf(utbetaltBeløp));
             builder.medTilbakekrevesBelop(BigDecimal.valueOf(tilbakekrevBeløp));
+            builder.medSkattProsent(BigDecimal.valueOf(skattProsent));
             return builder.build();
         }
 
@@ -110,13 +117,14 @@ public class KravgrunnlagTestBuilder {
             return beløpNytt == kgBeløp.beløpNytt &&
                 utbetaltBeløp == kgBeløp.utbetaltBeløp &&
                 tilbakekrevBeløp == kgBeløp.tilbakekrevBeløp &&
+                skattProsent == kgBeløp.skattProsent &&
                 Objects.equals(klasseType, kgBeløp.klasseType) &&
                 Objects.equals(klassekode, kgBeløp.klassekode);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(klasseType, klassekode, beløpNytt, utbetaltBeløp, tilbakekrevBeløp);
+            return Objects.hash(klasseType, klassekode, beløpNytt, utbetaltBeløp, tilbakekrevBeløp,skattProsent);
         }
     }
 

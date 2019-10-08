@@ -13,6 +13,8 @@ public class TilbakekrevingBeløp {
     private BigDecimal utbetaltBeløp;
     private BigDecimal tilbakekrevBeløp;
     private BigDecimal uinnkrevdBeløp;
+    private BigDecimal skattProsent;
+    private BigDecimal skattBeløp;
     private KodeResultat kodeResultat;
 
     public TilbakekrevingBeløp(KlasseType klasseType, String klassekode) {
@@ -45,6 +47,16 @@ public class TilbakekrevingBeløp {
         return this;
     }
 
+    public TilbakekrevingBeløp medSkattProsent(BigDecimal skattProsent) {
+        this.skattProsent = skattProsent;
+        return this;
+    }
+
+    public TilbakekrevingBeløp medSkattBeløp(BigDecimal skattBeløp) {
+        this.skattBeløp = skattBeløp;
+        return this;
+    }
+
     public KodeResultat getKodeResultat() {
         return kodeResultat;
     }
@@ -73,6 +85,14 @@ public class TilbakekrevingBeløp {
         return uinnkrevdBeløp;
     }
 
+    public BigDecimal getSkattProsent() {
+        return skattProsent;
+    }
+
+    public BigDecimal getSkattBeløp() {
+        return skattBeløp;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -85,7 +105,8 @@ public class TilbakekrevingBeløp {
                 equals(nyttBeløp, annen.nyttBeløp) &&
                 equals(utbetaltBeløp, annen.utbetaltBeløp) &&
                 equals(tilbakekrevBeløp, annen.tilbakekrevBeløp) &&
-                equals(uinnkrevdBeløp, annen.uinnkrevdBeløp);
+                equals(uinnkrevdBeløp, annen.uinnkrevdBeløp) &&
+                equals(skattProsent, annen.skattProsent);
         }
         return false;
     }
@@ -108,6 +129,7 @@ public class TilbakekrevingBeløp {
             ", utbetalt=" + utbetaltBeløp +
             ", tilbakekrev=" + tilbakekrevBeløp +
             ", uinnkrevd=" + uinnkrevdBeløp +
+            ", skattProsent=" + skattProsent +
             '}';
     }
 }
