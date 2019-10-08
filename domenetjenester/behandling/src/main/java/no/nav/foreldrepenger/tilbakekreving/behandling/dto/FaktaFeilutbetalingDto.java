@@ -9,7 +9,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTypeMedUndertypeDto;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
-class FaktaFeilutbetalingDto {
+public class FaktaFeilutbetalingDto {
 
     private LocalDate fom;
 
