@@ -74,7 +74,7 @@ public class AvklartFaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
 
     @Test
     public void lagreÅrsakForFeilutbetalingPeriode_medIngenUnderÅrsak() {
-        HendelseTypeMedUndertypeDto feilutbetalingÅrsakDto = new HendelseTypeMedUndertypeDto(HENDELSE_TYPE, HENDELSE_UNDERTYPE);
+        HendelseTypeMedUndertypeDto feilutbetalingÅrsakDto = new HendelseTypeMedUndertypeDto(HENDELSE_TYPE, null);
         FaktaFeilutbetalingDto faktaFeilutbetalingDto = new FaktaFeilutbetalingDto(FOM, TOM, feilutbetalingÅrsakDto);
 
         avklartFaktaFeilutbetalingTjeneste.lagreÅrsakForFeilutbetalingPeriode(nyBehandling, Arrays.asList(faktaFeilutbetalingDto), "ABC");
