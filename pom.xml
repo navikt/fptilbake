@@ -79,7 +79,7 @@
         <ojdbc.version>12.2.0.1</ojdbc.version>
         <abac-attribute-constants.version>3.3.13</abac-attribute-constants.version>
 
-        <jetty.version>9.4.15.v20190215</jetty.version>
+        <jetty.version>9.4.17.v20190418</jetty.version>
 
     </properties>
     <dependencies>
@@ -378,7 +378,7 @@
             <dependency>
                 <groupId>org.apache.santuario</groupId>
                 <artifactId>xmlsec</artifactId>
-                <version>2.1.2</version>
+                <version>2.1.4</version>
             </dependency>
             <dependency>
                 <groupId>io.dropwizard.metrics</groupId>
