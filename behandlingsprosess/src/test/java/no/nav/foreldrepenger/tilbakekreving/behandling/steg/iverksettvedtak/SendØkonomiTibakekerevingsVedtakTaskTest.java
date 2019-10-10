@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.task;
+package no.nav.foreldrepenger.tilbakekreving.behandling.steg.iverksettvedtak;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -16,9 +16,11 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodev
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiConsumer;
 import no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste.TilbakekrevingsvedtakTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.sporing.VedtakXmlRepository;
+import no.nav.foreldrepenger.tilbakekreving.økonomixml.MeldingType;
+import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiSendtXmlRepository;
 import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsvedtakDto;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
 
@@ -33,7 +35,9 @@ public class SendØkonomiTibakekerevingsVedtakTaskTest {
     @Inject
     private TilbakekrevingsvedtakTjeneste tilbakekrevingsvedtakTjeneste;
     @Inject
-    private VedtakXmlRepository vedtakXmlRepository;
+    private ØkonomiSendtXmlRepository økonomiSendtXmlRepository;
+    @Inject
+    private ProsessTaskRepository prosessTaskRepository;
 
     private ØkonomiConsumer økonomiConsumer = Mockito.mock(ØkonomiConsumer.class);
 
@@ -48,10 +52,10 @@ public class SendØkonomiTibakekerevingsVedtakTaskTest {
         ProsessTaskData data = new ProsessTaskData(SendØkonomiTibakekerevingsVedtakTask.TASKTYPE);
         data.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
 
-        SendØkonomiTibakekerevingsVedtakTask task = new SendØkonomiTibakekerevingsVedtakTask(tilbakekrevingsvedtakTjeneste, økonomiConsumer, vedtakXmlRepository);
+        SendØkonomiTibakekerevingsVedtakTask task = new SendØkonomiTibakekerevingsVedtakTask(tilbakekrevingsvedtakTjeneste, økonomiConsumer, økonomiSendtXmlRepository, prosessTaskRepository);
         task.doTask(data);
 
-        assertThat(vedtakXmlRepository.finnVedtakXml(behandling.getId())).hasSize(1);
+        assertThat(økonomiSendtXmlRepository.finnXml(behandling.getId(), MeldingType.VEDTAK)).hasSize(1);
         Mockito.verify(økonomiConsumer).iverksettTilbakekrevingsvedtak(Mockito.eq(behandling.getId()), Mockito.any(TilbakekrevingsvedtakDto.class));
     }
 

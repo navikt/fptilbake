@@ -24,7 +24,8 @@
     <sequence-generator name="SEQ_FEILUTBET_PERIODE_AARSAK" allocation-size="50" sequence-name="SEQ_FEILUTBET_PERIODE_AARSAK"/>
     <sequence-generator name="SEQ_EKSTERN_BEHANDLING" allocation-size="50" sequence-name="SEQ_EKSTERN_BEHANDLING"/>
     <sequence-generator name="SEQ_VARSELBREV_DATA" allocation-size="50" sequence-name="SEQ_VARSELBREV_DATA"/>
-    <sequence-generator name="SEQ_VEDTAK_XML" allocation-size="50" sequence-name="SEQ_VEDTAK_XML"/>
+    <sequence-generator name="SEQ_OKO_XML_SENDT" allocation-size="50" sequence-name="SEQ_OKO_XML_SENDT"/>
+    <sequence-generator name="SEQ_OKO_XML_MOTTATT" allocation-size="50" sequence-name="SEQ_OKO_XML_MOTTATT"/>
 
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker"/>
 
@@ -114,7 +115,8 @@
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingAggregate"/>
 
-    <entity class="no.nav.foreldrepenger.tilbakekreving.sporing.VedtakXml"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlSendt"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt"/>
 
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.dokumentbestiller.DokumentMalType"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.tilbakekrevingsvalg.VidereBehandling"/>

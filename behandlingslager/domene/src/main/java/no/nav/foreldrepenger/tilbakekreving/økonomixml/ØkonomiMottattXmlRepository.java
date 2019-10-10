@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.grunnlag;
+package no.nav.foreldrepenger.tilbakekreving.økonomixml;
 
 import static no.nav.vedtak.felles.jpa.HibernateVerktøy.hentUniktResultat;
 

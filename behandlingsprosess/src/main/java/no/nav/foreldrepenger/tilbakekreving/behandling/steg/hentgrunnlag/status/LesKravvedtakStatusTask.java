@@ -19,7 +19,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatus437;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagAggregate;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.ØkonomiMottattXmlRepository;
+import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.tilbakekreving.status.v1.KravOgVedtakstatus;
 import no.nav.vedtak.feil.Feil;
 import no.nav.vedtak.feil.FeilFactory;
@@ -89,7 +89,7 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
             logger.info("Ignorerte kravVedtakStatus med id={} eksternBehandlingId={}. Fantes ikke tilbakekrevingsbehandling", mottattXmlId, eksternBehandlingId);
         }
 
-        opprettProsesstaskForÅSletteXml(mottattXmlId);
+        opprettProsesstaskForÅSletteMottattXml(mottattXmlId);
     }
 
     private Optional<EksternBehandling> hentKoblingTilInternBehandling(String referanse) {
