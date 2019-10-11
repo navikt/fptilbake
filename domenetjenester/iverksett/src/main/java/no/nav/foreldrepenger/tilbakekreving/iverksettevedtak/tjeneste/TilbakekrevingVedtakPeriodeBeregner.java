@@ -94,6 +94,7 @@ public class TilbakekrevingVedtakPeriodeBeregner {
         kgTidligereBehandledeVirkedager.put(kPeriode, kgBehandledeVirkedager + virkedagerOverlapp);
 
         TilbakekrevingPeriode tp = new TilbakekrevingPeriode(kPeriode.overlap(bgPeriode.getPeriode()).orElseThrow());
+
         for (KravgrunnlagBelop433 kgBeløp : kgPeriode.getKravgrunnlagBeloper433()) {
             BigDecimal skalertNyttBeløp = skalerMedAvrundingskorrigering(kgBeløp.getNyBelop(), kgTidligereSkalering, kgKumulativSkalering);
             if (KlasseType.FEIL.equals(kgBeløp.getKlasseType())) {
@@ -102,23 +103,19 @@ public class TilbakekrevingVedtakPeriodeBeregner {
                     .medUtbetBeløp(BigDecimal.ZERO)
                     .medTilbakekrevBeløp(BigDecimal.ZERO)
                     .medUinnkrevdBeløp(BigDecimal.ZERO)
-                    .medSkattProsent(BigDecimal.ZERO)
                     .medSkattBeløp(BigDecimal.ZERO));
             }
             if (KlasseType.YTEL.equals(kgBeløp.getKlasseType())) {
                 BigDecimal skalertUtbet = skalerMedAvrundingskorrigering(kgBeløp.getOpprUtbetBelop(), kgTidligereSkalering, kgKumulativSkalering);
                 BigDecimal skalertForeslåttTilbakekreves = skalerMedAvrundingskorrigering(kgBeløp.getTilbakekrevesBelop(), kgTidligereSkalering, kgKumulativSkalering);
                 BigDecimal skalertTilbakekreves = skalerMedAvrundingskorrigering(kgBeløp.getTilbakekrevesBelop(), kgTidligereSkalering, kgKumulativSkalering, andelSkalering);
-                BigDecimal skattProsent = kgBeløp.getSkattProsent();
-                BigDecimal nettoTilbakekrevesBeløp = beregnNettoTilbakekrevesBeløp(skalertTilbakekreves, kgBeløp.getSkattProsent()).setScale(0,RoundingMode.HALF_UP);
-                BigDecimal skattBeløp = skalertTilbakekreves.subtract(nettoTilbakekrevesBeløp).setScale(0,RoundingMode.HALF_DOWN);
+                BigDecimal skattBeløp = beregnSkattBeløp(skalertTilbakekreves,kgBeløp.getSkattProsent());
 
                 tp.medBeløp(new TilbakekrevingBeløp(kgBeløp.getKlasseType(), kgBeløp.getKlasseKode())
                     .medNyttBeløp(skalertNyttBeløp)
                     .medUtbetBeløp(skalertUtbet)
-                    .medTilbakekrevBeløp(nettoTilbakekrevesBeløp)
-                    .medUinnkrevdBeløp(skalertForeslåttTilbakekreves.subtract(nettoTilbakekrevesBeløp))
-                    .medSkattProsent(skattProsent)
+                    .medTilbakekrevBeløp(skalertTilbakekreves)
+                    .medUinnkrevdBeløp(skalertForeslåttTilbakekreves.subtract(skalertTilbakekreves))
                     .medSkattBeløp(skattBeløp));
             }
         }
@@ -130,11 +127,8 @@ public class TilbakekrevingVedtakPeriodeBeregner {
         BigDecimal sumPerioder = perioder.stream()
             .map(TilbakekrevingVedtakPeriodeBeregner::summerTilbakekreving)
             .reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal sumSkattBeløp = perioder.stream()
-            .map(TilbakekrevingVedtakPeriodeBeregner::summerSkattBeløp)
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal diff = sumPerioder.add(sumSkattBeløp).subtract(fasit);
+        BigDecimal diff = sumPerioder.subtract(fasit);
         if (diff.signum() == 0) {
             return;
         }
@@ -195,10 +189,6 @@ public class TilbakekrevingVedtakPeriodeBeregner {
 
     private static BigDecimal summerTilbakekreving(TilbakekrevingPeriode tp) {
         return tp.getBeløp().stream().map(TilbakekrevingBeløp::getTilbakekrevBeløp).reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
-
-    private static BigDecimal summerSkattBeløp(TilbakekrevingPeriode tp) {
-        return tp.getBeløp().stream().map(TilbakekrevingBeløp::getSkattBeløp).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     private static BigDecimal skalerMedAvrundingskorrigering(BigDecimal verdi, Skalering tidligereSkalering, Skalering kumulativSkalering) {
@@ -277,13 +267,8 @@ public class TilbakekrevingVedtakPeriodeBeregner {
         }
     }
 
-    private static BigDecimal beregnNettoTilbakekrevesBeløp(BigDecimal bruttoTilbakekrevesBeløp, BigDecimal skattProsent) {
-        BigDecimal skattBeløp = beregnSkattBeløp(bruttoTilbakekrevesBeløp, skattProsent);
-        return bruttoTilbakekrevesBeløp.subtract(skattBeløp);
-    }
-
     private static BigDecimal beregnSkattBeløp(BigDecimal bruttoTilbakekrevesBeløp, BigDecimal skattProsent) {
-        return bruttoTilbakekrevesBeløp.multiply(skattProsent).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+        return bruttoTilbakekrevesBeløp.multiply(skattProsent).divide(BigDecimal.valueOf(100), 0, RoundingMode.HALF_DOWN);
     }
 
     interface TilbakekrevingVedtakPeriodeBeregnerFeil extends DeklarerteFeil {

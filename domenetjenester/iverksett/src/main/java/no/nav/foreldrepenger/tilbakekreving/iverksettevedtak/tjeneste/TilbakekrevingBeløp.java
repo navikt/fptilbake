@@ -13,7 +13,6 @@ public class TilbakekrevingBeløp {
     private BigDecimal utbetaltBeløp;
     private BigDecimal tilbakekrevBeløp;
     private BigDecimal uinnkrevdBeløp;
-    private BigDecimal skattProsent;
     private BigDecimal skattBeløp;
     private KodeResultat kodeResultat;
 
@@ -44,11 +43,6 @@ public class TilbakekrevingBeløp {
 
     public TilbakekrevingBeløp medNyttBeløp(BigDecimal nyttBeløp) {
         this.nyttBeløp = nyttBeløp;
-        return this;
-    }
-
-    public TilbakekrevingBeløp medSkattProsent(BigDecimal skattProsent) {
-        this.skattProsent = skattProsent;
         return this;
     }
 
@@ -85,10 +79,6 @@ public class TilbakekrevingBeløp {
         return uinnkrevdBeløp;
     }
 
-    public BigDecimal getSkattProsent() {
-        return skattProsent;
-    }
-
     public BigDecimal getSkattBeløp() {
         return skattBeløp;
     }
@@ -106,7 +96,7 @@ public class TilbakekrevingBeløp {
                 equals(utbetaltBeløp, annen.utbetaltBeløp) &&
                 equals(tilbakekrevBeløp, annen.tilbakekrevBeløp) &&
                 equals(uinnkrevdBeløp, annen.uinnkrevdBeløp) &&
-                equals(skattProsent, annen.skattProsent);
+                equals(skattBeløp, annen.skattBeløp);
         }
         return false;
     }
@@ -129,7 +119,7 @@ public class TilbakekrevingBeløp {
             ", utbetalt=" + utbetaltBeløp +
             ", tilbakekrev=" + tilbakekrevBeløp +
             ", uinnkrevd=" + uinnkrevdBeløp +
-            ", skattProsent=" + skattProsent +
+            ", skattBeløp=" + skattBeløp +
             '}';
     }
 }

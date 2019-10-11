@@ -25,7 +25,7 @@ public class TbkBeløp extends TilbakekrevingBeløp {
             .medUtbetBeløp(0)
             .medUinnkrevdBeløp(0)
             .medTilbakekrevBeløp(0)
-            .medSkattProsent(0);
+            .medSkattBeløp(0);
     }
 
     public static TbkBeløp ytelse(KlasseKode klasseKode) {
@@ -78,11 +78,6 @@ public class TbkBeløp extends TilbakekrevingBeløp {
 
     public TbkBeløp medNyttBeløp(int nyttBeløp) {
         super.medNyttBeløp(BigDecimal.valueOf(nyttBeløp));
-        return this;
-    }
-
-    public TbkBeløp medSkattProsent(int skattProsent) {
-        super.medSkattProsent(BigDecimal.valueOf(skattProsent));
         return this;
     }
 
