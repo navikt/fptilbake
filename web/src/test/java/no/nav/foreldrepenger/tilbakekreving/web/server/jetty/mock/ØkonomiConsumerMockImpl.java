@@ -20,6 +20,7 @@ import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagPeriode
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.HentKravgrunnlagDetaljDto;
 import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsvedtakDto;
 import no.nav.tilbakekreving.typer.v1.JaNeiDto;
+import no.nav.tilbakekreving.typer.v1.MmelDto;
 import no.nav.tilbakekreving.typer.v1.PeriodeDto;
 import no.nav.tilbakekreving.typer.v1.TypeGjelderDto;
 import no.nav.tilbakekreving.typer.v1.TypeKlasseDto;
@@ -32,8 +33,9 @@ class ØkonomiConsumerMockImpl implements ØkonomiConsumer {
     private static final String ENHET = "8020";
 
     @Override
-    public void iverksettTilbakekrevingsvedtak(Long behandlingId, TilbakekrevingsvedtakDto vedtak) {
+    public MmelDto iverksettTilbakekrevingsvedtak(Long behandlingId, TilbakekrevingsvedtakDto vedtak) {
         logger.info("Tilbakekrevingsvedtak sendt til oppdragsystemet for behandlingId={}", behandlingId);
+        return lagMockRespons();
     }
 
     @Override
@@ -43,9 +45,19 @@ class ØkonomiConsumerMockImpl implements ØkonomiConsumer {
     }
 
     @Override
-    public void anullereKravgrunnlag(Long behandlingId, AnnullerKravgrunnlagDto annullerKravgrunnlag) {
+    public MmelDto anullereKravgrunnlag(Long behandlingId, AnnullerKravgrunnlagDto annullerKravgrunnlag) {
         logger.info("AnnulereKravgrunnlag sendt til oppdragsystemet for behandlingId={}", behandlingId);
+        return lagMockRespons();
     }
+
+    private MmelDto lagMockRespons() {
+        MmelDto mmelDto = new MmelDto();
+        mmelDto.setSystemId("460-BIDR");
+        mmelDto.setAlvorlighetsgrad("00");
+        mmelDto.setBeskrMelding("OK");
+        return mmelDto;
+    }
+
 
     private DetaljertKravgrunnlagDto hentGrunnlag() {
         DetaljertKravgrunnlagDto detaljertKravgrunnlag = new DetaljertKravgrunnlagDto();

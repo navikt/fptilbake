@@ -35,7 +35,7 @@ public class ØkonomiConsumerImpl implements ØkonomiConsumer {
     }
 
     @Override
-    public void iverksettTilbakekrevingsvedtak(Long behandlingId, TilbakekrevingsvedtakDto vedtak) {
+    public MmelDto iverksettTilbakekrevingsvedtak(Long behandlingId, TilbakekrevingsvedtakDto vedtak) {
         TilbakekrevingsvedtakResponse respons = iverksett(vedtak);
         MmelDto kvittering = respons.getMmel();
         validerKvitteringForIverksettelse(behandlingId, kvittering);
@@ -45,6 +45,7 @@ public class ØkonomiConsumerImpl implements ØkonomiConsumer {
             behandlingId,
             kvittering.getAlvorlighetsgrad(),
             kvittering.getBeskrMelding());
+        return kvittering;
     }
 
     @Override
@@ -60,7 +61,7 @@ public class ØkonomiConsumerImpl implements ØkonomiConsumer {
     }
 
     @Override
-    public void anullereKravgrunnlag(Long behandlingId, AnnullerKravgrunnlagDto annullerKravgrunnlag) {
+    public MmelDto anullereKravgrunnlag(Long behandlingId, AnnullerKravgrunnlagDto annullerKravgrunnlag) {
         logger.info("Starter Anullerekravgrunnlag for behandlingId={}", behandlingId);
         KravgrunnlagAnnulerResponse respons = anullereGrunnlag(annullerKravgrunnlag);
         MmelDto kvittering = respons.getMmel();
@@ -69,6 +70,7 @@ public class ØkonomiConsumerImpl implements ØkonomiConsumer {
             behandlingId,
             kvittering.getAlvorlighetsgrad(),
             kvittering.getBeskrMelding());
+        return kvittering;
     }
 
 

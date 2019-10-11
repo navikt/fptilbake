@@ -20,7 +20,6 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlag;
 
 public class KravgrunnlagMapperTest extends FellesTestOppsett {
-    private KravgrunnlagMapper mapper = new KravgrunnlagMapper(tpsAdapterWrapper);
 
     @Test
     public void skal_mappe_om_til_egen_domenemodell_og_konvertere_fnr_til_aktørId() {

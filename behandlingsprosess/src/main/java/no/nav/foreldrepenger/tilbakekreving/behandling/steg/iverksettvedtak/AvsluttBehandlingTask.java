@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.task;
+package no.nav.foreldrepenger.tilbakekreving.behandling.steg.iverksettvedtak;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;

@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.grunnlag;
+package no.nav.foreldrepenger.tilbakekreving.økonomixml;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

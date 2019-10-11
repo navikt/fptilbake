@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.iverksettevedtak;
+package no.nav.foreldrepenger.tilbakekreving.behandling.steg.iverksettvedtak;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,9 +7,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
-import no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.task.AvsluttBehandlingTask;
-import no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.task.SendVedtaksbrevTask;
-import no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.task.SendØkonomiTibakekerevingsVedtakTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;

@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.task;
+package no.nav.foreldrepenger.tilbakekreving.behandling.steg.henlegg;
 
 import java.io.StringWriter;
 
@@ -8,23 +8,23 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
 
-import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsvedtakDto;
+import no.nav.tilbakekreving.kravgrunnlag.annuller.v1.AnnullerKravgrunnlagDto;
 
-public class TilbakekrevingsvedtakMarshaller {
+public class TilbakekrevingsAnnuleregrunnlagMarshaller {
 
     private static volatile JAXBContext context;
 
-    private TilbakekrevingsvedtakMarshaller() {
+    private TilbakekrevingsAnnuleregrunnlagMarshaller() {
         //hindrer instansiering
     }
 
-    public static String marshall(long behandlingId, TilbakekrevingsvedtakDto vedtak) {
+    public static String marshall(long behandlingId, AnnullerKravgrunnlagDto annulereKravgrunnlag) {
         //HAXX marshalling løses normalt sett ikke slik som dette. Se JaxbHelper for normaltilfeller.
         //HAXX gjør her marshalling uten kobling til skjema, siden skjema som brukes ikke er egnet for å
         //HAXX konvertere til streng. Skjemaet er bare egnet for å bruke mot WS.
 
-        QName qname = new QName(TilbakekrevingsvedtakDto.class.getSimpleName());
-        JAXBElement<TilbakekrevingsvedtakDto> jaxbelement = new JAXBElement<>(qname, TilbakekrevingsvedtakDto.class, vedtak);
+        QName qname = new QName(AnnullerKravgrunnlagDto.class.getSimpleName());
+        JAXBElement<AnnullerKravgrunnlagDto> jaxbelement = new JAXBElement<>(qname, AnnullerKravgrunnlagDto.class, annulereKravgrunnlag);
         try {
             Marshaller marshaller = getContext().createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, false);
@@ -32,13 +32,13 @@ public class TilbakekrevingsvedtakMarshaller {
             marshaller.marshal(jaxbelement, stringWriter);
             return stringWriter.toString();
         } catch (JAXBException e) {
-            throw SendØkonomiTibakekerevingsVedtakTask.SendØkonomiTilbakekrevingVedtakTaskFeil.FACTORY.kunneIkkeMarshalleVedtakXml(behandlingId, e).toException();
+            throw AnnullereKravgrunnlagTask.AnnulereKravgrunnlagTaskFeil.FACTORY.kunneIkkeMarshalleAnnulereGrunnlagXml(behandlingId, e).toException();
         }
     }
 
     private static JAXBContext getContext() throws JAXBException {
         if (context == null) {
-            context = JAXBContext.newInstance(TilbakekrevingsvedtakDto.class);
+            context = JAXBContext.newInstance(AnnullerKravgrunnlagDto.class);
         }
         return context;
     }
