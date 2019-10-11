@@ -23,6 +23,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.VariantF
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkOpplysningType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
@@ -65,7 +67,9 @@ class HentKodeverkTjenesteImpl implements HentKodeverkTjeneste {
         BehandlingÅrsakType.class,
         BehandlingResultatType.class,
         KonsekvensForYtelsen.class,
-        VidereBehandling.class
+        VidereBehandling.class,
+        HendelseType.class,
+        HendelseUnderType.class
     );
 
     public HentKodeverkTjenesteImpl() {
