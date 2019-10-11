@@ -87,7 +87,7 @@ public class TilbakekrevingBeregnerVilkårTest {
             .medPeriode(vurdering)
             .medSærligGrunnerTilReduksjon(true)
             .medIleggRenter(true)
-            .medAndelSomTilbakekreves(70)
+            .medProsenterSomTilbakekreves(BigDecimal.valueOf(70))
             .build());
 
         //assert
@@ -104,12 +104,30 @@ public class TilbakekrevingBeregnerVilkårTest {
             .medPeriode(vurdering)
             .medSærligGrunnerTilReduksjon(true)
             .medIleggRenter(false)
-            .medAndelSomTilbakekreves(70)
+            .medProsenterSomTilbakekreves(BigDecimal.valueOf(70))
             .build());
 
         //assert
         BeregningResultatPeriode resultat = TilbakekrevingBeregnerVilkår.beregn(vurdering, BigDecimal.valueOf(10000));
         assertThat(resultat.getTilbakekrevingBeløp()).isEqualByComparingTo(BigDecimal.valueOf(7000));
+        assertThat(resultat.getRenterProsent()).isNull();
+        assertThat(resultat.getRenteBeløp()).isZero();
+    }
+
+    @Test
+    public void skal_takle_desimaler_på_prosenter_som_tilbakekreves() {
+        vurdering.setAktsomhet(VilkårVurderingAktsomhetEntitet.builder()
+            .medAktsomhet(Aktsomhet.GROVT_UAKTSOM)
+            .medBegrunnelse("foo")
+            .medPeriode(vurdering)
+            .medSærligGrunnerTilReduksjon(true)
+            .medIleggRenter(false)
+            .medProsenterSomTilbakekreves(new BigDecimal("0.01"))
+            .build());
+
+        //assert
+        BeregningResultatPeriode resultat = TilbakekrevingBeregnerVilkår.beregn(vurdering, BigDecimal.valueOf(70000));
+        assertThat(resultat.getTilbakekrevingBeløp()).isEqualByComparingTo(BigDecimal.valueOf(7));
         assertThat(resultat.getRenterProsent()).isNull();
         assertThat(resultat.getRenteBeløp()).isZero();
     }

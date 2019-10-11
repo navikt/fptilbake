@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -120,7 +121,7 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
             .medPeriode(periode)
             .medSærligGrunnerTilReduksjon(false)
             .medAktsomhet(Aktsomhet.SIMPEL_UAKTSOM)
-            .medAndelSomTilbakekreves(100)
+            .medProsenterSomTilbakekreves(BigDecimal.valueOf(100))
             .medBegrunnelse("foo")
             .build();
         periode.setAktsomhet(aktsomhet);

@@ -1,0 +1,1 @@
+alter table VILKAAR_AKTSOMHET modify ANDEL_TILBAKEKREVES number(5, 2);

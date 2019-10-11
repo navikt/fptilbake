@@ -25,7 +25,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Foreldel
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingAggregate;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.FpHendelseUnderTyper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingAggregateEntitet;
@@ -262,7 +261,7 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         assertThat(andrePeriode.getPeriode()).isEqualTo(Periode.of(LocalDate.of(2016, 4, 1), TOM));
         assertThat(andrePeriode.getGodTro()).isNull();
         assertThat(andrePeriode.getAktsomhet().getAktsomhet()).isEqualByComparingTo(Aktsomhet.GROVT_UAKTSOM);
-        assertThat(andrePeriode.getAktsomhet().getAndelSomTilbakekreves()).isEqualByComparingTo(100);
+        assertThat(andrePeriode.getAktsomhet().getProsenterSomTilbakekreves()).isEqualByComparingTo(BigDecimal.valueOf(100));
         assertThat(andrePeriode.getAktsomhet().getSærligGrunnerTilReduksjon()).isFalse();
         assertThat(andrePeriode.getAktsomhet().getIleggRenter()).isTrue();
         assertThat(andrePeriode.getAktsomhet().getSærligGrunner().size()).isEqualTo(2);
@@ -294,7 +293,7 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         assertThat(periode.getPeriode()).isEqualTo(Periode.of(FØRSTE_DAG_I_FORELDELSE_PERIODE, TOM));
         assertThat(periode.getGodTro()).isNull();
         assertThat(periode.getAktsomhet().getAktsomhet()).isEqualByComparingTo(Aktsomhet.GROVT_UAKTSOM);
-        assertThat(periode.getAktsomhet().getAndelSomTilbakekreves()).isEqualByComparingTo(100);
+        assertThat(periode.getAktsomhet().getProsenterSomTilbakekreves()).isEqualByComparingTo(BigDecimal.valueOf(100));
         assertThat(periode.getAktsomhet().getSærligGrunnerTilReduksjon()).isFalse();
         assertThat(periode.getAktsomhet().getIleggRenter()).isTrue();
         assertThat(periode.getAktsomhet().getSærligGrunner().size()).isEqualTo(2);
@@ -367,7 +366,7 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
 
         annetDto = (VilkårResultatAnnetDto) andrePeriode.getVilkarResultatInfo();
         assertThat(annetDto.getAktsomhet()).isEqualByComparingTo(Aktsomhet.GROVT_UAKTSOM);
-        assertThat(annetDto.getAktsomhetInfo().getAndelTilbakekreves()).isEqualByComparingTo(100);
+        assertThat(annetDto.getAktsomhetInfo().getAndelTilbakekreves()).isEqualByComparingTo(BigDecimal.valueOf(100));
         assertThat(annetDto.getAktsomhetInfo().isHarGrunnerTilReduksjon()).isFalse();
         assertThat(annetDto.getAktsomhetInfo().isIleggRenter()).isTrue();
         assertThat(annetDto.getAktsomhetInfo().getSærligeGrunner().size()).isEqualTo(2);

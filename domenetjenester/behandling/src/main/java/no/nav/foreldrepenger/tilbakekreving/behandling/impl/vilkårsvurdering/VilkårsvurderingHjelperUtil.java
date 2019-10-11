@@ -46,7 +46,7 @@ public class VilkårsvurderingHjelperUtil {
                     .medAktsomhet(aktsomhet)
                     .medBegrunnelse(annetDto.getBegrunnelse())
                     .medSærligGrunnerTilReduksjon(aktsomhetInfo.isHarGrunnerTilReduksjon())
-                    .medAndelSomTilbakekreves(aktsomhetInfo.getAndelTilbakekreves())
+                    .medProsenterSomTilbakekreves(aktsomhetInfo.getAndelTilbakekreves())
                     .medIleggRenter(aktsomhetInfo.isIleggRenter())
                     .medBeløpTilbakekreves(aktsomhetInfo.getTilbakekrevesBelop())
                     .medTilbakekrevSmåBeløp(aktsomhetInfo.isTilbakekrevSelvOmBeloepErUnder4Rettsgebyr()).build();
@@ -77,7 +77,7 @@ public class VilkårsvurderingHjelperUtil {
         if (!Aktsomhet.FORSETT.equals(aktsomhetEntitet.getAktsomhet())) {
             VilkårResultatAktsomhetDto aktsomhetDto = new VilkårResultatAktsomhetDto();
             aktsomhetDto.setTilbakekrevesBelop(aktsomhetEntitet.getManueltTilbakekrevesBeløp());
-            aktsomhetDto.setAndelTilbakekreves(aktsomhetEntitet.getAndelSomTilbakekreves());
+            aktsomhetDto.setAndelTilbakekreves(aktsomhetEntitet.getProsenterSomTilbakekreves());
             aktsomhetDto.setIleggRenter(aktsomhetEntitet.getIleggRenter());
             aktsomhetDto.setHarGrunnerTilReduksjon(aktsomhetEntitet.getSærligGrunnerTilReduksjon());
             aktsomhetDto.setTilbakekrevSelvOmBeloepErUnder4Rettsgebyr(aktsomhetEntitet.getTilbakekrevSmåBeløp());

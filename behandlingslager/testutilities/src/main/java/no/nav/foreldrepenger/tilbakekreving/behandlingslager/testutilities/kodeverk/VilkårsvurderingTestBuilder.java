@@ -97,10 +97,10 @@ public class VilkårsvurderingTestBuilder {
             return this;
         }
 
-        public VVurdering setAndelTilbakekreves(int andel) {
+        public VVurdering setProsenterTilbakekreves(BigDecimal prosentandel) {
             if (aktsomhet != null) {
-                aktsomhet.medAndelSomTilbakekreves(andel);
-                aktsomhet.medSærligGrunnerTilReduksjon(andel != 100);
+                aktsomhet.medProsenterSomTilbakekreves(prosentandel);
+                aktsomhet.medSærligGrunnerTilReduksjon(BigDecimal.valueOf(100).compareTo(prosentandel) != 0);
                 return this;
             }
             throw new IllegalArgumentException("Kan ikke bruke andel når god tro");
