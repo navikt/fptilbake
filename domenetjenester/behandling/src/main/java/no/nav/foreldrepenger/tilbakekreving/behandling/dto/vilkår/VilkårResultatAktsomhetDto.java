@@ -1,14 +1,10 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.dto.vilkår;
 
-import static no.nav.vedtak.util.StringUtils.nullOrEmpty;
-import static org.apache.cxf.common.util.CollectionUtils.isEmpty;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
-import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Digits;
@@ -25,16 +21,17 @@ import no.nav.vedtak.util.InputValideringRegex;
 
 public class VilkårResultatAktsomhetDto {
 
-    @Size(min = 0,max = 5)
+    @Size(max = 5)
     @JsonProperty("sarligGrunner")
     @Valid
     private List<@ValidKodeverk SærligGrunn> særligeGrunner = new ArrayList<>();
 
     private boolean harGrunnerTilReduksjon;
 
-    @Min(0)
-    @Max(100)
-    private Integer andelTilbakekreves;
+    @DecimalMin("0.01")
+    @DecimalMax("99.99")
+    @Digits(integer = 3, fraction = 2)
+    private BigDecimal andelTilbakekreves;
 
     private Boolean ileggRenter;
 
@@ -47,7 +44,7 @@ public class VilkårResultatAktsomhetDto {
 
     private Boolean tilbakekrevSelvOmBeloepErUnder4Rettsgebyr;
 
-    @Size(min=0)
+    @Size(max = 1500)
     @Pattern(regexp = InputValideringRegex.FRITEKST)
     private String annetBegrunnelse;
 
@@ -67,11 +64,11 @@ public class VilkårResultatAktsomhetDto {
         this.harGrunnerTilReduksjon = harGrunnerTilReduksjon;
     }
 
-    public Integer getAndelTilbakekreves() {
+    public BigDecimal getAndelTilbakekreves() {
         return andelTilbakekreves;
     }
 
-    public void setAndelTilbakekreves(Integer andelTilbakekreves) {
+    public void setAndelTilbakekreves(BigDecimal andelTilbakekreves) {
         this.andelTilbakekreves = andelTilbakekreves;
     }
 
@@ -105,25 +102,6 @@ public class VilkårResultatAktsomhetDto {
 
     public void setAnnetBegrunnelse(String annetBegrunnelse) {
         this.annetBegrunnelse = annetBegrunnelse;
-    }
-
-    @AssertTrue(message = "tilbakekreves beløp er ikke ordentlig")
-    private boolean isTilbakekrevesBeløp() {
-        return !(tilbakekrevesBelop != null && andelTilbakekreves != null);
-    }
-
-    @AssertTrue(message = "annetBegrunnelse er ikke ordentlig")
-    private boolean isAnnetBegrunnelse() {
-        return (nullOrEmpty(this.annetBegrunnelse) || isSærligGrunnerInnholdetAnnet()) &&
-                (!nullOrEmpty(this.annetBegrunnelse) || !isSærligGrunnerInnholdetAnnet());
-    }
-
-    private boolean isNullOrFalse(Boolean verdi) {
-        return verdi == null || !verdi;
-    }
-
-    private boolean isSærligGrunnerInnholdetAnnet() {
-        return !isEmpty(this.særligeGrunner) && this.getSærligeGrunner().contains(SærligGrunn.ANNET);
     }
 
 }

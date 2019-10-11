@@ -86,10 +86,7 @@ class TilbakekrevingBeregnerVilkår {
         if (Aktsomhet.FORSETT.equals(aktsomhet.getAktsomhet()) || !aktsomhet.getSærligGrunnerTilReduksjon()) {
             return _100_PROSENT;
         }
-        if (aktsomhet.getAndelSomTilbakekreves() != null) {
-            return BigDecimal.valueOf(aktsomhet.getAndelSomTilbakekreves());
-        }
-        return null;
+        return aktsomhet.getProsenterSomTilbakekreves();
     }
 
     private static BigDecimal finnManueltSattBeløp(VilkårVurderingPeriodeEntitet vurdering) {

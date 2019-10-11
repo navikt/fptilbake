@@ -1,5 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
@@ -69,8 +70,8 @@ public class TilbakekrevingVedtakPeriodeBeregnerScenarioerTest {
 
         VilkårsvurderingTestBuilder.medRepo(vilkårsvurderingRepository).lagre(behandlingId, Map.of(
             PP2018.periode("16/3-3/4"), VilkårsvurderingTestBuilder.VVurdering.godTro().setManueltBeløp(0),
-            PP2018.periode("4/4-20/4"), VilkårsvurderingTestBuilder.VVurdering.simpelUaktsom().setAndelTilbakekreves(50),
-            PP2018.periode("21/4-26/5"), VilkårsvurderingTestBuilder.VVurdering.simpelUaktsom().setAndelTilbakekreves(100)
+            PP2018.periode("4/4-20/4"), VilkårsvurderingTestBuilder.VVurdering.simpelUaktsom().setProsenterTilbakekreves(BigDecimal.valueOf(50)),
+            PP2018.periode("21/4-26/5"), VilkårsvurderingTestBuilder.VVurdering.simpelUaktsom().setProsenterTilbakekreves(BigDecimal.valueOf(100))
         ));
 
         flushAndClear();
@@ -113,7 +114,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerScenarioerTest {
         ));
 
         VilkårsvurderingTestBuilder.medRepo(vilkårsvurderingRepository).lagre(behandlingId, Map.of(
-            PP2018.periode("10/4-20/5"), VilkårsvurderingTestBuilder.VVurdering.simpelUaktsom().setAndelTilbakekreves(100)
+            PP2018.periode("10/4-20/5"), VilkårsvurderingTestBuilder.VVurdering.simpelUaktsom().setProsenterTilbakekreves(BigDecimal.valueOf(100))
         ));
 
         flushAndClear();

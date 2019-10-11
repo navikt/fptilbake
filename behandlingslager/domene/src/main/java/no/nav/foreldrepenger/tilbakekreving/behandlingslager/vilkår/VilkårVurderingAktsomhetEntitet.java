@@ -55,7 +55,7 @@ public class VilkårVurderingAktsomhetEntitet extends BaseEntitet {
     private Boolean ileggRenter;
 
     @Column(name = "andel_tilbakekreves")
-    private Integer andelSomTilbakekreves;
+    private BigDecimal prosenterSomTilbakekreves;
 
     @Column(name = "manuelt_satt_beloep")
     private BigDecimal manueltTilbakekrevesBeløp;
@@ -94,8 +94,8 @@ public class VilkårVurderingAktsomhetEntitet extends BaseEntitet {
         return ileggRenter;
     }
 
-    public Integer getAndelSomTilbakekreves() {
-        return andelSomTilbakekreves;
+    public BigDecimal getProsenterSomTilbakekreves() {
+        return prosenterSomTilbakekreves;
     }
 
     public BigDecimal getManueltTilbakekrevesBeløp() {
@@ -145,8 +145,8 @@ public class VilkårVurderingAktsomhetEntitet extends BaseEntitet {
             return this;
         }
 
-        public Builder medAndelSomTilbakekreves(Integer andelSomTilbakekreves) {
-            this.kladd.andelSomTilbakekreves = andelSomTilbakekreves;
+        public Builder medProsenterSomTilbakekreves(BigDecimal prosenterSomTilbakekreves) {
+            this.kladd.prosenterSomTilbakekreves = prosenterSomTilbakekreves;
             return this;
         }
 
@@ -169,14 +169,14 @@ public class VilkårVurderingAktsomhetEntitet extends BaseEntitet {
             Objects.requireNonNull(this.kladd.periode, "periode");
             Objects.requireNonNull(this.kladd.aktsomhet, "aktsomhet");
             Objects.requireNonNull(this.kladd.begrunnelse, "begrunnelse");
-            if (kladd.andelSomTilbakekreves != null && kladd.manueltTilbakekrevesBeløp != null) {
-                throw new IllegalArgumentException("Kan ikke sette både andelSomTilbakekreves og beløpSomTilbakekreves");
+            if (kladd.prosenterSomTilbakekreves != null && kladd.manueltTilbakekrevesBeløp != null) {
+                throw new IllegalArgumentException("Kan ikke sette både prosenterSomTilbakekreves og beløpSomTilbakekreves");
             }
             if (kladd.aktsomhet.equals(Aktsomhet.FORSETT)) {
                 no.nav.vedtak.util.Objects.check(kladd.ileggRenter == null, "Ved FORSETT er rentebeslutning automatisk, og skal ikke settes her");
                 no.nav.vedtak.util.Objects.check(kladd.særligGrunnerTilReduksjon == null, "Ved FORSETT skal ikke særligeGrunnerTilReduksjon settes her");
                 no.nav.vedtak.util.Objects.check(kladd.manueltTilbakekrevesBeløp == null, "Ved FORSETT er beløp automatisk, og skal ikke settes her");
-                no.nav.vedtak.util.Objects.check(kladd.andelSomTilbakekreves == null, "Ved FORSETT er andel automatisk, og skal ikke settes her");
+                no.nav.vedtak.util.Objects.check(kladd.prosenterSomTilbakekreves == null, "Ved FORSETT er andel automatisk, og skal ikke settes her");
                 no.nav.vedtak.util.Objects.check(kladd.tilbakekrevSmåBeløp == null, "Dette er gyldig bare for Simpel uaktsom");
             }
             if (kladd.aktsomhet.equals(Aktsomhet.GROVT_UAKTSOM)) {

@@ -24,7 +24,6 @@ import org.hibernate.annotations.JoinFormula;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.NavOppfulgt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Vurdering;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.vedtak.felles.jpa.BaseEntitet;
 
@@ -136,8 +135,8 @@ public class VilkårVurderingPeriodeEntitet extends BaseEntitet {
         return null;
     }
 
-    public Integer finnAndelTilbakekreves() {
-        return aktsomhet != null ? aktsomhet.getAndelSomTilbakekreves() : null;
+    public BigDecimal finnAndelTilbakekreves() {
+        return aktsomhet != null ? aktsomhet.getProsenterSomTilbakekreves() : null;
     }
 
     public Boolean tilbakekrevesSmåbeløp() {
