@@ -18,6 +18,8 @@ public class BeregningResultatPeriode {
     private BigDecimal tilbakekrevingBeløpUtenRenter;
     private BigDecimal renteBeløp;
     private BigDecimal tilbakekrevingBeløp;
+    private BigDecimal skattBeløp;
+    private BigDecimal tilbakekrevingBeløpEtterSkatt;
 
     public Periode getPeriode() {
         return periode;
@@ -85,6 +87,22 @@ public class BeregningResultatPeriode {
 
     public void setManueltSattTilbakekrevingsbeløp(BigDecimal manueltSattTilbakekrevingsbeløp) {
         this.manueltSattTilbakekrevingsbeløp = manueltSattTilbakekrevingsbeløp;
+    }
+
+    public BigDecimal getSkattBeløp() {
+        return skattBeløp;
+    }
+
+    public void setSkattBeløp(BigDecimal skattBeløp) {
+        this.skattBeløp = skattBeløp;
+    }
+
+    public BigDecimal getTilbakekrevingBeløpEtterSkatt() {
+        return tilbakekrevingBeløpEtterSkatt;
+    }
+
+    public void setTilbakekrevingBeløpEtterSkatt(BigDecimal tilbakekrevingBeløpEtterSkatt) {
+        this.tilbakekrevingBeløpEtterSkatt = tilbakekrevingBeløpEtterSkatt;
     }
 
     public BigDecimal getManueltSattTilbakekrevingsbeløp() {

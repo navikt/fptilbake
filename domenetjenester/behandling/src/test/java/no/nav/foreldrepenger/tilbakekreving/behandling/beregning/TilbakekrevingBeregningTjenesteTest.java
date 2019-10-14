@@ -16,7 +16,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKo
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingAggregateEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingAktsomhetEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingPeriodeEntitet;
@@ -28,7 +27,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.V
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelsePeriode;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagAggregate;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagBelop433;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType;
@@ -46,7 +44,7 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
     public void skal_beregne_tilbakekrevingsbeløp_for_periode_som_ikke_er_foreldet() {
         Periode periode = new Periode(LocalDate.of(2019, 5, 1), LocalDate.of(2019, 5, 3));
 
-        lagKravgrunnlag(internBehandlingId, periode);
+        lagKravgrunnlag(internBehandlingId, periode,BigDecimal.ZERO);
         lagForeldelse(internBehandlingId, periode, ForeldelseVurderingType.IKKE_FORELDET);
         lagVilkårsvurderingMedForsett(internBehandlingId, periode);
 
@@ -70,7 +68,7 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
     public void skal_beregne_tilbakekrevingsbeløp_for_periode_som_gjelder_ikke_er_foreldelse() {
         Periode periode = new Periode(LocalDate.of(2019, 5, 1), LocalDate.of(2019, 5, 3));
 
-        lagKravgrunnlag(internBehandlingId, periode);
+        lagKravgrunnlag(internBehandlingId, periode,BigDecimal.ZERO);
         lagVilkårsvurderingMedForsett(internBehandlingId, periode);
 
         BeregningResultat beregningResultat = tjeneste.beregn(internBehandlingId);
@@ -93,7 +91,7 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
     public void skal_beregne_tilbakekrevingsbeløp_for_periode_som_er_foreldet() {
         Periode periode = new Periode(LocalDate.of(2019, 5, 1), LocalDate.of(2019, 5, 3));
 
-        lagKravgrunnlag(internBehandlingId, periode);
+        lagKravgrunnlag(internBehandlingId, periode,BigDecimal.ZERO);
         lagForeldelse(internBehandlingId, periode, ForeldelseVurderingType.FORELDET);
 
         BeregningResultat beregningResultat = tjeneste.beregn(internBehandlingId);
@@ -114,6 +112,32 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
         assertThat(beregningResultat.getVedtakResultatType()).isEqualByComparingTo(VedtakResultatType.INGEN_TILBAKEBETALING);
     }
 
+    @Test
+    public void skal_beregne_tilbakekrevingsbeløp_for_periode_som_ikke_er_foreldet_medSkattProsent() {
+        Periode periode = new Periode(LocalDate.of(2019, 5, 1), LocalDate.of(2019, 5, 3));
+
+        lagKravgrunnlag(internBehandlingId, periode,BigDecimal.valueOf(10));
+        lagForeldelse(internBehandlingId, periode, ForeldelseVurderingType.IKKE_FORELDET);
+        lagVilkårsvurderingMedForsett(internBehandlingId, periode);
+
+        BeregningResultat beregningResultat = tjeneste.beregn(internBehandlingId);
+        List<BeregningResultatPeriode> resultat = beregningResultat.getBeregningResultatPerioder();
+
+        assertThat(resultat).hasSize(1);
+        BeregningResultatPeriode r = resultat.get(0);
+        assertThat(r.getPeriode()).isEqualTo(periode);
+        assertThat(r.getTilbakekrevingBeløp()).isEqualByComparingTo(BigDecimal.valueOf(11000));
+        assertThat(r.getVurdering()).isEqualTo(Aktsomhet.FORSETT);
+        assertThat(r.getRenterProsent()).isEqualByComparingTo(BigDecimal.valueOf(10));
+        assertThat(r.getFeilutbetaltBeløp()).isEqualByComparingTo(BigDecimal.valueOf(10000));
+        assertThat(r.getManueltSattTilbakekrevingsbeløp()).isNull();
+        assertThat(r.getAndelAvBeløp()).isEqualByComparingTo(BigDecimal.valueOf(100));
+        assertThat(r.getSkattBeløp()).isEqualByComparingTo(BigDecimal.valueOf(1100));
+        assertThat(r.getTilbakekrevingBeløpEtterSkatt()).isEqualByComparingTo(BigDecimal.valueOf(9900));
+
+        assertThat(beregningResultat.getVedtakResultatType()).isEqualByComparingTo(VedtakResultatType.FULL_TILBAKEBETALING);
+    }
+
     private void lagVilkårsvurderingMedForsett(Long behandlingId, Periode periode) {
         VilkårVurderingEntitet vurdering = new VilkårVurderingEntitet();
         VilkårVurderingPeriodeEntitet p = VilkårVurderingPeriodeEntitet.builder()
@@ -129,22 +153,7 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
             .medPeriode(p)
             .build());
         vurdering.leggTilPeriode(p);
-        VilkårVurderingAggregateEntitet vurderingAggregat = VilkårVurderingAggregateEntitet.builder()
-            .medBehandlingId(behandlingId)
-            .medManuellVilkår(vurdering)
-            .medAktiv(true)
-            .build();
-        vilkårsvurderingRepository.lagre(vurderingAggregat);
-    }
-
-    private void lagTomVilkårsvurdering(Long behandlingId) {
-        VilkårVurderingEntitet vurdering = new VilkårVurderingEntitet();
-        VilkårVurderingAggregateEntitet vurderingAggregat = VilkårVurderingAggregateEntitet.builder()
-            .medBehandlingId(behandlingId)
-            .medManuellVilkår(vurdering)
-            .medAktiv(true)
-            .build();
-        vilkårsvurderingRepository.lagre(vurderingAggregat);
+        vilkårsvurderingRepository.lagre(behandlingId,vurdering);
     }
 
     private void lagForeldelse(Long behandlingId, Periode periode, ForeldelseVurderingType resultat) {
@@ -164,7 +173,7 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
         vurdertForeldelseRepository.lagre(aggregate);
     }
 
-    private void lagKravgrunnlag(long behandlingId, Periode periode) {
+    private void lagKravgrunnlag(long behandlingId, Periode periode, BigDecimal skattProsent) {
         Kravgrunnlag431 grunnlag = Kravgrunnlag431.builder()
             .medVedtakId(1111L)
             .medEksternKravgrunnlagId("123")
@@ -195,14 +204,20 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
             //TODO feltene under skal valideres i builder:
             .medKravgrunnlagPeriode432(p)
             .build());
+        p.leggTilBeløp(KravgrunnlagBelop433.builder()
+            .medKlasseKode(KlasseKode.FPATORD)
+            .medKlasseType(KlasseType.YTEL)
+            .medNyBelop(BigDecimal.ZERO)
+            .medOpprUtbetBelop(BigDecimal.valueOf(10000))
+            .medTilbakekrevesBelop(BigDecimal.valueOf(10000))
+            .medUinnkrevdBelop(BigDecimal.ZERO)
+            .medSkattProsent(skattProsent)
+            //TODO feltene under skal valideres i builder:
+            .medKravgrunnlagPeriode432(p)
+            .build());
         grunnlag.leggTilPeriode(p);
 
-        KravgrunnlagAggregate aggregat = new KravgrunnlagAggregate.Builder()
-            .medBehandlingId(behandlingId)
-            .medGrunnlagØkonomi(grunnlag)
-            .medAktiv(true)
-            .build();
-        grunnlagRepository.lagre(aggregat);
+        grunnlagRepository.lagre(behandlingId,grunnlag);
     }
 
 }

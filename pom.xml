@@ -1075,6 +1075,13 @@
 
     </profiles>
 
+    <scm>
+        <connection>scm:git:ssh://git@stash.adeo.no:7999/vedfp/vl-tilbakekreving.git</connection>
+        <developerConnection>scm:git:ssh://git@stash.adeo.no:7999/vedfp/vl-tilbakekreving.git
+        </developerConnection>
+        <url>http://stash.adeo.no/projects/VEDFP/repos/vl-tilbakekreving/browse</url>
+    </scm>
+
     <distributionManagement>
         <repository>
             <id>repo.adeo.no-releases</id>

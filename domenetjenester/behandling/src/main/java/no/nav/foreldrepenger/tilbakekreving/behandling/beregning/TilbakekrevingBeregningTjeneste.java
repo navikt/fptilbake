@@ -1,17 +1,21 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.beregning;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BeregnBeløpUtil;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurdertForeldelseTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BeregningResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
@@ -25,6 +29,11 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.V
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseAggregate;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelsePeriode;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagAggregate;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagBelop433;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 
 @ApplicationScoped
 public class TilbakekrevingBeregningTjeneste {
@@ -48,8 +57,9 @@ public class TilbakekrevingBeregningTjeneste {
 
         List<Periode> perioder = finnPerioder(vurdertForeldelse, vilkårsvurdering);
         Map<Periode, BigDecimal> perioderMedBeløp = vurdertForeldelseTjeneste.beregnFeilutbetaltBeløpForPerioder(behandlingId, perioder);
+        Map<Periode,BigDecimal> perioderMedSkattProsent = beregnSkattProsentForPerioder(behandlingId,perioder);
 
-        List<BeregningResultatPeriode> beregningResultatPerioder = beregn(vurdertForeldelse, vilkårsvurdering, perioderMedBeløp);
+        List<BeregningResultatPeriode> beregningResultatPerioder = beregn(vurdertForeldelse, vilkårsvurdering, perioderMedBeløp,perioderMedSkattProsent);
         BigDecimal totalTilbakekrevingBeløp = sum(beregningResultatPerioder, BeregningResultatPeriode::getTilbakekrevingBeløp);
         BigDecimal totalFeilutbetaltBeløp = sum(beregningResultatPerioder, BeregningResultatPeriode::getFeilutbetaltBeløp);
 
@@ -80,10 +90,10 @@ public class TilbakekrevingBeregningTjeneste {
         return tilEnListe(foreldedePerioder, ikkeForeldedePerioder);
     }
 
-    private List<BeregningResultatPeriode> beregn(VurdertForeldelse vurdertForeldelse, VilkårVurderingEntitet vilkårsvurdering, Map<Periode, BigDecimal> perioderMedBeløp) {
+    private List<BeregningResultatPeriode> beregn(VurdertForeldelse vurdertForeldelse, VilkårVurderingEntitet vilkårsvurdering, Map<Periode, BigDecimal> perioderMedBeløp, Map<Periode,BigDecimal> perioderMedSkattProsent) {
         List<BeregningResultatPeriode> resulat = new ArrayList<>();
         resulat.addAll(beregnForForeldedePerioder(vurdertForeldelse, perioderMedBeløp));
-        resulat.addAll(beregnForIkkeForeldedePerioder(vilkårsvurdering, perioderMedBeløp));
+        resulat.addAll(beregnForIkkeForeldedePerioder(vilkårsvurdering, perioderMedBeløp,perioderMedSkattProsent));
         resulat.sort(Comparator.comparing(b -> b.getPeriode().getFom()));
         return resulat;
     }
@@ -111,10 +121,10 @@ public class TilbakekrevingBeregningTjeneste {
         return resultat;
     }
 
-    private Collection<BeregningResultatPeriode> beregnForIkkeForeldedePerioder(VilkårVurderingEntitet vilkårsvurdering, Map<Periode, BigDecimal> kravbeløpPrPeriode) {
+    private Collection<BeregningResultatPeriode> beregnForIkkeForeldedePerioder(VilkårVurderingEntitet vilkårsvurdering, Map<Periode, BigDecimal> kravbeløpPrPeriode,Map<Periode,BigDecimal> perioderMedSkattProsent) {
         return vilkårsvurdering.getPerioder()
             .stream()
-            .map(p -> beregnIkkeForeldetPeriode(p, kravbeløpPrPeriode))
+            .map(p -> beregnIkkeForeldetPeriode(p, kravbeløpPrPeriode,perioderMedSkattProsent))
             .collect(Collectors.toList());
     }
 
@@ -136,13 +146,16 @@ public class TilbakekrevingBeregningTjeneste {
         resultat.setRenteBeløp(BigDecimal.ZERO);
         resultat.setAndelAvBeløp(BigDecimal.ZERO);
         resultat.setVurdering(AnnenVurdering.FORELDET);
+        resultat.setSkattBeløp(BigDecimal.ZERO);
+        resultat.setTilbakekrevingBeløpEtterSkatt(BigDecimal.ZERO);
         return resultat;
     }
 
-    private BeregningResultatPeriode beregnIkkeForeldetPeriode(VilkårVurderingPeriodeEntitet vurdering, Map<Periode, BigDecimal> kravbeløpPrPeriode) {
+    private BeregningResultatPeriode beregnIkkeForeldetPeriode(VilkårVurderingPeriodeEntitet vurdering, Map<Periode, BigDecimal> kravbeløpPrPeriode,Map<Periode,BigDecimal> perioderMedSkattProsent) {
         Periode periode = vurdering.getPeriode();
         BigDecimal kravbeløp = kravbeløpPrPeriode.get(periode);
-        return TilbakekrevingBeregnerVilkår.beregn(vurdering, kravbeløp);
+        BigDecimal skattProsent = perioderMedSkattProsent.get(periode);
+        return TilbakekrevingBeregnerVilkår.beregn(vurdering, kravbeløp,skattProsent);
     }
 
     private VedtakResultatType bestemVedtakResultat(BigDecimal tilbakekrevingBeløp, BigDecimal feilutbetaltBeløp) {
@@ -158,5 +171,36 @@ public class TilbakekrevingBeregningTjeneste {
         return liste.stream()
             .map(konverter::apply)
             .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    private Map<Periode, BigDecimal> beregnSkattProsentForPerioder(Long behandlingId, List<Periode> perioder) {
+        var map = new HashMap<Periode, BigDecimal>();
+        Optional<KravgrunnlagAggregate> aggregate = repositoryProvider.getGrunnlagRepository().finnGrunnlagForBehandlingId(behandlingId);
+        if (aggregate.isPresent()) {
+            for (Periode periode : perioder) {
+                map.put(periode, beregnSkattProsent(aggregate.get(), periode));
+            }
+        }
+        return map;
+    }
+
+    private BigDecimal beregnSkattProsent(KravgrunnlagAggregate aggregate, Periode foreldetPeriode) {
+        Kravgrunnlag431 kravgrunnlag = aggregate.getGrunnlagØkonomi();
+        List<KravgrunnlagPeriode432> kgPerioder = new ArrayList<>(kravgrunnlag.getPerioder());
+        kgPerioder.sort(Comparator.comparing(p -> p.getPeriode().getFom()));
+        BigDecimal sum = BigDecimal.ZERO;
+        for (KravgrunnlagPeriode432 kgPeriode : kgPerioder) {
+            BigDecimal skattProsent = kgPeriode.getKravgrunnlagBeloper433().stream()
+                .filter(kgBeløp -> kgBeløp.getKlasseType().equals(KlasseType.YTEL))
+                .map(KravgrunnlagBelop433::getSkattProsent)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            if (skattProsent.signum() != 0) {
+                BigDecimal skattProsentPrVirkedag = BeregnBeløpUtil.beregnBeløpPrVirkedag(skattProsent, kgPeriode.getPeriode());
+                sum = sum.add(BeregnBeløpUtil.beregnBeløp(foreldetPeriode, kgPeriode.getPeriode(), skattProsentPrVirkedag));
+            }
+        }
+
+        return sum.setScale(0, RoundingMode.HALF_UP);
     }
 }

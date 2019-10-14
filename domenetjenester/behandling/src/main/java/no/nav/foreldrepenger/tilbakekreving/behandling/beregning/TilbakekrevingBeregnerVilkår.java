@@ -21,7 +21,7 @@ class TilbakekrevingBeregnerVilkår {
         // for CDI
     }
 
-    static BeregningResultatPeriode beregn(VilkårVurderingPeriodeEntitet vilkårVurdering, BigDecimal kravgrunnlagBeløp) {
+    static BeregningResultatPeriode beregn(VilkårVurderingPeriodeEntitet vilkårVurdering, BigDecimal kravgrunnlagBeløp, BigDecimal skattProsent) {
         Periode periode = vilkårVurdering.getPeriode();
         Vurdering vurdering = finnVurdering(vilkårVurdering);
         boolean renter = finnRenter(vilkårVurdering);
@@ -41,16 +41,24 @@ class TilbakekrevingBeregnerVilkår {
             ? BigDecimal.ZERO
             : finnBeløpUtenRenter(kravgrunnlagBeløp, andel, manueltBeløp);
         BigDecimal rentebeløp = beregnRentebeløp(beløpUtenRenter, renter);
-        BigDecimal totalBeløp = beløpUtenRenter.add(rentebeløp);
+        BigDecimal bruttoBeløp = beløpUtenRenter.add(rentebeløp);
+        BigDecimal skattBeløp = beregnSkattBeløp(bruttoBeløp, skattProsent);
+        BigDecimal nettoBeløp = bruttoBeløp.subtract(skattBeløp);
 
         resulat.setTilbakekrevingBeløpUtenRenter(beløpUtenRenter);
         resulat.setRenteBeløp(rentebeløp);
-        resulat.setTilbakekrevingBeløp(totalBeløp);
+        resulat.setTilbakekrevingBeløpEtterSkatt(nettoBeløp);
+        resulat.setSkattBeløp(skattBeløp);
+        resulat.setTilbakekrevingBeløp(bruttoBeløp);
         return resulat;
     }
 
     private static BigDecimal beregnRentebeløp(BigDecimal beløp, boolean renter) {
         return renter ? beløp.multiply(RENTEFAKTOR).setScale(0, RoundingMode.HALF_UP) : BigDecimal.ZERO;
+    }
+
+    private static BigDecimal beregnSkattBeløp(BigDecimal bruttoTilbakekrevesBeløp, BigDecimal skattProsent) {
+        return bruttoTilbakekrevesBeløp.multiply(skattProsent).divide(BigDecimal.valueOf(100), 0, RoundingMode.HALF_DOWN);
     }
 
     private static BigDecimal finnBeløpUtenRenter(BigDecimal kravgrunnlagBeløp, BigDecimal andel, BigDecimal manueltBeløp) {
@@ -83,7 +91,7 @@ class TilbakekrevingBeregnerVilkår {
     }
 
     private static BigDecimal finnAndelForAktsomhet(VilkårVurderingAktsomhetEntitet aktsomhet) {
-        if (Aktsomhet.FORSETT.equals(aktsomhet.getAktsomhet()) || !aktsomhet.getSærligGrunnerTilReduksjon()) {
+        if (Aktsomhet.FORSETT.equals(aktsomhet.getAktsomhet()) || Boolean.FALSE.equals(aktsomhet.getSærligGrunnerTilReduksjon())) {
             return _100_PROSENT;
         }
         return aktsomhet.getProsenterSomTilbakekreves();
