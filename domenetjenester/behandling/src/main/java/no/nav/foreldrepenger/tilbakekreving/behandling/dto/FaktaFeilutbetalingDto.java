@@ -4,7 +4,9 @@ import java.time.LocalDate;
 
 import javax.validation.Valid;
 
-import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.FeilutbetalingÅrsakDto;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
+import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTypeMedUndertypeDto;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
 public class FaktaFeilutbetalingDto {
@@ -14,13 +16,13 @@ public class FaktaFeilutbetalingDto {
     private LocalDate tom;
 
     @Valid
-    private FeilutbetalingÅrsakDto årsak;
+    private HendelseTypeMedUndertypeDto årsak;
 
     FaktaFeilutbetalingDto() {
         // For CDI
     }
 
-    public FaktaFeilutbetalingDto(LocalDate fom, LocalDate tom, FeilutbetalingÅrsakDto feilutbetalingÅrsakDto) {
+    public FaktaFeilutbetalingDto(LocalDate fom, LocalDate tom, HendelseTypeMedUndertypeDto feilutbetalingÅrsakDto) {
         this.fom = fom;
         this.tom = tom;
         this.årsak = feilutbetalingÅrsakDto;
@@ -38,8 +40,15 @@ public class FaktaFeilutbetalingDto {
         return Periode.of(fom, tom);
     }
 
-    public FeilutbetalingÅrsakDto getÅrsak() {
-        return årsak;
+    public HendelseType getHendelseType() {
+        return årsak.getHendelseType();
     }
 
+    public HendelseUnderType getHendelseUndertype() {
+        return årsak.getHendelseUndertype();
+    }
+
+    public HendelseTypeMedUndertypeDto getÅrsak() {
+        return årsak;
+    }
 }
