@@ -178,7 +178,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
         HbVedtaksbrevPeriodeOgFelles data = new HbVedtaksbrevPeriodeOgFelles(felles, periode);
 
         String generertTekst = TekstformatererVedtaksbrev.lagSærligeGrunnerTekst(data);
-        assertThat(generertTekst).contains("Selv om du må ha forstått at du fikk for mye utbetalt, har vi vurdert om det er grunner til å redusere beløpet. Vi har kommet fram til at du må betale tilbake hele beløpet.");
+        assertThat(generertTekst).contains("Vi har vurdert om det er grunner til å redusere beløpet. Vi har lagt vekt på at du må ha forstått at beløpet du fikk utbetalt var feil, og det er ingen bestemte grunner til å redusere beløpet. Derfor må du betale tilbake hele beløpet.");
     }
 
     @Test
