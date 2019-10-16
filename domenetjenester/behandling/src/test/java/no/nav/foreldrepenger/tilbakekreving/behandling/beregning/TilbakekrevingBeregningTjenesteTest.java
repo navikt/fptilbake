@@ -132,8 +132,8 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
         assertThat(r.getFeilutbetaltBeløp()).isEqualByComparingTo(BigDecimal.valueOf(10000));
         assertThat(r.getManueltSattTilbakekrevingsbeløp()).isNull();
         assertThat(r.getAndelAvBeløp()).isEqualByComparingTo(BigDecimal.valueOf(100));
-        assertThat(r.getSkattBeløp()).isEqualByComparingTo(BigDecimal.valueOf(1100));
-        assertThat(r.getTilbakekrevingBeløpEtterSkatt()).isEqualByComparingTo(BigDecimal.valueOf(9900));
+        assertThat(r.getSkattBeløp()).isEqualByComparingTo(BigDecimal.valueOf(1000));
+        assertThat(r.getTilbakekrevingBeløpEtterSkatt()).isEqualByComparingTo(BigDecimal.valueOf(10000));
 
         assertThat(beregningResultat.getVedtakResultatType()).isEqualByComparingTo(VedtakResultatType.FULL_TILBAKEBETALING);
     }

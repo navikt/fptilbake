@@ -2,7 +2,10 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.beregning;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BeregnBeløpUtil;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingAktsomhetEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingGodTroEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingPeriodeEntitet;
@@ -21,7 +24,7 @@ class TilbakekrevingBeregnerVilkår {
         // for CDI
     }
 
-    static BeregningResultatPeriode beregn(VilkårVurderingPeriodeEntitet vilkårVurdering, BigDecimal kravgrunnlagBeløp, BigDecimal skattProsent) {
+    static BeregningResultatPeriode beregn(VilkårVurderingPeriodeEntitet vilkårVurdering, BigDecimal kravgrunnlagBeløp, List<GrunnlagPeriodeMedSkattProsent> perioderMedSkattProsent) {
         Periode periode = vilkårVurdering.getPeriode();
         Vurdering vurdering = finnVurdering(vilkårVurdering);
         boolean renter = finnRenter(vilkårVurdering);
@@ -41,15 +44,15 @@ class TilbakekrevingBeregnerVilkår {
             ? BigDecimal.ZERO
             : finnBeløpUtenRenter(kravgrunnlagBeløp, andel, manueltBeløp);
         BigDecimal rentebeløp = beregnRentebeløp(beløpUtenRenter, renter);
-        BigDecimal bruttoBeløp = beløpUtenRenter.add(rentebeløp);
-        BigDecimal skattBeløp = beregnSkattBeløp(bruttoBeløp, skattProsent);
-        BigDecimal nettoBeløp = bruttoBeløp.subtract(skattBeløp);
+        BigDecimal tilbakekrevingBeløp = beløpUtenRenter.add(rentebeløp);
+        BigDecimal skattBeløp = beregnSkattBeløp(periode, beløpUtenRenter, perioderMedSkattProsent).setScale(0, RoundingMode.HALF_DOWN); //skatt beregnet alltid med uten renter
+        BigDecimal nettoBeløp = tilbakekrevingBeløp.subtract(skattBeløp);
 
         resulat.setTilbakekrevingBeløpUtenRenter(beløpUtenRenter);
         resulat.setRenteBeløp(rentebeløp);
         resulat.setTilbakekrevingBeløpEtterSkatt(nettoBeløp);
         resulat.setSkattBeløp(skattBeløp);
-        resulat.setTilbakekrevingBeløp(bruttoBeløp);
+        resulat.setTilbakekrevingBeløp(tilbakekrevingBeløp);
         return resulat;
     }
 
@@ -57,8 +60,17 @@ class TilbakekrevingBeregnerVilkår {
         return renter ? beløp.multiply(RENTEFAKTOR).setScale(0, RoundingMode.HALF_UP) : BigDecimal.ZERO;
     }
 
-    private static BigDecimal beregnSkattBeløp(BigDecimal bruttoTilbakekrevesBeløp, BigDecimal skattProsent) {
-        return bruttoTilbakekrevesBeløp.multiply(skattProsent).divide(BigDecimal.valueOf(100), 0, RoundingMode.HALF_DOWN);
+    private static BigDecimal beregnSkattBeløp(Periode periode, BigDecimal bruttoTilbakekrevesBeløp, List<GrunnlagPeriodeMedSkattProsent> perioderMedSkattProsent) {
+        BigDecimal totalKgTilbakekrevesBeløp = perioderMedSkattProsent.stream().map(GrunnlagPeriodeMedSkattProsent::getTilbakekrevesBeløp).reduce(BigDecimal::add).get(); //NOSONAR
+        BigDecimal andel = totalKgTilbakekrevesBeløp.signum() == 0 ? BigDecimal.ZERO : bruttoTilbakekrevesBeløp.divide(totalKgTilbakekrevesBeløp, 4, RoundingMode.HALF_UP);
+        BigDecimal skattBeløp = BigDecimal.ZERO;
+        for (GrunnlagPeriodeMedSkattProsent grunnlagPeriodeMedSkattProsent : perioderMedSkattProsent) {
+            if (periode.overlapper(grunnlagPeriodeMedSkattProsent.getPeriode())) {
+                BigDecimal delTilbakekrevesBeløp = grunnlagPeriodeMedSkattProsent.getTilbakekrevesBeløp().multiply(andel);
+                skattBeløp = skattBeløp.add(delTilbakekrevesBeløp.multiply(grunnlagPeriodeMedSkattProsent.getSkattProsent()).divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP));
+            }
+        }
+        return skattBeløp;
     }
 
     private static BigDecimal finnBeløpUtenRenter(BigDecimal kravgrunnlagBeløp, BigDecimal andel, BigDecimal manueltBeløp) {

@@ -135,7 +135,7 @@ public class TilbakekrevingVedtakPeriodeBeregner {
 
         List<TilbakekrevingBeløp> ytelBeløp = perioder.stream()
             .flatMap(p -> p.getBeløp().stream())
-            .filter(b -> b.getKlasseType() == KlasseType.YTEL)
+            .filter(b -> KlasseType.YTEL.equals(b.getKlasseType() ))
             .collect(Collectors.toList());
 
         if (diff.signum() < 0) {
