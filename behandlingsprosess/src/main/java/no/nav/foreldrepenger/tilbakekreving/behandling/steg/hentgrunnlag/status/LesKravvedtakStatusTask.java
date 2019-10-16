@@ -115,8 +115,9 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
             logger.info("Grunnlag finnes allerede for vedtakId={}", vedtakId);
             KravgrunnlagAggregate kravgrunnlagAggregate = aggregate.get();
             String referense = kravgrunnlagAggregate.getGrunnlagØkonomi().getReferanse();
-            if (!referense.equals(eksternBehandlingId)) {
-                Long behandlingId = kravgrunnlagAggregate.getBehandlingId();
+            Long behandlingId = kravgrunnlagAggregate.getBehandlingId();
+            boolean erEksternBehandlingFinnes = eksternBehandlingRepository.finnesEksternBehandling(behandlingId, Long.valueOf(eksternBehandlingId));
+            if (!referense.equals(eksternBehandlingId) && !erEksternBehandlingFinnes) {
                 Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
                 UUID eksternUUID = hentUUIDFraEksternBehandling(behandlingId);
 
@@ -124,7 +125,7 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
                 EksternBehandling eksternBehandling = new EksternBehandling(behandling, Long.valueOf(eksternBehandlingId), eksternUUID);
                 eksternBehandlingRepository.lagre(eksternBehandling);
             } else {
-                logger.info("Samme eksternBehandlingId={} finnes. Ikke oppdatere eksternBehandling", eksternBehandlingId);
+                logger.info("eksternBehandlingId={} allerede finnes. Ikke oppdatere eksternBehandling", eksternBehandlingId);
             }
 
         }
