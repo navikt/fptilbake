@@ -38,4 +38,6 @@ public interface EksternBehandlingRepository {
      * @return
      */
     Optional<EksternBehandling> finnForSisteAvsluttetTbkBehandling(UUID eksternUuid);
+
+    boolean finnesEksternBehandling(long internId, long eksternId);
 }

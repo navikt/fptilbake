@@ -22,6 +22,7 @@ public class EksternBehandlingRepositoryImpl implements EksternBehandlingReposit
 
     private static final String EKSTERN_ID = "eksternId";
     private static final String EKSTERN_UUID = "eksternUuid";
+    private static final String INTERN_ID = "internId";
     private EntityManager entityManager;
 
     EksternBehandlingRepositoryImpl() {
@@ -48,7 +49,7 @@ public class EksternBehandlingRepositoryImpl implements EksternBehandlingReposit
     @Override
     public EksternBehandling hentFraInternId(long internBehandlingId) {
         TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where intern_id=:internId and aktiv='J'", EksternBehandling.class);
-        query.setParameter("internId", internBehandlingId);
+        query.setParameter(INTERN_ID, internBehandlingId);
         return hentEksaktResultat(query);
     }
 
@@ -67,7 +68,7 @@ public class EksternBehandlingRepositoryImpl implements EksternBehandlingReposit
     }
 
     @Override
-    public Optional<EksternBehandling> finnForSisteAvsluttetTbkBehandling(UUID eksternUuid){
+    public Optional<EksternBehandling> finnForSisteAvsluttetTbkBehandling(UUID eksternUuid) {
         TypedQuery<EksternBehandling> query = entityManager.createQuery("select eks from EksternBehandling eks , Behandling beh where eks.internId=beh.id " +
             "and eks.eksternUuid=:eksternUuid and beh.behandlingType=:behandlingType " +
             "and beh.status = :behandlingStatus and eks.aktiv='J' " +
@@ -76,14 +77,22 @@ public class EksternBehandlingRepositoryImpl implements EksternBehandlingReposit
         query.setParameter(EKSTERN_UUID, eksternUuid);
         query.setParameter("behandlingType", BehandlingType.TILBAKEKREVING);
         query.setParameter("behandlingStatus", BehandlingStatus.AVSLUTTET);
-        List<EksternBehandling> eksternBehandlinger =  query.getResultList();
+        List<EksternBehandling> eksternBehandlinger = query.getResultList();
 
         return eksternBehandlinger.isEmpty() ? Optional.empty() : Optional.of(eksternBehandlinger.get(0));
     }
 
+    @Override
+    public boolean finnesEksternBehandling(long internId, long eksternId) {
+        TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where ekstern_id=:eksternId and intern_id=:internId and aktiv='J'", EksternBehandling.class);
+        query.setParameter(EKSTERN_ID, eksternId);
+        query.setParameter(INTERN_ID, internId);
+        return !query.getResultList().isEmpty();
+    }
+
     private Optional<EksternBehandling> hentOptionalFraInternId(long internBehandlingId) {
         TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where intern_id=:internId and aktiv='J'", EksternBehandling.class);
-        query.setParameter("internId", internBehandlingId);
+        query.setParameter(INTERN_ID, internBehandlingId);
         return hentUniktResultat(query);
     }
 }
