@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -177,6 +178,19 @@ public class HenleggBehandlingTjenesteTest {
     }
 
     @Test
+    public void skal_henlegge_behandling_uten_å_sende_annulere_grunnlag(){
+        BehandlingResultatType behandlingsresultat = BehandlingResultatType.HENLAGT_FEILOPPRETTET;
+        when(kravgrunnlagRepositoryMock.harGrunnlagForBehandlingId(behandling.getId())).thenReturn(true);
+
+        henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), behandlingsresultat, true);
+
+        verify(historikkRepositoryMock,atLeastOnce()).lagre(any(Historikkinnslag.class));
+        verify(repositoryProviderMock.getBehandlingRepository(), atLeast(2)).lagre(eq(behandling), any(BehandlingLås.class));
+        verify(prosessTaskRepositoryMock,never()).lagre(any(ProsessTaskData.class));
+
+    }
+
+    @Test
     public void kan_henlegge_behandling_som_er_satt_på_vent() {
         // Arrange
         AksjonspunktDefinisjon def = AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING;
@@ -229,4 +243,5 @@ public class HenleggBehandlingTjenesteTest {
         // forsøker å henlegge behandlingen igjen
         henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), behandlingsresultat, "begrunnelse");
     }
+
 }

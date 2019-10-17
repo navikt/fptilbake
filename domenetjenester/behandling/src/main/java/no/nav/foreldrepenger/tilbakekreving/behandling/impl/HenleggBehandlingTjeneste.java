@@ -51,10 +51,14 @@ public class HenleggBehandlingTjeneste {
     }
 
     public void henleggBehandling(long behandlingId, BehandlingResultatType årsakKode, String begrunnelse) {
-        doHenleggBehandling(behandlingId, årsakKode, begrunnelse, false);
+        doHenleggBehandling(behandlingId, årsakKode, begrunnelse, false, false);
     }
 
-    private void doHenleggBehandling(long behandlingId, BehandlingResultatType årsakKode, String begrunnelse, boolean avbrytVentendeAutopunkt) {
+    public void henleggBehandling(long behandlingId, BehandlingResultatType årsakKode, boolean kommerAvsluttetMeldingfraØkonomi) {
+        doHenleggBehandling(behandlingId, årsakKode, null, false, kommerAvsluttetMeldingfraØkonomi);
+    }
+
+    private void doHenleggBehandling(long behandlingId, BehandlingResultatType årsakKode, String begrunnelse, boolean avbrytVentendeAutopunkt, boolean kommerAvsluttetMeldingfraØkonomi) {
         BehandlingskontrollKontekst kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandlingId);
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         if (avbrytVentendeAutopunkt && behandling.isBehandlingPåVent()) {
@@ -68,7 +72,7 @@ public class HenleggBehandlingTjeneste {
         if (kanSendeHenleggelsebrev(behandling)) {
             sendHenleggelsesbrev();
         }
-        if (kravgrunnlagRepository.harGrunnlagForBehandlingId(behandlingId)) {
+        if (kravgrunnlagRepository.harGrunnlagForBehandlingId(behandlingId) && ! kommerAvsluttetMeldingfraØkonomi) {
             annulereGrunnlag(kontekst);
         }
         opprettHistorikkinnslag(behandling, årsakKode, begrunnelse);
