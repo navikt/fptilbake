@@ -62,6 +62,7 @@ public class TilbakekrevingsvedtakMapper {
         dto.setBelopUinnkrevd(b.getUinnkrevdBeløp());
         dto.setBelopOpprUtbet(b.getUtbetaltBeløp());
         dto.setBelopNy(b.getNyttBeløp());
+        dto.setBelopSkatt(b.getSkattBeløp());
         if (KlasseType.YTEL.equals(b.getKlasseType())) {
             dto.setKodeResultat(b.getKodeResultat().getKode());
             dto.setKodeAarsak("ANNET"); // fast verdi

@@ -80,19 +80,19 @@ public class TilbakekrevingVedtakPeriodeBeregnerScenarioerTest {
         Assertions.assertThat(resultat).containsOnly(
             TilbakekrevingPeriode.med(PP2018.periode("16/3-31/3")).medRenter(0)
                 .medBeløp(TbkBeløp.feil(11000))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(11000).medNyttBeløp(0).medTilbakekrevBeløp(0).medUinnkrevdBeløp(11000)),
+                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(11000).medNyttBeløp(0).medTilbakekrevBeløp(0).medUinnkrevdBeløp(11000).medSkattBeløp(0)),
             TilbakekrevingPeriode.med(PP2018.periode("1/4-3/4")).medRenter(0)
                 .medBeløp(TbkBeløp.feil(2000))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(2000).medNyttBeløp(0).medTilbakekrevBeløp(0).medUinnkrevdBeløp(2000)),
+                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(2000).medNyttBeløp(0).medTilbakekrevBeløp(0).medUinnkrevdBeløp(2000).medSkattBeløp(0)),
             TilbakekrevingPeriode.med(PP2018.periode("4/4-20/4")).medRenter(0)
                 .medBeløp(TbkBeløp.feil(13000))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(13000).medNyttBeløp(0).medTilbakekrevBeløp(6500).medUinnkrevdBeløp(6500)),
+                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(13000).medNyttBeløp(0).medTilbakekrevBeløp(6500).medUinnkrevdBeløp(6500).medSkattBeløp(0)),
             TilbakekrevingPeriode.med(PP2018.periode("21/4-30/4")).medRenter(0)
                 .medBeløp(TbkBeløp.feil(6000))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(6000).medNyttBeløp(0).medTilbakekrevBeløp(6000).medUinnkrevdBeløp(0)),
+                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(6000).medNyttBeløp(0).medTilbakekrevBeløp(6000).medUinnkrevdBeløp(0).medSkattBeløp(0)),
             TilbakekrevingPeriode.med(PP2018.periode("1/5-26/5")).medRenter(0)
                 .medBeløp(TbkBeløp.feil(19000))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(19000).medNyttBeløp(0).medTilbakekrevBeløp(19000).medUinnkrevdBeløp(0)));
+                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(19000).medNyttBeløp(0).medTilbakekrevBeløp(19000).medUinnkrevdBeløp(0).medSkattBeløp(0)));
     }
 
 
@@ -123,13 +123,13 @@ public class TilbakekrevingVedtakPeriodeBeregnerScenarioerTest {
         Assertions.assertThat(resultat).containsOnly(
             TilbakekrevingPeriode.med(PP2018.periode("10/4-30/4")).medRenter(0)
                 .medBeløp(TbkBeløp.feil(7500))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(15000).medNyttBeløp(7500).medTilbakekrevBeløp(7500).medUinnkrevdBeløp(0)),
+                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(15000).medNyttBeløp(7500).medTilbakekrevBeløp(7500).medUinnkrevdBeløp(0).medSkattBeløp(0)),
             TilbakekrevingPeriode.med(PP2018.periode("1/5-5/5")).medRenter(0)
                 .medBeløp(TbkBeløp.feil(2000))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(4000).medNyttBeløp(2000).medTilbakekrevBeløp(2000).medUinnkrevdBeløp(0)),
+                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(4000).medNyttBeløp(2000).medTilbakekrevBeløp(2000).medUinnkrevdBeløp(0).medSkattBeløp(0)),
             TilbakekrevingPeriode.med(PP2018.periode("6/5-20/5")).medRenter(0)
                 .medBeløp(TbkBeløp.feil(10000))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(10000).medNyttBeløp(0).medTilbakekrevBeløp(10000).medUinnkrevdBeløp(0))
+                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(10000).medNyttBeløp(0).medTilbakekrevBeløp(10000).medUinnkrevdBeløp(0).medSkattBeløp(0))
             );
     }
 

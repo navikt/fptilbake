@@ -1076,10 +1076,10 @@
     </profiles>
 
     <scm>
-        <connection>scm:git:ssh://git@stash.devillo.no:7999/vedfp/vl-tilbakekreving.git</connection>
-        <developerConnection>scm:git:ssh://git@stash.devillo.no:7999/vedfp/vl-tilbakekreving.git
+        <connection>scm:git:https://github.com/navikt/fptilbake.git</connection>
+        <developerConnection>scm:git:https://github.com/navikt/fptilbake.git
         </developerConnection>
-        <url>http://stash.devillo.no/projects/VEDFP/repos/vl-tilbakekreving/browse</url>
+        <url>https://github.com/navikt/fptilbake</url>
     </scm>
 
     <distributionManagement>

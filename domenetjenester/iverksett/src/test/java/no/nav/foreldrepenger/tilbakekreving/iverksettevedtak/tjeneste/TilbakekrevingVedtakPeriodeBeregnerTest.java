@@ -87,7 +87,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         List<TilbakekrevingPeriode> resultat = beregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
         assertThat(resultat).containsOnly(TilbakekrevingPeriode.med(uke1).medRenter(900)
             .medBeløp(TbkBeløp.feil(9000))
-            .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(11000).medTilbakekrevBeløp(9000).medUinnkrevdBeløp(0)));
+            .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(11000).medTilbakekrevBeløp(9000).medUinnkrevdBeløp(0).medSkattBeløp(0)));
     }
 
     @Test
@@ -117,7 +117,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         List<TilbakekrevingPeriode> resultat = beregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
         assertThat(resultat).containsOnly(TilbakekrevingPeriode.med(uke1).medRenter(0)
             .medBeløp(TbkBeløp.feil(9000))
-            .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(11000).medTilbakekrevBeløp(0).medUinnkrevdBeløp(9000)));
+            .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(11000).medTilbakekrevBeløp(0).medUinnkrevdBeløp(9000).medSkattBeløp(0)));
     }
 
     @Test
@@ -146,11 +146,11 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         assertThat(resultat).containsOnly(
             TilbakekrevingPeriode.med(uke1).medRenter(100)
                 .medBeløp(TbkBeløp.feil(1000))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medUinnkrevdBeløp(0)),
+                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medUinnkrevdBeløp(0).medSkattBeløp(0)),
 
             TilbakekrevingPeriode.med(uke2).medRenter(200)
                 .medBeløp(TbkBeløp.feil(2000))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(2000).medTilbakekrevBeløp(2000).medUinnkrevdBeløp(0))
+                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(2000).medTilbakekrevBeløp(2000).medUinnkrevdBeløp(0).medSkattBeløp(0))
         );
     }
 
@@ -164,7 +164,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
             uke1til3, Arrays.asList(
                 KgBeløp.feil(3000),
-                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(3000).medTilbakekrevBeløp(3000))
+                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(3000).medTilbakekrevBeløp(3000).medSkattProsent(0))
         ));
 
         VilkårsvurderingTestBuilder.medRepo(vilkårsvurderingRepository).lagre(behandlingId, Map.of(
@@ -178,11 +178,11 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         assertThat(resultat).containsOnly(
             TilbakekrevingPeriode.med(uke1og2).medRenter(200)
                 .medBeløp(TbkBeløp.feil(2000))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(2000).medTilbakekrevBeløp(2000).medUinnkrevdBeløp(0)),
+                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(2000).medTilbakekrevBeløp(2000).medUinnkrevdBeløp(0).medSkattBeløp(0)),
 
             TilbakekrevingPeriode.med(uke3).medRenter(0)
                 .medBeløp(TbkBeløp.feil(1000))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(1000).medTilbakekrevBeløp(300).medUinnkrevdBeløp(700))
+                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(1000).medTilbakekrevBeløp(300).medUinnkrevdBeløp(700).medSkattBeløp(0))
 
         );
     }
@@ -195,8 +195,8 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
             uke1, Arrays.asList(
                 KgBeløp.feil(2500),
-                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000),
-                KgBeløp.ytelse(KlasseKode.FPSNDFI).medUtbetBeløp(1500).medTilbakekrevBeløp(1500))
+                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medSkattProsent(0),
+                KgBeløp.ytelse(KlasseKode.FPSNDFI).medUtbetBeløp(1500).medTilbakekrevBeløp(1500).medSkattProsent(0))
         ));
 
         VilkårsvurderingTestBuilder.medRepo(vilkårsvurderingRepository).lagre(behandlingId, Map.of(
@@ -209,8 +209,8 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         assertThat(resultat).containsOnly(
             TilbakekrevingPeriode.med(uke1).medRenter(250)
                 .medBeløp(TbkBeløp.feil(2500))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medUinnkrevdBeløp(0))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPSNDFI).medNyttBeløp(0).medUtbetBeløp(1500).medTilbakekrevBeløp(1500).medUinnkrevdBeløp(0))
+                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medUinnkrevdBeløp(0).medSkattBeløp(0))
+                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPSNDFI).medNyttBeløp(0).medUtbetBeløp(1500).medTilbakekrevBeløp(1500).medUinnkrevdBeløp(0).medSkattBeløp(0))
         );
     }
 
@@ -222,15 +222,15 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
             uke1, Arrays.asList(
                 KgBeløp.feil(1000),
-                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000)
+                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medSkattProsent(0)
             ),
             uke2, Arrays.asList(
                 KgBeløp.feil(1000),
-                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000)
+                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medSkattProsent(0)
             ),
             uke3, Arrays.asList(
                 KgBeløp.feil(1000),
-                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000)
+                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medSkattProsent(0)
             )
         ));
 
@@ -249,13 +249,13 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         assertThat(resultat).containsOnly(
             TilbakekrevingPeriode.med(uke1).medRenter(0)
                 .medBeløp(TbkBeløp.feil(1000))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(1000).medTilbakekrevBeløp(334).medUinnkrevdBeløp(666)),
+                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(1000).medTilbakekrevBeløp(334).medUinnkrevdBeløp(666).medSkattBeløp(0)),
             TilbakekrevingPeriode.med(uke2).medRenter(0)
                 .medBeløp(TbkBeløp.feil(1000))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(1000).medTilbakekrevBeløp(333).medUinnkrevdBeløp(667)),
+                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(1000).medTilbakekrevBeløp(333).medUinnkrevdBeløp(667).medSkattBeløp(0)),
             TilbakekrevingPeriode.med(uke3).medRenter(0)
                 .medBeløp(TbkBeløp.feil(1000))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(1000).medTilbakekrevBeløp(333).medUinnkrevdBeløp(667))
+                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(1000).medTilbakekrevBeløp(333).medUinnkrevdBeløp(667).medSkattBeløp(0))
         );
     }
 
@@ -288,14 +288,107 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         assertThat(resultat).containsOnly(
             TilbakekrevingPeriode.med(uke1).medRenter(0)
                 .medBeløp(TbkBeløp.feil(333))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(333).medTilbakekrevBeløp(333).medUinnkrevdBeløp(0)),
+                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(333).medTilbakekrevBeløp(333).medUinnkrevdBeløp(0).medSkattBeløp(0)),
             TilbakekrevingPeriode.med(uke2).medRenter(0)
                 .medBeløp(TbkBeløp.feil(334))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(334).medTilbakekrevBeløp(100).medUinnkrevdBeløp(234)),
+                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(334).medTilbakekrevBeløp(100).medUinnkrevdBeløp(234).medSkattBeløp(0)),
             TilbakekrevingPeriode.med(uke3).medRenter(0)
                 .medBeløp(TbkBeløp.feil(333))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(333).medTilbakekrevBeløp(333).medUinnkrevdBeløp(0))
+                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(333).medTilbakekrevBeløp(333).medUinnkrevdBeløp(0).medSkattBeløp(0))
         );
+    }
+
+    @Test
+    public void skal_beregne_skatt_beløp_for_grunnlag_med_skatt_prosent_for_full_tilbakekreving(){
+        Behandling behandling = simple.lagre(behandlingRepositoryProvider);
+        Long behandlingId = behandling.getId();
+
+        Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
+            uke1, Arrays.asList(
+                KgBeløp.feil(1000),
+                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medSkattProsent(10)
+            )
+        ));
+
+        VilkårsvurderingTestBuilder.medRepo(vilkårsvurderingRepository).lagre(behandlingId, Map.of(
+            uke1, VilkårsvurderingTestBuilder.VVurdering.simpelUaktsom()
+        ));
+
+        flushAndClear();
+
+        List<TilbakekrevingPeriode> resultat = beregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
+
+        assertThat(finSumAv(resultat, TilbakekrevingBeløp::getNyttBeløp, KlasseType.FEIL)).isEqualByComparingTo(BigDecimal.valueOf(1000));
+        assertThat(finSumAv(resultat, TilbakekrevingBeløp::getUtbetaltBeløp, KlasseType.YTEL)).isEqualByComparingTo(BigDecimal.valueOf(1000));
+
+        //resterende asserts i testen definerer i hvilken periode den ekstra kronen legges. Det er sannsynligvis ikke viktig.
+        assertThat(resultat).containsOnly(
+            TilbakekrevingPeriode.med(uke1).medRenter(0)
+                .medBeløp(TbkBeløp.feil(1000))
+                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medUinnkrevdBeløp(0).medSkattBeløp(100)));
+
+    }
+
+    @Test
+    public void skal_beregne_skatt_beløp_for_grunnlag_med_skatt_prosent_for_ingen_tilbakekreving(){
+        Behandling behandling = simple.lagre(behandlingRepositoryProvider);
+        Long behandlingId = behandling.getId();
+
+        Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
+            uke1, Arrays.asList(
+                KgBeløp.feil(1000),
+                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medSkattProsent(10)
+            )
+        ));
+
+        VilkårsvurderingTestBuilder.medRepo(vilkårsvurderingRepository).lagre(behandlingId, Map.of(
+            uke1, VilkårsvurderingTestBuilder.VVurdering.godTro()
+        ));
+
+        flushAndClear();
+
+        List<TilbakekrevingPeriode> resultat = beregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
+
+        assertThat(finSumAv(resultat, TilbakekrevingBeløp::getNyttBeløp, KlasseType.FEIL)).isEqualByComparingTo(BigDecimal.valueOf(1000));
+        assertThat(finSumAv(resultat, TilbakekrevingBeløp::getUtbetaltBeløp, KlasseType.YTEL)).isEqualByComparingTo(BigDecimal.valueOf(1000));
+
+        //resterende asserts i testen definerer i hvilken periode den ekstra kronen legges. Det er sannsynligvis ikke viktig.
+        assertThat(resultat).containsOnly(
+            TilbakekrevingPeriode.med(uke1).medRenter(0)
+                .medBeløp(TbkBeløp.feil(1000))
+                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(1000).medTilbakekrevBeløp(0).medUinnkrevdBeløp(1000).medSkattBeløp(0)));
+
+    }
+
+    @Test
+    public void skal_beregne_skatt_beløp_for_grunnlag_med_skatt_prosent_for_delvis_tilbakekreving(){
+        Behandling behandling = simple.lagre(behandlingRepositoryProvider);
+        Long behandlingId = behandling.getId();
+
+        Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
+            uke1, Arrays.asList(
+                KgBeløp.feil(1000),
+                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medSkattProsent(10)
+            )
+        ));
+
+        VilkårsvurderingTestBuilder.medRepo(vilkårsvurderingRepository).lagre(behandlingId, Map.of(
+            uke1, VilkårsvurderingTestBuilder.VVurdering.godTro().setManueltBeløp(500)
+        ));
+
+        flushAndClear();
+
+        List<TilbakekrevingPeriode> resultat = beregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
+
+        assertThat(finSumAv(resultat, TilbakekrevingBeløp::getNyttBeløp, KlasseType.FEIL)).isEqualByComparingTo(BigDecimal.valueOf(1000));
+        assertThat(finSumAv(resultat, TilbakekrevingBeløp::getUtbetaltBeløp, KlasseType.YTEL)).isEqualByComparingTo(BigDecimal.valueOf(1000));
+
+        //resterende asserts i testen definerer i hvilken periode den ekstra kronen legges. Det er sannsynligvis ikke viktig.
+        assertThat(resultat).containsOnly(
+            TilbakekrevingPeriode.med(uke1).medRenter(0)
+                .medBeløp(TbkBeløp.feil(1000))
+                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(1000).medTilbakekrevBeløp(500).medUinnkrevdBeløp(500).medSkattBeløp(50)));
+
     }
 
     @Test
