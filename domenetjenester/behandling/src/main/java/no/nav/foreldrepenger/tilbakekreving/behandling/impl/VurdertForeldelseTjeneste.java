@@ -3,6 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -116,6 +117,7 @@ public class VurdertForeldelseTjeneste {
         FeilutbetalingPerioderDto feilutbetalingPerioderDto = new FeilutbetalingPerioderDto();
         if (vurdertForeldelseGrunnlag.isPresent()) {
             KravgrunnlagAggregate aggregate = grunnlagRepository.finnEksaktGrunnlagForBehandlingId(behandlingId);
+            Kravgrunnlag431 kravgrunnlag = aggregate.getGrunnlagØkonomi();
             List<PeriodeDto> perioder = new ArrayList<>();
             VurdertForeldelseAggregate vurdertForeldelseAggregate = vurdertForeldelseGrunnlag.get();
             VurdertForeldelse vurdertForeldelse = vurdertForeldelseAggregate.getVurdertForeldelse();
@@ -126,7 +128,7 @@ public class VurdertForeldelseTjeneste {
                 periodeDto.setPeriode(vurdertForeldelsePeriode.getPeriode());
                 periodeDto.setForeldelseVurderingType(vurdertForeldelsePeriode.getForeldelseVurderingType());
                 periodeDto.setBegrunnelse(vurdertForeldelsePeriode.getBegrunnelse());
-                periodeDto.setBelop(beregnFeilutbetaltBeløp(aggregate, vurdertForeldelsePeriode.getPeriode()));
+                periodeDto.setBelop(beregnFeilutbetaltBeløp(kravgrunnlag, vurdertForeldelsePeriode.getPeriode()));
                 perioder.add(periodeDto);
             }
             feilutbetalingPerioderDto.setPerioder(perioder);
@@ -134,15 +136,22 @@ public class VurdertForeldelseTjeneste {
         return feilutbetalingPerioderDto;
     }
 
-    public Map<Periode, BigDecimal> beregnFeilutbetaltBeløpForPerioder(Long behandlingId, List<Periode> perioder) {
+    //TODO flytt til annen/egen tjeneste, hører ikke til sammen med Foreldelse
+    public Map<Periode, BigDecimal> beregnFeilutbetaltBeløpForPerioder(Kravgrunnlag431 kravgrunnlag, List<Periode> perioder) {
         var map = new HashMap<Periode, BigDecimal>();
-        Optional<KravgrunnlagAggregate> aggregate = grunnlagRepository.finnGrunnlagForBehandlingId(behandlingId);
-        if (aggregate.isPresent()) {
-            for (Periode periode : perioder) {
-                map.put(periode, beregnFeilutbetaltBeløp(aggregate.get(), periode));
-            }
+        for (Periode periode : perioder) {
+            map.put(periode, beregnFeilutbetaltBeløp(kravgrunnlag, periode));
         }
         return map;
+    }
+
+    //TODO flytt til annen/egen tjeneste, hører ikke til sammen med Foreldelse
+    public Map<Periode, BigDecimal> beregnFeilutbetaltBeløpForPerioder(Long behandlingId, List<Periode> perioder) {
+        Optional<KravgrunnlagAggregate> aggregate = grunnlagRepository.finnGrunnlagForBehandlingId(behandlingId);
+        if (aggregate.isPresent()) {
+            return beregnFeilutbetaltBeløpForPerioder(aggregate.get().getGrunnlagØkonomi(), perioder);
+        }
+        return Collections.emptyMap();
     }
 
     public boolean harForeldetPeriodeForBehandlingId(Long behandlingId) {
@@ -157,8 +166,8 @@ public class VurdertForeldelseTjeneste {
             .build();
     }
 
-    private BigDecimal beregnFeilutbetaltBeløp(KravgrunnlagAggregate aggregate, Periode foreldetPeriode) {
-        Kravgrunnlag431 kravgrunnlag = aggregate.getGrunnlagØkonomi();
+    //TODO flytt til annen/egen tjeneste, hører ikke til sammen med Foreldelse
+    private BigDecimal beregnFeilutbetaltBeløp(Kravgrunnlag431 kravgrunnlag, Periode foreldetPeriode) {
         List<KravgrunnlagPeriode432> kgPerioder = new ArrayList<>(kravgrunnlag.getPerioder());
         kgPerioder.sort(Comparator.comparing(p -> p.getPeriode().getFom()));
         BigDecimal sum = BigDecimal.ZERO;

@@ -33,7 +33,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Foreldel
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.InntektskategoriKlassekodeMapper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingAggregateEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingEntitet;
@@ -251,7 +250,7 @@ public class VilkårsvurderingTjeneste {
             Inntektskategori inntektskategori = finnesInntektsKategori(belop);
             YtelseDto ytelse = new YtelseDto();
             ytelse.setAktivitet(inntektskategori.getNavn());
-            ytelse.setBelop(BeregnBeløpUtil.beregnYtelseBeløp(belop.getTilbakekrevesBelop(), feilutbetalingPeriode, grunnlagPeriode));
+            ytelse.setBelop(BeregnBeløpUtil.beregnBeløpForPeriode(belop.getTilbakekrevesBelop(), feilutbetalingPeriode, grunnlagPeriode));
             ytelser.add(ytelse);
         }
         return ytelser;
