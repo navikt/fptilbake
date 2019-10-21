@@ -53,9 +53,10 @@ public class ForeldelseRestTjenesteTest {
 
         FeilutbetalingPerioderDto dto = new FeilutbetalingPerioderDto();
         dto.setPerioder(Collections.singletonList(periodeDto));
+        dto.setBehandlingId(1000L);
 
         Map<Periode, BigDecimal> feilutbetaltePerioder = Map.of(Periode.of(periodeDto.getFom(), periodeDto.getTom()), BigDecimal.valueOf(3999));
-        Mockito.when(vurdertForeldelseTjenesteMock.beregnFeilutbetaltBeløpForPerioder(Mockito.any(), Mockito.any())).thenReturn(feilutbetaltePerioder);
+        Mockito.when(vurdertForeldelseTjenesteMock.beregnFeilutbetaltBeløpForPerioder(Mockito.anyLong(), Mockito.any())).thenReturn(feilutbetaltePerioder);
 
         FeilutbetalingPerioderDto resultat = restTjeneste.beregnBeløp(dto);
 

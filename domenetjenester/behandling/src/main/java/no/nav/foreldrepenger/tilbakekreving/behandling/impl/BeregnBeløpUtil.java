@@ -30,7 +30,7 @@ public class BeregnBeløpUtil {
         return BigDecimal.ZERO;
     }
 
-    public static BigDecimal beregnYtelseBeløp(BigDecimal tilbakekrevesBeløp, Periode feilutbetalingPeriode, Periode periode) {
+    public static BigDecimal beregnBeløpForPeriode(BigDecimal tilbakekrevesBeløp, Periode feilutbetalingPeriode, Periode periode) {
         BigDecimal grunnlagBelopPerUkeDager = BeregnBeløpUtil.beregnBeløpPrVirkedag(tilbakekrevesBeløp, periode);
         BigDecimal ytelseBeløp = BeregnBeløpUtil.beregnBeløp(feilutbetalingPeriode, periode, grunnlagBelopPerUkeDager);
         return ytelseBeløp.setScale(0, RoundingMode.HALF_UP);
