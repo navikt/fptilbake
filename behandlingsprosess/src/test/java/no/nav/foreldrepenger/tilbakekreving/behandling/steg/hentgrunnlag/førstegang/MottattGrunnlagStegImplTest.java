@@ -14,8 +14,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.Grunnla
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandleStegResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.transisjoner.FellesTransisjoner;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
@@ -26,9 +24,6 @@ public class MottattGrunnlagStegImplTest extends FellesTestOppsett {
 
     @Test
     public void skal_sette_behandling_på_vent() {
-        fagsakRepository.lagre(fagsak);
-        Behandling behandling = lagBehandling();
-
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
         BehandleStegResultat stegResultat = steg().utførSteg(new BehandlingskontrollKontekst(fagsak.getId(), fagsak.getAktørId(), lås));
 
@@ -40,8 +35,6 @@ public class MottattGrunnlagStegImplTest extends FellesTestOppsett {
 
     @Test
     public void skal_utføre_steg_uten_aksjonspunkt() {
-        fagsakRepository.lagre(fagsak);
-        Behandling behandling = lagBehandling();
         KravgrunnlagAggregate kravgrunnlagAggregate = KravgrunnlagAggregate.builder().
             medBehandlingId(behandling.getId()).medAktiv(true).medGrunnlagØkonomi(KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList())).build();
         grunnlagRepository.lagre(kravgrunnlagAggregate);
@@ -54,11 +47,17 @@ public class MottattGrunnlagStegImplTest extends FellesTestOppsett {
         assertThat(behandling.getAksjonspunkter()).isEmpty();
     }
 
-    private Behandling lagBehandling() {
-        Behandling behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).build();
+    @Test
+    public void skal_fortsatt_på_vent_hvis_grunnlag_er_sperret() {
+        KravgrunnlagAggregate kravgrunnlagAggregate = KravgrunnlagAggregate.builder().
+            medBehandlingId(behandling.getId()).medAktiv(true).medGrunnlagØkonomi(KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList())).build();
+        kravgrunnlagAggregate.sperr();
+        grunnlagRepository.lagre(kravgrunnlagAggregate);
+
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
-        Long behandlingId = behandlingRepository.lagre(behandling, lås);
-        return behandlingRepository.hentBehandling(behandlingId);
+        BehandleStegResultat stegResultat = steg().gjenopptaSteg(new BehandlingskontrollKontekst(fagsak.getId(), fagsak.getAktørId(), lås));
+        assertThat(stegResultat.getTransisjon()).isEqualTo(FellesTransisjoner.SETT_PÅ_VENT);
+        assertThat(behandling.isBehandlingPåVent()).isTrue();
     }
 
     private GrunnlagSteg steg() {

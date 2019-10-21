@@ -26,6 +26,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatus437;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatusAggregate;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatusRepository;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagAggregate;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
 
@@ -35,7 +36,7 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
     private BehandlingresultatRepository behandlingresultatRepository = new BehandlingresultatRepositoryImpl(repoRule.getEntityManager());
 
     private HenleggBehandlingTjeneste henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repositoryProvider, prosessTaskRepository, behandlingskontrollTjeneste, historikkinnslagTjeneste);
-    private KravVedtakStatusTjeneste kravVedtakStatusTjeneste = new KravVedtakStatusTjeneste(kravVedtakStatusRepository, behandlingRepository, henleggBehandlingTjeneste, behandlingskontrollTjeneste);
+    private KravVedtakStatusTjeneste kravVedtakStatusTjeneste = new KravVedtakStatusTjeneste(kravVedtakStatusRepository, repositoryProvider, henleggBehandlingTjeneste, behandlingskontrollTjeneste);
     private KravVedtakStatusMapper kravVedtakStatusMapper = new KravVedtakStatusMapper(tpsAdapterWrapper);
     private LesKravvedtakStatusTask lesKravvedtakStatusTask = new LesKravvedtakStatusTask(mottattXmlRepository, repositoryProvider, prosessTaskRepository,
         kravVedtakStatusTjeneste, kravVedtakStatusMapper, fpsakKlientMock);
@@ -165,6 +166,9 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         assertThat(aggregate).isPresent();
         KravVedtakStatus437 kravVedtakStatus437 = aggregate.get().getKravVedtakStatus();
         assertThat(kravVedtakStatus437.getKravStatusKode()).isEqualByComparingTo(KravStatusKode.SPERRET);
+
+        KravgrunnlagAggregate kravgrunnlagAggregate = grunnlagRepository.finnEksaktGrunnlagForBehandlingId(behandling.getId());
+        assertThat(kravgrunnlagAggregate.isSperret()).isTrue();
     }
 
     @Test
@@ -188,5 +192,8 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         assertThat(aggregate).isPresent();
         KravVedtakStatus437 kravVedtakStatus437 = aggregate.get().getKravVedtakStatus();
         assertThat(kravVedtakStatus437.getKravStatusKode()).isEqualByComparingTo(KravStatusKode.SPERRET);
+
+        KravgrunnlagAggregate kravgrunnlagAggregate = grunnlagRepository.finnEksaktGrunnlagForBehandlingId(behandling.getId());
+        assertThat(kravgrunnlagAggregate.isSperret()).isTrue();
     }
 }
