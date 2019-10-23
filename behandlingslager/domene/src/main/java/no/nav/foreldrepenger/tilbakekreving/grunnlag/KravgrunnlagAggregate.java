@@ -66,8 +66,8 @@ public class KravgrunnlagAggregate extends BaseEntitet {
         this.aktiv = false;
     }
 
-    public Boolean isSperret() {
-        return sperret;
+    public boolean isSperret() {
+        return sperret != null && sperret;
     }
 
     public void sperr(){
