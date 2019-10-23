@@ -2,7 +2,6 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.først
 
 import java.time.LocalDateTime;
 import java.time.Period;
-import java.util.Optional;
 import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -11,6 +10,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.GrunnlagSteg;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandleStegResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegRef;
@@ -23,8 +23,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagAggregate;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.vedtak.konfig.KonfigVerdi;
 import no.nav.vedtak.util.FPDateUtil;
 
@@ -37,7 +35,7 @@ public class MottattGrunnlagStegImpl implements GrunnlagSteg {
 
     private BehandlingRepository behandlingRepository;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
-    private KravgrunnlagRepository grunnlagRepository;
+    private GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste;
     private Period ventefrist;
 
     public MottattGrunnlagStegImpl() {
@@ -47,11 +45,11 @@ public class MottattGrunnlagStegImpl implements GrunnlagSteg {
     @Inject
     public MottattGrunnlagStegImpl(BehandlingRepository behandlingRepository,
                                    BehandlingskontrollTjeneste behandlingskontrollTjeneste,
-                                   KravgrunnlagRepository grunnlagRepository,
+                                   GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste,
                                    @KonfigVerdi(value = "frist.grunnlag.tbkg") Period ventefrist) {
         this.behandlingRepository = behandlingRepository;
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
-        this.grunnlagRepository = grunnlagRepository;
+        this.gjenopptaBehandlingTjeneste = gjenopptaBehandlingTjeneste;
         this.ventefrist = ventefrist;
     }
 
@@ -59,7 +57,7 @@ public class MottattGrunnlagStegImpl implements GrunnlagSteg {
     public BehandleStegResultat utførSteg(BehandlingskontrollKontekst kontekst) {
         Behandling behandling = behandlingRepository.hentBehandling(kontekst.getBehandlingId());
 
-        if (kanGjenopptaSteg(kontekst.getBehandlingId())) {
+        if (gjenopptaBehandlingTjeneste.kanGjenopptaSteg(kontekst.getBehandlingId())) {
             return BehandleStegResultat.utførtUtenAksjonspunkter();
         }
         LocalDateTime fristTid = FPDateUtil.nå().plus(ventefrist);
@@ -73,7 +71,7 @@ public class MottattGrunnlagStegImpl implements GrunnlagSteg {
     public BehandleStegResultat gjenopptaSteg(BehandlingskontrollKontekst kontekst) {
         Behandling behandling = behandlingRepository.hentBehandling(kontekst.getBehandlingId());
 
-        if (kanGjenopptaSteg(behandling.getId())) {
+        if (gjenopptaBehandlingTjeneste.kanGjenopptaSteg(behandling.getId())) {
             return BehandleStegResultat.utførtUtenAksjonspunkter();
         }
 
@@ -105,18 +103,6 @@ public class MottattGrunnlagStegImpl implements GrunnlagSteg {
 
     private boolean gåttOverFristen(LocalDateTime fristTid) {
         return fristTid != null && FPDateUtil.nå().toLocalDate().isAfter(fristTid.toLocalDate());
-    }
-
-    private boolean kanGjenopptaSteg(Long behandlingId){
-        boolean kanGjenopptaSteg = false;
-        Optional<KravgrunnlagAggregate> kravgrunnlagAggregate = grunnlagRepository.finnGrunnlagForBehandlingId(behandlingId);
-        if(kravgrunnlagAggregate.isPresent()){
-            KravgrunnlagAggregate aggregate = kravgrunnlagAggregate.get();
-            if(!aggregate.isSperret()){
-                kanGjenopptaSteg = true;
-            }
-        }
-        return kanGjenopptaSteg;
     }
 
 }

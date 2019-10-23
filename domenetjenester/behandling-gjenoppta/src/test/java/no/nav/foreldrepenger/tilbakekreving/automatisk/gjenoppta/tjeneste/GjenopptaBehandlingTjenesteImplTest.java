@@ -36,6 +36,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
@@ -63,6 +64,9 @@ public class GjenopptaBehandlingTjenesteImplTest {
     @Inject
     private BehandlingKandidaterRepository behandlingKandidaterRepository;
 
+    @Inject
+    private KravgrunnlagRepository kravgrunnlagRepository;
+
     private InternalAksjonspunktManipulator internalAksjonspunktManipulator = new InternalAksjonspunktManipulator();
     private ProsessTaskRepository mockProsesstaskRepository = mock(ProsessTaskRepository.class);
     private VarselresponsTjeneste mockVarselResponsTjeneste = mock(VarselresponsTjeneste.class);
@@ -72,6 +76,7 @@ public class GjenopptaBehandlingTjenesteImplTest {
         gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjenesteImpl(mockProsesstaskRepository,
                 behandlingKandidaterRepository,
                 behandlingVenterRepository,
+                kravgrunnlagRepository,
                 mockVarselResponsTjeneste);
     }
 

@@ -61,7 +61,7 @@ public class MottattGrunnlagStegImplTest extends FellesTestOppsett {
     }
 
     private GrunnlagSteg steg() {
-        return new MottattGrunnlagStegImpl(behandlingRepository, behandlingskontrollTjeneste, grunnlagRepository, Period.ofWeeks(4));
+        return new MottattGrunnlagStegImpl(behandlingRepository, behandlingskontrollTjeneste, gjenopptaBehandlingTjeneste, Period.ofWeeks(4));
     }
 
 }

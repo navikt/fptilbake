@@ -36,7 +36,7 @@ public class KravgrunnlagAggregate extends BaseEntitet {
 
     @Convert(converter = BooleanToStringConverter.class)
     @Column(name = "sperret")
-    private boolean sperret = false;
+    private Boolean sperret = false;
 
     KravgrunnlagAggregate() {
         // Hibernate
