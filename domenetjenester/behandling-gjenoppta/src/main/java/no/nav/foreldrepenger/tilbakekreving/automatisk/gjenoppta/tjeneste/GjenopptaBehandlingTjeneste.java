@@ -42,4 +42,11 @@ public interface GjenopptaBehandlingTjeneste {
      */
     List<TaskStatus> hentStatusForGjenopptaBehandlingGruppe(String gruppe);
 
+    /**
+     * Sjekk om behandling kan ta av vent
+     * @param behandlingId
+     * @return
+     */
+    boolean kanGjenopptaSteg(long behandlingId);
+
 }

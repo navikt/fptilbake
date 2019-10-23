@@ -15,6 +15,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingKandidaterRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingVenterRepository;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagAggregate;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.ResponsKanal;
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -23,13 +25,14 @@ import no.nav.vedtak.felles.prosesstask.api.TaskStatus;
 import no.nav.vedtak.log.mdc.MDCOperations;
 
 @ApplicationScoped
-public class GjenopptaBehandlingTjenesteImpl implements GjenopptaBehandlingTjeneste{
+public class GjenopptaBehandlingTjenesteImpl implements GjenopptaBehandlingTjeneste {
 
     private static Logger LOGGER = LoggerFactory.getLogger(GjenopptaBehandlingTjenesteImpl.class);
 
     private ProsessTaskRepository prosessTaskRepository;
     private BehandlingKandidaterRepository behandlingKandidaterRepository;
     private BehandlingVenterRepository behandlingVenterRepository;
+    private KravgrunnlagRepository grunnlagRepository;
     private VarselresponsTjeneste varselresponsTjeneste;
 
     public GjenopptaBehandlingTjenesteImpl() {
@@ -40,10 +43,12 @@ public class GjenopptaBehandlingTjenesteImpl implements GjenopptaBehandlingTjene
     public GjenopptaBehandlingTjenesteImpl(ProsessTaskRepository prosessTaskRepository,
                                            BehandlingKandidaterRepository behandlingKandidaterRepository,
                                            BehandlingVenterRepository behandlingVenterRepository,
+                                           KravgrunnlagRepository kravgrunnlagRepository,
                                            VarselresponsTjeneste varselresponsTjeneste) {
         this.prosessTaskRepository = prosessTaskRepository;
         this.behandlingKandidaterRepository = behandlingKandidaterRepository;
         this.behandlingVenterRepository = behandlingVenterRepository;
+        this.grunnlagRepository = kravgrunnlagRepository;
         this.varselresponsTjeneste = varselresponsTjeneste;
     }
 
@@ -64,12 +69,15 @@ public class GjenopptaBehandlingTjenesteImpl implements GjenopptaBehandlingTjene
     @Override
     public Optional<String> fortsettBehandlingManuelt(long behandlingId) {
         Optional<Behandling> behandlingOpt = behandlingVenterRepository.hentBehandlingPåVent(behandlingId);
-        behandlingOpt.ifPresent(b -> {
-            if (BehandlingStegType.VARSEL.equals(b.getAktivtBehandlingSteg())
-                    && Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING.equals(b.getVenteårsak())) {
+        if (behandlingOpt.isPresent()) {
+            Behandling behandling = behandlingOpt.get();
+            if (BehandlingStegType.VARSEL.equals(behandling.getAktivtBehandlingSteg())
+                && Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING.equals(behandling.getVenteårsak())) {
                 varselresponsTjeneste.lagreRespons(behandlingId, ResponsKanal.MANUELL);
+            } else if (!kanGjenopptaSteg(behandlingId) && Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG.equals(behandling.getVenteårsak())) {
+                return Optional.empty();
             }
-        });
+        }
         return fortsettBehandling(behandlingId);
     }
 
@@ -103,6 +111,19 @@ public class GjenopptaBehandlingTjenesteImpl implements GjenopptaBehandlingTjene
     @Override
     public List<TaskStatus> hentStatusForGjenopptaBehandlingGruppe(String gruppe) {
         return prosessTaskRepository.finnStatusForTaskIGruppe(GjenopptaBehandlingTask.TASKTYPE, gruppe);
+    }
+
+    @Override
+    public boolean kanGjenopptaSteg(long behandlingId) {
+        boolean kanGjenopptaSteg = false;
+        Optional<KravgrunnlagAggregate> kravgrunnlagAggregate = grunnlagRepository.finnGrunnlagForBehandlingId(behandlingId);
+        if (kravgrunnlagAggregate.isPresent()) {
+            KravgrunnlagAggregate aggregate = kravgrunnlagAggregate.get();
+            if (!aggregate.isSperret()) {
+                kanGjenopptaSteg = true;
+            }
+        }
+        return kanGjenopptaSteg;
     }
 
     private String hentCallId() {

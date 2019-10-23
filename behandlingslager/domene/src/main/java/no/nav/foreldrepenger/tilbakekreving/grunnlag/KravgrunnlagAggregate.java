@@ -34,6 +34,10 @@ public class KravgrunnlagAggregate extends BaseEntitet {
     @Column(name = "aktiv", nullable = false)
     private boolean aktiv = true;
 
+    @Convert(converter = BooleanToStringConverter.class)
+    @Column(name = "sperret")
+    private Boolean sperret = false;
+
     KravgrunnlagAggregate() {
         // Hibernate
     }
@@ -60,6 +64,14 @@ public class KravgrunnlagAggregate extends BaseEntitet {
 
     public void disable() {
         this.aktiv = false;
+    }
+
+    public boolean isSperret() {
+        return sperret;
+    }
+
+    public void sperr(){
+        this.sperret = true;
     }
 
     public static Builder builder() {

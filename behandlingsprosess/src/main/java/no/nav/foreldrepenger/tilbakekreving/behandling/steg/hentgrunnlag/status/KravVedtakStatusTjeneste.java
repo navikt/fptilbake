@@ -7,6 +7,7 @@ import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.HenleggBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
@@ -15,6 +16,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatus437;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatusRepository;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 import no.nav.vedtak.feil.Feil;
 import no.nav.vedtak.feil.FeilFactory;
@@ -28,6 +30,7 @@ public class KravVedtakStatusTjeneste {
 
     private KravVedtakStatusRepository kravVedtakStatusRepository;
     private BehandlingRepository behandlingRepository;
+    private KravgrunnlagRepository grunnlagRepository;
 
     private HenleggBehandlingTjeneste henleggBehandlingTjeneste;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
@@ -37,10 +40,11 @@ public class KravVedtakStatusTjeneste {
     }
 
     @Inject
-    public KravVedtakStatusTjeneste(KravVedtakStatusRepository kravVedtakStatusRepository, BehandlingRepository behandlingRepository,
+    public KravVedtakStatusTjeneste(KravVedtakStatusRepository kravVedtakStatusRepository, BehandlingRepositoryProvider repositoryProvider,
                                     HenleggBehandlingTjeneste henleggBehandlingTjeneste, BehandlingskontrollTjeneste behandlingskontrollTjeneste) {
         this.kravVedtakStatusRepository = kravVedtakStatusRepository;
-        this.behandlingRepository = behandlingRepository;
+        this.behandlingRepository = repositoryProvider.getBehandlingRepository();
+        this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.henleggBehandlingTjeneste = henleggBehandlingTjeneste;
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
     }
@@ -50,6 +54,7 @@ public class KravVedtakStatusTjeneste {
             henleggBehandlingTjeneste.henleggBehandling(behandlingId, BehandlingResultatType.HENLAGT_KRAVGRUNNLAG_NULLSTILT, true);
         } else if (KravStatusKode.MANUELL.equals(kravVedtakStatus437.getKravStatusKode()) || KravStatusKode.SPERRET.equals(kravVedtakStatus437.getKravStatusKode())) {
             settBehandlingPåVent(behandlingId);
+            sperrGrunnlag(behandlingId);
         } else {
             throw KravVedtakStatusTjenesteFeil.FACTORY.ugyldigKravStatusKode(kravVedtakStatus437.getKravStatusKode().getKode(), behandlingId).toException();
         }
@@ -60,6 +65,10 @@ public class KravVedtakStatusTjeneste {
         LocalDateTime fristDato = FPDateUtil.nå().plusMonths(3);
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, BehandlingStegType.TBKGSTEG, fristDato, Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
+    }
+
+    private void sperrGrunnlag(Long behandlingId) {
+        grunnlagRepository.sperrGrunnlag(behandlingId);
     }
 
     public interface KravVedtakStatusTjenesteFeil extends DeklarerteFeil {

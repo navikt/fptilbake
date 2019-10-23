@@ -82,6 +82,15 @@ public class KravgrunnlagRepository {
         return hentUniktResultat(query);
     }
 
+    public void sperrGrunnlag(Long behandlingId){
+        Optional<KravgrunnlagAggregate> aggregate = finnGrunnlagForBehandlingId(behandlingId);
+        if(aggregate.isPresent()){
+            aggregate.get().sperr();
+            entityManager.persist(aggregate.get());
+            entityManager.flush();
+        }
+    }
+
     private TypedQuery<KravgrunnlagAggregate> formFinngrunnlagQuery(Long behandlingId) {
         TypedQuery<KravgrunnlagAggregate> query = entityManager.createQuery("from KravgrunnlagAggregate aggr " +
             "where aggr.behandlingId=:behandlingId and aggr.aktiv=:aktiv", KravgrunnlagAggregate.class);
