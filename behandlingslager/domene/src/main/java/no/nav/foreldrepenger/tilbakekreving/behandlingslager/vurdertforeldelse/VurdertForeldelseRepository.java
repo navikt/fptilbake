@@ -12,5 +12,5 @@ public interface VurdertForeldelseRepository {
 
     boolean harVurdertForeldelseForBehandlingId(Long behandlingId);
 
-    void sletteForeldelse(Long behandlingId);
+    void slettForeldelse(Long behandlingId);
 }

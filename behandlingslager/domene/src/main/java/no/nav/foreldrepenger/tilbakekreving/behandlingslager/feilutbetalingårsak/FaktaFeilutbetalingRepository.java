@@ -58,7 +58,7 @@ public class FaktaFeilutbetalingRepository {
         entityManager.flush();
     }
 
-    public void sletteFaktaFeilutbetaling(Long behandlingId) {
+    public void slettFaktaFeilutbetaling(Long behandlingId) {
         disableFaktaAggregate(finnFeilutbetaling(behandlingId));
     }
 

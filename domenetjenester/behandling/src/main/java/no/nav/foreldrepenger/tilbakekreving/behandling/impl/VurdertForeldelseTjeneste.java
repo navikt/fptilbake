@@ -257,7 +257,7 @@ public class VurdertForeldelseTjeneste {
 
 
     private void sletteVilkårData(Long behandlingId) {
-        vilkårsvurderingRepository.sletteVilkårsvurdering(behandlingId);
+        vilkårsvurderingRepository.slettVilkårsvurdering(behandlingId);
     }
 
     private ForeldelseVurderingType finnForeldelseVurderingType(ForeldelseVurderingType foreldelseVurderingType) {

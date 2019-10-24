@@ -3,6 +3,9 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollTjeneste;
@@ -20,6 +23,8 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 
 @ApplicationScoped
 public class KravgrunnlagTjeneste {
+
+    private static final Logger logger = LoggerFactory.getLogger(KravgrunnlagTjeneste.class);
 
     private KravgrunnlagRepository kravgrunnlagRepository;
     private BehandlingRepository behandlingRepository;
@@ -49,11 +54,13 @@ public class KravgrunnlagTjeneste {
     public void lagreTilbakekrevingsgrunnlagFraØkonomi(Long behandlingId, Kravgrunnlag431 kravgrunnlag431) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         if (KravStatusKode.ENDRET.equals(kravgrunnlag431.getKravStatusKode())) {
+            logger.info("Mottok endret kravbrunnlag for behandlingId={}", behandlingId);
             boolean erStegPassert = behandlingskontrollTjeneste.erStegPassert(behandling, BehandlingStegType.FAKTA_FEILUTBETALING);
             BehandlingskontrollKontekst kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandling);
             //forutsatt at FPTILBAKE allrede har fått SPER melding for den behandlingen og sett behandling på vent med VenteÅrsak VENT_PÅ_TILBAKEKREVINGSGRUNNLAG
             behandlingskontrollTjeneste.settAutopunktTilUtført(AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, kontekst);
             if (erStegPassert) {
+                logger.info("Hopper tilbake til {} pga endret kravgrunnlag for behandlingId={}", BehandlingStegType.FAKTA_FEILUTBETALING.getKode(), behandlingId);
                 behandlingskontrollTjeneste.behandlingTilbakeføringTilTidligereBehandlingSteg(kontekst, BehandlingStegType.FAKTA_FEILUTBETALING);
             }
             //Perioder knyttet med gammel grunnlag må slettes
@@ -64,9 +71,10 @@ public class KravgrunnlagTjeneste {
     }
 
     private void sletteGammelData(Long behandlingId) {
-        faktaFeilutbetalingRepository.sletteFaktaFeilutbetaling(behandlingId);
-        vurdertForeldelseRepository.sletteForeldelse(behandlingId);
-        vilkårsvurderingRepository.sletteVilkårsvurdering(behandlingId);
+        logger.info("Sletter fakta,foreldelse og vilkårsvurdering for for behandlingId={} på endret kravgrunnlag", behandlingId);
+        faktaFeilutbetalingRepository.slettFaktaFeilutbetaling(behandlingId);
+        vurdertForeldelseRepository.slettForeldelse(behandlingId);
+        vilkårsvurderingRepository.slettVilkårsvurdering(behandlingId);
     }
 
 }

@@ -82,7 +82,7 @@ public class VilkårsvurderingRepository {
         return hentUniktResultat(query);
     }
 
-    public void sletteVilkårsvurdering(Long behandlingId) {
+    public void slettVilkårsvurdering(Long behandlingId) {
         Optional<VilkårVurderingAggregateEntitet> vilkårVurderingAggregateEntitet = finnVilkårsvurderingForBehandlingId(behandlingId);
         vilkårVurderingAggregateEntitet.ifPresent(aggregateEntitet -> {
             aggregateEntitet.disable();

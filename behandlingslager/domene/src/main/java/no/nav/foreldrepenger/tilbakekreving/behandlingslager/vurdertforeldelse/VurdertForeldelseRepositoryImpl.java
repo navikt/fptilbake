@@ -74,7 +74,7 @@ public class VurdertForeldelseRepositoryImpl implements VurdertForeldelseReposit
     }
 
     @Override
-    public void sletteForeldelse(Long behandlingId) {
+    public void slettForeldelse(Long behandlingId) {
         disableForrigeAggregat(behandlingId);
     }
 
