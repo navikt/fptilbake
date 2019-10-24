@@ -73,5 +73,10 @@ public class VurdertForeldelseRepositoryImpl implements VurdertForeldelseReposit
         return query.getSingleResult() > 0;
     }
 
+    @Override
+    public void slettForeldelse(Long behandlingId) {
+        disableForrigeAggregat(behandlingId);
+    }
+
 
 }

@@ -11,4 +11,6 @@ public interface VurdertForeldelseRepository {
     Optional<VurdertForeldelseAggregate> finnVurdertForeldelseForBehandling(Long behandlingId);
 
     boolean harVurdertForeldelseForBehandlingId(Long behandlingId);
+
+    void slettForeldelse(Long behandlingId);
 }
