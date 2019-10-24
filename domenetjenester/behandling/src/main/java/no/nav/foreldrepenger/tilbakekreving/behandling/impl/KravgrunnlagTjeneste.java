@@ -64,14 +64,14 @@ public class KravgrunnlagTjeneste {
                 behandlingskontrollTjeneste.behandlingTilbakeføringTilTidligereBehandlingSteg(kontekst, BehandlingStegType.FAKTA_FEILUTBETALING);
             }
             //Perioder knyttet med gammel grunnlag må slettes
-            sletteGammelData(behandlingId);
+            slettGammelData(behandlingId);
         }
         kravgrunnlagRepository.lagre(behandlingId, kravgrunnlag431);
         gjenopptaBehandlingTjeneste.fortsettBehandlingMedGrunnlag(behandlingId);
     }
 
-    private void sletteGammelData(Long behandlingId) {
-        logger.info("Sletter fakta,foreldelse og vilkårsvurdering for for behandlingId={} på endret kravgrunnlag", behandlingId);
+    private void slettGammelData(Long behandlingId) {
+        logger.info("Sletter fakta, foreldelse og vilkårsvurdering for behandlingId={} på endret kravgrunnlag", behandlingId);
         faktaFeilutbetalingRepository.slettFaktaFeilutbetaling(behandlingId);
         vurdertForeldelseRepository.slettForeldelse(behandlingId);
         vilkårsvurderingRepository.slettVilkårsvurdering(behandlingId);
