@@ -43,10 +43,7 @@ public class FaktaFeilutbetalingRepository {
 
     public void lagre(Long behandlingId, FaktaFeilutbetaling faktaFeilutbetaling) {
         Optional<FaktaFeilutbetalingAggregate> forrigeAggregate = finnFeilutbetaling(behandlingId);
-        if (forrigeAggregate.isPresent()) {
-            forrigeAggregate.get().disable();
-            entityManager.persist(forrigeAggregate.get());
-        }
+        disableFaktaAggregate(forrigeAggregate);
         FaktaFeilutbetalingAggregate aggregate = new FaktaFeilutbetalingAggregate.Builder()
             .medBehandlingId(behandlingId)
             .medFeilutbetaling(faktaFeilutbetaling)
@@ -59,6 +56,17 @@ public class FaktaFeilutbetalingRepository {
 
         //TODO unngå flush, det er kun nyttig i test
         entityManager.flush();
+    }
+
+    public void sletteFaktaFeilutbetaling(Long behandlingId) {
+        disableFaktaAggregate(finnFeilutbetaling(behandlingId));
+    }
+
+    private void disableFaktaAggregate(Optional<FaktaFeilutbetalingAggregate> forrigeAggregate) {
+        if (forrigeAggregate.isPresent()) {
+            forrigeAggregate.get().disable();
+            entityManager.persist(forrigeAggregate.get());
+        }
     }
 
 }

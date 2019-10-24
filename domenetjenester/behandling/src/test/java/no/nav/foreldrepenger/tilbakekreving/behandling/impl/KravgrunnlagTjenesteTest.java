@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -17,8 +18,18 @@ import org.junit.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingGodTroEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingPeriodeEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelse;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelsePeriode;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagAggregate;
@@ -42,6 +53,7 @@ public class KravgrunnlagTjenesteTest extends FellesTestOppsett {
     @Before
     public void setup() {
         when(mockTpsTjeneste.hentAktørForFnr(new PersonIdent(SSN))).thenReturn(Optional.of(aktørId));
+        when(behandlingskontrollTjeneste.erStegPassert(any(Behandling.class),any(BehandlingStegType.class))).thenReturn(true);
     }
 
     @Test
@@ -60,6 +72,57 @@ public class KravgrunnlagTjenesteTest extends FellesTestOppsett {
         kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(internBehandlingId, kravgrunnlag);
 
         assertKravgrunnlag();
+    }
+
+    @Test
+    public void lagreTilbakekrevingsgrunnlagFraØkonomi_medEndretGrunnlag_med_allerede_har_grunnlag() {
+        Kravgrunnlag431 kravgrunnlag = formKravgrunnlagDto(KravStatusKode.NYTT);
+        formPerioder(fom, tom, kravgrunnlag);
+        kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(internBehandlingId, kravgrunnlag);
+
+        FaktaFeilutbetaling faktaFeilutbetaling = lagFaktaFeilutbetaling();
+        faktaFeilutbetalingRepository.lagre(internBehandlingId, faktaFeilutbetaling);
+
+        VurdertForeldelse vurdertForeldelse = lagForeldelse();
+        vurdertForeldelseRepository.lagre(internBehandlingId, vurdertForeldelse);
+
+        VilkårVurderingEntitet vilkårEntitet = lagVilkårsVurdering();
+        vilkårsvurderingRepository.lagre(internBehandlingId, vilkårEntitet);
+
+
+        kravgrunnlag = formKravgrunnlagDto(KravStatusKode.ENDRET);
+        formPerioder(fom, tom, kravgrunnlag);
+        kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(internBehandlingId, kravgrunnlag);
+
+        assertKravgrunnlag();
+        assertThat(faktaFeilutbetalingRepository.finnFaktaOmFeilutbetaling(internBehandlingId)).isEmpty();
+        assertThat(vurdertForeldelseRepository.finnVurdertForeldelseForBehandling(internBehandlingId)).isEmpty();
+        assertThat(vilkårsvurderingRepository.finnVilkårsvurderingForBehandlingId(internBehandlingId)).isEmpty();
+    }
+
+    private VurdertForeldelse lagForeldelse() {
+        VurdertForeldelse vurdertForeldelse = new VurdertForeldelse();
+        VurdertForeldelsePeriode foreldelsePeriode = VurdertForeldelsePeriode.builder().medPeriode(fom, tom)
+            .medVurdertForeldelse(vurdertForeldelse)
+            .medForeldelseVurderingType(ForeldelseVurderingType.IKKE_FORELDET)
+            .medBegrunnelse("ikke foreldet").build();
+        vurdertForeldelse.leggTilVurderForeldelsePerioder(foreldelsePeriode);
+        return vurdertForeldelse;
+    }
+
+    private VilkårVurderingEntitet lagVilkårsVurdering() {
+        VilkårVurderingEntitet vilkårEntitet = new VilkårVurderingEntitet();
+        VilkårVurderingPeriodeEntitet periodeEntitet = VilkårVurderingPeriodeEntitet.builder().medPeriode(fom, tom)
+            .medVurderinger(vilkårEntitet)
+            .medVilkårResultat(VilkårResultat.GOD_TRO)
+            .medBegrunnelse("vurdert").build();
+        VilkårVurderingGodTroEntitet godTroEntitet = VilkårVurderingGodTroEntitet.builder().medPeriode(periodeEntitet)
+            .medBegrunnelse("vurdert")
+            .medBeløpErIBehold(true)
+            .medBeløpTilbakekreves(BigDecimal.TEN).build();
+        periodeEntitet.setGodTro(godTroEntitet);
+        vilkårEntitet.leggTilPeriode(periodeEntitet);
+        return vilkårEntitet;
     }
 
     private Kravgrunnlag431 formKravgrunnlagDto(KravStatusKode kravStatusKode) {
