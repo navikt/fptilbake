@@ -1,14 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.henlegg;
 
-import java.math.BigInteger;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.FellesTask;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KodeAksjon;
@@ -30,6 +21,13 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import java.math.BigInteger;
 
 @ApplicationScoped
 @ProsessTask(AnnullereKravgrunnlagTask.TASKTYPE)
@@ -73,7 +71,6 @@ public class AnnullereKravgrunnlagTask extends FellesTask implements ProsessTask
         annullerKravgrunnlagDto.setKodeAksjon(KodeAksjon.ANNULERE_GRUNNLAG.getKode()); // fast verdi
 
         long sendtXmlId = lagreXml(behandlingId, annullerKravgrunnlagDto);
-        opprettProsesstaskForÅSletteSendtXml(sendtXmlId);
         sendAnnulereGrunnlagTilØkonomi(behandlingId, sendtXmlId, annullerKravgrunnlagDto);
     }
 
