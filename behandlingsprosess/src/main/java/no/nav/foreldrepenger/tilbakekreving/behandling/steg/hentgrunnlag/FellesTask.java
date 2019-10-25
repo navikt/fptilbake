@@ -25,20 +25,6 @@ public abstract class FellesTask {
         this.fpsakKlient = fpsakKlient;
     }
 
-    protected void opprettProsesstaskForÅSletteMottattXml(Long mottattXmlId) {
-        ProsessTaskData slettXmlTask = new ProsessTaskData(SlettMottattXmlTask.TASKTYPE);
-        slettXmlTask.setNesteKjøringEtter(FPDateUtil.nå().plusMonths(3));
-        slettXmlTask.setProperty(TaskProperty.PROPERTY_MOTTATT_XML_ID, Long.toString(mottattXmlId));
-        prosessTaskRepository.lagre(slettXmlTask);
-    }
-
-    protected void opprettProsesstaskForÅSletteSendtXml(Long sendtXmlId) {
-        ProsessTaskData slettXmlTask = new ProsessTaskData(SlettSendtXmlTask.TASKTYPE);
-        slettXmlTask.setNesteKjøringEtter(FPDateUtil.nå().plusMonths(1));
-        slettXmlTask.setProperty(TaskProperty.PROPERTY_SENDT_XML_ID, Long.toString(sendtXmlId));
-        prosessTaskRepository.lagre(slettXmlTask);
-    }
-
     protected boolean erGyldigTall(String referanse) {
         return referanse != null && referanse.matches("^\\d*$");
     }

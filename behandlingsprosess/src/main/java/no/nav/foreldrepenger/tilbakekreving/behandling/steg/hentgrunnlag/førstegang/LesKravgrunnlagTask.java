@@ -1,13 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang;
 
-import java.util.Optional;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.FellesTask;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TaskProperty;
@@ -27,6 +19,12 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import java.util.Optional;
 
 @ApplicationScoped
 @ProsessTask(LesKravgrunnlagTask.TASKTYPE)
@@ -79,7 +77,6 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
             validerBehandlingsEksistens(eksternBehandlingId, saksnummer);
             logger.info("Ignorerte kravgrunnlag med id={} eksternBehandlingId={}. Fantes ikke tilbakekrevingsbehandling", mottattXmlId, eksternBehandlingId);
         }
-        opprettProsesstaskForÅSletteMottattXml(mottattXmlId);
     }
 
     private Optional<EksternBehandling> hentKoblingTilInternBehandling(String referanse) {

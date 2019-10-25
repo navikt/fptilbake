@@ -1,12 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.iverksettvedtak;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.FellesTask;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiConsumer;
@@ -26,6 +19,12 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import javax.persistence.EntityManager;
 
 @ApplicationScoped
 @ProsessTask(SendØkonomiTibakekerevingsVedtakTask.TASKTYPE)
@@ -59,7 +58,6 @@ public class SendØkonomiTibakekerevingsVedtakTask extends FellesTask implements
         long behandlingId = prosessTaskData.getBehandlingId();
         TilbakekrevingsvedtakDto tilbakekrevingsvedtak = tilbakekrevingsvedtakTjeneste.lagTilbakekrevingsvedtak(behandlingId);
         Long sendtXmlId = lagreXml(behandlingId, tilbakekrevingsvedtak);
-        opprettProsesstaskForÅSletteSendtXml(sendtXmlId);
         lagSavepointOgIverksett(behandlingId, sendtXmlId, tilbakekrevingsvedtak);
     }
 
