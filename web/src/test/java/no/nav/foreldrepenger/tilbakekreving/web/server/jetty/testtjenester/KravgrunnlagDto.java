@@ -1,9 +1,8 @@
-package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.tilbakekrevingsgrunnlag;
+package no.nav.foreldrepenger.tilbakekreving.web.server.jetty.testtjenester;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.dto.DetaljertKravgrunnlagDto;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.AbacDto;
 

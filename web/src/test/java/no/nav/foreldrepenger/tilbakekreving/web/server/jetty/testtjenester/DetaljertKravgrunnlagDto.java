@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.behandling.dto;
+package no.nav.foreldrepenger.tilbakekreving.web.server.jetty.testtjenester;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
