@@ -175,9 +175,8 @@ public class TekstformatererVedtaksbrevIBiterTest {
             .medRenterBeløp(BigDecimal.valueOf(100))
             .medSærligeGrunner(Collections.singletonList(SærligGrunn.GRAD_AV_UAKTSOMHET))
             .build();
-        HbVedtaksbrevPeriodeOgFelles data = new HbVedtaksbrevPeriodeOgFelles(felles, periode);
 
-        String generertTekst = TekstformatererVedtaksbrev.lagSærligeGrunnerTekst(data);
+        String generertTekst = TekstformatererVedtaksbrev.lagSærligeGrunnerTekst(felles, periode);
         assertThat(generertTekst).contains("Vi har vurdert om det er grunner til å redusere beløpet. Vi har lagt vekt på at du må ha forstått at beløpet du fikk utbetalt var feil, og det er ingen bestemte grunner til å redusere beløpet. Derfor må du betale tilbake hele beløpet.");
     }
 
@@ -209,9 +208,8 @@ public class TekstformatererVedtaksbrevIBiterTest {
             .medRenterBeløp(BigDecimal.valueOf(0))
             .medSærligeGrunner(Collections.singletonList(SærligGrunn.GRAD_AV_UAKTSOMHET))
             .build();
-        HbVedtaksbrevPeriodeOgFelles data = new HbVedtaksbrevPeriodeOgFelles(felles, periode);
 
-        String generertTekst = TekstformatererVedtaksbrev.lagSærligeGrunnerTekst(data);
+        String generertTekst = TekstformatererVedtaksbrev.lagSærligeGrunnerTekst(felles, periode);
         assertThat(generertTekst)
             .contains("Vi har lagt vekt på at du må ha forstått at du fikk penger du ikke har rett til. Vi vurderer likevel at uaktsomheten din har vært så liten at vi har redusert beløpet du må betale tilbake.")
             .contains("Du må betale 500 kroner");

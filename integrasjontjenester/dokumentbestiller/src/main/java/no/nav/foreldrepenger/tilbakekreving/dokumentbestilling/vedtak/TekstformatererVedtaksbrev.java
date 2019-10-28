@@ -25,6 +25,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.Handle
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.ObjectMapperForUtvekslingAvDataMedHandlebars;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.TekstformatererVarselbrevFeil;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevData;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevFelles;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevPeriode;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevPeriodeOgFelles;
 import no.nav.vedtak.feil.Feil;
@@ -68,6 +69,7 @@ class TekstformatererVedtaksbrev {
             periode.setFritekstSærligeGrunner(markerFritekst(periode.getFritekstSærligeGrunner()));
             periode.setFritekstFakta(markerFritekst(periode.getFritekstFakta()));
             periode.setFritekstVilkår(markerFritekst(periode.getFritekstVilkår()));
+            periode.setFritekstSærligeGrunnerAnnet(markerFritekst(periode.getFritekstSærligeGrunnerAnnet()));
         }
         vedtaksbrevData.getFelles().setFritekstOppsummering(markerFritekst(vedtaksbrevData.getFelles().getFritekstOppsummering()));
     }
@@ -245,8 +247,9 @@ class TekstformatererVedtaksbrev {
         return konverterMedPartialTemplate(PARTIAL_PERIODE_VILKÅR, periode);
     }
 
-    static String lagSærligeGrunnerTekst(HbVedtaksbrevPeriodeOgFelles periode) {
-        return konverterMedPartialTemplate(PARTIAL_PERIODE_SÆRLIGE_GRUNNER, periode);
+    static String lagSærligeGrunnerTekst(HbVedtaksbrevFelles felles, HbVedtaksbrevPeriode periode) {
+        HbVedtaksbrevPeriodeOgFelles data = new HbVedtaksbrevPeriodeOgFelles(felles, periode);
+        return konverterMedPartialTemplate(PARTIAL_PERIODE_SÆRLIGE_GRUNNER, data);
     }
 
     private static String konverterMedPartialTemplate(String partial, HandlebarsData vedtaksbrevPeriode) {
