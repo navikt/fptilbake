@@ -11,8 +11,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositor
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevdataRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VarselbrevSporing;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VarselbrevSporingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.dokumentbestiller.DokumentMalType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
@@ -36,7 +36,6 @@ public class ManueltVarselBrevTjeneste {
     public static final String TITTEL_VARSELBREV_HISTORIKKINNSLAG = "Varselbrev Tilbakekreving";
     public static final String TITTEL_KORRIGERT_VARSELBREV_HISTORIKKINNSLAG = "Korrigert Varselbrev Tilbakekreving";
 
-    private BrevdataRepository brevdataRepository;
     private VarselRepository varselRepository;
     private BehandlingRepository behandlingRepository;
 
@@ -44,6 +43,7 @@ public class ManueltVarselBrevTjeneste {
     private FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste;
     private FritekstbrevTjeneste bestillDokumentTjeneste;
     private HistorikkinnslagTjeneste historikkinnslagTjeneste;
+    private VarselbrevSporingRepository varselbrevSporingRepository;
 
     ManueltVarselBrevTjeneste() {
         // for CDI
@@ -51,14 +51,13 @@ public class ManueltVarselBrevTjeneste {
 
     @Inject
     public ManueltVarselBrevTjeneste(BehandlingRepositoryProvider repositoryProvider,
-                                     BrevdataRepository brevdataRepository,
                                      EksternDataForBrevTjeneste eksternDataForBrevTjeneste,
                                      FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste,
                                      FritekstbrevTjeneste bestillDokumentTjeneste,
                                      HistorikkinnslagTjeneste historikkinnslagTjeneste) {
-        this.brevdataRepository = brevdataRepository;
         this.varselRepository = repositoryProvider.getVarselRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
+        this.varselbrevSporingRepository = repositoryProvider.getVarselbrevSporingRepository();
 
         this.eksternDataForBrevTjeneste = eksternDataForBrevTjeneste;
         this.faktaFeilutbetalingTjeneste = faktaFeilutbetalingTjeneste;
@@ -99,7 +98,7 @@ public class ManueltVarselBrevTjeneste {
         VarselbrevSamletInfo varselbrevSamletInfo = lagVarselBeløpForSending(fritekst, behandling, true);
         VarselInfo varselInfo = varselRepository.finnEksaktVarsel(behandlingId);
 
-        FritekstbrevData data = lagKorrigertVarselBrev(varselbrevSamletInfo,varselInfo);
+        FritekstbrevData data = lagKorrigertVarselBrev(varselbrevSamletInfo, varselInfo);
 
         JournalpostIdOgDokumentId dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data);
         opprettHistorikkinnslag(behandling, malType, dokumentreferanse, TITTEL_KORRIGERT_VARSELBREV_HISTORIKKINNSLAG);
@@ -121,7 +120,7 @@ public class ManueltVarselBrevTjeneste {
             VarselbrevOverskrift.finnOverskriftKorrigertVarselbrevEnngangsstønad(varselbrevSamletInfo.getBrevMetadata().getFagsaktypenavnPåSpråk()) :
             VarselbrevOverskrift.finnOverskriftKorrigertVarselbrev(varselbrevSamletInfo.getBrevMetadata().getFagsaktypenavnPåSpråk());
 
-        String brevtekst = TekstformatererVarselbrev.lagKorrigertVarselbrevFritekst(varselbrevSamletInfo,varselInfo);
+        String brevtekst = TekstformatererVarselbrev.lagKorrigertVarselbrevFritekst(varselbrevSamletInfo, varselInfo);
         return new FritekstbrevData.Builder()
             .medOverskrift(overskrift)
             .medBrevtekst(brevtekst)
@@ -177,7 +176,7 @@ public class ManueltVarselBrevTjeneste {
             .medDokumentId(dokumentreferanse.getDokumentId())
             .medJournalpostId(dokumentreferanse.getJournalpostId())
             .build();
-        brevdataRepository.lagreVarselbrevData(varselbrevSporing);
+        varselbrevSporingRepository.lagreVarselbrevData(varselbrevSporing);
     }
 
     private void lagreInfoOmVarselSendt(Long behandlingId, String varseltTekst, Long varseltBeløp) {

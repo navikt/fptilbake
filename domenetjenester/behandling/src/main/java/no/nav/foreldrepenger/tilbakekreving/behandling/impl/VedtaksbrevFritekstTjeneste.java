@@ -10,10 +10,10 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevdataRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.FritekstType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevOppsummering;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevPeriode;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstOppsummering;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstPeriode;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
@@ -34,65 +34,65 @@ public class VedtaksbrevFritekstTjeneste {
 
     private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository;
     private VilkårsvurderingRepository vilkårsvurderingRepository;
-    private BrevdataRepository brevdataRepository;
+    private VedtaksbrevFritekstRepository vedtaksbrevFritekstRepository;
 
     VedtaksbrevFritekstTjeneste() {
         //for CDI proxy
     }
 
     @Inject
-    public VedtaksbrevFritekstTjeneste(FaktaFeilutbetalingRepository faktaFeilutbetalingRepository, VilkårsvurderingRepository vilkårsvurderingRepository, BrevdataRepository brevdataRepository) {
+    public VedtaksbrevFritekstTjeneste(FaktaFeilutbetalingRepository faktaFeilutbetalingRepository, VilkårsvurderingRepository vilkårsvurderingRepository, VedtaksbrevFritekstRepository vedtaksbrevFritekstRepository) {
         this.faktaFeilutbetalingRepository = faktaFeilutbetalingRepository;
         this.vilkårsvurderingRepository = vilkårsvurderingRepository;
-        this.brevdataRepository = brevdataRepository;
+        this.vedtaksbrevFritekstRepository = vedtaksbrevFritekstRepository;
     }
 
-    public void lagreFriteksterFraSaksbehandler(Long behandlingId, VedtaksbrevOppsummering vedtaksbrevOppsummering, List<VedtaksbrevPeriode> vedtaksbrevPerioder) {
-        validerAtPåkrevdeFriteksterErSatt(behandlingId, vedtaksbrevPerioder);
+    public void lagreFriteksterFraSaksbehandler(Long behandlingId, VedtaksbrevFritekstOppsummering vedtaksbrevFritekstOppsummering, List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder) {
+        validerAtPåkrevdeFriteksterErSatt(behandlingId, vedtaksbrevFritekstPerioder);
 
-        brevdataRepository.slettOppsummering(behandlingId);
-        brevdataRepository.slettPerioderMedFritekster(behandlingId);
+        vedtaksbrevFritekstRepository.slettOppsummering(behandlingId);
+        vedtaksbrevFritekstRepository.slettPerioderMedFritekster(behandlingId);
 
-        brevdataRepository.lagreVedtakPerioderOgTekster(vedtaksbrevPerioder);
-        if (vedtaksbrevOppsummering != null) {
-            brevdataRepository.lagreVedtaksbrevOppsummering(vedtaksbrevOppsummering);
+        vedtaksbrevFritekstRepository.lagreVedtakPerioderOgTekster(vedtaksbrevFritekstPerioder);
+        if (vedtaksbrevFritekstOppsummering != null) {
+            vedtaksbrevFritekstRepository.lagreVedtaksbrevOppsummering(vedtaksbrevFritekstOppsummering);
         }
     }
 
-    private void validerAtPåkrevdeFriteksterErSatt(Long behandlingId, List<VedtaksbrevPeriode> vedtaksbrevPerioder) {
+    private void validerAtPåkrevdeFriteksterErSatt(Long behandlingId, List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder) {
         vilkårsvurderingRepository.finnVilkårsvurdering(behandlingId)
-            .ifPresent(vilkårVurderingEntitet -> validerAtPåkrevdeFriteksterErSatt(vilkårVurderingEntitet, vedtaksbrevPerioder));
+            .ifPresent(vilkårVurderingEntitet -> validerAtPåkrevdeFriteksterErSatt(vilkårVurderingEntitet, vedtaksbrevFritekstPerioder));
 
         FaktaFeilutbetaling faktaFeilutbetaling = faktaFeilutbetalingRepository.finnFaktaOmFeilutbetaling(behandlingId).orElseThrow();
-        validerAtPåkrevdeFriteksterErSatt(faktaFeilutbetaling, vedtaksbrevPerioder);
+        validerAtPåkrevdeFriteksterErSatt(faktaFeilutbetaling, vedtaksbrevFritekstPerioder);
     }
 
-    private static void validerAtPåkrevdeFriteksterErSatt(VilkårVurderingEntitet vilkårVurdering, List<VedtaksbrevPeriode> vedtaksbrevPerioder) {
+    private static void validerAtPåkrevdeFriteksterErSatt(VilkårVurderingEntitet vilkårVurdering, List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder) {
         List<Periode> perioderSomMåHaFritekst = vilkårVurdering.getPerioder().stream()
             .filter(p -> p.getAktsomhet() != null && p.getAktsomhet().getSærligGrunner().stream().map(VilkårVurderingSærligGrunnEntitet::getGrunn).anyMatch(SærligGrunn.ANNET::equals))
             .map(VilkårVurderingPeriodeEntitet::getPeriode)
             .collect(Collectors.toList());
 
-        validerFritekstSatt(vedtaksbrevPerioder, perioderSomMåHaFritekst, FritekstType.SAERLIGE_GRUNNER_ANNET_AVSNITT);
+        validerFritekstSatt(vedtaksbrevFritekstPerioder, perioderSomMåHaFritekst, VedtaksbrevFritekstType.SAERLIGE_GRUNNER_ANNET_AVSNITT);
     }
 
-    private static void validerAtPåkrevdeFriteksterErSatt(FaktaFeilutbetaling fakta, List<VedtaksbrevPeriode> vedtaksbrevPerioder) {
+    private static void validerAtPåkrevdeFriteksterErSatt(FaktaFeilutbetaling fakta, List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder) {
         List<Periode> perioderSomMåHaFritekst = fakta.getFeilutbetaltPerioder().stream()
             .filter(p -> FellesUndertyper.ANNET_FRITEKST.equals(p.getHendelseUndertype()))
             .map(FaktaFeilutbetalingPeriode::getPeriode)
             .collect(Collectors.toList());
 
-        validerFritekstSatt(vedtaksbrevPerioder, perioderSomMåHaFritekst, FritekstType.FAKTA_AVSNITT);
+        validerFritekstSatt(vedtaksbrevFritekstPerioder, perioderSomMåHaFritekst, VedtaksbrevFritekstType.FAKTA_AVSNITT);
     }
 
-    private static void validerFritekstSatt(List<VedtaksbrevPeriode> vedtaksbrevPerioder, List<Periode> perioderSomMåHaFritekst, FritekstType fritekstType) {
+    private static void validerFritekstSatt(List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder, List<Periode> perioderSomMåHaFritekst, VedtaksbrevFritekstType fritekstType) {
         for (Periode periode : perioderSomMåHaFritekst) {
-            validerFritekstSatt(vedtaksbrevPerioder, periode, fritekstType);
+            validerFritekstSatt(vedtaksbrevFritekstPerioder, periode, fritekstType);
         }
     }
 
-    private static void validerFritekstSatt(List<VedtaksbrevPeriode> vedtaksbrevPerioder, Periode periodeSomMåHaFritekst, FritekstType fritekstType) {
-        List<Periode> perioder = finnFritekstPerioder(vedtaksbrevPerioder, periodeSomMåHaFritekst, fritekstType);
+    private static void validerFritekstSatt(List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder, Periode periodeSomMåHaFritekst, VedtaksbrevFritekstType fritekstType) {
+        List<Periode> perioder = finnFritekstPerioder(vedtaksbrevFritekstPerioder, periodeSomMåHaFritekst, fritekstType);
         if (perioder.isEmpty()) {
             throw FritekstFeil.FACTORY.manglerFritekst(periodeSomMåHaFritekst, fritekstType.getKode()).toException();
         }
@@ -113,11 +113,11 @@ public class VedtaksbrevFritekstTjeneste {
         }
     }
 
-    private static List<Periode> finnFritekstPerioder(List<VedtaksbrevPeriode> perioder, Periode periodeSomMåHaFritekst, FritekstType fritekstType) {
+    private static List<Periode> finnFritekstPerioder(List<VedtaksbrevFritekstPeriode> perioder, Periode periodeSomMåHaFritekst, VedtaksbrevFritekstType fritekstType) {
         return perioder.stream()
             .filter(p -> fritekstType.equals(p.getFritekstType()))
             .filter(p -> !p.getFritekst().isBlank())
-            .map(VedtaksbrevPeriode::getPeriode)
+            .map(VedtaksbrevFritekstPeriode::getPeriode)
             .filter(periodeSomMåHaFritekst::omslutter)
             .sorted(Comparator.comparing(Periode::getFom))
             .collect(Collectors.toList());

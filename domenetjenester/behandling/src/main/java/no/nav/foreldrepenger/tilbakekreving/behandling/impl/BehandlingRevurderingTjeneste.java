@@ -1,6 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,6 +32,7 @@ import no.nav.vedtak.feil.LogLevel;
 import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
 import no.nav.vedtak.feil.deklarasjon.FunksjonellFeil;
 import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
+import no.nav.vedtak.util.FPDateUtil;
 
 @ApplicationScoped
 public class BehandlingRevurderingTjeneste {
@@ -54,14 +54,14 @@ public class BehandlingRevurderingTjeneste {
         this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
     }
 
-    public Behandling opprettRevurdering(Saksnummer saksnummer, UUID eksternUuid, BehandlingÅrsakType behandlingÅrsakType,BehandlingType behandlingType) {
+    public Behandling opprettRevurdering(Saksnummer saksnummer, UUID eksternUuid, BehandlingÅrsakType behandlingÅrsakType, BehandlingType behandlingType) {
 
         Fagsak fagsak = fagsakRepository.hentEksaktFagsakForGittSaksnummer(saksnummer);
 
         validerHarIkkeÅpenBehandling(saksnummer, eksternUuid);
 
         repositoryProvider.getFagsakRepository().oppdaterFagsakStatus(fagsak.getId(), FagsakStatus.UNDER_BEHANDLING);
-        return opprettManuellRevurdering(fagsak, behandlingÅrsakType, eksternUuid,behandlingType);
+        return opprettManuellRevurdering(fagsak, behandlingÅrsakType, eksternUuid, behandlingType);
     }
 
     public boolean kanOppretteRevurdering(UUID eksternUuid) {
@@ -74,18 +74,18 @@ public class BehandlingRevurderingTjeneste {
         return true;
     }
 
-    public EksternBehandling hentEksternBehandling(long behandlingId){
+    public EksternBehandling hentEksternBehandling(long behandlingId) {
         return eksternBehandlingRepository.hentFraInternId(behandlingId);
     }
 
-    private Behandling opprettManuellRevurdering(Fagsak fagsak, BehandlingÅrsakType behandlingÅrsakType, UUID eksternUuid,BehandlingType behandlingType) {
+    private Behandling opprettManuellRevurdering(Fagsak fagsak, BehandlingÅrsakType behandlingÅrsakType, UUID eksternUuid, BehandlingType behandlingType) {
         EksternBehandling eksternBehandlingForSisteTbkBehandling = eksternBehandlingRepository.finnForSisteAvsluttetTbkBehandling(eksternUuid)
             .orElseThrow(() -> RevurderingFeil.FACTORY.tjenesteFinnerIkkeBehandlingForRevurdering(fagsak.getId()).toException());
 
         Behandling origBehandling = behandlingRepository.hentBehandling(eksternBehandlingForSisteTbkBehandling.getInternId());
         Long eksternBehandlingId = eksternBehandlingForSisteTbkBehandling.getEksternId(); // eksternBehandling må være samme som siste når vi opprette revurdering
 
-        Behandling revurdering = opprettRevurderingsBehandling(behandlingÅrsakType, origBehandling,behandlingType);
+        Behandling revurdering = opprettRevurderingsBehandling(behandlingÅrsakType, origBehandling, behandlingType);
         BehandlingLås lås = behandlingRepository.taSkriveLås(revurdering);
         behandlingRepository.lagre(revurdering, lås);
 
@@ -101,12 +101,12 @@ public class BehandlingRevurderingTjeneste {
         return revurdering;
     }
 
-    private Behandling opprettRevurderingsBehandling(BehandlingÅrsakType behandlingÅrsakType, Behandling origBehandling,BehandlingType behandlingType) {
+    private Behandling opprettRevurderingsBehandling(BehandlingÅrsakType behandlingÅrsakType, Behandling origBehandling, BehandlingType behandlingType) {
         BehandlingÅrsak.Builder revurderingÅrsak = BehandlingÅrsak.builder(behandlingÅrsakType)
             .medOriginalBehandling(origBehandling);
         OrganisasjonsEnhet organisasjonsEnhet = new OrganisasjonsEnhet(origBehandling.getBehandlendeEnhetId(), origBehandling.getBehandlendeEnhetNavn());
         Behandling revurdering = Behandling.fraTidligereBehandling(origBehandling, behandlingType)
-            .medOpprettetDato(LocalDateTime.now())
+            .medOpprettetDato(FPDateUtil.nå())
             .medBehandlingÅrsak(revurderingÅrsak).build();
         revurdering.setBehandlendeOrganisasjonsEnhet(organisasjonsEnhet);
         return revurdering;

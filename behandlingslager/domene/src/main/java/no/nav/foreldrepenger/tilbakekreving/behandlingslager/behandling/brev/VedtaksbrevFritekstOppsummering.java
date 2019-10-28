@@ -1,6 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev;
 
-import no.nav.vedtak.felles.jpa.BaseEntitet;
+import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -8,11 +8,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.util.Objects;
 
-@Entity(name = "VedtaksbrevOppsummering")
+import no.nav.vedtak.felles.jpa.BaseEntitet;
+
+@Entity(name = "VedtaksbrevFritekstOppsummering")
 @Table(name = "VEDTAKSBREV_OPPSUMMERING")
-public class VedtaksbrevOppsummering extends BaseEntitet {
+public class VedtaksbrevFritekstOppsummering extends BaseEntitet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_VEDTAKSBREV_OPPSUMMERING")
@@ -24,7 +25,7 @@ public class VedtaksbrevOppsummering extends BaseEntitet {
     @Column(name = "OPPSUMMERING_FRITEKST")
     private String oppsummeringFritekst;
 
-    public VedtaksbrevOppsummering() {
+    public VedtaksbrevFritekstOppsummering() {
     }
 
     public Long getId() {
@@ -53,21 +54,21 @@ public class VedtaksbrevOppsummering extends BaseEntitet {
 
     public static class Builder {
 
-        private VedtaksbrevOppsummering vedtaksbrevOppsummering = new VedtaksbrevOppsummering();
+        private VedtaksbrevFritekstOppsummering vedtaksbrevFritekstOppsummering = new VedtaksbrevFritekstOppsummering();
 
-        public VedtaksbrevOppsummering.Builder medBehandlingId(Long behandlingId) {
-            vedtaksbrevOppsummering.behandlingId = behandlingId;
+        public VedtaksbrevFritekstOppsummering.Builder medBehandlingId(Long behandlingId) {
+            vedtaksbrevFritekstOppsummering.behandlingId = behandlingId;
             return this;
         }
 
-        public VedtaksbrevOppsummering.Builder medOppsummeringFritekst(String oppsummeringFritekst) {
-            vedtaksbrevOppsummering.oppsummeringFritekst = oppsummeringFritekst;
+        public VedtaksbrevFritekstOppsummering.Builder medOppsummeringFritekst(String oppsummeringFritekst) {
+            vedtaksbrevFritekstOppsummering.oppsummeringFritekst = oppsummeringFritekst;
             return this;
         }
 
-        public VedtaksbrevOppsummering build() {
-            Objects.requireNonNull(vedtaksbrevOppsummering.behandlingId);
-            return vedtaksbrevOppsummering;
+        public VedtaksbrevFritekstOppsummering build() {
+            Objects.requireNonNull(vedtaksbrevFritekstOppsummering.behandlingId);
+            return vedtaksbrevFritekstOppsummering;
         }
     }
 }

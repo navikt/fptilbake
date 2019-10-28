@@ -24,10 +24,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevdataRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevdataRepositoryImpl;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.FritekstType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevPeriode;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstPeriode;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProviderImpl;
@@ -50,7 +49,7 @@ public class ForeslåVedtakOppdatererTest {
     private BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProviderImpl(repositoryRule.getEntityManager());
     private BehandlingRepository behandlingRepository = repositoryProvider.getBehandlingRepository();
     private AksjonspunktRepository aksjonspunktRepository = repositoryProvider.getAksjonspunktRepository();
-    private BrevdataRepository brevdataRepository = new BrevdataRepositoryImpl(repositoryRule.getEntityManager());
+    private VedtaksbrevFritekstRepository vedtaksbrevFritekstRepository = new VedtaksbrevFritekstRepository(repositoryRule.getEntityManager());
 
     private TilbakekrevingBeregningTjeneste beregningTjenesteMock = mock(TilbakekrevingBeregningTjeneste.class);
     private HistorikkTjenesteAdapter historikkTjenesteAdapterMock = mock(HistorikkTjenesteAdapter.class);
@@ -59,7 +58,7 @@ public class ForeslåVedtakOppdatererTest {
     private VilkårsvurderingRepository vilkårsvurderingRepository = mock(VilkårsvurderingRepository.class);
     private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository = mock(FaktaFeilutbetalingRepository.class);
 
-    private final VedtaksbrevFritekstTjeneste vedtaksbrevFritekstTjeneste = new VedtaksbrevFritekstTjeneste(faktaFeilutbetalingRepository, vilkårsvurderingRepository, brevdataRepository);
+    private VedtaksbrevFritekstTjeneste vedtaksbrevFritekstTjeneste = new VedtaksbrevFritekstTjeneste(faktaFeilutbetalingRepository, vilkårsvurderingRepository, vedtaksbrevFritekstRepository);
     private ForeslåVedtakOppdaterer foreslåVedtakOppdaterer = new ForeslåVedtakOppdaterer(foreslåVedtakTjeneste, totrinnTjenesteMock, aksjonspunktRepository, vedtaksbrevFritekstTjeneste);
 
     @Before
@@ -73,13 +72,14 @@ public class ForeslåVedtakOppdatererTest {
     public void oppdater_medFaktaAvsnitt() {
         Behandling behandling = lagMockBehandling();
         foreslåVedtakOppdaterer.oppdater(lagMockForeslåVedtak("fakta", null, null), behandling);
+        repositoryRule.getEntityManager().flush();
 
         fellesAssert(behandling);
-        List<VedtaksbrevPeriode> perioder = brevdataRepository.hentVedtaksbrevPerioderMedTekst(behandling.getId());
+        List<VedtaksbrevFritekstPeriode> perioder = vedtaksbrevFritekstRepository.hentVedtaksbrevPerioderMedTekst(behandling.getId());
         assertThat(perioder).isNotEmpty();
         assertThat(perioder.size()).isEqualTo(1);
-        VedtaksbrevPeriode periode = perioder.get(0);
-        assertThat(periode.getFritekstType()).isEqualByComparingTo(FritekstType.FAKTA_AVSNITT);
+        VedtaksbrevFritekstPeriode periode = perioder.get(0);
+        assertThat(periode.getFritekstType()).isEqualByComparingTo(VedtaksbrevFritekstType.FAKTA_AVSNITT);
         assertThat(periode.getFritekst()).isEqualTo("fakta");
         assertThat(periode.getBehandlingId()).isEqualTo(behandling.getId());
     }
@@ -88,13 +88,14 @@ public class ForeslåVedtakOppdatererTest {
     public void oppdater_medVilkårAvsnitt() {
         Behandling behandling = lagMockBehandling();
         foreslåVedtakOppdaterer.oppdater(lagMockForeslåVedtak(null, null, "vilkår"), behandling);
+        repositoryRule.getEntityManager().flush();
 
         fellesAssert(behandling);
-        List<VedtaksbrevPeriode> perioder = brevdataRepository.hentVedtaksbrevPerioderMedTekst(behandling.getId());
+        List<VedtaksbrevFritekstPeriode> perioder = vedtaksbrevFritekstRepository.hentVedtaksbrevPerioderMedTekst(behandling.getId());
         assertThat(perioder).isNotEmpty();
         assertThat(perioder.size()).isEqualTo(1);
-        VedtaksbrevPeriode periode = perioder.get(0);
-        assertThat(periode.getFritekstType()).isEqualByComparingTo(FritekstType.VILKAAR_AVSNITT);
+        VedtaksbrevFritekstPeriode periode = perioder.get(0);
+        assertThat(periode.getFritekstType()).isEqualByComparingTo(VedtaksbrevFritekstType.VILKAAR_AVSNITT);
         assertThat(periode.getFritekst()).isEqualTo("vilkår");
         assertThat(periode.getBehandlingId()).isEqualTo(behandling.getId());
     }
@@ -103,13 +104,14 @@ public class ForeslåVedtakOppdatererTest {
     public void oppdater_medSærligGrunnerAvsnitt() {
         Behandling behandling = lagMockBehandling();
         foreslåVedtakOppdaterer.oppdater(lagMockForeslåVedtak(null, "særligGrunner", null), behandling);
+        repositoryRule.getEntityManager().flush();
 
         fellesAssert(behandling);
-        List<VedtaksbrevPeriode> perioder = brevdataRepository.hentVedtaksbrevPerioderMedTekst(behandling.getId());
+        List<VedtaksbrevFritekstPeriode> perioder = vedtaksbrevFritekstRepository.hentVedtaksbrevPerioderMedTekst(behandling.getId());
         assertThat(perioder).isNotEmpty();
         assertThat(perioder.size()).isEqualTo(1);
-        VedtaksbrevPeriode periode = perioder.get(0);
-        assertThat(periode.getFritekstType()).isEqualByComparingTo(FritekstType.SAERLIGE_GRUNNER_AVSNITT);
+        VedtaksbrevFritekstPeriode periode = perioder.get(0);
+        assertThat(periode.getFritekstType()).isEqualByComparingTo(VedtaksbrevFritekstType.SAERLIGE_GRUNNER_AVSNITT);
         assertThat(periode.getFritekst()).isEqualTo("særligGrunner");
         assertThat(periode.getBehandlingId()).isEqualTo(behandling.getId());
     }
@@ -120,7 +122,6 @@ public class ForeslåVedtakOppdatererTest {
             .filter(aksjonspunkt -> aksjonspunkt.getAksjonspunktDefinisjon().equals(AksjonspunktDefinisjon.FATTE_VEDTAK))
             .findFirst()).isNotEmpty();
     }
-
 
     private Behandling lagMockBehandling() {
         Fagsak fagsak = TestFagsakUtil.opprettFagsak();

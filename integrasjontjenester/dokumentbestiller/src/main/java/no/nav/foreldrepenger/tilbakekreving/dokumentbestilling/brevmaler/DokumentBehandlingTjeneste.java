@@ -8,7 +8,7 @@ import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevdataRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VarselbrevSporingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.dokumentbestiller.DokumentMalType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
@@ -17,9 +17,11 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.manuelt.Ma
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.manuelt.ManueltVarselBrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.manuelt.SendManueltVarselbrevTask;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.manuelt.TaskProperty;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.selvbetjening.SendBeskjedUtsendtVarselTilSelvbetjeningTask;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 
 @ApplicationScoped
@@ -27,7 +29,7 @@ public class DokumentBehandlingTjeneste {
 
     private BehandlingRepository behandlingRepository;
     private KodeverkRepository kodeverkRepository;
-    private BrevdataRepository brevdataRepository;
+    private VarselbrevSporingRepository varselbrevSporingRepository;
     private KravgrunnlagRepository grunnlagRepository;
     private ProsessTaskRepository prosessTaskRepository;
 
@@ -41,13 +43,12 @@ public class DokumentBehandlingTjeneste {
 
     @Inject
     public DokumentBehandlingTjeneste(BehandlingRepositoryProvider repositoryProvider,
-                                      BrevdataRepository brevdataRepository,
                                       ProsessTaskRepository prosessTaskRepository,
                                       HistorikkinnslagTjeneste historikkinnslagTjeneste,
                                       ManueltVarselBrevTjeneste manueltVarselBrevTjeneste) {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.kodeverkRepository = repositoryProvider.getKodeverkRepository();
-        this.brevdataRepository = brevdataRepository;
+        this.varselbrevSporingRepository = repositoryProvider.getVarselbrevSporingRepository();
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.prosessTaskRepository = prosessTaskRepository;
 
@@ -85,7 +86,7 @@ public class DokumentBehandlingTjeneste {
     }
 
     private void leggTilVarselBrevmaler(Long behandlingId, List<DokumentMalType> gyldigBrevMaler) {
-        if (!brevdataRepository.harVarselBrevSendtForBehandlingId(behandlingId)) {
+        if (!varselbrevSporingRepository.harVarselBrevSendtForBehandlingId(behandlingId)) {
             gyldigBrevMaler.add(kodeverkRepository.finn(DokumentMalType.class, DokumentMalType.VARSEL_DOK));
         } else {
             gyldigBrevMaler.add(kodeverkRepository.finn(DokumentMalType.class, DokumentMalType.KORRIGERT_VARSEL_DOK));
@@ -114,12 +115,18 @@ public class DokumentBehandlingTjeneste {
             throw ManueltVarselBrevFeil.FACTORY.kanIkkeSendeVarselForGrunnlagFinnesIkke(behandlingId).toException();
         }
 
-        ProsessTaskData prosessTaskData = new ProsessTaskData(SendManueltVarselbrevTask.TASKTYPE);
-        prosessTaskData.setProperty(TaskProperty.MAL_TYPE, malType.getKode());
-        prosessTaskData.setProperty(TaskProperty.FRITEKST, fritekst);
-        prosessTaskData.setBehandling(behandling.getFagsakId(), behandlingId, behandling.getAktørId().getId());
+        ProsessTaskData sendVarselbrev = new ProsessTaskData(SendManueltVarselbrevTask.TASKTYPE);
+        sendVarselbrev.setProperty(TaskProperty.MAL_TYPE, malType.getKode());
+        sendVarselbrev.setProperty(TaskProperty.FRITEKST, fritekst);
+        sendVarselbrev.setBehandling(behandling.getFagsakId(), behandlingId, behandling.getAktørId().getId());
 
-        prosessTaskRepository.lagre(prosessTaskData);
+        ProsessTaskData sendBeskjedUtsendtVarsel = new ProsessTaskData(SendBeskjedUtsendtVarselTilSelvbetjeningTask.TASKTYPE);
+        sendBeskjedUtsendtVarsel.setBehandling(behandling.getFagsakId(), behandlingId, behandling.getAktørId().getId());
+
+        ProsessTaskGruppe taskGruppe = new ProsessTaskGruppe();
+        taskGruppe.addNesteSekvensiell(sendVarselbrev);
+        taskGruppe.addNesteSekvensiell(sendBeskjedUtsendtVarsel);
+        prosessTaskRepository.lagre(taskGruppe);
     }
 
 }
