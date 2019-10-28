@@ -13,6 +13,7 @@ import java.util.List;
 import org.junit.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.tilbakekrevingsvalg.VidereBehandling;
 import no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.task.HendelseTaskDataWrapper;
 import no.nav.foreldrepenger.tilbakekreving.kafka.poller.PostTransactionHandler;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -44,6 +45,9 @@ public class TilkjentYtelseReaderTest extends TilkjentYtelseTestOppsett {
         assertThat(taskDataWrapper.getBehandlingUuid()).isEqualTo(EKSTERN_BEHANDLING_UUID.toString());
         assertThat(taskDataWrapper.getFagsakYtelseType()).isEqualByComparingTo(FagsakYtelseType.FORELDREPENGER);
         assertThat(taskDataWrapper.getSaksnummer()).isEqualTo(SAKSNUMMER);
+        assertThat(taskDataWrapper.getVarselTekst()).isEqualTo(VARSEL_TEKST);
+        assertThat(taskDataWrapper.getVarselBeløp()).isEqualTo(VARSEL_BELØP);
+        assertThat(taskDataWrapper.getTilbakekrevingValg()).isEqualTo(VidereBehandling.TILBAKEKREV_I_INFOTRYGD.getKode());
     }
 
     @Test

@@ -1,8 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.tjeneste;
 
-import java.util.Optional;
-import java.util.UUID;
-
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -11,8 +8,6 @@ import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.tilbakekrevingsvalg.VidereBehandling;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.TilbakekrevingValgDto;
 import no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.task.HendelseTaskDataWrapper;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 
@@ -22,41 +17,29 @@ public class HendelseHåndtererTjeneste {
     private static final Logger logger = LoggerFactory.getLogger(HendelseHåndtererTjeneste.class);
 
     private ProsessTaskRepository taskRepository;
-    private FpsakKlient restKlient;
 
     HendelseHåndtererTjeneste() {
         // CDI
     }
 
     @Inject
-    public HendelseHåndtererTjeneste(ProsessTaskRepository taskRepository, FpsakKlient restKlient) {
+    public HendelseHåndtererTjeneste(ProsessTaskRepository taskRepository) {
         this.taskRepository = taskRepository;
-        this.restKlient = restKlient;
     }
 
     public void håndterHendelse(HendelseTaskDataWrapper hendelseTaskDataWrapper) {
         long behandlingId = hendelseTaskDataWrapper.getBehandlingId();
-        Optional<TilbakekrevingValgDto> tbkDataOpt = restKlient.hentTilbakekrevingValg(UUID.fromString(hendelseTaskDataWrapper.getBehandlingUuid()));
+        VidereBehandling videreBehandling = VidereBehandling.fraKode(hendelseTaskDataWrapper.getTilbakekrevingValg());
 
-        if (tbkDataOpt.isPresent()) {
-            TilbakekrevingValgDto tbkData = tbkDataOpt.get();
-            if(erRelevantHendelseForOpprettTilbakekreving(tbkData)){
-                logger.info("Hendelse={} er relevant for tilbakekreving opprett for ekstern behandlingId={}", tbkData.getVidereBehandling(), behandlingId);
-                lagOpprettBehandlingTask(hendelseTaskDataWrapper);
-            }else if(erRelevantHendelseForOppdatereTilbakekreving(tbkData)){
-                logger.info("Hendelse={} er relevant for å oppdatere eksistende tilbakekreving med ekstern behandlingId={}", tbkData.getVidereBehandling(), behandlingId);
-                lagOppdaterBehandlingTask(hendelseTaskDataWrapper);
-            }
+        if (VidereBehandling.TILBAKEKREV_I_INFOTRYGD.equals(videreBehandling)) {
+            logger.info("Hendelse {} er relevant for tilbakekreving opprett for ekstern behandlingId={}", videreBehandling.getKode(), behandlingId);
+            lagOpprettBehandlingTask(hendelseTaskDataWrapper);
+        } else if (VidereBehandling.TILBAKEKR_OPPDATER.equals(videreBehandling)) {
+            logger.info("Hendelse={} er relevant for å oppdatere eksistende tilbakekreving med ekstern behandlingId={}", videreBehandling.getKode(), behandlingId);
+            lagOppdaterBehandlingTask(hendelseTaskDataWrapper);
         }
     }
 
-    private boolean erRelevantHendelseForOpprettTilbakekreving(TilbakekrevingValgDto tbkData) {
-        return VidereBehandling.TILBAKEKREV_I_INFOTRYGD.equals(tbkData.getVidereBehandling());
-    }
-
-    private boolean erRelevantHendelseForOppdatereTilbakekreving(TilbakekrevingValgDto tbkData) {
-        return VidereBehandling.TILBAKEKR_OPPDATER.equals(tbkData.getVidereBehandling());
-    }
 
     private void lagOpprettBehandlingTask(HendelseTaskDataWrapper hendelseTaskDataWrapper) {
         HendelseTaskDataWrapper taskData = HendelseTaskDataWrapper.lagWrapperForOpprettBehandling(hendelseTaskDataWrapper.getBehandlingUuid(),
@@ -66,6 +49,9 @@ public class HendelseHåndtererTjeneste {
 
         taskData.setFagsakYtelseType(hendelseTaskDataWrapper.getFagsakYtelseType());
         taskData.setBehandlingType(BehandlingType.TILBAKEKREVING);
+        taskData.setVarselTekst(hendelseTaskDataWrapper.getVarselTekst());
+        taskData.setVarselBeløp(hendelseTaskDataWrapper.getVarselBeløp());
+        taskData.setTilbakekrevingValg(hendelseTaskDataWrapper.getTilbakekrevingValg());
 
         taskRepository.lagre(taskData.getProsessTaskData());
     }

@@ -11,6 +11,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakReposi
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseRepository;
@@ -45,5 +46,7 @@ public interface BehandlingRepositoryProvider {
     VilkårsvurderingRepository getVilkårsvurderingRepository();
 
     BehandlingVedtakRepository getBehandlingVedtakRepository();
+
+    VarselRepository getVarselRepository();
 
 }

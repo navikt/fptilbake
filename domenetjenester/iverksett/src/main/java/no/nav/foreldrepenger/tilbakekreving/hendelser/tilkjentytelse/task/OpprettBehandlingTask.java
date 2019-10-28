@@ -5,10 +5,13 @@ import java.util.UUID;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.StringUtils;
+
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
@@ -22,14 +25,17 @@ public class OpprettBehandlingTask implements ProsessTaskHandler {
 
     public static final String TASKTYPE = "hendelser.opprettBehandling";
 
-    BehandlingTjeneste behandlingTjeneste;
+    private VarselRepository varselRepository;
+    private BehandlingTjeneste behandlingTjeneste;
+
 
     OpprettBehandlingTask() {
         // CDI
     }
 
     @Inject
-    public OpprettBehandlingTask(BehandlingTjeneste behandlingTjeneste) {
+    public OpprettBehandlingTask(VarselRepository varselRepository, BehandlingTjeneste behandlingTjeneste) {
+        this.varselRepository = varselRepository;
         this.behandlingTjeneste = behandlingTjeneste;
     }
 
@@ -44,13 +50,22 @@ public class OpprettBehandlingTask implements ProsessTaskHandler {
         AktørId aktørId = dataWrapper.getAktørId();
         BehandlingType behandlingType = dataWrapper.getBehandlingType();
         FagsakYtelseType fagsakYtelseType = dataWrapper.getFagsakYtelseType();
+        String varselTekst = dataWrapper.getVarselTekst();
+        Long varselBeløp = dataWrapper.getVarselBeløp() != null ? Long.valueOf(dataWrapper.getVarselBeløp()) : 0l;
 
-        opprettBehandling(saksnummer, UUID.fromString(externBehandlingUuid), eksternBehandlingId, aktørId, fagsakYtelseType, behandlingType);
+        Long behandlingId = opprettBehandling(saksnummer, UUID.fromString(externBehandlingUuid), eksternBehandlingId, aktørId, fagsakYtelseType, behandlingType);
+        if (StringUtils.isNotEmpty(varselTekst)) { // lagres varsel bare når varselTekst finnes
+            lagreVarselData(behandlingId, varselTekst, varselBeløp);
+        }
     }
 
-    private void opprettBehandling(Saksnummer saksnummer, UUID eksternUuid, long eksternBehandlingId,
+    private Long opprettBehandling(Saksnummer saksnummer, UUID eksternUuid, long eksternBehandlingId,
                                    AktørId aktørId, FagsakYtelseType fagsakYtelseType,
                                    BehandlingType behandlingType) {
-        behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer, eksternUuid, eksternBehandlingId, aktørId, fagsakYtelseType, behandlingType);
+        return behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer, eksternUuid, eksternBehandlingId, aktørId, fagsakYtelseType, behandlingType);
+    }
+
+    private void lagreVarselData(Long behandlingId, String varselTekst, Long varselBeløp) {
+        varselRepository.lagre(behandlingId, varselTekst, varselBeløp);
     }
 }

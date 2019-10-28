@@ -39,6 +39,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fagsak.FagsakTjeneste;
@@ -52,8 +54,6 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagAggregate;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.simulering.kontrakt.SimuleringResultatDto;
-import no.nav.foreldrepenger.tilbakekreving.simulering.tjeneste.SimuleringIntegrasjonTjeneste;
 import no.nav.vedtak.felles.jpa.Transaction;
 import no.nav.vedtak.konfig.KonfigVerdi;
 
@@ -66,10 +66,10 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
     private BehandlingRepository behandlingRepository;
     private EksternBehandlingRepository eksternBehandlingRepository;
     private BehandlingresultatRepository behandlingresultatRepository;
+    private KravgrunnlagRepository grunnlagRepository;
+    private VarselRepository varselRepository;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste;
-    private KravgrunnlagRepository grunnlagRepository;
-    private SimuleringIntegrasjonTjeneste simuleringIntegrasjonTjeneste;
     private FagsakTjeneste fagsakTjeneste;
     private HistorikkinnslagTjeneste historikkinnslagTjeneste;
     private FeilutbetalingTjeneste feilutbetalingTjeneste;
@@ -82,9 +82,8 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
     }
 
     @Inject
-    public BehandlingTjenesteImpl(BehandlingRepositoryProvider behandlingRepositoryProvider, //NOSONAR
+    public BehandlingTjenesteImpl(BehandlingRepositoryProvider behandlingRepositoryProvider,
                                   BehandlingskontrollProvider behandlingskontrollProvider,
-                                  SimuleringIntegrasjonTjeneste simuleringIntegrasjonTjeneste,
                                   FagsakTjeneste fagsakTjeneste,
                                   HistorikkinnslagTjeneste historikkinnslagTjeneste,
                                   FeilutbetalingTjeneste feilutbetalingTjeneste,
@@ -92,7 +91,6 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
                                   @KonfigVerdi("frist.brukerrespons.varsel") Period defaultVentefrist) {
         this.behandlingskontrollTjeneste = behandlingskontrollProvider.getBehandlingskontrollTjeneste();
         this.behandlingskontrollAsynkTjeneste = behandlingskontrollProvider.getBehandlingskontrollAsynkTjeneste();
-        this.simuleringIntegrasjonTjeneste = simuleringIntegrasjonTjeneste;
         this.fagsakTjeneste = fagsakTjeneste;
         this.historikkinnslagTjeneste = historikkinnslagTjeneste;
         this.feilutbetalingTjeneste = feilutbetalingTjeneste;
@@ -103,6 +101,7 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
         this.grunnlagRepository = behandlingRepositoryProvider.getGrunnlagRepository();
         this.eksternBehandlingRepository = behandlingRepositoryProvider.getEksternBehandlingRepository();
         this.behandlingresultatRepository = behandlingRepositoryProvider.getBehandlingresultatRepository();
+        this.varselRepository = behandlingRepositoryProvider.getVarselRepository();
     }
 
     @Override
@@ -158,17 +157,14 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
     public Optional<BehandlingFeilutbetalingFakta> hentBehandlingFeilutbetalingFakta(Long behandlingId) {
         Optional<KravgrunnlagAggregate> grunnlagAggregate = grunnlagRepository.finnGrunnlagForBehandlingId(behandlingId);
         EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandlingId);
-        Optional<SimuleringResultatDto> resultat = simuleringIntegrasjonTjeneste.hentResultat(eksternBehandling.getEksternId());
+        Optional<VarselEntitet> resultat = varselRepository.finnVarsel(behandlingId);
         UUID eksternUuid = eksternBehandling.getEksternUuid();
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto = hentEksternBehandlingFraFpsak(eksternUuid);
         Optional<TilbakekrevingValgDto> tilbakekrevingValg = fpsakKlient.hentTilbakekrevingValg(eksternUuid);
-        if (!resultat.isPresent()) {
-            throw BehandlingFeil.FACTORY.fantIkkeSimuleringResultatForBehandlingId(behandlingId).toException();
-        }
+
         if (grunnlagAggregate.isPresent() && grunnlagAggregate.get().getGrunnlagØkonomi() != null) {
             // vi skal bare vise posteringer med feilutbetalt periode
             List<KravgrunnlagPeriode432> feilutbetaltPerioder = feilutbetalingTjeneste.finnPerioderMedFeilutbetaltPosteringer(grunnlagAggregate.get().getGrunnlagØkonomi().getPerioder());
-            SimuleringResultatDto simuleringResultat = resultat.get();
             BigDecimal aktuellFeilUtbetaltBeløp = BigDecimal.ZERO;
             List<UtbetaltPeriode> utbetaltPerioder = feilutbetalingTjeneste.finnesLogiskPeriode(feilutbetaltPerioder);
             LocalDate totalPeriodeFom = null;
@@ -179,7 +175,7 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
                 totalPeriodeFom = totalPeriodeFom == null || totalPeriodeFom.isAfter(utbetaltPeriode.getFom()) ? utbetaltPeriode.getFom() : totalPeriodeFom;
                 totalPeriodeTom = totalPeriodeTom == null || totalPeriodeTom.isBefore(utbetaltPeriode.getTom()) ? utbetaltPeriode.getTom() : totalPeriodeTom;
             }
-            return Optional.of(feilutbetalingTjeneste.lagBehandlingFeilUtbetalingFakta(simuleringResultat, aktuellFeilUtbetaltBeløp, utbetaltPerioder,
+            return Optional.of(feilutbetalingTjeneste.lagBehandlingFeilUtbetalingFakta(resultat, aktuellFeilUtbetaltBeløp, utbetaltPerioder,
                 new Periode(totalPeriodeFom, totalPeriodeTom), eksternBehandlingsinfoDto, tilbakekrevingValg));
         }
         return Optional.empty();

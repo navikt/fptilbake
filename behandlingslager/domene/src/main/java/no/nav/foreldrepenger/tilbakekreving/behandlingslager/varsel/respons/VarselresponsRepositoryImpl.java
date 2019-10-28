@@ -1,6 +1,6 @@
-package no.nav.foreldrepenger.tilbakekreving.behandlingslager.varselrespons;
+package no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons;
 
-import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.varselrespons.VarselresponsRepositoryFeil.FACTORY;
+import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons.VarselresponsRepositoryFeil.FACTORY;
 
 import java.util.List;
 import java.util.Objects;

@@ -22,6 +22,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositor
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselEntitet;
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTypeMedUndertypeDto;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
@@ -29,7 +30,6 @@ import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.TilbakekrevingValgD
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagBelop433;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
-import no.nav.foreldrepenger.tilbakekreving.simulering.kontrakt.SimuleringResultatDto;
 
 @ApplicationScoped
 public class FeilutbetalingTjeneste {
@@ -57,13 +57,14 @@ public class FeilutbetalingTjeneste {
         }
     }
 
-    public BehandlingFeilutbetalingFakta lagBehandlingFeilUtbetalingFakta(SimuleringResultatDto simuleringResultat, BigDecimal aktuellFeilUtbetaltBeløp,
+    public BehandlingFeilutbetalingFakta lagBehandlingFeilUtbetalingFakta(Optional<VarselEntitet> varselEntitet, BigDecimal aktuellFeilUtbetaltBeløp,
                                                                           List<UtbetaltPeriode> utbetaltPerioder, Periode totalPeriode,
                                                                           EksternBehandlingsinfoDto eksternBehandlingsinfoDto, Optional<TilbakekrevingValgDto> tilbakekrevingValgDto) {
+        BigDecimal tidligereVarseltBeløp = varselEntitet.isPresent() ? BigDecimal.valueOf(varselEntitet.get().getVarselBeløp()).abs() : BigDecimal.ZERO;
         return BehandlingFeilutbetalingFakta.builder()
             .medPerioder(utbetaltPerioder)
             .medAktuellFeilUtbetaltBeløp(aktuellFeilUtbetaltBeløp)
-            .medTidligereVarsletBeløp(new BigDecimal(simuleringResultat.getSumFeilutbetaling()).abs())
+            .medTidligereVarsletBeløp(tidligereVarseltBeløp)
             .medTotalPeriodeFom(totalPeriode.getFom())
             .medTotalPeriodeTom(totalPeriode.getTom())
             .medDatoForRevurderingsvedtak(eksternBehandlingsinfoDto.getVedtakDato())

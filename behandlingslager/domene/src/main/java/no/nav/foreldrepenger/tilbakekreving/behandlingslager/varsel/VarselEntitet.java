@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.behandlingslager.varselrespons;
+package no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel;
 
 import java.util.Objects;
 
@@ -13,9 +13,9 @@ import javax.persistence.Table;
 import no.nav.vedtak.felles.jpa.BaseEntitet;
 import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
 
-@Entity(name = "Varselrespons")
-@Table(name = "mottaker_varsel_respons")
-public class Varselrespons extends BaseEntitet {
+@Entity(name = "VarselEntitet")
+@Table(name = "varsel")
+public class VarselEntitet extends BaseEntitet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_MOTTAKER_VARSEL_RESPONS")
@@ -25,14 +25,17 @@ public class Varselrespons extends BaseEntitet {
     private Long behandlingId;
 
     @Convert(converter = BooleanToStringConverter.class)
-    @Column(name = "akseptert_faktagrunnlag")
-    private Boolean akseptertFaktagrunnlag;
+    @Column(name = "aktiv", nullable = false)
+    private boolean aktiv = true;
 
-    @Column(name = "kilde", nullable = false)
-    private String kilde;
+    @Column(name = "varsel_tekst")
+    private String varselTekst;
 
-    private Varselrespons() {
-        // Hibernate
+    @Column(name = "varsel_beloep")
+    private Long varselBeløp;
+
+    private VarselEntitet() {
+        // for hibernate
     }
 
     public Long getId() {
@@ -43,16 +46,20 @@ public class Varselrespons extends BaseEntitet {
         return behandlingId;
     }
 
-    public Boolean getAkseptertFaktagrunnlag() {
-        return akseptertFaktagrunnlag;
+    public boolean isAktiv() {
+        return aktiv;
     }
 
-    public void setAkseptertFaktagrunnlag(boolean akseptertFaktagrunnlag) {
-        this.akseptertFaktagrunnlag = akseptertFaktagrunnlag;
+    public String getVarselTekst() {
+        return varselTekst;
     }
 
-    public String getKilde() {
-        return kilde;
+    public Long getVarselBeløp() {
+        return varselBeløp;
+    }
+
+    public void disable() {
+        this.aktiv = false;
     }
 
     public static Builder builder() {
@@ -60,32 +67,31 @@ public class Varselrespons extends BaseEntitet {
     }
 
     public static class Builder {
-        private Varselrespons kladd;
-
-        public Builder() {
-            kladd = new Varselrespons();
-        }
+        private VarselEntitet kladd = new VarselEntitet();
 
         public Builder medBehandlingId(Long behandlingId) {
             kladd.behandlingId = behandlingId;
             return this;
         }
 
-        public Builder setAkseptertFaktagrunnlag(Boolean akseptertFaktagrunnlag) {
-            kladd.akseptertFaktagrunnlag = akseptertFaktagrunnlag;
+        public Builder medAktiv(boolean aktiv) {
+            kladd.aktiv = aktiv;
             return this;
         }
 
-        public Builder setKilde(String kilde) {
-            kladd.kilde = kilde;
+        public Builder medVarselTekst(String varselTekst) {
+            kladd.varselTekst = varselTekst;
             return this;
         }
 
-        public Varselrespons build() {
+        public Builder medVarselBeløp(Long varselBeløp) {
+            kladd.varselBeløp = varselBeløp;
+            return this;
+        }
+
+        public VarselEntitet build() {
             Objects.requireNonNull(kladd.behandlingId);
-            Objects.requireNonNull(kladd.kilde);
             return kladd;
         }
     }
-
 }

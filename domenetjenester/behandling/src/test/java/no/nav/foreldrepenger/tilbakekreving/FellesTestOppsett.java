@@ -38,7 +38,6 @@ import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.PersonopplysningDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
-import no.nav.foreldrepenger.tilbakekreving.simulering.kontrakt.SimuleringResultatDto;
 
 /**
  * Opprettet for å forenkle unit-tester
@@ -75,7 +74,6 @@ public class FellesTestOppsett extends TestOppsett {
     protected BehandlingTjeneste behandlingTjeneste = new BehandlingTjenesteImpl(
         repoProvider,
         behandlingskontrollProvider,
-        mockSimuleringIntegrasjonTjeneste,
         fagsakTjeneste,
         mockHistorikkTjeneste,
         feilutbetalingTjeneste,
@@ -83,8 +81,6 @@ public class FellesTestOppsett extends TestOppsett {
         defaultVentetid);
 
     protected TestUtility testUtility = new TestUtility(behandlingTjeneste);
-
-    private SimuleringResultatDto simResDto = new SimuleringResultatDto(SUM_FEIL_UTBETALT, SUM_INNTREKK);
 
     @Before
     public void init() {
@@ -95,7 +91,6 @@ public class FellesTestOppsett extends TestOppsett {
 
         TestUtility.SakDetaljer sakDetaljer = testUtility.opprettFørstegangsBehandling(aktørId);
         mapSakDetaljer(sakDetaljer);
-        when(mockSimuleringIntegrasjonTjeneste.hentResultat(eksternBehandlingId)).thenReturn(Optional.of(simResDto));
     }
 
     protected String formatDate(LocalDate localDate) {

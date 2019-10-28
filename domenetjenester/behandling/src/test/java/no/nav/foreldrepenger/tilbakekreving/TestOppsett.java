@@ -26,6 +26,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.TotrinnRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseRepository;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
@@ -35,7 +36,6 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkInnslagKonverter;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.simulering.tjeneste.SimuleringIntegrasjonTjeneste;
 import no.nav.vedtak.felles.integrasjon.journal.v3.JournalConsumer;
 import no.nav.vedtak.felles.integrasjon.journal.v3.JournalConsumerImpl;
 
@@ -50,7 +50,6 @@ public class TestOppsett {
 
     protected BehandlingskontrollTjeneste behandlingskontrollTjeneste = mock(BehandlingskontrollTjeneste.class);
     protected BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste = mock(BehandlingskontrollAsynkTjeneste.class);
-    protected SimuleringIntegrasjonTjeneste mockSimuleringIntegrasjonTjeneste = mock(SimuleringIntegrasjonTjeneste.class);
     protected TpsTjeneste mockTpsTjeneste = mock(TpsTjeneste.class);
     protected HistorikkinnslagTjeneste mockHistorikkTjeneste = mock(HistorikkinnslagTjeneste.class);
     protected FpsakKlient mockFpsakKlient = mock(FpsakKlient.class);
@@ -68,6 +67,7 @@ public class TestOppsett {
     protected VilkårsvurderingRepository vilkårsvurderingRepository = new VilkårsvurderingRepository(em);
     protected TotrinnRepository totrinnRepository = new TotrinnRepository(em);
     protected BehandlingRepository behandlingRepository = repoProvider.getBehandlingRepository();
+    protected VarselRepository varselRepository = repoProvider.getVarselRepository();
 
     protected HistorikkInnslagKonverter historikkInnslagKonverter = new HistorikkInnslagKonverter(repoProvider.getKodeverkRepository(),
             repoProvider.getAksjonspunktRepository());

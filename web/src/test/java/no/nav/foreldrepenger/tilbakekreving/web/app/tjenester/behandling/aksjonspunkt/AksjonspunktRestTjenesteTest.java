@@ -43,7 +43,6 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fagsak.FagsakTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.simulering.tjeneste.SimuleringIntegrasjonTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.BekreftedeAksjonspunkterDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.BekreftetAksjonspunktDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.VurderForeldelseDto;
@@ -79,7 +78,6 @@ public class AksjonspunktRestTjenesteTest {
 
         BehandlingTjeneste behandlingTjeneste = new BehandlingTjenesteImpl(repositoryProviderMock,
                 behandlingskontrollProvider,
-                mock(SimuleringIntegrasjonTjeneste.class),
                 mock(FagsakTjeneste.class),
                 mock(HistorikkinnslagTjeneste.class),
                 mock(FeilutbetalingTjeneste.class),
