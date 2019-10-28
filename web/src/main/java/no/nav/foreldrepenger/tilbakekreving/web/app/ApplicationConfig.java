@@ -4,8 +4,12 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.enterprise.inject.Instance;
+import javax.enterprise.inject.spi.CDI;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
+
+import org.jboss.weld.interceptor.util.proxy.TargetInstanceProxy;
 
 import io.swagger.jaxrs.config.BeanConfig;
 import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.ConstraintViolationMapper;
@@ -80,11 +84,19 @@ public class ApplicationConfig extends Application {
         classes.add(VarselresponsRestTjeneste.class);
         classes.add(BehandlingFaktaRestTjeneste.class);
         classes.add(FeilutbetalingÅrsakRestTjeneste.class);
-        classes.add(GrunnlagRestTestTjeneste.class);
         classes.add(VilkårsvurderingRestTjeneste.class);
         classes.add(TilbakekrevingResulattRestTjeneste.class);
         classes.add(TotrinnskontrollRestTjeneste.class);
         classes.add(BrevRestTjeneste.class);
+
+        //HAXX GrunnlagRestTjenesteTest skal bare være tilgjengelig for lokal utvikling, brukes for å sette opp test
+        //hvis denne legges til i en egen Application isdf i denne, kan man ikke bruke swagger for å nå tjenesten
+        //bruker derfor CDI for å slå opp klassen
+        Instance<GrunnlagRestTestTjeneste> grunnlagTestTjeneste = CDI.current().select(GrunnlagRestTestTjeneste.class);
+        if (!grunnlagTestTjeneste.isUnsatisfied()) {
+            TargetInstanceProxy proxy = (TargetInstanceProxy) grunnlagTestTjeneste.get();
+            classes.add(proxy.weld_getTargetClass());
+        }
 
         return Collections.unmodifiableSet(classes);
     }

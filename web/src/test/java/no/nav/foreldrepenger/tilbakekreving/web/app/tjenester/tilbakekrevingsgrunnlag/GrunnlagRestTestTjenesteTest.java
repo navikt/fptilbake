@@ -17,7 +17,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
@@ -26,13 +25,15 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.testtjenester.GrunnlagRestTestTjenesteLocalDev;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.testtjenester.KravgrunnlagDto;
 
 public class GrunnlagRestTestTjenesteTest {
 
     private TpsTjeneste tpsTjenesteMock = mock(TpsTjeneste.class);
     private KravgrunnlagTjeneste kravgrunnlagTjenesteMock = mock(KravgrunnlagTjeneste.class);
 
-    private GrunnlagRestTestTjeneste grunnlagTjeneste = new GrunnlagRestTestTjeneste(tpsTjenesteMock, kravgrunnlagTjenesteMock);
+    private GrunnlagRestTestTjenesteLocalDev grunnlagTjeneste = new GrunnlagRestTestTjenesteLocalDev(tpsTjenesteMock, kravgrunnlagTjenesteMock);
 
     @Test
     public void lagreUtbetalinger() throws Exception {
