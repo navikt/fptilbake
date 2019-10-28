@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.behandlingslager.varselrespons;
+package no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons;
 
 import no.nav.vedtak.feil.Feil;
 import no.nav.vedtak.feil.FeilFactory;

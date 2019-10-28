@@ -16,12 +16,15 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegRe
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingTypeRef;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varselrespons.Varselrespons;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons.Varselrespons;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.SendVarselbrevTask;
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -39,6 +42,7 @@ public class VarselStegImpl implements VarselSteg {
 
     private BehandlingRepository behandlingRepository;
     private ProsessTaskRepository taskRepository;
+    private VarselRepository varselRepository;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private VarselresponsTjeneste varselresponsTjeneste;
     private Period ventefrist;
@@ -48,26 +52,33 @@ public class VarselStegImpl implements VarselSteg {
     }
 
     @Inject
-    public VarselStegImpl(BehandlingRepository behandlingRepository,
+    public VarselStegImpl(BehandlingRepositoryProvider behandlingRepositoryProvider,
                           BehandlingskontrollTjeneste behandlingskontrollTjeneste,
                           VarselresponsTjeneste varselresponsTjeneste,
                           ProsessTaskRepository taskRepository,
                           @KonfigVerdi(value = "behandling.venter.frist.lengde") Period ventefrist) {
-        this.behandlingRepository = behandlingRepository;
+        this.behandlingRepository = behandlingRepositoryProvider.getBehandlingRepository();
+        this.taskRepository = taskRepository;
+        this.varselRepository = behandlingRepositoryProvider.getVarselRepository();
+
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
         this.varselresponsTjeneste = varselresponsTjeneste;
         this.ventefrist = ventefrist;
-        this.taskRepository = taskRepository;
     }
 
     @Override
     public BehandleStegResultat utførSteg(BehandlingskontrollKontekst kontekst) {
         Behandling behandling = behandlingRepository.hentBehandling(kontekst.getBehandlingId());
+        Optional<VarselEntitet> varselEntitet = varselRepository.finnVarsel(kontekst.getBehandlingId());
+        if (varselEntitet.isEmpty()) {
+            log.info("VarselTekst finnes ikke for behandlingId={}, ikke sende varsel til bruker!!",behandling.getId());
+            return BehandleStegResultat.utførtUtenAksjonspunkter();
+        }
         LocalDateTime fristTid = FPDateUtil.nå().plus(ventefrist).plusDays(1);
         opprettSendVarselTask(behandling);
 
         behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING,
-                BehandlingStegType.VARSEL, fristTid, Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING);
+            BehandlingStegType.VARSEL, fristTid, Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING);
 
         return BehandleStegResultat.settPåVent();
     }

@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.behandlingslager.varselrespons;
+package no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons;
 
 import java.util.Optional;
 

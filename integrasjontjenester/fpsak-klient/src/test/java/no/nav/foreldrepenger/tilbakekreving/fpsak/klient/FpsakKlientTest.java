@@ -28,7 +28,6 @@ import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.PersonadresseDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.PersonopplysningDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.TilbakekrevingValgDto;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.VarseltekstDto;
 import no.nav.vedtak.felles.integrasjon.rest.OidcRestClient;
 
 public class FpsakKlientTest {
@@ -36,14 +35,12 @@ public class FpsakKlientTest {
     private static final Long BEHANDLING_ID = 123456L;
     private static final Long FAGSAK_ID = 1234L;
     private static final String SAKSNUMMER = "1256436";
-    private static final String VARSELTEKST = "varseltekst";
     private static final UUID BEHANDLING_UUID = UUID.randomUUID();
 
     private static final String BASE_URI = "http://fpsak";
     private static final URI BEHANDLING_URI = URI.create(BASE_URI + "/fpsak/api/behandling/backend-root?uuid=" + BEHANDLING_UUID);
     private static final URI BEHANDLING_ALLE_URI = URI.create(BASE_URI + "/fpsak/api/behandlinger/alle?saksnummer=" + SAKSNUMMER);
     private static final URI PERSONOPPLYSNING_URI = URI.create(BASE_URI + "/fpsak/api/behandling/person/personopplysninger?uuid=" + BEHANDLING_UUID);
-    private static final URI VARSELTEKST_URI = URI.create(BASE_URI + "/fpsak/api/behandling/tilbakekreving/varseltekst?uuid=" + BEHANDLING_UUID);
     private static final URI TILBAKEKREVING_VALG_URI = URI.create(BASE_URI + "/fpsak/api/behandling/tilbakekreving/valg?uuid=" + BEHANDLING_UUID);
 
     @Rule
@@ -59,20 +56,18 @@ public class FpsakKlientTest {
 
         when(oidcRestClientMock.getReturnsOptional(BEHANDLING_URI, EksternBehandlingsinfoDto.class)).thenReturn(Optional.of(returnDto));
         when(oidcRestClientMock.getReturnsOptional(PERSONOPPLYSNING_URI, PersonopplysningDto.class)).thenReturn(Optional.of(personopplysningDto()));
-        when(oidcRestClientMock.getReturnsOptional(VARSELTEKST_URI, VarseltekstDto.class)).thenReturn(Optional.of(new VarseltekstDto(VARSELTEKST)));
 
-        SamletEksternBehandlingInfo dokumentinfoDto = klient.hentBehandlingsinfo(BEHANDLING_UUID, Tillegsinformasjon.PERSONOPPLYSNINGER, Tillegsinformasjon.VARSELTEKST);
+        SamletEksternBehandlingInfo dokumentinfoDto = klient.hentBehandlingsinfo(BEHANDLING_UUID, Tillegsinformasjon.PERSONOPPLYSNINGER);
 
         assertThat(dokumentinfoDto.getGrunninformasjon()).isEqualTo(returnDto);
         assertThat(dokumentinfoDto.getPersonopplysninger()).isNotNull();
-        assertThat(dokumentinfoDto.getVarseltekst()).isEqualTo(VARSELTEKST);
     }
 
     @Test
     public void skal_returnere_null_grunninformasjon_når_dokumentinfo_ikke_finnes() {
         when(oidcRestClientMock.getReturnsOptional(any(), any())).thenReturn(Optional.empty());
 
-        SamletEksternBehandlingInfo resultat = klient.hentBehandlingsinfo(BEHANDLING_UUID, Tillegsinformasjon.PERSONOPPLYSNINGER, Tillegsinformasjon.VARSELTEKST);
+        SamletEksternBehandlingInfo resultat = klient.hentBehandlingsinfo(BEHANDLING_UUID, Tillegsinformasjon.PERSONOPPLYSNINGER);
         assertThat(resultat.getGrunninformasjon()).isNull();
     }
 

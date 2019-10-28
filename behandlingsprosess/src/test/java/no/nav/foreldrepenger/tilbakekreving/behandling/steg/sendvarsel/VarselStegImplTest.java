@@ -9,6 +9,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,12 +18,14 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandleStegResu
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.transisjoner.FellesTransisjoner;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProviderImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
@@ -30,6 +33,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.TestFagsakUtil;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
@@ -42,23 +46,33 @@ public class VarselStegImplTest {
     public final UnittestRepositoryRule repoRule = new UnittestRepositoryRule();
 
     @Inject
-    private FagsakRepository fagsakRepository;
-    @Inject
-    private BehandlingRepository behandlingRepository;
-    @Inject
     private ProsessTaskRepository prosessTaskRepository;
+
     @Inject
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
 
-    private HistorikkRepository historikkRepository = new HistorikkRepository(repoRule.getEntityManager());
+    private BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProviderImpl(repoRule.getEntityManager());
+
+    private FagsakRepository fagsakRepository = repositoryProvider.getFagsakRepository();
+    private HistorikkRepository historikkRepository = repositoryProvider.getHistorikkRepository();
+    private BehandlingRepository behandlingRepository = repositoryProvider.getBehandlingRepository();
+    private VarselRepository varselRepository = repositoryProvider.getVarselRepository();
+
     private VarselresponsTjeneste varselresponsTjeneste = mock(VarselresponsTjeneste.class);
+    private Fagsak fagsak;
+    private Behandling behandling;
+
+    @Before
+    public void setup() {
+        fagsak = TestFagsakUtil.opprettFagsak();
+        fagsakRepository.lagre(fagsak);
+        behandling = lagBehandling(fagsak);
+    }
 
     @Test
     public void skal_sette_behandling_på_vent() {
-        Fagsak fagsak = TestFagsakUtil.opprettFagsak();
-        fagsakRepository.lagre(fagsak);
-        Behandling behandling = lagBehandling(fagsak);
 
+        varselRepository.lagre(behandling.getId(), "hello", 23000l);
 
         //act
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
@@ -78,6 +92,13 @@ public class VarselStegImplTest {
         assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.BEH_VENT);
     }
 
+    public void skal_sette_behandling_ikke_på_vent_hvis_varsel_finnes_ikke() {
+        BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
+        BehandleStegResultat stegResultat = steg().utførSteg(new BehandlingskontrollKontekst(fagsak.getId(), fagsak.getAktørId(), lås));
+        assertThat(stegResultat.getAksjonspunktListe()).isEmpty();
+        assertThat(behandling.isBehandlingPåVent()).isFalse();
+    }
+
     private Behandling lagBehandling(Fagsak fagsak) {
         Behandling behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).build();
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
@@ -87,7 +108,7 @@ public class VarselStegImplTest {
 
     private VarselSteg steg() {
         return new VarselStegImpl(
-            behandlingRepository,
+            repositoryProvider,
             behandlingskontrollTjeneste,
             varselresponsTjeneste,
             prosessTaskRepository,

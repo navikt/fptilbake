@@ -18,9 +18,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.TestFagsakUtil;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varselrespons.Varselrespons;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varselrespons.VarselresponsRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varselrespons.VarselresponsRepositoryImpl;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons.Varselrespons;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons.VarselresponsRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons.VarselresponsRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 
 public class VarselresponsTjenesteImplTest {

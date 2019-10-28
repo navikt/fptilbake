@@ -5,6 +5,9 @@ import static no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.Task
 import static no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.TaskProperties.EKSTERN_BEHANDLING_UUID;
 import static no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.TaskProperties.FAGSAK_YTELSE_TYPE;
 import static no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.TaskProperties.SAKSNUMMER;
+import static no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.TaskProperties.TILBAKEKREVING_VALG;
+import static no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.TaskProperties.VARSEL_BELØP;
+import static no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.TaskProperties.VARSEL_TEKST;
 
 import java.util.Objects;
 
@@ -55,6 +58,18 @@ public class HendelseTaskDataWrapper {
         return prosessTaskData.getPropertyValue(EKSTERN_BEHANDLING_UUID);
     }
 
+    public String getVarselTekst() {
+        return prosessTaskData.getPropertyValue(VARSEL_TEKST);
+    }
+
+    public String getVarselBeløp() {
+        return prosessTaskData.getPropertyValue(VARSEL_BELØP);
+    }
+
+    public String getTilbakekrevingValg() {
+        return prosessTaskData.getPropertyValue(TILBAKEKREVING_VALG);
+    }
+
     public void setFagsakYtelseType(FagsakYtelseType fagsakYtelseType) {
         prosessTaskData.setProperty(FAGSAK_YTELSE_TYPE, fagsakYtelseType.getKode());
     }
@@ -63,9 +78,20 @@ public class HendelseTaskDataWrapper {
         prosessTaskData.setProperty(SAKSNUMMER, saksnummer.getVerdi());
     }
 
-
     public void setBehandlingType(BehandlingType behandlingType) {
         prosessTaskData.setProperty(BEHANDLING_TYPE, behandlingType.getKode());
+    }
+
+    public void setVarselTekst(String varselTekst) {
+        prosessTaskData.setProperty(VARSEL_TEKST, varselTekst);
+    }
+
+    public void setVarselBeløp(String varselBeløp) {
+        prosessTaskData.setProperty(VARSEL_BELØP, varselBeløp);
+    }
+
+    public void setTilbakekrevingValg(String valg) {
+        prosessTaskData.setProperty(TILBAKEKREVING_VALG, valg);
     }
 
     public void validerTaskDataHåndterHendelse() {
@@ -74,6 +100,7 @@ public class HendelseTaskDataWrapper {
         Objects.requireNonNull(prosessTaskData.getPropertyValue(EKSTERN_BEHANDLING_ID));
         Objects.requireNonNull(prosessTaskData.getPropertyValue(SAKSNUMMER));
         Objects.requireNonNull(prosessTaskData.getPropertyValue(FAGSAK_YTELSE_TYPE));
+        Objects.requireNonNull(prosessTaskData.getPropertyValue(TILBAKEKREVING_VALG));
     }
 
     public void validerTaskDataOpprettBehandling() {
@@ -94,6 +121,9 @@ public class HendelseTaskDataWrapper {
         ProsessTaskData td = lagProsessTaskDataMedFellesProperty(HåndterHendelseTask.TASKTYPE, melding.getAktørId(), melding.getBehandlingId(),
             melding.getBehandlingUuid().toString(), melding.getSaksnummer());
         td.setProperty(FAGSAK_YTELSE_TYPE, melding.getFagsakYtelseType());
+        td.setProperty(VARSEL_TEKST,melding.getVarselTekst());
+        td.setProperty(VARSEL_BELØP,String.valueOf(melding.getVarselBeløp()));
+        td.setProperty(TILBAKEKREVING_VALG,melding.getTilbakekrevingValg());
 
         return new HendelseTaskDataWrapper(td);
     }
@@ -114,7 +144,7 @@ public class HendelseTaskDataWrapper {
         ProsessTaskData td = new ProsessTaskData(taskType);
         td.setAktørId(aktørId.getId());
         td.setProperty(EKSTERN_BEHANDLING_ID, String.valueOf(behandlingId));
-        td.setProperty(EKSTERN_BEHANDLING_UUID, behandlingUuid.toString());
+        td.setProperty(EKSTERN_BEHANDLING_UUID, behandlingUuid);
         td.setProperty(SAKSNUMMER, saksnummer.getVerdi());
         return td;
     }

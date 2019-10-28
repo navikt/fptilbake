@@ -6,8 +6,8 @@ import java.util.Optional;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varselrespons.Varselrespons;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varselrespons.VarselresponsRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons.Varselrespons;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons.VarselresponsRepository;
 
 @ApplicationScoped
 public class VarselresponsTjenesteImpl implements VarselresponsTjeneste {

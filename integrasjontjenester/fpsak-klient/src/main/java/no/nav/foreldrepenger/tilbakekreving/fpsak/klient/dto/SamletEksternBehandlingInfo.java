@@ -13,7 +13,6 @@ public class SamletEksternBehandlingInfo {
     private Collection<Tillegsinformasjon> tilleggsinformasjonHentet;
     private EksternBehandlingsinfoDto grunninformasjon;
     private PersonopplysningDto personopplysninger;
-    private String varseltekst;
     private TilbakekrevingValgDto tilbakekrevingsvalg;
     private SoknadDto søknad;
     private FagsakDto fagsak;
@@ -25,11 +24,6 @@ public class SamletEksternBehandlingInfo {
     public PersonopplysningDto getPersonopplysninger() {
         Objects.check(tilleggsinformasjonHentet.contains(Tillegsinformasjon.PERSONOPPLYSNINGER), "Utvikler-feil: har ikke hentet personopplysninger");
         return personopplysninger;
-    }
-
-    public String getVarseltekst() {
-        Objects.check(tilleggsinformasjonHentet.contains(Tillegsinformasjon.VARSELTEKST), "Utvikler-feil: har ikke hentet varseltekst");
-        return varseltekst;
     }
 
     public TilbakekrevingValgDto getTilbakekrevingsvalg() {
@@ -89,16 +83,6 @@ public class SamletEksternBehandlingInfo {
 
         public Builder setPersonopplysninger(PersonopplysningDto personopplysninger) {
             kladd.personopplysninger = personopplysninger;
-            return this;
-        }
-
-        public Builder setVarseltekst(String varseltekst) {
-            kladd.varseltekst = varseltekst;
-            return this;
-        }
-
-        public Builder setVarseltekst(VarseltekstDto varseltekst) {
-            kladd.varseltekst = varseltekst.getVarseltekst();
             return this;
         }
 
