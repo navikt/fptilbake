@@ -69,9 +69,7 @@ public class VarselStegImpl implements VarselSteg {
     @Override
     public BehandleStegResultat utførSteg(BehandlingskontrollKontekst kontekst) {
         Behandling behandling = behandlingRepository.hentBehandling(kontekst.getBehandlingId());
-        Optional<VarselEntitet> varselEntitet = varselRepository.finnVarsel(kontekst.getBehandlingId());
-        if (varselEntitet.isEmpty()) {
-            log.info("VarselTekst finnes ikke for behandlingId={}, ikke sende varsel til bruker!!",behandling.getId());
+        if (sjekkTilbakekrevingOpprettetUtenVarsel(behandling.getId())) {
             return BehandleStegResultat.utførtUtenAksjonspunkter();
         }
         LocalDateTime fristTid = FPDateUtil.nå().plus(ventefrist).plusDays(1);
@@ -87,6 +85,9 @@ public class VarselStegImpl implements VarselSteg {
     public BehandleStegResultat gjenopptaSteg(BehandlingskontrollKontekst kontekst) {
         Behandling behandling = behandlingRepository.hentBehandling(kontekst.getBehandlingId());
         LocalDate iDag = FPDateUtil.iDag();
+        if (sjekkTilbakekrevingOpprettetUtenVarsel(behandling.getId())) {
+            return BehandleStegResultat.utførtUtenAksjonspunkter();
+        }
         Optional<Varselrespons> varselrespons = varselresponsTjeneste.hentRespons(kontekst.getBehandlingId());
         Optional<LocalDate> frist = Optional.ofNullable(behandling.getFristDatoBehandlingPåVent());
         if (frist.isPresent() && iDag.isAfter(frist.get()) && !varselrespons.isPresent()) {
@@ -101,5 +102,14 @@ public class VarselStegImpl implements VarselSteg {
         ProsessTaskData taskData = new ProsessTaskData(SendVarselbrevTask.TASKTYPE);
         taskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         taskRepository.lagre(taskData);
+    }
+
+    private boolean sjekkTilbakekrevingOpprettetUtenVarsel(Long behandlingId) {
+        Optional<VarselEntitet> varselEntitet = varselRepository.finnVarsel(behandlingId);
+        if (varselEntitet.isEmpty()) {
+            log.info("VarselTekst finnes ikke for behandlingId={}, ikke sende varsel til bruker!!", behandlingId);
+            return true;
+        }
+        return false;
     }
 }

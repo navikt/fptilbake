@@ -2,6 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.fpsak.klient;
 
 public enum Tillegsinformasjon {
     PERSONOPPLYSNINGER("soeker-personopplysninger"),
+    VARSELTEKST("tilbakekrevingsvarsel-fritekst"),
     SØKNAD("soknad"),
     TILBAKEKREVINGSVALG("tilbakekreving-valg"),
     FAGSAK("fagsak");

@@ -58,6 +58,10 @@ public class VarselEntitet extends BaseEntitet {
         return varselBeløp;
     }
 
+    public void setVarselBeløp(Long varselBeløp) {
+        this.varselBeløp = varselBeløp;
+    }
+
     public void disable() {
         this.aktiv = false;
     }

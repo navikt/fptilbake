@@ -18,7 +18,6 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 public class LesKravgrunnlagTaskTest extends FellesTestOppsett {
 
     private Long kravgrunnlagId;
-    private static final Long FPSAK_BEHANDLING_ID = 100000001L;
 
 
     @Before

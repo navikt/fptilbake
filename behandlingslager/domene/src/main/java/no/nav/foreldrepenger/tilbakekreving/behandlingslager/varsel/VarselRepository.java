@@ -55,4 +55,12 @@ public class VarselRepository {
         query.setParameter("aktiv", true);
         return hentEksaktResultat(query);
     }
+
+    public void lagreVarseltBeløp(Long behandlingId, Long varseltBeløp) {
+        VarselEntitet varselEntitet = finnEksaktVarsel(behandlingId);
+        varselEntitet.setVarselBeløp(varseltBeløp);
+
+        entityManager.persist(varselEntitet);
+        entityManager.flush();
+    }
 }

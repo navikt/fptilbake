@@ -81,6 +81,7 @@ public class FellesTestOppsett {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 
+    protected static final Long FPSAK_BEHANDLING_ID = 100000001L;
     protected static final UUID FPSAK_BEHANDLING_UUID = UUID.randomUUID();
 
     private ProsessTaskEventPubliserer eventPublisererMock = mock(ProsessTaskEventPubliserer.class);

@@ -76,7 +76,6 @@ public class TilkjentYtelseReader {
         Objects.requireNonNull(melding.getBehandlingUuid());
         Objects.requireNonNull(melding.getSaksnummer());
         Objects.requireNonNull(melding.getFagsakYtelseType());
-        Objects.requireNonNull(melding.getTilbakekrevingValg());
     }
 
 }

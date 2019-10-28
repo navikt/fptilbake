@@ -163,6 +163,7 @@ public class VarselbrevTjeneste {
 
         VarselEntitet varselEntitet = varselRepository.finnEksaktVarsel(behandlingId);
         String varselTekst = varselEntitet.getVarselTekst();
+        lagreVarseltBeløp(behandlingId,feilutbetaltePerioderDto.getSumFeilutbetaling());
 
         return VarselbrevUtil.sammenstillInfoFraFagsystemerForSending(
             eksternBehandlingsinfoDto,
@@ -195,5 +196,9 @@ public class VarselbrevTjeneste {
             eksternDataForBrevTjeneste.getBrukersSvarfrist(),
             fagsakYtleseType,
             ytelseNavn);
+    }
+
+    private void lagreVarseltBeløp(Long behandlingId,Long varseltBeløp){
+        varselRepository.lagreVarseltBeløp(behandlingId,varseltBeløp);
     }
 }

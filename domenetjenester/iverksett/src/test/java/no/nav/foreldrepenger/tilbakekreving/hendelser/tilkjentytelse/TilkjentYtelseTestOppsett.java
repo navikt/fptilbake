@@ -9,7 +9,6 @@ import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.tilbakekrevingsvalg.VidereBehandling;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
@@ -28,8 +27,6 @@ public class TilkjentYtelseTestOppsett {
     protected static final String IV_SYSTEM = "FPSAK";
     protected static final UUID EKSTERN_BEHANDLING_UUID = UUID.randomUUID();
     protected static final FagsakYtelseType FAGSAK_YTELSE_TYPE = FagsakYtelseType.FORELDREPENGER;
-    protected static final String VARSEL_TEKST = "hello";
-    protected static final String VARSEL_BELØP = "23000";
 
     @Rule
     public RepositoryRule repoRule = new UnittestRepositoryRule();
@@ -50,8 +47,6 @@ public class TilkjentYtelseTestOppsett {
         prosessTaskData.setAktørId(AKTØR_ID.getId());
         prosessTaskData.setProperty(TaskProperties.SAKSNUMMER,SAKSNUMMER.getVerdi());
         prosessTaskData.setProperty(TaskProperties.FAGSAK_YTELSE_TYPE,FAGSAK_YTELSE_TYPE.getKode());
-        prosessTaskData.setProperty(TaskProperties.VARSEL_TEKST,"hello");
-        prosessTaskData.setProperty(TaskProperties.VARSEL_BELØP,"23000");
         hendelseTaskDataWrapper = new HendelseTaskDataWrapper(prosessTaskData);
     }
 
@@ -63,9 +58,6 @@ public class TilkjentYtelseTestOppsett {
         melding.setBehandlingUuid(EKSTERN_BEHANDLING_UUID);
         melding.setFagsakYtelseType(FagsakYtelseType.FORELDREPENGER.getKode());
         melding.setSaksnummer("1234");
-        melding.setVarselTekst(VARSEL_TEKST);
-        melding.setVarselBeløp(Long.valueOf(VARSEL_BELØP));
-        melding.setTilbakekrevingValg(VidereBehandling.TILBAKEKREV_I_INFOTRYGD.getKode());
 
         return melding;
     }
