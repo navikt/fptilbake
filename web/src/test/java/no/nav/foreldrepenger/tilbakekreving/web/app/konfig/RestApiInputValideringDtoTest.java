@@ -63,6 +63,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkTa
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.ValidKodeverk;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.foreldrepenger.tilbakekreving.web.app.IndexClasses;
+import no.nav.vedtak.felles.testutilities.cdi.WeldContext;
 
 @RunWith(Parameterized.class)
 public class RestApiInputValideringDtoTest extends RestApiTester {
@@ -71,8 +72,8 @@ public class RestApiInputValideringDtoTest extends RestApiTester {
 
     @Parameterized.Parameters(name = "Validerer Dto - {0}")
     public static Collection<Object[]> getDtos() {
-        System.setProperty("loadbalancer.url","http://localhost:8030");
-        return finnAlleDtoTyper().stream().map(c -> new Object[] { c.getName(), c }).collect(Collectors.toSet());
+        System.setProperty("loadbalancer.url", "http://localhost:8030");
+        return WeldContext.getInstance().doWithScope(() -> finnAlleDtoTyper().stream().map(c -> new Object[]{c.getName(), c}).collect(Collectors.toSet()));
     }
 
     @After

@@ -13,7 +13,9 @@ import javax.servlet.http.HttpServletRequest;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 import no.nav.vedtak.isso.config.ServerInfo;
 import no.nav.vedtak.sikkerhet.abac.AbacDto;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
@@ -21,6 +23,7 @@ import no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessursResourceAttributt;
 
 
+@RunWith(CdiRunner.class)
 public class RestApiAbacTest {
 
     private static String PREV_LB_URL;
@@ -114,7 +117,7 @@ public class RestApiAbacTest {
 
     @AfterClass
     public static void teardown() {
-        if(PREV_LB_URL != null){
+        if (PREV_LB_URL != null) {
             System.setProperty(ServerInfo.PROPERTY_KEY_LOADBALANCER_URL, PREV_LB_URL);
         }
     }

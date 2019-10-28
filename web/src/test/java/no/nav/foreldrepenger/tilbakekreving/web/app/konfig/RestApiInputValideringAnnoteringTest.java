@@ -11,14 +11,18 @@ import javax.ws.rs.core.Context;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
+
+@RunWith(CdiRunner.class)
 public class RestApiInputValideringAnnoteringTest extends RestApiTester {
 
     private Function<Method, String> printKlasseOgMetodeNavn = (method -> String.format("%s.%s", method.getDeclaringClass(), method.getName()));
 
     @Before
-    public void setup(){
-        System.setProperty("loadbalancer.url","http://localhost:8030");
+    public void setup() {
+        System.setProperty("loadbalancer.url", "http://localhost:8030");
     }
 
     /**
