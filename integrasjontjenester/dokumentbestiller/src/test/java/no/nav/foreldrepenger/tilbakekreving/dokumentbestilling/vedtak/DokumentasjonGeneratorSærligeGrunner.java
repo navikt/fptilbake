@@ -42,7 +42,7 @@ public class DokumentasjonGeneratorSærligeGrunner {
                             String s = TekstformatererVedtaksbrev.lagSærligeGrunnerTekst(felles, periode);
                             String overskrift = overskrift(sgNav, sgBeløp, sgTid, sgAnnet, reduksjon);
                             String prettyprint = s.replace("_Er det særlige grunner til å redusere beløpet?", overskrift)
-                                .replace(" 500 kroner", " [kravbeløp] kroner");
+                                .replace(" 500 kroner", " <kravbeløp> kroner");
 
                             System.out.println();
                             System.out.println(prettyprint);
