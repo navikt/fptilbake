@@ -46,8 +46,9 @@ class TekstformatererVedtaksbrev {
     private static String PARTIAL_VEDTAK_START = "vedtak/vedtak_start";
     private static String PARTIAL_VEDTAK_SLUTT = "vedtak/vedtak_slutt";
     private static String PARTIAL_VEDTAK_FELLES = "vedtak/vedtak_felles";
-    static String FRITEKST_MARKERING_START = "\\\\START//";
-    static String FRITEKST_MARKERING_SLUTT = "\\\\SLUTT//";
+    static String FRITEKST_MARKERING_START = "\\\\FRITEKST_START";
+    static String FRITEKST_PÅKREVET_MARKERING_START = "\\\\PÅKREVET_FRITEKST_START";
+    static String FRITEKST_MARKERING_SLUTT = "\\\\FRITEKST_SLUTT";
 
     private static final ObjectMapper OM = ObjectMapperForUtvekslingAvDataMedHandlebars.INSTANCE;
 
@@ -66,18 +67,38 @@ class TekstformatererVedtaksbrev {
 
     private static void settInnMarkeringForFritekst(HbVedtaksbrevData vedtaksbrevData) {
         for (HbVedtaksbrevPeriode periode : vedtaksbrevData.getPerioder()) {
-            periode.setFritekstSærligeGrunner(markerFritekst(periode.getFritekstSærligeGrunner()));
-            periode.setFritekstFakta(markerFritekst(periode.getFritekstFakta()));
-            periode.setFritekstVilkår(markerFritekst(periode.getFritekstVilkår()));
-            periode.setFritekstSærligeGrunnerAnnet(markerFritekst(periode.getFritekstSærligeGrunnerAnnet()));
+            periode.setFritekstFakta(markerFritekst(periode.getFritekstFakta(), Underavsnitt.Underavsnittstype.FAKTA));
+            periode.setFritekstVilkår(markerFritekst(periode.getFritekstVilkår(), Underavsnitt.Underavsnittstype.VILKÅR));
+            periode.setFritekstSærligeGrunner(markerFritekst(periode.getFritekstSærligeGrunner(), Underavsnitt.Underavsnittstype.SÆRLIGEGRUNNER));
+            periode.setFritekstSærligeGrunnerAnnet(markerFritekst(periode.getFritekstSærligeGrunnerAnnet(), Underavsnitt.Underavsnittstype.SÆRLIGEGRUNNER_ANNET));
         }
         vedtaksbrevData.getFelles().setFritekstOppsummering(markerFritekst(vedtaksbrevData.getFelles().getFritekstOppsummering()));
     }
 
     static String markerFritekst(String fritekst) {
+        return markerFritekst(fritekst, null);
+    }
+
+    static String markerFritekst(String fritekst, Underavsnitt.Underavsnittstype underavsnittstype) {
+        String startmarkør = underavsnittstype == null
+            ? FRITEKST_MARKERING_START
+            : FRITEKST_MARKERING_START + underavsnittstype;
         return fritekst == null
-            ? FRITEKST_MARKERING_START + "\n" + FRITEKST_MARKERING_SLUTT
-            : FRITEKST_MARKERING_START + "\n" + fritekst + "\n" + FRITEKST_MARKERING_SLUTT;
+            ? startmarkør + "\n" + FRITEKST_MARKERING_SLUTT
+            : startmarkør + "\n" + fritekst + "\n" + FRITEKST_MARKERING_SLUTT;
+    }
+
+    static String markerPåkrevetFritekst(String fritekst) {
+        return markerPåkrevetFritekst(fritekst, null);
+    }
+
+    static String markerPåkrevetFritekst(String fritekst, Underavsnitt.Underavsnittstype underavsnittstype) {
+        String startmarkør = underavsnittstype == null
+            ? FRITEKST_PÅKREVET_MARKERING_START
+            : FRITEKST_PÅKREVET_MARKERING_START + underavsnittstype;
+        return fritekst == null
+            ? startmarkør + "\n" + FRITEKST_MARKERING_SLUTT
+            : startmarkør + "\n" + fritekst + "\n" + FRITEKST_MARKERING_SLUTT;
     }
 
     static Avsnitt lagOppsummeringAvsnitt(HbVedtaksbrevData vedtaksbrevData, String hovedoverskrift) {
@@ -101,7 +122,6 @@ class TekstformatererVedtaksbrev {
     }
 
     private static Avsnitt lagPeriodeAvsnitt(HbVedtaksbrevPeriodeOgFelles data) {
-
         String overskrift = konverterMedPartialTemplate(PARTIAL_PERIODE_OVERSKRIFT, data);
         String faktatekst = konverterMedPartialTemplate(PARTIAL_PERIODE_FAKTA, data);
         String vilkårTekst = konverterMedPartialTemplate(PARTIAL_PERIODE_VILKÅR, data);
@@ -121,10 +141,8 @@ class TekstformatererVedtaksbrev {
         return avsnittBuilder.build();
     }
 
-
     static Avsnitt.Builder parseTekst(String generertTekst, Avsnitt.Builder avsnittBuilder, Underavsnitt.Underavsnittstype underavsnittstype) {
-
-        List<TekstElement> elementer = parse(generertTekst);
+        List<TekstElement> elementer = parse(generertTekst, underavsnittstype);
         if (!avsnittBuilder.harOverskrift() && !elementer.isEmpty() && elementer.get(0).getTekstType() == TekstType.OVERSKRIFT) {
             TekstElement element = elementer.remove(0);
             avsnittBuilder.medOverskrift(element.getTekst());
@@ -133,14 +151,17 @@ class TekstformatererVedtaksbrev {
         String overskrift = null;
         String brødtekst = null;
         boolean kanHaFritekst = false;
+        boolean måHaFritekst = false;
         String fritekst = null;
         for (TekstElement element : elementer) {
+            underavsnittstype = element.getUnderavsnittstype();
             TekstType type = element.getTekstType();
             if (kanHaFritekst || (overskrift != null || brødtekst != null) && type == TekstType.OVERSKRIFT || brødtekst != null && type == TekstType.BRØDTEKST) {
-                avsnittBuilder.leggTilUnderavsnitt(lagUnderavsnitt(underavsnittstype, overskrift, brødtekst, kanHaFritekst, fritekst));
+                avsnittBuilder.leggTilUnderavsnitt(lagUnderavsnitt(underavsnittstype, overskrift, brødtekst, kanHaFritekst, måHaFritekst, fritekst));
                 overskrift = null;
                 brødtekst = null;
                 kanHaFritekst = false;
+                måHaFritekst = false;
                 fritekst = null;
             }
             if (type == TekstType.OVERSKRIFT) {
@@ -149,46 +170,57 @@ class TekstformatererVedtaksbrev {
                 brødtekst = element.getTekst();
             } else if (type == TekstType.FRITEKST) {
                 kanHaFritekst = true;
+                måHaFritekst = false;
+                fritekst = element.getTekst();
+            } else if (type == TekstType.PÅKREVET_FRITEKST) {
+                kanHaFritekst = true;
+                måHaFritekst = true;
                 fritekst = element.getTekst();
             }
         }
         if (kanHaFritekst || overskrift != null || brødtekst != null) {
-            avsnittBuilder.leggTilUnderavsnitt(lagUnderavsnitt(underavsnittstype, overskrift, brødtekst, kanHaFritekst, fritekst));
+            avsnittBuilder.leggTilUnderavsnitt(lagUnderavsnitt(underavsnittstype, overskrift, brødtekst, kanHaFritekst, måHaFritekst, fritekst));
         }
         return avsnittBuilder;
     }
 
-    private static Underavsnitt lagUnderavsnitt(Underavsnitt.Underavsnittstype underavsnittstype, String overskrift, String brødtekst, boolean kanHaFritekst, String fritekst) {
+    private static Underavsnitt lagUnderavsnitt(Underavsnitt.Underavsnittstype underavsnittstype, String overskrift, String brødtekst, boolean kanHaFritekst, boolean måHaFritekst, String fritekst) {
         return new Underavsnitt.Builder().
             medUnderavsnittstype(underavsnittstype)
             .medOverskrift(overskrift)
             .medBrødtekst(brødtekst)
             .medErFritekstTillatt(kanHaFritekst)
+            .medErFritekstPåkrevet(måHaFritekst)
             .medFritekst(fritekst)
             .build();
     }
 
-    static List<TekstElement> parse(String generertTekst) {
+    static List<TekstElement> parse(String generertTekst, Underavsnitt.Underavsnittstype underavsnittstype) {
         var resultat = new ArrayList<TekstElement>();
         String[] splittet = generertTekst.split("\r?\n");
         boolean leserFritekst = false;
+        Boolean fritekstPåkrevet = null;
         List<String> fritekstLinjer = null;
         for (String linje : splittet) {
             if (erFritekstStart(linje)) {
                 Objects.check(!leserFritekst, "Feil med vedtaksbrev, har markering for 2 fritekst-start etter hverandre");
+                fritekstPåkrevet = erFritekstPåkrevetStart(linje);
+                underavsnittstype = parseUnderavsnittstype(linje);
                 leserFritekst = true;
                 fritekstLinjer = new ArrayList<>();
             } else if (erFritekstSlutt(linje)) {
                 Objects.check(leserFritekst, "Feil med vedtaksbrev, fikk markering for fritekst-slutt før fritekst-start");
-                resultat.add(new TekstElement(TekstType.FRITEKST, fritekstLinjer.isEmpty() ? null : String.join("\n", fritekstLinjer)));
+                TekstType tekstType = fritekstPåkrevet ? TekstType.PÅKREVET_FRITEKST : TekstType.FRITEKST;
+                resultat.add(new TekstElement(tekstType, fritekstLinjer.isEmpty() ? null : String.join("\n", fritekstLinjer), underavsnittstype));
                 leserFritekst = false;
                 fritekstLinjer = null;
+                fritekstPåkrevet = null;
             } else if (leserFritekst) {
                 fritekstLinjer.add(linje);
             } else if (erOverskrift(linje)) {
-                resultat.add(new TekstElement(TekstType.OVERSKRIFT, fjernOverskriftFormattering(linje)));
+                resultat.add(new TekstElement(TekstType.OVERSKRIFT, fjernOverskriftFormattering(linje), underavsnittstype));
             } else if (!linje.isBlank()) {
-                resultat.add(new TekstElement(TekstType.BRØDTEKST, linje));
+                resultat.add(new TekstElement(TekstType.BRØDTEKST, linje, underavsnittstype));
             }
         }
         return resultat;
@@ -198,14 +230,17 @@ class TekstformatererVedtaksbrev {
         OVERSKRIFT,
         BRØDTEKST,
         FRITEKST,
+        PÅKREVET_FRITEKST,
     }
 
     static class TekstElement {
         private TekstType tekstType;
+        private Underavsnitt.Underavsnittstype underavsnittstype;
         private String tekst;
 
-        public TekstElement(TekstType tekstType, String tekst) {
+        public TekstElement(TekstType tekstType, String tekst, Underavsnitt.Underavsnittstype underavsnittstype) {
             this.tekstType = tekstType;
+            this.underavsnittstype = underavsnittstype;
             this.tekst = tekst;
         }
 
@@ -216,10 +251,35 @@ class TekstformatererVedtaksbrev {
         public String getTekst() {
             return tekst;
         }
+
+        public Underavsnitt.Underavsnittstype getUnderavsnittstype() {
+            return underavsnittstype;
+        }
     }
 
     private static boolean erFritekstStart(String tekst) {
-        return FRITEKST_MARKERING_START.equals(tekst);
+        return tekst.startsWith(FRITEKST_MARKERING_START) || tekst.startsWith(FRITEKST_PÅKREVET_MARKERING_START);
+    }
+
+    private static boolean erFritekstPåkrevetStart(String tekst) {
+        return tekst.startsWith(FRITEKST_PÅKREVET_MARKERING_START);
+    }
+
+    private static Underavsnitt.Underavsnittstype parseUnderavsnittstype(String tekst) {
+        String rest = null;
+        if (tekst.startsWith(FRITEKST_MARKERING_START)) {
+            rest = tekst.substring(FRITEKST_MARKERING_START.length());
+        } else if (tekst.startsWith(FRITEKST_PÅKREVET_MARKERING_START)) {
+            rest = tekst.substring(FRITEKST_PÅKREVET_MARKERING_START.length());
+        } else {
+            throw new IllegalArgumentException("Utvikler-feil: denne metoden skal bare brukes på fritekstmarkering-start");
+        }
+        for (Underavsnitt.Underavsnittstype underavsnittstype : Underavsnitt.Underavsnittstype.values()) {
+            if (underavsnittstype.name().equals(rest)) {
+                return underavsnittstype;
+            }
+        }
+        return null;
     }
 
     private static boolean erFritekstSlutt(String tekst) {

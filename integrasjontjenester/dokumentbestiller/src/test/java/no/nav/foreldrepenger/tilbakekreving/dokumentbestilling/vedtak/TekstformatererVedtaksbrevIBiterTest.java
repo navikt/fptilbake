@@ -288,5 +288,45 @@ public class TekstformatererVedtaksbrevIBiterTest {
         assertThat(underavsnitt.get(0).getFritekst()).isEqualTo("fritekst linje 1\n\nfritekst linje2");
     }
 
+    @Test
+    public void skal_skille_mellom_påkrevet_og_valgfritt_fritekstfelt() {
+        Avsnitt.Builder avsnittbuilder = new Avsnitt.Builder().medOverskrift("Hovedoverskrift");
+        Avsnitt resultat = TekstformatererVedtaksbrev.parseTekst("_underoverskrift 1\n"
+                + TekstformatererVedtaksbrev.markerPåkrevetFritekst(null)
+                + "\n_underoverskrift 2\n"
+                + TekstformatererVedtaksbrev.markerFritekst(null)
+            , avsnittbuilder, null).build();
+        assertThat(resultat.getOverskrift()).isEqualTo("Hovedoverskrift");
+        List<Underavsnitt> underavsnitt = resultat.getUnderavsnittsliste();
+        assertThat(underavsnitt).hasSize(2);
+        assertThat(underavsnitt.get(0).getOverskrift()).isEqualTo("underoverskrift 1");
+        assertThat(underavsnitt.get(0).getBrødtekst()).isNull();
+        assertThat(underavsnitt.get(0).isFritekstTillatt()).isTrue();
+        assertThat(underavsnitt.get(0).isFritekstPåkrevet()).isTrue();
+        assertThat(underavsnitt.get(0).getFritekst()).isNull();
 
+        assertThat(underavsnitt.get(1).getOverskrift()).isEqualTo("underoverskrift 2");
+        assertThat(underavsnitt.get(1).getBrødtekst()).isNull();
+        assertThat(underavsnitt.get(1).isFritekstTillatt()).isTrue();
+        assertThat(underavsnitt.get(1).isFritekstPåkrevet()).isFalse();
+        assertThat(underavsnitt.get(1).getFritekst()).isNull();
+    }
+
+    @Test
+    public void skal_utlede_underavsnittstype_fra_fritekstmarkering_slik_at_det_er_mulig_å_skille_mellom_særlige_grunner_og_andre_særlige_grunner() {
+        Avsnitt.Builder avsnittbuilder = new Avsnitt.Builder().medOverskrift("Hovedoverskrift");
+        Avsnitt resultat = TekstformatererVedtaksbrev.parseTekst("_underoverskrift 1\n"
+                + TekstformatererVedtaksbrev.markerFritekst(null, Underavsnitt.Underavsnittstype.SÆRLIGEGRUNNER)
+                + "\n_underoverskrift 2\n"
+                + TekstformatererVedtaksbrev.markerFritekst(null, Underavsnitt.Underavsnittstype.SÆRLIGEGRUNNER_ANNET)
+                + "\n_underoverskrift 3\n"
+            , avsnittbuilder, null).build();
+        assertThat(resultat.getOverskrift()).isEqualTo("Hovedoverskrift");
+        List<Underavsnitt> underavsnitt = resultat.getUnderavsnittsliste();
+        assertThat(underavsnitt).hasSize(3);
+        assertThat(underavsnitt.get(0).getUnderavsnittstype()).isEqualTo(Underavsnitt.Underavsnittstype.SÆRLIGEGRUNNER);
+        assertThat(underavsnitt.get(1).getUnderavsnittstype()).isEqualTo(Underavsnitt.Underavsnittstype.SÆRLIGEGRUNNER_ANNET);
+        assertThat(underavsnitt.get(2).getUnderavsnittstype()).isEqualTo(Underavsnitt.Underavsnittstype.SÆRLIGEGRUNNER_ANNET);
+
+    }
 }
