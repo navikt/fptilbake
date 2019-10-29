@@ -12,7 +12,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.TotrinnRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.Totrinnresultatgrunnlag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.Totrinnsvurdering;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingAggregateEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseAggregate;
 
 @ApplicationScoped
@@ -35,11 +34,11 @@ public class TotrinnTjeneste {
         Long behandlingId = behandling.getId();
         Optional<Long> faktaAggregateId = repositoryProvider.getFaktaFeilutbetalingRepository().finnFaktaFeilutbetalingAggregateId(behandlingId);
         Optional<VurdertForeldelseAggregate> foreldelseAggregate = repositoryProvider.getVurdertForeldelseRepository().finnVurdertForeldelseForBehandling(behandlingId);
-        Optional<VilkårVurderingAggregateEntitet> vilkårVurderingAggregateEntitet = repositoryProvider.getVilkårsvurderingRepository().finnVilkårsvurderingForBehandlingId(behandlingId);
+        Optional<Long> vilkårAggregateId = repositoryProvider.getVilkårsvurderingRepository().finnVilkårsvurderingAggregateId(behandlingId);
 
         Long feilUtbetalingId = faktaAggregateId.orElseThrow();
         Long foreldelseId = foreldelseAggregate.map(VurdertForeldelseAggregate::getId).orElse(null);
-        Long vilkårId = vilkårVurderingAggregateEntitet.map(VilkårVurderingAggregateEntitet::getId).orElse(null);
+        Long vilkårId = vilkårAggregateId.orElse(null);
 
         Totrinnresultatgrunnlag totrinnresultatgrunnlag = Totrinnresultatgrunnlag.builder()
             .medBehandling(behandling)

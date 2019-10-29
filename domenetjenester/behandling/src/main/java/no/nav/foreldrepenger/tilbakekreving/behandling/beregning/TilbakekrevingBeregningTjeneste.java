@@ -18,7 +18,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BeregningResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingAggregateEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingPeriodeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
@@ -73,8 +72,7 @@ public class TilbakekrevingBeregningTjeneste {
 
     private VilkårVurderingEntitet hentVilkårsvurdering(Long behandlingId) {
         VilkårVurderingEntitet vurderingUtenPerioder = new VilkårVurderingEntitet();
-        return vilkårsvurderingRepository.finnVilkårsvurderingForBehandlingId(behandlingId)
-            .map(VilkårVurderingAggregateEntitet::getManuellVilkår)
+        return vilkårsvurderingRepository.finnVilkårsvurdering(behandlingId)
             .orElse(vurderingUtenPerioder);
     }
 
