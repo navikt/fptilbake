@@ -62,7 +62,7 @@ public class TotrinnTjenesteTest extends FellesTestOppsett {
         assertThat(resultat.getBehandling().getId()).isEqualTo(internBehandlingId);
         assertThat(resultat.getFaktaFeilutbetalingId()).isEqualTo(repoProvider.getFaktaFeilutbetalingRepository().finnFaktaFeilutbetalingAggregateId(internBehandlingId).get());
         assertThat(resultat.getVurderForeldelseId()).isEqualTo(repoProvider.getVurdertForeldelseRepository().finnVurdertForeldelseForBehandling(internBehandlingId).get().getId());
-        assertThat(resultat.getVurderVilkårId()).isEqualTo(repoProvider.getVilkårsvurderingRepository().finnVilkårsvurderingForBehandlingId(internBehandlingId).get().getId());
+        assertThat(resultat.getVurderVilkårId()).isEqualTo(repoProvider.getVilkårsvurderingRepository().finnVilkårsvurderingAggregateId(internBehandlingId).get());
     }
 
     @Test
