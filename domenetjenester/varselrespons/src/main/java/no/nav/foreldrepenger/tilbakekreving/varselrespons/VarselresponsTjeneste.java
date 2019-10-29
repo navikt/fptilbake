@@ -2,7 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.varselrespons;
 
 import java.util.Optional;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varselrespons.Varselrespons;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons.Varselrespons;
 
 public interface VarselresponsTjeneste {
 

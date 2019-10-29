@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -20,6 +21,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselInfo;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.HentForhåndsvisningVarselbrevDto;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.EksternDataForBrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.YtelseNavn;
@@ -43,28 +46,33 @@ public class VarselbrevTjeneste {
     private static final String TITTEL_VARSELBREV_HISTORIKKINNSLAG = "Varselbrev Tilbakekreving";
 
     private BehandlingRepository behandlingRepository;
+    private EksternBehandlingRepository eksternBehandlingRepository;
+    private BrevdataRepository brevdataRepository;
+    private VarselRepository varselRepository;
+
     private EksternDataForBrevTjeneste eksternDataForBrevTjeneste;
     private BehandlingTjeneste behandlingTjeneste;
-    private EksternBehandlingRepository eksternBehandlingRepository;
     private FritekstbrevTjeneste bestillDokumentTjeneste;
     private HistorikkinnslagTjeneste historikkinnslagTjeneste;
-    private BrevdataRepository brevdataRepository;
+
 
     @Inject
-    public VarselbrevTjeneste(BehandlingRepository behandlingRepository,
+    public VarselbrevTjeneste(BehandlingRepositoryProvider repositoryProvider,
+                              BrevdataRepository brevdataRepository,
                               EksternDataForBrevTjeneste eksternDataForBrevTjeneste,
                               BehandlingTjeneste behandlingTjeneste,
-                              EksternBehandlingRepository eksternBehandlingRepository,
                               FritekstbrevTjeneste bestillDokumentTjeneste,
-                              HistorikkinnslagTjeneste historikkinnslagTjeneste,
-                              BrevdataRepository brevdataRepository) {
-        this.behandlingRepository = behandlingRepository;
+                              HistorikkinnslagTjeneste historikkinnslagTjeneste) {
+        this.behandlingRepository = repositoryProvider.getBehandlingRepository();
+        this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
+        this.varselRepository = repositoryProvider.getVarselRepository();
+        this.brevdataRepository = brevdataRepository;
+
         this.eksternDataForBrevTjeneste = eksternDataForBrevTjeneste;
         this.behandlingTjeneste = behandlingTjeneste;
-        this.eksternBehandlingRepository = eksternBehandlingRepository;
         this.bestillDokumentTjeneste = bestillDokumentTjeneste;
         this.historikkinnslagTjeneste = historikkinnslagTjeneste;
-        this.brevdataRepository = brevdataRepository;
+
     }
 
     public VarselbrevTjeneste() {
@@ -139,7 +147,7 @@ public class VarselbrevTjeneste {
 
         //Henter data fra fpsak
         Saksnummer saksnummer = behandling.getFagsak().getSaksnummer();
-        SamletEksternBehandlingInfo eksternBehandlingsinfoDto = eksternDataForBrevTjeneste.hentBehandlingFpsak(eksternBehandling.getEksternUuid(), Tillegsinformasjon.PERSONOPPLYSNINGER, Tillegsinformasjon.VARSELTEKST);
+        SamletEksternBehandlingInfo eksternBehandlingsinfoDto = eksternDataForBrevTjeneste.hentBehandlingFpsak(eksternBehandling.getEksternUuid(), Tillegsinformasjon.PERSONOPPLYSNINGER);
         //Henter data fra tps
         String aktørId = behandling.getAktørId().getId();
         Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(aktørId);
@@ -153,6 +161,10 @@ public class VarselbrevTjeneste {
         //Henter data fra fpoppdrag
         FeilutbetaltePerioderDto feilutbetaltePerioderDto = eksternDataForBrevTjeneste.hentFeilutbetaltePerioder(behandlingIdIFpsak);
 
+        VarselInfo varselInfo = varselRepository.finnEksaktVarsel(behandlingId);
+        String varselTekst = varselInfo.getVarselTekst();
+        lagreVarseltBeløp(behandlingId,feilutbetaltePerioderDto.getSumFeilutbetaling());
+
         return VarselbrevUtil.sammenstillInfoFraFagsystemerForSending(
             eksternBehandlingsinfoDto,
             saksnummer,
@@ -161,11 +173,12 @@ public class VarselbrevTjeneste {
             feilutbetaltePerioderDto,
             eksternDataForBrevTjeneste.getBrukersSvarfrist(),
             fagsakYtelseType,
-            ytelseNavn);
+            ytelseNavn,
+            varselTekst);
     }
 
     public VarselbrevSamletInfo lagVarselbrevForForhåndsvisning(UUID behandlingUuId, String varseltekst, FagsakYtelseType fagsakYtleseType) {
-        SamletEksternBehandlingInfo eksternBehandlingsinfo = eksternDataForBrevTjeneste.hentBehandlingFpsak(behandlingUuId, Tillegsinformasjon.PERSONOPPLYSNINGER, Tillegsinformasjon.VARSELTEKST, Tillegsinformasjon.FAGSAK);
+        SamletEksternBehandlingInfo eksternBehandlingsinfo = eksternDataForBrevTjeneste.hentBehandlingFpsak(behandlingUuId, Tillegsinformasjon.PERSONOPPLYSNINGER, Tillegsinformasjon.FAGSAK);
 
         String aktørId = eksternBehandlingsinfo.getAktørId().getId();
         Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(aktørId);
@@ -183,5 +196,9 @@ public class VarselbrevTjeneste {
             eksternDataForBrevTjeneste.getBrukersSvarfrist(),
             fagsakYtleseType,
             ytelseNavn);
+    }
+
+    private void lagreVarseltBeløp(Long behandlingId,Long varseltBeløp){
+        varselRepository.lagreVarseltBeløp(behandlingId,varseltBeløp);
     }
 }

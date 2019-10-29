@@ -114,7 +114,7 @@ public class HendelseTaskDataWrapper {
         ProsessTaskData td = new ProsessTaskData(taskType);
         td.setAktørId(aktørId.getId());
         td.setProperty(EKSTERN_BEHANDLING_ID, String.valueOf(behandlingId));
-        td.setProperty(EKSTERN_BEHANDLING_UUID, behandlingUuid.toString());
+        td.setProperty(EKSTERN_BEHANDLING_UUID, behandlingUuid);
         td.setProperty(SAKSNUMMER, saksnummer.getVerdi());
         return td;
     }

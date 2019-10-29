@@ -1,11 +1,12 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.List;
 
-import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
@@ -51,7 +52,7 @@ public class VarselbrevUtilTest {
         ytelseNavn.setNavnPåBrukersSpråk("eingongsstønad");
         ytelseNavn.setNavnPåBokmål("engangsstønad");
 
-        SamletEksternBehandlingInfo behandingsinfo = SamletEksternBehandlingInfo.builder(Tillegsinformasjon.PERSONOPPLYSNINGER, Tillegsinformasjon.VARSELTEKST)
+        SamletEksternBehandlingInfo behandingsinfo = SamletEksternBehandlingInfo.builder(Tillegsinformasjon.PERSONOPPLYSNINGER)
             .setGrunninformasjon(eksternBehandlingsinfoDto)
             .setPersonopplysninger(personopplysningDto)
             .build();
@@ -66,23 +67,23 @@ public class VarselbrevUtilTest {
             FagsakYtelseType.ENGANGSTØNAD,
             ytelseNavn);
 
-        Assertions.assertThat(varselbrev.getBrevMetadata().getBehandlendeEnhetId()).isEqualTo(eksternBehandlingsinfoDto.getBehandlendeEnhetId());
-        Assertions.assertThat(varselbrev.getBrevMetadata().getBehandlendeEnhetNavn()).isEqualTo(eksternBehandlingsinfoDto.getBehandlendeEnhetNavn());
-        Assertions.assertThat(varselbrev.getBrevMetadata().getFagsaktype()).isEqualTo(FagsakYtelseType.ENGANGSTØNAD);
-        Assertions.assertThat(varselbrev.getFritekstFraSaksbehandler()).isEqualTo(varseltekst);
-        Assertions.assertThat(varselbrev.getBrevMetadata().getSaksnummer()).isEqualTo(saksnummer.getVerdi());
-        Assertions.assertThat(varselbrev.getBrevMetadata().getAnsvarligSaksbehandler()).isEqualTo(eksternBehandlingsinfoDto.getAnsvarligSaksbehandler());
-        Assertions.assertThat(varselbrev.getBrevMetadata().getSpråkkode()).isEqualTo(eksternBehandlingsinfoDto.getSpråkkodeEllerDefault());
-        Assertions.assertThat(varselbrev.getSumFeilutbetaling()).isEqualTo(feilutbetaltePerioderDto.getSumFeilutbetaling());
-        Assertions.assertThat(varselbrev.getBrevMetadata().getFagsaktypenavnPåSpråk()).isEqualTo("eingongsstønad");
-        Assertions.assertThat(varselbrev.getBrevMetadata().getTittel()).isEqualTo("Varsel tilbakebetaling engangsstønad");
+        assertThat(varselbrev.getBrevMetadata().getBehandlendeEnhetId()).isEqualTo(eksternBehandlingsinfoDto.getBehandlendeEnhetId());
+        assertThat(varselbrev.getBrevMetadata().getBehandlendeEnhetNavn()).isEqualTo(eksternBehandlingsinfoDto.getBehandlendeEnhetNavn());
+        assertThat(varselbrev.getBrevMetadata().getFagsaktype()).isEqualTo(FagsakYtelseType.ENGANGSTØNAD);
+        assertThat(varselbrev.getFritekstFraSaksbehandler()).isEqualTo(varseltekst);
+        assertThat(varselbrev.getBrevMetadata().getSaksnummer()).isEqualTo(saksnummer.getVerdi());
+        assertThat(varselbrev.getBrevMetadata().getAnsvarligSaksbehandler()).isEqualTo(eksternBehandlingsinfoDto.getAnsvarligSaksbehandler());
+        assertThat(varselbrev.getBrevMetadata().getSpråkkode()).isEqualTo(eksternBehandlingsinfoDto.getSpråkkodeEllerDefault());
+        assertThat(varselbrev.getSumFeilutbetaling()).isEqualTo(feilutbetaltePerioderDto.getSumFeilutbetaling());
+        assertThat(varselbrev.getBrevMetadata().getFagsaktypenavnPåSpråk()).isEqualTo("eingongsstønad");
+        assertThat(varselbrev.getBrevMetadata().getTittel()).isEqualTo("Varsel tilbakebetaling engangsstønad");
 
-        Assertions.assertThat(varselbrev.getBrevMetadata().getSakspartNavn()).isEqualTo(behandingsinfo.getPersonopplysninger().getNavn());
-        Assertions.assertThat(varselbrev.getBrevMetadata().getSakspartId()).isEqualTo(behandingsinfo.getPersonopplysninger().getFødselsnummer());
+        assertThat(varselbrev.getBrevMetadata().getSakspartNavn()).isEqualTo(behandingsinfo.getPersonopplysninger().getNavn());
+        assertThat(varselbrev.getBrevMetadata().getSakspartId()).isEqualTo(behandingsinfo.getPersonopplysninger().getFødselsnummer());
 
-        Assertions.assertThat(varselbrev.getFeilutbetaltePerioder().get(0).getFom()).isEqualTo(feilutbetaltePerioderDto.getPerioder().get(0).getFom());
-        Assertions.assertThat(varselbrev.getFeilutbetaltePerioder().get(0).getTom()).isEqualTo(feilutbetaltePerioderDto.getPerioder().get(0).getTom());
-        Assertions.assertThat(varselbrev.getBrevMetadata().getMottakerAdresse()).isEqualTo(adresseinfo);
+        assertThat(varselbrev.getFeilutbetaltePerioder().get(0).getFom()).isEqualTo(feilutbetaltePerioderDto.getPerioder().get(0).getFom());
+        assertThat(varselbrev.getFeilutbetaltePerioder().get(0).getTom()).isEqualTo(feilutbetaltePerioderDto.getPerioder().get(0).getTom());
+        assertThat(varselbrev.getBrevMetadata().getMottakerAdresse()).isEqualTo(adresseinfo);
     }
 
     @Test
@@ -100,9 +101,10 @@ public class VarselbrevUtilTest {
         ytelseNavn.setNavnPåBrukersSpråk("svangerskapspengar");
         ytelseNavn.setNavnPåBokmål("svangerskapspenger");
 
-        SamletEksternBehandlingInfo behandingsinfo = SamletEksternBehandlingInfo.builder(Tillegsinformasjon.PERSONOPPLYSNINGER, Tillegsinformasjon.VARSELTEKST)
+        String varselTekst = "Dette ser ikke bra ut as";
+
+        SamletEksternBehandlingInfo behandingsinfo = SamletEksternBehandlingInfo.builder(Tillegsinformasjon.PERSONOPPLYSNINGER)
             .setGrunninformasjon(eksternBehandlingsinfoDto)
-            .setVarseltekst("Dette ser ikke bra ut as")
             .build();
 
         VarselbrevSamletInfo varselbrev = VarselbrevUtil.sammenstillInfoFraFagsystemerForSending(
@@ -113,32 +115,32 @@ public class VarselbrevUtilTest {
             feilutbetaltePerioderDto,
             Period.ofWeeks(3),
             FagsakYtelseType.SVANGERSKAPSPENGER,
-            ytelseNavn);
+            ytelseNavn,varselTekst);
 
-        Assertions.assertThat(varselbrev.getBrevMetadata().getBehandlendeEnhetId()).isEqualTo("behandlendeEnhetId 1234");
-        Assertions.assertThat(varselbrev.getBrevMetadata().getBehandlendeEnhetNavn()).isEqualTo("behandlende enhet i Rogaland");
-        Assertions.assertThat(varselbrev.getBrevMetadata().getFagsaktype()).isEqualTo(svangerskapspengerkode);
-        Assertions.assertThat(varselbrev.getFritekstFraSaksbehandler()).isEqualTo("Dette ser ikke bra ut as");
-        Assertions.assertThat(varselbrev.getBrevMetadata().getSaksnummer()).isEqualTo("11111111");
-        Assertions.assertThat(varselbrev.getBrevMetadata().getAnsvarligSaksbehandler()).isEqualTo("Line Saksbehandler");
-        Assertions.assertThat(varselbrev.getBrevMetadata().getSpråkkode()).isEqualTo(Språkkode.nn);
-        Assertions.assertThat(varselbrev.getSumFeilutbetaling()).isEqualTo(feilutbetaltePerioderDto.getSumFeilutbetaling());
-        Assertions.assertThat(varselbrev.getBrevMetadata().getFagsaktypenavnPåSpråk()).isEqualTo("svangerskapspengar");
-        Assertions.assertThat(varselbrev.getBrevMetadata().getTittel()).isEqualTo("Varsel tilbakebetaling svangerskapspenger");
+        assertThat(varselbrev.getBrevMetadata().getBehandlendeEnhetId()).isEqualTo("behandlendeEnhetId 1234");
+        assertThat(varselbrev.getBrevMetadata().getBehandlendeEnhetNavn()).isEqualTo("behandlende enhet i Rogaland");
+        assertThat(varselbrev.getBrevMetadata().getFagsaktype()).isEqualTo(svangerskapspengerkode);
+        assertThat(varselbrev.getFritekstFraSaksbehandler()).isEqualTo(varselTekst);
+        assertThat(varselbrev.getBrevMetadata().getSaksnummer()).isEqualTo("11111111");
+        assertThat(varselbrev.getBrevMetadata().getAnsvarligSaksbehandler()).isEqualTo("Line Saksbehandler");
+        assertThat(varselbrev.getBrevMetadata().getSpråkkode()).isEqualTo(Språkkode.nn);
+        assertThat(varselbrev.getSumFeilutbetaling()).isEqualTo(feilutbetaltePerioderDto.getSumFeilutbetaling());
+        assertThat(varselbrev.getBrevMetadata().getFagsaktypenavnPåSpråk()).isEqualTo("svangerskapspengar");
+        assertThat(varselbrev.getBrevMetadata().getTittel()).isEqualTo("Varsel tilbakebetaling svangerskapspenger");
 
-        Assertions.assertThat(varselbrev.getBrevMetadata().getSakspartNavn()).isEqualTo("Fiona");
-        Assertions.assertThat(varselbrev.getBrevMetadata().getSakspartId()).isEqualTo("12345678900");
+        assertThat(varselbrev.getBrevMetadata().getSakspartNavn()).isEqualTo("Fiona");
+        assertThat(varselbrev.getBrevMetadata().getSakspartId()).isEqualTo("12345678900");
 
-        Assertions.assertThat(varselbrev.getFeilutbetaltePerioder().get(0).getFom()).isEqualTo(feilutbetaltePerioderDto.getPerioder().get(0).getFom());
-        Assertions.assertThat(varselbrev.getFeilutbetaltePerioder().get(0).getTom()).isEqualTo(feilutbetaltePerioderDto.getPerioder().get(0).getTom());
-        Assertions.assertThat(varselbrev.getBrevMetadata().getMottakerAdresse()).isEqualTo(adresseinfo);
+        assertThat(varselbrev.getFeilutbetaltePerioder().get(0).getFom()).isEqualTo(feilutbetaltePerioderDto.getPerioder().get(0).getFom());
+        assertThat(varselbrev.getFeilutbetaltePerioder().get(0).getTom()).isEqualTo(feilutbetaltePerioderDto.getPerioder().get(0).getTom());
+        assertThat(varselbrev.getBrevMetadata().getMottakerAdresse()).isEqualTo(adresseinfo);
     }
 
     @Test
     public void skal_sette_fristdato() {
         Period ventetid = Period.ofWeeks(3);
         LocalDateTime dagensDato = LocalDateTime.of(2020, 1, 1, 12, 0);
-        Assertions.assertThat(VarselbrevUtil.finnFristForTilbakemeldingFraBruker(dagensDato, ventetid)).isEqualTo(LocalDate.of(2020, 1, 22));
+        assertThat(VarselbrevUtil.finnFristForTilbakemeldingFraBruker(dagensDato, ventetid)).isEqualTo(LocalDate.of(2020, 1, 22));
     }
 
     private FeilutbetaltePerioderDto lagFeilutbetaltePerioderMock(Long sumFeilutbetalinger) {

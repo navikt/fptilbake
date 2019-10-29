@@ -26,6 +26,7 @@
     <sequence-generator name="SEQ_VARSELBREV_DATA" allocation-size="50" sequence-name="SEQ_VARSELBREV_DATA"/>
     <sequence-generator name="SEQ_OKO_XML_SENDT" allocation-size="50" sequence-name="SEQ_OKO_XML_SENDT"/>
     <sequence-generator name="SEQ_OKO_XML_MOTTATT" allocation-size="50" sequence-name="SEQ_OKO_XML_MOTTATT"/>
+    <sequence-generator name="SEQ_VARSEL" allocation-size="50" sequence-name="SEQ_VARSEL"/>
 
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker"/>
 
@@ -54,7 +55,7 @@
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.VurderÅrsakTotrinnsvurdering"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårType"/>
 
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.varselrespons.Varselrespons"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons.Varselrespons"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode"/>
 
@@ -121,6 +122,7 @@
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.dokumentbestiller.DokumentMalType"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.tilbakekrevingsvalg.VidereBehandling"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KonsekvensForYtelsen"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselInfo"/>
 
 
 </entity-mappings>

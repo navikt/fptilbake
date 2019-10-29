@@ -11,8 +11,8 @@ import org.apache.commons.lang3.StringUtils;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.YtelseNavn;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
@@ -27,7 +27,7 @@ public class VarselbrevUtil {
         // for static access
     }
 
-    public static VarselbrevSamletInfo sammenstillInfoFraFagsystemerForSending(
+    public static VarselbrevSamletInfo sammenstillInfoFraFagsystemerForSending(//NOSONAR
         SamletEksternBehandlingInfo eksternBehandlingsinfoDto,
         Saksnummer saksnummer,
         Adresseinfo adresseinfo,
@@ -35,7 +35,8 @@ public class VarselbrevUtil {
         FeilutbetaltePerioderDto feilutbetaltePerioderDto,
         Period ventetid,
         FagsakYtelseType fagsakYtelseType,
-        YtelseNavn ytelseNavn) {
+        YtelseNavn ytelseNavn,
+        String varselTekst) {
 
         EksternBehandlingsinfoDto grunninformasjon = eksternBehandlingsinfoDto.getGrunninformasjon();
         BrevMetadata metadata = new BrevMetadata.Builder()
@@ -54,14 +55,14 @@ public class VarselbrevUtil {
 
         return new VarselbrevSamletInfo.Builder()
             .medMetadata(metadata)
-            .medFritekstFraSaksbehandler(eksternBehandlingsinfoDto.getVarseltekst())
+            .medFritekstFraSaksbehandler(varselTekst)
             .medSumFeilutbetaling(feilutbetaltePerioderDto.getSumFeilutbetaling())
             .medFeilutbetaltePerioder(mapFeilutbetaltePerioder(feilutbetaltePerioderDto))
             .medFristdato(finnFristForTilbakemeldingFraBruker(FPDateUtil.nå(), ventetid))
             .build();
     }
 
-    public static VarselbrevSamletInfo sammenstillInfoFraFagsystemerForhåndvisningVarselbrev(
+    public static VarselbrevSamletInfo sammenstillInfoFraFagsystemerForhåndvisningVarselbrev( //NOSONAR
         Saksnummer saksnummer,
         String varseltekst,
         Adresseinfo adresseinfo,

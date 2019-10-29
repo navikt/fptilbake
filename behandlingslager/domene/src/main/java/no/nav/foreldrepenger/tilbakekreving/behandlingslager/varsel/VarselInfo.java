@@ -1,0 +1,89 @@
+package no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel;
+
+import java.util.Objects;
+
+import javax.persistence.Column;
+import javax.persistence.Convert;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import no.nav.vedtak.felles.jpa.BaseEntitet;
+import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
+
+@Entity(name = "VarselInfo")
+@Table(name = "varsel")
+public class VarselInfo extends BaseEntitet {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_VARSEL")
+    private Long id;
+
+    @Column(name = "behandling_id", nullable = false)
+    private Long behandlingId;
+
+    @Convert(converter = BooleanToStringConverter.class)
+    @Column(name = "aktiv", nullable = false)
+    private boolean aktiv = true;
+
+    @Column(name = "varsel_fritekst", nullable = false, updatable = false)
+    private String varselTekst;
+
+    @Column(name = "varsel_beloep")
+    private Long varselBeløp;
+
+    private VarselInfo() {
+        // for hibernate
+    }
+
+    public boolean isAktiv() {
+        return aktiv;
+    }
+
+    public String getVarselTekst() {
+        return varselTekst;
+    }
+
+    public Long getVarselBeløp() {
+        return varselBeløp;
+    }
+
+    public void setVarselBeløp(Long varselBeløp) {
+        this.varselBeløp = varselBeløp;
+    }
+
+    public void disable() {
+        this.aktiv = false;
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+        private VarselInfo kladd = new VarselInfo();
+
+        public Builder medBehandlingId(Long behandlingId) {
+            kladd.behandlingId = behandlingId;
+            return this;
+        }
+
+        public Builder medVarselTekst(String varselTekst) {
+            kladd.varselTekst = varselTekst;
+            return this;
+        }
+
+        public Builder medVarselBeløp(Long varselBeløp) {
+            kladd.varselBeløp = varselBeløp;
+            return this;
+        }
+
+        public VarselInfo build() {
+            Objects.requireNonNull(kladd.behandlingId);
+            Objects.requireNonNull(kladd.varselTekst);
+            return kladd;
+        }
+    }
+}
