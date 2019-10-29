@@ -22,7 +22,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselInfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons.Varselrespons;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.SendVarselbrevTask;
@@ -85,7 +85,7 @@ public class VarselStegImpl implements VarselSteg {
     public BehandleStegResultat gjenopptaSteg(BehandlingskontrollKontekst kontekst) {
         Behandling behandling = behandlingRepository.hentBehandling(kontekst.getBehandlingId());
         LocalDate iDag = FPDateUtil.iDag();
-        if (sjekkTilbakekrevingOpprettetUtenVarsel(behandling.getId())) {
+        if (sjekkTilbakekrevingOpprettetUtenVarsel(behandling.getId())) { // hvis det er ingen varselTekst finnes,kan behandling fortsette
             return BehandleStegResultat.utførtUtenAksjonspunkter();
         }
         Optional<Varselrespons> varselrespons = varselresponsTjeneste.hentRespons(kontekst.getBehandlingId());
@@ -105,7 +105,7 @@ public class VarselStegImpl implements VarselSteg {
     }
 
     private boolean sjekkTilbakekrevingOpprettetUtenVarsel(Long behandlingId) {
-        Optional<VarselEntitet> varselEntitet = varselRepository.finnVarsel(behandlingId);
+        Optional<VarselInfo> varselEntitet = varselRepository.finnVarsel(behandlingId);
         if (varselEntitet.isEmpty()) {
             log.info("VarselTekst finnes ikke for behandlingId={}, ikke sende varsel til bruker!!", behandlingId);
             return true;

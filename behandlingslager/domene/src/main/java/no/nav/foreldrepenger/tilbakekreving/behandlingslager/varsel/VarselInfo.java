@@ -13,12 +13,12 @@ import javax.persistence.Table;
 import no.nav.vedtak.felles.jpa.BaseEntitet;
 import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
 
-@Entity(name = "VarselEntitet")
+@Entity(name = "VarselInfo")
 @Table(name = "varsel")
-public class VarselEntitet extends BaseEntitet {
+public class VarselInfo extends BaseEntitet {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_MOTTAKER_VARSEL_RESPONS")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_VARSEL")
     private Long id;
 
     @Column(name = "behandling_id", nullable = false)
@@ -28,22 +28,14 @@ public class VarselEntitet extends BaseEntitet {
     @Column(name = "aktiv", nullable = false)
     private boolean aktiv = true;
 
-    @Column(name = "varsel_tekst")
+    @Column(name = "varsel_fritekst", nullable = false, updatable = false)
     private String varselTekst;
 
     @Column(name = "varsel_beloep")
     private Long varselBeløp;
 
-    private VarselEntitet() {
+    private VarselInfo() {
         // for hibernate
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Long getBehandlingId() {
-        return behandlingId;
     }
 
     public boolean isAktiv() {
@@ -71,15 +63,10 @@ public class VarselEntitet extends BaseEntitet {
     }
 
     public static class Builder {
-        private VarselEntitet kladd = new VarselEntitet();
+        private VarselInfo kladd = new VarselInfo();
 
         public Builder medBehandlingId(Long behandlingId) {
             kladd.behandlingId = behandlingId;
-            return this;
-        }
-
-        public Builder medAktiv(boolean aktiv) {
-            kladd.aktiv = aktiv;
             return this;
         }
 
@@ -93,8 +80,9 @@ public class VarselEntitet extends BaseEntitet {
             return this;
         }
 
-        public VarselEntitet build() {
+        public VarselInfo build() {
             Objects.requireNonNull(kladd.behandlingId);
+            Objects.requireNonNull(kladd.varselTekst);
             return kladd;
         }
     }

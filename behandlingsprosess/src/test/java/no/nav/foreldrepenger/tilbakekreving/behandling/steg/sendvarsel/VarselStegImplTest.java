@@ -92,7 +92,7 @@ public class VarselStegImplTest {
         assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.BEH_VENT);
     }
 
-    public void skal_sette_behandling_ikke_på_vent_hvis_varsel_finnes_ikke() {
+    public void skal_ikke_sette_behandling_på_vent_når_varseltekst_ikke_finnes() {
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
         BehandleStegResultat stegResultat = steg().utførSteg(new BehandlingskontrollKontekst(fagsak.getId(), fagsak.getAktørId(), lås));
         assertThat(stegResultat.getAksjonspunktListe()).isEmpty();

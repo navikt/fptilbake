@@ -14,7 +14,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.steg.inhentopplysning.Inn
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselInfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
@@ -23,7 +23,6 @@ public class InnhentOpplysningStegImplTest extends FellesTestOppsett {
 
     private InnhentOpplysningSteg innhentOpplysningSteg = new InnhentOpplysningStegImpl(repositoryProvider, fpsakKlientMock);
     private VarselRepository varselRepository = repositoryProvider.getVarselRepository();
-    private final String varselTekst = "Dette er varselTekst";
 
     @Before
     public void setup(){
@@ -32,7 +31,8 @@ public class InnhentOpplysningStegImplTest extends FellesTestOppsett {
     }
 
     @Test
-    public void utføreSteg_medVarsel() {
+    public void skal_hente_varseltekst_fra_fpsak_og_lagre() {
+        final String varselTekst = "Dette er varselTekst";
         SamletEksternBehandlingInfo samletEksternBehandlingInfo = SamletEksternBehandlingInfo
             .builder(Tillegsinformasjon.VARSELTEKST)
             .setVarseltekst(varselTekst).build();
@@ -41,15 +41,14 @@ public class InnhentOpplysningStegImplTest extends FellesTestOppsett {
 
         innhentOpplysningSteg.utførSteg(new BehandlingskontrollKontekst(fagsak.getId(), fagsak.getAktørId(), lås));
 
-        Optional<VarselEntitet> entitet = varselRepository.finnVarsel(behandling.getId());
+        Optional<VarselInfo> entitet = varselRepository.finnVarsel(behandling.getId());
         assertThat(entitet).isPresent();
-        VarselEntitet varselEntitet = entitet.get();
-        assertThat(varselEntitet.getBehandlingId()).isEqualTo(behandling.getId());
-        assertThat(varselEntitet.getVarselTekst()).isEqualTo(varselTekst);
+        VarselInfo varselInfo = entitet.get();
+        assertThat(varselInfo.getVarselTekst()).isEqualTo(varselTekst);
     }
 
     @Test
-    public void utføreSteg_utenVarsel() {
+    public void skal_forsøke_å_hente_varseltekst_fra_fpsak_og_ikke_lagre_varsel_når_varseltekst_ikke_finnes() {
         SamletEksternBehandlingInfo samletEksternBehandlingInfo = SamletEksternBehandlingInfo
             .builder(Tillegsinformasjon.VARSELTEKST)
             .setVarseltekst("").build();
@@ -58,7 +57,7 @@ public class InnhentOpplysningStegImplTest extends FellesTestOppsett {
 
         innhentOpplysningSteg.utførSteg(new BehandlingskontrollKontekst(fagsak.getId(), fagsak.getAktørId(), lås));
 
-        Optional<VarselEntitet> entitet = varselRepository.finnVarsel(behandling.getId());
+        Optional<VarselInfo> entitet = varselRepository.finnVarsel(behandling.getId());
         assertThat(entitet).isEmpty();
     }
 

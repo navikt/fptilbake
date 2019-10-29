@@ -21,7 +21,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselInfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.HentForhåndsvisningVarselbrevDto;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.EksternDataForBrevTjeneste;
@@ -161,8 +161,8 @@ public class VarselbrevTjeneste {
         //Henter data fra fpoppdrag
         FeilutbetaltePerioderDto feilutbetaltePerioderDto = eksternDataForBrevTjeneste.hentFeilutbetaltePerioder(behandlingIdIFpsak);
 
-        VarselEntitet varselEntitet = varselRepository.finnEksaktVarsel(behandlingId);
-        String varselTekst = varselEntitet.getVarselTekst();
+        VarselInfo varselInfo = varselRepository.finnEksaktVarsel(behandlingId);
+        String varselTekst = varselInfo.getVarselTekst();
         lagreVarseltBeløp(behandlingId,feilutbetaltePerioderDto.getSumFeilutbetaling());
 
         return VarselbrevUtil.sammenstillInfoFraFagsystemerForSending(

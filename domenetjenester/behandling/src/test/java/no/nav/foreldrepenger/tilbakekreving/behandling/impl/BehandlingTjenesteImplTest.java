@@ -52,7 +52,7 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_hente_feilutbetalingfakta_når_varselBeløp_finnes_ikke() {
+    public void skal_hente_feilutbetalingfakta_når_varselBeløp_ikke_finnes() {
         KravgrunnlagMock mockMedFeilPostering = lagKravgrunnlag(FOM, TOM, KlasseType.FEIL, BigDecimal.valueOf(10000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedYtelPostering = lagKravgrunnlag(FOM, TOM, KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(10000));
 

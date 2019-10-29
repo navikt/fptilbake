@@ -27,40 +27,41 @@ public class VarselRepository {
     }
 
     public void lagre(Long behandlingId, String varselTekst, Long varselBeløp) {
-        Optional<VarselEntitet> forrigeVarsel = finnVarsel(behandlingId);
+        Optional<VarselInfo> forrigeVarsel = finnVarsel(behandlingId);
         if (forrigeVarsel.isPresent()) {
             forrigeVarsel.get().disable();
             entityManager.persist(forrigeVarsel);
         }
-        VarselEntitet varselEntitet = VarselEntitet.builder().medBehandlingId(behandlingId)
+        VarselInfo varselInfo = VarselInfo.builder().medBehandlingId(behandlingId)
             .medVarselTekst(varselTekst)
-            .medVarselBeløp(varselBeløp)
-            .medAktiv(true).build();
-        entityManager.persist(varselEntitet);
+            .medVarselBeløp(varselBeløp).build();
+        entityManager.persist(varselInfo);
         entityManager.flush();
     }
 
-    public Optional<VarselEntitet> finnVarsel(Long behandlingId) {
-        TypedQuery<VarselEntitet> query = entityManager.createQuery("from VarselEntitet vars where vars.behandlingId=:behandlingId " +
-            "and vars.aktiv=:aktiv", VarselEntitet.class);
-        query.setParameter("behandlingId", behandlingId);
-        query.setParameter("aktiv", true);
+    public Optional<VarselInfo> finnVarsel(Long behandlingId) {
+        TypedQuery<VarselInfo> query = lagFinnVarselQuery(behandlingId);
         return hentUniktResultat(query);
     }
 
-    public VarselEntitet finnEksaktVarsel(Long behandlingId) {
-        TypedQuery<VarselEntitet> query = entityManager.createQuery("from VarselEntitet vars where vars.behandlingId=:behandlingId " +
-            "and vars.aktiv=:aktiv", VarselEntitet.class);
-        query.setParameter("behandlingId", behandlingId);
-        query.setParameter("aktiv", true);
+    public VarselInfo finnEksaktVarsel(Long behandlingId) {
+        TypedQuery<VarselInfo> query = lagFinnVarselQuery(behandlingId);
         return hentEksaktResultat(query);
     }
 
-    public void lagreVarseltBeløp(Long behandlingId, Long varseltBeløp) {
-        VarselEntitet varselEntitet = finnEksaktVarsel(behandlingId);
-        varselEntitet.setVarselBeløp(varseltBeløp);
+    private TypedQuery<VarselInfo> lagFinnVarselQuery(Long behandlingId) {
+        TypedQuery<VarselInfo> query = entityManager.createQuery("from VarselInfo vars where vars.behandlingId=:behandlingId " +
+            "and vars.aktiv=:aktiv", VarselInfo.class);
+        query.setParameter("behandlingId", behandlingId);
+        query.setParameter("aktiv", true);
+        return query;
+    }
 
-        entityManager.persist(varselEntitet);
+    public void lagreVarseltBeløp(Long behandlingId, Long varseltBeløp) {
+        VarselInfo varselInfo = finnEksaktVarsel(behandlingId);
+        varselInfo.setVarselBeløp(varseltBeløp);
+
+        entityManager.persist(varselInfo);
         entityManager.flush();
     }
 }
