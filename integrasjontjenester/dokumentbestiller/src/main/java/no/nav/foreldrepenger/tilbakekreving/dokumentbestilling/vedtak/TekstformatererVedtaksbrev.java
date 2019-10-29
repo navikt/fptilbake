@@ -83,9 +83,10 @@ class TekstformatererVedtaksbrev {
         String startmarkør = underavsnittstype == null
             ? FRITEKST_MARKERING_START
             : FRITEKST_MARKERING_START + underavsnittstype;
-        return fritekst == null
+        String markertFritekst = fritekst == null
             ? startmarkør + "\n" + FRITEKST_MARKERING_SLUTT
             : startmarkør + "\n" + fritekst + "\n" + FRITEKST_MARKERING_SLUTT;
+        return "\n" + markertFritekst;
     }
 
     static String markerPåkrevetFritekst(String fritekst) {
@@ -96,9 +97,10 @@ class TekstformatererVedtaksbrev {
         String startmarkør = underavsnittstype == null
             ? FRITEKST_PÅKREVET_MARKERING_START
             : FRITEKST_PÅKREVET_MARKERING_START + underavsnittstype;
-        return fritekst == null
+        String markertFritekst = fritekst == null
             ? startmarkør + "\n" + FRITEKST_MARKERING_SLUTT
             : startmarkør + "\n" + fritekst + "\n" + FRITEKST_MARKERING_SLUTT;
+        return "\n" + markertFritekst;
     }
 
     static Avsnitt lagOppsummeringAvsnitt(HbVedtaksbrevData vedtaksbrevData, String hovedoverskrift) {

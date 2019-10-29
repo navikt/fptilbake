@@ -318,7 +318,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
         Avsnitt resultat = TekstformatererVedtaksbrev.parseTekst("_underoverskrift 1\n"
                 + TekstformatererVedtaksbrev.markerFritekst(null, Underavsnitt.Underavsnittstype.SÆRLIGEGRUNNER)
                 + "\n_underoverskrift 2\n"
-                + TekstformatererVedtaksbrev.markerFritekst(null, Underavsnitt.Underavsnittstype.SÆRLIGEGRUNNER_ANNET)
+                + "brødtekst " + TekstformatererVedtaksbrev.markerFritekst(null, Underavsnitt.Underavsnittstype.SÆRLIGEGRUNNER_ANNET)
                 + "\n_underoverskrift 3\n"
             , avsnittbuilder, null).build();
         assertThat(resultat.getOverskrift()).isEqualTo("Hovedoverskrift");
@@ -326,7 +326,9 @@ public class TekstformatererVedtaksbrevIBiterTest {
         assertThat(underavsnitt).hasSize(3);
         assertThat(underavsnitt.get(0).getUnderavsnittstype()).isEqualTo(Underavsnitt.Underavsnittstype.SÆRLIGEGRUNNER);
         assertThat(underavsnitt.get(1).getUnderavsnittstype()).isEqualTo(Underavsnitt.Underavsnittstype.SÆRLIGEGRUNNER_ANNET);
+        assertThat(underavsnitt.get(1).getBrødtekst()).isEqualTo("brødtekst ");
+        assertThat(underavsnitt.get(1).isFritekstTillatt()).isTrue();
         assertThat(underavsnitt.get(2).getUnderavsnittstype()).isEqualTo(Underavsnitt.Underavsnittstype.SÆRLIGEGRUNNER_ANNET);
-
+        assertThat(underavsnitt.get(2).isFritekstTillatt()).isFalse();
     }
 }

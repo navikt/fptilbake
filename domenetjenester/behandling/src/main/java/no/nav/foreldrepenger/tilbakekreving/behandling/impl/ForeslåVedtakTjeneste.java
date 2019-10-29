@@ -1,5 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
+import java.util.List;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -14,9 +16,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
-
-import java.util.List;
-import java.util.Optional;
 
 @ApplicationScoped
 public class ForeslåVedtakTjeneste {
@@ -53,14 +52,13 @@ public class ForeslåVedtakTjeneste {
         historikkTjenesteAdapter.lagInnslag(historikkinnslag);
     }
 
-    public void lagreFriteksterFraSaksbehandler(
-        Long behandlingId,
-        Optional<VedtaksbrevOppsummering> vedtaksbrevOppsummeringOpt,
-        Optional<List<VedtaksbrevPeriode>> vedtaksbrevPerioderOpt) {
-
+    public void lagreFriteksterFraSaksbehandler(Long behandlingId, VedtaksbrevOppsummering vedtaksbrevOppsummering, List<VedtaksbrevPeriode> vedtaksbrevPerioder) {
         brevdataRepository.slettOppsummering(behandlingId);
         brevdataRepository.slettPerioderMedFritekster(behandlingId);
-        vedtaksbrevPerioderOpt.ifPresent(vedtaksbrevPerioder -> brevdataRepository.lagreVedtakPerioderOgTekster(vedtaksbrevPerioder));
-        vedtaksbrevOppsummeringOpt.ifPresent(vedtaksbrevOppsummering -> brevdataRepository.lagreVedtaksbrevOppsummering(vedtaksbrevOppsummering));
+
+        brevdataRepository.lagreVedtakPerioderOgTekster(vedtaksbrevPerioder);
+        if (vedtaksbrevOppsummering != null) {
+            brevdataRepository.lagreVedtaksbrevOppsummering(vedtaksbrevOppsummering);
+        }
     }
 }
