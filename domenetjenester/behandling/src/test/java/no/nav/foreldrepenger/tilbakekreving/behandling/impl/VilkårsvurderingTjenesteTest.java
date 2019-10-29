@@ -238,6 +238,15 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         List<VilkårsvurderingPerioderDto> vilkårPerioder = Lists.newArrayList(
             formVilkårsvurderingPerioderDto(VilkårResultat.FORSTO_BURDE_FORSTÅTT, FOM, LocalDate.of(2016, 3, 31), Aktsomhet.SIMPEL_UAKTSOM),
             formVilkårsvurderingPerioderDto(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER, LocalDate.of(2016, 4, 1), TOM, Aktsomhet.GROVT_UAKTSOM));
+
+        vilkårPerioder.stream()
+            .filter(perioderDto -> VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER.equals(perioderDto.getVilkårResultat()))
+            .map(perioderDto -> (VilkårResultatAnnetDto) perioderDto.getVilkarResultatInfo())
+            .map(VilkårResultatAnnetDto::getAktsomhetInfo).forEach(aktsomhetDto -> {
+            aktsomhetDto.setHarGrunnerTilReduksjon(true);
+            aktsomhetDto.setAndelTilbakekreves(BigDecimal.TEN);
+        });
+
         vilkårsvurderingTjeneste.lagreVilkårsvurdering(internBehandlingId, vilkårPerioder);
 
         Optional<VilkårVurderingAggregateEntitet> aggregateEntitet = repoProvider.getVilkårsvurderingRepository().finnVilkårsvurderingForBehandlingId(internBehandlingId);
@@ -261,8 +270,8 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         assertThat(andrePeriode.getPeriode()).isEqualTo(Periode.of(LocalDate.of(2016, 4, 1), TOM));
         assertThat(andrePeriode.getGodTro()).isNull();
         assertThat(andrePeriode.getAktsomhet().getAktsomhet()).isEqualByComparingTo(Aktsomhet.GROVT_UAKTSOM);
-        assertThat(andrePeriode.getAktsomhet().getProsenterSomTilbakekreves()).isEqualByComparingTo(BigDecimal.valueOf(100));
-        assertThat(andrePeriode.getAktsomhet().getSærligGrunnerTilReduksjon()).isFalse();
+        assertThat(andrePeriode.getAktsomhet().getSærligGrunnerTilReduksjon()).isTrue();
+        assertThat(andrePeriode.getAktsomhet().getProsenterSomTilbakekreves()).isEqualByComparingTo(BigDecimal.TEN);
         assertThat(andrePeriode.getAktsomhet().getIleggRenter()).isTrue();
         assertThat(andrePeriode.getAktsomhet().getSærligGrunner().size()).isEqualTo(2);
     }
@@ -293,8 +302,8 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         assertThat(periode.getPeriode()).isEqualTo(Periode.of(FØRSTE_DAG_I_FORELDELSE_PERIODE, TOM));
         assertThat(periode.getGodTro()).isNull();
         assertThat(periode.getAktsomhet().getAktsomhet()).isEqualByComparingTo(Aktsomhet.GROVT_UAKTSOM);
-        assertThat(periode.getAktsomhet().getProsenterSomTilbakekreves()).isEqualByComparingTo(BigDecimal.valueOf(100));
         assertThat(periode.getAktsomhet().getSærligGrunnerTilReduksjon()).isFalse();
+        assertThat(periode.getAktsomhet().getProsenterSomTilbakekreves()).isNull();
         assertThat(periode.getAktsomhet().getIleggRenter()).isTrue();
         assertThat(periode.getAktsomhet().getSærligGrunner().size()).isEqualTo(2);
     }
@@ -366,8 +375,8 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
 
         annetDto = (VilkårResultatAnnetDto) andrePeriode.getVilkarResultatInfo();
         assertThat(annetDto.getAktsomhet()).isEqualByComparingTo(Aktsomhet.GROVT_UAKTSOM);
-        assertThat(annetDto.getAktsomhetInfo().getAndelTilbakekreves()).isEqualByComparingTo(BigDecimal.valueOf(100));
         assertThat(annetDto.getAktsomhetInfo().isHarGrunnerTilReduksjon()).isFalse();
+        assertThat(annetDto.getAktsomhetInfo().getAndelTilbakekreves()).isNull();
         assertThat(annetDto.getAktsomhetInfo().isIleggRenter()).isTrue();
         assertThat(annetDto.getAktsomhetInfo().getSærligeGrunner().size()).isEqualTo(2);
 

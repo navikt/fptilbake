@@ -141,7 +141,7 @@ public class FellesTestOppsett extends TestOppsett {
             if (aktsomhet == Aktsomhet.GROVT_UAKTSOM) {
                 aktsomhetDto.setHarGrunnerTilReduksjon(false);
                 aktsomhetDto.setIleggRenter(true);
-                aktsomhetDto.setAndelTilbakekreves(BigDecimal.valueOf(100));
+                aktsomhetDto.setAndelTilbakekreves(BigDecimal.valueOf(100)); //feil verdi, andelTilbakekreves alltid være null når harGrunnerTilReduksjon er true
             } else if (aktsomhet == Aktsomhet.SIMPEL_UAKTSOM) {
                 aktsomhetDto.setHarGrunnerTilReduksjon(true);
                 aktsomhetDto.setTilbakekrevesBelop(BigDecimal.valueOf(2000.00));
