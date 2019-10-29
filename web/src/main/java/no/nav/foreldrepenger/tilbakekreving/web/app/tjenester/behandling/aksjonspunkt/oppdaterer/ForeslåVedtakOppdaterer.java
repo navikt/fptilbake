@@ -9,6 +9,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.ForeslåVedtakTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VedtaksbrevFritekstTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.totrinn.TotrinnTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
@@ -30,28 +31,30 @@ public class ForeslåVedtakOppdaterer implements AksjonspunktOppdaterer<Foreslå
     private ForeslåVedtakTjeneste foreslåVedtakTjeneste;
     private TotrinnTjeneste totrinnTjeneste;
     private AksjonspunktRepository aksjonspunktRepository;
+    private VedtaksbrevFritekstTjeneste vedtaksbrevFritekstTjeneste;
 
     @Inject
-    public ForeslåVedtakOppdaterer(ForeslåVedtakTjeneste foreslåVedtakTjeneste, TotrinnTjeneste totrinnTjeneste, AksjonspunktRepository aksjonspunktRepository) {
+    public ForeslåVedtakOppdaterer(ForeslåVedtakTjeneste foreslåVedtakTjeneste, TotrinnTjeneste totrinnTjeneste, AksjonspunktRepository aksjonspunktRepository, VedtaksbrevFritekstTjeneste vedtaksbrevFritekstTjeneste) {
         this.foreslåVedtakTjeneste = foreslåVedtakTjeneste;
         this.totrinnTjeneste = totrinnTjeneste;
         this.aksjonspunktRepository = aksjonspunktRepository;
+        this.vedtaksbrevFritekstTjeneste = vedtaksbrevFritekstTjeneste;
     }
 
     @Override
     public void oppdater(ForeslåVedtakDto dto, Behandling behandling) {
         Long behandlingId = behandling.getId();
 
-        foreslåVedtakTjeneste.lagreFriteksterFraSaksbehandler(behandlingId, lagOppsummeringstekst(behandlingId, dto), lagPerioderMedTekst(behandlingId, dto));
+        vedtaksbrevFritekstTjeneste.lagreFriteksterFraSaksbehandler(behandlingId, lagOppsummeringstekst(behandlingId, dto), lagPerioderMedTekst(behandlingId, dto.getPerioderMedTekst()));
         foreslåVedtakTjeneste.lagHistorikkInnslagForForeslåVedtak(behandlingId);
 
         opprettEllerReåpne(behandling, AksjonspunktDefinisjon.FATTE_VEDTAK);
         totrinnTjeneste.settNyttTotrinnsgrunnlag(behandling);
     }
 
-    private List<VedtaksbrevPeriode> lagPerioderMedTekst(Long behandlingId, ForeslåVedtakDto dto) {
+    private List<VedtaksbrevPeriode> lagPerioderMedTekst(Long behandlingId, List<PeriodeMedTekstDto> perioderMedTekst) {
         List<VedtaksbrevPeriode> fritekstPerioder = new ArrayList<>();
-        for (PeriodeMedTekstDto periodeDto : dto.getPerioderMedTekst()) {
+        for (PeriodeMedTekstDto periodeDto : perioderMedTekst) {
             lagFritekstPeriode(behandlingId, periodeDto, PeriodeMedTekstDto::getFaktaAvsnitt, FritekstType.FAKTA_AVSNITT).ifPresent(fritekstPerioder::add);
             lagFritekstPeriode(behandlingId, periodeDto, PeriodeMedTekstDto::getVilkårAvsnitt, FritekstType.VILKAAR_AVSNITT).ifPresent(fritekstPerioder::add);
             lagFritekstPeriode(behandlingId, periodeDto, PeriodeMedTekstDto::getSærligeGrunnerAvsnitt, FritekstType.SAERLIGE_GRUNNER_AVSNITT).ifPresent(fritekstPerioder::add);

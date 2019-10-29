@@ -74,6 +74,11 @@ public class VilkårsvurderingRepository {
         }
     }
 
+    public Optional<VilkårVurderingEntitet> finnVilkårsvurdering(Long behandlingId) {
+        return finnVilkårsvurderingForBehandlingId(behandlingId).map(VilkårVurderingAggregateEntitet::getManuellVilkår);
+    }
+
+    //TODO AggregatEntiteten skal bare benyttes i repository, ikke deles ut til andre deler av koden
     public Optional<VilkårVurderingAggregateEntitet> finnVilkårsvurderingForBehandlingId(Long behandlingId) {
         TypedQuery<VilkårVurderingAggregateEntitet> query = entityManager.createQuery("from VilkårVurderingAggregate aggr " +
             "where aggr.behandlingId=:behandlingId and aggr.aktiv=:aktiv", VilkårVurderingAggregateEntitet.class);

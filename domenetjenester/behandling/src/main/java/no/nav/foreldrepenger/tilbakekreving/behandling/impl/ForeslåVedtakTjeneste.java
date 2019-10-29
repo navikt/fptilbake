@@ -1,15 +1,10 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
-import java.util.List;
-
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BeregningResultat;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevdataRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevOppsummering;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
@@ -22,17 +17,16 @@ public class ForeslåVedtakTjeneste {
 
     private TilbakekrevingBeregningTjeneste beregningTjeneste;
     private HistorikkTjenesteAdapter historikkTjenesteAdapter;
-    private BrevdataRepository brevdataRepository;
 
     ForeslåVedtakTjeneste() {
         // for CDI
     }
 
     @Inject
-    public ForeslåVedtakTjeneste(TilbakekrevingBeregningTjeneste beregningTjeneste, HistorikkTjenesteAdapter historikkTjenesteAdapter, BrevdataRepository brevdataRepository) {
+    public ForeslåVedtakTjeneste(TilbakekrevingBeregningTjeneste beregningTjeneste, HistorikkTjenesteAdapter historikkTjenesteAdapter) {
+
         this.beregningTjeneste = beregningTjeneste;
         this.historikkTjenesteAdapter = historikkTjenesteAdapter;
-        this.brevdataRepository = brevdataRepository;
     }
 
     public void lagHistorikkInnslagForForeslåVedtak(Long behandlingId) {
@@ -52,13 +46,6 @@ public class ForeslåVedtakTjeneste {
         historikkTjenesteAdapter.lagInnslag(historikkinnslag);
     }
 
-    public void lagreFriteksterFraSaksbehandler(Long behandlingId, VedtaksbrevOppsummering vedtaksbrevOppsummering, List<VedtaksbrevPeriode> vedtaksbrevPerioder) {
-        brevdataRepository.slettOppsummering(behandlingId);
-        brevdataRepository.slettPerioderMedFritekster(behandlingId);
 
-        brevdataRepository.lagreVedtakPerioderOgTekster(vedtaksbrevPerioder);
-        if (vedtaksbrevOppsummering != null) {
-            brevdataRepository.lagreVedtaksbrevOppsummering(vedtaksbrevOppsummering);
-        }
-    }
+
 }

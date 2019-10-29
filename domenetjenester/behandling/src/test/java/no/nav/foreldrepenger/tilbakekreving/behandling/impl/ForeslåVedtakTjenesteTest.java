@@ -6,7 +6,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevdataRepository;
 import org.junit.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
@@ -22,8 +21,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResult
 public class ForeslåVedtakTjenesteTest extends FellesTestOppsett {
 
     private TilbakekrevingBeregningTjeneste beregningTjeneste = mock(TilbakekrevingBeregningTjeneste.class);
-    private BrevdataRepository brevdataRepositoryMock = mock(BrevdataRepository.class);
-    private ForeslåVedtakTjeneste foreslåVedtakTjeneste = new ForeslåVedtakTjeneste(beregningTjeneste, historikkTjenesteAdapter, brevdataRepositoryMock);
+    private ForeslåVedtakTjeneste foreslåVedtakTjeneste = new ForeslåVedtakTjeneste(beregningTjeneste, historikkTjenesteAdapter);
 
     @Test
     public void lagHistorikkInnslagForForeslåVedtak() {
@@ -46,7 +44,7 @@ public class ForeslåVedtakTjenesteTest extends FellesTestOppsett {
         HistorikkinnslagDel historikkinnslagDel = historikkinnslagDeler.get(0);
         assertThat(historikkinnslagDel.getSkjermlenke().get()).isEqualTo(SkjermlenkeType.VEDTAK.getKode());
         assertThat(historikkinnslagDel.getResultat().get())
-                .isEqualTo(beregningResultat.getVedtakResultatType().getKode());
+            .isEqualTo(beregningResultat.getVedtakResultatType().getKode());
     }
 
 }
