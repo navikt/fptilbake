@@ -25,10 +25,10 @@ public class VilkårsvurderingHjelperUtil {
     static void formGodTroEntitet(VilkårsvurderingPerioderDto periode, VilkårVurderingPeriodeEntitet periodeEntitet) {
         VilkårResultatGodTroDto godTro = (VilkårResultatGodTroDto) periode.getVilkarResultatInfo();
         VilkårVurderingGodTroEntitet godTroEntitet = VilkårVurderingGodTroEntitet.builder().medPeriode(periodeEntitet)
-                .medBegrunnelse(godTro.getBegrunnelse())
-                .medBeløpErIBehold(godTro.getErBelopetIBehold())
-                .medBeløpTilbakekreves(godTro.getTilbakekrevesBelop())
-                .build();
+            .medBegrunnelse(godTro.getBegrunnelse())
+            .medBeløpErIBehold(godTro.getErBelopetIBehold())
+            .medBeløpTilbakekreves(godTro.getTilbakekrevesBelop())
+            .build();
         periodeEntitet.setGodTro(godTroEntitet);
     }
 
@@ -38,24 +38,24 @@ public class VilkårsvurderingHjelperUtil {
         VilkårVurderingAktsomhetEntitet aktsomhetEntitet = null;
         if (Aktsomhet.FORSETT.equals(annetDto.getAktsomhet())) {
             aktsomhetEntitet = VilkårVurderingAktsomhetEntitet.builder().medPeriode(periodeEntitet)
-                    .medAktsomhet(aktsomhet)
-                    .medBegrunnelse(annetDto.getBegrunnelse()).build();
+                .medAktsomhet(aktsomhet)
+                .medBegrunnelse(annetDto.getBegrunnelse()).build();
         } else {
             VilkårResultatAktsomhetDto aktsomhetInfo = annetDto.getAktsomhetInfo();
             aktsomhetEntitet = VilkårVurderingAktsomhetEntitet.builder().medPeriode(periodeEntitet)
-                    .medAktsomhet(aktsomhet)
-                    .medBegrunnelse(annetDto.getBegrunnelse())
-                    .medSærligGrunnerTilReduksjon(aktsomhetInfo.isHarGrunnerTilReduksjon())
-                    .medProsenterSomTilbakekreves(aktsomhetInfo.getAndelTilbakekreves())
-                    .medIleggRenter(aktsomhetInfo.isIleggRenter())
-                    .medBeløpTilbakekreves(aktsomhetInfo.getTilbakekrevesBelop())
-                    .medTilbakekrevSmåBeløp(aktsomhetInfo.isTilbakekrevSelvOmBeloepErUnder4Rettsgebyr()).build();
+                .medAktsomhet(aktsomhet)
+                .medBegrunnelse(annetDto.getBegrunnelse())
+                .medSærligGrunnerTilReduksjon(aktsomhetInfo.isHarGrunnerTilReduksjon())
+                .medProsenterSomTilbakekreves(aktsomhetInfo.isHarGrunnerTilReduksjon() ? aktsomhetInfo.getAndelTilbakekreves() : null)
+                .medIleggRenter(aktsomhetInfo.isIleggRenter())
+                .medBeløpTilbakekreves(aktsomhetInfo.getTilbakekrevesBelop())
+                .medTilbakekrevSmåBeløp(aktsomhetInfo.isTilbakekrevSelvOmBeloepErUnder4Rettsgebyr()).build();
 
             for (SærligGrunn grunn : aktsomhetInfo.getSærligeGrunner()) {
                 VilkårVurderingSærligGrunnEntitet særligGrunnEntitet = VilkårVurderingSærligGrunnEntitet.builder()
-                        .medGrunn(grunn)
-                        .medVurdertAktsomhet(aktsomhetEntitet)
-                        .medBegrunnelse(SærligGrunn.ANNET.equals(grunn) ? aktsomhetInfo.getAnnetBegrunnelse() : null).build();
+                    .medGrunn(grunn)
+                    .medVurdertAktsomhet(aktsomhetEntitet)
+                    .medBegrunnelse(SærligGrunn.ANNET.equals(grunn) ? aktsomhetInfo.getAnnetBegrunnelse() : null).build();
                 aktsomhetEntitet.leggTilSærligGrunn(særligGrunnEntitet);
             }
         }
@@ -66,7 +66,7 @@ public class VilkårsvurderingHjelperUtil {
         if (periodeEntitet.getGodTro() != null) {
             VilkårVurderingGodTroEntitet godTroEntitet = periodeEntitet.getGodTro();
             return new VilkårResultatGodTroDto(godTroEntitet.getBegrunnelse(), godTroEntitet.isBeløpErIBehold(),
-                    godTroEntitet.getBeløpTilbakekreves());
+                godTroEntitet.getBeløpTilbakekreves());
         } else {
             return fylleUtPeiodeForAktsomhet(periodeEntitet);
         }
@@ -92,7 +92,7 @@ public class VilkårsvurderingHjelperUtil {
         return new VilkårResultatAnnetDto(aktsomhetEntitet.getBegrunnelse(), aktsomhetEntitet.getAktsomhet(), null);
     }
 
-      static boolean harEndret(Object forrigeVerdi, Object verdi) {
+    static boolean harEndret(Object forrigeVerdi, Object verdi) {
         return !Objects.equals(forrigeVerdi, verdi);
     }
 
