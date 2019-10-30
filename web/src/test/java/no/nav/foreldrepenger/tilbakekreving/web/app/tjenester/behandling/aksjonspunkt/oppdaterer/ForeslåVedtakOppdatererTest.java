@@ -1,11 +1,8 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.oppdaterer;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
@@ -18,6 +15,7 @@ import org.junit.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.ForeslåVedtakTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VedtaksbrevFritekstTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.totrinn.TotrinnTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BeregningResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
@@ -35,6 +33,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.TestFagsakUtil;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.PeriodeMedTekstDto;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
@@ -52,13 +51,15 @@ public class ForeslåVedtakOppdatererTest {
 
     private TilbakekrevingBeregningTjeneste beregningTjenesteMock = mock(TilbakekrevingBeregningTjeneste.class);
     private HistorikkTjenesteAdapter historikkTjenesteAdapterMock = mock(HistorikkTjenesteAdapter.class);
-    private ForeslåVedtakTjeneste foreslåVedtakTjeneste = new ForeslåVedtakTjeneste(beregningTjenesteMock,historikkTjenesteAdapterMock,brevdataRepository);
+    private ForeslåVedtakTjeneste foreslåVedtakTjeneste = new ForeslåVedtakTjeneste(beregningTjenesteMock, historikkTjenesteAdapterMock);
     private TotrinnTjeneste totrinnTjenesteMock = mock(TotrinnTjeneste.class);
+    private VilkårsvurderingRepository vilkårsvurderingRepository = mock(VilkårsvurderingRepository.class);
 
-    private ForeslåVedtakOppdaterer foreslåVedtakOppdaterer = new ForeslåVedtakOppdaterer(foreslåVedtakTjeneste, totrinnTjenesteMock, aksjonspunktRepository);
+    private final VedtaksbrevFritekstTjeneste vedtaksbrevFritekstTjeneste = new VedtaksbrevFritekstTjeneste(vilkårsvurderingRepository, brevdataRepository);
+    private ForeslåVedtakOppdaterer foreslåVedtakOppdaterer = new ForeslåVedtakOppdaterer(foreslåVedtakTjeneste, totrinnTjenesteMock, aksjonspunktRepository, vedtaksbrevFritekstTjeneste);
 
     @Before
-    public void setup(){
+    public void setup() {
         when(historikkTjenesteAdapterMock.tekstBuilder()).thenReturn(new HistorikkInnslagTekstBuilder());
         when(beregningTjenesteMock.beregn(anyLong())).thenReturn(new BeregningResultat());
     }
@@ -66,7 +67,7 @@ public class ForeslåVedtakOppdatererTest {
     @Test
     public void oppdater_medFaktaAvsnitt() {
         Behandling behandling = lagMockBehandling();
-        foreslåVedtakOppdaterer.oppdater(lagMockForeslåVedtak("fakta",null,null), behandling);
+        foreslåVedtakOppdaterer.oppdater(lagMockForeslåVedtak("fakta", null, null), behandling);
 
         fellesAssert(behandling);
         List<VedtaksbrevPeriode> perioder = brevdataRepository.hentVedtaksbrevPerioderMedTekst(behandling.getId());
@@ -81,7 +82,7 @@ public class ForeslåVedtakOppdatererTest {
     @Test
     public void oppdater_medVilkårAvsnitt() {
         Behandling behandling = lagMockBehandling();
-        foreslåVedtakOppdaterer.oppdater(lagMockForeslåVedtak(null,null,"vilkår"), behandling);
+        foreslåVedtakOppdaterer.oppdater(lagMockForeslåVedtak(null, null, "vilkår"), behandling);
 
         fellesAssert(behandling);
         List<VedtaksbrevPeriode> perioder = brevdataRepository.hentVedtaksbrevPerioderMedTekst(behandling.getId());
@@ -96,7 +97,7 @@ public class ForeslåVedtakOppdatererTest {
     @Test
     public void oppdater_medSærligGrunnerAvsnitt() {
         Behandling behandling = lagMockBehandling();
-        foreslåVedtakOppdaterer.oppdater(lagMockForeslåVedtak(null,"særligGrunner",null), behandling);
+        foreslåVedtakOppdaterer.oppdater(lagMockForeslåVedtak(null, "særligGrunner", null), behandling);
 
         fellesAssert(behandling);
         List<VedtaksbrevPeriode> perioder = brevdataRepository.hentVedtaksbrevPerioderMedTekst(behandling.getId());

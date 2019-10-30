@@ -14,7 +14,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.transisjoner.Fel
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingAggregateEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseAggregate;
 
@@ -35,31 +34,30 @@ public class VurderTilbakekrevingStegImpl implements VurderTilbakekrevingSteg {
     public BehandleStegResultat utførSteg(BehandlingskontrollKontekst kontekst) {
         Long behandlingId = kontekst.getBehandlingId();
 
-        // hvis alle periode er foreldet, prosess skal hoppe til vedtak
-        Optional<VurdertForeldelseAggregate> foreldelseAggregate = behandlingRepositoryProvider.getVurdertForeldelseRepository()
-                .finnVurdertForeldelseForBehandling(behandlingId);
-        if (foreldelseAggregate.isPresent()) {
-            boolean erAllePeriodeForeldet = foreldelseAggregate.get().getVurdertForeldelse().getVurdertForeldelsePerioder().stream()
-                    .allMatch(foreldelsePeriodeDto -> ForeldelseVurderingType.FORELDET.equals(foreldelsePeriodeDto.getForeldelseVurderingType()));
-            if (erAllePeriodeForeldet) {
-                // fjerner gamle vilkårsvurdering hvis det finnes
-                håndteresGammelVilkårsvurdering(behandlingId);
-
-                return BehandleStegResultat.fremoverførtMedAksjonspunkter(FellesTransisjoner.FREMHOPP_TIL_FORESLÅ_VEDTAK,
-                        Collections.singletonList(AksjonspunktDefinisjon.FORESLÅ_VEDTAK));
-            }
+        if (allePerioderErForeldet(behandlingId)){
+            deaktiverForrigeVilkårsvurdering(behandlingId);
+            return hoppFremoverTilVedtak();
         }
-        // ellers forsatt med Vilkårsvudering
+
         return BehandleStegResultat.utførtMedAksjonspunkter(Collections.singletonList(AksjonspunktDefinisjon.VURDER_TILBAKEKREVING));
     }
 
-    private void håndteresGammelVilkårsvurdering(Long behandlingId) {
+    private BehandleStegResultat hoppFremoverTilVedtak() {
+        return BehandleStegResultat.fremoverførtMedAksjonspunkter(FellesTransisjoner.FREMHOPP_TIL_FORESLÅ_VEDTAK,
+            Collections.singletonList(AksjonspunktDefinisjon.FORESLÅ_VEDTAK));
+    }
 
-        VilkårsvurderingRepository vilkårsvurderingRepository = behandlingRepositoryProvider.getVilkårsvurderingRepository();
-        Optional<VilkårVurderingAggregateEntitet> aggregateEntitet = vilkårsvurderingRepository.finnVilkårsvurderingForBehandlingId(behandlingId);
-        if (aggregateEntitet.isPresent()) {
-            aggregateEntitet.get().disable();
-            behandlingRepositoryProvider.getVilkårsvurderingRepository().lagre(aggregateEntitet.get());
+    private boolean allePerioderErForeldet(Long behandlingId) {
+        Optional<VurdertForeldelseAggregate> foreldelseAggregate = behandlingRepositoryProvider.getVurdertForeldelseRepository().finnVurdertForeldelseForBehandling(behandlingId);
+        if (foreldelseAggregate.isPresent()) {
+            return foreldelseAggregate.get().getVurdertForeldelse().getVurdertForeldelsePerioder().stream()
+                .allMatch(foreldelsePeriodeDto -> ForeldelseVurderingType.FORELDET.equals(foreldelsePeriodeDto.getForeldelseVurderingType()));
         }
+        return false;
+    }
+
+    private void deaktiverForrigeVilkårsvurdering(Long behandlingId) {
+        VilkårsvurderingRepository vilkårsvurderingRepository = behandlingRepositoryProvider.getVilkårsvurderingRepository();
+        vilkårsvurderingRepository.slettVilkårsvurdering(behandlingId);
     }
 }

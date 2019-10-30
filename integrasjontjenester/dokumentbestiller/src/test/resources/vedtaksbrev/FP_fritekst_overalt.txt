@@ -14,7 +14,7 @@ Gratulerer, du fikk norgesrekord i feilutbetalt beløp! Du skal slippe å betale
 
 Vi har vurdert om det er grunner til å redusere beløpet. Selv om vi kunne unngått at du fikk for mye utbetalt, har vi lagt vekt på at du må ha forstått at at du fikk penger du ikke har rett til. Vi har også lagt vekt på at det feilutbetalte beløpet er høyt og at det er kort tid siden utbetalingen skjedde. Derfor må du betale tilbake hele beløpet.
 _Gjelder perioden fra og med 1. februar 2019 til og med 28. februar 2019
-Vi har gjort en feil og utbetalt for mye i foreldrepenger i denne perioden. Du skulle hatt 0 kroner, men du fikk 1 kroner. Derfor har du fått 1 kroner for mye utbetalt.
+Vi har gjort en feil og utbetalt for mye i foreldrepenger i denne perioden. Du skulle hatt [riktig-beløp] kroner, men du fikk [utbetalt-beløp] kroner. Derfor har du fått 1 kroner for mye utbetalt.
 
 Her har økonomisystemet gjort noe helt feil.
 _Hvordan har vi kommet fram til at du må betale tilbake?

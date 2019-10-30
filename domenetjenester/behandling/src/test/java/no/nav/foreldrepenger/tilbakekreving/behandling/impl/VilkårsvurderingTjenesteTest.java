@@ -27,7 +27,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.FpHendelseUnderTyper;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingAggregateEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingPeriodeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
@@ -213,10 +212,9 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
             formVilkårsvurderingPerioderDto(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER, LocalDate.of(2016, 4, 1), TOM, Aktsomhet.FORSETT));
         vilkårsvurderingTjeneste.lagreVilkårsvurdering(internBehandlingId, vilkårPerioder);
 
-        Optional<VilkårVurderingAggregateEntitet> aggregateEntitet = repoProvider.getVilkårsvurderingRepository().finnVilkårsvurderingForBehandlingId(internBehandlingId);
+        Optional<VilkårVurderingEntitet> aggregateEntitet = repoProvider.getVilkårsvurderingRepository().finnVilkårsvurdering(internBehandlingId);
         assertThat(aggregateEntitet).isNotEmpty();
-        assertThat(aggregateEntitet.get().isAktiv()).isTrue();
-        VilkårVurderingEntitet vilkårEntitet = aggregateEntitet.get().getManuellVilkår();
+        VilkårVurderingEntitet vilkårEntitet = aggregateEntitet.get();
         List<VilkårVurderingPeriodeEntitet> periodene = new ArrayList<>(vilkårEntitet.getPerioder());
         assertThat(periodene.size()).isEqualTo(2);
         periodene.sort(PERIODE_FOM_COMPARATOR);
@@ -249,10 +247,9 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
 
         vilkårsvurderingTjeneste.lagreVilkårsvurdering(internBehandlingId, vilkårPerioder);
 
-        Optional<VilkårVurderingAggregateEntitet> aggregateEntitet = repoProvider.getVilkårsvurderingRepository().finnVilkårsvurderingForBehandlingId(internBehandlingId);
+        Optional<VilkårVurderingEntitet> aggregateEntitet = repoProvider.getVilkårsvurderingRepository().finnVilkårsvurdering(internBehandlingId);
         assertThat(aggregateEntitet).isNotEmpty();
-        assertThat(aggregateEntitet.get().isAktiv()).isTrue();
-        VilkårVurderingEntitet vilkårEntitet = aggregateEntitet.get().getManuellVilkår();
+        VilkårVurderingEntitet vilkårEntitet = aggregateEntitet.get();
         List<VilkårVurderingPeriodeEntitet> periodene = new ArrayList<>(vilkårEntitet.getPerioder());
         periodene.sort(PERIODE_FOM_COMPARATOR);
 
@@ -292,10 +289,9 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
             formVilkårsvurderingPerioderDto(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER, FØRSTE_DAG_I_FORELDELSE_PERIODE, TOM, Aktsomhet.GROVT_UAKTSOM));
         vilkårsvurderingTjeneste.lagreVilkårsvurdering(internBehandlingId, vilkårPerioder);
 
-        Optional<VilkårVurderingAggregateEntitet> aggregateEntitet = repoProvider.getVilkårsvurderingRepository().finnVilkårsvurderingForBehandlingId(internBehandlingId);
+        Optional<VilkårVurderingEntitet> aggregateEntitet = repoProvider.getVilkårsvurderingRepository().finnVilkårsvurdering(internBehandlingId);
         assertThat(aggregateEntitet).isNotEmpty();
-        assertThat(aggregateEntitet.get().isAktiv()).isTrue();
-        VilkårVurderingEntitet vilkårEntitet = aggregateEntitet.get().getManuellVilkår();
+        VilkårVurderingEntitet vilkårEntitet = aggregateEntitet.get();
         assertThat(vilkårEntitet.getPerioder().size()).isEqualTo(1);
 
         VilkårVurderingPeriodeEntitet periode = vilkårEntitet.getPerioder().get(0);

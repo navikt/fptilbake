@@ -1,11 +1,14 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import no.nav.vedtak.util.InputValideringRegex;
+import java.time.LocalDate;
 
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-import java.time.LocalDate;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
+import no.nav.vedtak.util.InputValideringRegex;
 
 public class PeriodeMedTekstDto {
 
@@ -27,6 +30,11 @@ public class PeriodeMedTekstDto {
     @JsonProperty("saerligeGrunnerAvsnitt")
     private String særligeGrunnerAvsnitt;
 
+    @Size(max = 1500, message = "Fritekst for særlige grunner annet er for lang")
+    @Pattern(regexp = InputValideringRegex.FRITEKST)
+    @JsonProperty("saerligeGrunnerAnnetAvsnitt")
+    private String særligeGrunnerAnnetAvsnitt;
+
     public LocalDate getFom() {
         return fom;
     }
@@ -41,6 +49,10 @@ public class PeriodeMedTekstDto {
 
     public LocalDate getTom() {
         return tom;
+    }
+
+    public Periode getPeriode(){
+        return Periode.of(fom, tom);
     }
 
     public String getFaktaAvsnitt() {
@@ -65,5 +77,13 @@ public class PeriodeMedTekstDto {
 
     public void setSærligeGrunnerAvsnitt(String særligeGrunnerAvsnitt) {
         this.særligeGrunnerAvsnitt = særligeGrunnerAvsnitt;
+    }
+
+    public String getSærligeGrunnerAnnetAvsnitt() {
+        return særligeGrunnerAnnetAvsnitt;
+    }
+
+    public void setSærligeGrunnerAnnetAvsnitt(String særligeGrunnerAnnetAvsnitt) {
+        this.særligeGrunnerAnnetAvsnitt = særligeGrunnerAnnetAvsnitt;
     }
 }

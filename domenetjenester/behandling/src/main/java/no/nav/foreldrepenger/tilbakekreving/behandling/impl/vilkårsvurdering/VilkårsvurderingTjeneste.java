@@ -34,7 +34,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.InntektskategoriKlassekodeMapper;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingAggregateEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingPeriodeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
@@ -114,8 +113,8 @@ public class VilkårsvurderingTjeneste {
             vilkårVurderingEntitet.leggTilPeriode(periodeEntitet);
         }
 
-        Optional<VilkårVurderingAggregateEntitet> forrigeEntitet = vilkårsvurderingRepository.finnVilkårsvurderingForBehandlingId(behandlingId);
-        VilkårVurderingEntitet forrigeVurdering = forrigeEntitet.isPresent() ? forrigeEntitet.get().getManuellVilkår() : null;
+        Optional<VilkårVurderingEntitet> forrigeEntitet = vilkårsvurderingRepository.finnVilkårsvurdering(behandlingId);
+        VilkårVurderingEntitet forrigeVurdering = forrigeEntitet.orElse(null);
 
         vilkårsvurderingHistorikkInnslagTjeneste.lagHistorikkInnslag(behandlingId, forrigeVurdering, vilkårVurderingEntitet);
 
@@ -123,10 +122,10 @@ public class VilkårsvurderingTjeneste {
     }
 
     public List<VilkårsvurderingPerioderDto> hentVilkårsvurdering(Long behandlingId) {
-        Optional<VilkårVurderingAggregateEntitet> aggregateEntitet = vilkårsvurderingRepository.finnVilkårsvurderingForBehandlingId(behandlingId);
+        Optional<VilkårVurderingEntitet> vilkårsvurdering = vilkårsvurderingRepository.finnVilkårsvurdering(behandlingId);
         List<VilkårsvurderingPerioderDto> perioder = new ArrayList<>();
-        if (aggregateEntitet.isPresent()) {
-            VilkårVurderingEntitet vilkår = aggregateEntitet.get().getManuellVilkår();
+        if (vilkårsvurdering.isPresent()) {
+            VilkårVurderingEntitet vilkår = vilkårsvurdering.get();
             for (VilkårVurderingPeriodeEntitet periodeEntitet : vilkår.getPerioder()) {
                 VilkårsvurderingPerioderDto periode = new VilkårsvurderingPerioderDto();
                 periode.setBegrunnelse(periodeEntitet.getBegrunnelse());

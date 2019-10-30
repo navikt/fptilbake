@@ -87,6 +87,8 @@ public class HbVedtaksbrevPeriode implements HandlebarsData {
     private boolean særligGrunnTid;
     @JsonProperty("fritekst-særlige-grunner")
     private String fritekstSærligeGrunner;
+    @JsonProperty("fritekst-særlig-grunn-annet")
+    private String fritekstSærligeGrunnerAnnet;
 
     @JsonProperty("unntas-innkreving-pga-lavt-beløp")
     private boolean unntasInnkrevingPgaLavtBeløp;
@@ -113,6 +115,14 @@ public class HbVedtaksbrevPeriode implements HandlebarsData {
 
     public String getFritekstSærligeGrunner() {
         return fritekstSærligeGrunner;
+    }
+
+    public void setFritekstSærligeGrunnerAnnet(String fritekstSærligeGrunnerAnnet) {
+        this.fritekstSærligeGrunnerAnnet = fritekstSærligeGrunnerAnnet;
+    }
+
+    public String getFritekstSærligeGrunnerAnnet() {
+        return fritekstSærligeGrunnerAnnet;
     }
 
     public void setFritekstVilkår(String fritekstVilkår) {
@@ -213,6 +223,11 @@ public class HbVedtaksbrevPeriode implements HandlebarsData {
 
         public Builder medFritekstSærligeGrunner(String fritekstSærligeGrunner) {
             kladd.fritekstSærligeGrunner = fritekstSærligeGrunner;
+            return this;
+        }
+
+        public Builder medFritekstSærligGrunnAnnet(String fritekstSærligGrunnAnnet) {
+            kladd.fritekstSærligeGrunnerAnnet = fritekstSærligGrunnAnnet;
             return this;
         }
 

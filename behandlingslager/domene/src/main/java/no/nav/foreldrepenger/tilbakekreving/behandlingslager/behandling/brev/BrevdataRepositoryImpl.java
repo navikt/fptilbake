@@ -30,12 +30,14 @@ public class BrevdataRepositoryImpl implements BrevdataRepository {
     @Override
     public void lagreVarselbrevData(VarselbrevSporing varselbrevSporing) {
         entityManager.persist(varselbrevSporing);
+        //TODO unngå flush, bare nyttig for tester
         entityManager.flush();
     }
 
     @Override
     public void lagreVedtaksbrevData(VedtaksbrevSporing vedtaksbrevSporing) {
         entityManager.persist(vedtaksbrevSporing);
+        //TODO unngå flush, bare nyttig for tester
         entityManager.flush();
     }
 
@@ -44,12 +46,14 @@ public class BrevdataRepositoryImpl implements BrevdataRepository {
         for (VedtaksbrevPeriode vedtaksbrevPeriode : vedtaksbrevPerioder) {
             entityManager.persist(vedtaksbrevPeriode);
         }
+        //TODO unngå flush, bare nyttig for tester
         entityManager.flush();
     }
 
     @Override
     public void lagreVedtaksbrevOppsummering(VedtaksbrevOppsummering vedtaksbrevOppsummering) {
         entityManager.persist(vedtaksbrevOppsummering);
+        //TODO unngå flush, bare nyttig for tester
         entityManager.flush();
     }
 
@@ -83,17 +87,17 @@ public class BrevdataRepositoryImpl implements BrevdataRepository {
 
     @Override
     public void slettOppsummering(Long behandlingId) {
+        //FIXME unngå fysisk slett av data.. bør kun gjøre logisk  sletting
         Optional<VedtaksbrevOppsummering> vedtaksbrevOppsummeringOpt = hentVedtaksbrevOppsummering(behandlingId);
         vedtaksbrevOppsummeringOpt.ifPresent(oppsummering -> entityManager.remove(oppsummering));
     }
 
     @Override
     public void slettPerioderMedFritekster(Long behandlingId) {
+        //FIXME unngå fysisk slett av data.. bør kun gjøre logisk  sletting
         List<VedtaksbrevPeriode> vedtaksbrevPerioder = hentVedtaksbrevPerioderMedTekst(behandlingId);
-        if (!vedtaksbrevPerioder.isEmpty()) {
-            for (VedtaksbrevPeriode periode : vedtaksbrevPerioder) {
-                entityManager.remove(periode);
-            }
+        for (VedtaksbrevPeriode periode : vedtaksbrevPerioder) {
+            entityManager.remove(periode);
         }
     }
 

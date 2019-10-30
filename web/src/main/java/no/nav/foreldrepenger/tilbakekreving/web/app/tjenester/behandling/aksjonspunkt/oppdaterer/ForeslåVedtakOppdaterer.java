@@ -1,6 +1,15 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.oppdaterer;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.ForeslåVedtakTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VedtaksbrevFritekstTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.totrinn.TotrinnTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
@@ -15,12 +24,6 @@ import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.DtoTilServiceAdapter;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.ForeslåVedtakDto;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
 @ApplicationScoped
 @DtoTilServiceAdapter(dto = ForeslåVedtakDto.class, adapter = AksjonspunktOppdaterer.class)
 public class ForeslåVedtakOppdaterer implements AksjonspunktOppdaterer<ForeslåVedtakDto> {
@@ -28,91 +31,62 @@ public class ForeslåVedtakOppdaterer implements AksjonspunktOppdaterer<Foreslå
     private ForeslåVedtakTjeneste foreslåVedtakTjeneste;
     private TotrinnTjeneste totrinnTjeneste;
     private AksjonspunktRepository aksjonspunktRepository;
+    private VedtaksbrevFritekstTjeneste vedtaksbrevFritekstTjeneste;
 
     @Inject
-    public ForeslåVedtakOppdaterer(ForeslåVedtakTjeneste foreslåVedtakTjeneste, TotrinnTjeneste totrinnTjeneste, AksjonspunktRepository aksjonspunktRepository) {
+    public ForeslåVedtakOppdaterer(ForeslåVedtakTjeneste foreslåVedtakTjeneste, TotrinnTjeneste totrinnTjeneste, AksjonspunktRepository aksjonspunktRepository, VedtaksbrevFritekstTjeneste vedtaksbrevFritekstTjeneste) {
         this.foreslåVedtakTjeneste = foreslåVedtakTjeneste;
         this.totrinnTjeneste = totrinnTjeneste;
         this.aksjonspunktRepository = aksjonspunktRepository;
+        this.vedtaksbrevFritekstTjeneste = vedtaksbrevFritekstTjeneste;
     }
 
     @Override
     public void oppdater(ForeslåVedtakDto dto, Behandling behandling) {
         Long behandlingId = behandling.getId();
 
-        foreslåVedtakTjeneste.lagreFriteksterFraSaksbehandler(behandlingId, lagOppsummeringstekst(behandlingId, dto), lagPerioderMedTekst(behandlingId, dto));
-
+        vedtaksbrevFritekstTjeneste.lagreFriteksterFraSaksbehandler(behandlingId, lagOppsummeringstekst(behandlingId, dto), lagPerioderMedTekst(behandlingId, dto.getPerioderMedTekst()));
         foreslåVedtakTjeneste.lagHistorikkInnslagForForeslåVedtak(behandlingId);
 
         opprettEllerReåpne(behandling, AksjonspunktDefinisjon.FATTE_VEDTAK);
-
         totrinnTjeneste.settNyttTotrinnsgrunnlag(behandling);
     }
 
-    private Optional<List<VedtaksbrevPeriode>> lagPerioderMedTekst(Long behandlingId, ForeslåVedtakDto dto) {
-        if (saksbehandlerHarLagtTilFritekst(dto)) {
-            List<VedtaksbrevPeriode> vedtaksbrevPerioderTilDB = new ArrayList<>();
-            List<PeriodeMedTekstDto> perioderMedFritekstFraSaksbehandler = dto.getPerioderMedTekst();
+    private List<VedtaksbrevPeriode> lagPerioderMedTekst(Long behandlingId, List<PeriodeMedTekstDto> perioderMedTekst) {
+        List<VedtaksbrevPeriode> fritekstPerioder = new ArrayList<>();
+        for (PeriodeMedTekstDto periodeDto : perioderMedTekst) {
+            lagFritekstPeriode(behandlingId, periodeDto, PeriodeMedTekstDto::getFaktaAvsnitt, FritekstType.FAKTA_AVSNITT).ifPresent(fritekstPerioder::add);
+            lagFritekstPeriode(behandlingId, periodeDto, PeriodeMedTekstDto::getVilkårAvsnitt, FritekstType.VILKAAR_AVSNITT).ifPresent(fritekstPerioder::add);
+            lagFritekstPeriode(behandlingId, periodeDto, PeriodeMedTekstDto::getSærligeGrunnerAvsnitt, FritekstType.SAERLIGE_GRUNNER_AVSNITT).ifPresent(fritekstPerioder::add);
+            lagFritekstPeriode(behandlingId, periodeDto, PeriodeMedTekstDto::getSærligeGrunnerAnnetAvsnitt, FritekstType.SAERLIGE_GRUNNER_ANNET_AVSNITT).ifPresent(fritekstPerioder::add);
+        }
+        return fritekstPerioder;
+    }
 
-            for (PeriodeMedTekstDto periodeMedTekstDto : perioderMedFritekstFraSaksbehandler) {
-                if (periodeMedTekstDto.getFaktaAvsnitt() != null) {
-                    vedtaksbrevPerioderTilDB.add(lagPeriodeMedFakta(behandlingId, periodeMedTekstDto));
-                } else if (periodeMedTekstDto.getVilkårAvsnitt() != null) {
-                    vedtaksbrevPerioderTilDB.add(lagPeriodeMedVilkår(behandlingId, periodeMedTekstDto));
-                } else if (periodeMedTekstDto.getSærligeGrunnerAvsnitt() != null) {
-                    vedtaksbrevPerioderTilDB.add(lagPeriodeMedSærligeGrunner(behandlingId, periodeMedTekstDto));
-                }
-            }
-            return Optional.of(vedtaksbrevPerioderTilDB);
-        } else {
+    private Optional<VedtaksbrevPeriode> lagFritekstPeriode(Long behandlingId, PeriodeMedTekstDto dto, Function<PeriodeMedTekstDto, String> stringSupplier, FritekstType fritekstType) {
+        String fritekst = stringSupplier.apply(dto);
+        if (fritekst == null) {
             return Optional.empty();
         }
+        return Optional.of(lagFritekstPeriode(behandlingId, fritekstType, dto.getPeriode(), fritekst));
     }
 
-    private boolean saksbehandlerHarLagtTilFritekst(ForeslåVedtakDto dto) {
-        List<PeriodeMedTekstDto> perioder = dto.getPerioderMedTekst();
-        for (PeriodeMedTekstDto periode : perioder) {
-            if (periode.getFaktaAvsnitt() != null || periode.getVilkårAvsnitt() != null || periode.getSærligeGrunnerAvsnitt() != null) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private VedtaksbrevPeriode lagPeriodeMedFakta(Long behandlingId, PeriodeMedTekstDto periodeMedTekstDto) {
+    private VedtaksbrevPeriode lagFritekstPeriode(Long behandlingId, FritekstType fritekstType, Periode periode, String fritekst) {
         return new VedtaksbrevPeriode.Builder()
-            .medPeriode(Periode.of(periodeMedTekstDto.getFom(), periodeMedTekstDto.getTom()))
+            .medPeriode(periode)
             .medBehandlingId(behandlingId)
-            .medFritekstType(FritekstType.FAKTA_AVSNITT)
-            .medFritekst(periodeMedTekstDto.getFaktaAvsnitt())
+            .medFritekstType(fritekstType)
+            .medFritekst(fritekst)
             .build();
     }
 
-    private VedtaksbrevPeriode lagPeriodeMedVilkår(Long behandlingId, PeriodeMedTekstDto periodeMedTekstDto) {
-        return new VedtaksbrevPeriode.Builder()
-            .medPeriode(Periode.of(periodeMedTekstDto.getFom(), periodeMedTekstDto.getTom()))
-            .medBehandlingId(behandlingId)
-            .medFritekstType(FritekstType.VILKAAR_AVSNITT)
-            .medFritekst(periodeMedTekstDto.getVilkårAvsnitt())
-            .build();
-    }
-
-    private VedtaksbrevPeriode lagPeriodeMedSærligeGrunner(Long behandlingId, PeriodeMedTekstDto periodeMedTekstDto) {
-        return new VedtaksbrevPeriode.Builder()
-            .medPeriode(Periode.of(periodeMedTekstDto.getFom(), periodeMedTekstDto.getTom()))
-            .medBehandlingId(behandlingId)
-            .medFritekstType(FritekstType.SAERLIGE_GRUNNER_AVSNITT)
-            .medFritekst(periodeMedTekstDto.getSærligeGrunnerAvsnitt())
-            .build();
-    }
-
-    private Optional<VedtaksbrevOppsummering> lagOppsummeringstekst(Long behandlingId, ForeslåVedtakDto dto) {
+    private VedtaksbrevOppsummering lagOppsummeringstekst(Long behandlingId, ForeslåVedtakDto dto) {
         if (dto.getOppsummeringstekst() != null) {
-            return Optional.of(new VedtaksbrevOppsummering.Builder()
+            return new VedtaksbrevOppsummering.Builder()
                 .medOppsummeringFritekst(dto.getOppsummeringstekst())
-                .medBehandlingId(behandlingId).build());
+                .medBehandlingId(behandlingId).build();
         } else {
-            return Optional.empty();
+            return null;
         }
     }
 

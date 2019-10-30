@@ -10,7 +10,7 @@ Vi har lagt vekt på at du burde forstått at du fikk penger du ikke har rett ti
 
 Du må betale 20002 kroner.
 _Gjelder perioden fra og med 1. februar 2019 til og med 28. februar 2019
-Vi har gjort en feil og utbetalt foreldrepenger to ganger i denne perioden. Du skulle hatt 3000 kroner, men du fikk 6000 kroner. Derfor har du fått 3000 kroner for mye utbetalt.
+Vi har gjort en feil og utbetalt foreldrepenger to ganger i denne perioden. Du skulle hatt [riktig-beløp] kroner, men du fikk [utbetalt-beløp] kroner. Derfor har du fått 3000 kroner for mye utbetalt.
 _Hvordan har vi kommet fram til at du må betale tilbake?
 Du har fått vite om du har rett til foreldrepenger og hvor mye du har rett til. Selv om du har meldt fra til oss, kan vi kreve tilbake det du har fått for mye dersom du burde forstått at beløpet var feil.
 
