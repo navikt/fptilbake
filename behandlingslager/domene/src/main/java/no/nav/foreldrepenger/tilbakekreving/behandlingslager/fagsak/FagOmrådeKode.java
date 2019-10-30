@@ -26,6 +26,8 @@ public class FagOmrådeKode extends Kodeliste {
     public static final FagOmrådeKode PLEIEPENGER = new FagOmrådeKode("OOP");
     public static final FagOmrådeKode PLEIEPENGER_ARBEIDSGIVER = new FagOmrådeKode("OOPREF");
     public static final FagOmrådeKode ENGANGSSTØNAD = new FagOmrådeKode("REFUTG");
+    public static final FagOmrådeKode SVANGERSKAPSPENGER = new FagOmrådeKode("SVP");
+    public static final FagOmrådeKode SVANGERSKAPSPENGER_ARBEIDSGIVER = new FagOmrådeKode("SVPREF");
     public static final FagOmrådeKode UDEFINERT = new FagOmrådeKode("-");
 
     private static final Map<String, FagOmrådeKode> TILGJENGELIGE = new HashMap<>();
@@ -38,6 +40,8 @@ public class FagOmrådeKode extends Kodeliste {
         TILGJENGELIGE.put(PLEIEPENGER.getKode(), PLEIEPENGER);
         TILGJENGELIGE.put(PLEIEPENGER_ARBEIDSGIVER.getKode(), PLEIEPENGER);
         TILGJENGELIGE.put(ENGANGSSTØNAD.getKode(), ENGANGSSTØNAD);
+        TILGJENGELIGE.put(SVANGERSKAPSPENGER.getKode(), SVANGERSKAPSPENGER);
+        TILGJENGELIGE.put(SVANGERSKAPSPENGER_ARBEIDSGIVER.getKode(), SVANGERSKAPSPENGER_ARBEIDSGIVER);
     }
 
     FagOmrådeKode() {
