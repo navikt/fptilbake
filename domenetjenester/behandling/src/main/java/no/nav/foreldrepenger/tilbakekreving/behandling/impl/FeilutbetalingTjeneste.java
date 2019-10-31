@@ -61,7 +61,7 @@ public class FeilutbetalingTjeneste {
                                                                           List<UtbetaltPeriode> utbetaltPerioder, Periode totalPeriode,
                                                                           EksternBehandlingsinfoDto eksternBehandlingsinfoDto, Optional<TilbakekrevingValgDto> tilbakekrevingValgDto,
                                                                           String begrunnelse) {
-        BigDecimal tidligereVarseltBeløp = varselEntitet.isPresent() ? BigDecimal.valueOf(varselEntitet.get().getVarselBeløp()).abs() : BigDecimal.ZERO;
+        Long tidligereVarseltBeløp = varselEntitet.isPresent() ? varselEntitet.get().getVarselBeløp() : null;
         return BehandlingFeilutbetalingFakta.builder()
             .medPerioder(utbetaltPerioder)
             .medAktuellFeilUtbetaltBeløp(aktuellFeilUtbetaltBeløp)

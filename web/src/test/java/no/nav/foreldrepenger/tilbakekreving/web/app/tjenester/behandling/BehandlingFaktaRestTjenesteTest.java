@@ -39,7 +39,7 @@ public class BehandlingFaktaRestTjenesteTest {
                 .medAktuellFeilUtbetaltBeløp(BigDecimal.valueOf(2500))
                 .medDatoForRevurderingsvedtak(LocalDate.now().minusDays(40))
                 .medPerioder(Collections.singletonList(UtbetaltPeriode.lagPeriode(LocalDate.now().minusDays(120), LocalDate.now().minusDays(80), BigDecimal.valueOf(20000))))
-                .medTidligereVarsletBeløp(BigDecimal.valueOf(3000))
+                .medTidligereVarsletBeløp(3000l)
                 .medTotalPeriodeFom(LocalDate.now().minusDays(150))
                 .medTotalPeriodeTom(LocalDate.now().minusDays(70))
                 .build();
