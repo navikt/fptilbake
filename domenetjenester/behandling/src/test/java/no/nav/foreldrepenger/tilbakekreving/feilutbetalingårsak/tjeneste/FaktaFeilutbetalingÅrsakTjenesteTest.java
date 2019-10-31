@@ -2,9 +2,9 @@ package no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.tjeneste;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -20,8 +20,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.SvpHendelseUnderTyper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.ØkonomiUndertyper;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
-import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTyperPrYtelseTypeDto;
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTypeMedUndertyperDto;
+import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTyperPrYtelseTypeDto;
 
 public class FaktaFeilutbetalingÅrsakTjenesteTest {
 
@@ -33,16 +33,10 @@ public class FaktaFeilutbetalingÅrsakTjenesteTest {
 
     @Test
     public void skal_ha_riktige_årsaker_og_underårsaker_for_foreldrepenger() {
-        List<HendelseTypeMedUndertyperDto> feilutbetalingÅrsaker = hentÅrsakerForYtelseType(FagsakYtelseType.FORELDREPENGER);
+        Map<HendelseType, List<HendelseUnderType>> mapAvResultat = hentÅrsakerForYtelseType(FagsakYtelseType.FORELDREPENGER);
 
-        Map<HendelseType, List<HendelseUnderType>> mapAvResultat = feilutbetalingÅrsaker.stream().collect(Collectors.toMap(
-            HendelseTypeMedUndertyperDto::getHendelseType,
-            HendelseTypeMedUndertyperDto::getHendelseUndertyper)
-        );
-
-        assertThat(mapAvResultat.keySet()).containsOnly(
+        assertThat(mapAvResultat.keySet()).containsExactly(
             HendelseType.MEDLEMSKAP_TYPE,
-            HendelseType.ØKONOMI_FEIL,
             HendelseType.FP_OPPTJENING_TYPE,
             HendelseType.FP_BEREGNING_TYPE,
             HendelseType.FP_STONADSPERIODEN_TYPE,
@@ -53,8 +47,10 @@ public class FaktaFeilutbetalingÅrsakTjenesteTest {
             HendelseType.FP_KUN_RETT_TYPE,
             HendelseType.FP_UTTAK_ALENEOMSORG_TYPE,
             HendelseType.FP_UTTAK_GRADERT_TYPE,
+            HendelseType.ØKONOMI_FEIL,
             HendelseType.FP_ANNET_HENDELSE_TYPE
         );
+
         assertThat(mapAvResultat.get(HendelseType.ØKONOMI_FEIL)).containsExactly(
             ØkonomiUndertyper.DOBBELTUTBETALING,
             ØkonomiUndertyper.FOR_MYE_UTBETALT,
@@ -140,24 +136,18 @@ public class FaktaFeilutbetalingÅrsakTjenesteTest {
 
     @Test
     public void skal_ha_riktige_årsaker_og_underårsaker_for_svangerskapspenger() {
-        List<HendelseTypeMedUndertyperDto> feilutbetalingÅrsaker = hentÅrsakerForYtelseType(FagsakYtelseType.SVANGERSKAPSPENGER);
+        Map<HendelseType, List<HendelseUnderType>> mapAvResultat = hentÅrsakerForYtelseType(FagsakYtelseType.SVANGERSKAPSPENGER);
 
-        Map<HendelseType, List<HendelseUnderType>> mapAvResultat = feilutbetalingÅrsaker.stream().collect(Collectors.toMap(
-            HendelseTypeMedUndertyperDto::getHendelseType,
-            HendelseTypeMedUndertyperDto::getHendelseUndertyper)
-        );
-
-        assertThat(mapAvResultat.keySet()).containsOnly(
+        assertThat(mapAvResultat.keySet()).containsExactly(
             HendelseType.MEDLEMSKAP_TYPE,
-            HendelseType.ØKONOMI_FEIL,
-            HendelseType.SVP_OPPHØR,
             HendelseType.SVP_FAKTA_TYPE,
             HendelseType.SVP_ARBEIDSGIVERS_FORHOLD_TYPE,
             HendelseType.SVP_ARBEIDSFORHOLD_TYPE,
             HendelseType.SVP_OPPTJENING_TYPE,
             HendelseType.SVP_BEREGNING_TYPE,
             HendelseType.SVP_UTTAK_TYPE,
-            HendelseType.SVP_INNTEKT_TYPE,
+            HendelseType.SVP_OPPHØR,
+            HendelseType.ØKONOMI_FEIL,
             HendelseType.SVP_ANNET_TYPE
         );
 
@@ -198,22 +188,18 @@ public class FaktaFeilutbetalingÅrsakTjenesteTest {
         );
 
         assertThat(mapAvResultat.get(HendelseType.SVP_OPPTJENING_TYPE)).containsExactly(
-            SvpHendelseUnderTyper.SVP_IKKE_ARBEID
+            SvpHendelseUnderTyper.SVP_IKKE_ARBEID,
+            SvpHendelseUnderTyper.SVP_INNTEKT_IKKE_TAP,
+            SvpHendelseUnderTyper.SVP_INNTEKT_UNDER
         );
 
         assertThat(mapAvResultat.get(HendelseType.SVP_BEREGNING_TYPE)).containsExactly(
-            SvpHendelseUnderTyper.SVP_ENDRING_GRUNNLAG,
-            SvpHendelseUnderTyper.SVP_INNTEKT_UNDER
-
+            SvpHendelseUnderTyper.SVP_ENDRING_GRUNNLAG
         );
 
         assertThat(mapAvResultat.get(HendelseType.SVP_UTTAK_TYPE)).containsExactly(
             SvpHendelseUnderTyper.SVP_ENDRING_PROSENT,
             SvpHendelseUnderTyper.SVP_ENDRING_PERIODE
-        );
-
-        assertThat(mapAvResultat.get(HendelseType.SVP_INNTEKT_TYPE)).containsOnly(
-            SvpHendelseUnderTyper.SVP_INNTEKT_IKKE_TAP
         );
 
         assertThat(mapAvResultat.get(HendelseType.SVP_ANNET_TYPE)).containsOnly(
@@ -222,12 +208,19 @@ public class FaktaFeilutbetalingÅrsakTjenesteTest {
         );
     }
 
-    private List<HendelseTypeMedUndertyperDto> hentÅrsakerForYtelseType(FagsakYtelseType fagsakYtelseType) {
-        return feilutbetalingÅrsakTjeneste.hentFeilutbetalingårsaker()
+    private Map<HendelseType, List<HendelseUnderType>> hentÅrsakerForYtelseType(FagsakYtelseType fagsakYtelseType) {
+        List<HendelseTypeMedUndertyperDto> feilutbetalingÅrsaker = feilutbetalingÅrsakTjeneste.hentFeilutbetalingårsaker()
             .stream()
             .filter(v -> v.getYtelseType().equals(fagsakYtelseType))
             .map(HendelseTyperPrYtelseTypeDto::getHendelseTyper)
             .findFirst()
             .orElseThrow(() -> new IllegalArgumentException("Ukjent ytelseType:" + fagsakYtelseType));
+
+        LinkedHashMap<HendelseType, List<HendelseUnderType>> mapAvResultat = new LinkedHashMap<>();
+        feilutbetalingÅrsaker.forEach(
+            m -> mapAvResultat.put(m.getHendelseType(), m.getHendelseUndertyper())
+        );
+
+        return mapAvResultat;
     }
 }

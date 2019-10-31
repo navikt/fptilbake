@@ -53,7 +53,6 @@ public class DokumentasjonGeneratorFakta {
         prettyPrint(resultat);
     }
 
-    @Ignore("Må implementere fakta for SVP helt ferdig før")
     @Test
     public void list_ut_permutasjoner_for_SVP() {
         HbVedtaksbrevFelles felles = lagFellesBuilder()
@@ -144,7 +143,9 @@ public class DokumentasjonGeneratorFakta {
 
         @Override
         public int compare(HendelseMedUndertype o1, HendelseMedUndertype o2) {
-            int hendelseCompare = o1.getHendelseType().getNavn().compareTo(o2.getHendelseType().getNavn());
+            int hendelseCompare = Long.compare(
+                Long.parseLong(o1.getHendelseType().getEkstraData()),
+                Long.parseLong(o2.getHendelseType().getEkstraData()));
             if (hendelseCompare != 0) {
                 return hendelseCompare;
             }

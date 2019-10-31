@@ -35,16 +35,6 @@ I denne perioden har vi utbetalt for mye i feriepenger. Du skulle fått [riktig-
         {{/case}}
         {{/switch}}
 {{/inline}}
-{{#* inline "fakta-beregning"}}
-        {{#switch hendelseundertype}}
-        {{#case "INNTEKT_UNDER" "SVP_INNTEKT_UNDER"}}
-Du har kun rett til {{> ytelse-navn}} dersom du har tjent mer enn {{halvt-grunnbeløp}} kroner i året{{> før-skatt}}. Inntekten din var lavere enn {{halvt-grunnbeløp}} kroner i året{{> før-skatt}}. Derfor har du fått {{feilutbetalt-beløp}} kroner for mye utbetalt i denne perioden.
-        {{/case}}
-        {{#case "ENDRING_GRUNNLAG" "SVP_ENDRING_GRUNNLAG"}}
-Vi beregnet {{> ytelse-produkt}} dine til [beløp] kroner i året{{> før-skatt}}. Beregningen ble deretter endret [dato] til [beløp] kroner i året{{> før-skatt}}. Du har derfor fått {{feilutbetalt-beløp}} kroner for mye utbetalt i denne perioden.
-        {{/case}}
-        {{/switch}}
-{{/inline}}
 {{#* inline "fakta-arbeidsgiver-refusjon"}}
 I denne perioden har du både fått utbetalt {{> ytelse-navn}} fra oss og lønn fra arbeidsgiver. Det er arbeidsgiveren din som har rett til {{> ytelse-produkt}} fordi de utbetaler deg full lønn i samme periode. Derfor har du fått {{feilutbetalt-beløp}} kroner for mye utbetalt.
 {{/inline}}
@@ -161,7 +151,14 @@ Du har ikke rett til foreldrepenger i denne perioden. Derfor har du fått [belø
         {{> fakta-økonomi-feil}}
     {{/case}}
     {{#case "BEREGNING_TYPE"}}
-        {{> fakta-beregning}}
+        {{#switch hendelseundertype}}
+        {{#case "INNTEKT_UNDER"}}
+Du har kun rett til {{> ytelse-navn}} dersom du har tjent mer enn {{halvt-grunnbeløp}} kroner i året{{> før-skatt}}. Inntekten din var lavere enn {{halvt-grunnbeløp}} kroner i året{{> før-skatt}}. Derfor har du fått {{feilutbetalt-beløp}} kroner for mye utbetalt i denne perioden.
+        {{/case}}
+        {{#case "ENDRING_GRUNNLAG"}}
+Vi beregnet {{> ytelse-produkt}} dine til [beløp] kroner i året{{> før-skatt}}. Beregningen ble deretter endret [dato] til [beløp] kroner i året{{> før-skatt}}. Du har derfor fått {{feilutbetalt-beløp}} kroner for mye utbetalt i denne perioden.
+        {{/case}}
+        {{/switch}}
     {{/case}}
     {{#case "OPPTJENING_TYPE"}}
         {{#switch hendelseundertype}}
@@ -183,7 +180,7 @@ Du fikk innvilget 100 prosent foreldrepenger, men i ettertid har du fått gjort 
 Dere begge har fått foreldrepenger i samme periode, men kun en av dere skulle hatt foreldrepenger. Fordi den andre forelderen har rett til pengene, har du fått {{feilutbetalt-beløp}} kroner for mye utbetalt i denne perioden.
         {{/case}}
         {{#case "OPPHOR_BARN_DOD"}}
-Vi har fått melding om at {{> barnet-ditt}}", døde [dødsdato]. Du har rett til foreldrepenger til og med [6 uker etter dødsdato].
+Vi har fått melding om at {{> barnet-ditt}}, døde [dødsdato]. Du har rett til foreldrepenger til og med [6 uker etter dødsdato].
 
 Fordi foreldrepengene er blitt utbetalt etter denne datoen, har du fått {{feilutbetalt-beløp}} kroner for mye utbetalt.
         {{/case}}
@@ -315,7 +312,11 @@ Arbeidsgiver kunne tilpasse eller endre arbeidsoppgavene dine uten at det var fa
         {{> fakta-økonomi-feil}}
     {{/case}}
     {{#case "SVP_BEREGNING_TYPE"}}
-        {{> fakta-beregning}}
+        {{#switch hendelseundertype}}
+        {{#case "SVP_ENDRING_GRUNNLAG"}}
+Vi beregnet {{> ytelse-produkt}} dine til [beløp] kroner i året{{> før-skatt}}. Beregningen ble deretter endret [dato] til [beløp] kroner i året{{> før-skatt}}. Du har derfor fått {{feilutbetalt-beløp}} kroner for mye utbetalt i denne perioden.
+        {{/case}}
+        {{/switch}}
     {{/case}}
     {{#case "SVP_UTTAK_TYPE"}}
         {{#switch hendelseundertype}}
@@ -359,6 +360,12 @@ Du fikk innvilget svangerskapspenger i denne perioden. Du kan kun få svangerska
 Du har ikke hatt arbeidsinntekt eller inntekt som er likestilt med lønn i minst fire uker før du må slutte å jobbe. Derfor har du ikke rett til svangerskapspenger.
 
 Du har fått {{feilutbetalt-beløp}} kroner for mye utbetalt i denne perioden.
+        {{/case}}
+        {{#case "SVP_INNTEKT_UNDER"}}
+Du har kun rett til {{> ytelse-navn}} dersom du har tjent mer enn {{halvt-grunnbeløp}} kroner i året{{> før-skatt}}. Inntekten din var lavere enn {{halvt-grunnbeløp}} kroner i året{{> før-skatt}}. Derfor har du fått {{feilutbetalt-beløp}} kroner for mye utbetalt i denne perioden.
+        {{/case}}
+        {{#case "SVP_INNTEKT_IKKE_TAP"}}
+Du har ikke hatt arbeidsinntekt eller inntekt som er likestilt med lønn. Derfor har du ikke rett til svangerskapspenger.
         {{/case}}
         {{/switch}}
     {{/case}}
