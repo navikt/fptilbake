@@ -64,7 +64,7 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
         assertThat(feilutbetalingFakta).isNotEmpty();
         BehandlingFeilutbetalingFakta fakta = feilutbetalingFakta.get();
         fellesFaktaResponsSjekk(fakta);
-        assertThat(fakta.getTidligereVarseltBeløp()).isEqualByComparingTo(0l);
+        assertThat(fakta.getTidligereVarseltBeløp()).isNull();
     }
 
     @Test
