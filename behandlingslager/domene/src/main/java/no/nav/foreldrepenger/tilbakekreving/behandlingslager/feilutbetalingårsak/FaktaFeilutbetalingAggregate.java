@@ -1,5 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak;
 
+import java.util.Objects;
+
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
@@ -31,6 +33,7 @@ public class FaktaFeilutbetalingAggregate extends BaseEntitet {
     @Convert(converter = BooleanToStringConverter.class)
     @Column(name = "aktiv", nullable = false)
     private boolean aktiv = true;
+
 
     FaktaFeilutbetalingAggregate() {
         // for hibernate
@@ -73,7 +76,11 @@ public class FaktaFeilutbetalingAggregate extends BaseEntitet {
             return this;
         }
 
+
         public FaktaFeilutbetalingAggregate build() {
+            Objects.requireNonNull(this.kladd.behandlingId);
+            Objects.requireNonNull(this.kladd.faktaFeilutbetaling);
+            Objects.requireNonNull(this.kladd.faktaFeilutbetaling.getBegrunnelse());
             return kladd;
         }
     }

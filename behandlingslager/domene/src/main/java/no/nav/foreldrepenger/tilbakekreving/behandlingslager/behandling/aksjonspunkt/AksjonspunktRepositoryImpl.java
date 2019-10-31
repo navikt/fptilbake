@@ -167,10 +167,10 @@ public class AksjonspunktRepositoryImpl implements AksjonspunktRepository {
 
 
     @Override
-    public boolean setTilUtført(Aksjonspunkt aksjonspunkt, String begrunnelse) {
+    public boolean setTilUtført(Aksjonspunkt aksjonspunkt) {
         validerAktivt(aksjonspunkt);
         log.info("Setter aksjonspunkt utført: {}", aksjonspunkt.getAksjonspunktDefinisjon());
-        return aksjonspunkt.setStatus(finnAksjonspunktStatus(AksjonspunktStatus.UTFØRT), begrunnelse);
+        return aksjonspunkt.setStatus(finnAksjonspunktStatus(AksjonspunktStatus.UTFØRT));
     }
 
     @Override
@@ -195,14 +195,14 @@ public class AksjonspunktRepositoryImpl implements AksjonspunktRepository {
     public void setTilAvbrutt(Aksjonspunkt aksjonspunkt) {
         validerAktivt(aksjonspunkt);
         log.info("Setter aksjonspunkt avbrutt: {}", aksjonspunkt.getAksjonspunktDefinisjon());
-        aksjonspunkt.setStatus(finnAksjonspunktStatus(AksjonspunktStatus.AVBRUTT), aksjonspunkt.getBegrunnelse());
+        aksjonspunkt.setStatus(finnAksjonspunktStatus(AksjonspunktStatus.AVBRUTT));
     }
 
     @Override
     public void setReåpnet(Aksjonspunkt aksjonspunkt) {
         validerAktivt(aksjonspunkt);
         log.info("Setter aksjonspunkt reåpnet: {}", aksjonspunkt.getAksjonspunktDefinisjon());
-        aksjonspunkt.setStatus(finnAksjonspunktStatus(AksjonspunktStatus.OPPRETTET), aksjonspunkt.getBegrunnelse());
+        aksjonspunkt.setStatus(finnAksjonspunktStatus(AksjonspunktStatus.OPPRETTET));
     }
 
     @Override

@@ -7,9 +7,10 @@ import java.util.Optional;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.StringUtils;
+
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.FaktaFeilutbetalingDto;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
@@ -68,7 +69,7 @@ public class AvklartFaktaFeilutbetalingTjeneste {
             boolean harEndret = lagHistorikkInnslagDeler(behandling, historikkinnslag, begrunnelse, forrigeFakta, faktaFeilutbetalingDto, historikkinnslagDelDto);
             behovForHistorikkInnslag = !behovForHistorikkInnslag ? harEndret : behovForHistorikkInnslag;
         }
-
+        faktaFeilutbetaling.setBegrunnelse(begrunnelse);
         faktaFeilutbetalingRepository.lagre(behandling.getId(), faktaFeilutbetaling);
 
         if (behovForHistorikkInnslag) {
@@ -84,11 +85,13 @@ public class AvklartFaktaFeilutbetalingTjeneste {
         HistorikkInnslagTekstBuilder tekstBuilder = historikkTjenesteAdapter.tekstBuilder();
         if (forrigeFakta.isPresent()) {
             List<FaktaFeilutbetalingPeriode> feilutbetalingPerioder = forrigeFakta.get().getFeilutbetaltPerioder();
+            String forrigeBegrunnelse = forrigeFakta.get().getBegrunnelse();
             Optional<FaktaFeilutbetalingPeriode> forrigeFeilutbetalingPeriodeÅrsak = feilutbetalingPerioder.stream()
                 .filter(fpå -> fpå.getPeriode().equals(faktaFeilutbetalingDto.tilPeriode()))
                 .findFirst();
             if (forrigeFeilutbetalingPeriodeÅrsak.isPresent()) {
-                harEndret = håndtereEndretÅrsak(behandling, forrigeFeilutbetalingPeriodeÅrsak.get(), faktaFeilutbetalingDto, begrunnelse, tekstBuilder, historikkinnslagDelDto);
+                harEndret = håndtereEndretÅrsak(forrigeFeilutbetalingPeriodeÅrsak.get(), faktaFeilutbetalingDto, begrunnelse, forrigeBegrunnelse,
+                    tekstBuilder, historikkinnslagDelDto);
             } else { // det betyr perioder har endret
                 opprettNyHistorikkinnslagDel(begrunnelse, faktaFeilutbetalingDto, tekstBuilder);
                 harEndret = true;
@@ -117,7 +120,8 @@ public class AvklartFaktaFeilutbetalingTjeneste {
             .medOpplysning(HistorikkOpplysningType.PERIODE_TOM, faktaFeilutbetalingDto.getTom());
     }
 
-    private boolean håndtereEndretÅrsak(Behandling behandling, FaktaFeilutbetalingPeriode forrigePeiodeÅrsak, FaktaFeilutbetalingDto faktaFeilutbetalingDto, String begrunnelse,
+    private boolean håndtereEndretÅrsak(FaktaFeilutbetalingPeriode forrigePeiodeÅrsak, FaktaFeilutbetalingDto faktaFeilutbetalingDto,
+                                        String begrunnelse, String forrigeBegrunnelse,
                                         HistorikkInnslagTekstBuilder tekstBuilder, HistorikkinnslagDelDto historikkinnslagDelDto) {
 
         if (sjekkHvisÅrsakEllerUnderÅrsakEndret(faktaFeilutbetalingDto, forrigePeiodeÅrsak)) {
@@ -125,7 +129,7 @@ public class AvklartFaktaFeilutbetalingTjeneste {
             tekstBuilder.medEndretFelt(HistorikkEndretFeltType.HENDELSE_ÅRSAK, forrigePeiodeÅrsak.getHendelseType(), faktaFeilutbetalingDto.getHendelseType());
             tekstBuilder.medEndretFelt(HistorikkEndretFeltType.HENDELSE_UNDER_ÅRSAK, forrigePeiodeÅrsak.getHendelseUndertype(), faktaFeilutbetalingDto.getHendelseUndertype());
             return true;
-        } else if (historikkinnslagDelDto.getBegrunnelseFritekst() == null && harBegrunnelseEndret(behandling, begrunnelse)) {
+        } else if (historikkinnslagDelDto.getBegrunnelseFritekst() == null && harBegrunnelseEndret(forrigeBegrunnelse, begrunnelse)) {
             tekstBuilder.medSkjermlenke(SkjermlenkeType.FAKTA_OM_FEILUTBETALING)
                 .medBegrunnelse(begrunnelse);
             historikkinnslagDelDto.setBegrunnelseFritekst(begrunnelse);
@@ -148,9 +152,8 @@ public class AvklartFaktaFeilutbetalingTjeneste {
         return erEndret;
     }
 
-    private boolean harBegrunnelseEndret(Behandling behandling, String begrunnelse) {
-        String forrigeBegrunnelse = behandling.getAksjonspunktFor(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING).getBegrunnelse();
-        return !forrigeBegrunnelse.equals(begrunnelse);
+    private boolean harBegrunnelseEndret(String forrigeBegrunnelse, String begrunnelse) {
+        return StringUtils.isNotEmpty(forrigeBegrunnelse) && !forrigeBegrunnelse.equalsIgnoreCase(begrunnelse);
     }
 
 }

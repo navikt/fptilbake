@@ -34,7 +34,6 @@ public class AksjonspunktDtoMapper {
         AksjonspunktDto dto = new AksjonspunktDto();
         dto.setDefinisjon(aksjonspunktDefinisjon);
         dto.setStatus(aksjonspunkt.getStatus());
-        dto.setBegrunnelse(aksjonspunkt.getBegrunnelse());
         dto.setVilkårType(VilkårType.UDEFINERT); //TODO Hvordan blir dette?
         dto.setToTrinnsBehandling(aksjonspunkt.isToTrinnsBehandling() || aksjonspunktDefinisjon.getDefaultTotrinnBehandling());
 

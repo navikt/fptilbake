@@ -59,7 +59,8 @@ public class FeilutbetalingTjeneste {
 
     public BehandlingFeilutbetalingFakta lagBehandlingFeilUtbetalingFakta(Optional<VarselInfo> varselEntitet, BigDecimal aktuellFeilUtbetaltBeløp,
                                                                           List<UtbetaltPeriode> utbetaltPerioder, Periode totalPeriode,
-                                                                          EksternBehandlingsinfoDto eksternBehandlingsinfoDto, Optional<TilbakekrevingValgDto> tilbakekrevingValgDto) {
+                                                                          EksternBehandlingsinfoDto eksternBehandlingsinfoDto, Optional<TilbakekrevingValgDto> tilbakekrevingValgDto,
+                                                                          String begrunnelse) {
         BigDecimal tidligereVarseltBeløp = varselEntitet.isPresent() ? BigDecimal.valueOf(varselEntitet.get().getVarselBeløp()).abs() : BigDecimal.ZERO;
         return BehandlingFeilutbetalingFakta.builder()
             .medPerioder(utbetaltPerioder)
@@ -71,6 +72,7 @@ public class FeilutbetalingTjeneste {
             .medBehandlingsResultat(eksternBehandlingsinfoDto.getBehandlingsresultat())
             .medBehandlingÅrsaker(eksternBehandlingsinfoDto.getBehandlingÅrsaker())
             .medTilbakekrevingValg(tilbakekrevingValgDto.orElse(null))
+            .medBegrunnelse(begrunnelse)
             .build();
     }
 
@@ -125,6 +127,11 @@ public class FeilutbetalingTjeneste {
             beregnetPerioider.add(UtbetaltPeriode.lagPeriode(førsteDag, sisteDag, belopPerPeriode));
         }
         return beregnetPerioider;
+    }
+
+    public String hentFaktaBegrunnelse(Long behandlingId){
+        Optional<FaktaFeilutbetaling> faktaFeilutbetaling = faktaFeilutbetalingRepository.finnFaktaOmFeilutbetaling(behandlingId);
+        return faktaFeilutbetaling.map(FaktaFeilutbetaling::getBegrunnelse).orElse(null);
     }
 
 }

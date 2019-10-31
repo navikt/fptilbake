@@ -354,7 +354,7 @@ public class BehandlingskontrollTjenesteImpl implements BehandlingskontrollTjene
         if (åpneAutopunkter.isEmpty()) {
             return;
         }
-        åpneAutopunkter.forEach(autopunkt -> aksjonspunktRepository.setTilUtført(autopunkt, null));
+        åpneAutopunkter.forEach(autopunkt -> aksjonspunktRepository.setTilUtført(autopunkt));
         behandlingRepository.lagre(behandling, kontekst.getSkriveLås());
 
         if (!erHenleggelse) {
@@ -370,7 +370,7 @@ public class BehandlingskontrollTjenesteImpl implements BehandlingskontrollTjene
 
         aksjonspunktMedDefinisjonOptional.ifPresent(aksjonspunkt -> {
             if (aksjonspunkt.erÅpentAksjonspunkt()) {
-                aksjonspunktRepository.setTilUtført(aksjonspunkt, null);
+                aksjonspunktRepository.setTilUtført(aksjonspunkt);
                 behandlingRepository.lagre(behandling, kontekst.getSkriveLås());
                 aksjonspunkterUtført(kontekst, singletonList(aksjonspunkt), behandling.getAktivtBehandlingSteg());
             }
@@ -392,7 +392,7 @@ public class BehandlingskontrollTjenesteImpl implements BehandlingskontrollTjene
             BehandlingStegType behandlingStegFunnet = ap.getBehandlingStegFunnet();
             logger.info("Fant aksjonspunkt kode={}, status={}, tilbakehopp={}, behandlingStegFunnet={} som medfører tilbakehopp på behandlingId={}",
                 ap.getAksjonspunktDefinisjon().getKode(), ap.getStatus().getKode(), ap.tilbakehoppVedGjenopptakelse(), behandlingStegFunnet, behandling.getId());
-            aksjonspunktRepository.setTilUtført(ap, ap.getBegrunnelse());
+            aksjonspunktRepository.setTilUtført(ap);
             eventPubliserer.fireEvent(new AksjonspunktUtførtEvent(kontekst, singletonList(ap), behandlingStegFunnet));
             behandlingTilbakeføringTilTidligereBehandlingSteg(kontekst, behandlingStegFunnet);
         }

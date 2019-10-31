@@ -359,7 +359,7 @@ public class BehandlingModellTest {
         BehandlingStegVisitorUtenLagring visitor = lagVisitor(behandling);
 
         Aksjonspunkt aksjonspunkt = aksjonspunktRepository.leggTilAksjonspunkt(behandling, apd, STEG_2);
-        aksjonspunktRepository.setTilUtført(aksjonspunkt, "ferdig");
+        aksjonspunktRepository.setTilUtført(aksjonspunkt);
         aksjonspunktRepository.deaktiver(aksjonspunkt);
 
         BehandlingStegUtfall siste = modell.prosesserFra(STEG_1, visitor);
@@ -387,11 +387,11 @@ public class BehandlingModellTest {
         BehandlingStegVisitorUtenLagring visitor = lagVisitor(behandling);
 
         Aksjonspunkt aksjonspunkt = aksjonspunktRepository.leggTilAksjonspunkt(behandling, apd, STEG_2);
-        aksjonspunktRepository.setTilUtført(aksjonspunkt, "ferdig");
+        aksjonspunktRepository.setTilUtført(aksjonspunkt);
         aksjonspunktRepository.deaktiver(aksjonspunkt);
 
         Aksjonspunkt aksjonspunkt2 = aksjonspunktRepository.leggTilAksjonspunkt(behandling, apd2, STEG_2);
-        aksjonspunktRepository.setTilUtført(aksjonspunkt2, "ferdig");
+        aksjonspunktRepository.setTilUtført(aksjonspunkt2);
         aksjonspunktRepository.deaktiver(aksjonspunkt2);
 
         BehandlingStegUtfall siste = modell.prosesserFra(STEG_1, visitor);

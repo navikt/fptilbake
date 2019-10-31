@@ -19,8 +19,7 @@ public class FatteVedtakDto extends BekreftetAksjonspunktDto {
         // For Jackson
     }
 
-    public FatteVedtakDto(String begrunnelse, Collection<AksjonspunktGodkjenningDto> aksjonspunktGodkjenningDtos) {
-        super(begrunnelse);
+    public FatteVedtakDto(Collection<AksjonspunktGodkjenningDto> aksjonspunktGodkjenningDtos) {
         this.aksjonspunktGodkjenningDtos = aksjonspunktGodkjenningDtos;
     }
 

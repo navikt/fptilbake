@@ -119,6 +119,7 @@ public class FellesTestOppsett extends TestOppsett {
             .medPeriode(FOM, TOM)
             .medFeilutbetalinger(faktaFeilutbetaling).build();
         faktaFeilutbetaling.leggTilFeilutbetaltPeriode(periodeÅrsak);
+        faktaFeilutbetaling.setBegrunnelse("begrunnelse");
         return faktaFeilutbetaling;
     }
 

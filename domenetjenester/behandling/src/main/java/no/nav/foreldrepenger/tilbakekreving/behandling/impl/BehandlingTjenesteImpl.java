@@ -175,8 +175,9 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
                 totalPeriodeFom = totalPeriodeFom == null || totalPeriodeFom.isAfter(utbetaltPeriode.getFom()) ? utbetaltPeriode.getFom() : totalPeriodeFom;
                 totalPeriodeTom = totalPeriodeTom == null || totalPeriodeTom.isBefore(utbetaltPeriode.getTom()) ? utbetaltPeriode.getTom() : totalPeriodeTom;
             }
+            String begrunnelse = feilutbetalingTjeneste.hentFaktaBegrunnelse(behandlingId);
             return Optional.of(feilutbetalingTjeneste.lagBehandlingFeilUtbetalingFakta(resultat, aktuellFeilUtbetaltBeløp, utbetaltPerioder,
-                new Periode(totalPeriodeFom, totalPeriodeTom), eksternBehandlingsinfoDto, tilbakekrevingValg));
+                new Periode(totalPeriodeFom, totalPeriodeTom), eksternBehandlingsinfoDto, tilbakekrevingValg,begrunnelse));
         }
         return Optional.empty();
     }
