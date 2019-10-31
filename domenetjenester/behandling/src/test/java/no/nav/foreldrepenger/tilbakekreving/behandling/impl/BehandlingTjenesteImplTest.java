@@ -64,7 +64,7 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
         assertThat(feilutbetalingFakta).isNotEmpty();
         BehandlingFeilutbetalingFakta fakta = feilutbetalingFakta.get();
         fellesFaktaResponsSjekk(fakta);
-        assertThat(fakta.getTidligereVarseltBeløp()).isEqualByComparingTo(BigDecimal.ZERO);
+        assertThat(fakta.getTidligereVarseltBeløp()).isEqualByComparingTo(0l);
     }
 
     @Test
@@ -83,7 +83,7 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
         fellesFaktaResponsSjekk(fakta);
         assertThat(fakta.getAktuellFeilUtbetaltBeløp()).isEqualByComparingTo(BigDecimal.valueOf(10000));
         assertThat(fakta.getPerioder().get(0).getBelop()).isEqualByComparingTo(BigDecimal.valueOf(10000));
-        assertThat(fakta.getTidligereVarseltBeløp()).isEqualByComparingTo(BigDecimal.valueOf(23000));
+        assertThat(fakta.getTidligereVarseltBeløp()).isEqualByComparingTo(23000l);
         assertThat(fakta.getPerioder().get(0).getFom()).isEqualTo(FOM);
         assertThat(fakta.getPerioder().get(0).getTom()).isEqualTo(TOM);
     }
@@ -110,7 +110,7 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
         BehandlingFeilutbetalingFakta fakta = feilutbetalingFakta.get();
         fellesFaktaResponsSjekk(fakta);
         assertThat(fakta.getAktuellFeilUtbetaltBeløp()).isEqualByComparingTo(BigDecimal.valueOf(37000));
-        assertThat(fakta.getTidligereVarseltBeløp()).isEqualByComparingTo(BigDecimal.valueOf(23000));
+        assertThat(fakta.getTidligereVarseltBeløp()).isEqualByComparingTo(23000l);
         assertThat(fakta.getPerioder().size()).isEqualTo(2);
         assertThat(fakta.getPerioder().get(0).getFom()).isEqualTo(FOM);
         assertThat(fakta.getPerioder().get(0).getTom()).isEqualTo(LocalDate.of(2016, 04, 15));

@@ -24,6 +24,7 @@ public class AvklartFaktaFeilutbetalingDto extends BekreftetAksjonspunktDto {
 
     @Valid
     @Size(min = 1)
+    @JsonProperty("feilutbetalingFakta")
     private List<FaktaFeilutbetalingDto> feilutbetalingFakta;
 
     public AvklartFaktaFeilutbetalingDto() {
@@ -45,5 +46,9 @@ public class AvklartFaktaFeilutbetalingDto extends BekreftetAksjonspunktDto {
 
     public void setFeilutbetalingFakta(List<FaktaFeilutbetalingDto> feilutbetalingFakta) {
         this.feilutbetalingFakta = feilutbetalingFakta;
+    }
+
+    public void setBegrunnelse(String begrunnelse) {
+        this.begrunnelse = begrunnelse;
     }
 }

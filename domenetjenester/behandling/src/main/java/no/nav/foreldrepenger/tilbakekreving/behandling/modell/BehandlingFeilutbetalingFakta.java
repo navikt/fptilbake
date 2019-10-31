@@ -10,7 +10,7 @@ import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.TilbakekrevingValgD
 
 public class BehandlingFeilutbetalingFakta {
 
-    private BigDecimal tidligereVarseltBeløp;
+    private Long tidligereVarseltBeløp;
     private BigDecimal aktuellFeilUtbetaltBeløp;
     private LocalDate datoForRevurderingsvedtak;
     private LocalDate totalPeriodeFom;
@@ -25,7 +25,7 @@ public class BehandlingFeilutbetalingFakta {
         // bygges med builder
     }
 
-    public BigDecimal getTidligereVarseltBeløp() {
+    public Long getTidligereVarseltBeløp() {
         return tidligereVarseltBeløp;
     }
 
@@ -77,7 +77,7 @@ public class BehandlingFeilutbetalingFakta {
             this.behandlingFeilutbetalingFakta = new BehandlingFeilutbetalingFakta();
         }
 
-        public Builder medTidligereVarsletBeløp(BigDecimal tidligereVarsletBeløp) {
+        public Builder medTidligereVarsletBeløp(Long tidligereVarsletBeløp) {
             this.behandlingFeilutbetalingFakta.tidligereVarseltBeløp = tidligereVarsletBeløp;
             return this;
         }
