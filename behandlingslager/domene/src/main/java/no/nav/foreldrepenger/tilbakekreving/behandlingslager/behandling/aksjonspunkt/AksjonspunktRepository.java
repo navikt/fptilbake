@@ -17,7 +17,7 @@ public interface AksjonspunktRepository extends BehandlingslagerRepository {
 
     void setTilManueltOpprettet(Aksjonspunkt aksjonspunkt);
 
-    boolean setTilUtført(Aksjonspunkt aksjonspunkt, String begrunnelse);
+    boolean setTilUtført(Aksjonspunkt aksjonspunkt);
 
     void reaktiver(Aksjonspunkt aksjonspunkt);
 

@@ -343,7 +343,7 @@ public class TilbakehoppTest {
 
 
         if (status.getKode().equals(AksjonspunktStatus.UTFØRT.getKode())) {
-            aksjonspunktRepository.setTilUtført(ap, "ferdig");
+            aksjonspunktRepository.setTilUtført(ap);
         } else if (status.getKode().equals(AksjonspunktStatus.OPPRETTET.getKode())) {
             //dette er default-status ved opprettelse
         } else {

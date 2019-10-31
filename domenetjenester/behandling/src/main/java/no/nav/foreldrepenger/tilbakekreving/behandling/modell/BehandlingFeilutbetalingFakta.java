@@ -19,6 +19,7 @@ public class BehandlingFeilutbetalingFakta {
     private BehandlingsresultatDto behandlingsresultat;
     private List<BehandlingÅrsakDto> behandlingÅrsaker;
     private TilbakekrevingValgDto tilbakekrevingValg;
+    private String begrunnelse;
 
     private BehandlingFeilutbetalingFakta() {
         // bygges med builder
@@ -58,6 +59,10 @@ public class BehandlingFeilutbetalingFakta {
 
     public TilbakekrevingValgDto getTilbakekrevingValg() {
         return tilbakekrevingValg;
+    }
+
+    public String getBegrunnelse() {
+        return begrunnelse;
     }
 
     public static Builder builder() {
@@ -114,6 +119,11 @@ public class BehandlingFeilutbetalingFakta {
 
         public Builder medTilbakekrevingValg(TilbakekrevingValgDto tilbakekrevingValg) {
             this.behandlingFeilutbetalingFakta.tilbakekrevingValg = tilbakekrevingValg;
+            return this;
+        }
+
+        public Builder medBegrunnelse(String begrunnelse) {
+            this.behandlingFeilutbetalingFakta.begrunnelse = begrunnelse;
             return this;
         }
 

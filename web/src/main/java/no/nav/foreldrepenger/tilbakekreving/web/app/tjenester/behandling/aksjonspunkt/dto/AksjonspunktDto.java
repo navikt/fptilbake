@@ -11,7 +11,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Vi
 public class AksjonspunktDto {
     private AksjonspunktDefinisjon definisjon;
     private AksjonspunktStatus status;
-    private String begrunnelse;
     private Boolean toTrinnsBehandling;
     private Boolean toTrinnsBehandlingGodkjent;
     private Set<VurderÅrsak> vurderPaNyttArsaker;
@@ -30,10 +29,6 @@ public class AksjonspunktDto {
 
     public void setStatus(AksjonspunktStatus status) {
         this.status = status;
-    }
-
-    public void setBegrunnelse(String begrunnelse) {
-        this.begrunnelse = begrunnelse;
     }
 
     public void setToTrinnsBehandling(Boolean toTrinnsBehandling) {
@@ -74,10 +69,6 @@ public class AksjonspunktDto {
 
     public AksjonspunktStatus getStatus() {
         return status;
-    }
-
-    public String getBegrunnelse() {
-        return begrunnelse;
     }
 
     public Boolean getToTrinnsBehandling() {

@@ -1,7 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -9,12 +8,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.persistence.AttributeOverride;
-import javax.persistence.AttributeOverrides;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Convert;
-import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -36,7 +32,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.InternalUtil;
 import no.nav.vedtak.felles.jpa.BaseEntitet;
 import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
-import no.nav.vedtak.felles.jpa.tid.DatoIntervallEntitet;
 
 @Entity(name = "Aksjonspunkt")
 @Table(name = "AKSJONSPUNKT")
@@ -76,22 +71,6 @@ public class Aksjonspunkt extends BaseEntitet {
     @Column(name = "versjon", nullable = false)
     private Long versjon;
 
-    /**
-     * Saksbehandler begrunnelse som settes ifm at et aksjonspunkt settes til utført.
-     */
-    @Column(name = "begrunnelse")
-    private String begrunnelse;
-
-    @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "fomDato", column = @Column(name = "periode_fom")),
-            @AttributeOverride(name = "tomDato", column = @Column(name = "periode_tom"))
-    })
-    private DatoIntervallEntitet periode;
-
-    @Column(name = "beslutters_begrunnelse")
-    private String besluttersBegrunnelse;
-
     // OK med orphanRemoval=true siden årsakene er eid av et aksjonspunkt
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "aksjonspunkt")
     private Set<VurderPåNyttÅrsak> vurderPåNyttÅrsaker = new HashSet<>();
@@ -99,10 +78,6 @@ public class Aksjonspunkt extends BaseEntitet {
     @Convert(converter = BooleanToStringConverter.class)
     @Column(name = "TOTRINN_BEHANDLING", nullable = false)
     private boolean toTrinnsBehandling;
-
-    @Convert(converter = BooleanToStringConverter.class)
-    @Column(name = "TOTRINN_BEHANDLING_GODKJENT")
-    private Boolean toTrinnsBehandlingGodkjent;
 
     /**
      * Angir om aksjonspunktet er aktivt. NB: Ikke samme som status.
@@ -216,26 +191,17 @@ public class Aksjonspunkt extends BaseEntitet {
      *
      * @return true hvis status eller begrunnelse er endret.
      */
-    boolean setStatus(AksjonspunktStatus nyStatus, String begrunnelse) {
+    boolean setStatus(AksjonspunktStatus nyStatus) {
         boolean statusEndret = !Objects.equals(getStatus(), nyStatus);
 
         if (statusEndret) {
             if (Objects.equals(nyStatus, AksjonspunktStatus.UTFØRT)) {
                 validerIkkeAvbruttAllerede();
             }
-            if (!Objects.equals(nyStatus, AksjonspunktStatus.OPPRETTET)) {
-                nullstillToTrinnsBehandlingGodkjent();
-            }
-
             this.status = nyStatus;
         }
 
-        boolean begrunnelseEndret = !Objects.equals(getBegrunnelse(), begrunnelse);
-        if (begrunnelseEndret) {
-            setBegrunnelse(begrunnelse);
-        }
-
-        return begrunnelseEndret || statusEndret;
+        return statusEndret;
     }
 
     public BehandlingStegType getBehandlingStegFunnet() {
@@ -287,29 +253,12 @@ public class Aksjonspunkt extends BaseEntitet {
         return Objects.equals(getAksjonspunktDefinisjon(), kontrollpunkt.getAksjonspunktDefinisjon())
                 && Objects.equals(getBehandling(), kontrollpunkt.getBehandling())
                 && Objects.equals(getStatus(), kontrollpunkt.getStatus())
-                && Objects.equals(getPeriode(), kontrollpunkt.getPeriode())
                 && Objects.equals(getFristTid(), kontrollpunkt.getFristTid());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getAksjonspunktDefinisjon(), getBehandling(), getStatus(), getPeriode(), getFristTid());
-    }
-
-    public String getBegrunnelse() {
-        return begrunnelse;
-    }
-
-    void setBegrunnelse(String begrunnelse) {
-        this.begrunnelse = begrunnelse;
-    }
-
-    public String getBesluttersBegrunnelse() {
-        return besluttersBegrunnelse;
-    }
-
-    private void setBesluttersBegrunnelse(String besluttersBegrunnelse) {
-        this.besluttersBegrunnelse = besluttersBegrunnelse;
+        return Objects.hash(getAksjonspunktDefinisjon(), getBehandling(), getStatus(),  getFristTid());
     }
 
     public boolean isToTrinnsBehandling() {
@@ -319,13 +268,11 @@ public class Aksjonspunkt extends BaseEntitet {
     void settToTrinnsFlag() {
         validerIkkeUtførtAvbruttAllerede();
         this.setToTrinnsBehandling(true);
-        nullstillToTrinnsBehandlingGodkjent();
     }
 
     void fjernToTrinnsFlagg() {
         validerIkkeUtførtAvbruttAllerede();
         this.setToTrinnsBehandling(false);
-        nullstillToTrinnsBehandlingGodkjent();
     }
 
     private void validerIkkeUtførtAvbruttAllerede() {
@@ -345,50 +292,12 @@ public class Aksjonspunkt extends BaseEntitet {
         return vurderPåNyttÅrsaker;
     }
 
-    public Boolean getToTrinnsBehandlingGodkjent() {
-        return toTrinnsBehandlingGodkjent;
-    }
-
-    void setToTrinnsVurdering(boolean toTrinnsBehandlingGodkjent, String begrunnelse, Collection<VurderÅrsak> arsaker) {
-        validerIkkeAvbruttAllerede();
-        this.toTrinnsBehandlingGodkjent = toTrinnsBehandlingGodkjent;
-        this.setBesluttersBegrunnelse(begrunnelse);
-        this.vurderPåNyttÅrsaker.clear();
-        if (arsaker != null) {
-            for (VurderÅrsak årsakType : arsaker) {
-                vurderPåNyttÅrsaker.add(new VurderPåNyttÅrsak(årsakType, this));
-            }
-        }
-    }
-
     public Venteårsak getVenteårsak() {
         return venteårsak;
     }
 
     void setVenteårsak(Venteårsak venteårsak) {
         this.venteårsak = venteårsak;
-    }
-
-    void nullstillToTrinnsBehandlingGodkjent() {
-        this.toTrinnsBehandlingGodkjent = null;
-    }
-
-    void nullstillTotrinnsbehandlingBegrunnelse() {
-        nullstillToTrinnsBehandlingGodkjent();
-        this.besluttersBegrunnelse = null;
-        this.vurderPåNyttÅrsaker.clear();
-    }
-
-    public DatoIntervallEntitet getPeriode() {
-        return periode;
-    }
-
-    /**
-     * (optional)
-     * Periode aksjonspunktet peker på.
-     */
-    void setPeriode(DatoIntervallEntitet periode) {
-        this.periode = periode;
     }
 
     /**
@@ -410,25 +319,6 @@ public class Aksjonspunkt extends BaseEntitet {
         Builder(Aksjonspunkt opprinneligAp) {
             this.opprinneligAp = opprinneligAp;
             this.aksjonspunkt = new Aksjonspunkt(opprinneligAp.getAksjonspunktDefinisjon());
-        }
-
-        /**
-         * Angir om aksjonspunktet gjelder en spesifikk periode. Forutsetter at opplysningene aksjonspunktet er
-         * opprettet for er periodisert.
-         * <p>
-         * NB: Skal kun brukes for aksjonspunkt som kan repteres flere ganger for en behandling (eks. per periode i
-         * utgangsvilkår).
-         */
-        Aksjonspunkt.Builder medPeriode(DatoIntervallEntitet status) {
-            sjekkTilstand();
-            this.aksjonspunkt.setPeriode(status);
-            return this;
-        }
-
-        private void sjekkTilstand() {
-            if (aksjonspunkt == null) {
-                throw new IllegalStateException("Aksjonpunkt ikke definert"); //$NON-NLS-1$
-            }
         }
 
         Aksjonspunkt buildFor(Behandling behandling) {
@@ -458,8 +348,6 @@ public class Aksjonspunkt extends BaseEntitet {
             kopierBasisfelter(fra, til);
             if (medTotrinnsfelter) {
                 til.setToTrinnsBehandling(fra.isToTrinnsBehandling());
-                til.setBesluttersBegrunnelse(fra.getBesluttersBegrunnelse());
-                til.toTrinnsBehandlingGodkjent = fra.getToTrinnsBehandlingGodkjent();
             }
             if (fra.getVurderPåNyttÅrsaker() != null) {
                 for (VurderPåNyttÅrsak årsak : fra.getVurderPåNyttÅrsaker()) {
@@ -478,11 +366,9 @@ public class Aksjonspunkt extends BaseEntitet {
         }
 
         private void kopierBasisfelter(Aksjonspunkt fra, Aksjonspunkt til) {
-            til.setBegrunnelse(fra.getBegrunnelse());
-            til.setPeriode(fra.getPeriode());
             til.setVenteårsak(fra.getVenteårsak());
             til.setFristTid(fra.getFristTid());
-            til.setStatus(fra.getStatus(), fra.getBegrunnelse());
+            til.setStatus(fra.getStatus());
         }
 
         Aksjonspunkt.Builder medFristTid(LocalDateTime fristTid) {
@@ -539,12 +425,8 @@ public class Aksjonspunkt extends BaseEntitet {
                 ", manueltOpprettet=" + manueltOpprettet +
                 ", behandlingStegFunnet=" + getBehandlingStegFunnet() +
                 ", versjon=" + versjon +
-                ", begrunnelse='" + begrunnelse + '\'' +
-                ", periode=" + periode +
-                ", besluttersBegrunnelse='" + besluttersBegrunnelse + '\'' +
                 ", vurderPåNyttÅrsaker=" + vurderPåNyttÅrsaker +
                 ", toTrinnsBehandling=" + isToTrinnsBehandling() +
-                ", toTrinnsBehandlingGodkjent=" + toTrinnsBehandlingGodkjent +
                 ", fristTid=" + getFristTid() +
                 ", revurdering=" + revurdering +
                 '}';

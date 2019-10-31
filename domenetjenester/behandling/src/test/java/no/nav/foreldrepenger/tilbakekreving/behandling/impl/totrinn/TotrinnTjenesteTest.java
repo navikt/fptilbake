@@ -22,7 +22,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.Totrinnsvur
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagAggregate;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMock;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMockUtil;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
@@ -41,12 +40,9 @@ public class TotrinnTjenesteTest extends FellesTestOppsett {
         mockMedYtelPostering.setKlasseKode(KlasseKode.FPADATAL);
 
         Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedYtelPostering));
-        KravgrunnlagAggregate kravgrunnlagAggregate = KravgrunnlagAggregate.builder()
-            .medGrunnlagØkonomi(kravgrunnlag431)
-            .medBehandlingId(internBehandlingId).build();
-        grunnlagRepository.lagre(kravgrunnlagAggregate);
+        grunnlagRepository.lagre(internBehandlingId,kravgrunnlag431);
 
-        repoProvider.getFaktaFeilutbetalingRepository().lagre(internBehandlingId, lagFaktaFeilutbetaling());
+        repoProvider.getFaktaFeilutbetalingRepository().lagre(internBehandlingId,  lagFaktaFeilutbetaling());
         vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, Collections.singletonList(
             new ForeldelsePeriodeDto(FOM, TOM,
                 ForeldelseVurderingType.FORELDET, "ABC")));

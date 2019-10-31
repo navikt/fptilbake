@@ -75,7 +75,7 @@ public class AksjonspunktApplikasjonTjenesteImpl implements AksjonspunktApplikas
         // Her sikres at behandlingskontroll hopper tilbake til aksjonspunktenes tidligste "løsesteg" dersom aktivt
         // behandlingssteg er lenger fremme i sekvensen
         List<String> bekreftedeApKoder = aksjonspunktDtoer.stream()
-                .map(dto -> dto.getKode())
+                .map(AksjonspunktKode :: getKode)
                 .collect(toList());
 
         behandlingskontrollTjeneste.behandlingTilbakeføringTilTidligsteAksjonspunkt(kontekst, bekreftedeApKoder, erOverstyring);
@@ -113,10 +113,8 @@ public class AksjonspunktApplikasjonTjenesteImpl implements AksjonspunktApplikas
             oppdaterer.oppdater(dto, behandling);
         }
 
-        if (!aksjonspunkt.erBehandletAksjonspunkt() && !aksjonspunkt.erAvbrutt()) {
-            if (aksjonspunktRepository.setTilUtført(aksjonspunkt, dto.getBegrunnelse())) {
+        if (!aksjonspunkt.erBehandletAksjonspunkt() && !aksjonspunkt.erAvbrutt() && aksjonspunktRepository.setTilUtført(aksjonspunkt)) {
                 utførteAksjonspunkter.add(aksjonspunkt);
-            }
         }
     }
 

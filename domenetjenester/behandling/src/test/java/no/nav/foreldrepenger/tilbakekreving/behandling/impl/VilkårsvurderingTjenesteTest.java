@@ -411,6 +411,7 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
             .medFeilutbetalinger(faktaFeilutbetaling)
             .build();
         faktaFeilutbetaling.leggTilFeilutbetaltPeriode(faktaFeilutbetalingPeriode);
+        faktaFeilutbetaling.setBegrunnelse("begrunnelse");
 
         faktaFeilutbetalingRepository.lagre(internBehandlingId, faktaFeilutbetaling);
     }
