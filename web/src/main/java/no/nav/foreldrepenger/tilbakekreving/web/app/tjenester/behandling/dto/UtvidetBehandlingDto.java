@@ -9,20 +9,11 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkko
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
 public class UtvidetBehandlingDto extends BehandlingDto {
 
-    @JsonProperty("behandlingPaaVent")
-    private boolean behandlingPåVent;
-
     @JsonProperty("behandlingKoet")
     private boolean behandlingKøet;
 
     @JsonProperty("ansvarligSaksbehandler")
     private String ansvarligSaksbehandler;
-
-    @JsonProperty("fristBehandlingPaaVent")
-    private String fristBehandlingPåVent;
-
-    @JsonProperty("venteArsakKode")
-    private String venteÅrsakKode;
 
     @JsonProperty("sprakkode")
     private Språkkode språkkode;
@@ -37,20 +28,8 @@ public class UtvidetBehandlingDto extends BehandlingDto {
     @JsonProperty("taskStatus")
     private AsyncPollingStatus taskStatus;
 
-    public boolean isBehandlingPåVent() {
-        return behandlingPåVent;
-    }
-
     public String getAnsvarligSaksbehandler() {
         return ansvarligSaksbehandler;
-    }
-
-    public String getFristBehandlingPåVent() {
-        return fristBehandlingPåVent;
-    }
-
-    public String getVenteÅrsakKode() {
-        return venteÅrsakKode;
     }
 
     public Språkkode getSpråkkode() {
@@ -69,20 +48,8 @@ public class UtvidetBehandlingDto extends BehandlingDto {
         return taskStatus;
     }
 
-    void setBehandlingPåVent(boolean behandlingPåVent) {
-        this.behandlingPåVent = behandlingPåVent;
-    }
-
     void setAnsvarligSaksbehandler(String ansvarligSaksbehandler) {
         this.ansvarligSaksbehandler = ansvarligSaksbehandler;
-    }
-
-    void setFristBehandlingPåVent(String fristBehandlingPåVent) {
-        this.fristBehandlingPåVent = fristBehandlingPåVent;
-    }
-
-    void setVenteÅrsakKode(String venteÅrsakKode) {
-        this.venteÅrsakKode = venteÅrsakKode;
     }
 
     void setSpråkkode(Språkkode språkkode) {

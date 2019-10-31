@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.web.app.rest.ResourceLink;
@@ -22,6 +24,12 @@ public class BehandlingDto {
     private String behandlendeEnhetId;
     private String behandlendeEnhetNavn;
     private boolean toTrinnsBehandling;
+    @JsonProperty("behandlingPaaVent")
+    private boolean behandlingPåVent;
+    @JsonProperty("fristBehandlingPaaVent")
+    private String fristBehandlingPåVent;
+    @JsonProperty("venteArsakKode")
+    private String venteÅrsakKode;
 
 
     /**
@@ -125,5 +133,29 @@ public class BehandlingDto {
 
     void setToTrinnsBehandling(boolean toTrinnsBehandling) {
         this.toTrinnsBehandling = toTrinnsBehandling;
+    }
+
+    public boolean isBehandlingPåVent() {
+        return behandlingPåVent;
+    }
+
+    public String getFristBehandlingPåVent() {
+        return fristBehandlingPåVent;
+    }
+
+    public String getVenteÅrsakKode() {
+        return venteÅrsakKode;
+    }
+
+    void setBehandlingPåVent(boolean behandlingPåVent) {
+        this.behandlingPåVent = behandlingPåVent;
+    }
+
+    void setFristBehandlingPåVent(String fristBehandlingPåVent) {
+        this.fristBehandlingPåVent = fristBehandlingPåVent;
+    }
+
+    void setVenteÅrsakKode(String venteÅrsakKode) {
+        this.venteÅrsakKode = venteÅrsakKode;
     }
 }
