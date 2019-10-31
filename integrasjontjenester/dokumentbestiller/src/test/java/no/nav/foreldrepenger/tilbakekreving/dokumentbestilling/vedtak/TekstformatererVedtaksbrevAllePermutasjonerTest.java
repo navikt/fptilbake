@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -22,6 +21,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelse
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.EsHendelseUnderTyper;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.SvpHendelseUnderTyper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
@@ -54,7 +54,6 @@ public class TekstformatererVedtaksbrevAllePermutasjonerTest {
         sjekkVerdier(resultat);
     }
 
-    @Ignore("Må implementere fakta for SVP helt ferdig før")
     @Test
     public void skal_støtte_alle_permutasjoner_av_fakta_for_SVP() {
         HbVedtaksbrevFelles felles = lagFellesBuilder()
@@ -63,7 +62,10 @@ public class TekstformatererVedtaksbrevAllePermutasjonerTest {
             .medAntallBarn(1)
             .build();
         Map<HendelseMedUndertype, String> resultat = lagFaktatekster(felles);
-        sjekkVerdier(resultat);
+
+        Set<HendelseMedUndertype> unntak1 = Set.of(new HendelseMedUndertype(HendelseType.SVP_ARBEIDSGIVERS_FORHOLD_TYPE, SvpHendelseUnderTyper.SVP_TILRETTELEGGING_FULLT_MULIG), new HendelseMedUndertype(HendelseType.SVP_ARBEIDSGIVERS_FORHOLD_TYPE, SvpHendelseUnderTyper.SVP_TILRETTELEGGING_DELVIS_MULIG));
+
+        sjekkVerdier(resultat, unntak1);
     }
 
     @Test
@@ -166,4 +168,5 @@ public class TekstformatererVedtaksbrevAllePermutasjonerTest {
         }
         return resultat;
     }
+
 }
