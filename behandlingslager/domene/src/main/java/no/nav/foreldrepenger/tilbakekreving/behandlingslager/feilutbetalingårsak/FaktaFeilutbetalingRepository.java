@@ -41,6 +41,14 @@ public class FaktaFeilutbetalingRepository {
         return hentUniktResultat(query);
     }
 
+    public boolean harDataForFaktaFeilutbetaling(Long behandlingId) {
+        TypedQuery<Long> query = entityManager.createQuery("select count(1) from FaktaFeilutbetalingAggregate aggr where aggr.behandlingId=:behandlingId " +
+            "and aggr.aktiv=:aktiv", Long.class);
+        query.setParameter("behandlingId", behandlingId);
+        query.setParameter("aktiv", true);
+        return query.getSingleResult() > 0;
+    }
+
     public void lagre(Long behandlingId, FaktaFeilutbetaling faktaFeilutbetaling) {
         Optional<FaktaFeilutbetalingAggregate> forrigeAggregate = finnFeilutbetaling(behandlingId);
         disableFaktaAggregate(forrigeAggregate);

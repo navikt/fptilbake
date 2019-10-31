@@ -41,6 +41,14 @@ public class VilkårsvurderingRepository {
         lagreAggregat(behandlingId, vilkårVurdering);
     }
 
+    public boolean harDataForVilkårsvurdering(Long behandlingId) {
+        TypedQuery<Long> query = entityManager.createQuery("select count(1) from VilkårVurderingAggregate aggr where aggr.behandlingId=:behandlingId " +
+            "and aggr.aktiv=:aktiv", Long.class);
+        query.setParameter("behandlingId", behandlingId);
+        query.setParameter("aktiv", true);
+        return query.getSingleResult() > 0;
+    }
+
     private Optional<VilkårVurderingAggregateEntitet> finnVilkårsvurderingForBehandlingId(Long behandlingId) {
         TypedQuery<VilkårVurderingAggregateEntitet> query = entityManager.createQuery("from VilkårVurderingAggregate aggr " +
             "where aggr.behandlingId=:behandlingId and aggr.aktiv=:aktiv", VilkårVurderingAggregateEntitet.class);

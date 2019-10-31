@@ -154,7 +154,7 @@ public class VurdertForeldelseTjeneste {
         return Collections.emptyMap();
     }
 
-    public boolean harForeldetPeriodeForBehandlingId(Long behandlingId) {
+    public boolean harVurdertForeldelse(Long behandlingId) {
         return vurdertForeldelseRepository.harVurdertForeldelseForBehandlingId(behandlingId);
     }
 
