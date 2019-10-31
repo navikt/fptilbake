@@ -81,7 +81,7 @@ public class VilkårsvurderingTjeneste {
         if (feilutbetalingAggregate.isPresent()) {
             List<FaktaFeilutbetalingPeriode> feilutbetaltPerioder = feilutbetalingAggregate.get().getFeilutbetaltPerioder();
             // hvis perioder er vurdert for foreldelse
-            if (foreldelseTjeneste.harForeldetPeriodeForBehandlingId(behandlingId)) {
+            if (foreldelseTjeneste.harVurdertForeldelse(behandlingId)) {
                 feilutbetalingPerioder.addAll(henteFeilutbetalingPerioderFraForeldelse(behandlingId, feilutbetaltPerioder));
             } else { // hvis perioder er ikke vurderes for foreldelse
                 feilutbetalingPerioder.addAll(henteFeilutbetalingPerioderFraFaktaOmFeilutbetaling(behandlingId, feilutbetaltPerioder));
