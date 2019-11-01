@@ -69,7 +69,7 @@ public class VarselStegImpl implements VarselSteg {
     @Override
     public BehandleStegResultat utførSteg(BehandlingskontrollKontekst kontekst) {
         Behandling behandling = behandlingRepository.hentBehandling(kontekst.getBehandlingId());
-        if (sjekkTilbakekrevingOpprettetUtenVarsel(behandling.getId())) {
+        if (sjekkTilbakekrevingOpprettetUtenVarsel(behandling.getId()) || behandling.isManueltOpprettet()) { //ikke sendt varsel når behandling er opprettet manuelt eller opprettet uten varsel
             return BehandleStegResultat.utførtUtenAksjonspunkter();
         }
         LocalDateTime fristTid = FPDateUtil.nå().plus(ventefrist).plusDays(1);

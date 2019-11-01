@@ -66,7 +66,7 @@ public class VarselStegImplTest {
     public void setup() {
         fagsak = TestFagsakUtil.opprettFagsak();
         fagsakRepository.lagre(fagsak);
-        behandling = lagBehandling(fagsak);
+        behandling = lagBehandling(fagsak,false);
     }
 
     @Test
@@ -92,6 +92,7 @@ public class VarselStegImplTest {
         assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.BEH_VENT);
     }
 
+    @Test
     public void skal_ikke_sette_behandling_på_vent_når_varseltekst_ikke_finnes() {
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
         BehandleStegResultat stegResultat = steg().utførSteg(new BehandlingskontrollKontekst(fagsak.getId(), fagsak.getAktørId(), lås));
@@ -99,8 +100,20 @@ public class VarselStegImplTest {
         assertThat(behandling.isBehandlingPåVent()).isFalse();
     }
 
-    private Behandling lagBehandling(Fagsak fagsak) {
-        Behandling behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).build();
+    @Test
+    public void skal_ikke_sette_behandling_på_vent_når_behandling_er_manuelt_opprettet() {
+        Behandling behandling = lagBehandling(fagsak,true);
+        varselRepository.lagre(behandling.getId(), "hello", 23000l);
+
+        BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
+        BehandleStegResultat stegResultat = steg().utførSteg(new BehandlingskontrollKontekst(fagsak.getId(), fagsak.getAktørId(), lås));
+
+        assertThat(stegResultat.getAksjonspunktListe()).isEmpty();
+        assertThat(behandling.isBehandlingPåVent()).isFalse();
+    }
+
+    private Behandling lagBehandling(Fagsak fagsak,boolean manueltOpprettet) {
+        Behandling behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).medManueltOpprettet(manueltOpprettet).build();
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
         Long behandlingId = behandlingRepository.lagre(behandling, lås);
         return behandlingRepository.hentBehandling(behandlingId);

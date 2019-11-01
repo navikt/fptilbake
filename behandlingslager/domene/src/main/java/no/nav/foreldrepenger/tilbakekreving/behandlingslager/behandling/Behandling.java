@@ -19,6 +19,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.ColumnResult;
 import javax.persistence.ConstructorResult;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -44,6 +45,7 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.BehandlingInfo;
 import no.nav.vedtak.feil.FeilFactory;
 import no.nav.vedtak.felles.jpa.BaseEntitet;
+import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
 import no.nav.vedtak.util.FPDateUtil;
 
 // mapping for BehandlingInfo klassen
@@ -131,6 +133,10 @@ public class Behandling extends BaseEntitet {
 
     @Column(name = "behandlende_enhet_navn")
     private String behandlendeEnhetNavn;
+
+    @Convert(converter = BooleanToStringConverter.class)
+    @Column(name = "MANUELT_OPPRETTET", nullable = false)
+    private boolean manueltOpprettet = false;
 
     Behandling() {
         // Hibernate
@@ -501,6 +507,9 @@ public class Behandling extends BaseEntitet {
         this.behandlingÅrsaker.add(behandlingÅrsak);
     }
 
+    public boolean isManueltOpprettet() {
+        return manueltOpprettet;
+    }
 
     @SuppressWarnings("unchecked")
     private static <V extends BaseEntitet> Comparator<V> compareOpprettetTid() {
@@ -522,6 +531,7 @@ public class Behandling extends BaseEntitet {
          */
         private LocalDateTime opprettetDato;
         private LocalDateTime avsluttetDato;
+        private boolean manueltOpprettet;
 
         private BehandlingÅrsak.Builder behandlingÅrsakBuilder;
 
@@ -562,6 +572,11 @@ public class Behandling extends BaseEntitet {
             return this;
         }
 
+        public Builder medManueltOpprettet(boolean manueltOpprettet) {
+            this.manueltOpprettet = manueltOpprettet;
+            return this;
+        }
+
 
         /**
          * Bygger en Behandling.
@@ -588,6 +603,7 @@ public class Behandling extends BaseEntitet {
             if (behandlingÅrsakBuilder != null) {
                 behandlingÅrsakBuilder.buildFor(behandling);
             }
+            behandling.manueltOpprettet = manueltOpprettet;
 
             return behandling;
         }
