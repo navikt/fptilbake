@@ -5,6 +5,7 @@ import java.util.Optional;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingFeil;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
@@ -18,20 +19,15 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 
 @ApplicationScoped
 public class HenleggBehandlingTjeneste {
 
     private BehandlingRepository behandlingRepository;
-    private ProsessTaskRepository prosessTaskRepository;
-    private KravgrunnlagRepository kravgrunnlagRepository;
+    private KravgrunnlagRepository grunnlagRepository;
 
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private HistorikkinnslagTjeneste historikkinnslagTjeneste;
-
-    private static final String ANNULERE_KRAVGRUNNLAG_TASK = "kravgrunnlag.annulere";
 
     HenleggBehandlingTjeneste() {
         // CDI
@@ -39,28 +35,30 @@ public class HenleggBehandlingTjeneste {
 
     @Inject
     public HenleggBehandlingTjeneste(BehandlingRepositoryProvider repositoryProvider,
-                                     ProsessTaskRepository prosessTaskRepository,
                                      BehandlingskontrollTjeneste behandlingskontrollTjeneste,
                                      HistorikkinnslagTjeneste historikkinnslagTjeneste) {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
-        this.prosessTaskRepository = prosessTaskRepository;
-        this.kravgrunnlagRepository = repositoryProvider.getGrunnlagRepository();
+        this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
 
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
         this.historikkinnslagTjeneste = historikkinnslagTjeneste;
     }
 
-    public void henleggBehandling(long behandlingId, BehandlingResultatType årsakKode, String begrunnelse) {
-        doHenleggBehandling(behandlingId, årsakKode, begrunnelse, false, false);
+    public void henleggBehandlingManuelt(long behandlingId, BehandlingResultatType årsakKode, String begrunnelse) {
+        if (grunnlagRepository.harGrunnlagForBehandlingId(behandlingId)) {
+            throw BehandlingFeil.FACTORY.kanIkkeHenleggeBehandling(behandlingId).toException();
+        }
+        doHenleggBehandling(behandlingId, årsakKode, begrunnelse, false);
     }
 
-    public void henleggBehandling(long behandlingId, BehandlingResultatType årsakKode, boolean kommerAvsluttetMeldingfraØkonomi) {
-        doHenleggBehandling(behandlingId, årsakKode, null, false, kommerAvsluttetMeldingfraØkonomi);
+    public void henleggBehandling(long behandlingId, BehandlingResultatType årsakKode) {
+        doHenleggBehandling(behandlingId, årsakKode, null, false);
     }
 
-    private void doHenleggBehandling(long behandlingId, BehandlingResultatType årsakKode, String begrunnelse, boolean avbrytVentendeAutopunkt, boolean kommerAvsluttetMeldingfraØkonomi) {
+    private void doHenleggBehandling(long behandlingId, BehandlingResultatType årsakKode, String begrunnelse, boolean avbrytVentendeAutopunkt) {
         BehandlingskontrollKontekst kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandlingId);
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
+
         if (avbrytVentendeAutopunkt && behandling.isBehandlingPåVent()) {
             behandlingskontrollTjeneste.taBehandlingAvVent(behandling, kontekst);
             behandlingskontrollTjeneste.settAutopunkterTilUtført(kontekst, true);
@@ -71,9 +69,6 @@ public class HenleggBehandlingTjeneste {
 
         if (kanSendeHenleggelsebrev(behandling)) {
             sendHenleggelsesbrev();
-        }
-        if (kravgrunnlagRepository.harGrunnlagForBehandlingId(behandlingId) && ! kommerAvsluttetMeldingfraØkonomi) {
-            annulereGrunnlag(kontekst);
         }
         opprettHistorikkinnslag(behandling, årsakKode, begrunnelse);
     }
@@ -88,13 +83,6 @@ public class HenleggBehandlingTjeneste {
             return false;
         }
         return AksjonspunktStatus.UTFØRT.equals(sendVarselAksjonspunkt.get().getStatus());
-    }
-
-    private void annulereGrunnlag(BehandlingskontrollKontekst kontekst) {
-        // opprett prosess task for å annulere grunnlag
-        ProsessTaskData hentxmlTask = new ProsessTaskData(ANNULERE_KRAVGRUNNLAG_TASK);
-        hentxmlTask.setBehandling(kontekst.getFagsakId(), kontekst.getBehandlingId(), kontekst.getAktørId().getId());
-        prosessTaskRepository.lagre(hentxmlTask);
     }
 
     private void opprettHistorikkinnslag(Behandling behandling, BehandlingResultatType årsakKode, String begrunnelse) {

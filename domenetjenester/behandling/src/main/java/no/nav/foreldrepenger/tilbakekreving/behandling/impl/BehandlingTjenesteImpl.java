@@ -292,7 +292,12 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
     }
 
     private boolean harTilbakekrevingAlleredeFinnes(UUID eksternUuid) {
-        return eksternBehandlingRepository.finnForSisteAvsluttetTbkBehandling(eksternUuid).isPresent();
+        Optional<EksternBehandling> eksternBehandling =  eksternBehandlingRepository.finnForSisteAvsluttetTbkBehandling(eksternUuid);
+        if(eksternBehandling.isPresent()){
+            Behandling behandling = behandlingRepository.hentBehandling(eksternBehandling.get().getInternId());
+            return !erBehandlingHenlagt(behandling); //hvis behandlingen er henlagt,kan opprettes nye behandling
+        }
+        return false;
     }
 
     private Long hentEksternBehandlingIdHvisFinnesIkke(Long eksternBehandlingId, EksternBehandlingsinfoDto eksternBehandlingsinfoDto) {

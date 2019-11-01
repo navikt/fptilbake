@@ -35,7 +35,7 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
     private KravVedtakStatusRepository kravVedtakStatusRepository = new KravVedtakStatusRepository(repoRule.getEntityManager());
     private BehandlingresultatRepository behandlingresultatRepository = new BehandlingresultatRepositoryImpl(repoRule.getEntityManager());
 
-    private HenleggBehandlingTjeneste henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repositoryProvider, prosessTaskRepository, behandlingskontrollTjeneste, historikkinnslagTjeneste);
+    private HenleggBehandlingTjeneste henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repositoryProvider, behandlingskontrollTjeneste, historikkinnslagTjeneste);
     private KravVedtakStatusTjeneste kravVedtakStatusTjeneste = new KravVedtakStatusTjeneste(kravVedtakStatusRepository, repositoryProvider, henleggBehandlingTjeneste, behandlingskontrollTjeneste);
     private KravVedtakStatusMapper kravVedtakStatusMapper = new KravVedtakStatusMapper(tpsAdapterWrapper);
     private LesKravvedtakStatusTask lesKravvedtakStatusTask = new LesKravvedtakStatusTask(mottattXmlRepository, repositoryProvider, prosessTaskRepository,

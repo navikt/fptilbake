@@ -18,6 +18,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BehandlingFeilutbe
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandlingsresultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KonsekvensForYtelsen;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
@@ -197,6 +198,15 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
     }
 
     @Test
+    public void skal_opprette_behandling_manell_med_allerede_henlagt_avsluttet_behandling_med_samme_fpsak_revurdering() {
+        lagBehandlingsResulatat();
+        avsluttBehandling();
+
+        Long behandlingId = behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternBehandlingUuid, FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING);
+        fellesBehandlingAssert(behandlingId);
+    }
+
+    @Test
     public void kan_opprette_behandling_med_åpen_behandling_finnes() {
         boolean result = behandlingTjeneste.kanOppretteBehandling(saksnummer, eksternBehandlingUuid);
         assertThat(result).isFalse();
@@ -208,6 +218,22 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
 
         boolean result = behandlingTjeneste.kanOppretteBehandling(saksnummer, eksternBehandlingUuid);
         assertThat(result).isFalse();
+    }
+
+    @Test
+    public void kan_opprette_behandling_med_allerede_avsluttet_henlagt_behandling_med_samme_fpsak_revurdering() {
+        lagBehandlingsResulatat();
+        avsluttBehandling();
+
+        boolean result = behandlingTjeneste.kanOppretteBehandling(saksnummer, eksternBehandlingUuid);
+        assertThat(result).isTrue();
+    }
+
+    private void lagBehandlingsResulatat() {
+        Behandlingsresultat behandlingsresultat = Behandlingsresultat.builder()
+            .medBehandling(behandling)
+            .medBehandlingResultatType(BehandlingResultatType.HENLAGT_FEILOPPRETTET).build();
+        repoProvider.getBehandlingresultatRepository().lagre(behandlingsresultat);
     }
 
     @Test
