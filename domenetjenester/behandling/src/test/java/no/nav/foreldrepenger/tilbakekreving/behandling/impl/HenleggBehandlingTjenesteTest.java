@@ -7,7 +7,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -49,9 +48,8 @@ import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
+import no.nav.vedtak.exception.FunksjonellException;
 import no.nav.vedtak.exception.TekniskException;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 import no.nav.vedtak.konfig.KonfigVerdi;
 
@@ -90,9 +88,6 @@ public class HenleggBehandlingTjenesteTest {
 
     @Mock
     private KravgrunnlagRepository kravgrunnlagRepositoryMock;
-
-    @Mock
-    private ProsessTaskRepository prosessTaskRepositoryMock;
 
     @Inject
     private AksjonspunktRepository aksjonspunktRepository;
@@ -134,8 +129,7 @@ public class HenleggBehandlingTjenesteTest {
 
         historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepositoryMock, mock(JournalTjeneste.class), mock(PersoninfoAdapter.class));
 
-        henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repositoryProviderMock, prosessTaskRepositoryMock,
-            behandlingskontrollTjenesteImpl, historikkinnslagTjeneste);
+        henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repositoryProviderMock, behandlingskontrollTjenesteImpl, historikkinnslagTjeneste);
     }
 
     @Test
@@ -143,7 +137,7 @@ public class HenleggBehandlingTjenesteTest {
         // Arrange
         BehandlingResultatType behandlingsresultat = BehandlingResultatType.HENLAGT_FEILOPPRETTET;
         // Act
-        henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), behandlingsresultat, "begrunnelse");
+        henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), behandlingsresultat);
         // Assert
         verify(historikkRepositoryMock).lagre(any(Historikkinnslag.class));
         verify(repositoryProviderMock.getBehandlingRepository(), atLeast(2)).lagre(eq(behandling), any(BehandlingLås.class));
@@ -157,7 +151,7 @@ public class HenleggBehandlingTjenesteTest {
         assertThat(aksjonspunkt.getStatus()).isEqualTo(AksjonspunktStatus.OPPRETTET);
 
         // Act
-        henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), behandlingsresultat, "begrunnelse");
+        henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), behandlingsresultat);
 
         // Assert
         verify(historikkRepositoryMock).lagre(any(Historikkinnslag.class));
@@ -166,27 +160,26 @@ public class HenleggBehandlingTjenesteTest {
     }
 
     @Test
-    public void skal_henlegge_behandling_med_annuelere_kravgrunnlag (){
+    public void skal_ikke_henlegge_behandling_manuelt_når_grunnlag_finnes (){
         BehandlingResultatType behandlingsresultat = BehandlingResultatType.HENLAGT_FEILOPPRETTET;
         when(kravgrunnlagRepositoryMock.harGrunnlagForBehandlingId(behandling.getId())).thenReturn(true);
 
-        henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), behandlingsresultat, "begrunnelse");
+        expectedException.expect(FunksjonellException.class);
+        expectedException.expectMessage("FPT-663491");
 
-        verify(historikkRepositoryMock).lagre(any(Historikkinnslag.class));
-        verify(repositoryProviderMock.getBehandlingRepository(), atLeast(2)).lagre(eq(behandling), any(BehandlingLås.class));
-        verify(prosessTaskRepositoryMock,atLeastOnce()).lagre(any(ProsessTaskData.class));
+        henleggBehandlingTjeneste.henleggBehandlingManuelt(behandling.getId(), behandlingsresultat,"");
+
     }
 
     @Test
-    public void skal_henlegge_behandling_uten_å_sende_annulere_grunnlag(){
+    public void skal_henlegge_behandling_manuelt_når_grunnlag_ikke_finnes(){
         BehandlingResultatType behandlingsresultat = BehandlingResultatType.HENLAGT_FEILOPPRETTET;
-        when(kravgrunnlagRepositoryMock.harGrunnlagForBehandlingId(behandling.getId())).thenReturn(true);
+        when(kravgrunnlagRepositoryMock.harGrunnlagForBehandlingId(behandling.getId())).thenReturn(false);
 
-        henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), behandlingsresultat, true);
+        henleggBehandlingTjeneste.henleggBehandlingManuelt(behandling.getId(), behandlingsresultat,"");
 
         verify(historikkRepositoryMock,atLeastOnce()).lagre(any(Historikkinnslag.class));
         verify(repositoryProviderMock.getBehandlingRepository(), atLeast(2)).lagre(eq(behandling), any(BehandlingLås.class));
-        verify(prosessTaskRepositoryMock,never()).lagre(any(ProsessTaskData.class));
 
     }
 
@@ -202,7 +195,9 @@ public class HenleggBehandlingTjenesteTest {
         BehandlingResultatType behandlingsresultat = BehandlingResultatType.HENLAGT_FEILOPPRETTET;
 
         // Act
-        henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), behandlingsresultat, "begrunnelse");
+        henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), behandlingsresultat);
+        verify(historikkRepositoryMock,atLeastOnce()).lagre(any(Historikkinnslag.class));
+        verify(repositoryProviderMock.getBehandlingRepository(), atLeast(2)).lagre(eq(behandling), any(BehandlingLås.class));
     }
 
     @Test
@@ -212,7 +207,9 @@ public class HenleggBehandlingTjenesteTest {
         BehandlingResultatType behandlingsresultat = BehandlingResultatType.HENLAGT_FEILOPPRETTET;
 
         // Act
-        henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), behandlingsresultat, "begrunnelse");
+        henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), behandlingsresultat);
+        verify(historikkRepositoryMock,atLeastOnce()).lagre(any(Historikkinnslag.class));
+        verify(repositoryProviderMock.getBehandlingRepository(), atLeast(2)).lagre(eq(behandling), any(BehandlingLås.class));
     }
 
     @Test
@@ -226,7 +223,7 @@ public class HenleggBehandlingTjenesteTest {
         expectedException.expectMessage("FPT-143308");
 
         // Act
-        henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), behandlingsresultat, "begrunnelse");
+        henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), behandlingsresultat);
     }
 
     @Test
@@ -239,9 +236,9 @@ public class HenleggBehandlingTjenesteTest {
         expectedException.expectMessage("FPT-143308");
 
         // Act
-        henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), behandlingsresultat, "begrunnelse");
+        henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), behandlingsresultat);
         // forsøker å henlegge behandlingen igjen
-        henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), behandlingsresultat, "begrunnelse");
+        henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), behandlingsresultat);
     }
 
 }

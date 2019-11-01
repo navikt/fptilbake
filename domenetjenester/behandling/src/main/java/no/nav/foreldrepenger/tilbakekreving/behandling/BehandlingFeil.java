@@ -42,5 +42,6 @@ public interface BehandlingFeil extends DeklarerteFeil {
     @FunksjonellFeil(feilkode = "FPT-663490", feilmelding = "Fant ingen tilbakekreving behandling for saksnummer %s ", løsningsforslag = "", logLevel = LogLevel.WARN)
     Feil fantIngenTilbakekrevingBehandlingForSaksnummer(Saksnummer saksnummer);
 
-
+    @FunksjonellFeil(feilkode = "FPT-663491", feilmelding = "Det foreligger et feilutbetalt beløp, kan ikke henlegges behandling %s", løsningsforslag = "", logLevel = LogLevel.WARN)
+    Feil kanIkkeHenleggeBehandling(Long behandlingId);
 }

@@ -115,7 +115,7 @@ public class BehandlingRestTjenesteTest {
 
         behandlingRestTjeneste.henleggBehandling(opprettHenleggBehandlingDto(1234l, versjon, årsak, begrunnelse));
 
-        verify(henleggBehandlingTjenesteMock).henleggBehandling(1234l, årsak, begrunnelse);
+        verify(henleggBehandlingTjenesteMock).henleggBehandlingManuelt(1234l, årsak, begrunnelse);
     }
 
     @Test

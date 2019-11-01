@@ -194,7 +194,7 @@ public class BehandlingRestTjeneste {
         Long behandlingId = dto.getBehandlingId();
         behandlingTjeneste.kanEndreBehandling(behandlingId, dto.getBehandlingVersjon());
         BehandlingResultatType årsakKode = tilHenleggBehandlingResultatType(dto.getÅrsakKode());
-        henleggBehandlingTjeneste.henleggBehandling(behandlingId, årsakKode, dto.getBegrunnelse());
+        henleggBehandlingTjeneste.henleggBehandlingManuelt(behandlingId, årsakKode, dto.getBegrunnelse());
     }
 
     private BehandlingResultatType tilHenleggBehandlingResultatType(String årsak) {
