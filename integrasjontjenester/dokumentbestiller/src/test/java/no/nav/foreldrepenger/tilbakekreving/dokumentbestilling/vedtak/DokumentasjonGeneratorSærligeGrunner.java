@@ -39,7 +39,7 @@ public class DokumentasjonGeneratorSærligeGrunner {
                 for (boolean sgTid : boolske) {
                     for (boolean reduksjon : boolske) {
                         for (boolean sgAnnet : boolske) {
-                            HbVedtaksbrevPeriode periode = lagPeriodeDel(Aktsomhet.SIMPEL_UAKTSOM, sgNav, sgBeløp, sgTid, reduksjon, sgAnnet);
+                            HbVedtaksbrevPeriode periode = lagPeriodeDel(Aktsomhet.SIMPEL_UAKTSOM, sgNav, sgBeløp, sgTid, sgAnnet, reduksjon);
                             periode.setFritekstSærligeGrunnerAnnet("[fritekst her]");
                             String s = TekstformatererVedtaksbrev.lagSærligeGrunnerTekst(felles, periode);
                             String overskrift = overskrift(sgNav, sgBeløp, sgTid, sgAnnet, reduksjon);
