@@ -12,14 +12,14 @@ public class HendelseTypeMedUndertypeDto {
     @ValidKodeverk
     private HendelseType hendelseType;
 
+    @NotNull
     @ValidKodeverk
-    //nullable
     private HendelseUnderType hendelseUndertype;
 
     public HendelseTypeMedUndertypeDto() {
     }
 
-    public HendelseTypeMedUndertypeDto(@NotNull @ValidKodeverk HendelseType hendelseType, @ValidKodeverk HendelseUnderType hendelseUndertype) {
+    public HendelseTypeMedUndertypeDto(HendelseType hendelseType, HendelseUnderType hendelseUndertype) {
         this.hendelseType = hendelseType;
         this.hendelseUndertype = hendelseUndertype;
     }

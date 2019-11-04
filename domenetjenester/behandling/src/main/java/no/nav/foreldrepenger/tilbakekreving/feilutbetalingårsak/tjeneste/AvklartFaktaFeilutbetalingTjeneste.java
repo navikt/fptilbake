@@ -66,7 +66,7 @@ public class AvklartFaktaFeilutbetalingTjeneste {
             faktaFeilutbetaling.leggTilFeilutbetaltPeriode(faktaFeilutbetalingPeriode);
 
             // lag historikkinnslagDeler
-            boolean harEndret = lagHistorikkInnslagDeler(behandling, historikkinnslag, begrunnelse, forrigeFakta, faktaFeilutbetalingDto, historikkinnslagDelDto);
+            boolean harEndret = lagHistorikkInnslagDeler(historikkinnslag, begrunnelse, forrigeFakta, faktaFeilutbetalingDto, historikkinnslagDelDto);
             behovForHistorikkInnslag = !behovForHistorikkInnslag ? harEndret : behovForHistorikkInnslag;
         }
         faktaFeilutbetaling.setBegrunnelse(begrunnelse);
@@ -77,7 +77,7 @@ public class AvklartFaktaFeilutbetalingTjeneste {
         }
     }
 
-    private boolean lagHistorikkInnslagDeler(Behandling behandling, Historikkinnslag historikkinnslag, String begrunnelse,
+    private boolean lagHistorikkInnslagDeler(Historikkinnslag historikkinnslag, String begrunnelse,
                                              Optional<FaktaFeilutbetaling> forrigeFakta,
                                              FaktaFeilutbetalingDto faktaFeilutbetalingDto,
                                              HistorikkinnslagDelDto historikkinnslagDelDto) {
@@ -124,7 +124,7 @@ public class AvklartFaktaFeilutbetalingTjeneste {
                                         String begrunnelse, String forrigeBegrunnelse,
                                         HistorikkInnslagTekstBuilder tekstBuilder, HistorikkinnslagDelDto historikkinnslagDelDto) {
 
-        if (sjekkHvisÅrsakEllerUnderÅrsakEndret(faktaFeilutbetalingDto, forrigePeiodeÅrsak)) {
+        if (erÅrsakEllerUnderÅrsakEndret(faktaFeilutbetalingDto, forrigePeiodeÅrsak)) {
             mapFellesVerdier(tekstBuilder, begrunnelse, faktaFeilutbetalingDto);
             tekstBuilder.medEndretFelt(HistorikkEndretFeltType.HENDELSE_ÅRSAK, forrigePeiodeÅrsak.getHendelseType(), faktaFeilutbetalingDto.getHendelseType());
             tekstBuilder.medEndretFelt(HistorikkEndretFeltType.HENDELSE_UNDER_ÅRSAK, forrigePeiodeÅrsak.getHendelseUndertype(), faktaFeilutbetalingDto.getHendelseUndertype());
@@ -139,8 +139,8 @@ public class AvklartFaktaFeilutbetalingTjeneste {
         return false;
     }
 
-    private boolean sjekkHvisÅrsakEllerUnderÅrsakEndret(FaktaFeilutbetalingDto faktaFeilutbetalingDto,
-                                                        FaktaFeilutbetalingPeriode forrigePeriodeÅrsak) {
+    private boolean erÅrsakEllerUnderÅrsakEndret(FaktaFeilutbetalingDto faktaFeilutbetalingDto,
+                                                 FaktaFeilutbetalingPeriode forrigePeriodeÅrsak) {
         boolean erEndret = false;
         HendelseType nyHendelseType = faktaFeilutbetalingDto.getHendelseType();
         HendelseUnderType nyHendelseUndertype = faktaFeilutbetalingDto.getHendelseUndertype();

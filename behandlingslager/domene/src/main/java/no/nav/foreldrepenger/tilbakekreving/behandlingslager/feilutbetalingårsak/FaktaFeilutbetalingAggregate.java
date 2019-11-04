@@ -80,6 +80,7 @@ public class FaktaFeilutbetalingAggregate extends BaseEntitet {
         public FaktaFeilutbetalingAggregate build() {
             Objects.requireNonNull(this.kladd.behandlingId);
             Objects.requireNonNull(this.kladd.faktaFeilutbetaling);
+            //TODO validering av faktaFeilutbetaling skal skje når faktaFeilutbetaling opprettes, ikke her
             Objects.requireNonNull(this.kladd.faktaFeilutbetaling.getBegrunnelse());
             return kladd;
         }

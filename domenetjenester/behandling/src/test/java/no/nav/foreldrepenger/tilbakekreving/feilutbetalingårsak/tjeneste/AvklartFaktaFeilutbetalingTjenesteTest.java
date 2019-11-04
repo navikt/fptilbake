@@ -73,27 +73,6 @@ public class AvklartFaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void lagreÅrsakForFeilutbetalingPeriode_medIngenUnderÅrsak() {
-        HendelseTypeMedUndertypeDto feilutbetalingÅrsakDto = new HendelseTypeMedUndertypeDto(HENDELSE_TYPE, null);
-        FaktaFeilutbetalingDto faktaFeilutbetalingDto = new FaktaFeilutbetalingDto(FOM, TOM, feilutbetalingÅrsakDto);
-
-        avklartFaktaFeilutbetalingTjeneste.lagreÅrsakForFeilutbetalingPeriode(nyBehandling, Arrays.asList(faktaFeilutbetalingDto), "ABC");
-
-        Optional<FaktaFeilutbetaling> feilutbetalingAggregate = faktaFeilutbetalingRepository.finnFaktaOmFeilutbetaling(nyBehandling.getId());
-        assertThat(feilutbetalingAggregate).isNotEmpty();
-
-        List<FaktaFeilutbetalingPeriode> feilutbetalingPerioder = feilutbetalingAggregate.get().getFeilutbetaltPerioder();
-        assertThat(feilutbetalingPerioder.size()).isEqualTo(1);
-
-        FaktaFeilutbetalingPeriode faktaPeriode = feilutbetalingPerioder.get(0);
-        assertThat(faktaPeriode.getPeriode()).isEqualTo(Periode.of(FOM, TOM));
-        assertThat(faktaPeriode.getHendelseType()).isEqualTo(HENDELSE_TYPE);
-        assertThat(faktaPeriode.getHendelseUndertype()).isNull();
-
-        testHistorikkInnslag();
-    }
-
-    @Test
     public void lagreÅrsakForFeilutbetalingPeriode_medUnderÅrsakOgFlerePeriode() {
         FaktaFeilutbetalingDto faktaFeilutbetalingDto = formFaktaFeilutbetaling();
 

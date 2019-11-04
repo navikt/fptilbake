@@ -46,9 +46,6 @@ class TekstformatererVedtaksbrev {
     private static String PARTIAL_VEDTAK_START = "vedtak/vedtak_start";
     private static String PARTIAL_VEDTAK_SLUTT = "vedtak/vedtak_slutt";
     private static String PARTIAL_VEDTAK_FELLES = "vedtak/vedtak_felles";
-    static String FRITEKST_MARKERING_START = "\\\\FRITEKST_START";
-    static String FRITEKST_PÅKREVET_MARKERING_START = "\\\\PÅKREVET_FRITEKST_START";
-    static String FRITEKST_MARKERING_SLUTT = "\\\\FRITEKST_SLUTT";
 
     private static final ObjectMapper OM = ObjectMapperForUtvekslingAvDataMedHandlebars.INSTANCE;
 
@@ -58,49 +55,11 @@ class TekstformatererVedtaksbrev {
 
     static List<Avsnitt> lagVedtaksbrevDeltIAvsnitt(HbVedtaksbrevData vedtaksbrevData, String hovedoverskrift) {
         List<Avsnitt> resultat = new ArrayList<>();
-        settInnMarkeringForFritekst(vedtaksbrevData);
+        VedtaksbrevFritekst.settInnMarkeringForFritekst(vedtaksbrevData);
         resultat.add(lagOppsummeringAvsnitt(vedtaksbrevData, hovedoverskrift));
         resultat.addAll(lagPerioderAvsnitt(vedtaksbrevData));
         resultat.add(lagAvsluttendeAvsnitt(vedtaksbrevData));
         return resultat;
-    }
-
-    private static void settInnMarkeringForFritekst(HbVedtaksbrevData vedtaksbrevData) {
-        for (HbVedtaksbrevPeriode periode : vedtaksbrevData.getPerioder()) {
-            periode.setFritekstFakta(markerFritekst(periode.getFritekstFakta(), Underavsnitt.Underavsnittstype.FAKTA));
-            periode.setFritekstVilkår(markerFritekst(periode.getFritekstVilkår(), Underavsnitt.Underavsnittstype.VILKÅR));
-            periode.setFritekstSærligeGrunner(markerFritekst(periode.getFritekstSærligeGrunner(), Underavsnitt.Underavsnittstype.SÆRLIGEGRUNNER));
-            periode.setFritekstSærligeGrunnerAnnet(markerFritekst(periode.getFritekstSærligeGrunnerAnnet(), Underavsnitt.Underavsnittstype.SÆRLIGEGRUNNER_ANNET));
-        }
-        vedtaksbrevData.getFelles().setFritekstOppsummering(markerFritekst(vedtaksbrevData.getFelles().getFritekstOppsummering()));
-    }
-
-    static String markerFritekst(String fritekst) {
-        return markerFritekst(fritekst, null);
-    }
-
-    static String markerFritekst(String fritekst, Underavsnitt.Underavsnittstype underavsnittstype) {
-        String startmarkør = underavsnittstype == null
-            ? FRITEKST_MARKERING_START
-            : FRITEKST_MARKERING_START + underavsnittstype;
-        String markertFritekst = fritekst == null
-            ? startmarkør + "\n" + FRITEKST_MARKERING_SLUTT
-            : startmarkør + "\n" + fritekst + "\n" + FRITEKST_MARKERING_SLUTT;
-        return "\n" + markertFritekst;
-    }
-
-    static String markerPåkrevetFritekst(String fritekst) {
-        return markerPåkrevetFritekst(fritekst, null);
-    }
-
-    static String markerPåkrevetFritekst(String fritekst, Underavsnitt.Underavsnittstype underavsnittstype) {
-        String startmarkør = underavsnittstype == null
-            ? FRITEKST_PÅKREVET_MARKERING_START
-            : FRITEKST_PÅKREVET_MARKERING_START + underavsnittstype;
-        String markertFritekst = fritekst == null
-            ? startmarkør + "\n" + FRITEKST_MARKERING_SLUTT
-            : startmarkør + "\n" + fritekst + "\n" + FRITEKST_MARKERING_SLUTT;
-        return "\n" + markertFritekst;
     }
 
     static Avsnitt lagOppsummeringAvsnitt(HbVedtaksbrevData vedtaksbrevData, String hovedoverskrift) {
@@ -204,13 +163,13 @@ class TekstformatererVedtaksbrev {
         Boolean fritekstPåkrevet = null;
         List<String> fritekstLinjer = null;
         for (String linje : splittet) {
-            if (erFritekstStart(linje)) {
+            if (VedtaksbrevFritekst.erFritekstStart(linje)) {
                 Objects.check(!leserFritekst, "Feil med vedtaksbrev, har markering for 2 fritekst-start etter hverandre");
-                fritekstPåkrevet = erFritekstPåkrevetStart(linje);
+                fritekstPåkrevet = VedtaksbrevFritekst.erFritekstPåkrevetStart(linje);
                 underavsnittstype = parseUnderavsnittstype(linje);
                 leserFritekst = true;
                 fritekstLinjer = new ArrayList<>();
-            } else if (erFritekstSlutt(linje)) {
+            } else if (VedtaksbrevFritekst.erFritekstSlutt(linje)) {
                 Objects.check(leserFritekst, "Feil med vedtaksbrev, fikk markering for fritekst-slutt før fritekst-start");
                 TekstType tekstType = fritekstPåkrevet ? TekstType.PÅKREVET_FRITEKST : TekstType.FRITEKST;
                 resultat.add(new TekstElement(tekstType, fritekstLinjer.isEmpty() ? null : String.join("\n", fritekstLinjer), underavsnittstype));
@@ -259,33 +218,14 @@ class TekstformatererVedtaksbrev {
         }
     }
 
-    private static boolean erFritekstStart(String tekst) {
-        return tekst.startsWith(FRITEKST_MARKERING_START) || tekst.startsWith(FRITEKST_PÅKREVET_MARKERING_START);
-    }
-
-    private static boolean erFritekstPåkrevetStart(String tekst) {
-        return tekst.startsWith(FRITEKST_PÅKREVET_MARKERING_START);
-    }
-
     private static Underavsnitt.Underavsnittstype parseUnderavsnittstype(String tekst) {
-        String rest = null;
-        if (tekst.startsWith(FRITEKST_MARKERING_START)) {
-            rest = tekst.substring(FRITEKST_MARKERING_START.length());
-        } else if (tekst.startsWith(FRITEKST_PÅKREVET_MARKERING_START)) {
-            rest = tekst.substring(FRITEKST_PÅKREVET_MARKERING_START.length());
-        } else {
-            throw new IllegalArgumentException("Utvikler-feil: denne metoden skal bare brukes på fritekstmarkering-start");
-        }
+        String rest = VedtaksbrevFritekst.fjernFritekstmarkering(tekst);
         for (Underavsnitt.Underavsnittstype underavsnittstype : Underavsnitt.Underavsnittstype.values()) {
             if (underavsnittstype.name().equals(rest)) {
                 return underavsnittstype;
             }
         }
         return null;
-    }
-
-    private static boolean erFritekstSlutt(String tekst) {
-        return FRITEKST_MARKERING_SLUTT.equals(tekst);
     }
 
     private static boolean erOverskrift(String tekst) {

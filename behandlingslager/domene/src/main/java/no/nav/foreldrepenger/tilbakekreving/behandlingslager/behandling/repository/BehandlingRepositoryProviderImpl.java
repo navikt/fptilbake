@@ -9,6 +9,8 @@ import javax.persistence.EntityManager;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepositoryImpl;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevdataRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevdataRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakLåsRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakLåsRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
@@ -47,6 +49,7 @@ public class BehandlingRepositoryProviderImpl implements BehandlingRepositoryPro
     private VilkårsvurderingRepository vilkårsvurderingRepository;
     private BehandlingVedtakRepository behandlingVedtakRepository;
     private VarselRepository varselRepository;
+    private BrevdataRepository brevdataRepository;
 
 
     BehandlingRepositoryProviderImpl() {
@@ -73,6 +76,7 @@ public class BehandlingRepositoryProviderImpl implements BehandlingRepositoryPro
         this.vilkårsvurderingRepository = new VilkårsvurderingRepository(entityManager);
         this.behandlingVedtakRepository = new BehandlingVedtakRepository(entityManager);
         this.varselRepository = new VarselRepository(entityManager);
+        this.brevdataRepository = new BrevdataRepositoryImpl(entityManager);
     }
 
     protected EntityManager getEntityManager() {
@@ -153,5 +157,10 @@ public class BehandlingRepositoryProviderImpl implements BehandlingRepositoryPro
     @Override
     public VarselRepository getVarselRepository() {
         return varselRepository;
+    }
+
+    @Override
+    public BrevdataRepository getBrevdataRepository() {
+        return brevdataRepository;
     }
 }

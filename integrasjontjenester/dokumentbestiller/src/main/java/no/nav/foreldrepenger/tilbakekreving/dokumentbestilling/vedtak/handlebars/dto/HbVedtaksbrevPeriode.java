@@ -133,6 +133,10 @@ public class HbVedtaksbrevPeriode implements HandlebarsData {
         return fritekstVilkår;
     }
 
+    public HendelseUnderType getHendelseundertype() {
+        return hendelseundertype;
+    }
+
     public static Builder builder() {
         return new Builder();
     }

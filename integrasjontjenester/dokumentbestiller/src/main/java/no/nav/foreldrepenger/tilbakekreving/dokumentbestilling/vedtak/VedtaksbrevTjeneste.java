@@ -18,6 +18,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultatPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BeregningResultat;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -37,7 +38,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingAktsomhetEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingEntitet;
@@ -79,42 +79,37 @@ public class VedtaksbrevTjeneste {
 
     private BehandlingRepository behandlingRepository;
     private EksternBehandlingRepository eksternBehandlingRepository;
-    private TilbakekrevingBeregningTjeneste tilbakekrevingBeregningTjeneste;
-    private BehandlingTjeneste behandlingTjeneste;
-    private EksternDataForBrevTjeneste eksternDataForBrevTjeneste;
-    private BrevdataRepository brevdataRepository;
     private FaktaFeilutbetalingRepository faktaRepository;
-    private KodeverkRepository kodeverkRepository;
-    private VilkårsvurderingRepository vilkårsvurderingRepository;
     private VurdertForeldelseRepository foreldelseRepository;
+    private VilkårsvurderingRepository vilkårsvurderingRepository;
+    private BrevdataRepository brevdataRepository;
+
+    private BehandlingTjeneste behandlingTjeneste;
     private FritekstbrevTjeneste bestillDokumentTjeneste;
     private HistorikkinnslagTjeneste historikkinnslagTjeneste;
+    private TilbakekrevingBeregningTjeneste tilbakekrevingBeregningTjeneste;
+    private EksternDataForBrevTjeneste eksternDataForBrevTjeneste;
 
     @Inject
-    public VedtaksbrevTjeneste(BehandlingRepository behandlingRepository,
-                               EksternBehandlingRepository eksternBehandlingRepository,
+    public VedtaksbrevTjeneste(BehandlingRepositoryProvider behandlingRepositoryProvider,
                                TilbakekrevingBeregningTjeneste tilbakekrevingBeregningTjeneste,
                                BehandlingTjeneste behandlingTjeneste,
                                EksternDataForBrevTjeneste eksternDataForBrevTjeneste,
-                               BrevdataRepository brevdataRepository,
-                               FaktaFeilutbetalingRepository faktaRepository,
-                               KodeverkRepository kodeverkRepository,
-                               VilkårsvurderingRepository vilkårsvurderingRepository,
-                               VurdertForeldelseRepository foreldelseRepository,
                                FritekstbrevTjeneste bestillDokumentTjeneste,
                                HistorikkinnslagTjeneste historikkinnslagTjeneste) {
-        this.behandlingRepository = behandlingRepository;
-        this.eksternBehandlingRepository = eksternBehandlingRepository;
-        this.tilbakekrevingBeregningTjeneste = tilbakekrevingBeregningTjeneste;
+        this.behandlingRepository = behandlingRepositoryProvider.getBehandlingRepository();
+        this.eksternBehandlingRepository = behandlingRepositoryProvider.getEksternBehandlingRepository();
+        this.faktaRepository = behandlingRepositoryProvider.getFaktaFeilutbetalingRepository();
+        this.foreldelseRepository = behandlingRepositoryProvider.getVurdertForeldelseRepository();
+        this.vilkårsvurderingRepository = behandlingRepositoryProvider.getVilkårsvurderingRepository();
+        this.brevdataRepository = behandlingRepositoryProvider.getBrevdataRepository();
+
         this.behandlingTjeneste = behandlingTjeneste;
-        this.eksternDataForBrevTjeneste = eksternDataForBrevTjeneste;
-        this.brevdataRepository = brevdataRepository;
-        this.faktaRepository = faktaRepository;
-        this.kodeverkRepository = kodeverkRepository;
-        this.vilkårsvurderingRepository = vilkårsvurderingRepository;
-        this.foreldelseRepository = foreldelseRepository;
         this.bestillDokumentTjeneste = bestillDokumentTjeneste;
         this.historikkinnslagTjeneste = historikkinnslagTjeneste;
+        this.tilbakekrevingBeregningTjeneste = tilbakekrevingBeregningTjeneste;
+        this.eksternDataForBrevTjeneste = eksternDataForBrevTjeneste;
+
     }
 
     public VedtaksbrevTjeneste() {
@@ -178,8 +173,10 @@ public class VedtaksbrevTjeneste {
         UUID fpsakBehandlingUuid = eksternBehandling.getEksternUuid();
         Behandling behandling = behandlingTjeneste.hentBehandling(behandlingId);
 
+        //TODO hent data i et tidlig steg og hent fra repository
         SamletEksternBehandlingInfo fpsakBehandling = eksternDataForBrevTjeneste.hentBehandlingFpsak(fpsakBehandlingUuid, Tillegsinformasjon.PERSONOPPLYSNINGER, Tillegsinformasjon.SØKNAD);
 
+        //FIXME hent fra repository
         Long varsletFeilutbetaling = eksternDataForBrevTjeneste.hentFeilutbetaltePerioder(fpsakBehandlingId).getSumFeilutbetaling(); //TODO gjelder bare orginalt varsel
 
         BeregningResultat beregnetResultat = tilbakekrevingBeregningTjeneste.beregn(behandlingId);
@@ -332,8 +329,7 @@ public class VedtaksbrevTjeneste {
         return null;
     }
 
-    private VilkårVurderingPeriodeEntitet finnVilkårvurdering(Periode
-                                                                  periode, List<VilkårVurderingPeriodeEntitet> vilkårPerioder) {
+    private VilkårVurderingPeriodeEntitet finnVilkårvurdering(Periode periode, List<VilkårVurderingPeriodeEntitet> vilkårPerioder) {
         for (VilkårVurderingPeriodeEntitet vurdering : vilkårPerioder) {
             if (vurdering.getPeriode().omslutter(periode)) {
                 return vurdering;
@@ -345,8 +341,7 @@ public class VedtaksbrevTjeneste {
     private HendelseType finnHendelseType(Periode periode, FaktaFeilutbetaling fakta) {
         for (FaktaFeilutbetalingPeriode faktaPeriode : fakta.getFeilutbetaltPerioder()) {
             if (faktaPeriode.getPeriode().omslutter(periode)) {
-                //FIXME entitet skal tilby HendelseType direkte
-                return kodeverkRepository.finn(HendelseType.class, faktaPeriode.getÅrsak());
+                return faktaPeriode.getHendelseType();
             }
         }
         throw new IllegalArgumentException("Fant ikke fakta-periode som omslutter periode " + periode);
@@ -355,8 +350,7 @@ public class VedtaksbrevTjeneste {
     private HendelseUnderType finnHendelseUnderType(Periode periode, FaktaFeilutbetaling fakta) {
         for (FaktaFeilutbetalingPeriode faktaPeriode : fakta.getFeilutbetaltPerioder()) {
             if (faktaPeriode.getPeriode().omslutter(periode)) {
-                //FIXME entitet skal tilby HendelseType direkte
-                return kodeverkRepository.finn(HendelseUnderType.class, faktaPeriode.getUnderÅrsak());
+                return faktaPeriode.getHendelseUndertype();
             }
         }
         throw new IllegalArgumentException("Fant ikke fakta-periode som omslutter periode " + periode);

@@ -2,6 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager;
 
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevdataRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLåsRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingresultatRepository;
@@ -48,5 +49,7 @@ public interface BehandlingRepositoryProvider {
     BehandlingVedtakRepository getBehandlingVedtakRepository();
 
     VarselRepository getVarselRepository();
+
+    BrevdataRepository getBrevdataRepository();
 
 }

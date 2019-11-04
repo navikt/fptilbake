@@ -217,7 +217,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
 
     @Test
     public void skal_parse_tekst_til_avsnitt() {
-        Avsnitt resultat = TekstformatererVedtaksbrev.parseTekst("_Hovedoverskrift i brevet\n\nBrødtekst første avsnitt\n\nBrødtekst andre avsnitt\n\n_underoverskrift\n\nBrødtekst tredje avsnitt\n\n_Avsluttende overskrift uten etterfølgende tekst\n" + TekstformatererVedtaksbrev.markerFritekst(null), new Avsnitt.Builder(), null).build();
+        Avsnitt resultat = TekstformatererVedtaksbrev.parseTekst("_Hovedoverskrift i brevet\n\nBrødtekst første avsnitt\n\nBrødtekst andre avsnitt\n\n_underoverskrift\n\nBrødtekst tredje avsnitt\n\n_Avsluttende overskrift uten etterfølgende tekst\n" + VedtaksbrevFritekst.markerValgfriFritekst(null), new Avsnitt.Builder(), null).build();
         assertThat(resultat.getOverskrift()).isEqualTo("Hovedoverskrift i brevet");
         List<Underavsnitt> underavsnitt = resultat.getUnderavsnittsliste();
         assertThat(underavsnitt).hasSize(4);
@@ -237,7 +237,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
 
     @Test
     public void skal_plassere_fritekstfelt_etter_første_avsnitt_når_det_er_valgt() {
-        Avsnitt resultat = TekstformatererVedtaksbrev.parseTekst("_Hovedoverskrift i brevet\n\nBrødtekst første avsnitt\n" + TekstformatererVedtaksbrev.markerFritekst(null) + "\nBrødtekst andre avsnitt\n\n_underoverskrift\n\nBrødtekst tredje avsnitt\n\n_Avsluttende overskrift uten etterfølgende tekst", new Avsnitt.Builder(), null).build();
+        Avsnitt resultat = TekstformatererVedtaksbrev.parseTekst("_Hovedoverskrift i brevet\n\nBrødtekst første avsnitt\n" + VedtaksbrevFritekst.markerValgfriFritekst(null) + "\nBrødtekst andre avsnitt\n\n_underoverskrift\n\nBrødtekst tredje avsnitt\n\n_Avsluttende overskrift uten etterfølgende tekst", new Avsnitt.Builder(), null).build();
         assertThat(resultat.getOverskrift()).isEqualTo("Hovedoverskrift i brevet");
         List<Underavsnitt> underavsnitt = resultat.getUnderavsnittsliste();
         assertThat(underavsnitt).hasSize(4);
@@ -258,7 +258,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
     @Test
     public void skal_plassere_fritekstfelt_etter_overskriften_når_det_er_valgt() {
         Avsnitt.Builder avsnittbuilder = new Avsnitt.Builder().medOverskrift("Hovedoverskrift");
-        Avsnitt resultat = TekstformatererVedtaksbrev.parseTekst("_underoverskrift 1\n" + TekstformatererVedtaksbrev.markerFritekst(null) + "\nBrødtekst første avsnitt\n\n_underoverskrift 2\n\nBrødtekst andre avsnitt", avsnittbuilder, null).build();
+        Avsnitt resultat = TekstformatererVedtaksbrev.parseTekst("_underoverskrift 1\n" + VedtaksbrevFritekst.markerValgfriFritekst(null) + "\nBrødtekst første avsnitt\n\n_underoverskrift 2\n\nBrødtekst andre avsnitt", avsnittbuilder, null).build();
         assertThat(resultat.getOverskrift()).isEqualTo("Hovedoverskrift");
         List<Underavsnitt> underavsnitt = resultat.getUnderavsnittsliste();
         assertThat(underavsnitt).hasSize(3);
@@ -277,7 +277,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
     public void skal_parse_fritekstfelt_med_eksisterende_fritekst() {
         Avsnitt.Builder avsnittbuilder = new Avsnitt.Builder().medOverskrift("Hovedoverskrift");
         Avsnitt resultat = TekstformatererVedtaksbrev.parseTekst("_underoverskrift 1\n"
-                + TekstformatererVedtaksbrev.markerFritekst("fritekst linje 1\n\nfritekst linje2")
+                + VedtaksbrevFritekst.markerValgfriFritekst("fritekst linje 1\n\nfritekst linje2")
             , avsnittbuilder, null).build();
         assertThat(resultat.getOverskrift()).isEqualTo("Hovedoverskrift");
         List<Underavsnitt> underavsnitt = resultat.getUnderavsnittsliste();
@@ -292,9 +292,9 @@ public class TekstformatererVedtaksbrevIBiterTest {
     public void skal_skille_mellom_påkrevet_og_valgfritt_fritekstfelt() {
         Avsnitt.Builder avsnittbuilder = new Avsnitt.Builder().medOverskrift("Hovedoverskrift");
         Avsnitt resultat = TekstformatererVedtaksbrev.parseTekst("_underoverskrift 1\n"
-                + TekstformatererVedtaksbrev.markerPåkrevetFritekst(null)
+                + VedtaksbrevFritekst.markerPåkrevetFritekst(null, null)
                 + "\n_underoverskrift 2\n"
-                + TekstformatererVedtaksbrev.markerFritekst(null)
+                + VedtaksbrevFritekst.markerValgfriFritekst(null)
             , avsnittbuilder, null).build();
         assertThat(resultat.getOverskrift()).isEqualTo("Hovedoverskrift");
         List<Underavsnitt> underavsnitt = resultat.getUnderavsnittsliste();
@@ -316,9 +316,9 @@ public class TekstformatererVedtaksbrevIBiterTest {
     public void skal_utlede_underavsnittstype_fra_fritekstmarkering_slik_at_det_er_mulig_å_skille_mellom_særlige_grunner_og_andre_særlige_grunner() {
         Avsnitt.Builder avsnittbuilder = new Avsnitt.Builder().medOverskrift("Hovedoverskrift");
         Avsnitt resultat = TekstformatererVedtaksbrev.parseTekst("_underoverskrift 1\n"
-                + TekstformatererVedtaksbrev.markerFritekst(null, Underavsnitt.Underavsnittstype.SÆRLIGEGRUNNER)
+                + VedtaksbrevFritekst.markerValgfriFritekst(null, Underavsnitt.Underavsnittstype.SÆRLIGEGRUNNER)
                 + "\n_underoverskrift 2\n"
-                + "brødtekst " + TekstformatererVedtaksbrev.markerFritekst(null, Underavsnitt.Underavsnittstype.SÆRLIGEGRUNNER_ANNET)
+                + "brødtekst " + VedtaksbrevFritekst.markerValgfriFritekst(null, Underavsnitt.Underavsnittstype.SÆRLIGEGRUNNER_ANNET)
                 + "\n_underoverskrift 3\n"
             , avsnittbuilder, null).build();
         assertThat(resultat.getOverskrift()).isEqualTo("Hovedoverskrift");

@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.assertj.core.util.Lists;
 import org.junit.Before;
@@ -31,6 +32,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProviderImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.TestFagsakUtil;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
@@ -54,14 +57,16 @@ public class ForeslåVedtakOppdatererTest {
     private ForeslåVedtakTjeneste foreslåVedtakTjeneste = new ForeslåVedtakTjeneste(beregningTjenesteMock, historikkTjenesteAdapterMock);
     private TotrinnTjeneste totrinnTjenesteMock = mock(TotrinnTjeneste.class);
     private VilkårsvurderingRepository vilkårsvurderingRepository = mock(VilkårsvurderingRepository.class);
+    private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository = mock(FaktaFeilutbetalingRepository.class);
 
-    private final VedtaksbrevFritekstTjeneste vedtaksbrevFritekstTjeneste = new VedtaksbrevFritekstTjeneste(vilkårsvurderingRepository, brevdataRepository);
+    private final VedtaksbrevFritekstTjeneste vedtaksbrevFritekstTjeneste = new VedtaksbrevFritekstTjeneste(faktaFeilutbetalingRepository, vilkårsvurderingRepository, brevdataRepository);
     private ForeslåVedtakOppdaterer foreslåVedtakOppdaterer = new ForeslåVedtakOppdaterer(foreslåVedtakTjeneste, totrinnTjenesteMock, aksjonspunktRepository, vedtaksbrevFritekstTjeneste);
 
     @Before
     public void setup() {
         when(historikkTjenesteAdapterMock.tekstBuilder()).thenReturn(new HistorikkInnslagTekstBuilder());
         when(beregningTjenesteMock.beregn(anyLong())).thenReturn(new BeregningResultat());
+        when(faktaFeilutbetalingRepository.finnFaktaOmFeilutbetaling(anyLong())).thenReturn(Optional.of(new FaktaFeilutbetaling()));
     }
 
     @Test

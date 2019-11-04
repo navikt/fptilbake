@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
@@ -20,8 +21,6 @@ import org.hibernate.annotations.JoinFormula;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.FellesUndertyper;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.vedtak.felles.jpa.BaseEntitet;
 
@@ -66,34 +65,12 @@ public class FaktaFeilutbetalingPeriode extends BaseEntitet {
         return periode;
     }
 
-    @Deprecated //FIXME bruk getHendelse isdedet
-    public String getÅrsak() {
-        return hendelseType.getKode();
-    }
-
-    @Deprecated //FIXME bruk getHendelse isdedet
-    public String getÅrsakKodeverk() {
-        return hendelseType.getKodeverk();
-    }
-
-    @Deprecated //FIXME bruk getHendelseUndertype isdedet
-    public String getUnderÅrsak() {
-        //TODO returner IKKE_SATT direkte isdf null, må tilpasse håndtering andre steder i koden
-        return FellesUndertyper.IKKE_SATT.equals(hendelseUndertype) ? null : hendelseUndertype.getKode();
-    }
-
-    @Deprecated //FIXME bruk getHendelseUndertype isdedet
-    public String getUnderÅrsakKodeverk() {
-        return hendelseUndertype.getKodeverk();
-    }
-
     public HendelseType getHendelseType() {
         return hendelseType;
     }
 
     public HendelseUnderType getHendelseUndertype() {
-        //TODO returner IKKE_SATT direkte isdf null, må tilpasse håndtering andre steder i koden
-        return FellesUndertyper.IKKE_SATT.equals(hendelseUndertype) ? null : hendelseUndertype;
+        return hendelseUndertype;
     }
 
     public static Builder builder() {
@@ -124,35 +101,25 @@ public class FaktaFeilutbetalingPeriode extends BaseEntitet {
         }
 
         public Builder medHendelseUndertype(HendelseUnderType hendelseUndertype) {
-            this.kladd.hendelseUndertype = hendelseUndertype != null ? hendelseUndertype : FellesUndertyper.IKKE_SATT;
-            return this;
-        }
-
-        @Deprecated // FIXME bruk medHendelseType
-        public Builder medÅrsak(String årsak, KodeverkRepository kodeverkRepository) {
-            this.kladd.hendelseType = kodeverkRepository.finn(HendelseType.class, årsak);
-            return this;
-        }
-
-        @Deprecated // FIXME bruk medHendelseUndertype
-        public Builder medUnderÅrsak(String underÅrsak, KodeverkRepository kodeverkRepository) {
-            String kode = underÅrsak == null ? FellesUndertyper.IKKE_SATT.getKode() : underÅrsak;
-            this.kladd.hendelseUndertype = kodeverkRepository.finn(HendelseUnderType.class, kode);
+            this.kladd.hendelseUndertype = hendelseUndertype;
             return this;
         }
 
         public FaktaFeilutbetalingPeriode build() {
-            //FIXME valider at bygd riktig
+            Objects.requireNonNull(kladd.getPeriode(), "Periode må være satt");
+            Objects.requireNonNull(kladd.getHendelseType(), "HendelseType må være satt");
+            Objects.requireNonNull(kladd.getHendelseUndertype(), "HendelseUndertype må være satt");
             return kladd;
         }
     }
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "<id=" + id //$NON-NLS-1$
-            + ", periode=" + periode //$NON-NLS-1$
-            + ", hendelseType=" + hendelseType //$NON-NLS-1$
-            + ", hendelseUndertype=" + hendelseUndertype //$NON-NLS-1$
+        return getClass().getSimpleName() +
+            "<" //$NON-NLS-1$
+            + "periode=" + periode //$NON-NLS-1$
+            + ", hendelseType=" + hendelseType.getKode() //$NON-NLS-1$
+            + ", hendelseUndertype=" + hendelseUndertype.getKode() //$NON-NLS-1$
             + ">"; //$NON-NLS-1$
 
     }
