@@ -156,7 +156,7 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
     public void skal_opprette_behandling_automatisk() {
         avsluttBehandling();
         Long behandlingId = behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer, UUID.randomUUID(), eksternBehandlingId, aktørId, FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING);
-        fellesBehandlingAssert(behandlingId);
+        fellesBehandlingAssert(behandlingId,false);
     }
 
 
@@ -170,7 +170,7 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
     public void skal_opprette_behandling_manell() {
         avsluttBehandling();
         Long behandlingId = behandlingTjeneste.opprettBehandlingManuell(saksnummer, UUID.randomUUID(), FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING);
-        fellesBehandlingAssert(behandlingId);
+        fellesBehandlingAssert(behandlingId,true);
     }
 
     @Test
@@ -186,7 +186,7 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
         revurderingTjeneste.opprettRevurdering(saksnummer, eksternBehandlingUuid, BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR, BehandlingType.REVURDERING_TILBAKEKREVING);
 
         Long behandlingId = behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternUUID, FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING);
-        fellesBehandlingAssert(behandlingId);
+        fellesBehandlingAssert(behandlingId,true);
     }
 
     @Test
@@ -203,7 +203,7 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
         avsluttBehandling();
 
         Long behandlingId = behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternBehandlingUuid, FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING);
-        fellesBehandlingAssert(behandlingId);
+        fellesBehandlingAssert(behandlingId,true);
     }
 
     @Test
@@ -285,7 +285,7 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
         assertThat(fakta.getBehandlingÅrsaker().size()).isEqualTo(1);
     }
 
-    private void fellesBehandlingAssert(Long behandlingId) {
+    private void fellesBehandlingAssert(Long behandlingId,boolean manueltOpprettet) {
         assertThat(behandlingId).isNotNull();
         Behandling behandling = behandlingTjeneste.hentBehandling(behandlingId);
         assertThat(behandling).isNotNull();
@@ -293,6 +293,7 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
         assertThat(behandling.getType()).isEqualByComparingTo(BehandlingType.TILBAKEKREVING);
         assertThat(behandling.getBehandlendeEnhetId()).isNotEmpty();
         assertThat(behandling.getBehandlendeEnhetNavn()).isNotEmpty();
+        assertThat(behandling.isManueltOpprettet()).isEqualTo(manueltOpprettet);
     }
 
     private EksternBehandlingsinfoDto lagEksternBehandlingsInfo() {

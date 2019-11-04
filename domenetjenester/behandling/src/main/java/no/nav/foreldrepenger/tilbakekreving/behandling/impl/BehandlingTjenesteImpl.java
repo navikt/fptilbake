@@ -243,11 +243,13 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
 
         validateHarIkkeÅpenTilbakekrevingBehandling(saksnummer, eksternUuid);
 
+        boolean manueltOpprettet = false;
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto;
         if (aktørId == null) {
             SamletEksternBehandlingInfo samletEksternBehandlingInfo = hentEksternBehandlingMedAktørId(eksternUuid);
             aktørId = samletEksternBehandlingInfo.getAktørId();
             eksternBehandlingsinfoDto = samletEksternBehandlingInfo.getGrunninformasjon();
+            manueltOpprettet = true;
         } else {
             eksternBehandlingsinfoDto = hentEksternBehandlingFraFpsak(eksternUuid);
         }
@@ -255,7 +257,8 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
 
         Fagsak fagsak = fagsakTjeneste.opprettFagsak(saksnummer, aktørId, fagsakYtelseType);
 
-        Behandling behandling = Behandling.nyBehandlingFor(fagsak, behandlingType).build();
+        Behandling behandling = Behandling.nyBehandlingFor(fagsak, behandlingType)
+            .medManueltOpprettet(manueltOpprettet).build();
         OrganisasjonsEnhet organisasjonsEnhet = new OrganisasjonsEnhet(eksternBehandlingsinfoDto.getBehandlendeEnhetId(), eksternBehandlingsinfoDto.getBehandlendeEnhetNavn());
         behandling.setBehandlendeOrganisasjonsEnhet(organisasjonsEnhet);
 
