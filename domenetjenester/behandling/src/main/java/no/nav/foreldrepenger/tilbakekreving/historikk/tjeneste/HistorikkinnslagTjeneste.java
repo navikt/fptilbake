@@ -104,13 +104,14 @@ public class HistorikkinnslagTjeneste {
         if (historikkinnslagForBehandlingStartetErLoggetTidligere(behandling.getId(), HistorikkinnslagType.BEH_STARTET)) {
             return;
         }
+        HistorikkAktør historikkAktør = behandling.isManueltOpprettet() ? HistorikkAktør.SAKSBEHANDLER : HistorikkAktør.VEDTAKSLØSNINGEN;
 
         opprettHistorikkinnslag(
             behandling.getId(),
             behandling.getAktørId(),
             behandling.getFagsakId(),
             HistorikkinnslagType.TBK_OPPR,
-            HistorikkAktør.VEDTAKSLØSNINGEN,
+            historikkAktør,
             Collections.emptyList());
     }
 

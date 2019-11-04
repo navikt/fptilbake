@@ -11,6 +11,11 @@ import org.junit.Test;
 
 import no.nav.foreldrepenger.domene.dokumentarkiv.journal.JournalTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagDokumentLink;
@@ -62,6 +67,25 @@ public class HistorikkinnslagTjenesteTest extends FellesTestOppsett {
 
         Historikkinnslag historikkinnslag = historikkinnslagene.get(0);
         assertThat(historikkinnslag.getAktør()).isEqualByComparingTo(HistorikkAktør.VEDTAKSLØSNINGEN);
+        assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.TBK_OPPR);
+        assertThat(historikkinnslag.getDokumentLinker()).isEmpty();
+        verify(mockJournalTjeneste, never()).hentMetadata(null);
+    }
+
+    @Test
+    public void opprettHistorikkinnslagForOpprettetTilbakekreving_med_manuelt() {
+        Fagsak fagsak = fagsakTjeneste.opprettFagsak(saksnummer,aktørId, FagsakYtelseType.FORELDREPENGER);
+        Behandling behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).medManueltOpprettet(true).build();
+        BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(behandling);
+        behandlingRepository.lagre(behandling,behandlingLås);
+
+        historikkinnslagTjeneste.opprettHistorikkinnslagForOpprettetBehandling(behandling);
+
+        List<Historikkinnslag> historikkinnslagene = historikkRepository.hentHistorikk(behandling.getId());
+        assertThat(historikkinnslagene).isNotEmpty();
+
+        Historikkinnslag historikkinnslag = historikkinnslagene.get(0);
+        assertThat(historikkinnslag.getAktør()).isEqualByComparingTo(HistorikkAktør.SAKSBEHANDLER);
         assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.TBK_OPPR);
         assertThat(historikkinnslag.getDokumentLinker()).isEmpty();
         verify(mockJournalTjeneste, never()).hentMetadata(null);
