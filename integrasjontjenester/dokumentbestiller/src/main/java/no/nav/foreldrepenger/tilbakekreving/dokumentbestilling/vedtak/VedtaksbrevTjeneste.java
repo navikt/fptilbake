@@ -345,8 +345,7 @@ public class VedtaksbrevTjeneste {
     private HendelseType finnHendelseType(Periode periode, FaktaFeilutbetaling fakta) {
         for (FaktaFeilutbetalingPeriode faktaPeriode : fakta.getFeilutbetaltPerioder()) {
             if (faktaPeriode.getPeriode().omslutter(periode)) {
-                //FIXME entitet skal tilby HendelseType direkte
-                return kodeverkRepository.finn(HendelseType.class, faktaPeriode.getÅrsak());
+                return faktaPeriode.getHendelseType();
             }
         }
         throw new IllegalArgumentException("Fant ikke fakta-periode som omslutter periode " + periode);
@@ -355,8 +354,7 @@ public class VedtaksbrevTjeneste {
     private HendelseUnderType finnHendelseUnderType(Periode periode, FaktaFeilutbetaling fakta) {
         for (FaktaFeilutbetalingPeriode faktaPeriode : fakta.getFeilutbetaltPerioder()) {
             if (faktaPeriode.getPeriode().omslutter(periode)) {
-                //FIXME entitet skal tilby HendelseType direkte
-                return kodeverkRepository.finn(HendelseUnderType.class, faktaPeriode.getUnderÅrsak());
+                return faktaPeriode.getHendelseUndertype();
             }
         }
         throw new IllegalArgumentException("Fant ikke fakta-periode som omslutter periode " + periode);

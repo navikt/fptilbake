@@ -66,27 +66,6 @@ public class FaktaFeilutbetalingPeriode extends BaseEntitet {
         return periode;
     }
 
-    @Deprecated //FIXME bruk getHendelse isdedet
-    public String getÅrsak() {
-        return hendelseType.getKode();
-    }
-
-    @Deprecated //FIXME bruk getHendelse isdedet
-    public String getÅrsakKodeverk() {
-        return hendelseType.getKodeverk();
-    }
-
-    @Deprecated //FIXME bruk getHendelseUndertype isdedet
-    public String getUnderÅrsak() {
-        //TODO returner IKKE_SATT direkte isdf null, må tilpasse håndtering andre steder i koden
-        return FellesUndertyper.IKKE_SATT.equals(hendelseUndertype) ? null : hendelseUndertype.getKode();
-    }
-
-    @Deprecated //FIXME bruk getHendelseUndertype isdedet
-    public String getUnderÅrsakKodeverk() {
-        return hendelseUndertype.getKodeverk();
-    }
-
     public HendelseType getHendelseType() {
         return hendelseType;
     }
