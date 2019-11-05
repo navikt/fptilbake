@@ -196,6 +196,7 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
         KravgrunnlagPeriode432 p = KravgrunnlagPeriode432.builder()
             .medPeriode(periode)
             .medKravgrunnlag431(grunnlag)
+            .medBeløpSkattMnd(BigDecimal.valueOf(1000))
             .build();
         p.leggTilBeløp(KravgrunnlagBelop433.builder()
             .medKlasseKode(KlasseKode.FPATORD)
