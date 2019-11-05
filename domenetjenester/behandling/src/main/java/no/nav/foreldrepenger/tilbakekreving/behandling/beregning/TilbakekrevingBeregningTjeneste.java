@@ -204,13 +204,18 @@ public class TilbakekrevingBeregningTjeneste {
 
     private static void sjekkOgJusterTotalSkattBeløp(List<KravgrunnlagPeriode432> kgPerioder, List<BeregningResultatPeriode> resultat) {
         for (KravgrunnlagPeriode432 periode432 : kgPerioder) {
-            List<BeregningResultatPeriode> bgPerioder = resultat.stream().filter(periode -> periode.getPeriode().overlapper(periode432.getPeriode())).collect(Collectors.toList());
+            Periode kgPeriode = periode432.getPeriode();
+            List<BeregningResultatPeriode> bgPerioder = resultat.stream().filter(periode -> periode.getPeriode().overlapper(kgPeriode)).collect(Collectors.toList());
             BigDecimal totalBeregnetSkattBeløp = BigDecimal.ZERO;
             for (BeregningResultatPeriode beregningResultatPeriode : bgPerioder) {
-                totalBeregnetSkattBeløp = totalBeregnetSkattBeløp.add(beregningResultatPeriode.getSkattBeløp());
-                BigDecimal diff = totalBeregnetSkattBeløp.subtract(periode432.getBeløpSkattMnd());
-                if (diff.signum() > 0) {
-                    beregningResultatPeriode.setSkattBeløp(beregningResultatPeriode.getSkattBeløp().subtract(diff));
+                if (!beregningResultatPeriode.getPeriode().omslutter(kgPeriode)) {
+                    totalBeregnetSkattBeløp = totalBeregnetSkattBeløp.add(beregningResultatPeriode.getSkattBeløp());
+                    BigDecimal diff = totalBeregnetSkattBeløp.subtract(periode432.getBeløpSkattMnd());
+                    if (diff.signum() > 0) {
+                        var skattBeløp = beregningResultatPeriode.getSkattBeløp();
+                        beregningResultatPeriode.setSkattBeløp(skattBeløp.subtract(diff));
+                        beregningResultatPeriode.setTilbakekrevingBeløpEtterSkatt(beregningResultatPeriode.getTilbakekrevingBeløp().subtract(skattBeløp));
+                    }
                 }
             }
 
