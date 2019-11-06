@@ -140,14 +140,13 @@ public class BehandlingRestTjeneste {
 
     @GET
     @Path("/kan-opprettes")
-    @ApiOperation(value = "Sjekk om behandling eller revurdering kan opprettes")
+    @ApiOperation(value = "Sjekk om behandling kan opprettes")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "OK"),
     })
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     public Response kanOpprettesBehandling(@NotNull @QueryParam("saksnummer") @Valid SaksnummerDto saksnummerDto,
-                                           @NotNull @QueryParam("uuid") @Valid FpsakUuidDto fpsakUuidDto,
-                                           @QueryParam("behandlingId") @Valid BehandlingIdDto idDto) {
+                                           @NotNull @QueryParam("uuid") @Valid FpsakUuidDto fpsakUuidDto) {
         KanBehandlingOpprettesDto kanBehandlingOpprettesDto = new KanBehandlingOpprettesDto();
         Saksnummer saksnummer = new Saksnummer(saksnummerDto.getVerdi());
         UUID eksternUUID = fpsakUuidDto.getUuid();
@@ -155,11 +154,21 @@ public class BehandlingRestTjeneste {
         boolean result = behandlingTjeneste.kanOppretteBehandling(saksnummer, eksternUUID);
         kanBehandlingOpprettesDto.setKanBehandlingOpprettes(result);
 
-        if(idDto != null){
-            EksternBehandling eksternBehandling = revurderingTjeneste.hentEksternBehandling(idDto.getBehandlingId());
-            result = revurderingTjeneste.kanOppretteRevurdering(eksternBehandling.getEksternUuid());
-            kanBehandlingOpprettesDto.setKanRevurderingOpprettes(result);
-        }
+        return Response.ok(kanBehandlingOpprettesDto).build();
+    }
+
+    @GET
+    @Path("/kan-revurdering-opprettes")
+    @ApiOperation(value = "Sjekk om revurdering kan opprettes")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK"),
+    })
+    @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
+    public Response kanOpprettesRevurdering(@NotNull @QueryParam("behandlingId") @Valid BehandlingIdDto idDto) {
+        KanBehandlingOpprettesDto kanBehandlingOpprettesDto = new KanBehandlingOpprettesDto();
+        EksternBehandling eksternBehandling = revurderingTjeneste.hentEksternBehandling(idDto.getBehandlingId());
+        boolean result = revurderingTjeneste.kanOppretteRevurdering(eksternBehandling.getEksternUuid());
+        kanBehandlingOpprettesDto.setKanRevurderingOpprettes(result);
 
         return Response.ok(kanBehandlingOpprettesDto).build();
     }

@@ -122,7 +122,7 @@ public class BehandlingRestTjenesteTest {
     public void test_kan_behandling_opprettes_med_tilbakekreving() {
         when(behandlingTjenesteMock.kanOppretteBehandling(any(Saksnummer.class), any(UUID.class))).thenReturn(true);
 
-        Response response = behandlingRestTjeneste.kanOpprettesBehandling(saksnummerDto, fpsakUuidDto, null);
+        Response response = behandlingRestTjeneste.kanOpprettesBehandling(saksnummerDto, fpsakUuidDto);
         assertThat(response.getEntity()).isNotNull();
         KanBehandlingOpprettesDto kanBehandlingOpprettesDto = (KanBehandlingOpprettesDto) response.getEntity();
         assertThat(kanBehandlingOpprettesDto.isKanBehandlingOpprettes()).isTrue();
@@ -135,23 +135,10 @@ public class BehandlingRestTjenesteTest {
         when(revurderingTjenesteMock.hentEksternBehandling(anyLong())).thenReturn(opprettEksternBehandling());
         when(revurderingTjenesteMock.kanOppretteRevurdering(any(UUID.class))).thenReturn(true);
 
-        Response response = behandlingRestTjeneste.kanOpprettesBehandling(saksnummerDto, fpsakUuidDto, behandlingIdDto);
+        Response response = behandlingRestTjeneste.kanOpprettesRevurdering(behandlingIdDto);
         assertThat(response.getEntity()).isNotNull();
         KanBehandlingOpprettesDto kanBehandlingOpprettesDto = (KanBehandlingOpprettesDto) response.getEntity();
         assertThat(kanBehandlingOpprettesDto.isKanBehandlingOpprettes()).isFalse();
-        assertThat(kanBehandlingOpprettesDto.isKanRevurderingOpprettes()).isTrue();
-    }
-
-    @Test
-    public void test_kan_behandling_opprettes_med_tilbakekreving_og_revurdering() {
-        when(behandlingTjenesteMock.kanOppretteBehandling(any(Saksnummer.class), any(UUID.class))).thenReturn(true);
-        when(revurderingTjenesteMock.hentEksternBehandling(anyLong())).thenReturn(opprettEksternBehandling());
-        when(revurderingTjenesteMock.kanOppretteRevurdering(any(UUID.class))).thenReturn(true);
-
-        Response response = behandlingRestTjeneste.kanOpprettesBehandling(saksnummerDto, fpsakUuidDto, behandlingIdDto);
-        assertThat(response.getEntity()).isNotNull();
-        KanBehandlingOpprettesDto kanBehandlingOpprettesDto = (KanBehandlingOpprettesDto) response.getEntity();
-        assertThat(kanBehandlingOpprettesDto.isKanBehandlingOpprettes()).isTrue();
         assertThat(kanBehandlingOpprettesDto.isKanRevurderingOpprettes()).isTrue();
     }
 
