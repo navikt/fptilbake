@@ -214,7 +214,7 @@ public class TilbakekrevingBeregningTjeneste {
                     if (diff.signum() > 0) {
                         var skattBeløp = beregningResultatPeriode.getSkattBeløp();
                         beregningResultatPeriode.setSkattBeløp(skattBeløp.subtract(diff));
-                        beregningResultatPeriode.setTilbakekrevingBeløpEtterSkatt(beregningResultatPeriode.getTilbakekrevingBeløp().subtract(skattBeløp));
+                        beregningResultatPeriode.setTilbakekrevingBeløpEtterSkatt(beregningResultatPeriode.getTilbakekrevingBeløp().subtract(beregningResultatPeriode.getSkattBeløp()));
                     }
                 }
             }
