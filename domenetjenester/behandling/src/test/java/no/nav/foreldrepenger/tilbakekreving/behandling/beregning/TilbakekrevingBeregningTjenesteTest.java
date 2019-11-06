@@ -138,6 +138,46 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
         assertThat(beregningResultat.getVedtakResultatType()).isEqualByComparingTo(VedtakResultatType.FULL_TILBAKEBETALING);
     }
 
+    @Test
+    public void skal_beregne_tilbakekrevingsbeløp_for_periode_som_ikke_er_foreldet_medSkattProsent_når_beregnet_periode_er_på_tvers_av_grunnlag_periode() {
+        Periode periode = new Periode(LocalDate.of(2019, 5, 1), LocalDate.of(2019, 5, 3));
+        Periode periode1 = new Periode(LocalDate.of(2019, 5, 4), LocalDate.of(2019, 5, 6));
+        Periode logikkPeriode = new Periode(LocalDate.of(2019, 5, 1), LocalDate.of(2019, 5, 6));
+        Kravgrunnlag431 grunnlag = lagGrunnlag();
+        KravgrunnlagPeriode432 grunnlagPeriode = lagGrunnlagPeriode(periode,grunnlag);
+        grunnlagPeriode.leggTilBeløp(lagYtelBeløp(BigDecimal.valueOf(10),grunnlagPeriode));
+        grunnlagPeriode.leggTilBeløp(lagFeilBeløp(grunnlagPeriode));
+
+        KravgrunnlagPeriode432 grunnlagPeriode1 = lagGrunnlagPeriode(periode1,grunnlag);
+        grunnlagPeriode1.leggTilBeløp(lagYtelBeløp(BigDecimal.valueOf(10),grunnlagPeriode1));
+        grunnlagPeriode1.leggTilBeløp(lagFeilBeløp(grunnlagPeriode1));
+
+        grunnlag.leggTilPeriode(grunnlagPeriode);
+        grunnlag.leggTilPeriode(grunnlagPeriode1);
+        grunnlagRepository.lagre(internBehandlingId,grunnlag);
+
+        lagForeldelse(internBehandlingId, logikkPeriode, ForeldelseVurderingType.IKKE_FORELDET);
+        lagVilkårsvurderingMedForsett(internBehandlingId, logikkPeriode);
+
+        BeregningResultat beregningResultat = tjeneste.beregn(internBehandlingId);
+        List<BeregningResultatPeriode> resultat = beregningResultat.getBeregningResultatPerioder();
+
+        assertThat(resultat).hasSize(1);
+        BeregningResultatPeriode r = resultat.get(0);
+        assertThat(r.getPeriode()).isEqualTo(logikkPeriode);
+        assertThat(r.getTilbakekrevingBeløp()).isEqualByComparingTo(BigDecimal.valueOf(22000));
+        assertThat(r.getVurdering()).isEqualTo(Aktsomhet.FORSETT);
+        assertThat(r.getRenterProsent()).isEqualByComparingTo(BigDecimal.valueOf(10));
+        assertThat(r.getFeilutbetaltBeløp()).isEqualByComparingTo(BigDecimal.valueOf(20000));
+        assertThat(r.getManueltSattTilbakekrevingsbeløp()).isNull();
+        assertThat(r.getAndelAvBeløp()).isEqualByComparingTo(BigDecimal.valueOf(100));
+        assertThat(r.getSkattBeløp()).isEqualByComparingTo(BigDecimal.valueOf(2000));
+        assertThat(r.getTilbakekrevingBeløpEtterSkatt()).isEqualByComparingTo(BigDecimal.valueOf(20000));
+
+        assertThat(beregningResultat.getVedtakResultatType()).isEqualByComparingTo(VedtakResultatType.FULL_TILBAKEBETALING);
+    }
+
+
     private void lagVilkårsvurderingMedForsett(Long behandlingId, Periode periode) {
         VilkårVurderingEntitet vurdering = new VilkårVurderingEntitet();
         VilkårVurderingPeriodeEntitet p = VilkårVurderingPeriodeEntitet.builder()
@@ -174,7 +214,48 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
     }
 
     private void lagKravgrunnlag(long behandlingId, Periode periode, BigDecimal skattProsent) {
-        Kravgrunnlag431 grunnlag = Kravgrunnlag431.builder()
+        Kravgrunnlag431 grunnlag = lagGrunnlag();
+        KravgrunnlagPeriode432 p = lagGrunnlagPeriode(periode, grunnlag);
+        p.leggTilBeløp(lagFeilBeløp(p));
+        p.leggTilBeløp(lagYtelBeløp(skattProsent, p));
+        grunnlag.leggTilPeriode(p);
+
+        grunnlagRepository.lagre(behandlingId,grunnlag);
+    }
+
+    private KravgrunnlagBelop433 lagFeilBeløp(KravgrunnlagPeriode432 p) {
+        return KravgrunnlagBelop433.builder()
+            .medKlasseKode(KlasseKode.FPATORD)
+            .medKlasseType(KlasseType.FEIL)
+            .medNyBelop(BigDecimal.valueOf(10000))
+            //TODO feltene under skal valideres i builder:
+            .medKravgrunnlagPeriode432(p)
+            .build();
+    }
+
+    private KravgrunnlagBelop433 lagYtelBeløp(BigDecimal skattProsent, KravgrunnlagPeriode432 p) {
+        return KravgrunnlagBelop433.builder()
+            .medKlasseKode(KlasseKode.FPATORD)
+            .medKlasseType(KlasseType.YTEL)
+            .medNyBelop(BigDecimal.ZERO)
+            .medOpprUtbetBelop(BigDecimal.valueOf(10000))
+            .medTilbakekrevesBelop(BigDecimal.valueOf(10000))
+            .medUinnkrevdBelop(BigDecimal.ZERO)
+            .medSkattProsent(skattProsent)
+            //TODO feltene under skal valideres i builder:
+            .medKravgrunnlagPeriode432(p).build();
+    }
+
+    private KravgrunnlagPeriode432 lagGrunnlagPeriode(Periode periode, Kravgrunnlag431 grunnlag) {
+        return KravgrunnlagPeriode432.builder()
+            .medPeriode(periode)
+            .medKravgrunnlag431(grunnlag)
+            .medBeløpSkattMnd(BigDecimal.valueOf(1000))
+            .build();
+    }
+
+    private Kravgrunnlag431 lagGrunnlag() {
+        return Kravgrunnlag431.builder()
             .medVedtakId(1111L)
             .medEksternKravgrunnlagId("123")
             .medKravStatusKode(KravStatusKode.NYTT)
@@ -193,31 +274,6 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
             .medFeltKontroll("kontroll-123")
             .medSaksBehId("VL")
             .build();
-        KravgrunnlagPeriode432 p = KravgrunnlagPeriode432.builder()
-            .medPeriode(periode)
-            .medKravgrunnlag431(grunnlag)
-            .build();
-        p.leggTilBeløp(KravgrunnlagBelop433.builder()
-            .medKlasseKode(KlasseKode.FPATORD)
-            .medKlasseType(KlasseType.FEIL)
-            .medNyBelop(BigDecimal.valueOf(10000))
-            //TODO feltene under skal valideres i builder:
-            .medKravgrunnlagPeriode432(p)
-            .build());
-        p.leggTilBeløp(KravgrunnlagBelop433.builder()
-            .medKlasseKode(KlasseKode.FPATORD)
-            .medKlasseType(KlasseType.YTEL)
-            .medNyBelop(BigDecimal.ZERO)
-            .medOpprUtbetBelop(BigDecimal.valueOf(10000))
-            .medTilbakekrevesBelop(BigDecimal.valueOf(10000))
-            .medUinnkrevdBelop(BigDecimal.ZERO)
-            .medSkattProsent(skattProsent)
-            //TODO feltene under skal valideres i builder:
-            .medKravgrunnlagPeriode432(p)
-            .build());
-        grunnlag.leggTilPeriode(p);
-
-        grunnlagRepository.lagre(behandlingId,grunnlag);
     }
 
 }

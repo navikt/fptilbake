@@ -71,6 +71,7 @@ public class TilbakekrevingVedtakPeriodeBeregner {
 
             resultat.addAll(bgResultatPerioder);
         }
+        sjekkOgJusterTotalSkattBeløp(kgPerioder, resultat);
         return resultat;
     }
 
@@ -324,6 +325,25 @@ public class TilbakekrevingVedtakPeriodeBeregner {
 
     private static BigDecimal beregnSkattBeløp(BigDecimal bruttoTilbakekrevesBeløp, BigDecimal skattProsent) {
         return bruttoTilbakekrevesBeløp.multiply(skattProsent).divide(BigDecimal.valueOf(100), 0, RoundingMode.HALF_DOWN);
+    }
+
+    private static void sjekkOgJusterTotalSkattBeløp(List<KravgrunnlagPeriode432> kgPerioder, List<TilbakekrevingPeriode> resultat) {
+        for(KravgrunnlagPeriode432 periode432 : kgPerioder){
+            List<TilbakekrevingPeriode> bgPerioder = resultat.stream().filter(periode -> periode.getPeriode().overlapper(periode432.getPeriode())).collect(Collectors.toList());
+            BigDecimal totalBeregnetSkattBeløp = BigDecimal.ZERO;
+            for(TilbakekrevingPeriode tilbakekrevingPeriode : bgPerioder){
+                for(TilbakekrevingBeløp tilbakekrevingBeløp : tilbakekrevingPeriode.getBeløp()){
+                    if(KlasseType.YTEL.equals(tilbakekrevingBeløp.getKlasseType())){
+                        totalBeregnetSkattBeløp = totalBeregnetSkattBeløp.add(tilbakekrevingBeløp.getSkattBeløp());
+                        BigDecimal diff = totalBeregnetSkattBeløp.subtract(periode432.getBeløpSkattMnd());
+                        if(diff.signum() > 0){
+                            tilbakekrevingBeløp.medSkattBeløp(tilbakekrevingBeløp.getSkattBeløp().subtract(diff));
+                        }
+                    }
+                }
+            }
+
+        }
     }
 
     interface TilbakekrevingVedtakPeriodeBeregnerFeil extends DeklarerteFeil {

@@ -34,7 +34,7 @@ public class KravgrunnlagTestBuilder {
         private int beløpNytt;
         private int utbetaltBeløp;
         private int tilbakekrevBeløp;
-        private int skattProsent;
+        private BigDecimal skattProsent;
 
         public KgBeløp(KlasseType klasseType) {
             this.klasseType = klasseType;
@@ -89,6 +89,11 @@ public class KravgrunnlagTestBuilder {
         }
 
         public KgBeløp medSkattProsent(int skattProsent){
+            this.skattProsent = BigDecimal.valueOf(skattProsent);
+            return this;
+        }
+
+        public KgBeløp medSkattProsent(BigDecimal skattProsent){
             this.skattProsent = skattProsent;
             return this;
         }
@@ -101,7 +106,7 @@ public class KravgrunnlagTestBuilder {
             builder.medKravgrunnlagPeriode432(periode);
             builder.medOpprUtbetBelop(BigDecimal.valueOf(utbetaltBeløp));
             builder.medTilbakekrevesBelop(BigDecimal.valueOf(tilbakekrevBeløp));
-            builder.medSkattProsent(BigDecimal.valueOf(skattProsent));
+            builder.medSkattProsent(skattProsent == null ? BigDecimal.ZERO : skattProsent);
             return builder.build();
         }
 
@@ -128,16 +133,17 @@ public class KravgrunnlagTestBuilder {
         }
     }
 
-    public Kravgrunnlag431 lagreKravgrunnlag(Long behandlingId, Map<Periode, List<KgBeløp>> beløp) {
-        Kravgrunnlag431 kg = lagKravgrunnlag(beløp);
+    public Kravgrunnlag431 lagreKravgrunnlag(Long behandlingId, Map<Periode, List<KgBeløp>> beløp, int... skattBeløpMnd) {
+        int skattBeløp = skattBeløpMnd.length == 0 ? 0 : skattBeløpMnd[0];
+        Kravgrunnlag431 kg = lagKravgrunnlag(beløp,skattBeløp);
         kravgrunnlagRepository.lagre(behandlingId, kg);
         return kg;
     }
 
-    public static Kravgrunnlag431 lagKravgrunnlag(Map<Periode, List<KgBeløp>> beløp) {
+    private static Kravgrunnlag431 lagKravgrunnlag(Map<Periode, List<KgBeløp>> beløp, int skattBeløpMnd) {
         Kravgrunnlag431 kg = lagKravgrunnlag();
         for (Map.Entry<Periode, List<KgBeløp>> entry : beløp.entrySet()) {
-            KravgrunnlagPeriode432 kgPeriode = new KravgrunnlagPeriode432.Builder().medPeriode(entry.getKey()).medKravgrunnlag431(kg).build();
+            KravgrunnlagPeriode432 kgPeriode = new KravgrunnlagPeriode432.Builder().medPeriode(entry.getKey()).medBeløpSkattMnd(BigDecimal.valueOf(skattBeløpMnd)).medKravgrunnlag431(kg).build();
             for (KgBeløp kgBeløp : entry.getValue()) {
                 kgPeriode.leggTilBeløp(kgBeløp.mapTilØkonomi(kgPeriode));
             }

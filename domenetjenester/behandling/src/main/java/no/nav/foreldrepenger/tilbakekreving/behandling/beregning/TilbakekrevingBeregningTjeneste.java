@@ -61,6 +61,7 @@ public class TilbakekrevingBeregningTjeneste {
         Map<Periode, BigDecimal> perioderMedBeløp = vurdertForeldelseTjeneste.beregnFeilutbetaltBeløpForPerioder(kravgrunnlag, perioder);
 
         List<BeregningResultatPeriode> beregningResultatPerioder = beregn(kravgrunnlag, vurdertForeldelse, vilkårsvurdering, perioderMedBeløp);
+        sjekkOgJusterTotalSkattBeløp(kravgrunnlag.getPerioder(), beregningResultatPerioder);
         BigDecimal totalTilbakekrevingBeløp = sum(beregningResultatPerioder, BeregningResultatPeriode::getTilbakekrevingBeløp);
         BigDecimal totalFeilutbetaltBeløp = sum(beregningResultatPerioder, BeregningResultatPeriode::getFeilutbetaltBeløp);
 
@@ -198,6 +199,27 @@ public class TilbakekrevingBeregningTjeneste {
         return liste.stream()
             .map(konverter::apply)
             .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+
+    private static void sjekkOgJusterTotalSkattBeløp(List<KravgrunnlagPeriode432> kgPerioder, List<BeregningResultatPeriode> resultat) {
+        for (KravgrunnlagPeriode432 periode432 : kgPerioder) {
+            Periode kgPeriode = periode432.getPeriode();
+            List<BeregningResultatPeriode> bgPerioder = resultat.stream().filter(periode -> periode.getPeriode().overlapper(kgPeriode)).collect(Collectors.toList());
+            BigDecimal totalBeregnetSkattBeløp = BigDecimal.ZERO;
+            for (BeregningResultatPeriode beregningResultatPeriode : bgPerioder) {
+                if (!beregningResultatPeriode.getPeriode().omslutter(kgPeriode)) {
+                    totalBeregnetSkattBeløp = totalBeregnetSkattBeløp.add(beregningResultatPeriode.getSkattBeløp());
+                    BigDecimal diff = totalBeregnetSkattBeløp.subtract(periode432.getBeløpSkattMnd());
+                    if (diff.signum() > 0) {
+                        var skattBeløp = beregningResultatPeriode.getSkattBeløp();
+                        beregningResultatPeriode.setSkattBeløp(skattBeløp.subtract(diff));
+                        beregningResultatPeriode.setTilbakekrevingBeløpEtterSkatt(beregningResultatPeriode.getTilbakekrevingBeløp().subtract(beregningResultatPeriode.getSkattBeløp()));
+                    }
+                }
+            }
+
+        }
     }
 
 }
