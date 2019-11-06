@@ -9,15 +9,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkko
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
 public class UtvidetBehandlingDto extends BehandlingDto {
 
-    @JsonProperty("behandlingKoet")
-    private boolean behandlingKøet;
-
-    @JsonProperty("ansvarligSaksbehandler")
-    private String ansvarligSaksbehandler;
-
-    @JsonProperty("sprakkode")
-    private Språkkode språkkode;
-
     @JsonProperty("behandlingHenlagt")
     private boolean behandlingHenlagt;
 
@@ -27,14 +18,6 @@ public class UtvidetBehandlingDto extends BehandlingDto {
     /** Eventuelt async status på tasks. */
     @JsonProperty("taskStatus")
     private AsyncPollingStatus taskStatus;
-
-    public String getAnsvarligSaksbehandler() {
-        return ansvarligSaksbehandler;
-    }
-
-    public Språkkode getSpråkkode() {
-        return språkkode;
-    }
 
     public boolean isBehandlingHenlagt() {
         return behandlingHenlagt;
@@ -48,24 +31,8 @@ public class UtvidetBehandlingDto extends BehandlingDto {
         return taskStatus;
     }
 
-    void setAnsvarligSaksbehandler(String ansvarligSaksbehandler) {
-        this.ansvarligSaksbehandler = ansvarligSaksbehandler;
-    }
-
-    void setSpråkkode(Språkkode språkkode) {
-        this.språkkode = språkkode;
-    }
-
     void setBehandlingHenlagt(boolean behandlingHenlagt) {
         this.behandlingHenlagt = behandlingHenlagt;
-    }
-
-    public boolean isBehandlingKoet() {
-        return behandlingKøet;
-    }
-
-    public void setBehandlingKøet(boolean behandlingKøet) {
-        this.behandlingKøet = behandlingKøet;
     }
 
     public void setOriginalBehandlingId(Long originalBehandlingId) {

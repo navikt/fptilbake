@@ -94,12 +94,9 @@ public class BehandlingDtoTjeneste {
         Behandling behandling = behandlingTjeneste.hentBehandling(behandlingId);
 
         UtvidetBehandlingDto dto = new UtvidetBehandlingDto();
-
         settStandardFelter(behandling, dto);
-        dto.setAnsvarligSaksbehandler(behandling.getAnsvarligSaksbehandler());
         boolean behandlingHenlagt = behandlingTjeneste.erBehandlingHenlagt(behandling);
         dto.setBehandlingHenlagt(behandlingHenlagt);
-        dto.setSpråkkode(behandling.getFagsak().getNavBruker().getSpråkkode());
 
         settResourceLinks(behandling, dto, behandlingHenlagt);
 
@@ -125,6 +122,8 @@ public class BehandlingDtoTjeneste {
         dto.setBehandlingPåVent(behandling.isBehandlingPåVent());
         getFristDatoBehandlingPåVent(behandling).ifPresent(dto::setFristBehandlingPåVent);
         getVenteÅrsak(behandling).ifPresent(dto::setVenteÅrsakKode);
+        dto.setAnsvarligSaksbehandler(behandling.getAnsvarligSaksbehandler());
+        dto.setSpråkkode(behandling.getFagsak().getNavBruker().getSpråkkode());
     }
 
     private void settResourceLinks(Behandling behandling, UtvidetBehandlingDto dto, boolean behandlingHenlagt) {
