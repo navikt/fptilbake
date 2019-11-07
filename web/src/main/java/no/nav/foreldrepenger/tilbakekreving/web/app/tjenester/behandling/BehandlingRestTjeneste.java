@@ -57,6 +57,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.Fps
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.GjenopptaBehandlingDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.HenleggBehandlingDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.KanBehandlingOpprettesDto;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.KanRevurderingOpprettesDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.OpprettBehandlingDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.ProsessTaskGruppeIdDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.Redirect;
@@ -165,12 +166,12 @@ public class BehandlingRestTjeneste {
     })
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     public Response kanOpprettesRevurdering(@NotNull @QueryParam("behandlingId") @Valid BehandlingIdDto idDto) {
-        KanBehandlingOpprettesDto kanBehandlingOpprettesDto = new KanBehandlingOpprettesDto();
+        KanRevurderingOpprettesDto kanRevurderingOpprettesDto = new KanRevurderingOpprettesDto();
         EksternBehandling eksternBehandling = revurderingTjeneste.hentEksternBehandling(idDto.getBehandlingId());
         boolean result = revurderingTjeneste.kanOppretteRevurdering(eksternBehandling.getEksternUuid());
-        kanBehandlingOpprettesDto.setKanRevurderingOpprettes(result);
+        kanRevurderingOpprettesDto.setKanRevurderingOpprettes(result);
 
-        return Response.ok(kanBehandlingOpprettesDto).build();
+        return Response.ok(kanRevurderingOpprettesDto).build();
     }
 
     @POST
