@@ -41,8 +41,6 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.Beh
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.FpsakUuidDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.HenleggBehandlingDto;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.KanBehandlingOpprettesDto;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.KanRevurderingOpprettesDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.OpprettBehandlingDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.SaksnummerDto;
 
@@ -125,8 +123,8 @@ public class BehandlingRestTjenesteTest {
 
         Response response = behandlingRestTjeneste.kanOpprettesBehandling(saksnummerDto, fpsakUuidDto);
         assertThat(response.getEntity()).isNotNull();
-        KanBehandlingOpprettesDto kanBehandlingOpprettesDto = (KanBehandlingOpprettesDto) response.getEntity();
-        assertThat(kanBehandlingOpprettesDto.isKanBehandlingOpprettes()).isTrue();
+        boolean result = (boolean) response.getEntity();
+        assertThat(result).isTrue();
     }
 
     @Test
@@ -137,8 +135,8 @@ public class BehandlingRestTjenesteTest {
 
         Response response = behandlingRestTjeneste.kanOpprettesRevurdering(behandlingIdDto);
         assertThat(response.getEntity()).isNotNull();
-        KanRevurderingOpprettesDto kanRevurderingOpprettesDto = (KanRevurderingOpprettesDto) response.getEntity();
-        assertThat(kanRevurderingOpprettesDto.isKanRevurderingOpprettes()).isTrue();
+        boolean result = (boolean) response.getEntity();
+        assertThat(result).isTrue();
     }
 
     private OpprettBehandlingDto opprettBehandlingDto(String saksnr, String eksternUuid, FagsakYtelseType ytelseType) {

@@ -56,8 +56,6 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.Byt
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.FpsakUuidDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.GjenopptaBehandlingDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.HenleggBehandlingDto;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.KanBehandlingOpprettesDto;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.KanRevurderingOpprettesDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.OpprettBehandlingDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.ProsessTaskGruppeIdDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.Redirect;
@@ -148,14 +146,10 @@ public class BehandlingRestTjeneste {
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     public Response kanOpprettesBehandling(@NotNull @QueryParam("saksnummer") @Valid SaksnummerDto saksnummerDto,
                                            @NotNull @QueryParam("uuid") @Valid FpsakUuidDto fpsakUuidDto) {
-        KanBehandlingOpprettesDto kanBehandlingOpprettesDto = new KanBehandlingOpprettesDto();
         Saksnummer saksnummer = new Saksnummer(saksnummerDto.getVerdi());
         UUID eksternUUID = fpsakUuidDto.getUuid();
 
-        boolean result = behandlingTjeneste.kanOppretteBehandling(saksnummer, eksternUUID);
-        kanBehandlingOpprettesDto.setKanBehandlingOpprettes(result);
-
-        return Response.ok(kanBehandlingOpprettesDto).build();
+        return Response.ok(behandlingTjeneste.kanOppretteBehandling(saksnummer, eksternUUID)).build();
     }
 
     @GET
@@ -166,12 +160,9 @@ public class BehandlingRestTjeneste {
     })
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     public Response kanOpprettesRevurdering(@NotNull @QueryParam("behandlingId") @Valid BehandlingIdDto idDto) {
-        KanRevurderingOpprettesDto kanRevurderingOpprettesDto = new KanRevurderingOpprettesDto();
         EksternBehandling eksternBehandling = revurderingTjeneste.hentEksternBehandling(idDto.getBehandlingId());
-        boolean result = revurderingTjeneste.kanOppretteRevurdering(eksternBehandling.getEksternUuid());
-        kanRevurderingOpprettesDto.setKanRevurderingOpprettes(result);
 
-        return Response.ok(kanRevurderingOpprettesDto).build();
+        return Response.ok(revurderingTjeneste.kanOppretteRevurdering(eksternBehandling.getEksternUuid())).build();
     }
 
     @POST
