@@ -24,11 +24,9 @@ public class BehandlingDto {
     private String behandlendeEnhetId;
     private String behandlendeEnhetNavn;
     private boolean toTrinnsBehandling;
-    @JsonProperty("behandlingPaaVent")
+
     private boolean behandlingPåVent;
-    @JsonProperty("fristBehandlingPaaVent")
     private String fristBehandlingPåVent;
-    @JsonProperty("venteArsakKode")
     private String venteÅrsakKode;
 
 
@@ -135,14 +133,17 @@ public class BehandlingDto {
         this.toTrinnsBehandling = toTrinnsBehandling;
     }
 
+    @JsonProperty("behandlingPaaVent")
     public boolean isBehandlingPåVent() {
         return behandlingPåVent;
     }
 
+    @JsonProperty("fristBehandlingPaaVent")
     public String getFristBehandlingPåVent() {
         return fristBehandlingPåVent;
     }
 
+    @JsonProperty("venteArsakKode")
     public String getVenteÅrsakKode() {
         return venteÅrsakKode;
     }
