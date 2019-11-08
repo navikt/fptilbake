@@ -35,14 +35,14 @@ Fordi vi oppdaget feilutbetalingen [dato], og har behandlet saken din innen ett 
         {{#if unntas-innkreving-pga-lavt-beløp}}
         {{> ikke-krev-småbeløp}}
         {{else}}
-Du har fått vite om du har rett til foreldrepenger og hvor mye du har rett til. Selv om du har meldt fra til oss, kan vi kreve tilbake det du har fått for mye dersom du burde forstått at beløpet var feil.
+Du har fått vite om du har rett til {{> ytelse-navn}} og hvor mye du har rett til. Selv om du har meldt fra til oss, kan vi kreve tilbake det du har fått for mye dersom du burde forstått at beløpet var feil.
 {{> fritekst}}
 
 Ut fra informasjonen du har fått, burde du etter vår vurdering forstått at du fikk for mye utbetalt. Derfor kan vi kreve tilbake.
         {{/if}}
     {{/if}}
     {{#if (eq aktsomhet-resultat "GROVT_UAKTSOM")}}
-Du har fått vite om du har rett til foreldrepenger og hvor mye du har rett til. Selv om du har meldt fra til oss, kan vi kreve tilbake det du har fått for mye dersom du må ha forstått at beløpet var feil.
+Du har fått vite om du har rett til {{> ytelse-navn}} og hvor mye du har rett til. Selv om du har meldt fra til oss, kan vi kreve tilbake det du har fått for mye dersom du må ha forstått at beløpet var feil.
 {{> fritekst}}
 
 Ut fra informasjonen du har fått, må du etter vår vurdering ha forstått at du fikk for mye utbetalt. Derfor kan vi kreve tilbake.
@@ -53,12 +53,12 @@ Ut fra informasjonen du har fått, må du etter vår vurdering ha forstått at d
         {{#if unntas-innkreving-pga-lavt-beløp}}
         {{> ikke-krev-småbeløp}}
         {{else}}
-Du har fått vite om du har rett til foreldrepenger og hvor mye du har rett til. Etter vår vurdering burde du forstått at opplysningene du ga oss var uriktige. Derfor kan vi kreve pengene tilbake.
+Du har fått vite om du har rett til {{> ytelse-navn}} og hvor mye du har rett til. Etter vår vurdering burde du forstått at opplysningene du ga oss var uriktige. Derfor kan vi kreve pengene tilbake.
 {{> fritekst}}
         {{/if}}
     {{/if}}
     {{#if (eq aktsomhet-resultat "GROVT_UAKTSOM")}}
-Du har fått vite om du har rett til foreldrepenger og hvor mye du har rett til. Etter vår vurdering må du ha forstått at opplysningene du ga oss var uriktige. Derfor kan vi kreve pengene tilbake.
+Du har fått vite om du har rett til {{> ytelse-navn}} og hvor mye du har rett til. Etter vår vurdering må du ha forstått at opplysningene du ga oss var uriktige. Derfor kan vi kreve pengene tilbake.
 {{> fritekst}}
     {{/if}}
 {{/if}}
@@ -67,12 +67,12 @@ Du har fått vite om du har rett til foreldrepenger og hvor mye du har rett til.
         {{#if unntas-innkreving-pga-lavt-beløp}}
         {{> ikke-krev-småbeløp}}
         {{else}}
-Du har fått vite om du har rett til foreldrepenger og hvor mye du har rett til. Etter vår vurdering burde du forstått at du ikke ga oss alle opplysningene vi trengte tidsnok for å sikre at du fikk riktig utbetaling. Derfor kan vi kreve pengene tilbake.
+Du har fått vite om du har rett til {{> ytelse-navn}} og hvor mye du har rett til. Etter vår vurdering burde du forstått at du ikke ga oss alle opplysningene vi trengte tidsnok for å sikre at du fikk riktig utbetaling. Derfor kan vi kreve pengene tilbake.
 {{> fritekst}}
         {{/if}}
     {{/if}}
     {{#if (eq aktsomhet-resultat "GROVT_UAKTSOM")}}
-Du har fått vite om du har rett til foreldrepenger og hvor mye du har rett til. Etter vår vurdering må du ha forstått at du ikke ga oss alle opplysningene vi trengte tidsnok for å sikre at du fikk riktig utbetaling. Derfor kan vi kreve pengene tilbake.
+Du har fått vite om du har rett til {{> ytelse-navn}} og hvor mye du har rett til. Etter vår vurdering må du ha forstått at du ikke ga oss alle opplysningene vi trengte tidsnok for å sikre at du fikk riktig utbetaling. Derfor kan vi kreve pengene tilbake.
 {{> fritekst}}
     {{/if}}
 {{/if}}
@@ -85,7 +85,7 @@ Vi har ikke gitt deg den informasjonen du trengte for å forstå at beløpet du 
 {{> fritekst}}
 {{/if}}
 {{#if (eq aktsomhet-resultat "FORSETT")}}
-Du har fått informasjon om hvor mye du har rett til å få i foreldrepenger og at du må melde fra om endringer til NAV. Informasjonen du har fått forklarer om du har rett til foreldrepenger og hvor mye du har rett til å få utbetalt.
+Du har fått informasjon om hvor mye du har rett til å få i {{> ytelse-navn}} og at du må melde fra om endringer til NAV. Informasjonen du har fått forklarer om du har rett til {{> ytelse-navn}} og hvor mye du har rett til å få utbetalt.
 {{>fritekst}}
 
     {{#switch vilkår-resultat}}
