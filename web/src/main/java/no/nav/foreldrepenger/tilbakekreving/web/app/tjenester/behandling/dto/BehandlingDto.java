@@ -29,11 +29,8 @@ public class BehandlingDto {
     private boolean behandlingPåVent;
     private String fristBehandlingPåVent;
     private String venteÅrsakKode;
-    @JsonProperty("sprakkode")
     private Språkkode språkkode;
-    @JsonProperty("behandlingKoet")
     private boolean behandlingKøet;
-    @JsonProperty("ansvarligSaksbehandler")
     private String ansvarligSaksbehandler;
 
 
@@ -92,14 +89,17 @@ public class BehandlingDto {
         return toTrinnsBehandling;
     }
 
+    @JsonProperty("sprakkode")
     public Språkkode getSpråkkode() {
         return språkkode;
     }
 
+    @JsonProperty("behandlingKoet")
     public boolean isBehandlingKoet() {
         return behandlingKøet;
     }
 
+    @JsonProperty("ansvarligSaksbehandler")
     public String getAnsvarligSaksbehandler() {
         return ansvarligSaksbehandler;
     }
