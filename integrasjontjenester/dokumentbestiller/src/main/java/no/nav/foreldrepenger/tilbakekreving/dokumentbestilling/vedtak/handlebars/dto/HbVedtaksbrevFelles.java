@@ -81,6 +81,11 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
         this.fritekstOppsummering = fritekstOppsummering;
     }
 
+
+    public VedtakResultatType getHovedresultat() {
+        return hovedresultat;
+    }
+
     public static class Builder {
 
         private HbVedtaksbrevFelles kladd = new HbVedtaksbrevFelles();

@@ -117,8 +117,10 @@ public class VedtaksbrevTjeneste {
 
     public void sendVedtaksbrev(Long behandlingId) {
         VedtaksbrevData vedtaksbrevData = hentDataForVedtaksbrev(behandlingId);
+        VedtakResultatType hovedresultat = vedtaksbrevData.getHovedresultat();
+        String fagsakTypeNavn = vedtaksbrevData.getMetadata().getFagsaktypenavnPåSpråk();
         FritekstbrevData data = new FritekstbrevData.Builder()
-            .medOverskrift(VedtaksbrevOverskrift.finnOverskriftVedtaksbrev(vedtaksbrevData.getMetadata().getFagsaktypenavnPåSpråk()))
+            .medOverskrift(VedtaksbrevOverskrift.finnOverskriftVedtaksbrev(fagsakTypeNavn, hovedresultat))
             .medBrevtekst(TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(vedtaksbrevData.getVedtaksbrevData()))
             .medMetadata(vedtaksbrevData.getMetadata())
             .build();
@@ -132,8 +134,10 @@ public class VedtaksbrevTjeneste {
 
     public byte[] hentForhåndsvisningVedtaksbrevSomPdf(HentForhåndvisningVedtaksbrevPdfDto dto) {
         VedtaksbrevData vedtaksbrevData = hentDataForVedtaksbrev(dto.getBehandlingId(), dto.getOppsummeringstekst(), dto.getPerioderMedTekst());
+        VedtakResultatType hovedresultat = vedtaksbrevData.getHovedresultat();
+        String fagsakTypeNavn = vedtaksbrevData.getMetadata().getFagsaktypenavnPåSpråk();
         FritekstbrevData data = new FritekstbrevData.Builder()
-            .medOverskrift(VedtaksbrevOverskrift.finnOverskriftVedtaksbrev(vedtaksbrevData.getMetadata().getFagsaktypenavnPåSpråk()))
+            .medOverskrift(VedtaksbrevOverskrift.finnOverskriftVedtaksbrev(fagsakTypeNavn, hovedresultat))
             .medBrevtekst(TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(vedtaksbrevData.getVedtaksbrevData()))
             .medMetadata(vedtaksbrevData.getMetadata())
             .build();
@@ -143,7 +147,9 @@ public class VedtaksbrevTjeneste {
 
     public List<Avsnitt> hentForhåndsvisningVedtaksbrevSomTekst(Long behandlingId) {
         VedtaksbrevData vedtaksbrevData = hentDataForVedtaksbrev(behandlingId);
-        String hovedoverskrift = VedtaksbrevOverskrift.finnOverskriftVedtaksbrev(vedtaksbrevData.getMetadata().getFagsaktypenavnPåSpråk());
+        VedtakResultatType hovedresultat = vedtaksbrevData.getHovedresultat();
+        String fagsakTypeNavn = vedtaksbrevData.getMetadata().getFagsaktypenavnPåSpråk();
+        String hovedoverskrift = VedtaksbrevOverskrift.finnOverskriftVedtaksbrev(fagsakTypeNavn, hovedresultat);
         return TekstformatererVedtaksbrev.lagVedtaksbrevDeltIAvsnitt(vedtaksbrevData.getVedtaksbrevData(), hovedoverskrift);
     }
 

@@ -31,29 +31,35 @@ public class VedtaksbrevUtil {
         return nyesteVarselSendt;
     }
 
-    public static List<PeriodeMedTekstDto> mapFritekstFraDb(List<VedtaksbrevPeriode> eksisterendePerioderForBrev) {
-        List<PeriodeMedTekstDto> perioderMedTekster = new ArrayList<>();
-        for (VedtaksbrevPeriode eksisterendePeriode : eksisterendePerioderForBrev) {
-            Optional<PeriodeMedTekstDto> periodeMedTekstOptional = finnOpprettetPeriode(perioderMedTekster, eksisterendePeriode.getPeriode());
+    public static List<PeriodeMedTekstDto> mapFritekstFraDb(List<VedtaksbrevPeriode> fritekstPerioder) {
+        List<PeriodeMedTekstDto> resultat = new ArrayList<>();
+        for (VedtaksbrevPeriode fritekstPeriode : fritekstPerioder) {
+            Optional<PeriodeMedTekstDto> periodeMedTekstOptional = finnOpprettetPeriode(resultat, fritekstPeriode.getPeriode());
             PeriodeMedTekstDto periodeMedTekst;
             if (periodeMedTekstOptional.isPresent()) {
                 periodeMedTekst = periodeMedTekstOptional.get();
             } else {
                 periodeMedTekst = new PeriodeMedTekstDto();
-                periodeMedTekst.setFom(eksisterendePeriode.getPeriode().getFom());
-                periodeMedTekst.setTom(eksisterendePeriode.getPeriode().getTom());
-                perioderMedTekster.add(periodeMedTekst);
+                periodeMedTekst.setFom(fritekstPeriode.getPeriode().getFom());
+                periodeMedTekst.setTom(fritekstPeriode.getPeriode().getTom());
+                resultat.add(periodeMedTekst);
             }
 
-            if (FritekstType.FAKTA_AVSNITT.equals(eksisterendePeriode.getFritekstType())) {
-                periodeMedTekst.setFaktaAvsnitt(eksisterendePeriode.getFritekst());
-            } else if (FritekstType.VILKAAR_AVSNITT.equals(eksisterendePeriode.getFritekstType())) {
-                periodeMedTekst.setVilkårAvsnitt(eksisterendePeriode.getFritekst());
-            } else if (FritekstType.SAERLIGE_GRUNNER_AVSNITT.equals(eksisterendePeriode.getFritekstType())) {
-                periodeMedTekst.setSærligeGrunnerAvsnitt(eksisterendePeriode.getFritekst());
+            FritekstType fritekstType = fritekstPeriode.getFritekstType();
+            String fritekst = fritekstPeriode.getFritekst();
+            if (FritekstType.FAKTA_AVSNITT.equals(fritekstType)) {
+                periodeMedTekst.setFaktaAvsnitt(fritekst);
+            } else if (FritekstType.VILKAAR_AVSNITT.equals(fritekstType)) {
+                periodeMedTekst.setVilkårAvsnitt(fritekst);
+            } else if (FritekstType.SAERLIGE_GRUNNER_AVSNITT.equals(fritekstType)) {
+                periodeMedTekst.setSærligeGrunnerAvsnitt(fritekst);
+            } else if (FritekstType.SAERLIGE_GRUNNER_ANNET_AVSNITT.equals(fritekstType)) {
+                periodeMedTekst.setSærligeGrunnerAnnetAvsnitt(fritekst);
+            } else {
+                throw new IllegalArgumentException("Utvikler-feil: mangler håndtering for fritekstType:" + fritekstType);
             }
         }
-        return perioderMedTekster;
+        return resultat;
     }
 
     private static Optional<PeriodeMedTekstDto> finnOpprettetPeriode(List<PeriodeMedTekstDto> perioderMedTekster, Periode periode) {

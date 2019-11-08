@@ -366,6 +366,44 @@ public class TekstformatererVedtaksbrevTest {
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 
+    @Test
+    public void skal_generere_vedtaksbrev_for_FP_ingen_tilbakekreving_pga_lavt_beløp() throws Exception {
+        HbVedtaksbrevFelles vedtaksbrevData = HbVedtaksbrevFelles.builder()
+            .medErFødsel(true)
+            .medAntallBarn(5)
+            .medHovedresultat(VedtakResultatType.INGEN_TILBAKEBETALING)
+            .medLovhjemmelVedtak("Folketrygdloven § 22-15 6.ledd")
+            .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
+            .medVarsletBeløp(BigDecimal.valueOf(500))
+            .medTotaltTilbakekrevesBeløp(BigDecimal.ZERO)
+            .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.ZERO)
+            .medTotaltRentebeløp(BigDecimal.ZERO)
+            .medVarsletDato(LocalDate.of(2020, 4, 4))
+            .medKlagefristUker(6)
+            .build();
+        List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
+            HbVedtaksbrevPeriode.builder()
+                .medPeriode(førsteNyttårsdag)
+                .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
+                .medHendelsetype(HendelseType.FP_ANNET_HENDELSE_TYPE)
+                .medHendelseUndertype(FellesUndertyper.ANNET_FRITEKST)
+                .medFritekstFakta("foo bar baz")
+                .medVilkårResultat(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER)
+                .medAktsomhetResultat(Aktsomhet.SIMPEL_UAKTSOM)
+                .medUnntasInnkrevingPgaLavtBeløp(true)
+                .medFeilutbetaltBeløp(BigDecimal.valueOf(500))
+                .medTilbakekrevesBeløp(BigDecimal.ZERO)
+                .medRenterBeløp(BigDecimal.ZERO)
+                .build()
+        );
+
+        HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
+
+        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
+        String fasit = les("/vedtaksbrev/FP_ikke_tilbakekreves_pga_lavt_beløp.txt");
+        assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
+    }
+
     private String les(String filnavn) throws IOException {
         try (InputStream resource = getClass().getResourceAsStream(filnavn);
              Scanner scanner = new Scanner(resource, "UTF-8")) {
