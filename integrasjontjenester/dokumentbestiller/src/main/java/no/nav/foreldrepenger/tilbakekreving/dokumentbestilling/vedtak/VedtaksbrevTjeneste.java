@@ -275,7 +275,8 @@ public class VedtaksbrevTjeneste {
             builder
                 .medFritekstFakta(fritekst.getFaktaAvsnitt())
                 .medFritekstVilkår(fritekst.getVilkårAvsnitt())
-                .medFritekstSærligeGrunner(fritekst.getSærligeGrunnerAvsnitt());
+                .medFritekstSærligeGrunner(fritekst.getSærligeGrunnerAvsnitt())
+                .medFritekstSærligGrunnAnnet(fritekst.getSærligeGrunnerAnnetAvsnitt());
         }
 
         VilkårVurderingPeriodeEntitet vilkårvurdering = finnVilkårvurdering(periode, vilkårPerioder);
