@@ -1,4 +1,4 @@
-{{#if (or (eq aktsomhet-resultat "SIMPEL_UAKTSOM") (eq aktsomhet-resultat "GROVT_UAKTSOM"))}}
+{{#if (or (eq aktsomhet-resultat "GROVT_UAKTSOM") (and (eq aktsomhet-resultat "SIMPEL_UAKTSOM") (not unntas-innkreving-pga-lavt-beløp)))}}
 {{> underoverskrift_start}}Er det særlige grunner til å redusere beløpet?{{> underoverskrift_slutt}}
     {{#if fritekst-særlige-grunner}}
 {{fritekst-særlige-grunner}}
