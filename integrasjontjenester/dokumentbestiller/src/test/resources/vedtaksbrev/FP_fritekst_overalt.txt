@@ -12,7 +12,9 @@ Ut fra informasjonen du har fått, må du etter vår vurdering ha forstått at d
 _Er det særlige grunner til å redusere beløpet?
 Gratulerer, du fikk norgesrekord i feilutbetalt beløp! Du skal slippe å betale renter, for det har du ikke råd til uansett!
 
-Vi har vurdert om det er grunner til å redusere beløpet. Selv om vi kunne unngått at du fikk for mye utbetalt, har vi lagt vekt på at du må ha forstått at at du fikk penger du ikke har rett til. Vi har også lagt vekt på at det feilutbetalte beløpet er høyt og at det er kort tid siden utbetalingen skjedde. Derfor må du betale tilbake hele beløpet.
+Vi har vurdert om det er grunner til å redusere beløpet. Selv om vi kunne unngått at du fikk for mye utbetalt, har vi lagt vekt på at du må ha forstått at du fikk penger du ikke har rett til og at det feilutbetalte beløpet er høyt. Vi har også lagt vekt på at det er kort tid siden utbetalingen skjedde og at du jobber med foreldrepenger og dermed vet hvordan dette fungerer!
+
+Derfor må du betale tilbake hele beløpet.
 _Gjelder perioden fra og med 1. februar 2019 til og med 28. februar 2019
 Vi har gjort en feil og utbetalt for mye i foreldrepenger i denne perioden. Du skulle hatt [riktig-beløp] kroner, men du fikk [utbetalt-beløp] kroner. Derfor har du fått 1 kroner for mye utbetalt.
 

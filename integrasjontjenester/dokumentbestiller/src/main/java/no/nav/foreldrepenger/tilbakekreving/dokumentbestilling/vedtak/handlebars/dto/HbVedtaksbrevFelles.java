@@ -60,6 +60,8 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
     private String kontaktNavTelefon = "55 55 33 33"; //TODO fjerne hardkoding
     @JsonProperty("kontakt-nav-innkreving-telefon")
     private String kontaktNavInnkrevingTelefon = "21 05 11 00";  //TODO fjerne hardkoding
+    @JsonProperty("bruk-midlertidig-tekst-for-hvordan-betale")
+    private boolean brukMidlertidigTekstForHvordanBetale = true;
 
     private HbVedtaksbrevFelles() {
         //bruk Builder
@@ -199,6 +201,11 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
 
         public Builder medKontaktNavInnkrevingTelefon(String kontaktNavInnkrevingTelefon) {
             kladd.kontaktNavInnkrevingTelefon = kontaktNavInnkrevingTelefon;
+            return this;
+        }
+
+        public Builder skruAvMidlertidigTekst() {
+            kladd.brukMidlertidigTekstForHvordanBetale = false;
             return this;
         }
     }
