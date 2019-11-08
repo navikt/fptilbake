@@ -52,6 +52,7 @@ public class TekstformatererVedtaksbrevTest {
             .medTotaltRentebeløp(BigDecimal.ZERO)
             .medVarsletDato(LocalDate.of(2020, 4, 4))
             .medKlagefristUker(6)
+            //.skruAvMidlertidigTekst() //generer tekst som skal brukes i pilot
             .build();
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
             HbVedtaksbrevPeriode.builder()
@@ -102,6 +103,7 @@ public class TekstformatererVedtaksbrevTest {
             .medTotaltRentebeløp(BigDecimal.ZERO)
             .medVarsletDato(LocalDate.of(2020, 4, 4))
             .medKlagefristUker(6)
+            .skruAvMidlertidigTekst() //generer tekst slik den skal være etter pilot
             .build();
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
             HbVedtaksbrevPeriode.builder()
@@ -138,6 +140,7 @@ public class TekstformatererVedtaksbrevTest {
             .medVarsletDato(LocalDate.of(2019, 1, 3))
             .medFritekstOppsummering("Skynd deg å betale, vi trenger pengene med en gang!")
             .medKlagefristUker(6)
+            .skruAvMidlertidigTekst() //generer tekst slik den skal være etter pilot
             .build();
 
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
@@ -148,7 +151,7 @@ public class TekstformatererVedtaksbrevTest {
                 .medHendelseUndertype(FellesUndertyper.ANNET_FRITEKST)
                 .medVilkårResultat(VilkårResultat.FORSTO_BURDE_FORSTÅTT)
                 .medAktsomhetResultat(Aktsomhet.GROVT_UAKTSOM)
-                .medSærligeGrunner(Arrays.asList(SærligGrunn.HELT_ELLER_DELVIS_NAVS_FEIL, SærligGrunn.STØRRELSE_BELØP, SærligGrunn.TID_FRA_UTBETALING))
+                .medSærligeGrunner(Arrays.asList(SærligGrunn.HELT_ELLER_DELVIS_NAVS_FEIL, SærligGrunn.STØRRELSE_BELØP, SærligGrunn.TID_FRA_UTBETALING, SærligGrunn.ANNET))
                 .medRiktigBeløp(BigDecimal.valueOf(0))
                 .medFeilutbetaltBeløp(BigDecimal.valueOf(1234567890))
                 .medTilbakekrevesBeløp(BigDecimal.valueOf(1234567890))
@@ -156,6 +159,7 @@ public class TekstformatererVedtaksbrevTest {
                 .medFritekstFakta("Ingen vet riktig hva som har skjedd, men du har fått utbetalt alt for mye penger.")
                 .medFritekstSærligeGrunner("Gratulerer, du fikk norgesrekord i feilutbetalt beløp! Du skal slippe å betale renter, for det har du ikke råd til uansett!")
                 .medFritekstVilkår("Det er helt utrolig om du ikke har oppdaget dette!")
+                .medFritekstSærligGrunnAnnet("at du jobber med foreldrepenger og dermed vet hvordan dette fungerer!")
                 .build(),
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(februar)
@@ -221,6 +225,7 @@ public class TekstformatererVedtaksbrevTest {
             .medTotaltRentebeløp(BigDecimal.valueOf(1000))
             .medVarsletDato(LocalDate.of(2020, 4, 4))
             .medKlagefristUker(6)
+            .skruAvMidlertidigTekst() //generer tekst slik den skal være etter pilot
             .build();
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
             HbVedtaksbrevPeriode.builder()
@@ -258,6 +263,7 @@ public class TekstformatererVedtaksbrevTest {
             .medTotaltRentebeløp(BigDecimal.ZERO)
             .medVarsletDato(LocalDate.of(2020, 4, 4))
             .medKlagefristUker(6)
+            .skruAvMidlertidigTekst() //generer tekst slik den skal være etter pilot
             .build();
 
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
@@ -297,6 +303,7 @@ public class TekstformatererVedtaksbrevTest {
             .medTotaltRentebeløp(BigDecimal.valueOf(50000))
             .medVarsletDato(LocalDate.of(2020, 4, 4))
             .medKlagefristUker(6)
+            .skruAvMidlertidigTekst() //generer tekst slik den skal være etter pilot
             .build();
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
             HbVedtaksbrevPeriode.builder()
@@ -335,6 +342,7 @@ public class TekstformatererVedtaksbrevTest {
             .medTotaltRentebeløp(BigDecimal.ZERO)
             .medVarsletDato(LocalDate.of(2020, 4, 4))
             .medKlagefristUker(6)
+            .skruAvMidlertidigTekst() //generer tekst slik den skal være etter pilot
             .build();
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
             HbVedtaksbrevPeriode.builder()
@@ -380,6 +388,7 @@ public class TekstformatererVedtaksbrevTest {
             .medTotaltRentebeløp(BigDecimal.ZERO)
             .medVarsletDato(LocalDate.of(2020, 4, 4))
             .medKlagefristUker(6)
+            .skruAvMidlertidigTekst() //generer tekst slik den skal være etter pilot
             .build();
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
             HbVedtaksbrevPeriode.builder()
