@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.web.app.rest.ResourceLink;
 
 public class BehandlingDto {
@@ -28,6 +29,9 @@ public class BehandlingDto {
     private boolean behandlingPåVent;
     private String fristBehandlingPåVent;
     private String venteÅrsakKode;
+    private Språkkode språkkode;
+    private boolean behandlingKøet;
+    private String ansvarligSaksbehandler;
 
 
     /**
@@ -83,6 +87,21 @@ public class BehandlingDto {
 
     public boolean getToTrinnsBehandling() {
         return toTrinnsBehandling;
+    }
+
+    @JsonProperty("sprakkode")
+    public Språkkode getSpråkkode() {
+        return språkkode;
+    }
+
+    @JsonProperty("behandlingKoet")
+    public boolean isBehandlingKoet() {
+        return behandlingKøet;
+    }
+
+    @JsonProperty("ansvarligSaksbehandler")
+    public String getAnsvarligSaksbehandler() {
+        return ansvarligSaksbehandler;
     }
 
     void setFagsakId(Long fagsakId) {
@@ -158,5 +177,17 @@ public class BehandlingDto {
 
     void setVenteÅrsakKode(String venteÅrsakKode) {
         this.venteÅrsakKode = venteÅrsakKode;
+    }
+
+    void setSpråkkode(Språkkode språkkode) {
+        this.språkkode = språkkode;
+    }
+
+    void setBehandlingKøet(boolean behandlingKøet) {
+        this.behandlingKøet = behandlingKøet;
+    }
+
+    void setAnsvarligSaksbehandler(String ansvarligSaksbehandler) {
+        this.ansvarligSaksbehandler = ansvarligSaksbehandler;
     }
 }
