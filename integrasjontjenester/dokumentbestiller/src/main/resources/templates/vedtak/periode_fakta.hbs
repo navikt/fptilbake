@@ -136,7 +136,7 @@ Du har kun rett til engangsstønad hvis du føder eller adopterer barn. Vi har i
 Du har fått {{feilutbetalt-beløp}} kroner for mye utbetalt.
         {{/case}}
         {{#case "ES_MOTTAKER_FAR_MEDMOR"}}
-Du har ikke rett til foreldrepenger i denne perioden. Derfor har du fått [beløp] kroner for mye utbetalt.
+Du har ikke rett til foreldrepenger i denne perioden. Derfor har du fått {{feilutbetalt-beløp}} kroner for mye utbetalt.
         {{/case}}
         {{/switch}}
     {{/case}}
@@ -185,7 +185,7 @@ Vi har fått melding om at {{> barnet-ditt}}, døde [dødsdato]. Du har rett til
 Fordi foreldrepengene er blitt utbetalt etter denne datoen, har du fått {{feilutbetalt-beløp}} kroner for mye utbetalt.
         {{/case}}
         {{#case "OPPHOR_MOTTAKER_DOD"}}
-Vi har fått melding om at [sokersNavn] døde [opphørsdato].
+Vi har fått melding om at [søkers navn] døde [dødsdato].
 
 Foreldrepengene skulle vært stanset [opphørsdato]. Fordi foreldrepengene er blitt utbetalt etter denne datoen, er det utbetalt {{feilutbetalt-beløp}} kroner for mye.
         {{/case}}
@@ -302,7 +302,7 @@ Du har jobbet samtidig som at du har fått utbetalt foreldrepenger. Fordi du har
 {{/case}}
 {{#case "SVP"}}
     {{#* inline "tilrettelegging-mulig"}}
-Arbeidsgiver kunne tilpasse eller endre arbeidsoppgavene dine uten at det var fare for å skade {{> barnet}} du venter. Du har kun rett til svangerskapspenger om du må slutte å jobbe. Derfor har du fått [beløp] kroner for mye utbetalt i denne perioden.
+Arbeidsgiver kunne tilpasse eller endre arbeidsoppgavene dine uten at det var fare for å skade {{> barnet}} du venter. Du har kun rett til svangerskapspenger om du må slutte å jobbe. Derfor har du fått {{feilutbetalt-beløp}} kroner for mye utbetalt i denne perioden.
     {{/inline}}
     {{#switch hendelsetype}}
     {{#case "MEDLEMSKAP"}}
