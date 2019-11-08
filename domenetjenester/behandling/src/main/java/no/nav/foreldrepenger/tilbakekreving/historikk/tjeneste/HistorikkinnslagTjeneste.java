@@ -21,6 +21,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Dokument
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.VariantFormat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.NavBrukerKjønn;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.dokumentbestiller.DokumentMalType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepository;
@@ -85,7 +86,10 @@ public class HistorikkinnslagTjeneste {
         }
     }
 
-    public void opprettHistorikkinnslagForBrevsending(Behandling behandling, JournalpostId journalpostId, String dokumentId, String tittel) {
+    public void opprettHistorikkinnslagForBrevsending(Behandling behandling,
+                                                      JournalpostId journalpostId,
+                                                      String dokumentId,
+                                                      String tittel) {
         HistorikkinnslagDokumentLink dokumentLink = new HistorikkinnslagDokumentLink();
         dokumentLink.setJournalpostId(journalpostId);
         dokumentLink.setDokumentId(dokumentId);
@@ -98,6 +102,22 @@ public class HistorikkinnslagTjeneste {
             HistorikkinnslagType.BREV_SENT,
             HistorikkAktør.VEDTAKSLØSNINGEN,
             Collections.singletonList(dokumentLink));
+    }
+
+    public void opprettHistorikkinnslagForBrevBestilt(Behandling behandling, DokumentMalType malType){
+        Historikkinnslag historikkinnslag = new Historikkinnslag.Builder()
+            .medAktør(HistorikkAktør.SAKSBEHANDLER)
+            .medKjoenn(setKjønn(behandling.getAktørId()))
+            .medType(HistorikkinnslagType.BREV_BESTILT)
+            .medBehandlingId(behandling.getId())
+            .medFagsakId(behandling.getFagsakId()).build();
+
+        HistorikkInnslagTekstBuilder builder = new HistorikkInnslagTekstBuilder()
+            .medHendelse(HistorikkinnslagType.BREV_BESTILT)
+            .medBegrunnelse(malType.getNavn());
+        builder.build(historikkinnslag);
+
+        historikkRepository.lagre(historikkinnslag);
     }
 
     public void opprettHistorikkinnslagForOpprettetBehandling(Behandling behandling) {

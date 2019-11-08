@@ -29,8 +29,9 @@ public class VarselRepository {
     public void lagre(Long behandlingId, String varselTekst, Long varselBeløp) {
         Optional<VarselInfo> forrigeVarsel = finnVarsel(behandlingId);
         if (forrigeVarsel.isPresent()) {
-            forrigeVarsel.get().disable();
-            entityManager.persist(forrigeVarsel);
+            VarselInfo forrigeVarselInfo = forrigeVarsel.get();
+            forrigeVarselInfo.disable();
+            entityManager.persist(forrigeVarselInfo);
         }
         VarselInfo varselInfo = VarselInfo.builder().medBehandlingId(behandlingId)
             .medVarselTekst(varselTekst)

@@ -15,7 +15,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevdataRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevSporing;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VarselbrevSporing;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
@@ -101,7 +101,7 @@ public class VarselbrevTjeneste {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         JournalpostIdOgDokumentId dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data);
         opprettHistorikkinnslag(behandling, dokumentreferanse);
-        lagreInfoOmVedtaksbrev(behandlingId, dokumentreferanse);
+        lagreInfoOmVarselbrev(behandlingId, dokumentreferanse);
     }
 
     public byte[] hentForhåndsvisningVarselbrev(HentForhåndsvisningVarselbrevDto hentForhåndsvisningVarselbrevDto) {
@@ -129,13 +129,13 @@ public class VarselbrevTjeneste {
             TITTEL_VARSELBREV_HISTORIKKINNSLAG);
     }
 
-    private void lagreInfoOmVedtaksbrev(Long behandlingId, JournalpostIdOgDokumentId dokumentreferanse) {
-        VedtaksbrevSporing vedtaksbrevSporing = new VedtaksbrevSporing.Builder()
+    private void lagreInfoOmVarselbrev(Long behandlingId, JournalpostIdOgDokumentId dokumentreferanse) {
+        VarselbrevSporing varselbrevSporing = new VarselbrevSporing.Builder()
             .medBehandlingId(behandlingId)
             .medDokumentId(dokumentreferanse.getDokumentId())
             .medJournalpostId(dokumentreferanse.getJournalpostId())
             .build();
-        brevdataRepository.lagreVedtaksbrevData(vedtaksbrevSporing);
+        brevdataRepository.lagreVarselbrevData(varselbrevSporing);
     }
 
     private VarselbrevSamletInfo lagVarselbrevForSending(Long behandlingId) {

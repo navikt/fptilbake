@@ -5,12 +5,14 @@ import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
-
+import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BehandlingFeilutbetalingFakta;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.YtelseNavn;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
@@ -49,7 +51,7 @@ public class VarselbrevUtil {
             .medFagsaktypenavnPåSpråk(ytelseNavn.getNavnPåBrukersSpråk())
             .medFagsaktype(fagsakYtelseType)
             .medSprakkode(personinfo.getForetrukketSpråk())
-            .medAnsvarligSaksbehandler(StringUtils.isNotEmpty(grunninformasjon.getAnsvarligSaksbehandler()) ? grunninformasjon.getAnsvarligSaksbehandler() : "VL")
+            .medAnsvarligSaksbehandler("VL")
             .medTittel(VarselbrevOverskrift.finnTittelVarselbrev(ytelseNavn.getNavnPåBokmål()))
             .build();
 
@@ -96,6 +98,40 @@ public class VarselbrevUtil {
             .build();
     }
 
+    public static VarselbrevSamletInfo sammenstillInfoFraFagsystemerForSendingManueltVarselBrev(
+        Behandling behandling,
+        Personinfo personinfo,
+        Adresseinfo adresseinfo,
+        FagsakYtelseType fagsakYtelseType,
+        Språkkode språkkode,
+        YtelseNavn ytelseNavn,
+        Period ventetid,
+        String friTekst,
+        BehandlingFeilutbetalingFakta feilutbetalingFakta){
+
+        BrevMetadata metadata = new BrevMetadata.Builder()
+            .medBehandlendeEnhetId(behandling.getBehandlendeEnhetId())
+            .medBehandlendeEnhetNavn(behandling.getBehandlendeEnhetNavn())
+            .medSakspartId(personinfo.getPersonIdent().getIdent())
+            .medMottakerAdresse(adresseinfo)
+            .medSaksnummer(behandling.getFagsak().getSaksnummer().getVerdi())
+            .medSakspartNavn(personinfo.getNavn())
+            .medFagsaktype(fagsakYtelseType)
+            .medSprakkode(språkkode)
+            .medFagsaktypenavnPåSpråk(ytelseNavn.getNavnPåBrukersSpråk())
+            .medAnsvarligSaksbehandler("VL")
+            .medTittel(VarselbrevOverskrift.finnTittelVarselbrev(ytelseNavn.getNavnPåBokmål()))
+            .build();
+
+        return new VarselbrevSamletInfo.Builder()
+            .medMetadata(metadata)
+            .medFritekstFraSaksbehandler(friTekst)
+            .medSumFeilutbetaling(feilutbetalingFakta.getAktuellFeilUtbetaltBeløp().longValue())
+            .medFeilutbetaltePerioder(mapFeilutbetaltePerioder(feilutbetalingFakta))
+            .medFristdato(finnFristForTilbakemeldingFraBruker(FPDateUtil.nå(), ventetid))
+            .build();
+    }
+
     private static List<Periode> mapFeilutbetaltePerioder(FeilutbetaltePerioderDto feilutbetaltePerioderDto) {
         ArrayList<Periode> feilutbetaltPerioder = new ArrayList<>();
         for (PeriodeDto periodeDto : feilutbetaltePerioderDto.getPerioder()) {
@@ -104,7 +140,14 @@ public class VarselbrevUtil {
         return feilutbetaltPerioder;
     }
 
+    private static List<Periode> mapFeilutbetaltePerioder(BehandlingFeilutbetalingFakta feilutbetalingFakta) {
+        return feilutbetalingFakta.getPerioder().stream()
+            .map(utbetaltPeriode -> new Periode(utbetaltPeriode.getFom(), utbetaltPeriode.getTom()))
+            .collect(Collectors.toList());
+    }
+
     static LocalDate finnFristForTilbakemeldingFraBruker(LocalDateTime dagensDato, Period ventetid) {
         return dagensDato.plus(ventetid).toLocalDate();
     }
+
 }

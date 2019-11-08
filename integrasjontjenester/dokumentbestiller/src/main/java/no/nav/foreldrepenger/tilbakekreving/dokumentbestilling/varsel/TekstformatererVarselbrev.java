@@ -22,13 +22,13 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.handlebars
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.vedtak.util.FPDateUtil;
 
-class TekstformatererVarselbrev {
+public class TekstformatererVarselbrev {
 
     private TekstformatererVarselbrev() {
         // for static access
     }
 
-    static String lagVarselbrevFritekst(VarselbrevSamletInfo varselbrevSamletInfo) {
+    public static String lagVarselbrevFritekst(VarselbrevSamletInfo varselbrevSamletInfo) {
         try {
             Template template = opprettHandlebarsTemplate("/templates/varsel");
             VarselbrevDokument varselbrevDokument = mapTilVarselbrevDokument(
