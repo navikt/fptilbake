@@ -102,8 +102,6 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
             Objects.check(kladd.erAdopsjon != kladd.erFødsel, "En og bare en av fødsel og adopsjon skal være satt");
             Objects.check(kladd.ytelsetype != null, "Ytelse type er ikke satt");
             Objects.check(kladd.antallBarn != null, "antallBarn er ikke satt");
-            Objects.check(kladd.varsletDato != null, "varsletDato er ikke satt");
-            Objects.check(kladd.varsletBeløp != null, "varsletBeløp er ikke satt");
             Objects.check(kladd.hovedresultat != null, "hovedresultat er ikke satt");
             Objects.check(kladd.lovhjemmelVedtak != null, "lovhjemmelVedtak er ikke satt");
             Objects.check(kladd.totaltTilbakekrevesBeløp != null, "totaltTilbakekrevesBeløp er ikke satt");
@@ -117,6 +115,13 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
             Objects.check(kladd.klagefristUker != null, "klagefristUker er ikke satt");
             Objects.check(kladd.kontaktNavTelefon != null, "kontaktNavTelefon er ikke satt");
             Objects.check(kladd.kontaktNavInnkrevingTelefon != null, "kontaktNavInnkrevingTelefon er ikke satt");
+
+            if (kladd.varsletDato == null && kladd.varsletBeløp != null) {
+                throw new IllegalArgumentException("Inkonsistent tilstand: varslet beløp finnes, men varslet dato finnes ikke");
+            }
+            if (kladd.varsletDato != null && kladd.varsletBeløp == null) {
+                throw new IllegalArgumentException("Inkonsistent tilstand: varslet dato finnes, men varslet beløp finnes ikke");
+            }
             return kladd;
         }
 
@@ -147,6 +152,11 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
 
         public Builder medVarsletBeløp(BigDecimal varsletBeløp) {
             kladd.varsletBeløp = varsletBeløp;
+            return this;
+        }
+
+        public Builder medVarsletBeløp(Long varsletBeløp) {
+            kladd.varsletBeløp = varsletBeløp != null ? BigDecimal.valueOf(varsletBeløp) : null;
             return this;
         }
 

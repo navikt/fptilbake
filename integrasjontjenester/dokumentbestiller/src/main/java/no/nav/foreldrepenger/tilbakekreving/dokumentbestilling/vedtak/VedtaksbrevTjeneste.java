@@ -38,6 +38,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselInfo;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingAktsomhetEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingEntitet;
@@ -78,6 +80,7 @@ public class VedtaksbrevTjeneste {
 
     private BehandlingRepository behandlingRepository;
     private EksternBehandlingRepository eksternBehandlingRepository;
+    private VarselRepository varselRepository;
     private FaktaFeilutbetalingRepository faktaRepository;
     private VurdertForeldelseRepository foreldelseRepository;
     private VilkårsvurderingRepository vilkårsvurderingRepository;
@@ -98,6 +101,7 @@ public class VedtaksbrevTjeneste {
                                HistorikkinnslagTjeneste historikkinnslagTjeneste) {
         this.behandlingRepository = behandlingRepositoryProvider.getBehandlingRepository();
         this.eksternBehandlingRepository = behandlingRepositoryProvider.getEksternBehandlingRepository();
+        this.varselRepository = behandlingRepositoryProvider.getVarselRepository();
         this.faktaRepository = behandlingRepositoryProvider.getFaktaFeilutbetalingRepository();
         this.foreldelseRepository = behandlingRepositoryProvider.getVurdertForeldelseRepository();
         this.vilkårsvurderingRepository = behandlingRepositoryProvider.getVilkårsvurderingRepository();
@@ -174,22 +178,20 @@ public class VedtaksbrevTjeneste {
 
     public VedtaksbrevData hentDataForVedtaksbrev(Long behandlingId, String oppsummeringFritekst, List<PeriodeMedTekstDto> perioderFritekst) {
         EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandlingId);
-        Long fpsakBehandlingId = eksternBehandling.getEksternId();
         UUID fpsakBehandlingUuid = eksternBehandling.getEksternUuid();
         Behandling behandling = behandlingTjeneste.hentBehandling(behandlingId);
 
         //TODO hent data i et tidlig steg og hent fra repository
         SamletEksternBehandlingInfo fpsakBehandling = eksternDataForBrevTjeneste.hentBehandlingFpsak(fpsakBehandlingUuid, Tillegsinformasjon.PERSONOPPLYSNINGER, Tillegsinformasjon.SØKNAD);
 
-        //FIXME hent fra repository
-        Long varsletFeilutbetaling = eksternDataForBrevTjeneste.hentFeilutbetaltePerioder(fpsakBehandlingId).getSumFeilutbetaling(); //TODO gjelder bare orginalt varsel
+        Optional<VarselInfo> varselInfo = varselRepository.finnVarsel(behandlingId);
 
         BeregningResultat beregnetResultat = tilbakekrevingBeregningTjeneste.beregn(behandlingId);
         List<BeregningResultatPeriode> resulatPerioder = beregnetResultat.getBeregningResultatPerioder();
         VedtakResultatType vedtakResultatType = beregnetResultat.getVedtakResultatType();
 
         List<VarselbrevSporing> varselbrevData = brevdataRepository.hentVarselbrevData(behandlingId);
-        LocalDateTime nyesteVarselbrevTidspunkt = VedtaksbrevUtil.finnNyesteVarselbrevTidspunkt(varselbrevData);
+        Optional<LocalDateTime> nyesteVarselbrevTidspunkt = VedtaksbrevUtil.finnNyesteVarselbrevTidspunkt(varselbrevData);
 
         FaktaFeilutbetaling fakta = faktaRepository.finnFaktaOmFeilutbetaling(behandlingId).orElseThrow();
         List<VilkårVurderingPeriodeEntitet> vilkårPerioder = vilkårsvurderingRepository.finnVilkårsvurdering(behandlingId)
@@ -201,8 +203,8 @@ public class VedtaksbrevTjeneste {
         BigDecimal totaltSkattetrekk = summer(resulatPerioder, BeregningResultatPeriode::getSkattBeløp);
         HbVedtaksbrevFelles.Builder vedtakDataBuilder = HbVedtaksbrevFelles.builder()
             .medYtelsetype(behandling.getFagsak().getFagsakYtelseType())
-            .medVarsletDato(nyesteVarselbrevTidspunkt.toLocalDate())
-            .medVarsletBeløp(BigDecimal.valueOf(varsletFeilutbetaling))
+            .medVarsletDato(nyesteVarselbrevTidspunkt.map(LocalDateTime::toLocalDate).orElse(null))
+            .medVarsletBeløp(varselInfo.map(VarselInfo::getVarselBeløp).orElse(null))
             .medAntallBarn(fpsakBehandling.getAntallBarnSøktFor())
             .medErFødsel(SøknadType.FØDSEL == fpsakBehandling.getSøknadType())
             .medErAdopsjon(SøknadType.ADOPSJON == fpsakBehandling.getSøknadType())

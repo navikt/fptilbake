@@ -91,18 +91,18 @@ public class TekstformatererVedtaksbrevTest {
     }
 
     @Test
-    public void skal_generere_vedtaksbrev_for_FP_og_god_tro_uten_tilbakekreving() throws Exception {
+    public void skal_generere_vedtaksbrev_for_FP_og_god_tro_uten_tilbakekreving_uten_varsel() throws Exception {
         HbVedtaksbrevFelles vedtaksbrevData = HbVedtaksbrevFelles.builder()
             .medErFødsel(true)
             .medAntallBarn(1)
             .medHovedresultat(VedtakResultatType.INGEN_TILBAKEBETALING)
             .medLovhjemmelVedtak("Folketrygdloven § 22-15")
             .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
-            .medVarsletBeløp(BigDecimal.valueOf(10000))
+            .medVarsletBeløp((BigDecimal)null)
             .medTotaltTilbakekrevesBeløp(BigDecimal.ZERO)
             .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.ZERO)
             .medTotaltRentebeløp(BigDecimal.ZERO)
-            .medVarsletDato(LocalDate.of(2020, 4, 4))
+            .medVarsletDato(null)
             .medKlagefristUker(6)
             .skruAvMidlertidigTekst() //generer tekst slik den skal være etter pilot
             .build();
