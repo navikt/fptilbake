@@ -329,7 +329,7 @@ public class VedtaksbrevTjeneste {
 
     private PeriodeMedTekstDto finnPeriodeFritekster(Periode periode, List<PeriodeMedTekstDto> perioder) {
         for (PeriodeMedTekstDto fritekstPeriode : perioder) {
-            if (periode.overlapper(fritekstPeriode.getFom()) && periode.overlapper(fritekstPeriode.getTom())) {
+            if (fritekstPeriode.getPeriode().equals(periode)) {
                 return fritekstPeriode;
             }
         }
