@@ -333,6 +333,7 @@ class TekstformatererVedtaksbrev {
         handlebars.registerHelper("case", new CustomHelpers.CaseHelper());
         handlebars.registerHelper("var", new CustomHelpers.VariableHelper());
         handlebars.registerHelper("lookup-map", new CustomHelpers.MapLookupHelper());
+        handlebars.registerHelper("kroner", new CustomHelpers.KroneFormattererMedTusenskille());
         handlebars.registerHelpers(ConditionalHelpers.class);
         return handlebars;
     }

@@ -1,4 +1,4 @@
-Vi varslet deg 3. januar 2019 om at du har fått 1234567893 kroner for mye. Du må betale tilbake 1234567892 kroner, som er deler av det feilutbetalte beløpet.
+Vi varslet deg 3. januar 2019 om at du har fått 1 234 567 893 kroner for mye. Du må betale tilbake 1 234 567 892 kroner, som er deler av det feilutbetalte beløpet.
 
 Skynd deg å betale, vi trenger pengene med en gang!
 _Gjelder perioden fra og med 1. januar 2019 til og med 31. januar 2019
@@ -16,15 +16,15 @@ Vi har vurdert om det er grunner til å redusere beløpet. Selv om vi kunne unng
 
 Derfor må du betale tilbake hele beløpet.
 _Gjelder perioden fra og med 1. februar 2019 til og med 28. februar 2019
-Vi har gjort en feil og utbetalt for mye i foreldrepenger i denne perioden. Du skulle hatt [riktig-beløp] kroner, men du fikk [utbetalt-beløp] kroner. Derfor har du fått 1 kroner for mye utbetalt.
+Vi har gjort en feil og utbetalt for mye i foreldrepenger i denne perioden. Du skulle hatt [riktig-beløp] kroner, men du fikk [utbetalt-beløp] kroner. Derfor har du fått 1 krone for mye utbetalt.
 
 Her har økonomisystemet gjort noe helt feil.
 _Hvordan har vi kommet fram til at du må betale tilbake?
-Vi har ikke gitt deg den informasjonen du trengte for å forstå at beløpet du fikk utbetalt var feil. Du har opplyst at du ikke har brukt 1 kroner. Disse kan vi kreve betale, selv om du ikke forstod at utbetalingen var feil.
+Vi har ikke gitt deg den informasjonen du trengte for å forstå at beløpet du fikk utbetalt var feil. Du har opplyst at du ikke har brukt 1 krone. Disse kan vi kreve betale, selv om du ikke forstod at utbetalingen var feil.
 
 Vi skjønner at du ikke har oppdaget beløpet, siden du hadde så mye annet på konto.
 _Gjelder perioden fra og med 1. mars 2019 til og med 31. mars 2019
-Du har jobbet samtidig som at du har fått utbetalt foreldrepenger. Fordi du har fått endret hvor mye du skal jobbe og hvor mye du tar ut i foreldrepenger, er deler av beløpet du har fått utbetalt feil. Du har derfor fått 1 kroner for mye utbetalt.
+Du har jobbet samtidig som at du har fått utbetalt foreldrepenger. Fordi du har fått endret hvor mye du skal jobbe og hvor mye du tar ut i foreldrepenger, er deler av beløpet du har fått utbetalt feil. Du har derfor fått 1 krone for mye utbetalt.
 _Hvordan har vi kommet fram til at du må betale tilbake?
 Du har fått vite om du har rett til foreldrepenger og hvor mye du har rett til. Etter vår vurdering burde du forstått at opplysningene du ga oss var uriktige. Derfor kan vi kreve pengene tilbake.
 
@@ -32,7 +32,7 @@ Her burde du passet mer på!
 _Er det særlige grunner til å redusere beløpet?
 Vi har vurdert om det er grunner til å redusere beløpet. Vi har lagt vekt på at du burde forstått at beløpet du fikk utbetalt var feil, og det er ingen bestemte grunner til å redusere beløpet. Derfor må du betale tilbake hele beløpet.
 _Gjelder perioden fra og med 1. april 2019 til og med 30. april 2019
-Du overførte kvoten til den andre forelderen fordi du var innlagt i helseinstitusjon. I den samme perioden har du likevel fått utbetalt foreldrepenger. Du kan ikke overføre kvoten og samtidig få foreldrepenger. Derfor har du fått 1 kroner for mye utbetalt i denne perioden.
+Du overførte kvoten til den andre forelderen fordi du var innlagt i helseinstitusjon. I den samme perioden har du likevel fått utbetalt foreldrepenger. Du kan ikke overføre kvoten og samtidig få foreldrepenger. Derfor har du fått 1 krone for mye utbetalt i denne perioden.
 _Hvordan har vi kommet fram til at du må betale tilbake?
 Du har fått informasjon om hvor mye du har rett til å få i foreldrepenger og at du må melde fra om endringer til NAV. Informasjonen du har fått forklarer om du har rett til foreldrepenger og hvor mye du har rett til å få utbetalt.
 

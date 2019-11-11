@@ -1,6 +1,6 @@
-Vi varslet deg 4. april 2020 om at du har fått 33001 kroner for mye. Du må betale tilbake 23002 kroner, som er deler av det feilutbetalte beløpet.
+Vi varslet deg 4. april 2020 om at du har fått 33 001 kroner for mye. Du må betale tilbake 23 002 kroner, som er deler av det feilutbetalte beløpet.
 _Gjelder perioden fra og med 1. januar 2019 til og med 31. januar 2019
-I denne perioden har du både fått utbetalt foreldrepenger fra oss og lønn fra arbeidsgiver. Det er arbeidsgiveren din som har rett til foreldrepengene fordi de utbetaler deg full lønn i samme periode. Derfor har du fått 30001 kroner for mye utbetalt.
+I denne perioden har du både fått utbetalt foreldrepenger fra oss og lønn fra arbeidsgiver. Det er arbeidsgiveren din som har rett til foreldrepengene fordi de utbetaler deg full lønn i samme periode. Derfor har du fått 30 001 kroner for mye utbetalt.
 _Hvordan har vi kommet fram til at du må betale tilbake?
 Du har fått vite om du har rett til foreldrepenger og hvor mye du har rett til. Etter vår vurdering burde du forstått at du ikke ga oss alle opplysningene vi trengte tidsnok for å sikre at du fikk riktig utbetaling. Derfor kan vi kreve pengene tilbake.
 
@@ -8,9 +8,9 @@ Du er heldig som slapp å betale alt!
 _Er det særlige grunner til å redusere beløpet?
 Vi har lagt vekt på at du burde forstått at du fikk penger du ikke har rett til. Vi har likevel redusert beløpet du må betale tilbake fordi beløpet er lavt og det er lenge siden feilutbetalingen skjedde.
 
-Du må betale 20002 kroner.
+Du må betale 20 002 kroner.
 _Gjelder perioden fra og med 1. februar 2019 til og med 28. februar 2019
-Vi har gjort en feil og utbetalt foreldrepenger to ganger i denne perioden. Du skulle hatt [riktig-beløp] kroner, men du fikk [utbetalt-beløp] kroner. Derfor har du fått 3000 kroner for mye utbetalt.
+Vi har gjort en feil og utbetalt foreldrepenger to ganger i denne perioden. Du skulle hatt [riktig-beløp] kroner, men du fikk [utbetalt-beløp] kroner. Derfor har du fått 3 000 kroner for mye utbetalt.
 _Hvordan har vi kommet fram til at du må betale tilbake?
 Du har fått vite om du har rett til foreldrepenger og hvor mye du har rett til. Selv om du har meldt fra til oss, kan vi kreve tilbake det du har fått for mye dersom du burde forstått at beløpet var feil.
 
