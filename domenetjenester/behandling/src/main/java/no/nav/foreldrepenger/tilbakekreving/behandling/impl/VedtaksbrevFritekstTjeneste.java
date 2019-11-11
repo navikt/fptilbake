@@ -2,6 +2,8 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
 import static no.nav.vedtak.feil.LogLevel.WARN;
 
+import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -85,16 +87,40 @@ public class VedtaksbrevFritekstTjeneste {
 
     private static void validerFritekstSatt(List<VedtaksbrevPeriode> vedtaksbrevPerioder, List<Periode> perioderSomMåHaFritekst, FritekstType fritekstType) {
         for (Periode periode : perioderSomMåHaFritekst) {
-            if (!finnesFritekst(vedtaksbrevPerioder, periode, fritekstType)) {
-                throw FritekstFeil.FACTORY.manglerFritekst(periode, fritekstType.getKode()).toException();
-            }
+            validerFritekstSatt(vedtaksbrevPerioder, periode, fritekstType);
         }
     }
 
-    private static boolean finnesFritekst(List<VedtaksbrevPeriode> perioder, Periode aktuellPeriode, FritekstType fritekstType) {
-        return perioder.stream().anyMatch(p -> p.getPeriode().equals(aktuellPeriode)
-            && fritekstType.equals(p.getFritekstType())
-            && !p.getFritekst().isBlank());
+    private static void validerFritekstSatt(List<VedtaksbrevPeriode> vedtaksbrevPerioder, Periode periodeSomMåHaFritekst, FritekstType fritekstType) {
+        List<Periode> perioder = finnFritekstPerioder(vedtaksbrevPerioder, periodeSomMåHaFritekst, fritekstType);
+        if (perioder.isEmpty()) {
+            throw FritekstFeil.FACTORY.manglerFritekst(periodeSomMåHaFritekst, fritekstType.getKode()).toException();
+        }
+        Periode førstePeriode = perioder.get(0);
+        if (!periodeSomMåHaFritekst.getFom().equals(førstePeriode.getFom())) {
+            throw FritekstFeil.FACTORY.manglerFritekst(Periode.of(periodeSomMåHaFritekst.getFom(), førstePeriode.getFom().minusDays(1)), fritekstType.getKode()).toException();
+        }
+        for (int i = 1; i < perioder.size(); i++) {
+            LocalDate forrigeSlutt = perioder.get(i - 1).getTom();
+            LocalDate start = perioder.get(i).getFom();
+            if (!forrigeSlutt.plusDays(1).equals(start)) {
+                throw FritekstFeil.FACTORY.manglerFritekst(Periode.of(forrigeSlutt.plusDays(1), start.minusDays(1)), fritekstType.getKode()).toException();
+            }
+        }
+        Periode sistePeriode = perioder.get(perioder.size() - 1);
+        if (!periodeSomMåHaFritekst.getTom().equals(sistePeriode.getTom())) {
+            throw FritekstFeil.FACTORY.manglerFritekst(Periode.of(sistePeriode.getTom().plusDays(1), periodeSomMåHaFritekst.getTom()), fritekstType.getKode()).toException();
+        }
+    }
+
+    private static List<Periode> finnFritekstPerioder(List<VedtaksbrevPeriode> perioder, Periode periodeSomMåHaFritekst, FritekstType fritekstType) {
+        return perioder.stream()
+            .filter(p -> fritekstType.equals(p.getFritekstType()))
+            .filter(p -> !p.getFritekst().isBlank())
+            .map(VedtaksbrevPeriode::getPeriode)
+            .filter(periodeSomMåHaFritekst::omslutter)
+            .sorted(Comparator.comparing(Periode::getFom))
+            .collect(Collectors.toList());
     }
 
     interface FritekstFeil extends DeklarerteFeil {
