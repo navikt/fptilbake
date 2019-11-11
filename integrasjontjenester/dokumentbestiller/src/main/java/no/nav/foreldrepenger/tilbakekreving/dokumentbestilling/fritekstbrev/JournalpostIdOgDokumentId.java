@@ -6,7 +6,7 @@ public class JournalpostIdOgDokumentId {
     private JournalpostId journalpostId;
     private String dokumentId;
 
-    JournalpostIdOgDokumentId(JournalpostId journalpostId, String dokumentId) {
+    public JournalpostIdOgDokumentId(JournalpostId journalpostId, String dokumentId) {
         this.journalpostId = journalpostId;
         this.dokumentId = dokumentId;
     }

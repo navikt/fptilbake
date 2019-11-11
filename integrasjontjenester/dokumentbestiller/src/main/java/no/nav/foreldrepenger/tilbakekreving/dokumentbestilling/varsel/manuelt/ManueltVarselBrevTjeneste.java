@@ -63,17 +63,33 @@ public class ManueltVarselBrevTjeneste {
         Behandling behandling = behandlingTjeneste.hentBehandling(behandlingId);
         VarselbrevSamletInfo varselbrevSamletInfo = lagVarselBeløpForSending(fritekst, behandling);
 
-        String overskrift = VarselbrevOverskrift.finnOverskriftVarselbrev(varselbrevSamletInfo.getBrevMetadata().getFagsaktypenavnPåSpråk());
-        String brevtekst = TekstformatererVarselbrev.lagVarselbrevFritekst(varselbrevSamletInfo);
-        FritekstbrevData data = new FritekstbrevData.Builder()
-            .medOverskrift(overskrift)
-            .medBrevtekst(brevtekst)
-            .medMetadata(varselbrevSamletInfo.getBrevMetadata())
-            .build();
+        FritekstbrevData data = lagManueltVarselBrev(varselbrevSamletInfo);
+
         JournalpostIdOgDokumentId dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data);
         opprettHistorikkinnslag(behandling, malType, dokumentreferanse);
         lagreInfoOmVarselbrev(behandlingId, dokumentreferanse);
         lagreInfoOmVarselSendt(behandlingId, fritekst, varselbrevSamletInfo.getSumFeilutbetaling());
+    }
+
+    public byte[] hentForhåndsvisningManueltVarselbrev(Long behandlingId, DokumentMalType malType, String fritekst) {
+        if (DokumentMalType.VARSEL_DOK.equals(malType)) {
+            Behandling behandling = behandlingTjeneste.hentBehandling(behandlingId);
+            VarselbrevSamletInfo varselbrevSamletInfo = lagVarselBeløpForSending(fritekst, behandling);
+
+            FritekstbrevData data = lagManueltVarselBrev(varselbrevSamletInfo);
+            return bestillDokumentTjeneste.hentForhåndsvisningFritekstbrev(data);
+        }
+        return new byte[0];
+    }
+
+    private FritekstbrevData lagManueltVarselBrev(VarselbrevSamletInfo varselbrevSamletInfo) {
+        String overskrift = VarselbrevOverskrift.finnOverskriftVarselbrev(varselbrevSamletInfo.getBrevMetadata().getFagsaktypenavnPåSpråk());
+        String brevtekst = TekstformatererVarselbrev.lagVarselbrevFritekst(varselbrevSamletInfo);
+        return new FritekstbrevData.Builder()
+            .medOverskrift(overskrift)
+            .medBrevtekst(brevtekst)
+            .medMetadata(varselbrevSamletInfo.getBrevMetadata())
+            .build();
     }
 
     private VarselbrevSamletInfo lagVarselBeløpForSending(String fritekst, Behandling behandling) {
