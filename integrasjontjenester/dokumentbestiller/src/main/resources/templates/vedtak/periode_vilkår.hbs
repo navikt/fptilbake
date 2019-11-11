@@ -5,7 +5,7 @@
 {{/if}}
 {{/inline}}
 {{#* inline "ikke-krev-småbeløp"}}
-Du har fått vite om du har rett til {{> ytelse-navn}} og hvor mye du har rett til. Selv om du burde forstått at beløpet var feil, er beløpet lavere enn {{fire-rettsgebyr}} kroner. Du må derfor ikke må betale tilbake beløpet.
+Du har fått vite om du har rett til {{> ytelse-navn}} og hvor mye du har rett til. Selv om du burde forstått at beløpet var feil, er beløpet lavere enn {{kroner fire-rettsgebyr}}. Du må derfor ikke må betale tilbake beløpet.
 {{/inline}}
 {{> underoverskrift_start}}Hvordan har vi kommet fram til at du {{#if tilbakekreves-beløp}}{{else}}ikke {{/if}}må betale tilbake?{{> underoverskrift_slutt}}
 {{#switch foreldelsevurdering}}
@@ -14,7 +14,7 @@ Fristen for å kreve tilbake {{> ytelse-produkt}} er tre år og starter fra det 
 
 Foreldelsesfristen er [dato]. Vi kan ikke kreve tilbake penger som er blitt utbetalt mer enn tre år før denne datoen.
 
-Du skal derfor ikke betale tilbake {{foreldet-beløp}} kroner{{> før-skatt}}, som er feilutbetalt fra og med {{fom}} til og med {{tom}}.
+Du skal derfor ikke betale tilbake {{kroner foreldet-beløp}}{{> før-skatt}}, som er feilutbetalt fra og med {{fom}} til og med {{tom}}.
 
     {{/case}}
     {{#case "TILLEGGSFRIST"}}
@@ -78,7 +78,7 @@ Du har fått vite om du har rett til {{> ytelse-navn}} og hvor mye du har rett t
 {{/if}}
 {{#if (eq vilkår-resultat "GOD_TRO")}}
     {{#if beløp-i-behold}}
-Vi har ikke gitt deg den informasjonen du trengte for å forstå at beløpet du fikk utbetalt var feil. Du har opplyst at du ikke har brukt {{beløp-i-behold}} kroner. Disse kan vi kreve betale, selv om du ikke forstod at utbetalingen var feil.
+Vi har ikke gitt deg den informasjonen du trengte for å forstå at beløpet du fikk utbetalt var feil. Du har opplyst at du ikke har brukt {{kroner beløp-i-behold}}. Disse kan vi kreve betale, selv om du ikke forstod at utbetalingen var feil.
     {{else}}
 Vi har ikke gitt deg den informasjonen du trengte for å forstå at beløpet du fikk utbetalt var feil. Du må ikke betale tilbake fordi vi har opplysninger om at du ikke har noe igjen av pengene.
     {{/if}}

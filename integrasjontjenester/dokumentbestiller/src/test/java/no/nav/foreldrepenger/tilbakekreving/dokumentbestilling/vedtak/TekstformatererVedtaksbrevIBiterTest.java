@@ -112,7 +112,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
         HbVedtaksbrevPeriodeOgFelles data = new HbVedtaksbrevPeriodeOgFelles(felles, periode);
 
         String generertTekst = TekstformatererVedtaksbrev.lagFaktaTekst(data);
-        assertThat(generertTekst).isEqualTo("Du har jobbet samtidig som at du har fått utbetalt foreldrepenger. Fordi du har fått endret hvor mye du skal jobbe og hvor mye du tar ut i foreldrepenger, er deler av beløpet du har fått utbetalt feil. Du har derfor fått 30001 kroner for mye utbetalt.");
+        assertThat(generertTekst).isEqualTo("Du har jobbet samtidig som at du har fått utbetalt foreldrepenger. Fordi du har fått endret hvor mye du skal jobbe og hvor mye du tar ut i foreldrepenger, er deler av beløpet du har fått utbetalt feil. Du har derfor fått 30 001 kroner for mye utbetalt.");
     }
 
     @Test
@@ -212,7 +212,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
         String generertTekst = TekstformatererVedtaksbrev.lagSærligeGrunnerTekst(felles, periode);
         assertThat(generertTekst)
             .contains("Vi har lagt vekt på at du må ha forstått at du fikk penger du ikke har rett til. Vi vurderer likevel at uaktsomheten din har vært så liten at vi har redusert beløpet du må betale tilbake.")
-            .contains("Du må betale 500 kroner");
+            .contains("Du må betale 500 kroner");
     }
 
     @Test

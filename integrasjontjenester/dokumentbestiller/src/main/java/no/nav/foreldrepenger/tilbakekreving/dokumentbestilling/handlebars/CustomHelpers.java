@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -65,7 +66,7 @@ public interface CustomHelpers {
 
     class MapLookupHelper implements Helper<Object> {
         @Override
-        public Object apply(Object context, Options options) throws IOException {
+        public Object apply(Object context, Options options) {
             String key = context.toString();
             Object defaultVerdi = options.param(0, null);
             Object verdi = options.hash(key, defaultVerdi);
@@ -73,6 +74,41 @@ public interface CustomHelpers {
                 throw new IllegalArgumentException("Fant ikke verdi for " + key + " i " + options.hash);
             }
             return verdi;
+        }
+    }
+
+    class KroneFormattererMedTusenskille implements Helper<Object> {
+        @Override
+        public Object apply(Object context, Options options) {
+            if (context == null) {
+                throw new IllegalArgumentException("Mangler context");
+            }
+            String key = context.toString();
+            if (key == null) {
+                throw new IllegalArgumentException("Mangler påkrevd beløp");
+            }
+            String utf8nonBreakingSpace = "\u00A0";
+            BigDecimal beløp = new BigDecimal(key);
+            String beløpMedTusenskille = medTusenskille(beløp, utf8nonBreakingSpace);
+            String benevning = beløp.compareTo(BigDecimal.ONE) == 0 ? "krone" : "kroner";
+            return beløpMedTusenskille + utf8nonBreakingSpace + benevning;
+        }
+
+        public static String medTusenskille(BigDecimal verdi, String tusenskille) {
+            BigDecimal minsteTallTusenskille = BigDecimal.valueOf(1000);
+            if (verdi.compareTo(minsteTallTusenskille) < 0) {
+                return verdi.toPlainString();
+            }
+            String utenTusenskille = verdi.toPlainString();
+            int antallFørFørsteTusenskille = utenTusenskille.length() % 3 != 0 ? utenTusenskille.length() % 3 : 3;
+            String resultat = utenTusenskille.substring(0, antallFørFørsteTusenskille);
+            int index = antallFørFørsteTusenskille;
+            while (index < utenTusenskille.length()) {
+                resultat += tusenskille;
+                resultat += utenTusenskille.substring(index, index + 3);
+                index += 3;
+            }
+            return resultat;
         }
     }
 }

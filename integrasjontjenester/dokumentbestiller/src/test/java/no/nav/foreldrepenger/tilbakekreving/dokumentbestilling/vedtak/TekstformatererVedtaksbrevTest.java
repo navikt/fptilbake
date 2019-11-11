@@ -354,6 +354,7 @@ public class TekstformatererVedtaksbrevTest {
                 .medRiktigBeløp(BigDecimal.ZERO)
                 .medFeilutbetaltBeløp(BigDecimal.valueOf(1000))
                 .medTilbakekrevesBeløp(BigDecimal.ZERO)
+                .medForeldetBeløp(BigDecimal.valueOf(1000))
                 .build(),
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(februar)
