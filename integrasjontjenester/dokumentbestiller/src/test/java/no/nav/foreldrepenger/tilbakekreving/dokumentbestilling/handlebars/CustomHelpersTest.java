@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 
 import org.junit.Test;
 
-class CustomHelpersTest {
+public class CustomHelpersTest {
     @Test
     public void skal_ha_riktig_tusenskille() {
         assertThat(medTusenskille(BigDecimal.valueOf(1), " ")).isEqualTo("1");
