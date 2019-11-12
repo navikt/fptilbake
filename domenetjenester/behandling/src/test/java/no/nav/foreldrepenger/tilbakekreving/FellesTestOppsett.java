@@ -76,7 +76,6 @@ public class FellesTestOppsett extends TestOppsett {
         behandlingskontrollProvider,
         fagsakTjeneste,
         mockHistorikkTjeneste,
-        feilutbetalingTjeneste,
         mockFpsakKlient,
         defaultVentetid);
 

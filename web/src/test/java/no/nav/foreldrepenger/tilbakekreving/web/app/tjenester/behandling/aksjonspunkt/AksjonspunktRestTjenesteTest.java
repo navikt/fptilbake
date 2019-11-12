@@ -24,7 +24,6 @@ import org.junit.rules.ExpectedException;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjenesteImpl;
-import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FeilutbetalingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollAsynkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollTjeneste;
@@ -80,7 +79,6 @@ public class AksjonspunktRestTjenesteTest {
                 behandlingskontrollProvider,
                 mock(FagsakTjeneste.class),
                 mock(HistorikkinnslagTjeneste.class),
-                mock(FeilutbetalingTjeneste.class),
                 mock(FpsakKlient.class),
                 DEFAULT_PERIOD);
 

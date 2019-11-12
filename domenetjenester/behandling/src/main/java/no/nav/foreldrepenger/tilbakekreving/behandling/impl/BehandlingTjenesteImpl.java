@@ -2,7 +2,6 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
 import static no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingUtil.bestemFristForBehandlingVent;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
@@ -18,8 +17,6 @@ import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingFeil;
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BehandlingFeilutbetalingFakta;
-import no.nav.foreldrepenger.tilbakekreving.behandling.modell.UtbetaltPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollAsynkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollTjeneste;
@@ -39,20 +36,13 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselInfo;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fagsak.FagsakTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.TilbakekrevingValgDto;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagAggregate;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.vedtak.felles.jpa.Transaction;
 import no.nav.vedtak.konfig.KonfigVerdi;
@@ -66,13 +56,10 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
     private BehandlingRepository behandlingRepository;
     private EksternBehandlingRepository eksternBehandlingRepository;
     private BehandlingresultatRepository behandlingresultatRepository;
-    private KravgrunnlagRepository grunnlagRepository;
-    private VarselRepository varselRepository;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste;
     private FagsakTjeneste fagsakTjeneste;
     private HistorikkinnslagTjeneste historikkinnslagTjeneste;
-    private FeilutbetalingTjeneste feilutbetalingTjeneste;
     private FpsakKlient fpsakKlient;
 
     private Period defaultVentefrist;
@@ -86,22 +73,18 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
                                   BehandlingskontrollProvider behandlingskontrollProvider,
                                   FagsakTjeneste fagsakTjeneste,
                                   HistorikkinnslagTjeneste historikkinnslagTjeneste,
-                                  FeilutbetalingTjeneste feilutbetalingTjeneste,
                                   FpsakKlient fpsakKlient,
                                   @KonfigVerdi("frist.brukerrespons.varsel") Period defaultVentefrist) {
         this.behandlingskontrollTjeneste = behandlingskontrollProvider.getBehandlingskontrollTjeneste();
         this.behandlingskontrollAsynkTjeneste = behandlingskontrollProvider.getBehandlingskontrollAsynkTjeneste();
         this.fagsakTjeneste = fagsakTjeneste;
         this.historikkinnslagTjeneste = historikkinnslagTjeneste;
-        this.feilutbetalingTjeneste = feilutbetalingTjeneste;
         this.fpsakKlient = fpsakKlient;
         this.defaultVentefrist = defaultVentefrist;
 
         this.behandlingRepository = behandlingRepositoryProvider.getBehandlingRepository();
-        this.grunnlagRepository = behandlingRepositoryProvider.getGrunnlagRepository();
         this.eksternBehandlingRepository = behandlingRepositoryProvider.getEksternBehandlingRepository();
         this.behandlingresultatRepository = behandlingRepositoryProvider.getBehandlingresultatRepository();
-        this.varselRepository = behandlingRepositoryProvider.getVarselRepository();
     }
 
     @Override
@@ -151,35 +134,6 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
         if (!kanEndreBehandling) {
             throw BehandlingFeil.FACTORY.endringerHarForekommetPåSøknaden().toException();
         }
-    }
-
-    @Override
-    public Optional<BehandlingFeilutbetalingFakta> hentBehandlingFeilutbetalingFakta(Long behandlingId) {
-        Optional<KravgrunnlagAggregate> grunnlagAggregate = grunnlagRepository.finnGrunnlagForBehandlingId(behandlingId);
-        EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandlingId);
-        Optional<VarselInfo> resultat = varselRepository.finnVarsel(behandlingId);
-        UUID eksternUuid = eksternBehandling.getEksternUuid();
-        EksternBehandlingsinfoDto eksternBehandlingsinfoDto = hentEksternBehandlingFraFpsak(eksternUuid);
-        Optional<TilbakekrevingValgDto> tilbakekrevingValg = fpsakKlient.hentTilbakekrevingValg(eksternUuid);
-
-        if (grunnlagAggregate.isPresent() && grunnlagAggregate.get().getGrunnlagØkonomi() != null) {
-            // vi skal bare vise posteringer med feilutbetalt periode
-            List<KravgrunnlagPeriode432> feilutbetaltPerioder = feilutbetalingTjeneste.finnPerioderMedFeilutbetaltPosteringer(grunnlagAggregate.get().getGrunnlagØkonomi().getPerioder());
-            BigDecimal aktuellFeilUtbetaltBeløp = BigDecimal.ZERO;
-            List<UtbetaltPeriode> utbetaltPerioder = feilutbetalingTjeneste.finnesLogiskPeriode(feilutbetaltPerioder);
-            LocalDate totalPeriodeFom = null;
-            LocalDate totalPeriodeTom = null;
-            for (UtbetaltPeriode utbetaltPeriode : utbetaltPerioder) {
-                aktuellFeilUtbetaltBeløp = aktuellFeilUtbetaltBeløp.add(utbetaltPeriode.getBelop());
-                feilutbetalingTjeneste.hentFeilutbetalingÅrsak(behandlingId, utbetaltPeriode);
-                totalPeriodeFom = totalPeriodeFom == null || totalPeriodeFom.isAfter(utbetaltPeriode.getFom()) ? utbetaltPeriode.getFom() : totalPeriodeFom;
-                totalPeriodeTom = totalPeriodeTom == null || totalPeriodeTom.isBefore(utbetaltPeriode.getTom()) ? utbetaltPeriode.getTom() : totalPeriodeTom;
-            }
-            String begrunnelse = feilutbetalingTjeneste.hentFaktaBegrunnelse(behandlingId);
-            return Optional.of(feilutbetalingTjeneste.lagBehandlingFeilUtbetalingFakta(resultat, aktuellFeilUtbetaltBeløp, utbetaltPerioder,
-                new Periode(totalPeriodeFom, totalPeriodeTom), eksternBehandlingsinfoDto, tilbakekrevingValg,begrunnelse));
-        }
-        return Optional.empty();
     }
 
     @Override
@@ -295,8 +249,8 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
     }
 
     private boolean harTilbakekrevingAlleredeFinnes(UUID eksternUuid) {
-        Optional<EksternBehandling> eksternBehandling =  eksternBehandlingRepository.finnForSisteAvsluttetTbkBehandling(eksternUuid);
-        if(eksternBehandling.isPresent()){
+        Optional<EksternBehandling> eksternBehandling = eksternBehandlingRepository.finnForSisteAvsluttetTbkBehandling(eksternUuid);
+        if (eksternBehandling.isPresent()) {
             Behandling behandling = behandlingRepository.hentBehandling(eksternBehandling.get().getInternId());
             return !erBehandlingHenlagt(behandling); //hvis behandlingen er henlagt,kan opprettes nye behandling
         }

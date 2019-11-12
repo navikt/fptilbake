@@ -37,14 +37,13 @@ import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 @RunWith(CdiRunner.class)
 public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
 
-    TilbakekrevingBeregningTjeneste tjeneste = new TilbakekrevingBeregningTjeneste(vurdertForeldelseTjeneste, repoProvider);
-
+    private TilbakekrevingBeregningTjeneste tjeneste = new TilbakekrevingBeregningTjeneste(vurdertForeldelseTjeneste, repoProvider);
 
     @Test
     public void skal_beregne_tilbakekrevingsbeløp_for_periode_som_ikke_er_foreldet() {
         Periode periode = new Periode(LocalDate.of(2019, 5, 1), LocalDate.of(2019, 5, 3));
 
-        lagKravgrunnlag(internBehandlingId, periode,BigDecimal.ZERO);
+        lagKravgrunnlag(internBehandlingId, periode, BigDecimal.ZERO);
         lagForeldelse(internBehandlingId, periode, ForeldelseVurderingType.IKKE_FORELDET);
         lagVilkårsvurderingMedForsett(internBehandlingId, periode);
 
@@ -68,7 +67,7 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
     public void skal_beregne_tilbakekrevingsbeløp_for_periode_som_gjelder_ikke_er_foreldelse() {
         Periode periode = new Periode(LocalDate.of(2019, 5, 1), LocalDate.of(2019, 5, 3));
 
-        lagKravgrunnlag(internBehandlingId, periode,BigDecimal.ZERO);
+        lagKravgrunnlag(internBehandlingId, periode, BigDecimal.ZERO);
         lagVilkårsvurderingMedForsett(internBehandlingId, periode);
 
         BeregningResultat beregningResultat = tjeneste.beregn(internBehandlingId);
@@ -91,7 +90,7 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
     public void skal_beregne_tilbakekrevingsbeløp_for_periode_som_er_foreldet() {
         Periode periode = new Periode(LocalDate.of(2019, 5, 1), LocalDate.of(2019, 5, 3));
 
-        lagKravgrunnlag(internBehandlingId, periode,BigDecimal.ZERO);
+        lagKravgrunnlag(internBehandlingId, periode, BigDecimal.ZERO);
         lagForeldelse(internBehandlingId, periode, ForeldelseVurderingType.FORELDET);
 
         BeregningResultat beregningResultat = tjeneste.beregn(internBehandlingId);
@@ -116,7 +115,7 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
     public void skal_beregne_tilbakekrevingsbeløp_for_periode_som_ikke_er_foreldet_medSkattProsent() {
         Periode periode = new Periode(LocalDate.of(2019, 5, 1), LocalDate.of(2019, 5, 3));
 
-        lagKravgrunnlag(internBehandlingId, periode,BigDecimal.valueOf(10));
+        lagKravgrunnlag(internBehandlingId, periode, BigDecimal.valueOf(10));
         lagForeldelse(internBehandlingId, periode, ForeldelseVurderingType.IKKE_FORELDET);
         lagVilkårsvurderingMedForsett(internBehandlingId, periode);
 
@@ -144,17 +143,17 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
         Periode periode1 = new Periode(LocalDate.of(2019, 5, 4), LocalDate.of(2019, 5, 6));
         Periode logikkPeriode = new Periode(LocalDate.of(2019, 5, 1), LocalDate.of(2019, 5, 6));
         Kravgrunnlag431 grunnlag = lagGrunnlag();
-        KravgrunnlagPeriode432 grunnlagPeriode = lagGrunnlagPeriode(periode,grunnlag);
-        grunnlagPeriode.leggTilBeløp(lagYtelBeløp(BigDecimal.valueOf(10),grunnlagPeriode));
+        KravgrunnlagPeriode432 grunnlagPeriode = lagGrunnlagPeriode(periode, grunnlag);
+        grunnlagPeriode.leggTilBeløp(lagYtelBeløp(BigDecimal.valueOf(10), grunnlagPeriode));
         grunnlagPeriode.leggTilBeløp(lagFeilBeløp(grunnlagPeriode));
 
-        KravgrunnlagPeriode432 grunnlagPeriode1 = lagGrunnlagPeriode(periode1,grunnlag);
-        grunnlagPeriode1.leggTilBeløp(lagYtelBeløp(BigDecimal.valueOf(10),grunnlagPeriode1));
+        KravgrunnlagPeriode432 grunnlagPeriode1 = lagGrunnlagPeriode(periode1, grunnlag);
+        grunnlagPeriode1.leggTilBeløp(lagYtelBeløp(BigDecimal.valueOf(10), grunnlagPeriode1));
         grunnlagPeriode1.leggTilBeløp(lagFeilBeløp(grunnlagPeriode1));
 
         grunnlag.leggTilPeriode(grunnlagPeriode);
         grunnlag.leggTilPeriode(grunnlagPeriode1);
-        grunnlagRepository.lagre(internBehandlingId,grunnlag);
+        grunnlagRepository.lagre(internBehandlingId, grunnlag);
 
         lagForeldelse(internBehandlingId, logikkPeriode, ForeldelseVurderingType.IKKE_FORELDET);
         lagVilkårsvurderingMedForsett(internBehandlingId, logikkPeriode);
@@ -193,7 +192,7 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
             .medPeriode(p)
             .build());
         vurdering.leggTilPeriode(p);
-        vilkårsvurderingRepository.lagre(behandlingId,vurdering);
+        vilkårsvurderingRepository.lagre(behandlingId, vurdering);
     }
 
     private void lagForeldelse(Long behandlingId, Periode periode, ForeldelseVurderingType resultat) {
@@ -220,7 +219,7 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
         p.leggTilBeløp(lagYtelBeløp(skattProsent, p));
         grunnlag.leggTilPeriode(p);
 
-        grunnlagRepository.lagre(behandlingId,grunnlag);
+        grunnlagRepository.lagre(behandlingId, grunnlag);
     }
 
     private KravgrunnlagBelop433 lagFeilBeløp(KravgrunnlagPeriode432 p) {

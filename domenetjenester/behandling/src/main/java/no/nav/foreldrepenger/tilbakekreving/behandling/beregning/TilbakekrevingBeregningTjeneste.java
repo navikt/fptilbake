@@ -54,7 +54,7 @@ public class TilbakekrevingBeregningTjeneste {
     }
 
     public BeregningResultat beregn(Long behandlingId) {
-        Kravgrunnlag431 kravgrunnlag = hentKravgrunnlag(behandlingId);
+        Kravgrunnlag431 kravgrunnlag = kravgrunnlagRepository.finnKravgrunnlag(behandlingId);
         VurdertForeldelse vurdertForeldelse = hentVurdertForeldelse(behandlingId);
         VilkårVurderingEntitet vilkårsvurdering = hentVilkårsvurdering(behandlingId);
         List<Periode> perioder = finnPerioder(vurdertForeldelse, vilkårsvurdering);
@@ -82,13 +82,6 @@ public class TilbakekrevingBeregningTjeneste {
         return vurdertForeldelseRepository.finnVurdertForeldelseForBehandling(behandlingId)
             .map(VurdertForeldelseAggregate::getVurdertForeldelse)
             .orElse(vurderingUtenPerioder);
-    }
-
-    private Kravgrunnlag431 hentKravgrunnlag(Long behandlingId) {
-        return kravgrunnlagRepository
-            .finnGrunnlagForBehandlingId(behandlingId)
-            .orElseThrow()
-            .getGrunnlagØkonomi();
     }
 
     private List<Periode> finnPerioder(VurdertForeldelse vurdertForeldelse, VilkårVurderingEntitet vilkårsvurdering) {

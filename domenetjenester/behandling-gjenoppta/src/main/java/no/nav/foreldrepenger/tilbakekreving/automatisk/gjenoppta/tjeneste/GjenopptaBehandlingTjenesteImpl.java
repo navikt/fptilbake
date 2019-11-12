@@ -15,7 +15,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingKandidaterRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingVenterRepository;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagAggregate;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.ResponsKanal;
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
@@ -115,15 +114,8 @@ public class GjenopptaBehandlingTjenesteImpl implements GjenopptaBehandlingTjene
 
     @Override
     public boolean kanGjenopptaSteg(long behandlingId) {
-        boolean kanGjenopptaSteg = false;
-        Optional<KravgrunnlagAggregate> kravgrunnlagAggregate = grunnlagRepository.finnGrunnlagForBehandlingId(behandlingId);
-        if (kravgrunnlagAggregate.isPresent()) {
-            KravgrunnlagAggregate aggregate = kravgrunnlagAggregate.get();
-            if (!aggregate.isSperret()) {
-                kanGjenopptaSteg = true;
-            }
-        }
-        return kanGjenopptaSteg;
+        return grunnlagRepository.harGrunnlagForBehandlingId(behandlingId)
+            && !grunnlagRepository.erKravgrunnlagSperret(behandlingId);
     }
 
     private String hentCallId() {

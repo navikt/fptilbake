@@ -9,8 +9,10 @@ import org.junit.rules.ExpectedException;
 
 import no.nav.foreldrepenger.domene.dokumentarkiv.DokumentArkivTjeneste;
 import no.nav.foreldrepenger.domene.dokumentarkiv.impl.DokumentArkivTjenesteImpl;
+import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingRevurderingTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FeilutbetalingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FaktaFeilutbetalingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurdertForeldelseTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.vilkårsvurdering.VilkårsvurderingHistorikkInnslagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.vilkårsvurdering.VilkårsvurderingTjeneste;
@@ -49,6 +51,7 @@ public class TestOppsett {
     protected EntityManager em = repoRule.getEntityManager();
 
     protected BehandlingskontrollTjeneste behandlingskontrollTjeneste = mock(BehandlingskontrollTjeneste.class);
+    protected GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste = mock(GjenopptaBehandlingTjeneste.class);
     protected BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste = mock(BehandlingskontrollAsynkTjeneste.class);
     protected TpsTjeneste mockTpsTjeneste = mock(TpsTjeneste.class);
     protected HistorikkinnslagTjeneste mockHistorikkTjeneste = mock(HistorikkinnslagTjeneste.class);
@@ -68,12 +71,13 @@ public class TestOppsett {
     protected TotrinnRepository totrinnRepository = new TotrinnRepository(em);
     protected BehandlingRepository behandlingRepository = repoProvider.getBehandlingRepository();
     protected VarselRepository varselRepository = repoProvider.getVarselRepository();
+    protected KravgrunnlagTjeneste kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repoProvider, gjenopptaBehandlingTjeneste, behandlingskontrollTjeneste);
 
     protected HistorikkInnslagKonverter historikkInnslagKonverter = new HistorikkInnslagKonverter(repoProvider.getKodeverkRepository(),
-            repoProvider.getAksjonspunktRepository());
+        repoProvider.getAksjonspunktRepository());
 
     protected DokumentArkivTjeneste dokumentArkivTjeneste = new DokumentArkivTjenesteImpl(mockJournalConsumer, repoProvider.getKodeverkRepository(),
-            repoProvider.getFagsakRepository());
+        repoProvider.getFagsakRepository());
 
     protected HistorikkTjenesteAdapter historikkTjenesteAdapter = new HistorikkTjenesteAdapter(historikkRepository, historikkInnslagKonverter, dokumentArkivTjeneste);
 
@@ -85,6 +89,6 @@ public class TestOppsett {
 
     protected BehandlingRevurderingTjeneste revurderingTjeneste = new BehandlingRevurderingTjeneste(repoProvider);
 
-    protected FeilutbetalingTjeneste feilutbetalingTjeneste = new FeilutbetalingTjeneste(repoProvider);
+    protected FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste = new FaktaFeilutbetalingTjeneste(repoProvider, kravgrunnlagTjeneste, mockFpsakKlient);
 
 }
