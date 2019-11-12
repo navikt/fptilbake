@@ -21,12 +21,12 @@ public class BestillBrevDto implements AbacDto {
     @NotNull
     @Size(min = 1, max = 100)
     @Pattern(regexp = InputValideringRegex.KODEVERK)
-    private String dokumentMalType;
+    private String brevmalkode;
 
     @NotNull
     @Size(min = 1, max = 3000)
     @Pattern(regexp = InputValideringRegex.FRITEKST)
-    private String friTekst;
+    private String fritekst;
 
     public Long getBehandlingId() {
         return behandlingId;
@@ -36,20 +36,20 @@ public class BestillBrevDto implements AbacDto {
         this.behandlingId = behandlingId;
     }
 
-    public String getDokumentMalType() {
-        return dokumentMalType;
+    public String getBrevmalkode() {
+        return brevmalkode;
     }
 
-    public void setDokumentMalType(String dokumentMalType) {
-        this.dokumentMalType = dokumentMalType;
+    public void setBrevmalkode(String brevmalkode) {
+        this.brevmalkode = brevmalkode;
     }
 
-    public String getFriTekst() {
-        return friTekst;
+    public String getFritekst() {
+        return fritekst;
     }
 
-    public void setFriTekst(String friTekst) {
-        this.friTekst = friTekst;
+    public void setFritekst(String fritekst) {
+        this.fritekst = fritekst;
     }
 
     @Override

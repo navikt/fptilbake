@@ -17,7 +17,7 @@ import org.junit.Test;
 import com.google.common.collect.Lists;
 
 import no.nav.foreldrepenger.domene.dokumentarkiv.journal.JournalTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FaktaFeilutbetalingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BehandlingFeilutbetalingFakta;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.UtbetaltPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
@@ -51,7 +51,7 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
     private VarselRepository varselRepository = new VarselRepository(repositoryRule.getEntityManager());
 
     private EksternDataForBrevTjeneste mockEksternDataForBrevTjeneste = mock(EksternDataForBrevTjeneste.class);
-    private BehandlingTjeneste mockBehandlingTjeneste = mock(BehandlingTjeneste.class);
+    private FaktaFeilutbetalingTjeneste mockFeilutbetalingTjeneste = mock(FaktaFeilutbetalingTjeneste.class);
     private FritekstbrevTjeneste mockFritekstbrevTjeneste = mock(FritekstbrevTjeneste.class);
     private JournalTjeneste mockJournalTjeneste = mock(JournalTjeneste.class);
     private PersoninfoAdapter mockPersoninfoAdapter = mock(PersoninfoAdapter.class);
@@ -61,10 +61,10 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
         mockJournalTjeneste,
         mockPersoninfoAdapter);
 
-    private ManueltVarselBrevTjeneste manueltVarselBrevTjeneste = new ManueltVarselBrevTjeneste(brevdataRepository,
-        varselRepository,
+    private ManueltVarselBrevTjeneste manueltVarselBrevTjeneste = new ManueltVarselBrevTjeneste(repositoryProvider,
+        brevdataRepository,
         mockEksternDataForBrevTjeneste,
-        mockBehandlingTjeneste,
+        mockFeilutbetalingTjeneste,
         mockFritekstbrevTjeneste,
         historikkinnslagTjeneste);
 
@@ -73,8 +73,7 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
     @Before
     public void setup() {
         behandlingId = behandling.getId();
-        when(mockBehandlingTjeneste.hentBehandling(behandling.getId())).thenReturn(behandling);
-        when(mockBehandlingTjeneste.hentBehandlingFeilutbetalingFakta(behandlingId)).thenReturn(Optional.of(lagFeilutbetalingFakta()));
+        when(mockFeilutbetalingTjeneste.hentBehandlingFeilutbetalingFakta(behandlingId)).thenReturn(lagFeilutbetalingFakta());
         when(mockFritekstbrevTjeneste.sendFritekstbrev(any(FritekstbrevData.class))).thenReturn(lagJournalOgDokument());
 
         when(mockEksternDataForBrevTjeneste.hentYtelsenavn(FagsakYtelseType.FORELDREPENGER, Språkkode.nb))

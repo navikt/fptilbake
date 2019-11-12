@@ -186,7 +186,8 @@ public class BehandlingDtoTjenesteTest {
             "sett-behandling-pa-vent",
             "totrinnskontroll-arsaker-readOnly",
             "brev-maler",
-            "brev-bestill");
+            "brev-bestill",
+            "brev-forhandvis");
     }
 
     @Test
@@ -207,7 +208,8 @@ public class BehandlingDtoTjenesteTest {
             "totrinnskontroll-arsaker",
             "bekreft-totrinnsaksjonspunkt",
             "brev-maler",
-            "brev-bestill");
+            "brev-bestill",
+            "brev-forhandvis");
     }
 
     private Behandling mockBehandling() {

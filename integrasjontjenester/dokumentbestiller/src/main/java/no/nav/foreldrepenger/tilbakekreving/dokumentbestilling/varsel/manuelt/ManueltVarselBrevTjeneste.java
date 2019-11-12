@@ -1,18 +1,19 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.manuelt;
 
 import java.time.Period;
-import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FaktaFeilutbetalingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BehandlingFeilutbetalingFakta;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevdataRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VarselbrevSporing;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.dokumentbestiller.DokumentMalType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
@@ -33,9 +34,10 @@ public class ManueltVarselBrevTjeneste {
 
     private BrevdataRepository brevdataRepository;
     private VarselRepository varselRepository;
+    private BehandlingRepository behandlingRepository;
 
     private EksternDataForBrevTjeneste eksternDataForBrevTjeneste;
-    private BehandlingTjeneste behandlingTjeneste;
+    private FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste;
     private FritekstbrevTjeneste bestillDokumentTjeneste;
     private HistorikkinnslagTjeneste historikkinnslagTjeneste;
 
@@ -44,23 +46,24 @@ public class ManueltVarselBrevTjeneste {
     }
 
     @Inject
-    public ManueltVarselBrevTjeneste(BrevdataRepository brevdataRepository,
-                                     VarselRepository varselRepository,
+    public ManueltVarselBrevTjeneste(BehandlingRepositoryProvider repositoryProvider,
+                                     BrevdataRepository brevdataRepository,
                                      EksternDataForBrevTjeneste eksternDataForBrevTjeneste,
-                                     BehandlingTjeneste behandlingTjeneste,
+                                     FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste,
                                      FritekstbrevTjeneste bestillDokumentTjeneste,
                                      HistorikkinnslagTjeneste historikkinnslagTjeneste) {
         this.brevdataRepository = brevdataRepository;
-        this.varselRepository = varselRepository;
+        this.varselRepository = repositoryProvider.getVarselRepository();
+        this.behandlingRepository = repositoryProvider.getBehandlingRepository();
 
         this.eksternDataForBrevTjeneste = eksternDataForBrevTjeneste;
-        this.behandlingTjeneste = behandlingTjeneste;
+        this.faktaFeilutbetalingTjeneste = faktaFeilutbetalingTjeneste;
         this.bestillDokumentTjeneste = bestillDokumentTjeneste;
         this.historikkinnslagTjeneste = historikkinnslagTjeneste;
     }
 
     public void sendManueltVarselBrev(Long behandlingId, DokumentMalType malType, String fritekst) {
-        Behandling behandling = behandlingTjeneste.hentBehandling(behandlingId);
+        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         VarselbrevSamletInfo varselbrevSamletInfo = lagVarselBeløpForSending(fritekst, behandling);
 
         FritekstbrevData data = lagManueltVarselBrev(varselbrevSamletInfo);
@@ -73,7 +76,7 @@ public class ManueltVarselBrevTjeneste {
 
     public byte[] hentForhåndsvisningManueltVarselbrev(Long behandlingId, DokumentMalType malType, String fritekst) {
         if (DokumentMalType.VARSEL_DOK.equals(malType)) {
-            Behandling behandling = behandlingTjeneste.hentBehandling(behandlingId);
+            Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
             VarselbrevSamletInfo varselbrevSamletInfo = lagVarselBeløpForSending(fritekst, behandling);
 
             FritekstbrevData data = lagManueltVarselBrev(varselbrevSamletInfo);
@@ -106,8 +109,7 @@ public class ManueltVarselBrevTjeneste {
         Period ventetid = eksternDataForBrevTjeneste.getBrukersSvarfrist();
 
         //Henter feilutbetaling fakta
-        Optional<BehandlingFeilutbetalingFakta> fakta = behandlingTjeneste.hentBehandlingFeilutbetalingFakta(behandling.getId());
-        BehandlingFeilutbetalingFakta feilutbetalingFakta = fakta.get(); //NOSONAR
+        BehandlingFeilutbetalingFakta feilutbetalingFakta = faktaFeilutbetalingTjeneste.hentBehandlingFeilutbetalingFakta(behandling.getId());
 
         return VarselbrevUtil.sammenstillInfoFraFagsystemerForSendingManueltVarselBrev(
             behandling,

@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -8,7 +9,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import com.google.common.collect.Lists;
 
@@ -23,6 +23,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.brevmaler.DokumentBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.BrevmalDto;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.manuelt.ManueltVarselBrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.manuelt.SendManueltVarselbrevTask;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
@@ -38,10 +39,11 @@ import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepositoryImpl;
 public class DokumentBehandlingTjenesteTest extends DokumentBestillerTestOppsett {
 
     private final ProsessTaskRepository prosessTaskRepository = new ProsessTaskRepositoryImpl(repositoryRule.getEntityManager(), null, null);
-    private final JournalTjeneste mockJournalTjeneste = Mockito.mock(JournalTjeneste.class);
-    private final PersoninfoAdapter mockPersoninfoAdapter = Mockito.mock(PersoninfoAdapter.class);
+    private final JournalTjeneste mockJournalTjeneste = mock(JournalTjeneste.class);
+    private final PersoninfoAdapter mockPersoninfoAdapter = mock(PersoninfoAdapter.class);
     private HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(repositoryProvider.getHistorikkRepository(), mockJournalTjeneste, mockPersoninfoAdapter);
-    private DokumentBehandlingTjeneste dokumentBehandlingTjeneste = new DokumentBehandlingTjeneste(repositoryProvider, brevdataRepository, prosessTaskRepository, historikkinnslagTjeneste);
+    private ManueltVarselBrevTjeneste mockManueltVarselBrevTjeneste = mock(ManueltVarselBrevTjeneste.class);
+    private DokumentBehandlingTjeneste dokumentBehandlingTjeneste = new DokumentBehandlingTjeneste(repositoryProvider, brevdataRepository, prosessTaskRepository, historikkinnslagTjeneste, mockManueltVarselBrevTjeneste);
 
     @Test
     public void skal_henteBrevMal_for_behandling_som_har_ikke_sendt_varsel() {
@@ -90,7 +92,7 @@ public class DokumentBehandlingTjenesteTest extends DokumentBestillerTestOppsett
     }
 
     @Test
-    public void skal_bestille_brev_når_grunnlag_finnes(){
+    public void skal_bestille_brev_når_grunnlag_finnes() {
         Kravgrunnlag431 kravgrunnlag431 = Kravgrunnlag431.builder().medFagomraadeKode(FagOmrådeKode.FORELDREPENGER)
             .medVedtakId(12342l)
             .medEksternKravgrunnlagId("1234")
@@ -106,7 +108,7 @@ public class DokumentBehandlingTjenesteTest extends DokumentBestillerTestOppsett
             .medFeltKontroll("132323")
             .medSaksBehId("23454334").build();
         KravgrunnlagPeriode432 periode = KravgrunnlagPeriode432.builder()
-            .medPeriode(LocalDate.of(2019,5,1),LocalDate.of(2019,5,31))
+            .medPeriode(LocalDate.of(2019, 5, 1), LocalDate.of(2019, 5, 31))
             .medKravgrunnlag431(kravgrunnlag431).build();
         KravgrunnlagBelop433 ytelBeløp = KravgrunnlagBelop433.builder().medKlasseType(KlasseType.YTEL)
             .medKlasseKode(KlasseKode.FPADATORD)
@@ -121,13 +123,13 @@ public class DokumentBehandlingTjenesteTest extends DokumentBestillerTestOppsett
             .medTilbakekrevesBelop(BigDecimal.ZERO)
             .medOpprUtbetBelop(BigDecimal.ZERO)
             .medKravgrunnlagPeriode432(periode).build();
-        periode.setKravgrunnlagBeloper433(Lists.newArrayList(ytelBeløp,feilBeløp));
+        periode.setKravgrunnlagBeloper433(Lists.newArrayList(ytelBeløp, feilBeløp));
         kravgrunnlag431.leggTilPeriode(periode);
 
         Long behandlingId = behandling.getId();
-        repositoryProvider.getGrunnlagRepository().lagre(behandlingId,kravgrunnlag431);
+        repositoryProvider.getGrunnlagRepository().lagre(behandlingId, kravgrunnlag431);
 
-        dokumentBehandlingTjeneste.bestillBrev(behandlingId,DokumentMalType.VARSEL_DOK,"Bestilt varselbrev");
+        dokumentBehandlingTjeneste.bestillBrev(behandlingId, DokumentMalType.VARSEL_DOK, "Bestilt varselbrev");
 
         assertThat(prosessTaskRepository.finnProsessTaskType(SendManueltVarselbrevTask.TASKTYPE)).isPresent();
         List<Historikkinnslag> historikkinnslager = repositoryProvider.getHistorikkRepository().hentHistorikk(behandlingId);
@@ -138,9 +140,9 @@ public class DokumentBehandlingTjenesteTest extends DokumentBestillerTestOppsett
     }
 
     @Test
-    public void skal_bestille_brev_når_grunnlag_ikke_finnes(){
+    public void skal_bestille_brev_når_grunnlag_ikke_finnes() {
         expectedException.expectMessage("FPT-612900");
-        dokumentBehandlingTjeneste.bestillBrev(behandling.getId(),DokumentMalType.VARSEL_DOK,"Bestilt varselbrev");
+        dokumentBehandlingTjeneste.bestillBrev(behandling.getId(), DokumentMalType.VARSEL_DOK, "Bestilt varselbrev");
     }
 
     private Optional<BrevmalDto> hentSpesifiskBrevMal(List<BrevmalDto> brevMaler, DokumentMalType malType) {

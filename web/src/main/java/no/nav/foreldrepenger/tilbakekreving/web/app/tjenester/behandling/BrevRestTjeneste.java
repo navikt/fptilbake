@@ -23,6 +23,7 @@ import com.codahale.metrics.annotation.Timed;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.dokumentbestiller.DokumentMalType;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.brevmaler.DokumentBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.BrevmalDto;
@@ -72,9 +73,28 @@ public class BrevRestTjeneste {
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK, sporingslogg = false)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response bestillBrev(@NotNull @Valid BestillBrevDto bestillBrevDto) {
-        DokumentMalType malType = DokumentMalType.fraKode(bestillBrevDto.getDokumentMalType());
-        dokumentBehandlingTjeneste.bestillBrev(bestillBrevDto.getBehandlingId(), malType, bestillBrevDto.getFriTekst());
+        DokumentMalType malType = DokumentMalType.fraKode(bestillBrevDto.getBrevmalkode());
+        dokumentBehandlingTjeneste.bestillBrev(bestillBrevDto.getBehandlingId(), malType, bestillBrevDto.getFritekst());
         return Response.ok().build();
+    }
+
+    @POST
+    @Timed
+    @Path("/forhandsvis")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Returnerer en pdf som er en forhåndsvisning av brevet")
+    @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
+    @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
+    public Response forhåndsvisBrev(@ApiParam("Inneholder kode til brevmal og data som skal flettes inn i brevet") @NotNull @Valid BestillBrevDto forhåndsvisBestillBrevDto) {
+        DokumentMalType malType = DokumentMalType.fraKode(forhåndsvisBestillBrevDto.getBrevmalkode());
+        String fritekst = forhåndsvisBestillBrevDto.getFritekst();
+        long behandlingId = forhåndsvisBestillBrevDto.getBehandlingId();
+        byte[] dokument = dokumentBehandlingTjeneste.forhåndsvisBrev(behandlingId, malType, fritekst);
+
+        Response.ResponseBuilder responseBuilder = Response.ok(dokument);
+        responseBuilder.type("application/pdf");
+        responseBuilder.header("Content-Disposition", "filename=dokument.pdf");
+        return responseBuilder.build();
     }
 
 }
