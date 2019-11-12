@@ -95,7 +95,7 @@ public class KravgrunnlagTjenesteTest extends FellesTestOppsett {
 
         assertKravgrunnlag();
         assertThat(faktaFeilutbetalingRepository.finnFaktaOmFeilutbetaling(internBehandlingId)).isEmpty();
-        assertThat(vurdertForeldelseRepository.finnVurdertForeldelseForBehandling(internBehandlingId)).isEmpty();
+        assertThat(vurdertForeldelseRepository.finnVurdertForeldelse(internBehandlingId)).isEmpty();
         assertThat(vilkårsvurderingRepository.finnVilkårsvurdering(internBehandlingId)).isEmpty();
     }
 
