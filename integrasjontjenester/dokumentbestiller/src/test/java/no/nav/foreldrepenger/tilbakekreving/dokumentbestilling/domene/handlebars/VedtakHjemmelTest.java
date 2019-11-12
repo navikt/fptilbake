@@ -49,19 +49,19 @@ public class VedtakHjemmelTest {
     }
 
     @Test
-    public void skal_gi_riktig_hjemmel_når_foreldelse_er_vurdert_uten_tilleggsfrist_og_ikke_renter() {
-        VurdertForeldelse vurdertForeldelse = lagForeldelseperiode(periode, f -> f.medForeldelseVurderingType(ForeldelseVurderingType.IKKE_FORELDET));
+    public void skal_gi_riktig_hjemmel_når_noe_er_foreldet_uten_tilleggsfrist_og_ikke_renter() {
+        VurdertForeldelse vurdertForeldelse = lagForeldelseperiode(periode, f -> f.medForeldelseVurderingType(ForeldelseVurderingType.FORELDET));
         List<VilkårVurderingPeriodeEntitet> vurderingPerioder = aktsomhet(periode, a -> a.medAktsomhet(Aktsomhet.GROVT_UAKTSOM).medIleggRenter(false));
 
         assertThat(VedtakHjemmel.lagHjemmelstekst(VedtakResultatType.INGEN_TILBAKEBETALING, vurdertForeldelse, vurderingPerioder)).isEqualTo("folketrygdloven § 22-15 og foreldelsesloven §§ 2 og 3");
     }
 
     @Test
-    public void skal_gi_riktig_hjemmel_når_foreldelse_er_vurdert_uten_tilleggsfrist_og_renter() {
+    public void skal_gi_riktig_hjemmel_når_foreldelse_er_vurdert_men_ikke_ilagt_uten_tilleggsfrist_og_renter() {
         VurdertForeldelse vurdertForeldelse = lagForeldelseperiode(periode, f -> f.medForeldelseVurderingType(ForeldelseVurderingType.IKKE_FORELDET));
         List<VilkårVurderingPeriodeEntitet> vurderingPerioder = aktsomhet(periode, a -> a.medAktsomhet(Aktsomhet.GROVT_UAKTSOM).medIleggRenter(true));
 
-        assertThat(VedtakHjemmel.lagHjemmelstekst(VedtakResultatType.INGEN_TILBAKEBETALING, vurdertForeldelse, vurderingPerioder)).isEqualTo("folketrygdloven §§ 22-15 og 22-17 a og foreldelsesloven §§ 2 og 3");
+        assertThat(VedtakHjemmel.lagHjemmelstekst(VedtakResultatType.INGEN_TILBAKEBETALING, vurdertForeldelse, vurderingPerioder)).isEqualTo("folketrygdloven §§ 22-15 og 22-17 a");
     }
 
     @Test
