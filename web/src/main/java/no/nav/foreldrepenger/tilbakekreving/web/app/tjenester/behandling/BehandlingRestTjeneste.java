@@ -52,6 +52,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.Asy
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingDtoTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingRettigheterDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.ByttBehandlendeEnhetDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.FpsakUuidDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.GjenopptaBehandlingDto;
@@ -327,4 +328,16 @@ public class BehandlingRestTjeneste {
         behandlendeEnhetTjeneste.byttBehandlendeEnhet(behandlingId, new OrganisasjonsEnhet(enhetId, enhetNavn), HistorikkAktør.SAKSBEHANDLER);
     }
 
+    @GET
+    @Path("/handling-rettigheter")
+    @ApiOperation(value = "Henter rettigheter for lovlige behandlingsoperasjoner")
+    @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
+    @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
+    public BehandlingRettigheterDto hentBehandlingOperasjonRettigheter(
+        @NotNull @QueryParam("behandlingId") @Valid BehandlingIdDto behandlingIdDto
+    ) {
+        Boolean harSoknad = true;
+        //TODO (TOR) Denne skal etterkvart returnere rettighetene knytta til behandlingsmeny i frontend
+        return new BehandlingRettigheterDto(harSoknad);
+    }
 }

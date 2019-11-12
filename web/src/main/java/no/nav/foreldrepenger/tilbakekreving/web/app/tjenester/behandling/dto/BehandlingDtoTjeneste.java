@@ -70,6 +70,7 @@ public class BehandlingDtoTjeneste {
         settStandardFelter(behandling, dto);
 
         // Behandlingsmeny-operasjoner
+        dto.leggTil(new ResourceLink("/fptilbake/api/behandlinger/handling-rettigheter?behandlingId=" + behandling.getId(), "handling-rettigheter", ResourceLink.HttpMethod.GET));
         dto.leggTil(new ResourceLink("/fptilbake/api/behandlinger/bytt-enhet", "bytt-behandlende-enhet", ResourceLink.HttpMethod.POST));
         dto.leggTil(new ResourceLink("/fptilbake/api/behandlinger/opne-for-endringer", "opne-for-endringer", ResourceLink.HttpMethod.POST));
         dto.leggTil(new ResourceLink("/fptilbake/api/behandlinger/henlegg", "henlegg-behandling", ResourceLink.HttpMethod.POST));
