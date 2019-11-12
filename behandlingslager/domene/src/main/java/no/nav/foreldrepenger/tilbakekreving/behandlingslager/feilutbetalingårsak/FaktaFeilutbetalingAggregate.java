@@ -17,7 +17,7 @@ import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
 
 @Entity(name = "FaktaFeilutbetalingAggregate")
 @Table(name = "GR_FAKTA_FEILUTBETALING")
-public class FaktaFeilutbetalingAggregate extends BaseEntitet {
+class FaktaFeilutbetalingAggregate extends BaseEntitet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_GR_FAKTA_FEILUTBETALING")
