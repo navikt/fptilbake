@@ -33,6 +33,9 @@ import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 @ApplicationScoped
 public class DokumentRestTjeneste {
 
+    private static final String PDF_CONTENT_TYPE = "application/pdf";
+    private static final String CONTENT_DISPOSITION = "Content-Disposition";
+    private static final String FILENAME_DOKUMENT_PDF = "filename=dokument.pdf";
     private VarselbrevTjeneste varselbrevTjeneste;
     private VedtaksbrevTjeneste vedtaksbrevTjeneste;
 
@@ -57,8 +60,8 @@ public class DokumentRestTjeneste {
         @ApiParam("Inneholder kode til brevmal og data som skal flettes inn i brevet") @Valid HentForhåndsvisningVarselbrevDto hentForhåndsvisningVarselbrevDto) { // NOSONAR
         byte[] dokument = varselbrevTjeneste.hentForhåndsvisningVarselbrev(hentForhåndsvisningVarselbrevDto);
         Response.ResponseBuilder responseBuilder = Response.ok(dokument);
-        responseBuilder.type("application/pdf");
-        responseBuilder.header("Content-Disposition", "filename=dokument.pdf");
+        responseBuilder.type(PDF_CONTENT_TYPE);
+        responseBuilder.header(CONTENT_DISPOSITION, FILENAME_DOKUMENT_PDF);
         return responseBuilder.build();
     }
 
@@ -84,8 +87,8 @@ public class DokumentRestTjeneste {
     public Response hentForhåndsvisningVedtaksbrev(@Valid HentForhåndvisningVedtaksbrevPdfDto vedtaksbrevPdfDto) { // NOSONAR
         byte[] dokument = vedtaksbrevTjeneste.hentForhåndsvisningVedtaksbrevSomPdf(vedtaksbrevPdfDto);
         Response.ResponseBuilder responseBuilder = Response.ok(dokument);
-        responseBuilder.type("application/pdf");
-        responseBuilder.header("Content-Disposition", "filename=dokument.pdf");
+        responseBuilder.type(PDF_CONTENT_TYPE);
+        responseBuilder.header(CONTENT_DISPOSITION, FILENAME_DOKUMENT_PDF);
         return responseBuilder.build();
     }
 

@@ -1,6 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev;
 
-import no.nav.vedtak.felles.jpa.BaseEntitet;
+import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -8,7 +8,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.util.Objects;
+
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
+import no.nav.vedtak.felles.jpa.BaseEntitet;
 
 
 @Entity(name = "VarselbrevSporing")
@@ -73,8 +75,8 @@ public class VarselbrevSporing extends BaseEntitet {
             return this;
         }
 
-        public VarselbrevSporing.Builder medJournalpostId(String journalpostId) {
-            varselbrevSporing.journalpostId = journalpostId;
+        public VarselbrevSporing.Builder medJournalpostId(JournalpostId journalpostId) {
+            varselbrevSporing.journalpostId = journalpostId.getVerdi();
             return this;
         }
 
