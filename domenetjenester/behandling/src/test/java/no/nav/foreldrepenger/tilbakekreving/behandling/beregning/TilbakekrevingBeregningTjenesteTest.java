@@ -23,7 +23,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Ak
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.AnnenVurdering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelse;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseAggregate;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelsePeriode;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
@@ -46,6 +45,8 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
         lagKravgrunnlag(internBehandlingId, periode, BigDecimal.ZERO);
         lagForeldelse(internBehandlingId, periode, ForeldelseVurderingType.IKKE_FORELDET);
         lagVilkårsvurderingMedForsett(internBehandlingId, periode);
+
+        flush();
 
         BeregningResultat beregningResultat = tjeneste.beregn(internBehandlingId);
         List<BeregningResultatPeriode> resultat = beregningResultat.getBeregningResultatPerioder();
@@ -70,6 +71,8 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
         lagKravgrunnlag(internBehandlingId, periode, BigDecimal.ZERO);
         lagVilkårsvurderingMedForsett(internBehandlingId, periode);
 
+        flush();
+
         BeregningResultat beregningResultat = tjeneste.beregn(internBehandlingId);
         List<BeregningResultatPeriode> resultat = beregningResultat.getBeregningResultatPerioder();
 
@@ -92,6 +95,8 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
 
         lagKravgrunnlag(internBehandlingId, periode, BigDecimal.ZERO);
         lagForeldelse(internBehandlingId, periode, ForeldelseVurderingType.FORELDET);
+
+        flush();
 
         BeregningResultat beregningResultat = tjeneste.beregn(internBehandlingId);
         List<BeregningResultatPeriode> resultat = beregningResultat.getBeregningResultatPerioder();
@@ -118,6 +123,8 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
         lagKravgrunnlag(internBehandlingId, periode, BigDecimal.valueOf(10));
         lagForeldelse(internBehandlingId, periode, ForeldelseVurderingType.IKKE_FORELDET);
         lagVilkårsvurderingMedForsett(internBehandlingId, periode);
+
+        flush();
 
         BeregningResultat beregningResultat = tjeneste.beregn(internBehandlingId);
         List<BeregningResultatPeriode> resultat = beregningResultat.getBeregningResultatPerioder();
@@ -158,6 +165,8 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
         lagForeldelse(internBehandlingId, logikkPeriode, ForeldelseVurderingType.IKKE_FORELDET);
         lagVilkårsvurderingMedForsett(internBehandlingId, logikkPeriode);
 
+        flush();
+
         BeregningResultat beregningResultat = tjeneste.beregn(internBehandlingId);
         List<BeregningResultatPeriode> resultat = beregningResultat.getBeregningResultatPerioder();
 
@@ -174,6 +183,10 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
         assertThat(r.getTilbakekrevingBeløpEtterSkatt()).isEqualByComparingTo(BigDecimal.valueOf(20000));
 
         assertThat(beregningResultat.getVedtakResultatType()).isEqualByComparingTo(VedtakResultatType.FULL_TILBAKEBETALING);
+    }
+
+    private void flush() {
+        repoRule.getEntityManager().flush();
     }
 
 
@@ -203,13 +216,7 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
             .medForeldelseVurderingType(resultat)
             .medVurdertForeldelse(vurdertForeldelse)
             .build());
-
-        VurdertForeldelseAggregate aggregate = VurdertForeldelseAggregate.builder()
-            .medAktiv(true)
-            .medBehandlingId(behandlingId)
-            .medVurdertForeldelse(vurdertForeldelse)
-            .build();
-        vurdertForeldelseRepository.lagre(aggregate);
+        vurdertForeldelseRepository.lagre(behandlingId, vurdertForeldelse);
     }
 
     private void lagKravgrunnlag(long behandlingId, Periode periode, BigDecimal skattProsent) {

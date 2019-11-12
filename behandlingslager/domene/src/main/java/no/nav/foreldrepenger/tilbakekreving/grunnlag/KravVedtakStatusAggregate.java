@@ -17,7 +17,7 @@ import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
 
 @Entity(name = "KravVedtakStatusAggregate")
 @Table(name = "GR_KRAV_VEDTAK_STATUS")
-public class KravVedtakStatusAggregate extends BaseEntitet {
+class KravVedtakStatusAggregate extends BaseEntitet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_GR_KRAV_VEDTAK_STATUS")

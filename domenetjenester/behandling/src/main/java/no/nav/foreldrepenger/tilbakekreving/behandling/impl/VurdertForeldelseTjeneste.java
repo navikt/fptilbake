@@ -30,7 +30,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelse;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseAggregate;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelsePeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseRepository;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
@@ -74,14 +73,9 @@ public class VurdertForeldelseTjeneste {
             VurdertForeldelsePeriode vurdertForeldelsePeriode = lagVurdertForeldelse(vurdertForeldelse, foreldelsePeriodeDto);
             vurdertForeldelse.leggTilVurderForeldelsePerioder(vurdertForeldelsePeriode);
         }
-        VurdertForeldelseAggregate vurdertForeldelseAggregate = VurdertForeldelseAggregate.builder()
-            .medVurdertForeldelse(vurdertForeldelse)
-            .medAktiv(true)
-            .medBehandlingId(behandlingId).build();
-
-        Optional<VurdertForeldelseAggregate> forrigeVurdertForeldelseAggregate = vurdertForeldelseRepository.finnVurdertForeldelseForBehandling(behandlingId);
-        vurdertForeldelseRepository.lagre(vurdertForeldelseAggregate);
-        lagInnslag(behandlingId, forrigeVurdertForeldelseAggregate, vurdertForeldelseAggregate);
+        Optional<VurdertForeldelse> forrigeVurdertForeldelse = vurdertForeldelseRepository.finnVurdertForeldelse(behandlingId);
+        vurdertForeldelseRepository.lagre(behandlingId, vurdertForeldelse);
+        lagInnslag(behandlingId, forrigeVurdertForeldelse, vurdertForeldelse);
 
     }
 
@@ -111,13 +105,12 @@ public class VurdertForeldelseTjeneste {
     }
 
     public FeilutbetalingPerioderDto henteVurdertForeldelse(Long behandlingId) {
-        Optional<VurdertForeldelseAggregate> vurdertForeldelseGrunnlag = vurdertForeldelseRepository.finnVurdertForeldelseForBehandling(behandlingId);
+        Optional<VurdertForeldelse> vurdertForeldelseOpt = vurdertForeldelseRepository.finnVurdertForeldelse(behandlingId);
         FeilutbetalingPerioderDto feilutbetalingPerioderDto = new FeilutbetalingPerioderDto();
-        if (vurdertForeldelseGrunnlag.isPresent()) {
+        if (vurdertForeldelseOpt.isPresent()) {
             Kravgrunnlag431 kravgrunnlag = grunnlagRepository.finnKravgrunnlag(behandlingId);
             List<PeriodeDto> perioder = new ArrayList<>();
-            VurdertForeldelseAggregate vurdertForeldelseAggregate = vurdertForeldelseGrunnlag.get();
-            VurdertForeldelse vurdertForeldelse = vurdertForeldelseAggregate.getVurdertForeldelse();
+            VurdertForeldelse vurdertForeldelse = vurdertForeldelseOpt.get();
             List<VurdertForeldelsePeriode> foreldelsePerioder = new ArrayList<>(vurdertForeldelse.getVurdertForeldelsePerioder());
             foreldelsePerioder.sort(Comparator.comparing(VurdertForeldelsePeriode::getFom));
             for (VurdertForeldelsePeriode vurdertForeldelsePeriode : foreldelsePerioder) {
@@ -184,14 +177,14 @@ public class VurdertForeldelseTjeneste {
         return verdi.signum() != 0;
     }
 
-    private void lagInnslag(Long behandlingId, Optional<VurdertForeldelseAggregate> forrigeVurdertForeldelse, VurdertForeldelseAggregate vurdertForeldelseAggregate) {
+    private void lagInnslag(Long behandlingId, Optional<VurdertForeldelse> forrigeVurdertForeldelse, VurdertForeldelse vurdertForeldelseAggregate) {
         Historikkinnslag historikkinnslag = new Historikkinnslag();
         historikkinnslag.setType(HistorikkinnslagType.FORELDELSE);
         historikkinnslag.setBehandlingId(behandlingId);
         historikkinnslag.setAktør(HistorikkAktør.SAKSBEHANDLER);
 
         boolean behovForHistorikkInnslag = false;
-        for (VurdertForeldelsePeriode foreldelsePeriode : vurdertForeldelseAggregate.getVurdertForeldelse().getVurdertForeldelsePerioder()) {
+        for (VurdertForeldelsePeriode foreldelsePeriode : vurdertForeldelseAggregate.getVurdertForeldelsePerioder()) {
             HistorikkInnslagTekstBuilder tekstBuilder = historikkTjenesteAdapter.tekstBuilder();
             boolean harEndret = false;
             // forrigeVurdertForeldelse finnes ikke
@@ -199,7 +192,7 @@ public class VurdertForeldelseTjeneste {
                 harEndret = true;
                 tekstBuilder.medEndretFelt(HistorikkEndretFeltType.FORELDELSE, null, finnForeldelseVurderingType(foreldelsePeriode.getForeldelseVurderingType()).getNavn());
             } else {
-                harEndret = opprettInnslagNårForrigePerioderFinnes(forrigeVurdertForeldelse, foreldelsePeriode, tekstBuilder);
+                harEndret = opprettInnslagNårForrigePerioderFinnes(behandlingId, forrigeVurdertForeldelse.get(), foreldelsePeriode, tekstBuilder);
             }
             if (harEndret) {
                 tekstBuilder.medSkjermlenke(SkjermlenkeType.FORELDELSE)
@@ -218,10 +211,10 @@ public class VurdertForeldelseTjeneste {
 
     }
 
-    private boolean opprettInnslagNårForrigePerioderFinnes(Optional<VurdertForeldelseAggregate> forrigeVurdertForeldelse, VurdertForeldelsePeriode foreldelsePeriode,
+    private boolean opprettInnslagNårForrigePerioderFinnes(Long behandlingId, VurdertForeldelse forrigeVurdertForeldelse, VurdertForeldelsePeriode foreldelsePeriode,
                                                            HistorikkInnslagTekstBuilder tekstBuilder) {
-        VurdertForeldelseAggregate forrigeVurdertForeldelseAggregate = forrigeVurdertForeldelse.get();
-        Optional<VurdertForeldelsePeriode> forrigeForeldelsePeriode = forrigeVurdertForeldelseAggregate.getVurdertForeldelse().getVurdertForeldelsePerioder()
+
+        Optional<VurdertForeldelsePeriode> forrigeForeldelsePeriode = forrigeVurdertForeldelse.getVurdertForeldelsePerioder()
             .stream()
             .filter(vurdertForeldelsePeriode -> vurdertForeldelsePeriode.getPeriode().equals(foreldelsePeriode.getPeriode()))
             .findAny();
@@ -235,14 +228,14 @@ public class VurdertForeldelseTjeneste {
                 finnForeldelseVurderingType(foreldelsePeriode.getForeldelseVurderingType()).getNavn());
             // hvis saksbehandler endret vurdering type, må vi starte vilkårs på nytt
             if (ForeldelseVurderingType.FORELDET.equals(foreldelsePeriode.getForeldelseVurderingType())) {
-                sletteVilkårData(forrigeVurdertForeldelse.get().getBehandlingId());
+                sletteVilkårData(behandlingId);
             }
 
         } else if (forrigeForeldelsePeriode.isEmpty()) { // nye perioder
             harEndret = true;
             tekstBuilder.medEndretFelt(HistorikkEndretFeltType.FORELDELSE, null, finnForeldelseVurderingType(foreldelsePeriode.getForeldelseVurderingType()).getNavn());
             // hvis saksbehandler deler opp perioder, må vi starte vilkårs på nytt
-            sletteVilkårData(forrigeVurdertForeldelse.get().getBehandlingId());
+            sletteVilkårData(behandlingId);
         } else if (!forrigeForeldelsePeriode.isEmpty() && !foreldelsePeriode.getBegrunnelse().equals(forrigeForeldelsePeriode.get().getBegrunnelse())) {
             harEndret = true;
         }

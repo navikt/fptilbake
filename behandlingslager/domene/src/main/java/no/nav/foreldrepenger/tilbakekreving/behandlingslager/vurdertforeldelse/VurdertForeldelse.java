@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -22,7 +21,7 @@ public class VurdertForeldelse extends BaseEntitet {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_VURDERT_FORELDELSE")
     private Long id;
 
-    @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "vurdertForeldelse")
+    @OneToMany(mappedBy = "vurdertForeldelse")
     private List<VurdertForeldelsePeriode> vurdertForeldelsePerioder = new ArrayList<>();
 
     public Long getId() {

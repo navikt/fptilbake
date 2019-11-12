@@ -9,6 +9,7 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
 
 @ApplicationScoped
@@ -26,7 +27,7 @@ public class KravVedtakStatusRepository {
     }
 
     public void lagre(Long behandlingId, KravVedtakStatus437 kravVedtakStatus) {
-        Optional<KravVedtakStatusAggregate> forrigeGrunnlag = finnForBehandlingId(behandlingId);
+        Optional<KravVedtakStatusAggregate> forrigeGrunnlag = finnKravStatus(behandlingId);
         if (forrigeGrunnlag.isPresent()) {
             forrigeGrunnlag.get().disable();
             entityManager.persist(forrigeGrunnlag.get());
@@ -41,7 +42,13 @@ public class KravVedtakStatusRepository {
         entityManager.flush();
     }
 
-    public Optional<KravVedtakStatusAggregate> finnForBehandlingId(Long behandlingId) {
+
+    public Optional<KravStatusKode> finnKravstatus(Long behandlingId) {
+        return finnKravStatus(behandlingId)
+            .map(ks -> ks.getKravVedtakStatus().getKravStatusKode());
+    }
+
+    private Optional<KravVedtakStatusAggregate> finnKravStatus(Long behandlingId) {
         TypedQuery<KravVedtakStatusAggregate> query = entityManager.createQuery("from KravVedtakStatusAggregate aggr " +
             "where aggr.behandlingId=:behandlingId and aggr.aktiv=:aktiv", KravVedtakStatusAggregate.class);
         query.setParameter("behandlingId", behandlingId);

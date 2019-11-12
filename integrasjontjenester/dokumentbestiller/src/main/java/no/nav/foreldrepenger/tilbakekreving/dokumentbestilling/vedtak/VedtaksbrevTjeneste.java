@@ -47,7 +47,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurd
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.AnnenVurdering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelse;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseAggregate;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelsePeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseRepository;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Avsnitt;
@@ -196,9 +195,7 @@ public class VedtaksbrevTjeneste {
         List<VilkårVurderingPeriodeEntitet> vilkårPerioder = vilkårsvurderingRepository.finnVilkårsvurdering(behandlingId)
             .map(VilkårVurderingEntitet::getPerioder)
             .orElse(Collections.emptyList());
-        VurdertForeldelse foreldelse = foreldelseRepository.finnVurdertForeldelseForBehandling(behandlingId)
-            .map(VurdertForeldelseAggregate::getVurdertForeldelse)
-            .orElse(null);
+        VurdertForeldelse foreldelse = foreldelseRepository.finnVurdertForeldelse(behandlingId).orElse(null);
 
         HbVedtaksbrevFelles.Builder vedtakDataBuilder = HbVedtaksbrevFelles.builder()
             .medYtelsetype(behandling.getFagsak().getFagsakYtelseType())

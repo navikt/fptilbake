@@ -4,13 +4,13 @@ import java.util.Optional;
 
 public interface VurdertForeldelseRepository {
 
-    void lagre(VurdertForeldelseAggregate vurdertForeldelseAggregate);
+    Optional<VurdertForeldelse> finnVurdertForeldelse(Long behandlingId);
 
-    void lagre(Long behandlingId, VurdertForeldelse vurdertForeldelse);
-
-    Optional<VurdertForeldelseAggregate> finnVurdertForeldelseForBehandling(Long behandlingId);
+    Optional<Long> finnVurdertForeldelseAggregateId(Long behandlingId);
 
     boolean harVurdertForeldelseForBehandlingId(Long behandlingId);
+
+    void lagre(Long behandlingId, VurdertForeldelse vurdertForeldelse);
 
     void slettForeldelse(Long behandlingId);
 }

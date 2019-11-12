@@ -12,11 +12,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import no.nav.vedtak.felles.jpa.BaseEntitet;
 import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
 
 @Entity(name = "VurdertForeldelseAggregate")
 @Table(name = "GR_VURDERT_FORELDELSE")
-public class VurdertForeldelseAggregate {
+class VurdertForeldelseAggregate extends BaseEntitet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_GR_VURDERT_FORELDELSE")
@@ -90,9 +91,9 @@ public class VurdertForeldelseAggregate {
     @Override
     public String toString() {
         return getClass().getSimpleName() + "<id=" + id //$NON-NLS-1$
-                + ", behandlingId=" + behandlingId //$NON-NLS-1$
-                + ", aktiv=" + aktiv //$NON-NLS-1$
-                + ">"; //$NON-NLS-1$
+            + ", behandlingId=" + behandlingId //$NON-NLS-1$
+            + ", aktiv=" + aktiv //$NON-NLS-1$
+            + ">"; //$NON-NLS-1$
 
     }
 }

@@ -25,43 +25,16 @@ public class VurdertForeldelseRepositoryImpl implements VurdertForeldelseReposit
         this.entityManager = entityManager;
     }
 
-    @Deprecated(forRemoval = true) //bruk den andre lagre-metoden
     @Override
-    public void lagre(VurdertForeldelseAggregate vurdertForeldelseAggregate) {
-        disableForrigeAggregat(vurdertForeldelseAggregate.getBehandlingId());
-        entityManager.persist(vurdertForeldelseAggregate.getVurdertForeldelse());
-        entityManager.persist(vurdertForeldelseAggregate);
-        entityManager.flush();
+    public Optional<VurdertForeldelse> finnVurdertForeldelse(Long behandlingId) {
+        return finnVurdertForeldelseForBehandling(behandlingId)
+            .map(VurdertForeldelseAggregate::getVurdertForeldelse);
     }
 
     @Override
-    public void lagre(Long behandlingId, VurdertForeldelse vurdertForeldelse) {
-        disableForrigeAggregat(behandlingId);
-        VurdertForeldelseAggregate aggr = VurdertForeldelseAggregate.builder()
-            .medAktiv(true)
-            .medBehandlingId(behandlingId)
-            .medVurdertForeldelse(vurdertForeldelse)
-            .build();
-        entityManager.persist(vurdertForeldelse);
-        entityManager.persist(aggr);
-    }
-
-    private void disableForrigeAggregat(Long behandlingId) {
-        Optional<VurdertForeldelseAggregate> forrigeVurdertForeldelse = finnVurdertForeldelseForBehandling(behandlingId);
-        if (forrigeVurdertForeldelse.isPresent()) {
-            VurdertForeldelseAggregate forrigeVurdertForeldelseAggregate = forrigeVurdertForeldelse.get();
-            forrigeVurdertForeldelseAggregate.disable();
-            entityManager.persist(forrigeVurdertForeldelseAggregate);
-        }
-    }
-
-    @Override
-    public Optional<VurdertForeldelseAggregate> finnVurdertForeldelseForBehandling(Long behandlingId) {
-        TypedQuery<VurdertForeldelseAggregate> query = entityManager.createQuery("from VurdertForeldelseAggregate aggr where aggr.behandlingId=:behandlingId " +
-            "and aggr.aktiv=:aktiv", VurdertForeldelseAggregate.class);
-        query.setParameter("behandlingId", behandlingId);
-        query.setParameter("aktiv", true);
-        return hentUniktResultat(query);
+    public Optional<Long> finnVurdertForeldelseAggregateId(Long behandlingId) {
+        return finnVurdertForeldelseForBehandling(behandlingId)
+            .map(VurdertForeldelseAggregate::getId);
     }
 
     @Override
@@ -74,8 +47,40 @@ public class VurdertForeldelseRepositoryImpl implements VurdertForeldelseReposit
     }
 
     @Override
+    public void lagre(Long behandlingId, VurdertForeldelse vurdertForeldelse) {
+        disableForrigeAggregat(behandlingId);
+        VurdertForeldelseAggregate aggr = VurdertForeldelseAggregate.builder()
+            .medAktiv(true)
+            .medBehandlingId(behandlingId)
+            .medVurdertForeldelse(vurdertForeldelse)
+            .build();
+        entityManager.persist(vurdertForeldelse);
+        for (VurdertForeldelsePeriode periode : vurdertForeldelse.getVurdertForeldelsePerioder()) {
+            entityManager.persist(periode);
+        }
+        entityManager.persist(aggr);
+    }
+
+    @Override
     public void slettForeldelse(Long behandlingId) {
         disableForrigeAggregat(behandlingId);
+    }
+
+    private void disableForrigeAggregat(Long behandlingId) {
+        Optional<VurdertForeldelseAggregate> forrigeVurdertForeldelse = finnVurdertForeldelseForBehandling(behandlingId);
+        if (forrigeVurdertForeldelse.isPresent()) {
+            VurdertForeldelseAggregate forrigeVurdertForeldelseAggregate = forrigeVurdertForeldelse.get();
+            forrigeVurdertForeldelseAggregate.disable();
+            entityManager.persist(forrigeVurdertForeldelseAggregate);
+        }
+    }
+
+    private Optional<VurdertForeldelseAggregate> finnVurdertForeldelseForBehandling(Long behandlingId) {
+        TypedQuery<VurdertForeldelseAggregate> query = entityManager.createQuery("from VurdertForeldelseAggregate aggr where aggr.behandlingId=:behandlingId " +
+            "and aggr.aktiv=:aktiv", VurdertForeldelseAggregate.class);
+        query.setParameter("behandlingId", behandlingId);
+        query.setParameter("aktiv", true);
+        return hentUniktResultat(query);
     }
 
 
