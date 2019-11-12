@@ -17,7 +17,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.transisjoner.Fel
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagAggregate;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMockUtil;
 
 public class MottattGrunnlagStegImplTest extends FellesTestOppsett {
@@ -35,9 +34,7 @@ public class MottattGrunnlagStegImplTest extends FellesTestOppsett {
 
     @Test
     public void skal_utføre_steg_uten_aksjonspunkt() {
-        KravgrunnlagAggregate kravgrunnlagAggregate = KravgrunnlagAggregate.builder().
-            medBehandlingId(behandling.getId()).medAktiv(true).medGrunnlagØkonomi(KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList())).build();
-        grunnlagRepository.lagre(kravgrunnlagAggregate);
+        grunnlagRepository.lagre(behandling.getId(), KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList()));
 
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
         BehandleStegResultat stegResultat = steg().utførSteg(new BehandlingskontrollKontekst(fagsak.getId(), fagsak.getAktørId(), lås));
@@ -49,10 +46,8 @@ public class MottattGrunnlagStegImplTest extends FellesTestOppsett {
 
     @Test
     public void skal_fortsatt_på_vent_hvis_grunnlag_er_sperret() {
-        KravgrunnlagAggregate kravgrunnlagAggregate = KravgrunnlagAggregate.builder().
-            medBehandlingId(behandling.getId()).medAktiv(true).medGrunnlagØkonomi(KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList())).build();
-        kravgrunnlagAggregate.sperr();
-        grunnlagRepository.lagre(kravgrunnlagAggregate);
+        grunnlagRepository.lagre(behandling.getId(), KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList()));
+        grunnlagRepository.sperrGrunnlag(behandling.getId());
 
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
         BehandleStegResultat stegResultat = steg().gjenopptaSteg(new BehandlingskontrollKontekst(fagsak.getId(), fagsak.getAktørId(), lås));

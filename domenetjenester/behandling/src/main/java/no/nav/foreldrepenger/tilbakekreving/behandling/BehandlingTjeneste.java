@@ -2,10 +2,8 @@ package no.nav.foreldrepenger.tilbakekreving.behandling;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BehandlingFeilutbetalingFakta;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
@@ -29,8 +27,6 @@ public interface BehandlingTjeneste {
     void kanEndreBehandling(Long behandlingId, Long versjon);
 
     Behandling hentBehandling(Long behandlingId);
-
-    Optional<BehandlingFeilutbetalingFakta> hentBehandlingFeilutbetalingFakta(Long behandlingId);
 
     boolean erBehandlingHenlagt(Behandling behandling);
 

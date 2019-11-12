@@ -41,7 +41,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.In
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTypeMedUndertypeDto;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagAggregate;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagBelop433;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
@@ -209,9 +209,9 @@ public class VilkårsvurderingTjeneste {
     }
 
     private List<YtelseDto> henteYtelse(Long behandlingId, Periode feilutbetalingPeriode) {
-        KravgrunnlagAggregate aggregate = grunnlagRepository.finnEksaktGrunnlagForBehandlingId(behandlingId);
+        Kravgrunnlag431 kravgrunnlag = grunnlagRepository.finnKravgrunnlag(behandlingId);
         List<YtelseDto> ytelser = new ArrayList<>();
-        for (KravgrunnlagPeriode432 kgPeriode : aggregate.getGrunnlagØkonomi().getPerioder()) {
+        for (KravgrunnlagPeriode432 kgPeriode : kravgrunnlag.getPerioder()) {
             Periode grunnlagPeriode = kgPeriode.getPeriode();
             if (feilutbetalingPeriode.overlapper(grunnlagPeriode)) {
                 List<KravgrunnlagBelop433> beloper = kgPeriode.getKravgrunnlagBeloper433().stream()
@@ -225,9 +225,9 @@ public class VilkårsvurderingTjeneste {
     }
 
     private List<RedusertBeløpDto> henteRedusertBeløper(Long behandlingId, Periode feilutbetalingPeriode) {
-        KravgrunnlagAggregate aggregate = grunnlagRepository.finnEksaktGrunnlagForBehandlingId(behandlingId);
+        Kravgrunnlag431 kravgrunnlag = grunnlagRepository.finnKravgrunnlag(behandlingId);
         List<RedusertBeløpDto> redusertBeløper = new ArrayList<>();
-        for (KravgrunnlagPeriode432 kgPeriode : aggregate.getGrunnlagØkonomi().getPerioder()) {
+        for (KravgrunnlagPeriode432 kgPeriode : kravgrunnlag.getPerioder()) {
             Periode grunnlagPeriode = kgPeriode.getPeriode();
             if (feilutbetalingPeriode.overlapper(grunnlagPeriode)) {
                 List<KravgrunnlagBelop433> trekkBeløper = kgPeriode.getKravgrunnlagBeloper433().stream()

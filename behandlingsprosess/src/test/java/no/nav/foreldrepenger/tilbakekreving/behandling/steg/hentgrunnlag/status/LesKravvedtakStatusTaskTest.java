@@ -26,7 +26,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatus437;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatusAggregate;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatusRepository;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagAggregate;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
 
@@ -167,8 +166,7 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         KravVedtakStatus437 kravVedtakStatus437 = aggregate.get().getKravVedtakStatus();
         assertThat(kravVedtakStatus437.getKravStatusKode()).isEqualByComparingTo(KravStatusKode.SPERRET);
 
-        KravgrunnlagAggregate kravgrunnlagAggregate = grunnlagRepository.finnEksaktGrunnlagForBehandlingId(behandling.getId());
-        assertThat(kravgrunnlagAggregate.isSperret()).isTrue();
+        assertThat(grunnlagRepository.erKravgrunnlagSperret(behandling.getId())).isTrue();
     }
 
     @Test
@@ -193,7 +191,6 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         KravVedtakStatus437 kravVedtakStatus437 = aggregate.get().getKravVedtakStatus();
         assertThat(kravVedtakStatus437.getKravStatusKode()).isEqualByComparingTo(KravStatusKode.SPERRET);
 
-        KravgrunnlagAggregate kravgrunnlagAggregate = grunnlagRepository.finnEksaktGrunnlagForBehandlingId(behandling.getId());
-        assertThat(kravgrunnlagAggregate.isSperret()).isTrue();
+        assertThat(grunnlagRepository.erKravgrunnlagSperret(behandling.getId())).isTrue();
     }
 }

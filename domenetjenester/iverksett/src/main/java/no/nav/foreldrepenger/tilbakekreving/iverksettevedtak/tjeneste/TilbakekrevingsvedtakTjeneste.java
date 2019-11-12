@@ -8,7 +8,6 @@ import javax.inject.Inject;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BeregningResultat;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagAggregate;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsvedtakDto;
 
@@ -31,16 +30,9 @@ public class TilbakekrevingsvedtakTjeneste {
     }
 
     public TilbakekrevingsvedtakDto lagTilbakekrevingsvedtak(Long behandlingId) {
-        Kravgrunnlag431 kravgrunnlag = hentKravgrunnlag(behandlingId);
+        Kravgrunnlag431 kravgrunnlag = kravgrunnlagRepository.finnKravgrunnlag(behandlingId);
         BeregningResultat beregningResultat = beregningTjeneste.beregn(behandlingId);
         List<TilbakekrevingPeriode> tilbakekrevingPerioder = vedtakPeriodeBeregner.lagTilbakekrevingsPerioder(kravgrunnlag, beregningResultat);
-
         return TilbakekrevingsvedtakMapper.tilDto(kravgrunnlag, tilbakekrevingPerioder);
     }
-
-    private Kravgrunnlag431 hentKravgrunnlag(Long behandlingId) {
-        KravgrunnlagAggregate grunnlag = kravgrunnlagRepository.finnEksaktGrunnlagForBehandlingId(behandlingId);
-        return grunnlag.getGrunnlagØkonomi();
-    }
-
 }

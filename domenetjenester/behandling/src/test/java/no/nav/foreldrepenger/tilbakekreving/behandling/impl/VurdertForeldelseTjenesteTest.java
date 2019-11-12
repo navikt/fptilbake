@@ -33,7 +33,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseAggregate;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelsePeriode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagAggregate;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMock;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMockUtil;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
@@ -139,11 +138,8 @@ public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
         KravgrunnlagMock mockMedYtelPostering = new KravgrunnlagMock(FOM_1, TOM_1, KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(22000));
 
         Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedFeilPostering2, mockMedYtelPostering));
-        KravgrunnlagAggregate kravgrunnlagAggregate = KravgrunnlagAggregate.builder()
-            .medGrunnlagØkonomi(kravgrunnlag431)
-            .medBehandlingId(internBehandlingId).build();
 
-        grunnlagRepository.lagre(kravgrunnlagAggregate);
+        grunnlagRepository.lagre(internBehandlingId, kravgrunnlag431);
         vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, Lists.newArrayList(
             new ForeldelsePeriodeDto(FOM_1, LocalDate.of(2016, 3, 28),
                 ForeldelseVurderingType.FORELDET, "ABC")));
@@ -166,12 +162,8 @@ public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
             TOM_1, KlasseType.FEIL, BigDecimal.valueOf(12000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedYtelPostering = new KravgrunnlagMock(FOM_1, TOM_1, KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(22000));
 
-        Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedFeilPostering2, mockMedYtelPostering));
-        KravgrunnlagAggregate kravgrunnlagAggregate = KravgrunnlagAggregate.builder()
-            .medGrunnlagØkonomi(kravgrunnlag431)
-            .medBehandlingId(internBehandlingId).build();
-
-        grunnlagRepository.lagre(kravgrunnlagAggregate);
+        Kravgrunnlag431 kravgrunnlag = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedFeilPostering2, mockMedYtelPostering));
+        grunnlagRepository.lagre(internBehandlingId, kravgrunnlag);
         vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, Lists.newArrayList(
             new ForeldelsePeriodeDto(FOM_1, LocalDate.of(2016, 3, 20),
                 ForeldelseVurderingType.FORELDET, "ABC")));
@@ -202,11 +194,8 @@ public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
 
         Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedFeilPostering2,
             mockMedFeilPostering3, mockMedFeilPostering4, mockMedYtelPostering));
-        KravgrunnlagAggregate kravgrunnlagAggregate = KravgrunnlagAggregate.builder()
-            .medGrunnlagØkonomi(kravgrunnlag431)
-            .medBehandlingId(internBehandlingId).build();
 
-        grunnlagRepository.lagre(kravgrunnlagAggregate);
+        grunnlagRepository.lagre(internBehandlingId, kravgrunnlag431);
         vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, Lists.newArrayList(
             new ForeldelsePeriodeDto(FOM_1, LocalDate.of(2016, 3, 20),
                 ForeldelseVurderingType.FORELDET, "ABC"),
@@ -251,10 +240,7 @@ public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
         KravgrunnlagMock mockMedYtelPostering = new KravgrunnlagMock(FOM_1, TOM_1, KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(37000));
 
         Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedFeilPostering2, mockMedFeilPostering3, mockMedYtelPostering));
-        KravgrunnlagAggregate kravgrunnlagAggregate = KravgrunnlagAggregate.builder()
-            .medGrunnlagØkonomi(kravgrunnlag431)
-            .medBehandlingId(internBehandlingId).build();
-        grunnlagRepository.lagre(kravgrunnlagAggregate);
+        grunnlagRepository.lagre(internBehandlingId, kravgrunnlag431);
 
         FaktaFeilutbetaling faktaFeilutbetaling = new FaktaFeilutbetaling();
 

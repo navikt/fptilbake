@@ -3,7 +3,6 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -36,7 +35,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.V
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseRepository;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagAggregate;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagBelop433;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
@@ -116,8 +114,7 @@ public class VurdertForeldelseTjeneste {
         Optional<VurdertForeldelseAggregate> vurdertForeldelseGrunnlag = vurdertForeldelseRepository.finnVurdertForeldelseForBehandling(behandlingId);
         FeilutbetalingPerioderDto feilutbetalingPerioderDto = new FeilutbetalingPerioderDto();
         if (vurdertForeldelseGrunnlag.isPresent()) {
-            KravgrunnlagAggregate aggregate = grunnlagRepository.finnEksaktGrunnlagForBehandlingId(behandlingId);
-            Kravgrunnlag431 kravgrunnlag = aggregate.getGrunnlagØkonomi();
+            Kravgrunnlag431 kravgrunnlag = grunnlagRepository.finnKravgrunnlag(behandlingId);
             List<PeriodeDto> perioder = new ArrayList<>();
             VurdertForeldelseAggregate vurdertForeldelseAggregate = vurdertForeldelseGrunnlag.get();
             VurdertForeldelse vurdertForeldelse = vurdertForeldelseAggregate.getVurdertForeldelse();
@@ -147,11 +144,8 @@ public class VurdertForeldelseTjeneste {
 
     //TODO flytt til annen/egen tjeneste, hører ikke til sammen med Foreldelse
     public Map<Periode, BigDecimal> beregnFeilutbetaltBeløpForPerioder(Long behandlingId, List<Periode> perioder) {
-        Optional<KravgrunnlagAggregate> aggregate = grunnlagRepository.finnGrunnlagForBehandlingId(behandlingId);
-        if (aggregate.isPresent()) {
-            return beregnFeilutbetaltBeløpForPerioder(aggregate.get().getGrunnlagØkonomi(), perioder);
-        }
-        return Collections.emptyMap();
+        Kravgrunnlag431 kravgrunnlag = grunnlagRepository.finnKravgrunnlag(behandlingId);
+        return beregnFeilutbetaltBeløpForPerioder(kravgrunnlag, perioder);
     }
 
     public boolean harVurdertForeldelse(Long behandlingId) {

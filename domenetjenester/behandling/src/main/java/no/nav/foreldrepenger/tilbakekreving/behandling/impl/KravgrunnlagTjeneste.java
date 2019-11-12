@@ -1,12 +1,24 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
+import static no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingUtil.sjekkAvvikHvisSisteDagIHelgen;
+import static no.nav.foreldrepenger.tilbakekreving.behandling.impl.BeregnBeløpUtil.beregnBelop;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.threeten.extra.Days;
 
 import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.modell.UtbetaltPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
@@ -17,8 +29,12 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseRepository;
+import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagBelop433;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 
 @ApplicationScoped
@@ -44,11 +60,72 @@ public class KravgrunnlagTjeneste {
                                 BehandlingskontrollTjeneste behandlingskontrollTjeneste) {
         this.kravgrunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
+        this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
+        this.gjenopptaBehandlingTjeneste = gjenopptaBehandlingTjeneste;
+
+        //FIXME Kravgrunlag-tjeneste skal ikke vite om fakta/foreldelse/vilkårsvurdering, se PFP-9003
         this.faktaFeilutbetalingRepository = repositoryProvider.getFaktaFeilutbetalingRepository();
         this.vurdertForeldelseRepository = repositoryProvider.getVurdertForeldelseRepository();
         this.vilkårsvurderingRepository = repositoryProvider.getVilkårsvurderingRepository();
-        this.gjenopptaBehandlingTjeneste = gjenopptaBehandlingTjeneste;
-        this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
+    }
+
+
+    /**
+     * WARNING denne metoden returerer ikke komplette perioder, periodene inneholder eks. ikke YTEL-posteringer
+     *
+     * Dette kan være overraskende.
+     */
+    public List<KravgrunnlagPeriode432> finnKravgrunnlagPerioderMedFeilutbetaltPosteringer(Long behandlingId) {
+        Kravgrunnlag431 kravgrunnlag = kravgrunnlagRepository.finnKravgrunnlag(behandlingId);
+        return finnKravgrunnlagPerioderMedFeilutbetaltPosteringer(kravgrunnlag.getPerioder());
+    }
+
+    /**
+     * WARNING denne metoden returerer ikke komplette perioder, periodene inneholder eks. ikke YTEL-posteringer
+     */
+    private List<KravgrunnlagPeriode432> finnKravgrunnlagPerioderMedFeilutbetaltPosteringer(List<KravgrunnlagPeriode432> allePerioder) {
+        List<KravgrunnlagPeriode432> feilutbetaltPerioder = new ArrayList<>();
+        for (KravgrunnlagPeriode432 kravgrunnlagPeriode432 : allePerioder) {
+            List<KravgrunnlagBelop433> posteringer = kravgrunnlagPeriode432.getKravgrunnlagBeloper433().stream()
+                .filter(belop433 -> belop433.getKlasseType().equals(KlasseType.FEIL)).collect(Collectors.toList());
+            if (!posteringer.isEmpty()) {
+                kravgrunnlagPeriode432.setKravgrunnlagBeloper433(posteringer);
+                feilutbetaltPerioder.add(kravgrunnlagPeriode432);
+            }
+        }
+        return feilutbetaltPerioder;
+    }
+
+    public List<UtbetaltPeriode> utledLogiskPeriode(List<KravgrunnlagPeriode432> feilutbetaltPerioder) {
+        LocalDate førsteDag = null;
+        LocalDate sisteDag = null;
+        BigDecimal belopPerPeriode = BigDecimal.ZERO;
+        feilutbetaltPerioder.sort(Comparator.comparing(KravgrunnlagPeriode432::getFom));
+        List<UtbetaltPeriode> beregnetPerioider = new ArrayList<>();
+        for (KravgrunnlagPeriode432 kgPeriode : feilutbetaltPerioder) {
+            // for første gang
+            Periode periode = kgPeriode.getPeriode();
+            if (førsteDag == null && sisteDag == null) {
+                førsteDag = periode.getFom();
+                sisteDag = periode.getTom();
+            } else {
+                // beregn forskjellen mellom to perioder
+                int antallDager = Days.between(sisteDag, periode.getFom()).getAmount();
+                // hvis forskjellen er mer enn 1 dager eller siste dag er i helgen
+                if (antallDager > 1 && sjekkAvvikHvisSisteDagIHelgen(sisteDag, antallDager)) {
+                    // lag ny perioder hvis forskjellen er mer enn 1 dager
+                    beregnetPerioider.add(UtbetaltPeriode.lagPeriode(førsteDag, sisteDag, belopPerPeriode));
+                    førsteDag = periode.getFom();
+                    belopPerPeriode = BigDecimal.ZERO;
+                }
+                sisteDag = periode.getTom();
+            }
+            belopPerPeriode = belopPerPeriode.add(beregnBelop(kgPeriode.getKravgrunnlagBeloper433()));
+        }
+        if (belopPerPeriode != BigDecimal.ZERO) {
+            beregnetPerioider.add(UtbetaltPeriode.lagPeriode(førsteDag, sisteDag, belopPerPeriode));
+        }
+        return beregnetPerioider;
     }
 
     public void lagreTilbakekrevingsgrunnlagFraØkonomi(Long behandlingId, Kravgrunnlag431 kravgrunnlag431) {

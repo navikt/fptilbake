@@ -14,7 +14,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagAggregate;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.vedtak.konfig.KonfigVerdi;
@@ -42,8 +42,8 @@ public class VurderForeldelseAksjonspunktUtlederImpl implements VurderForeldelse
     @Override
     public Optional<AksjonspunktDefinisjon> utledAksjonspunkt(Long behandlingId) {
         // Henter perioder og vurderer foreldelse
-        KravgrunnlagAggregate aggregate = grunnlagRepository.finnEksaktGrunnlagForBehandlingId(behandlingId);
-        for (KravgrunnlagPeriode432 grunnlagPeriode : aggregate.getGrunnlagØkonomi().getPerioder()) {
+        Kravgrunnlag431 kravgrunnlag = grunnlagRepository.finnKravgrunnlag(behandlingId);
+        for (KravgrunnlagPeriode432 grunnlagPeriode : kravgrunnlag.getPerioder()) {
             if (erForeldet(FPDateUtil.iDag(), grunnlagPeriode.getFom())) {
                 return Optional.of(AksjonspunktDefinisjon.VURDER_FORELDELSE);
             }

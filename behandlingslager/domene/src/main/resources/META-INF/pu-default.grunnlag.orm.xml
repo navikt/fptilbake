@@ -20,5 +20,5 @@
     <entity class="no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagBelop433"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatus437"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagAggregate"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagAggregateEntity"/>
 </entity-mappings>

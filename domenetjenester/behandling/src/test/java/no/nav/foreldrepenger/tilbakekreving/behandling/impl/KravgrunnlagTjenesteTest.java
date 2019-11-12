@@ -32,7 +32,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.V
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelsePeriode;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagAggregate;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagBelop433;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType;
@@ -53,7 +52,7 @@ public class KravgrunnlagTjenesteTest extends FellesTestOppsett {
     @Before
     public void setup() {
         when(mockTpsTjeneste.hentAktørForFnr(new PersonIdent(SSN))).thenReturn(Optional.of(aktørId));
-        when(behandlingskontrollTjeneste.erStegPassert(any(Behandling.class),any(BehandlingStegType.class))).thenReturn(true);
+        when(behandlingskontrollTjeneste.erStegPassert(any(Behandling.class), any(BehandlingStegType.class))).thenReturn(true);
     }
 
     @Test
@@ -170,15 +169,11 @@ public class KravgrunnlagTjenesteTest extends FellesTestOppsett {
     }
 
     private void assertKravgrunnlag() {
-        Optional<KravgrunnlagAggregate> kravgrunnlagAggregate = grunnlagRepository.finnGrunnlagForBehandlingId(internBehandlingId);
-        assertThat(kravgrunnlagAggregate).isNotEmpty();
-        KravgrunnlagAggregate aggregate = kravgrunnlagAggregate.get();
-        assertThat(aggregate.getBehandlingId()).isEqualTo(internBehandlingId);
-        assertThat(aggregate.isAktiv()).isTrue();
-        assertThat(aggregate.getGrunnlagØkonomi()).isNotNull();
-        assertThat(aggregate.getGrunnlagØkonomi().getGjelderVedtakId()).isEqualTo(aktørId.getId());
-        assertThat(aggregate.getGrunnlagØkonomi().getUtbetalesTilId()).isEqualTo(aktørId.getId());
-        List<KravgrunnlagPeriode432> kravgrunnlagPerioder = new ArrayList<>(aggregate.getGrunnlagØkonomi().getPerioder());
+        Kravgrunnlag431 kravgrunnlag = grunnlagRepository.finnKravgrunnlag(internBehandlingId);
+        assertThat(kravgrunnlag).isNotNull();
+        assertThat(kravgrunnlag.getGjelderVedtakId()).isEqualTo(aktørId.getId());
+        assertThat(kravgrunnlag.getUtbetalesTilId()).isEqualTo(aktørId.getId());
+        List<KravgrunnlagPeriode432> kravgrunnlagPerioder = new ArrayList<>(kravgrunnlag.getPerioder());
 
         assertThat(kravgrunnlagPerioder).isNotEmpty();
         kravgrunnlagPerioder.sort(Comparator.comparing(KravgrunnlagPeriode432::getFom));

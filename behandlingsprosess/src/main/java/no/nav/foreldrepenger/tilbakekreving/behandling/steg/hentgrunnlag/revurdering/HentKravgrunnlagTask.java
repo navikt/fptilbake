@@ -17,7 +17,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KodeAksjon;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagAggregate;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiConsumer;
@@ -63,18 +62,18 @@ public class HentKravgrunnlagTask implements ProsessTaskHandler {
         Behandling behandling = repositoryProvider.getBehandlingRepository().hentBehandling(behandlingId);
         Long origBehandlingId = Long.valueOf(prosessTaskData.getPropertyValue(TaskProperty.PROPERTY_ORIGINAL_BEHANDLING_ID));
 
-        Kravgrunnlag431 kravgrunnlag431 = hentGrunnlag(origBehandlingId);
+        Kravgrunnlag431 kravgrunnlag431 = hentNyttKravgrunnlag(origBehandlingId);
         kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(behandlingId, kravgrunnlag431);
         lagHistorikkInnslagForMotattKravgrunnlag(behandling, kravgrunnlag431);
     }
 
-    private Kravgrunnlag431 hentGrunnlag(Long origBehandlingId) {
-        KravgrunnlagAggregate kravgrunnlagAggregate = grunnlagRepository.finnEksaktGrunnlagForBehandlingId(origBehandlingId);
-        DetaljertKravgrunnlagDto grunnlag = hentGrunnlagFraØkonomi(origBehandlingId, kravgrunnlagAggregate.getGrunnlagØkonomi());
+    private Kravgrunnlag431 hentNyttKravgrunnlag(Long origBehandlingId) {
+        Kravgrunnlag431 kravgrunnlag = grunnlagRepository.finnKravgrunnlag(origBehandlingId);
+        DetaljertKravgrunnlagDto grunnlag = hentNyttKravgrunnlagFraØkonomi(origBehandlingId, kravgrunnlag);
         return kravgrunnlagMapper.mapTilDomene(grunnlag);
     }
 
-    private DetaljertKravgrunnlagDto hentGrunnlagFraØkonomi(Long origBehandlingId, Kravgrunnlag431 kravgrunnlag431) {
+    private DetaljertKravgrunnlagDto hentNyttKravgrunnlagFraØkonomi(Long origBehandlingId, Kravgrunnlag431 kravgrunnlag431) {
         HentKravgrunnlagDetaljDto hentKravgrunnlagDetalj = forberedeHentKravgrunnlagDetailRequest(kravgrunnlag431);
         return økonomiConsumer.hentKravgrunnlag(origBehandlingId, hentKravgrunnlagDetalj);
     }

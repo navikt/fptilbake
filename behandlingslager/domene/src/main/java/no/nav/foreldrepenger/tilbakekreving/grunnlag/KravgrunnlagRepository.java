@@ -10,10 +10,20 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import no.nav.vedtak.feil.Feil;
+import no.nav.vedtak.feil.FeilFactory;
+import no.nav.vedtak.feil.LogLevel;
+import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
+import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
 import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
 
 @ApplicationScoped
 public class KravgrunnlagRepository {
+
+    private static final Logger logger = LoggerFactory.getLogger(KravgrunnlagRepository.class);
 
     private static final String BEHANDLING_ID = "behandlingId";
     private static final String AKTIV = "aktiv";
@@ -28,72 +38,70 @@ public class KravgrunnlagRepository {
         this.entityManager = entityManager;
     }
 
-    @Deprecated //KravgrunnlagAggregate skal ikke brukes utenfor repository. Bruk alternativ lagre-metode
-    public void lagre(KravgrunnlagAggregate kravgrunnlagAggregate) {
-        Optional<KravgrunnlagAggregate> forrigeGrunnlag = finnGrunnlagForBehandlingId(kravgrunnlagAggregate.getBehandlingId());
-        if (forrigeGrunnlag.isPresent()) {
-            forrigeGrunnlag.get().disable();
-            entityManager.persist(forrigeGrunnlag.get());
-        }
-        entityManager.persist(kravgrunnlagAggregate.getGrunnlagØkonomi());
-        entityManager.persist(kravgrunnlagAggregate);
-        entityManager.flush();
-    }
-
     public void lagre(Long behandlingId, Kravgrunnlag431 kravgrunnlag) {
-        Optional<KravgrunnlagAggregate> forrigeGrunnlag = finnGrunnlagForBehandlingId(behandlingId);
+        Optional<KravgrunnlagAggregateEntity> forrigeGrunnlag = finnKravgrunnlagOptional(behandlingId);
         if (forrigeGrunnlag.isPresent()) {
             forrigeGrunnlag.get().disable();
             entityManager.persist(forrigeGrunnlag.get());
         }
-        KravgrunnlagAggregate aggregate = new KravgrunnlagAggregate.Builder()
+        KravgrunnlagAggregateEntity aggregate = new KravgrunnlagAggregateEntity.Builder()
             .medGrunnlagØkonomi(kravgrunnlag)
             .medBehandlingId(behandlingId)
             .medAktiv(true)
             .build();
         entityManager.persist(kravgrunnlag);
         entityManager.persist(aggregate);
-        entityManager.flush();
+        entityManager.flush(); //TODO unngå flush i repository, det er typisk bare nyttig for tester
     }
 
-    public Optional<KravgrunnlagAggregate> finnGrunnlagForBehandlingId(Long behandlingId) {
-        TypedQuery<KravgrunnlagAggregate> query = formFinngrunnlagQuery(behandlingId);
-        return hentUniktResultat(query);
-    }
-
-    public KravgrunnlagAggregate finnEksaktGrunnlagForBehandlingId(Long behandlingId) {
-        TypedQuery<KravgrunnlagAggregate> query = formFinngrunnlagQuery(behandlingId);
-        return hentEksaktResultat(query);
+    public Kravgrunnlag431 finnKravgrunnlag(Long behandlingId) {
+        TypedQuery<KravgrunnlagAggregateEntity> query = lagFinnKravgrunnlagQuery(behandlingId);
+        KravgrunnlagAggregateEntity aggregate = hentEksaktResultat(query);
+        return aggregate.getGrunnlagØkonomi();
     }
 
     public boolean harGrunnlagForBehandlingId(Long behandlingId) {
-        TypedQuery<Long> query = entityManager.createQuery("select count(1) from KravgrunnlagAggregate aggr " +
+        TypedQuery<Long> query = entityManager.createQuery("select count(1) from KravgrunnlagAggregateEntity aggr " +
             "where aggr.behandlingId=:behandlingId and aggr.aktiv=:aktiv", Long.class);
         query.setParameter(BEHANDLING_ID, behandlingId);
         query.setParameter(AKTIV, true);
         return query.getSingleResult() > 0;
     }
 
-    public Optional<KravgrunnlagAggregate> finnGrunnlagForVedtakId(Long vedtakId) {
-        TypedQuery<KravgrunnlagAggregate> query = entityManager.createQuery("from KravgrunnlagAggregate aggr " +
-            "where aggr.grunnlagØkonomi.vedtakId=:vedtakId and aggr.aktiv=:aktiv", KravgrunnlagAggregate.class);
-        query.setParameter("vedtakId", vedtakId);
-        query.setParameter(AKTIV, true);
-        return hentUniktResultat(query);
+    public boolean erKravgrunnlagSperret(Long behandlingId) {
+        TypedQuery<KravgrunnlagAggregateEntity> query = lagFinnKravgrunnlagQuery(behandlingId);
+        Optional<KravgrunnlagAggregateEntity> kravgrunnlag = hentUniktResultat(query);
+        return kravgrunnlag.stream().anyMatch(KravgrunnlagAggregate::isSperret);
     }
 
-    public void sperrGrunnlag(Long behandlingId){
-        Optional<KravgrunnlagAggregate> aggregate = finnGrunnlagForBehandlingId(behandlingId);
-        if(aggregate.isPresent()){
+    public Optional<KravgrunnlagAggregate> finnGrunnlagForVedtakId(Long vedtakId) {
+        TypedQuery<KravgrunnlagAggregateEntity> query = entityManager.createQuery("from KravgrunnlagAggregateEntity aggr " +
+            "where aggr.grunnlagØkonomi.vedtakId=:vedtakId and aggr.aktiv=:aktiv", KravgrunnlagAggregateEntity.class);
+        query.setParameter("vedtakId", vedtakId);
+        query.setParameter(AKTIV, true);
+        Optional<KravgrunnlagAggregateEntity> resultat = hentUniktResultat(query);
+        return Optional.ofNullable(resultat.orElse(null));
+    }
+
+    public void sperrGrunnlag(Long behandlingId) {
+        Optional<KravgrunnlagAggregateEntity> aggregate = finnKravgrunnlagOptional(behandlingId);
+        if (aggregate.isPresent()) {
             aggregate.get().sperr();
             entityManager.persist(aggregate.get());
-            entityManager.flush();
+            entityManager.flush(); //TODO unngå flush i repository, det er typisk bare nyttig for tester
+        } else {
+            KravgrunnlagRepositoryFeil.FEILFACTORY.kanIkkeSperreGrunnlagSomIkkeFinnes(behandlingId).log(logger);
         }
     }
 
-    private TypedQuery<KravgrunnlagAggregate> formFinngrunnlagQuery(Long behandlingId) {
-        TypedQuery<KravgrunnlagAggregate> query = entityManager.createQuery("from KravgrunnlagAggregate aggr " +
-            "where aggr.behandlingId=:behandlingId and aggr.aktiv=:aktiv", KravgrunnlagAggregate.class);
+    private Optional<KravgrunnlagAggregateEntity> finnKravgrunnlagOptional(Long behandlingId) {
+        TypedQuery<KravgrunnlagAggregateEntity> query = lagFinnKravgrunnlagQuery(behandlingId);
+        return hentUniktResultat(query);
+    }
+
+    private TypedQuery<KravgrunnlagAggregateEntity> lagFinnKravgrunnlagQuery(Long behandlingId) {
+        TypedQuery<KravgrunnlagAggregateEntity> query = entityManager.createQuery("from KravgrunnlagAggregateEntity aggr " +
+            "where aggr.behandlingId=:behandlingId and aggr.aktiv=:aktiv", KravgrunnlagAggregateEntity.class);
         query.setParameter(BEHANDLING_ID, behandlingId);
         query.setParameter(AKTIV, true);
         return query;
@@ -101,5 +109,13 @@ public class KravgrunnlagRepository {
 
     public EntityManager getEntityManager() {
         return entityManager;
+    }
+
+    interface KravgrunnlagRepositoryFeil extends DeklarerteFeil {
+
+        KravgrunnlagRepositoryFeil FEILFACTORY = FeilFactory.create(KravgrunnlagRepositoryFeil.class);
+
+        @TekniskFeil(feilkode = "FPT-710434", feilmelding = "Forsøker å sperre kravgrunnlag, men det finnes ikke noe kravgrunnlag for behandlingId=%s", logLevel = LogLevel.WARN)
+        Feil kanIkkeSperreGrunnlagSomIkkeFinnes(Long behandlingId);
     }
 }

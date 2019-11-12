@@ -1,5 +1,14 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.status;
 
+import java.util.Optional;
+import java.util.UUID;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.FellesTask;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TaskProperty;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
@@ -21,13 +30,6 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import java.util.Optional;
-import java.util.UUID;
 
 @ApplicationScoped
 @ProsessTask(LesKravvedtakStatusTask.TASKTYPE)
@@ -107,22 +109,22 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
     }
 
     private void oppdatereEksternBehandling(long vedtakId, String eksternBehandlingId) {
-        Optional<KravgrunnlagAggregate> aggregate = finnGrunnlagForVedtakId(vedtakId);
-        if (aggregate.isPresent()) {
+        Optional<KravgrunnlagAggregate> aggregateOpt = finnGrunnlagForVedtakId(vedtakId);
+        if (aggregateOpt.isPresent()) {
             logger.info("Grunnlag finnes allerede for vedtakId={}", vedtakId);
-            KravgrunnlagAggregate kravgrunnlagAggregate = aggregate.get();
-            String referense = kravgrunnlagAggregate.getGrunnlagØkonomi().getReferanse();
-            Long behandlingId = kravgrunnlagAggregate.getBehandlingId();
-            boolean erEksternBehandlingFinnes = eksternBehandlingRepository.finnesEksternBehandling(behandlingId, Long.valueOf(eksternBehandlingId));
-            if (!referense.equals(eksternBehandlingId) && !erEksternBehandlingFinnes) {
+            KravgrunnlagAggregate aggregate = aggregateOpt.get();
+            String referense = aggregate.getGrunnlagØkonomi().getReferanse();
+            Long behandlingId = aggregate.getBehandlingId();
+            boolean eksternBehandlingFinnes = eksternBehandlingRepository.finnesEksternBehandling(behandlingId, Long.valueOf(eksternBehandlingId));
+            if (!referense.equals(eksternBehandlingId) && !eksternBehandlingFinnes) {
                 Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
                 UUID eksternUUID = hentUUIDFraEksternBehandling(behandlingId);
 
-                logger.info("Oppdatere eksternBehandling for behandlingId={} med ny eksternId={}", behandlingId, eksternBehandlingId);
+                logger.info("Oppdaterer eksternBehandling for behandlingId={} med ny eksternId={}", behandlingId, eksternBehandlingId);
                 EksternBehandling eksternBehandling = new EksternBehandling(behandling, Long.valueOf(eksternBehandlingId), eksternUUID);
                 eksternBehandlingRepository.lagre(eksternBehandling);
             } else {
-                logger.info("eksternBehandlingId={} allerede finnes. Ikke oppdatere eksternBehandling", eksternBehandlingId);
+                logger.info("eksternBehandlingId={} finnes allerede. Oppdaterer ikke eksternBehandling", eksternBehandlingId);
             }
 
         }
