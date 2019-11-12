@@ -15,7 +15,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositor
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseAggregate;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelse;
 
 
 @BehandlingStegRef(kode = "VTILBSTEG")
@@ -48,9 +48,9 @@ public class VurderTilbakekrevingStegImpl implements VurderTilbakekrevingSteg {
     }
 
     private boolean allePerioderErForeldet(Long behandlingId) {
-        Optional<VurdertForeldelseAggregate> foreldelseAggregate = behandlingRepositoryProvider.getVurdertForeldelseRepository().finnVurdertForeldelseForBehandling(behandlingId);
-        if (foreldelseAggregate.isPresent()) {
-            return foreldelseAggregate.get().getVurdertForeldelse().getVurdertForeldelsePerioder().stream()
+        Optional<VurdertForeldelse> vurdertForeldelseOpt = behandlingRepositoryProvider.getVurdertForeldelseRepository().finnVurdertForeldelse(behandlingId);
+        if (vurdertForeldelseOpt.isPresent()) {
+            return vurdertForeldelseOpt.get().getVurdertForeldelsePerioder().stream()
                 .allMatch(foreldelsePeriodeDto -> ForeldelseVurderingType.FORELDET.equals(foreldelsePeriodeDto.getForeldelseVurderingType()));
         }
         return false;

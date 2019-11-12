@@ -23,7 +23,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurd
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.AnnenVurdering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelse;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseAggregate;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelsePeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseRepository;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
@@ -79,9 +78,7 @@ public class TilbakekrevingBeregningTjeneste {
 
     private VurdertForeldelse hentVurdertForeldelse(Long behandlingId) {
         VurdertForeldelse vurderingUtenPerioder = new VurdertForeldelse();
-        return vurdertForeldelseRepository.finnVurdertForeldelseForBehandling(behandlingId)
-            .map(VurdertForeldelseAggregate::getVurdertForeldelse)
-            .orElse(vurderingUtenPerioder);
+        return vurdertForeldelseRepository.finnVurdertForeldelse(behandlingId).orElse(vurderingUtenPerioder);
     }
 
     private List<Periode> finnPerioder(VurdertForeldelse vurdertForeldelse, VilkårVurderingEntitet vilkårsvurdering) {

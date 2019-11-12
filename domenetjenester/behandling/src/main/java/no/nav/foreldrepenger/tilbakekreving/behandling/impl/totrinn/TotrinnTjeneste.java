@@ -12,7 +12,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.TotrinnRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.Totrinnresultatgrunnlag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.Totrinnsvurdering;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseAggregate;
 
 @ApplicationScoped
 public class TotrinnTjeneste {
@@ -33,11 +32,11 @@ public class TotrinnTjeneste {
     public void settNyttTotrinnsgrunnlag(Behandling behandling) {
         Long behandlingId = behandling.getId();
         Optional<Long> faktaAggregateId = repositoryProvider.getFaktaFeilutbetalingRepository().finnFaktaFeilutbetalingAggregateId(behandlingId);
-        Optional<VurdertForeldelseAggregate> foreldelseAggregate = repositoryProvider.getVurdertForeldelseRepository().finnVurdertForeldelseForBehandling(behandlingId);
+        Optional<Long> foreldelseAggregateId = repositoryProvider.getVurdertForeldelseRepository().finnVurdertForeldelseAggregateId(behandlingId);
         Optional<Long> vilkårAggregateId = repositoryProvider.getVilkårsvurderingRepository().finnVilkårsvurderingAggregateId(behandlingId);
 
         Long feilUtbetalingId = faktaAggregateId.orElseThrow();
-        Long foreldelseId = foreldelseAggregate.map(VurdertForeldelseAggregate::getId).orElse(null);
+        Long foreldelseId = foreldelseAggregateId.orElse(null);
         Long vilkårId = vilkårAggregateId.orElse(null);
 
         Totrinnresultatgrunnlag totrinnresultatgrunnlag = Totrinnresultatgrunnlag.builder()

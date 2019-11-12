@@ -30,7 +30,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagDel;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseAggregate;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelse;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelsePeriode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMock;
@@ -50,11 +50,9 @@ public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
             new ForeldelsePeriodeDto(FØRSTE_DATO, sisteDato,
                 ForeldelseVurderingType.FORELDET, "ABC")));
 
-        Optional<VurdertForeldelseAggregate> vurdertForeldelseAggregateOptional = vurdertForeldelseRepository.finnVurdertForeldelseForBehandling(internBehandlingId);
-        assertThat(vurdertForeldelseAggregateOptional).isPresent();
-        VurdertForeldelseAggregate vurdertForeldelseAggregate = vurdertForeldelseAggregateOptional.get();
-        assertThat(vurdertForeldelseAggregate.getVurdertForeldelse()).isNotNull();
-        List<VurdertForeldelsePeriode> vurdertForeldelsePerioder = Lists.newArrayList(vurdertForeldelseAggregate.getVurdertForeldelse().getVurdertForeldelsePerioder());
+        Optional<VurdertForeldelse> vurdertForeldelseOptional = vurdertForeldelseRepository.finnVurdertForeldelse(internBehandlingId);
+        assertThat(vurdertForeldelseOptional).isPresent();
+        List<VurdertForeldelsePeriode> vurdertForeldelsePerioder = Lists.newArrayList(vurdertForeldelseOptional.get().getVurdertForeldelsePerioder());
         assertThat(vurdertForeldelsePerioder).isNotEmpty();
         assertThat(vurdertForeldelsePerioder.size()).isEqualTo(1);
         assertThat(vurdertForeldelsePerioder.get(0).getForeldelseVurderingType()).isEqualByComparingTo(ForeldelseVurderingType.FORELDET);
@@ -87,11 +85,9 @@ public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
             new ForeldelsePeriodeDto(andrePeriodeFørsteDato, andrePeriodeSisteDato,
                 ForeldelseVurderingType.TILLEGGSFRIST, "CDE")));
 
-        Optional<VurdertForeldelseAggregate> vurdertForeldelseAggregateOptional = vurdertForeldelseRepository.finnVurdertForeldelseForBehandling(internBehandlingId);
-        assertThat(vurdertForeldelseAggregateOptional).isPresent();
-        VurdertForeldelseAggregate vurdertForeldelseAggregate = vurdertForeldelseAggregateOptional.get();
-        assertThat(vurdertForeldelseAggregate.getVurdertForeldelse()).isNotNull();
-        List<VurdertForeldelsePeriode> vurdertForeldelsePerioder = Lists.newArrayList(vurdertForeldelseAggregate.getVurdertForeldelse().getVurdertForeldelsePerioder());
+        Optional<VurdertForeldelse> vurdertForeldelseOptional = vurdertForeldelseRepository.finnVurdertForeldelse(internBehandlingId);
+        assertThat(vurdertForeldelseOptional).isPresent();
+        List<VurdertForeldelsePeriode> vurdertForeldelsePerioder = Lists.newArrayList(vurdertForeldelseOptional.get().getVurdertForeldelsePerioder());
         assertThat(vurdertForeldelsePerioder).isNotEmpty();
         vurdertForeldelsePerioder.sort(Comparator.comparing(VurdertForeldelsePeriode::getFom));
         assertThat(vurdertForeldelsePerioder.size()).isEqualTo(2);

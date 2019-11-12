@@ -17,7 +17,7 @@ import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
 
 @Entity(name = "VilkårVurderingAggregate")
 @Table(name = "GR_VILKAAR")
-public class VilkårVurderingAggregateEntitet extends BaseEntitet {
+class VilkårVurderingAggregateEntitet extends BaseEntitet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_GR_VILKAAR")
