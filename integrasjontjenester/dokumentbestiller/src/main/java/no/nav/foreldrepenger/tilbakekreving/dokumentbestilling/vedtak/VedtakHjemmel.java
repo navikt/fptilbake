@@ -14,8 +14,8 @@ public class VedtakHjemmel {
     }
 
     public static String lagHjemmelstekst(VedtakResultatType vedtakResultatType, VurdertForeldelse foreldelse, List<VilkårVurderingPeriodeEntitet> vilkårPerioder) {
-        boolean foreldelseErVurdert = foreldelse != null;
-        boolean foreldelseValgtTilleggsfrist = erTilleggsfristBenyttet(foreldelse);
+        boolean foreldetVanlig = erNoeSattTilVanligForeldet(foreldelse);
+        boolean foreldetMedTilleggsfrist = erTilleggsfristBenyttet(foreldelse);
         boolean ignorerteSmåbeløp = heleVurderingPgaSmåbeløp(vedtakResultatType, vilkårPerioder);
         boolean renter = erRenterBenyttet(vilkårPerioder);
 
@@ -31,9 +31,9 @@ public class VedtakHjemmel {
             }
         }
 
-        if (foreldelseValgtTilleggsfrist) {
+        if (foreldetMedTilleggsfrist) {
             hjemler.add("foreldelsesloven §§ 2, 3 og 10");
-        } else if (foreldelseErVurdert) {
+        } else if (foreldetVanlig) {
             hjemler.add("foreldelsesloven §§ 2 og 3");
         }
         return join(hjemler, " og ");
@@ -49,6 +49,10 @@ public class VedtakHjemmel {
 
     private static boolean erTilleggsfristBenyttet(VurdertForeldelse foreldelse) {
         return foreldelse != null && foreldelse.getVurdertForeldelsePerioder().stream().anyMatch(f -> f.getForeldelseVurderingType().equals(ForeldelseVurderingType.TILLEGGSFRIST));
+    }
+
+    private static boolean erNoeSattTilVanligForeldet(VurdertForeldelse foreldelse) {
+        return foreldelse != null && foreldelse.getVurdertForeldelsePerioder().stream().anyMatch(f -> f.getForeldelseVurderingType().equals(ForeldelseVurderingType.FORELDET));
     }
 
     private static String join(List<String> elementer, String skille) {
