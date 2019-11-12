@@ -20,7 +20,7 @@ import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
 public class KravVedtakStatusAggregate extends BaseEntitet {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_GR_KRAV_GRUNNLAG")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_GR_KRAV_VEDTAK_STATUS")
     private Long id;
 
     @ManyToOne(optional = false)

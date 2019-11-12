@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://xmlns.jcp.org/xml/ns/persistence/orm"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence/orm
+      http://xmlns.jcp.org/xml/ns/persistence/orm_2_1.xsd"
+                 version="2.1">
+
+    <sequence-generator name="SEQ_MOTTAKER_VARSEL_RESPONS" allocation-size="50" sequence-name="SEQ_MOTTAKER_VARSEL_RESPONS"/>
+    <sequence-generator name="SEQ_VARSELBREV_DATA" allocation-size="50" sequence-name="SEQ_VARSELBREV_DATA"/>
+    <sequence-generator name="SEQ_VARSEL" allocation-size="50" sequence-name="SEQ_VARSEL"/>
+
+    <!-- fritekst vedtaksbrev -->
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevPeriode"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevOppsummering"/>
+
+    <!-- sporing -->
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VarselbrevSporing"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevSporing"/>
+
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons.Varselrespons"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselInfo"/>
+
+
+    <!-- kodeverk -->
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.dokumentbestiller.DokumentMalType"/>
+
+
+</entity-mappings>

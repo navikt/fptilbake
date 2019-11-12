@@ -1,0 +1,3 @@
+--må sette mye høyere tall for å unngå konflikt, siden feil sekvens har vært i bruk
+drop SEQUENCE SEQ_GR_KRAV_VEDTAK_STATUS;
+CREATE SEQUENCE SEQ_GR_KRAV_VEDTAK_STATUS MINVALUE 1 START WITH 2000000 INCREMENT BY 50 NOCACHE NOCYCLE;

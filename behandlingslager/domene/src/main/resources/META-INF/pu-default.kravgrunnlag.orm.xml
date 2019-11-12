@@ -5,20 +5,27 @@
       http://xmlns.jcp.org/xml/ns/persistence/orm_2_1.xsd"
                  version="2.1">
 
-    <sequence-generator name="SEQ_KRAVGRUNNLAG_XML" allocation-size="50" sequence-name="SEQ_KRAVGRUNNLAG_XML"/>
+    <sequence-generator name="SEQ_GR_KRAV_GRUNNLAG" allocation-size="50" sequence-name="SEQ_GR_KRAV_GRUNNLAG"/>
     <sequence-generator name="SEQ_KRAV_GRUNNLAG_431" allocation-size="50" sequence-name="SEQ_KRAV_GRUNNLAG_431"/>
     <sequence-generator name="SEQ_KRAV_GRUNNLAG_PERIODE_432" allocation-size="50" sequence-name="SEQ_KRAV_GRUNNLAG_PERIODE_432"/>
     <sequence-generator name="SEQ_KRAV_GRUNNLAG_BELOP_433" allocation-size="50" sequence-name="SEQ_KRAV_GRUNNLAG_BELOP_433"/>
+
+    <!-- for sporing av statusmeldinger-->
+    <sequence-generator name="SEQ_GR_KRAV_VEDTAK_STATUS" allocation-size="50" sequence-name="SEQ_GR_KRAV_VEDTAK_STATUS"/>
     <sequence-generator name="SEQ_KRAV_VEDTAK_STATUS_437" allocation-size="50" sequence-name="SEQ_KRAV_VEDTAK_STATUS_437"/>
-    <sequence-generator name="SEQ_GR_KRAV_GRUNNLAG" allocation-size="50" sequence-name="SEQ_GR_KRAV_GRUNNLAG"/>
 
-    <entity class="no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType"/>
-
+    <entity class="no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagAggregateEntity"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagBelop433"/>
+
+    <!-- for sporing av statusmeldinger-->
+    <entity class="no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatusAggregate"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatus437"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagAggregateEntity"/>
+
+    <!-- kodeverk -->
+    <entity class="no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Inntektskategori"/>
 </entity-mappings>

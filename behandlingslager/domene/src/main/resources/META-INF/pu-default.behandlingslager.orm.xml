@@ -5,40 +5,27 @@
       http://xmlns.jcp.org/xml/ns/persistence/orm_2_1.xsd"
                  version="2.1">
 
-    <sequence-generator name="SEQ_AKSJONSPUNKT" allocation-size="50" sequence-name="SEQ_AKSJONSPUNKT"/>
+    <sequence-generator name="SEQ_BRUKER" allocation-size="50" sequence-name="SEQ_BRUKER"/>
+    <sequence-generator name="SEQ_FAGSAK" allocation-size="50" sequence-name="SEQ_FAGSAK"/>
+    <sequence-generator name="SEQ_FAGSAK_PROSESS_TASK" allocation-size="50" sequence-name="SEQ_FAGSAK_PROSESS_TASK"/>
     <sequence-generator name="SEQ_BEHANDLING" allocation-size="50" sequence-name="SEQ_BEHANDLING"/>
+    <sequence-generator name="SEQ_EKSTERN_BEHANDLING" allocation-size="50" sequence-name="SEQ_EKSTERN_BEHANDLING"/>
     <sequence-generator name="SEQ_BEHANDLING_STEG_TILSTAND" allocation-size="50" sequence-name="SEQ_BEHANDLING_STEG_TILSTAND"/>
     <sequence-generator name="SEQ_BEHANDLING_TYPE_STEG_SEKV" allocation-size="50" sequence-name="SEQ_BEHANDLING_STEG_TYPE_SEKV"/>
-    <sequence-generator name="SEQ_BRUKER" allocation-size="50" sequence-name="SEQ_BRUKER"/>
-    <sequence-generator name="SEQ_FAGSAK_PROSESS_TASK" allocation-size="50" sequence-name="SEQ_FAGSAK_PROSESS_TASK"/>
-
+    <sequence-generator name="SEQ_AKSJONSPUNKT" allocation-size="50" sequence-name="SEQ_AKSJONSPUNKT"/>
     <sequence-generator name="SEQ_VURDER_PAA_NYTT_AARSAK" allocation-size="50" sequence-name="SEQ_VURDER_PAA_NYTT_AARSAK"/>
     <sequence-generator name="SEQ_TOTRINNSVURDERING" allocation-size="50" sequence-name="SEQ_TOTRINNSVURDERING"/>
     <sequence-generator name="SEQ_TOTRINNRESULTATGRUNNLAG" allocation-size="50" sequence-name="SEQ_TOTRINNRESULTATGRUNNLAG"/>
     <sequence-generator name="SEQ_VURDER_AARSAK_TTVURDERING" allocation-size="50" sequence-name="SEQ_VURDER_AARSAK_TTVURDERING"/>
-    <sequence-generator name="SEQ_MOTTAKER_VARSEL_RESPONS" allocation-size="50" sequence-name="SEQ_MOTTAKER_VARSEL_RESPONS"/>
-    <sequence-generator name="SEQ_VURDERT_FORELDELSE" allocation-size="50" sequence-name="SEQ_VURDERT_FORELDELSE"/>
-    <sequence-generator name="SEQ_GR_VURDERT_FORELDELSE" allocation-size="50" sequence-name="SEQ_GR_VURDERT_FORELDELSE"/>
-    <sequence-generator name="SEQ_FORELDELSE_PERIODE" allocation-size="50" sequence-name="SEQ_FORELDELSE_PERIODE"/>
-    <sequence-generator name="SEQ_FEILUTBETALING_AARSAK_DEF" allocation-size="50" sequence-name="SEQ_FEILUTBETALING_AARSAK_DEF"/>
-    <sequence-generator name="SEQ_FEILUTBET_PERIODE_AARSAK" allocation-size="50" sequence-name="SEQ_FEILUTBET_PERIODE_AARSAK"/>
-    <sequence-generator name="SEQ_EKSTERN_BEHANDLING" allocation-size="50" sequence-name="SEQ_EKSTERN_BEHANDLING"/>
-    <sequence-generator name="SEQ_VARSELBREV_DATA" allocation-size="50" sequence-name="SEQ_VARSELBREV_DATA"/>
-    <sequence-generator name="SEQ_OKO_XML_SENDT" allocation-size="50" sequence-name="SEQ_OKO_XML_SENDT"/>
-    <sequence-generator name="SEQ_OKO_XML_MOTTATT" allocation-size="50" sequence-name="SEQ_OKO_XML_MOTTATT"/>
-    <sequence-generator name="SEQ_VARSEL" allocation-size="50" sequence-name="SEQ_VARSEL"/>
+    <sequence-generator name="SEQ_KONFIG_VERDI" allocation-size="50" sequence-name="SEQ_KONFIG_VERDI"/>
 
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker"/>
-
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VarselbrevSporing"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevSporing"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevPeriode"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevOppsummering"/>
 
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsessTask"/>
 
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegTilstand"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingTypeStegSekvens"/>
@@ -48,35 +35,14 @@
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.VurderPåNyttÅrsak"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.VurderingspunktDefinisjon"/>
 
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling"/>
 
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.Totrinnsvurdering"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.Totrinnresultatgrunnlag"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.VurderÅrsakTotrinnsvurdering"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårType"/>
 
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons.Varselrespons"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode"/>
-
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelse"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseAggregate"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelsePeriode"/>
-
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagDel"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagDokumentLink"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagFelt"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagFeltType"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltVerdiType"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkBegrunnelseType"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkOpplysningType"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkResultatType"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.RelasjonsRolleType"/>
 
     <!--###################-->
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.AdresseType"/>
@@ -109,20 +75,10 @@
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.VariantFormat"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.VurderÅrsak"/>
-
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.konfig.KonfigVerdiEntitet"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.konfig.KonfigVerdiKode"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingAggregate"/>
-
-    <entity class="no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlSendt"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt"/>
-
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.dokumentbestiller.DokumentMalType"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.tilbakekrevingsvalg.VidereBehandling"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KonsekvensForYtelsen"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselInfo"/>
 
 
 </entity-mappings>
