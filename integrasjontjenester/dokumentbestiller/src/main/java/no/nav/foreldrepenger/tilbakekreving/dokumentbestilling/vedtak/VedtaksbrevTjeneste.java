@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -28,7 +29,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.Var
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevOppsummering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevSporing;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
@@ -177,43 +177,38 @@ public class VedtaksbrevTjeneste {
     }
 
     public VedtaksbrevData hentDataForVedtaksbrev(Long behandlingId, String oppsummeringFritekst, List<PeriodeMedTekstDto> perioderFritekst) {
-        EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandlingId);
-        UUID fpsakBehandlingUuid = eksternBehandling.getEksternUuid();
         Behandling behandling = behandlingTjeneste.hentBehandling(behandlingId);
-
-        //TODO hent data i et tidlig steg og hent fra repository
-        SamletEksternBehandlingInfo fpsakBehandling = eksternDataForBrevTjeneste.hentBehandlingFpsak(fpsakBehandlingUuid, Tillegsinformasjon.PERSONOPPLYSNINGER, Tillegsinformasjon.SØKNAD);
-
-        Optional<VarselInfo> varselInfo = varselRepository.finnVarsel(behandlingId);
-
+        //TODO hent data fra fpsak i tidligere steg, og hent fra repository her
+        SamletEksternBehandlingInfo fpsakBehandling = hentDataFraFpsak(behandlingId);
+        Long varsletBeløp = finnVarsletBeløp(behandlingId);
+        LocalDate varsletDato = finnVarsletDato(behandlingId);
         BeregningResultat beregnetResultat = tilbakekrevingBeregningTjeneste.beregn(behandlingId);
         List<BeregningResultatPeriode> resulatPerioder = beregnetResultat.getBeregningResultatPerioder();
         VedtakResultatType vedtakResultatType = beregnetResultat.getVedtakResultatType();
-
-        List<VarselbrevSporing> varselbrevData = brevdataRepository.hentVarselbrevData(behandlingId);
-        Optional<LocalDateTime> nyesteVarselbrevTidspunkt = VedtaksbrevUtil.finnNyesteVarselbrevTidspunkt(varselbrevData);
-
         FaktaFeilutbetaling fakta = faktaRepository.finnFaktaOmFeilutbetaling(behandlingId).orElseThrow();
-        List<VilkårVurderingPeriodeEntitet> vilkårPerioder = vilkårsvurderingRepository.finnVilkårsvurdering(behandlingId)
-            .map(VilkårVurderingEntitet::getPerioder)
-            .orElse(Collections.emptyList());
+        List<VilkårVurderingPeriodeEntitet> vilkårPerioder = finnVilkårVurderingPerioder(behandlingId);
         VurdertForeldelse foreldelse = foreldelseRepository.finnVurdertForeldelse(behandlingId).orElse(null);
 
+        BigDecimal totaltTilbakekrevesUtenRenter = summer(resulatPerioder, BeregningResultatPeriode::getTilbakekrevingBeløpUtenRenter);
         BigDecimal totaltTilbakekrevesMedRenter = summer(resulatPerioder, BeregningResultatPeriode::getTilbakekrevingBeløp);
         BigDecimal totaltSkattetrekk = summer(resulatPerioder, BeregningResultatPeriode::getSkattBeløp);
+        BigDecimal totaltRentebeløp = summer(resulatPerioder, BeregningResultatPeriode::getRenteBeløp);
+        BigDecimal totaltTilbakekrevesBeløpMedRenterUtenSkatt = totaltTilbakekrevesMedRenter.subtract(totaltSkattetrekk);
+        String hjemmelstekst = VedtakHjemmel.lagHjemmelstekst(vedtakResultatType, foreldelse, vilkårPerioder);
         HbVedtaksbrevFelles.Builder vedtakDataBuilder = HbVedtaksbrevFelles.builder()
             .medYtelsetype(behandling.getFagsak().getFagsakYtelseType())
-            .medVarsletDato(nyesteVarselbrevTidspunkt.map(LocalDateTime::toLocalDate).orElse(null))
-            .medVarsletBeløp(varselInfo.map(VarselInfo::getVarselBeløp).orElse(null))
+            .medVarsletDato(varsletDato)
+            .medVarsletBeløp(varsletBeløp)
+            .medDatoFagsakvedtak(fpsakBehandling.getGrunninformasjon().getVedtakDato())
             .medAntallBarn(fpsakBehandling.getAntallBarnSøktFor())
             .medErFødsel(SøknadType.FØDSEL == fpsakBehandling.getSøknadType())
             .medErAdopsjon(SøknadType.ADOPSJON == fpsakBehandling.getSøknadType())
             .medFritekstOppsummering(oppsummeringFritekst)
-            .medLovhjemmelVedtak(VedtakHjemmel.lagHjemmelstekst(vedtakResultatType, foreldelse, vilkårPerioder))
-            .medTotaltTilbakekrevesBeløp(summer(resulatPerioder, BeregningResultatPeriode::getTilbakekrevingBeløpUtenRenter))
-            .medTotaltRentebeløp(summer(resulatPerioder, BeregningResultatPeriode::getRenteBeløp))
+            .medLovhjemmelVedtak(hjemmelstekst)
+            .medTotaltTilbakekrevesBeløp(totaltTilbakekrevesUtenRenter)
+            .medTotaltRentebeløp(totaltRentebeløp)
             .medTotaltTilbakekrevesBeløpMedRenter(totaltTilbakekrevesMedRenter)
-            .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(totaltTilbakekrevesMedRenter.subtract(totaltSkattetrekk))
+            .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(totaltTilbakekrevesBeløpMedRenterUtenSkatt)
             .medHovedresultat(vedtakResultatType)
             .medKlagefristUker(KLAGEFRIST_UKER);
 
@@ -224,6 +219,28 @@ public class VedtaksbrevTjeneste {
         HbVedtaksbrevData data = new HbVedtaksbrevData(vedtakDataBuilder.build(), perioder);
         BrevMetadata brevMetadata = lagMetadataForVedtaksbrev(behandling, vedtakResultatType, fpsakBehandling);
         return new VedtaksbrevData(data, brevMetadata);
+    }
+
+    private SamletEksternBehandlingInfo hentDataFraFpsak(Long behandlingId) {
+        UUID fpsakBehandlingUuid = eksternBehandlingRepository.hentFraInternId(behandlingId).getEksternUuid();
+        return eksternDataForBrevTjeneste.hentBehandlingFpsak(fpsakBehandlingUuid, Tillegsinformasjon.PERSONOPPLYSNINGER, Tillegsinformasjon.SØKNAD);
+    }
+
+    private List<VilkårVurderingPeriodeEntitet> finnVilkårVurderingPerioder(Long behandlingId) {
+        return vilkårsvurderingRepository.finnVilkårsvurdering(behandlingId)
+                .map(VilkårVurderingEntitet::getPerioder)
+                .orElse(Collections.emptyList());
+    }
+
+    private LocalDate finnVarsletDato(Long behandlingId) {
+        List<VarselbrevSporing> varselbrevData = brevdataRepository.hentVarselbrevData(behandlingId);
+        Optional<LocalDateTime> nyesteVarselbrevTidspunkt = VedtaksbrevUtil.finnNyesteVarselbrevTidspunkt(varselbrevData);
+        return nyesteVarselbrevTidspunkt.map(LocalDateTime::toLocalDate).orElse(null);
+    }
+
+    private Long finnVarsletBeløp(Long behandlingId) {
+        Optional<VarselInfo> varselInfo = varselRepository.finnVarsel(behandlingId);
+        return varselInfo.map(VarselInfo::getVarselBeløp).orElse(null);
     }
 
     BrevMetadata lagMetadataForVedtaksbrev(Behandling behandling, VedtakResultatType vedtakResultatType, SamletEksternBehandlingInfo eksternBehandlingsinfo) {

@@ -65,6 +65,9 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
     private String kontaktNavInnkrevingTelefon = "21 05 11 00";  //TODO fjerne hardkoding
     @JsonProperty("bruk-midlertidig-tekst")
     private boolean brukMidlertidigTekst = true;
+    @JsonProperty("dato-fagsakvedtak")
+    @JsonSerialize(using = LocalDateTilStrengMedNorskFormatSerialiserer.class)
+    private LocalDate datoFagsakvedtak;
 
     private HbVedtaksbrevFelles() {
         //bruk Builder
@@ -85,7 +88,6 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
     public void setFritekstOppsummering(String fritekstOppsummering) {
         this.fritekstOppsummering = fritekstOppsummering;
     }
-
 
     public VedtakResultatType getHovedresultat() {
         return hovedresultat;
@@ -122,6 +124,9 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
             if (kladd.varsletDato != null && kladd.varsletBeløp == null) {
                 throw new IllegalArgumentException("Inkonsistent tilstand: varslet dato finnes, men varslet beløp finnes ikke");
             }
+            if (kladd.varsletDato == null) {
+                Objects.check(kladd.datoFagsakvedtak != null, "dato for fagsakvedtak/revurdering er ikke satt");
+            }
             return kladd;
         }
 
@@ -147,6 +152,11 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
 
         public Builder medVarsletDato(LocalDate varsletDato) {
             kladd.varsletDato = varsletDato;
+            return this;
+        }
+
+        public Builder medDatoFagsakvedtak(LocalDate datoFagsakvedtak) {
+            kladd.datoFagsakvedtak = datoFagsakvedtak;
             return this;
         }
 

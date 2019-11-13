@@ -98,11 +98,12 @@ public class TekstformatererVedtaksbrevTest {
             .medHovedresultat(VedtakResultatType.INGEN_TILBAKEBETALING)
             .medLovhjemmelVedtak("Folketrygdloven § 22-15")
             .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
-            .medVarsletBeløp((BigDecimal)null)
+            .medVarsletBeløp((BigDecimal) null)
             .medTotaltTilbakekrevesBeløp(BigDecimal.ZERO)
             .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.ZERO)
             .medTotaltRentebeløp(BigDecimal.ZERO)
             .medVarsletDato(null)
+            .medDatoFagsakvedtak(LocalDate.of(2019, 3, 21))
             .medKlagefristUker(6)
             .skruAvMidlertidigTekst() //generer tekst slik den skal være etter pilot
             .build();
@@ -337,11 +338,10 @@ public class TekstformatererVedtaksbrevTest {
             .medHovedresultat(VedtakResultatType.DELVIS_TILBAKEBETALING)
             .medLovhjemmelVedtak("Folketrygdloven § 22-15")
             .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
-            .medVarsletBeløp(BigDecimal.valueOf(2000))
             .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(1000))
             .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(1000))
             .medTotaltRentebeløp(BigDecimal.ZERO)
-            .medVarsletDato(LocalDate.of(2020, 4, 4))
+            .medDatoFagsakvedtak(LocalDate.of(2019, 11, 12))
             .medKlagefristUker(6)
             .skruAvMidlertidigTekst() //generer tekst slik den skal være etter pilot
             .build();
@@ -372,7 +372,7 @@ public class TekstformatererVedtaksbrevTest {
         HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
 
         String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
-        String fasit = les("/vedtaksbrev/FP_foreldelse.txt");
+        String fasit = les("/vedtaksbrev/FP_delvis_foreldelse_uten_varsel.txt");
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 
