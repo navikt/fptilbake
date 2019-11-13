@@ -6,6 +6,7 @@ public class BaseDokument {
     private boolean foreldrepenger;
     private boolean engangsstonad;
     private boolean svangerskapspenger;
+    private boolean isKorrigert;
 
     public enum Lokale {
         BOKMÅL("nb_NO"),
@@ -64,5 +65,13 @@ public class BaseDokument {
 
     public void setSvangerskapspenger(boolean svangerskapspenger) {
         this.svangerskapspenger = svangerskapspenger;
+    }
+
+    public boolean isKorrigert() {
+        return isKorrigert;
+    }
+
+    public void setKorrigert(boolean korrigert) {
+        isKorrigert = korrigert;
     }
 }

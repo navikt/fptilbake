@@ -49,7 +49,11 @@ public class SendManueltVarselbrevTask implements ProsessTaskHandler {
         DokumentMalType malType = DokumentMalType.fraKode(prosessTaskData.getPropertyValue(TaskProperty.MAL_TYPE));
         String friTekst = prosessTaskData.getPropertyValue(TaskProperty.FRITEKST);
 
-        manueltVarselBrevTjeneste.sendManueltVarselBrev(behandlingId, malType, friTekst);
+        if (DokumentMalType.VARSEL_DOK.equals(malType)) {
+            manueltVarselBrevTjeneste.sendManueltVarselBrev(behandlingId, malType, friTekst);
+        }else if (DokumentMalType.KORRIGERT_VARSEL_DOK.equals(malType)) {
+            manueltVarselBrevTjeneste.sendKorrigertVarselBrev(behandlingId, malType, friTekst);
+        }
 
         LocalDateTime fristTid = FPDateUtil.nå().plus(ventefrist).plusDays(1);
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);

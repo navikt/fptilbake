@@ -1,10 +1,10 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.handlebars.dto;
 
-import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
+
+import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
 public class VarselbrevDokument extends BaseDokument {
 
@@ -15,6 +15,8 @@ public class VarselbrevDokument extends BaseDokument {
     private LocalDate fristdatoForTilbakemelding;
     private Periode datoerHvisSammenhengendePeriode;
     private String kontakttelefonnummer;
+    private LocalDate varsletDato;
+    private Long varsletBelop;
 
     public String getKontakttelefonnummer() {
         return kontakttelefonnummer;
@@ -72,6 +74,22 @@ public class VarselbrevDokument extends BaseDokument {
         this.datoerHvisSammenhengendePeriode = datoerHvisSammenhengendePeriode;
     }
 
+    public LocalDate getVarsletDato() {
+        return varsletDato;
+    }
+
+    public void setVarsletDato(LocalDate varsletDato) {
+        this.varsletDato = varsletDato;
+    }
+
+    public Long getVarsletBelop() {
+        return varsletBelop;
+    }
+
+    public void setVarsletBelop(Long varsletBelop) {
+        this.varsletBelop = varsletBelop;
+    }
+
     public void valider() {
         Objects.requireNonNull(belop, "totalbeløp fra fpoppdrag/oppdragssystemet");
         Objects.requireNonNull(endringsdato, "endringsdato");
@@ -91,6 +109,11 @@ public class VarselbrevDokument extends BaseDokument {
                     Objects.requireNonNull(feilutbetaltPeriode.getTom(), "tilogmed-dato for feilutbetalingsperiode");
                 }
             }
+        }
+
+        if(isKorrigert()){
+            Objects.requireNonNull(varsletDato, "varsletDato");
+            Objects.requireNonNull(varsletBelop, "varsletBelop");
         }
     }
 
