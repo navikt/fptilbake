@@ -91,18 +91,19 @@ public class TekstformatererVedtaksbrevTest {
     }
 
     @Test
-    public void skal_generere_vedtaksbrev_for_FP_og_god_tro_uten_tilbakekreving() throws Exception {
+    public void skal_generere_vedtaksbrev_for_FP_og_god_tro_uten_tilbakekreving_uten_varsel() throws Exception {
         HbVedtaksbrevFelles vedtaksbrevData = HbVedtaksbrevFelles.builder()
             .medErFødsel(true)
             .medAntallBarn(1)
             .medHovedresultat(VedtakResultatType.INGEN_TILBAKEBETALING)
             .medLovhjemmelVedtak("Folketrygdloven § 22-15")
             .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
-            .medVarsletBeløp(BigDecimal.valueOf(10000))
+            .medVarsletBeløp((BigDecimal) null)
             .medTotaltTilbakekrevesBeløp(BigDecimal.ZERO)
             .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.ZERO)
             .medTotaltRentebeløp(BigDecimal.ZERO)
-            .medVarsletDato(LocalDate.of(2020, 4, 4))
+            .medVarsletDato(null)
+            .medDatoFagsakvedtak(LocalDate.of(2019, 3, 21))
             .medKlagefristUker(6)
             .skruAvMidlertidigTekst() //generer tekst slik den skal være etter pilot
             .build();
@@ -337,11 +338,10 @@ public class TekstformatererVedtaksbrevTest {
             .medHovedresultat(VedtakResultatType.DELVIS_TILBAKEBETALING)
             .medLovhjemmelVedtak("Folketrygdloven § 22-15")
             .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
-            .medVarsletBeløp(BigDecimal.valueOf(2000))
             .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(1000))
             .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(1000))
             .medTotaltRentebeløp(BigDecimal.ZERO)
-            .medVarsletDato(LocalDate.of(2020, 4, 4))
+            .medDatoFagsakvedtak(LocalDate.of(2019, 11, 12))
             .medKlagefristUker(6)
             .skruAvMidlertidigTekst() //generer tekst slik den skal være etter pilot
             .build();
@@ -372,7 +372,7 @@ public class TekstformatererVedtaksbrevTest {
         HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
 
         String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
-        String fasit = les("/vedtaksbrev/FP_foreldelse.txt");
+        String fasit = les("/vedtaksbrev/FP_delvis_foreldelse_uten_varsel.txt");
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 

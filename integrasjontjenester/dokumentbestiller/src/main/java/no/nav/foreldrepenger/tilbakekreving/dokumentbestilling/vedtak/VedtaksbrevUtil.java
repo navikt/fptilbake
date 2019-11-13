@@ -10,7 +10,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.Var
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevPeriode;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.PeriodeMedTekstDto;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
-import no.nav.vedtak.util.FPDateUtil;
+import no.nav.vedtak.felles.jpa.BaseEntitet;
 
 public class VedtaksbrevUtil {
 
@@ -18,17 +18,10 @@ public class VedtaksbrevUtil {
         //for static access
     }
 
-    public static LocalDateTime finnNyesteVarselbrevTidspunkt(List<VarselbrevSporing> utsendteVarselbrev) {
-        if (utsendteVarselbrev.isEmpty()) {
-            return FPDateUtil.nå();
-        }
-        LocalDateTime nyesteVarselSendt = utsendteVarselbrev.get(0).getOpprettetTidspunkt();
-        for (VarselbrevSporing varselbrevData : utsendteVarselbrev) {
-            if (varselbrevData.getOpprettetTidspunkt().isAfter(nyesteVarselSendt)) {
-                nyesteVarselSendt = varselbrevData.getOpprettetTidspunkt();
-            }
-        }
-        return nyesteVarselSendt;
+    public static Optional<LocalDateTime> finnNyesteVarselbrevTidspunkt(List<VarselbrevSporing> utsendteVarselbrev) {
+        return utsendteVarselbrev.stream()
+            .map(BaseEntitet::getOpprettetTidspunkt)
+            .max(LocalDateTime::compareTo);
     }
 
     public static List<PeriodeMedTekstDto> mapFritekstFraDb(List<VedtaksbrevPeriode> fritekstPerioder) {
