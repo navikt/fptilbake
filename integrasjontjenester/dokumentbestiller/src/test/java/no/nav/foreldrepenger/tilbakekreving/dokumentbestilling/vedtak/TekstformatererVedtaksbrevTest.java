@@ -50,6 +50,7 @@ public class TekstformatererVedtaksbrevTest {
             .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(23002))
             .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(23002))
             .medTotaltRentebeløp(BigDecimal.ZERO)
+            .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.valueOf(17601))
             .medVarsletDato(LocalDate.of(2020, 4, 4))
             .medKlagefristUker(6)
             //.skruAvMidlertidigTekst() //generer tekst som skal brukes i pilot
@@ -222,10 +223,10 @@ public class TekstformatererVedtaksbrevTest {
             .medVarsletBeløp(BigDecimal.valueOf(10000))
             .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(10000))
             .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(11000))
+            .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.valueOf(7011))
             .medTotaltRentebeløp(BigDecimal.valueOf(1000))
             .medVarsletDato(LocalDate.of(2020, 4, 4))
             .medKlagefristUker(6)
-            .skruAvMidlertidigTekst() //generer tekst slik den skal være etter pilot
             .build();
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
             HbVedtaksbrevPeriode.builder()
