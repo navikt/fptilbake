@@ -36,6 +36,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
     @Test
     public void skal_generere_brev_delt_i_avsnitt_og_underavsnitt() {
         HbVedtaksbrevFelles vedtaksbrevData = HbVedtaksbrevFelles.builder()
+            .skruAvMidlertidigTekst()
             .medErFødsel(true)
             .medAntallBarn(2)
             .medHovedresultat(VedtakResultatType.DELVIS_TILBAKEBETALING)
@@ -85,6 +86,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
     @Test
     public void skal_generere_tekst_for_faktaperiode() {
         HbVedtaksbrevFelles felles = HbVedtaksbrevFelles.builder()
+            .skruAvMidlertidigTekst()
             .medErFødsel(true)
             .medAntallBarn(2)
             .medHovedresultat(VedtakResultatType.DELVIS_TILBAKEBETALING)
@@ -118,6 +120,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
     @Test
     public void skal_si_at_du_ikke_trenger_betale_tilbake_når_det_er_god_tro_og_beløp_ikke_er_i_behold() {
         HbVedtaksbrevFelles felles = HbVedtaksbrevFelles.builder()
+            .skruAvMidlertidigTekst()
             .medErFødsel(true)
             .medAntallBarn(1)
             .medHovedresultat(VedtakResultatType.DELVIS_TILBAKEBETALING)
@@ -150,6 +153,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
     @Test
     public void skal_ha_riktig_tekst_for_særlige_grunner_når_det_ikke_er_reduksjon_av_beløp() {
         HbVedtaksbrevFelles felles = HbVedtaksbrevFelles.builder()
+            .skruAvMidlertidigTekst()
             .medErFødsel(true)
             .medAntallBarn(1)
             .medHovedresultat(VedtakResultatType.FULL_TILBAKEBETALING)
@@ -183,6 +187,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
     @Test
     public void skal_ha_riktig_tekst_for_særlige_grunner_når_det_er_reduksjon_av_beløp() {
         HbVedtaksbrevFelles felles = HbVedtaksbrevFelles.builder()
+            .skruAvMidlertidigTekst()
             .medErFødsel(true)
             .medAntallBarn(1)
             .medHovedresultat(VedtakResultatType.FULL_TILBAKEBETALING)

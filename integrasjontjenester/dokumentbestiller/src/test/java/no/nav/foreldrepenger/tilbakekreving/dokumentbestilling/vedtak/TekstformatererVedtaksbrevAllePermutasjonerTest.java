@@ -153,7 +153,8 @@ public class TekstformatererVedtaksbrevAllePermutasjonerTest {
             .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(11000))
             .medVarsletBeløp(BigDecimal.valueOf(10000))
             .medVarsletDato(LocalDate.now().minusDays(100))
-            .medKlagefristUker(6);
+            .medKlagefristUker(6)
+            .skruAvMidlertidigTekst();
     }
 
     private List<HendelseMedUndertype> getFeilutbetalingsårsaker(FagsakYtelseType ytelseType) {

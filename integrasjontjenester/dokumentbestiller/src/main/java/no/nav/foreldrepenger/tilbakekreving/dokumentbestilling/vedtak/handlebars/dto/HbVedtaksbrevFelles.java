@@ -39,6 +39,9 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
     @JsonProperty("totalt-tilbakekreves-beløp-med-renter")
     @JsonSerialize(using = BigDecimalHeltallSerialiserer.class)
     private BigDecimal totaltTilbakekrevesBeløpMedRenter;
+    @JsonProperty("totalt-tilbakekreves-beløp-med-renter-uten-skatt")
+    @JsonSerialize(using = BigDecimalHeltallSerialiserer.class)
+    private BigDecimal totaltTilbakekrevesBeløpMedRenterUtenSkatt;
     @JsonProperty("totalt-rentebeløp")
     @JsonSerialize(using = BigDecimalHeltallSerialiserer.class)
     private BigDecimal totaltRentebeløp;
@@ -60,8 +63,8 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
     private String kontaktNavTelefon = "55 55 33 33"; //TODO fjerne hardkoding
     @JsonProperty("kontakt-nav-innkreving-telefon")
     private String kontaktNavInnkrevingTelefon = "21 05 11 00";  //TODO fjerne hardkoding
-    @JsonProperty("bruk-midlertidig-tekst-for-hvordan-betale")
-    private boolean brukMidlertidigTekstForHvordanBetale = true;
+    @JsonProperty("bruk-midlertidig-tekst")
+    private boolean brukMidlertidigTekst = true;
 
     private HbVedtaksbrevFelles() {
         //bruk Builder
@@ -105,6 +108,9 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
             Objects.check(kladd.lovhjemmelVedtak != null, "lovhjemmelVedtak er ikke satt");
             Objects.check(kladd.totaltTilbakekrevesBeløp != null, "totaltTilbakekrevesBeløp er ikke satt");
             Objects.check(kladd.totaltTilbakekrevesBeløpMedRenter != null, "totaltTilbakekrevesBeløpMedRenter er ikke satt");
+            if (kladd.brukMidlertidigTekst) {
+                Objects.check(kladd.totaltTilbakekrevesBeløpMedRenterUtenSkatt != null, "totaltTilbakekrevesBeløpMedRenterUtenSkatt er ikke satt");
+            }
             Objects.check(kladd.totaltRentebeløp != null, "totaltRentebeløp er ikke satt");
             Objects.check(kladd.fireRettsgebyr != null, "fireRettsgebyr er ikke satt");
             Objects.check(kladd.halvtGrunnbeløp != null, "halvtGrunnbeløp er ikke satt");
@@ -159,6 +165,11 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
             return this;
         }
 
+        public Builder medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal totaltTilbakekrevesBeløpMedRenterUtenSkatt) {
+            kladd.totaltTilbakekrevesBeløpMedRenterUtenSkatt = totaltTilbakekrevesBeløpMedRenterUtenSkatt;
+            return this;
+        }
+
         public Builder medTotaltRentebeløp(BigDecimal totaltRentebeløp) {
             kladd.totaltRentebeløp = totaltRentebeløp;
             return this;
@@ -205,7 +216,7 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
         }
 
         public Builder skruAvMidlertidigTekst() {
-            kladd.brukMidlertidigTekstForHvordanBetale = false;
+            kladd.brukMidlertidigTekst = false;
             return this;
         }
     }

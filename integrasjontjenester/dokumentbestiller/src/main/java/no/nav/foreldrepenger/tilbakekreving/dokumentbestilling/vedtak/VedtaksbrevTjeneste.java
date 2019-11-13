@@ -197,6 +197,8 @@ public class VedtaksbrevTjeneste {
             .orElse(Collections.emptyList());
         VurdertForeldelse foreldelse = foreldelseRepository.finnVurdertForeldelse(behandlingId).orElse(null);
 
+        BigDecimal totaltTilbakekrevesMedRenter = summer(resulatPerioder, BeregningResultatPeriode::getTilbakekrevingBeløp);
+        BigDecimal totaltSkattetrekk = summer(resulatPerioder, BeregningResultatPeriode::getSkattBeløp);
         HbVedtaksbrevFelles.Builder vedtakDataBuilder = HbVedtaksbrevFelles.builder()
             .medYtelsetype(behandling.getFagsak().getFagsakYtelseType())
             .medVarsletDato(nyesteVarselbrevTidspunkt.toLocalDate())
@@ -208,7 +210,8 @@ public class VedtaksbrevTjeneste {
             .medLovhjemmelVedtak(VedtakHjemmel.lagHjemmelstekst(vedtakResultatType, foreldelse, vilkårPerioder))
             .medTotaltTilbakekrevesBeløp(summer(resulatPerioder, BeregningResultatPeriode::getTilbakekrevingBeløpUtenRenter))
             .medTotaltRentebeløp(summer(resulatPerioder, BeregningResultatPeriode::getRenteBeløp))
-            .medTotaltTilbakekrevesBeløpMedRenter(summer(resulatPerioder, BeregningResultatPeriode::getTilbakekrevingBeløp))
+            .medTotaltTilbakekrevesBeløpMedRenter(totaltTilbakekrevesMedRenter)
+            .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(totaltTilbakekrevesMedRenter.subtract(totaltSkattetrekk))
             .medHovedresultat(vedtakResultatType)
             .medKlagefristUker(KLAGEFRIST_UKER);
 

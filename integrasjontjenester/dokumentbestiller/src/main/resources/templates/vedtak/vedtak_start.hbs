@@ -1,14 +1,18 @@
 {{#switch hovedresultat}}
   {{#case "FULL_TILBAKEBETALING"}}
-Vi varslet deg {{varslet-dato}} om at du har fått utbetalt for mye. Du må betale tilbake {{kroner totalt-tilbakekreves-beløp-med-renter}}, som er hele det feilutbetalte beløpet.{{#if totalt-rentebeløp}} Dette beløpet er med renter.{{/if}}
+Vi varslet deg {{varslet-dato}} om at du har fått utbetalt for mye.{{#if (not bruk-midlertidig-tekst)}} Du må betale tilbake {{kroner totalt-tilbakekreves-beløp-med-renter}}, som er hele det feilutbetalte beløpet.{{#if totalt-rentebeløp}} Dette beløpet er med renter.{{/if}}{{/if}}
   {{/case}}
   {{#case "DELVIS_TILBAKEBETALING"}}
-Vi varslet deg {{varslet-dato}} om at du har fått {{kroner varslet-beløp}} for mye. Du må betale tilbake {{kroner totalt-tilbakekreves-beløp-med-renter}}, som er deler av det feilutbetalte beløpet.{{#if totalt-rentebeløp}} Dette beløpet er med renter.{{/if}}
+Vi varslet deg {{varslet-dato}} om at du har fått {{kroner varslet-beløp}} for mye.{{#if (not bruk-midlertidig-tekst)}} Du må betale tilbake {{kroner totalt-tilbakekreves-beløp-med-renter}}, som er deler av det feilutbetalte beløpet.{{#if totalt-rentebeløp}} Dette beløpet er med renter.{{/if}}{{/if}}
   {{/case}}
   {{#case "INGEN_TILBAKEBETALING"}}
 Vi varslet deg {{varslet-dato}} om at du har fått {{kroner varslet-beløp}} for mye. Vi har behandlet saken din og du må ikke betale tilbake det feilutbetalte beløpet.
   {{/case}}
 {{/switch}}
+{{#if (and bruk-midlertidig-tekst (neq hovedresultat "INGEN_TILBAKEBETALING"))}}
+
+Beløpet du skylder før skatt er {{kroner totalt-tilbakekreves-beløp-med-renter}}, som er {{#if (eq hovedresultat "FULL_TILBAKEBETALING")}}hele{{else}}deler av{{/if}} det feilutbetalte beløpet.{{#if totalt-rentebeløp}} Dette beløpet er med renter.{{/if}} Beløpet du skal betale tilbake etter skatten er trukket fra er {{kroner totalt-tilbakekreves-beløp-med-renter-uten-skatt}}.
+{{/if}}
 {{#if fritekst-oppsummering}}
 
 {{fritekst-oppsummering}}
