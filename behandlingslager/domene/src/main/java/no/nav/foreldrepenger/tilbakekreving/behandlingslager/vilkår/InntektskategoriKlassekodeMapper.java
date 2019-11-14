@@ -18,6 +18,14 @@ import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.K
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode.FPSNDFI;
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode.FPSNDJB_OP;
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode.FPSND_OP;
+import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode.FPSVATAL;
+import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode.FPSVATFRI;
+import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode.FPSVATORD;
+import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode.FPSVATSJO;
+import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode.FPSVSNDDM_OP;
+import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode.FPSVSNDFI;
+import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode.FPSVSNDJB_OP;
+import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode.FPSVSND_OP;
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Inntektskategori.ADOPSJON_ES;
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Inntektskategori.ARBEIDSLEDIG;
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Inntektskategori.ARBEIDSTAKER;
@@ -41,42 +49,57 @@ public class InntektskategoriKlassekodeMapper {
     private static final Map<KlasseKode, Inntektskategori> KLASSEKODE_INNTEKTSKATEGORI_MAP_ENGANGSSTØNAD;
     private static final Map<KlasseKode, Inntektskategori> KLASSEKODE_INNTEKTSKATEGORI_MAP_FØDSEL;
     private static final Map<KlasseKode, Inntektskategori> KLASSEKODE_INNTEKTSKATEGORI_MAP_ADOPSJON;
+    private static final Map<KlasseKode, Inntektskategori> KLASSEKODE_INNTEKTSKATEGORI_MAP_SVANGERSKAPPENGER;
 
     private InntektskategoriKlassekodeMapper() {
     }
 
     static {
         KLASSEKODE_INNTEKTSKATEGORI_MAP_ENGANGSSTØNAD = Map.of(
-                FPENFOD_OP, FØDSEL_ES,
-                FPENAD_OP, ADOPSJON_ES
+            FPENFOD_OP, FØDSEL_ES,
+            FPENAD_OP, ADOPSJON_ES
         );
     }
 
     static {
         KLASSEKODE_INNTEKTSKATEGORI_MAP_FØDSEL = Map.of(
-                FPADATORD, ARBEIDSTAKER,
-                FPATFRI, FRILANSER,
-                FPADSND_OP, SELVSTENDIG_NÆRINGSDRIVENDE,
-                FPADATAL, ARBEIDSLEDIG,
-                FPADATSJO, SJØMANN,
-                FPADSNDDM_OP, DAGMAMMA,
-                FPADSNDJB_OP, JORDBRUKER,
-                FPADSNDFI, FISKER,
-                FPATFER, FERIEPENGER_ARBEIDSTAKER
+            FPADATORD, ARBEIDSTAKER,
+            FPATFRI, FRILANSER,
+            FPADSND_OP, SELVSTENDIG_NÆRINGSDRIVENDE,
+            FPADATAL, ARBEIDSLEDIG,
+            FPADATSJO, SJØMANN,
+            FPADSNDDM_OP, DAGMAMMA,
+            FPADSNDJB_OP, JORDBRUKER,
+            FPADSNDFI, FISKER,
+            FPATFER, FERIEPENGER_ARBEIDSTAKER
         );
     }
 
     static {
         KLASSEKODE_INNTEKTSKATEGORI_MAP_ADOPSJON = Map.of(
-                FPATORD, ARBEIDSTAKER,
-                FPATFRI, FRILANSER,
-                FPSND_OP, SELVSTENDIG_NÆRINGSDRIVENDE,
-                FPATAL, ARBEIDSLEDIG,
-                FPATSJO, SJØMANN,
-                FPSNDDM_OP, DAGMAMMA,
-                FPSNDJB_OP, JORDBRUKER,
-                FPSNDFI, FISKER,
-                FPATFER, FERIEPENGER_ARBEIDSTAKER
+            FPATORD, ARBEIDSTAKER,
+            FPATFRI, FRILANSER,
+            FPSND_OP, SELVSTENDIG_NÆRINGSDRIVENDE,
+            FPATAL, ARBEIDSLEDIG,
+            FPATSJO, SJØMANN,
+            FPSNDDM_OP, DAGMAMMA,
+            FPSNDJB_OP, JORDBRUKER,
+            FPSNDFI, FISKER,
+            FPATFER, FERIEPENGER_ARBEIDSTAKER
+        );
+    }
+
+    static {
+        KLASSEKODE_INNTEKTSKATEGORI_MAP_SVANGERSKAPPENGER = Map.of(
+            FPSVATORD, ARBEIDSTAKER,
+            FPSVATFRI, FRILANSER,
+            FPSVSND_OP, SELVSTENDIG_NÆRINGSDRIVENDE,
+            FPSVATAL, ARBEIDSLEDIG,
+            FPSVATSJO, SJØMANN,
+            FPSVSNDDM_OP, DAGMAMMA,
+            FPSVSNDJB_OP, JORDBRUKER,
+            FPSVSNDFI, FISKER,
+            FPATFER, FERIEPENGER_ARBEIDSTAKER
         );
     }
 
@@ -87,7 +110,9 @@ public class InntektskategoriKlassekodeMapper {
             return KLASSEKODE_INNTEKTSKATEGORI_MAP_FØDSEL.get(klasseKode);
         } else if (KLASSEKODE_INNTEKTSKATEGORI_MAP_ADOPSJON.containsKey(klasseKode)) {
             return KLASSEKODE_INNTEKTSKATEGORI_MAP_ADOPSJON.get(klasseKode);
-        } else {
+        } else if (KLASSEKODE_INNTEKTSKATEGORI_MAP_SVANGERSKAPPENGER.containsKey(klasseKode)) {
+            return KLASSEKODE_INNTEKTSKATEGORI_MAP_SVANGERSKAPPENGER.get(klasseKode);
+        }else {
             throw new IllegalStateException("Utvikler feil: Mangler mapping for klasseKode=" + klasseKode);
         }
     }
