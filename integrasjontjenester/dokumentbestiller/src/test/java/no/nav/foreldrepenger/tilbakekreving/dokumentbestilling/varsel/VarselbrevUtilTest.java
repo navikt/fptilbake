@@ -41,7 +41,6 @@ public class VarselbrevUtilTest {
     private static final String BEHANDLENDE_ENHET_NAVN = "behandlende enhet i Rogaland";
     private static final String BEHANDLENDE_ENHET_ID = "behandlendeEnhetId 1234";
     private static final String VARSEL_TEKST = "Dette ser ikke bra ut as";
-    private static final String ANSVARLIG_SAKSBEHANDLER = "Line Saksbehandler";
     private static final String PERSONNUMMER = "12345678900";
     private FagsakYtelseType svangerskapspengerkode = FagsakYtelseType.SVANGERSKAPSPENGER;
 
@@ -54,7 +53,6 @@ public class VarselbrevUtilTest {
         eksternBehandlingsinfoDto.setBehandlendeEnhetId(BEHANDLENDE_ENHET_ID);
         eksternBehandlingsinfoDto.setBehandlendeEnhetNavn(BEHANDLENDE_ENHET_NAVN);
         eksternBehandlingsinfoDto.setSprakkode(Språkkode.nn);
-        eksternBehandlingsinfoDto.setAnsvarligSaksbehandler(ANSVARLIG_SAKSBEHANDLER);
 
         Adresseinfo adresseinfo = lagStandardNorskAdresse();
 
@@ -84,7 +82,6 @@ public class VarselbrevUtilTest {
         assertThat(varselbrev.getBrevMetadata().getFagsaktype()).isEqualTo(FagsakYtelseType.ENGANGSTØNAD);
         assertThat(varselbrev.getFritekstFraSaksbehandler()).isEqualTo(VARSEL_TEKST);
         assertThat(varselbrev.getBrevMetadata().getSaksnummer()).isEqualTo(saksnummer.getVerdi());
-        assertThat(varselbrev.getBrevMetadata().getAnsvarligSaksbehandler()).isEqualTo(ANSVARLIG_SAKSBEHANDLER);
         assertThat(varselbrev.getBrevMetadata().getSpråkkode()).isEqualTo(eksternBehandlingsinfoDto.getSpråkkodeEllerDefault());
         assertThat(varselbrev.getSumFeilutbetaling()).isEqualTo(feilutbetaltePerioderDto.getSumFeilutbetaling());
         assertThat(varselbrev.getBrevMetadata().getFagsaktypenavnPåSpråk()).isEqualTo("eingongsstønad");

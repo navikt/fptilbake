@@ -115,10 +115,8 @@ public class FpsakKlientTest {
         EksternBehandlingsinfoDto dto = new EksternBehandlingsinfoDto();
         dto.setBehandlendeEnhetId("4214");
         dto.setBehandlendeEnhetNavn("enhetnavn");
-        dto.setAnsvarligSaksbehandler("saksbehandler");
         dto.setId(BEHANDLING_ID);
         dto.setLinks(resourcelinks());
-        dto.setFagsakId(FAGSAK_ID);
         return dto;
     }
 

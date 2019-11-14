@@ -21,6 +21,7 @@ import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsi
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.simulering.kontrakt.FeilutbetaltePerioderDto;
 import no.nav.foreldrepenger.tilbakekreving.simulering.kontrakt.PeriodeDto;
+import no.nav.vedtak.sikkerhet.context.SubjectHandler;
 import no.nav.vedtak.util.FPDateUtil;
 
 public class VarselbrevUtil {
@@ -86,7 +87,7 @@ public class VarselbrevUtil {
             .medFagsaktype(fagsakYtelseType)
             .medSprakkode(grunninformasjon.getSpråkkodeEllerDefault())
             .medFagsaktypenavnPåSpråk(ytelseNavn.getNavnPåBrukersSpråk())
-            .medAnsvarligSaksbehandler(grunninformasjon.getAnsvarligSaksbehandler())
+            .medAnsvarligSaksbehandler(SubjectHandler.getSubjectHandler().getUid())
             .medTittel(VarselbrevOverskrift.finnTittelVarselbrev(ytelseNavn.getNavnPåBokmål()))
             .build();
 
