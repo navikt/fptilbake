@@ -48,7 +48,7 @@ public class VurdertForeldelseRepositoryImpl implements VurdertForeldelseReposit
 
     @Override
     public void lagre(Long behandlingId, VurdertForeldelse vurdertForeldelse) {
-        disableForrigeAggregat(behandlingId);
+            disableForrigeAggregat(behandlingId);
         VurdertForeldelseAggregate aggr = VurdertForeldelseAggregate.builder()
             .medAktiv(true)
             .medBehandlingId(behandlingId)

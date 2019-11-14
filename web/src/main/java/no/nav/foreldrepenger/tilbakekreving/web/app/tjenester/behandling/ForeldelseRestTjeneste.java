@@ -24,6 +24,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.FeilutbetalingPerioderDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.PeriodeDto;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurdertForeldelseTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
@@ -40,14 +41,16 @@ public class ForeldelseRestTjeneste {
 
     public static final String PATH_FRAGMENT = "/foreldelse";
     private VurdertForeldelseTjeneste vurdertForeldelseTjeneste;
+    private KravgrunnlagBeregningTjeneste kravgrunnlagBeregningTjeneste;
 
     public ForeldelseRestTjeneste() {
         // For CDI
     }
 
     @Inject
-    public ForeldelseRestTjeneste(VurdertForeldelseTjeneste vurdertForeldelseTjeneste) {
+    public ForeldelseRestTjeneste(VurdertForeldelseTjeneste vurdertForeldelseTjeneste, KravgrunnlagBeregningTjeneste kravgrunnlagBeregningTjeneste) {
         this.vurdertForeldelseTjeneste = vurdertForeldelseTjeneste;
+        this.kravgrunnlagBeregningTjeneste = kravgrunnlagBeregningTjeneste;
     }
 
     @GET
@@ -71,7 +74,7 @@ public class ForeldelseRestTjeneste {
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     public FeilutbetalingPerioderDto beregnBeløp(@NotNull @Valid FeilutbetalingPerioderDto perioderDto) {
         List<Periode> perioderFraDto = perioderDto.getPerioder().stream().map(PeriodeDto::tilPeriode).collect(Collectors.toList());
-        Map<Periode, BigDecimal> feilutbetalinger = vurdertForeldelseTjeneste.beregnFeilutbetaltBeløpForPerioder(perioderDto.getBehandlingId(), perioderFraDto);
+        Map<Periode, BigDecimal> feilutbetalinger = kravgrunnlagBeregningTjeneste.beregnFeilutbetaltBeløp(perioderDto.getBehandlingId(), perioderFraDto);
         for (PeriodeDto dto : perioderDto.getPerioder()) {
             dto.setBelop(feilutbetalinger.get(dto.tilPeriode()));
         }

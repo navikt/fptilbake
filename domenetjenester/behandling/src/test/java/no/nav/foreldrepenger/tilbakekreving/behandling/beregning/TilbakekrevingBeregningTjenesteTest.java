@@ -36,7 +36,7 @@ import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 @RunWith(CdiRunner.class)
 public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
 
-    private TilbakekrevingBeregningTjeneste tjeneste = new TilbakekrevingBeregningTjeneste(vurdertForeldelseTjeneste, repoProvider);
+    private TilbakekrevingBeregningTjeneste tjeneste = new TilbakekrevingBeregningTjeneste(repoProvider, kravgrunnlagBeregningTjeneste);
 
     @Test
     public void skal_beregne_tilbakekrevingsbeløp_for_periode_som_ikke_er_foreldet() {
@@ -145,25 +145,12 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_beregne_tilbakekrevingsbeløp_for_periode_som_ikke_er_foreldet_medSkattProsent_når_beregnet_periode_er_på_tvers_av_grunnlag_periode() {
+    public void skal_beregne_rigtig_beløp_og_utbetalt_beløp_for_periode() {
         Periode periode = new Periode(LocalDate.of(2019, 5, 1), LocalDate.of(2019, 5, 3));
-        Periode periode1 = new Periode(LocalDate.of(2019, 5, 4), LocalDate.of(2019, 5, 6));
-        Periode logikkPeriode = new Periode(LocalDate.of(2019, 5, 1), LocalDate.of(2019, 5, 6));
-        Kravgrunnlag431 grunnlag = lagGrunnlag();
-        KravgrunnlagPeriode432 grunnlagPeriode = lagGrunnlagPeriode(periode, grunnlag);
-        grunnlagPeriode.leggTilBeløp(lagYtelBeløp(BigDecimal.valueOf(10), grunnlagPeriode));
-        grunnlagPeriode.leggTilBeløp(lagFeilBeløp(grunnlagPeriode));
 
-        KravgrunnlagPeriode432 grunnlagPeriode1 = lagGrunnlagPeriode(periode1, grunnlag);
-        grunnlagPeriode1.leggTilBeløp(lagYtelBeløp(BigDecimal.valueOf(10), grunnlagPeriode1));
-        grunnlagPeriode1.leggTilBeløp(lagFeilBeløp(grunnlagPeriode1));
-
-        grunnlag.leggTilPeriode(grunnlagPeriode);
-        grunnlag.leggTilPeriode(grunnlagPeriode1);
-        grunnlagRepository.lagre(internBehandlingId, grunnlag);
-
-        lagForeldelse(internBehandlingId, logikkPeriode, ForeldelseVurderingType.IKKE_FORELDET);
-        lagVilkårsvurderingMedForsett(internBehandlingId, logikkPeriode);
+        lagKravgrunnlag(internBehandlingId, periode, BigDecimal.valueOf(10));
+        lagForeldelse(internBehandlingId, periode, ForeldelseVurderingType.IKKE_FORELDET);
+        lagVilkårsvurderingMedForsett(internBehandlingId, periode);
 
         flush();
 
@@ -172,7 +159,80 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
 
         assertThat(resultat).hasSize(1);
         BeregningResultatPeriode r = resultat.get(0);
-        assertThat(r.getPeriode()).isEqualTo(logikkPeriode);
+        assertThat(r.getUtbetaltYtelseBeløp()).isEqualByComparingTo(BigDecimal.valueOf(10000));
+        assertThat(r.getRiktigYtelseBeløp()).isEqualByComparingTo(BigDecimal.ZERO);
+    }
+
+    @Test
+    public void skal_beregne_rigtig_beløp_og_utbetalt_beløp_ved_delvis_feilutbetaling_for_perioder_som_slås_sammen_i_logisk_periode() {
+        BigDecimal skatteprosent = BigDecimal.valueOf(10);
+        Periode periode1 = new Periode(LocalDate.of(2019, 5, 1), LocalDate.of(2019, 5, 3));
+        Periode periode2 = new Periode(LocalDate.of(2019, 5, 4), LocalDate.of(2019, 5, 6));
+        Periode logiskPeriode = new Periode(LocalDate.of(2019, 5, 1), LocalDate.of(2019, 5, 6));
+        Kravgrunnlag431 grunnlag = lagGrunnlag();
+
+        KravgrunnlagPeriode432 grunnlagPeriode1 = lagGrunnlagPeriode(periode1, grunnlag);
+        BigDecimal utbetalt1 = BigDecimal.valueOf(10000);
+        BigDecimal nyttBeløp1 = BigDecimal.valueOf(5000);
+        BigDecimal feilutbetalt1 = utbetalt1.subtract(nyttBeløp1);
+        grunnlagPeriode1.leggTilBeløp(lagYtelBeløp(grunnlagPeriode1, utbetalt1, nyttBeløp1, skatteprosent));
+        grunnlagPeriode1.leggTilBeløp(lagFeilBeløp(grunnlagPeriode1, feilutbetalt1));
+        grunnlag.leggTilPeriode(grunnlagPeriode1);
+
+        KravgrunnlagPeriode432 grunnlagPeriode2 = lagGrunnlagPeriode(periode2, grunnlag);
+        BigDecimal utbetalt2 = BigDecimal.valueOf(10000);
+        BigDecimal nyttBeløp2 = BigDecimal.valueOf(100);
+        BigDecimal feilutbetalt2 = utbetalt2.subtract(nyttBeløp2);
+        grunnlagPeriode2.leggTilBeløp(lagYtelBeløp(grunnlagPeriode2, utbetalt2, nyttBeløp2, skatteprosent));
+        grunnlagPeriode2.leggTilBeløp(lagFeilBeløp(grunnlagPeriode2, feilutbetalt2));
+        grunnlag.leggTilPeriode(grunnlagPeriode2);
+
+        grunnlagRepository.lagre(internBehandlingId, grunnlag);
+
+        lagForeldelse(internBehandlingId, logiskPeriode, ForeldelseVurderingType.IKKE_FORELDET);
+        lagVilkårsvurderingMedForsett(internBehandlingId, logiskPeriode);
+
+        flush();
+
+        BeregningResultat beregningResultat = tjeneste.beregn(internBehandlingId);
+        List<BeregningResultatPeriode> resultat = beregningResultat.getBeregningResultatPerioder();
+
+        assertThat(resultat).hasSize(1);
+        BeregningResultatPeriode r = resultat.get(0);
+        assertThat(r.getPeriode()).isEqualTo(logiskPeriode);
+        assertThat(r.getUtbetaltYtelseBeløp()).isEqualByComparingTo(utbetalt1.add(utbetalt2));
+        assertThat(r.getRiktigYtelseBeløp()).isEqualByComparingTo(nyttBeløp1.add(nyttBeløp2));
+    }
+
+    @Test
+    public void skal_beregne_tilbakekrevingsbeløp_for_periode_som_ikke_er_foreldet_medSkattProsent_når_beregnet_periode_er_på_tvers_av_grunnlag_periode() {
+        Periode periode = new Periode(LocalDate.of(2019, 5, 1), LocalDate.of(2019, 5, 3));
+        Periode periode1 = new Periode(LocalDate.of(2019, 5, 4), LocalDate.of(2019, 5, 6));
+        Periode logiskPeriode = new Periode(LocalDate.of(2019, 5, 1), LocalDate.of(2019, 5, 6));
+        Kravgrunnlag431 grunnlag = lagGrunnlag();
+        KravgrunnlagPeriode432 grunnlagPeriode = lagGrunnlagPeriode(periode, grunnlag);
+        grunnlagPeriode.leggTilBeløp(lagYtelBeløp(grunnlagPeriode, BigDecimal.valueOf(10000), BigDecimal.valueOf(10)));
+        grunnlagPeriode.leggTilBeløp(lagFeilBeløp(grunnlagPeriode, BigDecimal.valueOf(10000)));
+
+        KravgrunnlagPeriode432 grunnlagPeriode1 = lagGrunnlagPeriode(periode1, grunnlag);
+        grunnlagPeriode1.leggTilBeløp(lagYtelBeløp(grunnlagPeriode1, BigDecimal.valueOf(10000), BigDecimal.valueOf(10)));
+        grunnlagPeriode1.leggTilBeløp(lagFeilBeløp(grunnlagPeriode1, BigDecimal.valueOf(10000)));
+
+        grunnlag.leggTilPeriode(grunnlagPeriode);
+        grunnlag.leggTilPeriode(grunnlagPeriode1);
+        grunnlagRepository.lagre(internBehandlingId, grunnlag);
+
+        lagForeldelse(internBehandlingId, logiskPeriode, ForeldelseVurderingType.IKKE_FORELDET);
+        lagVilkårsvurderingMedForsett(internBehandlingId, logiskPeriode);
+
+        flush();
+
+        BeregningResultat beregningResultat = tjeneste.beregn(internBehandlingId);
+        List<BeregningResultatPeriode> resultat = beregningResultat.getBeregningResultatPerioder();
+
+        assertThat(resultat).hasSize(1);
+        BeregningResultatPeriode r = resultat.get(0);
+        assertThat(r.getPeriode()).isEqualTo(logiskPeriode);
         assertThat(r.getTilbakekrevingBeløp()).isEqualByComparingTo(BigDecimal.valueOf(22000));
         assertThat(r.getVurdering()).isEqualTo(Aktsomhet.FORSETT);
         assertThat(r.getRenterProsent()).isEqualByComparingTo(BigDecimal.valueOf(10));
@@ -222,33 +282,36 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
     private void lagKravgrunnlag(long behandlingId, Periode periode, BigDecimal skattProsent) {
         Kravgrunnlag431 grunnlag = lagGrunnlag();
         KravgrunnlagPeriode432 p = lagGrunnlagPeriode(periode, grunnlag);
-        p.leggTilBeløp(lagFeilBeløp(p));
-        p.leggTilBeløp(lagYtelBeløp(skattProsent, p));
+        p.leggTilBeløp(lagFeilBeløp(p, BigDecimal.valueOf(10000)));
+        p.leggTilBeløp(lagYtelBeløp(p, BigDecimal.valueOf(10000), skattProsent));
         grunnlag.leggTilPeriode(p);
 
         grunnlagRepository.lagre(behandlingId, grunnlag);
     }
 
-    private KravgrunnlagBelop433 lagFeilBeløp(KravgrunnlagPeriode432 p) {
+    private KravgrunnlagBelop433 lagFeilBeløp(KravgrunnlagPeriode432 p, BigDecimal feilutbetaling) {
         return KravgrunnlagBelop433.builder()
             .medKlasseKode(KlasseKode.FPATORD)
             .medKlasseType(KlasseType.FEIL)
-            .medNyBelop(BigDecimal.valueOf(10000))
-            //TODO feltene under skal valideres i builder:
+            .medNyBelop(feilutbetaling)
             .medKravgrunnlagPeriode432(p)
             .build();
     }
 
-    private KravgrunnlagBelop433 lagYtelBeløp(BigDecimal skattProsent, KravgrunnlagPeriode432 p) {
+
+    private KravgrunnlagBelop433 lagYtelBeløp(KravgrunnlagPeriode432 p, BigDecimal utbetalt, BigDecimal skattProsent) {
+        return lagYtelBeløp(p, utbetalt, BigDecimal.ZERO, skattProsent);
+    }
+
+    private KravgrunnlagBelop433 lagYtelBeløp(KravgrunnlagPeriode432 p, BigDecimal utbetalt, BigDecimal nyttBeløp, BigDecimal skattProsent) {
         return KravgrunnlagBelop433.builder()
             .medKlasseKode(KlasseKode.FPATORD)
             .medKlasseType(KlasseType.YTEL)
-            .medNyBelop(BigDecimal.ZERO)
-            .medOpprUtbetBelop(BigDecimal.valueOf(10000))
-            .medTilbakekrevesBelop(BigDecimal.valueOf(10000))
+            .medNyBelop(nyttBeløp)
+            .medOpprUtbetBelop(utbetalt)
+            .medTilbakekrevesBelop(utbetalt.subtract(nyttBeløp))
             .medUinnkrevdBelop(BigDecimal.ZERO)
             .medSkattProsent(skattProsent)
-            //TODO feltene under skal valideres i builder:
             .medKravgrunnlagPeriode432(p).build();
     }
 

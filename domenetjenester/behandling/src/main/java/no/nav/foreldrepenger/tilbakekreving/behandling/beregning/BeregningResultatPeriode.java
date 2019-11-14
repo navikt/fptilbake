@@ -20,6 +20,8 @@ public class BeregningResultatPeriode {
     private BigDecimal tilbakekrevingBeløp;
     private BigDecimal skattBeløp;
     private BigDecimal tilbakekrevingBeløpEtterSkatt;
+    private BigDecimal utbetaltYtelseBeløp; //rått beløp, ikke justert for evt. trekk
+    private BigDecimal riktigYtelseBeløp; //rått beløp, ikke justert for evt. trekk
 
     public Periode getPeriode() {
         return periode;
@@ -107,6 +109,22 @@ public class BeregningResultatPeriode {
 
     public BigDecimal getManueltSattTilbakekrevingsbeløp() {
         return manueltSattTilbakekrevingsbeløp;
+    }
+
+    public BigDecimal getUtbetaltYtelseBeløp() {
+        return utbetaltYtelseBeløp;
+    }
+
+    public void setUtbetaltYtelseBeløp(BigDecimal utbetaltYtelseBeløp) {
+        this.utbetaltYtelseBeløp = utbetaltYtelseBeløp;
+    }
+
+    public BigDecimal getRiktigYtelseBeløp() {
+        return riktigYtelseBeløp;
+    }
+
+    public void setRiktigYtelseBeløp(BigDecimal riktigYtelseBeløp) {
+        this.riktigYtelseBeløp = riktigYtelseBeløp;
     }
 
     public KodeResultat getKodeResultat() {

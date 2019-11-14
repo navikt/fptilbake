@@ -228,8 +228,8 @@ public class VedtaksbrevTjeneste {
 
     private List<VilkårVurderingPeriodeEntitet> finnVilkårVurderingPerioder(Long behandlingId) {
         return vilkårsvurderingRepository.finnVilkårsvurdering(behandlingId)
-                .map(VilkårVurderingEntitet::getPerioder)
-                .orElse(Collections.emptyList());
+            .map(VilkårVurderingEntitet::getPerioder)
+            .orElse(Collections.emptyList());
     }
 
     private LocalDate finnVarsletDato(Long behandlingId) {
@@ -285,8 +285,8 @@ public class VedtaksbrevTjeneste {
             .medHendelseUndertype(finnHendelseUnderType(periode, fakta))
             .medFeilutbetaltBeløp(resultatPeriode.getFeilutbetaltBeløp())
             .medTilbakekrevesBeløp(resultatPeriode.getTilbakekrevingBeløpUtenRenter())
-            //.medRiktigBeløp(FIXME - legg til i BeregningResultatPeriode)
-            //.medUtbetaltBeløp(FIXME- legg til i BeregningResultatPeriode)
+            .medRiktigBeløp(resultatPeriode.getRiktigYtelseBeløp())
+            .medUtbetaltBeløp(resultatPeriode.getUtbetaltYtelseBeløp())
             .medRenterBeløp(resultatPeriode.getRenteBeløp());
 
         PeriodeMedTekstDto fritekst = finnPeriodeFritekster(periode, perioderFritekst);

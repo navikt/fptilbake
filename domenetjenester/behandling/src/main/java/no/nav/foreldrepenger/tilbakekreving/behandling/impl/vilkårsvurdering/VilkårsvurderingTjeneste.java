@@ -18,8 +18,6 @@ import javax.inject.Inject;
 
 import org.apache.cxf.common.util.CollectionUtils;
 
-import com.google.common.collect.Lists;
-
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.DetaljertFeilutbetalingPeriodeDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.FeilutbetalingPerioderDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.PeriodeDto;
@@ -27,12 +25,14 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.dto.RedusertBeløpDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.YtelseDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.vilkår.VilkårsvurderingPerioderDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BeregnBeløpUtil;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurdertForeldelseTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.InntektskategoriKlassekodeMapper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingPeriodeEntitet;
@@ -52,11 +52,13 @@ import no.nav.vedtak.felles.jpa.Transaction;
 @Transaction
 public class VilkårsvurderingTjeneste {
 
-    private VurdertForeldelseTjeneste foreldelseTjeneste;
+    private KodeverkRepository kodeverkRepository;
     private KravgrunnlagRepository grunnlagRepository;
     private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository;
     private VilkårsvurderingRepository vilkårsvurderingRepository;
-    private BehandlingRepositoryProvider behandlingRepositoryProvider;
+
+    private KravgrunnlagBeregningTjeneste kravgrunnlagBeregningTjeneste;
+    private VurdertForeldelseTjeneste foreldelseTjeneste;
     private VilkårsvurderingHistorikkInnslagTjeneste vilkårsvurderingHistorikkInnslagTjeneste;
 
     VilkårsvurderingTjeneste() {
@@ -65,12 +67,13 @@ public class VilkårsvurderingTjeneste {
 
     @Inject
     public VilkårsvurderingTjeneste(VurdertForeldelseTjeneste foreldelseTjeneste, BehandlingRepositoryProvider behandlingRepositoryProvider,
-                                    VilkårsvurderingHistorikkInnslagTjeneste vilkårsvurderingHistorikkInnslagTjeneste) {
-        this.foreldelseTjeneste = foreldelseTjeneste;
-        this.behandlingRepositoryProvider = behandlingRepositoryProvider;
+                                    VilkårsvurderingHistorikkInnslagTjeneste vilkårsvurderingHistorikkInnslagTjeneste, KravgrunnlagBeregningTjeneste kravgrunnlagBeregningTjeneste) {
+        this.kodeverkRepository=behandlingRepositoryProvider.getKodeverkRepository();
         this.grunnlagRepository = behandlingRepositoryProvider.getGrunnlagRepository();
         this.faktaFeilutbetalingRepository = behandlingRepositoryProvider.getFaktaFeilutbetalingRepository();
         this.vilkårsvurderingRepository = behandlingRepositoryProvider.getVilkårsvurderingRepository();
+        this.kravgrunnlagBeregningTjeneste = kravgrunnlagBeregningTjeneste;
+        this.foreldelseTjeneste = foreldelseTjeneste;
         this.vilkårsvurderingHistorikkInnslagTjeneste = vilkårsvurderingHistorikkInnslagTjeneste;
     }
 
@@ -126,13 +129,15 @@ public class VilkårsvurderingTjeneste {
         List<VilkårsvurderingPerioderDto> perioder = new ArrayList<>();
         if (vilkårsvurdering.isPresent()) {
             VilkårVurderingEntitet vilkår = vilkårsvurdering.get();
+            List<Periode> vvPerioder = vilkår.getPerioder().stream().map(VilkårVurderingPeriodeEntitet::getPeriode).collect(Collectors.toList());
+            Map<Periode, BigDecimal> result = kravgrunnlagBeregningTjeneste.beregnFeilutbetaltBeløp(behandlingId, vvPerioder);
             for (VilkårVurderingPeriodeEntitet periodeEntitet : vilkår.getPerioder()) {
                 VilkårsvurderingPerioderDto periode = new VilkårsvurderingPerioderDto();
                 periode.setBegrunnelse(periodeEntitet.getBegrunnelse());
                 periode.setPeriode(periodeEntitet.getPeriode());
                 periode.setVilkårResultat(periodeEntitet.getVilkårResultat());
                 periode.setVilkarResultatInfo(fylleUtVilkårResultat(periodeEntitet));
-                periode.setFeilutbetalingBelop(hentNyFeilutbetaltBelop(behandlingId, new Periode(periode.getFom(), periode.getTom())));
+                periode.setFeilutbetalingBelop(result.get(periodeEntitet.getPeriode()));
                 perioder.add(periode);
             }
         }
@@ -162,7 +167,7 @@ public class VilkårsvurderingTjeneste {
         List<DetaljertFeilutbetalingPeriodeDto> feilutbetalingPerioder = new ArrayList<>();
 
         List<Periode> råPerioder = faktaFeilutbetalingPerioder.stream().map(FaktaFeilutbetalingPeriode::getPeriode).collect(Collectors.toList());
-        Map<Periode, BigDecimal> beløpForPerioder = foreldelseTjeneste.beregnFeilutbetaltBeløpForPerioder(behandlingId, råPerioder);
+        Map<Periode, BigDecimal> beløpForPerioder = kravgrunnlagBeregningTjeneste.beregnFeilutbetaltBeløp(behandlingId, råPerioder);
 
         for (FaktaFeilutbetalingPeriode periodeÅrsak : faktaFeilutbetalingPerioder) {
             Periode periode = periodeÅrsak.getPeriode();
@@ -279,13 +284,8 @@ public class VilkårsvurderingTjeneste {
 
     private Inntektskategori finnesInntektsKategori(KravgrunnlagBelop433 belop) {
         Inntektskategori inntektskategori = InntektskategoriKlassekodeMapper.finnInntekstkategoriMedKlasseKode(belop.getKlasseKodeKodeverk());
-        inntektskategori = behandlingRepositoryProvider.getKodeverkRepository().finn(Inntektskategori.class, inntektskategori.getKode());
+        inntektskategori = kodeverkRepository.finn(Inntektskategori.class, inntektskategori.getKode());
         return inntektskategori;
-    }
-
-    private BigDecimal hentNyFeilutbetaltBelop(long behandlingId, Periode periode) {
-        Map<Periode, BigDecimal> result = foreldelseTjeneste.beregnFeilutbetaltBeløpForPerioder(behandlingId, Lists.newArrayList(periode));
-        return result.get(periode);
     }
 
     private List<YtelseDto> oppsummereYtelser(List<YtelseDto> ytelser) {

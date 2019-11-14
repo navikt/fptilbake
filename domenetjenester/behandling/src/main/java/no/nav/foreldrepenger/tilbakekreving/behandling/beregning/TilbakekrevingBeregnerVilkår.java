@@ -3,9 +3,8 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.beregning;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BeregnBeløpUtil;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FordeltKravgrunnlagBeløp;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingAktsomhetEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingGodTroEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingPeriodeEntitet;
@@ -24,7 +23,7 @@ class TilbakekrevingBeregnerVilkår {
         // for CDI
     }
 
-    static BeregningResultatPeriode beregn(VilkårVurderingPeriodeEntitet vilkårVurdering, BigDecimal kravgrunnlagBeløp, List<GrunnlagPeriodeMedSkattProsent> perioderMedSkattProsent) {
+    static BeregningResultatPeriode beregn(VilkårVurderingPeriodeEntitet vilkårVurdering, FordeltKravgrunnlagBeløp delresultat, List<GrunnlagPeriodeMedSkattProsent> perioderMedSkattProsent) {
         Periode periode = vilkårVurdering.getPeriode();
         Vurdering vurdering = finnVurdering(vilkårVurdering);
         boolean renter = finnRenter(vilkårVurdering);
@@ -36,13 +35,15 @@ class TilbakekrevingBeregnerVilkår {
         resulat.setPeriode(periode);
         resulat.setVurdering(vurdering);
         resulat.setRenterProsent(renter ? RENTESATS : null);
-        resulat.setFeilutbetaltBeløp(kravgrunnlagBeløp);
+        resulat.setFeilutbetaltBeløp(delresultat.getFeilutbetaltBeløp());
+        resulat.setRiktigYtelseBeløp(delresultat.getRiktigYtelseBeløp());
+        resulat.setUtbetaltYtelseBeløp(delresultat.getUtbetaltYtelseBeløp());
         resulat.setAndelAvBeløp(andel);
         resulat.setManueltSattTilbakekrevingsbeløp(manueltBeløp);
 
         BigDecimal beløpUtenRenter = ignoreresPgaLavtBeløp
             ? BigDecimal.ZERO
-            : finnBeløpUtenRenter(kravgrunnlagBeløp, andel, manueltBeløp);
+            : finnBeløpUtenRenter(delresultat.getFeilutbetaltBeløp(), andel, manueltBeløp);
         BigDecimal rentebeløp = beregnRentebeløp(beløpUtenRenter, renter);
         BigDecimal tilbakekrevingBeløp = beløpUtenRenter.add(rentebeløp);
         BigDecimal skattBeløp = beregnSkattBeløp(periode, beløpUtenRenter, perioderMedSkattProsent).setScale(0, RoundingMode.HALF_DOWN); //skatt beregnet alltid med uten renter
