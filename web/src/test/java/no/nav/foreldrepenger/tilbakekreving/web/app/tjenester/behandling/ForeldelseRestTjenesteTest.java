@@ -14,6 +14,7 @@ import org.mockito.Mockito;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.FeilutbetalingPerioderDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.PeriodeDto;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurdertForeldelseTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
@@ -25,8 +26,9 @@ public class ForeldelseRestTjenesteTest {
     private static final BehandlingIdDto idDto = new BehandlingIdDto(behandlingId);
 
     private VurdertForeldelseTjeneste vurdertForeldelseTjenesteMock = mock(VurdertForeldelseTjeneste.class);
+    private KravgrunnlagBeregningTjeneste kravgrunnlagBeregningTjenesteMock =mock(KravgrunnlagBeregningTjeneste.class);
 
-    private ForeldelseRestTjeneste restTjeneste = new ForeldelseRestTjeneste(vurdertForeldelseTjenesteMock);
+    private ForeldelseRestTjeneste restTjeneste = new ForeldelseRestTjeneste(vurdertForeldelseTjenesteMock, kravgrunnlagBeregningTjenesteMock);
 
     @Test
     public void skal_kalle_hentLogiskePerioder() {
@@ -56,7 +58,7 @@ public class ForeldelseRestTjenesteTest {
         dto.setBehandlingId(1000L);
 
         Map<Periode, BigDecimal> feilutbetaltePerioder = Map.of(Periode.of(periodeDto.getFom(), periodeDto.getTom()), BigDecimal.valueOf(3999));
-        Mockito.when(vurdertForeldelseTjenesteMock.beregnFeilutbetaltBeløpForPerioder(Mockito.anyLong(), Mockito.any())).thenReturn(feilutbetaltePerioder);
+        Mockito.when(kravgrunnlagBeregningTjenesteMock.beregnFeilutbetaltBeløp(Mockito.anyLong(), Mockito.any())).thenReturn(feilutbetaltePerioder);
 
         FeilutbetalingPerioderDto resultat = restTjeneste.beregnBeløp(dto);
 

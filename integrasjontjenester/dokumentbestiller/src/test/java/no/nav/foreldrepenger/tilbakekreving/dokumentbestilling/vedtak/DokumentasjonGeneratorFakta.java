@@ -80,7 +80,10 @@ public class DokumentasjonGeneratorFakta {
             HendelseMedUndertype typer = entry.getKey();
             System.out.println("[" + typer.getHendelseType().getNavn() + " - " + typer.getHendelseUnderType().getNavn() + "]");
             String generertTekst = entry.getValue();
-            String parametrisertTekst = generertTekst.replaceAll(" 10000 kroner", " <feilutbetalt beløp> kroner");
+            String parametrisertTekst = generertTekst
+                .replaceAll(" 10\u00A0000\u00A0kroner", " <feilutbetalt beløp> kroner")
+                .replaceAll(" 33\u00A0333\u00A0kroner", " <utbetalt beløp> kroner")
+                .replaceAll(" 23\u00A0333\u00A0kroner", " <riktig beløp> kroner");
             System.out.println(parametrisertTekst);
             System.out.println();
         }
@@ -109,7 +112,9 @@ public class DokumentasjonGeneratorFakta {
             .medTilbakekrevesBeløp(BigDecimal.valueOf(5000))
             .medRenterBeløp(BigDecimal.ZERO)
             .medVilkårResultat(VilkårResultat.GOD_TRO)
-            .medBeløpIBehold(BigDecimal.valueOf(5000));
+            .medBeløpIBehold(BigDecimal.valueOf(5000))
+            .medRiktigBeløp(BigDecimal.valueOf(23333))
+            .medUtbetaltBeløp(BigDecimal.valueOf(33333));
     }
 
     private HbVedtaksbrevFelles.Builder lagFellesBuilder() {
@@ -119,6 +124,7 @@ public class DokumentasjonGeneratorFakta {
             .medTotaltRentebeløp(BigDecimal.valueOf(1000))
             .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(10000))
             .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(11000))
+            .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.valueOf(6855))
             .medVarsletBeløp(BigDecimal.valueOf(10000))
             .medVarsletDato(LocalDate.now().minusDays(100))
             .medKlagefristUker(6);

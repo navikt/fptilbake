@@ -22,16 +22,16 @@ Derfor har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt i denne peri
 {{#* inline "fakta-økonomi-feil"}}
         {{#switch hendelseundertype}}
         {{#case "OKONOMI_DOBBELUTBETALING"}}
-Vi har gjort en feil og utbetalt {{> ytelse-navn}} to ganger i denne perioden. Du skulle hatt [riktig-beløp] kroner, men du fikk [utbetalt-beløp] kroner. Derfor har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt.
+Vi har gjort en feil og utbetalt {{> ytelse-navn}} to ganger i denne perioden. Du skulle hatt {{kroner riktig-beløp}}, men du fikk {{kroner utbetalt-beløp}}. Derfor har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt.
         {{/case}}
         {{#case "OKONOMI_UTBETALT"}}
-Vi har gjort en feil og utbetalt for mye i {{> ytelse-navn}} i denne perioden. Du skulle hatt [riktig-beløp] kroner, men du fikk [utbetalt-beløp] kroner. Derfor har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt.
+Vi har gjort en feil og utbetalt for mye i {{> ytelse-navn}} i denne perioden. Du skulle hatt {{kroner riktig-beløp}}, men du fikk {{kroner utbetalt-beløp}}. Derfor har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt.
         {{/case}}
         {{#case "OKONOMI_FEIL_TREKK"}}
-I denne perioden har vi ikke trukket fra hele skattetrekket på beløpet vi har utbetalt. Du skulle fått [riktig-beløp] kroner, men du fikk [utbetalt-beløp] kroner. Derfor har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt.
+I denne perioden har vi ikke trukket fra hele skattetrekket på beløpet vi har utbetalt. Du skulle fått {{kroner riktig-beløp}}, men du fikk {{kroner utbetalt-beløp}}. Derfor har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt.
         {{/case}}
         {{#case "OKONOMI_FEIL_FERIEPENGER"}}
-I denne perioden har vi utbetalt for mye i feriepenger. Du skulle fått [riktig-beløp] kroner, men du fikk [utbetalt-beløp] kroner. Derfor har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt.
+I denne perioden har vi utbetalt for mye i feriepenger. Du skulle fått {{kroner riktig-beløp}}, men du fikk {{kroner utbetalt-beløp}}. Derfor har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt.
         {{/case}}
         {{/switch}}
 {{/inline}}
@@ -68,7 +68,7 @@ Du har fått {{kroner feilutbetalt-beløp}} for mye utbetalt.
 Du har kun rett til én engangsstønad per barn. Fordi du har fått utbetalt engangsstønad flere ganger for {{> det-samme-barnet}}, har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt.
         {{/case}}
         {{#case "ØKONOMI_UTBETALT_FOR_MYE"}}
-Vi har gjort en feil og utbetalt for mye i engangsstønad. Du skulle hatt [riktig-beløp] kroner, men du fikk [utbetalt-beløp] kroner. Derfor har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt.
+Vi har gjort en feil og utbetalt for mye i engangsstønad. Du skulle hatt {{kroner riktig-beløp}}, men du fikk {{kroner utbetalt-beløp}}. Derfor har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt.
         {{/case}}
         {{/switch}}
     {{/case}}
@@ -118,6 +118,7 @@ Derfor har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt.
         {{#switch hendelseundertype}}
         {{#case "ES_BRUKER_RETT_FORELDREPENGER"}}
 Du fikk først utbetalt engangsstønad, men har i ettertid fått innvilget foreldrepenger.
+
 Du har ikke rett til både engangsstønad og foreldrepenger. Derfor har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt i engangsstønad.
         {{/case}}
         {{/switch}}
@@ -169,6 +170,7 @@ Du har ikke hatt arbeidsinntekt eller inntekt som er likestilt med lønn i seks 
 Du har ikke jobbet eller hatt pensjonsgivende inntekt. Derfor har du ikke rett til foreldrepenger.
         {{/case}}
         {{/switch}}
+
 Du har fått {{kroner feilutbetalt-beløp}} for mye utbetalt i denne perioden.
     {{/case}}
     {{#case "STONADSPERIODEN_TYPE"}}

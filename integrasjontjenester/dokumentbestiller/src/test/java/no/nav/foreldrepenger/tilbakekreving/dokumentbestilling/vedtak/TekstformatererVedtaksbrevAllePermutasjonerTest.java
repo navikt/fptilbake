@@ -141,7 +141,9 @@ public class TekstformatererVedtaksbrevAllePermutasjonerTest {
             .medTilbakekrevesBeløp(BigDecimal.valueOf(10000))
             .medRenterBeløp(BigDecimal.valueOf(1000))
             .medVilkårResultat(VilkårResultat.GOD_TRO)
-            .medBeløpIBehold(BigDecimal.valueOf(10000));
+            .medBeløpIBehold(BigDecimal.valueOf(10000))
+            .medUtbetaltBeløp(BigDecimal.valueOf(33333))
+            .medRiktigBeløp(BigDecimal.valueOf(23333));
     }
 
     private HbVedtaksbrevFelles.Builder lagFellesBuilder() {

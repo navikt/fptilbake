@@ -264,6 +264,10 @@ public class HbVedtaksbrevPeriode implements HandlebarsData {
             Objects.check(kladd.hendelsetype != null, "hendelsetype er ikke satt");
             Objects.check(kladd.hendelseundertype != null, "hendelseundertype er ikke satt");
             Objects.check(kladd.tilbakekrevesBeløp != null, "tilbakekrevesbeløp er ikke satt");
+            if (HendelseType.ØKONOMI_FEIL.equals(kladd.hendelsetype) || HendelseType.ES_FEIL_UTBETALING_TYPE.equals(kladd.hendelsetype)){
+                Objects.check(kladd.riktigBeløp != null, "riktig beløp er ikke satt");
+                Objects.check(kladd.utbetaltBeløp != null, "utbetalt beløp er ikke satt");
+            }
 
             kladd.tilbakekrevesBeløpMedRenter = kladd.renterBeløp != null
                 ? kladd.tilbakekrevesBeløp.add(kladd.renterBeløp)
