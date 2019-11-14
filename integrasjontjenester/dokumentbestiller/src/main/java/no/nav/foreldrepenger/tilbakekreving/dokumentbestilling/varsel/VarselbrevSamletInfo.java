@@ -13,6 +13,7 @@ public class VarselbrevSamletInfo {
     private Long sumFeilutbetaling;
     private LocalDate fristdato;
     private BrevMetadata brevMetadata;
+    private LocalDate revurderingVedtakDato;
 
     private VarselbrevSamletInfo() {
 
@@ -38,6 +39,10 @@ public class VarselbrevSamletInfo {
         return sumFeilutbetaling;
     }
 
+    public LocalDate getRevurderingVedtakDato() {
+        return revurderingVedtakDato;
+    }
+
     public static class Builder {
 
         private VarselbrevSamletInfo varselbrev = new VarselbrevSamletInfo();
@@ -54,6 +59,11 @@ public class VarselbrevSamletInfo {
 
         public Builder medFeilutbetaltePerioder(List<Periode> feilutbetaltePerioder) {
             this.varselbrev.feilutbetaltePerioder = feilutbetaltePerioder;
+            return this;
+        }
+
+        public Builder medRevurderingVedtakDato(LocalDate revurderingVedtakDato) {
+            this.varselbrev.revurderingVedtakDato = revurderingVedtakDato;
             return this;
         }
 

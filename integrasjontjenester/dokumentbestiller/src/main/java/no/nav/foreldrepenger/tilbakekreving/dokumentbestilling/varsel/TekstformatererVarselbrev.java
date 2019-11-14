@@ -5,7 +5,6 @@ import java.nio.charset.Charset;
 import java.sql.Date;
 import java.text.DateFormat;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 
@@ -33,8 +32,7 @@ public class TekstformatererVarselbrev {
         try {
             Template template = opprettHandlebarsTemplate("/templates/varsel");
             VarselbrevDokument varselbrevDokument = mapTilVarselbrevDokument(
-                varselbrevSamletInfo,
-                FPDateUtil.nå());
+                varselbrevSamletInfo);
 
             return template.apply(varselbrevDokument);
         } catch (IOException e) {
@@ -47,7 +45,6 @@ public class TekstformatererVarselbrev {
             Template template = opprettHandlebarsTemplate("/templates/korrigert_varsel");
             VarselbrevDokument varselbrevDokument = mapTilKorrigertVarselbrevDokument(
                 varselbrevSamletInfo,
-                FPDateUtil.nå(),
                 varselInfo);
 
             return template.apply(varselbrevDokument);
@@ -108,11 +105,11 @@ public class TekstformatererVarselbrev {
         }
     }
 
-    static VarselbrevDokument mapTilVarselbrevDokument(VarselbrevSamletInfo varselbrevSamletInfo, LocalDateTime dagensDato) {
+    static VarselbrevDokument mapTilVarselbrevDokument(VarselbrevSamletInfo varselbrevSamletInfo) {
         VarselbrevDokument varselbrevDokument = new VarselbrevDokument();
         varselbrevDokument.setBelop(varselbrevSamletInfo.getSumFeilutbetaling());
         varselbrevDokument.setKontakttelefonnummer(ReturadresseKonfigurasjon.getBrevTelefonnummerKlageEnhet());
-        varselbrevDokument.setEndringsdato(dagensDato.toLocalDate());
+        varselbrevDokument.setEndringsdato(varselbrevSamletInfo.getRevurderingVedtakDato()!=null ? varselbrevSamletInfo.getRevurderingVedtakDato(): FPDateUtil.iDag());
         varselbrevDokument.setFristdatoForTilbakemelding(varselbrevSamletInfo.getFristdato());
         varselbrevDokument.setVarseltekstFraSaksbehandler(varselbrevSamletInfo.getFritekstFraSaksbehandler());
         varselbrevDokument.setFeilutbetaltePerioder(varselbrevSamletInfo.getFeilutbetaltePerioder());
@@ -125,8 +122,8 @@ public class TekstformatererVarselbrev {
         return varselbrevDokument;
     }
 
-    static VarselbrevDokument mapTilKorrigertVarselbrevDokument(VarselbrevSamletInfo varselbrevSamletInfo, LocalDateTime dagensDato, VarselInfo varselInfo) {
-        VarselbrevDokument varselbrevDokument = mapTilVarselbrevDokument(varselbrevSamletInfo,dagensDato);
+    static VarselbrevDokument mapTilKorrigertVarselbrevDokument(VarselbrevSamletInfo varselbrevSamletInfo, VarselInfo varselInfo) {
+        VarselbrevDokument varselbrevDokument = mapTilVarselbrevDokument(varselbrevSamletInfo);
         varselbrevDokument.setKorrigert(true);
         varselbrevDokument.setVarsletDato(varselInfo.getOpprettetTidspunkt().toLocalDate());
         varselbrevDokument.setVarsletBelop(varselInfo.getVarselBeløp());

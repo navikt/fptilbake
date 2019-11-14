@@ -61,6 +61,7 @@ public class VarselbrevUtil {
             .medSumFeilutbetaling(feilutbetaltePerioderDto.getSumFeilutbetaling())
             .medFeilutbetaltePerioder(mapFeilutbetaltePerioder(feilutbetaltePerioderDto))
             .medFristdato(finnFristForTilbakemeldingFraBruker(FPDateUtil.nå(), ventetid))
+            .medRevurderingVedtakDato(grunninformasjon.getVedtakDato())
             .build();
     }
 
@@ -95,6 +96,7 @@ public class VarselbrevUtil {
             .medSumFeilutbetaling(feilutbetaltePerioderDto.getSumFeilutbetaling())
             .medFeilutbetaltePerioder(mapFeilutbetaltePerioder(feilutbetaltePerioderDto))
             .medFristdato(finnFristForTilbakemeldingFraBruker(FPDateUtil.nå(), ventetid))
+            .medRevurderingVedtakDato(grunninformasjon.getVedtakDato())
             .build();
     }
 
@@ -130,6 +132,7 @@ public class VarselbrevUtil {
             .medSumFeilutbetaling(feilutbetalingFakta.getAktuellFeilUtbetaltBeløp().longValue())
             .medFeilutbetaltePerioder(mapFeilutbetaltePerioder(feilutbetalingFakta))
             .medFristdato(finnFristForTilbakemeldingFraBruker(FPDateUtil.nå(), ventetid))
+            .medRevurderingVedtakDato(feilutbetalingFakta.getDatoForRevurderingsvedtak())
             .build();
     }
 
