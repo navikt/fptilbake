@@ -39,6 +39,7 @@ public class TekstformattererForVarselbrevTest {
             .medSumFeilutbetaling(595959L)
             .medFeilutbetaltePerioder(mockFeilutbetalingerMedFlerePerioder())
             .medFristdato(LocalDate.of(2020, 4, 4))
+            .medRevurderingVedtakDato(FPDateUtil.iDag())
             .medMetadata(metadata)
             .build();
 
@@ -60,6 +61,7 @@ public class TekstformattererForVarselbrevTest {
             .medSumFeilutbetaling(595959L)
             .medFeilutbetaltePerioder(mockFeilutbetalingerMedKunEnPeriode())
             .medFristdato(LocalDate.of(2020, 4, 4))
+            .medRevurderingVedtakDato(FPDateUtil.iDag())
             .medMetadata(metadata)
             .build();
 
@@ -80,6 +82,7 @@ public class TekstformattererForVarselbrevTest {
             .medSumFeilutbetaling(595959L)
             .medFeilutbetaltePerioder(mockFeilutbetalingerMedKunEnPeriode())
             .medFristdato(LocalDate.of(2020, 4, 4))
+            .medRevurderingVedtakDato(FPDateUtil.iDag())
             .medMetadata(metadata)
             .build();
 
@@ -100,11 +103,12 @@ public class TekstformattererForVarselbrevTest {
             .medSumFeilutbetaling(595959L)
             .medFeilutbetaltePerioder(mockFeilutbetalingerMedKunEnPeriode())
             .medFristdato(LocalDate.of(2018, 5, 27))
+            .medRevurderingVedtakDato(LocalDate.of(2018, 5, 6))
             .medMetadata(brevMetadata)
             .build();
 
         LocalDateTime dagensDato = LocalDateTime.of(2018, 5, 6, 1, 1);
-        VarselbrevDokument varselbrev = TekstformatererVarselbrev.mapTilVarselbrevDokument(varselbrevSamletInfo, dagensDato);
+        VarselbrevDokument varselbrev = TekstformatererVarselbrev.mapTilVarselbrevDokument(varselbrevSamletInfo);
 
         assertThat(varselbrev.getEndringsdato()).isEqualTo(LocalDate.of(2018, 5, 6));
         assertThat(varselbrev.getFristdatoForTilbakemelding()).isEqualTo(LocalDate.of(2018, 5, 27));
@@ -128,10 +132,11 @@ public class TekstformattererForVarselbrevTest {
             .medFeilutbetaltePerioder(mockFeilutbetalingerMedFlerePerioder())
             .medSumFeilutbetaling(595959L)
             .medFristdato(LocalDate.of(2020, 5, 5))
+            .medRevurderingVedtakDato(FPDateUtil.iDag())
             .medMetadata(brevMetadata)
             .build();
 
-        VarselbrevDokument varselbrev = TekstformatererVarselbrev.mapTilVarselbrevDokument(varselbrevSamletInfo, FPDateUtil.nå());
+        VarselbrevDokument varselbrev = TekstformatererVarselbrev.mapTilVarselbrevDokument(varselbrevSamletInfo);
         assertThat(varselbrev.getDatoerHvisSammenhengendePeriode()).isNull();
     }
 

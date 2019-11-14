@@ -44,6 +44,7 @@ import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
+import no.nav.vedtak.util.FPDateUtil;
 
 public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett {
 
@@ -154,7 +155,8 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
             LocalDate.of(2019, 10, 30),
             BigDecimal.valueOf(9000));
         return BehandlingFeilutbetalingFakta.builder().medAktuellFeilUtbetaltBeløp(BigDecimal.valueOf(9000))
-            .medPerioder(Lists.newArrayList(utbetaltPeriode)).build();
+            .medPerioder(Lists.newArrayList(utbetaltPeriode))
+            .medDatoForRevurderingsvedtak(FPDateUtil.iDag()).build();
     }
 
     private JournalpostIdOgDokumentId lagJournalOgDokument() {
