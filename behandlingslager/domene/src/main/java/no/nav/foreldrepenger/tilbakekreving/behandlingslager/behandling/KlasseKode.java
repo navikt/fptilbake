@@ -46,6 +46,16 @@ public class KlasseKode extends Kodeliste {
     public static final KlasseKode FPADSNDFI = new KlasseKode("FPADSNDFI");
     public static final KlasseKode FPATSJO = new KlasseKode("FPATSJO");
 
+    //SVP klassekoder
+    public static final KlasseKode FPSVATORD = new KlasseKode("FPSVATORD");
+    public static final KlasseKode FPSVATFRI = new KlasseKode("FPSVATFRI");
+    public static final KlasseKode FPSVSND_OP = new KlasseKode("FPSVSND-OP");
+    public static final KlasseKode FPSVATAL = new KlasseKode("FPSVATAL");
+    public static final KlasseKode FPSVATSJO = new KlasseKode("FPSVATSJO");
+    public static final KlasseKode FPSVSNDDM_OP = new KlasseKode("FPSVSNDDM-OP");
+    public static final KlasseKode FPSVSNDJB_OP = new KlasseKode("FPSVSNDJB-OP");
+    public static final KlasseKode FPSVSNDFI = new KlasseKode("FPSVSNDFI");
+
 
     public static final KlasseKode UDEFINERT = new KlasseKode("-");
 
@@ -78,6 +88,14 @@ public class KlasseKode extends Kodeliste {
         TILGJENGELIGE.put(FPADSNDJB_OP.getKode(), FPADSNDJB_OP);
         TILGJENGELIGE.put(FPADSNDFI.getKode(), FPADSNDFI);
         TILGJENGELIGE.put(FPATSJO.getKode(), FPATSJO);
+        TILGJENGELIGE.put(FPSVATORD.getKode(), FPSVATORD);
+        TILGJENGELIGE.put(FPSVATFRI.getKode(), FPSVATFRI);
+        TILGJENGELIGE.put(FPSVSND_OP.getKode(), FPSVSND_OP);
+        TILGJENGELIGE.put(FPSVATAL.getKode(), FPSVATAL);
+        TILGJENGELIGE.put(FPSVATSJO.getKode(), FPSVATSJO);
+        TILGJENGELIGE.put(FPSVSNDDM_OP.getKode(), FPSVSNDDM_OP);
+        TILGJENGELIGE.put(FPSVSNDJB_OP.getKode(), FPSVSNDJB_OP);
+        TILGJENGELIGE.put(FPSVSNDFI.getKode(), FPSVSNDFI);
     }
 
     KlasseKode() {
