@@ -1,0 +1,29 @@
+{{i18n "varsletsummarytekst" datoformat bundle="korrigertvarselbrev" locale=locale}} {{datoformat varsletDato}} {{i18n "varsletsummarytekst1" varsletBelop fagsaktypeNavn bundle="korrigertvarselbrev" locale=locale}} {{#if (not engangsstonad)}}{{i18n "foerskatt" bundle="korrigertvarselbrev" locale=locale}} {{/if}}.
+
+{{i18n "riktigbeloptekst" belop bundle="korrigertvarselbrev" locale=locale}}.
+
+{{#eq feilutbetaltePerioder.length 1}} {{i18n "enkeltperiode" bundle="korrigertvarselbrev" locale=locale}}{{else}}{{i18n "flereperioder" bundle="korrigertvarselbrev" locale=locale}} {{i18n "periodeoversikt" bundle="korrigertvarselbrev" locale=locale}}
+{{/eq}}
+*-{{#each feilutbetaltePerioder }}
+    {{i18n "fom" bundle="korrigertvarselbrev" locale=locale}} {{datoformat fom }} {{i18n "tom" bundle="korrigertvarselbrev" locale=locale}} {{datoformat tom }}.{{/each}}-*
+{{i18n "fristdatotekst" datoformat bundle="korrigertvarselbrev" locale=locale}} {{datoformat fristdatoForTilbakemelding}}.
+
+{{i18n "nettotekst" bundle="varselbrev" locale=locale}}
+{{i18n "overskrift2" bundle="korrigertvarselbrev" locale=locale}}
+{{i18n "endringtekst1" bundle="korrigertvarselbrev" locale=locale}} {{i18n "endringtekst2" bundle="korrigertvarselbrev" locale=locale}}.
+{{#if varseltekstFraSaksbehandler}}{{i18n "fritekst" varseltekstFraSaksbehandler bundle="korrigertvarselbrev" locale=locale}}{{/if}}
+{{i18n "overskrift3" bundle="varselbrev" locale=locale}}
+{{i18n "vurderingforklaring" bundle="varselbrev" locale=locale}}
+
+{{#if foreldrepenger}}{{i18n "vurderingslisteForeldrepenger" bundle="varselbrev" locale=locale}}
+{{else if engangsstonad}}{{i18n "vurderingslisteEngangsstonad" bundle="varselbrev" locale=locale}}
+{{else if svangerskapspenger}}{{i18n "vurderingslisteSvangerskapspenger" bundle="varselbrev" locale=locale}}
+{{/if}}
+
+{{i18n "vurderingavslutning" bundle="varselbrev" locale=locale}}
+{{i18n "slikuttalerdudeg" bundle="varselbrev" locale=locale}}
+{{i18n "innsyn" bundle="varselbrev" locale=locale}}
+{{i18n "spoersmaal" kontakttelefonnummer bundle="varselbrev" locale=locale}}
+
+
+{{i18n "hilsen" bundle="varselbrev" locale=locale}}

@@ -30,15 +30,15 @@ public class VarselbrevUtil {
     }
 
     public static VarselbrevSamletInfo sammenstillInfoFraFagsystemerForSending(//NOSONAR
-        SamletEksternBehandlingInfo eksternBehandlingsinfoDto,
-        Saksnummer saksnummer,
-        Adresseinfo adresseinfo,
-        Personinfo personinfo,
-        FeilutbetaltePerioderDto feilutbetaltePerioderDto,
-        Period ventetid,
-        FagsakYtelseType fagsakYtelseType,
-        YtelseNavn ytelseNavn,
-        String varselTekst) {
+                                                                               SamletEksternBehandlingInfo eksternBehandlingsinfoDto,
+                                                                               Saksnummer saksnummer,
+                                                                               Adresseinfo adresseinfo,
+                                                                               Personinfo personinfo,
+                                                                               FeilutbetaltePerioderDto feilutbetaltePerioderDto,
+                                                                               Period ventetid,
+                                                                               FagsakYtelseType fagsakYtelseType,
+                                                                               YtelseNavn ytelseNavn,
+                                                                               String varselTekst) {
 
         EksternBehandlingsinfoDto grunninformasjon = eksternBehandlingsinfoDto.getGrunninformasjon();
         BrevMetadata metadata = new BrevMetadata.Builder()
@@ -65,14 +65,14 @@ public class VarselbrevUtil {
     }
 
     public static VarselbrevSamletInfo sammenstillInfoFraFagsystemerForhåndvisningVarselbrev( //NOSONAR
-        Saksnummer saksnummer,
-        String varseltekst,
-        Adresseinfo adresseinfo,
-        SamletEksternBehandlingInfo eksternBehandlingsinfo,
-        FeilutbetaltePerioderDto feilutbetaltePerioderDto,
-        Period ventetid,
-        FagsakYtelseType fagsakYtelseType,
-        YtelseNavn ytelseNavn) {
+                                                                                              Saksnummer saksnummer,
+                                                                                              String varseltekst,
+                                                                                              Adresseinfo adresseinfo,
+                                                                                              SamletEksternBehandlingInfo eksternBehandlingsinfo,
+                                                                                              FeilutbetaltePerioderDto feilutbetaltePerioderDto,
+                                                                                              Period ventetid,
+                                                                                              FagsakYtelseType fagsakYtelseType,
+                                                                                              YtelseNavn ytelseNavn) {
 
         EksternBehandlingsinfoDto grunninformasjon = eksternBehandlingsinfo.getGrunninformasjon();
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
@@ -98,7 +98,7 @@ public class VarselbrevUtil {
             .build();
     }
 
-    public static VarselbrevSamletInfo sammenstillInfoFraFagsystemerForSendingManueltVarselBrev(
+    public static VarselbrevSamletInfo sammenstillInfoFraFagsystemerForSendingManueltVarselBrev(//NOSONAR
         Behandling behandling,
         Personinfo personinfo,
         Adresseinfo adresseinfo,
@@ -107,7 +107,8 @@ public class VarselbrevUtil {
         YtelseNavn ytelseNavn,
         Period ventetid,
         String friTekst,
-        BehandlingFeilutbetalingFakta feilutbetalingFakta){
+        BehandlingFeilutbetalingFakta feilutbetalingFakta,
+        boolean erKorrigert) {
 
         BrevMetadata metadata = new BrevMetadata.Builder()
             .medBehandlendeEnhetId(behandling.getBehandlendeEnhetId())
@@ -120,7 +121,7 @@ public class VarselbrevUtil {
             .medSprakkode(språkkode)
             .medFagsaktypenavnPåSpråk(ytelseNavn.getNavnPåBrukersSpråk())
             .medAnsvarligSaksbehandler("VL")
-            .medTittel(VarselbrevOverskrift.finnTittelVarselbrev(ytelseNavn.getNavnPåBokmål()))
+            .medTittel(erKorrigert ? VarselbrevOverskrift.finnTittelKorrigertVarselbrev(ytelseNavn.getNavnPåBokmål()) : VarselbrevOverskrift.finnTittelVarselbrev(ytelseNavn.getNavnPåBokmål()))
             .build();
 
         return new VarselbrevSamletInfo.Builder()

@@ -16,6 +16,7 @@ import com.github.jknack.handlebars.helper.ConditionalHelpers;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselInfo;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.ReturadresseKonfigurasjon;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.handlebars.dto.BaseDokument;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.handlebars.dto.VarselbrevDokument;
@@ -34,6 +35,20 @@ public class TekstformatererVarselbrev {
             VarselbrevDokument varselbrevDokument = mapTilVarselbrevDokument(
                 varselbrevSamletInfo,
                 FPDateUtil.nå());
+
+            return template.apply(varselbrevDokument);
+        } catch (IOException e) {
+            throw TekstformatererVarselbrevFeil.FACTORY.feilVedTekstgenerering(e).toException();
+        }
+    }
+
+    public static String lagKorrigertVarselbrevFritekst(VarselbrevSamletInfo varselbrevSamletInfo, VarselInfo varselInfo) {
+        try {
+            Template template = opprettHandlebarsTemplate("/templates/korrigert_varsel");
+            VarselbrevDokument varselbrevDokument = mapTilKorrigertVarselbrevDokument(
+                varselbrevSamletInfo,
+                FPDateUtil.nå(),
+                varselInfo);
 
             return template.apply(varselbrevDokument);
         } catch (IOException e) {
@@ -105,6 +120,16 @@ public class TekstformatererVarselbrev {
         varselbrevDokument.setLocale(finnRiktigSpråk(varselbrevSamletInfo.getBrevMetadata().getSpråkkode()));
         settFagsaktype(varselbrevDokument, varselbrevSamletInfo.getBrevMetadata().getFagsaktype());
         settSenesteOgTidligsteDatoer(varselbrevDokument, varselbrevSamletInfo.getFeilutbetaltePerioder());
+
+        varselbrevDokument.valider();
+        return varselbrevDokument;
+    }
+
+    static VarselbrevDokument mapTilKorrigertVarselbrevDokument(VarselbrevSamletInfo varselbrevSamletInfo, LocalDateTime dagensDato, VarselInfo varselInfo) {
+        VarselbrevDokument varselbrevDokument = mapTilVarselbrevDokument(varselbrevSamletInfo,dagensDato);
+        varselbrevDokument.setKorrigert(true);
+        varselbrevDokument.setVarsletDato(varselInfo.getOpprettetTidspunkt().toLocalDate());
+        varselbrevDokument.setVarsletBelop(varselInfo.getVarselBeløp());
 
         varselbrevDokument.valider();
         return varselbrevDokument;
