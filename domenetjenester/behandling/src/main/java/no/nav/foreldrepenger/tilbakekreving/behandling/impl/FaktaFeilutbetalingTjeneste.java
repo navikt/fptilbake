@@ -26,12 +26,10 @@ import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.TilbakekrevingValgDto;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 
 @ApplicationScoped
 public class FaktaFeilutbetalingTjeneste {
 
-    private KravgrunnlagRepository grunnlagRepository;
     private VarselRepository varselRepository;
     private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository;
 
@@ -49,7 +47,6 @@ public class FaktaFeilutbetalingTjeneste {
         this.fpsakKlient = fpsakKlient;
 
         this.faktaFeilutbetalingRepository = behandlingRepositoryProvider.getFaktaFeilutbetalingRepository();
-        this.grunnlagRepository = behandlingRepositoryProvider.getGrunnlagRepository();
         this.eksternBehandlingRepository = behandlingRepositoryProvider.getEksternBehandlingRepository();
         this.varselRepository = behandlingRepositoryProvider.getVarselRepository();
 
