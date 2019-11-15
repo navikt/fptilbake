@@ -12,7 +12,6 @@ public interface SvpHendelseUnderTyper {
     //Arbeidsgiverforhold
     HendelseUnderType SVP_TILRETTELEGGING_FULLT_MULIG = new HendelseUnderType("SVP_TILRETTELEGGING_FULLT_MULIG");
     HendelseUnderType SVP_TILRETTELEGGING_DELVIS_MULIG = new HendelseUnderType("SVP_TILRETTELEGGING_DELVIS_MULIG");
-    HendelseUnderType SVP_TILRETTELEGGING_IKKE_MULIG = new HendelseUnderType("SVP_TILRETTELEGGING_IKKE_MULIG");
 
     HendelseUnderType SVP_MANGLER_ARBEIDSFORHOLD = new HendelseUnderType("MANGLER_ARBEIDSFORHOLD");
 

@@ -179,8 +179,7 @@ public class FaktaFeilutbetalingÅrsakTjenesteTest {
 
         assertThat(mapAvResultat.get(HendelseType.SVP_ARBEIDSGIVERS_FORHOLD_TYPE)).containsExactly(
             SvpHendelseUnderTyper.SVP_TILRETTELEGGING_FULLT_MULIG,
-            SvpHendelseUnderTyper.SVP_TILRETTELEGGING_DELVIS_MULIG,
-            SvpHendelseUnderTyper.SVP_TILRETTELEGGING_IKKE_MULIG
+            SvpHendelseUnderTyper.SVP_TILRETTELEGGING_DELVIS_MULIG
         );
 
         assertThat(mapAvResultat.get(HendelseType.SVP_ARBEIDSFORHOLD_TYPE)).containsExactly(

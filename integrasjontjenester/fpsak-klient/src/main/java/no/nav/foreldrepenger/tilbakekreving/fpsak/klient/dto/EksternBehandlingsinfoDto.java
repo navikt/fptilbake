@@ -16,10 +16,8 @@ public class EksternBehandlingsinfoDto {
 
     private Long id;
     private UUID uuid;
-    private Long fagsakId;
     private String behandlendeEnhetId;
     private String behandlendeEnhetNavn;
-    private String ansvarligSaksbehandler;
     private Språkkode sprakkode;
     @JsonProperty("originalVedtaksDato")
     private LocalDate vedtakDato;
@@ -44,14 +42,6 @@ public class EksternBehandlingsinfoDto {
         this.uuid = uuid;
     }
 
-    public Long getFagsakId() {
-        return fagsakId;
-    }
-
-    public void setFagsakId(Long fagsakId) {
-        this.fagsakId = fagsakId;
-    }
-
     public String getBehandlendeEnhetId() {
         return behandlendeEnhetId;
     }
@@ -66,14 +56,6 @@ public class EksternBehandlingsinfoDto {
 
     public void setBehandlendeEnhetNavn(String behandlendeEnhetNavn) {
         this.behandlendeEnhetNavn = behandlendeEnhetNavn;
-    }
-
-    public String getAnsvarligSaksbehandler() {
-        return ansvarligSaksbehandler;
-    }
-
-    public void setAnsvarligSaksbehandler(String ansvarligSaksbehandler) {
-        this.ansvarligSaksbehandler = ansvarligSaksbehandler;
     }
 
     public Optional<Språkkode> getSpråkkode() {
