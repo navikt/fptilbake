@@ -132,9 +132,9 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         KravgrunnlagMock mockMedYtelPostering = new KravgrunnlagMock(FOM, LocalDate.of(2016, 3, 31),
             KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(11000));
         mockMedYtelPostering.setKlasseKode(KlasseKode.FPADATAL);
-        KravgrunnlagMock mockMedTrekPostering = new KravgrunnlagMock(FOM, LocalDate.of(2016, 3, 31),
-            KlasseType.TREK, BigDecimal.valueOf(5000), BigDecimal.ZERO);
-        mockMedTrekPostering.setKlasseKode(KlasseKode.FPADATAL);
+        KravgrunnlagMock mockMedJustPostering = new KravgrunnlagMock(FOM, LocalDate.of(2016, 3, 31),
+            KlasseType.JUST, BigDecimal.valueOf(5000), BigDecimal.ZERO);
+        mockMedJustPostering.setKlasseKode(KlasseKode.FPADATAL);
 
         KravgrunnlagMock mockMedFeilPostering1 = new KravgrunnlagMock(LocalDate.of(2016, 4, 1), LocalDate.of(2016, 4, 30), KlasseType.FEIL,
             BigDecimal.valueOf(21000), BigDecimal.ZERO);
@@ -146,7 +146,7 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         mockMedYtelPostering2.setKlasseKode(KlasseKode.FPADSNDFI);
 
         Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedFeilPostering1,
-            mockMedYtelPostering, mockMedYtelPostering1, mockMedYtelPostering2, mockMedTrekPostering));
+            mockMedYtelPostering, mockMedYtelPostering1, mockMedYtelPostering2, mockMedJustPostering));
         grunnlagRepository.lagre(internBehandlingId, kravgrunnlag431);
 
         lagreFaktaTestdata();
@@ -160,15 +160,12 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         assertThat(periode.getHendelseUndertype()).isEqualTo(FpHendelseUnderTyper.ARBEID_HELTID);
         assertThat(periode.isForeldet()).isFalse();
 
-        assertThat(periode.getRedusertBeloper().size()).isEqualTo(2);
+        assertThat(periode.getRedusertBeloper().size()).isEqualTo(1);
         periode.getRedusertBeloper().sort(Comparator.comparing(RedusertBeløpDto::getBelop));
-        RedusertBeløpDto førsteRedusertBeløp = periode.getRedusertBeloper().get(0);
-        assertThat(førsteRedusertBeløp.getBelop()).isEqualByComparingTo(BigDecimal.valueOf(3000l));
-        assertThat(førsteRedusertBeløp.isErTrekk()).isEqualTo(false);
 
-        RedusertBeløpDto andreRedusertBeløp = periode.getRedusertBeloper().get(1);
-        assertThat(andreRedusertBeløp.getBelop()).isEqualByComparingTo(BigDecimal.valueOf(5000l));
-        assertThat(andreRedusertBeløp.isErTrekk()).isEqualTo(true);
+        RedusertBeløpDto førsteRedusertBeløp = periode.getRedusertBeloper().get(0);
+        assertThat(førsteRedusertBeløp.getBelop()).isEqualByComparingTo(BigDecimal.valueOf(5000l));
+        assertThat(førsteRedusertBeløp.isErTrekk()).isEqualTo(false);
     }
 
     @Test

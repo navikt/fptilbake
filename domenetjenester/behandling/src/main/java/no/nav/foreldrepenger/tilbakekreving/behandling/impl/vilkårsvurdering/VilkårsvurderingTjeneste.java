@@ -68,7 +68,7 @@ public class VilkårsvurderingTjeneste {
     @Inject
     public VilkårsvurderingTjeneste(VurdertForeldelseTjeneste foreldelseTjeneste, BehandlingRepositoryProvider behandlingRepositoryProvider,
                                     VilkårsvurderingHistorikkInnslagTjeneste vilkårsvurderingHistorikkInnslagTjeneste, KravgrunnlagBeregningTjeneste kravgrunnlagBeregningTjeneste) {
-        this.kodeverkRepository=behandlingRepositoryProvider.getKodeverkRepository();
+        this.kodeverkRepository = behandlingRepositoryProvider.getKodeverkRepository();
         this.grunnlagRepository = behandlingRepositoryProvider.getGrunnlagRepository();
         this.faktaFeilutbetalingRepository = behandlingRepositoryProvider.getFaktaFeilutbetalingRepository();
         this.vilkårsvurderingRepository = behandlingRepositoryProvider.getVilkårsvurderingRepository();
@@ -235,14 +235,22 @@ public class VilkårsvurderingTjeneste {
         for (KravgrunnlagPeriode432 kgPeriode : kravgrunnlag.getPerioder()) {
             Periode grunnlagPeriode = kgPeriode.getPeriode();
             if (feilutbetalingPeriode.overlapper(grunnlagPeriode)) {
-                List<KravgrunnlagBelop433> trekkBeløper = kgPeriode.getKravgrunnlagBeloper433().stream()
+                List<KravgrunnlagBelop433> skattogTrekkBeløoper = new ArrayList<>();
+                skattogTrekkBeløoper.addAll(kgPeriode.getKravgrunnlagBeloper433().stream()
                     .filter(belop433 -> KlasseType.TREK.equals(belop433.getKlasseType()))
-                    .collect(Collectors.toList());
+                    .filter(belop433 -> belop433.getOpprUtbetBelop().signum() == -1)
+                    .collect(Collectors.toList())); //redusertBeløp
+                skattogTrekkBeløoper.addAll(kgPeriode.getKravgrunnlagBeloper433().stream()
+                    .filter(belop433 -> KlasseType.SKAT.equals(belop433.getKlasseType()))
+                    .filter(belop433 -> belop433.getOpprUtbetBelop().signum() == -1)
+                    .collect(Collectors.toList())); //redusertBeløp
                 List<KravgrunnlagBelop433> redusertYtelseBeløper = kgPeriode.getKravgrunnlagBeloper433().stream()
-                    .filter(belop433 -> KlasseType.YTEL.equals(belop433.getKlasseType()))
-                    .filter(belop433 -> BigDecimal.ZERO.compareTo(belop433.getTilbakekrevesBelop()) == 0)
-                    .collect(Collectors.toList());
-                redusertBeløper.addAll(opprettRedusertBeløper(trekkBeløper, redusertYtelseBeløper));
+                    .filter(belop433 -> KlasseType.JUST.equals(belop433.getKlasseType()))
+                    .filter(belop433 -> belop433.getOpprUtbetBelop().signum() == 0)
+                    .filter(belop433 -> belop433.getNyBelop().signum() == 1)
+                    .collect(Collectors.toList()); // etterbetaling
+
+                redusertBeløper.addAll(opprettRedusertBeløper(skattogTrekkBeløoper, redusertYtelseBeløper));
             }
         }
         return redusertBeløper;
@@ -261,18 +269,18 @@ public class VilkårsvurderingTjeneste {
     }
 
 
-    private List<RedusertBeløpDto> opprettRedusertBeløper(List<KravgrunnlagBelop433> trekkBeløper, List<KravgrunnlagBelop433> redusertYtelseBeløper) {
+    private List<RedusertBeløpDto> opprettRedusertBeløper(List<KravgrunnlagBelop433> skattOgTrekkBeløper, List<KravgrunnlagBelop433> etterbetalingBeløper) {
         List<RedusertBeløpDto> redusertBeløpListe = new ArrayList<>();
-        if (!trekkBeløper.isEmpty()) {
-            for (KravgrunnlagBelop433 belop433 : trekkBeløper) {
+        if (!skattOgTrekkBeløper.isEmpty()) {
+            for (KravgrunnlagBelop433 belop433 : skattOgTrekkBeløper) {
                 RedusertBeløpDto redusertBeløp = new RedusertBeløpDto();
                 redusertBeløp.setBelop(belop433.getNyBelop());
                 redusertBeløp.setErTrekk(true);
                 redusertBeløpListe.add(redusertBeløp);
             }
         }
-        if (!redusertYtelseBeløper.isEmpty()) {
-            for (KravgrunnlagBelop433 belop433 : redusertYtelseBeløper) {
+        if (!etterbetalingBeløper.isEmpty()) {
+            for (KravgrunnlagBelop433 belop433 : etterbetalingBeløper) {
                 RedusertBeløpDto redusertBeløp = new RedusertBeløpDto();
                 redusertBeløp.setBelop(belop433.getNyBelop().subtract(belop433.getOpprUtbetBelop()));
                 redusertBeløp.setErTrekk(false);
