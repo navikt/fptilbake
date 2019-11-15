@@ -41,7 +41,7 @@
         <assertj.version>3.7.0</assertj.version>
 
         <cxf.version>3.3.1</cxf.version>
-        <woodstox.version>5.1.0</woodstox.version>
+        <woodstox.version>6.0.2</woodstox.version>
         <surefire.version>2.21.0</surefire.version>
         <asm.version>7.1</asm.version>
         <metrics.version>3.2.5</metrics.version>
