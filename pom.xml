@@ -75,7 +75,7 @@
 
         <!-- Dupliserte properties fra vl-felles. Pass på å oppdatere begge steder. Disse trengs for definisjon av videre plugins -->
         <!-- <flyway.version>5.1.4</flyway.version> FIXME: støtter ikke oracle 11, se på hva som skal til for å kjøre på 12 -->
-        <flyway.version>4.2.0</flyway.version>
+        <flyway.version>6.0.8</flyway.version>
         <ojdbc.version>12.2.0.1</ojdbc.version>
         <abac-attribute-constants.version>3.3.13</abac-attribute-constants.version>
 
