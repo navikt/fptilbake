@@ -274,7 +274,7 @@ public class VilkårsvurderingTjeneste {
         if (!skattOgTrekkBeløper.isEmpty()) {
             for (KravgrunnlagBelop433 belop433 : skattOgTrekkBeløper) {
                 RedusertBeløpDto redusertBeløp = new RedusertBeløpDto();
-                redusertBeløp.setBelop(belop433.getNyBelop());
+                redusertBeløp.setBelop(belop433.getOpprUtbetBelop().abs());
                 redusertBeløp.setErTrekk(true);
                 redusertBeløpListe.add(redusertBeløp);
             }
@@ -282,7 +282,7 @@ public class VilkårsvurderingTjeneste {
         if (!etterbetalingBeløper.isEmpty()) {
             for (KravgrunnlagBelop433 belop433 : etterbetalingBeløper) {
                 RedusertBeløpDto redusertBeløp = new RedusertBeløpDto();
-                redusertBeløp.setBelop(belop433.getNyBelop().subtract(belop433.getOpprUtbetBelop()));
+                redusertBeløp.setBelop(belop433.getNyBelop());
                 redusertBeløp.setErTrekk(false);
                 redusertBeløpListe.add(redusertBeløp);
             }
