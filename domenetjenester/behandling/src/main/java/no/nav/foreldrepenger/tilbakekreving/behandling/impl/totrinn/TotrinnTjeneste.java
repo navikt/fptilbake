@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
@@ -12,6 +13,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.TotrinnRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.Totrinnresultatgrunnlag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.Totrinnsvurdering;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.SlettGrunnlagEvent;
 
 @ApplicationScoped
 public class TotrinnTjeneste {
@@ -57,5 +59,9 @@ public class TotrinnTjeneste {
 
     public Optional<Totrinnresultatgrunnlag> hentTotrinngrunnlagHvisEksisterer(Behandling behandling) {
         return totrinnRepository.hentTotrinngrunnlag(behandling);
+    }
+
+    public void slettGammelTotrinnData(@Observes SlettGrunnlagEvent slettGrunnlagEvent){
+        totrinnRepository.slettGammelTotrinnData(slettGrunnlagEvent.getBehandlingId());
     }
 }

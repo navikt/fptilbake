@@ -5,6 +5,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
@@ -23,6 +24,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkOpplysningType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.SlettGrunnlagEvent;
 import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkinnslagDelDto;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
 
@@ -75,6 +77,10 @@ public class AvklartFaktaFeilutbetalingTjeneste {
         if (behovForHistorikkInnslag) {
             historikkTjenesteAdapter.lagInnslag(historikkinnslag);
         }
+    }
+
+    public void slettGammelFaktaData(@Observes SlettGrunnlagEvent slettGrunnlagEvent){
+        faktaFeilutbetalingRepository.slettFaktaFeilutbetaling(slettGrunnlagEvent.getBehandlingId());
     }
 
     private boolean lagHistorikkInnslagDeler(Historikkinnslag historikkinnslag, String begrunnelse,

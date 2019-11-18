@@ -26,14 +26,12 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseRepository;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagBelop433;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.SlettGrunnlagEventPubliserer;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 
@@ -44,11 +42,10 @@ public class KravgrunnlagTjeneste {
 
     private KravgrunnlagRepository kravgrunnlagRepository;
     private BehandlingRepository behandlingRepository;
-    private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository;
-    private VurdertForeldelseRepository vurdertForeldelseRepository;
-    private VilkårsvurderingRepository vilkårsvurderingRepository;
     private GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
+
+    private SlettGrunnlagEventPubliserer slettGrunnlagEventPubliserer;
 
 
     KravgrunnlagTjeneste() {
@@ -57,16 +54,14 @@ public class KravgrunnlagTjeneste {
 
     @Inject
     public KravgrunnlagTjeneste(BehandlingRepositoryProvider repositoryProvider, GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste,
-                                BehandlingskontrollTjeneste behandlingskontrollTjeneste) {
+                                BehandlingskontrollTjeneste behandlingskontrollTjeneste,
+                                SlettGrunnlagEventPubliserer slettGrunnlagEventPubliserer) {
         this.kravgrunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
         this.gjenopptaBehandlingTjeneste = gjenopptaBehandlingTjeneste;
 
-        //FIXME Kravgrunlag-tjeneste skal ikke vite om fakta/foreldelse/vilkårsvurdering, se PFP-9003
-        this.faktaFeilutbetalingRepository = repositoryProvider.getFaktaFeilutbetalingRepository();
-        this.vurdertForeldelseRepository = repositoryProvider.getVurdertForeldelseRepository();
-        this.vilkårsvurderingRepository = repositoryProvider.getVilkårsvurderingRepository();
+        this.slettGrunnlagEventPubliserer = slettGrunnlagEventPubliserer;
     }
 
 
@@ -140,18 +135,16 @@ public class KravgrunnlagTjeneste {
                 logger.info("Hopper tilbake til {} pga endret kravgrunnlag for behandlingId={}", BehandlingStegType.FAKTA_FEILUTBETALING.getKode(), behandlingId);
                 behandlingskontrollTjeneste.behandlingTilbakeføringTilTidligereBehandlingSteg(kontekst, BehandlingStegType.FAKTA_FEILUTBETALING);
             }
-            //Perioder knyttet med gammel grunnlag må slettes
-            slettGammelData(behandlingId);
+            //Perioder knyttet med gammel grunnlag må slettes, opprettet SlettGrunnlagEvent som skal slette det
+            opprettOgFireSlettgrunnlagEvent(behandlingId);
         }
         kravgrunnlagRepository.lagre(behandlingId, kravgrunnlag431);
         gjenopptaBehandlingTjeneste.fortsettBehandlingMedGrunnlag(behandlingId);
     }
 
-    private void slettGammelData(Long behandlingId) {
-        logger.info("Sletter fakta, foreldelse og vilkårsvurdering for behandlingId={} på endret kravgrunnlag", behandlingId);
-        faktaFeilutbetalingRepository.slettFaktaFeilutbetaling(behandlingId);
-        vurdertForeldelseRepository.slettForeldelse(behandlingId);
-        vilkårsvurderingRepository.slettVilkårsvurdering(behandlingId);
+    private void opprettOgFireSlettgrunnlagEvent(Long behandlingId) {
+        logger.info("Sletter gammel grunnlag data for behandlingId={}", behandlingId);
+        slettGrunnlagEventPubliserer.fireEvent(behandlingId);
     }
 
 }

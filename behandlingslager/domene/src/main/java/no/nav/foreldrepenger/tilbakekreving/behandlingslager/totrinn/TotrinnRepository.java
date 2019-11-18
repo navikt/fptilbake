@@ -2,6 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn;
 
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -67,6 +68,23 @@ public class TotrinnRepository {
 
     public Optional<Totrinnresultatgrunnlag> hentTotrinngrunnlag(Behandling behandling) {
         return getAktivtTotrinnresultatgrunnlag(behandling);
+    }
+
+    public void slettGammelTotrinnData(Long behandlingId){
+        List<Totrinnsvurdering> totrinnsvurderinger = (List<Totrinnsvurdering>) getAktiveTotrinnaksjonspunktvurderinger(behandlingId);
+        if(!totrinnsvurderinger.isEmpty()){
+            totrinnsvurderinger.forEach(totrinnsvurdering -> {
+                totrinnsvurdering.disable();
+                entityManager.persist(totrinnsvurdering);
+            });
+        }
+        Optional<Totrinnresultatgrunnlag> totrinnresultatgrunnlag = getAktivtTotrinnresultatgrunnlag(behandlingId);
+        if(totrinnresultatgrunnlag.isPresent()){
+            Totrinnresultatgrunnlag aktivTotrinnresultatgrunnlag = totrinnresultatgrunnlag.get();
+            aktivTotrinnresultatgrunnlag.disable();
+            entityManager.persist(aktivTotrinnresultatgrunnlag);
+        }
+        entityManager.flush();
     }
 
     protected Collection<Totrinnsvurdering> getAktiveTotrinnaksjonspunktvurderinger(Behandling behandling) {

@@ -24,6 +24,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Vi
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMock;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMockUtil;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.SlettGrunnlagEvent;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 
 public class TotrinnTjenesteTest extends FellesTestOppsett {
@@ -40,9 +41,9 @@ public class TotrinnTjenesteTest extends FellesTestOppsett {
         mockMedYtelPostering.setKlasseKode(KlasseKode.FPADATAL);
 
         Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedYtelPostering));
-        grunnlagRepository.lagre(internBehandlingId,kravgrunnlag431);
+        grunnlagRepository.lagre(internBehandlingId, kravgrunnlag431);
 
-        repoProvider.getFaktaFeilutbetalingRepository().lagre(internBehandlingId,  lagFaktaFeilutbetaling());
+        repoProvider.getFaktaFeilutbetalingRepository().lagre(internBehandlingId, lagFaktaFeilutbetaling());
         vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, Collections.singletonList(
             new ForeldelsePeriodeDto(FOM, TOM,
                 ForeldelseVurderingType.FORELDET, "ABC")));
@@ -78,5 +79,24 @@ public class TotrinnTjenesteTest extends FellesTestOppsett {
         assertThat(totrinnsvurdering.getAksjonspunktDefinisjon()).isEqualToComparingFieldByField(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING);
         assertThat(totrinnsvurdering.getBehandling()).isEqualToComparingFieldByField(behandling);
         assertThat(totrinnsvurdering.getBegrunnelse()).isNull();
+    }
+
+    @Test
+    public void slettGammelTotrinndata() {
+        Totrinnsvurdering totrinnsvurdering = Totrinnsvurdering.builder().medGodkjent(true)
+            .medAksjonspunktDefinisjon(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING)
+            .medBehandling(behandling)
+            .build();
+        totrinnTjeneste.settNyeTotrinnaksjonspunktvurderinger(behandling, Collections.singletonList(totrinnsvurdering));
+
+        List<Totrinnsvurdering> totrinnsvurderinger = (List<Totrinnsvurdering>) totrinnTjeneste.hentTotrinnsvurderinger(behandling);
+        assertThat(totrinnsvurderinger).isNotEmpty();
+
+        SlettGrunnlagEvent slettGrunnlagEvent = new SlettGrunnlagEvent(behandling.getId());
+        totrinnTjeneste.slettGammelTotrinnData(slettGrunnlagEvent);
+
+        totrinnsvurderinger = (List<Totrinnsvurdering>) totrinnTjeneste.hentTotrinnsvurderinger(behandling);
+        assertThat(totrinnsvurderinger).isEmpty();
+        assertThat(totrinnTjeneste.hentTotrinngrunnlagHvisEksisterer(behandling)).isEmpty();
     }
 }

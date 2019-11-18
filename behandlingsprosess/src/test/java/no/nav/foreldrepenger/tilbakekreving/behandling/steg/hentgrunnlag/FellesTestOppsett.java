@@ -65,6 +65,7 @@ import no.nav.foreldrepenger.tilbakekreving.domene.person.TpsAdapter;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.SlettGrunnlagEventPubliserer;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
@@ -93,6 +94,7 @@ public class FellesTestOppsett {
     protected final TpsAdapterWrapper tpsAdapterWrapper = new TpsAdapterWrapper(tpsAdapterMock);
     private BehandlingModellRepository behandlingModellRepositoryMock = mock(BehandlingModellRepository.class);
     private VarselresponsTjeneste varselresponsTjenesteMock = mock(VarselresponsTjeneste.class);
+    private SlettGrunnlagEventPubliserer mockSlettGrunnlagEventPubliserer = mock(SlettGrunnlagEventPubliserer.class);
 
     protected final BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProviderImpl(repoRule.getEntityManager());
     protected final BehandlingRepository behandlingRepository = repositoryProvider.getBehandlingRepository();
@@ -109,7 +111,7 @@ public class FellesTestOppsett {
     protected final HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(repositoryProvider.getHistorikkRepository(), journalTjenesteMock, personinfoAdapterMock);
     protected final BehandlingskontrollTjeneste behandlingskontrollTjeneste = new BehandlingskontrollTjenesteImpl(repositoryProvider,behandlingModellRepositoryMock,behandlingskontrollEventPublisererMock);
     private InternalManipulerBehandling manipulerInternBehandling = new InternalManipulerBehandlingImpl(repositoryProvider);
-    protected final KravgrunnlagTjeneste kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repositoryProvider, gjenopptaBehandlingTjeneste,behandlingskontrollTjeneste);
+    protected final KravgrunnlagTjeneste kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repositoryProvider, gjenopptaBehandlingTjeneste,behandlingskontrollTjeneste,mockSlettGrunnlagEventPubliserer);
     protected final KravgrunnlagMapper kravgrunnlagMapper = new KravgrunnlagMapper(tpsAdapterWrapper);
     protected final LesKravgrunnlagTask lesKravgrunnlagTask = new LesKravgrunnlagTask(mottattXmlRepository, kravgrunnlagTjeneste, prosessTaskRepository,
         kravgrunnlagMapper,repositoryProvider, fpsakKlientMock);

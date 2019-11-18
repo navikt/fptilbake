@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.FeilutbetalingPerioderDto;
@@ -32,6 +33,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.V
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelsePeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseRepository;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.SlettGrunnlagEvent;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
 import no.nav.vedtak.felles.jpa.Transaction;
 
@@ -124,6 +126,10 @@ public class VurdertForeldelseTjeneste {
 
     public boolean harVurdertForeldelse(Long behandlingId) {
         return vurdertForeldelseRepository.harVurdertForeldelseForBehandlingId(behandlingId);
+    }
+
+    public void slettGammelForeldelseData(@Observes SlettGrunnlagEvent slettGrunnlagEvent){
+        vurdertForeldelseRepository.slettForeldelse(slettGrunnlagEvent.getBehandlingId());
     }
 
     private VurdertForeldelsePeriode lagVurdertForeldelse(VurdertForeldelse vurdertForeldelse, ForeldelsePeriodeDto foreldelsePeriodeDto) {
