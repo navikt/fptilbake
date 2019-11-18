@@ -70,7 +70,7 @@ public class TotrinnRepository {
         return getAktivtTotrinnresultatgrunnlag(behandling);
     }
 
-    public void slettGammelTotrrinData(Long behandlingId){
+    public void slettGammelTotrinnData(Long behandlingId){
         List<Totrinnsvurdering> totrinnsvurderinger = (List<Totrinnsvurdering>) getAktiveTotrinnaksjonspunktvurderinger(behandlingId);
         if(!totrinnsvurderinger.isEmpty()){
             totrinnsvurderinger.forEach(totrinnsvurdering -> {

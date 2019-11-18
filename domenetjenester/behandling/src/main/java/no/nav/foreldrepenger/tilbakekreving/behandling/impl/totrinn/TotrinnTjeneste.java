@@ -62,6 +62,6 @@ public class TotrinnTjeneste {
     }
 
     public void slettGammelTotrinnData(@Observes SlettGrunnlagEvent slettGrunnlagEvent){
-        totrinnRepository.slettGammelTotrrinData(slettGrunnlagEvent.getBehandlingId());
+        totrinnRepository.slettGammelTotrinnData(slettGrunnlagEvent.getBehandlingId());
     }
 }
