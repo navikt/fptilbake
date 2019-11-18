@@ -1,5 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling;
 
+import static no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.selvbetjening.SendBeskjedUtsendtVarselTilSelvbetjeningTask.TASKTYPE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
@@ -43,7 +44,7 @@ public class DokumentBehandlingTjenesteTest extends DokumentBestillerTestOppsett
     private final PersoninfoAdapter mockPersoninfoAdapter = mock(PersoninfoAdapter.class);
     private HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(repositoryProvider.getHistorikkRepository(), mockJournalTjeneste, mockPersoninfoAdapter);
     private ManueltVarselBrevTjeneste mockManueltVarselBrevTjeneste = mock(ManueltVarselBrevTjeneste.class);
-    private DokumentBehandlingTjeneste dokumentBehandlingTjeneste = new DokumentBehandlingTjeneste(repositoryProvider, brevdataRepository, prosessTaskRepository, historikkinnslagTjeneste, mockManueltVarselBrevTjeneste);
+    private DokumentBehandlingTjeneste dokumentBehandlingTjeneste = new DokumentBehandlingTjeneste(repositoryProvider, prosessTaskRepository, historikkinnslagTjeneste, mockManueltVarselBrevTjeneste);
 
     @Test
     public void skal_henteBrevMal_for_behandling_som_har_ikke_sendt_varsel() {
@@ -132,6 +133,7 @@ public class DokumentBehandlingTjenesteTest extends DokumentBestillerTestOppsett
         dokumentBehandlingTjeneste.bestillBrev(behandlingId, DokumentMalType.VARSEL_DOK, "Bestilt varselbrev");
 
         assertThat(prosessTaskRepository.finnProsessTaskType(SendManueltVarselbrevTask.TASKTYPE)).isPresent();
+        assertThat(prosessTaskRepository.finnProsessTaskType(TASKTYPE)).isPresent();
         List<Historikkinnslag> historikkinnslager = repositoryProvider.getHistorikkRepository().hentHistorikk(behandlingId);
         assertThat(historikkinnslager.size()).isEqualTo(1);
         Historikkinnslag historikkinnslag = historikkinnslager.get(0);
@@ -155,7 +157,8 @@ public class DokumentBehandlingTjenesteTest extends DokumentBestillerTestOppsett
             .medDokumentId(dokumentId)
             .medJournalpostId(new JournalpostId(journalpostId))
             .build();
-        brevdataRepository.lagreVarselbrevData(varselbrevSporing);
+        varselbrevSporingRepository.lagreVarselbrevData(varselbrevSporing);
+        repositoryRule.getEntityManager().flush();
     }
 
 }

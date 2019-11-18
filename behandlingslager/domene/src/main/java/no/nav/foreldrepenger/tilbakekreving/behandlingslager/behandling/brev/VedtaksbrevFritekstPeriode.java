@@ -1,9 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev;
 
-import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
-import no.nav.vedtak.felles.jpa.BaseEntitet;
-import org.hibernate.annotations.JoinColumnOrFormula;
-import org.hibernate.annotations.JoinFormula;
+import java.util.Objects;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
@@ -16,11 +13,16 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import java.util.Objects;
 
-@Entity(name = "VedtaksbrevPeriode")
+import org.hibernate.annotations.JoinColumnOrFormula;
+import org.hibernate.annotations.JoinFormula;
+
+import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
+import no.nav.vedtak.felles.jpa.BaseEntitet;
+
+@Entity(name = "VedtaksbrevFritekstPeriode")
 @Table(name = "VEDTAKSBREV_PERIODE")
-public class VedtaksbrevPeriode extends BaseEntitet {
+public class VedtaksbrevFritekstPeriode extends BaseEntitet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_VEDTAKSBREV_PERIODE")
@@ -38,13 +40,13 @@ public class VedtaksbrevPeriode extends BaseEntitet {
 
     @ManyToOne(optional = false)
     @JoinColumnOrFormula(column = @JoinColumn(name = "FRITEKST_TYPE", referencedColumnName = "kode", nullable = false))
-    @JoinColumnOrFormula(formula = @JoinFormula(referencedColumnName = "kodeverk", value = "'" + FritekstType.DISCRIMINATOR + "'"))
-    private FritekstType fritekstType;
+    @JoinColumnOrFormula(formula = @JoinFormula(referencedColumnName = "kodeverk", value = "'" + VedtaksbrevFritekstType.DISCRIMINATOR + "'"))
+    private VedtaksbrevFritekstType fritekstType;
 
     @Column(name = "FRITEKST", nullable = false)
     private String fritekst;
 
-    public VedtaksbrevPeriode() {
+    public VedtaksbrevFritekstPeriode() {
     }
 
     public Long getId() {
@@ -72,11 +74,11 @@ public class VedtaksbrevPeriode extends BaseEntitet {
         this.periode = periode;
     }
 
-    public FritekstType getFritekstType() {
+    public VedtaksbrevFritekstType getFritekstType() {
         return fritekstType;
     }
 
-    public void setFritekstType(FritekstType fritekstType) {
+    public void setFritekstType(VedtaksbrevFritekstType fritekstType) {
         this.fritekstType = fritekstType;
     }
 
@@ -90,32 +92,32 @@ public class VedtaksbrevPeriode extends BaseEntitet {
 
     public static class Builder {
 
-        private VedtaksbrevPeriode vedtaksbrevPeriode = new VedtaksbrevPeriode();
+        private VedtaksbrevFritekstPeriode vedtaksbrevFritekstPeriode = new VedtaksbrevFritekstPeriode();
 
-        public VedtaksbrevPeriode.Builder medBehandlingId(Long behandlingId) {
-            vedtaksbrevPeriode.behandlingId = behandlingId;
+        public VedtaksbrevFritekstPeriode.Builder medBehandlingId(Long behandlingId) {
+            vedtaksbrevFritekstPeriode.behandlingId = behandlingId;
             return this;
         }
 
-        public VedtaksbrevPeriode.Builder medPeriode(Periode periode) {
-            vedtaksbrevPeriode.periode = periode;
+        public VedtaksbrevFritekstPeriode.Builder medPeriode(Periode periode) {
+            vedtaksbrevFritekstPeriode.periode = periode;
             return this;
         }
 
-        public VedtaksbrevPeriode.Builder medFritekstType(FritekstType fritekstType) {
-            vedtaksbrevPeriode.fritekstType = fritekstType;
+        public VedtaksbrevFritekstPeriode.Builder medFritekstType(VedtaksbrevFritekstType fritekstType) {
+            vedtaksbrevFritekstPeriode.fritekstType = fritekstType;
             return this;
         }
 
-        public VedtaksbrevPeriode.Builder medFritekst(String fritekst) {
-            vedtaksbrevPeriode.fritekst = fritekst;
+        public VedtaksbrevFritekstPeriode.Builder medFritekst(String fritekst) {
+            vedtaksbrevFritekstPeriode.fritekst = fritekst;
             return this;
         }
 
-        public VedtaksbrevPeriode build() {
-            Objects.requireNonNull(vedtaksbrevPeriode.behandlingId);
-            Objects.requireNonNull(vedtaksbrevPeriode.periode);
-            return vedtaksbrevPeriode;
+        public VedtaksbrevFritekstPeriode build() {
+            Objects.requireNonNull(vedtaksbrevFritekstPeriode.behandlingId);
+            Objects.requireNonNull(vedtaksbrevFritekstPeriode.periode);
+            return vedtaksbrevFritekstPeriode;
         }
     }
 }

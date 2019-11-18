@@ -65,7 +65,6 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
         mockPersoninfoAdapter);
 
     private ManueltVarselBrevTjeneste manueltVarselBrevTjeneste = new ManueltVarselBrevTjeneste(repositoryProvider,
-        brevdataRepository,
         mockEksternDataForBrevTjeneste,
         mockFeilutbetalingTjeneste,
         mockFritekstbrevTjeneste,
@@ -100,7 +99,7 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
         assertThat(varsel.getVarselBeløp()).isEqualTo(9000l);
         assertThat(varsel.isAktiv()).isTrue();
 
-        assertThat(brevdataRepository.harVarselBrevSendtForBehandlingId(behandlingId)).isTrue();
+        assertThat(varselbrevSporingRepository.harVarselBrevSendtForBehandlingId(behandlingId)).isTrue();
 
         List<Historikkinnslag> historikkInnslager = repositoryProvider.getHistorikkRepository().hentHistorikk(behandlingId);
         assertThat(historikkInnslager.size()).isEqualTo(1);
@@ -122,7 +121,7 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
         assertThat(varsel.getVarselBeløp()).isEqualTo(9000l);
         assertThat(varsel.isAktiv()).isTrue();
 
-        assertThat(brevdataRepository.harVarselBrevSendtForBehandlingId(behandlingId)).isTrue();
+        assertThat(varselbrevSporingRepository.harVarselBrevSendtForBehandlingId(behandlingId)).isTrue();
 
         List<Historikkinnslag> historikkInnslager = repositoryProvider.getHistorikkRepository().hentHistorikk(behandlingId);
         assertThat(historikkInnslager.size()).isEqualTo(2);

@@ -11,8 +11,8 @@ import org.junit.rules.ExpectedException;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevdataRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevdataRepositoryImpl;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VarselbrevSporingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
@@ -41,7 +41,8 @@ public class DokumentBestillerTestOppsett {
     protected final BehandlingRepository behandlingRepository = repositoryProvider.getBehandlingRepository();
     protected final KodeverkRepository kodeverkRepository = repositoryProvider.getKodeverkRepository();
     protected final EksternBehandlingRepository eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
-    protected final BrevdataRepository brevdataRepository = new BrevdataRepositoryImpl(entityManager);
+    protected final VedtaksbrevFritekstRepository vedtaksbrevFritekstRepository = new VedtaksbrevFritekstRepository(entityManager);
+    protected final VarselbrevSporingRepository varselbrevSporingRepository = new VarselbrevSporingRepository(entityManager);
 
 
     protected Fagsak fagsak;

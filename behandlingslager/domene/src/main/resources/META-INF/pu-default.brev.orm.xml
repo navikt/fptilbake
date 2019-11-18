@@ -10,8 +10,8 @@
     <sequence-generator name="SEQ_VARSEL" allocation-size="50" sequence-name="SEQ_VARSEL"/>
 
     <!-- fritekst vedtaksbrev -->
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevPeriode"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevOppsummering"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstPeriode"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstOppsummering"/>
 
     <!-- sporing -->
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VarselbrevSporing"/>

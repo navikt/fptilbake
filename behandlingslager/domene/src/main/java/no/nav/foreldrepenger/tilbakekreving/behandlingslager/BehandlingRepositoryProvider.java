@@ -2,7 +2,9 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager;
 
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevdataRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VarselbrevSporingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevSporingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLåsRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingresultatRepository;
@@ -50,6 +52,10 @@ public interface BehandlingRepositoryProvider {
 
     VarselRepository getVarselRepository();
 
-    BrevdataRepository getBrevdataRepository();
+    VedtaksbrevFritekstRepository getVedtaksbrevFritekstRepository();
+
+    VarselbrevSporingRepository getVarselbrevSporingRepository();
+
+    VedtaksbrevSporingRepository getVedtaksbrevSporingRepository();
 
 }

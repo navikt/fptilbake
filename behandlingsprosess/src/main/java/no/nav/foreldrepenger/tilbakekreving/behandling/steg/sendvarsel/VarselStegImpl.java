@@ -26,8 +26,10 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselInfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons.Varselrespons;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.SendVarselbrevTask;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.selvbetjening.SendBeskjedUtsendtVarselTilSelvbetjeningTask;
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.konfig.KonfigVerdi;
 import no.nav.vedtak.util.FPDateUtil;
@@ -99,9 +101,16 @@ public class VarselStegImpl implements VarselSteg {
     }
 
     private void opprettSendVarselTask(Behandling behandling) {
-        ProsessTaskData taskData = new ProsessTaskData(SendVarselbrevTask.TASKTYPE);
-        taskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
-        taskRepository.lagre(taskData);
+        ProsessTaskData sendVarselbrev = new ProsessTaskData(SendVarselbrevTask.TASKTYPE);
+        sendVarselbrev.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
+
+        ProsessTaskData sendBeskjedUtsendtVarsel = new ProsessTaskData(SendBeskjedUtsendtVarselTilSelvbetjeningTask.TASKTYPE);
+        sendBeskjedUtsendtVarsel.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
+
+        ProsessTaskGruppe taskGruppe = new ProsessTaskGruppe();
+        taskGruppe.addNesteSekvensiell(sendVarselbrev);
+        taskGruppe.addNesteSekvensiell(sendBeskjedUtsendtVarsel);
+        taskRepository.lagre(taskGruppe);
     }
 
     private boolean sjekkTilbakekrevingOpprettetUtenVarsel(Long behandlingId) {

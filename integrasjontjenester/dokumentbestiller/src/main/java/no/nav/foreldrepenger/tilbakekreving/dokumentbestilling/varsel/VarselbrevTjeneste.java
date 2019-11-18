@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel;
 
 import java.time.LocalDate;
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -14,8 +15,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositor
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevdataRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VarselbrevSporing;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VarselbrevSporingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
@@ -47,7 +48,7 @@ public class VarselbrevTjeneste {
 
     private BehandlingRepository behandlingRepository;
     private EksternBehandlingRepository eksternBehandlingRepository;
-    private BrevdataRepository brevdataRepository;
+    private VarselbrevSporingRepository  varselbrevSporingRepository;
     private VarselRepository varselRepository;
 
     private EksternDataForBrevTjeneste eksternDataForBrevTjeneste;
@@ -58,7 +59,6 @@ public class VarselbrevTjeneste {
 
     @Inject
     public VarselbrevTjeneste(BehandlingRepositoryProvider repositoryProvider,
-                              BrevdataRepository brevdataRepository,
                               EksternDataForBrevTjeneste eksternDataForBrevTjeneste,
                               BehandlingTjeneste behandlingTjeneste,
                               FritekstbrevTjeneste bestillDokumentTjeneste,
@@ -66,25 +66,24 @@ public class VarselbrevTjeneste {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
         this.varselRepository = repositoryProvider.getVarselRepository();
-        this.brevdataRepository = brevdataRepository;
+        this.varselbrevSporingRepository = repositoryProvider.getVarselbrevSporingRepository();
 
         this.eksternDataForBrevTjeneste = eksternDataForBrevTjeneste;
         this.behandlingTjeneste = behandlingTjeneste;
         this.bestillDokumentTjeneste = bestillDokumentTjeneste;
         this.historikkinnslagTjeneste = historikkinnslagTjeneste;
-
     }
 
     public VarselbrevTjeneste() {
     }
 
-    public void sendVarselbrev(Long behandlingId) {
+    public Optional<JournalpostIdOgDokumentId> sendVarselbrev(Long behandlingId) {
         VarselbrevSamletInfo varselbrevSamletInfo = lagVarselbrevForSending(behandlingId);
         if (varselbrevSamletInfo.getFritekstFraSaksbehandler() == null || varselbrevSamletInfo.getFritekstFraSaksbehandler().isEmpty()) {
             LocalDate estimertSluttPåPrøveperiode = LocalDate.of(2019, 12, 1);
             if (LocalDate.now().isBefore(estimertSluttPåPrøveperiode)) {
                 logger.info("Sendte ikke varselbrev for behandlingId={} siden saksbehandler ikke har skrevet fritekst (påkrevet). Dette er OK i prøveperioden.", behandlingId);
-                return;
+                return Optional.empty();
             } else {
                 throw new IllegalStateException("Mangler fritekst i varselbrevet for behandling=" + behandlingId);
             }
@@ -102,6 +101,7 @@ public class VarselbrevTjeneste {
         JournalpostIdOgDokumentId dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data);
         opprettHistorikkinnslag(behandling, dokumentreferanse);
         lagreInfoOmVarselbrev(behandlingId, dokumentreferanse);
+        return Optional.of(dokumentreferanse);
     }
 
     public byte[] hentForhåndsvisningVarselbrev(HentForhåndsvisningVarselbrevDto hentForhåndsvisningVarselbrevDto) {
@@ -135,7 +135,7 @@ public class VarselbrevTjeneste {
             .medDokumentId(dokumentreferanse.getDokumentId())
             .medJournalpostId(dokumentreferanse.getJournalpostId())
             .build();
-        brevdataRepository.lagreVarselbrevData(varselbrevSporing);
+        varselbrevSporingRepository.lagreVarselbrevData(varselbrevSporing);
     }
 
     private VarselbrevSamletInfo lagVarselbrevForSending(Long behandlingId) {
@@ -163,7 +163,7 @@ public class VarselbrevTjeneste {
 
         VarselInfo varselInfo = varselRepository.finnEksaktVarsel(behandlingId);
         String varselTekst = varselInfo.getVarselTekst();
-        lagreVarseltBeløp(behandlingId,feilutbetaltePerioderDto.getSumFeilutbetaling());
+        lagreVarseltBeløp(behandlingId, feilutbetaltePerioderDto.getSumFeilutbetaling());
 
         return VarselbrevUtil.sammenstillInfoFraFagsystemerForSending(
             eksternBehandlingsinfoDto,
@@ -198,7 +198,7 @@ public class VarselbrevTjeneste {
             ytelseNavn);
     }
 
-    private void lagreVarseltBeløp(Long behandlingId,Long varseltBeløp){
-        varselRepository.lagreVarseltBeløp(behandlingId,varseltBeløp);
+    private void lagreVarseltBeløp(Long behandlingId, Long varseltBeløp) {
+        varselRepository.lagreVarseltBeløp(behandlingId, varseltBeløp);
     }
 }

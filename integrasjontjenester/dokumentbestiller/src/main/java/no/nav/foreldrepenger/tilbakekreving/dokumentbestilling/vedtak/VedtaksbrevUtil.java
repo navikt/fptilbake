@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.FritekstType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VarselbrevSporing;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevPeriode;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstPeriode;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstType;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.PeriodeMedTekstDto;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.vedtak.felles.jpa.BaseEntitet;
@@ -24,9 +24,9 @@ public class VedtaksbrevUtil {
             .max(LocalDateTime::compareTo);
     }
 
-    public static List<PeriodeMedTekstDto> mapFritekstFraDb(List<VedtaksbrevPeriode> fritekstPerioder) {
+    public static List<PeriodeMedTekstDto> mapFritekstFraDb(List<VedtaksbrevFritekstPeriode> fritekstPerioder) {
         List<PeriodeMedTekstDto> resultat = new ArrayList<>();
-        for (VedtaksbrevPeriode fritekstPeriode : fritekstPerioder) {
+        for (VedtaksbrevFritekstPeriode fritekstPeriode : fritekstPerioder) {
             Optional<PeriodeMedTekstDto> periodeMedTekstOptional = finnOpprettetPeriode(resultat, fritekstPeriode.getPeriode());
             PeriodeMedTekstDto periodeMedTekst;
             if (periodeMedTekstOptional.isPresent()) {
@@ -38,15 +38,15 @@ public class VedtaksbrevUtil {
                 resultat.add(periodeMedTekst);
             }
 
-            FritekstType fritekstType = fritekstPeriode.getFritekstType();
+            VedtaksbrevFritekstType fritekstType = fritekstPeriode.getFritekstType();
             String fritekst = fritekstPeriode.getFritekst();
-            if (FritekstType.FAKTA_AVSNITT.equals(fritekstType)) {
+            if (VedtaksbrevFritekstType.FAKTA_AVSNITT.equals(fritekstType)) {
                 periodeMedTekst.setFaktaAvsnitt(fritekst);
-            } else if (FritekstType.VILKAAR_AVSNITT.equals(fritekstType)) {
+            } else if (VedtaksbrevFritekstType.VILKAAR_AVSNITT.equals(fritekstType)) {
                 periodeMedTekst.setVilkårAvsnitt(fritekst);
-            } else if (FritekstType.SAERLIGE_GRUNNER_AVSNITT.equals(fritekstType)) {
+            } else if (VedtaksbrevFritekstType.SAERLIGE_GRUNNER_AVSNITT.equals(fritekstType)) {
                 periodeMedTekst.setSærligeGrunnerAvsnitt(fritekst);
-            } else if (FritekstType.SAERLIGE_GRUNNER_ANNET_AVSNITT.equals(fritekstType)) {
+            } else if (VedtaksbrevFritekstType.SAERLIGE_GRUNNER_ANNET_AVSNITT.equals(fritekstType)) {
                 periodeMedTekst.setSærligeGrunnerAnnetAvsnitt(fritekst);
             } else {
                 throw new IllegalArgumentException("Utvikler-feil: mangler håndtering for fritekstType:" + fritekstType);

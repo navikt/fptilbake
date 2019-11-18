@@ -15,11 +15,10 @@ import org.junit.rules.ExpectedException;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevdataRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevdataRepositoryImpl;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.FritekstType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevOppsummering;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevPeriode;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstOppsummering;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstPeriode;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryImpl;
@@ -51,9 +50,9 @@ public class VedtaksbrevFritekstTjenesteTest {
 
     private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository = new FaktaFeilutbetalingRepository(repoRule.getEntityManager());
     private VilkårsvurderingRepository vilkårsvurderingRepository = new VilkårsvurderingRepository(repoRule.getEntityManager());
-    private BrevdataRepository brevdataRepository = new BrevdataRepositoryImpl(repoRule.getEntityManager());
+    private VedtaksbrevFritekstRepository vedtaksbrevFritekstRepository = new VedtaksbrevFritekstRepository(repoRule.getEntityManager());
 
-    private VedtaksbrevFritekstTjeneste tjeneste = new VedtaksbrevFritekstTjeneste(faktaFeilutbetalingRepository, vilkårsvurderingRepository, brevdataRepository);
+    private VedtaksbrevFritekstTjeneste tjeneste = new VedtaksbrevFritekstTjeneste(faktaFeilutbetalingRepository, vilkårsvurderingRepository, vedtaksbrevFritekstRepository);
 
     private LocalDate jan1 = LocalDate.of(2019, 1, 1);
     private LocalDate jan2 = LocalDate.of(2019, 1, 2);
@@ -83,15 +82,16 @@ public class VedtaksbrevFritekstTjenesteTest {
             .build());
         faktaFeilutbetalingRepository.lagre(behandlingId, fakta);
 
-        VedtaksbrevOppsummering oppsummering = new VedtaksbrevOppsummering.Builder().medBehandlingId(behandlingId).build();
-        List<VedtaksbrevPeriode> fritekstperioder = Arrays.asList(
-            new VedtaksbrevPeriode.Builder().medBehandlingId(behandlingId).medFritekst("foo").medFritekstType(FritekstType.FAKTA_AVSNITT).medPeriode(Periode.of(jan1, jan2)).build(),
-            new VedtaksbrevPeriode.Builder().medBehandlingId(behandlingId).medFritekst("foo").medFritekstType(FritekstType.FAKTA_AVSNITT).medPeriode(Periode.of(jan3, jan24)).build()
+        VedtaksbrevFritekstOppsummering oppsummering = new VedtaksbrevFritekstOppsummering.Builder().medBehandlingId(behandlingId).build();
+        List<VedtaksbrevFritekstPeriode> fritekstperioder = Arrays.asList(
+            new VedtaksbrevFritekstPeriode.Builder().medBehandlingId(behandlingId).medFritekst("foo").medFritekstType(VedtaksbrevFritekstType.FAKTA_AVSNITT).medPeriode(Periode.of(jan1, jan2)).build(),
+            new VedtaksbrevFritekstPeriode.Builder().medBehandlingId(behandlingId).medFritekst("foo").medFritekstType(VedtaksbrevFritekstType.FAKTA_AVSNITT).medPeriode(Periode.of(jan3, jan24)).build()
         );
 
         tjeneste.lagreFriteksterFraSaksbehandler(behandlingId, oppsummering, fritekstperioder);
+        repoRule.getEntityManager().flush();
 
-        List<VedtaksbrevPeriode> fritekster = brevdataRepository.hentVedtaksbrevPerioderMedTekst(behandlingId);
+        List<VedtaksbrevFritekstPeriode> fritekster = vedtaksbrevFritekstRepository.hentVedtaksbrevPerioderMedTekst(behandlingId);
         assertThat(fritekster).hasSize(2);
         assertThat(fritekster.get(0).getFritekst()).isEqualTo("foo");
         assertThat(fritekster.get(1).getFritekst()).isEqualTo("foo");
@@ -109,8 +109,8 @@ public class VedtaksbrevFritekstTjenesteTest {
             .build());
         faktaFeilutbetalingRepository.lagre(behandlingId, fakta);
 
-        VedtaksbrevOppsummering oppsummering = new VedtaksbrevOppsummering.Builder().medBehandlingId(behandlingId).build();
-        List<VedtaksbrevPeriode> fritekstperioder = Collections.emptyList();
+        VedtaksbrevFritekstOppsummering oppsummering = new VedtaksbrevFritekstOppsummering.Builder().medBehandlingId(behandlingId).build();
+        List<VedtaksbrevFritekstPeriode> fritekstperioder = Collections.emptyList();
         expectedException.expectMessage("Ugyldig input: Når ANNET er valgt er fritekst påkrevet. Mangler for periode Periode[2019-01-01,2019-01-24] og avsnitt FAKTA_AVSNITT");
         tjeneste.lagreFriteksterFraSaksbehandler(behandlingId, oppsummering, fritekstperioder);
     }
@@ -127,9 +127,9 @@ public class VedtaksbrevFritekstTjenesteTest {
             .build());
         faktaFeilutbetalingRepository.lagre(behandlingId, fakta);
 
-        VedtaksbrevOppsummering oppsummering = new VedtaksbrevOppsummering.Builder().medBehandlingId(behandlingId).build();
-        List<VedtaksbrevPeriode> fritekstperioder = Collections.singletonList(
-            new VedtaksbrevPeriode.Builder().medBehandlingId(behandlingId).medFritekst("foo").medFritekstType(FritekstType.FAKTA_AVSNITT).medPeriode(Periode.of(jan1, jan3)).build()
+        VedtaksbrevFritekstOppsummering oppsummering = new VedtaksbrevFritekstOppsummering.Builder().medBehandlingId(behandlingId).build();
+        List<VedtaksbrevFritekstPeriode> fritekstperioder = Collections.singletonList(
+            new VedtaksbrevFritekstPeriode.Builder().medBehandlingId(behandlingId).medFritekst("foo").medFritekstType(VedtaksbrevFritekstType.FAKTA_AVSNITT).medPeriode(Periode.of(jan1, jan3)).build()
         );
 
         expectedException.expectMessage("Ugyldig input: Når ANNET er valgt er fritekst påkrevet. Mangler for periode Periode[2019-01-04,2019-01-24] og avsnitt FAKTA_AVSNITT");
@@ -149,10 +149,10 @@ public class VedtaksbrevFritekstTjenesteTest {
             .build());
         faktaFeilutbetalingRepository.lagre(behandlingId, fakta);
 
-        VedtaksbrevOppsummering oppsummering = new VedtaksbrevOppsummering.Builder().medBehandlingId(behandlingId).build();
-        List<VedtaksbrevPeriode> fritekstperioder = Arrays.asList(
-            new VedtaksbrevPeriode.Builder().medBehandlingId(behandlingId).medFritekst("foo").medFritekstType(FritekstType.FAKTA_AVSNITT).medPeriode(Periode.of(jan1, jan1)).build(),
-            new VedtaksbrevPeriode.Builder().medBehandlingId(behandlingId).medFritekst("foo").medFritekstType(FritekstType.FAKTA_AVSNITT).medPeriode(Periode.of(jan3, jan24)).build()
+        VedtaksbrevFritekstOppsummering oppsummering = new VedtaksbrevFritekstOppsummering.Builder().medBehandlingId(behandlingId).build();
+        List<VedtaksbrevFritekstPeriode> fritekstperioder = Arrays.asList(
+            new VedtaksbrevFritekstPeriode.Builder().medBehandlingId(behandlingId).medFritekst("foo").medFritekstType(VedtaksbrevFritekstType.FAKTA_AVSNITT).medPeriode(Periode.of(jan1, jan1)).build(),
+            new VedtaksbrevFritekstPeriode.Builder().medBehandlingId(behandlingId).medFritekst("foo").medFritekstType(VedtaksbrevFritekstType.FAKTA_AVSNITT).medPeriode(Periode.of(jan3, jan24)).build()
         );
 
         expectedException.expectMessage("Ugyldig input: Når ANNET er valgt er fritekst påkrevet. Mangler for periode Periode[2019-01-02,2019-01-02] og avsnitt FAKTA_AVSNITT");

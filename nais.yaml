@@ -89,6 +89,8 @@ fasitResources:
         url: BOOTSTRAP_SERVERS
     - alias: fp-tilkjentytelse-v1-topic
       resourceType: baseUrl
+    - alias: tilbakekreving-brukerdialog-hendelse-v1-topic
+      resourceType: baseUrl
   # Køer
     - alias: mqGateway02
       resourceType: queuemanager
