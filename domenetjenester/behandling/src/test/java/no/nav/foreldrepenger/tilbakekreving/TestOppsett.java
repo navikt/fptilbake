@@ -36,6 +36,7 @@ import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.TpsTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.SlettGrunnlagEventPubliserer;
 import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkInnslagKonverter;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
@@ -58,6 +59,7 @@ public class TestOppsett {
     protected HistorikkinnslagTjeneste mockHistorikkTjeneste = mock(HistorikkinnslagTjeneste.class);
     protected FpsakKlient mockFpsakKlient = mock(FpsakKlient.class);
     protected JournalConsumer mockJournalConsumer = mock(JournalConsumerImpl.class);
+    protected SlettGrunnlagEventPubliserer mockSlettGrunnlagEventPubliserer = mock(SlettGrunnlagEventPubliserer.class);
 
     protected BehandlingskontrollProvider behandlingskontrollProvider = new BehandlingskontrollProvider(behandlingskontrollTjeneste, behandlingskontrollAsynkTjeneste);
 
@@ -72,7 +74,7 @@ public class TestOppsett {
     protected TotrinnRepository totrinnRepository = new TotrinnRepository(em);
     protected BehandlingRepository behandlingRepository = repoProvider.getBehandlingRepository();
     protected VarselRepository varselRepository = repoProvider.getVarselRepository();
-    protected KravgrunnlagTjeneste kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repoProvider, gjenopptaBehandlingTjeneste, behandlingskontrollTjeneste);
+    protected KravgrunnlagTjeneste kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repoProvider, gjenopptaBehandlingTjeneste, behandlingskontrollTjeneste,mockSlettGrunnlagEventPubliserer);
     protected KravgrunnlagBeregningTjeneste kravgrunnlagBeregningTjeneste = new KravgrunnlagBeregningTjeneste(grunnlagRepository);
 
     protected HistorikkInnslagKonverter historikkInnslagKonverter = new HistorikkInnslagKonverter(repoProvider.getKodeverkRepository(),

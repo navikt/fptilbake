@@ -13,8 +13,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
+import javax.inject.Inject;
+
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjeneste;
@@ -34,17 +37,24 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagBelop433;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.SlettGrunnlagEventPubliserer;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
+import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
+@RunWith(CdiRunner.class)
 public class KravgrunnlagTjenesteTest extends FellesTestOppsett {
 
     private static final String SSN = "11112222333";
     private static final String ENHET = "8020";
 
     private GjenopptaBehandlingTjeneste mockGjenopptaBehandlingTjeneste = mock(GjenopptaBehandlingTjeneste.class);
-    private KravgrunnlagTjeneste kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repoProvider, mockGjenopptaBehandlingTjeneste, behandlingskontrollTjeneste);
+
+    @Inject
+    private SlettGrunnlagEventPubliserer eventPubliserer;
+
+    private KravgrunnlagTjeneste kravgrunnlagTjeneste;
 
     private static final LocalDate fom = LocalDate.of(2016, 3, 15);
     private static final LocalDate tom = LocalDate.of(2016, 3, 18);
@@ -53,6 +63,7 @@ public class KravgrunnlagTjenesteTest extends FellesTestOppsett {
     public void setup() {
         when(mockTpsTjeneste.hentAktørForFnr(new PersonIdent(SSN))).thenReturn(Optional.of(aktørId));
         when(behandlingskontrollTjeneste.erStegPassert(any(Behandling.class), any(BehandlingStegType.class))).thenReturn(true);
+        kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repoProvider, mockGjenopptaBehandlingTjeneste, behandlingskontrollTjeneste,eventPubliserer);
     }
 
     @Test

@@ -84,6 +84,10 @@ public class Totrinnsvurdering extends BaseEntitet {
         return aktiv;
     }
 
+    public void disable(){
+        this.aktiv = false;
+    }
+
     public Behandling getBehandling() {
         return behandling;
     }

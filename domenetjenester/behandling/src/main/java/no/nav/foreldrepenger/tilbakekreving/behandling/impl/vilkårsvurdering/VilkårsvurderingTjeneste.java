@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
 import org.apache.cxf.common.util.CollectionUtils;
@@ -45,6 +46,7 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagBelop433;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.SlettGrunnlagEvent;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.vedtak.felles.jpa.Transaction;
 
@@ -142,6 +144,10 @@ public class VilkårsvurderingTjeneste {
             }
         }
         return perioder;
+    }
+
+    public void slettGammelVilkårData(@Observes SlettGrunnlagEvent slettGrunnlagEvent){
+        vilkårsvurderingRepository.slettVilkårsvurdering(slettGrunnlagEvent.getBehandlingId());
     }
 
     private List<DetaljertFeilutbetalingPeriodeDto> henteFeilutbetalingPerioderFraForeldelse(Long behandlingId, List<FaktaFeilutbetalingPeriode> faktaFeilutbetalingPerioder) {
