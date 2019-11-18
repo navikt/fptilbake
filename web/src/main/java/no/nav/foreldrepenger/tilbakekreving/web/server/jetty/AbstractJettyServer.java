@@ -1,7 +1,13 @@
 package no.nav.foreldrepenger.tilbakekreving.web.server.jetty;
 
-import no.nav.vedtak.sikkerhet.context.SubjectHandler;
-import no.nav.vedtak.sikkerhetsfilter.SecurityFilter;
+import java.io.File;
+import java.io.IOException;
+import java.security.Security;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.security.auth.message.config.AuthConfigFactory;
+
 import org.apache.geronimo.components.jaspi.AuthConfigFactoryImpl;
 import org.eclipse.jetty.annotations.AnnotationConfiguration;
 import org.eclipse.jetty.jaas.JAASLoginService;
@@ -12,19 +18,20 @@ import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.DefaultIdentityService;
 import org.eclipse.jetty.security.SecurityHandler;
 import org.eclipse.jetty.security.jaspi.JaspiAuthenticatorFactory;
-import org.eclipse.jetty.server.*;
+import org.eclipse.jetty.server.AbstractNetworkConnector;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.webapp.Configuration;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.jetty.webapp.WebInfConfiguration;
 import org.eclipse.jetty.webapp.WebXmlConfiguration;
 
-import javax.security.auth.message.config.AuthConfigFactory;
-import java.io.File;
-import java.io.IOException;
-import java.security.Security;
-import java.util.ArrayList;
-import java.util.List;
+import no.nav.vedtak.sikkerhet.context.SubjectHandler;
+import no.nav.vedtak.sikkerhetsfilter.SecurityFilter;
 
 abstract class AbstractJettyServer {
 
@@ -133,7 +140,7 @@ abstract class AbstractJettyServer {
         webAppContext.setBaseResource(createResourceCollection());
         webAppContext.setContextPath(appKonfigurasjon.getContextPath());
         webAppContext.setConfigurations(CONFIGURATIONS);
-        webAppContext.setAttribute("org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern", "^.*resteasy-.*.jar$|^.*felles-.*.jar$");
+        webAppContext.setAttribute("org.eclipse.jetty.server.webapp.WebInfIncludeJarPattern", "^.*resteasy-.*.jar$|^.*felles-.*.jar$");
         webAppContext.setSecurityHandler(createSecurityHandler());
 
         return webAppContext;
