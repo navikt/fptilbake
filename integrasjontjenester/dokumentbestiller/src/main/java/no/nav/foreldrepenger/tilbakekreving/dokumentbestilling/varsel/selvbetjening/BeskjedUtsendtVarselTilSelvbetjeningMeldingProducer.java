@@ -20,6 +20,7 @@ import org.apache.kafka.common.serialization.StringSerializer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -42,6 +43,7 @@ public class BeskjedUtsendtVarselTilSelvbetjeningMeldingProducer {
         OM.registerModule(new JavaTimeModule());
         OM.registerModule(new Jdk8Module());
         OM.registerModule(new SimpleModule());
+        OM.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
 
     private Producer<String, String> producer;
