@@ -72,7 +72,6 @@ public class VarselbrevTjeneste {
         this.behandlingTjeneste = behandlingTjeneste;
         this.bestillDokumentTjeneste = bestillDokumentTjeneste;
         this.historikkinnslagTjeneste = historikkinnslagTjeneste;
-        this.brevdataRepository = brevdataRepository;
     }
 
     public VarselbrevTjeneste() {
