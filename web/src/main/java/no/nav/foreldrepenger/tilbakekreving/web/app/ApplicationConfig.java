@@ -27,6 +27,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.Vilkår
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.AksjonspunktRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.dokument.DokumentRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.feilutbetaling.FeilutbetalingÅrsakRestTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.fordelling.FordelRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.historikk.HistorikkRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.kodeverk.KodeverkRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.konfig.KonfigRestTjeneste;
@@ -88,6 +89,7 @@ public class ApplicationConfig extends Application {
         classes.add(TilbakekrevingResulattRestTjeneste.class);
         classes.add(TotrinnskontrollRestTjeneste.class);
         classes.add(BrevRestTjeneste.class);
+        classes.add(FordelRestTjeneste.class);
 
         //HAXX GrunnlagRestTjenesteTest skal bare være tilgjengelig for lokal utvikling, brukes for å sette opp test
         //hvis denne legges til i en egen Application isdf i denne, kan man ikke bruke swagger for å nå tjenesten
