@@ -36,7 +36,7 @@ public class FordelRestTjeneste {
 
     private static final Logger logger = LoggerFactory.getLogger(FordelRestTjeneste.class);
 
-    private static final String UTTALSE_TILBAKEKREVING_DOKUMENT_TYPE_ID = "I000114";
+    public static final String UTTALSE_TILBAKEKREVING_DOKUMENT_TYPE_ID = "I000114";
 
     private BehandlingRepository behandlingRepository;
     private GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste;
