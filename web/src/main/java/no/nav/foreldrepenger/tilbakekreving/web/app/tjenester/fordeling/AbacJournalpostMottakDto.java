@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.fordelling;
+package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.fordeling;
 
 import java.time.LocalDateTime;
 

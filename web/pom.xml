@@ -65,10 +65,6 @@
             <groupId>no.nav.foreldrepenger.felles</groupId>
             <artifactId>felles-util</artifactId>
         </dependency>
-        <dependency>
-            <groupId>no.nav.foreldrepenger.kontrakter</groupId>
-            <artifactId>fordel-v1</artifactId>
-        </dependency>
 
         <!-- REST + WebService -->
         <dependency>
@@ -251,7 +247,6 @@
         <dependency>
             <groupId>no.nav.foreldrepenger.kontrakter</groupId>
             <artifactId>fordel-v1</artifactId>
-            <version>5.0_20191031073150_c3b9f11</version>
         </dependency>
     </dependencies>
 

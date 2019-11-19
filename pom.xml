@@ -320,6 +320,11 @@
                 <artifactId>fp-tilkjent-ytelse-v1</artifactId>
                 <version>${fpkontrakter.version}</version>
             </dependency>
+            <dependency>
+                <groupId>no.nav.foreldrepenger.kontrakter</groupId>
+                <artifactId>fordel-v1</artifactId>
+                <version>${fpkontrakter.version}</version>
+            </dependency>
 
             <!-- Felles integrasjon biblioteker -->
             <dependency>

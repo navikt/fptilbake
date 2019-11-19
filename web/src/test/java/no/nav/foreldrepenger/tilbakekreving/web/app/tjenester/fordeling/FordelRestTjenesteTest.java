@@ -1,6 +1,6 @@
-package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.fordelling;
+package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.fordeling;
 
-import static no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.fordelling.FordelRestTjeneste.UTTALSE_TILBAKEKREVING_DOKUMENT_TYPE_ID;
+import static no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.fordeling.FordelRestTjeneste.UTTALSE_TILBAKEKREVING_DOKUMENT_TYPE_ID;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
