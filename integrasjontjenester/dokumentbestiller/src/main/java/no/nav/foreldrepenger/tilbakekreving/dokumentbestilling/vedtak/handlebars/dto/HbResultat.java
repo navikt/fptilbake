@@ -19,6 +19,9 @@ public class HbResultat {
     @JsonProperty("renter-beløp")
     @JsonSerialize(using = BigDecimalHeltallSerialiserer.class)
     private BigDecimal renterBeløp;
+    @JsonProperty("foreldet-beløp")
+    @JsonSerialize(using = BigDecimalHeltallSerialiserer.class)
+    private BigDecimal foreldetBeløp;
 
     private HbResultat() {
     }
@@ -44,6 +47,11 @@ public class HbResultat {
 
         public HbResultat.Builder medRenterBeløp(BigDecimal renterBeløp) {
             kladd.renterBeløp = renterBeløp;
+            return this;
+        }
+
+        public HbResultat.Builder medForeldetBeløp(BigDecimal foreldetBeløp) {
+            kladd.foreldetBeløp = foreldetBeløp;
             return this;
         }
 

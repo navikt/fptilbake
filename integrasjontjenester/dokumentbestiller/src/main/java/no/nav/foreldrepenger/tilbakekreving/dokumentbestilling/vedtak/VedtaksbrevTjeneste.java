@@ -38,8 +38,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelse
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselInfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
@@ -291,25 +289,38 @@ public class VedtaksbrevTjeneste {
 
     private HbVedtaksbrevPeriode lagBrevdataPeriode(BeregningResultatPeriode resultatPeriode, FaktaFeilutbetaling fakta, List<VilkårVurderingPeriodeEntitet> vilkårPerioder, VurdertForeldelse foreldelse, List<PeriodeMedTekstDto> perioderFritekst) {
         Periode periode = resultatPeriode.getPeriode();
-        PeriodeMedTekstDto fritekst = finnPeriodeFritekster(periode, perioderFritekst);
+        PeriodeMedTekstDto fritekster = finnPeriodeFritekster(periode, perioderFritekst);
 
         return HbVedtaksbrevPeriode.builder()
             .medPeriode(periode)
-            .medFakta(utledFakta(periode, fakta, fritekst))
-            .medVurderinger(utledVurderinger(resultatPeriode, vilkårPerioder, foreldelse, fritekst))
-            .medKravgrunnlag(HbKravgrunnlag.builder()
-                .medFeilutbetaltBeløp(resultatPeriode.getFeilutbetaltBeløp())
-                .medRiktigBeløp(resultatPeriode.getRiktigYtelseBeløp())
-                .medUtbetaltBeløp(resultatPeriode.getUtbetaltYtelseBeløp())
-                .build())
-            .medResultat(HbResultat.builder()
-                .medTilbakekrevesBeløp(resultatPeriode.getTilbakekrevingBeløpUtenRenter())
-                .medRenterBeløp(resultatPeriode.getRenteBeløp())
-                .build()).build();
+            .medKravgrunnlag(utledKravgrunnlag(resultatPeriode))
+            .medFakta(utledFakta(periode, fakta, fritekster))
+            .medVurderinger(utledVurderinger(periode, vilkårPerioder, foreldelse, fritekster))
+            .medResultat(utledResultat(resultatPeriode, foreldelse)).build();
     }
 
-    private HbVurderinger utledVurderinger(BeregningResultatPeriode resultatPeriode, List<VilkårVurderingPeriodeEntitet> vilkårPerioder, VurdertForeldelse foreldelse, PeriodeMedTekstDto fritekst) {
-        Periode periode = resultatPeriode.getPeriode();
+    private HbKravgrunnlag utledKravgrunnlag(BeregningResultatPeriode resultatPeriode) {
+        return HbKravgrunnlag.builder()
+            .medFeilutbetaltBeløp(resultatPeriode.getFeilutbetaltBeløp())
+            .medRiktigBeløp(resultatPeriode.getRiktigYtelseBeløp())
+            .medUtbetaltBeløp(resultatPeriode.getUtbetaltYtelseBeløp())
+            .build();
+    }
+
+    private HbFakta utledFakta(Periode periode, FaktaFeilutbetaling fakta, PeriodeMedTekstDto fritekst) {
+        for (FaktaFeilutbetalingPeriode faktaPeriode : fakta.getFeilutbetaltPerioder()) {
+            if (faktaPeriode.getPeriode().omslutter(periode)) {
+                return HbFakta.builder()
+                    .medHendelsetype(faktaPeriode.getHendelseType())
+                    .medHendelseUndertype(faktaPeriode.getHendelseUndertype())
+                    .medFritekstFakta(fritekst != null ? fritekst.getFaktaAvsnitt() : null)
+                    .build();
+            }
+        }
+        throw new IllegalArgumentException("Fant ikke fakta-periode som omslutter periode " + periode);
+    }
+
+    private HbVurderinger utledVurderinger(Periode periode, List<VilkårVurderingPeriodeEntitet> vilkårPerioder, VurdertForeldelse foreldelse, PeriodeMedTekstDto fritekst) {
         HbVurderinger.Builder builder = HbVurderinger.builder()
             .medFritekstVilkår(fritekst != null ? fritekst.getVilkårAvsnitt() : null);
 
@@ -342,13 +353,25 @@ public class VedtaksbrevTjeneste {
         if (foreldelsePeriode != null) {
             if (foreldelsePeriode.erForeldet()) {
                 builder.medAktsomhetResultat(AnnenVurdering.FORELDET);
-                builder.medForeldetBeløp(resultatPeriode.getFeilutbetaltBeløp().subtract(resultatPeriode.getTilbakekrevingBeløp()));
             }
             builder.medForeldelsevurdering(foreldelsePeriode.getForeldelseVurderingType());
         } else {
             builder.medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT);
         }
 
+        return builder.build();
+    }
+
+    private HbResultat utledResultat(BeregningResultatPeriode resultatPeriode, VurdertForeldelse foreldelse) {
+        HbResultat.Builder builder = HbResultat.builder()
+            .medTilbakekrevesBeløp(resultatPeriode.getTilbakekrevingBeløpUtenRenter())
+            .medRenterBeløp(resultatPeriode.getRenteBeløp());
+
+        VurdertForeldelsePeriode foreldelsePeriode = finnForeldelsePeriode(foreldelse, resultatPeriode.getPeriode());
+        boolean foreldetPeriode = foreldelsePeriode != null && foreldelsePeriode.erForeldet();
+        if (foreldetPeriode) {
+            builder.medForeldetBeløp(resultatPeriode.getFeilutbetaltBeløp().subtract(resultatPeriode.getTilbakekrevingBeløp()));
+        }
         return builder.build();
     }
 
@@ -367,7 +390,6 @@ public class VedtaksbrevTjeneste {
             .orElseThrow(() -> new IllegalArgumentException("Fant ikke VurdertForeldelse-periode som omslutter periode " + periode));
     }
 
-
     private PeriodeMedTekstDto finnPeriodeFritekster(Periode periode, List<PeriodeMedTekstDto> perioder) {
         for (PeriodeMedTekstDto fritekstPeriode : perioder) {
             if (fritekstPeriode.getPeriode().equals(periode)) {
@@ -384,37 +406,6 @@ public class VedtaksbrevTjeneste {
             }
         }
         return null; //skjer ved foreldet periode
-    }
-
-    private HendelseType utledFakta(Periode periode, FaktaFeilutbetaling fakta) {
-        for (FaktaFeilutbetalingPeriode faktaPeriode : fakta.getFeilutbetaltPerioder()) {
-            if (faktaPeriode.getPeriode().omslutter(periode)) {
-                return faktaPeriode.getHendelseType();
-            }
-        }
-        throw new IllegalArgumentException("Fant ikke fakta-periode som omslutter periode " + periode);
-    }
-
-    private HbFakta utledFakta(Periode periode, FaktaFeilutbetaling fakta, PeriodeMedTekstDto fritekst) {
-        for (FaktaFeilutbetalingPeriode faktaPeriode : fakta.getFeilutbetaltPerioder()) {
-            if (faktaPeriode.getPeriode().omslutter(periode)) {
-                return HbFakta.builder()
-                    .medHendelsetype(faktaPeriode.getHendelseType())
-                    .medHendelseUndertype(faktaPeriode.getHendelseUndertype())
-                    .medFritekstFakta(fritekst != null ? fritekst.getFaktaAvsnitt() : null)
-                    .build();
-            }
-        }
-        throw new IllegalArgumentException("Fant ikke fakta-periode som omslutter periode " + periode);
-    }
-
-    private HendelseUnderType finnHendelseUnderType(Periode periode, FaktaFeilutbetaling fakta) {
-        for (FaktaFeilutbetalingPeriode faktaPeriode : fakta.getFeilutbetaltPerioder()) {
-            if (faktaPeriode.getPeriode().omslutter(periode)) {
-                return faktaPeriode.getHendelseUndertype();
-            }
-        }
-        throw new IllegalArgumentException("Fant ikke fakta-periode som omslutter periode " + periode);
     }
 
     private List<PeriodeMedTekstDto> hentFriteksterTilPerioder(Long behandlingId) {

@@ -34,9 +34,6 @@ public class HbVurderinger {
     @JsonSerialize(using = KodelisteSomKodeSerialiserer.class)
     @JsonProperty("foreldelsevurdering")
     private ForeldelseVurderingType foreldelsevurdering;
-    @JsonProperty("foreldet-beløp")
-    @JsonSerialize(using = BigDecimalHeltallSerialiserer.class)
-    private BigDecimal foreldetBeløp;
 
     @JsonProperty("beløp-i-behold")
     @JsonSerialize(using = BigDecimalHeltallSerialiserer.class)
@@ -86,11 +83,6 @@ public class HbVurderinger {
 
         public HbVurderinger.Builder medForeldelsevurdering(ForeldelseVurderingType foreldelsevurdering) {
             kladd.foreldelsevurdering = foreldelsevurdering;
-            return this;
-        }
-
-        public HbVurderinger.Builder medForeldetBeløp(BigDecimal foreldetBeløp) {
-            kladd.foreldetBeløp = foreldetBeløp;
             return this;
         }
 
