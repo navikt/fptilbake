@@ -1,26 +1,26 @@
 {{#* inline "fritekst"}}
-{{#if fritekst-vilkår}}
+{{#if vurderinger.fritekst}}
 
-{{fritekst-vilkår}}
+{{vurderinger.fritekst}}
 {{/if}}
 {{/inline}}
 {{#* inline "ikke-krev-småbeløp"}}
 Du har fått vite om du har rett til {{> ytelse-navn}} og hvor mye du har rett til. Selv om du burde forstått at beløpet var feil, er beløpet lavere enn {{kroner fire-rettsgebyr}}. Du må derfor ikke må betale tilbake beløpet.
 {{/inline}}
 {{> underoverskrift_start}}Hvordan har vi kommet fram til at du {{#if tilbakekreves-beløp}}{{else}}ikke {{/if}}må betale tilbake?{{> underoverskrift_slutt}}
-{{#switch foreldelsevurdering}}
+{{#switch vurderinger.foreldelsevurdering}}
     {{#case "FORELDET"}}
 Fristen for å kreve tilbake {{> ytelse-produkt}} er tre år og starter fra det tidspunktet feilutbetalingen skjedde.
 
 Foreldelsesfristen er [dato]. Vi kan ikke kreve tilbake penger som er blitt utbetalt mer enn tre år før denne datoen.
 
-Du skal derfor ikke betale tilbake {{kroner foreldet-beløp}}{{> før-skatt}}, som er feilutbetalt fra og med {{fom}} til og med {{tom}}.
+Du skal derfor ikke betale tilbake {{kroner vurderinger.foreldet-beløp}}{{> før-skatt}}, som er feilutbetalt fra og med {{periode.fom}} til og med {{periode.tom}}.
 
     {{/case}}
     {{#case "TILLEGGSFRIST"}}
 Fristen for å kreve tilbake {{> ytelse-produkt}} er tre år fra det tidspunktet feilutbetalingen skjedde. Vi kan utvide fristen med ytterligere 10 år hvis det ikke var mulig for NAV å oppdage feilen tidligere. Fra tidspunktet vi oppdaget feilen, har vi ett år på å kreve pengene tilbake.
 
-Fordi vi oppdaget feilutbetalingen [dato], og har behandlet saken din innen ett år, er foreldelsesfristen [dato]. Derfor må du betale tilbake fra og med {{fom}} til og med {{tom}}.
+Fordi vi oppdaget feilutbetalingen [dato], og har behandlet saken din innen ett år, er foreldelsesfristen [dato]. Derfor må du betale tilbake fra og med {{periode.fom}} til og med {{periode.tom}}.
 
     {{/case}}
     {{#case "IKKE_FORELDET"}}
@@ -30,9 +30,9 @@ Fordi vi oppdaget feilutbetalingen [dato], og har behandlet saken din innen ett 
     {{! ikke noe tekst her}}
     {{/case}}
 {{/switch}}
-{{#if (eq vilkår-resultat "FORSTO_BURDE_FORSTAATT")}}
-    {{#if (eq aktsomhet-resultat "SIMPEL_UAKTSOM")}}
-        {{#if unntas-innkreving-pga-lavt-beløp}}
+{{#if (eq vurderinger.vilkår-resultat "FORSTO_BURDE_FORSTAATT")}}
+    {{#if (eq vurderinger.aktsomhet-resultat "SIMPEL_UAKTSOM")}}
+        {{#if vurderinger.unntas-innkreving-pga-lavt-beløp}}
         {{> ikke-krev-småbeløp}}
         {{else}}
 Du har fått vite om du har rett til {{> ytelse-navn}} og hvor mye du har rett til. Selv om du har meldt fra til oss, kan vi kreve tilbake det du har fått for mye dersom du burde forstått at beløpet var feil.
@@ -41,54 +41,54 @@ Du har fått vite om du har rett til {{> ytelse-navn}} og hvor mye du har rett t
 Ut fra informasjonen du har fått, burde du etter vår vurdering forstått at du fikk for mye utbetalt. Derfor kan vi kreve tilbake.
         {{/if}}
     {{/if}}
-    {{#if (eq aktsomhet-resultat "GROVT_UAKTSOM")}}
+    {{#if (eq vurderinger.aktsomhet-resultat "GROVT_UAKTSOM")}}
 Du har fått vite om du har rett til {{> ytelse-navn}} og hvor mye du har rett til. Selv om du har meldt fra til oss, kan vi kreve tilbake det du har fått for mye dersom du må ha forstått at beløpet var feil.
 {{> fritekst}}
 
 Ut fra informasjonen du har fått, må du etter vår vurdering ha forstått at du fikk for mye utbetalt. Derfor kan vi kreve tilbake.
     {{/if}}
 {{/if}}
-{{#if (eq vilkår-resultat "FEIL_OPPLYSNINGER")}}
-    {{#if (eq aktsomhet-resultat "SIMPEL_UAKTSOM")}}
-        {{#if unntas-innkreving-pga-lavt-beløp}}
+{{#if (eq vurderinger.vilkår-resultat "FEIL_OPPLYSNINGER")}}
+    {{#if (eq vurderinger.aktsomhet-resultat "SIMPEL_UAKTSOM")}}
+        {{#if vurderinger.unntas-innkreving-pga-lavt-beløp}}
         {{> ikke-krev-småbeløp}}
         {{else}}
 Du har fått vite om du har rett til {{> ytelse-navn}} og hvor mye du har rett til. Etter vår vurdering burde du forstått at opplysningene du ga oss var uriktige. Derfor kan vi kreve pengene tilbake.
 {{> fritekst}}
         {{/if}}
     {{/if}}
-    {{#if (eq aktsomhet-resultat "GROVT_UAKTSOM")}}
+    {{#if (eq vurderinger.aktsomhet-resultat "GROVT_UAKTSOM")}}
 Du har fått vite om du har rett til {{> ytelse-navn}} og hvor mye du har rett til. Etter vår vurdering må du ha forstått at opplysningene du ga oss var uriktige. Derfor kan vi kreve pengene tilbake.
 {{> fritekst}}
     {{/if}}
 {{/if}}
-{{#if (eq vilkår-resultat "MANGELFULL_OPPLYSNING")}}
-    {{#if (eq aktsomhet-resultat "SIMPEL_UAKTSOM")}}
-        {{#if unntas-innkreving-pga-lavt-beløp}}
+{{#if (eq vurderinger.vilkår-resultat "MANGELFULL_OPPLYSNING")}}
+    {{#if (eq vurderinger.aktsomhet-resultat "SIMPEL_UAKTSOM")}}
+        {{#if vurderinger.unntas-innkreving-pga-lavt-beløp}}
         {{> ikke-krev-småbeløp}}
         {{else}}
 Du har fått vite om du har rett til {{> ytelse-navn}} og hvor mye du har rett til. Etter vår vurdering burde du forstått at du ikke ga oss alle opplysningene vi trengte tidsnok for å sikre at du fikk riktig utbetaling. Derfor kan vi kreve pengene tilbake.
 {{> fritekst}}
         {{/if}}
     {{/if}}
-    {{#if (eq aktsomhet-resultat "GROVT_UAKTSOM")}}
+    {{#if (eq vurderinger.aktsomhet-resultat "GROVT_UAKTSOM")}}
 Du har fått vite om du har rett til {{> ytelse-navn}} og hvor mye du har rett til. Etter vår vurdering må du ha forstått at du ikke ga oss alle opplysningene vi trengte tidsnok for å sikre at du fikk riktig utbetaling. Derfor kan vi kreve pengene tilbake.
 {{> fritekst}}
     {{/if}}
 {{/if}}
-{{#if (eq vilkår-resultat "GOD_TRO")}}
-    {{#if beløp-i-behold}}
-Vi har ikke gitt deg den informasjonen du trengte for å forstå at beløpet du fikk utbetalt var feil. Du har opplyst at du ikke har brukt {{kroner beløp-i-behold}}. Disse kan vi kreve betale, selv om du ikke forstod at utbetalingen var feil.
+{{#if (eq vurderinger.vilkår-resultat "GOD_TRO")}}
+    {{#if vurderinger.beløp-i-behold}}
+Vi har ikke gitt deg den informasjonen du trengte for å forstå at beløpet du fikk utbetalt var feil. Du har opplyst at du ikke har brukt {{kroner vurderinger.beløp-i-behold}}. Disse kan vi kreve betale, selv om du ikke forstod at utbetalingen var feil.
     {{else}}
 Vi har ikke gitt deg den informasjonen du trengte for å forstå at beløpet du fikk utbetalt var feil. Du må ikke betale tilbake fordi vi har opplysninger om at du ikke har noe igjen av pengene.
     {{/if}}
 {{> fritekst}}
 {{/if}}
-{{#if (eq aktsomhet-resultat "FORSETT")}}
+{{#if (eq vurderinger.aktsomhet-resultat "FORSETT")}}
 Du har fått informasjon om hvor mye du har rett til å få i {{> ytelse-navn}} og at du må melde fra om endringer til NAV. Informasjonen du har fått forklarer om du har rett til {{> ytelse-navn}} og hvor mye du har rett til å få utbetalt.
 {{>fritekst}}
 
-    {{#switch vilkår-resultat}}
+    {{#switch vurderinger.vilkår-resultat}}
     {{#case "FORSTO_BURDE_FORSTAATT"}}
 Vi mener at du forstod at beløpet du fikk utbetalt var feil. Du må derfor betale tilbake det du har fått for mye.
     {{/case}}

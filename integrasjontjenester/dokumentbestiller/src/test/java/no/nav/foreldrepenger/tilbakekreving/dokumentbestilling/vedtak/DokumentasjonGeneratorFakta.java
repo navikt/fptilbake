@@ -29,6 +29,7 @@ import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevFelles;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevPeriode;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevPeriodeOgFelles;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVurderinger;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
 
@@ -93,8 +94,7 @@ public class DokumentasjonGeneratorFakta {
         Map<HendelseMedUndertype, String> resultat = new LinkedHashMap<>();
         for (HendelseMedUndertype undertype : getFeilutbetalingsårsaker(felles.getYtelsetype())) {
             HbVedtaksbrevPeriode periode = lagPeriodeBuilder()
-                .medHendelsetype(undertype.getHendelseType())
-                .medHendelseUndertype(undertype.getHendelseUnderType())
+                .medFakta(undertype.getHendelseType(), undertype.getHendelseUnderType())
                 .build();
             HbVedtaksbrevPeriodeOgFelles data = new HbVedtaksbrevPeriodeOgFelles(felles, periode);
             String tekst = TekstformatererVedtaksbrev.lagFaktaTekst(data);
@@ -106,13 +106,15 @@ public class DokumentasjonGeneratorFakta {
     private HbVedtaksbrevPeriode.Builder lagPeriodeBuilder() {
         return HbVedtaksbrevPeriode.builder()
             .medPeriode(januar)
-            .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
-            .medAktsomhetResultat(AnnenVurdering.GOD_TRO)
+            .medVurderinger(HbVurderinger.builder()
+                .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
+                .medAktsomhetResultat(AnnenVurdering.GOD_TRO)
+                .medVilkårResultat(VilkårResultat.GOD_TRO)
+                .medBeløpIBehold(BigDecimal.valueOf(5000))
+                .build())
             .medFeilutbetaltBeløp(BigDecimal.valueOf(10000))
             .medTilbakekrevesBeløp(BigDecimal.valueOf(5000))
             .medRenterBeløp(BigDecimal.ZERO)
-            .medVilkårResultat(VilkårResultat.GOD_TRO)
-            .medBeløpIBehold(BigDecimal.valueOf(5000))
             .medRiktigBeløp(BigDecimal.valueOf(23333))
             .medUtbetaltBeløp(BigDecimal.valueOf(33333));
     }

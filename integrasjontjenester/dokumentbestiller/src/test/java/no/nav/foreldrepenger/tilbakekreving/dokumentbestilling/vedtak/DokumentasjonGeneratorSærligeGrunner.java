@@ -18,6 +18,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.S�
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevFelles;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevPeriode;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVurderinger;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
 /*
@@ -40,7 +41,6 @@ public class DokumentasjonGeneratorSærligeGrunner {
                     for (boolean reduksjon : boolske) {
                         for (boolean sgAnnet : boolske) {
                             HbVedtaksbrevPeriode periode = lagPeriodeDel(Aktsomhet.SIMPEL_UAKTSOM, sgNav, sgBeløp, sgTid, sgAnnet, reduksjon);
-                            periode.setFritekstSærligeGrunnerAnnet("[fritekst her]");
                             String s = TekstformatererVedtaksbrev.lagSærligeGrunnerTekst(felles, periode);
                             String overskrift = overskrift(sgNav, sgBeløp, sgTid, sgAnnet, reduksjon);
                             String prettyprint = s.replace("_Er det særlige grunner til å redusere beløpet?", overskrift)
@@ -91,18 +91,21 @@ public class DokumentasjonGeneratorSærligeGrunner {
             sg.add(SærligGrunn.ANNET);
         }
 
+        String fritekstSærligeGrunnerAnnet = "[fritekst her]";
         return HbVedtaksbrevPeriode.builder()
             .medPeriode(januar)
-            .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
-            .medHendelsetype(HendelseType.FP_UTTAK_GRADERT_TYPE)
-            .medHendelseUndertype(FpHendelseUnderTyper.GRADERT_UTTAK)
-            .medVilkårResultat(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER)
-            .medAktsomhetResultat(aktsomhet)
+            .medVurderinger(HbVurderinger.builder()
+                .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
+                .medVilkårResultat(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER)
+                .medAktsomhetResultat(aktsomhet)
+                .medSærligeGrunner(sg, null, fritekstSærligeGrunnerAnnet)
+                .build()
+            )
+            .medFakta(HendelseType.FP_UTTAK_GRADERT_TYPE, FpHendelseUnderTyper.GRADERT_UTTAK)
             .medRiktigBeløp(BigDecimal.ZERO)
             .medFeilutbetaltBeløp(BigDecimal.valueOf(1000))
             .medTilbakekrevesBeløp(BigDecimal.valueOf(reduksjon ? 500 : 1000))
             .medRenterBeløp(BigDecimal.ZERO)
-            .medSærligeGrunner(sg)
             .build();
     }
 
