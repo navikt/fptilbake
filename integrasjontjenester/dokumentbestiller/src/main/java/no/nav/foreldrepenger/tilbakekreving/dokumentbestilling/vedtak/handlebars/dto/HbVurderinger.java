@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.AnnenVurdering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.SærligGrunn;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Vurdering;
@@ -112,6 +113,11 @@ public class HbVurderinger {
             if (ForeldelseVurderingType.IKKE_VURDERT.equals(kladd.foreldelsevurdering) ||
                 ForeldelseVurderingType.IKKE_FORELDET.equals(kladd.foreldelsevurdering)) {
                 Objects.check(kladd.vilkårResultat != null, "vilkårResultat er ikke satt");
+            }
+            if (AnnenVurdering.GOD_TRO.equals(kladd.aktsomhetResultat)) {
+                Objects.check(kladd.beløpIBehold != null, "beløp i behold er ikke satt");
+            } else {
+                Objects.check(kladd.beløpIBehold == null, "beløp i behold skal ikke være satt når aktsomhetresultat er " + kladd.aktsomhetResultat);
             }
             return kladd;
         }

@@ -143,6 +143,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
                 .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
                 .medVilkårResultat(VilkårResultat.GOD_TRO)
                 .medAktsomhetResultat(AnnenVurdering.GOD_TRO)
+                .medBeløpIBehold(BigDecimal.ZERO)
                 .build())
             .medFakta(HendelseType.FP_UTTAK_GRADERT_TYPE,FpHendelseUnderTyper.GRADERT_UTTAK)
             .medRiktigBeløp(BigDecimal.ZERO)
