@@ -1,11 +1,11 @@
-{{#* inline "evt-renter-utsagn"}}{{#if totalt-rentebeløp}} Dette beløpet er med renter.{{/if}}{{/inline}}
+{{#* inline "evt-renter-utsagn"}}{{#if totalresultat.totalt-rentebeløp}} Dette beløpet er med renter.{{/if}}{{/inline}}
 {{#if varslet-dato}}
-    {{#switch hovedresultat}}
+    {{#switch totalresultat.hovedresultat}}
     {{#case "FULL_TILBAKEBETALING"}}
-Vi varslet deg {{varslet-dato}} om at du har fått utbetalt for mye.{{#if (not bruk-midlertidig-tekst)}} Du må betale tilbake {{kroner totalt-tilbakekreves-beløp-med-renter}}, som er hele det feilutbetalte beløpet.{{>evt-renter-utsagn}}{{/if}}
+Vi varslet deg {{varslet-dato}} om at du har fått utbetalt for mye.{{#if (not bruk-midlertidig-tekst)}} Du må betale tilbake {{kroner totalresultat.totalt-tilbakekreves-beløp-med-renter}}, som er hele det feilutbetalte beløpet.{{>evt-renter-utsagn}}{{/if}}
     {{/case}}
     {{#case "DELVIS_TILBAKEBETALING"}}
-Vi varslet deg {{varslet-dato}} om at du har fått {{kroner varslet-beløp}} for mye.{{#if (not bruk-midlertidig-tekst)}} Du må betale tilbake {{kroner totalt-tilbakekreves-beløp-med-renter}}, som er deler av det feilutbetalte beløpet.{{>evt-renter-utsagn}}{{/if}}
+Vi varslet deg {{varslet-dato}} om at du har fått {{kroner varslet-beløp}} for mye.{{#if (not bruk-midlertidig-tekst)}} Du må betale tilbake {{kroner totalresultat.totalt-tilbakekreves-beløp-med-renter}}, som er deler av det feilutbetalte beløpet.{{>evt-renter-utsagn}}{{/if}}
     {{/case}}
     {{#case "INGEN_TILBAKEBETALING"}}
 Vi varslet deg {{varslet-dato}} om at du har fått {{kroner varslet-beløp}} for mye. Vi har behandlet saken din og du må ikke betale tilbake det feilutbetalte beløpet.
@@ -13,21 +13,21 @@ Vi varslet deg {{varslet-dato}} om at du har fått {{kroner varslet-beløp}} for
     {{/switch}}
 {{else}}
     {{#* inline "brev-ytelse-endret"}}I brev {{dato-fagsakvedtak}} fikk du melding om at {{>ytelse-produkt}} {{#if (eq ytelsetype "ES")}}din{{else}}dine{{/if}} er endret. Endringen gjorde at du har fått utbetalt for mye.{{/inline}}
-    {{#switch hovedresultat}}
+    {{#switch totalresultat.hovedresultat}}
     {{#case "FULL_TILBAKEBETALING"}}
-{{>brev-ytelse-endret}}{{#if (not bruk-midlertidig-tekst)}} Du må betale tilbake {{kroner totalt-tilbakekreves-beløp-med-renter}}, som er hele det feilutbetalte beløpet.{{>evt-renter-utsagn}}{{/if}}
+{{>brev-ytelse-endret}}{{#if (not bruk-midlertidig-tekst)}} Du må betale tilbake {{kroner totalresultat.totalt-tilbakekreves-beløp-med-renter}}, som er hele det feilutbetalte beløpet.{{>evt-renter-utsagn}}{{/if}}
     {{/case}}
     {{#case "DELVIS_TILBAKEBETALING"}}
-{{>brev-ytelse-endret}}{{#if (not bruk-midlertidig-tekst)}} Du må betale tilbake {{kroner totalt-tilbakekreves-beløp-med-renter}}, som er deler av det feilutbetalte beløpet.{{>evt-renter-utsagn}}{{/if}}
+{{>brev-ytelse-endret}}{{#if (not bruk-midlertidig-tekst)}} Du må betale tilbake {{kroner totalresultat.totalt-tilbakekreves-beløp-med-renter}}, som er deler av det feilutbetalte beløpet.{{>evt-renter-utsagn}}{{/if}}
     {{/case}}
     {{#case "INGEN_TILBAKEBETALING"}}
 {{>brev-ytelse-endret}} Du må ikke betale tilbake det du har fått for mye.
     {{/case}}
     {{/switch}}
 {{/if}}
-{{#if (and bruk-midlertidig-tekst (neq hovedresultat "INGEN_TILBAKEBETALING"))}}
+{{#if (and bruk-midlertidig-tekst (neq totalresultat.hovedresultat "INGEN_TILBAKEBETALING"))}}
 
-Beløpet du skylder før skatt er {{kroner totalt-tilbakekreves-beløp-med-renter}}, som er {{#if (eq hovedresultat "FULL_TILBAKEBETALING")}}hele{{else}}deler av{{/if}} det feilutbetalte beløpet.{{>evt-renter-utsagn}} Beløpet du skal betale tilbake etter skatten er trukket fra er {{kroner totalt-tilbakekreves-beløp-med-renter-uten-skatt}}.
+Beløpet du skylder før skatt er {{kroner totalresultat.totalt-tilbakekreves-beløp-med-renter}}, som er {{#if (eq totalresultat.hovedresultat "FULL_TILBAKEBETALING")}}hele{{else}}deler av{{/if}} det feilutbetalte beløpet.{{>evt-renter-utsagn}} Beløpet du skal betale tilbake etter skatten er trukket fra er {{kroner totalresultat.totalt-tilbakekreves-beløp-med-renter-uten-skatt}}.
 {{/if}}
 {{#if fritekst-oppsummering}}
 

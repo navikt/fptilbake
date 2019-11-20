@@ -22,13 +22,14 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.S�
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Avsnitt;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Underavsnitt;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbKravgrunnlag;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbResultat;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbTotalresultat;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevFelles;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevPeriode;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevPeriodeOgFelles;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVurderinger;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbKravgrunnlag;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbResultat;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbVedtaksbrevPeriode;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbVurderinger;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
 public class TekstformatererVedtaksbrevIBiterTest {
@@ -42,13 +43,15 @@ public class TekstformatererVedtaksbrevIBiterTest {
             .skruAvMidlertidigTekst()
             .medErFødsel(true)
             .medAntallBarn(2)
-            .medHovedresultat(VedtakResultatType.DELVIS_TILBAKEBETALING)
+            .medVedtakResultat(HbTotalresultat.builder()
+                .medHovedresultat(VedtakResultatType.DELVIS_TILBAKEBETALING)
+                .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(23002))
+                .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(23002))
+                .medTotaltRentebeløp(BigDecimal.ZERO)
+                .build())
             .medLovhjemmelVedtak("Folketrygdloven § 22-15")
             .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
             .medVarsletBeløp(BigDecimal.valueOf(33001))
-            .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(23002))
-            .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(23002))
-            .medTotaltRentebeløp(BigDecimal.ZERO)
             .medVarsletDato(LocalDate.of(2020, 4, 4))
             .medKlagefristUker(4)
             .build();
@@ -95,13 +98,15 @@ public class TekstformatererVedtaksbrevIBiterTest {
             .skruAvMidlertidigTekst()
             .medErFødsel(true)
             .medAntallBarn(2)
-            .medHovedresultat(VedtakResultatType.DELVIS_TILBAKEBETALING)
+            .medVedtakResultat(HbTotalresultat.builder()
+                .medHovedresultat(VedtakResultatType.DELVIS_TILBAKEBETALING)
+                .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(23002))
+                .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(23002))
+                .medTotaltRentebeløp(BigDecimal.ZERO)
+                .build())
             .medLovhjemmelVedtak("foo")
             .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
             .medVarsletBeløp(BigDecimal.valueOf(33001))
-            .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(23002))
-            .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(23002))
-            .medTotaltRentebeløp(BigDecimal.ZERO)
             .medVarsletDato(LocalDate.of(2020, 4, 4))
             .medKlagefristUker(4)
             .build();
@@ -129,13 +134,15 @@ public class TekstformatererVedtaksbrevIBiterTest {
             .skruAvMidlertidigTekst()
             .medErFødsel(true)
             .medAntallBarn(1)
-            .medHovedresultat(VedtakResultatType.DELVIS_TILBAKEBETALING)
+            .medVedtakResultat(HbTotalresultat.builder()
+                .medHovedresultat(VedtakResultatType.DELVIS_TILBAKEBETALING)
+                .medTotaltTilbakekrevesBeløp(BigDecimal.ZERO)
+                .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.ZERO)
+                .medTotaltRentebeløp(BigDecimal.ZERO)
+                .build())
             .medLovhjemmelVedtak("foo")
             .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
             .medVarsletBeløp(BigDecimal.valueOf(1000))
-            .medTotaltTilbakekrevesBeløp(BigDecimal.ZERO)
-            .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.ZERO)
-            .medTotaltRentebeløp(BigDecimal.ZERO)
             .medVarsletDato(LocalDate.of(2020, 4, 4))
             .medKlagefristUker(4)
             .build();
@@ -163,13 +170,15 @@ public class TekstformatererVedtaksbrevIBiterTest {
             .skruAvMidlertidigTekst()
             .medErFødsel(true)
             .medAntallBarn(1)
-            .medHovedresultat(VedtakResultatType.FULL_TILBAKEBETALING)
+            .medVedtakResultat(HbTotalresultat.builder()
+                .medHovedresultat(VedtakResultatType.FULL_TILBAKEBETALING)
+                .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(1000))
+                .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(1100))
+                .medTotaltRentebeløp(BigDecimal.valueOf(100))
+                .build())
             .medLovhjemmelVedtak("foo")
             .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
             .medVarsletBeløp(BigDecimal.valueOf(1000))
-            .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(1000))
-            .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(1100))
-            .medTotaltRentebeløp(BigDecimal.valueOf(100))
             .medVarsletDato(LocalDate.of(2020, 4, 4))
             .medKlagefristUker(4)
             .build();
@@ -199,13 +208,15 @@ public class TekstformatererVedtaksbrevIBiterTest {
             .skruAvMidlertidigTekst()
             .medErFødsel(true)
             .medAntallBarn(1)
-            .medHovedresultat(VedtakResultatType.FULL_TILBAKEBETALING)
+            .medVedtakResultat(HbTotalresultat.builder()
+                .medHovedresultat(VedtakResultatType.FULL_TILBAKEBETALING)
+                .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(1000))
+                .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(1100))
+                .medTotaltRentebeløp(BigDecimal.valueOf(100))
+                .build())
             .medLovhjemmelVedtak("foo")
             .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
             .medVarsletBeløp(BigDecimal.valueOf(1000))
-            .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(1000))
-            .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(1100))
-            .medTotaltRentebeløp(BigDecimal.valueOf(100))
             .medVarsletDato(LocalDate.of(2020, 4, 4))
             .medKlagefristUker(4)
             .build();

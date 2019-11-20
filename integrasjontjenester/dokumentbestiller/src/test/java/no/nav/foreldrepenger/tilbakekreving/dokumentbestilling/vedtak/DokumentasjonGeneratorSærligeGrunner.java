@@ -16,11 +16,12 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResult
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.SærligGrunn;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbKravgrunnlag;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbResultat;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbTotalresultat;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevFelles;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevPeriode;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVurderinger;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbKravgrunnlag;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbResultat;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbVedtaksbrevPeriode;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbVurderinger;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
 /*
@@ -117,13 +118,15 @@ public class DokumentasjonGeneratorSærligeGrunner {
         return HbVedtaksbrevFelles.builder()
             .medErFødsel(true)
             .medAntallBarn(1)
-            .medHovedresultat(VedtakResultatType.FULL_TILBAKEBETALING)
+            .medVedtakResultat(HbTotalresultat.builder()
+                .medHovedresultat(VedtakResultatType.FULL_TILBAKEBETALING)
+                .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(1000))
+                .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(1100))
+                .medTotaltRentebeløp(BigDecimal.valueOf(100))
+                .build())
             .medLovhjemmelVedtak("foo")
             .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
             .medVarsletBeløp(BigDecimal.valueOf(1000))
-            .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(1000))
-            .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(1100))
-            .medTotaltRentebeløp(BigDecimal.valueOf(100))
             .medVarsletDato(LocalDate.of(2020, 4, 4))
             .medKlagefristUker(4)
             .build();

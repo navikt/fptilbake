@@ -30,21 +30,7 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
     @JsonProperty("varslet-beløp")
     @JsonSerialize(using = BigDecimalHeltallSerialiserer.class)
     private BigDecimal varsletBeløp;
-    @JsonProperty("hovedresultat")
-    @JsonSerialize(using = KodelisteSomKodeSerialiserer.class)
-    private VedtakResultatType hovedresultat;
-    @JsonProperty("totalt-tilbakekreves-beløp")
-    @JsonSerialize(using = BigDecimalHeltallSerialiserer.class)
-    private BigDecimal totaltTilbakekrevesBeløp;
-    @JsonProperty("totalt-tilbakekreves-beløp-med-renter")
-    @JsonSerialize(using = BigDecimalHeltallSerialiserer.class)
-    private BigDecimal totaltTilbakekrevesBeløpMedRenter;
-    @JsonProperty("totalt-tilbakekreves-beløp-med-renter-uten-skatt")
-    @JsonSerialize(using = BigDecimalHeltallSerialiserer.class)
-    private BigDecimal totaltTilbakekrevesBeløpMedRenterUtenSkatt;
-    @JsonProperty("totalt-rentebeløp")
-    @JsonSerialize(using = BigDecimalHeltallSerialiserer.class)
-    private BigDecimal totaltRentebeløp;
+
     @JsonProperty("fritekst-oppsummering")
     private String fritekstOppsummering;
     @JsonProperty("lovhjemmel-vedtak")
@@ -69,6 +55,9 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
     @JsonSerialize(using = LocalDateTilStrengMedNorskFormatSerialiserer.class)
     private LocalDate datoFagsakvedtak;
 
+    @JsonProperty("totalresultat")
+    private HbTotalresultat totalresultat;
+
     private HbVedtaksbrevFelles() {
         //bruk Builder
     }
@@ -90,7 +79,7 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
     }
 
     public VedtakResultatType getHovedresultat() {
-        return hovedresultat;
+        return totalresultat.getHovedresultat();
     }
 
     public static class Builder {
@@ -101,22 +90,22 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
         }
 
         public HbVedtaksbrevFelles build() {
+
             Objects.check(kladd.erAdopsjon != kladd.erFødsel, "En og bare en av fødsel og adopsjon skal være satt");
             Objects.check(kladd.ytelsetype != null, "Ytelse type er ikke satt");
             Objects.check(kladd.antallBarn != null, "antallBarn er ikke satt");
-            Objects.check(kladd.hovedresultat != null, "hovedresultat er ikke satt");
             Objects.check(kladd.lovhjemmelVedtak != null, "lovhjemmelVedtak er ikke satt");
-            Objects.check(kladd.totaltTilbakekrevesBeløp != null, "totaltTilbakekrevesBeløp er ikke satt");
-            Objects.check(kladd.totaltTilbakekrevesBeløpMedRenter != null, "totaltTilbakekrevesBeløpMedRenter er ikke satt");
-            if (kladd.brukMidlertidigTekst) {
-                Objects.check(kladd.totaltTilbakekrevesBeløpMedRenterUtenSkatt != null, "totaltTilbakekrevesBeløpMedRenterUtenSkatt er ikke satt");
-            }
-            Objects.check(kladd.totaltRentebeløp != null, "totaltRentebeløp er ikke satt");
+
             Objects.check(kladd.fireRettsgebyr != null, "fireRettsgebyr er ikke satt");
             Objects.check(kladd.halvtGrunnbeløp != null, "halvtGrunnbeløp er ikke satt");
             Objects.check(kladd.klagefristUker != null, "klagefristUker er ikke satt");
             Objects.check(kladd.kontaktNavTelefon != null, "kontaktNavTelefon er ikke satt");
             Objects.check(kladd.kontaktNavInnkrevingTelefon != null, "kontaktNavInnkrevingTelefon er ikke satt");
+
+            Objects.check(kladd.totalresultat != null, "totalresultat er ikke satt");
+            if (kladd.brukMidlertidigTekst) {
+                Objects.check(kladd.totalresultat.harBeløpMedRenterUtenSkatt(), "totaltTilbakekrevesBeløpMedRenterUtenSkatt er ikke satt");
+            }
 
             if (kladd.varsletDato == null && kladd.varsletBeløp != null) {
                 throw new IllegalArgumentException("Inkonsistent tilstand: varslet beløp finnes, men varslet dato finnes ikke");
@@ -128,6 +117,11 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
                 Objects.check(kladd.datoFagsakvedtak != null, "dato for fagsakvedtak/revurdering er ikke satt");
             }
             return kladd;
+        }
+
+        public Builder medVedtakResultat(HbTotalresultat vedtakResultat) {
+            kladd.totalresultat = vedtakResultat;
+            return this;
         }
 
         public Builder medYtelsetype(FagsakYtelseType ytelsetype) {
@@ -170,30 +164,6 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
             return this;
         }
 
-        public Builder medHovedresultat(VedtakResultatType hovedresultat) {
-            kladd.hovedresultat = hovedresultat;
-            return this;
-        }
-
-        public Builder medTotaltTilbakekrevesBeløp(BigDecimal totaltTilbakekrevesBeløp) {
-            kladd.totaltTilbakekrevesBeløp = totaltTilbakekrevesBeløp;
-            return this;
-        }
-
-        public Builder medTotaltTilbakekrevesBeløpMedRenter(BigDecimal totaltTilbakekrevesBeløpMedRenter) {
-            kladd.totaltTilbakekrevesBeløpMedRenter = totaltTilbakekrevesBeløpMedRenter;
-            return this;
-        }
-
-        public Builder medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal totaltTilbakekrevesBeløpMedRenterUtenSkatt) {
-            kladd.totaltTilbakekrevesBeløpMedRenterUtenSkatt = totaltTilbakekrevesBeløpMedRenterUtenSkatt;
-            return this;
-        }
-
-        public Builder medTotaltRentebeløp(BigDecimal totaltRentebeløp) {
-            kladd.totaltRentebeløp = totaltRentebeløp;
-            return this;
-        }
 
         public Builder medFritekstOppsummering(String fritekstOppsummering) {
             kladd.fritekstOppsummering = fritekstOppsummering;
