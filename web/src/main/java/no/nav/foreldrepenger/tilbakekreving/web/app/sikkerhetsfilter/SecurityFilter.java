@@ -32,7 +32,7 @@ public class SecurityFilter implements Filter {
      * da skal man få en console-feil med forventet hash
      * </p>
      */
-    private static final String HASH_FOR_SWAGGER_INLINE_JAVASCRIPT = "sha256-S6UdqSRAsovNMnA3zLfPxcOynVd0ynctkR20nS7kRZk=";
+    private static final String HASH_FOR_SWAGGER_INLINE_JAVASCRIPT = "sha256-jZ9Y3HJCuOrdIL95F0ngZyJyP3DaGenAOpFYW3rvs5E=";
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
