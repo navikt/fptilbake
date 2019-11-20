@@ -28,6 +28,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResult
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.AnnenVurdering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbSak;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbTotalresultat;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevFelles;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevPeriodeOgFelles;
@@ -50,9 +51,11 @@ public class TekstformatererVedtaksbrevAllePermutasjonerTest {
     @Test
     public void skal_støtte_alle_permutasjoner_av_fakta_for_FP() {
         HbVedtaksbrevFelles felles = lagFellesBuilder()
-            .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
-            .medErFødsel(true)
-            .medAntallBarn(1)
+            .medSak(HbSak.build()
+                .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
+                .medErFødsel(true)
+                .medAntallBarn(1)
+                .build())
             .build();
         Map<HendelseMedUndertype, String> resultat = lagFaktatekster(felles);
         sjekkVerdier(resultat);
@@ -61,9 +64,11 @@ public class TekstformatererVedtaksbrevAllePermutasjonerTest {
     @Test
     public void skal_støtte_alle_permutasjoner_av_fakta_for_SVP() {
         HbVedtaksbrevFelles felles = lagFellesBuilder()
-            .medYtelsetype(FagsakYtelseType.SVANGERSKAPSPENGER)
-            .medErFødsel(true)
-            .medAntallBarn(1)
+            .medSak(HbSak.build()
+                .medYtelsetype(FagsakYtelseType.SVANGERSKAPSPENGER)
+                .medErFødsel(true)
+                .medAntallBarn(1)
+                .build())
             .build();
         Map<HendelseMedUndertype, String> resultat = lagFaktatekster(felles);
 
@@ -75,9 +80,11 @@ public class TekstformatererVedtaksbrevAllePermutasjonerTest {
     @Test
     public void skal_støtte_alle_permutasjoner_av_fakta_for_ES() {
         HbVedtaksbrevFelles felles = lagFellesBuilder()
-            .medYtelsetype(FagsakYtelseType.ENGANGSTØNAD)
-            .medErFødsel(true)
-            .medAntallBarn(1)
+            .medSak(HbSak.build()
+                .medYtelsetype(FagsakYtelseType.ENGANGSTØNAD)
+                .medErFødsel(true)
+                .medAntallBarn(1)
+                .build())
             .build();
         Map<HendelseMedUndertype, String> resultat = lagFaktatekster(felles);
 

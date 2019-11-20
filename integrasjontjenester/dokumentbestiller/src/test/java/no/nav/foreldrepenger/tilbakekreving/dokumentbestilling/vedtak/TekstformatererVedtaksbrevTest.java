@@ -25,6 +25,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Ak
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.AnnenVurdering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.SærligGrunn;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbSak;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbTotalresultat;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevFelles;
@@ -45,8 +46,11 @@ public class TekstformatererVedtaksbrevTest {
     @Test
     public void skal_generere_vedtaksbrev_for_FP_og_tvillinger_og_simpel_uaktsomhet() throws Exception {
         HbVedtaksbrevFelles vedtaksbrevData = HbVedtaksbrevFelles.builder()
-            .medErFødsel(true)
-            .medAntallBarn(2)
+            .medSak(HbSak.build()
+                .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
+                .medErFødsel(true)
+                .medAntallBarn(2)
+                .build())
             .medVedtakResultat(HbTotalresultat.builder()
                 .medHovedresultat(VedtakResultatType.DELVIS_TILBAKEBETALING)
                 .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(23002))
@@ -55,7 +59,6 @@ public class TekstformatererVedtaksbrevTest {
                 .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.valueOf(17601))
                 .build())
             .medLovhjemmelVedtak("Folketrygdloven § 22-15")
-            .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
             .medVarsletBeløp(BigDecimal.valueOf(33001))
             .medVarsletDato(LocalDate.of(2020, 4, 4))
             .medKlagefristUker(6)
@@ -102,8 +105,12 @@ public class TekstformatererVedtaksbrevTest {
     @Test
     public void skal_generere_vedtaksbrev_for_FP_og_god_tro_uten_tilbakekreving_uten_varsel() throws Exception {
         HbVedtaksbrevFelles vedtaksbrevData = HbVedtaksbrevFelles.builder()
-            .medErFødsel(true)
-            .medAntallBarn(1)
+            .medSak(HbSak.build()
+                .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
+                .medErFødsel(true)
+                .medAntallBarn(1)
+                .medDatoFagsakvedtak(LocalDate.of(2019, 3, 21))
+                .build())
             .medVedtakResultat(HbTotalresultat.builder()
                 .medHovedresultat(VedtakResultatType.INGEN_TILBAKEBETALING)
                 .medTotaltTilbakekrevesBeløp(BigDecimal.ZERO)
@@ -111,10 +118,8 @@ public class TekstformatererVedtaksbrevTest {
                 .medTotaltRentebeløp(BigDecimal.ZERO)
                 .build())
             .medLovhjemmelVedtak("Folketrygdloven § 22-15")
-            .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
             .medVarsletBeløp((BigDecimal) null)
             .medVarsletDato(null)
-            .medDatoFagsakvedtak(LocalDate.of(2019, 3, 21))
             .medKlagefristUker(6)
             .skruAvMidlertidigTekst() //generer tekst slik den skal være etter pilot
             .build();
@@ -144,8 +149,11 @@ public class TekstformatererVedtaksbrevTest {
     @Test
     public void skal_generere_vedtaksbrev_for_FP_og_adopsjon_med_mye_fritekst() throws Exception {
         HbVedtaksbrevFelles vedtaksbrevData = HbVedtaksbrevFelles.builder()
-            .medErAdopsjon(true)
-            .medAntallBarn(1)
+            .medSak(HbSak.build()
+                .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
+                .medErAdopsjon(true)
+                .medAntallBarn(1)
+                .build())
             .medVedtakResultat(HbTotalresultat.builder()
                 .medHovedresultat(VedtakResultatType.DELVIS_TILBAKEBETALING)
                 .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(1234567892))
@@ -153,7 +161,6 @@ public class TekstformatererVedtaksbrevTest {
                 .medTotaltRentebeløp(BigDecimal.ZERO)
                 .build())
             .medLovhjemmelVedtak("Folketrygdloven § 22-15")
-            .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
             .medVarsletBeløp(BigDecimal.valueOf(1234567893))
             .medVarsletDato(LocalDate.of(2019, 1, 3))
             .medFritekstOppsummering("Skynd deg å betale, vi trenger pengene med en gang!")
@@ -241,8 +248,11 @@ public class TekstformatererVedtaksbrevTest {
     @Test
     public void skal_generere_vedtaksbrev_for_SVP_og_ett_barn_og_forsett() throws Exception {
         HbVedtaksbrevFelles vedtaksbrevData = HbVedtaksbrevFelles.builder()
-            .medErFødsel(true)
-            .medAntallBarn(1)
+            .medSak(HbSak.build()
+                .medYtelsetype(FagsakYtelseType.SVANGERSKAPSPENGER)
+                .medErFødsel(true)
+                .medAntallBarn(1)
+                .build())
             .medVedtakResultat(HbTotalresultat.builder()
                 .medHovedresultat(VedtakResultatType.FULL_TILBAKEBETALING)
                 .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(10000))
@@ -251,7 +261,6 @@ public class TekstformatererVedtaksbrevTest {
                 .medTotaltRentebeløp(BigDecimal.valueOf(1000))
                 .build())
             .medLovhjemmelVedtak("Folketrygdloven § 22-15")
-            .medYtelsetype(FagsakYtelseType.SVANGERSKAPSPENGER)
             .medVarsletBeløp(BigDecimal.valueOf(10000))
             .medVarsletDato(LocalDate.of(2020, 4, 4))
             .medKlagefristUker(6)
@@ -283,8 +292,11 @@ public class TekstformatererVedtaksbrevTest {
     @Test
     public void skal_generere_vedtaksbrev_for_ES_god_tro_og_ingen_tilbakebetaling() throws Exception {
         HbVedtaksbrevFelles vedtaksbrevData = HbVedtaksbrevFelles.builder()
-            .medErFødsel(true)
-            .medAntallBarn(1)
+            .medSak(HbSak.build()
+                .medYtelsetype(FagsakYtelseType.ENGANGSTØNAD)
+                .medErFødsel(true)
+                .medAntallBarn(1)
+                .build())
             .medVedtakResultat(HbTotalresultat.builder()
                 .medHovedresultat(VedtakResultatType.INGEN_TILBAKEBETALING)
                 .medTotaltTilbakekrevesBeløp(BigDecimal.ZERO)
@@ -292,7 +304,6 @@ public class TekstformatererVedtaksbrevTest {
                 .medTotaltRentebeløp(BigDecimal.ZERO)
                 .build())
             .medLovhjemmelVedtak("Folketrygdloven § 22-15")
-            .medYtelsetype(FagsakYtelseType.ENGANGSTØNAD)
             .medVarsletBeløp(BigDecimal.valueOf(10000))
             .medVarsletDato(LocalDate.of(2020, 4, 4))
             .medKlagefristUker(6)
@@ -327,8 +338,11 @@ public class TekstformatererVedtaksbrevTest {
     @Test
     public void skal_generere_vedtaksbrev_for_ES_adopsjon_og_grov_uaktsomhet() throws Exception {
         HbVedtaksbrevFelles vedtaksbrevData = HbVedtaksbrevFelles.builder()
-            .medErAdopsjon(true)
-            .medAntallBarn(5)
+            .medSak(HbSak.build()
+                .medErAdopsjon(true)
+                .medAntallBarn(5)
+                .medYtelsetype(FagsakYtelseType.ENGANGSTØNAD)
+                .build())
             .medVedtakResultat(HbTotalresultat.builder()
                 .medHovedresultat(VedtakResultatType.FULL_TILBAKEBETALING)
                 .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(500000))
@@ -336,7 +350,6 @@ public class TekstformatererVedtaksbrevTest {
                 .medTotaltRentebeløp(BigDecimal.valueOf(50000))
                 .build())
             .medLovhjemmelVedtak("Folketrygdloven § 22-15")
-            .medYtelsetype(FagsakYtelseType.ENGANGSTØNAD)
             .medVarsletBeløp(BigDecimal.valueOf(500000))
             .medVarsletDato(LocalDate.of(2020, 4, 4))
             .medKlagefristUker(6)
@@ -370,8 +383,12 @@ public class TekstformatererVedtaksbrevTest {
     @Test
     public void skal_generere_vedtaksbrev_for_FP_med_og_uten_foreldelse() throws Exception {
         HbVedtaksbrevFelles vedtaksbrevData = HbVedtaksbrevFelles.builder()
-            .medErFødsel(true)
-            .medAntallBarn(1)
+            .medSak(HbSak.build()
+                .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
+                .medErFødsel(true)
+                .medAntallBarn(1)
+                .medDatoFagsakvedtak(LocalDate.of(2019, 11, 12))
+                .build())
             .medVedtakResultat(HbTotalresultat.builder()
                 .medHovedresultat(VedtakResultatType.DELVIS_TILBAKEBETALING)
                 .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(1000))
@@ -379,8 +396,6 @@ public class TekstformatererVedtaksbrevTest {
                 .medTotaltRentebeløp(BigDecimal.ZERO)
                 .build())
             .medLovhjemmelVedtak("Folketrygdloven § 22-15")
-            .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
-            .medDatoFagsakvedtak(LocalDate.of(2019, 11, 12))
             .medKlagefristUker(6)
             .skruAvMidlertidigTekst() //generer tekst slik den skal være etter pilot
             .build();
@@ -421,8 +436,11 @@ public class TekstformatererVedtaksbrevTest {
     @Test
     public void skal_generere_vedtaksbrev_for_FP_ingen_tilbakekreving_pga_lavt_beløp() throws Exception {
         HbVedtaksbrevFelles vedtaksbrevData = HbVedtaksbrevFelles.builder()
-            .medErFødsel(true)
-            .medAntallBarn(5)
+            .medSak(HbSak.build()
+                .medErFødsel(true)
+                .medAntallBarn(5)
+                .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
+                .build())
             .medVedtakResultat(HbTotalresultat.builder()
                 .medHovedresultat(VedtakResultatType.INGEN_TILBAKEBETALING)
                 .medTotaltTilbakekrevesBeløp(BigDecimal.ZERO)
@@ -430,7 +448,6 @@ public class TekstformatererVedtaksbrevTest {
                 .medTotaltRentebeløp(BigDecimal.ZERO)
                 .build())
             .medLovhjemmelVedtak("Folketrygdloven § 22-15 6.ledd")
-            .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
             .medVarsletBeløp(BigDecimal.valueOf(500))
             .medVarsletDato(LocalDate.of(2020, 4, 4))
             .medKlagefristUker(6)

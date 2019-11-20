@@ -12,7 +12,7 @@ Vi varslet deg {{varslet-dato}} om at du har fått {{kroner varslet-beløp}} for
     {{/case}}
     {{/switch}}
 {{else}}
-    {{#* inline "brev-ytelse-endret"}}I brev {{dato-fagsakvedtak}} fikk du melding om at {{>ytelse-produkt}} {{#if (eq ytelsetype "ES")}}din{{else}}dine{{/if}} er endret. Endringen gjorde at du har fått utbetalt for mye.{{/inline}}
+    {{#* inline "brev-ytelse-endret"}}I brev {{sak.dato-fagsakvedtak}} fikk du melding om at {{>ytelse-produkt}} {{#if (eq sak.ytelsetype "ES")}}din{{else}}dine{{/if}} er endret. Endringen gjorde at du har fått utbetalt for mye.{{/inline}}
     {{#switch totalresultat.hovedresultat}}
     {{#case "FULL_TILBAKEBETALING"}}
 {{>brev-ytelse-endret}}{{#if (not bruk-midlertidig-tekst)}} Du må betale tilbake {{kroner totalresultat.totalt-tilbakekreves-beløp-med-renter}}, som er hele det feilutbetalte beløpet.{{>evt-renter-utsagn}}{{/if}}

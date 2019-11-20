@@ -10,20 +10,11 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelse
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.BigDecimalHeltallSerialiserer;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.HandlebarsData;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.KodelisteSomKodeSerialiserer;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.LocalDateTilStrengMedNorskFormatSerialiserer;
 import no.nav.vedtak.util.Objects;
 
 public class HbVedtaksbrevFelles implements HandlebarsData {
-    @JsonProperty("ytelsetype")
-    @JsonSerialize(using = KodelisteSomKodeSerialiserer.class)
-    private FagsakYtelseType ytelsetype;
-    @JsonProperty("er-fødsel")
-    private boolean erFødsel;
-    @JsonProperty("er-adopsjon")
-    private boolean erAdopsjon;
-    @JsonProperty("antall-barn")
-    private Integer antallBarn;
+
     @JsonProperty("varslet-dato")
     @JsonSerialize(using = LocalDateTilStrengMedNorskFormatSerialiserer.class)
     private LocalDate varsletDato;
@@ -51,12 +42,12 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
     private String kontaktNavInnkrevingTelefon = "21 05 11 00";  //TODO fjerne hardkoding
     @JsonProperty("bruk-midlertidig-tekst")
     private boolean brukMidlertidigTekst = true;
-    @JsonProperty("dato-fagsakvedtak")
-    @JsonSerialize(using = LocalDateTilStrengMedNorskFormatSerialiserer.class)
-    private LocalDate datoFagsakvedtak;
 
     @JsonProperty("totalresultat")
     private HbTotalresultat totalresultat;
+
+    @JsonProperty("sak")
+    private HbSak sak;
 
     private HbVedtaksbrevFelles() {
         //bruk Builder
@@ -67,7 +58,7 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
     }
 
     public FagsakYtelseType getYtelsetype() {
-        return ytelsetype;
+        return sak.getYtelsetype();
     }
 
     public String getFritekstOppsummering() {
@@ -90,11 +81,8 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
         }
 
         public HbVedtaksbrevFelles build() {
-
-            Objects.check(kladd.erAdopsjon != kladd.erFødsel, "En og bare en av fødsel og adopsjon skal være satt");
-            Objects.check(kladd.ytelsetype != null, "Ytelse type er ikke satt");
-            Objects.check(kladd.antallBarn != null, "antallBarn er ikke satt");
             Objects.check(kladd.lovhjemmelVedtak != null, "lovhjemmelVedtak er ikke satt");
+            Objects.check(kladd.sak != null, "sak-informasjon er ikke satt");
 
             Objects.check(kladd.fireRettsgebyr != null, "fireRettsgebyr er ikke satt");
             Objects.check(kladd.halvtGrunnbeløp != null, "halvtGrunnbeløp er ikke satt");
@@ -114,7 +102,7 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
                 throw new IllegalArgumentException("Inkonsistent tilstand: varslet dato finnes, men varslet beløp finnes ikke");
             }
             if (kladd.varsletDato == null) {
-                Objects.check(kladd.datoFagsakvedtak != null, "dato for fagsakvedtak/revurdering er ikke satt");
+                Objects.check(kladd.sak.harDatoForFagsakvedtak(), "dato for fagsakvedtak/revurdering er ikke satt");
             }
             return kladd;
         }
@@ -124,33 +112,13 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
             return this;
         }
 
-        public Builder medYtelsetype(FagsakYtelseType ytelsetype) {
-            kladd.ytelsetype = ytelsetype;
-            return this;
-        }
-
-        public Builder medErFødsel(boolean erFødsel) {
-            kladd.erFødsel = erFødsel;
-            return this;
-        }
-
-        public Builder medErAdopsjon(boolean erAdopsjon) {
-            kladd.erAdopsjon = erAdopsjon;
-            return this;
-        }
-
-        public Builder medAntallBarn(int antallBarn) {
-            kladd.antallBarn = antallBarn;
-            return this;
-        }
-
         public Builder medVarsletDato(LocalDate varsletDato) {
             kladd.varsletDato = varsletDato;
             return this;
         }
 
-        public Builder medDatoFagsakvedtak(LocalDate datoFagsakvedtak) {
-            kladd.datoFagsakvedtak = datoFagsakvedtak;
+        public Builder medSak(HbSak sak) {
+            kladd.sak = sak;
             return this;
         }
 

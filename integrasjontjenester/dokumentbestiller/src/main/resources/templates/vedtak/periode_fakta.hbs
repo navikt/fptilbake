@@ -38,7 +38,7 @@ I denne perioden har vi utbetalt for mye i feriepenger. Du skulle fått {{kroner
 {{#* inline "fakta-arbeidsgiver-refusjon"}}
 I denne perioden har du både fått utbetalt {{> ytelse-navn}} fra oss og lønn fra arbeidsgiver. Det er arbeidsgiveren din som har rett til {{> ytelse-produkt}} fordi de utbetaler deg full lønn i samme periode. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt.
 {{/inline}}
-{{#switch ytelsetype}}
+{{#switch sak.ytelsetype}}
 {{#case "ES"}}
     {{#switch fakta.hendelsetype}}
     {{#case "MEDLEMSKAP"}}
@@ -105,7 +105,7 @@ Du har fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt.
     {{#case "ES_FORELDREANSVAR_FAR_TYPE"}}
         {{#switch fakta.hendelseundertype}}
         {{#case "ES_FAR_IKKE_ALENE"}}
-Du har kun rett til engangsstønad når du overtar omsorgen innen 56 uker etter {{eq er-adopsjon yes="adopsjonen" no="fødselen"}}. Du overtok omsorgen for {{> barnet}} senere enn dette. Derfor har du ikke rett til engangsstønad
+Du har kun rett til engangsstønad når du overtar omsorgen innen 56 uker etter {{eq sak.er-adopsjon yes="adopsjonen" no="fødselen"}}. Du overtok omsorgen for {{> barnet}} senere enn dette. Derfor har du ikke rett til engangsstønad
         {{/case}}
         {{#case "ES_FAR_IKKE_INNEN_STONADSPERIODE"}}
 Du har kun rett til engangsstønad når du skal overta foreldreansvaret for {{> barnet}} etter barneloven kapittel 5. Fordi det ikke er dokumentert at du skal ha foreldreansvaret alene for {{> barnet}}, har du ikke rett til engangsstønad.
@@ -196,13 +196,13 @@ Foreldrepengene skulle vært stanset [opphørsdato]. Fordi foreldrepengene er bl
     {{#case "UTTAK_GENERELT_TYPE"}}
         {{#switch fakta.hendelseundertype}}
         {{#case "STONADSPERIODE_OVER_3"}}
-Du kan få foreldrepenger i inntil tre år etter at {{#if er-adopsjon}}du overtok omsorgen for {{/if}}{{> barnet-ditt}}{{#if er-fødsel}} ble født{{/if}}. Fordi det har gått mer enn tre år, har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
+Du kan få foreldrepenger i inntil tre år etter at {{#if sak.er-adopsjon}}du overtok omsorgen for {{/if}}{{> barnet-ditt}}{{#if sak.er-fødsel}} ble født{{/if}}. Fordi det har gått mer enn tre år, har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
         {{/case}}
         {{#case "NY_STONADSPERIODE"}}
 Du eller den andre forelderen har fått innvilget foreldrepenger for [nytt/nye] barn [dato]. Du har ikke rett til foreldrepenger de dagene som er igjen fra den forrige perioden med foreldrepenger. Du har derfor fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
         {{/case}}
         {{#case "IKKE_OMSORG"}}
-Vi har fått opplysninger om at du ikke hadde omsorgen for {{eq antall-barn 1 yes="barnet" no="barna"}} fra og med [dato]. Du har kun rett til foreldrepenger dersom du har omsorgen for {{eq antall-barn 1 yes="barnet" no="barna"}}. Du har derfor fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
+Vi har fått opplysninger om at du ikke hadde omsorgen for {{eq sak.antall-barn 1 yes="barnet" no="barna"}} fra og med [dato]. Du har kun rett til foreldrepenger dersom du har omsorgen for {{eq sak.antall-barn 1 yes="barnet" no="barna"}}. Du har derfor fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
         {{/case}}
         {{#case "MOTTAKER_I_ARBEID"}}
 Du har fått utbetalt foreldrepenger i samme periode som du har jobbet heltid. Du kan ikke jobbe heltid og få utbetalt foreldrepenger samtidig. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
@@ -279,7 +279,7 @@ Du har ikke rett til foreldrepenger i denne perioden. Derfor har du fått {{kron
     {{#case "UTTAK_ALENEOMSORG_TYPE"}}
         {{#switch fakta.hendelseundertype}}
         {{#case "IKKE_ALENEOMSORG"}}
-Du hadde bare rett til foreldrepenger i denne perioden hvis du hadde hatt aleneomsorgen for {{eq antall-barn 1 yes="barnet" no="barna"}}. Vi  har fått opplyst at du ikke hadde aleneomsorgen. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
+Du hadde bare rett til foreldrepenger i denne perioden hvis du hadde hatt aleneomsorgen for {{eq sak.antall-barn 1 yes="barnet" no="barna"}}. Vi  har fått opplyst at du ikke hadde aleneomsorgen. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
         {{/case}}
         {{/switch}}
     {{/case}}

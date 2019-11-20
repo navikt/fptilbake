@@ -63,6 +63,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.Brev
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.JournalpostIdOgDokumentId;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbSak;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbTotalresultat;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevFelles;
@@ -208,13 +209,15 @@ public class VedtaksbrevTjeneste {
         BigDecimal totaltTilbakekrevesBeløpMedRenterUtenSkatt = totaltTilbakekrevesMedRenter.subtract(totaltSkattetrekk);
         String hjemmelstekst = VedtakHjemmel.lagHjemmelstekst(vedtakResultatType, foreldelse, vilkårPerioder);
         HbVedtaksbrevFelles.Builder vedtakDataBuilder = HbVedtaksbrevFelles.builder()
-            .medYtelsetype(behandling.getFagsak().getFagsakYtelseType())
+            .medSak(HbSak.build()
+                .medYtelsetype(behandling.getFagsak().getFagsakYtelseType())
+                .medDatoFagsakvedtak(fpsakBehandling.getGrunninformasjon().getVedtakDato())
+                .medAntallBarn(fpsakBehandling.getAntallBarnSøktFor())
+                .medErFødsel(SøknadType.FØDSEL == fpsakBehandling.getSøknadType())
+                .medErAdopsjon(SøknadType.ADOPSJON == fpsakBehandling.getSøknadType())
+                .build())
             .medVarsletDato(varsletDato)
             .medVarsletBeløp(varsletBeløp)
-            .medDatoFagsakvedtak(fpsakBehandling.getGrunninformasjon().getVedtakDato())
-            .medAntallBarn(fpsakBehandling.getAntallBarnSøktFor())
-            .medErFødsel(SøknadType.FØDSEL == fpsakBehandling.getSøknadType())
-            .medErAdopsjon(SøknadType.ADOPSJON == fpsakBehandling.getSøknadType())
             .medFritekstOppsummering(oppsummeringFritekst)
             .medLovhjemmelVedtak(hjemmelstekst)
             .medVedtakResultat(HbTotalresultat.builder()

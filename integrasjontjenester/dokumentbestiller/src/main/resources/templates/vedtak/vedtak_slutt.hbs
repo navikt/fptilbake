@@ -5,7 +5,7 @@
 {{/if}}
 Vedtaket er gjort etter {{lovhjemmel-vedtak}}.
 {{#if (neq totalresultat.hovedresultat "INGEN_TILBAKEBETALING")}}
-    {{#if (neq ytelsetype "ES")}}
+    {{#if (neq sak.ytelsetype "ES")}}
 {{> hovedoverskrift}}Skatt
 NAV gir opplysninger til skatteetaten når det feilutbetalte beløpet er tilbakebetalt. Skatteetaten vil da vurdere om det er grunnlag for å endre tidligere skatteoppgjør.
     {{/if}}
