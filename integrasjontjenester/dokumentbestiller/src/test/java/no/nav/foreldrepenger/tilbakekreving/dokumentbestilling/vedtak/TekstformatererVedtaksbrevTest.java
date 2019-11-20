@@ -25,6 +25,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Ak
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.AnnenVurdering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.SærligGrunn;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbKravgrunnlag;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbResultat;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevFelles;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevPeriode;
@@ -67,9 +69,8 @@ public class TekstformatererVedtaksbrevTest {
                     .medSærligeGrunner(Arrays.asList(SærligGrunn.TID_FRA_UTBETALING, SærligGrunn.STØRRELSE_BELØP), null, null)
                     .build())
                 .medFakta(HendelseType.FP_ANNET_HENDELSE_TYPE, FellesUndertyper.REFUSJON_ARBEIDSGIVER)
-                .medRiktigBeløp(BigDecimal.valueOf(10000))
-                .medFeilutbetaltBeløp(BigDecimal.valueOf(30001))
-                .medTilbakekrevesBeløp(BigDecimal.valueOf(20002))
+                .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(30001)))
+                .medResultat(HbResultat.forTilbakekrevesBeløp(BigDecimal.valueOf(20002)))
                 .build(),
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(februar)
@@ -80,10 +81,12 @@ public class TekstformatererVedtaksbrevTest {
                     .medSærligeGrunner(Arrays.asList(SærligGrunn.HELT_ELLER_DELVIS_NAVS_FEIL, SærligGrunn.STØRRELSE_BELØP), null, null)
                     .build())
                 .medFakta(HendelseType.ØKONOMI_FEIL, ØkonomiUndertyper.DOBBELTUTBETALING)
-                .medRiktigBeløp(BigDecimal.valueOf(3000))
-                .medUtbetaltBeløp(BigDecimal.valueOf(6000))
-                .medFeilutbetaltBeløp(BigDecimal.valueOf(3000))
-                .medTilbakekrevesBeløp(BigDecimal.valueOf(3000))
+                .medKravgrunnlag(HbKravgrunnlag.builder()
+                    .medFeilutbetaltBeløp(BigDecimal.valueOf(3000))
+                    .medRiktigBeløp(BigDecimal.valueOf(3000))
+                    .medUtbetaltBeløp(BigDecimal.valueOf(6000))
+                    .build())
+                .medResultat(HbResultat.forTilbakekrevesBeløp(BigDecimal.valueOf(3000)))
                 .build()
         );
         HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
@@ -120,9 +123,10 @@ public class TekstformatererVedtaksbrevTest {
                     .medBeløpIBehold(BigDecimal.ZERO)
                     .build())
                 .medFakta(HendelseType.FP_UTTAK_GRADERT_TYPE, FpHendelseUnderTyper.GRADERT_UTTAK)
-                .medRiktigBeløp(BigDecimal.ZERO)
-                .medFeilutbetaltBeløp(BigDecimal.valueOf(1000))
-                .medTilbakekrevesBeløp(BigDecimal.ZERO)
+                .medKravgrunnlag(HbKravgrunnlag.builder()
+                    .medFeilutbetaltBeløp(BigDecimal.valueOf(1000))
+                    .build())
+                .medResultat(HbResultat.forTilbakekrevesBeløp(BigDecimal.ZERO))
                 .build()
         );
         HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
@@ -161,10 +165,13 @@ public class TekstformatererVedtaksbrevTest {
                     .medSærligeGrunner(Arrays.asList(SærligGrunn.HELT_ELLER_DELVIS_NAVS_FEIL, SærligGrunn.STØRRELSE_BELØP, SærligGrunn.TID_FRA_UTBETALING, SærligGrunn.ANNET), "Gratulerer, du fikk norgesrekord i feilutbetalt beløp! Du skal slippe å betale renter, for det har du ikke råd til uansett!", "at du jobber med foreldrepenger og dermed vet hvordan dette fungerer!")
                     .build())
                 .medFakta(HendelseType.FP_ANNET_HENDELSE_TYPE, FellesUndertyper.ANNET_FRITEKST, "Ingen vet riktig hva som har skjedd, men du har fått utbetalt alt for mye penger.")
-                .medRiktigBeløp(BigDecimal.valueOf(0))
-                .medFeilutbetaltBeløp(BigDecimal.valueOf(1234567890))
-                .medTilbakekrevesBeløp(BigDecimal.valueOf(1234567890))
-                .medRenterBeløp(BigDecimal.valueOf(0))
+                .medKravgrunnlag(HbKravgrunnlag.builder()
+                    .medFeilutbetaltBeløp(BigDecimal.valueOf(1234567890))
+                    .build())
+                .medResultat(HbResultat.builder()
+                    .medTilbakekrevesBeløp(BigDecimal.valueOf(1234567890))
+                    .medRenterBeløp(BigDecimal.valueOf(0))
+                    .build())
                 .build(),
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(februar)
@@ -176,10 +183,12 @@ public class TekstformatererVedtaksbrevTest {
                     .medBeløpIBehold(BigDecimal.valueOf(1))
                     .build())
                 .medFakta(HendelseType.ØKONOMI_FEIL, ØkonomiUndertyper.FOR_MYE_UTBETALT, "Her har økonomisystemet gjort noe helt feil.")
-                .medRiktigBeløp(BigDecimal.valueOf(0))
-                .medUtbetaltBeløp(BigDecimal.valueOf(1))
-                .medFeilutbetaltBeløp(BigDecimal.valueOf(1))
-                .medTilbakekrevesBeløp(BigDecimal.valueOf(1))
+                .medKravgrunnlag(HbKravgrunnlag.builder()
+                    .medRiktigBeløp(BigDecimal.valueOf(0))
+                    .medUtbetaltBeløp(BigDecimal.valueOf(1))
+                    .medFeilutbetaltBeløp(BigDecimal.valueOf(1))
+                    .build())
+                .medResultat(HbResultat.forTilbakekrevesBeløp(BigDecimal.valueOf(1)))
                 .build(),
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(mars)
@@ -190,10 +199,12 @@ public class TekstformatererVedtaksbrevTest {
                     .medFritekstVilkår("Her burde du passet mer på!")
                     .build())
                 .medFakta(HendelseType.FP_UTTAK_GRADERT_TYPE, FpHendelseUnderTyper.GRADERT_UTTAK)
-                .medRiktigBeløp(BigDecimal.valueOf(0))
-                .medUtbetaltBeløp(BigDecimal.valueOf(1))
-                .medFeilutbetaltBeløp(BigDecimal.valueOf(1))
-                .medTilbakekrevesBeløp(BigDecimal.valueOf(1))
+                .medKravgrunnlag(HbKravgrunnlag.builder()
+                    .medRiktigBeløp(BigDecimal.valueOf(0))
+                    .medUtbetaltBeløp(BigDecimal.valueOf(1))
+                    .medFeilutbetaltBeløp(BigDecimal.valueOf(1))
+                    .build())
+                .medResultat(HbResultat.forTilbakekrevesBeløp(BigDecimal.valueOf(1)))
                 .build(),
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(april)
@@ -204,10 +215,12 @@ public class TekstformatererVedtaksbrevTest {
                     .medFritekstVilkår("Dette gjorde du med vilje!")
                     .build())
                 .medFakta(HendelseType.FP_UTTAK_KVOTENE_TYPE, FpHendelseUnderTyper.KVO_MOTTAKER_INNLAGT)
-                .medRiktigBeløp(BigDecimal.valueOf(0))
-                .medUtbetaltBeløp(BigDecimal.valueOf(1))
-                .medFeilutbetaltBeløp(BigDecimal.valueOf(1))
-                .medTilbakekrevesBeløp(BigDecimal.valueOf(1))
+                .medKravgrunnlag(HbKravgrunnlag.builder()
+                    .medRiktigBeløp(BigDecimal.valueOf(0))
+                    .medUtbetaltBeløp(BigDecimal.valueOf(1))
+                    .medFeilutbetaltBeløp(BigDecimal.valueOf(1))
+                    .build())
+                .medResultat(HbResultat.forTilbakekrevesBeløp(BigDecimal.valueOf(1)))
                 .build()
         );
 
@@ -243,10 +256,11 @@ public class TekstformatererVedtaksbrevTest {
                     .medAktsomhetResultat(Aktsomhet.FORSETT)
                     .build())
                 .medFakta(HendelseType.SVP_FAKTA_TYPE, SvpHendelseUnderTyper.SVP_IKKE_HELSEFARLIG)
-                .medRiktigBeløp(BigDecimal.ZERO)
-                .medFeilutbetaltBeløp(BigDecimal.valueOf(10000))
-                .medTilbakekrevesBeløp(BigDecimal.valueOf(10000))
-                .medRenterBeløp(BigDecimal.valueOf(1000))
+                .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(10000)))
+                .medResultat(HbResultat.builder()
+                    .medTilbakekrevesBeløp(BigDecimal.valueOf(10000))
+                    .medRenterBeløp(BigDecimal.valueOf(1000))
+                    .build())
                 .build()
         );
 
@@ -284,10 +298,11 @@ public class TekstformatererVedtaksbrevTest {
                     .medBeløpIBehold(BigDecimal.ZERO)
                     .build())
                 .medFakta(HendelseType.ES_FODSELSVILKAARET_TYPE, EsHendelseUnderTyper.ES_MOTTAKER_FAR_MEDMOR)
-                .medRiktigBeløp(BigDecimal.ZERO)
-                .medFeilutbetaltBeløp(BigDecimal.valueOf(10000))
-                .medTilbakekrevesBeløp(BigDecimal.ZERO)
-                .medRenterBeløp(BigDecimal.ZERO)
+                .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(10000)))
+                .medResultat(HbResultat.builder()
+                    .medTilbakekrevesBeløp(BigDecimal.ZERO)
+                    .medRenterBeløp(BigDecimal.ZERO)
+                    .build())
                 .build()
         );
 
@@ -324,10 +339,11 @@ public class TekstformatererVedtaksbrevTest {
                     .medSærligeGrunner(Arrays.asList(SærligGrunn.STØRRELSE_BELØP, SærligGrunn.GRAD_AV_UAKTSOMHET), null, null)
                     .build())
                 .medFakta(HendelseType.ES_ADOPSJONSVILKAARET_TYPE, EsHendelseUnderTyper.ES_BARN_OVER_15)
-                .medRiktigBeløp(BigDecimal.valueOf(500000))
-                .medFeilutbetaltBeløp(BigDecimal.valueOf(500000))
-                .medTilbakekrevesBeløp(BigDecimal.valueOf(500000))
-                .medRenterBeløp(BigDecimal.valueOf(50000))
+                .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(500000)))
+                .medResultat(HbResultat.builder()
+                    .medTilbakekrevesBeløp(BigDecimal.valueOf(500000))
+                    .medRenterBeløp(BigDecimal.valueOf(50000))
+                    .build())
                 .build()
         );
 
@@ -362,9 +378,8 @@ public class TekstformatererVedtaksbrevTest {
                     .medForeldetBeløp(BigDecimal.valueOf(1000))
                     .medAktsomhetResultat(AnnenVurdering.FORELDET)
                     .build())
-                .medRiktigBeløp(BigDecimal.ZERO)
-                .medFeilutbetaltBeløp(BigDecimal.valueOf(1000))
-                .medTilbakekrevesBeløp(BigDecimal.ZERO)
+                .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(1000)))
+                .medResultat(HbResultat.forTilbakekrevesBeløp(BigDecimal.ZERO))
                 .build(),
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(februar)
@@ -375,9 +390,8 @@ public class TekstformatererVedtaksbrevTest {
                     .medBeløpIBehold(BigDecimal.valueOf(1000))
                     .build())
                 .medFakta(HendelseType.FP_UTTAK_GRADERT_TYPE, FpHendelseUnderTyper.GRADERT_UTTAK)
-                .medRiktigBeløp(BigDecimal.ZERO)
-                .medFeilutbetaltBeløp(BigDecimal.valueOf(1000))
-                .medTilbakekrevesBeløp(BigDecimal.valueOf(1000))
+                .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(1000)))
+                .medResultat(HbResultat.forTilbakekrevesBeløp(BigDecimal.valueOf(1000)))
                 .build()
         );
         HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
@@ -413,9 +427,11 @@ public class TekstformatererVedtaksbrevTest {
                     .medUnntasInnkrevingPgaLavtBeløp(true)
                     .build())
                 .medFakta(HendelseType.FP_ANNET_HENDELSE_TYPE, FellesUndertyper.ANNET_FRITEKST, "foo bar baz")
-                .medFeilutbetaltBeløp(BigDecimal.valueOf(500))
-                .medTilbakekrevesBeløp(BigDecimal.ZERO)
-                .medRenterBeløp(BigDecimal.ZERO)
+                .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(500)))
+                .medResultat(HbResultat.builder()
+                    .medTilbakekrevesBeløp(BigDecimal.ZERO)
+                    .medRenterBeløp(BigDecimal.ZERO)
+                    .build())
                 .build()
         );
 

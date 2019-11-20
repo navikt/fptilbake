@@ -16,6 +16,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResult
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.SærligGrunn;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbKravgrunnlag;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbResultat;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevFelles;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevPeriode;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVurderinger;
@@ -99,13 +101,15 @@ public class DokumentasjonGeneratorSærligeGrunner {
                 .medVilkårResultat(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER)
                 .medAktsomhetResultat(aktsomhet)
                 .medSærligeGrunner(sg, null, fritekstSærligeGrunnerAnnet)
-                .build()
-            )
+                .build()            )
+            .medKravgrunnlag(HbKravgrunnlag.builder()
+                .medFeilutbetaltBeløp(BigDecimal.valueOf(1000))
+                .build()            )
+            .medResultat(HbResultat.builder()
+                .medTilbakekrevesBeløp(BigDecimal.valueOf(reduksjon ? 500 : 1000))
+                .medRenterBeløp(BigDecimal.ZERO)
+                .build())
             .medFakta(HendelseType.FP_UTTAK_GRADERT_TYPE, FpHendelseUnderTyper.GRADERT_UTTAK)
-            .medRiktigBeløp(BigDecimal.ZERO)
-            .medFeilutbetaltBeløp(BigDecimal.valueOf(1000))
-            .medTilbakekrevesBeløp(BigDecimal.valueOf(reduksjon ? 500 : 1000))
-            .medRenterBeløp(BigDecimal.ZERO)
             .build();
     }
 

@@ -66,6 +66,8 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.Frit
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.JournalpostIdOgDokumentId;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbFakta;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbKravgrunnlag;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbResultat;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevFelles;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevPeriode;
@@ -291,16 +293,19 @@ public class VedtaksbrevTjeneste {
         Periode periode = resultatPeriode.getPeriode();
         PeriodeMedTekstDto fritekst = finnPeriodeFritekster(periode, perioderFritekst);
 
-        HbVedtaksbrevPeriode.Builder builder = HbVedtaksbrevPeriode.builder()
+        return HbVedtaksbrevPeriode.builder()
             .medPeriode(periode)
             .medFakta(utledFakta(periode, fakta, fritekst))
             .medVurderinger(utledVurderinger(resultatPeriode, vilkårPerioder, foreldelse, fritekst))
-            .medFeilutbetaltBeløp(resultatPeriode.getFeilutbetaltBeløp())
-            .medTilbakekrevesBeløp(resultatPeriode.getTilbakekrevingBeløpUtenRenter())
-            .medRiktigBeløp(resultatPeriode.getRiktigYtelseBeløp())
-            .medUtbetaltBeløp(resultatPeriode.getUtbetaltYtelseBeløp())
-            .medRenterBeløp(resultatPeriode.getRenteBeløp());
-        return builder.build();
+            .medKravgrunnlag(HbKravgrunnlag.builder()
+                .medFeilutbetaltBeløp(resultatPeriode.getFeilutbetaltBeløp())
+                .medRiktigBeløp(resultatPeriode.getRiktigYtelseBeløp())
+                .medUtbetaltBeløp(resultatPeriode.getUtbetaltYtelseBeløp())
+                .build())
+            .medResultat(HbResultat.builder()
+                .medTilbakekrevesBeløp(resultatPeriode.getTilbakekrevingBeløpUtenRenter())
+                .medRenterBeløp(resultatPeriode.getRenteBeløp())
+                .build()).build();
     }
 
     private HbVurderinger utledVurderinger(BeregningResultatPeriode resultatPeriode, List<VilkårVurderingPeriodeEntitet> vilkårPerioder, VurdertForeldelse foreldelse, PeriodeMedTekstDto fritekst) {

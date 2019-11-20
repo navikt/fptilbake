@@ -28,6 +28,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResult
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.AnnenVurdering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbKravgrunnlag;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbResultat;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevFelles;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevPeriode;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevPeriodeOgFelles;
@@ -141,11 +143,15 @@ public class TekstformatererVedtaksbrevAllePermutasjonerTest {
                 .medVilkårResultat(VilkårResultat.GOD_TRO)
                 .medBeløpIBehold(BigDecimal.valueOf(10000))
                 .build())
-            .medFeilutbetaltBeløp(BigDecimal.valueOf(10000))
-            .medTilbakekrevesBeløp(BigDecimal.valueOf(10000))
-            .medRenterBeløp(BigDecimal.valueOf(1000))
-            .medUtbetaltBeløp(BigDecimal.valueOf(33333))
-            .medRiktigBeløp(BigDecimal.valueOf(23333));
+            .medKravgrunnlag(HbKravgrunnlag.builder()
+                .medFeilutbetaltBeløp(BigDecimal.valueOf(10000))
+                .medUtbetaltBeløp(BigDecimal.valueOf(33333))
+                .medRiktigBeløp(BigDecimal.valueOf(23333))
+                .build())
+            .medResultat(HbResultat.builder()
+                .medTilbakekrevesBeløp(BigDecimal.valueOf(10000))
+                .medRenterBeløp(BigDecimal.valueOf(1000))
+                .build());
     }
 
     private HbVedtaksbrevFelles.Builder lagFellesBuilder() {
