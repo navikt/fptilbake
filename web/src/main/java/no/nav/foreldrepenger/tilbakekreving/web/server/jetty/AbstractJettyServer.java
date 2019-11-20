@@ -74,6 +74,8 @@ abstract class AbstractJettyServer {
     protected abstract void konfigurerMiljø() throws Exception;
 
     protected void konfigurerSikkerhet() {
+        System.setProperty(SecurityFilter.SWAGGER_HASH_KEY, "sha256-S6UdqSRAsovNMnA3zLfPxcOynVd0ynctkR20nS7kRZk="); //må ha egen hash siden swagger-filene inneholder applikasjonsnavnet
+
         Security.setProperty(AuthConfigFactory.DEFAULT_FACTORY_SECURITY_PROPERTY, AuthConfigFactoryImpl.class.getCanonicalName());
         System.setProperty(SubjectHandler.SUBJECTHANDLER_KEY, JettySubjectHandler.class.getName());
 
