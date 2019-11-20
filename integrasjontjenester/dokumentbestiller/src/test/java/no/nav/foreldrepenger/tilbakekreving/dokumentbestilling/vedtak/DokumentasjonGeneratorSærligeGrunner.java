@@ -16,8 +16,10 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResult
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.SærligGrunn;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbKonfigurasjon;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbSak;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbTotalresultat;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVarsel;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevFelles;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbKravgrunnlag;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbResultat;
@@ -103,10 +105,10 @@ public class DokumentasjonGeneratorSærligeGrunner {
                 .medVilkårResultat(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER)
                 .medAktsomhetResultat(aktsomhet)
                 .medSærligeGrunner(sg, null, fritekstSærligeGrunnerAnnet)
-                .build()            )
+                .build())
             .medKravgrunnlag(HbKravgrunnlag.builder()
                 .medFeilutbetaltBeløp(BigDecimal.valueOf(1000))
-                .build()            )
+                .build())
             .medResultat(HbResultat.builder()
                 .medTilbakekrevesBeløp(BigDecimal.valueOf(reduksjon ? 500 : 1000))
                 .medRenterBeløp(BigDecimal.ZERO)
@@ -129,9 +131,13 @@ public class DokumentasjonGeneratorSærligeGrunner {
                 .medTotaltRentebeløp(BigDecimal.valueOf(100))
                 .build())
             .medLovhjemmelVedtak("foo")
-            .medVarsletBeløp(BigDecimal.valueOf(1000))
-            .medVarsletDato(LocalDate.of(2020, 4, 4))
-            .medKlagefristUker(4)
+            .medVarsel(HbVarsel.builder()
+                .medVarsletBeløp(BigDecimal.valueOf(1000))
+                .medVarsletDato(LocalDate.of(2020, 4, 4))
+                .build())
+            .medKonfigurasjon(HbKonfigurasjon.builder()
+                .medKlagefristUker(4)
+                .build())
             .build();
     }
 }

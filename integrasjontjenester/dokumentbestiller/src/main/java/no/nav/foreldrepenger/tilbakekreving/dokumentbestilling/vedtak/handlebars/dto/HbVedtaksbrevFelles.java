@@ -1,26 +1,13 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.BigDecimalHeltallSerialiserer;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.HandlebarsData;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.LocalDateTilStrengMedNorskFormatSerialiserer;
 import no.nav.vedtak.util.Objects;
 
 public class HbVedtaksbrevFelles implements HandlebarsData {
-
-    @JsonProperty("varslet-dato")
-    @JsonSerialize(using = LocalDateTilStrengMedNorskFormatSerialiserer.class)
-    private LocalDate varsletDato;
-    @JsonProperty("varslet-beløp")
-    @JsonSerialize(using = BigDecimalHeltallSerialiserer.class)
-    private BigDecimal varsletBeløp;
 
     @JsonProperty("fritekst-oppsummering")
     private String fritekstOppsummering;
@@ -28,26 +15,15 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
     private String lovhjemmelVedtak;
     @JsonProperty("lovhjemmel-flertall")
     private boolean lovhjemmelFlertall;
-    @JsonProperty("fire-rettsgebyr")
-    @JsonSerialize(using = BigDecimalHeltallSerialiserer.class)
-    private BigDecimal fireRettsgebyr = BigDecimal.valueOf(4600);  //FIXME fjerne hardkoding
-    @JsonProperty("halvt-grunnbeløp")
-    @JsonSerialize(using = BigDecimalHeltallSerialiserer.class)
-    private BigDecimal halvtGrunnbeløp = BigDecimal.valueOf(49929);  //FIXME fjerne hardkoding
-    @JsonProperty("klagefrist-uker")
-    private Integer klagefristUker;
-    @JsonProperty("kontakt-nav-telefon")
-    private String kontaktNavTelefon = "55 55 33 33"; //TODO fjerne hardkoding
-    @JsonProperty("kontakt-nav-innkreving-telefon")
-    private String kontaktNavInnkrevingTelefon = "21 05 11 00";  //TODO fjerne hardkoding
-    @JsonProperty("bruk-midlertidig-tekst")
-    private boolean brukMidlertidigTekst = true;
 
     @JsonProperty("totalresultat")
     private HbTotalresultat totalresultat;
-
     @JsonProperty("sak")
     private HbSak sak;
+    @JsonProperty("varsel")
+    private HbVarsel varsel;
+    @JsonProperty("konfigurasjon")
+    private HbKonfigurasjon konfigurasjon;
 
     private HbVedtaksbrevFelles() {
         //bruk Builder
@@ -83,25 +59,12 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
         public HbVedtaksbrevFelles build() {
             Objects.check(kladd.lovhjemmelVedtak != null, "lovhjemmelVedtak er ikke satt");
             Objects.check(kladd.sak != null, "sak-informasjon er ikke satt");
-
-            Objects.check(kladd.fireRettsgebyr != null, "fireRettsgebyr er ikke satt");
-            Objects.check(kladd.halvtGrunnbeløp != null, "halvtGrunnbeløp er ikke satt");
-            Objects.check(kladd.klagefristUker != null, "klagefristUker er ikke satt");
-            Objects.check(kladd.kontaktNavTelefon != null, "kontaktNavTelefon er ikke satt");
-            Objects.check(kladd.kontaktNavInnkrevingTelefon != null, "kontaktNavInnkrevingTelefon er ikke satt");
-
+            Objects.check(kladd.konfigurasjon != null, "konfigurasjon er ikke satt");
             Objects.check(kladd.totalresultat != null, "totalresultat er ikke satt");
-            if (kladd.brukMidlertidigTekst) {
+            if (kladd.konfigurasjon.brukMidlertidigTekst()) {
                 Objects.check(kladd.totalresultat.harBeløpMedRenterUtenSkatt(), "totaltTilbakekrevesBeløpMedRenterUtenSkatt er ikke satt");
             }
-
-            if (kladd.varsletDato == null && kladd.varsletBeløp != null) {
-                throw new IllegalArgumentException("Inkonsistent tilstand: varslet beløp finnes, men varslet dato finnes ikke");
-            }
-            if (kladd.varsletDato != null && kladd.varsletBeløp == null) {
-                throw new IllegalArgumentException("Inkonsistent tilstand: varslet dato finnes, men varslet beløp finnes ikke");
-            }
-            if (kladd.varsletDato == null) {
+            if (kladd.varsel == null) {
                 Objects.check(kladd.sak.harDatoForFagsakvedtak(), "dato for fagsakvedtak/revurdering er ikke satt");
             }
             return kladd;
@@ -112,26 +75,20 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
             return this;
         }
 
-        public Builder medVarsletDato(LocalDate varsletDato) {
-            kladd.varsletDato = varsletDato;
-            return this;
-        }
-
         public Builder medSak(HbSak sak) {
             kladd.sak = sak;
             return this;
         }
 
-        public Builder medVarsletBeløp(BigDecimal varsletBeløp) {
-            kladd.varsletBeløp = varsletBeløp;
+        public Builder medVarsel(HbVarsel varsel) {
+            kladd.varsel = varsel;
             return this;
         }
 
-        public Builder medVarsletBeløp(Long varsletBeløp) {
-            kladd.varsletBeløp = varsletBeløp != null ? BigDecimal.valueOf(varsletBeløp) : null;
+        public Builder medKonfigurasjon(HbKonfigurasjon konfigurasjon) {
+            kladd.konfigurasjon = konfigurasjon;
             return this;
         }
-
 
         public Builder medFritekstOppsummering(String fritekstOppsummering) {
             kladd.fritekstOppsummering = fritekstOppsummering;
@@ -148,34 +105,5 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
             return this;
         }
 
-        public Builder medFireRettsgebyr(BigDecimal fireRettsgebyr) {
-            kladd.fireRettsgebyr = fireRettsgebyr;
-            return this;
-        }
-
-        public Builder medHalvtGrunnbeløp(BigDecimal halvtGrunnbeløp) {
-            kladd.halvtGrunnbeløp = halvtGrunnbeløp;
-            return this;
-        }
-
-        public Builder medKlagefristUker(int klagefristUker) {
-            kladd.klagefristUker = klagefristUker;
-            return this;
-        }
-
-        public Builder medKontaktNavTelefon(String kontaktNavTelefon) {
-            kladd.kontaktNavTelefon = kontaktNavTelefon;
-            return this;
-        }
-
-        public Builder medKontaktNavInnkrevingTelefon(String kontaktNavInnkrevingTelefon) {
-            kladd.kontaktNavInnkrevingTelefon = kontaktNavInnkrevingTelefon;
-            return this;
-        }
-
-        public Builder skruAvMidlertidigTekst() {
-            kladd.brukMidlertidigTekst = false;
-            return this;
-        }
     }
 }

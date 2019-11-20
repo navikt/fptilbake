@@ -63,8 +63,10 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.Brev
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.JournalpostIdOgDokumentId;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbKonfigurasjon;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbSak;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbTotalresultat;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVarsel;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevFelles;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbFakta;
@@ -216,8 +218,7 @@ public class VedtaksbrevTjeneste {
                 .medErFødsel(SøknadType.FØDSEL == fpsakBehandling.getSøknadType())
                 .medErAdopsjon(SøknadType.ADOPSJON == fpsakBehandling.getSøknadType())
                 .build())
-            .medVarsletDato(varsletDato)
-            .medVarsletBeløp(varsletBeløp)
+            .medVarsel(HbVarsel.forDatoOgBeløp(varsletDato, varsletBeløp))
             .medFritekstOppsummering(oppsummeringFritekst)
             .medLovhjemmelVedtak(hjemmelstekst)
             .medVedtakResultat(HbTotalresultat.builder()
@@ -227,7 +228,9 @@ public class VedtaksbrevTjeneste {
                 .medTotaltTilbakekrevesBeløpMedRenter(totaltTilbakekrevesMedRenter)
                 .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(totaltTilbakekrevesBeløpMedRenterUtenSkatt)
                 .build())
-            .medKlagefristUker(KLAGEFRIST_UKER);
+            .medKonfigurasjon(HbKonfigurasjon.builder()
+                .medKlagefristUker(KLAGEFRIST_UKER)
+                .build());
 
         List<HbVedtaksbrevPeriode> perioder = resulatPerioder.stream()
             .map(brp -> lagBrevdataPeriode(brp, fakta, vilkårPerioder, foreldelse, perioderFritekst))

@@ -154,7 +154,7 @@ Du har ikke rett til foreldrepenger i denne perioden. Derfor har du fått {{kron
     {{#case "BEREGNING_TYPE"}}
         {{#switch fakta.hendelseundertype}}
         {{#case "INNTEKT_UNDER"}}
-Du har kun rett til {{> ytelse-navn}} dersom du har tjent mer enn {{kroner halvt-grunnbeløp}} i året{{> før-skatt}}. Inntekten din var lavere enn {{kroner halvt-grunnbeløp}} i året{{> før-skatt}}. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
+Du har kun rett til {{> ytelse-navn}} dersom du har tjent mer enn {{kroner konfigurasjon.halvt-grunnbeløp}} i året{{> før-skatt}}. Inntekten din var lavere enn {{kroner konfigurasjon.halvt-grunnbeløp}} i året{{> før-skatt}}. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
         {{/case}}
         {{#case "ENDRING_GRUNNLAG"}}
 Vi beregnet {{> ytelse-produkt}} dine til [beløp] kroner i året{{> før-skatt}}. Beregningen ble deretter endret [dato] til [beløp] kroner i året{{> før-skatt}}. Du har derfor fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
@@ -360,7 +360,7 @@ Du har ikke hatt arbeidsinntekt eller inntekt som er likestilt med lønn i minst
 Du har fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
         {{/case}}
         {{#case "SVP_INNTEKT_UNDER"}}
-Du har kun rett til {{> ytelse-navn}} dersom du har tjent mer enn {{kroner halvt-grunnbeløp}} i året{{> før-skatt}}. Inntekten din var lavere enn {{kroner halvt-grunnbeløp}} i året{{> før-skatt}}. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
+Du har kun rett til {{> ytelse-navn}} dersom du har tjent mer enn {{kroner konfigurasjon.halvt-grunnbeløp}} i året{{> før-skatt}}. Inntekten din var lavere enn {{kroner konfigurasjon.halvt-grunnbeløp}} i året{{> før-skatt}}. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
         {{/case}}
         {{#case "SVP_INNTEKT_IKKE_TAP"}}
 Du har ikke hatt arbeidsinntekt eller inntekt som er likestilt med lønn. Derfor har du ikke rett til svangerskapspenger.
