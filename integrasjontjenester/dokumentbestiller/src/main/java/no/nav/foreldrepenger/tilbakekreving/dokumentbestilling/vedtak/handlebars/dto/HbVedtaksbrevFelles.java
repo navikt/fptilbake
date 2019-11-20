@@ -9,21 +9,18 @@ import no.nav.vedtak.util.Objects;
 
 public class HbVedtaksbrevFelles implements HandlebarsData {
 
-    @JsonProperty("fritekst-oppsummering")
-    private String fritekstOppsummering;
-    @JsonProperty("lovhjemmel-vedtak")
-    private String lovhjemmelVedtak;
-    @JsonProperty("lovhjemmel-flertall")
-    private boolean lovhjemmelFlertall;
-
-    @JsonProperty("totalresultat")
-    private HbTotalresultat totalresultat;
     @JsonProperty("sak")
     private HbSak sak;
     @JsonProperty("varsel")
     private HbVarsel varsel;
+    @JsonProperty("totalresultat")
+    private HbTotalresultat totalresultat;
+    @JsonProperty("hjemmel")
+    private HbHjemmel hjemmel;
     @JsonProperty("konfigurasjon")
     private HbKonfigurasjon konfigurasjon;
+    @JsonProperty("fritekst-oppsummering")
+    private String fritekstOppsummering;
 
     private HbVedtaksbrevFelles() {
         //bruk Builder
@@ -57,7 +54,7 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
         }
 
         public HbVedtaksbrevFelles build() {
-            Objects.check(kladd.lovhjemmelVedtak != null, "lovhjemmelVedtak er ikke satt");
+            Objects.check(kladd.hjemmel != null, "hjemmel er ikke satt");
             Objects.check(kladd.sak != null, "sak-informasjon er ikke satt");
             Objects.check(kladd.konfigurasjon != null, "konfigurasjon er ikke satt");
             Objects.check(kladd.totalresultat != null, "totalresultat er ikke satt");
@@ -96,12 +93,9 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
         }
 
         public Builder medLovhjemmelVedtak(String lovhjemmelVedtak) {
-            return medLovhjemmelVedtak(lovhjemmelVedtak, " og ");
-        }
-
-        public Builder medLovhjemmelVedtak(String lovhjemmelVedtak, String skilletegnMellomHjemler) {
-            kladd.lovhjemmelVedtak = lovhjemmelVedtak;
-            kladd.lovhjemmelFlertall = lovhjemmelVedtak.contains(skilletegnMellomHjemler);
+            kladd.hjemmel = HbHjemmel.builder()
+                .medLovhjemmelVedtak(lovhjemmelVedtak)
+                .build();
             return this;
         }
 

@@ -1,9 +1,9 @@
 {{#if (neq 1 antall-perioder)}}
-{{> hovedoverskrift}}{{#if lovhjemmel-flertall}}Lovhjemlene{{else}}Lovhjemmelen{{/if}} vi har brukt
+{{> hovedoverskrift}}{{#if hjemmel.lovhjemmel-flertall}}Lovhjemlene{{else}}Lovhjemmelen{{/if}} vi har brukt
 {{else}}
 
 {{/if}}
-Vedtaket er gjort etter {{lovhjemmel-vedtak}}.
+Vedtaket er gjort etter {{hjemmel.lovhjemmel-vedtak}}.
 {{#if (neq totalresultat.hovedresultat "INGEN_TILBAKEBETALING")}}
     {{#if (neq sak.ytelsetype "ES")}}
 {{> hovedoverskrift}}Skatt
