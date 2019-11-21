@@ -48,7 +48,6 @@ public class FellesTestOppsett extends TestOppsett {
 
     protected static final LocalDate FOM = LocalDate.of(2016, 3, 10);
     protected static final LocalDate TOM = LocalDate.of(2016, 5, 31);
-    protected static final Long SUM_FEIL_UTBETALT = 23000L;
     protected static final Long SUM_INNTREKK = 1000L;
     protected static final HendelseType HENDELSE_TYPE = HendelseType.FP_UTTAK_UTSETTELSE_TYPE;
     protected static final HendelseUnderType HENDELSE_UNDERTYPE = FpHendelseUnderTyper.ARBEID_HELTID;
@@ -73,6 +72,7 @@ public class FellesTestOppsett extends TestOppsett {
 
     protected BehandlingTjeneste behandlingTjeneste = new BehandlingTjenesteImpl(
         repoProvider,
+        prosessTaskRepository,
         behandlingskontrollProvider,
         fagsakTjeneste,
         mockHistorikkTjeneste,

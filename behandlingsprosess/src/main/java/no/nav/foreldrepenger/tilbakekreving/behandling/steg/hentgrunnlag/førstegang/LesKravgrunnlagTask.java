@@ -1,5 +1,13 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang;
 
+import java.util.Optional;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.FellesTask;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TaskProperty;
@@ -18,13 +26,6 @@ import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import java.util.Optional;
 
 @ApplicationScoped
 @ProsessTask(LesKravgrunnlagTask.TASKTYPE)
@@ -44,10 +45,12 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
     }
 
     @Inject
-    public LesKravgrunnlagTask(ØkonomiMottattXmlRepository økonomiMottattXmlRepository, KravgrunnlagTjeneste kravgrunnlagTjeneste,
-                               ProsessTaskRepository taskRepository, KravgrunnlagMapper kravgrunnlagMapper,
-                               BehandlingRepositoryProvider repositoryProvider, FpsakKlient fpsakKlient) {
-        super(taskRepository, repositoryProvider.getGrunnlagRepository(), fpsakKlient);
+    public LesKravgrunnlagTask(ØkonomiMottattXmlRepository økonomiMottattXmlRepository,
+                               KravgrunnlagTjeneste kravgrunnlagTjeneste,
+                               KravgrunnlagMapper kravgrunnlagMapper,
+                               BehandlingRepositoryProvider repositoryProvider,
+                               FpsakKlient fpsakKlient) {
+        super(repositoryProvider.getGrunnlagRepository(), fpsakKlient);
         this.økonomiMottattXmlRepository = økonomiMottattXmlRepository;
         this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
 

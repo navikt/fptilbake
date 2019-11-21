@@ -59,6 +59,7 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
         avsluttBehandling();
         Long behandlingId = behandlingTjeneste.opprettBehandlingManuell(saksnummer, UUID.randomUUID(), FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING);
         fellesBehandlingAssert(behandlingId,true);
+        assertThat(prosessTaskRepository.finnProsessTaskType(BehandlingTjenesteImpl.FINN_KRAVGRUNNLAG_TASK)).isNotEmpty();
     }
 
     @Test
@@ -75,6 +76,7 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
 
         Long behandlingId = behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternUUID, FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING);
         fellesBehandlingAssert(behandlingId,true);
+        assertThat(prosessTaskRepository.finnProsessTaskType(BehandlingTjenesteImpl.FINN_KRAVGRUNNLAG_TASK)).isNotEmpty();
     }
 
     @Test
@@ -92,6 +94,7 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
 
         Long behandlingId = behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternBehandlingUuid, FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING);
         fellesBehandlingAssert(behandlingId,true);
+        assertThat(prosessTaskRepository.finnProsessTaskType(BehandlingTjenesteImpl.FINN_KRAVGRUNNLAG_TASK)).isNotEmpty();
     }
 
     @Test

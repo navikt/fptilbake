@@ -45,6 +45,8 @@ import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsi
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.vedtak.felles.jpa.Transaction;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.konfig.KonfigVerdi;
 
 @ApplicationScoped
@@ -52,10 +54,12 @@ import no.nav.vedtak.konfig.KonfigVerdi;
 public class BehandlingTjenesteImpl implements BehandlingTjeneste {
 
     private static final Logger logger = LoggerFactory.getLogger(BehandlingTjenesteImpl.class);
+    public static final String FINN_KRAVGRUNNLAG_TASK = "kravgrunnlag.finn";
 
     private BehandlingRepository behandlingRepository;
     private EksternBehandlingRepository eksternBehandlingRepository;
     private BehandlingresultatRepository behandlingresultatRepository;
+    private ProsessTaskRepository prosessTaskRepository;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste;
     private FagsakTjeneste fagsakTjeneste;
@@ -70,6 +74,7 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
 
     @Inject
     public BehandlingTjenesteImpl(BehandlingRepositoryProvider behandlingRepositoryProvider,
+                                  ProsessTaskRepository prosessTaskRepository,
                                   BehandlingskontrollProvider behandlingskontrollProvider,
                                   FagsakTjeneste fagsakTjeneste,
                                   HistorikkinnslagTjeneste historikkinnslagTjeneste,
@@ -85,6 +90,7 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
         this.behandlingRepository = behandlingRepositoryProvider.getBehandlingRepository();
         this.eksternBehandlingRepository = behandlingRepositoryProvider.getEksternBehandlingRepository();
         this.behandlingresultatRepository = behandlingRepositoryProvider.getBehandlingresultatRepository();
+        this.prosessTaskRepository = prosessTaskRepository;
     }
 
     @Override
@@ -118,7 +124,11 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
     public Long opprettBehandlingManuell(Saksnummer saksnummer, UUID eksternUuid,
                                          FagsakYtelseType fagsakYtelseType, BehandlingType behandlingType) {
 
-        return opprettFørstegangsbehandling(saksnummer, eksternUuid, null, null, fagsakYtelseType, behandlingType);
+        Long behandlingId = opprettFørstegangsbehandling(saksnummer, eksternUuid, null, null,
+            fagsakYtelseType, behandlingType);
+
+        opprettFinnGrunnlagTask(behandlingId);
+        return behandlingId;
     }
 
     @Override
@@ -262,6 +272,13 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
             eksternBehandlingId = eksternBehandlingsinfoDto.getId();
         }
         return eksternBehandlingId;
+    }
+
+    private void opprettFinnGrunnlagTask(Long behandlingId) {
+        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
+        ProsessTaskData prosessTaskData = new ProsessTaskData(FINN_KRAVGRUNNLAG_TASK);
+        prosessTaskData.setBehandling(behandling.getFagsakId(), behandlingId, behandling.getAktørId().getId());
+        prosessTaskRepository.lagre(prosessTaskData);
     }
 
 }

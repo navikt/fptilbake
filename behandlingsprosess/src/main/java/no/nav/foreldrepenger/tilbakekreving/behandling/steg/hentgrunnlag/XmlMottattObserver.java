@@ -1,5 +1,8 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag;
 
+import static no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TaskProperty.ROOT_ELEMENT_KRAVGRUNNLAG_XML;
+import static no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TaskProperty.ROOT_ELEMENT_KRAV_VEDTAK_STATUS_XML;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
@@ -23,9 +26,6 @@ public class XmlMottattObserver {
 
     private ØkonomiMottattXmlRepository økonomiMottattXmlRepository;
     private ProsessTaskRepository prosessTaskRepository;
-
-    private static final String ROOT_ELEMENT_KRAV_VEDTAK_STATUS_XML = "endringKravOgVedtakstatus";
-    private static final String ROOT_ELEMENT_KRAVGRUNNLAG_XML = "detaljertKravgrunnlagMelding";
 
     XmlMottattObserver() {
         //for CDI proxy
