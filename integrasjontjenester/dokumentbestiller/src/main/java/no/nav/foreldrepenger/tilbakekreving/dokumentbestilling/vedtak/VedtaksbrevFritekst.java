@@ -4,7 +4,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.FellesUndertyper;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Underavsnitt;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevData;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevPeriode;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbSærligeGrunner;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbVedtaksbrevPeriode;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbVurderinger;
 
 public class VedtaksbrevFritekst {
 
@@ -14,11 +16,17 @@ public class VedtaksbrevFritekst {
 
     public static void settInnMarkeringForFritekst(HbVedtaksbrevData vedtaksbrevData) {
         for (HbVedtaksbrevPeriode periode : vedtaksbrevData.getPerioder()) {
-            FritekstType fritekstTypeForFakta = utledFritekstTypeFakta(periode.getHendelseundertype());
-            periode.setFritekstFakta(markerFritekst(fritekstTypeForFakta, periode.getFritekstFakta(), Underavsnitt.Underavsnittstype.FAKTA));
-            periode.setFritekstVilkår(markerValgfriFritekst(periode.getFritekstVilkår(), Underavsnitt.Underavsnittstype.VILKÅR));
-            periode.setFritekstSærligeGrunner(markerValgfriFritekst(periode.getFritekstSærligeGrunner(), Underavsnitt.Underavsnittstype.SÆRLIGEGRUNNER));
-            periode.setFritekstSærligeGrunnerAnnet(markerPåkrevetFritekst(periode.getFritekstSærligeGrunnerAnnet(), Underavsnitt.Underavsnittstype.SÆRLIGEGRUNNER_ANNET));
+            FritekstType fritekstTypeForFakta = utledFritekstTypeFakta(periode.getFakta().getHendelseundertype());
+            periode.getFakta().setFritekstFakta(markerFritekst(fritekstTypeForFakta, periode.getFakta().getFritekstFakta(), Underavsnitt.Underavsnittstype.FAKTA));
+            HbVurderinger vurderinger = periode.getVurderinger();
+            if (vurderinger != null) {
+                vurderinger.setFritekstVilkår(markerValgfriFritekst(vurderinger.getFritekstVilkår(), Underavsnitt.Underavsnittstype.VILKÅR));
+            }
+            HbSærligeGrunner sg = vurderinger.getSærligeGrunner();
+            if (sg != null) {
+                sg.setFritekstSærligeGrunner(markerValgfriFritekst(sg.getFritekstSærligeGrunner(), Underavsnitt.Underavsnittstype.SÆRLIGEGRUNNER));
+                sg.setFritekstSærligeGrunnerAnnet(markerPåkrevetFritekst(sg.getFritekstSærligeGrunnerAnnet(), Underavsnitt.Underavsnittstype.SÆRLIGEGRUNNER_ANNET));
+            }
         }
         vedtaksbrevData.getFelles().setFritekstOppsummering(markerValgfriFritekst(vedtaksbrevData.getFelles().getFritekstOppsummering()));
     }
@@ -31,11 +39,11 @@ public class VedtaksbrevFritekst {
         return markerValgfriFritekst(fritekst, null);
     }
 
-     static String markerValgfriFritekst(String fritekst, Underavsnitt.Underavsnittstype underavsnittstype) {
+    static String markerValgfriFritekst(String fritekst, Underavsnitt.Underavsnittstype underavsnittstype) {
         return markerFritekst(FritekstType.VALGFRI, fritekst, underavsnittstype);
     }
 
-     static String markerPåkrevetFritekst(String fritekst, Underavsnitt.Underavsnittstype underavsnittstype) {
+    static String markerPåkrevetFritekst(String fritekst, Underavsnitt.Underavsnittstype underavsnittstype) {
         return markerFritekst(FritekstType.PÅKREVET, fritekst, underavsnittstype);
     }
 

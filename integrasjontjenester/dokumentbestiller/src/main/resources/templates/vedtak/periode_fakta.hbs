@@ -1,5 +1,5 @@
 {{#* inline "fakta-medlemskap"}}
-        {{#switch hendelseundertype}}
+        {{#switch fakta.hendelseundertype}}
         {{#case "IKKE_BOSATT"}}
 Du er ikke medlem av folketrygden fordi du har oppholdt deg mer i utlandet enn i Norge. Derfor har du ikke rett til {{> ytelse-navn}}.
         {{/case}}
@@ -17,35 +17,35 @@ Du er ikke medlem av folketrygden fordi du i følge folkeregisteret flyttet fra 
         {{/case}}
         {{/switch}}
 
-Derfor har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt i denne perioden.
+Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
 {{/inline}}
 {{#* inline "fakta-økonomi-feil"}}
-        {{#switch hendelseundertype}}
+        {{#switch fakta.hendelseundertype}}
         {{#case "OKONOMI_DOBBELUTBETALING"}}
-Vi har gjort en feil og utbetalt {{> ytelse-navn}} to ganger i denne perioden. Du skulle hatt {{kroner riktig-beløp}}, men du fikk {{kroner utbetalt-beløp}}. Derfor har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt.
+Vi har gjort en feil og utbetalt {{> ytelse-navn}} to ganger i denne perioden. Du skulle hatt {{kroner kravgrunnlag.riktig-beløp}}, men du fikk {{kroner kravgrunnlag.utbetalt-beløp}}. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt.
         {{/case}}
         {{#case "OKONOMI_UTBETALT"}}
-Vi har gjort en feil og utbetalt for mye i {{> ytelse-navn}} i denne perioden. Du skulle hatt {{kroner riktig-beløp}}, men du fikk {{kroner utbetalt-beløp}}. Derfor har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt.
+Vi har gjort en feil og utbetalt for mye i {{> ytelse-navn}} i denne perioden. Du skulle hatt {{kroner kravgrunnlag.riktig-beløp}}, men du fikk {{kroner kravgrunnlag.utbetalt-beløp}}. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt.
         {{/case}}
         {{#case "OKONOMI_FEIL_TREKK"}}
-I denne perioden har vi ikke trukket fra hele skattetrekket på beløpet vi har utbetalt. Du skulle fått {{kroner riktig-beløp}}, men du fikk {{kroner utbetalt-beløp}}. Derfor har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt.
+I denne perioden har vi ikke trukket fra hele skattetrekket på beløpet vi har utbetalt. Du skulle fått {{kroner kravgrunnlag.riktig-beløp}}, men du fikk {{kroner kravgrunnlag.utbetalt-beløp}}. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt.
         {{/case}}
         {{#case "OKONOMI_FEIL_FERIEPENGER"}}
-I denne perioden har vi utbetalt for mye i feriepenger. Du skulle fått {{kroner riktig-beløp}}, men du fikk {{kroner utbetalt-beløp}}. Derfor har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt.
+I denne perioden har vi utbetalt for mye i feriepenger. Du skulle fått {{kroner kravgrunnlag.riktig-beløp}}, men du fikk {{kroner kravgrunnlag.utbetalt-beløp}}. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt.
         {{/case}}
         {{/switch}}
 {{/inline}}
 {{#* inline "fakta-arbeidsgiver-refusjon"}}
-I denne perioden har du både fått utbetalt {{> ytelse-navn}} fra oss og lønn fra arbeidsgiver. Det er arbeidsgiveren din som har rett til {{> ytelse-produkt}} fordi de utbetaler deg full lønn i samme periode. Derfor har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt.
+I denne perioden har du både fått utbetalt {{> ytelse-navn}} fra oss og lønn fra arbeidsgiver. Det er arbeidsgiveren din som har rett til {{> ytelse-produkt}} fordi de utbetaler deg full lønn i samme periode. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt.
 {{/inline}}
-{{#switch ytelsetype}}
+{{#switch sak.ytelsetype}}
 {{#case "ES"}}
-    {{#switch hendelsetype}}
+    {{#switch fakta.hendelsetype}}
     {{#case "MEDLEMSKAP"}}
         {{> fakta-medlemskap}}
     {{/case}}
     {{#case "ES_FORELDREANSVAR_TYPE"}}
-        {{#switch hendelseundertype}}
+        {{#switch fakta.hendelseundertype}}
         {{#case "ES_IKKE_MINDRE_SAMVAER"}}
 Du har kun rett til engangsstønad hvis du har hatt et samvær med {{> barnet}} før du overtok omsorgen som er mindre enn én dag i uken og annenhver helg. Du har hatt mer samvær med {{> barnet}} enn dette. Derfor har du ikke rett til engangsstønad.
         {{/case}}
@@ -60,24 +60,24 @@ Du har kun rett til engangsstønad hvis du har foreldreansvaret. Fordi du ikke h
         {{/case}}
         {{/switch}}
 
-Du har fått {{kroner feilutbetalt-beløp}} for mye utbetalt.
+Du har fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt.
     {{/case}}
     {{#case "ES_FEIL_UTBETALING_TYPE"}}
-        {{#switch hendelseundertype}}
+        {{#switch fakta.hendelseundertype}}
         {{#case "ES_STONAD_FLERE_GANGER"}}
-Du har kun rett til én engangsstønad per barn. Fordi du har fått utbetalt engangsstønad flere ganger for {{> det-samme-barnet}}, har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt.
+Du har kun rett til én engangsstønad per barn. Fordi du har fått utbetalt engangsstønad flere ganger for {{> det-samme-barnet}}, har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt.
         {{/case}}
         {{#case "ØKONOMI_UTBETALT_FOR_MYE"}}
-Vi har gjort en feil og utbetalt for mye i engangsstønad. Du skulle hatt {{kroner riktig-beløp}}, men du fikk {{kroner utbetalt-beløp}}. Derfor har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt.
+Vi har gjort en feil og utbetalt for mye i engangsstønad. Du skulle hatt {{kroner kravgrunnlag.riktig-beløp}}, men du fikk {{kroner kravgrunnlag.utbetalt-beløp}}. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt.
         {{/case}}
         {{/switch}}
     {{/case}}
     {{#case "ES_OMSORGSVILKAAR_TYPE"}}
-        {{#switch hendelseundertype}}
+        {{#switch fakta.hendelseundertype}}
         {{#case "ES_FAR_IKKE_OMSORG"}}
 Du har kun rett til engangsstønad dersom du har omsorgen for {{> barnet}}. Fordi du ikke har omsorgen for {{> barnet}}, har du ikke rett til engangsstønad.
 
-Du har fått {{kroner feilutbetalt-beløp}} for mye utbetalt.
+Du har fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt.
         {{/case}}
         {{#case "ES_STONADEN_ALLEREDE_UTBETALT"}}
 Du har fått utbetalt engangsstønad. Du har kun rett til engangsstønad hvis den ikke allerede er utbetalt til mor. Mor har fått utbetalt stønaden, og du har derfor fått for mye utbetalt.
@@ -85,9 +85,9 @@ Du har fått utbetalt engangsstønad. Du har kun rett til engangsstønad hvis de
         {{/switch}}
     {{/case}}
     {{#case "ES_ADOPSJONSVILKAARET_TYPE"}}
-        {{#switch hendelseundertype}}
+        {{#switch fakta.hendelseundertype}}
         {{#case "ES_STEBARN"}}
-Du har ikke rett til engangsstønad når du adopterer {{> barnet}} til [ektefellen/samboeren] din. Fordi du har adoptert [ektefellen/samboeren] din {{> sitt-barn}}, har du ikke rett til engangsstønad.
+Du har ikke rett til engangsstønad når du adopterer {{> barnet}} til {{#if søker.er-gift}}ektefellen{{else}}samboeren{{/if}} din. Fordi du har adoptert {{#if søker.er-gift}}ektefellen{{else}}samboeren{{/if}} din {{> sitt-barn}}, har du ikke rett til engangsstønad.
         {{/case}}
         {{#case "ES_IKKE_OPPFYLT"}}
 Du fikk utbetalt engangsstønad fordi du skulle adoptere {{> barnet}}. Vi har ikke mottatt en gyldig adopsjonsbevilgning. Derfor har du ikke rett til engangsstønad.
@@ -100,51 +100,51 @@ Du har kun rett til engangsstønad når {{> barnet}} er under 15 år når du ove
         {{/case}}
         {{/switch}}
 
-Du har fått {{kroner feilutbetalt-beløp}} for mye utbetalt.
+Du har fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt.
     {{/case}}
     {{#case "ES_FORELDREANSVAR_FAR_TYPE"}}
-        {{#switch hendelseundertype}}
+        {{#switch fakta.hendelseundertype}}
         {{#case "ES_FAR_IKKE_ALENE"}}
-Du har kun rett til engangsstønad når du overtar omsorgen innen 56 uker etter {{eq er-adopsjon yes="adopsjonen" no="fødselen"}}. Du overtok omsorgen for {{> barnet}} senere enn dette. Derfor har du ikke rett til engangsstønad
+Du har kun rett til engangsstønad når du overtar omsorgen innen 56 uker etter {{eq sak.er-adopsjon yes="adopsjonen" no="fødselen"}}. Du overtok omsorgen for {{> barnet}} senere enn dette. Derfor har du ikke rett til engangsstønad
         {{/case}}
         {{#case "ES_FAR_IKKE_INNEN_STONADSPERIODE"}}
 Du har kun rett til engangsstønad når du skal overta foreldreansvaret for {{> barnet}} etter barneloven kapittel 5. Fordi det ikke er dokumentert at du skal ha foreldreansvaret alene for {{> barnet}}, har du ikke rett til engangsstønad.
         {{/case}}
         {{/switch}}
 
-Derfor har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt.
+Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt.
     {{/case}}
     {{#case "ES_RETT_PAA_FORELDREPENGER_TYPE"}}
-        {{#switch hendelseundertype}}
+        {{#switch fakta.hendelseundertype}}
         {{#case "ES_BRUKER_RETT_FORELDREPENGER"}}
 Du fikk først utbetalt engangsstønad, men har i ettertid fått innvilget foreldrepenger.
 
-Du har ikke rett til både engangsstønad og foreldrepenger. Derfor har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt i engangsstønad.
+Du har ikke rett til både engangsstønad og foreldrepenger. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i engangsstønad.
         {{/case}}
         {{/switch}}
     {{/case}}
     {{#case "ES_ANNET_TYPE"}}
-        {{#switch hendelseundertype}}
+        {{#switch fakta.hendelseundertype}}
         {{#case "ANNET_FRITEKST"}}
         {{/case}}
         {{/switch}}
     {{/case}}
     {{#case "ES_FODSELSVILKAARET_TYPE"}}
-        {{#switch hendelseundertype}}
+        {{#switch fakta.hendelseundertype}}
         {{#case "ES_BARN_IKKE_REGISTRERT"}}
 Du har kun rett til engangsstønad hvis du føder eller adopterer barn. Vi har ikke opplysninger som dokumenterer at du har født eller adoptert barn. Derfor har du ikke rett til engangsstønad.
 
-Du har fått {{kroner feilutbetalt-beløp}} for mye utbetalt.
+Du har fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt.
         {{/case}}
         {{#case "ES_MOTTAKER_FAR_MEDMOR"}}
-Du har ikke rett til foreldrepenger i denne perioden. Derfor har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt.
+Du har ikke rett til foreldrepenger i denne perioden. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt.
         {{/case}}
         {{/switch}}
     {{/case}}
     {{/switch}}
 {{/case}}
 {{#case "FP"}}
-    {{#switch hendelsetype}}
+    {{#switch fakta.hendelsetype}}
     {{#case "MEDLEMSKAP"}}
         {{> fakta-medlemskap}}
     {{/case}}
@@ -152,17 +152,17 @@ Du har ikke rett til foreldrepenger i denne perioden. Derfor har du fått {{kron
         {{> fakta-økonomi-feil}}
     {{/case}}
     {{#case "BEREGNING_TYPE"}}
-        {{#switch hendelseundertype}}
+        {{#switch fakta.hendelseundertype}}
         {{#case "INNTEKT_UNDER"}}
-Du har kun rett til {{> ytelse-navn}} dersom du har tjent mer enn {{kroner halvt-grunnbeløp}} i året{{> før-skatt}}. Inntekten din var lavere enn {{kroner halvt-grunnbeløp}} i året{{> før-skatt}}. Derfor har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt i denne perioden.
+Du har kun rett til {{> ytelse-navn}} dersom du har tjent mer enn {{kroner konfigurasjon.halvt-grunnbeløp}} i året{{> før-skatt}}. Inntekten din var lavere enn {{kroner konfigurasjon.halvt-grunnbeløp}} i året{{> før-skatt}}. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
         {{/case}}
         {{#case "ENDRING_GRUNNLAG"}}
-Vi beregnet {{> ytelse-produkt}} dine til [beløp] kroner i året{{> før-skatt}}. Beregningen ble deretter endret [dato] til [beløp] kroner i året{{> før-skatt}}. Du har derfor fått {{kroner feilutbetalt-beløp}} for mye utbetalt i denne perioden.
+Vi beregnet {{> ytelse-produkt}} dine til [beløp] kroner i året{{> før-skatt}}. Beregningen ble deretter endret [dato] til [beløp] kroner i året{{> før-skatt}}. Du har derfor fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
         {{/case}}
         {{/switch}}
     {{/case}}
     {{#case "OPPTJENING_TYPE"}}
-        {{#switch hendelseundertype}}
+        {{#switch fakta.hendelseundertype}}
         {{#case "IKKE_INNTEKT"}}
 Du har ikke hatt arbeidsinntekt eller inntekt som er likestilt med lønn i seks av de siste ti månedene før perioden med foreldrepenger startet. Derfor har du ikke rett til foreldrepenger.
         {{/case}}
@@ -171,44 +171,44 @@ Du har ikke jobbet eller hatt pensjonsgivende inntekt. Derfor har du ikke rett t
         {{/case}}
         {{/switch}}
 
-Du har fått {{kroner feilutbetalt-beløp}} for mye utbetalt i denne perioden.
+Du har fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
     {{/case}}
     {{#case "STONADSPERIODEN_TYPE"}}
-        {{#switch hendelseundertype}}
+        {{#switch fakta.hendelseundertype}}
         {{#case "ENDRET_DEKNINGSGRAD"}}
-Du fikk innvilget 100 prosent foreldrepenger, men i ettertid har du fått gjort om foreldrepengene til 80 prosent. Du har derfor fått {{kroner feilutbetalt-beløp}} for mye utbetalt i denne perioden.
+Du fikk innvilget 100 prosent foreldrepenger, men i ettertid har du fått gjort om foreldrepengene til 80 prosent. Du har derfor fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
         {{/case}}
         {{#case "FEIL_FLERBARNSDAGER"}}
-Dere begge har fått foreldrepenger i samme periode, men kun en av dere skulle hatt foreldrepenger. Fordi den andre forelderen har rett til pengene, har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt i denne perioden.
+Dere begge har fått foreldrepenger i samme periode, men kun en av dere skulle hatt foreldrepenger. Fordi den andre forelderen har rett til pengene, har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
         {{/case}}
         {{#case "OPPHOR_BARN_DOD"}}
 Vi har fått melding om at {{> barnet-ditt}}, døde [dødsdato]. Du har rett til foreldrepenger til og med [6 uker etter dødsdato].
 
-Fordi foreldrepengene er blitt utbetalt etter denne datoen, har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt.
+Fordi foreldrepengene er blitt utbetalt etter denne datoen, har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt.
         {{/case}}
         {{#case "OPPHOR_MOTTAKER_DOD"}}
-Vi har fått melding om at [søkers navn] døde [dødsdato].
+Vi har fått melding om at {{søker.navn}} døde {{søker.dødsdato}}.
 
-Foreldrepengene skulle vært stanset [opphørsdato]. Fordi foreldrepengene er blitt utbetalt etter denne datoen, er det utbetalt {{kroner feilutbetalt-beløp}} for mye.
+Foreldrepengene skulle vært stanset [opphørsdato]. Fordi foreldrepengene er blitt utbetalt etter denne datoen, er det utbetalt {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye.
         {{/case}}
         {{/switch}}
     {{/case}}
     {{#case "UTTAK_GENERELT_TYPE"}}
-        {{#switch hendelseundertype}}
+        {{#switch fakta.hendelseundertype}}
         {{#case "STONADSPERIODE_OVER_3"}}
-Du kan få foreldrepenger i inntil tre år etter at {{#if er-adopsjon}}du overtok omsorgen for {{/if}}{{> barnet-ditt}}{{#if er-fødsel}} ble født{{/if}}. Fordi det har gått mer enn tre år, har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt i denne perioden.
+Du kan få foreldrepenger i inntil tre år etter at {{#if sak.er-adopsjon}}du overtok omsorgen for {{/if}}{{> barnet-ditt}}{{#if sak.er-fødsel}} ble født{{/if}}. Fordi det har gått mer enn tre år, har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
         {{/case}}
         {{#case "NY_STONADSPERIODE"}}
-Du eller den andre forelderen har fått innvilget foreldrepenger for [nytt/nye] barn [dato]. Du har ikke rett til foreldrepenger de dagene som er igjen fra den forrige perioden med foreldrepenger. Du har derfor fått {{kroner feilutbetalt-beløp}} for mye utbetalt i denne perioden.
+Du eller den andre forelderen har fått innvilget foreldrepenger for [nytt/nye] barn [dato]. Du har ikke rett til foreldrepenger de dagene som er igjen fra den forrige perioden med foreldrepenger. Du har derfor fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
         {{/case}}
         {{#case "IKKE_OMSORG"}}
-Vi har fått opplysninger om at du ikke hadde omsorgen for {{eq antall-barn 1 yes="barnet" no="barna"}} fra og med [dato]. Du har kun rett til foreldrepenger dersom du har omsorgen for {{eq antall-barn 1 yes="barnet" no="barna"}}. Du har derfor fått {{kroner feilutbetalt-beløp}} for mye utbetalt i denne perioden.
+Vi har fått opplysninger om at du ikke hadde omsorgen for {{eq sak.antall-barn 1 yes="barnet" no="barna"}} fra og med [dato]. Du har kun rett til foreldrepenger dersom du har omsorgen for {{eq sak.antall-barn 1 yes="barnet" no="barna"}}. Du har derfor fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
         {{/case}}
         {{#case "MOTTAKER_I_ARBEID"}}
-Du har fått utbetalt foreldrepenger i samme periode som du har jobbet heltid. Du kan ikke jobbe heltid og få utbetalt foreldrepenger samtidig. Derfor har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt i denne perioden.
+Du har fått utbetalt foreldrepenger i samme periode som du har jobbet heltid. Du kan ikke jobbe heltid og få utbetalt foreldrepenger samtidig. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
         {{/case}}
         {{#case "FORELDRES_UTTAK"}}
-Fordi den andre forelderen har søkt og fått innvilget foreldrepenger i samme periode som du har fått foreldrepenger, har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt.
+Fordi den andre forelderen har søkt og fått innvilget foreldrepenger i samme periode som du har fått foreldrepenger, har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt.
         {{/case}}
         {{#case "STONADSPERIODE_MANGEL"}}
 Du har fått utbetalt foreldrepenger i denne perioden. Fordi du ikke har rett på foreldrepenger, har du fått for mye utbetalt.
@@ -216,41 +216,41 @@ Du har fått utbetalt foreldrepenger i denne perioden. Fordi du ikke har rett p�
         {{/switch}}
     {{/case}}
     {{#case "UTTAK_UTSETTELSE_TYPE"}}
-        {{#switch hendelseundertype}}
+        {{#switch fakta.hendelseundertype}}
         {{#case "LOVBESTEMT_FERIE"}}
-Du fikk utsatt foreldrepengene fordi du hadde ferie. I den samme perioden har du fått utbetalt foreldrepenger. Du kan ikke utsette perioden og samtidig få foreldrepenger. Derfor har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt i denne perioden.
+Du fikk utsatt foreldrepengene fordi du hadde ferie. I den samme perioden har du fått utbetalt foreldrepenger. Du kan ikke utsette perioden og samtidig få foreldrepenger. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
         {{/case}}
         {{#case "ARBEID_HELTID"}}
-Du fikk utsatt foreldrepengene fordi du jobbet heltid. I den samme perioden har du fått utbetalt foreldrepenger. Du kan ikke både utsette og samtidig få foreldrepenger. Derfor har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt i denne perioden.
+Du fikk utsatt foreldrepengene fordi du jobbet heltid. I den samme perioden har du fått utbetalt foreldrepenger. Du kan ikke både utsette og samtidig få foreldrepenger. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
         {{/case}}
         {{#case "MOTTAKER_HELT_AVHENGIG"}}
-Du fikk utsatt foreldrepengene fordi du var helt avhengig av hjelp til å ta deg av barnet/barna. I den samme perioden har du fått utbetalt foreldrepenger. Du kan ikke utsette og samtidig få foreldrepenger. Derfor har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt i denne perioden.
+Du fikk utsatt foreldrepengene fordi du var helt avhengig av hjelp til å ta deg av barnet/barna. I den samme perioden har du fått utbetalt foreldrepenger. Du kan ikke utsette og samtidig få foreldrepenger. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
         {{/case}}
         {{#case "MOTTAKER_INNLAGT"}}
-Du fikk utsatt foreldrepengene fordi du var innlagt i helseinstitusjon. I den samme perioden har du fått utbetalt foreldrepenger. Du kan ikke utsette og samtidig få foreldrepenger.  Derfor har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt i denne perioden.
+Du fikk utsatt foreldrepengene fordi du var innlagt i helseinstitusjon. I den samme perioden har du fått utbetalt foreldrepenger. Du kan ikke utsette og samtidig få foreldrepenger.  Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
         {{/case}}
         {{#case "BARN_INNLAGT"}}
-Du fikk utsatt foreldrepengene fordi barnet ditt/barna dine var innlagt i helseinstitusjon. I den samme perioden har du fått utbetalt foreldrepenger. Du kan ikke utsette og samtidig få foreldrepenger. Derfor har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt i denne perioden.
+Du fikk utsatt foreldrepengene fordi barnet ditt/barna dine var innlagt i helseinstitusjon. I den samme perioden har du fått utbetalt foreldrepenger. Du kan ikke utsette og samtidig få foreldrepenger. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
         {{/case}}
         {{/switch}}
     {{/case}}
     {{#case "UTTAK_KVOTENE_TYPE"}}
-        {{#switch hendelseundertype}}
+        {{#switch fakta.hendelseundertype}}
         {{#case "KVO_MOTTAKER_HELT_AVHENGIG"}}
-Du overførte kvoten til den andre forelderen fordi du var helt avhengig av hjelp til å ta deg av {{> barnet}}. I den samme perioden har du likevel fått utbetalt foreldrepenger. Du kan ikke overføre kvoten og samtidig få foreldrepenger. Derfor har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt i denne perioden.
+Du overførte kvoten til den andre forelderen fordi du var helt avhengig av hjelp til å ta deg av {{> barnet}}. I den samme perioden har du likevel fått utbetalt foreldrepenger. Du kan ikke overføre kvoten og samtidig få foreldrepenger. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
         {{/case}}
         {{#case "KVO_MOTTAKER_INNLAGT"}}
-Du overførte kvoten til den andre forelderen fordi du var innlagt i helseinstitusjon. I den samme perioden har du likevel fått utbetalt foreldrepenger. Du kan ikke overføre kvoten og samtidig få foreldrepenger. Derfor har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt i denne perioden.
+Du overførte kvoten til den andre forelderen fordi du var innlagt i helseinstitusjon. I den samme perioden har du likevel fått utbetalt foreldrepenger. Du kan ikke overføre kvoten og samtidig få foreldrepenger. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
         {{/case}}
         {{/switch}}
     {{/case}}
     {{#case "VILKAAR_GENERELLE_TYPE"}}
-        {{#switch hendelseundertype}}
+        {{#switch fakta.hendelseundertype}}
         {{#case "MOR_IKKE_ARBEID"}}
-Mor har ikke jobbet heltid, slik hun må for at du skal ha rett til foreldrepenger i denne perioden. Derfor har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt.
+Mor har ikke jobbet heltid, slik hun må for at du skal ha rett til foreldrepenger i denne perioden. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt.
         {{/case}}
         {{#case "MOR_IKKE_STUDERT"}}
-Mor har ikke studert på heltid, slik hun må for at du skal ha rett på foreldrepenger i denne perioden. Derfor har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt.
+Mor har ikke studert på heltid, slik hun må for at du skal ha rett på foreldrepenger i denne perioden. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt.
         {{/case}}
         {{#case "MOR_IKKE_ARBEID_OG_STUDER"}}
 Mor har ikke jobbet og tatt utdanning som til sammen utgjør heltid, slik hun må for at du skal ha rett på foreldrepenger i denne perioden. Derfor har du fått for mye utbetalt.
@@ -259,39 +259,39 @@ Mor har ikke jobbet og tatt utdanning som til sammen utgjør heltid, slik hun m�
 Mor har ikke vært helt avhengig av hjelp for å ta seg av barnet, slik hun må for at du skal ha rett på foreldrepenger i denne perioden. Derfor har du fått for mye utbetalt.
         {{/case}}
         {{#case "MOR_IKKE_INNLAGT"}}
-Mor har ikke vært innlagt i helseinstitusjon, slik hun må for at du skal ha rett til foreldrepenger i denne perioden Derfor har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt.
+Mor har ikke vært innlagt i helseinstitusjon, slik hun må for at du skal ha rett til foreldrepenger i denne perioden Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt.
         {{/case}}
         {{#case "MOR_IKKE_I_IP"}}
-Mor har ikke deltatt i introduksjonsprogrammet for nyankomne innvandrere etter kapittel 2, slik hun må for at du skal ha rett til foreldrepenger i denne perioden. Derfor har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt.
+Mor har ikke deltatt i introduksjonsprogrammet for nyankomne innvandrere etter kapittel 2, slik hun må for at du skal ha rett til foreldrepenger i denne perioden. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt.
         {{/case}}
         {{#case "MOR_IKKE_I_KP"}}
-Mor har ikke deltatt i kvalifiseringsprogrammet, slik hun må for at du skal ha rett til foreldrepenger i denne perioden. Derfor har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt.
+Mor har ikke deltatt i kvalifiseringsprogrammet, slik hun må for at du skal ha rett til foreldrepenger i denne perioden. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt.
         {{/case}}
         {{/switch}}
     {{/case}}
     {{#case "KUN_RETT_TYPE"}}
-        {{#switch hendelseundertype}}
+        {{#switch fakta.hendelseundertype}}
         {{#case "FEIL_I_ANTALL_DAGER"}}
-Du har ikke rett til foreldrepenger i denne perioden. Derfor har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt.
+Du har ikke rett til foreldrepenger i denne perioden. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt.
         {{/case}}
         {{/switch}}
     {{/case}}
     {{#case "UTTAK_ALENEOMSORG_TYPE"}}
-        {{#switch hendelseundertype}}
+        {{#switch fakta.hendelseundertype}}
         {{#case "IKKE_ALENEOMSORG"}}
-Du hadde bare rett til foreldrepenger i denne perioden hvis du hadde hatt aleneomsorgen for {{eq antall-barn 1 yes="barnet" no="barna"}}. Vi  har fått opplyst at du ikke hadde aleneomsorgen. Derfor har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt i denne perioden.
+Du hadde bare rett til foreldrepenger i denne perioden hvis du hadde hatt aleneomsorgen for {{eq sak.antall-barn 1 yes="barnet" no="barna"}}. Vi  har fått opplyst at du ikke hadde aleneomsorgen. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
         {{/case}}
         {{/switch}}
     {{/case}}
     {{#case "UTTAK_GRADERT_TYPE"}}
-        {{#switch hendelseundertype}}
+        {{#switch fakta.hendelseundertype}}
         {{#case "GRADERT_UTTAK"}}
-Du har jobbet samtidig som at du har fått utbetalt foreldrepenger. Fordi du har fått endret hvor mye du skal jobbe og hvor mye du tar ut i foreldrepenger, er deler av beløpet du har fått utbetalt feil. Du har derfor fått {{kroner feilutbetalt-beløp}} for mye utbetalt.
+Du har jobbet samtidig som at du har fått utbetalt foreldrepenger. Fordi du har fått endret hvor mye du skal jobbe og hvor mye du tar ut i foreldrepenger, er deler av beløpet du har fått utbetalt feil. Du har derfor fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt.
         {{/case}}
         {{/switch}}
     {{/case}}
     {{#case "FP_ANNET_HENDELSE_TYPE"}}
-        {{#switch hendelseundertype}}
+        {{#switch fakta.hendelseundertype}}
         {{#case "REFUSJON_ARBGIVER"}}
 {{> fakta-arbeidsgiver-refusjon}}
         {{/case}}
@@ -303,9 +303,9 @@ Du har jobbet samtidig som at du har fått utbetalt foreldrepenger. Fordi du har
 {{/case}}
 {{#case "SVP"}}
     {{#* inline "tilrettelegging-mulig"}}
-Arbeidsgiver kunne tilpasse eller endre arbeidsoppgavene dine uten at det var fare for å skade {{> barnet}} du venter. Du har kun rett til svangerskapspenger om du må slutte å jobbe. Derfor har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt i denne perioden.
+Arbeidsgiver kunne tilpasse eller endre arbeidsoppgavene dine uten at det var fare for å skade {{> barnet}} du venter. Du har kun rett til svangerskapspenger om du må slutte å jobbe. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
     {{/inline}}
-    {{#switch hendelsetype}}
+    {{#switch fakta.hendelsetype}}
     {{#case "MEDLEMSKAP"}}
         {{> fakta-medlemskap}}
     {{/case}}
@@ -313,24 +313,24 @@ Arbeidsgiver kunne tilpasse eller endre arbeidsoppgavene dine uten at det var fa
         {{> fakta-økonomi-feil}}
     {{/case}}
     {{#case "SVP_BEREGNING_TYPE"}}
-        {{#switch hendelseundertype}}
+        {{#switch fakta.hendelseundertype}}
         {{#case "SVP_ENDRING_GRUNNLAG"}}
-Vi beregnet {{> ytelse-produkt}} dine til [beløp] kroner i året{{> før-skatt}}. Beregningen ble deretter endret [dato] til [beløp] kroner i året{{> før-skatt}}. Du har derfor fått {{kroner feilutbetalt-beløp}} for mye utbetalt i denne perioden.
+Vi beregnet {{> ytelse-produkt}} dine til [beløp] kroner i året{{> før-skatt}}. Beregningen ble deretter endret [dato] til [beløp] kroner i året{{> før-skatt}}. Du har derfor fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
         {{/case}}
         {{/switch}}
     {{/case}}
     {{#case "SVP_UTTAK_TYPE"}}
-        {{#switch hendelseundertype}}
+        {{#switch fakta.hendelseundertype}}
         {{#case "SVP_ENDRING_PROSENT"}}
-Du har jobbet samtidig som at du har fått utbetalt svangerskapspenger. Fordi du har fått endret det du tar ut i svangerskapspenger i denne perioden, er deler av beløpet du har fått utbetalt feil. Du har derfor fått {{kroner feilutbetalt-beløp}} for mye utbetalt i denne perioden.
+Du har jobbet samtidig som at du har fått utbetalt svangerskapspenger. Fordi du har fått endret det du tar ut i svangerskapspenger i denne perioden, er deler av beløpet du har fått utbetalt feil. Du har derfor fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
         {{/case}}
         {{#case "SVP_ENDRING_PERIODE"}}
-Du fikk innvilget svangerskapspenger i denne perioden. I etterkant er perioden blitt endret og du har derfor fått {{kroner feilutbetalt-beløp}} for mye utbetalt.
+Du fikk innvilget svangerskapspenger i denne perioden. I etterkant er perioden blitt endret og du har derfor fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt.
         {{/case}}
         {{/switch}}
     {{/case}}
     {{#case "SVP_ARBEIDSGIVERS_FORHOLD_TYPE"}}
-        {{#switch hendelseundertype}}
+        {{#switch fakta.hendelseundertype}}
         {{#case "SVP_TILRETTELEGGING_DELVIS_MULIG"}}
 {{> tilrettelegging-mulig}}
         {{/case}}
@@ -340,27 +340,27 @@ Du fikk innvilget svangerskapspenger i denne perioden. I etterkant er perioden b
         {{/switch}}
     {{/case}}
     {{#case "SVP_FAKTA_TYPE"}}
-        {{#switch hendelseundertype}}
+        {{#switch fakta.hendelseundertype}}
         {{#case "SVP_ENDRING_TERMINDATO"}}
-Du fikk utbetalt svangerskapspenger når det var mindre enn tre uker til termin. Svangerskapspenger kan kun gis frem til tre uker før du har termin. Derfor har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt i denne perioden.
+Du fikk utbetalt svangerskapspenger når det var mindre enn tre uker til termin. Svangerskapspenger kan kun gis frem til tre uker før du har termin. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
         {{/case}}
         {{#case "SVP_IKKE_HELSEFARLIG"}}
-Du kunne gjøre arbeidsoppgavene hos [navn på arbeidsgiver] uten at det var fare for å skade {{> barnet}} du venter. Du hadde derfor ikke rett til svangerskapspenger og har fått {{kroner feilutbetalt-beløp}} for mye utbetalt i denne perioden.
+Du kunne gjøre arbeidsoppgavene hos [navn på arbeidsgiver] uten at det var fare for å skade {{> barnet}} du venter. Du hadde derfor ikke rett til svangerskapspenger og har fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
         {{/case}}
         {{#case "SVP_TIDLIG_FODSEL"}}
-Du fikk innvilget svangerskapspenger i denne perioden. Du kan kun få svangerskapspenger fram til {{> barnet}} er født. Fordi du fødte før termin har du fått utbetalt fått {{kroner feilutbetalt-beløp}} for mye.
+Du fikk innvilget svangerskapspenger i denne perioden. Du kan kun få svangerskapspenger fram til {{> barnet}} er født. Fordi du fødte før termin har du fått utbetalt fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye.
         {{/case}}
         {{/switch}}
     {{/case}}
     {{#case "SVP_OPPTJENING_TYPE"}}
-        {{#switch hendelseundertype}}
+        {{#switch fakta.hendelseundertype}}
         {{#case "SVP_IKKE_ARBEID"}}
 Du har ikke hatt arbeidsinntekt eller inntekt som er likestilt med lønn i minst fire uker før du må slutte å jobbe. Derfor har du ikke rett til svangerskapspenger.
 
-Du har fått {{kroner feilutbetalt-beløp}} for mye utbetalt i denne perioden.
+Du har fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
         {{/case}}
         {{#case "SVP_INNTEKT_UNDER"}}
-Du har kun rett til {{> ytelse-navn}} dersom du har tjent mer enn {{kroner halvt-grunnbeløp}} i året{{> før-skatt}}. Inntekten din var lavere enn {{kroner halvt-grunnbeløp}} i året{{> før-skatt}}. Derfor har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt i denne perioden.
+Du har kun rett til {{> ytelse-navn}} dersom du har tjent mer enn {{kroner konfigurasjon.halvt-grunnbeløp}} i året{{> før-skatt}}. Inntekten din var lavere enn {{kroner konfigurasjon.halvt-grunnbeløp}} i året{{> før-skatt}}. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
         {{/case}}
         {{#case "SVP_INNTEKT_IKKE_TAP"}}
 Du har ikke hatt arbeidsinntekt eller inntekt som er likestilt med lønn. Derfor har du ikke rett til svangerskapspenger.
@@ -368,24 +368,24 @@ Du har ikke hatt arbeidsinntekt eller inntekt som er likestilt med lønn. Derfor
         {{/switch}}
     {{/case}}
     {{#case "SVP_ARBEIDSFORHOLD_TYPE"}}
-        {{#switch hendelseundertype}}
+        {{#switch fakta.hendelseundertype}}
         {{#case "MANGLER_ARBEIDSFORHOLD"}}
 Du har ikke rett til svangerskapspenger fra og med {{fom}} til og med {{tom}} fordi du ikke er ansatt hos [arbeidsgiver navn] i denne perioden.
         {{/case}}
         {{/switch}}
     {{/case}}
     {{#case "OPPHØR"}}
-        {{#switch hendelseundertype}}
+        {{#switch fakta.hendelseundertype}}
         {{#case "MOTTAKER_DØD"}}
-Vi har fått melding om at [søkers navn] døde [opphørsdato]. Svangerskapspengene skulle vært stanset [opphørsdato]. Fordi svangerskapspengene er blitt utbetalt etter denne datoen, er det utbetalt {{kroner feilutbetalt-beløp}} for mye.
+Vi har fått melding om at [søkers navn] døde [opphørsdato]. Svangerskapspengene skulle vært stanset [opphørsdato]. Fordi svangerskapspengene er blitt utbetalt etter denne datoen, er det utbetalt {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye.
         {{/case}}
         {{#case "MOTTAKER_IKKE_GRAVID"}}
-Vi har fått melding om at du ikke lenger er gravid. Svangerskapspengene skulle vært stanset fra og med [opphørsdato]. Fordi svangerskapspengene er blitt utbetalt etter denne datoen, har du fått {{kroner feilutbetalt-beløp}} for mye utbetalt.
+Vi har fått melding om at du ikke lenger er gravid. Svangerskapspengene skulle vært stanset fra og med [opphørsdato]. Fordi svangerskapspengene er blitt utbetalt etter denne datoen, har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt.
         {{/case}}
         {{/switch}}
     {{/case}}
     {{#case "SVP_ANNET_TYPE"}}
-        {{#switch hendelseundertype}}
+        {{#switch fakta.hendelseundertype}}
         {{#case "REFUSJON_ARBGIVER"}}
 {{> fakta-arbeidsgiver-refusjon}}
         {{/case}}
@@ -396,9 +396,9 @@ Vi har fått melding om at du ikke lenger er gravid. Svangerskapspengene skulle 
     {{/switch}}
 {{/case}}
 {{/switch}}
-{{#if fritekst-fakta}}
-   {{#if (neq hendelseundertype "ANNET_FRITEKST")}}
+{{#if fakta.fritekst-fakta}}
+   {{#if (neq fakta.hendelseundertype "ANNET_FRITEKST")}}
 
    {{/if}}
-{{fritekst-fakta}}
+{{fakta.fritekst-fakta}}
 {{/if}}

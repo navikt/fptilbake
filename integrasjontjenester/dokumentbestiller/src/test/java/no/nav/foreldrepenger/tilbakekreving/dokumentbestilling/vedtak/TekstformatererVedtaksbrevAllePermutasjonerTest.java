@@ -28,9 +28,17 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResult
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.AnnenVurdering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbKonfigurasjon;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbPerson;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbSak;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbTotalresultat;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVarsel;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevFelles;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevPeriode;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevPeriodeOgFelles;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbKravgrunnlag;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbResultat;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbVedtaksbrevPeriode;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbVurderinger;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
 
@@ -46,9 +54,11 @@ public class TekstformatererVedtaksbrevAllePermutasjonerTest {
     @Test
     public void skal_støtte_alle_permutasjoner_av_fakta_for_FP() {
         HbVedtaksbrevFelles felles = lagFellesBuilder()
-            .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
-            .medErFødsel(true)
-            .medAntallBarn(1)
+            .medSak(HbSak.build()
+                .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
+                .medErFødsel(true)
+                .medAntallBarn(1)
+                .build())
             .build();
         Map<HendelseMedUndertype, String> resultat = lagFaktatekster(felles);
         sjekkVerdier(resultat);
@@ -57,9 +67,11 @@ public class TekstformatererVedtaksbrevAllePermutasjonerTest {
     @Test
     public void skal_støtte_alle_permutasjoner_av_fakta_for_SVP() {
         HbVedtaksbrevFelles felles = lagFellesBuilder()
-            .medYtelsetype(FagsakYtelseType.SVANGERSKAPSPENGER)
-            .medErFødsel(true)
-            .medAntallBarn(1)
+            .medSak(HbSak.build()
+                .medYtelsetype(FagsakYtelseType.SVANGERSKAPSPENGER)
+                .medErFødsel(true)
+                .medAntallBarn(1)
+                .build())
             .build();
         Map<HendelseMedUndertype, String> resultat = lagFaktatekster(felles);
 
@@ -71,9 +83,11 @@ public class TekstformatererVedtaksbrevAllePermutasjonerTest {
     @Test
     public void skal_støtte_alle_permutasjoner_av_fakta_for_ES() {
         HbVedtaksbrevFelles felles = lagFellesBuilder()
-            .medYtelsetype(FagsakYtelseType.ENGANGSTØNAD)
-            .medErFødsel(true)
-            .medAntallBarn(1)
+            .medSak(HbSak.build()
+                .medYtelsetype(FagsakYtelseType.ENGANGSTØNAD)
+                .medErFødsel(true)
+                .medAntallBarn(1)
+                .build())
             .build();
         Map<HendelseMedUndertype, String> resultat = lagFaktatekster(felles);
 
@@ -122,8 +136,7 @@ public class TekstformatererVedtaksbrevAllePermutasjonerTest {
         Map<HendelseMedUndertype, String> resultat = new LinkedHashMap<>();
         for (HendelseMedUndertype undertype : getFeilutbetalingsårsaker(felles.getYtelsetype())) {
             HbVedtaksbrevPeriode periode = lagPeriodeBuilder()
-                .medHendelsetype(undertype.getHendelseType())
-                .medHendelseUndertype(undertype.getHendelseUnderType())
+                .medFakta(undertype.getHendelseType(), undertype.getHendelseUnderType())
                 .build();
             HbVedtaksbrevPeriodeOgFelles data = new HbVedtaksbrevPeriodeOgFelles(felles, periode);
             String tekst = TekstformatererVedtaksbrev.lagFaktaTekst(data);
@@ -135,28 +148,46 @@ public class TekstformatererVedtaksbrevAllePermutasjonerTest {
     private HbVedtaksbrevPeriode.Builder lagPeriodeBuilder() {
         return HbVedtaksbrevPeriode.builder()
             .medPeriode(januar)
-            .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
-            .medAktsomhetResultat(AnnenVurdering.GOD_TRO)
-            .medFeilutbetaltBeløp(BigDecimal.valueOf(10000))
-            .medTilbakekrevesBeløp(BigDecimal.valueOf(10000))
-            .medRenterBeløp(BigDecimal.valueOf(1000))
-            .medVilkårResultat(VilkårResultat.GOD_TRO)
-            .medBeløpIBehold(BigDecimal.valueOf(10000))
-            .medUtbetaltBeløp(BigDecimal.valueOf(33333))
-            .medRiktigBeløp(BigDecimal.valueOf(23333));
+            .medKravgrunnlag(HbKravgrunnlag.builder()
+                .medFeilutbetaltBeløp(BigDecimal.valueOf(10000))
+                .medUtbetaltBeløp(BigDecimal.valueOf(33333))
+                .medRiktigBeløp(BigDecimal.valueOf(23333))
+                .build())
+            .medVurderinger(HbVurderinger.builder()
+                .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
+                .medAktsomhetResultat(AnnenVurdering.GOD_TRO)
+                .medVilkårResultat(VilkårResultat.GOD_TRO)
+                .medBeløpIBehold(BigDecimal.valueOf(10000))
+                .build())
+            .medResultat(HbResultat.builder()
+                .medTilbakekrevesBeløp(BigDecimal.valueOf(10000))
+                .medRenterBeløp(BigDecimal.valueOf(1000))
+                .build());
     }
 
     private HbVedtaksbrevFelles.Builder lagFellesBuilder() {
         return builder()
             .medLovhjemmelVedtak("Folketrygdloven")
-            .medHovedresultat(VedtakResultatType.FULL_TILBAKEBETALING)
-            .medTotaltRentebeløp(BigDecimal.valueOf(1000))
-            .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(10000))
-            .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(11000))
-            .medVarsletBeløp(BigDecimal.valueOf(10000))
-            .medVarsletDato(LocalDate.now().minusDays(100))
-            .medKlagefristUker(6)
-            .skruAvMidlertidigTekst();
+            .medVedtakResultat(HbTotalresultat.builder()
+                .medHovedresultat(VedtakResultatType.FULL_TILBAKEBETALING)
+                .medTotaltRentebeløp(BigDecimal.valueOf(1000))
+                .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(10000))
+                .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(11000))
+                .build())
+            .medVarsel(HbVarsel.builder()
+                .medVarsletBeløp(BigDecimal.valueOf(10000))
+                .medVarsletDato(LocalDate.now().minusDays(100))
+                .build())
+            .medKonfigurasjon(HbKonfigurasjon.builder()
+                .medKlagefristUker(6)
+                .skruAvMidlertidigTekst()
+                .build())
+            .medSøker(HbPerson.builder()
+                .medNavn("Søker Søkersen")
+                .medDødsdato(LocalDate.of(2018, 3, 1))
+                .medErGift(true)
+                .build())
+            ;
     }
 
     private List<HendelseMedUndertype> getFeilutbetalingsårsaker(FagsakYtelseType ytelseType) {

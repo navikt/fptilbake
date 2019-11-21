@@ -3,6 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebar
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.HandlebarsData;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbVedtaksbrevPeriode;
 
 public class HbVedtaksbrevPeriodeOgFelles implements HandlebarsData {
 

@@ -16,8 +16,16 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResult
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.SærligGrunn;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbKonfigurasjon;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbPerson;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbSak;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbTotalresultat;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVarsel;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevFelles;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevPeriode;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbKravgrunnlag;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbResultat;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbVedtaksbrevPeriode;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbVurderinger;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
 /*
@@ -40,7 +48,6 @@ public class DokumentasjonGeneratorSærligeGrunner {
                     for (boolean reduksjon : boolske) {
                         for (boolean sgAnnet : boolske) {
                             HbVedtaksbrevPeriode periode = lagPeriodeDel(Aktsomhet.SIMPEL_UAKTSOM, sgNav, sgBeløp, sgTid, sgAnnet, reduksjon);
-                            periode.setFritekstSærligeGrunnerAnnet("[fritekst her]");
                             String s = TekstformatererVedtaksbrev.lagSærligeGrunnerTekst(felles, periode);
                             String overskrift = overskrift(sgNav, sgBeløp, sgTid, sgAnnet, reduksjon);
                             String prettyprint = s.replace("_Er det særlige grunner til å redusere beløpet?", overskrift)
@@ -91,34 +98,52 @@ public class DokumentasjonGeneratorSærligeGrunner {
             sg.add(SærligGrunn.ANNET);
         }
 
+        String fritekstSærligeGrunnerAnnet = "[fritekst her]";
         return HbVedtaksbrevPeriode.builder()
             .medPeriode(januar)
-            .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
-            .medHendelsetype(HendelseType.FP_UTTAK_GRADERT_TYPE)
-            .medHendelseUndertype(FpHendelseUnderTyper.GRADERT_UTTAK)
-            .medVilkårResultat(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER)
-            .medAktsomhetResultat(aktsomhet)
-            .medRiktigBeløp(BigDecimal.ZERO)
-            .medFeilutbetaltBeløp(BigDecimal.valueOf(1000))
-            .medTilbakekrevesBeløp(BigDecimal.valueOf(reduksjon ? 500 : 1000))
-            .medRenterBeløp(BigDecimal.ZERO)
-            .medSærligeGrunner(sg)
+            .medVurderinger(HbVurderinger.builder()
+                .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
+                .medVilkårResultat(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER)
+                .medAktsomhetResultat(aktsomhet)
+                .medSærligeGrunner(sg, null, fritekstSærligeGrunnerAnnet)
+                .build())
+            .medKravgrunnlag(HbKravgrunnlag.builder()
+                .medFeilutbetaltBeløp(BigDecimal.valueOf(1000))
+                .build())
+            .medResultat(HbResultat.builder()
+                .medTilbakekrevesBeløp(BigDecimal.valueOf(reduksjon ? 500 : 1000))
+                .medRenterBeløp(BigDecimal.ZERO)
+                .build())
+            .medFakta(HendelseType.FP_UTTAK_GRADERT_TYPE, FpHendelseUnderTyper.GRADERT_UTTAK)
             .build();
     }
 
     private HbVedtaksbrevFelles lagFellesdel() {
         return HbVedtaksbrevFelles.builder()
-            .medErFødsel(true)
-            .medAntallBarn(1)
-            .medHovedresultat(VedtakResultatType.FULL_TILBAKEBETALING)
+            .medSak(HbSak.build()
+                .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
+                .medErFødsel(true)
+                .medAntallBarn(1)
+                .build())
+            .medVedtakResultat(HbTotalresultat.builder()
+                .medHovedresultat(VedtakResultatType.FULL_TILBAKEBETALING)
+                .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(1000))
+                .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(1100))
+                .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.valueOf(1100))
+                .medTotaltRentebeløp(BigDecimal.valueOf(100))
+                .build())
             .medLovhjemmelVedtak("foo")
-            .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
-            .medVarsletBeløp(BigDecimal.valueOf(1000))
-            .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(1000))
-            .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(1100))
-            .medTotaltRentebeløp(BigDecimal.valueOf(100))
-            .medVarsletDato(LocalDate.of(2020, 4, 4))
-            .medKlagefristUker(4)
+            .medVarsel(HbVarsel.builder()
+                .medVarsletBeløp(BigDecimal.valueOf(1000))
+                .medVarsletDato(LocalDate.of(2020, 4, 4))
+                .build())
+            .medKonfigurasjon(HbKonfigurasjon.builder()
+                .medKlagefristUker(4)
+                .build())
+            .medSøker(HbPerson.builder()
+                .medNavn("Søker Søkersen")
+                .medErGift(true)
+                .build())
             .build();
     }
 }
