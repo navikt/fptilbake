@@ -26,6 +26,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.An
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.SærligGrunn;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbKonfigurasjon;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbPerson;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbSak;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbTotalresultat;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVarsel;
@@ -47,7 +48,7 @@ public class TekstformatererVedtaksbrevTest {
 
     @Test
     public void skal_generere_vedtaksbrev_for_FP_og_tvillinger_og_simpel_uaktsomhet() throws Exception {
-        HbVedtaksbrevFelles vedtaksbrevData = HbVedtaksbrevFelles.builder()
+        HbVedtaksbrevFelles vedtaksbrevData = lagTestBuilder()
             .medSak(HbSak.build()
                 .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
                 .medErFødsel(true)
@@ -110,7 +111,7 @@ public class TekstformatererVedtaksbrevTest {
 
     @Test
     public void skal_generere_vedtaksbrev_for_FP_og_god_tro_uten_tilbakekreving_uten_varsel() throws Exception {
-        HbVedtaksbrevFelles vedtaksbrevData = HbVedtaksbrevFelles.builder()
+        HbVedtaksbrevFelles vedtaksbrevData = lagTestBuilder()
             .medSak(HbSak.build()
                 .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
                 .medErFødsel(true)
@@ -124,10 +125,6 @@ public class TekstformatererVedtaksbrevTest {
                 .medTotaltRentebeløp(BigDecimal.ZERO)
                 .build())
             .medLovhjemmelVedtak("Folketrygdloven § 22-15")
-            .medKonfigurasjon(HbKonfigurasjon.builder()
-                .medKlagefristUker(6)
-                .skruAvMidlertidigTekst() //generer tekst slik den skal være etter pilot
-                .build())
             .build();
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
             HbVedtaksbrevPeriode.builder()
@@ -135,7 +132,7 @@ public class TekstformatererVedtaksbrevTest {
                 .medKravgrunnlag(HbKravgrunnlag.builder()
                     .medFeilutbetaltBeløp(BigDecimal.valueOf(1000))
                     .build())
-                .medFakta(HendelseType.FP_UTTAK_GRADERT_TYPE, FpHendelseUnderTyper.GRADERT_UTTAK)
+                .medFakta(HendelseType.FP_STONADSPERIODEN_TYPE, FpHendelseUnderTyper.OPPHOR_MOTTAKER_DOD)
                 .medVurderinger(HbVurderinger.builder()
                     .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
                     .medVilkårResultat(VilkårResultat.GOD_TRO)
@@ -154,7 +151,7 @@ public class TekstformatererVedtaksbrevTest {
 
     @Test
     public void skal_generere_vedtaksbrev_for_FP_og_adopsjon_med_mye_fritekst() throws Exception {
-        HbVedtaksbrevFelles vedtaksbrevData = HbVedtaksbrevFelles.builder()
+        HbVedtaksbrevFelles vedtaksbrevData = lagTestBuilder()
             .medSak(HbSak.build()
                 .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
                 .medErAdopsjon(true)
@@ -172,10 +169,6 @@ public class TekstformatererVedtaksbrevTest {
                 .medVarsletDato(LocalDate.of(2019, 1, 3))
                 .build())
             .medFritekstOppsummering("Skynd deg å betale, vi trenger pengene med en gang!")
-            .medKonfigurasjon(HbKonfigurasjon.builder()
-                .medKlagefristUker(6)
-                .skruAvMidlertidigTekst() //generer tekst slik den skal være etter pilot
-                .build())
             .build();
 
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
@@ -257,7 +250,7 @@ public class TekstformatererVedtaksbrevTest {
 
     @Test
     public void skal_generere_vedtaksbrev_for_SVP_og_ett_barn_og_forsett() throws Exception {
-        HbVedtaksbrevFelles vedtaksbrevData = HbVedtaksbrevFelles.builder()
+        HbVedtaksbrevFelles vedtaksbrevData = lagTestBuilder()
             .medSak(HbSak.build()
                 .medYtelsetype(FagsakYtelseType.SVANGERSKAPSPENGER)
                 .medErFødsel(true)
@@ -305,7 +298,7 @@ public class TekstformatererVedtaksbrevTest {
 
     @Test
     public void skal_generere_vedtaksbrev_for_ES_god_tro_og_ingen_tilbakebetaling() throws Exception {
-        HbVedtaksbrevFelles vedtaksbrevData = HbVedtaksbrevFelles.builder()
+        HbVedtaksbrevFelles vedtaksbrevData = lagTestBuilder()
             .medSak(HbSak.build()
                 .medYtelsetype(FagsakYtelseType.ENGANGSTØNAD)
                 .medErFødsel(true)
@@ -321,10 +314,6 @@ public class TekstformatererVedtaksbrevTest {
             .medVarsel(HbVarsel.builder()
                 .medVarsletBeløp(BigDecimal.valueOf(10000))
                 .medVarsletDato(LocalDate.of(2020, 4, 4))
-                .build())
-            .medKonfigurasjon(HbKonfigurasjon.builder()
-                .medKlagefristUker(6)
-                .skruAvMidlertidigTekst() //generer tekst slik den skal være etter pilot
                 .build())
             .build();
 
@@ -355,7 +344,7 @@ public class TekstformatererVedtaksbrevTest {
 
     @Test
     public void skal_generere_vedtaksbrev_for_ES_adopsjon_og_grov_uaktsomhet() throws Exception {
-        HbVedtaksbrevFelles vedtaksbrevData = HbVedtaksbrevFelles.builder()
+        HbVedtaksbrevFelles vedtaksbrevData = lagTestBuilder()
             .medSak(HbSak.build()
                 .medErAdopsjon(true)
                 .medAntallBarn(5)
@@ -371,10 +360,6 @@ public class TekstformatererVedtaksbrevTest {
             .medVarsel(HbVarsel.builder()
                 .medVarsletBeløp(BigDecimal.valueOf(500000))
                 .medVarsletDato(LocalDate.of(2020, 4, 4))
-                .build())
-            .medKonfigurasjon(HbKonfigurasjon.builder()
-                .medKlagefristUker(6)
-                .skruAvMidlertidigTekst() //generer tekst slik den skal være etter pilot
                 .build())
             .build();
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
@@ -404,7 +389,7 @@ public class TekstformatererVedtaksbrevTest {
 
     @Test
     public void skal_generere_vedtaksbrev_for_FP_med_og_uten_foreldelse() throws Exception {
-        HbVedtaksbrevFelles vedtaksbrevData = HbVedtaksbrevFelles.builder()
+        HbVedtaksbrevFelles vedtaksbrevData = lagTestBuilder()
             .medSak(HbSak.build()
                 .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
                 .medErFødsel(true)
@@ -418,10 +403,6 @@ public class TekstformatererVedtaksbrevTest {
                 .medTotaltRentebeløp(BigDecimal.ZERO)
                 .build())
             .medLovhjemmelVedtak("Folketrygdloven § 22-15")
-            .medKonfigurasjon(HbKonfigurasjon.builder()
-                .medKlagefristUker(6)
-                .skruAvMidlertidigTekst() //generer tekst slik den skal være etter pilot
-                .build())
             .build();
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
             HbVedtaksbrevPeriode.builder()
@@ -459,7 +440,7 @@ public class TekstformatererVedtaksbrevTest {
 
     @Test
     public void skal_generere_vedtaksbrev_for_FP_ingen_tilbakekreving_pga_lavt_beløp() throws Exception {
-        HbVedtaksbrevFelles vedtaksbrevData = HbVedtaksbrevFelles.builder()
+        HbVedtaksbrevFelles vedtaksbrevData = lagTestBuilder()
             .medSak(HbSak.build()
                 .medErFødsel(true)
                 .medAntallBarn(5)
@@ -475,10 +456,6 @@ public class TekstformatererVedtaksbrevTest {
             .medVarsel(HbVarsel.builder()
                 .medVarsletBeløp(BigDecimal.valueOf(500))
                 .medVarsletDato(LocalDate.of(2020, 4, 4))
-                .build())
-            .medKonfigurasjon(HbKonfigurasjon.builder()
-                .medKlagefristUker(6)
-                .skruAvMidlertidigTekst() //generer tekst slik den skal være etter pilot
                 .build())
             .build();
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
@@ -504,6 +481,19 @@ public class TekstformatererVedtaksbrevTest {
         String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
         String fasit = les("/vedtaksbrev/FP_ikke_tilbakekreves_pga_lavt_beløp.txt");
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
+    }
+
+    private HbVedtaksbrevFelles.Builder lagTestBuilder() {
+        return HbVedtaksbrevFelles.builder()
+            .medKonfigurasjon(HbKonfigurasjon.builder()
+                .skruAvMidlertidigTekst() //generer tekst slik den skal være etter pilot
+                .medKlagefristUker(6)
+                .build())
+            .medSøker(HbPerson.builder()
+                .medNavn("Søker Søkersen")
+                .medDødsdato(LocalDate.of(2018, 3, 1))
+                .medErGift(true)
+                .build());
     }
 
     private String les(String filnavn) throws IOException {

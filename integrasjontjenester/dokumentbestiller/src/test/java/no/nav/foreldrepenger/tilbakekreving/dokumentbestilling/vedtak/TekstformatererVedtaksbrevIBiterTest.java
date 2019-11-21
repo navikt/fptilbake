@@ -23,6 +23,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Vi
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Avsnitt;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Underavsnitt;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbKonfigurasjon;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbPerson;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbSak;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbTotalresultat;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVarsel;
@@ -42,7 +43,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
 
     @Test
     public void skal_generere_brev_delt_i_avsnitt_og_underavsnitt() {
-        HbVedtaksbrevFelles vedtaksbrevData = HbVedtaksbrevFelles.builder()
+        HbVedtaksbrevFelles vedtaksbrevData = lagTestBuilder()
             .medSak(HbSak.build()
                 .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
                 .medErFødsel(true)
@@ -58,10 +59,6 @@ public class TekstformatererVedtaksbrevIBiterTest {
             .medVarsel(HbVarsel.builder()
                 .medVarsletBeløp(BigDecimal.valueOf(33001))
                 .medVarsletDato(LocalDate.of(2020, 4, 4))
-                .build())
-            .medKonfigurasjon(HbKonfigurasjon.builder()
-                .skruAvMidlertidigTekst()
-                .medKlagefristUker(4)
                 .build())
             .build();
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
@@ -103,7 +100,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
 
     @Test
     public void skal_generere_tekst_for_faktaperiode() {
-        HbVedtaksbrevFelles felles = HbVedtaksbrevFelles.builder()
+        HbVedtaksbrevFelles felles = lagTestBuilder()
             .medSak(HbSak.build()
                 .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
                 .medErFødsel(true)
@@ -119,10 +116,6 @@ public class TekstformatererVedtaksbrevIBiterTest {
             .medVarsel(HbVarsel.builder()
                 .medVarsletBeløp(BigDecimal.valueOf(33001))
                 .medVarsletDato(LocalDate.of(2020, 4, 4))
-                .build())
-            .medKonfigurasjon(HbKonfigurasjon.builder()
-                .skruAvMidlertidigTekst()
-                .medKlagefristUker(4)
                 .build())
             .build();
         HbVedtaksbrevPeriode periode = HbVedtaksbrevPeriode.builder()
@@ -143,9 +136,22 @@ public class TekstformatererVedtaksbrevIBiterTest {
         assertThat(generertTekst).isEqualTo("Du har jobbet samtidig som at du har fått utbetalt foreldrepenger. Fordi du har fått endret hvor mye du skal jobbe og hvor mye du tar ut i foreldrepenger, er deler av beløpet du har fått utbetalt feil. Du har derfor fått 30 001 kroner for mye utbetalt.");
     }
 
+    private HbVedtaksbrevFelles.Builder lagTestBuilder() {
+        return HbVedtaksbrevFelles.builder()
+            .medKonfigurasjon(HbKonfigurasjon.builder()
+                .skruAvMidlertidigTekst()
+                .medKlagefristUker(4)
+                .build())
+            .medSøker(HbPerson.builder()
+                .medNavn("Søker Søkersen")
+                .medDødsdato(LocalDate.of(2018, 3, 1))
+                .medErGift(true)
+                .build());
+    }
+
     @Test
     public void skal_si_at_du_ikke_trenger_betale_tilbake_når_det_er_god_tro_og_beløp_ikke_er_i_behold() {
-        HbVedtaksbrevFelles felles = HbVedtaksbrevFelles.builder()
+        HbVedtaksbrevFelles felles = lagTestBuilder()
             .medSak(HbSak.build()
                 .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
                 .medErFødsel(true)
@@ -161,10 +167,6 @@ public class TekstformatererVedtaksbrevIBiterTest {
             .medVarsel(HbVarsel.builder()
                 .medVarsletBeløp(BigDecimal.valueOf(1000))
                 .medVarsletDato(LocalDate.of(2020, 4, 4))
-                .build())
-            .medKonfigurasjon(HbKonfigurasjon.builder()
-                .skruAvMidlertidigTekst()
-                .medKlagefristUker(4)
                 .build())
             .build();
         HbVedtaksbrevPeriode periode = HbVedtaksbrevPeriode.builder()
@@ -187,7 +189,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
 
     @Test
     public void skal_ha_riktig_tekst_for_særlige_grunner_når_det_ikke_er_reduksjon_av_beløp() {
-        HbVedtaksbrevFelles felles = HbVedtaksbrevFelles.builder()
+        HbVedtaksbrevFelles felles = lagTestBuilder()
             .medSak(HbSak.build()
                 .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
                 .medErFødsel(true)
@@ -203,10 +205,6 @@ public class TekstformatererVedtaksbrevIBiterTest {
             .medVarsel(HbVarsel.builder()
                 .medVarsletBeløp(BigDecimal.valueOf(1000))
                 .medVarsletDato(LocalDate.of(2020, 4, 4))
-                .build())
-            .medKonfigurasjon(HbKonfigurasjon.builder()
-                .skruAvMidlertidigTekst()
-                .medKlagefristUker(4)
                 .build())
             .build();
         HbVedtaksbrevPeriode periode = HbVedtaksbrevPeriode.builder()
@@ -231,7 +229,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
 
     @Test
     public void skal_ha_riktig_tekst_for_særlige_grunner_når_det_er_reduksjon_av_beløp() {
-        HbVedtaksbrevFelles felles = HbVedtaksbrevFelles.builder()
+        HbVedtaksbrevFelles felles = lagTestBuilder()
             .medSak(HbSak.build()
                 .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
                 .medErFødsel(true)
@@ -247,10 +245,6 @@ public class TekstformatererVedtaksbrevIBiterTest {
             .medVarsel(HbVarsel.builder()
                 .medVarsletBeløp(BigDecimal.valueOf(1000))
                 .medVarsletDato(LocalDate.of(2020, 4, 4))
-                .build())
-            .medKonfigurasjon(HbKonfigurasjon.builder()
-                .skruAvMidlertidigTekst()
-                .medKlagefristUker(4)
                 .build())
             .build();
         HbVedtaksbrevPeriode periode = HbVedtaksbrevPeriode.builder()

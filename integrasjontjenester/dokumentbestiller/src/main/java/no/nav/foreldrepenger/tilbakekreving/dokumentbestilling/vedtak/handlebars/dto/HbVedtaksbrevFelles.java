@@ -9,6 +9,8 @@ import no.nav.vedtak.util.Objects;
 
 public class HbVedtaksbrevFelles implements HandlebarsData {
 
+    @JsonProperty("søker")
+    private HbPerson søker;
     @JsonProperty("sak")
     private HbSak sak;
     @JsonProperty("varsel")
@@ -55,6 +57,7 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
 
         public HbVedtaksbrevFelles build() {
             Objects.check(kladd.hjemmel != null, "hjemmel er ikke satt");
+            Objects.check(kladd.søker != null, "søker er ikke satt");
             Objects.check(kladd.sak != null, "sak-informasjon er ikke satt");
             Objects.check(kladd.konfigurasjon != null, "konfigurasjon er ikke satt");
             Objects.check(kladd.totalresultat != null, "totalresultat er ikke satt");
@@ -69,6 +72,11 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
 
         public Builder medVedtakResultat(HbTotalresultat vedtakResultat) {
             kladd.totalresultat = vedtakResultat;
+            return this;
+        }
+
+        public Builder medSøker(HbPerson person) {
+            kladd.søker = person;
             return this;
         }
 

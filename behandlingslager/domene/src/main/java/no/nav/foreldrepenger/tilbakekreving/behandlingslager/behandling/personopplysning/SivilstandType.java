@@ -31,4 +31,8 @@ public class SivilstandType extends Kodeliste {
     private SivilstandType(String kode) {
         super(kode, DISCRIMINATOR);
     }
+
+    public boolean erGift(){
+        return GIFT.equals(this) || GIFT_ADSKILT.equals(this) || SEPARERT.equals(this);
+    }
 }

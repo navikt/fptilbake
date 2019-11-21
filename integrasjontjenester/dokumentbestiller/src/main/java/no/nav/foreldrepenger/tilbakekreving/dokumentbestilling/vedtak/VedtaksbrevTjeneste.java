@@ -64,6 +64,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.Frit
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.JournalpostIdOgDokumentId;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbKonfigurasjon;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbPerson;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbSak;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbTotalresultat;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVarsel;
@@ -195,6 +196,7 @@ public class VedtaksbrevTjeneste {
         Behandling behandling = behandlingTjeneste.hentBehandling(behandlingId);
         //TODO hent data fra fpsak i tidligere steg, og hent fra repository her
         SamletEksternBehandlingInfo fpsakBehandling = hentDataFraFpsak(behandlingId);
+        Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(behandling.getAktørId().getId());
         Long varsletBeløp = finnVarsletBeløp(behandlingId);
         LocalDate varsletDato = finnVarsletDato(behandlingId);
         BeregningResultat beregnetResultat = tilbakekrevingBeregningTjeneste.beregn(behandlingId);
@@ -230,15 +232,24 @@ public class VedtaksbrevTjeneste {
                 .build())
             .medKonfigurasjon(HbKonfigurasjon.builder()
                 .medKlagefristUker(KLAGEFRIST_UKER)
-                .build());
+                .build())
+            .medSøker(utledSøker(personinfo));
 
         List<HbVedtaksbrevPeriode> perioder = resulatPerioder.stream()
             .map(brp -> lagBrevdataPeriode(brp, fakta, vilkårPerioder, foreldelse, perioderFritekst))
             .collect(Collectors.toList());
 
         HbVedtaksbrevData data = new HbVedtaksbrevData(vedtakDataBuilder.build(), perioder);
-        BrevMetadata brevMetadata = lagMetadataForVedtaksbrev(behandling, vedtakResultatType, fpsakBehandling);
+        BrevMetadata brevMetadata = lagMetadataForVedtaksbrev(behandling, vedtakResultatType, fpsakBehandling, personinfo);
         return new VedtaksbrevData(data, brevMetadata);
+    }
+
+    private HbPerson utledSøker(Personinfo personinfo) {
+        return HbPerson.builder()
+            .medNavn(personinfo.getNavn())
+            .medDødsdato(personinfo.getDødsdato())
+            .medErGift(personinfo.getSivilstandType().erGift())
+            .build();
     }
 
     private SamletEksternBehandlingInfo hentDataFraFpsak(Long behandlingId) {
@@ -263,12 +274,11 @@ public class VedtaksbrevTjeneste {
         return varselInfo.map(VarselInfo::getVarselBeløp).orElse(null);
     }
 
-    BrevMetadata lagMetadataForVedtaksbrev(Behandling behandling, VedtakResultatType vedtakResultatType, SamletEksternBehandlingInfo eksternBehandlingsinfo) {
+    BrevMetadata lagMetadataForVedtaksbrev(Behandling behandling, VedtakResultatType vedtakResultatType, SamletEksternBehandlingInfo eksternBehandlingsinfo, Personinfo personinfo) {
         String aktørId = eksternBehandlingsinfo.getPersonopplysninger().getAktoerId();
         FagsakYtelseType fagsakType = behandling.getFagsak().getFagsakYtelseType();
         Språkkode språkkode = eksternBehandlingsinfo.getGrunninformasjon().getSpråkkodeEllerDefault();
 
-        Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(aktørId);
         Adresseinfo adresseinfo = eksternDataForBrevTjeneste.hentAdresse(personinfo, aktørId);
         YtelseNavn ytelseNavn = eksternDataForBrevTjeneste.hentYtelsenavn(fagsakType, språkkode);
 

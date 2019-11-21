@@ -27,6 +27,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.An
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbKonfigurasjon;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbPerson;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbSak;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbTotalresultat;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVarsel;
@@ -96,7 +97,11 @@ public class DokumentasjonGeneratorFakta {
             String parametrisertTekst = generertTekst
                 .replaceAll(" 10\u00A0000\u00A0kroner", " <feilutbetalt beløp> kroner")
                 .replaceAll(" 33\u00A0333\u00A0kroner", " <utbetalt beløp> kroner")
-                .replaceAll(" 23\u00A0333\u00A0kroner", " <riktig beløp> kroner");
+                .replaceAll(" 23\u00A0333\u00A0kroner", " <riktig beløp> kroner")
+                .replaceAll("Søker Søkersen", " <søkers navn>")
+                .replaceAll("1. mars 2018", " <dato søker døde>")
+                .replaceAll("ektefellen", "<ektefellen/samboeren>")
+                ;
             System.out.println(parametrisertTekst);
             System.out.println();
         }
@@ -152,6 +157,11 @@ public class DokumentasjonGeneratorFakta {
                 .build())
             .medKonfigurasjon(HbKonfigurasjon.builder()
                 .medKlagefristUker(6)
+                .build())
+            .medSøker(HbPerson.builder()
+                .medNavn("Søker Søkersen")
+                .medDødsdato(LocalDate.of(2018, 3, 1))
+                .medErGift(true)
                 .build());
     }
 

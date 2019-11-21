@@ -87,7 +87,7 @@ Du har fått utbetalt engangsstønad. Du har kun rett til engangsstønad hvis de
     {{#case "ES_ADOPSJONSVILKAARET_TYPE"}}
         {{#switch fakta.hendelseundertype}}
         {{#case "ES_STEBARN"}}
-Du har ikke rett til engangsstønad når du adopterer {{> barnet}} til [ektefellen/samboeren] din. Fordi du har adoptert [ektefellen/samboeren] din {{> sitt-barn}}, har du ikke rett til engangsstønad.
+Du har ikke rett til engangsstønad når du adopterer {{> barnet}} til {{#if søker.er-gift}}ektefellen{{else}}samboeren{{/if}} din. Fordi du har adoptert {{#if søker.er-gift}}ektefellen{{else}}samboeren{{/if}} din {{> sitt-barn}}, har du ikke rett til engangsstønad.
         {{/case}}
         {{#case "ES_IKKE_OPPFYLT"}}
 Du fikk utbetalt engangsstønad fordi du skulle adoptere {{> barnet}}. Vi har ikke mottatt en gyldig adopsjonsbevilgning. Derfor har du ikke rett til engangsstønad.
@@ -187,7 +187,7 @@ Vi har fått melding om at {{> barnet-ditt}}, døde [dødsdato]. Du har rett til
 Fordi foreldrepengene er blitt utbetalt etter denne datoen, har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt.
         {{/case}}
         {{#case "OPPHOR_MOTTAKER_DOD"}}
-Vi har fått melding om at [søkers navn] døde [dødsdato].
+Vi har fått melding om at {{søker.navn}} døde {{søker.dødsdato}}.
 
 Foreldrepengene skulle vært stanset [opphørsdato]. Fordi foreldrepengene er blitt utbetalt etter denne datoen, er det utbetalt {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye.
         {{/case}}
