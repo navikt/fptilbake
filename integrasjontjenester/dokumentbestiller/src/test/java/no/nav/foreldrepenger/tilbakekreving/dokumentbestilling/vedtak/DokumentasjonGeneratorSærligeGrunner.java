@@ -17,6 +17,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Ak
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.SærligGrunn;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbKonfigurasjon;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbPerson;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbSak;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbTotalresultat;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVarsel;
@@ -128,6 +129,7 @@ public class DokumentasjonGeneratorSærligeGrunner {
                 .medHovedresultat(VedtakResultatType.FULL_TILBAKEBETALING)
                 .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(1000))
                 .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(1100))
+                .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.valueOf(1100))
                 .medTotaltRentebeløp(BigDecimal.valueOf(100))
                 .build())
             .medLovhjemmelVedtak("foo")
@@ -137,6 +139,10 @@ public class DokumentasjonGeneratorSærligeGrunner {
                 .build())
             .medKonfigurasjon(HbKonfigurasjon.builder()
                 .medKlagefristUker(4)
+                .build())
+            .medSøker(HbPerson.builder()
+                .medNavn("Søker Søkersen")
+                .medErGift(true)
                 .build())
             .build();
     }
