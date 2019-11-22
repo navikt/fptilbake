@@ -83,6 +83,11 @@ h3 {
     margin: 3mm 0 1.5mm 0;
 }
 
+h4 {
+    font-size: 18px;
+    margin: 3mm 0 1.5mm 0;
+}
+
 p {
     font-size: 16px;
     margin: 0.5mm 0 0 0;
@@ -91,36 +96,30 @@ p {
 table {
     border-collapse: collapse;
     border-spacing: 0;
-    border-color: black;
+    font-size : 12px;
 }
 
 table, th, td {
     border: 1px solid black;
 }
 
+.sumrad {
+    border: 1px solid black;
+    border-top : 2px solid black;
+}
+
 th, td {
-    padding: 2px 5px;
+    padding: 5px 10px;
+    margin: 0;
+    overflow: hidden;
 }
 
 thead {
-    background-color : lightblue;
-}
-
-tr {
-    font-size: 10px;
+    background-color : #c6d9f1;
 }
 
 .bold {
     font-weight: bold;
-}
-
-.checkbox {
-    width: 3mm;
-    height: 3mm;
-    border: black 1px solid;
-    text-align: center;
-    vertical-align: middle;
-    font-size: 10px;
 }
 
 .new_page {
@@ -151,4 +150,10 @@ tr {
     text-align: center;
     font-size: 12px;
 }
+.sum {
+    font-weight: bold;
+}
 
+.tall {
+    text-align : right;
+}
