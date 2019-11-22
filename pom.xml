@@ -33,7 +33,7 @@
         <felles.version>1.1.0_20190523160217_423c87f</felles.version>
         <vl-fpsak-tidsserie.version>2.0_20180831125757_006dad2</vl-fpsak-tidsserie.version>
         <!-- Kontrakter -->
-        <fpkontrakter.version>5.0_20190378112809_48b51b5</fpkontrakter.version>
+        <fpkontrakter.version>5.0_20191031073150_c3b9f11</fpkontrakter.version>
 
         <!-- NAV -->
 
@@ -318,6 +318,11 @@
             <dependency>
                 <groupId>no.nav.foreldrepenger.kontrakter</groupId>
                 <artifactId>fp-tilkjent-ytelse-v1</artifactId>
+                <version>${fpkontrakter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.foreldrepenger.kontrakter</groupId>
+                <artifactId>fordel-v1</artifactId>
                 <version>${fpkontrakter.version}</version>
             </dependency>
 

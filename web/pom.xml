@@ -244,6 +244,10 @@
             <artifactId>domene-testutilities</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>no.nav.foreldrepenger.kontrakter</groupId>
+            <artifactId>fordel-v1</artifactId>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>
