@@ -18,9 +18,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRe
 import no.nav.foreldrepenger.tilbakekreving.domene.person.TpsTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.KodeDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.simulering.klient.FpOppdragRestKlient;
 import no.nav.foreldrepenger.tilbakekreving.simulering.kontrakt.FeilutbetaltePerioderDto;
 import no.nav.vedtak.felles.jpa.Transaction;
@@ -41,7 +41,7 @@ public class EksternDataForBrevTjeneste {
                                       TpsTjeneste tpsTjeneste,
                                       FpsakKlient fpsakKlient,
                                       KodeverkRepository kodeverkRepository,
-                                      @KonfigVerdi(value = "behandling.venter.frist.lengde") Period brukersSvarfrist) {
+                                      @KonfigVerdi(value = "brukertilbakemelding.venter.frist.lengde") Period brukersSvarfrist) {
         this.fpOppdragKlient = fpOppdragKlient;
         this.tpsTjeneste = tpsTjeneste;
         this.kodeverkRepository = kodeverkRepository;
