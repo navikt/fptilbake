@@ -84,7 +84,8 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
         if (behandlingKobling.isPresent()) {
             Long internId = behandlingKobling.get().getInternId();
             kravVedtakStatusTjeneste.håndteresMottakAvKravVedtakStatus(internId, kravVedtakStatus437);
-            logger.info("Leste kravVedtakStatus med id={} eksternBehandlingId={} internBehandlingId={}", mottattXmlId, eksternBehandlingId, internId);
+            økonomiMottattXmlRepository.opprettTilkobling(mottattXmlId);
+            logger.info("Tilkoblet kravVedtakStatus med id={} eksternBehandlingId={} internBehandlingId={}", mottattXmlId, eksternBehandlingId, internId);
         } else {
             validerBehandlingsEksistens(eksternBehandlingId, saksnummer);
             logger.info("Ignorerte kravVedtakStatus med id={} eksternBehandlingId={}. Fantes ikke tilbakekrevingsbehandling", mottattXmlId, eksternBehandlingId);

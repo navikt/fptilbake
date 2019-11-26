@@ -2,6 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.finn;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.Before;
@@ -18,6 +19,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatusRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
+import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 
 public class FinnGrunnlagTaskTest extends FellesTestOppsett {
@@ -44,6 +46,7 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
         finnGrunnlagTask.doTask(prosessTaskData);
 
         assertThat(grunnlagRepository.harGrunnlagForBehandlingId(behandling.getId())).isTrue();
+        assertTilkobling();
     }
 
     @Test
@@ -56,11 +59,15 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
         assertThat(grunnlagRepository.harGrunnlagForBehandlingId(behandling.getId())).isTrue();
         Kravgrunnlag431 kravgrunnlag431 = grunnlagRepository.finnKravgrunnlag(behandling.getId());
         assertThat(kravgrunnlag431.getKravStatusKode()).isEqualByComparingTo(KravStatusKode.NYTT);
+        assertTilkobling();
     }
 
     @Test
     public void skal_finne_og_håndtere_avsl_melding_for_behandling() {
-        Long mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_AVSL.xml"));
+        Long mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_YTEL.xml"));
+        mottattXmlRepository.oppdaterMedEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID), mottattXmlId);
+
+        mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_AVSL.xml"));
         mottattXmlRepository.oppdaterMedEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID), mottattXmlId);
         ProsessTaskData prosessTaskData = opprettFinngrunnlagProsessTask();
         finnGrunnlagTask.doTask(prosessTaskData);
@@ -71,29 +78,17 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
         assertThat(behandlingsresultat.get().getBehandlingResultatType()).isEqualByComparingTo(BehandlingResultatType.HENLAGT_KRAVGRUNNLAG_NULLSTILT);
 
         assertThat(kravVedtakStatusRepository.finnKravstatus(behandling.getId())).isNotEmpty();
+        assertThat(grunnlagRepository.harGrunnlagForBehandlingId(behandling.getId())).isTrue();
+        assertTilkobling();
     }
 
     @Test
     public void skal_finne_og_håndtere_sper_melding_for_behandling() {
-        Long mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_SPER.xml"));
-        mottattXmlRepository.oppdaterMedEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID), mottattXmlId);
-        ProsessTaskData prosessTaskData = opprettFinngrunnlagProsessTask();
-        finnGrunnlagTask.doTask(prosessTaskData);
-
-        assertThat(behandling.isBehandlingPåVent()).isTrue();
-        assertThat(behandling.getVenteårsak()).isEqualByComparingTo(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
-
-        assertThat(kravVedtakStatusRepository.finnKravstatus(behandling.getId())).isNotEmpty();
-    }
-
-    @Test
-    public void skal_finne_og_håndtere_sper_melding_for_behandling_når_finnes_flere_meldinger() {
         Long mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_YTEL.xml"));
         mottattXmlRepository.oppdaterMedEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID), mottattXmlId);
 
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_SPER.xml"));
         mottattXmlRepository.oppdaterMedEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID), mottattXmlId);
-
         ProsessTaskData prosessTaskData = opprettFinngrunnlagProsessTask();
         finnGrunnlagTask.doTask(prosessTaskData);
 
@@ -101,14 +96,48 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
         assertThat(behandling.getVenteårsak()).isEqualByComparingTo(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
 
         assertThat(kravVedtakStatusRepository.finnKravstatus(behandling.getId())).isNotEmpty();
-        assertThat(grunnlagRepository.harGrunnlagForBehandlingId(behandling.getId())).isFalse();
+        assertThat(grunnlagRepository.harGrunnlagForBehandlingId(behandling.getId())).isTrue();
+        assertThat(grunnlagRepository.erKravgrunnlagSperret(behandling.getId())).isTrue();
+        assertTilkobling();
+    }
 
+    @Test
+    public void skal_ikke_finne_og_håndtere_ny_grunnlag_når_ekstern_behandling_ikke_finnes() {
+        Long mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_FEIL_samme_referanse.xml"));
+        mottattXmlRepository.oppdaterMedEksternBehandlingId(String.valueOf(1174551), mottattXmlId);
+
+        ProsessTaskData prosessTaskData = opprettFinngrunnlagProsessTask();
+        finnGrunnlagTask.doTask(prosessTaskData);
+
+        assertThat(grunnlagRepository.harGrunnlagForBehandlingId(behandling.getId())).isFalse();
+        Optional<ØkonomiXmlMottatt> økonomiXmlMottatt = mottattXmlRepository.finnForEksternBehandlingId(String.valueOf(1174551));
+        assertThat(økonomiXmlMottatt).isPresent();
+        assertThat(økonomiXmlMottatt.get().isTilkoblet()).isFalse();
+    }
+
+    @Test
+    public void skal_ikke_finne_og_håndtere_sper_melding_for_behandling_når_grunnlag_xml_ikke_finnes() {
+        Long mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_SPER.xml"));
+        mottattXmlRepository.oppdaterMedEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID), mottattXmlId);
+
+        ProsessTaskData prosessTaskData = opprettFinngrunnlagProsessTask();
+        finnGrunnlagTask.doTask(prosessTaskData);
+
+        assertThat(behandling.isBehandlingPåVent()).isFalse();
+        assertThat(kravVedtakStatusRepository.finnKravstatus(behandling.getId())).isEmpty();
+        assertThat(grunnlagRepository.harGrunnlagForBehandlingId(behandling.getId())).isFalse();
+        assertThat(grunnlagRepository.erKravgrunnlagSperret(behandling.getId())).isFalse();
     }
 
     private ProsessTaskData opprettFinngrunnlagProsessTask() {
         ProsessTaskData prosessTaskData = new ProsessTaskData(FinnGrunnlagTask.TASKTYPE);
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         return prosessTaskData;
+    }
+
+    private void assertTilkobling() {
+        List<ØkonomiXmlMottatt> xmlMeldinger = mottattXmlRepository.finnAlleEksternBehandlingSomIkkeErKoblet(String.valueOf(FPSAK_BEHANDLING_ID));
+        assertThat(xmlMeldinger).isEmpty();
     }
 
 }

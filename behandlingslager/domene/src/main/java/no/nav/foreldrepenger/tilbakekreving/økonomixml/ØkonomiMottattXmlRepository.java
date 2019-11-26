@@ -16,6 +16,7 @@ import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
 
 @ApplicationScoped
 public class ØkonomiMottattXmlRepository {
+    private static final String KEY_EKSTERN_BEHANDLING_ID = "eksternBehandlingId";
     private EntityManager entityManager;
 
     ØkonomiMottattXmlRepository() {
@@ -44,13 +45,19 @@ public class ØkonomiMottattXmlRepository {
 
     public Optional<ØkonomiXmlMottatt> finnForEksternBehandlingId(String eksternBehandlingId) {
         TypedQuery<ØkonomiXmlMottatt> query = entityManager.createQuery("from ØkonomiXmlMottatt where eksternBehandlingId=:eksternBehandlingId", ØkonomiXmlMottatt.class);
-        query.setParameter("eksternBehandlingId", eksternBehandlingId);
+        query.setParameter(KEY_EKSTERN_BEHANDLING_ID, eksternBehandlingId);
         return hentUniktResultat(query);
     }
 
     public List<ØkonomiXmlMottatt> finnAlleForEksternBehandlingId(String eksternBehandlingId) {
         TypedQuery<ØkonomiXmlMottatt> query = entityManager.createQuery("from ØkonomiXmlMottatt where eksternBehandlingId=:eksternBehandlingId", ØkonomiXmlMottatt.class);
-        query.setParameter("eksternBehandlingId", eksternBehandlingId);
+        query.setParameter(KEY_EKSTERN_BEHANDLING_ID, eksternBehandlingId);
+        return query.getResultList();
+    }
+
+    public List<ØkonomiXmlMottatt> finnAlleEksternBehandlingSomIkkeErKoblet(String eksternBehandlingId) {
+        TypedQuery<ØkonomiXmlMottatt> query = entityManager.createQuery("from ØkonomiXmlMottatt where eksternBehandlingId=:eksternBehandlingId and tilkoblet='N'", ØkonomiXmlMottatt.class);
+        query.setParameter(KEY_EKSTERN_BEHANDLING_ID, eksternBehandlingId);
         return query.getResultList();
     }
 
@@ -66,9 +73,15 @@ public class ØkonomiMottattXmlRepository {
         entityManager.persist(entity);
     }
 
+    public void opprettTilkobling(Long mottattXmlId) {
+        ØkonomiXmlMottatt entity = finnMottattXml(mottattXmlId);
+        entity.lagTilkobling();
+        entityManager.persist(entity);
+    }
+
     private Long finnHøyesteVersjonsnummer(String eksternBehandlingId) {
         Query query = entityManager.createNativeQuery("select max(sekvens) from oko_xml_mottatt where ekstern_behandling_id=:eksternBehandlingId");
-        query.setParameter("eksternBehandlingId", eksternBehandlingId);
+        query.setParameter(KEY_EKSTERN_BEHANDLING_ID, eksternBehandlingId);
         Object resultat = query.getSingleResult();
         return resultat != null ? ((BigDecimal) resultat).longValue() : null;
     }

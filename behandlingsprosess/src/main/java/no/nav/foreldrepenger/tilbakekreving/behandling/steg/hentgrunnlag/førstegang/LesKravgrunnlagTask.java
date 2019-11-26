@@ -82,6 +82,7 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
             Behandling behandling = behandlingRepository.hentBehandling(internId);
             if (!behandling.erAvsluttet()) {
                 kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(internId, kravgrunnlag);
+                økonomiMottattXmlRepository.opprettTilkobling(mottattXmlId);
                 logger.info("Behandling med internBehandlingId={} koblet med grunnlag id={}", internId, mottattXmlId);
             } else {
                 logger.info("Behandling med internBehandlingId={} og eksternBehandlingId={} er avsluttet, ikke koblet grunnlag med behandling", internId, eksternBehandlingId);
