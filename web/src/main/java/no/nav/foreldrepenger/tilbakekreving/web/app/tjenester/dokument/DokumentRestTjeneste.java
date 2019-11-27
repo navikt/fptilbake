@@ -19,6 +19,7 @@ import com.codahale.metrics.annotation.Timed;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import no.finn.unleash.Unleash;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Avsnitt;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.ForhåndvisningVedtaksbrevTekstDto;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.HentForhåndsvisningVarselbrevDto;
@@ -38,11 +39,13 @@ public class DokumentRestTjeneste {
     private static final String FILENAME_DOKUMENT_PDF = "filename=dokument.pdf";
     private VarselbrevTjeneste varselbrevTjeneste;
     private VedtaksbrevTjeneste vedtaksbrevTjeneste;
+    private Unleash unleash;
 
     @Inject
-    public DokumentRestTjeneste(VarselbrevTjeneste varselbrevTjeneste, VedtaksbrevTjeneste vedtaksbrevTjeneste) {
+    public DokumentRestTjeneste(VarselbrevTjeneste varselbrevTjeneste, VedtaksbrevTjeneste vedtaksbrevTjeneste, Unleash unleash) {
         this.varselbrevTjeneste = varselbrevTjeneste;
         this.vedtaksbrevTjeneste = vedtaksbrevTjeneste;
+        this.unleash = unleash;
     }
 
     public DokumentRestTjeneste() {
@@ -85,7 +88,11 @@ public class DokumentRestTjeneste {
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response hentForhåndsvisningVedtaksbrev(@Valid HentForhåndvisningVedtaksbrevPdfDto vedtaksbrevPdfDto) { // NOSONAR
-        byte[] dokument = vedtaksbrevTjeneste.hentForhåndsvisningVedtaksbrevSomPdf(vedtaksbrevPdfDto);
+
+        byte[] dokument = unleash.isEnabled("fptilbake.vedtaksbrev.vedlegg")
+            ? vedtaksbrevTjeneste.hentForhåndsvisningVedtaksbrevMedVedleggSomPdf(vedtaksbrevPdfDto)
+            : vedtaksbrevTjeneste.hentForhåndsvisningVedtaksbrevSomPdf(vedtaksbrevPdfDto);
+
         Response.ResponseBuilder responseBuilder = Response.ok(dokument);
         responseBuilder.type(PDF_CONTENT_TYPE);
         responseBuilder.header(CONTENT_DISPOSITION, FILENAME_DOKUMENT_PDF);

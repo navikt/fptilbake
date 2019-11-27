@@ -41,6 +41,14 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+            <artifactId>journalpost</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+            <artifactId>pdfgen</artifactId>
+        </dependency>
 
         <!-- NAV-avhengigheter -->
         <dependency>

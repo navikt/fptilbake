@@ -1,5 +1,8 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -15,6 +18,8 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.pdfbox.io.MemoryUsageSetting;
+import org.apache.pdfbox.multipdf.PDFMergerUtility;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultatPeriode;
@@ -128,7 +133,6 @@ public class VedtaksbrevTjeneste {
         this.historikkinnslagTjeneste = historikkinnslagTjeneste;
         this.tilbakekrevingBeregningTjeneste = tilbakekrevingBeregningTjeneste;
         this.eksternDataForBrevTjeneste = eksternDataForBrevTjeneste;
-
     }
 
     public VedtaksbrevTjeneste() {
@@ -149,6 +153,34 @@ public class VedtaksbrevTjeneste {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         opprettHistorikkinnslag(behandling, dokumentreferanse);
         lagreInfoOmVedtaksbrev(behandlingId, dokumentreferanse);
+    }
+
+    public byte[] hentForhåndsvisningVedtaksbrevMedVedleggSomPdf(HentForhåndvisningVedtaksbrevPdfDto dto) {
+        VedtaksbrevData vedtaksbrevData = hentDataForVedtaksbrev(dto.getBehandlingId(), dto.getOppsummeringstekst(), dto.getPerioderMedTekst());
+        VedtakResultatType hovedresultat = vedtaksbrevData.getHovedresultat();
+        String fagsakTypeNavn = vedtaksbrevData.getMetadata().getFagsaktypenavnPåSpråk();
+        FritekstbrevData data = new FritekstbrevData.Builder()
+            .medOverskrift(VedtaksbrevOverskrift.finnOverskriftVedtaksbrev(fagsakTypeNavn, hovedresultat))
+            .medBrevtekst(TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(vedtaksbrevData.getVedtaksbrevData()))
+            .medMetadata(vedtaksbrevData.getMetadata())
+            .build();
+
+        byte[] vedtaksbrevPdf = bestillDokumentTjeneste.hentForhåndsvisningFritekstbrev(data);
+
+        VedtaksbrevVedleggTjeneste vedleggTjeneste = new VedtaksbrevVedleggTjeneste();
+        byte[] vedlegg = vedleggTjeneste.lagVedlegg(vedtaksbrevData);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PDFMergerUtility mergerUtil = new PDFMergerUtility();
+        mergerUtil.setDestinationStream(baos);
+        mergerUtil.addSource(new ByteArrayInputStream(vedtaksbrevPdf));
+        mergerUtil.addSource(new ByteArrayInputStream(vedlegg));
+        try {
+            mergerUtil.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly());
+        } catch (IOException e) {
+            throw new RuntimeException("Fikk IO exception ved forhåndsvisning inkl vedlegg", e);
+        }
+        return baos.toByteArray();
     }
 
     public byte[] hentForhåndsvisningVedtaksbrevSomPdf(HentForhåndvisningVedtaksbrevPdfDto dto) {
@@ -384,6 +416,7 @@ public class VedtaksbrevTjeneste {
     private HbResultat utledResultat(BeregningResultatPeriode resultatPeriode, VurdertForeldelse foreldelse) {
         HbResultat.Builder builder = HbResultat.builder()
             .medTilbakekrevesBeløp(resultatPeriode.getTilbakekrevingBeløpUtenRenter())
+            .medTilbakekrevesBeløpUtenSkatt(resultatPeriode.getTilbakekrevingBeløpEtterSkatt())
             .medRenterBeløp(resultatPeriode.getRenteBeløp());
 
         VurdertForeldelsePeriode foreldelsePeriode = finnForeldelsePeriode(foreldelse, resultatPeriode.getPeriode());

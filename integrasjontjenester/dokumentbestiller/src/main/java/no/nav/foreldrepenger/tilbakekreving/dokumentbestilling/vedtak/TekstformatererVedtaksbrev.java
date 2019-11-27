@@ -241,6 +241,11 @@ class TekstformatererVedtaksbrev {
         return applyTemplate(template, vedtaksbrevData);
     }
 
+    static String lagVedtaksbrevVedleggHtml(HbVedtaksbrevData vedtaksbrevData) {
+        Template template = getTemplate("vedtak/vedlegg");
+        return applyTemplate(template, vedtaksbrevData);
+    }
+
     static String lagFaktaTekst(HbVedtaksbrevPeriodeOgFelles periode) {
         return konverterMedPartialTemplate(PARTIAL_PERIODE_FAKTA, periode);
     }

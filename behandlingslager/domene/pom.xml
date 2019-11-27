@@ -16,6 +16,12 @@
         <dependency>
             <groupId>no.nav.foreldrepenger.felles</groupId>
             <artifactId>felles-db</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>ca.szc.thirdparty.nl.jworks.markdown_to_asciidoc</groupId>
+                    <artifactId>markdown_to_asciidoc</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
@@ -40,6 +46,12 @@
         <dependency>
             <groupId>no.nav.foreldrepenger.felles</groupId>
             <artifactId>felles-util</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>ca.szc.thirdparty.nl.jworks.markdown_to_asciidoc</groupId>
+                    <artifactId>markdown_to_asciidoc</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>no.nav.foreldrepenger.felles.integrasjon</groupId>

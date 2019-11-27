@@ -13,23 +13,21 @@ import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 import com.openhtmltopdf.svgsupport.BatikSVGDrawer;
 
-public class DocumentGeneratorTjeneste {
+public class PdfGenerator {
 
     public static void main(String[] args) throws Exception {
-        DocumentGeneratorTjeneste tjeneste = new DocumentGeneratorTjeneste();
+        PdfGenerator tjeneste = new PdfGenerator();
 
         String html = FileStructureUtil.readResourceAsString("test/in.html");
-        Document document = tjeneste.appendHtmlMetadata(html, DocFormat.PDF);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        tjeneste.genererPDF(document, baos);
+        tjeneste.genererPDF(html, baos);
 
         try (FileOutputStream os = new FileOutputStream("ouput.pdf")) {
             baos.writeTo(os);
         }
     }
 
-    public Document appendHtmlMetadata(String html, DocFormat format) {
-
+    private Document appendHtmlMetadata(String html, DocFormat format) {
         Document document = Jsoup.parse(("<div id=\"content\">" + html + "</div>"));
         Element head = document.head();
 
@@ -39,8 +37,15 @@ public class DocumentGeneratorTjeneste {
         return document;
     }
 
-    public void genererPDF(Document html, ByteArrayOutputStream outputStream) {
-        org.w3c.dom.Document doc = new W3CDom().fromJsoup(html);
+    public byte[] genererPDF(String html) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        genererPDF(html, baos);
+        return baos.toByteArray();
+    }
+
+    public void genererPDF(String html, ByteArrayOutputStream outputStream) {
+        Document document = appendHtmlMetadata(html, DocFormat.PDF);
+        org.w3c.dom.Document doc = new W3CDom().fromJsoup(document);
         PdfRendererBuilder builder = new PdfRendererBuilder();
         try {
             builder

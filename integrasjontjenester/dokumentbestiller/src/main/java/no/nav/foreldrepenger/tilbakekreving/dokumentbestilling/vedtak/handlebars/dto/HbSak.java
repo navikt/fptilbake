@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.KodelisteSomKodeSerialiserer;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.LocalDateTilStrengMedNorskFormatSerialiserer;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.LocalDateTilLangtNorskFormatSerialiserer;
 import no.nav.vedtak.util.Objects;
 
 public class HbSak {
@@ -21,7 +21,7 @@ public class HbSak {
     @JsonProperty("antall-barn")
     private Integer antallBarn;
     @JsonProperty("dato-fagsakvedtak")
-    @JsonSerialize(using = LocalDateTilStrengMedNorskFormatSerialiserer.class)
+    @JsonSerialize(using = LocalDateTilLangtNorskFormatSerialiserer.class)
     private LocalDate datoFagsakvedtak;
 
     private HbSak() {
