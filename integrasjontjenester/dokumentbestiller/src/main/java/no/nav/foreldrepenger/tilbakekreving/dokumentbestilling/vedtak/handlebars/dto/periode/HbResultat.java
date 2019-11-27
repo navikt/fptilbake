@@ -63,7 +63,7 @@ public class HbResultat {
             Objects.check(kladd.renterBeløp != null, "renter er ikke satt");
             Objects.check(nettoBeløp != null, "nettobeløp er ikke satt");
             kladd.tilbakekrevesBeløpMedRenter = kladd.tilbakekrevesBeløp.add(kladd.renterBeløp);
-            kladd.tilbakekrevesBeløpUtenSkattMedRenter = nettoBeløp.add(kladd.renterBeløp);
+            kladd.tilbakekrevesBeløpUtenSkattMedRenter = nettoBeløp;
             return kladd;
         }
     }

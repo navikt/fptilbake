@@ -6,12 +6,12 @@
     <table>
         <thead>
         <tr>
-            <th>Periode<br>&nbsp;</th>
-            <th>Feilutbetalt beløp<br>&nbsp;</th>
-            <th>Tilbakebetaling<br>&nbsp;</th>
-            <th>Renter<br>&nbsp;</th>
-            <th>Beløp før skatt<br>&nbsp;</th>
-            <th>Beløp du skal betale tilbake<br>etter skatt er trukket fra</th>
+            <th>Periode<br><br>&nbsp;</th>
+            <th>Feilutbetalt beløp<br><br>&nbsp;</th>
+            <th>Tilbakebetaling<br><br>&nbsp;</th>
+            <th>Renter<br><br>&nbsp;</th>
+            <th>Beløp før skatt<br><br>&nbsp;</th>
+            <th>Beløp du skal betale<br>tilbake etter skatt<br>er trukket fra</th>
         </tr>
         </thead>
         <tbody>
@@ -37,7 +37,7 @@
             <td>Hele beløpet</td>
             <td class="tall">300 kroner</td>
             <td class="tall">3 300 kroner</td>
-            <td class="tall sum">2 522 kroner</td>
+            <td class="tall sum">2 222 kroner</td>
         </tr>
         <tr>
             <td class="sumrad">Sum</td>

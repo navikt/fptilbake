@@ -6,14 +6,20 @@
     <table>
         <thead>
         <tr>
+{{#if totalresultat.totalt-rentebeløp}}
+            <th>Periode<br><br>&nbsp;</th>
+            <th>Feilutbetalt beløp<br><br>&nbsp;</th>
+            <th>Tilbakebetaling<br><br>&nbsp;</th>
+            <th>Renter<br><br>&nbsp;</th>
+            <th>Beløp før skatt<br><br>&nbsp;</th>
+            <th>Beløp du skal betale<br>tilbake etter skatt<br>er trukket fra</th>
+{{else}}
             <th>Periode<br>&nbsp;</th>
             <th>Feilutbetalt beløp<br>&nbsp;</th>
             <th>Tilbakebetaling<br>&nbsp;</th>
-{{#if totalresultat.totalt-rentebeløp}}
-            <th>Renter<br>&nbsp;</th>
-{{/if}}
             <th>Beløp før skatt<br>&nbsp;</th>
             <th>Beløp du skal betale tilbake<br>etter skatt er trukket fra</th>
+{{/if}}
         </tr>
         </thead>
         <tbody>
