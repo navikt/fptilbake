@@ -33,10 +33,12 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingKandidaterRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingVenterRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
@@ -65,7 +67,7 @@ public class GjenopptaBehandlingTjenesteImplTest {
     private BehandlingKandidaterRepository behandlingKandidaterRepository;
 
     @Inject
-    private KravgrunnlagRepository kravgrunnlagRepository;
+    private BehandlingRepositoryProvider repositoryProvider;
 
     private InternalAksjonspunktManipulator internalAksjonspunktManipulator = new InternalAksjonspunktManipulator();
     private ProsessTaskRepository mockProsesstaskRepository = mock(ProsessTaskRepository.class);
@@ -74,10 +76,10 @@ public class GjenopptaBehandlingTjenesteImplTest {
     @Before
     public void setup() {
         gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjenesteImpl(mockProsesstaskRepository,
-                behandlingKandidaterRepository,
-                behandlingVenterRepository,
-                kravgrunnlagRepository,
-                mockVarselResponsTjeneste);
+            behandlingKandidaterRepository,
+            behandlingVenterRepository,
+            repositoryProvider,
+            mockVarselResponsTjeneste);
     }
 
     @Test
@@ -101,6 +103,23 @@ public class GjenopptaBehandlingTjenesteImplTest {
         assertThat(prosessTaskData.getAktørId()).isEqualTo(aktørId.getId());
         assertThat(prosessTaskData.getFagsakId()).isEqualTo(fagsakId);
         assertThat(prosessTaskData.getBehandlingId()).isEqualTo(behandlingId);
+    }
+
+    @Test
+    public void skal_lage_forsett_behandling_prosess_task_når_behandling_er_manuelt_gjenopptatt() {
+        final String gruppe = "44";
+        Behandling behandling = lagBehandling();
+        final Long behandlingId = behandling.getId();
+
+        when(mockProsesstaskRepository.lagre(any(ProsessTaskData.class))).thenReturn("Call_123");
+
+        gjenopptaBehandlingTjeneste.fortsettBehandlingManuelt(behandlingId);
+        assertThat(behandling.isBehandlingPåVent()).isTrue();
+        List<Historikkinnslag> historikkinnslager = repositoryProvider.getHistorikkRepository().hentHistorikk(behandlingId);
+        assertThat(historikkinnslager.size()).isEqualTo(1);
+        Historikkinnslag historikkinnslag = historikkinnslager.get(0);
+        assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.BEH_MAN_GJEN);
+        assertThat(historikkinnslag.getAktør()).isEqualByComparingTo(HistorikkAktør.SAKSBEHANDLER);
     }
 
     @Test

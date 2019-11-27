@@ -10,11 +10,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.task.FortsettBehandlingTaskProperties;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingKandidaterRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingVenterRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.ResponsKanal;
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
@@ -32,6 +38,7 @@ public class GjenopptaBehandlingTjenesteImpl implements GjenopptaBehandlingTjene
     private BehandlingKandidaterRepository behandlingKandidaterRepository;
     private BehandlingVenterRepository behandlingVenterRepository;
     private KravgrunnlagRepository grunnlagRepository;
+    private HistorikkRepository historikkRepository;
     private VarselresponsTjeneste varselresponsTjeneste;
 
     public GjenopptaBehandlingTjenesteImpl() {
@@ -42,12 +49,13 @@ public class GjenopptaBehandlingTjenesteImpl implements GjenopptaBehandlingTjene
     public GjenopptaBehandlingTjenesteImpl(ProsessTaskRepository prosessTaskRepository,
                                            BehandlingKandidaterRepository behandlingKandidaterRepository,
                                            BehandlingVenterRepository behandlingVenterRepository,
-                                           KravgrunnlagRepository kravgrunnlagRepository,
+                                           BehandlingRepositoryProvider repositoryProvider,
                                            VarselresponsTjeneste varselresponsTjeneste) {
         this.prosessTaskRepository = prosessTaskRepository;
         this.behandlingKandidaterRepository = behandlingKandidaterRepository;
         this.behandlingVenterRepository = behandlingVenterRepository;
-        this.grunnlagRepository = kravgrunnlagRepository;
+        this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
+        this.historikkRepository = repositoryProvider.getHistorikkRepository();
         this.varselresponsTjeneste = varselresponsTjeneste;
     }
 
@@ -77,7 +85,11 @@ public class GjenopptaBehandlingTjenesteImpl implements GjenopptaBehandlingTjene
                 return Optional.empty();
             }
         }
-        return fortsettBehandling(behandlingId);
+        Optional<String> callId = fortsettBehandling(behandlingId);
+        if(callId.isPresent()){
+            opprettHistorikkInnslagForManueltGjenopptaBehandling(behandlingId);
+        }
+        return callId;
     }
 
     @Override
@@ -135,6 +147,17 @@ public class GjenopptaBehandlingTjenesteImpl implements GjenopptaBehandlingTjene
 
         LOGGER.info("oppretter ny prosesstask med callId: {}", callId);
         return prosessTaskRepository.lagre(prosessTaskData);
+    }
+
+    private void opprettHistorikkInnslagForManueltGjenopptaBehandling(long behandlingId) {
+        Historikkinnslag historikkinnslag = new Historikkinnslag();
+        historikkinnslag.setAktør(HistorikkAktør.SAKSBEHANDLER);
+        historikkinnslag.setType(HistorikkinnslagType.BEH_MAN_GJEN);
+        historikkinnslag.setBehandlingId(behandlingId);
+
+        HistorikkInnslagTekstBuilder builder = new HistorikkInnslagTekstBuilder();
+        builder.medHendelse(HistorikkinnslagType.BEH_MAN_GJEN).build(historikkinnslag);
+        historikkRepository.lagre(historikkinnslag);
     }
 
 }
