@@ -94,13 +94,7 @@ public class FpsakKlient {
                     hentVarseltekst(lenke).ifPresent(builder::setVarseltekst);
                 }
                 if (ekstrainfo.contains(Tillegsinformasjon.SØKNAD) && lenke.getRel().equals(Tillegsinformasjon.SØKNAD.getFpsakRelasjonNavn())) {
-                    SoknadDto dto = new SoknadDto();
-                    dto.setSoknadType(SøknadType.FØDSEL);
-                    if (1==1){
-                        builder.setFamiliehendelse(dto);
-                    } else {
-                        builder.setFamiliehendelse(hentSøknad(lenke));
-                    }
+                    builder.setFamiliehendelse(hentSøknad(lenke));
                 }
                 if (ekstrainfo.contains(Tillegsinformasjon.TILBAKEKREVINGSVALG) && lenke.getRel().equals(Tillegsinformasjon.TILBAKEKREVINGSVALG.getFpsakRelasjonNavn())) {
                     hentTilbakekrevingValg(lenke).ifPresent(builder::setTilbakekrevingvalg);
