@@ -28,6 +28,7 @@ import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.FagsakDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.PersonopplysningDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SoknadDto;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SøknadType;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.TilbakekrevingValgDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.VarseltekstDto;
 import no.nav.vedtak.felles.integrasjon.rest.OidcRestClient;
@@ -93,7 +94,13 @@ public class FpsakKlient {
                     hentVarseltekst(lenke).ifPresent(builder::setVarseltekst);
                 }
                 if (ekstrainfo.contains(Tillegsinformasjon.SØKNAD) && lenke.getRel().equals(Tillegsinformasjon.SØKNAD.getFpsakRelasjonNavn())) {
-                    builder.setFamiliehendelse(hentSøknad(lenke));
+                    SoknadDto dto = new SoknadDto();
+                    dto.setSoknadType(SøknadType.FØDSEL);
+                    if (1==1){
+                        builder.setFamiliehendelse(dto);
+                    } else {
+                        builder.setFamiliehendelse(hentSøknad(lenke));
+                    }
                 }
                 if (ekstrainfo.contains(Tillegsinformasjon.TILBAKEKREVINGSVALG) && lenke.getRel().equals(Tillegsinformasjon.TILBAKEKREVINGSVALG.getFpsakRelasjonNavn())) {
                     hentTilbakekrevingValg(lenke).ifPresent(builder::setTilbakekrevingvalg);

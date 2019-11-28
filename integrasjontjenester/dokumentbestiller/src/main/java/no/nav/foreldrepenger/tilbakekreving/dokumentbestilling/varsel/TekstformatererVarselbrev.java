@@ -16,7 +16,6 @@ import com.github.jknack.handlebars.helper.ConditionalHelpers;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselInfo;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.ReturadresseKonfigurasjon;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.handlebars.dto.BaseDokument;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.handlebars.dto.VarselbrevDokument;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
@@ -108,7 +107,6 @@ public class TekstformatererVarselbrev {
     static VarselbrevDokument mapTilVarselbrevDokument(VarselbrevSamletInfo varselbrevSamletInfo) {
         VarselbrevDokument varselbrevDokument = new VarselbrevDokument();
         varselbrevDokument.setBelop(varselbrevSamletInfo.getSumFeilutbetaling());
-        varselbrevDokument.setKontakttelefonnummer(ReturadresseKonfigurasjon.getBrevTelefonnummerKlageEnhet());
         varselbrevDokument.setEndringsdato(varselbrevSamletInfo.getRevurderingVedtakDato()!=null ? varselbrevSamletInfo.getRevurderingVedtakDato(): FPDateUtil.iDag());
         varselbrevDokument.setFristdatoForTilbakemelding(varselbrevSamletInfo.getFristdato());
         varselbrevDokument.setVarseltekstFraSaksbehandler(varselbrevSamletInfo.getFritekstFraSaksbehandler());

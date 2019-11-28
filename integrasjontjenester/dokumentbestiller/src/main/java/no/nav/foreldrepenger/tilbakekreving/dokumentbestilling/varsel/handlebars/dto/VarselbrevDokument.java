@@ -14,17 +14,8 @@ public class VarselbrevDokument extends BaseDokument {
     private String varseltekstFraSaksbehandler;
     private LocalDate fristdatoForTilbakemelding;
     private Periode datoerHvisSammenhengendePeriode;
-    private String kontakttelefonnummer;
     private LocalDate varsletDato;
     private Long varsletBelop;
-
-    public String getKontakttelefonnummer() {
-        return kontakttelefonnummer;
-    }
-
-    public void setKontakttelefonnummer(String kontakttelefonnummer) {
-        this.kontakttelefonnummer = kontakttelefonnummer;
-    }
 
     public Long getBelop() {
         return belop;
@@ -95,7 +86,6 @@ public class VarselbrevDokument extends BaseDokument {
         Objects.requireNonNull(endringsdato, "endringsdato");
         Objects.requireNonNull(getFagsaktypeNavn(), "fagtypenavn/ytelsenavn");
         Objects.requireNonNull(fristdatoForTilbakemelding, "fristdato for tilbakemelding");
-        Objects.requireNonNull(kontakttelefonnummer, "kontakttelefonnummer");
         Objects.requireNonNull(feilutbetaltePerioder, "feilutbetalte perioder");
 
         if (isEngangsstonad()) {
