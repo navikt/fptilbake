@@ -22,6 +22,12 @@
         <dependency>
             <groupId>no.nav.foreldrepenger.felles.integrasjon</groupId>
             <artifactId>unleash-klient</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>ca.szc.thirdparty.nl.jworks.markdown_to_asciidoc</groupId>
+                    <artifactId>markdown_to_asciidoc</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Database håndtering -->
