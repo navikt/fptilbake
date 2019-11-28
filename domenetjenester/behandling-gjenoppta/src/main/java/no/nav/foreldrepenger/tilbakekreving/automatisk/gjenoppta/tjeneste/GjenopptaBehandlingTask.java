@@ -6,8 +6,6 @@ import javax.inject.Inject;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
@@ -41,10 +39,6 @@ public class GjenopptaBehandlingTask implements ProsessTaskHandler {
         BehandlingskontrollKontekst kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandlingsId);
         Behandling behandling = behandlingRepository.hentBehandling(behandlingsId);
 
-        behandlingskontrollTjeneste.taBehandlingAvVent(behandling, kontekst);
-        behandlingskontrollTjeneste.settAutopunktTilUtført(AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, kontekst);
-        behandlingskontrollTjeneste.behandlingFramføringTilSenereBehandlingSteg(kontekst, BehandlingStegType.TBKGSTEG);
-
-        behandlingskontrollTjeneste.prosesserBehandling(kontekst);
+        behandlingskontrollTjeneste.taBehandlingAvVentSetAlleAutopunktUtført(behandling, kontekst);
     }
 }
