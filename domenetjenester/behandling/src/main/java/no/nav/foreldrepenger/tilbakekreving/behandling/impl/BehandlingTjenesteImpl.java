@@ -20,6 +20,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollAsynkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.task.FortsettBehandlingTaskProperties;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.OrganisasjonsEnhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -275,8 +276,17 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
     }
 
     private void opprettFinnGrunnlagTask(Long behandlingId) {
-        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         ProsessTaskData prosessTaskData = new ProsessTaskData(FINN_KRAVGRUNNLAG_TASK);
+        List<ProsessTaskData> prosesser = prosessTaskRepository.finnUferdigeBatchTasks(FortsettBehandlingTaskProperties.TASKTYPE);
+        if (!prosesser.isEmpty()) {
+            Optional<ProsessTaskData> fortsettBehandlingProsessTask = prosesser.stream().filter(taskData -> taskData.getBehandlingId().equals(behandlingId)).findFirst();
+            if (fortsettBehandlingProsessTask.isPresent()) {
+                ProsessTaskData fortsettBehandlingProsessTaskData = fortsettBehandlingProsessTask.get();
+                prosessTaskData.setGruppe(fortsettBehandlingProsessTaskData.getGruppe());
+                prosessTaskData.setSekvens(fortsettBehandlingProsessTaskData.getSekvens() + 1);
+            }
+        }
+        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandlingId, behandling.getAktørId().getId());
         prosessTaskRepository.lagre(prosessTaskData);
     }
