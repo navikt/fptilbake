@@ -309,8 +309,9 @@
                 <type>pom</type>
                 <exclusions>
                     <exclusion>
-                        <groupId>ca.szc.thirdparty.nl.jworks.markdown_to_asciidoc</groupId>
-                        <artifactId>markdown_to_asciidoc</artifactId>
+                        <!-- denne drar med eldre versjon av jsoup gjennom markdown_to_asciidoc (som vi foreløpig ikke bruker -->
+                        <groupId>org.jsoup</groupId>
+                        <artifactId>jsoup</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -320,8 +321,9 @@
                 <version>${felles.version}</version>
                 <exclusions>
                     <exclusion>
-                        <groupId>ca.szc.thirdparty.nl.jworks.markdown_to_asciidoc</groupId>
-                        <artifactId>markdown_to_asciidoc</artifactId>
+                        <!-- denne drar med eldre versjon av jsoup gjennom markdown_to_asciidoc (som vi foreløpig ikke bruker -->
+                        <groupId>org.jsoup</groupId>
+                        <artifactId>jsoup</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -331,8 +333,9 @@
                 <version>${felles.version}</version>
                 <exclusions>
                     <exclusion>
-                        <groupId>ca.szc.thirdparty.nl.jworks.markdown_to_asciidoc</groupId>
-                        <artifactId>markdown_to_asciidoc</artifactId>
+                        <!-- denne drar med eldre versjon av jsoup gjennom markdown_to_asciidoc (som vi foreløpig ikke bruker -->
+                        <groupId>org.jsoup</groupId>
+                        <artifactId>jsoup</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -363,8 +366,9 @@
                 <type>pom</type>
                 <exclusions>
                     <exclusion>
-                        <groupId>ca.szc.thirdparty.nl.jworks.markdown_to_asciidoc</groupId>
-                        <artifactId>markdown_to_asciidoc</artifactId>
+                        <!-- denne drar med eldre versjon av jsoup gjennom markdown_to_asciidoc (som vi foreløpig ikke bruker -->
+                        <groupId>org.jsoup</groupId>
+                        <artifactId>jsoup</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -374,8 +378,9 @@
                 <version>${felles.version}</version>
                 <exclusions>
                     <exclusion>
-                        <groupId>ca.szc.thirdparty.nl.jworks.markdown_to_asciidoc</groupId>
-                        <artifactId>markdown_to_asciidoc</artifactId>
+                        <!-- denne drar med eldre versjon av jsoup gjennom markdown_to_asciidoc (som vi foreløpig ikke bruker -->
+                        <groupId>org.jsoup</groupId>
+                        <artifactId>jsoup</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -819,8 +824,9 @@
                         <artifactId>javax.json-api</artifactId>
                     </exclusion>
                     <exclusion>
-                        <groupId>ca.szc.thirdparty.nl.jworks.markdown_to_asciidoc</groupId>
-                        <artifactId>markdown_to_asciidoc</artifactId>
+                        <!-- denne drar med eldre versjon av jsoup gjennom markdown_to_asciidoc (som vi foreløpig ikke bruker -->
+                        <groupId>org.jsoup</groupId>
+                        <artifactId>jsoup</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
