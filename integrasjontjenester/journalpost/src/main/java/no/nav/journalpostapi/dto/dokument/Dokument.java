@@ -1,15 +1,25 @@
 package no.nav.journalpostapi.dto.dokument;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import no.nav.journalpostapi.dto.serializer.KodelisteSomKodeSerialiserer;
+
 import java.util.ArrayList;
 import java.util.List;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Dokument {
-    private String tittel;
     private String brevkode;
-    private Dokumentkategori dokumentkategori;
+    @JsonSerialize(using = KodelisteSomKodeSerialiserer.class)
+    private Dokumentkategori dokumentKategori;
     private List<Dokumentvariant> dokumentvarianter = new ArrayList<>();
+    private String tittel;
 
     private Dokument() {
+    }
+
+    public static Builder builder() {
+        return new Builder();
     }
 
     public static class Builder {
@@ -27,16 +37,11 @@ public class Dokument {
         }
 
         public Builder medDokumentkategori(Dokumentkategori dokumentkategori) {
-            kladd.dokumentkategori = dokumentkategori;
+            kladd.dokumentKategori = dokumentkategori;
             return this;
         }
 
-        public Builder medDokumentvarianter(List<Dokumentvariant> dokumentvarianter) {
-            kladd.dokumentvarianter.addAll(dokumentvarianter);
-            return this;
-        }
-
-        public Builder medDokumentvariant(Dokumentvariant dokumentvarianter) {
+        public Builder leggTilDokumentvariant(Dokumentvariant dokumentvarianter) {
             kladd.dokumentvarianter.add(dokumentvarianter);
             return this;
         }

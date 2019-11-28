@@ -2,7 +2,7 @@ package no.nav.journalpostapi.dto;
 
 import no.nav.journalpostapi.Kode;
 
-enum BrukerIdType implements Kode {
+public enum BrukerIdType implements Kode {
     NorskIdent("FNR"),
     Organisasjonsnummer("ORGNR"),
     AktørId("AKTOERID");

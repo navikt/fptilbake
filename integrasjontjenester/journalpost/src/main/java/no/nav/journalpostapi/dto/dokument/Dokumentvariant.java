@@ -1,13 +1,20 @@
 package no.nav.journalpostapi.dto.dokument;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import no.nav.journalpostapi.dto.serializer.KodelisteSomKodeSerialiserer;
+
 import java.util.Base64;
 import java.util.Objects;
 
+@JsonInclude(   JsonInclude.Include.NON_NULL)
 public class Dokumentvariant {
-    private Filtype filtype;
-    private Variantformat variantformat;
-    private String fysiskDokument;
     private String filnavn;
+    @JsonSerialize(using = KodelisteSomKodeSerialiserer.class)
+    private Filtype filtype;
+    private byte[] fysiskDokument;
+    @JsonSerialize(using = KodelisteSomKodeSerialiserer.class)
+    private Variantformat variantformat;
 
     public Variantformat getVariantformat() {
         return variantformat;
@@ -16,13 +23,16 @@ public class Dokumentvariant {
     private Dokumentvariant() {
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public static class Builder {
 
         private Dokumentvariant kladd = new Dokumentvariant();
-        private byte[] dokumentInnhold;
 
         public Builder medDokument(byte[] dokumentInnhold) {
-            this.dokumentInnhold = dokumentInnhold;
+            kladd.fysiskDokument = dokumentInnhold;
             return this;
         }
 
@@ -36,17 +46,15 @@ public class Dokumentvariant {
             return this;
         }
 
-
         public Builder medFilnavn(String filnavn) {
             kladd.filnavn = filnavn;
             return this;
         }
 
         public Dokumentvariant build() {
-            Objects.requireNonNull(dokumentInnhold, "mangler dokumentinnhold");
+            Objects.requireNonNull(kladd.fysiskDokument, "mangler dokumentinnhold");
             Objects.requireNonNull(kladd.filtype, "mangler filtype");
             Objects.requireNonNull(kladd.variantformat, "mangler variantformat");
-            kladd.fysiskDokument = Base64.getEncoder().encodeToString(dokumentInnhold);
             return kladd;
         }
     }

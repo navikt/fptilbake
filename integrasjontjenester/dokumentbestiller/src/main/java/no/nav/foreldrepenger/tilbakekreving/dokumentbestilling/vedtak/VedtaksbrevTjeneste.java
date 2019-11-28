@@ -17,6 +17,15 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import no.nav.journalpostapi.JournalpostApiKlient;
+import no.nav.journalpostapi.dto.*;
+import no.nav.journalpostapi.dto.dokument.*;
+import no.nav.journalpostapi.dto.opprett.OpprettJournalpostRequest;
+import no.nav.journalpostapi.dto.opprett.OpprettJournalpostResponse;
+import no.nav.journalpostapi.dto.sak.Arkivsaksystem;
+import no.nav.journalpostapi.dto.sak.Sak;
+import no.nav.journalpostapi.dto.sak.Sakstype;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
@@ -111,13 +120,15 @@ public class VedtaksbrevTjeneste {
     private TilbakekrevingBeregningTjeneste tilbakekrevingBeregningTjeneste;
     private EksternDataForBrevTjeneste eksternDataForBrevTjeneste;
 
+    private JournalpostApiKlient journalpostApiKlient;
+
     @Inject
     public VedtaksbrevTjeneste(BehandlingRepositoryProvider behandlingRepositoryProvider,
                                TilbakekrevingBeregningTjeneste tilbakekrevingBeregningTjeneste,
                                BehandlingTjeneste behandlingTjeneste,
                                EksternDataForBrevTjeneste eksternDataForBrevTjeneste,
                                FritekstbrevTjeneste bestillDokumentTjeneste,
-                               HistorikkinnslagTjeneste historikkinnslagTjeneste) {
+                               HistorikkinnslagTjeneste historikkinnslagTjeneste, JournalpostApiKlient journalpostApiKlient) {
         this.behandlingRepository = behandlingRepositoryProvider.getBehandlingRepository();
         this.eksternBehandlingRepository = behandlingRepositoryProvider.getEksternBehandlingRepository();
         this.varselRepository = behandlingRepositoryProvider.getVarselRepository();
@@ -133,6 +144,7 @@ public class VedtaksbrevTjeneste {
         this.historikkinnslagTjeneste = historikkinnslagTjeneste;
         this.tilbakekrevingBeregningTjeneste = tilbakekrevingBeregningTjeneste;
         this.eksternDataForBrevTjeneste = eksternDataForBrevTjeneste;
+        this.journalpostApiKlient = journalpostApiKlient;
     }
 
     public VedtaksbrevTjeneste() {
@@ -170,6 +182,8 @@ public class VedtaksbrevTjeneste {
         VedtaksbrevVedleggTjeneste vedleggTjeneste = new VedtaksbrevVedleggTjeneste();
         byte[] vedlegg = vedleggTjeneste.lagVedlegg(vedtaksbrevData);
 
+        journalførVedlegg(dto.getBehandlingId(), vedlegg);
+
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PDFMergerUtility mergerUtil = new PDFMergerUtility();
         mergerUtil.setDestinationStream(baos);
@@ -181,6 +195,51 @@ public class VedtaksbrevTjeneste {
             throw new RuntimeException("Fikk IO exception ved forhåndsvisning inkl vedlegg", e);
         }
         return baos.toByteArray();
+    }
+
+    public void journalførVedlegg(Long behandlingId, byte[] vedleggPdf) {
+        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
+        OpprettJournalpostRequest request = OpprettJournalpostRequest.builder()
+            .medTema(Tema.FORELDREPENGER_SVANGERSKAPSPENGER)
+            .medBehandlingstema(BehandlingTema.TILBAKEBETALING)
+            .medBruker(new Bruker(BrukerIdType.AktørId, behandling.getAktørId().getId()))
+            .medEksternReferanseId(behandlingId.toString()) //FIXME bytt til uuid
+            .medJournalførendeEnhet(behandling.getBehandlendeEnhetId())
+            .medJournalposttype(Journalposttype.UTGÅENDE)
+            .medAvsenderMottaker(AvsenderMottaker.builder()
+                .medId(SenderMottakerIdType.NorskIdent, "12345678901").build())
+            .medTittel("Oversikt over resultatet av tilbakebetalingssaken")
+            .medSak(Sak.builder()
+                .medSakstype(Sakstype.ARKIVSAK)
+                .medArkivsak(Arkivsaksystem.GSAK, behandling.getFagsak().getSaksnummer().getVerdi())
+                .build())
+            .medHoveddokument(Dokument.builder()
+                .medDokumentkategori(Dokumentkategori.Infobrev)
+                .medTittel("Oversikt over resultatet av tilbakebetalingssaken (vedlegg til vedtaksbrev)")
+                .medBrevkode("FP-TILB")
+                .leggTilDokumentvariant(Dokumentvariant.builder()
+                    .medFilnavn("vedlegg.pdf")
+                    .medVariantformat(Variantformat.Arkiv)
+                    .medDokument(vedleggPdf)
+                    .medFiltype(Filtype.PDFA)
+                    .build())
+                .build())
+            .build();
+
+
+        JsonNode rJson = TekstformatererVedtaksbrev.OM.valueToTree(request);
+        System.out.println();
+        System.out.println("----REQUEST------------");
+        System.out.println(rJson.toString());
+
+        OpprettJournalpostResponse response = journalpostApiKlient.opprettJournalpost(request);
+
+
+        JsonNode jsonNode = TekstformatererVedtaksbrev.OM.valueToTree(response);
+        System.out.println();
+        System.out.println("-----RESPONSE-----------");
+        System.out.println(jsonNode.toString());
+
     }
 
     public byte[] hentForhåndsvisningVedtaksbrevSomPdf(HentForhåndvisningVedtaksbrevPdfDto dto) {

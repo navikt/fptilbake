@@ -47,7 +47,7 @@ class TekstformatererVedtaksbrev {
     private static String PARTIAL_VEDTAK_SLUTT = "vedtak/vedtak_slutt";
     private static String PARTIAL_VEDTAK_FELLES = "vedtak/vedtak_felles";
 
-    private static final ObjectMapper OM = ObjectMapperForUtvekslingAvDataMedHandlebars.INSTANCE;
+     static final ObjectMapper OM = ObjectMapperForUtvekslingAvDataMedHandlebars.INSTANCE;
 
     private TekstformatererVedtaksbrev() {
         // for static access

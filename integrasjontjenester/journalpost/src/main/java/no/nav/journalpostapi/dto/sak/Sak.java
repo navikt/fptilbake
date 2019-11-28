@@ -2,10 +2,12 @@ package no.nav.journalpostapi.dto.sak;
 
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import no.nav.journalpostapi.dto.serializer.KodelisteSomKodeSerialiserer;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Sak {
 
     @JsonSerialize(using = KodelisteSomKodeSerialiserer.class)
@@ -18,6 +20,10 @@ public class Sak {
     private Arkivsaksystem arkivsaksystem;
 
     private Sak() {
+    }
+
+    public static Builder builder() {
+        return new Builder();
     }
 
     public static class Builder {

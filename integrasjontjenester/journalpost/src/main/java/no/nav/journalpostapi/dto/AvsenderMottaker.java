@@ -2,10 +2,12 @@ package no.nav.journalpostapi.dto;
 
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import no.nav.journalpostapi.dto.serializer.KodelisteSomKodeSerialiserer;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class AvsenderMottaker {
 
     private String id;
@@ -15,6 +17,10 @@ public class AvsenderMottaker {
     private String land;
 
     private AvsenderMottaker() {
+    }
+
+    public static Builder builder() {
+        return new Builder();
     }
 
     public static class Builder {

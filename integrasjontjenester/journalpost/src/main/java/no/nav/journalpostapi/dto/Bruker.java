@@ -7,6 +7,10 @@ import no.nav.journalpostapi.dto.serializer.KodelisteSomKodeSerialiserer;
 public class Bruker {
     private String id;
     @JsonSerialize(using = KodelisteSomKodeSerialiserer.class)
-    private SenderMottakerIdType idType;
+    private BrukerIdType idType;
 
+    public Bruker(BrukerIdType idType, String id) {
+        this.id = id;
+        this.idType = idType;
+    }
 }

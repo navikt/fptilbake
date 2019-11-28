@@ -1,9 +1,11 @@
 package no.nav.journalpostapi.dto;
 
+import no.nav.journalpostapi.Kode;
+
 /**
  * se https://confluence.adeo.no/display/BOA/Tema
  */
-public enum Tema {
+public enum Tema implements Kode {
 
     FORELDREPENGER_SVANGERSKAPSPENGER("FOR"),
     OMSORGSPENGER_PLEIEPENGER_OPPLÆRINGSPENGER("OMS"),
@@ -18,6 +20,7 @@ public enum Tema {
         this.kode = kode;
     }
 
+    @Override
     public String getKode() {
         return kode;
     }

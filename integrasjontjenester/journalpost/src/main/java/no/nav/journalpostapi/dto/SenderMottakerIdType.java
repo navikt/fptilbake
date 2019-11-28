@@ -2,7 +2,7 @@ package no.nav.journalpostapi.dto;
 
 import no.nav.journalpostapi.Kode;
 
-enum SenderMottakerIdType implements Kode {
+public enum SenderMottakerIdType implements Kode {
 
     NorskIdent("FNR"),
     Organisasjonsnummer("ORGNR"),
