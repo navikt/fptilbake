@@ -202,7 +202,6 @@ public class TekstformattererForVarselbrevTest {
         varselbrevDokument.setBelop(40L);
         varselbrevDokument.setEndringsdato(LocalDate.of(2020, 1, 30));
         varselbrevDokument.setFristdatoForTilbakemelding(LocalDate.of(2022, 2, 2));
-        varselbrevDokument.setKontakttelefonnummer("99 99 99 99");
         return varselbrevDokument;
     }
 

@@ -18,8 +18,6 @@ public class HbKonfigurasjon {
     private BigDecimal halvtGrunnbeløp = BigDecimal.valueOf(49929);  //FIXME fjerne hardkoding
     @JsonProperty("klagefrist-uker")
     private Integer klagefristUker;
-    @JsonProperty("kontakt-nav-telefon")
-    private String kontaktNavTelefon = "55 55 33 33"; //TODO fjerne hardkoding
     @JsonProperty("kontakt-nav-innkreving-telefon")
     private String kontaktNavInnkrevingTelefon = "21 05 11 00";  //TODO fjerne hardkoding
     @JsonProperty("bruk-midlertidig-tekst")
@@ -54,11 +52,6 @@ public class HbKonfigurasjon {
             return this;
         }
 
-        public HbKonfigurasjon.Builder medKontaktNavTelefon(String kontaktNavTelefon) {
-            kladd.kontaktNavTelefon = kontaktNavTelefon;
-            return this;
-        }
-
         public HbKonfigurasjon.Builder medKontaktNavInnkrevingTelefon(String kontaktNavInnkrevingTelefon) {
             kladd.kontaktNavInnkrevingTelefon = kontaktNavInnkrevingTelefon;
             return this;
@@ -73,7 +66,6 @@ public class HbKonfigurasjon {
             Objects.check(kladd.fireRettsgebyr != null, "fireRettsgebyr er ikke satt");
             Objects.check(kladd.halvtGrunnbeløp != null, "halvtGrunnbeløp er ikke satt");
             Objects.check(kladd.klagefristUker != null, "klagefristUker er ikke satt");
-            Objects.check(kladd.kontaktNavTelefon != null, "kontaktNavTelefon er ikke satt");
             Objects.check(kladd.kontaktNavInnkrevingTelefon != null, "kontaktNavInnkrevingTelefon er ikke satt");
             return kladd;
         }
