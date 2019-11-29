@@ -188,7 +188,7 @@ public class VedtaksbrevTjeneste {
         VedtaksbrevVedleggTjeneste vedleggTjeneste = new VedtaksbrevVedleggTjeneste();
         byte[] vedlegg = vedleggTjeneste.lagVedlegg(vedtaksbrevData);
 
-        if (unleash.isEnabled("fptilbake.journalfør.vedlegg")) {
+        if (unleash.isEnabled("fptilbake.journalfoer.vedlegg")) {
             journalførVedlegg(dto.getBehandlingId(), vedlegg);
         }
 
