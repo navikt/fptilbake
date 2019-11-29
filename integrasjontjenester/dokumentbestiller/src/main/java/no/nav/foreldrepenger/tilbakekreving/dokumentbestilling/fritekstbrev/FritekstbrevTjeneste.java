@@ -89,9 +89,19 @@ public class FritekstbrevTjeneste {
 
     public void knyttVedleggTilForsendelse(JournalpostId journalpost, JournalpostIdOgDokumentId vedlegg) {
         KnyttVedleggTilForsendelseRequest request = new KnyttVedleggTilForsendelseRequest();
+        request.setKnyttesTilJournalpostId(journalpost.getVerdi());
+        request.setKnyttesFraJournalpostId(vedlegg.getJournalpostId().getVerdi());
+        request.setDokumentId(vedlegg.getDokumentId());
+        request.setEndretAvNavn("VL");
         try {
             dokumentproduksjonConsumer.knyttVedleggTilForsendelse(request);
-        } catch (KnyttVedleggTilForsendelseDokumentIkkeFunnet | KnyttVedleggTilForsendelseEksterntVedleggIkkeTillatt | KnyttVedleggTilForsendelseJournalpostIkkeFunnet | KnyttVedleggTilForsendelseJournalpostIkkeUnderArbeid | KnyttVedleggTilForsendelseDokumentTillatesIkkeGjenbrukt | KnyttVedleggTilForsendelseUlikeFagomraader | KnyttVedleggTilForsendelseJournalpostIkkeFerdigstilt e) {
+        } catch (KnyttVedleggTilForsendelseDokumentIkkeFunnet
+            | KnyttVedleggTilForsendelseEksterntVedleggIkkeTillatt
+            | KnyttVedleggTilForsendelseJournalpostIkkeFunnet
+            | KnyttVedleggTilForsendelseJournalpostIkkeUnderArbeid
+            | KnyttVedleggTilForsendelseDokumentTillatesIkkeGjenbrukt
+            | KnyttVedleggTilForsendelseUlikeFagomraader
+            | KnyttVedleggTilForsendelseJournalpostIkkeFerdigstilt e) {
             throw FritekstbrevFeil.FACTORY.feilVedTilknytningAvVedlegg(vedlegg, journalpost, e).toException();
         }
     }
@@ -119,7 +129,8 @@ public class FritekstbrevTjeneste {
 
         try {
             return dokumentproduksjonConsumer.produserIkkeredigerbartDokument(produserIkkeredigerbartDokumentRequest);
-        } catch (ProduserIkkeredigerbartDokumentDokumentErRedigerbart | ProduserIkkeredigerbartDokumentDokumentErVedlegg funksjonellFeil) {
+        } catch (ProduserIkkeredigerbartDokumentDokumentErRedigerbart
+            | ProduserIkkeredigerbartDokumentDokumentErVedlegg funksjonellFeil) {
             throw FritekstbrevFeil.FACTORY.feilFraDokumentProduksjon(funksjonellFeil).toException();
         }
     }
@@ -152,7 +163,10 @@ public class FritekstbrevTjeneste {
             InputSource is = new InputSource(new StringReader(heleXml));
             Document doc = db.parse(is);
             return doc.getDocumentElement();
-        } catch (JAXBException | SAXException | ParserConfigurationException | IOException e) {
+        } catch (JAXBException
+            | SAXException
+            | ParserConfigurationException
+            | IOException e) {
             throw FritekstbrevFeil.FACTORY.feiletVedKonverteringTilXml(e).toException();
         }
     }

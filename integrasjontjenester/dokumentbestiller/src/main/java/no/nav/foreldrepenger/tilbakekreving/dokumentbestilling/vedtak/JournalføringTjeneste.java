@@ -87,9 +87,6 @@ public class JournalføringTjeneste {
         if (response.getDokumenter().size() != 1) {
             throw JournalføringTjenesteFeil.FACTORY.uforventetAntallDokumenterIRespons(response.getDokumenter().size()).toException();
         }
-        if (!response.isJournalpostFerdigstilt()) {
-            throw JournalføringTjenesteFeil.FACTORY.journalføringIkkeFerdigstilt().toException();
-        }
         logger.info("Journalførte vedlegg for vedtaksbrev for behandlingId={} med journalpostid={}", behandlingId, journalpostId.getVerdi());
         return new JournalpostIdOgDokumentId(journalpostId, response.getDokumenter().get(0).getDokumentInfoId());
     }
@@ -100,9 +97,6 @@ public class JournalføringTjeneste {
 
         @IntegrasjonFeil(feilkode = "FPT-496149", feilmelding = "Forsøkte å journalføre 1 dokument (vedlegg til vedtaksbrev), fikk %s dokumenter i respons fra dokarkiv", logLevel = LogLevel.WARN)
         Feil uforventetAntallDokumenterIRespons(Integer antallDokumenter);
-
-        @IntegrasjonFeil(feilkode = "FPT-954690", feilmelding = "Journalføring av vedlegget til vedtaksbrevet ble ikke ferdigstilt", logLevel = LogLevel.WARN)
-        Feil journalføringIkkeFerdigstilt();
 
     }
 
