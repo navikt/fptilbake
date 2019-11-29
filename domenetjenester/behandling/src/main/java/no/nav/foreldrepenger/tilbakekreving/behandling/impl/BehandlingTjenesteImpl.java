@@ -20,7 +20,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollAsynkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.task.FortsettBehandlingTaskProperties;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.OrganisasjonsEnhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -125,18 +124,20 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
     public Long opprettBehandlingManuell(Saksnummer saksnummer, UUID eksternUuid,
                                          FagsakYtelseType fagsakYtelseType, BehandlingType behandlingType) {
 
-        Long behandlingId = opprettFørstegangsbehandling(saksnummer, eksternUuid, null, null,
+        Behandling behandling = opprettFørstegangsbehandling(saksnummer, eksternUuid, null, null,
             fagsakYtelseType, behandlingType);
-
-        opprettFinnGrunnlagTask(behandlingId);
-        return behandlingId;
+        String gruppe = behandlingskontrollAsynkTjeneste.asynkProsesserBehandling(behandling);
+        opprettFinnGrunnlagTask(behandling, gruppe);
+        return behandling.getId();
     }
 
     @Override
     public Long opprettBehandlingAutomatisk(Saksnummer saksnummer, UUID eksternUuid, long eksternBehandlingId,
                                             AktørId aktørId, FagsakYtelseType fagsakYtelseType,
                                             BehandlingType behandlingType) {
-        return opprettFørstegangsbehandling(saksnummer, eksternUuid, eksternBehandlingId, aktørId, fagsakYtelseType, behandlingType);
+        Behandling behandling = opprettFørstegangsbehandling(saksnummer, eksternUuid, eksternBehandlingId, aktørId, fagsakYtelseType, behandlingType);
+        behandlingskontrollAsynkTjeneste.asynkProsesserBehandling(behandling);
+        return behandling.getId();
     }
 
     @Override
@@ -201,9 +202,9 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
     }
 
 
-    private Long opprettFørstegangsbehandling(Saksnummer saksnummer, UUID eksternUuid, Long eksternBehandlingId,
-                                              AktørId aktørId, FagsakYtelseType fagsakYtelseType,
-                                              BehandlingType behandlingType) {
+    private Behandling opprettFørstegangsbehandling(Saksnummer saksnummer, UUID eksternUuid, Long eksternBehandlingId,
+                                                    AktørId aktørId, FagsakYtelseType fagsakYtelseType,
+                                                    BehandlingType behandlingType) {
         logger.info("Oppretter Tilbakekrevingbehandling for [saksnummer: {} ] for ekstern Uuid [ {} ]", saksnummer, eksternUuid);
 
         validateHarIkkeÅpenTilbakekrevingBehandling(saksnummer, eksternUuid);
@@ -228,16 +229,14 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
         behandling.setBehandlendeOrganisasjonsEnhet(organisasjonsEnhet);
 
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
-        Long behandlingId = behandlingRepository.lagre(behandling, lås);
+        behandlingRepository.lagre(behandling, lås);
 
         EksternBehandling eksternBehandling = new EksternBehandling(behandling, eksternBehandlingId, eksternUuid);
         eksternBehandlingRepository.lagre(eksternBehandling);
 
         historikkinnslagTjeneste.opprettHistorikkinnslagForOpprettetBehandling(behandling); // FIXME: sjekk om journalpostId skal hentes ///
 
-        behandlingskontrollAsynkTjeneste.asynkProsesserBehandling(behandling);
-
-        return behandlingId;
+        return behandling;
     }
 
 
@@ -275,19 +274,11 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
         return eksternBehandlingId;
     }
 
-    private void opprettFinnGrunnlagTask(Long behandlingId) {
+    private void opprettFinnGrunnlagTask(Behandling behandling, String fortsettBehandlingProsessTaskGruppe) {
         ProsessTaskData prosessTaskData = new ProsessTaskData(FINN_KRAVGRUNNLAG_TASK);
-        List<ProsessTaskData> prosesser = prosessTaskRepository.finnUferdigeBatchTasks(FortsettBehandlingTaskProperties.TASKTYPE);
-        if (!prosesser.isEmpty()) {
-            Optional<ProsessTaskData> fortsettBehandlingProsessTask = prosesser.stream().filter(taskData -> taskData.getBehandlingId().equals(behandlingId)).findFirst();
-            if (fortsettBehandlingProsessTask.isPresent()) {
-                ProsessTaskData fortsettBehandlingProsessTaskData = fortsettBehandlingProsessTask.get();
-                prosessTaskData.setGruppe(fortsettBehandlingProsessTaskData.getGruppe());
-                prosessTaskData.setSekvens(fortsettBehandlingProsessTaskData.getSekvens() + 1);
-            }
-        }
-        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-        prosessTaskData.setBehandling(behandling.getFagsakId(), behandlingId, behandling.getAktørId().getId());
+        prosessTaskData.setGruppe(fortsettBehandlingProsessTaskGruppe);
+        prosessTaskData.setSekvens("2");
+        prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         prosessTaskRepository.lagre(prosessTaskData);
     }
 
