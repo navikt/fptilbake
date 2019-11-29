@@ -188,10 +188,6 @@ public class VedtaksbrevTjeneste {
         VedtaksbrevVedleggTjeneste vedleggTjeneste = new VedtaksbrevVedleggTjeneste();
         byte[] vedlegg = vedleggTjeneste.lagVedlegg(vedtaksbrevData);
 
-        if (unleash.isEnabled("fptilbake.journalfoer.vedlegg")) {
-            journalførVedlegg(dto.getBehandlingId(), vedlegg);
-        }
-
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PDFMergerUtility mergerUtil = new PDFMergerUtility();
         mergerUtil.setDestinationStream(baos);
@@ -221,6 +217,7 @@ public class VedtaksbrevTjeneste {
                 .medSakstype(Sakstype.ARKIVSAK)
                 .medArkivsak(Arkivsaksystem.GSAK, behandling.getFagsak().getSaksnummer().getVerdi())
                 .build())
+            .leggTilTilleggsopplysning(new Tilleggsopplysning("foo", "bar"))
             .medHoveddokument(Dokument.builder()
                 .medDokumentkategori(Dokumentkategori.Infobrev)
                 .medTittel("Oversikt over resultatet av tilbakebetalingssaken (vedlegg til vedtaksbrev)")
@@ -234,20 +231,7 @@ public class VedtaksbrevTjeneste {
                 .build())
             .build();
 
-
-        JsonNode rJson = TekstformatererVedtaksbrev.OM.valueToTree(request);
-        System.out.println();
-        System.out.println("----REQUEST------------");
-        System.out.println(rJson.toString());
-
         OpprettJournalpostResponse response = journalpostApiKlient.opprettJournalpost(request);
-
-
-        JsonNode jsonNode = TekstformatererVedtaksbrev.OM.valueToTree(response);
-        System.out.println();
-        System.out.println("-----RESPONSE-----------");
-        System.out.println(jsonNode.toString());
-
     }
 
     public byte[] hentForhåndsvisningVedtaksbrevSomPdf(HentForhåndvisningVedtaksbrevPdfDto dto) {

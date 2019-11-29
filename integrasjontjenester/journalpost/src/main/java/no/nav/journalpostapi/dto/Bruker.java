@@ -13,4 +13,12 @@ public class Bruker {
         this.id = id;
         this.idType = idType;
     }
+
+    public String getId() {
+        return id;
+    }
+
+    public BrukerIdType getIdType() {
+        return idType;
+    }
 }

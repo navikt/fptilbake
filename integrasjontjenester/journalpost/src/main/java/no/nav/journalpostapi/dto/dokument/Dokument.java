@@ -22,6 +22,22 @@ public class Dokument {
         return new Builder();
     }
 
+    public String getBrevkode() {
+        return brevkode;
+    }
+
+    public Dokumentkategori getDokumentKategori() {
+        return dokumentKategori;
+    }
+
+    public List<Dokumentvariant> getDokumentvarianter() {
+        return dokumentvarianter;
+    }
+
+    public String getTittel() {
+        return tittel;
+    }
+
     public static class Builder {
 
         private Dokument kladd = new Dokument();

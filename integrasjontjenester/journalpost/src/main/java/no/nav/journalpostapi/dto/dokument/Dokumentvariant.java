@@ -7,7 +7,7 @@ import no.nav.journalpostapi.dto.serializer.KodelisteSomKodeSerialiserer;
 import java.util.Base64;
 import java.util.Objects;
 
-@JsonInclude(   JsonInclude.Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Dokumentvariant {
     private String filnavn;
     @JsonSerialize(using = KodelisteSomKodeSerialiserer.class)
@@ -25,6 +25,18 @@ public class Dokumentvariant {
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    public String getFilnavn() {
+        return filnavn;
+    }
+
+    public Filtype getFiltype() {
+        return filtype;
+    }
+
+    public byte[] getFysiskDokument() {
+        return fysiskDokument;
     }
 
     public static class Builder {

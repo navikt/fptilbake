@@ -26,6 +26,26 @@ public class Sak {
         return new Builder();
     }
 
+    public Sakstype getSakstype() {
+        return sakstype;
+    }
+
+    public String getFagsakId() {
+        return fagsakId;
+    }
+
+    public FagsakSystem getFagsaksystem() {
+        return fagsaksystem;
+    }
+
+    public String getArkivsaksnummer() {
+        return arkivsaksnummer;
+    }
+
+    public Arkivsaksystem getArkivsaksystem() {
+        return arkivsaksystem;
+    }
+
     public static class Builder {
 
         private Sak kladd = new Sak();

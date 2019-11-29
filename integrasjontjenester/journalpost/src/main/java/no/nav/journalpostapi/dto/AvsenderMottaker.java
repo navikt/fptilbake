@@ -9,7 +9,6 @@ import no.nav.journalpostapi.dto.serializer.KodelisteSomKodeSerialiserer;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AvsenderMottaker {
-
     private String id;
     @JsonSerialize(using = KodelisteSomKodeSerialiserer.class)
     private SenderMottakerIdType idType;
@@ -21,6 +20,22 @@ public class AvsenderMottaker {
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public SenderMottakerIdType getIdType() {
+        return idType;
+    }
+
+    public String getNavn() {
+        return navn;
+    }
+
+    public String getLand() {
+        return land;
     }
 
     public static class Builder {

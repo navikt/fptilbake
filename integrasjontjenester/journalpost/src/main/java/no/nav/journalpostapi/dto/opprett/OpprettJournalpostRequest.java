@@ -8,18 +8,14 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import no.nav.journalpostapi.dto.AvsenderMottaker;
-import no.nav.journalpostapi.dto.BehandlingTema;
-import no.nav.journalpostapi.dto.Bruker;
-import no.nav.journalpostapi.dto.Journalposttype;
-import no.nav.journalpostapi.dto.Tema;
+import no.nav.journalpostapi.dto.*;
 import no.nav.journalpostapi.dto.dokument.Dokument;
 import no.nav.journalpostapi.dto.sak.Sak;
 import no.nav.journalpostapi.dto.serializer.KodelisteSomKodeSerialiserer;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonSerialize()
 public class OpprettJournalpostRequest {
-
     private AvsenderMottaker avsenderMottaker;
     @JsonSerialize(using = KodelisteSomKodeSerialiserer.class)
     private BehandlingTema behandlingstema;
@@ -33,6 +29,7 @@ public class OpprettJournalpostRequest {
     private Sak sak;
     @JsonSerialize(using = KodelisteSomKodeSerialiserer.class)
     private Tema tema;
+    private List<Tilleggsopplysning> tilleggsopplysninger = new ArrayList<>();
     private String tittel;
 
     private OpprettJournalpostRequest() {
@@ -40,6 +37,50 @@ public class OpprettJournalpostRequest {
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    public AvsenderMottaker getAvsenderMottaker() {
+        return avsenderMottaker;
+    }
+
+    public BehandlingTema getBehandlingstema() {
+        return behandlingstema;
+    }
+
+    public Bruker getBruker() {
+        return bruker;
+    }
+
+    public List<Dokument> getDokumenter() {
+        return dokumenter;
+    }
+
+    public String getEksternReferanseId() {
+        return eksternReferanseId;
+    }
+
+    public Integer getJournalførendeEnhet() {
+        return journalførendeEnhet;
+    }
+
+    public Journalposttype getJournalposttype() {
+        return journalposttype;
+    }
+
+    public Sak getSak() {
+        return sak;
+    }
+
+    public Tema getTema() {
+        return tema;
+    }
+
+    public List<Tilleggsopplysning> getTilleggsopplysninger() {
+        return tilleggsopplysninger;
+    }
+
+    public String getTittel() {
+        return tittel;
     }
 
     public static class Builder {
@@ -100,6 +141,11 @@ public class OpprettJournalpostRequest {
 
         public Builder leggTilVedlegg(Dokument dokument) {
             vedlegg.add(dokument);
+            return this;
+        }
+
+        public Builder leggTilTilleggsopplysning(Tilleggsopplysning tilleggsopplysning){
+            kladd.tilleggsopplysninger.add(tilleggsopplysning);
             return this;
         }
 

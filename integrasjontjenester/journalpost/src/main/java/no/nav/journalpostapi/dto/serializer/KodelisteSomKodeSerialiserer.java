@@ -14,7 +14,7 @@ public class KodelisteSomKodeSerialiserer extends JsonSerializer {
     public void serialize(Object o, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         if (o instanceof Kode) {
             Kode verdi = (Kode) o;
-            jsonGenerator.writeObject(verdi.getKode());
+            jsonGenerator.writeString(verdi.getKode());
         } else {
             throw new IllegalArgumentException("Serialiserer kan bare brukes for Kode");
         }
