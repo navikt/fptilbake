@@ -61,7 +61,6 @@ public class HenleggBehandlingTjeneste {
 
         if (behandling.isBehandlingPåVent()) {
             behandlingskontrollTjeneste.taBehandlingAvVent(behandling, kontekst);
-            behandlingskontrollTjeneste.settAutopunkterTilUtført(kontekst, true);
         }
         behandlingskontrollTjeneste.henleggBehandling(kontekst, årsakKode);
 
