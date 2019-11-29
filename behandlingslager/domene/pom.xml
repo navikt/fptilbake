@@ -16,13 +16,6 @@
         <dependency>
             <groupId>no.nav.foreldrepenger.felles</groupId>
             <artifactId>felles-db</artifactId>
-            <exclusions>
-                <exclusion>
-                    <!-- denne drar med eldre versjon av jsoup gjennom markdown_to_asciidoc (som vi foreløpig ikke bruker -->
-                    <groupId>org.jsoup</groupId>
-                        <artifactId>jsoup</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
@@ -47,13 +40,6 @@
         <dependency>
             <groupId>no.nav.foreldrepenger.felles</groupId>
             <artifactId>felles-util</artifactId>
-            <exclusions>
-                <exclusion>
-                    <!-- denne drar med eldre versjon av jsoup gjennom markdown_to_asciidoc (som vi foreløpig ikke bruker -->
-                    <groupId>org.jsoup</groupId>
-                        <artifactId>jsoup</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>no.nav.foreldrepenger.felles.integrasjon</groupId>

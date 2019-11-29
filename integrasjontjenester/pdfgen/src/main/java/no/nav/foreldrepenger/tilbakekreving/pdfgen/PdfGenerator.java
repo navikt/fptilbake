@@ -4,11 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import org.jsoup.Jsoup;
-import org.jsoup.helper.W3CDom;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-
 import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 import com.openhtmltopdf.svgsupport.BatikSVGDrawer;
@@ -27,14 +22,23 @@ public class PdfGenerator {
         }
     }
 
-    private Document appendHtmlMetadata(String html, DocFormat format) {
-        Document document = Jsoup.parse(("<div id=\"content\">" + html + "</div>"));
-        Element head = document.head();
-
-        head.append("<meta charset=\"UTF-8\">");
-        head.append("<style>" + hentCss(format) + "</style>");
-
-        return document;
+    private String appendHtmlMetadata(String html, DocFormat format) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("<html>");
+        builder.append("<head>");
+        builder.append("<meta charset=\"UTF-8\" />");
+        builder.append("<style>");
+        builder.append(hentCss(format));
+        builder.append("</style>");
+        builder.append("</head>");
+        builder.append("<body>");
+        builder.append("<div id=\"content\">");
+        builder.append(html);
+        builder.append("</div>");
+        builder.append("</body>");
+        builder.append("</html>");
+        String s = builder.toString();
+        return s;
     }
 
     public byte[] genererPDF(String html) {
@@ -43,9 +47,8 @@ public class PdfGenerator {
         return baos.toByteArray();
     }
 
-    public void genererPDF(String html, ByteArrayOutputStream outputStream) {
-        Document document = appendHtmlMetadata(html, DocFormat.PDF);
-        org.w3c.dom.Document doc = new W3CDom().fromJsoup(document);
+    public void genererPDF(String htmlContent, ByteArrayOutputStream outputStream) {
+        String htmlDocument = appendHtmlMetadata(htmlContent, DocFormat.PDF);
         PdfRendererBuilder builder = new PdfRendererBuilder();
         try {
             builder
@@ -55,7 +58,7 @@ public class PdfGenerator {
                 .useColorProfile(FileStructureUtil.getColorProfile())
                 .useSVGDrawer(new BatikSVGDrawer())
                 .usePdfAConformance(PdfRendererBuilder.PdfAConformance.PDFA_2_U)
-                .withW3cDocument(doc, "")
+                .withHtmlContent(htmlDocument, "")
                 .toStream(outputStream)
                 .useFastMode()
                 .buildPdfRenderer()

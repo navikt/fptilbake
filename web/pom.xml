@@ -22,13 +22,6 @@
         <dependency>
             <groupId>no.nav.foreldrepenger.felles.integrasjon</groupId>
             <artifactId>unleash-klient</artifactId>
-            <exclusions>
-                <exclusion>
-                    <!-- denne drar med eldre versjon av jsoup gjennom markdown_to_asciidoc (som vi foreløpig ikke bruker -->
-                    <groupId>org.jsoup</groupId>
-                    <artifactId>jsoup</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <!-- Database håndtering -->
@@ -76,24 +69,10 @@
         <dependency>
             <groupId>no.nav.foreldrepenger.felles.sikkerhet</groupId>
             <artifactId>felles-sikkerhet</artifactId>
-            <exclusions>
-                <exclusion>
-                    <!-- denne drar med eldre versjon av jsoup gjennom markdown_to_asciidoc (som vi foreløpig ikke bruker -->
-                    <groupId>org.jsoup</groupId>
-                    <artifactId>jsoup</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>no.nav.foreldrepenger.felles</groupId>
             <artifactId>felles-util</artifactId>
-            <exclusions>
-                <exclusion>
-                    <!-- denne drar med eldre versjon av jsoup gjennom markdown_to_asciidoc (som vi foreløpig ikke bruker -->
-                    <groupId>org.jsoup</groupId>
-                    <artifactId>jsoup</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <!-- REST + WebService -->

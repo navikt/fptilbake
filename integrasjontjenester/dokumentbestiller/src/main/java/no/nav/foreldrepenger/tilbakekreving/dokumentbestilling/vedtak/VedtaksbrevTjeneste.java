@@ -18,6 +18,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import no.finn.unleash.Unleash;
 import no.nav.journalpostapi.JournalpostApiKlient;
 import no.nav.journalpostapi.dto.*;
 import no.nav.journalpostapi.dto.dokument.*;
@@ -122,13 +123,17 @@ public class VedtaksbrevTjeneste {
 
     private JournalpostApiKlient journalpostApiKlient;
 
+    private Unleash unleash;
+
     @Inject
     public VedtaksbrevTjeneste(BehandlingRepositoryProvider behandlingRepositoryProvider,
                                TilbakekrevingBeregningTjeneste tilbakekrevingBeregningTjeneste,
                                BehandlingTjeneste behandlingTjeneste,
                                EksternDataForBrevTjeneste eksternDataForBrevTjeneste,
                                FritekstbrevTjeneste bestillDokumentTjeneste,
-                               HistorikkinnslagTjeneste historikkinnslagTjeneste, JournalpostApiKlient journalpostApiKlient) {
+                               HistorikkinnslagTjeneste historikkinnslagTjeneste,
+                               JournalpostApiKlient journalpostApiKlient,
+                               Unleash unleash) {
         this.behandlingRepository = behandlingRepositoryProvider.getBehandlingRepository();
         this.eksternBehandlingRepository = behandlingRepositoryProvider.getEksternBehandlingRepository();
         this.varselRepository = behandlingRepositoryProvider.getVarselRepository();
@@ -145,6 +150,7 @@ public class VedtaksbrevTjeneste {
         this.tilbakekrevingBeregningTjeneste = tilbakekrevingBeregningTjeneste;
         this.eksternDataForBrevTjeneste = eksternDataForBrevTjeneste;
         this.journalpostApiKlient = journalpostApiKlient;
+        this.unleash = unleash;
     }
 
     public VedtaksbrevTjeneste() {
@@ -182,7 +188,9 @@ public class VedtaksbrevTjeneste {
         VedtaksbrevVedleggTjeneste vedleggTjeneste = new VedtaksbrevVedleggTjeneste();
         byte[] vedlegg = vedleggTjeneste.lagVedlegg(vedtaksbrevData);
 
-        journalførVedlegg(dto.getBehandlingId(), vedlegg);
+        if (unleash.isEnabled("fptilbake.journalfør.vedlegg")) {
+            journalførVedlegg(dto.getBehandlingId(), vedlegg);
+        }
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PDFMergerUtility mergerUtil = new PDFMergerUtility();

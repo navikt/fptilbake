@@ -29,13 +29,6 @@
         <dependency>
             <groupId>no.nav.foreldrepenger.felles</groupId>
             <artifactId>felles-db</artifactId>
-            <exclusions>
-                <exclusion>
-                    <!-- denne drar med eldre versjon av jsoup gjennom markdown_to_asciidoc (som vi foreløpig ikke bruker -->
-                    <groupId>org.jsoup</groupId>
-                    <artifactId>jsoup</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <!--test -->
         <dependency>

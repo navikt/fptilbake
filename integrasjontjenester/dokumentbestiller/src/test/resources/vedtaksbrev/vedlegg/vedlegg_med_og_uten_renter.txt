@@ -1,17 +1,13 @@
-<html>
-<head></head>
-<body>
-<div id="content">
-    <h4>Oversikt over resultatet av tilbakebetalingssaken</h4>
+<h4>Oversikt over resultatet av tilbakebetalingssaken</h4>
     <table>
         <thead>
         <tr>
-            <th>Periode<br><br>&nbsp;</th>
-            <th>Feilutbetalt beløp<br><br>&nbsp;</th>
-            <th>Tilbakebetaling<br><br>&nbsp;</th>
-            <th>Renter<br><br>&nbsp;</th>
-            <th>Beløp før skatt<br><br>&nbsp;</th>
-            <th>Beløp du skal betale<br>tilbake etter skatt<br>er trukket fra</th>
+            <th>Periode<br/><br/> </th>
+            <th>Feilutbetalt beløp<br/><br/> </th>
+            <th>Tilbakebetaling<br/><br/> </th>
+            <th>Renter<br/><br/> </th>
+            <th>Beløp før skatt<br/><br/> </th>
+            <th>Beløp du skal betale<br/>tilbake etter skatt<br/>er trukket fra</th>
         </tr>
         </thead>
         <tbody>
@@ -49,6 +45,3 @@
         </tr>
         </tbody>
     </table>
-</div>
-</body>
-</html>
