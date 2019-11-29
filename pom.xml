@@ -282,6 +282,16 @@
                 <artifactId>domenetjenester-iverksett</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+                <artifactId>pdfgen</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+                <artifactId>journalpost</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- Felles biblioteker og sikkerhet -->
             <dependency>
@@ -339,6 +349,7 @@
                 <artifactId>felles-integrasjon-bom</artifactId>
                 <version>${felles.version}</version>
             </dependency>
+
 
             <!-- NAV -->
             <dependency>
@@ -936,16 +947,11 @@
                         <configuration>
                             <rules>
                                 <requireJavaVersion>
-                                    <version>[10,)</version>
+                                    <version>[11,)</version>
                                 </requireJavaVersion>
                                 <requireMavenVersion>
                                     <version>[3.5.3,)</version>
                                 </requireMavenVersion>
-                                <bannedDependencies>
-                                    <excludes>
-                                        <exclude>commons-logging:commons-logging</exclude>
-                                    </excludes>
-                                </bannedDependencies>
                                 <dependencyConvergence/>
                                 <!-- Ikke kommenter inn denne. Det brekker
                                     muligheten til å bygge bare deler av prosjektet https://issues.apache.org/jira/browse/MENFORCER-189

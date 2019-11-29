@@ -24,16 +24,24 @@ import no.nav.foreldrepenger.integrasjon.dokument.fritekstbrev.FritekstbrevConst
 import no.nav.foreldrepenger.integrasjon.dokument.fritekstbrev.ObjectFactory;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMetadataMapper;
+import no.nav.tjeneste.virksomhet.dokumentproduksjon.v2.binding.KnyttVedleggTilForsendelseDokumentIkkeFunnet;
+import no.nav.tjeneste.virksomhet.dokumentproduksjon.v2.binding.KnyttVedleggTilForsendelseDokumentTillatesIkkeGjenbrukt;
+import no.nav.tjeneste.virksomhet.dokumentproduksjon.v2.binding.KnyttVedleggTilForsendelseEksterntVedleggIkkeTillatt;
+import no.nav.tjeneste.virksomhet.dokumentproduksjon.v2.binding.KnyttVedleggTilForsendelseJournalpostIkkeFerdigstilt;
+import no.nav.tjeneste.virksomhet.dokumentproduksjon.v2.binding.KnyttVedleggTilForsendelseJournalpostIkkeFunnet;
+import no.nav.tjeneste.virksomhet.dokumentproduksjon.v2.binding.KnyttVedleggTilForsendelseJournalpostIkkeUnderArbeid;
+import no.nav.tjeneste.virksomhet.dokumentproduksjon.v2.binding.KnyttVedleggTilForsendelseUlikeFagomraader;
 import no.nav.tjeneste.virksomhet.dokumentproduksjon.v2.binding.ProduserIkkeredigerbartDokumentDokumentErRedigerbart;
 import no.nav.tjeneste.virksomhet.dokumentproduksjon.v2.binding.ProduserIkkeredigerbartDokumentDokumentErVedlegg;
 import no.nav.tjeneste.virksomhet.dokumentproduksjon.v2.informasjon.Dokumentbestillingsinformasjon;
+import no.nav.tjeneste.virksomhet.dokumentproduksjon.v2.meldinger.FerdigstillForsendelseRequest;
+import no.nav.tjeneste.virksomhet.dokumentproduksjon.v2.meldinger.KnyttVedleggTilForsendelseRequest;
 import no.nav.tjeneste.virksomhet.dokumentproduksjon.v2.meldinger.ProduserDokumentutkastRequest;
 import no.nav.tjeneste.virksomhet.dokumentproduksjon.v2.meldinger.ProduserDokumentutkastResponse;
 import no.nav.tjeneste.virksomhet.dokumentproduksjon.v2.meldinger.ProduserIkkeredigerbartDokumentRequest;
 import no.nav.tjeneste.virksomhet.dokumentproduksjon.v2.meldinger.ProduserIkkeredigerbartDokumentResponse;
 import no.nav.vedtak.felles.integrasjon.dokument.produksjon.DokumentproduksjonConsumer;
 import no.nav.vedtak.felles.integrasjon.felles.ws.JaxbHelper;
-import no.nav.vedtak.felles.jpa.Transaction;
 
 @ApplicationScoped
 public class FritekstbrevTjeneste {
@@ -56,14 +64,57 @@ public class FritekstbrevTjeneste {
     }
 
     public JournalpostIdOgDokumentId sendFritekstbrev(FritekstbrevData data) {
+        boolean skalLeggeTilVedlegg = false;
+        return sendEllerKlargjørFritekstbrev(data, skalLeggeTilVedlegg);
+    }
+
+    public JournalpostIdOgDokumentId sendFritekstbrev(FritekstbrevData data, JournalpostIdOgDokumentId vedlegg) {
+        boolean skalLeggeTilVedlegg = true;
+        JournalpostIdOgDokumentId fritekstbrevReferanse = sendEllerKlargjørFritekstbrev(data, skalLeggeTilVedlegg);
+        knyttVedleggTilForsendelse(fritekstbrevReferanse.getJournalpostId(), vedlegg);
+        ferdigstillForsendelse(fritekstbrevReferanse.getJournalpostId());
+        return fritekstbrevReferanse;
+    }
+
+    private JournalpostIdOgDokumentId sendEllerKlargjørFritekstbrev(FritekstbrevData data, boolean skalLeggeTilVedlegg) {
         Element ferdigXml = lagXmlDokument(data);
 
-        Dokumentbestillingsinformasjon dokumentbestillingsinfo = DokumentbestillingsinfoMapper.opprettDokumentbestillingsinformasjon(data.getBrevMetadata());
+        Dokumentbestillingsinformasjon dokumentbestillingsinfo = DokumentbestillingsinfoMapper.opprettDokumentbestillingsinformasjon(data.getBrevMetadata(), skalLeggeTilVedlegg);
         ProduserIkkeredigerbartDokumentResponse bestillingSvar = sendBrevbestilling(ferdigXml, dokumentbestillingsinfo);
 
         String journalpostId = bestillingSvar.getJournalpostId();
         String dokumentId = bestillingSvar.getDokumentId();
         return new JournalpostIdOgDokumentId(new JournalpostId(journalpostId), dokumentId);
+    }
+
+    public void knyttVedleggTilForsendelse(JournalpostId journalpost, JournalpostIdOgDokumentId vedlegg) {
+        KnyttVedleggTilForsendelseRequest request = new KnyttVedleggTilForsendelseRequest();
+        request.setKnyttesTilJournalpostId(journalpost.getVerdi());
+        request.setKnyttesFraJournalpostId(vedlegg.getJournalpostId().getVerdi());
+        request.setDokumentId(vedlegg.getDokumentId());
+        request.setEndretAvNavn("VL");
+        try {
+            dokumentproduksjonConsumer.knyttVedleggTilForsendelse(request);
+        } catch (KnyttVedleggTilForsendelseDokumentIkkeFunnet
+            | KnyttVedleggTilForsendelseEksterntVedleggIkkeTillatt
+            | KnyttVedleggTilForsendelseJournalpostIkkeFunnet
+            | KnyttVedleggTilForsendelseJournalpostIkkeUnderArbeid
+            | KnyttVedleggTilForsendelseDokumentTillatesIkkeGjenbrukt
+            | KnyttVedleggTilForsendelseUlikeFagomraader
+            | KnyttVedleggTilForsendelseJournalpostIkkeFerdigstilt e) {
+            throw FritekstbrevFeil.FACTORY.feilVedTilknytningAvVedlegg(vedlegg, journalpost, e).toException();
+        }
+    }
+
+    private void ferdigstillForsendelse(JournalpostId journalpostId) {
+        FerdigstillForsendelseRequest request = new FerdigstillForsendelseRequest();
+        request.setJournalpostId(journalpostId.getVerdi());
+        request.setEndretAvNavn("VL");
+        try {
+            dokumentproduksjonConsumer.ferdigstillForsendelse(request);
+        } catch (Exception e) {
+            throw FritekstbrevFeil.FACTORY.feilVedFerdigstillelse(journalpostId, e).toException();
+        }
     }
 
     public byte[] hentForhåndsvisningFritekstbrev(FritekstbrevData data) {
@@ -78,7 +129,8 @@ public class FritekstbrevTjeneste {
 
         try {
             return dokumentproduksjonConsumer.produserIkkeredigerbartDokument(produserIkkeredigerbartDokumentRequest);
-        } catch (ProduserIkkeredigerbartDokumentDokumentErRedigerbart | ProduserIkkeredigerbartDokumentDokumentErVedlegg funksjonellFeil) {
+        } catch (ProduserIkkeredigerbartDokumentDokumentErRedigerbart
+            | ProduserIkkeredigerbartDokumentDokumentErVedlegg funksjonellFeil) {
             throw FritekstbrevFeil.FACTORY.feilFraDokumentProduksjon(funksjonellFeil).toException();
         }
     }
@@ -111,7 +163,10 @@ public class FritekstbrevTjeneste {
             InputSource is = new InputSource(new StringReader(heleXml));
             Document doc = db.parse(is);
             return doc.getDocumentElement();
-        } catch (JAXBException | SAXException | ParserConfigurationException | IOException e) {
+        } catch (JAXBException
+            | SAXException
+            | ParserConfigurationException
+            | IOException e) {
             throw FritekstbrevFeil.FACTORY.feiletVedKonverteringTilXml(e).toException();
         }
     }

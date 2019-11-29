@@ -21,6 +21,8 @@
         <module>fpsak-klient</module>
         <module>kravgrunnlag-queue</module>
         <module>kafka-poller</module>
+        <module>pdfgen</module>
+        <module>journalpost</module>
     </modules>
 
 </project>

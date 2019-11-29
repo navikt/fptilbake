@@ -41,6 +41,14 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+            <artifactId>journalpost</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+            <artifactId>pdfgen</artifactId>
+        </dependency>
 
         <!-- NAV-avhengigheter -->
         <dependency>
@@ -48,8 +56,16 @@
             <artifactId>dokumentbestiller-v1</artifactId>
             <classifier>jaxb</classifier>
         </dependency>
+        <dependency>
+            <groupId>no.nav.foreldrepenger.felles.integrasjon</groupId>
+            <artifactId>unleash-klient</artifactId>
+        </dependency>
 
         <!-- eksterne avhengigheter -->
+        <dependency>
+            <groupId>no.finn.unleash</groupId>
+            <artifactId>unleash-client-java</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.github.jknack</groupId>
             <artifactId>handlebars</artifactId>

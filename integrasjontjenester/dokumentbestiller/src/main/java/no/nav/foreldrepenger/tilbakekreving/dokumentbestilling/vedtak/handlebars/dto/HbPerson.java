@@ -6,7 +6,7 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.LocalDateTilStrengMedNorskFormatSerialiserer;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.LocalDateTilLangtNorskFormatSerialiserer;
 
 public class HbPerson {
 
@@ -14,7 +14,7 @@ public class HbPerson {
     private String navn;
 
     @JsonProperty("dødsdato")
-    @JsonSerialize(using = LocalDateTilStrengMedNorskFormatSerialiserer.class)
+    @JsonSerialize(using = LocalDateTilLangtNorskFormatSerialiserer.class)
     private LocalDate dødsdato;
 
     @JsonProperty("er-gift")

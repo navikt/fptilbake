@@ -32,6 +32,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevPeriodeOgFelles;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbKravgrunnlag;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbResultat;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbResultatTestBuilder;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbVedtaksbrevPeriode;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbVurderinger;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
@@ -73,7 +74,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
                     .medFritekstVilkår("Du er heldig som slapp å betale alt!")
                     .medSærligeGrunner(Arrays.asList(SærligGrunn.TID_FRA_UTBETALING, SærligGrunn.STØRRELSE_BELØP), null, null)
                     .build())
-                .medResultat(HbResultat.forTilbakekrevesBeløp(BigDecimal.valueOf(20002)))
+                .medResultat(HbResultatTestBuilder.forTilbakekrevesBeløp(20002))
                 .build(),
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(februar)
@@ -89,7 +90,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
                     .medRiktigBeløp(BigDecimal.valueOf(3000))
                     .medUtbetaltBeløp(BigDecimal.valueOf(6000))
                     .build())
-                .medResultat(HbResultat.forTilbakekrevesBeløp(BigDecimal.valueOf(3000)))
+                .medResultat(HbResultatTestBuilder.forTilbakekrevesBeløp(3000))
                 .build()
         );
         HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
@@ -128,7 +129,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
                 .medAktsomhetResultat(Aktsomhet.SIMPEL_UAKTSOM)
                 .medSærligeGrunner(Arrays.asList(SærligGrunn.TID_FRA_UTBETALING, SærligGrunn.STØRRELSE_BELØP), null, null)
                 .build())
-            .medResultat(HbResultat.forTilbakekrevesBeløp(BigDecimal.valueOf(20002)))
+            .medResultat(HbResultatTestBuilder.forTilbakekrevesBeløp(20002))
             .build();
         HbVedtaksbrevPeriodeOgFelles data = new HbVedtaksbrevPeriodeOgFelles(felles, periode);
 
@@ -179,7 +180,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
                 .medAktsomhetResultat(AnnenVurdering.GOD_TRO)
                 .medBeløpIBehold(BigDecimal.ZERO)
                 .build())
-            .medResultat(HbResultat.forTilbakekrevesBeløp(BigDecimal.ZERO))
+            .medResultat(HbResultatTestBuilder.forTilbakekrevesBeløp(0))
             .build();
         HbVedtaksbrevPeriodeOgFelles data = new HbVedtaksbrevPeriodeOgFelles(felles, periode);
 
@@ -220,6 +221,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
             .medResultat(HbResultat.builder()
                 .medTilbakekrevesBeløp(BigDecimal.valueOf(1000))
                 .medRenterBeløp(BigDecimal.valueOf(100))
+                .medTilbakekrevesBeløpUtenSkatt(BigDecimal.valueOf(1000))
                 .build())
             .build();
 
@@ -260,6 +262,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
             .medResultat(HbResultat.builder()
                 .medTilbakekrevesBeløp(BigDecimal.valueOf(500))
                 .medRenterBeløp(BigDecimal.valueOf(0))
+                .medTilbakekrevesBeløpUtenSkatt(BigDecimal.valueOf(500))
                 .build())
             .build();
 

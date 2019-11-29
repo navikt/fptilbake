@@ -1,5 +1,8 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -15,7 +18,10 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.pdfbox.io.MemoryUsageSetting;
+import org.apache.pdfbox.multipdf.PDFMergerUtility;
 
+import no.finn.unleash.Unleash;
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultatPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingBeregningTjeneste;
@@ -106,13 +112,18 @@ public class VedtaksbrevTjeneste {
     private TilbakekrevingBeregningTjeneste tilbakekrevingBeregningTjeneste;
     private EksternDataForBrevTjeneste eksternDataForBrevTjeneste;
 
+    private JournalføringTjeneste journalføringTjeneste;
+
+    private Unleash unleash;
+
     @Inject
     public VedtaksbrevTjeneste(BehandlingRepositoryProvider behandlingRepositoryProvider,
                                TilbakekrevingBeregningTjeneste tilbakekrevingBeregningTjeneste,
                                BehandlingTjeneste behandlingTjeneste,
                                EksternDataForBrevTjeneste eksternDataForBrevTjeneste,
                                FritekstbrevTjeneste bestillDokumentTjeneste,
-                               HistorikkinnslagTjeneste historikkinnslagTjeneste) {
+                               HistorikkinnslagTjeneste historikkinnslagTjeneste,
+                               JournalføringTjeneste journalføringTjeneste, Unleash unleash) {
         this.behandlingRepository = behandlingRepositoryProvider.getBehandlingRepository();
         this.eksternBehandlingRepository = behandlingRepositoryProvider.getEksternBehandlingRepository();
         this.varselRepository = behandlingRepositoryProvider.getVarselRepository();
@@ -128,7 +139,8 @@ public class VedtaksbrevTjeneste {
         this.historikkinnslagTjeneste = historikkinnslagTjeneste;
         this.tilbakekrevingBeregningTjeneste = tilbakekrevingBeregningTjeneste;
         this.eksternDataForBrevTjeneste = eksternDataForBrevTjeneste;
-
+        this.journalføringTjeneste = journalføringTjeneste;
+        this.unleash = unleash;
     }
 
     public VedtaksbrevTjeneste() {
@@ -144,11 +156,48 @@ public class VedtaksbrevTjeneste {
             .medMetadata(vedtaksbrevData.getMetadata())
             .build();
 
-        JournalpostIdOgDokumentId dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data);
-
+        JournalpostIdOgDokumentId dokumentreferanse;
+        if (unleash.isEnabled("fptilbake.vedtaksbrev.vedlegg")) {
+            byte[] vedlegg = lagVedtaksbrevVedleggTabellPdf(vedtaksbrevData);
+            JournalpostIdOgDokumentId vedleggReferanse = journalføringTjeneste.journalførVedlegg(behandlingId, vedlegg);
+            dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data, vedleggReferanse);
+        } else {
+            dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data);
+        }
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         opprettHistorikkinnslag(behandling, dokumentreferanse);
         lagreInfoOmVedtaksbrev(behandlingId, dokumentreferanse);
+    }
+
+    private byte[] lagVedtaksbrevVedleggTabellPdf(VedtaksbrevData vedtaksbrevData) {
+        VedtaksbrevVedleggTjeneste vedleggTjeneste = new VedtaksbrevVedleggTjeneste();
+        return vedleggTjeneste.lagVedlegg(vedtaksbrevData);
+    }
+
+    public byte[] hentForhåndsvisningVedtaksbrevMedVedleggSomPdf(HentForhåndvisningVedtaksbrevPdfDto dto) {
+        VedtaksbrevData vedtaksbrevData = hentDataForVedtaksbrev(dto.getBehandlingId(), dto.getOppsummeringstekst(), dto.getPerioderMedTekst());
+        VedtakResultatType hovedresultat = vedtaksbrevData.getHovedresultat();
+        String fagsakTypeNavn = vedtaksbrevData.getMetadata().getFagsaktypenavnPåSpråk();
+        FritekstbrevData data = new FritekstbrevData.Builder()
+            .medOverskrift(VedtaksbrevOverskrift.finnOverskriftVedtaksbrev(fagsakTypeNavn, hovedresultat))
+            .medBrevtekst(TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(vedtaksbrevData.getVedtaksbrevData()))
+            .medMetadata(vedtaksbrevData.getMetadata())
+            .build();
+
+        byte[] vedtaksbrevPdf = bestillDokumentTjeneste.hentForhåndsvisningFritekstbrev(data);
+        byte[] vedlegg = lagVedtaksbrevVedleggTabellPdf(vedtaksbrevData);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PDFMergerUtility mergerUtil = new PDFMergerUtility();
+        mergerUtil.setDestinationStream(baos);
+        mergerUtil.addSource(new ByteArrayInputStream(vedtaksbrevPdf));
+        mergerUtil.addSource(new ByteArrayInputStream(vedlegg));
+        try {
+            mergerUtil.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly());
+        } catch (IOException e) {
+            throw new RuntimeException("Fikk IO exception ved forhåndsvisning inkl vedlegg", e);
+        }
+        return baos.toByteArray();
     }
 
     public byte[] hentForhåndsvisningVedtaksbrevSomPdf(HentForhåndvisningVedtaksbrevPdfDto dto) {
@@ -384,6 +433,7 @@ public class VedtaksbrevTjeneste {
     private HbResultat utledResultat(BeregningResultatPeriode resultatPeriode, VurdertForeldelse foreldelse) {
         HbResultat.Builder builder = HbResultat.builder()
             .medTilbakekrevesBeløp(resultatPeriode.getTilbakekrevingBeløpUtenRenter())
+            .medTilbakekrevesBeløpUtenSkatt(resultatPeriode.getTilbakekrevingBeløpEtterSkatt())
             .medRenterBeløp(resultatPeriode.getRenteBeløp());
 
         VurdertForeldelsePeriode foreldelsePeriode = finnForeldelsePeriode(foreldelse, resultatPeriode.getPeriode());

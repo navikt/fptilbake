@@ -24,6 +24,10 @@ public class DokumentbestillingsinfoMapper {
     }
 
     public static Dokumentbestillingsinformasjon opprettDokumentbestillingsinformasjon(BrevMetadata brevMetadata) {
+        return opprettDokumentbestillingsinformasjon(brevMetadata, false);
+    }
+
+    public static Dokumentbestillingsinformasjon opprettDokumentbestillingsinformasjon(BrevMetadata brevMetadata, boolean skalLeggeTilVedlegg) {
         Dokumentbestillingsinformasjon dokumentinfo = new Dokumentbestillingsinformasjon();
 
         Fagsystemer fptilbakeFagsystem = new Fagsystemer();
@@ -40,8 +44,8 @@ public class DokumentbestillingsinfoMapper {
         dokumentinfo.setBruker(bruker);
 
         dokumentinfo.setDokumenttypeId("000096");
-        dokumentinfo.setFerdigstillForsendelse(true);
-        dokumentinfo.setInkludererEksterneVedlegg(false);
+        dokumentinfo.setFerdigstillForsendelse(!skalLeggeTilVedlegg);
+        dokumentinfo.setInkludererEksterneVedlegg(skalLeggeTilVedlegg);
         dokumentinfo.setJournalfoerendeEnhet(brevMetadata.getBehandlendeEnhetId());
         dokumentinfo.setSaksbehandlernavn(brevMetadata.getAnsvarligSaksbehandler());
         dokumentinfo.setJournalsakId(brevMetadata.getSaksnummer());

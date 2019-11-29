@@ -15,6 +15,15 @@
 
     <dependencies>
 
+        <dependency>
+            <groupId>no.finn.unleash</groupId>
+            <artifactId>unleash-client-java</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.foreldrepenger.felles.integrasjon</groupId>
+            <artifactId>unleash-klient</artifactId>
+        </dependency>
+
         <!-- Database håndtering -->
         <dependency>
             <groupId>com.zaxxer</groupId>
@@ -300,28 +309,6 @@
                 <configuration>
                     <addOutputDirectoryToResources>true</addOutputDirectoryToResources>
                     <timestampFormat>dd.MM.yyyy HH.mm.ss</timestampFormat>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-enforcer-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>only-allowed-deps</id>
-                        <goals>
-                            <goal>enforce</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <rules>
-                        <bannedDependencies>
-                            <searchTransitive>true</searchTransitive>
-                            <excludes>
-                                <exclude>commons-logging:commons-logging</exclude>
-                            </excludes>
-                        </bannedDependencies>
-                    </rules>
                 </configuration>
             </plugin>
             <plugin>

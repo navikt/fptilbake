@@ -26,6 +26,7 @@ public class HentForhåndvisningVedtaksbrevPdfDto implements AbacDto {
     private String oppsummeringstekst;
 
     @Size(max = 50, message = "For mange perioder")
+    @NotNull
     @Valid
     private List<PeriodeMedTekstDto> perioderMedTekst;
 

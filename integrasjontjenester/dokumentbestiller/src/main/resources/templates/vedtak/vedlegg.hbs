@@ -1,0 +1,51 @@
+    <h4>Oversikt over resultatet av tilbakebetalingssaken</h4>
+    <table>
+        <thead>
+        <tr>
+{{#if totalresultat.totalt-rentebeløp}}
+            <th>Periode<br/><br/> </th>
+            <th>Feilutbetalt beløp<br/><br/> </th>
+            <th>Tilbakebetaling<br/><br/> </th>
+            <th>Renter<br/><br/> </th>
+            <th>Beløp før skatt<br/><br/> </th>
+            <th>Beløp du skal betale<br/>tilbake etter skatt<br/>er trukket fra</th>
+{{else}}
+            <th>Periode<br/> </th>
+            <th>Feilutbetalt beløp<br/> </th>
+            <th>Tilbakebetaling<br/> </th>
+            <th>Beløp før skatt<br/> </th>
+            <th>Beløp du skal betale tilbake<br/>etter skatt er trukket fra</th>
+{{/if}}
+        </tr>
+        </thead>
+        <tbody>
+{{#each perioder }}
+        <tr>
+            <td>{{periode.fom-kompakt}} – {{periode.tom-kompakt}}</td>
+            <td class="tall">{{kroner kravgrunnlag.feilutbetalt-beløp}}</td>
+{{#if (not resultat.tilbakekreves-beløp)}}
+            <td>Ingen tilbakebetaling</td>
+{{else if (eq resultat.tilbakekreves-beløp kravgrunnlag.feilutbetalt-beløp)}}
+            <td>Hele beløpet</td>
+{{else}}
+            <td>Deler av beløpet</td>
+{{/if}}
+{{#if totalresultat.totalt-rentebeløp}}
+            <td class="tall">{{#if resultat.renter-beløp}}{{kroner resultat.renter-beløp}}{{/if}}</td>
+{{/if}}
+            <td class="tall">{{kroner resultat.tilbakekreves-beløp-med-renter}}</td>
+            <td class="tall sum">{{kroner resultat.tilbakekreves-beløp-uten-skatt-med-renter}}</td>
+        </tr>
+{{/each}}
+        <tr>
+            <td class="sumrad">Sum</td>
+            <td class="tall sumrad"></td>
+            <td class="sumrad"></td>
+{{#if totalresultat.totalt-rentebeløp}}
+            <td class="tall sumrad"></td>
+{{/if}}
+            <td class="tall sumrad">{{kroner totalresultat.totalt-tilbakekreves-beløp-med-renter}}</td>
+            <td class="tall sum sumrad">{{kroner totalresultat.totalt-tilbakekreves-beløp-med-renter-uten-skatt}}</td>
+        </tr>
+        </tbody>
+    </table>

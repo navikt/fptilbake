@@ -7,12 +7,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.BigDecimalHeltallSerialiserer;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.LocalDateTilStrengMedNorskFormatSerialiserer;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.LocalDateTilLangtNorskFormatSerialiserer;
 
 public class HbVarsel {
 
     @JsonProperty("varslet-dato")
-    @JsonSerialize(using = LocalDateTilStrengMedNorskFormatSerialiserer.class)
+    @JsonSerialize(using = LocalDateTilLangtNorskFormatSerialiserer.class)
     private LocalDate varsletDato;
     @JsonProperty("varslet-beløp")
     @JsonSerialize(using = BigDecimalHeltallSerialiserer.class)

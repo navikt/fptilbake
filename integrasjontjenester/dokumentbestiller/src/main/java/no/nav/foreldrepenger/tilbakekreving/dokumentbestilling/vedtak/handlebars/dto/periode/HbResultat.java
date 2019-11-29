@@ -22,6 +22,9 @@ public class HbResultat {
     @JsonProperty("foreldet-beløp")
     @JsonSerialize(using = BigDecimalHeltallSerialiserer.class)
     private BigDecimal foreldetBeløp;
+    @JsonProperty("tilbakekreves-beløp-uten-skatt-med-renter")
+    @JsonSerialize(using = BigDecimalHeltallSerialiserer.class)
+    private BigDecimal tilbakekrevesBeløpUtenSkattMedRenter;
 
     private HbResultat() {
     }
@@ -30,18 +33,18 @@ public class HbResultat {
         return new Builder();
     }
 
-    public static HbResultat forTilbakekrevesBeløp(BigDecimal tilbakekrevesBeløp) {
-        return HbResultat.builder()
-            .medTilbakekrevesBeløp(tilbakekrevesBeløp)
-            .build();
-    }
-
     public static class Builder {
 
         private HbResultat kladd = new HbResultat();
+        private BigDecimal nettoBeløp;
 
         public HbResultat.Builder medTilbakekrevesBeløp(BigDecimal tilbakekrevesBeløp) {
             kladd.tilbakekrevesBeløp = tilbakekrevesBeløp;
+            return this;
+        }
+
+        public HbResultat.Builder medTilbakekrevesBeløpUtenSkatt(BigDecimal nettoBeløp) {
+            this.nettoBeløp = nettoBeløp;
             return this;
         }
 
@@ -57,9 +60,10 @@ public class HbResultat {
 
         public HbResultat build() {
             Objects.check(kladd.tilbakekrevesBeløp != null, "tilbakekrevesbeløp er ikke satt");
-            kladd.tilbakekrevesBeløpMedRenter = kladd.renterBeløp != null
-                ? kladd.tilbakekrevesBeløp.add(kladd.renterBeløp)
-                : kladd.tilbakekrevesBeløp;
+            Objects.check(kladd.renterBeløp != null, "renter er ikke satt");
+            Objects.check(nettoBeløp != null, "nettobeløp er ikke satt");
+            kladd.tilbakekrevesBeløpMedRenter = kladd.tilbakekrevesBeløp.add(kladd.renterBeløp);
+            kladd.tilbakekrevesBeløpUtenSkattMedRenter = nettoBeløp;
             return kladd;
         }
     }

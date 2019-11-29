@@ -162,6 +162,7 @@ public class TekstformatererVedtaksbrevAllePermutasjonerTest {
             .medResultat(HbResultat.builder()
                 .medTilbakekrevesBeløp(BigDecimal.valueOf(10000))
                 .medRenterBeløp(BigDecimal.valueOf(1000))
+                .medTilbakekrevesBeløpUtenSkatt(BigDecimal.valueOf(9000))
                 .build());
     }
 

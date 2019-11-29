@@ -5,21 +5,31 @@ import java.time.LocalDate;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.LocalDateTilStrengMedNorskFormatSerialiserer;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.LocalDateTilKortNorskFormatSerialiserer;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.LocalDateTilLangtNorskFormatSerialiserer;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
 public class HbPeriode {
 
     @JsonProperty("fom")
-    @JsonSerialize(using = LocalDateTilStrengMedNorskFormatSerialiserer.class)
+    @JsonSerialize(using = LocalDateTilLangtNorskFormatSerialiserer.class)
     private LocalDate fom;
     @JsonProperty("tom")
-    @JsonSerialize(using = LocalDateTilStrengMedNorskFormatSerialiserer.class)
+    @JsonSerialize(using = LocalDateTilLangtNorskFormatSerialiserer.class)
     private LocalDate tom;
+
+    @JsonProperty("fom-kompakt")
+    @JsonSerialize(using = LocalDateTilKortNorskFormatSerialiserer.class)
+    private LocalDate fomKompakt;
+    @JsonProperty("tom-kompakt")
+    @JsonSerialize(using = LocalDateTilKortNorskFormatSerialiserer.class)
+    private LocalDate tomKompakt;
 
     private HbPeriode(LocalDate fom, LocalDate tom) {
         this.fom = fom;
         this.tom = tom;
+        this.fomKompakt = fom;
+        this.tomKompakt = tom;
     }
 
     public static HbPeriode of(Periode periode) {
