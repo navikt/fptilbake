@@ -1,19 +1,26 @@
 package no.nav.foreldrepenger.tilbakekreving.web.server.jetty;
 
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.joran.JoranConfigurator;
-import ch.qos.logback.core.joran.spi.JoranException;
-import ch.qos.logback.core.util.StatusPrinter;
-import org.eclipse.jetty.server.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.SecureRequestCustomizer;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.util.resource.ResourceCollection;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.joran.JoranConfigurator;
+import ch.qos.logback.core.joran.spi.JoranException;
+import ch.qos.logback.core.util.StatusPrinter;
 
 public class JettyDevServer extends JettyServer {
 
@@ -98,8 +105,8 @@ public class JettyDevServer extends JettyServer {
         File storeFile = new File(storePath);
         if (!storeFile.exists()) {
             throw new IllegalStateException("Finner ikke " + storeName + " i " + storePath
-                    + "\n\tKonfigurer enten som System property \'" + storeProperty + "\' eller environment variabel \'"
-                    + storeProperty.toUpperCase().replace('.', '_') + "\'");
+                + "\n\tKonfigurer enten som System property \'" + storeProperty + "\' eller environment variabel \'"
+                + storeProperty.toUpperCase().replace('.', '_') + "\'");
         }
         String password = getProperty(storePasswordProperty, defaultPassword);
         if (password == null) {
@@ -145,8 +152,8 @@ public class JettyDevServer extends JettyServer {
         https.addCustomizer(new SecureRequestCustomizer());
 
         ServerConnector sslConnector = new ServerConnector(server,
-                new SslConnectionFactory(sslContextFactory, "http/1.1"),
-                new HttpConnectionFactory(https));
+            new SslConnectionFactory(sslContextFactory, "http/1.1"),
+            new HttpConnectionFactory(https));
         sslConnector.setPort(appKonfigurasjon.getSslPort());
         connectors.add(sslConnector);
 
@@ -164,8 +171,8 @@ public class JettyDevServer extends JettyServer {
     @Override
     protected ResourceCollection createResourceCollection() throws IOException {
         return new ResourceCollection(
-                Resource.newClassPathResource("/web"),
-                Resource.newClassPathResource("/META-INF/resources")/** i18n */
+            Resource.newClassPathResource("/web"),
+            Resource.newClassPathResource("/META-INF/resources")/** i18n */
         );
     }
 }

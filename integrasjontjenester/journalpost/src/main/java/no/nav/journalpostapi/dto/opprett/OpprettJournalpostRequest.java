@@ -8,7 +8,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import no.nav.journalpostapi.dto.*;
+import no.nav.journalpostapi.dto.AvsenderMottaker;
+import no.nav.journalpostapi.dto.BehandlingTema;
+import no.nav.journalpostapi.dto.Bruker;
+import no.nav.journalpostapi.dto.Journalposttype;
+import no.nav.journalpostapi.dto.Tema;
+import no.nav.journalpostapi.dto.Tilleggsopplysning;
 import no.nav.journalpostapi.dto.dokument.Dokument;
 import no.nav.journalpostapi.dto.sak.Sak;
 import no.nav.journalpostapi.dto.serializer.KodelisteSomKodeSerialiserer;
@@ -144,7 +149,7 @@ public class OpprettJournalpostRequest {
             return this;
         }
 
-        public Builder leggTilTilleggsopplysning(Tilleggsopplysning tilleggsopplysning){
+        public Builder leggTilTilleggsopplysning(Tilleggsopplysning tilleggsopplysning) {
             kladd.tilleggsopplysninger.add(tilleggsopplysning);
             return this;
         }
