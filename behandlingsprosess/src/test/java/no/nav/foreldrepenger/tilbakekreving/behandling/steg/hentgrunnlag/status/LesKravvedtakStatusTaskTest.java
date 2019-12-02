@@ -35,7 +35,7 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
     private HenleggBehandlingTjeneste henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repositoryProvider, behandlingskontrollTjeneste, historikkinnslagTjeneste);
     private KravVedtakStatusTjeneste kravVedtakStatusTjeneste = new KravVedtakStatusTjeneste(kravVedtakStatusRepository, repositoryProvider, henleggBehandlingTjeneste, behandlingskontrollTjeneste);
     private KravVedtakStatusMapper kravVedtakStatusMapper = new KravVedtakStatusMapper(tpsAdapterWrapper);
-    private LesKravvedtakStatusTask lesKravvedtakStatusTask = new LesKravvedtakStatusTask(mottattXmlRepository, repositoryProvider, prosessTaskRepository,
+    private LesKravvedtakStatusTask lesKravvedtakStatusTask = new LesKravvedtakStatusTask(mottattXmlRepository, repositoryProvider,
         kravVedtakStatusTjeneste, kravVedtakStatusMapper, fpsakKlientMock);
 
     private Long mottattXmlId;
@@ -58,6 +58,7 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         assertThat(behandling.getVenteårsak()).isEqualByComparingTo(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
 
         assertThat(kravVedtakStatusRepository.finnKravstatus(behandling.getId())).isEqualTo(Optional.of(KravStatusKode.SPERRET));
+        assertTilkobling();
     }
 
     @Test
@@ -71,6 +72,7 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         assertThat(behandling.getVenteårsak()).isEqualByComparingTo(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
 
         assertThat(kravVedtakStatusRepository.finnKravstatus(behandling.getId())).isEqualTo(Optional.of(KravStatusKode.MANUELL));
+        assertTilkobling();
     }
 
     @Test
@@ -90,6 +92,7 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         assertThat(historikkinnslager.size()).isEqualTo(1);
         Historikkinnslag historikkinnslag = historikkinnslager.get(0);
         assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.AVBRUTT_BEH);
+        assertTilkobling();
     }
 
     @Test
@@ -153,6 +156,7 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         assertThat(kravVedtakStatusRepository.finnKravstatus(behandling.getId())).isEqualTo(Optional.of(KravStatusKode.SPERRET));
 
         assertThat(grunnlagRepository.erKravgrunnlagSperret(behandling.getId())).isTrue();
+        assertTilkobling();
     }
 
     @Test
@@ -174,5 +178,11 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
 
         assertThat(kravVedtakStatusRepository.finnKravstatus(behandling.getId())).isEqualTo(Optional.of(KravStatusKode.SPERRET));
         assertThat(grunnlagRepository.erKravgrunnlagSperret(behandling.getId())).isTrue();
+    }
+
+    private void assertTilkobling() {
+        Optional<ØkonomiXmlMottatt> økonomiXmlMottatt = mottattXmlRepository.finnForEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID));
+        assertThat(økonomiXmlMottatt).isPresent();
+        assertThat(økonomiXmlMottatt.get().isTilkoblet()).isTrue();
     }
 }

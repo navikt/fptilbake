@@ -20,7 +20,6 @@ import no.nav.foreldrepenger.tilbakekreving.økonomixml.MeldingType;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiSendtXmlRepository;
 import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsvedtakDto;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
 
@@ -36,8 +35,6 @@ public class SendØkonomiTibakekerevingsVedtakTaskTest {
     private TilbakekrevingsvedtakTjeneste tilbakekrevingsvedtakTjeneste;
     @Inject
     private ØkonomiSendtXmlRepository økonomiSendtXmlRepository;
-    @Inject
-    private ProsessTaskRepository prosessTaskRepository;
 
     private ØkonomiConsumer økonomiConsumer = Mockito.mock(ØkonomiConsumer.class);
 
@@ -52,7 +49,7 @@ public class SendØkonomiTibakekerevingsVedtakTaskTest {
         ProsessTaskData data = new ProsessTaskData(SendØkonomiTibakekerevingsVedtakTask.TASKTYPE);
         data.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
 
-        SendØkonomiTibakekerevingsVedtakTask task = new SendØkonomiTibakekerevingsVedtakTask(tilbakekrevingsvedtakTjeneste, økonomiConsumer, økonomiSendtXmlRepository, prosessTaskRepository);
+        SendØkonomiTibakekerevingsVedtakTask task = new SendØkonomiTibakekerevingsVedtakTask(tilbakekrevingsvedtakTjeneste, økonomiConsumer, økonomiSendtXmlRepository);
         task.doTask(data);
 
         assertThat(økonomiSendtXmlRepository.finnXml(behandling.getId(), MeldingType.VEDTAK)).hasSize(1);

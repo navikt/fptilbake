@@ -29,7 +29,6 @@ import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 
 @ApplicationScoped
 @ProsessTask(LesKravvedtakStatusTask.TASKTYPE)
@@ -52,10 +51,12 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
     }
 
     @Inject
-    public LesKravvedtakStatusTask(ØkonomiMottattXmlRepository økonomiMottattXmlRepository, BehandlingRepositoryProvider repositoryProvider,
-                                   ProsessTaskRepository prosessTaskRepository, KravVedtakStatusTjeneste kravVedtakStatusTjeneste,
-                                   KravVedtakStatusMapper statusMapper, FpsakKlient fpsakKlient) {
-        super(prosessTaskRepository, repositoryProvider.getGrunnlagRepository(), fpsakKlient);
+    public LesKravvedtakStatusTask(ØkonomiMottattXmlRepository økonomiMottattXmlRepository,
+                                   BehandlingRepositoryProvider repositoryProvider,
+                                   KravVedtakStatusTjeneste kravVedtakStatusTjeneste,
+                                   KravVedtakStatusMapper statusMapper,
+                                   FpsakKlient fpsakKlient) {
+        super(repositoryProvider.getGrunnlagRepository(), fpsakKlient);
         this.økonomiMottattXmlRepository = økonomiMottattXmlRepository;
         this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
@@ -83,7 +84,8 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
         if (behandlingKobling.isPresent()) {
             Long internId = behandlingKobling.get().getInternId();
             kravVedtakStatusTjeneste.håndteresMottakAvKravVedtakStatus(internId, kravVedtakStatus437);
-            logger.info("Leste kravVedtakStatus med id={} eksternBehandlingId={} internBehandlingId={}", mottattXmlId, eksternBehandlingId, internId);
+            økonomiMottattXmlRepository.opprettTilkobling(mottattXmlId);
+            logger.info("Tilkoblet kravVedtakStatus med id={} eksternBehandlingId={} internBehandlingId={}", mottattXmlId, eksternBehandlingId, internId);
         } else {
             validerBehandlingsEksistens(eksternBehandlingId, saksnummer);
             logger.info("Ignorerte kravVedtakStatus med id={} eksternBehandlingId={}. Fantes ikke tilbakekrevingsbehandling", mottattXmlId, eksternBehandlingId);

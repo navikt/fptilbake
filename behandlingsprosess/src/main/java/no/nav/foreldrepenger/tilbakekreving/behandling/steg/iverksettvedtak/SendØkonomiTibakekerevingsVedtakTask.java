@@ -1,6 +1,12 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.iverksettvedtak;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.FellesTask;
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import javax.persistence.EntityManager;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiConsumer;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiResponsMarshaller;
@@ -18,18 +24,11 @@ import no.nav.vedtak.felles.jpa.savepoint.RunWithSavepoint;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
 
 @ApplicationScoped
 @ProsessTask(SendØkonomiTibakekerevingsVedtakTask.TASKTYPE)
 @FagsakProsesstaskRekkefølge(gruppeSekvens = true)
-public class SendØkonomiTibakekerevingsVedtakTask extends FellesTask implements ProsessTaskHandler {
+public class SendØkonomiTibakekerevingsVedtakTask implements ProsessTaskHandler {
     public static final String TASKTYPE = "iverksetteVedtak.sendØkonomiTilbakekrevingsvedtak";
 
     private static final Logger log = LoggerFactory.getLogger(SendØkonomiTibakekerevingsVedtakTask.class);
@@ -44,9 +43,9 @@ public class SendØkonomiTibakekerevingsVedtakTask extends FellesTask implements
     }
 
     @Inject
-    public SendØkonomiTibakekerevingsVedtakTask(TilbakekrevingsvedtakTjeneste tilbakekrevingsvedtakTjeneste, ØkonomiConsumer økonomiConsumer,
-                                                ØkonomiSendtXmlRepository økonomiSendtXmlRepository, ProsessTaskRepository prosessTaskRepository) {
-        super(prosessTaskRepository, null, null);
+    public SendØkonomiTibakekerevingsVedtakTask(TilbakekrevingsvedtakTjeneste tilbakekrevingsvedtakTjeneste,
+                                                ØkonomiConsumer økonomiConsumer,
+                                                ØkonomiSendtXmlRepository økonomiSendtXmlRepository) {
         this.tilbakekrevingsvedtakTjeneste = tilbakekrevingsvedtakTjeneste;
         this.økonomiConsumer = økonomiConsumer;
         this.økonomiSendtXmlRepository = økonomiSendtXmlRepository;

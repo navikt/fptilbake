@@ -1,10 +1,20 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang;
 
+import java.util.Optional;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.FellesTask;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TaskProperty;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
@@ -18,13 +28,6 @@ import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import java.util.Optional;
 
 @ApplicationScoped
 @ProsessTask(LesKravgrunnlagTask.TASKTYPE)
@@ -38,18 +41,22 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
     private KravgrunnlagTjeneste kravgrunnlagTjeneste;
     private KravgrunnlagMapper kravgrunnlagMapper;
     private EksternBehandlingRepository eksternBehandlingRepository;
+    private BehandlingRepository behandlingRepository;
 
     LesKravgrunnlagTask() {
         //for CDI proxy
     }
 
     @Inject
-    public LesKravgrunnlagTask(ØkonomiMottattXmlRepository økonomiMottattXmlRepository, KravgrunnlagTjeneste kravgrunnlagTjeneste,
-                               ProsessTaskRepository taskRepository, KravgrunnlagMapper kravgrunnlagMapper,
-                               BehandlingRepositoryProvider repositoryProvider, FpsakKlient fpsakKlient) {
-        super(taskRepository, repositoryProvider.getGrunnlagRepository(), fpsakKlient);
+    public LesKravgrunnlagTask(ØkonomiMottattXmlRepository økonomiMottattXmlRepository,
+                               KravgrunnlagTjeneste kravgrunnlagTjeneste,
+                               KravgrunnlagMapper kravgrunnlagMapper,
+                               BehandlingRepositoryProvider repositoryProvider,
+                               FpsakKlient fpsakKlient) {
+        super(repositoryProvider.getGrunnlagRepository(), fpsakKlient);
         this.økonomiMottattXmlRepository = økonomiMottattXmlRepository;
         this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
+        this.behandlingRepository = repositoryProvider.getBehandlingRepository();
 
         this.kravgrunnlagTjeneste = kravgrunnlagTjeneste;
         this.kravgrunnlagMapper = kravgrunnlagMapper;
@@ -70,9 +77,17 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
         Optional<EksternBehandling> behandlingKobling = hentKoblingTilInternBehandling(eksternBehandlingId);
         if (behandlingKobling.isPresent()) {
             Long internId = behandlingKobling.get().getInternId();
-            //TODO gjør bare lagring av grunnlag her, splitt gjennopptagelse etc til egen task
-            kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(internId, kravgrunnlag);
             logger.info("Leste kravgrunnlag med id={} eksternBehandlingId={} internBehandlingId={}", mottattXmlId, eksternBehandlingId, internId);
+
+            Behandling behandling = behandlingRepository.hentBehandling(internId);
+            if (!behandling.erAvsluttet()) {
+                kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(internId, kravgrunnlag);
+                økonomiMottattXmlRepository.opprettTilkobling(mottattXmlId);
+                logger.info("Behandling med internBehandlingId={} koblet med grunnlag id={}", internId, mottattXmlId);
+            } else {
+                logger.info("Behandling med internBehandlingId={} og eksternBehandlingId={} er avsluttet, ikke koblet grunnlag med behandling", internId, eksternBehandlingId);
+            }
+
         } else {
             validerBehandlingsEksistens(eksternBehandlingId, saksnummer);
             logger.info("Ignorerte kravgrunnlag med id={} eksternBehandlingId={}. Fantes ikke tilbakekrevingsbehandling", mottattXmlId, eksternBehandlingId);
@@ -91,7 +106,7 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
         if (!erGyldigTall(eksternBehandlingId)) {
             throw LesKravgrunnlagTaskFeil.FACTORY.behandlingFinnesIkkeIFpsak(eksternBehandlingId).toException();
         }
-        if (!erBehandlingFinnesIFpsak(saksnummer,eksternBehandlingId)) {
+        if (!erBehandlingFinnesIFpsak(saksnummer, eksternBehandlingId)) {
             throw LesKravgrunnlagTaskFeil.FACTORY.behandlingFinnesIkkeIFpsak(Long.valueOf(eksternBehandlingId)).toException();
         }
     }

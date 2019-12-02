@@ -13,6 +13,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.FellesT
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TaskProperty;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
+import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 
 public class LesKravgrunnlagTaskTest extends FellesTestOppsett {
@@ -37,11 +38,12 @@ public class LesKravgrunnlagTaskTest extends FellesTestOppsett {
         Optional<EksternBehandling> eksternBehandling = eksternBehandlingRepository.hentFraEksternId(FPSAK_BEHANDLING_ID);
         assertThat(eksternBehandling).isNotEmpty();
         assertThat(eksternBehandling.get().getInternId()).isEqualTo(behandling.getId());
+        assertTilkobling();
     }
 
     @Test
     public void skal_utføre_leskravgrunnlag_task_nårBehandlingFinnesIkkeIFpsak() {
-        when(fpsakKlientMock.finnesBehandlingIFpsak(fagsak.getSaksnummer().getVerdi(),FPSAK_BEHANDLING_ID)).thenReturn(false);
+        when(fpsakKlientMock.finnesBehandlingIFpsak(fagsak.getSaksnummer().getVerdi(), FPSAK_BEHANDLING_ID)).thenReturn(false);
 
         expectedException.expectMessage("FPT-587195");
         lesKravgrunnlagTask.doTask(lagProsessTaskData());
@@ -63,7 +65,13 @@ public class LesKravgrunnlagTaskTest extends FellesTestOppsett {
     }
 
     private void lagEksternBehandling() {
-        EksternBehandling eksternBehandling = new EksternBehandling(behandling, FPSAK_BEHANDLING_ID,FPSAK_BEHANDLING_UUID);
+        EksternBehandling eksternBehandling = new EksternBehandling(behandling, FPSAK_BEHANDLING_ID, FPSAK_BEHANDLING_UUID);
         eksternBehandlingRepository.lagre(eksternBehandling);
+    }
+
+    private void assertTilkobling() {
+        Optional<ØkonomiXmlMottatt> økonomiXmlMottatt = mottattXmlRepository.finnForEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID));
+        assertThat(økonomiXmlMottatt).isPresent();
+        assertThat(økonomiXmlMottatt.get().isTilkoblet()).isTrue();
     }
 }

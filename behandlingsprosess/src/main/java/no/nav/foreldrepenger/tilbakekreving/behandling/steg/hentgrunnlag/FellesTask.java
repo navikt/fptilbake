@@ -5,13 +5,9 @@ import java.util.Optional;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagAggregate;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
-import no.nav.vedtak.util.FPDateUtil;
 
 public abstract class FellesTask {
 
-    private ProsessTaskRepository prosessTaskRepository;
     private KravgrunnlagRepository grunnlagRepository;
     private FpsakKlient fpsakKlient;
 
@@ -19,8 +15,7 @@ public abstract class FellesTask {
         // for CDI proxy
     }
 
-    public FellesTask(ProsessTaskRepository taskRepository,KravgrunnlagRepository grunnlagRepository, FpsakKlient fpsakKlient) {
-        this.prosessTaskRepository = taskRepository;
+    public FellesTask(KravgrunnlagRepository grunnlagRepository, FpsakKlient fpsakKlient) {
         this.grunnlagRepository = grunnlagRepository;
         this.fpsakKlient = fpsakKlient;
     }

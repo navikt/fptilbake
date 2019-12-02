@@ -42,6 +42,8 @@ import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjeneste
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.vedtak.felles.integrasjon.journal.v3.JournalConsumer;
 import no.nav.vedtak.felles.integrasjon.journal.v3.JournalConsumerImpl;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
+import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepositoryImpl;
 
 public class TestOppsett {
 
@@ -76,6 +78,7 @@ public class TestOppsett {
     protected VarselRepository varselRepository = repoProvider.getVarselRepository();
     protected KravgrunnlagTjeneste kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repoProvider, gjenopptaBehandlingTjeneste, behandlingskontrollTjeneste,mockSlettGrunnlagEventPubliserer);
     protected KravgrunnlagBeregningTjeneste kravgrunnlagBeregningTjeneste = new KravgrunnlagBeregningTjeneste(grunnlagRepository);
+    protected ProsessTaskRepository prosessTaskRepository = new ProsessTaskRepositoryImpl(em,null);
 
     protected HistorikkInnslagKonverter historikkInnslagKonverter = new HistorikkInnslagKonverter(repoProvider.getKodeverkRepository(),
         repoProvider.getAksjonspunktRepository());

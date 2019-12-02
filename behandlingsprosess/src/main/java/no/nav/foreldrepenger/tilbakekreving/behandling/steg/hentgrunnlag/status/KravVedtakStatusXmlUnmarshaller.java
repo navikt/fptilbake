@@ -14,7 +14,7 @@ import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
 import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
 import no.nav.vedtak.felles.integrasjon.felles.ws.JaxbHelper;
 
-class KravVedtakStatusXmlUnmarshaller {
+public class KravVedtakStatusXmlUnmarshaller {
 
     private static final String XSD_PLASSERING = "xsd/no/nav/melding/virksomhet/tilbakekreving/krav_og_vedtakstatus.xsd";
 

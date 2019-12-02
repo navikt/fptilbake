@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.økonomixml;
 
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -9,6 +10,7 @@ import javax.persistence.Lob;
 import javax.persistence.Table;
 
 import no.nav.vedtak.felles.jpa.BaseEntitet;
+import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
 
 /**
  * Ved mottak av xml fra oppdragsystemet mellomlagres XML direkte i denne tabellen.
@@ -35,6 +37,10 @@ public class ØkonomiXmlMottatt extends BaseEntitet {
     @Column(name = "sekvens")
     private Long sekvens;
 
+    @Convert(converter = BooleanToStringConverter.class)
+    @Column(name = "tilkoblet", nullable = false)
+    private boolean tilkoblet = false;
+
     ØkonomiXmlMottatt() {
         //for hibernate
     }
@@ -59,8 +65,16 @@ public class ØkonomiXmlMottatt extends BaseEntitet {
         return sekvens;
     }
 
+    public boolean isTilkoblet() {
+        return tilkoblet;
+    }
+
     public void setEksternBehandling(String eksternBehandlingId, long sekvens) {
         this.eksternBehandlingId = eksternBehandlingId;
         this.sekvens = sekvens;
+    }
+
+    public void lagTilkobling() {
+        this.tilkoblet = true;
     }
 }

@@ -45,6 +45,8 @@ import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsi
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.vedtak.felles.jpa.Transaction;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.konfig.KonfigVerdi;
 
 @ApplicationScoped
@@ -52,10 +54,12 @@ import no.nav.vedtak.konfig.KonfigVerdi;
 public class BehandlingTjenesteImpl implements BehandlingTjeneste {
 
     private static final Logger logger = LoggerFactory.getLogger(BehandlingTjenesteImpl.class);
+    public static final String FINN_KRAVGRUNNLAG_TASK = "kravgrunnlag.finn";
 
     private BehandlingRepository behandlingRepository;
     private EksternBehandlingRepository eksternBehandlingRepository;
     private BehandlingresultatRepository behandlingresultatRepository;
+    private ProsessTaskRepository prosessTaskRepository;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste;
     private FagsakTjeneste fagsakTjeneste;
@@ -70,6 +74,7 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
 
     @Inject
     public BehandlingTjenesteImpl(BehandlingRepositoryProvider behandlingRepositoryProvider,
+                                  ProsessTaskRepository prosessTaskRepository,
                                   BehandlingskontrollProvider behandlingskontrollProvider,
                                   FagsakTjeneste fagsakTjeneste,
                                   HistorikkinnslagTjeneste historikkinnslagTjeneste,
@@ -85,6 +90,7 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
         this.behandlingRepository = behandlingRepositoryProvider.getBehandlingRepository();
         this.eksternBehandlingRepository = behandlingRepositoryProvider.getEksternBehandlingRepository();
         this.behandlingresultatRepository = behandlingRepositoryProvider.getBehandlingresultatRepository();
+        this.prosessTaskRepository = prosessTaskRepository;
     }
 
     @Override
@@ -118,14 +124,20 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
     public Long opprettBehandlingManuell(Saksnummer saksnummer, UUID eksternUuid,
                                          FagsakYtelseType fagsakYtelseType, BehandlingType behandlingType) {
 
-        return opprettFørstegangsbehandling(saksnummer, eksternUuid, null, null, fagsakYtelseType, behandlingType);
+        Behandling behandling = opprettFørstegangsbehandling(saksnummer, eksternUuid, null, null,
+            fagsakYtelseType, behandlingType);
+        String gruppe = behandlingskontrollAsynkTjeneste.asynkProsesserBehandling(behandling);
+        opprettFinnGrunnlagTask(behandling, gruppe);
+        return behandling.getId();
     }
 
     @Override
     public Long opprettBehandlingAutomatisk(Saksnummer saksnummer, UUID eksternUuid, long eksternBehandlingId,
                                             AktørId aktørId, FagsakYtelseType fagsakYtelseType,
                                             BehandlingType behandlingType) {
-        return opprettFørstegangsbehandling(saksnummer, eksternUuid, eksternBehandlingId, aktørId, fagsakYtelseType, behandlingType);
+        Behandling behandling = opprettFørstegangsbehandling(saksnummer, eksternUuid, eksternBehandlingId, aktørId, fagsakYtelseType, behandlingType);
+        behandlingskontrollAsynkTjeneste.asynkProsesserBehandling(behandling);
+        return behandling.getId();
     }
 
     @Override
@@ -190,9 +202,9 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
     }
 
 
-    private Long opprettFørstegangsbehandling(Saksnummer saksnummer, UUID eksternUuid, Long eksternBehandlingId,
-                                              AktørId aktørId, FagsakYtelseType fagsakYtelseType,
-                                              BehandlingType behandlingType) {
+    private Behandling opprettFørstegangsbehandling(Saksnummer saksnummer, UUID eksternUuid, Long eksternBehandlingId,
+                                                    AktørId aktørId, FagsakYtelseType fagsakYtelseType,
+                                                    BehandlingType behandlingType) {
         logger.info("Oppretter Tilbakekrevingbehandling for [saksnummer: {} ] for ekstern Uuid [ {} ]", saksnummer, eksternUuid);
 
         validateHarIkkeÅpenTilbakekrevingBehandling(saksnummer, eksternUuid);
@@ -217,16 +229,14 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
         behandling.setBehandlendeOrganisasjonsEnhet(organisasjonsEnhet);
 
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
-        Long behandlingId = behandlingRepository.lagre(behandling, lås);
+        behandlingRepository.lagre(behandling, lås);
 
         EksternBehandling eksternBehandling = new EksternBehandling(behandling, eksternBehandlingId, eksternUuid);
         eksternBehandlingRepository.lagre(eksternBehandling);
 
         historikkinnslagTjeneste.opprettHistorikkinnslagForOpprettetBehandling(behandling); // FIXME: sjekk om journalpostId skal hentes ///
 
-        behandlingskontrollAsynkTjeneste.asynkProsesserBehandling(behandling);
-
-        return behandlingId;
+        return behandling;
     }
 
 
@@ -262,6 +272,14 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
             eksternBehandlingId = eksternBehandlingsinfoDto.getId();
         }
         return eksternBehandlingId;
+    }
+
+    private void opprettFinnGrunnlagTask(Behandling behandling, String fortsettBehandlingProsessTaskGruppe) {
+        ProsessTaskData prosessTaskData = new ProsessTaskData(FINN_KRAVGRUNNLAG_TASK);
+        prosessTaskData.setGruppe(fortsettBehandlingProsessTaskGruppe);
+        prosessTaskData.setSekvens("2");
+        prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
+        prosessTaskRepository.lagre(prosessTaskData);
     }
 
 }

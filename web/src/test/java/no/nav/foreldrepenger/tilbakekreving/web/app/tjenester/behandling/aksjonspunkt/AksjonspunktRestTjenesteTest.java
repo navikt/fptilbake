@@ -46,6 +46,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjons
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.BekreftetAksjonspunktDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.VurderForeldelseDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 
 public class AksjonspunktRestTjenesteTest {
 
@@ -62,6 +63,7 @@ public class AksjonspunktRestTjenesteTest {
     private BehandlingRepository behandlingRepositoryMock = mock(BehandlingRepository.class);
     private TotrinnRepository totrinnRepositoryMock = mock(TotrinnRepository.class);
     private BehandlingRepositoryProvider repositoryProviderMock = mock(BehandlingRepositoryProvider.class);
+    private ProsessTaskRepository prosessTaskRepositoryMock = mock(ProsessTaskRepository.class);
 
     private BehandlingskontrollTjeneste behandlingskontrollTjenesteMock = mock(BehandlingskontrollTjeneste.class);
     private BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjenesteMock = mock(BehandlingskontrollAsynkTjeneste.class);
@@ -76,6 +78,7 @@ public class AksjonspunktRestTjenesteTest {
         when(repositoryProviderMock.getBehandlingRepository()).thenReturn(behandlingRepositoryMock);
 
         BehandlingTjeneste behandlingTjeneste = new BehandlingTjenesteImpl(repositoryProviderMock,
+                prosessTaskRepositoryMock,
                 behandlingskontrollProvider,
                 mock(FagsakTjeneste.class),
                 mock(HistorikkinnslagTjeneste.class),

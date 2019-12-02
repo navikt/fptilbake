@@ -17,6 +17,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import javax.persistence.FlushModeType;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
@@ -113,7 +115,7 @@ public class FellesTestOppsett {
     private InternalManipulerBehandling manipulerInternBehandling = new InternalManipulerBehandlingImpl(repositoryProvider);
     protected final KravgrunnlagTjeneste kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repositoryProvider, gjenopptaBehandlingTjeneste,behandlingskontrollTjeneste,mockSlettGrunnlagEventPubliserer);
     protected final KravgrunnlagMapper kravgrunnlagMapper = new KravgrunnlagMapper(tpsAdapterWrapper);
-    protected final LesKravgrunnlagTask lesKravgrunnlagTask = new LesKravgrunnlagTask(mottattXmlRepository, kravgrunnlagTjeneste, prosessTaskRepository,
+    protected final LesKravgrunnlagTask lesKravgrunnlagTask = new LesKravgrunnlagTask(mottattXmlRepository, kravgrunnlagTjeneste,
         kravgrunnlagMapper,repositoryProvider, fpsakKlientMock);
 
     protected final KravgrunnlagMapper mapper = new KravgrunnlagMapper(tpsAdapterWrapper);
@@ -124,6 +126,7 @@ public class FellesTestOppsett {
 
     @Before
     public void init() {
+        repoRule.getEntityManager().setFlushMode(FlushModeType.AUTO);
         fagsak = TestFagsakUtil.opprettFagsak();
         fagsakRepository.lagre(fagsak);
         behandling = lagBehandling(null);
