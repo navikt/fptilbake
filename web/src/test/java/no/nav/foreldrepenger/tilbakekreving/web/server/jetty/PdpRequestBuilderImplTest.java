@@ -12,8 +12,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import no.nav.abac.xacml.NavAttributter;
-import no.nav.abac.xacml.StandardAttributter;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakStatus;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
@@ -21,14 +19,16 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.TilbakekrevingAbacAttributtType;
 import no.nav.foreldrepenger.tilbakekreving.pip.PipBehandlingData;
 import no.nav.foreldrepenger.tilbakekreving.pip.PipRepository;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.AbacBehandlingStatus;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.AbacFagsakStatus;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.CommonAttributter;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.ForeldrepengerAttributter;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.FpsakPipKlient;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.PdpRequestBuilderImpl;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.PipDto;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.sikkerhet.abac.AbacAttributtSamling;
-import no.nav.vedtak.sikkerhet.abac.AbacBehandlingStatus;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
-import no.nav.vedtak.sikkerhet.abac.AbacFagsakStatus;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessursResourceAttributt;
 import no.nav.vedtak.sikkerhet.abac.PdpRequest;
@@ -63,17 +63,17 @@ public class PdpRequestBuilderImplTest {
             .thenReturn(returnData(true, true));
 
         PdpRequest request = requestBuilder.lagPdpRequest(attributter);
-        assertThat(request.getListOfString(NavAttributter.RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE)).containsOnly(PERSON1, PERSON2);
-        assertThat(request.getString(NavAttributter.RESOURCE_FORELDREPENGER_SAK_ANSVARLIG_SAKSBEHANDLER)).isEqualTo(SAKSBEHANDLER);
-        assertThat(request.getString(NavAttributter.RESOURCE_FORELDREPENGER_SAK_SAKSSTATUS)).isEqualTo(AbacFagsakStatus.OPPRETTET.getEksternKode());
-        assertThat(request.getString(NavAttributter.RESOURCE_FORELDREPENGER_SAK_BEHANDLINGSSTATUS)).isEqualTo(AbacBehandlingStatus.UTREDES.getEksternKode());
-        assertThat(request.getString(StandardAttributter.ACTION_ID)).isEqualTo(BeskyttetRessursActionAttributt.READ.getEksternKode());
+        assertThat(request.getListOfString(CommonAttributter.RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE)).containsOnly(PERSON1, PERSON2);
+        assertThat(request.getString(ForeldrepengerAttributter.RESOURCE_FORELDREPENGER_SAK_ANSVARLIG_SAKSBEHANDLER)).isEqualTo(SAKSBEHANDLER);
+        assertThat(request.getString(ForeldrepengerAttributter.RESOURCE_FORELDREPENGER_SAK_SAKSSTATUS)).isEqualTo(AbacFagsakStatus.OPPRETTET.getEksternKode());
+        assertThat(request.getString(ForeldrepengerAttributter.RESOURCE_FORELDREPENGER_SAK_BEHANDLINGSSTATUS)).isEqualTo(AbacBehandlingStatus.UTREDES.getEksternKode());
+        assertThat(request.getString(CommonAttributter.XACML_1_0_ACTION_ACTION_ID)).isEqualTo(BeskyttetRessursActionAttributt.READ.getEksternKode());
     }
 
     @Test
     public void skal_hente_behandlinginfo_fra_fpsak_når_input_er_fpsak_behandlingid() {
         AbacAttributtSamling attributter = byggAbacAttributtsamling().leggTil(
-            AbacDataAttributter.opprett().leggTil(TilbakekrevingAbacAttributtType.FPSAK_BEHANDLING_UUID, UUID.toString()));
+            AbacDataAttributter.opprett().leggTil(TilbakekrevingAbacAttributtType.FPSAK_BEHANDLING_UUID, UUID));
 
         PipDto pipDto = new PipDto();
         pipDto.setAktørIder(Set.of(new AktørId(PERSON1)));
@@ -82,11 +82,11 @@ public class PdpRequestBuilderImplTest {
         when(fpsakPipKlient.hentPipdataForFpsakBehandling(UUID)).thenReturn(pipDto);
 
         PdpRequest request = requestBuilder.lagPdpRequest(attributter);
-        assertThat(request.getListOfString(NavAttributter.RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE)).containsOnly(PERSON1);
-        assertThat(request.getString(NavAttributter.RESOURCE_FORELDREPENGER_SAK_ANSVARLIG_SAKSBEHANDLER)).isNull();
-        assertThat(request.getString(NavAttributter.RESOURCE_FORELDREPENGER_SAK_SAKSSTATUS)).isEqualTo(AbacFagsakStatus.UNDER_BEHANDLING.getEksternKode());
-        assertThat(request.getString(NavAttributter.RESOURCE_FORELDREPENGER_SAK_BEHANDLINGSSTATUS)).isEqualTo(AbacBehandlingStatus.OPPRETTET.getEksternKode());
-        assertThat(request.getString(StandardAttributter.ACTION_ID)).isEqualTo(BeskyttetRessursActionAttributt.READ.getEksternKode());
+        assertThat(request.getListOfString(CommonAttributter.RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE)).containsOnly(PERSON1);
+        assertThat(request.getString(ForeldrepengerAttributter.RESOURCE_FORELDREPENGER_SAK_ANSVARLIG_SAKSBEHANDLER)).isNull();
+        assertThat(request.getString(ForeldrepengerAttributter.RESOURCE_FORELDREPENGER_SAK_SAKSSTATUS)).isEqualTo(AbacFagsakStatus.UNDER_BEHANDLING.getEksternKode());
+        assertThat(request.getString(ForeldrepengerAttributter.RESOURCE_FORELDREPENGER_SAK_BEHANDLINGSSTATUS)).isEqualTo(AbacBehandlingStatus.OPPRETTET.getEksternKode());
+        assertThat(request.getString(CommonAttributter.XACML_1_0_ACTION_ACTION_ID)).isEqualTo(BeskyttetRessursActionAttributt.READ.getEksternKode());
     }
 
     @Test
@@ -97,9 +97,9 @@ public class PdpRequestBuilderImplTest {
         when(fpsakPipKlient.hentAktørIderSomString(new Saksnummer(SAKSNUMMER))).thenReturn(Set.of(PERSON2));
 
         PdpRequest request = requestBuilder.lagPdpRequest(attributter);
-        assertThat(request.getListOfString(NavAttributter.RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE)).containsOnly(PERSON2);
-        assertThat(request.getString(NavAttributter.RESOURCE_FORELDREPENGER_SAK_ANSVARLIG_SAKSBEHANDLER)).isNull();
-        assertThat(request.getString(StandardAttributter.ACTION_ID)).isEqualTo(BeskyttetRessursActionAttributt.READ.getEksternKode());
+        assertThat(request.getListOfString(CommonAttributter.RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE)).containsOnly(PERSON2);
+        assertThat(request.getString(ForeldrepengerAttributter.RESOURCE_FORELDREPENGER_SAK_ANSVARLIG_SAKSBEHANDLER)).isNull();
+        assertThat(request.getString(CommonAttributter.XACML_1_0_ACTION_ACTION_ID)).isEqualTo(BeskyttetRessursActionAttributt.READ.getEksternKode());
     }
 
     @Test
@@ -111,11 +111,11 @@ public class PdpRequestBuilderImplTest {
             .thenReturn(returnData(true, false));
 
         PdpRequest request = requestBuilder.lagPdpRequest(attributter);
-        assertThat(request.getListOfString(NavAttributter.RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE)).containsOnly(PERSON1, PERSON2);
-        assertThat(request.getString(NavAttributter.RESOURCE_FORELDREPENGER_SAK_ANSVARLIG_SAKSBEHANDLER)).isNullOrEmpty();
-        assertThat(request.getString(NavAttributter.RESOURCE_FORELDREPENGER_SAK_SAKSSTATUS)).isEqualTo(AbacFagsakStatus.OPPRETTET.getEksternKode());
-        assertThat(request.getString(NavAttributter.RESOURCE_FORELDREPENGER_SAK_BEHANDLINGSSTATUS)).isEqualTo(AbacBehandlingStatus.UTREDES.getEksternKode());
-        assertThat(request.getString(StandardAttributter.ACTION_ID)).isEqualTo(BeskyttetRessursActionAttributt.READ.getEksternKode());
+        assertThat(request.getListOfString(CommonAttributter.RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE)).containsOnly(PERSON1, PERSON2);
+        assertThat(request.getString(ForeldrepengerAttributter.RESOURCE_FORELDREPENGER_SAK_ANSVARLIG_SAKSBEHANDLER)).isNullOrEmpty();
+        assertThat(request.getString(ForeldrepengerAttributter.RESOURCE_FORELDREPENGER_SAK_SAKSSTATUS)).isEqualTo(AbacFagsakStatus.OPPRETTET.getEksternKode());
+        assertThat(request.getString(ForeldrepengerAttributter.RESOURCE_FORELDREPENGER_SAK_BEHANDLINGSSTATUS)).isEqualTo(AbacBehandlingStatus.UTREDES.getEksternKode());
+        assertThat(request.getString(CommonAttributter.XACML_1_0_ACTION_ACTION_ID)).isEqualTo(BeskyttetRessursActionAttributt.READ.getEksternKode());
     }
 
     @Test
@@ -141,7 +141,7 @@ public class PdpRequestBuilderImplTest {
         AbacAttributtSamling attributter = byggAbacAttributtsamling().leggTil(
             AbacDataAttributter.opprett()
                 .leggTil(StandardAbacAttributtType.BEHANDLING_ID, BEHANDLING_ID)
-                .leggTil(TilbakekrevingAbacAttributtType.FPSAK_BEHANDLING_UUID, UUID.toString()));
+                .leggTil(TilbakekrevingAbacAttributtType.FPSAK_BEHANDLING_UUID, UUID));
 
         requestBuilder.lagPdpRequest(attributter);
     }

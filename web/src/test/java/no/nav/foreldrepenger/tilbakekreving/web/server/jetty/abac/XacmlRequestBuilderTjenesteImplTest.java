@@ -1,6 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac;
 
-import static no.nav.abac.xacml.NavAttributter.RESOURCE_FELLES_PERSON_FNR;
+import static no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.CommonAttributter.RESOURCE_FELLES_PERSON_FNR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -22,8 +22,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
-import no.nav.abac.xacml.NavAttributter;
-import no.nav.abac.xacml.StandardAttributter;
 import no.nav.vedtak.sikkerhet.abac.AbacIdToken;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessursResourceAttributt;
@@ -61,7 +59,7 @@ public class XacmlRequestBuilderTjenesteImplTest {
         pdpRequest.put(PdpKlient.ENVIRONMENT_AUTH_TOKEN, idToken);
         pdpKlient.forespørTilgang(pdpRequest);
 
-        assertThat(captor.getValue().build().toString().contains(NavAttributter.ENVIRONMENT_FELLES_SAML_TOKEN)).isTrue();
+        assertThat(captor.getValue().build().toString().contains(CommonAttributter.ENVIRONMENT_FELLES_SAML_TOKEN)).isTrue();
     }
 
     @Test
@@ -93,7 +91,7 @@ public class XacmlRequestBuilderTjenesteImplTest {
         pdpRequest.put(PdpKlient.ENVIRONMENT_AUTH_TOKEN, idToken);
         pdpKlient.forespørTilgang(pdpRequest);
 
-        assertThat(captor.getValue().build().toString().contains(NavAttributter.ENVIRONMENT_FELLES_OIDC_TOKEN_BODY)).isTrue();
+        assertThat(captor.getValue().build().toString().contains(CommonAttributter.ENVIRONMENT_FELLES_OIDC_TOKEN_BODY)).isTrue();
     }
 
     @Test
@@ -149,9 +147,9 @@ public class XacmlRequestBuilderTjenesteImplTest {
 
     private PdpRequest lagPdpRequest() {
         PdpRequest request = new PdpRequest();
-        request.put(NavAttributter.RESOURCE_FELLES_DOMENE, "foreldrepenger");
-        request.put(StandardAttributter.ACTION_ID, BeskyttetRessursActionAttributt.READ.getEksternKode());
-        request.put(NavAttributter.RESOURCE_FELLES_RESOURCE_TYPE, BeskyttetRessursResourceAttributt.FAGSAK.getEksternKode());
+        request.put(CommonAttributter.RESOURCE_FELLES_DOMENE, "foreldrepenger");
+        request.put(CommonAttributter.XACML_1_0_ACTION_ACTION_ID, BeskyttetRessursActionAttributt.READ.getEksternKode());
+        request.put(CommonAttributter.RESOURCE_FELLES_RESOURCE_TYPE, BeskyttetRessursResourceAttributt.FAGSAK.getEksternKode());
         return request;
     }
 

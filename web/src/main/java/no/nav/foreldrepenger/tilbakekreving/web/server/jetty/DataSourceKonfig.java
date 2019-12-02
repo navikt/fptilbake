@@ -19,8 +19,7 @@ class DataSourceKonfig {
 
     DataSourceKonfig() {
         defaultDatasource = new DBConnProp(createDatasource("defaultDS"), location + "defaultDS");
-        dataSources = Arrays.asList(
-                defaultDatasource);
+        dataSources = Arrays.asList(defaultDatasource);
     }
 
     private DataSource createDatasource(String dataSourceName) {
@@ -49,7 +48,7 @@ class DataSourceKonfig {
         return dataSources;
     }
 
-    class DBConnProp {
+    static final class DBConnProp {
         private DataSource datasource;
         private String migrationScripts;
 

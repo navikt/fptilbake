@@ -8,23 +8,15 @@ public enum TilbakekrevingAbacAttributtType implements AbacAttributtType {
 
     private final String sporingsloggEksternKode;
     private final boolean maskerOutput;
-    private final boolean valider;
 
     TilbakekrevingAbacAttributtType(String sporingsloggEksternKode) {
         this.sporingsloggEksternKode = sporingsloggEksternKode;
         this.maskerOutput = false;
-        valider = false;
     }
 
-    TilbakekrevingAbacAttributtType(String sporingsloggEksternKode, boolean maskerOutput, boolean valider) {
+    TilbakekrevingAbacAttributtType(String sporingsloggEksternKode, boolean maskerOutput) {
         this.sporingsloggEksternKode = sporingsloggEksternKode;
         this.maskerOutput = maskerOutput;
-        this.valider = valider;
-    }
-
-    @Override
-    public String getSporingsloggEksternKode() {
-        return sporingsloggEksternKode;
     }
 
     @Override
@@ -33,8 +25,7 @@ public enum TilbakekrevingAbacAttributtType implements AbacAttributtType {
     }
 
     @Override
-    public boolean getValider() {
-        return valider;
+    public String getSporingsloggKode() {
+        return sporingsloggEksternKode;
     }
-
 }
