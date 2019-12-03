@@ -48,21 +48,18 @@ public class HenleggBehandlingTjeneste {
         if (grunnlagRepository.harGrunnlagForBehandlingId(behandlingId)) {
             throw BehandlingFeil.FACTORY.kanIkkeHenleggeBehandling(behandlingId).toException();
         }
-        doHenleggBehandling(behandlingId, årsakKode, begrunnelse, false);
+        doHenleggBehandling(behandlingId, årsakKode, begrunnelse);
     }
 
     public void henleggBehandling(long behandlingId, BehandlingResultatType årsakKode) {
-        doHenleggBehandling(behandlingId, årsakKode, null, false);
+        doHenleggBehandling(behandlingId, årsakKode, null);
     }
 
-    private void doHenleggBehandling(long behandlingId, BehandlingResultatType årsakKode, String begrunnelse, boolean avbrytVentendeAutopunkt) {
+    private void doHenleggBehandling(long behandlingId, BehandlingResultatType årsakKode, String begrunnelse) {
         BehandlingskontrollKontekst kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandlingId);
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
 
-        if (avbrytVentendeAutopunkt && behandling.isBehandlingPåVent()) {
-            behandlingskontrollTjeneste.taBehandlingAvVent(behandling, kontekst);
-            behandlingskontrollTjeneste.settAutopunkterTilUtført(kontekst, true);
-        } else if (behandling.isBehandlingPåVent()) {
+        if (behandling.isBehandlingPåVent()) {
             behandlingskontrollTjeneste.taBehandlingAvVent(behandling, kontekst);
         }
         behandlingskontrollTjeneste.henleggBehandling(kontekst, årsakKode);

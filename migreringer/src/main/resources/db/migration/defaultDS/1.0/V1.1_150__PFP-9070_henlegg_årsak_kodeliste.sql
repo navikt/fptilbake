@@ -1,0 +1,8 @@
+INSERT INTO KODELISTE (ID,KODEVERK,KODE,OFFISIELL_KODE,BESKRIVELSE,GYLDIG_FOM,GYLDIG_TOM) values (seq_kodeliste.nextval,'BEHANDLING_RESULTAT_TYPE','HENLAGT_TEKNISK_VEDLIKEHOLD',null,
+'Teknisk vedlikehold',to_date('01.01.2000','DD.MM.RRRR'),to_date('31.12.9999','DD.MM.RRRR'));
+
+INSERT INTO KODELISTE_NAVN_I18N (ID,KL_KODEVERK,KL_KODE,SPRAK,NAVN,OPPRETTET_AV,OPPRETTET_TID,ENDRET_AV,ENDRET_TID)
+VALUES (SEQ_KODELISTE_NAVN_I18N.NEXTVAL,'BEHANDLING_RESULTAT_TYPE','HENLAGT_TEKNISK_VEDLIKEHOLD','NB','Teknisk vedlikehold','VL',to_date(sysdate,'DD.MM.RRRR'),null,null);
+
+INSERT INTO PROSESS_TASK_TYPE (KODE,NAVN,FEIL_MAKS_FORSOEK,FEIL_SEK_MELLOM_FORSOEK,BESKRIVELSE)
+VALUES ('behandlingskontroll.tvingHenleggBehandling','Tving Henlegg behandling','3','30','Tvinge en behandling til å bli henlagt, selvom normale regler for saksbehandling ikke tillater henleggelse');
