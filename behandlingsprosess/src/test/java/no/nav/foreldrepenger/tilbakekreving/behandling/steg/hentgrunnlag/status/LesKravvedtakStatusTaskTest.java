@@ -180,6 +180,28 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         assertThat(grunnlagRepository.erKravgrunnlagSperret(behandling.getId())).isTrue();
     }
 
+    @Test
+    public void skal_utføre_leskravvedtakststatustask_for_mottatt_endr_melding_med_gyldig_behandling(){
+        mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_FEIL_samme_referanse.xml"));
+        lesKravgrunnlagTask.doTask(lagProsessTaskData(mottattXmlId, LesKravgrunnlagTask.TASKTYPE));
+
+        mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_SPER.xml"));
+        lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LesKravvedtakStatusTask.TASKTYPE));
+
+        mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_ENDR_samme_referanse.xml"));
+        lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LesKravvedtakStatusTask.TASKTYPE));
+
+        EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandling.getId());
+        assertThat(eksternBehandling.getEksternId()).isEqualTo(FPSAK_BEHANDLING_ID);
+
+        List<ØkonomiXmlMottatt> xmlMottatt = mottattXmlRepository.finnAlleForEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID));
+        assertThat(xmlMottatt.size()).isEqualTo(3);
+        assertThat(behandling.isBehandlingPåVent()).isFalse();
+
+        assertThat(kravVedtakStatusRepository.finnKravstatus(behandling.getId())).isEqualTo(Optional.of(KravStatusKode.ENDRET));
+        assertThat(grunnlagRepository.erKravgrunnlagSperret(behandling.getId())).isFalse();
+    }
+
     private void assertTilkobling() {
         Optional<ØkonomiXmlMottatt> økonomiXmlMottatt = mottattXmlRepository.finnForEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID));
         assertThat(økonomiXmlMottatt).isPresent();

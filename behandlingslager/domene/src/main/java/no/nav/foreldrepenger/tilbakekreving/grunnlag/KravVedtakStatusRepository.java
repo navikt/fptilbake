@@ -27,10 +27,10 @@ public class KravVedtakStatusRepository {
     }
 
     public void lagre(Long behandlingId, KravVedtakStatus437 kravVedtakStatus) {
-        Optional<KravVedtakStatusAggregate> forrigeGrunnlag = finnKravStatus(behandlingId);
-        if (forrigeGrunnlag.isPresent()) {
-            forrigeGrunnlag.get().disable();
-            entityManager.persist(forrigeGrunnlag.get());
+        Optional<KravVedtakStatusAggregate> forrigeGrunnlagStatus = finnKravStatusForBehaandlingId(behandlingId);
+        if (forrigeGrunnlagStatus.isPresent()) {
+            forrigeGrunnlagStatus.get().disable();
+            entityManager.persist(forrigeGrunnlagStatus.get());
         }
         KravVedtakStatusAggregate aggregate = new KravVedtakStatusAggregate.Builder()
             .medKravVedtakStatus(kravVedtakStatus)
@@ -44,11 +44,11 @@ public class KravVedtakStatusRepository {
 
 
     public Optional<KravStatusKode> finnKravstatus(Long behandlingId) {
-        return finnKravStatus(behandlingId)
+        return finnKravStatusForBehaandlingId(behandlingId)
             .map(ks -> ks.getKravVedtakStatus().getKravStatusKode());
     }
 
-    private Optional<KravVedtakStatusAggregate> finnKravStatus(Long behandlingId) {
+    private Optional<KravVedtakStatusAggregate> finnKravStatusForBehaandlingId(Long behandlingId) {
         TypedQuery<KravVedtakStatusAggregate> query = entityManager.createQuery("from KravVedtakStatusAggregate aggr " +
             "where aggr.behandlingId=:behandlingId and aggr.aktiv=:aktiv", KravVedtakStatusAggregate.class);
         query.setParameter("behandlingId", behandlingId);

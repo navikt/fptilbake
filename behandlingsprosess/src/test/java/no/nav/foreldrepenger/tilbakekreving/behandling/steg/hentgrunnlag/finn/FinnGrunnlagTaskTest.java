@@ -20,6 +20,7 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatusRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
+import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 
 public class FinnGrunnlagTaskTest extends FellesTestOppsett {
@@ -127,6 +128,59 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
         assertThat(kravVedtakStatusRepository.finnKravstatus(behandling.getId())).isEmpty();
         assertThat(grunnlagRepository.harGrunnlagForBehandlingId(behandling.getId())).isFalse();
         assertThat(grunnlagRepository.erKravgrunnlagSperret(behandling.getId())).isFalse();
+    }
+
+    @Test
+    public void skal_ikke_finne_og_håndtere_endr_melding_for_behandling_når_grunnlag_xml_ikke_finnes(){
+        Long mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_ENDR.xml"));
+        mottattXmlRepository.oppdaterMedEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID), mottattXmlId);
+
+        ProsessTaskData prosessTaskData = opprettFinngrunnlagProsessTask();
+        finnGrunnlagTask.doTask(prosessTaskData);
+
+        assertThat(behandling.isBehandlingPåVent()).isFalse();
+        assertThat(kravVedtakStatusRepository.finnKravstatus(behandling.getId())).isEmpty();
+        assertThat(grunnlagRepository.harGrunnlagForBehandlingId(behandling.getId())).isFalse();
+        assertThat(grunnlagRepository.erKravgrunnlagSperret(behandling.getId())).isFalse();
+    }
+
+    @Test
+    public void skal_finne_og_håndtere_endr_melding_for_behandling_når_grunnlag_er_sperret(){
+        Long mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_YTEL.xml"));
+        mottattXmlRepository.oppdaterMedEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID), mottattXmlId);
+
+        mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_SPER.xml"));
+        mottattXmlRepository.oppdaterMedEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID), mottattXmlId);
+
+        mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_ENDR.xml"));
+        mottattXmlRepository.oppdaterMedEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID), mottattXmlId);
+
+        ProsessTaskData prosessTaskData = opprettFinngrunnlagProsessTask();
+        finnGrunnlagTask.doTask(prosessTaskData);
+
+        assertThat(behandling.isBehandlingPåVent()).isFalse();
+        assertThat(kravVedtakStatusRepository.finnKravstatus(behandling.getId())).isNotEmpty();
+        assertThat(grunnlagRepository.harGrunnlagForBehandlingId(behandling.getId())).isTrue();
+        assertThat(grunnlagRepository.erKravgrunnlagSperret(behandling.getId())).isFalse();
+    }
+
+    @Test
+    public void skal_ikke_finne_og_håndtere_endr_melding_for_behandling_når_xml_rekkefølge_ikke_riktig(){
+        Long mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_YTEL.xml"));
+        mottattXmlRepository.oppdaterMedEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID), mottattXmlId);
+
+        mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_ENDR.xml"));
+        mottattXmlRepository.oppdaterMedEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID), mottattXmlId);
+
+        mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_SPER.xml"));
+        mottattXmlRepository.oppdaterMedEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID), mottattXmlId);
+
+        expectedException.expect(TekniskException.class);
+        expectedException.expectMessage("FPT-107929");
+
+        ProsessTaskData prosessTaskData = opprettFinngrunnlagProsessTask();
+        finnGrunnlagTask.doTask(prosessTaskData);
+
     }
 
     private ProsessTaskData opprettFinngrunnlagProsessTask() {

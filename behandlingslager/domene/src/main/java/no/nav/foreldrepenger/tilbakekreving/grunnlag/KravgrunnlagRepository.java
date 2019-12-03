@@ -88,9 +88,18 @@ public class KravgrunnlagRepository {
         if (aggregate.isPresent()) {
             aggregate.get().sperr();
             entityManager.persist(aggregate.get());
-            entityManager.flush(); //TODO unngå flush i repository, det er typisk bare nyttig for tester
         } else {
             KravgrunnlagRepositoryFeil.FEILFACTORY.kanIkkeSperreGrunnlagSomIkkeFinnes(behandlingId).log(logger);
+        }
+    }
+
+    public void opphevGrunnlag(Long behandlingId){
+        Optional<KravgrunnlagAggregateEntity> aggregate = finnKravgrunnlagOptional(behandlingId);
+        if(aggregate.isPresent()){
+            aggregate.get().opphev();
+            entityManager.persist(aggregate.get());
+        }else {
+            KravgrunnlagRepositoryFeil.FEILFACTORY.kanIkkeOppheveGrunnlagSomIkkeFinnes(behandlingId).log(logger);
         }
     }
 
@@ -117,5 +126,8 @@ public class KravgrunnlagRepository {
 
         @TekniskFeil(feilkode = "FPT-710434", feilmelding = "Forsøker å sperre kravgrunnlag, men det finnes ikke noe kravgrunnlag for behandlingId=%s", logLevel = LogLevel.WARN)
         Feil kanIkkeSperreGrunnlagSomIkkeFinnes(Long behandlingId);
+
+        @TekniskFeil(feilkode = "FPT-710435", feilmelding = "Forsøker å oppheve kravgrunnlag, men det finnes ikke noe kravgrunnlag for behandlingId=%s", logLevel = LogLevel.WARN)
+        Feil kanIkkeOppheveGrunnlagSomIkkeFinnes(Long behandlingId);
     }
 }

@@ -5,7 +5,6 @@ import static no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -78,26 +77,24 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
         if (!alleXmlMeldinger.isEmpty()) {
             logger.info("Fant {} meldinger som ikke er koblet for behandlingId={} og eksternBehandlingId={}", alleXmlMeldinger.size(), behandlingId, eksternBehandling.getEksternId());
             alleXmlMeldinger = alleXmlMeldinger.stream()
-                .sorted(Comparator.comparing(ØkonomiXmlMottatt::getSekvens).reversed())
+                .sorted(Comparator.comparing(ØkonomiXmlMottatt::getSekvens))
                 .collect(Collectors.toList());
-            ØkonomiXmlMottatt sisteMottattXml = alleXmlMeldinger.get(0);
-            Long mottattXmlId = sisteMottattXml.getId();
-            String mottattXml = sisteMottattXml.getMottattXml();
+            for (ØkonomiXmlMottatt økonomiXmlMottatt : alleXmlMeldinger) {
+                Long mottattXmlId = økonomiXmlMottatt.getId();
+                String mottattXml = økonomiXmlMottatt.getMottattXml();
 
-            if (mottattXml.contains(ROOT_ELEMENT_KRAVGRUNNLAG_XML)) {
-                logger.info("siste xml er grunnlag xml med mottattXmlId={}", mottattXmlId);
-                kobleGrunnlagMedBehandling(behandlingId, mottattXmlId, mottattXml);
-            } else if (mottattXml.contains(ROOT_ELEMENT_KRAV_VEDTAK_STATUS_XML)) {
-                logger.info("siste xml er status xml med mottattXmlId={},da siste kravgrunnlag må hentes.", mottattXmlId);
-                Optional<ØkonomiXmlMottatt> sisteKravgrunnlag = finnSisteKravgrunnlagMelding(alleXmlMeldinger);
-                if (sisteKravgrunnlag.isPresent()) {
-                    kobleSisteGrunnlagMedBehandling(behandlingId, sisteKravgrunnlag.get().getId(), sisteKravgrunnlag.get().getMottattXml());
+                if (mottattXml.contains(ROOT_ELEMENT_KRAVGRUNNLAG_XML)) {
+                    logger.info("xml er grunnlag xml med mottattXmlId={}", mottattXmlId);
+                    kobleGrunnlagMedBehandling(behandlingId, mottattXmlId, mottattXml);
+                } else if (mottattXml.contains(ROOT_ELEMENT_KRAV_VEDTAK_STATUS_XML) && grunnlagRepository.harGrunnlagForBehandlingId(behandlingId)) {
+                    logger.info("xml er status xml med mottattXmlId={}", mottattXmlId);
                     håndtereGrunnlagStatusForBehandling(behandlingId, mottattXmlId, mottattXml);
                 } else {
-                    logger.info("siste grunnlag xml finnes ikke for behandlingId={}", behandlingId);
+                    logger.warn("xml rekkefølge er ikke riktig med mottattXmlId={}",mottattXmlId);
                 }
+                mottattXmlRepository.opprettTilkobling(mottattXmlId);
             }
-            mottattXmlRepository.opprettTilkobling(mottattXmlId);
+
         } else {
             logger.info("Xml mottatt ikke for behandlingId={}", behandlingId);
         }
@@ -117,14 +114,4 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
         grunnlagRepository.lagre(behandlingId, kravgrunnlag431);
     }
 
-    private void kobleSisteGrunnlagMedBehandling(Long behandlingId, Long mottattXmlId, String mottattXml) {
-        kobleGrunnlagMedBehandling(behandlingId, mottattXmlId, mottattXml);
-        mottattXmlRepository.opprettTilkobling(mottattXmlId);
-    }
-
-    private Optional<ØkonomiXmlMottatt> finnSisteKravgrunnlagMelding(List<ØkonomiXmlMottatt> alleXmlMeldinger) {
-        return alleXmlMeldinger.stream()
-            .filter(økonomiXmlMottatt -> økonomiXmlMottatt.getMottattXml().contains(ROOT_ELEMENT_KRAVGRUNNLAG_XML))
-            .findFirst();
-    }
 }

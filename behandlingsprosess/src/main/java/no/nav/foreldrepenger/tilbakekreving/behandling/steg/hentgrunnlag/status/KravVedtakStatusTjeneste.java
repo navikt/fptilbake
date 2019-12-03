@@ -6,6 +6,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.HenleggBehandlingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -55,6 +56,8 @@ public class KravVedtakStatusTjeneste {
         } else if (KravStatusKode.MANUELL.equals(kravVedtakStatus437.getKravStatusKode()) || KravStatusKode.SPERRET.equals(kravVedtakStatus437.getKravStatusKode())) {
             settBehandlingPåVent(behandlingId);
             sperrGrunnlag(behandlingId);
+        } else if (KravStatusKode.ENDRET.equals(kravVedtakStatus437.getKravStatusKode())) {
+            håndteresEndretStatusMelding(behandlingId, kravVedtakStatus437.getKravStatusKode().getKode());
         } else {
             throw KravVedtakStatusTjenesteFeil.FACTORY.ugyldigKravStatusKode(kravVedtakStatus437.getKravStatusKode().getKode(), behandlingId).toException();
         }
@@ -67,8 +70,22 @@ public class KravVedtakStatusTjeneste {
         behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, BehandlingStegType.TBKGSTEG, fristDato, Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
     }
 
+    private void taBehandlingAvVent(Long behandlingId) {
+        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
+        BehandlingskontrollKontekst kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandling);
+        behandlingskontrollTjeneste.taBehandlingAvVentSetAlleAutopunktUtført(behandling, kontekst);
+    }
+
     private void sperrGrunnlag(Long behandlingId) {
         grunnlagRepository.sperrGrunnlag(behandlingId);
+    }
+
+    private void håndteresEndretStatusMelding(Long behandlingId, String statusKode) {
+        if (grunnlagRepository.harGrunnlagForBehandlingId(behandlingId) && !grunnlagRepository.erKravgrunnlagSperret(behandlingId)) {
+            throw KravVedtakStatusTjenesteFeil.FACTORY.kanIkkeFinnesSperretGrunnlagForBehandling(statusKode, behandlingId).toException();
+        }
+        taBehandlingAvVent(behandlingId);
+        grunnlagRepository.opphevGrunnlag(behandlingId);
     }
 
     public interface KravVedtakStatusTjenesteFeil extends DeklarerteFeil {
@@ -77,6 +94,9 @@ public class KravVedtakStatusTjeneste {
 
         @TekniskFeil(feilkode = "FPT-107928", feilmelding = "Har fått ugyldig status kode %s fra økonomisystem, kan ikke akspetere for behandlingId '%s'", logLevel = LogLevel.WARN)
         Feil ugyldigKravStatusKode(String status, long behandlingId);
+
+        @TekniskFeil(feilkode = "FPT-107929", feilmelding = "Har fått ENDR status kode %s fra økonomisystem for behandlingId '%s', men ikke finnes sperret grunnlag", logLevel = LogLevel.WARN)
+        Feil kanIkkeFinnesSperretGrunnlagForBehandling(String status, long behandlingId);
     }
 
 }
