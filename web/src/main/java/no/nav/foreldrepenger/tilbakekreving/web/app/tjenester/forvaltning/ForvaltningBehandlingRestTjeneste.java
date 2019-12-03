@@ -72,7 +72,7 @@ public class ForvaltningBehandlingRestTjeneste {
     @Path("/tving-gjenoppta")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Tjeneste for å tvinge en behandling til å gjenopptas (tas av vent).")
+    @ApiOperation(value = "Tjeneste for å tvinge en behandling til å gjenopptas (tas av vent). NB! Må ikke brukes på saker uten kravgrunnlag!")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Gjenopptatt behandling", response = String.class),
         @ApiResponse(code = 400, message = "Ukjent behandlingId"),
