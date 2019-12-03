@@ -23,9 +23,12 @@ import javax.ws.rs.core.Response;
 
 import com.codahale.metrics.annotation.Timed;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
@@ -40,7 +43,6 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.Red
 import no.nav.vedtak.felles.jpa.Transaction;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 
-@Api(tags = {"aksjonspunkt"})
 @Path("/behandling/aksjonspunkt")
 @RequestScoped
 @Transaction
@@ -69,7 +71,12 @@ public class AksjonspunktRestTjeneste {
     @GET
     @Timed
     @Consumes(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Hent aksjonspunter for en behandling", response = AksjonspunktDto.class, responseContainer = "Set")
+    @Operation(
+        tags = "aksjonspunkt",
+        description = "Hent aksjonspunter for en behandling",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Aksjonspunkter", content = @Content(array = @ArraySchema(schema = @Schema(implementation = AksjonspunktDto.class))))
+        })
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response getAksjonspunkter(@NotNull @QueryParam("behandlingId") @Valid BehandlingIdDto behandlingIdDto) throws URISyntaxException { // NOSONAR
@@ -94,10 +101,12 @@ public class AksjonspunktRestTjeneste {
     @POST
     @Timed
     @Consumes(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Lagre endringer gitt av aksjonspunktene og rekjør behandling fra gjeldende steg")
+    @Operation(
+        tags = "aksjonspunkt",
+        description = "Lagre endringer gitt av aksjonspunktene og rekjør behandling fra gjeldende steg")
     @BeskyttetRessurs(action = UPDATE, ressurs = FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public Response bekreft(@ApiParam("Liste over aksjonspunkt som skal bekreftes, inklusiv data som trengs for å løse de.") @Valid BekreftedeAksjonspunkterDto apDto) throws URISyntaxException { // NOSONAR
+    public Response bekreft(@Parameter(description = "Liste over aksjonspunkt som skal bekreftes, inklusiv data som trengs for å løse de.") @Valid BekreftedeAksjonspunkterDto apDto) throws URISyntaxException { // NOSONAR
         Long behandlingId = apDto.getBehandlingId().getBehandlingId();
         Collection<BekreftetAksjonspunktDto> bekreftedeAksjonspunktDtoer = apDto.getBekreftedeAksjonspunktDtoer();
         behandlingTjeneste.kanEndreBehandling(behandlingId, apDto.getBehandlingVersjon());

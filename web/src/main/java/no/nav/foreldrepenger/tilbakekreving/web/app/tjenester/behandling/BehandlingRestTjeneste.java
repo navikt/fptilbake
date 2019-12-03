@@ -26,12 +26,12 @@ import javax.ws.rs.core.Response;
 
 import com.codahale.metrics.annotation.Timed;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.ResponseHeader;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.headers.Header;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingsTjenesteProvider;
@@ -66,7 +66,6 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.Søkest
 import no.nav.vedtak.felles.jpa.Transaction;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 
-@Api(tags = "behandlinger")
 @Path(BehandlingRestTjeneste.PATH_FRAGMENT)
 @Produces(APPLICATION_JSON)
 @Consumes(APPLICATION_JSON)
@@ -104,10 +103,10 @@ public class BehandlingRestTjeneste {
     }
 
     @GET
-    @ApiOperation(value = "Henter behandlinger knyttet til søkestreng", notes = "Ikke implementert enda")
-    @ApiResponses(value = {
-
-    })
+    @Operation(
+        tags = "behandlinger",
+        description = "Henter behandlinger knyttet til søkestreng",
+        summary = "Ikke implementert enda")
     @Path("/finnbehandling")
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     public Response hentBehandling(@QueryParam("søkestring") @NotNull @Valid SøkestrengDto søkestreng) {
@@ -116,10 +115,9 @@ public class BehandlingRestTjeneste {
     }
 
     @POST
-    @ApiOperation(value = "Opprett ny behandling")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK")
-    })
+    @Operation(
+        tags = "behandlinger",
+        description = "Opprett ny behandling")
     @Path("/opprett")
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     public Response opprettBehandling(@Valid @NotNull OpprettBehandlingDto opprettBehandlingDto) throws URISyntaxException {
@@ -139,10 +137,9 @@ public class BehandlingRestTjeneste {
 
     @GET
     @Path("/kan-opprettes")
-    @ApiOperation(value = "Sjekk om behandling kan opprettes")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-    })
+    @Operation(
+        tags = "behandlinger",
+        description = "Sjekk om behandling kan opprettes")
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     public Response kanOpprettesBehandling(@NotNull @QueryParam("saksnummer") @Valid SaksnummerDto saksnummerDto,
                                            @NotNull @QueryParam("uuid") @Valid FpsakUuidDto fpsakUuidDto) {
@@ -154,10 +151,9 @@ public class BehandlingRestTjeneste {
 
     @GET
     @Path("/kan-revurdering-opprettes")
-    @ApiOperation(value = "Sjekk om revurdering kan opprettes")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-    })
+    @Operation(
+        tags = "behandlinger",
+        description = "Sjekk om revurdering kan opprettes")
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     public Response kanOpprettesRevurdering(@NotNull @QueryParam("behandlingId") @Valid BehandlingIdDto idDto) {
         EksternBehandling eksternBehandling = revurderingTjeneste.hentEksternBehandling(idDto.getBehandlingId());
@@ -168,12 +164,12 @@ public class BehandlingRestTjeneste {
     @POST
     @Timed
     @Path("/gjenoppta")
-    @ApiOperation(value = "Gjenopptar behandling som er satt på vent")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Gjenoppta behandling påstartet i bakgrunnen", responseHeaders = {@ResponseHeader(name = "Location")})
-    })
+    @Operation(
+        tags = "behandlinger",
+        description = "Gjenopptar behandling som er satt på vent",
+        responses = {@ApiResponse(responseCode = "200", description = "Gjenoppta behandling påstartet i bakgrunnen", headers = {@Header(name = "Location")})})
     @BeskyttetRessurs(action = UPDATE, ressurs = FAGSAK)
-    public Response gjenopptaBehandling(@ApiParam("BehandlingId for behandling som skal gjenopptas") @Valid GjenopptaBehandlingDto dto)
+    public Response gjenopptaBehandling(@Parameter(description = "BehandlingId for behandling som skal gjenopptas") @Valid GjenopptaBehandlingDto dto)
         throws URISyntaxException {
         Long behandlingId = dto.getBehandlingId();
 
@@ -189,9 +185,11 @@ public class BehandlingRestTjeneste {
     @POST
     @Timed
     @Path("/henlegg")
-    @ApiOperation(value = "Henlegger behandling")
+    @Operation(
+        tags = "behandlinger",
+        description = "Henlegger behandling")
     @BeskyttetRessurs(action = UPDATE, ressurs = FAGSAK)
-    public void henleggBehandling(@ApiParam("Henleggelse årsak") @Valid HenleggBehandlingDto dto) {
+    public void henleggBehandling(@Parameter(description = "Henleggelse årsak") @Valid HenleggBehandlingDto dto) {
         Long behandlingId = dto.getBehandlingId();
         behandlingTjeneste.kanEndreBehandling(behandlingId, dto.getBehandlingVersjon());
         BehandlingResultatType årsakKode = tilHenleggBehandlingResultatType(dto.getÅrsakKode());
@@ -207,10 +205,12 @@ public class BehandlingRestTjeneste {
     @Timed
     @Path("/sett-pa-vent")
     @Consumes(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Setter behandling på vent")
+    @Operation(
+        tags = "behandlinger",
+        description = "Setter behandling på vent")
     @BeskyttetRessurs(action = UPDATE, ressurs = FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public void settBehandlingPaVent(@ApiParam("Frist for behandling på vent") @Valid SettBehandlingPåVentDto dto) {
+    public void settBehandlingPaVent(@Parameter(description = "Frist for behandling på vent") @Valid SettBehandlingPåVentDto dto) {
         behandlingTjeneste.kanEndreBehandling(dto.getBehandlingId(), dto.getBehandlingVersjon());
         behandlingTjeneste.settBehandlingPaVent(dto.getBehandlingId(), dto.getFrist(), dto.getVentearsak());
     }
@@ -219,9 +219,11 @@ public class BehandlingRestTjeneste {
     @POST
     @Timed
     @Path("/endre-pa-vent")
-    @ApiOperation(value = "Endrer ventefrist for behandling på vent")
+    @Operation(
+        tags = "behandlinger",
+        description = "Endrer ventefrist for behandling på vent")
     @BeskyttetRessurs(action = UPDATE, ressurs = VENTEFRIST)
-    public void endreBehandlingPåVent(@ApiParam("Frist for behandling på vent") @Valid SettBehandlingPåVentDto dto) {
+    public void endreBehandlingPåVent(@Parameter(description = "Frist for behandling på vent") @Valid SettBehandlingPåVentDto dto) {
         behandlingTjeneste.kanEndreBehandling(dto.getBehandlingId(), dto.getBehandlingVersjon());
         behandlingTjeneste.endreBehandlingPåVent(dto.getBehandlingId(), dto.getFrist(), dto.getVentearsak());
     }
@@ -229,23 +231,26 @@ public class BehandlingRestTjeneste {
     @GET
     @Path("/alle")
     @Timed
-    @ApiOperation(value = "Søk etter behandlinger på saksnummer", notes = ("Returnerer alle behandlinger som er tilknyttet saksnummer."))
+    @Operation(
+        tags = "behandlinger",
+        description = "Søk etter behandlinger på saksnummer", summary = "Returnerer alle behandlinger som er tilknyttet saksnummer.")
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public List<BehandlingDto> hentBehandlinger(
-        @NotNull @QueryParam("saksnummer") @ApiParam("Saksnummer må være et eksisterende saksnummer") @Valid SaksnummerDto s) {
+        @NotNull @QueryParam("saksnummer") @Parameter(description = "Saksnummer må være et eksisterende saksnummer") @Valid SaksnummerDto s) {
         Saksnummer saksnummer = new Saksnummer(s.getVerdi());
         return behandlingDtoTjeneste.hentAlleBehandlinger(saksnummer);
     }
 
     @POST
     @Timed
-    @ApiOperation(value = "Init hent behandling")
-    @ApiResponses(value = {
-        @ApiResponse(code = 202, message = "Hent behandling initiert, Returnerer link til å polle på fremdrift", responseHeaders = {
-            @ResponseHeader(name = "Location")}),
-        @ApiResponse(code = 303, message = "Behandling tilgjenglig (prosesstasks avsluttet)", responseHeaders = {@ResponseHeader(name = "Location")})
-    })
+    @Operation(
+        tags = "behandlinger",
+        description = "Init hent behandling",
+        responses = {
+            @ApiResponse(responseCode = "202", description = "Hent behandling initiert, Returnerer link til å polle på fremdrift", headers = {@Header(name = "Location")}),
+            @ApiResponse(responseCode = "303", description = "Behandling tilgjenglig (prosesstasks avsluttet)", headers = {@Header(name = "Location")})
+        })
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response hentBehandling(@NotNull @Valid BehandlingIdDto idDto) throws URISyntaxException {
@@ -256,13 +261,14 @@ public class BehandlingRestTjeneste {
     @GET
     @Path("/status")
     @Timed
-    @ApiOperation(value = "Url for å polle på behandling mens behandlingprosessen pågår i bakgrunnen(asynkront)", notes = ("Returnerer link til enten samme (hvis ikke ferdig) eller redirecter til /behandlinger dersom asynkrone operasjoner er ferdig."))
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Returnerer Status", response = AsyncPollingStatus.class),
-        @ApiResponse(code = 418, message = "ProsessTasks har feilet", response = AsyncPollingStatus.class, responseHeaders = {
-            @ResponseHeader(name = "Location")}),
-        @ApiResponse(code = 303, message = "Behandling tilgjenglig (prosesstasks avsluttet)", responseHeaders = {@ResponseHeader(name = "Location")})
-    })
+    @Operation(
+        tags = "behandlinger",
+        description = "Url for å polle på behandling mens behandlingprosessen pågår i bakgrunnen(asynkront)", summary = "Returnerer link til enten samme (hvis ikke ferdig) eller redirecter til /behandlinger dersom asynkrone operasjoner er ferdig.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Returnerer Status", content = @Content(schema = @Schema(implementation = AsyncPollingStatus.class))),
+            @ApiResponse(responseCode = "418", description = "ProsessTasks har feilet", content = @Content(schema = @Schema(implementation = AsyncPollingStatus.class)), headers = {@Header(name = "Location")}),
+            @ApiResponse(responseCode = "303", description = "Behandling tilgjenglig (prosesstasks avsluttet)", content = @Content(schema = @Schema(implementation = AsyncPollingStatus.class)), headers = {@Header(name = "Location")}),
+        })
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response hentBehandlingMidlertidigStatus(@NotNull @QueryParam("behandlingId") @Valid BehandlingIdDto idDto,
@@ -277,10 +283,12 @@ public class BehandlingRestTjeneste {
 
     @GET
     @Timed
-    @ApiOperation(value = "Hent behandling gitt id", notes = ("Returnerer behandlingen som er tilknyttet id. Dette er resultat etter at asynkrone operasjoner er utført."))
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Returnerer Behandling", response = UtvidetBehandlingDto.class),
-    })
+    @Operation(
+        tags = "behandlinger",
+        description = "Hent behandling gitt id", summary = "Returnerer behandlingen som er tilknyttet id. Dette er resultat etter at asynkrone operasjoner er utført.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Returnerer behandling", content = @Content(schema = @Schema(implementation = UtvidetBehandlingDto.class)))
+        })
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response hentBehandlingResultat(@NotNull @QueryParam("behandlingId") @Valid BehandlingIdDto idDto) {
@@ -299,10 +307,12 @@ public class BehandlingRestTjeneste {
     @GET
     @Path("/tilbakekreving/aapen")
     @Timed
-    @ApiOperation(value = "Sjekk hvis tilbakekrevingbehandling er åpen", notes = ("Returnerer true hvis det finnes en åpen tilbakekrevingbehandling"))
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Returnerer true eller false", response = Response.class),
-    })
+    @Operation(
+        tags = "behandlinger",
+        description = "Sjekk hvis tilbakekrevingbehandling er åpen",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Returnerer true hvis det finnes en åpen tilbakekrevingbehandling ellers false", content = @Content(schema = @Schema(implementation = Boolean.class)))
+        })
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     public Response harÅpenTilbakekrevingBehandling(@NotNull @QueryParam("saksnummer") @Valid SaksnummerDto saksnummerDto) {
         List<Behandling> behandlinger = behandlingTjeneste.hentBehandlinger(new Saksnummer(saksnummerDto.getVerdi()));
@@ -315,10 +325,12 @@ public class BehandlingRestTjeneste {
     @POST
     @Path("/bytt-enhet")
     @Consumes(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Bytte behandlende enhet")
+    @Operation(
+        tags = "behandlinger",
+        description = "Bytte behandlende enhet")
     @BeskyttetRessurs(action = UPDATE, ressurs = FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public void byttBehandlendeEnhet(@ApiParam("Ny enhet som skal byttes") @Valid ByttBehandlendeEnhetDto dto) {
+    public void byttBehandlendeEnhet(@Parameter(description = "Ny enhet som skal byttes") @Valid ByttBehandlendeEnhetDto dto) {
         Long behandlingId = dto.getBehandlingId();
         Long behandlingVersjon = dto.getBehandlingVersjon();
         behandlingTjeneste.kanEndreBehandling(behandlingId, behandlingVersjon);
@@ -330,7 +342,9 @@ public class BehandlingRestTjeneste {
 
     @GET
     @Path("/handling-rettigheter")
-    @ApiOperation(value = "Henter rettigheter for lovlige behandlingsoperasjoner")
+    @Operation(
+        tags = "behandlinger",
+        description = "Henter rettigheter for lovlige behandlingsoperasjoner")
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public BehandlingRettigheterDto hentBehandlingOperasjonRettigheter(

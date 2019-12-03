@@ -19,10 +19,10 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.ResponsKanal;
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
@@ -30,7 +30,6 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.Beh
 import no.nav.vedtak.felles.jpa.Transaction;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 
-@Api(tags = "brukerrespons")
 @Path(value = "/varsel/respons")
 @Produces(value = MediaType.APPLICATION_JSON)
 @Consumes(value = MediaType.APPLICATION_JSON)
@@ -50,25 +49,14 @@ public class VarselresponsRestTjeneste {
         this.gjenopptaBehandlingTjeneste = gjenopptaBehandlingTjeneste;
     }
 
-    @POST
-    @ApiOperation(value = "Lagrer respons fra bruker")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Respons registrert")
-    })
-    @Path(value = "/registrer")
-    @BeskyttetRessurs(action = UPDATE, ressurs = FAGSAK)
-    public Response registrerBrukerrespons(@Valid @NotNull VarselresponsDto brukerRespons) {
-        responsTjeneste.lagreRespons(brukerRespons.getBehandlingId(), ResponsKanal.SELVBETJENING, brukerRespons.getAkseptertFaktagrunnlag());
-        gjenopptaBehandlingTjeneste.fortsettBehandling(brukerRespons.getBehandlingId());
-        return Response.ok().build();
-    }
-
     @GET
-    @ApiOperation(value = "Henter respons for behandling")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Respons lagret", response = VarselresponsDto.class),
-        @ApiResponse(code = 404, message = "Response finnes ikke")
-    })
+    @Operation(
+        tags = "brukerrespons",
+        description = "Henter respons for behandling",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Respons lagret", content = @Content(mediaType = "application/json", schema = @Schema(implementation = VarselresponsDto.class))),
+            @ApiResponse(responseCode = "404", description = "Response finnes ikke")
+        })
     @Path(value = "/hent-respons")
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     public Response finnRespons(@Valid @NotNull @QueryParam("behandlingId") BehandlingIdDto behandlingIdDto) {
@@ -79,4 +67,18 @@ public class VarselresponsRestTjeneste {
         return Response.noContent().build();
     }
 
+    @POST
+    @Operation(
+        tags = "brukerrespons",
+        description = "Lagrer respons fra bruker",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Respons registrert")
+        })
+    @Path(value = "/registrer")
+    @BeskyttetRessurs(action = UPDATE, ressurs = FAGSAK)
+    public Response registrerBrukerrespons(@Valid @NotNull VarselresponsDto brukerRespons) {
+        responsTjeneste.lagreRespons(brukerRespons.getBehandlingId(), ResponsKanal.SELVBETJENING, brukerRespons.getAkseptertFaktagrunnlag());
+        gjenopptaBehandlingTjeneste.fortsettBehandling(brukerRespons.getBehandlingId());
+        return Response.ok().build();
+    }
 }

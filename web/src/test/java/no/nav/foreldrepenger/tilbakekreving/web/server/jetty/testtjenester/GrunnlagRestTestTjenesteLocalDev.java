@@ -20,10 +20,7 @@ import javax.ws.rs.core.Response;
 
 import com.codahale.metrics.annotation.Timed;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingFeil;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
@@ -42,7 +39,6 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.tilbakekrevingsgru
 import no.nav.vedtak.felles.jpa.Transaction;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 
-@Api(tags = "grunnlag")
 @Path(GrunnlagRestTestTjenesteLocalDev.PATH_FRAGMENT)
 @Produces(APPLICATION_JSON)
 @Consumes(APPLICATION_JSON)
@@ -67,10 +63,7 @@ public class GrunnlagRestTestTjenesteLocalDev implements GrunnlagRestTestTjenest
 
     @POST
     @Timed
-    @ApiOperation(value = "Lagre tilbakekrevingsgrunnlag fra økonomi")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Lagret tilbakekrevingsgrunnlag fra økonomi")
-    })
+    @Operation(tags = "kravgrunnlag", description =  "Lagre tilbakekrevingsgrunnlag fra økonomi")
     @BeskyttetRessurs(action = UPDATE, ressurs = FAGSAK)
     public Response lagreUtbetalinger(@NotNull @QueryParam("behandlingId") @Valid BehandlingIdDto idDto,
                                       @NotNull @Valid KravgrunnlagDto kravgrunnlagDto) {

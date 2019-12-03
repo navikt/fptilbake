@@ -21,9 +21,8 @@ import javax.ws.rs.core.Response;
 
 import com.codahale.metrics.annotation.Timed;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.dokumentbestiller.DokumentMalType;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.brevmaler.DokumentBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.BrevmalDto;
@@ -32,7 +31,6 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.Bes
 import no.nav.vedtak.felles.jpa.Transaction;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 
-@Api(tags = "brev")
 @Path(BrevRestTjeneste.PATH_FRAGMENT)
 @Produces(APPLICATION_JSON)
 @Consumes(APPLICATION_JSON)
@@ -58,7 +56,7 @@ public class BrevRestTjeneste {
     @Timed
     @Path("/maler")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    @ApiOperation(value = "Henter liste over tilgjengelige brevtyper")
+    @Operation(tags = "brev", description = "Henter liste over tilgjengelige brevtyper")
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK, sporingslogg = false)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public List<BrevmalDto> hentMaler(@Valid @QueryParam("behandlingId") BehandlingIdDto behandlingIdDto) {
@@ -69,7 +67,7 @@ public class BrevRestTjeneste {
     @Timed
     @Path("/bestill")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    @ApiOperation(value = "bestiller brev")
+    @Operation(tags = "brev", description = "bestiller brev")
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK, sporingslogg = false)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response bestillBrev(@NotNull @Valid BestillBrevDto bestillBrevDto) {
@@ -82,10 +80,10 @@ public class BrevRestTjeneste {
     @Timed
     @Path("/forhandsvis")
     @Consumes(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Returnerer en pdf som er en forhåndsvisning av brevet")
+    @Operation(tags = "brev", description = "Returnerer en pdf som er en forhåndsvisning av brevet")
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public Response forhåndsvisBrev(@ApiParam("Inneholder kode til brevmal og data som skal flettes inn i brevet") @NotNull @Valid BestillBrevDto forhåndsvisBestillBrevDto) {
+    public Response forhåndsvisBrev(@Parameter(description = "Inneholder kode til brevmal og data som skal flettes inn i brevet") @NotNull @Valid BestillBrevDto forhåndsvisBestillBrevDto) {
         DokumentMalType malType = DokumentMalType.fraKode(forhåndsvisBestillBrevDto.getBrevmalkode());
         String fritekst = forhåndsvisBestillBrevDto.getFritekst();
         long behandlingId = forhåndsvisBestillBrevDto.getBehandlingId();

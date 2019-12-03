@@ -9,10 +9,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
-import io.swagger.annotations.Api;
+import io.swagger.v3.oas.annotations.Operation;
 import no.nav.foreldrepenger.tilbakekreving.web.app.selftest.SelftestService;
 
-@Api(tags = {"nais"})
 @Path("/")
 @Produces(TEXT_PLAIN)
 @RequestScoped
@@ -37,29 +36,32 @@ public class NaisRestTjeneste {
 
     @GET
     @Path("isAlive")
+    @Operation(tags = "nais", description = "sjekker om applikasjonen er i live", hidden = true)
     public Response isAlive() {
         return Response
-                .ok(RESPONSE_OK)
-                .header(RESPONSE_CACHE_KEY, RESPONSE_CACHE_VAL)
-                .build();
+            .ok(RESPONSE_OK)
+            .header(RESPONSE_CACHE_KEY, RESPONSE_CACHE_VAL)
+            .build();
     }
 
     @GET
     @Path("isReady")
+    @Operation(tags = "nais", description = "sjekker om applikasjonen er klar", hidden = true)
     public Response isReady() {
         if (selftestService.kritiskTjenesteFeilet()) {
             return Response.status(Response.Status.SERVICE_UNAVAILABLE)
-                    .header(RESPONSE_CACHE_KEY, RESPONSE_CACHE_VAL)
-                    .build();
+                .header(RESPONSE_CACHE_KEY, RESPONSE_CACHE_VAL)
+                .build();
         } else {
             return Response.ok(RESPONSE_OK)
-                    .header(RESPONSE_CACHE_KEY, RESPONSE_CACHE_VAL)
-                    .build();
+                .header(RESPONSE_CACHE_KEY, RESPONSE_CACHE_VAL)
+                .build();
         }
     }
 
     @GET
     @Path("preStop")
+    @Operation(tags = "nais", description = "forbered stopp av applikasjonen", hidden = true)
     public Response preStop() {
         starterService.stopServices();
         return Response.ok(RESPONSE_OK).build();

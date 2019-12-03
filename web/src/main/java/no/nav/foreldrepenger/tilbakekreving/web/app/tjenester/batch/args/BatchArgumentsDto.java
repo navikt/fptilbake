@@ -12,16 +12,16 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Parameter;
 import no.nav.foreldrepenger.tilbakekreving.web.app.util.StringUtils;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.AbacDto;
 
-@JsonAutoDetect(getterVisibility=Visibility.NONE, setterVisibility=Visibility.NONE, fieldVisibility=Visibility.ANY)
+@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
 public class BatchArgumentsDto implements AbacDto {
 
     @JsonProperty("jobParameters")
-    @ApiParam("Kommaseparert liste med argumenter. eks: id=1,fom=2017-03-03")
+    @Parameter(description = "Kommaseparert liste med argumenter. eks: id=1,fom=2017-03-03")
     @Pattern(regexp = "[a-zA-Z0-9, =-]*")
     @Size(max = 1000)
     private String jobParameters = "";

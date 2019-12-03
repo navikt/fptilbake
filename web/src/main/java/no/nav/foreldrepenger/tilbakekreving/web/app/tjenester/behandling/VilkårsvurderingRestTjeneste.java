@@ -16,8 +16,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.vilkårsvurdering.VilkårsvurderingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.DetaljerteFeilutbetalingsperioderDto;
@@ -25,7 +24,6 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.Vil
 import no.nav.vedtak.konfig.KonfigVerdi;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 
-@Api(tags = "vilkarsvurdering")
 @Path(VilkårsvurderingRestTjeneste.PATH_FRAGMENT)
 @Produces(APPLICATION_JSON)
 @Consumes(APPLICATION_JSON)
@@ -48,7 +46,7 @@ public class VilkårsvurderingRestTjeneste {
 
     @GET
     @Path("/perioder")
-    @ApiOperation(value = "Henter perioder som skal vurderes for vilkårsvurdering")
+    @Operation(tags = "vilkårsvurdering", description = "Henter perioder som skal vurderes for vilkårsvurdering")
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     public DetaljerteFeilutbetalingsperioderDto hentDetailjertFeilutbetalingPerioder(@QueryParam("behandlingId") @NotNull @Valid BehandlingIdDto behandlingIdDto) {
         DetaljerteFeilutbetalingsperioderDto perioderDto = new DetaljerteFeilutbetalingsperioderDto();
@@ -59,7 +57,7 @@ public class VilkårsvurderingRestTjeneste {
 
     @GET
     @Path("/vurdert")
-    @ApiOperation(value = "Henter allerede vurdert vilkårsvurdering")
+    @Operation(tags = "vilkårsvurdering", description = "Henter allerede vurdert vilkårsvurdering")
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     public VilkårsvurderteDto hentVurdertPerioder(@QueryParam("behandlingId") @NotNull @Valid BehandlingIdDto behandlingIdDto) {
         VilkårsvurderteDto vilkårsvurderteDto = new VilkårsvurderteDto();

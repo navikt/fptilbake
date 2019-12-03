@@ -14,7 +14,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
-import io.swagger.annotations.Api;
+import io.swagger.v3.oas.annotations.Operation;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FaktaFeilutbetalingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BehandlingFeilutbetalingFakta;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingFeilutbetalingFaktaDto;
@@ -22,7 +22,6 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.Beh
 import no.nav.vedtak.felles.jpa.Transaction;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 
-@Api(tags = "behandlingfakta")
 @Path(BehandlingFaktaRestTjeneste.PATH_FRAGMENT)
 @Produces(APPLICATION_JSON)
 @Consumes(APPLICATION_JSON)
@@ -43,6 +42,10 @@ public class BehandlingFaktaRestTjeneste {
     }
 
     @GET
+    @Operation(
+        tags = "behandlingfakta",
+        description = "Hent fakta om feilutbetaling"
+    )
     @Path("/hent-fakta/feilutbetaling")
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     public BehandlingFeilutbetalingFaktaDto hentFeilutbetalingFakta(@QueryParam(value = "behandlingId") @NotNull @Valid BehandlingIdDto idDto) {

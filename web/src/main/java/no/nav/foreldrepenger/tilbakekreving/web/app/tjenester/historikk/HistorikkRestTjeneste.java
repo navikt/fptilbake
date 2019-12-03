@@ -21,9 +21,8 @@ import javax.ws.rs.core.Response;
 
 import com.codahale.metrics.annotation.Timed;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkInnslagDokumentLinkDto;
 import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkinnslagDto;
@@ -32,7 +31,6 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.Saksnum
 import no.nav.vedtak.felles.jpa.Transaction;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 
-@Api(tags = "historikk")
 @Path("/historikk")
 @ApplicationScoped
 @Transaction
@@ -51,12 +49,12 @@ public class HistorikkRestTjeneste {
     @GET
     @Timed
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    @ApiOperation(value = "Henter alle historikkinnslag for gitt behandling.")
+    @Operation(tags = "historikk", description = "Henter alle historikkinnslag for gitt behandling.")
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response hentAlleInnslag(@Context HttpServletRequest request,
                                     @NotNull @QueryParam("saksnummer")
-                                    @ApiParam("Saksnummer må være et eksisterende saksnummer")
+                                    @Parameter(description = "Saksnummer må være et eksisterende saksnummer")
                                     @Valid SaksnummerDto saksnummerDto) {
         Response.ResponseBuilder responseBuilder = Response.ok();
         // FIXME XSS valider requestURL eller bruk relativ URL
@@ -64,7 +62,7 @@ public class HistorikkRestTjeneste {
         String url = requestURL + "/dokument/hent-dokument";
 
         List<HistorikkinnslagDto> historikkInnslagDtoList = historikkTjeneste.hentAlleHistorikkInnslagForSak(
-                new Saksnummer(saksnummerDto.getVerdi()));
+            new Saksnummer(saksnummerDto.getVerdi()));
         if (!historikkInnslagDtoList.isEmpty()) {
             responseBuilder.entity(historikkInnslagDtoList);
             for (HistorikkinnslagDto dto : historikkInnslagDtoList) {
@@ -88,13 +86,13 @@ public class HistorikkRestTjeneste {
         StringBuilder stringBuilder = new StringBuilder();
 
         stringBuilder.append(request.getScheme())
-                .append("://")
-                .append(request.getLocalName())
-                .append(":") // NOSONAR
-                .append(request.getLocalPort());
+            .append("://")
+            .append(request.getLocalName())
+            .append(":") // NOSONAR
+            .append(request.getLocalPort());
 
         stringBuilder.append(request.getContextPath())
-                .append(request.getServletPath());
+            .append(request.getServletPath());
         return stringBuilder.toString();
     }
 }

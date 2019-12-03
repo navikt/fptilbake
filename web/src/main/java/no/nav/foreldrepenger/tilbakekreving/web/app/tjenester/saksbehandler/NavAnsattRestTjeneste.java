@@ -12,8 +12,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.saksbehandler.dto.InnloggetNavAnsattDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.util.LdapUtil;
 import no.nav.vedtak.felles.integrasjon.ldap.LdapBruker;
@@ -23,7 +22,6 @@ import no.nav.vedtak.konfig.KonfigVerdi;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.context.SubjectHandler;
 
-@Api(tags = {"nav-ansatt"})
 @Path("/nav-ansatt")
 @RequestScoped
 @Transaction
@@ -42,13 +40,13 @@ public class NavAnsattRestTjeneste {
 
     @Inject
     public NavAnsattRestTjeneste(
-            @KonfigVerdi(value = "bruker.gruppenavn.saksbehandler") String gruppenavnSaksbehandler,
-            @KonfigVerdi(value = "bruker.gruppenavn.veileder") String gruppenavnVeileder,
-            @KonfigVerdi(value = "bruker.gruppenavn.beslutter") String gruppenavnBeslutter,
-            @KonfigVerdi(value = "bruker.gruppenavn.overstyrer") String gruppenavnOverstyrer,
-            @KonfigVerdi(value = "bruker.gruppenavn.egenansatt") String gruppenavnEgenAnsatt,
-            @KonfigVerdi(value = "bruker.gruppenavn.kode6") String gruppenavnKode6,
-            @KonfigVerdi(value = "bruker.gruppenavn.kode7") String gruppenavnKode7
+        @KonfigVerdi(value = "bruker.gruppenavn.saksbehandler") String gruppenavnSaksbehandler,
+        @KonfigVerdi(value = "bruker.gruppenavn.veileder") String gruppenavnVeileder,
+        @KonfigVerdi(value = "bruker.gruppenavn.beslutter") String gruppenavnBeslutter,
+        @KonfigVerdi(value = "bruker.gruppenavn.overstyrer") String gruppenavnOverstyrer,
+        @KonfigVerdi(value = "bruker.gruppenavn.egenansatt") String gruppenavnEgenAnsatt,
+        @KonfigVerdi(value = "bruker.gruppenavn.kode6") String gruppenavnKode6,
+        @KonfigVerdi(value = "bruker.gruppenavn.kode7") String gruppenavnKode7
     ) {
         this.gruppenavnSaksbehandler = gruppenavnSaksbehandler;
         this.gruppenavnVeileder = gruppenavnVeileder;
@@ -61,8 +59,9 @@ public class NavAnsattRestTjeneste {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Returnerer fullt navn for ident",
-        notes = ("Ident hentes fra sikkerhetskonteksten som er tilgjengelig etter innlogging."))
+    @Operation(description = "Returnerer fullt navn for ident",
+        summary = "Ident hentes fra sikkerhetskonteksten som er tilgjengelig etter innlogging.",
+        tags = "nav-ansatt")
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK, sporingslogg = false)
     public InnloggetNavAnsattDto innloggetBruker() {
         String ident = SubjectHandler.getSubjectHandler().getUid();

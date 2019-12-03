@@ -20,8 +20,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.FeilutbetalingPerioderDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.PeriodeDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagBeregningTjeneste;
@@ -30,8 +29,6 @@ import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
 import no.nav.vedtak.felles.jpa.Transaction;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
-
-@Api(tags = "foreldelse")
 @Path(ForeldelseRestTjeneste.PATH_FRAGMENT)
 @Produces(APPLICATION_JSON)
 @Consumes(APPLICATION_JSON)
@@ -54,14 +51,14 @@ public class ForeldelseRestTjeneste {
     }
 
     @GET
-    @ApiOperation(value = "Henter perioder som skal vurderes for foreldelse")
+    @Operation(tags = "foreldelse", description = "Henter perioder som skal vurderes for foreldelse")
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     public FeilutbetalingPerioderDto hentLogiskePerioder(@QueryParam("behandlingId") @NotNull @Valid BehandlingIdDto behandlingIdDto) {
         return vurdertForeldelseTjeneste.hentFaktaPerioder(behandlingIdDto.getBehandlingId());
     }
 
     @GET
-    @ApiOperation(value = "Hente allerede vurdert foreldelse perioder")
+    @Operation(tags = "foreldelse", description = "Hente allerede vurdert foreldelse perioder")
     @Path("/vurdert")
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     public FeilutbetalingPerioderDto hentVurdertPerioder(@QueryParam("behandlingId") @NotNull @Valid BehandlingIdDto behandlingIdDto) {
@@ -69,7 +66,7 @@ public class ForeldelseRestTjeneste {
     }
 
     @POST
-    @ApiOperation(value = "Beregn feilutbetalingsbeløp for oppgitte perioder")
+    @Operation(tags = "foreldelse", description = "Beregn feilutbetalingsbeløp for oppgitte perioder")
     @Path("/belop")
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     public FeilutbetalingPerioderDto beregnBeløp(@NotNull @Valid FeilutbetalingPerioderDto perioderDto) {

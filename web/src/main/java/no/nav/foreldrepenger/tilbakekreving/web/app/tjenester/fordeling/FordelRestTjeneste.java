@@ -15,9 +15,8 @@ import javax.ws.rs.core.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
@@ -27,7 +26,6 @@ import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessursResourceAttributt;
 
-@Api(tags = {"fordel"})
 @Path("/fordel")
 @ApplicationScoped
 @Transaction
@@ -55,9 +53,9 @@ public class FordelRestTjeneste {
     @POST
     @Path("/journalpost")
     @Consumes(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Ny journalpost skal behandles.", notes = ("Varsel om en ny journalpost som skal behandles i systemet."))
+    @Operation(tags = "fordel", description = "Ny journalpost skal behandles.", summary = "Varsel om en ny journalpost som skal behandles i systemet.")
     @BeskyttetRessurs(action = BeskyttetRessursActionAttributt.CREATE, ressurs = BeskyttetRessursResourceAttributt.FAGSAK)
-    public void mottaJournalpost(@ApiParam("Krever saksnummer, journalpostId og behandlingstemaOffisiellKode") @Valid AbacJournalpostMottakDto mottattJournalpost) {
+    public void mottaJournalpost(@Parameter(description = "Krever saksnummer, journalpostId og behandlingstemaOffisiellKode") @Valid AbacJournalpostMottakDto mottattJournalpost) {
 
         Optional<String> dokumentTypeId = mottattJournalpost.getDokumentTypeIdOffisiellKode();
         Saksnummer saksnummer = new Saksnummer(mottattJournalpost.getSaksnummer());
