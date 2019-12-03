@@ -2,7 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.web.server.jetty;
 
 public class JettyWebKonfigurasjon implements AppKonfigurasjon {
     private static final String CONTEXT_PATH = "/fptilbake";
-    private static final String SWAGGER_HASH = "sha256-yj14k3nMIh1W9c56bQ9eeO39DJ/72T4HjL0m4OvcIyY=";
+    private static final String SWAGGER_HASH = "sha256-kSkKHlHlbab41DaOOVlOH4oE242hsr4p7uyT0xbufxs=";
 
     private Integer serverPort;
 

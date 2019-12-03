@@ -68,6 +68,7 @@ public class BatchRestTjeneste {
     @GET
     @Path("/init")
     @BeskyttetRessurs(action = READ, ressurs = DRIFT, sporingslogg = false)
+    @Operation(tags = "batch", description = "denne gjør ingenting - brukes for å logge inn bruker som kjører batch")
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response init() {
         return Response.ok().build();
