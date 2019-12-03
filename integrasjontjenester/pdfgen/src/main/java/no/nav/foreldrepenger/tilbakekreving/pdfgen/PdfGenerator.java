@@ -10,18 +10,6 @@ import com.openhtmltopdf.svgsupport.BatikSVGDrawer;
 
 public class PdfGenerator {
 
-    public static void main(String[] args) throws Exception {
-        PdfGenerator tjeneste = new PdfGenerator();
-
-        String html = FileStructureUtil.readResourceAsString("test/in.html");
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        tjeneste.genererPDF(html, baos);
-
-        try (FileOutputStream os = new FileOutputStream("ouput.pdf")) {
-            baos.writeTo(os);
-        }
-    }
-
     private String appendHtmlMetadata(String html, DocFormat format) {
         StringBuilder builder = new StringBuilder();
         builder.append("<html>");
@@ -37,8 +25,7 @@ public class PdfGenerator {
         builder.append("</div>");
         builder.append("</body>");
         builder.append("</html>");
-        String s = builder.toString();
-        return s;
+        return builder.toString();
     }
 
     public byte[] genererPDF(String html) {
