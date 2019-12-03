@@ -1,14 +1,20 @@
 package no.nav.foreldrepenger.tilbakekreving.pdfgen;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
+import com.openhtmltopdf.extend.FSSupplier;
 import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 import com.openhtmltopdf.svgsupport.BatikSVGDrawer;
 
 public class PdfGenerator {
+
+    private static final Map<String, byte[]> FONT_CACHE = new HashMap<>();
 
     private String appendHtmlMetadata(String html, DocFormat format) {
         StringBuilder builder = new StringBuilder();
@@ -39,9 +45,9 @@ public class PdfGenerator {
         PdfRendererBuilder builder = new PdfRendererBuilder();
         try {
             builder
-                .useFont(FileStructureUtil.getFont("SourceSansPro-Regular.ttf"), "Source Sans Pro", 400, BaseRendererBuilder.FontStyle.NORMAL, true)
-                .useFont(FileStructureUtil.getFont("SourceSansPro-Bold.ttf"), "Source Sans Pro", 700, BaseRendererBuilder.FontStyle.OBLIQUE, true)
-                .useFont(FileStructureUtil.getFont("SourceSansPro-It.ttf"), "Source Sans Pro", 400, BaseRendererBuilder.FontStyle.ITALIC, true)
+                .useFont(fontSupplier("SourceSansPro-Regular.ttf"), "Source Sans Pro", 400, BaseRendererBuilder.FontStyle.NORMAL, true)
+                .useFont(fontSupplier("SourceSansPro-Bold.ttf"), "Source Sans Pro", 700, BaseRendererBuilder.FontStyle.OBLIQUE, true)
+                .useFont(fontSupplier("SourceSansPro-It.ttf"), "Source Sans Pro", 400, BaseRendererBuilder.FontStyle.ITALIC, true)
                 .useColorProfile(FileStructureUtil.getColorProfile())
                 .useSVGDrawer(new BatikSVGDrawer())
                 .usePdfAConformance(PdfRendererBuilder.PdfAConformance.PDFA_2_U)
@@ -53,6 +59,16 @@ public class PdfGenerator {
         } catch (IOException e) {
             throw new RuntimeException("Feil ved generering av pdf", e);
         }
+    }
+
+    private FSSupplier<InputStream> fontSupplier(String fontName) {
+        if (FONT_CACHE.containsKey(fontName)) {
+            byte[] bytes = FONT_CACHE.get(fontName);
+            return () -> new ByteArrayInputStream(bytes);
+        }
+        byte[] bytes = FileStructureUtil.readResource("fonts/" + fontName);
+        FONT_CACHE.put(fontName, bytes);
+        return () -> new ByteArrayInputStream(bytes);
     }
 
     private String hentCss(DocFormat format) {

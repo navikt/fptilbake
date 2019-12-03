@@ -15,15 +15,6 @@ public class FileStructureUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(FileStructureUtil.class);
 
-    public static File getFont(String fontName) {
-        String location = "fonts/" + fontName;
-        ClassLoader cl = FileStructureUtil.class.getClassLoader();
-        String filnavn = cl.getResource(location).toExternalForm();
-        File fil = new File(filnavn);
-        logger.info("Fil for font {} på path {} finnes? {}, størrelse {}", fontName, filnavn, fil.exists(), fil.length());
-        return fil;
-    }
-
     public static byte[] getColorProfile() {
         String location = "colorprofile/sRGB2014.icc";
         return readResource(location);
