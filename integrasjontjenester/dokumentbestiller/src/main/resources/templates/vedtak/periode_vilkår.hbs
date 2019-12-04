@@ -35,14 +35,14 @@ Fordi vi oppdaget feilutbetalingen [dato], og har behandlet saken din innen ett 
         {{#if vurderinger.unntas-innkreving-pga-lavt-beløp}}
         {{> ikke-krev-småbeløp}}
         {{else}}
-Du har fått vite om du har rett til {{> ytelse-navn}} og hvor mye du har rett til. Selv om du har meldt fra til oss, kan vi kreve tilbake det du har fått for mye dersom du burde forstått at beløpet var feil.
+Du har fått vite om du har rett til {{> ytelse-navn}} og hvor mye du har rett til. Selv hvis du har meldt fra til oss, kan vi kreve tilbake det du har fått for mye dersom du burde forstått at beløpet var feil.
 {{> fritekst}}
 
 Ut fra informasjonen du har fått, burde du etter vår vurdering forstått at du fikk for mye utbetalt. Derfor kan vi kreve tilbake.
         {{/if}}
     {{/if}}
     {{#if (eq vurderinger.aktsomhet-resultat "GROVT_UAKTSOM")}}
-Du har fått vite om du har rett til {{> ytelse-navn}} og hvor mye du har rett til. Selv om du har meldt fra til oss, kan vi kreve tilbake det du har fått for mye dersom du må ha forstått at beløpet var feil.
+Du har fått vite om du har rett til {{> ytelse-navn}} og hvor mye du har rett til. Selv hvis du har meldt fra til oss, kan vi kreve tilbake det du har fått for mye dersom du må ha forstått at beløpet var feil.
 {{> fritekst}}
 
 Ut fra informasjonen du har fått, må du etter vår vurdering ha forstått at du fikk for mye utbetalt. Derfor kan vi kreve tilbake.
