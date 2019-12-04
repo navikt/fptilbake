@@ -26,6 +26,7 @@ import no.nav.vedtak.exception.IntegrasjonException;
 
 public class DokumentProduksjonConsumerTest {
 
+    public static final String SOAP_FEILKODE = "FP-942048";
     private DokumentproduksjonConsumer consumer;
 
     @Rule
@@ -43,7 +44,7 @@ public class DokumentProduksjonConsumerTest {
         when(mockWebservice.produserIkkeredigerbartDokument(any(ProduserIkkeredigerbartDokumentRequest.class))).thenThrow(opprettSOAPFaultException("feil"));
 
         expectedException.expect(IntegrasjonException.class);
-        expectedException.expectMessage("FP-942048");
+        expectedException.expectMessage(SOAP_FEILKODE);
 
         consumer.produserIkkeredigerbartDokument(mock(ProduserIkkeredigerbartDokumentRequest.class));
     }
@@ -53,7 +54,7 @@ public class DokumentProduksjonConsumerTest {
         when(mockWebservice.produserDokumentutkast(any(ProduserDokumentutkastRequest.class))).thenThrow(opprettSOAPFaultException("feil"));
 
         expectedException.expect(IntegrasjonException.class);
-        expectedException.expectMessage("FP-942048");
+        expectedException.expectMessage(SOAP_FEILKODE);
 
         consumer.produserDokumentutkast(mock(ProduserDokumentutkastRequest.class));
     }
@@ -63,7 +64,7 @@ public class DokumentProduksjonConsumerTest {
         doThrow(opprettSOAPFaultException("feil")).when(mockWebservice).ferdigstillForsendelse(any(FerdigstillForsendelseRequest.class));
 
         expectedException.expect(IntegrasjonException.class);
-        expectedException.expectMessage("FP-942048");
+        expectedException.expectMessage(SOAP_FEILKODE);
 
         consumer.ferdigstillForsendelse(mock(FerdigstillForsendelseRequest.class));
     }
@@ -73,7 +74,7 @@ public class DokumentProduksjonConsumerTest {
         doThrow(opprettSOAPFaultException("feil")).when(mockWebservice).knyttVedleggTilForsendelse(any(KnyttVedleggTilForsendelseRequest.class));
 
         expectedException.expect(IntegrasjonException.class);
-        expectedException.expectMessage("FP-942048");
+        expectedException.expectMessage(SOAP_FEILKODE);
 
         consumer.knyttVedleggTilForsendelse(mock(KnyttVedleggTilForsendelseRequest.class));
     }
