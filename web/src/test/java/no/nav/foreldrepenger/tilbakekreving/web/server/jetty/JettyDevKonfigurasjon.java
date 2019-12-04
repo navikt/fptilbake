@@ -5,7 +5,7 @@ public class JettyDevKonfigurasjon extends JettyWebKonfigurasjon {
     private static int DEFAULT_DEV_SERVER_PORT = 8030;
 
     JettyDevKonfigurasjon(){
-        super(8030);
+        super(DEFAULT_DEV_SERVER_PORT);
     }
 
     @Override
