@@ -15,10 +15,9 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTask;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
@@ -28,7 +27,6 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 
-@Api(tags = "FORVALTNING-behandling")
 @Path("/forvaltningBehandling")
 @ApplicationScoped
 @Transaction
@@ -52,12 +50,14 @@ public class ForvaltningBehandlingRestTjeneste {
     @Path("/tving-henleggelse")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Tjeneste for å tvinge en behandling til å bli henlagt, selvom normale regler for saksbehandling ikke tillater henleggelse")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Henlagt behandling", response = String.class),
-        @ApiResponse(code = 400, message = "Ukjent behandlingId"),
-        @ApiResponse(code = 500, message = "Feilet pga ukjent feil.")
-    })
+    @Operation(
+        tags = "FORVALTNING-behandling",
+        description = "Tjeneste for å tvinge en behandling til å bli henlagt, selvom normale regler for saksbehandling ikke tillater henleggelse",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Henlagt behandling", content = @Content(mediaType = "text")),
+            @ApiResponse(responseCode = "400", description = "Behandlingen er avsluttet"),
+            @ApiResponse(responseCode = "500", description = "Feilet pga ukjent feil.")
+        })
     @BeskyttetRessurs(action = CREATE, ressurs = DRIFT)
     public Response tvingHenleggelseBehandling(@NotNull @QueryParam("behandlingId") @Valid BehandlingIdDto behandlingIdDto) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingIdDto.getBehandlingId());
@@ -72,12 +72,14 @@ public class ForvaltningBehandlingRestTjeneste {
     @Path("/tving-gjenoppta")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Tjeneste for å tvinge en behandling til å gjenopptas (tas av vent). NB! Må ikke brukes på saker uten kravgrunnlag!")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Gjenopptatt behandling", response = String.class),
-        @ApiResponse(code = 400, message = "Ukjent behandlingId"),
-        @ApiResponse(code = 500, message = "Feilet pga ukjent feil.")
-    })
+    @Operation(
+        tags = "FORVALTNING-behandling",
+        description = "Tjeneste for å tvinge en behandling til å gjenopptas (tas av vent). NB! Må ikke brukes på saker uten kravgrunnlag!",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Gjenopptatt behandling", content = @Content(mediaType = "text")),
+            @ApiResponse(responseCode = "400", description = "Behandlingen er avsluttet eller behandlingen er ikke på vent"),
+            @ApiResponse(responseCode = "500", description = "Feilet pga ukjent feil.")
+        })
     @BeskyttetRessurs(action = CREATE, ressurs = DRIFT)
     public Response tvingGjenopptaBehandling(@NotNull @QueryParam("behandlingId") @Valid BehandlingIdDto behandlingIdDto) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingIdDto.getBehandlingId());
@@ -89,15 +91,15 @@ public class ForvaltningBehandlingRestTjeneste {
         return Response.ok().build();
     }
 
-    private void opprettGjenopptaBehandlingTask(Behandling behandling){
+    private void opprettGjenopptaBehandlingTask(Behandling behandling) {
         ProsessTaskData prosessTaskData = new ProsessTaskData(GjenopptaBehandlingTask.TASKTYPE);
-        prosessTaskData.setBehandling(behandling.getFagsakId(),behandling.getId(),behandling.getAktørId().getId());
+        prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         prosessTaskRepository.lagre(prosessTaskData);
     }
 
-    private void opprettHenleggBehandlingTask(Behandling behandling){
+    private void opprettHenleggBehandlingTask(Behandling behandling) {
         ProsessTaskData prosessTaskData = new ProsessTaskData(TvingHenlegglBehandlingTask.TASKTYPE);
-        prosessTaskData.setBehandling(behandling.getFagsakId(),behandling.getId(),behandling.getAktørId().getId());
+        prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         prosessTaskRepository.lagre(prosessTaskData);
     }
 
