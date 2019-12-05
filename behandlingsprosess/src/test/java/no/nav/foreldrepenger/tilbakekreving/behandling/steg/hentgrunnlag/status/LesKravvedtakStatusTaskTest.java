@@ -26,6 +26,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatusRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
+import no.nav.vedtak.exception.TekniskException;
 
 public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
 
@@ -200,6 +201,27 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
 
         assertThat(kravVedtakStatusRepository.finnKravstatus(behandling.getId())).isEqualTo(Optional.of(KravStatusKode.ENDRET));
         assertThat(grunnlagRepository.erKravgrunnlagSperret(behandling.getId())).isFalse();
+    }
+
+    @Test
+    public void skal_ikke_utføre_leskravvedtakststatustask_for_mottatt_endr_melding_når_grunnlag_ikke_finnes(){
+        expectedException.expect(TekniskException.class);
+        expectedException.expectMessage("FPT-107929");
+
+        mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_ENDR_samme_referanse.xml"));
+        lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LesKravvedtakStatusTask.TASKTYPE));
+    }
+
+    @Test
+    public void skal_ikke_utføre_leskravvedtakststatustask_for_mottatt_endr_melding_når_grunnlag_ikke_sperret(){
+        expectedException.expect(TekniskException.class);
+        expectedException.expectMessage("FPT-107929");
+
+        mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_FEIL_samme_referanse.xml"));
+        lesKravgrunnlagTask.doTask(lagProsessTaskData(mottattXmlId, LesKravgrunnlagTask.TASKTYPE));
+
+        mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_ENDR_samme_referanse.xml"));
+        lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LesKravvedtakStatusTask.TASKTYPE));
     }
 
     private void assertTilkobling() {

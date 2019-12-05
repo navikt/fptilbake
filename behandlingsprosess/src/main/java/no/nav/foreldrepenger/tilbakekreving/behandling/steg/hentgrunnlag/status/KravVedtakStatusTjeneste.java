@@ -81,11 +81,15 @@ public class KravVedtakStatusTjeneste {
     }
 
     private void håndteresEndretStatusMelding(Long behandlingId, String statusKode) {
-        if (grunnlagRepository.harGrunnlagForBehandlingId(behandlingId) && !grunnlagRepository.erKravgrunnlagSperret(behandlingId)) {
+        if (grunnlagRepository.harGrunnlagForBehandlingId(behandlingId)) {
+            if (!grunnlagRepository.erKravgrunnlagSperret(behandlingId)) {
+                throw KravVedtakStatusTjenesteFeil.FACTORY.kanIkkeFinnesSperretGrunnlagForBehandling(statusKode, behandlingId).toException();
+            }
+            taBehandlingAvVent(behandlingId);
+            grunnlagRepository.opphevGrunnlag(behandlingId);
+        } else {
             throw KravVedtakStatusTjenesteFeil.FACTORY.kanIkkeFinnesSperretGrunnlagForBehandling(statusKode, behandlingId).toException();
         }
-        taBehandlingAvVent(behandlingId);
-        grunnlagRepository.opphevGrunnlag(behandlingId);
     }
 
     public interface KravVedtakStatusTjenesteFeil extends DeklarerteFeil {
