@@ -13,13 +13,11 @@ import javax.ws.rs.Produces;
 
 import com.codahale.metrics.annotation.Timed;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import no.nav.vedtak.felles.jpa.Transaction;
 import no.nav.vedtak.konfig.KonfigVerdi;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 
-@Api(tags = "konfig")
 @Path("/konfig")
 @RequestScoped
 @Transaction
@@ -42,7 +40,7 @@ public class KonfigRestTjeneste {
     @Timed
     @Path("/rettskilde")
     @Produces("application/json")
-    @ApiOperation(value = "Henter lenke til rettskilde.")
+    @Operation(tags = "konfigurasjon", description = "Henter lenke til rettskilde.")
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK, sporingslogg = false)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Konfig hentRettskildeUrl() {
@@ -53,7 +51,7 @@ public class KonfigRestTjeneste {
     @Timed
     @Path("/systemrutine")
     @Produces("application/json")
-    @ApiOperation(value = "Henter lenge til systemrutine")
+    @Operation(tags = "konfigurasjon", description = "Henter lenge til systemrutine")
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK, sporingslogg = false)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Konfig hentSystemrutine() {

@@ -14,14 +14,12 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BeregningResultat;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 
-@Api(tags = "tilbakekrevingsberegning")
 @Path(TilbakekrevingResulattRestTjeneste.PATH_FRAGMENT)
 @Produces(APPLICATION_JSON)
 @Consumes(APPLICATION_JSON)
@@ -42,7 +40,7 @@ public class TilbakekrevingResulattRestTjeneste {
 
     @GET
     @Path("/resultat")
-    @ApiOperation(value = "Henter beregningsresultat for tilbakekreving")
+    @Operation(tags = "beregning", description = "Henter beregningsresultat for tilbakekreving")
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     public BeregningResultat hentBeregningResultat(@QueryParam("behandlingId") @NotNull @Valid BehandlingIdDto behandlingIdDto) {
         return tilbakekrevingBeregningTjeneste.beregn(behandlingIdDto.getBehandlingId());

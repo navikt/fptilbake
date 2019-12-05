@@ -17,15 +17,13 @@ import javax.ws.rs.core.MediaType;
 
 import com.codahale.metrics.annotation.Timed;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.kodeverk.app.HentKodeverkTjeneste;
 import no.nav.vedtak.felles.jpa.Transaction;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.util.LRUCache;
 
-@Api(tags = {"kodeverk"})
 @Path("/kodeverk")
 @RequestScoped
 @Transaction
@@ -48,7 +46,7 @@ public class KodeverkRestTjeneste {
     @GET
     @Timed
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Henter kodeliste", notes = ("Returnerer gruppert kodeliste."))
+    @Operation(tags = "kodeverk", description = "Henter kodeliste", summary = "Returnerer gruppert kodeliste.")
     @BeskyttetRessurs(action = READ, ressurs = APPLIKASJON, sporingslogg = false)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Map<String, Object> hentGruppertKodeliste() {

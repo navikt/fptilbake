@@ -32,7 +32,7 @@
             <artifactId>behandling</artifactId>
         </dependency>
         <dependency>
-            <groupId>no.nav.foreldrepenger.felles.integrasjon</groupId>
+            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
             <artifactId>dokumentproduksjon-klient</artifactId>
             <exclusions>
                 <exclusion>

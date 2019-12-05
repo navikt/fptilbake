@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Parameter;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.AbacDto;
 import no.nav.vedtak.util.InputValideringRegex;
@@ -15,7 +15,7 @@ import no.nav.vedtak.util.InputValideringRegex;
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
 public class BatchNameDto implements AbacDto {
 
-    @ApiParam(value = "Name of batch to run", allowEmptyValue = false, required = true)
+    @Parameter(description = "Name of batch to run", allowEmptyValue = false, required = true)
     @JsonProperty("batchName")
     @Size(min = 1, max = 100)
     @Pattern(regexp = InputValideringRegex.KODEVERK)

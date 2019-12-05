@@ -30,7 +30,7 @@
 
         <!-- Felles avhengigheter i prosjektet Disse skal ALLTID være en
             RELEASE-avhengighet UNNTAK: feature-brancher og lokalt -->
-        <felles.version>1.1.0_20190523160217_423c87f</felles.version>
+        <felles.version>1.3.1-20191203075537-010d20b</felles.version>
         <vl-fpsak-tidsserie.version>2.0_20180831125757_006dad2</vl-fpsak-tidsserie.version>
         <!-- Kontrakter -->
         <fpkontrakter.version>5.0_20191031073150_c3b9f11</fpkontrakter.version>
@@ -38,22 +38,15 @@
         <!-- NAV -->
 
         <!-- Eksterne -->
-        <assertj.version>3.7.0</assertj.version>
 
-        <cxf.version>3.3.1</cxf.version>
-        <woodstox.version>5.1.0</woodstox.version>
         <surefire.version>2.21.0</surefire.version>
-        <asm.version>7.1</asm.version>
         <metrics.version>3.2.5</metrics.version>
-
+        <ow2.asm.version>7.2</ow2.asm.version>
         <geronimo.jaspi.version>2.0.0</geronimo.jaspi.version>
         <geronimo.osgi.version>1.1</geronimo.osgi.version>
         <hamcrest.version>1.3</hamcrest.version>
-        <jandex.version>2.0.5.Final</jandex.version>
         <junit.version>5.2.0</junit.version>
         <logstash.version>4.10</logstash.version>
-        <mockito.version>2.12.0</mockito.version>
-        <swagger.version>1.5.17</swagger.version>
 
         <!-- Transitive avh. versjoner for å sikre unikhet (enforcer dependencyConvergence).
             Skal ikke benyttes direkte av vår egen kode. -->
@@ -61,28 +54,19 @@
         <joda-time.version>2.9.9</joda-time.version>
         <javaslang.version>2.0.6</javaslang.version>
         <plexus.version>3.0.8</plexus.version>
-
-        <!-- Transitive avh. versjoner for å sikre unikhet (enforcer dependencyConvergence). Skal ikke benyttes direkte av vår egen kode. -->
         <jasypt.version>1.9.2</jasypt.version>
-        <javaslang.version>2.0.6</javaslang.version>
 
         <joda-time.version>2.9.9</joda-time.version>
-        <ow2.asm.version>7.1</ow2.asm.version>
         <swagger.spec-parser.version>1.0.28</swagger.spec-parser.version>
 
         <owaspencoder.version>1.2.1</owaspencoder.version>
-        <sysdoc.version>2.0.0</sysdoc.version>
 
-        <!-- Dupliserte properties fra vl-felles. Pass på å oppdatere begge steder. Disse trengs for definisjon av videre plugins -->
-        <!-- <flyway.version>5.1.4</flyway.version> FIXME: støtter ikke oracle 11, se på hva som skal til for å kjøre på 12 -->
-        <flyway.version>4.2.0</flyway.version>
-        <ojdbc.version>12.2.0.1</ojdbc.version>
+        <ojdbc.version>19.3.0.0</ojdbc.version>
         <abac-attribute-constants.version>3.3.13</abac-attribute-constants.version>
-
-        <jetty.version>9.4.17.v20190418</jetty.version>
 
     </properties>
     <dependencies>
+
         <!-- Avhengigeter som fjernes fra JDK11 som er del av JavaSE. Legger til her framfor med add-modules. -->
         <dependency>
             <groupId>javax.xml.bind</groupId>
@@ -107,44 +91,35 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-core</artifactId>
-
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-simple</artifactId>
-
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-ws-security</artifactId>
-
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-ws-policy</artifactId>
-
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
-
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
-
         </dependency>
-
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-
             <scope>test</scope>
         </dependency>
 
@@ -292,6 +267,11 @@
                 <artifactId>journalpost</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+                <artifactId>dokumentproduksjon-klient</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- Felles biblioteker og sikkerhet -->
             <dependency>
@@ -318,11 +298,13 @@
                 <artifactId>felles-util</artifactId>
                 <version>${felles.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>no.nav.fpsak.tidsserie</groupId>
                 <artifactId>fpsak-tidsserie</artifactId>
                 <version>${vl-fpsak-tidsserie.version}</version>
             </dependency>
+
 
             <!-- felles kontrakter -->
             <dependency>
@@ -375,12 +357,31 @@
                 <version>1.0.4</version>
                 <classifier>jaxws</classifier>
             </dependency>
+            <dependency>
+                <groupId>no.nav.tjenester.fim</groupId>
+                <artifactId>nav-fim-dokumentproduksjon-v2-tjenestespesifikasjon</artifactId>
+                <version>2.1.8</version>
+                <classifier>jaxws</classifier>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.tjenester</groupId>
+                <artifactId>nav-dokumentproduksjon-v3-tjenestespesifikasjon</artifactId>
+                <version>3.3.3</version>
+                <classifier>jaxws</classifier>
+            </dependency>
             <!-- Eksterne -->
             <dependency>
-                <groupId>org.flywaydb</groupId>
-                <artifactId>flyway-core</artifactId>
-                <version>${flyway.version}</version>
+                <groupId>com.oracle.ojdbc</groupId>
+                <artifactId>ojdbc8</artifactId>
+                <version>${ojdbc.version}</version>
             </dependency>
+            <!-- bean validation -->
+            <dependency>
+                <groupId>org.glassfish</groupId>
+                <artifactId>javax.el</artifactId>
+                <version>3.0.1-b11</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.jboss.classfilewriter</groupId>
                 <artifactId>jboss-classfilewriter</artifactId>
@@ -410,11 +411,6 @@
                 <groupId>org.jasypt</groupId>
                 <artifactId>jasypt</artifactId>
                 <version>${jasypt.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.swagger</groupId>
-                <artifactId>swagger-compat-spec-parser</artifactId>
-                <version>${swagger.spec-parser.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.javaslang</groupId>
@@ -448,69 +444,6 @@
                 <artifactId>plexus-utils</artifactId>
                 <version>${plexus.version}</version>
             </dependency>
-
-            <!-- CXF avhengigheter. Gjentas her da de ikke er del av vl-felles / vl-felles-integrasjon ennå -->
-            <dependency>
-                <groupId>com.fasterxml.woodstox</groupId>
-                <artifactId>woodstox-core</artifactId>
-                <version>${woodstox.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-core</artifactId>
-                <version>${cxf.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-rt-frontend-simple</artifactId>
-                <version>${cxf.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-rt-ws-security</artifactId>
-                <version>${cxf.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.fasterxml.woodstox</groupId>
-                        <artifactId>woodstox-core</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-rt-ws-policy</artifactId>
-                <version>${cxf.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-rt-frontend-jaxws</artifactId>
-                <version>${cxf.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-rt-transports-http</artifactId>
-                <version>${cxf.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.assertj</groupId>
-                <artifactId>assertj-core</artifactId>
-                <version>${assertj.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss</groupId>
-                <artifactId>jandex</artifactId>
-                <version>${jandex.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.swagger</groupId>
-                <artifactId>swagger-jaxrs</artifactId>
-                <version>${swagger.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.swagger</groupId>
-                <artifactId>swagger-core</artifactId>
-                <version>${swagger.version}</version>
-            </dependency>
             <dependency>
                 <groupId>com.papertrailapp</groupId>
                 <artifactId>logback-syslog4j</artifactId>
@@ -523,33 +456,11 @@
                 <version>4.1</version>
             </dependency>
 
-            <!-- Generelle clashes -->
-            <dependency>
-                <!-- clasher med javax.annotations-api -->
-                <groupId>org.jboss.spec.javax.annotation</groupId>
-                <artifactId>jboss-annotations-api_1.2_spec</artifactId>
-                <version>1.0.1.Final</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <!-- clasher med javax.interceptor-api -->
-                <groupId>org.jboss.spec.javax.interceptor</groupId>
-                <artifactId>jboss-interceptors-api_1.2_spec</artifactId>
-                <version>1.0.0.Final</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.spec.javax.ws.rs</groupId>
-                <artifactId>jboss-jaxrs-api_2.0_spec</artifactId>
-                <version>1.0.1.Beta1</version>
-                <scope>provided</scope>
-            </dependency>
-
             <!-- Sikkerhet -->
             <dependency>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-rt-transports-http-jetty</artifactId>
-                <version>${cxf.version}</version>
+                <version>3.3.4</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.ws.xmlschema</groupId>
@@ -570,63 +481,6 @@
                 <version>${geronimo.osgi.version}</version>
             </dependency>
 
-            <!-- Jetty -->
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-server</artifactId>
-                <version>${jetty.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-annotations</artifactId>
-                <version>${jetty.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-jaas</artifactId>
-                <version>${jetty.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-jaspi</artifactId>
-                <version>${jetty.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-plus</artifactId>
-                <version>${jetty.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-security</artifactId>
-                <version>${jetty.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-servlets</artifactId>
-                <version>${jetty.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-io</artifactId>
-                <version>${jetty.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-util</artifactId>
-                <version>${jetty.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-http</artifactId>
-                <version>${jetty.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-continuation</artifactId>
-                <version>${jetty.version}</version>
-            </dependency>
             <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
@@ -677,12 +531,6 @@
             </dependency>
 
             <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-core</artifactId>
-                <version>${mockito.version}</version>
-            </dependency>
-
-            <dependency>
                 <groupId>net.logstash.logback</groupId>
                 <artifactId>logstash-logback-encoder</artifactId>
                 <version>${logstash.version}</version>
@@ -698,48 +546,22 @@
                 <version>${joda-time.version}</version>
             </dependency>
             <dependency>
-                <!-- Transitive avhengighet resolution for å sikre bestemt
-                    versjon -->
+                <!-- Transitive avhengighet resolution for å sikre bestemt versjon -->
                 <groupId>org.ow2.asm</groupId>
                 <artifactId>asm</artifactId>
                 <version>${ow2.asm.version}</version>
             </dependency>
             <dependency>
+                <!-- Transitive avhengighet resolution for å sikre bestemt versjon -->
                 <groupId>org.ow2.asm</groupId>
                 <artifactId>asm-analysis</artifactId>
                 <version>${ow2.asm.version}</version>
             </dependency>
             <dependency>
+                <!-- Transitive avhengighet resolution for å sikre bestemt versjon -->
                 <groupId>org.ow2.asm</groupId>
                 <artifactId>asm-tree</artifactId>
                 <version>${ow2.asm.version}</version>
-            </dependency>
-
-            <!-- Systemdokumentasjon -->
-            <dependency>
-                <groupId>io.github.swagger2markup</groupId>
-                <artifactId>markup-document-builder</artifactId>
-                <version>1.1.2</version>
-            </dependency>
-            <!-- TODO (Frode M): vil vi ha dette? -->
-            <dependency>
-                <groupId>no.nav.vedtak.sysdoc</groupId>
-                <artifactId>sysdoclet</artifactId>
-                <version>${sysdoc.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>commons-logging</groupId>
-                        <artifactId>commons-logging</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.google.code.findbugs</groupId>
-                        <artifactId>jsr305</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.github.fge</groupId>
-                        <artifactId>json-patch</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
 
             <!--Java10-->
@@ -778,41 +600,21 @@
                 <artifactId>javax.xml.soap-api</artifactId>
                 <version>1.4.0</version>
             </dependency>
-            <dependency>
-                <groupId>no.nav.foreldrepenger.felles</groupId>
-                <artifactId>felles-sikkerhet</artifactId>
-                <version>${felles.version}</version>
-                <scope>compile</scope>
-                <exclusions>
-                    <exclusion>
-                        <groupId>javax.json</groupId>
-                        <artifactId>javax.json-api</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.foreldrepenger.felles</groupId>
-                <artifactId>felles-testutilities</artifactId>
-                <version>${felles.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.fasterxml.woodstox</groupId>
-                        <artifactId>woodstox-core</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.codehaus.woodstox</groupId>
-                        <artifactId>woodstox-core-asl</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>no.nav.foreldrepenger.felles</groupId>
-                        <artifactId>felles-sikkerhet-testutilities</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
+
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
                 <version>1.2.3</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.validator</groupId>
+                <artifactId>hibernate-validator-cdi</artifactId>
+                <version>6.0.16.Final</version>
+            </dependency>
+            <dependency>
+                <groupId>org.webjars</groupId>
+                <artifactId>swagger-ui</artifactId>
+                <version>3.24.3</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -973,7 +775,7 @@
             <plugin>
                 <groupId>org.jboss.jandex</groupId>
                 <artifactId>jandex-maven-plugin</artifactId>
-                <version>1.0.5</version>
+                <version>1.0.6</version>
                 <executions>
                     <execution>
                         <id>make-index</id>

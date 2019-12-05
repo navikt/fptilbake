@@ -34,7 +34,7 @@
             <artifactId>flyway-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.oracle</groupId>
+            <groupId>com.oracle.ojdbc</groupId>
             <artifactId>ojdbc8</artifactId>
             <scope>compile</scope>
         </dependency>
@@ -70,6 +70,7 @@
             <groupId>no.nav.foreldrepenger.felles.sikkerhet</groupId>
             <artifactId>felles-sikkerhet</artifactId>
         </dependency>
+
         <dependency>
             <groupId>no.nav.foreldrepenger.felles</groupId>
             <artifactId>felles-util</artifactId>
@@ -224,6 +225,34 @@
             <artifactId>encoder</artifactId>
         </dependency>
 
+        <!-- bean validation -->
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.el</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator-cdi</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>swagger-ui</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-jaxrs2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss</groupId>
+            <artifactId>jandex</artifactId>
+        </dependency>
+
         <!-- Må gjenta her for å få riktig scope (kolliderer ellers med dependencyManagement -->
         <dependency>
             <groupId>junit</groupId>
@@ -258,38 +287,6 @@
             <artifactId>fordel-v1</artifactId>
         </dependency>
     </dependencies>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.apache.geronimo.components</groupId>
-                <artifactId>geronimo-jaspi</artifactId>
-                <version>2.0.0</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.geronimo.specs</groupId>
-                <artifactId>geronimo-osgi-locator</artifactId>
-                <version>1.1</version>
-            </dependency>
-            <dependency>
-                <!-- bør ha samme versjon som CXF ellers -->
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-rt-transports-http-jetty</artifactId>
-                <version>3.2.5</version>
-            </dependency>
-            <dependency>
-                <groupId>ch.qos.logback</groupId>
-                <artifactId>logback-classic</artifactId>
-                <version>1.2.3</version>
-            </dependency>
-
-            <dependency>
-                <groupId>no.nav.foreldrepenger.felles.sikkerhet</groupId>
-                <artifactId>felles-sikkerhet-testutilities</artifactId>
-                <scope>test</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <build>
         <!-- setter til app da det er default for jar som kjører i nais baseimaget -->

@@ -23,10 +23,9 @@ import org.slf4j.LoggerFactory;
 
 import com.codahale.metrics.annotation.Timed;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import no.nav.foreldrepenger.batch.BatchArguments;
 import no.nav.foreldrepenger.batch.BatchSupportTjeneste;
 import no.nav.foreldrepenger.batch.BatchTjeneste;
@@ -36,7 +35,6 @@ import no.nav.vedtak.felles.jpa.Transaction;
 import no.nav.vedtak.log.util.LoggerUtils;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 
-@Api(tags = "batch")
 @Path("/batch")
 @ApplicationScoped
 @Transaction
@@ -70,6 +68,7 @@ public class BatchRestTjeneste {
     @GET
     @Path("/init")
     @BeskyttetRessurs(action = READ, ressurs = DRIFT, sporingslogg = false)
+    @Operation(tags = "batch", description = "denne gjør ingenting - brukes for å logge inn bruker som kjører batch")
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response init() {
         return Response.ok().build();
@@ -80,11 +79,10 @@ public class BatchRestTjeneste {
     @Path("/launch")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)
-    @ApiOperation(value = "Start batchjob")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Starter batch og returnerer executionId", response = String.class),
-        @ApiResponse(code = 400, message = "Ukjent batch forespurt."),
-        @ApiResponse(code = 500, message = "Feilet pga ukjent feil.")
+    @Operation(tags = "batch", description = "Start batchjob", responses = {
+        @ApiResponse(responseCode = "200", description = "Starter batch og returnerer executionId", content = @Content(mediaType = "text")),
+        @ApiResponse(responseCode = "400", description = "Ukjent batch forespurt."),
+        @ApiResponse(responseCode = "500", description = "Feilet pga ukjent feil.")
     })
     @BeskyttetRessurs(action = CREATE, ressurs = BATCH)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
@@ -108,11 +106,10 @@ public class BatchRestTjeneste {
     @Timed
     @Path("/poll")
     @Produces(MediaType.TEXT_PLAIN)
-    @ApiOperation(value = "Poll status of batchjob")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Henter ut exitkode for executionId", response = String.class),
-        @ApiResponse(code = 400, message = "Ukjent batch forespurt."),
-        @ApiResponse(code = 500, message = "Feilet pga ukjent feil.")
+    @Operation(tags = "batch", description = "Poll status of batchjob", responses = {
+        @ApiResponse(responseCode = "200", description = "Henter ut exitkode for executionId", content = @Content(mediaType = "text")),
+        @ApiResponse(responseCode = "400", description = "Ukjent batch forespurt."),
+        @ApiResponse(responseCode = "500", description = "Feilet pga ukjent feil.")
     })
     @BeskyttetRessurs(action = READ, ressurs = DRIFT, sporingslogg = false)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
@@ -131,10 +128,9 @@ public class BatchRestTjeneste {
     @Path("/autorun")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)
-    @ApiOperation(value = "Start task for å kjøre batchjobs")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Starter batch-scheduler."),
-        @ApiResponse(code = 500, message = "Feilet pga ukjent feil.")
+    @Operation(tags = "batch", description = "Start task for å kjøre batchjobs", responses = {
+        @ApiResponse(responseCode = "200", description = "Starter batch-scheduler."),
+        @ApiResponse(responseCode = "500", description = "Feilet pga ukjent feil.")
     })
     @BeskyttetRessurs(action = CREATE, ressurs = BATCH)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")

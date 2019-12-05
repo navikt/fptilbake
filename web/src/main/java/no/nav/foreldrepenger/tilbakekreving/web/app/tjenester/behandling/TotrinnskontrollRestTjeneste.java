@@ -15,8 +15,7 @@ import javax.ws.rs.QueryParam;
 
 import com.codahale.metrics.annotation.Timed;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.TotrinnskontrollAksjonspunkterTjeneste;
@@ -25,7 +24,6 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.tot
 import no.nav.vedtak.felles.jpa.Transaction;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 
-@Api(tags = { "totrinnskontroll" })
 @Path("/behandling/totrinnskontroll")
 @ApplicationScoped
 @Transaction
@@ -48,7 +46,7 @@ public class TotrinnskontrollRestTjeneste {
     @GET
     @Timed
     @Path("/arsaker")
-    @ApiOperation(value = "Hent aksjonspunkter som skal til totrinnskontroll.", notes = ("Returner aksjonspunkter til totrinnskontroll for behandling."))
+    @Operation(tags = "totrinnskontroll", description = "Hent aksjonspunkter som skal til totrinnskontroll.", summary = "Returner aksjonspunkter til totrinnskontroll for behandling.")
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public List<TotrinnskontrollSkjermlenkeContextDto> hentTotrinnskontrollSkjermlenkeContext(@NotNull @QueryParam("behandlingId") @Valid BehandlingIdDto behandlingIdDto) {
@@ -62,7 +60,7 @@ public class TotrinnskontrollRestTjeneste {
     @GET
     @Timed
     @Path("/arsaker_read_only")
-    @ApiOperation(value = "Hent totrinnsvurderinger for aksjonspunkter.", notes = ("Returner vurderinger for aksjonspunkter etter totrinnskontroll for behandling."))
+    @Operation(tags = "totrinnskontroll", description = "Hent totrinnsvurderinger for aksjonspunkter.", summary = "Returner vurderinger for aksjonspunkter etter totrinnskontroll for behandling.")
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public List<TotrinnskontrollSkjermlenkeContextDto> hentTotrinnskontrollvurderingSkjermlenkeContext(@NotNull @QueryParam("behandlingId") @Valid BehandlingIdDto behandlingIdDto) {

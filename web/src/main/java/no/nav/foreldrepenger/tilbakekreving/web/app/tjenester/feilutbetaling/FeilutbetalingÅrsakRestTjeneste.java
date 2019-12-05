@@ -12,18 +12,16 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-import org.eclipse.jetty.http.HttpStatus;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTyperPrYtelseTypeDto;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTypeMedUndertypeDto;
+import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTyperPrYtelseTypeDto;
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.tjeneste.FeilutbetalingÅrsakTjeneste;
 import no.nav.vedtak.felles.jpa.Transaction;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 
-@Api(tags = "feilutbetalingårsak")
 @Path("/feilutbetalingaarsak")
 @Produces(APPLICATION_JSON)
 @RequestScoped
@@ -42,8 +40,12 @@ public class FeilutbetalingÅrsakRestTjeneste {
     }
 
     @GET
-    @ApiOperation(value = "Henter kodeverk for årsak med underårsaker for feilutbetaling")
-    @ApiResponse(code = HttpStatus.OK_200, message = "OK", response = HendelseTypeMedUndertypeDto.class)
+    @Operation(
+        tags="kodeverk",
+        description = "Henter kodeverk for årsak med underårsaker for feilutbetaling",
+    responses = {
+            @ApiResponse(responseCode = "200", description = "Kodeverk", content = @Content(schema = @Schema(implementation = HendelseTypeMedUndertypeDto.class)))
+    })
     @BeskyttetRessurs(action = READ, ressurs = APPLIKASJON)
     public List<HendelseTyperPrYtelseTypeDto> hentAlleFeilutbetalingÅrsaker() {
         return feilutbetalingÅrsakTjeneste.hentFeilutbetalingårsaker();

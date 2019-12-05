@@ -23,6 +23,7 @@
         <module>kafka-poller</module>
         <module>pdfgen</module>
         <module>journalpost</module>
+        <module>dokumentproduksjon-klient</module>
     </modules>
 
 </project>

@@ -12,6 +12,7 @@ import javax.interceptor.AroundInvoke;
 import javax.interceptor.Interceptor;
 import javax.interceptor.InvocationContext;
 
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.AppAbacAttributtType;
 import no.nav.vedtak.sikkerhet.abac.AbacAttributtSamling;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.AbacDto;
@@ -36,8 +37,8 @@ public class MDCLoggingInterceptor {
     public Object wrapTransaction(final InvocationContext invocationContext) throws Exception {
         AbacAttributtSamling abacAttributtSamling = hentAbacAttributter(invocationContext);
 
-        leggTilMDC("behandling", abacAttributtSamling.getBehandlingsIder());
-        leggTilMDC("fagsak", abacAttributtSamling.getFagsakIder());
+        leggTilMDC("behandling", abacAttributtSamling.getVerdier(AppAbacAttributtType.BEHANDLING_ID));
+        leggTilMDC("fagsak", abacAttributtSamling.getVerdier(AppAbacAttributtType.FAGSAK_ID));
 
         return invocationContext.proceed();
 

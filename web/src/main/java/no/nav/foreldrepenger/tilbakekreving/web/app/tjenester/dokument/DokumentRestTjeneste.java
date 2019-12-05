@@ -17,9 +17,8 @@ import javax.ws.rs.core.Response;
 
 import com.codahale.metrics.annotation.Timed;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import no.finn.unleash.Unleash;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Avsnitt;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.ForhåndvisningVedtaksbrevTekstDto;
@@ -30,7 +29,6 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.Vedtaksbre
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 
-@Api(tags = "dokument")
 @Path("/dokument")
 @ApplicationScoped
 public class DokumentRestTjeneste {
@@ -57,11 +55,11 @@ public class DokumentRestTjeneste {
     @Timed
     @Path("/forhandsvis-varselbrev")
     @Consumes(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Returnerer en pdf som er en forhåndsvisning av varselbrevet")
+    @Operation(tags = "dokument", description = "Returnerer en pdf som er en forhåndsvisning av varselbrevet")
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response hentForhåndsvisningVarselbrev(
-        @ApiParam("Inneholder kode til brevmal og data som skal flettes inn i brevet") @Valid HentForhåndsvisningVarselbrevDto hentForhåndsvisningVarselbrevDto) { // NOSONAR
+        @Parameter(description = "Inneholder kode til brevmal og data som skal flettes inn i brevet") @Valid HentForhåndsvisningVarselbrevDto hentForhåndsvisningVarselbrevDto) { // NOSONAR
         byte[] dokument = varselbrevTjeneste.hentForhåndsvisningVarselbrev(hentForhåndsvisningVarselbrevDto);
         Response.ResponseBuilder responseBuilder = Response.ok(dokument);
         responseBuilder.type(PDF_CONTENT_TYPE);
@@ -73,7 +71,7 @@ public class DokumentRestTjeneste {
     @Timed
     @Path("/hent-vedtaksbrev")
     @Consumes(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Returnerer forhåndsvisning av vedtaksbrevet som tekst, slik at det kan vises i GUI for redigering")
+    @Operation(tags = "dokument", description = "Returnerer forhåndsvisning av vedtaksbrevet som tekst, slik at det kan vises i GUI for redigering")
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public ForhåndvisningVedtaksbrevTekstDto hentVedtaksbrevForRedigering(@Valid BehandlingIdDto behandlingIdDto) { // NOSONAR
@@ -85,7 +83,7 @@ public class DokumentRestTjeneste {
     @Timed
     @Path("/forhandsvis-vedtaksbrev")
     @Consumes(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Returnerer en pdf som er en forhåndsvisning av vedtaksbrevet")
+    @Operation(tags = "dokument", description = "Returnerer en pdf som er en forhåndsvisning av vedtaksbrevet")
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response hentForhåndsvisningVedtaksbrev(@Valid @NotNull HentForhåndvisningVedtaksbrevPdfDto vedtaksbrevPdfDto) { // NOSONAR
