@@ -40,7 +40,7 @@
         <!-- Eksterne -->
 
         <surefire.version>2.21.0</surefire.version>
-        <metrics.version>3.2.5</metrics.version>
+        <metrics.version>4.1.1</metrics.version>
         <ow2.asm.version>7.2</ow2.asm.version>
         <geronimo.jaspi.version>2.0.0</geronimo.jaspi.version>
         <geronimo.osgi.version>1.1</geronimo.osgi.version>
