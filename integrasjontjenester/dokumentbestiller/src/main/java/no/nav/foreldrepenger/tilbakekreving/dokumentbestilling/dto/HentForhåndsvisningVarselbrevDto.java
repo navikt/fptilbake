@@ -54,6 +54,6 @@ public class HentForhåndsvisningVarselbrevDto implements AbacDto {
 
     @Override
     public AbacDataAttributter abacAttributter() {
-        return AbacDataAttributter.opprett().leggTil(TilbakekrevingAbacAttributtType.FPSAK_BEHANDLING_UUID, behandlingUuid.toString());
+        return AbacDataAttributter.opprett().leggTil(TilbakekrevingAbacAttributtType.FPSAK_BEHANDLING_UUID, behandlingUuid);
     }
 }

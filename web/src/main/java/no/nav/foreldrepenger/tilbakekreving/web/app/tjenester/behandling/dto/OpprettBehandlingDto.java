@@ -82,7 +82,7 @@ public class OpprettBehandlingDto implements AbacDto {
     public AbacDataAttributter abacAttributter() {
         return AbacDataAttributter.opprett()
             .leggTil(StandardAbacAttributtType.SAKSNUMMER, saksnummer)
-            .leggTil(TilbakekrevingAbacAttributtType.FPSAK_BEHANDLING_UUID, eksternUuid.toString());
+            .leggTil(TilbakekrevingAbacAttributtType.FPSAK_BEHANDLING_UUID, eksternUuid);
     }
 
 }
