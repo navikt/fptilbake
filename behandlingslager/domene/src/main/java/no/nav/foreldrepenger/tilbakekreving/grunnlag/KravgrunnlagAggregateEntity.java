@@ -77,6 +77,10 @@ class KravgrunnlagAggregateEntity extends BaseEntitet implements KravgrunnlagAgg
         this.sperret = true;
     }
 
+    public void opphev(){
+        this.sperret = false;
+    }
+
     public static Builder builder() {
         return new Builder();
     }
