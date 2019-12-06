@@ -13,9 +13,9 @@ public interface GrunnlagStegFeil extends DeklarerteFeil {
     GrunnlagStegFeil FACTORY = FeilFactory.create(GrunnlagStegFeil.class);
 
     @TekniskFeil(feilkode = "FPT-783523",
-            feilmelding = "Grunnlag fra Økonomi har ikke blitt mottatt innen fristen: %s, behandlingen kan ikke fortsette uten grunnlaget." +
-                    " Kontroller at økonomisystemet er tilgjengelig og har grunnlag for behandling med saksnummer: %s . [ behandlingId: %s ]",
-            logLevel = LogLevel.ERROR)
+        feilmelding = "Grunnlag fra Økonomi har ikke blitt mottatt innen fristen: %s, behandlingen kan ikke fortsette uten grunnlaget." +
+            " Kontroller at økonomisystemet er tilgjengelig og har grunnlag for behandling med saksnummer: %s . [ behandlingId: %s ]",
+        logLevel = LogLevel.WARN)
     Feil harIkkeMottattGrunnlagFraØkonomi(LocalDateTime frist, String saksnummer, Long behandlingId);
 
 }
