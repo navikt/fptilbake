@@ -8,7 +8,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
 
-import no.nav.tilbakekreving.typer.v1.MmelDto;
+import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakResponse;
 
 public class ØkonomiResponsMarshaller {
 
@@ -18,13 +18,13 @@ public class ØkonomiResponsMarshaller {
         //hindrer instansiering
     }
 
-    public static String marshall(long behandlingId, MmelDto respons) {
+    public static String marshall(long behandlingId, TilbakekrevingsvedtakResponse respons) {
         //HAXX marshalling løses normalt sett ikke slik som dette. Se JaxbHelper for normaltilfeller.
         //HAXX gjør her marshalling uten kobling til skjema, siden skjema som brukes ikke er egnet for å
         //HAXX konvertere til streng. Skjemaet er bare egnet for å bruke mot WS.
 
-        QName qname = new QName(MmelDto.class.getSimpleName());
-        JAXBElement<MmelDto> jaxbelement = new JAXBElement<>(qname, MmelDto.class, respons);
+        QName qname = new QName(TilbakekrevingsvedtakResponse.class.getSimpleName());
+        JAXBElement<TilbakekrevingsvedtakResponse> jaxbelement = new JAXBElement<>(qname, TilbakekrevingsvedtakResponse.class, respons);
         try {
             Marshaller marshaller = getContext().createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, false);
@@ -38,7 +38,7 @@ public class ØkonomiResponsMarshaller {
 
     private static JAXBContext getContext() throws JAXBException {
         if (context == null) {
-            context = JAXBContext.newInstance(MmelDto.class);
+            context = JAXBContext.newInstance(TilbakekrevingsvedtakResponse.class);
         }
         return context;
     }

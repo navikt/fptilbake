@@ -1,7 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi;
 
-import java.util.Set;
-
 import javax.xml.ws.soap.SOAPFaultException;
 
 import org.slf4j.Logger;
@@ -21,12 +19,10 @@ import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.Tilbakekrevingsvedt
 import no.nav.tilbakekreving.typer.v1.MmelDto;
 import no.nav.vedtak.felles.integrasjon.felles.ws.SoapWebServiceFeil;
 
-//TODO denne klassen bør ha deafult scope
-public class ØkonomiConsumerImpl implements ØkonomiConsumer {
+class ØkonomiConsumerImpl implements ØkonomiConsumer {
 
     private static final String SERVICE_IDENTIFIER = "TilbakekrevingServiceV1";
     private static final Logger logger = LoggerFactory.getLogger(ØkonomiConsumerImpl.class);
-    private static final Set<String> KVITTERING_OK_KODE = Set.of("00", "04");
 
     private TilbakekrevingPortType port;
 
@@ -35,23 +31,22 @@ public class ØkonomiConsumerImpl implements ØkonomiConsumer {
     }
 
     @Override
-    public MmelDto iverksettTilbakekrevingsvedtak(Long behandlingId, TilbakekrevingsvedtakDto vedtak) {
+    public TilbakekrevingsvedtakResponse iverksettTilbakekrevingsvedtak(Long behandlingId, TilbakekrevingsvedtakDto vedtak) {
         TilbakekrevingsvedtakResponse respons = iverksett(vedtak);
         MmelDto kvittering = respons.getMmel();
-        validerKvitteringForIverksettelse(behandlingId, kvittering);
-
-        //hvis kvittering er OK, er alt være OK. Ikke noen grunn til å lagre resultat.
-        logger.info("Tilbakekrevingsvedtak sendt til oppdragsystemet. BehandlingId={} Alvorlighetsgrad='{}' infomelding='{}'",
-            behandlingId,
-            kvittering.getAlvorlighetsgrad(),
-            kvittering.getBeskrMelding());
-        return kvittering;
+        if (ØkonomiKvitteringTolk.erKvitteringOK(kvittering)) {
+            logger.info("Tilbakekrevingsvedtak sendt til oppdragsystemet. BehandlingId={} Alvorlighetsgrad='{}' infomelding='{}'", behandlingId, kvittering.getAlvorlighetsgrad(), kvittering.getBeskrMelding());
+        } else {
+            ØkonomiConsumerFeil.FACTORY.fikkFeilkodeVedIverksetting(behandlingId, ØkonomiConsumerFeil.formaterKvitterign(kvittering)).log(logger);
+        }
+        return respons;
     }
 
     @Override
     public DetaljertKravgrunnlagDto hentKravgrunnlag(Long behandlingId, HentKravgrunnlagDetaljDto kravgrunnlagDetalj) {
         KravgrunnlagHentDetaljResponse respons = hentGrunnlagRespons(kravgrunnlagDetalj);
         MmelDto kvittering = respons.getMmel();
+
         validerKvitteringForHentGrunnlag(behandlingId, kvittering);
         logger.info("Hentet kravgrunnlag fra oppdragsystemet for behandlingId={} Alvorlighetsgrad='{}' infomelding='{}'",
             behandlingId,
@@ -104,23 +99,14 @@ public class ØkonomiConsumerImpl implements ØkonomiConsumer {
         }
     }
 
-    private void validerKvitteringForIverksettelse(Long behandlingId, MmelDto mmel) {
-        String alvorlighetsgrad = mmel.getAlvorlighetsgrad();
-        if (!KVITTERING_OK_KODE.contains(alvorlighetsgrad)) {
-            throw ØkonomiConsumerFeil.FACTORY.fikkFeilkodeVedIverksetting(behandlingId, ØkonomiConsumerFeil.formaterKvitterign(mmel)).toException();
-        }
-    }
-
     private void validerKvitteringForHentGrunnlag(Long behandlingId, MmelDto mmel) {
-        String alvorlighetsgrad = mmel.getAlvorlighetsgrad();
-        if (!KVITTERING_OK_KODE.contains(alvorlighetsgrad)) {
+        if (!ØkonomiKvitteringTolk.erKvitteringOK(mmel)) {
             throw ØkonomiConsumerFeil.FACTORY.fikkFeilkodeVedHentingAvKravgrunnlag(behandlingId, ØkonomiConsumerFeil.formaterKvitterign(mmel)).toException();
         }
     }
 
     private void validerKvitteringForAnnulereGrunnlag(Long behandlingId, MmelDto mmel) {
-        String alvorlighetsgrad = mmel.getAlvorlighetsgrad();
-        if (!KVITTERING_OK_KODE.contains(alvorlighetsgrad)) {
+        if (!ØkonomiKvitteringTolk.erKvitteringOK(mmel)) {
             throw ØkonomiConsumerFeil.FACTORY.fikkFeilkodeVedAnnulereKravgrunnlag(behandlingId, ØkonomiConsumerFeil.formaterKvitterign(mmel)).toException();
         }
     }

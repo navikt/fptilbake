@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 
+import no.nav.foreldrepenger.tilbakekreving.avstemming.IverksattVedtakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
@@ -35,6 +36,8 @@ public class SendØkonomiTibakekerevingsVedtakTaskTest {
     private TilbakekrevingsvedtakTjeneste tilbakekrevingsvedtakTjeneste;
     @Inject
     private ØkonomiSendtXmlRepository økonomiSendtXmlRepository;
+    @Inject
+    private IverksattVedtakRepository iverksattVedtakRepository;
 
     private ØkonomiConsumer økonomiConsumer = Mockito.mock(ØkonomiConsumer.class);
 
@@ -49,7 +52,7 @@ public class SendØkonomiTibakekerevingsVedtakTaskTest {
         ProsessTaskData data = new ProsessTaskData(SendØkonomiTibakekerevingsVedtakTask.TASKTYPE);
         data.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
 
-        SendØkonomiTibakekerevingsVedtakTask task = new SendØkonomiTibakekerevingsVedtakTask(tilbakekrevingsvedtakTjeneste, økonomiConsumer, økonomiSendtXmlRepository);
+        SendØkonomiTibakekerevingsVedtakTask task = new SendØkonomiTibakekerevingsVedtakTask(tilbakekrevingsvedtakTjeneste, økonomiConsumer, økonomiSendtXmlRepository, iverksattVedtakRepository);
         task.doTask(data);
 
         assertThat(økonomiSendtXmlRepository.finnXml(behandling.getId(), MeldingType.VEDTAK)).hasSize(1);

@@ -24,6 +24,11 @@ interface ØkonomiConsumerFeil extends DeklarerteFeil {
         //HAXX ikke bruk dette som mal ved oppsett av deklarative feil
         //.... brukes her siden det er veldig mange parametre som skal logges
         //.... reduserer sjangsen for at parametre stokkes feil ved fremtidig endring
+
+        if (kvittering == null) {
+            return "mangler kvittering";
+        }
+
         StringBuilder builder = new StringBuilder();
         addToBuilder(builder, "Alvorlighetsgrad", kvittering.getAlvorlighetsgrad());
         addToBuilder(builder, "KodeMelding", kvittering.getKodeMelding());
@@ -42,10 +47,10 @@ interface ØkonomiConsumerFeil extends DeklarerteFeil {
     private static void addToBuilder(StringBuilder builder, String name, String value) {
         if (value != null) {
             builder.append(" ")
-                    .append(name)
-                    .append("='")
-                    .append(value)
-                    .append("'");
+                .append(name)
+                .append("='")
+                .append(value)
+                .append("'");
         }
     }
 
