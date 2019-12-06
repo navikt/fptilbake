@@ -57,32 +57,26 @@ public class FordelRestTjeneste {
     @BeskyttetRessurs(action = BeskyttetRessursActionAttributt.CREATE, ressurs = BeskyttetRessursResourceAttributt.FAGSAK)
     public void mottaJournalpost(@Parameter(description = "Krever saksnummer, journalpostId og behandlingstemaOffisiellKode") @Valid AbacJournalpostMottakDto mottattJournalpost) {
 
-        Optional<String> dokumentTypeId = mottattJournalpost.getDokumentTypeIdOffisiellKode();
-        Saksnummer saksnummer = new Saksnummer(mottattJournalpost.getSaksnummer());
-        Optional<Behandling> behandlingForSaksnummer = harBehandlingPåVent(saksnummer);
+        String dokumentTypeId = mottattJournalpost.getDokumentTypeIdOffisiellKode().orElse(null);
+        String saksnummer = mottattJournalpost.getSaksnummer();
+        Optional<Behandling> behandlingForSaksnummer = harBehandlingPåVent(new Saksnummer(saksnummer));
         UUID forsendelseId = mottattJournalpost.getForsendelseId().orElse(null);
 
         if (behandlingForSaksnummer.isPresent()) {
-            logger.info("Behandling finnes for dokumentTypeId={},saksnummer={} og forsendelseId={}", dokumentTypeId.get(), saksnummer, forsendelseId);
             Behandling behandling = behandlingForSaksnummer.get();
-
             if (erTilbakemeldingFraBruker(dokumentTypeId)) {
-                logger.info("Mottok dokument og tok behandlingId={} av vent. Saksnummer={} dokumentTypeId={} forsendelseId={}",
-                    behandling.getId(), saksnummer, dokumentTypeId, forsendelseId);
+                logger.info("Mottok dokument og tok behandlingId={} av vent. Saksnummer={} dokumentTypeId={} forsendelseId={}", behandling.getId(), saksnummer, dokumentTypeId, forsendelseId);
                 gjenopptaBehandlingTjeneste.fortsettBehandlingManuelt(behandling.getId()); //ta behandling av vent
             } else {
-                logger.info("Mottok og ignorerte dokument pga dokumentTypeId. Saksnummer={} dokumentTypeId={} forsendelseId={}",
-                    saksnummer, dokumentTypeId, forsendelseId);
+                logger.info("Mottok og ignorerte dokument pga dokumentTypeId. Saksnummer={} dokumentTypeId={} forsendelseId={}", saksnummer, dokumentTypeId, forsendelseId);
             }
-
         } else {
-            logger.info("Mottok og ignorerte dokument siden ingen behandling er på vent for saken. Saksnummer={} dokumentTypeId={} forsendelseId={}",
-                saksnummer, dokumentTypeId, forsendelseId);
+            logger.info("Mottok og ignorerte dokument siden ingen behandling er på vent for saken. Saksnummer={} dokumentTypeId={} forsendelseId={}", saksnummer, dokumentTypeId, forsendelseId);
         }
     }
 
-    private boolean erTilbakemeldingFraBruker(Optional<String> dokumentTypeId) {
-        return dokumentTypeId.isPresent() && UTTALSE_TILBAKEKREVING_DOKUMENT_TYPE_ID.equals(dokumentTypeId.get());
+    private boolean erTilbakemeldingFraBruker(String dokumentTypeId) {
+        return UTTALSE_TILBAKEKREVING_DOKUMENT_TYPE_ID.equals(dokumentTypeId);
     }
 
     private Optional<Behandling> harBehandlingPåVent(Saksnummer saksnummer) {
