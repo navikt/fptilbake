@@ -35,9 +35,6 @@
         <!-- Kontrakter -->
         <fpkontrakter.version>5.0_20191031073150_c3b9f11</fpkontrakter.version>
 
-        <!-- NAV -->
-
-        <!-- Eksterne -->
 
         <surefire.version>2.21.0</surefire.version>
         <metrics.version>3.2.5</metrics.version>
@@ -444,11 +441,6 @@
                 <artifactId>plexus-utils</artifactId>
                 <version>${plexus.version}</version>
             </dependency>
-            <dependency>
-                <groupId>com.papertrailapp</groupId>
-                <artifactId>logback-syslog4j</artifactId>
-                <version>1.0.0</version>
-            </dependency>
             <!-- https://mvnrepository.com/artifact/org.codehaus.woodstox/stax2-api -->
             <dependency>
                 <groupId>org.codehaus.woodstox</groupId>
@@ -530,12 +522,6 @@
                 <version>4.1.2</version>
             </dependency>
 
-            <dependency>
-                <groupId>net.logstash.logback</groupId>
-                <artifactId>logstash-logback-encoder</artifactId>
-                <version>${logstash.version}</version>
-            </dependency>
-
             <!-- Transitive avh. versjoner for å sikre unikhet (enforcer
                 dependencyConvergence). Skal ikke benyttes direkte av vår egen kode. -->
             <dependency>
@@ -601,11 +587,28 @@
                 <version>1.4.0</version>
             </dependency>
 
+            <!-- logging -->
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
                 <version>1.2.3</version>
             </dependency>
+            <dependency>
+                <groupId>com.papertrailapp</groupId>
+                <artifactId>logback-syslog4j</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>net.logstash.logback</groupId>
+                <artifactId>logstash-logback-encoder</artifactId>
+                <version>${logstash.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>jul-to-slf4j</artifactId>
+                <version>1.7.5</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.hibernate.validator</groupId>
                 <artifactId>hibernate-validator-cdi</artifactId>

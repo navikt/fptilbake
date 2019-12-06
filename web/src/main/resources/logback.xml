@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
+    <!-- for bedre ytelse for logging fra java.utils.logging (brukes av openhtmltopdf) -->
+    <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator" />
 
     <appender name="STDOUT_JSON" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="net.logstash.logback.encoder.LogstashEncoder">

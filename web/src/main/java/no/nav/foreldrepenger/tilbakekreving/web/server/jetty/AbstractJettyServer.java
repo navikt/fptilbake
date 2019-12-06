@@ -29,6 +29,7 @@ import org.eclipse.jetty.webapp.Configuration;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.jetty.webapp.WebInfConfiguration;
 import org.eclipse.jetty.webapp.WebXmlConfiguration;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import no.nav.vedtak.sikkerhet.context.SubjectHandler;
 import no.nav.vedtak.sikkerhetsfilter.SecurityFilter;
@@ -46,11 +47,11 @@ abstract class AbstractJettyServer {
      * nedstrippet sett med Jetty configurations for raskere startup.
      */
     protected static final Configuration[] CONFIGURATIONS = new Configuration[]{
-            new WebInfConfiguration(),
-            new WebXmlConfiguration(),
-            new AnnotationConfiguration(),
-            new EnvConfiguration(),
-            new PlusConfiguration(),
+        new WebInfConfiguration(),
+        new WebXmlConfiguration(),
+        new AnnotationConfiguration(),
+        new EnvConfiguration(),
+        new PlusConfiguration(),
     };
     private AppKonfigurasjon appKonfigurasjon;
 
@@ -66,9 +67,17 @@ abstract class AbstractJettyServer {
     }
 
     protected void konfigurer() throws Exception {
+        konfigurerLogging();
         konfigurerMiljø();
         konfigurerSikkerhet();
         konfigurerJndi();
+    }
+
+    private void konfigurerLogging() {
+        //openhtmltopdf bruker java.util.logging og konfigurerer egen handler, overstyrer vha system property
+        System.setProperty("xr.util-logging.handlers", "org.slf4j.bridge.SLF4JBridgeHandler");
+        SLF4JBridgeHandler.removeHandlersForRootLogger();
+        SLF4JBridgeHandler.install();
     }
 
     protected abstract void konfigurerMiljø() throws Exception;
@@ -77,8 +86,8 @@ abstract class AbstractJettyServer {
         Security.setProperty(AuthConfigFactory.DEFAULT_FACTORY_SECURITY_PROPERTY, AuthConfigFactoryImpl.class.getCanonicalName());
         System.setProperty(SubjectHandler.SUBJECTHANDLER_KEY, JettySubjectHandler.class.getName());
 
-        File jaspiConf = new File(System.getProperty("conf", "./conf")+"/jaspi-conf.xml");
-        if(!jaspiConf.exists()) {
+        File jaspiConf = new File(System.getProperty("conf", "./conf") + "/jaspi-conf.xml");
+        if (!jaspiConf.exists()) {
             throw new IllegalStateException("Missing required file: " + jaspiConf.getAbsolutePath());
         }
         System.setProperty("org.apache.geronimo.jaspic.configurationFile", jaspiConf.getAbsolutePath());
@@ -152,7 +161,7 @@ abstract class AbstractJettyServer {
         HttpConfiguration httpConfig = new HttpConfiguration();
 
         // Add support for X-Forwarded headers
-        httpConfig.addCustomizer( new org.eclipse.jetty.server.ForwardedRequestCustomizer() );
+        httpConfig.addCustomizer(new org.eclipse.jetty.server.ForwardedRequestCustomizer());
 
         return httpConfig;
 
