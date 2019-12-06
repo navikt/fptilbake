@@ -16,7 +16,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTask;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -54,12 +53,12 @@ public class ForvaltningBehandlingRestTjeneste {
         tags = "FORVALTNING-behandling",
         description = "Tjeneste for å tvinge en behandling til å bli henlagt, selvom normale regler for saksbehandling ikke tillater henleggelse",
         responses = {
-            @ApiResponse(responseCode = "200", description = "Henlagt behandling", content = @Content(mediaType = "text")),
+            @ApiResponse(responseCode = "200", description = "Henlagt behandling"),
             @ApiResponse(responseCode = "400", description = "Behandlingen er avsluttet"),
             @ApiResponse(responseCode = "500", description = "Feilet pga ukjent feil.")
         })
     @BeskyttetRessurs(action = CREATE, ressurs = DRIFT)
-    public Response tvingHenleggelseBehandling(@NotNull @QueryParam("behandlingId") @Valid BehandlingIdDto behandlingIdDto) {
+    public Response tvingHenleggelseBehandling(@QueryParam("behandlingId") @NotNull @Valid BehandlingIdDto behandlingIdDto) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingIdDto.getBehandlingId());
         if (behandling.erAvsluttet()) {
             return Response.status(Response.Status.BAD_REQUEST).build();
@@ -76,7 +75,7 @@ public class ForvaltningBehandlingRestTjeneste {
         tags = "FORVALTNING-behandling",
         description = "Tjeneste for å tvinge en behandling til å gjenopptas (tas av vent). NB! Må ikke brukes på saker uten kravgrunnlag!",
         responses = {
-            @ApiResponse(responseCode = "200", description = "Gjenopptatt behandling", content = @Content(mediaType = "text")),
+            @ApiResponse(responseCode = "200", description = "Gjenopptatt behandling"),
             @ApiResponse(responseCode = "400", description = "Behandlingen er avsluttet eller behandlingen er ikke på vent"),
             @ApiResponse(responseCode = "500", description = "Feilet pga ukjent feil.")
         })
