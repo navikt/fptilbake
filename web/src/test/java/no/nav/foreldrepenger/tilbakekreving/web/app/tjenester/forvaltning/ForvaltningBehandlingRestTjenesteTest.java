@@ -1,7 +1,10 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
 
@@ -11,6 +14,8 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTask;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TpsAdapterWrapper;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.KravgrunnlagMapper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollEventPubliserer;
@@ -27,7 +32,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.TestFagsakUtil;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
+import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
@@ -43,8 +50,11 @@ public class ForvaltningBehandlingRestTjenesteTest {
     private BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProviderImpl(repositoryRule.getEntityManager());
     private FagsakRepository fagsakRepository = repositoryProvider.getFagsakRepository();
     private BehandlingRepository behandlingRepository = repositoryProvider.getBehandlingRepository();
+    private ØkonomiMottattXmlRepository mottattXmlRepository = new ØkonomiMottattXmlRepository(repositoryRule.getEntityManager());
+    private TpsAdapterWrapper mockTpsAdapterWrapper = mock(TpsAdapterWrapper.class);
+    private KravgrunnlagMapper kravgrunnlagMapper = new KravgrunnlagMapper(mockTpsAdapterWrapper);
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste = new BehandlingskontrollTjenesteImpl(repositoryProvider, mock(BehandlingModellRepository.class), mock(BehandlingskontrollEventPubliserer.class));
-    private ForvaltningBehandlingRestTjeneste forvaltningBehandlingRestTjeneste = new ForvaltningBehandlingRestTjeneste(behandlingRepository, prosessTaskRepository);
+    private ForvaltningBehandlingRestTjeneste forvaltningBehandlingRestTjeneste = new ForvaltningBehandlingRestTjeneste(repositoryProvider, prosessTaskRepository, mottattXmlRepository, kravgrunnlagMapper);
 
     @Test
     public void skal_ikke_tvinge_henlegg_behandling_når_behandling_er_allerede_avsluttet() {
@@ -97,6 +107,59 @@ public class ForvaltningBehandlingRestTjenesteTest {
         assertThat(prosessTasker.get(0).getTaskType()).isEqualTo(GjenopptaBehandlingTask.TASKTYPE);
     }
 
+    @Test
+    public void skal_ikke_tvinge_koble_grunnlag_når_behandling_er_ikke_på_vent() {
+        Behandling behandling = lagBehandling();
+
+        Response response = forvaltningBehandlingRestTjeneste.tvingkobleBehandlingTilGrunnlag(new KobleBehandlingTilGrunnlagDto(behandling.getId(), 1l));
+        assertThat(response.getStatus()).isEqualTo(Response.Status.BAD_REQUEST.getStatusCode());
+    }
+
+    @Test
+    public void skal_ikke_tvinge_koble_grunnlag_når_behandling_er_ikke_på_vent_på_tilbakekrevingsgrunnlag() {
+        Behandling behandling = lagBehandling();
+        behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(behandling, AksjonspunktDefinisjon.SEND_VARSEL, FPDateUtil.nå().plusDays(3), Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING);
+
+        Response response = forvaltningBehandlingRestTjeneste.tvingkobleBehandlingTilGrunnlag(new KobleBehandlingTilGrunnlagDto(behandling.getId(), 1l));
+        assertThat(response.getStatus()).isEqualTo(Response.Status.BAD_REQUEST.getStatusCode());
+    }
+
+    @Test
+    public void skal_ikke_tvinge_koble_grunnlag_når_mottattXml_er_status_melding() {
+        Behandling behandling = lagBehandling();
+        behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, FPDateUtil.nå().plusDays(3), Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
+        Long mottattXmlId = mottattXmlRepository.lagreMottattXml("<?xml version=\"1.0\" encoding=\"utf-8\"?><urn:endringKravOgVedtakstatus xmlns:urn=\"urn:no:nav:tilbakekreving:status:v1\"/>");
+
+        Response response = forvaltningBehandlingRestTjeneste.tvingkobleBehandlingTilGrunnlag(new KobleBehandlingTilGrunnlagDto(behandling.getId(), mottattXmlId));
+        assertThat(response.getStatus()).isEqualTo(Response.Status.BAD_REQUEST.getStatusCode());
+    }
+
+    @Test
+    public void skal_ikke_tvinge_koble_grunnlag_når_mottattXml_er_allerede_koblet() {
+        Behandling behandling = lagBehandling();
+        behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, FPDateUtil.nå().plusDays(3), Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
+        Long mottattXmlId = mottattXmlRepository.lagreMottattXml(getKravgrunnlagXml());
+        mottattXmlRepository.opprettTilkobling(mottattXmlId);
+
+        Response response = forvaltningBehandlingRestTjeneste.tvingkobleBehandlingTilGrunnlag(new KobleBehandlingTilGrunnlagDto(behandling.getId(), mottattXmlId));
+        assertThat(response.getStatus()).isEqualTo(Response.Status.BAD_REQUEST.getStatusCode());
+    }
+
+    @Test
+    public void skal_tvinge_koble_grunnlag_når_mottattXml_er_grunnlag() {
+        Behandling behandling = lagBehandling();
+        behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, FPDateUtil.nå().plusDays(3), Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
+        Long mottattXmlId = mottattXmlRepository.lagreMottattXml(getKravgrunnlagXml());
+
+        when(mockTpsAdapterWrapper.hentAktørIdEllerOrganisajonNummer(anyString(), any(GjelderType.class))).thenReturn("123");
+
+        Response response = forvaltningBehandlingRestTjeneste.tvingkobleBehandlingTilGrunnlag(new KobleBehandlingTilGrunnlagDto(behandling.getId(), mottattXmlId));
+        assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
+        assertThat(repositoryProvider.getGrunnlagRepository().harGrunnlagForBehandlingId(behandling.getId())).isTrue();
+        assertThat(mottattXmlRepository.erMottattXmlTilkoblet(mottattXmlId)).isTrue();
+    }
+
+
     private Behandling lagBehandling() {
         Fagsak fagsak = TestFagsakUtil.opprettFagsak();
         fagsakRepository.lagre(fagsak);
@@ -104,5 +167,47 @@ public class ForvaltningBehandlingRestTjenesteTest {
         BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(behandling);
         behandlingRepository.lagre(behandling, behandlingLås);
         return behandling;
+    }
+
+    private String getKravgrunnlagXml() {
+        return "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+            "<urn:detaljertKravgrunnlagMelding xmlns:urn=\"urn:no:nav:tilbakekreving:kravgrunnlag:detalj:v1\"\n" +
+            "                                  xmlns:mmel=\"urn:no:nav:tilbakekreving:typer:v1\">\n" +
+            "    <urn:detaljertKravgrunnlag>\n" +
+            "        <urn:kravgrunnlagId>123456789</urn:kravgrunnlagId>\n" +
+            "        <urn:vedtakId>100</urn:vedtakId>\n" +
+            "        <urn:kodeStatusKrav>NY</urn:kodeStatusKrav>\n" +
+            "        <urn:kodeFagomraade>FP</urn:kodeFagomraade>\n" +
+            "        <urn:fagsystemId>100001</urn:fagsystemId>\n" +
+            "        <!--Optional:-->\n" +
+            "        <urn:datoVedtakFagsystem>2007-10-26</urn:datoVedtakFagsystem>\n" +
+            "        <urn:vedtakGjelderId>12345678901</urn:vedtakGjelderId>\n" +
+            "        <urn:typeGjelderId>PERSON</urn:typeGjelderId>\n" +
+            "        <urn:utbetalesTilId>12345678901</urn:utbetalesTilId>\n" +
+            "        <urn:typeUtbetId>PERSON</urn:typeUtbetId>\n" +
+            "        <urn:enhetAnsvarlig>8020</urn:enhetAnsvarlig>\n" +
+            "        <urn:enhetBosted>8020</urn:enhetBosted>\n" +
+            "        <urn:enhetBehandl>8020</urn:enhetBehandl>\n" +
+            "        <urn:kontrollfelt>kontrolll-123</urn:kontrollfelt>\n" +
+            "        <urn:saksbehId>Z111111</urn:saksbehId>\n" +
+            "        <!--Optional:-->\n" +
+            "        <urn:referanse>100000001</urn:referanse>\n" +
+            "        <!--1 or more repetitions:-->\n" +
+            "        <urn:tilbakekrevingsPeriode>\n" +
+            "            <urn:periode>\n" +
+            "                <mmel:fom>2018-11-01+01:00</mmel:fom>\n" +
+            "                <mmel:tom>2018-11-22+02:00</mmel:tom>\n" +
+            "            </urn:periode>\n" +
+            "            <urn:belopSkattMnd>0.00</urn:belopSkattMnd>\n" +
+            "            <!--1 or more repetitions:-->\n" +
+            "            <urn:tilbakekrevingsBelop>\n" +
+            "                <urn:kodeKlasse>FPATORD</urn:kodeKlasse>\n" +
+            "                <urn:typeKlasse>YTEL</urn:typeKlasse>\n" +
+            "                <urn:belopNy>9000.00</urn:belopNy>\n" +
+            "                <urn:skattProsent>0.0000</urn:skattProsent>\n" +
+            "            </urn:tilbakekrevingsBelop>\n" +
+            "        </urn:tilbakekrevingsPeriode>\n" +
+            "    </urn:detaljertKravgrunnlag>\n" +
+            "</urn:detaljertKravgrunnlagMelding>\n";
     }
 }
