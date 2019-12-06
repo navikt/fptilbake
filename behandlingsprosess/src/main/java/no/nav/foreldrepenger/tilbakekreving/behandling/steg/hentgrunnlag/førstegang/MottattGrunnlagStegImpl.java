@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.GrunnlagSteg;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.GrunnlagStegFeil;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandleStegResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegRef;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingTypeRef;
@@ -31,7 +32,7 @@ import no.nav.vedtak.util.FPDateUtil;
 @ApplicationScoped
 public class MottattGrunnlagStegImpl implements GrunnlagSteg {
 
-    private static final Logger log = LoggerFactory.getLogger(MottattGrunnlagStegImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(MottattGrunnlagStegImpl.class);
 
     private BehandlingRepository behandlingRepository;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
@@ -86,9 +87,7 @@ public class MottattGrunnlagStegImpl implements GrunnlagSteg {
              * Hvis denne meldingen logges, må det kontrolleres at oppdragssystemet (OS) er oppe, tilgjengelig for fptilbake, og at OS ikke har feil.
              */
             String saksnummer = behandlingRepository.hentSaksnummerForBehandling(behandling.getId());
-            log.error("Grunnlag fra Økonomi har ikke blitt mottatt innen fristen: %s, behandlingen kan ikke fortsette uten grunnlaget." +
-                    " Kontroller at økonomisystemet er tilgjengelig og har grunnlag for behandling med saksnummer: %s . [ behandlingId: %s ]",
-                fristTid, saksnummer, behandling.getId());
+            GrunnlagStegFeil.FACTORY.harIkkeMottattGrunnlagFraØkonomi(fristTid, saksnummer, behandling.getId()).log(logger);
         }
         return BehandleStegResultat.settPåVent();
     }
