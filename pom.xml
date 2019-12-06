@@ -59,7 +59,7 @@
         <joda-time.version>2.9.9</joda-time.version>
         <swagger.spec-parser.version>1.0.28</swagger.spec-parser.version>
 
-        <owaspencoder.version>1.2.1</owaspencoder.version>
+        <owaspencoder.version>1.2.2</owaspencoder.version>
 
         <ojdbc.version>19.3.0.0</ojdbc.version>
         <abac-attribute-constants.version>3.3.13</abac-attribute-constants.version>
