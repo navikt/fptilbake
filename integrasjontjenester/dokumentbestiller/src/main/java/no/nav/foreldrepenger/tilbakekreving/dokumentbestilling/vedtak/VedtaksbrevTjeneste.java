@@ -413,7 +413,7 @@ public class VedtaksbrevTjeneste {
             VilkårVurderingGodTroEntitet godTro = vilkårvurdering.getGodTro();
             if (godTro != null) {
                 builder.medAktsomhetResultat(AnnenVurdering.GOD_TRO);
-                builder.medBeløpIBehold(godTro.getBeløpTilbakekreves());
+                builder.medBeløpIBehold(godTro.isBeløpErIBehold() ? godTro.getBeløpTilbakekreves() : BigDecimal.ZERO);
             }
         }
 
