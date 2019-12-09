@@ -159,7 +159,9 @@ public class TilbakekrevingVedtakPeriodeBeregner {
             }
             i++;
         }
-        TilbakekrevingVedtakPeriodeBeregnerFeil.FACTORY.avrundingsfeilForLiteInnkrevet(periode, diff.abs()).log(logger);
+        if (diff.signum() != 0) {
+            TilbakekrevingVedtakPeriodeBeregnerFeil.FACTORY.avrundingsfeilForLiteInnkrevet(periode, diff.abs()).log(logger);
+        }
     }
 
     private void justerNed(Periode periode, BigDecimal diff, List<TilbakekrevingBeløp> ytelBeløp) {
@@ -173,7 +175,9 @@ public class TilbakekrevingVedtakPeriodeBeregner {
             }
             i++;
         }
-        TilbakekrevingVedtakPeriodeBeregnerFeil.FACTORY.avrundingsfeilForMyeInnkrevet(periode, diff.abs()).log(logger);
+        if (diff.signum() != 0) {
+            TilbakekrevingVedtakPeriodeBeregnerFeil.FACTORY.avrundingsfeilForMyeInnkrevet(periode, diff.abs()).log(logger);
+        }
     }
 
     private void justerAvrundingSkatt(BeregningResultatPeriode beregningResultatPeriode, List<TilbakekrevingPeriode> perioder) {
@@ -210,7 +214,9 @@ public class TilbakekrevingVedtakPeriodeBeregner {
             }
             i++;
         }
-        TilbakekrevingVedtakPeriodeBeregnerFeil.FACTORY.avrundingsfeilForLiteInnkrevet(periode, diff.abs()).log(logger);
+        if (diff.signum() != 0) {
+            TilbakekrevingVedtakPeriodeBeregnerFeil.FACTORY.avrundingsfeilForLiteSkatt(periode, diff.abs()).log(logger);
+        }
     }
 
     private void justerNedSkatt(Periode periode, BigDecimal diff, List<TilbakekrevingBeløp> ytelBeløp) {
@@ -223,7 +229,9 @@ public class TilbakekrevingVedtakPeriodeBeregner {
             }
             i++;
         }
-        TilbakekrevingVedtakPeriodeBeregnerFeil.FACTORY.avrundingsfeilForMyeInnkrevet(periode, diff.abs()).log(logger);
+        if (diff.signum() !=  0) {
+            TilbakekrevingVedtakPeriodeBeregnerFeil.FACTORY.avrundingsfeilForMyeSkatt(periode, diff.abs()).log(logger);
+        }
     }
 
     private static void leggPåKodeResultat(BeregningResultatPeriode bgPeriode, List<TilbakekrevingPeriode> tmp) {
@@ -328,15 +336,15 @@ public class TilbakekrevingVedtakPeriodeBeregner {
     }
 
     private static void sjekkOgJusterTotalSkattBeløp(List<KravgrunnlagPeriode432> kgPerioder, List<TilbakekrevingPeriode> resultat) {
-        for(KravgrunnlagPeriode432 periode432 : kgPerioder){
+        for (KravgrunnlagPeriode432 periode432 : kgPerioder) {
             List<TilbakekrevingPeriode> bgPerioder = resultat.stream().filter(periode -> periode.getPeriode().overlapper(periode432.getPeriode())).collect(Collectors.toList());
             BigDecimal totalBeregnetSkattBeløp = BigDecimal.ZERO;
-            for(TilbakekrevingPeriode tilbakekrevingPeriode : bgPerioder){
-                for(TilbakekrevingBeløp tilbakekrevingBeløp : tilbakekrevingPeriode.getBeløp()){
-                    if(KlasseType.YTEL.equals(tilbakekrevingBeløp.getKlasseType())){
+            for (TilbakekrevingPeriode tilbakekrevingPeriode : bgPerioder) {
+                for (TilbakekrevingBeløp tilbakekrevingBeløp : tilbakekrevingPeriode.getBeløp()) {
+                    if (KlasseType.YTEL.equals(tilbakekrevingBeløp.getKlasseType())) {
                         totalBeregnetSkattBeløp = totalBeregnetSkattBeløp.add(tilbakekrevingBeløp.getSkattBeløp());
                         BigDecimal diff = totalBeregnetSkattBeløp.subtract(periode432.getBeløpSkattMnd());
-                        if(diff.signum() > 0){
+                        if (diff.signum() > 0) {
                             tilbakekrevingBeløp.medSkattBeløp(tilbakekrevingBeløp.getSkattBeløp().subtract(diff));
                         }
                     }
@@ -355,6 +363,12 @@ public class TilbakekrevingVedtakPeriodeBeregner {
 
         @TekniskFeil(feilkode = "FPT-480533", feilmelding = "Avrundingsfeil i periode %s i vedtak. Krever inn %s for lite for perioden", logLevel = LogLevel.WARN)
         Feil avrundingsfeilForLiteInnkrevet(Periode periode, BigDecimal diff);
+
+        @TekniskFeil(feilkode = "FPT-925291", feilmelding = "Avrundingsfeil i periode %s i vedtak. Skattebeløp er satt %s for lite for perioden", logLevel = LogLevel.WARN)
+        Feil avrundingsfeilForLiteSkatt(Periode periode, BigDecimal diff);
+
+        @TekniskFeil(feilkode = "FPT-812610", feilmelding = "Avrundingsfeil i periode %s i vedtak. Skattebeløp er satt %s for høyt for perioden", logLevel = LogLevel.WARN)
+        Feil avrundingsfeilForMyeSkatt(Periode periode, BigDecimal diff);
 
         @TekniskFeil(feilkode = "FPT-685113", feilmelding = "Kravgrunnlagperiode %s har %s virkedager, forventer en-til-en, men ovelapper mot beregningsresultat med %s dager", logLevel = LogLevel.ERROR)
         Feil inputvalideringFeiletKgPerioderOverlappBrPerioder(Periode periode, int kgVirkedager, int overlappVirkedager);
