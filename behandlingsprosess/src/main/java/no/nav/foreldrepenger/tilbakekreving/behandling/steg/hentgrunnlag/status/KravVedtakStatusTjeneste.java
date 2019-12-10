@@ -6,8 +6,8 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.HenleggBehandlingTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.task.FortsettBehandlingTaskProperties;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
@@ -24,6 +24,8 @@ import no.nav.vedtak.feil.FeilFactory;
 import no.nav.vedtak.feil.LogLevel;
 import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
 import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.util.FPDateUtil;
 
 @ApplicationScoped
@@ -32,6 +34,7 @@ public class KravVedtakStatusTjeneste {
     private KravVedtakStatusRepository kravVedtakStatusRepository;
     private BehandlingRepository behandlingRepository;
     private KravgrunnlagRepository grunnlagRepository;
+    private ProsessTaskRepository prosessTaskRepository;
 
     private HenleggBehandlingTjeneste henleggBehandlingTjeneste;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
@@ -41,9 +44,12 @@ public class KravVedtakStatusTjeneste {
     }
 
     @Inject
-    public KravVedtakStatusTjeneste(KravVedtakStatusRepository kravVedtakStatusRepository, BehandlingRepositoryProvider repositoryProvider,
+    public KravVedtakStatusTjeneste(KravVedtakStatusRepository kravVedtakStatusRepository,
+                                    ProsessTaskRepository prosessTaskRepository,
+                                    BehandlingRepositoryProvider repositoryProvider,
                                     HenleggBehandlingTjeneste henleggBehandlingTjeneste, BehandlingskontrollTjeneste behandlingskontrollTjeneste) {
         this.kravVedtakStatusRepository = kravVedtakStatusRepository;
+        this.prosessTaskRepository = prosessTaskRepository;
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.henleggBehandlingTjeneste = henleggBehandlingTjeneste;
@@ -70,12 +76,6 @@ public class KravVedtakStatusTjeneste {
         behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, BehandlingStegType.TBKGSTEG, fristDato, Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
     }
 
-    private void taBehandlingAvVent(Long behandlingId) {
-        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-        BehandlingskontrollKontekst kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandling);
-        behandlingskontrollTjeneste.taBehandlingAvVentSetAlleAutopunktUtført(behandling, kontekst);
-    }
-
     private void sperrGrunnlag(Long behandlingId) {
         grunnlagRepository.sperrGrunnlag(behandlingId);
     }
@@ -85,11 +85,20 @@ public class KravVedtakStatusTjeneste {
             if (!grunnlagRepository.erKravgrunnlagSperret(behandlingId)) {
                 throw KravVedtakStatusTjenesteFeil.FACTORY.kanIkkeFinnesSperretGrunnlagForBehandling(statusKode, behandlingId).toException();
             }
-            taBehandlingAvVent(behandlingId);
+            taBehandlingAvventOgFortsettBehandling(behandlingId);
             grunnlagRepository.opphevGrunnlag(behandlingId);
         } else {
             throw KravVedtakStatusTjenesteFeil.FACTORY.kanIkkeFinnesSperretGrunnlagForBehandling(statusKode, behandlingId).toException();
         }
+    }
+
+    private void taBehandlingAvventOgFortsettBehandling(long behandlingId) {
+        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
+        ProsessTaskData taskData = new ProsessTaskData(FortsettBehandlingTaskProperties.TASKTYPE);
+        taskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
+        taskData.setCallIdFraEksisterende();
+        taskData.setProperty(FortsettBehandlingTaskProperties.GJENOPPTA_STEG, behandling.getAktivtBehandlingSteg().getKode());
+        prosessTaskRepository.lagre(taskData);
     }
 
     public interface KravVedtakStatusTjenesteFeil extends DeklarerteFeil {
