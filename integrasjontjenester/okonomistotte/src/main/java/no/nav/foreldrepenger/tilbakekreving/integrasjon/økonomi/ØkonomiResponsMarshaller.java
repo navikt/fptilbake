@@ -1,11 +1,13 @@
 package no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi;
 
+import java.io.StringReader;
 import java.io.StringWriter;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 import no.nav.tilbakekreving.typer.v1.MmelDto;
@@ -33,6 +35,15 @@ public class ØkonomiResponsMarshaller {
             return stringWriter.toString();
         } catch (JAXBException e) {
             throw ØkonomiResponsFeil.FACTORY.kunneIkkeMarshalleØkonomiResponsXml(behandlingId, e).toException();
+        }
+    }
+
+    public static MmelDto unmarshall(String xml) {
+        try {
+            Unmarshaller unmarshaller = getContext().createUnmarshaller();
+            return (MmelDto) unmarshaller.unmarshal(new StringReader(xml));
+        } catch (JAXBException e) {
+            throw ØkonomiResponsFeil.FACTORY.kunneIkkeUnmarshalleØkonomiResponsXml(e).toException();
         }
     }
 

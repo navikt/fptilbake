@@ -105,22 +105,19 @@ public class ØkonomiConsumerImpl implements ØkonomiConsumer {
     }
 
     private void validerKvitteringForIverksettelse(Long behandlingId, MmelDto mmel) {
-        String alvorlighetsgrad = mmel.getAlvorlighetsgrad();
-        if (!KVITTERING_OK_KODE.contains(alvorlighetsgrad)) {
+        if (!ØkonomiKvitteringTolk.erKvitteringOK(mmel)) {
             throw ØkonomiConsumerFeil.FACTORY.fikkFeilkodeVedIverksetting(behandlingId, ØkonomiConsumerFeil.formaterKvitterign(mmel)).toException();
         }
     }
 
     private void validerKvitteringForHentGrunnlag(Long behandlingId, MmelDto mmel) {
-        String alvorlighetsgrad = mmel.getAlvorlighetsgrad();
-        if (!KVITTERING_OK_KODE.contains(alvorlighetsgrad)) {
+        if (!ØkonomiKvitteringTolk.erKvitteringOK(mmel)) {
             throw ØkonomiConsumerFeil.FACTORY.fikkFeilkodeVedHentingAvKravgrunnlag(behandlingId, ØkonomiConsumerFeil.formaterKvitterign(mmel)).toException();
         }
     }
 
     private void validerKvitteringForAnnulereGrunnlag(Long behandlingId, MmelDto mmel) {
-        String alvorlighetsgrad = mmel.getAlvorlighetsgrad();
-        if (!KVITTERING_OK_KODE.contains(alvorlighetsgrad)) {
+        if (!ØkonomiKvitteringTolk.erKvitteringOK(mmel)) {
             throw ØkonomiConsumerFeil.FACTORY.fikkFeilkodeVedAnnulereKravgrunnlag(behandlingId, ØkonomiConsumerFeil.formaterKvitterign(mmel)).toException();
         }
     }

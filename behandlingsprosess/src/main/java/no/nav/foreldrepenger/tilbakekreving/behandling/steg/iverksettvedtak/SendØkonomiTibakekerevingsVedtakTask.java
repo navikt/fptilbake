@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
+import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.TilbakekrevingsvedtakMarshaller;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiConsumer;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiResponsMarshaller;
 import no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste.TilbakekrevingsvedtakTjeneste;
@@ -15,11 +16,6 @@ import no.nav.foreldrepenger.tilbakekreving.økonomixml.MeldingType;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiSendtXmlRepository;
 import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsvedtakDto;
 import no.nav.tilbakekreving.typer.v1.MmelDto;
-import no.nav.vedtak.feil.Feil;
-import no.nav.vedtak.feil.FeilFactory;
-import no.nav.vedtak.feil.LogLevel;
-import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
-import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
 import no.nav.vedtak.felles.jpa.savepoint.RunWithSavepoint;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -81,15 +77,6 @@ public class SendØkonomiTibakekerevingsVedtakTask implements ProsessTaskHandler
         String responsXml = ØkonomiResponsMarshaller.marshall(behandlingId, respons);
         økonomiSendtXmlRepository.oppdatereKvittering(sendtXmlId, responsXml);
         log.info("oppdatert respons-xml for behandling={}", behandlingId);
-    }
-
-    public interface SendØkonomiTilbakekrevingVedtakTaskFeil extends DeklarerteFeil {
-
-        SendØkonomiTilbakekrevingVedtakTaskFeil FACTORY = FeilFactory.create(SendØkonomiTilbakekrevingVedtakTaskFeil.class);
-
-        @TekniskFeil(feilkode = "FPT-113616", feilmelding = "Kunne ikke marshalle vedtak. BehandlingId=%s", logLevel = LogLevel.WARN)
-        Feil kunneIkkeMarshalleVedtakXml(Long behandlingId, Exception e);
-
     }
 
 

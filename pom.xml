@@ -31,7 +31,7 @@
 
         <!-- Felles avhengigheter i prosjektet Disse skal ALLTID være en
             RELEASE-avhengighet UNNTAK: feature-brancher og lokalt -->
-        <felles.version>1.4.0-20191211091041-d8fc90c</felles.version>
+        <felles.version>1.4.0-20191212105502-c3ea7ca</felles.version>
         <vl-fpsak-tidsserie.version>2.0_20180831125757_006dad2</vl-fpsak-tidsserie.version>
         <!-- Kontrakter -->
         <fpkontrakter.version>5.0_20191031073150_c3b9f11</fpkontrakter.version>

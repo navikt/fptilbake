@@ -1,5 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.økonomixml;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -55,11 +56,18 @@ public class ØkonomiSendtXmlRepository {
     }
 
     public Optional<ØkonomiXmlSendt> finn(Long behandlingId, MeldingType meldingType) {
-        TypedQuery<ØkonomiXmlSendt> query = entityManager.createQuery("from OkoXmlSendt where behandling_id = :behandlingId and melding_type =:meldingType order by opprettet_tid desc", ØkonomiXmlSendt.class);
+        TypedQuery<ØkonomiXmlSendt> query = entityManager.createQuery("from OkoXmlSendt where behandling_id = :behandlingId and melding_type =:meldingType", ØkonomiXmlSendt.class);
         query.setParameter("behandlingId", behandlingId);
         query.setParameter("meldingType", meldingType.getKode());
         return query.getResultList().stream().findFirst();
+    }
 
+    public Collection<ØkonomiXmlSendt> finn(MeldingType meldingType, LocalDate opprettetDato) {
+        TypedQuery<ØkonomiXmlSendt> query = entityManager.createQuery("from OkoXmlSendt where meldingType = :meldingType and opprettet_tid >= :t0 and opprettetTid < :t1 order by opprettetTid desc", ØkonomiXmlSendt.class);
+        query.setParameter("meldingType", meldingType);
+        query.setParameter("t0", opprettetDato.atStartOfDay());
+        query.setParameter("t1", opprettetDato.plusDays(1).atStartOfDay());
+        return query.getResultList();
     }
 
     public void slettSendtXml(Long xmlId) {
@@ -70,5 +78,6 @@ public class ØkonomiSendtXmlRepository {
     private ØkonomiXmlSendt finnSendtXml(Long sendtXmlId) {
         return entityManager.find(ØkonomiXmlSendt.class, sendtXmlId);
     }
+
 
 }

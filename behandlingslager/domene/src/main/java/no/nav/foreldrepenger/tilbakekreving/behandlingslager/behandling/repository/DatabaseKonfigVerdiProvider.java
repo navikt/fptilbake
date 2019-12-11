@@ -63,7 +63,7 @@ public class DatabaseKonfigVerdiProvider implements KonfigVerdiProvider {
     public <V> Map<String, V> getVerdierAsMap(String key, Converter<V> converter) {
         List<KonfigVerdiEntitet> list = konfigVerdiRepository.finnVerdierFor(KonfigVerdiGruppe.forGruppe(key), LocalDate.now());
         Map<String, V> map = list.stream()
-                .collect(Collectors.toMap(KonfigVerdiEntitet::getKode, kve -> converter.tilVerdi(kve.getVerdi())));
+            .collect(Collectors.toMap(KonfigVerdiEntitet::getKode, kve -> converter.tilVerdi(kve.getVerdi())));
 
         return map;
 

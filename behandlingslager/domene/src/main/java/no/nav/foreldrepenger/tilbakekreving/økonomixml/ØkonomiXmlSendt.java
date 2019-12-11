@@ -64,11 +64,11 @@ public class ØkonomiXmlSendt extends BaseEntitet {
         this.kvitteringXml = kvittering;
     }
 
-    Long getBehandlingId() {
+    public Long getBehandlingId() {
         return behandlingId;
     }
 
-    public Long getId() {
+    Long getId() {
         return id;
     }
 
