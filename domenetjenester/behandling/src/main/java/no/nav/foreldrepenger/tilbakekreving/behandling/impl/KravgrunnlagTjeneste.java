@@ -21,10 +21,10 @@ import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.Gjenop
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.UtbetaltPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.task.FortsettBehandlingTaskProperties;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
@@ -34,6 +34,8 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.SlettGrunnlagEventPubliserer;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 
 @ApplicationScoped
 public class KravgrunnlagTjeneste {
@@ -42,6 +44,7 @@ public class KravgrunnlagTjeneste {
 
     private KravgrunnlagRepository kravgrunnlagRepository;
     private BehandlingRepository behandlingRepository;
+    private ProsessTaskRepository prosessTaskRepository;
     private GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
 
@@ -53,11 +56,14 @@ public class KravgrunnlagTjeneste {
     }
 
     @Inject
-    public KravgrunnlagTjeneste(BehandlingRepositoryProvider repositoryProvider, GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste,
+    public KravgrunnlagTjeneste(BehandlingRepositoryProvider repositoryProvider,
+                                ProsessTaskRepository prosessTaskRepository,
+                                GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste,
                                 BehandlingskontrollTjeneste behandlingskontrollTjeneste,
                                 SlettGrunnlagEventPubliserer slettGrunnlagEventPubliserer) {
         this.kravgrunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
+        this.prosessTaskRepository = prosessTaskRepository;
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
         this.gjenopptaBehandlingTjeneste = gjenopptaBehandlingTjeneste;
 
@@ -67,7 +73,7 @@ public class KravgrunnlagTjeneste {
 
     /**
      * WARNING denne metoden returerer ikke komplette perioder, periodene inneholder eks. ikke YTEL-posteringer
-     *
+     * <p>
      * Dette kan være overraskende.
      */
     public List<KravgrunnlagPeriode432> finnKravgrunnlagPerioderMedFeilutbetaltPosteringer(Long behandlingId) {
@@ -130,10 +136,11 @@ public class KravgrunnlagTjeneste {
             boolean erStegPassert = behandlingskontrollTjeneste.erStegPassert(behandling, BehandlingStegType.FAKTA_FEILUTBETALING);
             BehandlingskontrollKontekst kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandling);
             //forutsatt at FPTILBAKE allrede har fått SPER melding for den behandlingen og sett behandling på vent med VenteÅrsak VENT_PÅ_TILBAKEKREVINGSGRUNNLAG
-            behandlingskontrollTjeneste.settAutopunktTilUtført(AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, kontekst);
             if (erStegPassert) {
                 logger.info("Hopper tilbake til {} pga endret kravgrunnlag for behandlingId={}", BehandlingStegType.FAKTA_FEILUTBETALING.getKode(), behandlingId);
                 behandlingskontrollTjeneste.behandlingTilbakeføringTilTidligereBehandlingSteg(kontekst, BehandlingStegType.FAKTA_FEILUTBETALING);
+            } else {
+                taBehandlingAvventOgFortsettBehandling(behandlingId);
             }
             //Perioder knyttet med gammel grunnlag må slettes, opprettet SlettGrunnlagEvent som skal slette det
             opprettOgFireSlettgrunnlagEvent(behandlingId);
@@ -145,6 +152,15 @@ public class KravgrunnlagTjeneste {
     private void opprettOgFireSlettgrunnlagEvent(Long behandlingId) {
         logger.info("Sletter gammel grunnlag data for behandlingId={}", behandlingId);
         slettGrunnlagEventPubliserer.fireEvent(behandlingId);
+    }
+
+    private void taBehandlingAvventOgFortsettBehandling(long behandlingId) {
+        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
+        ProsessTaskData taskData = new ProsessTaskData(FortsettBehandlingTaskProperties.TASKTYPE);
+        taskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
+        taskData.setCallIdFraEksisterende();
+        taskData.setProperty(FortsettBehandlingTaskProperties.GJENOPPTA_STEG, behandling.getAktivtBehandlingSteg().getKode());
+        prosessTaskRepository.lagre(taskData);
     }
 
 }

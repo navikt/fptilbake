@@ -14,6 +14,7 @@ import org.junit.Test;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.HenleggBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.LesKravgrunnlagTask;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.task.FortsettBehandlingTaskProperties;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandlingsresultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
@@ -27,6 +28,8 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatusRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
 import no.nav.vedtak.exception.TekniskException;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
 
 public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
 
@@ -34,7 +37,7 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
     private BehandlingresultatRepository behandlingresultatRepository = new BehandlingresultatRepositoryImpl(repoRule.getEntityManager());
 
     private HenleggBehandlingTjeneste henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repositoryProvider, behandlingskontrollTjeneste, historikkinnslagTjeneste);
-    private KravVedtakStatusTjeneste kravVedtakStatusTjeneste = new KravVedtakStatusTjeneste(kravVedtakStatusRepository, repositoryProvider, henleggBehandlingTjeneste, behandlingskontrollTjeneste);
+    private KravVedtakStatusTjeneste kravVedtakStatusTjeneste = new KravVedtakStatusTjeneste(kravVedtakStatusRepository,prosessTaskRepository, repositoryProvider, henleggBehandlingTjeneste, behandlingskontrollTjeneste);
     private KravVedtakStatusMapper kravVedtakStatusMapper = new KravVedtakStatusMapper(tpsAdapterWrapper);
     private LesKravvedtakStatusTask lesKravvedtakStatusTask = new LesKravvedtakStatusTask(mottattXmlRepository, repositoryProvider,
         kravVedtakStatusTjeneste, kravVedtakStatusMapper, fpsakKlientMock);
@@ -182,7 +185,7 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_utføre_leskravvedtakststatustask_for_mottatt_endr_melding_med_gyldig_behandling(){
+    public void skal_utføre_leskravvedtakststatustask_for_mottatt_endr_melding_med_gyldig_behandling() {
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_FEIL_samme_referanse.xml"));
         lesKravgrunnlagTask.doTask(lagProsessTaskData(mottattXmlId, LesKravgrunnlagTask.TASKTYPE));
 
@@ -197,14 +200,18 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
 
         List<ØkonomiXmlMottatt> xmlMottatt = mottattXmlRepository.finnAlleForEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID));
         assertThat(xmlMottatt.size()).isEqualTo(3);
-        assertThat(behandling.isBehandlingPåVent()).isFalse();
 
         assertThat(kravVedtakStatusRepository.finnKravstatus(behandling.getId())).isEqualTo(Optional.of(KravStatusKode.ENDRET));
         assertThat(grunnlagRepository.erKravgrunnlagSperret(behandling.getId())).isFalse();
+
+        List<ProsessTaskData> prosessTasker = prosessTaskRepository.finnAlle(ProsessTaskStatus.FERDIG, ProsessTaskStatus.KLAR);
+        assertThat(prosessTasker).isNotEmpty();
+        assertThat(prosessTasker.size()).isEqualTo(1);
+        assertThat(prosessTasker.get(0).getTaskType()).isEqualTo(FortsettBehandlingTaskProperties.TASKTYPE);
     }
 
     @Test
-    public void skal_ikke_utføre_leskravvedtakststatustask_for_mottatt_endr_melding_når_grunnlag_ikke_finnes(){
+    public void skal_ikke_utføre_leskravvedtakststatustask_for_mottatt_endr_melding_når_grunnlag_ikke_finnes() {
         expectedException.expect(TekniskException.class);
         expectedException.expectMessage("FPT-107929");
 
@@ -213,7 +220,7 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_ikke_utføre_leskravvedtakststatustask_for_mottatt_endr_melding_når_grunnlag_ikke_sperret(){
+    public void skal_ikke_utføre_leskravvedtakststatustask_for_mottatt_endr_melding_når_grunnlag_ikke_sperret() {
         expectedException.expect(TekniskException.class);
         expectedException.expectMessage("FPT-107929");
 

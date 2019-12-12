@@ -113,7 +113,7 @@ public class FellesTestOppsett {
     protected final HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(repositoryProvider.getHistorikkRepository(), journalTjenesteMock, personinfoAdapterMock);
     protected final BehandlingskontrollTjeneste behandlingskontrollTjeneste = new BehandlingskontrollTjenesteImpl(repositoryProvider,behandlingModellRepositoryMock,behandlingskontrollEventPublisererMock);
     private InternalManipulerBehandling manipulerInternBehandling = new InternalManipulerBehandlingImpl(repositoryProvider);
-    protected final KravgrunnlagTjeneste kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repositoryProvider, gjenopptaBehandlingTjeneste,behandlingskontrollTjeneste,mockSlettGrunnlagEventPubliserer);
+    protected final KravgrunnlagTjeneste kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repositoryProvider, prosessTaskRepository, gjenopptaBehandlingTjeneste,behandlingskontrollTjeneste,mockSlettGrunnlagEventPubliserer);
     protected final KravgrunnlagMapper kravgrunnlagMapper = new KravgrunnlagMapper(tpsAdapterWrapper);
     protected final LesKravgrunnlagTask lesKravgrunnlagTask = new LesKravgrunnlagTask(mottattXmlRepository, kravgrunnlagTjeneste,
         kravgrunnlagMapper,repositoryProvider, fpsakKlientMock);
