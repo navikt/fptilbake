@@ -16,6 +16,7 @@
         <module>behandlingsprosess</module>
         <module>infrastrukturtjenester</module>
         <module>integrasjontjenester</module>
+        <module>testutilities</module>
     </modules>
 
     <properties>
@@ -134,6 +135,11 @@
             <dependency>
                 <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
                 <artifactId>domene-testutilities</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+                <artifactId>testutilities</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -336,11 +342,6 @@
                 <artifactId>dokumentbestiller-v1</artifactId>
                 <version>2.0_20190205180510_7b6a6b5</version>
                 <classifier>jaxb</classifier>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.modig</groupId>
-                <artifactId>modig-core-test</artifactId>
-                <version>1.0.0</version>
             </dependency>
             <dependency>
                 <groupId>no.nav.meldinger.virksomhet</groupId>

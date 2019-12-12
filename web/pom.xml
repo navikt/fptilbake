@@ -335,8 +335,8 @@
 
         <!-- Test avhengigheter -->
         <dependency>
-            <groupId>no.nav.modig</groupId>
-            <artifactId>modig-core-test</artifactId>
+            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+            <artifactId>testutilities</artifactId>
             <scope>test</scope>
         </dependency>
 

@@ -11,16 +11,16 @@ import org.junit.Test;
 
 import com.codahale.metrics.health.HealthCheck;
 
+import no.nav.foreldrepenger.tilbakekreving.test.LogSniffer;
 import no.nav.foreldrepenger.tilbakekreving.web.app.selftest.SelftestResultat;
 import no.nav.foreldrepenger.tilbakekreving.web.app.selftest.Selftests;
 import no.nav.foreldrepenger.tilbakekreving.web.app.selftest.checks.ExtHealthCheck;
-import no.nav.modig.core.test.LogSniffer;
 
 public class AppStartupInfoLoggerTest {
 
     @Rule
     public final LogSniffer logSniffer = new LogSniffer();
-    
+
     private AppStartupInfoLogger logger;
 
     @Before
@@ -51,7 +51,7 @@ public class AppStartupInfoLoggerTest {
     @Test
     public void test() {
         logger.logAppStartupInfo();
-        
+
         logSniffer.assertHasInfoMessage("OPPSTARTSINFO start");
         logSniffer.assertHasInfoMessage("System property");
         logSniffer.assertHasInfoMessage("OPPSTARTSINFO slutt");
