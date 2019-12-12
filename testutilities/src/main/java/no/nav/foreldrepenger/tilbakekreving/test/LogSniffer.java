@@ -25,7 +25,7 @@ import ch.qos.logback.core.spi.FilterReply;
  */
 public class LogSniffer implements TestRule {
 
-    private final Map<ILoggingEvent, Boolean> logbackAppender = new LinkedHashMap<ILoggingEvent, Boolean>();
+    private final Map<ILoggingEvent, Boolean> logbackAppender = new LinkedHashMap<>();
     private final Level minimumLevel;
     private final boolean denyOthersWhenMatched;
 
