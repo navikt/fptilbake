@@ -20,7 +20,7 @@ public class DokumentproduksjonConsumerConfig {
     private static final QName PORT = new QName(NAMESPACE, "Dokumentproduksjon_v2Port");
 
     @Inject
-    @KonfigVerdi("Dokumentproduksjon_v2.url")
+    @KonfigVerdi("Dokumentproduksjon.v2.url")
     private String endpointUrl;  // NOSONAR
 
     DokumentproduksjonV2 getPort() {

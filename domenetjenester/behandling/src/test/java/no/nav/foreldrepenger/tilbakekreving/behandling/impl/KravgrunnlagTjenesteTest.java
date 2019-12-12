@@ -63,7 +63,7 @@ public class KravgrunnlagTjenesteTest extends FellesTestOppsett {
     public void setup() {
         when(mockTpsTjeneste.hentAktørForFnr(new PersonIdent(SSN))).thenReturn(Optional.of(aktørId));
         when(behandlingskontrollTjeneste.erStegPassert(any(Behandling.class), any(BehandlingStegType.class))).thenReturn(true);
-        kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repoProvider, mockGjenopptaBehandlingTjeneste, behandlingskontrollTjeneste,eventPubliserer);
+        kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repoProvider, prosessTaskRepository, mockGjenopptaBehandlingTjeneste, behandlingskontrollTjeneste, eventPubliserer);
     }
 
     @Test
