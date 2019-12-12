@@ -10,7 +10,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import no.nav.modig.core.test.LogSniffer;
+import no.nav.foreldrepenger.tilbakekreving.test.LogSniffer;
 
 public class AppStartupServletContextListenerTest {
 
