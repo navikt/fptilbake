@@ -138,6 +138,7 @@ public class KravgrunnlagTjeneste {
             //forutsatt at FPTILBAKE allrede har fått SPER melding for den behandlingen og sett behandling på vent med VenteÅrsak VENT_PÅ_TILBAKEKREVINGSGRUNNLAG
             if (erStegPassert) {
                 logger.info("Hopper tilbake til {} pga endret kravgrunnlag for behandlingId={}", BehandlingStegType.FAKTA_FEILUTBETALING.getKode(), behandlingId);
+                behandlingskontrollTjeneste.settAutopunkterTilUtført(kontekst,false);
                 behandlingskontrollTjeneste.behandlingTilbakeføringTilTidligereBehandlingSteg(kontekst, BehandlingStegType.FAKTA_FEILUTBETALING);
             } else {
                 taBehandlingAvventOgFortsettBehandling(behandlingId);
