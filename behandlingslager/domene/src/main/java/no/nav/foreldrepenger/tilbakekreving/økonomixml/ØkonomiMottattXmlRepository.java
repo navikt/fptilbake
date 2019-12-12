@@ -65,11 +65,12 @@ public class ØkonomiMottattXmlRepository {
         return entityManager.find(ØkonomiXmlMottatt.class, mottattXmlId);
     }
 
-    public void oppdaterMedEksternBehandlingId(String eksternBehandlingId, Long kravgrunnlagXmlId) {
+    public void oppdaterMedEksternBehandlingIdOgSaksnummer(String eksternBehandlingId, String saksnummer, Long kravgrunnlagXmlId) {
         ØkonomiXmlMottatt entity = finnMottattXml(kravgrunnlagXmlId);
         Long eksisterendeVersjon = finnHøyesteVersjonsnummer(eksternBehandlingId);
         long nyVersjon = eksisterendeVersjon == null ? 1 : eksisterendeVersjon + 1;
         entity.setEksternBehandling(eksternBehandlingId, nyVersjon);
+        entity.setSaksnummer(saksnummer);
         entityManager.persist(entity);
     }
 

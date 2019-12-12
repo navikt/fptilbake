@@ -35,16 +35,19 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
 
     private FinnGrunnlagTask finnGrunnlagTask = new FinnGrunnlagTask(repositoryProvider, mottattXmlRepository, kravVedtakStatusTjeneste, kravVedtakStatusMapper, kravgrunnlagMapper);
 
+    private String saksnummer;
+
     @Before
     public void setup() {
         EksternBehandling eksternBehandling = new EksternBehandling(behandling, FPSAK_BEHANDLING_ID, FPSAK_BEHANDLING_UUID);
         eksternBehandlingRepository.lagre(eksternBehandling);
+        saksnummer =  behandling.getFagsak().getSaksnummer().getVerdi();
     }
 
     @Test
     public void skal_finne_og_koble_ny_grunnlag_til_behandling() {
         Long mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_YTEL.xml"));
-        mottattXmlRepository.oppdaterMedEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID), mottattXmlId);
+        mottattXmlRepository.oppdaterMedEksternBehandlingIdOgSaksnummer(String.valueOf(FPSAK_BEHANDLING_ID),saksnummer, mottattXmlId);
         ProsessTaskData prosessTaskData = opprettFinngrunnlagProsessTask();
         finnGrunnlagTask.doTask(prosessTaskData);
 
@@ -55,7 +58,7 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
     @Test
     public void skal_finne_og_koble_endre_grunnlag_til_behandling() {
         Long mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_YTEL_ENDR.xml"));
-        mottattXmlRepository.oppdaterMedEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID), mottattXmlId);
+        mottattXmlRepository.oppdaterMedEksternBehandlingIdOgSaksnummer(String.valueOf(FPSAK_BEHANDLING_ID), saksnummer,mottattXmlId);
         ProsessTaskData prosessTaskData = opprettFinngrunnlagProsessTask();
         finnGrunnlagTask.doTask(prosessTaskData);
 
@@ -68,10 +71,10 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
     @Test
     public void skal_finne_og_håndtere_avsl_melding_for_behandling() {
         Long mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_YTEL.xml"));
-        mottattXmlRepository.oppdaterMedEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID), mottattXmlId);
+        mottattXmlRepository.oppdaterMedEksternBehandlingIdOgSaksnummer(String.valueOf(FPSAK_BEHANDLING_ID), saksnummer,mottattXmlId);
 
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_AVSL.xml"));
-        mottattXmlRepository.oppdaterMedEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID), mottattXmlId);
+        mottattXmlRepository.oppdaterMedEksternBehandlingIdOgSaksnummer(String.valueOf(FPSAK_BEHANDLING_ID), saksnummer,mottattXmlId);
         ProsessTaskData prosessTaskData = opprettFinngrunnlagProsessTask();
         finnGrunnlagTask.doTask(prosessTaskData);
 
@@ -88,10 +91,10 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
     @Test
     public void skal_finne_og_håndtere_sper_melding_for_behandling() {
         Long mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_YTEL.xml"));
-        mottattXmlRepository.oppdaterMedEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID), mottattXmlId);
+        mottattXmlRepository.oppdaterMedEksternBehandlingIdOgSaksnummer(String.valueOf(FPSAK_BEHANDLING_ID), saksnummer, mottattXmlId);
 
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_SPER.xml"));
-        mottattXmlRepository.oppdaterMedEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID), mottattXmlId);
+        mottattXmlRepository.oppdaterMedEksternBehandlingIdOgSaksnummer(String.valueOf(FPSAK_BEHANDLING_ID), saksnummer, mottattXmlId);
         ProsessTaskData prosessTaskData = opprettFinngrunnlagProsessTask();
         finnGrunnlagTask.doTask(prosessTaskData);
 
@@ -107,7 +110,7 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
     @Test
     public void skal_ikke_finne_og_håndtere_ny_grunnlag_når_ekstern_behandling_ikke_finnes() {
         Long mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_FEIL_samme_referanse.xml"));
-        mottattXmlRepository.oppdaterMedEksternBehandlingId(String.valueOf(1174551), mottattXmlId);
+        mottattXmlRepository.oppdaterMedEksternBehandlingIdOgSaksnummer(String.valueOf(1174551), saksnummer, mottattXmlId);
 
         ProsessTaskData prosessTaskData = opprettFinngrunnlagProsessTask();
         finnGrunnlagTask.doTask(prosessTaskData);
@@ -121,7 +124,7 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
     @Test
     public void skal_ikke_finne_og_håndtere_sper_melding_for_behandling_når_grunnlag_xml_ikke_finnes() {
         Long mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_SPER.xml"));
-        mottattXmlRepository.oppdaterMedEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID), mottattXmlId);
+        mottattXmlRepository.oppdaterMedEksternBehandlingIdOgSaksnummer(String.valueOf(FPSAK_BEHANDLING_ID), saksnummer, mottattXmlId);
 
         ProsessTaskData prosessTaskData = opprettFinngrunnlagProsessTask();
         finnGrunnlagTask.doTask(prosessTaskData);
@@ -135,7 +138,7 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
     @Test
     public void skal_ikke_finne_og_håndtere_endr_melding_for_behandling_når_grunnlag_xml_ikke_finnes(){
         Long mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_ENDR.xml"));
-        mottattXmlRepository.oppdaterMedEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID), mottattXmlId);
+        mottattXmlRepository.oppdaterMedEksternBehandlingIdOgSaksnummer(String.valueOf(FPSAK_BEHANDLING_ID), saksnummer, mottattXmlId);
 
         ProsessTaskData prosessTaskData = opprettFinngrunnlagProsessTask();
         finnGrunnlagTask.doTask(prosessTaskData);
@@ -149,13 +152,13 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
     @Test
     public void skal_finne_og_håndtere_endr_melding_for_behandling_når_grunnlag_er_sperret(){
         Long mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_YTEL.xml"));
-        mottattXmlRepository.oppdaterMedEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID), mottattXmlId);
+        mottattXmlRepository.oppdaterMedEksternBehandlingIdOgSaksnummer(String.valueOf(FPSAK_BEHANDLING_ID), saksnummer, mottattXmlId);
 
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_SPER.xml"));
-        mottattXmlRepository.oppdaterMedEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID), mottattXmlId);
+        mottattXmlRepository.oppdaterMedEksternBehandlingIdOgSaksnummer(String.valueOf(FPSAK_BEHANDLING_ID), saksnummer, mottattXmlId);
 
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_ENDR.xml"));
-        mottattXmlRepository.oppdaterMedEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID), mottattXmlId);
+        mottattXmlRepository.oppdaterMedEksternBehandlingIdOgSaksnummer(String.valueOf(FPSAK_BEHANDLING_ID), saksnummer, mottattXmlId);
 
         ProsessTaskData prosessTaskData = opprettFinngrunnlagProsessTask();
         finnGrunnlagTask.doTask(prosessTaskData);
@@ -173,13 +176,13 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
     @Test
     public void skal_ikke_finne_og_håndtere_endr_melding_for_behandling_når_xml_rekkefølge_ikke_riktig(){
         Long mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_YTEL.xml"));
-        mottattXmlRepository.oppdaterMedEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID), mottattXmlId);
+        mottattXmlRepository.oppdaterMedEksternBehandlingIdOgSaksnummer(String.valueOf(FPSAK_BEHANDLING_ID), saksnummer, mottattXmlId);
 
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_ENDR.xml"));
-        mottattXmlRepository.oppdaterMedEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID), mottattXmlId);
+        mottattXmlRepository.oppdaterMedEksternBehandlingIdOgSaksnummer(String.valueOf(FPSAK_BEHANDLING_ID), saksnummer, mottattXmlId);
 
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_SPER.xml"));
-        mottattXmlRepository.oppdaterMedEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID), mottattXmlId);
+        mottattXmlRepository.oppdaterMedEksternBehandlingIdOgSaksnummer(String.valueOf(FPSAK_BEHANDLING_ID), saksnummer, mottattXmlId);
 
         expectedException.expect(TekniskException.class);
         expectedException.expectMessage("FPT-107929");

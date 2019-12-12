@@ -72,7 +72,7 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
         String saksnummer = finnSaksnummer(kravgrunnlagDto.getFagsystemId());
         Kravgrunnlag431 kravgrunnlag = kravgrunnlagMapper.mapTilDomene(kravgrunnlagDto);
 
-        økonomiMottattXmlRepository.oppdaterMedEksternBehandlingId(eksternBehandlingId, mottattXmlId);
+        økonomiMottattXmlRepository.oppdaterMedEksternBehandlingIdOgSaksnummer(eksternBehandlingId, saksnummer,mottattXmlId);
 
         Optional<EksternBehandling> behandlingKobling = hentKoblingTilInternBehandling(eksternBehandlingId);
         if (behandlingKobling.isPresent()) {

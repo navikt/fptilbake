@@ -9,7 +9,7 @@ import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
 
-import no.nav.vedtak.felles.jpa.BaseEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkBaseEntitet;
 import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
 
 /**
@@ -21,7 +21,7 @@ import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
  */
 @Entity(name = "ØkonomiXmlMottatt")
 @Table(name = "OKO_XML_MOTTATT")
-public class ØkonomiXmlMottatt extends BaseEntitet {
+public class ØkonomiXmlMottatt extends KodeverkBaseEntitet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_OKO_XML_MOTTATT")
@@ -33,6 +33,9 @@ public class ØkonomiXmlMottatt extends BaseEntitet {
 
     @Column(name = "ekstern_behandling_id")
     private String eksternBehandlingId;
+
+    @Column(name = "saksnummer")
+    private String saksnummer;
 
     @Column(name = "sekvens")
     private Long sekvens;
@@ -76,5 +79,13 @@ public class ØkonomiXmlMottatt extends BaseEntitet {
 
     public void lagTilkobling() {
         this.tilkoblet = true;
+    }
+
+    public String getSaksnummer() {
+        return saksnummer;
+    }
+
+    public void setSaksnummer(String saksnummer) {
+        this.saksnummer = saksnummer;
     }
 }
