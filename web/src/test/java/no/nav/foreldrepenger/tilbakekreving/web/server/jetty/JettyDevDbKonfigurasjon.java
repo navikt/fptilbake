@@ -195,7 +195,7 @@ public class JettyDevDbKonfigurasjon {
             config.setPassword(dbProperties.getPassword());
 
             config.setConnectionTimeout(1000);
-            config.setMinimumIdle(0);
+            config.setMinimumIdle(2);
             config.setMaximumPoolSize(4);
             config.setConnectionTestQuery("select 1 from dual");
             config.setDriverClassName("oracle.jdbc.OracleDriver");
