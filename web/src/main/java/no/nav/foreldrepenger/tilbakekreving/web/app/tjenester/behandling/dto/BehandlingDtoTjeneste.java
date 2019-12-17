@@ -159,7 +159,7 @@ public class BehandlingDtoTjeneste {
         }
         if (iEllerEtterForeslåVedtakSteg && !behandlingHenlagt) {
             dto.leggTil(ResourceLink.get("/fptilbake/api/beregning/resultat?behandlingId=" + behandlingId, "beregningsresultat", null));
-            dto.leggTil(ResourceLink.post("/fptilbake/api/dokument/hent-vedtaksbrev?behandlingId=" + behandlingId, "vedtaksbrev", behandlingId));
+            dto.leggTil(ResourceLink.get("/fptilbake/api/dokument/hent-vedtaksbrev?behandlingId=" + behandlingId, "vedtaksbrev", null));
         }
 
     }
