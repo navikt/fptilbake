@@ -72,7 +72,6 @@ public class LesKravgrunnlagTaskTest extends FellesTestOppsett {
     private void assertTilkobling() {
         Optional<ØkonomiXmlMottatt> økonomiXmlMottatt = mottattXmlRepository.finnForEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID));
         assertThat(økonomiXmlMottatt).isPresent();
-        ØkonomiXmlMottatt xmlMottatt = økonomiXmlMottatt.get();
-        assertThat(xmlMottatt.isTilkoblet()).isTrue();
+        assertThat(økonomiXmlMottatt.get().isTilkoblet()).isTrue();
     }
 }
