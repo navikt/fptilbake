@@ -79,6 +79,10 @@ public class ØkonomiMottattXmlRepository {
         entityManager.persist(entity);
     }
 
+    public boolean erMottattXmlTilkoblet(Long mottattXmlId) {
+        return finnMottattXml(mottattXmlId).isTilkoblet();
+    }
+
     private Long finnHøyesteVersjonsnummer(String eksternBehandlingId) {
         Query query = entityManager.createNativeQuery("select max(sekvens) from oko_xml_mottatt where ekstern_behandling_id=:eksternBehandlingId");
         query.setParameter(KEY_EKSTERN_BEHANDLING_ID, eksternBehandlingId);
