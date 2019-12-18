@@ -7,8 +7,10 @@
 *-{{#each feilutbetaltePerioder }}
     {{i18n "fom" bundle="korrigertvarselbrev" locale=locale}} {{datoformat fom }} {{i18n "tom" bundle="korrigertvarselbrev" locale=locale}} {{datoformat tom }}.{{/each}}-*
 {{i18n "fristdatotekst" datoformat bundle="korrigertvarselbrev" locale=locale}} {{datoformat fristdatoForTilbakemelding}}.
+{{#if (or foreldrepenger svangerskapspenger)}}
 
 {{i18n "nettotekst" bundle="varselbrev" locale=locale}}
+{{/if}}
 {{i18n "overskrift2" bundle="korrigertvarselbrev" locale=locale}}
 {{i18n "endringtekst1" datoformat bundle="korrigertvarselbrev" locale=locale}} {{datoformat endringsdato}} {{i18n "endringtekst2" bundle="korrigertvarselbrev" locale=locale}}.
 {{#if varseltekstFraSaksbehandler}}{{i18n "fritekst" varseltekstFraSaksbehandler bundle="korrigertvarselbrev" locale=locale}}{{/if}}
@@ -23,7 +25,7 @@
 {{i18n "vurderingavslutning" bundle="varselbrev" locale=locale}}
 {{i18n "slikuttalerdudeg" bundle="varselbrev" locale=locale}}
 {{i18n "innsyn" bundle="varselbrev" locale=locale}}
-{{i18n "spoersmaal" kontakttelefonnummer bundle="varselbrev" locale=locale}}
+{{i18n "spoersmaal" bundle="varselbrev" locale=locale}}
 
 
 {{i18n "hilsen" bundle="varselbrev" locale=locale}}
