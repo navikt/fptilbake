@@ -40,4 +40,6 @@ public interface EksternBehandlingRepository {
     Optional<EksternBehandling> finnForSisteAvsluttetTbkBehandling(UUID eksternUuid);
 
     boolean finnesEksternBehandling(long internId, long eksternId);
+
+    void deaktivateTilkobling(long internId);
 }
