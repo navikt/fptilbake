@@ -2,9 +2,11 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Scanner;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
@@ -27,7 +29,7 @@ public class TekstformattererForVarselbrevTest {
     private final LocalDate JANUAR_30_2019 = LocalDate.of(2019, 1, 30);
 
     @Test
-    public void skal_generere_varseltekst_for_flere_perioder() {
+    public void skal_generere_varseltekst_for_flere_perioder() throws Exception{
         BrevMetadata metadata = new BrevMetadata.Builder()
             .medFagsaktype(svangerskapspengerkode)
             .medSprakkode(Språkkode.nn)
@@ -43,13 +45,14 @@ public class TekstformattererForVarselbrevTest {
             .medMetadata(metadata)
             .build();
 
-        String varselbrevMedFlerePerioder = TekstformatererVarselbrev.lagVarselbrevFritekst(varselbrevSamletInfo);
-        System.out.println(varselbrevMedFlerePerioder);
+        String generertBrev = TekstformatererVarselbrev.lagVarselbrevFritekst(varselbrevSamletInfo);
+
+        String fasit = les("/varselbrev/nn/SVP_flere_perioder.txt");
+        assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 
-
     @Test
-    public void skal_generere_varseltekst_for_engangsstønad() {
+    public void skal_generere_varseltekst_for_engangsstønad() throws IOException {
         BrevMetadata metadata = new BrevMetadata.Builder()
             .medFagsaktype(engangsstønadkode)
             .medSprakkode(Språkkode.nb)
@@ -65,12 +68,14 @@ public class TekstformattererForVarselbrevTest {
             .medMetadata(metadata)
             .build();
 
-        String varselbrevForEngangsstønad = TekstformatererVarselbrev.lagVarselbrevFritekst(varselbrevSamletInfo);
-        System.out.println(varselbrevForEngangsstønad);
+        String generertBrev = TekstformatererVarselbrev.lagVarselbrevFritekst(varselbrevSamletInfo);
+
+        String fasit = les("/varselbrev/nb/ES.txt");
+        assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 
     @Test
-    public void skal_generere_varseltekst_for_foreldrepenger_med_enkelt_periode() {
+    public void skal_generere_varseltekst_for_foreldrepenger_med_enkelt_periode() throws IOException {
         BrevMetadata metadata = new BrevMetadata.Builder()
             .medFagsaktype(foreldrepengerkode)
             .medSprakkode(Språkkode.nb)
@@ -86,8 +91,10 @@ public class TekstformattererForVarselbrevTest {
             .medMetadata(metadata)
             .build();
 
-        String varselbrevForForeldrepenger = TekstformatererVarselbrev.lagVarselbrevFritekst(varselbrevSamletInfo);
-        System.out.println(varselbrevForForeldrepenger);
+        String generertBrev = TekstformatererVarselbrev.lagVarselbrevFritekst(varselbrevSamletInfo);
+
+        String fasit = les("/varselbrev/nb/FP_en_periode.txt");
+        assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 
     @Test
@@ -107,7 +114,6 @@ public class TekstformattererForVarselbrevTest {
             .medMetadata(brevMetadata)
             .build();
 
-        LocalDateTime dagensDato = LocalDateTime.of(2018, 5, 6, 1, 1);
         VarselbrevDokument varselbrev = TekstformatererVarselbrev.mapTilVarselbrevDokument(varselbrevSamletInfo);
 
         assertThat(varselbrev.getEndringsdato()).isEqualTo(LocalDate.of(2018, 5, 6));
@@ -208,4 +214,13 @@ public class TekstformattererForVarselbrevTest {
     private List<Periode> mockUtbetalingEnPeriode() {
         return List.of(new Periode(JANUAR_1_2019, JANUAR_30_2019));
     }
+
+    private String les(String filnavn) throws IOException {
+        try (InputStream resource = getClass().getResourceAsStream(filnavn);
+             Scanner scanner = new Scanner(resource, "UTF-8")) {
+            scanner.useDelimiter("\\A");
+            return scanner.hasNext() ? scanner.next() : null;
+        }
+    }
+
 }
