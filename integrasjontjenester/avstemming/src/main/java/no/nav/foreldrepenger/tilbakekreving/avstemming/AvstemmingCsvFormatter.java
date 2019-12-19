@@ -17,19 +17,23 @@ public class AvstemmingCsvFormatter {
     private static final DateTimeFormatter DATOFORMAT = DateTimeFormatter.ofPattern("yyyyMMdd");
 
     private StringBuilder data = new StringBuilder();
-    private boolean erTom = true;
+    private int antallRader;
 
     public void leggTilRad(RadBuilder radBuilder) {
         String rad = radBuilder.build();
-        if (!erTom) {
+        if (antallRader > 0) {
             data.append(SKILLETEGN_RADER);
         }
         data.append(rad);
-        erTom = false;
+        antallRader++;
     }
 
     public String getData() {
         return data.toString();
+    }
+
+    public int getAntallRader() {
+        return antallRader;
     }
 
     public static RadBuilder radBuilder() {
