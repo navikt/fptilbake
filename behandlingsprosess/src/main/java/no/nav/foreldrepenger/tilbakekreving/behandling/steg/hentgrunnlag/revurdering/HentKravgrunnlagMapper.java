@@ -6,6 +6,9 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TpsAdapterWrapper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
@@ -24,6 +27,7 @@ import no.nav.vedtak.felles.integrasjon.felles.ws.DateUtil;
 
 @ApplicationScoped
 public class HentKravgrunnlagMapper {
+    private Logger logger = LoggerFactory.getLogger(HentKravgrunnlagMapper.class);
     private TpsAdapterWrapper tpsAdapterWrapper;
 
     HentKravgrunnlagMapper() {
@@ -49,6 +53,8 @@ public class HentKravgrunnlagMapper {
     }
 
     private Kravgrunnlag431 formKravgrunnlag431(DetaljertKravgrunnlagDto dto) {
+        logger.info("Mottatt respons fra økonomi={}",dto);
+        logger.info("Mottatt typeGjelderId={} fra økonomi",dto.getTypeGjelderId());
         GjelderType gjelderType = GjelderType.fraKode(dto.getTypeGjelderId().value());
         GjelderType utbetalingGjelderType = GjelderType.fraKode(dto.getTypeUtbetId().value());
         return Kravgrunnlag431.builder().medVedtakId(dto.getVedtakId().longValue())

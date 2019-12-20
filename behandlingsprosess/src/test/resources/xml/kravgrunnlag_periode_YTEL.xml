@@ -6,7 +6,7 @@
         <urn:vedtakId>100</urn:vedtakId>
         <urn:kodeStatusKrav>NY</urn:kodeStatusKrav>
         <urn:kodeFagomraade>FP</urn:kodeFagomraade>
-        <urn:fagsystemId>2000001100</urn:fagsystemId>
+        <urn:fagsystemId>100001</urn:fagsystemId>
         <!--Optional:-->
         <urn:datoVedtakFagsystem>2007-10-26</urn:datoVedtakFagsystem>
         <urn:vedtakGjelderId>12345678901</urn:vedtakGjelderId>
