@@ -27,9 +27,11 @@ public class TekstformattererForVarselbrevTest {
 
     private final LocalDate JANUAR_1_2019 = LocalDate.of(2019, 1, 1);
     private final LocalDate JANUAR_30_2019 = LocalDate.of(2019, 1, 30);
+    private final LocalDate REVURDERING_VEDTAK_DATO = LocalDate.of(2019, 12, 18);
+    private final LocalDate FRIST_DATO = LocalDate.of(2020, 4, 4);
 
     @Test
-    public void skal_generere_varseltekst_for_flere_perioder() throws Exception{
+    public void skal_generere_varseltekst_for_flere_perioder() throws Exception {
         BrevMetadata metadata = new BrevMetadata.Builder()
             .medFagsaktype(svangerskapspengerkode)
             .medSprakkode(Språkkode.nn)
@@ -40,8 +42,8 @@ public class TekstformattererForVarselbrevTest {
             .medFritekstFraSaksbehandler("Dette er fritekst skrevet av saksbehandler.")
             .medSumFeilutbetaling(595959L)
             .medFeilutbetaltePerioder(mockFeilutbetalingerMedFlerePerioder())
-            .medFristdato(LocalDate.of(2020, 4, 4))
-            .medRevurderingVedtakDato(FPDateUtil.iDag())
+            .medFristdato(FRIST_DATO)
+            .medRevurderingVedtakDato(REVURDERING_VEDTAK_DATO)
             .medMetadata(metadata)
             .build();
 
@@ -63,8 +65,8 @@ public class TekstformattererForVarselbrevTest {
             .medFritekstFraSaksbehandler("Dette er fritekst skrevet av saksbehandler.")
             .medSumFeilutbetaling(595959L)
             .medFeilutbetaltePerioder(mockFeilutbetalingerMedKunEnPeriode())
-            .medFristdato(LocalDate.of(2020, 4, 4))
-            .medRevurderingVedtakDato(FPDateUtil.iDag())
+            .medFristdato(FRIST_DATO)
+            .medRevurderingVedtakDato(REVURDERING_VEDTAK_DATO)
             .medMetadata(metadata)
             .build();
 
@@ -86,8 +88,8 @@ public class TekstformattererForVarselbrevTest {
             .medFritekstFraSaksbehandler("Dette er fritekst skrevet av saksbehandler.")
             .medSumFeilutbetaling(595959L)
             .medFeilutbetaltePerioder(mockFeilutbetalingerMedKunEnPeriode())
-            .medFristdato(LocalDate.of(2020, 4, 4))
-            .medRevurderingVedtakDato(FPDateUtil.iDag())
+            .medFristdato(FRIST_DATO)
+            .medRevurderingVedtakDato(REVURDERING_VEDTAK_DATO)
             .medMetadata(metadata)
             .build();
 
