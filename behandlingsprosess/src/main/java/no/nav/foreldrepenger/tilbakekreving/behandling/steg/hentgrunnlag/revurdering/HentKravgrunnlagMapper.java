@@ -53,8 +53,11 @@ public class HentKravgrunnlagMapper {
     }
 
     private Kravgrunnlag431 formKravgrunnlag431(DetaljertKravgrunnlagDto dto) {
-        logger.info("Mottatt respons fra økonomi={}",dto);
         logger.info("Mottatt typeGjelderId={} fra økonomi",dto.getTypeGjelderId());
+        logger.info("Mottatt typeUtbetId={} fra økonomi",dto.getTypeUtbetId());
+        logger.info("Mottatt vedtakId={} fra økonomi",dto.getVedtakId());
+        logger.info("Mottatt fagSystemId={} fra økonomi",dto.getFagsystemId());
+        logger.info("Mottatt kodeStatusKrav={},fagområdeKode={} fra økonomi",dto.getKodeStatusKrav(),dto.getKodeFagomraade());
         GjelderType gjelderType = GjelderType.fraKode(dto.getTypeGjelderId().value());
         GjelderType utbetalingGjelderType = GjelderType.fraKode(dto.getTypeUtbetId().value());
         return Kravgrunnlag431.builder().medVedtakId(dto.getVedtakId().longValue())
