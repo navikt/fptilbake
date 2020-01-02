@@ -58,6 +58,11 @@ public class HentKravgrunnlagMapper {
         logger.info("Mottatt vedtakId={} fra økonomi",dto.getVedtakId());
         logger.info("Mottatt fagSystemId={} fra økonomi",dto.getFagsystemId());
         logger.info("Mottatt kodeStatusKrav={},fagområdeKode={} fra økonomi",dto.getKodeStatusKrav(),dto.getKodeFagomraade());
+        logger.info("Mottatt renterBeregnes={} fra økonomi",dto.getRenterBeregnes());
+        if(dto.getTilbakekrevingsPeriode()!=null){
+            logger.info("Mottatt tilbakekrevingPeriode={} fra økonomi",dto.getTilbakekrevingsPeriode().get(0).getPeriode().getFom());
+        }
+
         GjelderType gjelderType = GjelderType.fraKode(dto.getTypeGjelderId().value());
         GjelderType utbetalingGjelderType = GjelderType.fraKode(dto.getTypeUtbetId().value());
         return Kravgrunnlag431.builder().medVedtakId(dto.getVedtakId().longValue())
