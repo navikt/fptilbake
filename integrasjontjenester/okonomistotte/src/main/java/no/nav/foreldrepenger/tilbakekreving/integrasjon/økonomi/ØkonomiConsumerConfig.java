@@ -9,7 +9,6 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
 
 import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingPortType;
-import no.nav.vedtak.felles.integrasjon.felles.ws.CallIdInInterceptor;
 import no.nav.vedtak.felles.integrasjon.felles.ws.CallIdOutInterceptor;
 import no.nav.vedtak.konfig.KonfigVerdi;
 
@@ -38,7 +37,6 @@ public class ØkonomiConsumerConfig {
         factoryBean.getFeatures().add(new WSAddressingFeature());
         factoryBean.getFeatures().add(new LoggingFeature());
         factoryBean.getOutInterceptors().add(new CallIdOutInterceptor());
-        factoryBean.getInInterceptors().add(new CallIdInInterceptor());
         return factoryBean.create(TilbakekrevingPortType.class);
     }
 
