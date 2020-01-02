@@ -53,22 +53,12 @@ public class HentKravgrunnlagMapper {
     }
 
     private Kravgrunnlag431 formKravgrunnlag431(DetaljertKravgrunnlagDto dto) {
-        logger.info("Mottatt typeGjelderId={} fra økonomi",dto.getTypeGjelderId());
-        logger.info("Mottatt typeUtbetId={} fra økonomi",dto.getTypeUtbetId());
-        logger.info("Mottatt vedtakId={} fra økonomi",dto.getVedtakId());
-        logger.info("Mottatt fagSystemId={} fra økonomi",dto.getFagsystemId());
-        logger.info("Mottatt kodeStatusKrav={},fagområdeKode={} fra økonomi",dto.getKodeStatusKrav(),dto.getKodeFagomraade());
-        logger.info("Mottatt renterBeregnes={} fra økonomi",dto.getRenterBeregnes());
-        if(dto.getTilbakekrevingsPeriode()!=null){
-            logger.info("Mottatt tilbakekrevingPeriode={} fra økonomi",dto.getTilbakekrevingsPeriode().get(0).getPeriode().getFom());
-        }
-
         GjelderType gjelderType = GjelderType.fraKode(dto.getTypeGjelderId().value());
         GjelderType utbetalingGjelderType = GjelderType.fraKode(dto.getTypeUtbetId().value());
         return Kravgrunnlag431.builder().medVedtakId(dto.getVedtakId().longValue())
-            .medKravStatusKode(KravStatusKode.fraKode(dto.getKodeStatusKrav()))
-            .medFagomraadeKode(FagOmrådeKode.fraKode(dto.getKodeFagomraade()))
-            .medFagSystemId(dto.getFagsystemId())
+            .medKravStatusKode(KravStatusKode.fraKode(trimTrailingSpaces(dto.getKodeStatusKrav())))
+            .medFagomraadeKode(FagOmrådeKode.fraKode(trimTrailingSpaces(dto.getKodeFagomraade().trim())))
+            .medFagSystemId(trimTrailingSpaces(dto.getFagsystemId()))
             .medVedtakFagSystemDato(konverter(dto.getDatoVedtakFagsystem()))
             .medOmgjortVedtakId(dto.getVedtakIdOmgjort() != null ? dto.getVedtakIdOmgjort().longValue() : null)
             .medGjelderVedtakId(tpsAdapterWrapper.hentAktørIdEllerOrganisajonNummer(dto.getVedtakGjelderId(), gjelderType))
@@ -77,12 +67,12 @@ public class HentKravgrunnlagMapper {
             .medUtbetIdType(utbetalingGjelderType)
             .medHjemmelKode(dto.getKodeHjemmel())
             .medBeregnesRenter(dto.getRenterBeregnes() != null ? dto.getRenterBeregnes().value() : null)
-            .medAnsvarligEnhet(dto.getEnhetAnsvarlig())
-            .medBostedEnhet(dto.getEnhetBosted())
-            .medBehandlendeEnhet(dto.getEnhetBehandl())
+            .medAnsvarligEnhet(trimTrailingSpaces(dto.getEnhetAnsvarlig()))
+            .medBostedEnhet(trimTrailingSpaces(dto.getEnhetBosted()))
+            .medBehandlendeEnhet(trimTrailingSpaces(dto.getEnhetBehandl()))
             .medFeltKontroll(dto.getKontrollfelt())
-            .medSaksBehId(dto.getSaksbehId())
-            .medReferanse(dto.getReferanse())
+            .medSaksBehId(trimTrailingSpaces(dto.getSaksbehId()))
+            .medReferanse(trimTrailingSpaces(dto.getReferanse()))
             .medEksternKravgrunnlagId(String.valueOf(dto.getKravgrunnlagId()))
             .build();
     }
@@ -139,6 +129,10 @@ public class HentKravgrunnlagMapper {
             default:
                 throw new IllegalArgumentException("Ukjent klassetype: " + typeKlasse);
         }
+    }
+
+    private String trimTrailingSpaces(String field){
+        return field.trim();
     }
 
 }
