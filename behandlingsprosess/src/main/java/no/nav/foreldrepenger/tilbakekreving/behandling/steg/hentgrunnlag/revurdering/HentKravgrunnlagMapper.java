@@ -97,16 +97,16 @@ public class HentKravgrunnlagMapper {
             .medTilbakekrevesBelop(dto.getBelopTilbakekreves())
             .medUinnkrevdBelop(dto.getBelopUinnkrevd())
             .medSkattProsent(dto.getSkattProsent())
-            .medResultatKode(dto.getKodeResultat())
-            .medÅrsakKode(dto.getKodeAArsak())
-            .medSkyldKode(dto.getKodeSkyld())
+            .medResultatKode(trimTrailingSpaces(dto.getKodeResultat()))
+            .medÅrsakKode(trimTrailingSpaces(dto.getKodeAArsak()))
+            .medSkyldKode(trimTrailingSpaces(dto.getKodeSkyld()))
             .medKravgrunnlagPeriode432(kravgrunnlagPeriode432)
             .build();
     }
 
     private KlasseKode finnKlasseKode(DetaljertKravgrunnlagBelopDto dto, KlasseType type) {
         return type == KlasseType.YTEL || type == KlasseType.FEIL
-            ? KlasseKode.fraKode(dto.getKodeKlasse())
+            ? KlasseKode.fraKode(trimTrailingSpaces(dto.getKodeKlasse()))
             : KlasseKode.UDEFINERT;
     }
 
