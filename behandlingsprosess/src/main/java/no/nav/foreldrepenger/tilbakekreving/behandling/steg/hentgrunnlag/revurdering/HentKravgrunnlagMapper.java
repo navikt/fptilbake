@@ -72,7 +72,7 @@ public class HentKravgrunnlagMapper {
             .medBehandlendeEnhet(trimTrailingSpaces(dto.getEnhetBehandl()))
             .medFeltKontroll(dto.getKontrollfelt())
             .medSaksBehId(trimTrailingSpaces(dto.getSaksbehId()))
-            .medReferanse(trimTrailingSpaces(dto.getReferanse()))
+            .medReferanse(dto.getReferanse())
             .medEksternKravgrunnlagId(String.valueOf(dto.getKravgrunnlagId()))
             .build();
     }
@@ -97,9 +97,9 @@ public class HentKravgrunnlagMapper {
             .medTilbakekrevesBelop(dto.getBelopTilbakekreves())
             .medUinnkrevdBelop(dto.getBelopUinnkrevd())
             .medSkattProsent(dto.getSkattProsent())
-            .medResultatKode(trimTrailingSpaces(dto.getKodeResultat()))
-            .medÅrsakKode(trimTrailingSpaces(dto.getKodeAArsak()))
-            .medSkyldKode(trimTrailingSpaces(dto.getKodeSkyld()))
+            .medResultatKode(dto.getKodeResultat())
+            .medÅrsakKode(dto.getKodeAArsak())
+            .medSkyldKode(dto.getKodeSkyld())
             .medKravgrunnlagPeriode432(kravgrunnlagPeriode432)
             .build();
     }
