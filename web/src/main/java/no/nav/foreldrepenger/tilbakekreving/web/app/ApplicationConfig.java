@@ -11,6 +11,7 @@ import javax.enterprise.inject.spi.CDI;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.migrasjon.MigrasjonRestTjeneste;
 import org.jboss.weld.interceptor.util.proxy.TargetInstanceProxy;
 
 import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
@@ -112,6 +113,7 @@ public class ApplicationConfig extends Application {
         classes.add(FordelRestTjeneste.class);
         classes.add(ForvaltningTekniskRestTjeneste.class);
         classes.add(ForvaltningBehandlingRestTjeneste.class);
+        classes.add(MigrasjonRestTjeneste.class);
 
         //HAXX GrunnlagRestTjenesteTest skal bare være tilgjengelig for lokal utvikling, brukes for å sette opp test
         //hvis denne legges til i en egen Application isdf i denne, kan man ikke bruke swagger for å nå tjenesten

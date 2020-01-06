@@ -84,6 +84,17 @@ public class ØkonomiMottattXmlRepository {
         return finnMottattXml(mottattXmlId).isTilkoblet();
     }
 
+    public List<ØkonomiXmlMottatt> hentAlleMeldingerUtenSaksnummer(){
+        TypedQuery<ØkonomiXmlMottatt> query = entityManager.createQuery("from ØkonomiXmlMottatt where saksnummer is null", ØkonomiXmlMottatt.class);
+        return query.getResultList();
+    }
+
+    public void oppdaterSaksnummer(Long kravgrunnlagXmlId, String saksnummer){
+        ØkonomiXmlMottatt entity = finnMottattXml(kravgrunnlagXmlId);
+        entity.setSaksnummer(saksnummer);
+        entityManager.persist(entity);
+    }
+
     private Long finnHøyesteVersjonsnummer(String eksternBehandlingId) {
         Query query = entityManager.createNativeQuery("select max(sekvens) from oko_xml_mottatt where ekstern_behandling_id=:eksternBehandlingId");
         query.setParameter(KEY_EKSTERN_BEHANDLING_ID, eksternBehandlingId);
