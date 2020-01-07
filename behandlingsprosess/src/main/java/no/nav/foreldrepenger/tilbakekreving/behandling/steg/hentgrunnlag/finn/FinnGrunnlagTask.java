@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +45,7 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
     public static final String TASKTYPE = "kravgrunnlag.finn";
 
     private KravgrunnlagRepository grunnlagRepository;
-    private EksternBehandlingRepository eksternBehandlingRepository;
+    private BehandlingRepository behandlingRepository;
     private ØkonomiMottattXmlRepository mottattXmlRepository;
     private KravVedtakStatusTjeneste kravVedtakStatusTjeneste;
     private KravVedtakStatusMapper kravVedtakStatusMapper;
@@ -60,7 +62,7 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
                             KravVedtakStatusMapper kravVedtakStatusMapper,
                             KravgrunnlagMapper kravgrunnlagMapper) {
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
-        this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
+        this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.mottattXmlRepository = mottattXmlRepository;
 
         this.kravVedtakStatusTjeneste = kravVedtakStatusTjeneste;
@@ -71,11 +73,12 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
         Long behandlingId = prosessTaskData.getBehandlingId();
-        EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandlingId);
+        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
+        String saksnummer = behandling.getFagsak().getSaksnummer().getVerdi();
 
-        List<ØkonomiXmlMottatt> alleXmlMeldinger = mottattXmlRepository.finnAlleEksternBehandlingSomIkkeErKoblet(String.valueOf(eksternBehandling.getEksternId()));
+        List<ØkonomiXmlMottatt> alleXmlMeldinger = mottattXmlRepository.finnAlleForSaksnummerSomIkkeErKoblet(saksnummer);
         if (!alleXmlMeldinger.isEmpty()) {
-            logger.info("Fant {} meldinger som ikke er koblet for behandlingId={} og eksternBehandlingId={}", alleXmlMeldinger.size(), behandlingId, eksternBehandling.getEksternId());
+            logger.info("Fant {} meldinger som ikke er koblet for behandlingId={} og saksnummer={}", alleXmlMeldinger.size(), behandlingId, saksnummer);
             alleXmlMeldinger = alleXmlMeldinger.stream()
                 .sorted(Comparator.comparing(ØkonomiXmlMottatt::getSekvens))
                 .collect(Collectors.toList());

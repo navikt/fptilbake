@@ -55,9 +55,9 @@ public class ØkonomiMottattXmlRepository {
         return query.getResultList();
     }
 
-    public List<ØkonomiXmlMottatt> finnAlleEksternBehandlingSomIkkeErKoblet(String eksternBehandlingId) {
-        TypedQuery<ØkonomiXmlMottatt> query = entityManager.createQuery("from ØkonomiXmlMottatt where eksternBehandlingId=:eksternBehandlingId and tilkoblet='N'", ØkonomiXmlMottatt.class);
-        query.setParameter(KEY_EKSTERN_BEHANDLING_ID, eksternBehandlingId);
+    public List<ØkonomiXmlMottatt> finnAlleForSaksnummerSomIkkeErKoblet(String saksnummer) {
+        TypedQuery<ØkonomiXmlMottatt> query = entityManager.createQuery("from ØkonomiXmlMottatt where saksnummer=:saksnummer and tilkoblet='N'", ØkonomiXmlMottatt.class);
+        query.setParameter("saksnummer", saksnummer);
         return query.getResultList();
     }
 
