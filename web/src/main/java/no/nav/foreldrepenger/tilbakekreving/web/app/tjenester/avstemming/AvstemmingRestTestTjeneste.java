@@ -27,7 +27,7 @@ public class AvstemmingRestTestTjeneste {
     private static final Logger logger = LoggerFactory.getLogger(AvstemmingRestTestTjeneste.class);
     private AvstemmingTjeneste avstemmingTjeneste;
 
-    AvstemmingRestTestTjeneste() {
+    public AvstemmingRestTestTjeneste() {
         //for cdi proxy
     }
 
