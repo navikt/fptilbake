@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtakRepository;
@@ -68,7 +69,6 @@ public class AvstemmingTjeneste {
 
                 avstemmingCsvFormatter.leggTilRad(AvstemmingCsvFormatter.radBuilder()
                     .medAvsender("fptilbake")
-                    .medTidspunktDannet(sendtMelding.getOpprettetTidspunkt())
                     .medVedtakId(oppsummering.getØkonomiVedtakId())
                     .medFnr(mapper.getFnr(behandling.getAktørId()))
                     .medVedtaksdato(behandlingVedtak.getVedtaksdato())
@@ -77,11 +77,16 @@ public class AvstemmingTjeneste {
                     .medTilbakekrevesNettoUtenRenter(oppsummering.getTilbakekrevesNettoUtenRenter())
                     .medSkatt(oppsummering.getSkatt())
                     .medRenter(oppsummering.getRenter())
+                    .medErOmgjøringTilIngenTilbakekreving(erOmgjøringTilIngenTilbakekreving(oppsummering, behandling))
                 );
             }
         }
         logger.info("Avstemmingdata for {} ble hentet. Av {} sendte meldinger var {} med OK kvittering og kan sendes til avstemming", dato, sendteMeldinger.size(), avstemmingCsvFormatter.getAntallRader());
         return avstemmingCsvFormatter.getData();
+    }
+
+    private boolean erOmgjøringTilIngenTilbakekreving(TilbakekrevingsvedtakOppsummering oppsummering, Behandling behandling) {
+        return behandling.getType().equals(BehandlingType.REVURDERING_TILBAKEKREVING) && oppsummering.getTilbakekrevesBruttoUtenRenter().signum() == 0;
     }
 
     static class AktørIdFnrMapper {
