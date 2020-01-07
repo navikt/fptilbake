@@ -2,6 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.web.app;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -12,6 +13,8 @@ import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
 import org.jboss.weld.interceptor.util.proxy.TargetInstanceProxy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
@@ -24,6 +27,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.ConstraintViolati
 import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.JsonMappingExceptionMapper;
 import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.JsonParseExceptionMapper;
 import no.nav.foreldrepenger.tilbakekreving.web.app.konfig.FellesKlasserForRest;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.avstemming.AvstemmingRestTestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.batch.BatchRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.BehandlingFaktaRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.BehandlingRestTjeneste;
@@ -44,12 +48,14 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.konfig.KonfigRestT
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.saksbehandler.NavAnsattRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.tilbakekrevingsgrunnlag.GrunnlagRestTestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.varselrespons.VarselresponsRestTjeneste;
+import no.nav.vedtak.felles.integrasjon.unleash.EnvironmentProperty;
 import no.nav.vedtak.felles.prosesstask.rest.ProsessTaskRestTjeneste;
 
 
 @ApplicationPath(ApplicationConfig.API_URI)
 public class ApplicationConfig extends Application {
 
+    private static final Logger logger = LoggerFactory.getLogger(ApplicationConfig.class);
     public static final String API_URI = "/api";
 
     public ApplicationConfig() {
@@ -112,6 +118,13 @@ public class ApplicationConfig extends Application {
         classes.add(FordelRestTjeneste.class);
         classes.add(ForvaltningTekniskRestTjeneste.class);
         classes.add(ForvaltningBehandlingRestTjeneste.class);
+
+        //HAXX legger til en test-tjeneste i alle miljø utenom prod
+        Optional<String> envName = EnvironmentProperty.getEnvironmentName();
+        if (envName.isPresent() && !EnvironmentProperty.PROD.equalsIgnoreCase(envName.get())) {
+            logger.warn("Legger til testklasser (skal ikke skje i prod): {}", AvstemmingRestTestTjeneste.class.getSimpleName());
+            classes.add(AvstemmingRestTestTjeneste.class);
+        }
 
         //HAXX GrunnlagRestTjenesteTest skal bare være tilgjengelig for lokal utvikling, brukes for å sette opp test
         //hvis denne legges til i en egen Application isdf i denne, kan man ikke bruke swagger for å nå tjenesten

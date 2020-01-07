@@ -13,17 +13,18 @@
     <name>FPTILBAKE :: Integrasjontjenester</name>
 
     <modules>
+        <module>avstemming</module>
+        <module>dokumentarkiv</module>
         <module>dokumentbestiller</module>
+        <module>dokumentproduksjon-klient</module>
+        <module>fpsak-klient</module>
+        <module>journalpost</module>
+        <module>kafka-poller</module>
+        <module>kravgrunnlag-queue</module>
         <module>okonomistotte</module>
         <module>person</module>
-        <module>simulering</module>
-        <module>dokumentarkiv</module>
-        <module>fpsak-klient</module>
-        <module>kravgrunnlag-queue</module>
-        <module>kafka-poller</module>
         <module>pdfgen</module>
-        <module>journalpost</module>
-        <module>dokumentproduksjon-klient</module>
+        <module>simulering</module>
     </modules>
 
 </project>

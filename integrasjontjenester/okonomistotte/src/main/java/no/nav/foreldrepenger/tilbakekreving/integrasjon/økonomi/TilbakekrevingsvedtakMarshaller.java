@@ -1,14 +1,21 @@
-package no.nav.foreldrepenger.tilbakekreving.behandling.steg.iverksettvedtak;
+package no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi;
 
+import java.io.StringReader;
 import java.io.StringWriter;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsvedtakDto;
+import no.nav.vedtak.feil.Feil;
+import no.nav.vedtak.feil.FeilFactory;
+import no.nav.vedtak.feil.LogLevel;
+import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
+import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
 
 public class TilbakekrevingsvedtakMarshaller {
 
@@ -32,7 +39,16 @@ public class TilbakekrevingsvedtakMarshaller {
             marshaller.marshal(jaxbelement, stringWriter);
             return stringWriter.toString();
         } catch (JAXBException e) {
-            throw SendØkonomiTibakekerevingsVedtakTask.SendØkonomiTilbakekrevingVedtakTaskFeil.FACTORY.kunneIkkeMarshalleVedtakXml(behandlingId, e).toException();
+            throw TilbakekrevingsvedtakMarshallerFeil.FACTORY.kunneIkkeMarshalleVedtakXml(behandlingId, e).toException();
+        }
+    }
+
+    public static TilbakekrevingsvedtakDto unmarshall(String xml) {
+        try {
+            Unmarshaller unmarshaller = getContext().createUnmarshaller();
+            return (TilbakekrevingsvedtakDto) unmarshaller.unmarshal(new StringReader(xml));
+        } catch (JAXBException e) {
+            throw TilbakekrevingsvedtakMarshallerFeil.FACTORY.kunneIkkeUnmarshalleVedtakXml(e).toException();
         }
     }
 
@@ -41,5 +57,17 @@ public class TilbakekrevingsvedtakMarshaller {
             context = JAXBContext.newInstance(TilbakekrevingsvedtakDto.class);
         }
         return context;
+    }
+
+    interface TilbakekrevingsvedtakMarshallerFeil extends DeklarerteFeil {
+
+        TilbakekrevingsvedtakMarshallerFeil FACTORY = FeilFactory.create(TilbakekrevingsvedtakMarshallerFeil.class);
+
+        @TekniskFeil(feilkode = "FPT-113616", feilmelding = "Kunne ikke marshalle vedtak. BehandlingId=%s", logLevel = LogLevel.WARN)
+        Feil kunneIkkeMarshalleVedtakXml(Long behandlingId, Exception e);
+
+        @TekniskFeil(feilkode = "FPT-511823", feilmelding = "Kunne ikke unmarshalle vedtak. BehandlingId=%s", logLevel = LogLevel.WARN)
+        Feil kunneIkkeUnmarshalleVedtakXml(Exception e);
+
     }
 }

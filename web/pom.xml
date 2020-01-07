@@ -104,6 +104,10 @@
         <!-- Prosjekt avhengigheter -->
         <dependency>
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+            <artifactId>avstemming</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
             <artifactId>felles-kodeverk</artifactId>
         </dependency>
         <dependency>

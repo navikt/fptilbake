@@ -13,4 +13,7 @@ public interface ØkonomiResponsFeil extends DeklarerteFeil {
     @TekniskFeil(feilkode = "FPT-113618", feilmelding = "Kunne ikke marshalle respons fra økonomi. BehandlingId=%s", logLevel = LogLevel.WARN)
     Feil kunneIkkeMarshalleØkonomiResponsXml(Long behandlingId, Exception e);
 
+    @TekniskFeil(feilkode = "FPT-176103", feilmelding = "Kunne ikke unmarshalle respons fra økonomi. BehandlingId=%s", logLevel = LogLevel.WARN)
+    Feil kunneIkkeUnmarshalleØkonomiResponsXml(Exception e);
+
 }
