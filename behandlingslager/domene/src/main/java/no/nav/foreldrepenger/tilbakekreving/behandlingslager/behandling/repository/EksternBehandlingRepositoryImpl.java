@@ -90,6 +90,13 @@ public class EksternBehandlingRepositoryImpl implements EksternBehandlingReposit
         return !query.getResultList().isEmpty();
     }
 
+    @Override
+    public void deaktivateTilkobling(long internId) {
+        EksternBehandling eksternBehandling = hentFraInternId(internId);
+        eksternBehandling.setInaktiv();
+        entityManager.persist(eksternBehandling);
+    }
+
     private Optional<EksternBehandling> hentOptionalFraInternId(long internBehandlingId) {
         TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where intern_id=:internId and aktiv='J'", EksternBehandling.class);
         query.setParameter(INTERN_ID, internBehandlingId);

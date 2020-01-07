@@ -15,6 +15,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
@@ -25,6 +26,7 @@ public class HenleggBehandlingTjeneste {
 
     private BehandlingRepository behandlingRepository;
     private KravgrunnlagRepository grunnlagRepository;
+    private EksternBehandlingRepository eksternBehandlingRepository;
 
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private HistorikkinnslagTjeneste historikkinnslagTjeneste;
@@ -39,6 +41,7 @@ public class HenleggBehandlingTjeneste {
                                      HistorikkinnslagTjeneste historikkinnslagTjeneste) {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
+        this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
 
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
         this.historikkinnslagTjeneste = historikkinnslagTjeneste;
@@ -68,6 +71,7 @@ public class HenleggBehandlingTjeneste {
             sendHenleggelsesbrev();
         }
         opprettHistorikkinnslag(behandling, årsakKode, begrunnelse);
+        eksternBehandlingRepository.deaktivateTilkobling(behandlingId);
     }
 
     private void sendHenleggelsesbrev() {

@@ -40,6 +40,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingresultatRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
@@ -76,6 +77,9 @@ public class HenleggBehandlingTjenesteTest {
 
     @Mock
     private BehandlingModellRepository behandlingModellRepository;
+
+    @Mock
+    private EksternBehandlingRepository eksternBehandlingRepositoryMock;
 
     @Mock
     private BehandlingStegType behandlingStegType;
@@ -120,6 +124,7 @@ public class HenleggBehandlingTjenesteTest {
         when(repositoryProviderMock.getHistorikkRepository()).thenReturn(historikkRepositoryMock);
         when(repositoryProviderMock.getBehandlingresultatRepository()).thenReturn(behandlingresultatRepository);
         when(repositoryProviderMock.getGrunnlagRepository()).thenReturn(kravgrunnlagRepositoryMock);
+        when(repositoryProviderMock.getEksternBehandlingRepository()).thenReturn(eksternBehandlingRepositoryMock);
         when(repositoryProviderMock.getBehandlingRepository().finnBehandlingStegType(IVERKSETT_VEDTAK.getKode())).thenReturn(behandlingStegType);
         BehandlingskontrollTjenesteImpl behandlingskontrollTjenesteImpl = new BehandlingskontrollTjenesteImpl(repositoryProviderMock,
             behandlingModellRepository, null);
