@@ -10,20 +10,21 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelse
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
 
 public class AvstemmingCsvFormatter {
-
     private static final String SKILLETEGN_KOLONNER = ";";
+
     private static final String SKILLETEGN_RADER = "\n";
     private static final DateTimeFormatter DATOFORMAT = DateTimeFormatter.ofPattern("yyyyMMdd");
 
     private StringBuilder data = new StringBuilder();
     private int antallRader;
 
+    public AvstemmingCsvFormatter() {
+        data.append(RadBuilder.buildeHeader());
+    }
+
     public void leggTilRad(RadBuilder radBuilder) {
-        String rad = radBuilder.build();
-        if (antallRader > 0) {
-            data.append(SKILLETEGN_RADER);
-        }
-        data.append(rad);
+        data.append(SKILLETEGN_RADER);
+        data.append(radBuilder.build());
         antallRader++;
     }
 
@@ -40,6 +41,7 @@ public class AvstemmingCsvFormatter {
     }
 
     public static class RadBuilder {
+
         private String avsender;
         private String vedtakId;
         private String fnr;
@@ -99,6 +101,19 @@ public class AvstemmingCsvFormatter {
         public RadBuilder medErOmgjøringTilIngenTilbakekreving(boolean erOmgjøringTilIngenTilbakekreving) {
             this.erOmgjøringTilIngenTilbakekreving = erOmgjøringTilIngenTilbakekreving;
             return this;
+        }
+
+        public static String buildeHeader() {
+            return "avsender" + SKILLETEGN_KOLONNER +
+                "vedtakId" + SKILLETEGN_KOLONNER +
+                "fnr" + SKILLETEGN_KOLONNER +
+                "vedtaksdato" + SKILLETEGN_KOLONNER +
+                "fagsakYtelseType" + SKILLETEGN_KOLONNER +
+                "tilbakekrevesBruttoUtenRenter" + SKILLETEGN_KOLONNER +
+                "skatt" + SKILLETEGN_KOLONNER +
+                "tilbakekrevesNettoUtenRenter" + SKILLETEGN_KOLONNER +
+                "renter" + SKILLETEGN_KOLONNER +
+                "erOmgjøringTilIngenTilbakekreving";
         }
 
         public String build() {

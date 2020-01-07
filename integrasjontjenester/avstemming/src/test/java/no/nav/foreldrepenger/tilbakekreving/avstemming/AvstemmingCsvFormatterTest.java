@@ -11,12 +11,13 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelse
 
 public class AvstemmingCsvFormatterTest {
 
+    private static final String FORVENTET_HEADER = "avsender;vedtakId;fnr;vedtaksdato;fagsakYtelseType;tilbakekrevesBruttoUtenRenter;skatt;tilbakekrevesNettoUtenRenter;renter;erOmgjøringTilIngenTilbakekreving\n";
+
     @Test
     public void skal_liste_ut_med_forventet_format_for_datoer_og_tall_skal_multipliseres_med_100() {
         AvstemmingCsvFormatter formatter = new AvstemmingCsvFormatter();
         formatter.leggTilRad(testRad());
-        //rekkefølge på feltene er: avsender,tidspunkt dannet, vedtaId, fnr, vedtaksdato, ytelsetype,brutto(uten renter), skatt, netto  (uten renter), renter, omgjøringKode
-        assertThat(formatter.getData()).isEqualTo("fptilbake;1234;12345678901;20191231;FP;1000;200;800;100;");
+        assertThat(formatter.getData()).isEqualTo(FORVENTET_HEADER + "fptilbake;1234;12345678901;20191231;FP;1000;200;800;100;");
     }
 
     @Test
@@ -26,7 +27,7 @@ public class AvstemmingCsvFormatterTest {
         formatter.leggTilRad(testRad());
 
         String enRad = "fptilbake;1234;12345678901;20191231;FP;1000;200;800;100;";
-        assertThat(formatter.getData()).isEqualTo(enRad + "\n" + enRad);
+        assertThat(formatter.getData()).isEqualTo(FORVENTET_HEADER + enRad + "\n" + enRad);
     }
 
     @Test
@@ -38,8 +39,7 @@ public class AvstemmingCsvFormatterTest {
             .medRenter(BigDecimal.ZERO)
             .medSkatt(BigDecimal.ZERO)
             .medErOmgjøringTilIngenTilbakekreving(true));
-        //rekkefølge på feltene er: avsender,tidspunkt dannet, vedtaId, fnr, vedtaksdato, ytelsetype,brutto(uten renter), skatt, netto  (uten renter), renter, omgjøringKode
-        assertThat(formatter.getData()).isEqualTo("fptilbake;1234;12345678901;20191231;FP;0;0;0;0;Omgjoring0");
+        assertThat(formatter.getData()).isEqualTo(FORVENTET_HEADER + "fptilbake;1234;12345678901;20191231;FP;0;0;0;0;Omgjoring0");
     }
 
     private AvstemmingCsvFormatter.RadBuilder testRad() {
