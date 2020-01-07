@@ -55,13 +55,6 @@ public class ØkonomiSendtXmlRepository {
         entityManager.persist(entity);
     }
 
-    public Optional<ØkonomiXmlSendt> finn(Long behandlingId, MeldingType meldingType) {
-        TypedQuery<ØkonomiXmlSendt> query = entityManager.createQuery("from OkoXmlSendt where behandling_id = :behandlingId and melding_type =:meldingType", ØkonomiXmlSendt.class);
-        query.setParameter("behandlingId", behandlingId);
-        query.setParameter("meldingType", meldingType.getKode());
-        return query.getResultList().stream().findFirst();
-    }
-
     public Collection<ØkonomiXmlSendt> finn(MeldingType meldingType, LocalDate opprettetDato) {
         TypedQuery<ØkonomiXmlSendt> query = entityManager.createQuery("from OkoXmlSendt where meldingType = :meldingType and opprettet_tid >= :t0 and opprettetTid < :t1 order by opprettetTid desc", ØkonomiXmlSendt.class);
         query.setParameter("meldingType", meldingType);
