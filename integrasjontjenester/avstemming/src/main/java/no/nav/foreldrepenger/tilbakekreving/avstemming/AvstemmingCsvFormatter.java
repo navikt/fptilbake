@@ -1,8 +1,8 @@
 package no.nav.foreldrepenger.tilbakekreving.avstemming;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
@@ -10,21 +10,21 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelse
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
 
 public class AvstemmingCsvFormatter {
+    private static final String SKILLETEGN_KOLONNER = ";";
 
-    private static final String SKILLETEGN_KOLONNER = ",";
     private static final String SKILLETEGN_RADER = "\n";
-    private static final DateTimeFormatter TIDSFORMAT = DateTimeFormatter.ofPattern("yyyyMMdd HH:mm");
     private static final DateTimeFormatter DATOFORMAT = DateTimeFormatter.ofPattern("yyyyMMdd");
 
     private StringBuilder data = new StringBuilder();
     private int antallRader;
 
+    public AvstemmingCsvFormatter() {
+        data.append(RadBuilder.buildeHeader());
+    }
+
     public void leggTilRad(RadBuilder radBuilder) {
-        String rad = radBuilder.build();
-        if (antallRader > 0) {
-            data.append(SKILLETEGN_RADER);
-        }
-        data.append(rad);
+        data.append(SKILLETEGN_RADER);
+        data.append(radBuilder.build());
         antallRader++;
     }
 
@@ -41,24 +41,20 @@ public class AvstemmingCsvFormatter {
     }
 
     public static class RadBuilder {
+
         private String avsender;
-        private LocalDateTime tidspunktDannet;
         private String vedtakId;
         private String fnr;
         private LocalDate vedtaksdato;
         private FagsakYtelseType fagsakYtelseType;
         private BigDecimal tilbakekrevesBruttoUtenRenter;
+        private BigDecimal skatt;
         private BigDecimal tilbakekrevesNettoUtenRenter;
         private BigDecimal renter;
-        private BigDecimal skatt;
+        private boolean erOmgjøringTilIngenTilbakekreving;
 
         public RadBuilder medAvsender(String avsender) {
             this.avsender = avsender;
-            return this;
-        }
-
-        public RadBuilder medTidspunktDannet(LocalDateTime tidspunktDannet) {
-            this.tidspunktDannet = tidspunktDannet;
             return this;
         }
 
@@ -102,9 +98,26 @@ public class AvstemmingCsvFormatter {
             return this;
         }
 
+        public RadBuilder medErOmgjøringTilIngenTilbakekreving(boolean erOmgjøringTilIngenTilbakekreving) {
+            this.erOmgjøringTilIngenTilbakekreving = erOmgjøringTilIngenTilbakekreving;
+            return this;
+        }
+
+        public static String buildeHeader() {
+            return "avsender" + SKILLETEGN_KOLONNER +
+                "vedtakId" + SKILLETEGN_KOLONNER +
+                "fnr" + SKILLETEGN_KOLONNER +
+                "vedtaksdato" + SKILLETEGN_KOLONNER +
+                "fagsakYtelseType" + SKILLETEGN_KOLONNER +
+                "tilbakekrevesBruttoUtenRenter" + SKILLETEGN_KOLONNER +
+                "skatt" + SKILLETEGN_KOLONNER +
+                "tilbakekrevesNettoUtenRenter" + SKILLETEGN_KOLONNER +
+                "renter" + SKILLETEGN_KOLONNER +
+                "erOmgjøringTilIngenTilbakekreving";
+        }
+
         public String build() {
             Objects.requireNonNull(avsender, "avsender mangler");
-            Objects.requireNonNull(tidspunktDannet, "tidspunktDannet mangler");
             Objects.requireNonNull(vedtakId, "vedtakId mangler");
             Objects.requireNonNull(fnr, "fnr mangler");
             Objects.requireNonNull(vedtaksdato, "vedtaksdato mangler");
@@ -115,7 +128,6 @@ public class AvstemmingCsvFormatter {
             Objects.requireNonNull(skatt, "skatt mangler");
 
             return format(avsender)
-                + SKILLETEGN_KOLONNER + format(tidspunktDannet)
                 + SKILLETEGN_KOLONNER + format(vedtakId)
                 + SKILLETEGN_KOLONNER + format(fnr)
                 + SKILLETEGN_KOLONNER + format(vedtaksdato)
@@ -124,15 +136,12 @@ public class AvstemmingCsvFormatter {
                 + SKILLETEGN_KOLONNER + format(skatt)
                 + SKILLETEGN_KOLONNER + format(tilbakekrevesNettoUtenRenter)
                 + SKILLETEGN_KOLONNER + format(renter)
+                + SKILLETEGN_KOLONNER + formatOmgjøring(erOmgjøringTilIngenTilbakekreving)
                 ;
         }
 
         private String format(String verdi) {
             return verdi;
-        }
-
-        private String format(LocalDateTime tid) {
-            return tid.format(TIDSFORMAT);
         }
 
         private String format(LocalDate dato) {
@@ -144,9 +153,11 @@ public class AvstemmingCsvFormatter {
         }
 
         private String format(BigDecimal verdi) {
-            //Rart, men multipliserer her med 100 for å sende samme data på samme format som brukes i andre enden av kjeden
-            BigDecimal omskrevet = verdi.multiply(BigDecimal.valueOf(100));
-            return omskrevet.toPlainString();
+            return verdi.setScale(0, RoundingMode.UNNECESSARY).toPlainString();
+        }
+
+        private String formatOmgjøring(boolean verdi) {
+            return verdi ? "Omgjoring0" : "";
         }
 
     }
