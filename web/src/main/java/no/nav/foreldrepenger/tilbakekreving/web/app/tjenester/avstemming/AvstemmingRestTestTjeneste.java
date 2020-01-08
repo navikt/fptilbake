@@ -13,6 +13,8 @@ import javax.validation.constraints.NotNull;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
@@ -40,6 +42,7 @@ public class AvstemmingRestTestTjeneste {
 
     @POST
     @Path("/hent")
+    @Produces(MediaType.TEXT_PLAIN)
     @Operation(tags = "Avstemming-TEST", description = "Tjeneste for å hente avstemmingdata for en dag. Brukes bare for test")
     @BeskyttetRessurs(action = READ, ressurs = DRIFT)
     public Response hentAvstemmingData(@HeaderParam("Content-Type") String contentType, @Valid @NotNull LocalDate dato) {
