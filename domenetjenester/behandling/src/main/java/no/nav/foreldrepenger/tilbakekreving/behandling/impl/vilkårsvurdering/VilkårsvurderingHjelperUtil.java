@@ -15,6 +15,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurd
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingSærligGrunnEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.SærligGrunn;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
 
 public class VilkårsvurderingHjelperUtil {
 
@@ -37,9 +38,14 @@ public class VilkårsvurderingHjelperUtil {
         Aktsomhet aktsomhet = annetDto.getAktsomhet();
         VilkårVurderingAktsomhetEntitet aktsomhetEntitet = null;
         if (Aktsomhet.FORSETT.equals(annetDto.getAktsomhet())) {
-            aktsomhetEntitet = VilkårVurderingAktsomhetEntitet.builder().medPeriode(periodeEntitet)
+            VilkårVurderingAktsomhetEntitet.Builder builder = VilkårVurderingAktsomhetEntitet.builder();
+            builder.medPeriode(periodeEntitet)
                 .medAktsomhet(aktsomhet)
-                .medBegrunnelse(annetDto.getBegrunnelse()).build();
+                .medBegrunnelse(annetDto.getBegrunnelse());
+            if (VilkårResultat.FORSTO_BURDE_FORSTÅTT.equals(periodeEntitet.getVilkårResultat()) && annetDto.getAktsomhetInfo() != null) {
+                builder.medIleggRenter(annetDto.getAktsomhetInfo().isIleggRenter());
+            }
+            aktsomhetEntitet = builder.build();
         } else {
             VilkårResultatAktsomhetDto aktsomhetInfo = annetDto.getAktsomhetInfo();
             aktsomhetEntitet = VilkårVurderingAktsomhetEntitet.builder().medPeriode(periodeEntitet)
@@ -74,11 +80,11 @@ public class VilkårsvurderingHjelperUtil {
 
     static VilkårResultatInfoDto fylleUtPeiodeForAktsomhet(VilkårVurderingPeriodeEntitet periodeEntitet) {
         VilkårVurderingAktsomhetEntitet aktsomhetEntitet = periodeEntitet.getAktsomhet();
+        VilkårResultatAktsomhetDto aktsomhetDto = new VilkårResultatAktsomhetDto();
+        aktsomhetDto.setIleggRenter(aktsomhetEntitet.getIleggRenter());
         if (!Aktsomhet.FORSETT.equals(aktsomhetEntitet.getAktsomhet())) {
-            VilkårResultatAktsomhetDto aktsomhetDto = new VilkårResultatAktsomhetDto();
             aktsomhetDto.setTilbakekrevesBelop(aktsomhetEntitet.getManueltTilbakekrevesBeløp());
             aktsomhetDto.setAndelTilbakekreves(aktsomhetEntitet.getProsenterSomTilbakekreves());
-            aktsomhetDto.setIleggRenter(aktsomhetEntitet.getIleggRenter());
             aktsomhetDto.setHarGrunnerTilReduksjon(aktsomhetEntitet.getSærligGrunnerTilReduksjon());
             aktsomhetDto.setTilbakekrevSelvOmBeloepErUnder4Rettsgebyr(aktsomhetEntitet.getTilbakekrevSmåBeløp());
             List<SærligGrunn> særligGrunner = new ArrayList<>();
@@ -87,9 +93,8 @@ public class VilkårsvurderingHjelperUtil {
                 aktsomhetDto.setAnnetBegrunnelse(grunnEntitet.getBegrunnelse());
             }
             aktsomhetDto.setSærligeGrunner(særligGrunner);
-            return new VilkårResultatAnnetDto(aktsomhetEntitet.getBegrunnelse(), aktsomhetEntitet.getAktsomhet(), aktsomhetDto);
         }
-        return new VilkårResultatAnnetDto(aktsomhetEntitet.getBegrunnelse(), aktsomhetEntitet.getAktsomhet(), null);
+        return new VilkårResultatAnnetDto(aktsomhetEntitet.getBegrunnelse(), aktsomhetEntitet.getAktsomhet(), aktsomhetDto);
     }
 
     static boolean harEndret(Object forrigeVerdi, Object verdi) {
