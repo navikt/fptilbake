@@ -8,7 +8,9 @@ import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.ws.rs.GET;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -36,11 +38,11 @@ public class AvstemmingRestTestTjeneste {
         this.avstemmingTjeneste = avstemmingTjeneste;
     }
 
-    @GET
+    @POST
     @Path("/hent")
     @Operation(tags = "Avstemming-TEST", description = "Tjeneste for å hente avstemmingdata for en dag. Brukes bare for test")
     @BeskyttetRessurs(action = READ, ressurs = DRIFT)
-    public Response hentAvstemmingData(LocalDate dato) {
+    public Response hentAvstemmingData(@Valid @NotNull LocalDate dato) {
         validerIkkeIProd();
         String data = avstemmingTjeneste.oppsummer(dato);
         logger.info("Hentet avstemmingsdata for {}", dato);
