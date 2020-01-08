@@ -12,7 +12,6 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
@@ -46,7 +45,7 @@ public class AvstemmingRestTestTjeneste {
         validerIkkeIProd();
         String data = avstemmingTjeneste.oppsummer(dato);
         logger.info("Hentet avstemmingsdata for {}", dato);
-        return Response.ok(data, MediaType.TEXT_PLAIN_TYPE).build();
+        return Response.ok(data).build();
     }
 
     private static void validerIkkeIProd() {
