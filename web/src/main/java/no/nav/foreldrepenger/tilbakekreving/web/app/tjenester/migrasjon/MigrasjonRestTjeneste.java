@@ -70,7 +70,8 @@ public class MigrasjonRestTjeneste {
                 try {
                     documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
                     Document document = documentBuilder.parse(new InputSource(new StringReader(melding)));
-                    String saksnummer = document.getElementsByTagName("urn:fagsystemId").item(0).getTextContent();
+                    String fagsystemId = document.getElementsByTagName("urn:fagsystemId").item(0).getTextContent();
+                    String saksnummer = finnSaksnummer(fagsystemId);
                     økonomiMottattXmlRepository.oppdaterSaksnummer(økonomiXmlMottatt.getId(), saksnummer);
                 } catch (ParserConfigurationException | SAXException | IOException e) {
                     logger.warn("kan ikke prossesere XML med Id={}.Fikk følgende problemer={}", økonomiXmlMottatt.getId(), e.getMessage());
@@ -78,5 +79,9 @@ public class MigrasjonRestTjeneste {
             }
         }
         return Response.status(Response.Status.OK).build();
+    }
+
+    private String finnSaksnummer(String fagsystemId) {
+        return fagsystemId.substring(0, fagsystemId.length() - 3);
     }
 }
