@@ -42,7 +42,7 @@ public class VilkårsvurderingHjelperUtil {
             builder.medPeriode(periodeEntitet)
                 .medAktsomhet(aktsomhet)
                 .medBegrunnelse(annetDto.getBegrunnelse());
-            if (VilkårResultat.FORSTO_BURDE_FORSTÅTT.equals(periodeEntitet.getVilkårResultat()) && annetDto.getAktsomhetInfo() != null) {
+            if (VilkårResultat.FORSTO_BURDE_FORSTÅTT.equals(periodeEntitet.getVilkårResultat())) {
                 builder.medIleggRenter(annetDto.getAktsomhetInfo().isIleggRenter());
             }
             aktsomhetEntitet = builder.build();

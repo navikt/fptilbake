@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -380,98 +381,54 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
 
     @Test
     public void hentVilkårsvurdering_medForstBurdeForstattOgForsettAktsomhet_skalTilleggesRenter() {
-        List<VilkårsvurderingPerioderDto> vilkårPerioder = Lists.newArrayList(
-            formVilkårsvurderingPerioderDto(VilkårResultat.GOD_TRO, FOM, LocalDate.of(2016, 3, 31), null),
-            formVilkårsvurderingPerioderDto(VilkårResultat.FORSTO_BURDE_FORSTÅTT, LocalDate.of(2016, 4, 1), TOM, Aktsomhet.FORSETT)
-        );
+        VilkårsvurderingPerioderDto vilkårsvurderingPerioderDto = formVilkårsvurderingPerioderDto(VilkårResultat.FORSTO_BURDE_FORSTÅTT, LocalDate.of(2016, 4, 1), TOM, Aktsomhet.FORSETT);
+        VilkårResultatAnnetDto vilkarResultatInfo = (VilkårResultatAnnetDto) vilkårsvurderingPerioderDto.getVilkarResultatInfo();
+        vilkarResultatInfo.getAktsomhetInfo().setIleggRenter(true);
 
-        vilkårPerioder.stream()
-            .filter(perioderDto -> VilkårResultat.FORSTO_BURDE_FORSTÅTT.equals(perioderDto.getVilkårResultat()))
-            .map(perioderDto -> (VilkårResultatAnnetDto) perioderDto.getVilkarResultatInfo())
-            .map(VilkårResultatAnnetDto::getAktsomhetInfo).forEach(aktsomhetDto -> {
-            aktsomhetDto.setIleggRenter(true);
-        });
+        List<VilkårsvurderingPerioderDto> vilkårPerioder = Collections.singletonList(vilkårsvurderingPerioderDto);
 
         vilkårsvurderingTjeneste.lagreVilkårsvurdering(internBehandlingId, vilkårPerioder);
 
         formGrunnlag();
 
         List<VilkårsvurderingPerioderDto> perioder = vilkårsvurderingTjeneste.hentVilkårsvurdering(internBehandlingId);
-        assertThat(perioder.size()).isEqualTo(2);
+        assertThat(perioder.size()).isEqualTo(1);
         perioder.sort(Comparator.comparing(VilkårsvurderingPerioderDto::getFom));
 
-        VilkårsvurderingPerioderDto førstePeriode = perioder.get(0);
-        assertThat(førstePeriode.getFom()).isEqualTo(FOM);
-        assertThat(førstePeriode.getTom()).isEqualTo(LocalDate.of(2016, 3, 31));
-        assertThat(førstePeriode.getVilkårResultat()).isEqualByComparingTo(VilkårResultat.GOD_TRO);
-        assertThat(førstePeriode.getFeilutbetalingBelop()).isEqualByComparingTo(BigDecimal.valueOf(11000.00));
-
-        VilkårResultatGodTroDto godTroDto = (VilkårResultatGodTroDto) førstePeriode.getVilkarResultatInfo();
-        assertThat(godTroDto.getErBelopetIBehold()).isTrue();
-        assertThat(godTroDto.getTilbakekrevesBelop()).isEqualByComparingTo(BigDecimal.valueOf(1000.00));
-
-        VilkårsvurderingPerioderDto andrePeriode = perioder.get(1);
-        assertThat(andrePeriode.getFom()).isEqualTo(LocalDate.of(2016, 4, 1));
-        assertThat(andrePeriode.getTom()).isEqualTo(TOM);
+        VilkårsvurderingPerioderDto andrePeriode = perioder.get(0);
         assertThat(andrePeriode.getVilkårResultat()).isEqualByComparingTo(VilkårResultat.FORSTO_BURDE_FORSTÅTT);
         assertThat(andrePeriode.getFeilutbetalingBelop()).isEqualByComparingTo(BigDecimal.valueOf(40000.00));
 
         VilkårResultatAnnetDto annetDto = (VilkårResultatAnnetDto) andrePeriode.getVilkarResultatInfo();
         assertThat(annetDto.getAktsomhet()).isEqualByComparingTo(Aktsomhet.FORSETT);
-        assertThat(annetDto.getAktsomhetInfo()).isNotNull();
-        assertThat(annetDto.getAktsomhetInfo().isHarGrunnerTilReduksjon()).isFalse();
-        assertThat(annetDto.getAktsomhetInfo().getAndelTilbakekreves()).isNull();
         assertThat(annetDto.getAktsomhetInfo().isIleggRenter()).isNotNull();
         assertThat(annetDto.getAktsomhetInfo().isIleggRenter()).isTrue();
-        assertThat(annetDto.getAktsomhetInfo().getSærligeGrunner().size()).isEqualTo(0);
     }
 
     @Test
     public void hentVilkårsvurdering_medForstBurdeForstattOgForsettAktsomhet_skalIkkeTilleggesRenter() {
-        List<VilkårsvurderingPerioderDto> vilkårPerioder = Lists.newArrayList(
-            formVilkårsvurderingPerioderDto(VilkårResultat.GOD_TRO, FOM, LocalDate.of(2016, 3, 31), null),
-            formVilkårsvurderingPerioderDto(VilkårResultat.FORSTO_BURDE_FORSTÅTT, LocalDate.of(2016, 4, 1), TOM, Aktsomhet.FORSETT)
-        );
+        VilkårsvurderingPerioderDto vilkårsvurderingPerioderDto = formVilkårsvurderingPerioderDto(VilkårResultat.FORSTO_BURDE_FORSTÅTT, LocalDate.of(2016, 4, 1), TOM, Aktsomhet.FORSETT);
+        VilkårResultatAnnetDto vilkarResultatInfo = (VilkårResultatAnnetDto) vilkårsvurderingPerioderDto.getVilkarResultatInfo();
+        vilkarResultatInfo.getAktsomhetInfo().setIleggRenter(false);
 
-        vilkårPerioder.stream()
-            .filter(perioderDto -> VilkårResultat.FORSTO_BURDE_FORSTÅTT.equals(perioderDto.getVilkårResultat()))
-            .map(perioderDto -> (VilkårResultatAnnetDto) perioderDto.getVilkarResultatInfo())
-            .map(VilkårResultatAnnetDto::getAktsomhetInfo).forEach(aktsomhetDto -> {
-            aktsomhetDto.setIleggRenter(false);
-        });
+        List<VilkårsvurderingPerioderDto> vilkårPerioder = Collections.singletonList(vilkårsvurderingPerioderDto);
 
         vilkårsvurderingTjeneste.lagreVilkårsvurdering(internBehandlingId, vilkårPerioder);
 
         formGrunnlag();
 
         List<VilkårsvurderingPerioderDto> perioder = vilkårsvurderingTjeneste.hentVilkårsvurdering(internBehandlingId);
-        assertThat(perioder.size()).isEqualTo(2);
+        assertThat(perioder.size()).isEqualTo(1);
         perioder.sort(Comparator.comparing(VilkårsvurderingPerioderDto::getFom));
 
-        VilkårsvurderingPerioderDto førstePeriode = perioder.get(0);
-        assertThat(førstePeriode.getFom()).isEqualTo(FOM);
-        assertThat(førstePeriode.getTom()).isEqualTo(LocalDate.of(2016, 3, 31));
-        assertThat(førstePeriode.getVilkårResultat()).isEqualByComparingTo(VilkårResultat.GOD_TRO);
-        assertThat(førstePeriode.getFeilutbetalingBelop()).isEqualByComparingTo(BigDecimal.valueOf(11000.00));
-
-        VilkårResultatGodTroDto godTroDto = (VilkårResultatGodTroDto) førstePeriode.getVilkarResultatInfo();
-        assertThat(godTroDto.getErBelopetIBehold()).isTrue();
-        assertThat(godTroDto.getTilbakekrevesBelop()).isEqualByComparingTo(BigDecimal.valueOf(1000.00));
-
-        VilkårsvurderingPerioderDto andrePeriode = perioder.get(1);
-        assertThat(andrePeriode.getFom()).isEqualTo(LocalDate.of(2016, 4, 1));
-        assertThat(andrePeriode.getTom()).isEqualTo(TOM);
+        VilkårsvurderingPerioderDto andrePeriode = perioder.get(0);
         assertThat(andrePeriode.getVilkårResultat()).isEqualByComparingTo(VilkårResultat.FORSTO_BURDE_FORSTÅTT);
         assertThat(andrePeriode.getFeilutbetalingBelop()).isEqualByComparingTo(BigDecimal.valueOf(40000.00));
 
         VilkårResultatAnnetDto annetDto = (VilkårResultatAnnetDto) andrePeriode.getVilkarResultatInfo();
         assertThat(annetDto.getAktsomhet()).isEqualByComparingTo(Aktsomhet.FORSETT);
-        assertThat(annetDto.getAktsomhetInfo()).isNotNull();
-        assertThat(annetDto.getAktsomhetInfo().isHarGrunnerTilReduksjon()).isFalse();
-        assertThat(annetDto.getAktsomhetInfo().getAndelTilbakekreves()).isNull();
         assertThat(annetDto.getAktsomhetInfo().isIleggRenter()).isNotNull();
         assertThat(annetDto.getAktsomhetInfo().isIleggRenter()).isFalse();
-        assertThat(annetDto.getAktsomhetInfo().getSærligeGrunner().size()).isEqualTo(0);
     }
 
     private void formGrunnlag() {

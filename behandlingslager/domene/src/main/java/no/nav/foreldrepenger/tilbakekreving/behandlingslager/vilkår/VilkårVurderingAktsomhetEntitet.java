@@ -178,7 +178,9 @@ public class VilkårVurderingAktsomhetEntitet extends BaseEntitet {
                 no.nav.vedtak.util.Objects.check(kladd.manueltTilbakekrevesBeløp == null, "Ved FORSETT er beløp automatisk, og skal ikke settes her");
                 no.nav.vedtak.util.Objects.check(kladd.prosenterSomTilbakekreves == null, "Ved FORSETT er andel automatisk, og skal ikke settes her");
                 no.nav.vedtak.util.Objects.check(kladd.tilbakekrevSmåBeløp == null, "Dette er gyldig bare for Simpel uaktsom");
-                if (!kladd.periode.getVilkårResultat().equals(VilkårResultat.FORSTO_BURDE_FORSTÅTT)) {
+                if (kladd.periode.getVilkårResultat().equals(VilkårResultat.FORSTO_BURDE_FORSTÅTT)) {
+                    Objects.requireNonNull(this.kladd.ileggRenter, "ileggRenter");
+                } else {
                     no.nav.vedtak.util.Objects.check(kladd.ileggRenter == null, "Ved FORSETT er rentebeslutning automatisk, og skal ikke settes her");
                 }
             }
