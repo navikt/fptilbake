@@ -4,16 +4,17 @@ import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.READ;
 import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursResourceAttributt.DRIFT;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
+import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -40,14 +41,15 @@ public class AvstemmingRestTestTjeneste {
         this.avstemmingTjeneste = avstemmingTjeneste;
     }
 
-    @POST
+    @GET
     @Path("/hent")
     @Produces(MediaType.TEXT_PLAIN)
     @Operation(tags = "Avstemming-TEST", description = "Tjeneste for å hente avstemmingdata for en dag. Brukes bare for test")
     @BeskyttetRessurs(action = READ, ressurs = DRIFT)
-    public Response hentAvstemmingData(@HeaderParam("Content-Type") String contentType, @Valid @NotNull LocalDate dato) {
+    public Response hentAvstemmingData(@Valid @NotNull @QueryParam("dato") String dato) {
         validerIkkeIProd();
-        String data = avstemmingTjeneste.oppsummer(dato);
+        LocalDate d = LocalDate.parse(dato, DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+        String data = avstemmingTjeneste.oppsummer(d);
         logger.info("Hentet avstemmingsdata for {}", dato);
         return Response.ok(data).build();
     }

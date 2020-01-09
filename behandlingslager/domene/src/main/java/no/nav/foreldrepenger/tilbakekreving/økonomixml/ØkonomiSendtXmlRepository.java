@@ -2,7 +2,6 @@ package no.nav.foreldrepenger.tilbakekreving.økonomixml;
 
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -56,7 +55,7 @@ public class ØkonomiSendtXmlRepository {
     }
 
     public Collection<ØkonomiXmlSendt> finn(MeldingType meldingType, LocalDate opprettetDato) {
-        TypedQuery<ØkonomiXmlSendt> query = entityManager.createQuery("from OkoXmlSendt where meldingType = :meldingType and opprettet_tid >= :t0 and opprettetTid < :t1 order by opprettetTid desc", ØkonomiXmlSendt.class);
+        TypedQuery<ØkonomiXmlSendt> query = entityManager.createQuery("from OkoXmlSendt where meldingType = :meldingType and opprettetTidspunkt >= :t0 and opprettetTidspunkt < :t1 order by opprettetTidspunkt desc", ØkonomiXmlSendt.class);
         query.setParameter("meldingType", meldingType);
         query.setParameter("t0", opprettetDato.atStartOfDay());
         query.setParameter("t1", opprettetDato.plusDays(1).atStartOfDay());
