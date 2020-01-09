@@ -140,8 +140,6 @@ public class KravgrunnlagTjeneste {
                 logger.info("Hopper tilbake til {} pga endret kravgrunnlag for behandlingId={}", BehandlingStegType.FAKTA_FEILUTBETALING.getKode(), behandlingId);
                 behandlingskontrollTjeneste.settAutopunkterTilUtført(kontekst,false);
                 behandlingskontrollTjeneste.behandlingTilbakeføringTilTidligereBehandlingSteg(kontekst, BehandlingStegType.FAKTA_FEILUTBETALING);
-            } else {
-                taBehandlingAvventOgFortsettBehandling(behandlingId);
             }
             //Perioder knyttet med gammel grunnlag må slettes, opprettet SlettGrunnlagEvent som skal slette det
             opprettOgFireSlettgrunnlagEvent(behandlingId);

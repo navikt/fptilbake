@@ -1,11 +1,14 @@
 package no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
+import no.nav.vedtak.util.FPDateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,7 +89,7 @@ public class GjenopptaBehandlingTjenesteImpl implements GjenopptaBehandlingTjene
             }
         }
         Optional<String> callId = fortsettBehandling(behandlingId);
-        if(callId.isPresent()){
+        if (callId.isPresent()) {
             opprettHistorikkInnslagForManueltGjenopptaBehandling(behandlingId);
         }
         return callId;
@@ -99,6 +102,11 @@ public class GjenopptaBehandlingTjenesteImpl implements GjenopptaBehandlingTjene
             BehandlingStegType bst = behandlingOpt.get().getAktivtBehandlingSteg();
             if (BehandlingStegType.TBKGSTEG.equals(bst)) {
                 return fortsettBehandling(behandlingId);
+            } else if (BehandlingStegType.VARSEL.equals(bst)) {
+                LocalDateTime fristTid = behandlingOpt.get().getAksjonspunktFor(AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING).getFristTid();
+                if (fristTid.isBefore(FPDateUtil.nå())) {
+                    return fortsettBehandling(behandlingId);
+                }
             }
         }
         return Optional.empty();
