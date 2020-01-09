@@ -3,6 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.avstemming;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -53,36 +54,44 @@ public class AvstemmingTjeneste {
     }
 
     public String oppsummer(LocalDate dato) {
+        Collection<ØkonomiXmlSendt> sendteVedtak = sendtXmlRepository.finn(MeldingType.VEDTAK, dato);
+        AktørIdFnrMapper mapper = lagMapperForAktørIdent(sendteVedtak);
         AvstemmingCsvFormatter avstemmingCsvFormatter = new AvstemmingCsvFormatter();
-
-        Collection<ØkonomiXmlSendt> sendteMeldinger = sendtXmlRepository.finn(MeldingType.VEDTAK, dato);
-        List<AktørId> aktørIds = finnAktørIDer(sendteMeldinger);
-        List<AktoerIder> identer = aktørConsumer.hentPersonIdenterForAktørIder(aktørIds.stream().map(AktørId::getId).collect(Collectors.toSet()));
-        AktørIdFnrMapper mapper = new AktørIdFnrMapper(identer);
-
-        for (ØkonomiXmlSendt sendtMelding : sendteMeldinger) {
-            if (erSendtOK(sendtMelding)) {
-                TilbakekrevingsvedtakOppsummering oppsummering = oppsummer(sendtMelding);
-                Long behandlingId = sendtMelding.getBehandlingId();
-                Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-                BehandlingVedtak behandlingVedtak = behandlingVedtakRepository.hentBehandlingvedtakForBehandlingId(behandlingId).orElseThrow();
-
-                avstemmingCsvFormatter.leggTilRad(AvstemmingCsvFormatter.radBuilder()
-                    .medAvsender("fptilbake")
-                    .medVedtakId(oppsummering.getØkonomiVedtakId())
-                    .medFnr(mapper.getFnr(behandling.getAktørId()))
-                    .medVedtaksdato(behandlingVedtak.getVedtaksdato())
-                    .medFagsakYtelseType(behandling.getFagsak().getFagsakYtelseType())
-                    .medTilbakekrevesBruttoUtenRenter(oppsummering.getTilbakekrevesBruttoUtenRenter())
-                    .medTilbakekrevesNettoUtenRenter(oppsummering.getTilbakekrevesNettoUtenRenter())
-                    .medSkatt(oppsummering.getSkatt())
-                    .medRenter(oppsummering.getRenter())
-                    .medErOmgjøringTilIngenTilbakekreving(erOmgjøringTilIngenTilbakekreving(oppsummering, behandling))
-                );
+        for (ØkonomiXmlSendt sendtVedtak : sendteVedtak) {
+            if (erSendtOK(sendtVedtak)) {
+                leggTilAvstemmingsdataForVedtaket(avstemmingCsvFormatter, mapper, sendtVedtak);
             }
         }
-        logger.info("Avstemmingdata for {} ble hentet. Av {} sendte meldinger var {} med OK kvittering og kan sendes til avstemming", dato, sendteMeldinger.size(), avstemmingCsvFormatter.getAntallRader());
+        logger.info("Avstemmingdata for {} ble hentet. Av {} sendte meldinger var {} med OK kvittering og kan sendes til avstemming", dato, sendteVedtak.size(), avstemmingCsvFormatter.getAntallRader());
         return avstemmingCsvFormatter.getData();
+    }
+
+    private void leggTilAvstemmingsdataForVedtaket(AvstemmingCsvFormatter avstemmingCsvFormatter, AktørIdFnrMapper mapper, ØkonomiXmlSendt sendtVedtak) {
+        TilbakekrevingsvedtakOppsummering oppsummering = oppsummer(sendtVedtak);
+        Long behandlingId = sendtVedtak.getBehandlingId();
+        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
+        BehandlingVedtak behandlingVedtak = behandlingVedtakRepository.hentBehandlingvedtakForBehandlingId(behandlingId).orElseThrow();
+
+        avstemmingCsvFormatter.leggTilRad(AvstemmingCsvFormatter.radBuilder()
+            .medAvsender("fptilbake")
+            .medVedtakId(oppsummering.getØkonomiVedtakId())
+            .medFnr(mapper.getFnr(behandling.getAktørId()))
+            .medVedtaksdato(behandlingVedtak.getVedtaksdato())
+            .medFagsakYtelseType(behandling.getFagsak().getFagsakYtelseType())
+            .medTilbakekrevesBruttoUtenRenter(oppsummering.getTilbakekrevesBruttoUtenRenter())
+            .medTilbakekrevesNettoUtenRenter(oppsummering.getTilbakekrevesNettoUtenRenter())
+            .medSkatt(oppsummering.getSkatt())
+            .medRenter(oppsummering.getRenter())
+            .medErOmgjøringTilIngenTilbakekreving(erOmgjøringTilIngenTilbakekreving(oppsummering, behandling))
+        );
+    }
+
+    private AktørIdFnrMapper lagMapperForAktørIdent(Collection<ØkonomiXmlSendt> sendteMeldinger) {
+        List<AktørId> aktørIds = finnAktørIDer(sendteMeldinger);
+        List<AktoerIder> identer = aktørIds.isEmpty()
+            ? Collections.emptyList()
+            : aktørConsumer.hentPersonIdenterForAktørIder(aktørIds.stream().map(AktørId::getId).collect(Collectors.toSet()));
+        return new AktørIdFnrMapper(identer);
     }
 
     private boolean erOmgjøringTilIngenTilbakekreving(TilbakekrevingsvedtakOppsummering oppsummering, Behandling behandling) {
