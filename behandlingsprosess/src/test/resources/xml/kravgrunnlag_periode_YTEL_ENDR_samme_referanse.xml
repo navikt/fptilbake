@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<urn:detaljertKravgrunnlagMelding xmlns:urn="urn:no:nav:tilbakekreving:kravgrunnlag:detalj:v1"
+                                  xmlns:mmel="urn:no:nav:tilbakekreving:typer:v1">
+    <urn:detaljertKravgrunnlag>
+        <urn:kravgrunnlagId>123456789</urn:kravgrunnlagId>
+        <urn:vedtakId>100</urn:vedtakId>
+        <urn:kodeStatusKrav>ENDR</urn:kodeStatusKrav>
+        <urn:kodeFagomraade>FP</urn:kodeFagomraade>
+        <urn:fagsystemId>139015144100</urn:fagsystemId>
+        <!--Optional:-->
+        <urn:datoVedtakFagsystem>2007-10-26</urn:datoVedtakFagsystem>
+        <urn:vedtakGjelderId>12345678901</urn:vedtakGjelderId>
+        <urn:typeGjelderId>PERSON</urn:typeGjelderId>
+        <urn:utbetalesTilId>12345678901</urn:utbetalesTilId>
+        <urn:typeUtbetId>PERSON</urn:typeUtbetId>
+        <urn:enhetAnsvarlig>8020</urn:enhetAnsvarlig>
+        <urn:enhetBosted>8020</urn:enhetBosted>
+        <urn:enhetBehandl>8020</urn:enhetBehandl>
+        <urn:kontrollfelt>kontrolll-123</urn:kontrollfelt>
+        <urn:saksbehId>Z111111</urn:saksbehId>
+        <!--Optional:-->
+        <urn:referanse>1174551</urn:referanse>
+        <!--1 or more repetitions:-->
+        <urn:tilbakekrevingsPeriode>
+            <urn:periode>
+                <mmel:fom>2018-11-01+01:00</mmel:fom>
+                <mmel:tom>2018-11-22+02:00</mmel:tom>
+            </urn:periode>
+            <urn:belopSkattMnd>0.00</urn:belopSkattMnd>
+            <!--1 or more repetitions:-->
+            <urn:tilbakekrevingsBelop>
+                <urn:kodeKlasse>FPATORD</urn:kodeKlasse>
+                <urn:typeKlasse>YTEL</urn:typeKlasse>
+                <urn:belopNy>9000.00</urn:belopNy>
+                <urn:skattProsent>0.0000</urn:skattProsent>
+            </urn:tilbakekrevingsBelop>
+        </urn:tilbakekrevingsPeriode>
+    </urn:detaljertKravgrunnlag>
+</urn:detaljertKravgrunnlagMelding>

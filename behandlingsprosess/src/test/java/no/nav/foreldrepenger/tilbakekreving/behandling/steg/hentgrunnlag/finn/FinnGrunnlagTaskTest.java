@@ -2,9 +2,13 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.finn;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
+import no.nav.vedtak.util.FPDateUtil;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -33,7 +37,7 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
     private KravVedtakStatusTjeneste kravVedtakStatusTjeneste = new KravVedtakStatusTjeneste(kravVedtakStatusRepository, prosessTaskRepository, repositoryProvider, henleggBehandlingTjeneste, behandlingskontrollTjeneste);
     private KravVedtakStatusMapper kravVedtakStatusMapper = new KravVedtakStatusMapper(tpsAdapterWrapper);
 
-    private FinnGrunnlagTask finnGrunnlagTask = new FinnGrunnlagTask(repositoryProvider, mottattXmlRepository, kravVedtakStatusTjeneste, kravVedtakStatusMapper, kravgrunnlagMapper);
+    private FinnGrunnlagTask finnGrunnlagTask = new FinnGrunnlagTask(repositoryProvider, mottattXmlRepository, kravVedtakStatusTjeneste, behandlingskontrollTjeneste, kravVedtakStatusMapper, kravgrunnlagMapper);
 
     private String saksnummer;
 
@@ -42,6 +46,8 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
         EksternBehandling eksternBehandling = new EksternBehandling(behandling, FPSAK_BEHANDLING_ID, FPSAK_BEHANDLING_UUID);
         eksternBehandlingRepository.lagre(eksternBehandling);
         saksnummer = behandling.getFagsak().getSaksnummer().getVerdi();
+        behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, BehandlingStegType.TBKGSTEG,
+            FPDateUtil.nå().plusDays(10), Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
     }
 
     @Test
@@ -53,6 +59,7 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
 
         assertThat(grunnlagRepository.harGrunnlagForBehandlingId(behandling.getId())).isTrue();
         assertTilkobling();
+        assertThat(behandling.isBehandlingPåVent()).isFalse();
     }
 
     @Test
@@ -66,6 +73,7 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
         Kravgrunnlag431 kravgrunnlag431 = grunnlagRepository.finnKravgrunnlag(behandling.getId());
         assertThat(kravgrunnlag431.getKravStatusKode()).isEqualByComparingTo(KravStatusKode.NYTT);
         assertTilkobling();
+        assertThat(behandling.isBehandlingPåVent()).isFalse();
     }
 
     @Test
@@ -115,7 +123,7 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_SPER.xml"));
         mottattXmlRepository.oppdaterMedEksternBehandlingIdOgSaksnummer(String.valueOf(FPSAK_BEHANDLING_ID), saksnummer, mottattXmlId);
 
-        mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_FEIL_samme_referanse.xml"));
+        mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_YTEL_ENDR_samme_referanse.xml"));
         mottattXmlRepository.oppdaterMedEksternBehandlingIdOgSaksnummer(String.valueOf(1174551), saksnummer, mottattXmlId);
 
         ProsessTaskData prosessTaskData = opprettFinngrunnlagProsessTask();
@@ -125,6 +133,7 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
         Optional<ØkonomiXmlMottatt> økonomiXmlMottatt = mottattXmlRepository.finnForEksternBehandlingId(String.valueOf(1174551));
         assertThat(økonomiXmlMottatt).isPresent();
         assertThat(økonomiXmlMottatt.get().isTilkoblet()).isTrue();
+        assertThat(behandling.isBehandlingPåVent()).isFalse();
     }
 
     @Test

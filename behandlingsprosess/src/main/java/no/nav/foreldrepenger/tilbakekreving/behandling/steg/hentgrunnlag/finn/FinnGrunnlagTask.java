@@ -10,6 +10,9 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollAsynkTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import org.slf4j.Logger;
@@ -48,6 +51,7 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
     private BehandlingRepository behandlingRepository;
     private ØkonomiMottattXmlRepository mottattXmlRepository;
     private KravVedtakStatusTjeneste kravVedtakStatusTjeneste;
+    private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private KravVedtakStatusMapper kravVedtakStatusMapper;
     private KravgrunnlagMapper kravgrunnlagMapper;
 
@@ -59,6 +63,7 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
     public FinnGrunnlagTask(BehandlingRepositoryProvider repositoryProvider,
                             ØkonomiMottattXmlRepository mottattXmlRepository,
                             KravVedtakStatusTjeneste kravVedtakStatusTjeneste,
+                            BehandlingskontrollTjeneste behandlingskontrollTjeneste,
                             KravVedtakStatusMapper kravVedtakStatusMapper,
                             KravgrunnlagMapper kravgrunnlagMapper) {
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
@@ -66,6 +71,7 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
         this.mottattXmlRepository = mottattXmlRepository;
 
         this.kravVedtakStatusTjeneste = kravVedtakStatusTjeneste;
+        this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
         this.kravVedtakStatusMapper = kravVedtakStatusMapper;
         this.kravgrunnlagMapper = kravgrunnlagMapper;
     }
@@ -80,7 +86,7 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
         if (!alleXmlMeldinger.isEmpty()) {
             logger.info("Fant {} meldinger som ikke er koblet for behandlingId={} og saksnummer={}", alleXmlMeldinger.size(), behandlingId, saksnummer);
             alleXmlMeldinger = alleXmlMeldinger.stream()
-                .sorted(Comparator.comparing(ØkonomiXmlMottatt::getSekvens))
+                .sorted(Comparator.comparing(ØkonomiXmlMottatt::getOpprettetTidspunkt))
                 .collect(Collectors.toList());
             for (ØkonomiXmlMottatt økonomiXmlMottatt : alleXmlMeldinger) {
                 Long mottattXmlId = økonomiXmlMottatt.getId();
@@ -93,10 +99,11 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
                     logger.info("xml er status xml med mottattXmlId={}", mottattXmlId);
                     håndtereGrunnlagStatusForBehandling(behandlingId, mottattXmlId, mottattXml);
                 } else {
-                    logger.warn("xml rekkefølge er ikke riktig med mottattXmlId={}",mottattXmlId);
+                    logger.warn("xml rekkefølge er ikke riktig med mottattXmlId={}", mottattXmlId);
                 }
                 mottattXmlRepository.opprettTilkobling(mottattXmlId);
             }
+            taBehandlingAvVentHvisGrunnlagetIkkeErSperret(behandling);
 
         } else {
             logger.info("Xml mottatt ikke for behandlingId={}", behandlingId);
@@ -115,6 +122,14 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
         kravgrunnlag.setKodeStatusKrav(KravStatusKode.NYTT.getKode()); // alltid vurderes som nytt grunnlag for den behandlingen
         Kravgrunnlag431 kravgrunnlag431 = kravgrunnlagMapper.mapTilDomene(kravgrunnlag);
         grunnlagRepository.lagre(behandlingId, kravgrunnlag431);
+    }
+
+    private void taBehandlingAvVentHvisGrunnlagetIkkeErSperret(Behandling behandling) {
+        Long behandlingId = behandling.getId();
+        if (behandling.isBehandlingPåVent() && !grunnlagRepository.erKravgrunnlagSperret(behandlingId)) {
+            BehandlingskontrollKontekst kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandlingId);
+            behandlingskontrollTjeneste.taBehandlingAvVentSetAlleAutopunktUtført(behandling, kontekst);
+        }
     }
 
 }
