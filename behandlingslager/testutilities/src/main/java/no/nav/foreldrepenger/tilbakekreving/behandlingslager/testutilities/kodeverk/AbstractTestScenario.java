@@ -22,8 +22,10 @@ import org.mockito.stubbing.Answer;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandlingsresultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.InternalManipulerBehandlingImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
@@ -36,8 +38,12 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakReposi
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.IverksettingStatus;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingAktsomhetEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingGodTroEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingPeriodeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
@@ -75,6 +81,9 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
     private Map<AksjonspunktDefinisjon, BehandlingStegType> aksjonspunktDefinisjoner = new HashMap<>();
     private Map<Periode, List<KravgrunnlagTestBuilder.KgBeløp>> kravgrunnlag;
     private VilkårVurderingEntitet vilkårsvurdering;
+    private BehandlingResultatType behandlingResultatType;
+    private LocalDate vedtaksdato;
+    private VedtakResultatType vedtakResultatType;
 
     protected AbstractTestScenario() {
         AktørId aktørId = new AktørId(nyId());
@@ -95,11 +104,22 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
         return Fagsak.opprettNy(eksternSaksnummer, bruker);
     }
 
+    public S medBehandlingResultatType(BehandlingResultatType behandlingResultatType) {
+        this.behandlingResultatType = behandlingResultatType;
+        return (S) this;
+    }
+
+    public S medVedtak(LocalDate vedtaksdato, VedtakResultatType vedtakResultatType) {
+        this.vedtaksdato = vedtaksdato;
+        this.vedtakResultatType = vedtakResultatType;
+        return (S) this;
+    }
+
     public S medDefaultKravgrunnlag() {
         Periode april2019 = Periode.of(LocalDate.of(2019, 4, 1), LocalDate.of(2019, 4, 30));
         return medKravgrunnlag(Map.of(april2019, Arrays.asList(
             KravgrunnlagTestBuilder.KgBeløp.feil(23000),
-            KravgrunnlagTestBuilder.KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(23000)
+            KravgrunnlagTestBuilder.KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(23000).medTilbakekrevBeløp(23000)
         )));
     }
 
@@ -108,7 +128,7 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
         return (S) this;
     }
 
-    public S medDefaultVilkårsvurdering() {
+    public S medFullInnkreving() {
         Periode april2019 = Periode.of(LocalDate.of(2019, 4, 1), LocalDate.of(2019, 4, 30));
         VilkårVurderingEntitet vurdering = new VilkårVurderingEntitet();
         VilkårVurderingPeriodeEntitet periode = VilkårVurderingPeriodeEntitet.builder()
@@ -125,6 +145,25 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
             .medBegrunnelse("foo")
             .build();
         periode.setAktsomhet(aktsomhet);
+        vurdering.leggTilPeriode(periode);
+        return medVilkårsvurdering(vurdering);
+    }
+
+    public S medIngenInnkreving() {
+        Periode april2019 = Periode.of(LocalDate.of(2019, 4, 1), LocalDate.of(2019, 4, 30));
+        VilkårVurderingEntitet vurdering = new VilkårVurderingEntitet();
+        VilkårVurderingPeriodeEntitet periode = VilkårVurderingPeriodeEntitet.builder()
+            .medVurderinger(vurdering)
+            .medPeriode(april2019)
+            .medBegrunnelse("foo")
+            .medVilkårResultat(VilkårResultat.GOD_TRO)
+            .build();
+        VilkårVurderingGodTroEntitet godTro = VilkårVurderingGodTroEntitet.builder()
+            .medPeriode(periode)
+            .medBeløpErIBehold(false)
+            .medBegrunnelse("foo")
+            .build();
+        periode.setGodTro(godTro);
         vurdering.leggTilPeriode(periode);
         return medVilkårsvurdering(vurdering);
     }
@@ -317,6 +356,24 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
         }
         if (vilkårsvurdering != null) {
             repositoryProvider.getVilkårsvurderingRepository().lagre(behandling.getId(), vilkårsvurdering);
+        }
+        if (behandlingResultatType != null) {
+            Behandlingsresultat behandlingsresultat = Behandlingsresultat.builder()
+                .medBehandling(behandling)
+                .medBehandlingResultatType(behandlingResultatType)
+                .build();
+            repositoryProvider.getBehandlingresultatRepository().lagre(behandlingsresultat);
+
+            if (vedtaksdato != null) {
+                BehandlingVedtak vedtak = BehandlingVedtak.builder()
+                    .medBehandlingsresultat(behandlingsresultat)
+                    .medVedtakResultat(vedtakResultatType)
+                    .medVedtaksdato(vedtaksdato)
+                    .medIverksettingStatus(IverksettingStatus.IKKE_IVERKSATT)
+                    .medAnsvarligSaksbehandler("Z111111")
+                    .build();
+                repositoryProvider.getBehandlingVedtakRepository().lagre(vedtak);
+            }
         }
     }
 

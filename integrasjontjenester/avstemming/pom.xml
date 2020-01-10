@@ -38,5 +38,11 @@
             <artifactId>domene-testutilities</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <!-- bruker for å lage iverksetting-xml for test -->
+            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+            <artifactId>behandlingsprosess</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>

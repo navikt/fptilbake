@@ -14,8 +14,9 @@ import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiRespons
 import no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste.TilbakekrevingsvedtakTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.MeldingType;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiSendtXmlRepository;
+import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakRequest;
+import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakResponse;
 import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsvedtakDto;
-import no.nav.tilbakekreving.typer.v1.MmelDto;
 import no.nav.vedtak.felles.jpa.savepoint.RunWithSavepoint;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -52,29 +53,31 @@ public class SendØkonomiTibakekerevingsVedtakTask implements ProsessTaskHandler
     public void doTask(ProsessTaskData prosessTaskData) {
         long behandlingId = prosessTaskData.getBehandlingId();
         TilbakekrevingsvedtakDto tilbakekrevingsvedtak = tilbakekrevingsvedtakTjeneste.lagTilbakekrevingsvedtak(behandlingId);
-        Long sendtXmlId = lagreXml(behandlingId, tilbakekrevingsvedtak);
-        lagSavepointOgIverksett(behandlingId, sendtXmlId, tilbakekrevingsvedtak);
+        TilbakekrevingsvedtakRequest request = new TilbakekrevingsvedtakRequest();
+        request.setTilbakekrevingsvedtak(tilbakekrevingsvedtak);
+        Long sendtXmlId = lagreXml(behandlingId, request);
+        lagSavepointOgIverksett(behandlingId, sendtXmlId, request);
     }
 
-    private void lagSavepointOgIverksett(long behandlingId, long sendtXmlId, TilbakekrevingsvedtakDto tilbakekrevingsvedtak) {
+    private void lagSavepointOgIverksett(long behandlingId, long sendtXmlId, TilbakekrevingsvedtakRequest tilbakekrevingsvedtak) {
         RunWithSavepoint runWithSavepoint = new RunWithSavepoint(entityManager);
         runWithSavepoint.doWork(() -> {
-            MmelDto respons = økonomiConsumer.iverksettTilbakekrevingsvedtak(behandlingId, tilbakekrevingsvedtak);
+            TilbakekrevingsvedtakResponse respons = økonomiConsumer.iverksettTilbakekrevingsvedtak(behandlingId, tilbakekrevingsvedtak);
             log.info("Oversendte tilbakekrevingsvedtak til oppdragsystemet for behandling={}", behandlingId);
             oppdatereRespons(behandlingId, sendtXmlId, respons);
             return null;
         });
     }
 
-    private Long lagreXml(Long behandlingId, TilbakekrevingsvedtakDto tilbakekrevingsvedtak) {
-        String xml = TilbakekrevingsvedtakMarshaller.marshall(behandlingId, tilbakekrevingsvedtak);
+    private Long lagreXml(Long behandlingId, TilbakekrevingsvedtakRequest request) {
+        String xml = TilbakekrevingsvedtakMarshaller.marshall(behandlingId, request);
         Long sendtXmlId = økonomiSendtXmlRepository.lagre(behandlingId, xml, MeldingType.VEDTAK);
         log.info("lagret vedtak-xml for behandling={}", behandlingId);
         return sendtXmlId;
     }
 
-    private void oppdatereRespons(long behandlingId, long sendtXmlId, MmelDto respons) {
-        String responsXml = ØkonomiResponsMarshaller.marshall(behandlingId, respons);
+    private void oppdatereRespons(long behandlingId, long sendtXmlId, TilbakekrevingsvedtakResponse respons) {
+        String responsXml = ØkonomiResponsMarshaller.marshall(respons, behandlingId);
         økonomiSendtXmlRepository.oppdatereKvittering(sendtXmlId, responsXml);
         log.info("oppdatert respons-xml for behandling={}", behandlingId);
     }

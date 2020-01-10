@@ -2,6 +2,8 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.steg.iverksettvedtak;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 import javax.inject.Inject;
 
@@ -18,7 +20,8 @@ import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiConsume
 import no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste.TilbakekrevingsvedtakTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.MeldingType;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiSendtXmlRepository;
-import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsvedtakDto;
+import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakRequest;
+import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakResponse;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
@@ -40,10 +43,12 @@ public class SendØkonomiTibakekerevingsVedtakTaskTest {
 
     @Test
     public void skal_lagre_xml_og_sende_vedtak_til_os() {
+        when(økonomiConsumer.iverksettTilbakekrevingsvedtak(any(), any())).thenReturn(new TilbakekrevingsvedtakResponse());
+
         ScenarioSimple scenario = ScenarioSimple
             .simple()
             .medDefaultKravgrunnlag()
-            .medDefaultVilkårsvurdering();
+            .medFullInnkreving();
         Behandling behandling = scenario.lagre(behandlingRepositoryProvider);
 
         ProsessTaskData data = new ProsessTaskData(SendØkonomiTibakekerevingsVedtakTask.TASKTYPE);
@@ -53,7 +58,7 @@ public class SendØkonomiTibakekerevingsVedtakTaskTest {
         task.doTask(data);
 
         assertThat(økonomiSendtXmlRepository.finnXml(behandling.getId(), MeldingType.VEDTAK)).hasSize(1);
-        Mockito.verify(økonomiConsumer).iverksettTilbakekrevingsvedtak(Mockito.eq(behandling.getId()), Mockito.any(TilbakekrevingsvedtakDto.class));
+        Mockito.verify(økonomiConsumer).iverksettTilbakekrevingsvedtak(Mockito.eq(behandling.getId()), any(TilbakekrevingsvedtakRequest.class));
     }
 
 
