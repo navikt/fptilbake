@@ -32,14 +32,11 @@ public class ØkonomiConsumerImpl implements ØkonomiConsumer {
 
     @Override
     public TilbakekrevingsvedtakResponse iverksettTilbakekrevingsvedtak(Long behandlingId, TilbakekrevingsvedtakRequest vedtak) {
-        TilbakekrevingsvedtakResponse respons = iverksett(vedtak);
-        MmelDto kvittering = respons.getMmel();
-        validerKvitteringForIverksettelse(behandlingId, kvittering);
-        logger.info("Tilbakekrevingsvedtak sendt til oppdragsystemet. BehandlingId={} Alvorlighetsgrad='{}' infomelding='{}'",
-            behandlingId,
-            kvittering.getAlvorlighetsgrad(),
-            kvittering.getBeskrMelding());
-        return respons;
+        try {
+            return port.tilbakekrevingsvedtak(vedtak);
+        } catch (SOAPFaultException e) { // NOSONAR
+            throw SoapWebServiceFeil.FACTORY.soapFaultIwebserviceKall(SERVICE_IDENTIFIER, e).toException();
+        }
     }
 
     @Override
@@ -68,14 +65,6 @@ public class ØkonomiConsumerImpl implements ØkonomiConsumer {
     }
 
 
-    private TilbakekrevingsvedtakResponse iverksett(TilbakekrevingsvedtakRequest request) {
-        try {
-            return port.tilbakekrevingsvedtak(request);
-        } catch (SOAPFaultException e) { // NOSONAR
-            throw SoapWebServiceFeil.FACTORY.soapFaultIwebserviceKall(SERVICE_IDENTIFIER, e).toException();
-        }
-    }
-
     private KravgrunnlagHentDetaljResponse hentGrunnlagRespons(HentKravgrunnlagDetaljDto kravgrunnlagDetalj) {
         KravgrunnlagHentDetaljRequest hentKravgrunnlagRequest = new KravgrunnlagHentDetaljRequest();
         hentKravgrunnlagRequest.setHentkravgrunnlag(kravgrunnlagDetalj);
@@ -96,21 +85,15 @@ public class ØkonomiConsumerImpl implements ØkonomiConsumer {
         }
     }
 
-    private void validerKvitteringForIverksettelse(Long behandlingId, MmelDto mmel) {
-        if (!ØkonomiKvitteringTolk.erKvitteringOK(mmel)) {
-            throw ØkonomiConsumerFeil.FACTORY.fikkFeilkodeVedIverksetting(behandlingId, ØkonomiConsumerFeil.formaterKvitterign(mmel)).toException();
-        }
-    }
-
     private void validerKvitteringForHentGrunnlag(Long behandlingId, MmelDto mmel) {
         if (!ØkonomiKvitteringTolk.erKvitteringOK(mmel)) {
-            throw ØkonomiConsumerFeil.FACTORY.fikkFeilkodeVedHentingAvKravgrunnlag(behandlingId, ØkonomiConsumerFeil.formaterKvitterign(mmel)).toException();
+            throw ØkonomiConsumerFeil.FACTORY.fikkFeilkodeVedHentingAvKravgrunnlag(behandlingId, ØkonomiConsumerFeil.formaterKvittering(mmel)).toException();
         }
     }
 
     private void validerKvitteringForAnnulereGrunnlag(Long behandlingId, MmelDto mmel) {
         if (!ØkonomiKvitteringTolk.erKvitteringOK(mmel)) {
-            throw ØkonomiConsumerFeil.FACTORY.fikkFeilkodeVedAnnulereKravgrunnlag(behandlingId, ØkonomiConsumerFeil.formaterKvitterign(mmel)).toException();
+            throw ØkonomiConsumerFeil.FACTORY.fikkFeilkodeVedAnnulereKravgrunnlag(behandlingId, ØkonomiConsumerFeil.formaterKvittering(mmel)).toException();
         }
     }
 
