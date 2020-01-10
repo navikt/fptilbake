@@ -10,10 +10,12 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollAsynkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,8 +26,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.status.
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.status.KravVedtakStatusTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.status.KravVedtakStatusXmlUnmarshaller;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatus437;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
@@ -50,6 +50,7 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
     private KravgrunnlagRepository grunnlagRepository;
     private BehandlingRepository behandlingRepository;
     private ØkonomiMottattXmlRepository mottattXmlRepository;
+    private AksjonspunktRepository aksjonspunktRepository;
     private KravVedtakStatusTjeneste kravVedtakStatusTjeneste;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private KravVedtakStatusMapper kravVedtakStatusMapper;
@@ -69,6 +70,7 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.mottattXmlRepository = mottattXmlRepository;
+        this.aksjonspunktRepository = repositoryProvider.getAksjonspunktRepository();
 
         this.kravVedtakStatusTjeneste = kravVedtakStatusTjeneste;
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
@@ -103,7 +105,7 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
                 }
                 mottattXmlRepository.opprettTilkobling(mottattXmlId);
             }
-            taBehandlingAvVentHvisGrunnlagetIkkeErSperret(behandling);
+            taBehandlingAvVentOgProssereHvisGrunnlagetIkkeErSperret(behandling);
 
         } else {
             logger.info("Xml mottatt ikke for behandlingId={}", behandlingId);
@@ -124,11 +126,12 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
         grunnlagRepository.lagre(behandlingId, kravgrunnlag431);
     }
 
-    private void taBehandlingAvVentHvisGrunnlagetIkkeErSperret(Behandling behandling) {
+    private void taBehandlingAvVentOgProssereHvisGrunnlagetIkkeErSperret(Behandling behandling) {
         Long behandlingId = behandling.getId();
         if (behandling.isBehandlingPåVent() && !grunnlagRepository.erKravgrunnlagSperret(behandlingId)) {
             BehandlingskontrollKontekst kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandlingId);
             behandlingskontrollTjeneste.taBehandlingAvVentSetAlleAutopunktUtført(behandling, kontekst);
+            aksjonspunktRepository.leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING, BehandlingStegType.FAKTA_FEILUTBETALING);
         }
     }
 
