@@ -79,7 +79,7 @@ public class AvstemmingTjeneste {
         BehandlingVedtak behandlingVedtak = behandlingVedtakRepository.hentBehandlingvedtakForBehandlingId(behandlingId).orElseThrow();
 
         String fnr = aktørConsumer.hentPersonIdentForAktørId(behandling.getAktørId().getId())
-            .orElseThrow(() -> new IllegalArgumentException("Avstemming feilet, fant ikke ident. Gjelder behandlingId=" + behandlingId + " aktørId=" + behandling.getAktørId().getId()));
+            .orElseThrow(() -> new IllegalArgumentException("Avstemming feilet, fant ikke ident. Gjelder behandlingId=" + behandlingId));
 
         avstemmingCsvFormatter.leggTilRad(AvstemmingCsvFormatter.radBuilder()
             .medAvsender("fptilbake")
