@@ -1,19 +1,19 @@
 {{#* inline "fakta-medlemskap"}}
         {{#switch fakta.hendelseundertype}}
         {{#case "IKKE_BOSATT"}}
-Du er ikke medlem av folketrygden fordi du har oppholdt deg mer i utlandet enn i Norge. Derfor har du ikke rett til {{> ytelse-navn}}.
+Du er ikke medlem av folketrygden fordi du har oppholdt deg så mye i utlandet at du ikke anses som bosatt i Norge, og du er heller ikke arbeidstaker i Norge. Derfor har du ikke rett til {{> ytelse-navn}}.
         {{/case}}
         {{#case "MEDLEM_I_ANNET_LAND"}}
-Du er ikke medlem av folketrygden fordi du er omfattet av trygdeordningen i et annet land fra og med [dato]. Derfor har du ikke rett til {{> ytelse-navn}}.
+Du er ikke medlem av folketrygden fordi du er omfattet av trygdeordningen i et annet land. Derfor har du ikke rett til {{> ytelse-navn}}.
         {{/case}}
         {{#case "IKKE_LOVLIG_OPPHOLD"}}
-Du er ikke medlem av folketrygden fordi du ikke har oppholdstillatelse i Norge fra og med [dato]. Derfor har du ikke rett til {{> ytelse-navn}}.
+Du er ikke medlem av folketrygden fordi du ikke har oppholdstillatelse i Norge. Derfor har du ikke rett til {{> ytelse-navn}}.
         {{/case}}
         {{#case "IKKE_OPPHOLDSRETT_EØS"}}
 Du er ikke medlem av folketrygden. Fordi du ikke har jobbet eller hatt familie som forsørget deg i Norge, har du ikke rett til opphold etter EØS avtalen. Derfor har du ikke rett til {{> ytelse-navn}}.
         {{/case}}
         {{#case "UTVANDRET"}}
-Du er ikke medlem av folketrygden fordi du i følge folkeregisteret flyttet fra Norge [dato]. Derfor har du ikke rett til {{> ytelse-navn}}.
+Du er ikke medlem av folketrygden fordi du har flyttet fra Norge og heller ikke regnes som arbeidstaker i Norge. Derfor har du ikke rett til {{> ytelse-navn}}.
         {{/case}}
         {{/switch}}
 
