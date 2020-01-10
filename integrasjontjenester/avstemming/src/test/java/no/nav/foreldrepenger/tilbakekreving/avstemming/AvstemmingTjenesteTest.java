@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -22,7 +21,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.TilbakekrevingsvedtakMarshaller;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiResponsMarshaller;
 import no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste.TilbakekrevingsvedtakTjeneste;
@@ -32,8 +30,6 @@ import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakRequest;
 import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakResponse;
 import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsvedtakDto;
 import no.nav.tilbakekreving.typer.v1.MmelDto;
-import no.nav.tjeneste.virksomhet.aktoer.v2.meldinger.AktoerIder;
-import no.nav.tjeneste.virksomhet.aktoer.v2.meldinger.IdentDetaljer;
 import no.nav.vedtak.felles.integrasjon.aktør.klient.AktørConsumer;
 import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
@@ -55,6 +51,7 @@ public class AvstemmingTjenesteTest {
     @Before
     public void setup() {
         avstemmingTjeneste = new AvstemmingTjeneste(sendtXmlRepository, behandlingRepositoryProvider, aktørConsumerMock);
+        when(aktørConsumerMock.hentPersonIdentForAktørId(Mockito.any())).thenReturn(Optional.of("12345678901"));
     }
 
     @Test
@@ -71,7 +68,6 @@ public class AvstemmingTjenesteTest {
             .medBehandlingResultatType(BehandlingResultatType.INNVILGET)
             .medVedtak(LocalDate.now(), VedtakResultatType.FULL_TILBAKEBETALING)
             .lagre(behandlingRepositoryProvider);
-        mockAktørConsumer(behandling);
 
         Long behandlingId = behandling.getId();
         Long xmlId = lagOgLagreVedtak(behandlingId);
@@ -90,7 +86,6 @@ public class AvstemmingTjenesteTest {
             .medBehandlingResultatType(BehandlingResultatType.INNVILGET)
             .medVedtak(LocalDate.now(), VedtakResultatType.FULL_TILBAKEBETALING)
             .lagre(behandlingRepositoryProvider);
-        mockAktørConsumer(behandling);
 
         Long behandlingId = behandling.getId();
         Long xmlId = lagOgLagreVedtak(behandlingId);
@@ -109,7 +104,7 @@ public class AvstemmingTjenesteTest {
             .medBehandlingResultatType(BehandlingResultatType.INNVILGET)
             .medVedtak(LocalDate.now(), VedtakResultatType.INGEN_TILBAKEBETALING)
             .lagre(behandlingRepositoryProvider);
-        mockAktørConsumer(behandling);
+        when(aktørConsumerMock.hentPersonIdentForAktørId(Mockito.any())).thenReturn(Optional.of("12345678901"));
 
         Long behandlingId = behandling.getId();
         Long xmlId = lagOgLagreVedtak(behandlingId);
@@ -134,7 +129,6 @@ public class AvstemmingTjenesteTest {
             .medBehandlingResultatType(BehandlingResultatType.INNVILGET)
             .medVedtak(LocalDate.now(), VedtakResultatType.INGEN_TILBAKEBETALING)
             .lagre(behandlingRepositoryProvider);
-        mockAktørConsumer(behandling);
 
         Long behandlingId = behandling.getId();
         Long xmlId = lagOgLagreVedtak(behandlingId);
@@ -145,24 +139,11 @@ public class AvstemmingTjenesteTest {
         assertThat(oppsummer).isNotEmpty();
     }
 
-    private void mockAktørConsumer(Behandling behandling) {
-        when(aktørConsumerMock.hentPersonIdenterForAktørIder(Mockito.anySet())).thenReturn(Collections.singletonList(lagAktoerId(behandling.getAktørId(), "12345678901")));
-    }
-
     private Long lagreIverksattVedtak(Long behandlingId, TilbakekrevingsvedtakDto vedtak) {
         TilbakekrevingsvedtakRequest request = new TilbakekrevingsvedtakRequest();
         request.setTilbakekrevingsvedtak(vedtak);
         String xml = TilbakekrevingsvedtakMarshaller.marshall(behandlingId, request);
         return sendtXmlRepository.lagre(behandlingId, xml, MeldingType.VEDTAK);
-    }
-
-    private AktoerIder lagAktoerId(AktørId aktørId, String fnr) {
-        AktoerIder aktoerId = new AktoerIder();
-        aktoerId.setAktoerId(aktørId.getId());
-        IdentDetaljer value = new IdentDetaljer();
-        value.setTpsId(fnr);
-        aktoerId.setGjeldendeIdent(value);
-        return aktoerId;
     }
 
     private TilbakekrevingsvedtakResponse lagRespons(MmelDto kvittering) {

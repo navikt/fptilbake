@@ -1,12 +1,8 @@
 package no.nav.foreldrepenger.tilbakekreving.avstemming;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -20,7 +16,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtakRepository;
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.TilbakekrevingsvedtakMarshaller;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiKvitteringTolk;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiResponsMarshaller;
@@ -29,7 +24,6 @@ import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiSendtXmlReposito
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlSendt;
 import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakRequest;
 import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakResponse;
-import no.nav.tjeneste.virksomhet.aktoer.v2.meldinger.AktoerIder;
 import no.nav.vedtak.felles.integrasjon.aktør.klient.AktørConsumer;
 
 @ApplicationScoped
@@ -56,7 +50,6 @@ public class AvstemmingTjeneste {
 
     public Optional<String> oppsummer(LocalDate dato) {
         Collection<ØkonomiXmlSendt> sendteVedtak = sendtXmlRepository.finn(MeldingType.VEDTAK, dato);
-        AktørIdFnrMapper mapper = lagMapperForAktørIdent(sendteVedtak);
         AvstemmingCsvFormatter avstemmingCsvFormatter = new AvstemmingCsvFormatter();
         for (ØkonomiXmlSendt sendtVedtak : sendteVedtak) {
             if (!erSendtOK(sendtVedtak)) {
@@ -67,7 +60,7 @@ public class AvstemmingTjeneste {
             if (erFørstegangsvedtakUtenTilbakekreving(behandling, oppsummering)) {
                 continue;
             }
-            leggTilAvstemmingsdataForVedtaket(avstemmingCsvFormatter, mapper, behandling, oppsummering);
+            leggTilAvstemmingsdataForVedtaket(avstemmingCsvFormatter, behandling, oppsummering);
 
         }
         logger.info("Avstemmingdata for {} ble hentet. Av {} sendte meldinger var {} med OK kvittering og kan sendes til avstemming", dato, sendteVedtak.size(), avstemmingCsvFormatter.getAntallRader());
@@ -81,14 +74,17 @@ public class AvstemmingTjeneste {
         return behandling.getType().equals(BehandlingType.TILBAKEKREVING) && oppsummering.harIngenTilbakekreving();
     }
 
-    private void leggTilAvstemmingsdataForVedtaket(AvstemmingCsvFormatter avstemmingCsvFormatter, AktørIdFnrMapper mapper, Behandling behandling, TilbakekrevingsvedtakOppsummering oppsummering) {
+    private void leggTilAvstemmingsdataForVedtaket(AvstemmingCsvFormatter avstemmingCsvFormatter, Behandling behandling, TilbakekrevingsvedtakOppsummering oppsummering) {
         Long behandlingId = behandling.getId();
         BehandlingVedtak behandlingVedtak = behandlingVedtakRepository.hentBehandlingvedtakForBehandlingId(behandlingId).orElseThrow();
+
+        String fnr = aktørConsumer.hentPersonIdentForAktørId(behandling.getAktørId().getId())
+            .orElseThrow(() -> new IllegalArgumentException("Avstemming feilet, fant ikke ident. Gjelder behandlingId=" + behandlingId + " aktørId=" + behandling.getAktørId().getId()));
 
         avstemmingCsvFormatter.leggTilRad(AvstemmingCsvFormatter.radBuilder()
             .medAvsender("fptilbake")
             .medVedtakId(oppsummering.getØkonomiVedtakId())
-            .medFnr(mapper.getFnr(behandling.getAktørId()))
+            .medFnr(fnr)
             .medVedtaksdato(behandlingVedtak.getVedtaksdato())
             .medFagsakYtelseType(behandling.getFagsak().getFagsakYtelseType())
             .medTilbakekrevesBruttoUtenRenter(oppsummering.getTilbakekrevesBruttoUtenRenter())
@@ -99,43 +95,8 @@ public class AvstemmingTjeneste {
         );
     }
 
-    private AktørIdFnrMapper lagMapperForAktørIdent(Collection<ØkonomiXmlSendt> sendteMeldinger) {
-        List<AktørId> aktørIds = finnAktørIDer(sendteMeldinger);
-        List<AktoerIder> identer = aktørIds.isEmpty()
-            ? Collections.emptyList()
-            : aktørConsumer.hentPersonIdenterForAktørIder(aktørIds.stream().map(AktørId::getId).collect(Collectors.toSet()));
-        return new AktørIdFnrMapper(identer);
-    }
-
     private boolean erOmgjøringTilIngenTilbakekreving(TilbakekrevingsvedtakOppsummering oppsummering, Behandling behandling) {
         return behandling.getType().equals(BehandlingType.REVURDERING_TILBAKEKREVING) && oppsummering.harIngenTilbakekreving();
-    }
-
-    static class AktørIdFnrMapper {
-
-        private List<AktoerIder> mapping;
-
-        public AktørIdFnrMapper(List<AktoerIder> mapping) {
-            this.mapping = mapping;
-        }
-
-        public String getFnr(AktørId aktørId) {
-            for (AktoerIder id : mapping) {
-                if (id.getAktoerId().equalsIgnoreCase(aktørId.getId())) {
-                    return id.getGjeldendeIdent().getTpsId();
-                }
-            }
-            throw new IllegalArgumentException("Fant ikke aktørId i mapping");
-        }
-    }
-
-    private List<AktørId> finnAktørIDer(Collection<ØkonomiXmlSendt> sendteMeldinger) {
-        List<AktørId> aktørIder = new ArrayList<>();
-        for (ØkonomiXmlSendt sentMelding : sendteMeldinger) {
-            Behandling behandling = behandlingRepository.hentBehandling(sentMelding.getBehandlingId());
-            aktørIder.add(behandling.getAktørId());
-        }
-        return aktørIder;
     }
 
     private static boolean erSendtOK(ØkonomiXmlSendt melding) {
