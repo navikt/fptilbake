@@ -1,7 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi;
 
-import java.util.Set;
-
 import javax.xml.ws.soap.SOAPFaultException;
 
 import org.slf4j.Logger;
@@ -17,7 +15,6 @@ import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakResponse;
 import no.nav.tilbakekreving.kravgrunnlag.annuller.v1.AnnullerKravgrunnlagDto;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagDto;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.HentKravgrunnlagDetaljDto;
-import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsvedtakDto;
 import no.nav.tilbakekreving.typer.v1.MmelDto;
 import no.nav.vedtak.felles.integrasjon.felles.ws.SoapWebServiceFeil;
 
@@ -26,7 +23,6 @@ public class ØkonomiConsumerImpl implements ØkonomiConsumer {
 
     private static final String SERVICE_IDENTIFIER = "TilbakekrevingServiceV1";
     private static final Logger logger = LoggerFactory.getLogger(ØkonomiConsumerImpl.class);
-    private static final Set<String> KVITTERING_OK_KODE = Set.of("00", "04");
 
     private TilbakekrevingPortType port;
 
@@ -35,17 +31,12 @@ public class ØkonomiConsumerImpl implements ØkonomiConsumer {
     }
 
     @Override
-    public MmelDto iverksettTilbakekrevingsvedtak(Long behandlingId, TilbakekrevingsvedtakDto vedtak) {
-        TilbakekrevingsvedtakResponse respons = iverksett(vedtak);
-        MmelDto kvittering = respons.getMmel();
-        validerKvitteringForIverksettelse(behandlingId, kvittering);
-
-        //hvis kvittering er OK, er alt være OK. Ikke noen grunn til å lagre resultat.
-        logger.info("Tilbakekrevingsvedtak sendt til oppdragsystemet. BehandlingId={} Alvorlighetsgrad='{}' infomelding='{}'",
-            behandlingId,
-            kvittering.getAlvorlighetsgrad(),
-            kvittering.getBeskrMelding());
-        return kvittering;
+    public TilbakekrevingsvedtakResponse iverksettTilbakekrevingsvedtak(Long behandlingId, TilbakekrevingsvedtakRequest vedtak) {
+        try {
+            return port.tilbakekrevingsvedtak(vedtak);
+        } catch (SOAPFaultException e) { // NOSONAR
+            throw SoapWebServiceFeil.FACTORY.soapFaultIwebserviceKall(SERVICE_IDENTIFIER, e).toException();
+        }
     }
 
     @Override
@@ -74,16 +65,6 @@ public class ØkonomiConsumerImpl implements ØkonomiConsumer {
     }
 
 
-    private TilbakekrevingsvedtakResponse iverksett(TilbakekrevingsvedtakDto vedtak) {
-        TilbakekrevingsvedtakRequest request = new TilbakekrevingsvedtakRequest();
-        request.setTilbakekrevingsvedtak(vedtak);
-        try {
-            return port.tilbakekrevingsvedtak(request);
-        } catch (SOAPFaultException e) { // NOSONAR
-            throw SoapWebServiceFeil.FACTORY.soapFaultIwebserviceKall(SERVICE_IDENTIFIER, e).toException();
-        }
-    }
-
     private KravgrunnlagHentDetaljResponse hentGrunnlagRespons(HentKravgrunnlagDetaljDto kravgrunnlagDetalj) {
         KravgrunnlagHentDetaljRequest hentKravgrunnlagRequest = new KravgrunnlagHentDetaljRequest();
         hentKravgrunnlagRequest.setHentkravgrunnlag(kravgrunnlagDetalj);
@@ -104,21 +85,15 @@ public class ØkonomiConsumerImpl implements ØkonomiConsumer {
         }
     }
 
-    private void validerKvitteringForIverksettelse(Long behandlingId, MmelDto mmel) {
-        if (!ØkonomiKvitteringTolk.erKvitteringOK(mmel)) {
-            throw ØkonomiConsumerFeil.FACTORY.fikkFeilkodeVedIverksetting(behandlingId, ØkonomiConsumerFeil.formaterKvitterign(mmel)).toException();
-        }
-    }
-
     private void validerKvitteringForHentGrunnlag(Long behandlingId, MmelDto mmel) {
         if (!ØkonomiKvitteringTolk.erKvitteringOK(mmel)) {
-            throw ØkonomiConsumerFeil.FACTORY.fikkFeilkodeVedHentingAvKravgrunnlag(behandlingId, ØkonomiConsumerFeil.formaterKvitterign(mmel)).toException();
+            throw ØkonomiConsumerFeil.FACTORY.fikkFeilkodeVedHentingAvKravgrunnlag(behandlingId, ØkonomiConsumerFeil.formaterKvittering(mmel)).toException();
         }
     }
 
     private void validerKvitteringForAnnulereGrunnlag(Long behandlingId, MmelDto mmel) {
         if (!ØkonomiKvitteringTolk.erKvitteringOK(mmel)) {
-            throw ØkonomiConsumerFeil.FACTORY.fikkFeilkodeVedAnnulereKravgrunnlag(behandlingId, ØkonomiConsumerFeil.formaterKvitterign(mmel)).toException();
+            throw ØkonomiConsumerFeil.FACTORY.fikkFeilkodeVedAnnulereKravgrunnlag(behandlingId, ØkonomiConsumerFeil.formaterKvittering(mmel)).toException();
         }
     }
 

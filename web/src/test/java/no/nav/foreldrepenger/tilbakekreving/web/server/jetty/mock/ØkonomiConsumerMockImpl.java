@@ -13,12 +13,13 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiConsumer;
+import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakRequest;
+import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakResponse;
 import no.nav.tilbakekreving.kravgrunnlag.annuller.v1.AnnullerKravgrunnlagDto;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagBelopDto;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagDto;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagPeriodeDto;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.HentKravgrunnlagDetaljDto;
-import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsvedtakDto;
 import no.nav.tilbakekreving.typer.v1.JaNeiDto;
 import no.nav.tilbakekreving.typer.v1.MmelDto;
 import no.nav.tilbakekreving.typer.v1.PeriodeDto;
@@ -33,7 +34,7 @@ class ØkonomiConsumerMockImpl implements ØkonomiConsumer {
     private static final String ENHET = "8020";
 
     @Override
-    public MmelDto iverksettTilbakekrevingsvedtak(Long behandlingId, TilbakekrevingsvedtakDto vedtak) {
+    public TilbakekrevingsvedtakResponse iverksettTilbakekrevingsvedtak(Long behandlingId, TilbakekrevingsvedtakRequest request) {
         logger.info("Tilbakekrevingsvedtak sendt til oppdragsystemet for behandlingId={}", behandlingId);
         return lagMockRespons();
     }
@@ -47,17 +48,23 @@ class ØkonomiConsumerMockImpl implements ØkonomiConsumer {
     @Override
     public MmelDto anullereKravgrunnlag(Long behandlingId, AnnullerKravgrunnlagDto annullerKravgrunnlag) {
         logger.info("AnnulereKravgrunnlag sendt til oppdragsystemet for behandlingId={}", behandlingId);
-        return lagMockRespons();
+        return lagMockKvittering();
     }
 
-    private MmelDto lagMockRespons() {
+    private TilbakekrevingsvedtakResponse lagMockRespons() {
+        TilbakekrevingsvedtakResponse response = new TilbakekrevingsvedtakResponse();
+        MmelDto mmelDto = lagMockKvittering();
+        response.setMmel(mmelDto);
+        return response;
+    }
+
+    private MmelDto lagMockKvittering() {
         MmelDto mmelDto = new MmelDto();
         mmelDto.setSystemId("460-BIDR");
         mmelDto.setAlvorlighetsgrad("00");
         mmelDto.setBeskrMelding("OK");
         return mmelDto;
     }
-
 
     private DetaljertKravgrunnlagDto hentGrunnlag() {
         DetaljertKravgrunnlagDto detaljertKravgrunnlag = new DetaljertKravgrunnlagDto();

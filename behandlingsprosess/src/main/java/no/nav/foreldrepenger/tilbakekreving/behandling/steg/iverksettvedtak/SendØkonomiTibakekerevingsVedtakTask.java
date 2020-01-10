@@ -10,12 +10,21 @@ import org.slf4j.LoggerFactory;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.TilbakekrevingsvedtakMarshaller;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiConsumer;
+import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiConsumerFeil;
+import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiKvitteringTolk;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiResponsMarshaller;
 import no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste.TilbakekrevingsvedtakTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.MeldingType;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiSendtXmlRepository;
+import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakRequest;
+import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakResponse;
 import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsvedtakDto;
 import no.nav.tilbakekreving.typer.v1.MmelDto;
+import no.nav.vedtak.feil.Feil;
+import no.nav.vedtak.feil.FeilFactory;
+import no.nav.vedtak.feil.LogLevel;
+import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
+import no.nav.vedtak.feil.deklarasjon.IntegrasjonFeil;
 import no.nav.vedtak.felles.jpa.savepoint.RunWithSavepoint;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -27,7 +36,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 public class SendØkonomiTibakekerevingsVedtakTask implements ProsessTaskHandler {
     public static final String TASKTYPE = "iverksetteVedtak.sendØkonomiTilbakekrevingsvedtak";
 
-    private static final Logger log = LoggerFactory.getLogger(SendØkonomiTibakekerevingsVedtakTask.class);
+    private static final Logger logger = LoggerFactory.getLogger(SendØkonomiTibakekerevingsVedtakTask.class);
 
     private EntityManager entityManager;
     private TilbakekrevingsvedtakTjeneste tilbakekrevingsvedtakTjeneste;
@@ -52,32 +61,55 @@ public class SendØkonomiTibakekerevingsVedtakTask implements ProsessTaskHandler
     public void doTask(ProsessTaskData prosessTaskData) {
         long behandlingId = prosessTaskData.getBehandlingId();
         TilbakekrevingsvedtakDto tilbakekrevingsvedtak = tilbakekrevingsvedtakTjeneste.lagTilbakekrevingsvedtak(behandlingId);
-        Long sendtXmlId = lagreXml(behandlingId, tilbakekrevingsvedtak);
-        lagSavepointOgIverksett(behandlingId, sendtXmlId, tilbakekrevingsvedtak);
+        TilbakekrevingsvedtakRequest request = lagRequest(tilbakekrevingsvedtak);
+        Long sendtXmlId = lagreXml(behandlingId, request);
+        lagSavepointOgIverksett(behandlingId, sendtXmlId, request);
     }
 
-    private void lagSavepointOgIverksett(long behandlingId, long sendtXmlId, TilbakekrevingsvedtakDto tilbakekrevingsvedtak) {
+    private void lagSavepointOgIverksett(long behandlingId, long sendtXmlId, TilbakekrevingsvedtakRequest tilbakekrevingsvedtak) {
         RunWithSavepoint runWithSavepoint = new RunWithSavepoint(entityManager);
         runWithSavepoint.doWork(() -> {
-            MmelDto respons = økonomiConsumer.iverksettTilbakekrevingsvedtak(behandlingId, tilbakekrevingsvedtak);
-            log.info("Oversendte tilbakekrevingsvedtak til oppdragsystemet for behandling={}", behandlingId);
-            oppdatereRespons(behandlingId, sendtXmlId, respons);
+            //setter før kall til OS, slik at requesten blir lagret selv om kallet feiler
+            TilbakekrevingsvedtakResponse respons = økonomiConsumer.iverksettTilbakekrevingsvedtak(behandlingId, tilbakekrevingsvedtak);
+            lagreRespons(behandlingId, sendtXmlId, respons);
+            MmelDto kvittering = respons.getMmel();
+            if (ØkonomiKvitteringTolk.erKvitteringOK(kvittering)) {
+                logger.info("Tilbakekrevingsvedtak sendt til oppdragsystemet. BehandlingId={} Alvorlighetsgrad='{}' infomelding='{}'", behandlingId, kvittering.getAlvorlighetsgrad(), kvittering.getBeskrMelding());
+            } else {
+                RunWithSavepoint rwsp = new RunWithSavepoint(entityManager);
+                rwsp.doWork(() -> {
+                    //setter savepoint før feilen kastes, slik at kvitteringen blir lagret. Kaster feil for å feile prosesstasken, samt trigge logging
+                    String detaljer = kvittering != null ? ØkonomiConsumerFeil.formaterKvittering(kvittering) : " Fikk ikke kvittering fra OS";
+                    throw Feilene.FACTORY.fikkFeilkodeVedIverksetting(behandlingId, detaljer).toException();
+                });
+            }
             return null;
         });
     }
 
-    private Long lagreXml(Long behandlingId, TilbakekrevingsvedtakDto tilbakekrevingsvedtak) {
-        String xml = TilbakekrevingsvedtakMarshaller.marshall(behandlingId, tilbakekrevingsvedtak);
+    private TilbakekrevingsvedtakRequest lagRequest(TilbakekrevingsvedtakDto tilbakekrevingsvedtak) {
+        TilbakekrevingsvedtakRequest request = new TilbakekrevingsvedtakRequest();
+        request.setTilbakekrevingsvedtak(tilbakekrevingsvedtak);
+        return request;
+    }
+
+    private Long lagreXml(Long behandlingId, TilbakekrevingsvedtakRequest request) {
+        String xml = TilbakekrevingsvedtakMarshaller.marshall(behandlingId, request);
         Long sendtXmlId = økonomiSendtXmlRepository.lagre(behandlingId, xml, MeldingType.VEDTAK);
-        log.info("lagret vedtak-xml for behandling={}", behandlingId);
+        logger.info("lagret vedtak-xml for behandling={}", behandlingId);
         return sendtXmlId;
     }
 
-    private void oppdatereRespons(long behandlingId, long sendtXmlId, MmelDto respons) {
-        String responsXml = ØkonomiResponsMarshaller.marshall(behandlingId, respons);
+    private void lagreRespons(long behandlingId, long sendtXmlId, TilbakekrevingsvedtakResponse respons) {
+        String responsXml = ØkonomiResponsMarshaller.marshall(respons, behandlingId);
         økonomiSendtXmlRepository.oppdatereKvittering(sendtXmlId, responsXml);
-        log.info("oppdatert respons-xml for behandling={}", behandlingId);
+        logger.info("oppdatert respons-xml for behandling={}", behandlingId);
     }
 
+    interface Feilene extends DeklarerteFeil {
+        Feilene FACTORY = FeilFactory.create(Feilene.class);
 
+        @IntegrasjonFeil(feilkode = "FPT-609912", feilmelding = "Fikk feil fra OS ved iverksetting av behandlingId=%s.%s", logLevel = LogLevel.WARN)
+        Feil fikkFeilkodeVedIverksetting(Long behandlingId, String infoFraKvittering);
+    }
 }

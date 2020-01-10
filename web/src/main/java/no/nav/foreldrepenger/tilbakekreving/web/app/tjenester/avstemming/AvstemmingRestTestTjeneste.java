@@ -49,9 +49,11 @@ public class AvstemmingRestTestTjeneste {
     public Response hentAvstemmingData(@Valid @NotNull @QueryParam("dato") String dato) {
         validerIkkeIProd();
         LocalDate d = LocalDate.parse(dato, DateTimeFormatter.ofPattern("dd.MM.yyyy"));
-        String data = avstemmingTjeneste.oppsummer(d);
+        Optional<String> data = avstemmingTjeneste.oppsummer(d);
         logger.info("Hentet avstemmingsdata for {}", dato);
-        return Response.ok(data).build();
+        return data.isPresent()
+            ? Response.ok(data.get()).build()
+            : Response.noContent().build();
     }
 
     private static void validerIkkeIProd() {

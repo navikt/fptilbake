@@ -68,7 +68,7 @@ public class ØkonomiXmlSendt extends BaseEntitet {
         return behandlingId;
     }
 
-    Long getId() {
+    public Long getId() {
         return id;
     }
 

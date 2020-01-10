@@ -57,6 +57,10 @@ public class TilbakekrevingsvedtakOppsummering {
         return skatt;
     }
 
+    public boolean harIngenTilbakekreving() {
+        return tilbakekrevesBruttoUtenRenter.signum() == 0;
+    }
+
     public static class Builder {
         private boolean brukt;
         private TilbakekrevingsvedtakOppsummering kladd = new TilbakekrevingsvedtakOppsummering();

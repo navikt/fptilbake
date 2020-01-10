@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -26,8 +27,8 @@ import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiRespons
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.MeldingType;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiSendtXmlRepository;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlSendt;
-import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsvedtakDto;
-import no.nav.tilbakekreving.typer.v1.MmelDto;
+import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakRequest;
+import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakResponse;
 import no.nav.tjeneste.virksomhet.aktoer.v2.meldinger.AktoerIder;
 import no.nav.vedtak.felles.integrasjon.aktør.klient.AktørConsumer;
 
@@ -53,23 +54,35 @@ public class AvstemmingTjeneste {
         this.aktørConsumer = aktørConsumer;
     }
 
-    public String oppsummer(LocalDate dato) {
+    public Optional<String> oppsummer(LocalDate dato) {
         Collection<ØkonomiXmlSendt> sendteVedtak = sendtXmlRepository.finn(MeldingType.VEDTAK, dato);
         AktørIdFnrMapper mapper = lagMapperForAktørIdent(sendteVedtak);
         AvstemmingCsvFormatter avstemmingCsvFormatter = new AvstemmingCsvFormatter();
         for (ØkonomiXmlSendt sendtVedtak : sendteVedtak) {
-            if (erSendtOK(sendtVedtak)) {
-                leggTilAvstemmingsdataForVedtaket(avstemmingCsvFormatter, mapper, sendtVedtak);
+            if (!erSendtOK(sendtVedtak)) {
+                continue;
             }
+            Behandling behandling = behandlingRepository.hentBehandling(sendtVedtak.getBehandlingId());
+            TilbakekrevingsvedtakOppsummering oppsummering = oppsummer(sendtVedtak);
+            if (erFørstegangsvedtakUtenTilbakekreving(behandling, oppsummering)) {
+                continue;
+            }
+            leggTilAvstemmingsdataForVedtaket(avstemmingCsvFormatter, mapper, behandling, oppsummering);
+
         }
         logger.info("Avstemmingdata for {} ble hentet. Av {} sendte meldinger var {} med OK kvittering og kan sendes til avstemming", dato, sendteVedtak.size(), avstemmingCsvFormatter.getAntallRader());
-        return avstemmingCsvFormatter.getData();
+        if (avstemmingCsvFormatter.getAntallRader() == 0) {
+            return Optional.empty();
+        }
+        return Optional.of(avstemmingCsvFormatter.getData());
     }
 
-    private void leggTilAvstemmingsdataForVedtaket(AvstemmingCsvFormatter avstemmingCsvFormatter, AktørIdFnrMapper mapper, ØkonomiXmlSendt sendtVedtak) {
-        TilbakekrevingsvedtakOppsummering oppsummering = oppsummer(sendtVedtak);
-        Long behandlingId = sendtVedtak.getBehandlingId();
-        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
+    private boolean erFørstegangsvedtakUtenTilbakekreving(Behandling behandling, TilbakekrevingsvedtakOppsummering oppsummering) {
+        return behandling.getType().equals(BehandlingType.TILBAKEKREVING) && oppsummering.harIngenTilbakekreving();
+    }
+
+    private void leggTilAvstemmingsdataForVedtaket(AvstemmingCsvFormatter avstemmingCsvFormatter, AktørIdFnrMapper mapper, Behandling behandling, TilbakekrevingsvedtakOppsummering oppsummering) {
+        Long behandlingId = behandling.getId();
         BehandlingVedtak behandlingVedtak = behandlingVedtakRepository.hentBehandlingvedtakForBehandlingId(behandlingId).orElseThrow();
 
         avstemmingCsvFormatter.leggTilRad(AvstemmingCsvFormatter.radBuilder()
@@ -95,7 +108,7 @@ public class AvstemmingTjeneste {
     }
 
     private boolean erOmgjøringTilIngenTilbakekreving(TilbakekrevingsvedtakOppsummering oppsummering, Behandling behandling) {
-        return behandling.getType().equals(BehandlingType.REVURDERING_TILBAKEKREVING) && oppsummering.getTilbakekrevesBruttoUtenRenter().signum() == 0;
+        return behandling.getType().equals(BehandlingType.REVURDERING_TILBAKEKREVING) && oppsummering.harIngenTilbakekreving();
     }
 
     static class AktørIdFnrMapper {
@@ -130,13 +143,14 @@ public class AvstemmingTjeneste {
         if (kvitteringXml == null) {
             return false;
         }
-        MmelDto kvittering = ØkonomiResponsMarshaller.unmarshall(kvitteringXml);
-        return ØkonomiKvitteringTolk.erKvitteringOK(kvittering);
+        TilbakekrevingsvedtakResponse response = ØkonomiResponsMarshaller.unmarshall(kvitteringXml, melding.getBehandlingId(), melding.getId());
+        return ØkonomiKvitteringTolk.erKvitteringOK(response);
     }
 
     private TilbakekrevingsvedtakOppsummering oppsummer(ØkonomiXmlSendt sendtMelding) {
-        TilbakekrevingsvedtakDto melding = TilbakekrevingsvedtakMarshaller.unmarshall(sendtMelding.getMelding());
-        return TilbakekrevingsvedtakOppsummering.oppsummer(melding);
+        String xml = sendtMelding.getMelding();
+        TilbakekrevingsvedtakRequest melding = TilbakekrevingsvedtakMarshaller.unmarshall(xml, sendtMelding.getBehandlingId(), sendtMelding.getId());
+        return TilbakekrevingsvedtakOppsummering.oppsummer(melding.getTilbakekrevingsvedtak());
     }
 
 
