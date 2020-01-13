@@ -102,11 +102,6 @@ public class GjenopptaBehandlingTjenesteImpl implements GjenopptaBehandlingTjene
             BehandlingStegType bst = behandlingOpt.get().getAktivtBehandlingSteg();
             if (BehandlingStegType.TBKGSTEG.equals(bst)) {
                 return fortsettBehandling(behandlingId);
-            } else if (BehandlingStegType.VARSEL.equals(bst)) {
-                LocalDateTime fristTid = behandlingOpt.get().getAksjonspunktFor(AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING).getFristTid();
-                if (fristTid.isBefore(FPDateUtil.nå())) {
-                    return fortsettBehandling(behandlingId);
-                }
             }
         }
         return Optional.empty();

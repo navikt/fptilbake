@@ -166,14 +166,6 @@ public class GjenopptaBehandlingTjenesteImplTest {
     }
 
     @Test
-    public void skal_fortsette_behandling_med_grunnlag_for_behandling_i_varsel_steg_og_fristen_gått_ut() {
-        Behandling behandling = lagBehandling();
-        when(mockProsesstaskRepository.lagre(any(ProsessTaskData.class))).thenReturn("Call_123");
-        Optional<String> callId = gjenopptaBehandlingTjeneste.fortsettBehandlingMedGrunnlag(behandling.getId());
-        assertThat(callId).isNotEmpty();
-    }
-
-    @Test
     public void skal_fortsette_behandling_med_grunnlag_for_behandling_i_varsel_steg_og_fristen_ikke_gått_ut() {
         Behandling behandling = lagBehandling();
         internalAksjonspunktManipulator.forceFristForAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, LocalDateTime.now().plusDays(20));
