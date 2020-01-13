@@ -17,6 +17,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkTabellRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +51,7 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
     private KravgrunnlagRepository grunnlagRepository;
     private BehandlingRepository behandlingRepository;
     private ØkonomiMottattXmlRepository mottattXmlRepository;
-    private AksjonspunktRepository aksjonspunktRepository;
+    private KodeverkTabellRepository kodeverkTabellRepository;
     private KravVedtakStatusTjeneste kravVedtakStatusTjeneste;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private KravVedtakStatusMapper kravVedtakStatusMapper;
@@ -63,6 +64,7 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
     @Inject
     public FinnGrunnlagTask(BehandlingRepositoryProvider repositoryProvider,
                             ØkonomiMottattXmlRepository mottattXmlRepository,
+                            KodeverkTabellRepository kodeverkTabellRepository,
                             KravVedtakStatusTjeneste kravVedtakStatusTjeneste,
                             BehandlingskontrollTjeneste behandlingskontrollTjeneste,
                             KravVedtakStatusMapper kravVedtakStatusMapper,
@@ -70,7 +72,7 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.mottattXmlRepository = mottattXmlRepository;
-        this.aksjonspunktRepository = repositoryProvider.getAksjonspunktRepository();
+        this.kodeverkTabellRepository = kodeverkTabellRepository;
 
         this.kravVedtakStatusTjeneste = kravVedtakStatusTjeneste;
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
@@ -131,8 +133,16 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
         if (behandling.isBehandlingPåVent() && !grunnlagRepository.erKravgrunnlagSperret(behandlingId)) {
             BehandlingskontrollKontekst kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandlingId);
             behandlingskontrollTjeneste.taBehandlingAvVentSetAlleAutopunktUtført(behandling, kontekst);
-            aksjonspunktRepository.leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING, BehandlingStegType.FAKTA_FEILUTBETALING);
+            behandlingskontrollTjeneste.prosesserBehandlingGjenopptaHvisStegVenter(kontekst, finnBehandlingStegType(behandling.getAktivtBehandlingSteg().getKode()));
         }
+    }
+
+    private BehandlingStegType finnBehandlingStegType(String gjenoppta) {
+        BehandlingStegType stegtype = kodeverkTabellRepository.finnBehandlingStegType(gjenoppta);
+        if (stegtype == null) {
+            throw new IllegalStateException("Utviklerfeil: ukjent steg " + gjenoppta);
+        }
+        return stegtype;
     }
 
 }
