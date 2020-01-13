@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -162,6 +163,15 @@ public class GjenopptaBehandlingTjenesteImplTest {
 
         // Assert
         assertThat(statusListFromSvc).containsExactly(status1, status2);
+    }
+
+    @Test
+    public void skal_fortsette_behandling_med_grunnlag_for_behandling_i_varsel_steg_og_fristen_ikke_gått_ut() {
+        Behandling behandling = lagBehandling();
+        internalAksjonspunktManipulator.forceFristForAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, LocalDateTime.now().plusDays(20));
+        when(mockProsesstaskRepository.lagre(any(ProsessTaskData.class))).thenReturn("Call_123");
+        Optional<String> callId = gjenopptaBehandlingTjeneste.fortsettBehandlingMedGrunnlag(behandling.getId());
+        assertThat(callId).isEmpty();
     }
 
     private Behandling lagBehandling() {
