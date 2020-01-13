@@ -34,6 +34,7 @@ import no.nav.vedtak.feil.LogLevel;
 import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
 import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
 import no.nav.vedtak.util.Objects;
+import no.nav.vedtak.util.StringUtils;
 
 class TekstformatererVedtaksbrev {
     private static Map<String, Template> TEMPLATE_CACHE = new HashMap<>();
@@ -91,8 +92,10 @@ class TekstformatererVedtaksbrev {
 
         Avsnitt.Builder avsnittBuilder = new Avsnitt.Builder()
             .medAvsnittstype(Avsnitt.Avsnittstype.PERIODE)
-            .medPeriode(data.getPeriode().getPeriode())
-            .medOverskrift(fjernOverskriftFormattering(overskrift));
+            .medPeriode(data.getPeriode().getPeriode());
+        if (!StringUtils.nullOrEmpty(overskrift)) {
+            avsnittBuilder.medOverskrift(fjernOverskriftFormattering(overskrift));
+        }
 
         parseTekst(faktatekst, avsnittBuilder, Underavsnitt.Underavsnittstype.FAKTA);
         parseTekst(vilkårTekst, avsnittBuilder, Underavsnitt.Underavsnittstype.VILKÅR);

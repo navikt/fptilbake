@@ -19,6 +19,27 @@ Du er ikke medlem av folketrygden fordi du i følge folkeregisteret flyttet fra 
 
 Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
 {{/inline}}
+{{#* inline "es-fakta-medlemskap"}}
+        {{#switch fakta.hendelseundertype}}
+        {{#case "IKKE_BOSATT"}}
+Du var ikke medlem av folketrygden {{> familie-hendelse}}, fordi du har oppholdt deg så mye i utlandet at du anses ikke som bosatt i Norge, og du er heller ikke arbeidstaker i Norge. Derfor har du ikke rett til {{> ytelse-navn}}.
+        {{/case}}
+        {{#case "MEDLEM_I_ANNET_LAND"}}
+Du var ikke medlem av folketrygden {{> familie-hendelse}}, fordi du var omfattet av trygdeordningen i et annet land. Derfor har du ikke rett til {{> ytelse-navn}}.
+        {{/case}}
+        {{#case "IKKE_LOVLIG_OPPHOLD"}}
+Du var ikke medlem av folketrygden {{> familie-hendelse}}, fordi du ikke hadde oppholdstillatelse. Derfor har du ikke rett til {{> ytelse-navn}}.
+        {{/case}}
+        {{#case "IKKE_OPPHOLDSRETT_EØS"}}
+Du var ikke medlem av folketrygden {{> familie-hendelse}}. Fordi du ikke har jobbet eller hatt familie som forsørget deg i Norge, har du ikke rett til opphold etter EØS avtalen. Derfor har du ikke rett til {{> ytelse-navn}}.
+        {{/case}}
+        {{#case "UTVANDRET"}}
+Du var ikke medlem av folketrygden {{> familie-hendelse}} fordi du ikke lenger var bosatt eller arbeidstaker i Norge. Derfor har du ikke rett til {{> ytelse-navn}}.
+        {{/case}}
+        {{/switch}}
+
+Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
+{{/inline}}
 {{#* inline "fakta-økonomi-feil"}}
         {{#switch fakta.hendelseundertype}}
         {{#case "OKONOMI_DOBBELUTBETALING"}}
@@ -42,7 +63,7 @@ I denne perioden har du både fått utbetalt {{> ytelse-navn}} fra oss og lønn 
 {{#case "ES"}}
     {{#switch fakta.hendelsetype}}
     {{#case "MEDLEMSKAP"}}
-        {{> fakta-medlemskap}}
+        {{> es-fakta-medlemskap}}
     {{/case}}
     {{#case "ES_FORELDREANSVAR_TYPE"}}
         {{#switch fakta.hendelseundertype}}
