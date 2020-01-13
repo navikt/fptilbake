@@ -12,6 +12,7 @@ import javax.enterprise.inject.spi.CDI;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.migrasjon.MigrasjonRestTjeneste;
 import org.jboss.weld.interceptor.util.proxy.TargetInstanceProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,6 +119,7 @@ public class ApplicationConfig extends Application {
         classes.add(FordelRestTjeneste.class);
         classes.add(ForvaltningTekniskRestTjeneste.class);
         classes.add(ForvaltningBehandlingRestTjeneste.class);
+        classes.add(MigrasjonRestTjeneste.class);
 
         //HAXX legger til en test-tjeneste i alle miljø utenom prod
         Optional<String> envName = EnvironmentProperty.getEnvironmentName();

@@ -75,7 +75,7 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
         String saksnummer = finnSaksnummer(kravOgVedtakstatus.getFagsystemId());
 
         String eksternBehandlingId = statusMapper.finnBehandlngId(kravOgVedtakstatus);
-        økonomiMottattXmlRepository.oppdaterMedEksternBehandlingId(eksternBehandlingId, mottattXmlId);
+        økonomiMottattXmlRepository.oppdaterMedEksternBehandlingIdOgSaksnummer(eksternBehandlingId, saksnummer, mottattXmlId);
 
         long vedtakId = statusMapper.finnVedtakId(kravOgVedtakstatus);
         oppdatereEksternBehandling(vedtakId, eksternBehandlingId);

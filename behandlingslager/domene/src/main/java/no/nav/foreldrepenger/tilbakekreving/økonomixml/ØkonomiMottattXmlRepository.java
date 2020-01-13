@@ -55,9 +55,9 @@ public class ØkonomiMottattXmlRepository {
         return query.getResultList();
     }
 
-    public List<ØkonomiXmlMottatt> finnAlleEksternBehandlingSomIkkeErKoblet(String eksternBehandlingId) {
-        TypedQuery<ØkonomiXmlMottatt> query = entityManager.createQuery("from ØkonomiXmlMottatt where eksternBehandlingId=:eksternBehandlingId and tilkoblet='N'", ØkonomiXmlMottatt.class);
-        query.setParameter(KEY_EKSTERN_BEHANDLING_ID, eksternBehandlingId);
+    public List<ØkonomiXmlMottatt> finnAlleForSaksnummerSomIkkeErKoblet(String saksnummer) {
+        TypedQuery<ØkonomiXmlMottatt> query = entityManager.createQuery("from ØkonomiXmlMottatt where saksnummer=:saksnummer and tilkoblet='N'", ØkonomiXmlMottatt.class);
+        query.setParameter("saksnummer", saksnummer);
         return query.getResultList();
     }
 
@@ -65,11 +65,12 @@ public class ØkonomiMottattXmlRepository {
         return entityManager.find(ØkonomiXmlMottatt.class, mottattXmlId);
     }
 
-    public void oppdaterMedEksternBehandlingId(String eksternBehandlingId, Long kravgrunnlagXmlId) {
+    public void oppdaterMedEksternBehandlingIdOgSaksnummer(String eksternBehandlingId, String saksnummer, Long kravgrunnlagXmlId) {
         ØkonomiXmlMottatt entity = finnMottattXml(kravgrunnlagXmlId);
         Long eksisterendeVersjon = finnHøyesteVersjonsnummer(eksternBehandlingId);
         long nyVersjon = eksisterendeVersjon == null ? 1 : eksisterendeVersjon + 1;
         entity.setEksternBehandling(eksternBehandlingId, nyVersjon);
+        entity.setSaksnummer(saksnummer);
         entityManager.persist(entity);
     }
 
@@ -81,6 +82,17 @@ public class ØkonomiMottattXmlRepository {
 
     public boolean erMottattXmlTilkoblet(Long mottattXmlId) {
         return finnMottattXml(mottattXmlId).isTilkoblet();
+    }
+
+    public List<ØkonomiXmlMottatt> hentAlleMeldingerUtenSaksnummer(){
+        TypedQuery<ØkonomiXmlMottatt> query = entityManager.createQuery("from ØkonomiXmlMottatt where saksnummer is null", ØkonomiXmlMottatt.class);
+        return query.getResultList();
+    }
+
+    public void oppdaterSaksnummer(Long kravgrunnlagXmlId, String saksnummer){
+        ØkonomiXmlMottatt entity = finnMottattXml(kravgrunnlagXmlId);
+        entity.setSaksnummer(saksnummer);
+        entityManager.persist(entity);
     }
 
     private Long finnHøyesteVersjonsnummer(String eksternBehandlingId) {

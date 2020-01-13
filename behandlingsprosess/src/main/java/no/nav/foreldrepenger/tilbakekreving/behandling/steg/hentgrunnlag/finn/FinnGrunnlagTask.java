@@ -10,6 +10,14 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkTabellRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,8 +27,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.status.
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.status.KravVedtakStatusTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.status.KravVedtakStatusXmlUnmarshaller;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatus437;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
@@ -43,9 +49,11 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
     public static final String TASKTYPE = "kravgrunnlag.finn";
 
     private KravgrunnlagRepository grunnlagRepository;
-    private EksternBehandlingRepository eksternBehandlingRepository;
+    private BehandlingRepository behandlingRepository;
     private ØkonomiMottattXmlRepository mottattXmlRepository;
+    private KodeverkTabellRepository kodeverkTabellRepository;
     private KravVedtakStatusTjeneste kravVedtakStatusTjeneste;
+    private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private KravVedtakStatusMapper kravVedtakStatusMapper;
     private KravgrunnlagMapper kravgrunnlagMapper;
 
@@ -56,14 +64,18 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
     @Inject
     public FinnGrunnlagTask(BehandlingRepositoryProvider repositoryProvider,
                             ØkonomiMottattXmlRepository mottattXmlRepository,
+                            KodeverkTabellRepository kodeverkTabellRepository,
                             KravVedtakStatusTjeneste kravVedtakStatusTjeneste,
+                            BehandlingskontrollTjeneste behandlingskontrollTjeneste,
                             KravVedtakStatusMapper kravVedtakStatusMapper,
                             KravgrunnlagMapper kravgrunnlagMapper) {
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
-        this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
+        this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.mottattXmlRepository = mottattXmlRepository;
+        this.kodeverkTabellRepository = kodeverkTabellRepository;
 
         this.kravVedtakStatusTjeneste = kravVedtakStatusTjeneste;
+        this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
         this.kravVedtakStatusMapper = kravVedtakStatusMapper;
         this.kravgrunnlagMapper = kravgrunnlagMapper;
     }
@@ -71,13 +83,14 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
         Long behandlingId = prosessTaskData.getBehandlingId();
-        EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandlingId);
+        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
+        String saksnummer = behandling.getFagsak().getSaksnummer().getVerdi();
 
-        List<ØkonomiXmlMottatt> alleXmlMeldinger = mottattXmlRepository.finnAlleEksternBehandlingSomIkkeErKoblet(String.valueOf(eksternBehandling.getEksternId()));
+        List<ØkonomiXmlMottatt> alleXmlMeldinger = mottattXmlRepository.finnAlleForSaksnummerSomIkkeErKoblet(saksnummer);
         if (!alleXmlMeldinger.isEmpty()) {
-            logger.info("Fant {} meldinger som ikke er koblet for behandlingId={} og eksternBehandlingId={}", alleXmlMeldinger.size(), behandlingId, eksternBehandling.getEksternId());
+            logger.info("Fant {} meldinger som ikke er koblet for behandlingId={} og saksnummer={}", alleXmlMeldinger.size(), behandlingId, saksnummer);
             alleXmlMeldinger = alleXmlMeldinger.stream()
-                .sorted(Comparator.comparing(ØkonomiXmlMottatt::getSekvens))
+                .sorted(Comparator.comparing(ØkonomiXmlMottatt::getOpprettetTidspunkt))
                 .collect(Collectors.toList());
             for (ØkonomiXmlMottatt økonomiXmlMottatt : alleXmlMeldinger) {
                 Long mottattXmlId = økonomiXmlMottatt.getId();
@@ -90,10 +103,11 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
                     logger.info("xml er status xml med mottattXmlId={}", mottattXmlId);
                     håndtereGrunnlagStatusForBehandling(behandlingId, mottattXmlId, mottattXml);
                 } else {
-                    logger.warn("xml rekkefølge er ikke riktig med mottattXmlId={}",mottattXmlId);
+                    logger.warn("xml rekkefølge er ikke riktig med mottattXmlId={}", mottattXmlId);
                 }
                 mottattXmlRepository.opprettTilkobling(mottattXmlId);
             }
+            taBehandlingAvVentOgProssereHvisGrunnlagetIkkeErSperret(behandling);
 
         } else {
             logger.info("Xml mottatt ikke for behandlingId={}", behandlingId);
@@ -112,6 +126,23 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
         kravgrunnlag.setKodeStatusKrav(KravStatusKode.NYTT.getKode()); // alltid vurderes som nytt grunnlag for den behandlingen
         Kravgrunnlag431 kravgrunnlag431 = kravgrunnlagMapper.mapTilDomene(kravgrunnlag);
         grunnlagRepository.lagre(behandlingId, kravgrunnlag431);
+    }
+
+    private void taBehandlingAvVentOgProssereHvisGrunnlagetIkkeErSperret(Behandling behandling) {
+        Long behandlingId = behandling.getId();
+        if (behandling.isBehandlingPåVent() && !grunnlagRepository.erKravgrunnlagSperret(behandlingId)) {
+            BehandlingskontrollKontekst kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandlingId);
+            behandlingskontrollTjeneste.taBehandlingAvVentSetAlleAutopunktUtført(behandling, kontekst);
+            behandlingskontrollTjeneste.prosesserBehandlingGjenopptaHvisStegVenter(kontekst, finnBehandlingStegType(behandling.getAktivtBehandlingSteg().getKode()));
+        }
+    }
+
+    private BehandlingStegType finnBehandlingStegType(String gjenoppta) {
+        BehandlingStegType stegtype = kodeverkTabellRepository.finnBehandlingStegType(gjenoppta);
+        if (stegtype == null) {
+            throw new IllegalStateException("Utviklerfeil: ukjent steg " + gjenoppta);
+        }
+        return stegtype;
     }
 
 }
