@@ -6,7 +6,7 @@ metadata:
   labels:
     team: teamforeldrepenger
 spec:
-  image: "repo.adeo.no:5443/fptilbake:RELEASE_VERSION"
+  image: repo.adeo.no:5443/fptilbake:RELEASE_VERSION
   port: 8080
   team: teamforeldrepenger
   liveness:
@@ -34,10 +34,10 @@ spec:
     enabled: false # Optional. When true, envoy-proxy sidecar will be injected into pod and https urls envvars will be rewritten
   resources:
     limits:
-      cpu: 1000m
+      cpu: "1000m"
       memory: "1024Mi"
     requests:
-      cpu: 200m
+      cpu: "200m"
       memory: "256Mi"
   ingresses: # Optional. List of ingress URLs that will route HTTP traffic to the application.
     - "ingress_url1"
@@ -53,9 +53,11 @@ spec:
       - mountPath: /var/run/secrets/nais.io/defaultDS
         kvPath:  oracle.secret.kv
       - mountPath: /var/run/secrets/nais.io/serviceuser
-        kvPath: serviceuser.kv
+        kvPath: fptilbake.serviceuser.kv
       - mountPath: /var/run/secrets/nais.io/vault
         kvPath: app.secret.kv
+      - mountPath: /var/run/secrets/nais.io/ldap
+        kvPath: ldap.serviceuser.kv
   sidecar: true # refresh token
   env:
     - name: APP_NAME
@@ -72,6 +74,7 @@ spec:
       value: securitytokenservice.url
     - name: FPSAK_PIP_AKTOER_FOR_SAK_URL
       value: fpsak_pip_aktoer_for_sak.url
+
     # Systembruker konfigurasjoner hentes fra vault.
     # OIDC
     - name: OIDC_OPENAM_JWKSURL
@@ -82,7 +85,36 @@ spec:
       value: oidc_openam.agentname
     - name: OIDC_OPENAM_HOSTURL
       value: oidc_openam.hosturl
+
+    # LDAP
+    - name: LDAP_URL
+      value: ldap.url
+    - name: LDAP_BASEDN
+      value: ldap.basedn
+    - name: LDAP_DOMAIN
+      value: ldap.domain
+    - name: LDAP_USER_BASEDN
+      value: ldap_user.basedn
+    - name: LDAP_SERVICEUSER_BASEDN
+      value: ldap_serviceuser.basedn
+
     # Database konfigurasjoner hentes fra vault.
+    # Køer
+    - name: MQGATEWAY02_NAME
+      value: mqGateway02.name
+    - name: MQGATEWAY02_HOSTNAME
+      value: mqGateway02.hostname
+    - name: MQGATEWAY02_PORT
+      value: mqGateway02.port
+    - name: FPSAK_CHANNEL_NAME
+      value: fpsak_channel.name
+    - name: FPSAK_CHANNEL_QUEUEMANAGER
+      value: fpsak_channel.queuemanager
+    - name: FPTILBAKE_KRAVGRUNNLAG_QUEUENAME
+      value: fptilbake_kravgrunnlag.queuename
+    - name: FPTILBAKE_KRAVGRUNNLAG_QUEUEMANAGER
+      value: fptilbake_kravgrunnlag.queuemanager
+
     # Eksterne systemer
     - name: PERSON_V3_URL
       value: person_v3.url
@@ -99,22 +131,8 @@ spec:
     - name: FP_TILKJENTYTELSE_V1_TOPIC_URL
       value: fp_tilkjentytelse_v1_topic.url
     - name: TILBAKEKREVING_BRUKERDIALOG_HENDELSE_V1_TOPIC_URL
-      value: tilbakekreving_brukerdialog_hendelse_v1_topic.url
-    # Køer
-    - name: MQGATEWAY02_NAME
-      value: mqGateway02.name
-    - name: MQGATEWAY02_HOSTNAME
-      value: mqGateway02.hostname
-    - name: MQGATEWAY02_PORT
-      value: mqGateway02.port
-    - name: FPSAK_CHANNEL_NAME
-      value: fpsak_channel.name
-    - name: FPSAK_CHANNEL_QUEUEMANAGER
-      value: fpsak_channel.queuemanager
-    - name: FPTILBAKE_KRAVGRUNNLAG_QUEUENAME
-      value: fptilbake_kravgrunnlag.queuename
-    - name: FPTILBAKE_KRAVGRUNNLAG_QUEUEMANAGER
-      value: fptilbake_kravgrunnlag.queuemanager
+      value: tilbakekreving_brukerdialog_hendelse_v1_topic.ur
+
 
 
 
