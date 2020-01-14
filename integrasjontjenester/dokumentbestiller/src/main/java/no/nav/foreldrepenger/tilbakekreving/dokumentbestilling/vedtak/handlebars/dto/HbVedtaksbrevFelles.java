@@ -50,16 +50,10 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
         this.fritekstOppsummering = fritekstOppsummering;
     }
 
-    @JsonProperty("fp-opphørsdato-død-søker")
+    @JsonProperty("opphørsdato-død-søker")
     @JsonSerialize(using = LocalDateTilLangtNorskFormatSerialiserer.class)
-    private LocalDate getFpOpphørsdatoDødSøker() {
-        return datoer != null ? datoer.getFpOpphørsdatoDødSøker() : null;
-    }
-
-    @JsonProperty("svp-opphørsdato-død-søker")
-    @JsonSerialize(using = LocalDateTilLangtNorskFormatSerialiserer.class)
-    private LocalDate getSvpOpphørsdatoDødSøker() {
-        return datoer != null ? datoer.getSvpOpphørsdatoDødSøker() : null;
+    private LocalDate getOpphørsdatoDødSøker() {
+        return datoer != null ? datoer.getOpphørsdatoDødSøker() : null;
     }
 
     public VedtakResultatType getHovedresultat() {

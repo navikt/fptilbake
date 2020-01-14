@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
@@ -10,19 +11,14 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars
 
 public class HbVedtaksbrevDatoer {
 
-    private LocalDate fpOpphørsdatoDødSøker;
-    private LocalDate svpOpphørsdatoDødSøker;
+    private LocalDate opphørsdatoDødSøker;
 
     private HbVedtaksbrevDatoer() {
 
     }
 
-    public LocalDate getFpOpphørsdatoDødSøker() {
-        return fpOpphørsdatoDødSøker;
-    }
-
-    public LocalDate getSvpOpphørsdatoDødSøker() {
-        return svpOpphørsdatoDødSøker;
+    public LocalDate getOpphørsdatoDødSøker() {
+        return opphørsdatoDødSøker;
     }
 
     public static HbVedtaksbrevDatoer.Builder builder() {
@@ -40,23 +36,22 @@ public class HbVedtaksbrevDatoer {
         public HbVedtaksbrevDatoer.Builder medPerioder(List<HbVedtaksbrevPeriode> perioder) {
             this.perioder = perioder;
 
-            kladd.fpOpphørsdatoDødSøker = getOpphørsdato(FpHendelseUnderTyper.OPPHOR_MOTTAKER_DOD);
-            kladd.svpOpphørsdatoDødSøker = getOpphørsdato(SvpHendelseUnderTyper.MOTTAKER_DØD);
+            kladd.opphørsdatoDødSøker = getOpphørsdato(SvpHendelseUnderTyper.MOTTAKER_DØD, FpHendelseUnderTyper.OPPHOR_MOTTAKER_DOD);
 
             return this;
         }
 
-        private LocalDate getOpphørsdato(HendelseUnderType hendelseUnderType) {
-            LocalDate førsteDagForType = getFørsteDagForHendelseUnderType(hendelseUnderType);
+        private LocalDate getOpphørsdato(HendelseUnderType... hendelseUnderTyper) {
+            LocalDate førsteDagForType = getFørsteDagForHendelseUnderType(Arrays.asList(hendelseUnderTyper));
             if (førsteDagForType != null) {
                 return førsteDagForType.minusDays(1);
             }
             return null;
         }
 
-        private LocalDate getFørsteDagForHendelseUnderType(HendelseUnderType hendelseUnderType) {
+        private LocalDate getFørsteDagForHendelseUnderType(List<HendelseUnderType> hendelseUnderTyper) {
             return perioder.stream()
-                .filter((per) -> per.getFakta().getHendelseundertype().equals(hendelseUnderType))
+                .filter((per) -> hendelseUnderTyper.contains(per.getFakta().getHendelseundertype()))
                 .findFirst()
                 .map(per -> per.getPeriode().getFom())
                 .orElse(null);
