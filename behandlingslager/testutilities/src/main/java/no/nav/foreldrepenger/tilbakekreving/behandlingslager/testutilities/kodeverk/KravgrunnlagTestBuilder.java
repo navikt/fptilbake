@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
@@ -88,12 +89,12 @@ public class KravgrunnlagTestBuilder {
             return this;
         }
 
-        public KgBeløp medSkattProsent(int skattProsent){
+        public KgBeløp medSkattProsent(int skattProsent) {
             this.skattProsent = BigDecimal.valueOf(skattProsent);
             return this;
         }
 
-        public KgBeløp medSkattProsent(BigDecimal skattProsent){
+        public KgBeløp medSkattProsent(BigDecimal skattProsent) {
             this.skattProsent = skattProsent;
             return this;
         }
@@ -129,21 +130,34 @@ public class KravgrunnlagTestBuilder {
 
         @Override
         public int hashCode() {
-            return Objects.hash(klasseType, klassekode, beløpNytt, utbetaltBeløp, tilbakekrevBeløp,skattProsent);
+            return Objects.hash(klasseType, klassekode, beløpNytt, utbetaltBeløp, tilbakekrevBeløp, skattProsent);
         }
     }
 
-    public Kravgrunnlag431 lagreKravgrunnlag(Long behandlingId, Map<Periode, List<KgBeløp>> beløp, int... skattBeløpMnd) {
-        int skattBeløp = skattBeløpMnd.length == 0 ? 0 : skattBeløpMnd[0];
-        Kravgrunnlag431 kg = lagKravgrunnlag(beløp,skattBeløp);
+    public Kravgrunnlag431 lagreKravgrunnlag(Long behandlingId, Map<Periode, List<KgBeløp>> beløp, Map<Periode, Integer> skattBeløpMnd) {
+        Kravgrunnlag431 kg = lagKravgrunnlag(beløp, skattBeløpMnd::get);
         kravgrunnlagRepository.lagre(behandlingId, kg);
         return kg;
     }
 
-    private static Kravgrunnlag431 lagKravgrunnlag(Map<Periode, List<KgBeløp>> beløp, int skattBeløpMnd) {
+    public Kravgrunnlag431 lagreKravgrunnlag(Long behandlingId, Map<Periode, List<KgBeløp>> beløp) {
+        return lagreKravgrunnlag(behandlingId, beløp, 0);
+    }
+
+    public Kravgrunnlag431 lagreKravgrunnlag(Long behandlingId, Map<Periode, List<KgBeløp>> beløp, int skattBeløpMnd) {
+        Kravgrunnlag431 kg = lagKravgrunnlag(beløp, periode -> skattBeløpMnd);
+        kravgrunnlagRepository.lagre(behandlingId, kg);
+        return kg;
+    }
+
+    private static Kravgrunnlag431 lagKravgrunnlag(Map<Periode, List<KgBeløp>> beløp, Function<Periode, Integer> skattBeløpMnd) {
         Kravgrunnlag431 kg = lagKravgrunnlag();
         for (Map.Entry<Periode, List<KgBeløp>> entry : beløp.entrySet()) {
-            KravgrunnlagPeriode432 kgPeriode = new KravgrunnlagPeriode432.Builder().medPeriode(entry.getKey()).medBeløpSkattMnd(BigDecimal.valueOf(skattBeløpMnd)).medKravgrunnlag431(kg).build();
+            KravgrunnlagPeriode432 kgPeriode = new KravgrunnlagPeriode432.Builder()
+                .medPeriode(entry.getKey())
+                .medBeløpSkattMnd(BigDecimal.valueOf(skattBeløpMnd.apply(entry.getKey())))
+                .medKravgrunnlag431(kg)
+                .build();
             for (KgBeløp kgBeløp : entry.getValue()) {
                 kgPeriode.leggTilBeløp(kgBeløp.mapTilØkonomi(kgPeriode));
             }

@@ -60,8 +60,8 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
     @Inject
     public VurdertForeldelseRepository foreldelseRepository;
 
-    private LocalDate nå = LocalDate.now();
-    private Periode uke1 = Periode.of(nå, nå.plusDays(6));
+    private LocalDate dag1 = LocalDate.of(2019, 7, 1);
+    private Periode uke1 = Periode.of(dag1, dag1.plusDays(6));
     private Periode uke2 = uke1.plusDays(7);
     private Periode uke3 = uke1.plusDays(14);
     private Periode uke1og2 = Periode.omsluttende(uke1, uke2);
@@ -395,12 +395,12 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
     public void skal_beregne_skatt_beløp_for_grunnlag_med_skatt_prosent_for_full_tilbakekreving_når_total_skatt_beløp_blir_høyere_enn_skattBeløpMnd() {
         Behandling behandling = simple.lagre(behandlingRepositoryProvider);
         Long behandlingId = behandling.getId();
-        Periode uke1 = Periode.of(LocalDate.of(2019,8,5), LocalDate.of(2019,8,11));
-        Periode uke2 = Periode.of(LocalDate.of(2019,8,12), LocalDate.of(2019,8,23));
-        Periode uke3 = Periode.of(LocalDate.of(2019,8,24), LocalDate.of(2019,8,31));
+        Periode uke1 = Periode.of(LocalDate.of(2019, 8, 5), LocalDate.of(2019, 8, 11));
+        Periode uke2 = Periode.of(LocalDate.of(2019, 8, 12), LocalDate.of(2019, 8, 23));
+        Periode uke3 = Periode.of(LocalDate.of(2019, 8, 24), LocalDate.of(2019, 8, 31));
 
         Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
-            Periode.omsluttende(uke1,uke2,uke3), Arrays.asList(
+            Periode.omsluttende(uke1, uke2, uke3), Arrays.asList(
                 KgBeløp.feil(3180).medSkattProsent(BigDecimal.valueOf(9.5041)),
                 KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(6380).medTilbakekrevBeløp(3180).medNyttBeløp(3200).medSkattProsent(BigDecimal.valueOf(9.5041))
             )
@@ -430,7 +430,65 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
             TilbakekrevingPeriode.med(uke3).medRenter(0)
                 .medBeløp(TbkBeløp.feil(795))
                 .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(800).medUtbetBeløp(1595).medTilbakekrevBeløp(795).medUinnkrevdBeløp(0).medSkattBeløp(75)));
+    }
 
+    @Test
+    public void skal_begrense_avrunding_av_skatt_slik_at_skatt_ikke_går_over_maksgrensen_for_måneden_selv_når_måneden_er_splittet_i_flere_kravgrunnlagperioder() {
+        Behandling behandling = simple.lagre(behandlingRepositoryProvider);
+        Long behandlingId = behandling.getId();
+        Periode janDel1 = Periode.of(LocalDate.of(2019, 1, 18), LocalDate.of(2019, 1, 24));
+        Periode janDel2 = Periode.of(LocalDate.of(2019, 1, 25), LocalDate.of(2019, 1, 31));
+        Periode feb = Periode.of(LocalDate.of(2019, 2, 1), LocalDate.of(2019, 2, 28));
+        Periode mars = Periode.of(LocalDate.of(2019, 3, 1), LocalDate.of(2019, 3, 31));
+
+        Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
+            janDel1, Arrays.asList(
+                KgBeløp.feil(2).medSkattProsent(BigDecimal.valueOf(50)),
+                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(2).medTilbakekrevBeløp(2).medNyttBeløp(0).medSkattProsent(BigDecimal.valueOf(50))
+            ),
+            janDel2, Arrays.asList(
+                KgBeløp.feil(2).medSkattProsent(BigDecimal.valueOf(50)),
+                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(2).medTilbakekrevBeløp(2).medNyttBeløp(0).medSkattProsent(BigDecimal.valueOf(50))
+            ),
+            feb, Arrays.asList(
+                KgBeløp.feil(1).medSkattProsent(BigDecimal.valueOf(50)),
+                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1).medTilbakekrevBeløp(1).medNyttBeløp(0).medSkattProsent(BigDecimal.valueOf(50))
+            ),
+            mars, Arrays.asList(
+                KgBeløp.feil(1).medSkattProsent(BigDecimal.valueOf(50)),
+                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1).medTilbakekrevBeløp(1).medNyttBeløp(0).medSkattProsent(BigDecimal.valueOf(50))
+            )),
+            Map.of(
+                janDel1, 2,
+                janDel2, 2,
+                feb, 1,
+                mars, 1
+            ));
+
+        VilkårsvurderingTestBuilder.medRepo(vilkårsvurderingRepository).lagre(behandlingId, Map.of(
+            Periode.omsluttende(janDel1, mars), VilkårsvurderingTestBuilder.VVurdering.forsett()
+        ));
+
+        flushAndClear();
+
+        List<TilbakekrevingPeriode> resultat = beregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
+
+        //det viktigste her er at skatt fordeles slik at den ikke overstiger "kvoten" skatt pr mnd slik det er definert i grunnlaget
+        //det er viktig at det kommer 1 kr skatt pr periode i januar,
+        //og 1 krone i februar eller i mars.
+        assertThat(resultat).containsOnly(
+            TilbakekrevingPeriode.med(janDel1).medRenter(0)
+                .medBeløp(TbkBeløp.feil(2))
+                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(2).medTilbakekrevBeløp(2).medUinnkrevdBeløp(0).medSkattBeløp(1)),
+            TilbakekrevingPeriode.med(janDel2).medRenter(0)
+                .medBeløp(TbkBeløp.feil(2))
+                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(2).medTilbakekrevBeløp(2).medUinnkrevdBeløp(0).medSkattBeløp(1)),
+            TilbakekrevingPeriode.med(feb).medRenter(0)
+                .medBeløp(TbkBeløp.feil(1))
+                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(1).medTilbakekrevBeløp(1).medUinnkrevdBeløp(0).medSkattBeløp(1)),
+            TilbakekrevingPeriode.med(mars).medRenter(0)
+                .medBeløp(TbkBeløp.feil(1))
+                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(1).medTilbakekrevBeløp(1).medUinnkrevdBeløp(0).medSkattBeløp(0)));
     }
 
     @Test
