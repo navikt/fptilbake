@@ -60,7 +60,7 @@ public class KravgrunnlagBelop433 extends BaseEntitet {
     private String skyldKode;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "krav_grunnlag_periode_432_id", nullable = false)
+    @JoinColumn(name = "krav_grunnlag_periode_432_id", nullable = false, updatable = false)
     private KravgrunnlagPeriode432 kravgrunnlagPeriode432;
 
     public Long getId() {
