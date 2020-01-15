@@ -12,6 +12,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars
 public class HbVedtaksbrevDatoer {
 
     private LocalDate opphørsdatoDødSøker;
+    private LocalDate opphørsdatoDødtBarn;
 
     private HbVedtaksbrevDatoer() {
 
@@ -19,6 +20,10 @@ public class HbVedtaksbrevDatoer {
 
     public LocalDate getOpphørsdatoDødSøker() {
         return opphørsdatoDødSøker;
+    }
+
+    public LocalDate getOpphørsdatoDødtBarn() {
+        return opphørsdatoDødtBarn;
     }
 
     public static HbVedtaksbrevDatoer.Builder builder() {
@@ -37,6 +42,7 @@ public class HbVedtaksbrevDatoer {
             this.perioder = perioder;
 
             kladd.opphørsdatoDødSøker = getOpphørsdato(SvpHendelseUnderTyper.MOTTAKER_DØD, FpHendelseUnderTyper.OPPHOR_MOTTAKER_DOD);
+            kladd.opphørsdatoDødtBarn = getOpphørsdato(FpHendelseUnderTyper.OPPHOR_BARN_DOD);
 
             return this;
         }

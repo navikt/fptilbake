@@ -56,6 +56,12 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
         return datoer != null ? datoer.getOpphørsdatoDødSøker() : null;
     }
 
+    @JsonProperty("opphørsdato-dødt-barn")
+    @JsonSerialize(using = LocalDateTilLangtNorskFormatSerialiserer.class)
+    private LocalDate getOpphørsdatoDødtBarn() {
+        return datoer != null ? datoer.getOpphørsdatoDødtBarn() : null;
+    }
+
     public VedtakResultatType getHovedresultat() {
         return totalresultat.getHovedresultat();
     }
