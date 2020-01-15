@@ -31,6 +31,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbTotalresultat;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVarsel;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevData;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevDatoer;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevFelles;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbKravgrunnlag;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbResultat;
@@ -112,21 +113,6 @@ public class TekstformatererVedtaksbrevTest {
 
     @Test
     public void skal_generere_vedtaksbrev_for_FP_og_god_tro_uten_tilbakekreving_uten_varsel() throws Exception {
-        HbVedtaksbrevFelles vedtaksbrevData = lagTestBuilder()
-            .medSak(HbSak.build()
-                .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
-                .medErFødsel(true)
-                .medAntallBarn(1)
-                .medDatoFagsakvedtak(LocalDate.of(2019, 3, 21))
-                .build())
-            .medVedtakResultat(HbTotalresultat.builder()
-                .medHovedresultat(VedtakResultatType.INGEN_TILBAKEBETALING)
-                .medTotaltTilbakekrevesBeløp(BigDecimal.ZERO)
-                .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.ZERO)
-                .medTotaltRentebeløp(BigDecimal.ZERO)
-                .build())
-            .medLovhjemmelVedtak("Folketrygdloven § 22-15")
-            .build();
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(januar)
@@ -143,6 +129,24 @@ public class TekstformatererVedtaksbrevTest {
                 .medResultat(HbResultatTestBuilder.forTilbakekrevesBeløp(0))
                 .build()
         );
+        HbVedtaksbrevFelles vedtaksbrevData = lagTestBuilder()
+            .medSak(HbSak.build()
+                .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
+                .medErFødsel(true)
+                .medAntallBarn(1)
+                .medDatoFagsakvedtak(LocalDate.of(2019, 3, 21))
+                .build())
+            .medVedtakResultat(HbTotalresultat.builder()
+                .medHovedresultat(VedtakResultatType.INGEN_TILBAKEBETALING)
+                .medTotaltTilbakekrevesBeløp(BigDecimal.ZERO)
+                .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.ZERO)
+                .medTotaltRentebeløp(BigDecimal.ZERO)
+                .build())
+            .medLovhjemmelVedtak("Folketrygdloven § 22-15")
+            .medDatoer(HbVedtaksbrevDatoer.builder()
+                .medPerioder(perioder)
+                .build())
+            .build();
         HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
 
         String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);

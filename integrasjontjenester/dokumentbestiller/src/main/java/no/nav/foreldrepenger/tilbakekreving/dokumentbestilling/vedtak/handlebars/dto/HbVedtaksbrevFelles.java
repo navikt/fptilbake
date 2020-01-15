@@ -1,10 +1,14 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto;
 
+import java.time.LocalDate;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.HandlebarsData;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.LocalDateTilLangtNorskFormatSerialiserer;
 import no.nav.vedtak.util.Objects;
 
 public class HbVedtaksbrevFelles implements HandlebarsData {
@@ -24,6 +28,8 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
     @JsonProperty("fritekst-oppsummering")
     private String fritekstOppsummering;
 
+    private HbVedtaksbrevDatoer datoer;
+
     private HbVedtaksbrevFelles() {
         //bruk Builder
     }
@@ -42,6 +48,12 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
 
     public void setFritekstOppsummering(String fritekstOppsummering) {
         this.fritekstOppsummering = fritekstOppsummering;
+    }
+
+    @JsonProperty("opphørsdato-død-søker")
+    @JsonSerialize(using = LocalDateTilLangtNorskFormatSerialiserer.class)
+    private LocalDate getOpphørsdatoDødSøker() {
+        return datoer != null ? datoer.getOpphørsdatoDødSøker() : null;
     }
 
     public VedtakResultatType getHovedresultat() {
@@ -107,5 +119,9 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
             return this;
         }
 
+        public Builder medDatoer(HbVedtaksbrevDatoer datoer) {
+            kladd.datoer = datoer;
+            return this;
+        }
     }
 }

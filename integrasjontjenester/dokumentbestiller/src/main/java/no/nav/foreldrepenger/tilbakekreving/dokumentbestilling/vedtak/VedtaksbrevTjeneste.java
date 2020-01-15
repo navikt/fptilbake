@@ -75,6 +75,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbTotalresultat;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVarsel;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevData;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevDatoer;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevFelles;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbFakta;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbKravgrunnlag;
@@ -261,6 +262,11 @@ public class VedtaksbrevTjeneste {
         BigDecimal totaltRentebeløp = summer(resulatPerioder, BeregningResultatPeriode::getRenteBeløp);
         BigDecimal totaltTilbakekrevesBeløpMedRenterUtenSkatt = totaltTilbakekrevesMedRenter.subtract(totaltSkattetrekk);
         String hjemmelstekst = VedtakHjemmel.lagHjemmelstekst(vedtakResultatType, foreldelse, vilkårPerioder);
+
+        List<HbVedtaksbrevPeriode> perioder = resulatPerioder.stream()
+            .map(brp -> lagBrevdataPeriode(brp, fakta, vilkårPerioder, foreldelse, perioderFritekst))
+            .collect(Collectors.toList());
+
         HbVedtaksbrevFelles.Builder vedtakDataBuilder = HbVedtaksbrevFelles.builder()
             .medSak(HbSak.build()
                 .medYtelsetype(behandling.getFagsak().getFagsakYtelseType())
@@ -282,11 +288,10 @@ public class VedtaksbrevTjeneste {
             .medKonfigurasjon(HbKonfigurasjon.builder()
                 .medKlagefristUker(KLAGEFRIST_UKER)
                 .build())
+            .medDatoer(HbVedtaksbrevDatoer.builder()
+                .medPerioder(perioder)
+                .build())
             .medSøker(utledSøker(personinfo));
-
-        List<HbVedtaksbrevPeriode> perioder = resulatPerioder.stream()
-            .map(brp -> lagBrevdataPeriode(brp, fakta, vilkårPerioder, foreldelse, perioderFritekst))
-            .collect(Collectors.toList());
 
         HbVedtaksbrevData data = new HbVedtaksbrevData(vedtakDataBuilder.build(), perioder);
         BrevMetadata brevMetadata = lagMetadataForVedtaksbrev(behandling, vedtakResultatType, fpsakBehandling, personinfo);
