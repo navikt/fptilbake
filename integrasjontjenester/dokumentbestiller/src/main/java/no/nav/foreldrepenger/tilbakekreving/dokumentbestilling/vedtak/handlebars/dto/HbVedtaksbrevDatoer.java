@@ -13,6 +13,7 @@ public class HbVedtaksbrevDatoer {
 
     private LocalDate opphørsdatoDødSøker;
     private LocalDate opphørsdatoDødtBarn;
+    private LocalDate opphørsdatoIkkeGravid;
 
     private HbVedtaksbrevDatoer() {
 
@@ -24,6 +25,10 @@ public class HbVedtaksbrevDatoer {
 
     public LocalDate getOpphørsdatoDødtBarn() {
         return opphørsdatoDødtBarn;
+    }
+
+    public LocalDate getOpphørsdatoIkkeGravid() {
+        return opphørsdatoIkkeGravid;
     }
 
     public static HbVedtaksbrevDatoer.Builder builder() {
@@ -43,6 +48,7 @@ public class HbVedtaksbrevDatoer {
 
             kladd.opphørsdatoDødSøker = getOpphørsdato(SvpHendelseUnderTyper.MOTTAKER_DØD, FpHendelseUnderTyper.OPPHOR_MOTTAKER_DOD);
             kladd.opphørsdatoDødtBarn = getOpphørsdato(FpHendelseUnderTyper.OPPHOR_BARN_DOD);
+            kladd.opphørsdatoIkkeGravid = getOpphørsdato(SvpHendelseUnderTyper.MOTTAKER_IKKE_GRAVID);
 
             return this;
         }
