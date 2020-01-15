@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -31,6 +32,7 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 public class FaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
 
     private static final LocalDate NOW = LocalDate.now();
+    private HenleggBehandlingTjeneste henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repoProvider, behandlingskontrollTjeneste, mockHistorikkTjeneste);
 
     @Before
     public void setup() {
@@ -45,7 +47,7 @@ public class FaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
 
         Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedYtelPostering));
 
-        grunnlagRepository.lagre(internBehandlingId,kravgrunnlag431);
+        grunnlagRepository.lagre(internBehandlingId, kravgrunnlag431);
 
         BehandlingFeilutbetalingFakta fakta = faktaFeilutbetalingTjeneste.hentBehandlingFeilutbetalingFakta(internBehandlingId);
         fellesFaktaResponsSjekk(fakta);
@@ -53,14 +55,14 @@ public class FaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skalHenteFeilutbetalingFaktaMedEnkelPeriode() {
+    public void skal_hente_feilutbetalingFakta_med_enkel_periode() {
         KravgrunnlagMock mockMedFeilPostering = lagKravgrunnlag(FOM, TOM, KlasseType.FEIL, BigDecimal.valueOf(10000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedYtelPostering = lagKravgrunnlag(FOM, TOM, KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(10000));
 
         Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedYtelPostering));
 
-        grunnlagRepository.lagre(internBehandlingId,kravgrunnlag431);
-        varselRepository.lagre(internBehandlingId,"hello",23000l);
+        grunnlagRepository.lagre(internBehandlingId, kravgrunnlag431);
+        varselRepository.lagre(internBehandlingId, "hello", 23000l);
         BehandlingFeilutbetalingFakta fakta = faktaFeilutbetalingTjeneste.hentBehandlingFeilutbetalingFakta(internBehandlingId);
         fellesFaktaResponsSjekk(fakta);
         assertThat(fakta.getAktuellFeilUtbetaltBeløp()).isEqualByComparingTo(BigDecimal.valueOf(10000));
@@ -71,7 +73,30 @@ public class FaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skalHenteFeilutbetalingFaktaMedFlerePerioder() {
+    public void skal_hente_feilutbetalingFakta_med_enkel_periode_når_behandling_er_henlagt() {
+        KravgrunnlagMock mockMedFeilPostering = lagKravgrunnlag(FOM, TOM, KlasseType.FEIL, BigDecimal.valueOf(10000), BigDecimal.ZERO);
+        KravgrunnlagMock mockMedYtelPostering = lagKravgrunnlag(FOM, TOM, KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(10000));
+
+        Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedYtelPostering));
+
+        grunnlagRepository.lagre(internBehandlingId, kravgrunnlag431);
+        varselRepository.lagre(internBehandlingId, "hello", 23000l);
+
+        henleggBehandlingTjeneste.henleggBehandling(internBehandlingId, BehandlingResultatType.HENLAGT_FEILOPPRETTET);
+        EksternBehandling eksternBehandling = repoProvider.getEksternBehandlingRepository().hentForSisteAktivertInternId(behandling.getId());
+        assertThat(eksternBehandling.getAktiv()).isFalse();
+
+        BehandlingFeilutbetalingFakta fakta = faktaFeilutbetalingTjeneste.hentBehandlingFeilutbetalingFakta(internBehandlingId);
+        fellesFaktaResponsSjekk(fakta);
+        assertThat(fakta.getAktuellFeilUtbetaltBeløp()).isEqualByComparingTo(BigDecimal.valueOf(10000));
+        assertThat(fakta.getPerioder().get(0).getBelop()).isEqualByComparingTo(BigDecimal.valueOf(10000));
+        assertThat(fakta.getTidligereVarseltBeløp()).isEqualByComparingTo(23000l);
+        assertThat(fakta.getPerioder().get(0).getFom()).isEqualTo(FOM);
+        assertThat(fakta.getPerioder().get(0).getTom()).isEqualTo(TOM);
+    }
+
+    @Test
+    public void skal_hente_feilutbetalingFakta_med_flere_perioder() {
         KravgrunnlagMock mockMedFeilPostering = lagKravgrunnlag(FOM, LocalDate.of(2016, 03, 31), KlasseType.FEIL,
             BigDecimal.valueOf(10000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedFeilPostering2 = lagKravgrunnlag(LocalDate.of(2016, 04, 01), LocalDate.of(2016, 04, 15),
@@ -83,8 +108,8 @@ public class FaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
         Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedFeilPostering2,
             mockMedFeilPostering3, mockMedYtelPostering));
 
-        grunnlagRepository.lagre(internBehandlingId,kravgrunnlag431);
-        varselRepository.lagre(internBehandlingId,"hello",23000l);
+        grunnlagRepository.lagre(internBehandlingId, kravgrunnlag431);
+        varselRepository.lagre(internBehandlingId, "hello", 23000l);
 
         BehandlingFeilutbetalingFakta fakta = faktaFeilutbetalingTjeneste.hentBehandlingFeilutbetalingFakta(internBehandlingId);
         fellesFaktaResponsSjekk(fakta);
@@ -101,7 +126,7 @@ public class FaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skalHenteFeilutbetalingFaktaMedFlerePerioderOgSisteDagIHelgen() {
+    public void skal_hente_feilutbetalingFakta_med_flere_perioder_og_sistedag_i_helgen() {
         KravgrunnlagMock mockMedFeilPostering = lagKravgrunnlag(FOM, LocalDate.of(2016, 03, 26), KlasseType.FEIL,
             BigDecimal.valueOf(10000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedFeilPostering2 = lagKravgrunnlag(LocalDate.of(2016, 03, 28), LocalDate.of(2016, 04, 15),
@@ -113,7 +138,7 @@ public class FaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
         Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedFeilPostering2,
             mockMedFeilPostering3, mockMedYtelPostering));
 
-        grunnlagRepository.lagre(internBehandlingId,kravgrunnlag431);
+        grunnlagRepository.lagre(internBehandlingId, kravgrunnlag431);
         BehandlingFeilutbetalingFakta fakta = faktaFeilutbetalingTjeneste.hentBehandlingFeilutbetalingFakta(internBehandlingId);
         fellesFaktaResponsSjekk(fakta);
         assertThat(fakta.getAktuellFeilUtbetaltBeløp()).isEqualByComparingTo(BigDecimal.valueOf(37000));

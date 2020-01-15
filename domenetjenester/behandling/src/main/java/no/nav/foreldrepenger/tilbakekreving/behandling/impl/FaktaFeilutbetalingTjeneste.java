@@ -65,7 +65,7 @@ public class FaktaFeilutbetalingTjeneste {
     }
 
     public BehandlingFeilutbetalingFakta hentBehandlingFeilutbetalingFakta(Long behandlingId) {
-        EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandlingId);
+        EksternBehandling eksternBehandling = eksternBehandlingRepository.hentForSisteAktivertInternId(behandlingId);
         Optional<VarselInfo> resultat = varselRepository.finnVarsel(behandlingId);
         UUID eksternUuid = eksternBehandling.getEksternUuid();
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto = hentEksternBehandlingFraFpsak(eksternUuid);
