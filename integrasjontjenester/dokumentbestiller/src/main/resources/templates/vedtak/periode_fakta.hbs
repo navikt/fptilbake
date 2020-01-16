@@ -403,7 +403,9 @@ Vi har fått melding om at {{søker.navn}} døde.
 Svangerskapspengene skulle vært stanset {{opphørsdato-død-søker}}. Fordi svangerskapspengene er blitt utbetalt etter denne datoen, er det utbetalt {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye.
         {{/case}}
         {{#case "MOTTAKER_IKKE_GRAVID"}}
-Vi har fått melding om at du ikke lenger er gravid. Svangerskapspengene skulle vært stanset fra og med [opphørsdato]. Fordi svangerskapspengene er blitt utbetalt etter denne datoen, har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt.
+Vi har fått melding om at du ikke lenger er gravid. Svangerskapspengene skulle vært stanset fra og med {{opphørsdato-ikke-gravid}}.
+
+Fordi svangerskapspengene er blitt utbetalt etter denne datoen, har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt.
         {{/case}}
         {{/switch}}
     {{/case}}
