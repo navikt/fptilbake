@@ -97,6 +97,13 @@ public class EksternBehandlingRepositoryImpl implements EksternBehandlingReposit
         entityManager.persist(eksternBehandling);
     }
 
+    @Override
+    public EksternBehandling hentForSisteAktivertInternId(long internBehandlingId) {
+        TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where intern_id=:internId order by opprettetTidspunkt desc", EksternBehandling.class);
+        query.setParameter(INTERN_ID, internBehandlingId);
+        return query.getResultList().get(0);
+    }
+
     private Optional<EksternBehandling> hentOptionalFraInternId(long internBehandlingId) {
         TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where intern_id=:internId and aktiv='J'", EksternBehandling.class);
         query.setParameter(INTERN_ID, internBehandlingId);

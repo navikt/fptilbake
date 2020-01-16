@@ -42,4 +42,11 @@ public interface EksternBehandlingRepository {
     boolean finnesEksternBehandling(long internId, long eksternId);
 
     void deaktivateTilkobling(long internId);
+
+    /**
+     * Finner eksternbehandling for siste aktivert internId
+     * @param internBehandlingId
+     * @return eksternBehandling
+     */
+    EksternBehandling hentForSisteAktivertInternId(long internBehandlingId);
 }
