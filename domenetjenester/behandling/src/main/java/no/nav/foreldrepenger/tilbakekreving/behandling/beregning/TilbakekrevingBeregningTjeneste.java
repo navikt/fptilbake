@@ -191,7 +191,7 @@ public class TilbakekrevingBeregningTjeneste {
 
     private static <T> BigDecimal sum(Collection<T> liste, Function<T, BigDecimal> konverter) {
         return liste.stream()
-            .map(konverter::apply)
+            .map(konverter)
             .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
