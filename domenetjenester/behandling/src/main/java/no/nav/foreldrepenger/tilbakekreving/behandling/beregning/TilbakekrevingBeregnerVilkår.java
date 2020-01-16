@@ -46,7 +46,7 @@ class TilbakekrevingBeregnerVilkår {
             : finnBeløpUtenRenter(delresultat.getFeilutbetaltBeløp(), andel, manueltBeløp);
         BigDecimal rentebeløp = beregnRentebeløp(beløpUtenRenter, renter);
         BigDecimal tilbakekrevingBeløp = beløpUtenRenter.add(rentebeløp);
-        BigDecimal skattBeløp = beregnSkattBeløp(periode, beløpUtenRenter, perioderMedSkattProsent).setScale(0, RoundingMode.HALF_DOWN); //skatt beregnet alltid med uten renter
+        BigDecimal skattBeløp = beregnSkattBeløp(periode, beløpUtenRenter, perioderMedSkattProsent).setScale(0, RoundingMode.DOWN); //skatt beregnet alltid uten renter
         BigDecimal nettoBeløp = tilbakekrevingBeløp.subtract(skattBeløp);
 
         resulat.setTilbakekrevingBeløpUtenRenter(beløpUtenRenter);
