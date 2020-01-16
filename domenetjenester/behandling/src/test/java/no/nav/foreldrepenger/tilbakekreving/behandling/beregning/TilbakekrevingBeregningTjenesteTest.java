@@ -245,26 +245,122 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
         assertThat(beregningResultat.getVedtakResultatType()).isEqualByComparingTo(VedtakResultatType.FULL_TILBAKEBETALING);
     }
 
+    @Test
+    public void skal_ikke_overskyte_maks_skatt_pr_måned_selv_om_vurderingen_splitter_kravgrunnlaget() {
+        LocalDate onsdag = LocalDate.of(2020, 1, 15);
+        LocalDate torsdag = onsdag.plusDays(1);
+        Periode kgPeriode = new Periode(onsdag, torsdag);
+        Periode vurderingperiode1 = new Periode(onsdag, onsdag);
+        Periode vurderingperiode2 = new Periode(torsdag, torsdag);
+        Periode logiskPeriode = new Periode(LocalDate.of(2019, 5, 1), LocalDate.of(2019, 5, 6));
+        Kravgrunnlag431 grunnlag = lagGrunnlag();
+        KravgrunnlagPeriode432 grunnlagPeriode = lagGrunnlagPeriode(kgPeriode, grunnlag, 1);
+        grunnlagPeriode.leggTilBeløp(lagYtelBeløp(grunnlagPeriode, BigDecimal.valueOf(2), BigDecimal.valueOf(99)));
+        grunnlagPeriode.leggTilBeløp(lagFeilBeløp(grunnlagPeriode, BigDecimal.valueOf(2)));
+        grunnlag.leggTilPeriode(grunnlagPeriode);
+        grunnlagRepository.lagre(internBehandlingId, grunnlag);
+
+        lagForeldelse(internBehandlingId, logiskPeriode, ForeldelseVurderingType.IKKE_FORELDET);
+        lagVilkårsvurderingMedForsett(internBehandlingId, vurderingperiode1, vurderingperiode2);
+
+        flush();
+
+        BeregningResultat beregningResultat = tjeneste.beregn(internBehandlingId);
+        List<BeregningResultatPeriode> resultat = beregningResultat.getBeregningResultatPerioder();
+
+        assertThat(resultat).hasSize(2);
+        assertThat(resultat.get(0).getSkattBeløp().add(resultat.get(1).getSkattBeløp())).isLessThanOrEqualTo(BigDecimal.ONE);
+    }
+
+    @Test
+    public void skal_ha_riktig_skatt_når_skatt_for_første_periode_er_høyere_enn_maks_skatt_for_første_måned_siden_første_periode_er_lang() {
+        Periode kgPeriode0 = new Periode(LocalDate.of(2019, 3, 18), LocalDate.of(2019, 3, 29));
+        Periode kgPeriode1 = new Periode(LocalDate.of(2019, 4, 1), LocalDate.of(2019, 4, 30));
+        Periode vurderingPeriode0 = new Periode(LocalDate.of(2019, 3, 18), LocalDate.of(2019, 4, 22));
+        Periode vurderingPeriode1 = new Periode(LocalDate.of(2019, 4, 23), LocalDate.of(2019, 4, 30));
+        Periode logiskPeriode = Periode.omsluttende(kgPeriode0, kgPeriode1);
+        Kravgrunnlag431 grunnlag = lagGrunnlag();
+        KravgrunnlagPeriode432 grunnlagPeriode0 = lagGrunnlagPeriode(kgPeriode0, grunnlag, 724);
+        grunnlagPeriode0.leggTilBeløp(lagYtelBeløp(grunnlagPeriode0, BigDecimal.valueOf(8280), BigDecimal.valueOf(6150), new BigDecimal("33.9975")));
+        grunnlagPeriode0.leggTilBeløp(lagFeilBeløp(grunnlagPeriode0, BigDecimal.valueOf(2130)));
+
+        KravgrunnlagPeriode432 grunnlagPeriode1 = lagGrunnlagPeriode(kgPeriode1, grunnlag, 881);
+        grunnlagPeriode1.leggTilBeløp(lagYtelBeløp(grunnlagPeriode1, BigDecimal.valueOf(18216), BigDecimal.valueOf(13530), new BigDecimal("18.8076")));
+        grunnlagPeriode1.leggTilBeløp(lagFeilBeløp(grunnlagPeriode1, BigDecimal.valueOf(4686)));
+
+        grunnlag.leggTilPeriode(grunnlagPeriode0);
+        grunnlag.leggTilPeriode(grunnlagPeriode1);
+        grunnlagRepository.lagre(internBehandlingId, grunnlag);
+
+        lagForeldelse(internBehandlingId, logiskPeriode, ForeldelseVurderingType.IKKE_FORELDET);
+
+        VilkårVurderingEntitet vurdering = new VilkårVurderingEntitet();
+        VilkårVurderingPeriodeEntitet vurdering0 = VilkårVurderingPeriodeEntitet.builder()
+            .medPeriode(vurderingPeriode0)
+            .medBegrunnelse("foo")
+            .medVilkårResultat(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER)
+            .medVurderinger(vurdering)
+            .build();
+        vurdering0.setAktsomhet(VilkårVurderingAktsomhetEntitet.builder()
+            .medAktsomhet(Aktsomhet.SIMPEL_UAKTSOM)
+            .medProsenterSomTilbakekreves(BigDecimal.valueOf(70))
+            .medBegrunnelse("foo")
+            .medPeriode(vurdering0)
+            .build());
+        VilkårVurderingPeriodeEntitet vurdering1 = VilkårVurderingPeriodeEntitet.builder()
+            .medPeriode(vurderingPeriode1)
+            .medBegrunnelse("foo")
+            .medVilkårResultat(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER)
+            .medVurderinger(vurdering)
+            .build();
+        vurdering1.setAktsomhet(VilkårVurderingAktsomhetEntitet.builder()
+            .medAktsomhet(Aktsomhet.FORSETT)
+            .medBegrunnelse("foo")
+            .medPeriode(vurdering1)
+            .build());
+        vurdering.leggTilPeriode(vurdering0);
+        vurdering.leggTilPeriode(vurdering1);
+        vilkårsvurderingRepository.lagre(internBehandlingId, vurdering);
+
+        flush();
+
+        BeregningResultat beregningResultat = tjeneste.beregn(internBehandlingId);
+        List<BeregningResultatPeriode> resultat = beregningResultat.getBeregningResultatPerioder();
+
+        assertThat(resultat).hasSize(2);
+        BeregningResultatPeriode brp0 = resultat.get(0);
+        assertThat(brp0.getPeriode()).isEqualTo(vurderingPeriode0);
+        assertThat(brp0.getTilbakekrevingBeløpUtenRenter()).isEqualByComparingTo(BigDecimal.valueOf(3877));
+        assertThat(brp0.getSkattBeløp()).isEqualByComparingTo(BigDecimal.valueOf(955));
+        assertThat(brp0.getTilbakekrevingBeløpEtterSkatt()).isEqualByComparingTo(BigDecimal.valueOf(3877 - 955));
+        BeregningResultatPeriode brp1 = resultat.get(1);
+        assertThat(brp1.getPeriode()).isEqualTo(vurderingPeriode1);
+        assertThat(brp1.getTilbakekrevingBeløpUtenRenter()).isEqualByComparingTo(BigDecimal.valueOf(1278));
+        assertThat(brp1.getSkattBeløp()).isEqualByComparingTo(BigDecimal.valueOf(240));
+        assertThat(brp1.getRenteBeløp()).isEqualByComparingTo(BigDecimal.valueOf(128));
+        assertThat(brp1.getTilbakekrevingBeløpEtterSkatt()).isEqualByComparingTo(BigDecimal.valueOf(1278 - 240 + 128));
+    }
+
     private void flush() {
         repoRule.getEntityManager().flush();
     }
 
-
-    private void lagVilkårsvurderingMedForsett(Long behandlingId, Periode periode) {
+    private void lagVilkårsvurderingMedForsett(Long behandlingId, Periode... perioder) {
         VilkårVurderingEntitet vurdering = new VilkårVurderingEntitet();
-        VilkårVurderingPeriodeEntitet p = VilkårVurderingPeriodeEntitet.builder()
-            .medPeriode(periode.getFom(), periode.getTom())
-            .medBegrunnelse("foo")
-            //TODO følgende skal legges til i validering i builder, siden det er påkrevet i modellen:
-            .medVilkårResultat(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER)
-            .medVurderinger(vurdering)
-            .build();
-        p.setAktsomhet(VilkårVurderingAktsomhetEntitet.builder()
-            .medAktsomhet(Aktsomhet.FORSETT)
-            .medBegrunnelse("foo")
-            .medPeriode(p)
-            .build());
-        vurdering.leggTilPeriode(p);
+        for (Periode periode : perioder) {
+            VilkårVurderingPeriodeEntitet p = VilkårVurderingPeriodeEntitet.builder()
+                .medPeriode(periode.getFom(), periode.getTom())
+                .medBegrunnelse("foo")
+                .medVilkårResultat(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER)
+                .medVurderinger(vurdering)
+                .build();
+            p.setAktsomhet(VilkårVurderingAktsomhetEntitet.builder()
+                .medAktsomhet(Aktsomhet.FORSETT)
+                .medBegrunnelse("foo")
+                .medPeriode(p)
+                .build());
+            vurdering.leggTilPeriode(p);
+        }
         vilkårsvurderingRepository.lagre(behandlingId, vurdering);
     }
 
@@ -316,10 +412,14 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
     }
 
     private KravgrunnlagPeriode432 lagGrunnlagPeriode(Periode periode, Kravgrunnlag431 grunnlag) {
+        return lagGrunnlagPeriode(periode, grunnlag, 1000);
+    }
+
+    private KravgrunnlagPeriode432 lagGrunnlagPeriode(Periode periode, Kravgrunnlag431 grunnlag, int skattMnd) {
         return KravgrunnlagPeriode432.builder()
             .medPeriode(periode)
             .medKravgrunnlag431(grunnlag)
-            .medBeløpSkattMnd(BigDecimal.valueOf(1000))
+            .medBeløpSkattMnd(BigDecimal.valueOf(skattMnd))
             .build();
     }
 

@@ -423,7 +423,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         assertThat(resultat).containsOnly(
             TilbakekrevingPeriode.med(uke1).medRenter(0)
                 .medBeløp(TbkBeløp.feil(795))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(800).medUtbetBeløp(1595).medTilbakekrevBeløp(795).medUinnkrevdBeløp(0).medSkattBeløp(76)),
+                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(800).medUtbetBeløp(1595).medTilbakekrevBeløp(795).medUinnkrevdBeløp(0).medSkattBeløp(75)),
             TilbakekrevingPeriode.med(uke2).medRenter(0)
                 .medBeløp(TbkBeløp.feil(1590))
                 .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(1600).medUtbetBeløp(3190).medTilbakekrevBeløp(1590).medUinnkrevdBeløp(0).medSkattBeløp(151)),

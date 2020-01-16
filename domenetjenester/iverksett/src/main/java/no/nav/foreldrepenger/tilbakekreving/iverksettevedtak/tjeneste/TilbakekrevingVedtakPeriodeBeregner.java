@@ -37,6 +37,7 @@ import no.nav.vedtak.util.Objects;
 @ApplicationScoped
 public class TilbakekrevingVedtakPeriodeBeregner {
 
+    private static final int GRENSE_AVRUNDINGSFEIL = 5;
     private static final Logger logger = LoggerFactory.getLogger(TilbakekrevingVedtakPeriodeBeregner.class);
 
     private TilbakekrevingBeregningTjeneste beregningTjeneste;
@@ -163,7 +164,7 @@ public class TilbakekrevingVedtakPeriodeBeregner {
             i++;
         }
         if (diff.signum() != 0) {
-            TilbakekrevingVedtakPeriodeBeregnerFeil.FACTORY.avrundingsfeilForLiteInnkrevet(periode, diff.abs()).log(logger);
+            rapporterAvrundingsfeil(diff, TilbakekrevingVedtakPeriodeBeregnerFeil.FACTORY.avrundingsfeilForLiteInnkrevet(periode, diff.abs()));
         }
     }
 
@@ -179,7 +180,7 @@ public class TilbakekrevingVedtakPeriodeBeregner {
             i++;
         }
         if (diff.signum() != 0) {
-            TilbakekrevingVedtakPeriodeBeregnerFeil.FACTORY.avrundingsfeilForMyeInnkrevet(periode, diff.abs()).log(logger);
+            rapporterAvrundingsfeil(diff, TilbakekrevingVedtakPeriodeBeregnerFeil.FACTORY.avrundingsfeilForMyeInnkrevet(periode, diff.abs()));
         }
     }
 
@@ -213,12 +214,16 @@ public class TilbakekrevingVedtakPeriodeBeregner {
     }
 
     private static void rapporterVedUfullstendigJustering(BigDecimal diff, Periode bergningsperiode) {
-        if (diff.signum() == -1) {
-            TilbakekrevingVedtakPeriodeBeregnerFeil.FACTORY.avrundingsfeilForLiteSkatt(bergningsperiode, diff.abs()).log(logger);
+        if (diff.signum() == 0) {
+            return;
         }
-        if (diff.signum() == 1) {
-            TilbakekrevingVedtakPeriodeBeregnerFeil.FACTORY.avrundingsfeilForMyeSkatt(bergningsperiode, diff.abs()).log(logger);
+        Feil feil = diff.signum() == -1
+            ? TilbakekrevingVedtakPeriodeBeregnerFeil.FACTORY.avrundingsfeilForLiteSkatt(bergningsperiode, diff.negate())
+            : TilbakekrevingVedtakPeriodeBeregnerFeil.FACTORY.avrundingsfeilForMyeSkatt(bergningsperiode, diff);
+        if (diff.abs().intValue() > GRENSE_AVRUNDINGSFEIL) {
+            throw feil.toException();
         }
+        feil.log(logger);
     }
 
     private void oppdaterGjenståendeSkattetrekk(List<TilbakekrevingPeriode> perioder, Map<YearMonth, BigDecimal> kgGjenståendeMuligSkattetrekk) {
@@ -374,8 +379,14 @@ public class TilbakekrevingVedtakPeriodeBeregner {
         return YearMonth.of(periode.getFom().getYear(), periode.getFom().getMonthValue());
     }
 
-    interface TilbakekrevingVedtakPeriodeBeregnerFeil extends DeklarerteFeil {
+    private static void rapporterAvrundingsfeil(BigDecimal diff, Feil feil) {
+        if (diff.abs().intValue() > GRENSE_AVRUNDINGSFEIL) {
+            throw feil.toException();
+        }
+        feil.log(logger);
+    }
 
+    interface TilbakekrevingVedtakPeriodeBeregnerFeil extends DeklarerteFeil {
 
         TilbakekrevingVedtakPeriodeBeregnerFeil FACTORY = FeilFactory.create(TilbakekrevingVedtakPeriodeBeregnerFeil.class);
 
@@ -398,5 +409,4 @@ public class TilbakekrevingVedtakPeriodeBeregner {
         Feil inputvalideringFeiletBrPerioderOverlappKgPerioder(Periode periode, int kgVirkedager, int overlappVirkedager);
 
     }
-
 }
