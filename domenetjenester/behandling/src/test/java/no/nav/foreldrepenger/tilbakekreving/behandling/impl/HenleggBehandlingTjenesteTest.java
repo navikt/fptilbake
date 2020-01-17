@@ -39,6 +39,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktStatus;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingresultatRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
@@ -111,6 +112,9 @@ public class HenleggBehandlingTjenesteTest {
     @Mock
     private VarselRepository varselRepository;
 
+    @Mock
+    private BrevSporingRepository brevSporingRepository;
+
     @Inject
     @KonfigVerdi(value = "bruker.gruppenavn.saksbehandler")
     private String gruppenavnSaksbehandler;
@@ -139,6 +143,7 @@ public class HenleggBehandlingTjenesteTest {
         when(repositoryProvider.getEksternBehandlingRepository()).thenReturn(eksternBehandlingRepositoryMock);
         when(repositoryProvider.getBehandlingRepository().finnBehandlingStegType(IVERKSETT_VEDTAK.getKode())).thenReturn(behandlingStegType);
         when(repositoryProvider.getVarselRepository()).thenReturn(varselRepository);
+        when(repositoryProvider.getBrevSporingRepository()).thenReturn(brevSporingRepository);
         BehandlingskontrollTjenesteImpl behandlingskontrollTjenesteImpl = new BehandlingskontrollTjenesteImpl(repositoryProvider,
             behandlingModellRepository, null);
         when(behandlingModellRepository.getBehandlingStegKonfigurasjon()).thenReturn(BehandlingStegKonfigurasjon.lagDummy());
@@ -271,17 +276,13 @@ public class HenleggBehandlingTjenesteTest {
     @Test
     public void kan_sende_henleggelsesbrev_hvis_varselbrev_er_sendt() {
         BehandlingResultatType behandlingsresultat = BehandlingResultatType.HENLAGT_FEILOPPRETTET;
-        Aksjonspunkt aksjonspunkt = repositoryProvider.getAksjonspunktRepository().leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING);
-        assertThat(aksjonspunkt.getStatus()).isEqualTo(AksjonspunktStatus.OPPRETTET);
-
         VarselInfo varselInfo = VarselInfo.builder()
             .medBehandlingId(behandling.getId())
             .medVarselTekst("hello")
             .medVarselBeløp(1000l).build();
 
         when(varselRepository.finnVarsel(behandling.getId())).thenReturn(Optional.of(varselInfo));
-
-        repositoryProvider.getAksjonspunktRepository().setTilUtført(aksjonspunkt);
+        when(brevSporingRepository.harVarselBrevSendtForBehandlingId(behandling.getId())).thenReturn(true);
 
         henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), behandlingsresultat);
         List<ProsessTaskData> prosessTaskData = prosessTaskRepository.finnAlle(ProsessTaskStatus.KLAR);
