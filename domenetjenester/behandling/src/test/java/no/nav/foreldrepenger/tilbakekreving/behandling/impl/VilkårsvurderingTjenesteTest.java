@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -332,7 +333,11 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
 
         VilkårResultatAnnetDto annetDto = (VilkårResultatAnnetDto) andrePeriode.getVilkarResultatInfo();
         assertThat(annetDto.getAktsomhet()).isEqualByComparingTo(Aktsomhet.FORSETT);
-        assertThat(annetDto.getAktsomhetInfo()).isNull();
+        assertThat(annetDto.getAktsomhetInfo()).isNotNull();
+        assertThat(annetDto.getAktsomhetInfo().isHarGrunnerTilReduksjon()).isFalse();
+        assertThat(annetDto.getAktsomhetInfo().getAndelTilbakekreves()).isNull();
+        assertThat(annetDto.getAktsomhetInfo().isIleggRenter()).isNull();
+        assertThat(annetDto.getAktsomhetInfo().getSærligeGrunner().size()).isEqualTo(0);
     }
 
     @Test
@@ -372,7 +377,58 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         assertThat(annetDto.getAktsomhetInfo().getAndelTilbakekreves()).isNull();
         assertThat(annetDto.getAktsomhetInfo().isIleggRenter()).isTrue();
         assertThat(annetDto.getAktsomhetInfo().getSærligeGrunner().size()).isEqualTo(2);
+    }
 
+    @Test
+    public void hentVilkårsvurdering_medForstBurdeForstattOgForsettAktsomhet_skalTilleggesRenter() {
+        VilkårsvurderingPerioderDto vilkårsvurderingPerioderDto = formVilkårsvurderingPerioderDto(VilkårResultat.FORSTO_BURDE_FORSTÅTT, LocalDate.of(2016, 4, 1), TOM, Aktsomhet.FORSETT);
+        VilkårResultatAnnetDto vilkarResultatInfo = (VilkårResultatAnnetDto) vilkårsvurderingPerioderDto.getVilkarResultatInfo();
+        vilkarResultatInfo.getAktsomhetInfo().setIleggRenter(true);
+
+        List<VilkårsvurderingPerioderDto> vilkårPerioder = Collections.singletonList(vilkårsvurderingPerioderDto);
+
+        vilkårsvurderingTjeneste.lagreVilkårsvurdering(internBehandlingId, vilkårPerioder);
+
+        formGrunnlag();
+
+        List<VilkårsvurderingPerioderDto> perioder = vilkårsvurderingTjeneste.hentVilkårsvurdering(internBehandlingId);
+        assertThat(perioder.size()).isEqualTo(1);
+        perioder.sort(Comparator.comparing(VilkårsvurderingPerioderDto::getFom));
+
+        VilkårsvurderingPerioderDto andrePeriode = perioder.get(0);
+        assertThat(andrePeriode.getVilkårResultat()).isEqualByComparingTo(VilkårResultat.FORSTO_BURDE_FORSTÅTT);
+        assertThat(andrePeriode.getFeilutbetalingBelop()).isEqualByComparingTo(BigDecimal.valueOf(40000.00));
+
+        VilkårResultatAnnetDto annetDto = (VilkårResultatAnnetDto) andrePeriode.getVilkarResultatInfo();
+        assertThat(annetDto.getAktsomhet()).isEqualByComparingTo(Aktsomhet.FORSETT);
+        assertThat(annetDto.getAktsomhetInfo().isIleggRenter()).isNotNull();
+        assertThat(annetDto.getAktsomhetInfo().isIleggRenter()).isTrue();
+    }
+
+    @Test
+    public void hentVilkårsvurdering_medForstBurdeForstattOgForsettAktsomhet_skalIkkeTilleggesRenter() {
+        VilkårsvurderingPerioderDto vilkårsvurderingPerioderDto = formVilkårsvurderingPerioderDto(VilkårResultat.FORSTO_BURDE_FORSTÅTT, LocalDate.of(2016, 4, 1), TOM, Aktsomhet.FORSETT);
+        VilkårResultatAnnetDto vilkarResultatInfo = (VilkårResultatAnnetDto) vilkårsvurderingPerioderDto.getVilkarResultatInfo();
+        vilkarResultatInfo.getAktsomhetInfo().setIleggRenter(false);
+
+        List<VilkårsvurderingPerioderDto> vilkårPerioder = Collections.singletonList(vilkårsvurderingPerioderDto);
+
+        vilkårsvurderingTjeneste.lagreVilkårsvurdering(internBehandlingId, vilkårPerioder);
+
+        formGrunnlag();
+
+        List<VilkårsvurderingPerioderDto> perioder = vilkårsvurderingTjeneste.hentVilkårsvurdering(internBehandlingId);
+        assertThat(perioder.size()).isEqualTo(1);
+        perioder.sort(Comparator.comparing(VilkårsvurderingPerioderDto::getFom));
+
+        VilkårsvurderingPerioderDto andrePeriode = perioder.get(0);
+        assertThat(andrePeriode.getVilkårResultat()).isEqualByComparingTo(VilkårResultat.FORSTO_BURDE_FORSTÅTT);
+        assertThat(andrePeriode.getFeilutbetalingBelop()).isEqualByComparingTo(BigDecimal.valueOf(40000.00));
+
+        VilkårResultatAnnetDto annetDto = (VilkårResultatAnnetDto) andrePeriode.getVilkarResultatInfo();
+        assertThat(annetDto.getAktsomhet()).isEqualByComparingTo(Aktsomhet.FORSETT);
+        assertThat(annetDto.getAktsomhetInfo().isIleggRenter()).isNotNull();
+        assertThat(annetDto.getAktsomhetInfo().isIleggRenter()).isFalse();
     }
 
     private void formGrunnlag() {

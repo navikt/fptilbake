@@ -24,6 +24,7 @@ public class TilbakekrevingBeregnerVilkårTest {
 
     private VilkårVurderingPeriodeEntitet vurdering;
     private GrunnlagPeriodeMedSkattProsent grunnlagPeriodeMedSkattProsent;
+    private VilkårVurderingPeriodeEntitet forstoBurdeForstattVurdering;
 
     @Before
     public void setup(){
@@ -32,11 +33,16 @@ public class TilbakekrevingBeregnerVilkårTest {
             .medPeriode(LocalDate.of(2019, 5, 1), LocalDate.of(2019, 5, 3))
             .medBegrunnelse("foo")
             .build();
+        forstoBurdeForstattVurdering = new VilkårVurderingPeriodeEntitet.Builder()
+            .medVilkårResultat(VilkårResultat.FORSTO_BURDE_FORSTÅTT)
+            .medPeriode(LocalDate.of(2019, 5, 1), LocalDate.of(2019, 5, 3))
+            .medBegrunnelse("foo")
+            .build();
         grunnlagPeriodeMedSkattProsent = new GrunnlagPeriodeMedSkattProsent(vurdering.getPeriode(),BigDecimal.valueOf(10000),BigDecimal.ZERO);
     }
 
     @Test
-    public void skal_kreve_tilbake_alt_med_renter_ved_forsett() {
+    public void skal_kreve_tilbake_alt_med_renter_ved_forsett_og_illeggRenter_ikke_satt() {
         vurdering.setAktsomhet(VilkårVurderingAktsomhetEntitet.builder()
             .medAktsomhet(Aktsomhet.FORSETT)
             .medBegrunnelse("foo")
@@ -52,6 +58,54 @@ public class TilbakekrevingBeregnerVilkårTest {
         assertThat(resultat.getTilbakekrevingBeløpUtenRenter()).isEqualByComparingTo(BigDecimal.valueOf(10000));
         assertThat(resultat.getRenteBeløp()).isEqualByComparingTo(BigDecimal.valueOf(1000));
         assertThat(resultat.getRenterProsent()).isEqualByComparingTo(BigDecimal.valueOf(10));
+        assertThat(resultat.getAndelAvBeløp()).isEqualByComparingTo(BigDecimal.valueOf(100));
+        assertThat(resultat.getFeilutbetaltBeløp()).isEqualByComparingTo(BigDecimal.valueOf(10000));
+        assertThat(resultat.getVurdering()).isEqualByComparingTo(Aktsomhet.FORSETT);
+        assertThat(resultat.getPeriode()).isEqualTo(new Periode(LocalDate.of(2019, 5, 1), LocalDate.of(2019, 5, 3)));
+        assertThat(resultat.getManueltSattTilbakekrevingsbeløp()).isNull();
+    }
+
+    @Test
+    public void skal_kreve_tilbake_alt_med_renter_ved_forsett_og_illeggRenter_satt_true() {
+        forstoBurdeForstattVurdering.setAktsomhet(VilkårVurderingAktsomhetEntitet.builder()
+            .medAktsomhet(Aktsomhet.FORSETT)
+            .medBegrunnelse("foo")
+            .medPeriode(forstoBurdeForstattVurdering)
+            .medIleggRenter(true)
+            .build());
+
+        //act
+        BeregningResultatPeriode resultat = beregn(forstoBurdeForstattVurdering, BigDecimal.valueOf(10000), Lists.newArrayList(grunnlagPeriodeMedSkattProsent));
+
+        //assert
+        assertThat(resultat.getTilbakekrevingBeløp()).isEqualByComparingTo(BigDecimal.valueOf(11000));
+        assertThat(resultat.getTilbakekrevingBeløpUtenRenter()).isEqualByComparingTo(BigDecimal.valueOf(10000));
+        assertThat(resultat.getRenteBeløp()).isEqualByComparingTo(BigDecimal.valueOf(1000));
+        assertThat(resultat.getRenterProsent()).isEqualByComparingTo(BigDecimal.valueOf(10));
+        assertThat(resultat.getAndelAvBeløp()).isEqualByComparingTo(BigDecimal.valueOf(100));
+        assertThat(resultat.getFeilutbetaltBeløp()).isEqualByComparingTo(BigDecimal.valueOf(10000));
+        assertThat(resultat.getVurdering()).isEqualByComparingTo(Aktsomhet.FORSETT);
+        assertThat(resultat.getPeriode()).isEqualTo(new Periode(LocalDate.of(2019, 5, 1), LocalDate.of(2019, 5, 3)));
+        assertThat(resultat.getManueltSattTilbakekrevingsbeløp()).isNull();
+    }
+
+    @Test
+    public void skal_kreve_tilbake_alt_uten_renter_ved_forsett_og_illeggRenter_satt_false() {
+        forstoBurdeForstattVurdering.setAktsomhet(VilkårVurderingAktsomhetEntitet.builder()
+            .medAktsomhet(Aktsomhet.FORSETT)
+            .medBegrunnelse("foo")
+            .medPeriode(forstoBurdeForstattVurdering)
+            .medIleggRenter(false)
+            .build());
+
+        //act
+        BeregningResultatPeriode resultat = beregn(forstoBurdeForstattVurdering, BigDecimal.valueOf(10000), Lists.newArrayList(grunnlagPeriodeMedSkattProsent));
+
+        //assert
+        assertThat(resultat.getTilbakekrevingBeløp()).isEqualByComparingTo(BigDecimal.valueOf(10000));
+        assertThat(resultat.getTilbakekrevingBeløpUtenRenter()).isEqualByComparingTo(BigDecimal.valueOf(10000));
+        assertThat(resultat.getRenteBeløp()).isEqualByComparingTo(BigDecimal.valueOf(0));
+        assertThat(resultat.getRenterProsent()).isNull();
         assertThat(resultat.getAndelAvBeløp()).isEqualByComparingTo(BigDecimal.valueOf(100));
         assertThat(resultat.getFeilutbetaltBeløp()).isEqualByComparingTo(BigDecimal.valueOf(10000));
         assertThat(resultat.getVurdering()).isEqualByComparingTo(Aktsomhet.FORSETT);

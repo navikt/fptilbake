@@ -41,7 +41,6 @@ public class VilkårResultatAnnetDto extends VilkårResultatInfoDto {
 
     @AssertTrue(message = "aktsomhetInfo kan bare være null når aktsomhet er FORSETT")
     private boolean isAktsomhetInfo() {
-        return (this.aktsomhetInfo == null && Aktsomhet.FORSETT.equals(this.aktsomhet)) ||
-                (this.aktsomhetInfo != null && !Aktsomhet.FORSETT.equals(this.aktsomhet));
+        return this.aktsomhetInfo != null || Aktsomhet.FORSETT.equals(this.aktsomhet);
     }
 }

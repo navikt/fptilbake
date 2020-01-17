@@ -87,7 +87,9 @@ class TilbakekrevingBeregnerVilkår {
     private static boolean finnRenter(VilkårVurderingPeriodeEntitet vurdering) {
         VilkårVurderingAktsomhetEntitet aktsomhet = vurdering.getAktsomhet();
         if (aktsomhet != null) {
-            return Aktsomhet.FORSETT.equals(aktsomhet.getAktsomhet()) || (aktsomhet.getIleggRenter() != null && aktsomhet.getIleggRenter());
+            boolean erForsett = Aktsomhet.FORSETT.equals(aktsomhet.getAktsomhet());
+            return (erForsett && (aktsomhet.getIleggRenter() == null || aktsomhet.getIleggRenter())) ||
+                (aktsomhet.getIleggRenter() != null && aktsomhet.getIleggRenter());
         }
         return false;
     }
