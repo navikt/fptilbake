@@ -1,13 +1,8 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.List;
-
-import org.junit.Test;
-
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType;
@@ -19,8 +14,15 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.vedtak.exception.FunksjonellException;
 import no.nav.vedtak.exception.TekniskException;
+import org.junit.Test;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class BehandlingRevurderingTjenesteTest extends FellesTestOppsett {
+
+    private HenleggBehandlingTjeneste henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repoProvider, behandlingskontrollTjeneste, mockHistorikkTjeneste);
 
     @Test
     public void opprettRevurdering_nårTbkBehandlingErIkkeAvsluttet() {
@@ -67,6 +69,12 @@ public class BehandlingRevurderingTjenesteTest extends FellesTestOppsett {
         Historikkinnslag historikkinnslag = historikkinnslager.get(0);
         assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.REVURD_OPPR);
         assertThat(historikkinnslag.getAktør()).isEqualByComparingTo(HistorikkAktør.VEDTAKSLØSNINGEN);
+    }
+
+    @Test
+    public void kan_revurdering_ikke_opprettes_når_behandling_er_henlagt() {
+        henleggBehandlingTjeneste.henleggBehandlingManuelt(behandling.getId(), BehandlingResultatType.HENLAGT_FEILOPPRETTET, "");
+        assertThat(revurderingTjeneste.kanOppretteRevurdering(eksternBehandlingUuid)).isFalse();
     }
 
 }

@@ -156,9 +156,12 @@ public class BehandlingRestTjeneste {
         description = "Sjekk om revurdering kan opprettes")
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     public Response kanOpprettesRevurdering(@NotNull @QueryParam("behandlingId") @Valid BehandlingIdDto idDto) {
-        EksternBehandling eksternBehandling = revurderingTjeneste.hentEksternBehandling(idDto.getBehandlingId());
-
-        return Response.ok(revurderingTjeneste.kanOppretteRevurdering(eksternBehandling.getEksternUuid())).build();
+        Optional<EksternBehandling> eksternBehandling = revurderingTjeneste.hentEksternBehandling(idDto.getBehandlingId());
+        boolean kanRevurderingOprettes = false;
+        if (eksternBehandling.isPresent()) {
+            kanRevurderingOprettes = revurderingTjeneste.kanOppretteRevurdering(eksternBehandling.get().getEksternUuid());
+        }
+        return Response.ok(kanRevurderingOprettes).build();
     }
 
     @POST

@@ -104,7 +104,8 @@ public class EksternBehandlingRepositoryImpl implements EksternBehandlingReposit
         return query.getResultList().get(0);
     }
 
-    private Optional<EksternBehandling> hentOptionalFraInternId(long internBehandlingId) {
+    @Override
+    public Optional<EksternBehandling> hentOptionalFraInternId(long internBehandlingId) {
         TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where intern_id=:internId and aktiv='J'", EksternBehandling.class);
         query.setParameter(INTERN_ID, internBehandlingId);
         return hentUniktResultat(query);

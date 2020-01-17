@@ -49,4 +49,6 @@ public interface EksternBehandlingRepository {
      * @return eksternBehandling
      */
     EksternBehandling hentForSisteAktivertInternId(long internBehandlingId);
+
+    Optional<EksternBehandling> hentOptionalFraInternId(long internBehandlingId);
 }

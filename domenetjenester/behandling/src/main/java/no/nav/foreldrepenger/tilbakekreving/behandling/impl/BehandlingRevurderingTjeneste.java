@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -74,8 +75,8 @@ public class BehandlingRevurderingTjeneste {
         return true;
     }
 
-    public EksternBehandling hentEksternBehandling(long behandlingId) {
-        return eksternBehandlingRepository.hentFraInternId(behandlingId);
+    public Optional<EksternBehandling> hentEksternBehandling(long behandlingId) {
+        return eksternBehandlingRepository.hentOptionalFraInternId(behandlingId);
     }
 
     private Behandling opprettManuellRevurdering(Fagsak fagsak, BehandlingÅrsakType behandlingÅrsakType, UUID eksternUuid, BehandlingType behandlingType) {

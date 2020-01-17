@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.net.URISyntaxException;
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.ws.rs.core.Response;
@@ -163,8 +164,8 @@ public class BehandlingRestTjenesteTest {
             BehandlingType.REVURDERING_TILBAKEKREVING).build();
     }
 
-    private EksternBehandling opprettEksternBehandling() {
-        return new EksternBehandling(mockBehandling(), 1l, UUID.fromString(EKSTERN_BEHANDLING_UUID));
+    private Optional<EksternBehandling> opprettEksternBehandling() {
+        return Optional.of(new EksternBehandling(mockBehandling(), 1l, UUID.fromString(EKSTERN_BEHANDLING_UUID)));
     }
 
 }
