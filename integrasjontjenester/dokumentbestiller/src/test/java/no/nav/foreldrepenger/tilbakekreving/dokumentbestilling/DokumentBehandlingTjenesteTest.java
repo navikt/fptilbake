@@ -15,7 +15,8 @@ import com.google.common.collect.Lists;
 
 import no.nav.foreldrepenger.domene.dokumentarkiv.journal.JournalTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VarselbrevSporing;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporing;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.dokumentbestiller.DokumentMalType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
@@ -152,12 +153,13 @@ public class DokumentBehandlingTjenesteTest extends DokumentBestillerTestOppsett
     }
 
     private void lagreInfoOmVarselbrev(Long behandlingId, String journalpostId, String dokumentId) {
-        VarselbrevSporing varselbrevSporing = new VarselbrevSporing.Builder()
+        BrevSporing brevSporing = new BrevSporing.Builder()
             .medBehandlingId(behandlingId)
             .medDokumentId(dokumentId)
             .medJournalpostId(new JournalpostId(journalpostId))
+            .medBrevType(BrevType.VARSEL_BREV)
             .build();
-        varselbrevSporingRepository.lagreVarselbrevData(varselbrevSporing);
+        brevSporingRepository.lagre(brevSporing);
         repositoryRule.getEntityManager().flush();
     }
 

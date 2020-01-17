@@ -15,8 +15,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositor
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VarselbrevSporing;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VarselbrevSporingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporing;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
@@ -48,7 +49,7 @@ public class VarselbrevTjeneste {
 
     private BehandlingRepository behandlingRepository;
     private EksternBehandlingRepository eksternBehandlingRepository;
-    private VarselbrevSporingRepository  varselbrevSporingRepository;
+    private BrevSporingRepository brevSporingRepository;
     private VarselRepository varselRepository;
 
     private EksternDataForBrevTjeneste eksternDataForBrevTjeneste;
@@ -66,7 +67,7 @@ public class VarselbrevTjeneste {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
         this.varselRepository = repositoryProvider.getVarselRepository();
-        this.varselbrevSporingRepository = repositoryProvider.getVarselbrevSporingRepository();
+        this.brevSporingRepository = repositoryProvider.getBrevSporingRepository();
 
         this.eksternDataForBrevTjeneste = eksternDataForBrevTjeneste;
         this.behandlingTjeneste = behandlingTjeneste;
@@ -130,12 +131,13 @@ public class VarselbrevTjeneste {
     }
 
     private void lagreInfoOmVarselbrev(Long behandlingId, JournalpostIdOgDokumentId dokumentreferanse) {
-        VarselbrevSporing varselbrevSporing = new VarselbrevSporing.Builder()
+        BrevSporing brevSporing = new BrevSporing.Builder()
             .medBehandlingId(behandlingId)
             .medDokumentId(dokumentreferanse.getDokumentId())
             .medJournalpostId(dokumentreferanse.getJournalpostId())
+            .medBrevType(BrevType.VARSEL_BREV)
             .build();
-        varselbrevSporingRepository.lagreVarselbrevData(varselbrevSporing);
+        brevSporingRepository.lagre(brevSporing);
     }
 
     private VarselbrevSamletInfo lagVarselbrevForSending(Long behandlingId) {

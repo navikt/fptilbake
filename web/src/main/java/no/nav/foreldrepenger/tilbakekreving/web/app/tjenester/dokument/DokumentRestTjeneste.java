@@ -26,6 +26,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Avsnitt;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.ForhåndvisningVedtaksbrevTekstDto;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.HentForhåndsvisningVarselbrevDto;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.HentForhåndvisningVedtaksbrevPdfDto;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.henleggelse.HenleggelsesbrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.VarselbrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.VedtaksbrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
@@ -40,12 +41,14 @@ public class DokumentRestTjeneste {
     private static final String FILENAME_DOKUMENT_PDF = "filename=dokument.pdf";
     private VarselbrevTjeneste varselbrevTjeneste;
     private VedtaksbrevTjeneste vedtaksbrevTjeneste;
+    private HenleggelsesbrevTjeneste henleggelsesbrevTjeneste;
     private Unleash unleash;
 
     @Inject
-    public DokumentRestTjeneste(VarselbrevTjeneste varselbrevTjeneste, VedtaksbrevTjeneste vedtaksbrevTjeneste, Unleash unleash) {
+    public DokumentRestTjeneste(VarselbrevTjeneste varselbrevTjeneste, VedtaksbrevTjeneste vedtaksbrevTjeneste, HenleggelsesbrevTjeneste henleggelsesbrevTjeneste, Unleash unleash) {
         this.varselbrevTjeneste = varselbrevTjeneste;
         this.vedtaksbrevTjeneste = vedtaksbrevTjeneste;
+        this.henleggelsesbrevTjeneste = henleggelsesbrevTjeneste;
         this.unleash = unleash;
     }
 
@@ -93,6 +96,23 @@ public class DokumentRestTjeneste {
         byte[] dokument = unleash.isEnabled("fptilbake.vedtaksbrev.vedlegg")
             ? vedtaksbrevTjeneste.hentForhåndsvisningVedtaksbrevMedVedleggSomPdf(vedtaksbrevPdfDto)
             : vedtaksbrevTjeneste.hentForhåndsvisningVedtaksbrevSomPdf(vedtaksbrevPdfDto);
+
+        Response.ResponseBuilder responseBuilder = Response.ok(dokument);
+        responseBuilder.type(PDF_CONTENT_TYPE);
+        responseBuilder.header(CONTENT_DISPOSITION, FILENAME_DOKUMENT_PDF);
+        return responseBuilder.build();
+    }
+
+    @POST
+    @Timed
+    @Path("/forhandsvis-henleggelsesbrev")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Operation(tags = "dokument", description = "Returnerer en pdf som er en forhåndsvisning av henleggelsesbrevet")
+    @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
+    @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
+    public Response hentForhåndsvisningHenleggelsesbrev(@Valid @NotNull BehandlingIdDto behandlingIdDto) { // NOSONAR
+
+        byte[] dokument = henleggelsesbrevTjeneste.hentForhåndsvisningVarselbrev(behandlingIdDto.getBehandlingId());
 
         Response.ResponseBuilder responseBuilder = Response.ok(dokument);
         responseBuilder.type(PDF_CONTENT_TYPE);

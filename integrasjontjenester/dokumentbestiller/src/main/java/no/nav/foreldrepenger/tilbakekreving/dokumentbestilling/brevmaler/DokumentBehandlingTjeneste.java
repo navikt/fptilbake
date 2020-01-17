@@ -8,7 +8,7 @@ import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VarselbrevSporingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.dokumentbestiller.DokumentMalType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
@@ -29,7 +29,7 @@ public class DokumentBehandlingTjeneste {
 
     private BehandlingRepository behandlingRepository;
     private KodeverkRepository kodeverkRepository;
-    private VarselbrevSporingRepository varselbrevSporingRepository;
+    private BrevSporingRepository brevSporingRepository;
     private KravgrunnlagRepository grunnlagRepository;
     private ProsessTaskRepository prosessTaskRepository;
 
@@ -48,7 +48,7 @@ public class DokumentBehandlingTjeneste {
                                       ManueltVarselBrevTjeneste manueltVarselBrevTjeneste) {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.kodeverkRepository = repositoryProvider.getKodeverkRepository();
-        this.varselbrevSporingRepository = repositoryProvider.getVarselbrevSporingRepository();
+        this.brevSporingRepository = repositoryProvider.getBrevSporingRepository();
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.prosessTaskRepository = prosessTaskRepository;
 
@@ -86,7 +86,7 @@ public class DokumentBehandlingTjeneste {
     }
 
     private void leggTilVarselBrevmaler(Long behandlingId, List<DokumentMalType> gyldigBrevMaler) {
-        if (!varselbrevSporingRepository.harVarselBrevSendtForBehandlingId(behandlingId)) {
+        if (!brevSporingRepository.harVarselBrevSendtForBehandlingId(behandlingId)) {
             gyldigBrevMaler.add(kodeverkRepository.finn(DokumentMalType.class, DokumentMalType.VARSEL_DOK));
         } else {
             gyldigBrevMaler.add(kodeverkRepository.finn(DokumentMalType.class, DokumentMalType.KORRIGERT_VARSEL_DOK));

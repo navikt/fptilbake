@@ -18,8 +18,11 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 
 @ApplicationScoped
 public class HenleggBehandlingTjeneste {
@@ -27,9 +30,13 @@ public class HenleggBehandlingTjeneste {
     private BehandlingRepository behandlingRepository;
     private KravgrunnlagRepository grunnlagRepository;
     private EksternBehandlingRepository eksternBehandlingRepository;
+    private VarselRepository varselRepository;
+    private ProsessTaskRepository prosessTaskRepository;
 
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private HistorikkinnslagTjeneste historikkinnslagTjeneste;
+
+    private static final String HENLEGGELSESBREV_TASK_TYPE = "brev.sendhenleggelse";
 
     HenleggBehandlingTjeneste() {
         // CDI
@@ -37,11 +44,14 @@ public class HenleggBehandlingTjeneste {
 
     @Inject
     public HenleggBehandlingTjeneste(BehandlingRepositoryProvider repositoryProvider,
+                                     ProsessTaskRepository prosessTaskRepository,
                                      BehandlingskontrollTjeneste behandlingskontrollTjeneste,
                                      HistorikkinnslagTjeneste historikkinnslagTjeneste) {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
+        this.varselRepository = repositoryProvider.getVarselRepository();
+        this.prosessTaskRepository = prosessTaskRepository;
 
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
         this.historikkinnslagTjeneste = historikkinnslagTjeneste;
@@ -68,22 +78,26 @@ public class HenleggBehandlingTjeneste {
         behandlingskontrollTjeneste.henleggBehandling(kontekst, årsakKode);
 
         if (kanSendeHenleggelsebrev(behandling)) {
-            sendHenleggelsesbrev();
+            sendHenleggelsesbrev(behandling);
         }
         opprettHistorikkinnslag(behandling, årsakKode, begrunnelse);
         eksternBehandlingRepository.deaktivateTilkobling(behandlingId);
     }
 
-    private void sendHenleggelsesbrev() {
-//        TODO: implementer funksjonalitet for å sende henleggelsebrev
+    private void sendHenleggelsesbrev(Behandling behandling) {
+        ProsessTaskData taskData = new ProsessTaskData(HENLEGGELSESBREV_TASK_TYPE);
+        taskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
+        taskData.setCallIdFraEksisterende();
+        prosessTaskRepository.lagre(taskData);
     }
 
     private boolean kanSendeHenleggelsebrev(Behandling behandling) {
-        Optional<Aksjonspunkt> sendVarselAksjonspunkt = behandling.getAksjonspunktMedDefinisjonOptional(AksjonspunktDefinisjon.SEND_VARSEL);
+        Optional<Aksjonspunkt> sendVarselAksjonspunkt = behandling.getAksjonspunktMedDefinisjonOptional(AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING);
         if (sendVarselAksjonspunkt.isEmpty()) {
             return false;
         }
-        return AksjonspunktStatus.UTFØRT.equals(sendVarselAksjonspunkt.get().getStatus());
+        return AksjonspunktStatus.UTFØRT.equals(sendVarselAksjonspunkt.get().getStatus()) &&
+            varselRepository.finnVarsel(behandling.getId()).isPresent();
     }
 
     private void opprettHistorikkinnslag(Behandling behandling, BehandlingResultatType årsakKode, String begrunnelse) {
