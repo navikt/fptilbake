@@ -3,17 +3,17 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.henleggelse.hand
 import java.time.LocalDate;
 import java.util.Objects;
 
-public class HenleggelsesbrevDokument extends BaseDokument{
+public class HenleggelsesbrevDokument {
 
-    private String avsenderEnhetNavn;
+    private String fagsaktypeNavn;
     private LocalDate varsletDato;
 
-    public String getAvsenderEnhetNavn() {
-        return avsenderEnhetNavn;
+    public String getFagsaktypeNavn() {
+        return fagsaktypeNavn;
     }
 
-    public void setAvsenderEnhetNavn(String avsenderEnhetNavn) {
-        this.avsenderEnhetNavn = avsenderEnhetNavn;
+    public void setFagsaktypeNavn(String fagsaktypeNavn) {
+        this.fagsaktypeNavn = fagsaktypeNavn;
     }
 
     public LocalDate getVarsletDato() {
@@ -26,7 +26,6 @@ public class HenleggelsesbrevDokument extends BaseDokument{
 
     public void valider() {
         Objects.requireNonNull(getFagsaktypeNavn(), "fagsaktypeNavn kan ikke være null");
-        Objects.requireNonNull(avsenderEnhetNavn, "avsenderEnhetNavn kan ikke være null");
-        Objects.requireNonNull(varsletDato, "varsletDato kan ikke være null");
+        Objects.requireNonNull(getVarsletDato(), "varsletDato kan ikke være null");
     }
 }

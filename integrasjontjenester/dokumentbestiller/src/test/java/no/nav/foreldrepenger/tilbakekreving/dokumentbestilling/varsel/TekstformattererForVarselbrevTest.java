@@ -148,13 +148,6 @@ public class TekstformattererForVarselbrevTest {
         assertThat(varselbrev.getDatoerHvisSammenhengendePeriode()).isNull();
     }
 
-    @Test
-    public void skal_finne_riktig_språk() {
-        assertThat(TekstformatererVarselbrev.finnRiktigSpråk(Språkkode.en)).isEqualTo(BaseDokument.Lokale.BOKMÅL);
-        assertThat(TekstformatererVarselbrev.finnRiktigSpråk(Språkkode.nn)).isEqualTo(BaseDokument.Lokale.NYNORSK);
-        assertThat(TekstformatererVarselbrev.finnRiktigSpråk(Språkkode.nb)).isEqualTo(BaseDokument.Lokale.BOKMÅL);
-    }
-
     public List<Periode> mockFeilutbetalingerMedKunEnPeriode() {
         return List.of(new Periode(LocalDate.of(2019, 3, 3),
             LocalDate.of(2020, 3, 3)));

@@ -68,7 +68,7 @@ public class HenleggelsesbrevTjeneste {
         return Optional.ofNullable(dokumentreferanse);
     }
 
-    public byte[] hentForhåndsvisningVarselbrev(Long behandlingId) {
+    public byte[] hentForhåndsvisningHenleggelsebrev(Long behandlingId) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = lagHenleggelsebrevForSending(behandling);
         FritekstbrevData fritekstbrevData = lagHenleggelsebrev(henleggelsesbrevSamletInfo);

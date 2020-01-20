@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class BehandlingRevurderingTjenesteTest extends FellesTestOppsett {
 
-    private HenleggBehandlingTjeneste henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repoProvider, behandlingskontrollTjeneste, mockHistorikkTjeneste);
+    private HenleggBehandlingTjeneste henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repoProvider, prosessTaskRepository, behandlingskontrollTjeneste, mockHistorikkTjeneste);
 
     @Test
     public void opprettRevurdering_nårTbkBehandlingErIkkeAvsluttet() {

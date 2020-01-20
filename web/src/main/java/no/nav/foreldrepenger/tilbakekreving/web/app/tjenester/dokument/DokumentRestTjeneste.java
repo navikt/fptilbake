@@ -1,24 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.dokument;
 
-import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.READ;
-import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursResourceAttributt.FAGSAK;
-
-import java.util.List;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
 import com.codahale.metrics.annotation.Timed;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import no.finn.unleash.Unleash;
@@ -31,6 +13,22 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.Varselbrev
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.VedtaksbrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.util.List;
+
+import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.READ;
+import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursResourceAttributt.FAGSAK;
 
 @Path("/dokument")
 @ApplicationScoped
@@ -66,9 +64,7 @@ public class DokumentRestTjeneste {
     public Response hentForhåndsvisningVarselbrev(
         @Parameter(description = "Inneholder kode til brevmal og data som skal flettes inn i brevet") @Valid HentForhåndsvisningVarselbrevDto hentForhåndsvisningVarselbrevDto) { // NOSONAR
         byte[] dokument = varselbrevTjeneste.hentForhåndsvisningVarselbrev(hentForhåndsvisningVarselbrevDto);
-        Response.ResponseBuilder responseBuilder = Response.ok(dokument);
-        responseBuilder.type(PDF_CONTENT_TYPE);
-        responseBuilder.header(CONTENT_DISPOSITION, FILENAME_DOKUMENT_PDF);
+        Response.ResponseBuilder responseBuilder = lagRespons(dokument);
         return responseBuilder.build();
     }
 
@@ -97,9 +93,7 @@ public class DokumentRestTjeneste {
             ? vedtaksbrevTjeneste.hentForhåndsvisningVedtaksbrevMedVedleggSomPdf(vedtaksbrevPdfDto)
             : vedtaksbrevTjeneste.hentForhåndsvisningVedtaksbrevSomPdf(vedtaksbrevPdfDto);
 
-        Response.ResponseBuilder responseBuilder = Response.ok(dokument);
-        responseBuilder.type(PDF_CONTENT_TYPE);
-        responseBuilder.header(CONTENT_DISPOSITION, FILENAME_DOKUMENT_PDF);
+        Response.ResponseBuilder responseBuilder = lagRespons(dokument);
         return responseBuilder.build();
     }
 
@@ -112,12 +106,17 @@ public class DokumentRestTjeneste {
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response hentForhåndsvisningHenleggelsesbrev(@Valid @NotNull BehandlingIdDto behandlingIdDto) { // NOSONAR
 
-        byte[] dokument = henleggelsesbrevTjeneste.hentForhåndsvisningVarselbrev(behandlingIdDto.getBehandlingId());
+        byte[] dokument = henleggelsesbrevTjeneste.hentForhåndsvisningHenleggelsebrev(behandlingIdDto.getBehandlingId());
 
+        Response.ResponseBuilder responseBuilder = lagRespons(dokument);
+        return responseBuilder.build();
+    }
+
+    private Response.ResponseBuilder lagRespons(byte[] dokument) {
         Response.ResponseBuilder responseBuilder = Response.ok(dokument);
         responseBuilder.type(PDF_CONTENT_TYPE);
         responseBuilder.header(CONTENT_DISPOSITION, FILENAME_DOKUMENT_PDF);
-        return responseBuilder.build();
+        return responseBuilder;
     }
 
 }

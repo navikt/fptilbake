@@ -79,6 +79,6 @@ public class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
 
     @Test
     public void skal_forhåndsvise_henleggelsebrev() {
-        assertThat(henleggelsesbrevTjeneste.hentForhåndsvisningVarselbrev(behandlingId)).isNotEmpty();
+        assertThat(henleggelsesbrevTjeneste.hentForhåndsvisningHenleggelsebrev(behandlingId)).isNotEmpty();
     }
 }

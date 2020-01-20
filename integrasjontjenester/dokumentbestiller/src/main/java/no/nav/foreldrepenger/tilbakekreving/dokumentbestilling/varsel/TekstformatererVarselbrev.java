@@ -1,25 +1,26 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel;
 
+import com.github.jknack.handlebars.Handlebars;
+import com.github.jknack.handlebars.Helper;
+import com.github.jknack.handlebars.Template;
+import com.github.jknack.handlebars.helper.ConditionalHelpers;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselInfo;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.handlebars.dto.BaseDokument;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.handlebars.dto.VarselbrevDokument;
+import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
+import no.nav.vedtak.util.FPDateUtil;
+
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.sql.Date;
 import java.text.DateFormat;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 
-import com.github.jknack.handlebars.Handlebars;
-import com.github.jknack.handlebars.Helper;
-import com.github.jknack.handlebars.Template;
-import com.github.jknack.handlebars.helper.ConditionalHelpers;
-
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselInfo;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.handlebars.dto.BaseDokument;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.handlebars.dto.VarselbrevDokument;
-import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
-import no.nav.vedtak.util.FPDateUtil;
+import static no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevSpråkUtil.finnRiktigSpråk;
 
 public class TekstformatererVarselbrev {
 
@@ -93,16 +94,6 @@ public class TekstformatererVarselbrev {
         }
     }
 
-    static BaseDokument.Lokale finnRiktigSpråk(Språkkode språkkode) {
-        if (Språkkode.nn.equals(språkkode)) {
-            return BaseDokument.Lokale.NYNORSK;
-        } else if (Språkkode.nb.equals(språkkode) || Språkkode.en.equals(språkkode)
-            || "NO".equals(språkkode.getKode()) || Språkkode.UDEFINERT.equals(språkkode)) {
-            return BaseDokument.Lokale.BOKMÅL;
-        } else {
-            throw new IllegalArgumentException("Utviklerfeil - ugyldig språkkode: " + språkkode.getKode());
-        }
-    }
 
     static VarselbrevDokument mapTilVarselbrevDokument(VarselbrevSamletInfo varselbrevSamletInfo) {
         VarselbrevDokument varselbrevDokument = new VarselbrevDokument();
