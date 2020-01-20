@@ -134,6 +134,23 @@ public class KravgrunnlagTestBuilder {
         }
     }
 
+    public Kravgrunnlag431 lagreKravgrunnlag(Long behandlingId, List<KgPeriode> perioder) {
+        Kravgrunnlag431 kg = lagKravgrunnlag();
+        for (KgPeriode p : perioder) {
+            KravgrunnlagPeriode432 kgPeriode = new KravgrunnlagPeriode432.Builder()
+                .medPeriode(p.getPeriode())
+                .medBeløpSkattMnd(p.getSkatteprosent())
+                .medKravgrunnlag431(kg)
+                .build();
+            for (KgBeløp kgBeløp : p.getBeløpene()) {
+                kgPeriode.leggTilBeløp(kgBeløp.mapTilØkonomi(kgPeriode));
+            }
+            kg.leggTilPeriode(kgPeriode);
+        }
+        kravgrunnlagRepository.lagre(behandlingId, kg);
+        return kg;
+    }
+
     public Kravgrunnlag431 lagreKravgrunnlag(Long behandlingId, Map<Periode, List<KgBeløp>> beløp, Map<Periode, Integer> skattBeløpMnd) {
         Kravgrunnlag431 kg = lagKravgrunnlag(beløp, skattBeløpMnd::get);
         kravgrunnlagRepository.lagre(behandlingId, kg);
@@ -186,5 +203,30 @@ public class KravgrunnlagTestBuilder {
             .medUtbetIdType(GjelderType.PERSON)
             .build();
     }
+
+    public static class KgPeriode {
+        private Periode periode;
+        private List<KgBeløp> beløpene;
+        private BigDecimal skatteprosent;
+
+        public KgPeriode(Periode periode, List<KgBeløp> beløpene, BigDecimal skatteprosent) {
+            this.periode = periode;
+            this.beløpene = beløpene;
+            this.skatteprosent = skatteprosent;
+        }
+
+        public Periode getPeriode() {
+            return periode;
+        }
+
+        public List<KgBeløp> getBeløpene() {
+            return beløpene;
+        }
+
+        public BigDecimal getSkatteprosent() {
+            return skatteprosent;
+        }
+    }
+
 
 }
