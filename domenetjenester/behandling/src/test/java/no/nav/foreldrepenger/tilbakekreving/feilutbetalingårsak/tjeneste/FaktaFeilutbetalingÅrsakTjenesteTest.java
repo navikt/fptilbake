@@ -47,15 +47,7 @@ public class FaktaFeilutbetalingÅrsakTjenesteTest {
             HendelseType.FP_KUN_RETT_TYPE,
             HendelseType.FP_UTTAK_ALENEOMSORG_TYPE,
             HendelseType.FP_UTTAK_GRADERT_TYPE,
-            HendelseType.ØKONOMI_FEIL,
             HendelseType.FP_ANNET_HENDELSE_TYPE
-        );
-
-        assertThat(mapAvResultat.get(HendelseType.ØKONOMI_FEIL)).containsExactly(
-            ØkonomiUndertyper.DOBBELTUTBETALING,
-            ØkonomiUndertyper.FOR_MYE_UTBETALT,
-            ØkonomiUndertyper.FEIL_TREKK,
-            ØkonomiUndertyper.FEIL_FERIEPENGER
         );
 
         assertThat(mapAvResultat.get(HendelseType.MEDLEMSKAP_TYPE)).containsExactly(
@@ -147,7 +139,6 @@ public class FaktaFeilutbetalingÅrsakTjenesteTest {
             HendelseType.SVP_BEREGNING_TYPE,
             HendelseType.SVP_UTTAK_TYPE,
             HendelseType.SVP_OPPHØR,
-            HendelseType.ØKONOMI_FEIL,
             HendelseType.SVP_ANNET_TYPE
         );
 
@@ -157,13 +148,6 @@ public class FaktaFeilutbetalingÅrsakTjenesteTest {
             MedlemskapHendelseUndertyper.IKKE_OPPHOLDSRETT_EØS,
             MedlemskapHendelseUndertyper.IKKE_LOVLIG_OPPHOLD,
             MedlemskapHendelseUndertyper.MEDLEM_I_ANNET_LAND
-        );
-
-        assertThat(mapAvResultat.get(HendelseType.ØKONOMI_FEIL)).containsExactly(
-            ØkonomiUndertyper.DOBBELTUTBETALING,
-            ØkonomiUndertyper.FOR_MYE_UTBETALT,
-            ØkonomiUndertyper.FEIL_TREKK,
-            ØkonomiUndertyper.FEIL_FERIEPENGER
         );
 
         assertThat(mapAvResultat.get(HendelseType.SVP_OPPHØR)).containsExactly(
