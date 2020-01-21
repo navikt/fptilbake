@@ -1,8 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingFeil;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollTjeneste;
@@ -14,11 +11,13 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
 @ApplicationScoped
 public class HenleggBehandlingTjeneste {
@@ -26,7 +25,6 @@ public class HenleggBehandlingTjeneste {
     private BehandlingRepository behandlingRepository;
     private KravgrunnlagRepository grunnlagRepository;
     private EksternBehandlingRepository eksternBehandlingRepository;
-    private VarselRepository varselRepository;
     private ProsessTaskRepository prosessTaskRepository;
     private BrevSporingRepository brevSporingRepository;
 
@@ -47,7 +45,6 @@ public class HenleggBehandlingTjeneste {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
-        this.varselRepository = repositoryProvider.getVarselRepository();
         this.brevSporingRepository = repositoryProvider.getBrevSporingRepository();
         this.prosessTaskRepository = prosessTaskRepository;
 
@@ -90,7 +87,7 @@ public class HenleggBehandlingTjeneste {
     }
 
     private boolean kanSendeHenleggelsebrev(long behandlingId) {
-        return varselRepository.finnVarsel(behandlingId).isPresent() && brevSporingRepository.harVarselBrevSendtForBehandlingId(behandlingId);
+        return brevSporingRepository.harVarselBrevSendtForBehandlingId(behandlingId);
     }
 
     private void opprettHistorikkinnslag(Behandling behandling, BehandlingResultatType årsakKode, String begrunnelse) {

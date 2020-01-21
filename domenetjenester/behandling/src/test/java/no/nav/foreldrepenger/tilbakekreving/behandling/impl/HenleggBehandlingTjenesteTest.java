@@ -56,7 +56,6 @@ public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
     private BehandlingModell modell = mock(BehandlingModell.class);
 
     private AksjonspunktRepository aksjonspunktRepository;
-    private EksternBehandlingRepository eksternBehandlingRepository;
 
     private InternalManipulerBehandling manipulerInternBehandling;
 
@@ -75,7 +74,6 @@ public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
         when(mockBehandlingModellRepository.getModell(any())).thenReturn(modell);
         when(modell.erStegAFørStegB(any(), any())).thenReturn(true);
 
-        eksternBehandlingRepository = repoProvider.getEksternBehandlingRepository();
         aksjonspunktRepository = repoProvider.getAksjonspunktRepository();
         brevSporingRepository = repoProvider.getBrevSporingRepository();
 
@@ -172,7 +170,6 @@ public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
     @Test
     public void kan_sende_henleggelsesbrev_hvis_varselbrev_er_sendt() {
         JournalpostId journalpostId = new JournalpostId("123");
-        varselRepository.lagre(internBehandlingId, "hello", 1000l);
         BrevSporing henleggelsesBrevsporing = new BrevSporing.Builder()
             .medBehandlingId(internBehandlingId)
             .medJournalpostId(journalpostId)
