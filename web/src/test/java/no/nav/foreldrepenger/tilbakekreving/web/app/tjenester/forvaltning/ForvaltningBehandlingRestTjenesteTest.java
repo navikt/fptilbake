@@ -118,7 +118,7 @@ public class ForvaltningBehandlingRestTjenesteTest {
     @Test
     public void skal_ikke_tvinge_koble_grunnlag_når_behandling_er_ikke_på_vent_på_tilbakekrevingsgrunnlag() {
         Behandling behandling = lagBehandling();
-        behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(behandling, AksjonspunktDefinisjon.SEND_VARSEL, FPDateUtil.nå().plusDays(3), Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING);
+        behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, FPDateUtil.nå().plusDays(3), Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING);
 
         Response response = forvaltningBehandlingRestTjeneste.tvingkobleBehandlingTilGrunnlag(new KobleBehandlingTilGrunnlagDto(behandling.getId(), 1l));
         assertThat(response.getStatus()).isEqualTo(Response.Status.BAD_REQUEST.getStatusCode());

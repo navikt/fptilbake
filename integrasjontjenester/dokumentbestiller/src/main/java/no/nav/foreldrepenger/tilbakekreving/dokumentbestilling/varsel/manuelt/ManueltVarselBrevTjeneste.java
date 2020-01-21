@@ -11,8 +11,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositor
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VarselbrevSporing;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VarselbrevSporingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporing;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.dokumentbestiller.DokumentMalType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
@@ -43,7 +44,7 @@ public class ManueltVarselBrevTjeneste {
     private FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste;
     private FritekstbrevTjeneste bestillDokumentTjeneste;
     private HistorikkinnslagTjeneste historikkinnslagTjeneste;
-    private VarselbrevSporingRepository varselbrevSporingRepository;
+    private BrevSporingRepository brevSporingRepository;
 
     ManueltVarselBrevTjeneste() {
         // for CDI
@@ -57,7 +58,7 @@ public class ManueltVarselBrevTjeneste {
                                      HistorikkinnslagTjeneste historikkinnslagTjeneste) {
         this.varselRepository = repositoryProvider.getVarselRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
-        this.varselbrevSporingRepository = repositoryProvider.getVarselbrevSporingRepository();
+        this.brevSporingRepository = repositoryProvider.getBrevSporingRepository();
 
         this.eksternDataForBrevTjeneste = eksternDataForBrevTjeneste;
         this.faktaFeilutbetalingTjeneste = faktaFeilutbetalingTjeneste;
@@ -171,12 +172,13 @@ public class ManueltVarselBrevTjeneste {
     }
 
     private void lagreInfoOmVarselbrev(Long behandlingId, JournalpostIdOgDokumentId dokumentreferanse) {
-        VarselbrevSporing varselbrevSporing = new VarselbrevSporing.Builder()
+        BrevSporing brevSporing = new BrevSporing.Builder()
             .medBehandlingId(behandlingId)
             .medDokumentId(dokumentreferanse.getDokumentId())
             .medJournalpostId(dokumentreferanse.getJournalpostId())
+            .medBrevType(BrevType.VARSEL_BREV)
             .build();
-        varselbrevSporingRepository.lagreVarselbrevData(varselbrevSporing);
+        brevSporingRepository.lagre(brevSporing);
     }
 
     private void lagreInfoOmVarselSendt(Long behandlingId, String varseltTekst, Long varseltBeløp) {

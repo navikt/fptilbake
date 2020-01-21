@@ -357,7 +357,7 @@ public class TilbakekrevingVedtakPeriodeBeregner {
     }
 
     private static BigDecimal beregnSkattBeløp(BigDecimal bruttoTilbakekrevesBeløp, BigDecimal skattProsent) {
-        return bruttoTilbakekrevesBeløp.multiply(skattProsent).divide(BigDecimal.valueOf(100), 0, RoundingMode.HALF_DOWN);
+        return bruttoTilbakekrevesBeløp.multiply(skattProsent).divide(BigDecimal.valueOf(100), 0, RoundingMode.DOWN);
     }
 
     private static Map<YearMonth, BigDecimal> initMuligSkattetrekk(List<KravgrunnlagPeriode432> kgPerioder) {

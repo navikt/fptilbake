@@ -5,7 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -31,13 +30,12 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VarselbrevSporing;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VarselbrevSporingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporing;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstOppsummering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevSporing;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevSporingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
@@ -104,8 +102,7 @@ public class VedtaksbrevTjeneste {
     private VurdertForeldelseRepository foreldelseRepository;
     private VilkårsvurderingRepository vilkårsvurderingRepository;
     private VedtaksbrevFritekstRepository vedtaksbrevFritekstRepository;
-    private VarselbrevSporingRepository varselbrevSporingRepository;
-    private VedtaksbrevSporingRepository vedtaksbrevSporingRepository;
+    private BrevSporingRepository brevSporingRepository;
 
     private BehandlingTjeneste behandlingTjeneste;
     private FritekstbrevTjeneste bestillDokumentTjeneste;
@@ -132,8 +129,7 @@ public class VedtaksbrevTjeneste {
         this.foreldelseRepository = behandlingRepositoryProvider.getVurdertForeldelseRepository();
         this.vilkårsvurderingRepository = behandlingRepositoryProvider.getVilkårsvurderingRepository();
         this.vedtaksbrevFritekstRepository = behandlingRepositoryProvider.getVedtaksbrevFritekstRepository();
-        this.varselbrevSporingRepository = behandlingRepositoryProvider.getVarselbrevSporingRepository();
-        this.vedtaksbrevSporingRepository = behandlingRepositoryProvider.getVedtaksbrevSporingRepository();
+        this.brevSporingRepository = behandlingRepositoryProvider.getBrevSporingRepository();
 
         this.behandlingTjeneste = behandlingTjeneste;
         this.bestillDokumentTjeneste = bestillDokumentTjeneste;
@@ -228,12 +224,13 @@ public class VedtaksbrevTjeneste {
     }
 
     private void lagreInfoOmVedtaksbrev(Long behandlingId, JournalpostIdOgDokumentId dokumentreferanse) {
-        VedtaksbrevSporing vedtaksbrevSporing = new VedtaksbrevSporing.Builder()
+        BrevSporing brevSporing = new BrevSporing.Builder()
             .medBehandlingId(behandlingId)
             .medDokumentId(dokumentreferanse.getDokumentId())
             .medJournalpostId(dokumentreferanse.getJournalpostId())
+            .medBrevType(BrevType.VEDTAK_BREV)
             .build();
-        vedtaksbrevSporingRepository.lagreVedtaksbrevData(vedtaksbrevSporing);
+        brevSporingRepository.lagre(brevSporing);
     }
 
     public VedtaksbrevData hentDataForVedtaksbrev(Long behandlingId) {
@@ -318,9 +315,8 @@ public class VedtaksbrevTjeneste {
     }
 
     private LocalDate finnVarsletDato(Long behandlingId) {
-        List<VarselbrevSporing> varselbrevData = varselbrevSporingRepository.hentVarselbrevData(behandlingId);
-        Optional<LocalDateTime> nyesteVarselbrevTidspunkt = VedtaksbrevUtil.finnNyesteVarselbrevTidspunkt(varselbrevData);
-        return nyesteVarselbrevTidspunkt.map(LocalDateTime::toLocalDate).orElse(null);
+        Optional<BrevSporing> varselbrevData = brevSporingRepository.hentSistSendtVarselbrev(behandlingId);
+        return varselbrevData.map(brevSporing -> brevSporing.getOpprettetTidspunkt().toLocalDate()).orElse(null);
     }
 
     private Long finnVarsletBeløp(Long behandlingId) {

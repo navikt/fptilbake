@@ -67,6 +67,17 @@ public class VilkårsvurderingTestBuilder {
             return vurdering;
         }
 
+        public static VVurdering grovtUaktsom(int andel) {
+            VVurdering vurdering = new VVurdering();
+            vurdering.aktsomhet = VilkårVurderingAktsomhetEntitet.builder()
+                .medBegrunnelse("foo")
+                .medAktsomhet(Aktsomhet.SIMPEL_UAKTSOM)
+                .medIleggRenter(false)
+                .medSærligGrunnerTilReduksjon(true)
+                .medProsenterSomTilbakekreves(BigDecimal.valueOf(andel));
+            return vurdering;
+        }
+
         public static VVurdering forsett() {
             VVurdering vurdering = new VVurdering();
             vurdering.aktsomhet = VilkårVurderingAktsomhetEntitet.builder()

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -37,9 +38,12 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.tjeneste.TbkBeløp;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
+import no.nav.vedtak.util.Objects;
 
 @RunWith(CdiRunner.class)
 public class TilbakekrevingVedtakPeriodeBeregnerTest {
+
+    public static final DateTimeFormatter DATO_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @Rule
     public UnittestRepositoryRule repositoryRule = new UnittestRepositoryRule();
@@ -489,6 +493,78 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
             TilbakekrevingPeriode.med(mars).medRenter(0)
                 .medBeløp(TbkBeløp.feil(1))
                 .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(1).medTilbakekrevBeløp(1).medUinnkrevdBeløp(0).medSkattBeløp(0)));
+    }
+
+
+    static KravgrunnlagTestBuilder.KgPeriode grunnlagPeriode(String periodeTekst, int utbetalt, int nytt, int tilbakekreves, String skatteprosent, int maxSkattMnd) {
+        Periode periode = parsePeriode(periodeTekst);
+        Objects.check(tilbakekreves == utbetalt - nytt, "Tilbakekreves er feil");
+        List<KgBeløp> kgBeløp = Arrays.asList(
+            KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(utbetalt).medNyttBeløp(nytt).medTilbakekrevBeløp(tilbakekreves).medSkattProsent(new BigDecimal(skatteprosent)),
+            KgBeløp.feil(tilbakekreves).medSkattProsent(new BigDecimal(skatteprosent)));
+        return new KravgrunnlagTestBuilder.KgPeriode(periode, kgBeløp, BigDecimal.valueOf(maxSkattMnd));
+    }
+
+    static Periode parsePeriode(String input) {
+        String[] split = input.split(",");
+        return Periode.of(parse(split[0]), parse(split[1]));
+    }
+
+    static LocalDate parse(String input) {
+        return LocalDate.parse(input, DATO_FORMATTER);
+    }
+
+    @Test
+    public void skal_ikke_kreve_høyere_skatt_i_måneden_enn_grensen_case_fra_testmiljø_som_trigget_en_feil_her() {
+        Behandling behandling = simple.lagre(behandlingRepositoryProvider);
+        Long behandlingId = behandling.getId();
+        List<KravgrunnlagTestBuilder.KgPeriode> kgData = Arrays.asList(
+            grunnlagPeriode("2019-04-23,2019-04-30", 5526, 3690, 1836, "21.9869", 404),
+            grunnlagPeriode("2019-05-01,2019-05-15", 10131, 6765, 3366, "21.9987", 1548),
+            grunnlagPeriode("2019-05-16,2019-05-31", 11052, 7380, 3672, "21.9987", 1548),
+            grunnlagPeriode("2019-06-01,2019-06-26", 16578, 11070, 5508, "21.9978", 1346),
+            grunnlagPeriode("2019-06-27,2019-06-30", 1842, 1230, 612, "21.9978", 1346),
+            grunnlagPeriode("2019-07-01,2019-07-31", 21183, 14145, 7038, "21.9987", 1548),
+            grunnlagPeriode("2019-08-01,2019-08-31", 20262, 13530, 6732, "21.9968", 1481),
+            grunnlagPeriode("2019-09-01,2019-09-25", 16578, 11070, 5508, "21.9998", 1414),
+            grunnlagPeriode("2019-09-26,2019-09-30", 2763, 1845, 918, "21.9998", 1414),
+            grunnlagPeriode("2019-10-01,2019-10-31", 21183, 14145, 7038, "21.9987", 1548),
+            grunnlagPeriode("2019-11-01,2019-11-30", 19341, 12915, 6426, "21.9998", 1414),
+            grunnlagPeriode("2019-12-01,2019-12-31", 20262, 13530, 6732, "10.9959", 740));
+
+        Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, kgData);
+
+        VilkårsvurderingTestBuilder.medRepo(vilkårsvurderingRepository).lagre(behandlingId, Map.of(
+            parsePeriode("2019-04-23,2019-05-08"), VilkårsvurderingTestBuilder.VVurdering.grovtUaktsom(77),
+            parsePeriode("2019-05-09,2019-12-31"), VilkårsvurderingTestBuilder.VVurdering.forsett())
+        );
+
+        flushAndClear();
+
+        List<TilbakekrevingPeriode> resultat = beregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
+
+        //fordeling av skatt mellom perioder er ikke kritisk, men sum pr måned MÅ være under grensen for måneden
+        assertThat(resultat).containsOnly(
+            tilbakekrevingPeriode("2019-04-23,2019-04-30", 5526, 3690, 1413, 0, 310),
+            tilbakekrevingPeriode("2019-05-01,2019-05-08", 5526, 3690, 1414, 0, 311),
+            tilbakekrevingPeriode("2019-05-09,2019-05-15", 4605, 3075, 1530, 153, 337),
+            tilbakekrevingPeriode("2019-05-16,2019-05-31", 11052, 7380, 3672, 367, 808),
+            tilbakekrevingPeriode("2019-06-01,2019-06-26", 16578, 11070, 5508, 551, 1212),
+            tilbakekrevingPeriode("2019-06-27,2019-06-30", 1842, 1230, 612, 61, 134),
+            tilbakekrevingPeriode("2019-07-01,2019-07-31", 21183, 14145, 7038, 704, 1548),
+            tilbakekrevingPeriode("2019-08-01,2019-08-31", 20262, 13530, 6732, 673, 1481),
+            tilbakekrevingPeriode("2019-09-01,2019-09-25", 16578, 11070, 5508, 551, 1212),
+            tilbakekrevingPeriode("2019-09-26,2019-09-30", 2763, 1845, 918, 92, 202),
+            tilbakekrevingPeriode("2019-10-01,2019-10-31", 21183, 14145, 7038, 704, 1548),
+            tilbakekrevingPeriode("2019-11-01,2019-11-30", 19341, 12915, 6426, 643, 1413),
+            tilbakekrevingPeriode("2019-12-01,2019-12-31", 20262, 13530, 6732, 673, 740));
+    }
+
+    static TilbakekrevingPeriode tilbakekrevingPeriode(String periode, int utbetalt, int nytt, int tilbakekreves, int renter, int skattbeløp) {
+        Periode p = parsePeriode(periode);
+        return TilbakekrevingPeriode.med(p).medRenter(renter)
+            .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(utbetalt).medNyttBeløp(nytt).medTilbakekrevBeløp(tilbakekreves).medUinnkrevdBeløp(utbetalt - nytt - tilbakekreves).medSkattBeløp(skattbeløp))
+            .medBeløp(TbkBeløp.feil(utbetalt - nytt));
     }
 
     @Test

@@ -14,8 +14,7 @@
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstOppsummering"/>
 
     <!-- sporing -->
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VarselbrevSporing"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevSporing"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporing"/>
 
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons.Varselrespons"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselInfo"/>
@@ -23,6 +22,7 @@
 
     <!-- kodeverk -->
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.dokumentbestiller.DokumentMalType"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevType"/>
 
 
 </entity-mappings>

@@ -8,9 +8,10 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VarselbrevSporing;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VarselbrevSporingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporing;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
@@ -21,7 +22,7 @@ public class VarselSelvbetjeningTjeneste {
 
     private static final Logger logger = LoggerFactory.getLogger(VarselSelvbetjeningTjeneste.class);
 
-    private VarselbrevSporingRepository varselbrevSporingRepository;
+    private BrevSporingRepository brevSporingRepository;
     private BehandlingRepository behandlingRepository;
     private BeskjedUtsendtVarselTilSelvbetjeningMeldingProducer meldingProducer;
 
@@ -30,15 +31,15 @@ public class VarselSelvbetjeningTjeneste {
     }
 
     @Inject
-    public VarselSelvbetjeningTjeneste(VarselbrevSporingRepository varselbrevSporingRepository, BehandlingRepository behandlingRepository, BeskjedUtsendtVarselTilSelvbetjeningMeldingProducer meldingProducer) {
-        this.varselbrevSporingRepository = varselbrevSporingRepository;
-        this.behandlingRepository = behandlingRepository;
+    public VarselSelvbetjeningTjeneste(BehandlingRepositoryProvider repositoryProvider, BeskjedUtsendtVarselTilSelvbetjeningMeldingProducer meldingProducer) {
+        this.brevSporingRepository = repositoryProvider.getBrevSporingRepository();
+        this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.meldingProducer = meldingProducer;
     }
 
     public void sendBeskjedOmUtsendtVarsel(Long behandlingId) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-        VarselbrevSporing varselSporing = varselbrevSporingRepository.hentSistSendtVarselbrev(behandlingId).orElseThrow();
+        BrevSporing varselSporing = brevSporingRepository.hentSistSendtVarselbrev(behandlingId).orElseThrow();
 
         Fagsak fagsak = behandling.getFagsak();
         Saksnummer saksnummer = fagsak.getSaksnummer();
