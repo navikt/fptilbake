@@ -191,15 +191,14 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         );
     }
 
-    @Test
-    public void skal_fordele_på_ulike_klassekoder() {
+    public void skal_fordele_på_ulike_klassekoder_med_ulik_skatt() {
         Behandling behandling = simple.lagre(behandlingRepositoryProvider);
         Long behandlingId = behandling.getId();
 
         Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
             uke1, Arrays.asList(
                 KgBeløp.feil(2500),
-                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medSkattProsent(0),
+                KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medSkattProsent(25),
                 KgBeløp.ytelse(KlasseKode.FPSNDFI).medUtbetBeløp(1500).medTilbakekrevBeløp(1500).medSkattProsent(0))
         ));
 
@@ -213,7 +212,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         assertThat(resultat).containsOnly(
             TilbakekrevingPeriode.med(uke1).medRenter(250)
                 .medBeløp(TbkBeløp.feil(2500))
-                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medUinnkrevdBeløp(0).medSkattBeløp(0))
+                .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medUinnkrevdBeløp(0).medSkattBeløp(250))
                 .medBeløp(TbkBeløp.ytelse(KlasseKode.FPSNDFI).medNyttBeløp(0).medUtbetBeløp(1500).medTilbakekrevBeløp(1500).medUinnkrevdBeløp(0).medSkattBeløp(0))
         );
     }
