@@ -19,7 +19,7 @@ import no.nav.foreldrepenger.tilbakekreving.avstemming.AvstemmingTjeneste;
 @ApplicationScoped
 public class AvstemmingBatchTjeneste implements BatchTjeneste {
 
-    private Logger logger = LoggerFactory.getLogger(AvstemmingTjeneste.class);
+    private Logger logger = LoggerFactory.getLogger(AvstemmingBatchTjeneste.class);
     private static final String BATCHNAVN = "BFPT-001";
 
     private AvstemmingTjeneste avstemmingTjeneste;
