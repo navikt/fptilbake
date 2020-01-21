@@ -12,7 +12,7 @@ public class HbKonfigurasjon {
 
     @JsonProperty("fire-rettsgebyr")
     @JsonSerialize(using = BigDecimalHeltallSerialiserer.class)
-    private BigDecimal fireRettsgebyr = BigDecimal.valueOf(4600);  //FIXME fjerne hardkoding
+    private BigDecimal fireRettsgebyr = BigDecimal.valueOf(4600);
     @JsonProperty("halvt-grunnbeløp")
     @JsonSerialize(using = BigDecimalHeltallSerialiserer.class)
     private BigDecimal halvtGrunnbeløp = BigDecimal.valueOf(49929);  //FIXME fjerne hardkoding

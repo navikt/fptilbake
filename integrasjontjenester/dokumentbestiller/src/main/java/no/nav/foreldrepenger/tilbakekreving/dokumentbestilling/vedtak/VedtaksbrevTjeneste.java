@@ -81,6 +81,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbVedtaksbrevPeriode;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbVurderinger;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
+import no.nav.foreldrepenger.tilbakekreving.felles.Rettsgebyr;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SøknadType;
@@ -113,6 +114,7 @@ public class VedtaksbrevTjeneste {
     private JournalføringTjeneste journalføringTjeneste;
 
     private Unleash unleash;
+    private Integer rettsgebyr;
 
     @Inject
     public VedtaksbrevTjeneste(BehandlingRepositoryProvider behandlingRepositoryProvider,
@@ -121,7 +123,8 @@ public class VedtaksbrevTjeneste {
                                EksternDataForBrevTjeneste eksternDataForBrevTjeneste,
                                FritekstbrevTjeneste bestillDokumentTjeneste,
                                HistorikkinnslagTjeneste historikkinnslagTjeneste,
-                               JournalføringTjeneste journalføringTjeneste, Unleash unleash) {
+                               JournalføringTjeneste journalføringTjeneste,
+                               Unleash unleash) {
         this.behandlingRepository = behandlingRepositoryProvider.getBehandlingRepository();
         this.eksternBehandlingRepository = behandlingRepositoryProvider.getEksternBehandlingRepository();
         this.varselRepository = behandlingRepositoryProvider.getVarselRepository();
@@ -138,6 +141,7 @@ public class VedtaksbrevTjeneste {
         this.eksternDataForBrevTjeneste = eksternDataForBrevTjeneste;
         this.journalføringTjeneste = journalføringTjeneste;
         this.unleash = unleash;
+        this.rettsgebyr = new Rettsgebyr().getGebyr();
     }
 
     public VedtaksbrevTjeneste() {
@@ -283,6 +287,7 @@ public class VedtaksbrevTjeneste {
                 .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(totaltTilbakekrevesBeløpMedRenterUtenSkatt)
                 .build())
             .medKonfigurasjon(HbKonfigurasjon.builder()
+                .medFireRettsgebyr(new BigDecimal(rettsgebyr*4))
                 .medKlagefristUker(KLAGEFRIST_UKER)
                 .build())
             .medDatoer(HbVedtaksbrevDatoer.builder()

@@ -18,10 +18,10 @@ import javax.ws.rs.QueryParam;
 
 import io.swagger.v3.oas.annotations.Operation;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.vilkårsvurdering.VilkårsvurderingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.felles.Rettsgebyr;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.DetaljerteFeilutbetalingsperioderDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.VilkårsvurderteDto;
-import no.nav.vedtak.konfig.KonfigVerdi;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 
 @Path(VilkårsvurderingRestTjeneste.PATH_FRAGMENT)
@@ -39,9 +39,9 @@ public class VilkårsvurderingRestTjeneste {
     }
 
     @Inject
-    public VilkårsvurderingRestTjeneste(VilkårsvurderingTjeneste vilkårsvurderingTjeneste, @KonfigVerdi(value = "rettsgebyr") Integer rettsgebyr) {
+    public VilkårsvurderingRestTjeneste(VilkårsvurderingTjeneste vilkårsvurderingTjeneste) {
         this.vilkårsvurderingTjeneste = vilkårsvurderingTjeneste;
-        this.rettsgebyr = rettsgebyr;
+        this.rettsgebyr = new Rettsgebyr().getGebyr();
     }
 
     @GET
