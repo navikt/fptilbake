@@ -21,28 +21,20 @@ import no.nav.foreldrepenger.domene.dokumentarkiv.journal.JournalTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FaktaFeilutbetalingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BehandlingFeilutbetalingFakta;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.UtbetaltPeriode;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.AdresseType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.NavBrukerKjønn;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.dokumentbestiller.DokumentMalType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselInfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.DokumentBestillerTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.EksternDataForBrevTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.YtelseNavn;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.JournalpostIdOgDokumentId;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.vedtak.util.FPDateUtil;
 
@@ -99,7 +91,7 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
         assertThat(varsel.getVarselBeløp()).isEqualTo(9000l);
         assertThat(varsel.isAktiv()).isTrue();
 
-        assertThat(varselbrevSporingRepository.harVarselBrevSendtForBehandlingId(behandlingId)).isTrue();
+        assertThat(brevSporingRepository.harVarselBrevSendtForBehandlingId(behandlingId)).isTrue();
 
         List<Historikkinnslag> historikkInnslager = repositoryProvider.getHistorikkRepository().hentHistorikk(behandlingId);
         assertThat(historikkInnslager.size()).isEqualTo(1);
@@ -121,7 +113,7 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
         assertThat(varsel.getVarselBeløp()).isEqualTo(9000l);
         assertThat(varsel.isAktiv()).isTrue();
 
-        assertThat(varselbrevSporingRepository.harVarselBrevSendtForBehandlingId(behandlingId)).isTrue();
+        assertThat(brevSporingRepository.harVarselBrevSendtForBehandlingId(behandlingId)).isTrue();
 
         List<Historikkinnslag> historikkInnslager = repositoryProvider.getHistorikkRepository().hentHistorikk(behandlingId);
         assertThat(historikkInnslager.size()).isEqualTo(2);
@@ -156,41 +148,5 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
         return BehandlingFeilutbetalingFakta.builder().medAktuellFeilUtbetaltBeløp(BigDecimal.valueOf(9000))
             .medPerioder(Lists.newArrayList(utbetaltPeriode))
             .medDatoForRevurderingsvedtak(FPDateUtil.iDag()).build();
-    }
-
-    private JournalpostIdOgDokumentId lagJournalOgDokument() {
-        JournalpostId journalpostId = new JournalpostId(12344l);
-        return new JournalpostIdOgDokumentId(journalpostId, "qwr12334");
-    }
-
-    private YtelseNavn lagYtelseNavn(String navnPåBrukersSpråk, String navnPåBokmål) {
-        YtelseNavn ytelseNavn = new YtelseNavn();
-        ytelseNavn.setNavnPåBrukersSpråk(navnPåBrukersSpråk);
-        ytelseNavn.setNavnPåBokmål(navnPåBokmål);
-        return ytelseNavn;
-    }
-
-    private Personinfo byggStandardPerson(String navn, String personnummer, Språkkode språkkode) {
-        return new Personinfo.Builder()
-            .medPersonIdent(PersonIdent.fra(personnummer))
-            .medNavn(navn)
-            .medAktørId(new AktørId(9000000030014L))
-            .medFødselsdato(LocalDate.of(1990, 2, 2))
-            .medNavBrukerKjønn(NavBrukerKjønn.KVINNE)
-            .medForetrukketSpråk(språkkode)
-            .build();
-    }
-
-    private Adresseinfo lagStandardNorskAdresse() {
-        return new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE,
-            new PersonIdent("12345678901"),
-            "Jens Trallala", null)
-            .medAdresselinje1("adresselinje 1")
-            .medAdresselinje2("adresselinje 2")
-            .medAdresselinje3("adresselinje 3")
-            .medLand("NOR")
-            .medPostNr("0688")
-            .medPoststed("OSLO")
-            .build();
     }
 }

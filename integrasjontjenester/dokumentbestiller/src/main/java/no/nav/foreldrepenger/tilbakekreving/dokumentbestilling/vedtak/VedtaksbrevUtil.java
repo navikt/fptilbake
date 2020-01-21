@@ -1,27 +1,18 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VarselbrevSporing;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstType;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.PeriodeMedTekstDto;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
-import no.nav.vedtak.felles.jpa.BaseEntitet;
 
 public class VedtaksbrevUtil {
 
     private VedtaksbrevUtil() {
         //for static access
-    }
-
-    public static Optional<LocalDateTime> finnNyesteVarselbrevTidspunkt(List<VarselbrevSporing> utsendteVarselbrev) {
-        return utsendteVarselbrev.stream()
-            .map(BaseEntitet::getOpprettetTidspunkt)
-            .max(LocalDateTime::compareTo);
     }
 
     public static List<PeriodeMedTekstDto> mapFritekstFraDb(List<VedtaksbrevFritekstPeriode> fritekstPerioder) {

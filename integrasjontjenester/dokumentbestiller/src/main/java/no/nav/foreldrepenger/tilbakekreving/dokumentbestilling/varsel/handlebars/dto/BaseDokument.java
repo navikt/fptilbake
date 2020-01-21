@@ -1,5 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.handlebars.dto;
 
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.Lokale;
+
 public class BaseDokument {
 
     private String fagsaktypeNavn;
@@ -8,23 +10,6 @@ public class BaseDokument {
     private boolean svangerskapspenger;
     private boolean isKorrigert;
 
-    public enum Lokale {
-        BOKMÅL("nb_NO"),
-        NYNORSK("nn_NO"),
-        ENGELSK("en_GB");
-
-        private final String tekst;
-
-        Lokale(final String tekst) {
-            this.tekst = tekst;
-        }
-
-        @Override
-        public String toString() {
-            return tekst;
-        }
-    }
-
     Lokale locale = Lokale.ENGELSK;
 
     public void setLocale(Lokale locale) {
@@ -32,7 +17,7 @@ public class BaseDokument {
     }
 
     public String getLocale() {
-        return locale.tekst;
+        return locale.getTekst();
     }
 
     public String getFagsaktypeNavn() {

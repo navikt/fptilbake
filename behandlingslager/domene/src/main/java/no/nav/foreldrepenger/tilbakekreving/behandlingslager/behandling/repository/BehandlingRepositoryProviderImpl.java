@@ -9,9 +9,8 @@ import javax.persistence.EntityManager;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepositoryImpl;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VarselbrevSporingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevSporingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakLåsRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakLåsRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
@@ -51,8 +50,7 @@ public class BehandlingRepositoryProviderImpl implements BehandlingRepositoryPro
     private BehandlingVedtakRepository behandlingVedtakRepository;
     private VarselRepository varselRepository;
     private VedtaksbrevFritekstRepository vedtaksbrevFritekstRepository;
-    private VarselbrevSporingRepository varselbrevSporingRepository;
-    private VedtaksbrevSporingRepository vedtaksbrevSporingRepository;
+    private BrevSporingRepository brevSporingRepository;
 
 
     BehandlingRepositoryProviderImpl() {
@@ -80,8 +78,7 @@ public class BehandlingRepositoryProviderImpl implements BehandlingRepositoryPro
         this.behandlingVedtakRepository = new BehandlingVedtakRepository(entityManager);
         this.varselRepository = new VarselRepository(entityManager);
         this.vedtaksbrevFritekstRepository = new VedtaksbrevFritekstRepository(entityManager);
-        this.varselbrevSporingRepository = new VarselbrevSporingRepository(entityManager);
-        this.vedtaksbrevSporingRepository = new VedtaksbrevSporingRepository(entityManager);
+        this.brevSporingRepository = new BrevSporingRepository(entityManager);
     }
 
     protected EntityManager getEntityManager() {
@@ -170,13 +167,8 @@ public class BehandlingRepositoryProviderImpl implements BehandlingRepositoryPro
     }
 
     @Override
-    public VarselbrevSporingRepository getVarselbrevSporingRepository() {
-        return varselbrevSporingRepository;
-    }
-
-    @Override
-    public VedtaksbrevSporingRepository getVedtaksbrevSporingRepository() {
-        return vedtaksbrevSporingRepository;
+    public BrevSporingRepository getBrevSporingRepository() {
+        return brevSporingRepository;
     }
 
 }
