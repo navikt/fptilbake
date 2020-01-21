@@ -30,6 +30,7 @@ public class HenleggelsesbrevTjeneste {
 
     private static final String OVERSKRIFT_HENLEGGELSESBREV = "NAV har avsluttet saken din om tilbakebetaling";
     private static final String TITTEL_HENLEGGELSESBREV_HISTORIKKINNSLAG = "Henleggelsesbrev tilbakekreving";
+    private static final String TITTEL_HENLEGGELSESBREV = "Informasjon om at tilbakekrevingssaken er henlagt";
 
     private VarselRepository varselRepository;
     private BehandlingRepository behandlingRepository;
@@ -97,6 +98,7 @@ public class HenleggelsesbrevTjeneste {
             .medMottakerAdresse(adresseinfo)
             .medSaksnummer(behandling.getFagsak().getSaksnummer().getVerdi())
             .medSakspartNavn(personinfo.getNavn())
+            .medTittel(TITTEL_HENLEGGELSESBREV)
             .build();
 
         HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = new HenleggelsesbrevSamletInfo();
