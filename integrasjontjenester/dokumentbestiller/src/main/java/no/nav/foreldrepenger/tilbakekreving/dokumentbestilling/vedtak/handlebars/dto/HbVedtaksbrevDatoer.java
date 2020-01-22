@@ -48,7 +48,7 @@ public class HbVedtaksbrevDatoer {
 
             kladd.opphørsdatoDødSøker = getFørsteDagForHendelseUnderType(SvpHendelseUnderTyper.MOTTAKER_DØD, FpHendelseUnderTyper.OPPHOR_MOTTAKER_DOD);
             kladd.opphørsdatoDødtBarn = getFørsteDagForHendelseUnderType(FpHendelseUnderTyper.OPPHOR_BARN_DOD);
-            kladd.opphørsdatoIkkeGravid = getOpphørsdato(SvpHendelseUnderTyper.MOTTAKER_IKKE_GRAVID);
+            kladd.opphørsdatoIkkeGravid = getFørsteDagForHendelseUnderType(SvpHendelseUnderTyper.MOTTAKER_IKKE_GRAVID);
 
             return this;
         }
