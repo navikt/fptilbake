@@ -15,6 +15,7 @@ public class HistorikkOpplysningType extends Kodeliste {
     public static final HistorikkOpplysningType PERIODE_FOM = new HistorikkOpplysningType("PERIODE_FOM");
     public static final HistorikkOpplysningType PERIODE_TOM = new HistorikkOpplysningType("PERIODE_TOM");
     public static final HistorikkOpplysningType TILBAKEKREVING_OPPFYLT_BEGRUNNELSE = new HistorikkOpplysningType("TILBAKEKREVING_OPPFYLT_BEGRUNNELSE");
+    public static final HistorikkOpplysningType SÆRLIG_GRUNNER_BEGRUNNELSE = new HistorikkOpplysningType("SÆRLIG_GRUNNER_BEGRUNNELSE");
     public static final HistorikkOpplysningType KRAVGRUNNLAG_VEDTAK_ID = new HistorikkOpplysningType("KRAVGRUNNLAG_VEDTAK_ID");
     public static final HistorikkOpplysningType KRAVGRUNNLAG_STATUS = new HistorikkOpplysningType("KRAVGRUNNLAG_STATUS");
 

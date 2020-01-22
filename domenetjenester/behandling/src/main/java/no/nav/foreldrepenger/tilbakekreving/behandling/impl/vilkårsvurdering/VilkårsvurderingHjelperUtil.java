@@ -55,7 +55,8 @@ public class VilkårsvurderingHjelperUtil {
                 .medProsenterSomTilbakekreves(aktsomhetInfo.isHarGrunnerTilReduksjon() ? aktsomhetInfo.getAndelTilbakekreves() : null)
                 .medIleggRenter(aktsomhetInfo.isIleggRenter())
                 .medBeløpTilbakekreves(aktsomhetInfo.getTilbakekrevesBelop())
-                .medTilbakekrevSmåBeløp(aktsomhetInfo.isTilbakekrevSelvOmBeloepErUnder4Rettsgebyr()).build();
+                .medTilbakekrevSmåBeløp(aktsomhetInfo.isTilbakekrevSelvOmBeloepErUnder4Rettsgebyr())
+                .medSærligGrunnerBegrunnelse(aktsomhetInfo.getSærligGrunnerBegrunnelse()).build();
 
             for (SærligGrunn grunn : aktsomhetInfo.getSærligeGrunner()) {
                 VilkårVurderingSærligGrunnEntitet særligGrunnEntitet = VilkårVurderingSærligGrunnEntitet.builder()
@@ -87,6 +88,7 @@ public class VilkårsvurderingHjelperUtil {
             aktsomhetDto.setAndelTilbakekreves(aktsomhetEntitet.getProsenterSomTilbakekreves());
             aktsomhetDto.setHarGrunnerTilReduksjon(aktsomhetEntitet.getSærligGrunnerTilReduksjon());
             aktsomhetDto.setTilbakekrevSelvOmBeloepErUnder4Rettsgebyr(aktsomhetEntitet.getTilbakekrevSmåBeløp());
+            aktsomhetDto.setSærligGrunnerBegrunnelse(aktsomhetEntitet.getSærligGrunnerBegrunnelse());
             List<SærligGrunn> særligGrunner = new ArrayList<>();
             for (VilkårVurderingSærligGrunnEntitet grunnEntitet : aktsomhetEntitet.getSærligGrunner()) {
                 særligGrunner.add(grunnEntitet.getGrunn());
