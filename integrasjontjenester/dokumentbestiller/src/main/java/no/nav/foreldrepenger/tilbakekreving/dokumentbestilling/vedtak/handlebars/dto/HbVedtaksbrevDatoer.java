@@ -46,19 +46,23 @@ public class HbVedtaksbrevDatoer {
         public HbVedtaksbrevDatoer.Builder medPerioder(List<HbVedtaksbrevPeriode> perioder) {
             this.perioder = perioder;
 
-            kladd.opphørsdatoDødSøker = getOpphørsdato(SvpHendelseUnderTyper.MOTTAKER_DØD, FpHendelseUnderTyper.OPPHOR_MOTTAKER_DOD);
-            kladd.opphørsdatoDødtBarn = getOpphørsdato(FpHendelseUnderTyper.OPPHOR_BARN_DOD);
+            kladd.opphørsdatoDødSøker = getFørsteDagForHendelseUnderType(SvpHendelseUnderTyper.MOTTAKER_DØD, FpHendelseUnderTyper.OPPHOR_MOTTAKER_DOD);
+            kladd.opphørsdatoDødtBarn = getFørsteDagForHendelseUnderType(FpHendelseUnderTyper.OPPHOR_BARN_DOD);
             kladd.opphørsdatoIkkeGravid = getOpphørsdato(SvpHendelseUnderTyper.MOTTAKER_IKKE_GRAVID);
 
             return this;
         }
 
         private LocalDate getOpphørsdato(HendelseUnderType... hendelseUnderTyper) {
-            LocalDate førsteDagForType = getFørsteDagForHendelseUnderType(Arrays.asList(hendelseUnderTyper));
+            LocalDate førsteDagForType = getFørsteDagForHendelseUnderType(hendelseUnderTyper);
             if (førsteDagForType != null) {
                 return førsteDagForType.minusDays(1);
             }
             return null;
+        }
+
+        private LocalDate getFørsteDagForHendelseUnderType(HendelseUnderType... hendelseUnderTyper) {
+            return getFørsteDagForHendelseUnderType(Arrays.asList(hendelseUnderTyper));
         }
 
         private LocalDate getFørsteDagForHendelseUnderType(List<HendelseUnderType> hendelseUnderTyper) {
