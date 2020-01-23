@@ -2,13 +2,9 @@ package no.nav.foreldrepenger.tilbakekreving.felles;
 
 public class Rettsgebyr {
 
-    private final Integer gebyr;
+    public final static int GEBYR = 1172;
 
-    public Rettsgebyr() {
-        gebyr = Integer.valueOf("1172");
-    }
-
-    public Integer getGebyr() {
-        return gebyr;
+    public int getGebyr() {
+        return GEBYR;
     }
 }

@@ -114,7 +114,6 @@ public class VedtaksbrevTjeneste {
     private JournalføringTjeneste journalføringTjeneste;
 
     private Unleash unleash;
-    private Integer rettsgebyr;
 
     @Inject
     public VedtaksbrevTjeneste(BehandlingRepositoryProvider behandlingRepositoryProvider,
@@ -141,7 +140,6 @@ public class VedtaksbrevTjeneste {
         this.eksternDataForBrevTjeneste = eksternDataForBrevTjeneste;
         this.journalføringTjeneste = journalføringTjeneste;
         this.unleash = unleash;
-        this.rettsgebyr = new Rettsgebyr().getGebyr();
     }
 
     public VedtaksbrevTjeneste() {
@@ -287,7 +285,6 @@ public class VedtaksbrevTjeneste {
                 .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(totaltTilbakekrevesBeløpMedRenterUtenSkatt)
                 .build())
             .medKonfigurasjon(HbKonfigurasjon.builder()
-                .medFireRettsgebyr(new BigDecimal(rettsgebyr*4))
                 .medKlagefristUker(KLAGEFRIST_UKER)
                 .build())
             .medDatoer(HbVedtaksbrevDatoer.builder()
