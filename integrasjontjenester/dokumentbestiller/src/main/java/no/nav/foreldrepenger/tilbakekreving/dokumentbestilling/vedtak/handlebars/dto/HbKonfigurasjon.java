@@ -6,13 +6,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.BigDecimalHeltallSerialiserer;
+import no.nav.foreldrepenger.tilbakekreving.felles.Rettsgebyr;
 import no.nav.vedtak.util.Objects;
 
 public class HbKonfigurasjon {
 
     @JsonProperty("fire-rettsgebyr")
     @JsonSerialize(using = BigDecimalHeltallSerialiserer.class)
-    private BigDecimal fireRettsgebyr = BigDecimal.valueOf(4600);  //FIXME fjerne hardkoding
+    private BigDecimal fireRettsgebyr = BigDecimal.valueOf(Rettsgebyr.GEBYR * 4);
     @JsonProperty("halvt-grunnbeløp")
     @JsonSerialize(using = BigDecimalHeltallSerialiserer.class)
     private BigDecimal halvtGrunnbeløp = BigDecimal.valueOf(49929);  //FIXME fjerne hardkoding
