@@ -1,7 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VedtaksbrevFritekstKonfigurasjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.FellesUndertyper;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Underavsnitt;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbSærligeGrunner;
@@ -32,7 +32,7 @@ public class VedtaksbrevFritekst {
     }
 
     private static FritekstType utledFritekstTypeFakta(HendelseUnderType underType) {
-        return FellesUndertyper.ANNET_FRITEKST.equals(underType) ? FritekstType.PÅKREVET : FritekstType.VALGFRI;
+        return VedtaksbrevFritekstKonfigurasjon.UNDERTYPER_MED_PÅKREVD_FRITEKST.contains(underType) ? FritekstType.PÅKREVET : FritekstType.VALGFRI;
     }
 
     static String markerValgfriFritekst(String fritekst) {
