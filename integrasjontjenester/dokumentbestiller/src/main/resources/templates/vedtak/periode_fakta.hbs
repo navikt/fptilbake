@@ -178,7 +178,7 @@ Du har ikke rett til foreldrepenger i denne perioden. Derfor har du fått {{kron
 Du har kun rett til {{> ytelse-navn}} dersom du har tjent mer enn {{kroner konfigurasjon.halvt-grunnbeløp}} i året{{> før-skatt}}. Inntekten din var lavere enn {{kroner konfigurasjon.halvt-grunnbeløp}} i året{{> før-skatt}}. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
         {{/case}}
         {{#case "ENDRING_GRUNNLAG"}}
-Vi beregnet {{> ytelse-produkt}} dine til [beløp] kroner i året{{> før-skatt}}. Beregningen ble deretter endret [dato] til [beløp] kroner i året{{> før-skatt}}. Du har derfor fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
+Vi har endret beregningen av {{> ytelse-produkt}} dine. Du har derfor fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
         {{/case}}
         {{/switch}}
     {{/case}}
@@ -336,7 +336,7 @@ Arbeidsgiver kunne tilpasse eller endre arbeidsoppgavene dine uten at det var fa
     {{#case "SVP_BEREGNING_TYPE"}}
         {{#switch fakta.hendelseundertype}}
         {{#case "SVP_ENDRING_GRUNNLAG"}}
-Vi beregnet {{> ytelse-produkt}} dine til [beløp] kroner i året{{> før-skatt}}. Beregningen ble deretter endret [dato] til [beløp] kroner i året{{> før-skatt}}. Du har derfor fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
+Vi har endret beregningen av {{> ytelse-produkt}} dine. Du har derfor fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
         {{/case}}
         {{/switch}}
     {{/case}}
