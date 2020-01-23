@@ -70,7 +70,7 @@ public class KravgrunnlagTjenesteTest extends FellesTestOppsett {
     public void lagreTilbakekrevingsgrunnlagFraØkonomi() {
         Kravgrunnlag431 kravgrunnlag = formKravgrunnlagDto(KravStatusKode.NYTT);
         formPerioder(fom, tom, kravgrunnlag);
-        kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(internBehandlingId, kravgrunnlag);
+        kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(internBehandlingId, kravgrunnlag, true);
 
         assertKravgrunnlag();
     }
@@ -79,7 +79,7 @@ public class KravgrunnlagTjenesteTest extends FellesTestOppsett {
     public void lagreTilbakekrevingsgrunnlagFraØkonomi_medEndretGrunnlag() {
         Kravgrunnlag431 kravgrunnlag = formKravgrunnlagDto(KravStatusKode.ENDRET);
         formPerioder(fom, tom, kravgrunnlag);
-        kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(internBehandlingId, kravgrunnlag);
+        kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(internBehandlingId, kravgrunnlag, true);
 
         assertKravgrunnlag();
     }
@@ -88,7 +88,7 @@ public class KravgrunnlagTjenesteTest extends FellesTestOppsett {
     public void lagreTilbakekrevingsgrunnlagFraØkonomi_medEndretGrunnlag_med_allerede_har_grunnlag() {
         Kravgrunnlag431 kravgrunnlag = formKravgrunnlagDto(KravStatusKode.NYTT);
         formPerioder(fom, tom, kravgrunnlag);
-        kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(internBehandlingId, kravgrunnlag);
+        kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(internBehandlingId, kravgrunnlag, true);
 
         FaktaFeilutbetaling faktaFeilutbetaling = lagFaktaFeilutbetaling();
         faktaFeilutbetalingRepository.lagre(internBehandlingId, faktaFeilutbetaling);
@@ -102,7 +102,7 @@ public class KravgrunnlagTjenesteTest extends FellesTestOppsett {
 
         kravgrunnlag = formKravgrunnlagDto(KravStatusKode.ENDRET);
         formPerioder(fom, tom, kravgrunnlag);
-        kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(internBehandlingId, kravgrunnlag);
+        kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(internBehandlingId, kravgrunnlag, true);
 
         assertKravgrunnlag();
         assertThat(faktaFeilutbetalingRepository.finnFaktaOmFeilutbetaling(internBehandlingId)).isEmpty();

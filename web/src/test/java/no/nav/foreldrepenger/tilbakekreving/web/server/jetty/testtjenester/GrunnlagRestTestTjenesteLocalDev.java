@@ -31,6 +31,7 @@ import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagBelop433;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagValidator;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
@@ -63,13 +64,14 @@ public class GrunnlagRestTestTjenesteLocalDev implements GrunnlagRestTestTjenest
 
     @POST
     @Timed
-    @Operation(tags = "kravgrunnlag", description =  "Lagre tilbakekrevingsgrunnlag fra økonomi")
+    @Operation(tags = "kravgrunnlag", description = "Lagre tilbakekrevingsgrunnlag fra økonomi")
     @BeskyttetRessurs(action = UPDATE, ressurs = FAGSAK)
     public Response lagreUtbetalinger(@NotNull @QueryParam("behandlingId") @Valid BehandlingIdDto idDto,
                                       @NotNull @Valid KravgrunnlagDto kravgrunnlagDto) {
 
         Kravgrunnlag431 kravgrunnlag = lagKravgrunnlag(kravgrunnlagDto.getKravGrunnlag());
-        kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(idDto.getBehandlingId(), kravgrunnlag);
+        KravgrunnlagValidator.validerGrunnlag(kravgrunnlag);
+        kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(idDto.getBehandlingId(), kravgrunnlag, true);
         return Response.ok().build();
     }
 

@@ -1,12 +1,11 @@
 package no.nav.foreldrepenger.tilbakekreving.grunnlag;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Optional;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
@@ -14,12 +13,15 @@ import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
-import no.nav.vedtak.feil.Feil;
 
 public class KravgrunnlagValidatorTest {
 
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
     private Kravgrunnlag431 kravgrunnlag = lagKravgrunnlag();
     private BigDecimal maxSkattJanuar = BigDecimal.valueOf(100);
+
 
     @Test
     public void skal_godta_kravgrunnlag_som_er_OK() {
@@ -28,8 +30,7 @@ public class KravgrunnlagValidatorTest {
         BigDecimal skatteprosent = BigDecimal.valueOf(10);
         leggTilFeilutbetaling(kgPeriode, 1000, skatteprosent);
 
-        Optional<Feil> feil = KravgrunnlagValidator.validerGrunnlag(kravgrunnlag);
-        assertThat(feil).isNotPresent();
+         KravgrunnlagValidator.validerGrunnlag(kravgrunnlag);
     }
 
     @Test
@@ -41,9 +42,10 @@ public class KravgrunnlagValidatorTest {
         leggTilFeilutbetaling(kgPeriode1, 1000);
         leggTilFeilutbetaling(kgPeriode2, 1000);
 
-        Optional<Feil> feil = KravgrunnlagValidator.validerGrunnlag(kravgrunnlag);
-        assertThat(feil).isPresent();
-        assertThat(feil.get().getFeilmelding()).contains("Ugyldig kravgrunnlag. Overlappende perioder 01.01.2020-10.01.2020 og 06.01.2020-31.01.2020.");
+        expectedException.expect(KravgrunnlagValidator.UgyldigKravgrunnlagException.class);
+        expectedException.expectMessage("Ugyldig kravgrunnlag. Overlappende perioder 01.01.2020-10.01.2020 og 06.01.2020-31.01.2020.");
+
+        KravgrunnlagValidator.validerGrunnlag(kravgrunnlag);
     }
 
     @Test
@@ -56,10 +58,10 @@ public class KravgrunnlagValidatorTest {
         KravgrunnlagPeriode432 kgPeriode2 = leggTilKravgrunnlagPeriode(kravgrunnlag, periode2, maxSkattJanuar);
         leggTilFeilutbetaling(kgPeriode1, 500, skatteprosent);
         leggTilFeilutbetaling(kgPeriode2, 500, skatteprosent);
+        expectedException.expect(KravgrunnlagValidator.UgyldigKravgrunnlagException.class);
+        expectedException.expectMessage("Ugyldig kravgrunnlag. For måned 2020-01 er maks skatt 299, men maks tilbakekreving ganget med skattesats blir 300");
 
-        Optional<Feil> feil = KravgrunnlagValidator.validerGrunnlag(kravgrunnlag);
-        assertThat(feil).isPresent();
-        assertThat(feil.get().getFeilmelding()).contains("Ugyldig kravgrunnlag. For måned 2020-01 er maks skatt 299, men maks tilbakekreving ganget med skattesats blir 300");
+        KravgrunnlagValidator.validerGrunnlag(kravgrunnlag);
     }
 
     @Test
@@ -73,9 +75,10 @@ public class KravgrunnlagValidatorTest {
         leggTilYtel(kgPeriode, KlasseKode.FPADSND_OP, 100, skattNæringsdrivende);
         leggTilFeil(kgPeriode, 100 + 100 + 1, BigDecimal.ZERO);
 
-        Optional<Feil> feil = KravgrunnlagValidator.validerGrunnlag(kravgrunnlag);
-        assertThat(feil).isPresent();
-        assertThat(feil.get().getFeilmelding()).contains("Ugyldig kravgrunnlag. For periode 01.01.2020-15.01.2020 er sum tilkakekreving fra YTEL 200, mens belopNytt i FEIL er 201. Det er forventet at disse er like.");
+        expectedException.expect(KravgrunnlagValidator.UgyldigKravgrunnlagException.class);
+        expectedException.expectMessage("Ugyldig kravgrunnlag. For periode 01.01.2020-15.01.2020 er sum tilkakekreving fra YTEL 200, mens belopNytt i FEIL er 201. Det er forventet at disse er like.");
+
+        KravgrunnlagValidator.validerGrunnlag(kravgrunnlag);
     }
 
     private void leggTilFeilutbetaling(KravgrunnlagPeriode432 kgPeriode, int feilutbetaltBeløp) {

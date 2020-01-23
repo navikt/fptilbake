@@ -41,7 +41,7 @@ public class GrunnlagRestTestTjenesteTest {
 
         Response response = grunnlagTjeneste.lagreUtbetalinger(new BehandlingIdDto("1"), lagMockKravgrunnlagDto());
         assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_OK);
-        verify(kravgrunnlagTjenesteMock, atLeastOnce()).lagreTilbakekrevingsgrunnlagFraØkonomi(anyLong(), any(Kravgrunnlag431.class));
+        verify(kravgrunnlagTjenesteMock, atLeastOnce()).lagreTilbakekrevingsgrunnlagFraØkonomi(anyLong(), any(Kravgrunnlag431.class), any(boolean.class));
     }
 
     private KravgrunnlagDto lagMockKravgrunnlagDto() throws Exception {

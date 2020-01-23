@@ -35,15 +35,15 @@ public class KravgrunnlagMapperTest extends FellesTestOppsett {
 
         assertThat(oversatt.getPerioder()).hasSize(1);
         KravgrunnlagPeriode432 periode = oversatt.getPerioder().get(0);
-        assertThat(periode.getBeløpSkattMnd()).isEqualByComparingTo(BigDecimal.valueOf(0l));
+        assertThat(periode.getBeløpSkattMnd()).isEqualByComparingTo(BigDecimal.valueOf(4500));
 
         List<KravgrunnlagBelop433> beløpene = periode.getKravgrunnlagBeloper433();
-        assertThat(beløpene).hasSize(1);
-        KravgrunnlagBelop433 beløp = beløpene.get(0);
-        assertThat(beløp.getKlasseType()).isEqualTo(KlasseType.FEIL);
-        assertThat(beløp.getKlasseKode()).isEqualTo("foobar");
-        assertThat(beløp.getNyBelop()).isEqualByComparingTo(BigDecimal.valueOf(9000));
-        assertThat(beløp.getSkattProsent()).isEqualByComparingTo(BigDecimal.valueOf(0l));
+        assertThat(beløpene).hasSize(2);
+        KravgrunnlagBelop433 beløpYTEL = beløpene.stream().filter(b -> b.getKlasseType().equals(KlasseType.FEIL)).findFirst().orElseThrow();
+        assertThat(beløpYTEL.getKlasseType()).isEqualTo(KlasseType.FEIL);
+        assertThat(beløpYTEL.getKlasseKode()).isEqualTo("KL_KODE_FEIL_KORTTID");
+        assertThat(beløpYTEL.getNyBelop()).isEqualByComparingTo(BigDecimal.valueOf(9000));
+        assertThat(beløpYTEL.getSkattProsent()).isEqualByComparingTo(BigDecimal.valueOf(50));
     }
 
     @Test
@@ -59,15 +59,17 @@ public class KravgrunnlagMapperTest extends FellesTestOppsett {
 
         assertThat(oversatt.getPerioder()).hasSize(1);
         KravgrunnlagPeriode432 periode = oversatt.getPerioder().get(0);
-        assertThat(periode.getBeløpSkattMnd()).isEqualByComparingTo(BigDecimal.valueOf(0l));
+        assertThat(periode.getBeløpSkattMnd()).isEqualByComparingTo(BigDecimal.valueOf(4500));
 
         List<KravgrunnlagBelop433> beløpene = periode.getKravgrunnlagBeloper433();
-        assertThat(beløpene).hasSize(1);
-        KravgrunnlagBelop433 beløp = beløpene.get(0);
-        assertThat(beløp.getKlasseType()).isEqualTo(KlasseType.YTEL);
-        assertThat(beløp.getKlasseKode()).isEqualTo(KlasseKode.FPATORD.getKode());
-        assertThat(beløp.getNyBelop()).isEqualByComparingTo(BigDecimal.valueOf(9000));
-        assertThat(beløp.getSkattProsent()).isEqualByComparingTo(BigDecimal.valueOf(0l));
+        assertThat(beløpene).hasSize(2);
+        KravgrunnlagBelop433 beløpYTEL = beløpene.stream().filter(b -> b.getKlasseType().equals(KlasseType.YTEL)).findFirst().orElseThrow();
+        assertThat(beløpYTEL.getKlasseType()).isEqualTo(KlasseType.YTEL);
+        assertThat(beløpYTEL.getKlasseKode()).isEqualTo(KlasseKode.FPATORD.getKode());
+        assertThat(beløpYTEL.getTilbakekrevesBelop()).isEqualByComparingTo(BigDecimal.valueOf(9000));
+        assertThat(beløpYTEL.getNyBelop()).isEqualByComparingTo(BigDecimal.valueOf(0));
+        assertThat(beløpYTEL.getOpprUtbetBelop()).isEqualByComparingTo(BigDecimal.valueOf(9000));
+        assertThat(beløpYTEL.getSkattProsent()).isEqualByComparingTo(BigDecimal.valueOf(50));
     }
 
 }

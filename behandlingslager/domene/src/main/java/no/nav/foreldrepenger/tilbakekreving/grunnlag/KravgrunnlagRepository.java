@@ -77,9 +77,14 @@ public class KravgrunnlagRepository {
     public boolean erKravgrunnlagSomForventet(Long behandlingId) {
         TypedQuery<KravgrunnlagAggregateEntity> query = lagFinnKravgrunnlagQuery(behandlingId);
         KravgrunnlagAggregateEntity kravgrunnlag = hentUniktResultat(query).orElseThrow();
-        Optional<Feil> grunnlagFeil = KravgrunnlagValidator.validerGrunnlag(kravgrunnlag.getGrunnlagØkonomi());
-        grunnlagFeil.ifPresent(feil -> feil.log(logger));
-        return !grunnlagFeil.isPresent();
+
+        try {
+            KravgrunnlagValidator.validerGrunnlag(kravgrunnlag.getGrunnlagØkonomi());
+            return true;
+        } catch (KravgrunnlagValidator.UgyldigKravgrunnlagException e) {
+            e.getFeil().log(logger);
+            return false;
+        }
     }
 
     public Optional<KravgrunnlagAggregate> finnGrunnlagForVedtakId(Long vedtakId) {
