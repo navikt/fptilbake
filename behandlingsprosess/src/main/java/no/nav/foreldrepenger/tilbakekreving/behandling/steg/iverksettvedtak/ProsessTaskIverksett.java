@@ -1,8 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.iverksettvedtak;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -16,32 +13,22 @@ public class ProsessTaskIverksett {
 
     private ProsessTaskRepository taskRepository;
 
-    ProsessTaskIverksett(){
+    ProsessTaskIverksett() {
         // for CDI
     }
 
     @Inject
-    public ProsessTaskIverksett(ProsessTaskRepository taskRepository){
+    public ProsessTaskIverksett(ProsessTaskRepository taskRepository) {
         this.taskRepository = taskRepository;
     }
 
     public void opprettIverksettingstasker(Behandling behandling) {
-        ProsessTaskData avsluttBehandlingTask = new ProsessTaskData(AvsluttBehandlingTask.TASKTYPE);
-
-        ProsessTaskData sendVedtaksbrevTask = new ProsessTaskData(SendVedtaksbrevTask.TASKTYPE);
-
-        ProsessTaskData sendØkonomiTilbakekrevingsvedtakTask = new ProsessTaskData(SendØkonomiTibakekerevingsVedtakTask.TASKTYPE);
-
         ProsessTaskGruppe taskGruppe = new ProsessTaskGruppe();
+        taskGruppe.addNesteSekvensiell(new ProsessTaskData(SendØkonomiTibakekerevingsVedtakTask.TASKTYPE));
+        taskGruppe.addNesteSekvensiell(new ProsessTaskData(SendVedtaksbrevTask.TASKTYPE));
+        taskGruppe.addNesteSekvensiell(new ProsessTaskData(AvsluttBehandlingTask.TASKTYPE));
 
-        List<ProsessTaskData> parallelle = new ArrayList<>();
-        parallelle.add(sendVedtaksbrevTask);
-        parallelle.add(sendØkonomiTilbakekrevingsvedtakTask);
-
-        taskGruppe.addNesteParallell(parallelle);
-        taskGruppe.addNesteSekvensiell(avsluttBehandlingTask);
-
-        taskGruppe.setBehandling(behandling.getFagsakId(),behandling.getId(),behandling.getAktørId().getId());
+        taskGruppe.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         taskGruppe.setCallIdFraEksisterende();
 
         taskRepository.lagre(taskGruppe);
