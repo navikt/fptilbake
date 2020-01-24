@@ -1,0 +1,23 @@
+version: "3.7"
+services:
+  sftp1:
+    image: atmoz/sftp:alpine
+    container_name: sftp1
+    volumes:
+    - ${PWD}/users.conf:/etc/sftp/users.conf
+    - ${PWD}/keys/ssh_host_ed25519_key:/etc/ssh/ssh_host_ed25519_key:ro
+    - ${PWD}/keys/ssh_host_rsa_key:/etc/ssh/ssh_host_rsa_ke
+    - ${PWD}/keys/twin_key.pub:/home/twin/.ssh/keys/id_rsa.pub:ro
+    - ${PWD}/keys/third_key.pub:/home/third/.ssh/keys/id_rsa.pub:ro
+    - ${PWD}/keys/fourth_key.pub:/home/fourth/.ssh/keys/id_rsa.pub:ro
+    - ${PWD}/keys/fptilbake_key.pub:/home/fptilbake/.ssh/keys/id_rsa.pub:ro
+    - ${PWD}/keys/fptilbake2_key.pub:/home/fptilbake2/.ssh/keys/id_rsa.pub:ro
+    - ${PWD}/tmp/foo:/home/foo/share
+    - ${PWD}/tmp/twin:/home/twin/another
+    - ${PWD}/tmp/third:/home/third/share
+    - ${PWD}/tmp/fourth:/home/fourth/share
+    - ${PWD}/tmp/fptilbake:/home/fptilbake/share
+    - ${PWD}/tmp/fptilbake2:/home/fptilbake2/share
+    ports:
+    - "50522:22"
+    command: "last:bar:1010"

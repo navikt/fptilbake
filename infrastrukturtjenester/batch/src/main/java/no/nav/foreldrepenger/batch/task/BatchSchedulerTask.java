@@ -1,11 +1,11 @@
 package no.nav.foreldrepenger.batch.task;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -20,9 +20,9 @@ import no.nav.vedtak.util.FPDateUtil;
 
 /**
  * Enkel scheduler for dagens situasjon der man kjører batcher mandag-fredag og det er noe variasjon i parametere.
- *
+ * <p>
  * Kan evt endres slik at BatchSchedulerTask kjører tidlig på døgnet og oppretter dagens batches (hvis ikke tidspunkt passert)
- *
+ * <p>
  * Skal man utvide med ukentlige, måndedlige batcher etc bør man se på cron-aktige uttrykk for spesifikasjon av kjøring.
  * FC har implementert et rammeverk på github
  */
@@ -31,28 +31,14 @@ import no.nav.vedtak.util.FPDateUtil;
 public class BatchSchedulerTask implements ProsessTaskHandler {
 
     public static final String TASKTYPE = "batch.scheduler";
-
-//    private static final String AVSTEMMING = "BVL001"; // FIXME (FM): se fixmes under
+    public static final String BATCH_AVSTEMMING = "BFPT-001";
+    public static final String BATCH_TA_AV_VENT = "BVL007";
 
     private BatchSupportTjeneste batchSupportTjeneste;
 
-    private final List<BatchConfig> batchOppsettAvstemmingMandag = Arrays.asList(
-            // FIXME (FM): trenger vi disse?
-//        new BatchConfig(6, 55, AVSTEMMING, "antallDager=3, fagomrade=REFUTG"),
-//        new BatchConfig(6, 56, AVSTEMMING, "antallDager=3, fagomrade=FP"),
-//        new BatchConfig(6, 57, AVSTEMMING, "antallDager=3, fagomrade=FPREF")
-    );
-
-    private final List<BatchConfig> batchOppsettAvstemmingUkedag = Arrays.asList(
-            // FIXME (FM): trenger vi disse?
-//        new BatchConfig(6, 55, AVSTEMMING, "antallDager=1, fagomrade=REFUTG"),
-//        new BatchConfig(6, 56, AVSTEMMING, "antallDager=1, fagomrade=FP"),
-//        new BatchConfig(6, 57, AVSTEMMING, "antallDager=1, fagomrade=FPREF")
-    );
-
-    // TODO(diamant): Når stabilt i produksjon - legg til en BRT.B_N_RETRY_TASKS fx kl 06:59. Dekker nedetid i andre system
-    private final List<BatchConfig> batchOppsettFelles = Arrays.asList(
-            new BatchConfig(7, 0, "BVL007", null)
+    private final List<Supplier<BatchConfig>> batchOppsettFelles = Arrays.asList(
+        () -> new BatchConfig(6, 55, BATCH_AVSTEMMING, "dato=" + FPDateUtil.iDag().minusDays(1).format(DateTimeFormatter.ISO_DATE)),
+        () -> new BatchConfig(7, 0, BATCH_TA_AV_VENT, null)
     );
 
     private LocalDate dagensDato;
@@ -69,7 +55,6 @@ public class BatchSchedulerTask implements ProsessTaskHandler {
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
         dagensDato = FPDateUtil.iDag();
-        DayOfWeek dagensUkedag = DayOfWeek.from(dagensDato);
 
         // Lagre neste instans av daglig scheduler straks over midnatt
         ProsessTaskData batchScheduler = new ProsessTaskData(BatchSchedulerTask.TASKTYPE);
@@ -78,28 +63,17 @@ public class BatchSchedulerTask implements ProsessTaskHandler {
         ProsessTaskGruppe gruppeScheduler = new ProsessTaskGruppe(batchScheduler);
         batchSupportTjeneste.opprettScheduledTasks(gruppeScheduler);
 
-        // Ingenting å kjøre i helgene enn så lenge
-        if (DayOfWeek.FRIDAY.getValue() < dagensUkedag.getValue()) {
-            return;
-        }
+        List<BatchConfig> batchOppsett = batchOppsettFelles.stream()
+            .map(Supplier::get)
+            .collect(Collectors.toList());
 
-        List<BatchConfig> batchOppsett = new ArrayList<>();
-        if (DayOfWeek.MONDAY.equals(dagensUkedag)) {
-            batchOppsett.addAll(batchOppsettAvstemmingMandag);
-        } else {
-            batchOppsett.addAll(batchOppsettAvstemmingUkedag);
-        }
-        batchOppsett.addAll(batchOppsettFelles);
+        List<ProsessTaskData> batchtasks = batchOppsett.stream()
+            .map(this::mapBatchConfigTilBatchRunnerTask)
+            .collect(Collectors.toList());
+        ProsessTaskGruppe gruppeRunner = new ProsessTaskGruppe();
+        gruppeRunner.addNesteParallell(batchtasks);
 
-        if (!batchOppsett.isEmpty()) {
-            List<ProsessTaskData> batchtasks = batchOppsett.stream()
-                .map(this::mapBatchConfigTilBatchRunnerTask)
-                .collect(Collectors.toList());
-            ProsessTaskGruppe gruppeRunner = new ProsessTaskGruppe();
-            gruppeRunner.addNesteParallell(batchtasks);
-
-            batchSupportTjeneste.opprettScheduledTasks(gruppeRunner);
-        }
+        batchSupportTjeneste.opprettScheduledTasks(gruppeRunner);
     }
 
     private ProsessTaskData mapBatchConfigTilBatchRunnerTask(BatchConfig config) {
