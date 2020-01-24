@@ -18,6 +18,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagValidator;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlag;
 import no.nav.vedtak.feil.Feil;
@@ -72,7 +73,8 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
         String saksnummer = finnSaksnummer(kravgrunnlagDto.getFagsystemId());
         Kravgrunnlag431 kravgrunnlag = kravgrunnlagMapper.mapTilDomene(kravgrunnlagDto);
 
-        økonomiMottattXmlRepository.oppdaterMedEksternBehandlingIdOgSaksnummer(eksternBehandlingId, saksnummer,mottattXmlId);
+        boolean kravgrunnlagetErGyldig = validerKravgrunnlag(mottattXmlId, eksternBehandlingId, saksnummer, kravgrunnlag);
+        økonomiMottattXmlRepository.oppdaterMedEksternBehandlingIdOgSaksnummer(eksternBehandlingId, saksnummer, mottattXmlId);
 
         Optional<EksternBehandling> behandlingKobling = hentKoblingTilInternBehandling(eksternBehandlingId);
         if (behandlingKobling.isPresent()) {
@@ -81,7 +83,7 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
 
             Behandling behandling = behandlingRepository.hentBehandling(internId);
             if (!behandling.erAvsluttet()) {
-                kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(internId, kravgrunnlag);
+                kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(internId, kravgrunnlag, kravgrunnlagetErGyldig);
                 økonomiMottattXmlRepository.opprettTilkobling(mottattXmlId);
                 logger.info("Behandling med internBehandlingId={} koblet med grunnlag id={}", internId, mottattXmlId);
             } else {
@@ -91,6 +93,19 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
         } else {
             validerBehandlingsEksistens(eksternBehandlingId, saksnummer);
             logger.info("Ignorerte kravgrunnlag med id={} eksternBehandlingId={}. Fantes ikke tilbakekrevingsbehandling", mottattXmlId, eksternBehandlingId);
+        }
+
+    }
+
+    private static boolean validerKravgrunnlag(Long mottattXmlId, String eksternBehandlingId, String saksnummer, Kravgrunnlag431 kravgrunnlag) {
+        try {
+            KravgrunnlagValidator.validerGrunnlag(kravgrunnlag);
+            return true;
+        } catch (KravgrunnlagValidator.UgyldigKravgrunnlagException e) {
+            //logger feilen i kravgrunnlaget sammen med metainformasjon slik at feilen kan følges opp
+            //prosessen får fortsette, slik at prosessen hopper tilbake hvis den er i fakta-steget eller senere
+            LesKravgrunnlagTaskFeil.FACTORY.ugyldigKravgrunnlag(saksnummer, eksternBehandlingId, mottattXmlId, e).log(logger);
+            return false;
         }
     }
 
@@ -124,6 +139,11 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
             feilmelding = "Mottok et tilbakekrevingsgrunnlag fra Økonomi med behandlingId som ikke er et tall. behandlingId=%s. Kravgrunnlaget skulle kanskje til et annet system. Si i fra til Økonomi!",
             logLevel = LogLevel.WARN)
         Feil behandlingFinnesIkkeIFpsak(String behandlingId);
+
+        @TekniskFeil(feilkode = "FPT-839288",
+            feilmelding = "Mottok et ugyldig kravgrunnlag for saksnummer=%s eksternBehandlingId=%s mottattXmlId=%s",
+            logLevel = LogLevel.WARN)
+        Feil ugyldigKravgrunnlag(String saksnummer, String eksternBehandlingId, Long mottattXmlId, KravgrunnlagValidator.UgyldigKravgrunnlagException cause);
     }
 
 }

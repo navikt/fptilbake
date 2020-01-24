@@ -7,19 +7,19 @@ import javax.inject.Inject;
 @ApplicationScoped
 public class SlettGrunnlagEventPubliserer {
 
-    private Event<SlettGrunnlagEvent> slettKravgrunnlagEvent;
+    private Event<KravgrunnlagEndretEvent> slettKravgrunnlagEvent;
 
     SlettGrunnlagEventPubliserer() {
         // for CDI
     }
 
     @Inject
-    public SlettGrunnlagEventPubliserer(Event<SlettGrunnlagEvent> slettKravgrunnlagEvent) {
+    public SlettGrunnlagEventPubliserer(Event<KravgrunnlagEndretEvent> slettKravgrunnlagEvent) {
         this.slettKravgrunnlagEvent = slettKravgrunnlagEvent;
     }
 
-    public void fireEvent(Long behandlingId) {
-        SlettGrunnlagEvent endretKravgrunnlag = new SlettGrunnlagEvent(behandlingId);
+    public void fireKravgrunnlagEndretEvent(Long behandlingId) {
+        KravgrunnlagEndretEvent endretKravgrunnlag = new KravgrunnlagEndretEvent(behandlingId);
         slettKravgrunnlagEvent.fire(endretKravgrunnlag);
     }
 

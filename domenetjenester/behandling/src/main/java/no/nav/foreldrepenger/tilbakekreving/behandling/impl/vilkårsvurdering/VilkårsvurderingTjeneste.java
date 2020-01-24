@@ -44,9 +44,9 @@ import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTyp
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagBelop433;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagEndretEvent;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.SlettGrunnlagEvent;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.vedtak.felles.jpa.Transaction;
 
@@ -146,8 +146,8 @@ public class VilkårsvurderingTjeneste {
         return perioder;
     }
 
-    public void slettGammelVilkårData(@Observes SlettGrunnlagEvent slettGrunnlagEvent){
-        vilkårsvurderingRepository.slettVilkårsvurdering(slettGrunnlagEvent.getBehandlingId());
+    public void slettGammelVilkårData(@Observes KravgrunnlagEndretEvent event){
+        vilkårsvurderingRepository.slettVilkårsvurdering(event.getBehandlingId());
     }
 
     private List<DetaljertFeilutbetalingPeriodeDto> henteFeilutbetalingPerioderFraForeldelse(Long behandlingId, List<FaktaFeilutbetalingPeriode> faktaFeilutbetalingPerioder) {

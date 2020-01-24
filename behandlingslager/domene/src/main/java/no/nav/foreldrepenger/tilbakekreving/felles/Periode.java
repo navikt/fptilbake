@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.felles;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -9,6 +10,8 @@ import javax.persistence.Embeddable;
 
 @Embeddable
 public class Periode {
+
+    private static final DateTimeFormatter DATO_FORMAT = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
     @Column(name = "fom")
     private LocalDate fom;
@@ -99,9 +102,8 @@ public class Periode {
     }
 
     @Override
-
     public String toString() {
-        return String.format("Periode[%s,%s]", fom, tom);
+        return fom.format(DATO_FORMAT) + "-" + tom.format(DATO_FORMAT);
     }
 
     @Override

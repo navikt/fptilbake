@@ -18,6 +18,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KodeAksjon;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagValidator;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiConsumer;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagDto;
@@ -63,7 +64,10 @@ public class HentKravgrunnlagTask implements ProsessTaskHandler {
         Long origBehandlingId = Long.valueOf(prosessTaskData.getPropertyValue(TaskProperty.PROPERTY_ORIGINAL_BEHANDLING_ID));
 
         Kravgrunnlag431 kravgrunnlag431 = hentNyttKravgrunnlag(origBehandlingId);
-        kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(behandlingId, kravgrunnlag431);
+
+        KravgrunnlagValidator.validerGrunnlag(kravgrunnlag431);
+
+        kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(behandlingId, kravgrunnlag431, true);
         lagHistorikkInnslagForMotattKravgrunnlag(behandling, kravgrunnlag431);
     }
 

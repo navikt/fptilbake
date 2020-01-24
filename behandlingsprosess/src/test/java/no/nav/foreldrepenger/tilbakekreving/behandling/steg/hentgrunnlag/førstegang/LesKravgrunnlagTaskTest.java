@@ -20,7 +20,6 @@ public class LesKravgrunnlagTaskTest extends FellesTestOppsett {
 
     private Long kravgrunnlagId;
 
-
     @Before
     public void setup() {
         kravgrunnlagId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_YTEL.xml"));

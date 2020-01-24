@@ -77,7 +77,7 @@ public class VedtaksbrevFritekstValidatorTest {
             .build());
         faktaFeilutbetalingRepository.lagre(behandlingId, fakta);
 
-        expectedException.expectMessage("Ugyldig input: Når 'ANNET_FRITEKST' er valgt er fritekst påkrevet. Mangler for periode Periode[2019-01-01,2019-01-24] og avsnitt FAKTA_AVSNITT");
+        expectedException.expectMessage("Ugyldig input: Når 'ANNET_FRITEKST' er valgt er fritekst påkrevet. Mangler for periode 01.01.2019-24.01.2019 og avsnitt FAKTA_AVSNITT");
         validator.validerAtPåkrevdeFriteksterErSatt(behandlingId, Collections.emptyList());
     }
 
@@ -97,7 +97,7 @@ public class VedtaksbrevFritekstValidatorTest {
             new VedtaksbrevFritekstPeriode.Builder().medBehandlingId(behandlingId).medFritekst("foo").medFritekstType(VedtaksbrevFritekstType.FAKTA_AVSNITT).medPeriode(Periode.of(jan1, jan3)).build()
         );
 
-        expectedException.expectMessage("Når 'ENDRING_GRUNNLAG' er valgt er fritekst påkrevet. Mangler for periode Periode[2019-01-04,2019-01-24] og avsnitt FAKTA_AVSNITT");
+        expectedException.expectMessage("Når 'ENDRING_GRUNNLAG' er valgt er fritekst påkrevet. Mangler for periode 04.01.2019-24.01.2019 og avsnitt FAKTA_AVSNITT");
 
         validator.validerAtPåkrevdeFriteksterErSatt(behandlingId, fritekstperioder);
     }
@@ -119,7 +119,7 @@ public class VedtaksbrevFritekstValidatorTest {
             new VedtaksbrevFritekstPeriode.Builder().medBehandlingId(behandlingId).medFritekst("foo").medFritekstType(VedtaksbrevFritekstType.FAKTA_AVSNITT).medPeriode(Periode.of(jan3, jan24)).build()
         );
 
-        expectedException.expectMessage("Når 'SVP_ENDRING_GRUNNLAG' er valgt er fritekst påkrevet. Mangler for periode Periode[2019-01-02,2019-01-02] og avsnitt FAKTA_AVSNITT");
+        expectedException.expectMessage("Når 'SVP_ENDRING_GRUNNLAG' er valgt er fritekst påkrevet. Mangler for periode 02.01.2019-02.01.2019 og avsnitt FAKTA_AVSNITT");
         validator.validerAtPåkrevdeFriteksterErSatt(behandlingId, fritekstperioder);
     }
 

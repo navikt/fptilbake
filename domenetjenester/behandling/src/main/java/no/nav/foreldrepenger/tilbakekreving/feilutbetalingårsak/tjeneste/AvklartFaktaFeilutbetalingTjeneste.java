@@ -24,7 +24,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkOpplysningType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.SlettGrunnlagEvent;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagEndretEvent;
 import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkinnslagDelDto;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
 
@@ -79,8 +79,8 @@ public class AvklartFaktaFeilutbetalingTjeneste {
         }
     }
 
-    public void slettGammelFaktaData(@Observes SlettGrunnlagEvent slettGrunnlagEvent){
-        faktaFeilutbetalingRepository.slettFaktaFeilutbetaling(slettGrunnlagEvent.getBehandlingId());
+    public void slettGammelFaktaData(@Observes KravgrunnlagEndretEvent event){
+        faktaFeilutbetalingRepository.slettFaktaFeilutbetaling(event.getBehandlingId());
     }
 
     private boolean lagHistorikkInnslagDeler(Historikkinnslag historikkinnslag, String begrunnelse,

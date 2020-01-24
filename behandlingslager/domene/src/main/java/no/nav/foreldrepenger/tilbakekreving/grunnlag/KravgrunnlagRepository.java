@@ -74,6 +74,19 @@ public class KravgrunnlagRepository {
         return kravgrunnlag.stream().anyMatch(KravgrunnlagAggregate::isSperret);
     }
 
+    public boolean erKravgrunnlagSomForventet(Long behandlingId) {
+        TypedQuery<KravgrunnlagAggregateEntity> query = lagFinnKravgrunnlagQuery(behandlingId);
+        KravgrunnlagAggregateEntity kravgrunnlag = hentUniktResultat(query).orElseThrow();
+
+        try {
+            KravgrunnlagValidator.validerGrunnlag(kravgrunnlag.getGrunnlagØkonomi());
+            return true;
+        } catch (KravgrunnlagValidator.UgyldigKravgrunnlagException e) {
+            e.getFeil().log(logger);
+            return false;
+        }
+    }
+
     public Optional<KravgrunnlagAggregate> finnGrunnlagForVedtakId(Long vedtakId) {
         TypedQuery<KravgrunnlagAggregateEntity> query = entityManager.createQuery("from KravgrunnlagAggregateEntity aggr " +
             "where aggr.grunnlagØkonomi.vedtakId=:vedtakId and aggr.aktiv=:aktiv", KravgrunnlagAggregateEntity.class);
@@ -93,12 +106,12 @@ public class KravgrunnlagRepository {
         }
     }
 
-    public void opphevGrunnlag(Long behandlingId){
+    public void opphevGrunnlag(Long behandlingId) {
         Optional<KravgrunnlagAggregateEntity> aggregate = finnKravgrunnlagOptional(behandlingId);
-        if(aggregate.isPresent()){
+        if (aggregate.isPresent()) {
             aggregate.get().opphev();
             entityManager.persist(aggregate.get());
-        }else {
+        } else {
             KravgrunnlagRepositoryFeil.FEILFACTORY.kanIkkeOppheveGrunnlagSomIkkeFinnes(behandlingId).log(logger);
         }
     }

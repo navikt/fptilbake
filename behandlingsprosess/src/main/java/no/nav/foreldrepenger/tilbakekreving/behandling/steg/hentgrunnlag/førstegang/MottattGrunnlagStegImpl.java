@@ -82,7 +82,7 @@ public class MottattGrunnlagStegImpl implements GrunnlagSteg {
             fristTid, Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
 
         if (gåttOverFristen(fristTid)) {
-            /* Hvis fristen har gått ut, og grunnlag fra økonomi ikke har blitt mottatt, logger vi en feil med level ERROR.
+            /* Hvis fristen har gått ut, og grunnlag fra økonomi ikke har blitt mottatt, logger vi en feil.
              * Dersom en exception kastes, så vil ikke ny settPåVent status bli persistert, og steget blir satt (feilaktig) som utført.
              * Hvis denne meldingen logges, må det kontrolleres at oppdragssystemet (OS) er oppe, tilgjengelig for fptilbake, og at OS ikke har feil.
              */

@@ -13,7 +13,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.TotrinnRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.Totrinnresultatgrunnlag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.Totrinnsvurdering;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.SlettGrunnlagEvent;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagEndretEvent;
 
 @ApplicationScoped
 public class TotrinnTjeneste {
@@ -61,7 +61,7 @@ public class TotrinnTjeneste {
         return totrinnRepository.hentTotrinngrunnlag(behandling);
     }
 
-    public void slettGammelTotrinnData(@Observes SlettGrunnlagEvent slettGrunnlagEvent){
-        totrinnRepository.slettGammelTotrinnData(slettGrunnlagEvent.getBehandlingId());
+    public void slettGammelTotrinnData(@Observes KravgrunnlagEndretEvent event){
+        totrinnRepository.slettGammelTotrinnData(event.getBehandlingId());
     }
 }

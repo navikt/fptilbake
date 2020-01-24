@@ -33,7 +33,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.V
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelsePeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseRepository;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.SlettGrunnlagEvent;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagEndretEvent;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
 import no.nav.vedtak.felles.jpa.Transaction;
 
@@ -128,8 +128,8 @@ public class VurdertForeldelseTjeneste {
         return vurdertForeldelseRepository.harVurdertForeldelseForBehandlingId(behandlingId);
     }
 
-    public void slettGammelForeldelseData(@Observes SlettGrunnlagEvent slettGrunnlagEvent){
-        vurdertForeldelseRepository.slettForeldelse(slettGrunnlagEvent.getBehandlingId());
+    public void slettGammelForeldelseData(@Observes KravgrunnlagEndretEvent event){
+        vurdertForeldelseRepository.slettForeldelse(event.getBehandlingId());
     }
 
     private VurdertForeldelsePeriode lagVurdertForeldelse(VurdertForeldelse vurdertForeldelse, ForeldelsePeriodeDto foreldelsePeriodeDto) {

@@ -1,14 +1,11 @@
 package no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
-import no.nav.vedtak.util.FPDateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -130,7 +127,8 @@ public class GjenopptaBehandlingTjenesteImpl implements GjenopptaBehandlingTjene
     @Override
     public boolean kanGjenopptaSteg(long behandlingId) {
         return grunnlagRepository.harGrunnlagForBehandlingId(behandlingId)
-            && !grunnlagRepository.erKravgrunnlagSperret(behandlingId);
+            && !grunnlagRepository.erKravgrunnlagSperret(behandlingId)
+            && grunnlagRepository.erKravgrunnlagSomForventet(behandlingId);
     }
 
     private String hentCallId() {

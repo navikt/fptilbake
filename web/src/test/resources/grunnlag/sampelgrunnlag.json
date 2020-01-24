@@ -23,6 +23,8 @@
       {
         "fom": "2016-03-16",
         "tom": "2016-03-31",
+        "beløpSkattMnd" : 10000,
+
         "posteringer": [
           {
             "klasseKode": "FPATAL",
@@ -30,6 +32,7 @@
             "opprUtbetBelop": 0,
             "nyBelop": 11000,
             "tilbakekrevesBelop": 0,
+            "skattProsent": 32,
             "uinnkrevdBelop": 0,
             "resultatKode": "",
             "årsakKode": "",
@@ -41,6 +44,7 @@
             "opprUtbetBelop": 11000,
             "nyBelop": 0,
             "tilbakekrevesBelop": 11000,
+            "skattProsent": 32,
             "uinnkrevdBelop": 0,
             "resultatKode": "",
             "årsakKode": "",
@@ -51,6 +55,7 @@
       {
         "fom": "2016-04-01",
         "tom": "2016-04-30",
+        "beløpSkattMnd" :  10000,
         "posteringer": [
           {
             "klasseKode": "FPATAL",
@@ -58,6 +63,7 @@
             "opprUtbetBelop": 0,
             "nyBelop": 21000,
             "tilbakekrevesBelop": 0,
+            "skattProsent": 32,
             "uinnkrevdBelop": 0,
             "resultatKode": "",
             "årsakKode": "",
@@ -69,6 +75,7 @@
             "opprUtbetBelop": 21000,
             "nyBelop": 0,
             "tilbakekrevesBelop": 21000,
+            "skattProsent": 32,
             "uinnkrevdBelop": 0,
             "resultatKode": "",
             "årsakKode": "",
@@ -79,6 +86,7 @@
       {
         "fom": "2016-05-01",
         "tom": "2016-05-26",
+        "beløpSkattMnd" :  10000,
         "posteringer": [
           {
             "klasseKode": "FPATAL",
@@ -86,6 +94,7 @@
             "opprUtbetBelop": 0,
             "nyBelop": 19000,
             "tilbakekrevesBelop": 0,
+            "skattProsent": 32,
             "uinnkrevdBelop": 0,
             "resultatKode": "",
             "årsakKode": "",
@@ -97,6 +106,7 @@
             "opprUtbetBelop": 19000,
             "nyBelop": 0,
             "tilbakekrevesBelop": 19000,
+            "skattProsent": 32,
             "uinnkrevdBelop": 0,
             "resultatKode": "",
             "årsakKode": "",
