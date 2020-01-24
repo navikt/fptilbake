@@ -22,9 +22,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.Totrinnsvur
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagEndretEvent;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMock;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMockUtil;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.SlettGrunnlagEvent;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 
 public class TotrinnTjenesteTest extends FellesTestOppsett {
@@ -92,8 +92,8 @@ public class TotrinnTjenesteTest extends FellesTestOppsett {
         List<Totrinnsvurdering> totrinnsvurderinger = (List<Totrinnsvurdering>) totrinnTjeneste.hentTotrinnsvurderinger(behandling);
         assertThat(totrinnsvurderinger).isNotEmpty();
 
-        SlettGrunnlagEvent slettGrunnlagEvent = new SlettGrunnlagEvent(behandling.getId());
-        totrinnTjeneste.slettGammelTotrinnData(slettGrunnlagEvent);
+        KravgrunnlagEndretEvent kravgrunnlagEndretEvent = new KravgrunnlagEndretEvent(behandling.getId());
+        totrinnTjeneste.slettGammelTotrinnData(kravgrunnlagEndretEvent);
 
         totrinnsvurderinger = (List<Totrinnsvurdering>) totrinnTjeneste.hentTotrinnsvurderinger(behandling);
         assertThat(totrinnsvurderinger).isEmpty();

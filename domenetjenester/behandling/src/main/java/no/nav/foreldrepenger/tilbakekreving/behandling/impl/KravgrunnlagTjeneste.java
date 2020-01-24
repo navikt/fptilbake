@@ -49,7 +49,7 @@ public class KravgrunnlagTjeneste {
     private GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
 
-    private SlettGrunnlagEventPubliserer slettGrunnlagEventPubliserer;
+    private SlettGrunnlagEventPubliserer kravgrunnlagEventPubliserer;
 
 
     KravgrunnlagTjeneste() {
@@ -67,7 +67,7 @@ public class KravgrunnlagTjeneste {
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
         this.gjenopptaBehandlingTjeneste = gjenopptaBehandlingTjeneste;
 
-        this.slettGrunnlagEventPubliserer = slettGrunnlagEventPubliserer;
+        this.kravgrunnlagEventPubliserer = slettGrunnlagEventPubliserer;
     }
 
 
@@ -132,7 +132,7 @@ public class KravgrunnlagTjeneste {
     public void lagreTilbakekrevingsgrunnlagFraØkonomi(Long behandlingId, Kravgrunnlag431 kravgrunnlag431, boolean kravgrunnlagetErGyldig) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         if (KravStatusKode.ENDRET.equals(kravgrunnlag431.getKravStatusKode())) {
-            //TODO KravgrunnlagTjeneste bør IKKE være ansvarlig for å bytte steg/sette på vent. Bør heller ha en observer som lytter og flytter til riktig steg/på vent.
+            //TODO KravgrunnlagTjeneste bør ikke være ansvarlig for å bytte steg/sette på vent. Bør heller ha en tjeneste/observer som lytter og flytter til riktig steg/på vent.
             logger.info("Mottok endret kravgrunnlag for behandlingId={}", behandlingId);
             boolean erIFaktaSteg = FAKTA_FEILUTBETALING.equals(behandling.getAktivtBehandlingSteg());
             boolean erForbiFaktaSteg = behandlingskontrollTjeneste.erStegPassert(behandling, FAKTA_FEILUTBETALING);
@@ -148,15 +148,15 @@ public class KravgrunnlagTjeneste {
                 logger.info("Setter behandling på vent pga kravgrunnlag endret til et ugyldig kravgrunnlag for behandlingId={}", behandlingId);
                 behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, BehandlingStegType.TBKGSTEG, FPDateUtil.nå().plusDays(7), Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
             }
-            opprettOgFireSlettgrunnlagEvent(behandlingId);
+            fyrKravgrunnlagEndretEvent(behandlingId);
         }
         kravgrunnlagRepository.lagre(behandlingId, kravgrunnlag431);
         gjenopptaBehandlingTjeneste.fortsettBehandlingMedGrunnlag(behandlingId);
     }
 
-    private void opprettOgFireSlettgrunnlagEvent(Long behandlingId) {
+    private void fyrKravgrunnlagEndretEvent(Long behandlingId) {
         logger.info("Sletter gammel grunnlag data for behandlingId={}", behandlingId);
-        slettGrunnlagEventPubliserer.fireEvent(behandlingId);
+        kravgrunnlagEventPubliserer.fireKravgrunnlagEndretEvent(behandlingId);
     }
 
 }
