@@ -3,6 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.avstemming.batch;
 import java.io.IOException;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
 import org.jboss.resteasy.util.Base64;
 
@@ -23,6 +24,7 @@ class AvstemmingSftpBatchTjeneste extends SftpTjeneste {
         //for CDI proxy
     }
 
+    @Inject
     public AvstemmingSftpBatchTjeneste(@KonfigVerdi(value = "AVSTEMMING_SFTP_USERNAME") String username,
                                        @KonfigVerdi(value = "AVSTEMMING_SFTP_HOST") String host,
                                        @KonfigVerdi(value = "AVSTEMMING_SFTP_PORT", defaultVerdi = "22") int port,
