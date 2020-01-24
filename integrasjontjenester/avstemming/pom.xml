@@ -35,6 +35,16 @@
             <groupId>no.nav.foreldrepenger.felles.integrasjon</groupId>
             <artifactId>aktoer-klient</artifactId>
         </dependency>
+        <dependency>
+            <groupId>no.nav.foreldrepenger.felles.integrasjon</groupId>
+            <artifactId>unleash-klient</artifactId>
+        </dependency>
+
+        <!-- eksterne avhengigheter -->
+        <dependency>
+            <groupId>com.jcraft</groupId>
+            <artifactId>jsch</artifactId>
+        </dependency>
 
         <!-- Test avhengigheter -->
         <dependency>

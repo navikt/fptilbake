@@ -542,6 +542,11 @@
                 <artifactId>openhtmltopdf-svg-support</artifactId>
                 <version>1.0.0</version>
             </dependency>
+            <dependency>
+                <groupId>com.jcraft</groupId>
+                <artifactId>jsch</artifactId>
+                <version>0.1.55</version>
+            </dependency>
 
             <!-- Transitive avh. versjoner for å sikre unikhet (enforcer
                 dependencyConvergence). Skal ikke benyttes direkte av vår egen kode. -->
