@@ -7,16 +7,16 @@ import no.nav.vedtak.util.Objects;
 
 public class SftpKonfigImpl implements SftpKonfig {
 
-    private String username = null;
-    private String host = null;
+    private String username;
+    private String host;
     private int port = SftpKonfig.JSCH_DEFAULT_PORT;
 
-    private String password = null;
+    private String password;
 
     private boolean hasKeyFile = false;
     private byte[] keyFilePassphrase;
 
-    private String keyFileFile;
+    private String keyFileUrl;
 
     private boolean isKeyFileByParams = false;
     private String privateKey;
@@ -52,15 +52,16 @@ public class SftpKonfigImpl implements SftpKonfig {
 
     @Override
     public void medIdentiy(JSch jSch) throws JSchException {
-        if (this.keyFileFile != null) {
-            if (this.keyFilePassphrase != null) {
-                jSch.addIdentity(this.keyFileFile, this.keyFilePassphrase);
+        if (keyFileUrl != null) {
+            if (keyFilePassphrase != null) {
+                jSch.addIdentity(keyFileUrl, keyFilePassphrase);
             }  else {
-                jSch.addIdentity(this.keyFileFile);
+                jSch.addIdentity(keyFileUrl);
             }
-        }
-        if (this.isKeyFileByParams) {
-            jSch.addIdentity(this.username, this.privateKey.getBytes(), this.publicKey.getBytes(), this.keyFilePassphrase);
+        } else if (isKeyFileByParams) {
+            jSch.addIdentity(username, privateKey.getBytes(), publicKey.getBytes(), keyFilePassphrase);
+        } else {
+            throw new RuntimeException("Mangler identity konfigurering");
         }
     }
 
@@ -87,8 +88,7 @@ public class SftpKonfigImpl implements SftpKonfig {
     }
 
     public static Builder builder(String username, String host) {
-        Builder builder = new Builder(username, host);
-        return builder;
+        return new Builder(username, host);
     }
 
     public static class Builder {
@@ -112,7 +112,7 @@ public class SftpKonfigImpl implements SftpKonfig {
         public Builder medKeyFile(String keyFileUrl, String passphrase) {
             kladd.hasKeyFile = true;
             kladd.keyFilePassphrase = getKeyFilePassphrase(passphrase);
-            kladd.keyFileFile = keyFileUrl;
+            kladd.keyFileUrl = keyFileUrl;
             return this;
         }
 
@@ -144,7 +144,7 @@ public class SftpKonfigImpl implements SftpKonfig {
                     Objects.check(kladd.privateKey != null, "må ha privateKey for sftp med nøkkel");
                     Objects.check(kladd.publicKey != null, "må ha publicKey for sftp med nøkkel");
                 } else {
-                    Objects.check(kladd.keyFileFile != null, "må ha keyFile for sftp med fil");
+                    Objects.check(kladd.keyFileUrl != null, "må ha keyFile for sftp med fil");
                 }
             } else {
                 Objects.check(kladd.password != null, "må ha password for sftp");
