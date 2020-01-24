@@ -23,12 +23,12 @@ class AvstemmingSftpBatchTjeneste extends SftpTjeneste {
         //for CDI proxy
     }
 
-    public AvstemmingSftpBatchTjeneste(@KonfigVerdi(value = "avstemming.sftp.username") String username,
-                                       @KonfigVerdi(value = "avstemming.sftp.host") String host,
-                                       @KonfigVerdi(value = "avstemming.sftp.port", defaultVerdi = "22") int port,
-                                       @KonfigVerdi(value = "avstemming.sftp.key.private") String privateKey,
-                                       @KonfigVerdi(value = "avstemming.sftp.key.public") String publicKey,
-                                       @KonfigVerdi(value = "avstemming.sftp.key.passphrase", required = false) String passphrase) throws Exception {
+    public AvstemmingSftpBatchTjeneste(@KonfigVerdi(value = "AVSTEMMING_SFTP_USERNAME") String username,
+                                       @KonfigVerdi(value = "AVSTEMMING_SFTP_HOST") String host,
+                                       @KonfigVerdi(value = "AVSTEMMING_SFTP_PORT", defaultVerdi = "22") int port,
+                                       @KonfigVerdi(value = "AVSTEMMING_SFTP_KEY_PRIVATE") String privateKey,
+                                       @KonfigVerdi(value = "AVSTEMMING_SFTP_KEY_PUBLIC") String publicKey,
+                                       @KonfigVerdi(value = "AVSTEMMING_SFTP_KEY_PASSPHRASE", required = false) String passphrase) throws Exception {
         SftpKonfigImpl.Builder builder = SftpKonfigImpl.builder(username, host)
             .medPort(port)
             .medKeyAsParams(base64Decode(privateKey), base64Decode(publicKey), passphrase);
