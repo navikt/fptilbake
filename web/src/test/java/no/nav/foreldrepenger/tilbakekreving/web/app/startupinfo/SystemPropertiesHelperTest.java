@@ -3,7 +3,6 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.startupinfo;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.SortedMap;
 
 import org.assertj.core.api.Assertions;
@@ -44,5 +43,16 @@ public class SystemPropertiesHelperTest {
         SystemPropertiesHelper.filter(input);
 
         Assertions.assertThat(input.get("JAVA_OPTS")).isEqualTo("-Djavax.net.ssl.trustStore=/foo/bar -Djavax.net.ssl.trustStorePassword=*****  -javaagent:/foo/bar/javaagent.jar  -DapplicationName=dummy -");
+    }
+
+    @Test
+    public void skal_filtrere_bort_passord_fra_env_variabel(){
+        var input = new HashMap<String, String>() {{
+            put("AVSTEMMING_SFTP_KEY_PRIVATE", "hemmelig");
+        }};
+
+        SystemPropertiesHelper.filter(input);
+
+        Assertions.assertThat(input.get("AVSTEMMING_SFTP_KEY_PRIVATE")).isEqualTo("*****");
     }
 }

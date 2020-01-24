@@ -11,9 +11,9 @@ import java.util.regex.Pattern;
 
 class SystemPropertiesHelper {
 
-    private static final List<String> SECRET_NAME_PARTS = Arrays.asList("passord", "password", "passwd");
+    private static final List<String> SECRET_NAME_PARTS = Arrays.asList("passord", "password", "passwd", "private");
     private static final String FILTERED_VALUE = "*****";
-    private static final Pattern SECRET_VERDI_REGEX = Pattern.compile("([^= ]*?(?:passord|password|passwd)[^=]*\\s*=\\s*)[^ ]*", Pattern.CASE_INSENSITIVE);
+    private static final Pattern SECRET_VERDI_REGEX = Pattern.compile("([^= ]*?(?:passord|password|passwd|private)[^=]*\\s*=\\s*)[^ ]*", Pattern.CASE_INSENSITIVE);
     private static final String FILTER_PATTERN="$1*****";
 
     private SystemPropertiesHelper() {
