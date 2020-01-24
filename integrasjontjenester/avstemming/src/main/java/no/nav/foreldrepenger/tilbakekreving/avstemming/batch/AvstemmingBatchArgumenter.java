@@ -29,6 +29,7 @@ public class AvstemmingBatchArgumenter extends BatchArguments {
     public boolean settParameterVerdien(String key, String value) {
         if (DATO_KEY.equals(key)) {
             dato = parsedato(value);
+            return true;
         }
         return false;
     }
