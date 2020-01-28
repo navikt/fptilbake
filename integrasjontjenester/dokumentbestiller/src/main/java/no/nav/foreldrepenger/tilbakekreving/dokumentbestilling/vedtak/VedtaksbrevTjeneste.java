@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import org.apache.commons.lang.WordUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
@@ -297,8 +298,9 @@ public class VedtaksbrevTjeneste {
     }
 
     private HbPerson utledSøker(Personinfo personinfo) {
+        char[] delimiters = new char[]{' ', '-'};
         return HbPerson.builder()
-            .medNavn(personinfo.getNavn())
+            .medNavn(WordUtils.capitalizeFully(personinfo.getNavn(), delimiters))
             .medDødsdato(personinfo.getDødsdato())
             .medErGift(personinfo.getSivilstandType().erGift() || personinfo.getSivilstandType().erEtterlatt())
             .medErPartner(personinfo.getSivilstandType().erPartner())
