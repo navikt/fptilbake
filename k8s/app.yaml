@@ -131,7 +131,7 @@ spec:
     - name: FP_TILKJENTYTELSE_V1_TOPIC_URL
       value: fp_tilkjentytelse_v1_topic.url
     - name: TILBAKEKREVING_BRUKERDIALOG_HENDELSE_V1_TOPIC_URL
-      value: tilbakekreving_brukerdialog_hendelse_v1_topic.ur
+      value: tilbakekreving_brukerdialog_hendelse_v1_topic.url
 
 
 
