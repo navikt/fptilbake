@@ -20,6 +20,9 @@ public class HbPerson {
     @JsonProperty("er-gift")
     private boolean erGift;
 
+    @JsonProperty("er-partner")
+    private boolean erPartner;
+
     private HbPerson() {
     }
 
@@ -43,6 +46,11 @@ public class HbPerson {
 
         public Builder medErGift(boolean erGift) {
             kladd.erGift = erGift;
+            return this;
+        }
+
+        public Builder medErPartner(boolean erPartner) {
+            kladd.erPartner = erPartner;
             return this;
         }
 
