@@ -10,12 +10,14 @@ class Vilkårsendring {
     private Periode periode;
     private String begrunnelseVilkår;
     private String begrunnelseAktsomhet;
+    private String begrunnelseSærligGrunner;
     private List<Historikkendring> endringer;
 
-    Vilkårsendring(Periode periode, String begrunnelseVilkår, String begrunnelseAktsomhet, List<Historikkendring> endringer) {
+    Vilkårsendring(Periode periode, String begrunnelseVilkår, String begrunnelseAktsomhet, String begrunnelseSærligGrunner, List<Historikkendring> endringer) {
         this.periode = periode;
         this.begrunnelseVilkår = begrunnelseVilkår;
         this.begrunnelseAktsomhet = begrunnelseAktsomhet;
+        this.begrunnelseSærligGrunner = begrunnelseSærligGrunner;
         this.endringer = endringer;
     }
 
@@ -37,5 +39,9 @@ class Vilkårsendring {
 
     public String getBegrunnelseAktsomhet() {
         return begrunnelseAktsomhet;
+    }
+
+    public String getBegrunnelseSærligGrunner() {
+        return begrunnelseSærligGrunner;
     }
 }

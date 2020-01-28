@@ -48,6 +48,11 @@ public class VilkårResultatAktsomhetDto {
     @Pattern(regexp = InputValideringRegex.FRITEKST)
     private String annetBegrunnelse;
 
+    @Size(max = 1500)
+    @JsonProperty("sarligGrunnerBegrunnelse")
+    @Pattern(regexp = InputValideringRegex.FRITEKST)
+    private String særligGrunnerBegrunnelse;
+
     public List<SærligGrunn> getSærligeGrunner() {
         return særligeGrunner;
     }
@@ -104,4 +109,11 @@ public class VilkårResultatAktsomhetDto {
         this.annetBegrunnelse = annetBegrunnelse;
     }
 
+    public String getSærligGrunnerBegrunnelse() {
+        return særligGrunnerBegrunnelse;
+    }
+
+    public void setSærligGrunnerBegrunnelse(String særligGrunnerBegrunnelse) {
+        this.særligGrunnerBegrunnelse = særligGrunnerBegrunnelse;
+    }
 }

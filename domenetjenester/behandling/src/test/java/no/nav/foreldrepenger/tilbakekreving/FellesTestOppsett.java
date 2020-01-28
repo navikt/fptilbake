@@ -56,6 +56,7 @@ public class FellesTestOppsett extends TestOppsett {
     protected static final String BEHANDLENDE_ENHET_ID = "4833";
     protected static final String BEHANDLENDE_ENHET_NAVN = "NAV Familie- og pensjonsytelser Oslo 1";
     protected static final BehandlingType REVURDERING_BEHANDLING_TYPE = BehandlingType.REVURDERING_TILBAKEKREVING;
+    protected static final String SÆRLIG_GRUNNER_BEGRUNNELSE = "særlig grunner begrunnelse";
 
     protected AktørId aktørId;
     protected Saksnummer saksnummer;
@@ -133,6 +134,7 @@ public class FellesTestOppsett extends TestOppsett {
         } else {
             VilkårResultatAktsomhetDto aktsomhetDto = new VilkårResultatAktsomhetDto();
             aktsomhetDto.setSærligeGrunner(Lists.newArrayList(SærligGrunn.GRAD_AV_UAKTSOMHET, SærligGrunn.HELT_ELLER_DELVIS_NAVS_FEIL));
+            aktsomhetDto.setSærligGrunnerBegrunnelse(SÆRLIG_GRUNNER_BEGRUNNELSE);
             if (aktsomhet == Aktsomhet.GROVT_UAKTSOM) {
                 aktsomhetDto.setHarGrunnerTilReduksjon(false);
                 aktsomhetDto.setIleggRenter(true);

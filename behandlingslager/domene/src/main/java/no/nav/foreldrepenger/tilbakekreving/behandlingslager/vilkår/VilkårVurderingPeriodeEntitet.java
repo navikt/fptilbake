@@ -169,6 +169,13 @@ public class VilkårVurderingPeriodeEntitet extends BaseEntitet {
         return null;
     }
 
+    public String getBegrunnelseSærligGrunner() {
+        if(aktsomhet != null && !aktsomhet.getSærligGrunner().isEmpty()) {
+            return aktsomhet.getSærligGrunnerBegrunnelse();
+        }
+        return null;
+    }
+
 
     public static class Builder {
         private VilkårVurderingPeriodeEntitet kladd = new VilkårVurderingPeriodeEntitet();

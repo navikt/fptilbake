@@ -34,6 +34,7 @@ public class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOpp
     private static final String ANDRE_PERIODE_BEGRUNNELSE = "2nd periode begrunnelse";
     private static final String GOD_TRO_BEGRUNNELSE = "god tro begrunnelse";
     private static final String AKTSOMHET_BEGRUNNELSE = "aktsomhet begrunnelse";
+    private static final String SÆRLIG_GRUNNER_BEGRUNNELSE = "særlig grunner begrunnelse";
     private static final String BELØP_TILBAKEKREVES = "2000";
     private static final String JA = "Ja";
     private static final String NEI = "Nei";
@@ -76,7 +77,8 @@ public class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOpp
             .medBegrunnelse("Gammel Aktsomhet Begrunnelse")
             .medPeriode(forrigePeriodeEntitet)
             .medSærligGrunnerTilReduksjon(true)
-            .medIleggRenter(false).build();
+            .medIleggRenter(false)
+            .medSærligGrunnerBegrunnelse(SÆRLIG_GRUNNER_BEGRUNNELSE).build();
         forrigeAktsomhetEntitet.leggTilSærligGrunn(formSærligGrunn(SærligGrunn.HELT_ELLER_DELVIS_NAVS_FEIL, forrigeAktsomhetEntitet));
         forrigeAktsomhetEntitet.leggTilSærligGrunn(formSærligGrunn(SærligGrunn.TID_FRA_UTBETALING, forrigeAktsomhetEntitet));
         forrigePeriodeEntitet.setAktsomhet(forrigeAktsomhetEntitet);
@@ -99,11 +101,12 @@ public class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOpp
         assertThat(getTilVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.MOTTAKER_UAKTSOMHET_GRAD)))
             .isEqualTo(repoProvider.getKodeverkRepository().finn(Aktsomhet.class, Aktsomhet.GROVT_UAKTSOM.getKode()).getNavn());
         assertThat(getFraVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.ER_SÆRLIGE_GRUNNER_TIL_REDUKSJON))).isEqualTo(formGrunnTekst(forrigeAktsomhetEntitet));
-        assertThat(getTilVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.ER_SÆRLIGE_GRUNNER_TIL_REDUKSJON))).isNull();
+        assertThat(getTilVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.ER_SÆRLIGE_GRUNNER_TIL_REDUKSJON))).isEqualTo(formGrunnTekst(nyVurdering.getPerioder().get(0).getAktsomhet()));
         assertThat(getFraVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.BELØP_TILBAKEKREVES))).isNull();
         assertThat(getTilVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.BELØP_TILBAKEKREVES))).isEqualTo(BELØP_TILBAKEKREVES);
         assertThat(getFraVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.ILEGG_RENTER))).isEqualTo(NEI);
         assertThat(getTilVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.ILEGG_RENTER))).isNull();
+        assertThat(getTilVerdi(førsteDel.getOpplysning(HistorikkOpplysningType.SÆRLIG_GRUNNER_BEGRUNNELSE))).isEqualTo(SÆRLIG_GRUNNER_BEGRUNNELSE);
 
     }
 
@@ -194,7 +197,7 @@ public class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOpp
     }
 
     private VilkårVurderingSærligGrunnEntitet formSærligGrunn(SærligGrunn grunn, VilkårVurderingAktsomhetEntitet aktsomhetEntitet) {
-        return VilkårVurderingSærligGrunnEntitet.builder().medBegrunnelse("Særlig grunn begrunnelse")
+        return VilkårVurderingSærligGrunnEntitet.builder().medBegrunnelse("Annet begrunnelse")
             .medGrunn(grunn)
             .medVurdertAktsomhet(aktsomhetEntitet).build();
     }
@@ -210,7 +213,10 @@ public class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOpp
             .medBeløpTilbakekreves(BigDecimal.valueOf(SUM_INNTREKK).add(BigDecimal.valueOf(1000l)))
             .medPeriode(andrePeriode)
             .medAktsomhet(Aktsomhet.GROVT_UAKTSOM)
-            .build();
+            .medSærligGrunnerTilReduksjon(false)
+            .medSærligGrunnerBegrunnelse(SÆRLIG_GRUNNER_BEGRUNNELSE).build();
+        aktsomhetEntitet.leggTilSærligGrunn(formSærligGrunn(SærligGrunn.STØRRELSE_BELØP, aktsomhetEntitet));
+        aktsomhetEntitet.leggTilSærligGrunn(formSærligGrunn(SærligGrunn.ANNET, aktsomhetEntitet));
         andrePeriode.setAktsomhet(aktsomhetEntitet);
         return andrePeriode;
     }
@@ -288,6 +294,7 @@ public class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOpp
             .isEqualTo(BELØP_TILBAKEKREVES);
         assertThat(getFraVerdi(andreDel.getEndretFelt(HistorikkEndretFeltType.BELØP_TILBAKEKREVES)))
             .isNull();
+        assertThat(getTilVerdi(andreDel.getOpplysning(HistorikkOpplysningType.SÆRLIG_GRUNNER_BEGRUNNELSE))).isEqualTo(SÆRLIG_GRUNNER_BEGRUNNELSE);
     }
 
 

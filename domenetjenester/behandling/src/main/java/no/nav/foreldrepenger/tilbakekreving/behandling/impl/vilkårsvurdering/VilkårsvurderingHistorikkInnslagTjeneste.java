@@ -33,6 +33,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurd
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingPeriodeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingSærligGrunnEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.SærligGrunn;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
@@ -69,7 +70,8 @@ public class VilkårsvurderingHistorikkInnslagTjeneste {
             if (!endringer.isEmpty()) {
                 String begrunnelseVilkår = nyPeriode.getBegrunnelse();
                 String begrunnelseAktsomhet = nyPeriode.getBegrunnelseAktsomhet();
-                resultat.add(new Vilkårsendring(periode, begrunnelseVilkår, begrunnelseAktsomhet, endringer));
+                String begrunnelseSærligGrunner = nyPeriode.getBegrunnelseSærligGrunner();
+                resultat.add(new Vilkårsendring(periode, begrunnelseVilkår, begrunnelseAktsomhet, begrunnelseSærligGrunner, endringer));
             }
         }
         return resultat;
@@ -95,7 +97,8 @@ public class VilkårsvurderingHistorikkInnslagTjeneste {
                 finnEndring(gammel, ny, ANDEL_TILBAKEKREVES, VilkårVurderingPeriodeEntitet::finnAndelTilbakekreves),
                 finnEndring(gammel, ny, ILEGG_RENTER, r -> fraBoolean(r.manueltSattIleggRenter())),
                 finnEndring(gammel, ny, TILBAKEKREV_SMÅBELOEP, r -> fraBoolean(r.tilbakekrevesSmåbeløp())),
-                finnEndring(gammel, ny, ER_SÆRLIGE_GRUNNER_TIL_REDUKSJON, this::lagSærligeGrunnerTekst)
+                ! (ny.getAktsomhet()!=null && ny.getAktsomhet().getSærligGrunner().isEmpty())?
+                   finnEndring(gammel, ny, ER_SÆRLIGE_GRUNNER_TIL_REDUKSJON, this::lagSærligeGrunnerTekst) :null
         );
         return endringer
                 .stream()
@@ -125,6 +128,7 @@ public class VilkårsvurderingHistorikkInnslagTjeneste {
             }
             builder.medSkjermlenke(SkjermlenkeType.TILBAKEKREVING);
             builder.medBegrunnelse(vilkårsendring.getBegrunnelseAktsomhet());
+            builder.medOpplysning(HistorikkOpplysningType.SÆRLIG_GRUNNER_BEGRUNNELSE,vilkårsendring.getBegrunnelseSærligGrunner());
             builder.build(historikkinnslag);
         }
         historikkTjenesteAdapter.lagInnslag(historikkinnslag);

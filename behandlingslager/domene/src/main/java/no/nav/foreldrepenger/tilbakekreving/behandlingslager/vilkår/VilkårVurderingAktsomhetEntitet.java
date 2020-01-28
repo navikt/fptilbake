@@ -1,10 +1,12 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkBaseEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
+import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
+import org.hibernate.annotations.JoinColumnOrFormula;
+import org.hibernate.annotations.JoinColumnsOrFormulas;
+import org.hibernate.annotations.JoinFormula;
 
 import javax.persistence.Column;
 import javax.persistence.Convert;
@@ -18,19 +20,15 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.JoinColumnOrFormula;
-import org.hibernate.annotations.JoinColumnsOrFormulas;
-import org.hibernate.annotations.JoinFormula;
-
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
-import no.nav.vedtak.felles.jpa.BaseEntitet;
-import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 @Entity(name = "VilkårVurderingAktsomhet")
 @Table(name = "VILKAAR_AKTSOMHET")
-public class VilkårVurderingAktsomhetEntitet extends BaseEntitet {
+public class VilkårVurderingAktsomhetEntitet extends KodeverkBaseEntitet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_VILKAAR_AKTSOMHET")
@@ -67,6 +65,9 @@ public class VilkårVurderingAktsomhetEntitet extends BaseEntitet {
     @Convert(converter = BooleanToStringConverter.class)
     @Column(name = "tilbakekrev_smaabeloep", updatable = false)
     private Boolean tilbakekrevSmåBeløp;
+
+    @Column(name = "sarlig_grunner_begrunnelse",updatable = false)
+    private String særligGrunnerBegrunnelse;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "vurdertAktsomhet")
     private List<VilkårVurderingSærligGrunnEntitet> særligGrunner = new ArrayList<>();
@@ -109,6 +110,10 @@ public class VilkårVurderingAktsomhetEntitet extends BaseEntitet {
 
     public Boolean getTilbakekrevSmåBeløp() {
         return tilbakekrevSmåBeløp;
+    }
+
+    public String getSærligGrunnerBegrunnelse() {
+        return særligGrunnerBegrunnelse;
     }
 
     public List<VilkårVurderingSærligGrunnEntitet> getSærligGrunner() {
@@ -166,6 +171,11 @@ public class VilkårVurderingAktsomhetEntitet extends BaseEntitet {
             return this;
         }
 
+        public Builder medSærligGrunnerBegrunnelse(String særligGrunnerBegrunnelse) {
+            this.kladd.særligGrunnerBegrunnelse = særligGrunnerBegrunnelse;
+            return this;
+        }
+
         public VilkårVurderingAktsomhetEntitet build() {
             Objects.requireNonNull(this.kladd.periode, "periode");
             Objects.requireNonNull(this.kladd.aktsomhet, "aktsomhet");
@@ -187,7 +197,6 @@ public class VilkårVurderingAktsomhetEntitet extends BaseEntitet {
             if (kladd.aktsomhet.equals(Aktsomhet.GROVT_UAKTSOM)) {
                 no.nav.vedtak.util.Objects.check(kladd.tilbakekrevSmåBeløp == null, "Dette er gyldig bare for Simpel uaktsom");
             }
-
             return kladd;
         }
     }
