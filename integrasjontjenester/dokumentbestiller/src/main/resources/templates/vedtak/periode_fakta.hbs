@@ -223,7 +223,7 @@ Du kan få foreldrepenger i inntil tre år etter at {{#if sak.er-adopsjon}}du ov
 Du eller den andre forelderen har fått innvilget foreldrepenger for nytt barn. Du har ikke rett til foreldrepenger de dagene som er igjen fra den forrige perioden med foreldrepenger. Du har derfor fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
         {{/case}}
         {{#case "IKKE_OMSORG"}}
-Vi har fått opplysninger om at du ikke hadde omsorgen for {{eq sak.antall-barn 1 yes="barnet" no="barna"}} fra og med [dato]. Du har kun rett til foreldrepenger dersom du har omsorgen for {{eq sak.antall-barn 1 yes="barnet" no="barna"}}. Du har derfor fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
+Vi har fått opplysninger om at du ikke hadde omsorgen for {{eq sak.antall-barn 1 yes="barnet" no="barna"}} fra og med {{opphørsdato-ikke-omsorg}}. Du har kun rett til foreldrepenger dersom du har omsorgen for {{eq sak.antall-barn 1 yes="barnet" no="barna"}}. Du har derfor fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
         {{/case}}
         {{#case "MOTTAKER_I_ARBEID"}}
 Du har fått utbetalt foreldrepenger i samme periode som du har jobbet heltid. Du kan ikke jobbe heltid og få utbetalt foreldrepenger samtidig. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
