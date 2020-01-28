@@ -68,6 +68,12 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
         return datoer != null ? datoer.getOpphørsdatoIkkeGravid() : null;
     }
 
+    @JsonProperty("opphørsdato-ikke-omsorg")
+    @JsonSerialize(using = LocalDateTilLangtNorskFormatSerialiserer.class)
+    private LocalDate getOpphørsdatoIkkeOmsorg() {
+        return datoer != null ? datoer.getOpphørsdatoIkkeOmsorg() : null;
+    }
+
     public VedtakResultatType getHovedresultat() {
         return totalresultat.getHovedresultat();
     }

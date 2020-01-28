@@ -1,22 +1,21 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.henleggelse;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Helper;
 import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.helper.ConditionalHelpers;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevSpråkUtil;
+
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.henleggelse.handlebars.dto.HenleggelsesbrevDokument;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.TekstformatererVarselbrevFeil;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.sql.Date;
-import java.text.DateFormat;
-import java.time.LocalDate;
-import java.util.Locale;
-
 public class TekstformatererHenleggelsesbrev {
+    private static final DateTimeFormatter FORMATTER_LANGT_DATOFORMAT = DateTimeFormatter.ofPattern("d. MMMM yyyy", new Locale("no"));
 
     private TekstformatererHenleggelsesbrev() {
         // for static access
@@ -51,10 +50,8 @@ public class TekstformatererHenleggelsesbrev {
     }
 
     private static String konverterFraLocaldateTilTekst(LocalDate dato) {
-        DateFormat dateInstance = DateFormat.getDateInstance(1, new Locale("no"));
-        return dateInstance.format(Date.valueOf(dato));
+        return FORMATTER_LANGT_DATOFORMAT.format(dato);
     }
-
 
     private static HenleggelsesbrevDokument mapTilHenleggelsebrevDokument(HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo){
         HenleggelsesbrevDokument henleggelsesbrevDokument = new HenleggelsesbrevDokument();

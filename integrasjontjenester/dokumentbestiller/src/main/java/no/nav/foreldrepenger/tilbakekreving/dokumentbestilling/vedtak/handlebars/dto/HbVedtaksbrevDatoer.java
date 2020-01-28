@@ -14,6 +14,7 @@ public class HbVedtaksbrevDatoer {
     private LocalDate opphørsdatoDødSøker;
     private LocalDate opphørsdatoDødtBarn;
     private LocalDate opphørsdatoIkkeGravid;
+    private LocalDate opphørsdatoIkkeOmsorg;
 
     private HbVedtaksbrevDatoer() {
 
@@ -29,6 +30,10 @@ public class HbVedtaksbrevDatoer {
 
     public LocalDate getOpphørsdatoIkkeGravid() {
         return opphørsdatoIkkeGravid;
+    }
+
+    public LocalDate getOpphørsdatoIkkeOmsorg() {
+        return opphørsdatoIkkeOmsorg;
     }
 
     public static HbVedtaksbrevDatoer.Builder builder() {
@@ -49,16 +54,10 @@ public class HbVedtaksbrevDatoer {
             kladd.opphørsdatoDødSøker = getFørsteDagForHendelseUnderType(SvpHendelseUnderTyper.MOTTAKER_DØD, FpHendelseUnderTyper.OPPHOR_MOTTAKER_DOD);
             kladd.opphørsdatoDødtBarn = getFørsteDagForHendelseUnderType(FpHendelseUnderTyper.OPPHOR_BARN_DOD);
             kladd.opphørsdatoIkkeGravid = getFørsteDagForHendelseUnderType(SvpHendelseUnderTyper.MOTTAKER_IKKE_GRAVID);
+            kladd.opphørsdatoIkkeOmsorg = getFørsteDagForHendelseUnderType(FpHendelseUnderTyper.IKKE_OMSORG);
+
 
             return this;
-        }
-
-        private LocalDate getOpphørsdato(HendelseUnderType... hendelseUnderTyper) {
-            LocalDate førsteDagForType = getFørsteDagForHendelseUnderType(hendelseUnderTyper);
-            if (førsteDagForType != null) {
-                return førsteDagForType.minusDays(1);
-            }
-            return null;
         }
 
         private LocalDate getFørsteDagForHendelseUnderType(HendelseUnderType... hendelseUnderTyper) {

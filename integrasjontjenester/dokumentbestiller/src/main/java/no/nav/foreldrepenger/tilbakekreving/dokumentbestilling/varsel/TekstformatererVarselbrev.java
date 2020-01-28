@@ -1,9 +1,19 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel;
 
+import static no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevSpråkUtil.finnRiktigSpråk;
+
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Locale;
+
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Helper;
 import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.helper.ConditionalHelpers;
+
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselInfo;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.handlebars.dto.BaseDokument;
@@ -11,18 +21,8 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.handlebars
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.vedtak.util.FPDateUtil;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.sql.Date;
-import java.text.DateFormat;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Locale;
-
-import static no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevSpråkUtil.finnRiktigSpråk;
-
 public class TekstformatererVarselbrev {
+    private static final DateTimeFormatter FORMATTER_LANGT_DATOFORMAT = DateTimeFormatter.ofPattern("d. MMMM yyyy", new Locale("no"));
 
     private TekstformatererVarselbrev() {
         // for static access
@@ -68,11 +68,9 @@ public class TekstformatererVarselbrev {
         return (value, options) -> konverterFraLocaldateTilTekst((LocalDate) value);
     }
 
-     static String konverterFraLocaldateTilTekst(LocalDate dato) {
-        DateFormat dateInstance = DateFormat.getDateInstance(1, new Locale("no"));
-        return dateInstance.format(Date.valueOf(dato));
+    static String konverterFraLocaldateTilTekst(LocalDate dato) {
+        return FORMATTER_LANGT_DATOFORMAT.format(dato);
     }
-
 
     private static void settFagsaktype(BaseDokument baseDokument, FagsakYtelseType fagsaktype) {
         if (FagsakYtelseType.ENGANGSTØNAD.equals(fagsaktype)) {
@@ -98,7 +96,7 @@ public class TekstformatererVarselbrev {
     static VarselbrevDokument mapTilVarselbrevDokument(VarselbrevSamletInfo varselbrevSamletInfo) {
         VarselbrevDokument varselbrevDokument = new VarselbrevDokument();
         varselbrevDokument.setBelop(varselbrevSamletInfo.getSumFeilutbetaling());
-        varselbrevDokument.setEndringsdato(varselbrevSamletInfo.getRevurderingVedtakDato()!=null ? varselbrevSamletInfo.getRevurderingVedtakDato(): FPDateUtil.iDag());
+        varselbrevDokument.setEndringsdato(varselbrevSamletInfo.getRevurderingVedtakDato() != null ? varselbrevSamletInfo.getRevurderingVedtakDato() : FPDateUtil.iDag());
         varselbrevDokument.setFristdatoForTilbakemelding(varselbrevSamletInfo.getFristdato());
         varselbrevDokument.setVarseltekstFraSaksbehandler(varselbrevSamletInfo.getFritekstFraSaksbehandler());
         varselbrevDokument.setFeilutbetaltePerioder(varselbrevSamletInfo.getFeilutbetaltePerioder());
