@@ -108,7 +108,7 @@ Du har fått utbetalt engangsstønad. Du har kun rett til engangsstønad hvis de
     {{#case "ES_ADOPSJONSVILKAARET_TYPE"}}
         {{#switch fakta.hendelseundertype}}
         {{#case "ES_STEBARN"}}
-Du har ikke rett til engangsstønad når du adopterer {{> barnet}} til {{#if søker.er-gift}}ektefellen{{else}}samboeren{{/if}} din. Fordi du har adoptert {{#if søker.er-gift}}ektefellen{{else}}samboeren{{/if}} din {{> sitt-barn}}, har du ikke rett til engangsstønad.
+Du har ikke rett til engangsstønad når du adopterer {{> barnet}} til {{#if søker.er-gift}}ektefellen{{else if søker.er-partner}}partneren{{else}}samboeren{{/if}} din. Fordi du har adoptert {{#if søker.er-gift}}ektefellen{{else if søker.er-partner}}partneren{{else}}samboeren{{/if}} din {{> sitt-barn}}, har du ikke rett til engangsstønad.
         {{/case}}
         {{#case "ES_IKKE_OPPFYLT"}}
 Du fikk utbetalt engangsstønad fordi du skulle adoptere {{> barnet}}. Vi har ikke mottatt en gyldig adopsjonsbevilgning. Derfor har du ikke rett til engangsstønad.
