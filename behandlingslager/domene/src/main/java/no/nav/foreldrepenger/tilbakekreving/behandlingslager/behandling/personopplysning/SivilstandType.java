@@ -10,7 +10,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
 public class SivilstandType extends Kodeliste {
     public static final String DISCRIMINATOR = "SIVILSTAND_TYPE";
 
-    public static final SivilstandType ENKEMANN            = new SivilstandType("ENKE");  //$NON-NLS-1$
+    public static final SivilstandType ETTERLATT           = new SivilstandType("ENKE");  //$NON-NLS-1$
     public static final SivilstandType GIFT                = new SivilstandType("GIFT");  //$NON-NLS-1$
     public static final SivilstandType GJENLEVENDE_PARTNER = new SivilstandType("GJPA");  //$NON-NLS-1$
     public static final SivilstandType GIFT_ADSKILT        = new SivilstandType("GLAD");  //$NON-NLS-1$
@@ -32,7 +32,15 @@ public class SivilstandType extends Kodeliste {
         super(kode, DISCRIMINATOR);
     }
 
-    public boolean erGift(){
+    public boolean erGift() {
         return GIFT.equals(this) || GIFT_ADSKILT.equals(this) || SEPARERT.equals(this);
+    }
+
+    public boolean erPartner() {
+        return REGISTRERT_PARTNER.equals(this) || SEPARERT_PARTNER.equals(this) || GJENLEVENDE_PARTNER.equals(this);
+    }
+
+    public boolean erEtterlatt() {
+        return ETTERLATT.equals(this);
     }
 }
