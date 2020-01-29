@@ -68,7 +68,8 @@ public class FatteVedtakStegImpl implements FatteVedtakSteg {
                 .map(Totrinnsvurdering::getAksjonspunktDefinisjon).collect(Collectors.toList());
             return BehandleStegResultat.tilbakeførtMedAksjonspunkter(aksjonspunktDefinisjoner);
         } else {
-            opprettBehandlingVedtak(behandling, BehandlingResultatType.INNVILGET);
+            //TODO Velge mer fingranulert ved revurdering
+            opprettBehandlingVedtak(behandling, BehandlingResultatType.FASTSATT);
             return BehandleStegResultat.utførtUtenAksjonspunkter();
         }
     }

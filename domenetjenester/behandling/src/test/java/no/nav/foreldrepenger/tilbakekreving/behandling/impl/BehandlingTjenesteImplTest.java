@@ -28,6 +28,7 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.BehandlingsresultatDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.BehandlingÅrsakDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.FpsakBehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.TilbakekrevingValgDto;
 
 public class BehandlingTjenesteImplTest extends FellesTestOppsett {
@@ -44,7 +45,7 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
     public void skal_opprette_behandling_automatisk() {
         avsluttBehandling();
         Long behandlingId = behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer, UUID.randomUUID(), eksternBehandlingId, aktørId, FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING);
-        fellesBehandlingAssert(behandlingId,false);
+        fellesBehandlingAssert(behandlingId, false);
     }
 
 
@@ -58,7 +59,7 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
     public void skal_opprette_behandling_manell() {
         avsluttBehandling();
         Long behandlingId = behandlingTjeneste.opprettBehandlingManuell(saksnummer, UUID.randomUUID(), FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING);
-        fellesBehandlingAssert(behandlingId,true);
+        fellesBehandlingAssert(behandlingId, true);
         assertThat(prosessTaskRepository.finnProsessTaskType(BehandlingTjenesteImpl.FINN_KRAVGRUNNLAG_TASK)).isNotEmpty();
     }
 
@@ -75,7 +76,7 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
         revurderingTjeneste.opprettRevurdering(saksnummer, eksternBehandlingUuid, BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR, BehandlingType.REVURDERING_TILBAKEKREVING);
 
         Long behandlingId = behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternUUID, FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING);
-        fellesBehandlingAssert(behandlingId,true);
+        fellesBehandlingAssert(behandlingId, true);
         assertThat(prosessTaskRepository.finnProsessTaskType(BehandlingTjenesteImpl.FINN_KRAVGRUNNLAG_TASK)).isNotEmpty();
     }
 
@@ -93,7 +94,7 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
         avsluttBehandling();
 
         Long behandlingId = behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternBehandlingUuid, FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING);
-        fellesBehandlingAssert(behandlingId,true);
+        fellesBehandlingAssert(behandlingId, true);
         assertThat(prosessTaskRepository.finnProsessTaskType(BehandlingTjenesteImpl.FINN_KRAVGRUNNLAG_TASK)).isNotEmpty();
     }
 
@@ -139,7 +140,7 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
     public void skal_oppdatere_behandling_medEksternReferanse() {
         UUID eksternUuid = testUtility.genererEksternUuid();
         long eksternBehandlingId = 5l;
-        behandlingTjeneste.oppdaterBehandlingMedEksternReferanse(saksnummer,eksternBehandlingId, eksternUuid);
+        behandlingTjeneste.oppdaterBehandlingMedEksternReferanse(saksnummer, eksternBehandlingId, eksternUuid);
 
         EksternBehandling eksternBehandling = repoProvider.getEksternBehandlingRepository().hentFraInternId(behandling.getId());
         assertThat(eksternBehandling.getEksternUuid()).isEqualByComparingTo(eksternUuid);
@@ -151,7 +152,7 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
         UUID eksternUuid = testUtility.genererEksternUuid();
         expectedException.expectMessage("FPT-663490");
 
-        behandlingTjeneste.oppdaterBehandlingMedEksternReferanse(new Saksnummer("1233434"),5l,  eksternUuid);
+        behandlingTjeneste.oppdaterBehandlingMedEksternReferanse(new Saksnummer("1233434"), 5l, eksternUuid);
     }
 
     private void avsluttBehandling() {
@@ -160,7 +161,7 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
         behandlingRepository.lagre(behandling, behandlingLås);
     }
 
-    private void fellesBehandlingAssert(Long behandlingId,boolean manueltOpprettet) {
+    private void fellesBehandlingAssert(Long behandlingId, boolean manueltOpprettet) {
         assertThat(behandlingId).isNotNull();
         Behandling behandling = behandlingTjeneste.hentBehandling(behandlingId);
         assertThat(behandling).isNotNull();
@@ -178,7 +179,7 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
         eksternBehandlingsinfo.setVedtakDato(NOW);
 
         BehandlingsresultatDto behandlingsresultatDto = new BehandlingsresultatDto();
-        behandlingsresultatDto.setType(BehandlingResultatType.OPPHØR);
+        behandlingsresultatDto.setType(FpsakBehandlingResultatType.OPPHØR);
         behandlingsresultatDto.setKonsekvenserForYtelsen(Lists.newArrayList(KonsekvensForYtelsen.ENDRING_I_BEREGNING, KonsekvensForYtelsen.FORELDREPENGER_OPPHØRER));
         eksternBehandlingsinfo.setBehandlingsresultat(behandlingsresultatDto);
 

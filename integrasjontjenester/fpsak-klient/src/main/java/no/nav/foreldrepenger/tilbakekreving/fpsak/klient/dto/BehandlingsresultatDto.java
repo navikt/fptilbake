@@ -4,24 +4,23 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KonsekvensForYtelsen;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class BehandlingsresultatDto {
 
-    private BehandlingResultatType type;
+    private FpsakBehandlingResultatType type;
     private List<KonsekvensForYtelsen> konsekvenserForYtelsen;
 
     public BehandlingsresultatDto() {
         // trengs for deserialisering av JSON
     }
 
-    public BehandlingResultatType getType() {
+    public FpsakBehandlingResultatType getType() {
         return type;
     }
 
-    public void setType(BehandlingResultatType type) {
+    public void setType(FpsakBehandlingResultatType type) {
         this.type = type;
     }
 

@@ -62,22 +62,6 @@ public class Behandlingsresultat extends BaseEntitet {
         return BehandlingResultatType.getAlleHenleggelseskoder().contains(behandlingResultatType);
     }
 
-    public boolean erBehandlingresultatAvslåttEllerOpphørt() {
-        return erBehandlingresultatAvslått() || erBehandlingresultatOpphørt();
-    }
-
-    public boolean erBehandlingresultatAvslått() {
-        return BehandlingResultatType.AVSLÅTT.equals(behandlingResultatType);
-    }
-
-    public boolean erBehandlingresultatOpphørt() {
-        return BehandlingResultatType.OPPHØR.equals(behandlingResultatType);
-    }
-
-    public boolean erBehandlingresultatInnvilget() {
-        return BehandlingResultatType.INNVILGET.equals(behandlingResultatType);
-    }
-
     public static Builder builder() {
         return new Builder();
     }
@@ -89,8 +73,8 @@ public class Behandlingsresultat extends BaseEntitet {
     @Override
     public String toString() {
         return getClass().getSimpleName()
-                + "<behandling: " + behandling.getId()
-                + " resultatType: " + behandlingResultatType.getKode() + ">";
+            + "<behandling: " + behandling.getId()
+            + " resultatType: " + behandlingResultatType.getKode() + ">";
     }
 
     @Override
