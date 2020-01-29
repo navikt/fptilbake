@@ -20,7 +20,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
@@ -40,7 +39,6 @@ public class BehandlingRevurderingTjeneste {
 
     private BehandlingRepositoryProvider repositoryProvider;
     private BehandlingRepository behandlingRepository;
-    private FagsakRepository fagsakRepository;
     private EksternBehandlingRepository eksternBehandlingRepository;
 
     BehandlingRevurderingTjeneste() {
@@ -51,18 +49,20 @@ public class BehandlingRevurderingTjeneste {
     public BehandlingRevurderingTjeneste(BehandlingRepositoryProvider repositoryProvider) {
         this.repositoryProvider = repositoryProvider;
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
-        this.fagsakRepository = repositoryProvider.getFagsakRepository();
         this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
     }
 
-    public Behandling opprettRevurdering(Saksnummer saksnummer, UUID eksternUuid, BehandlingÅrsakType behandlingÅrsakType, BehandlingType behandlingType) {
-
-        Fagsak fagsak = fagsakRepository.hentEksaktFagsakForGittSaksnummer(saksnummer);
+    public Behandling opprettRevurdering(Long tilbakekrevingBehandlingId, BehandlingÅrsakType behandlingÅrsakType) {
+        Behandling tbkBehandling = behandlingRepository.hentBehandling(tilbakekrevingBehandlingId);
+        EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(tbkBehandling.getId());
+        Fagsak fagsak = tbkBehandling.getFagsak();
+        Saksnummer saksnummer = fagsak.getSaksnummer();
+        UUID eksternUuid = eksternBehandling.getEksternUuid();
 
         validerHarIkkeÅpenBehandling(saksnummer, eksternUuid);
 
         repositoryProvider.getFagsakRepository().oppdaterFagsakStatus(fagsak.getId(), FagsakStatus.UNDER_BEHANDLING);
-        return opprettManuellRevurdering(fagsak, behandlingÅrsakType, eksternUuid, behandlingType);
+        return opprettManuellRevurdering(fagsak, behandlingÅrsakType, eksternUuid);
     }
 
     public boolean kanOppretteRevurdering(UUID eksternUuid) {
@@ -79,14 +79,14 @@ public class BehandlingRevurderingTjeneste {
         return eksternBehandlingRepository.hentOptionalFraInternId(behandlingId);
     }
 
-    private Behandling opprettManuellRevurdering(Fagsak fagsak, BehandlingÅrsakType behandlingÅrsakType, UUID eksternUuid, BehandlingType behandlingType) {
+    private Behandling opprettManuellRevurdering(Fagsak fagsak, BehandlingÅrsakType behandlingÅrsakType, UUID eksternUuid) {
         EksternBehandling eksternBehandlingForSisteTbkBehandling = eksternBehandlingRepository.finnForSisteAvsluttetTbkBehandling(eksternUuid)
             .orElseThrow(() -> RevurderingFeil.FACTORY.tjenesteFinnerIkkeBehandlingForRevurdering(fagsak.getId()).toException());
 
         Behandling origBehandling = behandlingRepository.hentBehandling(eksternBehandlingForSisteTbkBehandling.getInternId());
         Long eksternBehandlingId = eksternBehandlingForSisteTbkBehandling.getEksternId(); // eksternBehandling må være samme som siste når vi opprette revurdering
 
-        Behandling revurdering = opprettRevurderingsBehandling(behandlingÅrsakType, origBehandling, behandlingType);
+        Behandling revurdering = opprettRevurderingsBehandling(behandlingÅrsakType, origBehandling, BehandlingType.REVURDERING_TILBAKEKREVING);
         BehandlingLås lås = behandlingRepository.taSkriveLås(revurdering);
         behandlingRepository.lagre(revurdering, lås);
 

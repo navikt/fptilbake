@@ -73,7 +73,7 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
     public void skal_opprette_behandling_manell_med_allerede_åpen_revurdeing_behandling() {
         UUID eksternUUID = UUID.randomUUID();
         avsluttBehandling();
-        revurderingTjeneste.opprettRevurdering(saksnummer, eksternBehandlingUuid, BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR, BehandlingType.REVURDERING_TILBAKEKREVING);
+        revurderingTjeneste.opprettRevurdering(behandling.getId(), BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR);
 
         Long behandlingId = behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternUUID, FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING);
         fellesBehandlingAssert(behandlingId, true);

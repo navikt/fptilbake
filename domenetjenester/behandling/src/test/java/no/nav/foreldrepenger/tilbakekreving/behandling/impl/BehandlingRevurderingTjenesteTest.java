@@ -29,15 +29,7 @@ public class BehandlingRevurderingTjenesteTest extends FellesTestOppsett {
         expectedException.expect(FunksjonellException.class);
         expectedException.expectMessage("FPT-663487");
 
-        revurderingTjeneste.opprettRevurdering(saksnummer, eksternBehandlingUuid, BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR, REVURDERING_BEHANDLING_TYPE);
-    }
-
-    @Test
-    public void opprettRevurdering_nårSaksnummerErUgyldig() {
-        expectedException.expect(TekniskException.class);
-        expectedException.expectMessage("FPT-429884");
-
-        revurderingTjeneste.opprettRevurdering(null, eksternBehandlingUuid, BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR, REVURDERING_BEHANDLING_TYPE);
+        revurderingTjeneste.opprettRevurdering(behandling.getId(), BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR);
     }
 
     @Test
@@ -46,7 +38,7 @@ public class BehandlingRevurderingTjenesteTest extends FellesTestOppsett {
         BehandlingLås behandlingLås = repoProvider.getBehandlingRepository().taSkriveLås(behandling);
         behandlingRepository.lagre(behandling, behandlingLås);
 
-        Behandling revurdering = revurderingTjeneste.opprettRevurdering(saksnummer, eksternBehandlingUuid, BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR, REVURDERING_BEHANDLING_TYPE);
+        Behandling revurdering = revurderingTjeneste.opprettRevurdering(behandling.getId(), BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR);
         assertThat(revurdering).isNotNull();
         assertThat(revurdering.getFagsakId()).isNotNull();
         assertThat(revurdering.getStatus()).isEqualByComparingTo(BehandlingStatus.OPPRETTET);
