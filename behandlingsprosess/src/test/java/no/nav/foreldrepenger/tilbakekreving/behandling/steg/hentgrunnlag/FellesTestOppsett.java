@@ -101,21 +101,21 @@ public class FellesTestOppsett {
     protected final BehandlingRepository behandlingRepository = repositoryProvider.getBehandlingRepository();
     protected final FagsakRepository fagsakRepository = repositoryProvider.getFagsakRepository();
     protected final KravgrunnlagRepository grunnlagRepository = repositoryProvider.getGrunnlagRepository();
-    protected final ProsessTaskRepository prosessTaskRepository = new ProsessTaskRepositoryImpl(repoRule.getEntityManager(), eventPublisererMock);
+    protected final ProsessTaskRepository prosessTaskRepository = new ProsessTaskRepositoryImpl(repoRule.getEntityManager(), null, eventPublisererMock);
     protected final ØkonomiMottattXmlRepository mottattXmlRepository = new ØkonomiMottattXmlRepository(repoRule.getEntityManager());
     protected final EksternBehandlingRepository eksternBehandlingRepository = new EksternBehandlingRepositoryImpl(repoRule.getEntityManager());
     private final FellesQueriesForBehandlingRepositories fellesQueriesForBehandlingRepositories = new FellesQueriesForBehandlingRepositories(repoRule.getEntityManager());
     protected final BehandlingVenterRepository behandlingVenterRepository = new BehandlingVenterRepositoryImpl(fellesQueriesForBehandlingRepositories);
     protected final BehandlingKandidaterRepository behandlingKandidaterRepository = new BehandlingKandidaterRepository(fellesQueriesForBehandlingRepositories);
 
-    protected final GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjenesteImpl(prosessTaskRepository,behandlingKandidaterRepository,behandlingVenterRepository,repositoryProvider,varselresponsTjenesteMock);
+    protected final GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjenesteImpl(prosessTaskRepository, behandlingKandidaterRepository, behandlingVenterRepository, repositoryProvider, varselresponsTjenesteMock);
     protected final HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(repositoryProvider.getHistorikkRepository(), journalTjenesteMock, personinfoAdapterMock);
-    protected final BehandlingskontrollTjeneste behandlingskontrollTjeneste = new BehandlingskontrollTjenesteImpl(repositoryProvider,behandlingModellRepositoryMock,behandlingskontrollEventPublisererMock);
+    protected final BehandlingskontrollTjeneste behandlingskontrollTjeneste = new BehandlingskontrollTjenesteImpl(repositoryProvider, behandlingModellRepositoryMock, behandlingskontrollEventPublisererMock);
     private InternalManipulerBehandling manipulerInternBehandling = new InternalManipulerBehandlingImpl(repositoryProvider);
-    protected final KravgrunnlagTjeneste kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repositoryProvider, prosessTaskRepository, gjenopptaBehandlingTjeneste,behandlingskontrollTjeneste,mockSlettGrunnlagEventPubliserer);
+    protected final KravgrunnlagTjeneste kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repositoryProvider, prosessTaskRepository, gjenopptaBehandlingTjeneste, behandlingskontrollTjeneste, mockSlettGrunnlagEventPubliserer);
     protected final KravgrunnlagMapper kravgrunnlagMapper = new KravgrunnlagMapper(tpsAdapterWrapper);
     protected final LesKravgrunnlagTask lesKravgrunnlagTask = new LesKravgrunnlagTask(mottattXmlRepository, kravgrunnlagTjeneste,
-        kravgrunnlagMapper,repositoryProvider, fpsakKlientMock);
+        kravgrunnlagMapper, repositoryProvider, fpsakKlientMock);
 
     protected final KravgrunnlagMapper mapper = new KravgrunnlagMapper(tpsAdapterWrapper);
 
@@ -154,16 +154,16 @@ public class FellesTestOppsett {
         return behandlingRepository.hentBehandling(behandlingId);
     }
 
-    public ProsessTaskData lagProsessTaskData(Long mottattXmlId,String taskType) {
+    public ProsessTaskData lagProsessTaskData(Long mottattXmlId, String taskType) {
         ProsessTaskData prosessTaskData = new ProsessTaskData(taskType);
-        prosessTaskData.setProperty(TaskProperty.PROPERTY_MOTTATT_XML_ID,String.valueOf(mottattXmlId));
+        prosessTaskData.setProperty(TaskProperty.PROPERTY_MOTTATT_XML_ID, String.valueOf(mottattXmlId));
         return prosessTaskData;
     }
 
     private BehandlingModell lagDummyBehandlingsModell() {
         List<TestStegKonfig> steg = Lists.newArrayList(
-            new TestStegKonfig(BehandlingStegType.TBKGSTEG, BehandlingType.TILBAKEKREVING,new MottattGrunnlagStegImpl()),
-            new TestStegKonfig(BehandlingStegType.IVERKSETT_VEDTAK,BehandlingType.TILBAKEKREVING,new IverksetteVedtakStegImpl(repositoryProvider,null)));
+            new TestStegKonfig(BehandlingStegType.TBKGSTEG, BehandlingType.TILBAKEKREVING, new MottattGrunnlagStegImpl()),
+            new TestStegKonfig(BehandlingStegType.IVERKSETT_VEDTAK, BehandlingType.TILBAKEKREVING, new IverksetteVedtakStegImpl(repositoryProvider, null)));
 
         BehandlingModellImpl.TriFunction<BehandlingStegType, BehandlingType, BehandlingSteg> finnSteg = map(steg);
         BehandlingModellImpl modell = new BehandlingModellImpl(BehandlingType.TILBAKEKREVING, finnSteg);

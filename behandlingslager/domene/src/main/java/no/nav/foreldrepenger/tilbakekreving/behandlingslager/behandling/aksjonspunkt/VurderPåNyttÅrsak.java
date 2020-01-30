@@ -14,8 +14,8 @@ import org.hibernate.annotations.JoinColumnOrFormula;
 import org.hibernate.annotations.JoinColumnsOrFormulas;
 import org.hibernate.annotations.JoinFormula;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.diff.IndexKey;
-import no.nav.vedtak.felles.jpa.BaseEntitet;
 
 
 /**
@@ -48,7 +48,7 @@ public class VurderPåNyttÅrsak extends BaseEntitet implements IndexKey {
         this.aksjonspunkt = aksjonspunkt;
         this.årsaksType = type;
     }
-    
+
     @Override
     public String getIndexKey() {
         return IndexKey.createKey(årsaksType);

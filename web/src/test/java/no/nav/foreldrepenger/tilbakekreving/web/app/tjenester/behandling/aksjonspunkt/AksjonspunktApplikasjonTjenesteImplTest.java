@@ -28,14 +28,13 @@ import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.VurderForeldelseDto;
 import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 import no.nav.vedtak.felles.testutilities.db.RepositoryRule;
-import no.nav.vedtak.util.FPDateUtil;
 
 @RunWith(CdiRunner.class)
 public class AksjonspunktApplikasjonTjenesteImplTest {
 
     private static final String BEGRUNNELSE = "begrunnelse";
-    private static final LocalDate FOM = FPDateUtil.iDag().minusDays(40);
-    private static final LocalDate TOM = FPDateUtil.iDag().minusDays(7);
+    private static final LocalDate FOM = LocalDate.now().minusDays(40);
+    private static final LocalDate TOM = LocalDate.now().minusDays(7);
 
     @Rule
     public final RepositoryRule repoRule = new UnittestRepositoryRule();

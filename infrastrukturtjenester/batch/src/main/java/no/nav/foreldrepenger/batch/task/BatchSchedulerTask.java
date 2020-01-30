@@ -16,7 +16,6 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
-import no.nav.vedtak.util.FPDateUtil;
 
 /**
  * Enkel scheduler for dagens situasjon der man kjører batcher mandag-fredag og det er noe variasjon i parametere.
@@ -37,7 +36,7 @@ public class BatchSchedulerTask implements ProsessTaskHandler {
     private BatchSupportTjeneste batchSupportTjeneste;
 
     private final List<Supplier<BatchConfig>> batchOppsettFelles = Arrays.asList(
-        () -> new BatchConfig(6, 55, BATCH_AVSTEMMING, "dato=" + FPDateUtil.iDag().minusDays(1).format(DateTimeFormatter.ISO_DATE)),
+        () -> new BatchConfig(6, 55, BATCH_AVSTEMMING, "dato=" + LocalDate.now().minusDays(1).format(DateTimeFormatter.ISO_DATE)),
         () -> new BatchConfig(7, 0, BATCH_TA_AV_VENT, null)
     );
 
@@ -54,7 +53,7 @@ public class BatchSchedulerTask implements ProsessTaskHandler {
 
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
-        dagensDato = FPDateUtil.iDag();
+        dagensDato = LocalDate.now();
 
         // Lagre neste instans av daglig scheduler straks over midnatt
         ProsessTaskData batchScheduler = new ProsessTaskData(BatchSchedulerTask.TASKTYPE);

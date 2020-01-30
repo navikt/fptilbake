@@ -9,7 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import no.nav.vedtak.felles.jpa.BaseEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 
 @Entity(name = "VedtaksbrevFritekstOppsummering")
 @Table(name = "VEDTAKSBREV_OPPSUMMERING")

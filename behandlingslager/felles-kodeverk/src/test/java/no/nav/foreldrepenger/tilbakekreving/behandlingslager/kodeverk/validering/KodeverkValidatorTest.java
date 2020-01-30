@@ -54,7 +54,6 @@ public class KodeverkValidatorTest {
         assertEquals(KODEVERK_KODE_FEIL_MELDING, violations.iterator().next().getMessage());
     }
 
-
     @Test
     public void testSkalFeilePåTomInput() {
         TestKodeliste kl = new TestKodeliste("", "");

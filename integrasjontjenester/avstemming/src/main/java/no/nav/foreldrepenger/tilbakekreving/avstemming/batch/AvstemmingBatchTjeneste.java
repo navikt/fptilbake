@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.avstemming.batch;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.Optional;
@@ -25,7 +26,6 @@ import no.nav.vedtak.feil.LogLevel;
 import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
 import no.nav.vedtak.feil.deklarasjon.IntegrasjonFeil;
 import no.nav.vedtak.felles.integrasjon.unleash.EnvironmentProperty;
-import no.nav.vedtak.util.FPDateUtil;
 
 @ApplicationScoped
 public class AvstemmingBatchTjeneste implements BatchTjeneste {
@@ -68,7 +68,7 @@ public class AvstemmingBatchTjeneste implements BatchTjeneste {
 
         if (resultat.isPresent()) {
             String forDato = dato.format(DATO_FORMATTER);
-            String kjøreTidspunkt = FPDateUtil.nå().format(DATO_TIDSPUNKT_FORMATTER);
+            String kjøreTidspunkt = LocalDateTime.now().format(DATO_TIDSPUNKT_FORMATTER);
             String filnavn = String.format(FILNAVN_MAL, miljø, forDato, kjøreTidspunkt);
             try {
                 sftpBatchTjeneste.put(resultat.get(), filnavn);

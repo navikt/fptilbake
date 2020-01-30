@@ -15,8 +15,8 @@ import org.hibernate.annotations.JoinColumnOrFormula;
 import org.hibernate.annotations.JoinColumnsOrFormulas;
 import org.hibernate.annotations.JoinFormula;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.SærligGrunn;
-import no.nav.vedtak.felles.jpa.BaseEntitet;
 
 @Entity(name = "VilkårVurderingSærligGrunn")
 @Table(name = "VILKAAR_SAERLIG_GRUNN")

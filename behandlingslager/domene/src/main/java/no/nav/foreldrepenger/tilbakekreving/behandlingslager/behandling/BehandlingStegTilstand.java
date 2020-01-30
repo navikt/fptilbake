@@ -15,8 +15,8 @@ import javax.persistence.Version;
 import org.hibernate.annotations.JoinColumnOrFormula;
 import org.hibernate.annotations.JoinFormula;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.diff.IndexKey;
-import no.nav.vedtak.felles.jpa.BaseEntitet;
 
 
 @Entity(name = "BehandlingStegTilstand")
@@ -61,7 +61,7 @@ public class BehandlingStegTilstand extends BaseEntitet implements IndexKey {
     public Long getId() {
         return id;
     }
-    
+
     @Override
     public String getIndexKey() {
         return IndexKey.createKey(behandlingSteg, behandlingStegStatus);

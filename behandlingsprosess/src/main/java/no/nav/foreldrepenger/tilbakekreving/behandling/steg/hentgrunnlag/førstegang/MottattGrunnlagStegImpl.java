@@ -25,7 +25,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.vedtak.konfig.KonfigVerdi;
-import no.nav.vedtak.util.FPDateUtil;
 
 @BehandlingStegRef(kode = "TBKGSTEG")
 @BehandlingTypeRef
@@ -61,7 +60,7 @@ public class MottattGrunnlagStegImpl implements GrunnlagSteg {
         if (gjenopptaBehandlingTjeneste.kanGjenopptaSteg(kontekst.getBehandlingId())) {
             return BehandleStegResultat.utførtUtenAksjonspunkter();
         }
-        LocalDateTime fristTid = FPDateUtil.nå().plus(ventefrist);
+        LocalDateTime fristTid = LocalDateTime.now().plus(ventefrist);
         behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG,
             BehandlingStegType.TBKGSTEG, fristTid, Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
 
@@ -101,7 +100,7 @@ public class MottattGrunnlagStegImpl implements GrunnlagSteg {
     }
 
     private boolean gåttOverFristen(LocalDateTime fristTid) {
-        return fristTid != null && FPDateUtil.nå().toLocalDate().isAfter(fristTid.toLocalDate());
+        return fristTid != null && LocalDateTime.now().toLocalDate().isAfter(fristTid.toLocalDate());
     }
 
 }

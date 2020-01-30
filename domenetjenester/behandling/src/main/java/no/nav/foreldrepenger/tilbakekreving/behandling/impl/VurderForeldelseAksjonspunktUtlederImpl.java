@@ -18,7 +18,6 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.vedtak.konfig.KonfigVerdi;
-import no.nav.vedtak.util.FPDateUtil;
 
 @ApplicationScoped
 public class VurderForeldelseAksjonspunktUtlederImpl implements VurderForeldelseAksjonspunktUtleder {
@@ -44,7 +43,7 @@ public class VurderForeldelseAksjonspunktUtlederImpl implements VurderForeldelse
         // Henter perioder og vurderer foreldelse
         Kravgrunnlag431 kravgrunnlag = grunnlagRepository.finnKravgrunnlag(behandlingId);
         for (KravgrunnlagPeriode432 grunnlagPeriode : kravgrunnlag.getPerioder()) {
-            if (erForeldet(FPDateUtil.iDag(), grunnlagPeriode.getFom())) {
+            if (erForeldet(LocalDate.now(), grunnlagPeriode.getFom())) {
                 return Optional.of(AksjonspunktDefinisjon.VURDER_FORELDELSE);
             }
         }

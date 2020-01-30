@@ -22,7 +22,6 @@ import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehand
 import no.nav.foreldrepenger.tilbakekreving.simulering.kontrakt.FeilutbetaltePerioderDto;
 import no.nav.foreldrepenger.tilbakekreving.simulering.kontrakt.PeriodeDto;
 import no.nav.vedtak.sikkerhet.context.SubjectHandler;
-import no.nav.vedtak.util.FPDateUtil;
 
 public class VarselbrevUtil {
 
@@ -61,7 +60,7 @@ public class VarselbrevUtil {
             .medFritekstFraSaksbehandler(varselTekst)
             .medSumFeilutbetaling(feilutbetaltePerioderDto.getSumFeilutbetaling())
             .medFeilutbetaltePerioder(mapFeilutbetaltePerioder(feilutbetaltePerioderDto))
-            .medFristdato(finnFristForTilbakemeldingFraBruker(FPDateUtil.nå(), ventetid))
+            .medFristdato(finnFristForTilbakemeldingFraBruker(LocalDateTime.now(), ventetid))
             .medRevurderingVedtakDato(grunninformasjon.getVedtakDato())
             .build();
     }
@@ -96,7 +95,7 @@ public class VarselbrevUtil {
             .medFritekstFraSaksbehandler(varseltekst)
             .medSumFeilutbetaling(feilutbetaltePerioderDto.getSumFeilutbetaling())
             .medFeilutbetaltePerioder(mapFeilutbetaltePerioder(feilutbetaltePerioderDto))
-            .medFristdato(finnFristForTilbakemeldingFraBruker(FPDateUtil.nå(), ventetid))
+            .medFristdato(finnFristForTilbakemeldingFraBruker(LocalDateTime.now(), ventetid))
             .medRevurderingVedtakDato(grunninformasjon.getVedtakDato())
             .build();
     }
@@ -132,7 +131,7 @@ public class VarselbrevUtil {
             .medFritekstFraSaksbehandler(friTekst)
             .medSumFeilutbetaling(feilutbetalingFakta.getAktuellFeilUtbetaltBeløp().longValue())
             .medFeilutbetaltePerioder(mapFeilutbetaltePerioder(feilutbetalingFakta))
-            .medFristdato(finnFristForTilbakemeldingFraBruker(FPDateUtil.nå(), ventetid))
+            .medFristdato(finnFristForTilbakemeldingFraBruker(LocalDateTime.now(), ventetid))
             .medRevurderingVedtakDato(feilutbetalingFakta.getDatoForRevurderingsvedtak())
             .build();
     }

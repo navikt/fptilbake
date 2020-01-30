@@ -13,7 +13,6 @@ import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.Tilbakekrevingsvedt
 import no.nav.tilbakekreving.typer.v1.PeriodeDto;
 import no.nav.vedtak.felles.integrasjon.felles.ws.DateUtil;
 import no.nav.vedtak.sikkerhet.context.SubjectHandler;
-import no.nav.vedtak.util.FPDateUtil;
 
 public class TilbakekrevingsvedtakMapper {
 
@@ -35,7 +34,7 @@ public class TilbakekrevingsvedtakMapper {
         tilbakekrevingsvedtak.setVedtakId(BigInteger.valueOf(kravgrunnlag.getVedtakId()));
         LocalDate vedtakFagsystemDato = kravgrunnlag.getVedtakFagSystemDato();
         if (vedtakFagsystemDato == null) {
-            vedtakFagsystemDato = FPDateUtil.iDag();
+            vedtakFagsystemDato = LocalDate.now();
         }
         tilbakekrevingsvedtak.setDatoVedtakFagsystem(DateUtil.convertToXMLGregorianCalendar(vedtakFagsystemDato));
         tilbakekrevingsvedtak.setKodeHjemmel("22-15"); // fast verdi

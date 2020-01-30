@@ -32,7 +32,6 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.konfig.KonfigVerdi;
-import no.nav.vedtak.util.FPDateUtil;
 
 
 @BehandlingStegRef(kode = "VARSELSTEG")
@@ -74,7 +73,7 @@ public class VarselStegImpl implements VarselSteg {
         if (sjekkTilbakekrevingOpprettetUtenVarsel(behandling.getId()) || behandling.isManueltOpprettet()) { //ikke sendt varsel når behandling er opprettet manuelt eller opprettet uten varsel
             return BehandleStegResultat.utførtUtenAksjonspunkter();
         }
-        LocalDateTime fristTid = FPDateUtil.nå().plus(ventefrist).plusDays(1);
+        LocalDateTime fristTid = LocalDateTime.now().plus(ventefrist).plusDays(1);
         opprettSendVarselTask(behandling);
 
         behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING,
@@ -86,7 +85,7 @@ public class VarselStegImpl implements VarselSteg {
     @Override
     public BehandleStegResultat gjenopptaSteg(BehandlingskontrollKontekst kontekst) {
         Behandling behandling = behandlingRepository.hentBehandling(kontekst.getBehandlingId());
-        LocalDate iDag = FPDateUtil.iDag();
+        LocalDate iDag = LocalDate.now();
         if (sjekkTilbakekrevingOpprettetUtenVarsel(behandling.getId())) { // hvis det er ingen varselTekst finnes,kan behandling fortsette
             return BehandleStegResultat.utførtUtenAksjonspunkter();
         }

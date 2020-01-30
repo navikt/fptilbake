@@ -14,10 +14,8 @@ import org.junit.Test;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.handlebars.dto.BaseDokument;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.handlebars.dto.VarselbrevDokument;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
-import no.nav.vedtak.util.FPDateUtil;
 
 public class TekstformattererForVarselbrevTest {
 
@@ -140,7 +138,7 @@ public class TekstformattererForVarselbrevTest {
             .medFeilutbetaltePerioder(mockFeilutbetalingerMedFlerePerioder())
             .medSumFeilutbetaling(595959L)
             .medFristdato(LocalDate.of(2020, 5, 5))
-            .medRevurderingVedtakDato(FPDateUtil.iDag())
+            .medRevurderingVedtakDato(LocalDate.now())
             .medMetadata(brevMetadata)
             .build();
 

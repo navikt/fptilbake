@@ -15,7 +15,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.Bre
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
-import no.nav.vedtak.util.FPDateUtil;
 
 @ApplicationScoped
 public class VarselSelvbetjeningTjeneste {
@@ -43,7 +42,7 @@ public class VarselSelvbetjeningTjeneste {
 
         Fagsak fagsak = behandling.getFagsak();
         Saksnummer saksnummer = fagsak.getSaksnummer();
-        LocalDateTime nå = FPDateUtil.nå();
+        LocalDateTime nå = LocalDateTime.now();
         SendtVarselInformasjon svInfo = SendtVarselInformasjon.builder()
             .medAktørId(behandling.getAktørId())
             .medSaksnummer(saksnummer)

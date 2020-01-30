@@ -19,7 +19,7 @@ public class ForvaltningTekniskRestTjenesteTest {
     @Rule
     public UnittestRepositoryRule repositoryRule = new UnittestRepositoryRule();
 
-    private ProsessTaskRepository prosessTaskRepository = new ProsessTaskRepositoryImpl(repositoryRule.getEntityManager(), null);
+    private ProsessTaskRepository prosessTaskRepository = new ProsessTaskRepositoryImpl(repositoryRule.getEntityManager(), null, null);
     private ForvaltningTekniskRestTjeneste forvaltningTekniskRestTjeneste = new ForvaltningTekniskRestTjeneste(prosessTaskRepository);
 
     @Test

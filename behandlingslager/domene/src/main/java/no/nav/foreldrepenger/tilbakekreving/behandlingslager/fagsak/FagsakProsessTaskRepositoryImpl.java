@@ -35,7 +35,6 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe.Entry;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
 import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskEntitet;
-import no.nav.vedtak.util.FPDateUtil;
 
 @ApplicationScoped
 public class FagsakProsessTaskRepositoryImpl implements FagsakProsessTaskRepository {
@@ -139,9 +138,9 @@ public class FagsakProsessTaskRepositoryImpl implements FagsakProsessTaskReposit
             Optional<ProsessTaskData> feilet = matchedTasks.stream().filter(t -> t.getStatus().equals(ProsessTaskStatus.FEILET)).findFirst();
 
             Set<String> nyeTaskTyper = nyeTasks.stream().map(t -> t.getTask().getTaskType()).collect(Collectors.toSet());
-            Set<String> eksisterendeTaskTyper = eksisterendeTasks.stream().map(t -> t.getTaskType()).collect(Collectors.toSet());
+            Set<String> eksisterendeTaskTyper = eksisterendeTasks.stream().map(ProsessTaskData::getTaskType).collect(Collectors.toSet());
 
-            if (!feilet.isPresent()) {
+            if (feilet.isEmpty()) {
                 if(eksisterendeTaskTyper.containsAll(nyeTaskTyper)){
                     return eksisterendeTasks.get(0).getGruppe();
                 } else {
@@ -158,7 +157,7 @@ public class FagsakProsessTaskRepositoryImpl implements FagsakProsessTaskReposit
     public List<ProsessTaskData> sjekkStatusProsessTasks(Long fagsakId, Long behandlingId, String gruppe) {
         Objects.requireNonNull(fagsakId, "fagsakId"); // NOSONAR
 
-        LocalDateTime now = FPDateUtil.nå().withNano(0).withSecond(0);
+        LocalDateTime now = LocalDateTime.now().withNano(0).withSecond(0);
 
         // et tidsrom for neste kjøring vi kan ta hensyn til. Det som er lenger ut i fremtiden er ikke relevant her, kun det vi kan forvente
         // kjøres i umiddelbar fremtid. tar i tillegg hensyn til alt som skulle ha vært kjørt tilbake i tid (som har stoppet av en eller annen

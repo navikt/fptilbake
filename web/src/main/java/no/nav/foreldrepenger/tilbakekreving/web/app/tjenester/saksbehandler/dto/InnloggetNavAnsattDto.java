@@ -2,8 +2,6 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.saksbehandler.dto
 
 import java.time.LocalDateTime;
 
-import no.nav.vedtak.util.FPDateUtil;
-
 public class InnloggetNavAnsattDto {
 
     private String brukernavn;
@@ -114,7 +112,7 @@ public class InnloggetNavAnsattDto {
         }
 
         public InnloggetNavAnsattDto create() {
-            this.kladd.funksjonellTid = FPDateUtil.nå();
+            this.kladd.funksjonellTid = LocalDateTime.now();
             return kladd;
         }
     }
