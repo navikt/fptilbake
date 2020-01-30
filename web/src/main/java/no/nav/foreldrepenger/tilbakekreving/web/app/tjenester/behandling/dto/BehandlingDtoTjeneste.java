@@ -149,8 +149,6 @@ public class BehandlingDtoTjeneste {
 
         leggTilLenkerForBehandlingsoperasjoner(dto);
 
-        dto.leggTil(new ResourceLink("/fptilbake/api/kodeverk", "kodeverk", ResourceLink.HttpMethod.GET));
-
         dto.leggTil(ResourceLink.get("/fptilbake/api/behandling/aksjonspunkt?behandlingId=" + behandlingId, "aksjonspunkter", null));
         if (BehandlingStegType.FAKTA_FEILUTBETALING.equals(bst) || harDataForFaktaFeilutbetaling) {
             dto.leggTil(ResourceLink.get("/fptilbake/api/feilutbetalingaarsak", "feilutbetalingAarsak", null));
