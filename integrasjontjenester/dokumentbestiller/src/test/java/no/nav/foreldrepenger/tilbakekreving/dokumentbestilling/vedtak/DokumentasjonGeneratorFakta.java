@@ -31,6 +31,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbSak;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbTotalresultat;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVarsel;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevDatoer;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevFelles;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevPeriodeOgFelles;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbKravgrunnlag;
@@ -98,10 +99,12 @@ public class DokumentasjonGeneratorFakta {
                 .replaceAll(" 10\u00A0000\u00A0kroner", " <feilutbetalt beløp> kroner")
                 .replaceAll(" 33\u00A0333\u00A0kroner", " <utbetalt beløp> kroner")
                 .replaceAll(" 23\u00A0333\u00A0kroner", " <riktig beløp> kroner")
-                .replaceAll("Søker Søkersen", " <søkers navn>")
-                .replaceAll("1. mars 2018", " <dato søker døde>")
-                .replaceAll("ektefellen", "<ektefellen/samboeren>")
-                ;
+                .replaceAll("Søker Søkersen", "<søkers navn>")
+                .replaceAll("2. mars 2018", "<opphørsdato søker døde>")
+                .replaceAll("3. mars 2018", "<opphørsdato barn døde>")
+                .replaceAll("4. mars 2018", "<opphørsdato ikke lenger gravid>")
+                .replaceAll("5. mars 2018", "<opphørsdato ikke omsorg>")
+                .replaceAll("ektefellen", "<ektefellen/samboeren>");
             System.out.println(parametrisertTekst);
             System.out.println();
         }
@@ -136,12 +139,19 @@ public class DokumentasjonGeneratorFakta {
                 .build())
             .medResultat(HbResultat.builder()
                 .medTilbakekrevesBeløp(BigDecimal.valueOf(5000))
+                .medTilbakekrevesBeløpUtenSkatt(BigDecimal.valueOf(4002))
                 .medRenterBeløp(BigDecimal.ZERO)
                 .build())
             ;
     }
 
     private HbVedtaksbrevFelles.Builder lagFellesBuilder() {
+        HbVedtaksbrevDatoer datoer = HbVedtaksbrevDatoer.builder().medDatoer(
+            LocalDate.of(2018, 3, 2)
+            , LocalDate.of(2018, 3, 3)
+            , LocalDate.of(2018, 3, 4)
+            , LocalDate.of(2018, 3, 5))
+            .build();
         return builder()
             .medLovhjemmelVedtak("Folketrygdloven")
             .medVedtakResultat(HbTotalresultat.builder()
@@ -160,9 +170,9 @@ public class DokumentasjonGeneratorFakta {
                 .build())
             .medSøker(HbPerson.builder()
                 .medNavn("Søker Søkersen")
-                .medDødsdato(LocalDate.of(2018, 3, 1))
                 .medErGift(true)
-                .build());
+                .build())
+            .medDatoer(datoer);
     }
 
     private List<HendelseMedUndertype> getFeilutbetalingsårsaker(FagsakYtelseType ytelseType) {

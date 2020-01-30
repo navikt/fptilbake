@@ -51,7 +51,7 @@ public class DokumentasjonGeneratorSærligeGrunner {
                             String s = TekstformatererVedtaksbrev.lagSærligeGrunnerTekst(felles, periode);
                             String overskrift = overskrift(sgNav, sgBeløp, sgTid, sgAnnet, reduksjon);
                             String prettyprint = s.replace("_Er det særlige grunner til å redusere beløpet?", overskrift)
-                                .replace(" 500 kroner", " <kravbeløp> kroner");
+                                .replace(" 500\u00A0kroner", " <kravbeløp> kroner");
 
                             System.out.println();
                             System.out.println(prettyprint);
@@ -112,6 +112,7 @@ public class DokumentasjonGeneratorSærligeGrunner {
                 .build())
             .medResultat(HbResultat.builder()
                 .medTilbakekrevesBeløp(BigDecimal.valueOf(reduksjon ? 500 : 1000))
+                .medTilbakekrevesBeløpUtenSkatt(BigDecimal.valueOf(reduksjon ? 400 : 800))
                 .medRenterBeløp(BigDecimal.ZERO)
                 .build())
             .medFakta(HendelseType.FP_UTTAK_GRADERT_TYPE, FpHendelseUnderTyper.GRADERT_UTTAK)

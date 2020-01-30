@@ -2,6 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -32,7 +33,7 @@ import no.nav.vedtak.log.mdc.MDCOperations;
 @ApplicationScoped
 public class GjenopptaBehandlingTjenesteImpl implements GjenopptaBehandlingTjeneste {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(GjenopptaBehandlingTjenesteImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(GjenopptaBehandlingTjenesteImpl.class);
 
     private ProsessTaskRepository prosessTaskRepository;
     private BehandlingKandidaterRepository behandlingKandidaterRepository;
@@ -61,7 +62,7 @@ public class GjenopptaBehandlingTjenesteImpl implements GjenopptaBehandlingTjene
 
     @Override
     public String automatiskGjenopptaBehandlinger() {
-        List<Behandling> behandlinger = behandlingKandidaterRepository.finnBehandlingerForAutomatiskGjenopptagelse();
+        Set<Behandling> behandlinger = behandlingKandidaterRepository.finnBehandlingerForAutomatiskGjenopptagelse();
 
         final String callId = hentCallId();
 
@@ -78,8 +79,7 @@ public class GjenopptaBehandlingTjenesteImpl implements GjenopptaBehandlingTjene
         Optional<Behandling> behandlingOpt = behandlingVenterRepository.hentBehandlingPåVent(behandlingId);
         if (behandlingOpt.isPresent()) {
             Behandling behandling = behandlingOpt.get();
-            if (BehandlingStegType.VARSEL.equals(behandling.getAktivtBehandlingSteg())
-                && Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING.equals(behandling.getVenteårsak())) {
+            if (BehandlingStegType.VARSEL.equals(behandling.getAktivtBehandlingSteg()) && Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING.equals(behandling.getVenteårsak())) {
                 varselresponsTjeneste.lagreRespons(behandlingId, ResponsKanal.MANUELL);
             } else if (!kanGjenopptaSteg(behandlingId) && Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG.equals(behandling.getVenteårsak())) {
                 return Optional.empty();
@@ -146,7 +146,7 @@ public class GjenopptaBehandlingTjenesteImpl implements GjenopptaBehandlingTjene
         // unik per task da det gjelder ulike behandlinger, gjenbruker derfor ikke
         prosessTaskData.setCallId(callId);
 
-        LOGGER.info("oppretter ny prosesstask med callId: {}", callId);
+        logger.info("Gjenopptar behandling av behandlingId={}, oppretter {}-prosesstask med callId={}", behandling.getId(), prosessTaskData.getTaskType(), callId);
         return prosessTaskRepository.lagre(prosessTaskData);
     }
 
