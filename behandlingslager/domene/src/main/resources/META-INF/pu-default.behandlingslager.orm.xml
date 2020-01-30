@@ -17,7 +17,6 @@
     <sequence-generator name="SEQ_TOTRINNSVURDERING" allocation-size="50" sequence-name="SEQ_TOTRINNSVURDERING"/>
     <sequence-generator name="SEQ_TOTRINNRESULTATGRUNNLAG" allocation-size="50" sequence-name="SEQ_TOTRINNRESULTATGRUNNLAG"/>
     <sequence-generator name="SEQ_VURDER_AARSAK_TTVURDERING" allocation-size="50" sequence-name="SEQ_VURDER_AARSAK_TTVURDERING"/>
-    <sequence-generator name="SEQ_KONFIG_VERDI" allocation-size="50" sequence-name="SEQ_KONFIG_VERDI"/>
 
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker"/>
 
@@ -58,8 +57,6 @@
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakStatus"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodelisteRelasjon"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.konfig.KonfigVerdiGruppe"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.konfig.KonfigVerdiType"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Landkoder"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.MottakKanal"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.NavBrukerKjønn"/>
@@ -75,8 +72,6 @@
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.VariantFormat"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.VurderÅrsak"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.konfig.KonfigVerdiEntitet"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.konfig.KonfigVerdiKode"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.tilbakekrevingsvalg.VidereBehandling"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KonsekvensForYtelsen"/>
 
