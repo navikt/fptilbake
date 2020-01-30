@@ -128,7 +128,8 @@ public class BehandlingRestTjeneste {
             Long behandlingId = behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternUuid, opprettBehandlingDto.getFagsakYtelseType(), behandlingType);
             return Redirect.tilBehandlingPollStatus(behandlingId, Optional.empty());
         } else if (BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandlingType)) {
-            Behandling revurdering = revurderingTjeneste.opprettRevurdering(saksnummer, eksternUuid, opprettBehandlingDto.getBehandlingArsakType(), behandlingType);
+            Long tbkBehandlingId = opprettBehandlingDto.getBehandlingId();
+            Behandling revurdering = revurderingTjeneste.opprettRevurdering(tbkBehandlingId, opprettBehandlingDto.getBehandlingArsakType());
             String gruppe = behandlingskontrollAsynkTjeneste.asynkProsesserBehandling(revurdering);
             return Redirect.tilBehandlingPollStatus(revurdering.getId(), Optional.of(gruppe));
         }
