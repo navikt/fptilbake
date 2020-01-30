@@ -15,8 +15,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.Bre
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselInfo;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.EksternDataForBrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.YtelseNavn;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
@@ -32,7 +30,6 @@ public class HenleggelsesbrevTjeneste {
     private static final String TITTEL_HENLEGGELSESBREV_HISTORIKKINNSLAG = "Henleggelsesbrev tilbakekreving";
     private static final String TITTEL_HENLEGGELSESBREV = "Informasjon om at tilbakekrevingssaken er henlagt";
 
-    private VarselRepository varselRepository;
     private BehandlingRepository behandlingRepository;
     private BrevSporingRepository brevSporingRepository;
 
@@ -50,7 +47,6 @@ public class HenleggelsesbrevTjeneste {
                                     EksternDataForBrevTjeneste eksternDataForBrevTjeneste,
                                     FritekstbrevTjeneste bestillDokumentTjenest,
                                     HistorikkinnslagTjeneste historikkinnslagTjeneste) {
-        this.varselRepository = repositoryProvider.getVarselRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.brevSporingRepository = repositoryProvider.getBrevSporingRepository();
 
@@ -77,7 +73,12 @@ public class HenleggelsesbrevTjeneste {
     }
 
     private HenleggelsesbrevSamletInfo lagHenleggelsebrevForSending(Behandling behandling) {
-        VarselInfo varselInfo = varselRepository.finnEksaktVarsel(behandling.getId());
+        Long behandlingId = behandling.getId();
+        Optional<BrevSporing> brevSporing = brevSporingRepository.hentSistSendtVarselbrev(behandlingId);
+        if (brevSporing.isEmpty()) {
+            throw HenleggelsesbrevFeil.FACTORY.kanIkkeSendeEllerForhåndsviseHenleggelsesBrev(behandlingId).toException();
+        }
+
         FagsakYtelseType fagsakYtelseType = behandling.getFagsak().getFagsakYtelseType();
         Språkkode språkkode = behandling.getFagsak().getNavBruker().getSpråkkode();
 
@@ -103,7 +104,7 @@ public class HenleggelsesbrevTjeneste {
 
         HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = new HenleggelsesbrevSamletInfo();
         henleggelsesbrevSamletInfo.setBrevMetadata(metadata);
-        henleggelsesbrevSamletInfo.setVarsletDato(varselInfo.getOpprettetTidspunkt().toLocalDate());
+        henleggelsesbrevSamletInfo.setVarsletDato(brevSporing.get().getOpprettetTidspunkt().toLocalDate());
         return henleggelsesbrevSamletInfo;
     }
 
