@@ -71,11 +71,6 @@ public class BehandlingDtoTjeneste {
 
         // Behandlingsmeny-operasjoner
         dto.leggTil(new ResourceLink("/fptilbake/api/behandlinger/handling-rettigheter?behandlingId=" + behandling.getId(), "handling-rettigheter", ResourceLink.HttpMethod.GET));
-        dto.leggTil(new ResourceLink("/fptilbake/api/behandlinger/bytt-enhet", "bytt-behandlende-enhet", ResourceLink.HttpMethod.POST));
-        dto.leggTil(new ResourceLink("/fptilbake/api/behandlinger/opne-for-endringer", "opne-for-endringer", ResourceLink.HttpMethod.POST));
-        dto.leggTil(new ResourceLink("/fptilbake/api/behandlinger/henlegg", "henlegg-behandling", ResourceLink.HttpMethod.POST));
-        dto.leggTil(new ResourceLink("/fptilbake/api/behandlinger/gjenoppta", "gjenoppta-behandling", ResourceLink.HttpMethod.POST));
-        dto.leggTil(new ResourceLink("/fptilbake/api/behandlinger/sett-pa-vent", "sett-behandling-pa-vent", ResourceLink.HttpMethod.POST));
 
         // Totrinnsbehandling
         if (BehandlingStatus.FATTER_VEDTAK.equals(behandling.getStatus())) {
@@ -128,6 +123,19 @@ public class BehandlingDtoTjeneste {
         dto.setSpråkkode(behandling.getFagsak().getNavBruker().getSpråkkode());
     }
 
+    private static void leggTilLenkerForBehandlingsoperasjoner(BehandlingDto dto) {
+        dto.leggTil(new ResourceLink("/fptilbake/api/behandlinger/bytt-enhet", "bytt-behandlende-enhet", ResourceLink.HttpMethod.POST));
+        dto.leggTil(new ResourceLink("/fptilbake/api/behandlinger/opne-for-endringer", "opne-for-endringer", ResourceLink.HttpMethod.POST));
+        dto.leggTil(new ResourceLink("/fptilbake/api/behandlinger/henlegg", "henlegg-behandling", ResourceLink.HttpMethod.POST));
+        dto.leggTil(new ResourceLink("/fptilbake/api/behandlinger/gjenoppta", "gjenoppta-behandling", ResourceLink.HttpMethod.POST));
+        dto.leggTil(new ResourceLink("/fptilbake/api/behandlinger/sett-pa-vent", "sett-behandling-pa-vent", ResourceLink.HttpMethod.POST));
+        dto.leggTil(new ResourceLink("/fptilbake/api/behandlinger/endre-pa-vent", "endre-pa-vent", ResourceLink.HttpMethod.POST));
+
+        dto.leggTil(new ResourceLink("/fptilbake/api/behandling/aksjonspunkt", "lagre-aksjonspunkter", ResourceLink.HttpMethod.POST));
+
+        dto.leggTil(new ResourceLink("/fptilbake/api/foreldelse/belop", "beregne-belop", ResourceLink.HttpMethod.POST));
+    }
+
     private void settResourceLinks(Behandling behandling, UtvidetBehandlingDto dto, boolean behandlingHenlagt) {
         Long behandlingId = behandling.getId();
         BehandlingModell behandlingModell = behandlingModellRepository.getModell(behandling.getType());
@@ -138,6 +146,10 @@ public class BehandlingDtoTjeneste {
         boolean harDataForFaktaFeilutbetaling = faktaFeilutbetalingRepository.harDataForFaktaFeilutbetaling(behandlingId);
         boolean harVurdertForeldelse = vurdertForeldelseTjeneste.harVurdertForeldelse(behandlingId);
         boolean harDataForVilkårsvurdering = vilkårsvurderingRepository.harDataForVilkårsvurdering(behandlingId);
+
+        leggTilLenkerForBehandlingsoperasjoner(dto);
+
+        dto.leggTil(new ResourceLink("/fptilbake/api/kodeverk", "kodeverk", ResourceLink.HttpMethod.GET));
 
         dto.leggTil(ResourceLink.get("/fptilbake/api/behandling/aksjonspunkt?behandlingId=" + behandlingId, "aksjonspunkter", null));
         if (BehandlingStegType.FAKTA_FEILUTBETALING.equals(bst) || harDataForFaktaFeilutbetaling) {
