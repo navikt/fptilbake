@@ -8,6 +8,8 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import java.util.Optional;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
+import no.nav.vedtak.exception.FunksjonellException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -58,13 +60,13 @@ public class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
         when(mockEksternDataForBrevTjeneste.hentPerson(aktørId)).thenReturn(personinfo);
         when(mockEksternDataForBrevTjeneste.hentAdresse(personinfo, aktørId)).thenReturn(lagStandardNorskAdresse());
 
-        repositoryProvider.getVarselRepository().lagre(behandlingId, varselTekst, 1000L);
         OrganisasjonsEnhet organisasjonsEnhet = new OrganisasjonsEnhet("1234", "NAV-TESTENHET");
         behandling.setBehandlendeOrganisasjonsEnhet(organisasjonsEnhet);
     }
 
     @Test
     public void skal_sende_henleggelsesbrev() {
+        lagreVarselBrevSporing();
         Optional<JournalpostIdOgDokumentId> dokumentReferanse = henleggelsesbrevTjeneste.sendHenleggelsebrev(behandlingId);
         assertThat(dokumentReferanse).isPresent();
 
@@ -79,6 +81,25 @@ public class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
 
     @Test
     public void skal_forhåndsvise_henleggelsebrev() {
+        lagreVarselBrevSporing();
         assertThat(henleggelsesbrevTjeneste.hentForhåndsvisningHenleggelsebrev(behandlingId)).isNotEmpty();
     }
+
+    @Test
+    public void skal_ikke_sende_henleggelsesbrev_hvis_varselbrev_ikke_sendt() {
+        expectedException.expectMessage("FPT-110801");
+        expectedException.expect(FunksjonellException.class);
+
+        henleggelsesbrevTjeneste.sendHenleggelsebrev(behandlingId);
+    }
+
+    private void lagreVarselBrevSporing() {
+        BrevSporing brevSporing = new BrevSporing.Builder()
+            .medJournalpostId(new JournalpostId("1213214234"))
+            .medBrevType(BrevType.VARSEL_BREV)
+            .medDokumentId("12312423432423")
+            .medBehandlingId(behandlingId).build();
+        repositoryProvider.getBrevSporingRepository().lagre(brevSporing);
+    }
+
 }
