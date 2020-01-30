@@ -7,10 +7,10 @@ import java.util.Set;
 
 import javax.persistence.EntityManager;
 
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
@@ -27,23 +27,19 @@ import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 
-public class BehandlingKandidaterRepositoryImplTest {
+public class BehandlingKandidaterRepositoryTest {
 
     @Rule
     public final UnittestRepositoryRule reporule = new UnittestRepositoryRule();
     private final EntityManager entityManager = reporule.getEntityManager();
 
     private final FellesQueriesForBehandlingRepositories fellesQueriesForBehandlingRepositories = new FellesQueriesForBehandlingRepositories(entityManager);
-    private final BehandlingKandidaterRepository repository = new BehandlingKandidaterRepository(fellesQueriesForBehandlingRepositories);
-    private final BehandlingRepositoryProviderImpl repositoryProvider = new BehandlingRepositoryProviderImpl(entityManager);
+    private final BehandlingKandidaterRepository behandlingKandidaterRepository = new BehandlingKandidaterRepository(fellesQueriesForBehandlingRepositories);
+    private final BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProviderImpl(entityManager);
 
     private final AksjonspunktRepository aksjonspunktRepository = repositoryProvider.getAksjonspunktRepository();
     private final BehandlingRepository behandlingRepository = repositoryProvider.getBehandlingRepository();
     private final FagsakRepository fagsakRepository = repositoryProvider.getFagsakRepository();
-
-    @Before
-    public void setUp() {
-    }
 
     @Test
     public void test_skalHenteBehandlingerSomVenterPåBrukerResponsHvorTidsfristUtgåttEllerTilbakekrevinggrunnlag() {
@@ -55,7 +51,7 @@ public class BehandlingKandidaterRepositoryImplTest {
         settVenterPåBrukerRespons(behandling2, LocalDateTime.now().plusWeeks(3));
         settVenterPåTilbakekrevinggrunnlag(behandling3);
 
-        Set<Behandling> resultat = repository.finnBehandlingerForAutomatiskGjenopptagelse();
+        Set<Behandling> resultat = behandlingKandidaterRepository.finnBehandlingerForAutomatiskGjenopptagelse();
 
         assertThat(resultat).hasSize(1);
         assertThat(resultat).contains(behandling1);

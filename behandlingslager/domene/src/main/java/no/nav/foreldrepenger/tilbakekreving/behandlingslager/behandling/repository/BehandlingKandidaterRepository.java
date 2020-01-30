@@ -18,7 +18,7 @@ public class BehandlingKandidaterRepository {
 
     private FellesQueriesForBehandlingRepositories sharedQueries;
 
-    public BehandlingKandidaterRepository() {
+    BehandlingKandidaterRepository() {
         // CDI
     }
 

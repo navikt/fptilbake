@@ -38,12 +38,6 @@ public class FellesQueriesForBehandlingRepositories {
      * Henter behandlinger på vent med autopunkter for gitte aksjonspunktdefinisjoner
      */
     public Collection<Behandling> finnVentendeBehandlingerMedAktivtAksjonspunkt(AksjonspunktDefinisjon... aksjonspunktDefinisjoner) {
-        List<String> åpneAksjonspunktKoder = AksjonspunktStatus.getÅpneAksjonspunktKoder();
-        String autopunktkode = AksjonspunktType.AUTOPUNKT.getKode();
-        String reaktiverkode = ReaktiveringStatus.AKTIV.getKode();
-
-        List<String> aksjonspunktKoder = Arrays.stream(aksjonspunktDefinisjoner).map(AksjonspunktDefinisjon::getKode).collect(Collectors.toList());
-
         TypedQuery<Behandling> query = entityManager.createQuery(
             "select distinct b" +
                 " from Aksjonspunkt ap" +
@@ -54,12 +48,7 @@ public class FellesQueriesForBehandlingRepositories {
                 " and ap.aksjonspunktDefinisjon.kode in (:køetKode)",
             Behandling.class);
 
-        query.setHint(QueryHints.HINT_READONLY, "true");
-        query.setParameter("åpneAksjonspunktKoder", åpneAksjonspunktKoder);
-        query.setParameter("autopunktkode", autopunktkode);
-        query.setParameter("reaktiverkode", reaktiverkode);
-        query.setParameter("køetKode", aksjonspunktKoder);
-
+        setParametre(query, aksjonspunktDefinisjoner);
         return query.getResultList();
     }
 
@@ -67,16 +56,10 @@ public class FellesQueriesForBehandlingRepositories {
      * Henter behandling, gitt at den er på vent med autopunkter for gitte aksjonspunktdefinisjoner
      */
     public Optional<Behandling> finnVentendeBehandlingMedAktivtAksjonspunkt(Long behandingId, AksjonspunktDefinisjon... aksjonspunktDefinisjoner) {
-        List<String> åpneAksjonspunktKoder = AksjonspunktStatus.getÅpneAksjonspunktKoder();
-        String autopunktkode = AksjonspunktType.AUTOPUNKT.getKode();
-        String reaktiverkode = ReaktiveringStatus.AKTIV.getKode();
-
-        List<String> aksjonspunktKoder = Arrays.stream(aksjonspunktDefinisjoner).map(AksjonspunktDefinisjon::getKode).collect(Collectors.toList());
-
         TypedQuery<Behandling> query = entityManager.createQuery(
             "select b" +
-                " from Aksjonspunkt ap" +
-                " inner join ap.behandling b on ap.behandling.id = b.id" +
+                " from Behandling b" +
+                " inner join Aksjonspunkt ap on ap.behandling.id = b.id" +
                 " where ap.status.kode = :åpneAksjonspunktKoder" +
                 " and ap.reaktiveringStatus.kode = :reaktiverkode" +
                 " and ap.aksjonspunktDefinisjon.aksjonspunktType.kode = :autopunktkode" +
@@ -84,18 +67,23 @@ public class FellesQueriesForBehandlingRepositories {
                 " and b.id = :behandlingId",
             Behandling.class);
 
+        setParametre(query, aksjonspunktDefinisjoner);
         query.setHint(QueryHints.HINT_READONLY, "true");
         query.setParameter("behandlingId", behandingId);
-        query.setParameter("åpneAksjonspunktKoder", åpneAksjonspunktKoder);
-        query.setParameter("autopunktkode", autopunktkode);
-        query.setParameter("reaktiverkode", reaktiverkode);
-        query.setParameter("køetKode", aksjonspunktKoder);
 
         List<Behandling> resultat = query.getResultList();
         if (resultat.size() > 1) {
             throw new IllegalStateException("Fant flere enn en behandlig med id=" + behandingId);
         }
         return resultat.stream().findFirst();
+    }
+
+    private void setParametre(TypedQuery<Behandling> query, AksjonspunktDefinisjon[] aksjonspunktDefinisjoner) {
+        query.setHint(QueryHints.HINT_READONLY, "true");
+        query.setParameter("åpneAksjonspunktKoder", AksjonspunktStatus.getÅpneAksjonspunktKoder());
+        query.setParameter("autopunktkode", AksjonspunktType.AUTOPUNKT.getKode());
+        query.setParameter("reaktiverkode", ReaktiveringStatus.AKTIV.getKode());
+        query.setParameter("køetKode", Arrays.stream(aksjonspunktDefinisjoner).map(AksjonspunktDefinisjon::getKode).collect(Collectors.toList()));
     }
 
 }
