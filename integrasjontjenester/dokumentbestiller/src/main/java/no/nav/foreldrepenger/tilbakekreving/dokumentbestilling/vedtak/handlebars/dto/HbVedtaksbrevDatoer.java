@@ -55,10 +55,17 @@ public class HbVedtaksbrevDatoer {
             kladd.opphørsdatoDødtBarn = getFørsteDagForHendelseUnderType(FpHendelseUnderTyper.OPPHOR_BARN_DOD);
             kladd.opphørsdatoIkkeGravid = getFørsteDagForHendelseUnderType(SvpHendelseUnderTyper.MOTTAKER_IKKE_GRAVID);
             kladd.opphørsdatoIkkeOmsorg = getFørsteDagForHendelseUnderType(FpHendelseUnderTyper.IKKE_OMSORG);
-
-
             return this;
         }
+
+        public  HbVedtaksbrevDatoer.Builder medDatoer(LocalDate opphørsdatoDødSøker, LocalDate opphørsdatoDødtBarn, LocalDate opphørsdatoIkkeGravid, LocalDate opphørsdatoIkkeOmsorg) {
+            kladd.opphørsdatoDødSøker = opphørsdatoDødSøker;
+            kladd.opphørsdatoDødtBarn = opphørsdatoDødtBarn;
+            kladd.opphørsdatoIkkeGravid = opphørsdatoIkkeGravid;
+            kladd.opphørsdatoIkkeOmsorg = opphørsdatoIkkeOmsorg;
+            return this;
+        }
+
 
         private LocalDate getFørsteDagForHendelseUnderType(HendelseUnderType... hendelseUnderTyper) {
             return getFørsteDagForHendelseUnderType(Arrays.asList(hendelseUnderTyper));
@@ -66,7 +73,7 @@ public class HbVedtaksbrevDatoer {
 
         private LocalDate getFørsteDagForHendelseUnderType(List<HendelseUnderType> hendelseUnderTyper) {
             return perioder.stream()
-                .filter((per) -> hendelseUnderTyper.contains(per.getFakta().getHendelseundertype()))
+                .filter(per -> hendelseUnderTyper.contains(per.getFakta().getHendelseundertype()))
                 .findFirst()
                 .map(per -> per.getPeriode().getFom())
                 .orElse(null);

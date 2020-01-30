@@ -1,8 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -15,7 +12,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 @ApplicationScoped
 public class BehandlingVenterRepositoryImpl implements BehandlingVenterRepository {
 
-    private FellesQueriesForBehandlingRepositories fellesQueriesForBehandlingRepositories;
+    private FellesQueriesForBehandlingRepositories sharedQueries;
 
     public BehandlingVenterRepositoryImpl() {
         // CDI
@@ -23,20 +20,11 @@ public class BehandlingVenterRepositoryImpl implements BehandlingVenterRepositor
 
     @Inject
     public BehandlingVenterRepositoryImpl(FellesQueriesForBehandlingRepositories fellesQueriesForBehandlingRepositories) {
-        this.fellesQueriesForBehandlingRepositories = fellesQueriesForBehandlingRepositories;
+        this.sharedQueries = fellesQueriesForBehandlingRepositories;
     }
 
     @Override
     public Optional<Behandling> hentBehandlingPåVent(long behandlingId) {
-        List<Behandling> behandlingerVenterTilbakemelding = fellesQueriesForBehandlingRepositories.finnVentendeBehandlingMedAktivtAksjonspunkt(AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING);
-        List<Behandling> behandlingerVenterGrunnlag = fellesQueriesForBehandlingRepositories.finnVentendeBehandlingMedAktivtAksjonspunkt(AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
-
-        List<Behandling> behandlinger = new ArrayList<>();
-        behandlinger.addAll(behandlingerVenterTilbakemelding);
-        behandlinger.addAll(behandlingerVenterGrunnlag);
-
-        return behandlinger.stream()
-                .filter(o -> Objects.equals(behandlingId, o.getId()))
-                .findFirst();
+        return sharedQueries.finnVentendeBehandlingMedAktivtAksjonspunkt(behandlingId, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
     }
 }
