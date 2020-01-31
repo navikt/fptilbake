@@ -68,6 +68,14 @@ public class BehandlingDtoTjenesteTest {
         assertUtvidetBehandlingDto(utvidetBehandlingDto);
 
         assertThat(utvidetBehandlingDto.getLinks().stream().map(ResourceLink::getRel).collect(Collectors.toList())).containsOnly(
+            "bytt-behandlende-enhet",
+            "opne-for-endringer",
+            "henlegg-behandling",
+            "gjenoppta-behandling",
+            "sett-behandling-pa-vent",
+            "endre-pa-vent",
+            "lagre-aksjonspunkter",
+            "beregne-feilutbetalt-belop",
             "aksjonspunkter",
             "feilutbetalingFakta",
             "feilutbetalingAarsak");
@@ -83,6 +91,14 @@ public class BehandlingDtoTjenesteTest {
         assertUtvidetBehandlingDto(utvidetBehandlingDto);
 
         assertThat(utvidetBehandlingDto.getLinks().stream().map(ResourceLink::getRel).collect(Collectors.toList())).containsOnly(
+            "bytt-behandlende-enhet",
+            "opne-for-endringer",
+            "henlegg-behandling",
+            "gjenoppta-behandling",
+            "sett-behandling-pa-vent",
+            "endre-pa-vent",
+            "lagre-aksjonspunkter",
+            "beregne-feilutbetalt-belop",
             "aksjonspunkter",
             "feilutbetalingFakta",
             "feilutbetalingAarsak",
@@ -102,6 +118,14 @@ public class BehandlingDtoTjenesteTest {
         assertUtvidetBehandlingDto(utvidetBehandlingDto);
 
         assertThat(utvidetBehandlingDto.getLinks().stream().map(ResourceLink::getRel).collect(Collectors.toList())).containsOnly(
+            "bytt-behandlende-enhet",
+            "opne-for-endringer",
+            "henlegg-behandling",
+            "gjenoppta-behandling",
+            "sett-behandling-pa-vent",
+            "endre-pa-vent",
+            "lagre-aksjonspunkter",
+            "beregne-feilutbetalt-belop",
             "aksjonspunkter",
             "feilutbetalingFakta",
             "feilutbetalingAarsak",
@@ -122,6 +146,14 @@ public class BehandlingDtoTjenesteTest {
         assertUtvidetBehandlingDto(utvidetBehandlingDto);
 
         assertThat(utvidetBehandlingDto.getLinks().stream().map(ResourceLink::getRel).collect(Collectors.toList())).containsOnly(
+            "bytt-behandlende-enhet",
+            "opne-for-endringer",
+            "henlegg-behandling",
+            "gjenoppta-behandling",
+            "sett-behandling-pa-vent",
+            "endre-pa-vent",
+            "lagre-aksjonspunkter",
+            "beregne-feilutbetalt-belop",
             "aksjonspunkter",
             "feilutbetalingFakta",
             "feilutbetalingAarsak",
@@ -142,6 +174,14 @@ public class BehandlingDtoTjenesteTest {
         assertUtvidetBehandlingDto(utvidetBehandlingDto);
 
         assertThat(utvidetBehandlingDto.getLinks().stream().map(ResourceLink::getRel).collect(Collectors.toList())).containsOnly(
+            "bytt-behandlende-enhet",
+            "opne-for-endringer",
+            "henlegg-behandling",
+            "gjenoppta-behandling",
+            "sett-behandling-pa-vent",
+            "endre-pa-vent",
+            "lagre-aksjonspunkter",
+            "beregne-feilutbetalt-belop",
             "aksjonspunkter",
             "feilutbetalingFakta",
             "feilutbetalingAarsak",
@@ -165,6 +205,14 @@ public class BehandlingDtoTjenesteTest {
         assertUtvidetBehandlingDto(utvidetBehandlingDto);
 
         assertThat(utvidetBehandlingDto.getLinks().stream().map(ResourceLink::getRel).collect(Collectors.toList())).containsOnly(
+            "bytt-behandlende-enhet",
+            "opne-for-endringer",
+            "henlegg-behandling",
+            "gjenoppta-behandling",
+            "sett-behandling-pa-vent",
+            "endre-pa-vent",
+            "lagre-aksjonspunkter",
+            "beregne-feilutbetalt-belop",
             "aksjonspunkter"
         );
     }
@@ -179,11 +227,6 @@ public class BehandlingDtoTjenesteTest {
         BehandlingDto behandlingDto = assertBehandlingDto(behandling, behandlingDtoListe);
 
         assertThat(behandlingDto.getLinks().stream().map(ResourceLink::getRel).collect(Collectors.toList())).containsOnly(
-            "bytt-behandlende-enhet",
-            "opne-for-endringer",
-            "henlegg-behandling",
-            "gjenoppta-behandling",
-            "sett-behandling-pa-vent",
             "totrinnskontroll-arsaker-readOnly",
             "brev-maler",
             "brev-bestill",
@@ -201,11 +244,6 @@ public class BehandlingDtoTjenesteTest {
         BehandlingDto behandlingDto = assertBehandlingDto(behandling, behandlingDtoListe);
 
         assertThat(behandlingDto.getLinks().stream().map(ResourceLink::getRel).collect(Collectors.toList())).containsOnly(
-            "bytt-behandlende-enhet",
-            "opne-for-endringer",
-            "henlegg-behandling",
-            "gjenoppta-behandling",
-            "sett-behandling-pa-vent",
             "totrinnskontroll-arsaker",
             "bekreft-totrinnsaksjonspunkt",
             "brev-maler",
