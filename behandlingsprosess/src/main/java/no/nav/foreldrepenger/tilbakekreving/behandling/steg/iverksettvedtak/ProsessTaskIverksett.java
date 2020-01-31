@@ -22,10 +22,10 @@ public class ProsessTaskIverksett {
         this.taskRepository = taskRepository;
     }
 
-    public void opprettIverksettingstasker(Behandling behandling, boolean kanSendeVedtaksBrev) {
+    public void opprettIverksettingstasker(Behandling behandling, boolean sendeVedtaksbrev) {
         ProsessTaskGruppe taskGruppe = new ProsessTaskGruppe();
         taskGruppe.addNesteSekvensiell(new ProsessTaskData(SendØkonomiTibakekerevingsVedtakTask.TASKTYPE));
-        if (kanSendeVedtaksBrev) {
+        if (sendeVedtaksbrev) {
             taskGruppe.addNesteSekvensiell(new ProsessTaskData(SendVedtaksbrevTask.TASKTYPE));
         }
         taskGruppe.addNesteSekvensiell(new ProsessTaskData(AvsluttBehandlingTask.TASKTYPE));
