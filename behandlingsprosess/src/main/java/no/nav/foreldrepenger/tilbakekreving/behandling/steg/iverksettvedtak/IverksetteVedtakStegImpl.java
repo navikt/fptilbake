@@ -6,9 +6,6 @@ import java.util.Optional;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsak;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +15,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingTypeRe
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsak;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryFeil;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
@@ -65,7 +65,7 @@ public class IverksetteVedtakStegImpl implements IverksetteVedtakSteg {
             behandlingVedtakRepository.lagre(vedtak);
 
             boolean kanSendeVedtaksBrev = erRevurderingOpprettesForKlage(behandling);
-            prosessTaskIverksett.opprettIverksettingstasker(behandling,kanSendeVedtaksBrev);
+            prosessTaskIverksett.opprettIverksettingstasker(behandling, kanSendeVedtaksBrev);
             return BehandleStegResultat.settPåVent();
         }
         return BehandleStegResultat.utførtUtenAksjonspunkter();
@@ -77,11 +77,11 @@ public class IverksetteVedtakStegImpl implements IverksetteVedtakSteg {
         return BehandleStegResultat.utførtUtenAksjonspunkter();
     }
 
-    private boolean erRevurderingOpprettesForKlage(Behandling behandling){
-        if(BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandling.getType())){
+    private boolean erRevurderingOpprettesForKlage(Behandling behandling) {
+        if (BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandling.getType())) {
             List<BehandlingÅrsak> behandlingÅrsaker = behandling.getBehandlingÅrsaker();
             return behandlingÅrsaker.stream()
-                .anyMatch(behandlingÅrsak -> BehandlingÅrsakType.klageÅrsaker()
+                .anyMatch(behandlingÅrsak -> BehandlingÅrsakType.KLAGE_ÅRSAKER
                     .contains(behandlingÅrsak.getBehandlingÅrsakType()));
         }
         return false;
