@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.revurdering;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -24,6 +25,7 @@ import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagDto;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagPeriodeDto;
 import no.nav.tilbakekreving.typer.v1.TypeKlasseDto;
 import no.nav.vedtak.felles.integrasjon.felles.ws.DateUtil;
+import no.nav.vedtak.felles.integrasjon.unleash.EnvironmentProperty;
 
 @ApplicationScoped
 public class HentKravgrunnlagMapper {
@@ -61,9 +63,9 @@ public class HentKravgrunnlagMapper {
             .medFagSystemId(trimTrailingSpaces(dto.getFagsystemId()))
             .medVedtakFagSystemDato(konverter(dto.getDatoVedtakFagsystem()))
             .medOmgjortVedtakId(dto.getVedtakIdOmgjort() != null ? dto.getVedtakIdOmgjort().longValue() : null)
-            .medGjelderVedtakId(tpsAdapterWrapper.hentAktørIdEllerOrganisajonNummer(dto.getVedtakGjelderId(), gjelderType))
+            .medGjelderVedtakId(hentAktoerId(gjelderType, dto.getVedtakGjelderId()))
             .medGjelderType(gjelderType)
-            .medUtbetalesTilId(tpsAdapterWrapper.hentAktørIdEllerOrganisajonNummer(dto.getUtbetalesTilId(), utbetalingGjelderType))
+            .medUtbetalesTilId(hentAktoerId(utbetalingGjelderType, dto.getUtbetalesTilId()))
             .medUtbetIdType(utbetalingGjelderType)
             .medHjemmelKode(dto.getKodeHjemmel())
             .medBeregnesRenter(dto.getRenterBeregnes() != null ? dto.getRenterBeregnes().value() : null)
@@ -75,6 +77,19 @@ public class HentKravgrunnlagMapper {
             .medReferanse(dto.getReferanse())
             .medEksternKravgrunnlagId(String.valueOf(dto.getKravgrunnlagId()))
             .build();
+    }
+
+    private String hentAktoerId(GjelderType identType, String ident) {
+        if (isInDevMode()) {
+            logger.warn("Hentet kravgrunnlag i utviklermodus. Skal ikke skje i testmiljø eller produksjon, det er for lokalt utviklingsmiljø. Lagrer mocket aktørId i databasen.");
+            return "mock" + ident;
+        }
+        return tpsAdapterWrapper.hentAktørIdEllerOrganisajonNummer(ident, identType);
+    }
+
+    private boolean isInDevMode() {
+        Optional<String> environmentName = EnvironmentProperty.getEnvironmentName();
+        return environmentName.isPresent() && environmentName.get().equalsIgnoreCase("devimg");
     }
 
     private KravgrunnlagPeriode432 formKravgrunnlagPeriode432(Kravgrunnlag431 kravgrunnlag431, DetaljertKravgrunnlagPeriodeDto dto) {
