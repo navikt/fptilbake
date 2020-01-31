@@ -62,7 +62,7 @@ public class IverksetteVedtakStegImpl implements IverksetteVedtakSteg {
             vedtak.setIverksettingStatus(IverksettingStatus.UNDER_IVERKSETTING);
             behandlingVedtakRepository.lagre(vedtak);
 
-            boolean sendVedtaksbrev = !erRevurderingOpprettesForKlage(behandling);
+            boolean sendVedtaksbrev = !erRevurderingOpprettetForKlage(behandling);
             prosessTaskIverksett.opprettIverksettingstasker(behandling, sendVedtaksbrev);
             return BehandleStegResultat.settPåVent();
         }
@@ -75,7 +75,7 @@ public class IverksetteVedtakStegImpl implements IverksetteVedtakSteg {
         return BehandleStegResultat.utførtUtenAksjonspunkter();
     }
 
-    private boolean erRevurderingOpprettesForKlage(Behandling behandling) {
+    private boolean erRevurderingOpprettetForKlage(Behandling behandling) {
         return BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandling.getType()) &&
             behandling.getBehandlingÅrsaker().stream()
                 .anyMatch(årsak -> BehandlingÅrsakType.KLAGE_ÅRSAKER.contains(årsak.getBehandlingÅrsakType()));
