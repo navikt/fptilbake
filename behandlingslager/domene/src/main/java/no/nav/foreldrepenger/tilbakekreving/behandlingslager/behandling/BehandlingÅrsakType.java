@@ -1,13 +1,11 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling;
 
+import java.util.Set;
+
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
-import com.google.common.collect.Lists;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
-
-import java.util.Collections;
-import java.util.List;
 
 @Entity(name = "BehandlingÅrsakType")
 @DiscriminatorValue(BehandlingÅrsakType.DISCRIMINATOR)
@@ -65,8 +63,7 @@ public class BehandlingÅrsakType extends Kodeliste {
         super(kode, DISCRIMINATOR);
     }
 
-    public static List<BehandlingÅrsakType> klageÅrsaker(){
-        return Collections.unmodifiableList(Lists.newArrayList(BehandlingÅrsakType.RE_KLAGE_KA, BehandlingÅrsakType.RE_KLAGE_NFP));
-    }
+
+    public static final Set<BehandlingÅrsakType> KLAGE_ÅRSAKER = Set.of(BehandlingÅrsakType.RE_KLAGE_KA, BehandlingÅrsakType.RE_KLAGE_NFP);
 
 }

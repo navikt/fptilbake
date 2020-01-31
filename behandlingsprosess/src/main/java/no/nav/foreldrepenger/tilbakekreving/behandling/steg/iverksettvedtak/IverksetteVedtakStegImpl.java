@@ -1,14 +1,10 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.iverksettvedtak;
 
-import java.util.List;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsak;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,8 +60,7 @@ public class IverksetteVedtakStegImpl implements IverksetteVedtakSteg {
             vedtak.setIverksettingStatus(IverksettingStatus.UNDER_IVERKSETTING);
             behandlingVedtakRepository.lagre(vedtak);
 
-            boolean kanSendeVedtaksBrev = erRevurderingOpprettesForKlage(behandling);
-            prosessTaskIverksett.opprettIverksettingstasker(behandling,kanSendeVedtaksBrev);
+            prosessTaskIverksett.opprettIverksettingstasker(behandling);
             return BehandleStegResultat.settPåVent();
         }
         return BehandleStegResultat.utførtUtenAksjonspunkter();
@@ -77,13 +72,4 @@ public class IverksetteVedtakStegImpl implements IverksetteVedtakSteg {
         return BehandleStegResultat.utførtUtenAksjonspunkter();
     }
 
-    private boolean erRevurderingOpprettesForKlage(Behandling behandling){
-        if(BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandling.getType())){
-            List<BehandlingÅrsak> behandlingÅrsaker = behandling.getBehandlingÅrsaker();
-            return behandlingÅrsaker.stream()
-                .anyMatch(behandlingÅrsak -> BehandlingÅrsakType.klageÅrsaker()
-                    .contains(behandlingÅrsak.getBehandlingÅrsakType()));
-        }
-        return false;
-    }
 }

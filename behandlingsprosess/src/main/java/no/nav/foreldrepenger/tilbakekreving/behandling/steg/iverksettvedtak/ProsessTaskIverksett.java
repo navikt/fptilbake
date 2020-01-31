@@ -4,6 +4,8 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsak;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
@@ -22,10 +24,10 @@ public class ProsessTaskIverksett {
         this.taskRepository = taskRepository;
     }
 
-    public void opprettIverksettingstasker(Behandling behandling, boolean kanSendeVedtaksBrev) {
+    public void opprettIverksettingstasker(Behandling behandling) {
         ProsessTaskGruppe taskGruppe = new ProsessTaskGruppe();
         taskGruppe.addNesteSekvensiell(new ProsessTaskData(SendØkonomiTibakekerevingsVedtakTask.TASKTYPE));
-        if (kanSendeVedtaksBrev) {
+        if (!opprettetPgaKlage(behandling)) {
             taskGruppe.addNesteSekvensiell(new ProsessTaskData(SendVedtaksbrevTask.TASKTYPE));
         }
         taskGruppe.addNesteSekvensiell(new ProsessTaskData(AvsluttBehandlingTask.TASKTYPE));
@@ -34,5 +36,11 @@ public class ProsessTaskIverksett {
         taskGruppe.setCallIdFraEksisterende();
 
         taskRepository.lagre(taskGruppe);
+    }
+
+    private boolean opprettetPgaKlage(Behandling behandling) {
+        return behandling.getBehandlingÅrsaker().stream()
+            .map(BehandlingÅrsak::getBehandlingÅrsakType)
+            .anyMatch(BehandlingÅrsakType.KLAGE_ÅRSAKER::contains);
     }
 }
