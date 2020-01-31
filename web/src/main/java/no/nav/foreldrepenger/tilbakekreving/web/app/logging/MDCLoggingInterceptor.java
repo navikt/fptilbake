@@ -13,6 +13,7 @@ import javax.interceptor.Interceptor;
 import javax.interceptor.InvocationContext;
 
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.AppAbacAttributtType;
+import no.nav.vedtak.log.mdc.MdcExtendedLogContext;
 import no.nav.vedtak.sikkerhet.abac.AbacAttributtSamling;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.AbacDto;
@@ -20,7 +21,6 @@ import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessursResourceAttributt;
 import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
-import no.nav.vedtak.util.MdcExtendedLogContext;
 
 @BeskyttetRessurs(action = BeskyttetRessursActionAttributt.DUMMY, ressurs = BeskyttetRessursResourceAttributt.DUMMY)
 @Interceptor

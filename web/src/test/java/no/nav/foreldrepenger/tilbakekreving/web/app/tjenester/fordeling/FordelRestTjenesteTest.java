@@ -6,6 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.junit.Rule;
@@ -26,7 +27,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkko
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
-import no.nav.vedtak.util.FPDateUtil;
 
 public class FordelRestTjenesteTest {
 
@@ -48,7 +48,7 @@ public class FordelRestTjenesteTest {
     public void mottaJournalpost_når_saksnummer_ikke_finnes() {
         Long behandlingId = lagBehandling();
         AbacJournalpostMottakDto abacJournalpostMottakDto = new AbacJournalpostMottakDto("10000", JOURNAL_POST_ID, FORSENDELSE_ID,
-            UTTALSE_TILBAKEKREVING_DOKUMENT_TYPE_ID, FPDateUtil.nå(), null);
+            UTTALSE_TILBAKEKREVING_DOKUMENT_TYPE_ID, LocalDateTime.now(), null);
         fordelRestTjeneste.mottaJournalpost(abacJournalpostMottakDto);
         verify(mockGjenopptaBehandlingTjeneste, never()).fortsettBehandlingManuelt(behandlingId);
     }
@@ -57,7 +57,7 @@ public class FordelRestTjenesteTest {
     public void mottaJournalpost_når_dokument_type_id_ikke_gyldig() {
         Long behandlingId = lagBehandling();
         AbacJournalpostMottakDto abacJournalpostMottakDto = new AbacJournalpostMottakDto(SAKSNUMMER.getVerdi(), JOURNAL_POST_ID, FORSENDELSE_ID,
-            "XYZS", FPDateUtil.nå(), null);
+            "XYZS", LocalDateTime.now(), null);
         fordelRestTjeneste.mottaJournalpost(abacJournalpostMottakDto);
         verify(mockGjenopptaBehandlingTjeneste, never()).fortsettBehandlingManuelt(behandlingId);
     }
@@ -69,7 +69,7 @@ public class FordelRestTjenesteTest {
         behandling.avsluttBehandling();
 
         AbacJournalpostMottakDto abacJournalpostMottakDto = new AbacJournalpostMottakDto(SAKSNUMMER.getVerdi(), JOURNAL_POST_ID, FORSENDELSE_ID,
-            UTTALSE_TILBAKEKREVING_DOKUMENT_TYPE_ID, FPDateUtil.nå(), null);
+            UTTALSE_TILBAKEKREVING_DOKUMENT_TYPE_ID, LocalDateTime.now(), null);
         fordelRestTjeneste.mottaJournalpost(abacJournalpostMottakDto);
         verify(mockGjenopptaBehandlingTjeneste, never()).fortsettBehandlingManuelt(behandlingId);
     }
@@ -81,7 +81,7 @@ public class FordelRestTjenesteTest {
         repositoryProvider.getAksjonspunktRepository().leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, BehandlingStegType.FAKTA_FEILUTBETALING);
 
         AbacJournalpostMottakDto abacJournalpostMottakDto = new AbacJournalpostMottakDto(SAKSNUMMER.getVerdi(), JOURNAL_POST_ID, FORSENDELSE_ID,
-            UTTALSE_TILBAKEKREVING_DOKUMENT_TYPE_ID, FPDateUtil.nå(), null);
+            UTTALSE_TILBAKEKREVING_DOKUMENT_TYPE_ID, LocalDateTime.now(), null);
         fordelRestTjeneste.mottaJournalpost(abacJournalpostMottakDto);
         verify(mockGjenopptaBehandlingTjeneste, atLeastOnce()).fortsettBehandlingManuelt(behandlingId);
     }

@@ -1,5 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -32,7 +33,6 @@ import no.nav.vedtak.feil.LogLevel;
 import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
 import no.nav.vedtak.feil.deklarasjon.FunksjonellFeil;
 import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
-import no.nav.vedtak.util.FPDateUtil;
 
 @ApplicationScoped
 public class BehandlingRevurderingTjeneste {
@@ -107,7 +107,7 @@ public class BehandlingRevurderingTjeneste {
             .medOriginalBehandling(origBehandling);
         OrganisasjonsEnhet organisasjonsEnhet = new OrganisasjonsEnhet(origBehandling.getBehandlendeEnhetId(), origBehandling.getBehandlendeEnhetNavn());
         Behandling revurdering = Behandling.fraTidligereBehandling(origBehandling, behandlingType)
-            .medOpprettetDato(FPDateUtil.nå())
+            .medOpprettetDato(LocalDateTime.now())
             .medBehandlingÅrsak(revurderingÅrsak).build();
         revurdering.setBehandlendeOrganisasjonsEnhet(organisasjonsEnhet);
         return revurdering;

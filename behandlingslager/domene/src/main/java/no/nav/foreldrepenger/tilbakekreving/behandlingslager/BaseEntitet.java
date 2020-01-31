@@ -1,41 +1,31 @@
-package no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk;
+package no.nav.foreldrepenger.tilbakekreving.behandlingslager;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import javax.persistence.Column;
-import javax.persistence.Entity;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.diff.DiffIgnore;
 import no.nav.vedtak.sikkerhet.context.SubjectHandler;
 
-/**
- * En basis {@link Entity} klasse som håndtere felles standarder for utformign av tabeller (eks. sporing av hvem som har
- * opprettet eller oppdatert en rad, og når).
- */
 @MappedSuperclass
-public class KodeverkBaseEntitet implements Serializable {
+public class BaseEntitet implements Serializable {
 
     private static final String BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES = "VL";
 
-    @DiffIgnore
     @Column(name = "opprettet_av", nullable = false)
     private String opprettetAv;
 
-    @DiffIgnore
     @Column(name = "opprettet_tid", nullable = false)
-    private LocalDateTime opprettetTidspunkt; // NOSONAR
+    private LocalDateTime opprettetTidspunkt;
 
-    @DiffIgnore
     @Column(name = "endret_av")
     private String endretAv;
 
-    @DiffIgnore
     @Column(name = "endret_tid")
-    private LocalDateTime endretTidspunkt; // NOSONAR
+    private LocalDateTime endretTidspunkt;
 
     @PrePersist
     protected void onCreate() {
@@ -64,7 +54,6 @@ public class KodeverkBaseEntitet implements Serializable {
     public LocalDateTime getEndretTidspunkt() {
         return endretTidspunkt;
     }
-
 
     private static String finnBrukernavn() {
         String brukerident = SubjectHandler.getSubjectHandler().getUid();

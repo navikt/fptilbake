@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.ws.rs.core.Response;
@@ -39,14 +40,13 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
 import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepositoryImpl;
-import no.nav.vedtak.util.FPDateUtil;
 
 public class ForvaltningBehandlingRestTjenesteTest {
 
     @Rule
     public UnittestRepositoryRule repositoryRule = new UnittestRepositoryRule();
 
-    private ProsessTaskRepository prosessTaskRepository = new ProsessTaskRepositoryImpl(repositoryRule.getEntityManager(), null);
+    private ProsessTaskRepository prosessTaskRepository = new ProsessTaskRepositoryImpl(repositoryRule.getEntityManager(), null, null);
     private BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProviderImpl(repositoryRule.getEntityManager());
     private FagsakRepository fagsakRepository = repositoryProvider.getFagsakRepository();
     private BehandlingRepository behandlingRepository = repositoryProvider.getBehandlingRepository();
@@ -97,7 +97,7 @@ public class ForvaltningBehandlingRestTjenesteTest {
     @Test
     public void skal_ikke_tvinge_gjenoppta_behandling() {
         Behandling behandling = lagBehandling();
-        behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, FPDateUtil.nå().plusDays(3), Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
+        behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, LocalDateTime.now().plusDays(3), Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
 
         Response response = forvaltningBehandlingRestTjeneste.tvingGjenopptaBehandling(new BehandlingIdDto(behandling.getId()));
         assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
@@ -118,7 +118,7 @@ public class ForvaltningBehandlingRestTjenesteTest {
     @Test
     public void skal_ikke_tvinge_koble_grunnlag_når_behandling_er_ikke_på_vent_på_tilbakekrevingsgrunnlag() {
         Behandling behandling = lagBehandling();
-        behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, FPDateUtil.nå().plusDays(3), Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING);
+        behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, LocalDateTime.now().plusDays(3), Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING);
 
         Response response = forvaltningBehandlingRestTjeneste.tvingkobleBehandlingTilGrunnlag(new KobleBehandlingTilGrunnlagDto(behandling.getId(), 1l));
         assertThat(response.getStatus()).isEqualTo(Response.Status.BAD_REQUEST.getStatusCode());
@@ -127,7 +127,7 @@ public class ForvaltningBehandlingRestTjenesteTest {
     @Test
     public void skal_ikke_tvinge_koble_grunnlag_når_mottattXml_er_status_melding() {
         Behandling behandling = lagBehandling();
-        behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, FPDateUtil.nå().plusDays(3), Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
+        behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, LocalDateTime.now().plusDays(3), Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
         Long mottattXmlId = mottattXmlRepository.lagreMottattXml("<?xml version=\"1.0\" encoding=\"utf-8\"?><urn:endringKravOgVedtakstatus xmlns:urn=\"urn:no:nav:tilbakekreving:status:v1\"/>");
 
         Response response = forvaltningBehandlingRestTjeneste.tvingkobleBehandlingTilGrunnlag(new KobleBehandlingTilGrunnlagDto(behandling.getId(), mottattXmlId));
@@ -137,7 +137,7 @@ public class ForvaltningBehandlingRestTjenesteTest {
     @Test
     public void skal_ikke_tvinge_koble_grunnlag_når_mottattXml_er_allerede_koblet() {
         Behandling behandling = lagBehandling();
-        behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, FPDateUtil.nå().plusDays(3), Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
+        behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, LocalDateTime.now().plusDays(3), Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
         Long mottattXmlId = mottattXmlRepository.lagreMottattXml(getKravgrunnlagXml());
         mottattXmlRepository.opprettTilkobling(mottattXmlId);
 
@@ -148,7 +148,7 @@ public class ForvaltningBehandlingRestTjenesteTest {
     @Test
     public void skal_tvinge_koble_grunnlag_når_mottattXml_er_grunnlag() {
         Behandling behandling = lagBehandling();
-        behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, FPDateUtil.nå().plusDays(3), Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
+        behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, LocalDateTime.now().plusDays(3), Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
         Long mottattXmlId = mottattXmlRepository.lagreMottattXml(getKravgrunnlagXml());
 
         when(mockTpsAdapterWrapper.hentAktørIdEllerOrganisajonNummer(anyString(), any(GjelderType.class))).thenReturn("123");

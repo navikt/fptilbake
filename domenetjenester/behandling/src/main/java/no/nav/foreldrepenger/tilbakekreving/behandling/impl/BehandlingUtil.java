@@ -5,8 +5,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
 
-import no.nav.vedtak.util.FPDateUtil;
-
 class BehandlingUtil {
 
     BehandlingUtil(){
@@ -15,8 +13,8 @@ class BehandlingUtil {
 
     static LocalDateTime bestemFristForBehandlingVent(LocalDate frist, Period defaultVentefrist) {
         return frist != null
-            ? LocalDateTime.of(frist, FPDateUtil.nå().toLocalTime())
-            : FPDateUtil.nå().plus(defaultVentefrist);
+            ? LocalDateTime.of(frist, LocalDateTime.now().toLocalTime())
+            : LocalDateTime.now().plus(defaultVentefrist);
     }
 
     static boolean sjekkAvvikHvisSisteDagIHelgen(LocalDate sisteDag, int antallDager) {

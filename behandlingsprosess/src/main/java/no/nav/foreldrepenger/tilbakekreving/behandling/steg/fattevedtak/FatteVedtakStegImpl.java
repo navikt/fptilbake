@@ -2,6 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.steg.fattevedtak;
 
 import static java.lang.Boolean.TRUE;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,7 +28,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.Totrinnsvur
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.IverksettingStatus;
-import no.nav.vedtak.util.FPDateUtil;
 import no.nav.vedtak.util.StringUtils;
 
 @BehandlingStegRef(kode = "FVEDSTEG")
@@ -89,7 +89,7 @@ public class FatteVedtakStegImpl implements FatteVedtakSteg {
             .medAnsvarligSaksbehandler(finnSaksBehandler(behandling))
             .medBehandlingsresultat(behandlingsresultat)
             .medIverksettingStatus(IverksettingStatus.IKKE_IVERKSATT)
-            .medVedtaksdato(FPDateUtil.iDag())
+            .medVedtaksdato(LocalDate.now())
             .medVedtakResultat(beregningResultat.getVedtakResultatType()).build();
 
         behandlingVedtakRepository.lagre(behandlingVedtak);

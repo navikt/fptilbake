@@ -6,6 +6,7 @@ import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.B
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -37,7 +38,6 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.SlettGrunnlagEventPublisere
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
-import no.nav.vedtak.util.FPDateUtil;
 
 @ApplicationScoped
 public class KravgrunnlagTjeneste {
@@ -146,7 +146,7 @@ public class KravgrunnlagTjeneste {
             }
             if (!kravgrunnlagetErGyldig && erFørFaktaSteg) {
                 logger.info("Setter behandling på vent pga kravgrunnlag endret til et ugyldig kravgrunnlag for behandlingId={}", behandlingId);
-                behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, BehandlingStegType.TBKGSTEG, FPDateUtil.nå().plusDays(7), Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
+                behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, BehandlingStegType.TBKGSTEG, LocalDateTime.now().plusDays(7), Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
             }
             fyrKravgrunnlagEndretEvent(behandlingId);
         }

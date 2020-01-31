@@ -76,8 +76,8 @@ public class TestOppsett {
     protected TotrinnRepository totrinnRepository = new TotrinnRepository(em);
     protected BehandlingRepository behandlingRepository = repoProvider.getBehandlingRepository();
     protected VarselRepository varselRepository = repoProvider.getVarselRepository();
-    protected ProsessTaskRepository prosessTaskRepository = new ProsessTaskRepositoryImpl(em,null);
-    protected KravgrunnlagTjeneste kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repoProvider, prosessTaskRepository,gjenopptaBehandlingTjeneste, behandlingskontrollTjeneste,mockSlettGrunnlagEventPubliserer);
+    protected ProsessTaskRepository prosessTaskRepository = new ProsessTaskRepositoryImpl(em, null, null);
+    protected KravgrunnlagTjeneste kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repoProvider, prosessTaskRepository, gjenopptaBehandlingTjeneste, behandlingskontrollTjeneste, mockSlettGrunnlagEventPubliserer);
     protected KravgrunnlagBeregningTjeneste kravgrunnlagBeregningTjeneste = new KravgrunnlagBeregningTjeneste(grunnlagRepository);
 
     protected HistorikkInnslagKonverter historikkInnslagKonverter = new HistorikkInnslagKonverter(repoProvider.getKodeverkRepository(),

@@ -14,8 +14,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.diff.IndexKey;
-import no.nav.vedtak.felles.jpa.BaseEntitet;
 
 @Entity(name = "HistorikkinnslagDokumentLink")
 @Table(name = "HISTORIKKINNSLAG_DOK_LINK")

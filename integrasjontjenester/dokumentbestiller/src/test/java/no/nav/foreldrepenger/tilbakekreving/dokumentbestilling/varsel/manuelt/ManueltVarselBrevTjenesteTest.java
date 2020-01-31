@@ -36,7 +36,6 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.Frit
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
-import no.nav.vedtak.util.FPDateUtil;
 
 public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett {
 
@@ -147,6 +146,6 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
             BigDecimal.valueOf(9000));
         return BehandlingFeilutbetalingFakta.builder().medAktuellFeilUtbetaltBeløp(BigDecimal.valueOf(9000))
             .medPerioder(Lists.newArrayList(utbetaltPeriode))
-            .medDatoForRevurderingsvedtak(FPDateUtil.iDag()).build();
+            .medDatoForRevurderingsvedtak(LocalDate.now()).build();
     }
 }

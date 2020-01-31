@@ -10,7 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
-import no.nav.vedtak.felles.jpa.BaseEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 
 
 @Entity(name = "FagsakProsessTask")

@@ -15,9 +15,9 @@ import javax.persistence.Table;
 import org.hibernate.annotations.JoinColumnOrFormula;
 import org.hibernate.annotations.JoinFormula;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
-import no.nav.vedtak.felles.jpa.BaseEntitet;
 
 @Entity(name = "KravgrunnlagBelop433")
 @Table(name = "KRAV_GRUNNLAG_BELOP_433")

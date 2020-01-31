@@ -34,7 +34,7 @@ public class TilkjentYtelseTestOppsett {
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
-    protected ProsessTaskRepository prosessTaskRepository = spy(new ProsessTaskRepositoryImpl(repoRule.getEntityManager(), null));
+    protected ProsessTaskRepository prosessTaskRepository = spy(new ProsessTaskRepositoryImpl(repoRule.getEntityManager(), null, null));
 
     protected HendelseTaskDataWrapper hendelseTaskDataWrapper;
 

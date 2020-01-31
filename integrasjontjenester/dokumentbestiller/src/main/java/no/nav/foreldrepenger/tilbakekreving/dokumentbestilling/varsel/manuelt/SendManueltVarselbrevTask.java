@@ -17,7 +17,6 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 import no.nav.vedtak.konfig.KonfigVerdi;
-import no.nav.vedtak.util.FPDateUtil;
 
 @Dependent
 @ProsessTask(SendManueltVarselbrevTask.TASKTYPE)
@@ -55,7 +54,7 @@ public class SendManueltVarselbrevTask implements ProsessTaskHandler {
             manueltVarselBrevTjeneste.sendKorrigertVarselBrev(behandlingId, malType, friTekst);
         }
 
-        LocalDateTime fristTid = FPDateUtil.nå().plus(ventefrist).plusDays(1);
+        LocalDateTime fristTid = LocalDateTime.now().plus(ventefrist).plusDays(1);
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING,
             fristTid, Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING);

@@ -16,9 +16,9 @@ import org.hibernate.annotations.JoinFormula;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.diff.IndexKey;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
-import no.nav.vedtak.felles.jpa.BaseEntitet;
 
 @Entity(name = "HistorikkinnslagFelt")
 @Table(name = "HISTORIKKINNSLAG_FELT")

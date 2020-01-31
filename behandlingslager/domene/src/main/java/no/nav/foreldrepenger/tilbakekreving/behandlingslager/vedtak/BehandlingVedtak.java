@@ -19,8 +19,8 @@ import org.hibernate.annotations.JoinColumnOrFormula;
 import org.hibernate.annotations.JoinColumnsOrFormulas;
 import org.hibernate.annotations.JoinFormula;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandlingsresultat;
-import no.nav.vedtak.felles.jpa.BaseEntitet;
 
 @Entity(name = "BehandlingVedtak")
 @Table(name = "BEHANDLING_VEDTAK")

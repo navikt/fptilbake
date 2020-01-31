@@ -18,7 +18,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepositoryImpl;
 import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
-import no.nav.vedtak.util.FPDateUtil;
 
 /**
  * Håndter all endring av aksjonspunkt.
@@ -93,7 +92,7 @@ public class AksjonspunktRepositoryImpl implements AksjonspunktRepository {
         if (frist.isPresent()) {
             adBuilder.medFristTid(frist.get());
         } else if (ad.getFristPeriod() != null) {
-            adBuilder.medFristTid(FPDateUtil.nå().plus(ad.getFristPeriod()));
+            adBuilder.medFristTid(LocalDateTime.now().plus(ad.getFristPeriod()));
         }
 
         if (venteÅrsak.isPresent()) {

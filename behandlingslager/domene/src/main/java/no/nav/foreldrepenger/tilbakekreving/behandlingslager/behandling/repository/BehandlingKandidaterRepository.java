@@ -11,7 +11,6 @@ import javax.inject.Inject;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.felles.FellesQueriesForBehandlingRepositories;
-import no.nav.vedtak.util.FPDateUtil;
 
 @ApplicationScoped
 public class BehandlingKandidaterRepository {
@@ -28,7 +27,7 @@ public class BehandlingKandidaterRepository {
     }
 
     public Set<Behandling> finnBehandlingerForAutomatiskGjenopptagelse() {
-        LocalDate iDag = FPDateUtil.iDag();
+        LocalDate iDag = LocalDate.now();
 
         Collection<Behandling> ventendeBehandlinger = sharedQueries.finnVentendeBehandlingerMedAktivtAksjonspunkt(AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
 

@@ -31,10 +31,11 @@
 
         <!-- Felles avhengigheter i prosjektet Disse skal ALLTID være en
             RELEASE-avhengighet UNNTAK: feature-brancher og lokalt -->
-        <felles.version>1.4.0-20191212105502-c3ea7ca</felles.version>
-        <vl-fpsak-tidsserie.version>2.0_20191220142239_d22df82</vl-fpsak-tidsserie.version>
+        <felles.version>1.5-20200129145325-846bbaf</felles.version>
+        <prosesstask.version>2.0.0-20200118083448-d87fd6d</prosesstask.version>
+        <vl-fpsak-tidsserie.version>2.1-20200123110022-e75fb59</vl-fpsak-tidsserie.version>
         <!-- Kontrakter -->
-        <fpkontrakter.version>5.0_20191031073150_c3b9f11</fpkontrakter.version>
+        <fpkontrakter.version>5.1_20191210141010_6a7f399</fpkontrakter.version>
 
 
         <surefire.version>2.21.0</surefire.version>
@@ -290,16 +291,16 @@
                 <type>pom</type>
             </dependency>
             <dependency>
-                <groupId>no.nav.foreldrepenger.felles</groupId>
-                <artifactId>felles-prosesstask</artifactId>
-                <version>${felles.version}</version>
+                <groupId>no.nav.vedtak.prosesstask</groupId>
+                <artifactId>prosesstask-root</artifactId>
+                <version>${prosesstask.version}</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
             <dependency>
-                <groupId>no.nav.foreldrepenger.felles</groupId>
-                <artifactId>felles-prosesstask</artifactId>
-                <version>${felles.version}</version>
+                <groupId>no.nav.vedtak.prosesstask</groupId>
+                <artifactId>prosesstask</artifactId>
+                <version>${prosesstask.version}</version>
             </dependency>
             <dependency>
                 <groupId>no.nav.foreldrepenger.felles</groupId>
@@ -310,9 +311,8 @@
             <dependency>
                 <groupId>no.nav.fpsak.tidsserie</groupId>
                 <artifactId>fpsak-tidsserie</artifactId>
-                <version>${vl-fpsak-tidsserie.version}</version>
+                <version>2.0_20180831125757_006dad2</version>
             </dependency>
-
 
             <!-- felles kontrakter -->
             <dependency>
@@ -342,6 +342,12 @@
 
 
             <!-- NAV -->
+            <dependency>
+                <!-- bør ha samme versjon som CXF ellers -->
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-rt-transports-http-jetty</artifactId>
+                <version>3.2.5</version>
+            </dependency>
             <dependency>
                 <groupId>no.nav.foreldrepenger.kontrakter</groupId>
                 <artifactId>dokumentbestiller-v1</artifactId>
@@ -530,12 +536,12 @@
             <dependency>
                 <groupId>com.openhtmltopdf</groupId>
                 <artifactId>openhtmltopdf-core</artifactId>
-                <version>1.0.0</version>
+                <version>1.0.1</version>
             </dependency>
             <dependency>
                 <groupId>com.openhtmltopdf</groupId>
                 <artifactId>openhtmltopdf-pdfbox</artifactId>
-                <version>1.0.0</version>
+                <version>1.0.1</version>
             </dependency>
             <dependency>
                 <groupId>com.openhtmltopdf</groupId>
@@ -600,7 +606,7 @@
             <dependency>
                 <groupId>javax.xml.ws</groupId>
                 <artifactId>jaxws-api</artifactId>
-                <version>2.3.0</version>
+                <version>2.3.1</version>
             </dependency>
             <dependency>
                 <groupId>javax.jws</groupId>
@@ -638,7 +644,7 @@
             <dependency>
                 <groupId>org.hibernate.validator</groupId>
                 <artifactId>hibernate-validator-cdi</artifactId>
-                <version>6.0.16.Final</version>
+                <version>6.0.18.Final</version>
             </dependency>
             <dependency>
                 <groupId>org.webjars</groupId>
@@ -719,7 +725,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-remote-resources-plugin</artifactId>
-                    <version>1.5</version>
+                    <version>1.7.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -729,7 +735,7 @@
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.8.2</version>
+                    <version>0.8.5</version>
                 </plugin>
 
             </plugins>
@@ -799,7 +805,7 @@
             <plugin>
                 <groupId>org.jboss.jandex</groupId>
                 <artifactId>jandex-maven-plugin</artifactId>
-                <version>1.0.6</version>
+                <version>1.0.7</version>
                 <executions>
                     <execution>
                         <id>make-index</id>

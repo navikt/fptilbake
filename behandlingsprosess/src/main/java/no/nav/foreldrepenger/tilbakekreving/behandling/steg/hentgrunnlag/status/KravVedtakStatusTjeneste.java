@@ -26,7 +26,6 @@ import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
 import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
-import no.nav.vedtak.util.FPDateUtil;
 
 @ApplicationScoped
 public class KravVedtakStatusTjeneste {
@@ -71,7 +70,7 @@ public class KravVedtakStatusTjeneste {
     }
 
     private void settBehandlingPåVent(Long behandlingId) {
-        LocalDateTime fristDato = FPDateUtil.nå().plusMonths(3);
+        LocalDateTime fristDato = LocalDateTime.now().plusMonths(3);
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, BehandlingStegType.TBKGSTEG, fristDato, Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
     }

@@ -22,8 +22,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
-import no.nav.vedtak.felles.jpa.BaseEntitet;
 
 @Entity(name = "KravgrunnlagPeriode432")
 @Table(name = "KRAV_GRUNNLAG_PERIODE_432")

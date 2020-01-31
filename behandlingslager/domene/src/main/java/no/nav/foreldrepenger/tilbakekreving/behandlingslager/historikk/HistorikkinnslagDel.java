@@ -20,9 +20,9 @@ import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepository;
-import no.nav.vedtak.felles.jpa.BaseEntitet;
 
 @Entity(name = "HistorikkinnslagDel")
 @Table(name = "HISTORIKKINNSLAG_DEL")

@@ -17,8 +17,8 @@ import javax.persistence.Table;
 import org.hibernate.annotations.JoinColumnOrFormula;
 import org.hibernate.annotations.JoinFormula;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
-import no.nav.vedtak.felles.jpa.BaseEntitet;
 
 @Entity(name = "VedtaksbrevFritekstPeriode")
 @Table(name = "VEDTAKSBREV_PERIODE")

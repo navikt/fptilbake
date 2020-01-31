@@ -1,5 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles;
 
+import java.time.LocalDate;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -17,7 +19,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkko
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
 import no.nav.vedtak.felles.integrasjon.felles.ws.DateUtil;
-import no.nav.vedtak.util.FPDateUtil;
 
 @ApplicationScoped
 public class BrevMetadataMapper {
@@ -61,7 +62,7 @@ public class BrevMetadataMapper {
 
         fellesType.setKontaktInformasjon(hentKontaktinformasjon());
 
-        fellesType.setDokumentDato(DateUtil.convertToXMLGregorianCalendarRemoveTimezone(FPDateUtil.iDag()));
+        fellesType.setDokumentDato(DateUtil.convertToXMLGregorianCalendarRemoveTimezone(LocalDate.now()));
 
         return fellesType;
     }

@@ -12,7 +12,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegTilstand;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.TekniskRepository;
 import no.nav.vedtak.felles.jpa.savepoint.Work;
-import no.nav.vedtak.util.MdcExtendedLogContext;
+import no.nav.vedtak.log.mdc.MdcExtendedLogContext;
 
 /**
  * Tekniske oppsett ved kjøring av et steg:<br>

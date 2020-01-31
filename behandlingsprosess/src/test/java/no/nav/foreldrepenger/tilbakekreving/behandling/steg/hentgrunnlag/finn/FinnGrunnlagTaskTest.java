@@ -2,6 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.finn;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,7 +29,6 @@ import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
-import no.nav.vedtak.util.FPDateUtil;
 
 public class FinnGrunnlagTaskTest extends FellesTestOppsett {
 
@@ -49,7 +49,7 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
         eksternBehandlingRepository.lagre(eksternBehandling);
         saksnummer = behandling.getFagsak().getSaksnummer().getVerdi();
         behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, BehandlingStegType.TBKGSTEG,
-            FPDateUtil.nå().plusDays(10), Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
+            LocalDateTime.now().plusDays(10), Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
     }
 
     @Test

@@ -13,7 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import no.nav.vedtak.felles.jpa.BaseEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 
 @Entity(name = "FaktaFeilutbetaling")
 @Table(name = "FAKTA_FEILUTBETALING")
