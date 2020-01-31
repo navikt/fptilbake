@@ -133,7 +133,7 @@ public class BehandlingDtoTjeneste {
 
         dto.leggTil(new ResourceLink("/fptilbake/api/behandling/aksjonspunkt", "lagre-aksjonspunkter", ResourceLink.HttpMethod.POST));
 
-        dto.leggTil(new ResourceLink("/fptilbake/api/foreldelse/belop", "beregne-belop", ResourceLink.HttpMethod.POST));
+        dto.leggTil(new ResourceLink("/fptilbake/api/foreldelse/belop", "beregne-feilutbetalt-belop", ResourceLink.HttpMethod.POST));
     }
 
     private void settResourceLinks(Behandling behandling, UtvidetBehandlingDto dto, boolean behandlingHenlagt) {

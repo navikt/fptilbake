@@ -75,7 +75,7 @@ public class BehandlingDtoTjenesteTest {
             "sett-behandling-pa-vent",
             "endre-pa-vent",
             "lagre-aksjonspunkter",
-            "beregne-belop",
+            "beregne-feilutbetalt-belop",
             "aksjonspunkter",
             "feilutbetalingFakta",
             "feilutbetalingAarsak");
@@ -98,7 +98,7 @@ public class BehandlingDtoTjenesteTest {
             "sett-behandling-pa-vent",
             "endre-pa-vent",
             "lagre-aksjonspunkter",
-            "beregne-belop",
+            "beregne-feilutbetalt-belop",
             "aksjonspunkter",
             "feilutbetalingFakta",
             "feilutbetalingAarsak",
@@ -125,7 +125,7 @@ public class BehandlingDtoTjenesteTest {
             "sett-behandling-pa-vent",
             "endre-pa-vent",
             "lagre-aksjonspunkter",
-            "beregne-belop",
+            "beregne-feilutbetalt-belop",
             "aksjonspunkter",
             "feilutbetalingFakta",
             "feilutbetalingAarsak",
@@ -153,7 +153,7 @@ public class BehandlingDtoTjenesteTest {
             "sett-behandling-pa-vent",
             "endre-pa-vent",
             "lagre-aksjonspunkter",
-            "beregne-belop",
+            "beregne-feilutbetalt-belop",
             "aksjonspunkter",
             "feilutbetalingFakta",
             "feilutbetalingAarsak",
@@ -181,7 +181,7 @@ public class BehandlingDtoTjenesteTest {
             "sett-behandling-pa-vent",
             "endre-pa-vent",
             "lagre-aksjonspunkter",
-            "beregne-belop",
+            "beregne-feilutbetalt-belop",
             "aksjonspunkter",
             "feilutbetalingFakta",
             "feilutbetalingAarsak",
@@ -212,7 +212,7 @@ public class BehandlingDtoTjenesteTest {
             "sett-behandling-pa-vent",
             "endre-pa-vent",
             "lagre-aksjonspunkter",
-            "beregne-belop",
+            "beregne-feilutbetalt-belop",
             "aksjonspunkter"
         );
     }
