@@ -1,6 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.iverksettvedtak;
 
-import java.util.List;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -16,7 +15,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.Behandlingskontr
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryFeil;
@@ -78,12 +76,8 @@ public class IverksetteVedtakStegImpl implements IverksetteVedtakSteg {
     }
 
     private boolean erRevurderingOpprettesForKlage(Behandling behandling) {
-        if (BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandling.getType())) {
-            List<BehandlingÅrsak> behandlingÅrsaker = behandling.getBehandlingÅrsaker();
-            return behandlingÅrsaker.stream()
-                .anyMatch(behandlingÅrsak -> BehandlingÅrsakType.KLAGE_ÅRSAKER
-                    .contains(behandlingÅrsak.getBehandlingÅrsakType()));
-        }
-        return false;
+        return BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandling.getType()) &&
+            behandling.getBehandlingÅrsaker().stream()
+                .anyMatch(årsak -> BehandlingÅrsakType.KLAGE_ÅRSAKER.contains(årsak.getBehandlingÅrsakType()));
     }
 }
