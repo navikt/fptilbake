@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +31,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositor
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsak;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporing;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporingRepository;
@@ -260,7 +264,7 @@ public class VedtaksbrevTjeneste {
         BigDecimal totaltSkattetrekk = summer(resulatPerioder, BeregningResultatPeriode::getSkattBeløp);
         BigDecimal totaltRentebeløp = summer(resulatPerioder, BeregningResultatPeriode::getRenteBeløp);
         BigDecimal totaltTilbakekrevesBeløpMedRenterUtenSkatt = totaltTilbakekrevesMedRenter.subtract(totaltSkattetrekk);
-        String hjemmelstekst = VedtakHjemmel.lagHjemmelstekst(vedtakResultatType, foreldelse, vilkårPerioder);
+        String hjemmelstekst = VedtakHjemmel.lagHjemmelstekst(vedtakResultatType, foreldelse, vilkårPerioder, behandlingErRevurderingKlage(behandling));
 
         List<HbVedtaksbrevPeriode> perioder = resulatPerioder.stream()
             .map(brp -> lagBrevdataPeriode(brp, fakta, vilkårPerioder, foreldelse, perioderFritekst))
@@ -295,6 +299,17 @@ public class VedtaksbrevTjeneste {
         HbVedtaksbrevData data = new HbVedtaksbrevData(vedtakDataBuilder.build(), perioder);
         BrevMetadata brevMetadata = lagMetadataForVedtaksbrev(behandling, vedtakResultatType, fpsakBehandling, personinfo);
         return new VedtaksbrevData(data, brevMetadata);
+    }
+
+    private boolean behandlingErRevurderingKlage(Behandling behandling) {
+        return BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandling.getType()) && behandling.getBehandlingÅrsaker().size() > 0 && erÅrsakKlage(behandling.getBehandlingÅrsaker().get(0));
+    }
+
+    private boolean erÅrsakKlage(BehandlingÅrsak behandling) {
+        List<BehandlingÅrsakType> arrayList = new ArrayList<>();
+        arrayList.add(BehandlingÅrsakType.RE_KLAGE_NFP);
+        arrayList.add(BehandlingÅrsakType.RE_KLAGE_KA);
+        return behandling.getBehandlingÅrsakType() != null && arrayList.contains(behandling.getBehandlingÅrsakType());
     }
 
     private HbPerson utledSøker(Personinfo personinfo) {

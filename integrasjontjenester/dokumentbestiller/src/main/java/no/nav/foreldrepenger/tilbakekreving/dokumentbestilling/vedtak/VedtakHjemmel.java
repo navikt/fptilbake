@@ -13,7 +13,7 @@ public class VedtakHjemmel {
     private VedtakHjemmel() {
     }
 
-    public static String lagHjemmelstekst(VedtakResultatType vedtakResultatType, VurdertForeldelse foreldelse, List<VilkårVurderingPeriodeEntitet> vilkårPerioder) {
+    public static String lagHjemmelstekst(VedtakResultatType vedtakResultatType, VurdertForeldelse foreldelse, List<VilkårVurderingPeriodeEntitet> vilkårPerioder, boolean erRevurderingKlage) {
         boolean foreldetVanlig = erNoeSattTilVanligForeldet(foreldelse);
         boolean foreldetMedTilleggsfrist = erTilleggsfristBenyttet(foreldelse);
         boolean ignorerteSmåbeløp = heleVurderingPgaSmåbeløp(vedtakResultatType, vilkårPerioder);
@@ -36,7 +36,15 @@ public class VedtakHjemmel {
         } else if (foreldetVanlig) {
             hjemler.add("foreldelsesloven §§ 2 og 3");
         }
-        return join(hjemler, " og ");
+        String hjemlerFørKlage = join(hjemler, erRevurderingKlage ? ", " : " og ");
+        if (erRevurderingKlage) {
+            List<String> klageHjemler = new ArrayList<>();
+            klageHjemler.add(hjemlerFørKlage);
+            klageHjemler.add("forvaltningsloven § 35 a)/c)");
+            return join(klageHjemler, " og ");
+        } else {
+            return hjemlerFørKlage;
+        }
     }
 
     private static boolean erRenterBenyttet(List<VilkårVurderingPeriodeEntitet> vilkårPerioder) {
