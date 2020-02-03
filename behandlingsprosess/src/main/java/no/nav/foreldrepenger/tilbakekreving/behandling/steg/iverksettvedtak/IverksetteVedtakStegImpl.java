@@ -14,6 +14,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingTypeRe
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryFeil;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
@@ -59,7 +61,9 @@ public class IverksetteVedtakStegImpl implements IverksetteVedtakSteg {
             log.info("Behandling {}: Iverksetter vedtak", behandlingId);
             vedtak.setIverksettingStatus(IverksettingStatus.UNDER_IVERKSETTING);
             behandlingVedtakRepository.lagre(vedtak);
-            prosessTaskIverksett.opprettIverksettingstasker(behandling);
+
+            boolean sendVedtaksbrev = !erRevurderingOpprettetForKlage(behandling);
+            prosessTaskIverksett.opprettIverksettingstasker(behandling, sendVedtaksbrev);
             return BehandleStegResultat.settPåVent();
         }
         return BehandleStegResultat.utførtUtenAksjonspunkter();
@@ -69,5 +73,11 @@ public class IverksetteVedtakStegImpl implements IverksetteVedtakSteg {
     public final BehandleStegResultat gjenopptaSteg(BehandlingskontrollKontekst kontekst) {
         log.info("Behandling {}: Iverksetting fullført", kontekst.getBehandlingId());
         return BehandleStegResultat.utførtUtenAksjonspunkter();
+    }
+
+    private boolean erRevurderingOpprettetForKlage(Behandling behandling) {
+        return BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandling.getType()) &&
+            behandling.getBehandlingÅrsaker().stream()
+                .anyMatch(årsak -> BehandlingÅrsakType.KLAGE_ÅRSAKER.contains(årsak.getBehandlingÅrsakType()));
     }
 }
