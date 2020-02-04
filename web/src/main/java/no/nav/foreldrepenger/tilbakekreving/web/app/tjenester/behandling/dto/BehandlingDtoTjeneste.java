@@ -2,6 +2,8 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -13,13 +15,16 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurdertForeldelseTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingModell;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.BehandlingÅrsakDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.rest.ResourceLink;
 
 /**
@@ -121,6 +126,29 @@ public class BehandlingDtoTjeneste {
         getVenteÅrsak(behandling).ifPresent(dto::setVenteÅrsakKode);
         dto.setAnsvarligSaksbehandler(behandling.getAnsvarligSaksbehandler());
         dto.setSpråkkode(behandling.getFagsak().getNavBruker().getSpråkkode());
+
+        dto.setFørsteÅrsak(førsteÅrsak(behandling).orElse(null));
+        dto.setBehandlingÅrsaker(lagBehandlingÅrsakDto(behandling));
+    }
+
+    private List<BehandlingÅrsakDto> lagBehandlingÅrsakDto(Behandling behandling) {
+        if (!behandling.getBehandlingÅrsaker().isEmpty()) {
+            return behandling.getBehandlingÅrsaker().stream().map(this::lagBehandlingÅrsakDto).collect(Collectors.toList());
+        }
+        return Collections.emptyList();
+    }
+
+    private Optional<BehandlingÅrsakDto> førsteÅrsak(Behandling behandling) {
+        return behandling.getBehandlingÅrsaker().stream()
+            .sorted(Comparator.comparing(BaseEntitet::getOpprettetTidspunkt))
+            .map(this::lagBehandlingÅrsakDto)
+            .findFirst();
+    }
+
+    private BehandlingÅrsakDto lagBehandlingÅrsakDto(BehandlingÅrsak behandlingÅrsak) {
+        BehandlingÅrsakDto dto = new BehandlingÅrsakDto();
+        dto.setBehandlingÅrsakType(behandlingÅrsak.getBehandlingÅrsakType());
+        return dto;
     }
 
     private static void leggTilLenkerForBehandlingsoperasjoner(BehandlingDto dto) {

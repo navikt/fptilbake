@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.BehandlingÅrsakDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.rest.ResourceLink;
 
 public class BehandlingDto {
@@ -33,6 +34,8 @@ public class BehandlingDto {
     private boolean behandlingKøet;
     private String ansvarligSaksbehandler;
 
+    private BehandlingÅrsakDto førsteÅrsak;
+    private List<BehandlingÅrsakDto> behandlingÅrsaker;
 
     /**
      * REST HATEOAS - pekere på data innhold som hentes fra andre url'er, eller handlinger som er tilgjengelig på behandling.
@@ -189,5 +192,22 @@ public class BehandlingDto {
 
     void setAnsvarligSaksbehandler(String ansvarligSaksbehandler) {
         this.ansvarligSaksbehandler = ansvarligSaksbehandler;
+    }
+
+    public BehandlingÅrsakDto getFørsteÅrsak() {
+        return førsteÅrsak;
+    }
+
+    public void setFørsteÅrsak(BehandlingÅrsakDto førsteÅrsak) {
+        this.førsteÅrsak = førsteÅrsak;
+    }
+
+    @JsonProperty("behandlingArsaker")
+    public List<BehandlingÅrsakDto> getBehandlingÅrsaker() {
+        return behandlingÅrsaker;
+    }
+
+    public void setBehandlingÅrsaker(List<BehandlingÅrsakDto> behandlingÅrsaker) {
+        this.behandlingÅrsaker = behandlingÅrsaker;
     }
 }

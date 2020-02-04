@@ -1,5 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling;
 
+import java.util.Set;
+
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
@@ -60,5 +62,8 @@ public class BehandlingÅrsakType extends Kodeliste {
     private BehandlingÅrsakType(String kode) {
         super(kode, DISCRIMINATOR);
     }
+
+
+    public static final Set<BehandlingÅrsakType> KLAGE_ÅRSAKER = Set.of(BehandlingÅrsakType.RE_KLAGE_KA, BehandlingÅrsakType.RE_KLAGE_NFP);
 
 }
