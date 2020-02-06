@@ -22,6 +22,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.S�
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Avsnitt;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Underavsnitt;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbBehandling;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbKonfigurasjon;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbPerson;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbSak;
@@ -50,11 +51,15 @@ public class TekstformatererVedtaksbrevIBiterTest {
                 .medErFødsel(true)
                 .medAntallBarn(2)
                 .build())
+            .medBehandling(HbBehandling.builder()
+                .medErRevurdering(false)
+                .build())
             .medVedtakResultat(HbTotalresultat.builder()
                 .medHovedresultat(VedtakResultatType.DELVIS_TILBAKEBETALING)
                 .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(23002))
                 .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(23002))
                 .medTotaltRentebeløp(BigDecimal.ZERO)
+                .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.valueOf(23002))
                 .build())
             .medLovhjemmelVedtak("Folketrygdloven § 22-15")
             .medVarsel(HbVarsel.builder()
@@ -111,6 +116,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
                 .medHovedresultat(VedtakResultatType.DELVIS_TILBAKEBETALING)
                 .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(23002))
                 .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(23002))
+                .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.valueOf(23002))
                 .medTotaltRentebeløp(BigDecimal.ZERO)
                 .build())
             .medLovhjemmelVedtak("foo")
@@ -140,7 +146,6 @@ public class TekstformatererVedtaksbrevIBiterTest {
     private HbVedtaksbrevFelles.Builder lagTestBuilder() {
         return HbVedtaksbrevFelles.builder()
             .medKonfigurasjon(HbKonfigurasjon.builder()
-                .skruAvMidlertidigTekst()
                 .medKlagefristUker(4)
                 .build())
             .medSøker(HbPerson.builder()
@@ -163,6 +168,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
                 .medTotaltTilbakekrevesBeløp(BigDecimal.ZERO)
                 .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.ZERO)
                 .medTotaltRentebeløp(BigDecimal.ZERO)
+                .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.ZERO)
                 .build())
             .medLovhjemmelVedtak("foo")
             .medVarsel(HbVarsel.builder()
@@ -201,6 +207,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
                 .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(1000))
                 .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(1100))
                 .medTotaltRentebeløp(BigDecimal.valueOf(100))
+                .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.valueOf(1100))
                 .build())
             .medLovhjemmelVedtak("foo")
             .medVarsel(HbVarsel.builder()
@@ -242,6 +249,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
                 .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(1000))
                 .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(1100))
                 .medTotaltRentebeløp(BigDecimal.valueOf(100))
+                .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.valueOf(1100))
                 .build())
             .medLovhjemmelVedtak("foo")
             .medVarsel(HbVarsel.builder()

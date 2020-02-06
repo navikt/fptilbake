@@ -19,18 +19,12 @@ public class HbKonfigurasjon {
     private BigDecimal halvtGrunnbeløp = BigDecimal.valueOf(49929);  //FIXME fjerne hardkoding
     @JsonProperty("klagefrist-uker")
     private Integer klagefristUker;
-    @JsonProperty("bruk-midlertidig-tekst")
-    private boolean brukMidlertidigTekst = true;
 
     public HbKonfigurasjon() {
     }
 
     public static Builder builder() {
         return new Builder();
-    }
-
-    public boolean brukMidlertidigTekst() {
-        return brukMidlertidigTekst;
     }
 
     public static class Builder {
@@ -48,11 +42,6 @@ public class HbKonfigurasjon {
 
         public HbKonfigurasjon.Builder medKlagefristUker(int klagefristUker) {
             kladd.klagefristUker = klagefristUker;
-            return this;
-        }
-
-        public HbKonfigurasjon.Builder skruAvMidlertidigTekst() {
-            kladd.brukMidlertidigTekst = false;
             return this;
         }
 

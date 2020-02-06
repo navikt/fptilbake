@@ -27,6 +27,8 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
     private HbKonfigurasjon konfigurasjon;
     @JsonProperty("fritekst-oppsummering")
     private String fritekstOppsummering;
+    @JsonProperty("behandling")
+    private HbBehandling behandling;
 
     private HbVedtaksbrevDatoer datoer;
 
@@ -48,6 +50,10 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
 
     public void setFritekstOppsummering(String fritekstOppsummering) {
         this.fritekstOppsummering = fritekstOppsummering;
+    }
+
+    public HbBehandling getBehandling() {
+        return behandling;
     }
 
     @JsonProperty("opphørsdato-død-søker")
@@ -91,9 +97,6 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
             Objects.check(kladd.sak != null, "sak-informasjon er ikke satt");
             Objects.check(kladd.konfigurasjon != null, "konfigurasjon er ikke satt");
             Objects.check(kladd.totalresultat != null, "totalresultat er ikke satt");
-            if (kladd.konfigurasjon.brukMidlertidigTekst()) {
-                Objects.check(kladd.totalresultat.harBeløpMedRenterUtenSkatt(), "totaltTilbakekrevesBeløpMedRenterUtenSkatt er ikke satt");
-            }
             if (kladd.varsel == null) {
                 Objects.check(kladd.sak.harDatoForFagsakvedtak(), "dato for fagsakvedtak/revurdering er ikke satt");
             }
@@ -139,6 +142,11 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
 
         public Builder medDatoer(HbVedtaksbrevDatoer datoer) {
             kladd.datoer = datoer;
+            return this;
+        }
+
+        public Builder medBehandling(HbBehandling behandling) {
+            kladd.behandling = behandling;
             return this;
         }
     }

@@ -5,7 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -33,7 +32,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsak;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporing;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporingRepository;
@@ -50,6 +48,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselInfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingAktsomhetEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingEntitet;
@@ -72,6 +72,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.Brev
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.JournalpostIdOgDokumentId;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbBehandling;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbKonfigurasjon;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbPerson;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbSak;
@@ -101,6 +102,7 @@ public class VedtaksbrevTjeneste {
     private static final int KLAGEFRIST_UKER = 6;
 
     private BehandlingRepository behandlingRepository;
+    private BehandlingVedtakRepository behandlingVedtakRepository;
     private EksternBehandlingRepository eksternBehandlingRepository;
     private VarselRepository varselRepository;
     private FaktaFeilutbetalingRepository faktaRepository;
@@ -129,6 +131,7 @@ public class VedtaksbrevTjeneste {
                                JournalføringTjeneste journalføringTjeneste,
                                Unleash unleash) {
         this.behandlingRepository = behandlingRepositoryProvider.getBehandlingRepository();
+        this.behandlingVedtakRepository = behandlingRepositoryProvider.getBehandlingVedtakRepository();
         this.eksternBehandlingRepository = behandlingRepositoryProvider.getEksternBehandlingRepository();
         this.varselRepository = behandlingRepositoryProvider.getVarselRepository();
         this.faktaRepository = behandlingRepositoryProvider.getFaktaFeilutbetalingRepository();
@@ -264,7 +267,29 @@ public class VedtaksbrevTjeneste {
         BigDecimal totaltSkattetrekk = summer(resulatPerioder, BeregningResultatPeriode::getSkattBeløp);
         BigDecimal totaltRentebeløp = summer(resulatPerioder, BeregningResultatPeriode::getRenteBeløp);
         BigDecimal totaltTilbakekrevesBeløpMedRenterUtenSkatt = totaltTilbakekrevesMedRenter.subtract(totaltSkattetrekk);
-        String hjemmelstekst = VedtakHjemmel.lagHjemmelstekst(vedtakResultatType, foreldelse, vilkårPerioder, behandlingErRevurderingKlage(behandling));
+
+        boolean erRevurdering = BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandling.getType());
+        boolean positivtForBruker = false;
+        LocalDate originalBehandlingVedtaksdato = null;
+        if (erRevurdering) {
+            BehandlingÅrsak behandlingÅrsak = behandling.getBehandlingÅrsaker().get(0);
+            Behandling originalBehandling = behandlingÅrsak.getOriginalBehandling()
+                .orElseThrow(() -> new RuntimeException("Mangler original behandling for revurdering!????"));
+
+            Optional<BehandlingVedtak> originalBehandlingVedtak = behandlingVedtakRepository.hentBehandlingvedtakForBehandlingId(originalBehandling.getId());
+            BehandlingVedtak behandlingVedtak = originalBehandlingVedtak.orElseThrow();
+
+            originalBehandlingVedtaksdato = behandlingVedtak.getVedtaksdato();
+
+            BeregningResultat originaltBeregnetResultat = tilbakekrevingBeregningTjeneste.beregn(originalBehandling.getId());
+            List<BeregningResultatPeriode> originalBeregningResultatPerioder = originaltBeregnetResultat.getBeregningResultatPerioder();
+            BigDecimal originalBehandlingTotaltMedRenter = summer(originalBeregningResultatPerioder, BeregningResultatPeriode::getTilbakekrevingBeløp);
+            BigDecimal originalBehandlingTotaltSkattetrekk = summer(originalBeregningResultatPerioder, BeregningResultatPeriode::getSkattBeløp);
+            BigDecimal originalBehandlingTotaltTilbakekrevesBeløpMedRenterUtenSkatt = originalBehandlingTotaltMedRenter.subtract(originalBehandlingTotaltSkattetrekk);
+
+            positivtForBruker = totaltTilbakekrevesBeløpMedRenterUtenSkatt.compareTo(originalBehandlingTotaltTilbakekrevesBeløpMedRenterUtenSkatt) < 0;
+        }
+        String hjemmelstekst = VedtakHjemmel.lagHjemmelstekst(vedtakResultatType, foreldelse, vilkårPerioder, erRevurdering, positivtForBruker);
 
         List<HbVedtaksbrevPeriode> perioder = resulatPerioder.stream()
             .map(brp -> lagBrevdataPeriode(brp, fakta, vilkårPerioder, foreldelse, perioderFritekst))
@@ -277,6 +302,10 @@ public class VedtaksbrevTjeneste {
                 .medAntallBarn(fpsakBehandling.getAntallBarnSøktFor())
                 .medErFødsel(SøknadType.FØDSEL == fpsakBehandling.getSøknadType())
                 .medErAdopsjon(SøknadType.ADOPSJON == fpsakBehandling.getSøknadType())
+                .build())
+            .medBehandling(HbBehandling.builder()
+                .medErRevurdering(erRevurdering)
+                .medOriginalBehandlingDatoFagsakvedtak(originalBehandlingVedtaksdato)
                 .build())
             .medVarsel(HbVarsel.forDatoOgBeløp(varsletDato, varsletBeløp))
             .medFritekstOppsummering(oppsummeringFritekst)
@@ -299,17 +328,6 @@ public class VedtaksbrevTjeneste {
         HbVedtaksbrevData data = new HbVedtaksbrevData(vedtakDataBuilder.build(), perioder);
         BrevMetadata brevMetadata = lagMetadataForVedtaksbrev(behandling, vedtakResultatType, fpsakBehandling, personinfo);
         return new VedtaksbrevData(data, brevMetadata);
-    }
-
-    private boolean behandlingErRevurderingKlage(Behandling behandling) {
-        return BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandling.getType()) && behandling.getBehandlingÅrsaker().size() > 0 && erÅrsakKlage(behandling.getBehandlingÅrsaker().get(0));
-    }
-
-    private boolean erÅrsakKlage(BehandlingÅrsak behandling) {
-        List<BehandlingÅrsakType> arrayList = new ArrayList<>();
-        arrayList.add(BehandlingÅrsakType.RE_KLAGE_NFP);
-        arrayList.add(BehandlingÅrsakType.RE_KLAGE_KA);
-        return behandling.getBehandlingÅrsakType() != null && arrayList.contains(behandling.getBehandlingÅrsakType());
     }
 
     private HbPerson utledSøker(Personinfo personinfo) {

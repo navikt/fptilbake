@@ -5,13 +5,19 @@ import static no.nav.vedtak.feil.LogLevel.WARN;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstOppsummering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstPeriode;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
@@ -30,14 +36,21 @@ public class VedtaksbrevFritekstValidator {
 
     private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository;
     private VilkårsvurderingRepository vilkårsvurderingRepository;
+    private BehandlingRepository behandlingRepository;
+    private VedtaksbrevFritekstRepository vedtaksbrevFritekstRepository;
 
     public VedtaksbrevFritekstValidator() {
     }
 
     @Inject
-    public VedtaksbrevFritekstValidator(FaktaFeilutbetalingRepository faktaFeilutbetalingRepository, VilkårsvurderingRepository vilkårsvurderingRepository) {
+    public VedtaksbrevFritekstValidator(FaktaFeilutbetalingRepository faktaFeilutbetalingRepository,
+                                        VilkårsvurderingRepository vilkårsvurderingRepository,
+                                        BehandlingRepository behandlingRepository,
+                                        VedtaksbrevFritekstRepository vedtaksbrevFritekstRepository) {
         this.faktaFeilutbetalingRepository = faktaFeilutbetalingRepository;
         this.vilkårsvurderingRepository = vilkårsvurderingRepository;
+        this.behandlingRepository = behandlingRepository;
+        this.vedtaksbrevFritekstRepository = vedtaksbrevFritekstRepository;
     }
 
     public void validerAtPåkrevdeFriteksterErSatt(Long behandlingId, List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder) {
@@ -46,6 +59,18 @@ public class VedtaksbrevFritekstValidator {
 
         FaktaFeilutbetaling faktaFeilutbetaling = faktaFeilutbetalingRepository.finnFaktaOmFeilutbetaling(behandlingId).orElseThrow();
         validerFritekstFakta(faktaFeilutbetaling, vedtaksbrevFritekstPerioder);
+
+        validerAtPåkrevdOppsummeringErSatt(behandlingId);
+    }
+
+    private void validerAtPåkrevdOppsummeringErSatt(Long behandlingId) {
+        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
+        if (BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandling.getType())) {
+            Optional<VedtaksbrevFritekstOppsummering> vedtaksbrevFritekstOppsummering = vedtaksbrevFritekstRepository.hentVedtaksbrevOppsummering(behandlingId);
+            if (vedtaksbrevFritekstOppsummering.isEmpty()) {
+                throw FritekstFeil.FACTORY.manglerPåkrevetOppsumering().toException();
+            }
+        }
     }
 
     private static void validerSærligeGrunnerAnnet(VilkårVurderingEntitet vilkårVurdering, List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder) {
@@ -105,5 +130,7 @@ public class VedtaksbrevFritekstValidator {
         @TekniskFeil(feilkode = "FPT-022180", feilmelding = "Ugyldig input: Når '%s' er valgt er fritekst påkrevet. Mangler for periode %s og avsnitt %s", logLevel = WARN)
         Feil manglerFritekst(String hendelseUnderType, Periode periode, String fritekstType);
 
+        @TekniskFeil(feilkode = "FPT-063091", feilmelding = "Ugyldig input: Når det er revurdering, så er oppsummering fritekst påkrevet.", logLevel = WARN)
+        Feil manglerPåkrevetOppsumering();
     }
 }

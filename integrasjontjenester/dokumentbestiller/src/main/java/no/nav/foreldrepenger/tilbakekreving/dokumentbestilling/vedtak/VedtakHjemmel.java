@@ -13,7 +13,7 @@ public class VedtakHjemmel {
     private VedtakHjemmel() {
     }
 
-    public static String lagHjemmelstekst(VedtakResultatType vedtakResultatType, VurdertForeldelse foreldelse, List<VilkårVurderingPeriodeEntitet> vilkårPerioder, boolean erRevurderingKlage) {
+    public static String lagHjemmelstekst(VedtakResultatType vedtakResultatType, VurdertForeldelse foreldelse, List<VilkårVurderingPeriodeEntitet> vilkårPerioder, boolean erRevurdering, boolean positivForBruker) {
         boolean foreldetVanlig = erNoeSattTilVanligForeldet(foreldelse);
         boolean foreldetMedTilleggsfrist = erTilleggsfristBenyttet(foreldelse);
         boolean ignorerteSmåbeløp = heleVurderingPgaSmåbeløp(vedtakResultatType, vilkårPerioder);
@@ -36,14 +36,18 @@ public class VedtakHjemmel {
         } else if (foreldetVanlig) {
             hjemler.add("foreldelsesloven §§ 2 og 3");
         }
-        String hjemlerFørKlage = join(hjemler, erRevurderingKlage ? ", " : " og ");
-        if (erRevurderingKlage) {
-            List<String> klageHjemler = new ArrayList<>();
-            klageHjemler.add(hjemlerFørKlage);
-            klageHjemler.add("forvaltningsloven § 35 a)/c)");
-            return join(klageHjemler, " og ");
+        String hjemmeltekstUtenRevurdering = join(hjemler, erRevurdering ? ", " : " og ");
+        if (erRevurdering) {
+            List<String> revurderingHjemler = new ArrayList<>();
+            revurderingHjemler.add(hjemmeltekstUtenRevurdering);
+            if (positivForBruker) {
+                revurderingHjemler.add("forvaltningsloven § 35 a)");
+            } else {
+                revurderingHjemler.add("forvaltningsloven § 35 c)");
+            }
+            return join(revurderingHjemler, " og ");
         } else {
-            return hjemlerFørKlage;
+            return hjemmeltekstUtenRevurdering;
         }
     }
 

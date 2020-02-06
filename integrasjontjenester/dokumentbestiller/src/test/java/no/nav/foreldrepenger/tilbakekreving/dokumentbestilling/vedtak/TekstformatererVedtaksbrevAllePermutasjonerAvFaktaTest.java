@@ -42,7 +42,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
 
-public class TekstformatererVedtaksbrevAllePermutasjonerTest {
+public class TekstformatererVedtaksbrevAllePermutasjonerAvFaktaTest {
 
     private final Periode januar = Periode.of(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 1, 31));
 
@@ -174,6 +174,7 @@ public class TekstformatererVedtaksbrevAllePermutasjonerTest {
                 .medTotaltRentebeløp(BigDecimal.valueOf(1000))
                 .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(10000))
                 .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(11000))
+                .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.valueOf(11000))
                 .build())
             .medVarsel(HbVarsel.builder()
                 .medVarsletBeløp(BigDecimal.valueOf(10000))
@@ -181,7 +182,6 @@ public class TekstformatererVedtaksbrevAllePermutasjonerTest {
                 .build())
             .medKonfigurasjon(HbKonfigurasjon.builder()
                 .medKlagefristUker(6)
-                .skruAvMidlertidigTekst()
                 .build())
             .medSøker(HbPerson.builder()
                 .medNavn("Søker Søkersen")

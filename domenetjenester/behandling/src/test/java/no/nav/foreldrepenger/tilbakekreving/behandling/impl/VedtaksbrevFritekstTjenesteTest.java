@@ -7,10 +7,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -21,22 +24,21 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.Ved
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.FellesUndertyper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
+import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
+@RunWith(CdiRunner.class)
 public class VedtaksbrevFritekstTjenesteTest {
 
     @Rule
@@ -45,15 +47,18 @@ public class VedtaksbrevFritekstTjenesteTest {
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
-    private BehandlingRepository behandlingRepository = new BehandlingRepositoryImpl(repoRule.getEntityManager());
-    private FagsakRepository fagsakRepository = new FagsakRepositoryImpl(repoRule.getEntityManager());
+    @Inject
+    private BehandlingRepository behandlingRepository;
+    @Inject
+    private FagsakRepository fagsakRepository;
 
-    private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository = new FaktaFeilutbetalingRepository(repoRule.getEntityManager());
-    private VilkårsvurderingRepository vilkårsvurderingRepository = new VilkårsvurderingRepository(repoRule.getEntityManager());
-    private VedtaksbrevFritekstRepository vedtaksbrevFritekstRepository = new VedtaksbrevFritekstRepository(repoRule.getEntityManager());
+    @Inject
+    private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository;
+    @Inject
+    private VedtaksbrevFritekstRepository vedtaksbrevFritekstRepository;
 
-    private VedtaksbrevFritekstValidator validator = new VedtaksbrevFritekstValidator(faktaFeilutbetalingRepository, vilkårsvurderingRepository);
-    private VedtaksbrevFritekstTjeneste tjeneste = new VedtaksbrevFritekstTjeneste(validator, vedtaksbrevFritekstRepository);
+    @Inject
+    private VedtaksbrevFritekstTjeneste tjeneste;
 
     private LocalDate jan1 = LocalDate.of(2019, 1, 1);
     private LocalDate jan2 = LocalDate.of(2019, 1, 2);
