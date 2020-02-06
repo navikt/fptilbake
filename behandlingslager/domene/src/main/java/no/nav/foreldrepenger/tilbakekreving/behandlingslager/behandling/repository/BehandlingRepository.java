@@ -3,6 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposit
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingslagerRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -16,6 +17,11 @@ public interface BehandlingRepository extends BehandlingslagerRepository {
      * Hent Behandling med angitt id.
      */
     Behandling hentBehandling(Long behandlingId);
+
+    /**
+     * Hent Behandling med angitt UUid.
+     */
+    Behandling hentBehandling(UUID uuid);
 
     /**
      * Lagrer behandling, sikrer at relevante parent-entiteter (Fagsak, FagsakRelasjon) også oppdateres.

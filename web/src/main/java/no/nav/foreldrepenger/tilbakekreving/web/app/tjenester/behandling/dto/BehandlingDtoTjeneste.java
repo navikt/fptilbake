@@ -112,6 +112,7 @@ public class BehandlingDtoTjeneste {
     private void settStandardFelter(Behandling behandling, BehandlingDto dto) {
         dto.setFagsakId(behandling.getFagsakId());
         dto.setId(behandling.getId());
+        dto.setUuid(behandling.getUuid());
         dto.setVersjon(behandling.getVersjon());
         dto.setType(behandling.getType());
         dto.setOpprettet(behandling.getOpprettetTidspunkt());

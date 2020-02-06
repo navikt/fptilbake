@@ -121,6 +121,11 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
     }
 
     @Override
+    public Behandling hentBehandling(UUID behandlingUUId) {
+        return behandlingRepository.hentBehandling(behandlingUUId);
+    }
+
+    @Override
     public Long opprettBehandlingManuell(Saksnummer saksnummer, UUID eksternUuid,
                                          FagsakYtelseType fagsakYtelseType, BehandlingType behandlingType) {
 
