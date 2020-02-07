@@ -59,17 +59,27 @@ public class PdpRequestBuilderImpl implements PdpRequestBuilder {
     public PdpRequest lagPdpRequest(AbacAttributtSamling attributter) {
         MDC_EXTENDED_LOG_CONTEXT.remove("behandling");
         MDC_EXTENDED_LOG_CONTEXT.remove("fpsakBehandlingUuid");
+        MDC_EXTENDED_LOG_CONTEXT.remove("behandlingUuid");
 
         Optional<Long> behandlingId = utledBehandlingId(attributter);
+        Optional<UUID> behandlingUuid = utledBehandlingUuId(attributter);
         Optional<UUID> fpsakBehandlingId = utledFpsakBehandlingId(attributter);
         if (behandlingId.isPresent() && fpsakBehandlingId.isPresent()) {
             throw PdpRequestBuilderFeil.FACTORY.ugyldigInputFlereBehandlinger(behandlingId.get(), fpsakBehandlingId.get()).toException();
+        }
+        if (behandlingUuid.isPresent() && fpsakBehandlingId.isPresent()) {
+            throw PdpRequestBuilderFeil.FACTORY.ugyldigInputFlereBehandlinger(behandlingUuid.get(), fpsakBehandlingId.get()).toException();
+        }
+        if (behandlingId.isPresent() && behandlingUuid.isPresent()) {
+            throw PdpRequestBuilderFeil.FACTORY.ugyldigInputFlereBehandlinger(behandlingId.get(), behandlingUuid.get()).toException();
         }
 
         PipBehandlingData behandlingData = null;
         if (behandlingId.isPresent()) {
             behandlingData = lagBehandlingData(behandlingId.get());
-        } else if (fpsakBehandlingId.isPresent()) {
+        } else if (behandlingUuid.isPresent()) {
+            behandlingData = lagBehandlingData(behandlingUuid.get());
+        }else if (fpsakBehandlingId.isPresent()) {
             behandlingData = hentFpsakBehandlingData(fpsakBehandlingId.get());
         }
 
@@ -79,7 +89,8 @@ public class PdpRequestBuilderImpl implements PdpRequestBuilder {
         //legger til utledede attributter til AbacAttributtSamling, slik at de kan bli logget til sporingslogg
         AbacDataAttributter utlededeAttributter = AbacDataAttributter.opprett();
         utlededeAttributter.leggTil(StandardAbacAttributtType.AKTØR_ID, aktørIder);
-        fpsakBehandlingId.ifPresent(uuid -> utlededeAttributter.leggTil(AppAbacAttributtType.BEHANDLING_UUID, uuid));
+        fpsakBehandlingId.ifPresent(uuid -> utlededeAttributter.leggTil(TilbakekrevingAbacAttributtType.FPSAK_BEHANDLING_UUID, uuid));
+        behandlingUuid.ifPresent(uuid -> utlededeAttributter.leggTil(StandardAbacAttributtType.BEHANDLING_UUID,uuid));
         attributter.leggTil(utlededeAttributter);
 
         return behandlingData != null
@@ -104,6 +115,16 @@ public class PdpRequestBuilderImpl implements PdpRequestBuilder {
             return behandlingDataOpt.get();
         } else {
             throw PdpRequestBuilderFeil.FACTORY.fantIkkeBehandling(behandlingId).toException();
+        }
+    }
+
+    private PipBehandlingData lagBehandlingData(UUID behandlingUuid) {
+        MDC_EXTENDED_LOG_CONTEXT.add("behandlingUuid", behandlingUuid);
+        Optional<PipBehandlingData> behandlingDataOpt = pipRepository.hentBehandlingData(behandlingUuid);
+        if (behandlingDataOpt.isPresent()) {
+            return behandlingDataOpt.get();
+        } else {
+            throw PdpRequestBuilderFeil.FACTORY.fantIkkeBehandling(behandlingUuid).toException();
         }
     }
 
@@ -163,6 +184,16 @@ public class PdpRequestBuilderImpl implements PdpRequestBuilder {
         throw PdpRequestBuilderFeil.FACTORY.ugyldigInputFlereBehandlingIder(behandlingIder).toException();
     }
 
+    private Optional<UUID> utledBehandlingUuId(AbacAttributtSamling attributter) {
+        Set<UUID> behandlingUuider = attributter.getVerdier(AppAbacAttributtType.BEHANDLING_UUID);
+        if (behandlingUuider.isEmpty()) {
+            return Optional.empty();
+        } else if (behandlingUuider.size() == 1) {
+            return Optional.of(behandlingUuider.iterator().next());
+        }
+        throw PdpRequestBuilderFeil.FACTORY.ugyldigInputFlereBehandlingUuider(behandlingUuider).toException();
+    }
+
     private Optional<UUID> utledFpsakBehandlingId(AbacAttributtSamling attributter) {
         Set<UUID> behandlingUuider = attributter.getVerdier(TilbakekrevingAbacAttributtType.FPSAK_BEHANDLING_UUID);
         if (behandlingUuider.isEmpty()) {
@@ -198,15 +229,23 @@ public class PdpRequestBuilderImpl implements PdpRequestBuilder {
         @TekniskFeil(feilkode = "FPT-426124", feilmelding = "Ugyldig input. Støtter bare 0 eller 1 behandling, men har %s", logLevel = LogLevel.WARN)
         Feil ugyldigInputFlereBehandlingIder(Collection<Long> behandlingId);
 
+        @TekniskFeil(feilkode = "FPT-426125", feilmelding = "Ugyldig input. Støtter bare 0 eller 1 behandling, men har %s", logLevel = LogLevel.WARN)
+        Feil ugyldigInputFlereBehandlingUuider(Collection<UUID> behandlingUuid);
+
         @TekniskFeil(feilkode = "FPT-651672", feilmelding = "Ugyldig input. Støtter bare 0 eller 1 behandling, men har %s", logLevel = LogLevel.WARN)
         Feil ugyldigInputFlereBehandlingUuid(Collection<UUID> behandlingId);
 
         @TekniskFeil(feilkode = "FPT-317633", feilmelding = "Ugyldig input. Støtter bare 0 eller 1 behandling, men har %s og %s", logLevel = LogLevel.WARN)
         Feil ugyldigInputFlereBehandlinger(Long behandlingId, UUID fpsakUuid);
 
+        @TekniskFeil(feilkode = "FPT-317634", feilmelding = "Ugyldig input. Støtter bare 0 eller 1 behandling, men har %s og %s", logLevel = LogLevel.WARN)
+        Feil ugyldigInputFlereBehandlinger(UUID behandlingUuid, UUID fpsakUuid);
+
         @TekniskFeil(feilkode = "FPT-426125", feilmelding = "Ugyldig input. Fant ikke behandlingId %s", logLevel = LogLevel.WARN)
         Feil fantIkkeBehandling(Long behandlingId);
 
+        @TekniskFeil(feilkode = "FPT-426126", feilmelding = "Ugyldig input. Fant ikke behandlingId %s", logLevel = LogLevel.WARN)
+        Feil fantIkkeBehandling(UUID behandlingUuid);
     }
 
 }

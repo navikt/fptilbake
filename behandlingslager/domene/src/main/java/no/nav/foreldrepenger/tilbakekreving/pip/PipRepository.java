@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -29,8 +30,9 @@ public class PipRepository {
         this.entityManager = entityManager;
     }
 
-    public Optional<PipBehandlingData> hentBehandlingData(long behandlingId) {
-        Optional<BehandlingInfo> internBehandlingData = hentInternBehandlingData(behandlingId);
+    public Optional<PipBehandlingData> hentBehandlingData(Object identifikator) {
+        Optional<BehandlingInfo> internBehandlingData = identifikator instanceof  Long ? hentInternBehandlingData((Long) identifikator)
+                                                                                       : hentInternBehandlingData((UUID) identifikator);
         if (internBehandlingData.isPresent()) {
             BehandlingInfo internData = internBehandlingData.get();
 
@@ -72,6 +74,33 @@ public class PipRepository {
         } else {
             throw new IllegalStateException("Utvikler feil: Forventet 0 eller 1 treff etter søk på behandlingId, fikk "
                     + resultater.size() + " [behandlingId: " + behandlingId);
+        }
+    }
+
+    private Optional<BehandlingInfo> hentInternBehandlingData(UUID behandlingUuid) {
+        String sql = "select" +
+            " b.id as behandlingId" +
+            ", f.saksnummer as saksnummer" +
+            ", u.aktoer_id as aktørId" +
+            ", b.behandling_status as behandlingstatus" +
+            ", b.ansvarlig_saksbehandler as ansvarligSaksbehandler" +
+            " from behandling b" +
+            " left join fagsak f on f.id = b.fagsak_id" +
+            " left join bruker u on u.id = f.bruker_id" +
+            " where b.uuid = :behandlingUuid";
+
+        // PipBehandlingInfo-mappingen er definert i Behandling entiteten
+        Query query = entityManager.createNativeQuery(sql, "PipBehandlingInfo");
+        query.setParameter("behandlingUuid", behandlingUuid);
+
+        List resultater = query.getResultList();
+        if (resultater.isEmpty()) {
+            return Optional.empty();
+        } else if (resultater.size() == 1) {
+            return Optional.of((BehandlingInfo) resultater.get(0));
+        } else {
+            throw new IllegalStateException("Utvikler feil: Forventet 0 eller 1 treff etter søk på behandlingId, fikk "
+                + resultater.size() + " [behandlingUuid: " + behandlingUuid);
         }
     }
 

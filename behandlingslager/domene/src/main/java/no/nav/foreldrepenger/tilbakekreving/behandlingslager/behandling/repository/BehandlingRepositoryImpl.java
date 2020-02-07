@@ -53,7 +53,7 @@ public class BehandlingRepositoryImpl implements BehandlingRepository {
 
     @Override
     public Behandling hentBehandling(UUID uuid) {
-        Objects.requireNonNull(uuid, "behandlingUUId"); // NOSONAR //$NON-NLS-1$
+        Objects.requireNonNull(uuid, "behandlingUUID"); // NOSONAR //$NON-NLS-1$
         return hentEksaktResultat(lagBehandlingQuery(uuid));
     }
 
@@ -187,9 +187,9 @@ public class BehandlingRepositoryImpl implements BehandlingRepository {
         return query;
     }
 
-    private TypedQuery<Behandling> lagBehandlingQuery(UUID behandlingUUId) {
-        TypedQuery<Behandling> query = getEntityManager().createQuery("from Behandling where uuid=:behandlingUUId", Behandling.class); //$NON-NLS-1$
-        query.setParameter("behandlingUUId", behandlingUUId); //$NON-NLS-1$
+    private TypedQuery<Behandling> lagBehandlingQuery(UUID behandlingUUID) {
+        TypedQuery<Behandling> query = getEntityManager().createQuery("from Behandling where uuid=:behandlingUUID", Behandling.class); //$NON-NLS-1$
+        query.setParameter("behandlingUUID", behandlingUUID); //$NON-NLS-1$
         return query;
     }
 

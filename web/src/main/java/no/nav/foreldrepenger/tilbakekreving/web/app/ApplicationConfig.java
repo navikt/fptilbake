@@ -1,22 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import javax.enterprise.inject.Instance;
-import javax.enterprise.inject.spi.CDI;
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.core.Application;
-
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.BehandlingBackendRestTjeneste;
-import org.jboss.weld.interceptor.util.proxy.TargetInstanceProxy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 import io.swagger.v3.oas.integration.OpenApiConfigurationException;
@@ -52,6 +35,20 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.tilbakekrevingsgru
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.varselrespons.VarselresponsRestTjeneste;
 import no.nav.vedtak.felles.integrasjon.unleash.EnvironmentProperty;
 import no.nav.vedtak.felles.prosesstask.rest.ProsessTaskRestTjeneste;
+import org.jboss.weld.interceptor.util.proxy.TargetInstanceProxy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.enterprise.inject.Instance;
+import javax.enterprise.inject.spi.CDI;
+import javax.ws.rs.ApplicationPath;
+import javax.ws.rs.core.Application;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @ApplicationPath(ApplicationConfig.API_URI)
@@ -121,7 +118,6 @@ public class ApplicationConfig extends Application {
         classes.add(ForvaltningTekniskRestTjeneste.class);
         classes.add(ForvaltningBehandlingRestTjeneste.class);
         classes.add(MigrasjonRestTjeneste.class);
-        classes.add(BehandlingBackendRestTjeneste.class);
 
         //HAXX legger til en test-tjeneste i alle miljø utenom prod
         Optional<String> envName = EnvironmentProperty.getEnvironmentName();
