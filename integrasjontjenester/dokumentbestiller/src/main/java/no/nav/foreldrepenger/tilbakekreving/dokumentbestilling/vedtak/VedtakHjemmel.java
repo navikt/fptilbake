@@ -13,7 +13,7 @@ public class VedtakHjemmel {
     private VedtakHjemmel() {
     }
 
-    public static String lagHjemmelstekst(VedtakResultatType vedtakResultatType, VurdertForeldelse foreldelse, List<VilkårVurderingPeriodeEntitet> vilkårPerioder, boolean erRevurdering, boolean positivForBruker) {
+    public static String lagHjemmelstekst(VedtakResultatType vedtakResultatType, VurdertForeldelse foreldelse, List<VilkårVurderingPeriodeEntitet> vilkårPerioder, EffektForBruker effektForBruker) {
         boolean foreldetVanlig = erNoeSattTilVanligForeldet(foreldelse);
         boolean foreldetMedTilleggsfrist = erTilleggsfristBenyttet(foreldelse);
         boolean ignorerteSmåbeløp = heleVurderingPgaSmåbeløp(vedtakResultatType, vilkårPerioder);
@@ -36,19 +36,15 @@ public class VedtakHjemmel {
         } else if (foreldetVanlig) {
             hjemler.add("foreldelsesloven §§ 2 og 3");
         }
-        String hjemmeltekstUtenRevurdering = join(hjemler, erRevurdering ? ", " : " og ");
-        if (erRevurdering) {
-            List<String> revurderingHjemler = new ArrayList<>();
-            revurderingHjemler.add(hjemmeltekstUtenRevurdering);
-            if (positivForBruker) {
-                revurderingHjemler.add("forvaltningsloven § 35 a)");
+        if (effektForBruker.erRevurdering()) {
+            if (effektForBruker.erTilGunstForBruker()) {
+                hjemler.add("forvaltningsloven § 35 a)");
             } else {
-                revurderingHjemler.add("forvaltningsloven § 35 c)");
+                hjemler.add("forvaltningsloven § 35 c)");
             }
-            return join(revurderingHjemler, " og ");
-        } else {
-            return hjemmeltekstUtenRevurdering;
         }
+
+        return join(hjemler, " og ");
     }
 
     private static boolean erRenterBenyttet(List<VilkårVurderingPeriodeEntitet> vilkårPerioder) {
@@ -67,12 +63,17 @@ public class VedtakHjemmel {
         return foreldelse != null && foreldelse.getVurdertForeldelsePerioder().stream().anyMatch(f -> f.getForeldelseVurderingType().equals(ForeldelseVurderingType.FORELDET));
     }
 
-    private static String join(List<String> elementer, String skille) {
+    private static String join(List<String> elementer, String sisteSkille) {
         StringBuilder builder = new StringBuilder();
         boolean første = true;
-        for (String element : elementer) {
-            if (!første) {
-                builder.append(skille);
+        for (int i = 0 ; i < elementer.size() ; i++) {
+            String element = elementer.get(i);
+            boolean siste = i == (elementer.size() - 1);
+            if (!første && !siste) {
+                builder.append(", ");
+            }
+            if (!første && siste) {
+                builder.append(sisteSkille);
             }
             builder.append(element);
             første = false;
@@ -80,4 +81,17 @@ public class VedtakHjemmel {
         return builder.toString();
     }
 
+    enum EffektForBruker {
+        FØRSTEGANGSVEDTAK,
+        ENDRET_TIL_GUNST_FOR_BRUKER,
+        ENDRET_TIL_UGUNST_FOR_BRUKER;
+
+        boolean erRevurdering() {
+            return ENDRET_TIL_GUNST_FOR_BRUKER.equals(this) || ENDRET_TIL_UGUNST_FOR_BRUKER.equals(this);
+        }
+
+        boolean erTilGunstForBruker() {
+            return ENDRET_TIL_GUNST_FOR_BRUKER.equals(this);
+        }
+    }
 }

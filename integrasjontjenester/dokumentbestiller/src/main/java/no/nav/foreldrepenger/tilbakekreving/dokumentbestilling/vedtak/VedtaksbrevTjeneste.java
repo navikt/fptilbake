@@ -25,6 +25,7 @@ import no.finn.unleash.Unleash;
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultatPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingBeregningTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BehandlingFeilutbetalingFakta;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BeregningResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
@@ -269,27 +270,12 @@ public class VedtaksbrevTjeneste {
         BigDecimal totaltTilbakekrevesBeløpMedRenterUtenSkatt = totaltTilbakekrevesMedRenter.subtract(totaltSkattetrekk);
 
         boolean erRevurdering = BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandling.getType());
-        boolean positivtForBruker = false;
-        LocalDate originalBehandlingVedtaksdato = null;
-        if (erRevurdering) {
-            BehandlingÅrsak behandlingÅrsak = behandling.getBehandlingÅrsaker().get(0);
-            Behandling originalBehandling = behandlingÅrsak.getOriginalBehandling()
-                .orElseThrow(() -> new RuntimeException("Mangler original behandling for revurdering!????"));
+        VedtakHjemmel.EffektForBruker effektForBruker = erRevurdering
+            ? hentEffektForBruker(behandling, totaltTilbakekrevesMedRenter)
+            : VedtakHjemmel.EffektForBruker.FØRSTEGANGSVEDTAK;
+        LocalDate originalBehandlingVedtaksdato = erRevurdering ? finnOriginalBehandlingVedtaksdato(behandling) : null;
 
-            Optional<BehandlingVedtak> originalBehandlingVedtak = behandlingVedtakRepository.hentBehandlingvedtakForBehandlingId(originalBehandling.getId());
-            BehandlingVedtak behandlingVedtak = originalBehandlingVedtak.orElseThrow();
-
-            originalBehandlingVedtaksdato = behandlingVedtak.getVedtaksdato();
-
-            BeregningResultat originaltBeregnetResultat = tilbakekrevingBeregningTjeneste.beregn(originalBehandling.getId());
-            List<BeregningResultatPeriode> originalBeregningResultatPerioder = originaltBeregnetResultat.getBeregningResultatPerioder();
-            BigDecimal originalBehandlingTotaltMedRenter = summer(originalBeregningResultatPerioder, BeregningResultatPeriode::getTilbakekrevingBeløp);
-            BigDecimal originalBehandlingTotaltSkattetrekk = summer(originalBeregningResultatPerioder, BeregningResultatPeriode::getSkattBeløp);
-            BigDecimal originalBehandlingTotaltTilbakekrevesBeløpMedRenterUtenSkatt = originalBehandlingTotaltMedRenter.subtract(originalBehandlingTotaltSkattetrekk);
-
-            positivtForBruker = totaltTilbakekrevesBeløpMedRenterUtenSkatt.compareTo(originalBehandlingTotaltTilbakekrevesBeløpMedRenterUtenSkatt) < 0;
-        }
-        String hjemmelstekst = VedtakHjemmel.lagHjemmelstekst(vedtakResultatType, foreldelse, vilkårPerioder, erRevurdering, positivtForBruker);
+        String hjemmelstekst = VedtakHjemmel.lagHjemmelstekst(vedtakResultatType, foreldelse, vilkårPerioder, effektForBruker);
 
         List<HbVedtaksbrevPeriode> perioder = resulatPerioder.stream()
             .map(brp -> lagBrevdataPeriode(brp, fakta, vilkårPerioder, foreldelse, perioderFritekst))
@@ -328,6 +314,27 @@ public class VedtaksbrevTjeneste {
         HbVedtaksbrevData data = new HbVedtaksbrevData(vedtakDataBuilder.build(), perioder);
         BrevMetadata brevMetadata = lagMetadataForVedtaksbrev(behandling, vedtakResultatType, fpsakBehandling, personinfo);
         return new VedtaksbrevData(data, brevMetadata);
+    }
+
+    private VedtakHjemmel.EffektForBruker hentEffektForBruker(Behandling behandling, BigDecimal totaltTilbakekrevesMedRenter) {
+        BehandlingÅrsak behandlingÅrsak = behandling.getBehandlingÅrsaker().get(0);
+        Behandling originalBehandling = behandlingÅrsak.getOriginalBehandling().orElseThrow();
+
+        BeregningResultat originaltBeregnetResultat = tilbakekrevingBeregningTjeneste.beregn(originalBehandling.getId());
+        List<BeregningResultatPeriode> originalBeregningResultatPerioder = originaltBeregnetResultat.getBeregningResultatPerioder();
+        BigDecimal originalBehandlingTotaltMedRenter = summer(originalBeregningResultatPerioder, BeregningResultatPeriode::getTilbakekrevingBeløp);
+
+        boolean positivtForBruker = totaltTilbakekrevesMedRenter.compareTo(originalBehandlingTotaltMedRenter) < 0;
+        return positivtForBruker ? VedtakHjemmel.EffektForBruker.ENDRET_TIL_GUNST_FOR_BRUKER : VedtakHjemmel.EffektForBruker.ENDRET_TIL_UGUNST_FOR_BRUKER;
+    }
+
+    private LocalDate finnOriginalBehandlingVedtaksdato(Behandling behandling) {
+        BehandlingÅrsak behandlingÅrsak = behandling.getBehandlingÅrsaker().get(0);
+        Behandling originalBehandling = behandlingÅrsak.getOriginalBehandling().orElseThrow();
+
+        return behandlingVedtakRepository.hentBehandlingvedtakForBehandlingId(originalBehandling.getId())
+            .orElseThrow()
+            .getVedtaksdato();
     }
 
     private HbPerson utledSøker(Personinfo personinfo) {

@@ -26,7 +26,7 @@ public class VedtaksbrevFritekstTjeneste {
     }
 
     public void lagreFriteksterFraSaksbehandler(Long behandlingId, VedtaksbrevFritekstOppsummering vedtaksbrevFritekstOppsummering, List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder) {
-        validator.validerAtPåkrevdeFriteksterErSatt(behandlingId, vedtaksbrevFritekstPerioder);
+        validator.validerAtPåkrevdeFriteksterErSatt(behandlingId, vedtaksbrevFritekstPerioder, vedtaksbrevFritekstOppsummering);
 
         vedtaksbrevFritekstRepository.slettOppsummering(behandlingId);
         vedtaksbrevFritekstRepository.slettPerioderMedFritekster(behandlingId);

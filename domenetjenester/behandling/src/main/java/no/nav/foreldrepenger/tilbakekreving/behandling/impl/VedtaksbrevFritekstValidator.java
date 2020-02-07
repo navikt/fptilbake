@@ -5,7 +5,6 @@ import static no.nav.vedtak.feil.LogLevel.WARN;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -15,7 +14,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstOppsummering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstPeriode;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
@@ -30,6 +28,7 @@ import no.nav.vedtak.feil.Feil;
 import no.nav.vedtak.feil.FeilFactory;
 import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
 import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
+import no.nav.vedtak.util.StringUtils;
 
 @ApplicationScoped
 public class VedtaksbrevFritekstValidator {
@@ -37,7 +36,6 @@ public class VedtaksbrevFritekstValidator {
     private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository;
     private VilkårsvurderingRepository vilkårsvurderingRepository;
     private BehandlingRepository behandlingRepository;
-    private VedtaksbrevFritekstRepository vedtaksbrevFritekstRepository;
 
     public VedtaksbrevFritekstValidator() {
     }
@@ -45,31 +43,29 @@ public class VedtaksbrevFritekstValidator {
     @Inject
     public VedtaksbrevFritekstValidator(FaktaFeilutbetalingRepository faktaFeilutbetalingRepository,
                                         VilkårsvurderingRepository vilkårsvurderingRepository,
-                                        BehandlingRepository behandlingRepository,
-                                        VedtaksbrevFritekstRepository vedtaksbrevFritekstRepository) {
+                                        BehandlingRepository behandlingRepository) {
         this.faktaFeilutbetalingRepository = faktaFeilutbetalingRepository;
         this.vilkårsvurderingRepository = vilkårsvurderingRepository;
         this.behandlingRepository = behandlingRepository;
-        this.vedtaksbrevFritekstRepository = vedtaksbrevFritekstRepository;
     }
 
-    public void validerAtPåkrevdeFriteksterErSatt(Long behandlingId, List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder) {
+    public void validerAtPåkrevdeFriteksterErSatt(Long behandlingId,
+                                                  List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder,
+                                                  VedtaksbrevFritekstOppsummering vedtaksbrevFritekstOppsummering) {
         vilkårsvurderingRepository.finnVilkårsvurdering(behandlingId)
             .ifPresent(vilkårVurderingEntitet -> validerSærligeGrunnerAnnet(vilkårVurderingEntitet, vedtaksbrevFritekstPerioder));
 
         FaktaFeilutbetaling faktaFeilutbetaling = faktaFeilutbetalingRepository.finnFaktaOmFeilutbetaling(behandlingId).orElseThrow();
         validerFritekstFakta(faktaFeilutbetaling, vedtaksbrevFritekstPerioder);
 
-        validerAtPåkrevdOppsummeringErSatt(behandlingId);
+        validerAtPåkrevdOppsummeringErSatt(behandlingId, vedtaksbrevFritekstOppsummering);
     }
 
-    private void validerAtPåkrevdOppsummeringErSatt(Long behandlingId) {
+    private void validerAtPåkrevdOppsummeringErSatt(Long behandlingId, VedtaksbrevFritekstOppsummering vedtaksbrevFritekstOppsummering) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-        if (BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandling.getType())) {
-            Optional<VedtaksbrevFritekstOppsummering> vedtaksbrevFritekstOppsummering = vedtaksbrevFritekstRepository.hentVedtaksbrevOppsummering(behandlingId);
-            if (vedtaksbrevFritekstOppsummering.isEmpty()) {
-                throw FritekstFeil.FACTORY.manglerPåkrevetOppsumering().toException();
-            }
+        if (BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandling.getType()) &&
+            (vedtaksbrevFritekstOppsummering == null || StringUtils.nullOrEmpty(vedtaksbrevFritekstOppsummering.getOppsummeringFritekst()))) {
+            throw FritekstFeil.FACTORY.manglerPåkrevetOppsumering().toException();
         }
     }
 
