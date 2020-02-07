@@ -15,8 +15,9 @@ import com.jcraft.jsch.JSchException;
 @Ignore("Må starte docker-kontaineren sftp-test manuelt. Testen brukt under utvikling og til eksempel ved seinere implementering av sftp-tjenester")
 public class AvstemmingSftpBatchTjenesteTest {
 
-    public static final String HOST = "localhost";
-    public static final int TEST_PORT = 50522;
+    private static final String HOST = "localhost";
+    private static final int TEST_PORT = 50522;
+    private static final String DIRECTORY = "inbound";
 
     private final String testDir = "../../test-ressurser/sftp-test/";
     private String keyDir = testDir + "keys/";
@@ -35,8 +36,8 @@ public class AvstemmingSftpBatchTjenesteTest {
         long timeMillis = System.currentTimeMillis();
         String filnavn = "avstemming_" + timeMillis + ".txt";
 
-        AvstemmingSftpBatchTjeneste sftpTjeneste = new AvstemmingSftpBatchTjeneste(username, HOST, TEST_PORT, encodeString(privKey), encodeString(pubKey), null);
-        sftpTjeneste.put("Dette skulle vært avstemmingsinformasjon, men er bare en tekst", "share/" + filnavn);
+        AvstemmingSftpBatchTjeneste sftpTjeneste = new AvstemmingSftpBatchTjeneste(username, HOST, TEST_PORT, encodeString(privKey), encodeString(pubKey), null, DIRECTORY);
+        sftpTjeneste.put("Dette skulle vært avstemmingsinformasjon, men er bare en tekst", filnavn);
 
         Path opprettetFil = Paths.get(tmpDir + filnavn);
         assertTrue(Files.exists(opprettetFil), "Filen skulle nå ha blitt opprettet");
@@ -58,8 +59,8 @@ public class AvstemmingSftpBatchTjenesteTest {
         long timeMillis = System.currentTimeMillis();
         String filnavn = "avstemming_" + timeMillis + ".txt";
 
-        AvstemmingSftpBatchTjeneste sftpTjeneste = new AvstemmingSftpBatchTjeneste(username, HOST, TEST_PORT, privKey, pubKey, passphrase);
-        sftpTjeneste.put("Dette skulle vært avstemmingsinformasjon, men er bare en tekst", "share/" + filnavn);
+        AvstemmingSftpBatchTjeneste sftpTjeneste = new AvstemmingSftpBatchTjeneste(username, HOST, TEST_PORT, privKey, pubKey, passphrase, DIRECTORY);
+        sftpTjeneste.put("Dette skulle vært avstemmingsinformasjon, men er bare en tekst", filnavn);
 
         Path opprettetFil = Paths.get(tmpDir + filnavn);
         assertTrue(Files.exists(opprettetFil), "Filen skulle nå ha blitt opprettet");
@@ -77,8 +78,8 @@ public class AvstemmingSftpBatchTjenesteTest {
         long timeMillis = System.currentTimeMillis();
         String filnavn = "avstemming_" + timeMillis + ".txt";
 
-        AvstemmingSftpBatchTjeneste sftpTjeneste = new AvstemmingSftpBatchTjeneste("fptilbake", HOST, 22, encodeString(privKey), encodeString(pubKey), null);
-        sftpTjeneste.put("Dette skulle vært avstemmingsinformasjon, men er bare en tekst", "share/" + filnavn);
+        AvstemmingSftpBatchTjeneste sftpTjeneste = new AvstemmingSftpBatchTjeneste("fptilbake", HOST, 22, encodeString(privKey), encodeString(pubKey), null, DIRECTORY);
+        sftpTjeneste.put("Dette skulle vært avstemmingsinformasjon, men er bare en tekst", filnavn);
     }
 
     private String encodeString(String decoded) {

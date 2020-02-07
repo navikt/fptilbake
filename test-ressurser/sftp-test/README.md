@@ -26,3 +26,9 @@ Dersom nyere OpenSSH, så må nøkkelformat spesifieseres til pem. Det nyere for
 ``` 
 ssh-keygen -t rsa -b 4096 -f <filnavn key> -m pem -C "<kommentar i pub-nøkkelen>"
 ```
+
+## Feilsøking
+Git skriver kanskje om lese- og skriverettighetene til nøkkelfilene, og vil klage på at rettighetene ikke er strengt nok. Kan løses med å kjøre kommandoen under på privat-nøkkelen:
+``` 
+chmod 0600 <filnavn key>
+```

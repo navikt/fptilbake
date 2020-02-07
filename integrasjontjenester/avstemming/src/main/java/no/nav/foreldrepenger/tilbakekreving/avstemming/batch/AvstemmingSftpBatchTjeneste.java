@@ -30,9 +30,11 @@ class AvstemmingSftpBatchTjeneste extends SftpTjeneste {
                                        @KonfigVerdi(value = "AVSTEMMING_SFTP_PORT", defaultVerdi = "22") int port,
                                        @KonfigVerdi(value = "AVSTEMMING_SFTP_KEY_PRIVATE") String privateKey,
                                        @KonfigVerdi(value = "AVSTEMMING_SFTP_KEY_PUBLIC") String publicKey,
-                                       @KonfigVerdi(value = "AVSTEMMING_SFTP_KEY_PASSPHRASE", required = false) String passphrase) throws Exception {
+                                       @KonfigVerdi(value = "AVSTEMMING_SFTP_KEY_PASSPHRASE", required = false) String passphrase,
+                                       @KonfigVerdi(value = "AVSTEMMING_SFTP_DIRECTORY", defaultVerdi = "inbound") String directory) throws Exception {
         SftpKonfigImpl.Builder builder = SftpKonfigImpl.builder(username, host)
             .medPort(port)
+            .medDirectory(directory)
             .medKeyAsParams(base64Decode(privateKey), base64Decode(publicKey), passphrase);
         sftpKonfig = builder.build();
     }
