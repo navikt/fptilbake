@@ -125,7 +125,7 @@ public class FpsakKlient {
     }
 
 
-    private List<EksternBehandlingsinfoDto> hentBehandlingForSaksnummer(String saksnummer) {
+    public List<EksternBehandlingsinfoDto> hentBehandlingForSaksnummer(String saksnummer) {
         URI endpoint = createUri(BEHANDLING_ALLE_EP, PARAM_NAME_SAKSNUMMER, saksnummer);
         JsonNode jsonNode = restClient.get(endpoint, JsonNode.class);
         return lesResponsFraJsonNode(saksnummer, jsonNode);
