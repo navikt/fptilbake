@@ -36,12 +36,11 @@ public class VedtakHjemmel {
         } else if (foreldetVanlig) {
             hjemler.add("foreldelsesloven §§ 2 og 3");
         }
-        if (effektForBruker.erRevurdering()) {
-            if (effektForBruker.erTilGunstForBruker()) {
-                hjemler.add("forvaltningsloven § 35 a)");
-            } else {
-                hjemler.add("forvaltningsloven § 35 c)");
-            }
+        if (EffektForBruker.ENDRET_TIL_GUNST_FOR_BRUKER.equals(effektForBruker)) {
+            hjemler.add("forvaltningsloven § 35 a)");
+        }
+        if (EffektForBruker.ENDRET_TIL_UGUNST_FOR_BRUKER.equals(effektForBruker)){
+            hjemler.add("forvaltningsloven § 35 c)");
         }
 
         return join(hjemler, " og ");
@@ -69,11 +68,8 @@ public class VedtakHjemmel {
         for (int i = 0 ; i < elementer.size() ; i++) {
             String element = elementer.get(i);
             boolean siste = i == (elementer.size() - 1);
-            if (!første && !siste) {
-                builder.append(", ");
-            }
-            if (!første && siste) {
-                builder.append(sisteSkille);
+            if (!første) {
+                builder.append(siste ? sisteSkille : ", ");
             }
             builder.append(element);
             første = false;
@@ -84,14 +80,6 @@ public class VedtakHjemmel {
     enum EffektForBruker {
         FØRSTEGANGSVEDTAK,
         ENDRET_TIL_GUNST_FOR_BRUKER,
-        ENDRET_TIL_UGUNST_FOR_BRUKER;
-
-        boolean erRevurdering() {
-            return ENDRET_TIL_GUNST_FOR_BRUKER.equals(this) || ENDRET_TIL_UGUNST_FOR_BRUKER.equals(this);
-        }
-
-        boolean erTilGunstForBruker() {
-            return ENDRET_TIL_GUNST_FOR_BRUKER.equals(this);
-        }
+        ENDRET_TIL_UGUNST_FOR_BRUKER
     }
 }
