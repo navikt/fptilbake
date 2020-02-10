@@ -5,22 +5,24 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstOppsummering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
@@ -29,12 +31,13 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.FpHendelseUnderTyper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.SvpHendelseUnderTyper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
+import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
+@RunWith(CdiRunner.class)
 public class VedtaksbrevFritekstValidatorTest {
     @Rule
     public UnittestRepositoryRule repoRule = new UnittestRepositoryRule();
@@ -42,13 +45,16 @@ public class VedtaksbrevFritekstValidatorTest {
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
-    private BehandlingRepository behandlingRepository = new BehandlingRepositoryImpl(repoRule.getEntityManager());
-    private FagsakRepository fagsakRepository = new FagsakRepositoryImpl(repoRule.getEntityManager());
+    @Inject
+    private BehandlingRepository behandlingRepository;
+    @Inject
+    private FagsakRepository fagsakRepository;
 
-    private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository = new FaktaFeilutbetalingRepository(repoRule.getEntityManager());
-    private VilkårsvurderingRepository vilkårsvurderingRepository = new VilkårsvurderingRepository(repoRule.getEntityManager());
+    @Inject
+    private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository;
 
-    private VedtaksbrevFritekstValidator validator = new VedtaksbrevFritekstValidator(faktaFeilutbetalingRepository, vilkårsvurderingRepository);
+    @Inject
+    private VedtaksbrevFritekstValidator validator;
 
     private LocalDate jan1 = LocalDate.of(2019, 1, 1);
     private LocalDate jan3 = LocalDate.of(2019, 1, 3);
@@ -57,12 +63,15 @@ public class VedtaksbrevFritekstValidatorTest {
     private NavBruker bruker = NavBruker.opprettNy(new AktørId(1L), Språkkode.nb);
     private Fagsak fagsak = Fagsak.opprettNy(new Saksnummer("123"), bruker);
     private Behandling behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).build();
+    private Behandling revurderingBehandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.REVURDERING_TILBAKEKREVING).build();
     private Long behandlingId;
+    private Long revurderingBehandlingId;
 
     @Before
     public void setUp() {
         fagsakRepository.lagre(fagsak);
         behandlingId = behandlingRepository.lagre(behandling, new BehandlingLås(null));
+        revurderingBehandlingId = behandlingRepository.lagre(revurderingBehandling, new BehandlingLås(null));
     }
 
     @Test
@@ -78,7 +87,7 @@ public class VedtaksbrevFritekstValidatorTest {
         faktaFeilutbetalingRepository.lagre(behandlingId, fakta);
 
         expectedException.expectMessage("Ugyldig input: Når 'ANNET_FRITEKST' er valgt er fritekst påkrevet. Mangler for periode 01.01.2019-24.01.2019 og avsnitt FAKTA_AVSNITT");
-        validator.validerAtPåkrevdeFriteksterErSatt(behandlingId, Collections.emptyList());
+        validator.validerAtPåkrevdeFriteksterErSatt(behandlingId, Collections.emptyList(), null);
     }
 
     @Test
@@ -99,7 +108,7 @@ public class VedtaksbrevFritekstValidatorTest {
 
         expectedException.expectMessage("Når 'ENDRING_GRUNNLAG' er valgt er fritekst påkrevet. Mangler for periode 04.01.2019-24.01.2019 og avsnitt FAKTA_AVSNITT");
 
-        validator.validerAtPåkrevdeFriteksterErSatt(behandlingId, fritekstperioder);
+        validator.validerAtPåkrevdeFriteksterErSatt(behandlingId, fritekstperioder, null);
     }
 
     @Test
@@ -120,7 +129,53 @@ public class VedtaksbrevFritekstValidatorTest {
         );
 
         expectedException.expectMessage("Når 'SVP_ENDRING_GRUNNLAG' er valgt er fritekst påkrevet. Mangler for periode 02.01.2019-02.01.2019 og avsnitt FAKTA_AVSNITT");
-        validator.validerAtPåkrevdeFriteksterErSatt(behandlingId, fritekstperioder);
+        validator.validerAtPåkrevdeFriteksterErSatt(behandlingId, fritekstperioder, null);
     }
 
+    @Test
+    public void skal_feile_når_påkrevet_oppsummering_fritekst_mangler_for_revurdering() {
+        FaktaFeilutbetaling fakta = new FaktaFeilutbetaling();
+        fakta.setBegrunnelse("foo");
+        fakta.leggTilFeilutbetaltPeriode(FaktaFeilutbetalingPeriode.builder()
+            .medFeilutbetalinger(fakta)
+            .medHendelseType(HendelseType.FP_UTTAK_GRADERT_TYPE)
+            .medHendelseUndertype(FpHendelseUnderTyper.GRADERT_UTTAK)
+            .medPeriode(jan1, jan24)
+            .build());
+        faktaFeilutbetalingRepository.lagre(revurderingBehandlingId, fakta);
+
+        expectedException.expectMessage("Ugyldig input: Når det er revurdering, så er oppsummering fritekst påkrevet");
+        validator.validerAtPåkrevdeFriteksterErSatt(revurderingBehandlingId, Collections.emptyList(), null);
+    }
+
+    @Test
+    public void skal_feile_når_påkrevet_oppsummering_fritekst_mangler_for_revurdering_2() {
+        FaktaFeilutbetaling fakta = new FaktaFeilutbetaling();
+        fakta.setBegrunnelse("foo");
+        fakta.leggTilFeilutbetaltPeriode(FaktaFeilutbetalingPeriode.builder()
+            .medFeilutbetalinger(fakta)
+            .medHendelseType(HendelseType.FP_UTTAK_GRADERT_TYPE)
+            .medHendelseUndertype(FpHendelseUnderTyper.GRADERT_UTTAK)
+            .medPeriode(jan1, jan24)
+            .build());
+        faktaFeilutbetalingRepository.lagre(revurderingBehandlingId, fakta);
+
+        expectedException.expectMessage("Ugyldig input: Når det er revurdering, så er oppsummering fritekst påkrevet");
+        validator.validerAtPåkrevdeFriteksterErSatt(revurderingBehandlingId, Collections.emptyList(), new VedtaksbrevFritekstOppsummering());
+    }
+
+    @Test
+    public void skal_ikke_feile_når_alle_påkrevet_fritekst_er_utfylt() {
+        FaktaFeilutbetaling fakta = new FaktaFeilutbetaling();
+        fakta.setBegrunnelse("foo");
+        fakta.leggTilFeilutbetaltPeriode(FaktaFeilutbetalingPeriode.builder()
+            .medFeilutbetalinger(fakta)
+            .medHendelseType(HendelseType.FP_UTTAK_GRADERT_TYPE)
+            .medHendelseUndertype(FpHendelseUnderTyper.GRADERT_UTTAK)
+            .medPeriode(jan1, jan24)
+            .build());
+        faktaFeilutbetalingRepository.lagre(behandlingId, fakta);
+
+        validator.validerAtPåkrevdeFriteksterErSatt(behandlingId, Collections.emptyList(), null);
+    }
 }

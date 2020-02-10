@@ -39,10 +39,6 @@ public class HbTotalresultat {
         return new Builder();
     }
 
-    public boolean harBeløpMedRenterUtenSkatt(){
-        return totaltTilbakekrevesBeløpMedRenterUtenSkatt != null;
-    }
-
     public static class Builder {
 
         private HbTotalresultat kladd = new HbTotalresultat();
@@ -77,6 +73,7 @@ public class HbTotalresultat {
             Objects.check(kladd.totaltTilbakekrevesBeløp != null, "totaltTilbakekrevesBeløp er ikke satt");
             Objects.check(kladd.totaltTilbakekrevesBeløpMedRenter != null, "totaltTilbakekrevesBeløpMedRenter er ikke satt");
             Objects.check(kladd.totaltRentebeløp != null, "totaltRentebeløp er ikke satt");
+            Objects.check(kladd.totaltTilbakekrevesBeløpMedRenterUtenSkatt != null, "totaltTilbakekrevesBeløpMedRenterUtenSkatt er ikke satt");
             return kladd;
         }
 

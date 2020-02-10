@@ -179,7 +179,6 @@ public class TekstformatererVedtaksbrevVedleggTest {
     private HbVedtaksbrevFelles.Builder lagTestBuilder() {
         return HbVedtaksbrevFelles.builder()
             .medKonfigurasjon(HbKonfigurasjon.builder()
-                .skruAvMidlertidigTekst() //generer tekst slik den skal være etter pilot
                 .medKlagefristUker(6)
                 .build())
             .medSøker(HbPerson.builder()

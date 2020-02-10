@@ -28,7 +28,12 @@ public class VedtaksbrevFritekst {
                 sg.setFritekstSærligeGrunnerAnnet(markerPåkrevetFritekst(sg.getFritekstSærligeGrunnerAnnet(), Underavsnitt.Underavsnittstype.SÆRLIGEGRUNNER_ANNET));
             }
         }
-        vedtaksbrevData.getFelles().setFritekstOppsummering(markerValgfriFritekst(vedtaksbrevData.getFelles().getFritekstOppsummering()));
+        FritekstType fritekstType = utledFritekstTypeForOppsummering(vedtaksbrevData);
+        vedtaksbrevData.getFelles().setFritekstOppsummering(markerFritekst(fritekstType, vedtaksbrevData.getFelles().getFritekstOppsummering(), null));
+    }
+
+    private static FritekstType utledFritekstTypeForOppsummering(HbVedtaksbrevData vedtaksbrevData) {
+        return vedtaksbrevData.getFelles().getBehandling().erRevurdering() ? FritekstType.PÅKREVET : FritekstType.VALGFRI;
     }
 
     private static FritekstType utledFritekstTypeFakta(HendelseUnderType underType) {

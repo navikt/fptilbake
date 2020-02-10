@@ -59,7 +59,7 @@ public class ForeslåVedtakOppdatererTest {
     private VilkårsvurderingRepository vilkårsvurderingRepository = mock(VilkårsvurderingRepository.class);
     private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository = mock(FaktaFeilutbetalingRepository.class);
 
-    private VedtaksbrevFritekstValidator vedtaksbrevFritekstValidator = new VedtaksbrevFritekstValidator(faktaFeilutbetalingRepository, vilkårsvurderingRepository);
+    private VedtaksbrevFritekstValidator vedtaksbrevFritekstValidator = new VedtaksbrevFritekstValidator(faktaFeilutbetalingRepository, vilkårsvurderingRepository, behandlingRepository);
     private VedtaksbrevFritekstTjeneste vedtaksbrevFritekstTjeneste = new VedtaksbrevFritekstTjeneste(vedtaksbrevFritekstValidator, vedtaksbrevFritekstRepository);
     private ForeslåVedtakOppdaterer foreslåVedtakOppdaterer = new ForeslåVedtakOppdaterer(foreslåVedtakTjeneste, totrinnTjenesteMock, aksjonspunktRepository, vedtaksbrevFritekstTjeneste);
 

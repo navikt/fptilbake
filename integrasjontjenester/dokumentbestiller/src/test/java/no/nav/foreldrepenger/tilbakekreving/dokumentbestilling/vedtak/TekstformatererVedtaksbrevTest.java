@@ -25,6 +25,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Ak
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.AnnenVurdering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.SærligGrunn;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbBehandling;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbKonfigurasjon;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbPerson;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbSak;
@@ -71,7 +72,6 @@ public class TekstformatererVedtaksbrevTest {
             .medKonfigurasjon(HbKonfigurasjon.builder()
                 .medKlagefristUker(6)
                 .build())
-            //.skruAvMidlertidigTekst() //generer tekst som skal brukes i pilot
             .build();
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
             HbVedtaksbrevPeriode.builder()
@@ -141,6 +141,7 @@ public class TekstformatererVedtaksbrevTest {
                 .medTotaltTilbakekrevesBeløp(BigDecimal.ZERO)
                 .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.ZERO)
                 .medTotaltRentebeløp(BigDecimal.ZERO)
+                .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.ZERO)
                 .build())
             .medLovhjemmelVedtak("Folketrygdloven § 22-15")
             .medDatoer(HbVedtaksbrevDatoer.builder()
@@ -155,18 +156,89 @@ public class TekstformatererVedtaksbrevTest {
     }
 
     @Test
-    public void skal_generere_vedtaksbrev_for_FP_og_adopsjon_med_mye_fritekst() throws Exception {
+    public void skal_generere_vedtaksbrev_for_revurdering_med_SVP_og_tvillinger_og_simpel_uaktsomhet() throws Exception {
+        HbVedtaksbrevFelles vedtaksbrevData = lagTestBuilder()
+            .medSak(HbSak.build()
+                .medYtelsetype(FagsakYtelseType.SVANGERSKAPSPENGER)
+                .medErFødsel(true)
+                .medAntallBarn(2)
+                .build())
+            .medVedtakResultat(HbTotalresultat.builder()
+                .medHovedresultat(VedtakResultatType.DELVIS_TILBAKEBETALING)
+                .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(23002))
+                .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(23002))
+                .medTotaltRentebeløp(BigDecimal.ZERO)
+                .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.valueOf(17601))
+                .build())
+            .medBehandling(HbBehandling.builder()
+                .medErRevurdering(true)
+                .medOriginalBehandlingDatoFagsakvedtak(LocalDate.of(2020, 3, 4))
+                .build())
+            .medLovhjemmelVedtak("Folketrygdloven § 22-15")
+            .medVarsel(HbVarsel.builder()
+                .medVarsletBeløp(BigDecimal.valueOf(33001))
+                .medVarsletDato(LocalDate.of(2020, 4, 4))
+                .build())
+            .medKonfigurasjon(HbKonfigurasjon.builder()
+                .medKlagefristUker(6)
+                .build())
+            .build();
+        List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
+            HbVedtaksbrevPeriode.builder()
+                .medPeriode(januar)
+                .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(30001)))
+                .medFakta(HendelseType.SVP_ANNET_TYPE, FellesUndertyper.REFUSJON_ARBEIDSGIVER)
+                .medVurderinger(HbVurderinger.builder()
+                    .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
+                    .medVilkårResultat(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER)
+                    .medAktsomhetResultat(Aktsomhet.SIMPEL_UAKTSOM)
+                    .medFritekstVilkår("Du er heldig som slapp å betale alt!")
+                    .medSærligeGrunner(Arrays.asList(SærligGrunn.TID_FRA_UTBETALING, SærligGrunn.STØRRELSE_BELØP), null, null)
+                    .build())
+                .medResultat(HbResultatTestBuilder.forTilbakekrevesBeløp(20002))
+                .build(),
+            HbVedtaksbrevPeriode.builder()
+                .medPeriode(februar)
+                .medKravgrunnlag(HbKravgrunnlag.builder()
+                    .medFeilutbetaltBeløp(BigDecimal.valueOf(3000))
+                    .medRiktigBeløp(BigDecimal.valueOf(3000))
+                    .medUtbetaltBeløp(BigDecimal.valueOf(6000))
+                    .build())
+                .medFakta(HendelseType.ØKONOMI_FEIL, ØkonomiUndertyper.DOBBELTUTBETALING)
+                .medVurderinger(HbVurderinger.builder()
+                    .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
+                    .medVilkårResultat(VilkårResultat.FORSTO_BURDE_FORSTÅTT)
+                    .medAktsomhetResultat(Aktsomhet.SIMPEL_UAKTSOM)
+                    .medSærligeGrunner(Arrays.asList(SærligGrunn.HELT_ELLER_DELVIS_NAVS_FEIL, SærligGrunn.STØRRELSE_BELØP), null, null)
+                    .build())
+                .medResultat(HbResultatTestBuilder.forTilbakekrevesBeløp(3000))
+                .build()
+        );
+        HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
+
+        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
+        String fasit = les("/vedtaksbrev/SVP_tvillinger.txt");
+        assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
+    }
+
+    @Test
+    public void skal_generere_vedtaksbrev_for_revurdering_med_FP_og_adopsjon_med_mye_fritekst() throws Exception {
         HbVedtaksbrevFelles vedtaksbrevData = lagTestBuilder()
             .medSak(HbSak.build()
                 .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
                 .medErAdopsjon(true)
                 .medAntallBarn(1)
                 .build())
+            .medBehandling(HbBehandling.builder()
+                .medErRevurdering(true)
+                .medOriginalBehandlingDatoFagsakvedtak(LocalDate.of(2019, 1, 1))
+                .build())
             .medVedtakResultat(HbTotalresultat.builder()
                 .medHovedresultat(VedtakResultatType.DELVIS_TILBAKEBETALING)
                 .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(1234567892))
                 .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(1234567892))
                 .medTotaltRentebeløp(BigDecimal.ZERO)
+                .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.valueOf(1234567892))
                 .build())
             .medLovhjemmelVedtak("Folketrygdloven § 22-15")
             .medVarsel(HbVarsel.builder()
@@ -308,6 +380,7 @@ public class TekstformatererVedtaksbrevTest {
                 .medTotaltTilbakekrevesBeløp(BigDecimal.ZERO)
                 .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.ZERO)
                 .medTotaltRentebeløp(BigDecimal.ZERO)
+                .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.ZERO)
                 .build())
             .medLovhjemmelVedtak("Folketrygdloven § 22-15")
             .medVarsel(HbVarsel.builder()
@@ -351,6 +424,7 @@ public class TekstformatererVedtaksbrevTest {
                 .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(500000))
                 .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(550000))
                 .medTotaltRentebeløp(BigDecimal.valueOf(50000))
+                .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.valueOf(550000))
                 .build())
             .medLovhjemmelVedtak("Folketrygdloven § 22-15")
             .medVarsel(HbVarsel.builder()
@@ -398,6 +472,7 @@ public class TekstformatererVedtaksbrevTest {
                 .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(1000))
                 .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(1000))
                 .medTotaltRentebeløp(BigDecimal.ZERO)
+                .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.valueOf(1000))
                 .build())
             .medLovhjemmelVedtak("Folketrygdloven § 22-15")
             .build();
@@ -450,6 +525,7 @@ public class TekstformatererVedtaksbrevTest {
                 .medTotaltTilbakekrevesBeløp(BigDecimal.ZERO)
                 .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.ZERO)
                 .medTotaltRentebeløp(BigDecimal.ZERO)
+                .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.ZERO)
                 .build())
             .medLovhjemmelVedtak("Folketrygdloven § 22-15 6.ledd")
             .medVarsel(HbVarsel.builder()
@@ -482,7 +558,6 @@ public class TekstformatererVedtaksbrevTest {
     private HbVedtaksbrevFelles.Builder lagTestBuilder() {
         return HbVedtaksbrevFelles.builder()
             .medKonfigurasjon(HbKonfigurasjon.builder()
-                .skruAvMidlertidigTekst() //generer tekst slik den skal være etter pilot
                 .medKlagefristUker(6)
                 .build())
             .medSøker(HbPerson.builder()

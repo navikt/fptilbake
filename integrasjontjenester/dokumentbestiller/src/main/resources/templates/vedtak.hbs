@@ -1,5 +1,9 @@
 {{> vedtak/vedtak_felles}}
+{{#if (eq sak.ytelsetype "ES")}}
+{{> vedtak/vedtak_start_es}}
+{{else}}
 {{> vedtak/vedtak_start}}
+{{/if}}
 {{#each perioder }}
 {{> vedtak/periode_overskrift}}
 {{> vedtak/periode_fakta}}
