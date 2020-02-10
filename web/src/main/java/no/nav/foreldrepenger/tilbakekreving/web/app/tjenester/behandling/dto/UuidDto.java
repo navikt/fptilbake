@@ -6,6 +6,7 @@ import no.nav.vedtak.sikkerhet.abac.AbacDto;
 import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
 public class UuidDto implements AbacDto {
@@ -18,6 +19,7 @@ public class UuidDto implements AbacDto {
      * Behandling UUID (nytt alternativ til intern behandlingId. Bør brukes av eksterne systemer).
      */
     @Valid
+    @NotNull
     private UUID behandlingUuid;
 
     public UuidDto(String behandlingUuid) {

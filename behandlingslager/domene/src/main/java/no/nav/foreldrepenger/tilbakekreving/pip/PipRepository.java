@@ -30,9 +30,17 @@ public class PipRepository {
         this.entityManager = entityManager;
     }
 
-    public Optional<PipBehandlingData> hentBehandlingData(Object identifikator) {
-        Optional<BehandlingInfo> internBehandlingData = identifikator instanceof  Long ? hentInternBehandlingData((Long) identifikator)
-                                                                                       : hentInternBehandlingData((UUID) identifikator);
+    public Optional<PipBehandlingData> hentBehandlingData(Long behandlingId) {
+        Optional<BehandlingInfo> internBehandlingData = hentInternBehandlingData(behandlingId);
+        return getPipBehandlingData(internBehandlingData);
+    }
+
+    public Optional<PipBehandlingData> hentBehandlingData(UUID behandlingUuid) {
+        Optional<BehandlingInfo> internBehandlingData = hentInternBehandlingData(behandlingUuid);
+        return getPipBehandlingData(internBehandlingData);
+    }
+
+    private Optional<PipBehandlingData> getPipBehandlingData(Optional<BehandlingInfo> internBehandlingData) {
         if (internBehandlingData.isPresent()) {
             BehandlingInfo internData = internBehandlingData.get();
 
