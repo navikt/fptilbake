@@ -12,6 +12,8 @@ import java.util.UUID;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtakRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,6 +62,7 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
     private EksternBehandlingRepository eksternBehandlingRepository;
     private BehandlingresultatRepository behandlingresultatRepository;
     private ProsessTaskRepository prosessTaskRepository;
+    private BehandlingVedtakRepository behandlingVedtakRepository;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste;
     private FagsakTjeneste fagsakTjeneste;
@@ -90,6 +93,7 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
         this.behandlingRepository = behandlingRepositoryProvider.getBehandlingRepository();
         this.eksternBehandlingRepository = behandlingRepositoryProvider.getEksternBehandlingRepository();
         this.behandlingresultatRepository = behandlingRepositoryProvider.getBehandlingresultatRepository();
+        this.behandlingVedtakRepository = behandlingRepositoryProvider.getBehandlingVedtakRepository();
         this.prosessTaskRepository = prosessTaskRepository;
     }
 
@@ -118,6 +122,11 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
     @Override
     public Behandling hentBehandling(Long behandlingId) {
         return behandlingRepository.hentBehandling(behandlingId);
+    }
+
+    @Override
+    public Behandling hentBehandling(UUID behandlingUUId) {
+        return behandlingRepository.hentBehandling(behandlingUUId);
     }
 
     @Override
@@ -175,6 +184,11 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
             EksternBehandling eksternBehandling = new EksternBehandling(behandling, eksternBehandlingId, eksternUuid);
             eksternBehandlingRepository.lagre(eksternBehandling);
         }
+    }
+
+    @Override
+    public Optional<BehandlingVedtak> hentBehandlingvedtakForBehandlingId(long behandlingId) {
+        return behandlingVedtakRepository.hentBehandlingvedtakForBehandlingId(behandlingId);
     }
 
     private void doSetBehandlingPåVent(Long behandlingId, AksjonspunktDefinisjon apDef, LocalDate frist, Venteårsak venteårsak) {

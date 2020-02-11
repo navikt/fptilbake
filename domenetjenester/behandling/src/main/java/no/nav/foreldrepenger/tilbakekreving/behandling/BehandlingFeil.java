@@ -44,4 +44,7 @@ public interface BehandlingFeil extends DeklarerteFeil {
 
     @FunksjonellFeil(feilkode = "FPT-663491", feilmelding = "Det foreligger et feilutbetalt beløp, kan ikke henlegges behandling %s", løsningsforslag = "", logLevel = LogLevel.WARN)
     Feil kanIkkeHenleggeBehandling(Long behandlingId);
+
+    @TekniskFeil(feilkode = "FPT-763492", feilmelding = "Behandling er ikke fattet ennå, kan ikke finne vedtak info %s", logLevel = LogLevel.WARN)
+    Feil fantIkkeBehandlingsVedtakInfo(Long behandlingId);
 }

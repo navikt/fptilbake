@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -48,6 +49,12 @@ public class BehandlingRepositoryImpl implements BehandlingRepository {
     public Behandling hentBehandling(Long behandlingId) {
         Objects.requireNonNull(behandlingId, "behandlingId"); // NOSONAR //$NON-NLS-1$
         return hentEksaktResultat(lagBehandlingQuery(behandlingId));
+    }
+
+    @Override
+    public Behandling hentBehandling(UUID uuid) {
+        Objects.requireNonNull(uuid, "behandlingUUID"); // NOSONAR //$NON-NLS-1$
+        return hentEksaktResultat(lagBehandlingQuery(uuid));
     }
 
     @Override
@@ -175,10 +182,14 @@ public class BehandlingRepositoryImpl implements BehandlingRepository {
     }
 
     private TypedQuery<Behandling> lagBehandlingQuery(Long behandlingId) {
-        Objects.requireNonNull(behandlingId, "behandlingId"); // NOSONAR //$NON-NLS-1$
-
         TypedQuery<Behandling> query = getEntityManager().createQuery("from Behandling where id=:behandlingId", Behandling.class); //$NON-NLS-1$
         query.setParameter("behandlingId", behandlingId); //$NON-NLS-1$
+        return query;
+    }
+
+    private TypedQuery<Behandling> lagBehandlingQuery(UUID behandlingUUID) {
+        TypedQuery<Behandling> query = getEntityManager().createQuery("from Behandling where uuid=:behandlingUUID", Behandling.class); //$NON-NLS-1$
+        query.setParameter("behandlingUUID", behandlingUUID); //$NON-NLS-1$
         return query;
     }
 

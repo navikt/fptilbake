@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -28,6 +29,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.PreUpdate;
 import javax.persistence.SqlResultSetMapping;
 import javax.persistence.Table;
 import javax.persistence.Version;
@@ -46,6 +48,7 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.BehandlingInfo;
 import no.nav.vedtak.feil.FeilFactory;
 import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
+import org.hibernate.annotations.NaturalId;
 
 // mapping for BehandlingInfo klassen
 @SqlResultSetMapping(name = "PipBehandlingInfo", classes = {
@@ -86,6 +89,10 @@ public class Behandling extends BaseEntitet {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_BEHANDLING")
     private Long id;
+
+    @NaturalId
+    @Column(name = "uuid")
+    private UUID uuid;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "fagsak_id", nullable = false, updatable = false)
@@ -147,6 +154,8 @@ public class Behandling extends BaseEntitet {
         if (type != null) {
             this.behandlingType = type;
         }
+
+        this.uuid = UUID.randomUUID();
     }
 
     /**
@@ -172,6 +181,10 @@ public class Behandling extends BaseEntitet {
 
     public Long getId() {
         return id;
+    }
+
+    public UUID getUuid() {
+        return uuid;
     }
 
     public Long getFagsakId() {
@@ -270,6 +283,17 @@ public class Behandling extends BaseEntitet {
     public BehandlingStegType getAktivtBehandlingSteg() {
         BehandlingStegTilstand stegTilstand = getBehandlingStegTilstand().orElse(null);
         return stegTilstand == null ? null : stegTilstand.getBehandlingSteg();
+    }
+
+    /**
+     * @deprecated - fjernes når alle behandlinger har UUID og denne er satt NOT NULL i db. Inntil da sikrer denne lagring av UUID
+     */
+    @Deprecated
+    @PreUpdate
+    protected void onUpdateMigrerUuid() {
+        if (uuid == null) {
+            uuid = UUID.randomUUID();
+        }
     }
 
     @Override

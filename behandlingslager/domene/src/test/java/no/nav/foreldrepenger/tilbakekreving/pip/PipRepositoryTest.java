@@ -57,8 +57,19 @@ public class PipRepositoryTest {
     }
 
     @Test
+    public void skal_hentBehandlingData_medGyldigBehandlingUuid() {
+        Optional<PipBehandlingData> pipBehandlingData = pipRepository.hentBehandlingData(behandling.getUuid());
+        assertThat(pipBehandlingData).isPresent();
+        PipBehandlingData behandlingData = pipBehandlingData.get();
+        assertThat(behandlingData.getBehandlingId()).isEqualTo(behandling.getId());
+        assertThat(behandlingData.getStatusForBehandling()).isEqualTo(BehandlingStatus.OPPRETTET.getKode());
+        assertThat(behandlingData.getFagsakstatus()).isEqualTo(FagsakStatus.UNDER_BEHANDLING.getKode());
+    }
+
+
+    @Test
     public void skal_hentBehandlingData_medUgyldigBehandlingId() {
-        Optional<PipBehandlingData> pipBehandlingData = pipRepository.hentBehandlingData(1234);
+        Optional<PipBehandlingData> pipBehandlingData = pipRepository.hentBehandlingData(1234l);
         assertThat(pipBehandlingData).isEmpty();
     }
 

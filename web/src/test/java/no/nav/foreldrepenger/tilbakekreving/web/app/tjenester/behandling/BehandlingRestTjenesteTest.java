@@ -1,24 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.net.URISyntaxException;
-import java.util.Optional;
-import java.util.UUID;
-
-import javax.ws.rs.core.Response;
-
-import org.apache.http.HttpStatus;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
+import com.google.common.collect.Lists;
 import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingsTjenesteProvider;
@@ -30,11 +12,16 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandlingsresultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.IverksettingStatus;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.BehandlingsprosessApplikasjonTjeneste;
@@ -42,8 +29,30 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.Beh
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.FpsakUuidDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.HenleggBehandlingDto;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.KlageTilbakekrevingDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.OpprettBehandlingDto;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.UuidDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.SaksnummerDto;
+import no.nav.vedtak.exception.TekniskException;
+import org.apache.http.HttpStatus;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
+import javax.ws.rs.core.Response;
+import java.net.URISyntaxException;
+import java.time.LocalDate;
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class BehandlingRestTjenesteTest {
 
@@ -73,6 +82,7 @@ public class BehandlingRestTjenesteTest {
     private static SaksnummerDto saksnummerDto = new SaksnummerDto(GYLDIG_SAKSNR);
     private static FpsakUuidDto fpsakUuidDto = new FpsakUuidDto(EKSTERN_BEHANDLING_UUID);
     private static BehandlingIdDto behandlingIdDto = new BehandlingIdDto(1l);
+    private static UuidDto uuidDto = new UuidDto(UUID.randomUUID());
 
     @Test
     public void test_opprett_behandling_skal_feile_med_ugyldig_saksnummer() throws URISyntaxException {
@@ -140,6 +150,68 @@ public class BehandlingRestTjenesteTest {
         boolean result = (boolean) response.getEntity();
         assertThat(result).isTrue();
     }
+
+    @Test
+    public void skal_ha_åpen_tilbakekreving_hvis_tilbakekreving_ikke_er_avsluttet() {
+        Behandling behandling = ScenarioSimple.simple().lagMocked();
+        when(behandlingTjenesteMock.hentBehandlinger(any(Saksnummer.class))).thenReturn(Lists.newArrayList(behandling));
+        Response response = behandlingRestTjeneste.harÅpenTilbakekrevingBehandling(saksnummerDto);
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_OK);
+        assertThat(response.getEntity()).isEqualTo(true);
+    }
+
+    @Test
+    public void skal_ikke_ha_åpen_tilbakekreving_hvis_tilbakekreving_er_avsluttet() {
+        Behandling behandling = ScenarioSimple.simple().lagMocked();
+        behandling.avsluttBehandling();
+        when(behandlingTjenesteMock.hentBehandlinger(any(Saksnummer.class))).thenReturn(Lists.newArrayList(behandling));
+
+        Response response = behandlingRestTjeneste.harÅpenTilbakekrevingBehandling(saksnummerDto);
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_OK);
+        assertThat(response.getEntity()).isEqualTo(false);
+    }
+
+    @Test
+    public void skal_ikke_returnere_vedtak_info_hvis_tilbakekreving_ikke_er_avsluttet() {
+        Behandling behandling = ScenarioSimple.simple().lagMocked();
+        when(behandlingTjenesteMock.hentBehandling(any(UUID.class))).thenReturn(behandling);
+        assertThrows("FPT-763492", TekniskException.class, () -> behandlingRestTjeneste.hentTilbakekrevingsVedtakInfo(uuidDto));
+    }
+
+    @Test
+    public void skal_ikke_returnere_vedtak_info_hvis_vedtak_info_ikke_finnes() {
+        Behandling behandling = ScenarioSimple.simple().lagMocked();
+        behandling.avsluttBehandling();
+        when(behandlingTjenesteMock.hentBehandling(any(UUID.class))).thenReturn(behandling);
+        assertThrows("FPT-763492", TekniskException.class, () -> behandlingRestTjeneste.hentTilbakekrevingsVedtakInfo(uuidDto));
+    }
+
+    @Test
+    public void skal_returnere_vedtak_info_hvis_tilbakekreving_er_avsluttet_og_vedtak_info_finnes() {
+        Behandling behandling = ScenarioSimple.simple().lagMocked();
+        Behandlingsresultat behandlingsresultat = Behandlingsresultat.builder()
+            .medBehandling(behandling)
+            .medBehandlingResultatType(BehandlingResultatType.FASTSATT).build();
+        var vedtakDato = LocalDate.now();
+        BehandlingVedtak behandlingVedtak = BehandlingVedtak.builder()
+            .medBehandlingsresultat(behandlingsresultat)
+            .medVedtaksdato(vedtakDato)
+            .medIverksettingStatus(IverksettingStatus.IVERKSATT)
+            .medAnsvarligSaksbehandler("VL")
+            .medVedtakResultat(VedtakResultatType.FULL_TILBAKEBETALING).build();
+        behandling.avsluttBehandling();
+
+        when(behandlingTjenesteMock.hentBehandling(any(UUID.class))).thenReturn(behandling);
+        when(behandlingTjenesteMock.hentBehandlingvedtakForBehandlingId(any(Long.class))).thenReturn(Optional.of(behandlingVedtak));
+
+        Response response = behandlingRestTjeneste.hentTilbakekrevingsVedtakInfo(uuidDto);
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_OK);
+        KlageTilbakekrevingDto klageTilbakekrevingDto = (KlageTilbakekrevingDto) response.getEntity();
+        assertThat(klageTilbakekrevingDto.getBehandlingType()).isEqualTo(BehandlingType.TILBAKEKREVING.getKode());
+        assertThat(klageTilbakekrevingDto.getBehandlingId()).isNotNull();
+        assertThat(klageTilbakekrevingDto.getVedtakDato()).isEqualTo(vedtakDato);
+    }
+
 
     private OpprettBehandlingDto opprettBehandlingDto(String saksnr, String eksternUuid, FagsakYtelseType ytelseType) {
         OpprettBehandlingDto dto = new OpprettBehandlingDto();

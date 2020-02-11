@@ -243,7 +243,7 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
         repositoryProvider = mock(BehandlingRepositoryProvider.class);
         BehandlingRepository behandlingRepository = lagBasicMockBehandlingRepository(repositoryProvider);
 
-        when(behandlingRepository.hentBehandling(Mockito.any())).thenAnswer(a -> {
+        when(behandlingRepository.hentBehandling(Mockito.any(Long.class))).thenAnswer(a -> {
             return behandling;
         });
         when(behandlingRepository.hentSisteBehandlingForFagsakId(Mockito.any(), Mockito.any(BehandlingType.class)))

@@ -38,7 +38,8 @@ public class PdpRequestBuilderImplTest {
 
     private static final String DUMMY_ID_TOKEN = "dummyheader.dymmypayload.dummysignaturee";
     private static final String SAKSNUMMER = "5555";
-    private static final UUID UUID = java.util.UUID.randomUUID();
+    private static final UUID FPSAK_BEHANDLING_UUID = java.util.UUID.randomUUID();
+    private static final UUID BEHANDLING_UUID = java.util.UUID.randomUUID();
     private static final Long BEHANDLING_ID = 1234L;
     private static final String SAK_STATUS = "OPPR";
     private static final String PERSON1 = "8888888";
@@ -71,15 +72,31 @@ public class PdpRequestBuilderImplTest {
     }
 
     @Test
+    public void skal_hente_behandling_og_fagsak_informasjon_når_input_er_behandlinguuid() {
+        AbacAttributtSamling attributter = byggAbacAttributtsamling().leggTil(
+            AbacDataAttributter.opprett().leggTil(StandardAbacAttributtType.BEHANDLING_UUID, BEHANDLING_UUID));
+
+        when(pipRepository.hentBehandlingData(BEHANDLING_UUID))
+            .thenReturn(returnData(true, true));
+
+        PdpRequest request = requestBuilder.lagPdpRequest(attributter);
+        assertThat(request.getListOfString(CommonAttributter.RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE)).containsOnly(PERSON1, PERSON2);
+        assertThat(request.getString(ForeldrepengerAttributter.RESOURCE_FORELDREPENGER_SAK_ANSVARLIG_SAKSBEHANDLER)).isEqualTo(SAKSBEHANDLER);
+        assertThat(request.getString(ForeldrepengerAttributter.RESOURCE_FORELDREPENGER_SAK_SAKSSTATUS)).isEqualTo(AbacFagsakStatus.OPPRETTET.getEksternKode());
+        assertThat(request.getString(ForeldrepengerAttributter.RESOURCE_FORELDREPENGER_SAK_BEHANDLINGSSTATUS)).isEqualTo(AbacBehandlingStatus.UTREDES.getEksternKode());
+        assertThat(request.getString(CommonAttributter.XACML_1_0_ACTION_ACTION_ID)).isEqualTo(BeskyttetRessursActionAttributt.READ.getEksternKode());
+    }
+
+    @Test
     public void skal_hente_behandlinginfo_fra_fpsak_når_input_er_fpsak_behandlingid() {
         AbacAttributtSamling attributter = byggAbacAttributtsamling().leggTil(
-            AbacDataAttributter.opprett().leggTil(TilbakekrevingAbacAttributtType.FPSAK_BEHANDLING_UUID, UUID));
+            AbacDataAttributter.opprett().leggTil(TilbakekrevingAbacAttributtType.FPSAK_BEHANDLING_UUID, FPSAK_BEHANDLING_UUID));
 
         PipDto pipDto = new PipDto();
         pipDto.setAktørIder(Set.of(new AktørId(PERSON1)));
         pipDto.setBehandlingStatus(BehandlingStatus.OPPRETTET.getKode());
         pipDto.setFagsakStatus(FagsakStatus.UNDER_BEHANDLING.getKode());
-        when(fpsakPipKlient.hentPipdataForFpsakBehandling(UUID)).thenReturn(pipDto);
+        when(fpsakPipKlient.hentPipdataForFpsakBehandling(FPSAK_BEHANDLING_UUID)).thenReturn(pipDto);
 
         PdpRequest request = requestBuilder.lagPdpRequest(attributter);
         assertThat(request.getListOfString(CommonAttributter.RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE)).containsOnly(PERSON1);
@@ -88,6 +105,7 @@ public class PdpRequestBuilderImplTest {
         assertThat(request.getString(ForeldrepengerAttributter.RESOURCE_FORELDREPENGER_SAK_BEHANDLINGSSTATUS)).isEqualTo(AbacBehandlingStatus.OPPRETTET.getEksternKode());
         assertThat(request.getString(CommonAttributter.XACML_1_0_ACTION_ACTION_ID)).isEqualTo(BeskyttetRessursActionAttributt.READ.getEksternKode());
     }
+
 
     @Test
     public void skal_hente_aktører_fra_fpsak_når_input_er_saksnummer() {
@@ -132,16 +150,46 @@ public class PdpRequestBuilderImplTest {
     }
 
     @Test
-    public void skal_kaste_feil_ved_både_behandlingId_og_behandlingUuid() {
+    public void skal_kaste_feil_ved_både_behandlingId_og_fpsak_behandlingUuid() {
         expectedException.expect(TekniskException.class);
         expectedException.expectMessage("FPT-317633");
         expectedException.expectMessage(BEHANDLING_ID.toString());
-        expectedException.expectMessage(UUID.toString());
+        expectedException.expectMessage(FPSAK_BEHANDLING_UUID.toString());
 
         AbacAttributtSamling attributter = byggAbacAttributtsamling().leggTil(
             AbacDataAttributter.opprett()
                 .leggTil(StandardAbacAttributtType.BEHANDLING_ID, BEHANDLING_ID)
-                .leggTil(TilbakekrevingAbacAttributtType.FPSAK_BEHANDLING_UUID, UUID));
+                .leggTil(TilbakekrevingAbacAttributtType.FPSAK_BEHANDLING_UUID, FPSAK_BEHANDLING_UUID));
+
+        requestBuilder.lagPdpRequest(attributter);
+    }
+
+    @Test
+    public void skal_kaste_feil_ved_både_behandlingId_og_behandlingUuid() {
+        expectedException.expect(TekniskException.class);
+        expectedException.expectMessage("FPT-317633");
+        expectedException.expectMessage(BEHANDLING_ID.toString());
+        expectedException.expectMessage(BEHANDLING_UUID.toString());
+
+        AbacAttributtSamling attributter = byggAbacAttributtsamling().leggTil(
+            AbacDataAttributter.opprett()
+                .leggTil(StandardAbacAttributtType.BEHANDLING_ID, BEHANDLING_ID)
+                .leggTil(StandardAbacAttributtType.BEHANDLING_UUID, BEHANDLING_UUID));
+
+        requestBuilder.lagPdpRequest(attributter);
+    }
+
+    @Test
+    public void skal_kaste_feil_ved_både_behandlingUuid_og_fpsak_behandlingUuid() {
+        expectedException.expect(TekniskException.class);
+        expectedException.expectMessage("FPT-317634");
+        expectedException.expectMessage(BEHANDLING_UUID.toString());
+        expectedException.expectMessage(FPSAK_BEHANDLING_UUID.toString());
+
+        AbacAttributtSamling attributter = byggAbacAttributtsamling().leggTil(
+            AbacDataAttributter.opprett()
+                .leggTil(StandardAbacAttributtType.BEHANDLING_UUID, BEHANDLING_UUID)
+                .leggTil(TilbakekrevingAbacAttributtType.FPSAK_BEHANDLING_UUID, FPSAK_BEHANDLING_UUID));
 
         requestBuilder.lagPdpRequest(attributter);
     }

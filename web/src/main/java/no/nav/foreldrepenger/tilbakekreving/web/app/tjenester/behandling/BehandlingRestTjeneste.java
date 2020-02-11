@@ -33,6 +33,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingFeil;
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingsTjenesteProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlendeEnhetTjeneste;
@@ -45,6 +46,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.BehandlingsprosessApplikasjonTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.AsyncPollingStatus;
@@ -56,11 +58,13 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.Byt
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.FpsakUuidDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.GjenopptaBehandlingDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.HenleggBehandlingDto;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.KlageTilbakekrevingDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.OpprettBehandlingDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.ProsessTaskGruppeIdDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.Redirect;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.SettBehandlingPåVentDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.UtvidetBehandlingDto;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.UuidDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.SaksnummerDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.SøkestrengDto;
 import no.nav.vedtak.felles.jpa.Transaction;
@@ -308,6 +312,7 @@ public class BehandlingRestTjeneste {
         return responseBuilder.build();
     }
 
+    //kun brukes av fpsak(backend)
     @GET
     @Path("/tilbakekreving/aapen")
     @Timed
@@ -324,6 +329,29 @@ public class BehandlingRestTjeneste {
             .filter(behandling -> BehandlingType.TILBAKEKREVING.equals(behandling.getType()))
             .anyMatch(behandling -> !behandling.erAvsluttet());
         return Response.ok().entity(result).build();
+    }
+
+    //kun brukes av fpsak(backend)
+    @GET
+    @Path("/tilbakekreving/vedtak-info")
+    @Timed
+    @Operation(
+        tags = "behandlinger",
+        description = "Hent tilbakekrevingsvedtakInfo",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Returnerer vedtak info for tilbakekreving", content = @Content(schema = @Schema(implementation = Boolean.class)))
+        })
+    @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
+    public Response hentTilbakekrevingsVedtakInfo(@NotNull @QueryParam(UuidDto.NAME) @Parameter(description = UuidDto.DESC) @Valid UuidDto uuidDto) {
+        UUID behandlingUUId = uuidDto.getBehandlingUuid();
+        Behandling behandling = behandlingTjeneste.hentBehandling(behandlingUUId);
+        Long behandlingId = behandling.getId();
+        Optional<BehandlingVedtak> behandlingVedtak= behandlingTjeneste.hentBehandlingvedtakForBehandlingId(behandlingId);
+        if(!behandling.erAvsluttet() || behandlingVedtak.isEmpty()){
+            throw BehandlingFeil.FACTORY.fantIkkeBehandlingsVedtakInfo(behandlingId).toException();
+        }
+        KlageTilbakekrevingDto klageTilbakekrevingDto = new KlageTilbakekrevingDto(behandlingId, behandlingVedtak.get().getVedtaksdato(),behandling.getType().getKode());
+        return Response.ok().entity(klageTilbakekrevingDto).build();
     }
 
     @POST
