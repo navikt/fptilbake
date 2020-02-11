@@ -97,7 +97,7 @@ public class GjenopptaBehandlingTjenesteImpl implements GjenopptaBehandlingTjene
         Optional<Behandling> behandlingOpt = behandlingVenterRepository.hentBehandlingPåVent(behandlingId);
         if (behandlingOpt.isPresent()) {
             BehandlingStegType bst = behandlingOpt.get().getAktivtBehandlingSteg();
-            if (BehandlingStegType.TBKGSTEG.equals(bst)) {
+            if (BehandlingStegType.TBKGSTEG.equals(bst) || BehandlingStegType.FAKTA_FEILUTBETALING.equals(bst)) {
                 return fortsettBehandling(behandlingId);
             }
         }

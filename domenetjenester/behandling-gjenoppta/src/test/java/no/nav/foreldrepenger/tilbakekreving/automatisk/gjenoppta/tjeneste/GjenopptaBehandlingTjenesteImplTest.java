@@ -166,12 +166,32 @@ public class GjenopptaBehandlingTjenesteImplTest {
     }
 
     @Test
-    public void skal_fortsette_behandling_med_grunnlag_for_behandling_i_varsel_steg_og_fristen_ikke_gått_ut() {
+    public void skal_ikke_fortsette_behandling_med_grunnlag_for_behandling_i_varsel_steg_og_fristen_ikke_gått_ut() {
         Behandling behandling = lagBehandling();
         internalAksjonspunktManipulator.forceFristForAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, LocalDateTime.now().plusDays(20));
         when(mockProsesstaskRepository.lagre(any(ProsessTaskData.class))).thenReturn("Call_123");
         Optional<String> callId = gjenopptaBehandlingTjeneste.fortsettBehandlingMedGrunnlag(behandling.getId());
         assertThat(callId).isEmpty();
+    }
+
+    @Test
+    public void skal_fortsette_behandling_med_grunnlag_for_behandling_i_tbk_steg() {
+        Behandling behandling = lagBehandling();
+        internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.TBKGSTEG, BehandlingStegStatus.VENTER);
+        internalAksjonspunktManipulator.forceFristForAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, LocalDateTime.now().plusDays(20));
+        when(mockProsesstaskRepository.lagre(any(ProsessTaskData.class))).thenReturn("Call_123");
+        Optional<String> callId = gjenopptaBehandlingTjeneste.fortsettBehandlingMedGrunnlag(behandling.getId());
+        assertThat(callId).isNotEmpty();
+    }
+
+    @Test
+    public void skal_fortsette_behandling_med_grunnlag_for_behandling_i_fakta_steg() {
+        Behandling behandling = lagBehandling();
+        internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.FAKTA_FEILUTBETALING, BehandlingStegStatus.VENTER);
+        internalAksjonspunktManipulator.forceFristForAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, LocalDateTime.now().plusDays(20));
+        when(mockProsesstaskRepository.lagre(any(ProsessTaskData.class))).thenReturn("Call_123");
+        Optional<String> callId = gjenopptaBehandlingTjeneste.fortsettBehandlingMedGrunnlag(behandling.getId());
+        assertThat(callId).isNotEmpty();
     }
 
     private Behandling lagBehandling() {
