@@ -5,19 +5,12 @@ import static no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkTabellRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,8 +19,19 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.første
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.status.KravVedtakStatusMapper;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.status.KravVedtakStatusTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.status.KravVedtakStatusXmlUnmarshaller;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkTabellRepository;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatus437;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
@@ -52,10 +56,12 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
     private BehandlingRepository behandlingRepository;
     private ØkonomiMottattXmlRepository mottattXmlRepository;
     private KodeverkTabellRepository kodeverkTabellRepository;
+    private EksternBehandlingRepository eksternBehandlingRepository;
     private KravVedtakStatusTjeneste kravVedtakStatusTjeneste;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private KravVedtakStatusMapper kravVedtakStatusMapper;
     private KravgrunnlagMapper kravgrunnlagMapper;
+    private FpsakKlient fpsakKlient;
 
     FinnGrunnlagTask() {
         // for CDI proxy
@@ -68,16 +74,19 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
                             KravVedtakStatusTjeneste kravVedtakStatusTjeneste,
                             BehandlingskontrollTjeneste behandlingskontrollTjeneste,
                             KravVedtakStatusMapper kravVedtakStatusMapper,
-                            KravgrunnlagMapper kravgrunnlagMapper) {
+                            KravgrunnlagMapper kravgrunnlagMapper,
+                            FpsakKlient fpsakKlient) {
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.mottattXmlRepository = mottattXmlRepository;
         this.kodeverkTabellRepository = kodeverkTabellRepository;
+        this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
 
         this.kravVedtakStatusTjeneste = kravVedtakStatusTjeneste;
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
         this.kravVedtakStatusMapper = kravVedtakStatusMapper;
         this.kravgrunnlagMapper = kravgrunnlagMapper;
+        this.fpsakKlient = fpsakKlient;
     }
 
     @Override
@@ -98,7 +107,7 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
 
                 if (mottattXml.contains(ROOT_ELEMENT_KRAVGRUNNLAG_XML)) {
                     logger.info("xml er grunnlag xml med mottattXmlId={}", mottattXmlId);
-                    kobleGrunnlagMedBehandling(behandlingId, mottattXmlId, mottattXml);
+                    kobleGrunnlagMedBehandling(behandling, mottattXmlId, mottattXml);
                 } else if (mottattXml.contains(ROOT_ELEMENT_KRAV_VEDTAK_STATUS_XML) && grunnlagRepository.harGrunnlagForBehandlingId(behandlingId)) {
                     logger.info("xml er status xml med mottattXmlId={}", mottattXmlId);
                     håndtereGrunnlagStatusForBehandling(behandlingId, mottattXmlId, mottattXml);
@@ -121,11 +130,18 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
         kravVedtakStatusTjeneste.håndteresMottakAvKravVedtakStatus(behandlingId, kravVedtakStatus437);
     }
 
-    private void kobleGrunnlagMedBehandling(Long behandlingId, Long mottattXmlId, String mottattXml) {
+    private void kobleGrunnlagMedBehandling(Behandling behandling, Long mottattXmlId, String mottattXml) {
         DetaljertKravgrunnlag kravgrunnlag = KravgrunnlagXmlUnmarshaller.unmarshall(mottattXmlId, mottattXml);
         kravgrunnlag.setKodeStatusKrav(KravStatusKode.NYTT.getKode()); // alltid vurderes som nytt grunnlag for den behandlingen
         Kravgrunnlag431 kravgrunnlag431 = kravgrunnlagMapper.mapTilDomene(kravgrunnlag);
-        grunnlagRepository.lagre(behandlingId, kravgrunnlag431);
+        grunnlagRepository.lagre(behandling.getId(), kravgrunnlag431);
+
+        String grunnlagReferanse = kravgrunnlag431.getReferanse();
+        EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandling.getId());
+        if (!sjekkOmReferanseErRiktig(grunnlagReferanse, eksternBehandling)) {
+            logger.info("Tilkoblet grunnlag har en annen referanse={} enn behandling for behandlingId={}", grunnlagReferanse, behandling.getId());
+            oppdatereEksternBehandlingMedRiktigReferanse(behandling, Long.valueOf(grunnlagReferanse));
+        }
     }
 
     private void taBehandlingAvVentOgProssereHvisGrunnlagetIkkeErSperret(Behandling behandling) {
@@ -143,6 +159,25 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
             throw new IllegalStateException("Utviklerfeil: ukjent steg " + gjenoppta);
         }
         return stegtype;
+    }
+
+    private boolean sjekkOmReferanseErRiktig(String grunnlagReferanse, EksternBehandling eksternBehandling) {
+        return grunnlagReferanse.equalsIgnoreCase(String.valueOf(eksternBehandling.getEksternId()));
+    }
+
+    private void oppdatereEksternBehandlingMedRiktigReferanse(Behandling behandling, Long grunnlagReferanse) {
+        String saksnummer = behandling.getFagsak().getSaksnummer().getVerdi();
+        List<EksternBehandlingsinfoDto> eksternBehandlinger = fpsakKlient.hentBehandlingForSaksnummer(saksnummer);
+        if (!eksternBehandlinger.isEmpty()) {
+            Optional<EksternBehandlingsinfoDto> eksternBehandlingsinfoDto = eksternBehandlinger.stream()
+                .filter(eksternBehandling -> eksternBehandling.getId().equals(grunnlagReferanse)).findFirst();
+            if (eksternBehandlingsinfoDto.isPresent()) {
+                logger.info("Oppdaterer ekstern behandling referanse med referanse={} for behandlingId={}", grunnlagReferanse, behandling.getId());
+                EksternBehandlingsinfoDto fpsakEksternBehandling = eksternBehandlingsinfoDto.get();
+                EksternBehandling eksternBehandling = new EksternBehandling(behandling, fpsakEksternBehandling.getId(), fpsakEksternBehandling.getUuid());
+                eksternBehandlingRepository.lagre(eksternBehandling);
+            }
+        }
     }
 
 }
