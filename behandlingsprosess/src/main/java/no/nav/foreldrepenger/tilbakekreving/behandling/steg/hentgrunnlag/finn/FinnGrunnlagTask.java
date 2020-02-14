@@ -29,7 +29,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkTabellRepository;
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatus437;
@@ -138,7 +137,7 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
 
         String grunnlagReferanse = kravgrunnlag431.getReferanse();
         EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandling.getId());
-        if (!sjekkOmReferanseErRiktig(grunnlagReferanse, eksternBehandling)) {
+        if (!erReferanseRiktig(grunnlagReferanse, eksternBehandling)) {
             logger.info("Tilkoblet grunnlag har en annen referanse={} enn behandling for behandlingId={}", grunnlagReferanse, behandling.getId());
             oppdatereEksternBehandlingMedRiktigReferanse(behandling, Long.valueOf(grunnlagReferanse));
         }
@@ -161,8 +160,8 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
         return stegtype;
     }
 
-    private boolean sjekkOmReferanseErRiktig(String grunnlagReferanse, EksternBehandling eksternBehandling) {
-        return grunnlagReferanse.equalsIgnoreCase(String.valueOf(eksternBehandling.getEksternId()));
+    private boolean erReferanseRiktig(String grunnlagReferanse, EksternBehandling eksternBehandling) {
+        return grunnlagReferanse.equals(String.valueOf(eksternBehandling.getEksternId()));
     }
 
     private void oppdatereEksternBehandlingMedRiktigReferanse(Behandling behandling, Long grunnlagReferanse) {
@@ -176,6 +175,8 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
                 EksternBehandlingsinfoDto fpsakEksternBehandling = eksternBehandlingsinfoDto.get();
                 EksternBehandling eksternBehandling = new EksternBehandling(behandling, fpsakEksternBehandling.getId(), fpsakEksternBehandling.getUuid());
                 eksternBehandlingRepository.lagre(eksternBehandling);
+            }else {
+                throw FinnGrunnlagTaskFeil.FACTORY.grunnlagHarFeilReferanse(behandling.getId(),saksnummer).toException();
             }
         }
     }

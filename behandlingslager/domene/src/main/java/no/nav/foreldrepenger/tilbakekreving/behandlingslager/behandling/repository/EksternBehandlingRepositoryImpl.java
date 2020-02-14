@@ -35,10 +35,10 @@ public class EksternBehandlingRepositoryImpl implements EksternBehandlingReposit
     }
 
     @Override
-    public Long lagre(EksternBehandling eksternBehandling) {
+    public void lagre(EksternBehandling eksternBehandling) {
         Optional<EksternBehandling> eksisterende = hentOptionalFraInternId(eksternBehandling.getInternId());
         eksisterende.ifPresent(o -> {
-            o.deaktivate();
+            o.deaktiver();
             entityManager.persist(o);
         });
         Optional<EksternBehandling> eksisterendeDeaktivert = hentEksisterendeDeaktivert(eksternBehandling.getInternId(),eksternBehandling.getEksternId());
@@ -47,7 +47,6 @@ public class EksternBehandlingRepositoryImpl implements EksternBehandlingReposit
             entityManager.persist(o);
         },() -> entityManager.persist(eksternBehandling));
         entityManager.flush();
-        return eksternBehandling.getId();
     }
 
     @Override
@@ -97,7 +96,7 @@ public class EksternBehandlingRepositoryImpl implements EksternBehandlingReposit
     @Override
     public void deaktivateTilkobling(long internId) {
         EksternBehandling eksternBehandling = hentFraInternId(internId);
-        eksternBehandling.deaktivate();
+        eksternBehandling.deaktiver();
         entityManager.persist(eksternBehandling);
     }
 

@@ -69,7 +69,7 @@ public class EksternBehandling extends BaseEntitet {
         return aktiv;
     }
 
-    public void deaktivate() {
+    public void deaktiver() {
         aktiv = false;
     }
 

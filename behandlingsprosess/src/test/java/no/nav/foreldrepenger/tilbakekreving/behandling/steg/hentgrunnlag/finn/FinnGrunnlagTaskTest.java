@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.finn;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
@@ -10,7 +11,6 @@ import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import com.google.common.collect.Lists;
 
@@ -41,14 +41,14 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
     private KravVedtakStatusRepository kravVedtakStatusRepository = new KravVedtakStatusRepository(repoRule.getEntityManager());
     private KodeverkTabellRepository kodeverkTabellRepository = new KodeverkTabellRepositoryImpl(repoRule.getEntityManager());
 
-    private HenleggBehandlingTjeneste henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repositoryProvider, prosessTaskRepository,behandlingskontrollTjeneste, historikkinnslagTjeneste);
+    private HenleggBehandlingTjeneste henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repositoryProvider, prosessTaskRepository, behandlingskontrollTjeneste, historikkinnslagTjeneste);
     private KravVedtakStatusTjeneste kravVedtakStatusTjeneste = new KravVedtakStatusTjeneste(kravVedtakStatusRepository, prosessTaskRepository, repositoryProvider, henleggBehandlingTjeneste, behandlingskontrollTjeneste);
     private KravVedtakStatusMapper kravVedtakStatusMapper = new KravVedtakStatusMapper(tpsAdapterWrapper);
 
-    private FinnGrunnlagTask finnGrunnlagTask = new FinnGrunnlagTask(repositoryProvider, mottattXmlRepository, kodeverkTabellRepository, kravVedtakStatusTjeneste, behandlingskontrollTjeneste, kravVedtakStatusMapper, kravgrunnlagMapper,fpsakKlientMock);
+    private FinnGrunnlagTask finnGrunnlagTask = new FinnGrunnlagTask(repositoryProvider, mottattXmlRepository, kodeverkTabellRepository, kravVedtakStatusTjeneste, behandlingskontrollTjeneste, kravVedtakStatusMapper, kravgrunnlagMapper, fpsakKlientMock);
 
     private String saksnummer;
-    private static final Long FPSAK_ANNEN_BEHANDLING_ID= 1174551L;
+    private static final Long FPSAK_ANNEN_BEHANDLING_ID = 1174551L;
 
     @Before
     public void setup() {
@@ -149,8 +149,8 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_finne_og_håndtere_grunnlag_og_oppdatere_fpsak_referanse_når_kravgrunnlag_referanse_er_forskjellige_enn_fpsak_referanse(){
-        Long mottattXmlId =mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_YTEL_ENDR_samme_referanse.xml"));
+    public void skal_finne_og_håndtere_grunnlag_og_oppdatere_fpsak_referanse_når_kravgrunnlag_referanse_er_forskjellige_enn_fpsak_referanse() {
+        Long mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_YTEL_ENDR_samme_referanse.xml"));
         mottattXmlRepository.oppdaterMedEksternBehandlingIdOgSaksnummer(String.valueOf(FPSAK_ANNEN_BEHANDLING_ID), saksnummer, mottattXmlId);
 
         mockFpsakKlientRespons();
@@ -163,6 +163,20 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
         assertThat(økonomiXmlMottatt.get().isTilkoblet()).isTrue();
         assertThat(behandling.isBehandlingPåVent()).isFalse();
         assertThat(eksternBehandlingRepository.hentFraEksternId(FPSAK_ANNEN_BEHANDLING_ID)).isNotEmpty();
+    }
+
+    @Test
+    public void skal_ikke_finne_og_håndtere_grunnlag_når_kravgrunnlag_har_feil_referanse() {
+        EksternBehandlingsinfoDto førsteVedtak = new EksternBehandlingsinfoDto();
+        førsteVedtak.setId(FPSAK_BEHANDLING_ID);
+        førsteVedtak.setUuid(FPSAK_BEHANDLING_UUID);
+        when(fpsakKlientMock.hentBehandlingForSaksnummer(saksnummer)).thenReturn(Lists.newArrayList(førsteVedtak));
+
+        Long mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_YTEL_ENDR_samme_referanse.xml"));
+        mottattXmlRepository.oppdaterMedEksternBehandlingIdOgSaksnummer(String.valueOf(FPSAK_ANNEN_BEHANDLING_ID), saksnummer, mottattXmlId);
+
+        ProsessTaskData prosessTaskData = opprettFinngrunnlagProsessTask();
+        assertThrows("FPT-783524", TekniskException.class, () -> finnGrunnlagTask.doTask(prosessTaskData));
     }
 
     @Test
@@ -256,7 +270,7 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
         andreVedtak.setId(FPSAK_ANNEN_BEHANDLING_ID);
         andreVedtak.setUuid(UUID.randomUUID());
 
-        when(fpsakKlientMock.hentBehandlingForSaksnummer(saksnummer)).thenReturn(Lists.newArrayList(førsteVedtak,andreVedtak));
+        when(fpsakKlientMock.hentBehandlingForSaksnummer(saksnummer)).thenReturn(Lists.newArrayList(førsteVedtak, andreVedtak));
     }
 
 }
