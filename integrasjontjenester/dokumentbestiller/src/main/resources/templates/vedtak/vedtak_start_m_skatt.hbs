@@ -1,0 +1,30 @@
+{{#* inline "evt-renter-utsagn"}}{{#if totalresultat.totalt-rentebeløp}} Dette beløpet er med renter.{{/if}}{{/inline}}
+{{#if behandling.er-revurdering}}
+Vi har vurdert saken din om tilbakebetaling på nytt. Derfor gjelder ikke det tidligere vedtaket {{behandling.original-behandling-dato-fagsakvedtak}} om tilbakebetaling av {{>ytelse-produkt}}.
+
+{{/if}}
+{{#if varsel.varslet-dato}}
+    {{#switch totalresultat.hovedresultat}}
+    {{#case "FULL_TILBAKEBETALING"}}
+Vi varslet deg {{varsel.varslet-dato}} om at du har fått utbetalt for mye.
+    {{/case}}
+    {{#case "DELVIS_TILBAKEBETALING"}}
+Vi varslet deg {{varsel.varslet-dato}} om at du har fått {{kroner varsel.varslet-beløp}} for mye.
+    {{/case}}
+    {{#case "INGEN_TILBAKEBETALING"}}
+Vi varslet deg {{varsel.varslet-dato}} om at du har fått {{kroner varsel.varslet-beløp}} for mye. Vi har behandlet saken din og du må ikke betale tilbake det feilutbetalte beløpet.
+    {{/case}}
+    {{/switch}}
+{{else}}
+    {{#if (not behandling.er-revurdering)}}
+I brev {{sak.dato-fagsakvedtak}} fikk du melding om at {{>ytelse-produkt}} {{#if (eq sak.ytelsetype "ES")}}din{{else}}dine{{/if}} er endret. Endringen gjorde at du har fått utbetalt for mye.{{#if (eq totalresultat.hovedresultat "INGEN_TILBAKEBETALING")}} Du må ikke betale tilbake det du har fått for mye.{{/if}}
+    {{/if}}
+{{/if}}
+{{#if (neq totalresultat.hovedresultat "INGEN_TILBAKEBETALING")}}
+
+Beløpet du skylder før skatt er {{kroner totalresultat.totalt-tilbakekreves-beløp-med-renter}}, som er {{#if (eq totalresultat.hovedresultat "FULL_TILBAKEBETALING")}}hele{{else}}deler av{{/if}} det feilutbetalte beløpet.{{>evt-renter-utsagn}} Beløpet du skal betale tilbake etter skatten er trukket fra er {{kroner totalresultat.totalt-tilbakekreves-beløp-med-renter-uten-skatt}}.
+{{/if}}
+{{#if fritekst-oppsummering}}
+
+{{fritekst-oppsummering}}
+{{/if}}

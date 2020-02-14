@@ -1,7 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -328,12 +328,12 @@ class TekstformatererVedtaksbrev {
 
     private static Handlebars opprettHandlebarsKonfigurasjon() {
         ClassPathTemplateLoader loader = new ClassPathTemplateLoader();
-        loader.setCharset(Charset.forName("UTF-8"));
+        loader.setCharset(StandardCharsets.UTF_8);
         loader.setPrefix("/templates/");
         loader.setSuffix(".hbs");
         Handlebars handlebars = new Handlebars(loader);
 
-        handlebars.setCharset(Charset.forName("UTF-8"));
+        handlebars.setCharset(StandardCharsets.UTF_8);
         handlebars.setInfiniteLoops(false);
         handlebars.setPrettyPrint(true);
 
