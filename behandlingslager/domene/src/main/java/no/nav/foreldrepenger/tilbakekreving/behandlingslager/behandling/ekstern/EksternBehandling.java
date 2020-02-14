@@ -69,8 +69,12 @@ public class EksternBehandling extends BaseEntitet {
         return aktiv;
     }
 
-    public void setInaktiv() {
+    public void deaktiver() {
         aktiv = false;
+    }
+
+    public void reaktivate() {
+        aktiv = true;
     }
 
     public UUID getEksternUuid() {

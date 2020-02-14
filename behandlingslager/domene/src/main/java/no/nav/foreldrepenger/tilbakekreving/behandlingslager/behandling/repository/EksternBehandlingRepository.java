@@ -12,7 +12,7 @@ public interface EksternBehandlingRepository {
      * Lagrer eksternBehandling, setter eksisterende, hvis finnes, til inaktiv
      * @param eksternBehandling
      */
-    Long lagre(EksternBehandling eksternBehandling);
+    void lagre(EksternBehandling eksternBehandling);
 
     /**
      * Henter eksternBehandling data for behandlingen

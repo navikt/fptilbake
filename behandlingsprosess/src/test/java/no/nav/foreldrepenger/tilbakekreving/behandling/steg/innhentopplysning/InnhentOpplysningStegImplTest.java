@@ -60,5 +60,4 @@ public class InnhentOpplysningStegImplTest extends FellesTestOppsett {
         Optional<VarselInfo> entitet = varselRepository.finnVarsel(behandling.getId());
         assertThat(entitet).isEmpty();
     }
-
 }

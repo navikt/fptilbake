@@ -35,15 +35,18 @@ public class EksternBehandlingRepositoryImpl implements EksternBehandlingReposit
     }
 
     @Override
-    public Long lagre(EksternBehandling eksternBehandling) {
+    public void lagre(EksternBehandling eksternBehandling) {
         Optional<EksternBehandling> eksisterende = hentOptionalFraInternId(eksternBehandling.getInternId());
         eksisterende.ifPresent(o -> {
-            o.setInaktiv();
+            o.deaktiver();
             entityManager.persist(o);
         });
-        entityManager.persist(eksternBehandling);
+        Optional<EksternBehandling> eksisterendeDeaktivert = hentEksisterendeDeaktivert(eksternBehandling.getInternId(),eksternBehandling.getEksternId());
+        eksisterendeDeaktivert.ifPresentOrElse(o -> {
+            o.reaktivate();
+            entityManager.persist(o);
+        },() -> entityManager.persist(eksternBehandling));
         entityManager.flush();
-        return eksternBehandling.getId();
     }
 
     @Override
@@ -93,7 +96,7 @@ public class EksternBehandlingRepositoryImpl implements EksternBehandlingReposit
     @Override
     public void deaktivateTilkobling(long internId) {
         EksternBehandling eksternBehandling = hentFraInternId(internId);
-        eksternBehandling.setInaktiv();
+        eksternBehandling.deaktiver();
         entityManager.persist(eksternBehandling);
     }
 
@@ -108,6 +111,14 @@ public class EksternBehandlingRepositoryImpl implements EksternBehandlingReposit
     public Optional<EksternBehandling> hentOptionalFraInternId(long internBehandlingId) {
         TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where intern_id=:internId and aktiv='J'", EksternBehandling.class);
         query.setParameter(INTERN_ID, internBehandlingId);
+        return hentUniktResultat(query);
+    }
+
+    private Optional<EksternBehandling> hentEksisterendeDeaktivert(long internBehandlingId, long eksternBehandlingId){
+        TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where intern_id=:internId and ekstern_id=:eksternId order by opprettetTidspunkt desc", EksternBehandling.class);
+        query.setParameter(INTERN_ID, internBehandlingId);
+        query.setParameter(EKSTERN_ID, eksternBehandlingId);
+
         return hentUniktResultat(query);
     }
 }

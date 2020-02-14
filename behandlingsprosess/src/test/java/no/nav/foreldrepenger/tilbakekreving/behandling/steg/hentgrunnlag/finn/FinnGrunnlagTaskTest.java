@@ -1,13 +1,18 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.finn;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertThrows;
+import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import com.google.common.collect.Lists;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.HenleggBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.FellesTestOppsett;
@@ -22,6 +27,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkTabellRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkTabellRepositoryImpl;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatusRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
@@ -35,13 +41,14 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
     private KravVedtakStatusRepository kravVedtakStatusRepository = new KravVedtakStatusRepository(repoRule.getEntityManager());
     private KodeverkTabellRepository kodeverkTabellRepository = new KodeverkTabellRepositoryImpl(repoRule.getEntityManager());
 
-    private HenleggBehandlingTjeneste henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repositoryProvider, prosessTaskRepository,behandlingskontrollTjeneste, historikkinnslagTjeneste);
+    private HenleggBehandlingTjeneste henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repositoryProvider, prosessTaskRepository, behandlingskontrollTjeneste, historikkinnslagTjeneste);
     private KravVedtakStatusTjeneste kravVedtakStatusTjeneste = new KravVedtakStatusTjeneste(kravVedtakStatusRepository, prosessTaskRepository, repositoryProvider, henleggBehandlingTjeneste, behandlingskontrollTjeneste);
     private KravVedtakStatusMapper kravVedtakStatusMapper = new KravVedtakStatusMapper(tpsAdapterWrapper);
 
-    private FinnGrunnlagTask finnGrunnlagTask = new FinnGrunnlagTask(repositoryProvider, mottattXmlRepository, kodeverkTabellRepository, kravVedtakStatusTjeneste, behandlingskontrollTjeneste, kravVedtakStatusMapper, kravgrunnlagMapper);
+    private FinnGrunnlagTask finnGrunnlagTask = new FinnGrunnlagTask(repositoryProvider, mottattXmlRepository, kodeverkTabellRepository, kravVedtakStatusTjeneste, behandlingskontrollTjeneste, kravVedtakStatusMapper, kravgrunnlagMapper, fpsakKlientMock);
 
     private String saksnummer;
+    private static final Long FPSAK_ANNEN_BEHANDLING_ID = 1174551L;
 
     @Before
     public void setup() {
@@ -126,16 +133,50 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
         mottattXmlRepository.oppdaterMedEksternBehandlingIdOgSaksnummer(String.valueOf(FPSAK_BEHANDLING_ID), saksnummer, mottattXmlId);
 
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_YTEL_ENDR_samme_referanse.xml"));
-        mottattXmlRepository.oppdaterMedEksternBehandlingIdOgSaksnummer(String.valueOf(1174551), saksnummer, mottattXmlId);
+        mottattXmlRepository.oppdaterMedEksternBehandlingIdOgSaksnummer(String.valueOf(FPSAK_ANNEN_BEHANDLING_ID), saksnummer, mottattXmlId);
+
+        mockFpsakKlientRespons();
 
         ProsessTaskData prosessTaskData = opprettFinngrunnlagProsessTask();
         finnGrunnlagTask.doTask(prosessTaskData);
 
         assertThat(grunnlagRepository.harGrunnlagForBehandlingId(behandling.getId())).isTrue();
-        Optional<ØkonomiXmlMottatt> økonomiXmlMottatt = mottattXmlRepository.finnForEksternBehandlingId(String.valueOf(1174551));
+        Optional<ØkonomiXmlMottatt> økonomiXmlMottatt = mottattXmlRepository.finnForEksternBehandlingId(String.valueOf(FPSAK_ANNEN_BEHANDLING_ID));
         assertThat(økonomiXmlMottatt).isPresent();
         assertThat(økonomiXmlMottatt.get().isTilkoblet()).isTrue();
         assertThat(behandling.isBehandlingPåVent()).isFalse();
+        assertThat(eksternBehandlingRepository.hentFraEksternId(FPSAK_ANNEN_BEHANDLING_ID)).isNotEmpty();
+    }
+
+    @Test
+    public void skal_finne_og_håndtere_grunnlag_og_oppdatere_fpsak_referanse_når_kravgrunnlag_referanse_er_forskjellige_enn_fpsak_referanse() {
+        Long mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_YTEL_ENDR_samme_referanse.xml"));
+        mottattXmlRepository.oppdaterMedEksternBehandlingIdOgSaksnummer(String.valueOf(FPSAK_ANNEN_BEHANDLING_ID), saksnummer, mottattXmlId);
+
+        mockFpsakKlientRespons();
+        ProsessTaskData prosessTaskData = opprettFinngrunnlagProsessTask();
+        finnGrunnlagTask.doTask(prosessTaskData);
+
+        assertThat(grunnlagRepository.harGrunnlagForBehandlingId(behandling.getId())).isTrue();
+        Optional<ØkonomiXmlMottatt> økonomiXmlMottatt = mottattXmlRepository.finnForEksternBehandlingId(String.valueOf(FPSAK_ANNEN_BEHANDLING_ID));
+        assertThat(økonomiXmlMottatt).isPresent();
+        assertThat(økonomiXmlMottatt.get().isTilkoblet()).isTrue();
+        assertThat(behandling.isBehandlingPåVent()).isFalse();
+        assertThat(eksternBehandlingRepository.hentFraEksternId(FPSAK_ANNEN_BEHANDLING_ID)).isNotEmpty();
+    }
+
+    @Test
+    public void skal_ikke_finne_og_håndtere_grunnlag_når_kravgrunnlag_har_feil_referanse() {
+        EksternBehandlingsinfoDto førsteVedtak = new EksternBehandlingsinfoDto();
+        førsteVedtak.setId(FPSAK_BEHANDLING_ID);
+        førsteVedtak.setUuid(FPSAK_BEHANDLING_UUID);
+        when(fpsakKlientMock.hentBehandlingForSaksnummer(saksnummer)).thenReturn(Lists.newArrayList(førsteVedtak));
+
+        Long mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_YTEL_ENDR_samme_referanse.xml"));
+        mottattXmlRepository.oppdaterMedEksternBehandlingIdOgSaksnummer(String.valueOf(FPSAK_ANNEN_BEHANDLING_ID), saksnummer, mottattXmlId);
+
+        ProsessTaskData prosessTaskData = opprettFinngrunnlagProsessTask();
+        assertThrows("FPT-783524", TekniskException.class, () -> finnGrunnlagTask.doTask(prosessTaskData));
     }
 
     @Test
@@ -218,6 +259,18 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
     private void assertTilkobling() {
         List<ØkonomiXmlMottatt> xmlMeldinger = mottattXmlRepository.finnAlleForSaksnummerSomIkkeErKoblet(String.valueOf(FPSAK_BEHANDLING_ID));
         assertThat(xmlMeldinger).isEmpty();
+    }
+
+    private void mockFpsakKlientRespons() {
+        EksternBehandlingsinfoDto førsteVedtak = new EksternBehandlingsinfoDto();
+        førsteVedtak.setId(FPSAK_BEHANDLING_ID);
+        førsteVedtak.setUuid(FPSAK_BEHANDLING_UUID);
+
+        EksternBehandlingsinfoDto andreVedtak = new EksternBehandlingsinfoDto();
+        andreVedtak.setId(FPSAK_ANNEN_BEHANDLING_ID);
+        andreVedtak.setUuid(UUID.randomUUID());
+
+        when(fpsakKlientMock.hentBehandlingForSaksnummer(saksnummer)).thenReturn(Lists.newArrayList(førsteVedtak, andreVedtak));
     }
 
 }
