@@ -1,0 +1,25 @@
+{{#if engangsstønad}}
+Du har {{datoformat datoerHvisSammenhengendePeriode.fom}} fått {{kroner beløp}} for mykje utbetalt i eingongsstønad.
+
+{{else if datoerHvisSammenhengendePeriode.fom}}
+Du har fått {{kroner beløp}} for mykje utbetalt i {{fagsaktypeNavn}} frå og med {{datoformat datoerHvisSammenhengendePeriode.fom }} til og med {{datoformat datoerHvisSammenhengendePeriode.tom}}. Dette er før skatt.
+
+{{else}}
+Du har fått {{kroner beløp}} for mykje utbetalt i {{fagsaktypeNavn}}. Dette er før skatt.
+
+Periodane du har fått for mykje utbetalt for, er:
+*-{{#each feilutbetaltePerioder }}
+Frå og med {{datoformat fom }} til og med {{datoformat tom }}{{/each}}-*
+{{/if}}
+Før vi avgjer om du skal betale tilbake, kan du uttale deg innan {{datoformat fristdatoForTilbakemelding}}.
+{{#if (or foreldrepenger svangerskapspenger)}}
+
+Dersom du må betale tilbake, reduserer vi beløpet med trekt skatt.
+{{/if}}
+_Dette har skjedd
+Saka di blei endra {{datoformat endringsdato}}, og endringa har ført til at du har fått utbetalt for mykje.
+{{#if varseltekstFraSaksbehandler}}
+
+{{varseltekstFraSaksbehandler}}
+{{/if}}
+{{> varsel/varsel_slutt_nn}}

@@ -1,32 +1,5 @@
-{{#if engangsstonad}}{{i18n "engangsstonad1" bundle="varselbrev" locale=locale}} {{datoformat datoerHvisSammenhengendePeriode.fom}} {{i18n "engangsstonad2" belop bundle="varselbrev" locale=locale}}
-
-{{else if datoerHvisSammenhengendePeriode.fom}}{{i18n "introduksjonSammenhengendePeriode" belop fagsaktypeNavn bundle="varselbrev" locale=locale}} {{i18n "fom2" bundle="varselbrev" locale=locale}} {{datoformat datoerHvisSammenhengendePeriode.fom }} {{i18n "tom" bundle="varselbrev" locale=locale}} {{datoformat datoerHvisSammenhengendePeriode.tom}}. {{i18n "foerSkatt" bundle="varselbrev" locale=locale}}
-
-{{else}}{{i18n "introduksjonFlerePerioder" belop fagsaktypeNavn bundle="varselbrev" locale=locale}}
-
-{{i18n "periodeoversikt" bundle="varselbrev" locale=locale}}
-*-{{#each feilutbetaltePerioder }}
-{{i18n "fom" bundle="varselbrev" locale=locale}} {{datoformat fom }} {{i18n "tom" bundle="varselbrev" locale=locale}} {{datoformat tom }}{{/each}}-*
+{{#if (eq locale "nn_NO")}}
+{{> varsel/varsel_nn}}
+{{else}}
+{{> varsel/varsel_nb}}
 {{/if}}
-{{i18n "fristdatotekst" datoformat bundle="varselbrev" locale=locale}} {{datoformat fristdatoForTilbakemelding}}.
-{{#if (or foreldrepenger svangerskapspenger)}}
-
-{{i18n "nettotekst" bundle="varselbrev" locale=locale}}
-{{/if}}
-{{i18n "overskrift2" bundle="varselbrev" locale=locale}}
-{{i18n "endringtekst1" bundle="varselbrev" locale=locale}} {{datoformat endringsdato}}{{i18n "endringtekst2" bundle="varselbrev" locale=locale}}{{#if varseltekstFraSaksbehandler}}{{i18n "fritekst" varseltekstFraSaksbehandler bundle="varselbrev" locale=locale}}{{/if}}
-{{i18n "overskrift3" bundle="varselbrev" locale=locale}}
-{{i18n "vurderingforklaring" bundle="varselbrev" locale=locale}}
-
-{{#if foreldrepenger}}{{i18n "vurderingslisteForeldrepenger" bundle="varselbrev" locale=locale}}
-{{else if engangsstonad}}{{i18n "vurderingslisteEngangsstonad" bundle="varselbrev" locale=locale}}
-{{else if svangerskapspenger}}{{i18n "vurderingslisteSvangerskapspenger" bundle="varselbrev" locale=locale}}
-{{/if}}
-
-{{i18n "vurderingavslutning" bundle="varselbrev" locale=locale}}
-{{i18n "slikuttalerdudeg" bundle="varselbrev" locale=locale}}
-{{i18n "innsyn" bundle="varselbrev" locale=locale}}
-{{i18n "spoersmaal" bundle="varselbrev" locale=locale}}
-
-
-{{i18n "hilsen" bundle="varselbrev" locale=locale}}

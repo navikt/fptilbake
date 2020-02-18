@@ -6,7 +6,7 @@ public class BaseDokument {
 
     private String fagsaktypeNavn;
     private boolean foreldrepenger;
-    private boolean engangsstonad;
+    private boolean engangsstønad;
     private boolean svangerskapspenger;
     private boolean isKorrigert;
 
@@ -36,12 +36,12 @@ public class BaseDokument {
         this.foreldrepenger = foreldrepenger;
     }
 
-    public boolean isEngangsstonad() {
-        return engangsstonad;
+    public boolean isEngangsstønad() {
+        return engangsstønad;
     }
 
-    public void setEngangsstonad(boolean engangsstonad) {
-        this.engangsstonad = engangsstonad;
+    public void setEngangsstønad(boolean engangsstønad) {
+        this.engangsstønad = engangsstønad;
     }
 
     public boolean isSvangerskapspenger() {

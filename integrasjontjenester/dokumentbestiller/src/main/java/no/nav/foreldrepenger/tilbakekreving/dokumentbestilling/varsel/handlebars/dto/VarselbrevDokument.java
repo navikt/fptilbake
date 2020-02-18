@@ -8,21 +8,21 @@ import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
 public class VarselbrevDokument extends BaseDokument {
 
-    private Long belop;
+    private Long beløp;
     private LocalDate endringsdato;
     private List<Periode> feilutbetaltePerioder;
     private String varseltekstFraSaksbehandler;
     private LocalDate fristdatoForTilbakemelding;
     private Periode datoerHvisSammenhengendePeriode;
     private LocalDate varsletDato;
-    private Long varsletBelop;
+    private Long varsletBeløp;
 
-    public Long getBelop() {
-        return belop;
+    public Long getBeløp() {
+        return beløp;
     }
 
-    public void setBelop(Long belop) {
-        this.belop = belop;
+    public void setBeløp(Long beløp) {
+        this.beløp = beløp;
     }
 
     public LocalDate getEndringsdato() {
@@ -73,22 +73,22 @@ public class VarselbrevDokument extends BaseDokument {
         this.varsletDato = varsletDato;
     }
 
-    public Long getVarsletBelop() {
-        return varsletBelop;
+    public Long getVarsletBeløp() {
+        return varsletBeløp;
     }
 
-    public void setVarsletBelop(Long varsletBelop) {
-        this.varsletBelop = varsletBelop;
+    public void setVarsletBeløp(Long varsletBeløp) {
+        this.varsletBeløp = varsletBeløp;
     }
 
     public void valider() {
-        Objects.requireNonNull(belop, "totalbeløp fra fpoppdrag/oppdragssystemet");
+        Objects.requireNonNull(beløp, "totalbeløp fra fpoppdrag/oppdragssystemet");
         Objects.requireNonNull(endringsdato, "endringsdato");
         Objects.requireNonNull(getFagsaktypeNavn(), "fagtypenavn/ytelsenavn");
         Objects.requireNonNull(fristdatoForTilbakemelding, "fristdato for tilbakemelding");
         Objects.requireNonNull(feilutbetaltePerioder, "feilutbetalte perioder");
 
-        if (isEngangsstonad()) {
+        if (isEngangsstønad()) {
             Objects.requireNonNull(datoerHvisSammenhengendePeriode, "utbetalingsdato/fom-dato for engangsstønad");
         } else if (isForeldrepenger() || isSvangerskapspenger()) {
             if (feilutbetaltePerioder.size() == 1) {
@@ -103,7 +103,7 @@ public class VarselbrevDokument extends BaseDokument {
 
         if(isKorrigert()){
             Objects.requireNonNull(varsletDato, "varsletDato");
-            Objects.requireNonNull(varsletBelop, "varsletBelop");
+            Objects.requireNonNull(varsletBeløp, "varsletBelop");
         }
     }
 

@@ -3,7 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel;
 import static no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevSpråkUtil.finnRiktigSpråk;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -13,9 +13,11 @@ import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Helper;
 import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.helper.ConditionalHelpers;
+import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselInfo;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.CustomHelpers;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.handlebars.dto.BaseDokument;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.handlebars.dto.VarselbrevDokument;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
@@ -29,7 +31,7 @@ public class TekstformatererVarselbrev {
 
     public static String lagVarselbrevFritekst(VarselbrevSamletInfo varselbrevSamletInfo) {
         try {
-            Template template = opprettHandlebarsTemplate("/templates/varsel");
+            Template template = opprettHandlebarsTemplate("varsel");
             VarselbrevDokument varselbrevDokument = mapTilVarselbrevDokument(
                 varselbrevSamletInfo);
 
@@ -41,7 +43,7 @@ public class TekstformatererVarselbrev {
 
     public static String lagKorrigertVarselbrevFritekst(VarselbrevSamletInfo varselbrevSamletInfo, VarselInfo varselInfo) {
         try {
-            Template template = opprettHandlebarsTemplate("/templates/korrigert_varsel");
+            Template template = opprettHandlebarsTemplate("korrigert_varsel");
             VarselbrevDokument varselbrevDokument = mapTilKorrigertVarselbrevDokument(
                 varselbrevSamletInfo,
                 varselInfo);
@@ -53,12 +55,18 @@ public class TekstformatererVarselbrev {
     }
 
     private static Template opprettHandlebarsTemplate(String filsti) throws IOException {
-        Handlebars handlebars = new Handlebars();
+        ClassPathTemplateLoader loader = new ClassPathTemplateLoader();
+        loader.setCharset(StandardCharsets.UTF_8);
+        loader.setPrefix("/templates/");
+        loader.setSuffix(".hbs");
 
-        handlebars.setCharset(Charset.forName("latin1")); //TODO begge maler skal bruke UTF-8
+        Handlebars handlebars = new Handlebars(loader);
+
+        handlebars.setCharset(StandardCharsets.UTF_8);
         handlebars.setInfiniteLoops(false);
         handlebars.setPrettyPrint(true);
         handlebars.registerHelper("datoformat", datoformatHelper());
+        handlebars.registerHelper("kroner", new CustomHelpers.KroneFormattererMedTusenskille());
         handlebars.registerHelpers(ConditionalHelpers.class);
         return handlebars.compile(filsti);
     }
@@ -73,7 +81,7 @@ public class TekstformatererVarselbrev {
 
     private static void settFagsaktype(BaseDokument baseDokument, FagsakYtelseType fagsaktype) {
         if (FagsakYtelseType.ENGANGSTØNAD.equals(fagsaktype)) {
-            baseDokument.setEngangsstonad(true);
+            baseDokument.setEngangsstønad(true);
         } else if (FagsakYtelseType.FORELDREPENGER.equals(fagsaktype)) {
             baseDokument.setForeldrepenger(true);
         } else if (FagsakYtelseType.SVANGERSKAPSPENGER.equals(fagsaktype)) {
@@ -94,7 +102,7 @@ public class TekstformatererVarselbrev {
 
     static VarselbrevDokument mapTilVarselbrevDokument(VarselbrevSamletInfo varselbrevSamletInfo) {
         VarselbrevDokument varselbrevDokument = new VarselbrevDokument();
-        varselbrevDokument.setBelop(varselbrevSamletInfo.getSumFeilutbetaling());
+        varselbrevDokument.setBeløp(varselbrevSamletInfo.getSumFeilutbetaling());
         varselbrevDokument.setEndringsdato(varselbrevSamletInfo.getRevurderingVedtakDato() != null ? varselbrevSamletInfo.getRevurderingVedtakDato() : LocalDate.now());
         varselbrevDokument.setFristdatoForTilbakemelding(varselbrevSamletInfo.getFristdato());
         varselbrevDokument.setVarseltekstFraSaksbehandler(varselbrevSamletInfo.getFritekstFraSaksbehandler());
@@ -112,7 +120,7 @@ public class TekstformatererVarselbrev {
         VarselbrevDokument varselbrevDokument = mapTilVarselbrevDokument(varselbrevSamletInfo);
         varselbrevDokument.setKorrigert(true);
         varselbrevDokument.setVarsletDato(varselInfo.getOpprettetTidspunkt().toLocalDate());
-        varselbrevDokument.setVarsletBelop(varselInfo.getVarselBeløp());
+        varselbrevDokument.setVarsletBeløp(varselInfo.getVarselBeløp());
 
         varselbrevDokument.valider();
         return varselbrevDokument;

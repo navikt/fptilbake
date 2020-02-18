@@ -122,7 +122,7 @@ public class TekstformattererForVarselbrevTest {
         assertThat(varselbrev.getDatoerHvisSammenhengendePeriode().getFom()).isEqualTo(LocalDate.of(2019, 3, 3));
         assertThat(varselbrev.getDatoerHvisSammenhengendePeriode().getTom()).isEqualTo(LocalDate.of(2020, 3, 3));
         assertThat(varselbrev.getFagsaktypeNavn()).isEqualTo("foreldrepenger");
-        assertThat(varselbrev.getBelop()).isEqualTo(595959L);
+        assertThat(varselbrev.getBeløp()).isEqualTo(595959L);
         assertThat(varselbrev.getFeilutbetaltePerioder()).isNotNull();
     }
 
@@ -157,14 +157,14 @@ public class TekstformattererForVarselbrevTest {
         varselbrevDokument.setDatoerHvisSammenhengendePeriode(new Periode(LocalDate.of(2019, 12, 12), LocalDate.of(2020, 1, 1)));
         varselbrevDokument.setFeilutbetaltePerioder(mockUtbetalingEnPeriode());
         varselbrevDokument.setFagsaktypeNavn("engangsstønad");
-        varselbrevDokument.setEngangsstonad(true);
+        varselbrevDokument.setEngangsstønad(true);
         varselbrevDokument.valider();
     }
 
     @Test
     public void skal_kaste_feil_dersom_ikke_nødvendige_verdier_for_komplett_brev_er_satt_for_engangsstønad() {
         VarselbrevDokument varselbrevDokument = lagTilbakekrevingvarselMedObligatoriskeVerdier();
-        varselbrevDokument.setEngangsstonad(true);
+        varselbrevDokument.setEngangsstønad(true);
         varselbrevDokument.setFeilutbetaltePerioder(mockUtbetalingEnPeriode());
         varselbrevDokument.setFagsaktypeNavn("engangsstønad");
         varselbrevDokument.setDatoerHvisSammenhengendePeriode(null);
@@ -198,7 +198,7 @@ public class TekstformattererForVarselbrevTest {
 
     private VarselbrevDokument lagTilbakekrevingvarselMedObligatoriskeVerdier() {
         VarselbrevDokument varselbrevDokument = new VarselbrevDokument();
-        varselbrevDokument.setBelop(40L);
+        varselbrevDokument.setBeløp(40L);
         varselbrevDokument.setEndringsdato(LocalDate.of(2020, 1, 30));
         varselbrevDokument.setFristdatoForTilbakemelding(LocalDate.of(2022, 2, 2));
         return varselbrevDokument;
