@@ -15,9 +15,9 @@ public class SendtVarselInformasjon {
     private String ytelseType;
     @JsonProperty("aktørId")
     private AktørId aktørId;
-    @JsonProperty("saksnr")
+    @JsonProperty("saksnummer")
     private String saksnummer;
-    @JsonProperty("jounalpostId")
+    @JsonProperty("journalpostId")
     private String journalpostId;
     @JsonProperty("dokumentId")
     private String dokumentId;
