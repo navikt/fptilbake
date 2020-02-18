@@ -81,7 +81,7 @@ public class TekstformatererVarselbrev {
 
     private static void settFagsaktype(BaseDokument baseDokument, FagsakYtelseType fagsaktype) {
         if (FagsakYtelseType.ENGANGSTØNAD.equals(fagsaktype)) {
-            baseDokument.setEngangsstonad(true);
+            baseDokument.setEngangsstønad(true);
         } else if (FagsakYtelseType.FORELDREPENGER.equals(fagsaktype)) {
             baseDokument.setForeldrepenger(true);
         } else if (FagsakYtelseType.SVANGERSKAPSPENGER.equals(fagsaktype)) {
@@ -102,7 +102,7 @@ public class TekstformatererVarselbrev {
 
     static VarselbrevDokument mapTilVarselbrevDokument(VarselbrevSamletInfo varselbrevSamletInfo) {
         VarselbrevDokument varselbrevDokument = new VarselbrevDokument();
-        varselbrevDokument.setBelop(varselbrevSamletInfo.getSumFeilutbetaling());
+        varselbrevDokument.setBeløp(varselbrevSamletInfo.getSumFeilutbetaling());
         varselbrevDokument.setEndringsdato(varselbrevSamletInfo.getRevurderingVedtakDato() != null ? varselbrevSamletInfo.getRevurderingVedtakDato() : LocalDate.now());
         varselbrevDokument.setFristdatoForTilbakemelding(varselbrevSamletInfo.getFristdato());
         varselbrevDokument.setVarseltekstFraSaksbehandler(varselbrevSamletInfo.getFritekstFraSaksbehandler());
@@ -120,7 +120,7 @@ public class TekstformatererVarselbrev {
         VarselbrevDokument varselbrevDokument = mapTilVarselbrevDokument(varselbrevSamletInfo);
         varselbrevDokument.setKorrigert(true);
         varselbrevDokument.setVarsletDato(varselInfo.getOpprettetTidspunkt().toLocalDate());
-        varselbrevDokument.setVarsletBelop(varselInfo.getVarselBeløp());
+        varselbrevDokument.setVarsletBeløp(varselInfo.getVarselBeløp());
 
         varselbrevDokument.valider();
         return varselbrevDokument;

@@ -1,9 +1,9 @@
-{{~#* inline "foerSkatt"}}{{#if (not engangsstonad)}} før skatt{{/if}}{{~/inline~}}
-Vi varslet deg {{datoformat varsletDato}} om at du hadde fått utbetalt {{kroner varsletBelop}} for mye i {{fagsaktypeNavn}}{{> foerSkatt}}.
+{{~#* inline "førSkatt"}}{{#if (not engangsstønad)}} før skatt{{/if}}{{~/inline~}}
+Vi varslet deg {{datoformat varsletDato}} om at du hadde fått utbetalt {{kroner varsletBeløp}} for mye i {{fagsaktypeNavn}}{{> førSkatt}}.
 
-Riktig beløp som er utbetalt for mye er {{kroner belop}}{{> foerSkatt}}.
+Riktig beløp som er utbetalt for mye er {{kroner beløp}}{{> førSkatt}}.
 
-{{#if (not engangsstonad) }}
+{{#if (not engangsstønad) }}
 {{#eq feilutbetaltePerioder.length 1}}Perioden{{else}}Periodene{{/eq}} du har fått for mye utbetalt for, er:
 *-{{#each feilutbetaltePerioder }}
 Fra og med {{datoformat fom }} til og med {{datoformat tom }}.{{/each}}-*
