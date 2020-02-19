@@ -1,9 +1,5 @@
-{{#* inline "evt-renter-utsagn"}}{{#if totalresultat.totalt-rentebeløp}} Dette beløpet er med renter.{{/if}}{{/inline}}
-{{#if behandling.er-revurdering}}
-Vi har vurdert saken din om tilbakebetaling på nytt. Derfor gjelder ikke det tidligere vedtaket {{behandling.original-behandling-dato-fagsakvedtak}} om tilbakebetaling av {{>ytelse-produkt}}.
-
-{{/if}}
-{{#if varsel.varslet-dato}}
+{{~#* inline "evt-renter-utsagn" ~}}{{#if totalresultat.totalt-rentebeløp}} Dette beløpet er med renter.{{/if}}{{~/inline~}}
+{{~#* inline "varsel-tekst" ~}}
     {{#switch totalresultat.hovedresultat}}
     {{#case "FULL_TILBAKEBETALING"}}
 Vi varslet deg {{varsel.varslet-dato}} om at du har fått utbetalt for mye.
@@ -15,8 +11,20 @@ Vi varslet deg {{varsel.varslet-dato}} om at du har fått {{kroner varsel.varsle
 Vi varslet deg {{varsel.varslet-dato}} om at du har fått {{kroner varsel.varslet-beløp}} for mye. Vi har behandlet saken din og du må ikke betale tilbake det feilutbetalte beløpet.
     {{/case}}
     {{/switch}}
+{{~/inline~}}
+{{#if behandling.er-revurdering}}
+Vi har vurdert saken din om tilbakebetaling på nytt. Derfor gjelder ikke det tidligere vedtaket av {{behandling.original-behandling-dato-fagsakvedtak}} om tilbakebetaling av {{>ytelse-produkt}}.
+    {{#if varsel.varslet-dato }}
+
+{{> varsel-tekst}}
+    {{else if (eq totalresultat.hovedresultat "INGEN_TILBAKEBETALING") }}
+
+Du må ikke betale tilbake det feilutbetalte beløpet.
+    {{/if}}
 {{else}}
-    {{#if (not behandling.er-revurdering)}}
+    {{#if varsel.varslet-dato }}
+{{> varsel-tekst}}
+    {{else}}
 I brev {{sak.dato-fagsakvedtak}} fikk du melding om at {{>ytelse-produkt}} {{#if (eq sak.ytelsetype "ES")}}din{{else}}dine{{/if}} er endret. Endringen gjorde at du har fått utbetalt for mye.{{#if (eq totalresultat.hovedresultat "INGEN_TILBAKEBETALING")}} Du må ikke betale tilbake det du har fått for mye.{{/if}}
     {{/if}}
 {{/if}}
