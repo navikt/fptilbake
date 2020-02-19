@@ -35,7 +35,7 @@
         <prosesstask.version>2.0.0-20200118083448-d87fd6d</prosesstask.version>
         <vl-fpsak-tidsserie.version>2.1-20200123110022-e75fb59</vl-fpsak-tidsserie.version>
         <!-- Kontrakter -->
-        <fpkontrakter.version>5.1_20191210141010_6a7f399</fpkontrakter.version>
+        <fpkontrakter.version>5.1-20200211164354-f6cea52</fpkontrakter.version>
 
 
         <surefire.version>2.21.0</surefire.version>
@@ -281,6 +281,11 @@
                 <artifactId>dokumentproduksjon-klient</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+                <artifactId>fplos-klient</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- Felles biblioteker og sikkerhet -->
             <dependency>
@@ -323,6 +328,11 @@
             <dependency>
                 <groupId>no.nav.foreldrepenger.kontrakter</groupId>
                 <artifactId>fordel-v1</artifactId>
+                <version>${fpkontrakter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.foreldrepenger.kontrakter.topics</groupId>
+                <artifactId>fp-topics-behandlingsprosess</artifactId>
                 <version>${fpkontrakter.version}</version>
             </dependency>
 
