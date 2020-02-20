@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -120,7 +119,6 @@ public class FplosPubliserEventTaskTest {
         assertThat(aksjonpunkterMap.get(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING.getKode())).isEqualTo(AksjonspunktStatus.OPPRETTET.getKode());
         assertThat(aksjonpunkterMap.get(AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING.getKode())).isEqualTo(AksjonspunktStatus.OPPRETTET.getKode());
 
-        assertThat(tilbakebetalingBehandlingProsessEventDto.getBehandlingId()).isEqualTo(behandling.getId());
         assertThat(tilbakebetalingBehandlingProsessEventDto.getEksternId()).isEqualByComparingTo(behandling.getUuid());
         assertThat(tilbakebetalingBehandlingProsessEventDto.getFagsystem()).isEqualByComparingTo(Fagsystem.FPTILBAKE);
         assertThat(tilbakebetalingBehandlingProsessEventDto.getEventHendelse()).isEqualByComparingTo(EventHendelse.AKSJONSPUNKT_OPPRETTET);

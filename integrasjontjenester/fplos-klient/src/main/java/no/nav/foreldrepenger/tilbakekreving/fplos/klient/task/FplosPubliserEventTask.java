@@ -18,6 +18,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FaktaFeilutbetalingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
@@ -64,6 +66,9 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.faktaFeilutbetalingTjeneste = faktaFeilutbetalingTjeneste;
         this.fplosKafkaProducer = fplosKafkaProducer;
+
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.registerModule(new Jdk8Module());
     }
 
     @Override
@@ -73,7 +78,7 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         Kravgrunnlag431 kravgrunnlag431 = grunnlagRepository.finnKravgrunnlag(behandlingId);
         try {
-            fplosKafkaProducer.sendJsonMedNøkkel(String.valueOf(behandlingId), opprettEventJson(behandling, eventName, kravgrunnlag431));
+            fplosKafkaProducer.sendJsonMedNøkkel(behandling.getUuid().toString(), opprettEventJson(behandling, eventName, kravgrunnlag431));
             logger.info("Publiserer event:{} på kafka slik at f.eks fplos kan fordele oppgaven for videre behandling. BehandlingsId: {}", eventName, behandlingId);
         }catch (Exception e){
             throw FplosPubliserEventTaskFeil.FACTORY.kanIkkePublisereFplosEventTilKafka(eventName,e).toException();
@@ -86,7 +91,6 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
     }
 
     public TilbakebetalingBehandlingProsessEventDto getTilbakebetalingBehandlingProsessEventDto(Behandling behandling, String eventName, Kravgrunnlag431 kravgrunnlag431) {
-        Long behandlingId = behandling.getId();
         Fagsak fagsak = behandling.getFagsak();
 
         Map<String, String> aksjonspunktKoderMedStatusListe = new HashMap<>();
@@ -94,7 +98,6 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
             aksjonspunktKoderMedStatusListe.put(aksjonspunkt.getAksjonspunktDefinisjon().getKode(), aksjonspunkt.getStatus().getKode()));
 
         return TilbakebetalingBehandlingProsessEventDto.builder()
-            .medBehandlingId(behandlingId)
             .medBehandlingStatus(behandling.getStatus().getKode())
             .medEksternId(behandling.getUuid())
             .medFagsystem(Fagsystem.FPTILBAKE)
@@ -110,7 +113,7 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
             .medAksjonspunktKoderMedStatusListe(aksjonspunktKoderMedStatusListe)
             .medAnsvarligSaksbehandlerIdent(behandling.getAnsvarligSaksbehandler())
             .medFørsteFeilutbetaling(hentFørsteFeilutbetalingDato(kravgrunnlag431))
-            .medFeilutbetaltBeløp(hentFeilutbetaltBeløp(behandlingId)).build();
+            .medFeilutbetaltBeløp(hentFeilutbetaltBeløp(behandling.getId())).build();
     }
 
     private LocalDate hentFørsteFeilutbetalingDato(Kravgrunnlag431 kravgrunnlag431){

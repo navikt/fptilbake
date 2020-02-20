@@ -16,7 +16,7 @@ public class BehandlingEnhetEventPubliserer {
     private BeanManager beanManager;
 
     BehandlingEnhetEventPubliserer() {
-        //Cyclopedia Drainage Invariant
+        //for CDI proxy
     }
 
     @Inject
@@ -25,9 +25,6 @@ public class BehandlingEnhetEventPubliserer {
     }
 
     public void fireEvent(Behandling behandling) {
-        if (beanManager == null) {
-            return;
-        }
         BehandlingEnhetEvent event = new BehandlingEnhetEvent(behandling);
         beanManager.fireEvent(event, new Annotation[] {});
     }

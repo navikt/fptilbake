@@ -23,21 +23,21 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 
 
 @ApplicationScoped
-public class AksjonspunktEventObserver {
+public class FplosEventObserver {
 
     private ProsessTaskRepository prosessTaskRepository;
     private BehandlingRepository behandlingRepository;
 
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
 
-    AksjonspunktEventObserver() {
+    FplosEventObserver() {
         // for CDI proxy
     }
 
     @Inject
-    public AksjonspunktEventObserver(BehandlingRepository behandlingRepository,
-                                     ProsessTaskRepository prosessTaskRepository,
-                                     BehandlingskontrollTjeneste behandlingskontrollTjeneste) {
+    public FplosEventObserver(BehandlingRepository behandlingRepository,
+                              ProsessTaskRepository prosessTaskRepository,
+                              BehandlingskontrollTjeneste behandlingskontrollTjeneste) {
         this.behandlingRepository = behandlingRepository;
         this.prosessTaskRepository = prosessTaskRepository;
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;

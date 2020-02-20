@@ -39,7 +39,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepositoryImpl;
 
-public class AksjonspunktEventObserverTest {
+public class FplosEventObserverTest {
 
     @Rule
     public UnittestRepositoryRule repositoryRule = new UnittestRepositoryRule();
@@ -54,7 +54,7 @@ public class AksjonspunktEventObserverTest {
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste = new BehandlingskontrollTjenesteImpl(repositoryProvider, mockBehandlingModellRepository,
         mock(BehandlingskontrollEventPubliserer.class));
 
-    private AksjonspunktEventObserver aksjonspunktEventObserver = new AksjonspunktEventObserver(repositoryProvider.getBehandlingRepository(),prosessTaskRepository,behandlingskontrollTjeneste);
+    private FplosEventObserver fplosEventObserver = new FplosEventObserver(repositoryProvider.getBehandlingRepository(),prosessTaskRepository,behandlingskontrollTjeneste);
 
     private InternalManipulerBehandling internalManipulerBehandling = new InternalManipulerBehandlingImpl(repositoryProvider);
 
@@ -75,7 +75,7 @@ public class AksjonspunktEventObserverTest {
         AksjonspunkterFunnetEvent aksjonspunkterFunnetEvent = new AksjonspunkterFunnetEvent(behandlingskontrollKontekst,behandling.getÅpneAksjonspunkter(),
             BehandlingStegType.FAKTA_FEILUTBETALING);
 
-        aksjonspunktEventObserver.observerAksjonpunktFunnetEvent(aksjonspunkterFunnetEvent);
+        fplosEventObserver.observerAksjonpunktFunnetEvent(aksjonspunkterFunnetEvent);
         fellesAssertProsessTask(EventHendelse.AKSJONSPUNKT_OPPRETTET);
     }
 
@@ -88,7 +88,7 @@ public class AksjonspunktEventObserverTest {
         when(mockBehandlingModell.erStegAFørStegB(BehandlingStegType.FAKTA_FEILUTBETALING,BehandlingStegType.FAKTA_FEILUTBETALING)).thenReturn(false);
         internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling,BehandlingStegType.FAKTA_FEILUTBETALING);
 
-        aksjonspunktEventObserver.observerAksjonpunktFunnetEvent(aksjonspunkterFunnetEvent);
+        fplosEventObserver.observerAksjonpunktFunnetEvent(aksjonspunkterFunnetEvent);
         fellesAssertProsessTask(EventHendelse.AKSJONSPUNKT_OPPRETTET);
     }
 
@@ -101,7 +101,7 @@ public class AksjonspunktEventObserverTest {
         when(mockBehandlingModell.erStegAFørStegB(BehandlingStegType.VTILBSTEG,BehandlingStegType.FAKTA_FEILUTBETALING)).thenReturn(false);
         internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling,BehandlingStegType.VTILBSTEG);
 
-        aksjonspunktEventObserver.observerAksjonpunktFunnetEvent(aksjonspunkterFunnetEvent);
+        fplosEventObserver.observerAksjonpunktFunnetEvent(aksjonspunkterFunnetEvent);
         fellesAssertProsessTask(EventHendelse.AKSJONSPUNKT_OPPRETTET);
     }
 
@@ -114,7 +114,7 @@ public class AksjonspunktEventObserverTest {
         when(mockBehandlingModell.erStegAFørStegB(BehandlingStegType.VARSEL,BehandlingStegType.FAKTA_FEILUTBETALING)).thenReturn(true);
         internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling,BehandlingStegType.VARSEL);
 
-        aksjonspunktEventObserver.observerAksjonpunktFunnetEvent(aksjonspunkterFunnetEvent);
+        fplosEventObserver.observerAksjonpunktFunnetEvent(aksjonspunkterFunnetEvent);
         assertThat(prosessTaskRepository.finnIkkeStartet()).isEmpty();
     }
 
@@ -129,7 +129,7 @@ public class AksjonspunktEventObserverTest {
         internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling,BehandlingStegType.VTILBSTEG);
         when(mockBehandlingModell.erStegAFørStegB(BehandlingStegType.FAKTA_FEILUTBETALING,BehandlingStegType.FAKTA_FEILUTBETALING)).thenReturn(false);
 
-        aksjonspunktEventObserver.observerAksjonpunktUtførtEvent(aksjonspunktUtførtEvent);
+        fplosEventObserver.observerAksjonpunktUtførtEvent(aksjonspunktUtførtEvent);
         fellesAssertProsessTask(EventHendelse.AKSJONSPUNKT_UTFØRT);
     }
 
@@ -144,7 +144,7 @@ public class AksjonspunktEventObserverTest {
         internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling,BehandlingStegType.VTILBSTEG);
         when(mockBehandlingModell.erStegAFørStegB(BehandlingStegType.VTILBSTEG,BehandlingStegType.FAKTA_FEILUTBETALING)).thenReturn(false);
 
-        aksjonspunktEventObserver.observerAksjonpunktUtførtEvent(aksjonspunktUtførtEvent);
+        fplosEventObserver.observerAksjonpunktUtførtEvent(aksjonspunktUtførtEvent);
         fellesAssertProsessTask(EventHendelse.AKSJONSPUNKT_UTFØRT);
     }
 
@@ -157,7 +157,7 @@ public class AksjonspunktEventObserverTest {
         internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling,BehandlingStegType.VARSEL);
         when(mockBehandlingModell.erStegAFørStegB(BehandlingStegType.VARSEL,BehandlingStegType.FAKTA_FEILUTBETALING)).thenReturn(true);
 
-        aksjonspunktEventObserver.observerAksjonpunktUtførtEvent(aksjonspunktUtførtEvent);
+        fplosEventObserver.observerAksjonpunktUtførtEvent(aksjonspunktUtførtEvent);
         assertThat(prosessTaskRepository.finnIkkeStartet()).isEmpty();
     }
 
@@ -170,7 +170,7 @@ public class AksjonspunktEventObserverTest {
         internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling,BehandlingStegType.FAKTA_FEILUTBETALING);
         when(mockBehandlingModell.erStegAFørStegB(BehandlingStegType.FAKTA_FEILUTBETALING,BehandlingStegType.FAKTA_FEILUTBETALING)).thenReturn(false);
 
-        aksjonspunktEventObserver.observerAksjonpunktUtførtEvent(aksjonspunktUtførtEvent);
+        fplosEventObserver.observerAksjonpunktUtførtEvent(aksjonspunktUtførtEvent);
         assertThat(prosessTaskRepository.finnIkkeStartet()).isEmpty();
     }
 
@@ -182,7 +182,7 @@ public class AksjonspunktEventObserverTest {
             BehandlingStegType.VTILBSTEG);
         internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling,BehandlingStegType.VTILBSTEG);
 
-        aksjonspunktEventObserver.observerAksjonpunktTilbakeførtEvent(aksjonspunktTilbakeførtEvent);
+        fplosEventObserver.observerAksjonpunktTilbakeførtEvent(aksjonspunktTilbakeførtEvent);
         fellesAssertProsessTask(EventHendelse.AKSJONSPUNKT_TILBAKEFØR);
     }
 
@@ -190,7 +190,7 @@ public class AksjonspunktEventObserverTest {
     public void skal_publisere_data_når_behandling_er_avsluttet(){
         BehandlingStatusEvent behandlingAvsluttetEvent = BehandlingStatusEvent.nyEvent(behandlingskontrollKontekst,BehandlingStatus.AVSLUTTET);
 
-        aksjonspunktEventObserver.observerBehandlingAvsluttetEvent((BehandlingStatusEvent.BehandlingAvsluttetEvent) behandlingAvsluttetEvent);
+        fplosEventObserver.observerBehandlingAvsluttetEvent((BehandlingStatusEvent.BehandlingAvsluttetEvent) behandlingAvsluttetEvent);
         fellesAssertProsessTask(EventHendelse.AKSJONSPUNKT_AVBRUTT);
     }
 
@@ -198,7 +198,7 @@ public class AksjonspunktEventObserverTest {
     public void skal_publisere_data_når_behandling_enhet_er_byttet(){
         BehandlingEnhetEvent behandlingEnhetEvent = new BehandlingEnhetEvent(behandling);
 
-        aksjonspunktEventObserver.observerAksjonspunktHarEndretBehandlendeEnhetEvent(behandlingEnhetEvent);
+        fplosEventObserver.observerAksjonspunktHarEndretBehandlendeEnhetEvent(behandlingEnhetEvent);
         fellesAssertProsessTask(EventHendelse.AKSJONSPUNKT_HAR_ENDRET_BEHANDLENDE_ENHET);
     }
 
