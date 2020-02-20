@@ -2,6 +2,8 @@ package no.nav.foreldrepenger.tilbakekreving.fplos.klient.observer;
 
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType.FAKTA_FEILUTBETALING;
 
+import java.util.Optional;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
@@ -15,6 +17,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.Behandlingskontr
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.prosesstask.UtvidetProsessTaskRepository;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.fplos.klient.task.FplosPubliserEventTask;
 import no.nav.vedtak.felles.integrasjon.kafka.EventHendelse;
@@ -25,6 +28,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 @ApplicationScoped
 public class FplosEventObserver {
 
+    private UtvidetProsessTaskRepository utvidetProsessTaskRepository;
     private ProsessTaskRepository prosessTaskRepository;
     private BehandlingRepository behandlingRepository;
 
@@ -36,9 +40,11 @@ public class FplosEventObserver {
 
     @Inject
     public FplosEventObserver(BehandlingRepository behandlingRepository,
+                              UtvidetProsessTaskRepository utvidetProsessTaskRepository,
                               ProsessTaskRepository prosessTaskRepository,
                               BehandlingskontrollTjeneste behandlingskontrollTjeneste) {
         this.behandlingRepository = behandlingRepository;
+        this.utvidetProsessTaskRepository = utvidetProsessTaskRepository;
         this.prosessTaskRepository = prosessTaskRepository;
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
     }
@@ -47,7 +53,7 @@ public class FplosEventObserver {
         Long behandlingId = event.getBehandlingId();
         for (Aksjonspunkt aksjonspunkt : event.getAksjonspunkter()) {
             if (aksjonspunkt.erManuell() || erBehandlingIFaktaEllerSenereSteg(behandlingId)) {
-                opprettProsessTask(event.getFagsakId(),behandlingId,event.getAktørId(), EventHendelse.AKSJONSPUNKT_OPPRETTET);
+                opprettProsessTask(event.getFagsakId(), behandlingId, event.getAktørId(), EventHendelse.AKSJONSPUNKT_OPPRETTET);
             }
         }
     }
@@ -56,30 +62,36 @@ public class FplosEventObserver {
         Long behandlingId = event.getBehandlingId();
         for (Aksjonspunkt aksjonspunkt : event.getAksjonspunkter()) {
             if (aksjonspunkt.erAutopunkt() && erBehandlingIFaktaEllerSenereSteg(behandlingId)) {
-                opprettProsessTask(event.getFagsakId(),behandlingId,event.getAktørId(), EventHendelse.AKSJONSPUNKT_UTFØRT);
+                opprettProsessTask(event.getFagsakId(), behandlingId, event.getAktørId(), EventHendelse.AKSJONSPUNKT_UTFØRT);
             }
         }
     }
 
     public void observerAksjonpunktTilbakeførtEvent(@Observes AksjonspunktTilbakeførtEvent event) {
-        opprettProsessTask(event.getFagsakId(),event.getBehandlingId(),event.getAktørId(), EventHendelse.AKSJONSPUNKT_TILBAKEFØR);
+        opprettProsessTask(event.getFagsakId(), event.getBehandlingId(), event.getAktørId(), EventHendelse.AKSJONSPUNKT_TILBAKEFØR);
     }
 
     public void observerBehandlingAvsluttetEvent(@Observes BehandlingStatusEvent.BehandlingAvsluttetEvent event) {
-        opprettProsessTask(event.getFagsakId(),event.getBehandlingId(),event.getAktørId(), EventHendelse.AKSJONSPUNKT_AVBRUTT);
+        opprettProsessTask(event.getFagsakId(), event.getBehandlingId(), event.getAktørId(), EventHendelse.AKSJONSPUNKT_AVBRUTT);
     }
 
     public void observerAksjonspunktHarEndretBehandlendeEnhetEvent(@Observes BehandlingEnhetEvent event) {
-        opprettProsessTask(event.getFagsakId(),event.getBehandlingId(),event.getAktørId(), EventHendelse.AKSJONSPUNKT_HAR_ENDRET_BEHANDLENDE_ENHET);
+        opprettProsessTask(event.getFagsakId(), event.getBehandlingId(), event.getAktørId(), EventHendelse.AKSJONSPUNKT_HAR_ENDRET_BEHANDLENDE_ENHET);
     }
 
 
     private void opprettProsessTask(long fagsakId, long behandlingId, AktørId aktørId, EventHendelse eventHendelse) {
+        String gruppe = "los" + behandlingId;
+        Optional<ProsessTaskData> eksisterendeProsessTask = utvidetProsessTaskRepository.finnSisteProsessTaskForProsessTaskGruppe(FplosPubliserEventTask.TASKTYPE, gruppe);
+        long sekvens = eksisterendeProsessTask.isPresent() ? Long.valueOf(eksisterendeProsessTask.get().getSekvens()) + 1 : 1l;
+
         ProsessTaskData taskData = new ProsessTaskData(FplosPubliserEventTask.TASKTYPE);
         taskData.setCallIdFraEksisterende();
         taskData.setPrioritet(50);
         taskData.setProperty(FplosPubliserEventTask.PROPERTY_EVENT_NAME, eventHendelse.name());
         taskData.setBehandling(fagsakId, behandlingId, aktørId.getId());
+        taskData.setGruppe(gruppe);
+        taskData.setSekvens(String.valueOf(sekvens));
 
         prosessTaskRepository.lagre(taskData);
     }

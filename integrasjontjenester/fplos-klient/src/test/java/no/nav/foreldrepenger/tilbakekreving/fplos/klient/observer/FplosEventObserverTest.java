@@ -31,6 +31,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Internal
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProviderImpl;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.prosesstask.UtvidetProsessTaskRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.fplos.klient.task.FplosPubliserEventTask;
@@ -47,14 +48,15 @@ public class FplosEventObserverTest {
     private BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProviderImpl(repositoryRule.getEntityManager());
     private AksjonspunktRepository aksjonspunktRepository = repositoryProvider.getAksjonspunktRepository();
 
-    private ProsessTaskRepository prosessTaskRepository = new ProsessTaskRepositoryImpl(repositoryRule.getEntityManager(),null,null);
+    private UtvidetProsessTaskRepository utvidetProsessTaskRepository = new UtvidetProsessTaskRepository(repositoryRule.getEntityManager());
+    private ProsessTaskRepository prosessTaskRepository = new ProsessTaskRepositoryImpl(repositoryRule.getEntityManager(), null, null);
 
-    private BehandlingModellRepository mockBehandlingModellRepository =  mock(BehandlingModellRepository.class);
+    private BehandlingModellRepository mockBehandlingModellRepository = mock(BehandlingModellRepository.class);
     private BehandlingModell mockBehandlingModell = mock(BehandlingModell.class);
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste = new BehandlingskontrollTjenesteImpl(repositoryProvider, mockBehandlingModellRepository,
         mock(BehandlingskontrollEventPubliserer.class));
 
-    private FplosEventObserver fplosEventObserver = new FplosEventObserver(repositoryProvider.getBehandlingRepository(),prosessTaskRepository,behandlingskontrollTjeneste);
+    private FplosEventObserver fplosEventObserver = new FplosEventObserver(repositoryProvider.getBehandlingRepository(), utvidetProsessTaskRepository, prosessTaskRepository, behandlingskontrollTjeneste);
 
     private InternalManipulerBehandling internalManipulerBehandling = new InternalManipulerBehandlingImpl(repositoryProvider);
 
@@ -62,17 +64,17 @@ public class FplosEventObserverTest {
     private BehandlingskontrollKontekst behandlingskontrollKontekst;
 
     @Before
-    public void setup(){
+    public void setup() {
         behandling = ScenarioSimple.simple().lagre(repositoryProvider);
         behandlingskontrollKontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandling);
         when(mockBehandlingModellRepository.getModell(BehandlingType.TILBAKEKREVING)).thenReturn(mockBehandlingModell);
     }
 
     @Test
-    public void skal_publisere_data_når_manuell_aksjonspunkt_er_oppretttet(){
+    public void skal_publisere_data_når_manuell_aksjonspunkt_er_oppretttet() {
         aksjonspunktRepository.leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING,
             BehandlingStegType.FAKTA_FEILUTBETALING);
-        AksjonspunkterFunnetEvent aksjonspunkterFunnetEvent = new AksjonspunkterFunnetEvent(behandlingskontrollKontekst,behandling.getÅpneAksjonspunkter(),
+        AksjonspunkterFunnetEvent aksjonspunkterFunnetEvent = new AksjonspunkterFunnetEvent(behandlingskontrollKontekst, behandling.getÅpneAksjonspunkter(),
             BehandlingStegType.FAKTA_FEILUTBETALING);
 
         fplosEventObserver.observerAksjonpunktFunnetEvent(aksjonspunkterFunnetEvent);
@@ -80,122 +82,122 @@ public class FplosEventObserverTest {
     }
 
     @Test
-    public void skal_publisere_data_for_autopunkter_når_behandling_er_i_fakta_steg(){
+    public void skal_publisere_data_for_autopunkter_når_behandling_er_i_fakta_steg() {
         aksjonspunktRepository.leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING,
             BehandlingStegType.VARSEL);
-        AksjonspunkterFunnetEvent aksjonspunkterFunnetEvent = new AksjonspunkterFunnetEvent(behandlingskontrollKontekst,behandling.getÅpneAksjonspunkter(),
+        AksjonspunkterFunnetEvent aksjonspunkterFunnetEvent = new AksjonspunkterFunnetEvent(behandlingskontrollKontekst, behandling.getÅpneAksjonspunkter(),
             BehandlingStegType.FAKTA_FEILUTBETALING);
-        when(mockBehandlingModell.erStegAFørStegB(BehandlingStegType.FAKTA_FEILUTBETALING,BehandlingStegType.FAKTA_FEILUTBETALING)).thenReturn(false);
-        internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling,BehandlingStegType.FAKTA_FEILUTBETALING);
+        when(mockBehandlingModell.erStegAFørStegB(BehandlingStegType.FAKTA_FEILUTBETALING, BehandlingStegType.FAKTA_FEILUTBETALING)).thenReturn(false);
+        internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.FAKTA_FEILUTBETALING);
 
         fplosEventObserver.observerAksjonpunktFunnetEvent(aksjonspunkterFunnetEvent);
         fellesAssertProsessTask(EventHendelse.AKSJONSPUNKT_OPPRETTET);
     }
 
     @Test
-    public void skal_publisere_data_for_autopunkter_når_behandling_er_i_vilkår_steg(){
+    public void skal_publisere_data_for_autopunkter_når_behandling_er_i_vilkår_steg() {
         aksjonspunktRepository.leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING,
             BehandlingStegType.VARSEL);
-        AksjonspunkterFunnetEvent aksjonspunkterFunnetEvent = new AksjonspunkterFunnetEvent(behandlingskontrollKontekst,behandling.getÅpneAksjonspunkter(),
+        AksjonspunkterFunnetEvent aksjonspunkterFunnetEvent = new AksjonspunkterFunnetEvent(behandlingskontrollKontekst, behandling.getÅpneAksjonspunkter(),
             BehandlingStegType.VTILBSTEG);
-        when(mockBehandlingModell.erStegAFørStegB(BehandlingStegType.VTILBSTEG,BehandlingStegType.FAKTA_FEILUTBETALING)).thenReturn(false);
-        internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling,BehandlingStegType.VTILBSTEG);
+        when(mockBehandlingModell.erStegAFørStegB(BehandlingStegType.VTILBSTEG, BehandlingStegType.FAKTA_FEILUTBETALING)).thenReturn(false);
+        internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VTILBSTEG);
 
         fplosEventObserver.observerAksjonpunktFunnetEvent(aksjonspunkterFunnetEvent);
         fellesAssertProsessTask(EventHendelse.AKSJONSPUNKT_OPPRETTET);
     }
 
     @Test
-    public void skal_ikke_publisere_data_for_autopunkter_når_behandling_er_før_fakta_steg(){
+    public void skal_ikke_publisere_data_for_autopunkter_når_behandling_er_før_fakta_steg() {
         aksjonspunktRepository.leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING,
             BehandlingStegType.VARSEL);
-        AksjonspunkterFunnetEvent aksjonspunkterFunnetEvent = new AksjonspunkterFunnetEvent(behandlingskontrollKontekst,behandling.getÅpneAksjonspunkter(),
+        AksjonspunkterFunnetEvent aksjonspunkterFunnetEvent = new AksjonspunkterFunnetEvent(behandlingskontrollKontekst, behandling.getÅpneAksjonspunkter(),
             BehandlingStegType.VARSEL);
-        when(mockBehandlingModell.erStegAFørStegB(BehandlingStegType.VARSEL,BehandlingStegType.FAKTA_FEILUTBETALING)).thenReturn(true);
-        internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling,BehandlingStegType.VARSEL);
+        when(mockBehandlingModell.erStegAFørStegB(BehandlingStegType.VARSEL, BehandlingStegType.FAKTA_FEILUTBETALING)).thenReturn(true);
+        internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VARSEL);
 
         fplosEventObserver.observerAksjonpunktFunnetEvent(aksjonspunkterFunnetEvent);
         assertThat(prosessTaskRepository.finnIkkeStartet()).isEmpty();
     }
 
     @Test
-    public void skal_publisere_data_når_autopunkter_er_utført_og_behandling_er_i_fakta_steg(){
+    public void skal_publisere_data_når_autopunkter_er_utført_og_behandling_er_i_fakta_steg() {
         aksjonspunktRepository.leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING,
             BehandlingStegType.FAKTA_FEILUTBETALING);
         aksjonspunktRepository.leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING,
             BehandlingStegType.VARSEL);
-        AksjonspunktUtførtEvent aksjonspunktUtførtEvent = new AksjonspunktUtførtEvent(behandlingskontrollKontekst,behandling.getÅpneAksjonspunkter(),
+        AksjonspunktUtførtEvent aksjonspunktUtførtEvent = new AksjonspunktUtførtEvent(behandlingskontrollKontekst, behandling.getÅpneAksjonspunkter(),
             BehandlingStegType.FAKTA_FEILUTBETALING);
-        internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling,BehandlingStegType.VTILBSTEG);
-        when(mockBehandlingModell.erStegAFørStegB(BehandlingStegType.FAKTA_FEILUTBETALING,BehandlingStegType.FAKTA_FEILUTBETALING)).thenReturn(false);
+        internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VTILBSTEG);
+        when(mockBehandlingModell.erStegAFørStegB(BehandlingStegType.FAKTA_FEILUTBETALING, BehandlingStegType.FAKTA_FEILUTBETALING)).thenReturn(false);
 
         fplosEventObserver.observerAksjonpunktUtførtEvent(aksjonspunktUtførtEvent);
         fellesAssertProsessTask(EventHendelse.AKSJONSPUNKT_UTFØRT);
     }
 
     @Test
-    public void skal_publisere_data_når_autopunkter_er_utført_og_behandling_er_forbi_fakta_steg(){
+    public void skal_publisere_data_når_autopunkter_er_utført_og_behandling_er_forbi_fakta_steg() {
         aksjonspunktRepository.leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.VURDER_TILBAKEKREVING,
             BehandlingStegType.VTILBSTEG);
         aksjonspunktRepository.leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING,
             BehandlingStegType.VARSEL);
-        AksjonspunktUtførtEvent aksjonspunktUtførtEvent = new AksjonspunktUtførtEvent(behandlingskontrollKontekst,behandling.getÅpneAksjonspunkter(),
+        AksjonspunktUtførtEvent aksjonspunktUtførtEvent = new AksjonspunktUtførtEvent(behandlingskontrollKontekst, behandling.getÅpneAksjonspunkter(),
             BehandlingStegType.VTILBSTEG);
-        internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling,BehandlingStegType.VTILBSTEG);
-        when(mockBehandlingModell.erStegAFørStegB(BehandlingStegType.VTILBSTEG,BehandlingStegType.FAKTA_FEILUTBETALING)).thenReturn(false);
+        internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VTILBSTEG);
+        when(mockBehandlingModell.erStegAFørStegB(BehandlingStegType.VTILBSTEG, BehandlingStegType.FAKTA_FEILUTBETALING)).thenReturn(false);
 
         fplosEventObserver.observerAksjonpunktUtførtEvent(aksjonspunktUtførtEvent);
         fellesAssertProsessTask(EventHendelse.AKSJONSPUNKT_UTFØRT);
     }
 
     @Test
-    public void skal_ikke_publisere_data_når_autopunkter_er_utført_og_behandling_er_før_fakta_steg(){
+    public void skal_ikke_publisere_data_når_autopunkter_er_utført_og_behandling_er_før_fakta_steg() {
         aksjonspunktRepository.leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING,
             BehandlingStegType.VARSEL);
-        AksjonspunktUtførtEvent aksjonspunktUtførtEvent = new AksjonspunktUtførtEvent(behandlingskontrollKontekst,behandling.getÅpneAksjonspunkter(),
+        AksjonspunktUtførtEvent aksjonspunktUtførtEvent = new AksjonspunktUtførtEvent(behandlingskontrollKontekst, behandling.getÅpneAksjonspunkter(),
             BehandlingStegType.VARSEL);
-        internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling,BehandlingStegType.VARSEL);
-        when(mockBehandlingModell.erStegAFørStegB(BehandlingStegType.VARSEL,BehandlingStegType.FAKTA_FEILUTBETALING)).thenReturn(true);
+        internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VARSEL);
+        when(mockBehandlingModell.erStegAFørStegB(BehandlingStegType.VARSEL, BehandlingStegType.FAKTA_FEILUTBETALING)).thenReturn(true);
 
         fplosEventObserver.observerAksjonpunktUtførtEvent(aksjonspunktUtførtEvent);
         assertThat(prosessTaskRepository.finnIkkeStartet()).isEmpty();
     }
 
     @Test
-    public void skal_ikke_publisere_data_når_manuell_aksjonspunkter_er_utført_og_behandling_er_i_fakta_steg(){
+    public void skal_ikke_publisere_data_når_manuell_aksjonspunkter_er_utført_og_behandling_er_i_fakta_steg() {
         aksjonspunktRepository.leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING,
             BehandlingStegType.FAKTA_FEILUTBETALING);
-        AksjonspunktUtførtEvent aksjonspunktUtførtEvent = new AksjonspunktUtførtEvent(behandlingskontrollKontekst,behandling.getÅpneAksjonspunkter(),
+        AksjonspunktUtførtEvent aksjonspunktUtførtEvent = new AksjonspunktUtførtEvent(behandlingskontrollKontekst, behandling.getÅpneAksjonspunkter(),
             BehandlingStegType.FAKTA_FEILUTBETALING);
-        internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling,BehandlingStegType.FAKTA_FEILUTBETALING);
-        when(mockBehandlingModell.erStegAFørStegB(BehandlingStegType.FAKTA_FEILUTBETALING,BehandlingStegType.FAKTA_FEILUTBETALING)).thenReturn(false);
+        internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.FAKTA_FEILUTBETALING);
+        when(mockBehandlingModell.erStegAFørStegB(BehandlingStegType.FAKTA_FEILUTBETALING, BehandlingStegType.FAKTA_FEILUTBETALING)).thenReturn(false);
 
         fplosEventObserver.observerAksjonpunktUtførtEvent(aksjonspunktUtførtEvent);
         assertThat(prosessTaskRepository.finnIkkeStartet()).isEmpty();
     }
 
     @Test
-    public void skal_publisere_data_når_behandling_er_tilbakeført_til_fakta_steg(){
+    public void skal_publisere_data_når_behandling_er_tilbakeført_til_fakta_steg() {
         aksjonspunktRepository.leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING,
             BehandlingStegType.FAKTA_FEILUTBETALING);
-        AksjonspunktTilbakeførtEvent aksjonspunktTilbakeførtEvent = new AksjonspunktTilbakeførtEvent(behandlingskontrollKontekst,behandling.getÅpneAksjonspunkter(),
+        AksjonspunktTilbakeførtEvent aksjonspunktTilbakeførtEvent = new AksjonspunktTilbakeførtEvent(behandlingskontrollKontekst, behandling.getÅpneAksjonspunkter(),
             BehandlingStegType.VTILBSTEG);
-        internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling,BehandlingStegType.VTILBSTEG);
+        internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VTILBSTEG);
 
         fplosEventObserver.observerAksjonpunktTilbakeførtEvent(aksjonspunktTilbakeførtEvent);
         fellesAssertProsessTask(EventHendelse.AKSJONSPUNKT_TILBAKEFØR);
     }
 
     @Test
-    public void skal_publisere_data_når_behandling_er_avsluttet(){
-        BehandlingStatusEvent behandlingAvsluttetEvent = BehandlingStatusEvent.nyEvent(behandlingskontrollKontekst,BehandlingStatus.AVSLUTTET);
+    public void skal_publisere_data_når_behandling_er_avsluttet() {
+        BehandlingStatusEvent behandlingAvsluttetEvent = BehandlingStatusEvent.nyEvent(behandlingskontrollKontekst, BehandlingStatus.AVSLUTTET);
 
         fplosEventObserver.observerBehandlingAvsluttetEvent((BehandlingStatusEvent.BehandlingAvsluttetEvent) behandlingAvsluttetEvent);
         fellesAssertProsessTask(EventHendelse.AKSJONSPUNKT_AVBRUTT);
     }
 
     @Test
-    public void skal_publisere_data_når_behandling_enhet_er_byttet(){
+    public void skal_publisere_data_når_behandling_enhet_er_byttet() {
         BehandlingEnhetEvent behandlingEnhetEvent = new BehandlingEnhetEvent(behandling);
 
         fplosEventObserver.observerAksjonspunktHarEndretBehandlendeEnhetEvent(behandlingEnhetEvent);
