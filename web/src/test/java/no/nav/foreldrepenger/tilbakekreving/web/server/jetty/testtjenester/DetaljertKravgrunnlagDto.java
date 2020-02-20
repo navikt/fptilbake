@@ -45,7 +45,7 @@ public class DetaljertKravgrunnlagDto implements AbacDto {
 
     private LocalDate vedtakFagSystemDato;
 
-    @Min(1)
+    @Min(0)
     @Max(Long.MAX_VALUE)
     private Long omgjortVedtakId;
 
