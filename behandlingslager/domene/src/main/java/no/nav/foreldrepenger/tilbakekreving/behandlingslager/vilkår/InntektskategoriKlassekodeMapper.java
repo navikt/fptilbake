@@ -26,6 +26,7 @@ import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.K
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode.FPSVSNDFI;
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode.FPSVSNDJB_OP;
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode.FPSVSND_OP;
+import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode.KL_KODE_FEIL_REFUTG;
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Inntektskategori.ADOPSJON_ES;
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Inntektskategori.ARBEIDSLEDIG;
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Inntektskategori.ARBEIDSTAKER;

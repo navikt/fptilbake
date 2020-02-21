@@ -7,6 +7,7 @@ import javax.inject.Inject;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TpsAdapterWrapper;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
@@ -92,7 +93,7 @@ public class KravgrunnlagMapper {
         KlasseType type = map(dto.getTypeKlasse());
         return KravgrunnlagBelop433.builder()
             .medKlasseType(type)
-            .medKlasseKode(dto.getKodeKlasse())
+            .medKlasseKode(KlasseKode.fraKode(dto.getKodeKlasse()))
             .medOpprUtbetBelop(dto.getBelopOpprUtbet())
             .medNyBelop(dto.getBelopNy())
             .medTilbakekrevesBelop(dto.getBelopTilbakekreves())
