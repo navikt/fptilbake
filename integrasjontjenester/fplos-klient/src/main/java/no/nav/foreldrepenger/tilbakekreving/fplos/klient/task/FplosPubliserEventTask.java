@@ -37,6 +37,7 @@ import no.nav.vedtak.felles.integrasjon.kafka.TilbakebetalingBehandlingProsessEv
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
+import no.nav.vedtak.util.StringUtils;
 
 @ApplicationScoped
 @ProsessTask(FplosPubliserEventTask.TASKTYPE)
@@ -54,14 +55,14 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
     private FplosKafkaProducer fplosKafkaProducer;
     private ObjectMapper objectMapper = new ObjectMapper();
 
-    FplosPubliserEventTask(){
+    FplosPubliserEventTask() {
         // for CDI proxy
     }
 
     @Inject
     public FplosPubliserEventTask(BehandlingRepositoryProvider repositoryProvider,
                                   FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste,
-                                  FplosKafkaProducer fplosKafkaProducer){
+                                  FplosKafkaProducer fplosKafkaProducer) {
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.faktaFeilutbetalingTjeneste = faktaFeilutbetalingTjeneste;
@@ -80,14 +81,16 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
         try {
             fplosKafkaProducer.sendJsonMedNøkkel(behandling.getUuid().toString(), opprettEventJson(behandling, eventName, kravgrunnlag431));
             logger.info("Publiserer event:{} på kafka slik at f.eks fplos kan fordele oppgaven for videre behandling. BehandlingsId: {}", eventName, behandlingId);
-        }catch (Exception e){
-            throw FplosPubliserEventTaskFeil.FACTORY.kanIkkePublisereFplosEventTilKafka(eventName,e).toException();
+        } catch (Exception e) {
+            throw FplosPubliserEventTaskFeil.FACTORY.kanIkkePublisereFplosEventTilKafka(eventName, e).toException();
         }
     }
 
     private String opprettEventJson(Behandling behandling, String eventName, Kravgrunnlag431 kravgrunnlag431) throws IOException {
         TilbakebetalingBehandlingProsessEventDto behandlingProsessEventDto = getTilbakebetalingBehandlingProsessEventDto(behandling, eventName, kravgrunnlag431);
-        return getJson(behandlingProsessEventDto);
+        String jsonData = getJson(behandlingProsessEventDto);
+        logger.debug("Publiserer json data {} til Fplos for behandlingId={}", jsonData, behandling.getId());
+        return jsonData;
     }
 
     public TilbakebetalingBehandlingProsessEventDto getTilbakebetalingBehandlingProsessEventDto(Behandling behandling, String eventName, Kravgrunnlag431 kravgrunnlag431) {
@@ -111,18 +114,18 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
             .medOpprettetBehandling(behandling.getOpprettetTidspunkt())
             .medYtelseTypeKode(fagsak.getFagsakYtelseType().getKode())
             .medAksjonspunktKoderMedStatusListe(aksjonspunktKoderMedStatusListe)
-            .medAnsvarligSaksbehandlerIdent(behandling.getAnsvarligSaksbehandler())
+            .medAnsvarligSaksbehandlerIdent(behandling.getAnsvarligBeslutter())
             .medFørsteFeilutbetaling(hentFørsteFeilutbetalingDato(kravgrunnlag431))
             .medFeilutbetaltBeløp(hentFeilutbetaltBeløp(behandling.getId())).build();
     }
 
-    private LocalDate hentFørsteFeilutbetalingDato(Kravgrunnlag431 kravgrunnlag431){
+    private LocalDate hentFørsteFeilutbetalingDato(Kravgrunnlag431 kravgrunnlag431) {
         Optional<KravgrunnlagPeriode432> førstePeriode = kravgrunnlag431.getPerioder().stream()
             .min(Comparator.comparing(KravgrunnlagPeriode432::getFom));
         return førstePeriode.map(KravgrunnlagPeriode432::getFom).orElse(null);
     }
 
-    private BigDecimal hentFeilutbetaltBeløp(Long behandlingId){
+    private BigDecimal hentFeilutbetaltBeløp(Long behandlingId) {
         return faktaFeilutbetalingTjeneste.hentBehandlingFeilutbetalingFakta(behandlingId).getAktuellFeilUtbetaltBeløp();
     }
 

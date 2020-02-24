@@ -8,13 +8,18 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.AksjonspunktTilbakeførtEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.AksjonspunktUtførtEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.AksjonspunkterFunnetEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingEnhetEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStatusEvent;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.prosesstask.UtvidetProsessTaskRepository;
@@ -27,6 +32,8 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 
 @ApplicationScoped
 public class FplosEventObserver {
+
+    private static final Logger logger = LoggerFactory.getLogger(FplosEventObserver.class);
 
     private UtvidetProsessTaskRepository utvidetProsessTaskRepository;
     private ProsessTaskRepository prosessTaskRepository;
@@ -53,6 +60,7 @@ public class FplosEventObserver {
         Long behandlingId = event.getBehandlingId();
         for (Aksjonspunkt aksjonspunkt : event.getAksjonspunkter()) {
             if (aksjonspunkt.erManuell() || erBehandlingIFaktaEllerSenereSteg(behandlingId)) {
+                logger.info("Oppretter prosess task for å publisere event={} til fplos for aksjonspunkt={}", EventHendelse.AKSJONSPUNKT_OPPRETTET, aksjonspunkt.getAksjonspunktDefinisjon().getKode());
                 opprettProsessTask(event.getFagsakId(), behandlingId, event.getAktørId(), EventHendelse.AKSJONSPUNKT_OPPRETTET);
             }
         }
@@ -62,12 +70,14 @@ public class FplosEventObserver {
         Long behandlingId = event.getBehandlingId();
         for (Aksjonspunkt aksjonspunkt : event.getAksjonspunkter()) {
             if (aksjonspunkt.erAutopunkt() && erBehandlingIFaktaEllerSenereSteg(behandlingId)) {
+                logger.info("Oppretter prosess task for å publisere event={} til fplos for aksjonspunkt={}", EventHendelse.AKSJONSPUNKT_UTFØRT, aksjonspunkt.getAksjonspunktDefinisjon().getKode());
                 opprettProsessTask(event.getFagsakId(), behandlingId, event.getAktørId(), EventHendelse.AKSJONSPUNKT_UTFØRT);
             }
         }
     }
 
     public void observerAksjonpunktTilbakeførtEvent(@Observes AksjonspunktTilbakeførtEvent event) {
+        logger.info("Oppretter prosess task for å publisere event={} til fplos for aksjonspunkt={}", EventHendelse.AKSJONSPUNKT_TILBAKEFØR, event.getAksjonspunkter().get(0).getAksjonspunktDefinisjon().getKode());
         opprettProsessTask(event.getFagsakId(), event.getBehandlingId(), event.getAktørId(), EventHendelse.AKSJONSPUNKT_TILBAKEFØR);
     }
 
@@ -77,6 +87,12 @@ public class FplosEventObserver {
 
     public void observerAksjonspunktHarEndretBehandlendeEnhetEvent(@Observes BehandlingEnhetEvent event) {
         opprettProsessTask(event.getFagsakId(), event.getBehandlingId(), event.getAktørId(), EventHendelse.AKSJONSPUNKT_HAR_ENDRET_BEHANDLENDE_ENHET);
+    }
+
+    public void observerStoppetEvent(@Observes BehandlingskontrollEvent.StoppetEvent event) {
+        if (event.getStegStatus().equals(BehandlingStegStatus.INNGANG)) {
+            opprettProsessTask(event.getFagsakId(), event.getBehandlingId(), event.getAktørId(), EventHendelse.BEHANDLINGSKONTROLL_EVENT);
+        }
     }
 
 
