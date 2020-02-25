@@ -37,7 +37,6 @@ import no.nav.vedtak.felles.integrasjon.kafka.TilbakebetalingBehandlingProsessEv
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
-import no.nav.vedtak.util.StringUtils;
 
 @ApplicationScoped
 @ProsessTask(FplosPubliserEventTask.TASKTYPE)
@@ -46,6 +45,7 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
 
     public static final String TASKTYPE = "fplos.oppgavebehandling.PubliserEvent";
     public static final String PROPERTY_EVENT_NAME = "eventName";
+    public static final String DEFAULT_HREF = "/fpsak/fagsak/%s/behandling/%s/?punkt=default&fakta=default";
 
     private static final Logger logger = LoggerFactory.getLogger(FplosPubliserEventTask.class);
 
@@ -95,6 +95,7 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
 
     public TilbakebetalingBehandlingProsessEventDto getTilbakebetalingBehandlingProsessEventDto(Behandling behandling, String eventName, Kravgrunnlag431 kravgrunnlag431) {
         Fagsak fagsak = behandling.getFagsak();
+        String saksnummer = fagsak.getSaksnummer().getVerdi();
 
         Map<String, String> aksjonspunktKoderMedStatusListe = new HashMap<>();
         behandling.getAksjonspunkter().forEach(aksjonspunkt ->
@@ -104,7 +105,7 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
             .medBehandlingStatus(behandling.getStatus().getKode())
             .medEksternId(behandling.getUuid())
             .medFagsystem(Fagsystem.FPTILBAKE)
-            .medSaksnummer(fagsak.getSaksnummer().getVerdi())
+            .medSaksnummer(saksnummer)
             .medAktørId(behandling.getAktørId().getId())
             .medBehandlingSteg(behandling.getAktivtBehandlingSteg() == null ? null : behandling.getAktivtBehandlingSteg().getKode())
             .medBehandlingTypeKode(behandling.getType().getKode())
@@ -114,6 +115,7 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
             .medOpprettetBehandling(behandling.getOpprettetTidspunkt())
             .medYtelseTypeKode(fagsak.getFagsakYtelseType().getKode())
             .medAksjonspunktKoderMedStatusListe(aksjonspunktKoderMedStatusListe)
+            .medHref(String.format(DEFAULT_HREF,saksnummer,behandling.getId()))
             .medAnsvarligSaksbehandlerIdent(behandling.getAnsvarligBeslutter())
             .medFørsteFeilutbetaling(hentFørsteFeilutbetalingDato(kravgrunnlag431))
             .medFeilutbetaltBeløp(hentFeilutbetaltBeløp(behandling.getId())).build();

@@ -35,7 +35,7 @@
         <prosesstask.version>2.0.0-20200118083448-d87fd6d</prosesstask.version>
         <vl-fpsak-tidsserie.version>2.1-20200123110022-e75fb59</vl-fpsak-tidsserie.version>
         <!-- Kontrakter -->
-        <fpkontrakter.version>5.1-20200211164354-f6cea52</fpkontrakter.version>
+        <fpkontrakter.version>5.1-20200225123631-afeacc4</fpkontrakter.version>
 
 
         <surefire.version>2.21.0</surefire.version>
