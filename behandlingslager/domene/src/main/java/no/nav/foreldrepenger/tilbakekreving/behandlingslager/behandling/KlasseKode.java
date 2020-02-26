@@ -23,8 +23,6 @@ public class KlasseKode extends Kodeliste {
     public static final KlasseKode FPATFER = new KlasseKode("FPATFER");
     public static final KlasseKode FPATFRI = new KlasseKode("FPATFRI");
     public static final KlasseKode FPATORD = new KlasseKode("FPATORD");
-    public static final KlasseKode FPENAD_OP = new KlasseKode("FPENAD-OP");
-    public static final KlasseKode FPENFOD_OP = new KlasseKode("FPENFOD-OP");
     public static final KlasseKode FPREFAGFER_IOP = new KlasseKode("FPREFAGFER-IOP");
     public static final KlasseKode FPREFAG_IOP = new KlasseKode("FPREFAG-IOP");
     public static final KlasseKode FPSNDDM_OP = new KlasseKode("FPSNDDM-OP");
@@ -45,6 +43,11 @@ public class KlasseKode extends Kodeliste {
     public static final KlasseKode FPADSNDJB_OP = new KlasseKode("FPADSNDJB-OP");
     public static final KlasseKode FPADSNDFI = new KlasseKode("FPADSNDFI");
     public static final KlasseKode FPATSJO = new KlasseKode("FPATSJO");
+
+    //ES klassekoder
+    public static final KlasseKode FPENAD_OP = new KlasseKode("FPENAD-OP");
+    public static final KlasseKode FPENFOD_OP = new KlasseKode("FPENFOD-OP");
+    public static final KlasseKode KL_KODE_FEIL_REFUTG = new KlasseKode("KL_KODE_FEIL_REFUTG");
 
     //SVP klassekoder
     public static final KlasseKode FPSVATORD = new KlasseKode("FPSVATORD");
@@ -68,6 +71,7 @@ public class KlasseKode extends Kodeliste {
         TILGJENGELIGE.put(FPATORD.getKode(), FPATORD);
         TILGJENGELIGE.put(FPENAD_OP.getKode(), FPENAD_OP);
         TILGJENGELIGE.put(FPENFOD_OP.getKode(), FPENFOD_OP);
+        TILGJENGELIGE.put(KL_KODE_FEIL_REFUTG.getKode(), KL_KODE_FEIL_REFUTG);
         TILGJENGELIGE.put(FPREFAGFER_IOP.getKode(), FPREFAGFER_IOP);
         TILGJENGELIGE.put(FPREFAG_IOP.getKode(), FPREFAG_IOP);
         TILGJENGELIGE.put(FPSNDDM_OP.getKode(), FPSNDDM_OP);
