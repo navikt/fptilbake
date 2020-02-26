@@ -59,12 +59,14 @@ public class FellesQueriesForBehandlingRepositories {
         TypedQuery<Behandling> query = entityManager.createQuery(
             "select b" +
                 " from Behandling b" +
-                " inner join Aksjonspunkt ap on ap.behandling.id = b.id" +
-                " where ap.status.kode = :åpneAksjonspunktKoder" +
-                " and ap.reaktiveringStatus.kode = :reaktiverkode" +
-                " and ap.aksjonspunktDefinisjon.aksjonspunktType.kode = :autopunktkode" +
-                " and ap.aksjonspunktDefinisjon.kode in (:køetKode)" +
-                " and b.id = :behandlingId",
+                " where b.id = :behandlingId " +
+                " and exists (select 1 from Aksjonspunkt ap " +
+                "             where ap.behandling = b " +
+                "             and ap.status.kode = :åpneAksjonspunktKoder" +
+                "             and ap.reaktiveringStatus.kode = :reaktiverkode" +
+                "             and ap.aksjonspunktDefinisjon.aksjonspunktType.kode = :autopunktkode" +
+                "             and ap.aksjonspunktDefinisjon.kode in (:køetKode)" +
+                "            )",
             Behandling.class);
 
         setParametre(query, aksjonspunktDefinisjoner);

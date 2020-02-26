@@ -81,6 +81,20 @@ public class BehandlingVenterRepositoryImplTest {
         assertThat(resultat2).isNotPresent();
     }
 
+    @Test
+    public void test_skalHenteBehandlingHvisVenterPåØkonomiGrunnlagOgPåBrukerSamtidig() {
+        Behandling behandling = opprettBehandling("325235", "5235235", BehandlingType.TILBAKEKREVING);
+
+        Long behandlingId = behandling.getId();
+
+        settVenterPåTilbakekrevinggrunnlag(behandling);
+        settVenterPåBrukerRespons(behandling, LocalDateTime.now().plusWeeks(2));
+
+        Optional<Behandling> resultat = repository.hentBehandlingPåVent(behandlingId);
+        assertThat(resultat).isPresent();
+        assertThat(resultat).contains(behandling);
+    }
+
     private Long lagreBehandling(Behandling behandling) {
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
         return behandlingRepository.lagre(behandling, lås);
