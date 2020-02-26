@@ -133,11 +133,11 @@ spec:
     - name: TILBAKEKREVING_BRUKERDIALOG_HENDELSE_V1_TOPIC_URL
       value: tilbakekreving_brukerdialog_hendelse_v1_topic.url
     - name: TILBAKEKREVING_FPLOS_HENDELSE_V1_TOPIC_URL
-      value: kafka.fplos.topic.url
+      value: kafka_fplos.topic
     - name: TILBAKEKREVING_FPLOS_HENDELSE_V1_CLIENT_ID
-      value: kafka.fplos.client.id
+      value: kafka_fplos_client.id
     - name: TILBAKEKREVING_FPLOS_HENDELSE_V1_REGISTRY_URL
-      value: kafka.fplos.schema.registry.url
+      value: kafka_fplos_schema_registry.url
 
 
 
