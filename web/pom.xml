@@ -133,6 +133,10 @@
             <artifactId>domenetjenester-bom</artifactId>
         </dependency>
         <dependency>
+            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+            <artifactId>fplos-klient</artifactId>
+        </dependency>
+        <dependency>
             <groupId>no.nav.foreldrepenger.felles.sikkerhet</groupId>
             <artifactId>felles-sikkerhet</artifactId>
         </dependency>
@@ -168,7 +172,6 @@
             <groupId>no.nav.foreldrepenger.felles.integrasjon</groupId>
             <artifactId>ldap-klient</artifactId>
         </dependency>
-
         <!-- CDI -->
         <dependency>
             <groupId>javax.servlet</groupId>

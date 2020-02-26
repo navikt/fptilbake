@@ -25,6 +25,7 @@
         <module>person</module>
         <module>pdfgen</module>
         <module>simulering</module>
+        <module>fplos-klient</module>
     </modules>
 
 </project>

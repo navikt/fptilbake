@@ -1,12 +1,14 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 import java.util.List;
 
 import org.junit.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingEnhetEventPubliserer;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.OrganisasjonsEnhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
@@ -17,7 +19,8 @@ public class BehandlendeEnhetTest extends FellesTestOppsett {
 
     private static final String NY_ENHET_ID = "4849";
     private static final String NY_ENHET_NAVN = "NAV Familie- og pensjonsytelser Tromsø";
-    private BehandlendeEnhetTjeneste behandlendeEnhetTjeneste = new BehandlendeEnhetTjeneste(repoProvider);
+    private BehandlingEnhetEventPubliserer mockEventPubliserer = mock(BehandlingEnhetEventPubliserer.class);
+    private BehandlendeEnhetTjeneste behandlendeEnhetTjeneste = new BehandlendeEnhetTjeneste(repoProvider,mockEventPubliserer);
 
     @Test
     public void skal_byttBehandlendeEnhet_med_gyldig_behandling() {
