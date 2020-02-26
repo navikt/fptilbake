@@ -126,6 +126,7 @@ public class FplosPubliserEventTaskTest {
         assertThat(tilbakebetalingBehandlingProsessEventDto.getYtelseTypeKode()).isEqualTo(FagsakYtelseType.FORELDREPENGER.getKode());
         assertThat(tilbakebetalingBehandlingProsessEventDto.getBehandlingTypeKode()).isEqualTo(BehandlingType.TILBAKEKREVING.getKode());
         assertThat(tilbakebetalingBehandlingProsessEventDto.getBehandlingSteg()).isEqualTo(BehandlingStegType.FAKTA_FEILUTBETALING.getKode());
+        assertThat(tilbakebetalingBehandlingProsessEventDto.getHref()).isNotEmpty();
     }
 
     private Kravgrunnlag431 lagkravgrunnlag() {

@@ -107,7 +107,7 @@ public class FplosEventObserver {
         taskData.setProperty(FplosPubliserEventTask.PROPERTY_EVENT_NAME, eventHendelse.name());
         taskData.setBehandling(fagsakId, behandlingId, aktørId.getId());
         taskData.setGruppe(gruppe);
-        taskData.setSekvens(String.valueOf(sekvens));
+        taskData.setSekvens(String.format("%04d",sekvens));
 
         prosessTaskRepository.lagre(taskData);
     }

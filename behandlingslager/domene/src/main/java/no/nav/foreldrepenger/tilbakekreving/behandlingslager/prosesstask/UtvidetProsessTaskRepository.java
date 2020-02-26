@@ -27,13 +27,14 @@ public class UtvidetProsessTaskRepository {
     }
 
     public Optional<ProsessTaskData> finnSisteProsessTaskForProsessTaskGruppe(String task, String gruppe) {
-        TypedQuery<ProsessTaskEntitet> query = entityManager.createQuery("from ProsessTaskEntitet pt where pt.taskType=:task and pt.gruppe=:gruppe order by to_number(pt.sekvens) desc", ProsessTaskEntitet.class);
+        TypedQuery<ProsessTaskEntitet> query = entityManager.createQuery("from ProsessTaskEntitet pt where pt.taskType=:task and pt.gruppe=:gruppe order by pt.sekvens desc", ProsessTaskEntitet.class);
         query.setParameter("task", task);
         query.setParameter("gruppe", gruppe);
         query.setMaxResults(1);
 
         List<ProsessTaskEntitet> alleTasker = query.getResultList();
 
-        return !alleTasker.isEmpty() ? alleTasker.stream().findFirst().map(ProsessTaskEntitet::tilProsessTask) : Optional.empty();
+        return alleTasker.stream().findFirst().map(ProsessTaskEntitet::tilProsessTask);
     }
+
 }

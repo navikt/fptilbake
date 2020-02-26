@@ -116,7 +116,7 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
             .medYtelseTypeKode(fagsak.getFagsakYtelseType().getKode())
             .medAksjonspunktKoderMedStatusListe(aksjonspunktKoderMedStatusListe)
             .medHref(String.format(DEFAULT_HREF,saksnummer,behandling.getId()))
-            .medAnsvarligSaksbehandlerIdent(behandling.getAnsvarligBeslutter())
+            .medAnsvarligSaksbehandlerIdent(behandling.getAnsvarligSaksbehandler())
             .medFørsteFeilutbetaling(hentFørsteFeilutbetalingDato(kravgrunnlag431))
             .medFeilutbetaltBeløp(hentFeilutbetaltBeløp(behandling.getId())).build();
     }
