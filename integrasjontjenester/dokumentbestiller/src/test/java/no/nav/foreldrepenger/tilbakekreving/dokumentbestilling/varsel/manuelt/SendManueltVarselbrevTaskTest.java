@@ -5,7 +5,9 @@ import static org.mockito.Mockito.mock;
 
 import java.time.Period;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
@@ -14,17 +16,26 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.dokumentbestiller.DokumentMalType;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.DokumentBestillerTestOppsett;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
+import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
+@RunWith(CdiRunner.class)
 public class SendManueltVarselbrevTaskTest extends DokumentBestillerTestOppsett {
 
     private ManueltVarselBrevTjeneste mockManueltVarselBrevTjeneste = mock(ManueltVarselBrevTjeneste.class);
     private BehandlingModellRepository mockBehandlingModellRepository = mock(BehandlingModellRepository.class);
 
-    private BehandlingskontrollTjeneste behandlingskontrollTjeneste = new BehandlingskontrollTjenesteImpl(repositoryProvider, mockBehandlingModellRepository, null);
-    private SendManueltVarselbrevTask varselbrevTask = new SendManueltVarselbrevTask(behandlingRepository,
-        mockManueltVarselBrevTjeneste,
-        behandlingskontrollTjeneste,
-        Period.ofWeeks(3));
+    private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
+    private SendManueltVarselbrevTask varselbrevTask;
+
+    @Before
+    public void setup() {
+        behandlingskontrollTjeneste = new BehandlingskontrollTjenesteImpl(repositoryProvider, mockBehandlingModellRepository, null);
+
+        varselbrevTask = new SendManueltVarselbrevTask(behandlingRepository,
+            mockManueltVarselBrevTjeneste,
+            behandlingskontrollTjeneste,
+            Period.ofWeeks(3));
+    }
 
     @Test
     public void skal_sende_manuelt_varselbrev_og_sett_behandling_på_vent() {

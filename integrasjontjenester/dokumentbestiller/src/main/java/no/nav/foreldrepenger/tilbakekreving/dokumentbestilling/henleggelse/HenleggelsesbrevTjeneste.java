@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.henleggelse;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -13,6 +14,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.Bre
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.EksternDataForBrevTjeneste;
@@ -21,6 +23,8 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.Brev
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.JournalpostIdOgDokumentId;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.Tillegsinformasjon;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 
 @ApplicationScoped
@@ -32,6 +36,7 @@ public class HenleggelsesbrevTjeneste {
 
     private BehandlingRepository behandlingRepository;
     private BrevSporingRepository brevSporingRepository;
+    private EksternBehandlingRepository eksternBehandlingRepository;
 
     private EksternDataForBrevTjeneste eksternDataForBrevTjeneste;
     private FritekstbrevTjeneste bestillDokumentTjeneste;
@@ -49,6 +54,7 @@ public class HenleggelsesbrevTjeneste {
                                     HistorikkinnslagTjeneste historikkinnslagTjeneste) {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.brevSporingRepository = repositoryProvider.getBrevSporingRepository();
+        this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
 
         this.eksternDataForBrevTjeneste = eksternDataForBrevTjeneste;
         this.bestillDokumentTjeneste = bestillDokumentTjenest;
@@ -80,7 +86,7 @@ public class HenleggelsesbrevTjeneste {
         }
 
         FagsakYtelseType fagsakYtelseType = behandling.getFagsak().getFagsakYtelseType();
-        Språkkode språkkode = behandling.getFagsak().getNavBruker().getSpråkkode();
+        Språkkode språkkode = hentSpråkkode(behandlingId);
 
         //Henter data fra tps
         String aktørId = behandling.getAktørId().getId();
@@ -93,7 +99,7 @@ public class HenleggelsesbrevTjeneste {
             .medBehandlendeEnhetNavn(behandling.getBehandlendeEnhetNavn())
             .medFagsaktypenavnPåSpråk(ytelseNavn.getNavnPåBrukersSpråk())
             .medFagsaktype(behandling.getFagsak().getFagsakYtelseType())
-            .medSprakkode(behandling.getFagsak().getNavBruker().getSpråkkode())
+            .medSprakkode(språkkode)
             .medAnsvarligSaksbehandler("VL")
             .medSakspartId(personinfo.getPersonIdent().getIdent())
             .medMottakerAdresse(adresseinfo)
@@ -106,6 +112,12 @@ public class HenleggelsesbrevTjeneste {
         henleggelsesbrevSamletInfo.setBrevMetadata(metadata);
         henleggelsesbrevSamletInfo.setVarsletDato(brevSporing.get().getOpprettetTidspunkt().toLocalDate());
         return henleggelsesbrevSamletInfo;
+    }
+
+    private Språkkode hentSpråkkode(Long behandlingId) {
+        UUID fpsakBehandlingUuid = eksternBehandlingRepository.hentFraInternId(behandlingId).getEksternUuid();
+        SamletEksternBehandlingInfo samletEksternBehandlingInfo = eksternDataForBrevTjeneste.hentBehandlingFpsak(fpsakBehandlingUuid, Tillegsinformasjon.PERSONOPPLYSNINGER, Tillegsinformasjon.SØKNAD);
+        return samletEksternBehandlingInfo.getGrunninformasjon().getSpråkkodeEllerDefault();
     }
 
     private FritekstbrevData lagHenleggelsebrev(HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo) {

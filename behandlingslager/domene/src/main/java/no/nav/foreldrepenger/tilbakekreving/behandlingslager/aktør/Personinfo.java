@@ -97,6 +97,10 @@ public class Personinfo {
         return adresseLandkode;
     }
 
+    /**
+     * @deprecated Ikke bruk denne metoden. Bruk språkkode i grunninformasjonen fra fpsak.
+     * @return Språkkode fra tps
+     */
     public Språkkode getForetrukketSpråk() {
         return foretrukketSpråk;
     }
@@ -240,7 +244,6 @@ public class Personinfo {
             requireNonNull(personinfoMal.navn, "Navbruker må ha navn"); //$NON-NLS-1$
             requireNonNull(personinfoMal.fødselsdato, "Navbruker må ha fødselsdato"); //$NON-NLS-1$
             requireNonNull(personinfoMal.kjønn, "Navbruker må ha kjønn"); //$NON-NLS-1$
-            requireNonNull(personinfoMal.foretrukketSpråk, "Navbruker må ha foretrukket språk"); //$NON-NLS-1$
             return personinfoMal;
         }
 

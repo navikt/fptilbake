@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.Lokale;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.HandlebarsData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.LocalDateTilLangtNorskFormatSerialiserer;
 import no.nav.vedtak.util.Objects;
@@ -29,6 +30,7 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
     private String fritekstOppsummering;
     @JsonProperty("behandling")
     private HbBehandling behandling;
+    private Lokale lokale = Lokale.BOKMÅL;
 
     private HbVedtaksbrevDatoer datoer;
 
@@ -54,6 +56,11 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
 
     public HbBehandling getBehandling() {
         return behandling;
+    }
+
+    @JsonProperty("locale")
+    public String getLocale() {
+        return lokale.getTekst();
     }
 
     @JsonProperty("opphørsdato-død-søker")
@@ -149,5 +156,11 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
             kladd.behandling = behandling;
             return this;
         }
+
+        public Builder medLocale(Lokale lokale) {
+            kladd.lokale = lokale;
+            return this;
+        }
     }
+
 }

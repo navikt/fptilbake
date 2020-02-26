@@ -1,31 +1,5 @@
-{{#if (neq 1 antall-perioder)}}
-{{> hovedoverskrift}}{{#if hjemmel.lovhjemmel-flertall}}Lovhjemlene{{else}}Lovhjemmelen{{/if}} vi har brukt
-{{else}}
-
-{{/if}}
-Vedtaket er gjort etter {{hjemmel.lovhjemmel-vedtak}}.
-{{#if (neq totalresultat.hovedresultat "INGEN_TILBAKEBETALING")}}
-    {{#if (neq sak.ytelsetype "ES")}}
-{{> hovedoverskrift}}Skatt
-NAV gir opplysninger til skatteetaten når det feilutbetalte beløpet er tilbakebetalt. Skatteetaten vil da vurdere om det er grunnlag for å endre tidligere skatteoppgjør.
-    {{/if}}
-{{> hovedoverskrift}}Hvordan betale tilbake pengene du skylder
-{{#if behandling.er-revurdering}}
-NAV Innkreving vil korrigere beløpet du skal betale tilbake. Du finner mer informasjon på nav.no/innkreving.
-{{else}}
-Du vil motta krav fra NAV Innkreving på det beløpet du skal betale tilbake. Du finner mer informasjon på nav.no/innkreving.
-{{/if}}
-{{/if}}
-{{> hovedoverskrift}}Du har rett til å klage
-Du kan klage innen {{konfigurasjon.klagefrist-uker}} uker fra den datoen du mottok vedtaket. Du finner skjema og informasjon på nav.no/klage.
-{{#if (neq totalresultat.hovedresultat "INGEN_TILBAKEBETALING")}}
-
-Du må som hovedregel begynne å betale beløpet tilbake, selv om du klager på dette vedtaket. Dette følger av forvaltningsloven § 42. Hvis du får vedtak om at du ikke trengte å betale tilbake hele eller deler av beløpet du skyldte, betaler vi pengene tilbake til deg.
-{{/if}}
-{{> hovedoverskrift}}Du har rett til innsyn
-På nav.no/dittnav kan du se dokumentene i saken din.
-{{> hovedoverskrift}}Har du spørsmål?
-Du finner nyttig informasjon på nav.no/familie.
-
-Med vennlig hilsen
-NAV Familie- og pensjonsytelser
+{{~#if (eq locale "nn_NO") ~}}
+{{> vedtak/nn/vedtak_slutt }}
+{{~else~}}
+{{> vedtak/nb/vedtak_slutt }}
+{{~/if~}}
