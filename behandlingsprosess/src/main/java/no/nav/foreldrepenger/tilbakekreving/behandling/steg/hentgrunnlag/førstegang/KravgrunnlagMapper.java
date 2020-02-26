@@ -93,7 +93,7 @@ public class KravgrunnlagMapper {
         KlasseType type = map(dto.getTypeKlasse());
         return KravgrunnlagBelop433.builder()
             .medKlasseType(type)
-            .medKlasseKode(KlasseKode.fraKode(dto.getKodeKlasse()))
+            .medKlasseKode(finnKlasseKode(dto.getKodeKlasse(),type))
             .medOpprUtbetBelop(dto.getBelopOpprUtbet())
             .medNyBelop(dto.getBelopNy())
             .medTilbakekrevesBelop(dto.getBelopTilbakekreves())
@@ -125,6 +125,13 @@ public class KravgrunnlagMapper {
             default:
                 throw new IllegalArgumentException("Ukjent klassetype: " + typeKlasse);
         }
+    }
+
+    private String finnKlasseKode(String klasseKode, KlasseType klasseType){
+        if(KlasseType.TREK.equals(klasseType) || KlasseType.SKAT.equals(klasseType)){
+            return klasseKode;
+        }
+        return KlasseKode.fraKode(klasseKode).getKode();
     }
 
 }

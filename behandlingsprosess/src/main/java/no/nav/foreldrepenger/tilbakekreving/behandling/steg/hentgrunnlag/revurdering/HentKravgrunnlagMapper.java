@@ -106,7 +106,7 @@ public class HentKravgrunnlagMapper {
         KlasseType type = map(dto.getTypeKlasse());
         return KravgrunnlagBelop433.builder()
             .medKlasseType(type)
-            .medKlasseKode(finnKlasseKode(dto, type))
+            .medKlasseKode(finnKlasseKode(dto.getKodeKlasse(), type))
             .medOpprUtbetBelop(dto.getBelopOpprUtbet())
             .medNyBelop(dto.getBelopNy())
             .medTilbakekrevesBelop(dto.getBelopTilbakekreves())
@@ -117,12 +117,6 @@ public class HentKravgrunnlagMapper {
             .medSkyldKode(dto.getKodeSkyld())
             .medKravgrunnlagPeriode432(kravgrunnlagPeriode432)
             .build();
-    }
-
-    private KlasseKode finnKlasseKode(DetaljertKravgrunnlagBelopDto dto, KlasseType type) {
-        return type == KlasseType.YTEL || type == KlasseType.FEIL
-            ? KlasseKode.fraKode(trimTrailingSpaces(dto.getKodeKlasse()))
-            : KlasseKode.UDEFINERT;
     }
 
     private static LocalDate konverter(XMLGregorianCalendar dato) {
@@ -144,6 +138,13 @@ public class HentKravgrunnlagMapper {
             default:
                 throw new IllegalArgumentException("Ukjent klassetype: " + typeKlasse);
         }
+    }
+
+    private String finnKlasseKode(String klasseKode, KlasseType klasseType){
+        if(KlasseType.TREK.equals(klasseType) || KlasseType.SKAT.equals(klasseType)){
+            return klasseKode;
+        }
+        return KlasseKode.fraKode(klasseKode).getKode();
     }
 
     private String trimTrailingSpaces(String field){

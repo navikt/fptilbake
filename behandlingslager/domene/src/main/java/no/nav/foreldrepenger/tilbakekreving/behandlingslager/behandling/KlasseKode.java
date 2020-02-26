@@ -59,6 +59,9 @@ public class KlasseKode extends Kodeliste {
     public static final KlasseKode FPSVSNDJB_OP = new KlasseKode("FPSVSNDJB-OP");
     public static final KlasseKode FPSVSNDFI = new KlasseKode("FPSVSNDFI");
 
+    //JUST klassekoder
+    public static final KlasseKode KL_KODE_JUST_KORTTID = new KlasseKode("KL_KODE_JUST_KORTTID");
+
 
     public static final KlasseKode UDEFINERT = new KlasseKode("-");
 
@@ -100,6 +103,7 @@ public class KlasseKode extends Kodeliste {
         TILGJENGELIGE.put(FPSVSNDDM_OP.getKode(), FPSVSNDDM_OP);
         TILGJENGELIGE.put(FPSVSNDJB_OP.getKode(), FPSVSNDJB_OP);
         TILGJENGELIGE.put(FPSVSNDFI.getKode(), FPSVSNDFI);
+        TILGJENGELIGE.put(KL_KODE_JUST_KORTTID.getKode(), KL_KODE_JUST_KORTTID);
     }
 
     KlasseKode() {
