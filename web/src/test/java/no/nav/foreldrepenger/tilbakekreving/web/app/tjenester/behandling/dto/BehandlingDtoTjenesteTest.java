@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 
 import org.assertj.core.util.Lists;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -39,6 +40,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.Vilkårsvur
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.web.app.rest.ResourceLink;
 
 public class BehandlingDtoTjenesteTest {
@@ -54,10 +56,16 @@ public class BehandlingDtoTjenesteTest {
     private VurdertForeldelseTjeneste foreldelseTjeneste = mock(VurdertForeldelseTjeneste.class);
     private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository = mock(FaktaFeilutbetalingRepository.class);
     private VilkårsvurderingRepository vilkårsvurderingRepository = mock(VilkårsvurderingRepository.class);
+    private KravgrunnlagRepository grunnlagRepository = mock(KravgrunnlagRepository.class);
     private BehandlingModellRepository behandlingModellRepository = new BehandlingModellRepositoryImpl(repositoryRule.getEntityManager());
-    private BehandlingDtoTjeneste behandlingDtoTjeneste = new BehandlingDtoTjeneste(behandlingTjeneste, foreldelseTjeneste, faktaFeilutbetalingRepository, vilkårsvurderingRepository, behandlingModellRepository);
+    private BehandlingDtoTjeneste behandlingDtoTjeneste = new BehandlingDtoTjeneste(behandlingTjeneste, foreldelseTjeneste, faktaFeilutbetalingRepository, vilkårsvurderingRepository, grunnlagRepository, behandlingModellRepository);
 
     private Saksnummer saksnummer = new Saksnummer(GYLDIG_SAKSNR);
+
+    @Before
+    public void setup() {
+        when(grunnlagRepository.harGrunnlagForBehandlingId(any())).thenReturn(true);
+    }
 
     @Test
     public void skal_hentUtvidetBehandlingResultat_medFaktaSteg() {
@@ -215,6 +223,7 @@ public class BehandlingDtoTjenesteTest {
             "beregne-feilutbetalt-belop",
             "aksjonspunkter"
         );
+        assertThat(utvidetBehandlingDto.isKanHenleggeBehandling()).isFalse();
     }
 
     @Test
@@ -252,6 +261,32 @@ public class BehandlingDtoTjenesteTest {
             "handling-rettigheter");
     }
 
+    @Test
+    public void skal_hentAlleBehandlinger_medVenterPåGrunnlagSteg() {
+        Behandling behandling = mockBehandling();
+        BehandlingStegMockUtil.nyBehandlingSteg(behandling, BehandlingStegType.TBKGSTEG, BehandlingStatus.UTREDES);
+        when(behandlingTjeneste.hentBehandlinger(saksnummer)).thenReturn(Lists.newArrayList(behandling));
+        when(behandlingTjeneste.erBehandlingHenlagt(any(Behandling.class))).thenReturn(false);
+        when(grunnlagRepository.harGrunnlagForBehandlingId(any())).thenReturn(false);
+
+        List<BehandlingDto> behandlingDtoListe = behandlingDtoTjeneste.hentAlleBehandlinger(saksnummer);
+        assertThat(behandlingDtoListe).isNotEmpty();
+        assertThat(behandlingDtoListe.size()).isEqualTo(1);
+
+        BehandlingDto behandlingDto = behandlingDtoListe.get(0);
+        assertThat(behandlingDto.getFagsakId()).isEqualTo(behandling.getFagsakId());
+        assertThat(behandlingDto.getType()).isEqualByComparingTo(BehandlingType.TILBAKEKREVING);
+
+        assertThat(behandlingDto.getLinks().stream().map(ResourceLink::getRel).collect(Collectors.toList())).containsExactlyInAnyOrder(
+            "totrinnskontroll-arsaker-readOnly",
+            "brev-maler",
+            "brev-bestill",
+            "brev-forhandvis",
+            "handling-rettigheter");
+
+        assertThat(behandlingDto.isKanHenleggeBehandling()).isTrue();
+    }
+
     private Behandling mockBehandling() {
         return Behandling.nyBehandlingFor(
             Fagsak.opprettNy(saksnummer, NavBruker.opprettNy(new AktørId(GYLDIG_AKTØR_ID), Språkkode.nb)),
@@ -277,6 +312,7 @@ public class BehandlingDtoTjenesteTest {
         BehandlingDto behandlingDto = behandlingDtoListe.get(0);
         assertThat(behandlingDto.getFagsakId()).isEqualTo(behandling.getFagsakId());
         assertThat(behandlingDto.getType()).isEqualByComparingTo(BehandlingType.TILBAKEKREVING);
+        assertThat(behandlingDto.isKanHenleggeBehandling()).isFalse();
         return behandlingDto;
     }
 

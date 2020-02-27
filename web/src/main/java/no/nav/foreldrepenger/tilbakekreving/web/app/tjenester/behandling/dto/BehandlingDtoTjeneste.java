@@ -25,6 +25,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.BehandlingÅrsakDto;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.web.app.rest.ResourceLink;
 
 /**
@@ -42,6 +43,7 @@ public class BehandlingDtoTjeneste {
     private VurdertForeldelseTjeneste vurdertForeldelseTjeneste;
     private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository;
     private VilkårsvurderingRepository vilkårsvurderingRepository;
+    private KravgrunnlagRepository grunnlagRepository;
 
     private BehandlingModellRepository behandlingModellRepository;
 
@@ -54,11 +56,13 @@ public class BehandlingDtoTjeneste {
                                  VurdertForeldelseTjeneste vurdertForeldelseTjeneste,
                                  FaktaFeilutbetalingRepository faktaFeilutbetalingRepository,
                                  VilkårsvurderingRepository vilkårsvurderingRepository,
+                                 KravgrunnlagRepository grunnlagRepository,
                                  BehandlingModellRepository behandlingModellRepository) {
         this.behandlingTjeneste = behandlingTjeneste;
         this.vurdertForeldelseTjeneste = vurdertForeldelseTjeneste;
         this.faktaFeilutbetalingRepository = faktaFeilutbetalingRepository;
         this.vilkårsvurderingRepository = vilkårsvurderingRepository;
+        this.grunnlagRepository = grunnlagRepository;
         this.behandlingModellRepository = behandlingModellRepository;
     }
 
@@ -130,6 +134,7 @@ public class BehandlingDtoTjeneste {
 
         dto.setFørsteÅrsak(førsteÅrsak(behandling).orElse(null));
         dto.setBehandlingÅrsaker(lagBehandlingÅrsakDto(behandling));
+        dto.setKanHenleggeBehandling(kanHenleggeBehandling(behandling));
     }
 
     private List<BehandlingÅrsakDto> lagBehandlingÅrsakDto(Behandling behandling) {
@@ -150,6 +155,10 @@ public class BehandlingDtoTjeneste {
         BehandlingÅrsakDto dto = new BehandlingÅrsakDto();
         dto.setBehandlingÅrsakType(behandlingÅrsak.getBehandlingÅrsakType());
         return dto;
+    }
+
+    private boolean kanHenleggeBehandling(Behandling behandling){
+        return !behandling.erAvsluttet() && !grunnlagRepository.harGrunnlagForBehandlingId(behandling.getId());
     }
 
     private static void leggTilLenkerForBehandlingsoperasjoner(BehandlingDto dto) {
