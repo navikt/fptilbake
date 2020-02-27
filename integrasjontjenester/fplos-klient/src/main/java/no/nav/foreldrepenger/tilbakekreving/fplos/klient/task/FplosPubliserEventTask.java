@@ -77,7 +77,7 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
         String eventName = prosessTaskData.getPropertyValue(PROPERTY_EVENT_NAME);
         Long behandlingId = prosessTaskData.getBehandlingId();
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-        Kravgrunnlag431 kravgrunnlag431 = grunnlagRepository.finnKravgrunnlag(behandlingId);
+        Kravgrunnlag431 kravgrunnlag431 = grunnlagRepository.harGrunnlagForBehandlingId(behandlingId) ? grunnlagRepository.finnKravgrunnlag(behandlingId) : null;
         try {
             fplosKafkaProducer.sendJsonMedNøkkel(behandling.getUuid().toString(), opprettEventJson(behandling, eventName, kravgrunnlag431));
             logger.info("Publiserer event:{} på kafka slik at f.eks fplos kan fordele oppgaven for videre behandling. BehandlingsId: {}", eventName, behandlingId);
@@ -117,8 +117,9 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
             .medAksjonspunktKoderMedStatusListe(aksjonspunktKoderMedStatusListe)
             .medHref(String.format(DEFAULT_HREF,saksnummer,behandling.getId()))
             .medAnsvarligSaksbehandlerIdent(behandling.getAnsvarligSaksbehandler())
-            .medFørsteFeilutbetaling(hentFørsteFeilutbetalingDato(kravgrunnlag431))
-            .medFeilutbetaltBeløp(hentFeilutbetaltBeløp(behandling.getId())).build();
+            .medFørsteFeilutbetaling(kravgrunnlag431 != null ? hentFørsteFeilutbetalingDato(kravgrunnlag431) : null)
+            .medFeilutbetaltBeløp(kravgrunnlag431 != null ? hentFeilutbetaltBeløp(behandling.getId()) : null)
+            .build();
     }
 
     private LocalDate hentFørsteFeilutbetalingDato(Kravgrunnlag431 kravgrunnlag431) {

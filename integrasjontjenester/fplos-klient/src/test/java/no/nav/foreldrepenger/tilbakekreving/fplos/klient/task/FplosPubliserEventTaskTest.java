@@ -92,7 +92,6 @@ public class FplosPubliserEventTaskTest {
         EksternBehandling eksternBehandling = new EksternBehandling(behandling, 1l, FPSAK_BEHANDLING_UUID);
         repositoryProvider.getEksternBehandlingRepository().lagre(eksternBehandling);
 
-        kravgrunnlag431 = lagkravgrunnlag();
         lagProsessTaskData();
 
         doNothing().when(mockKafkaProducer).sendJsonMedNøkkel(anyString(), anyString());
@@ -104,6 +103,7 @@ public class FplosPubliserEventTaskTest {
         aksjonspunktRepository.leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING, BehandlingStegType.FAKTA_FEILUTBETALING);
         aksjonspunktRepository.leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, BehandlingStegType.VARSEL);
         internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling,BehandlingStegType.FAKTA_FEILUTBETALING);
+        kravgrunnlag431 = lagkravgrunnlag();
 
         fplosPubliserEventTask.doTask(prosessTaskData);
         verify(mockKafkaProducer, atLeastOnce()).sendJsonMedNøkkel(anyString(), anyString());
@@ -126,6 +126,34 @@ public class FplosPubliserEventTaskTest {
         assertThat(tilbakebetalingBehandlingProsessEventDto.getYtelseTypeKode()).isEqualTo(FagsakYtelseType.FORELDREPENGER.getKode());
         assertThat(tilbakebetalingBehandlingProsessEventDto.getBehandlingTypeKode()).isEqualTo(BehandlingType.TILBAKEKREVING.getKode());
         assertThat(tilbakebetalingBehandlingProsessEventDto.getBehandlingSteg()).isEqualTo(BehandlingStegType.FAKTA_FEILUTBETALING.getKode());
+        assertThat(tilbakebetalingBehandlingProsessEventDto.getHref()).isNotEmpty();
+    }
+
+    @Test
+    public void skal_publisere_fplos_data_til_kafka_for_henleggelse_når_kravgrunnlag_ikke_finnes() {
+        aksjonspunktRepository.leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, BehandlingStegType.VARSEL);
+        internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling,BehandlingStegType.VARSEL);
+
+        fplosPubliserEventTask.doTask(prosessTaskData);
+        verify(mockKafkaProducer, atLeastOnce()).sendJsonMedNøkkel(anyString(), anyString());
+
+        TilbakebetalingBehandlingProsessEventDto tilbakebetalingBehandlingProsessEventDto = fplosPubliserEventTask.getTilbakebetalingBehandlingProsessEventDto(behandling,
+            EventHendelse.AKSJONSPUNKT_AVBRUTT.name(), null);
+
+        assertThat(tilbakebetalingBehandlingProsessEventDto.getFeilutbetaltBeløp()).isNull();
+        assertThat(tilbakebetalingBehandlingProsessEventDto.getFørsteFeilutbetaling()).isNull();
+
+        Map<String,String> aksjonpunkterMap = tilbakebetalingBehandlingProsessEventDto.getAksjonspunktKoderMedStatusListe();
+        assertThat(aksjonpunkterMap).isNotEmpty();
+        assertThat(aksjonpunkterMap.get(AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING.getKode())).isEqualTo(AksjonspunktStatus.OPPRETTET.getKode());
+
+        assertThat(tilbakebetalingBehandlingProsessEventDto.getEksternId()).isEqualByComparingTo(behandling.getUuid());
+        assertThat(tilbakebetalingBehandlingProsessEventDto.getFagsystem()).isEqualByComparingTo(Fagsystem.FPTILBAKE);
+        assertThat(tilbakebetalingBehandlingProsessEventDto.getEventHendelse()).isEqualByComparingTo(EventHendelse.AKSJONSPUNKT_AVBRUTT);
+        assertThat(tilbakebetalingBehandlingProsessEventDto.getAktørId()).isEqualTo(behandling.getAktørId().getId());
+        assertThat(tilbakebetalingBehandlingProsessEventDto.getYtelseTypeKode()).isEqualTo(FagsakYtelseType.FORELDREPENGER.getKode());
+        assertThat(tilbakebetalingBehandlingProsessEventDto.getBehandlingTypeKode()).isEqualTo(BehandlingType.TILBAKEKREVING.getKode());
+        assertThat(tilbakebetalingBehandlingProsessEventDto.getBehandlingSteg()).isEqualTo(BehandlingStegType.VARSEL.getKode());
         assertThat(tilbakebetalingBehandlingProsessEventDto.getHref()).isNotEmpty();
     }
 
