@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.manuelt;
 
 import java.time.Period;
+import java.util.UUID;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -15,6 +16,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.Bre
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.dokumentbestiller.DokumentMalType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
@@ -29,6 +31,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.Tekstforma
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.VarselbrevOverskrift;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.VarselbrevSamletInfo;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.VarselbrevUtil;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 
 @ApplicationScoped
@@ -39,12 +42,13 @@ public class ManueltVarselBrevTjeneste {
 
     private VarselRepository varselRepository;
     private BehandlingRepository behandlingRepository;
+    private BrevSporingRepository brevSporingRepository;
+    private EksternBehandlingRepository eksternBehandlingRepository;
 
     private EksternDataForBrevTjeneste eksternDataForBrevTjeneste;
     private FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste;
     private FritekstbrevTjeneste bestillDokumentTjeneste;
     private HistorikkinnslagTjeneste historikkinnslagTjeneste;
-    private BrevSporingRepository brevSporingRepository;
 
     ManueltVarselBrevTjeneste() {
         // for CDI
@@ -55,10 +59,12 @@ public class ManueltVarselBrevTjeneste {
                                      EksternDataForBrevTjeneste eksternDataForBrevTjeneste,
                                      FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste,
                                      FritekstbrevTjeneste bestillDokumentTjeneste,
-                                     HistorikkinnslagTjeneste historikkinnslagTjeneste) {
+                                     HistorikkinnslagTjeneste historikkinnslagTjeneste
+    ) {
         this.varselRepository = repositoryProvider.getVarselRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.brevSporingRepository = repositoryProvider.getBrevSporingRepository();
+        this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
 
         this.eksternDataForBrevTjeneste = eksternDataForBrevTjeneste;
         this.faktaFeilutbetalingTjeneste = faktaFeilutbetalingTjeneste;
@@ -136,7 +142,7 @@ public class ManueltVarselBrevTjeneste {
         Adresseinfo adresseinfo = eksternDataForBrevTjeneste.hentAdresse(personinfo, aktørId);
 
         //Henter fagsaktypenavn på riktig språk
-        Språkkode mottakersSpråkkode = behandling.getFagsak().getNavBruker().getSpråkkode();
+        Språkkode mottakersSpråkkode = hentSpråkkode(behandling.getId());
         FagsakYtelseType fagsakYtelseType = behandling.getFagsak().getFagsakYtelseType();
         YtelseNavn ytelseNavn = eksternDataForBrevTjeneste.hentYtelsenavn(fagsakYtelseType, mottakersSpråkkode);
 
@@ -156,6 +162,12 @@ public class ManueltVarselBrevTjeneste {
             fritekst,
             feilutbetalingFakta,
             erKorrigert);
+    }
+
+    private Språkkode hentSpråkkode(Long behandlingId) {
+        UUID fpsakBehandlingUuid = eksternBehandlingRepository.hentFraInternId(behandlingId).getEksternUuid();
+        SamletEksternBehandlingInfo samletEksternBehandlingInfo = eksternDataForBrevTjeneste.hentBehandlingFpsak(fpsakBehandlingUuid);
+        return samletEksternBehandlingInfo.getGrunninformasjon().getSpråkkodeEllerDefault();
     }
 
     private void opprettHistorikkinnslag(Behandling behandling, DokumentMalType malType, JournalpostIdOgDokumentId dokumentreferanse, String tittel) {

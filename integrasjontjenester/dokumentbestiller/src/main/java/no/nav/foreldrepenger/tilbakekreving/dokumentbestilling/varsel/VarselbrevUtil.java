@@ -50,7 +50,7 @@ public class VarselbrevUtil {
             .medSakspartNavn(personinfo.getNavn())
             .medFagsaktypenavnPåSpråk(ytelseNavn.getNavnPåBrukersSpråk())
             .medFagsaktype(fagsakYtelseType)
-            .medSprakkode(personinfo.getForetrukketSpråk())
+            .medSprakkode(eksternBehandlingsinfoDto.getGrunninformasjon().getSpråkkodeEllerDefault())
             .medAnsvarligSaksbehandler("VL")
             .medTittel(VarselbrevOverskrift.finnTittelVarselbrev(ytelseNavn.getNavnPåBokmål()))
             .build();

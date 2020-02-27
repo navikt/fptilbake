@@ -1,0 +1,38 @@
+{{~#* inline "evt-renter-utsagn" ~}}{{#if totalresultat.totalt-rentebeløp}} Dette beløpet er med renter.{{/if}}{{~/inline~}}
+{{~#* inline "varsel-tekst" ~}}
+    {{#switch totalresultat.hovedresultat}}
+    {{#case "FULL_TILBAKEBETALING"}}
+Vi varsla deg {{varsel.varslet-dato}} om at du har fått utbetalt for mykje.
+    {{/case}}
+    {{#case "DELVIS_TILBAKEBETALING"}}
+Vi varsla deg {{varsel.varslet-dato}} om at du har fått {{kroner varsel.varslet-beløp}} for mykje.
+    {{/case}}
+    {{#case "INGEN_TILBAKEBETALING"}}
+Vi varsla deg {{varsel.varslet-dato}} om at du har fått {{kroner varsel.varslet-beløp}} for mykje. Vi har behandla saka di, og du må ikkje betale tilbake det feilutbetalte beløpet.
+    {{/case}}
+    {{/switch}}
+{{~/inline~}}
+{{#if behandling.er-revurdering}}
+Vi har vurdert saka di om tilbakebetaling på nytt. Derfor gjeld ikkje det tidlegare vedtaket av {{behandling.original-behandling-dato-fagsakvedtak}} om tilbakebetaling av {{>ytelse-produkt}}.
+    {{#if varsel.varslet-dato }}
+
+{{> varsel-tekst}}
+    {{else if (eq totalresultat.hovedresultat "INGEN_TILBAKEBETALING") }}
+
+Du må ikkje betale tilbake det feilutbetalte beløpet.
+    {{/if}}
+{{else}}
+    {{#if varsel.varslet-dato }}
+{{> varsel-tekst}}
+    {{else}}
+I brev {{sak.dato-fagsakvedtak}} fikk du melding om at {{>ytelse-produkt}} {{#if (eq sak.ytelsetype "ES")}}din{{else}}dine{{/if}} er endra. Endringa gjorde at du har fått utbetalt for mykje.{{#if (eq totalresultat.hovedresultat "INGEN_TILBAKEBETALING")}} Du må ikkje betale tilbake det du har fått for mykje.{{/if}}
+    {{/if}}
+{{/if}}
+{{#if (neq totalresultat.hovedresultat "INGEN_TILBAKEBETALING")}}
+
+Beløpet du skuldar før skatt er {{kroner totalresultat.totalt-tilbakekreves-beløp-med-renter}}, som er {{#if (eq totalresultat.hovedresultat "FULL_TILBAKEBETALING")}}heile{{else}}delar av{{/if}} det feilutbetalte beløpet.{{>evt-renter-utsagn}} Beløpet du skal betale tilbake etter skatten er trukket frå er {{kroner totalresultat.totalt-tilbakekreves-beløp-med-renter-uten-skatt}}.
+{{/if}}
+{{#if fritekst-oppsummering}}
+
+{{fritekst-oppsummering}}
+{{/if}}

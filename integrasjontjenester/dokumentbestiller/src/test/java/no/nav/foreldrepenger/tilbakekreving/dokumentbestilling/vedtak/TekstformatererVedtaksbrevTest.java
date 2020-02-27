@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
@@ -25,6 +26,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Ak
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.AnnenVurdering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.SærligGrunn;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.Lokale;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbBehandling;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbKonfigurasjon;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbPerson;
@@ -51,6 +53,23 @@ public class TekstformatererVedtaksbrevTest {
 
     @Test
     public void skal_generere_vedtaksbrev_for_FP_og_tvillinger_og_simpel_uaktsomhet() throws Exception {
+        HbVedtaksbrevData data = getVedtaksbrevDataTvilling(null);
+
+        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
+        String fasit = les("/vedtaksbrev/FP_tvillinger.txt");
+        assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
+    }
+
+    @Test
+    public void skal_generere_vedtaksbrev_for_FP_og_tvillinger_og_simpel_uaktsomhet_nynorsk() throws Exception {
+        HbVedtaksbrevData data = getVedtaksbrevDataTvilling(Lokale.NYNORSK);
+
+        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
+        String fasit = les("/vedtaksbrev/FP_tvillinger_nn.txt");
+        assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
+    }
+
+    private HbVedtaksbrevData getVedtaksbrevDataTvilling(Lokale lokale) throws Exception {
         HbVedtaksbrevFelles vedtaksbrevData = lagTestBuilder()
             .medSak(HbSak.build()
                 .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
@@ -72,6 +91,7 @@ public class TekstformatererVedtaksbrevTest {
             .medKonfigurasjon(HbKonfigurasjon.builder()
                 .medKlagefristUker(6)
                 .build())
+            .medLocale(lokale != null ? lokale : Lokale.BOKMÅL)
             .build();
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
             HbVedtaksbrevPeriode.builder()
@@ -104,11 +124,7 @@ public class TekstformatererVedtaksbrevTest {
                 .medResultat(HbResultatTestBuilder.forTilbakekrevesBeløp(3000))
                 .build()
         );
-        HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
-
-        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
-        String fasit = les("/vedtaksbrev/FP_tvillinger.txt");
-        assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
+        return new HbVedtaksbrevData(vedtaksbrevData, perioder);
     }
 
     @Test

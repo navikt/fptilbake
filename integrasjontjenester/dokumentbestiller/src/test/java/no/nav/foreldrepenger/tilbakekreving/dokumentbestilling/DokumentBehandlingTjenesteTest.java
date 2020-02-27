@@ -9,7 +9,11 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import javax.inject.Inject;
+
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import com.google.common.collect.Lists;
 
@@ -37,15 +41,25 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepositoryImpl;
+import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
+@RunWith(CdiRunner.class)
 public class DokumentBehandlingTjenesteTest extends DokumentBestillerTestOppsett {
 
-    private final ProsessTaskRepository prosessTaskRepository = new ProsessTaskRepositoryImpl(repositoryRule.getEntityManager(), null, null);
+    private ProsessTaskRepository prosessTaskRepository;
+
     private final JournalTjeneste mockJournalTjeneste = mock(JournalTjeneste.class);
     private final PersoninfoAdapter mockPersoninfoAdapter = mock(PersoninfoAdapter.class);
-    private HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(repositoryProvider.getHistorikkRepository(), mockJournalTjeneste, mockPersoninfoAdapter);
     private ManueltVarselBrevTjeneste mockManueltVarselBrevTjeneste = mock(ManueltVarselBrevTjeneste.class);
-    private DokumentBehandlingTjeneste dokumentBehandlingTjeneste = new DokumentBehandlingTjeneste(repositoryProvider, prosessTaskRepository, historikkinnslagTjeneste, mockManueltVarselBrevTjeneste);
+
+    private DokumentBehandlingTjeneste dokumentBehandlingTjeneste;
+
+    @Before
+    public void setup() {
+        prosessTaskRepository = new ProsessTaskRepositoryImpl(repositoryRule.getEntityManager(), null, null);
+        HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepository, mockJournalTjeneste, mockPersoninfoAdapter);
+        dokumentBehandlingTjeneste = new DokumentBehandlingTjeneste(repositoryProvider, prosessTaskRepository, historikkinnslagTjeneste, mockManueltVarselBrevTjeneste);
+    }
 
     @Test
     public void skal_henteBrevMal_for_behandling_som_har_ikke_sendt_varsel() {

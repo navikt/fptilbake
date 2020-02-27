@@ -1,0 +1,37 @@
+{{~#* inline "evt-renter-utsagn" ~}}{{#if totalresultat.totalt-rentebeløp}} Dette beløpet er med renter.{{/if}}{{~/inline~}}
+{{#if behandling.er-revurdering}}
+Vi har vurdert saka di om tilbakebetaling på nytt. Derfor gjeld ikkje det tidlegare vedtaket av {{behandling.original-behandling-dato-fagsakvedtak}} om tilbakebetaling av {{>ytelse-produkt}}.
+
+{{/if}}
+{{#if varsel.varslet-dato}}
+    {{#switch totalresultat.hovedresultat}}
+    {{#case "FULL_TILBAKEBETALING"}}
+Vi varsla deg {{varsel.varslet-dato}} om at du har fått utbetalt for mykje. Du må betale tilbake {{kroner totalresultat.totalt-tilbakekreves-beløp-med-renter}}, som er heile det feilutbetalte beløpet.{{>evt-renter-utsagn}}
+    {{/case}}
+    {{#case "DELVIS_TILBAKEBETALING"}}
+Vi varsla deg {{varsel.varslet-dato}} om at du har fått {{kroner varsel.varslet-beløp}} for mykje. Du må betale tilbake {{kroner totalresultat.totalt-tilbakekreves-beløp-med-renter}}, som er delar av det feilutbetalte beløpet.{{>evt-renter-utsagn}}
+    {{/case}}
+    {{#case "INGEN_TILBAKEBETALING"}}
+Vi varsla deg {{varsel.varslet-dato}} om at du har fått {{kroner varsel.varslet-beløp}} for mykje. Vi har behandlet saka di og du må ikkje betale tilbake det feilutbetalte beløpet.
+    {{/case}}
+    {{/switch}}
+
+{{else}}
+{{~#* inline "brev-ytelse-endret" ~}}I brev {{sak.dato-fagsakvedtak}} fikk du melding om at {{>ytelse-produkt}} {{#if (eq sak.ytelsetype "ES")}}din{{else}}dine{{/if}} er endra. Endringa gjorde at du har fått utbetalt for mykje.{{~/inline~}}
+    {{#switch totalresultat.hovedresultat}}
+    {{#case "FULL_TILBAKEBETALING"}}
+{{>brev-ytelse-endret}} Du må betale tilbake {{kroner totalresultat.totalt-tilbakekreves-beløp-med-renter}}, som er heile det feilutbetalte beløpet.{{>evt-renter-utsagn}}
+    {{/case}}
+    {{#case "DELVIS_TILBAKEBETALING"}}
+{{>brev-ytelse-endret}} Du må betale tilbake {{kroner totalresultat.totalt-tilbakekreves-beløp-med-renter}}, som er delar av det feilutbetalte beløpet.{{>evt-renter-utsagn}}
+    {{/case}}
+    {{#case "INGEN_TILBAKEBETALING"}}
+{{>brev-ytelse-endret}} Du må ikkje betale tilbake det du har fått for mykje.
+    {{/case}}
+    {{/switch}}
+
+{{/if}}
+{{#if fritekst-oppsummering}}
+{{fritekst-oppsummering}}
+
+{{/if}}

@@ -3,7 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling;
 import java.time.LocalDate;
 import java.util.UUID;
 
-import javax.persistence.EntityManager;
+import javax.inject.Inject;
 import javax.persistence.FlushModeType;
 
 import org.junit.Before;
@@ -21,10 +21,11 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.NavBrukerKjønn;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProviderImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.TestFagsakUtil;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
@@ -45,13 +46,18 @@ public class DokumentBestillerTestOppsett {
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
-    protected final EntityManager entityManager = repositoryRule.getEntityManager();
-
-    protected final BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProviderImpl(entityManager);
-    protected final BehandlingRepository behandlingRepository = repositoryProvider.getBehandlingRepository();
-    protected final EksternBehandlingRepository eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
-    protected final BrevSporingRepository brevSporingRepository = repositoryProvider.getBrevSporingRepository();
-
+    @Inject
+    protected BehandlingRepositoryProvider repositoryProvider;
+    @Inject
+    protected BehandlingRepository behandlingRepository;
+    @Inject
+    protected EksternBehandlingRepository eksternBehandlingRepository;
+    @Inject
+    protected BrevSporingRepository brevSporingRepository;
+    @Inject
+    protected HistorikkRepository historikkRepository;
+    @Inject
+    private FagsakRepository fagsakRepository;
 
     protected Fagsak fagsak;
     protected Behandling behandling;
@@ -61,7 +67,7 @@ public class DokumentBestillerTestOppsett {
     public void init() {
         repositoryRule.getEntityManager().setFlushMode(FlushModeType.AUTO);
         fagsak = TestFagsakUtil.opprettFagsak();
-        repositoryProvider.getFagsakRepository().lagre(fagsak);
+        fagsakRepository.lagre(fagsak);
         behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).build();
         BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(behandling);
         behandlingRepository.lagre(behandling, behandlingLås);

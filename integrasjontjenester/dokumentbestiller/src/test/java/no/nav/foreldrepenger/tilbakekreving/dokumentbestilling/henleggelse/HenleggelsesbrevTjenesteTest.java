@@ -8,10 +8,9 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import java.util.Optional;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
-import no.nav.vedtak.exception.FunksjonellException;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import no.nav.foreldrepenger.domene.dokumentarkiv.journal.JournalTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.OrganisasjonsEnhet;
@@ -20,34 +19,41 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.Bre
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.DokumentBestillerTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.EksternDataForBrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.JournalpostIdOgDokumentId;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
+import no.nav.vedtak.exception.FunksjonellException;
+import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
+@RunWith(CdiRunner.class)
 public class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
 
     private EksternDataForBrevTjeneste mockEksternDataForBrevTjeneste = mock(EksternDataForBrevTjeneste.class);
     private FritekstbrevTjeneste mockFritekstbrevTjeneste = mock(FritekstbrevTjeneste.class);
     private JournalTjeneste mockJournalTjeneste = mock(JournalTjeneste.class);
     private PersoninfoAdapter mockPersoninfoAdapter = mock(PersoninfoAdapter.class);
-    private HistorikkRepository historikkRepository = repositoryProvider.getHistorikkRepository();
 
-    private HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(repositoryProvider.getHistorikkRepository(),
-        mockJournalTjeneste,
-        mockPersoninfoAdapter);
-    private HenleggelsesbrevTjeneste henleggelsesbrevTjeneste = new HenleggelsesbrevTjeneste(repositoryProvider, mockEksternDataForBrevTjeneste, mockFritekstbrevTjeneste, historikkinnslagTjeneste);
+    private HenleggelsesbrevTjeneste henleggelsesbrevTjeneste;
 
     private Long behandlingId;
 
     @Before
     public void setup() {
+        HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepository,
+            mockJournalTjeneste,
+            mockPersoninfoAdapter);
+        henleggelsesbrevTjeneste = new HenleggelsesbrevTjeneste(repositoryProvider, mockEksternDataForBrevTjeneste,
+            mockFritekstbrevTjeneste, historikkinnslagTjeneste);
+
         behandlingId = behandling.getId();
         String varselTekst = "hello";
         when(mockFritekstbrevTjeneste.sendFritekstbrev(any(FritekstbrevData.class))).thenReturn(lagJournalOgDokument());
@@ -59,6 +65,13 @@ public class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
         String aktørId = behandling.getAktørId().getId();
         when(mockEksternDataForBrevTjeneste.hentPerson(aktørId)).thenReturn(personinfo);
         when(mockEksternDataForBrevTjeneste.hentAdresse(personinfo, aktørId)).thenReturn(lagStandardNorskAdresse());
+
+        EksternBehandlingsinfoDto eksternBehandlingsinfoDto = new EksternBehandlingsinfoDto();
+        eksternBehandlingsinfoDto.setSprakkode(Språkkode.nb);
+        when(mockEksternDataForBrevTjeneste.hentBehandlingFpsak(FPSAK_BEHANDLING_UUID))
+            .thenReturn(SamletEksternBehandlingInfo.builder()
+                .setGrunninformasjon(eksternBehandlingsinfoDto)
+                .build());
 
         OrganisasjonsEnhet organisasjonsEnhet = new OrganisasjonsEnhet("1234", "NAV-TESTENHET");
         behandling.setBehandlendeOrganisasjonsEnhet(organisasjonsEnhet);
@@ -99,7 +112,6 @@ public class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
             .medBrevType(BrevType.VARSEL_BREV)
             .medDokumentId("12312423432423")
             .medBehandlingId(behandlingId).build();
-        repositoryProvider.getBrevSporingRepository().lagre(brevSporing);
+        brevSporingRepository.lagre(brevSporing);
     }
-
 }

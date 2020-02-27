@@ -25,7 +25,6 @@ import no.finn.unleash.Unleash;
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultatPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingBeregningTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BehandlingFeilutbetalingFakta;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BeregningResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
@@ -49,7 +48,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselInfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingAktsomhetEntitet;
@@ -67,7 +65,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.V
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Avsnitt;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.HentForhåndvisningVedtaksbrevPdfDto;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.PeriodeMedTekstDto;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevSpråkUtil;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.EksternDataForBrevTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.Lokale;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.YtelseNavn;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevData;
@@ -275,7 +275,8 @@ public class VedtaksbrevTjeneste {
             : VedtakHjemmel.EffektForBruker.FØRSTEGANGSVEDTAK;
         LocalDate originalBehandlingVedtaksdato = erRevurdering ? finnOriginalBehandlingVedtaksdato(behandling) : null;
 
-        String hjemmelstekst = VedtakHjemmel.lagHjemmelstekst(vedtakResultatType, foreldelse, vilkårPerioder, effektForBruker);
+        Lokale lokale = BrevSpråkUtil.finnRiktigSpråk(fpsakBehandling.getGrunninformasjon().getSpråkkodeEllerDefault());
+        String hjemmelstekst = VedtakHjemmel.lagHjemmelstekst(vedtakResultatType, foreldelse, vilkårPerioder, effektForBruker, lokale);
 
         List<HbVedtaksbrevPeriode> perioder = resulatPerioder.stream()
             .map(brp -> lagBrevdataPeriode(brp, fakta, vilkårPerioder, foreldelse, perioderFritekst))
@@ -309,7 +310,8 @@ public class VedtaksbrevTjeneste {
             .medDatoer(HbVedtaksbrevDatoer.builder()
                 .medPerioder(perioder)
                 .build())
-            .medSøker(utledSøker(personinfo));
+            .medSøker(utledSøker(personinfo))
+            .medLocale(lokale);
 
         HbVedtaksbrevData data = new HbVedtaksbrevData(vedtakDataBuilder.build(), perioder);
         BrevMetadata brevMetadata = lagMetadataForVedtaksbrev(behandling, vedtakResultatType, fpsakBehandling, personinfo);
@@ -389,7 +391,7 @@ public class VedtaksbrevTjeneste {
             .medFagsaktypenavnPåSpråk(ytelseNavn.getNavnPåBrukersSpråk())
             .medSakspartId(personinfo.getPersonIdent().getIdent())
             .medSakspartNavn(personinfo.getNavn())
-            .medSprakkode(personinfo.getForetrukketSpråk())
+            .medSprakkode(eksternBehandlingsinfo.getGrunninformasjon().getSpråkkodeEllerDefault())
             .medTittel(VedtaksbrevOverskrift.finnTittelVedtaksbrev(ytelseNavn.getNavnPåBokmål(), tilbakekreves))
             .build();
     }

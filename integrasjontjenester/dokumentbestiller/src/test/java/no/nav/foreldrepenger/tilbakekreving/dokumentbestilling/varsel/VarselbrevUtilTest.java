@@ -99,11 +99,12 @@ public class VarselbrevUtilTest {
     public void skal_sammenstille_data_fra_fpsak_fpoppdrag_og_tps_for_sending() {
         FeilutbetaltePerioderDto feilutbetaltePerioderDto = lagFeilutbetaltePerioderMock(9999999999L);
         Adresseinfo adresseinfo = lagStandardNorskAdresse();
-        Personinfo personinfo = byggStandardPerson("Fiona", PERSONNUMMER, Språkkode.nn);
+        Personinfo personinfo = byggStandardPerson("Fiona", PERSONNUMMER);
 
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto = new EksternBehandlingsinfoDto();
         eksternBehandlingsinfoDto.setBehandlendeEnhetId(BEHANDLENDE_ENHET_ID);
         eksternBehandlingsinfoDto.setBehandlendeEnhetNavn(BEHANDLENDE_ENHET_NAVN);
+        eksternBehandlingsinfoDto.setSprakkode(Språkkode.nn);
 
         YtelseNavn ytelseNavn = lagYtelseNavn("svangerskapspengar", "svangerskapspenger");
 
@@ -163,7 +164,7 @@ public class VarselbrevUtilTest {
         behandling.setBehandlendeOrganisasjonsEnhet(organisasjonsEnhet);
 
         Adresseinfo adresseinfo = lagStandardNorskAdresse();
-        Personinfo personinfo = byggStandardPerson("Fiona", PERSONNUMMER, Språkkode.nn);
+        Personinfo personinfo = byggStandardPerson("Fiona", PERSONNUMMER);
         YtelseNavn ytelseNavn = lagYtelseNavn("foreldrepenger", "foreldrepenger");
 
         VarselbrevSamletInfo varselbrev = VarselbrevUtil.sammenstillInfoFraFagsystemerForSendingManueltVarselBrev(behandling,
@@ -200,14 +201,13 @@ public class VarselbrevUtilTest {
         return feilutbetaltePerioderDto;
     }
 
-    private Personinfo byggStandardPerson(String navn, String personnummer, Språkkode språkkode) {
+    private Personinfo byggStandardPerson(String navn, String personnummer) {
         return new Personinfo.Builder()
             .medPersonIdent(PersonIdent.fra(personnummer))
             .medNavn(navn)
             .medAktørId(new AktørId(9000000030014L))
             .medFødselsdato(LocalDate.of(1990, 2, 2))
             .medNavBrukerKjønn(NavBrukerKjønn.KVINNE)
-            .medForetrukketSpråk(språkkode)
             .build();
     }
 
