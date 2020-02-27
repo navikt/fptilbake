@@ -39,14 +39,12 @@ public class FplosKafkaProducer {
     @Inject
     public FplosKafkaProducer(@KonfigVerdi("kafka.fplos.topic") String topic,
                               @KonfigVerdi("bootstrap.servers") String bootstrapServers,
-                              @KonfigVerdi("kafka.fplos.schema.registry.url") String schemaRegistryUrl,
-                              @KonfigVerdi("kafka.fplos.client.id") String clientId,
+                              @KonfigVerdi("application.name") String clientId,
                               @KonfigVerdi("systembruker.username") String username,
                               @KonfigVerdi("systembruker.password") String password) {
         Properties properties = new Properties();
 
         properties.setProperty("bootstrap.servers", bootstrapServers);
-        properties.setProperty("schema.registry.url", schemaRegistryUrl);
         properties.setProperty("client.id", clientId);
 
         setSecurity(username, properties);
