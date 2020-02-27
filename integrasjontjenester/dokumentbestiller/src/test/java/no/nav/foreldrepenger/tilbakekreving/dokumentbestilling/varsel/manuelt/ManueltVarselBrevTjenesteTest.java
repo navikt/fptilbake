@@ -38,7 +38,6 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.EksternDat
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
@@ -85,7 +84,7 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
 
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto = new EksternBehandlingsinfoDto();
         eksternBehandlingsinfoDto.setSprakkode(Språkkode.nb);
-        when(mockEksternDataForBrevTjeneste.hentBehandlingFpsak(FPSAK_BEHANDLING_UUID, Tillegsinformasjon.PERSONOPPLYSNINGER, Tillegsinformasjon.SØKNAD))
+        when(mockEksternDataForBrevTjeneste.hentBehandlingFpsak(FPSAK_BEHANDLING_UUID))
             .thenReturn(SamletEksternBehandlingInfo.builder()
                 .setGrunninformasjon(eksternBehandlingsinfoDto)
                 .build());
