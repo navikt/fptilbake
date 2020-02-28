@@ -16,6 +16,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResult
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.SærligGrunn;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.Lokale;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbKonfigurasjon;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbPerson;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbSak;
@@ -37,8 +38,8 @@ public class DokumentasjonGeneratorSærligeGrunner {
     private final Periode januar = Periode.of(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 1, 31));
 
     @Test
-    public void list_ut_særlige_grunner_simpel_uaktsomhet() {
-        HbVedtaksbrevFelles felles = lagFellesdel();
+    public void list_ut_særlige_grunner_simpel_uaktsomhet_feil_opplysninger() {
+        HbVedtaksbrevFelles felles = lagFellesdel(null);
 
         boolean[] boolske = {false, true};
 
@@ -47,11 +48,110 @@ public class DokumentasjonGeneratorSærligeGrunner {
                 for (boolean sgTid : boolske) {
                     for (boolean reduksjon : boolske) {
                         for (boolean sgAnnet : boolske) {
-                            HbVedtaksbrevPeriode periode = lagPeriodeDel(Aktsomhet.SIMPEL_UAKTSOM, sgNav, sgBeløp, sgTid, sgAnnet, reduksjon);
+                            HbVedtaksbrevPeriode periode = lagPeriodeDel(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER, Aktsomhet.SIMPEL_UAKTSOM, sgNav, sgBeløp, sgTid, sgAnnet, reduksjon);
                             String s = TekstformatererVedtaksbrev.lagSærligeGrunnerTekst(felles, periode);
                             String overskrift = overskrift(sgNav, sgBeløp, sgTid, sgAnnet, reduksjon);
-                            String prettyprint = s.replace("_Er det særlige grunner til å redusere beløpet?", overskrift)
-                                .replace(" 500\u00A0kroner", " <kravbeløp> kroner");
+                            String prettyprint = prettyprint(s, overskrift);
+
+                            System.out.println();
+                            System.out.println(prettyprint);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    public void list_ut_særlige_grunner_simpel_uaktsomhet_feil_opplysninger_forstod() {
+        HbVedtaksbrevFelles felles = lagFellesdel(null);
+
+        boolean[] boolske = {false, true};
+
+        for (boolean sgNav : boolske) {
+            for (boolean sgBeløp : boolske) {
+                for (boolean sgTid : boolske) {
+                    for (boolean reduksjon : boolske) {
+                        for (boolean sgAnnet : boolske) {
+                            HbVedtaksbrevPeriode periode = lagPeriodeDel(VilkårResultat.FORSTO_BURDE_FORSTÅTT, Aktsomhet.SIMPEL_UAKTSOM, sgNav, sgBeløp, sgTid, sgAnnet, reduksjon);
+                            String s = TekstformatererVedtaksbrev.lagSærligeGrunnerTekst(felles, periode);
+                            String overskrift = overskrift(sgNav, sgBeløp, sgTid, sgAnnet, reduksjon);
+                            String prettyprint = prettyprint(s, overskrift);
+
+                            System.out.println();
+                            System.out.println(prettyprint);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    public void list_ut_særlige_grunner_simpel_uaktsomhet_nynorsk() {
+        HbVedtaksbrevFelles felles = lagFellesdel(Lokale.NYNORSK);
+
+        boolean[] boolske = {false, true};
+
+        for (boolean sgNav : boolske) {
+            for (boolean sgBeløp : boolske) {
+                for (boolean sgTid : boolske) {
+                    for (boolean reduksjon : boolske) {
+                        for (boolean sgAnnet : boolske) {
+                            HbVedtaksbrevPeriode periode = lagPeriodeDel(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER, Aktsomhet.SIMPEL_UAKTSOM, sgNav, sgBeløp, sgTid, sgAnnet, reduksjon);
+                            String s = TekstformatererVedtaksbrev.lagSærligeGrunnerTekst(felles, periode);
+                            String overskrift = overskrift(sgNav, sgBeløp, sgTid, sgAnnet, reduksjon);
+                            String prettyprint = prettyprint(s, overskrift);
+
+                            System.out.println();
+                            System.out.println(prettyprint);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    public void list_ut_særlige_grunner_grov_uaktsomhet() {
+        HbVedtaksbrevFelles felles = lagFellesdel(null);
+
+        boolean[] boolske = {false, true};
+
+        for (boolean sgNav : boolske) {
+            for (boolean sgBeløp : boolske) {
+                for (boolean sgTid : boolske) {
+                    for (boolean reduksjon : boolske) {
+                        for (boolean sgAnnet : boolske) {
+                            HbVedtaksbrevPeriode periode = lagPeriodeDel(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER, Aktsomhet.GROVT_UAKTSOM, sgNav, sgBeløp, sgTid, sgAnnet, reduksjon);
+                            String s = TekstformatererVedtaksbrev.lagSærligeGrunnerTekst(felles, periode);
+                            String overskrift = overskrift(sgNav, sgBeløp, sgTid, sgAnnet, reduksjon);
+                            String prettyprint = prettyprint(s, overskrift);
+
+                            System.out.println();
+                            System.out.println(prettyprint);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    public void list_ut_særlige_grunner_grov_uaktsomhet_nynorsk() {
+        HbVedtaksbrevFelles felles = lagFellesdel(Lokale.NYNORSK);
+
+        boolean[] boolske = {false, true};
+
+        for (boolean sgNav : boolske) {
+            for (boolean sgBeløp : boolske) {
+                for (boolean sgTid : boolske) {
+                    for (boolean reduksjon : boolske) {
+                        for (boolean sgAnnet : boolske) {
+                            HbVedtaksbrevPeriode periode = lagPeriodeDel(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER, Aktsomhet.GROVT_UAKTSOM, sgNav, sgBeløp, sgTid, sgAnnet, reduksjon);
+                            String s = TekstformatererVedtaksbrev.lagSærligeGrunnerTekst(felles, periode);
+                            String overskrift = overskrift(sgNav, sgBeløp, sgTid, sgAnnet, reduksjon);
+                            String prettyprint = prettyprint(s, overskrift);
 
                             System.out.println();
                             System.out.println(prettyprint);
@@ -80,10 +180,10 @@ public class DokumentasjonGeneratorSærligeGrunner {
         if (sgAnnet) {
             deler.add("annet");
         }
-        return "[" + String.join(" - ", deler) + "]";
+        return "*[" + String.join(" - ", deler) + "]*";
     }
 
-    private HbVedtaksbrevPeriode lagPeriodeDel(Aktsomhet aktsomhet, boolean sgNav, boolean sgBeløp, boolean sgTid, boolean sgAnnet, boolean reduksjon) {
+    private HbVedtaksbrevPeriode lagPeriodeDel(VilkårResultat vilkårResultat, Aktsomhet aktsomhet, boolean sgNav, boolean sgBeløp, boolean sgTid, boolean sgAnnet, boolean reduksjon) {
         List<SærligGrunn> sg = new ArrayList<>();
         if (sgNav) {
             sg.add(SærligGrunn.HELT_ELLER_DELVIS_NAVS_FEIL);
@@ -103,7 +203,7 @@ public class DokumentasjonGeneratorSærligeGrunner {
             .medPeriode(januar)
             .medVurderinger(HbVurderinger.builder()
                 .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
-                .medVilkårResultat(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER)
+                .medVilkårResultat(vilkårResultat)
                 .medAktsomhetResultat(aktsomhet)
                 .medSærligeGrunner(sg, null, fritekstSærligeGrunnerAnnet)
                 .build())
@@ -119,7 +219,7 @@ public class DokumentasjonGeneratorSærligeGrunner {
             .build();
     }
 
-    private HbVedtaksbrevFelles lagFellesdel() {
+    private HbVedtaksbrevFelles lagFellesdel(Lokale lokale) {
         return HbVedtaksbrevFelles.builder()
             .medSak(HbSak.build()
                 .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
@@ -145,6 +245,15 @@ public class DokumentasjonGeneratorSærligeGrunner {
                 .medNavn("Søker Søkersen")
                 .medErGift(true)
                 .build())
+            .medLocale(lokale != null ? lokale : Lokale.BOKMÅL)
             .build();
+    }
+
+    private String prettyprint(String s, String overskrift) {
+        return s.replace("_Er det særlige grunner til å redusere beløpet?", overskrift)
+            .replace("_Er det særlege grunnar til å redusere beløpet?", overskrift)
+            .replace(" 500\u00A0kroner", " <kravbeløp> kroner")
+            .replaceAll("\\[", "[ ")
+            .replaceAll("]", " ]");
     }
 }

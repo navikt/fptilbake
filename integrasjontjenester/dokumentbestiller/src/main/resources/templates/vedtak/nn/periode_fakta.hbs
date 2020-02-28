@@ -2,7 +2,7 @@
 {{~#* inline "familie-hendelse" ~}}{{#if sak.er-adopsjon}}då du tok over omsorga for {{> barnet-ditt}}{{else}}da {{> barnet-ditt}} blei født{{/if}}{{~/inline~}}
 {{~#* inline "barnet" ~}}{{eq sak.antall-barn 1 yes="barnet" no="barna"}}{{~/inline~}}
 {{~#* inline "sitt-barn" ~}}{{eq sak.antall-barn 1 yes="sitt barn" no="sine barn"}}{{~/inline~}}
-{{~#* inline "det-samme-barnet" ~}}{{eq sak.antall-barn 1 yes="det samme barnet" no="de samme barna"}}{{~/inline~}}
+{{~#* inline "det-samme-barnet" ~}}{{eq sak.antall-barn 1 yes="det same barnet" no="dei same barna"}}{{~/inline~}}
 {{#* inline "fakta-medlemskap"}}
         {{#switch fakta.hendelseundertype}}
         {{#case "IKKE_BOSATT"}}
@@ -73,16 +73,16 @@ I denne perioden har du fått både utbetalt {{> ytelse-navn}} frå oss og lønn
     {{#case "ES_FORELDREANSVAR_TYPE"}}
         {{#switch fakta.hendelseundertype}}
         {{#case "ES_IKKE_MINDRE_SAMVAER"}}
-Du har berre rett til eingongsstønad hvis du har hatt et samvær med {{> barnet}} før du overtok omsorga som er mindre enn én dag i uken og annenhver helg. Du har hatt meir samvær med {{> barnet}} enn dette. Derfor har du ikkje rett til eingongsstønad.
+Du har berre rett til eingongsstønad dersom du har hatt eit samvær med {{> barnet}} før du overtok omsorga som er mindre enn éin dag i veka og annakvar helg. Du har hatt meir samvær med {{> barnet}} enn dette. Derfor har du ikkje rett til eingongsstønad.
         {{/case}}
         {{#case "ES_ANDRE_FORELDRE_DODD"}}
-Du har berre rett til eingongsstønad hvis du har foreldreansvaret. Fordi du ikkje har foreldreansvaret for {{> barnet}}, har du ikkje rett til eingongsstønad.
+Du har berre rett til eingongsstønad dersom du har foreldreansvaret. Fordi du ikkje har foreldreansvaret for {{> barnet}}, har du ikkje rett til eingongsstønad.
         {{/case}}
         {{#case "ES_FORELDREANSVAR_BARN_OVER_15"}}
-Du har berre rett til eingongsstønad når {{> barnet}} er under 15 år når du overtar omsorga. Fordi {{> barnet}} var fylt 15 år da du overtok omsorga, har du ikkje rett til eingongsstønad.
+Du har berre rett til eingongsstønad når {{> barnet}} er under 15 år når du overtek omsorga. Fordi {{> barnet}} var fylt 15 år då du overtok omsorga, har du ikkje rett til eingongsstønad.
         {{/case}}
         {{#case "ES_IKKE_TILDELT"}}
-Du har berre rett til eingongsstønad hvis du har foreldreansvaret. Fordi du ikkje har foreldreansvaret for {{> barnet}}, har du ikkje rett til eingongsstønad.
+Du har berre rett til eingongsstønad dersom du har foreldreansvaret. Fordi du ikkje har foreldreansvaret for {{> barnet}}, har du ikkje rett til eingongsstønad.
         {{/case}}
         {{/switch}}
 
@@ -91,7 +91,7 @@ Du har fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt.
     {{#case "ES_FEIL_UTBETALING_TYPE"}}
         {{#switch fakta.hendelseundertype}}
         {{#case "ES_STONAD_FLERE_GANGER"}}
-Du har berre rett til én eingongsstønad per barn. Fordi du har fått utbetalt eingongsstønad fleire gonger for {{> det-samme-barnet}}, har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt.
+Du har berre rett til éin eingongsstønad per barn. Fordi du har fått utbetalt eingongsstønad fleire gonger for {{> det-samme-barnet}}, har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt.
         {{/case}}
         {{#case "ØKONOMI_UTBETALT_FOR_MYE"}}
 Vi har gjort ein feil og betalt ut for mykje i eingongsstønad. Du skulle ha hatt {{kroner kravgrunnlag.riktig-beløp}}, men du fekk {{kroner kravgrunnlag.utbetalt-beløp}}. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt.
@@ -106,23 +106,23 @@ Du har berre rett til eingongsstønad dersom du har omsorga for {{> barnet}}. Fo
 Du har fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt.
         {{/case}}
         {{#case "ES_STONADEN_ALLEREDE_UTBETALT"}}
-Du har fått utbetalt eingongsstønad. Du har berre rett til eingongsstønad hvis den ikkje allerede er utbetalt til mor. Mor har fått utbetalt stønaden, og du har derfor fått for mykje utbetalt.
+Du har fått utbetalt eingongsstønad. Du har berre rett til eingongsstønad dersom han ikkje allereie er utbetalt til mor. Mor har fått utbetalt stønaden, og du har derfor fått for mykje utbetalt.
         {{/case}}
         {{/switch}}
     {{/case}}
     {{#case "ES_ADOPSJONSVILKAARET_TYPE"}}
         {{#switch fakta.hendelseundertype}}
         {{#case "ES_STEBARN"}}
-Du har ikkje rett til eingongsstønad når du adopterer {{> barnet}} til {{#if søker.er-gift}}ektefellen{{else if søker.er-partner}}partneren{{else}}samboeren{{/if}} din. Fordi du har adoptert {{#if søker.er-gift}}ektefellen{{else if søker.er-partner}}partneren{{else}}samboeren{{/if}} din {{> sitt-barn}}, har du ikkje rett til eingongsstønad.
+Du har ikkje rett til eingongsstønad når du adopterer {{> barnet}} til {{#if søker.er-gift}}ektefellen{{else if søker.er-partner}}partnaren{{else}}sambuaren{{/if}} din. Fordi du har adoptert {{#if søker.er-gift}}ektefellen{{else if søker.er-partner}}partnaren{{else}}sambuaren{{/if}} din {{> sitt-barn}}, har du ikkje rett til eingongsstønad.
         {{/case}}
         {{#case "ES_IKKE_OPPFYLT"}}
-Du fekk utbetalt eingongsstønad fordi du skulle adoptere {{> barnet}}. Vi har ikkje mottatt ein gyldig adopsjonsbevilgning. Derfor har du ikkje rett til eingongsstønad.
+Du fekk utbetalt eingongsstønad fordi du skulle adoptere {{> barnet}}. Vi har ikkje fått ei gyldig adopsjonsbevilgning. Derfor har du ikkje rett til eingongsstønad.
         {{/case}}
         {{#case "ES_MANN_IKKE_ALENE"}}
-Du har berre rett til eingongsstønad dersom du adopterer {{> barnet}} alene. Fordi du ikkje har åleineomsorga for {{> barnet}}, har du ikkje rett til eingongsstønad.
+Du har berre rett til eingongsstønad dersom du adopterer {{> barnet}} åleine. Fordi du ikkje har åleineomsorga for {{> barnet}}, har du ikkje rett til eingongsstønad.
         {{/case}}
         {{#case "ES_BARN_OVER_15"}}
-Du har berre rett til eingongsstønad når {{> barnet}} er under 15 år når du overtar omsorga. Fordi {{> barnet}} var fylt 15 år da du overtok omsorga, har du ikkje rett til eingongsstønad.
+Du har berre rett til eingongsstønad når {{> barnet}} er under 15 år når du overtek omsorga. Fordi {{> barnet}} var fylt 15 år då du overtok omsorga, har du ikkje rett til eingongsstønad.
         {{/case}}
         {{/switch}}
 
@@ -131,10 +131,10 @@ Du har fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt.
     {{#case "ES_FORELDREANSVAR_FAR_TYPE"}}
         {{#switch fakta.hendelseundertype}}
         {{#case "ES_FAR_IKKE_ALENE"}}
-Du har berre rett til eingongsstønad når du overtar omsorga innen 56 uker etter {{eq sak.er-adopsjon yes="adopsjonen" no="fødselen"}}. Du overtok omsorga for {{> barnet}} senere enn dette. Derfor har du ikkje rett til eingongsstønad
+Du har berre rett til eingongsstønad når du skal overta foreldreansvaret for {{> barnet}} etter barnelova kapittel 5. Fordi det ikkje er dokumentert at du skal ha foreldreansvaret åleine for {{> barnet}}, har du ikkje rett til eingongsstønad.
         {{/case}}
         {{#case "ES_FAR_IKKE_INNEN_STONADSPERIODE"}}
-Du har berre rett til eingongsstønad når du skal overta foreldreansvaret for {{> barnet}} etter barneloven kapittel 5. Fordi det ikkje er dokumentert at du skal ha foreldreansvaret alene for {{> barnet}}, har du ikkje rett til eingongsstønad.
+Du har berre rett til eingongsstønad når du overtek omsorga innan 56 veker etter {{eq sak.er-adopsjon yes="adopsjonen" no="fødselen"}}. Du overtok omsorga for {{> barnet}} seinare enn dette. Derfor har du ikkje rett til eingongsstønad
         {{/case}}
         {{/switch}}
 
@@ -158,7 +158,7 @@ Du har ikkje rett til både eingongsstønad og foreldrepengar. Derfor har du få
     {{#case "ES_FODSELSVILKAARET_TYPE"}}
         {{#switch fakta.hendelseundertype}}
         {{#case "ES_BARN_IKKE_REGISTRERT"}}
-Du har berre rett til eingongsstønad hvis du føder eller adopterer barn. Vi har ikkje opplysninger som dokumenterer at du har født eller adoptert barn. Derfor har du ikkje rett til eingongsstønad.
+Du har berre rett til eingongsstønad dersom du føder eller adopterer barn. Vi har ikkje opplysningar som dokumenterer at du har fått eller adoptert barn. Derfor har du ikkje rett til eingongsstønad.
 
 Du har fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt.
         {{/case}}
@@ -205,7 +205,7 @@ Du har fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i de
 Du fekk innvilga 100 prosent foreldrepengar, men i ettertid har du fått gjort om foreldrepengane til 80 prosent. Du har derfor fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
         {{/case}}
         {{#case "FEIL_FLERBARNSDAGER"}}
-De har begge fått foreldrepengar i den same perioden, men berre èin av dykk skulle ha hatt foreldrepengar. Fordi den andre forelderen har rett til pengane, har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt denne perioden.
+De har begge fått foreldrepengar i den same perioden, men berre éin av dykk skulle ha hatt foreldrepengar. Fordi den andre forelderen har rett til pengane, har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt denne perioden.
         {{/case}}
         {{#case "OPPHOR_BARN_DOD"}}
 Vi har fått melding om at {{> barnet-ditt}} døydde. Foreldrepengane skulle ha vore stansa frå og med {{opphørsdato-dødt-barn}}.
@@ -329,7 +329,7 @@ Du har jobba samtidig som at du har fått utbetalt foreldrepengar. Fordi du har 
 {{/case}}
 {{#case "SVP"}}
     {{#* inline "tilrettelegging-mulig"}}
-Arbeidsgiver kunne tilpasse eller endre arbeidsoppgavene dine uten at det var fare for å skade {{> barnet}} du venter. Du har berre rett til svangerskapspengar om du må slutte å jobbe. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
+Arbeidsgivaren kunne tilpasse eller endre arbeidsoppgåvene dine utan at det var fare for å skade {{> barnet}} du ventar. Du har berre rett til svangerskapspengar om du må slutte å jobbe. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
     {{/inline}}
     {{#switch fakta.hendelsetype}}
     {{#case "MEDLEMSKAP"}}
@@ -348,7 +348,7 @@ Vi har endra berekninga av {{> ytelse-produkt}} dine. Du har derfor fått {{kron
     {{#case "SVP_UTTAK_TYPE"}}
         {{#switch fakta.hendelseundertype}}
         {{#case "SVP_ENDRING_PROSENT"}}
-Du har jobba samtidig som at du har fått utbetalt svangerskapspengar. Fordi du har fått endra det du tar ut i svangerskapspengar i denne perioden, er delar av beløpet du har fått utbetalt feil. Du har derfor fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
+Du har jobba samtidig som at du har fått utbetalt svangerskapspengar. Fordi du har fått endra det du tek ut i svangerskapspengar i denne perioden, er delar av beløpet du har fått utbetalt feil. Du har derfor fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
         {{/case}}
         {{#case "SVP_ENDRING_PERIODE"}}
 Du fekk innvilga svangerskapspengar i denne perioden. I etterkant er perioden blitt endra og du har derfor fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt.
@@ -368,20 +368,20 @@ Du fekk innvilga svangerskapspengar i denne perioden. I etterkant er perioden bl
     {{#case "SVP_FAKTA_TYPE"}}
         {{#switch fakta.hendelseundertype}}
         {{#case "SVP_ENDRING_TERMINDATO"}}
-Du fekk utbetalt svangerskapspengar når det var mindre enn tre uker til termin. Svangerskapspengar kan berre gis frem til tre uker før du har termin. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
+Du fekk utbetalt svangerskapspengar då det var mindre enn tre veker til termin. Vi kan berre gi svangerskapspengar fram til tre veker før du har termin. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
         {{/case}}
         {{#case "SVP_IKKE_HELSEFARLIG"}}
-Du kunne gjøre arbeidsoppgavene hos [navn på arbeidsgiver] uten at det var fare for å skade {{> barnet}} du venter. Du hadde derfor ikkje rett til svangerskapspengar og har fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
+Du kunne gjere arbeidsoppgåvene hos [navn på arbeidsgiver] utan at det var fare for å skade {{> barnet}} du ventar. Du hadde derfor ikkje rett til svangerskapspengar og har fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
         {{/case}}
         {{#case "SVP_TIDLIG_FODSEL"}}
-Du fekk innvilga svangerskapspengar i denne perioden. Du kan berre få svangerskapspengar fram til {{> barnet}} er født. Fordi du fødte før termin har du fått utbetalt fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje.
+Du fekk innvilga svangerskapspengar i denne perioden. Du kan berre få svangerskapspengar fram til {{> barnet}} er født. Fordi du fødde før termin, har du fått utbetalt fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje.
         {{/case}}
         {{/switch}}
     {{/case}}
     {{#case "SVP_OPPTJENING_TYPE"}}
         {{#switch fakta.hendelseundertype}}
         {{#case "SVP_IKKE_ARBEID"}}
-Du har ikkje hatt arbeidsinntekt eller inntekt som er likestilt med lønn i minst fire uker før du må slutte å jobbe. Derfor har du ikkje rett til svangerskapspengar.
+Du har ikkje hatt arbeidsinntekt eller inntekt som er likestilt med lønn i minst fire veker før du må slutte å jobbe. Derfor har du ikkje rett til svangerskapspengar.
 
 Du har fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
         {{/case}}

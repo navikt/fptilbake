@@ -131,10 +131,10 @@ Du har fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt.
     {{#case "ES_FORELDREANSVAR_FAR_TYPE"}}
         {{#switch fakta.hendelseundertype}}
         {{#case "ES_FAR_IKKE_ALENE"}}
-Du har kun rett til engangsstønad når du overtar omsorgen innen 56 uker etter {{eq sak.er-adopsjon yes="adopsjonen" no="fødselen"}}. Du overtok omsorgen for {{> barnet}} senere enn dette. Derfor har du ikke rett til engangsstønad
+Du har kun rett til engangsstønad når du skal overta foreldreansvaret for {{> barnet}} etter barneloven kapittel 5. Fordi det ikke er dokumentert at du skal ha foreldreansvaret alene for {{> barnet}}, har du ikke rett til engangsstønad.
         {{/case}}
         {{#case "ES_FAR_IKKE_INNEN_STONADSPERIODE"}}
-Du har kun rett til engangsstønad når du skal overta foreldreansvaret for {{> barnet}} etter barneloven kapittel 5. Fordi det ikke er dokumentert at du skal ha foreldreansvaret alene for {{> barnet}}, har du ikke rett til engangsstønad.
+Du har kun rett til engangsstønad når du overtar omsorgen innen 56 uker etter {{eq sak.er-adopsjon yes="adopsjonen" no="fødselen"}}. Du overtok omsorgen for {{> barnet}} senere enn dette. Derfor har du ikke rett til engangsstønad
         {{/case}}
         {{/switch}}
 

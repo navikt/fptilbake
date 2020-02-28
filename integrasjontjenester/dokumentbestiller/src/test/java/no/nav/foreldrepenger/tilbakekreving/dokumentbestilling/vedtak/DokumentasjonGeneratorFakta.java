@@ -26,6 +26,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResult
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.AnnenVurdering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.Lokale;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbKonfigurasjon;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbPerson;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbSak;
@@ -65,6 +66,20 @@ public class DokumentasjonGeneratorFakta {
     }
 
     @Test
+    public void list_ut_permutasjoner_for_FP_nynorsk() {
+        HbVedtaksbrevFelles felles = lagFellesBuilder()
+            .medSak(HbSak.build()
+                .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
+                .medErFødsel(true)
+                .medAntallBarn(1)
+                .build())
+            .medLocale(Lokale.NYNORSK)
+            .build();
+        Map<HendelseMedUndertype, String> resultat = lagFaktatekster(felles);
+        prettyPrint(resultat);
+    }
+
+    @Test
     public void list_ut_permutasjoner_for_SVP() {
         HbVedtaksbrevFelles felles = lagFellesBuilder()
             .medSak(HbSak.build()
@@ -72,6 +87,20 @@ public class DokumentasjonGeneratorFakta {
                 .medErFødsel(true)
                 .medAntallBarn(1)
                 .build())
+            .build();
+        Map<HendelseMedUndertype, String> resultat = lagFaktatekster(felles);
+        prettyPrint(resultat);
+    }
+
+    @Test
+    public void list_ut_permutasjoner_for_SVP_nynorsk() {
+        HbVedtaksbrevFelles felles = lagFellesBuilder()
+            .medSak(HbSak.build()
+                .medYtelsetype(FagsakYtelseType.SVANGERSKAPSPENGER)
+                .medErFødsel(true)
+                .medAntallBarn(1)
+                .build())
+            .medLocale(Lokale.NYNORSK)
             .build();
         Map<HendelseMedUndertype, String> resultat = lagFaktatekster(felles);
         prettyPrint(resultat);
@@ -90,10 +119,24 @@ public class DokumentasjonGeneratorFakta {
         prettyPrint(resultat);
     }
 
+    @Test
+    public void list_ut_permutasjoner_for_ES_nynorsk() {
+        HbVedtaksbrevFelles felles = lagFellesBuilder()
+            .medSak(HbSak.build()
+                .medYtelsetype(FagsakYtelseType.ENGANGSTØNAD)
+                .medErFødsel(true)
+                .medAntallBarn(1)
+                .build())
+            .medLocale(Lokale.NYNORSK)
+            .build();
+        Map<HendelseMedUndertype, String> resultat = lagFaktatekster(felles);
+        prettyPrint(resultat);
+    }
+
     private void prettyPrint(Map<HendelseMedUndertype, String> resultat) {
         for (Map.Entry<HendelseMedUndertype, String> entry : resultat.entrySet()) {
             HendelseMedUndertype typer = entry.getKey();
-            System.out.println("[" + typer.getHendelseType().getNavn() + " - " + typer.getHendelseUnderType().getNavn() + "]");
+            System.out.println("*[ " + typer.getHendelseType().getNavn() + " - " + typer.getHendelseUnderType().getNavn() + " ]*");
             String generertTekst = entry.getValue();
             String parametrisertTekst = generertTekst
                 .replaceAll(" 10\u00A0000\u00A0kroner", " <feilutbetalt beløp> kroner")
@@ -104,7 +147,9 @@ public class DokumentasjonGeneratorFakta {
                 .replaceAll("3. mars 2018", "<opphørsdato barn døde>")
                 .replaceAll("4. mars 2018", "<opphørsdato ikke lenger gravid>")
                 .replaceAll("5. mars 2018", "<opphørsdato ikke omsorg>")
-                .replaceAll("ektefellen", "<ektefellen/samboeren>");
+                .replaceAll("ektefellen", "<ektefellen/partneren/samboeren>")
+                .replaceAll("\\[", "[ ")
+                .replaceAll("]", " ]");
             System.out.println(parametrisertTekst);
             System.out.println();
         }
