@@ -99,7 +99,7 @@ public class BeskjedUtsendtVarselTilSelvbetjeningMeldingProducer {
     public void sendBeskjedOmSendtVarsel(SendtVarselInformasjon varselHendelse) {
         try {
             String verdiSomJson = OM.writeValueAsString(varselHendelse);
-            sendJsonMedNøkkel(varselHendelse.getAktørId().getId(), verdiSomJson);
+            sendJsonMedNøkkel(varselHendelse.getNorskIdent(), verdiSomJson);
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException("Kunne ikke serialisere SendtVarselInformasjon til JSON", e);
         }
