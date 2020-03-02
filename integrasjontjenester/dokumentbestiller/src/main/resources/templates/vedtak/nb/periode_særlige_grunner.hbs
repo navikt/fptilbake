@@ -123,6 +123,6 @@ Vi har lagt vekt på at du {{> skulle-forstått}} at du fikk penger du ikke har 
         {{/switch}}
     {{#if (neq kravgrunnlag.feilutbetalt-beløp resultat.tilbakekreves-beløp)}}
 
-Du må betale {{kroner resultat.tilbakekreves-beløp-med-renter}}.
+Du må betale {{kroner resultat.tilbakekreves-beløp-med-renter}}{{> før-skatt}}.
     {{/if}}
 {{/if}}
