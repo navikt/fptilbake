@@ -15,6 +15,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.Bre
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.vedtak.felles.integrasjon.aktør.klient.AktørConsumerMedCache;
 
@@ -47,11 +48,13 @@ public class VarselSelvbetjeningTjeneste {
         Fagsak fagsak = behandling.getFagsak();
         Saksnummer saksnummer = fagsak.getSaksnummer();
         LocalDateTime nå = LocalDateTime.now();
-        Optional<String> personIdent = aktørConsumer.hentPersonIdentForAktørId(behandling.getAktørId().getId());
+        AktørId aktørId = behandling.getAktørId();
+        Optional<String> personIdent = aktørConsumer.hentPersonIdentForAktørId(aktørId.getId());
         if (personIdent.isEmpty()) {
             throw new IllegalArgumentException("Klarer ikke å finne norsk ident for aktørId");
         }
         SendtVarselInformasjon svInfo = SendtVarselInformasjon.builder()
+            .medAktørId(aktørId)
             .medNorskIdent(personIdent.get())
             .medSaksnummer(saksnummer)
             .medDialogId(saksnummer.getVerdi()) //unik referanse, saksnummer er akkurat unikt nok
