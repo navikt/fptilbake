@@ -7,14 +7,13 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 
 public class SendtVarselInformasjon {
     @JsonProperty("ytelseType")
     private String ytelseType;
-    @JsonProperty("aktørId")
-    private AktørId aktørId;
+    @JsonProperty("norskIdent")
+    private String norskIdent;
     @JsonProperty("saksnummer")
     private String saksnummer;
     @JsonProperty("journalpostId")
@@ -39,8 +38,8 @@ public class SendtVarselInformasjon {
         return ytelseType;
     }
 
-    public AktørId getAktørId() {
-        return aktørId;
+    public String getNorskIdent() {
+        return norskIdent;
     }
 
     public String getSaksnummer() {
@@ -87,8 +86,8 @@ public class SendtVarselInformasjon {
             return this;
         }
 
-        public Builder medAktørId(AktørId aktørId) {
-            kladd.aktørId = aktørId;
+        public Builder medNorskIdent(String norskIdent) {
+            kladd.norskIdent = norskIdent;
             return this;
         }
 
@@ -124,7 +123,7 @@ public class SendtVarselInformasjon {
 
         public SendtVarselInformasjon build() {
             Objects.requireNonNull(kladd.ytelseType, "mangler ytelseType");
-            Objects.requireNonNull(kladd.aktørId, "mangler aktørId");
+            Objects.requireNonNull(kladd.norskIdent, "mangler norskIdent (FNR/DNR)");
             Objects.requireNonNull(kladd.saksnummer, "mangler saksnummer");
             Objects.requireNonNull(kladd.journalpostId, "mangler journalpostId");
             Objects.requireNonNull(kladd.dokumentId, "mangler dokumentId");
