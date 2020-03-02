@@ -36,6 +36,21 @@ public class VedtakHjemmelTest {
     }
 
     @Test
+    public void skal_gi_riktig_hjemmel_når_det_er_forsto_burde_forstått_og_forsett() {
+        List<VilkårVurderingPeriodeEntitet> vurderingPerioder = aktsomhet(periode, a -> a.medAktsomhet(Aktsomhet.FORSETT).medIleggRenter(false));
+
+        assertThat(VedtakHjemmel.lagHjemmelstekst(VedtakResultatType.INGEN_TILBAKEBETALING, null, vurderingPerioder, VedtakHjemmel.EffektForBruker.FØRSTEGANGSVEDTAK, Lokale.BOKMÅL)).isEqualTo("folketrygdloven § 22-15");
+    }
+
+    @Test
+    public void skal_gi_riktig_hjemmel_når_det_er_feilaktig_opplysninger_og_forsett() {
+        List<VilkårVurderingPeriodeEntitet> vurderingPerioder = aktsomhet(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER,
+            periode, a -> a.medAktsomhet(Aktsomhet.FORSETT));
+
+        assertThat(VedtakHjemmel.lagHjemmelstekst(VedtakResultatType.INGEN_TILBAKEBETALING, null, vurderingPerioder, VedtakHjemmel.EffektForBruker.FØRSTEGANGSVEDTAK, Lokale.BOKMÅL)).isEqualTo("folketrygdloven §§ 22-15 og 22-17 a");
+    }
+
+    @Test
     public void skal_gi_riktig_hjemmel_når_det_ikke_kreves_tilbake_pga_lavt_beløp() {
         List<VilkårVurderingPeriodeEntitet> vurderingPerioder = aktsomhet(periode, a -> a.medTilbakekrevSmåBeløp(false));
 
@@ -109,12 +124,19 @@ public class VedtakHjemmelTest {
         return vurdertForeldelse;
     }
 
-    private List<VilkårVurderingPeriodeEntitet> aktsomhet(Periode periode, Function<VilkårVurderingAktsomhetEntitet.Builder, VilkårVurderingAktsomhetEntitet.Builder> oppsett) {
+    private List<VilkårVurderingPeriodeEntitet> aktsomhet(Periode periode,
+                                                          Function<VilkårVurderingAktsomhetEntitet.Builder, VilkårVurderingAktsomhetEntitet.Builder> oppsett) {
+        return aktsomhet(VilkårResultat.FORSTO_BURDE_FORSTÅTT, periode, oppsett);
+    }
+
+    private List<VilkårVurderingPeriodeEntitet> aktsomhet(VilkårResultat resultat,
+                                                          Periode periode,
+                                                          Function<VilkårVurderingAktsomhetEntitet.Builder, VilkårVurderingAktsomhetEntitet.Builder> oppsett) {
         VilkårVurderingEntitet vurdering = new VilkårVurderingEntitet();
         VilkårVurderingPeriodeEntitet vurderingPeriode = new VilkårVurderingPeriodeEntitet.Builder()
             .medVurderinger(vurdering)
             .medPeriode(periode)
-            .medVilkårResultat(VilkårResultat.FORSTO_BURDE_FORSTÅTT)
+            .medVilkårResultat(resultat)
             .medBegrunnelse("foo")
             .build();
         VilkårVurderingAktsomhetEntitet.Builder builder = VilkårVurderingAktsomhetEntitet.builder()
