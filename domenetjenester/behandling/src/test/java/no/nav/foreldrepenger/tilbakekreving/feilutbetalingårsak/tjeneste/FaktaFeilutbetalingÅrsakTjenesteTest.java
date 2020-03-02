@@ -134,7 +134,6 @@ public class FaktaFeilutbetalingÅrsakTjenesteTest {
             HendelseType.MEDLEMSKAP_TYPE,
             HendelseType.SVP_FAKTA_TYPE,
             HendelseType.SVP_ARBEIDSGIVERS_FORHOLD_TYPE,
-            HendelseType.SVP_ARBEIDSFORHOLD_TYPE,
             HendelseType.SVP_OPPTJENING_TYPE,
             HendelseType.SVP_BEREGNING_TYPE,
             HendelseType.SVP_UTTAK_TYPE,
@@ -164,10 +163,6 @@ public class FaktaFeilutbetalingÅrsakTjenesteTest {
         assertThat(mapAvResultat.get(HendelseType.SVP_ARBEIDSGIVERS_FORHOLD_TYPE)).containsExactly(
             SvpHendelseUnderTyper.SVP_TILRETTELEGGING_FULLT_MULIG,
             SvpHendelseUnderTyper.SVP_TILRETTELEGGING_DELVIS_MULIG
-        );
-
-        assertThat(mapAvResultat.get(HendelseType.SVP_ARBEIDSFORHOLD_TYPE)).containsExactly(
-            SvpHendelseUnderTyper.SVP_MANGLER_ARBEIDSFORHOLD
         );
 
         assertThat(mapAvResultat.get(HendelseType.SVP_OPPTJENING_TYPE)).containsExactly(

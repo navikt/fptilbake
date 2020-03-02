@@ -37,7 +37,6 @@ public class HendelseType extends Kodeliste {
 
     public static final HendelseType SVP_FAKTA_TYPE = new HendelseType("SVP_FAKTA_TYPE");
     public static final HendelseType SVP_ARBEIDSGIVERS_FORHOLD_TYPE = new HendelseType("SVP_ARBEIDSGIVERS_FORHOLD_TYPE");
-    public static final HendelseType SVP_ARBEIDSFORHOLD_TYPE = new HendelseType("SVP_ARBEIDSFORHOLD_TYPE");
     public static final HendelseType SVP_OPPTJENING_TYPE = new HendelseType("SVP_OPPTJENING_TYPE");
     public static final HendelseType SVP_BEREGNING_TYPE = new HendelseType("SVP_BEREGNING_TYPE");
     public static final HendelseType SVP_UTTAK_TYPE = new HendelseType("SVP_UTTAK_TYPE");
