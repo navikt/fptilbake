@@ -163,14 +163,10 @@ public class VedtaksbrevTjeneste {
             .medMetadata(vedtaksbrevData.getMetadata())
             .build();
 
-        JournalpostIdOgDokumentId dokumentreferanse;
-        if (unleash.isEnabled("fptilbake.vedtaksbrev.vedlegg")) {
-            byte[] vedlegg = lagVedtaksbrevVedleggTabellPdf(vedtaksbrevData);
-            JournalpostIdOgDokumentId vedleggReferanse = journalføringTjeneste.journalførVedlegg(behandlingId, vedlegg);
-            dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data, vedleggReferanse);
-        } else {
-            dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data);
-        }
+        byte[] vedlegg = lagVedtaksbrevVedleggTabellPdf(vedtaksbrevData);
+        JournalpostIdOgDokumentId vedleggReferanse = journalføringTjeneste.journalførVedlegg(behandlingId, vedlegg);
+        JournalpostIdOgDokumentId dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data, vedleggReferanse);
+
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         opprettHistorikkinnslag(behandling, dokumentreferanse);
         lagreInfoOmVedtaksbrev(behandlingId, dokumentreferanse);
@@ -205,19 +201,6 @@ public class VedtaksbrevTjeneste {
             throw new RuntimeException("Fikk IO exception ved forhåndsvisning inkl vedlegg", e);
         }
         return baos.toByteArray();
-    }
-
-    public byte[] hentForhåndsvisningVedtaksbrevSomPdf(HentForhåndvisningVedtaksbrevPdfDto dto) {
-        VedtaksbrevData vedtaksbrevData = hentDataForVedtaksbrev(dto.getBehandlingId(), dto.getOppsummeringstekst(), dto.getPerioderMedTekst());
-        VedtakResultatType hovedresultat = vedtaksbrevData.getHovedresultat();
-        String fagsakTypeNavn = vedtaksbrevData.getMetadata().getFagsaktypenavnPåSpråk();
-        FritekstbrevData data = new FritekstbrevData.Builder()
-            .medOverskrift(VedtaksbrevOverskrift.finnOverskriftVedtaksbrev(fagsakTypeNavn, hovedresultat))
-            .medBrevtekst(TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(vedtaksbrevData.getVedtaksbrevData()))
-            .medMetadata(vedtaksbrevData.getMetadata())
-            .build();
-
-        return bestillDokumentTjeneste.hentForhåndsvisningFritekstbrev(data);
     }
 
     public List<Avsnitt> hentForhåndsvisningVedtaksbrevSomTekst(Long behandlingId) {
