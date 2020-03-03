@@ -21,7 +21,6 @@ import com.codahale.metrics.annotation.Timed;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import no.finn.unleash.Unleash;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Avsnitt;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.ForhåndvisningVedtaksbrevTekstDto;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.HentForhåndsvisningVarselbrevDto;
@@ -42,14 +41,12 @@ public class DokumentRestTjeneste {
     private VarselbrevTjeneste varselbrevTjeneste;
     private VedtaksbrevTjeneste vedtaksbrevTjeneste;
     private HenleggelsesbrevTjeneste henleggelsesbrevTjeneste;
-    private Unleash unleash;
 
     @Inject
-    public DokumentRestTjeneste(VarselbrevTjeneste varselbrevTjeneste, VedtaksbrevTjeneste vedtaksbrevTjeneste, HenleggelsesbrevTjeneste henleggelsesbrevTjeneste, Unleash unleash) {
+    public DokumentRestTjeneste(VarselbrevTjeneste varselbrevTjeneste, VedtaksbrevTjeneste vedtaksbrevTjeneste, HenleggelsesbrevTjeneste henleggelsesbrevTjeneste) {
         this.varselbrevTjeneste = varselbrevTjeneste;
         this.vedtaksbrevTjeneste = vedtaksbrevTjeneste;
         this.henleggelsesbrevTjeneste = henleggelsesbrevTjeneste;
-        this.unleash = unleash;
     }
 
     public DokumentRestTjeneste() {
