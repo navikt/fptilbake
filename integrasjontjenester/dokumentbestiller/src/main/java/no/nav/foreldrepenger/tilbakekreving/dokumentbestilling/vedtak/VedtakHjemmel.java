@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,10 +9,17 @@ import java.util.Map;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingPeriodeEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelse;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.Lokale;
 
 public class VedtakHjemmel {
+
+    private static List<VilkårResultat> VILKÅRRESULTAT_MED_FORSETT_ALLTID_RENTER = Arrays.asList(
+        VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER,
+        VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER
+    );
 
     private VedtakHjemmel() {
     }
@@ -53,7 +61,12 @@ public class VedtakHjemmel {
     }
 
     private static boolean erRenterBenyttet(List<VilkårVurderingPeriodeEntitet> vilkårPerioder) {
-        return vilkårPerioder.stream().anyMatch(v -> v.getAktsomhet() != null && Boolean.TRUE.equals(v.getAktsomhet().getIleggRenter()));
+        return vilkårPerioder.stream().anyMatch(v -> (v.getAktsomhet() != null && Boolean.TRUE.equals(v.getAktsomhet().getIleggRenter()))
+            || erForsettOgAlltidRenter(v));
+    }
+
+    private static boolean erForsettOgAlltidRenter(VilkårVurderingPeriodeEntitet v) {
+        return VILKÅRRESULTAT_MED_FORSETT_ALLTID_RENTER.contains(v.getVilkårResultat()) && Aktsomhet.FORSETT.equals(v.getAktsomhetResultat());
     }
 
     private static boolean heleVurderingPgaSmåbeløp(VedtakResultatType vedtakResultatType, List<VilkårVurderingPeriodeEntitet> vilkårPerioder) {
