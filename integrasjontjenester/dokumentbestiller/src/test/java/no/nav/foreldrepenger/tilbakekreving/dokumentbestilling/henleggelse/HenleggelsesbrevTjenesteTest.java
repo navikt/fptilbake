@@ -13,8 +13,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import no.nav.foreldrepenger.domene.dokumentarkiv.journal.JournalTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.HenleggBehandlingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.OrganisasjonsEnhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporing;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
@@ -32,6 +35,8 @@ import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsi
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.vedtak.exception.FunksjonellException;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
+import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepositoryImpl;
 import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
 @RunWith(CdiRunner.class)
@@ -43,6 +48,7 @@ public class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
     private PersoninfoAdapter mockPersoninfoAdapter = mock(PersoninfoAdapter.class);
 
     private HenleggelsesbrevTjeneste henleggelsesbrevTjeneste;
+    private HenleggBehandlingTjeneste henleggBehandlingTjeneste;
 
     private Long behandlingId;
 
@@ -51,8 +57,12 @@ public class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
         HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepository,
             mockJournalTjeneste,
             mockPersoninfoAdapter);
+
         henleggelsesbrevTjeneste = new HenleggelsesbrevTjeneste(repositoryProvider, mockEksternDataForBrevTjeneste,
             mockFritekstbrevTjeneste, historikkinnslagTjeneste);
+        ProsessTaskRepository prosessTaskRepository = new ProsessTaskRepositoryImpl(repositoryRule.getEntityManager(),null,null);
+        henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repositoryProvider,prosessTaskRepository,mock(BehandlingskontrollTjeneste.class),historikkinnslagTjeneste);
+        henleggBehandlingTjeneste.henleggBehandlingManuelt(behandling.getId(), BehandlingResultatType.HENLAGT_KRAVGRUNNLAG_NULLSTILT,"manuell henlagt");
 
         behandlingId = behandling.getId();
         String varselTekst = "hello";
@@ -89,7 +99,9 @@ public class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
 
         List<Historikkinnslag> historikkinnslager = historikkRepository.hentHistorikk(behandlingId);
         assertThat(historikkinnslager).isNotEmpty();
-        assertThat(historikkinnslager.get(0).getType()).isEqualByComparingTo(HistorikkinnslagType.BREV_SENT);
+        assertThat(historikkinnslager.size()).isEqualTo(2);
+        assertThat(historikkinnslager.get(0).getType()).isEqualByComparingTo(HistorikkinnslagType.AVBRUTT_BEH);
+        assertThat(historikkinnslager.get(1).getType()).isEqualByComparingTo(HistorikkinnslagType.BREV_SENT);
     }
 
     @Test

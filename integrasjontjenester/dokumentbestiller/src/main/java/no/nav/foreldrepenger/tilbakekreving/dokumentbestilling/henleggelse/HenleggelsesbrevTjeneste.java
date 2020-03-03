@@ -114,7 +114,7 @@ public class HenleggelsesbrevTjeneste {
     }
 
     private Språkkode hentSpråkkode(Long behandlingId) {
-        UUID fpsakBehandlingUuid = eksternBehandlingRepository.hentFraInternId(behandlingId).getEksternUuid();
+        UUID fpsakBehandlingUuid = eksternBehandlingRepository.hentForSisteAktivertInternId(behandlingId).getEksternUuid();
         SamletEksternBehandlingInfo samletEksternBehandlingInfo = eksternDataForBrevTjeneste.hentBehandlingFpsak(fpsakBehandlingUuid);
         return samletEksternBehandlingInfo.getGrunninformasjon().getSpråkkodeEllerDefault();
     }
