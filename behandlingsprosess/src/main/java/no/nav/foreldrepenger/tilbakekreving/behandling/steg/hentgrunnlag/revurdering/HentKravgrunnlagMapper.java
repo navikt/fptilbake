@@ -1,14 +1,10 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.revurdering;
 
 import java.time.LocalDate;
-import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.xml.datatype.XMLGregorianCalendar;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TpsAdapterWrapper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
@@ -25,11 +21,10 @@ import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagDto;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagPeriodeDto;
 import no.nav.tilbakekreving.typer.v1.TypeKlasseDto;
 import no.nav.vedtak.felles.integrasjon.felles.ws.DateUtil;
-import no.nav.vedtak.felles.integrasjon.unleash.EnvironmentProperty;
 
 @ApplicationScoped
 public class HentKravgrunnlagMapper {
-    private Logger logger = LoggerFactory.getLogger(HentKravgrunnlagMapper.class);
+
     private TpsAdapterWrapper tpsAdapterWrapper;
 
     HentKravgrunnlagMapper() {
@@ -79,17 +74,8 @@ public class HentKravgrunnlagMapper {
             .build();
     }
 
-    private String hentAktoerId(GjelderType identType, String ident) {
-        if (isInDevMode()) {
-            logger.warn("Hentet kravgrunnlag i utviklermodus. Skal ikke skje i testmiljø eller produksjon, det er for lokalt utviklingsmiljø. Lagrer mocket aktørId i databasen.");
-            return "mock" + ident;
-        }
+    protected String hentAktoerId(GjelderType identType, String ident) {
         return tpsAdapterWrapper.hentAktørIdEllerOrganisajonNummer(ident, identType);
-    }
-
-    private boolean isInDevMode() {
-        Optional<String> environmentName = EnvironmentProperty.getEnvironmentName();
-        return environmentName.isPresent() && environmentName.get().equalsIgnoreCase("devimg");
     }
 
     private KravgrunnlagPeriode432 formKravgrunnlagPeriode432(Kravgrunnlag431 kravgrunnlag431, DetaljertKravgrunnlagPeriodeDto dto) {
@@ -140,14 +126,14 @@ public class HentKravgrunnlagMapper {
         }
     }
 
-    private String finnKlasseKode(String klasseKode, KlasseType klasseType){
-        if(KlasseType.TREK.equals(klasseType) || KlasseType.SKAT.equals(klasseType)){
+    private String finnKlasseKode(String klasseKode, KlasseType klasseType) {
+        if (KlasseType.TREK.equals(klasseType) || KlasseType.SKAT.equals(klasseType)) {
             return klasseKode;
         }
         return KlasseKode.fraKode(klasseKode).getKode();
     }
 
-    private String trimTrailingSpaces(String field){
+    private String trimTrailingSpaces(String field) {
         return field.trim();
     }
 
