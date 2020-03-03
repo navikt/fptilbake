@@ -21,7 +21,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 
-import no.finn.unleash.Unleash;
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultatPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingBeregningTjeneste;
@@ -120,8 +119,6 @@ public class VedtaksbrevTjeneste {
 
     private JournalføringTjeneste journalføringTjeneste;
 
-    private Unleash unleash;
-
     @Inject
     public VedtaksbrevTjeneste(BehandlingRepositoryProvider behandlingRepositoryProvider,
                                TilbakekrevingBeregningTjeneste tilbakekrevingBeregningTjeneste,
@@ -129,8 +126,7 @@ public class VedtaksbrevTjeneste {
                                EksternDataForBrevTjeneste eksternDataForBrevTjeneste,
                                FritekstbrevTjeneste bestillDokumentTjeneste,
                                HistorikkinnslagTjeneste historikkinnslagTjeneste,
-                               JournalføringTjeneste journalføringTjeneste,
-                               Unleash unleash) {
+                               JournalføringTjeneste journalføringTjeneste) {
         this.behandlingRepository = behandlingRepositoryProvider.getBehandlingRepository();
         this.behandlingVedtakRepository = behandlingRepositoryProvider.getBehandlingVedtakRepository();
         this.eksternBehandlingRepository = behandlingRepositoryProvider.getEksternBehandlingRepository();
@@ -147,7 +143,6 @@ public class VedtaksbrevTjeneste {
         this.tilbakekrevingBeregningTjeneste = tilbakekrevingBeregningTjeneste;
         this.eksternDataForBrevTjeneste = eksternDataForBrevTjeneste;
         this.journalføringTjeneste = journalføringTjeneste;
-        this.unleash = unleash;
     }
 
     public VedtaksbrevTjeneste() {
