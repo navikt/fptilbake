@@ -353,12 +353,6 @@
 
             <!-- NAV -->
             <dependency>
-                <!-- bør ha samme versjon som CXF ellers -->
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-rt-transports-http-jetty</artifactId>
-                <version>3.2.5</version>
-            </dependency>
-            <dependency>
                 <groupId>no.nav.foreldrepenger.kontrakter</groupId>
                 <artifactId>dokumentbestiller-v1</artifactId>
                 <version>2.0_20190205180510_7b6a6b5</version>
@@ -474,7 +468,7 @@
             <dependency>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-rt-transports-http-jetty</artifactId>
-                <version>3.3.4</version>
+                <version>3.3.5</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.ws.xmlschema</groupId>
