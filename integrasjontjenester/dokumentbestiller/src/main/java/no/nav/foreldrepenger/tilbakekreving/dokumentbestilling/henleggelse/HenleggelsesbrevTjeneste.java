@@ -29,7 +29,6 @@ import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagT
 @ApplicationScoped
 public class HenleggelsesbrevTjeneste {
 
-    private static final String OVERSKRIFT_HENLEGGELSESBREV = "NAV har avsluttet saken din om tilbakebetaling";
     private static final String TITTEL_HENLEGGELSESBREV_HISTORIKKINNSLAG = "Henleggelsesbrev tilbakekreving";
     private static final String TITTEL_HENLEGGELSESBREV = "Informasjon om at tilbakekrevingssaken er henlagt";
 
@@ -121,9 +120,10 @@ public class HenleggelsesbrevTjeneste {
 
     private FritekstbrevData lagHenleggelsebrev(HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo) {
         return new FritekstbrevData.Builder()
-            .medOverskrift(OVERSKRIFT_HENLEGGELSESBREV)
+            .medOverskrift(TekstformatererHenleggelsesbrev.lagHenleggelsebrevOverskrift(henleggelsesbrevSamletInfo))
             .medMetadata(henleggelsesbrevSamletInfo.getBrevMetadata())
-            .medBrevtekst(TekstformatererHenleggelsesbrev.lagHenleggelsebrevFritekst(henleggelsesbrevSamletInfo)).build();
+            .medBrevtekst(TekstformatererHenleggelsesbrev.lagHenleggelsebrevFritekst(henleggelsesbrevSamletInfo))
+            .build();
     }
 
     private void opprettHistorikkinnslag(Behandling behandling, JournalpostIdOgDokumentId dokumentreferanse) {

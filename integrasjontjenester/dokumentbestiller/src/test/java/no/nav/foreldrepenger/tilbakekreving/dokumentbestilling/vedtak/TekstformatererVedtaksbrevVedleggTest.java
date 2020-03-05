@@ -22,6 +22,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Ak
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.AnnenVurdering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.SærligGrunn;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.Lokale;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbKonfigurasjon;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbPerson;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbSak;
@@ -43,6 +44,23 @@ public class TekstformatererVedtaksbrevVedleggTest {
 
     @Test
     public void skal_generere_vedlegg_med_en_periode_uten_renter() throws Exception {
+        HbVedtaksbrevData data = getVedtaksbrevData(null);
+
+        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevVedleggHtml(data);
+        String fasit = les("/vedtaksbrev/vedlegg/vedlegg_uten_renter.txt");
+        assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
+    }
+
+    @Test
+    public void skal_generere_vedlegg_med_en_periode_uten_renter_nynorsk() throws Exception {
+        HbVedtaksbrevData data = getVedtaksbrevData(Lokale.NYNORSK);
+
+        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevVedleggHtml(data);
+        String fasit = les("/vedtaksbrev/vedlegg/vedlegg_uten_renter_nn.txt");
+        assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
+    }
+
+    private HbVedtaksbrevData getVedtaksbrevData(Lokale lokale) {
         HbVedtaksbrevFelles vedtaksbrevData = lagTestBuilder()
             .medSak(HbSak.build()
                 .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
@@ -61,6 +79,7 @@ public class TekstformatererVedtaksbrevVedleggTest {
                 .medVarsletBeløp(BigDecimal.valueOf(33001))
                 .medVarsletDato(LocalDate.of(2020, 4, 4))
                 .build())
+            .medLocale(lokale != null ? lokale : Lokale.BOKMÅL)
             .build();
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
             HbVedtaksbrevPeriode.builder()
@@ -81,11 +100,7 @@ public class TekstformatererVedtaksbrevVedleggTest {
                     .build())
                 .build()
         );
-        HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
-
-        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevVedleggHtml(data);
-        String fasit = les("/vedtaksbrev/vedlegg/vedlegg_uten_renter.txt");
-        assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
+        return new HbVedtaksbrevData(vedtaksbrevData, perioder);
     }
 
     @Test

@@ -1,12 +1,12 @@
 {{~#* inline "barnet-ditt" ~}}{{eq sak.antall-barn 1 yes="barnet ditt" no="barna dine"}}{{~/inline~}}
-{{~#* inline "familie-hendelse" ~}}{{#if sak.er-adopsjon}}då du tok over omsorga for {{> barnet-ditt}}{{else}}da {{> barnet-ditt}} blei født{{/if}}{{~/inline~}}
+{{~#* inline "familie-hendelse" ~}}{{#if sak.er-adopsjon}}då du tok over omsorga for {{> barnet-ditt}}{{else}}då {{> barnet-ditt}} blei {{eq sak.antall-barn 1 yes="født" no="fødde"}}{{/if}}{{~/inline~}}
 {{~#* inline "barnet" ~}}{{eq sak.antall-barn 1 yes="barnet" no="barna"}}{{~/inline~}}
 {{~#* inline "sitt-barn" ~}}{{eq sak.antall-barn 1 yes="sitt barn" no="sine barn"}}{{~/inline~}}
 {{~#* inline "det-samme-barnet" ~}}{{eq sak.antall-barn 1 yes="det same barnet" no="dei same barna"}}{{~/inline~}}
 {{#* inline "fakta-medlemskap"}}
         {{#switch fakta.hendelseundertype}}
         {{#case "IKKE_BOSATT"}}
-Du er ikkje medlem av folketrygda fordi du har opphaldt deg så mykje i utlandet at du ikkje reknas som busett i Noreg, og du er heller ikkje arbeidstaker i Noreg. Derfor har du ikkje rett til {{> ytelse-navn}}.
+Du er ikkje medlem av folketrygda fordi du har opphalde deg så mykje i utlandet at du ikkje blir rekna som busett i Noreg, og du er heller ikkje arbeidstaker i Noreg. Derfor har du ikkje rett til {{> ytelse-navn}}.
         {{/case}}
         {{#case "MEDLEM_I_ANNET_LAND"}}
 Du er ikkje medlem av folketrygda fordi du er omfatta av trygdeordninga i eit anna land. Derfor har du ikkje rett til {{> ytelse-navn}}.
@@ -27,7 +27,7 @@ Du har fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt.
 {{#* inline "es-fakta-medlemskap"}}
         {{#switch fakta.hendelseundertype}}
         {{#case "IKKE_BOSATT"}}
-Du var ikkje medlem av folketrygda {{> familie-hendelse}}, fordi du har opphaldt deg så mykje i utlandet at du ikkje reknas som busett i Noreg, og du er heller ikkje arbeidstakar i Noreg. Derfor har du ikkje rett til {{> ytelse-navn}}.
+Du var ikkje medlem av folketrygda {{> familie-hendelse}}, fordi du har opphalde deg så mykje i utlandet at du blir rekna som ikkje busett i Noreg, og du er heller ikkje arbeidstakar i Noreg. Derfor har du ikkje rett til {{> ytelse-navn}}.
         {{/case}}
         {{#case "MEDLEM_I_ANNET_LAND"}}
 Du var ikkje medlem av folketrygda {{> familie-hendelse}}, fordi du var omfatta av trygdeordninga i eit anna land. Derfor har du ikkje rett til {{> ytelse-navn}}.
@@ -39,7 +39,7 @@ Du var ikkje medlem av folketrygda {{> familie-hendelse}}, fordi du ikkje hadde 
 Du var ikkje medlem av folketrygda {{> familie-hendelse}}. Fordi du ikkje har jobba eller hatt familie som forsørgde deg i Noreg, har du ikkje rett til opphald etter EØS avtalen. Derfor har du ikkje rett til {{> ytelse-navn}}.
         {{/case}}
         {{#case "UTVANDRET"}}
-Du var ikkje medlem av folketrygda {{> familie-hendelse}}, fordi du ikkje lengre var busett eller arbeidstakar i Noreg. Derfor har du ikkje rett til {{> ytelse-navn}}.
+Du var ikkje medlem av folketrygda {{> familie-hendelse}}, fordi du ikkje lenger var busett i eller arbeidstakar i Noreg. Derfor har du ikkje rett til {{> ytelse-navn}}.
         {{/case}}
         {{/switch}}
 
@@ -329,7 +329,7 @@ Du har jobba samtidig som at du har fått utbetalt foreldrepengar. Fordi du har 
 {{/case}}
 {{#case "SVP"}}
     {{#* inline "tilrettelegging-mulig"}}
-Arbeidsgivaren kunne tilpasse eller endre arbeidsoppgåvene dine utan at det var fare for å skade {{> barnet}} du ventar. Du har berre rett til svangerskapspengar om du må slutte å jobbe. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
+Arbeidsgivaren kunne tilpasse eller endre arbeidsoppgåvene dine utan at det var fare for å skade barnet du ventar. Du har berre rett til svangerskapspengar om du må slutte å jobbe. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
     {{/inline}}
     {{#switch fakta.hendelsetype}}
     {{#case "MEDLEMSKAP"}}
@@ -371,10 +371,10 @@ Du fekk innvilga svangerskapspengar i denne perioden. I etterkant er perioden bl
 Du fekk utbetalt svangerskapspengar då det var mindre enn tre veker til termin. Vi kan berre gi svangerskapspengar fram til tre veker før du har termin. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
         {{/case}}
         {{#case "SVP_IKKE_HELSEFARLIG"}}
-Du kunne utføre arbeidsoppgåver utan at det var fare for å skade {{> barnet}} du ventar. Du hadde derfor ikkje rett til svangerskapspengar og har fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
+Du kunne utføre arbeidsoppgåver utan at det var fare for å skade barnet du ventar. Du hadde derfor ikkje rett til svangerskapspengar og har fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
         {{/case}}
         {{#case "SVP_TIDLIG_FODSEL"}}
-Du fekk innvilga svangerskapspengar i denne perioden. Du kan berre få svangerskapspengar fram til {{> barnet}} er født. Fordi du fødde før termin, har du fått utbetalt fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje.
+Du fekk innvilga svangerskapspengar i denne perioden. Du kan berre få svangerskapspengar fram til barnet er født. Fordi du fødde før termin, har du fått utbetalt fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje.
         {{/case}}
         {{/switch}}
     {{/case}}

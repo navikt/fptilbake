@@ -3,7 +3,6 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.KodeDto;
 
 public class BrevMetadata {
 

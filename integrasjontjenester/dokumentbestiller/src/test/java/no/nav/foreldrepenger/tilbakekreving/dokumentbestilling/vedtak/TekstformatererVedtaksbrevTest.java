@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
@@ -529,6 +530,65 @@ public class TekstformatererVedtaksbrevTest {
         String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
         String fasit = les("/vedtaksbrev/FP_ikke_tilbakekreves_pga_lavt_beløp.txt");
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
+    }
+
+    @Test
+    public void skal_generere_vedtaksbrev_overskrift_foreldrepenger_full_tilbakebetaling() {
+        HbVedtaksbrevData data = lagBrevOverskriftTestoppsett(FagsakYtelseType.FORELDREPENGER, VedtakResultatType.FULL_TILBAKEBETALING, null);
+
+        String overskrift = TekstformatererVedtaksbrev.lagVedtaksbrevOverskrift(data);
+        String fasit = "Du må betale tilbake foreldrepengene";
+        assertThat(overskrift).isEqualToNormalizingNewlines(fasit);
+    }
+
+    @Test
+    public void skal_generere_vedtaksbrev_overskrift_foreldrepenger_full_tilbakebetaling_nynorsk() {
+        HbVedtaksbrevData data = lagBrevOverskriftTestoppsett(FagsakYtelseType.FORELDREPENGER, VedtakResultatType.FULL_TILBAKEBETALING, Lokale.NYNORSK);
+
+        String overskrift = TekstformatererVedtaksbrev.lagVedtaksbrevOverskrift(data);
+        String fasit = "Du må betale tilbake foreldrepengane";
+        assertThat(overskrift).isEqualToNormalizingNewlines(fasit);
+    }
+
+    @Test
+    public void skal_generere_vedtaksbrev_overskrift_engangstønad_ingen_tilbakebetaling() {
+        HbVedtaksbrevData data = lagBrevOverskriftTestoppsett(FagsakYtelseType.ENGANGSTØNAD, VedtakResultatType.INGEN_TILBAKEBETALING, null);
+
+        String overskrift = TekstformatererVedtaksbrev.lagVedtaksbrevOverskrift(data);
+        String fasit = "Du må ikke betale tilbake engangsstønaden";
+        assertThat(overskrift).isEqualToNormalizingNewlines(fasit);
+    }
+
+    @Test
+    public void skal_generere_vedtaksbrev_overskrift_engangstønad_ingen_tilbakebetaling_nynorsk() {
+        HbVedtaksbrevData data = lagBrevOverskriftTestoppsett(FagsakYtelseType.ENGANGSTØNAD, VedtakResultatType.INGEN_TILBAKEBETALING, Lokale.NYNORSK);
+
+        String overskrift = TekstformatererVedtaksbrev.lagVedtaksbrevOverskrift(data);
+        String fasit = "Du må ikkje betale tilbake eingongsstønaden";
+        assertThat(overskrift).isEqualToNormalizingNewlines(fasit);
+    }
+
+    private HbVedtaksbrevData lagBrevOverskriftTestoppsett(FagsakYtelseType ytelsetype,
+                                                           VedtakResultatType hovedresultat,
+                                                           Lokale lokale) {
+        HbVedtaksbrevFelles vedtaksbrevFelles = lagTestBuilder()
+            .medVedtakResultat(HbTotalresultat.builder()
+                .medTotaltTilbakekrevesBeløp(BigDecimal.ZERO)
+                .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.ZERO)
+                .medTotaltRentebeløp(BigDecimal.ZERO)
+                .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.ZERO)
+                .medHovedresultat(hovedresultat)
+                .build())
+            .medLovhjemmelVedtak("uinteressant for testen")
+            .medSak(HbSak.build()
+                .medErFødsel(true)
+                .medYtelsetype(ytelsetype)
+                .medAntallBarn(1)
+                .medDatoFagsakvedtak(LocalDate.now())
+                .build())
+            .medLocale(lokale != null ? lokale : Lokale.BOKMÅL)
+            .build();
+        return new HbVedtaksbrevData(vedtaksbrevFelles, Collections.emptyList());
     }
 
     private HbVedtaksbrevFelles.Builder lagTestBuilder() {

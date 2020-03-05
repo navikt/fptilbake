@@ -1,7 +1,5 @@
-Vi sendte deg et varsel {{datoformat varsletDato}} om at du hadde fått for mye utbetalt i {{fagsaktypeNavn}}. Vi har i ettertid avsluttet saken om tilbakebetaling fordi det ikke lenger er et feilutbetalt beløp å betale tilbake.
-
-_Har du spørsmål?
-Du finner nyttig informasjon på nav.no/familie.
-
-Med vennlig hilsen
-NAV Familie- og pensjonsytelser
+{{#if (eq lokale "nn_NO")}}
+{{> henleggelse/henleggelse_nn}}
+{{else}}
+{{> henleggelse/henleggelse_nb}}
+{{/if}}

@@ -25,6 +25,9 @@ import no.nav.vedtak.sikkerhet.context.SubjectHandler;
 
 public class VarselbrevUtil {
 
+    private static final String TITTEL_VARSEL_TILBAKEBETALING = "Varsel tilbakebetaling ";
+    private static final String TITTEL_KORRIGERT_VARSEL_TILBAKEBETALING = "Korrigert Varsel tilbakebetaling ";
+
     private VarselbrevUtil() {
         // for static access
     }
@@ -52,7 +55,7 @@ public class VarselbrevUtil {
             .medFagsaktype(fagsakYtelseType)
             .medSprakkode(eksternBehandlingsinfoDto.getGrunninformasjon().getSpråkkodeEllerDefault())
             .medAnsvarligSaksbehandler("VL")
-            .medTittel(VarselbrevOverskrift.finnTittelVarselbrev(ytelseNavn.getNavnPåBokmål()))
+            .medTittel(getTittelForVarselbrev(ytelseNavn, false))
             .build();
 
         return new VarselbrevSamletInfo.Builder()
@@ -87,7 +90,7 @@ public class VarselbrevUtil {
             .medSprakkode(grunninformasjon.getSpråkkodeEllerDefault())
             .medFagsaktypenavnPåSpråk(ytelseNavn.getNavnPåBrukersSpråk())
             .medAnsvarligSaksbehandler(SubjectHandler.getSubjectHandler().getUid())
-            .medTittel(VarselbrevOverskrift.finnTittelVarselbrev(ytelseNavn.getNavnPåBokmål()))
+            .medTittel(getTittelForVarselbrev(ytelseNavn, false))
             .build();
 
         return new VarselbrevSamletInfo.Builder()
@@ -123,7 +126,7 @@ public class VarselbrevUtil {
             .medSprakkode(språkkode)
             .medFagsaktypenavnPåSpråk(ytelseNavn.getNavnPåBrukersSpråk())
             .medAnsvarligSaksbehandler("VL")
-            .medTittel(erKorrigert ? VarselbrevOverskrift.finnTittelKorrigertVarselbrev(ytelseNavn.getNavnPåBokmål()) : VarselbrevOverskrift.finnTittelVarselbrev(ytelseNavn.getNavnPåBokmål()))
+            .medTittel(getTittelForVarselbrev(ytelseNavn, erKorrigert))
             .build();
 
         return new VarselbrevSamletInfo.Builder()
@@ -134,6 +137,12 @@ public class VarselbrevUtil {
             .medFristdato(finnFristForTilbakemeldingFraBruker(LocalDateTime.now(), ventetid))
             .medRevurderingVedtakDato(feilutbetalingFakta.getDatoForRevurderingsvedtak())
             .build();
+    }
+
+    private static String getTittelForVarselbrev(YtelseNavn ytelseNavn, boolean erKorrigert) {
+        return erKorrigert ?
+            TITTEL_KORRIGERT_VARSEL_TILBAKEBETALING + ytelseNavn.getNavnPåBokmål() :
+            TITTEL_VARSEL_TILBAKEBETALING + ytelseNavn.getNavnPåBokmål();
     }
 
     private static List<Periode> mapFeilutbetaltePerioder(FeilutbetaltePerioderDto feilutbetaltePerioderDto) {

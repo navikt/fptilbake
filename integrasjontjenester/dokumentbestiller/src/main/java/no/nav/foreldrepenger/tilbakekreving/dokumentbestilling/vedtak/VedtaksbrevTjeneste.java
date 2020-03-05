@@ -99,6 +99,8 @@ import no.nav.vedtak.felles.jpa.Transaction;
 public class VedtaksbrevTjeneste {
 
     private static final String TITTEL_VEDTAKSBREV_HISTORIKKINNSLAG = "Vedtaksbrev Tilbakekreving";
+    private static final String TITTEL_VEDTAK_TILBAKEBETALING = "Vedtak tilbakebetaling ";
+    private static final String TITTEL_VEDTAK_INGEN_TILBAKEBETALING = "Vedtak ingen tilbakebetaling ";
     private static final int KLAGEFRIST_UKER = 6;
 
     private BehandlingRepository behandlingRepository;
@@ -150,11 +152,10 @@ public class VedtaksbrevTjeneste {
 
     public void sendVedtaksbrev(Long behandlingId) {
         VedtaksbrevData vedtaksbrevData = hentDataForVedtaksbrev(behandlingId);
-        VedtakResultatType hovedresultat = vedtaksbrevData.getHovedresultat();
-        String fagsakTypeNavn = vedtaksbrevData.getMetadata().getFagsaktypenavnPåSpråk();
+        HbVedtaksbrevData hbVedtaksbrevData = vedtaksbrevData.getVedtaksbrevData();
         FritekstbrevData data = new FritekstbrevData.Builder()
-            .medOverskrift(VedtaksbrevOverskrift.finnOverskriftVedtaksbrev(fagsakTypeNavn, hovedresultat))
-            .medBrevtekst(TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(vedtaksbrevData.getVedtaksbrevData()))
+            .medOverskrift(TekstformatererVedtaksbrev.lagVedtaksbrevOverskrift(hbVedtaksbrevData))
+            .medBrevtekst(TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(hbVedtaksbrevData))
             .medMetadata(vedtaksbrevData.getMetadata())
             .build();
 
@@ -174,11 +175,10 @@ public class VedtaksbrevTjeneste {
 
     public byte[] hentForhåndsvisningVedtaksbrevMedVedleggSomPdf(HentForhåndvisningVedtaksbrevPdfDto dto) {
         VedtaksbrevData vedtaksbrevData = hentDataForVedtaksbrev(dto.getBehandlingId(), dto.getOppsummeringstekst(), dto.getPerioderMedTekst());
-        VedtakResultatType hovedresultat = vedtaksbrevData.getHovedresultat();
-        String fagsakTypeNavn = vedtaksbrevData.getMetadata().getFagsaktypenavnPåSpråk();
+        HbVedtaksbrevData hbVedtaksbrevData = vedtaksbrevData.getVedtaksbrevData();
         FritekstbrevData data = new FritekstbrevData.Builder()
-            .medOverskrift(VedtaksbrevOverskrift.finnOverskriftVedtaksbrev(fagsakTypeNavn, hovedresultat))
-            .medBrevtekst(TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(vedtaksbrevData.getVedtaksbrevData()))
+            .medOverskrift(TekstformatererVedtaksbrev.lagVedtaksbrevOverskrift(hbVedtaksbrevData))
+            .medBrevtekst(TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(hbVedtaksbrevData))
             .medMetadata(vedtaksbrevData.getMetadata())
             .build();
 
@@ -200,15 +200,14 @@ public class VedtaksbrevTjeneste {
 
     public List<Avsnitt> hentForhåndsvisningVedtaksbrevSomTekst(Long behandlingId) {
         VedtaksbrevData vedtaksbrevData = hentDataForVedtaksbrev(behandlingId);
-        VedtakResultatType hovedresultat = vedtaksbrevData.getHovedresultat();
-        String fagsakTypeNavn = vedtaksbrevData.getMetadata().getFagsaktypenavnPåSpråk();
-        String hovedoverskrift = VedtaksbrevOverskrift.finnOverskriftVedtaksbrev(fagsakTypeNavn, hovedresultat);
-        return TekstformatererVedtaksbrev.lagVedtaksbrevDeltIAvsnitt(vedtaksbrevData.getVedtaksbrevData(), hovedoverskrift);
+        HbVedtaksbrevData hbVedtaksbrevData = vedtaksbrevData.getVedtaksbrevData();
+        String hovedoverskrift = TekstformatererVedtaksbrev.lagVedtaksbrevOverskrift(hbVedtaksbrevData);
+        return TekstformatererVedtaksbrev.lagVedtaksbrevDeltIAvsnitt(hbVedtaksbrevData, hovedoverskrift);
     }
 
     private void opprettHistorikkinnslag(Behandling behandling, JournalpostIdOgDokumentId dokumentreferanse) {
-        String tittel = TITTEL_VEDTAKSBREV_HISTORIKKINNSLAG;
-        historikkinnslagTjeneste.opprettHistorikkinnslagForBrevsending(behandling, dokumentreferanse.getJournalpostId(), dokumentreferanse.getDokumentId(), tittel);
+        historikkinnslagTjeneste.opprettHistorikkinnslagForBrevsending(behandling, dokumentreferanse.getJournalpostId(),
+            dokumentreferanse.getDokumentId(), TITTEL_VEDTAKSBREV_HISTORIKKINNSLAG);
     }
 
     private void lagreInfoOmVedtaksbrev(Long behandlingId, JournalpostIdOgDokumentId dokumentreferanse) {
@@ -370,7 +369,7 @@ public class VedtaksbrevTjeneste {
             .medSakspartId(personinfo.getPersonIdent().getIdent())
             .medSakspartNavn(personinfo.getNavn())
             .medSprakkode(eksternBehandlingsinfo.getGrunninformasjon().getSpråkkodeEllerDefault())
-            .medTittel(VedtaksbrevOverskrift.finnTittelVedtaksbrev(ytelseNavn.getNavnPåBokmål(), tilbakekreves))
+            .medTittel(finnTittelVedtaksbrev(ytelseNavn.getNavnPåBokmål(), tilbakekreves))
             .build();
     }
 
@@ -512,4 +511,11 @@ public class VedtaksbrevTjeneste {
         return vedtaksbrevOppsummeringOpt.map(VedtaksbrevFritekstOppsummering::getOppsummeringFritekst).orElse(null);
     }
 
+    private String finnTittelVedtaksbrev(String fagsaktypenavnBokmål, boolean tilbakekreves) {
+        if (tilbakekreves) {
+            return TITTEL_VEDTAK_TILBAKEBETALING + fagsaktypenavnBokmål;
+        } else {
+            return TITTEL_VEDTAK_INGEN_TILBAKEBETALING + fagsaktypenavnBokmål;
+        }
+    }
 }

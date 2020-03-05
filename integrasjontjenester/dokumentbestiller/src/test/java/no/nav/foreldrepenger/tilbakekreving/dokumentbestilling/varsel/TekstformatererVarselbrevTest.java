@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
@@ -17,7 +18,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.Brev
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.handlebars.dto.VarselbrevDokument;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
-public class TekstformattererForVarselbrevTest {
+public class TekstformatererVarselbrevTest {
 
     private FagsakYtelseType foreldrepengerkode = FagsakYtelseType.FORELDREPENGER;
     private FagsakYtelseType engangsstønadkode = FagsakYtelseType.ENGANGSTØNAD;
@@ -168,9 +169,7 @@ public class TekstformattererForVarselbrevTest {
         varselbrevDokument.setFeilutbetaltePerioder(mockUtbetalingEnPeriode());
         varselbrevDokument.setFagsaktypeNavn("engangsstønad");
         varselbrevDokument.setDatoerHvisSammenhengendePeriode(null);
-        Assertions.assertThatNullPointerException().isThrownBy(() -> {
-            varselbrevDokument.valider();
-        });
+        Assertions.assertThatNullPointerException().isThrownBy(varselbrevDokument::valider);
     }
 
     @Test
@@ -180,14 +179,81 @@ public class TekstformattererForVarselbrevTest {
         varselbrevDokument.setFagsaktypeNavn("foreldrepenger");
         varselbrevDokument.setForeldrepenger(true);
         varselbrevDokument.setDatoerHvisSammenhengendePeriode(null);
-        Assertions.assertThatNullPointerException().isThrownBy(() -> {
-            varselbrevDokument.valider();
-        });
+        Assertions.assertThatNullPointerException().isThrownBy(varselbrevDokument::valider);
     }
 
     @Test
-    public void skal_konvertere_dato_til_fin_tekst() {
-        Assertions.assertThat(TekstformatererVarselbrev.konverterFraLocaldateTilTekst(LocalDate.of(2020, 3, 4))).isEqualTo("4. mars 2020");
+    public void skal_generere_varselbrev_overskrift() {
+        BrevMetadata brevMetadata = new BrevMetadata.Builder()
+            .medFagsaktypenavnPåSpråk("foreldrepenger")
+            .medSprakkode(Språkkode.nb)
+            .build();
+
+        String overskrift = TekstformatererVarselbrev.lagVarselbrevOverskrift(brevMetadata);
+        String fasit = "NAV vurderer om du må betale tilbake foreldrepenger";
+        assertThat(overskrift).isEqualToNormalizingNewlines(fasit);
+    }
+
+    @Test
+    public void skal_generere_varselbrev_overskrift_nynorsk() {
+        BrevMetadata brevMetadata = new BrevMetadata.Builder()
+            .medFagsaktypenavnPåSpråk("foreldrepengar")
+            .medSprakkode(Språkkode.nb)
+            .build();
+
+        String overskrift = TekstformatererVarselbrev.lagVarselbrevOverskrift(brevMetadata);
+        String fasit = "NAV vurderer om du må betale tilbake foreldrepengar";
+        assertThat(overskrift).isEqualToNormalizingNewlines(fasit);
+    }
+
+    @Test
+    public void skal_generere_korrigert_varselbrev_overskrift() {
+        BrevMetadata brevMetadata = new BrevMetadata.Builder()
+            .medFagsaktypenavnPåSpråk("foreldrepenger")
+            .medSprakkode(Språkkode.nb)
+            .build();
+
+        String overskrift = TekstformatererVarselbrev.lagKorrigertVarselbrevOverskrift(brevMetadata);
+        String fasit = "Korrigert varsel om feilutbetalte foreldrepenger";
+        assertThat(overskrift).isEqualToNormalizingNewlines(fasit);
+    }
+
+    @Test
+    public void skal_generere_korrigert_varselbrev_overskrift_nynorsk() {
+        BrevMetadata brevMetadata = new BrevMetadata.Builder()
+            .medFagsaktypenavnPåSpråk("foreldrepengar")
+            .medSprakkode(Språkkode.nn)
+            .build();
+
+        String overskrift = TekstformatererVarselbrev.lagKorrigertVarselbrevOverskrift(brevMetadata);
+        String fasit = "Korrigert varsel om feilutbetalte foreldrepengar";
+        assertThat(overskrift).isEqualToNormalizingNewlines(fasit);
+    }
+
+    @Test
+    public void skal_generere_korrigert_varselbrev_overskrift_engangstønad() {
+        BrevMetadata brevMetadata = new BrevMetadata.Builder()
+            .medFagsaktype(FagsakYtelseType.ENGANGSTØNAD)
+            .medFagsaktypenavnPåSpråk("engangstønad")
+            .medSprakkode(Språkkode.nb)
+            .build();
+
+        String overskrift = TekstformatererVarselbrev.lagKorrigertVarselbrevOverskrift(brevMetadata);
+        String fasit = "Korrigert varsel om feilutbetalt engangstønad";
+        assertThat(overskrift).isEqualToNormalizingNewlines(fasit);
+    }
+
+    @Test
+    public void skal_generere_korrigert_varselbrev_overskrift_engangstønad_nynorsk() {
+        BrevMetadata brevMetadata = new BrevMetadata.Builder()
+            .medFagsaktype(FagsakYtelseType.ENGANGSTØNAD)
+            .medFagsaktypenavnPåSpråk("eingongstønad")
+            .medSprakkode(Språkkode.nn)
+            .build();
+
+        String overskrift = TekstformatererVarselbrev.lagKorrigertVarselbrevOverskrift(brevMetadata);
+        String fasit = "Korrigert varsel om feilutbetalt eingongstønad";
+        assertThat(overskrift).isEqualToNormalizingNewlines(fasit);
     }
 
     private List<Periode> mockFeilutbetalingerMedFlerePerioder() {
@@ -210,7 +276,7 @@ public class TekstformattererForVarselbrevTest {
 
     private String les(String filnavn) throws IOException {
         try (InputStream resource = getClass().getResourceAsStream(filnavn);
-             Scanner scanner = new Scanner(resource, "UTF-8")) {
+             Scanner scanner = new Scanner(resource, StandardCharsets.UTF_8)) {
             scanner.useDelimiter("\\A");
             return scanner.hasNext() ? scanner.next() : null;
         }
