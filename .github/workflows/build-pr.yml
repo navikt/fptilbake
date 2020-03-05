@@ -3,7 +3,7 @@ name: Bygg pull request
 on: [pull_request]
 
 env:
-  ORACLE_IMAGE: docker.pkg.github.com/navikt/vtp/foreldrepenger-oracle:v2
+  ORACLE_IMAGE: docker.pkg.github.com/navikt/vtp/foreldrepenger-oracle
 
 jobs:
   build:
