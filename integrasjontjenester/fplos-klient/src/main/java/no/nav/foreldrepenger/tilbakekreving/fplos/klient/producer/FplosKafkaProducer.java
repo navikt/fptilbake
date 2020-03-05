@@ -46,6 +46,8 @@ public class FplosKafkaProducer {
 
         properties.setProperty("bootstrap.servers", bootstrapServers);
         properties.setProperty("client.id", clientId);
+        properties.setProperty("max.in.flight.requests.per.connection", "1"); //påkrevet for å garantere rekkefølge sammen med retries
+        properties.setProperty("acks", "all"); //mindre sjangse for å miste melding
 
         setSecurity(username, properties);
         setUsernameAndPassword(username, password, properties);
@@ -55,20 +57,17 @@ public class FplosKafkaProducer {
 
     }
 
-    public void flush() {
-        producer.flush();
-    }
-
     void runProducerWithSingleJson(ProducerRecord<String, String> record) {
         try {
             producer.send(record).get();
+            producer.flush(); //påkrevd for å sikre at prosesstask feiler hvis sending til kafka feiler
         } catch (InterruptedException e) {
             log.warn("Uventet feil ved sending til Kafka, topic:" + topic, e);
             Thread.currentThread().interrupt(); // reinterrupt
         } catch (ExecutionException e) {
             log.warn("Uventet feil ved sending til Kafka, topic:" + topic, e);
         } catch (AuthenticationException | AuthorizationException e) {
-            log.warn("Feil i pålogging mot Kafka, topic:" + topic, e);
+            log.error("Feil i pålogging mot Kafka, topic:" + topic, e);
         } catch (RetriableException e) {
             log.warn("Fikk transient feil mot Kafka, kan prøve igjen, topic:" + topic, e);
         } catch (KafkaException e) {

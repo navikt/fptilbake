@@ -2,7 +2,9 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.DiscriminatorValue;
@@ -24,6 +26,15 @@ public class BehandlingResultatType extends Kodeliste {
     public static final BehandlingResultatType ENDRET = new BehandlingResultatType("ENDRET"); //$NON-NLS-1$
     public static final BehandlingResultatType INGEN_ENDRING = new BehandlingResultatType("INGEN_ENDRING"); //$NON-NLS-1$
 
+    private static final Map<String, BehandlingResultatType> BEHANDLING_RESULTAT_TYPER = new HashMap<>() {{
+        put(IKKE_FASTSATT.getKode(), IKKE_FASTSATT);
+        put(FASTSATT.getKode(), FASTSATT);
+        put(HENLAGT_FEILOPPRETTET.getKode(), HENLAGT_FEILOPPRETTET);
+        put(HENLAGT_KRAVGRUNNLAG_NULLSTILT.getKode(), HENLAGT_KRAVGRUNNLAG_NULLSTILT);
+        put(HENLAGT_TEKNISK_VEDLIKEHOLD.getKode(), HENLAGT_TEKNISK_VEDLIKEHOLD);
+    }};
+
+
     private static final Set<BehandlingResultatType> ALLE_HENLEGGELSESKODER = Collections.unmodifiableSet(new LinkedHashSet<>(Arrays.asList(HENLAGT_KRAVGRUNNLAG_NULLSTILT, HENLAGT_FEILOPPRETTET, HENLAGT_TEKNISK_VEDLIKEHOLD)));
 
     protected BehandlingResultatType() {
@@ -40,6 +51,13 @@ public class BehandlingResultatType extends Kodeliste {
 
     public boolean erHenlagt() {
         return ALLE_HENLEGGELSESKODER.contains(this);
+    }
+
+    public static BehandlingResultatType fraKode(String kode) {
+        if (BEHANDLING_RESULTAT_TYPER.containsKey(kode)) {
+            return BEHANDLING_RESULTAT_TYPER.get(kode);
+        }
+        throw new IllegalArgumentException("Fant ikke " + BehandlingResultatType.class + " for kode '" + kode + "'");
     }
 
 }
