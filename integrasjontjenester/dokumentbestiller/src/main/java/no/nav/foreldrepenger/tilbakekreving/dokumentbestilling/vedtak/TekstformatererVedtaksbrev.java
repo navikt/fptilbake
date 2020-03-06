@@ -234,17 +234,17 @@ class TekstformatererVedtaksbrev extends FellesTekstformaterer {
     }
 
     static String lagVedtaksbrevFritekst(HbVedtaksbrevData vedtaksbrevData) {
-        Template template = getTemplate(lagSpråkstøttetFilsti("vedtak/vedtak", vedtaksbrevData.getSpråkkode()));
+        Template template = getTemplate("vedtak/vedtak", vedtaksbrevData.getSpråkkode());
         return applyTemplate(template, vedtaksbrevData);
     }
 
     static String lagVedtaksbrevVedleggHtml(HbVedtaksbrevData vedtaksbrevData) {
-        Template template = getTemplate(lagSpråkstøttetFilsti("vedtak/vedlegg", vedtaksbrevData.getSpråkkode()));
+        Template template = getTemplate("vedtak/vedlegg", vedtaksbrevData.getSpråkkode());
         return applyTemplate(template, vedtaksbrevData);
     }
 
     static String lagVedtaksbrevOverskrift(HbVedtaksbrevData vedtaksbrevData, Språkkode språkkode) {
-        Template template = getTemplate(lagSpråkstøttetFilsti("vedtak/vedtak_overskrift", språkkode));
+        Template template = getTemplate("vedtak/vedtak_overskrift", språkkode);
         return applyTemplate(template, vedtaksbrevData);
     }
 
@@ -282,23 +282,25 @@ class TekstformatererVedtaksbrev extends FellesTekstformaterer {
         }
     }
 
-    private static Template getTemplate(String filsti) {
-        if (TEMPLATE_CACHE.containsKey(filsti)) {
-            return TEMPLATE_CACHE.get(filsti);
+    private static Template getTemplate(String filsti, Språkkode språkkode) {
+        String språkstøttetFilsti = lagSpråkstøttetFilsti(filsti, språkkode);
+        if (TEMPLATE_CACHE.containsKey(språkstøttetFilsti)) {
+            return TEMPLATE_CACHE.get(språkstøttetFilsti);
         }
-        TEMPLATE_CACHE.put(filsti, opprettHandlebarsTemplate(filsti));
-        return TEMPLATE_CACHE.get(filsti);
+        TEMPLATE_CACHE.put(språkstøttetFilsti, opprettHandlebarsTemplate(språkstøttetFilsti));
+        return TEMPLATE_CACHE.get(språkstøttetFilsti);
     }
 
     private static Template getTemplateFraPartial(String partial, Språkkode språkkode) {
-        if (TEMPLATE_CACHE.containsKey(partial)) {
-            return TEMPLATE_CACHE.get(partial);
+        String språkstøttetFilsti = lagSpråkstøttetFilsti(partial, språkkode);
+        if (TEMPLATE_CACHE.containsKey(språkstøttetFilsti)) {
+            return TEMPLATE_CACHE.get(språkstøttetFilsti);
         }
-        TEMPLATE_CACHE.put(partial, opprettTemplateFraPartials(
+        TEMPLATE_CACHE.put(språkstøttetFilsti, opprettTemplateFraPartials(
             lagSpråkstøttetFilsti("vedtak/vedtak_felles", språkkode),
-            lagSpråkstøttetFilsti(partial, språkkode)
+            språkstøttetFilsti
         ));
-        return TEMPLATE_CACHE.get(partial);
+        return TEMPLATE_CACHE.get(språkstøttetFilsti);
     }
 
     private static Template opprettTemplateFraPartials(String... partials) {

@@ -8,6 +8,7 @@ import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselInfo;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.TekstformatererBrevFeil;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
@@ -26,8 +27,7 @@ public class TekstformatererVarselbrev extends FellesTekstformaterer {
 
     public static String lagVarselbrevFritekst(VarselbrevSamletInfo varselbrevSamletInfo) {
         try {
-            Template template = opprettHandlebarsTemplate(lagSpråkstøttetFilsti("varsel/varsel",
-                varselbrevSamletInfo.getBrevMetadata().getSpråkkode()));
+            Template template = opprettHandlebarsTemplate("varsel/varsel", varselbrevSamletInfo.getBrevMetadata().getSpråkkode());
             VarselbrevDokument varselbrevDokument = mapTilVarselbrevDokument(
                 varselbrevSamletInfo);
 
@@ -39,8 +39,7 @@ public class TekstformatererVarselbrev extends FellesTekstformaterer {
 
     public static String lagVarselbrevOverskrift(BrevMetadata brevMetadata) {
         try {
-            Template template = opprettHandlebarsTemplate(lagSpråkstøttetFilsti("varsel/varsel_overskrift",
-                brevMetadata.getSpråkkode()));
+            Template template = opprettHandlebarsTemplate("varsel/varsel_overskrift", brevMetadata.getSpråkkode());
             OverskriftBrevData overskriftBrevData = lagOverskriftBrevData(brevMetadata);
 
             return template.apply(overskriftBrevData);
@@ -51,8 +50,7 @@ public class TekstformatererVarselbrev extends FellesTekstformaterer {
 
     public static String lagKorrigertVarselbrevFritekst(VarselbrevSamletInfo varselbrevSamletInfo, VarselInfo varselInfo) {
         try {
-            Template template = opprettHandlebarsTemplate(lagSpråkstøttetFilsti("varsel/korrigert_varsel",
-                varselbrevSamletInfo.getBrevMetadata().getSpråkkode()));
+            Template template = opprettHandlebarsTemplate("varsel/korrigert_varsel", varselbrevSamletInfo.getBrevMetadata().getSpråkkode());
             VarselbrevDokument varselbrevDokument = mapTilKorrigertVarselbrevDokument(
                 varselbrevSamletInfo,
                 varselInfo);
@@ -65,8 +63,7 @@ public class TekstformatererVarselbrev extends FellesTekstformaterer {
 
     public static String lagKorrigertVarselbrevOverskrift(BrevMetadata brevMetadata) {
         try {
-            Template template = opprettHandlebarsTemplate(lagSpråkstøttetFilsti("varsel/korrigert_varsel_overskrift",
-                brevMetadata.getSpråkkode()));
+            Template template = opprettHandlebarsTemplate("varsel/korrigert_varsel_overskrift", brevMetadata.getSpråkkode());
             OverskriftBrevData overskriftBrevData = lagOverskriftBrevData(brevMetadata);
             overskriftBrevData.setEngangsstønad(FagsakYtelseType.ENGANGSTØNAD.equals(brevMetadata.getFagsaktype()));
 
@@ -76,11 +73,11 @@ public class TekstformatererVarselbrev extends FellesTekstformaterer {
         }
     }
 
-    private static Template opprettHandlebarsTemplate(String filsti) throws IOException {
+    private static Template opprettHandlebarsTemplate(String filsti, Språkkode språkkode) throws IOException {
         Handlebars handlebars = opprettHandlebarsKonfigurasjon();
         handlebars.registerHelper("datoformat", datoformatHelper());
         handlebars.registerHelper("kroner", new CustomHelpers.KroneFormattererMedTusenskille());
-        return handlebars.compile(filsti);
+        return handlebars.compile(lagSpråkstøttetFilsti(filsti, språkkode));
     }
 
     private static void settFagsaktype(BaseDokument baseDokument, FagsakYtelseType fagsaktype) {

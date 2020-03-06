@@ -5,6 +5,7 @@ import java.io.IOException;
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.TekstformatererBrevFeil;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.FellesTekstformaterer;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.OverskriftBrevData;
@@ -18,8 +19,8 @@ class TekstformatererHenleggelsesbrev extends FellesTekstformaterer {
 
     static String lagHenleggelsebrevFritekst(HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo) {
         try {
-            Template template = opprettHandlebarsTemplate(lagSpråkstøttetFilsti("henleggelse/henleggelse",
-                henleggelsesbrevSamletInfo.getBrevMetadata().getSpråkkode()));
+            Template template = opprettHandlebarsTemplate("henleggelse/henleggelse",
+                henleggelsesbrevSamletInfo.getBrevMetadata().getSpråkkode());
             HenleggelsesbrevDokument henleggelsesbrevDokument = mapTilHenleggelsebrevDokument(
                 henleggelsesbrevSamletInfo);
 
@@ -31,19 +32,20 @@ class TekstformatererHenleggelsesbrev extends FellesTekstformaterer {
 
     static String lagHenleggelsebrevOverskrift(HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo) {
         try {
-            Template template = opprettHandlebarsTemplate(lagSpråkstøttetFilsti("henleggelse/henleggelse_overskrift",
-                henleggelsesbrevSamletInfo.getBrevMetadata().getSpråkkode()));
+            Template template = opprettHandlebarsTemplate("henleggelse/henleggelse_overskrift",
+                henleggelsesbrevSamletInfo.getBrevMetadata().getSpråkkode());
             OverskriftBrevData overskriftBrevData = lagOverskriftBrevData(henleggelsesbrevSamletInfo.getBrevMetadata());
+
             return template.apply(overskriftBrevData);
         } catch (IOException e) {
             throw TekstformatererBrevFeil.FACTORY.feilVedTekstgenerering(e).toException();
         }
     }
 
-    private static Template opprettHandlebarsTemplate(String filsti) throws IOException {
+    private static Template opprettHandlebarsTemplate(String filsti, Språkkode språkkode) throws IOException {
         Handlebars handlebars = opprettHandlebarsKonfigurasjon();
         handlebars.registerHelper("datoformat", datoformatHelper());
-        return handlebars.compile(filsti);
+        return handlebars.compile(lagSpråkstøttetFilsti(filsti, språkkode));
     }
 
     private static HenleggelsesbrevDokument mapTilHenleggelsebrevDokument(HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo) {
