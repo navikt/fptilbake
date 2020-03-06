@@ -1,7 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars;
 
-import static no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevSpråkUtil.finnRiktigSpråk;
-
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -12,6 +10,7 @@ import com.github.jknack.handlebars.Helper;
 import com.github.jknack.handlebars.helper.ConditionalHelpers;
 import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
 
 public abstract class FellesTekstformaterer {
@@ -23,7 +22,7 @@ public abstract class FellesTekstformaterer {
         loader.setCharset(StandardCharsets.UTF_8);
         loader.setPrefix("/templates/");
         loader.setSuffix(".hbs");
-        
+
         Handlebars handlebars = new Handlebars(loader);
         handlebars.setCharset(StandardCharsets.UTF_8);
         handlebars.setInfiniteLoops(false);
@@ -36,7 +35,6 @@ public abstract class FellesTekstformaterer {
     protected static OverskriftBrevData lagOverskriftBrevData(BrevMetadata brevMetadata) {
         OverskriftBrevData overskriftBrevData = new OverskriftBrevData();
         overskriftBrevData.setFagsakType(brevMetadata.getFagsaktypenavnPåSpråk());
-        overskriftBrevData.setLokale(finnRiktigSpråk(brevMetadata.getSpråkkode()));
         return overskriftBrevData;
     }
 
@@ -46,5 +44,18 @@ public abstract class FellesTekstformaterer {
 
     private static String konverterFraLocaldateTilTekst(LocalDate dato) {
         return FORMATTER_LANGT_DATOFORMAT.format(dato);
+    }
+
+    protected static String lagSpråkstøttetFilsti(String filsti, Språkkode språkkode) {
+        String språk = mapTilSpråk(språkkode);
+        return String.format("%s/%s", språk, filsti);
+    }
+
+    private static String mapTilSpråk(Språkkode språkkode) {
+        if (Språkkode.nn.equals(språkkode)) {
+            return "nn";
+        } else {
+            return "nb";
+        }
     }
 }

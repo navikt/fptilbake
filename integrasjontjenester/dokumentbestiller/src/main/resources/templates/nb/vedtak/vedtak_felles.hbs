@@ -1,15 +1,7 @@
 {{~#* inline "ytelse-navn" ~}}
-    {{~#if (eq locale "nn_NO") ~}}
-{{lookup-map sak.ytelsetype FP="foreldrepengar" SVP="svangerskapspengar" ES="eingongsstønad"}}
-    {{~else~}}
 {{lookup-map sak.ytelsetype FP="foreldrepenger" SVP="svangerskapspenger" ES="engangsstønad"}}
-    {{~/if~}}
 {{~/inline~}}
 {{~#* inline "ytelse-produkt" ~}}
-    {{~#if (eq locale "nn_NO") ~}}
-{{lookup-map sak.ytelsetype FP="foreldrepengane" SVP="svangerskapspengane" ES="eingongsstønaden"}}
-    {{~else~}}
 {{lookup-map sak.ytelsetype FP="foreldrepengene" SVP="svangerskapspengene" ES="engangsstønaden"}}
-    {{~/if~}}
 {{~/inline~}}
 {{#* inline "før-skatt"}}{{#if (neq sak.ytelsetype "ES")}} før skatt{{/if}}{{/inline}}

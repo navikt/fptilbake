@@ -1,7 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel;
 
-import static no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevSpråkUtil.finnRiktigSpråk;
-
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
@@ -28,7 +26,8 @@ public class TekstformatererVarselbrev extends FellesTekstformaterer {
 
     public static String lagVarselbrevFritekst(VarselbrevSamletInfo varselbrevSamletInfo) {
         try {
-            Template template = opprettHandlebarsTemplate("varsel");
+            Template template = opprettHandlebarsTemplate(lagSpråkstøttetFilsti("varsel/varsel",
+                varselbrevSamletInfo.getBrevMetadata().getSpråkkode()));
             VarselbrevDokument varselbrevDokument = mapTilVarselbrevDokument(
                 varselbrevSamletInfo);
 
@@ -40,7 +39,8 @@ public class TekstformatererVarselbrev extends FellesTekstformaterer {
 
     public static String lagVarselbrevOverskrift(BrevMetadata brevMetadata) {
         try {
-            Template template = opprettHandlebarsTemplate("varsel/varsel_overskrift");
+            Template template = opprettHandlebarsTemplate(lagSpråkstøttetFilsti("varsel/varsel_overskrift",
+                brevMetadata.getSpråkkode()));
             OverskriftBrevData overskriftBrevData = lagOverskriftBrevData(brevMetadata);
 
             return template.apply(overskriftBrevData);
@@ -51,7 +51,8 @@ public class TekstformatererVarselbrev extends FellesTekstformaterer {
 
     public static String lagKorrigertVarselbrevFritekst(VarselbrevSamletInfo varselbrevSamletInfo, VarselInfo varselInfo) {
         try {
-            Template template = opprettHandlebarsTemplate("korrigert_varsel");
+            Template template = opprettHandlebarsTemplate(lagSpråkstøttetFilsti("varsel/korrigert_varsel",
+                varselbrevSamletInfo.getBrevMetadata().getSpråkkode()));
             VarselbrevDokument varselbrevDokument = mapTilKorrigertVarselbrevDokument(
                 varselbrevSamletInfo,
                 varselInfo);
@@ -64,7 +65,8 @@ public class TekstformatererVarselbrev extends FellesTekstformaterer {
 
     public static String lagKorrigertVarselbrevOverskrift(BrevMetadata brevMetadata) {
         try {
-            Template template = opprettHandlebarsTemplate("varsel/korrigert_varsel_overskrift");
+            Template template = opprettHandlebarsTemplate(lagSpråkstøttetFilsti("varsel/korrigert_varsel_overskrift",
+                brevMetadata.getSpråkkode()));
             OverskriftBrevData overskriftBrevData = lagOverskriftBrevData(brevMetadata);
             overskriftBrevData.setEngangsstønad(FagsakYtelseType.ENGANGSTØNAD.equals(brevMetadata.getFagsaktype()));
 
@@ -109,7 +111,6 @@ public class TekstformatererVarselbrev extends FellesTekstformaterer {
         varselbrevDokument.setVarseltekstFraSaksbehandler(varselbrevSamletInfo.getFritekstFraSaksbehandler());
         varselbrevDokument.setFeilutbetaltePerioder(varselbrevSamletInfo.getFeilutbetaltePerioder());
         varselbrevDokument.setFagsaktypeNavn(varselbrevSamletInfo.getBrevMetadata().getFagsaktypenavnPåSpråk());
-        varselbrevDokument.setLocale(finnRiktigSpråk(varselbrevSamletInfo.getBrevMetadata().getSpråkkode()));
         settFagsaktype(varselbrevDokument, varselbrevSamletInfo.getBrevMetadata().getFagsaktype());
         settSenesteOgTidligsteDatoer(varselbrevDokument, varselbrevSamletInfo.getFeilutbetaltePerioder());
 

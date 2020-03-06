@@ -15,6 +15,7 @@ import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.context.JavaBeanValueResolver;
 import com.github.jknack.handlebars.context.MapValueResolver;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Avsnitt;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Underavsnitt;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.TekstformatererBrevFeil;
@@ -37,14 +38,9 @@ import no.nav.vedtak.util.StringUtils;
 class TekstformatererVedtaksbrev extends FellesTekstformaterer {
     private static Map<String, Template> TEMPLATE_CACHE = new HashMap<>();
 
-    private static String PARTIAL_PERIODE_OVERSKRIFT = "vedtak/periode_overskrift";
     private static String PARTIAL_PERIODE_FAKTA = "vedtak/periode_fakta";
     private static String PARTIAL_PERIODE_VILKÅR = "vedtak/periode_vilkår";
     private static String PARTIAL_PERIODE_SÆRLIGE_GRUNNER = "vedtak/periode_særlige_grunner";
-    private static String PARTIAL_PERIODE_SLUTT = "vedtak/periode_slutt";
-    private static String PARTIAL_VEDTAK_START = "vedtak/vedtak_start";
-    private static String PARTIAL_VEDTAK_SLUTT = "vedtak/vedtak_slutt";
-    private static String PARTIAL_VEDTAK_FELLES = "vedtak/vedtak_felles";
 
      static final ObjectMapper OM = ObjectMapperForUtvekslingAvDataMedHandlebars.INSTANCE;
 
@@ -62,7 +58,7 @@ class TekstformatererVedtaksbrev extends FellesTekstformaterer {
     }
 
     static Avsnitt lagOppsummeringAvsnitt(HbVedtaksbrevData vedtaksbrevData, String hovedoverskrift) {
-        String tekst = konverterMedPartialTemplate(PARTIAL_VEDTAK_START, vedtaksbrevData);
+        String tekst = konverterMedPartialTemplate("vedtak/vedtak_start", vedtaksbrevData);
         Avsnitt.Builder avsnittBuilder = new Avsnitt.Builder().medAvsnittstype(Avsnitt.Avsnittstype.OPPSUMMERING).medOverskrift(hovedoverskrift);
         return parseTekst(tekst, avsnittBuilder, null).build();
     }
@@ -76,17 +72,17 @@ class TekstformatererVedtaksbrev extends FellesTekstformaterer {
     }
 
     static Avsnitt lagAvsluttendeAvsnitt(HbVedtaksbrevData vedtaksbrevData) {
-        String tekst = konverterMedPartialTemplate(PARTIAL_VEDTAK_SLUTT, vedtaksbrevData);
+        String tekst = konverterMedPartialTemplate("vedtak/vedtak_slutt", vedtaksbrevData);
         Avsnitt.Builder avsnittBuilder = new Avsnitt.Builder().medAvsnittstype(Avsnitt.Avsnittstype.TILLEGGSINFORMASJON);
         return parseTekst(tekst, avsnittBuilder, null).build();
     }
 
     private static Avsnitt lagPeriodeAvsnitt(HbVedtaksbrevPeriodeOgFelles data) {
-        String overskrift = konverterMedPartialTemplate(PARTIAL_PERIODE_OVERSKRIFT, data);
+        String overskrift = konverterMedPartialTemplate("vedtak/periode_overskrift", data);
         String faktatekst = konverterMedPartialTemplate(PARTIAL_PERIODE_FAKTA, data);
         String vilkårTekst = konverterMedPartialTemplate(PARTIAL_PERIODE_VILKÅR, data);
         String særligeGrunnerTekst = konverterMedPartialTemplate(PARTIAL_PERIODE_SÆRLIGE_GRUNNER, data);
-        String avsluttendeTekst = konverterMedPartialTemplate(PARTIAL_PERIODE_SLUTT, data);
+        String avsluttendeTekst = konverterMedPartialTemplate("vedtak/periode_slutt", data);
 
         Avsnitt.Builder avsnittBuilder = new Avsnitt.Builder()
             .medAvsnittstype(Avsnitt.Avsnittstype.PERIODE)
@@ -238,17 +234,17 @@ class TekstformatererVedtaksbrev extends FellesTekstformaterer {
     }
 
     static String lagVedtaksbrevFritekst(HbVedtaksbrevData vedtaksbrevData) {
-        Template template = getTemplate("vedtak");
+        Template template = getTemplate(lagSpråkstøttetFilsti("vedtak/vedtak", vedtaksbrevData.getSpråkkode()));
         return applyTemplate(template, vedtaksbrevData);
     }
 
     static String lagVedtaksbrevVedleggHtml(HbVedtaksbrevData vedtaksbrevData) {
-        Template template = getTemplate("vedtak/vedlegg");
+        Template template = getTemplate(lagSpråkstøttetFilsti("vedtak/vedlegg", vedtaksbrevData.getSpråkkode()));
         return applyTemplate(template, vedtaksbrevData);
     }
 
-    static String lagVedtaksbrevOverskrift(HbVedtaksbrevData vedtaksbrevData) {
-        Template template = getTemplate("vedtak/vedtak_overskrift");
+    static String lagVedtaksbrevOverskrift(HbVedtaksbrevData vedtaksbrevData, Språkkode språkkode) {
+        Template template = getTemplate(lagSpråkstøttetFilsti("vedtak/vedtak_overskrift", språkkode));
         return applyTemplate(template, vedtaksbrevData);
     }
 
@@ -265,9 +261,9 @@ class TekstformatererVedtaksbrev extends FellesTekstformaterer {
         return konverterMedPartialTemplate(PARTIAL_PERIODE_SÆRLIGE_GRUNNER, data);
     }
 
-    private static String konverterMedPartialTemplate(String partial, HandlebarsData vedtaksbrevPeriode) {
-        Template template = getTemplateFraPartial(partial);
-        return applyTemplate(template, vedtaksbrevPeriode);
+    private static String konverterMedPartialTemplate(String partial, HandlebarsData handlebarsData) {
+        Template template = getTemplateFraPartial(partial, handlebarsData.getSpråkkode());
+        return applyTemplate(template, handlebarsData);
     }
 
     private static String applyTemplate(Template template, HandlebarsData data) {
@@ -294,11 +290,14 @@ class TekstformatererVedtaksbrev extends FellesTekstformaterer {
         return TEMPLATE_CACHE.get(filsti);
     }
 
-    private static Template getTemplateFraPartial(String partial) {
+    private static Template getTemplateFraPartial(String partial, Språkkode språkkode) {
         if (TEMPLATE_CACHE.containsKey(partial)) {
             return TEMPLATE_CACHE.get(partial);
         }
-        TEMPLATE_CACHE.put(partial, opprettTemplateFraPartials(PARTIAL_VEDTAK_FELLES, partial));
+        TEMPLATE_CACHE.put(partial, opprettTemplateFraPartials(
+            lagSpråkstøttetFilsti("vedtak/vedtak_felles", språkkode),
+            lagSpråkstøttetFilsti(partial, språkkode)
+        ));
         return TEMPLATE_CACHE.get(partial);
     }
 

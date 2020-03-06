@@ -64,9 +64,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.V
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Avsnitt;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.HentForhåndvisningVedtaksbrevPdfDto;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.PeriodeMedTekstDto;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevSpråkUtil;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.EksternDataForBrevTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.Lokale;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.YtelseNavn;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevData;
@@ -154,7 +152,7 @@ public class VedtaksbrevTjeneste {
         VedtaksbrevData vedtaksbrevData = hentDataForVedtaksbrev(behandlingId);
         HbVedtaksbrevData hbVedtaksbrevData = vedtaksbrevData.getVedtaksbrevData();
         FritekstbrevData data = new FritekstbrevData.Builder()
-            .medOverskrift(TekstformatererVedtaksbrev.lagVedtaksbrevOverskrift(hbVedtaksbrevData))
+            .medOverskrift(TekstformatererVedtaksbrev.lagVedtaksbrevOverskrift(hbVedtaksbrevData, vedtaksbrevData.getMetadata().getSpråkkode()))
             .medBrevtekst(TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(hbVedtaksbrevData))
             .medMetadata(vedtaksbrevData.getMetadata())
             .build();
@@ -177,7 +175,7 @@ public class VedtaksbrevTjeneste {
         VedtaksbrevData vedtaksbrevData = hentDataForVedtaksbrev(dto.getBehandlingId(), dto.getOppsummeringstekst(), dto.getPerioderMedTekst());
         HbVedtaksbrevData hbVedtaksbrevData = vedtaksbrevData.getVedtaksbrevData();
         FritekstbrevData data = new FritekstbrevData.Builder()
-            .medOverskrift(TekstformatererVedtaksbrev.lagVedtaksbrevOverskrift(hbVedtaksbrevData))
+            .medOverskrift(TekstformatererVedtaksbrev.lagVedtaksbrevOverskrift(hbVedtaksbrevData, vedtaksbrevData.getMetadata().getSpråkkode()))
             .medBrevtekst(TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(hbVedtaksbrevData))
             .medMetadata(vedtaksbrevData.getMetadata())
             .build();
@@ -201,7 +199,7 @@ public class VedtaksbrevTjeneste {
     public List<Avsnitt> hentForhåndsvisningVedtaksbrevSomTekst(Long behandlingId) {
         VedtaksbrevData vedtaksbrevData = hentDataForVedtaksbrev(behandlingId);
         HbVedtaksbrevData hbVedtaksbrevData = vedtaksbrevData.getVedtaksbrevData();
-        String hovedoverskrift = TekstformatererVedtaksbrev.lagVedtaksbrevOverskrift(hbVedtaksbrevData);
+        String hovedoverskrift = TekstformatererVedtaksbrev.lagVedtaksbrevOverskrift(hbVedtaksbrevData, vedtaksbrevData.getMetadata().getSpråkkode());
         return TekstformatererVedtaksbrev.lagVedtaksbrevDeltIAvsnitt(hbVedtaksbrevData, hovedoverskrift);
     }
 
@@ -252,8 +250,8 @@ public class VedtaksbrevTjeneste {
             : VedtakHjemmel.EffektForBruker.FØRSTEGANGSVEDTAK;
         LocalDate originalBehandlingVedtaksdato = erRevurdering ? finnOriginalBehandlingVedtaksdato(behandling) : null;
 
-        Lokale lokale = BrevSpråkUtil.finnRiktigSpråk(fpsakBehandling.getGrunninformasjon().getSpråkkodeEllerDefault());
-        String hjemmelstekst = VedtakHjemmel.lagHjemmelstekst(vedtakResultatType, foreldelse, vilkårPerioder, effektForBruker, lokale);
+        Språkkode språkkode = fpsakBehandling.getGrunninformasjon().getSpråkkodeEllerDefault();
+        String hjemmelstekst = VedtakHjemmel.lagHjemmelstekst(vedtakResultatType, foreldelse, vilkårPerioder, effektForBruker, språkkode);
 
         List<HbVedtaksbrevPeriode> perioder = resulatPerioder.stream()
             .map(brp -> lagBrevdataPeriode(brp, fakta, vilkårPerioder, foreldelse, perioderFritekst))
@@ -288,7 +286,7 @@ public class VedtaksbrevTjeneste {
                 .medPerioder(perioder)
                 .build())
             .medSøker(utledSøker(personinfo))
-            .medLocale(lokale);
+            .medSpråkkode(språkkode);
 
         HbVedtaksbrevData data = new HbVedtaksbrevData(vedtakDataBuilder.build(), perioder);
         BrevMetadata brevMetadata = lagMetadataForVedtaksbrev(behandling, vedtakResultatType, fpsakBehandling, personinfo);

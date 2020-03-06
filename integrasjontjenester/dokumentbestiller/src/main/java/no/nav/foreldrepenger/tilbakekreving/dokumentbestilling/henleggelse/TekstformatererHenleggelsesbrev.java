@@ -5,11 +5,10 @@ import java.io.IOException;
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
 
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevSpråkUtil;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.TekstformatererBrevFeil;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.FellesTekstformaterer;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.OverskriftBrevData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.henleggelse.handlebars.dto.HenleggelsesbrevDokument;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.TekstformatererBrevFeil;
 
 class TekstformatererHenleggelsesbrev extends FellesTekstformaterer {
 
@@ -19,7 +18,8 @@ class TekstformatererHenleggelsesbrev extends FellesTekstformaterer {
 
     static String lagHenleggelsebrevFritekst(HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo) {
         try {
-            Template template = opprettHandlebarsTemplate("henleggelse");
+            Template template = opprettHandlebarsTemplate(lagSpråkstøttetFilsti("henleggelse/henleggelse",
+                henleggelsesbrevSamletInfo.getBrevMetadata().getSpråkkode()));
             HenleggelsesbrevDokument henleggelsesbrevDokument = mapTilHenleggelsebrevDokument(
                 henleggelsesbrevSamletInfo);
 
@@ -31,7 +31,8 @@ class TekstformatererHenleggelsesbrev extends FellesTekstformaterer {
 
     static String lagHenleggelsebrevOverskrift(HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo) {
         try {
-            Template template = opprettHandlebarsTemplate("henleggelse/henleggelse_overskrift");
+            Template template = opprettHandlebarsTemplate(lagSpråkstøttetFilsti("henleggelse/henleggelse_overskrift",
+                henleggelsesbrevSamletInfo.getBrevMetadata().getSpråkkode()));
             OverskriftBrevData overskriftBrevData = lagOverskriftBrevData(henleggelsesbrevSamletInfo.getBrevMetadata());
             return template.apply(overskriftBrevData);
         } catch (IOException e) {
@@ -49,7 +50,6 @@ class TekstformatererHenleggelsesbrev extends FellesTekstformaterer {
         HenleggelsesbrevDokument henleggelsesbrevDokument = new HenleggelsesbrevDokument();
         henleggelsesbrevDokument.setFagsaktypeNavn(henleggelsesbrevSamletInfo.getBrevMetadata().getFagsaktypenavnPåSpråk());
         henleggelsesbrevDokument.setVarsletDato(henleggelsesbrevSamletInfo.getVarsletDato());
-        henleggelsesbrevDokument.setLokale(BrevSpråkUtil.finnRiktigSpråk(henleggelsesbrevSamletInfo.getBrevMetadata().getSpråkkode()));
 
         henleggelsesbrevDokument.valider();
         return henleggelsesbrevDokument;

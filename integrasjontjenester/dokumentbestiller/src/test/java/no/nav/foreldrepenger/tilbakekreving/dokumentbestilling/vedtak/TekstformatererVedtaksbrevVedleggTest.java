@@ -17,12 +17,12 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelse
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.FellesUndertyper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.ØkonomiUndertyper;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.AnnenVurdering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.SærligGrunn;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.Lokale;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbKonfigurasjon;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbPerson;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbSak;
@@ -53,14 +53,14 @@ public class TekstformatererVedtaksbrevVedleggTest {
 
     @Test
     public void skal_generere_vedlegg_med_en_periode_uten_renter_nynorsk() throws Exception {
-        HbVedtaksbrevData data = getVedtaksbrevData(Lokale.NYNORSK);
+        HbVedtaksbrevData data = getVedtaksbrevData(Språkkode.nn);
 
         String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevVedleggHtml(data);
         String fasit = les("/vedtaksbrev/vedlegg/vedlegg_uten_renter_nn.txt");
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 
-    private HbVedtaksbrevData getVedtaksbrevData(Lokale lokale) {
+    private HbVedtaksbrevData getVedtaksbrevData(Språkkode språkkode) {
         HbVedtaksbrevFelles vedtaksbrevData = lagTestBuilder()
             .medSak(HbSak.build()
                 .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
@@ -79,7 +79,7 @@ public class TekstformatererVedtaksbrevVedleggTest {
                 .medVarsletBeløp(BigDecimal.valueOf(33001))
                 .medVarsletDato(LocalDate.of(2020, 4, 4))
                 .build())
-            .medLocale(lokale != null ? lokale : Lokale.BOKMÅL)
+            .medSpråkkode(språkkode != null ? språkkode : Språkkode.nb)
             .build();
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
             HbVedtaksbrevPeriode.builder()

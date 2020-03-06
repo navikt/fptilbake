@@ -21,12 +21,12 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.FpHendelseUnderTyper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.SvpHendelseUnderTyper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.ØkonomiUndertyper;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.AnnenVurdering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.SærligGrunn;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.Lokale;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbBehandling;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbKonfigurasjon;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbPerson;
@@ -62,14 +62,14 @@ public class TekstformatererVedtaksbrevTest {
 
     @Test
     public void skal_generere_vedtaksbrev_for_FP_og_tvillinger_og_simpel_uaktsomhet_nynorsk() throws Exception {
-        HbVedtaksbrevData data = getVedtaksbrevDataTvilling(FagsakYtelseType.FORELDREPENGER, HendelseType.FP_ANNET_HENDELSE_TYPE, Lokale.NYNORSK);
+        HbVedtaksbrevData data = getVedtaksbrevDataTvilling(FagsakYtelseType.FORELDREPENGER, HendelseType.FP_ANNET_HENDELSE_TYPE, Språkkode.nn);
 
         String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
         String fasit = les("/vedtaksbrev/FP_tvillinger_nn.txt");
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 
-    private HbVedtaksbrevData getVedtaksbrevDataTvilling(FagsakYtelseType ytelseType, HendelseType hendelseType, Lokale lokale) throws Exception {
+    private HbVedtaksbrevData getVedtaksbrevDataTvilling(FagsakYtelseType ytelseType, HendelseType hendelseType, Språkkode språkkode) throws Exception {
         HbVedtaksbrevFelles.Builder vedtaksBrevBuilder = lagTestBuilder()
             .medSak(HbSak.build()
                 .medYtelsetype(ytelseType)
@@ -99,7 +99,7 @@ public class TekstformatererVedtaksbrevTest {
             .medKonfigurasjon(HbKonfigurasjon.builder()
                 .medKlagefristUker(6)
                 .build())
-            .medLocale(lokale != null ? lokale : Lokale.BOKMÅL)
+            .medSpråkkode(språkkode != null ? språkkode : Språkkode.nb)
             .build();
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
             HbVedtaksbrevPeriode.builder()
@@ -191,7 +191,7 @@ public class TekstformatererVedtaksbrevTest {
 
     @Test
     public void skal_generere_vedtaksbrev_for_revurdering_med_SVP_og_tvillinger_og_simpel_uaktsomhet_nynorsk() throws Exception {
-        HbVedtaksbrevData data = getVedtaksbrevDataTvilling(FagsakYtelseType.SVANGERSKAPSPENGER, HendelseType.SVP_ANNET_TYPE, Lokale.NYNORSK);
+        HbVedtaksbrevData data = getVedtaksbrevDataTvilling(FagsakYtelseType.SVANGERSKAPSPENGER, HendelseType.SVP_ANNET_TYPE, Språkkode.nn);
 
         String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
         String fasit = les("/vedtaksbrev/SVP_tvillinger_nn.txt");
@@ -536,16 +536,16 @@ public class TekstformatererVedtaksbrevTest {
     public void skal_generere_vedtaksbrev_overskrift_foreldrepenger_full_tilbakebetaling() {
         HbVedtaksbrevData data = lagBrevOverskriftTestoppsett(FagsakYtelseType.FORELDREPENGER, VedtakResultatType.FULL_TILBAKEBETALING, null);
 
-        String overskrift = TekstformatererVedtaksbrev.lagVedtaksbrevOverskrift(data);
+        String overskrift = TekstformatererVedtaksbrev.lagVedtaksbrevOverskrift(data, null);
         String fasit = "Du må betale tilbake foreldrepengene";
         assertThat(overskrift).isEqualToNormalizingNewlines(fasit);
     }
 
     @Test
     public void skal_generere_vedtaksbrev_overskrift_foreldrepenger_full_tilbakebetaling_nynorsk() {
-        HbVedtaksbrevData data = lagBrevOverskriftTestoppsett(FagsakYtelseType.FORELDREPENGER, VedtakResultatType.FULL_TILBAKEBETALING, Lokale.NYNORSK);
+        HbVedtaksbrevData data = lagBrevOverskriftTestoppsett(FagsakYtelseType.FORELDREPENGER, VedtakResultatType.FULL_TILBAKEBETALING, Språkkode.nn);
 
-        String overskrift = TekstformatererVedtaksbrev.lagVedtaksbrevOverskrift(data);
+        String overskrift = TekstformatererVedtaksbrev.lagVedtaksbrevOverskrift(data, Språkkode.nn);
         String fasit = "Du må betale tilbake foreldrepengane";
         assertThat(overskrift).isEqualToNormalizingNewlines(fasit);
     }
@@ -554,23 +554,23 @@ public class TekstformatererVedtaksbrevTest {
     public void skal_generere_vedtaksbrev_overskrift_engangstønad_ingen_tilbakebetaling() {
         HbVedtaksbrevData data = lagBrevOverskriftTestoppsett(FagsakYtelseType.ENGANGSTØNAD, VedtakResultatType.INGEN_TILBAKEBETALING, null);
 
-        String overskrift = TekstformatererVedtaksbrev.lagVedtaksbrevOverskrift(data);
+        String overskrift = TekstformatererVedtaksbrev.lagVedtaksbrevOverskrift(data, null);
         String fasit = "Du må ikke betale tilbake engangsstønaden";
         assertThat(overskrift).isEqualToNormalizingNewlines(fasit);
     }
 
     @Test
     public void skal_generere_vedtaksbrev_overskrift_engangstønad_ingen_tilbakebetaling_nynorsk() {
-        HbVedtaksbrevData data = lagBrevOverskriftTestoppsett(FagsakYtelseType.ENGANGSTØNAD, VedtakResultatType.INGEN_TILBAKEBETALING, Lokale.NYNORSK);
+        HbVedtaksbrevData data = lagBrevOverskriftTestoppsett(FagsakYtelseType.ENGANGSTØNAD, VedtakResultatType.INGEN_TILBAKEBETALING, Språkkode.nn);
 
-        String overskrift = TekstformatererVedtaksbrev.lagVedtaksbrevOverskrift(data);
+        String overskrift = TekstformatererVedtaksbrev.lagVedtaksbrevOverskrift(data, Språkkode.nn);
         String fasit = "Du må ikkje betale tilbake eingongsstønaden";
         assertThat(overskrift).isEqualToNormalizingNewlines(fasit);
     }
 
     private HbVedtaksbrevData lagBrevOverskriftTestoppsett(FagsakYtelseType ytelsetype,
                                                            VedtakResultatType hovedresultat,
-                                                           Lokale lokale) {
+                                                           Språkkode språkkode) {
         HbVedtaksbrevFelles vedtaksbrevFelles = lagTestBuilder()
             .medVedtakResultat(HbTotalresultat.builder()
                 .medTotaltTilbakekrevesBeløp(BigDecimal.ZERO)
@@ -586,7 +586,7 @@ public class TekstformatererVedtaksbrevTest {
                 .medAntallBarn(1)
                 .medDatoFagsakvedtak(LocalDate.now())
                 .build())
-            .medLocale(lokale != null ? lokale : Lokale.BOKMÅL)
+            .medSpråkkode(språkkode != null ? språkkode : Språkkode.nb)
             .build();
         return new HbVedtaksbrevData(vedtaksbrevFelles, Collections.emptyList());
     }

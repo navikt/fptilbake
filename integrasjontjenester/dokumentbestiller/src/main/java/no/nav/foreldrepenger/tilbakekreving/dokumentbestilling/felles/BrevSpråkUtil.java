@@ -41,17 +41,6 @@ public class BrevSpråkUtil {
         return fagsaknavn != null && fagsaknavn.getNavn()!= null ? fagsaknavn.getNavn().toLowerCase() : null;
     }
 
-    public static Lokale finnRiktigSpråk(Språkkode språkkode) {
-        if (Språkkode.nn.equals(språkkode)) {
-            return Lokale.NYNORSK;
-        } else if (Språkkode.nb.equals(språkkode) || Språkkode.en.equals(språkkode)
-            || "NO".equals(språkkode.getKode()) || Språkkode.UDEFINERT.equals(språkkode)) {
-            return Lokale.BOKMÅL;
-        } else {
-            throw new IllegalArgumentException("Utviklerfeil - ugyldig språkkode: " + språkkode.getKode());
-        }
-    }
-
     private static KodelisteNavnI18N finnFagsaknavnPåDefaultSpråkvalg(List<KodelisteNavnI18N> kodelisteNavnI18NList) {
         Optional<KodelisteNavnI18N> fagsaktypeNavn = kodelisteNavnI18NList.stream()
             .filter(fagsaktypenavn -> DEFAULT_SPRÅKKODE.getKode().equals(fagsaktypenavn.getSpråk()))

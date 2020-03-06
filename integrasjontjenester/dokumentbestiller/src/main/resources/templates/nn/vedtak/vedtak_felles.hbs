@@ -1,0 +1,7 @@
+{{~#* inline "ytelse-navn" ~}}
+{{lookup-map sak.ytelsetype FP="foreldrepengar" SVP="svangerskapspengar" ES="eingongsstønad"}}
+{{~/inline~}}
+{{~#* inline "ytelse-produkt" ~}}
+{{lookup-map sak.ytelsetype FP="foreldrepengane" SVP="svangerskapspengane" ES="eingongsstønaden"}}
+{{~/inline~}}
+{{#* inline "før-skatt"}}{{#if (neq sak.ytelsetype "ES")}} før skatt{{/if}}{{/inline}}

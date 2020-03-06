@@ -4,11 +4,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.HandlebarsData;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.vedtak.util.Objects;
 
-public class HbVedtaksbrevPeriode implements HandlebarsData {
+public class HbVedtaksbrevPeriode {
 
     @JsonProperty("periode")
     private HbPeriode periode;

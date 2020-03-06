@@ -20,13 +20,13 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Foreldel
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.AnnenVurdering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.Lokale;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbKonfigurasjon;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbPerson;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbSak;
@@ -73,7 +73,7 @@ public class DokumentasjonGeneratorFakta {
                 .medErFødsel(true)
                 .medAntallBarn(1)
                 .build())
-            .medLocale(Lokale.NYNORSK)
+            .medSpråkkode(Språkkode.nn)
             .build();
         Map<HendelseMedUndertype, String> resultat = lagFaktatekster(felles);
         prettyPrint(resultat);
@@ -100,7 +100,7 @@ public class DokumentasjonGeneratorFakta {
                 .medErFødsel(true)
                 .medAntallBarn(1)
                 .build())
-            .medLocale(Lokale.NYNORSK)
+            .medSpråkkode(Språkkode.nn)
             .build();
         Map<HendelseMedUndertype, String> resultat = lagFaktatekster(felles);
         prettyPrint(resultat);
@@ -127,7 +127,7 @@ public class DokumentasjonGeneratorFakta {
                 .medErFødsel(true)
                 .medAntallBarn(1)
                 .build())
-            .medLocale(Lokale.NYNORSK)
+            .medSpråkkode(Språkkode.nn)
             .build();
         Map<HendelseMedUndertype, String> resultat = lagFaktatekster(felles);
         prettyPrint(resultat);
