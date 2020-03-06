@@ -8,6 +8,7 @@ on:
 env:
   ORACLE_IMAGE: docker.pkg.github.com/navikt/vtp/foreldrepenger-oracle
   IMAGE_BASE: docker.pkg.github.com/${{ github.repository }}/fptilbake
+  TZ: "Europe/Oslo"
 
 jobs:
   build:
@@ -46,34 +47,51 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Bygg artifacts & deploy
-        shell: bash
+      - name: Set build version
         run: |
-          echo "Building artifacts $(echo $GITHUB_SHA | cut -c1-7)"
-          mvn --quiet jacoco:prepare-agent deploy -e --batch-mode --settings ./.m2/settings.xml -Dmaven.wagon.http.pool=false --file pom.xml -Dchangelist= -Dsha1=-$(date "+%Y.%m.%d")-$(echo $GITHUB_SHA | cut -c1-7) -Dfile.encoding=UTF-8 -DinstallAtEnd=true -DdeployAtEnd=true  -Djacoco.destFile=$(pwd)/target/jacoco.exec
-          echo "Deployed artifacts"
-          echo ::set-env name=TAG::$(date "+%Y.%m.%d")-$(echo $GITHUB_SHA | cut -c1-7)
-          echo ::set-env name=IMAGE::$IMAGE_BASE:$(date "+%Y.%m.%d")-$(echo $GITHUB_SHA | cut -c1-7)
+          echo "::set-env name=BUILD_VERSION::$(date +%Y.%m.%d.%H%M%S)-$(echo $GITHUB_SHA | cut -c1-7)"
+
+      - name: Build artifacts & deploy
         env:
-          TZ: Europe/Oslo
           GITHUB_USERNAME: x-access-token
           GITHUB_PASSWORD: ${{ secrets.GITHUB_ACCESS_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Bygg, tag og push Docker image
+        shell: bash
         run: |
-          docker build --pull --tag ${IMAGE} --tag ${IMAGE_BASE}:latest .
-          echo "$GITHUB_PASSWORD" | docker login --username "$GITHUB_USERNAME" --password-stdin https://docker.pkg.github.com
-          docker push ${IMAGE_BASE}:latest
-          docker push $IMAGE
+          echo "Building artifacts $BUILD_VERSION"
+          mvn jacoco:prepare-agent install --quiet -e --batch-mode --settings ./.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION} -Dfile.encoding=UTF-8 -Djacoco.destFile=$(pwd)/target/jacoco.exec -Pgithub
+          echo "Build artifacts"
+          echo "::set-env name=TAG::$(mvn help:evaluate --batch-mode --settings ./.m2/settings.xml --file .flattened -Dexpression=project.version -q -DforceStdout)"
+
+      - name: Bygg og push docker-image for distribuering
         env:
-          TZ: Europe/Oslo
           GITHUB_USERNAME: x-access-token
           GITHUB_PASSWORD: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+        run: |
+          docker build --pull --tag ${IMAGE_BASE}:${TAG} --tag ${IMAGE_BASE}:latest .
+          echo "$GITHUB_PASSWORD" | docker login --username "$GITHUB_USERNAME" --password-stdin https://docker.pkg.github.com
+          docker push ${IMAGE_BASE}:latest
+          docker push ${IMAGE_BASE}:${TAG}
+
+      - name: Bygg og push docker-image for bruk under testing
+        if: success()
+        env:
+          GITHUB_USERNAME: x-access-token
+          GITHUB_PASSWORD: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+        run: |
+          docker build -f vtp/Dockerfile --pull \
+            --build-arg DOWNLOAD_SCRIPT=getmqclients-GA.sh \
+            --build-arg TOKEN_CARRIER="$GITHUB_PASSWORD" \
+            --build-arg VERSION=${TAG} \
+            --tag ${IMAGE_BASE}-test:${TAG} \
+            --tag ${IMAGE_BASE}-test:latest .
+          echo "$GITHUB_PASSWORD" | docker login --username "$GITHUB_USERNAME" --password-stdin https://docker.pkg.github.com
+          docker push ${IMAGE_BASE}-test:latest
+          docker push ${IMAGE_BASE}-test:${TAG}
 
       - name: Opprett deployment issue
         if: success()
-      - uses: maxkomarychev/oction-create-issue@v0.7.1
+        uses: maxkomarychev/oction-create-issue@v0.7.1
         id: createdeployissue
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
