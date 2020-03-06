@@ -1,7 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,15 +14,15 @@ import com.github.jknack.handlebars.JsonNodeValueResolver;
 import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.context.JavaBeanValueResolver;
 import com.github.jknack.handlebars.context.MapValueResolver;
-import com.github.jknack.handlebars.helper.ConditionalHelpers;
-import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Avsnitt;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Underavsnitt;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.TekstformatererBrevFeil;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.CustomHelpers;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.FellesTekstformaterer;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.HandlebarsData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.ObjectMapperForUtvekslingAvDataMedHandlebars;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.TekstformatererVarselbrevFeil;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevFelles;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevPeriodeOgFelles;
@@ -36,17 +35,12 @@ import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
 import no.nav.vedtak.util.Objects;
 import no.nav.vedtak.util.StringUtils;
 
-class TekstformatererVedtaksbrev {
+class TekstformatererVedtaksbrev extends FellesTekstformaterer {
     private static Map<String, Template> TEMPLATE_CACHE = new HashMap<>();
 
-    private static String PARTIAL_PERIODE_OVERSKRIFT = "vedtak/periode_overskrift";
     private static String PARTIAL_PERIODE_FAKTA = "vedtak/periode_fakta";
     private static String PARTIAL_PERIODE_VILKÅR = "vedtak/periode_vilkår";
     private static String PARTIAL_PERIODE_SÆRLIGE_GRUNNER = "vedtak/periode_særlige_grunner";
-    private static String PARTIAL_PERIODE_SLUTT = "vedtak/periode_slutt";
-    private static String PARTIAL_VEDTAK_START = "vedtak/vedtak_start";
-    private static String PARTIAL_VEDTAK_SLUTT = "vedtak/vedtak_slutt";
-    private static String PARTIAL_VEDTAK_FELLES = "vedtak/vedtak_felles";
 
      static final ObjectMapper OM = ObjectMapperForUtvekslingAvDataMedHandlebars.INSTANCE;
 
@@ -64,7 +58,7 @@ class TekstformatererVedtaksbrev {
     }
 
     static Avsnitt lagOppsummeringAvsnitt(HbVedtaksbrevData vedtaksbrevData, String hovedoverskrift) {
-        String tekst = konverterMedPartialTemplate(PARTIAL_VEDTAK_START, vedtaksbrevData);
+        String tekst = konverterMedPartialTemplate("vedtak/vedtak_start", vedtaksbrevData);
         Avsnitt.Builder avsnittBuilder = new Avsnitt.Builder().medAvsnittstype(Avsnitt.Avsnittstype.OPPSUMMERING).medOverskrift(hovedoverskrift);
         return parseTekst(tekst, avsnittBuilder, null).build();
     }
@@ -78,17 +72,17 @@ class TekstformatererVedtaksbrev {
     }
 
     static Avsnitt lagAvsluttendeAvsnitt(HbVedtaksbrevData vedtaksbrevData) {
-        String tekst = konverterMedPartialTemplate(PARTIAL_VEDTAK_SLUTT, vedtaksbrevData);
+        String tekst = konverterMedPartialTemplate("vedtak/vedtak_slutt", vedtaksbrevData);
         Avsnitt.Builder avsnittBuilder = new Avsnitt.Builder().medAvsnittstype(Avsnitt.Avsnittstype.TILLEGGSINFORMASJON);
         return parseTekst(tekst, avsnittBuilder, null).build();
     }
 
     private static Avsnitt lagPeriodeAvsnitt(HbVedtaksbrevPeriodeOgFelles data) {
-        String overskrift = konverterMedPartialTemplate(PARTIAL_PERIODE_OVERSKRIFT, data);
+        String overskrift = konverterMedPartialTemplate("vedtak/periode_overskrift", data);
         String faktatekst = konverterMedPartialTemplate(PARTIAL_PERIODE_FAKTA, data);
         String vilkårTekst = konverterMedPartialTemplate(PARTIAL_PERIODE_VILKÅR, data);
         String særligeGrunnerTekst = konverterMedPartialTemplate(PARTIAL_PERIODE_SÆRLIGE_GRUNNER, data);
-        String avsluttendeTekst = konverterMedPartialTemplate(PARTIAL_PERIODE_SLUTT, data);
+        String avsluttendeTekst = konverterMedPartialTemplate("vedtak/periode_slutt", data);
 
         Avsnitt.Builder avsnittBuilder = new Avsnitt.Builder()
             .medAvsnittstype(Avsnitt.Avsnittstype.PERIODE)
@@ -240,12 +234,17 @@ class TekstformatererVedtaksbrev {
     }
 
     static String lagVedtaksbrevFritekst(HbVedtaksbrevData vedtaksbrevData) {
-        Template template = getTemplate("vedtak");
+        Template template = getTemplate("vedtak/vedtak", vedtaksbrevData.getSpråkkode());
         return applyTemplate(template, vedtaksbrevData);
     }
 
     static String lagVedtaksbrevVedleggHtml(HbVedtaksbrevData vedtaksbrevData) {
-        Template template = getTemplate("vedtak/vedlegg");
+        Template template = getTemplate("vedtak/vedlegg", vedtaksbrevData.getSpråkkode());
+        return applyTemplate(template, vedtaksbrevData);
+    }
+
+    static String lagVedtaksbrevOverskrift(HbVedtaksbrevData vedtaksbrevData, Språkkode språkkode) {
+        Template template = getTemplate("vedtak/vedtak_overskrift", språkkode);
         return applyTemplate(template, vedtaksbrevData);
     }
 
@@ -262,9 +261,9 @@ class TekstformatererVedtaksbrev {
         return konverterMedPartialTemplate(PARTIAL_PERIODE_SÆRLIGE_GRUNNER, data);
     }
 
-    private static String konverterMedPartialTemplate(String partial, HandlebarsData vedtaksbrevPeriode) {
-        Template template = getTemplateFraPartial(partial);
-        return applyTemplate(template, vedtaksbrevPeriode);
+    private static String konverterMedPartialTemplate(String partial, HandlebarsData handlebarsData) {
+        Template template = getTemplateFraPartial(partial, handlebarsData.getSpråkkode());
+        return applyTemplate(template, handlebarsData);
     }
 
     private static String applyTemplate(Template template, HandlebarsData data) {
@@ -279,24 +278,29 @@ class TekstformatererVedtaksbrev {
                 .build();
             return template.apply(context).stripLeading().stripTrailing();
         } catch (IOException e) {
-            throw TekstformatererVarselbrevFeil.FACTORY.feilVedTekstgenerering(e).toException();
+            throw TekstformatererBrevFeil.FACTORY.feilVedTekstgenerering(e).toException();
         }
     }
 
-    private static Template getTemplate(String filsti) {
-        if (TEMPLATE_CACHE.containsKey(filsti)) {
-            return TEMPLATE_CACHE.get(filsti);
+    private static Template getTemplate(String filsti, Språkkode språkkode) {
+        String språkstøttetFilsti = lagSpråkstøttetFilsti(filsti, språkkode);
+        if (TEMPLATE_CACHE.containsKey(språkstøttetFilsti)) {
+            return TEMPLATE_CACHE.get(språkstøttetFilsti);
         }
-        TEMPLATE_CACHE.put(filsti, opprettHandlebarsTemplate(filsti));
-        return TEMPLATE_CACHE.get(filsti);
+        TEMPLATE_CACHE.put(språkstøttetFilsti, opprettHandlebarsTemplate(språkstøttetFilsti));
+        return TEMPLATE_CACHE.get(språkstøttetFilsti);
     }
 
-    private static Template getTemplateFraPartial(String partial) {
-        if (TEMPLATE_CACHE.containsKey(partial)) {
-            return TEMPLATE_CACHE.get(partial);
+    private static Template getTemplateFraPartial(String partial, Språkkode språkkode) {
+        String språkstøttetFilsti = lagSpråkstøttetFilsti(partial, språkkode);
+        if (TEMPLATE_CACHE.containsKey(språkstøttetFilsti)) {
+            return TEMPLATE_CACHE.get(språkstøttetFilsti);
         }
-        TEMPLATE_CACHE.put(partial, opprettTemplateFraPartials(PARTIAL_VEDTAK_FELLES, partial));
-        return TEMPLATE_CACHE.get(partial);
+        TEMPLATE_CACHE.put(språkstøttetFilsti, opprettTemplateFraPartials(
+            lagSpråkstøttetFilsti("vedtak/vedtak_felles", språkkode),
+            språkstøttetFilsti
+        ));
+        return TEMPLATE_CACHE.get(språkstøttetFilsti);
     }
 
     private static Template opprettTemplateFraPartials(String... partials) {
@@ -308,7 +312,7 @@ class TekstformatererVedtaksbrev {
                 .append("\n");
         }
 
-        Handlebars handlebars = opprettHandlebarsKonfigurasjon();
+        Handlebars handlebars = opprettVedtakHandlebarsKonfigurasjon();
         try {
             return handlebars.compileInline(builder.toString());
         } catch (IOException e) {
@@ -318,7 +322,7 @@ class TekstformatererVedtaksbrev {
 
 
     private static Template opprettHandlebarsTemplate(String filsti) {
-        Handlebars handlebars = opprettHandlebarsKonfigurasjon();
+        Handlebars handlebars = opprettVedtakHandlebarsKonfigurasjon();
         try {
             return handlebars.compile(filsti);
         } catch (IOException e) {
@@ -326,23 +330,13 @@ class TekstformatererVedtaksbrev {
         }
     }
 
-    private static Handlebars opprettHandlebarsKonfigurasjon() {
-        ClassPathTemplateLoader loader = new ClassPathTemplateLoader();
-        loader.setCharset(StandardCharsets.UTF_8);
-        loader.setPrefix("/templates/");
-        loader.setSuffix(".hbs");
-        Handlebars handlebars = new Handlebars(loader);
-
-        handlebars.setCharset(StandardCharsets.UTF_8);
-        handlebars.setInfiniteLoops(false);
-        handlebars.setPrettyPrint(true);
-
+    protected static Handlebars opprettVedtakHandlebarsKonfigurasjon() {
+        Handlebars handlebars = opprettHandlebarsKonfigurasjon();
         handlebars.registerHelper("switch", new CustomHelpers.SwitchHelper());
         handlebars.registerHelper("case", new CustomHelpers.CaseHelper());
         handlebars.registerHelper("var", new CustomHelpers.VariableHelper());
         handlebars.registerHelper("lookup-map", new CustomHelpers.MapLookupHelper());
         handlebars.registerHelper("kroner", new CustomHelpers.KroneFormattererMedTusenskille());
-        handlebars.registerHelpers(ConditionalHelpers.class);
         return handlebars;
     }
 

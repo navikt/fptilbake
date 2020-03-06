@@ -1,29 +1,25 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel;
 
-import static no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevSpråkUtil.finnRiktigSpråk;
-
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Locale;
 
 import com.github.jknack.handlebars.Handlebars;
-import com.github.jknack.handlebars.Helper;
 import com.github.jknack.handlebars.Template;
-import com.github.jknack.handlebars.helper.ConditionalHelpers;
-import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselInfo;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.TekstformatererBrevFeil;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.CustomHelpers;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.FellesTekstformaterer;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.OverskriftBrevData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.handlebars.dto.BaseDokument;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.handlebars.dto.VarselbrevDokument;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
-public class TekstformatererVarselbrev {
-    private static final DateTimeFormatter FORMATTER_LANGT_DATOFORMAT = DateTimeFormatter.ofPattern("d. MMMM yyyy", new Locale("no"));
+public class TekstformatererVarselbrev extends FellesTekstformaterer {
 
     private TekstformatererVarselbrev() {
         // for static access
@@ -31,52 +27,57 @@ public class TekstformatererVarselbrev {
 
     public static String lagVarselbrevFritekst(VarselbrevSamletInfo varselbrevSamletInfo) {
         try {
-            Template template = opprettHandlebarsTemplate("varsel");
+            Template template = opprettHandlebarsTemplate("varsel/varsel", varselbrevSamletInfo.getBrevMetadata().getSpråkkode());
             VarselbrevDokument varselbrevDokument = mapTilVarselbrevDokument(
                 varselbrevSamletInfo);
 
             return template.apply(varselbrevDokument);
         } catch (IOException e) {
-            throw TekstformatererVarselbrevFeil.FACTORY.feilVedTekstgenerering(e).toException();
+            throw TekstformatererBrevFeil.FACTORY.feilVedTekstgenerering(e).toException();
+        }
+    }
+
+    public static String lagVarselbrevOverskrift(BrevMetadata brevMetadata) {
+        try {
+            Template template = opprettHandlebarsTemplate("varsel/varsel_overskrift", brevMetadata.getSpråkkode());
+            OverskriftBrevData overskriftBrevData = lagOverskriftBrevData(brevMetadata);
+
+            return template.apply(overskriftBrevData);
+        } catch (IOException e) {
+            throw TekstformatererBrevFeil.FACTORY.feilVedTekstgenerering(e).toException();
         }
     }
 
     public static String lagKorrigertVarselbrevFritekst(VarselbrevSamletInfo varselbrevSamletInfo, VarselInfo varselInfo) {
         try {
-            Template template = opprettHandlebarsTemplate("korrigert_varsel");
+            Template template = opprettHandlebarsTemplate("varsel/korrigert_varsel", varselbrevSamletInfo.getBrevMetadata().getSpråkkode());
             VarselbrevDokument varselbrevDokument = mapTilKorrigertVarselbrevDokument(
                 varselbrevSamletInfo,
                 varselInfo);
 
             return template.apply(varselbrevDokument);
         } catch (IOException e) {
-            throw TekstformatererVarselbrevFeil.FACTORY.feilVedTekstgenerering(e).toException();
+            throw TekstformatererBrevFeil.FACTORY.feilVedTekstgenerering(e).toException();
         }
     }
 
-    private static Template opprettHandlebarsTemplate(String filsti) throws IOException {
-        ClassPathTemplateLoader loader = new ClassPathTemplateLoader();
-        loader.setCharset(StandardCharsets.UTF_8);
-        loader.setPrefix("/templates/");
-        loader.setSuffix(".hbs");
+    public static String lagKorrigertVarselbrevOverskrift(BrevMetadata brevMetadata) {
+        try {
+            Template template = opprettHandlebarsTemplate("varsel/korrigert_varsel_overskrift", brevMetadata.getSpråkkode());
+            OverskriftBrevData overskriftBrevData = lagOverskriftBrevData(brevMetadata);
+            overskriftBrevData.setEngangsstønad(FagsakYtelseType.ENGANGSTØNAD.equals(brevMetadata.getFagsaktype()));
 
-        Handlebars handlebars = new Handlebars(loader);
+            return template.apply(overskriftBrevData);
+        } catch (IOException e) {
+            throw TekstformatererBrevFeil.FACTORY.feilVedTekstgenerering(e).toException();
+        }
+    }
 
-        handlebars.setCharset(StandardCharsets.UTF_8);
-        handlebars.setInfiniteLoops(false);
-        handlebars.setPrettyPrint(true);
+    private static Template opprettHandlebarsTemplate(String filsti, Språkkode språkkode) throws IOException {
+        Handlebars handlebars = opprettHandlebarsKonfigurasjon();
         handlebars.registerHelper("datoformat", datoformatHelper());
         handlebars.registerHelper("kroner", new CustomHelpers.KroneFormattererMedTusenskille());
-        handlebars.registerHelpers(ConditionalHelpers.class);
-        return handlebars.compile(filsti);
-    }
-
-    private static Helper<Object> datoformatHelper() {
-        return (value, options) -> konverterFraLocaldateTilTekst((LocalDate) value);
-    }
-
-    static String konverterFraLocaldateTilTekst(LocalDate dato) {
-        return FORMATTER_LANGT_DATOFORMAT.format(dato);
+        return handlebars.compile(lagSpråkstøttetFilsti(filsti, språkkode));
     }
 
     private static void settFagsaktype(BaseDokument baseDokument, FagsakYtelseType fagsaktype) {
@@ -99,7 +100,6 @@ public class TekstformatererVarselbrev {
         }
     }
 
-
     static VarselbrevDokument mapTilVarselbrevDokument(VarselbrevSamletInfo varselbrevSamletInfo) {
         VarselbrevDokument varselbrevDokument = new VarselbrevDokument();
         varselbrevDokument.setBeløp(varselbrevSamletInfo.getSumFeilutbetaling());
@@ -108,7 +108,6 @@ public class TekstformatererVarselbrev {
         varselbrevDokument.setVarseltekstFraSaksbehandler(varselbrevSamletInfo.getFritekstFraSaksbehandler());
         varselbrevDokument.setFeilutbetaltePerioder(varselbrevSamletInfo.getFeilutbetaltePerioder());
         varselbrevDokument.setFagsaktypeNavn(varselbrevSamletInfo.getBrevMetadata().getFagsaktypenavnPåSpråk());
-        varselbrevDokument.setLocale(finnRiktigSpråk(varselbrevSamletInfo.getBrevMetadata().getSpråkkode()));
         settFagsaktype(varselbrevDokument, varselbrevSamletInfo.getBrevMetadata().getFagsaktype());
         settSenesteOgTidligsteDatoer(varselbrevDokument, varselbrevSamletInfo.getFeilutbetaltePerioder());
 
@@ -125,5 +124,4 @@ public class TekstformatererVarselbrev {
         varselbrevDokument.valider();
         return varselbrevDokument;
     }
-
 }

@@ -91,7 +91,7 @@ public class VarselbrevTjeneste {
         }
 
 
-        String overskrift = VarselbrevOverskrift.finnOverskriftVarselbrev(varselbrevSamletInfo.getBrevMetadata().getFagsaktypenavnPåSpråk());
+        String overskrift = TekstformatererVarselbrev.lagVarselbrevOverskrift(varselbrevSamletInfo.getBrevMetadata());
         String brevtekst = TekstformatererVarselbrev.lagVarselbrevFritekst(varselbrevSamletInfo);
         FritekstbrevData data = new FritekstbrevData.Builder()
             .medOverskrift(overskrift)
@@ -111,7 +111,7 @@ public class VarselbrevTjeneste {
             hentForhåndsvisningVarselbrevDto.getVarseltekst(),
             hentForhåndsvisningVarselbrevDto.getFagsakYtelseType());
 
-        String overskrift = VarselbrevOverskrift.finnOverskriftVarselbrev(varselbrevSamletInfo.getBrevMetadata().getFagsaktypenavnPåSpråk());
+        String overskrift = TekstformatererVarselbrev.lagVarselbrevOverskrift(varselbrevSamletInfo.getBrevMetadata());
         String brevtekst = TekstformatererVarselbrev.lagVarselbrevFritekst(varselbrevSamletInfo);
         FritekstbrevData data = new FritekstbrevData.Builder()
             .medOverskrift(overskrift)

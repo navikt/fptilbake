@@ -28,7 +28,6 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.Frit
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.JournalpostIdOgDokumentId;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.TekstformatererVarselbrev;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.VarselbrevOverskrift;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.VarselbrevSamletInfo;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.VarselbrevUtil;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
@@ -113,7 +112,7 @@ public class ManueltVarselBrevTjeneste {
     }
 
     private FritekstbrevData lagManueltVarselBrev(VarselbrevSamletInfo varselbrevSamletInfo) {
-        String overskrift = VarselbrevOverskrift.finnOverskriftVarselbrev(varselbrevSamletInfo.getBrevMetadata().getFagsaktypenavnPåSpråk());
+        String overskrift = TekstformatererVarselbrev.lagVarselbrevOverskrift(varselbrevSamletInfo.getBrevMetadata());
         String brevtekst = TekstformatererVarselbrev.lagVarselbrevFritekst(varselbrevSamletInfo);
         return new FritekstbrevData.Builder()
             .medOverskrift(overskrift)
@@ -123,10 +122,7 @@ public class ManueltVarselBrevTjeneste {
     }
 
     private FritekstbrevData lagKorrigertVarselBrev(VarselbrevSamletInfo varselbrevSamletInfo, VarselInfo varselInfo) {
-        String overskrift = FagsakYtelseType.ENGANGSTØNAD.equals(varselbrevSamletInfo.getBrevMetadata().getFagsaktype()) ?
-            VarselbrevOverskrift.finnOverskriftKorrigertVarselbrevEnngangsstønad(varselbrevSamletInfo.getBrevMetadata().getFagsaktypenavnPåSpråk()) :
-            VarselbrevOverskrift.finnOverskriftKorrigertVarselbrev(varselbrevSamletInfo.getBrevMetadata().getFagsaktypenavnPåSpråk());
-
+        String overskrift = TekstformatererVarselbrev.lagKorrigertVarselbrevOverskrift(varselbrevSamletInfo.getBrevMetadata());
         String brevtekst = TekstformatererVarselbrev.lagKorrigertVarselbrevFritekst(varselbrevSamletInfo, varselInfo);
         return new FritekstbrevData.Builder()
             .medOverskrift(overskrift)

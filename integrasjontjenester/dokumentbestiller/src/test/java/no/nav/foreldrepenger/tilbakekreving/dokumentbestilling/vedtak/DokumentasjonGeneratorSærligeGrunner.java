@@ -12,11 +12,11 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Foreldel
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.FpHendelseUnderTyper;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.SærligGrunn;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.Lokale;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbKonfigurasjon;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbPerson;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbSak;
@@ -89,7 +89,7 @@ public class DokumentasjonGeneratorSærligeGrunner {
 
     @Test
     public void list_ut_særlige_grunner_simpel_uaktsomhet_nynorsk() {
-        HbVedtaksbrevFelles felles = lagFellesdel(Lokale.NYNORSK);
+        HbVedtaksbrevFelles felles = lagFellesdel(Språkkode.nn);
 
         boolean[] boolske = {false, true};
 
@@ -139,7 +139,7 @@ public class DokumentasjonGeneratorSærligeGrunner {
 
     @Test
     public void list_ut_særlige_grunner_grov_uaktsomhet_nynorsk() {
-        HbVedtaksbrevFelles felles = lagFellesdel(Lokale.NYNORSK);
+        HbVedtaksbrevFelles felles = lagFellesdel(Språkkode.nn);
 
         boolean[] boolske = {false, true};
 
@@ -219,7 +219,7 @@ public class DokumentasjonGeneratorSærligeGrunner {
             .build();
     }
 
-    private HbVedtaksbrevFelles lagFellesdel(Lokale lokale) {
+    private HbVedtaksbrevFelles lagFellesdel(Språkkode språkkode) {
         return HbVedtaksbrevFelles.builder()
             .medSak(HbSak.build()
                 .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
@@ -245,7 +245,7 @@ public class DokumentasjonGeneratorSærligeGrunner {
                 .medNavn("Søker Søkersen")
                 .medErGift(true)
                 .build())
-            .medLocale(lokale != null ? lokale : Lokale.BOKMÅL)
+            .medSpråkkode(språkkode != null ? språkkode : Språkkode.nb)
             .build();
     }
 

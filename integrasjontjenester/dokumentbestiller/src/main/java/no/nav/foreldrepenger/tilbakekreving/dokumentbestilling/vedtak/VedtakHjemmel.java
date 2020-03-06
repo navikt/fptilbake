@@ -7,12 +7,12 @@ import java.util.List;
 import java.util.Map;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingPeriodeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelse;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.Lokale;
 
 public class VedtakHjemmel {
 
@@ -28,7 +28,7 @@ public class VedtakHjemmel {
                                           VurdertForeldelse foreldelse,
                                           List<VilkårVurderingPeriodeEntitet> vilkårPerioder,
                                           EffektForBruker effektForBruker,
-                                          Lokale lokale) {
+                                          Språkkode språkkode) {
         boolean foreldetVanlig = erNoeSattTilVanligForeldet(foreldelse);
         boolean foreldetMedTilleggsfrist = erTilleggsfristBenyttet(foreldelse);
         boolean ignorerteSmåbeløp = heleVurderingPgaSmåbeløp(vedtakResultatType, vilkårPerioder);
@@ -57,7 +57,7 @@ public class VedtakHjemmel {
             hjemler.add(Hjemler.FORVALTNING_35_C);
         }
 
-        return join(hjemler, " og ", lokale);
+        return join(hjemler, " og ", språkkode);
     }
 
     private static boolean erRenterBenyttet(List<VilkårVurderingPeriodeEntitet> vilkårPerioder) {
@@ -83,7 +83,7 @@ public class VedtakHjemmel {
 
     private static String join(List<Hjemler> elementer,
                                String sisteSkille,
-                               Lokale lokale) {
+                               Språkkode lokale) {
         StringBuilder builder = new StringBuilder();
         boolean første = true;
         for (int i = 0 ; i < elementer.size() ; i++) {
@@ -113,16 +113,16 @@ public class VedtakHjemmel {
         FORVALTNING_35_A("forvaltningsloven § 35 a)", "forvaltningslova § 35 a)"),
         FORVALTNING_35_C("forvaltningsloven § 35 c)", "forvaltningslova § 35 c)");
 
-        private Map<Lokale, String> hjemmelTekster;
+        private Map<Språkkode, String> hjemmelTekster;
 
         Hjemler(String bokmål, String nynorsk) {
             hjemmelTekster = new HashMap<>();
-            hjemmelTekster.put(Lokale.BOKMÅL, bokmål);
-            hjemmelTekster.put(Lokale.NYNORSK, nynorsk);
+            hjemmelTekster.put(Språkkode.nb, bokmål);
+            hjemmelTekster.put(Språkkode.nn, nynorsk);
         }
 
-        String hjemmelTekst(Lokale lokale) {
-            return hjemmelTekster.get(lokale);
+        String hjemmelTekst(Språkkode språkkode) {
+            return hjemmelTekster.get(språkkode);
         }
     }
 }
