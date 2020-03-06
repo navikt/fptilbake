@@ -46,7 +46,7 @@ public class SendManueltVarselbrevTask implements ProsessTaskHandler {
     public void doTask(ProsessTaskData prosessTaskData) {
         Long behandlingId = prosessTaskData.getBehandlingId();
         DokumentMalType malType = DokumentMalType.fraKode(prosessTaskData.getPropertyValue(TaskProperty.MAL_TYPE));
-        String friTekst = prosessTaskData.getPropertyValue(TaskProperty.FRITEKST);
+        String friTekst = prosessTaskData.getPayloadAsString();
 
         if (DokumentMalType.VARSEL_DOK.equals(malType)) {
             manueltVarselBrevTjeneste.sendManueltVarselBrev(behandlingId, malType, friTekst);

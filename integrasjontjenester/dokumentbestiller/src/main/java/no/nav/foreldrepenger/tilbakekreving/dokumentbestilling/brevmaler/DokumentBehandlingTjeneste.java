@@ -117,7 +117,7 @@ public class DokumentBehandlingTjeneste {
 
         ProsessTaskData sendVarselbrev = new ProsessTaskData(SendManueltVarselbrevTask.TASKTYPE);
         sendVarselbrev.setProperty(TaskProperty.MAL_TYPE, malType.getKode());
-        sendVarselbrev.setProperty(TaskProperty.FRITEKST, fritekst);
+        sendVarselbrev.setPayload(fritekst);
         sendVarselbrev.setBehandling(behandling.getFagsakId(), behandlingId, behandling.getAktørId().getId());
 
         ProsessTaskData sendBeskjedUtsendtVarsel = new ProsessTaskData(SendBeskjedUtsendtVarselTilSelvbetjeningTask.TASKTYPE);

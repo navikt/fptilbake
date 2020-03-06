@@ -17,6 +17,9 @@ public class BeregnBeløpUtil {
 
     public static BigDecimal beregnBeløpPrVirkedag(BigDecimal beløp, Periode periode) {
         int antallVirkedager = Virkedager.beregnAntallVirkedager(periode);
+        if (antallVirkedager == 0){ //Gjelder kun ved Engangsstønad (REFUTG) som treffer en ikke vanlig virkedag.
+            return beløp;
+        }
         return beløp.divide(BigDecimal.valueOf(antallVirkedager), 2, RoundingMode.HALF_UP);
     }
 
@@ -25,6 +28,9 @@ public class BeregnBeløpUtil {
         if (overlap.isPresent()) {
             Periode overlapInterval = overlap.get();
             int antallVirkedager = Virkedager.beregnAntallVirkedager(overlapInterval);
+            if (antallVirkedager == 0){ //Gjelder kun ved Engangsstønad (REFUTG) som treffer en ikke vanlig virkedag.
+                return beløpPrVirkedag;
+            }
             return beløpPrVirkedag.multiply(BigDecimal.valueOf(antallVirkedager));
         }
         return BigDecimal.ZERO;
