@@ -38,7 +38,7 @@
         <fpkontrakter.version>5.1-20200225123631-afeacc4</fpkontrakter.version>
 
 
-        <surefire.version>2.21.0</surefire.version>
+        <surefire.version>2.22.2</surefire.version>
         <metrics.version>3.2.5</metrics.version>
         <ow2.asm.version>7.2</ow2.asm.version>
         <geronimo.jaspi.version>2.0.0</geronimo.jaspi.version>
