@@ -25,7 +25,6 @@ public class DatabaseScript {
         flyway.setDataSource(dataSource);
         flyway.setLocations(locations);
         flyway.setBaselineOnMigrate(true);
-        flyway.setOutOfOrder(true);
 
         try {
             flyway.migrate();

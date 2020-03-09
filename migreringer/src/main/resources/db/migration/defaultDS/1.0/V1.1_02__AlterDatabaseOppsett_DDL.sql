@@ -1,9 +1,0 @@
-alter session set NLS_DATE_LANGUAGE='NORWEGIAN';
-alter session set NLS_LANGUAGE='NORWEGIAN';
-alter session set NLS_SORT='NORWEGIAN';
-alter session set NLS_TERRITORY='NORWAY';
-alter session set NLS_CURRENCY='kr';
-alter session set NLS_ISO_CURRENCY='NORWAY';
-alter session set NLS_DATE_FORMAT='DD.MM.RRRR';
-alter session set NLS_TIMESTAMP_FORMAT='DD.MM.RRRR HH24.MI.SSXFF';
-alter session set NLS_TIMESTAMP_TZ_FORMAT='DD.MM.RRRR HH24.MI.SSXFF TZR';
