@@ -1,5 +1,7 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
@@ -21,7 +23,7 @@
 
     <properties>
         <revision>1.0</revision>
-        <sha1></sha1>
+        <sha1 />
         <changelist>-SNAPSHOT</changelist>
         <java.version>11</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
@@ -29,7 +31,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <!-- Felles avhengigheter i prosjektet Disse skal ALLTID være en
+        <!-- Felles avhengigheter i prosjektet Disse skal ALLTID være en 
             RELEASE-avhengighet UNNTAK: feature-brancher og lokalt -->
         <felles.version>1.5-20200129145325-846bbaf</felles.version>
         <prosesstask.version>2.0.0-20200118083448-d87fd6d</prosesstask.version>
@@ -38,7 +40,7 @@
         <fpkontrakter.version>5.1-20200225123631-afeacc4</fpkontrakter.version>
 
 
-        <surefire.version>2.21.0</surefire.version>
+        <surefire.version>2.22.2</surefire.version>
         <metrics.version>3.2.5</metrics.version>
         <ow2.asm.version>7.2</ow2.asm.version>
         <geronimo.jaspi.version>2.0.0</geronimo.jaspi.version>
@@ -47,7 +49,7 @@
         <junit.version>5.2.0</junit.version>
         <logstash.version>4.10</logstash.version>
 
-        <!-- Transitive avh. versjoner for å sikre unikhet (enforcer dependencyConvergence).
+        <!-- Transitive avh. versjoner for å sikre unikhet (enforcer dependencyConvergence). 
             Skal ikke benyttes direkte av vår egen kode. -->
         <apache.ws.xmlschema.version>2.2.5</apache.ws.xmlschema.version>
         <joda-time.version>2.9.9</joda-time.version>
@@ -66,7 +68,8 @@
     </properties>
     <dependencies>
 
-        <!-- Avhengigeter som fjernes fra JDK11 som er del av JavaSE. Legger til her framfor med add-modules. -->
+        <!-- Avhengigeter som fjernes fra JDK11 som er del av JavaSE. Legger 
+            til her framfor med add-modules. -->
         <dependency>
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
@@ -114,14 +117,15 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.junit.vintage</groupId>
+            <artifactId>junit-vintage-engine</artifactId>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>
@@ -558,35 +562,38 @@
                 <version>0.1.55</version>
             </dependency>
 
-            <!-- Transitive avh. versjoner for å sikre unikhet (enforcer
+            <!-- Transitive avh. versjoner for å sikre unikhet (enforcer 
                 dependencyConvergence). Skal ikke benyttes direkte av vår egen kode. -->
             <dependency>
-                <!-- Transitive avhengighet resolution for å sikre bestemt
+                <!-- Transitive avhengighet resolution for å sikre bestemt 
                     versjon -->
                 <groupId>joda-time</groupId>
                 <artifactId>joda-time</artifactId>
                 <version>${joda-time.version}</version>
             </dependency>
             <dependency>
-                <!-- Transitive avhengighet resolution for å sikre bestemt versjon -->
+                <!-- Transitive avhengighet resolution for å sikre bestemt 
+                    versjon -->
                 <groupId>org.ow2.asm</groupId>
                 <artifactId>asm</artifactId>
                 <version>${ow2.asm.version}</version>
             </dependency>
             <dependency>
-                <!-- Transitive avhengighet resolution for å sikre bestemt versjon -->
+                <!-- Transitive avhengighet resolution for å sikre bestemt 
+                    versjon -->
                 <groupId>org.ow2.asm</groupId>
                 <artifactId>asm-analysis</artifactId>
                 <version>${ow2.asm.version}</version>
             </dependency>
             <dependency>
-                <!-- Transitive avhengighet resolution for å sikre bestemt versjon -->
+                <!-- Transitive avhengighet resolution for å sikre bestemt 
+                    versjon -->
                 <groupId>org.ow2.asm</groupId>
                 <artifactId>asm-tree</artifactId>
                 <version>${ow2.asm.version}</version>
             </dependency>
 
-            <!--Java10-->
+            <!--Java10 -->
             <dependency>
                 <groupId>javax.xml.bind</groupId>
                 <artifactId>jaxb-api</artifactId>
@@ -788,10 +795,10 @@
                                 <requireMavenVersion>
                                     <version>[3.5.3,)</version>
                                 </requireMavenVersion>
-                                <dependencyConvergence/>
-                                <!-- Ikke kommenter inn denne. Det brekker
-                                    muligheten til å bygge bare deler av prosjektet https://issues.apache.org/jira/browse/MENFORCER-189
-                                    -> "ReactorModuleConvergence is not compatible with 'advanced' reactor options:
+                                <dependencyConvergence />
+                                <!-- Ikke kommenter inn denne. Det brekker 
+                                    muligheten til å bygge bare deler av prosjektet https://issues.apache.org/jira/browse/MENFORCER-189 
+                                    -> "ReactorModuleConvergence is not compatible with 'advanced' reactor options: 
                                     -pl, -rf" <reactorModuleConvergence /> -->
                             </rules>
                         </configuration>
@@ -835,7 +842,7 @@
                 <!-- maven.root bør overstyres fra cmdline -->
                 <maven.root>${project.basedir}</maven.root>
 
-                <sonar.language/>
+                <sonar.language />
                 <sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
                 <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
                 <sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
@@ -906,7 +913,9 @@
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
                             <useFile>true</useFile>
-                            <argLine>${jacoco.agent.argLine} -Xms256m -Dfile.encoding=UTF-8 -Dlog.level.no.nav=WARN
+                            <argLine>${jacoco.agent.argLine} -Xms256m
+                                -Dfile.encoding=UTF-8
+                                -Dlog.level.no.nav=WARN
                             </argLine>
                         </configuration>
                     </plugin>
