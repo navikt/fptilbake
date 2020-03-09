@@ -359,7 +359,7 @@
             <dependency>
                 <groupId>no.nav.foreldrepenger.kontrakter</groupId>
                 <artifactId>dokumentbestiller-v1</artifactId>
-                <version>2.0_20190205180510_7b6a6b5</version>
+                <version>2.0_20190816101820_003f3bb</version>
                 <classifier>jaxb</classifier>
             </dependency>
             <dependency>
@@ -383,7 +383,7 @@
             <dependency>
                 <groupId>no.nav.tjenester</groupId>
                 <artifactId>nav-dokumentproduksjon-v3-tjenestespesifikasjon</artifactId>
-                <version>3.3.3</version>
+                <version>3.3.4</version>
                 <classifier>jaxws</classifier>
             </dependency>
             <!-- Eksterne -->
@@ -935,14 +935,10 @@
 
     <distributionManagement>
         <repository>
-            <id>repo.adeo.no-releases</id>
-            <url>https://repo.adeo.no/repository/maven-releases</url>
+            <id>github1</id>
+            <name>GitHub Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/navikt/fptilbake/</url>
         </repository>
-        <snapshotRepository>
-            <id>repo.adeo.no-snapshots</id>
-            <url>https://repo.adeo.no/repository/maven-snapshots</url>
-            <uniqueVersion>false</uniqueVersion>
-        </snapshotRepository>
     </distributionManagement>
 
 </project>
