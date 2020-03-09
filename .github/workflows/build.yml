@@ -80,7 +80,6 @@ jobs:
           GITHUB_PASSWORD: ${{ secrets.GITHUB_ACCESS_TOKEN }}
         run: |
           docker build -f vtp/Dockerfile --pull \
-            --build-arg DOWNLOAD_SCRIPT=getmqclients-GA.sh \
             --build-arg TOKEN_CARRIER="$GITHUB_PASSWORD" \
             --build-arg VERSION=${TAG} \
             --tag ${IMAGE_BASE}-test:${TAG} \
