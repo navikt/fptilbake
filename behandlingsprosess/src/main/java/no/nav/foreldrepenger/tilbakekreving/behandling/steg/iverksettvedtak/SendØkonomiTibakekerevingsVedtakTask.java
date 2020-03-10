@@ -1,5 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.iverksettvedtak;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -67,24 +69,28 @@ public class SendØkonomiTibakekerevingsVedtakTask implements ProsessTaskHandler
     }
 
     private void lagSavepointOgIverksett(long behandlingId, long sendtXmlId, TilbakekrevingsvedtakRequest tilbakekrevingsvedtak) {
+        AtomicReference<MmelDto> kvitteringReferanse = new AtomicReference<>();
         RunWithSavepoint runWithSavepoint = new RunWithSavepoint(entityManager);
+
         runWithSavepoint.doWork(() -> {
             //setter før kall til OS, slik at requesten blir lagret selv om kallet feiler
             TilbakekrevingsvedtakResponse respons = økonomiConsumer.iverksettTilbakekrevingsvedtak(behandlingId, tilbakekrevingsvedtak);
             lagreRespons(behandlingId, sendtXmlId, respons);
-            MmelDto kvittering = respons.getMmel();
-            if (ØkonomiKvitteringTolk.erKvitteringOK(kvittering)) {
-                logger.info("Tilbakekrevingsvedtak sendt til oppdragsystemet. BehandlingId={} Alvorlighetsgrad='{}' infomelding='{}'", behandlingId, kvittering.getAlvorlighetsgrad(), kvittering.getBeskrMelding());
-            } else {
-                RunWithSavepoint rwsp = new RunWithSavepoint(entityManager);
-                rwsp.doWork(() -> {
-                    //setter savepoint før feilen kastes, slik at kvitteringen blir lagret. Kaster feil for å feile prosesstasken, samt trigge logging
-                    String detaljer = kvittering != null ? ØkonomiConsumerFeil.formaterKvittering(kvittering) : " Fikk ikke kvittering fra OS";
-                    throw Feilene.FACTORY.fikkFeilkodeVedIverksetting(behandlingId, detaljer).toException();
-                });
-            }
+            kvitteringReferanse.set(respons.getMmel());
             return null;
         });
+
+        MmelDto kvittering = kvitteringReferanse.get();
+        if (ØkonomiKvitteringTolk.erKvitteringOK(kvittering)) {
+            logger.info("Tilbakekrevingsvedtak sendt til oppdragsystemet. BehandlingId={} Alvorlighetsgrad='{}' infomelding='{}'", behandlingId, kvittering.getAlvorlighetsgrad(), kvittering.getBeskrMelding());
+        } else {
+            RunWithSavepoint rwsp = new RunWithSavepoint(entityManager);
+            rwsp.doWork(() -> {
+                //setter savepoint før feilen kastes, slik at kvitteringen blir lagret. Kaster feil for å feile prosesstasken, samt trigge logging
+                String detaljer = kvittering != null ? ØkonomiConsumerFeil.formaterKvittering(kvittering) : " Fikk ikke kvittering fra OS";
+                throw Feilene.FACTORY.fikkFeilkodeVedIverksetting(behandlingId, detaljer).toException();
+            });
+        }
     }
 
     private TilbakekrevingsvedtakRequest lagRequest(TilbakekrevingsvedtakDto tilbakekrevingsvedtak) {
