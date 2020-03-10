@@ -53,7 +53,6 @@
             Skal ikke benyttes direkte av vår egen kode. -->
         <apache.ws.xmlschema.version>2.2.5</apache.ws.xmlschema.version>
         <javaslang.version>2.0.6</javaslang.version>
-        <plexus.version>3.0.8</plexus.version>
         <jasypt.version>1.9.2</jasypt.version>
 
         <swagger.spec-parser.version>1.0.28</swagger.spec-parser.version>
@@ -464,11 +463,6 @@
             </dependency>
 
             <!-- transitiv avhengighet, sikrer konsistent versjon -->
-            <dependency>
-                <groupId>org.codehaus.plexus</groupId>
-                <artifactId>plexus-utils</artifactId>
-                <version>${plexus.version}</version>
-            </dependency>
             <!-- https://mvnrepository.com/artifact/org.codehaus.woodstox/stax2-api -->
             <dependency>
                 <groupId>org.codehaus.woodstox</groupId>
