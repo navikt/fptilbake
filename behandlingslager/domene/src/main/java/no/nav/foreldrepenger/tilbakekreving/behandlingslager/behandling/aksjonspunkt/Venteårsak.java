@@ -22,6 +22,14 @@ public class Venteårsak extends Kodeliste {
 
     public static final Venteårsak UDEFINERT = new Venteårsak("-"); //$NON-NLS-1$
 
+    public static boolean venterPåBruker(Venteårsak venteårsak) {
+        return VENT_PÅ_BRUKERTILBAKEMELDING.equals(venteårsak) || UTVIDET_TILSVAR_FRIST.equals(venteårsak) || AVVENTER_DOKUMENTASJON.equals(venteårsak);
+    }
+
+    public static boolean venterPåØkonomi(Venteårsak venteårsak) {
+        return VENT_PÅ_TILBAKEKREVINGSGRUNNLAG.equals(venteårsak) || VENT_PÅ_ØKONOMI.equals(venteårsak);
+    }
+
     public Venteårsak() {
     }
 

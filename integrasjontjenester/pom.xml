@@ -26,6 +26,7 @@
         <module>pdfgen</module>
         <module>simulering</module>
         <module>fplos-klient</module>
+        <module>datavarehus</module>
     </modules>
 
 </project>
