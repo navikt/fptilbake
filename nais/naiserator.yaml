@@ -58,7 +58,7 @@ spec:
       - mountPath: /var/run/secrets/nais.io/ldap
         kvPath: {{ldapserviceuser}}
       - mountPath: /var/run/secrets/nais.io/vault
-        kvPath: /kv/{{cluster}}/fss/fpsak/{{namespace}}
+        kvPath: /kv/{{cluster}}/fss/fptilbake/{{namespace}}
   sidecar: true # refresh token
   env:
   {{#each env}}
