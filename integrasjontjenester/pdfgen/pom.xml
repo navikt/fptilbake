@@ -19,12 +19,29 @@
             <groupId>com.openhtmltopdf</groupId>
             <artifactId>openhtmltopdf-core</artifactId>
         </dependency>
-
         <dependency>
             <groupId>com.openhtmltopdf</groupId>
             <artifactId>openhtmltopdf-pdfbox</artifactId>
             <exclusions>
                 <exclusion>
+                    <!-- openhtmltopdf-pdfbox er ikke enig med seg selv hvilken versjon av pdfbox som skal brukes, se under -->
+                    <groupId>org.apache.pdfbox</groupId>
+                    <artifactId>pdfbox</artifactId>
+                </exclusion>
+                <exclusion>
+                    <!-- unngår commons-logging siden den forkludrer logging -->
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <!-- openhtmltopdf-pdfbox er ikke enig med seg selv hvilken versjon av pdfbox som skal brukes, tvinger denne (se dependency management i hoved-pom for versjon)-->
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <exclusions>
+                <exclusion>
+                    <!-- unngår commons-logging siden den forkludrer logging -->
                     <groupId>commons-logging</groupId>
                     <artifactId>commons-logging</artifactId>
                 </exclusion>
@@ -34,18 +51,26 @@
         <dependency>
             <groupId>com.openhtmltopdf</groupId>
             <artifactId>openhtmltopdf-svg-support</artifactId>
-
             <exclusions>
-                <!-- denne drar inn en annen versjon enn hva som brukes i openhtmltopdf-pdfbox -->
                 <exclusion>
                     <groupId>commons-logging</groupId>
                     <artifactId>commons-logging</artifactId>
                 </exclusion>
+                <!-- denne drar inn en annen versjon enn hva som brukes i openhtmltopdf-pdfbox -->
                 <exclusion>
                     <groupId>org.apache.xmlgraphics</groupId>
                     <artifactId>xmlgraphics-commons</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>
+                </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <!-- openhtmltopdf-svg-support er ikke enig med seg selv hvilken versjon av xml-apis som skal brukes, tvinger denne (se dependency management i hoved-pom for versjon) -->
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
         </dependency>
 
     </dependencies>
