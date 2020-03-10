@@ -27,7 +27,8 @@ public class KravgrunnlagValidator {
         KravgrunnlagValidator::validerPeriodeInnenforMåned,
         KravgrunnlagValidator::validerOverlappendePerioder,
         KravgrunnlagValidator::validerSkatt,
-        KravgrunnlagValidator::validerYtelseMotFeilutbetaling
+        KravgrunnlagValidator::validerYtelseMotFeilutbetaling,
+        KravgrunnlagValidator::validerYtelPosteringTilbakekrevesMotNyttOgOpprinneligUtbetalt
     );
 
     public static void validerGrunnlag(Kravgrunnlag431 kravgrunnlag) throws UgyldigKravgrunnlagException {
@@ -119,6 +120,19 @@ public class KravgrunnlagValidator {
         }
     }
 
+    private static void validerYtelPosteringTilbakekrevesMotNyttOgOpprinneligUtbetalt(Kravgrunnlag431 kravgrunnlag) {
+        for (KravgrunnlagPeriode432 periode : kravgrunnlag.getPerioder()) {
+            for (KravgrunnlagBelop433 kgBeløp : periode.getKravgrunnlagBeloper433()) {
+                if (KlasseType.YTEL.equals(kgBeløp.getKlasseType())) {
+                    BigDecimal diff = kgBeløp.getOpprUtbetBelop().subtract(kgBeløp.getNyBelop());
+                    if (kgBeløp.getTilbakekrevesBelop().compareTo(diff) > 0) {
+                        throw KravgrunnlagFeil.FACTORY.ytelPosteringHvorTilbakekrevesIkkeStemmerMedNyttOgOpprinneligBeløp(periode.getPeriode(), kgBeløp.getTilbakekrevesBelop(), kgBeløp.getNyBelop(), kgBeløp.getOpprUtbetBelop()).toException();
+                    }
+                }
+            }
+        }
+    }
+
     private static YearMonth tilMåned(Periode periode) {
         LocalDate fom = periode.getFom();
         return YearMonth.of(fom.getYear(), fom.getMonth());
@@ -154,5 +168,8 @@ public class KravgrunnlagValidator {
 
         @IntegrasjonFeil(feilkode = "FPT-361605", feilmelding = "Ugyldig kravgrunnlag. For periode %s er sum tilkakekreving fra YTEL %s, mens belopNytt i FEIL er %s. Det er forventet at disse er like.", logLevel = WARN, exceptionClass = UgyldigKravgrunnlagException.class)
         Feil feilYtelseEllerFeilutbetaling(Periode periode, BigDecimal sumTilbakekrevingYtel, BigDecimal belopNyttFraFeilpostering);
+
+        @IntegrasjonFeil(feilkode = "FPT-615761", feilmelding = "Ugyldig kravgrunnlag. For perioden %s finnes YTEL-postering med tilbakekrevesBeløp %s som er større enn differanse mellom nyttBeløp %s og opprinneligBeløp %s", logLevel = WARN, exceptionClass = UgyldigKravgrunnlagException.class)
+        Feil ytelPosteringHvorTilbakekrevesIkkeStemmerMedNyttOgOpprinneligBeløp(Periode periode, BigDecimal tilbakekrevesBeløp, BigDecimal nyttBeløp, BigDecimal opprinneligBeløp);
     }
 }

@@ -30,7 +30,7 @@ public class KravgrunnlagValidatorTest {
         BigDecimal skatteprosent = BigDecimal.valueOf(10);
         leggTilFeilutbetaling(kgPeriode, 1000, skatteprosent);
 
-         KravgrunnlagValidator.validerGrunnlag(kravgrunnlag);
+        KravgrunnlagValidator.validerGrunnlag(kravgrunnlag);
     }
 
     @Test
@@ -77,6 +77,27 @@ public class KravgrunnlagValidatorTest {
 
         expectedException.expect(KravgrunnlagValidator.UgyldigKravgrunnlagException.class);
         expectedException.expectMessage("Ugyldig kravgrunnlag. For periode 01.01.2020-15.01.2020 er sum tilkakekreving fra YTEL 200, mens belopNytt i FEIL er 201. Det er forventet at disse er like.");
+
+        KravgrunnlagValidator.validerGrunnlag(kravgrunnlag);
+    }
+
+    @Test
+    public void skal_gi_feilmelding_når_tilbakekreves_beløp_er_høyere_enn_differanse_mellom_nytt_og_gammelt_beløp() {
+        Periode periode = Periode.of(LocalDate.of(2020, 1, 1), LocalDate.of(2020, 1, 10));
+        KravgrunnlagPeriode432 kgPeriode = leggTilKravgrunnlagPeriode(kravgrunnlag, periode, BigDecimal.ZERO);
+        leggTilFeil(kgPeriode, 1000, BigDecimal.ZERO);
+        kgPeriode.leggTilBeløp(KravgrunnlagBelop433.builder()
+            .medKravgrunnlagPeriode432(kgPeriode)
+            .medKlasseType(KlasseType.YTEL)
+            .medKlasseKode(KlasseKode.FPATORD)
+            .medTilbakekrevesBelop(BigDecimal.valueOf(1000))
+            .medOpprUtbetBelop(BigDecimal.valueOf(1000))
+            .medNyBelop(BigDecimal.valueOf(200))
+            .medSkattProsent(BigDecimal.valueOf(0))
+            .build());
+
+        expectedException.expect(KravgrunnlagValidator.UgyldigKravgrunnlagException.class);
+        expectedException.expectMessage("Ugyldig kravgrunnlag. For perioden 01.01.2020-10.01.2020 finnes YTEL-postering med tilbakekrevesBeløp 1000 som er større enn differanse mellom nyttBeløp 200 og opprinneligBeløp 1000");
 
         KravgrunnlagValidator.validerGrunnlag(kravgrunnlag);
     }
