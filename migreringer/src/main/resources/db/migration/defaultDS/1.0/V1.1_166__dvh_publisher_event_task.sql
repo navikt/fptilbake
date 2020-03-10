@@ -1,2 +1,2 @@
-INSERT INTO PROSESS_TASK_TYPE (KODE,NAVN,FEIL_MAKS_FORSOEK,BESKRIVELSE) VALUES ('dvh.send.sakshendelser','Publiserer data for saksstatisitikk til dvh (via kafka)','3','Publiserer saksstatisitikk til dvh (via kafka)');
-INSERT INTO PROSESS_TASK_TYPE (KODE,NAVN,FEIL_MAKS_FORSOEK,BESKRIVELSE) VALUES ('dvh.send.vedtak','Publiserer data for stønadsstatistikk til dvh (via kafka)','3','Publiserer data for stønadsstatistikk til dvh (via kafka)');
+INSERT INTO PROSESS_TASK_TYPE (KODE,NAVN,FEIL_MAKS_FORSOEK,BESKRIVELSE) VALUES ('dvh.send.sakshendelser','Publiserer data for saksstatisitikk til dvh','3','Publiserer saksstatisitikk til dvh (via kafka)');
+INSERT INTO PROSESS_TASK_TYPE (KODE,NAVN,FEIL_MAKS_FORSOEK,BESKRIVELSE) VALUES ('dvh.send.vedtak','Publiserer data for stønadsstatistikk til dvh','3','Publiserer data for stønadsstatistikk til dvh (via kafka)');
