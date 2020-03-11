@@ -5,8 +5,8 @@
   "oraclefptilbakesecret":"oracle/data/prod/creds/fptilbake_p-fptilbake_p",
   "fptilbakeserviceuser": "serviceuser/data/prod/srvfptilbake",
   "ldapserviceuser": "serviceuser/data/prod/srvssolinux",
-  "minReplicas": "4",
-  "maxReplicas": "6",
+  "minReplicas": "1",
+  "maxReplicas": "3",
   "ingresses": [
     "https://fptilbake.nais.adeo.no",
     "https://app.adeo.no/fptilbake"
