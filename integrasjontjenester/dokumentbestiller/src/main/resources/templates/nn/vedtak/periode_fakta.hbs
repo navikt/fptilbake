@@ -18,7 +18,7 @@ Du er ikkje medlem av folketrygda fordi du ikkje har opphaldsløyve i Noreg. Der
 Du er ikkje medlem av folketrygda. Fordi du ikkje har jobba eller hatt familie som forsørgde deg i Noreg, har du ikkje rett til opphald etter EØS avtalen. Derfor har du ikkje rett til {{> ytelse-navn}}.
         {{/case}}
         {{#case "UTVANDRET"}}
-Du er ikkje medlem av folketrygda fordi du har flytta frå Noreg og heller ikkje reknas som arbeidstakar i Noreg. Derfor har du ikkje rett til {{> ytelse-navn}}.
+Du er ikkje medlem av folketrygda fordi du har flytta frå Noreg og heller ikkje blir rekna som arbeidstakar i Noreg. Derfor har du ikkje rett til {{> ytelse-navn}}.
         {{/case}}
         {{/switch}}
 
@@ -225,10 +225,10 @@ Fordi foreldrepengane er blitt utbetalt frå denne datoen, er det utbetalt {{kro
 Du kan få foreldrepengar i inntil tre år etter at {{#if sak.er-adopsjon}}du overtok omsorga for {{/if}}{{> barnet-ditt}}{{#if sak.er-fødsel}} blei fødde{{/if}}. Fordi det har gått meir enn tre år, har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
         {{/case}}
         {{#case "NY_STONADSPERIODE"}}
-Du eller den andre forelderen har fått innvilga foreldrepengar for nytt barn. Du har ikkje rett til foreldrepengar dei dagane som er igjen frå den førre perioden med foreldrepengar. Du har derfor fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
+Du eller den andre forelderen har fått innvilga foreldrepengar for nytt barn. Du har ikkje rett til foreldrepengar dei dagane som er igjen frå den førre perioden med foreldrepengar. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
         {{/case}}
         {{#case "IKKE_OMSORG"}}
-Vi har fått opplysningar om at du ikkje hadde omsorga for {{> barnet}} frå og med {{opphørsdato-ikke-omsorg}}. Du har berre rett til foreldrepengar dersom du har omsorga for {{> barnet}}. Du har derfor fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
+Vi har fått opplysningar om at du ikkje hadde omsorga for {{> barnet}} frå og med {{opphørsdato-ikke-omsorg}}. Du har berre rett til foreldrepengar dersom du har omsorga for {{> barnet}}. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
         {{/case}}
         {{#case "MOTTAKER_I_ARBEID"}}
 Du har fått utbetalt foreldrepengar i den same perioden som du har jobba heiltid. Du kan ikkje få utbetalt foreldrepengar samtidig som du jobbar heiltid. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
