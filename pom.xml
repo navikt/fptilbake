@@ -53,7 +53,7 @@
             Skal ikke benyttes direkte av vår egen kode. -->
         <apache.ws.xmlschema.version>2.2.5</apache.ws.xmlschema.version>
         <javaslang.version>2.0.6</javaslang.version>
-        <jasypt.version>1.9.2</jasypt.version>
+        <jasypt.version>1.9.3</jasypt.version>
 
         <swagger.spec-parser.version>1.0.28</swagger.spec-parser.version>
 
