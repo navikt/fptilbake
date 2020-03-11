@@ -18,10 +18,12 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.vedtak.felles.integrasjon.aktør.klient.AktørConsumerMedCache;
+import no.nav.vedtak.util.env.Environment;
 
 @ApplicationScoped
 public class VarselSelvbetjeningTjeneste {
 
+    private static final Environment ENV = Environment.current();
     private static final Logger logger = LoggerFactory.getLogger(VarselSelvbetjeningTjeneste.class);
 
     private BrevSporingRepository brevSporingRepository;
@@ -30,11 +32,12 @@ public class VarselSelvbetjeningTjeneste {
     private AktørConsumerMedCache aktørConsumer;
 
     VarselSelvbetjeningTjeneste() {
-        //for CDI proxy
+        // for CDI proxy
     }
 
     @Inject
-    public VarselSelvbetjeningTjeneste(BehandlingRepositoryProvider repositoryProvider, BeskjedUtsendtVarselTilSelvbetjeningMeldingProducer meldingProducer, AktørConsumerMedCache aktørConsumer) {
+    public VarselSelvbetjeningTjeneste(BehandlingRepositoryProvider repositoryProvider,
+            BeskjedUtsendtVarselTilSelvbetjeningMeldingProducer meldingProducer, AktørConsumerMedCache aktørConsumer) {
         this.brevSporingRepository = repositoryProvider.getBrevSporingRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.meldingProducer = meldingProducer;
@@ -54,19 +57,28 @@ public class VarselSelvbetjeningTjeneste {
             throw new IllegalArgumentException("Klarer ikke å finne norsk ident for aktørId");
         }
         SendtVarselInformasjon svInfo = SendtVarselInformasjon.builder()
-            .medAktørId(aktørId)
-            .medNorskIdent(personIdent.get())
-            .medSaksnummer(saksnummer)
-            .medDialogId(saksnummer.getVerdi()) //unik referanse, saksnummer er akkurat unikt nok
-            .medYtelseType(fagsak.getFagsakYtelseType())
-            .medJournalpostId(varselSporing.getJournalpostId())
-            .medDokumentId(varselSporing.getDokumentId())
-            .medOpprettet(nå)
-            .medGyldigTil(nå.plusWeeks(3).toLocalDate())
-            .build();
+                .medAktørId(aktørId)
+                .medNorskIdent(personIdent.get())
+                .medSaksnummer(saksnummer)
+                .medDialogId(saksnummer.getVerdi()) // unik referanse, saksnummer er akkurat unikt nok
+                .medYtelseType(fagsak.getFagsakYtelseType())
+                .medJournalpostId(varselSporing.getJournalpostId())
+                .medDokumentId(varselSporing.getDokumentId())
+                .medOpprettet(nå)
+                .medGyldigTil(nå.plusWeeks(3).toLocalDate())
+                .build();
 
+        log("Sender", personIdent.get());
         meldingProducer.sendBeskjedOmSendtVarsel(svInfo);
+        log("Sendte", personIdent.get());
+    }
 
-        logger.info("Sendte beskjed til selvbetjening om utsendt tilbakekrevingsvarsel");
+    private void log(String msg, String personIdent) {
+        if (ENV.isProd()) {
+            logger.info("{} beskjed til selvbetjening om utsendt tilbakekrevingsvarsel", msg);
+        } else {
+            logger.info("{} beskjed til selvbetjening om utsendt tilbakekrevingsvarsel for fnr {}", msg,
+                    personIdent);
+        }
     }
 }
