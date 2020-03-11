@@ -32,6 +32,10 @@ public class ØkonomiMottattXmlRepository {
         return finnMottattXml(mottattXmlId).getMottattXml();
     }
 
+    public ØkonomiXmlMottatt finnMottattXml(Long mottattXmlId) {
+        return entityManager.find(ØkonomiXmlMottatt.class, mottattXmlId);
+    }
+
     public Long lagreMottattXml(String xml) {
         ØkonomiXmlMottatt entity = new ØkonomiXmlMottatt(xml);
         entityManager.persist(entity);
@@ -59,10 +63,6 @@ public class ØkonomiMottattXmlRepository {
         TypedQuery<ØkonomiXmlMottatt> query = entityManager.createQuery("from ØkonomiXmlMottatt where saksnummer=:saksnummer and tilkoblet='N'", ØkonomiXmlMottatt.class);
         query.setParameter("saksnummer", saksnummer);
         return query.getResultList();
-    }
-
-    private ØkonomiXmlMottatt finnMottattXml(Long mottattXmlId) {
-        return entityManager.find(ØkonomiXmlMottatt.class, mottattXmlId);
     }
 
     public void oppdaterMedEksternBehandlingIdOgSaksnummer(String eksternBehandlingId, String saksnummer, Long kravgrunnlagXmlId) {
