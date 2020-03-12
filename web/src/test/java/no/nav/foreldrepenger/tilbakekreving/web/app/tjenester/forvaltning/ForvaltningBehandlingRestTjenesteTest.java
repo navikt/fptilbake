@@ -138,7 +138,7 @@ public class ForvaltningBehandlingRestTjenesteTest {
     public void skal_ikke_tvinge_koble_grunnlag_når_mottattXml_er_allerede_koblet() {
         Behandling behandling = lagBehandling();
         behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, LocalDateTime.now().plusDays(3), Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
-        Long mottattXmlId = mottattXmlRepository.lagreMottattXml(getKravgrunnlagXml());
+        Long mottattXmlId = mottattXmlRepository.lagreMottattXml(getKravgrunnlagXml(true));
         mottattXmlRepository.opprettTilkobling(mottattXmlId);
 
         Response response = forvaltningBehandlingRestTjeneste.tvingkobleBehandlingTilGrunnlag(new KobleBehandlingTilGrunnlagDto(behandling.getId(), mottattXmlId));
@@ -149,7 +149,7 @@ public class ForvaltningBehandlingRestTjenesteTest {
     public void skal_tvinge_koble_grunnlag_når_mottattXml_er_grunnlag() {
         Behandling behandling = lagBehandling();
         behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, LocalDateTime.now().plusDays(3), Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
-        Long mottattXmlId = mottattXmlRepository.lagreMottattXml(getKravgrunnlagXml());
+        Long mottattXmlId = mottattXmlRepository.lagreMottattXml(getKravgrunnlagXml(true));
 
         when(mockTpsAdapterWrapper.hentAktørIdEllerOrganisajonNummer(anyString(), any(GjelderType.class))).thenReturn("123");
 
@@ -157,6 +157,20 @@ public class ForvaltningBehandlingRestTjenesteTest {
         assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
         assertThat(repositoryProvider.getGrunnlagRepository().harGrunnlagForBehandlingId(behandling.getId())).isTrue();
         assertThat(mottattXmlRepository.erMottattXmlTilkoblet(mottattXmlId)).isTrue();
+    }
+
+    @Test
+    public void skal_ikke_tvinge_koble_grunnlag_når_kravgrunnlaget_er_ugyldig() {
+        Behandling behandling = lagBehandling();
+        behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, LocalDateTime.now().plusDays(3), Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
+        Long mottattXmlId = mottattXmlRepository.lagreMottattXml(getKravgrunnlagXml(false));
+
+        when(mockTpsAdapterWrapper.hentAktørIdEllerOrganisajonNummer(anyString(), any(GjelderType.class))).thenReturn("123");
+
+        Response response = forvaltningBehandlingRestTjeneste.tvingkobleBehandlingTilGrunnlag(new KobleBehandlingTilGrunnlagDto(behandling.getId(), mottattXmlId));
+        assertThat(response.getStatus()).isEqualTo(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
+        assertThat(repositoryProvider.getGrunnlagRepository().harGrunnlagForBehandlingId(behandling.getId())).isFalse();
+        assertThat(mottattXmlRepository.erMottattXmlTilkoblet(mottattXmlId)).isFalse();
     }
 
 
@@ -169,7 +183,7 @@ public class ForvaltningBehandlingRestTjenesteTest {
         return behandling;
     }
 
-    private String getKravgrunnlagXml() {
+    private String getKravgrunnlagXml(boolean gyldig) {
         return "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
             "<urn:detaljertKravgrunnlagMelding xmlns:urn=\"urn:no:nav:tilbakekreving:kravgrunnlag:detalj:v1\"\n" +
             "                                  xmlns:mmel=\"urn:no:nav:tilbakekreving:typer:v1\">\n" +
@@ -203,7 +217,16 @@ public class ForvaltningBehandlingRestTjenesteTest {
             "            <urn:tilbakekrevingsBelop>\n" +
             "                <urn:kodeKlasse>FPATORD</urn:kodeKlasse>\n" +
             "                <urn:typeKlasse>YTEL</urn:typeKlasse>\n" +
+            "                <urn:belopOpprUtbet>9000.00</urn:belopOpprUtbet>\n" +
+            "                <urn:belopNy>0.00</urn:belopNy>\n" +
+            "                <urn:belopTilbakekreves>9000.00</urn:belopTilbakekreves>\n" +
+            String.format("  <urn:skattProsent>%d.0000</urn:skattProsent>\n", gyldig ? 0 : 100) +
+            "            </urn:tilbakekrevingsBelop>\n" +
+            "            <urn:tilbakekrevingsBelop>\n" +
+            "                <urn:kodeKlasse>KL_KODE_FEIL_KORTTID</urn:kodeKlasse>\n" +
+            "                <urn:typeKlasse>FEIL</urn:typeKlasse>\n" +
             "                <urn:belopNy>9000.00</urn:belopNy>\n" +
+            "                <urn:belopTilbakekreves>0.00</urn:belopTilbakekreves>\n" +
             "                <urn:skattProsent>0.0000</urn:skattProsent>\n" +
             "            </urn:tilbakekrevingsBelop>\n" +
             "        </urn:tilbakekrevingsPeriode>\n" +
