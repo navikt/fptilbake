@@ -5,7 +5,7 @@
   "oraclefptilbakesecret":"oracle/data/dev/creds/fptilbake_t4-user",
   "fptilbakeserviceuser": "serviceuser/data/test/srvfptilbake",
   "ldapserviceuser": "serviceuser/data/test/srvssolinux",
-  "minReplicas": "1",
+  "minReplicas": "2",
   "maxReplicas": "3",
   "ingresses": [
     "https://fptilbake-t4.nais.preprod.local/",

@@ -22,7 +22,7 @@ spec:
     periodSeconds: 10
     failureThreshold: 27
   replicas:
-    min: 1
+    min: 2
     max: 3
     cpuThresholdPercentage: 80
   preStopHookPath: /fptilbake/internal/preStop # Optional. A HTTP GET will be issued to this endpoint at least once before the pod is terminated.
