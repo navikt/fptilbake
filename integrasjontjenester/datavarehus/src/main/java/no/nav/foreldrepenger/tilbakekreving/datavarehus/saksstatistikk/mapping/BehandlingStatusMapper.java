@@ -2,7 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping;
 
 import java.util.Map;
 
-import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.BehandlingStatus;
+import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.BehandlingStatus;
 
 public class BehandlingStatusMapper {
 

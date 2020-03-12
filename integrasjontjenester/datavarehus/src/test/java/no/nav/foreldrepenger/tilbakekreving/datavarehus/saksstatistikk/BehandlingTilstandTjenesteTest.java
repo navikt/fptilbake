@@ -22,11 +22,11 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping.BehandlingTilstandMapper;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
-import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.BehandlingResultat;
-import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.BehandlingStatus;
+import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.BehandlingResultat;
+import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.BehandlingStatus;
+import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.BehandlingType;
+import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.YtelseType;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.BehandlingTilstand;
-import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.BehandlingType;
-import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.YtelseType;
 import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 import no.nav.vedtak.felles.testutilities.db.RepositoryRule;
 

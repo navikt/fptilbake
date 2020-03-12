@@ -4,7 +4,7 @@ import java.util.Map;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType;
-import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.RevurderingOpprettetÅrsak;
+import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.RevurderingOpprettetÅrsak;
 
 public class BehandlingÅrsakMapper {
     private static final Map<BehandlingÅrsakType, RevurderingOpprettetÅrsak> MAPPING = Map.of(
