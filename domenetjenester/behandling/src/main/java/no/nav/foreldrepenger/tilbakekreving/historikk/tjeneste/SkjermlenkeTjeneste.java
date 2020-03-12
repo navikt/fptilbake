@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste;
 
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING;
+import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon.FORESLÅ_VEDTAK;
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon.VURDER_FORELDELSE;
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon.VURDER_TILBAKEKREVING;
 
@@ -19,6 +20,8 @@ public class SkjermlenkeTjeneste {
             return SkjermlenkeType.FORELDELSE;
         } else if (VURDER_TILBAKEKREVING.equals(aksjonspunktDefinisjon)) {
             return SkjermlenkeType.TILBAKEKREVING;
+        } else if (FORESLÅ_VEDTAK.equals(aksjonspunktDefinisjon)) {
+            return SkjermlenkeType.VEDTAK;
         }
         return SkjermlenkeType.UDEFINERT;
     }
