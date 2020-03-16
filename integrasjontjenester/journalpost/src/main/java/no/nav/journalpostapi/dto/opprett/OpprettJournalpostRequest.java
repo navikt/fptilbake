@@ -30,7 +30,7 @@ public class OpprettJournalpostRequest {
     @JsonProperty("journalfoerendeEnhet")
     private Integer journalførendeEnhet;
     @JsonSerialize(using = KodelisteSomKodeSerialiserer.class)
-    private Journalposttype journalposttype;
+    private Journalposttype journalpostType;
     private Sak sak;
     @JsonSerialize(using = KodelisteSomKodeSerialiserer.class)
     private Tema tema;
@@ -68,8 +68,8 @@ public class OpprettJournalpostRequest {
         return journalførendeEnhet;
     }
 
-    public Journalposttype getJournalposttype() {
-        return journalposttype;
+    public Journalposttype getJournalpostType() {
+        return journalpostType;
     }
 
     public Sak getSak() {
@@ -95,7 +95,7 @@ public class OpprettJournalpostRequest {
         private List<Dokument> vedlegg = new ArrayList<>();
 
         public Builder medJournalposttype(Journalposttype journalposttype) {
-            kladd.journalposttype = journalposttype;
+            kladd.journalpostType = journalposttype;
             return this;
         }
 
@@ -156,8 +156,8 @@ public class OpprettJournalpostRequest {
 
         public OpprettJournalpostRequest build() {
             Objects.requireNonNull(hoveddokument, "Mangler hoveddokument");
-            Objects.requireNonNull(kladd.journalposttype, "Mangler journalposttype");
-            switch (kladd.journalposttype) {
+            Objects.requireNonNull(kladd.journalpostType, "Mangler journalposttype");
+            switch (kladd.journalpostType) {
                 case INNGÅENDE:
                 case UTGÅENDE:
                     Objects.requireNonNull(kladd.avsenderMottaker, "Mangler avsender/mottaker");
