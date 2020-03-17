@@ -92,7 +92,7 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
 
     @Test
     public void skal_sende_manuelt_varselbrev() {
-        manueltVarselBrevTjeneste.sendManueltVarselBrev(behandlingId, DokumentMalType.VARSEL_DOK, VARSEL_TEKST);
+        manueltVarselBrevTjeneste.sendManueltVarselBrev(behandlingId, VARSEL_TEKST);
 
         Optional<VarselInfo> varselInfo = varselRepository.finnVarsel(behandlingId);
         assertThat(varselInfo).isPresent();
@@ -113,8 +113,8 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
 
     @Test
     public void skal_sende_korrigert_varselbrev() {
-        manueltVarselBrevTjeneste.sendManueltVarselBrev(behandlingId, DokumentMalType.VARSEL_DOK, VARSEL_TEKST);
-        manueltVarselBrevTjeneste.sendKorrigertVarselBrev(behandlingId, DokumentMalType.KORRIGERT_VARSEL_DOK, KORRIGERT_VARSEL_TEKST);
+        manueltVarselBrevTjeneste.sendManueltVarselBrev(behandlingId, VARSEL_TEKST);
+        manueltVarselBrevTjeneste.sendKorrigertVarselBrev(behandlingId, KORRIGERT_VARSEL_TEKST);
 
         Optional<VarselInfo> varselInfo = varselRepository.finnVarsel(behandlingId);
         assertThat(varselInfo).isPresent();

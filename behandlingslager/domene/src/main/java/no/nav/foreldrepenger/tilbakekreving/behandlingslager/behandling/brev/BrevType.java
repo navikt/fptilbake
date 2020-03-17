@@ -17,6 +17,8 @@ public class BrevType extends Kodeliste {
 
     public static final BrevType HENLEGGELSE_BREV = new BrevType("HENLEGGELSE");
 
+    public static final BrevType INNHENT_DOKUMENTASJONBREV = new BrevType("INNHENT_DOKUMENTASJON");
+
     public static final BrevType UDEFINERT = new BrevType("-");
 
     BrevType(){

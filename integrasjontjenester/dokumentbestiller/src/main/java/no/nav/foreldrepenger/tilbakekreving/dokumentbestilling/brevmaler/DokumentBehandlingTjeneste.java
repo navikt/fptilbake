@@ -13,6 +13,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.dokumentbestiller.DokumentMalType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.BrevmalDto;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.innhentdokumentasjon.InnhentDokumentasjonbrevTask;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.innhentdokumentasjon.InnhentDokumentasjonbrevTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.innhentdokumentasjon.InnhentDokumentasjonbrevFeil;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.manuelt.ManueltVarselBrevFeil;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.manuelt.ManueltVarselBrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.manuelt.SendManueltVarselbrevTask;
@@ -35,6 +38,7 @@ public class DokumentBehandlingTjeneste {
 
     private HistorikkinnslagTjeneste historikkinnslagTjeneste;
     private ManueltVarselBrevTjeneste manueltVarselBrevTjeneste;
+    private InnhentDokumentasjonbrevTjeneste innhentDokumentasjonBrevTjeneste;
 
 
     DokumentBehandlingTjeneste() {
@@ -45,7 +49,8 @@ public class DokumentBehandlingTjeneste {
     public DokumentBehandlingTjeneste(BehandlingRepositoryProvider repositoryProvider,
                                       ProsessTaskRepository prosessTaskRepository,
                                       HistorikkinnslagTjeneste historikkinnslagTjeneste,
-                                      ManueltVarselBrevTjeneste manueltVarselBrevTjeneste) {
+                                      ManueltVarselBrevTjeneste manueltVarselBrevTjeneste,
+                                      InnhentDokumentasjonbrevTjeneste innhentDokumentasjonBrevTjeneste) {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.kodeverkRepository = repositoryProvider.getKodeverkRepository();
         this.brevSporingRepository = repositoryProvider.getBrevSporingRepository();
@@ -54,6 +59,7 @@ public class DokumentBehandlingTjeneste {
 
         this.historikkinnslagTjeneste = historikkinnslagTjeneste;
         this.manueltVarselBrevTjeneste = manueltVarselBrevTjeneste;
+        this.innhentDokumentasjonBrevTjeneste = innhentDokumentasjonBrevTjeneste;
     }
 
     public List<BrevmalDto> hentBrevmalerFor(Long behandlingId) {
@@ -61,7 +67,6 @@ public class DokumentBehandlingTjeneste {
         List<DokumentMalType> gyldigBrevMaler = new ArrayList<>();
 
         gyldigBrevMaler.add(kodeverkRepository.finn(DokumentMalType.class, DokumentMalType.INNHENT_DOK));
-        gyldigBrevMaler.add(kodeverkRepository.finn(DokumentMalType.class, DokumentMalType.FRITEKST_DOK));
 
         leggTilVarselBrevmaler(behandlingId, gyldigBrevMaler);
 
@@ -73,6 +78,9 @@ public class DokumentBehandlingTjeneste {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         if (DokumentMalType.VARSEL_DOK.equals(malType) || DokumentMalType.KORRIGERT_VARSEL_DOK.equals(malType)) {
             håndteresManueltSendVarsel(behandling, malType, fritekst);
+        } else if (DokumentMalType.INNHENT_DOK.equals(malType)) {
+            System.out.println("Bestiller dokument type " + malType.getKode());
+            håndteresInnhentDokumentasjon(behandling, malType, fritekst);
         }
         historikkinnslagTjeneste.opprettHistorikkinnslagForBrevBestilt(behandling, malType);
     }
@@ -81,6 +89,8 @@ public class DokumentBehandlingTjeneste {
         byte[] dokument = new byte[0];
         if (DokumentMalType.VARSEL_DOK.equals(malType) || DokumentMalType.KORRIGERT_VARSEL_DOK.equals(malType)) {
             dokument = manueltVarselBrevTjeneste.hentForhåndsvisningManueltVarselbrev(behandlingId, malType, fritekst);
+        } else if (DokumentMalType.INNHENT_DOK.equals(malType)) {
+            dokument = innhentDokumentasjonBrevTjeneste.hentForhåndsvisningInnhentDokumentasjonBrev(behandlingId, fritekst);
         }
         return dokument;
     }
@@ -129,4 +139,16 @@ public class DokumentBehandlingTjeneste {
         prosessTaskRepository.lagre(taskGruppe);
     }
 
+    private void håndteresInnhentDokumentasjon(Behandling behandling, DokumentMalType malType, String fritekst) {
+        Long behandlingId = behandling.getId();
+        if (!grunnlagRepository.harGrunnlagForBehandlingId(behandlingId)) {
+            throw InnhentDokumentasjonbrevFeil.FACTORY.kanIkkeSendeBrevForGrunnlagFinnesIkke(behandlingId).toException();
+        }
+
+        ProsessTaskData sendInnhentDokumentasjonBrev = new ProsessTaskData(InnhentDokumentasjonbrevTask.TASKTYPE);
+        sendInnhentDokumentasjonBrev.setPayload(fritekst);
+        sendInnhentDokumentasjonBrev.setBehandling(behandling.getFagsakId(), behandlingId, behandling.getAktørId().getId());
+
+        prosessTaskRepository.lagre(sendInnhentDokumentasjonBrev);
+    }
 }

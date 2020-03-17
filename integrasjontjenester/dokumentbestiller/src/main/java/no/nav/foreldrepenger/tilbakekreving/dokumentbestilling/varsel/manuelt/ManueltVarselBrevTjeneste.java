@@ -71,14 +71,14 @@ public class ManueltVarselBrevTjeneste {
         this.historikkinnslagTjeneste = historikkinnslagTjeneste;
     }
 
-    public void sendManueltVarselBrev(Long behandlingId, DokumentMalType malType, String fritekst) {
+    public void sendManueltVarselBrev(Long behandlingId, String fritekst) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         VarselbrevSamletInfo varselbrevSamletInfo = lagVarselBeløpForSending(fritekst, behandling, false);
 
         FritekstbrevData data = lagManueltVarselBrev(varselbrevSamletInfo);
 
         JournalpostIdOgDokumentId dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data);
-        opprettHistorikkinnslag(behandling, malType, dokumentreferanse, TITTEL_VARSELBREV_HISTORIKKINNSLAG);
+        opprettHistorikkinnslag(behandling, dokumentreferanse, TITTEL_VARSELBREV_HISTORIKKINNSLAG);
         lagreVarselData(behandlingId, dokumentreferanse, fritekst, varselbrevSamletInfo.getSumFeilutbetaling());
     }
 
@@ -99,7 +99,7 @@ public class ManueltVarselBrevTjeneste {
         return dokument;
     }
 
-    public void sendKorrigertVarselBrev(Long behandlingId, DokumentMalType malType, String fritekst) {
+    public void sendKorrigertVarselBrev(Long behandlingId, String fritekst) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         VarselbrevSamletInfo varselbrevSamletInfo = lagVarselBeløpForSending(fritekst, behandling, true);
         VarselInfo varselInfo = varselRepository.finnEksaktVarsel(behandlingId);
@@ -107,7 +107,7 @@ public class ManueltVarselBrevTjeneste {
         FritekstbrevData data = lagKorrigertVarselBrev(varselbrevSamletInfo, varselInfo);
 
         JournalpostIdOgDokumentId dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data);
-        opprettHistorikkinnslag(behandling, malType, dokumentreferanse, TITTEL_KORRIGERT_VARSELBREV_HISTORIKKINNSLAG);
+        opprettHistorikkinnslag(behandling, dokumentreferanse, TITTEL_KORRIGERT_VARSELBREV_HISTORIKKINNSLAG);
         lagreVarselData(behandlingId, dokumentreferanse, fritekst, varselbrevSamletInfo.getSumFeilutbetaling());
     }
 
@@ -166,7 +166,7 @@ public class ManueltVarselBrevTjeneste {
         return samletEksternBehandlingInfo.getGrunninformasjon().getSpråkkodeEllerDefault();
     }
 
-    private void opprettHistorikkinnslag(Behandling behandling, DokumentMalType malType, JournalpostIdOgDokumentId dokumentreferanse, String tittel) {
+    private void opprettHistorikkinnslag(Behandling behandling, JournalpostIdOgDokumentId dokumentreferanse, String tittel) {
         historikkinnslagTjeneste.opprettHistorikkinnslagForBrevsending(
             behandling,
             dokumentreferanse.getJournalpostId(),
