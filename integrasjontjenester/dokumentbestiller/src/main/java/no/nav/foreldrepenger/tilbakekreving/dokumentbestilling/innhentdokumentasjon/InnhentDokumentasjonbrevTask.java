@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.manuelt;
+package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.innhentdokumentasjon;
 
 import java.time.LocalDateTime;
 import java.time.Period;
@@ -11,7 +11,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.dokumentbestiller.DokumentMalType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -19,25 +18,25 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 import no.nav.vedtak.konfig.KonfigVerdi;
 
 @Dependent
-@ProsessTask(SendManueltVarselbrevTask.TASKTYPE)
-@FagsakProsesstaskRekkefølge(gruppeSekvens = true)
-public class SendManueltVarselbrevTask implements ProsessTaskHandler {
+@ProsessTask(InnhentDokumentasjonbrevTask.TASKTYPE)
+@FagsakProsesstaskRekkefølge(gruppeSekvens = false)
+public class InnhentDokumentasjonbrevTask implements ProsessTaskHandler {
 
-    public static final String TASKTYPE = "brev.sendManueltVarsel";
+    public static final String TASKTYPE = "brev.sendInnhentDokumentasjon";
 
     private BehandlingRepository behandlingRepository;
 
-    private ManueltVarselBrevTjeneste manueltVarselBrevTjeneste;
+    private InnhentDokumentasjonbrevTjeneste innhentDokumentasjonBrevTjeneste;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private Period ventefrist;
 
     @Inject
-    public SendManueltVarselbrevTask(BehandlingRepository behandlingRepository,
-                                     ManueltVarselBrevTjeneste manueltVarselBrevTjeneste,
-                                     BehandlingskontrollTjeneste behandlingskontrollTjeneste,
-                                     @KonfigVerdi(value = "behandling.venter.frist.lengde") Period ventefrist) {
-        this.manueltVarselBrevTjeneste = manueltVarselBrevTjeneste;
+    public InnhentDokumentasjonbrevTask(BehandlingRepository behandlingRepository,
+                                        InnhentDokumentasjonbrevTjeneste innhentDokumentasjonBrevTjeneste,
+                                        BehandlingskontrollTjeneste behandlingskontrollTjeneste,
+                                        @KonfigVerdi(value = "behandling.venter.frist.lengde") Period ventefrist) {
         this.behandlingRepository = behandlingRepository;
+        this.innhentDokumentasjonBrevTjeneste = innhentDokumentasjonBrevTjeneste;
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
         this.ventefrist = ventefrist;
     }
@@ -45,14 +44,9 @@ public class SendManueltVarselbrevTask implements ProsessTaskHandler {
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
         Long behandlingId = prosessTaskData.getBehandlingId();
-        DokumentMalType malType = DokumentMalType.fraKode(prosessTaskData.getPropertyValue(TaskProperty.MAL_TYPE));
         String friTekst = prosessTaskData.getPayloadAsString();
 
-        if (DokumentMalType.VARSEL_DOK.equals(malType)) {
-            manueltVarselBrevTjeneste.sendManueltVarselBrev(behandlingId, friTekst);
-        } else if (DokumentMalType.KORRIGERT_VARSEL_DOK.equals(malType)) {
-            manueltVarselBrevTjeneste.sendKorrigertVarselBrev(behandlingId, friTekst);
-        }
+        innhentDokumentasjonBrevTjeneste.sendInnhentDokumentasjonBrev(behandlingId, friTekst);
 
         LocalDateTime fristTid = LocalDateTime.now().plus(ventefrist).plusDays(1);
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
