@@ -44,6 +44,8 @@ import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 @Path("/forvaltningBehandling")
 @ApplicationScoped
 @Transaction
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 public class ForvaltningBehandlingRestTjeneste {
 
     private static final Logger logger = LoggerFactory.getLogger(ForvaltningBehandlingRestTjeneste.class);
@@ -72,8 +74,6 @@ public class ForvaltningBehandlingRestTjeneste {
 
     @POST
     @Path("/tving-henleggelse")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     @Operation(
         tags = "FORVALTNING-behandling",
         description = "Tjeneste for å tvinge en behandling til å bli henlagt, selvom normale regler for saksbehandling ikke tillater henleggelse",
@@ -95,8 +95,6 @@ public class ForvaltningBehandlingRestTjeneste {
 
     @POST
     @Path("/tving-gjenoppta")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     @Operation(
         tags = "FORVALTNING-behandling",
         description = "Tjeneste for å tvinge en behandling til å gjenopptas (tas av vent). NB! Må ikke brukes på saker uten kravgrunnlag!",
@@ -119,8 +117,6 @@ public class ForvaltningBehandlingRestTjeneste {
 
     @POST
     @Path("/tving-koble-grunnlag")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     @Operation(
         tags = "FORVALTNING-behandling",
         description = "Tjeneste for å tvinge en behandling til å bruke et grunnlag. NB! Kun brukes på saker som venter på grunnlag!",
@@ -143,6 +139,26 @@ public class ForvaltningBehandlingRestTjeneste {
             logger.info(message, e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(message + e.getMessage()).build();
         }
+    }
+
+    @POST
+    @Path("/hent-korrigert-grunnlag")
+    @Operation(
+        tags = "FORVALTNING-behandling",
+        description = "Tjeneste for å hente korrigert grunnlag for en behandling",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Hent korrigerte grunnlag og tilkoblet det med en behandling"),
+            @ApiResponse(responseCode = "400", description = "Behandling er avsluttet eller ikke gyldig")
+        })
+    @BeskyttetRessurs(action = CREATE, ressurs = DRIFT)
+    public Response hentKorrigertKravgrunnlag(@Valid @NotNull HentKorrigertGrunnlagDto hentKorrigertGrunnlagDto) {
+        Behandling behandling = behandlingRepository.hentBehandling(hentKorrigertGrunnlagDto.getBehandlingId());
+        if (behandling.erAvsluttet()) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        logger.info("Oppretter task for å hente korrigert kravgrunnlag for behandlingId={}", behandling.getId());
+        opprettHentKorrigertGrunnlagTask(behandling, hentKorrigertGrunnlagDto.getKravgrunnlagId());
+        return Response.ok().build();
     }
 
     private void kobleBehandling(KobleBehandlingTilGrunnlagDto dto) {
@@ -194,4 +210,10 @@ public class ForvaltningBehandlingRestTjeneste {
         prosessTaskRepository.lagre(prosessTaskData);
     }
 
+    private void opprettHentKorrigertGrunnlagTask(Behandling behandling, String kravgrunnlagId) {
+        ProsessTaskData prosessTaskData = new ProsessTaskData(HentKorrigertGrunnlagTask.TASKTYPE);
+        prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
+        prosessTaskData.setProperty("KRAVGRUNNLAG_ID", kravgrunnlagId);
+        prosessTaskRepository.lagre(prosessTaskData);
+    }
 }
