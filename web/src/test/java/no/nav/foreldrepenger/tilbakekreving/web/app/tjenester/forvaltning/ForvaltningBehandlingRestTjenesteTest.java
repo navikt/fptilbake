@@ -71,10 +71,7 @@ public class ForvaltningBehandlingRestTjenesteTest {
 
         Response response = forvaltningBehandlingRestTjeneste.tvingHenleggelseBehandling(new BehandlingIdDto(behandling.getId()));
         assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
-        List<ProsessTaskData> prosessTasker = prosessTaskRepository.finnAlle(ProsessTaskStatus.FERDIG, ProsessTaskStatus.KLAR);
-        assertThat(prosessTasker).isNotEmpty();
-        assertThat(prosessTasker.size()).isEqualTo(1);
-        assertThat(prosessTasker.get(0).getTaskType()).isEqualTo(TvingHenlegglBehandlingTask.TASKTYPE);
+        assertProsessTask(TvingHenlegglBehandlingTask.TASKTYPE);
     }
 
     @Test
@@ -101,10 +98,7 @@ public class ForvaltningBehandlingRestTjenesteTest {
 
         Response response = forvaltningBehandlingRestTjeneste.tvingGjenopptaBehandling(new BehandlingIdDto(behandling.getId()));
         assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
-        List<ProsessTaskData> prosessTasker = prosessTaskRepository.finnAlle(ProsessTaskStatus.FERDIG, ProsessTaskStatus.KLAR);
-        assertThat(prosessTasker).isNotEmpty();
-        assertThat(prosessTasker.size()).isEqualTo(1);
-        assertThat(prosessTasker.get(0).getTaskType()).isEqualTo(GjenopptaBehandlingTask.TASKTYPE);
+        assertProsessTask(GjenopptaBehandlingTask.TASKTYPE);
     }
 
     @Test
@@ -173,6 +167,25 @@ public class ForvaltningBehandlingRestTjenesteTest {
         assertThat(mottattXmlRepository.erMottattXmlTilkoblet(mottattXmlId)).isFalse();
     }
 
+    @Test
+    public void skal_hente_korrigert_kravgrunnlag(){
+        Behandling behandling = lagBehandling();
+        HentKorrigertKravgrunnlagDto hentKorrigertKravgrunnlagDto = new HentKorrigertKravgrunnlagDto(behandling.getId(),"");
+        Response respons = forvaltningBehandlingRestTjeneste.hentKorrigertKravgrunnlag(hentKorrigertKravgrunnlagDto);
+        assertThat(respons.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
+        assertProsessTask(HentKorrigertKravgrunnlagTask.TASKTYPE);
+    }
+
+    @Test
+    public void skal_ikke_hente_korrigert_kravgrunnlag_når_behandling_er_avsluttet(){
+        Behandling behandling = lagBehandling();
+        behandling.avsluttBehandling();
+        HentKorrigertKravgrunnlagDto hentKorrigertKravgrunnlagDto = new HentKorrigertKravgrunnlagDto(behandling.getId(),"");
+        Response respons = forvaltningBehandlingRestTjeneste.hentKorrigertKravgrunnlag(hentKorrigertKravgrunnlagDto);
+        assertThat(respons.getStatus()).isEqualTo(Response.Status.BAD_REQUEST.getStatusCode());
+    }
+
+
 
     private Behandling lagBehandling() {
         Fagsak fagsak = TestFagsakUtil.opprettFagsak();
@@ -232,5 +245,12 @@ public class ForvaltningBehandlingRestTjenesteTest {
             "        </urn:tilbakekrevingsPeriode>\n" +
             "    </urn:detaljertKravgrunnlag>\n" +
             "</urn:detaljertKravgrunnlagMelding>\n";
+    }
+
+    private void assertProsessTask(String tasktype) {
+        List<ProsessTaskData> prosessTasker = prosessTaskRepository.finnAlle(ProsessTaskStatus.FERDIG, ProsessTaskStatus.KLAR);
+        assertThat(prosessTasker).isNotEmpty();
+        assertThat(prosessTasker.size()).isEqualTo(1);
+        assertThat(prosessTasker.get(0).getTaskType()).isEqualTo(tasktype);
     }
 }
