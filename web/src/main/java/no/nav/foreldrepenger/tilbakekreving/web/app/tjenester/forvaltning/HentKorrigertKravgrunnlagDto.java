@@ -9,7 +9,7 @@ import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.AbacDto;
 import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
 
-public class HentKorrigertGrunnlagDto implements AbacDto {
+public class HentKorrigertKravgrunnlagDto implements AbacDto {
 
     @NotNull
     @Min(0)
@@ -19,11 +19,11 @@ public class HentKorrigertGrunnlagDto implements AbacDto {
     @Digits(integer = 9, fraction = 0)
     private String kravgrunnlagId;
 
-    public HentKorrigertGrunnlagDto() {
+    public HentKorrigertKravgrunnlagDto() {
         // for CDI
     }
 
-    public HentKorrigertGrunnlagDto(Long behandlingId, String kravgrunnlagId) {
+    public HentKorrigertKravgrunnlagDto(Long behandlingId, String kravgrunnlagId) {
         this.behandlingId = behandlingId;
         this.kravgrunnlagId = kravgrunnlagId;
     }

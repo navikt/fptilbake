@@ -34,13 +34,13 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @ApplicationScoped
-@ProsessTask(HentKorrigertGrunnlagTask.TASKTYPE)
+@ProsessTask(HentKorrigertKravgrunnlagTask.TASKTYPE)
 @FagsakProsesstaskRekkefølge(gruppeSekvens = true)
-public class HentKorrigertGrunnlagTask implements ProsessTaskHandler {
+public class HentKorrigertKravgrunnlagTask implements ProsessTaskHandler {
 
-    public static final String TASKTYPE = "kravgrunnlag.hentkorrigert";
+    public static final String TASKTYPE = "kravgrunnlag.korrigert.hent";
     public static final String KRAVGRUNNLAG_ID = "KRAVGRUNNLAG_ID";
-    public static final String ANSVARLIG_ENHET="8020";  // fast verdi
+    public static final String ANSVARLIG_ENHET_NØS ="8020";  // fast verdi
     public static final String OKO_SAKSBEH_ID="K231B433";  //fast verdi
 
     private EksternBehandlingRepository eksternBehandlingRepository;
@@ -51,15 +51,15 @@ public class HentKorrigertGrunnlagTask implements ProsessTaskHandler {
     private ØkonomiConsumer økonomiConsumer;
     private FpsakKlient fpsakKlient;
 
-    HentKorrigertGrunnlagTask() {
+    HentKorrigertKravgrunnlagTask() {
         // for CDI
     }
 
     @Inject
-    public HentKorrigertGrunnlagTask(BehandlingRepositoryProvider repositoryProvider,
-                                     HentKravgrunnlagMapper hentKravgrunnlagMapper,
-                                     ØkonomiConsumer økonomiConsumer,
-                                     FpsakKlient fpsakKlient) {
+    public HentKorrigertKravgrunnlagTask(BehandlingRepositoryProvider repositoryProvider,
+                                         HentKravgrunnlagMapper hentKravgrunnlagMapper,
+                                         ØkonomiConsumer økonomiConsumer,
+                                         FpsakKlient fpsakKlient) {
         this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
         this.kravgrunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
@@ -78,7 +78,7 @@ public class HentKorrigertGrunnlagTask implements ProsessTaskHandler {
 
         KravgrunnlagValidator.validerGrunnlag(korrigertKravgrunnlag);
         long eksternBehandlingId = Long.parseLong(korrigertKravgrunnlag.getReferanse());
-        if(!erFinnesEksternBehandling(behandlingId,eksternBehandlingId)){
+        if(!finnesEksternBehandling(behandlingId,eksternBehandlingId)){
             Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
             EksternBehandlingsinfoDto eksternBehandlingsinfoDto = hentEksternBehandlingFraFpsak(behandling,eksternBehandlingId);
             oppdaterEksternBehandling(behandling, eksternBehandlingsinfoDto);
@@ -99,7 +99,7 @@ public class HentKorrigertGrunnlagTask implements ProsessTaskHandler {
     private DetaljertKravgrunnlagDto hentKorrigertKravgrunnlagFraØkonomi(Long behandlingId, String kravgrunnlagId) {
         HentKravgrunnlagDetaljDto request;
         if (StringUtils.erIkkeTom(kravgrunnlagId)) {
-            request = forberedHentKravgrunnlagDetailRequest(kravgrunnlagId, ANSVARLIG_ENHET, OKO_SAKSBEH_ID);
+            request = forberedHentKravgrunnlagDetailRequest(kravgrunnlagId, ANSVARLIG_ENHET_NØS, OKO_SAKSBEH_ID);
         } else {
             Kravgrunnlag431 kravgrunnlag431 = kravgrunnlagRepository.finnKravgrunnlag(behandlingId);
             request = forberedHentKravgrunnlagDetailRequest(kravgrunnlag431.getEksternKravgrunnlagId(), kravgrunnlag431.getAnsvarligEnhet(), kravgrunnlag431.getSaksBehId());
@@ -107,7 +107,7 @@ public class HentKorrigertGrunnlagTask implements ProsessTaskHandler {
         return økonomiConsumer.hentKravgrunnlag(behandlingId, request);
     }
 
-    private boolean erFinnesEksternBehandling(long behandlingId, long eksternBehandlingId){
+    private boolean finnesEksternBehandling(long behandlingId, long eksternBehandlingId){
         return eksternBehandlingRepository.finnesEksternBehandling(behandlingId,eksternBehandlingId);
     }
 
@@ -133,7 +133,7 @@ public class HentKorrigertGrunnlagTask implements ProsessTaskHandler {
         HentKorrigertGrunnlagTaskFeil FACTORY = FeilFactory.create(HentKorrigertGrunnlagTaskFeil.class);
 
         @TekniskFeil(feilkode = "FPT-587197",
-            feilmelding = "Hentet et tilbakekrevingsgrunnlag fra Økonomi for en behandling som ikke finnes i fpsak. behandlingId=%s. Kravgrunnlaget skulle kanskje til et annet system. Si i fra til Økonomi!",
+            feilmelding = "Hentet et kravgrunnlag fra Økonomi for en behandling som ikke finnes i fpsak. behandlingId=%s. Kravgrunnlaget skulle kanskje til et annet system. Si i fra til Økonomi!",
             logLevel = LogLevel.WARN)
         Feil behandlingFinnesIkkeIFpsak(Long behandlingId);
     }

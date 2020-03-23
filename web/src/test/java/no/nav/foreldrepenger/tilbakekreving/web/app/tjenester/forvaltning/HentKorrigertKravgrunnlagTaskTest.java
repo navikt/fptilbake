@@ -56,7 +56,7 @@ import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.integrasjon.felles.ws.DateUtil;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 
-public class HentKorrigertGrunnlagTaskTest {
+public class HentKorrigertKravgrunnlagTaskTest {
 
     @Rule
     public UnittestRepositoryRule repositoryRule = new UnittestRepositoryRule();
@@ -69,7 +69,7 @@ public class HentKorrigertGrunnlagTaskTest {
     private ØkonomiConsumer økonomiConsumerMock = mock(ØkonomiConsumer.class);
     private FpsakKlient fpsakKlientMock = mock(FpsakKlient.class);
     private HentKravgrunnlagMapper hentKravgrunnlagMapper = new HentKravgrunnlagMapper(tpsAdapterWrapper);
-    private HentKorrigertGrunnlagTask hentKorrigertGrunnlagTask = new HentKorrigertGrunnlagTask(repositoryProvider,hentKravgrunnlagMapper, økonomiConsumerMock, fpsakKlientMock);
+    private HentKorrigertKravgrunnlagTask hentKorrigertGrunnlagTask = new HentKorrigertKravgrunnlagTask(repositoryProvider,hentKravgrunnlagMapper, økonomiConsumerMock, fpsakKlientMock);
 
     private Behandling behandling;
     private long behandlingId;
@@ -80,7 +80,7 @@ public class HentKorrigertGrunnlagTaskTest {
         behandling = scenarioSimple.lagre(repositoryProvider);
         behandlingId = behandling.getId();
         when(tpsAdapterMock.hentAktørIdForPersonIdent(any(PersonIdent.class))).thenReturn(Optional.of(behandling.getFagsak().getAktørId()));
-        when(økonomiConsumerMock.hentKravgrunnlag(anyLong(),any(HentKravgrunnlagDetaljDto.class))).thenReturn(hentGrunnlag(true));
+        when(økonomiConsumerMock.hentKravgrunnlag(anyLong(),any(HentKravgrunnlagDetaljDto.class))).thenReturn(lagKravgrunnlag(true));
         EksternBehandling eksternBehandling = new EksternBehandling(behandling,1l,UUID.randomUUID());
         eksternBehandlingRepository.lagre(eksternBehandling);
     }
@@ -100,7 +100,7 @@ public class HentKorrigertGrunnlagTaskTest {
 
     @Test
     public void skal_ikke_hente_og_lagre_korrigert_kravgrunnlag_når_hentet_grunnlaget_er_ugyldig(){
-        when(økonomiConsumerMock.hentKravgrunnlag(anyLong(),any(HentKravgrunnlagDetaljDto.class))).thenReturn(hentGrunnlag(false));
+        when(økonomiConsumerMock.hentKravgrunnlag(anyLong(),any(HentKravgrunnlagDetaljDto.class))).thenReturn(lagKravgrunnlag(false));
         ProsessTaskData prosessTaskData = lagProsessTaskData();
         assertThrows("FPT-879715", IntegrasjonException.class,() -> hentKorrigertGrunnlagTask.doTask(prosessTaskData));
     }
@@ -135,9 +135,9 @@ public class HentKorrigertGrunnlagTaskTest {
 
 
     private ProsessTaskData lagProsessTaskData() {
-        ProsessTaskData prosessTaskData = new ProsessTaskData(HentKorrigertGrunnlagTask.TASKTYPE);
+        ProsessTaskData prosessTaskData = new ProsessTaskData(HentKorrigertKravgrunnlagTask.TASKTYPE);
         prosessTaskData.setBehandling(behandling.getFagsakId(),behandlingId,behandling.getAktørId().getId());
-        prosessTaskData.setProperty(HentKorrigertGrunnlagTask.KRAVGRUNNLAG_ID,String.valueOf("152806"));
+        prosessTaskData.setProperty(HentKorrigertKravgrunnlagTask.KRAVGRUNNLAG_ID,String.valueOf("152806"));
         return prosessTaskData;
     }
 
@@ -148,12 +148,12 @@ public class HentKorrigertGrunnlagTaskTest {
         return eksternBehandlingsinfoDto;
     }
 
-    private no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagDto hentGrunnlag(boolean erGyldig) {
+    private no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagDto lagKravgrunnlag(boolean erGyldig) {
         no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagDto detaljertKravgrunnlag = new DetaljertKravgrunnlagDto();
         detaljertKravgrunnlag.setVedtakId(BigInteger.valueOf(207406));
         detaljertKravgrunnlag.setKravgrunnlagId(BigInteger.valueOf(152806));
         detaljertKravgrunnlag.setDatoVedtakFagsystem(konvertDato(LocalDate.of(2019, 3, 14)));
-        detaljertKravgrunnlag.setEnhetAnsvarlig(HentKorrigertGrunnlagTask.ANSVARLIG_ENHET);
+        detaljertKravgrunnlag.setEnhetAnsvarlig(HentKorrigertKravgrunnlagTask.ANSVARLIG_ENHET_NØS);
         detaljertKravgrunnlag.setFagsystemId("10000000000000000");
         detaljertKravgrunnlag.setKodeFagomraade("FP");
         detaljertKravgrunnlag.setKodeHjemmel("1234239042304");
@@ -162,53 +162,35 @@ public class HentKorrigertGrunnlagTaskTest {
         detaljertKravgrunnlag.setRenterBeregnes(JaNeiDto.N);
         detaljertKravgrunnlag.setSaksbehId("Z9901136");
         detaljertKravgrunnlag.setUtbetalesTilId("12345678901");
-        detaljertKravgrunnlag.setEnhetBehandl(HentKorrigertGrunnlagTask.ANSVARLIG_ENHET);
-        detaljertKravgrunnlag.setEnhetBosted(HentKorrigertGrunnlagTask.ANSVARLIG_ENHET);
+        detaljertKravgrunnlag.setEnhetBehandl(HentKorrigertKravgrunnlagTask.ANSVARLIG_ENHET_NØS);
+        detaljertKravgrunnlag.setEnhetBosted(HentKorrigertKravgrunnlagTask.ANSVARLIG_ENHET_NØS);
         detaljertKravgrunnlag.setKodeStatusKrav("BEHA");
         detaljertKravgrunnlag.setTypeGjelderId(TypeGjelderDto.PERSON);
         detaljertKravgrunnlag.setTypeUtbetId(TypeGjelderDto.PERSON);
         detaljertKravgrunnlag.setVedtakGjelderId("12345678901");
         detaljertKravgrunnlag.setVedtakIdOmgjort(BigInteger.valueOf(207407));
-        detaljertKravgrunnlag.getTilbakekrevingsPeriode().addAll(hentPerioder(erGyldig));
+        detaljertKravgrunnlag.getTilbakekrevingsPeriode().addAll(lagPerioder(erGyldig));
 
         return detaljertKravgrunnlag;
     }
 
-    private List<DetaljertKravgrunnlagPeriodeDto> hentPerioder(boolean erGyldig) {
+    private List<DetaljertKravgrunnlagPeriodeDto> lagPerioder(boolean erGyldig) {
         DetaljertKravgrunnlagPeriodeDto kravgrunnlagPeriode1 = new DetaljertKravgrunnlagPeriodeDto();
         PeriodeDto periode = new PeriodeDto();
         periode.setFom(konvertDato(LocalDate.of(2016, 3, 16)));
         periode.setTom(konvertDato(LocalDate.of(2016, 3, 31)));
         kravgrunnlagPeriode1.setPeriode(periode);
-        kravgrunnlagPeriode1.setBelopSkattMnd(BigDecimal.valueOf(600.00));
-        kravgrunnlagPeriode1.getTilbakekrevingsBelop().add(hentBeløp(BigDecimal.valueOf(6000.00), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TypeKlasseDto.FEIL));
-        kravgrunnlagPeriode1.getTilbakekrevingsBelop().add(hentBeløp(BigDecimal.ZERO, BigDecimal.valueOf(6000.00), BigDecimal.valueOf(6000.00), BigDecimal.ZERO, TypeKlasseDto.YTEL));
-
-        DetaljertKravgrunnlagPeriodeDto kravgrunnlagPeriode2 = new DetaljertKravgrunnlagPeriodeDto();
-        periode = new PeriodeDto();
-        periode.setFom(konvertDato(LocalDate.of(2016, 4, 01)));
-        periode.setTom(konvertDato(LocalDate.of(2016, 4, 30)));
-        kravgrunnlagPeriode2.setPeriode(periode);
-        kravgrunnlagPeriode2.setBelopSkattMnd(BigDecimal.valueOf(300.00));
-        kravgrunnlagPeriode2.getTilbakekrevingsBelop().add(hentBeløp(BigDecimal.valueOf(3000.00), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TypeKlasseDto.FEIL));
-        kravgrunnlagPeriode2.getTilbakekrevingsBelop().add(hentBeløp(BigDecimal.ZERO, BigDecimal.valueOf(3000.00), BigDecimal.valueOf(3000.00), BigDecimal.ZERO, TypeKlasseDto.YTEL));
-
-        DetaljertKravgrunnlagPeriodeDto kravgrunnlagPeriode3 = new DetaljertKravgrunnlagPeriodeDto();
-        periode = new PeriodeDto();
-        periode.setFom(konvertDato(LocalDate.of(2016, 5, 1)));
-        periode.setTom(konvertDato(LocalDate.of(2016, 5, 26)));
-        kravgrunnlagPeriode3.setPeriode(periode);
         if(erGyldig) {
-            kravgrunnlagPeriode3.setBelopSkattMnd(BigDecimal.valueOf(2100.00));
+            kravgrunnlagPeriode1.setBelopSkattMnd(BigDecimal.valueOf(600.00));
         }
-        kravgrunnlagPeriode3.getTilbakekrevingsBelop().add(hentBeløp(BigDecimal.valueOf(21000.00), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TypeKlasseDto.FEIL));
-        kravgrunnlagPeriode3.getTilbakekrevingsBelop().add(hentBeløp(BigDecimal.ZERO, BigDecimal.valueOf(21000.00), BigDecimal.valueOf(21000.00), BigDecimal.ZERO, TypeKlasseDto.YTEL));
+        kravgrunnlagPeriode1.getTilbakekrevingsBelop().add(lagKravgrunnlagBeløp(BigDecimal.valueOf(6000.00), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TypeKlasseDto.FEIL));
+        kravgrunnlagPeriode1.getTilbakekrevingsBelop().add(lagKravgrunnlagBeløp(BigDecimal.ZERO, BigDecimal.valueOf(6000.00), BigDecimal.valueOf(6000.00), BigDecimal.ZERO, TypeKlasseDto.YTEL));
 
-        return Lists.newArrayList(kravgrunnlagPeriode1, kravgrunnlagPeriode2, kravgrunnlagPeriode3);
+        return Lists.newArrayList(kravgrunnlagPeriode1);
     }
 
-    private DetaljertKravgrunnlagBelopDto hentBeløp(BigDecimal nyBeløp, BigDecimal tilbakekrevesBeløp,
-                                                    BigDecimal opprUtbetBeløp, BigDecimal uInnkrevdBeløp, TypeKlasseDto typeKlasse) {
+    private DetaljertKravgrunnlagBelopDto lagKravgrunnlagBeløp(BigDecimal nyBeløp, BigDecimal tilbakekrevesBeløp,
+                                                               BigDecimal opprUtbetBeløp, BigDecimal uInnkrevdBeløp, TypeKlasseDto typeKlasse) {
         DetaljertKravgrunnlagBelopDto detaljertKravgrunnlagBelop = new DetaljertKravgrunnlagBelopDto();
         detaljertKravgrunnlagBelop.setTypeKlasse(typeKlasse);
         detaljertKravgrunnlagBelop.setBelopNy(nyBeløp);

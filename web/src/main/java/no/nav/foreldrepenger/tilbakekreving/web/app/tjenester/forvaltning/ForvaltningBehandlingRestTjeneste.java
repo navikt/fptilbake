@@ -151,13 +151,13 @@ public class ForvaltningBehandlingRestTjeneste {
             @ApiResponse(responseCode = "400", description = "Behandling er avsluttet eller ikke gyldig")
         })
     @BeskyttetRessurs(action = CREATE, ressurs = DRIFT)
-    public Response hentKorrigertKravgrunnlag(@Valid @NotNull HentKorrigertGrunnlagDto hentKorrigertGrunnlagDto) {
-        Behandling behandling = behandlingRepository.hentBehandling(hentKorrigertGrunnlagDto.getBehandlingId());
+    public Response hentKorrigertKravgrunnlag(@Valid @NotNull HentKorrigertKravgrunnlagDto hentKorrigertKravgrunnlagDto) {
+        Behandling behandling = behandlingRepository.hentBehandling(hentKorrigertKravgrunnlagDto.getBehandlingId());
         if (behandling.erAvsluttet()) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("Kan ikke hente korrigert kravbrunnlag, behandlingen er avsluttet").build();
         }
         logger.info("Oppretter task for å hente korrigert kravgrunnlag for behandlingId={}", behandling.getId());
-        opprettHentKorrigertGrunnlagTask(behandling, hentKorrigertGrunnlagDto.getKravgrunnlagId());
+        opprettHentKorrigertGrunnlagTask(behandling, hentKorrigertKravgrunnlagDto.getKravgrunnlagId());
         return Response.ok().build();
     }
 
@@ -211,7 +211,7 @@ public class ForvaltningBehandlingRestTjeneste {
     }
 
     private void opprettHentKorrigertGrunnlagTask(Behandling behandling, String kravgrunnlagId) {
-        ProsessTaskData prosessTaskData = new ProsessTaskData(HentKorrigertGrunnlagTask.TASKTYPE);
+        ProsessTaskData prosessTaskData = new ProsessTaskData(HentKorrigertKravgrunnlagTask.TASKTYPE);
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         prosessTaskData.setProperty("KRAVGRUNNLAG_ID", kravgrunnlagId);
         prosessTaskRepository.lagre(prosessTaskData);

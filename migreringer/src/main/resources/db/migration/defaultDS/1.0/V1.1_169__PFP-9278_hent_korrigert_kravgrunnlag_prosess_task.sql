@@ -1,2 +1,2 @@
 INSERT INTO PROSESS_TASK_TYPE (KODE,NAVN,FEIL_MAKS_FORSOEK,BESKRIVELSE)
-  VALUES ('kravgrunnlag.hentkorrigert','Henter korrigert kravgrunnlaget fra økonomi','3','Henter korrigert kravgrunnlaget fra økonomi');
+  VALUES ('kravgrunnlag.korrigert.hent','Henter korrigert kravgrunnlag fra økonomi','3','Henter korrigert kravgrunnlag fra økonomi');

@@ -170,18 +170,18 @@ public class ForvaltningBehandlingRestTjenesteTest {
     @Test
     public void skal_hente_korrigert_kravgrunnlag(){
         Behandling behandling = lagBehandling();
-        HentKorrigertGrunnlagDto hentKorrigertGrunnlagDto = new HentKorrigertGrunnlagDto(behandling.getId(),"");
-        Response respons = forvaltningBehandlingRestTjeneste.hentKorrigertKravgrunnlag(hentKorrigertGrunnlagDto);
+        HentKorrigertKravgrunnlagDto hentKorrigertKravgrunnlagDto = new HentKorrigertKravgrunnlagDto(behandling.getId(),"");
+        Response respons = forvaltningBehandlingRestTjeneste.hentKorrigertKravgrunnlag(hentKorrigertKravgrunnlagDto);
         assertThat(respons.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
-        assertProsessTask(HentKorrigertGrunnlagTask.TASKTYPE);
+        assertProsessTask(HentKorrigertKravgrunnlagTask.TASKTYPE);
     }
 
     @Test
     public void skal_ikke_hente_korrigert_kravgrunnlag_når_behandling_er_avsluttet(){
         Behandling behandling = lagBehandling();
         behandling.avsluttBehandling();
-        HentKorrigertGrunnlagDto hentKorrigertGrunnlagDto = new HentKorrigertGrunnlagDto(behandling.getId(),"");
-        Response respons = forvaltningBehandlingRestTjeneste.hentKorrigertKravgrunnlag(hentKorrigertGrunnlagDto);
+        HentKorrigertKravgrunnlagDto hentKorrigertKravgrunnlagDto = new HentKorrigertKravgrunnlagDto(behandling.getId(),"");
+        Response respons = forvaltningBehandlingRestTjeneste.hentKorrigertKravgrunnlag(hentKorrigertKravgrunnlagDto);
         assertThat(respons.getStatus()).isEqualTo(Response.Status.BAD_REQUEST.getStatusCode());
     }
 
