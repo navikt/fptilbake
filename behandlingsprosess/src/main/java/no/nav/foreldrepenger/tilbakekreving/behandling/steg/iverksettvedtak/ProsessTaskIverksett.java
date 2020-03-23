@@ -4,6 +4,8 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporingRepository;
+import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.task.SendVedtakFattetTilSelvbetjeningTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
@@ -12,14 +14,17 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 public class ProsessTaskIverksett {
 
     private ProsessTaskRepository taskRepository;
+    private BrevSporingRepository brevSporingRepository;
 
     ProsessTaskIverksett() {
         // for CDI
     }
 
     @Inject
-    public ProsessTaskIverksett(ProsessTaskRepository taskRepository) {
+    public ProsessTaskIverksett(ProsessTaskRepository taskRepository,
+                                BrevSporingRepository brevSporingRepository) {
         this.taskRepository = taskRepository;
+        this.brevSporingRepository = brevSporingRepository;
     }
 
     public void opprettIverksettingstasker(Behandling behandling, boolean sendVedtaksbrev) {
@@ -29,10 +34,15 @@ public class ProsessTaskIverksett {
             taskGruppe.addNesteSekvensiell(new ProsessTaskData(SendVedtaksbrevTask.TASKTYPE));
         }
         taskGruppe.addNesteSekvensiell(new ProsessTaskData(AvsluttBehandlingTask.TASKTYPE));
-
         taskGruppe.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         taskGruppe.setCallIdFraEksisterende();
 
         taskRepository.lagre(taskGruppe);
+
+        if (brevSporingRepository.harVarselBrevSendtForBehandlingId(behandling.getId())) {
+            ProsessTaskData selvbetjeningTask = new ProsessTaskData(SendVedtakFattetTilSelvbetjeningTask.TASKTYPE);
+            selvbetjeningTask.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
+            taskRepository.lagre(selvbetjeningTask);
+        }
     }
 }

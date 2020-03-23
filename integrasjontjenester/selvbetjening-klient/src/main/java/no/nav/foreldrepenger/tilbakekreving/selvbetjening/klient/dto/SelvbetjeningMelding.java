@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.selvbetjening;
+package no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.dto;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -10,7 +10,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelse
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 
-public class SendtVarselInformasjon {
+public class SelvbetjeningMelding {
     @JsonProperty("ytelseType")
     private String ytelseType;
     @JsonProperty("aktørId")
@@ -25,8 +25,7 @@ public class SendtVarselInformasjon {
     private String dokumentId;
     @JsonProperty("dialogId")
     private String dialogId;
-    @JsonProperty("hendelse")
-    private String hendelse = "TILBAKEKREVING_SPM";
+    private Hendelse hendelse;
     @JsonProperty("gyldigTil")
     private LocalDate gyldigTil;
     @JsonProperty("opprettet")
@@ -34,7 +33,7 @@ public class SendtVarselInformasjon {
     @JsonProperty("aktiv")
     private boolean aktiv = true;
 
-    private SendtVarselInformasjon() {
+    private SelvbetjeningMelding() {
     }
 
     public String getYtelseType() {
@@ -65,8 +64,9 @@ public class SendtVarselInformasjon {
         return dialogId;
     }
 
+    @JsonProperty("hendelse")
     public String getHendelse() {
-        return hendelse;
+        return hendelse.getKode();
     }
 
     public LocalDate getGyldigTil() {
@@ -86,7 +86,7 @@ public class SendtVarselInformasjon {
     }
 
     public static class Builder {
-        private SendtVarselInformasjon kladd = new SendtVarselInformasjon();
+        private SelvbetjeningMelding kladd = new SelvbetjeningMelding();
 
         public Builder medYtelseType(FagsakYtelseType ytelseType) {
             kladd.ytelseType = ytelseType.getKode();
@@ -133,17 +133,24 @@ public class SendtVarselInformasjon {
             return this;
         }
 
-        public SendtVarselInformasjon build() {
+        public Builder medHendelse(Hendelse hendelse) {
+            kladd.hendelse = hendelse;
+            return this;
+        }
+
+        public SelvbetjeningMelding build() {
             Objects.requireNonNull(kladd.ytelseType, "mangler ytelseType");
             Objects.requireNonNull(kladd.aktørId, "mangler aktørId");
             Objects.requireNonNull(kladd.norskIdent, "mangler norskIdent (FNR/DNR)");
             Objects.requireNonNull(kladd.saksnummer, "mangler saksnummer");
-            Objects.requireNonNull(kladd.journalpostId, "mangler journalpostId");
             Objects.requireNonNull(kladd.dokumentId, "mangler dokumentId");
             Objects.requireNonNull(kladd.dialogId, "mangler dialogId");
             Objects.requireNonNull(kladd.hendelse, "mangler hendelse");
-            Objects.requireNonNull(kladd.gyldigTil, "mangler gyldigTil");
-            Objects.requireNonNull(kladd.opprettet, "mangler opprettet");
+            if (Hendelse.TILBAKEKREVING_SPM.equals(kladd.hendelse)) {
+                Objects.requireNonNull(kladd.journalpostId, "mangler journalpostId");
+                Objects.requireNonNull(kladd.gyldigTil, "mangler gyldigTil");
+                Objects.requireNonNull(kladd.opprettet, "mangler opprettet");
+            }
             return kladd;
         }
 

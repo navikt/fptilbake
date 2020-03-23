@@ -27,6 +27,7 @@
         <module>simulering</module>
         <module>fplos-klient</module>
         <module>datavarehus</module>
+        <module>selvbetjening-klient</module>
     </modules>
 
 </project>

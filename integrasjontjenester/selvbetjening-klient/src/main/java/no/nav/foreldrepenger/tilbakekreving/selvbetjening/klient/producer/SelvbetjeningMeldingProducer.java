@@ -1,6 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.selvbetjening;
-
-import static no.nav.vedtak.feil.LogLevel.WARN;
+package no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.producer;
 
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
@@ -25,8 +23,10 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
+import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.dto.SelvbetjeningMelding;
 import no.nav.vedtak.feil.Feil;
 import no.nav.vedtak.feil.FeilFactory;
+import no.nav.vedtak.feil.LogLevel;
 import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
 import no.nav.vedtak.feil.deklarasjon.ManglerTilgangFeil;
 import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
@@ -34,7 +34,7 @@ import no.nav.vedtak.konfig.KonfigVerdi;
 import no.nav.vedtak.util.StringUtils;
 
 @ApplicationScoped
-public class BeskjedUtsendtVarselTilSelvbetjeningMeldingProducer {
+public class SelvbetjeningMeldingProducer {
 
     private static final ObjectMapper OM;
 
@@ -49,16 +49,16 @@ public class BeskjedUtsendtVarselTilSelvbetjeningMeldingProducer {
     private Producer<String, String> producer;
     private String topic;
 
-    BeskjedUtsendtVarselTilSelvbetjeningMeldingProducer() {
+    SelvbetjeningMeldingProducer() {
         // for CDI proxy
     }
 
     @Inject
-    BeskjedUtsendtVarselTilSelvbetjeningMeldingProducer(@KonfigVerdi("tilbakekreving.brukerdialog.hendelse.v1.topic.url") String topic,
-                                                        @KonfigVerdi("bootstrap.servers") String bootstrapServers,
-                                                        @KonfigVerdi("application.name") String clientId,
-                                                        @KonfigVerdi("systembruker.username") String username,
-                                                        @KonfigVerdi("systembruker.password") String password) {
+    SelvbetjeningMeldingProducer(@KonfigVerdi("tilbakekreving.brukerdialog.hendelse.v1.topic.url") String topic,
+                                 @KonfigVerdi("bootstrap.servers") String bootstrapServers,
+                                 @KonfigVerdi("application.name") String clientId,
+                                 @KonfigVerdi("systembruker.username") String username,
+                                 @KonfigVerdi("systembruker.password") String password) {
         Properties properties = new Properties();
 
         properties.setProperty("bootstrap.servers", bootstrapServers);
@@ -96,10 +96,10 @@ public class BeskjedUtsendtVarselTilSelvbetjeningMeldingProducer {
         producer.flush();
     }
 
-    public void sendBeskjedOmSendtVarsel(SendtVarselInformasjon varselHendelse) {
+    public void sendMelding(SelvbetjeningMelding hendelse) {
         try {
-            String verdiSomJson = OM.writeValueAsString(varselHendelse);
-            sendJsonMedNøkkel(varselHendelse.getNorskIdent(), verdiSomJson);
+            String verdiSomJson = OM.writeValueAsString(hendelse);
+            sendJsonMedNøkkel(hendelse.getNorskIdent(), verdiSomJson);
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException("Kunne ikke serialisere SendtVarselInformasjon til JSON", e);
         }
@@ -131,16 +131,16 @@ public class BeskjedUtsendtVarselTilSelvbetjeningMeldingProducer {
 
         SendVarselhendelseFeil FACTORY = FeilFactory.create(SendVarselhendelseFeil.class);
 
-        @TekniskFeil(feilkode = "FPT-151561", feilmelding = "Uventet feil ved sending til Kafka for topic %s", logLevel = WARN)
+        @TekniskFeil(feilkode = "FPT-151561", feilmelding = "Uventet feil ved sending til Kafka for topic %s", logLevel = LogLevel.WARN)
         Feil uventetFeilKafka(String topic, Exception cause);
 
-        @ManglerTilgangFeil(feilkode = "FPT-732111", feilmelding = "Feil med pålogging mot Kafka for topic %s", logLevel = WARN)
+        @ManglerTilgangFeil(feilkode = "FPT-732111", feilmelding = "Feil med pålogging mot Kafka for topic %s", logLevel = LogLevel.WARN)
         Feil påloggingsfeilKafka(String topic, Exception cause);
 
-        @TekniskFeil(feilkode = "FPT-682119", feilmelding = "Midlertidig feil ved sending til Kafka, vil prøve igjen. Gjelder topic %s", logLevel = WARN)
+        @TekniskFeil(feilkode = "FPT-682119", feilmelding = "Midlertidig feil ved sending til Kafka, vil prøve igjen. Gjelder topic %s", logLevel = LogLevel.WARN)
         Feil midlertidigFeilKafka(String topic, Exception cause);
 
-        @TekniskFeil(feilkode = "FPT-981074", feilmelding = "Uventet feil ved sending til Kafka for topic %s", logLevel = WARN)
+        @TekniskFeil(feilkode = "FPT-981074", feilmelding = "Uventet feil ved sending til Kafka for topic %s", logLevel = LogLevel.WARN)
         Feil feilMedKafka(String topic, Exception cause);
 
     }

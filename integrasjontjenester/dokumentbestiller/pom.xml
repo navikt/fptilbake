@@ -49,6 +49,10 @@
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
             <artifactId>pdfgen</artifactId>
         </dependency>
+        <dependency>
+            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+            <artifactId>selvbetjening-klient</artifactId>
+        </dependency>
 
         <!-- NAV-avhengigheter -->
         <dependency>
@@ -65,10 +69,6 @@
         <dependency>
             <groupId>com.github.jknack</groupId>
             <artifactId>handlebars-jackson2</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka-clients</artifactId>
         </dependency>
 
         <!-- Test avhengigheter -->

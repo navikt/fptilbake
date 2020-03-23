@@ -10,15 +10,20 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandlingsresultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporing;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProviderImpl;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.IverksettingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.task.SendVedtakFattetTilSelvbetjeningTask;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
@@ -45,7 +50,8 @@ public class IverksetteVedtakStegImplTest {
 
     private BehandlingRepositoryProvider repoProvider = new BehandlingRepositoryProviderImpl(repositoryRule.getEntityManager());
     private ProsessTaskRepository prosessTaskRepository = new ProsessTaskRepositoryImpl(repositoryRule.getEntityManager(), null, Mockito.mock(ProsessTaskEventPubliserer.class));
-    private ProsessTaskIverksett prosessTaskIverksett = new ProsessTaskIverksett(prosessTaskRepository);
+    private BrevSporingRepository brevSporingRepository = new BrevSporingRepository(repositoryRule.getEntityManager());
+    private ProsessTaskIverksett prosessTaskIverksett = new ProsessTaskIverksett(prosessTaskRepository, brevSporingRepository);
     private IverksetteVedtakSteg iverksetteVedtakSteg = new IverksetteVedtakStegImpl(repoProvider, prosessTaskIverksett);
     private BehandlingVedtakRepository behandlingVedtakRepository = repoProvider.getBehandlingVedtakRepository();
     private BehandlingRepository behandlingRepository = repoProvider.getBehandlingRepository();
@@ -78,15 +84,17 @@ public class IverksetteVedtakStegImplTest {
     @Test
     public void skal_utføre_iverksette_vedtak_steg_for_tilbakekreving_behandling() {
         opprettBehandlingVedtak(behandling, IverksettingStatus.IKKE_IVERKSATT);
+        lagreInfoOmVarselbrev(behandling.getId(), "jpi1", "did2");
         BehandleStegResultat stegResultat = iverksetteVedtakSteg.utførSteg(behandlingskontrollKontekst);
         assertThat(stegResultat.getTransisjon()).isEqualTo(FellesTransisjoner.SETT_PÅ_VENT);
         assertBehandlingVedtak(behandling);
 
         List<ProsessTaskData> tasker = prosessTaskRepository.finnAlle(ProsessTaskStatus.KLAR);
-        assertThat(tasker.size()).isEqualTo(3);
+        assertThat(tasker.size()).isEqualTo(4);
         assertThat(tasker.get(0).getTaskType()).isEqualTo(SendØkonomiTibakekerevingsVedtakTask.TASKTYPE);
         assertThat(tasker.get(1).getTaskType()).isEqualTo(SendVedtaksbrevTask.TASKTYPE);
         assertThat(tasker.get(2).getTaskType()).isEqualTo(AvsluttBehandlingTask.TASKTYPE);
+        assertThat(tasker.get(3).getTaskType()).isEqualTo(SendVedtakFattetTilSelvbetjeningTask.TASKTYPE);
     }
 
     @Test
@@ -155,4 +163,14 @@ public class IverksetteVedtakStegImplTest {
         assertThat(behandlingVedtak.getIverksettingStatus()).isEqualByComparingTo(IverksettingStatus.UNDER_IVERKSETTING);
     }
 
+    private void lagreInfoOmVarselbrev(Long behandlingId, String journalpostId, String dokumentId) {
+        BrevSporing brevSporing = new BrevSporing.Builder()
+            .medBehandlingId(behandlingId)
+            .medDokumentId(dokumentId)
+            .medJournalpostId(new JournalpostId(journalpostId))
+            .medBrevType(BrevType.VARSEL_BREV)
+            .build();
+        brevSporingRepository.lagre(brevSporing);
+        repositoryRule.getEntityManager().flush();
+    }
 }
