@@ -181,6 +181,7 @@ public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
         List<ProsessTaskData> prosessTaskData = prosessTaskRepository.finnAlle(ProsessTaskStatus.KLAR);
         assertThat(prosessTaskData).isNotEmpty();
         assertThat(prosessTaskData.get(0).getTaskType()).isEqualTo("brev.sendhenleggelse");
+        assertThat(prosessTaskData.get(1).getTaskType()).isEqualTo("send.beskjed.tilbakekreving.henlagt.selvbetjening");
         assertHenleggelse();
     }
 

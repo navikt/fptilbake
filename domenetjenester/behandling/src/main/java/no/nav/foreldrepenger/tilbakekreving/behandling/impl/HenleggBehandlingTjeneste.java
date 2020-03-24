@@ -14,6 +14,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -32,6 +33,7 @@ public class HenleggBehandlingTjeneste {
     private HistorikkinnslagTjeneste historikkinnslagTjeneste;
 
     private static final String HENLEGGELSESBREV_TASK_TYPE = "brev.sendhenleggelse";
+    private static final String SELVBETJENING_HENLAGT_TASKTYPE = "send.beskjed.tilbakekreving.henlagt.selvbetjening";
 
     HenleggBehandlingTjeneste() {
         // CDI
@@ -72,21 +74,29 @@ public class HenleggBehandlingTjeneste {
         }
         behandlingskontrollTjeneste.henleggBehandling(kontekst, årsakKode);
 
-        if (kanSendeHenleggelsebrev(behandlingId)) {
+        if (erDetSendtVarsel(behandlingId)) {
             sendHenleggelsesbrev(behandling);
+            informerSelvbetjening(behandling);
         }
         opprettHistorikkinnslag(behandling, årsakKode, begrunnelse);
         eksternBehandlingRepository.deaktivateTilkobling(behandlingId);
     }
 
     private void sendHenleggelsesbrev(Behandling behandling) {
-        ProsessTaskData taskData = new ProsessTaskData(HENLEGGELSESBREV_TASK_TYPE);
-        taskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
-        taskData.setCallIdFraEksisterende();
-        prosessTaskRepository.lagre(taskData);
+        ProsessTaskData henleggelseBrevTask = new ProsessTaskData(HENLEGGELSESBREV_TASK_TYPE);
+        henleggelseBrevTask.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
+        henleggelseBrevTask.setCallIdFraEksisterende();
+        prosessTaskRepository.lagre(henleggelseBrevTask);
     }
 
-    private boolean kanSendeHenleggelsebrev(long behandlingId) {
+    private void informerSelvbetjening(Behandling behandling) {
+        ProsessTaskData selvbetjeningTask = new ProsessTaskData(SELVBETJENING_HENLAGT_TASKTYPE);
+        selvbetjeningTask.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
+        selvbetjeningTask.setCallIdFraEksisterende();
+        prosessTaskRepository.lagre(selvbetjeningTask);
+    }
+
+    private boolean erDetSendtVarsel(long behandlingId) {
         return brevSporingRepository.harVarselBrevSendtForBehandlingId(behandlingId);
     }
 

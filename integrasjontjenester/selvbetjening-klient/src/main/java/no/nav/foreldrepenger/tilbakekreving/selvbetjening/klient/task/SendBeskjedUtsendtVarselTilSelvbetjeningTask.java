@@ -1,9 +1,11 @@
-package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.selvbetjening;
+package no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.task;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
+import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.SelvbetjeningTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.dto.Hendelse;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
@@ -15,20 +17,20 @@ public class SendBeskjedUtsendtVarselTilSelvbetjeningTask implements ProsessTask
 
     public static final String TASKTYPE = "send.beskjed.utsendt.varsel.selvbetjening";
 
-    private VarselSelvbetjeningTjeneste varselSelvbetjeningTjeneste;
+    private SelvbetjeningTjeneste selvbetjeningTjeneste;
 
     SendBeskjedUtsendtVarselTilSelvbetjeningTask() {
         //for CDI proxy
     }
 
     @Inject
-    public SendBeskjedUtsendtVarselTilSelvbetjeningTask(VarselSelvbetjeningTjeneste varselSelvbetjeningTjeneste) {
-        this.varselSelvbetjeningTjeneste = varselSelvbetjeningTjeneste;
+    public SendBeskjedUtsendtVarselTilSelvbetjeningTask(SelvbetjeningTjeneste selvbetjeningTjeneste) {
+        this.selvbetjeningTjeneste = selvbetjeningTjeneste;
     }
 
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
         Long behandlingId = prosessTaskData.getBehandlingId();
-        varselSelvbetjeningTjeneste.sendBeskjedOmUtsendtVarsel(behandlingId);
+        selvbetjeningTjeneste.sendMelding(behandlingId, Hendelse.TILBAKEKREVING_SPM);
     }
 }

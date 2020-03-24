@@ -32,7 +32,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <!-- Felles avhengigheter i prosjektet Disse skal ALLTID være en 
+        <!-- Felles avhengigheter i prosjektet Disse skal ALLTID være en
             RELEASE-avhengighet UNNTAK: feature-brancher og lokalt -->
         <felles.version>1.5-20200129145325-846bbaf</felles.version>
         <prosesstask.version>2.0.0-20200118083448-d87fd6d</prosesstask.version>
@@ -49,7 +49,7 @@
         <junit.version>5.6.0</junit.version>
         <logstash.version>6.3</logstash.version>
 
-        <!-- Transitive avh. versjoner for å sikre unikhet (enforcer dependencyConvergence). 
+        <!-- Transitive avh. versjoner for å sikre unikhet (enforcer dependencyConvergence).
             Skal ikke benyttes direkte av vår egen kode. -->
         <apache.ws.xmlschema.version>2.2.5</apache.ws.xmlschema.version>
         <javaslang.version>2.0.6</javaslang.version>
@@ -64,7 +64,7 @@
     </properties>
     <dependencies>
 
-        <!-- Avhengigeter som fjernes fra JDK11 som er del av JavaSE. Legger 
+        <!-- Avhengigeter som fjernes fra JDK11 som er del av JavaSE. Legger
             til her framfor med add-modules. -->
         <dependency>
             <groupId>javax.xml.bind</groupId>
@@ -294,6 +294,11 @@
             <dependency>
                 <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
                 <artifactId>datavarehus</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+                <artifactId>selvbetjening-klient</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -785,9 +790,9 @@
                                     <version>[3.5.3,)</version>
                                 </requireMavenVersion>
                                 <dependencyConvergence />
-                                <!-- Ikke kommenter inn denne. Det brekker 
-                                    muligheten til å bygge bare deler av prosjektet https://issues.apache.org/jira/browse/MENFORCER-189 
-                                    -> "ReactorModuleConvergence is not compatible with 'advanced' reactor options: 
+                                <!-- Ikke kommenter inn denne. Det brekker
+                                    muligheten til å bygge bare deler av prosjektet https://issues.apache.org/jira/browse/MENFORCER-189
+                                    -> "ReactorModuleConvergence is not compatible with 'advanced' reactor options:
                                     -pl, -rf" <reactorModuleConvergence /> -->
                             </rules>
                         </configuration>
