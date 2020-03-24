@@ -72,6 +72,7 @@ public class SelvbetjeningTjeneste {
             throw new IllegalArgumentException("Klarer ikke å finne norsk ident for aktørId");
         }
 
+        LocalDateTime nå = LocalDateTime.now();
         SelvbetjeningMelding.Builder meldingsBuilder = SelvbetjeningMelding.builder()
             .medAktørId(aktørId)
             .medNorskIdent(personIdent)
@@ -79,13 +80,12 @@ public class SelvbetjeningTjeneste {
             .medDialogId(saksnummer.getVerdi()) // unik referanse, saksnummer er akkurat unikt nok
             .medYtelseType(fagsak.getFagsakYtelseType())
             .medDokumentId(varselSporing.getDokumentId())
-            .medHendelse(hendelse);
+            .medHendelse(hendelse)
+            .medOpprettet(nå);
 
         if (Hendelse.TILBAKEKREVING_SPM.equals(hendelse)) {
-            LocalDateTime nå = LocalDateTime.now();
             meldingsBuilder
                 .medJournalpostId(varselSporing.getJournalpostId())
-                .medOpprettet(nå)
                 .medGyldigTil(nå.plusWeeks(3).toLocalDate());
         }
 
@@ -93,15 +93,10 @@ public class SelvbetjeningTjeneste {
     }
 
     private void logMelding(String msg, Hendelse hendelse, String personIdent) {
-        String hendelseMsg = Hendelse.TILBAKEKREVING_SPM.equals(hendelse) ? "utsendt tilbakekrevingsvarsel"
-            : Hendelse.TILBAKEKREVING_FATTET_VEDTAK.equals(hendelse) ? "fattet vedtak"
-            : Hendelse.TILBAKEKREVING_HENLAGT.equals(hendelse) ? "behandling henlagt"
-            : "";
-
         if (ENV.isProd()) {
-            logger.info("{} beskjed til selvbetjening om {}", msg, hendelseMsg);
+            logger.info("{} beskjed til selvbetjening om {}", msg, hendelse.getBeskrivelse());
         } else {
-            logger.info("{} beskjed til selvbetjening om {} for fnr {}", msg, hendelseMsg, personIdent);
+            logger.info("{} beskjed til selvbetjening om {} for fnr {}", msg, hendelse.getBeskrivelse(), personIdent);
         }
     }
 }

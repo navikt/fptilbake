@@ -75,26 +75,25 @@ public class HenleggBehandlingTjeneste {
         behandlingskontrollTjeneste.henleggBehandling(kontekst, årsakKode);
 
         if (erDetSendtVarsel(behandlingId)) {
-            opprettHenleggelseTasker(behandling);
+            sendHenleggelsesbrev(behandling);
+            informerSelvbetjening(behandling);
         }
         opprettHistorikkinnslag(behandling, årsakKode, begrunnelse);
         eksternBehandlingRepository.deaktivateTilkobling(behandlingId);
     }
 
-    private void opprettHenleggelseTasker(Behandling behandling) {
+    private void sendHenleggelsesbrev(Behandling behandling) {
         ProsessTaskData henleggelseBrevTask = new ProsessTaskData(HENLEGGELSESBREV_TASK_TYPE);
         henleggelseBrevTask.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         henleggelseBrevTask.setCallIdFraEksisterende();
+        prosessTaskRepository.lagre(henleggelseBrevTask);
+    }
 
+    private void informerSelvbetjening(Behandling behandling) {
         ProsessTaskData selvbetjeningTask = new ProsessTaskData(SELVBETJENING_HENLAGT_TASKTYPE);
         selvbetjeningTask.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         selvbetjeningTask.setCallIdFraEksisterende();
-
-        ProsessTaskGruppe taskGruppe = new ProsessTaskGruppe();
-        taskGruppe.addNesteParallell(henleggelseBrevTask);
-        taskGruppe.addNesteParallell(selvbetjeningTask);
-
-        prosessTaskRepository.lagre(taskGruppe);
+        prosessTaskRepository.lagre(selvbetjeningTask);
     }
 
     private boolean erDetSendtVarsel(long behandlingId) {

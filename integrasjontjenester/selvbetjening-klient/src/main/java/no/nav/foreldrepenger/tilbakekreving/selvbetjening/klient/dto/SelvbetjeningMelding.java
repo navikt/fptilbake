@@ -4,12 +4,14 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class SelvbetjeningMelding {
     @JsonProperty("ytelseType")
     private String ytelseType;
@@ -146,10 +148,10 @@ public class SelvbetjeningMelding {
             Objects.requireNonNull(kladd.dokumentId, "mangler dokumentId");
             Objects.requireNonNull(kladd.dialogId, "mangler dialogId");
             Objects.requireNonNull(kladd.hendelse, "mangler hendelse");
+            Objects.requireNonNull(kladd.opprettet, "mangler opprettet");
             if (Hendelse.TILBAKEKREVING_SPM.equals(kladd.hendelse)) {
                 Objects.requireNonNull(kladd.journalpostId, "mangler journalpostId");
                 Objects.requireNonNull(kladd.gyldigTil, "mangler gyldigTil");
-                Objects.requireNonNull(kladd.opprettet, "mangler opprettet");
             }
             return kladd;
         }
