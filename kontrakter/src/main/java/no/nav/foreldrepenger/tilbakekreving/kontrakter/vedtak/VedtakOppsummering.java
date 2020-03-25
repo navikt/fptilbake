@@ -7,10 +7,7 @@ import java.util.UUID;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.BehandlingType;
-import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.RevurderingOpprettetÅrsak;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.YtelseType;
 
 public class VedtakOppsummering {
@@ -22,8 +19,6 @@ public class VedtakOppsummering {
     @NotNull
     private UUID behandlingUuid;
     private UUID forrigeBehandling;
-    @JsonProperty(value = "revurderingOpprettetAarsak")
-    private RevurderingOpprettetÅrsak revurderingOpprettetÅrsak;
     @NotNull
     @Size(min = 1, max = 100)
     private List<UUID> referteFagsakBehandlinger;
@@ -38,7 +33,6 @@ public class VedtakOppsummering {
     private String ansvarligBeslutter;
     @NotNull
     private OffsetDateTime behandlingOpprettetTid;
-    private OffsetDateTime behandlingAvsluttetTid; //hvis denne skal settes, må hendelse sendes etter at behandling er avsluttet
     @NotNull
     private OffsetDateTime vedtakFattetTid;
     @NotNull
@@ -75,14 +69,6 @@ public class VedtakOppsummering {
 
     public void setForrigeBehandling(UUID forrigeBehandling) {
         this.forrigeBehandling = forrigeBehandling;
-    }
-
-    public RevurderingOpprettetÅrsak getRevurderingOpprettetÅrsak() {
-        return revurderingOpprettetÅrsak;
-    }
-
-    public void setRevurderingOpprettetÅrsak(RevurderingOpprettetÅrsak revurderingOpprettetÅrsak) {
-        this.revurderingOpprettetÅrsak = revurderingOpprettetÅrsak;
     }
 
     public List<UUID> getReferteFagsakBehandlinger() {
@@ -139,14 +125,6 @@ public class VedtakOppsummering {
 
     public void setBehandlingOpprettetTid(OffsetDateTime behandlingOpprettetTid) {
         this.behandlingOpprettetTid = behandlingOpprettetTid;
-    }
-
-    public OffsetDateTime getBehandlingAvsluttetTid() {
-        return behandlingAvsluttetTid;
-    }
-
-    public void setBehandlingAvsluttetTid(OffsetDateTime behandlingAvsluttetTid) {
-        this.behandlingAvsluttetTid = behandlingAvsluttetTid;
     }
 
     public OffsetDateTime getVedtakFattetTid() {

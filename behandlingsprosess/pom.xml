@@ -51,6 +51,12 @@
             <artifactId>selvbetjening-klient</artifactId>
         </dependency>
 
+        <!-- for datavarehus -->
+        <dependency>
+            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+            <artifactId>datavarehus</artifactId>
+        </dependency>
+
         <!-- for hent grunnlag -->
         <dependency>
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>

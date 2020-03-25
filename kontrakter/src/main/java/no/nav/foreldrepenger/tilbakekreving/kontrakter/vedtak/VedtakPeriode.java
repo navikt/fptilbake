@@ -13,6 +13,8 @@ public class VedtakPeriode {
     private String hendelseUndertypeTekst;
     private boolean harBruktSjetteLedd;
     private Aktsomhet aktsomhet;
+    @JsonProperty(value = "vilkaarResultat")
+    private UtvidetVilkårResultat vilkårResultat;
     @JsonProperty(value = "saerligeGrunner")
     private SærligeGrunner særligeGrunner;
     @JsonProperty(value = "feilutbetaltBeloep")
@@ -60,6 +62,14 @@ public class VedtakPeriode {
 
     public void setHarBruktSjetteLedd(boolean harBruktSjetteLedd) {
         this.harBruktSjetteLedd = harBruktSjetteLedd;
+    }
+
+    public UtvidetVilkårResultat getVilkårResultat() {
+        return vilkårResultat;
+    }
+
+    public void setVilkårResultat(UtvidetVilkårResultat vilkårResultat) {
+        this.vilkårResultat = vilkårResultat;
     }
 
     public Aktsomhet getAktsomhet() {

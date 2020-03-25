@@ -5,6 +5,10 @@ import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporingRepository;
+import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.SendVedtakHendelserTilDvhTask;
+import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.VedtakOppsummeringTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping.VedtakOppsummeringMapper;
+import no.nav.foreldrepenger.tilbakekreving.kontrakter.vedtak.VedtakOppsummering;
 import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.task.SendVedtakFattetTilSelvbetjeningTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
@@ -15,6 +19,7 @@ public class ProsessTaskIverksett {
 
     private ProsessTaskRepository taskRepository;
     private BrevSporingRepository brevSporingRepository;
+    private VedtakOppsummeringTjeneste vedtakOppsummeringTjeneste;
 
     ProsessTaskIverksett() {
         // for CDI
@@ -22,9 +27,11 @@ public class ProsessTaskIverksett {
 
     @Inject
     public ProsessTaskIverksett(ProsessTaskRepository taskRepository,
-                                BrevSporingRepository brevSporingRepository) {
+                                BrevSporingRepository brevSporingRepository,
+                                VedtakOppsummeringTjeneste vedtakOppsummeringTjeneste) {
         this.taskRepository = taskRepository;
         this.brevSporingRepository = brevSporingRepository;
+        this.vedtakOppsummeringTjeneste = vedtakOppsummeringTjeneste;
     }
 
     public void opprettIverksettingstasker(Behandling behandling, boolean sendVedtaksbrev) {
@@ -44,5 +51,13 @@ public class ProsessTaskIverksett {
             selvbetjeningTask.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
             taskRepository.lagre(selvbetjeningTask);
         }
+        opprettDvhProsessTask(behandling.getId());
+    }
+
+    private void opprettDvhProsessTask(long behandlingId){
+        ProsessTaskData dvhProsessTaskData = new ProsessTaskData(SendVedtakHendelserTilDvhTask.TASKTYPE);
+        VedtakOppsummering vedtakOppsummering = vedtakOppsummeringTjeneste.hentVedtakOppsummering(behandlingId);
+        dvhProsessTaskData.setPayload(VedtakOppsummeringMapper.tilJsonString(vedtakOppsummering));
+        taskRepository.lagre(dvhProsessTaskData);
     }
 }
