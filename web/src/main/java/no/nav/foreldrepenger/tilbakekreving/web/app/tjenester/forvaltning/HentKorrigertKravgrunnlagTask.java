@@ -89,7 +89,7 @@ public class HentKorrigertKravgrunnlagTask implements ProsessTaskHandler {
     private HentKravgrunnlagDetaljDto forberedHentKravgrunnlagDetailRequest(String kravgrunnlagId, String ansvarligEnhet,
                                                                             String saksbehId) {
         HentKravgrunnlagDetaljDto hentKravgrunnlagDetalj = new HentKravgrunnlagDetaljDto();
-        hentKravgrunnlagDetalj.setKodeAksjon(KodeAksjon.HENT_GRUNNLAG_OMGJØRING.getKode());
+        hentKravgrunnlagDetalj.setKodeAksjon(KodeAksjon.HENT_KORRIGERT_KRAVGRUNNLAG.getKode());
         hentKravgrunnlagDetalj.setEnhetAnsvarlig(ansvarligEnhet);
         hentKravgrunnlagDetalj.setKravgrunnlagId(new BigInteger(kravgrunnlagId));
         hentKravgrunnlagDetalj.setSaksbehId(saksbehId);
