@@ -9,7 +9,6 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.finn.unleash.Unleash;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporing;
@@ -35,8 +34,6 @@ public class SelvbetjeningTjeneste {
     private SelvbetjeningMeldingProducer meldingProducer;
     private AktørConsumerMedCache aktørConsumer;
 
-    private Unleash unleash;
-
     SelvbetjeningTjeneste() {
         // for CDI proxy
     }
@@ -44,13 +41,11 @@ public class SelvbetjeningTjeneste {
     @Inject
     public SelvbetjeningTjeneste(BehandlingRepositoryProvider repositoryProvider,
                                  SelvbetjeningMeldingProducer meldingProducer,
-                                 AktørConsumerMedCache aktørConsumer,
-                                 Unleash unleash) {
+                                 AktørConsumerMedCache aktørConsumer) {
         this.brevSporingRepository = repositoryProvider.getBrevSporingRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.meldingProducer = meldingProducer;
         this.aktørConsumer = aktørConsumer;
-        this.unleash = unleash;
     }
 
     public void sendMelding(Long behandlingId, Hendelse hendelse) {
@@ -66,12 +61,12 @@ public class SelvbetjeningTjeneste {
             meldingProducer.sendMelding(svInfo);
             logMelding("Sendte", hendelse, personIdent.get());
         } else {
-            logger.info("Sending av {} meldinger til selvbetjening er slått av", hendelse.getBeskrivelse());
+            logger.info("Sending av {} meldinger til selvbetjening er slått av i prod", hendelse.getBeskrivelse());
         }
     }
 
     private boolean kanSendeMelding(Hendelse hendelse) {
-        return Hendelse.TILBAKEKREVING_SPM.equals(hendelse) || unleash.isEnabled("fptilbake.avslutt-meldinger-selvbetjening", false);
+        return Hendelse.TILBAKEKREVING_SPM.equals(hendelse) || !no.nav.vedtak.util.env.Environment.current().isProd();
     }
 
     private SelvbetjeningMelding lagSelvbetjeningMelding(Behandling behandling,
