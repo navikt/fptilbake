@@ -6,12 +6,12 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.prosesstask.UtvidetProsessTaskRepository;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping.VedtakOppsummeringMapper;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.vedtak.VedtakOppsummering;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 
 @ApplicationScoped
 @ProsessTask(SendVedtakHendelserTilDvhTask.TASKTYPE)
@@ -20,7 +20,7 @@ public class SendVedtakHendelserTilDvhTask implements ProsessTaskHandler {
 
     public static final String TASKTYPE = "dvh.send.vedtak";
 
-    private UtvidetProsessTaskRepository prosessTaskRepository;
+    private ProsessTaskRepository taskRepository;
     private VedtakOppsummeringTjeneste vedtakOppsummeringTjeneste;
     private VedtakOppsummeringKafkaProducer kafkaProducer;
 
@@ -31,10 +31,10 @@ public class SendVedtakHendelserTilDvhTask implements ProsessTaskHandler {
     }
 
     @Inject
-    public SendVedtakHendelserTilDvhTask(UtvidetProsessTaskRepository prosessTaskRepository,
+    public SendVedtakHendelserTilDvhTask(ProsessTaskRepository taskRepository,
                                          VedtakOppsummeringTjeneste vedtakOppsummeringTjeneste,
                                          VedtakOppsummeringKafkaProducer kafkaProducer) {
-        this.prosessTaskRepository = prosessTaskRepository;
+        this.taskRepository = taskRepository;
         this.vedtakOppsummeringTjeneste = vedtakOppsummeringTjeneste;
         this.kafkaProducer = kafkaProducer;
     }
@@ -45,7 +45,8 @@ public class SendVedtakHendelserTilDvhTask implements ProsessTaskHandler {
         VedtakOppsummering vedtakOppsummering = vedtakOppsummeringTjeneste.hentVedtakOppsummering(behandlingId);
         validate(vedtakOppsummering);
         kafkaProducer.sendMelding(vedtakOppsummering);
-        prosessTaskRepository.oppdaterTaskPayload(prosessTaskData.getId(), VedtakOppsummeringMapper.tilJsonString(vedtakOppsummering));
+        prosessTaskData.setPayload(VedtakOppsummeringMapper.tilJsonString(vedtakOppsummering));
+        taskRepository.lagre(prosessTaskData);
     }
 
     private void validate(Object object) {
