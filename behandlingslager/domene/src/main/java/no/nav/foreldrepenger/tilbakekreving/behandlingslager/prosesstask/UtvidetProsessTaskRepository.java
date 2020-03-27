@@ -17,7 +17,7 @@ public class UtvidetProsessTaskRepository {
 
     private EntityManager entityManager;
 
-    UtvidetProsessTaskRepository(){
+    UtvidetProsessTaskRepository() {
         // for CDI proxy
     }
 

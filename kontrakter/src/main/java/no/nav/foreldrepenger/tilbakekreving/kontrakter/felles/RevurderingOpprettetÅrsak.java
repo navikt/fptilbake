@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse;
+package no.nav.foreldrepenger.tilbakekreving.kontrakter.felles;
 
 public enum RevurderingOpprettetÅrsak {
     KLAGE_NFP,

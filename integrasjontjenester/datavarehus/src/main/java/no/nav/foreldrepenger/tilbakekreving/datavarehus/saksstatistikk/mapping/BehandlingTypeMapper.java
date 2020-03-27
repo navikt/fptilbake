@@ -2,7 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping;
 
 import java.util.Map;
 
-import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.BehandlingType;
+import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.BehandlingType;
 
 public class BehandlingTypeMapper {
 

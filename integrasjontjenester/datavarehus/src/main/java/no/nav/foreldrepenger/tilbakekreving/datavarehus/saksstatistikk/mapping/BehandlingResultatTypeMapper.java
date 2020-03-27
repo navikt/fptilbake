@@ -6,7 +6,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
-import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.BehandlingResultat;
+import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.BehandlingResultat;
 
 public class BehandlingResultatTypeMapper {
 

@@ -1,5 +1,20 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.iverksettvedtak;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertThrows;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import javax.persistence.FlushModeType;
+
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.mockito.Mockito;
+
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandleStegResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.transisjoner.FellesTransisjoner;
@@ -13,15 +28,18 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporing;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProviderImpl;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.IverksettingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
+import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.SendVedtakHendelserTilDvhTask;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.task.SendVedtakFattetTilSelvbetjeningTask;
 import no.nav.vedtak.exception.TekniskException;
@@ -30,18 +48,6 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
 import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskEventPubliserer;
 import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepositoryImpl;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.Mockito;
-
-import javax.persistence.FlushModeType;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertThrows;
 
 public class IverksetteVedtakStegImplTest {
 
@@ -55,6 +61,7 @@ public class IverksetteVedtakStegImplTest {
     private IverksetteVedtakSteg iverksetteVedtakSteg = new IverksetteVedtakStegImpl(repoProvider, prosessTaskIverksett);
     private BehandlingVedtakRepository behandlingVedtakRepository = repoProvider.getBehandlingVedtakRepository();
     private BehandlingRepository behandlingRepository = repoProvider.getBehandlingRepository();
+    private EksternBehandlingRepository eksternBehandlingRepository = repoProvider.getEksternBehandlingRepository();
 
     private ScenarioSimple simple = ScenarioSimple.simple();
     private Behandling behandling;
@@ -66,7 +73,7 @@ public class IverksetteVedtakStegImplTest {
         behandling = simple.lagre(repoProvider);
         BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(behandling);
         behandlingskontrollKontekst = new BehandlingskontrollKontekst(behandling.getFagsakId(), behandling.getAktørId(), behandlingLås);
-
+        opprettEksternBehandling(behandling);
     }
 
     @Test
@@ -90,11 +97,12 @@ public class IverksetteVedtakStegImplTest {
         assertBehandlingVedtak(behandling);
 
         List<ProsessTaskData> tasker = prosessTaskRepository.finnAlle(ProsessTaskStatus.KLAR);
-        assertThat(tasker.size()).isEqualTo(4);
+        assertThat(tasker.size()).isEqualTo(5);
         assertThat(tasker.get(0).getTaskType()).isEqualTo(SendØkonomiTibakekerevingsVedtakTask.TASKTYPE);
         assertThat(tasker.get(1).getTaskType()).isEqualTo(SendVedtaksbrevTask.TASKTYPE);
         assertThat(tasker.get(2).getTaskType()).isEqualTo(AvsluttBehandlingTask.TASKTYPE);
         assertThat(tasker.get(3).getTaskType()).isEqualTo(SendVedtakFattetTilSelvbetjeningTask.TASKTYPE);
+        assertThat(tasker.get(4).getTaskType()).isEqualTo(SendVedtakHendelserTilDvhTask.TASKTYPE);
     }
 
     @Test
@@ -106,6 +114,8 @@ public class IverksetteVedtakStegImplTest {
         revurdering.getBehandlingÅrsaker().addAll(behandlingÅrsaker);
         BehandlingLås revurderingBehandlingLås = behandlingRepository.taSkriveLås(revurdering);
         behandlingRepository.lagre(revurdering,revurderingBehandlingLås);
+        opprettEksternBehandling(revurdering);
+
         opprettBehandlingVedtak(revurdering,IverksettingStatus.IKKE_IVERKSATT);
 
         BehandleStegResultat stegResultat = iverksetteVedtakSteg.utførSteg(new BehandlingskontrollKontekst(revurdering.getFagsakId(), revurdering.getAktørId(), revurderingBehandlingLås));
@@ -113,9 +123,10 @@ public class IverksetteVedtakStegImplTest {
         assertBehandlingVedtak(revurdering);
 
         List<ProsessTaskData> tasker = prosessTaskRepository.finnAlle(ProsessTaskStatus.KLAR);
-        assertThat(tasker.size()).isEqualTo(2);
+        assertThat(tasker.size()).isEqualTo(3);
         assertThat(tasker.get(0).getTaskType()).isEqualTo(SendØkonomiTibakekerevingsVedtakTask.TASKTYPE);
         assertThat(tasker.get(1).getTaskType()).isEqualTo(AvsluttBehandlingTask.TASKTYPE);
+        assertThat(tasker.get(2).getTaskType()).isEqualTo(SendVedtakHendelserTilDvhTask.TASKTYPE);
     }
 
     @Test
@@ -127,6 +138,7 @@ public class IverksetteVedtakStegImplTest {
         revurdering.getBehandlingÅrsaker().addAll(behandlingÅrsaker);
         BehandlingLås revurderingBehandlingLås = behandlingRepository.taSkriveLås(revurdering);
         behandlingRepository.lagre(revurdering,revurderingBehandlingLås);
+        opprettEksternBehandling(revurdering);
         opprettBehandlingVedtak(revurdering,IverksettingStatus.IKKE_IVERKSATT);
 
         BehandleStegResultat stegResultat = iverksetteVedtakSteg.utførSteg(new BehandlingskontrollKontekst(revurdering.getFagsakId(), revurdering.getAktørId(), revurderingBehandlingLås));
@@ -134,10 +146,11 @@ public class IverksetteVedtakStegImplTest {
         assertBehandlingVedtak(revurdering);
 
         List<ProsessTaskData> tasker = prosessTaskRepository.finnAlle(ProsessTaskStatus.KLAR);
-        assertThat(tasker.size()).isEqualTo(3);
+        assertThat(tasker.size()).isEqualTo(4);
         assertThat(tasker.get(0).getTaskType()).isEqualTo(SendØkonomiTibakekerevingsVedtakTask.TASKTYPE);
         assertThat(tasker.get(1).getTaskType()).isEqualTo(SendVedtaksbrevTask.TASKTYPE);
         assertThat(tasker.get(2).getTaskType()).isEqualTo(AvsluttBehandlingTask.TASKTYPE);
+        assertThat(tasker.get(3).getTaskType()).isEqualTo(SendVedtakHendelserTilDvhTask.TASKTYPE);
     }
 
     private void opprettBehandlingVedtak(Behandling behandling, IverksettingStatus iverksettingStatus) {
@@ -172,5 +185,10 @@ public class IverksetteVedtakStegImplTest {
             .build();
         brevSporingRepository.lagre(brevSporing);
         repositoryRule.getEntityManager().flush();
+    }
+
+    private void opprettEksternBehandling(Behandling behandling) {
+        EksternBehandling eksternBehandling = new EksternBehandling(behandling, 1l, UUID.randomUUID());
+        eksternBehandlingRepository.lagre(eksternBehandling);
     }
 }

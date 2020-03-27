@@ -6,7 +6,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
-import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.YtelseType;
+import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.YtelseType;
 
 public class YtelseTypeMapper {
 

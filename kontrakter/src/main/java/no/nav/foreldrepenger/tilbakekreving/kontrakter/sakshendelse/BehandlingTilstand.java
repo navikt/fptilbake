@@ -6,6 +6,12 @@ import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.BehandlingResultat;
+import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.BehandlingStatus;
+import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.BehandlingType;
+import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.RevurderingOpprettetÅrsak;
+import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.YtelseType;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class BehandlingTilstand {
     private OffsetDateTime funksjonellTid;
@@ -26,6 +32,7 @@ public class BehandlingTilstand {
     private String ansvarligBeslutter;
 
     private UUID forrigeBehandling;
+    @JsonProperty(value = "revurderingOpprettetAarsak")
     private RevurderingOpprettetÅrsak revurderingOpprettetÅrsak;
 
     public OffsetDateTime getFunksjonellTid() {

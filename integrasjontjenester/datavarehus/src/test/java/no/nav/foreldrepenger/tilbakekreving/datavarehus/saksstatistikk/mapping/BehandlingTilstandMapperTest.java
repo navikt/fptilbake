@@ -7,19 +7,19 @@ import java.util.UUID;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
-import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.BehandlingResultat;
-import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.BehandlingStatus;
+import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.BehandlingResultat;
+import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.BehandlingStatus;
+import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.BehandlingType;
+import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.RevurderingOpprettetÅrsak;
+import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.YtelseType;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.BehandlingTilstand;
-import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.BehandlingType;
-import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.RevurderingOpprettetÅrsak;
-import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.YtelseType;
 
 public class BehandlingTilstandMapperTest {
 
     @Test
     public void skal_serialisere_riktig() {
         String string = BehandlingTilstandMapper.tilJsonString(lagTestTilstand());
-        Assertions.assertThat(string).isEqualTo("{\"funksjonellTid\":\"2020-03-05T13:48:10.001Z\",\"saksnummer\":\"SNR123\",\"ytelseType\":\"SVP\",\"behandlingUuid\":\"dd31dc4f-ea61-4124-8943-7738fa9b7b7a\",\"behandlingType\":\"REVURDERING_TILBAKEKREVING\",\"behandlingStatus\":\"AVSLUTTET\",\"behandlingResultat\":\"HENLAGT_FEILOPPRETTET\",\"erBehandlingManueltOpprettet\":false,\"behandlendeEnhetKode\":\"1234\",\"ansvarligSaksbehandler\":\"Z111111\",\"forrigeBehandling\":\"a93862f2-b72c-4e44-b042-0829599c3b53\",\"revurderingOpprettetÅrsak\":\"KLAGE_NFP\",\"venterPaaBruker\":false,\"venterPaaOekonomi\":false}");
+        Assertions.assertThat(string).isEqualTo("{\"funksjonellTid\":\"2020-03-05T13:48:10.001Z\",\"saksnummer\":\"SNR123\",\"ytelseType\":\"SVP\",\"behandlingUuid\":\"dd31dc4f-ea61-4124-8943-7738fa9b7b7a\",\"behandlingType\":\"REVURDERING_TILBAKEKREVING\",\"behandlingStatus\":\"AVSLUTTET\",\"behandlingResultat\":\"HENLAGT_FEILOPPRETTET\",\"erBehandlingManueltOpprettet\":false,\"behandlendeEnhetKode\":\"1234\",\"ansvarligSaksbehandler\":\"Z111111\",\"forrigeBehandling\":\"a93862f2-b72c-4e44-b042-0829599c3b53\",\"venterPaaBruker\":false,\"venterPaaOekonomi\":false,\"revurderingOpprettetAarsak\":\"KLAGE_NFP\"}");
     }
 
     @Test
