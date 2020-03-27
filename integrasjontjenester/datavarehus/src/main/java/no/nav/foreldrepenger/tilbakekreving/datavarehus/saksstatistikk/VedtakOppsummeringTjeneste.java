@@ -10,8 +10,6 @@ import java.util.Optional;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import com.google.common.collect.Lists;
-
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultatPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BeregningResultat;
@@ -21,6 +19,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
@@ -37,6 +36,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.V
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseRepository;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping.BehandlingTypeMapper;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping.YtelseTypeMapper;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.vedtak.Aktsomhet;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.vedtak.SærligGrunn;
@@ -76,6 +76,8 @@ public class VedtakOppsummeringTjeneste {
 
     public VedtakOppsummering hentVedtakOppsummering(long behandlingId) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
+        Fagsak fagsak = behandling.getFagsak();
+        Saksnummer saksnummer = fagsak.getSaksnummer();
         Optional<BehandlingVedtak> behandlingVedtak = behandlingVedtakRepository.hentBehandlingvedtakForBehandlingId(behandlingId);
         EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandlingId);
         Optional<BehandlingÅrsak> behandlingsårsak = behandling.getBehandlingÅrsaker().stream().findFirst();
@@ -89,14 +91,14 @@ public class VedtakOppsummeringTjeneste {
         }
         VedtakOppsummering vedtakOppsummering = new VedtakOppsummering();
         vedtakOppsummering.setBehandlingUuid(behandling.getUuid());
-        vedtakOppsummering.setSaksnummer(behandling.getFagsak().getSaksnummer().getVerdi());
-        vedtakOppsummering.setYtelseType(YtelseTypeMapper.getYtelseType(behandling.getFagsak().getFagsakYtelseType()));
+        vedtakOppsummering.setSaksnummer(saksnummer.getVerdi());
+        vedtakOppsummering.setYtelseType(YtelseTypeMapper.getYtelseType(fagsak.getFagsakYtelseType()));
         vedtakOppsummering.setAnsvarligSaksbehandler(behandling.getAnsvarligSaksbehandler());
         vedtakOppsummering.setAnsvarligBeslutter(behandling.getAnsvarligBeslutter());
         vedtakOppsummering.setBehandlingType(BehandlingTypeMapper.getBehandlingType(behandling.getType()));
-        vedtakOppsummering.setBehandlingOpprettetTid(konvertTidspunkt(behandling.getOpprettetTidspunkt()));
-        vedtakOppsummering.setVedtakFattetTid(konvertTidspunkt(behandlingVedtak.get().getOpprettetTidspunkt()));
-        vedtakOppsummering.setReferteFagsakBehandlinger(Lists.newArrayList(eksternBehandling.getEksternUuid()));
+        vedtakOppsummering.setBehandlingOpprettetTid(tilOffsetDateTime(behandling.getOpprettetTidspunkt()));
+        vedtakOppsummering.setVedtakFattetTid(tilOffsetDateTime(behandlingVedtak.get().getOpprettetTidspunkt()));
+        vedtakOppsummering.setReferteFagsakBehandling(eksternBehandling.getEksternUuid());
         vedtakOppsummering.setBehandlendeEnhetKode(behandling.getBehandlendeEnhetId());
         vedtakOppsummering.setErBehandlingManueltOpprettet(behandling.isManueltOpprettet());
         forrigeBehandling.ifPresent(forrige -> vedtakOppsummering.setForrigeBehandling(forrige.getUuid()));
@@ -108,12 +110,13 @@ public class VedtakOppsummeringTjeneste {
         List<VedtakPeriode> vedtakPerioder = new ArrayList<>();
         Optional<VilkårVurderingEntitet> vilkårVurderingEntitet = vilkårsvurderingRepository.finnVilkårsvurdering(behandlingId);
         Optional<VurdertForeldelse> vurdertForeldelseEntitet = foreldelseRepository.finnVurdertForeldelse(behandlingId);
-        vilkårVurderingEntitet.ifPresent(vilkårVurdering -> vedtakPerioder.addAll(hentVilkårPerioder(behandlingId, vilkårVurdering)));
-        vurdertForeldelseEntitet.ifPresent(vurdertForeldelse -> vedtakPerioder.addAll(hentForeldelsePerioder(behandlingId, vurdertForeldelse)));
+        BeregningResultat beregningResultat = beregningTjeneste.beregn(behandlingId);
+        vilkårVurderingEntitet.ifPresent(vilkårVurdering -> vedtakPerioder.addAll(hentVilkårPerioder(behandlingId, beregningResultat, vilkårVurdering)));
+        vurdertForeldelseEntitet.ifPresent(vurdertForeldelse -> vedtakPerioder.addAll(hentForeldelsePerioder(behandlingId, beregningResultat, vurdertForeldelse)));
         return vedtakPerioder;
     }
 
-    private List<VedtakPeriode> hentVilkårPerioder(long behandlingId, VilkårVurderingEntitet vilkårVurderingEntitet) {
+    private List<VedtakPeriode> hentVilkårPerioder(long behandlingId, BeregningResultat beregningResultat, VilkårVurderingEntitet vilkårVurderingEntitet) {
         List<VedtakPeriode> vilkårPerioder = new ArrayList<>();
         List<VilkårVurderingPeriodeEntitet> vilkårVurderingPerioder = vilkårVurderingEntitet.getPerioder();
         for (VilkårVurderingPeriodeEntitet periodeEntitet : vilkårVurderingPerioder) {
@@ -122,27 +125,31 @@ public class VedtakOppsummeringTjeneste {
             vedtakPeriode.setTom(periodeEntitet.getPeriode().getTom());
             if (periodeEntitet.getAktsomhet() != null) {
                 vedtakPeriode.setAktsomhet(Aktsomhet.valueOf(periodeEntitet.getAktsomhetResultat().getKode()));
-                vedtakPeriode.setHarBruktSjetteLedd(periodeEntitet.tilbakekrevesSmåbeløp() == null ? false : periodeEntitet.tilbakekrevesSmåbeløp());
+                if(periodeEntitet.tilbakekrevesSmåbeløp() != null){
+                    vedtakPeriode.setHarBruktSjetteLedd(periodeEntitet.tilbakekrevesSmåbeløp());
+                }
                 vedtakPeriode.setSærligeGrunner(hentSærligGrunner(periodeEntitet));
             }
             vedtakPeriode.setVilkårResultat(UtvidetVilkårResultat.valueOf(periodeEntitet.getVilkårResultat().getKode()));
-            settBeløp(behandlingId, vedtakPeriode);
+            settBeløp(behandlingId, beregningResultat, vedtakPeriode);
             settHendelser(behandlingId, vedtakPeriode);
             vilkårPerioder.add(vedtakPeriode);
         }
         return vilkårPerioder;
     }
 
-    private List<VedtakPeriode> hentForeldelsePerioder(long behandlingId, VurdertForeldelse vurdertForeldelse) {
+    private List<VedtakPeriode> hentForeldelsePerioder(long behandlingId, BeregningResultat beregningResultat, VurdertForeldelse vurdertForeldelse) {
         List<VedtakPeriode> foreldelsePerioder = new ArrayList<>();
         for (VurdertForeldelsePeriode foreldelsePeriode : vurdertForeldelse.getVurdertForeldelsePerioder()) {
-            VedtakPeriode vedtakPeriode = new VedtakPeriode();
-            vedtakPeriode.setFom(foreldelsePeriode.getFom());
-            vedtakPeriode.setTom(foreldelsePeriode.getPeriode().getTom());
-            vedtakPeriode.setVilkårResultat(UtvidetVilkårResultat.FORELDET);
-            settBeløp(behandlingId, vedtakPeriode);
-            settHendelser(behandlingId, vedtakPeriode);
-            foreldelsePerioder.add(vedtakPeriode);
+            if(foreldelsePeriode.erForeldet()){
+                VedtakPeriode vedtakPeriode = new VedtakPeriode();
+                vedtakPeriode.setFom(foreldelsePeriode.getFom());
+                vedtakPeriode.setTom(foreldelsePeriode.getPeriode().getTom());
+                vedtakPeriode.setVilkårResultat(UtvidetVilkårResultat.FORELDET);
+                settBeløp(behandlingId, beregningResultat, vedtakPeriode);
+                settHendelser(behandlingId, vedtakPeriode);
+                foreldelsePerioder.add(vedtakPeriode);
+            }
         }
         return foreldelsePerioder;
     }
@@ -160,8 +167,7 @@ public class VedtakOppsummeringTjeneste {
         return null;
     }
 
-    private void settBeløp(long behandlingId, VedtakPeriode vedtakPeriode) {
-        BeregningResultat beregningResultat = beregningTjeneste.beregn(behandlingId);
+    private void settBeløp(long behandlingId, BeregningResultat beregningResultat, VedtakPeriode vedtakPeriode) {
         Periode periode = new Periode(vedtakPeriode.getFom(), vedtakPeriode.getTom());
         Optional<BeregningResultatPeriode> resultatPeriode = beregningResultat.getBeregningResultatPerioder().stream()
             .filter(perioder -> perioder.getPeriode().equals(periode)).findAny();
@@ -188,8 +194,8 @@ public class VedtakOppsummeringTjeneste {
         }
     }
 
-    private OffsetDateTime konvertTidspunkt(LocalDateTime tidspunkt) {
-        return tidspunkt.atZone(ZoneId.systemDefault()).toOffsetDateTime();
+    private OffsetDateTime tilOffsetDateTime(LocalDateTime tidspunkt) {
+        return tidspunkt.atZone(ZoneId.of("UTC")).toOffsetDateTime();
     }
 
     private String hentNavn(String kodeverk, String kode) {

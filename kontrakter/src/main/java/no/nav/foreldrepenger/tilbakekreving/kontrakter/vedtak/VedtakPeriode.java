@@ -3,24 +3,32 @@ package no.nav.foreldrepenger.tilbakekreving.kontrakter.vedtak;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import javax.validation.constraints.NotNull;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class VedtakPeriode {
-
+    @NotNull
     private LocalDate fom;
+    @NotNull
     private LocalDate tom;
+    @NotNull
     private String hendelseTypeTekst;
     private String hendelseUndertypeTekst;
     private boolean harBruktSjetteLedd;
     private Aktsomhet aktsomhet;
+    @NotNull
     @JsonProperty(value = "vilkaarResultat")
     private UtvidetVilkårResultat vilkårResultat;
     @JsonProperty(value = "saerligeGrunner")
     private SærligeGrunner særligeGrunner;
+    @NotNull
     @JsonProperty(value = "feilutbetaltBeloep")
     private BigDecimal feilutbetaltBeløp;
+    @NotNull
     @JsonProperty(value = "tilbakekrevesBruttoBeloep")
     private BigDecimal tilbakekrevesBruttoBeløp;
+    @NotNull
     @JsonProperty(value = "renterBeloep")
     private BigDecimal renterBeløp;
 

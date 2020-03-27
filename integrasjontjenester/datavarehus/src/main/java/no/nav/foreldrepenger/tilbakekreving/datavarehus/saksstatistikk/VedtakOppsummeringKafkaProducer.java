@@ -21,7 +21,7 @@ public class VedtakOppsummeringKafkaProducer {
     }
 
     @Inject
-    public VedtakOppsummeringKafkaProducer(DvhKafkaProducer kafkaProducer, @KonfigVerdi(value = "kafka.dvh.saksstatistikk.topic", defaultVerdi = "privat-tilbakekreving-dvh-saksstatistikk-v1") String topic) {
+    public VedtakOppsummeringKafkaProducer(DvhKafkaProducer kafkaProducer, @KonfigVerdi(value = "kafka.dvh.vedtak.topic", defaultVerdi = "privat-tilbakekreving-dvh-vedtak-v1") String topic) {
         this.kafkaProducer = kafkaProducer;
         this.topic = topic;
     }

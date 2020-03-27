@@ -20,8 +20,7 @@ public class VedtakOppsummering {
     private UUID behandlingUuid;
     private UUID forrigeBehandling;
     @NotNull
-    @Size(min = 1, max = 100)
-    private List<UUID> referteFagsakBehandlinger;
+    private UUID referteFagsakBehandling;
     @NotNull
     private BehandlingType behandlingType;
     private boolean erBehandlingManueltOpprettet;
@@ -71,12 +70,12 @@ public class VedtakOppsummering {
         this.forrigeBehandling = forrigeBehandling;
     }
 
-    public List<UUID> getReferteFagsakBehandlinger() {
-        return referteFagsakBehandlinger;
+    public UUID getReferteFagsakBehandling() {
+        return referteFagsakBehandling;
     }
 
-    public void setReferteFagsakBehandlinger(List<UUID> referteFagsakBehandlinger) {
-        this.referteFagsakBehandlinger = referteFagsakBehandlinger;
+    public void setReferteFagsakBehandling(UUID referteFagsakBehandling) {
+        this.referteFagsakBehandling = referteFagsakBehandling;
     }
 
     public BehandlingType getBehandlingType() {

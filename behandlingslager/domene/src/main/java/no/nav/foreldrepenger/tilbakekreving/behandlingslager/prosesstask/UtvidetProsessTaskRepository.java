@@ -17,7 +17,7 @@ public class UtvidetProsessTaskRepository {
 
     private EntityManager entityManager;
 
-    UtvidetProsessTaskRepository(){
+    UtvidetProsessTaskRepository() {
         // for CDI proxy
     }
 
@@ -35,6 +35,13 @@ public class UtvidetProsessTaskRepository {
         List<ProsessTaskEntitet> alleTasker = query.getResultList();
 
         return alleTasker.stream().findFirst().map(ProsessTaskEntitet::tilProsessTask);
+    }
+
+    public void oppdaterTaskPayload(Long taskId, String payload) {
+        entityManager.createNativeQuery("update PROSESS_TASK set task_payload=:payload,versjon=versjon+1 where id=:taskId")
+            .setParameter("payload", payload)
+            .setParameter("taskId", taskId)
+            .executeUpdate();
     }
 
 }

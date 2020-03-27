@@ -15,8 +15,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingBeregningTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandleStegResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.transisjoner.FellesTransisjoner;
@@ -42,7 +40,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVe
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.IverksettingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.SendVedtakHendelserTilDvhTask;
-import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.VedtakOppsummeringTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.task.SendVedtakFattetTilSelvbetjeningTask;
 import no.nav.vedtak.exception.TekniskException;
@@ -60,10 +57,7 @@ public class IverksetteVedtakStegImplTest {
     private BehandlingRepositoryProvider repoProvider = new BehandlingRepositoryProviderImpl(repositoryRule.getEntityManager());
     private ProsessTaskRepository prosessTaskRepository = new ProsessTaskRepositoryImpl(repositoryRule.getEntityManager(), null, Mockito.mock(ProsessTaskEventPubliserer.class));
     private BrevSporingRepository brevSporingRepository = new BrevSporingRepository(repositoryRule.getEntityManager());
-    private KravgrunnlagBeregningTjeneste kravgrunnlagBeregningTjeneste = new KravgrunnlagBeregningTjeneste(repoProvider.getGrunnlagRepository());
-    private TilbakekrevingBeregningTjeneste tilbakekrevingBeregningTjeneste = new TilbakekrevingBeregningTjeneste(repoProvider,kravgrunnlagBeregningTjeneste);
-    private VedtakOppsummeringTjeneste vedtakOppsummeringTjeneste = new VedtakOppsummeringTjeneste(repoProvider,tilbakekrevingBeregningTjeneste);
-    private ProsessTaskIverksett prosessTaskIverksett = new ProsessTaskIverksett(prosessTaskRepository, brevSporingRepository,vedtakOppsummeringTjeneste);
+    private ProsessTaskIverksett prosessTaskIverksett = new ProsessTaskIverksett(prosessTaskRepository, brevSporingRepository);
     private IverksetteVedtakSteg iverksetteVedtakSteg = new IverksetteVedtakStegImpl(repoProvider, prosessTaskIverksett);
     private BehandlingVedtakRepository behandlingVedtakRepository = repoProvider.getBehandlingVedtakRepository();
     private BehandlingRepository behandlingRepository = repoProvider.getBehandlingRepository();

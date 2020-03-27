@@ -163,7 +163,7 @@ public class VedtakOppsummeringTjenesteTest {
         assertThat(vedtakOppsummering.getBehandlingOpprettetTid()).isNotNull();
         assertThat(vedtakOppsummering.getBehandlingType()).isEqualByComparingTo(BehandlingType.TILBAKEKREVING);
         assertThat(vedtakOppsummering.isErBehandlingManueltOpprettet()).isFalse();
-        assertThat(vedtakOppsummering.getReferteFagsakBehandlinger()).isNotEmpty();
+        assertThat(vedtakOppsummering.getReferteFagsakBehandling()).isNotNull();
         assertThat(vedtakOppsummering.getSaksnummer()).isEqualTo(saksnummer.getVerdi());
         assertThat(vedtakOppsummering.getVedtakFattetTid()).isNotNull();
         assertThat(vedtakOppsummering.getYtelseType()).isEqualByComparingTo(YtelseType.FP);
