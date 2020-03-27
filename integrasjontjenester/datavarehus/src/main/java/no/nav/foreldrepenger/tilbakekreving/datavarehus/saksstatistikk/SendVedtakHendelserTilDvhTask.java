@@ -2,6 +2,8 @@ package no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.validation.Validation;
+import javax.validation.Validator;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.prosesstask.UtvidetProsessTaskRepository;
@@ -22,6 +24,8 @@ public class SendVedtakHendelserTilDvhTask implements ProsessTaskHandler {
     private VedtakOppsummeringTjeneste vedtakOppsummeringTjeneste;
     private VedtakOppsummeringKafkaProducer kafkaProducer;
 
+    private Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+
     SendVedtakHendelserTilDvhTask() {
         // for CDI
     }
@@ -39,7 +43,15 @@ public class SendVedtakHendelserTilDvhTask implements ProsessTaskHandler {
     public void doTask(ProsessTaskData prosessTaskData) {
         long behandlingId = prosessTaskData.getBehandlingId();
         VedtakOppsummering vedtakOppsummering = vedtakOppsummeringTjeneste.hentVedtakOppsummering(behandlingId);
+        validate(vedtakOppsummering);
         kafkaProducer.sendMelding(vedtakOppsummering);
-        prosessTaskRepository.oppdaterTaskPayload(prosessTaskData.getId(),VedtakOppsummeringMapper.tilJsonString(vedtakOppsummering));
+        prosessTaskRepository.oppdaterTaskPayload(prosessTaskData.getId(), VedtakOppsummeringMapper.tilJsonString(vedtakOppsummering));
+    }
+
+    private void validate(Object object) {
+        var valideringsfeil = validator.validate(object);
+        if (!valideringsfeil.isEmpty()) {
+            throw new IllegalArgumentException("Valideringsfeil for " + object.getClass().getName() + ": Valideringsfeil:" + valideringsfeil);
+        }
     }
 }
