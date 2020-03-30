@@ -1,18 +1,27 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.iverksettvedtak;
 
+import java.util.Optional;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporingRepository;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.SendVedtakHendelserTilDvhTask;
 import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.task.SendVedtakFattetTilSelvbetjeningTask;
+import no.nav.vedtak.felles.integrasjon.unleash.EnvironmentProperty;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 
 @ApplicationScoped
 public class ProsessTaskIverksett {
+
+    private static final Logger logger = LoggerFactory.getLogger(ProsessTaskIverksett.class);
+
 
     private ProsessTaskRepository taskRepository;
     private BrevSporingRepository brevSporingRepository;
@@ -45,12 +54,23 @@ public class ProsessTaskIverksett {
             selvbetjeningTask.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
             taskRepository.lagre(selvbetjeningTask);
         }
-        opprettDvhProsessTask(behandling);
+        if(erTestMiljø()){
+            opprettDvhProsessTask(behandling);
+        }
     }
 
     private void opprettDvhProsessTask(Behandling behandling){
         ProsessTaskData dvhProsessTaskData = new ProsessTaskData(SendVedtakHendelserTilDvhTask.TASKTYPE);
         dvhProsessTaskData.setBehandling(behandling.getFagsakId(),behandling.getId(),behandling.getAktørId().getId());
         taskRepository.lagre(dvhProsessTaskData);
+    }
+
+    //midlertidig kode. skal fjernes da dvh er klar
+    private boolean erTestMiljø(){
+        //foreløpig kun på for testing
+        Optional<String> envName = EnvironmentProperty.getEnvironmentName();
+        boolean isEnabled = envName.isPresent() && ("t4".equalsIgnoreCase(envName.get()) || "devimg".equalsIgnoreCase(envName.get()));
+        logger.info("{} er {}", "Send vedtak til DVH", isEnabled ? "skudd på" : "ikke skudd på");
+        return isEnabled;
     }
 }
