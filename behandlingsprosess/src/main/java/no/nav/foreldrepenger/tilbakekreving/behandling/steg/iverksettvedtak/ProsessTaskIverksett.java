@@ -70,7 +70,7 @@ public class ProsessTaskIverksett {
         //foreløpig kun på for testing
         Optional<String> envName = EnvironmentProperty.getEnvironmentName();
         boolean isEnabled = envName.isPresent() && ("t4".equalsIgnoreCase(envName.get()) || "devimg".equalsIgnoreCase(envName.get()));
-        logger.info("{} er {}", ProsessTaskIverksett.class, isEnabled ? "skudd på" : "ikke skudd på");
+        logger.info("{} er {}", "Send vedtak til DVH", isEnabled ? "skudd på" : "ikke skudd på");
         return isEnabled;
     }
 }
