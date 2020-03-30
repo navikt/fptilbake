@@ -268,6 +268,9 @@ Du overførte kvoten til den andre forelderen fordi du var heilt avhengig av hje
         {{#case "KVO_MOTTAKER_INNLAGT"}}
 Du overførte kvoten til den andre forelderen fordi du var innlagd i helseinstitusjon. I den same perioden har du likevel fått utbetalt foreldrepengar. Du kan ikkje overføre kvoten og samtidig få foreldrepengar. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
         {{/case}}
+        {{#case "KVO_SAMTIDIG_UTTAK"}}
+Den andre forelderen er innvilga foreldrepengar i same perioden som du har fått utbetalt foreldrepengar for. Fordi du har fått utbetalt meir i foreldrepengar enn du har rett til i denne perioden, har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} kroner for mykje utbetalt.
+        {{/case}}
         {{/switch}}
     {{/case}}
     {{#case "VILKAAR_GENERELLE_TYPE"}}

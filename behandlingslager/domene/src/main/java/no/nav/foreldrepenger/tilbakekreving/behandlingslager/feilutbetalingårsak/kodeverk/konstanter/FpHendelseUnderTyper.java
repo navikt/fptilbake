@@ -37,6 +37,7 @@ public interface FpHendelseUnderTyper {
     //UttakKvotene
     HendelseUnderType KVO_MOTTAKER_HELT_AVHENGIG = new HendelseUnderType("KVO_MOTTAKER_HELT_AVHENGIG");
     HendelseUnderType KVO_MOTTAKER_INNLAGT = new HendelseUnderType("KVO_MOTTAKER_INNLAGT");
+    HendelseUnderType KVO_SAMTIDIG_UTTAK = new HendelseUnderType("KVO_SAMTIDIG_UTTAK");
 
     //VilkårGenerelle
     HendelseUnderType MOR_IKKE_ARBEID = new HendelseUnderType("MOR_IKKE_ARBEID");

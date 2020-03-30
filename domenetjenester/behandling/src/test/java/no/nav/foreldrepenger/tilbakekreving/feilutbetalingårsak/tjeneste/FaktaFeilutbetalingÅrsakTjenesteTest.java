@@ -94,7 +94,8 @@ public class FaktaFeilutbetalingÅrsakTjenesteTest {
 
         assertThat(mapAvResultat.get(HendelseType.FP_UTTAK_KVOTENE_TYPE)).containsExactly(
             FpHendelseUnderTyper.KVO_MOTTAKER_HELT_AVHENGIG,
-            FpHendelseUnderTyper.KVO_MOTTAKER_INNLAGT
+            FpHendelseUnderTyper.KVO_MOTTAKER_INNLAGT,
+            FpHendelseUnderTyper.KVO_SAMTIDIG_UTTAK
         );
 
         assertThat(mapAvResultat.get(HendelseType.FP_VILKAAR_GENERELLE_TYPE)).containsExactly(
