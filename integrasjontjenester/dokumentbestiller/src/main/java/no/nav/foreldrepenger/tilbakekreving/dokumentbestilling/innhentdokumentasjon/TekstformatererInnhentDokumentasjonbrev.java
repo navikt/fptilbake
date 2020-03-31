@@ -56,4 +56,5 @@ class TekstformatererInnhentDokumentasjonbrev extends FellesTekstformaterer {
         innhentDokumentasjonBrevDokument.valider();
         return innhentDokumentasjonBrevDokument;
     }
+
 }
