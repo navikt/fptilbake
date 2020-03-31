@@ -468,7 +468,7 @@
             <dependency>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-rt-transports-http-jetty</artifactId>
-                <version>3.3.5</version>
+                <version>3.3.6</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.ws.xmlschema</groupId>
