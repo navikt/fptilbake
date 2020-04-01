@@ -83,11 +83,22 @@ public class TilbakekrevingVedtakPeriodeBeregner {
         Skalering andelSkalering = Skalering.opprett(bgPeriode.getTilbakekrevingBeløpUtenRenter(), bgPeriode.getFeilutbetaltBeløp());
         List<TilbakekrevingPeriode> resultat = new ArrayList<>();
         for (KravgrunnlagPeriode432 kgPeriode : kgPerioder) {
+            if (manglerFEIL(kgPeriode)) {
+                //TODO denne blokken skal fjernes etter at PFP-9287 er løst.
+                //midlertidig kode for å fikse iverksettelse for en behandling med feil i kravgrunnlaget
+                logger.warn("Ignorerte periode {} ved iverksetting, siden hadde ingen postering med klasseType=FEIL", kgPeriode.getPeriode());
+                continue;
+            }
             if (virkedagerOverlapp(kgPeriode.getPeriode(), bgPeriode.getPeriode()) > 0) {
                 resultat.add(lagTilbakekrevingsperiode(bgPeriode, kgTidligereBehandledeVirkedager, andelSkalering, kgPeriode));
             }
         }
         return resultat;
+    }
+
+    boolean manglerFEIL(KravgrunnlagPeriode432 kgPeriode) {
+        return kgPeriode.getKravgrunnlagBeloper433().stream()
+            .noneMatch(kgb -> KlasseType.FEIL.equals(kgb.getKlasseType()));
     }
 
     private TilbakekrevingPeriode lagTilbakekrevingsperiode(BeregningResultatPeriode bgPeriode, Map<Periode, Integer> kgTidligereBehandledeVirkedager, Skalering andelSkalering, KravgrunnlagPeriode432 kgPeriode) {

@@ -27,6 +27,7 @@ public class KravgrunnlagValidator {
         KravgrunnlagValidator::validerPeriodeInnenforMåned,
         KravgrunnlagValidator::validerOverlappendePerioder,
         KravgrunnlagValidator::validerSkatt,
+        KravgrunnlagValidator::validerPerioderHarFeilutbetalingPostering,
         KravgrunnlagValidator::validerYtelseMotFeilutbetaling,
         KravgrunnlagValidator::validerYtelPosteringTilbakekrevesMotNyttOgOpprinneligUtbetalt
     );
@@ -48,7 +49,14 @@ public class KravgrunnlagValidator {
                 throw KravgrunnlagFeil.FACTORY.periodeIkkInnenforMåned(p).toException();
             }
         }
-        ;
+    }
+
+    private static void validerPerioderHarFeilutbetalingPostering(Kravgrunnlag431 kravgrunnlag) {
+        for (KravgrunnlagPeriode432 periode : kravgrunnlag.getPerioder()) {
+            if (periode.getKravgrunnlagBeloper433().stream().noneMatch(kgb -> KlasseType.FEIL.equals(kgb.getKlasseType()))) {
+                throw KravgrunnlagFeil.FACTORY.manglerKlasseTypeFeil(periode.getPeriode()).toException();
+            }
+        }
     }
 
     private static void validerOverlappendePerioder(Kravgrunnlag431 kravgrunnlag) {
@@ -153,6 +161,9 @@ public class KravgrunnlagValidator {
 
         @IntegrasjonFeil(feilkode = "FPT-936521", feilmelding = "Ugyldig kravgrunnlag. Overlappende perioder %s og %s.", logLevel = WARN, exceptionClass = UgyldigKravgrunnlagException.class)
         Feil overlappendePerioder(Periode a, Periode b);
+
+        @IntegrasjonFeil(feilkode = "FPT-727260", feilmelding = "Ugyldig kravgrunnlag. Perioden %s mangler postering med klasseType=FEIL.", logLevel = WARN, exceptionClass = UgyldigKravgrunnlagException.class)
+        Feil manglerKlasseTypeFeil(Periode periode);
 
         @IntegrasjonFeil(feilkode = "FPT-438893", feilmelding = "Ugyldig kravgrunnlag. Perioden %s er ikke innenfor en kalendermåned.", logLevel = WARN, exceptionClass = UgyldigKravgrunnlagException.class)
         Feil periodeIkkInnenforMåned(Periode periode);
