@@ -2,6 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.fplos.klient.observer;
 
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType.FAKTA_FEILUTBETALING;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -15,12 +16,14 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.AksjonspunktTilb
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.AksjonspunktUtførtEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.AksjonspunkterFunnetEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingEnhetEvent;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingFristenUtløptEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStatusEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.prosesstask.UtvidetProsessTaskRepository;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
@@ -95,8 +98,14 @@ public class FplosEventObserver {
         }
     }
 
+    public void observerBehandlingFristenUtøptEvent(@Observes BehandlingFristenUtløptEvent utløptEvent) {
+        logger.info("Oppretter prosess task for å publisere event={} til fplos for aksjonspunkt={}", EventHendelse.AKSJONSPUNKT_OPPRETTET,
+            AksjonspunktDefinisjon.VENT_PÅ_SAKSBEHANDLER_VURDER_HENLEGGELSE.getKode());
+        opprettProsessTask(utløptEvent.getFagsakId(), utløptEvent.getBehandlingId(), utløptEvent.getAktørId(), EventHendelse.AKSJONSPUNKT_OPPRETTET,utløptEvent.getFristDato());
+    }
 
-    private void opprettProsessTask(long fagsakId, long behandlingId, AktørId aktørId, EventHendelse eventHendelse) {
+
+    private void opprettProsessTask(long fagsakId, long behandlingId, AktørId aktørId, EventHendelse eventHendelse, LocalDateTime... fristTid) {
         String gruppe = "los" + behandlingId;
         Optional<ProsessTaskData> eksisterendeProsessTask = utvidetProsessTaskRepository.finnSisteProsessTaskForProsessTaskGruppe(FplosPubliserEventTask.TASKTYPE, gruppe);
         long sekvens = eksisterendeProsessTask.isPresent() ? Long.valueOf(eksisterendeProsessTask.get().getSekvens()) + 1 : 1l;
@@ -108,6 +117,9 @@ public class FplosEventObserver {
         taskData.setBehandling(fagsakId, behandlingId, aktørId.getId());
         taskData.setGruppe(gruppe);
         taskData.setSekvens(String.format("%04d",sekvens));
+
+        String verdi = fristTid.length == 0 ? null : fristTid[0].toString();
+        taskData.setProperty(FplosPubliserEventTask.PROPERTY_FRIST_TID,verdi);
 
         prosessTaskRepository.lagre(taskData);
     }

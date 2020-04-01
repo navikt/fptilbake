@@ -24,6 +24,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FaktaFeilutbetalingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
@@ -45,6 +47,7 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
 
     public static final String TASKTYPE = "fplos.oppgavebehandling.PubliserEvent";
     public static final String PROPERTY_EVENT_NAME = "eventName";
+    public static final String PROPERTY_FRIST_TID = "fristTid";
     public static final String DEFAULT_HREF = "/fpsak/fagsak/%s/behandling/%s/?punkt=default&fakta=default";
 
     private static final Logger logger = LoggerFactory.getLogger(FplosPubliserEventTask.class);
@@ -54,6 +57,7 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
     private FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste;
     private FplosKafkaProducer fplosKafkaProducer;
     private ObjectMapper objectMapper = new ObjectMapper();
+    private LocalDateTime fristTid = null;
 
     FplosPubliserEventTask() {
         // for CDI proxy
@@ -76,6 +80,8 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
     public void doTask(ProsessTaskData prosessTaskData) {
         String eventName = prosessTaskData.getPropertyValue(PROPERTY_EVENT_NAME);
         Long behandlingId = prosessTaskData.getBehandlingId();
+        String fristTidVerdi = prosessTaskData.getPropertyValue(PROPERTY_FRIST_TID);
+        fristTid = fristTidVerdi != null ? LocalDateTime.parse(fristTidVerdi) : null;
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         Kravgrunnlag431 kravgrunnlag431 = grunnlagRepository.harGrunnlagForBehandlingId(behandlingId) ? grunnlagRepository.finnKravgrunnlag(behandlingId) : null;
         try {
@@ -98,8 +104,12 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
         String saksnummer = fagsak.getSaksnummer().getVerdi();
 
         Map<String, String> aksjonspunktKoderMedStatusListe = new HashMap<>();
-        behandling.getAksjonspunkter().forEach(aksjonspunkt ->
-            aksjonspunktKoderMedStatusListe.put(aksjonspunkt.getAksjonspunktDefinisjon().getKode(), aksjonspunkt.getStatus().getKode()));
+        if (fristTid != null) {
+            aksjonspunktKoderMedStatusListe.put(AksjonspunktDefinisjon.VENT_PÅ_SAKSBEHANDLER_VURDER_HENLEGGELSE.getKode(), AksjonspunktStatus.OPPRETTET.getKode());
+        } else {
+            behandling.getAksjonspunkter().forEach(aksjonspunkt ->
+                aksjonspunktKoderMedStatusListe.put(aksjonspunkt.getAksjonspunktDefinisjon().getKode(), aksjonspunkt.getStatus().getKode()));
+        }
 
         return TilbakebetalingBehandlingProsessEventDto.builder()
             .medBehandlingStatus(behandling.getStatus().getKode())
@@ -115,14 +125,20 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
             .medOpprettetBehandling(behandling.getOpprettetTidspunkt())
             .medYtelseTypeKode(fagsak.getFagsakYtelseType().getKode())
             .medAksjonspunktKoderMedStatusListe(aksjonspunktKoderMedStatusListe)
-            .medHref(String.format(DEFAULT_HREF,saksnummer,behandling.getId()))
+            .medHref(String.format(DEFAULT_HREF, saksnummer, behandling.getId()))
             .medAnsvarligSaksbehandlerIdent(behandling.getAnsvarligSaksbehandler())
-            .medFørsteFeilutbetaling(kravgrunnlag431 != null ? hentFørsteFeilutbetalingDato(kravgrunnlag431) : null)
-            .medFeilutbetaltBeløp(kravgrunnlag431 != null ? hentFeilutbetaltBeløp(behandling.getId()) : null)
+            .medFørsteFeilutbetaling(hentFørsteFeilutbetalingDato(kravgrunnlag431))
+            .medFeilutbetaltBeløp(kravgrunnlag431 != null ? hentFeilutbetaltBeløp(behandling.getId()) : BigDecimal.ZERO)
             .build();
     }
 
     private LocalDate hentFørsteFeilutbetalingDato(Kravgrunnlag431 kravgrunnlag431) {
+        if (fristTid != null) {
+            return fristTid.toLocalDate();
+        }
+        if (kravgrunnlag431 == null) {
+            return null;
+        }
         Optional<KravgrunnlagPeriode432> førstePeriode = kravgrunnlag431.getPerioder().stream()
             .min(Comparator.comparing(KravgrunnlagPeriode432::getFom));
         return førstePeriode.map(KravgrunnlagPeriode432::getFom).orElse(null);

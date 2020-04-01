@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.junit.Before;
@@ -14,6 +15,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.AksjonspunktTilb
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.AksjonspunktUtførtEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.AksjonspunkterFunnetEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingEnhetEvent;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingFristenUtløptEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingModell;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStatusEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
@@ -204,11 +206,22 @@ public class FplosEventObserverTest {
         fellesAssertProsessTask(EventHendelse.AKSJONSPUNKT_HAR_ENDRET_BEHANDLENDE_ENHET);
     }
 
-    private void fellesAssertProsessTask(EventHendelse eventHendelse) {
+    @Test
+    public void skal_publisere_data_når_behandling_sett_på_vent_og_fristen_er_utløpt() {
+        LocalDateTime fristTid = LocalDateTime.now();
+        BehandlingFristenUtløptEvent utløptEvent = new BehandlingFristenUtløptEvent(behandling, fristTid);
+
+        fplosEventObserver.observerBehandlingFristenUtøptEvent(utløptEvent);
+        ProsessTaskData publisherEventProsessTask = fellesAssertProsessTask(EventHendelse.AKSJONSPUNKT_OPPRETTET);
+        assertThat(publisherEventProsessTask.getPropertyValue(FplosPubliserEventTask.PROPERTY_FRIST_TID)).isEqualTo(fristTid.toString());
+    }
+
+    private ProsessTaskData fellesAssertProsessTask(EventHendelse eventHendelse) {
         List<ProsessTaskData> prosessTasker = prosessTaskRepository.finnIkkeStartet();
         assertThat(prosessTasker.size()).isEqualTo(1);
         ProsessTaskData publisherEventProsessTask = prosessTasker.get(0);
         assertThat(publisherEventProsessTask.getTaskType()).isEqualTo(FplosPubliserEventTask.TASKTYPE);
         assertThat(publisherEventProsessTask.getPropertyValue(FplosPubliserEventTask.PROPERTY_EVENT_NAME)).isEqualTo(eventHendelse.name());
+        return publisherEventProsessTask;
     }
 }
