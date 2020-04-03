@@ -15,7 +15,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.AksjonspunktTilb
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.AksjonspunktUtførtEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.AksjonspunkterFunnetEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingEnhetEvent;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingFristenUtløptEvent;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingManglerKravgrunnlagFristenEndretEvent;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingManglerKravgrunnlagFristenUtløptEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingModell;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStatusEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
@@ -32,6 +33,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Internal
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.InternalManipulerBehandlingImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProviderImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.prosesstask.UtvidetProsessTaskRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
@@ -209,11 +211,23 @@ public class FplosEventObserverTest {
     @Test
     public void skal_publisere_data_når_behandling_sett_på_vent_og_fristen_er_utløpt() {
         LocalDateTime fristTid = LocalDateTime.now();
-        BehandlingFristenUtløptEvent utløptEvent = new BehandlingFristenUtløptEvent(behandling, fristTid);
+        BehandlingManglerKravgrunnlagFristenUtløptEvent utløptEvent = new BehandlingManglerKravgrunnlagFristenUtløptEvent(behandling, fristTid);
 
-        fplosEventObserver.observerBehandlingFristenUtøptEvent(utløptEvent);
+        fplosEventObserver.observerBehandlingFristenEndretEvent(utløptEvent);
         ProsessTaskData publisherEventProsessTask = fellesAssertProsessTask(EventHendelse.AKSJONSPUNKT_OPPRETTET);
-        assertThat(publisherEventProsessTask.getPropertyValue(FplosPubliserEventTask.PROPERTY_FRIST_TID)).isEqualTo(fristTid.toString());
+        assertThat(publisherEventProsessTask.getPropertyValue(FplosPubliserEventTask.PROPERTY_KRAVGRUNNLAG_MANGLER_FRIST_TID)).isEqualTo(fristTid.toString());
+        assertThat(publisherEventProsessTask.getPropertyValue(FplosPubliserEventTask.PROPERTY_KRAVGRUNNLAG_MANGLER_AKSJONSPUNKT_STATUS_KODE)).isEqualTo(AksjonspunktStatus.OPPRETTET.getKode());
+    }
+
+    @Test
+    public void skal_publisere_data_når_behandling_sett_på_vent_og_fristen_er_endret() {
+        LocalDateTime fristTid = LocalDateTime.now();
+        BehandlingManglerKravgrunnlagFristenEndretEvent fristenEndretEvent = new BehandlingManglerKravgrunnlagFristenEndretEvent(behandling,fristTid);
+
+        fplosEventObserver.observerBehandlingFristenEndretEvent(fristenEndretEvent);
+        ProsessTaskData publisherEventProsessTask = fellesAssertProsessTask(EventHendelse.AKSJONSPUNKT_AVBRUTT);
+        assertThat(publisherEventProsessTask.getPropertyValue(FplosPubliserEventTask.PROPERTY_KRAVGRUNNLAG_MANGLER_FRIST_TID)).isEqualTo(fristTid.toString());
+        assertThat(publisherEventProsessTask.getPropertyValue(FplosPubliserEventTask.PROPERTY_KRAVGRUNNLAG_MANGLER_AKSJONSPUNKT_STATUS_KODE)).isEqualTo(AksjonspunktStatus.AVBRUTT.getKode());
     }
 
     private ProsessTaskData fellesAssertProsessTask(EventHendelse eventHendelse) {

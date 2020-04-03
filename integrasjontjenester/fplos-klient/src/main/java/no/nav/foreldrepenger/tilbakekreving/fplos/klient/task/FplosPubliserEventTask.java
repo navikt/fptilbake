@@ -25,7 +25,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FaktaFeilutbetalingT
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
@@ -47,7 +46,8 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
 
     public static final String TASKTYPE = "fplos.oppgavebehandling.PubliserEvent";
     public static final String PROPERTY_EVENT_NAME = "eventName";
-    public static final String PROPERTY_FRIST_TID = "fristTid";
+    public static final String PROPERTY_KRAVGRUNNLAG_MANGLER_FRIST_TID = "kravgrunnlagManglerFristTid";
+    public static final String PROPERTY_KRAVGRUNNLAG_MANGLER_AKSJONSPUNKT_STATUS_KODE="kravgrunnlagManglerAksjonspunktStatusKode";
     public static final String DEFAULT_HREF = "/fpsak/fagsak/%s/behandling/%s/?punkt=default&fakta=default";
 
     private static final Logger logger = LoggerFactory.getLogger(FplosPubliserEventTask.class);
@@ -57,7 +57,8 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
     private FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste;
     private FplosKafkaProducer fplosKafkaProducer;
     private ObjectMapper objectMapper = new ObjectMapper();
-    private LocalDateTime fristTid = null;
+    private LocalDateTime kravgrunnlagManglerFristTid = null;
+    private String kravgrunnlagManglerAksjonspunktStatusKode = null;
 
     FplosPubliserEventTask() {
         // for CDI proxy
@@ -80,8 +81,9 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
     public void doTask(ProsessTaskData prosessTaskData) {
         String eventName = prosessTaskData.getPropertyValue(PROPERTY_EVENT_NAME);
         Long behandlingId = prosessTaskData.getBehandlingId();
-        String fristTidVerdi = prosessTaskData.getPropertyValue(PROPERTY_FRIST_TID);
-        fristTid = fristTidVerdi != null ? LocalDateTime.parse(fristTidVerdi) : null;
+        String fristTidVerdi = prosessTaskData.getPropertyValue(PROPERTY_KRAVGRUNNLAG_MANGLER_FRIST_TID);
+        kravgrunnlagManglerFristTid = fristTidVerdi != null ? LocalDateTime.parse(fristTidVerdi) : null;
+        kravgrunnlagManglerAksjonspunktStatusKode = prosessTaskData.getPropertyValue(PROPERTY_KRAVGRUNNLAG_MANGLER_AKSJONSPUNKT_STATUS_KODE);
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         Kravgrunnlag431 kravgrunnlag431 = grunnlagRepository.harGrunnlagForBehandlingId(behandlingId) ? grunnlagRepository.finnKravgrunnlag(behandlingId) : null;
         try {
@@ -104,8 +106,8 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
         String saksnummer = fagsak.getSaksnummer().getVerdi();
 
         Map<String, String> aksjonspunktKoderMedStatusListe = new HashMap<>();
-        if (fristTid != null) {
-            aksjonspunktKoderMedStatusListe.put(AksjonspunktDefinisjon.VENT_PÅ_SAKSBEHANDLER_VURDER_HENLEGGELSE.getKode(), AksjonspunktStatus.OPPRETTET.getKode());
+        if (kravgrunnlagManglerFristTid != null) {
+            aksjonspunktKoderMedStatusListe.put(AksjonspunktDefinisjon.VURDER_HENLEGGELSE_MANGLER_KRAVGRUNNLAG.getKode(), kravgrunnlagManglerAksjonspunktStatusKode);
         } else {
             behandling.getAksjonspunkter().forEach(aksjonspunkt ->
                 aksjonspunktKoderMedStatusListe.put(aksjonspunkt.getAksjonspunktDefinisjon().getKode(), aksjonspunkt.getStatus().getKode()));
@@ -133,8 +135,8 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
     }
 
     private LocalDate hentFørsteFeilutbetalingDato(Kravgrunnlag431 kravgrunnlag431) {
-        if (fristTid != null) {
-            return fristTid.toLocalDate();
+        if (kravgrunnlagManglerFristTid != null) {
+            return kravgrunnlagManglerFristTid.toLocalDate();
         }
         if (kravgrunnlag431 == null) {
             return null;

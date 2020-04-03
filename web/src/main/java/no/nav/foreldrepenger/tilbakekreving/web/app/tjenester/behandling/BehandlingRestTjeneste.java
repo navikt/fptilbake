@@ -7,6 +7,7 @@ import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursResourceAttributt.FAG
 import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursResourceAttributt.VENTEFRIST;
 
 import java.net.URISyntaxException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -40,6 +41,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlendeEnhetTjen
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingRevurderingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.HenleggBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollAsynkTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingManglerKravgrunnlagFristenEndretEventPubliserer;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.OrganisasjonsEnhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
@@ -86,6 +88,7 @@ public class BehandlingRestTjeneste {
     private BehandlingRevurderingTjeneste revurderingTjeneste;
     private BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste;
     private BehandlendeEnhetTjeneste behandlendeEnhetTjeneste;
+    private BehandlingManglerKravgrunnlagFristenEndretEventPubliserer fristenEndretEventPubliserer;
 
     public BehandlingRestTjeneste() {
         // CDI
@@ -95,7 +98,8 @@ public class BehandlingRestTjeneste {
     public BehandlingRestTjeneste(BehandlingsTjenesteProvider behandlingsTjenesteProvider,
                                   BehandlingDtoTjeneste behandlingDtoTjeneste,
                                   BehandlingsprosessApplikasjonTjeneste behandlingsprosessTjeneste,
-                                  BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste) {
+                                  BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste,
+                                  BehandlingManglerKravgrunnlagFristenEndretEventPubliserer fristenEndretEventPubliserer) {
         this.behandlingTjeneste = behandlingsTjenesteProvider.getBehandlingTjeneste();
         this.gjenopptaBehandlingTjeneste = behandlingsTjenesteProvider.getGjenopptaBehandlingTjeneste();
         this.behandlingDtoTjeneste = behandlingDtoTjeneste;
@@ -104,6 +108,7 @@ public class BehandlingRestTjeneste {
         this.revurderingTjeneste = behandlingsTjenesteProvider.getRevurderingTjeneste();
         this.behandlingskontrollAsynkTjeneste = behandlingskontrollAsynkTjeneste;
         this.behandlendeEnhetTjeneste = behandlingsTjenesteProvider.getEnhetTjeneste();
+        this.fristenEndretEventPubliserer = fristenEndretEventPubliserer;
     }
 
     @GET
@@ -234,6 +239,8 @@ public class BehandlingRestTjeneste {
     public void endreBehandlingPåVent(@Parameter(description = "Frist for behandling på vent") @Valid SettBehandlingPåVentDto dto) {
         behandlingTjeneste.kanEndreBehandling(dto.getBehandlingId(), dto.getBehandlingVersjon());
         behandlingTjeneste.endreBehandlingPåVent(dto.getBehandlingId(), dto.getFrist(), dto.getVentearsak());
+        Behandling behandling = behandlingTjeneste.hentBehandling(dto.getBehandlingId());
+        fristenEndretEventPubliserer.fireEvent(behandling, LocalDateTime.of(dto.getFrist(), LocalDateTime.now().toLocalTime()));
     }
 
     @GET
@@ -346,11 +353,11 @@ public class BehandlingRestTjeneste {
         UUID behandlingUUId = uuidDto.getBehandlingUuid();
         Behandling behandling = behandlingTjeneste.hentBehandling(behandlingUUId);
         Long behandlingId = behandling.getId();
-        Optional<BehandlingVedtak> behandlingVedtak= behandlingTjeneste.hentBehandlingvedtakForBehandlingId(behandlingId);
-        if(!behandling.erAvsluttet() || behandlingVedtak.isEmpty()){
+        Optional<BehandlingVedtak> behandlingVedtak = behandlingTjeneste.hentBehandlingvedtakForBehandlingId(behandlingId);
+        if (!behandling.erAvsluttet() || behandlingVedtak.isEmpty()) {
             throw BehandlingFeil.FACTORY.fantIkkeBehandlingsVedtakInfo(behandlingId).toException();
         }
-        KlageTilbakekrevingDto klageTilbakekrevingDto = new KlageTilbakekrevingDto(behandlingId, behandlingVedtak.get().getVedtaksdato(),behandling.getType().getKode());
+        KlageTilbakekrevingDto klageTilbakekrevingDto = new KlageTilbakekrevingDto(behandlingId, behandlingVedtak.get().getVedtaksdato(), behandling.getType().getKode());
         return Response.ok().entity(klageTilbakekrevingDto).build();
     }
 

@@ -43,8 +43,8 @@ public class AksjonspunktDefinisjon extends KodeverkTabell {
     public static final AksjonspunktDefinisjon VENT_PÅ_BRUKERTILBAKEMELDING = new AksjonspunktDefinisjon("7001");
     public static final AksjonspunktDefinisjon VENT_PÅ_TILBAKEKREVINGSGRUNNLAG = new AksjonspunktDefinisjon("7002");
     public static final AksjonspunktDefinisjon AVKLART_FAKTA_FEILUTBETALING = new AksjonspunktDefinisjon("7003");
-    // midlertidig aksjonspunkt. kun brukes for å sende data til fplos når behandling venter på grunnlaget etter fristen
-    public static final AksjonspunktDefinisjon VENT_PÅ_SAKSBEHANDLER_VURDER_HENLEGGELSE = new AksjonspunktDefinisjon("7004");
+    // kun brukes for å sende data til fplos når behandling venter på grunnlaget etter fristen
+    public static final AksjonspunktDefinisjon VURDER_HENLEGGELSE_MANGLER_KRAVGRUNNLAG = new AksjonspunktDefinisjon("8001");
 
 
     @ManyToOne(optional = false)

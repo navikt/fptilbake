@@ -1,2 +1,2 @@
 INSERT INTO AKSJONSPUNKT_DEF (KODE, NAVN, VURDERINGSPUNKT, BESKRIVELSE, VILKAR_TYPE, TOTRINN_BEHANDLING_DEFAULT, AKSJONSPUNKT_TYPE, FRIST_PERIODE, TILBAKEHOPP_VED_GJENOPPTAKELSE, LAG_UTEN_HISTORIKK, SKJERMLENKE_TYPE )
-VALUES ('7004', 'Venter på saksbehandler for å vurdere henleggelse', 'TBKGSTEG.UT', 'Venter på saksbehandler for å vurdere henleggelse', '-', 'N', 'MANU', null, 'J', 'J', '-');
+VALUES ('8001', 'Vurderer henleggelse p.g.a manglende kravgrunnlag', 'TBKGSTEG.UT', 'Vurderer henleggelse p.g.a manglende kravgrunnlag', '-', 'N', 'MANU', null, 'J', 'J', '-');

@@ -14,6 +14,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegRe
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingTypeRef;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingManglerKravgrunnlagFristenUtløptEventPubliserer;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
@@ -30,7 +31,7 @@ public class MottattGrunnlagStegImpl implements GrunnlagSteg {
     private BehandlingRepository behandlingRepository;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste;
-    private BehandlingFristenUtløptEventPubliserer utløptEventPubliserer;
+    private BehandlingManglerKravgrunnlagFristenUtløptEventPubliserer utløptEventPubliserer;
     private Period ventefrist;
 
     public MottattGrunnlagStegImpl() {
@@ -41,7 +42,7 @@ public class MottattGrunnlagStegImpl implements GrunnlagSteg {
     public MottattGrunnlagStegImpl(BehandlingRepository behandlingRepository,
                                    BehandlingskontrollTjeneste behandlingskontrollTjeneste,
                                    GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste,
-                                   BehandlingFristenUtløptEventPubliserer utløptEventPubliserer,
+                                   BehandlingManglerKravgrunnlagFristenUtløptEventPubliserer utløptEventPubliserer,
                                    @KonfigVerdi(value = "frist.grunnlag.tbkg") Period ventefrist) {
         this.behandlingRepository = behandlingRepository;
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;

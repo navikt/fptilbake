@@ -14,6 +14,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.FellesT
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.GrunnlagSteg;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandleStegResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingManglerKravgrunnlagFristenUtløptEventPubliserer;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.transisjoner.FellesTransisjoner;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
@@ -22,7 +23,7 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMockUtil;
 
 public class MottattGrunnlagStegImplTest extends FellesTestOppsett {
 
-    private BehandlingFristenUtløptEventPubliserer utløptEventPublisererMock = Mockito.mock(BehandlingFristenUtløptEventPubliserer.class);
+    private BehandlingManglerKravgrunnlagFristenUtløptEventPubliserer utløptEventPublisererMock = Mockito.mock(BehandlingManglerKravgrunnlagFristenUtløptEventPubliserer.class);
 
     @Test
     public void skal_sette_behandling_på_vent() {
