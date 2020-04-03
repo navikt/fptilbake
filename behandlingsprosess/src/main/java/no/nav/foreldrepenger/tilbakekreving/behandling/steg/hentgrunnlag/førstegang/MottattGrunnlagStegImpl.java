@@ -7,17 +7,14 @@ import java.util.Set;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.GrunnlagSteg;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.GrunnlagStegFeil;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandleStegResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegRef;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingTypeRef;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingManglerKravgrunnlagFristenUtløptEventPubliserer;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
@@ -31,11 +28,10 @@ import no.nav.vedtak.konfig.KonfigVerdi;
 @ApplicationScoped
 public class MottattGrunnlagStegImpl implements GrunnlagSteg {
 
-    private static final Logger logger = LoggerFactory.getLogger(MottattGrunnlagStegImpl.class);
-
     private BehandlingRepository behandlingRepository;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste;
+    private BehandlingManglerKravgrunnlagFristenUtløptEventPubliserer utløptEventPubliserer;
     private Period ventefrist;
 
     public MottattGrunnlagStegImpl() {
@@ -46,10 +42,12 @@ public class MottattGrunnlagStegImpl implements GrunnlagSteg {
     public MottattGrunnlagStegImpl(BehandlingRepository behandlingRepository,
                                    BehandlingskontrollTjeneste behandlingskontrollTjeneste,
                                    GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste,
+                                   BehandlingManglerKravgrunnlagFristenUtløptEventPubliserer utløptEventPubliserer,
                                    @KonfigVerdi(value = "frist.grunnlag.tbkg") Period ventefrist) {
         this.behandlingRepository = behandlingRepository;
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
         this.gjenopptaBehandlingTjeneste = gjenopptaBehandlingTjeneste;
+        this.utløptEventPubliserer = utløptEventPubliserer;
         this.ventefrist = ventefrist;
     }
 
@@ -81,12 +79,10 @@ public class MottattGrunnlagStegImpl implements GrunnlagSteg {
             fristTid, Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
 
         if (gåttOverFristen(fristTid)) {
-            /* Hvis fristen har gått ut, og grunnlag fra økonomi ikke har blitt mottatt, logger vi en feil.
-             * Dersom en exception kastes, så vil ikke ny settPåVent status bli persistert, og steget blir satt (feilaktig) som utført.
-             * Hvis denne meldingen logges, må det kontrolleres at oppdragssystemet (OS) er oppe, tilgjengelig for fptilbake, og at OS ikke har feil.
+            /* Hvis fristen har gått ut, og grunnlag fra økonomi ikke har blitt mottatt, publiserer BehandlingFristenUtløptEvent for å sende data til FPLOS .
+             * Etter hvert kan saksbehandler se oppgaven i fplos.Saksbehandler kan åpne oppgaven som åpner behandling på vent med mer informasjon.
              */
-            String saksnummer = behandlingRepository.hentSaksnummerForBehandling(behandling.getId());
-            GrunnlagStegFeil.FACTORY.harIkkeMottattGrunnlagFraØkonomi(fristTid, saksnummer, behandling.getId()).log(logger);
+            utløptEventPubliserer.fireEvent(behandling,fristTid);
         }
         return BehandleStegResultat.settPåVent();
     }

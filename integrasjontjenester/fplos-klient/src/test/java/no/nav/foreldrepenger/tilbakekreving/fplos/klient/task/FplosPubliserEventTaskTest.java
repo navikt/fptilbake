@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -102,7 +103,7 @@ public class FplosPubliserEventTaskTest {
     public void skal_publisere_fplos_data_til_kafka() {
         aksjonspunktRepository.leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING, BehandlingStegType.FAKTA_FEILUTBETALING);
         aksjonspunktRepository.leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, BehandlingStegType.VARSEL);
-        internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling,BehandlingStegType.FAKTA_FEILUTBETALING);
+        internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.FAKTA_FEILUTBETALING);
         kravgrunnlag431 = lagkravgrunnlag();
 
         fplosPubliserEventTask.doTask(prosessTaskData);
@@ -114,7 +115,7 @@ public class FplosPubliserEventTaskTest {
         assertThat(tilbakebetalingBehandlingProsessEventDto.getFørsteFeilutbetaling()).isEqualTo(FOM_1);
         assertThat(tilbakebetalingBehandlingProsessEventDto.getAnsvarligSaksbehandlerIdent()).isNotEmpty();
 
-        Map<String,String> aksjonpunkterMap = tilbakebetalingBehandlingProsessEventDto.getAksjonspunktKoderMedStatusListe();
+        Map<String, String> aksjonpunkterMap = tilbakebetalingBehandlingProsessEventDto.getAksjonspunktKoderMedStatusListe();
         assertThat(aksjonpunkterMap).isNotEmpty();
         assertThat(aksjonpunkterMap.get(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING.getKode())).isEqualTo(AksjonspunktStatus.OPPRETTET.getKode());
         assertThat(aksjonpunkterMap.get(AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING.getKode())).isEqualTo(AksjonspunktStatus.OPPRETTET.getKode());
@@ -132,7 +133,7 @@ public class FplosPubliserEventTaskTest {
     @Test
     public void skal_publisere_fplos_data_til_kafka_for_henleggelse_når_kravgrunnlag_ikke_finnes() {
         aksjonspunktRepository.leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, BehandlingStegType.VARSEL);
-        internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling,BehandlingStegType.VARSEL);
+        internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VARSEL);
 
         fplosPubliserEventTask.doTask(prosessTaskData);
         verify(mockKafkaProducer, atLeastOnce()).sendJsonMedNøkkel(anyString(), anyString());
@@ -140,10 +141,10 @@ public class FplosPubliserEventTaskTest {
         TilbakebetalingBehandlingProsessEventDto tilbakebetalingBehandlingProsessEventDto = fplosPubliserEventTask.getTilbakebetalingBehandlingProsessEventDto(behandling,
             EventHendelse.AKSJONSPUNKT_AVBRUTT.name(), null);
 
-        assertThat(tilbakebetalingBehandlingProsessEventDto.getFeilutbetaltBeløp()).isNull();
+        assertThat(tilbakebetalingBehandlingProsessEventDto.getFeilutbetaltBeløp()).isEqualByComparingTo(BigDecimal.ZERO);
         assertThat(tilbakebetalingBehandlingProsessEventDto.getFørsteFeilutbetaling()).isNull();
 
-        Map<String,String> aksjonpunkterMap = tilbakebetalingBehandlingProsessEventDto.getAksjonspunktKoderMedStatusListe();
+        Map<String, String> aksjonpunkterMap = tilbakebetalingBehandlingProsessEventDto.getAksjonspunktKoderMedStatusListe();
         assertThat(aksjonpunkterMap).isNotEmpty();
         assertThat(aksjonpunkterMap.get(AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING.getKode())).isEqualTo(AksjonspunktStatus.OPPRETTET.getKode());
 
@@ -154,6 +155,68 @@ public class FplosPubliserEventTaskTest {
         assertThat(tilbakebetalingBehandlingProsessEventDto.getYtelseTypeKode()).isEqualTo(FagsakYtelseType.FORELDREPENGER.getKode());
         assertThat(tilbakebetalingBehandlingProsessEventDto.getBehandlingTypeKode()).isEqualTo(BehandlingType.TILBAKEKREVING.getKode());
         assertThat(tilbakebetalingBehandlingProsessEventDto.getBehandlingSteg()).isEqualTo(BehandlingStegType.VARSEL.getKode());
+        assertThat(tilbakebetalingBehandlingProsessEventDto.getHref()).isNotEmpty();
+    }
+
+    @Test
+    public void skal_publisere_fplos_data_til_kafka_når_behandling_venter_på_kravgrunnlag_og_fristen_går_ut() {
+        aksjonspunktRepository.leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, BehandlingStegType.TBKGSTEG);
+        internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.TBKGSTEG);
+        LocalDateTime fristTid = LocalDateTime.now();
+        ProsessTaskData prosessTaskData = lagProsessTaskData();
+        prosessTaskData.setProperty(FplosPubliserEventTask.PROPERTY_KRAVGRUNNLAG_MANGLER_FRIST_TID, fristTid.toString());
+        prosessTaskData.setProperty(FplosPubliserEventTask.PROPERTY_KRAVGRUNNLAG_MANGLER_AKSJONSPUNKT_STATUS_KODE,AksjonspunktStatus.OPPRETTET.getKode());
+
+        fplosPubliserEventTask.doTask(prosessTaskData);
+        verify(mockKafkaProducer, atLeastOnce()).sendJsonMedNøkkel(anyString(), anyString());
+        TilbakebetalingBehandlingProsessEventDto tilbakebetalingBehandlingProsessEventDto = fplosPubliserEventTask.getTilbakebetalingBehandlingProsessEventDto(behandling,
+            EventHendelse.AKSJONSPUNKT_OPPRETTET.name(), null);
+
+        assertThat(tilbakebetalingBehandlingProsessEventDto.getFeilutbetaltBeløp()).isEqualByComparingTo(BigDecimal.ZERO);
+        assertThat(tilbakebetalingBehandlingProsessEventDto.getFørsteFeilutbetaling()).isEqualTo(fristTid.toLocalDate());
+
+        Map<String, String> aksjonpunkterMap = tilbakebetalingBehandlingProsessEventDto.getAksjonspunktKoderMedStatusListe();
+        assertThat(aksjonpunkterMap).isNotEmpty();
+        assertThat(aksjonpunkterMap.get(AksjonspunktDefinisjon.VURDER_HENLEGGELSE_MANGLER_KRAVGRUNNLAG.getKode())).isEqualTo(AksjonspunktStatus.OPPRETTET.getKode());
+
+        assertThat(tilbakebetalingBehandlingProsessEventDto.getEksternId()).isEqualByComparingTo(behandling.getUuid());
+        assertThat(tilbakebetalingBehandlingProsessEventDto.getFagsystem()).isEqualByComparingTo(Fagsystem.FPTILBAKE);
+        assertThat(tilbakebetalingBehandlingProsessEventDto.getEventHendelse()).isEqualByComparingTo(EventHendelse.AKSJONSPUNKT_OPPRETTET);
+        assertThat(tilbakebetalingBehandlingProsessEventDto.getAktørId()).isEqualTo(behandling.getAktørId().getId());
+        assertThat(tilbakebetalingBehandlingProsessEventDto.getYtelseTypeKode()).isEqualTo(FagsakYtelseType.FORELDREPENGER.getKode());
+        assertThat(tilbakebetalingBehandlingProsessEventDto.getBehandlingTypeKode()).isEqualTo(BehandlingType.TILBAKEKREVING.getKode());
+        assertThat(tilbakebetalingBehandlingProsessEventDto.getBehandlingSteg()).isEqualTo(BehandlingStegType.TBKGSTEG.getKode());
+        assertThat(tilbakebetalingBehandlingProsessEventDto.getHref()).isNotEmpty();
+    }
+
+    @Test
+    public void skal_publisere_fplos_data_til_kafka_når_behandling_venter_på_kravgrunnlag_og_fristen_er_endret() {
+        aksjonspunktRepository.leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, BehandlingStegType.TBKGSTEG);
+        internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.TBKGSTEG);
+        LocalDateTime fristTid = LocalDateTime.now();
+        ProsessTaskData prosessTaskData = lagProsessTaskData();
+        prosessTaskData.setProperty(FplosPubliserEventTask.PROPERTY_KRAVGRUNNLAG_MANGLER_FRIST_TID, fristTid.toString());
+        prosessTaskData.setProperty(FplosPubliserEventTask.PROPERTY_KRAVGRUNNLAG_MANGLER_AKSJONSPUNKT_STATUS_KODE,AksjonspunktStatus.AVBRUTT.getKode());
+
+        fplosPubliserEventTask.doTask(prosessTaskData);
+        verify(mockKafkaProducer, atLeastOnce()).sendJsonMedNøkkel(anyString(), anyString());
+        TilbakebetalingBehandlingProsessEventDto tilbakebetalingBehandlingProsessEventDto = fplosPubliserEventTask.getTilbakebetalingBehandlingProsessEventDto(behandling,
+            EventHendelse.AKSJONSPUNKT_AVBRUTT.name(), null);
+
+        assertThat(tilbakebetalingBehandlingProsessEventDto.getFeilutbetaltBeløp()).isEqualByComparingTo(BigDecimal.ZERO);
+        assertThat(tilbakebetalingBehandlingProsessEventDto.getFørsteFeilutbetaling()).isEqualTo(fristTid.toLocalDate());
+
+        Map<String, String> aksjonpunkterMap = tilbakebetalingBehandlingProsessEventDto.getAksjonspunktKoderMedStatusListe();
+        assertThat(aksjonpunkterMap).isNotEmpty();
+        assertThat(aksjonpunkterMap.get(AksjonspunktDefinisjon.VURDER_HENLEGGELSE_MANGLER_KRAVGRUNNLAG.getKode())).isEqualTo(AksjonspunktStatus.AVBRUTT.getKode());
+
+        assertThat(tilbakebetalingBehandlingProsessEventDto.getEksternId()).isEqualByComparingTo(behandling.getUuid());
+        assertThat(tilbakebetalingBehandlingProsessEventDto.getFagsystem()).isEqualByComparingTo(Fagsystem.FPTILBAKE);
+        assertThat(tilbakebetalingBehandlingProsessEventDto.getEventHendelse()).isEqualByComparingTo(EventHendelse.AKSJONSPUNKT_AVBRUTT);
+        assertThat(tilbakebetalingBehandlingProsessEventDto.getAktørId()).isEqualTo(behandling.getAktørId().getId());
+        assertThat(tilbakebetalingBehandlingProsessEventDto.getYtelseTypeKode()).isEqualTo(FagsakYtelseType.FORELDREPENGER.getKode());
+        assertThat(tilbakebetalingBehandlingProsessEventDto.getBehandlingTypeKode()).isEqualTo(BehandlingType.TILBAKEKREVING.getKode());
+        assertThat(tilbakebetalingBehandlingProsessEventDto.getBehandlingSteg()).isEqualTo(BehandlingStegType.TBKGSTEG.getKode());
         assertThat(tilbakebetalingBehandlingProsessEventDto.getHref()).isNotEmpty();
     }
 
@@ -170,10 +233,11 @@ public class FplosPubliserEventTaskTest {
         return kravgrunnlag;
     }
 
-    private void lagProsessTaskData() {
+    private ProsessTaskData lagProsessTaskData() {
         prosessTaskData = new ProsessTaskData(FplosPubliserEventTask.TASKTYPE);
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         prosessTaskData.setProperty(FplosPubliserEventTask.PROPERTY_EVENT_NAME, EventHendelse.AKSJONSPUNKT_OPPRETTET.name());
+        return prosessTaskData;
     }
 
 }
