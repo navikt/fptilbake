@@ -44,9 +44,10 @@ public class ØkonomiConsumerImpl implements ØkonomiConsumer {
         KravgrunnlagHentDetaljResponse respons = hentGrunnlagRespons(kravgrunnlagDetalj);
         MmelDto kvittering = respons.getMmel();
         validerKvitteringForHentGrunnlag(behandlingId, kvittering);
-        logger.info("Hentet kravgrunnlag fra oppdragsystemet for behandlingId={} Alvorlighetsgrad='{}' infomelding='{}'",
+        logger.info("Hentet kravgrunnlag fra oppdragsystemet for behandlingId={} Alvorlighetsgrad='{}' kodeMelding='{}' infomelding='{}'",
             behandlingId,
             kvittering.getAlvorlighetsgrad(),
+            kvittering.getKodeMelding(),
             kvittering.getBeskrMelding());
         return respons.getDetaljertkravgrunnlag();
     }
