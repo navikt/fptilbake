@@ -1,0 +1,153 @@
+@startuml
+
+skinparam componentStyle uml2
+skinparam linetype polyline
+
+skinparam nodesep 10
+skinparam ranksep 10
+
+skinparam rectangle {
+    shadowing<<Kafka>> false
+    BackgroundColor<<Kafka>> lightgrey
+    FontSize<<Kafka>> 1
+    FontStyle<<Kafka>> normal
+    RoundCorner<<Kafka>> 10
+
+    shadowing<<Mq>> false
+    BackgroundColor<<Mq>> lightgrey
+    FontSize<<Mq>> 1
+    FontStyle<<Mq>> normal
+    RoundCorner<<Mq>> 10
+}
+
+title fptilbake
+
+rectangle browser {
+    component [fpsak-frontend] as GUI
+}
+
+together saksb {
+    rectangle saksbehandling {
+        [fpsak] as fpsak
+
+        interface "/behandling" as fpsakApi
+    }
+
+    rectangle " " as kafka2 <<kafka>> {
+        queue "topic.tilkjentytelse" as tilkjentytelse
+    }
+}
+
+together os2 {
+    rectangle "økonomiservice" as os {
+        component [oppdrag]
+        interface "/TilbakekrevingServiceV1" as osService
+    }
+
+    rectangle " " as jms <<mq>> {
+        queue "QueueFptilbakeKravgrunnlag" as osmq
+    }
+}
+
+node tilbakekreving {
+    [fptilbake] as App
+
+    interface "/behandlinger" as behandlingerApi
+    interface "/fordel/journalpost" as varselApi
+
+    database "Oracle" as oracle {
+        [fagsak]
+        [behandling]
+    }
+
+    App -d-> oracle
+}
+
+together kafka_int {
+    component [selvbetjening]
+    component [dvh]
+    component [fplos]
+
+    rectangle " " as kafka <<kafka>> {
+        queue "topic.brukerdialog" as brukerdialog
+        queue "topic.saksstatistikk" as saksstatistikk
+        queue "topic.vedtak" as vedtakstatistikk
+        queue "topic.fplos" as fplostopic
+    }
+}
+
+rectangle dokumentproduksjon {
+    [dokprod]
+    interface "/DokumentproduksjonV2" as dokprodService
+}
+
+together avstem {
+    component [avstemming]
+    interface "filområde" as filområde
+}
+
+rectangle "fpoppdrag" as fpopp {
+    component [fpoppdrag]
+    interface "/simulering" as simulering
+}
+
+rectangle "tps" as tpsService {
+    component [tps]
+    interface "/PersonV2" as personService
+    interface "/AktoerV2" as aktørService
+}
+
+component [fpfordel]
+
+'GUI
+GUI -d-( behandlingerApi : REST
+behandlingerApi -d-> App
+
+'fpfordel
+fpfordel -d-( varselApi : REST
+varselApi -d- App
+
+'fpsak
+fpsak -d-> kafka2 : legger på
+App -> tilkjentytelse : leser
+App -( fpsakApi : REST
+fpsakApi -l--> fpsak
+fpsak -( behandlingerApi : REST
+
+'økonomiservice
+App -( osService : SOAP
+osService -r-> oppdrag
+oppdrag -u-> osmq : putter
+App -> osmq : leser
+
+'kafka integrasjon
+App -r-> kafka : legger på
+brukerdialog -u-> selvbetjening
+saksstatistikk -u-> dvh
+vedtakstatistikk -u-> dvh
+fplostopic -u-> fplos
+
+'tps
+App -d-( aktørService : SOAP
+aktørService -d-> tps
+App --( personService : SOAP
+personService -d-> tps
+
+'dokprod
+App -d-( dokprodService : SOAP
+dokprodService -d-> dokprod
+
+'fpoppdrag
+App -d-( simulering : REST
+simulering -d-> fpoppdrag
+
+'avstemming
+App -u--( filområde : sftp
+filområde -r-> avstemming
+
+saksb -[hidden]l- tilbakekreving
+saksb -[hidden]down-- os2
+
+kafka_int -[hidden]d- tpsService
+
+@enduml

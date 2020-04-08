@@ -7,7 +7,7 @@ Kontaktinformasjon:
 
 # Kontekst
 
-TODO legg inn kontekstdiagram, se k9-oppdrag for eksemepl
+![component diagram fptilbake](docs/component_diagram.png)
 
 # Kjør og test lokalt
 
