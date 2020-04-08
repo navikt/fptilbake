@@ -3,6 +3,8 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning;
 import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.CREATE;
 import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursResourceAttributt.DRIFT;
 
+import java.util.Collection;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -31,10 +33,16 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagValidator;
+import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.TilbakekrevingsvedtakMarshaller;
+import no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste.TilbakekrevingsvedtakTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
+import no.nav.foreldrepenger.tilbakekreving.økonomixml.MeldingType;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
+import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiSendtXmlRepository;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
+import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakRequest;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlag;
+import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsvedtakDto;
 import no.nav.vedtak.felles.jpa.Transaction;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
@@ -55,6 +63,8 @@ public class ForvaltningBehandlingRestTjeneste {
     private ØkonomiMottattXmlRepository mottattXmlRepository;
     private KravgrunnlagRepository grunnlagRepository;
     private KravgrunnlagMapper kravgrunnlagMapper;
+    private ØkonomiSendtXmlRepository økonomiSendtXmlRepository;
+    private TilbakekrevingsvedtakTjeneste tilbakekrevingsvedtakTjeneste;
 
     public ForvaltningBehandlingRestTjeneste() {
         // for CDI
@@ -64,12 +74,16 @@ public class ForvaltningBehandlingRestTjeneste {
     public ForvaltningBehandlingRestTjeneste(BehandlingRepositoryProvider repositoryProvider,
                                              ProsessTaskRepository prosessTaskRepository,
                                              ØkonomiMottattXmlRepository mottattXmlRepository,
-                                             KravgrunnlagMapper kravgrunnlagMapper) {
+                                             KravgrunnlagMapper kravgrunnlagMapper,
+                                             ØkonomiSendtXmlRepository økonomiSendtXmlRepository,
+                                             TilbakekrevingsvedtakTjeneste tilbakekrevingsvedtakTjeneste) {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.prosessTaskRepository = prosessTaskRepository;
         this.mottattXmlRepository = mottattXmlRepository;
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.kravgrunnlagMapper = kravgrunnlagMapper;
+        this.økonomiSendtXmlRepository = økonomiSendtXmlRepository;
+        this.tilbakekrevingsvedtakTjeneste = tilbakekrevingsvedtakTjeneste;
     }
 
     @POST
@@ -159,6 +173,54 @@ public class ForvaltningBehandlingRestTjeneste {
         logger.info("Oppretter task for å hente korrigert kravgrunnlag for behandlingId={}", behandling.getId());
         opprettHentKorrigertGrunnlagTask(behandling, hentKorrigertKravgrunnlagDto.getKravgrunnlagId());
         return Response.ok().build();
+    }
+
+    @POST
+    @Path("/hent-oko-xml-feilet-iverksetting")
+    @Operation(
+        tags = "FORVALTNING-behandling",
+        description = "Tjeneste for å hente xml til økonomi ved feilet iverksetting",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Hent xml til økonomi"),
+            @ApiResponse(responseCode = "400", description = "Behandling eksisterer ikke")
+        })
+    @BeskyttetRessurs(action = CREATE, ressurs = DRIFT)
+    public Response hentOkoXmlForFeiletIverksetting(@NotNull @QueryParam("behandlingId") @Valid BehandlingIdDto behandlingIdDto) {
+        Long behandlingId = behandlingIdDto.getBehandlingId();
+        logger.info("Henter xml til økonomi for behandling: {}", behandlingId);
+
+        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
+        if (behandling == null) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+
+        Collection<String> meldinger = økonomiSendtXmlRepository.finnXml(behandlingId, MeldingType.VEDTAK);
+        if (meldinger.isEmpty()) {
+            logger.info("Xml til økonomi ikke lagret i databasen for behandling: {}", behandlingId);
+            String xml = lagXmlTilØkonomi(behandlingId);
+            return Response.ok()
+                .type(MediaType.APPLICATION_XML)
+                .entity(xml)
+                .build();
+        } else if (meldinger.size() == 1) {
+            logger.info("Fant lagret xml til økonomi for behandling: {}", behandlingId);
+            return Response.ok()
+                .type(MediaType.APPLICATION_XML)
+                .entity(meldinger.toArray()[0])
+                .build();
+        } else {
+            logger.info("Fant {} lagrede xmler til økonomi for behandling: {}", meldinger.size(), behandlingId);
+            return Response.ok()
+                .entity(meldinger)
+                .build();
+        }
+    }
+
+    private String lagXmlTilØkonomi(Long behandlingId) {
+        TilbakekrevingsvedtakDto tilbakekrevingsvedtak = tilbakekrevingsvedtakTjeneste.lagTilbakekrevingsvedtak(behandlingId);
+        TilbakekrevingsvedtakRequest request = new TilbakekrevingsvedtakRequest();
+        request.setTilbakekrevingsvedtak(tilbakekrevingsvedtak);
+        return TilbakekrevingsvedtakMarshaller.marshall(behandlingId, request);
     }
 
     private void kobleBehandling(KobleBehandlingTilGrunnlagDto dto) {
