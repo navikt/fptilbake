@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning;
 
 import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.CREATE;
+import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.READ;
 import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursResourceAttributt.DRIFT;
 
 import java.util.Collection;
@@ -184,7 +185,7 @@ public class ForvaltningBehandlingRestTjeneste {
             @ApiResponse(responseCode = "200", description = "Hent xml til økonomi"),
             @ApiResponse(responseCode = "400", description = "Behandling eksisterer ikke")
         })
-    @BeskyttetRessurs(action = CREATE, ressurs = DRIFT)
+    @BeskyttetRessurs(action = READ, ressurs = DRIFT)
     public Response hentOkoXmlForFeiletIverksetting(@NotNull @QueryParam("behandlingId") @Valid BehandlingIdDto behandlingIdDto) {
         Long behandlingId = behandlingIdDto.getBehandlingId();
         logger.info("Henter xml til økonomi for behandling: {}", behandlingId);
