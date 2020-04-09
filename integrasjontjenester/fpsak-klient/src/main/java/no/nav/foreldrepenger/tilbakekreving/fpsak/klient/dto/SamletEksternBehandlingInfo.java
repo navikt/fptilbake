@@ -42,7 +42,7 @@ public class SamletEksternBehandlingInfo {
         return søknad;
     }
 
-    private FagsakDto getFagsak() {
+    public FagsakDto getFagsak() {
         Objects.check(tilleggsinformasjonHentet.contains(Tillegsinformasjon.FAGSAK), "Utvikler-feil: har ikke hentet fagsak");
         return fagsak;
     }

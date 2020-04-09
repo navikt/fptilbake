@@ -3,6 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.økonomixml;
 import static no.nav.vedtak.felles.jpa.HibernateVerktøy.hentUniktResultat;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -93,6 +94,21 @@ public class ØkonomiMottattXmlRepository {
         ØkonomiXmlMottatt entity = finnMottattXml(kravgrunnlagXmlId);
         entity.setSaksnummer(saksnummer);
         entityManager.persist(entity);
+    }
+
+    public List<ØkonomiXmlMottatt> hentGamleKravgrunnlagUtenTilkobling(LocalDateTime dato){
+        TypedQuery<ØkonomiXmlMottatt> query = entityManager.createQuery("from ØkonomiXmlMottatt where tilkoblet='N' and opprettetTidspunkt < :dato", ØkonomiXmlMottatt.class);
+        query.setParameter("dato",dato);
+        return query.getResultList();
+    }
+
+    public void arkiverMottattXml(Long mottattXmlId, String xml){
+        ØkonomiXmlMottattArkiv økonomiXmlMottattArkiv = new ØkonomiXmlMottattArkiv(mottattXmlId,xml);
+        entityManager.persist(økonomiXmlMottattArkiv);
+    }
+
+    public ØkonomiXmlMottattArkiv finnArkivertMottattXml(Long mottattXmlId){
+        return entityManager.find(ØkonomiXmlMottattArkiv.class, mottattXmlId);
     }
 
     private Long finnHøyesteVersjonsnummer(String eksternBehandlingId) {

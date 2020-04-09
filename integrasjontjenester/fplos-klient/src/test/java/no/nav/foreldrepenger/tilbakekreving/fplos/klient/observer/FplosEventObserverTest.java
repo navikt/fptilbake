@@ -213,7 +213,7 @@ public class FplosEventObserverTest {
         LocalDateTime fristTid = LocalDateTime.now();
         BehandlingManglerKravgrunnlagFristenUtløptEvent utløptEvent = new BehandlingManglerKravgrunnlagFristenUtløptEvent(behandling, fristTid);
 
-        fplosEventObserver.observerBehandlingFristenEndretEvent(utløptEvent);
+        fplosEventObserver.observerBehandlingFristenUtløptEvent(utløptEvent);
         ProsessTaskData publisherEventProsessTask = fellesAssertProsessTask(EventHendelse.AKSJONSPUNKT_OPPRETTET);
         assertThat(publisherEventProsessTask.getPropertyValue(FplosPubliserEventTask.PROPERTY_KRAVGRUNNLAG_MANGLER_FRIST_TID)).isEqualTo(fristTid.toString());
         assertThat(publisherEventProsessTask.getPropertyValue(FplosPubliserEventTask.PROPERTY_KRAVGRUNNLAG_MANGLER_AKSJONSPUNKT_STATUS_KODE)).isEqualTo(AksjonspunktStatus.OPPRETTET.getKode());

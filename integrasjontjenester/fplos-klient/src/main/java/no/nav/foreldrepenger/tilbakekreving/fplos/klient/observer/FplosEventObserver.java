@@ -39,6 +39,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 public class FplosEventObserver {
 
     private static final Logger logger = LoggerFactory.getLogger(FplosEventObserver.class);
+    private static final String LOGGER_OPPRETTER_PROSESS_TASK = "Oppretter prosess task for å publisere event={} til fplos for aksjonspunkt={}";
 
     private UtvidetProsessTaskRepository utvidetProsessTaskRepository;
     private ProsessTaskRepository prosessTaskRepository;
@@ -65,7 +66,7 @@ public class FplosEventObserver {
         Long behandlingId = event.getBehandlingId();
         for (Aksjonspunkt aksjonspunkt : event.getAksjonspunkter()) {
             if (aksjonspunkt.erManuell() || erBehandlingIFaktaEllerSenereSteg(behandlingId)) {
-                logger.info("Oppretter prosess task for å publisere event={} til fplos for aksjonspunkt={}", EventHendelse.AKSJONSPUNKT_OPPRETTET, aksjonspunkt.getAksjonspunktDefinisjon().getKode());
+                logger.info(LOGGER_OPPRETTER_PROSESS_TASK, EventHendelse.AKSJONSPUNKT_OPPRETTET, aksjonspunkt.getAksjonspunktDefinisjon().getKode());
                 opprettProsessTask(event.getFagsakId(), behandlingId, event.getAktørId(), EventHendelse.AKSJONSPUNKT_OPPRETTET);
             }
         }
@@ -75,14 +76,14 @@ public class FplosEventObserver {
         Long behandlingId = event.getBehandlingId();
         for (Aksjonspunkt aksjonspunkt : event.getAksjonspunkter()) {
             if (aksjonspunkt.erAutopunkt() && erBehandlingIFaktaEllerSenereSteg(behandlingId)) {
-                logger.info("Oppretter prosess task for å publisere event={} til fplos for aksjonspunkt={}", EventHendelse.AKSJONSPUNKT_UTFØRT, aksjonspunkt.getAksjonspunktDefinisjon().getKode());
+                logger.info(LOGGER_OPPRETTER_PROSESS_TASK, EventHendelse.AKSJONSPUNKT_UTFØRT, aksjonspunkt.getAksjonspunktDefinisjon().getKode());
                 opprettProsessTask(event.getFagsakId(), behandlingId, event.getAktørId(), EventHendelse.AKSJONSPUNKT_UTFØRT);
             }
         }
     }
 
     public void observerAksjonpunktTilbakeførtEvent(@Observes AksjonspunktTilbakeførtEvent event) {
-        logger.info("Oppretter prosess task for å publisere event={} til fplos for aksjonspunkt={}", EventHendelse.AKSJONSPUNKT_TILBAKEFØR, event.getAksjonspunkter().get(0).getAksjonspunktDefinisjon().getKode());
+        logger.info(LOGGER_OPPRETTER_PROSESS_TASK, EventHendelse.AKSJONSPUNKT_TILBAKEFØR, event.getAksjonspunkter().get(0).getAksjonspunktDefinisjon().getKode());
         opprettProsessTask(event.getFagsakId(), event.getBehandlingId(), event.getAktørId(), EventHendelse.AKSJONSPUNKT_TILBAKEFØR);
     }
 
@@ -100,15 +101,15 @@ public class FplosEventObserver {
         }
     }
 
-    public void observerBehandlingFristenEndretEvent(@Observes BehandlingManglerKravgrunnlagFristenUtløptEvent utløptEvent) {
-        logger.info("Oppretter prosess task for å publisere event={} til fplos for aksjonspunkt={}", EventHendelse.AKSJONSPUNKT_OPPRETTET,
+    public void observerBehandlingFristenUtløptEvent(@Observes BehandlingManglerKravgrunnlagFristenUtløptEvent utløptEvent) {
+        logger.info(LOGGER_OPPRETTER_PROSESS_TASK, EventHendelse.AKSJONSPUNKT_OPPRETTET,
             AksjonspunktDefinisjon.VURDER_HENLEGGELSE_MANGLER_KRAVGRUNNLAG.getKode());
         opprettProsessTask(utløptEvent.getFagsakId(), utløptEvent.getBehandlingId(), utløptEvent.getAktørId(),
             EventHendelse.AKSJONSPUNKT_OPPRETTET, AksjonspunktStatus.OPPRETTET, utløptEvent.getFristDato());
     }
 
     public void observerBehandlingFristenEndretEvent(@Observes BehandlingManglerKravgrunnlagFristenEndretEvent fristenEndretEvent) {
-        logger.info("Oppretter prosess task for å publisere event={} til fplos for aksjonspunkt={}", EventHendelse.AKSJONSPUNKT_AVBRUTT,
+        logger.info(LOGGER_OPPRETTER_PROSESS_TASK, EventHendelse.AKSJONSPUNKT_AVBRUTT,
             AksjonspunktDefinisjon.VURDER_HENLEGGELSE_MANGLER_KRAVGRUNNLAG.getKode());
         opprettProsessTask(fristenEndretEvent.getFagsakId(), fristenEndretEvent.getBehandlingId(), fristenEndretEvent.getAktørId(),
             EventHendelse.AKSJONSPUNKT_AVBRUTT, AksjonspunktStatus.AVBRUTT, fristenEndretEvent.getFristDato());
