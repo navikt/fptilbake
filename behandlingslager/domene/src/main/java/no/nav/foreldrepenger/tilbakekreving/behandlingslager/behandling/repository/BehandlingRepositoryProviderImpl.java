@@ -51,6 +51,7 @@ public class BehandlingRepositoryProviderImpl implements BehandlingRepositoryPro
     private VarselRepository varselRepository;
     private VedtaksbrevFritekstRepository vedtaksbrevFritekstRepository;
     private BrevSporingRepository brevSporingRepository;
+    private VergeRepository vergeRepository;
 
 
     BehandlingRepositoryProviderImpl() {
@@ -79,6 +80,7 @@ public class BehandlingRepositoryProviderImpl implements BehandlingRepositoryPro
         this.varselRepository = new VarselRepository(entityManager);
         this.vedtaksbrevFritekstRepository = new VedtaksbrevFritekstRepository(entityManager);
         this.brevSporingRepository = new BrevSporingRepository(entityManager);
+        this.vergeRepository = new VergeRepository(entityManager);
     }
 
     protected EntityManager getEntityManager() {
@@ -170,5 +172,11 @@ public class BehandlingRepositoryProviderImpl implements BehandlingRepositoryPro
     public BrevSporingRepository getBrevSporingRepository() {
         return brevSporingRepository;
     }
+
+    @Override
+    public VergeRepository getVergeRepository() {
+        return vergeRepository;
+    }
+
 
 }

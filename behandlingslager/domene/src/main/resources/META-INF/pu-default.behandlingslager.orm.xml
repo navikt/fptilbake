@@ -17,6 +17,8 @@
     <sequence-generator name="SEQ_TOTRINNSVURDERING" allocation-size="50" sequence-name="SEQ_TOTRINNSVURDERING"/>
     <sequence-generator name="SEQ_TOTRINNRESULTATGRUNNLAG" allocation-size="50" sequence-name="SEQ_TOTRINNRESULTATGRUNNLAG"/>
     <sequence-generator name="SEQ_VURDER_AARSAK_TTVURDERING" allocation-size="50" sequence-name="SEQ_VURDER_AARSAK_TTVURDERING"/>
+    <sequence-generator name="SEQ_VERGE" allocation-size="50" sequence-name="SEQ_VERGE"/>
+    <sequence-generator name="SEQ_VERGE_ORGANISASJON" allocation-size="50" sequence-name="SEQ_VERGE_ORGANISASJON"/>
 
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker"/>
 
@@ -42,6 +44,9 @@
 
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode"/>
+
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeOrganisasjonEntitet"/>
 
     <!--###################-->
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.AdresseType"/>

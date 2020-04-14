@@ -28,9 +28,9 @@ import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.FagsakDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.PersonopplysningDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SoknadDto;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SøknadType;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.TilbakekrevingValgDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.VarseltekstDto;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.VergeDto;
 import no.nav.vedtak.felles.integrasjon.rest.OidcRestClient;
 import no.nav.vedtak.konfig.PropertyUtil;
 
@@ -129,6 +129,11 @@ public class FpsakKlient {
         URI endpoint = createUri(BEHANDLING_ALLE_EP, PARAM_NAME_SAKSNUMMER, saksnummer);
         JsonNode jsonNode = restClient.get(endpoint, JsonNode.class);
         return lesResponsFraJsonNode(saksnummer, jsonNode);
+    }
+
+    public Optional<VergeDto> hentVergeInformasjon(UUID eksternUuid){
+        URI endpoint = createUri("/behandling/person/verge", PARAM_NAME_BEHANDLING_UUID, eksternUuid.toString());
+        return get(endpoint, VergeDto.class);
     }
 
     private List<EksternBehandlingsinfoDto> lesResponsFraJsonNode(String saksnummer, JsonNode jsonNode) {

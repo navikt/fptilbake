@@ -35,6 +35,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingresultatRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.VergeRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeOrganisasjonEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
@@ -46,10 +49,12 @@ import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.VergeDto;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.konfig.KonfigVerdi;
+import no.nav.vedtak.util.StringUtils;
 
 @ApplicationScoped
 @Transactional
@@ -63,6 +68,7 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
     private BehandlingresultatRepository behandlingresultatRepository;
     private ProsessTaskRepository prosessTaskRepository;
     private BehandlingVedtakRepository behandlingVedtakRepository;
+    private VergeRepository vergeRepository;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste;
     private FagsakTjeneste fagsakTjeneste;
@@ -94,6 +100,7 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
         this.eksternBehandlingRepository = behandlingRepositoryProvider.getEksternBehandlingRepository();
         this.behandlingresultatRepository = behandlingRepositoryProvider.getBehandlingresultatRepository();
         this.behandlingVedtakRepository = behandlingRepositoryProvider.getBehandlingVedtakRepository();
+        this.vergeRepository = behandlingRepositoryProvider.getVergeRepository();
         this.prosessTaskRepository = prosessTaskRepository;
     }
 
@@ -250,6 +257,8 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
 
         historikkinnslagTjeneste.opprettHistorikkinnslagForOpprettetBehandling(behandling); // FIXME: sjekk om journalpostId skal hentes ///
 
+        hentVergeInformasjonFraFpsak(behandling);
+
         return behandling;
     }
 
@@ -294,6 +303,26 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
         prosessTaskData.setSekvens("2");
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         prosessTaskRepository.lagre(prosessTaskData);
+    }
+
+    private void hentVergeInformasjonFraFpsak(Behandling behandling) {
+        EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandling.getId());
+        Optional<VergeDto> vergeInformasjon = fpsakKlient.hentVergeInformasjon(eksternBehandling.getEksternUuid());
+        vergeInformasjon.ifPresent(vergeDto -> lagreVergeInformasjon(behandling, vergeDto));
+    }
+
+    private void lagreVergeInformasjon(Behandling behandling, VergeDto vergeDto) {
+        VergeEntitet vergeEntitet = VergeEntitet.builder().medVergeType(vergeDto.getVergeType())
+            .medBruker(behandling.getFagsak().getNavBruker())
+            .medGyldigPeriode(vergeDto.getGyldigFom(), vergeDto.getGyldigTom()).build();
+        if (!StringUtils.nullOrEmpty(vergeDto.getOrganisasjonsnummer())) {
+            VergeOrganisasjonEntitet vergeOrganisasjonEntitet = VergeOrganisasjonEntitet.builder().medNavn(vergeDto.getNavn())
+                .medOrganisasjonnummer(vergeDto.getOrganisasjonsnummer())
+                .medVerge(vergeEntitet).build();
+            vergeEntitet.setVergeOrganisasjon(vergeOrganisasjonEntitet);
+        }
+        long vergeId = vergeRepository.lagreVergeInformasjon(vergeEntitet);
+        eksternBehandlingRepository.oppdaterVerge(vergeId, behandling.getId());
     }
 
 }

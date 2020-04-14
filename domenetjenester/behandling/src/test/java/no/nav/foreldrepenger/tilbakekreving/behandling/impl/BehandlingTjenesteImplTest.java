@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
@@ -21,6 +22,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KonsekvensForYtelsen;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeOrganisasjonEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.tilbakekrevingsvalg.VidereBehandling;
@@ -30,6 +34,7 @@ import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.BehandlingÅrsakDto
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.FpsakBehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.TilbakekrevingValgDto;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.VergeDto;
 
 public class BehandlingTjenesteImplTest extends FellesTestOppsett {
 
@@ -56,7 +61,7 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_opprette_behandling_manell() {
+    public void skal_opprette_behandling_manuell() {
         avsluttBehandling();
         Long behandlingId = behandlingTjeneste.opprettBehandlingManuell(saksnummer, UUID.randomUUID(), FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING);
         fellesBehandlingAssert(behandlingId, true);
@@ -64,13 +69,13 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_opprette_behandling_manell_med_allerede_åpen_behandling() {
+    public void skal_opprette_behandling_manuell_med_allerede_åpen_behandling() {
         expectedException.expectMessage("FPT-663486");
         behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternBehandlingUuid, FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING);
     }
 
     @Test
-    public void skal_opprette_behandling_manell_med_allerede_åpen_revurdeing_behandling() {
+    public void skal_opprette_behandling_manuell_med_allerede_åpen_revurdeing_behandling() {
         UUID eksternUUID = UUID.randomUUID();
         avsluttBehandling();
         revurderingTjeneste.opprettRevurdering(behandling.getId(), BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR);
@@ -81,7 +86,7 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_opprette_behandling_manell_med_allerede_avsluttet_behandling_med_samme_fpsak_revurdering() {
+    public void skal_opprette_behandling_manuell_med_allerede_avsluttet_behandling_med_samme_fpsak_revurdering() {
         avsluttBehandling();
         expectedException.expectMessage("FPT-663488");
 
@@ -89,7 +94,7 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_opprette_behandling_manell_med_allerede_henlagt_avsluttet_behandling_med_samme_fpsak_revurdering() {
+    public void skal_opprette_behandling_manuell_med_allerede_henlagt_avsluttet_behandling_med_samme_fpsak_revurdering() {
         lagBehandlingsResulatat();
         avsluttBehandling();
 
@@ -97,6 +102,27 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
         fellesBehandlingAssert(behandlingId, true);
         assertThat(prosessTaskRepository.finnProsessTaskType(BehandlingTjenesteImpl.FINN_KRAVGRUNNLAG_TASK)).isNotEmpty();
     }
+
+    @Test
+    public void skal_opprette_behandling_manuell_med_verge_informasjon() {
+        avsluttBehandling();
+        when(mockFpsakKlient.hentVergeInformasjon(any(UUID.class))).thenReturn(Optional.of(lagVergeInformasjon()));
+        Long behandlingId = behandlingTjeneste.opprettBehandlingManuell(saksnummer, UUID.randomUUID(), FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING);
+        fellesBehandlingAssert(behandlingId, true);
+        assertThat(prosessTaskRepository.finnProsessTaskType(BehandlingTjenesteImpl.FINN_KRAVGRUNNLAG_TASK)).isNotEmpty();
+        fellesVergeAssert(behandlingId);
+    }
+
+    @Test
+    public void skal_opprette_behandling_automatisk_med_verge_informasjon() {
+        avsluttBehandling();
+        when(mockFpsakKlient.hentVergeInformasjon(any(UUID.class))).thenReturn(Optional.of(lagVergeInformasjon()));
+        Long behandlingId = behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer, UUID.randomUUID(), eksternBehandlingId, aktørId, FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING);
+        fellesBehandlingAssert(behandlingId, false);
+        assertThat(prosessTaskRepository.finnProsessTaskType(BehandlingTjenesteImpl.FINN_KRAVGRUNNLAG_TASK)).isNotEmpty();
+        fellesVergeAssert(behandlingId);
+    }
+
 
     @Test
     public void kan_opprette_behandling_med_åpen_behandling_finnes() {
@@ -187,6 +213,32 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
         behandlingÅrsakDto.setBehandlingÅrsakType(BehandlingÅrsakType.RE_KLAGE_KA);
         eksternBehandlingsinfo.setBehandlingÅrsaker(Lists.newArrayList(behandlingÅrsakDto));
         return eksternBehandlingsinfo;
+    }
+
+    private VergeDto lagVergeInformasjon() {
+        VergeDto vergeDto = new VergeDto();
+        vergeDto.setGyldigFom(LocalDate.of(2019, 1, 1));
+        vergeDto.setGyldigTom(LocalDate.of(2020, 12, 31));
+        vergeDto.setVergeType(VergeType.BARN);
+        vergeDto.setNavn("testorg");
+        vergeDto.setOrganisasjonsnummer("12345");
+        return vergeDto;
+    }
+
+    private void fellesVergeAssert(Long behandlingId) {
+        EksternBehandling eksternBehandling = repoProvider.getEksternBehandlingRepository().hentFraInternId(behandlingId);
+        assertThat(eksternBehandling.getVergeId()).isNotNull();
+        long vergeId = eksternBehandling.getVergeId();
+        VergeEntitet vergeEntitet = repoProvider.getVergeRepository().hentVergeInformasjon(vergeId);
+        assertThat(vergeEntitet).isNotNull();
+        assertThat(vergeEntitet.getBruker().getAktørId()).isEqualTo(behandling.getAktørId());
+        assertThat(vergeEntitet.getVergeType()).isEqualByComparingTo(VergeType.BARN);
+        assertThat(vergeEntitet.getGyldigFom()).isNotNull();
+        assertThat(vergeEntitet.getGyldigTom()).isNotNull();
+        assertThat(vergeEntitet.getVergeOrganisasjon()).isNotEmpty();
+        VergeOrganisasjonEntitet vergeOrganisasjonEntitet = vergeEntitet.getVergeOrganisasjon().get();
+        assertThat(vergeOrganisasjonEntitet.getNavn()).isNotEmpty();
+        assertThat(vergeOrganisasjonEntitet.getOrganisasjonsnummer()).isNotEmpty();
     }
 
 }
