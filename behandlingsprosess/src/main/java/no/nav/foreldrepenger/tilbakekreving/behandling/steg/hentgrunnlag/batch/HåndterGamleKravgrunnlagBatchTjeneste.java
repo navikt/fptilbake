@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -16,11 +17,13 @@ import org.slf4j.LoggerFactory;
 import no.nav.foreldrepenger.batch.BatchArguments;
 import no.nav.foreldrepenger.batch.BatchStatus;
 import no.nav.foreldrepenger.batch.BatchTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TaskProperty;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagValidator;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
+import no.nav.vedtak.felles.integrasjon.unleash.EnvironmentProperty;
 import no.nav.vedtak.konfig.KonfigVerdi;
 
 @ApplicationScoped
@@ -46,10 +49,17 @@ public class HåndterGamleKravgrunnlagBatchTjeneste implements BatchTjeneste {
     @Override
     public String launch(BatchArguments arguments) {
         String batchRun = BATCHNAVN + "-" + UUID.randomUUID();
+        if (!erTestMiljø()) {
+            return batchRun;
+        }
         LocalDate bestemtDato = LocalDate.now().minus(venteFrist);
         logger.info("Håndterer kravgrunnlag som er eldre enn {} i batch {}", bestemtDato, batchRun);
 
-        List<ØkonomiXmlMottatt> alleGamleKravgrunnlag = håndterGamleKravgrunnlagTjeneste.hentGamleKravgrunnlag(bestemtDato);
+        List<ØkonomiXmlMottatt> alleGamleMeldinger = håndterGamleKravgrunnlagTjeneste.hentGamleMeldinger(bestemtDato);
+        List<ØkonomiXmlMottatt> alleGamleKravgrunnlag = alleGamleMeldinger.stream()
+            .filter(økonomiXmlMottatt -> økonomiXmlMottatt.getMottattXml().contains(TaskProperty.ROOT_ELEMENT_KRAVGRUNNLAG_XML))
+            .collect(Collectors.toList());
+
         if (alleGamleKravgrunnlag.isEmpty()) {
             logger.info("Det finnes ingen gammel kravgrunnlag før {}", bestemtDato);
         } else {
@@ -66,9 +76,9 @@ public class HåndterGamleKravgrunnlagBatchTjeneste implements BatchTjeneste {
                 }
             }
             //slette gamle kravgrunnlag som ikke finnes i Økonomi fra OKO_XML_MOTTATT
-            if (!slettesXmlListe.isEmpty()) {
+            if (slettesXmlListe.size() > 0) {
                 logger.info("Antall Gamle kravgrunnlag som skal slettes fra OKO_XML_MOTTATT er {}", slettesXmlListe);
-                håndterGamleKravgrunnlagTjeneste.slettGammelKravgrunnlag(slettesXmlListe);
+                håndterGamleKravgrunnlagTjeneste.slettMottattGamleKravgrunnlag(slettesXmlListe);
             }
         }
         return batchRun;
@@ -78,8 +88,15 @@ public class HåndterGamleKravgrunnlagBatchTjeneste implements BatchTjeneste {
         try {
             KravgrunnlagValidator.validerGrunnlag(kravgrunnlag431);
             String saksnummer = finnSaksnummer(kravgrunnlag431.getFagSystemId());
-            if (!håndterGamleKravgrunnlagTjeneste.erBehandlingAlleredeFinnes(new Saksnummer(saksnummer))) {
-                håndterGyldigkravgrunnlag(mottattXmlId, saksnummer, kravgrunnlag431);
+            if (!håndterGamleKravgrunnlagTjeneste.finnesBehandling(new Saksnummer(saksnummer))) {
+                Long eksternBehandlingId = Long.valueOf(kravgrunnlag431.getReferanse());
+                Optional<EksternBehandlingsinfoDto> fpsakBehandling = håndterGamleKravgrunnlagTjeneste.hentDataFraFpsak(saksnummer, eksternBehandlingId);
+                if (fpsakBehandling.isEmpty()) {
+                    håndterGamleKravgrunnlagTjeneste.arkiverMotattXml(mottattXmlId, melding);
+                    return Optional.of(mottattXmlId);
+                } else {
+                    håndterGyldigkravgrunnlag(mottattXmlId, saksnummer, kravgrunnlag431.getReferanse(), fpsakBehandling.get());
+                }
             }
         } catch (KravgrunnlagValidator.UgyldigKravgrunnlagException e) {
             logger.warn(e.getMessage());
@@ -89,14 +106,10 @@ public class HåndterGamleKravgrunnlagBatchTjeneste implements BatchTjeneste {
         return Optional.empty();
     }
 
-    private void håndterGyldigkravgrunnlag(Long mottattXmlId, String saksnummer, Kravgrunnlag431 kravgrunnlag431) {
-        Long eksternBehandlingId = Long.valueOf(kravgrunnlag431.getReferanse());
-        Optional<EksternBehandlingsinfoDto> fpsakBehandling = håndterGamleKravgrunnlagTjeneste.hentDataFraFpsak(saksnummer, eksternBehandlingId);
-        fpsakBehandling.ifPresent(eksternBehandlingData -> {
-            håndterGamleKravgrunnlagTjeneste.oppdaterMedEksternBehandlingIdOgSaksnummer(mottattXmlId, kravgrunnlag431.getReferanse(), saksnummer);
-            Long behandlingId = håndterGamleKravgrunnlagTjeneste.opprettBehandling(eksternBehandlingData);
-            logger.info("Behandling opprettet med behandlingId={}", behandlingId);
-        });
+    private void håndterGyldigkravgrunnlag(Long mottattXmlId, String saksnummer, String eksternBehandlingId, EksternBehandlingsinfoDto eksternBehandlingData) {
+        håndterGamleKravgrunnlagTjeneste.oppdaterMedEksternBehandlingIdOgSaksnummer(mottattXmlId, eksternBehandlingId, saksnummer);
+        Long behandlingId = håndterGamleKravgrunnlagTjeneste.opprettBehandling(eksternBehandlingData);
+        logger.info("Behandling opprettet med behandlingId={}", behandlingId);
     }
 
     @Override
@@ -112,6 +125,15 @@ public class HåndterGamleKravgrunnlagBatchTjeneste implements BatchTjeneste {
 
     private String finnSaksnummer(String fagsystemId) {
         return fagsystemId.substring(0, fagsystemId.length() - 3);
+    }
+
+    //midlertidig kode. skal fjernes da test er ferdig
+    private boolean erTestMiljø() {
+        //foreløpig kun på for testing
+        Optional<String> envName = EnvironmentProperty.getEnvironmentName();
+        boolean isEnabled = envName.isPresent() && ("t4".equalsIgnoreCase(envName.get()) || "devimg".equalsIgnoreCase(envName.get()));
+        logger.info("{} er {}", "HåndterGamleKravgrunnlag batch(BFPT-002) er", isEnabled ? "skudd på" : "ikke skudd på");
+        return isEnabled;
     }
 
 }

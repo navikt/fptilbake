@@ -23,13 +23,13 @@ import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsi
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KodeAksjon;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
+import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ManglendeKravgrunnlagException;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiConsumer;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlag;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagDto;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.HentKravgrunnlagDetaljDto;
-import no.nav.vedtak.exception.IntegrasjonException;
 
 @ApplicationScoped
 public class HåndterGamleKravgrunnlagTjeneste {
@@ -58,12 +58,12 @@ public class HåndterGamleKravgrunnlagTjeneste {
         this.fpsakKlient = fpsakKlient;
     }
 
-    public List<ØkonomiXmlMottatt> hentGamleKravgrunnlag(LocalDate bestemtDato) {
+    protected List<ØkonomiXmlMottatt> hentGamleMeldinger(LocalDate bestemtDato) {
         logger.info("Henter kravgrunnlag som er eldre enn {}", bestemtDato);
-        return mottattXmlRepository.hentGamleKravgrunnlagUtenTilkobling(bestemtDato.atStartOfDay());
+        return mottattXmlRepository.hentGamleUkobledeMottattXml(bestemtDato.atStartOfDay());
     }
 
-    public Optional<Kravgrunnlag431> hentKravgrunnlagFraØkonomi(ØkonomiXmlMottatt økonomiXmlMottatt) {
+    protected Optional<Kravgrunnlag431> hentKravgrunnlagFraØkonomi(ØkonomiXmlMottatt økonomiXmlMottatt) {
         String melding = økonomiXmlMottatt.getMottattXml();
         long mottattXmlId = økonomiXmlMottatt.getId();
         DetaljertKravgrunnlag detaljertKravgrunnlag = KravgrunnlagXmlUnmarshaller.unmarshall(mottattXmlId, melding);
@@ -71,16 +71,14 @@ public class HåndterGamleKravgrunnlagTjeneste {
         try {
             DetaljertKravgrunnlagDto detaljertKravgrunnlagDto = økonomiConsumer.hentKravgrunnlag(null, hentKravgrunnlagDetalj);
             return Optional.of(hentKravgrunnlagMapper.mapTilDomene(detaljertKravgrunnlagDto));
-        } catch (IntegrasjonException e) {
+        } catch (ManglendeKravgrunnlagException e) {
             logger.warn(e.getMessage());
-            if (e.getMessage().contains("FPT-539080")) {
-                arkiverMotattXml(mottattXmlId, melding);
-            }
+            arkiverMotattXml(mottattXmlId, melding);
+            return Optional.empty();
         }
-        return Optional.empty();
     }
 
-    public boolean erBehandlingAlleredeFinnes(Saksnummer saksnummer) {
+    protected boolean finnesBehandling(Saksnummer saksnummer) {
         if (!behandlingTjeneste.hentBehandlinger(saksnummer).isEmpty()) {
             logger.info("Behandling finnes allerede for saksnummer={}.Kan ikke opprette behandling igjen!", saksnummer);
             return true;
@@ -88,32 +86,32 @@ public class HåndterGamleKravgrunnlagTjeneste {
         return false;
     }
 
-    public Optional<EksternBehandlingsinfoDto> hentDataFraFpsak(String saksnummer, Long eksternBehandlingId) {
+    protected Optional<EksternBehandlingsinfoDto> hentDataFraFpsak(String saksnummer, Long eksternBehandlingId) {
         List<EksternBehandlingsinfoDto> eksternBehandlinger = fpsakKlient.hentBehandlingForSaksnummer(saksnummer);
         if (!eksternBehandlinger.isEmpty()) {
             return eksternBehandlinger.stream()
                 .filter(eksternBehandlingsinfoDto -> eksternBehandlingsinfoDto.getId().equals(eksternBehandlingId)).findAny();
         }
-
+        logger.warn("Saksnummer={} finnes ikke i fpsak",saksnummer);
         return Optional.empty();
     }
 
-    public void arkiverMotattXml(Long mottattXmlId, String melding){
+    protected void arkiverMotattXml(Long mottattXmlId, String melding) {
         mottattXmlRepository.arkiverMottattXml(mottattXmlId, melding);
     }
 
-    public void oppdaterMedEksternBehandlingIdOgSaksnummer(Long mottattXmlId,String eksternBehandlingId, String saksnummer){
-        mottattXmlRepository.oppdaterMedEksternBehandlingIdOgSaksnummer(eksternBehandlingId,saksnummer,mottattXmlId);
+    protected void oppdaterMedEksternBehandlingIdOgSaksnummer(Long mottattXmlId, String eksternBehandlingId, String saksnummer) {
+        mottattXmlRepository.oppdaterMedEksternBehandlingIdOgSaksnummer(eksternBehandlingId, saksnummer, mottattXmlId);
     }
 
-    public long opprettBehandling(EksternBehandlingsinfoDto eksternBehandlingData) {
+    protected long opprettBehandling(EksternBehandlingsinfoDto eksternBehandlingData) {
         UUID eksternBehandlingUuid = eksternBehandlingData.getUuid();
         SamletEksternBehandlingInfo samletEksternBehandlingInfo = fpsakKlient.hentBehandlingsinfo(eksternBehandlingUuid, Tillegsinformasjon.FAGSAK);
         FagsakYtelseType fagsakYtelseType = FagsakYtelseType.fraKode(samletEksternBehandlingInfo.getFagsak().getSakstype());
         return behandlingTjeneste.opprettBehandlingManuell(samletEksternBehandlingInfo.getSaksnummer(), eksternBehandlingUuid, fagsakYtelseType, BehandlingType.TILBAKEKREVING);
     }
 
-    public void slettGammelKravgrunnlag(List<Long> gammelKravgrunnlagListe) {
+    protected void slettMottattGamleKravgrunnlag(List<Long> gammelKravgrunnlagListe) {
         gammelKravgrunnlagListe.forEach(mottattXmlId -> mottattXmlRepository.slettMottattXml(mottattXmlId));
     }
 

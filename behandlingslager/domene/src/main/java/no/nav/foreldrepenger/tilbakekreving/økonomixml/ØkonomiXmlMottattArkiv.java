@@ -6,11 +6,11 @@ import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkBaseEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 
 @Entity(name = "ØkonomiXmlMottattArkiv")
 @Table(name = "OKO_XML_MOTTATT_ARKIV")
-public class ØkonomiXmlMottattArkiv extends KodeverkBaseEntitet {
+public class ØkonomiXmlMottattArkiv extends BaseEntitet {
 
     @Id
     private Long id;

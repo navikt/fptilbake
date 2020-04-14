@@ -77,6 +77,7 @@ public class HåndterGamleKravgrunnlagBatchTjenesteTest extends FellesTestOppset
 
     @Before
     public void setup() {
+        System.setProperty("environment.name","devimg");
         when(tpsAdapterMock.hentAktørIdForPersonIdent(any(PersonIdent.class))).thenReturn(Optional.of(behandling.getFagsak().getAktørId()));
         when(økonomiConsumerMock.hentKravgrunnlag(any(), any(HentKravgrunnlagDetaljDto.class))).thenReturn(lagDetaljertKravgrunnlagDto(true));
         when(fpsakKlientMock.hentBehandlingForSaksnummer(anyString())).thenReturn(Lists.newArrayList(lagEksternBehandlingData()));
@@ -116,6 +117,8 @@ public class HåndterGamleKravgrunnlagBatchTjenesteTest extends FellesTestOppset
         when(fpsakKlientMock.hentBehandlingForSaksnummer(anyString())).thenReturn(Lists.newArrayList());
         BatchArguments emptyBatchArguments = new EmptyBatchArguments(Collections.EMPTY_MAP);
         gamleKravgrunnlagBatchTjeneste.launch(emptyBatchArguments);
+        assertThat(mottattXmlRepository.finnArkivertMottattXml(mottattXmlId)).isNotNull();
+        assertThat(mottattXmlRepository.finnMottattXml(mottattXmlId)).isNull();
         assertThat(behandlingTjeneste.hentBehandlinger(new Saksnummer("139015144"))).isEmpty();
     }
 
