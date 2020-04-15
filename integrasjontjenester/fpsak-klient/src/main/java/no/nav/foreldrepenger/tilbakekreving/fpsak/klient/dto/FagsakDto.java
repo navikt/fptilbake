@@ -2,13 +2,14 @@ package no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FagsakDto {
 
     private Long saksnummer;
-    private String sakstype;
+    private FagsakYtelseType sakstype;
 
     public Saksnummer getSaksnummer() {
         return new Saksnummer(Long.toString(saksnummer));
@@ -18,11 +19,11 @@ public class FagsakDto {
         this.saksnummer = saksnummer;
     }
 
-    public String getSakstype() {
+    public FagsakYtelseType getSakstype() {
         return sakstype;
     }
 
-    public void setSakstype(String sakstype) {
+    public void setSakstype(FagsakYtelseType sakstype) {
         this.sakstype = sakstype;
     }
 }

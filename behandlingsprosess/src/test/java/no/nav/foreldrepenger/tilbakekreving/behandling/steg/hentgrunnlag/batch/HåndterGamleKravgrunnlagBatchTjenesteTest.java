@@ -197,7 +197,7 @@ public class HåndterGamleKravgrunnlagBatchTjenesteTest extends FellesTestOppset
     private SamletEksternBehandlingInfo lagSamletEksternBehandlingData() {
         FagsakDto fagsakDto = new FagsakDto();
         fagsakDto.setSaksnummer(139015144l);
-        fagsakDto.setSakstype(FagsakYtelseType.FORELDREPENGER.getKode());
+        fagsakDto.setSakstype(FagsakYtelseType.FORELDREPENGER);
         PersonopplysningDto personopplysningDto = new PersonopplysningDto();
         personopplysningDto.setAktoerId(behandling.getAktørId().getId());
         SamletEksternBehandlingInfo samletEksternBehandlingInfo = SamletEksternBehandlingInfo.builder(Tillegsinformasjon.FAGSAK, Tillegsinformasjon.PERSONOPPLYSNINGER)

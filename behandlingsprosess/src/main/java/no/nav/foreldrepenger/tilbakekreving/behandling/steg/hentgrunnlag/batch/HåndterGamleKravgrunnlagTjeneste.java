@@ -107,7 +107,7 @@ public class HåndterGamleKravgrunnlagTjeneste {
     protected long opprettBehandling(EksternBehandlingsinfoDto eksternBehandlingData) {
         UUID eksternBehandlingUuid = eksternBehandlingData.getUuid();
         SamletEksternBehandlingInfo samletEksternBehandlingInfo = fpsakKlient.hentBehandlingsinfo(eksternBehandlingUuid, Tillegsinformasjon.FAGSAK);
-        FagsakYtelseType fagsakYtelseType = FagsakYtelseType.fraKode(samletEksternBehandlingInfo.getFagsak().getSakstype());
+        FagsakYtelseType fagsakYtelseType = samletEksternBehandlingInfo.getFagsak().getSakstype();
         return behandlingTjeneste.opprettBehandlingManuell(samletEksternBehandlingInfo.getSaksnummer(), eksternBehandlingUuid, fagsakYtelseType, BehandlingType.TILBAKEKREVING);
     }
 
