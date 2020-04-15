@@ -1,4 +1,4 @@
-CREATE TABLE OKO_XML_MOTATT_ARKIV
+CREATE TABLE OKO_XML_MOTTATT_ARKIV
 (
   ID NUMBER(19, 0)                                NOT NULL ,
   MELDING CLOB                                    NOT NULL,
@@ -9,6 +9,6 @@ CREATE TABLE OKO_XML_MOTATT_ARKIV
   CONSTRAINT PK_OKO_XML_MOTATT_ARKIV PRIMARY KEY (ID)
 );
 
-COMMENT ON TABLE OKO_XML_MOTATT_ARKIV IS 'Tabell for å arkivere gamle kravgrunnlag som ikke finnes i Økonomi.';
-COMMENT ON COLUMN OKO_XML_MOTATT_ARKIV.ID IS 'Primary key';
-COMMENT ON COLUMN OKO_XML_MOTATT_ARKIV.MELDING IS 'Gammel kravgrunnlag XML';
+COMMENT ON TABLE  OKO_XML_MOTTATT_ARKIV IS 'Tabell for å arkivere gamle kravgrunnlag som ikke finnes i Økonomi.';
+COMMENT ON COLUMN OKO_XML_MOTTATT_ARKIV.ID IS 'Primary key';
+COMMENT ON COLUMN OKO_XML_MOTTATT_ARKIV.MELDING IS 'Gammel kravgrunnlag XML';
