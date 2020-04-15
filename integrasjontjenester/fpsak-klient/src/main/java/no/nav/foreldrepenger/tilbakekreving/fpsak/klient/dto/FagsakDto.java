@@ -8,6 +8,7 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 public class FagsakDto {
 
     private Long saksnummer;
+    private String sakstype;
 
     public Saksnummer getSaksnummer() {
         return new Saksnummer(Long.toString(saksnummer));
@@ -15,5 +16,13 @@ public class FagsakDto {
 
     public void setSaksnummer(Long saksnummer) {
         this.saksnummer = saksnummer;
+    }
+
+    public String getSakstype() {
+        return sakstype;
+    }
+
+    public void setSakstype(String sakstype) {
+        this.sakstype = sakstype;
     }
 }

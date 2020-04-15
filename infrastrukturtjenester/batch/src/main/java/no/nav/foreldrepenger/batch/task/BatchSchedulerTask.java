@@ -31,13 +31,15 @@ public class BatchSchedulerTask implements ProsessTaskHandler {
 
     public static final String TASKTYPE = "batch.scheduler";
     public static final String BATCH_AVSTEMMING = "BFPT-001";
+    public static final String BATCH_GAMLE_KRAVGRUNNLAG_UTEN_BEHANDLING = "BFPT-002";
     public static final String BATCH_TA_AV_VENT = "BVL007";
 
     private BatchSupportTjeneste batchSupportTjeneste;
 
     private final List<Supplier<BatchConfig>> batchOppsettFelles = Arrays.asList(
         () -> new BatchConfig(6, 55, BATCH_AVSTEMMING, "dato=" + LocalDate.now().minusDays(1).format(DateTimeFormatter.ISO_DATE)),
-        () -> new BatchConfig(7, 0, BATCH_TA_AV_VENT, null)
+        () -> new BatchConfig(7, 0, BATCH_TA_AV_VENT, null),
+        () -> new BatchConfig(8, 0, BATCH_GAMLE_KRAVGRUNNLAG_UTEN_BEHANDLING, null)
     );
 
     private LocalDate dagensDato;

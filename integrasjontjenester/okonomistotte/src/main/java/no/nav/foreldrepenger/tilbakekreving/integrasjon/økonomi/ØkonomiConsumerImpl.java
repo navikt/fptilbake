@@ -89,6 +89,8 @@ public class ØkonomiConsumerImpl implements ØkonomiConsumer {
     private void validerKvitteringForHentGrunnlag(Long behandlingId, MmelDto mmel) {
         if (!ØkonomiKvitteringTolk.erKvitteringOK(mmel)) {
             throw ØkonomiConsumerFeil.FACTORY.fikkFeilkodeVedHentingAvKravgrunnlag(behandlingId, ØkonomiConsumerFeil.formaterKvittering(mmel)).toException();
+        } else if (ØkonomiKvitteringTolk.erKravgrunnlagetIkkeFinnes(mmel)) {
+            throw ØkonomiConsumerFeil.FACTORY.fikkFeilkodeVedHentingAvKravgrunnlagNårKravgrunnlagIkkeFinnes(behandlingId, ØkonomiConsumerFeil.formaterKvittering(mmel)).toException();
         }
     }
 

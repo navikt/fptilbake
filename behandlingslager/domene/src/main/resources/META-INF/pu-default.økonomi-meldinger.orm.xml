@@ -10,5 +10,6 @@
 
     <entity class="no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlSendt"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottattArkiv"/>
 
 </entity-mappings>

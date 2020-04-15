@@ -16,6 +16,9 @@ public interface ØkonomiConsumerFeil extends DeklarerteFeil {
     @IntegrasjonFeil(feilkode = "FPT-539079", feilmelding = "Fikk feil fra OS ved annulere kravgrunnlag for behandlingId=%s.%s", logLevel = LogLevel.WARN)
     Feil fikkFeilkodeVedAnnulereKravgrunnlag(Long behandlingId, String infoFraKvittering);
 
+    @IntegrasjonFeil(feilkode = "FPT-539080", feilmelding = "Fikk feil fra OS ved henting av kravgrunnlag for behandlingId=%s.%s", logLevel = LogLevel.WARN, exceptionClass = ManglendeKravgrunnlagException.class)
+    Feil fikkFeilkodeVedHentingAvKravgrunnlagNårKravgrunnlagIkkeFinnes(Long behandlingId, String infoFraKvittering);
+
     static String formaterKvittering(MmelDto kvittering) {
         //HAXX ikke bruk dette som mal ved oppsett av deklarative feil
         //.... brukes her siden det er veldig mange parametre som skal logges
