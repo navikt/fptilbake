@@ -19,7 +19,7 @@ public class KravgrunnlagValidatorTest {
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
-    private Kravgrunnlag431 kravgrunnlag = lagKravgrunnlag();
+    private Kravgrunnlag431 kravgrunnlag = lagKravgrunnlag(1000000L);
     private BigDecimal maxSkattJanuar = BigDecimal.valueOf(100);
 
 
@@ -29,6 +29,15 @@ public class KravgrunnlagValidatorTest {
         KravgrunnlagPeriode432 kgPeriode = leggTilKravgrunnlagPeriode(kravgrunnlag, periode, maxSkattJanuar);
         BigDecimal skatteprosent = BigDecimal.valueOf(10);
         leggTilFeilutbetaling(kgPeriode, 1000, skatteprosent);
+
+        KravgrunnlagValidator.validerGrunnlag(kravgrunnlag);
+    }
+
+    @Test
+    public void skal_gi_feilmelding_ved_manglende_referanse_felt() {
+        kravgrunnlag = lagKravgrunnlag(null);
+        expectedException.expect(KravgrunnlagValidator.UgyldigKravgrunnlagException.class);
+        expectedException.expectMessage("Ugyldig kravgrunnlag. Mangler referanse");
 
         KravgrunnlagValidator.validerGrunnlag(kravgrunnlag);
     }
@@ -157,8 +166,7 @@ public class KravgrunnlagValidatorTest {
         return kgPeriode;
     }
 
-    private static Kravgrunnlag431 lagKravgrunnlag() {
-        Long eksternBehandlingId = 1000000L;
+    private static Kravgrunnlag431 lagKravgrunnlag(Long eksternBehandlingId) {
         return new Kravgrunnlag431.Builder()
             .medEksternKravgrunnlagId("12341")
             .medFagSystemId("GSAKNR-12312")
@@ -172,7 +180,7 @@ public class KravgrunnlagValidatorTest {
             .medGjelderType(GjelderType.PERSON)
             .medGjelderVedtakId("???")
             .medSaksBehId("Z111111")
-            .medReferanse(Long.toString(eksternBehandlingId))
+            .medReferanse(eksternBehandlingId != null ? Long.toString(eksternBehandlingId) : null)
             .medUtbetalesTilId("99999999999")
             .medUtbetIdType(GjelderType.PERSON)
             .build();

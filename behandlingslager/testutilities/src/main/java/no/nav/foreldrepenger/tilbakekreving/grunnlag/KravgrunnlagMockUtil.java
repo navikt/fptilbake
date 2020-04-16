@@ -29,7 +29,8 @@ public class KravgrunnlagMockUtil {
             .medBehandlendeEnhet("8020")
             .medBostedEnhet("8020")
             .medFeltKontroll("00")
-            .medSaksBehId("Z991035").build();
+            .medSaksBehId("Z991035")
+            .medReferanse("100000000").build();
         for (KravgrunnlagMock mock : kravgrunnlagMocker) {
             kravgrunnlag431.leggTilPeriode(lagMockPeriode(mock, kravgrunnlag431));
         }

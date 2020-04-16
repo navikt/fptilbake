@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.vedtak.exception.IntegrasjonException;
@@ -24,6 +26,7 @@ import no.nav.vedtak.feil.deklarasjon.IntegrasjonFeil;
 public class KravgrunnlagValidator {
 
     private static final List<Consumer<Kravgrunnlag431>> VALIDATORER = Arrays.asList(
+        KravgrunnlagValidator::validerReferanse,
         KravgrunnlagValidator::validerPeriodeInnenforMåned,
         KravgrunnlagValidator::validerOverlappendePerioder,
         KravgrunnlagValidator::validerSkatt,
@@ -35,6 +38,13 @@ public class KravgrunnlagValidator {
     public static void validerGrunnlag(Kravgrunnlag431 kravgrunnlag) throws UgyldigKravgrunnlagException {
         for (var validator : VALIDATORER) {
             validator.accept(kravgrunnlag);
+        }
+    }
+
+    private static void validerReferanse(Kravgrunnlag431 kravgrunnlag) {
+        String referanse = kravgrunnlag.getReferanse();
+        if (StringUtils.isEmpty(referanse)) {
+            throw KravgrunnlagFeil.FACTORY.manglerReferanse().toException();
         }
     }
 
@@ -158,6 +168,9 @@ public class KravgrunnlagValidator {
 
         @IntegrasjonFeil(feilkode = "FPT-879715", feilmelding = "Ugyldig kravgrunnlag. Mangler forventet felt %s for periode %s.", logLevel = WARN, exceptionClass = UgyldigKravgrunnlagException.class)
         Feil manglerFelt(String felt, Periode periode);
+
+        @IntegrasjonFeil(feilkode = "FPT-879716", feilmelding = "Ugyldig kravgrunnlag. Mangler referanse.", logLevel = WARN, exceptionClass = UgyldigKravgrunnlagException.class)
+        Feil manglerReferanse();
 
         @IntegrasjonFeil(feilkode = "FPT-936521", feilmelding = "Ugyldig kravgrunnlag. Overlappende perioder %s og %s.", logLevel = WARN, exceptionClass = UgyldigKravgrunnlagException.class)
         Feil overlappendePerioder(Periode a, Periode b);
