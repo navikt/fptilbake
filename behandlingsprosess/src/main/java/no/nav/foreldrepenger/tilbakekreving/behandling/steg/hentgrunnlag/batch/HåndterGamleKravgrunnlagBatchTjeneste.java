@@ -23,7 +23,6 @@ import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsi
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagValidator;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
-import no.nav.vedtak.felles.integrasjon.unleash.EnvironmentProperty;
 import no.nav.vedtak.konfig.KonfigVerdi;
 
 @ApplicationScoped
@@ -49,9 +48,6 @@ public class HåndterGamleKravgrunnlagBatchTjeneste implements BatchTjeneste {
     @Override
     public String launch(BatchArguments arguments) {
         String batchRun = BATCHNAVN + "-" + UUID.randomUUID();
-        if (!erTestMiljø()) {
-            return batchRun;
-        }
         LocalDate bestemtDato = LocalDate.now().minus(venteFrist);
         logger.info("Håndterer kravgrunnlag som er eldre enn {} i batch {}", bestemtDato, batchRun);
 
@@ -125,15 +121,6 @@ public class HåndterGamleKravgrunnlagBatchTjeneste implements BatchTjeneste {
 
     private String finnSaksnummer(String fagsystemId) {
         return fagsystemId.substring(0, fagsystemId.length() - 3);
-    }
-
-    //midlertidig kode. skal fjernes da test er ferdig
-    private boolean erTestMiljø() {
-        //foreløpig kun på for testing
-        Optional<String> envName = EnvironmentProperty.getEnvironmentName();
-        boolean isEnabled = envName.isPresent() && ("t4".equalsIgnoreCase(envName.get()) || "devimg".equalsIgnoreCase(envName.get()));
-        logger.info("{} er {}", "HåndterGamleKravgrunnlag batch(BFPT-002) er", isEnabled ? "skudd på" : "ikke skudd på");
-        return isEnabled;
     }
 
 }
