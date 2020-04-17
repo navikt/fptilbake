@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
+import javax.transaction.Transactional;
 
 import org.apache.cxf.common.util.CollectionUtils;
 
@@ -48,10 +49,9 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagEndretEvent;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
-import no.nav.vedtak.felles.jpa.Transaction;
 
 @ApplicationScoped
-@Transaction
+@Transactional
 public class VilkårsvurderingTjeneste {
 
     private KodeverkRepository kodeverkRepository;

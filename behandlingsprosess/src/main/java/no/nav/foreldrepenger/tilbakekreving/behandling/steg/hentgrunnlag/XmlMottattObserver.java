@@ -4,8 +4,10 @@ import static no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.
 import static no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TaskProperty.ROOT_ELEMENT_KRAV_VEDTAK_STATUS_XML;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.control.ActivateRequestContext;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
+import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,12 +16,12 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.første
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.status.LesKravvedtakStatusTask;
 import no.nav.foreldrepenger.tilbakekreving.kravgrunnlag.queue.consumer.XmlMottattEvent;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
-import no.nav.vedtak.felles.AktiverContextOgTransaksjon;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 
 @ApplicationScoped
-@AktiverContextOgTransaksjon
+@ActivateRequestContext
+@Transactional
 public class XmlMottattObserver {
 
     private static final Logger log = LoggerFactory.getLogger(XmlMottattObserver.class);

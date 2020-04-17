@@ -17,14 +17,12 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.saksbehandler.dto.
 import no.nav.foreldrepenger.tilbakekreving.web.app.util.LdapUtil;
 import no.nav.vedtak.felles.integrasjon.ldap.LdapBruker;
 import no.nav.vedtak.felles.integrasjon.ldap.LdapBrukeroppslag;
-import no.nav.vedtak.felles.jpa.Transaction;
 import no.nav.vedtak.konfig.KonfigVerdi;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.context.SubjectHandler;
 
 @Path("/nav-ansatt")
 @RequestScoped
-@Transaction
 public class NavAnsattRestTjeneste {
     private String gruppenavnSaksbehandler;
     private String gruppenavnVeileder;

@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
+import javax.transaction.Transactional;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.FeilutbetalingPerioderDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.ForeldelsePeriodeDto;
@@ -35,10 +36,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.V
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagEndretEvent;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
-import no.nav.vedtak.felles.jpa.Transaction;
 
 @ApplicationScoped
-@Transaction
+@Transactional
 public class VurdertForeldelseTjeneste {
 
     private KodeverkRepository kodeverkRepository;
