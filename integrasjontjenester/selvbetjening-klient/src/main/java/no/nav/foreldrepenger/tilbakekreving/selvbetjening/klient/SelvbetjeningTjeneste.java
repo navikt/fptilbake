@@ -57,16 +57,8 @@ public class SelvbetjeningTjeneste {
         SelvbetjeningMelding svInfo = lagSelvbetjeningMelding(behandling, varselSporing, aktørId, personIdent.get(), hendelse);
 
         logMelding("Sender", hendelse, personIdent.get());
-        if (kanSendeMelding(hendelse)) {
-            meldingProducer.sendMelding(svInfo);
-            logMelding("Sendte", hendelse, personIdent.get());
-        } else {
-            logger.info("Sending av {} meldinger til selvbetjening er slått av i prod", hendelse.getBeskrivelse());
-        }
-    }
-
-    private boolean kanSendeMelding(Hendelse hendelse) {
-        return Hendelse.TILBAKEKREVING_SPM.equals(hendelse) || !no.nav.vedtak.util.env.Environment.current().isProd();
+        meldingProducer.sendMelding(svInfo);
+        logMelding("Sendte", hendelse, personIdent.get());
     }
 
     private SelvbetjeningMelding lagSelvbetjeningMelding(Behandling behandling,
