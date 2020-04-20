@@ -114,13 +114,6 @@ public class EksternBehandlingRepositoryImpl implements EksternBehandlingReposit
         return hentUniktResultat(query);
     }
 
-    @Override
-    public void oppdaterVerge(long vergeId, long internId){
-        EksternBehandling eksternBehandling = hentFraInternId(internId);
-        eksternBehandling.setVergeId(vergeId);
-        entityManager.persist(eksternBehandling);
-    }
-
     private Optional<EksternBehandling> hentEksisterendeDeaktivert(long internBehandlingId, long eksternBehandlingId){
         TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where intern_id=:internId and ekstern_id=:eksternId order by opprettetTidspunkt desc", EksternBehandling.class);
         query.setParameter(INTERN_ID, internBehandlingId);

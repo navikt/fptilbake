@@ -7,6 +7,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.Ve
 public class VergeDto {
 
     private String navn;
+    private String fnr;
     private LocalDate gyldigFom;
     private LocalDate gyldigTom;
     private VergeType vergeType;
@@ -17,6 +18,10 @@ public class VergeDto {
 
     public void setNavn(String navn) {
         this.navn = navn;
+    }
+
+    public void setFnr(String fnr) {
+        this.fnr = fnr;
     }
 
     public void setGyldigFom(LocalDate gyldigFom) {
@@ -37,6 +42,10 @@ public class VergeDto {
 
     public String getNavn() {
         return navn;
+    }
+
+    public String getFnr() {
+        return fnr;
     }
 
     public LocalDate getGyldigFom() {

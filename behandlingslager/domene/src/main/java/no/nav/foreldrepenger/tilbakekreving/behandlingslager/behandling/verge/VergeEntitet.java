@@ -2,11 +2,9 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge;
 
 import java.time.LocalDate;
 import java.util.Objects;
-import java.util.Optional;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Embedded;
@@ -14,31 +12,29 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkBaseEntitet;
+import org.apache.http.util.Args;
+
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
-@Entity(name = "Verge")
+@Entity(name = "VergeEntitet")
 @Table(name = "VERGE")
-public class VergeEntitet extends KodeverkBaseEntitet {
+public class VergeEntitet extends BaseEntitet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_VERGE")
     private Long id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "bruker_id")
-    private NavBruker bruker;
+    @Column(name = "aktoer_id")
+    private AktørId vergeAktørId;
 
     @Embedded
     @AttributeOverrides({
-        @AttributeOverride(name = "fom", column = @Column(name = "gyldig_fom")),
-        @AttributeOverride(name = "tom", column = @Column(name = "gyldig_tom"))
+        @AttributeOverride(name = "fom", column = @Column(name = "gyldig_fom", nullable = false)),
+        @AttributeOverride(name = "tom", column = @Column(name = "gyldig_tom", nullable = false))
     })
     private Periode gyldigPeriode;
 
@@ -46,10 +42,14 @@ public class VergeEntitet extends KodeverkBaseEntitet {
     @Column(name = "verge_type", nullable = false)
     private VergeType vergeType = VergeType.UDEFINERT;
 
+    @Column(name = "orgnr")
+    private String organisasjonsnummer;
 
-    @OneToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "organisasjon_id")
-    private VergeOrganisasjonEntitet vergeOrganisasjon;
+    @Column(name = "navn", nullable = false)
+    private String navn;
+
+    @Column(name = "kilde", nullable = false)
+    private String kilde;
 
     VergeEntitet() {
         // Hibernate
@@ -61,15 +61,16 @@ public class VergeEntitet extends KodeverkBaseEntitet {
         if (o == null || getClass() != o.getClass()) return false;
         VergeEntitet that = (VergeEntitet) o;
         return
-            Objects.equals(bruker, that.bruker) &&
+            Objects.equals(vergeAktørId, that.vergeAktørId) &&
                 Objects.equals(gyldigPeriode, that.gyldigPeriode) &&
                 Objects.equals(vergeType, that.vergeType) &&
-                Objects.equals(vergeOrganisasjon, that.vergeOrganisasjon);
+                Objects.equals(navn, that.navn) &&
+                Objects.equals(kilde, that.kilde);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(bruker, gyldigPeriode, vergeType);
+        return Objects.hash(gyldigPeriode, vergeType, navn, kilde);
     }
 
     public VergeType getVergeType() {
@@ -84,20 +85,24 @@ public class VergeEntitet extends KodeverkBaseEntitet {
         return gyldigPeriode.getTom();
     }
 
-    public NavBruker getBruker() {
-        return bruker;
+    public AktørId getVergeAktørId() {
+        return vergeAktørId;
     }
 
     public Long getId() {
         return id;
     }
 
-    public Optional<VergeOrganisasjonEntitet> getVergeOrganisasjon() {
-        return Optional.ofNullable(vergeOrganisasjon);
+    public String getOrganisasjonsnummer() {
+        return organisasjonsnummer;
     }
 
-    public void setVergeOrganisasjon(VergeOrganisasjonEntitet vergeOrganisasjon) {
-        this.vergeOrganisasjon = vergeOrganisasjon;
+    public String getNavn() {
+        return navn;
+    }
+
+    public String getKilde() {
+        return kilde;
     }
 
     public static Builder builder() {
@@ -107,8 +112,8 @@ public class VergeEntitet extends KodeverkBaseEntitet {
     public static class Builder {
         private VergeEntitet kladd = new VergeEntitet();
 
-        public Builder medBruker(NavBruker navBruker) {
-            this.kladd.bruker = navBruker;
+        public Builder medVergeAktørId(AktørId aktørId) {
+            this.kladd.vergeAktørId = aktørId;
             return this;
         }
 
@@ -124,9 +129,33 @@ public class VergeEntitet extends KodeverkBaseEntitet {
             return this;
         }
 
+        public Builder medOrganisasjonnummer(String organisasjonsnummer) {
+            this.kladd.organisasjonsnummer = organisasjonsnummer;
+            return this;
+        }
+
+        public Builder medNavn(String navn) {
+            this.kladd.navn = navn;
+            return this;
+        }
+
+        public Builder medKilde(String kilde) {
+            this.kladd.kilde = kilde;
+            return this;
+        }
+
+
         public VergeEntitet build() {
-            Objects.requireNonNull(this.kladd.bruker, "bruker");
             Objects.requireNonNull(this.kladd.vergeType, "vergeType");
+            Objects.requireNonNull(this.kladd.kilde, "kilde");
+            Objects.requireNonNull(this.kladd.navn, "navn");
+
+            if (this.kladd.vergeAktørId == null) {
+                Args.notEmpty(this.kladd.organisasjonsnummer, "Organisasjonsnummer må finnes for verge organisasjon");
+            }
+            if (this.kladd.organisasjonsnummer == null) {
+                Args.notNull(this.kladd.vergeAktørId, "AktørId må finnes for verge organisasjon");
+            }
             return kladd;
         }
     }

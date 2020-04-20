@@ -18,6 +18,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakStatus
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.TpsTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 
 @ApplicationScoped
@@ -51,6 +52,15 @@ public class FagsakTjeneste {
         }
         lagreFagsak(fagsak, saksnummer);
         return fagsak;
+    }
+
+    public AktørId hentAktørForFnr(String fnr){
+        PersonIdent personIdent = new PersonIdent(fnr);
+        Optional<AktørId> aktørId = tpsTjeneste.hentAktørForFnr(personIdent);
+        if(aktørId.isEmpty()){
+            throw BehandlingFeil.FACTORY.fantIkkePersonIdentMedFnr().toException();
+        }
+        return aktørId.get();
     }
 
     private NavBruker hentNavBruker(AktørId aktørId) {

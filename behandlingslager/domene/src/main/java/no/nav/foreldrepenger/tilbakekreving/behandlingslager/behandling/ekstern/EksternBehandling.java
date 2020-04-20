@@ -39,9 +39,6 @@ public class EksternBehandling extends BaseEntitet {
     @Column(name = "ekstern_uuid")
     private UUID eksternUuid;
 
-    @Column(name = "verge_id")
-    private Long vergeId;
-
     EksternBehandling() {
         // Hibernate
     }
@@ -86,14 +83,6 @@ public class EksternBehandling extends BaseEntitet {
 
     public void setEksternUuid(UUID eksternUuid) {
         this.eksternUuid = eksternUuid;
-    }
-
-    public Long getVergeId() {
-        return vergeId;
-    }
-
-    public void setVergeId(Long vergeId) {
-        this.vergeId = vergeId;
     }
 
     @Override

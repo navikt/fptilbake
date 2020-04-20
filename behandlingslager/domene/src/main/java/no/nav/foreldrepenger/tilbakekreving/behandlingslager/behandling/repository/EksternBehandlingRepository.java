@@ -52,5 +52,4 @@ public interface EksternBehandlingRepository {
 
     Optional<EksternBehandling> hentOptionalFraInternId(long internBehandlingId);
 
-    void oppdaterVerge(long vergeId, long internId);
 }

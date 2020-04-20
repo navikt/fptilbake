@@ -1,9 +1,15 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository;
 
+import static no.nav.vedtak.felles.jpa.HibernateVerktøy.hentUniktResultat;
+
+import java.util.Optional;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeAggregateEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
 import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
 
@@ -21,13 +27,23 @@ public class VergeRepository {
         this.entityManager = entityManager;
     }
 
-    public long lagreVergeInformasjon(VergeEntitet vergeEntitet) {
-        vergeEntitet.getVergeOrganisasjon().ifPresent(vergeOrganisasjon -> entityManager.persist(vergeOrganisasjon));
+    public long lagreVergeInformasjon(long behandlingId, VergeEntitet vergeEntitet) {
+        Optional<VergeAggregateEntitet> forrigeVergeAggregateEntitet = finnVergeInformasjon(behandlingId);
+        if (forrigeVergeAggregateEntitet.isPresent()) {
+            VergeAggregateEntitet forrigeAggregate = forrigeVergeAggregateEntitet.get();
+            forrigeAggregate.disable();
+            entityManager.persist(forrigeAggregate);
+        }
+        VergeAggregateEntitet vergeAggregateEntitet = VergeAggregateEntitet.builder().medBehandlingId(behandlingId)
+            .medVergeEntitet(vergeEntitet).build();
         entityManager.persist(vergeEntitet);
+        entityManager.persist(vergeAggregateEntitet);
         return vergeEntitet.getId();
     }
 
-    public VergeEntitet hentVergeInformasjon(Long vergeId) {
-        return entityManager.find(VergeEntitet.class, vergeId);
+    public Optional<VergeAggregateEntitet> finnVergeInformasjon(long behandlingId) {
+        TypedQuery<VergeAggregateEntitet> query = entityManager.createQuery("from VergeAggregateEntitet where behandlingId=:behandlingId and aktiv='J'", VergeAggregateEntitet.class);
+        query.setParameter("behandlingId", behandlingId);
+        return hentUniktResultat(query);
     }
 }

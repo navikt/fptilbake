@@ -102,6 +102,9 @@ public class FpsakKlient {
                 if (ekstrainfo.contains(Tillegsinformasjon.FAGSAK) && lenke.getRel().equals(Tillegsinformasjon.FAGSAK.getFpsakRelasjonNavn())) {
                     builder.setFagsak(hentFagsak(lenke));
                 }
+                if (ekstrainfo.contains(Tillegsinformasjon.VERGE) && lenke.getRel().equals(Tillegsinformasjon.VERGE.getFpsakRelasjonNavn())) {
+                    hentVergeInformasjon(lenke).ifPresent(builder::setVerge);
+                }
             }
         });
         return builder.build();
@@ -129,11 +132,6 @@ public class FpsakKlient {
         URI endpoint = createUri(BEHANDLING_ALLE_EP, PARAM_NAME_SAKSNUMMER, saksnummer);
         JsonNode jsonNode = restClient.get(endpoint, JsonNode.class);
         return lesResponsFraJsonNode(saksnummer, jsonNode);
-    }
-
-    public Optional<VergeDto> hentVergeInformasjon(UUID eksternUuid){
-        URI endpoint = createUri("/behandling/person/verge", PARAM_NAME_BEHANDLING_UUID, eksternUuid.toString());
-        return get(endpoint, VergeDto.class);
     }
 
     private List<EksternBehandlingsinfoDto> lesResponsFraJsonNode(String saksnummer, JsonNode jsonNode) {
@@ -172,6 +170,11 @@ public class FpsakKlient {
         URI endpoint = URI.create(baseUri() + resourceLink.getHref());
         return get(endpoint, FagsakDto.class)
             .orElseThrow(() -> new IllegalArgumentException("Forventet å finne fagsak på lenken: " + endpoint));
+    }
+
+    private Optional<VergeDto> hentVergeInformasjon(BehandlingResourceLinkDto resourceLink) {
+        URI endpoint = URI.create(baseUri() + resourceLink.getHref());
+        return get(endpoint, VergeDto.class);
     }
 
     private <T> Optional<T> get(URI endpoint, Class<T> tClass) {

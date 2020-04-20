@@ -17,6 +17,7 @@ public class SamletEksternBehandlingInfo {
     private TilbakekrevingValgDto tilbakekrevingsvalg;
     private SoknadDto søknad;
     private FagsakDto fagsak;
+    private VergeDto verge;
 
     public EksternBehandlingsinfoDto getGrunninformasjon() {
         return grunninformasjon;
@@ -45,6 +46,10 @@ public class SamletEksternBehandlingInfo {
     public FagsakDto getFagsak() {
         Objects.check(tilleggsinformasjonHentet.contains(Tillegsinformasjon.FAGSAK), "Utvikler-feil: har ikke hentet fagsak");
         return fagsak;
+    }
+
+    public VergeDto getVerge() {
+        return verge;
     }
 
     public AktørId getAktørId() {
@@ -114,6 +119,11 @@ public class SamletEksternBehandlingInfo {
 
         public Builder setFamiliehendelse(SoknadDto søknad) {
             kladd.søknad = søknad;
+            return this;
+        }
+
+        public Builder setVerge(VergeDto verge) {
+            kladd.verge = verge;
             return this;
         }
 

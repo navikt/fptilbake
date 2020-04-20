@@ -36,8 +36,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingresultatRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.VergeRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.KildeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeOrganisasjonEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
@@ -55,6 +55,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.konfig.KonfigVerdi;
 import no.nav.vedtak.util.StringUtils;
+import no.nav.vedtak.util.env.Environment;
 
 @ApplicationScoped
 @Transactional
@@ -257,7 +258,7 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
 
         historikkinnslagTjeneste.opprettHistorikkinnslagForOpprettetBehandling(behandling); // FIXME: sjekk om journalpostId skal hentes ///
 
-        hentVergeInformasjonFraFpsak(behandling);
+        hentVergeInformasjonFraFpsak(behandling.getId());
 
         return behandling;
     }
@@ -305,24 +306,39 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
         prosessTaskRepository.lagre(prosessTaskData);
     }
 
-    private void hentVergeInformasjonFraFpsak(Behandling behandling) {
-        EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandling.getId());
-        Optional<VergeDto> vergeInformasjon = fpsakKlient.hentVergeInformasjon(eksternBehandling.getEksternUuid());
-        vergeInformasjon.ifPresent(vergeDto -> lagreVergeInformasjon(behandling, vergeDto));
+    private void hentVergeInformasjonFraFpsak(long behandlingId) {
+        if (erTestMiljø()) {
+            EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandlingId);
+            SamletEksternBehandlingInfo eksternBehandlingInfo = fpsakKlient.hentBehandlingsinfo(eksternBehandling.getEksternUuid(), Tillegsinformasjon.VERGE);
+            if (eksternBehandlingInfo.getVerge() != null) {
+                lagreVergeInformasjon(behandlingId, eksternBehandlingInfo.getVerge());
+            }
+        }
     }
 
-    private void lagreVergeInformasjon(Behandling behandling, VergeDto vergeDto) {
-        VergeEntitet vergeEntitet = VergeEntitet.builder().medVergeType(vergeDto.getVergeType())
-            .medBruker(behandling.getFagsak().getNavBruker())
-            .medGyldigPeriode(vergeDto.getGyldigFom(), vergeDto.getGyldigTom()).build();
-        if (!StringUtils.nullOrEmpty(vergeDto.getOrganisasjonsnummer())) {
-            VergeOrganisasjonEntitet vergeOrganisasjonEntitet = VergeOrganisasjonEntitet.builder().medNavn(vergeDto.getNavn())
-                .medOrganisasjonnummer(vergeDto.getOrganisasjonsnummer())
-                .medVerge(vergeEntitet).build();
-            vergeEntitet.setVergeOrganisasjon(vergeOrganisasjonEntitet);
+    private void lagreVergeInformasjon(long behandlingId, VergeDto vergeDto) {
+        if (vergeDto.getGyldigTom().isBefore(LocalDate.now())) {
+            logger.info("Verge informasjon er utløpt.Så kopierer ikke fra fpsak");
+        } else {
+            VergeEntitet.Builder builder = VergeEntitet.builder().medVergeType(vergeDto.getVergeType())
+                .medKilde(KildeType.FPSAK.name())
+                .medGyldigPeriode(vergeDto.getGyldigFom(), vergeDto.getGyldigTom())
+                .medNavn(vergeDto.getNavn());
+            if (!StringUtils.nullOrEmpty(vergeDto.getOrganisasjonsnummer())) {
+                builder.medOrganisasjonnummer(vergeDto.getOrganisasjonsnummer());
+            } else if (!StringUtils.nullOrEmpty(vergeDto.getFnr())) {
+                builder.medVergeAktørId(fagsakTjeneste.hentAktørForFnr(vergeDto.getFnr()));
+            }
+            vergeRepository.lagreVergeInformasjon(behandlingId, builder.build());
         }
-        long vergeId = vergeRepository.lagreVergeInformasjon(vergeEntitet);
-        eksternBehandlingRepository.oppdaterVerge(vergeId, behandling.getId());
+    }
+
+    //midlertidig kode. skal fjernes etter en stund
+    private boolean erTestMiljø() {
+        //foreløpig kun på for testing
+        boolean isEnabled = !Environment.current().isProd();
+        logger.info("{} er {}", "Hent vergeInformasjon er", isEnabled ? "skudd på" : "ikke skudd på");
+        return isEnabled;
     }
 
 }
