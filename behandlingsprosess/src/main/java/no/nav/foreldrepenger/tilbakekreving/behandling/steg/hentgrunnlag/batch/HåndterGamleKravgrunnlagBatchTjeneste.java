@@ -23,6 +23,7 @@ import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsi
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagValidator;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
+import no.nav.vedtak.felles.integrasjon.unleash.EnvironmentProperty;
 import no.nav.vedtak.konfig.KonfigVerdi;
 
 @ApplicationScoped
@@ -72,7 +73,7 @@ public class HåndterGamleKravgrunnlagBatchTjeneste implements BatchTjeneste {
                 }
             }
             //slette gamle kravgrunnlag som ikke finnes i Økonomi fra OKO_XML_MOTTATT
-            if (slettesXmlListe.size() > 0) {
+            if (!slettesXmlListe.isEmpty()) {
                 logger.info("Antall Gamle kravgrunnlag som skal slettes fra OKO_XML_MOTTATT er {}", slettesXmlListe);
                 håndterGamleKravgrunnlagTjeneste.slettMottattGamleKravgrunnlag(slettesXmlListe);
             }
@@ -104,8 +105,13 @@ public class HåndterGamleKravgrunnlagBatchTjeneste implements BatchTjeneste {
 
     private void håndterGyldigkravgrunnlag(Long mottattXmlId, String saksnummer, String eksternBehandlingId, EksternBehandlingsinfoDto eksternBehandlingData) {
         håndterGamleKravgrunnlagTjeneste.oppdaterMedEksternBehandlingIdOgSaksnummer(mottattXmlId, eksternBehandlingId, saksnummer);
-        Long behandlingId = håndterGamleKravgrunnlagTjeneste.opprettBehandling(eksternBehandlingData);
-        logger.info("Behandling opprettet med behandlingId={}", behandlingId);
+        if (erTestMiljø()) {
+            Long behandlingId = håndterGamleKravgrunnlagTjeneste.opprettBehandling(eksternBehandlingData);
+            logger.info("Behandling opprettet med behandlingId={}", behandlingId);
+        } else {
+            logger.info("Behandling for saksnummer={} og eksternBehandlingId={} bør opprettes her", saksnummer, eksternBehandlingId);
+        }
+
     }
 
     @Override
@@ -121,6 +127,15 @@ public class HåndterGamleKravgrunnlagBatchTjeneste implements BatchTjeneste {
 
     private String finnSaksnummer(String fagsystemId) {
         return fagsystemId.substring(0, fagsystemId.length() - 3);
+    }
+
+    //midlertidig kode. skal fjernes etter en stund
+    private boolean erTestMiljø() {
+        //foreløpig kun på for testing
+        Optional<String> envName = EnvironmentProperty.getEnvironmentName();
+        boolean isEnabled = envName.isPresent() && !"p".equalsIgnoreCase(envName.get());
+        logger.info("{} er {}", "Opprett behandling når kravgrunnlag venter etter fristen er ", isEnabled ? "skudd på" : "ikke skudd på");
+        return isEnabled;
     }
 
 }

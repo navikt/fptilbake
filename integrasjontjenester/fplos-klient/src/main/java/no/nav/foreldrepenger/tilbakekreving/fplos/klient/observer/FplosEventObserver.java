@@ -31,6 +31,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.prosesstask.Utvidet
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.fplos.klient.task.FplosPubliserEventTask;
 import no.nav.vedtak.felles.integrasjon.kafka.EventHendelse;
+import no.nav.vedtak.felles.integrasjon.unleash.EnvironmentProperty;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 
@@ -102,10 +103,14 @@ public class FplosEventObserver {
     }
 
     public void observerBehandlingFristenUtløptEvent(@Observes BehandlingManglerKravgrunnlagFristenUtløptEvent utløptEvent) {
-        logger.info(LOGGER_OPPRETTER_PROSESS_TASK, EventHendelse.AKSJONSPUNKT_OPPRETTET,
-            AksjonspunktDefinisjon.VURDER_HENLEGGELSE_MANGLER_KRAVGRUNNLAG.getKode());
-        opprettProsessTask(utløptEvent.getFagsakId(), utløptEvent.getBehandlingId(), utløptEvent.getAktørId(),
-            EventHendelse.AKSJONSPUNKT_OPPRETTET, AksjonspunktStatus.OPPRETTET, utløptEvent.getFristDato());
+        if (erTestMiljø()) {
+            logger.info(LOGGER_OPPRETTER_PROSESS_TASK, EventHendelse.AKSJONSPUNKT_OPPRETTET,
+                AksjonspunktDefinisjon.VURDER_HENLEGGELSE_MANGLER_KRAVGRUNNLAG.getKode());
+            opprettProsessTask(utløptEvent.getFagsakId(), utløptEvent.getBehandlingId(), utløptEvent.getAktørId(),
+                EventHendelse.AKSJONSPUNKT_OPPRETTET, AksjonspunktStatus.OPPRETTET, utløptEvent.getFristDato());
+        }else {
+            logger.info("Sender ikke data til FPLOS når fristen er utløpt");
+        }
     }
 
     public void observerBehandlingFristenEndretEvent(@Observes BehandlingManglerKravgrunnlagFristenEndretEvent fristenEndretEvent) {
@@ -150,5 +155,14 @@ public class FplosEventObserver {
         boolean erIFaktaSteg = FAKTA_FEILUTBETALING.equals(behandling.getAktivtBehandlingSteg());
         boolean erForbiFaktaSteg = behandlingskontrollTjeneste.erStegPassert(behandling, FAKTA_FEILUTBETALING);
         return erIFaktaSteg || erForbiFaktaSteg;
+    }
+
+    //midlertidig kode. skal fjernes etter en stund
+    private boolean erTestMiljø() {
+        //foreløpig kun på for testing
+        Optional<String> envName = EnvironmentProperty.getEnvironmentName();
+        boolean isEnabled = envName.isPresent() && !"p".equalsIgnoreCase(envName.get());
+        logger.info("{} er {}", "Send data til FPLOS når fristen er utløpt er ", isEnabled ? "skudd på" : "ikke skudd på");
+        return isEnabled;
     }
 }
