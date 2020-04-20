@@ -23,8 +23,8 @@ import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsi
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagValidator;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
-import no.nav.vedtak.felles.integrasjon.unleash.EnvironmentProperty;
 import no.nav.vedtak.konfig.KonfigVerdi;
+import no.nav.vedtak.util.env.Environment;
 
 @ApplicationScoped
 public class HåndterGamleKravgrunnlagBatchTjeneste implements BatchTjeneste {
@@ -132,8 +132,7 @@ public class HåndterGamleKravgrunnlagBatchTjeneste implements BatchTjeneste {
     //midlertidig kode. skal fjernes etter en stund
     private boolean erTestMiljø() {
         //foreløpig kun på for testing
-        Optional<String> envName = EnvironmentProperty.getEnvironmentName();
-        boolean isEnabled = envName.isPresent() && !"p".equalsIgnoreCase(envName.get());
+        boolean isEnabled = !Environment.current().isProd();
         logger.info("{} er {}", "Opprett behandling når kravgrunnlag venter etter fristen er ", isEnabled ? "skudd på" : "ikke skudd på");
         return isEnabled;
     }

@@ -31,9 +31,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.prosesstask.Utvidet
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.fplos.klient.task.FplosPubliserEventTask;
 import no.nav.vedtak.felles.integrasjon.kafka.EventHendelse;
-import no.nav.vedtak.felles.integrasjon.unleash.EnvironmentProperty;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
+import no.nav.vedtak.util.env.Environment;
 
 
 @ApplicationScoped
@@ -160,8 +160,7 @@ public class FplosEventObserver {
     //midlertidig kode. skal fjernes etter en stund
     private boolean erTestMiljø() {
         //foreløpig kun på for testing
-        Optional<String> envName = EnvironmentProperty.getEnvironmentName();
-        boolean isEnabled = envName.isPresent() && !"p".equalsIgnoreCase(envName.get());
+        boolean isEnabled = !Environment.current().isProd();
         logger.info("{} er {}", "Send data til FPLOS når fristen er utløpt er ", isEnabled ? "skudd på" : "ikke skudd på");
         return isEnabled;
     }

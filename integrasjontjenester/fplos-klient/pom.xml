@@ -25,10 +25,6 @@
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka-clients</artifactId>
         </dependency>
-        <dependency>
-            <groupId>no.nav.foreldrepenger.felles.integrasjon</groupId>
-            <artifactId>unleash-klient</artifactId>
-        </dependency>
         <!--test avhengigheter-->
         <dependency>
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
