@@ -28,9 +28,9 @@ import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.FagsakDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.PersonopplysningDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SoknadDto;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SøknadType;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.TilbakekrevingValgDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.VarseltekstDto;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.VergeDto;
 import no.nav.vedtak.felles.integrasjon.rest.OidcRestClient;
 import no.nav.vedtak.konfig.PropertyUtil;
 
@@ -102,6 +102,9 @@ public class FpsakKlient {
                 if (ekstrainfo.contains(Tillegsinformasjon.FAGSAK) && lenke.getRel().equals(Tillegsinformasjon.FAGSAK.getFpsakRelasjonNavn())) {
                     builder.setFagsak(hentFagsak(lenke));
                 }
+                if (ekstrainfo.contains(Tillegsinformasjon.VERGE) && lenke.getRel().equals(Tillegsinformasjon.VERGE.getFpsakRelasjonNavn())) {
+                    hentVergeInformasjon(lenke).ifPresent(builder::setVerge);
+                }
             }
         });
         return builder.build();
@@ -167,6 +170,11 @@ public class FpsakKlient {
         URI endpoint = URI.create(baseUri() + resourceLink.getHref());
         return get(endpoint, FagsakDto.class)
             .orElseThrow(() -> new IllegalArgumentException("Forventet å finne fagsak på lenken: " + endpoint));
+    }
+
+    private Optional<VergeDto> hentVergeInformasjon(BehandlingResourceLinkDto resourceLink) {
+        URI endpoint = URI.create(baseUri() + resourceLink.getHref());
+        return get(endpoint, VergeDto.class);
     }
 
     private <T> Optional<T> get(URI endpoint, Class<T> tClass) {

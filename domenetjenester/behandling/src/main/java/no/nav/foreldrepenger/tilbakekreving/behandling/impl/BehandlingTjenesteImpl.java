@@ -35,6 +35,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingresultatRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.VergeRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.KildeType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
@@ -46,10 +49,13 @@ import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.VergeDto;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.konfig.KonfigVerdi;
+import no.nav.vedtak.util.StringUtils;
+import no.nav.vedtak.util.env.Environment;
 
 @ApplicationScoped
 @Transactional
@@ -63,6 +69,7 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
     private BehandlingresultatRepository behandlingresultatRepository;
     private ProsessTaskRepository prosessTaskRepository;
     private BehandlingVedtakRepository behandlingVedtakRepository;
+    private VergeRepository vergeRepository;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste;
     private FagsakTjeneste fagsakTjeneste;
@@ -94,6 +101,7 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
         this.eksternBehandlingRepository = behandlingRepositoryProvider.getEksternBehandlingRepository();
         this.behandlingresultatRepository = behandlingRepositoryProvider.getBehandlingresultatRepository();
         this.behandlingVedtakRepository = behandlingRepositoryProvider.getBehandlingVedtakRepository();
+        this.vergeRepository = behandlingRepositoryProvider.getVergeRepository();
         this.prosessTaskRepository = prosessTaskRepository;
     }
 
@@ -250,6 +258,8 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
 
         historikkinnslagTjeneste.opprettHistorikkinnslagForOpprettetBehandling(behandling); // FIXME: sjekk om journalpostId skal hentes ///
 
+        hentVergeInformasjonFraFpsak(behandling.getId());
+
         return behandling;
     }
 
@@ -294,6 +304,41 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
         prosessTaskData.setSekvens("2");
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         prosessTaskRepository.lagre(prosessTaskData);
+    }
+
+    private void hentVergeInformasjonFraFpsak(long behandlingId) {
+        if (erTestMiljø()) {
+            EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandlingId);
+            SamletEksternBehandlingInfo eksternBehandlingInfo = fpsakKlient.hentBehandlingsinfo(eksternBehandling.getEksternUuid(), Tillegsinformasjon.VERGE);
+            if (eksternBehandlingInfo.getVerge() != null) {
+                lagreVergeInformasjon(behandlingId, eksternBehandlingInfo.getVerge());
+            }
+        }
+    }
+
+    private void lagreVergeInformasjon(long behandlingId, VergeDto vergeDto) {
+        if (vergeDto.getGyldigTom().isBefore(LocalDate.now())) {
+            logger.info("Verge informasjon er utløpt.Så kopierer ikke fra fpsak");
+        } else {
+            VergeEntitet.Builder builder = VergeEntitet.builder().medVergeType(vergeDto.getVergeType())
+                .medKilde(KildeType.FPSAK.name())
+                .medGyldigPeriode(vergeDto.getGyldigFom(), vergeDto.getGyldigTom())
+                .medNavn(vergeDto.getNavn());
+            if (!StringUtils.nullOrEmpty(vergeDto.getOrganisasjonsnummer())) {
+                builder.medOrganisasjonnummer(vergeDto.getOrganisasjonsnummer());
+            } else if (!StringUtils.nullOrEmpty(vergeDto.getFnr())) {
+                builder.medVergeAktørId(fagsakTjeneste.hentAktørForFnr(vergeDto.getFnr()));
+            }
+            vergeRepository.lagreVergeInformasjon(behandlingId, builder.build());
+        }
+    }
+
+    //midlertidig kode. skal fjernes etter en stund
+    private boolean erTestMiljø() {
+        //foreløpig kun på for testing
+        boolean isEnabled = !Environment.current().isProd();
+        logger.info("{} er {}", "Hent vergeInformasjon er", isEnabled ? "skudd på" : "ikke skudd på");
+        return isEnabled;
     }
 
 }
