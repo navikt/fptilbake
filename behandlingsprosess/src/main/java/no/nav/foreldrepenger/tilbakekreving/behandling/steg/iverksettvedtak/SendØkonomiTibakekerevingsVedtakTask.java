@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDataWrapper;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.TilbakekrevingsvedtakMarshaller;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiConsumer;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiConsumerFeil;
@@ -59,7 +60,7 @@ public class SendØkonomiTibakekerevingsVedtakTask implements ProsessTaskHandler
 
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
-        long behandlingId = prosessTaskData.getBehandlingId();
+        long behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
         TilbakekrevingsvedtakDto tilbakekrevingsvedtak = tilbakekrevingsvedtakTjeneste.lagTilbakekrevingsvedtak(behandlingId);
         TilbakekrevingsvedtakRequest request = lagRequest(tilbakekrevingsvedtak);
         Long sendtXmlId = lagreXml(behandlingId, request);

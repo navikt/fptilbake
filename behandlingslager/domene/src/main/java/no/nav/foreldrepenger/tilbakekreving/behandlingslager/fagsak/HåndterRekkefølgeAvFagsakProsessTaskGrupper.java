@@ -9,6 +9,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDataWrapper;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe.Entry;
@@ -88,7 +89,8 @@ public class HåndterRekkefølgeAvFagsakProsessTaskGrupper implements ProsessTas
                 }
                 FagsakProsesstaskRekkefølge rekkefølge = handler.getBean().getClass().getAnnotation(FagsakProsesstaskRekkefølge.class);
                 Long sekvensNr = rekkefølge.gruppeSekvens() ? gruppeSekvensNr : null;
-                repository.lagre(new FagsakProsessTask(task.getFagsakId(), task.getId(), task.getBehandlingId(), sekvensNr));
+                Long behandlingId = ProsessTaskDataWrapper.wrap(task).getBehandlingId();
+                repository.lagre(new FagsakProsessTask(task.getFagsakId(), task.getId(), behandlingId, sekvensNr));
             }
         }
     }

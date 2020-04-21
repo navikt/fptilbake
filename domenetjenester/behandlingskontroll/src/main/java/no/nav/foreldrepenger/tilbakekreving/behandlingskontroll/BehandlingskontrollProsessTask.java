@@ -2,6 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingskontroll;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDataWrapper;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskInfo;
@@ -38,7 +39,7 @@ public abstract class BehandlingskontrollProsessTask implements ProsessTaskHandl
     }
 
     protected Behandling finnBehandling(ProsessTaskInfo prosessTaskData) {
-        Long behandlingId = prosessTaskData.getBehandlingId();
+        Long behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         return behandling;
     }

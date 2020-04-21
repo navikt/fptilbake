@@ -6,6 +6,7 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDataWrapper;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping.VedtakOppsummeringMapper;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.vedtak.VedtakOppsummering;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
@@ -41,7 +42,7 @@ public class SendVedtakHendelserTilDvhTask implements ProsessTaskHandler {
 
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
-        long behandlingId = prosessTaskData.getBehandlingId();
+        long behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
         VedtakOppsummering vedtakOppsummering = vedtakOppsummeringTjeneste.hentVedtakOppsummering(behandlingId);
         validate(vedtakOppsummering);
         kafkaProducer.sendMelding(vedtakOppsummering);
