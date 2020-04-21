@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.KravgrunnlagXmlUnmarshaller;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.revurdering.HentKravgrunnlagMapper;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
@@ -23,6 +24,8 @@ import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsi
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KodeAksjon;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagFeil;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ManglendeKravgrunnlagException;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiConsumer;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
@@ -36,6 +39,7 @@ public class HåndterGamleKravgrunnlagTjeneste {
 
     private static final Logger logger = LoggerFactory.getLogger(HåndterGamleKravgrunnlagTjeneste.class);
     private ØkonomiMottattXmlRepository mottattXmlRepository;
+    private KravgrunnlagRepository grunnlagRepository;
     private HentKravgrunnlagMapper hentKravgrunnlagMapper;
     private BehandlingTjeneste behandlingTjeneste;
     private ØkonomiConsumer økonomiConsumer;
@@ -47,11 +51,13 @@ public class HåndterGamleKravgrunnlagTjeneste {
 
     @Inject
     public HåndterGamleKravgrunnlagTjeneste(ØkonomiMottattXmlRepository mottattXmlRepository,
+                                            KravgrunnlagRepository grunnlagRepository,
                                             HentKravgrunnlagMapper hentKravgrunnlagMapper,
                                             BehandlingTjeneste behandlingTjeneste,
                                             ØkonomiConsumer økonomiConsumer,
                                             FpsakKlient fpsakKlient) {
         this.mottattXmlRepository = mottattXmlRepository;
+        this.grunnlagRepository = grunnlagRepository;
         this.hentKravgrunnlagMapper = hentKravgrunnlagMapper;
         this.behandlingTjeneste = behandlingTjeneste;
         this.økonomiConsumer = økonomiConsumer;
@@ -78,9 +84,16 @@ public class HåndterGamleKravgrunnlagTjeneste {
         }
     }
 
-    protected boolean finnesBehandling(Saksnummer saksnummer) {
-        if (!behandlingTjeneste.hentBehandlinger(saksnummer).isEmpty()) {
-            logger.info("Behandling finnes allerede for saksnummer={}.Kan ikke opprette behandling igjen!", saksnummer);
+    protected boolean finnesBehandling(Saksnummer saksnummer, long mottattXmlId) {
+        List<Behandling> behandlinger = behandlingTjeneste.hentBehandlinger(saksnummer);
+        Optional<Behandling> aktivBehandling = behandlinger.stream().filter(behandling -> !behandling.erAvsluttet()).findFirst();
+        if (aktivBehandling.isPresent()) {
+            long behandlingId = aktivBehandling.get().getId();
+            logger.info("Behandling med behandlingId={} finnes allerede for saksnummer={}.Kan ikke opprette behandling igjen!", behandlingId, saksnummer.getVerdi());
+            if (grunnlagRepository.harGrunnlagForBehandlingId(behandlingId) && !grunnlagRepository.erKravgrunnlagSperret(behandlingId)) {
+                logger.info("Behandling med behandlingId={} har et aktivt grunnlag. Kravgrunnlaget kan ikke brukes lenger og arkiveres!", behandlingId);
+                throw KravgrunnlagFeil.FEILFACTORY.kravgrunnlagetKanIkkeBrukes(mottattXmlId).toException();
+            }
             return true;
         }
         return false;
@@ -90,9 +103,9 @@ public class HåndterGamleKravgrunnlagTjeneste {
         List<EksternBehandlingsinfoDto> eksternBehandlinger = fpsakKlient.hentBehandlingForSaksnummer(saksnummer);
         if (!eksternBehandlinger.isEmpty()) {
             return eksternBehandlinger.stream()
-                .filter(eksternBehandlingsinfoDto -> eksternBehandlingsinfoDto.getId().equals(eksternBehandlingId)).findAny();
+                    .filter(eksternBehandlingsinfoDto -> eksternBehandlingsinfoDto.getId().equals(eksternBehandlingId)).findAny();
         }
-        logger.warn("Saksnummer={} finnes ikke i fpsak",saksnummer);
+        logger.warn("Saksnummer={} finnes ikke i fpsak", saksnummer);
         return Optional.empty();
     }
 

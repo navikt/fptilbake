@@ -31,11 +31,16 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.finn.Fi
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.revurdering.HentKravgrunnlagMapper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollAsynkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollProvider;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBrukerRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBrukerRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.TestFagsakUtil;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.TpsTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
@@ -45,6 +50,7 @@ import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsi
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.FagsakDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.PersonopplysningDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiConsumer;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiConsumerFeil;
@@ -70,14 +76,14 @@ public class HåndterGamleKravgrunnlagBatchTjenesteTest extends FellesTestOppset
     private FagsakTjeneste fagsakTjeneste = new FagsakTjeneste(tpsTjenesteMock, fagsakRepository, navBrukerRepository);
     private BehandlingTjeneste behandlingTjeneste = new BehandlingTjenesteImpl(repositoryProvider, prosessTaskRepository, behandlingskontrollProvider,
         fagsakTjeneste, historikkinnslagTjeneste, fpsakKlientMock, Period.ofWeeks(4));
-    private HåndterGamleKravgrunnlagTjeneste håndterGamleKravgrunnlagTjeneste = new HåndterGamleKravgrunnlagTjeneste(mottattXmlRepository, mapper, behandlingTjeneste,
+    private HåndterGamleKravgrunnlagTjeneste håndterGamleKravgrunnlagTjeneste = new HåndterGamleKravgrunnlagTjeneste(mottattXmlRepository, grunnlagRepository, mapper, behandlingTjeneste,
         økonomiConsumerMock, fpsakKlientMock);
     private HåndterGamleKravgrunnlagBatchTjeneste gamleKravgrunnlagBatchTjeneste = new HåndterGamleKravgrunnlagBatchTjeneste(håndterGamleKravgrunnlagTjeneste, Period.ofWeeks(-1));
     Long mottattXmlId = null;
 
     @Before
     public void setup() {
-        System.setProperty("environment.name","devimg");
+        System.setProperty("environment.name", "devimg");
         when(tpsAdapterMock.hentAktørIdForPersonIdent(any(PersonIdent.class))).thenReturn(Optional.of(behandling.getFagsak().getAktørId()));
         when(økonomiConsumerMock.hentKravgrunnlag(any(), any(HentKravgrunnlagDetaljDto.class))).thenReturn(lagDetaljertKravgrunnlagDto(true));
         when(fpsakKlientMock.hentBehandlingForSaksnummer(anyString())).thenReturn(Lists.newArrayList(lagEksternBehandlingData()));
@@ -130,6 +136,43 @@ public class HåndterGamleKravgrunnlagBatchTjenesteTest extends FellesTestOppset
         assertThat(mottattXmlRepository.finnArkivertMottattXml(mottattXmlId)).isNotNull();
         assertThat(mottattXmlRepository.finnMottattXml(mottattXmlId)).isNull();
         assertThat(behandlingTjeneste.hentBehandlinger(new Saksnummer("139015144"))).isEmpty();
+    }
+
+    @Test
+    public void skal_kjøre_batch_for_å_prosessere_gammel_kravgrunnlag_når_behandling_allerede_finnes_med_samme_saksnummer_uten_kravgrunnlag() {
+        NavBruker navBruker = TestFagsakUtil.genererBruker();
+        Fagsak fagsak = Fagsak.opprettNy(new Saksnummer("139015144"), navBruker);
+        fagsakRepository.lagre(fagsak);
+        Behandling behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).build();
+        BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(behandling);
+        behandlingRepository.lagre(behandling, behandlingLås);
+        when(økonomiConsumerMock.hentKravgrunnlag(any(), any(HentKravgrunnlagDetaljDto.class))).thenReturn(lagDetaljertKravgrunnlagDto(true));
+
+        BatchArguments emptyBatchArguments = new EmptyBatchArguments(Collections.EMPTY_MAP);
+        gamleKravgrunnlagBatchTjeneste.launch(emptyBatchArguments);
+        assertThat(mottattXmlRepository.finnArkivertMottattXml(mottattXmlId)).isNull();
+        assertThat(mottattXmlRepository.finnMottattXml(mottattXmlId)).isNotNull();
+        assertThat(behandlingTjeneste.hentBehandlinger(new Saksnummer("139015144"))).isNotEmpty();
+    }
+
+    @Test
+    public void skal_kjøre_batch_for_å_prosessere_gammel_kravgrunnlag_når_behandling_allerede_finnes_med_samme_saksnummer_med_kravgrunnlag() {
+        NavBruker navBruker = TestFagsakUtil.genererBruker();
+        Fagsak fagsak = Fagsak.opprettNy(new Saksnummer("139015144"), navBruker);
+        fagsakRepository.lagre(fagsak);
+        Behandling behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).build();
+        BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(behandling);
+        behandlingRepository.lagre(behandling, behandlingLås);
+        DetaljertKravgrunnlagDto detaljertKravgrunnlagDto = lagDetaljertKravgrunnlagDto(true);
+        when(økonomiConsumerMock.hentKravgrunnlag(any(), any(HentKravgrunnlagDetaljDto.class))).thenReturn(detaljertKravgrunnlagDto);
+        Kravgrunnlag431 kravgrunnlag431 = mapper.mapTilDomene(detaljertKravgrunnlagDto);
+        grunnlagRepository.lagre(behandling.getId(), kravgrunnlag431);
+
+        BatchArguments emptyBatchArguments = new EmptyBatchArguments(Collections.EMPTY_MAP);
+        gamleKravgrunnlagBatchTjeneste.launch(emptyBatchArguments);
+        assertThat(mottattXmlRepository.finnArkivertMottattXml(mottattXmlId)).isNotNull();
+        assertThat(mottattXmlRepository.finnMottattXml(mottattXmlId)).isNull();
+        assertThat(behandlingTjeneste.hentBehandlinger(new Saksnummer("139015144"))).isNotEmpty();
     }
 
     private DetaljertKravgrunnlagDto lagDetaljertKravgrunnlagDto(boolean erGyldig) {
