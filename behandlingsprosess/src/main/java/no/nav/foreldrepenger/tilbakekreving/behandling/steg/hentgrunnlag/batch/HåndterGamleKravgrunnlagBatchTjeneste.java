@@ -20,6 +20,7 @@ import no.nav.foreldrepenger.batch.BatchTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TaskProperty;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.AktivKravgrunnlagException;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagValidator;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
@@ -95,7 +96,7 @@ public class HåndterGamleKravgrunnlagBatchTjeneste implements BatchTjeneste {
                     håndterGyldigkravgrunnlag(mottattXmlId, saksnummer, kravgrunnlag431.getReferanse(), fpsakBehandling.get());
                 }
             }
-        } catch (KravgrunnlagValidator.UgyldigKravgrunnlagException e) {
+        } catch (KravgrunnlagValidator.UgyldigKravgrunnlagException | AktivKravgrunnlagException e) {
             logger.warn(e.getMessage());
             håndterGamleKravgrunnlagTjeneste.arkiverMotattXml(mottattXmlId, melding);
             return Optional.of(mottattXmlId);

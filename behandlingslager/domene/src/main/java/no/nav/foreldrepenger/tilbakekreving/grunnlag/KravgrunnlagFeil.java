@@ -4,6 +4,7 @@ import no.nav.vedtak.feil.Feil;
 import no.nav.vedtak.feil.FeilFactory;
 import no.nav.vedtak.feil.LogLevel;
 import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
+import no.nav.vedtak.feil.deklarasjon.FunksjonellFeil;
 import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
 
 public interface KravgrunnlagFeil extends DeklarerteFeil {
@@ -18,4 +19,8 @@ public interface KravgrunnlagFeil extends DeklarerteFeil {
 
     @TekniskFeil(feilkode = "FPT-312903", feilmelding = "GjelderType '%s' er ugyldig", logLevel = LogLevel.WARN)
     Feil ugyldigGjelderType(String gjelderType);
+
+    @FunksjonellFeil(feilkode = "FPT-313924", feilmelding = "Kravgrunnlaget kan ikke brukes lenger",
+        exceptionClass = AktivKravgrunnlagException.class, logLevel = LogLevel.WARN, løsningsforslag = "")
+    Feil kravgrunnlagetKanIkkeBrukes(long behandlingId);
 }
