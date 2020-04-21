@@ -84,7 +84,7 @@ public class HåndterGamleKravgrunnlagTjeneste {
         }
     }
 
-    protected boolean finnesBehandling(Saksnummer saksnummer) {
+    protected boolean finnesBehandling(Saksnummer saksnummer, long mottattXmlId) {
         List<Behandling> behandlinger = behandlingTjeneste.hentBehandlinger(saksnummer);
         Optional<Behandling> aktivBehandling = behandlinger.stream().filter(behandling -> !behandling.erAvsluttet()).findFirst();
         if (aktivBehandling.isPresent()) {
@@ -92,7 +92,7 @@ public class HåndterGamleKravgrunnlagTjeneste {
             logger.info("Behandling med behandlingId={} finnes allerede for saksnummer={}.Kan ikke opprette behandling igjen!", behandlingId, saksnummer.getVerdi());
             if (grunnlagRepository.harGrunnlagForBehandlingId(behandlingId) && !grunnlagRepository.erKravgrunnlagSperret(behandlingId)) {
                 logger.info("Behandling med behandlingId={} har et aktivt grunnlag. Kravgrunnlaget kan ikke brukes lenger og arkiveres!", behandlingId);
-                throw KravgrunnlagFeil.FEILFACTORY.kravgrunnlagetKanIkkeBrukes(behandlingId).toException();
+                throw KravgrunnlagFeil.FEILFACTORY.kravgrunnlagetKanIkkeBrukes(mottattXmlId).toException();
             }
             return true;
         }
