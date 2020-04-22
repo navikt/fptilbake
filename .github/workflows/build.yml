@@ -6,7 +6,7 @@ on:
       - master   # Push events on master branch
 
 env:
-  ORACLE_IMAGE: docker.pkg.github.com/navikt/vtp/foreldrepenger-oracle
+  ORACLE_IMAGE: docker.pkg.github.com/navikt/fpsak-autotest/oracle-flattened
   IMAGE_BASE: docker.pkg.github.com/${{ github.repository }}/fptilbake
   TZ: "Europe/Oslo"
 
@@ -45,7 +45,7 @@ jobs:
           docker-compose -f oracle/docker-compose.yml up oracle >nohup.out 2>&1 &
           sh -c 'tail -n +0 -f nohup.out | { sed "/Disconnected/q" && kill $$; }' || true
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
 
       - name: Set build version
         run: |
