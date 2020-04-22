@@ -111,6 +111,12 @@ public class ØkonomiMottattXmlRepository {
         return entityManager.find(ØkonomiXmlMottattArkiv.class, mottattXmlId);
     }
 
+    public boolean erMottattXmlArkivert(Long mottattXmlId){
+        TypedQuery<Long> query = entityManager.createQuery("select count(1) from ØkonomiXmlMottattArkiv arkiv where arkiv.id=:mottattXmlId", Long.class);
+        query.setParameter("mottattXmlId", mottattXmlId);
+        return query.getSingleResult() == 1;
+    }
+
     private Long finnHøyesteVersjonsnummer(String eksternBehandlingId) {
         Query query = entityManager.createNativeQuery("select max(sekvens) from oko_xml_mottatt where ekstern_behandling_id=:eksternBehandlingId");
         query.setParameter(KEY_EKSTERN_BEHANDLING_ID, eksternBehandlingId);

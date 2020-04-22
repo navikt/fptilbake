@@ -37,7 +37,7 @@ public class KravgrunnlagValidatorTest {
     public void skal_gi_feilmelding_ved_manglende_referanse_felt() {
         kravgrunnlag = lagKravgrunnlag(null);
         expectedException.expect(KravgrunnlagValidator.UgyldigKravgrunnlagException.class);
-        expectedException.expectMessage("Ugyldig kravgrunnlag. Mangler referanse");
+        expectedException.expectMessage("Ugyldig kravgrunnlag for kravgrunnlagId 12341. Mangler referanse");
 
         KravgrunnlagValidator.validerGrunnlag(kravgrunnlag);
     }

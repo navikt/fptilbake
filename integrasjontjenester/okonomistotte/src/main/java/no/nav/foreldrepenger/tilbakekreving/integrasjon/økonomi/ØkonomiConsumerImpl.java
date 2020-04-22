@@ -43,9 +43,11 @@ public class ØkonomiConsumerImpl implements ØkonomiConsumer {
     public DetaljertKravgrunnlagDto hentKravgrunnlag(Long behandlingId, HentKravgrunnlagDetaljDto kravgrunnlagDetalj) {
         KravgrunnlagHentDetaljResponse respons = hentGrunnlagRespons(kravgrunnlagDetalj);
         MmelDto kvittering = respons.getMmel();
-        validerKvitteringForHentGrunnlag(behandlingId, kvittering);
-        logger.info("Hentet kravgrunnlag fra oppdragsystemet for behandlingId={} Alvorlighetsgrad='{}' kodeMelding='{}' infomelding='{}'",
+        Long kravgrunnlagId = kravgrunnlagDetalj.getKravgrunnlagId().longValue();
+        validerKvitteringForHentGrunnlag(behandlingId, kravgrunnlagId, kvittering);
+        logger.info("Hentet kravgrunnlag fra oppdragsystemet for behandlingId={} KravgrunnlagId={} Alvorlighetsgrad='{}' kodeMelding='{}' infomelding='{}'",
             behandlingId,
+            kravgrunnlagDetalj.getKravgrunnlagId(),
             kvittering.getAlvorlighetsgrad(),
             kvittering.getKodeMelding(),
             kvittering.getBeskrMelding());
@@ -86,11 +88,13 @@ public class ØkonomiConsumerImpl implements ØkonomiConsumer {
         }
     }
 
-    private void validerKvitteringForHentGrunnlag(Long behandlingId, MmelDto mmel) {
+    private void validerKvitteringForHentGrunnlag(Long behandlingId, Long kravgrunnlagId, MmelDto mmel) {
         if (!ØkonomiKvitteringTolk.erKvitteringOK(mmel)) {
             throw ØkonomiConsumerFeil.FACTORY.fikkFeilkodeVedHentingAvKravgrunnlag(behandlingId, ØkonomiConsumerFeil.formaterKvittering(mmel)).toException();
         } else if (ØkonomiKvitteringTolk.erKravgrunnlagetIkkeFinnes(mmel)) {
-            throw ØkonomiConsumerFeil.FACTORY.fikkFeilkodeVedHentingAvKravgrunnlagNårKravgrunnlagIkkeFinnes(behandlingId, ØkonomiConsumerFeil.formaterKvittering(mmel)).toException();
+            throw ØkonomiConsumerFeil.FACTORY.fikkFeilkodeVedHentingAvKravgrunnlagNårKravgrunnlagIkkeFinnes(behandlingId, kravgrunnlagId, ØkonomiConsumerFeil.formaterKvittering(mmel)).toException();
+        } else if (ØkonomiKvitteringTolk.harKravgrunnlagNoeUkjentFeil(mmel)) {
+            throw ØkonomiConsumerFeil.FACTORY.fikkUkjentFeilkodeVedHentingAvKravgrunnlag(behandlingId, kravgrunnlagId, ØkonomiConsumerFeil.formaterKvittering(mmel)).toException();
         }
     }
 

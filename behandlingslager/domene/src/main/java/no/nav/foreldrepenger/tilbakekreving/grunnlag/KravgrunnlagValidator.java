@@ -44,7 +44,7 @@ public class KravgrunnlagValidator {
     private static void validerReferanse(Kravgrunnlag431 kravgrunnlag) {
         String referanse = kravgrunnlag.getReferanse();
         if (StringUtils.isEmpty(referanse)) {
-            throw KravgrunnlagFeil.FACTORY.manglerReferanse().toException();
+            throw KravgrunnlagFeil.FACTORY.manglerReferanse(kravgrunnlag.getEksternKravgrunnlagId()).toException();
         }
     }
 
@@ -169,8 +169,8 @@ public class KravgrunnlagValidator {
         @IntegrasjonFeil(feilkode = "FPT-879715", feilmelding = "Ugyldig kravgrunnlag. Mangler forventet felt %s for periode %s.", logLevel = WARN, exceptionClass = UgyldigKravgrunnlagException.class)
         Feil manglerFelt(String felt, Periode periode);
 
-        @IntegrasjonFeil(feilkode = "FPT-879716", feilmelding = "Ugyldig kravgrunnlag. Mangler referanse.", logLevel = WARN, exceptionClass = UgyldigKravgrunnlagException.class)
-        Feil manglerReferanse();
+        @IntegrasjonFeil(feilkode = "FPT-879716", feilmelding = "Ugyldig kravgrunnlag for kravgrunnlagId %s. Mangler referanse.", logLevel = WARN, exceptionClass = UgyldigKravgrunnlagException.class)
+        Feil manglerReferanse(String kravgrunnlagId);
 
         @IntegrasjonFeil(feilkode = "FPT-936521", feilmelding = "Ugyldig kravgrunnlag. Overlappende perioder %s og %s.", logLevel = WARN, exceptionClass = UgyldigKravgrunnlagException.class)
         Feil overlappendePerioder(Periode a, Periode b);
