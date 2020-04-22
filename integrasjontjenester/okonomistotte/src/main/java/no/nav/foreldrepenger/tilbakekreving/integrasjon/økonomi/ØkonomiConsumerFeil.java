@@ -16,8 +16,13 @@ public interface ØkonomiConsumerFeil extends DeklarerteFeil {
     @IntegrasjonFeil(feilkode = "FPT-539079", feilmelding = "Fikk feil fra OS ved annulere kravgrunnlag for behandlingId=%s.%s", logLevel = LogLevel.WARN)
     Feil fikkFeilkodeVedAnnulereKravgrunnlag(Long behandlingId, String infoFraKvittering);
 
-    @IntegrasjonFeil(feilkode = "FPT-539080", feilmelding = "Fikk feil fra OS ved henting av kravgrunnlag for behandlingId=%s.%s", logLevel = LogLevel.WARN, exceptionClass = ManglendeKravgrunnlagException.class)
-    Feil fikkFeilkodeVedHentingAvKravgrunnlagNårKravgrunnlagIkkeFinnes(Long behandlingId, String infoFraKvittering);
+    @IntegrasjonFeil(feilkode = "FPT-539080", feilmelding = "Fikk feil fra OS ved henting av kravgrunnlag for behandlingId=%s og kravgrunnlagId=%s.%s",
+        logLevel = LogLevel.WARN, exceptionClass = ManglendeKravgrunnlagException.class)
+    Feil fikkFeilkodeVedHentingAvKravgrunnlagNårKravgrunnlagIkkeFinnes(Long behandlingId, Long kravgrunnlagId, String infoFraKvittering);
+
+    @IntegrasjonFeil(feilkode = "FPT-539081", feilmelding = "Fikk ukjent feil fra OS ved henting av kravgrunnlag for behandlingId=%s og kravgrunnlagId=%s.%s",
+        logLevel = LogLevel.WARN, exceptionClass = UkjentOppdragssystemException.class)
+    Feil fikkUkjentFeilkodeVedHentingAvKravgrunnlag(Long behandlingId, Long kravgrunnlagId, String infoFraKvittering);
 
     static String formaterKvittering(MmelDto kvittering) {
         //HAXX ikke bruk dette som mal ved oppsett av deklarative feil
@@ -41,10 +46,10 @@ public interface ØkonomiConsumerFeil extends DeklarerteFeil {
     private static void addToBuilder(StringBuilder builder, String name, String value) {
         if (value != null) {
             builder.append(" ")
-                    .append(name)
-                    .append("='")
-                    .append(value)
-                    .append("'");
+                .append(name)
+                .append("='")
+                .append(value)
+                .append("'");
         }
     }
 

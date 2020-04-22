@@ -110,11 +110,22 @@ public class HåndterGamleKravgrunnlagBatchTjenesteTest extends FellesTestOppset
     @Test
     public void skal_kjøre_batch_for_å_prosessere_gammel_kravgrunnlag_når_grunnlaget_ikke_finnes_i_økonomi() {
         when(økonomiConsumerMock.hentKravgrunnlag(any(), any(HentKravgrunnlagDetaljDto.class)))
-            .thenThrow(ØkonomiConsumerFeil.FACTORY.fikkFeilkodeVedHentingAvKravgrunnlagNårKravgrunnlagIkkeFinnes(any(), anyString()).toException());
+            .thenThrow(ØkonomiConsumerFeil.FACTORY.fikkFeilkodeVedHentingAvKravgrunnlagNårKravgrunnlagIkkeFinnes(behandling.getId(), 100000001l, "kravgrunnlag ikke finnes").toException());
         BatchArguments emptyBatchArguments = new EmptyBatchArguments(Collections.EMPTY_MAP);
         gamleKravgrunnlagBatchTjeneste.launch(emptyBatchArguments);
         assertThat(mottattXmlRepository.finnArkivertMottattXml(mottattXmlId)).isNotNull();
         assertThat(mottattXmlRepository.finnMottattXml(mottattXmlId)).isNull();
+        assertThat(behandlingTjeneste.hentBehandlinger(new Saksnummer("139015144"))).isEmpty();
+    }
+
+    @Test
+    public void skal_kjøre_batch_for_å_prosessere_gammel_kravgrunnlag_når_økonomi_svarer_ukjent_feil() {
+        when(økonomiConsumerMock.hentKravgrunnlag(any(), any(HentKravgrunnlagDetaljDto.class)))
+            .thenThrow(ØkonomiConsumerFeil.FACTORY.fikkUkjentFeilkodeVedHentingAvKravgrunnlag(behandling.getId(), 100000001l, "ukjent feil").toException());
+        BatchArguments emptyBatchArguments = new EmptyBatchArguments(Collections.EMPTY_MAP);
+        gamleKravgrunnlagBatchTjeneste.launch(emptyBatchArguments);
+        assertThat(mottattXmlRepository.finnArkivertMottattXml(mottattXmlId)).isNull();
+        assertThat(mottattXmlRepository.finnMottattXml(mottattXmlId)).isNotNull();
         assertThat(behandlingTjeneste.hentBehandlinger(new Saksnummer("139015144"))).isEmpty();
     }
 

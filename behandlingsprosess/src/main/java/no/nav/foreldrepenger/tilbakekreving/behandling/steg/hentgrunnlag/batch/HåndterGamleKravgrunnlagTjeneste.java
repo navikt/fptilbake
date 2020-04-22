@@ -27,6 +27,7 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagFeil;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ManglendeKravgrunnlagException;
+import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.UkjentOppdragssystemException;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiConsumer;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
@@ -80,8 +81,11 @@ public class HåndterGamleKravgrunnlagTjeneste {
         } catch (ManglendeKravgrunnlagException e) {
             logger.warn(e.getMessage());
             arkiverMotattXml(mottattXmlId, melding);
-            return Optional.empty();
+        } catch (UkjentOppdragssystemException e){
+            // ikke arkiver xml i tilfelle ukjent feil kommer fra økonomi
+            logger.warn(e.getMessage());
         }
+        return Optional.empty();
     }
 
     protected boolean finnesBehandling(Saksnummer saksnummer, long mottattXmlId) {
@@ -125,7 +129,9 @@ public class HåndterGamleKravgrunnlagTjeneste {
     }
 
     protected void slettMottattGamleKravgrunnlag(List<Long> gammelKravgrunnlagListe) {
-        gammelKravgrunnlagListe.forEach(mottattXmlId -> mottattXmlRepository.slettMottattXml(mottattXmlId));
+        // slettes kun xmlene fra OKO_XML_MOTTATT som er arkivert
+        gammelKravgrunnlagListe.stream().filter(mottattXMlId -> mottattXmlRepository.erMottattXmlArkivert(mottattXMlId))
+            .forEach(mottattXmlId -> mottattXmlRepository.slettMottattXml(mottattXmlId));
     }
 
     private HentKravgrunnlagDetaljDto forberedHentKravgrunnlagRequest(DetaljertKravgrunnlag detaljertKravgrunnlag) {

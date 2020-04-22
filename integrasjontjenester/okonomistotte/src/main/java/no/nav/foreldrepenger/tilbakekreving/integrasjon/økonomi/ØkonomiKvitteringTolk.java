@@ -4,6 +4,7 @@ import java.util.Set;
 
 import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakResponse;
 import no.nav.tilbakekreving.typer.v1.MmelDto;
+import no.nav.vedtak.util.StringUtils;
 
 public class ØkonomiKvitteringTolk {
 
@@ -24,6 +25,10 @@ public class ØkonomiKvitteringTolk {
 
     public static boolean erKravgrunnlagetIkkeFinnes(MmelDto kvittering) {
         return kvittering != null && KODE_MELDING_KRAVGRUNNLAG_IKKE_FINNES.equals(kvittering.getKodeMelding());
+    }
+
+    public static boolean harKravgrunnlagNoeUkjentFeil(MmelDto kvittering) {
+        return kvittering != null && !StringUtils.nullOrEmpty(kvittering.getKodeMelding()) && !StringUtils.nullOrEmpty(kvittering.getBeskrMelding());
     }
 
 }
