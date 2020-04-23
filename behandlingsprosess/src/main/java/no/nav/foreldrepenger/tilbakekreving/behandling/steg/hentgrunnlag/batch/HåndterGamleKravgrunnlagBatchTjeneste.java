@@ -73,9 +73,7 @@ public class HåndterGamleKravgrunnlagBatchTjeneste implements BatchTjeneste {
                     ugyldigkravgrunnlag.ifPresent(slettesXmlListe::add);
                 }
             }
-            //slette gamle kravgrunnlag som ikke finnes i Økonomi fra OKO_XML_MOTTATT
             if (!slettesXmlListe.isEmpty()) {
-                logger.info("Antall Gamle kravgrunnlag som skal slettes fra OKO_XML_MOTTATT er {}", slettesXmlListe);
                 håndterGamleKravgrunnlagTjeneste.slettMottattGamleKravgrunnlag(slettesXmlListe);
             }
         }
