@@ -40,6 +40,7 @@ public class ØkonomiMottattXmlRepository {
     public Long lagreMottattXml(String xml) {
         ØkonomiXmlMottatt entity = new ØkonomiXmlMottatt(xml);
         entityManager.persist(entity);
+        entityManager.flush();
         return entity.getId();
     }
 
