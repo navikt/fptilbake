@@ -49,6 +49,7 @@ public class HistorikkinnslagType extends Kodeliste {
     public static final HistorikkinnslagType SPOLT_TILBAKE = new HistorikkinnslagType("SPOLT_TILBAKE", MAL_TYPE_1);
     public static final HistorikkinnslagType TBK_OPPR = new HistorikkinnslagType("TILBAKEKREVING_OPPR", MAL_TYPE_1);
     public static final HistorikkinnslagType SAK_GODKJENT = new HistorikkinnslagType("SAK_GODKJENT", MAL_TYPE_1);
+    public static final HistorikkinnslagType FAKTA_VERGE = new HistorikkinnslagType("VERGE", MAL_TYPE_1);
 
     // type 2
     public static final HistorikkinnslagType FORSLAG_VEDTAK = new HistorikkinnslagType("FORSLAG_VEDTAK", MAL_TYPE_2);
