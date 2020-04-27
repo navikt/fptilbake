@@ -93,6 +93,8 @@ public class ØkonomiConsumerImpl implements ØkonomiConsumer {
             throw ØkonomiConsumerFeil.FACTORY.fikkFeilkodeVedHentingAvKravgrunnlag(behandlingId, ØkonomiConsumerFeil.formaterKvittering(mmel)).toException();
         } else if (ØkonomiKvitteringTolk.erKravgrunnlagetIkkeFinnes(mmel)) {
             throw ØkonomiConsumerFeil.FACTORY.fikkFeilkodeVedHentingAvKravgrunnlagNårKravgrunnlagIkkeFinnes(behandlingId, kravgrunnlagId, ØkonomiConsumerFeil.formaterKvittering(mmel)).toException();
+        } else if (ØkonomiKvitteringTolk.erKravgrunnlagetSperret(mmel)) {
+            throw ØkonomiConsumerFeil.FACTORY.fikkFeilkodeVedHentingAvKravgrunnlagNårKravgrunnlagErSperret(behandlingId, kravgrunnlagId, ØkonomiConsumerFeil.formaterKvittering(mmel)).toException();
         } else if (ØkonomiKvitteringTolk.harKravgrunnlagNoeUkjentFeil(mmel)) {
             throw ØkonomiConsumerFeil.FACTORY.fikkUkjentFeilkodeVedHentingAvKravgrunnlag(behandlingId, kravgrunnlagId, ØkonomiConsumerFeil.formaterKvittering(mmel)).toException();
         }

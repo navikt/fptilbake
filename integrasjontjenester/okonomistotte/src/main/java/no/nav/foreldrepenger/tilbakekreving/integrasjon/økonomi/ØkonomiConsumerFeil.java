@@ -20,7 +20,11 @@ public interface ØkonomiConsumerFeil extends DeklarerteFeil {
         logLevel = LogLevel.WARN, exceptionClass = ManglendeKravgrunnlagException.class)
     Feil fikkFeilkodeVedHentingAvKravgrunnlagNårKravgrunnlagIkkeFinnes(Long behandlingId, Long kravgrunnlagId, String infoFraKvittering);
 
-    @IntegrasjonFeil(feilkode = "FPT-539081", feilmelding = "Fikk ukjent feil fra OS ved henting av kravgrunnlag for behandlingId=%s og kravgrunnlagId=%s.%s",
+    @IntegrasjonFeil(feilkode = "FPT-539081", feilmelding = "Fikk feil fra OS ved henting av kravgrunnlag for behandlingId=%s og kravgrunnlagId=%s.%s",
+        logLevel = LogLevel.WARN, exceptionClass = SperringKravgrunnlagException.class)
+    Feil fikkFeilkodeVedHentingAvKravgrunnlagNårKravgrunnlagErSperret(Long behandlingId, Long kravgrunnlagId, String infoFraKvittering);
+
+    @IntegrasjonFeil(feilkode = "FPT-539085", feilmelding = "Fikk ukjent feil fra OS ved henting av kravgrunnlag for behandlingId=%s og kravgrunnlagId=%s.%s",
         logLevel = LogLevel.WARN, exceptionClass = UkjentOppdragssystemException.class)
     Feil fikkUkjentFeilkodeVedHentingAvKravgrunnlag(Long behandlingId, Long kravgrunnlagId, String infoFraKvittering);
 
