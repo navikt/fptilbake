@@ -10,6 +10,7 @@ public class ØkonomiKvitteringTolk {
 
     private static final Set<String> KVITTERING_OK_KODE = Set.of("00", "04");
     private static final String KODE_MELDING_KRAVGRUNNLAG_IKKE_FINNES = "B420010I";
+    public static final String KODE_MELDING_KRAVGRUNNLAG_ER_SPERRET = "B420012I";
 
     ØkonomiKvitteringTolk(){
         // privat construktor
@@ -25,6 +26,10 @@ public class ØkonomiKvitteringTolk {
 
     public static boolean erKravgrunnlagetIkkeFinnes(MmelDto kvittering) {
         return kvittering != null && KODE_MELDING_KRAVGRUNNLAG_IKKE_FINNES.equals(kvittering.getKodeMelding());
+    }
+
+    public static boolean erKravgrunnlagetSperret(MmelDto kvittering) {
+        return kvittering != null && KODE_MELDING_KRAVGRUNNLAG_ER_SPERRET.equals(kvittering.getKodeMelding());
     }
 
     public static boolean harKravgrunnlagNoeUkjentFeil(MmelDto kvittering) {

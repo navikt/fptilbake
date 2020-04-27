@@ -27,7 +27,7 @@ import no.nav.foreldrepenger.batch.EmptyBatchArguments;
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjenesteImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.FellesTestOppsett;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.finn.FinnGrunnlagTask;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.KravgrunnlagMapper;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.revurdering.HentKravgrunnlagMapper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollAsynkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollProvider;
@@ -63,12 +63,11 @@ import no.nav.tilbakekreving.typer.v1.PeriodeDto;
 import no.nav.tilbakekreving.typer.v1.TypeGjelderDto;
 import no.nav.tilbakekreving.typer.v1.TypeKlasseDto;
 import no.nav.vedtak.felles.integrasjon.felles.ws.DateUtil;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
 
 public class HåndterGamleKravgrunnlagBatchTjenesteTest extends FellesTestOppsett {
 
-    private HentKravgrunnlagMapper mapper = new HentKravgrunnlagMapper(tpsAdapterWrapper);
+    private HentKravgrunnlagMapper hentKravgrunnlagMapper = new HentKravgrunnlagMapper(tpsAdapterWrapper);
+    private KravgrunnlagMapper lesKravgrunnlagMapper = new KravgrunnlagMapper(tpsAdapterWrapper);
     private BehandlingskontrollProvider behandlingskontrollProvider = new BehandlingskontrollProvider(behandlingskontrollTjeneste, mock(BehandlingskontrollAsynkTjeneste.class));
     private TpsTjeneste tpsTjenesteMock = mock(TpsTjeneste.class);
     private ØkonomiConsumer økonomiConsumerMock = mock(ØkonomiConsumer.class);
@@ -76,8 +75,9 @@ public class HåndterGamleKravgrunnlagBatchTjenesteTest extends FellesTestOppset
     private FagsakTjeneste fagsakTjeneste = new FagsakTjeneste(tpsTjenesteMock, fagsakRepository, navBrukerRepository);
     private BehandlingTjeneste behandlingTjeneste = new BehandlingTjenesteImpl(repositoryProvider, prosessTaskRepository, behandlingskontrollProvider,
         fagsakTjeneste, historikkinnslagTjeneste, fpsakKlientMock, Period.ofWeeks(4));
-    private HåndterGamleKravgrunnlagTjeneste håndterGamleKravgrunnlagTjeneste = new HåndterGamleKravgrunnlagTjeneste(mottattXmlRepository, grunnlagRepository, mapper, behandlingTjeneste,
-        økonomiConsumerMock, fpsakKlientMock);
+    private HåndterGamleKravgrunnlagTjeneste håndterGamleKravgrunnlagTjeneste = new HåndterGamleKravgrunnlagTjeneste(mottattXmlRepository, grunnlagRepository,
+        hentKravgrunnlagMapper, lesKravgrunnlagMapper,
+        behandlingTjeneste, økonomiConsumerMock, fpsakKlientMock);
     private HåndterGamleKravgrunnlagBatchTjeneste gamleKravgrunnlagBatchTjeneste = new HåndterGamleKravgrunnlagBatchTjeneste(håndterGamleKravgrunnlagTjeneste, Period.ofWeeks(-1));
     Long mottattXmlId = null;
 
@@ -88,6 +88,7 @@ public class HåndterGamleKravgrunnlagBatchTjenesteTest extends FellesTestOppset
         when(økonomiConsumerMock.hentKravgrunnlag(any(), any(HentKravgrunnlagDetaljDto.class))).thenReturn(lagDetaljertKravgrunnlagDto(true));
         when(fpsakKlientMock.hentBehandlingForSaksnummer(anyString())).thenReturn(Lists.newArrayList(lagEksternBehandlingData()));
         when(fpsakKlientMock.hentBehandlingsinfo(any(UUID.class), any(Tillegsinformasjon.class))).thenReturn(lagSamletEksternBehandlingData());
+        when(fpsakKlientMock.hentBehandling(any(UUID.class))).thenReturn(Optional.of(lagEksternBehandlingData()));
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_YTEL.xml"));
     }
 
@@ -102,9 +103,9 @@ public class HåndterGamleKravgrunnlagBatchTjenesteTest extends FellesTestOppset
         assertThat(økonomiXmlMottatt).isNotNull();
         assertThat(økonomiXmlMottatt.getSaksnummer()).isEqualTo("139015144");
         assertThat(økonomiXmlMottatt.getEksternBehandlingId()).isNotEmpty();
-        List<ProsessTaskData> prosessTasker = prosessTaskRepository.finnAlle(ProsessTaskStatus.KLAR);
-        assertThat(prosessTasker).isNotEmpty();
-        assertThat(prosessTasker.get(0).getTaskType()).isEqualTo(FinnGrunnlagTask.TASKTYPE);
+        assertThat(økonomiXmlMottatt.isTilkoblet()).isTrue();
+        long behandlingId = behandlinger.get(0).getId();
+        assertThat(grunnlagRepository.harGrunnlagForBehandlingId(behandlingId)).isTrue();
     }
 
     @Test
@@ -127,6 +128,23 @@ public class HåndterGamleKravgrunnlagBatchTjenesteTest extends FellesTestOppset
         assertThat(mottattXmlRepository.finnArkivertMottattXml(mottattXmlId)).isNull();
         assertThat(mottattXmlRepository.finnMottattXml(mottattXmlId)).isNotNull();
         assertThat(behandlingTjeneste.hentBehandlinger(new Saksnummer("139015144"))).isEmpty();
+    }
+
+    @Test
+    public void skal_kjøre_batch_for_å_prosessere_gammel_kravgrunnlag_når_grunnlaget_er_sperret() {
+        when(økonomiConsumerMock.hentKravgrunnlag(any(), any(HentKravgrunnlagDetaljDto.class)))
+            .thenThrow(ØkonomiConsumerFeil.FACTORY.fikkFeilkodeVedHentingAvKravgrunnlagNårKravgrunnlagErSperret(behandling.getId(), 100000001l, "sperret").toException());
+        BatchArguments emptyBatchArguments = new EmptyBatchArguments(Collections.EMPTY_MAP);
+        gamleKravgrunnlagBatchTjeneste.launch(emptyBatchArguments);
+        assertThat(mottattXmlRepository.finnArkivertMottattXml(mottattXmlId)).isNull();
+        ØkonomiXmlMottatt økonomiXmlMottatt = mottattXmlRepository.finnMottattXml(mottattXmlId);
+        assertThat(økonomiXmlMottatt).isNotNull();
+        assertThat(økonomiXmlMottatt.isTilkoblet()).isTrue();
+        List<Behandling> behandlinger = behandlingTjeneste.hentBehandlinger(new Saksnummer("139015144"));
+        assertThat(behandlinger).isNotEmpty();
+        long behandlingId = behandlinger.get(0).getId();
+        assertThat(grunnlagRepository.harGrunnlagForBehandlingId(behandlingId)).isTrue();
+        assertThat(grunnlagRepository.erKravgrunnlagSperret(behandlingId)).isTrue();
     }
 
     @Test
@@ -176,7 +194,7 @@ public class HåndterGamleKravgrunnlagBatchTjenesteTest extends FellesTestOppset
         behandlingRepository.lagre(behandling, behandlingLås);
         DetaljertKravgrunnlagDto detaljertKravgrunnlagDto = lagDetaljertKravgrunnlagDto(true);
         when(økonomiConsumerMock.hentKravgrunnlag(any(), any(HentKravgrunnlagDetaljDto.class))).thenReturn(detaljertKravgrunnlagDto);
-        Kravgrunnlag431 kravgrunnlag431 = mapper.mapTilDomene(detaljertKravgrunnlagDto);
+        Kravgrunnlag431 kravgrunnlag431 = hentKravgrunnlagMapper.mapTilDomene(detaljertKravgrunnlagDto);
         grunnlagRepository.lagre(behandling.getId(), kravgrunnlag431);
 
         BatchArguments emptyBatchArguments = new EmptyBatchArguments(Collections.EMPTY_MAP);
