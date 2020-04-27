@@ -18,14 +18,9 @@ import no.nav.foreldrepenger.batch.BatchArguments;
 import no.nav.foreldrepenger.batch.BatchStatus;
 import no.nav.foreldrepenger.batch.BatchTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TaskProperty;
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.AktivKravgrunnlagAllerdeFinnesException;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagValidator;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
 import no.nav.vedtak.konfig.KonfigVerdi;
-import no.nav.vedtak.util.env.Environment;
 
 @ApplicationScoped
 public class HåndterGamleKravgrunnlagBatchTjeneste implements BatchTjeneste {
@@ -62,55 +57,27 @@ public class HåndterGamleKravgrunnlagBatchTjeneste implements BatchTjeneste {
             logger.info("Det finnes ingen gammel kravgrunnlag før {}", bestemtDato);
         } else {
             logger.info("Det finnes {} gamle kravgrunnlag før {}", alleGamleKravgrunnlag.size(), bestemtDato);
-            List<Long> slettesXmlListe = new ArrayList<>();
-            for (ØkonomiXmlMottatt økonomiXmlMottatt : alleGamleKravgrunnlag) {
-                Long mottattXmlId = økonomiXmlMottatt.getId();
-                Optional<Kravgrunnlag431> respons = håndterGamleKravgrunnlagTjeneste.hentKravgrunnlagFraØkonomi(økonomiXmlMottatt);
-                if (respons.isEmpty()) {
-                    slettesXmlListe.add(mottattXmlId);
-                } else {
-                    Optional<Long> ugyldigkravgrunnlag = håndterKravgrunnlagRespons(mottattXmlId, økonomiXmlMottatt.getMottattXml(), respons.get());
-                    ugyldigkravgrunnlag.ifPresent(slettesXmlListe::add);
-                }
-            }
-            if (!slettesXmlListe.isEmpty()) {
-                håndterGamleKravgrunnlagTjeneste.slettMottattGamleKravgrunnlag(slettesXmlListe);
-            }
+            håndterGamleKravgrunnlag(alleGamleKravgrunnlag);
         }
         return batchRun;
     }
 
-    private Optional<Long> håndterKravgrunnlagRespons(Long mottattXmlId, String melding, Kravgrunnlag431 kravgrunnlag431) {
-        try {
-            KravgrunnlagValidator.validerGrunnlag(kravgrunnlag431);
-            String saksnummer = finnSaksnummer(kravgrunnlag431.getFagSystemId());
-            if (!håndterGamleKravgrunnlagTjeneste.finnesBehandling(new Saksnummer(saksnummer),mottattXmlId)) {
-                Long eksternBehandlingId = Long.valueOf(kravgrunnlag431.getReferanse());
-                Optional<EksternBehandlingsinfoDto> fpsakBehandling = håndterGamleKravgrunnlagTjeneste.hentDataFraFpsak(saksnummer, eksternBehandlingId);
-                if (fpsakBehandling.isEmpty()) {
-                    håndterGamleKravgrunnlagTjeneste.arkiverMotattXml(mottattXmlId, melding);
-                    return Optional.of(mottattXmlId);
-                } else {
-                    håndterGyldigkravgrunnlag(mottattXmlId, saksnummer, kravgrunnlag431.getReferanse(), fpsakBehandling.get());
-                }
+    private void håndterGamleKravgrunnlag(List<ØkonomiXmlMottatt> alleGamleKravgrunnlag) {
+        List<Long> slettesXmlListe = new ArrayList<>();
+        for (ØkonomiXmlMottatt økonomiXmlMottatt : alleGamleKravgrunnlag) {
+            Long mottattXmlId = økonomiXmlMottatt.getId();
+            Optional<Kravgrunnlag431> respons = håndterGamleKravgrunnlagTjeneste.hentKravgrunnlagFraØkonomi(økonomiXmlMottatt);
+            if (respons.isEmpty()) {
+                slettesXmlListe.add(mottattXmlId);
+            } else {
+                Optional<Long> ugyldigkravgrunnlag = håndterGamleKravgrunnlagTjeneste.
+                    håndterKravgrunnlagRespons(mottattXmlId, økonomiXmlMottatt.getMottattXml(), respons.get());
+                ugyldigkravgrunnlag.ifPresent(slettesXmlListe::add);
             }
-        } catch (KravgrunnlagValidator.UgyldigKravgrunnlagException | AktivKravgrunnlagAllerdeFinnesException e) {
-            logger.warn(e.getMessage());
-            håndterGamleKravgrunnlagTjeneste.arkiverMotattXml(mottattXmlId, melding);
-            return Optional.of(mottattXmlId);
         }
-        return Optional.empty();
-    }
-
-    private void håndterGyldigkravgrunnlag(Long mottattXmlId, String saksnummer, String eksternBehandlingId, EksternBehandlingsinfoDto eksternBehandlingData) {
-        håndterGamleKravgrunnlagTjeneste.oppdaterMedEksternBehandlingIdOgSaksnummer(mottattXmlId, eksternBehandlingId, saksnummer);
-        if (erTestMiljø()) {
-            Long behandlingId = håndterGamleKravgrunnlagTjeneste.opprettBehandling(eksternBehandlingData);
-            logger.info("Behandling opprettet med behandlingId={}", behandlingId);
-        } else {
-            logger.info("Behandling for saksnummer={} og eksternBehandlingId={} bør opprettes her", saksnummer, eksternBehandlingId);
+        if (!slettesXmlListe.isEmpty()) {
+            håndterGamleKravgrunnlagTjeneste.slettMottattGamleKravgrunnlag(slettesXmlListe);
         }
-
     }
 
     @Override
@@ -122,18 +89,6 @@ public class HåndterGamleKravgrunnlagBatchTjeneste implements BatchTjeneste {
     @Override
     public String getBatchName() {
         return BATCHNAVN;
-    }
-
-    private String finnSaksnummer(String fagsystemId) {
-        return fagsystemId.substring(0, fagsystemId.length() - 3);
-    }
-
-    //midlertidig kode. skal fjernes etter en stund
-    private boolean erTestMiljø() {
-        //foreløpig kun på for testing
-        boolean isEnabled = !Environment.current().isProd();
-        logger.info("{} er {}", "Opprett behandling når kravgrunnlag venter etter fristen er ", isEnabled ? "skudd på" : "ikke skudd på");
-        return isEnabled;
     }
 
 }
