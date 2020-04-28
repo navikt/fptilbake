@@ -174,6 +174,7 @@ public class FagsakProsessTaskRepositoryImpl implements FagsakProsessTaskReposit
         if (tasks.isEmpty()) {
             // ignorerer alle ferdig, suspendert, veto når vi søker blant alle grupper
             statuser.remove(ProsessTaskStatus.FERDIG);
+            statuser.remove(ProsessTaskStatus.KJOERT);
             statuser.remove(ProsessTaskStatus.SUSPENDERT);
             tasks = finnAlleForAngittSøk(fagsakId, behandlingId, null, new ArrayList<>(statuser), fom, tom);
         }
