@@ -1,0 +1,8 @@
+update KODELISTE set GYLDIG_TOM = to_date('01.03.2020','DD.MM.RRRR') where KODEVERK = 'VENT_AARSAK' and kode in ('SCANN', 'VENT_PÅ_ØKONOMI');
+
+INSERT INTO KODELISTE (id, kodeverk, kode, beskrivelse,GYLDIG_FOM,GYLDIG_TOM,OPPRETTET_AV,OPPRETTET_TID)
+VALUES(seq_kodeliste.nextval, 'VENT_AARSAK', 'VENT_PÅ_MULIG_MOTREGNING','Mulig motregning med annen ytelse',to_date('01.01.2000','DD.MM.RRRR'),
+to_date('31.12.9999','DD.MM.RRRR'),'VL',to_date(sysdate,'DD.MM.RRRR'));
+
+INSERT INTO KODELISTE_NAVN_I18N (ID,KL_KODEVERK,KL_KODE,SPRAK,NAVN,OPPRETTET_AV,OPPRETTET_TID)
+VALUES (SEQ_KODELISTE_NAVN_I18N.NEXTVAL,'VENT_AARSAK','VENT_PÅ_MULIG_MOTREGNING','NB','Mulig motregning med annen ytelse','VL',to_date(sysdate,'DD.MM.RRRR'));

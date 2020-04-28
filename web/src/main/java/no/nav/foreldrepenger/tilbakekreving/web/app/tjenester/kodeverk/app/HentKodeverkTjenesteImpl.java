@@ -1,5 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.kodeverk.app;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -87,11 +88,13 @@ class HentKodeverkTjenesteImpl implements HentKodeverkTjeneste {
 
     @Override
     public Map<String, List<Kodeliste>> hentGruppertKodeliste() {
+        LocalDate now = LocalDate.now();
         Map<String, List<Kodeliste>> klientKoder = new HashMap<>();
         KODEVERK_SOM_BRUKES_PÅ_KLIENT.forEach(k -> {
             //TODO (TOR) Kjører repository-kall for kvar kodeliste. Er nok ikkje naudsynt
             List<Kodeliste> filtrertKodeliste = kodeverkRepository.hentAlle(k).stream()
                 .filter(ads -> !"-".equals(ads.getKode()))
+                .filter(ads -> now.isBefore(ads.getGyldigTilOgMed()))
                 .collect(Collectors.toList());
             klientKoder.put(k.getSimpleName(), filtrertKodeliste);
         });
