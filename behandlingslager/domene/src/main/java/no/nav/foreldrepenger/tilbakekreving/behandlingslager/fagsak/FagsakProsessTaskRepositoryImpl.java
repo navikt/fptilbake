@@ -26,6 +26,7 @@ import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskStatusUtil;
 import no.nav.vedtak.felles.jpa.HibernateVerktøy;
 import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -173,8 +174,7 @@ public class FagsakProsessTaskRepositoryImpl implements FagsakProsessTaskReposit
 
         if (tasks.isEmpty()) {
             // ignorerer alle ferdig, suspendert, veto når vi søker blant alle grupper
-            statuser.remove(ProsessTaskStatus.FERDIG);
-            statuser.remove(ProsessTaskStatus.KJOERT);
+            statuser.removeAll(ProsessTaskStatusUtil.FERDIG_STATUSER);
             statuser.remove(ProsessTaskStatus.SUSPENDERT);
             tasks = finnAlleForAngittSøk(fagsakId, behandlingId, null, new ArrayList<>(statuser), fom, tom);
         }
@@ -217,7 +217,7 @@ public class FagsakProsessTaskRepositoryImpl implements FagsakProsessTaskReposit
 
     }
 
-    /** Observerer og vedlikeholder relasjon mellom fagsak og prosess task for enklere søk (dvs. fjerner relasjon når FERDIG). */
+    /** Observerer og vedlikeholder relasjon mellom fagsak og prosess task for enklere søk (dvs. fjerner relasjon når FERDIG eller KJOERT). */
     public void observeProsessTask(@Observes ProsessTaskEvent ptEvent) {
 
         Long fagsakId = ptEvent.getFagsakId();
@@ -231,7 +231,7 @@ public class FagsakProsessTaskRepositoryImpl implements FagsakProsessTaskReposit
         Optional<FagsakProsessTask> fagsakProsessTaskOpt = hent(prosessTaskId, true);
 
         if (fagsakProsessTaskOpt.isPresent()) {
-            if (ProsessTaskStatus.FERDIG.equals(status)) {
+            if (ProsessTaskStatusUtil.FERDIG_STATUSER.contains(status)) {
                 // fjern link
                 fjern(fagsakId, ptEvent.getId(), fagsakProsessTaskOpt.get().getGruppeSekvensNr());
             }
