@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskStatusUtil;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.AsyncPollingStatus;
 import no.nav.vedtak.feil.Feil;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -36,7 +37,7 @@ public class VurderProsessTaskStatusForPollingApi {
     public Optional<AsyncPollingStatus> sjekkStatusNesteProsessTask(String gruppe, Map<String, ProsessTaskData> nesteTask) {
         LocalDateTime maksTidFørNesteKjøring = LocalDateTime.now().plusMinutes(2);
         nesteTask = nesteTask.entrySet().stream()
-                .filter(e -> !ProsessTaskStatus.FERDIG.equals(e.getValue().getStatus())) // trenger ikke FERDIG
+                .filter(e -> !ProsessTaskStatusUtil.FERDIG_STATUSER.contains(e.getValue().getStatus())) // trenger ikke FERDIG
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
         if (!nesteTask.isEmpty()) {

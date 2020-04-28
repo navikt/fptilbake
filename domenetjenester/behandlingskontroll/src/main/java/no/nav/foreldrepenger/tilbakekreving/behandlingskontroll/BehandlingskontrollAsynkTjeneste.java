@@ -12,9 +12,9 @@ public interface BehandlingskontrollAsynkTjeneste {
     /**
      * Sjekker om prosess tasks pågår nå for angitt behandling. Returnerer neste utestående tasks per gruppe for status (KLAR, FEILET, VENTER),
      * men ikke FERDIG, SUSPENDERT (unntatt der matcher angitt gruppe)
-     * 
+     *
      * Hvis gruppe angis sjekkes kun angitt gruppe. Dersom denne er null returneres status for alle åpne grupper (ikke-ferdig) for angitt
-     * behandling. Tasks som er {@link ProsessTaskStatus#FERDIG} ignoreres i resultatet når gruppe ikke er angitt.
+     * behandling. Tasks som er {@link ProsessTaskStatus#FERDIG eller ProsessTaskStatus#KJOERT} ignoreres i resultatet når gruppe ikke er angitt.
      */
     Map<String, ProsessTaskData> sjekkProsessTaskPågårForBehandling(Behandling behandling, String gruppe);
 
@@ -28,7 +28,7 @@ public interface BehandlingskontrollAsynkTjeneste {
 
     /**
      * Kjør prosess asynkront (i egen prosess task) videre.
-     * 
+     *
      * @return gruppe assignet til prosess task
      */
     String asynkProsesserBehandling(Behandling behandling);

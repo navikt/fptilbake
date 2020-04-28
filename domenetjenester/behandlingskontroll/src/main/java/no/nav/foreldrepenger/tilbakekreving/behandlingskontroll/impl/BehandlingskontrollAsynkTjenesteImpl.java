@@ -13,10 +13,10 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.Behandlingskontr
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.task.FortsettBehandlingTaskProperties;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsessTaskRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskStatusUtil;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
 
 @ApplicationScoped
 public class BehandlingskontrollAsynkTjenesteImpl implements BehandlingskontrollAsynkTjeneste {
@@ -78,7 +78,7 @@ public class BehandlingskontrollAsynkTjenesteImpl implements Behandlingskontroll
             && (nestePerGruppe.isEmpty()
                 || (nestePerGruppe.size() == 1
                     && nestePerGruppe.containsKey(gruppe)
-                    && ProsessTaskStatus.FERDIG.equals(nestePerGruppe.get(gruppe).getStatus())));
+                    && ProsessTaskStatusUtil.FERDIG_STATUSER.contains(nestePerGruppe.get(gruppe).getStatus())));
     }
 
     private Map<String, List<ProsessTaskData>> sjekkStatusProsessTasksGrouped(Long fagsakId, Long behandlingId, String gruppe) {
