@@ -28,16 +28,6 @@ jobs:
         id: oracle
         shell: bash
         run: |
-            echo "nullfile"
-            echo ${{ hashFiles('nullfile.xml') }}
-            echo "single pom"
-            echo ${{ hashFiles('pom.xml') }}
-            echo "single pom 2"
-            echo ${{ hashFiles('fptilbake/pom.xml') }}
-            echo "single pom 3"
-            echo ${{ hashFiles('/pom.xml') }}
-            echo "allpom"
-            echo ${{ hashFiles('**/pom.xml') }}
             echo  $GITHUB_TOKEN | docker login --username "x-access-token" --password-stdin https://docker.pkg.github.com
             echo "Henter og starter Oracle image $ORACLE_IMAGE"
             docker-compose -f oracle/docker-compose.yml pull
