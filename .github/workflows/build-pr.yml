@@ -13,16 +13,11 @@ jobs:
       - name: Sjekk ut kode
         uses: actions/checkout@v2
 
-      - name: Set cache key
-        run: |
-          echo "::set-env name=CACHE_KEY::$(expr $(date +%V) - 1 + 1)"
-          echo "::set-env name=PREVIOUS_CACHE_KEY::$(expr $(date +%V) - 1)"
       - uses: actions/cache@v1.1.2
         with:
-          path: ~/.m2
-          key: ${{ runner.os }}-maven-${{ env.CACHE_KEY }}
-          restore-keys: |
-            ${{ runner.os }}-maven-${{ env.PREVIOUS_CACHE_KEY }}
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-
 
       - name: Sett opp Java
         uses: actions/setup-java@v1
