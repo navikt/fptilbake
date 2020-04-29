@@ -40,13 +40,13 @@ public class ØkonomiMottattXmlRepository {
     public Long lagreMottattXml(String xml) {
         ØkonomiXmlMottatt entity = new ØkonomiXmlMottatt(xml);
         entityManager.persist(entity);
-        entityManager.flush();
         return entity.getId();
     }
 
     public void slettMottattXml(Long xmlId) {
         ØkonomiXmlMottatt entity = finnMottattXml(xmlId);
         entityManager.remove(entity);
+        entityManager.flush();
     }
 
     public Optional<ØkonomiXmlMottatt> finnForEksternBehandlingId(String eksternBehandlingId) {
