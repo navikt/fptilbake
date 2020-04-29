@@ -31,7 +31,10 @@
             <urn:tilbakekrevingsBelop>
                 <urn:kodeKlasse>FPATORD</urn:kodeKlasse>
                 <urn:typeKlasse>YTEL</urn:typeKlasse>
+                <urn:belopOpprUtbet>9000.00</urn:belopOpprUtbet>
                 <urn:belopNy>9000.00</urn:belopNy>
+                <urn:belopTilbakekreves>0.00</urn:belopTilbakekreves>
+                <urn:belopUinnkrevd>0.00</urn:belopUinnkrevd>
                 <urn:skattProsent>0.0000</urn:skattProsent>
             </urn:tilbakekrevingsBelop>
         </urn:tilbakekrevingsPeriode>

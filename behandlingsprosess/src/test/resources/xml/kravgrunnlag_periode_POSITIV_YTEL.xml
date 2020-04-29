@@ -19,20 +19,37 @@
         <urn:kontrollfelt>kontrolll-123</urn:kontrollfelt>
         <urn:saksbehId>Z111111</urn:saksbehId>
         <!--Optional:-->
-        <urn:referanse>1174551</urn:referanse>
+        <urn:referanse>100000001</urn:referanse>
         <!--1 or more repetitions:-->
         <urn:tilbakekrevingsPeriode>
             <urn:periode>
-                <mmel:fom>2018-11-01+01:00</mmel:fom>
-                <mmel:tom>2018-11-22+02:00</mmel:tom>
+                <mmel:fom>2019-08-09</mmel:fom>
+                <mmel:tom>2019-08-16</mmel:tom>
             </urn:periode>
-            <urn:belopSkattMnd>0.00</urn:belopSkattMnd>
-            <!--1 or more repetitions:-->
+            <urn:belopSkattMnd>2104.00</urn:belopSkattMnd>
             <urn:tilbakekrevingsBelop>
                 <urn:kodeKlasse>FPATORD</urn:kodeKlasse>
                 <urn:typeKlasse>YTEL</urn:typeKlasse>
-                <urn:belopOpprUtbet>9000.00</urn:belopOpprUtbet>
-                <urn:belopNy>9000.00</urn:belopNy>
+                <urn:belopOpprUtbet>3270.00</urn:belopOpprUtbet>
+                <urn:belopNy>0.00</urn:belopNy>
+                <urn:belopTilbakekreves>1794.00</urn:belopTilbakekreves>
+                <urn:belopUinnkrevd>0.00</urn:belopUinnkrevd>
+                <urn:skattProsent>43.9799</urn:skattProsent>
+            </urn:tilbakekrevingsBelop>
+            <urn:tilbakekrevingsBelop>
+                <urn:kodeKlasse>FPSND-OP</urn:kodeKlasse>
+                <urn:typeKlasse>YTEL</urn:typeKlasse>
+                <urn:belopOpprUtbet>2454.00</urn:belopOpprUtbet>
+                <urn:belopNy>3930.00</urn:belopNy>
+                <urn:belopTilbakekreves>0.00</urn:belopTilbakekreves>
+                <urn:belopUinnkrevd>0.00</urn:belopUinnkrevd>
+                <urn:skattProsent>0.0000</urn:skattProsent>
+            </urn:tilbakekrevingsBelop>
+            <urn:tilbakekrevingsBelop>
+                <urn:kodeKlasse>KL_KODE_FEIL_KORTTID</urn:kodeKlasse>
+                <urn:typeKlasse>FEIL</urn:typeKlasse>
+                <urn:belopOpprUtbet>0.00</urn:belopOpprUtbet>
+                <urn:belopNy>1794.00</urn:belopNy>
                 <urn:belopTilbakekreves>0.00</urn:belopTilbakekreves>
                 <urn:belopUinnkrevd>0.00</urn:belopUinnkrevd>
                 <urn:skattProsent>0.0000</urn:skattProsent>
