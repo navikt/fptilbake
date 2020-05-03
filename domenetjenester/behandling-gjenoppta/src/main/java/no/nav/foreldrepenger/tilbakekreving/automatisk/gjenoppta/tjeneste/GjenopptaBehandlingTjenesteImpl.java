@@ -67,8 +67,13 @@ public class GjenopptaBehandlingTjenesteImpl implements GjenopptaBehandlingTjene
         final String callId = hentCallId();
 
         behandlinger.forEach(behandling -> {
-            String nyCallId = callId + behandling.getId();
-            opprettFortsettBehandlingTask(behandling, nyCallId);
+            long behandlingId = behandling.getId();
+            String nyCallId = callId + behandlingId;
+            if (kanGjenopptaSteg(behandlingId) || !grunnlagRepository.harGrunnlagForBehandlingId(behandlingId)) {
+                opprettFortsettBehandlingTask(behandling, nyCallId);
+            } else {
+                logger.info("Behandling med id={} har et sperret kravgrunnlag, kan ikke gjenopptatt,", behandlingId);
+            }
         });
 
         return "-";

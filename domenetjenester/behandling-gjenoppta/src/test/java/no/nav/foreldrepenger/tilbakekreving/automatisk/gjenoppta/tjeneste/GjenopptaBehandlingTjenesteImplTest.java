@@ -151,6 +151,43 @@ public class GjenopptaBehandlingTjenesteImplTest {
     }
 
     @Test
+    public void skal_lage_prosess_tasks_for_behandlinger_med_aktiv_kravgrunnlag_som_skal_gjenopptas() {
+        final String gruppe = "56";
+        ScenarioSimple scenario = ScenarioSimple.simple();
+        scenario.medBehandlingType(BehandlingType.TILBAKEKREVING);
+        scenario.leggTilAksjonspunkt(AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, BehandlingStegType.VARSEL);
+        scenario.medDefaultKravgrunnlag();
+        Behandling behandling = scenario.lagre(repositoryProvider);
+        internalAksjonspunktManipulator.forceFristForAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, LocalDateTime.now().minusDays(10));
+        internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VARSEL, BehandlingStegStatus.VENTER);
+
+        List<ProsessTaskData> faktiskeProsessTaskDataListe = new ArrayList<>();
+        prosessTaskCapture(gruppe, faktiskeProsessTaskDataListe);
+
+        gjenopptaBehandlingTjeneste.automatiskGjenopptaBehandlinger();
+        assertThat(faktiskeProsessTaskDataListe).hasSize(1);
+    }
+
+    @Test
+    public void skal_ikke_lage_prosess_tasks_for_behandlinger_med_sperret_kravgrunnlag_som_skal_gjenopptas() {
+        final String gruppe = "56";
+        ScenarioSimple scenario = ScenarioSimple.simple();
+        scenario.medBehandlingType(BehandlingType.TILBAKEKREVING);
+        scenario.leggTilAksjonspunkt(AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, BehandlingStegType.VARSEL);
+        scenario.medDefaultKravgrunnlag();
+        Behandling behandling = scenario.lagre(repositoryProvider);
+        internalAksjonspunktManipulator.forceFristForAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, LocalDateTime.now().minusDays(10));
+        internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VARSEL, BehandlingStegStatus.VENTER);
+        repositoryProvider.getGrunnlagRepository().sperrGrunnlag(behandling.getId());
+
+        List<ProsessTaskData> faktiskeProsessTaskDataListe = new ArrayList<>();
+        prosessTaskCapture(gruppe, faktiskeProsessTaskDataListe);
+
+        gjenopptaBehandlingTjeneste.automatiskGjenopptaBehandlinger();
+        assertThat(faktiskeProsessTaskDataListe).hasSize(0);
+    }
+
+    @Test
     public void skal_hente_statuser_for_gjenopptaBehandling_gruppe() {
         // Arrange
         final TaskStatus status1 = new TaskStatus(ProsessTaskStatus.FERDIG, new BigDecimal(1));
