@@ -89,10 +89,10 @@ public class HåndterGamleKravgrunnlagTjeneste {
             DetaljertKravgrunnlagDto detaljertKravgrunnlagDto = økonomiConsumer.hentKravgrunnlag(null, hentKravgrunnlagDetalj);
             return Optional.of(hentKravgrunnlagMapper.mapTilDomene(detaljertKravgrunnlagDto));
         } catch (ManglendeKravgrunnlagException e) {
-            logger.warn(e.getMessage());
+            logger.info("Kravgrunnlag mangler i økonomi med følgende respons:{}", e.getMessage());
             arkiverMotattXml(mottattXmlId, melding);
         } catch (SperringKravgrunnlagException e) {
-            logger.warn(e.getMessage());
+            logger.info("Kravgrunnlag er sperret med følgende respons:{}", e.getMessage());
             return hentSperretKravgrunnlag(økonomiXmlMottatt);
         } catch (UkjentOppdragssystemException e) {
             // ikke arkiver xml i tilfelle ukjent feil kommer fra økonomi
@@ -163,7 +163,8 @@ public class HåndterGamleKravgrunnlagTjeneste {
                 }
             }
         } catch (KravgrunnlagValidator.UgyldigKravgrunnlagException | AktivKravgrunnlagAllerdeFinnesException e) {
-            logger.warn(e.getMessage());
+            logger.warn("Kravgrunnlag med id={} er ugyldig eller allerede finnes og feiler med følgende exception:{}" ,
+                kravgrunnlag431.getEksternKravgrunnlagId(), e.getMessage());
             arkiverMotattXml(mottattXmlId, melding);
             return Optional.of(mottattXmlId);
         }

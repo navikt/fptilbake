@@ -106,6 +106,7 @@ public class ØkonomiMottattXmlRepository {
     public void arkiverMottattXml(Long mottattXmlId, String xml){
         ØkonomiXmlMottattArkiv økonomiXmlMottattArkiv = new ØkonomiXmlMottattArkiv(mottattXmlId,xml);
         entityManager.persist(økonomiXmlMottattArkiv);
+        entityManager.flush();
     }
 
     public ØkonomiXmlMottattArkiv finnArkivertMottattXml(Long mottattXmlId){
