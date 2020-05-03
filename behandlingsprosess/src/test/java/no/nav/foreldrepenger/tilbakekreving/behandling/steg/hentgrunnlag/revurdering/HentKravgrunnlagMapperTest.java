@@ -23,6 +23,7 @@ import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagBelopDto;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagDto;
@@ -72,6 +73,46 @@ public class HentKravgrunnlagMapperTest extends FellesTestOppsett {
         assertThat(tredjePeriode.getBeløpSkattMnd()).isEqualByComparingTo(BigDecimal.valueOf(2100.00));
         assertThat(tredjePeriode.getKravgrunnlagBeloper433()).isNotEmpty();
         assertThat(tredjePeriode.getKravgrunnlagBeloper433().size()).isEqualTo(2);
+    }
+
+    @Test
+    public void skal_ignorere_belop_postering_med_positiv_ytel() {
+        Mockito.when(tpsAdapterMock.hentAktørIdForPersonIdent(PersonIdent.fra("12345678901"))).thenReturn(Optional.of(new AktørId(999999L)));
+
+        DetaljertKravgrunnlagBelopDto feilPostering = hentBeløp(BigDecimal.valueOf(1794), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TypeKlasseDto.FEIL);
+        DetaljertKravgrunnlagBelopDto ytelPostering = hentBeløp(BigDecimal.ZERO, BigDecimal.valueOf(1794), BigDecimal.valueOf(3270),
+            BigDecimal.ZERO, TypeKlasseDto.YTEL);
+        DetaljertKravgrunnlagBelopDto positivYtelPostering = hentBeløp(BigDecimal.valueOf(3930), BigDecimal.ZERO, BigDecimal.valueOf(2454),
+            BigDecimal.ZERO, TypeKlasseDto.YTEL);
+
+        DetaljertKravgrunnlagPeriodeDto kravgrunnlagPeriode = new DetaljertKravgrunnlagPeriodeDto();
+        PeriodeDto periode = new PeriodeDto();
+        periode.setFom(konvertDato(LocalDate.of(2019, 8, 9)));
+        periode.setTom(konvertDato(LocalDate.of(2019, 8, 16)));
+        kravgrunnlagPeriode.setPeriode(periode);
+        kravgrunnlagPeriode.setBelopSkattMnd(BigDecimal.valueOf(2104));
+        kravgrunnlagPeriode.getTilbakekrevingsBelop().add(feilPostering);
+        kravgrunnlagPeriode.getTilbakekrevingsBelop().add(ytelPostering);
+        kravgrunnlagPeriode.getTilbakekrevingsBelop().add(positivYtelPostering);
+
+        DetaljertKravgrunnlagDto kravgrunnlagDto = hentGrunnlag();
+        kravgrunnlagDto.getTilbakekrevingsPeriode().clear();
+        kravgrunnlagDto.getTilbakekrevingsPeriode().add(kravgrunnlagPeriode);
+        Kravgrunnlag431 kravgrunnlag431 = mapper.mapTilDomene(kravgrunnlagDto);
+
+        assertThat(kravgrunnlag431).isNotNull();
+        assertThat(kravgrunnlag431.getAnsvarligEnhet()).isEqualTo(ENHET);
+        assertThat(kravgrunnlag431.getFagOmrådeKode()).isEqualByComparingTo(FagOmrådeKode.FORELDREPENGER);
+        assertThat(kravgrunnlag431.getEksternKravgrunnlagId()).isEqualTo("152806");
+        assertThat(kravgrunnlag431.getKravStatusKode()).isEqualByComparingTo(KravStatusKode.BEHANDLET);
+        assertThat(kravgrunnlag431.getGjelderType()).isEqualByComparingTo(GjelderType.PERSON);
+
+        assertThat(kravgrunnlag431.getPerioder()).isNotEmpty();
+        assertThat(kravgrunnlag431.getPerioder().size()).isEqualTo(1);
+        KravgrunnlagPeriode432 periode432 = kravgrunnlag431.getPerioder().get(0);
+        assertThat(periode432.getKravgrunnlagBeloper433().size()).isEqualTo(2);
+        assertThat(periode432.getKravgrunnlagBeloper433().stream().filter(belop433 -> belop433.getKlasseType().equals(KlasseType.YTEL))).isNotEmpty();
+        assertThat(periode432.getKravgrunnlagBeloper433().stream().filter(belop433 -> belop433.getKlasseType().equals(KlasseType.FEIL))).isNotEmpty();
     }
 
     private DetaljertKravgrunnlagDto hentGrunnlag() {

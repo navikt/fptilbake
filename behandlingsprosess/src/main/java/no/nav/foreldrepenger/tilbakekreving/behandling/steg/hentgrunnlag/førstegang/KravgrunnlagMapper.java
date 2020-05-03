@@ -46,7 +46,9 @@ public class KravgrunnlagMapper {
             KravgrunnlagPeriode432 kravgrunnlagPeriode432 = formKravgrunnlagPeriode432(kravgrunnlag431, periodeDto);
             for (DetaljertKravgrunnlagBelop postering : periodeDto.getTilbakekrevingsBelop()) {
                 KravgrunnlagBelop433 kravgrunnlagBelop433 = formKravgrunnlagBelop433(kravgrunnlagPeriode432, postering);
-                kravgrunnlagPeriode432.leggTilBeløp(kravgrunnlagBelop433);
+                if (!erPosteringenPostitivYtel(kravgrunnlagBelop433)) {
+                    kravgrunnlagPeriode432.leggTilBeløp(kravgrunnlagBelop433);
+                }
             }
             kravgrunnlag431.leggTilPeriode(kravgrunnlagPeriode432);
         }
@@ -93,7 +95,7 @@ public class KravgrunnlagMapper {
         KlasseType type = map(dto.getTypeKlasse());
         return KravgrunnlagBelop433.builder()
             .medKlasseType(type)
-            .medKlasseKode(finnKlasseKode(dto.getKodeKlasse(),type))
+            .medKlasseKode(finnKlasseKode(dto.getKodeKlasse(), type))
             .medOpprUtbetBelop(dto.getBelopOpprUtbet())
             .medNyBelop(dto.getBelopNy())
             .medTilbakekrevesBelop(dto.getBelopTilbakekreves())
@@ -127,11 +129,15 @@ public class KravgrunnlagMapper {
         }
     }
 
-    private String finnKlasseKode(String klasseKode, KlasseType klasseType){
-        if(KlasseType.TREK.equals(klasseType) || KlasseType.SKAT.equals(klasseType)){
+    private String finnKlasseKode(String klasseKode, KlasseType klasseType) {
+        if (KlasseType.TREK.equals(klasseType) || KlasseType.SKAT.equals(klasseType)) {
             return klasseKode;
         }
         return KlasseKode.fraKode(klasseKode).getKode();
+    }
+
+    private boolean erPosteringenPostitivYtel(KravgrunnlagBelop433 belop433) {
+        return belop433.getKlasseType().equals(KlasseType.YTEL) && belop433.getNyBelop().compareTo(belop433.getOpprUtbetBelop()) > 0;
     }
 
 }
