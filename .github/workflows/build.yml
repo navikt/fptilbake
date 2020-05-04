@@ -106,3 +106,7 @@ jobs:
           token: ${{ secrets.GITHUB_ACCESS_TOKEN }}
           issue-number: ${{ steps.createdeployissue.outputs.number }}
           body: /promote dev-fss t4
+
+      - name: Rydd genererte artefakter fra cache før den lagres
+        run: |
+          rm ~/.m2/repository/no/nav/foreldrepenger/tilbakekreving -r
