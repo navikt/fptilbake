@@ -108,5 +108,6 @@ jobs:
           body: /promote dev-fss t4
 
       - name: Rydd genererte artefakter fra cache før den lagres
+        shell: bash
         run: |
           rm ~/.m2/repository/no/nav/foreldrepenger/tilbakekreving -r

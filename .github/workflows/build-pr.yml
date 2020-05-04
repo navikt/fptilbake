@@ -51,6 +51,7 @@ jobs:
           echo "Building $BUILD_VERSION"
           mvn package --quiet --batch-mode --settings ./.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION}
 
-    - name: Rydd genererte artefakter fra cache før den lagres
+      - name: Rydd genererte artefakter fra cache før den lagres
+        shell: bash
         run: |
           rm ~/.m2/repository/no/nav/foreldrepenger/tilbakekreving -r
