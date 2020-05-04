@@ -18,9 +18,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.Behandlingskontr
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.prosesstask.UtvidetProsessTaskRepository;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping.BehandlingTilstandMapper;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.BehandlingTilstand;
-import no.nav.vedtak.felles.integrasjon.unleash.EnvironmentProperty;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
+import no.nav.vedtak.util.env.Environment;
 
 
 @ApplicationScoped
@@ -47,8 +47,7 @@ public class SakshendelserEventObserver {
         this.behandlingTilstandTjeneste = behandlingTilstandTjeneste;
 
         //foreløpig kun på for testing
-        Optional<String> envName = EnvironmentProperty.getEnvironmentName();
-        this.isEnabled = envName.isPresent() && ("t4".equalsIgnoreCase(envName.get()) || "devimg".equalsIgnoreCase(envName.get()));
+        this.isEnabled = !Environment.current().isProd();
 
         logger.info("{} er {}", SakshendelserEventObserver.class, isEnabled ? "skudd på" : "ikke skudd på");
     }

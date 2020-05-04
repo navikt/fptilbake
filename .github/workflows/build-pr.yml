@@ -13,12 +13,6 @@ jobs:
       - name: Sjekk ut kode
         uses: actions/checkout@v2
 
-      - uses: actions/cache@v1.1.2
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('pom.xml') }}
-          restore-keys: ${{ runner.os }}-maven-
-
       - name: Sett opp Java
         uses: actions/setup-java@v1
         with:
@@ -41,6 +35,12 @@ jobs:
         run: |
           echo "::set-env name=BUILD_VERSION::$(date +%Y.%m.%d.%H%M%S)-$(echo $GITHUB_SHA | cut -c1-7)"
 
+      - uses: actions/cache@v1.1.2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-
+
 
       - name: Build
         env:
@@ -51,3 +51,7 @@ jobs:
           echo "Building $BUILD_VERSION"
           mvn package --quiet --batch-mode --settings ./.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION}
 
+      - name: Rydd genererte artefakter fra cache før den lagres
+        shell: bash
+        run: |
+          rm ~/.m2/repository/no/nav/foreldrepenger/tilbakekreving -r

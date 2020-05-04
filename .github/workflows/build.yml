@@ -17,12 +17,6 @@ jobs:
       - name: Sjekk ut kode
         uses: actions/checkout@v2
 
-      - uses: actions/cache@v1.1.2
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('pom.xml') }}
-          restore-keys: ${{ runner.os }}-maven-
-
       - name: Sett opp Java
         uses: actions/setup-java@v1
         with:
@@ -40,6 +34,12 @@ jobs:
           sh -c 'tail -n +0 -f nohup.out | { sed "/Disconnected/q" && kill $$; }' || true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+
+      - uses: actions/cache@v1.1.2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-
 
       - name: Set build version
         run: |
@@ -106,3 +106,8 @@ jobs:
           token: ${{ secrets.GITHUB_ACCESS_TOKEN }}
           issue-number: ${{ steps.createdeployissue.outputs.number }}
           body: /promote dev-fss t4
+
+      - name: Rydd genererte artefakter fra cache før den lagres
+        shell: bash
+        run: |
+          rm ~/.m2/repository/no/nav/foreldrepenger/tilbakekreving -r
