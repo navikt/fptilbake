@@ -23,10 +23,8 @@ import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.AktivKravgrunnlagAllerdeFinnesException;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KodeAksjon;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagFeil;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagValidator;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ManglendeKravgrunnlagException;
@@ -101,45 +99,8 @@ public class HåndterGamleKravgrunnlagTjeneste {
         return Optional.empty();
     }
 
-    protected boolean finnesBehandling(Saksnummer saksnummer, long mottattXmlId) {
-        List<Behandling> behandlinger = behandlingTjeneste.hentBehandlinger(saksnummer);
-        Optional<Behandling> aktivBehandling = behandlinger.stream().filter(behandling -> !behandling.erAvsluttet()).findFirst();
-        if (aktivBehandling.isPresent()) {
-            long behandlingId = aktivBehandling.get().getId();
-            logger.info("Behandling med behandlingId={} finnes allerede for saksnummer={}.Kan ikke opprette behandling igjen!", behandlingId, saksnummer.getVerdi());
-            if (grunnlagRepository.harGrunnlagForBehandlingId(behandlingId) && !grunnlagRepository.erKravgrunnlagSperret(behandlingId)) {
-                logger.info("Behandling med behandlingId={} har et aktivt grunnlag. Kravgrunnlaget kan ikke brukes lenger og arkiveres!", behandlingId);
-                throw KravgrunnlagFeil.FEILFACTORY.kravgrunnlagetKanIkkeBrukes(mottattXmlId).toException();
-            }
-            return true;
-        }
-        return false;
-    }
-
-    protected Optional<EksternBehandlingsinfoDto> hentDataFraFpsak(String saksnummer, Long eksternBehandlingId) {
-        List<EksternBehandlingsinfoDto> eksternBehandlinger = fpsakKlient.hentBehandlingForSaksnummer(saksnummer);
-        if (!eksternBehandlinger.isEmpty()) {
-            return eksternBehandlinger.stream()
-                .filter(eksternBehandlingsinfoDto -> eksternBehandlingsinfoDto.getId().equals(eksternBehandlingId)).findAny();
-        }
-        logger.warn("Saksnummer={} finnes ikke i fpsak", saksnummer);
-        return Optional.empty();
-    }
-
     protected void arkiverMotattXml(Long mottattXmlId, String melding) {
         mottattXmlRepository.arkiverMottattXml(mottattXmlId, melding);
-    }
-
-    protected void oppdaterMedEksternBehandlingIdOgSaksnummer(Long mottattXmlId, String eksternBehandlingId, String saksnummer) {
-        mottattXmlRepository.oppdaterMedEksternBehandlingIdOgSaksnummer(eksternBehandlingId, saksnummer, mottattXmlId);
-    }
-
-    protected long opprettBehandling(EksternBehandlingsinfoDto eksternBehandlingData) {
-        UUID eksternBehandlingUuid = eksternBehandlingData.getUuid();
-        SamletEksternBehandlingInfo samletEksternBehandlingInfo = fpsakKlient.hentBehandlingsinfo(eksternBehandlingUuid, Tillegsinformasjon.FAGSAK, Tillegsinformasjon.PERSONOPPLYSNINGER);
-        FagsakYtelseType fagsakYtelseType = samletEksternBehandlingInfo.getFagsak().getSakstype();
-        return behandlingTjeneste.opprettBehandlingAutomatisk(samletEksternBehandlingInfo.getSaksnummer(), eksternBehandlingUuid, eksternBehandlingData.getId(),
-            samletEksternBehandlingInfo.getAktørId(), fagsakYtelseType, BehandlingType.TILBAKEKREVING);
     }
 
     protected void slettMottattGamleKravgrunnlag(List<Long> gammelKravgrunnlagListe) {
@@ -152,7 +113,7 @@ public class HåndterGamleKravgrunnlagTjeneste {
         try {
             KravgrunnlagValidator.validerGrunnlag(kravgrunnlag431);
             String saksnummer = finnSaksnummer(kravgrunnlag431.getFagSystemId());
-            if (!finnesBehandling(new Saksnummer(saksnummer), mottattXmlId)) {
+            if (!finnesBehandling(saksnummer)) {
                 Long eksternBehandlingId = Long.valueOf(kravgrunnlag431.getReferanse());
                 Optional<EksternBehandlingsinfoDto> fpsakBehandling = hentDataFraFpsak(saksnummer, eksternBehandlingId);
                 if (fpsakBehandling.isEmpty()) {
@@ -161,14 +122,58 @@ public class HåndterGamleKravgrunnlagTjeneste {
                 } else {
                     håndterGyldigkravgrunnlag(mottattXmlId, saksnummer, kravgrunnlag431, fpsakBehandling.get());
                 }
+            } else {
+                hentAktivBehandling(saksnummer).ifPresent(behandling -> {
+                    logger.info("Lagrer hentet kravgrunnlaget for behandling med behandlingId={}", behandling.getId());
+                    grunnlagRepository.lagre(behandling.getId(), kravgrunnlag431);
+                });
+                tilkobleMottattXml(mottattXmlId);
             }
-        } catch (KravgrunnlagValidator.UgyldigKravgrunnlagException | AktivKravgrunnlagAllerdeFinnesException e) {
-            logger.warn("Kravgrunnlag med id={} er ugyldig eller allerede finnes og feiler med følgende exception:{}" ,
+        } catch (KravgrunnlagValidator.UgyldigKravgrunnlagException e) {
+            logger.warn("Kravgrunnlag med id={} er ugyldig og feiler med følgende exception:{}",
                 kravgrunnlag431.getEksternKravgrunnlagId(), e.getMessage());
-            arkiverMotattXml(mottattXmlId, melding);
-            return Optional.of(mottattXmlId);
         }
         return Optional.empty();
+    }
+
+    private boolean finnesBehandling(String saksnummer) {
+        Optional<Behandling> aktivBehandling = hentAktivBehandling(saksnummer);
+        if (aktivBehandling.isPresent()) {
+            long behandlingId = aktivBehandling.get().getId();
+            logger.info("Behandling med behandlingId={} finnes allerede for saksnummer={}.Kan ikke opprette behandling igjen!", behandlingId, saksnummer);
+            if (grunnlagRepository.harGrunnlagForBehandlingId(behandlingId) && !grunnlagRepository.erKravgrunnlagSperret(behandlingId)) {
+                logger.info("Behandling med behandlingId={} har et aktivt grunnlag", behandlingId);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private Optional<Behandling> hentAktivBehandling(String saksnummer) {
+        List<Behandling> behandlinger = behandlingTjeneste.hentBehandlinger(new Saksnummer(saksnummer));
+        return behandlinger.stream().filter(behandling -> !behandling.erAvsluttet()).findFirst();
+    }
+
+    private Optional<EksternBehandlingsinfoDto> hentDataFraFpsak(String saksnummer, Long eksternBehandlingId) {
+        List<EksternBehandlingsinfoDto> eksternBehandlinger = fpsakKlient.hentBehandlingForSaksnummer(saksnummer);
+        if (!eksternBehandlinger.isEmpty()) {
+            return eksternBehandlinger.stream()
+                .filter(eksternBehandlingsinfoDto -> eksternBehandlingsinfoDto.getId().equals(eksternBehandlingId)).findAny();
+        }
+        logger.warn("Saksnummer={} finnes ikke i fpsak", saksnummer);
+        return Optional.empty();
+    }
+
+    private void oppdaterMedEksternBehandlingIdOgSaksnummer(Long mottattXmlId, String eksternBehandlingId, String saksnummer) {
+        mottattXmlRepository.oppdaterMedEksternBehandlingIdOgSaksnummer(eksternBehandlingId, saksnummer, mottattXmlId);
+    }
+
+    private long opprettBehandling(EksternBehandlingsinfoDto eksternBehandlingData) {
+        UUID eksternBehandlingUuid = eksternBehandlingData.getUuid();
+        SamletEksternBehandlingInfo samletEksternBehandlingInfo = fpsakKlient.hentBehandlingsinfo(eksternBehandlingUuid, Tillegsinformasjon.FAGSAK, Tillegsinformasjon.PERSONOPPLYSNINGER);
+        FagsakYtelseType fagsakYtelseType = samletEksternBehandlingInfo.getFagsak().getSakstype();
+        return behandlingTjeneste.opprettBehandlingAutomatisk(samletEksternBehandlingInfo.getSaksnummer(), eksternBehandlingUuid, eksternBehandlingData.getId(),
+            samletEksternBehandlingInfo.getAktørId(), fagsakYtelseType, BehandlingType.TILBAKEKREVING);
     }
 
     private void håndterGyldigkravgrunnlag(Long mottattXmlId, String saksnummer,
@@ -226,7 +231,7 @@ public class HåndterGamleKravgrunnlagTjeneste {
     }
 
     //midlertidig kode. skal fjernes etter en stund
-    protected boolean erTestMiljø() {
+    private boolean erTestMiljø() {
         //foreløpig kun på for testing
         boolean isEnabled = !Environment.current().isProd();
         logger.info("{} er {}", "Opprett behandling når kravgrunnlag venter etter fristen er ", isEnabled ? "skudd på" : "ikke skudd på");

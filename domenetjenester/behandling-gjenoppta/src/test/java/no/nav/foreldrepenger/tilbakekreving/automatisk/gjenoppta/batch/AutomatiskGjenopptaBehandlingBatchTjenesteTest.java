@@ -3,10 +3,14 @@ package no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.batch;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.Collections;
 
 import org.junit.Before;
@@ -31,11 +35,24 @@ public class AutomatiskGjenopptaBehandlingBatchTjenesteTest {
     private static final TaskStatus FERDIG_2 = new TaskStatus(ProsessTaskStatus.FERDIG, new BigDecimal(1));
     private static final TaskStatus FEILET_1 = new TaskStatus(ProsessTaskStatus.FEILET, new BigDecimal(1));
     private static final TaskStatus KLAR_1 = new TaskStatus(ProsessTaskStatus.KLAR, new BigDecimal(1));
+    private Clock clock = Clock.fixed(Instant.parse("2020-05-04T12:00:00.00Z"), ZoneId.systemDefault());
 
     @Before
     public void setup() {
         mockTjeneste = mock(GjenopptaBehandlingTjeneste.class);
-        batchTjeneste = new AutomatiskGjenopptaBehandlingBatchTjeneste(mockTjeneste);
+        batchTjeneste = new AutomatiskGjenopptaBehandlingBatchTjeneste(mockTjeneste, clock);
+    }
+
+    @Test
+    public void skal_ikke_kalle_gjenopptaBehandlinger_og_returnere_execution_id_i_helgen() {
+        Clock clock = Clock.fixed(Instant.parse("2020-05-03T12:00:00.00Z"), ZoneId.systemDefault());
+        batchTjeneste = new AutomatiskGjenopptaBehandlingBatchTjeneste(mockTjeneste, clock);
+
+        // Act
+        batchTjeneste.launch(null);
+
+        // Verify
+        verify(mockTjeneste, never()).automatiskGjenopptaBehandlinger();
     }
 
     @Test

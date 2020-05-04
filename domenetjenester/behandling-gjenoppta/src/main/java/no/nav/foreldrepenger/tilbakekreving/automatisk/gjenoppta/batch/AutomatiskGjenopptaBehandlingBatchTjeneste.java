@@ -1,9 +1,15 @@
 package no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.batch;
 
+import java.time.Clock;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.batch.BatchArguments;
 import no.nav.foreldrepenger.batch.BatchStatus;
@@ -17,22 +23,37 @@ public class AutomatiskGjenopptaBehandlingBatchTjeneste implements BatchTjeneste
 
     static final String BATCHNAME = "BVL007";
     private static final String EXECUTION_ID_SEPARATOR = "-";
+    private static final Logger logger = LoggerFactory.getLogger(AutomatiskGjenopptaBehandlingBatchTjeneste.class);
 
     private GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste;
+    private Clock clock;
 
-    public AutomatiskGjenopptaBehandlingBatchTjeneste() {
+    AutomatiskGjenopptaBehandlingBatchTjeneste() {
         // CDI
     }
 
     @Inject
     public AutomatiskGjenopptaBehandlingBatchTjeneste(GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste) {
         this.gjenopptaBehandlingTjeneste = gjenopptaBehandlingTjeneste;
+        this.clock = Clock.systemDefaultZone();
+    }
+
+    // kun for test forbruk
+    public AutomatiskGjenopptaBehandlingBatchTjeneste(GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste,
+                                                      Clock clock) {
+        this.gjenopptaBehandlingTjeneste = gjenopptaBehandlingTjeneste;
+        this.clock = clock;
     }
 
     @Override
     public String launch(BatchArguments arguments) {
-        gjenopptaBehandlingTjeneste.automatiskGjenopptaBehandlinger();
         String executionId = BATCHNAME + EXECUTION_ID_SEPARATOR;
+        LocalDate iDag = LocalDate.now(clock);
+        if (iDag.getDayOfWeek().equals(DayOfWeek.SATURDAY) || iDag.getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
+            logger.info("I dag er helg, kan ikke kjøre batch-en {}", BATCHNAME);
+            return executionId;
+        }
+        gjenopptaBehandlingTjeneste.automatiskGjenopptaBehandlinger();
         return executionId;
     }
 
