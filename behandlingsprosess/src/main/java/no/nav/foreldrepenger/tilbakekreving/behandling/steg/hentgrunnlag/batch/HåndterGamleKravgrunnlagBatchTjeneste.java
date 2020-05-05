@@ -1,5 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.batch;
 
+import java.time.Clock;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
@@ -29,6 +31,7 @@ public class HåndterGamleKravgrunnlagBatchTjeneste implements BatchTjeneste {
     private static final String BATCHNAVN = "BFPT-002";
 
     private HåndterGamleKravgrunnlagTjeneste håndterGamleKravgrunnlagTjeneste;
+    private Clock clock;
     private Period venteFrist;
 
     HåndterGamleKravgrunnlagBatchTjeneste() {
@@ -39,13 +42,28 @@ public class HåndterGamleKravgrunnlagBatchTjeneste implements BatchTjeneste {
     public HåndterGamleKravgrunnlagBatchTjeneste(HåndterGamleKravgrunnlagTjeneste håndterGamleKravgrunnlagTjeneste,
                                                  @KonfigVerdi(value = "frist.grunnlag.tbkg") Period ventefrist) {
         this.håndterGamleKravgrunnlagTjeneste = håndterGamleKravgrunnlagTjeneste;
+        this.clock = Clock.systemDefaultZone();
+        this.venteFrist = ventefrist;
+    }
+
+    // kun for test forbruk
+    public HåndterGamleKravgrunnlagBatchTjeneste(HåndterGamleKravgrunnlagTjeneste håndterGamleKravgrunnlagTjeneste,
+                                                 Clock clock,
+                                                 @KonfigVerdi(value = "frist.grunnlag.tbkg") Period ventefrist) {
+        this.håndterGamleKravgrunnlagTjeneste = håndterGamleKravgrunnlagTjeneste;
+        this.clock = clock;
         this.venteFrist = ventefrist;
     }
 
     @Override
     public String launch(BatchArguments arguments) {
         String batchRun = BATCHNAVN + "-" + UUID.randomUUID();
-        LocalDate bestemtDato = LocalDate.now().minus(venteFrist);
+        LocalDate iDag = LocalDate.now(clock);
+        if (iDag.getDayOfWeek().equals(DayOfWeek.SATURDAY) || iDag.getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
+            logger.info("I dag er helg, kan ikke kjøre batch-en {}", BATCHNAVN);
+            return batchRun;
+        }
+        LocalDate bestemtDato = iDag.minus(venteFrist);
         logger.info("Håndterer kravgrunnlag som er eldre enn {} i batch {}", bestemtDato, batchRun);
 
         List<ØkonomiXmlMottatt> alleGamleMeldinger = håndterGamleKravgrunnlagTjeneste.hentGamleMeldinger(bestemtDato);

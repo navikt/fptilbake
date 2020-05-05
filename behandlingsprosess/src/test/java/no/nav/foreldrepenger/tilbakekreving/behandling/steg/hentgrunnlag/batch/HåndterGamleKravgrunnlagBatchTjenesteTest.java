@@ -8,8 +8,11 @@ import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Period;
+import java.time.ZoneId;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -78,8 +81,11 @@ public class HåndterGamleKravgrunnlagBatchTjenesteTest extends FellesTestOppset
     private HåndterGamleKravgrunnlagTjeneste håndterGamleKravgrunnlagTjeneste = new HåndterGamleKravgrunnlagTjeneste(mottattXmlRepository, grunnlagRepository,
         hentKravgrunnlagMapper, lesKravgrunnlagMapper,
         behandlingTjeneste, økonomiConsumerMock, fpsakKlientMock);
-    private HåndterGamleKravgrunnlagBatchTjeneste gamleKravgrunnlagBatchTjeneste = new HåndterGamleKravgrunnlagBatchTjeneste(håndterGamleKravgrunnlagTjeneste, Period.ofWeeks(-1));
+    private Clock clock = Clock.fixed(Instant.parse("2020-05-04T12:00:00.00Z"), ZoneId.systemDefault());
+    private HåndterGamleKravgrunnlagBatchTjeneste gamleKravgrunnlagBatchTjeneste = new HåndterGamleKravgrunnlagBatchTjeneste(håndterGamleKravgrunnlagTjeneste,
+        clock, Period.ofWeeks(-1));
     Long mottattXmlId = null;
+    private BatchArguments emptyBatchArguments = new EmptyBatchArguments(Collections.EMPTY_MAP);
 
     @Before
     public void setup() {
@@ -93,8 +99,19 @@ public class HåndterGamleKravgrunnlagBatchTjenesteTest extends FellesTestOppset
     }
 
     @Test
+    public void skal_ikke_kjøre_batch_i_helgen() {
+        Clock clock = Clock.fixed(Instant.parse("2020-05-03T12:00:00.00Z"), ZoneId.systemDefault());
+        HåndterGamleKravgrunnlagBatchTjeneste gamleKravgrunnlagBatchTjeneste = new HåndterGamleKravgrunnlagBatchTjeneste(håndterGamleKravgrunnlagTjeneste,
+            clock, Period.ofWeeks(-1));
+        gamleKravgrunnlagBatchTjeneste.launch(emptyBatchArguments);
+        assertThat(mottattXmlRepository.finnArkivertMottattXml(mottattXmlId)).isNull();
+        assertThat(mottattXmlRepository.finnMottattXml(mottattXmlId)).isNotNull();
+        assertThat(mottattXmlRepository.erMottattXmlTilkoblet(mottattXmlId)).isFalse();
+        assertThat(behandlingTjeneste.hentBehandlinger(new Saksnummer("139015144"))).isEmpty();
+    }
+
+    @Test
     public void skal_kjøre_batch_for_å_prosessere_gammel_kravgrunnlag_uten_behandling() {
-        BatchArguments emptyBatchArguments = new EmptyBatchArguments(Collections.EMPTY_MAP);
         gamleKravgrunnlagBatchTjeneste.launch(emptyBatchArguments);
         List<Behandling> behandlinger = behandlingTjeneste.hentBehandlinger(new Saksnummer("139015144"));
         assertThat(behandlinger).isNotEmpty();
@@ -162,8 +179,8 @@ public class HåndterGamleKravgrunnlagBatchTjenesteTest extends FellesTestOppset
         when(økonomiConsumerMock.hentKravgrunnlag(any(), any(HentKravgrunnlagDetaljDto.class))).thenReturn(lagDetaljertKravgrunnlagDto(false));
         BatchArguments emptyBatchArguments = new EmptyBatchArguments(Collections.EMPTY_MAP);
         gamleKravgrunnlagBatchTjeneste.launch(emptyBatchArguments);
-        assertThat(mottattXmlRepository.finnArkivertMottattXml(mottattXmlId)).isNotNull();
-        assertThat(mottattXmlRepository.finnMottattXml(mottattXmlId)).isNull();
+        assertThat(mottattXmlRepository.finnArkivertMottattXml(mottattXmlId)).isNull();
+        assertThat(mottattXmlRepository.finnMottattXml(mottattXmlId)).isNotNull();
         assertThat(behandlingTjeneste.hentBehandlinger(new Saksnummer("139015144"))).isEmpty();
     }
 
@@ -199,8 +216,9 @@ public class HåndterGamleKravgrunnlagBatchTjenesteTest extends FellesTestOppset
 
         BatchArguments emptyBatchArguments = new EmptyBatchArguments(Collections.EMPTY_MAP);
         gamleKravgrunnlagBatchTjeneste.launch(emptyBatchArguments);
-        assertThat(mottattXmlRepository.finnArkivertMottattXml(mottattXmlId)).isNotNull();
-        assertThat(mottattXmlRepository.finnMottattXml(mottattXmlId)).isNull();
+        assertThat(mottattXmlRepository.finnArkivertMottattXml(mottattXmlId)).isNull();
+        assertThat(mottattXmlRepository.finnMottattXml(mottattXmlId)).isNotNull();
+        assertThat(mottattXmlRepository.erMottattXmlTilkoblet(mottattXmlId)).isTrue();
         assertThat(behandlingTjeneste.hentBehandlinger(new Saksnummer("139015144"))).isNotEmpty();
     }
 
