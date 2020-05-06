@@ -12,8 +12,6 @@ import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
 import org.jboss.weld.interceptor.util.proxy.TargetInstanceProxy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
@@ -47,13 +45,13 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.migrasjon.Migrasjo
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.saksbehandler.NavAnsattRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.tilbakekrevingsgrunnlag.GrunnlagRestTestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.varselrespons.VarselresponsRestTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.VergeRestTjeneste;
 import no.nav.vedtak.felles.prosesstask.rest.ProsessTaskRestTjeneste;
 
 
 @ApplicationPath(ApplicationConfig.API_URI)
 public class ApplicationConfig extends Application {
 
-    private static final Logger logger = LoggerFactory.getLogger(ApplicationConfig.class);
     public static final String API_URI = "/api";
 
     public ApplicationConfig() {
@@ -117,6 +115,7 @@ public class ApplicationConfig extends Application {
         classes.add(ForvaltningTekniskRestTjeneste.class);
         classes.add(ForvaltningBehandlingRestTjeneste.class);
         classes.add(MigrasjonRestTjeneste.class);
+        classes.add(VergeRestTjeneste.class);
 
         //HAXX GrunnlagRestTjenesteTest skal bare være tilgjengelig for lokal utvikling, brukes for å sette opp test
         //hvis denne legges til i en egen Application isdf i denne, kan man ikke bruke swagger for å nå tjenesten

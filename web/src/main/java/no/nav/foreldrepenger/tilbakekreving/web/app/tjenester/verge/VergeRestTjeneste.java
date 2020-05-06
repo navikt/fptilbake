@@ -5,6 +5,7 @@ import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursResourceAttributt.FAG
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -31,6 +32,7 @@ import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 @ApplicationScoped
 @Path(VergeRestTjeneste.BASE_PATH)
 @Produces(MediaType.APPLICATION_JSON)
+@Transactional
 public class VergeRestTjeneste {
 
     static final String BASE_PATH = "/verge";

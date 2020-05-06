@@ -17,7 +17,7 @@ public class SkjermlenkeType extends Kodeliste {
     public static final SkjermlenkeType TILBAKEKREVING = new SkjermlenkeType("TILBAKEKREVING");
     public static final SkjermlenkeType FORELDELSE = new SkjermlenkeType("FORELDELSE");
     public static final SkjermlenkeType VEDTAK = new SkjermlenkeType("VEDTAK");
-    public static final SkjermlenkeType VERGE = new SkjermlenkeType("VERGE");
+    public static final SkjermlenkeType FAKTA_OM_VERGE = new SkjermlenkeType("FAKTA_OM_VERGE");
 
 
     public SkjermlenkeType() {

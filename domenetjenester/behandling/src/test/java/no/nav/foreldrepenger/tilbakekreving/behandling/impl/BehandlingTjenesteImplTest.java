@@ -30,7 +30,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.VergeRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.KildeType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeAggregateEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
@@ -129,9 +128,9 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
         fellesBehandlingAssert(behandlingId, true);
         assertThat(prosessTaskRepository.finnProsessTaskType(BehandlingTjenesteImpl.FINN_KRAVGRUNNLAG_TASK)).isNotEmpty();
         verify(mockTpsTjeneste, never()).hentAktørForFnr(any(PersonIdent.class));
-        Optional<VergeAggregateEntitet> vergeAggregateEntitet = vergeRepository.finnVergeInformasjon(behandlingId);
-        assertThat(vergeAggregateEntitet).isNotEmpty();
-        VergeEntitet vergeOrg = vergeAggregateEntitet.get().getVergeEntitet();
+        Optional<VergeEntitet> vergeEntitet = vergeRepository.finnVergeInformasjon(behandlingId);
+        assertThat(vergeEntitet).isNotEmpty();
+        VergeEntitet vergeOrg = vergeEntitet.get();
         fellesVergeAssert(vergeDto, vergeOrg);
         assertThat(vergeOrg.getVergeAktørId()).isNull();
         assertThat(vergeOrg.getOrganisasjonsnummer()).isEqualTo(vergeDto.getOrganisasjonsnummer());
@@ -149,9 +148,9 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
         fellesBehandlingAssert(behandlingId, false);
         assertThat(prosessTaskRepository.finnProsessTaskType(BehandlingTjenesteImpl.FINN_KRAVGRUNNLAG_TASK)).isNotEmpty();
         verify(mockTpsTjeneste, atLeastOnce()).hentAktørForFnr(any(PersonIdent.class));
-        Optional<VergeAggregateEntitet> vergeAggregateEntitet = vergeRepository.finnVergeInformasjon(behandlingId);
-        assertThat(vergeAggregateEntitet).isNotEmpty();
-        VergeEntitet vergePerson = vergeAggregateEntitet.get().getVergeEntitet();
+        Optional<VergeEntitet> vergeEntitet = vergeRepository.finnVergeInformasjon(behandlingId);
+        assertThat(vergeEntitet).isNotEmpty();
+        VergeEntitet vergePerson = vergeEntitet.get();
         fellesVergeAssert(vergeDto, vergePerson);
         assertThat(vergePerson.getOrganisasjonsnummer()).isNull();
         assertThat(vergePerson.getVergeAktørId()).isEqualTo(behandling.getAktørId());
@@ -179,8 +178,8 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
         fellesBehandlingAssert(behandlingId, false);
         assertThat(prosessTaskRepository.finnProsessTaskType(BehandlingTjenesteImpl.FINN_KRAVGRUNNLAG_TASK)).isNotEmpty();
         verify(mockTpsTjeneste, never()).hentAktørForFnr(any(PersonIdent.class));
-        Optional<VergeAggregateEntitet> vergeAggregateEntitet = vergeRepository.finnVergeInformasjon(behandlingId);
-        assertThat(vergeAggregateEntitet).isEmpty();
+        Optional<VergeEntitet> vergeEntitet = vergeRepository.finnVergeInformasjon(behandlingId);
+        assertThat(vergeEntitet).isEmpty();
     }
 
 
