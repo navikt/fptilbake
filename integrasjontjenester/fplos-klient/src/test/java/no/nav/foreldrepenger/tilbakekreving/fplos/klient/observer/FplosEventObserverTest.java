@@ -69,7 +69,6 @@ public class FplosEventObserverTest {
 
     @Before
     public void setup() {
-        System.setProperty("environment.name","devimg");
         behandling = ScenarioSimple.simple().lagre(repositoryProvider);
         behandlingskontrollKontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandling);
         when(mockBehandlingModellRepository.getModell(BehandlingType.TILBAKEKREVING)).thenReturn(mockBehandlingModell);
