@@ -35,6 +35,7 @@ public class BehandlingStegType extends KodeverkTabell {
     public static final BehandlingStegType TBKGSTEG = new BehandlingStegType("TBKGSTEG"); //$NON-NLS-1$
     public static final BehandlingStegType FORELDELSEVURDERINGSTEG = new BehandlingStegType("VFORELDETSTEG"); //$NON-NLS-1$
     public static final BehandlingStegType FAKTA_FEILUTBETALING = new BehandlingStegType("FAKTFEILUTSTEG"); //$NON-NLS-1$
+    public static final BehandlingStegType FAKTA_VERGE = new BehandlingStegType("FAKTAVERGESTEG"); //$NON-NLS-1$
     public static final BehandlingStegType VTILBSTEG = new BehandlingStegType("VTILBSTEG");
 
     @Valid
