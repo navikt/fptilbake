@@ -14,7 +14,6 @@ import org.junit.runner.RunWith;
 
 import com.google.common.collect.Lists;
 
-import no.nav.foreldrepenger.domene.dokumentarkiv.journal.JournalTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporing;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevType;
@@ -48,7 +47,6 @@ public class DokumentBehandlingTjenesteTest extends DokumentBestillerTestOppsett
 
     private ProsessTaskRepository prosessTaskRepository;
 
-    private final JournalTjeneste mockJournalTjeneste = mock(JournalTjeneste.class);
     private final PersoninfoAdapter mockPersoninfoAdapter = mock(PersoninfoAdapter.class);
     private ManueltVarselBrevTjeneste mockManueltVarselBrevTjeneste = mock(ManueltVarselBrevTjeneste.class);
     private InnhentDokumentasjonbrevTjeneste mockInnhentDokumentasjonbrevTjeneste = mock(InnhentDokumentasjonbrevTjeneste.class);
@@ -58,7 +56,7 @@ public class DokumentBehandlingTjenesteTest extends DokumentBestillerTestOppsett
     @Before
     public void setup() {
         prosessTaskRepository = new ProsessTaskRepositoryImpl(repositoryRule.getEntityManager(), null, null);
-        HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepository, mockJournalTjeneste, mockPersoninfoAdapter);
+        HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepository, mockPersoninfoAdapter);
         dokumentBehandlingTjeneste = new DokumentBehandlingTjeneste(repositoryProvider, prosessTaskRepository, historikkinnslagTjeneste,
             mockManueltVarselBrevTjeneste, mockInnhentDokumentasjonbrevTjeneste);
     }

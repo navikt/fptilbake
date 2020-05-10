@@ -56,7 +56,7 @@ public class HistorikkInnslagKonverter {
         Optional<ArkivJournalPost> aktivJournalPost = aktivJournalPost(lenke.getJournalpostId(), journalPosterForSak);
         HistorikkInnslagDokumentLinkDto dto = new HistorikkInnslagDokumentLinkDto();
         dto.setTag(lenke.getLinkTekst());
-        dto.setUtgått(!aktivJournalPost.isPresent());
+        dto.setUtgått(aktivJournalPost.isEmpty());
         dto.setDokumentId(lenke.getDokumentId());
         dto.setJournalpostId(lenke.getJournalpostId().getVerdi());
         return dto;

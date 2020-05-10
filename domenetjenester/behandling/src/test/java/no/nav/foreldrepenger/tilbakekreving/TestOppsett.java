@@ -8,7 +8,6 @@ import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 
 import no.nav.foreldrepenger.domene.dokumentarkiv.DokumentArkivTjeneste;
-import no.nav.foreldrepenger.domene.dokumentarkiv.impl.DokumentArkivTjenesteImpl;
 import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingRevurderingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FaktaFeilutbetalingTjeneste;
@@ -83,8 +82,7 @@ public class TestOppsett {
     protected HistorikkInnslagKonverter historikkInnslagKonverter = new HistorikkInnslagKonverter(repoProvider.getKodeverkRepository(),
         repoProvider.getAksjonspunktRepository());
 
-    protected DokumentArkivTjeneste dokumentArkivTjeneste = new DokumentArkivTjenesteImpl(mockJournalConsumer, repoProvider.getKodeverkRepository(),
-        repoProvider.getFagsakRepository());
+    protected DokumentArkivTjeneste dokumentArkivTjeneste = new DokumentArkivTjeneste(mockJournalConsumer, repoProvider.getFagsakRepository());
 
     protected HistorikkTjenesteAdapter historikkTjenesteAdapter = new HistorikkTjenesteAdapter(historikkRepository, historikkInnslagKonverter, dokumentArkivTjeneste);
 

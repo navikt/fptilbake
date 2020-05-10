@@ -20,7 +20,6 @@ import org.junit.runner.RunWith;
 
 import com.google.common.collect.Lists;
 
-import no.nav.foreldrepenger.domene.dokumentarkiv.journal.JournalTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FaktaFeilutbetalingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BehandlingFeilutbetalingFakta;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.UtbetaltPeriode;
@@ -55,7 +54,6 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
     private EksternDataForBrevTjeneste mockEksternDataForBrevTjeneste = mock(EksternDataForBrevTjeneste.class);
     private FaktaFeilutbetalingTjeneste mockFeilutbetalingTjeneste = mock(FaktaFeilutbetalingTjeneste.class);
     private FritekstbrevTjeneste mockFritekstbrevTjeneste = mock(FritekstbrevTjeneste.class);
-    private JournalTjeneste mockJournalTjeneste = mock(JournalTjeneste.class);
     private PersoninfoAdapter mockPersoninfoAdapter = mock(PersoninfoAdapter.class);
 
     private ManueltVarselBrevTjeneste manueltVarselBrevTjeneste;
@@ -65,8 +63,7 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
     @Before
     public void setup() {
         HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepository,
-            mockJournalTjeneste,
-            mockPersoninfoAdapter);
+                mockPersoninfoAdapter);
         manueltVarselBrevTjeneste = new ManueltVarselBrevTjeneste(repositoryProvider, mockEksternDataForBrevTjeneste,
             mockFeilutbetalingTjeneste, mockFritekstbrevTjeneste, historikkinnslagTjeneste);
 
