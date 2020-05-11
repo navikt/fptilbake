@@ -123,17 +123,28 @@ public class HåndterGamleKravgrunnlagTjeneste {
                     håndterGyldigkravgrunnlag(mottattXmlId, saksnummer, kravgrunnlag431, fpsakBehandling.get());
                 }
             } else {
-                hentAktivBehandling(saksnummer).ifPresent(behandling -> {
-                    logger.info("Lagrer hentet kravgrunnlaget for behandling med behandlingId={}", behandling.getId());
-                    grunnlagRepository.lagre(behandling.getId(), kravgrunnlag431);
-                });
-                tilkobleMottattXml(mottattXmlId);
+                håndterKravgrunnlagHvisBehandlingFinnes(mottattXmlId, kravgrunnlag431, saksnummer);
             }
         } catch (KravgrunnlagValidator.UgyldigKravgrunnlagException e) {
             logger.warn("Kravgrunnlag med id={} er ugyldig og feiler med følgende exception:{}",
                 kravgrunnlag431.getEksternKravgrunnlagId(), e.getMessage());
         }
         return Optional.empty();
+    }
+
+    private void håndterKravgrunnlagHvisBehandlingFinnes(Long mottattXmlId, Kravgrunnlag431 kravgrunnlag431, String saksnummer) {
+        hentAktivBehandling(saksnummer).ifPresent(behandling -> {
+            var behandlingId = behandling.getId();
+            logger.info("Lagrer hentet kravgrunnlaget for behandling med behandlingId={}", behandlingId);
+            grunnlagRepository.lagre(behandlingId, kravgrunnlag431);
+            if (skalGrunnlagSperres) {
+                logger.info("Hentet kravgrunnlaget med kravgrunnlagId={} for behandling med behandlingId={} er sperret hos økonomi. Derfor sperrer det i fptilbake også.",
+                    kravgrunnlag431.getEksternKravgrunnlagId(),behandlingId);
+                sperrGrunnlag(behandlingId, kravgrunnlag431.getEksternKravgrunnlagId());
+                skalGrunnlagSperres = false;
+            }
+        });
+        tilkobleMottattXml(mottattXmlId);
     }
 
     private boolean finnesBehandling(String saksnummer) {

@@ -224,6 +224,27 @@ public class HåndterGamleKravgrunnlagBatchTjenesteTest extends FellesTestOppset
         assertThat(behandlingTjeneste.hentBehandlinger(new Saksnummer("139015144"))).isNotEmpty();
     }
 
+    @Test
+    public void skal_kjøre_batch_for_å_prosessere_gammel_kravgrunnlag_når_behandling_allerede_finnes_med_samme_saksnummer_og_kravgrunnlaget_er_sperret() {
+        NavBruker navBruker = TestFagsakUtil.genererBruker();
+        Fagsak fagsak = Fagsak.opprettNy(new Saksnummer("139015144"), navBruker);
+        fagsakRepository.lagre(fagsak);
+        Behandling behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).build();
+        BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(behandling);
+        behandlingRepository.lagre(behandling, behandlingLås);
+        when(økonomiConsumerMock.hentKravgrunnlag(any(), any(HentKravgrunnlagDetaljDto.class)))
+            .thenThrow(ØkonomiConsumerFeil.FACTORY.fikkFeilkodeVedHentingAvKravgrunnlagNårKravgrunnlagErSperret(behandling.getId(), 100000001l, "sperret").toException());
+
+        BatchArguments emptyBatchArguments = new EmptyBatchArguments(Collections.EMPTY_MAP);
+        gamleKravgrunnlagBatchTjeneste.launch(emptyBatchArguments);
+        assertThat(mottattXmlRepository.finnArkivertMottattXml(mottattXmlId)).isNull();
+        assertThat(mottattXmlRepository.finnMottattXml(mottattXmlId)).isNotNull();
+        assertThat(mottattXmlRepository.erMottattXmlTilkoblet(mottattXmlId)).isTrue();
+        assertThat(behandlingTjeneste.hentBehandlinger(new Saksnummer("139015144"))).isNotEmpty();
+        assertThat(grunnlagRepository.harGrunnlagForBehandlingId(behandling.getId())).isTrue();
+        assertThat(grunnlagRepository.erKravgrunnlagSperret(behandling.getId())).isTrue();
+    }
+
     private DetaljertKravgrunnlagDto lagDetaljertKravgrunnlagDto(boolean erGyldig) {
         DetaljertKravgrunnlagDto kravgrunnlagDto = new DetaljertKravgrunnlagDto();
         kravgrunnlagDto.setKravgrunnlagId(BigInteger.valueOf(123456789));
