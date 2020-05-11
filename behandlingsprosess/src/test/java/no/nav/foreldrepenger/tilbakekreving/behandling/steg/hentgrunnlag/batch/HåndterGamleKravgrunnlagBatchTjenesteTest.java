@@ -9,10 +9,12 @@ import static org.mockito.Mockito.when;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.Clock;
+import java.time.DayOfWeek;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -81,7 +83,7 @@ public class HåndterGamleKravgrunnlagBatchTjenesteTest extends FellesTestOppset
     private HåndterGamleKravgrunnlagTjeneste håndterGamleKravgrunnlagTjeneste = new HåndterGamleKravgrunnlagTjeneste(mottattXmlRepository, grunnlagRepository,
         hentKravgrunnlagMapper, lesKravgrunnlagMapper,
         behandlingTjeneste, økonomiConsumerMock, fpsakKlientMock);
-    private Clock clock = Clock.fixed(Instant.parse("2020-05-04T12:00:00.00Z"), ZoneId.systemDefault());
+    private Clock clock = Clock.fixed(Instant.parse(getDateString()), ZoneId.systemDefault());
     private HåndterGamleKravgrunnlagBatchTjeneste gamleKravgrunnlagBatchTjeneste = new HåndterGamleKravgrunnlagBatchTjeneste(håndterGamleKravgrunnlagTjeneste,
         clock, Period.ofWeeks(-1));
     Long mottattXmlId = null;
@@ -295,6 +297,12 @@ public class HåndterGamleKravgrunnlagBatchTjenesteTest extends FellesTestOppset
             .setFagsak(fagsakDto)
             .setPersonopplysninger(personopplysningDto).build();
         return samletEksternBehandlingInfo;
+    }
+
+    private String getDateString() {
+        return (LocalDate.now().getDayOfWeek() == DayOfWeek.SUNDAY || LocalDate.now().getDayOfWeek() == DayOfWeek.SATURDAY) ?
+            Instant.now().plus(2, ChronoUnit.DAYS).toString() :
+            Instant.now().toString();
     }
 
 }
