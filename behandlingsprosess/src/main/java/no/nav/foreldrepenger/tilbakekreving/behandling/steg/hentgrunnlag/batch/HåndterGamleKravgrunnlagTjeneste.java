@@ -135,10 +135,10 @@ public class HåndterGamleKravgrunnlagTjeneste {
     private void håndterKravgrunnlagHvisBehandlingFinnes(Long mottattXmlId, Kravgrunnlag431 kravgrunnlag431, String saksnummer) {
         hentAktivBehandling(saksnummer).ifPresent(behandling -> {
             var behandlingId = behandling.getId();
-            logger.info("Lagrer hentet kravgrunnlaget for behandling med behandlingId={}", behandlingId);
+            logger.info("Lagrer mottatt kravgrunnlaget for behandling med behandlingId={}", behandlingId);
             grunnlagRepository.lagre(behandlingId, kravgrunnlag431);
             if (skalGrunnlagSperres) {
-                logger.info("Hentet kravgrunnlaget med kravgrunnlagId={} for behandling med behandlingId={} er sperret hos økonomi. Derfor sperrer det i fptilbake også.",
+                logger.info("Mottatt Kravgrunnlaget med kravgrunnlagId={} for behandling med behandlingId={} er sperret hos økonomi. Derfor sperrer det i fptilbake også.",
                     kravgrunnlag431.getEksternKravgrunnlagId(),behandlingId);
                 sperrGrunnlag(behandlingId, kravgrunnlag431.getEksternKravgrunnlagId());
                 skalGrunnlagSperres = false;
