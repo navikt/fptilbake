@@ -6,8 +6,6 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.domene.dokumentarkiv.ArkivJournalPost;
-import no.nav.foreldrepenger.domene.dokumentarkiv.DokumentArkivTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
@@ -24,7 +22,6 @@ public class HistorikkTjenesteAdapter {
     private HistorikkRepository historikkRepository;
     private HistorikkInnslagTekstBuilder builder;
     private HistorikkInnslagKonverter historikkinnslagKonverter;
-    private DokumentArkivTjeneste dokumentArkivTjeneste;
 
     HistorikkTjenesteAdapter() {
         // for CDI proxy
@@ -32,35 +29,32 @@ public class HistorikkTjenesteAdapter {
 
     @Inject
     public HistorikkTjenesteAdapter(HistorikkRepository historikkRepository,
-                                        HistorikkInnslagKonverter historikkinnslagKonverter,
-                                        DokumentArkivTjeneste dokumentArkivTjeneste) {
+                                    HistorikkInnslagKonverter historikkinnslagKonverter) {
         this.historikkRepository = historikkRepository;
         this.historikkinnslagKonverter = historikkinnslagKonverter;
-        this.dokumentArkivTjeneste = dokumentArkivTjeneste;
         this.builder = new HistorikkInnslagTekstBuilder();
     }
 
-    
+
     public List<HistorikkinnslagDto> hentAlleHistorikkInnslagForSak(Saksnummer saksnummer) {
         List<Historikkinnslag> historikkinnslagList = historikkRepository.hentHistorikkForSaksnummer(saksnummer);
-        List<ArkivJournalPost> journalPosterForSak = dokumentArkivTjeneste.hentAlleJournalposterForSak(saksnummer);
         return historikkinnslagList.stream()
-            .map(historikkinnslag -> historikkinnslagKonverter.mapFra(historikkinnslag, journalPosterForSak))
+            .map(historikkinnslag -> historikkinnslagKonverter.mapFra(historikkinnslag))
             .sorted()
             .collect(Collectors.toList());
     }
 
-    
+
     public void lagInnslag(Historikkinnslag historikkinnslag) {
         historikkRepository.lagre(historikkinnslag);
     }
 
-    
+
     public HistorikkInnslagTekstBuilder tekstBuilder() {
         return builder;
     }
 
-    
+
     public void opprettHistorikkInnslag(Behandling behandling, HistorikkinnslagType hisType) {
         if (!builder.getHistorikkinnslagDeler().isEmpty() || builder.antallEndredeFelter() > 0 ||
             builder.getErBegrunnelseEndret() || builder.getErGjeldendeFraSatt()) {

@@ -14,7 +14,6 @@
 
     <modules>
         <module>avstemming</module>
-        <module>dokumentarkiv</module>
         <module>dokumentbestiller</module>
         <module>dokumentproduksjon-klient</module>
         <module>fpsak-klient</module>

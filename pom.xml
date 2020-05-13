@@ -258,11 +258,6 @@
             </dependency>
             <dependency>
                 <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
-                <artifactId>dokumentarkiv</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
                 <artifactId>dokumentbestiller</artifactId>
                 <version>${project.version}</version>
             </dependency>

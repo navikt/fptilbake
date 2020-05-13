@@ -72,38 +72,6 @@ public class HistorikkinnslagDokumentLink extends BaseEntitet implements IndexKe
         this.dokumentId = dokumentId;
     }
 
-    public static class Builder {
-        private HistorikkinnslagDokumentLink historikkinnslagDokumentLink;
-
-        public Builder() {
-            historikkinnslagDokumentLink = new HistorikkinnslagDokumentLink();
-        }
-
-        public Builder medLinkTekst(String linkTekst) {
-            historikkinnslagDokumentLink.linkTekst = linkTekst;
-            return this;
-        }
-
-        public Builder medHistorikkinnslag(Historikkinnslag historikkinnslag) {
-            historikkinnslagDokumentLink.historikkinnslag = historikkinnslag;
-            return this;
-        }
-
-        public Builder medJournalpostId(JournalpostId journalpostId) {
-            historikkinnslagDokumentLink.journalpostId = journalpostId;
-            return this;
-        }
-
-        public Builder medDokumentId(String dokumentId) {
-            historikkinnslagDokumentLink.dokumentId = dokumentId;
-            return this;
-        }
-
-        public HistorikkinnslagDokumentLink build() {
-            return historikkinnslagDokumentLink;
-        }
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {

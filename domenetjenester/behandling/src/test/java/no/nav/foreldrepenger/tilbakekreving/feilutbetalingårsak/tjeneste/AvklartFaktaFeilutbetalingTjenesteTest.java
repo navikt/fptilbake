@@ -1,7 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.tjeneste;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -13,7 +12,6 @@ import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 
-import no.nav.foreldrepenger.domene.dokumentarkiv.DokumentArkivTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.FaktaFeilutbetalingDto;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -35,10 +33,8 @@ import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjeneste
 
 public class AvklartFaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
 
-    private DokumentArkivTjeneste mockDokumentArkivTjeneste = mock(DokumentArkivTjeneste.class);
-
     private HistorikkInnslagKonverter historikkInnslagKonverter = new HistorikkInnslagKonverter(kodeverkRepository, repoProvider.getAksjonspunktRepository());
-    private HistorikkTjenesteAdapter historikkTjenesteAdapter = new HistorikkTjenesteAdapter(historikkRepository, historikkInnslagKonverter, mockDokumentArkivTjeneste);
+    private HistorikkTjenesteAdapter historikkTjenesteAdapter = new HistorikkTjenesteAdapter(historikkRepository, historikkInnslagKonverter);
 
     private AvklartFaktaFeilutbetalingTjeneste avklartFaktaFeilutbetalingTjeneste = new AvklartFaktaFeilutbetalingTjeneste(faktaFeilutbetalingRepository, historikkTjenesteAdapter);
 

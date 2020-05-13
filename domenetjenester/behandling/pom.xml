@@ -47,10 +47,6 @@
         </dependency>
         <dependency>
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
-            <artifactId>dokumentarkiv</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
             <artifactId>behandling-gjenoppta</artifactId>
         </dependency>
         <dependency>

@@ -122,8 +122,6 @@ spec:
       value: tilbakekreving_service.url
     - name: AKTOER_V2_URL
       value: aktoer_v2.url
-    - name: JOURNAL_V3_URL
-      value: journal_v3.url
     - name: DOKUMENTPRODUKSJON_V2_URL
       value: dokumentproduksjon_v2.url
     - name: BOOTSTRAP_SERVERS

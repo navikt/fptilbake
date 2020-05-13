@@ -7,7 +7,6 @@ import javax.persistence.EntityManager;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 
-import no.nav.foreldrepenger.domene.dokumentarkiv.DokumentArkivTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingRevurderingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FaktaFeilutbetalingTjeneste;
@@ -39,8 +38,6 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.SlettGrunnlagEventPublisere
 import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkInnslagKonverter;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
-import no.nav.vedtak.felles.integrasjon.journal.v3.JournalConsumer;
-import no.nav.vedtak.felles.integrasjon.journal.v3.JournalConsumerImpl;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepositoryImpl;
 
@@ -59,7 +56,6 @@ public class TestOppsett {
     protected TpsTjeneste mockTpsTjeneste = mock(TpsTjeneste.class);
     protected HistorikkinnslagTjeneste mockHistorikkTjeneste = mock(HistorikkinnslagTjeneste.class);
     protected FpsakKlient mockFpsakKlient = mock(FpsakKlient.class);
-    protected JournalConsumer mockJournalConsumer = mock(JournalConsumerImpl.class);
     protected SlettGrunnlagEventPubliserer mockSlettGrunnlagEventPubliserer = mock(SlettGrunnlagEventPubliserer.class);
 
     protected BehandlingskontrollProvider behandlingskontrollProvider = new BehandlingskontrollProvider(behandlingskontrollTjeneste, behandlingskontrollAsynkTjeneste);
@@ -82,9 +78,7 @@ public class TestOppsett {
     protected HistorikkInnslagKonverter historikkInnslagKonverter = new HistorikkInnslagKonverter(repoProvider.getKodeverkRepository(),
         repoProvider.getAksjonspunktRepository());
 
-    protected DokumentArkivTjeneste dokumentArkivTjeneste = new DokumentArkivTjeneste(mockJournalConsumer, repoProvider.getFagsakRepository());
-
-    protected HistorikkTjenesteAdapter historikkTjenesteAdapter = new HistorikkTjenesteAdapter(historikkRepository, historikkInnslagKonverter, dokumentArkivTjeneste);
+    protected HistorikkTjenesteAdapter historikkTjenesteAdapter = new HistorikkTjenesteAdapter(historikkRepository, historikkInnslagKonverter);
 
     protected VurdertForeldelseTjeneste vurdertForeldelseTjeneste = new VurdertForeldelseTjeneste(repoProvider, historikkTjenesteAdapter, kravgrunnlagBeregningTjeneste);
 
