@@ -12,7 +12,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import no.nav.foreldrepenger.domene.dokumentarkiv.journal.JournalTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.HenleggBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.OrganisasjonsEnhet;
@@ -44,7 +43,6 @@ public class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
 
     private EksternDataForBrevTjeneste mockEksternDataForBrevTjeneste = mock(EksternDataForBrevTjeneste.class);
     private FritekstbrevTjeneste mockFritekstbrevTjeneste = mock(FritekstbrevTjeneste.class);
-    private JournalTjeneste mockJournalTjeneste = mock(JournalTjeneste.class);
     private PersoninfoAdapter mockPersoninfoAdapter = mock(PersoninfoAdapter.class);
 
     private HenleggelsesbrevTjeneste henleggelsesbrevTjeneste;
@@ -55,8 +53,7 @@ public class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
     @Before
     public void setup() {
         HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepository,
-            mockJournalTjeneste,
-            mockPersoninfoAdapter);
+                mockPersoninfoAdapter);
 
         henleggelsesbrevTjeneste = new HenleggelsesbrevTjeneste(repositoryProvider, mockEksternDataForBrevTjeneste,
             mockFritekstbrevTjeneste, historikkinnslagTjeneste);

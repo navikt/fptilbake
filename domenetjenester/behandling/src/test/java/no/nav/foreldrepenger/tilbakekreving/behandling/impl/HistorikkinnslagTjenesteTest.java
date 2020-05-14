@@ -2,14 +2,11 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 
 import java.util.List;
 
 import org.junit.Test;
 
-import no.nav.foreldrepenger.domene.dokumentarkiv.journal.JournalTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
@@ -37,11 +34,10 @@ public class HistorikkinnslagTjenesteTest extends FellesTestOppsett {
     private AktørConsumerMedCache mockAktørConsumer = mock(AktørConsumerMedCache.class);
     private PersonConsumer mockPersonConsumer = mock(PersonConsumer.class);
     private TpsOversetter mockTpsOversetter = mock(TpsOversetter.class);
-    private JournalTjeneste mockJournalTjeneste = mock(JournalTjeneste.class);
 
     private TpsAdapter tpsAdapter = new TpsAdapterImpl(mockAktørConsumer, mockPersonConsumer, mockTpsOversetter);
     private PersoninfoAdapter personinfoAdapter = new PersoninfoAdapterImpl(tpsAdapter);
-    private HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepository, mockJournalTjeneste, personinfoAdapter);
+    private HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepository, personinfoAdapter);
 
     @Test
     public void skal_opprette_historikkinnslag_for_utsendt_brev() {
@@ -69,7 +65,6 @@ public class HistorikkinnslagTjenesteTest extends FellesTestOppsett {
         assertThat(historikkinnslag.getAktør()).isEqualByComparingTo(HistorikkAktør.VEDTAKSLØSNINGEN);
         assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.TBK_OPPR);
         assertThat(historikkinnslag.getDokumentLinker()).isEmpty();
-        verify(mockJournalTjeneste, never()).hentMetadata(null);
     }
 
     @Test
@@ -88,7 +83,6 @@ public class HistorikkinnslagTjenesteTest extends FellesTestOppsett {
         assertThat(historikkinnslag.getAktør()).isEqualByComparingTo(HistorikkAktør.SAKSBEHANDLER);
         assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.TBK_OPPR);
         assertThat(historikkinnslag.getDokumentLinker()).isEmpty();
-        verify(mockJournalTjeneste, never()).hentMetadata(null);
     }
 
 }

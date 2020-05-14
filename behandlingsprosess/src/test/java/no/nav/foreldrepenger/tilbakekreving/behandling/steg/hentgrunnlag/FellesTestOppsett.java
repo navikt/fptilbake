@@ -25,7 +25,6 @@ import org.junit.rules.ExpectedException;
 
 import com.google.common.collect.Lists;
 
-import no.nav.foreldrepenger.domene.dokumentarkiv.journal.JournalTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjenesteImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
@@ -89,7 +88,6 @@ public class FellesTestOppsett {
     private ProsessTaskEventPubliserer eventPublisererMock = mock(ProsessTaskEventPubliserer.class);
     private BehandlingskontrollEventPubliserer behandlingskontrollEventPublisererMock = mock(BehandlingskontrollEventPubliserer.class);
     protected final TpsAdapter tpsAdapterMock = mock(TpsAdapter.class);
-    private JournalTjeneste journalTjenesteMock = mock(JournalTjeneste.class);
     private PersoninfoAdapter personinfoAdapterMock = mock(PersoninfoAdapter.class);
     protected final FpsakKlient fpsakKlientMock = mock(FpsakKlient.class);
     protected final TpsAdapterWrapper tpsAdapterWrapper = new TpsAdapterWrapper(tpsAdapterMock);
@@ -109,7 +107,7 @@ public class FellesTestOppsett {
     protected final BehandlingKandidaterRepository behandlingKandidaterRepository = new BehandlingKandidaterRepository(fellesQueriesForBehandlingRepositories);
 
     protected final GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjenesteImpl(prosessTaskRepository, behandlingKandidaterRepository, behandlingVenterRepository, repositoryProvider, varselresponsTjenesteMock);
-    protected final HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(repositoryProvider.getHistorikkRepository(), journalTjenesteMock, personinfoAdapterMock);
+    protected final HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(repositoryProvider.getHistorikkRepository(), personinfoAdapterMock);
     protected final BehandlingskontrollTjeneste behandlingskontrollTjeneste = new BehandlingskontrollTjenesteImpl(repositoryProvider, behandlingModellRepositoryMock, behandlingskontrollEventPublisererMock);
     private InternalManipulerBehandling manipulerInternBehandling = new InternalManipulerBehandlingImpl(repositoryProvider);
     protected final KravgrunnlagTjeneste kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repositoryProvider, prosessTaskRepository, gjenopptaBehandlingTjeneste, behandlingskontrollTjeneste, mockSlettGrunnlagEventPubliserer);

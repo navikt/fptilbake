@@ -1,7 +1,22 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+
+import javax.persistence.FlushModeType;
+
+import org.junit.Before;
+import org.junit.Test;
+
 import com.google.common.collect.Lists;
-import no.nav.foreldrepenger.domene.dokumentarkiv.journal.JournalTjeneste;
+
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingModell;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegKonfigurasjon;
@@ -22,7 +37,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporing;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
@@ -34,19 +48,6 @@ import no.nav.vedtak.exception.FunksjonellException;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
-import org.junit.Before;
-import org.junit.Test;
-
-import javax.persistence.FlushModeType;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 
 public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
@@ -79,7 +80,7 @@ public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
 
         manipulerInternBehandling = new InternalManipulerBehandlingImpl(repoProvider);
         behandlingskontrollTjeneste = new BehandlingskontrollTjenesteImpl(repoProvider, mockBehandlingModellRepository, null);
-        historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepository, mock(JournalTjeneste.class), mock(PersoninfoAdapter.class));
+        historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepository, mock(PersoninfoAdapter.class));
         henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repoProvider, prosessTaskRepository, behandlingskontrollTjeneste, historikkinnslagTjeneste);
     }
 
