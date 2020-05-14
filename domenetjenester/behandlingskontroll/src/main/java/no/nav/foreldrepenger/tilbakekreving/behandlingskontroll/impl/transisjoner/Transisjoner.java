@@ -34,4 +34,5 @@ public class Transisjoner {
         }
         throw new IllegalArgumentException("Ukjent transisjon: " + transisjonIdentifikator);
     }
+
 }

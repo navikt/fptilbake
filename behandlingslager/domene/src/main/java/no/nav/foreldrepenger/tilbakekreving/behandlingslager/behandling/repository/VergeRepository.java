@@ -28,7 +28,7 @@ public class VergeRepository {
     }
 
     public long lagreVergeInformasjon(long behandlingId, VergeEntitet vergeEntitet) {
-        Optional<VergeAggregateEntitet> forrigeVergeAggregateEntitet = finnVergeInformasjon(behandlingId);
+        Optional<VergeAggregateEntitet> forrigeVergeAggregateEntitet = hentVergeForBehandling(behandlingId);
         if (forrigeVergeAggregateEntitet.isPresent()) {
             VergeAggregateEntitet forrigeAggregate = forrigeVergeAggregateEntitet.get();
             forrigeAggregate.disable();
@@ -41,7 +41,12 @@ public class VergeRepository {
         return vergeEntitet.getId();
     }
 
-    public Optional<VergeAggregateEntitet> finnVergeInformasjon(long behandlingId) {
+    public Optional<VergeEntitet> finnVergeInformasjon(long behandlingId) {
+        Optional<VergeAggregateEntitet> vergeAggregateEntitet = hentVergeForBehandling(behandlingId);
+        return vergeAggregateEntitet.map(VergeAggregateEntitet::getVergeEntitet);
+    }
+
+    private Optional<VergeAggregateEntitet> hentVergeForBehandling(long behandlingId) {
         TypedQuery<VergeAggregateEntitet> query = entityManager.createQuery("from VergeAggregateEntitet where behandlingId=:behandlingId and aktiv='J'", VergeAggregateEntitet.class);
         query.setParameter("behandlingId", behandlingId);
         return hentUniktResultat(query);
