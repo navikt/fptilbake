@@ -65,4 +65,31 @@ public class VergeRestTjenesteTest {
         vergeRestTjeneste.opprettVerge(new BehandlingIdDto(behandling.getId()));
         verify(vergeTjenesteMock, atLeastOnce()).opprettVergeAksjonspunktOgHoppTilbakeTilFaktaHvisSenereSteg(any());
     }
+
+    @Test
+    public void kan_ikke_fjerne_verge_når_behandling_er_avsluttet() {
+        Behandling behandling = ScenarioSimple.simple().lagMocked();
+        behandling.avsluttBehandling();
+        when(behandlingTjenesteMock.hentBehandling(anyLong())).thenReturn(behandling);
+        assertThrows("FPT-763494", TekniskException.class, () -> vergeRestTjeneste.fjernVerge(new BehandlingIdDto(behandling.getId())));
+    }
+
+    @Test
+    public void kan_ikke_fjerne_verge_når_behandling_er_på_vent() {
+        ScenarioSimple scenario = ScenarioSimple.simple();
+        scenario.leggTilAksjonspunkt(AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, BehandlingStegType.TBKGSTEG);
+        Behandling behandling = scenario.lagre(new BehandlingRepositoryProviderImpl(repositoryRule.getEntityManager()));
+        when(behandlingTjenesteMock.hentBehandling(anyLong())).thenReturn(behandling);
+        assertThrows("FPT-763494", TekniskException.class, () -> vergeRestTjeneste.fjernVerge(new BehandlingIdDto(behandling.getId())));
+    }
+
+    @Test
+    public void skal_fjerne_verge() {
+        ScenarioSimple scenario = ScenarioSimple.simple();
+        scenario.leggTilAksjonspunkt(AksjonspunktDefinisjon.AVKLAR_VERGE, BehandlingStegType.FAKTA_VERGE);
+        Behandling behandling = scenario.lagre(new BehandlingRepositoryProviderImpl(repositoryRule.getEntityManager()));
+        when(behandlingTjenesteMock.hentBehandling(anyLong())).thenReturn(behandling);
+        vergeRestTjeneste.fjernVerge(new BehandlingIdDto(behandling.getId()));
+        verify(vergeTjenesteMock, atLeastOnce()).fjernVergeGrunnlagOgAksjonspunkt(any());
+    }
 }
