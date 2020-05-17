@@ -32,6 +32,7 @@ import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 @ApplicationScoped
 @Path(VergeRestTjeneste.BASE_PATH)
 @Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 @Transactional
 public class VergeRestTjeneste {
 
@@ -44,14 +45,13 @@ public class VergeRestTjeneste {
 
     @Inject
     public VergeRestTjeneste(BehandlingTjeneste behandlingTjeneste,
-                             VergeTjeneste vergeTjeneste){
+                             VergeTjeneste vergeTjeneste) {
         this.behandlingTjeneste = behandlingTjeneste;
         this.vergeTjeneste = vergeTjeneste;
     }
 
     @POST
     @Path("/opprett")
-    @Consumes(MediaType.APPLICATION_JSON)
     @Operation(description = "Oppretter aksjonspunkt for verge/fullmektig på behandlingen",
         tags = "verge",
         responses = {
@@ -64,13 +64,35 @@ public class VergeRestTjeneste {
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response opprettVerge(@Parameter(description = "Behandling som skal få verge/fullmektig") @Valid BehandlingIdDto dto) {
         Behandling behandling = behandlingTjeneste.hentBehandling(dto.getBehandlingId());
-        if(behandling.erAvsluttet() || behandling.isBehandlingPåVent()){
-            throw VergeFeil .FACTORY.kanIkkeOppretteVerge(behandling.getId()).toException();
+        if (behandling.erSaksbehandlingAvsluttet() || behandling.isBehandlingPåVent()) {
+            throw VergeFeil.FACTORY.kanIkkeOppretteVerge(behandling.getId()).toException();
         }
-        if(!behandling.getÅpneAksjonspunkter(Lists.newArrayList(AksjonspunktDefinisjon.AVKLAR_VERGE)).isEmpty()){
+        if (!behandling.getÅpneAksjonspunkter(Lists.newArrayList(AksjonspunktDefinisjon.AVKLAR_VERGE)).isEmpty()) {
             throw VergeFeil.FACTORY.harAlleredeAksjonspunktForVerge(behandling.getId()).toException();
         }
         vergeTjeneste.opprettVergeAksjonspunktOgHoppTilbakeTilFaktaHvisSenereSteg(behandling);
+
+        return Response.ok().build();
+    }
+
+    @POST
+    @Path("/fjern")
+    @Operation(description = "Fjerner aksjonspunkt og evt. registrert informasjon om verge/fullmektig fra behandlingen",
+        tags = "verge",
+        responses = {
+            @ApiResponse(responseCode = "200",
+                description = "Fjerning av verge/fullmektig er gjennomført",
+                headers = @Header(name = HttpHeaders.LOCATION)
+            )
+        })
+    @BeskyttetRessurs(action = UPDATE, ressurs = FAGSAK)
+    @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
+    public Response fjernVerge(@Parameter(description = "Behandling som skal få fjernet verge/fullmektig") @Valid BehandlingIdDto dto) {
+        Behandling behandling = behandlingTjeneste.hentBehandling(dto.getBehandlingId());
+        if (behandling.erSaksbehandlingAvsluttet() || behandling.isBehandlingPåVent()) {
+            throw VergeFeil.FACTORY.kanIkkeFjerneVerge(behandling.getId()).toException();
+        }
+        vergeTjeneste.fjernVergeGrunnlagOgAksjonspunkt(behandling);
 
         return Response.ok().build();
     }

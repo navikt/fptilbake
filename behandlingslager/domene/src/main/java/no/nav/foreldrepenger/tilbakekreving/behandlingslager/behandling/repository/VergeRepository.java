@@ -46,6 +46,14 @@ public class VergeRepository {
         return vergeAggregateEntitet.map(VergeAggregateEntitet::getVergeEntitet);
     }
 
+    public void fjernVergeInformasjon(long behandlingId){
+        Optional<VergeAggregateEntitet> vergeAggregateEntitet = hentVergeForBehandling(behandlingId);
+        vergeAggregateEntitet.ifPresent(vergeAggregate -> {
+            vergeAggregate.disable();
+            entityManager.persist(vergeAggregate);
+        } );
+    }
+
     private Optional<VergeAggregateEntitet> hentVergeForBehandling(long behandlingId) {
         TypedQuery<VergeAggregateEntitet> query = entityManager.createQuery("from VergeAggregateEntitet where behandlingId=:behandlingId and aktiv='J'", VergeAggregateEntitet.class);
         query.setParameter("behandlingId", behandlingId);

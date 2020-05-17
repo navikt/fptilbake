@@ -12,6 +12,9 @@ public interface VergeFeil extends DeklarerteFeil {
     @TekniskFeil(feilkode = "FPT-763493", feilmelding = "Behandlingen er allerede avsluttet eller sett på vent, kan ikke opprette verge for behandling %s", logLevel = LogLevel.WARN)
     Feil kanIkkeOppretteVerge(Long behandlingId);
 
+    @TekniskFeil(feilkode = "FPT-763494", feilmelding = "Behandlingen er allerede avsluttet eller sett på vent, kan ikke fjerne verge for behandling %s", logLevel = LogLevel.WARN)
+    Feil kanIkkeFjerneVerge(Long behandlingId);
+
     @TekniskFeil(feilkode = "FPT-185321", feilmelding = "Behandling %s har allerede aksjonspunkt 5030 for verge/fullmektig", logLevel = LogLevel.WARN)
     Feil harAlleredeAksjonspunktForVerge(Long behandlingId);
 }

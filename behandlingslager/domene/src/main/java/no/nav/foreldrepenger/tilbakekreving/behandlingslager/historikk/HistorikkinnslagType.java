@@ -67,6 +67,7 @@ public class HistorikkinnslagType extends Kodeliste {
     public static final HistorikkinnslagType BEH_VENT = new HistorikkinnslagType("BEH_VENT", MAL_TYPE_4);
     public static final HistorikkinnslagType BEH_KØET = new HistorikkinnslagType("BEH_KØET", MAL_TYPE_4);
     public static final HistorikkinnslagType IVERKSETTELSE_VENT = new HistorikkinnslagType("IVERKSETTELSE_VENT", MAL_TYPE_4);
+    public static final HistorikkinnslagType FJERNET_VERGE = new HistorikkinnslagType("FJERNET_VERGE", MAL_TYPE_4); //"Opplysninger om verge/fullmektig fjernet", HistorikkinnslagMal.MAL_TYPE_4)
 
     // type 5
     public static final HistorikkinnslagType FAKTA_ENDRET = new HistorikkinnslagType("FAKTA_ENDRET", MAL_TYPE_5);
