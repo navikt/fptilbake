@@ -7,11 +7,16 @@ import java.util.SortedMap;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.Timeout;
 
 public class SystemPropertiesHelperTest {
 
     private SystemPropertiesHelper helper; // objektet som testes
+
+    @Rule
+    public Timeout timeout = Timeout.seconds(2);
 
     @Before
     public void setup() {
@@ -19,7 +24,7 @@ public class SystemPropertiesHelperTest {
     }
 
     @Test
-    public void test_sysProps() {
+    public void test_sysProps() throws InterruptedException {
         SortedMap<String, String> sysProps = helper.filteredSortedProperties();
 
         assertThat(sysProps).isNotNull();
@@ -35,18 +40,18 @@ public class SystemPropertiesHelperTest {
     }
 
     @Test
-    public void skal_filtrere_bort_passord_fra_java_opts(){
+    public void skal_filtrere_bort_passord_fra_java_opts() {
         var input = new HashMap<String, String>() {{
-            put("JAVA_OPTS", "-Djavax.net.ssl.trustStore=/foo/bar -Djavax.net.ssl.trustStorePassword=passord_i_klartekst  -javaagent:/foo/bar/javaagent.jar  -DapplicationName=dummy -");
+            put("JAVA_OPTS", "-Djavax.net.ssl.trustStore=/foo/bar -Djavax.net.ssl.trustStorePassword=passord_i_klartekst  -javaagent:/foo/bar/javaagent.jar  -DapplicationName=dummy -Dpassord=1234");
         }};
 
         SystemPropertiesHelper.filter(input);
 
-        Assertions.assertThat(input.get("JAVA_OPTS")).isEqualTo("-Djavax.net.ssl.trustStore=/foo/bar -Djavax.net.ssl.trustStorePassword=*****  -javaagent:/foo/bar/javaagent.jar  -DapplicationName=dummy -");
+        Assertions.assertThat(input.get("JAVA_OPTS")).isEqualTo("-Djavax.net.ssl.trustStore=/foo/bar -Djavax.net.ssl.trustStorePassword=*****  -javaagent:/foo/bar/javaagent.jar  -DapplicationName=dummy -Dpassord=*****");
     }
 
     @Test
-    public void skal_filtrere_bort_passord_fra_env_variabel(){
+    public void skal_filtrere_bort_passord_fra_env_variabel() {
         var input = new HashMap<String, String>() {{
             put("AVSTEMMING_SFTP_KEY_PRIVATE", "hemmelig");
         }};
@@ -55,4 +60,5 @@ public class SystemPropertiesHelperTest {
 
         Assertions.assertThat(input.get("AVSTEMMING_SFTP_KEY_PRIVATE")).isEqualTo("*****");
     }
+
 }
