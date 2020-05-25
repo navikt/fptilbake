@@ -11,7 +11,6 @@ import java.util.Optional;
 import org.junit.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
-import no.nav.foreldrepenger.tilbakekreving.behandling.dto.VergeDto;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.VergeRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.KildeType;
@@ -59,6 +58,7 @@ public class AvklartVergeTjenesteTest extends FellesTestOppsett {
         assertThat(vergeEntitet.getGyldigTom()).isEqualTo(vergeDto.getTom());
         assertThat(vergeEntitet.getNavn()).isEqualTo(vergeDto.getNavn());
         assertThat(vergeEntitet.getKilde()).isEqualTo(KildeType.FPTILBAKE.name());
+        assertThat(vergeEntitet.getBegrunnelse()).isEqualTo("begrunnelse");
     }
 
     private void fellesHistorikkAssert() {
@@ -82,6 +82,7 @@ public class AvklartVergeTjenesteTest extends FellesTestOppsett {
         vergeDto.setNavn("John Doe");
         vergeDto.setOrganisasjonsnummer("123456789");
         vergeDto.setVergeType(vergeType);
+        vergeDto.setBegrunnelse("begrunnelse");
         return vergeDto;
     }
 }

@@ -66,7 +66,8 @@ public class VergeTjenesteTest extends FellesTestOppsett {
             .medVergeType(VergeType.BARN)
             .medKilde(KildeType.FPTILBAKE.name())
             .medNavn("John Doe")
-            .medGyldigPeriode(FOM, TOM).build();
+            .medGyldigPeriode(FOM, TOM)
+            .medBegrunnelse("begunnlese").build();
         vergeRepository.lagreVergeInformasjon(internBehandlingId, vergeEntitet);
         repoProvider.getAksjonspunktRepository().leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.AVKLAR_VERGE, BehandlingStegType.FAKTA_VERGE);
         assertThat(vergeRepository.finnVergeInformasjon(internBehandlingId)).isNotEmpty();

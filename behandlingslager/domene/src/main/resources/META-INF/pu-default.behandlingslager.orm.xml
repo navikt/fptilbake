@@ -79,6 +79,7 @@
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.VurderÅrsak"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.tilbakekrevingsvalg.VidereBehandling"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KonsekvensForYtelsen"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeType"/>
 
 
 </entity-mappings>

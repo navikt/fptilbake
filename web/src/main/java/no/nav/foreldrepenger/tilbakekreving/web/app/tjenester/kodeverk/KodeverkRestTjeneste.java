@@ -56,7 +56,7 @@ public class KodeverkRestTjeneste {
         return kodelisteCache.get("alle");
     }
 
-    private synchronized Map<String, Object> hentGruppertKodelisteTilCache() {
+        private synchronized Map<String, Object> hentGruppertKodelisteTilCache() {
         Map<String, Object> kodelisterGruppertPåType = new HashMap<>();
 
         Map<String, List<Kodeliste>> grupperteKodelister = hentKodeverkTjeneste.hentGruppertKodeliste();

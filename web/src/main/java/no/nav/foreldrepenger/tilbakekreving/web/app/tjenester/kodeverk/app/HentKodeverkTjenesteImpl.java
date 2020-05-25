@@ -1,6 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.kodeverk.app;
 
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +22,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Tema;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.VariantFormat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
@@ -72,7 +72,8 @@ class HentKodeverkTjenesteImpl implements HentKodeverkTjeneste {
         KonsekvensForYtelsen.class,
         VidereBehandling.class,
         HendelseType.class,
-        HendelseUnderType.class
+        HendelseUnderType.class,
+        VergeType.class
     );
 
     public HentKodeverkTjenesteImpl() {

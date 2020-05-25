@@ -323,7 +323,8 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
             VergeEntitet.Builder builder = VergeEntitet.builder().medVergeType(vergeDto.getVergeType())
                 .medKilde(KildeType.FPSAK.name())
                 .medGyldigPeriode(vergeDto.getGyldigFom(), vergeDto.getGyldigTom())
-                .medNavn(vergeDto.getNavn());
+                .medNavn(vergeDto.getNavn())
+                .medBegrunnelse("");
             if (!StringUtils.nullOrEmpty(vergeDto.getOrganisasjonsnummer())) {
                 builder.medOrganisasjonnummer(vergeDto.getOrganisasjonsnummer());
             } else if (!StringUtils.nullOrEmpty(vergeDto.getFnr())) {

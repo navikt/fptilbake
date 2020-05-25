@@ -2,6 +2,8 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.impl.verge;
 
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType.FAKTA_VERGE;
 
+import java.util.Optional;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -14,6 +16,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.VergeRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepository;
@@ -59,6 +62,10 @@ public class VergeTjeneste {
         vergeRepository.fjernVergeInformasjon(behandling.getId());
         opprettHistorikkinnslagForFjernetVerge(behandling);
         gjenopptaBehandlingTjeneste.fortsettBehandling(behandling.getId());
+    }
+
+    public Optional<VergeEntitet> hentVergeInformasjon(Long behandlingId){
+        return vergeRepository.finnVergeInformasjon(behandlingId);
     }
 
     private void opprettHistorikkinnslagForFjernetVerge(Behandling behandling) {
