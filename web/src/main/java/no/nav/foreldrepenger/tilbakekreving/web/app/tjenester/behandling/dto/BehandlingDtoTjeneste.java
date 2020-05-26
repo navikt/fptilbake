@@ -83,9 +83,7 @@ public class BehandlingDtoTjeneste {
 
         // Behandlingsmeny-operasjoner
         dto.leggTil(new ResourceLink("/fptilbake/api/behandlinger/handling-rettigheter?behandlingId=" + behandling.getId(), "handling-rettigheter", ResourceLink.HttpMethod.GET));
-        if(BehandlingStatus.UTREDES.equals(behandling.getStatus())){
-            dto.leggTil(new ResourceLink("/fptilbake/api/verge/behandlingsmeny", "finn-menyvalg-for-verge", ResourceLink.HttpMethod.GET));
-        }
+        dto.leggTil(new ResourceLink("/fptilbake/api/verge/behandlingsmeny", "finn-menyvalg-for-verge", ResourceLink.HttpMethod.GET));
 
         // Totrinnsbehandling
         if (BehandlingStatus.FATTER_VEDTAK.equals(behandling.getStatus())) {
