@@ -175,7 +175,7 @@ public class BehandlingDtoTjeneste {
         dto.leggTil(new ResourceLink("/fptilbake/api/behandling/aksjonspunkt", "lagre-aksjonspunkter", ResourceLink.HttpMethod.POST));
 
         dto.leggTil(new ResourceLink("/fptilbake/api/foreldelse/belop", "beregne-feilutbetalt-belop", ResourceLink.HttpMethod.POST));
-        if (BehandlingStatus.UTREDES.equals(dto.getStatus()) && !dto.isBehandlingPåVent()) {
+        if (!BehandlingStatus.AVSLUTTET.equals(dto.getStatus()) && !dto.isBehandlingPåVent()) {
             dto.leggTil(new ResourceLink("/fptilbake/api/verge/opprett", "opprett-verge", ResourceLink.HttpMethod.POST));
             dto.leggTil(new ResourceLink("/fptilbake/api/verge/fjern", "fjern-verge", ResourceLink.HttpMethod.POST));
         }

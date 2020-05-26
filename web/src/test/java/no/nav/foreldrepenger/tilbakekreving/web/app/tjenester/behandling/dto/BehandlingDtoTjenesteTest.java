@@ -302,7 +302,8 @@ public class BehandlingDtoTjenesteTest {
             "brev-maler",
             "brev-bestill",
             "brev-forhandvis",
-            "handling-rettigheter");
+            "handling-rettigheter",
+            "finn-menyvalg-for-verge");
     }
 
     @Test
