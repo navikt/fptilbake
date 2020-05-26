@@ -38,7 +38,7 @@ public class VergeTjenesteTest extends FellesTestOppsett {
     private BehandlingModellRepository behandlingModellRepository = new BehandlingModellRepositoryImpl(repoRule.getEntityManager());
     private BehandlingskontrollEventPubliserer eventPublisererMock = mock(BehandlingskontrollEventPubliserer.class);
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste = new BehandlingskontrollTjenesteImpl(repoProvider, behandlingModellRepository, eventPublisererMock);
-    private VergeTjeneste vergeTjeneste = new VergeTjeneste(behandlingskontrollTjeneste, gjenopptaBehandlingTjeneste,
+    private VergeTjeneste vergeTjeneste = new VergeTjeneste(behandlingskontrollTjeneste, behandlingskontrollAsynkTjeneste,
         repoProvider);
     private InternalManipulerBehandling manipulerBehandling = new InternalManipulerBehandlingImpl(repoProvider);
     private VergeRepository vergeRepository = repoProvider.getVergeRepository();
