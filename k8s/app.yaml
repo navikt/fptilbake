@@ -133,4 +133,11 @@ spec:
     - name: KAFKA_FPLOS_TOPIC
       value: kafka_fplos.topic
 
+    # Audit logging
+    - name: AUDITLOGGER_ENABLED
+      value: "true"
+    - name: AUDITLOGGER_VENDOR
+      value: "fp"
+    - name: AUDITLOGGER_PRODUCT
+      value: "fptilbake"
 

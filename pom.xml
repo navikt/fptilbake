@@ -34,8 +34,8 @@
 
         <!-- Felles avhengigheter i prosjektet Disse skal ALLTID være en
             RELEASE-avhengighet UNNTAK: feature-brancher og lokalt -->
-        <felles.version>1.6-20200413054738-70a4093</felles.version>
-        <prosesstask.version>2.3-20200423194250-5dcdce6</prosesstask.version>
+        <felles.version>1.8-20200525115735-89cb933</felles.version>
+        <prosesstask.version>2.4-20200521174607-7b541d2</prosesstask.version>
         <vl-fpsak-tidsserie.version>2.0_20191220142239_d22df82</vl-fpsak-tidsserie.version>
         <!-- Kontrakter -->
         <fpkontrakter.version>5.1-20200225123631-afeacc4</fpkontrakter.version>
@@ -121,6 +121,12 @@
         <dependency>
             <groupId>org.junit.vintage</groupId>
             <artifactId>junit-vintage-engine</artifactId>
+        </dependency>
+
+        <dependency>
+            <!-- sikrer en bestemt versjon, felles klarte ikke å bestemme seg -->
+            <groupId>com.sun.activation</groupId>
+            <artifactId>jakarta.activation</artifactId>
         </dependency>
     </dependencies>
 
@@ -403,6 +409,13 @@
                 <groupId>org.glassfish</groupId>
                 <artifactId>jakarta.el</artifactId>
                 <version>3.0.3</version>
+            </dependency>
+
+            <dependency>
+                <!-- velger en transitiv avhengighet - felles ikke enig med seg selv -->
+                <groupId>com.sun.activation</groupId>
+                <artifactId>jakarta.activation</artifactId>
+                <version>1.2.2</version>
             </dependency>
 
             <dependency>
