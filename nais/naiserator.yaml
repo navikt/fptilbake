@@ -66,13 +66,11 @@ spec:
    - name: {{@key}}
      value: "{{this}}"
   {{/each}}
-  # Audit logging
   - name: AUDITLOGGER_ENABLED
     value: "true"
   - name: AUDITLOGGER_VENDOR
     value: "fp"
   - name: AUDITLOGGER_PRODUCT
     value: "fptilbake"
-  # abac-mapping for fellestjenester (prosesstask o.l.)
   - name: ABAC_ATTRIBUTT_DRIFT
     value: "no.nav.abac.attributter.foreldrepenger.drift"
