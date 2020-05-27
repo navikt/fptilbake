@@ -36,7 +36,6 @@ import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlag;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagDto;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.HentKravgrunnlagDetaljDto;
-import no.nav.vedtak.util.env.Environment;
 
 @ApplicationScoped
 public class HåndterGamleKravgrunnlagTjeneste {
@@ -51,6 +50,7 @@ public class HåndterGamleKravgrunnlagTjeneste {
     private FpsakKlient fpsakKlient;
 
     private boolean skalGrunnlagSperres;
+    private long antallBehandlingOprettet = 0;
 
     HåndterGamleKravgrunnlagTjeneste() {
         // for CDI proxy
@@ -139,7 +139,7 @@ public class HåndterGamleKravgrunnlagTjeneste {
             grunnlagRepository.lagre(behandlingId, kravgrunnlag431);
             if (skalGrunnlagSperres) {
                 logger.info("Mottatt Kravgrunnlaget med kravgrunnlagId={} for behandling med behandlingId={} er sperret hos økonomi. Derfor sperrer det i fptilbake også.",
-                    kravgrunnlag431.getEksternKravgrunnlagId(),behandlingId);
+                    kravgrunnlag431.getEksternKravgrunnlagId(), behandlingId);
                 sperrGrunnlag(behandlingId, kravgrunnlag431.getEksternKravgrunnlagId());
                 skalGrunnlagSperres = false;
             }
@@ -192,7 +192,7 @@ public class HåndterGamleKravgrunnlagTjeneste {
                                            EksternBehandlingsinfoDto eksternBehandlingData) {
         String eksternBehandlingId = kravgrunnlag431.getReferanse();
         oppdaterMedEksternBehandlingIdOgSaksnummer(mottattXmlId, eksternBehandlingId, saksnummer);
-        if (erTestMiljø()) {
+        if (kanOppretteBehandling()) {
             Long behandlingId = opprettBehandling(eksternBehandlingData);
             logger.info("Behandling opprettet med behandlingId={}", behandlingId);
             lagreGrunnlag(behandlingId, kravgrunnlag431);
@@ -201,6 +201,7 @@ public class HåndterGamleKravgrunnlagTjeneste {
                 sperrGrunnlag(behandlingId, kravgrunnlag431.getEksternKravgrunnlagId());
                 skalGrunnlagSperres = false;
             }
+            antallBehandlingOprettet++;
         }
     }
 
@@ -242,9 +243,12 @@ public class HåndterGamleKravgrunnlagTjeneste {
     }
 
     //midlertidig kode. skal fjernes etter en stund
-    private boolean erTestMiljø() {
-        //foreløpig kun på for testing
-        boolean isEnabled = !Environment.current().isProd();
+    private boolean kanOppretteBehandling() {
+        boolean isEnabled = false;
+        if (antallBehandlingOprettet <= 60) {
+            logger.info("Antall behandling opprettet av batch-en er {}", antallBehandlingOprettet);
+            isEnabled = true;
+        }
         logger.info("{} er {}", "Opprett behandling når kravgrunnlag venter etter fristen er ", isEnabled ? "skudd på" : "ikke skudd på");
         return isEnabled;
     }

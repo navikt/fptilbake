@@ -63,6 +63,7 @@ public class HåndterGamleKravgrunnlagBatchTjeneste implements BatchTjeneste {
             logger.info("I dag er helg, kan ikke kjøre batch-en {}", BATCHNAVN);
             return batchRun;
         }
+        venteFrist = venteFrist.multipliedBy(2); // hardkoded for nå, en midlertidig løsning. Det blir fjernet når batchen lanseres fullstending i PROD
         LocalDate bestemtDato = iDag.minus(venteFrist);
         logger.info("Håndterer kravgrunnlag som er eldre enn {} i batch {}", bestemtDato, batchRun);
 
