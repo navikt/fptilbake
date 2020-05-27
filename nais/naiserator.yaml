@@ -61,7 +61,18 @@ spec:
         kvPath: /kv/{{cluster}}/fss/fptilbake/{{namespace}}
   sidecar: true # refresh token
   env:
+  # miljø-spesifikke variable
   {{#each env}}
    - name: {{@key}}
      value: "{{this}}"
   {{/each}}
+  # Audit logging
+  - name: AUDITLOGGER_ENABLED
+    value: "true"
+  - name: AUDITLOGGER_VENDOR
+    value: "fp"
+  - name: AUDITLOGGER_PRODUCT
+    value: "fptilbake"
+  # abac-mapping for fellestjenester (prosesstask o.l.)
+  - name: "abac.attributt.drift"
+    value: "no.nav.abac.attributter.foreldrepenger.drift"
