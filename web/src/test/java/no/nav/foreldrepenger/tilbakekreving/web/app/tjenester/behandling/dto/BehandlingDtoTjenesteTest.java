@@ -8,13 +8,14 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 
 import org.assertj.core.util.Lists;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -29,18 +30,33 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegMockUtil;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProviderImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.FpHendelseUnderTyper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingAktsomhetEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingPeriodeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMock;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMockUtil;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.foreldrepenger.tilbakekreving.web.app.rest.ResourceLink;
 
 public class BehandlingDtoTjenesteTest {
@@ -54,18 +70,15 @@ public class BehandlingDtoTjenesteTest {
     private FagsakRepository fagsakRepository = repositoryProvider.getFagsakRepository();
     private BehandlingTjeneste behandlingTjeneste = mock(BehandlingTjeneste.class);
     private VurdertForeldelseTjeneste foreldelseTjeneste = mock(VurdertForeldelseTjeneste.class);
-    private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository = mock(FaktaFeilutbetalingRepository.class);
-    private VilkårsvurderingRepository vilkårsvurderingRepository = mock(VilkårsvurderingRepository.class);
-    private KravgrunnlagRepository grunnlagRepository = mock(KravgrunnlagRepository.class);
+    private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository = repositoryProvider.getFaktaFeilutbetalingRepository();
+    private VilkårsvurderingRepository vilkårsvurderingRepository = repositoryProvider.getVilkårsvurderingRepository();
+    private KravgrunnlagRepository grunnlagRepository = repositoryProvider.getGrunnlagRepository();
     private BehandlingModellRepository behandlingModellRepository = new BehandlingModellRepositoryImpl(repositoryRule.getEntityManager());
-    private BehandlingDtoTjeneste behandlingDtoTjeneste = new BehandlingDtoTjeneste(behandlingTjeneste, foreldelseTjeneste, faktaFeilutbetalingRepository, vilkårsvurderingRepository, grunnlagRepository, behandlingModellRepository);
+    private BehandlingDtoTjeneste behandlingDtoTjeneste = new BehandlingDtoTjeneste(behandlingTjeneste, foreldelseTjeneste, repositoryProvider, behandlingModellRepository);
 
     private Saksnummer saksnummer = new Saksnummer(GYLDIG_SAKSNR);
-
-    @Before
-    public void setup() {
-        when(grunnlagRepository.harGrunnlagForBehandlingId(any())).thenReturn(true);
-    }
+    private static final LocalDate FOM = LocalDate.now().minusMonths(1);
+    private static final LocalDate TOM = LocalDate.now();
 
     @Test
     public void skal_hentUtvidetBehandlingResultat_medFaktaSteg() {
@@ -86,69 +99,16 @@ public class BehandlingDtoTjenesteTest {
             "beregne-feilutbetalt-belop",
             "aksjonspunkter",
             "feilutbetalingFakta",
-            "feilutbetalingAarsak");
+            "feilutbetalingAarsak",
+            "opprett-verge",
+            "fjern-verge");
     }
 
     @Test
     public void skal_hentUtvidetBehandlingResultat_medForeldelseSteg() {
         Behandling behandling = lagBehandling(BehandlingStegType.FORELDELSEVURDERINGSTEG, BehandlingStatus.UTREDES);
         when(behandlingTjeneste.hentBehandling(anyLong())).thenReturn(behandling);
-        when(faktaFeilutbetalingRepository.harDataForFaktaFeilutbetaling(anyLong())).thenReturn(true);
-
-        UtvidetBehandlingDto utvidetBehandlingDto = behandlingDtoTjeneste.hentUtvidetBehandlingResultat(1L, null);
-        assertUtvidetBehandlingDto(utvidetBehandlingDto);
-
-        assertThat(utvidetBehandlingDto.getLinks().stream().map(ResourceLink::getRel).collect(Collectors.toList())).containsOnly(
-            "bytt-behandlende-enhet",
-            "opne-for-endringer",
-            "henlegg-behandling",
-            "gjenoppta-behandling",
-            "sett-behandling-pa-vent",
-            "endre-pa-vent",
-            "lagre-aksjonspunkter",
-            "beregne-feilutbetalt-belop",
-            "aksjonspunkter",
-            "feilutbetalingFakta",
-            "feilutbetalingAarsak",
-            "perioderForeldelse",
-            "vilkarvurderingsperioder"
-        );
-    }
-
-    @Test
-    public void skal_hentUtvidetBehandlingResultat_medVilkårSteg() {
-        Behandling behandling = lagBehandling(BehandlingStegType.VTILBSTEG, BehandlingStatus.UTREDES);
-        when(behandlingTjeneste.hentBehandling(anyLong())).thenReturn(behandling);
-        when(faktaFeilutbetalingRepository.harDataForFaktaFeilutbetaling(anyLong())).thenReturn(true);
-        when(vilkårsvurderingRepository.harDataForVilkårsvurdering(anyLong())).thenReturn(false);
-
-        UtvidetBehandlingDto utvidetBehandlingDto = behandlingDtoTjeneste.hentUtvidetBehandlingResultat(1L, null);
-        assertUtvidetBehandlingDto(utvidetBehandlingDto);
-
-        assertThat(utvidetBehandlingDto.getLinks().stream().map(ResourceLink::getRel).collect(Collectors.toList())).containsOnly(
-            "bytt-behandlende-enhet",
-            "opne-for-endringer",
-            "henlegg-behandling",
-            "gjenoppta-behandling",
-            "sett-behandling-pa-vent",
-            "endre-pa-vent",
-            "lagre-aksjonspunkter",
-            "beregne-feilutbetalt-belop",
-            "aksjonspunkter",
-            "feilutbetalingFakta",
-            "feilutbetalingAarsak",
-            "perioderForeldelse",
-            "vilkarvurdering",
-            "vilkarvurderingsperioder"
-        );
-    }
-
-    @Test
-    public void skal_hentUtvidetBehandlingResultat_medVilkårSteg_når_vilkårsvurdering_finnes_allrede() {
-        Behandling behandling = lagBehandling(BehandlingStegType.VTILBSTEG, BehandlingStatus.UTREDES);
-        when(behandlingTjeneste.hentBehandling(anyLong())).thenReturn(behandling);
-        when(faktaFeilutbetalingRepository.harDataForFaktaFeilutbetaling(anyLong())).thenReturn(true);
-        when(vilkårsvurderingRepository.harDataForVilkårsvurdering(anyLong())).thenReturn(true);
+        lagFaktaFeilutbetaling(behandling.getId());
 
         UtvidetBehandlingDto utvidetBehandlingDto = behandlingDtoTjeneste.hentUtvidetBehandlingResultat(1L, null);
         assertUtvidetBehandlingDto(utvidetBehandlingDto);
@@ -167,7 +127,67 @@ public class BehandlingDtoTjenesteTest {
             "feilutbetalingAarsak",
             "perioderForeldelse",
             "vilkarvurderingsperioder",
-            "vilkarvurdering"
+            "opprett-verge",
+            "fjern-verge"
+        );
+    }
+
+    @Test
+    public void skal_hentUtvidetBehandlingResultat_medVilkårSteg() {
+        Behandling behandling = lagBehandling(BehandlingStegType.VTILBSTEG, BehandlingStatus.UTREDES);
+        when(behandlingTjeneste.hentBehandling(anyLong())).thenReturn(behandling);
+        lagFaktaFeilutbetaling(behandling.getId());
+
+        UtvidetBehandlingDto utvidetBehandlingDto = behandlingDtoTjeneste.hentUtvidetBehandlingResultat(1L, null);
+        assertUtvidetBehandlingDto(utvidetBehandlingDto);
+
+        assertThat(utvidetBehandlingDto.getLinks().stream().map(ResourceLink::getRel).collect(Collectors.toList())).containsOnly(
+            "bytt-behandlende-enhet",
+            "opne-for-endringer",
+            "henlegg-behandling",
+            "gjenoppta-behandling",
+            "sett-behandling-pa-vent",
+            "endre-pa-vent",
+            "lagre-aksjonspunkter",
+            "beregne-feilutbetalt-belop",
+            "aksjonspunkter",
+            "feilutbetalingFakta",
+            "feilutbetalingAarsak",
+            "perioderForeldelse",
+            "vilkarvurdering",
+            "vilkarvurderingsperioder",
+            "opprett-verge",
+            "fjern-verge"
+        );
+    }
+
+    @Test
+    public void skal_hentUtvidetBehandlingResultat_medVilkårSteg_når_vilkårsvurdering_finnes_allrede() {
+        Behandling behandling = lagBehandling(BehandlingStegType.VTILBSTEG, BehandlingStatus.UTREDES);
+        when(behandlingTjeneste.hentBehandling(anyLong())).thenReturn(behandling);
+        lagFaktaFeilutbetaling(behandling.getId());
+        lagVilkårsVurdering(behandling.getId());
+
+        UtvidetBehandlingDto utvidetBehandlingDto = behandlingDtoTjeneste.hentUtvidetBehandlingResultat(1L, null);
+        assertUtvidetBehandlingDto(utvidetBehandlingDto);
+
+        assertThat(utvidetBehandlingDto.getLinks().stream().map(ResourceLink::getRel).collect(Collectors.toList())).containsOnly(
+            "bytt-behandlende-enhet",
+            "opne-for-endringer",
+            "henlegg-behandling",
+            "gjenoppta-behandling",
+            "sett-behandling-pa-vent",
+            "endre-pa-vent",
+            "lagre-aksjonspunkter",
+            "beregne-feilutbetalt-belop",
+            "aksjonspunkter",
+            "feilutbetalingFakta",
+            "feilutbetalingAarsak",
+            "perioderForeldelse",
+            "vilkarvurderingsperioder",
+            "vilkarvurdering",
+            "opprett-verge",
+            "fjern-verge"
         );
     }
 
@@ -175,8 +195,8 @@ public class BehandlingDtoTjenesteTest {
     public void skal_hentUtvidetBehandlingResultat_medVedtakSteg() {
         Behandling behandling = lagBehandling(BehandlingStegType.FORESLÅ_VEDTAK, BehandlingStatus.UTREDES);
         when(behandlingTjeneste.hentBehandling(anyLong())).thenReturn(behandling);
-        when(faktaFeilutbetalingRepository.harDataForFaktaFeilutbetaling(anyLong())).thenReturn(true);
-        when(vilkårsvurderingRepository.harDataForVilkårsvurdering(anyLong())).thenReturn(true);
+        lagFaktaFeilutbetaling(behandling.getId());
+        lagVilkårsVurdering(behandling.getId());
 
         UtvidetBehandlingDto utvidetBehandlingDto = behandlingDtoTjeneste.hentUtvidetBehandlingResultat(1L, null);
         assertUtvidetBehandlingDto(utvidetBehandlingDto);
@@ -197,7 +217,9 @@ public class BehandlingDtoTjenesteTest {
             "vilkarvurdering",
             "vilkarvurderingsperioder",
             "beregningsresultat",
-            "vedtaksbrev"
+            "vedtaksbrev",
+            "opprett-verge",
+            "fjern-verge"
         );
     }
 
@@ -206,8 +228,6 @@ public class BehandlingDtoTjenesteTest {
         Behandling behandling = lagBehandling(BehandlingStegType.FORESLÅ_VEDTAK, BehandlingStatus.AVSLUTTET);
         when(behandlingTjeneste.hentBehandling(anyLong())).thenReturn(behandling);
         when(behandlingTjeneste.erBehandlingHenlagt(any(Behandling.class))).thenReturn(true);
-        when(faktaFeilutbetalingRepository.harDataForFaktaFeilutbetaling(anyLong())).thenReturn(false);
-        when(vilkårsvurderingRepository.harDataForVilkårsvurdering(anyLong())).thenReturn(false);
 
         UtvidetBehandlingDto utvidetBehandlingDto = behandlingDtoTjeneste.hentUtvidetBehandlingResultat(1L, null);
         assertUtvidetBehandlingDto(utvidetBehandlingDto);
@@ -227,9 +247,33 @@ public class BehandlingDtoTjenesteTest {
     }
 
     @Test
+    public void skal_hentUtvidetBehandlingResultat_medVergeAksjonspunkt(){
+        Behandling behandling = lagBehandling(BehandlingStegType.FAKTA_FEILUTBETALING, BehandlingStatus.UTREDES);
+        when(behandlingTjeneste.hentBehandling(anyLong())).thenReturn(behandling);
+        repositoryProvider.getAksjonspunktRepository().leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.AVKLAR_VERGE);
+
+        UtvidetBehandlingDto utvidetBehandlingDto = behandlingDtoTjeneste.hentUtvidetBehandlingResultat(1L, null);
+        assertUtvidetBehandlingDto(utvidetBehandlingDto);
+        assertThat(utvidetBehandlingDto.getLinks().stream().map(ResourceLink::getRel).collect(Collectors.toList())).containsOnly(
+            "bytt-behandlende-enhet",
+            "opne-for-endringer",
+            "henlegg-behandling",
+            "gjenoppta-behandling",
+            "sett-behandling-pa-vent",
+            "endre-pa-vent",
+            "lagre-aksjonspunkter",
+            "beregne-feilutbetalt-belop",
+            "aksjonspunkter",
+            "feilutbetalingFakta",
+            "feilutbetalingAarsak",
+            "opprett-verge",
+            "fjern-verge",
+            "soeker-verge");
+    }
+
+    @Test
     public void skal_hentAlleBehandlinger_medFaktaSteg() {
-        Behandling behandling = mockBehandling();
-        BehandlingStegMockUtil.nyBehandlingSteg(behandling, BehandlingStegType.FAKTA_FEILUTBETALING, BehandlingStatus.UTREDES);
+        Behandling behandling = lagBehandling(BehandlingStegType.FAKTA_FEILUTBETALING, BehandlingStatus.UTREDES);
         when(behandlingTjeneste.hentBehandlinger(saksnummer)).thenReturn(Lists.newArrayList(behandling));
 
         List<BehandlingDto> behandlingDtoListe = behandlingDtoTjeneste.hentAlleBehandlinger(saksnummer);
@@ -240,13 +284,13 @@ public class BehandlingDtoTjenesteTest {
             "brev-maler",
             "brev-bestill",
             "brev-forhandvis",
-            "handling-rettigheter");
+            "handling-rettigheter",
+            "finn-menyvalg-for-verge");
     }
 
     @Test
     public void skal_hentAlleBehandlinger_medFatteVedtakSteg() {
-        Behandling behandling = mockBehandling();
-        BehandlingStegMockUtil.nyBehandlingSteg(behandling, BehandlingStegType.FATTE_VEDTAK, BehandlingStatus.FATTER_VEDTAK);
+        Behandling behandling = lagBehandling(BehandlingStegType.FATTE_VEDTAK, BehandlingStatus.FATTER_VEDTAK);
         when(behandlingTjeneste.hentBehandlinger(saksnummer)).thenReturn(Lists.newArrayList(behandling));
 
         List<BehandlingDto> behandlingDtoListe = behandlingDtoTjeneste.hentAlleBehandlinger(saksnummer);
@@ -258,16 +302,16 @@ public class BehandlingDtoTjenesteTest {
             "brev-maler",
             "brev-bestill",
             "brev-forhandvis",
-            "handling-rettigheter");
+            "handling-rettigheter",
+            "finn-menyvalg-for-verge");
     }
 
     @Test
     public void skal_hentAlleBehandlinger_medVenterPåGrunnlagSteg() {
-        Behandling behandling = mockBehandling();
+        Behandling behandling = ScenarioSimple.simple().lagre(repositoryProvider);
         BehandlingStegMockUtil.nyBehandlingSteg(behandling, BehandlingStegType.TBKGSTEG, BehandlingStatus.UTREDES);
         when(behandlingTjeneste.hentBehandlinger(saksnummer)).thenReturn(Lists.newArrayList(behandling));
         when(behandlingTjeneste.erBehandlingHenlagt(any(Behandling.class))).thenReturn(false);
-        when(grunnlagRepository.harGrunnlagForBehandlingId(any())).thenReturn(false);
 
         List<BehandlingDto> behandlingDtoListe = behandlingDtoTjeneste.hentAlleBehandlinger(saksnummer);
         assertThat(behandlingDtoListe).isNotEmpty();
@@ -282,15 +326,10 @@ public class BehandlingDtoTjenesteTest {
             "brev-maler",
             "brev-bestill",
             "brev-forhandvis",
-            "handling-rettigheter");
+            "handling-rettigheter",
+            "finn-menyvalg-for-verge");
 
         assertThat(behandlingDto.isKanHenleggeBehandling()).isTrue();
-    }
-
-    private Behandling mockBehandling() {
-        return Behandling.nyBehandlingFor(
-            Fagsak.opprettNy(saksnummer, NavBruker.opprettNy(new AktørId(GYLDIG_AKTØR_ID), Språkkode.nb)),
-            BehandlingType.TILBAKEKREVING).build();
     }
 
     private Behandling lagBehandling(BehandlingStegType behandlingStegType, BehandlingStatus behandlingStatus) {
@@ -302,6 +341,7 @@ public class BehandlingDtoTjenesteTest {
         BehandlingStegMockUtil.nyBehandlingSteg(behandling, behandlingStegType, behandlingStatus);
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
         behandlingRepository.lagre(behandling, lås);
+        lagGrunnlag(behandling.getId());
         return behandling;
     }
 
@@ -320,5 +360,42 @@ public class BehandlingDtoTjenesteTest {
         assertThat(utvidetBehandlingDto).isNotNull();
         assertThat(utvidetBehandlingDto.getAnsvarligSaksbehandler()).isEqualTo("Z991136");
         assertThat(utvidetBehandlingDto.isBehandlingPåVent()).isFalse();
+    }
+
+    private void lagGrunnlag(long behandlingId) {
+        KravgrunnlagMock mockMedFeilPostering = new KravgrunnlagMock(FOM, TOM, KlasseType.FEIL, BigDecimal.valueOf(10000), BigDecimal.ZERO);
+        KravgrunnlagMock mockMedYtelPostering = new KravgrunnlagMock(FOM, TOM, KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(10000));
+        Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(com.google.common.collect.Lists.newArrayList(mockMedFeilPostering, mockMedYtelPostering));
+        grunnlagRepository.lagre(behandlingId, kravgrunnlag431);
+    }
+
+    private void lagFaktaFeilutbetaling(long behandlingId){
+        FaktaFeilutbetaling faktaFeilutbetaling = new FaktaFeilutbetaling();
+        FaktaFeilutbetalingPeriode faktaFeilutbetalingPeriode = FaktaFeilutbetalingPeriode.builder()
+            .medPeriode(FOM, TOM)
+            .medHendelseType(HendelseType.FP_UTTAK_UTSETTELSE_TYPE)
+            .medHendelseUndertype(FpHendelseUnderTyper.ARBEID_HELTID)
+            .medFeilutbetalinger(faktaFeilutbetaling)
+            .build();
+        faktaFeilutbetaling.leggTilFeilutbetaltPeriode(faktaFeilutbetalingPeriode);
+        faktaFeilutbetaling.setBegrunnelse("begrunnelse");
+        faktaFeilutbetalingRepository.lagre(behandlingId, faktaFeilutbetaling);
+    }
+
+    private void lagVilkårsVurdering(long behandlingId) {
+        VilkårVurderingEntitet vurdering = new VilkårVurderingEntitet();
+        VilkårVurderingPeriodeEntitet p = VilkårVurderingPeriodeEntitet.builder()
+            .medPeriode(FOM, TOM)
+            .medBegrunnelse("foo")
+            .medVilkårResultat(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER)
+            .medVurderinger(vurdering)
+            .build();
+        p.setAktsomhet(VilkårVurderingAktsomhetEntitet.builder()
+            .medAktsomhet(Aktsomhet.FORSETT)
+            .medBegrunnelse("foo")
+            .medPeriode(p)
+            .build());
+        vurdering.leggTilPeriode(p);
+        vilkårsvurderingRepository.lagre(behandlingId, vurdering);
     }
 }

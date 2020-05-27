@@ -4,6 +4,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.verge.AvklartVergeTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.verge.VergeDto;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.DtoTilServiceAdapter;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.AvklartVergeDto;
@@ -21,6 +22,18 @@ public class AvklartVergeOppdaterer implements AksjonspunktOppdaterer<AvklartVer
 
     @Override
     public void oppdater(AvklartVergeDto avklartVergeDto, Behandling behandling) {
-        avklartVergeTjeneste.lagreVergeInformasjon(behandling.getId(), avklartVergeDto.getVergeFakta());
+        avklartVergeTjeneste.lagreVergeInformasjon(behandling.getId(), lagVergeDto(avklartVergeDto));
+    }
+
+    private VergeDto lagVergeDto(AvklartVergeDto avklartVergeDto) {
+        VergeDto vergeDto = new VergeDto();
+        vergeDto.setFom(avklartVergeDto.getFom());
+        vergeDto.setTom(avklartVergeDto.getTom());
+        vergeDto.setFnr(avklartVergeDto.getFnr());
+        vergeDto.setOrganisasjonsnummer(avklartVergeDto.getOrganisasjonsnummer());
+        vergeDto.setNavn(avklartVergeDto.getNavn());
+        vergeDto.setBegrunnelse(avklartVergeDto.getBegrunnelse());
+        vergeDto.setVergeType(avklartVergeDto.getVergeType());
+        return vergeDto;
     }
 }

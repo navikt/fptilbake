@@ -6,7 +6,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingFeil;
-import no.nav.foreldrepenger.tilbakekreving.behandling.dto.VergeDto;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.VergeRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.KildeType;
@@ -41,24 +40,25 @@ public class AvklartVergeTjeneste {
         this.historikkTjenesteAdapter = historikkTjenesteAdapter;
     }
 
-    public void lagreVergeInformasjon(Long behandlingId, VergeDto vergeDto) {
+    public void lagreVergeInformasjon(Long behandlingId,
+                                      VergeDto vergeDto) {
         VergeEntitet.Builder builder = VergeEntitet.builder()
             .medKilde(KildeType.FPTILBAKE.name())
             .medGyldigPeriode(vergeDto.getFom(), vergeDto.getTom())
             .medNavn(vergeDto.getNavn())
-            .medVergeType(vergeDto.getVergeType());
-        if (vergeDto.getVergeType() != VergeType.ADVOKAT) {
-            builder.medVergeAktørId(hentAktørId(vergeDto));
-        } else {
+            .medVergeType(vergeDto.getVergeType())
+            .medBegrunnelse(vergeDto.getBegrunnelse());
+        if (VergeType.ADVOKAT.equals(vergeDto.getVergeType())) {
             builder.medOrganisasjonnummer(vergeDto.getOrganisasjonsnummer());
+        } else {
+            builder.medVergeAktørId(hentAktørId(vergeDto.getFnr()));
         }
         VergeEntitet vergeEntitet = builder.build();
         vergeRepository.lagreVergeInformasjon(behandlingId, vergeEntitet);
         lagHistorikkInnslagForVerge(behandlingId);
     }
 
-    private AktørId hentAktørId(VergeDto vergeDto) {
-        String fnr = vergeDto.getFnr();
+    private AktørId hentAktørId(String fnr) {
         Optional<AktørId> aktørId = tpsTjeneste.hentAktørForFnr(new PersonIdent(fnr));
         if (aktørId.isEmpty()) {
             throw BehandlingFeil.FACTORY.fantIkkePersonIdentMedFnr().toException();

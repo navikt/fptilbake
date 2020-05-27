@@ -6,15 +6,19 @@ import java.util.Objects;
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
-import javax.persistence.Convert;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.apache.http.util.Args;
+import org.hibernate.annotations.JoinColumnOrFormula;
+import org.hibernate.annotations.JoinColumnsOrFormulas;
+import org.hibernate.annotations.JoinFormula;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
@@ -36,10 +40,13 @@ public class VergeEntitet extends BaseEntitet {
         @AttributeOverride(name = "fom", column = @Column(name = "gyldig_fom", nullable = false)),
         @AttributeOverride(name = "tom", column = @Column(name = "gyldig_tom", nullable = false))
     })
-    private Periode gyldigPeriode;
+    private Periode gyldigPeriode; //NOSONAR
 
-    @Convert(converter = VergeType.KodeverdiConverter.class)
-    @Column(name = "verge_type", nullable = false)
+    @ManyToOne
+    @JoinColumnsOrFormulas(value = {
+        @JoinColumnOrFormula(formula = @JoinFormula(value = "'" + VergeType.DISCRIMINATOR + "'", referencedColumnName = "kodeverk")),
+        @JoinColumnOrFormula(column = @JoinColumn(name = "verge_type", referencedColumnName = "kode")),
+    })
     private VergeType vergeType = VergeType.UDEFINERT;
 
     @Column(name = "orgnr")
@@ -50,6 +57,9 @@ public class VergeEntitet extends BaseEntitet {
 
     @Column(name = "kilde", nullable = false)
     private String kilde;
+
+    @Column(name = "begrunnelse", nullable = false)
+    private String begrunnelse;
 
     VergeEntitet() {
         // Hibernate
@@ -105,6 +115,10 @@ public class VergeEntitet extends BaseEntitet {
         return kilde;
     }
 
+    public String getBegrunnelse() {
+        return begrunnelse;
+    }
+
     public static Builder builder() {
         return new Builder();
     }
@@ -144,11 +158,16 @@ public class VergeEntitet extends BaseEntitet {
             return this;
         }
 
+        public Builder medBegrunnelse(String begrunnelse) {
+            this.kladd.begrunnelse = begrunnelse;
+            return this;
+        }
 
         public VergeEntitet build() {
             Objects.requireNonNull(this.kladd.vergeType, "vergeType");
             Objects.requireNonNull(this.kladd.kilde, "kilde");
             Objects.requireNonNull(this.kladd.navn, "navn");
+            Objects.requireNonNull(this.kladd.begrunnelse, "begrunnelse");
 
             if (this.kladd.vergeAktørId == null) {
                 Args.notEmpty(this.kladd.organisasjonsnummer, "Organisasjonsnummer må finnes for verge organisasjon");

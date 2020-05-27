@@ -38,7 +38,7 @@ public class VergeTjenesteTest extends FellesTestOppsett {
     private BehandlingModellRepository behandlingModellRepository = new BehandlingModellRepositoryImpl(repoRule.getEntityManager());
     private BehandlingskontrollEventPubliserer eventPublisererMock = mock(BehandlingskontrollEventPubliserer.class);
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste = new BehandlingskontrollTjenesteImpl(repoProvider, behandlingModellRepository, eventPublisererMock);
-    private VergeTjeneste vergeTjeneste = new VergeTjeneste(behandlingskontrollTjeneste, gjenopptaBehandlingTjeneste,
+    private VergeTjeneste vergeTjeneste = new VergeTjeneste(behandlingskontrollTjeneste, behandlingskontrollAsynkTjeneste,
         repoProvider);
     private InternalManipulerBehandling manipulerBehandling = new InternalManipulerBehandlingImpl(repoProvider);
     private VergeRepository vergeRepository = repoProvider.getVergeRepository();
@@ -66,7 +66,8 @@ public class VergeTjenesteTest extends FellesTestOppsett {
             .medVergeType(VergeType.BARN)
             .medKilde(KildeType.FPTILBAKE.name())
             .medNavn("John Doe")
-            .medGyldigPeriode(FOM, TOM).build();
+            .medGyldigPeriode(FOM, TOM)
+            .medBegrunnelse("begunnlese").build();
         vergeRepository.lagreVergeInformasjon(internBehandlingId, vergeEntitet);
         repoProvider.getAksjonspunktRepository().leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.AVKLAR_VERGE, BehandlingStegType.FAKTA_VERGE);
         assertThat(vergeRepository.finnVergeInformasjon(internBehandlingId)).isNotEmpty();

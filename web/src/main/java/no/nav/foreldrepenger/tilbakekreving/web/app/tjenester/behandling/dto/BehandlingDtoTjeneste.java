@@ -16,11 +16,14 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurdertForeldelseTje
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingModell;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsak;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.VergeRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
@@ -44,6 +47,7 @@ public class BehandlingDtoTjeneste {
     private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository;
     private VilkårsvurderingRepository vilkårsvurderingRepository;
     private KravgrunnlagRepository grunnlagRepository;
+    private VergeRepository vergeRepository;
 
     private BehandlingModellRepository behandlingModellRepository;
 
@@ -54,15 +58,14 @@ public class BehandlingDtoTjeneste {
     @Inject
     public BehandlingDtoTjeneste(BehandlingTjeneste behandlingTjeneste,
                                  VurdertForeldelseTjeneste vurdertForeldelseTjeneste,
-                                 FaktaFeilutbetalingRepository faktaFeilutbetalingRepository,
-                                 VilkårsvurderingRepository vilkårsvurderingRepository,
-                                 KravgrunnlagRepository grunnlagRepository,
+                                 BehandlingRepositoryProvider repositoryProvider,
                                  BehandlingModellRepository behandlingModellRepository) {
         this.behandlingTjeneste = behandlingTjeneste;
         this.vurdertForeldelseTjeneste = vurdertForeldelseTjeneste;
-        this.faktaFeilutbetalingRepository = faktaFeilutbetalingRepository;
-        this.vilkårsvurderingRepository = vilkårsvurderingRepository;
-        this.grunnlagRepository = grunnlagRepository;
+        this.faktaFeilutbetalingRepository = repositoryProvider.getFaktaFeilutbetalingRepository();
+        this.vilkårsvurderingRepository = repositoryProvider.getVilkårsvurderingRepository();
+        this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
+        this.vergeRepository = repositoryProvider.getVergeRepository();
         this.behandlingModellRepository = behandlingModellRepository;
     }
 
@@ -80,6 +83,7 @@ public class BehandlingDtoTjeneste {
 
         // Behandlingsmeny-operasjoner
         dto.leggTil(new ResourceLink("/fptilbake/api/behandlinger/handling-rettigheter?behandlingId=" + behandling.getId(), "handling-rettigheter", ResourceLink.HttpMethod.GET));
+        dto.leggTil(new ResourceLink("/fptilbake/api/verge/behandlingsmeny", "finn-menyvalg-for-verge", ResourceLink.HttpMethod.GET));
 
         // Totrinnsbehandling
         if (BehandlingStatus.FATTER_VEDTAK.equals(behandling.getStatus())) {
@@ -92,7 +96,6 @@ public class BehandlingDtoTjeneste {
         dto.leggTil(new ResourceLink("/fptilbake/api/brev/maler?behandlingId=" + behandling.getId(), "brev-maler", ResourceLink.HttpMethod.GET));
         dto.leggTil(new ResourceLink("/fptilbake/api/brev/bestill", "brev-bestill", ResourceLink.HttpMethod.POST));
         dto.leggTil(new ResourceLink("/fptilbake/api/brev/forhandsvis", "brev-forhandvis", ResourceLink.HttpMethod.POST));
-
         return dto;
     }
 
@@ -109,7 +112,6 @@ public class BehandlingDtoTjeneste {
         if (taskStatus != null && !taskStatus.isPending()) {
             dto.setTaskStatus(taskStatus);
         }
-
         return dto;
     }
 
@@ -135,6 +137,7 @@ public class BehandlingDtoTjeneste {
         dto.setFørsteÅrsak(førsteÅrsak(behandling).orElse(null));
         dto.setBehandlingÅrsaker(lagBehandlingÅrsakDto(behandling));
         dto.setKanHenleggeBehandling(kanHenleggeBehandling(behandling));
+        vergeRepository.finnVergeInformasjon(behandling.getId()).ifPresent(verge -> dto.setHarVerge(true));
     }
 
     private List<BehandlingÅrsakDto> lagBehandlingÅrsakDto(Behandling behandling) {
@@ -157,7 +160,7 @@ public class BehandlingDtoTjeneste {
         return dto;
     }
 
-    private boolean kanHenleggeBehandling(Behandling behandling){
+    private boolean kanHenleggeBehandling(Behandling behandling) {
         return !behandling.erAvsluttet() && !grunnlagRepository.harGrunnlagForBehandlingId(behandling.getId());
     }
 
@@ -172,6 +175,10 @@ public class BehandlingDtoTjeneste {
         dto.leggTil(new ResourceLink("/fptilbake/api/behandling/aksjonspunkt", "lagre-aksjonspunkter", ResourceLink.HttpMethod.POST));
 
         dto.leggTil(new ResourceLink("/fptilbake/api/foreldelse/belop", "beregne-feilutbetalt-belop", ResourceLink.HttpMethod.POST));
+        if (!BehandlingStatus.AVSLUTTET.equals(dto.getStatus()) && !dto.isBehandlingPåVent()) {
+            dto.leggTil(new ResourceLink("/fptilbake/api/verge/opprett", "opprett-verge", ResourceLink.HttpMethod.POST));
+            dto.leggTil(new ResourceLink("/fptilbake/api/verge/fjern", "fjern-verge", ResourceLink.HttpMethod.POST));
+        }
     }
 
     private void settResourceLinks(Behandling behandling, UtvidetBehandlingDto dto, boolean behandlingHenlagt) {
@@ -184,7 +191,7 @@ public class BehandlingDtoTjeneste {
         boolean harDataForFaktaFeilutbetaling = faktaFeilutbetalingRepository.harDataForFaktaFeilutbetaling(behandlingId);
         boolean harVurdertForeldelse = vurdertForeldelseTjeneste.harVurdertForeldelse(behandlingId);
         boolean harDataForVilkårsvurdering = vilkårsvurderingRepository.harDataForVilkårsvurdering(behandlingId);
-
+        boolean harVergeAksjonspunkt = behandling.getAksjonspunktMedDefinisjonOptional(AksjonspunktDefinisjon.AVKLAR_VERGE).isPresent();
         leggTilLenkerForBehandlingsoperasjoner(dto);
 
         dto.leggTil(ResourceLink.get("/fptilbake/api/behandling/aksjonspunkt?behandlingId=" + behandlingId, "aksjonspunkter", null));
@@ -208,6 +215,9 @@ public class BehandlingDtoTjeneste {
         if (iEllerEtterForeslåVedtakSteg && !behandlingHenlagt) {
             dto.leggTil(ResourceLink.get("/fptilbake/api/beregning/resultat?behandlingId=" + behandlingId, "beregningsresultat", null));
             dto.leggTil(ResourceLink.get("/fptilbake/api/dokument/hent-vedtaksbrev?behandlingId=" + behandlingId, "vedtaksbrev", null));
+        }
+        if (harVergeAksjonspunkt) {
+            dto.leggTil(ResourceLink.get("/fptilbake/api/verge?behandlingId=" + behandlingId, "soeker-verge", null));
         }
 
     }
