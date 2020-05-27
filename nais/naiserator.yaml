@@ -66,11 +66,11 @@ spec:
    - name: {{@key}}
      value: "{{this}}"
   {{/each}}
-  - name: AUDITLOGGER_ENABLED
-    value: "true"
-  - name: AUDITLOGGER_VENDOR
-    value: "fp"
-  - name: AUDITLOGGER_PRODUCT
-    value: "fptilbake"
-  - name: ABAC_ATTRIBUTT_DRIFT
-    value: "no.nav.abac.attributter.foreldrepenger.drift"
+   - name: AUDITLOGGER_ENABLED
+     value: "true"
+   - name: AUDITLOGGER_VENDOR
+     value: "fp"
+   - name: AUDITLOGGER_PRODUCT
+     value: "fptilbake"
+   - name: ABAC_ATTRIBUTT_DRIFT
+     value: "no.nav.abac.attributter.foreldrepenger.drift"
