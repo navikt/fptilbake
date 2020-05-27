@@ -46,7 +46,7 @@ public class RestApiAbacTest {
     @Test
     public void sjekk_at_ingen_metoder_er_annotert_med_dummy_verdier() {
         for (Method metode : RestApiTester.finnAlleRestMetoder()) {
-            assertAtIngenBrukerDummyVerdierPåBeskyttetRessurs(metode);
+            assertResourceEllerPropertyIAnnotering(metode);
         }
     }
 
@@ -81,9 +81,15 @@ public class RestApiAbacTest {
         }
     }
 
-    private void assertAtIngenBrukerDummyVerdierPåBeskyttetRessurs(Method metode) {
+    private void assertResourceEllerPropertyIAnnotering(Method metode) {
         Class<?> klasse = metode.getDeclaringClass();
         BeskyttetRessurs annotation = metode.getAnnotation(BeskyttetRessurs.class);
+        if (annotation != null && !annotation.property().isEmpty()) {
+            if (annotation.property().equals("abac.attributt.drift")) {
+                return;
+            }
+            fail(klasse.getSimpleName() + "." + metode.getName() + " @" + annotation.getClass().getSimpleName() + " bruker ikke-støttet property: " + annotation.property());
+        }
         if (annotation != null && annotation.action() == BeskyttetRessursActionAttributt.DUMMY) {
             fail(klasse.getSimpleName() + "." + metode.getName() + " Ikke bruk DUMMY-verdi for "
                 + BeskyttetRessursActionAttributt.class.getSimpleName());

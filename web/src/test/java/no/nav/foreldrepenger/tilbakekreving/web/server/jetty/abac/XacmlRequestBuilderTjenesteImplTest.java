@@ -35,7 +35,6 @@ import no.nav.vedtak.sikkerhet.pdp.xacml.XacmlResponseWrapper;
 public class XacmlRequestBuilderTjenesteImplTest {
 
     public static final String JWT_TOKEN = "ew0KICAidHlwIjogIkpXVCIsDQogICJraWQiOiAiZm9vIiwNCiAgImFsZyI6ICJSUzI1NiINCn0.ew0KICAiYXVkIjogIk9JREMiLA0KICAiYXpwIjogIk9JREMiLA0KICAiYXV0aF90aW1lIjogMTQ5ODAzOTkxNCwNCiAgImV4cCI6IDE0OTgwNDM1MTUsDQogICJpYXQiOiAxNDk4MDM5OTE1LA0KICAiaXNzIjogImh0dHBzOi8vZm9vLmJhci5ubzo0NDMvaXNzby9vYXV0aDIiLA0KICAicmVhbG0iOiAiLyIsDQogICJzdWIiOiAic29tZW9uZSIsDQogICJ0b2tlblR5cGUiOiAiSldUVG9rZW4iDQp9.asdf";
-    private static final String PEP_ID = "pepId";
     private PdpKlientImpl pdpKlient;
     private PdpConsumer pdpConsumerMock;
     private XacmlRequestBuilderTjenesteImpl xamlRequestBuilderTjeneste;
@@ -44,7 +43,7 @@ public class XacmlRequestBuilderTjenesteImplTest {
     public void setUp() {
         pdpConsumerMock = mock(PdpConsumer.class);
         xamlRequestBuilderTjeneste = new XacmlRequestBuilderTjenesteImpl();
-        pdpKlient = new PdpKlientImpl(pdpConsumerMock, xamlRequestBuilderTjeneste, PEP_ID);
+        pdpKlient = new PdpKlientImpl(pdpConsumerMock, xamlRequestBuilderTjeneste);
     }
 
     @Test
