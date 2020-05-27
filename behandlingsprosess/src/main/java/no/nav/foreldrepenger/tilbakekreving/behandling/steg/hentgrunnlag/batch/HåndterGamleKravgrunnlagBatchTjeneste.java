@@ -63,7 +63,7 @@ public class HåndterGamleKravgrunnlagBatchTjeneste implements BatchTjeneste {
             logger.info("I dag er helg, kan ikke kjøre batch-en {}", BATCHNAVN);
             return batchRun;
         }
-        LocalDate bestemtDato = iDag.minus(venteFrist);
+        LocalDate bestemtDato = iDag.minus(venteFrist.multipliedBy(2));// hardkoded for nå, en midlertidig løsning. Det blir fjernet når batchen lanseres fullstending i PROD
         logger.info("Håndterer kravgrunnlag som er eldre enn {} i batch {}", bestemtDato, batchRun);
 
         List<ØkonomiXmlMottatt> alleGamleMeldinger = håndterGamleKravgrunnlagTjeneste.hentGamleMeldinger(bestemtDato);
