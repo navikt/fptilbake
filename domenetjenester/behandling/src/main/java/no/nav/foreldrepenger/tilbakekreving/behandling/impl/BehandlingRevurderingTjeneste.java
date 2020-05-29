@@ -20,6 +20,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.VergeRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
@@ -40,6 +42,7 @@ public class BehandlingRevurderingTjeneste {
     private BehandlingRepositoryProvider repositoryProvider;
     private BehandlingRepository behandlingRepository;
     private EksternBehandlingRepository eksternBehandlingRepository;
+    private VergeRepository vergeRepository;
 
     BehandlingRevurderingTjeneste() {
         // for CDI
@@ -50,6 +53,7 @@ public class BehandlingRevurderingTjeneste {
         this.repositoryProvider = repositoryProvider;
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
+        this.vergeRepository = repositoryProvider.getVergeRepository();
     }
 
     public Behandling opprettRevurdering(Long tilbakekrevingBehandlingId, BehandlingÅrsakType behandlingÅrsakType) {
@@ -96,6 +100,8 @@ public class BehandlingRevurderingTjeneste {
 
         opprettRelasjonMedEksternBehandling(eksternBehandlingId, revurdering, eksternUuid);
 
+        kopierVergeInformasjon(origBehandling.getId(), revurdering.getId());
+
         // lag historikkinnslag for Revurdering opprettet
         lagHistorikkInnslagForOpprettetRevurdering(revurdering, behandlingÅrsakType);
 
@@ -127,6 +133,13 @@ public class BehandlingRevurderingTjeneste {
     private void opprettRelasjonMedEksternBehandling(long eksternBehandlingId, Behandling revurdering, UUID eksternUuid) {
         EksternBehandling eksternBehandling = new EksternBehandling(revurdering, eksternBehandlingId, eksternUuid);
         eksternBehandlingRepository.lagre(eksternBehandling);
+    }
+
+    private void kopierVergeInformasjon(long origBehandlingId, long behandlingId){
+        Optional<VergeEntitet> vergeEntitet = vergeRepository.finnVergeInformasjon(origBehandlingId);
+        if(vergeEntitet.isPresent()){
+            vergeRepository.lagreVergeInformasjon(behandlingId, vergeEntitet.get());
+        }
     }
 
     private void lagHistorikkInnslagForOpprettetRevurdering(Behandling behandling, BehandlingÅrsakType revurderingÅrsak) {
