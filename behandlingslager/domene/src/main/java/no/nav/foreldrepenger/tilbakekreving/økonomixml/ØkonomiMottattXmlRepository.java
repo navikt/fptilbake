@@ -67,7 +67,9 @@ public class ØkonomiMottattXmlRepository {
         return query.getResultList();
     }
 
-    public void oppdaterMedEksternBehandlingIdOgSaksnummer(String eksternBehandlingId, String saksnummer, Long kravgrunnlagXmlId) {
+    public void oppdaterMedHenvisningOgSaksnummer(String henvisning, String saksnummer, Long kravgrunnlagXmlId) {
+        String eksternBehandlingId = henvisning;
+        //FIXME k9-tilbake, endre til 'henvisning'
         ØkonomiXmlMottatt entity = finnMottattXml(kravgrunnlagXmlId);
         Long eksisterendeVersjon = finnHøyesteVersjonsnummer(eksternBehandlingId);
         long nyVersjon = eksisterendeVersjon == null ? 1 : eksisterendeVersjon + 1;
@@ -86,42 +88,42 @@ public class ØkonomiMottattXmlRepository {
         return finnMottattXml(mottattXmlId).isTilkoblet();
     }
 
-    public List<ØkonomiXmlMottatt> hentAlleMeldingerUtenSaksnummer(){
+    public List<ØkonomiXmlMottatt> hentAlleMeldingerUtenSaksnummer() {
         TypedQuery<ØkonomiXmlMottatt> query = entityManager.createQuery("from ØkonomiXmlMottatt where saksnummer is null", ØkonomiXmlMottatt.class);
         return query.getResultList();
     }
 
-    public void oppdaterSaksnummer(Long kravgrunnlagXmlId, String saksnummer){
+    public void oppdaterSaksnummer(Long kravgrunnlagXmlId, String saksnummer) {
         ØkonomiXmlMottatt entity = finnMottattXml(kravgrunnlagXmlId);
         entity.setSaksnummer(saksnummer);
         entityManager.persist(entity);
     }
 
-    public List<ØkonomiXmlMottatt> hentGamleUkobledeMottattXml(LocalDateTime dato){
+    public List<ØkonomiXmlMottatt> hentGamleUkobledeMottattXml(LocalDateTime dato) {
         TypedQuery<ØkonomiXmlMottatt> query = entityManager.createQuery("from ØkonomiXmlMottatt where tilkoblet='N' and opprettetTidspunkt < :dato", ØkonomiXmlMottatt.class);
-        query.setParameter("dato",dato);
+        query.setParameter("dato", dato);
         return query.getResultList();
     }
 
-    public void arkiverMottattXml(Long mottattXmlId, String xml){
-        ØkonomiXmlMottattArkiv økonomiXmlMottattArkiv = new ØkonomiXmlMottattArkiv(mottattXmlId,xml);
+    public void arkiverMottattXml(Long mottattXmlId, String xml) {
+        ØkonomiXmlMottattArkiv økonomiXmlMottattArkiv = new ØkonomiXmlMottattArkiv(mottattXmlId, xml);
         entityManager.persist(økonomiXmlMottattArkiv);
         entityManager.flush();
     }
 
-    public ØkonomiXmlMottattArkiv finnArkivertMottattXml(Long mottattXmlId){
+    public ØkonomiXmlMottattArkiv finnArkivertMottattXml(Long mottattXmlId) {
         return entityManager.find(ØkonomiXmlMottattArkiv.class, mottattXmlId);
     }
 
-    public boolean erMottattXmlArkivert(Long mottattXmlId){
+    public boolean erMottattXmlArkivert(Long mottattXmlId) {
         TypedQuery<Long> query = entityManager.createQuery("select count(1) from ØkonomiXmlMottattArkiv arkiv where arkiv.id=:mottattXmlId", Long.class);
         query.setParameter("mottattXmlId", mottattXmlId);
         return query.getSingleResult() == 1;
     }
 
-    private Long finnHøyesteVersjonsnummer(String eksternBehandlingId) {
+    private Long finnHøyesteVersjonsnummer(String henvisning) {
         Query query = entityManager.createNativeQuery("select max(sekvens) from oko_xml_mottatt where ekstern_behandling_id=:eksternBehandlingId");
-        query.setParameter(KEY_EKSTERN_BEHANDLING_ID, eksternBehandlingId);
+        query.setParameter(KEY_EKSTERN_BEHANDLING_ID, henvisning);
         Object resultat = query.getSingleResult();
         return resultat != null ? ((BigDecimal) resultat).longValue() : null;
     }

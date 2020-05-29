@@ -81,7 +81,7 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
 
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto = new EksternBehandlingsinfoDto();
         eksternBehandlingsinfoDto.setSprakkode(Språkkode.nb);
-        when(mockEksternDataForBrevTjeneste.hentBehandlingFpsak(FPSAK_BEHANDLING_UUID))
+        when(mockEksternDataForBrevTjeneste.hentYtelsesbehandlingFraFagsystemet(FPSAK_BEHANDLING_UUID))
             .thenReturn(SamletEksternBehandlingInfo.builder()
                 .setGrunninformasjon(eksternBehandlingsinfoDto)
                 .build());

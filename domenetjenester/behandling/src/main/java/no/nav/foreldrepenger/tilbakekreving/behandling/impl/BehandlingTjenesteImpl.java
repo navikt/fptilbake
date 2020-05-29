@@ -173,7 +173,7 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
 
     @Override
     public boolean kanOppretteBehandling(Saksnummer saksnummer, UUID eksternUuid) {
-        return !(harÅpenBehandling(saksnummer) || harTilbakekrevingAlleredeFinnes(eksternUuid));
+        return !(harÅpenBehandling(saksnummer) || finnesTilbakekrevingsbehandlingForYtelsesbehandlingen(eksternUuid));
     }
 
     @Override
@@ -224,13 +224,10 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
     }
 
 
-    private Behandling opprettFørstegangsbehandling(Saksnummer saksnummer, UUID eksternUuid, Long eksternBehandlingId,
-                                                    AktørId aktørId, FagsakYtelseType fagsakYtelseType,
-                                                    BehandlingType behandlingType) {
+    private Behandling opprettFørstegangsbehandling(Saksnummer saksnummer, UUID eksternUuid, Long eksternBehandlingId, AktørId aktørId, FagsakYtelseType fagsakYtelseType, BehandlingType behandlingType) {
+        //FIXME k9-tilbake får ikke eksternBehandlingId
         logger.info("Oppretter Tilbakekrevingbehandling for [saksnummer: {} ] for ekstern Uuid [ {} ]", saksnummer, eksternUuid);
-
         validateHarIkkeÅpenTilbakekrevingBehandling(saksnummer, eksternUuid);
-
         boolean manueltOpprettet = false;
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto;
         if (aktørId == null) {
@@ -268,7 +265,7 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
         if (harÅpenBehandling(saksnummer)) {
             throw BehandlingFeil.FACTORY.kanIkkeOppretteTilbakekrevingBehandling(saksnummer).toException();
         }
-        if (harTilbakekrevingAlleredeFinnes(eksternUuid)) {
+        if (finnesTilbakekrevingsbehandlingForYtelsesbehandlingen(eksternUuid)) {
             throw BehandlingFeil.FACTORY.kanIkkeOppretteTilbakekrevingBehandling(eksternUuid).toException();
         }
     }
@@ -282,7 +279,7 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
             && BehandlingType.TILBAKEKREVING.equals(behandling.getType()));
     }
 
-    private boolean harTilbakekrevingAlleredeFinnes(UUID eksternUuid) {
+    private boolean finnesTilbakekrevingsbehandlingForYtelsesbehandlingen(UUID eksternUuid) {
         Optional<EksternBehandling> eksternBehandling = eksternBehandlingRepository.finnForSisteAvsluttetTbkBehandling(eksternUuid);
         if (eksternBehandling.isPresent()) {
             Behandling behandling = behandlingRepository.hentBehandling(eksternBehandling.get().getInternId());
@@ -306,6 +303,7 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
         prosessTaskRepository.lagre(prosessTaskData);
     }
 
+    //TODO verge bør flyttes til egen tjeneste
     private void hentVergeInformasjonFraFpsak(long behandlingId) {
         if (erTestMiljø()) {
             EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandlingId);
@@ -316,6 +314,7 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
         }
     }
 
+    //TODO verge bør flyttes til egen tjeneste
     private void lagreVergeInformasjon(long behandlingId, VergeDto vergeDto) {
         if (vergeDto.getGyldigTom().isBefore(LocalDate.now())) {
             logger.info("Verge informasjon er utløpt.Så kopierer ikke fra fpsak");

@@ -37,7 +37,7 @@ public class OppdaterBehandlingTask implements ProsessTaskHandler {
 
         Saksnummer saksnummer =  dataWrapper.getSaksnummer();
         UUID eksternUuid = UUID.fromString(dataWrapper.getBehandlingUuid());
-        long eksternBehandlingId = dataWrapper.getBehandlingId();
+        long eksternBehandlingId = dataWrapper.getEksternBehandlingId();
 
         behandlingTjeneste.oppdaterBehandlingMedEksternReferanse(saksnummer,eksternBehandlingId,eksternUuid);
     }

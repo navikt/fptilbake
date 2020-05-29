@@ -31,6 +31,8 @@ public class ØkonomiXmlMottatt extends KodeverkBaseEntitet {
     @Column(name = "melding", nullable = false)
     private String mottattXml;
 
+    //FIXME k9-tilbake opprett 'henvisning' og migrer ekstern_behandling_id til den.
+    //FIXME k9-tilbake når migrert, kan ekstern_behandling_id fjernes
     @Column(name = "ekstern_behandling_id")
     private String eksternBehandlingId;
 

@@ -18,6 +18,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.revurde
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.Tillegsinformasjon;
@@ -115,13 +116,13 @@ public class HåndterGamleKravgrunnlagTjeneste {
             KravgrunnlagValidator.validerGrunnlag(kravgrunnlag431);
             String saksnummer = finnSaksnummer(kravgrunnlag431.getFagSystemId());
             if (!finnesBehandling(saksnummer)) {
-                Long eksternBehandlingId = Long.valueOf(kravgrunnlag431.getReferanse());
-                Optional<EksternBehandlingsinfoDto> fpsakBehandling = hentDataFraFpsak(saksnummer, eksternBehandlingId);
-                if (fpsakBehandling.isEmpty()) {
+                String henvisning = kravgrunnlag431.getReferanse();
+                Optional<EksternBehandlingsinfoDto> ytelsebehandling = hentYtelsebehandlingFraFagsaksystemet(saksnummer, henvisning);
+                if (ytelsebehandling.isEmpty()) {
                     arkiverMotattXml(mottattXmlId, melding);
                     return Optional.of(mottattXmlId);
                 } else {
-                    håndterGyldigkravgrunnlag(mottattXmlId, saksnummer, kravgrunnlag431, fpsakBehandling.get());
+                    håndterGyldigkravgrunnlag(mottattXmlId, saksnummer, kravgrunnlag431, ytelsebehandling.get());
                 }
             } else {
                 håndterKravgrunnlagHvisBehandlingFinnes(mottattXmlId, kravgrunnlag431, saksnummer);
@@ -166,35 +167,39 @@ public class HåndterGamleKravgrunnlagTjeneste {
         return behandlinger.stream().filter(behandling -> !behandling.erAvsluttet()).findFirst();
     }
 
-    private Optional<EksternBehandlingsinfoDto> hentDataFraFpsak(String saksnummer, Long eksternBehandlingId) {
+    private Optional<EksternBehandlingsinfoDto> hentYtelsebehandlingFraFagsaksystemet(String saksnummer, String henvisning) {
+        //FIXME k9-tilbake Må tilpasse for å støtte også k9
+        Long fpsakBehandlingId = Long.valueOf(henvisning);
         List<EksternBehandlingsinfoDto> eksternBehandlinger = fpsakKlient.hentBehandlingForSaksnummer(saksnummer);
         if (!eksternBehandlinger.isEmpty()) {
             return eksternBehandlinger.stream()
-                .filter(eksternBehandlingsinfoDto -> eksternBehandlingsinfoDto.getId().equals(eksternBehandlingId)).findAny();
+                .filter(eksternBehandlingsinfoDto -> eksternBehandlingsinfoDto.getId().equals(fpsakBehandlingId)).findAny();
         }
         logger.warn("Saksnummer={} finnes ikke i fpsak", saksnummer);
         return Optional.empty();
     }
 
-    private void oppdaterMedEksternBehandlingIdOgSaksnummer(Long mottattXmlId, String eksternBehandlingId, String saksnummer) {
-        mottattXmlRepository.oppdaterMedEksternBehandlingIdOgSaksnummer(eksternBehandlingId, saksnummer, mottattXmlId);
+    private void oppdaterMedHenvisningOgSaksnummer(Long mottattXmlId, String henvisning, String saksnummer) {
+        mottattXmlRepository.oppdaterMedHenvisningOgSaksnummer(henvisning, saksnummer, mottattXmlId);
     }
 
     private long opprettBehandling(EksternBehandlingsinfoDto eksternBehandlingData) {
         UUID eksternBehandlingUuid = eksternBehandlingData.getUuid();
         SamletEksternBehandlingInfo samletEksternBehandlingInfo = fpsakKlient.hentBehandlingsinfo(eksternBehandlingUuid, Tillegsinformasjon.FAGSAK, Tillegsinformasjon.PERSONOPPLYSNINGER);
         FagsakYtelseType fagsakYtelseType = samletEksternBehandlingInfo.getFagsak().getSakstype();
-        return behandlingTjeneste.opprettBehandlingAutomatisk(samletEksternBehandlingInfo.getSaksnummer(), eksternBehandlingUuid, eksternBehandlingData.getId(),
-            samletEksternBehandlingInfo.getAktørId(), fagsakYtelseType, BehandlingType.TILBAKEKREVING);
+        Saksnummer saksnummer = samletEksternBehandlingInfo.getSaksnummer();
+        Long eksternBehandingId = eksternBehandlingData.getId(); //FIXME k9-tilbake vil ikke ha tilgang til k9-sak.behandlingId
+        AktørId aktørId = samletEksternBehandlingInfo.getAktørId();
+        return behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer, eksternBehandlingUuid, eksternBehandingId, aktørId, fagsakYtelseType, BehandlingType.TILBAKEKREVING);
     }
 
     private void håndterGyldigkravgrunnlag(Long mottattXmlId, String saksnummer,
                                            Kravgrunnlag431 kravgrunnlag431,
                                            EksternBehandlingsinfoDto eksternBehandlingData) {
-        String eksternBehandlingId = kravgrunnlag431.getReferanse();
-        oppdaterMedEksternBehandlingIdOgSaksnummer(mottattXmlId, eksternBehandlingId, saksnummer);
+        String henvisning = kravgrunnlag431.getReferanse();
+        oppdaterMedHenvisningOgSaksnummer(mottattXmlId, henvisning, saksnummer);
         if (kanOppretteBehandling()) {
-            Long behandlingId = opprettBehandling(eksternBehandlingData);
+            long behandlingId = opprettBehandling(eksternBehandlingData);
             logger.info("Behandling opprettet med behandlingId={}", behandlingId);
             lagreGrunnlag(behandlingId, kravgrunnlag431);
             tilkobleMottattXml(mottattXmlId);
@@ -246,9 +251,9 @@ public class HåndterGamleKravgrunnlagTjeneste {
     //midlertidig kode. skal fjernes etter en stund
     private boolean kanOppretteBehandling() {
         boolean isEnabled = false;
-        if(!Environment.current().isProd()){
+        if (!Environment.current().isProd()) {
             isEnabled = true;
-        }else if (antallBehandlingOprettet < 0) {
+        } else if (antallBehandlingOprettet < 0) {
             logger.info("Antall behandling opprettet av batch-en er {}", antallBehandlingOprettet);
             isEnabled = true;
         }

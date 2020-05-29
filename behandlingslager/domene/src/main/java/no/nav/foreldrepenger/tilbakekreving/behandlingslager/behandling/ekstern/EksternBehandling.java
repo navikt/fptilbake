@@ -28,6 +28,7 @@ public class EksternBehandling extends BaseEntitet {
     @Column(name = "intern_id", nullable = false)
     private Long internId;
 
+    //TODO k9-tilbake kan denne raden fjernes nå som vi har ekstern_uuid?
     @Column(name = "ekstern_id", nullable = false)
     private Long eksternId;
 
@@ -38,6 +39,8 @@ public class EksternBehandling extends BaseEntitet {
     @NaturalId
     @Column(name = "ekstern_uuid")
     private UUID eksternUuid;
+
+    //FIXME k9-tilbake legg til String henvisning, og migrer inn i eksisterende rader
 
     EksternBehandling() {
         // Hibernate

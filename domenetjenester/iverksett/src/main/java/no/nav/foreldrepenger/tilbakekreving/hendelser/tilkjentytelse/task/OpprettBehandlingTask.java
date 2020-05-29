@@ -38,14 +38,14 @@ public class OpprettBehandlingTask implements ProsessTaskHandler {
         HendelseTaskDataWrapper dataWrapper = new HendelseTaskDataWrapper(taskData);
         dataWrapper.validerTaskDataOpprettBehandling();
 
-        String externBehandlingUuid = dataWrapper.getBehandlingUuid();
-        long eksternBehandlingId = dataWrapper.getBehandlingId();
+        String eksternBehandlingUuid = dataWrapper.getBehandlingUuid();
+        long eksternBehandlingId = dataWrapper.getEksternBehandlingId();
         Saksnummer saksnummer = dataWrapper.getSaksnummer();
         AktørId aktørId = dataWrapper.getAktørId();
         BehandlingType behandlingType = dataWrapper.getBehandlingType();
         FagsakYtelseType fagsakYtelseType = dataWrapper.getFagsakYtelseType();
 
-        opprettBehandling(saksnummer, UUID.fromString(externBehandlingUuid), eksternBehandlingId, aktørId, fagsakYtelseType, behandlingType);
+        opprettBehandling(saksnummer, UUID.fromString(eksternBehandlingUuid), eksternBehandlingId, aktørId, fagsakYtelseType, behandlingType);
     }
 
     private void opprettBehandling(Saksnummer saksnummer, UUID eksternUuid, long eksternBehandlingId,
