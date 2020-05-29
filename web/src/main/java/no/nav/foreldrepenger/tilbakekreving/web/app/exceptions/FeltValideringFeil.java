@@ -17,4 +17,9 @@ interface FeltValideringFeil extends DeklarerteFeil{
         feilmelding = "Det oppstod en valideringsfeil på felt %s. Vennligst kontroller at alle feltverdier er korrekte.",
         løsningsforslag = "Kontroller at alle feltverdier er korrekte" ,logLevel = LogLevel.WARN)
     Feil feltverdiKanIkkeValideres(List<String> feltnavn);
+
+    @FunksjonellFeil(feilkode = "FPT-328673",
+        feilmelding = "Det oppstod en valideringsfeil på felt %s for aksjonspunktkode %s. Vennligst kontroller at alle feltverdier er korrekte.",
+        løsningsforslag = "Kontroller at alle feltverdier er korrekte" ,logLevel = LogLevel.WARN)
+    Feil feltverdiKanIkkeValideres(List<String> feltnavn, List<String> aksjonspunktKoder);
 }
