@@ -67,7 +67,7 @@ spec:
      value: "{{this}}"
   {{/each}}
    - name: AUDITLOGGER_ENABLED
-     value: "true"
+     value: "false"
    - name: AUDITLOGGER_VENDOR
      value: "fp"
    - name: AUDITLOGGER_PRODUCT
