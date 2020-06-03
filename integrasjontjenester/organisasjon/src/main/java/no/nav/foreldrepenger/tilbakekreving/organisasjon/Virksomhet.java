@@ -77,7 +77,6 @@ public class Virksomhet {
     public String toString() {
         return "Virksomhet{" +
                 "navn=" + navn +
-                ", orgnr=" + orgnr +
                 '}';
     }
 

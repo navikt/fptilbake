@@ -12,6 +12,9 @@ import javax.transaction.Transactional;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.AdresseType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodelisteNavnI18N;
@@ -20,6 +23,7 @@ import no.nav.foreldrepenger.tilbakekreving.domene.person.TpsTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.Tillegsinformasjon;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.KodeDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.organisasjon.Virksomhet;
 import no.nav.foreldrepenger.tilbakekreving.organisasjon.VirksomhetTjeneste;
@@ -97,14 +101,24 @@ public class EksternDataForBrevTjeneste {
         return adresseinfo.get();
     }
 
-    public Adresseinfo hentOrganisasjonAdresse(String organisasjonNummer, String vergeNavn, Personinfo personinfo) {
+    public Adresseinfo hentAdresse(Personinfo personinfo, Optional<VergeEntitet> vergeEntitet) {
+        if(vergeEntitet.isPresent()){
+            VergeEntitet verge = vergeEntitet.get();
+            if(VergeType.ADVOKAT.equals(verge.getVergeType())){
+                return hentOrganisasjonAdresse(verge.getOrganisasjonsnummer(),verge.getNavn(), personinfo);
+            }
+        }
+        return hentAdresse(personinfo,personinfo.getAktørId().getId());
+    }
+
+    private Adresseinfo hentOrganisasjonAdresse(String organisasjonNummer, String vergeNavn, Personinfo personinfo) {
         try {
             Virksomhet virksomhet = virksomhetTjeneste.hentOrganisasjon(organisasjonNummer);
             return fra(virksomhet, vergeNavn, personinfo);
         } catch (HentOrganisasjonOrganisasjonIkkeFunnet e) {
-            throw EksternDataForBrevFeil.FACTORY.organisasjonIkkeFunnet(organisasjonNummer, e).toException();
+            throw EksternDataForBrevFeil.FACTORY.organisasjonIkkeFunnet(e).toException();
         } catch (HentOrganisasjonUgyldigInput e) {
-            throw EksternDataForBrevFeil.FACTORY.ugyldigInput(organisasjonNummer, e).toException();
+            throw EksternDataForBrevFeil.FACTORY.ugyldigInput(e).toException();
         }
     }
 

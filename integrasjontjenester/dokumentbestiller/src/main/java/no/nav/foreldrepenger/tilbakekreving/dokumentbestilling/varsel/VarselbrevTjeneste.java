@@ -47,6 +47,7 @@ public class VarselbrevTjeneste {
 
     private static final Logger logger = LoggerFactory.getLogger(VarselbrevTjeneste.class);
     private static final String TITTEL_VARSELBREV_HISTORIKKINNSLAG = "Varselbrev Tilbakekreving";
+    private static final String TITTEL_VARSELBREV_HISTORIKKINNSLAG_TIL_VERGE = "Varselbrev Tilbakekreving til Verge";
 
     private BehandlingRepository behandlingRepository;
     private EksternBehandlingRepository eksternBehandlingRepository;
@@ -92,7 +93,7 @@ public class VarselbrevTjeneste {
             .build();
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         JournalpostIdOgDokumentId dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data);
-        opprettHistorikkinnslag(behandling, dokumentreferanse);
+        opprettHistorikkinnslag(behandling, dokumentreferanse, brevMottaker);
         lagreInfoOmVarselbrev(behandlingId, dokumentreferanse);
         return Optional.of(dokumentreferanse);
     }
@@ -114,12 +115,13 @@ public class VarselbrevTjeneste {
         return bestillDokumentTjeneste.hentForhåndsvisningFritekstbrev(data);
     }
 
-    private void opprettHistorikkinnslag(Behandling behandling, JournalpostIdOgDokumentId dokumentreferanse) {
+    private void opprettHistorikkinnslag(Behandling behandling, JournalpostIdOgDokumentId dokumentreferanse, BrevMottaker brevMottaker) {
+        String tittel = BrevMottaker.VERGE.equals(brevMottaker) ? TITTEL_VARSELBREV_HISTORIKKINNSLAG_TIL_VERGE : TITTEL_VARSELBREV_HISTORIKKINNSLAG;
         historikkinnslagTjeneste.opprettHistorikkinnslagForBrevsending(
             behandling,
             dokumentreferanse.getJournalpostId(),
             dokumentreferanse.getDokumentId(),
-            TITTEL_VARSELBREV_HISTORIKKINNSLAG);
+            tittel);
     }
 
     private void lagreInfoOmVarselbrev(Long behandlingId, JournalpostIdOgDokumentId dokumentreferanse) {
@@ -148,9 +150,9 @@ public class VarselbrevTjeneste {
         Saksnummer saksnummer = behandling.getFagsak().getSaksnummer();
         SamletEksternBehandlingInfo eksternBehandlingsinfoDto = eksternDataForBrevTjeneste.hentYtelsesbehandlingFraFagsystemet(eksternBehandling.getEksternUuid(), Tillegsinformasjon.PERSONOPPLYSNINGER);
         //Henter data fra tps
-        String aktørId = getAktørId(finnesVerge,behandling,vergeEntitet);
+        String aktørId = getMottakerAktørId(behandling,vergeEntitet);
         Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(aktørId);
-        Adresseinfo adresseinfo = hentAdresse(finnesVerge,personinfo,vergeEntitet);
+        Adresseinfo adresseinfo = eksternDataForBrevTjeneste.hentAdresse(personinfo,vergeEntitet);
 
         //Henter fagsaktypenavn på riktig språk
         Språkkode mottakersSpråkkode = eksternBehandlingsinfoDto.getGrunninformasjon().getSpråkkodeEllerDefault();
@@ -189,9 +191,9 @@ public class VarselbrevTjeneste {
         Optional<VergeEntitet> vergeEntitet = behandling != null ? vergeRepository.finnVergeInformasjon(behandling.getId()) : Optional.empty();
         boolean finnesVerge = vergeEntitet.isPresent();
 
-        String aktørId = finnesVerge ? getAktørId(finnesVerge, behandling,vergeEntitet) : eksternBehandlingsinfo.getAktørId().getId();
+        String aktørId = finnesVerge ? getMottakerAktørId(behandling,vergeEntitet) : eksternBehandlingsinfo.getAktørId().getId();
         Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(aktørId);
-        Adresseinfo adresseinfo = hentAdresse(finnesVerge, personinfo, vergeEntitet);
+        Adresseinfo adresseinfo = eksternDataForBrevTjeneste.hentAdresse(personinfo, vergeEntitet);
         FeilutbetaltePerioderDto feilutbetaltePerioderDto = eksternDataForBrevTjeneste.hentFeilutbetaltePerioder(grunninformasjon.getId());
         Språkkode mottakersSpråkkode = grunninformasjon.getSpråkkodeEllerDefault();
         YtelseNavn ytelseNavn = eksternDataForBrevTjeneste.hentYtelsenavn(fagsakYtleseType, mottakersSpråkkode);
@@ -211,26 +213,15 @@ public class VarselbrevTjeneste {
         varselRepository.lagreVarseltBeløp(behandlingId, varseltBeløp);
     }
 
-    private String getAktørId(boolean finnesVerge, Behandling behandling, Optional<VergeEntitet> vergeEntitet) {
+    private String getMottakerAktørId(Behandling behandling, Optional<VergeEntitet> vergeEntitet) {
         String aktørId = behandling.getAktørId().getId();
-        if (finnesVerge && vergeEntitet.isPresent()) {
+        if (vergeEntitet.isPresent()) {
             VergeEntitet verge = vergeEntitet.get();
             if (!VergeType.ADVOKAT.equals(verge.getVergeType())) {
                 aktørId = verge.getVergeAktørId().getId();
             }
         }
         return aktørId;
-    }
-
-    private Adresseinfo hentAdresse(boolean finnesVerge, Personinfo personinfo, Optional<VergeEntitet> vergeEntitet) {
-        Adresseinfo adresseinfo = eksternDataForBrevTjeneste.hentAdresse(personinfo,personinfo.getAktørId().getId());
-        if(finnesVerge && vergeEntitet.isPresent()){
-            VergeEntitet verge = vergeEntitet.get();
-            if(VergeType.ADVOKAT.equals(verge.getVergeType())){
-                adresseinfo = eksternDataForBrevTjeneste.hentOrganisasjonAdresse(verge.getOrganisasjonsnummer(),verge.getNavn(), personinfo);
-            }
-        }
-        return adresseinfo;
     }
 
 }

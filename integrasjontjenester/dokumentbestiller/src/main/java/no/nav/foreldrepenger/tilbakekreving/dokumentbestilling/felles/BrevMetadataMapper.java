@@ -47,7 +47,7 @@ public class BrevMetadataMapper {
 
         MottakerType mottakerType = new MottakerType();
         mottakerType.setMottakerTypeKode(IdKodeType.PERSON);
-        mottakerType.setMottakerId(brevMetadata.getMottakerAdresse().getOrganisasjonNummer() != null ? brevMetadata.getMottakerAdresse().getOrganisasjonNummer()
+        mottakerType.setMottakerId(brevMetadata.getMottakerAdresse().getVergeOrganisasjonNummer() != null ? brevMetadata.getMottakerAdresse().getVergeOrganisasjonNummer()
             : brevMetadata.getMottakerAdresse().getPersonIdent().getIdent());
         mottakerType.setMottakerNavn(brevMetadata.getMottakerAdresse().getMottakerNavn());
         mottakerType.setMottakerAdresse(settMottakeradresse(brevMetadata.getMottakerAdresse()));

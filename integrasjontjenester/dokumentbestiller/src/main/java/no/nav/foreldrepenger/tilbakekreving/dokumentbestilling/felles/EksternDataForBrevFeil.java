@@ -26,9 +26,9 @@ public interface EksternDataForBrevFeil extends DeklarerteFeil {
     @TekniskFeil(feilkode = "FPT-748279", feilmelding = "Fant ikke behandling med behandlingId %s fpoppdrag", logLevel = LogLevel.WARN)
     Feil fantIkkeYtelesbehandlingISimuleringsapplikasjonen(Long behandlingId);
 
-    @IntegrasjonFeil(feilkode = "FPT-254132", feilmelding = "Fant ikke organisasjon for orgNummer %s", exceptionClass = OrganisasjonIkkeFunnetException.class, logLevel = LogLevel.WARN)
-    Feil organisasjonIkkeFunnet(String orgnr, HentOrganisasjonOrganisasjonIkkeFunnet årsak);
+    @IntegrasjonFeil(feilkode = "FPT-254132", feilmelding = "Fant ikke organisasjon", exceptionClass = OrganisasjonIkkeFunnetException.class, logLevel = LogLevel.WARN)
+    Feil organisasjonIkkeFunnet(HentOrganisasjonOrganisasjonIkkeFunnet årsak);
 
-    @IntegrasjonFeil(feilkode= "FPT-934726", feilmelding = "Input orgNummer %s er ugyldig", exceptionClass = OrganisasjonUgyldigInputException.class, logLevel = LogLevel.WARN)
-    Feil ugyldigInput(String orgnr, HentOrganisasjonUgyldigInput årsak);
+    @IntegrasjonFeil(feilkode= "FPT-934726", feilmelding = "Input organisasjon nummer er ugyldig", exceptionClass = OrganisasjonUgyldigInputException.class, logLevel = LogLevel.WARN)
+    Feil ugyldigInput(HentOrganisasjonUgyldigInput årsak);
 }
