@@ -12,10 +12,14 @@ import java.util.Scanner;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.AdresseType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.PersonstatusType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.handlebars.dto.VarselbrevDokument;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
 public class TekstformatererVarselbrevTest {
@@ -35,6 +39,7 @@ public class TekstformatererVarselbrevTest {
             .medFagsaktype(svangerskapspengerkode)
             .medSprakkode(Språkkode.nn)
             .medFagsaktypenavnPåSpråk("svangerskapspengar")
+            .medMottakerAdresse(lagAdresseInfo())
             .build();
 
         VarselbrevSamletInfo varselbrevSamletInfo = new VarselbrevSamletInfo.Builder()
@@ -58,6 +63,7 @@ public class TekstformatererVarselbrevTest {
             .medFagsaktype(engangsstønadkode)
             .medSprakkode(Språkkode.nb)
             .medFagsaktypenavnPåSpråk("eingongsstønad")
+            .medMottakerAdresse(lagAdresseInfo())
             .build();
 
         VarselbrevSamletInfo varselbrevSamletInfo = new VarselbrevSamletInfo.Builder()
@@ -81,6 +87,7 @@ public class TekstformatererVarselbrevTest {
             .medFagsaktype(foreldrepengerkode)
             .medSprakkode(Språkkode.nb)
             .medFagsaktypenavnPåSpråk("foreldrepenger")
+            .medMottakerAdresse(lagAdresseInfo())
             .build();
 
         VarselbrevSamletInfo varselbrevSamletInfo = new VarselbrevSamletInfo.Builder()
@@ -104,6 +111,7 @@ public class TekstformatererVarselbrevTest {
             .medSprakkode(Språkkode.nn)
             .medFagsaktype(foreldrepengerkode)
             .medFagsaktypenavnPåSpråk("foreldrepenger")
+            .medMottakerAdresse(lagAdresseInfo())
             .build();
 
         VarselbrevSamletInfo varselbrevSamletInfo = new VarselbrevSamletInfo.Builder()
@@ -133,6 +141,7 @@ public class TekstformatererVarselbrevTest {
             .medFagsaktype(foreldrepengerkode)
             .medSprakkode(Språkkode.en)
             .medFagsaktypenavnPåSpråk("foreldrepengar")
+            .medMottakerAdresse(lagAdresseInfo())
             .build();
 
         VarselbrevSamletInfo varselbrevSamletInfo = new VarselbrevSamletInfo.Builder()
@@ -256,6 +265,32 @@ public class TekstformatererVarselbrevTest {
         assertThat(overskrift).isEqualToNormalizingNewlines(fasit);
     }
 
+    @Test
+    public void skal_generere_varselbrev_for_verge() throws IOException{
+        BrevMetadata metadata = new BrevMetadata.Builder()
+            .medFagsaktype(foreldrepengerkode)
+            .medSprakkode(Språkkode.nb)
+            .medFagsaktypenavnPåSpråk("foreldrepenger")
+            .medMottakerAdresse(lagAdresseInfo())
+            .build();
+
+        VarselbrevSamletInfo varselbrevSamletInfo = new VarselbrevSamletInfo.Builder()
+            .medFritekstFraSaksbehandler("Dette er fritekst skrevet av saksbehandler.")
+            .medSumFeilutbetaling(595959L)
+            .medFeilutbetaltePerioder(mockFeilutbetalingerMedKunEnPeriode())
+            .medFristdato(FRIST_DATO)
+            .medRevurderingVedtakDato(REVURDERING_VEDTAK_DATO)
+            .medMetadata(metadata)
+            .medFinnesVerge(true)
+            .build();
+
+        String generertBrev = TekstformatererVarselbrev.lagVarselbrevFritekst(varselbrevSamletInfo);
+
+        String fasit = les("/varselbrev/nb/FP_en_periode.txt");
+        String vergeTekst = les("/varselbrev/nb/verge.txt");
+        assertThat(generertBrev).isEqualToNormalizingNewlines(fasit+"\n"+"\n"+ vergeTekst);
+    }
+
     private List<Periode> mockFeilutbetalingerMedFlerePerioder() {
         Periode periode1 = new Periode(LocalDate.of(2019, 3, 3), LocalDate.of(2020, 3, 3));
         Periode periode2 = new Periode(LocalDate.of(2022, 3, 3), LocalDate.of(2024, 3, 3));
@@ -280,6 +315,10 @@ public class TekstformatererVarselbrevTest {
             scanner.useDelimiter("\\A");
             return scanner.hasNext() ? scanner.next() : null;
         }
+    }
+
+    private Adresseinfo lagAdresseInfo(){
+        return new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE,new PersonIdent("123456"),"John Doe", PersonstatusType.BOSA).build();
     }
 
 }

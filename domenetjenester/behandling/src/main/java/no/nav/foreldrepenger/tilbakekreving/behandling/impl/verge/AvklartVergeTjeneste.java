@@ -5,6 +5,8 @@ import java.util.Optional;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import org.apache.http.util.Asserts;
+
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingFeil;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.VergeRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
@@ -19,12 +21,14 @@ import no.nav.foreldrepenger.tilbakekreving.domene.person.TpsTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
+import no.nav.foreldrepenger.tilbakekreving.organisasjon.VirksomhetTjeneste;
 
 @ApplicationScoped
 public class AvklartVergeTjeneste {
 
     private VergeRepository vergeRepository;
     private TpsTjeneste tpsTjeneste;
+    private VirksomhetTjeneste virksomhetTjeneste;
     private HistorikkTjenesteAdapter historikkTjenesteAdapter;
 
     AvklartVergeTjeneste() {
@@ -34,9 +38,11 @@ public class AvklartVergeTjeneste {
     @Inject
     public AvklartVergeTjeneste(VergeRepository vergeRepository,
                                 TpsTjeneste tpsTjeneste,
+                                VirksomhetTjeneste virksomhetTjeneste,
                                 HistorikkTjenesteAdapter historikkTjenesteAdapter) {
         this.vergeRepository = vergeRepository;
         this.tpsTjeneste = tpsTjeneste;
+        this.virksomhetTjeneste = virksomhetTjeneste;
         this.historikkTjenesteAdapter = historikkTjenesteAdapter;
     }
 
@@ -49,6 +55,7 @@ public class AvklartVergeTjeneste {
             .medVergeType(vergeDto.getVergeType())
             .medBegrunnelse(vergeDto.getBegrunnelse());
         if (VergeType.ADVOKAT.equals(vergeDto.getVergeType())) {
+            Asserts.check(virksomhetTjeneste.validerOrganisasjon(vergeDto.getOrganisasjonsnummer()),"OrgansisasjonNummer er ikke gyldig");
             builder.medOrganisasjonnummer(vergeDto.getOrganisasjonsnummer());
         } else {
             builder.medVergeAktørId(hentAktørId(vergeDto.getFnr()));

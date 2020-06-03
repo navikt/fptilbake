@@ -16,6 +16,8 @@ public class VarselbrevDokument extends BaseDokument {
     private Periode datoerHvisSammenhengendePeriode;
     private LocalDate varsletDato;
     private Long varsletBeløp;
+    private boolean finnesVerge;
+    private String mottakerNavn;
 
     public Long getBeløp() {
         return beløp;
@@ -81,6 +83,23 @@ public class VarselbrevDokument extends BaseDokument {
         this.varsletBeløp = varsletBeløp;
     }
 
+    public boolean isFinnesVerge() {
+        return finnesVerge;
+    }
+
+    public void setFinnesVerge(boolean finnesVerge) {
+        this.finnesVerge = finnesVerge;
+    }
+
+
+    public String getMottakerNavn() {
+        return mottakerNavn;
+    }
+
+    public void setMottakerNavn(String mottakerNavn) {
+        this.mottakerNavn = mottakerNavn;
+    }
+
     public void valider() {
         Objects.requireNonNull(beløp, "totalbeløp fra fpoppdrag/oppdragssystemet");
         Objects.requireNonNull(endringsdato, "endringsdato");
@@ -104,6 +123,10 @@ public class VarselbrevDokument extends BaseDokument {
         if(isKorrigert()){
             Objects.requireNonNull(varsletDato, "varsletDato");
             Objects.requireNonNull(varsletBeløp, "varsletBelop");
+        }
+
+        if(finnesVerge){
+            Objects.requireNonNull(mottakerNavn,"mottakerNavn");
         }
     }
 

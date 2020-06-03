@@ -41,7 +41,8 @@ public class VarselbrevUtil {
                                                                                Period ventetid,
                                                                                FagsakYtelseType fagsakYtelseType,
                                                                                YtelseNavn ytelseNavn,
-                                                                               String varselTekst) {
+                                                                               String varselTekst,
+                                                                               boolean finnesVerge) {
 
         EksternBehandlingsinfoDto grunninformasjon = eksternBehandlingsinfoDto.getGrunninformasjon();
         BrevMetadata metadata = new BrevMetadata.Builder()
@@ -65,6 +66,7 @@ public class VarselbrevUtil {
             .medFeilutbetaltePerioder(mapFeilutbetaltePerioder(feilutbetaltePerioderDto))
             .medFristdato(finnFristForTilbakemeldingFraBruker(LocalDateTime.now(), ventetid))
             .medRevurderingVedtakDato(grunninformasjon.getVedtakDato())
+            .medFinnesVerge(finnesVerge)
             .build();
     }
 
@@ -76,7 +78,8 @@ public class VarselbrevUtil {
                                                                                               FeilutbetaltePerioderDto feilutbetaltePerioderDto,
                                                                                               Period ventetid,
                                                                                               FagsakYtelseType fagsakYtelseType,
-                                                                                              YtelseNavn ytelseNavn) {
+                                                                                              YtelseNavn ytelseNavn,
+                                                                                              boolean finnesVerge) {
 
         EksternBehandlingsinfoDto grunninformasjon = eksternBehandlingsinfo.getGrunninformasjon();
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
@@ -100,6 +103,7 @@ public class VarselbrevUtil {
             .medFeilutbetaltePerioder(mapFeilutbetaltePerioder(feilutbetaltePerioderDto))
             .medFristdato(finnFristForTilbakemeldingFraBruker(LocalDateTime.now(), ventetid))
             .medRevurderingVedtakDato(grunninformasjon.getVedtakDato())
+            .medFinnesVerge(finnesVerge)
             .build();
     }
 

@@ -2,13 +2,16 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.impl.verge;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.VergeRepository;
@@ -20,15 +23,20 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagDel;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
+import no.nav.foreldrepenger.tilbakekreving.organisasjon.VirksomhetTjeneste;
+import no.nav.tjeneste.virksomhet.organisasjon.v4.binding.HentOrganisasjonOrganisasjonIkkeFunnet;
+import no.nav.tjeneste.virksomhet.organisasjon.v4.binding.HentOrganisasjonUgyldigInput;
 
 public class AvklartVergeTjenesteTest extends FellesTestOppsett {
 
     private VergeRepository vergeRepository = new VergeRepository(repoRule.getEntityManager());
-    private AvklartVergeTjeneste avklartVergeTjeneste = new AvklartVergeTjeneste(vergeRepository, mockTpsTjeneste, historikkTjenesteAdapter);
+    private VirksomhetTjeneste virksomhetTjenesteMock = Mockito.mock(VirksomhetTjeneste.class);
+    private AvklartVergeTjeneste avklartVergeTjeneste = new AvklartVergeTjeneste(vergeRepository, mockTpsTjeneste, virksomhetTjenesteMock, historikkTjenesteAdapter);
 
     @Test
     public void skal_lagre_verge_informasjon_når_verge_er_advokat() {
         VergeDto vergeDto = lagVergeDto(VergeType.ADVOKAT);
+        when(virksomhetTjenesteMock.validerOrganisasjon(anyString())).thenReturn(true);
         avklartVergeTjeneste.lagreVergeInformasjon(internBehandlingId, vergeDto);
         Optional<VergeEntitet> vergeEntitet = vergeRepository.finnVergeInformasjon(internBehandlingId);
         assertThat(vergeEntitet).isNotEmpty();
@@ -51,6 +59,14 @@ public class AvklartVergeTjenesteTest extends FellesTestOppsett {
         assertThat(vergePerson.getVergeAktørId()).isNotNull();
         assertThat(vergePerson.getVergeType()).isEqualByComparingTo(VergeType.FBARN);
         fellesHistorikkAssert();
+    }
+
+    @Test
+    public void skal_ikke_lagre_verge_informasjon_når_verge_er_advokat_men_orgnummer_ikke_finnes() throws HentOrganisasjonOrganisasjonIkkeFunnet, HentOrganisasjonUgyldigInput {
+        VergeDto vergeDto = lagVergeDto(VergeType.ADVOKAT);
+        when(virksomhetTjenesteMock.validerOrganisasjon(anyString())).thenReturn(false);
+        Assert.assertThrows("OrgansisasjonNummer er ikke gyldig", IllegalStateException.class,
+            () -> avklartVergeTjeneste.lagreVergeInformasjon(internBehandlingId, vergeDto));
     }
 
     private void fellesVergeAssert(VergeDto vergeDto, VergeEntitet vergeEntitet) {

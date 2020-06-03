@@ -108,6 +108,8 @@ public class TekstformatererVarselbrev extends FellesTekstformaterer {
         varselbrevDokument.setVarseltekstFraSaksbehandler(varselbrevSamletInfo.getFritekstFraSaksbehandler());
         varselbrevDokument.setFeilutbetaltePerioder(varselbrevSamletInfo.getFeilutbetaltePerioder());
         varselbrevDokument.setFagsaktypeNavn(varselbrevSamletInfo.getBrevMetadata().getFagsaktypenavnPåSpråk());
+        varselbrevDokument.setMottakerNavn(varselbrevSamletInfo.getBrevMetadata().getMottakerAdresse().getMottakerNavn());
+        varselbrevDokument.setFinnesVerge(varselbrevSamletInfo.isFinnesVerge());
         settFagsaktype(varselbrevDokument, varselbrevSamletInfo.getBrevMetadata().getFagsaktype());
         settSenesteOgTidligsteDatoer(varselbrevDokument, varselbrevSamletInfo.getFeilutbetaltePerioder());
 

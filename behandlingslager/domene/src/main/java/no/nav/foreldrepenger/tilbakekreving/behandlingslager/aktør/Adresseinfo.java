@@ -19,6 +19,7 @@ public class Adresseinfo {
     private String poststed;
     private String land;
     private PersonstatusType personstatus;
+    private String organisasjonNummer;
 
     private Adresseinfo() {
     }
@@ -71,6 +72,10 @@ public class Adresseinfo {
         this.personstatus = personstatus;
     }
 
+    public String getOrganisasjonNummer() {
+        return organisasjonNummer;
+    }
+
     public static class Builder {
         private final AdresseType gjeldendePostadresseType;
         private final String mottakerNavn;
@@ -83,6 +88,7 @@ public class Adresseinfo {
         private String poststed;
         private String land;
         private PersonstatusType personstatus;
+        private String organisasjonNummer;
 
         public Builder(AdresseType gjeldende, PersonIdent fnr, String mottakerNavn, PersonstatusType personstatus) {
             this.gjeldendePostadresseType = gjeldende;
@@ -125,6 +131,11 @@ public class Adresseinfo {
             return this;
         }
 
+        public Builder medOrganisasjonNummer(String organisasjonNummer) {
+            this.organisasjonNummer = organisasjonNummer;
+            return this;
+        }
+
         public Adresseinfo build() {
             verifyStateForBuild();
             Adresseinfo adresseinfo = new Adresseinfo();
@@ -139,6 +150,7 @@ public class Adresseinfo {
             adresseinfo.poststed = this.poststed;
             adresseinfo.land = this.land;
             adresseinfo.personstatus = this.personstatus;
+            adresseinfo.organisasjonNummer = this.organisasjonNummer;
             return adresseinfo;
         }
 
