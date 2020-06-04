@@ -41,11 +41,11 @@ import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.BehandlingsresultatDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.BehandlingÅrsakDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.FpsakBehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.PersonopplysningDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.TilbakekrevingValgDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.VergeDto;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.YtelsesbehandlingResultatType;
 import no.nav.vedtak.exception.TekniskException;
 
 public class BehandlingTjenesteImplTest extends FellesTestOppsett {
@@ -267,7 +267,7 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
         eksternBehandlingsinfo.setBehandlendeEnhetNavn(BEHANDLENDE_ENHET_NAVN);
 
         BehandlingsresultatDto behandlingsresultatDto = new BehandlingsresultatDto();
-        behandlingsresultatDto.setType(FpsakBehandlingResultatType.OPPHØR);
+        behandlingsresultatDto.setType(YtelsesbehandlingResultatType.OPPHØR);
         behandlingsresultatDto.setKonsekvenserForYtelsen(Lists.newArrayList(KonsekvensForYtelsen.ENDRING_I_BEREGNING, KonsekvensForYtelsen.FORELDREPENGER_OPPHØRER));
         eksternBehandlingsinfo.setBehandlingsresultat(behandlingsresultatDto);
 

@@ -11,7 +11,6 @@ import javax.transaction.Transactional;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodelisteNavnI18N;
@@ -20,7 +19,6 @@ import no.nav.foreldrepenger.tilbakekreving.domene.person.TpsTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.Tillegsinformasjon;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.KodeDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.simulering.klient.FpOppdragRestKlient;
 import no.nav.foreldrepenger.tilbakekreving.simulering.kontrakt.FeilutbetaltePerioderDto;
@@ -28,6 +26,10 @@ import no.nav.vedtak.konfig.KonfigVerdi;
 
 @ApplicationScoped
 @Transactional
+//FIXME k9-tilbake
+// .. splitt eksternDataForBrevTjeneste i 2 (hvorav 1 del er for å hente fra fagsystemet)
+// .. lag 2 implementasjoner av fagsystemdelen
+// .. hentFeilutbetaltePerioder bør ta inn henvisning (eller intern behandlingId) og konvertere til eksernid/uuid
 public class EksternDataForBrevTjeneste {
 
     private FpOppdragRestKlient fpOppdragKlient;
@@ -63,17 +65,17 @@ public class EksternDataForBrevTjeneste {
         return BrevSpråkUtil.finnFagsaktypenavnPåAngittSpråk(kodelisteNavnI18NList, sprakkode);
     }
 
-    public SamletEksternBehandlingInfo hentBehandlingFpsak(UUID eksternUuid, Tillegsinformasjon... tillegsinformasjon) {
+    public SamletEksternBehandlingInfo hentYtelsesbehandlingFraFagsystemet(UUID eksternUuid, Tillegsinformasjon... tillegsinformasjon) {
         SamletEksternBehandlingInfo behandlingsinfo = fpsakKlient.hentBehandlingsinfo(eksternUuid, tillegsinformasjon);
         if (behandlingsinfo.getGrunninformasjon() == null) {
-            throw EksternDataForBrevFeil.FACTORY.fantIkkeBehandlingIFpsak(eksternUuid.toString()).toException();
+            throw EksternDataForBrevFeil.FACTORY.fantIkkeYtelesbehandlingIFagsystemet(eksternUuid.toString()).toException();
         }
         return behandlingsinfo;
     }
 
     public Personinfo hentPerson(String aktørId) {
         Optional<Personinfo> personinfo = tpsTjeneste.hentBrukerForAktør(new AktørId(aktørId));
-        if (!personinfo.isPresent()) {
+        if (personinfo.isEmpty()) {
             throw EksternDataForBrevFeil.FACTORY.fantIkkeAdresseForAktørId(aktørId).toException();
         }
         return personinfo.get();
@@ -81,7 +83,7 @@ public class EksternDataForBrevTjeneste {
 
     public Adresseinfo hentAdresse(Personinfo personinfo, String aktørId) {
         Optional<Adresseinfo> adresseinfo = Optional.of(personinfo).map(s -> tpsTjeneste.hentAdresseinformasjon(s.getPersonIdent()));
-        if (!adresseinfo.isPresent()) {
+        if (adresseinfo.isEmpty()) {
             throw EksternDataForBrevFeil.FACTORY.fantIkkeAdresseForAktørId(aktørId).toException();
         }
         return adresseinfo.get();
@@ -89,8 +91,8 @@ public class EksternDataForBrevTjeneste {
 
     public FeilutbetaltePerioderDto hentFeilutbetaltePerioder(Long eksternBehandlingId) {
         Optional<FeilutbetaltePerioderDto> feilutbetaltePerioderDto = fpOppdragKlient.hentFeilutbetaltePerioder(eksternBehandlingId); //tilpasse feilmelding til eksternid
-        if (!feilutbetaltePerioderDto.isPresent()) {
-            throw EksternDataForBrevFeil.FACTORY.fantIkkeBehandlingIFpoppdrag(eksternBehandlingId).toException();
+        if (feilutbetaltePerioderDto.isEmpty()) {
+            throw EksternDataForBrevFeil.FACTORY.fantIkkeYtelesbehandlingISimuleringsapplikasjonen(eksternBehandlingId).toException();
         }
         return feilutbetaltePerioderDto.get();
     }
@@ -106,11 +108,6 @@ public class EksternDataForBrevTjeneste {
             ytelseNavn.setNavnPåBrukersSpråk(ytelsePåBokmål);
         }
         return ytelseNavn;
-    }
-
-    public KodeDto henteFagsakYtelseType(Behandling behandling) {
-        FagsakYtelseType fagsakYtelseType = behandling.getFagsak().getFagsakYtelseType();
-        return new KodeDto(fagsakYtelseType.getKodeverk(), fagsakYtelseType.getKode(), fagsakYtelseType.getNavn());
     }
 
 }

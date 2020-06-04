@@ -1,5 +1,14 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.status;
 
+import java.util.Optional;
+import java.util.UUID;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.FellesTask;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TaskProperty;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
@@ -20,13 +29,6 @@ import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import java.util.Optional;
-import java.util.UUID;
 
 @ApplicationScoped
 @ProsessTask(LesKravvedtakStatusTask.TASKTYPE)
@@ -73,7 +75,7 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
         String saksnummer = finnSaksnummer(kravOgVedtakstatus.getFagsystemId());
 
         String eksternBehandlingId = statusMapper.finnBehandlngId(kravOgVedtakstatus);
-        økonomiMottattXmlRepository.oppdaterMedEksternBehandlingIdOgSaksnummer(eksternBehandlingId, saksnummer, mottattXmlId);
+        økonomiMottattXmlRepository.oppdaterMedHenvisningOgSaksnummer(eksternBehandlingId, saksnummer, mottattXmlId);
 
         long vedtakId = statusMapper.finnVedtakId(kravOgVedtakstatus);
         oppdatereEksternBehandling(vedtakId, eksternBehandlingId);

@@ -23,8 +23,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.tilbakekrevingsvalg
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.BehandlingsresultatDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.BehandlingÅrsakDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.FpsakBehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.TilbakekrevingValgDto;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.YtelsesbehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMock;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMockUtil;
@@ -163,7 +163,7 @@ public class FaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
         assertThat(fakta.getPerioder()).isNotEmpty();
         assertThat(fakta.getDatoForRevurderingsvedtak()).isEqualTo(NOW);
         assertThat(fakta.getTilbakekrevingValg().getVidereBehandling()).isEqualToComparingFieldByField(VidereBehandling.TILBAKEKREV_I_INFOTRYGD);
-        assertThat(fakta.getBehandlingsresultat().getType()).isEqualByComparingTo(FpsakBehandlingResultatType.OPPHØR);
+        assertThat(fakta.getBehandlingsresultat().getType()).isEqualByComparingTo(YtelsesbehandlingResultatType.OPPHØR);
         assertThat(fakta.getBehandlingsresultat().getKonsekvenserForYtelsen()).contains(KonsekvensForYtelsen.ENDRING_I_BEREGNING);
         assertThat(fakta.getBehandlingÅrsaker().size()).isEqualTo(1);
     }
@@ -175,7 +175,7 @@ public class FaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
         eksternBehandlingsinfo.setVedtakDato(NOW);
 
         BehandlingsresultatDto behandlingsresultatDto = new BehandlingsresultatDto();
-        behandlingsresultatDto.setType(FpsakBehandlingResultatType.OPPHØR);
+        behandlingsresultatDto.setType(YtelsesbehandlingResultatType.OPPHØR);
         behandlingsresultatDto.setKonsekvenserForYtelsen(Lists.newArrayList(KonsekvensForYtelsen.ENDRING_I_BEREGNING, KonsekvensForYtelsen.FORELDREPENGER_OPPHØRER));
         eksternBehandlingsinfo.setBehandlingsresultat(behandlingsresultatDto);
 

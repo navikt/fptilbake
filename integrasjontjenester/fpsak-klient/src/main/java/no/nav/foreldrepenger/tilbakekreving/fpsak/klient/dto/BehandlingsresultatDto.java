@@ -9,18 +9,20 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Konsekve
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class BehandlingsresultatDto {
 
-    private FpsakBehandlingResultatType type;
+    //FIXME k9-tilbake Bruker k9-tilbake likt nok kodeverk til at dette virker?
+    private YtelsesbehandlingResultatType type;
+    //FIXME k9-tilbake Bruker k9-tilbake likt nok kodeverk til at dette virker?
     private List<KonsekvensForYtelsen> konsekvenserForYtelsen;
 
     public BehandlingsresultatDto() {
         // trengs for deserialisering av JSON
     }
 
-    public FpsakBehandlingResultatType getType() {
+    public YtelsesbehandlingResultatType getType() {
         return type;
     }
 
-    public void setType(FpsakBehandlingResultatType type) {
+    public void setType(YtelsesbehandlingResultatType type) {
         this.type = type;
     }
 

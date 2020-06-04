@@ -123,6 +123,7 @@ public class KravgrunnlagTjeneste {
             }
             belopPerPeriode = belopPerPeriode.add(beregnBelop(kgPeriode.getKravgrunnlagBeloper433()));
         }
+        //FIXME sammenligningen er ikke riktig implementert, må bruke compareTo != 0
         if (belopPerPeriode != BigDecimal.ZERO) {
             beregnetPerioider.add(UtbetaltPeriode.lagPeriode(førsteDag, sisteDag, belopPerPeriode));
         }

@@ -27,8 +27,11 @@ public class HendelseTaskDataWrapper {
         return prosessTaskData;
     }
 
-    public long getBehandlingId() {
-        return Long.valueOf(prosessTaskData.getPropertyValue(EKSTERN_BEHANDLING_ID));
+
+    //FIXME k9-tilbake legg til henvisning
+
+    public long getEksternBehandlingId() {
+        return Long.parseLong(prosessTaskData.getPropertyValue(EKSTERN_BEHANDLING_ID));
     }
 
     public AktørId getAktørId() {

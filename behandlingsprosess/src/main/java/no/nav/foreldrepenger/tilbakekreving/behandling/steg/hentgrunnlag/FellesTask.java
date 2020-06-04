@@ -24,11 +24,13 @@ public abstract class FellesTask {
         return referanse != null && referanse.matches("^\\d*$");
     }
 
-    protected boolean erBehandlingFinnesIFpsak(String saksnummer, String eksternBehandlingId) {
-        return fpsakKlient.finnesBehandlingIFpsak(saksnummer,Long.valueOf(eksternBehandlingId));
+    protected boolean erBehandlingFinnesIFpsak(String saksnummer, String henvisning) {
+        //FIXME k9-tilbake må begge formater for henvsning. Antar enklest å delegere til spesifikk implementasjon av saksbehandlingKlient
+        return fpsakKlient.finnesBehandlingIFpsak(saksnummer,Long.valueOf(henvisning));
     }
 
     protected String finnSaksnummer(String fagsystemId) {
+        //FIXME k9-tilbake Støtte begge formater
         return fagsystemId.substring(0, fagsystemId.length() - 3);
     }
 

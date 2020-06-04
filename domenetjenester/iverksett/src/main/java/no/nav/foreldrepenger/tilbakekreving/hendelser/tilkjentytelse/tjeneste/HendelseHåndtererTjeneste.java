@@ -22,28 +22,28 @@ public class HendelseHåndtererTjeneste {
     private static final Logger logger = LoggerFactory.getLogger(HendelseHåndtererTjeneste.class);
 
     private ProsessTaskRepository taskRepository;
-    private FpsakKlient restKlient;
+    private FpsakKlient fagsystemKlient;
 
     HendelseHåndtererTjeneste() {
         // CDI
     }
 
     @Inject
-    public HendelseHåndtererTjeneste(ProsessTaskRepository taskRepository, FpsakKlient restKlient) {
+    public HendelseHåndtererTjeneste(ProsessTaskRepository taskRepository, FpsakKlient fagsystemKlient) {
         this.taskRepository = taskRepository;
-        this.restKlient = restKlient;
+        this.fagsystemKlient = fagsystemKlient;
     }
 
     public void håndterHendelse(HendelseTaskDataWrapper hendelseTaskDataWrapper) {
-        long behandlingId = hendelseTaskDataWrapper.getBehandlingId();
-        Optional<TilbakekrevingValgDto> tbkDataOpt = restKlient.hentTilbakekrevingValg(UUID.fromString(hendelseTaskDataWrapper.getBehandlingUuid()));
+        long behandlingId = hendelseTaskDataWrapper.getEksternBehandlingId();
+        Optional<TilbakekrevingValgDto> tbkDataOpt = fagsystemKlient.hentTilbakekrevingValg(UUID.fromString(hendelseTaskDataWrapper.getBehandlingUuid()));
 
         if (tbkDataOpt.isPresent()) {
             TilbakekrevingValgDto tbkData = tbkDataOpt.get();
-            if(erRelevantHendelseForOpprettTilbakekreving(tbkData)){
+            if (erRelevantHendelseForOpprettTilbakekreving(tbkData)) {
                 logger.info("Hendelse={} er relevant for tilbakekreving opprett for ekstern behandlingId={}", tbkData.getVidereBehandling(), behandlingId);
                 lagOpprettBehandlingTask(hendelseTaskDataWrapper);
-            }else if(erRelevantHendelseForOppdatereTilbakekreving(tbkData)){
+            } else if (erRelevantHendelseForOppdatereTilbakekreving(tbkData)) {
                 logger.info("Hendelse={} er relevant for å oppdatere eksistende tilbakekreving med ekstern behandlingId={}", tbkData.getVidereBehandling(), behandlingId);
                 lagOppdaterBehandlingTask(hendelseTaskDataWrapper);
             }
@@ -51,6 +51,7 @@ public class HendelseHåndtererTjeneste {
     }
 
     private boolean erRelevantHendelseForOpprettTilbakekreving(TilbakekrevingValgDto tbkData) {
+        //FIXME k9-tilbake k9-sak bruker en annen kode enn fpsak her
         return VidereBehandling.TILBAKEKREV_I_INFOTRYGD.equals(tbkData.getVidereBehandling());
     }
 
@@ -60,7 +61,7 @@ public class HendelseHåndtererTjeneste {
 
     private void lagOpprettBehandlingTask(HendelseTaskDataWrapper hendelseTaskDataWrapper) {
         HendelseTaskDataWrapper taskData = HendelseTaskDataWrapper.lagWrapperForOpprettBehandling(hendelseTaskDataWrapper.getBehandlingUuid(),
-            hendelseTaskDataWrapper.getBehandlingId(),
+            hendelseTaskDataWrapper.getEksternBehandlingId(), //FIXME k9-tilbake har ikke eksternBehandlingId
             hendelseTaskDataWrapper.getAktørId(),
             hendelseTaskDataWrapper.getSaksnummer());
 
@@ -72,7 +73,7 @@ public class HendelseHåndtererTjeneste {
 
     private void lagOppdaterBehandlingTask(HendelseTaskDataWrapper hendelseTaskDataWrapper) {
         HendelseTaskDataWrapper taskData = HendelseTaskDataWrapper.lagWrapperForOppdaterBehandling(hendelseTaskDataWrapper.getBehandlingUuid(),
-            hendelseTaskDataWrapper.getBehandlingId(),
+            hendelseTaskDataWrapper.getEksternBehandlingId(), //FIXME k9-tilbake har ikke eksternBehandlingId
             hendelseTaskDataWrapper.getAktørId(),
             hendelseTaskDataWrapper.getSaksnummer());
 

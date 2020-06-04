@@ -149,7 +149,7 @@ public class VarselbrevTjeneste {
 
         //Henter data fra fpsak
         Saksnummer saksnummer = behandling.getFagsak().getSaksnummer();
-        SamletEksternBehandlingInfo eksternBehandlingsinfoDto = eksternDataForBrevTjeneste.hentBehandlingFpsak(eksternBehandling.getEksternUuid(), Tillegsinformasjon.PERSONOPPLYSNINGER);
+        SamletEksternBehandlingInfo eksternBehandlingsinfoDto = eksternDataForBrevTjeneste.hentYtelsesbehandlingFraFagsystemet(eksternBehandling.getEksternUuid(), Tillegsinformasjon.PERSONOPPLYSNINGER);
         //Henter data fra tps
         String aktørId = behandling.getAktørId().getId();
         Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(aktørId);
@@ -161,6 +161,10 @@ public class VarselbrevTjeneste {
         YtelseNavn ytelseNavn = eksternDataForBrevTjeneste.hentYtelsenavn(fagsakYtelseType, mottakersSpråkkode);
 
         //Henter data fra fpoppdrag
+        //FIXME k9-tilbake må hente fra k9-oppdrag vha UUID. Bør antagelig løses ved:
+        // .. splitte eksternDataForBrevTjeneste i 2 (hvorav 1 del er for å hente fra fagsystemet)
+        // .. lag 2 implementasjoner av fagsystemdelen
+        // .. hentFeilutbetaltePerioder bør ta inn henvisning (eller intern behandlingId) og konvertere til eksernid/uuid
         FeilutbetaltePerioderDto feilutbetaltePerioderDto = eksternDataForBrevTjeneste.hentFeilutbetaltePerioder(behandlingIdIFpsak);
 
         VarselInfo varselInfo = varselRepository.finnEksaktVarsel(behandlingId);
@@ -180,7 +184,7 @@ public class VarselbrevTjeneste {
     }
 
     public VarselbrevSamletInfo lagVarselbrevForForhåndsvisning(UUID behandlingUuId, String varseltekst, FagsakYtelseType fagsakYtleseType) {
-        SamletEksternBehandlingInfo eksternBehandlingsinfo = eksternDataForBrevTjeneste.hentBehandlingFpsak(behandlingUuId, Tillegsinformasjon.PERSONOPPLYSNINGER, Tillegsinformasjon.FAGSAK);
+        SamletEksternBehandlingInfo eksternBehandlingsinfo = eksternDataForBrevTjeneste.hentYtelsesbehandlingFraFagsystemet(behandlingUuId, Tillegsinformasjon.PERSONOPPLYSNINGER, Tillegsinformasjon.FAGSAK);
 
         String aktørId = eksternBehandlingsinfo.getAktørId().getId();
         Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(aktørId);

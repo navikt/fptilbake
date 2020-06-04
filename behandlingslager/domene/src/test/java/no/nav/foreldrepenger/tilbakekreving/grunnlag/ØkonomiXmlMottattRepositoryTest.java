@@ -48,11 +48,11 @@ public class ØkonomiXmlMottattRepositoryTest {
         String saksnummer = "1234345";
         String eksternBehandlingId = "123";
         Long id1 = repository.lagreMottattXml(xml1);
-        repository.oppdaterMedEksternBehandlingIdOgSaksnummer(eksternBehandlingId,saksnummer, id1);
+        repository.oppdaterMedHenvisningOgSaksnummer(eksternBehandlingId,saksnummer, id1);
         em.flush();
         em.clear();
         Long id2 = repository.lagreMottattXml(xml2);
-        repository.oppdaterMedEksternBehandlingIdOgSaksnummer(eksternBehandlingId, saksnummer, id2);
+        repository.oppdaterMedHenvisningOgSaksnummer(eksternBehandlingId, saksnummer, id2);
 
         ØkonomiXmlMottatt lagret1 = em.find(ØkonomiXmlMottatt.class, id1);
         ØkonomiXmlMottatt lagret2 = em.find(ØkonomiXmlMottatt.class, id2);

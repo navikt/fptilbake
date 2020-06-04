@@ -123,7 +123,7 @@ public class InnhentDokumentasjonbrevTjeneste {
 
     private Språkkode hentSpråkkode(Long behandlingId) {
         UUID fpsakBehandlingUuid = eksternBehandlingRepository.hentFraInternId(behandlingId).getEksternUuid();
-        SamletEksternBehandlingInfo samletEksternBehandlingInfo = eksternDataForBrevTjeneste.hentBehandlingFpsak(fpsakBehandlingUuid);
+        SamletEksternBehandlingInfo samletEksternBehandlingInfo = eksternDataForBrevTjeneste.hentYtelsesbehandlingFraFagsystemet(fpsakBehandlingUuid);
         return samletEksternBehandlingInfo.getGrunninformasjon().getSpråkkodeEllerDefault();
     }
 
