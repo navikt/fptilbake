@@ -52,6 +52,8 @@ class TekstformatererHenleggelsesbrev extends FellesTekstformaterer {
         HenleggelsesbrevDokument henleggelsesbrevDokument = new HenleggelsesbrevDokument();
         henleggelsesbrevDokument.setFagsaktypeNavn(henleggelsesbrevSamletInfo.getBrevMetadata().getFagsaktypenavnPåSpråk());
         henleggelsesbrevDokument.setVarsletDato(henleggelsesbrevSamletInfo.getVarsletDato());
+        henleggelsesbrevDokument.setFinnesVerge(henleggelsesbrevSamletInfo.isFinnesVerge());
+        henleggelsesbrevDokument.setMottakerNavn(henleggelsesbrevSamletInfo.getBrevMetadata().getMottakerAdresse().getMottakerNavn());
 
         henleggelsesbrevDokument.valider();
         return henleggelsesbrevDokument;

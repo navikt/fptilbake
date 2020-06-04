@@ -15,8 +15,12 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.Bre
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.VergeRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevAktørIdUtil;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.EksternDataForBrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.YtelseNavn;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
@@ -29,12 +33,14 @@ import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagT
 @ApplicationScoped
 public class HenleggelsesbrevTjeneste {
 
-    private static final String TITTEL_HENLEGGELSESBREV_HISTORIKKINNSLAG = "Henleggelsesbrev tilbakekreving";
+    public static final String TITTEL_HENLEGGELSESBREV_HISTORIKKINNSLAG = "Henleggelsesbrev tilbakekreving";
+    public static final String TITTEL_HENLEGGELSESBREV_HISTORIKKINNSLAG_TIL_VERGE = "Henleggelsesbrev tilbakekreving til verge";
     private static final String TITTEL_HENLEGGELSESBREV = "Informasjon om at tilbakekrevingssaken er henlagt";
 
     private BehandlingRepository behandlingRepository;
     private BrevSporingRepository brevSporingRepository;
     private EksternBehandlingRepository eksternBehandlingRepository;
+    private VergeRepository vergeRepository;
 
     private EksternDataForBrevTjeneste eksternDataForBrevTjeneste;
     private FritekstbrevTjeneste bestillDokumentTjeneste;
@@ -53,18 +59,19 @@ public class HenleggelsesbrevTjeneste {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.brevSporingRepository = repositoryProvider.getBrevSporingRepository();
         this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
+        this.vergeRepository = repositoryProvider.getVergeRepository();
 
         this.eksternDataForBrevTjeneste = eksternDataForBrevTjeneste;
         this.bestillDokumentTjeneste = bestillDokumentTjenest;
         this.historikkinnslagTjeneste = historikkinnslagTjeneste;
     }
 
-    public Optional<JournalpostIdOgDokumentId> sendHenleggelsebrev(Long behandlingId) {
+    public Optional<JournalpostIdOgDokumentId> sendHenleggelsebrev(Long behandlingId, BrevMottaker brevMottaker) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = lagHenleggelsebrevForSending(behandling);
         FritekstbrevData fritekstbrevData = lagHenleggelsebrev(henleggelsesbrevSamletInfo);
         JournalpostIdOgDokumentId dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(fritekstbrevData);
-        opprettHistorikkinnslag(behandling,dokumentreferanse);
+        opprettHistorikkinnslag(behandling, dokumentreferanse, brevMottaker);
         lagreInfoOmHenleggelsesbrev(behandlingId, dokumentreferanse);
         return Optional.ofNullable(dokumentreferanse);
     }
@@ -82,15 +89,15 @@ public class HenleggelsesbrevTjeneste {
         if (brevSporing.isEmpty()) {
             throw HenleggelsesbrevFeil.FACTORY.kanIkkeSendeEllerForhåndsviseHenleggelsesBrev(behandlingId).toException();
         }
-
+        Optional<VergeEntitet> vergeEntitet = vergeRepository.finnVergeInformasjon(behandlingId);
         FagsakYtelseType fagsakYtelseType = behandling.getFagsak().getFagsakYtelseType();
         Språkkode språkkode = hentSpråkkode(behandlingId);
 
         //Henter data fra tps
-        String aktørId = behandling.getAktørId().getId();
+        String aktørId = BrevAktørIdUtil.getMottakerAktørId(behandling, vergeEntitet);
         YtelseNavn ytelseNavn = eksternDataForBrevTjeneste.hentYtelsenavn(fagsakYtelseType, språkkode);
         Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(aktørId);
-        Adresseinfo adresseinfo = eksternDataForBrevTjeneste.hentAdresse(personinfo, aktørId);
+        Adresseinfo adresseinfo = eksternDataForBrevTjeneste.hentAdresse(personinfo, vergeEntitet);
 
         BrevMetadata metadata = new BrevMetadata.Builder()
             .medBehandlendeEnhetId(behandling.getBehandlendeEnhetId())
@@ -109,6 +116,7 @@ public class HenleggelsesbrevTjeneste {
         HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = new HenleggelsesbrevSamletInfo();
         henleggelsesbrevSamletInfo.setBrevMetadata(metadata);
         henleggelsesbrevSamletInfo.setVarsletDato(brevSporing.get().getOpprettetTidspunkt().toLocalDate());
+        henleggelsesbrevSamletInfo.setFinnesVerge(vergeEntitet.isPresent());
         return henleggelsesbrevSamletInfo;
     }
 
@@ -126,12 +134,14 @@ public class HenleggelsesbrevTjeneste {
             .build();
     }
 
-    private void opprettHistorikkinnslag(Behandling behandling, JournalpostIdOgDokumentId dokumentreferanse) {
+    private void opprettHistorikkinnslag(Behandling behandling, JournalpostIdOgDokumentId dokumentreferanse, BrevMottaker brevMottaker) {
+        String tittel = BrevMottaker.VERGE.equals(brevMottaker) ? TITTEL_HENLEGGELSESBREV_HISTORIKKINNSLAG_TIL_VERGE
+            : TITTEL_HENLEGGELSESBREV_HISTORIKKINNSLAG;
         historikkinnslagTjeneste.opprettHistorikkinnslagForBrevsending(
             behandling,
             dokumentreferanse.getJournalpostId(),
             dokumentreferanse.getDokumentId(),
-            TITTEL_HENLEGGELSESBREV_HISTORIKKINNSLAG);
+            tittel);
     }
 
     private void lagreInfoOmHenleggelsesbrev(Long behandlingId, JournalpostIdOgDokumentId journalpostIdOgDokumentId) {

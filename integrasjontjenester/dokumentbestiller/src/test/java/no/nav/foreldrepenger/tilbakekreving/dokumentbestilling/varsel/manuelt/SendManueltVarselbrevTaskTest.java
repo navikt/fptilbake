@@ -10,8 +10,6 @@ import static org.mockito.Mockito.verify;
 
 import java.time.Period;
 
-import javax.inject.Inject;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,7 +18,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.Behandlingskontr
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjenesteImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.VergeRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.dokumentbestiller.DokumentMalType;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.DokumentBestillerTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker;
@@ -35,9 +32,6 @@ public class SendManueltVarselbrevTaskTest extends DokumentBestillerTestOppsett 
 
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private SendManueltVarselbrevTask varselbrevTask;
-
-    @Inject
-    private VergeRepository vergeRepository;
 
     @Before
     public void setup() {

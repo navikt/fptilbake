@@ -25,6 +25,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.DokumentBestillerTestOppsett;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.EksternDataForBrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevTjeneste;
@@ -71,7 +72,7 @@ public class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
         Personinfo personinfo = byggStandardPerson("Fiona", DUMMY_FØDSELSNUMMER, Språkkode.nn);
         String aktørId = behandling.getAktørId().getId();
         when(mockEksternDataForBrevTjeneste.hentPerson(aktørId)).thenReturn(personinfo);
-        when(mockEksternDataForBrevTjeneste.hentAdresse(personinfo, aktørId)).thenReturn(lagStandardNorskAdresse());
+        when(mockEksternDataForBrevTjeneste.hentAdresse(any(Personinfo.class), any(Optional.class))).thenReturn(lagStandardNorskAdresse());
 
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto = new EksternBehandlingsinfoDto();
         eksternBehandlingsinfoDto.setSprakkode(Språkkode.nb);
@@ -87,7 +88,7 @@ public class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
     @Test
     public void skal_sende_henleggelsesbrev() {
         lagreVarselBrevSporing();
-        Optional<JournalpostIdOgDokumentId> dokumentReferanse = henleggelsesbrevTjeneste.sendHenleggelsebrev(behandlingId);
+        Optional<JournalpostIdOgDokumentId> dokumentReferanse = henleggelsesbrevTjeneste.sendHenleggelsebrev(behandlingId, BrevMottaker.BRUKER);
         assertThat(dokumentReferanse).isPresent();
 
         List<BrevSporing> brevSporing = brevSporingRepository.hentBrevData(behandlingId, BrevType.HENLEGGELSE_BREV);
@@ -99,6 +100,28 @@ public class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
         assertThat(historikkinnslager.size()).isEqualTo(2);
         assertThat(historikkinnslager.get(0).getType()).isEqualByComparingTo(HistorikkinnslagType.AVBRUTT_BEH);
         assertThat(historikkinnslager.get(1).getType()).isEqualByComparingTo(HistorikkinnslagType.BREV_SENT);
+        assertThat(historikkinnslager.get(1).getDokumentLinker().get(0).getLinkTekst())
+            .isEqualTo(HenleggelsesbrevTjeneste.TITTEL_HENLEGGELSESBREV_HISTORIKKINNSLAG);
+    }
+
+    @Test
+    public void skal_sende_henleggelsesbrev_med_verge() {
+        vergeRepository.lagreVergeInformasjon(behandlingId,lagVerge());
+        lagreVarselBrevSporing();
+        Optional<JournalpostIdOgDokumentId> dokumentReferanse = henleggelsesbrevTjeneste.sendHenleggelsebrev(behandlingId, BrevMottaker.VERGE);
+        assertThat(dokumentReferanse).isPresent();
+
+        List<BrevSporing> brevSporing = brevSporingRepository.hentBrevData(behandlingId, BrevType.HENLEGGELSE_BREV);
+        assertThat(brevSporing).isNotEmpty();
+        assertThat(brevSporing.get(0).getDokumentId()).isEqualTo(dokumentReferanse.get().getDokumentId());
+
+        List<Historikkinnslag> historikkinnslager = historikkRepository.hentHistorikk(behandlingId);
+        assertThat(historikkinnslager).isNotEmpty();
+        assertThat(historikkinnslager.size()).isEqualTo(2);
+        assertThat(historikkinnslager.get(0).getType()).isEqualByComparingTo(HistorikkinnslagType.AVBRUTT_BEH);
+        assertThat(historikkinnslager.get(1).getType()).isEqualByComparingTo(HistorikkinnslagType.BREV_SENT);
+        assertThat(historikkinnslager.get(1).getDokumentLinker().get(0).getLinkTekst())
+            .isEqualTo(HenleggelsesbrevTjeneste.TITTEL_HENLEGGELSESBREV_HISTORIKKINNSLAG_TIL_VERGE);
     }
 
     @Test
@@ -112,7 +135,7 @@ public class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
         expectedException.expectMessage("FPT-110801");
         expectedException.expect(FunksjonellException.class);
 
-        henleggelsesbrevTjeneste.sendHenleggelsebrev(behandlingId);
+        henleggelsesbrevTjeneste.sendHenleggelsebrev(behandlingId, BrevMottaker.BRUKER);
     }
 
     private void lagreVarselBrevSporing() {

@@ -8,6 +8,7 @@ public class HenleggelsesbrevSamletInfo {
 
     private BrevMetadata brevMetadata;
     private LocalDate varsletDato;
+    private boolean finnesVerge;
 
     public BrevMetadata getBrevMetadata() {
         return brevMetadata;
@@ -23,5 +24,13 @@ public class HenleggelsesbrevSamletInfo {
 
     public void setVarsletDato(LocalDate varsletDato) {
         this.varsletDato = varsletDato;
+    }
+
+    public boolean isFinnesVerge() {
+        return finnesVerge;
+    }
+
+    public void setFinnesVerge(boolean finnesVerge) {
+        this.finnesVerge = finnesVerge;
     }
 }
