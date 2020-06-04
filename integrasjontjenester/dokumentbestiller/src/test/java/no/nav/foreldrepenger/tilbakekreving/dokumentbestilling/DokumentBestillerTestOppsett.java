@@ -22,6 +22,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personop
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.KildeType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
@@ -109,5 +112,15 @@ public class DokumentBestillerTestOppsett {
             .medPostNr("0688")
             .medPoststed("OSLO")
             .build();
+    }
+
+    protected VergeEntitet lagVerge() {
+        return VergeEntitet.builder()
+            .medVergeType(VergeType.ADVOKAT)
+            .medOrganisasjonnummer("1232456")
+            .medBegrunnelse("test")
+            .medKilde(KildeType.FPTILBAKE.name())
+            .medNavn("John Doe")
+            .medGyldigPeriode(LocalDate.now().minusDays(30), LocalDate.now()).build();
     }
 }

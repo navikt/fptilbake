@@ -122,6 +122,8 @@ public class TekstformatererVarselbrev extends FellesTekstformaterer {
         varselbrevDokument.setKorrigert(true);
         varselbrevDokument.setVarsletDato(varselInfo.getOpprettetTidspunkt().toLocalDate());
         varselbrevDokument.setVarsletBeløp(varselInfo.getVarselBeløp());
+        varselbrevDokument.setMottakerNavn(varselbrevSamletInfo.getBrevMetadata().getMottakerAdresse().getMottakerNavn());
+        varselbrevDokument.setFinnesVerge(varselbrevSamletInfo.isFinnesVerge());
 
         varselbrevDokument.valider();
         return varselbrevDokument;

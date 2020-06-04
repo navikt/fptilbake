@@ -117,6 +117,7 @@ public class VarselbrevUtil {
         Period ventetid,
         String friTekst,
         BehandlingFeilutbetalingFakta feilutbetalingFakta,
+        boolean finnesVerge,
         boolean erKorrigert) {
 
         BrevMetadata metadata = new BrevMetadata.Builder()
@@ -140,6 +141,7 @@ public class VarselbrevUtil {
             .medFeilutbetaltePerioder(mapFeilutbetaltePerioder(feilutbetalingFakta))
             .medFristdato(finnFristForTilbakemeldingFraBruker(LocalDateTime.now(), ventetid))
             .medRevurderingVedtakDato(feilutbetalingFakta.getDatoForRevurderingsvedtak())
+            .medFinnesVerge(finnesVerge)
             .build();
     }
 

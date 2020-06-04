@@ -177,6 +177,7 @@ public class VarselbrevUtilTest {
             Period.ofWeeks(3),
             VARSEL_TEKST,
             feilutbetalingFakta,
+            false,
             false);
 
         assertThat(varselbrev.getBrevMetadata().getBehandlendeEnhetId()).isEqualTo(BEHANDLENDE_ENHET_ID);

@@ -2,7 +2,6 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel;
 
 import static no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker.BRUKER;
 import static no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker.VERGE;
-import static no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker.VERGE_BRUKER;
 
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
@@ -34,11 +33,9 @@ public class SendVarselbrevTask implements ProsessTaskHandler {
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
         Long behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
-        if(vergeRepository.finnesVerge(behandlingId)){
+        if (vergeRepository.finnesVerge(behandlingId)) {
             varselbrevTjeneste.sendVarselbrev(behandlingId, VERGE);
-            varselbrevTjeneste.sendVarselbrev(behandlingId, VERGE_BRUKER);
-        } else {
-            varselbrevTjeneste.sendVarselbrev(behandlingId, BRUKER);
         }
+        varselbrevTjeneste.sendVarselbrev(behandlingId, BRUKER);
     }
 }

@@ -21,12 +21,12 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.VergeRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselInfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.HentForhåndsvisningVarselbrevDto;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevAktørIdUtil;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.EksternDataForBrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.YtelseNavn;
@@ -83,7 +83,7 @@ public class VarselbrevTjeneste {
     }
 
     public Optional<JournalpostIdOgDokumentId> sendVarselbrev(Long behandlingId, BrevMottaker brevMottaker) {
-        VarselbrevSamletInfo varselbrevSamletInfo = lagVarselbrevForSending(behandlingId, brevMottaker);
+        VarselbrevSamletInfo varselbrevSamletInfo = lagVarselbrevForSending(behandlingId);
         String overskrift = TekstformatererVarselbrev.lagVarselbrevOverskrift(varselbrevSamletInfo.getBrevMetadata());
         String brevtekst = TekstformatererVarselbrev.lagVarselbrevFritekst(varselbrevSamletInfo);
         FritekstbrevData data = new FritekstbrevData.Builder()
@@ -134,13 +134,11 @@ public class VarselbrevTjeneste {
         brevSporingRepository.lagre(brevSporing);
     }
 
-    private VarselbrevSamletInfo lagVarselbrevForSending(Long behandlingId, BrevMottaker brevMottaker) {
+    private VarselbrevSamletInfo lagVarselbrevForSending(Long behandlingId) {
         Behandling behandling = behandlingTjeneste.hentBehandling(behandlingId);
 
-        boolean erBrevMottakerVerge = BrevMottaker.VERGE.equals(brevMottaker);
-        boolean erBrevMottakerVergeBruker = BrevMottaker.VERGE_BRUKER.equals(brevMottaker);
-        boolean finnesVerge = erBrevMottakerVerge || erBrevMottakerVergeBruker;
-        Optional<VergeEntitet> vergeEntitet = finnesVerge ? vergeRepository.finnVergeInformasjon(behandlingId) : Optional.empty();
+        Optional<VergeEntitet> vergeEntitet = vergeRepository.finnVergeInformasjon(behandlingId);
+        boolean finnesVerge = vergeEntitet.isPresent();
 
         //Henter data fra fptilbakes eget repo for å finne behandlingsid brukt i fpsak, samt saksnummer
         EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandlingId);
@@ -150,7 +148,7 @@ public class VarselbrevTjeneste {
         Saksnummer saksnummer = behandling.getFagsak().getSaksnummer();
         SamletEksternBehandlingInfo eksternBehandlingsinfoDto = eksternDataForBrevTjeneste.hentYtelsesbehandlingFraFagsystemet(eksternBehandling.getEksternUuid(), Tillegsinformasjon.PERSONOPPLYSNINGER);
         //Henter data fra tps
-        String aktørId = getMottakerAktørId(behandling,vergeEntitet);
+        String aktørId = BrevAktørIdUtil.getMottakerAktørId(behandling,vergeEntitet);
         Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(aktørId);
         Adresseinfo adresseinfo = eksternDataForBrevTjeneste.hentAdresse(personinfo,vergeEntitet);
 
@@ -191,7 +189,7 @@ public class VarselbrevTjeneste {
         Optional<VergeEntitet> vergeEntitet = behandling != null ? vergeRepository.finnVergeInformasjon(behandling.getId()) : Optional.empty();
         boolean finnesVerge = vergeEntitet.isPresent();
 
-        String aktørId = finnesVerge ? getMottakerAktørId(behandling,vergeEntitet) : eksternBehandlingsinfo.getAktørId().getId();
+        String aktørId = finnesVerge ? BrevAktørIdUtil.getMottakerAktørId(behandling,vergeEntitet) : eksternBehandlingsinfo.getAktørId().getId();
         Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(aktørId);
         Adresseinfo adresseinfo = eksternDataForBrevTjeneste.hentAdresse(personinfo, vergeEntitet);
         FeilutbetaltePerioderDto feilutbetaltePerioderDto = eksternDataForBrevTjeneste.hentFeilutbetaltePerioder(grunninformasjon.getId());
@@ -212,16 +210,4 @@ public class VarselbrevTjeneste {
     private void lagreVarseltBeløp(Long behandlingId, Long varseltBeløp) {
         varselRepository.lagreVarseltBeløp(behandlingId, varseltBeløp);
     }
-
-    private String getMottakerAktørId(Behandling behandling, Optional<VergeEntitet> vergeEntitet) {
-        String aktørId = behandling.getAktørId().getId();
-        if (vergeEntitet.isPresent()) {
-            VergeEntitet verge = vergeEntitet.get();
-            if (!VergeType.ADVOKAT.equals(verge.getVergeType())) {
-                aktørId = verge.getVergeAktørId().getId();
-            }
-        }
-        return aktørId;
-    }
-
 }
