@@ -18,7 +18,6 @@ import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
 
 @ApplicationScoped
 public class ØkonomiMottattXmlRepository {
-    private static final String KEY_EKSTERN_BEHANDLING_ID = "eksternBehandlingId";
     private EntityManager entityManager;
 
     ØkonomiMottattXmlRepository() {
@@ -51,19 +50,10 @@ public class ØkonomiMottattXmlRepository {
     }
 
     public Optional<ØkonomiXmlMottatt> finnForHenvisning(Henvisning henvisning) {
-        return finnForEksternBehandlingId(henvisning.getVerdi());
-    }
-
-    public Optional<ØkonomiXmlMottatt> finnForEksternBehandlingId(String eksternBehandlingId) {
+        //TODO k9-tilbake bytt kolonne når ferdigmigrert
         TypedQuery<ØkonomiXmlMottatt> query = entityManager.createQuery("from ØkonomiXmlMottatt where eksternBehandlingId=:eksternBehandlingId", ØkonomiXmlMottatt.class);
-        query.setParameter(KEY_EKSTERN_BEHANDLING_ID, eksternBehandlingId);
+        query.setParameter("eksternBehandlingId", henvisning.getVerdi());
         return hentUniktResultat(query);
-    }
-
-    public List<ØkonomiXmlMottatt> finnAlleForEksternBehandlingId(String eksternBehandlingId) {
-        TypedQuery<ØkonomiXmlMottatt> query = entityManager.createQuery("from ØkonomiXmlMottatt where eksternBehandlingId=:eksternBehandlingId", ØkonomiXmlMottatt.class);
-        query.setParameter(KEY_EKSTERN_BEHANDLING_ID, eksternBehandlingId);
-        return query.getResultList();
     }
 
     public List<ØkonomiXmlMottatt> finnAlleForSaksnummerSomIkkeErKoblet(String saksnummer) {
@@ -127,7 +117,7 @@ public class ØkonomiMottattXmlRepository {
     private Long finnHøyesteVersjonsnummer(Henvisning henvisning) {
         //TODO k9-tilbake migrer kolonnenavn til 'henvisning'
         Query query = entityManager.createNativeQuery("select max(sekvens) from oko_xml_mottatt where ekstern_behandling_id=:eksternBehandlingId");
-        query.setParameter(KEY_EKSTERN_BEHANDLING_ID, henvisning.getVerdi());
+        query.setParameter("eksternBehandlingId", henvisning.getVerdi());
         Object resultat = query.getSingleResult();
         return resultat != null ? ((BigDecimal) resultat).longValue() : null;
     }

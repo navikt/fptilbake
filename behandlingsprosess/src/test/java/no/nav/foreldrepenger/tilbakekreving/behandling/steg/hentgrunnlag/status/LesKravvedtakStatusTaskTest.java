@@ -8,6 +8,8 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import java.util.Optional;
 
+import javax.persistence.TypedQuery;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -59,7 +61,7 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_SPER.xml"));
         lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LesKravvedtakStatusTask.TASKTYPE));
 
-        assertThat(mottattXmlRepository.finnForEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID))).isPresent();
+        assertThat(mottattXmlRepository.finnForHenvisning(HENVISNING)).isPresent();
         assertThat(behandling.isBehandlingPåVent()).isTrue();
         assertThat(behandling.getAksjonspunktFor(AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)).isNotNull();
         assertThat(behandling.getVenteårsak()).isEqualByComparingTo(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
@@ -73,7 +75,7 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_MANU.xml"));
         lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LesKravvedtakStatusTask.TASKTYPE));
 
-        assertThat(mottattXmlRepository.finnForEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID))).isPresent();
+        assertThat(mottattXmlRepository.finnForHenvisning(HENVISNING)).isPresent();
         assertThat(behandling.isBehandlingPåVent()).isTrue();
         assertThat(behandling.getAksjonspunktFor(AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)).isNotNull();
         assertThat(behandling.getVenteårsak()).isEqualByComparingTo(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
@@ -87,7 +89,7 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_AVSL.xml"));
         lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LesKravvedtakStatusTask.TASKTYPE));
 
-        assertThat(mottattXmlRepository.finnForEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID))).isPresent();
+        assertThat(mottattXmlRepository.finnForHenvisning(HENVISNING)).isPresent();
         assertThat(behandling.erAvsluttet()).isTrue();
         Optional<Behandlingsresultat> resultat = behandlingresultatRepository.hent(behandling);
         assertThat(resultat).isPresent();
@@ -155,7 +157,7 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandling.getId());
         assertThat(eksternBehandling.getHenvisning()).isEqualTo(HENVISNING);
 
-        assertThat(mottattXmlRepository.finnForEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID))).isPresent();
+        assertThat(mottattXmlRepository.finnForHenvisning(HENVISNING)).isPresent();
         assertThat(behandling.isBehandlingPåVent()).isTrue();
         assertThat(behandling.getAksjonspunktFor(AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)).isNotNull();
         assertThat(behandling.getVenteårsak()).isEqualByComparingTo(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
@@ -177,7 +179,7 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandling.getId());
         assertThat(eksternBehandling.getHenvisning()).isEqualTo(HENVISNING);
 
-        List<ØkonomiXmlMottatt> xmlMottatt = mottattXmlRepository.finnAlleForEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID));
+        List<ØkonomiXmlMottatt> xmlMottatt = finnAlleForHenvisning(HENVISNING);
         assertThat(xmlMottatt.size()).isEqualTo(2);
         assertThat(behandling.isBehandlingPåVent()).isTrue();
         assertThat(behandling.getAksjonspunktFor(AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)).isNotNull();
@@ -201,7 +203,7 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandling.getId());
         assertThat(eksternBehandling.getHenvisning()).isEqualTo(HENVISNING);
 
-        List<ØkonomiXmlMottatt> xmlMottatt = mottattXmlRepository.finnAlleForEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID));
+        List<ØkonomiXmlMottatt> xmlMottatt = finnAlleForHenvisning(HENVISNING);
         assertThat(xmlMottatt.size()).isEqualTo(3);
 
         assertThat(kravVedtakStatusRepository.finnKravstatus(behandling.getId())).isEqualTo(Optional.of(KravStatusKode.ENDRET));
@@ -244,15 +246,22 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_SPER_annen_referanse.xml"));
         lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LesKravvedtakStatusTask.TASKTYPE));
 
-        Optional<ØkonomiXmlMottatt> xmlMottatt = mottattXmlRepository.finnForEksternBehandlingId(String.valueOf(100000001));
+        Optional<ØkonomiXmlMottatt> xmlMottatt = mottattXmlRepository.finnForHenvisning(Henvisning.fraEksternBehandlingId(100000001L));
         assertThat(xmlMottatt).isPresent();
         assertThat(xmlMottatt.get().getSaksnummer()).isEqualTo("139015144");
         assertThat(xmlMottatt.get().isTilkoblet()).isFalse();
     }
 
     private void assertTilkobling() {
-        Optional<ØkonomiXmlMottatt> økonomiXmlMottatt = mottattXmlRepository.finnForEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID));
+        Optional<ØkonomiXmlMottatt> økonomiXmlMottatt = mottattXmlRepository.finnForHenvisning(HENVISNING);
         assertThat(økonomiXmlMottatt).isPresent();
         assertThat(økonomiXmlMottatt.get().isTilkoblet()).isTrue();
     }
+
+    public List<ØkonomiXmlMottatt> finnAlleForHenvisning(Henvisning henvisning) {
+        TypedQuery<ØkonomiXmlMottatt> query = repoRule.getEntityManager().createQuery("from ØkonomiXmlMottatt where eksternBehandlingId=:eksternBehandlingId", ØkonomiXmlMottatt.class);
+        query.setParameter("eksternBehandlingId", henvisning.getVerdi());
+        return query.getResultList();
+    }
+
 }

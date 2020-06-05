@@ -122,7 +122,7 @@ public class HåndterGamleKravgrunnlagBatchTjenesteTest extends FellesTestOppset
         ØkonomiXmlMottatt økonomiXmlMottatt = mottattXmlRepository.finnMottattXml(mottattXmlId);
         assertThat(økonomiXmlMottatt).isNotNull();
         assertThat(økonomiXmlMottatt.getSaksnummer()).isEqualTo("139015144");
-        assertThat(økonomiXmlMottatt.getEksternBehandlingId()).isNotEmpty();
+        assertThat(økonomiXmlMottatt.getHenvisning()).isNotNull();
         assertThat(økonomiXmlMottatt.isTilkoblet()).isTrue();
         long behandlingId = behandlinger.get(0).getId();
         assertThat(grunnlagRepository.harGrunnlagForBehandlingId(behandlingId)).isTrue();
