@@ -10,8 +10,12 @@ import java.util.Scanner;
 
 import org.junit.Test;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.AdresseType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.PersonstatusType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 
 public class TekstformatererHenleggelsesbrevTest {
 
@@ -22,6 +26,7 @@ public class TekstformatererHenleggelsesbrevTest {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
             .medFagsaktypenavnPåSpråk("foreldrepenger")
             .medSprakkode(Språkkode.nb)
+            .medMottakerAdresse(lagAdresseInfo())
             .build();
 
         HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = new HenleggelsesbrevSamletInfo();
@@ -33,10 +38,31 @@ public class TekstformatererHenleggelsesbrevTest {
     }
 
     @Test
+    public void skal_generere_henleggelsesbrev_med_verge() throws Exception {
+        BrevMetadata brevMetadata = new BrevMetadata.Builder()
+            .medFagsaktypenavnPåSpråk("foreldrepenger")
+            .medSprakkode(Språkkode.nb)
+            .medMottakerAdresse(lagAdresseInfo())
+            .medSakspartNavn("Test")
+            .medVergeNavn("John Doe")
+            .build();
+
+        HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = new HenleggelsesbrevSamletInfo();
+        henleggelsesbrevSamletInfo.setBrevMetadata(brevMetadata);
+        henleggelsesbrevSamletInfo.setVarsletDato(niendeMars);
+        henleggelsesbrevSamletInfo.setFinnesVerge(true);
+        String generertBrev = TekstformatererHenleggelsesbrev.lagHenleggelsebrevFritekst(henleggelsesbrevSamletInfo);
+        String fasit = les("/henleggelsesbrev/henleggelsesbrev.txt");
+        String vergeTekst = les("/varselbrev/nb/verge.txt");
+        assertThat(generertBrev).isEqualToNormalizingNewlines(fasit+"\n"+"\n"+ vergeTekst);
+    }
+
+    @Test
     public void skal_generere_henleggelsesbrev_nynorsk() throws Exception {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
             .medFagsaktypenavnPåSpråk("foreldrepengar")
             .medSprakkode(Språkkode.nn)
+            .medMottakerAdresse(lagAdresseInfo())
             .build();
 
         HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = new HenleggelsesbrevSamletInfo();
@@ -83,5 +109,9 @@ public class TekstformatererHenleggelsesbrevTest {
             scanner.useDelimiter("\\A");
             return scanner.hasNext() ? scanner.next() : null;
         }
+    }
+
+    private Adresseinfo lagAdresseInfo(){
+        return new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE,new PersonIdent("123456"),"Test", PersonstatusType.BOSA).build();
     }
 }

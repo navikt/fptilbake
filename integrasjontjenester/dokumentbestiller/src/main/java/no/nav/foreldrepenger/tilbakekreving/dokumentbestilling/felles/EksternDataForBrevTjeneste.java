@@ -11,6 +11,9 @@ import javax.transaction.Transactional;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.AdresseType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodelisteNavnI18N;
@@ -20,8 +23,12 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
+import no.nav.foreldrepenger.tilbakekreving.organisasjon.Virksomhet;
+import no.nav.foreldrepenger.tilbakekreving.organisasjon.VirksomhetTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.simulering.klient.FpOppdragRestKlient;
 import no.nav.foreldrepenger.tilbakekreving.simulering.kontrakt.FeilutbetaltePerioderDto;
+import no.nav.tjeneste.virksomhet.organisasjon.v4.binding.HentOrganisasjonOrganisasjonIkkeFunnet;
+import no.nav.tjeneste.virksomhet.organisasjon.v4.binding.HentOrganisasjonUgyldigInput;
 import no.nav.vedtak.konfig.KonfigVerdi;
 
 @ApplicationScoped
@@ -34,6 +41,7 @@ public class EksternDataForBrevTjeneste {
 
     private FpOppdragRestKlient fpOppdragKlient;
     private TpsTjeneste tpsTjeneste;
+    private VirksomhetTjeneste virksomhetTjeneste;
     private KodeverkRepository kodeverkRepository;
     private FpsakKlient fpsakKlient;
     private Period brukersSvarfrist;
@@ -41,11 +49,13 @@ public class EksternDataForBrevTjeneste {
     @Inject
     public EksternDataForBrevTjeneste(FpOppdragRestKlient fpOppdragKlient,
                                       TpsTjeneste tpsTjeneste,
+                                      VirksomhetTjeneste virksomhetTjeneste,
                                       FpsakKlient fpsakKlient,
                                       KodeverkRepository kodeverkRepository,
                                       @KonfigVerdi(value = "brukertilbakemelding.venter.frist.lengde") Period brukersSvarfrist) {
         this.fpOppdragKlient = fpOppdragKlient;
         this.tpsTjeneste = tpsTjeneste;
+        this.virksomhetTjeneste = virksomhetTjeneste;
         this.kodeverkRepository = kodeverkRepository;
         this.fpsakKlient = fpsakKlient;
         this.brukersSvarfrist = brukersSvarfrist;
@@ -75,7 +85,7 @@ public class EksternDataForBrevTjeneste {
 
     public Personinfo hentPerson(String aktørId) {
         Optional<Personinfo> personinfo = tpsTjeneste.hentBrukerForAktør(new AktørId(aktørId));
-        if (personinfo.isEmpty()) {
+        if (!personinfo.isPresent()) {
             throw EksternDataForBrevFeil.FACTORY.fantIkkeAdresseForAktørId(aktørId).toException();
         }
         return personinfo.get();
@@ -83,15 +93,40 @@ public class EksternDataForBrevTjeneste {
 
     public Adresseinfo hentAdresse(Personinfo personinfo, String aktørId) {
         Optional<Adresseinfo> adresseinfo = Optional.of(personinfo).map(s -> tpsTjeneste.hentAdresseinformasjon(s.getPersonIdent()));
-        if (adresseinfo.isEmpty()) {
+        if (!adresseinfo.isPresent()) {
             throw EksternDataForBrevFeil.FACTORY.fantIkkeAdresseForAktørId(aktørId).toException();
         }
         return adresseinfo.get();
     }
 
+    public Adresseinfo hentAdresse(Personinfo personinfo, BrevMottaker brevMottaker, Optional<VergeEntitet> vergeEntitet) {
+        String aktørId = personinfo.getAktørId().getId();
+        if(vergeEntitet.isPresent()){
+            VergeEntitet verge = vergeEntitet.get();
+            if(VergeType.ADVOKAT.equals(verge.getVergeType())){
+                return hentOrganisasjonAdresse(verge.getOrganisasjonsnummer(),verge.getNavn(), personinfo);
+            }else if(BrevMottaker.VERGE.equals(brevMottaker)){
+                aktørId = verge.getVergeAktørId().getId();
+                personinfo = hentPerson(aktørId);
+            }
+        }
+        return hentAdresse(personinfo,aktørId);
+    }
+
+    private Adresseinfo hentOrganisasjonAdresse(String organisasjonNummer, String vergeNavn, Personinfo personinfo) {
+        try {
+            Virksomhet virksomhet = virksomhetTjeneste.hentOrganisasjon(organisasjonNummer);
+            return fra(virksomhet, vergeNavn, personinfo);
+        } catch (HentOrganisasjonOrganisasjonIkkeFunnet e) {
+            throw EksternDataForBrevFeil.FACTORY.organisasjonIkkeFunnet(e).toException();
+        } catch (HentOrganisasjonUgyldigInput e) {
+            throw EksternDataForBrevFeil.FACTORY.ugyldigInput(e).toException();
+        }
+    }
+
     public FeilutbetaltePerioderDto hentFeilutbetaltePerioder(Long eksternBehandlingId) {
         Optional<FeilutbetaltePerioderDto> feilutbetaltePerioderDto = fpOppdragKlient.hentFeilutbetaltePerioder(eksternBehandlingId); //tilpasse feilmelding til eksternid
-        if (feilutbetaltePerioderDto.isEmpty()) {
+        if (!feilutbetaltePerioderDto.isPresent()) {
             throw EksternDataForBrevFeil.FACTORY.fantIkkeYtelesbehandlingISimuleringsapplikasjonen(eksternBehandlingId).toException();
         }
         return feilutbetaltePerioderDto.get();
@@ -108,6 +143,18 @@ public class EksternDataForBrevTjeneste {
             ytelseNavn.setNavnPåBrukersSpråk(ytelsePåBokmål);
         }
         return ytelseNavn;
+    }
+
+    private Adresseinfo fra(Virksomhet virksomhet, String vergeNavn, Personinfo personinfo) {
+        String navn = virksomhet.getNavn() + " c/o " + vergeNavn;
+        Adresseinfo.Builder adresseinfo = new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE, personinfo.getPersonIdent(), navn, personinfo.getPersonstatus());
+        return adresseinfo.medAdresselinje1(virksomhet.getAdresselinje1())
+            .medAdresselinje2(virksomhet.getAdresselinje2())
+            .medAdresselinje3(virksomhet.getAdresselinje3())
+            .medAdresselinje4(virksomhet.getAdresselinje4())
+            .medLand(virksomhet.getLandkode())
+            .medPostNr(virksomhet.getPostNr())
+            .medPoststed(virksomhet.getPoststed()).build();
     }
 
 }

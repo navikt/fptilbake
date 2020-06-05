@@ -45,10 +45,10 @@ public class BrevMetadataMapper {
         sakspartType.setSakspartTypeKode(IdKodeType.PERSON);
         fellesType.setSakspart(sakspartType);
 
-        //TODO (Trine) (PFP-6220): Hvis verge, må vi hente verges adresse istedet, og sette riktig mottakerId, navn etc.
         MottakerType mottakerType = new MottakerType();
         mottakerType.setMottakerTypeKode(IdKodeType.PERSON);
-        mottakerType.setMottakerId(brevMetadata.getMottakerAdresse().getPersonIdent().getIdent());
+        mottakerType.setMottakerId(brevMetadata.getMottakerAdresse().getVergeOrganisasjonNummer() != null ? brevMetadata.getMottakerAdresse().getVergeOrganisasjonNummer()
+            : brevMetadata.getMottakerAdresse().getPersonIdent().getIdent());
         mottakerType.setMottakerNavn(brevMetadata.getMottakerAdresse().getMottakerNavn());
         mottakerType.setMottakerAdresse(settMottakeradresse(brevMetadata.getMottakerAdresse()));
         fellesType.setMottaker(mottakerType);

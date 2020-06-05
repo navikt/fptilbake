@@ -75,7 +75,9 @@ public class VarselbrevUtilTest {
             feilutbetaltePerioderDto,
             Period.ofWeeks(3),
             FagsakYtelseType.ENGANGSTØNAD,
-            ytelseNavn);
+            ytelseNavn,
+            false,
+            null);
 
         assertThat(varselbrev.getBrevMetadata().getBehandlendeEnhetId()).isEqualTo(eksternBehandlingsinfoDto.getBehandlendeEnhetId());
         assertThat(varselbrev.getBrevMetadata().getBehandlendeEnhetNavn()).isEqualTo(eksternBehandlingsinfoDto.getBehandlendeEnhetNavn());
@@ -120,7 +122,7 @@ public class VarselbrevUtilTest {
             feilutbetaltePerioderDto,
             Period.ofWeeks(3),
             FagsakYtelseType.SVANGERSKAPSPENGER,
-            ytelseNavn, VARSEL_TEKST);
+            ytelseNavn, VARSEL_TEKST, false, null);
 
         assertThat(varselbrev.getBrevMetadata().getBehandlendeEnhetId()).isEqualTo(BEHANDLENDE_ENHET_ID);
         assertThat(varselbrev.getBrevMetadata().getBehandlendeEnhetNavn()).isEqualTo(BEHANDLENDE_ENHET_NAVN);
@@ -176,6 +178,8 @@ public class VarselbrevUtilTest {
             Period.ofWeeks(3),
             VARSEL_TEKST,
             feilutbetalingFakta,
+            false,
+            null,
             false);
 
         assertThat(varselbrev.getBrevMetadata().getBehandlendeEnhetId()).isEqualTo(BEHANDLENDE_ENHET_ID);

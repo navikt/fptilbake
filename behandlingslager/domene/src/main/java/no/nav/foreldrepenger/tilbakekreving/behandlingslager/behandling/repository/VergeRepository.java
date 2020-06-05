@@ -54,6 +54,10 @@ public class VergeRepository {
         } );
     }
 
+    public boolean finnesVerge(long behandlingId){
+        return finnVergeInformasjon(behandlingId).isPresent();
+    }
+
     private Optional<VergeAggregateEntitet> hentVergeForBehandling(long behandlingId) {
         TypedQuery<VergeAggregateEntitet> query = entityManager.createQuery("from VergeAggregateEntitet where behandlingId=:behandlingId and aktiv='J'", VergeAggregateEntitet.class);
         query.setParameter("behandlingId", behandlingId);
