@@ -58,16 +58,11 @@ public class EksternBehandlingRepositoryImpl implements EksternBehandlingReposit
     }
 
     @Override
-    public Optional<EksternBehandling> hentFraEksternId(long eksternBehandlingId) {
-        TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where ekstern_id=:eksternId and aktiv='J'", EksternBehandling.class);
-        query.setParameter(EKSTERN_ID, eksternBehandlingId);
-        return hentUniktResultat(query);
-    }
-
-    @Override
     public Optional<EksternBehandling> hentFraHenvisning(Henvisning henvisning) {
-        //FIXME k9-tilbake støtt henvisning for k9
-        return hentFraEksternId(henvisning.toLong());
+        //FIXME k9-tilbake støtt henvisning for k9 (bytt fra ekstern_id til henvisning når migrert)
+        TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where ekstern_id=:eksternId and aktiv='J'", EksternBehandling.class);
+        query.setParameter(EKSTERN_ID, henvisning.getVerdi());
+        return hentUniktResultat(query);
     }
 
     @Override
@@ -93,16 +88,8 @@ public class EksternBehandlingRepositoryImpl implements EksternBehandlingReposit
     }
 
     @Override
-    public boolean finnesEksternBehandling(long internId, long eksternId) {
-        TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where ekstern_id=:eksternId and intern_id=:internId and aktiv='J'", EksternBehandling.class);
-        query.setParameter(EKSTERN_ID, eksternId);
-        query.setParameter(INTERN_ID, internId);
-        return !query.getResultList().isEmpty();
-    }
-
-    @Override
     public boolean finnesEksternBehandling(long internId, Henvisning henvisning) {
-        //FIXME k9-tilbake støtt Henvisning som ikke er bare tall
+        //FIXME k9-tilbake støtt Henvisning som ikke er bare tall (bytt ekstern_id->henvisning når migrert)
         TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where ekstern_id=:eksternId and intern_id=:internId and aktiv='J'", EksternBehandling.class);
         query.setParameter(EKSTERN_ID, henvisning.toLong());
         query.setParameter(INTERN_ID, internId);

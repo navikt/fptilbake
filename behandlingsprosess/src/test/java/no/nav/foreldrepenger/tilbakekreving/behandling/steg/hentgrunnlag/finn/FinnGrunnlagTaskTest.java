@@ -147,7 +147,7 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
         assertThat(økonomiXmlMottatt).isPresent();
         assertThat(økonomiXmlMottatt.get().isTilkoblet()).isTrue();
         assertThat(behandling.isBehandlingPåVent()).isFalse();
-        assertThat(eksternBehandlingRepository.hentFraEksternId(FPSAK_ANNEN_BEHANDLING_ID)).isNotEmpty();
+        assertThat(eksternBehandlingRepository.hentFraHenvisning(ANNEN_HENVISNING)).isNotEmpty();
     }
 
     @Test
@@ -164,7 +164,7 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
         assertThat(økonomiXmlMottatt).isPresent();
         assertThat(økonomiXmlMottatt.get().isTilkoblet()).isTrue();
         assertThat(behandling.isBehandlingPåVent()).isFalse();
-        assertThat(eksternBehandlingRepository.hentFraEksternId(FPSAK_ANNEN_BEHANDLING_ID)).isNotEmpty();
+        assertThat(eksternBehandlingRepository.hentFraHenvisning(ANNEN_HENVISNING)).isNotEmpty();
     }
 
     @Test

@@ -96,7 +96,7 @@ public class HentKorrigertKravgrunnlagTaskTest {
         assertThat(kravgrunnlagRepository.harGrunnlagForBehandlingId(behandlingId)).isTrue();
         EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandlingId);
         Kravgrunnlag431 kravgrunnlag431 = kravgrunnlagRepository.finnKravgrunnlag(behandlingId);
-        assertThat(eksternBehandling.getHenvisning().getVerdi()).isEqualTo(kravgrunnlag431.getReferanse());
+        assertThat(eksternBehandling.getHenvisning()).isEqualTo(kravgrunnlag431.getReferanse());
         verify(fpsakKlientMock, never()).hentBehandlingForSaksnummer(anyString());
     }
 
@@ -122,7 +122,7 @@ public class HentKorrigertKravgrunnlagTaskTest {
         assertThat(kravgrunnlagRepository.harGrunnlagForBehandlingId(behandlingId)).isTrue();
         eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandlingId);
         Kravgrunnlag431 kravgrunnlag431 = kravgrunnlagRepository.finnKravgrunnlag(behandlingId);
-        assertThat(eksternBehandling.getHenvisning().getVerdi()).isEqualTo(kravgrunnlag431.getReferanse());
+        assertThat(eksternBehandling.getHenvisning()).isEqualTo(kravgrunnlag431.getReferanse());
         assertThat(eksternBehandling.getHenvisning().toLong()).isEqualTo(1l);
         verify(fpsakKlientMock, atLeastOnce()).hentBehandlingForSaksnummer(anyString());
     }

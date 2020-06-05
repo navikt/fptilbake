@@ -21,12 +21,6 @@ public interface EksternBehandlingRepository {
      */
     EksternBehandling hentFraInternId(long internBehandlingId);
 
-    /**
-     * Finner eksternBehandling med behandlingId fra eksternt system
-     * @param eksternBehandlingId
-     */
-    Optional<EksternBehandling> hentFraEksternId(long eksternBehandlingId);
-
     Optional<EksternBehandling> hentFraHenvisning(Henvisning henvisning);
 
     /**
@@ -41,8 +35,6 @@ public interface EksternBehandlingRepository {
      * @return
      */
     Optional<EksternBehandling> finnForSisteAvsluttetTbkBehandling(UUID eksternUuid);
-
-    boolean finnesEksternBehandling(long internId, long eksternId);
 
     boolean finnesEksternBehandling(long internId, Henvisning henvisning);
 

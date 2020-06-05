@@ -4,6 +4,7 @@ import java.util.List;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 
@@ -30,7 +31,8 @@ public class KravgrunnlagMockUtil {
             .medBostedEnhet("8020")
             .medFeltKontroll("00")
             .medSaksBehId("Z991035")
-            .medReferanse("100000000").build();
+            .medReferanse(Henvisning.fraEksternBehandlingId(100000000L))
+            .build();
         for (KravgrunnlagMock mock : kravgrunnlagMocker) {
             kravgrunnlag431.leggTilPeriode(lagMockPeriode(mock, kravgrunnlag431));
         }

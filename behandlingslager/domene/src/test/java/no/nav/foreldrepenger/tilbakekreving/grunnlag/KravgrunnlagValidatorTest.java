@@ -9,6 +9,7 @@ import org.junit.rules.ExpectedException;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
@@ -19,7 +20,7 @@ public class KravgrunnlagValidatorTest {
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
-    private Kravgrunnlag431 kravgrunnlag = lagKravgrunnlag(1000000L);
+    private Kravgrunnlag431 kravgrunnlag = lagKravgrunnlag(Henvisning.fraEksternBehandlingId(1000000L));
     private BigDecimal maxSkattJanuar = BigDecimal.valueOf(100);
 
 
@@ -166,7 +167,7 @@ public class KravgrunnlagValidatorTest {
         return kgPeriode;
     }
 
-    private static Kravgrunnlag431 lagKravgrunnlag(Long eksternBehandlingId) {
+    private static Kravgrunnlag431 lagKravgrunnlag(Henvisning henvisning) {
         return new Kravgrunnlag431.Builder()
             .medEksternKravgrunnlagId("12341")
             .medFagSystemId("GSAKNR-12312")
@@ -180,7 +181,7 @@ public class KravgrunnlagValidatorTest {
             .medGjelderType(GjelderType.PERSON)
             .medGjelderVedtakId("???")
             .medSaksBehId("Z111111")
-            .medReferanse(eksternBehandlingId != null ? Long.toString(eksternBehandlingId) : null)
+            .medReferanse(henvisning)
             .medUtbetalesTilId("99999999999")
             .medUtbetIdType(GjelderType.PERSON)
             .build();

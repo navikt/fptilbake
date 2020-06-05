@@ -25,10 +25,6 @@ public class KravVedtakStatusMapper {
         this.tpsAdapterWrapper = tpsAdapterWrapper;
     }
 
-    public Henvisning finnHenvisning(KravOgVedtakstatus kravOgVedtakstatus) {
-        return new Henvisning(kravOgVedtakstatus.getReferanse());
-    }
-
     public Long finnVedtakId(KravOgVedtakstatus kravOgVedtakstatus) {
         return kravOgVedtakstatus.getVedtakId().longValue();
     }
@@ -40,8 +36,9 @@ public class KravVedtakStatusMapper {
             .medFagomraadeKode(FagOmrådeKode.fraKode(kravOgVedtakstatus.getKodeFagomraade()))
             .medVedtakId(kravOgVedtakstatus.getVedtakId().longValue())
             .medFagSystemId(kravOgVedtakstatus.getFagsystemId())
-            .medReferanse(kravOgVedtakstatus.getReferanse())
+            .medReferanse(new Henvisning(kravOgVedtakstatus.getReferanse()))
             .medGjelderType(gjelderType)
-            .medGjelderVedtakId(tpsAdapterWrapper.hentAktørIdEllerOrganisajonNummer(kravOgVedtakstatus.getVedtakGjelderId(), gjelderType)).build();
+            .medGjelderVedtakId(tpsAdapterWrapper.hentAktørIdEllerOrganisajonNummer(kravOgVedtakstatus.getVedtakGjelderId(), gjelderType))
+            .build();
     }
 }

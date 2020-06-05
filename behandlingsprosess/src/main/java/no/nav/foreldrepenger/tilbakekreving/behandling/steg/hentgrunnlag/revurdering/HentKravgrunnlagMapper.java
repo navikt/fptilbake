@@ -9,6 +9,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TpsAdapterWrapper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagBelop433;
@@ -71,7 +72,7 @@ public class HentKravgrunnlagMapper {
             .medBehandlendeEnhet(trimTrailingSpaces(dto.getEnhetBehandl()))
             .medFeltKontroll(dto.getKontrollfelt())
             .medSaksBehId(trimTrailingSpaces(dto.getSaksbehId()))
-            .medReferanse(dto.getReferanse())
+            .medReferanse(new Henvisning(dto.getReferanse()))
             .medEksternKravgrunnlagId(String.valueOf(dto.getKravgrunnlagId()))
             .build();
     }

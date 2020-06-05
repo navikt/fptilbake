@@ -2,6 +2,8 @@ package no.nav.foreldrepenger.tilbakekreving.grunnlag;
 
 import java.util.Objects;
 
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -16,6 +18,7 @@ import org.hibernate.annotations.JoinFormula;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 
@@ -51,8 +54,10 @@ public class KravVedtakStatus437 extends BaseEntitet {
     @JoinColumnOrFormula(formula = @JoinFormula(referencedColumnName = "kodeverk", value = "'" + GjelderType.DISCRIMINATOR + "'"))
     private GjelderType gjelderType;
 
-    @Column(name = "referanse")
-    private String referanse;
+    @AttributeOverrides({
+        @AttributeOverride(name = "henvisning", column = @Column(name = "referanse"))
+    })
+    private Henvisning referanse;
 
     public Long getId() {
         return id;
@@ -86,7 +91,7 @@ public class KravVedtakStatus437 extends BaseEntitet {
         return gjelderType;
     }
 
-    public String getReferanse() {
+    public Henvisning getReferanse() {
         return referanse;
     }
 
@@ -146,7 +151,7 @@ public class KravVedtakStatus437 extends BaseEntitet {
             return this;
         }
 
-        public Builder medReferanse(String referanse) {
+        public Builder medReferanse(Henvisning referanse) {
             this.kladd.referanse = referanse;
             return this;
         }

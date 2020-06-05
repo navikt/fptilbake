@@ -13,7 +13,11 @@ import no.nav.vedtak.log.util.LoggerUtils;
 public class Henvisning {
     private static final String CHARS = "a-zA-Z0-9+/";
 
-    private static final Pattern VALID = Pattern.compile("^[" + CHARS + "]*$", Pattern.CASE_INSENSITIVE);
+    //tall som passer i en long
+    private static final Pattern LONG_PATTERN = Pattern.compile("^\\d{1,18}$", Pattern.CASE_INSENSITIVE);
+
+    //eksakt 22 tegn base64
+    private static final Pattern BASE64_UUID_PATTERN = Pattern.compile("^[" + CHARS + "]{22}$", Pattern.CASE_INSENSITIVE);
 
     @Column(name = "henvisning")
     private String henvisning; // NOSONAR
@@ -28,17 +32,16 @@ public class Henvisning {
     }
 
     public Henvisning(String henvisning) {
-        Objects.requireNonNull(henvisning, "henvisning");
-        if (!erGyldig(henvisning)) {
-            // skal ikke skje, funksjonelle feilmeldinger håndteres ikke her.
-            throw new IllegalArgumentException("Ugyldig henvisning, støtter kun " + CHARS + " tegn. Fikk: " + LoggerUtils.removeLineBreaks(henvisning));
-        }
         this.henvisning = henvisning;
+    }
+
+    public static boolean erGyldig(Henvisning henvisning) {
+        return erGyldig(henvisning.getVerdi());
     }
 
     public static boolean erGyldig(String henvisning) {
         //TODO k9-tilbake, vurder om denne skal være applikasjons-spesifikk
-        return VALID.matcher(henvisning).matches();
+        return henvisning != null && (LONG_PATTERN.matcher(henvisning).matches() || BASE64_UUID_PATTERN.matcher(henvisning).matches());
     }
 
     public String getVerdi() {
@@ -46,7 +49,7 @@ public class Henvisning {
     }
 
     public long toLong() {
-        if (!henvisning.matches("^\\d+$")) {
+        if (henvisning == null || !LONG_PATTERN.matcher(henvisning).matches()) {
             throw new IllegalArgumentException("Kan ikke konvertere henvisning " + LoggerUtils.removeLineBreaks(henvisning) + " til long");
         }
         return Long.parseLong(henvisning);
@@ -70,6 +73,6 @@ public class Henvisning {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "<" + henvisning + ">";
+        return henvisning;
     }
 }

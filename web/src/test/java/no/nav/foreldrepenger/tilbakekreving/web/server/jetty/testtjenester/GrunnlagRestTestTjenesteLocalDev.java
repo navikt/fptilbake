@@ -27,6 +27,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.TpsTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
@@ -77,11 +78,11 @@ public class GrunnlagRestTestTjenesteLocalDev implements GrunnlagRestTestTjenest
 
 
     private Kravgrunnlag431 lagKravgrunnlag(DetaljertKravgrunnlagDto kravgrunnlagDto) {
-        Kravgrunnlag431 kravgrunnlag431 = formKravgrunnlag431(kravgrunnlagDto);
+        Kravgrunnlag431 kravgrunnlag431 = lagKravgrunnlag431(kravgrunnlagDto);
         for (DetaljertKravgrunnlagPeriodeDto periodeDto : kravgrunnlagDto.getPerioder()) {
-            KravgrunnlagPeriode432 kravgrunnlagPeriode432 = formKravgrunnlagPeriode432(kravgrunnlag431, periodeDto);
+            KravgrunnlagPeriode432 kravgrunnlagPeriode432 = lagKravgrunnlagPeriode432(kravgrunnlag431, periodeDto);
             for (DetaljertKravgrunnlagBelopDto postering : periodeDto.getPosteringer()) {
-                KravgrunnlagBelop433 kravgrunnlagBelop433 = formKravgrunnlagBelop433(kravgrunnlagPeriode432, postering);
+                KravgrunnlagBelop433 kravgrunnlagBelop433 = lagKravgrunnlagBelop433(kravgrunnlagPeriode432, postering);
                 kravgrunnlagPeriode432.leggTilBeløp(kravgrunnlagBelop433);
             }
             kravgrunnlag431.leggTilPeriode(kravgrunnlagPeriode432);
@@ -89,7 +90,7 @@ public class GrunnlagRestTestTjenesteLocalDev implements GrunnlagRestTestTjenest
         return kravgrunnlag431;
     }
 
-    private Kravgrunnlag431 formKravgrunnlag431(DetaljertKravgrunnlagDto kravgrunnlagDto) {
+    private Kravgrunnlag431 lagKravgrunnlag431(DetaljertKravgrunnlagDto kravgrunnlagDto) {
         return Kravgrunnlag431.builder()
             .medEksternKravgrunnlagId(kravgrunnlagDto.getKravgrunnlagId().toString())
             .medVedtakId(kravgrunnlagDto.getVedtakId())
@@ -98,11 +99,9 @@ public class GrunnlagRestTestTjenesteLocalDev implements GrunnlagRestTestTjenest
             .medFagSystemId(kravgrunnlagDto.getFagSystemId())
             .medVedtakFagSystemDato(kravgrunnlagDto.getVedtakFagSystemDato())
             .medOmgjortVedtakId(kravgrunnlagDto.getOmgjortVedtakId())
-            .medGjelderVedtakId(hentAktørIdEllerOrganisajonNummer(kravgrunnlagDto.getGjelderVedtakId(),
-                GjelderType.fraKode(kravgrunnlagDto.getGjelderType())))
+            .medGjelderVedtakId(hentAktørIdEllerOrganisajonNummer(kravgrunnlagDto.getGjelderVedtakId(), GjelderType.fraKode(kravgrunnlagDto.getGjelderType())))
             .medGjelderType(GjelderType.fraKode(kravgrunnlagDto.getGjelderType()))
-            .medUtbetalesTilId(hentAktørIdEllerOrganisajonNummer(kravgrunnlagDto.getUtbetalesTilId(),
-                GjelderType.fraKode(kravgrunnlagDto.getUtbetGjelderType())))
+            .medUtbetalesTilId(hentAktørIdEllerOrganisajonNummer(kravgrunnlagDto.getUtbetalesTilId(), GjelderType.fraKode(kravgrunnlagDto.getUtbetGjelderType())))
             .medUtbetIdType(GjelderType.fraKode(kravgrunnlagDto.getUtbetGjelderType()))
             .medHjemmelKode(kravgrunnlagDto.getHjemmelKode())
             .medBeregnesRenter(kravgrunnlagDto.getBeregnesRenter())
@@ -111,10 +110,11 @@ public class GrunnlagRestTestTjenesteLocalDev implements GrunnlagRestTestTjenest
             .medBehandlendeEnhet(kravgrunnlagDto.getBehandlendeEnhet())
             .medFeltKontroll(kravgrunnlagDto.getKontrollFelt())
             .medSaksBehId(kravgrunnlagDto.getSaksBehId())
-            .medReferanse(kravgrunnlagDto.getReferanse()).build();
+            .medReferanse(new Henvisning(kravgrunnlagDto.getReferanse()))
+            .build();
     }
 
-    private KravgrunnlagPeriode432 formKravgrunnlagPeriode432(Kravgrunnlag431 kravgrunnlag431, DetaljertKravgrunnlagPeriodeDto periodeDto) {
+    private KravgrunnlagPeriode432 lagKravgrunnlagPeriode432(Kravgrunnlag431 kravgrunnlag431, DetaljertKravgrunnlagPeriodeDto periodeDto) {
         return KravgrunnlagPeriode432.builder()
             .medPeriode(Periode.of(periodeDto.getFom(), periodeDto.getTom()))
             .medBeløpSkattMnd(periodeDto.getBeløpSkattMnd())
@@ -122,7 +122,7 @@ public class GrunnlagRestTestTjenesteLocalDev implements GrunnlagRestTestTjenest
             .build();
     }
 
-    private KravgrunnlagBelop433 formKravgrunnlagBelop433(KravgrunnlagPeriode432 kravgrunnlagPeriode432, DetaljertKravgrunnlagBelopDto postering) {
+    private KravgrunnlagBelop433 lagKravgrunnlagBelop433(KravgrunnlagPeriode432 kravgrunnlagPeriode432, DetaljertKravgrunnlagBelopDto postering) {
         return KravgrunnlagBelop433.builder()
             .medKlasseKode(postering.getKlasseKode())
             .medKlasseType(KlasseType.fraKode(postering.getKlasseType()))

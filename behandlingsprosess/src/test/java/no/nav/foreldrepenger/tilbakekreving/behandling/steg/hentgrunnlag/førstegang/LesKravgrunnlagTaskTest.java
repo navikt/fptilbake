@@ -34,7 +34,7 @@ public class LesKravgrunnlagTaskTest extends FellesTestOppsett {
 
         boolean erGrunnlagFinnes = grunnlagRepository.harGrunnlagForBehandlingId(behandling.getId());
         assertThat(erGrunnlagFinnes).isTrue();
-        Optional<EksternBehandling> eksternBehandling = eksternBehandlingRepository.hentFraEksternId(FPSAK_BEHANDLING_ID);
+        Optional<EksternBehandling> eksternBehandling = eksternBehandlingRepository.hentFraHenvisning(HENVISNING);
         assertThat(eksternBehandling).isNotEmpty();
         assertThat(eksternBehandling.get().getInternId()).isEqualTo(behandling.getId());
         assertTilkobling();
@@ -52,7 +52,7 @@ public class LesKravgrunnlagTaskTest extends FellesTestOppsett {
     public void skal_utføre_leskravgrunnlag_task_forUgyldigBehandling() {
         kravgrunnlagId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_YTEL_ugyldig_referanse.xml"));
 
-        expectedException.expectMessage("Kan ikke konvertere henvisning ABC til long");
+        expectedException.expectMessage("Mottok et kravOgVedtakStatus fra Økonomi med henvisning i ikke-støttet format, henvisning=ABC. KravOgVedtakStatus skulle kanskje til et annet system. Si i fra til Økonomi!");
         lesKravgrunnlagTask.doTask(lagProsessTaskData());
     }
 

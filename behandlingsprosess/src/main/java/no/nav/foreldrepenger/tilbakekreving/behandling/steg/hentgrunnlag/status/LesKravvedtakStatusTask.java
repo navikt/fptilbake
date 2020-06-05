@@ -75,7 +75,8 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
         KravVedtakStatus437 kravVedtakStatus437 = statusMapper.mapTilDomene(kravOgVedtakstatus);
         String saksnummer = finnSaksnummer(kravOgVedtakstatus.getFagsystemId());
 
-        Henvisning henvisning = statusMapper.finnHenvisning(kravOgVedtakstatus);
+        Henvisning henvisning = kravVedtakStatus437.getReferanse();
+        validerHenvisning(henvisning);
         økonomiMottattXmlRepository.oppdaterMedHenvisningOgSaksnummer(henvisning, saksnummer, mottattXmlId);
 
         long vedtakId = statusMapper.finnVedtakId(kravOgVedtakstatus);
@@ -95,12 +96,18 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
     }
 
     private Optional<EksternBehandling> hentKoblingTilInternBehandling(Henvisning referanse) {
-            return eksternBehandlingRepository.hentFraHenvisning(referanse);
+        return eksternBehandlingRepository.hentFraHenvisning(referanse);
+    }
+
+    private void validerHenvisning(Henvisning henvisning) {
+        if (!Henvisning.erGyldig(henvisning)) {
+            throw LesKravvedtakStatusTaskFeil.FACTORY.ugyldigHenvisning(henvisning).toException();
+        }
     }
 
     private void validerBehandlingsEksistens(Henvisning henvisning, String saksnummer) {
         if (!finnesYtelsesbehandling(saksnummer, henvisning)) {
-            throw LesKravvedtakStatusTask.LesKravvedtakStatusTaskFeil.FACTORY.behandlingFinnesIkkeIFpsak(henvisning).toException();
+            throw LesKravvedtakStatusTaskFeil.FACTORY.behandlingFinnesIkkeIFpsak(henvisning).toException();
         }
     }
 
@@ -109,7 +116,7 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
         if (aggregateOpt.isPresent()) {
             logger.info("Grunnlag finnes allerede for vedtakId={}", vedtakId);
             KravgrunnlagAggregate aggregate = aggregateOpt.get();
-            Henvisning referanse = aggregate.getGrunnlagØkonomi().getHenvisning();
+            Henvisning referanse = aggregate.getGrunnlagØkonomi().getReferanse();
             Long behandlingId = aggregate.getBehandlingId();
             Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
             if (behandling.erAvsluttet()) {
@@ -142,6 +149,11 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
             feilmelding = "Mottok et tilbakekrevingsgrunnlag fra Økonomi for en behandling som ikke finnes i fpsak. henvisning=%s. Kravgrunnlaget skulle kanskje til et annet system. Si i fra til Økonomi!",
             logLevel = LogLevel.WARN)
         Feil behandlingFinnesIkkeIFpsak(Henvisning henvisning);
+
+        @TekniskFeil(feilkode = "FPT-675364",
+            feilmelding = "Mottok et kravOgVedtakStatus fra Økonomi med henvisning i ikke-støttet format, henvisning=%s. KravOgVedtakStatus skulle kanskje til et annet system. Si i fra til Økonomi!",
+            logLevel = LogLevel.WARN)
+        Feil ugyldigHenvisning(Henvisning henvisning);
 
     }
 

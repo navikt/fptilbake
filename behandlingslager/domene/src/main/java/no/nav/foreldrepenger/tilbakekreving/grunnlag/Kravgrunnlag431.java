@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -97,8 +99,10 @@ public class Kravgrunnlag431 extends BaseEntitet {
     @Column(name = "saksbeh_id", nullable = false)
     private String saksBehId;
 
-    @Column(name = "referanse")
-    private String referanse;
+    @AttributeOverrides({
+        @AttributeOverride(name = "henvisning", column = @Column(name = "referanse"))
+    })
+    private Henvisning referanse;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "kravgrunnlag431", cascade = CascadeType.PERSIST)
     private List<KravgrunnlagPeriode432> perioder = new ArrayList<>();
@@ -183,12 +187,8 @@ public class Kravgrunnlag431 extends BaseEntitet {
         return saksBehId;
     }
 
-    public String getReferanse() {
+    public Henvisning getReferanse(){
         return referanse;
-    }
-
-    public Henvisning getHenvisning(){
-        return new Henvisning(referanse);
     }
 
     public List<KravgrunnlagPeriode432> getPerioder() {
@@ -316,7 +316,7 @@ public class Kravgrunnlag431 extends BaseEntitet {
             return this;
         }
 
-        public Builder medReferanse(String referanse) {
+        public Builder medReferanse(Henvisning referanse) {
             this.kladd.referanse = referanse;
             return this;
         }

@@ -137,7 +137,7 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
         Kravgrunnlag431 kravgrunnlag431 = kravgrunnlagMapper.mapTilDomene(kravgrunnlag);
         grunnlagRepository.lagre(behandling.getId(), kravgrunnlag431);
 
-        Henvisning grunnlagReferanse = kravgrunnlag431.getHenvisning();
+        Henvisning grunnlagReferanse = kravgrunnlag431.getReferanse();
         EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandling.getId());
         if (!erReferanseRiktig(grunnlagReferanse, eksternBehandling)) {
             logger.info("Tilkoblet grunnlag har en annen referanse={} enn behandling for behandlingId={}", grunnlagReferanse, behandling.getId());

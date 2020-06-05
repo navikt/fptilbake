@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.FellesTask;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TaskProperty;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.status.LesKravvedtakStatusTask;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
@@ -99,6 +100,9 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
     }
 
     private static boolean validerKravgrunnlag(Long mottattXmlId, Henvisning henvisning, String saksnummer, Kravgrunnlag431 kravgrunnlag) {
+        if (!Henvisning.erGyldig(henvisning)) {
+            throw LesKravvedtakStatusTask.LesKravvedtakStatusTaskFeil.FACTORY.ugyldigHenvisning(henvisning).toException();
+        }
         try {
             KravgrunnlagValidator.validerGrunnlag(kravgrunnlag);
             return true;
@@ -111,12 +115,10 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
     }
 
     private Optional<EksternBehandling> hentKoblingTilInternBehandling(Henvisning henvisning) {
-        long eksternBehandlingId = henvisning.toLong();
-        return eksternBehandlingRepository.hentFraEksternId(eksternBehandlingId);
+        return eksternBehandlingRepository.hentFraHenvisning(henvisning);
     }
 
     private void validerBehandlingsEksistens(Henvisning henvisning, String saksnummer) {
-
         if (!finnesYtelsesbehandling(saksnummer, henvisning)) {
             throw LesKravgrunnlagTaskFeil.FACTORY.behandlingFinnesIkkeIFagsaksystemet(henvisning).toException();
         }
@@ -131,6 +133,11 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
             feilmelding = "Mottok et tilbakekrevingsgrunnlag fra Økonomi for en behandling som ikke finnes i fpsak. henvisning=%s. Kravgrunnlaget skulle kanskje til et annet system. Si i fra til Økonomi!",
             logLevel = LogLevel.WARN)
         Feil behandlingFinnesIkkeIFagsaksystemet(Henvisning henvisning);
+
+        @TekniskFeil(feilkode = "FPT-675363",
+            feilmelding = "Mottok et tilbakekrevingsgrunnlag fra Økonomi med henvisning som ikke er i støttet format. henvisning=%s. Kravgrunnlaget skulle kanskje til et annet system. Si i fra til Økonomi!",
+            logLevel = LogLevel.WARN)
+        Feil ugyldigHenvisning(Henvisning henvisning);
 
         @TekniskFeil(feilkode = "FPT-839288",
             feilmelding = "Mottok et ugyldig kravgrunnlag for saksnummer=%s henvisning=%s mottattXmlId=%s",

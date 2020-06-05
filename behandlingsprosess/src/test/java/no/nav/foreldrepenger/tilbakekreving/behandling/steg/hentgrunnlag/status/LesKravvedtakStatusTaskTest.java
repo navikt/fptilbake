@@ -138,7 +138,7 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         // den xml-en har behandlngId som finnes ikke i EksternBehandling
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_ugyldigreferanse.xml"));
 
-        expectedException.expectMessage("Kan ikke konvertere henvisning ABC til long");
+        expectedException.expectMessage("Mottok et kravOgVedtakStatus fra Økonomi med henvisning i ikke-støttet format, henvisning=ABC. KravOgVedtakStatus skulle kanskje til et annet system. Si i fra til Økonomi!");
         lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LesKravvedtakStatusTask.TASKTYPE));
     }
 
