@@ -183,7 +183,7 @@ public class VarselbrevTjeneste {
     public VarselbrevSamletInfo lagVarselbrevForForhåndsvisning(UUID behandlingUuId, String varseltekst, FagsakYtelseType fagsakYtleseType) {
         SamletEksternBehandlingInfo eksternBehandlingsinfo = eksternDataForBrevTjeneste.hentYtelsesbehandlingFraFagsystemet(behandlingUuId, Tillegsinformasjon.PERSONOPPLYSNINGER, Tillegsinformasjon.FAGSAK);
         EksternBehandlingsinfoDto grunninformasjon = eksternBehandlingsinfo.getGrunninformasjon();
-        Optional<EksternBehandling> eksternBehandling = eksternBehandlingRepository.hentFraEksternId(grunninformasjon.getId());
+        Optional<EksternBehandling> eksternBehandling = eksternBehandlingRepository.hentFraHenvisning(grunninformasjon.getHenvisning());
         Behandling behandling = eksternBehandling.isPresent() ? behandlingRepository.hentBehandling(eksternBehandling.get().getInternId()) : null;
         Optional<VergeEntitet> vergeEntitet = behandling != null ? vergeRepository.finnVergeInformasjon(behandling.getId()) : Optional.empty();
         boolean finnesVerge = vergeEntitet.isPresent();
