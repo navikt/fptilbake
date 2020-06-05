@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.FellesTask;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TaskProperty;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.status.LesKravvedtakStatusTask;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
@@ -100,9 +99,7 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
     }
 
     private static boolean validerKravgrunnlag(Long mottattXmlId, Henvisning henvisning, String saksnummer, Kravgrunnlag431 kravgrunnlag) {
-        if (!Henvisning.erGyldig(henvisning)) {
-            throw LesKravvedtakStatusTask.LesKravvedtakStatusTaskFeil.FACTORY.ugyldigHenvisning(henvisning).toException();
-        }
+        validerHenvisning(henvisning);
         try {
             KravgrunnlagValidator.validerGrunnlag(kravgrunnlag);
             return true;
@@ -111,6 +108,12 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
             //prosessen får fortsette, slik at prosessen hopper tilbake hvis den er i fakta-steget eller senere
             LesKravgrunnlagTaskFeil.FACTORY.ugyldigKravgrunnlag(saksnummer, henvisning, mottattXmlId, e).log(logger);
             return false;
+        }
+    }
+
+    private static void validerHenvisning(Henvisning henvisning){
+        if (!Henvisning.erGyldig(henvisning)) {
+            throw LesKravgrunnlagTaskFeil.FACTORY.ugyldigHenvisning(henvisning).toException();
         }
     }
 

@@ -95,9 +95,11 @@ public class HåndterGamleKravgrunnlagBatchTjenesteTest extends FellesTestOppset
         System.setProperty("environment.name", "devimg");
         when(tpsAdapterMock.hentAktørIdForPersonIdent(any(PersonIdent.class))).thenReturn(Optional.of(behandling.getFagsak().getAktørId()));
         when(økonomiConsumerMock.hentKravgrunnlag(any(), any(HentKravgrunnlagDetaljDto.class))).thenReturn(lagDetaljertKravgrunnlagDto(true));
-        when(fpsakKlientMock.hentBehandlingForSaksnummer(anyString())).thenReturn(Lists.newArrayList(lagEksternBehandlingData()));
-        when(fpsakKlientMock.hentBehandlingsinfo(any(UUID.class), any(Tillegsinformasjon.class))).thenReturn(lagSamletEksternBehandlingData());
-        when(fpsakKlientMock.hentBehandling(any(UUID.class))).thenReturn(Optional.of(lagEksternBehandlingData()));
+        EksternBehandlingsinfoDto eksternBehandlingsinfoDto = lagEksternBehandlingData();
+        when(fpsakKlientMock.hentBehandlingForSaksnummer(anyString())).thenReturn(Lists.newArrayList(eksternBehandlingsinfoDto));
+        when(fpsakKlientMock.hentBehandlingsinfo(any(UUID.class), any(Tillegsinformasjon.class))).thenReturn(lagSamletEksternBehandlingData(eksternBehandlingsinfoDto));
+        when(fpsakKlientMock.hentBehandlingOptional(any(UUID.class))).thenReturn(Optional.of(eksternBehandlingsinfoDto));
+        when(fpsakKlientMock.hentBehandling(any(UUID.class))).thenReturn(eksternBehandlingsinfoDto);
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_YTEL.xml"));
     }
 
@@ -309,14 +311,14 @@ public class HåndterGamleKravgrunnlagBatchTjenesteTest extends FellesTestOppset
         return eksternBehandlingsinfoDto;
     }
 
-    private SamletEksternBehandlingInfo lagSamletEksternBehandlingData() {
+    private SamletEksternBehandlingInfo lagSamletEksternBehandlingData(EksternBehandlingsinfoDto eksternBehandlingsinfoDto) {
         FagsakDto fagsakDto = new FagsakDto();
         fagsakDto.setSaksnummer(139015144l);
         fagsakDto.setSakstype(FagsakYtelseType.FORELDREPENGER);
         PersonopplysningDto personopplysningDto = new PersonopplysningDto();
         personopplysningDto.setAktoerId(behandling.getAktørId().getId());
         SamletEksternBehandlingInfo samletEksternBehandlingInfo = SamletEksternBehandlingInfo.builder(Tillegsinformasjon.FAGSAK, Tillegsinformasjon.PERSONOPPLYSNINGER)
-            .setGrunninformasjon(lagEksternBehandlingData())
+            .setGrunninformasjon(eksternBehandlingsinfoDto)
             .setFagsak(fagsakDto)
             .setPersonopplysninger(personopplysningDto).build();
         return samletEksternBehandlingInfo;

@@ -83,7 +83,7 @@ public class FpsakKlient {
     public SamletEksternBehandlingInfo hentBehandlingsinfo(UUID eksternUuid, Tillegsinformasjon... tillegsinformasjon) {
         List<Tillegsinformasjon> ekstrainfo = Arrays.asList(tillegsinformasjon);
         SamletEksternBehandlingInfo.Builder builder = SamletEksternBehandlingInfo.builder(ekstrainfo);
-        Optional<EksternBehandlingsinfoDto> eksternBehandlingsinfoDtoOptional = hentBehandling(eksternUuid);
+        Optional<EksternBehandlingsinfoDto> eksternBehandlingsinfoDtoOptional = hentBehandlingOptional(eksternUuid);
 
         eksternBehandlingsinfoDtoOptional.ifPresent(eksternBehandlingsinfo -> {
 
@@ -116,13 +116,18 @@ public class FpsakKlient {
         return builder.build();
     }
 
-    public Optional<EksternBehandlingsinfoDto> hentBehandling(UUID eksternUuid) {
+    public Optional<EksternBehandlingsinfoDto> hentBehandlingOptional(UUID eksternUuid) {
         URI endpoint = createUri(BEHANDLING_EP, PARAM_NAME_BEHANDLING_UUID, eksternUuid.toString());
         return get(endpoint, EksternBehandlingsinfoDto.class);
     }
 
+    public EksternBehandlingsinfoDto hentBehandling(UUID eksternUuid) {
+        return hentBehandlingOptional(eksternUuid)
+            .orElseThrow(() -> FpsakKlientFeil.FACTORY.fantIkkeEksternBehandlingForUuid(eksternUuid.toString()).toException());
+    }
+
     public Optional<TilbakekrevingValgDto> hentTilbakekrevingValg(UUID eksternUuid) {
-        Optional<EksternBehandlingsinfoDto> eksternBehandlingsinfoDtoOptional = hentBehandling(eksternUuid);
+        Optional<EksternBehandlingsinfoDto> eksternBehandlingsinfoDtoOptional = hentBehandlingOptional(eksternUuid);
         if (eksternBehandlingsinfoDtoOptional.isPresent()) {
             Optional<BehandlingResourceLinkDto> ressursLink = eksternBehandlingsinfoDtoOptional.get().getLinks().stream()
                 .filter(resourceLink -> Tillegsinformasjon.TILBAKEKREVINGSVALG.getFpsakRelasjonNavn().equals(resourceLink.getRel())).findAny();

@@ -9,7 +9,6 @@ import java.util.UUID;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingFeil;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BehandlingFeilutbetalingFakta;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.UtbetaltPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
@@ -23,7 +22,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselReposi
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTypeMedUndertypeDto;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.TilbakekrevingValgDto;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432;
 
@@ -68,8 +69,10 @@ public class FaktaFeilutbetalingTjeneste {
         EksternBehandling eksternBehandling = eksternBehandlingRepository.hentForSisteAktivertInternId(behandlingId);
         Optional<VarselInfo> resultat = varselRepository.finnVarsel(behandlingId);
         UUID eksternUuid = eksternBehandling.getEksternUuid();
-        EksternBehandlingsinfoDto eksternBehandlingsinfoDto = hentEksternBehandlingFraFpsak(eksternUuid);
-        Optional<TilbakekrevingValgDto> tilbakekrevingValg = fpsakKlient.hentTilbakekrevingValg(eksternUuid);
+
+        SamletEksternBehandlingInfo samletBehandlingInfo = fpsakKlient.hentBehandlingsinfo(eksternUuid, Tillegsinformasjon.TILBAKEKREVINGSVALG);
+        EksternBehandlingsinfoDto eksternBehandlingsinfoDto = samletBehandlingInfo.getGrunninformasjon();
+        TilbakekrevingValgDto tilbakekrevingValg = samletBehandlingInfo.getTilbakekrevingsvalg();
 
         List<KravgrunnlagPeriode432> feilutbetaltPerioder = kravgrunnlagTjeneste.finnKravgrunnlagPerioderMedFeilutbetaltPosteringer(behandlingId);
         BigDecimal aktuellFeilUtbetaltBeløp = BigDecimal.ZERO;
@@ -90,7 +93,7 @@ public class FaktaFeilutbetalingTjeneste {
 
     private BehandlingFeilutbetalingFakta lagBehandlingFeilUtbetalingFakta(Optional<VarselInfo> varselEntitet, BigDecimal aktuellFeilUtbetaltBeløp,
                                                                            List<UtbetaltPeriode> utbetaltPerioder, Periode totalPeriode,
-                                                                           EksternBehandlingsinfoDto eksternBehandlingsinfoDto, Optional<TilbakekrevingValgDto> tilbakekrevingValgDto,
+                                                                           EksternBehandlingsinfoDto eksternBehandlingsinfoDto, TilbakekrevingValgDto tilbakekrevingValgDto,
                                                                            String begrunnelse) {
         Long tidligereVarseltBeløp = varselEntitet.isPresent() ? varselEntitet.get().getVarselBeløp() : null;
         return BehandlingFeilutbetalingFakta.builder()
@@ -102,7 +105,7 @@ public class FaktaFeilutbetalingTjeneste {
             .medDatoForRevurderingsvedtak(eksternBehandlingsinfoDto.getVedtakDato())
             .medBehandlingsResultat(eksternBehandlingsinfoDto.getBehandlingsresultat())
             .medBehandlingÅrsaker(eksternBehandlingsinfoDto.getBehandlingÅrsaker())
-            .medTilbakekrevingValg(tilbakekrevingValgDto.orElse(null))
+            .medTilbakekrevingValg(tilbakekrevingValgDto)
             .medBegrunnelse(begrunnelse)
             .build();
     }
@@ -119,13 +122,5 @@ public class FaktaFeilutbetalingTjeneste {
     public String hentFaktaBegrunnelse(Long behandlingId) {
         Optional<FaktaFeilutbetaling> faktaFeilutbetaling = faktaFeilutbetalingRepository.finnFaktaOmFeilutbetaling(behandlingId);
         return faktaFeilutbetaling.map(FaktaFeilutbetaling::getBegrunnelse).orElse(null);
-    }
-
-    private EksternBehandlingsinfoDto hentEksternBehandlingFraFpsak(UUID eksternUuid) {
-        Optional<EksternBehandlingsinfoDto> eksternBehandlingsInfo = fpsakKlient.hentBehandling(eksternUuid);
-        if (eksternBehandlingsInfo.isPresent()) {
-            return eksternBehandlingsInfo.get();
-        }
-        throw BehandlingFeil.FACTORY.fantIkkeEksternBehandlingForUuid(eksternUuid.toString()).toException();
     }
 }

@@ -114,7 +114,6 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
     @Override
     public void settBehandlingPaVent(Long behandlingsId, LocalDate frist, Venteårsak venteårsak) {
         AksjonspunktDefinisjon aksjonspunktDefinisjon = AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING;
-
         doSetBehandlingPåVent(behandlingsId, aksjonspunktDefinisjon, frist, venteårsak);
     }
 
@@ -150,10 +149,10 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
     }
 
     @Override
-    public Long opprettBehandlingAutomatisk(Saksnummer saksnummer, UUID eksternUuid, Henvisning eksternBehandlingId,
+    public Long opprettBehandlingAutomatisk(Saksnummer saksnummer, UUID eksternUuid, Henvisning henvisning,
                                             AktørId aktørId, FagsakYtelseType fagsakYtelseType,
                                             BehandlingType behandlingType) {
-        Behandling behandling = opprettFørstegangsbehandling(saksnummer, eksternUuid, eksternBehandlingId, aktørId, fagsakYtelseType, behandlingType);
+        Behandling behandling = opprettFørstegangsbehandling(saksnummer, eksternUuid, henvisning, aktørId, fagsakYtelseType, behandlingType);
         behandlingskontrollAsynkTjeneste.asynkProsesserBehandling(behandling);
         return behandling.getId();
     }
@@ -178,7 +177,7 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
     }
 
     @Override
-    public void oppdaterBehandlingMedEksternReferanse(Saksnummer saksnummer, Henvisning eksternBehandlingId, UUID eksternUuid) {
+    public void oppdaterBehandlingMedEksternReferanse(Saksnummer saksnummer, Henvisning henvisning, UUID eksternUuid) {
         List<Behandling> behandlinger = behandlingRepository.hentAlleBehandlingerForSaksnummer(saksnummer);
         if (behandlinger.isEmpty()) {
             throw BehandlingFeil.FACTORY.fantIngenTilbakekrevingBehandlingForSaksnummer(saksnummer).toException();
@@ -190,7 +189,7 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
 
         if (åpenTilbakekrevingBehandling.isPresent()) {
             Behandling behandling = åpenTilbakekrevingBehandling.get();
-            EksternBehandling eksternBehandling = new EksternBehandling(behandling, eksternBehandlingId, eksternUuid);
+            EksternBehandling eksternBehandling = new EksternBehandling(behandling, henvisning, eksternUuid);
             eksternBehandlingRepository.lagre(eksternBehandling);
         }
     }
@@ -216,17 +215,8 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
         return fpsakKlient.hentBehandlingsinfo(eksternUuid, Tillegsinformasjon.PERSONOPPLYSNINGER);
     }
 
-    private EksternBehandlingsinfoDto hentEksternBehandlingFraFpsak(UUID eksternUuid) {
-        Optional<EksternBehandlingsinfoDto> eksternBehandlingsInfo = fpsakKlient.hentBehandling(eksternUuid);
-        if (eksternBehandlingsInfo.isPresent()) {
-            return eksternBehandlingsInfo.get();
-        }
-        throw BehandlingFeil.FACTORY.fantIkkeEksternBehandlingForUuid(eksternUuid.toString()).toException();
-    }
-
 
     private Behandling opprettFørstegangsbehandling(Saksnummer saksnummer, UUID eksternUuid, Henvisning henvisning, AktørId aktørId, FagsakYtelseType fagsakYtelseType, BehandlingType behandlingType) {
-        //FIXME k9-tilbake får ikke eksternBehandlingId
         logger.info("Oppretter Tilbakekrevingbehandling for [saksnummer: {} ] for ekstern Uuid [ {} ]", saksnummer, eksternUuid);
         validateHarIkkeÅpenTilbakekrevingBehandling(saksnummer, eksternUuid);
         boolean manueltOpprettet = false;
@@ -238,7 +228,7 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
             eksternBehandlingsinfoDto = samletEksternBehandlingInfo.getGrunninformasjon();
             manueltOpprettet = true;
         } else {
-            eksternBehandlingsinfoDto = hentEksternBehandlingFraFpsak(eksternUuid);
+            eksternBehandlingsinfoDto = fpsakKlient.hentBehandling(eksternUuid);
         }
         henvisning = hentHenvisningHvisIkkeFinnes(henvisning, eksternBehandlingsinfoDto);
 
@@ -277,8 +267,8 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
         if (behandlinger.isEmpty()) {
             return false;
         }
-        return behandlinger.stream().anyMatch(behandling -> !behandling.erAvsluttet()
-            && BehandlingType.TILBAKEKREVING.equals(behandling.getType()));
+        return behandlinger.stream()
+            .anyMatch(behandling -> !behandling.erAvsluttet() && BehandlingType.TILBAKEKREVING.equals(behandling.getType()));
     }
 
     private boolean finnesTilbakekrevingsbehandlingForYtelsesbehandlingen(UUID eksternUuid) {
@@ -308,7 +298,7 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
         prosessTaskRepository.lagre(prosessTaskData);
     }
 
-    //TODO verge bør flyttes til egen tjeneste
+    //TODO verge bør flyttes til egen tjeneste, aller helst i eget 'hent fra saksbehandlingssystemet-steg'
     private void hentVergeInformasjonFraFpsak(long behandlingId) {
         if (erTestMiljø()) {
             EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandlingId);
@@ -319,7 +309,7 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
         }
     }
 
-    //TODO verge bør flyttes til egen tjeneste
+    //TODO verge bør flyttes til egen tjeneste, aller helst i eget 'hent fra saksbehandlingssystemet-steg'
     private void lagreVergeInformasjon(long behandlingId, VergeDto vergeDto) {
         if (vergeDto.getGyldigTom().isBefore(LocalDate.now())) {
             logger.info("Verge informasjon er utløpt.Så kopierer ikke fra fpsak");

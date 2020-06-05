@@ -52,7 +52,7 @@ public class LesKravgrunnlagTaskTest extends FellesTestOppsett {
     public void skal_utføre_leskravgrunnlag_task_forUgyldigBehandling() {
         kravgrunnlagId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_YTEL_ugyldig_referanse.xml"));
 
-        expectedException.expectMessage("Mottok et kravOgVedtakStatus fra Økonomi med henvisning i ikke-støttet format, henvisning=ABC. KravOgVedtakStatus skulle kanskje til et annet system. Si i fra til Økonomi!");
+        expectedException.expectMessage("Mottok et tilbakekrevingsgrunnlag fra Økonomi med henvisning som ikke er i støttet format. henvisning=ABC. Kravgrunnlaget skulle kanskje til et annet system. Si i fra til Økonomi!");
         lesKravgrunnlagTask.doTask(lagProsessTaskData());
     }
 
