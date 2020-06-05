@@ -13,6 +13,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
 
 @ApplicationScoped
@@ -49,6 +50,10 @@ public class ØkonomiMottattXmlRepository {
         entityManager.flush();
     }
 
+    public Optional<ØkonomiXmlMottatt> finnForHenvisning(Henvisning henvisning) {
+        return finnForEksternBehandlingId(henvisning.getVerdi());
+    }
+
     public Optional<ØkonomiXmlMottatt> finnForEksternBehandlingId(String eksternBehandlingId) {
         TypedQuery<ØkonomiXmlMottatt> query = entityManager.createQuery("from ØkonomiXmlMottatt where eksternBehandlingId=:eksternBehandlingId", ØkonomiXmlMottatt.class);
         query.setParameter(KEY_EKSTERN_BEHANDLING_ID, eksternBehandlingId);
@@ -67,13 +72,11 @@ public class ØkonomiMottattXmlRepository {
         return query.getResultList();
     }
 
-    public void oppdaterMedHenvisningOgSaksnummer(String henvisning, String saksnummer, Long kravgrunnlagXmlId) {
-        String eksternBehandlingId = henvisning;
-        //FIXME k9-tilbake, endre til 'henvisning'
+    public void oppdaterMedHenvisningOgSaksnummer(Henvisning henvisning, String saksnummer, Long kravgrunnlagXmlId) {
         ØkonomiXmlMottatt entity = finnMottattXml(kravgrunnlagXmlId);
-        Long eksisterendeVersjon = finnHøyesteVersjonsnummer(eksternBehandlingId);
+        Long eksisterendeVersjon = finnHøyesteVersjonsnummer(henvisning);
         long nyVersjon = eksisterendeVersjon == null ? 1 : eksisterendeVersjon + 1;
-        entity.setEksternBehandling(eksternBehandlingId, nyVersjon);
+        entity.setHenvisning(henvisning, nyVersjon);
         entity.setSaksnummer(saksnummer);
         entityManager.persist(entity);
     }
@@ -121,9 +124,10 @@ public class ØkonomiMottattXmlRepository {
         return query.getSingleResult() == 1;
     }
 
-    private Long finnHøyesteVersjonsnummer(String henvisning) {
+    private Long finnHøyesteVersjonsnummer(Henvisning henvisning) {
+        //TODO k9-tilbake migrer kolonnenavn til 'henvisning'
         Query query = entityManager.createNativeQuery("select max(sekvens) from oko_xml_mottatt where ekstern_behandling_id=:eksternBehandlingId");
-        query.setParameter(KEY_EKSTERN_BEHANDLING_ID, henvisning);
+        query.setParameter(KEY_EKSTERN_BEHANDLING_ID, henvisning.getVerdi());
         Object resultat = query.getSingleResult();
         return resultat != null ? ((BigDecimal) resultat).longValue() : null;
     }

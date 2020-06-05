@@ -35,6 +35,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.Ve
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.tilbakekrevingsvalg.VidereBehandling;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.Tillegsinformasjon;
@@ -64,7 +65,7 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
     @Test
     public void skal_opprette_behandling_automatisk() {
         avsluttBehandling();
-        Long behandlingId = behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer, UUID.randomUUID(), eksternBehandlingId, aktørId, FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING);
+        Long behandlingId = behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer, UUID.randomUUID(), henvisning, aktørId, FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING);
         fellesBehandlingAssert(behandlingId, false);
     }
 
@@ -72,7 +73,7 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
     @Test
     public void skal_opprette_behandling_automatisk_med_allerede_åpen_behandling() {
         expectedException.expectMessage("FPT-663486");
-        behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer, eksternBehandlingUuid, eksternBehandlingId, aktørId, FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING);
+        behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer, eksternBehandlingUuid, henvisning, aktørId, FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING);
     }
 
     @Test
@@ -143,7 +144,7 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
         VergeDto vergeDto = samletEksternBehandlingInfo.getVerge();
         when(mockFpsakKlient.hentBehandlingsinfo(any(UUID.class), any(Tillegsinformasjon.class))).thenReturn(samletEksternBehandlingInfo);
         when(mockTpsTjeneste.hentAktørForFnr(any(PersonIdent.class))).thenReturn(Optional.of(behandling.getAktørId()));
-        Long behandlingId = behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer, UUID.randomUUID(), eksternBehandlingId, aktørId,
+        Long behandlingId = behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer, UUID.randomUUID(), henvisning, aktørId,
             FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING);
         fellesBehandlingAssert(behandlingId, false);
         assertThat(prosessTaskRepository.finnProsessTaskType(BehandlingTjenesteImpl.FINN_KRAVGRUNNLAG_TASK)).isNotEmpty();
@@ -163,17 +164,17 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
         when(mockFpsakKlient.hentBehandlingsinfo(any(UUID.class), any(Tillegsinformasjon.class))).thenReturn(samletEksternBehandlingInfo);
         when(mockTpsTjeneste.hentAktørForFnr(any(PersonIdent.class))).thenReturn(Optional.empty());
         Assert.assertThrows("FPT-7428494", TekniskException.class, () -> behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer, UUID.randomUUID(),
-            eksternBehandlingId, aktørId, FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING));
+            henvisning, aktørId, FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING));
     }
 
     @Test
-    public void skal_opprette_behandling_automatisk_uten_verge_informasjon_når_verge_er_utløpt(){
+    public void skal_opprette_behandling_automatisk_uten_verge_informasjon_når_verge_er_utløpt() {
         avsluttBehandling();
         SamletEksternBehandlingInfo samletEksternBehandlingInfo = lagSamletEksternBehandlingInfo(VergeType.BARN);
         samletEksternBehandlingInfo.getVerge().setGyldigTom(LocalDate.now().minusDays(2));
         when(mockFpsakKlient.hentBehandlingsinfo(any(UUID.class), any(Tillegsinformasjon.class))).thenReturn(samletEksternBehandlingInfo);
         when(mockTpsTjeneste.hentAktørForFnr(any(PersonIdent.class))).thenReturn(Optional.of(behandling.getAktørId()));
-        Long behandlingId = behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer, UUID.randomUUID(), eksternBehandlingId, aktørId,
+        Long behandlingId = behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer, UUID.randomUUID(), henvisning, aktørId,
             FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING);
         fellesBehandlingAssert(behandlingId, false);
         assertThat(prosessTaskRepository.finnProsessTaskType(BehandlingTjenesteImpl.FINN_KRAVGRUNNLAG_TASK)).isNotEmpty();
@@ -225,11 +226,12 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
     public void skal_oppdatere_behandling_medEksternReferanse() {
         UUID eksternUuid = testUtility.genererEksternUuid();
         long eksternBehandlingId = 5l;
-        behandlingTjeneste.oppdaterBehandlingMedEksternReferanse(saksnummer, eksternBehandlingId, eksternUuid);
+        Henvisning nyHenvisning = Henvisning.fraEksternBehandlingId(eksternBehandlingId);
+        behandlingTjeneste.oppdaterBehandlingMedEksternReferanse(saksnummer, nyHenvisning, eksternUuid);
 
         EksternBehandling eksternBehandling = repoProvider.getEksternBehandlingRepository().hentFraInternId(behandling.getId());
-        assertThat(eksternBehandling.getEksternUuid()).isEqualByComparingTo(eksternUuid);
-        assertThat(eksternBehandling.getEksternId()).isEqualByComparingTo(eksternBehandlingId);
+        assertThat(eksternBehandling.getEksternUuid()).isEqualTo(eksternUuid);
+        assertThat(eksternBehandling.getHenvisning()).isEqualTo(nyHenvisning);
     }
 
     @Test
@@ -237,7 +239,7 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
         UUID eksternUuid = testUtility.genererEksternUuid();
         expectedException.expectMessage("FPT-663490");
 
-        behandlingTjeneste.oppdaterBehandlingMedEksternReferanse(new Saksnummer("1233434"), 5l, eksternUuid);
+        behandlingTjeneste.oppdaterBehandlingMedEksternReferanse(new Saksnummer("1233434"), Henvisning.fraEksternBehandlingId(5l), eksternUuid);
     }
 
     private void avsluttBehandling() {
@@ -261,7 +263,8 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
         EksternBehandlingsinfoDto eksternBehandlingsinfo = new EksternBehandlingsinfoDto();
         eksternBehandlingsinfo.setSprakkode(Språkkode.nb);
         eksternBehandlingsinfo.setUuid(eksternBehandlingUuid);
-        eksternBehandlingsinfo.setId(eksternBehandlingId);
+        eksternBehandlingsinfo.setId(Long.valueOf(henvisning.getVerdi())); //TODO k9-tilbake, dette er fp-spesifikt
+        eksternBehandlingsinfo.setHenvisning(henvisning);
         eksternBehandlingsinfo.setVedtakDato(NOW);
         eksternBehandlingsinfo.setBehandlendeEnhetId(BEHANDLENDE_ENHET_ID);
         eksternBehandlingsinfo.setBehandlendeEnhetNavn(BEHANDLENDE_ENHET_NAVN);

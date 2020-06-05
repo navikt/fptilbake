@@ -39,7 +39,7 @@ public class TilkjentYtelseReaderTest extends TilkjentYtelseTestOppsett {
         verify(prosessTaskRepository).lagre(prosessTaskData);
 
         HendelseTaskDataWrapper taskDataWrapper = new HendelseTaskDataWrapper(prosessTaskData);
-        assertThat(taskDataWrapper.getEksternBehandlingId()).isEqualTo(EKSTERN_BEHANDLING_ID);
+        assertThat(taskDataWrapper.getHenvisning()).isEqualTo(HENVISNING);
         assertThat(taskDataWrapper.getAktørId()).isEqualTo(AKTØR_ID);
         assertThat(taskDataWrapper.getBehandlingUuid()).isEqualTo(EKSTERN_BEHANDLING_UUID.toString());
         assertThat(taskDataWrapper.getFagsakYtelseType()).isEqualByComparingTo(FagsakYtelseType.FORELDREPENGER);

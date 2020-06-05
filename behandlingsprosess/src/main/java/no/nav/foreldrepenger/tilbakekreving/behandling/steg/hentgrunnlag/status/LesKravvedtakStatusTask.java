@@ -16,6 +16,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatus437;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagAggregate;
@@ -74,62 +75,55 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
         KravVedtakStatus437 kravVedtakStatus437 = statusMapper.mapTilDomene(kravOgVedtakstatus);
         String saksnummer = finnSaksnummer(kravOgVedtakstatus.getFagsystemId());
 
-        String eksternBehandlingId = statusMapper.finnBehandlngId(kravOgVedtakstatus);
-        økonomiMottattXmlRepository.oppdaterMedHenvisningOgSaksnummer(eksternBehandlingId, saksnummer, mottattXmlId);
+        Henvisning henvisning = statusMapper.finnHenvisning(kravOgVedtakstatus);
+        økonomiMottattXmlRepository.oppdaterMedHenvisningOgSaksnummer(henvisning, saksnummer, mottattXmlId);
 
         long vedtakId = statusMapper.finnVedtakId(kravOgVedtakstatus);
-        oppdatereEksternBehandling(vedtakId, eksternBehandlingId);
+        oppdatereEksternBehandling(vedtakId, henvisning);
 
-        Optional<EksternBehandling> behandlingKobling = hentKoblingTilInternBehandling(eksternBehandlingId);
+        Optional<EksternBehandling> behandlingKobling = hentKoblingTilInternBehandling(henvisning);
         if (behandlingKobling.isPresent()) {
             Long internId = behandlingKobling.get().getInternId();
             kravVedtakStatusTjeneste.håndteresMottakAvKravVedtakStatus(internId, kravVedtakStatus437);
             økonomiMottattXmlRepository.opprettTilkobling(mottattXmlId);
-            logger.info("Tilkoblet kravVedtakStatus med id={} eksternBehandlingId={} internBehandlingId={}", mottattXmlId, eksternBehandlingId, internId);
+            logger.info("Tilkoblet kravVedtakStatus med id={} henvisning={} internBehandlingId={}", mottattXmlId, henvisning, internId);
         } else {
-            validerBehandlingsEksistens(eksternBehandlingId, saksnummer);
-            logger.info("Ignorerte kravVedtakStatus med id={} eksternBehandlingId={}. Fantes ikke tilbakekrevingsbehandling", mottattXmlId, eksternBehandlingId);
+            validerBehandlingsEksistens(henvisning, saksnummer);
+            logger.info("Ignorerte kravVedtakStatus med id={} henvisning={}. Fantes ikke tilbakekrevingsbehandling", mottattXmlId, henvisning);
         }
 
     }
 
-    private Optional<EksternBehandling> hentKoblingTilInternBehandling(String referanse) {
-        if (erGyldigTall(referanse)) {
-            long eksternBehandlingId = Long.parseLong(referanse);
-            return eksternBehandlingRepository.hentFraEksternId(eksternBehandlingId);
-        }
-        return Optional.empty();
+    private Optional<EksternBehandling> hentKoblingTilInternBehandling(Henvisning referanse) {
+            return eksternBehandlingRepository.hentFraHenvisning(referanse);
     }
 
-    private void validerBehandlingsEksistens(String eksternBehandlingId, String saksnummer) {
-        if (!erGyldigTall(eksternBehandlingId)) {
-            throw LesKravvedtakStatusTask.LesKravvedtakStatusTaskFeil.FACTORY.behandlingFinnesIkkeIFpsak(eksternBehandlingId).toException();
-        }
-        if (!erBehandlingFinnesIFpsak(saksnummer, eksternBehandlingId)) {
-            throw LesKravvedtakStatusTask.LesKravvedtakStatusTaskFeil.FACTORY.behandlingFinnesIkkeIFpsak(Long.valueOf(eksternBehandlingId)).toException();
+    private void validerBehandlingsEksistens(Henvisning henvisning, String saksnummer) {
+        if (!finnesYtelsesbehandling(saksnummer, henvisning)) {
+            throw LesKravvedtakStatusTask.LesKravvedtakStatusTaskFeil.FACTORY.behandlingFinnesIkkeIFpsak(henvisning).toException();
         }
     }
 
-    private void oppdatereEksternBehandling(long vedtakId, String eksternBehandlingId) {
+    private void oppdatereEksternBehandling(long vedtakId, Henvisning henvisning) {
         Optional<KravgrunnlagAggregate> aggregateOpt = finnGrunnlagForVedtakId(vedtakId);
         if (aggregateOpt.isPresent()) {
             logger.info("Grunnlag finnes allerede for vedtakId={}", vedtakId);
             KravgrunnlagAggregate aggregate = aggregateOpt.get();
-            String referense = aggregate.getGrunnlagØkonomi().getReferanse();
+            Henvisning referanse = aggregate.getGrunnlagØkonomi().getHenvisning();
             Long behandlingId = aggregate.getBehandlingId();
             Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
             if (behandling.erAvsluttet()) {
                 logger.info("Behandling {} er avsluttet og kan ikke tilkobles med meldingen", behandling.getId());
                 return;
             }
-            boolean eksternBehandlingFinnes = eksternBehandlingRepository.finnesEksternBehandling(behandlingId, Long.valueOf(eksternBehandlingId));
-            if (!referense.equals(eksternBehandlingId) && !eksternBehandlingFinnes) {
+            boolean eksternBehandlingFinnes = eksternBehandlingRepository.finnesEksternBehandling(behandlingId, henvisning);
+            if (!referanse.equals(henvisning) && !eksternBehandlingFinnes) {
                 UUID eksternUUID = hentUUIDFraEksternBehandling(behandlingId);
-                logger.info("Oppdaterer eksternBehandling for behandlingId={} med ny eksternId={}", behandlingId, eksternBehandlingId);
-                EksternBehandling eksternBehandling = new EksternBehandling(behandling, Long.valueOf(eksternBehandlingId), eksternUUID);
+                logger.info("Oppdaterer eksternBehandling for behandlingId={} med ny henvisning={}", behandlingId, henvisning);
+                EksternBehandling eksternBehandling = new EksternBehandling(behandling, henvisning, eksternUUID);
                 eksternBehandlingRepository.lagre(eksternBehandling);
             } else {
-                logger.info("eksternBehandlingId={} finnes allerede. Oppdaterer ikke eksternBehandling", eksternBehandlingId);
+                logger.info("henvisning={} finnes allerede. Oppdaterer ikke eksternBehandling", henvisning);
             }
 
         }
@@ -145,14 +139,10 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
         LesKravvedtakStatusTask.LesKravvedtakStatusTaskFeil FACTORY = FeilFactory.create(LesKravvedtakStatusTask.LesKravvedtakStatusTaskFeil.class);
 
         @TekniskFeil(feilkode = "FPT-587196",
-            feilmelding = "Mottok et tilbakekrevingsgrunnlag fra Økonomi for en behandling som ikke finnes i fpsak. behandlingId=%s. Kravgrunnlaget skulle kanskje til et annet system. Si i fra til Økonomi!",
+            feilmelding = "Mottok et tilbakekrevingsgrunnlag fra Økonomi for en behandling som ikke finnes i fpsak. henvisning=%s. Kravgrunnlaget skulle kanskje til et annet system. Si i fra til Økonomi!",
             logLevel = LogLevel.WARN)
-        Feil behandlingFinnesIkkeIFpsak(Long behandlingId);
+        Feil behandlingFinnesIkkeIFpsak(Henvisning henvisning);
 
-        @TekniskFeil(feilkode = "FPT-675364",
-            feilmelding = "Mottok et kravOgVedtakStatus fra Økonomi med behandlingId som ikke er et tall. behandlingId=%s. KravOgVedtakStatus skulle kanskje til et annet system. Si i fra til Økonomi!",
-            logLevel = LogLevel.WARN)
-        Feil behandlingFinnesIkkeIFpsak(String behandlingId);
     }
 
 

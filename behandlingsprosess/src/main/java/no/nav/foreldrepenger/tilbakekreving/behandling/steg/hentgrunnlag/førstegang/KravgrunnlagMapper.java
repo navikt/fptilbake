@@ -9,6 +9,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TpsAdapterWrapper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagBelop433;
@@ -36,8 +37,8 @@ public class KravgrunnlagMapper {
         this.tpsAdapterWrapper = tpsAdapterWrapper;
     }
 
-    public String finnBehandlngId(DetaljertKravgrunnlag kravgrunnlagDto) {
-        return kravgrunnlagDto.getReferanse();
+    public Henvisning finnHenvisning(DetaljertKravgrunnlag kravgrunnlagDto) {
+        return new Henvisning(kravgrunnlagDto.getReferanse());
     }
 
     public Kravgrunnlag431 mapTilDomene(DetaljertKravgrunnlag dto) {

@@ -48,6 +48,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.V
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelsePeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseRepository;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
@@ -96,7 +97,7 @@ public class VedtakOppsummeringTjenesteTest {
 
         behandlingId = behandling.getId();
         saksnummer = behandling.getFagsak().getSaksnummer();
-        EksternBehandling eksternBehandling = new EksternBehandling(behandling, 1l, UUID.randomUUID());
+        EksternBehandling eksternBehandling = new EksternBehandling(behandling, Henvisning.fraEksternBehandlingId(1l), UUID.randomUUID());
         eksternBehandlingRepository.lagre(eksternBehandling);
         lagKravgrunnlag();
         lagFakta();

@@ -42,7 +42,7 @@ public class LesKravgrunnlagTaskTest extends FellesTestOppsett {
 
     @Test
     public void skal_utføre_leskravgrunnlag_task_nårBehandlingFinnesIkkeIFpsak() {
-        when(fpsakKlientMock.finnesBehandlingIFpsak(fagsak.getSaksnummer().getVerdi(), FPSAK_BEHANDLING_ID)).thenReturn(false);
+        when(fpsakKlientMock.finnesBehandlingIFpsak(fagsak.getSaksnummer().getVerdi(), HENVISNING)).thenReturn(false);
 
         expectedException.expectMessage("FPT-587195");
         lesKravgrunnlagTask.doTask(lagProsessTaskData());
@@ -52,7 +52,7 @@ public class LesKravgrunnlagTaskTest extends FellesTestOppsett {
     public void skal_utføre_leskravgrunnlag_task_forUgyldigBehandling() {
         kravgrunnlagId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_YTEL_ugyldig_referanse.xml"));
 
-        expectedException.expectMessage("FPT-675363");
+        expectedException.expectMessage("Kan ikke konvertere henvisning ABC til long");
         lesKravgrunnlagTask.doTask(lagProsessTaskData());
     }
 
@@ -64,7 +64,7 @@ public class LesKravgrunnlagTaskTest extends FellesTestOppsett {
     }
 
     private void lagEksternBehandling() {
-        EksternBehandling eksternBehandling = new EksternBehandling(behandling, FPSAK_BEHANDLING_ID, FPSAK_BEHANDLING_UUID);
+        EksternBehandling eksternBehandling = new EksternBehandling(behandling, HENVISNING, FPSAK_BEHANDLING_UUID);
         eksternBehandlingRepository.lagre(eksternBehandling);
     }
 

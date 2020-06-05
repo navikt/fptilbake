@@ -20,6 +20,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodelisteN
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.TpsTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
@@ -124,10 +125,11 @@ public class EksternDataForBrevTjeneste {
         }
     }
 
-    public FeilutbetaltePerioderDto hentFeilutbetaltePerioder(Long eksternBehandlingId) {
-        Optional<FeilutbetaltePerioderDto> feilutbetaltePerioderDto = fpOppdragKlient.hentFeilutbetaltePerioder(eksternBehandlingId); //tilpasse feilmelding til eksternid
-        if (!feilutbetaltePerioderDto.isPresent()) {
-            throw EksternDataForBrevFeil.FACTORY.fantIkkeYtelesbehandlingISimuleringsapplikasjonen(eksternBehandlingId).toException();
+    public FeilutbetaltePerioderDto hentFeilutbetaltePerioder(Henvisning henvisning) {
+        long fpsakBehandlingId = henvisning.toLong();
+        Optional<FeilutbetaltePerioderDto> feilutbetaltePerioderDto = fpOppdragKlient.hentFeilutbetaltePerioder(fpsakBehandlingId);
+        if (feilutbetaltePerioderDto.isEmpty()) {
+            throw EksternDataForBrevFeil.FACTORY.fantIkkeYtelesbehandlingISimuleringsapplikasjonen(fpsakBehandlingId).toException();
         }
         return feilutbetaltePerioderDto.get();
     }

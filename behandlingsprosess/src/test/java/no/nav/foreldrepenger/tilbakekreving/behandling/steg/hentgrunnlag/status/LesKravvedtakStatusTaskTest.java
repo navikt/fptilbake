@@ -1,7 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.status;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -24,6 +24,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingresultatRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatusRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
@@ -39,15 +40,17 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
     private HenleggBehandlingTjeneste henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repositoryProvider, prosessTaskRepository, behandlingskontrollTjeneste, historikkinnslagTjeneste);
     private KravVedtakStatusTjeneste kravVedtakStatusTjeneste = new KravVedtakStatusTjeneste(kravVedtakStatusRepository, prosessTaskRepository, repositoryProvider, henleggBehandlingTjeneste, behandlingskontrollTjeneste);
     private KravVedtakStatusMapper kravVedtakStatusMapper = new KravVedtakStatusMapper(tpsAdapterWrapper);
-    private LesKravvedtakStatusTask lesKravvedtakStatusTask = new LesKravvedtakStatusTask(mottattXmlRepository, repositoryProvider,
-        kravVedtakStatusTjeneste, kravVedtakStatusMapper, fpsakKlientMock);
+    private LesKravvedtakStatusTask lesKravvedtakStatusTask = new LesKravvedtakStatusTask(mottattXmlRepository, repositoryProvider,        kravVedtakStatusTjeneste, kravVedtakStatusMapper, fpsakKlientMock);
 
     private Long mottattXmlId;
+
+    //TODO bør ikke bruke samme navn som i parent-klassens konstanter, det skaper lett forvirring
     private static final Long FPSAK_BEHANDLING_ID = 1174551l;
+    private static final Henvisning HENVISNING = Henvisning.fraEksternBehandlingId(FPSAK_BEHANDLING_ID);
 
     @Before
     public void setup() {
-        EksternBehandling eksternBehandling = new EksternBehandling(behandling, FPSAK_BEHANDLING_ID, FPSAK_BEHANDLING_UUID);
+        EksternBehandling eksternBehandling = new EksternBehandling(behandling, HENVISNING, FPSAK_BEHANDLING_UUID);
         eksternBehandlingRepository.lagre(eksternBehandling);
     }
 
@@ -111,7 +114,7 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
     public void skal_utføre_leskravvedtakstatus_task_for_behandling_som_finnes_ikke_iFpsak() {
         // den xml-en har behandlngId som finnes ikke i EksternBehandling
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_ugyldig.xml"));
-        when(fpsakKlientMock.finnesBehandlingIFpsak(anyString(), anyLong())).thenReturn(false);
+        when(fpsakKlientMock.finnesBehandlingIFpsak(anyString(), any(Henvisning.class))).thenReturn(false);
 
         expectedException.expectMessage("FPT-587196");
         lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LesKravvedtakStatusTask.TASKTYPE));
@@ -121,7 +124,7 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
     public void skal_utføre_leskravvedtakstatus_task_når_fptilbake_har_ingen_åpenBehandling() {
         // den xml-en har behandlngId som finnes ikke i EksternBehandling
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_ugyldig.xml"));
-        when(fpsakKlientMock.finnesBehandlingIFpsak(anyString(), anyLong())).thenReturn(true);
+        when(fpsakKlientMock.finnesBehandlingIFpsak(anyString(), any(Henvisning.class))).thenReturn(true);
 
         lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LesKravvedtakStatusTask.TASKTYPE));
 
@@ -133,14 +136,14 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         // den xml-en har behandlngId som finnes ikke i EksternBehandling
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_ugyldigreferanse.xml"));
 
-        expectedException.expectMessage("FPT-675364");
+        expectedException.expectMessage("Kan ikke konvertere henvisning ABC til long");
         lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LesKravvedtakStatusTask.TASKTYPE));
     }
 
     @Test
     public void skal_utføre_leskravvedtakstatus_task_for_behandling_som_allerede_har_grunnlag() {
         repoRule.getEntityManager().createQuery("delete from EksternBehandling").executeUpdate();
-        EksternBehandling eksternBehandling = new EksternBehandling(behandling, 100000001L, FPSAK_BEHANDLING_UUID);
+        EksternBehandling eksternBehandling = new EksternBehandling(behandling, Henvisning.fraEksternBehandlingId(100000001L), FPSAK_BEHANDLING_UUID);
         eksternBehandlingRepository.lagre(eksternBehandling);
 
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_FEIL.xml"));
@@ -150,7 +153,7 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LesKravvedtakStatusTask.TASKTYPE));
 
         eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandling.getId());
-        assertThat(eksternBehandling.getEksternId()).isEqualTo(FPSAK_BEHANDLING_ID);
+        assertThat(eksternBehandling.getHenvisning()).isEqualTo(HENVISNING);
 
         assertThat(mottattXmlRepository.finnForEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID))).isPresent();
         assertThat(behandling.isBehandlingPåVent()).isTrue();
@@ -172,7 +175,7 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LesKravvedtakStatusTask.TASKTYPE));
 
         EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandling.getId());
-        assertThat(eksternBehandling.getEksternId()).isEqualTo(FPSAK_BEHANDLING_ID);
+        assertThat(eksternBehandling.getHenvisning()).isEqualTo(HENVISNING);
 
         List<ØkonomiXmlMottatt> xmlMottatt = mottattXmlRepository.finnAlleForEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID));
         assertThat(xmlMottatt.size()).isEqualTo(2);
@@ -196,7 +199,7 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LesKravvedtakStatusTask.TASKTYPE));
 
         EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandling.getId());
-        assertThat(eksternBehandling.getEksternId()).isEqualTo(FPSAK_BEHANDLING_ID);
+        assertThat(eksternBehandling.getHenvisning()).isEqualTo(HENVISNING);
 
         List<ØkonomiXmlMottatt> xmlMottatt = mottattXmlRepository.finnAlleForEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID));
         assertThat(xmlMottatt.size()).isEqualTo(3);
@@ -237,7 +240,7 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         lesKravgrunnlagTask.doTask(lagProsessTaskData(mottattXmlId, LesKravgrunnlagTask.TASKTYPE));
         henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), BehandlingResultatType.HENLAGT_FEILOPPRETTET);
 
-        when(fpsakKlientMock.finnesBehandlingIFpsak(anyString(), anyLong())).thenReturn(true);
+        when(fpsakKlientMock.finnesBehandlingIFpsak(anyString(), any(Henvisning.class))).thenReturn(true);
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_SPER_annen_referanse.xml"));
         lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LesKravvedtakStatusTask.TASKTYPE));
 

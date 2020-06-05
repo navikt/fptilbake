@@ -11,6 +11,7 @@ import org.junit.rules.ExpectedException;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.task.HendelseTaskDataWrapper;
 import no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.task.HåndterHendelseTask;
@@ -22,6 +23,7 @@ import no.nav.vedtak.felles.testutilities.db.RepositoryRule;
 public class TilkjentYtelseTestOppsett {
 
     protected static final Long EKSTERN_BEHANDLING_ID = 123L;
+    protected static final Henvisning HENVISNING = Henvisning.fraEksternBehandlingId(EKSTERN_BEHANDLING_ID);
     protected static final Saksnummer SAKSNUMMER = new Saksnummer("1234");
     protected static final AktørId AKTØR_ID = new AktørId("1234567898765");
     protected static final String IV_SYSTEM = "FPSAK";

@@ -23,6 +23,7 @@ import org.hibernate.annotations.JoinFormula;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 
@@ -184,6 +185,10 @@ public class Kravgrunnlag431 extends BaseEntitet {
 
     public String getReferanse() {
         return referanse;
+    }
+
+    public Henvisning getHenvisning(){
+        return new Henvisning(referanse);
     }
 
     public List<KravgrunnlagPeriode432> getPerioder() {

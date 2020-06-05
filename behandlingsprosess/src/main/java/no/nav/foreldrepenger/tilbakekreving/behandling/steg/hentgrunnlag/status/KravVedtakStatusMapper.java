@@ -5,6 +5,7 @@ import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TpsAdapterWrapper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatus437;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
@@ -24,8 +25,8 @@ public class KravVedtakStatusMapper {
         this.tpsAdapterWrapper = tpsAdapterWrapper;
     }
 
-    public String finnBehandlngId(KravOgVedtakstatus kravOgVedtakstatus) {
-        return kravOgVedtakstatus.getReferanse();
+    public Henvisning finnHenvisning(KravOgVedtakstatus kravOgVedtakstatus) {
+        return new Henvisning(kravOgVedtakstatus.getReferanse());
     }
 
     public Long finnVedtakId(KravOgVedtakstatus kravOgVedtakstatus) {

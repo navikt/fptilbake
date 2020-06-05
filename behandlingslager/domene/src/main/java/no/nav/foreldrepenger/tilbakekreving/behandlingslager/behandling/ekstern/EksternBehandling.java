@@ -15,6 +15,7 @@ import org.hibernate.annotations.NaturalId;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
 
 @Entity(name = "EksternBehandling")
@@ -46,13 +47,13 @@ public class EksternBehandling extends BaseEntitet {
         // Hibernate
     }
 
-    public EksternBehandling(Behandling behandling, Long eksternId, UUID eksternUuid) {
+    public EksternBehandling(Behandling behandling, Henvisning henvisning, UUID eksternUuid) {
         Objects.requireNonNull(behandling, "behandlingId");
-        Objects.requireNonNull(eksternId, "eksternId");
+        Objects.requireNonNull(henvisning, "henvisning");
         Objects.requireNonNull(eksternUuid, "eksternUuid");
 
         this.internId = behandling.getId();
-        this.eksternId = eksternId;
+        this.eksternId = henvisning.toLong();
         this.eksternUuid = eksternUuid;
     }
 
@@ -64,12 +65,12 @@ public class EksternBehandling extends BaseEntitet {
         return internId;
     }
 
-    public Long getEksternId() {
-        return eksternId;
-    }
-
     public Boolean getAktiv() {
         return aktiv;
+    }
+
+    public Henvisning getHenvisning(){
+        return Henvisning.fraEksternBehandlingId(eksternId);
     }
 
     public void deaktiver() {

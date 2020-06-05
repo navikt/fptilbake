@@ -15,16 +15,16 @@ public class OppdaterBehandlingTaskTest extends TilkjentYtelseTestOppsett {
     private OppdaterBehandlingTask oppdaterBehandlingTask = new OppdaterBehandlingTask(mockBehandlingTjeneste);
 
     @Test
-    public void skal_oppdatere_behandling_med_gyldig_data(){
-        HendelseTaskDataWrapper hendelseTaskDataWrapper = HendelseTaskDataWrapper.lagWrapperForOppdaterBehandling(EKSTERN_BEHANDLING_UUID.toString(),EKSTERN_BEHANDLING_ID,AKTØR_ID,SAKSNUMMER);
+    public void skal_oppdatere_behandling_med_gyldig_data() {
+        HendelseTaskDataWrapper hendelseTaskDataWrapper = HendelseTaskDataWrapper.lagWrapperForOppdaterBehandling(EKSTERN_BEHANDLING_UUID.toString(), HENVISNING, AKTØR_ID, SAKSNUMMER);
         oppdaterBehandlingTask.doTask(hendelseTaskDataWrapper.getProsessTaskData());
 
-        verify(mockBehandlingTjeneste,atLeastOnce()).oppdaterBehandlingMedEksternReferanse(SAKSNUMMER,EKSTERN_BEHANDLING_ID,EKSTERN_BEHANDLING_UUID);
+        verify(mockBehandlingTjeneste, atLeastOnce()).oppdaterBehandlingMedEksternReferanse(SAKSNUMMER, HENVISNING, EKSTERN_BEHANDLING_UUID);
     }
 
     @Test(expected = NullPointerException.class)
-    public void skal_oppdatere_behandling_med_ugyldig_data(){
-        HendelseTaskDataWrapper hendelseTaskDataWrapper = HendelseTaskDataWrapper.lagWrapperForOppdaterBehandling(null,EKSTERN_BEHANDLING_ID,AKTØR_ID,SAKSNUMMER);
+    public void skal_oppdatere_behandling_med_ugyldig_data() {
+        HendelseTaskDataWrapper hendelseTaskDataWrapper = HendelseTaskDataWrapper.lagWrapperForOppdaterBehandling(null, HENVISNING, AKTØR_ID, SAKSNUMMER);
 
         oppdaterBehandlingTask.doTask(hendelseTaskDataWrapper.getProsessTaskData());
     }

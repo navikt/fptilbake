@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 
 public interface EksternBehandlingRepository {
 
@@ -26,6 +27,8 @@ public interface EksternBehandlingRepository {
      */
     Optional<EksternBehandling> hentFraEksternId(long eksternBehandlingId);
 
+    Optional<EksternBehandling> hentFraHenvisning(Henvisning henvisning);
+
     /**
      * Finner alle behandlinger som knyttet med uuid fra ekstern system
      * @param eksternUuid
@@ -40,6 +43,8 @@ public interface EksternBehandlingRepository {
     Optional<EksternBehandling> finnForSisteAvsluttetTbkBehandling(UUID eksternUuid);
 
     boolean finnesEksternBehandling(long internId, long eksternId);
+
+    boolean finnesEksternBehandling(long internId, Henvisning henvisning);
 
     void deaktivateTilkobling(long internId);
 

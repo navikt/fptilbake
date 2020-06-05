@@ -28,6 +28,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.vedtak.feil.Feil;
 import no.nav.vedtak.feil.FeilFactory;
@@ -88,7 +89,8 @@ public class BehandlingRevurderingTjeneste {
             .orElseThrow(() -> RevurderingFeil.FACTORY.tjenesteFinnerIkkeBehandlingForRevurdering(fagsak.getId()).toException());
 
         Behandling origBehandling = behandlingRepository.hentBehandling(eksternBehandlingForSisteTbkBehandling.getInternId());
-        Long eksternBehandlingId = eksternBehandlingForSisteTbkBehandling.getEksternId(); // eksternBehandling må være samme som siste når vi opprette revurdering
+
+        Henvisning henvisning = eksternBehandlingForSisteTbkBehandling.getHenvisning(); // henvisning må være samme som siste når vi opprette revurdering
 
         Behandling revurdering = opprettRevurderingsBehandling(behandlingÅrsakType, origBehandling, BehandlingType.REVURDERING_TILBAKEKREVING);
         BehandlingLås lås = behandlingRepository.taSkriveLås(revurdering);
@@ -98,7 +100,7 @@ public class BehandlingRevurderingTjeneste {
         repositoryProvider.getAksjonspunktRepository().leggTilAksjonspunkt(revurdering, AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING,
             BehandlingStegType.FAKTA_FEILUTBETALING);
 
-        opprettRelasjonMedEksternBehandling(eksternBehandlingId, revurdering, eksternUuid);
+        opprettRelasjonMedEksternBehandling(henvisning, revurdering, eksternUuid);
 
         kopierVergeInformasjon(origBehandling.getId(), revurdering.getId());
 
@@ -130,8 +132,8 @@ public class BehandlingRevurderingTjeneste {
         return !behandling.erAvsluttet();
     }
 
-    private void opprettRelasjonMedEksternBehandling(long eksternBehandlingId, Behandling revurdering, UUID eksternUuid) {
-        EksternBehandling eksternBehandling = new EksternBehandling(revurdering, eksternBehandlingId, eksternUuid);
+    private void opprettRelasjonMedEksternBehandling(Henvisning henvisning, Behandling revurdering, UUID eksternUuid) {
+        EksternBehandling eksternBehandling = new EksternBehandling(revurdering, henvisning, eksternUuid);
         eksternBehandlingRepository.lagre(eksternBehandling);
     }
 

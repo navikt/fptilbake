@@ -16,6 +16,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagValidator;
@@ -69,7 +70,7 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
 
         String råXml = økonomiMottattXmlRepository.hentMottattXml(mottattXmlId);
         DetaljertKravgrunnlag kravgrunnlagDto = KravgrunnlagXmlUnmarshaller.unmarshall(mottattXmlId, råXml);
-        String henvisning = kravgrunnlagMapper.finnBehandlngId(kravgrunnlagDto);
+        Henvisning henvisning = kravgrunnlagMapper.finnHenvisning(kravgrunnlagDto);
         String saksnummer = finnSaksnummer(kravgrunnlagDto.getFagsystemId());
         Kravgrunnlag431 kravgrunnlag = kravgrunnlagMapper.mapTilDomene(kravgrunnlagDto);
 
@@ -97,7 +98,7 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
 
     }
 
-    private static boolean validerKravgrunnlag(Long mottattXmlId, String henvisning, String saksnummer, Kravgrunnlag431 kravgrunnlag) {
+    private static boolean validerKravgrunnlag(Long mottattXmlId, Henvisning henvisning, String saksnummer, Kravgrunnlag431 kravgrunnlag) {
         try {
             KravgrunnlagValidator.validerGrunnlag(kravgrunnlag);
             return true;
@@ -109,21 +110,14 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
         }
     }
 
-    private Optional<EksternBehandling> hentKoblingTilInternBehandling(String henvisning) {
-        //FIXME k9-tilbake må støtte base64(uuid) fra K9
-        if (erGyldigTall(henvisning)) {
-            long eksternBehandlingId = Long.parseLong(henvisning);
-            return eksternBehandlingRepository.hentFraEksternId(eksternBehandlingId);
-        }
-        return Optional.empty();
+    private Optional<EksternBehandling> hentKoblingTilInternBehandling(Henvisning henvisning) {
+        long eksternBehandlingId = henvisning.toLong();
+        return eksternBehandlingRepository.hentFraEksternId(eksternBehandlingId);
     }
 
-    private void validerBehandlingsEksistens(String henvisning, String saksnummer) {
-        //FIXME k9-tilbake må støtte base64(uuid) fra K9
-        if (!erGyldigTall(henvisning)) {
-            throw LesKravgrunnlagTaskFeil.FACTORY.ugyldigHenvisning(henvisning).toException();
-        }
-        if (!erBehandlingFinnesIFpsak(saksnummer, henvisning)) {
+    private void validerBehandlingsEksistens(Henvisning henvisning, String saksnummer) {
+
+        if (!finnesYtelsesbehandling(saksnummer, henvisning)) {
             throw LesKravgrunnlagTaskFeil.FACTORY.behandlingFinnesIkkeIFagsaksystemet(henvisning).toException();
         }
     }
@@ -136,18 +130,12 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
         @TekniskFeil(feilkode = "FPT-587195",
             feilmelding = "Mottok et tilbakekrevingsgrunnlag fra Økonomi for en behandling som ikke finnes i fpsak. henvisning=%s. Kravgrunnlaget skulle kanskje til et annet system. Si i fra til Økonomi!",
             logLevel = LogLevel.WARN)
-        Feil behandlingFinnesIkkeIFagsaksystemet(String henvisning);
-
-        //FIXME k9-tilbake må støtte k9-format for henvisning også
-        @TekniskFeil(feilkode = "FPT-675363",
-            feilmelding = "Mottok et tilbakekrevingsgrunnlag fra Økonomi med henvisning som ikke er et tall. behandlingId=%s. Kravgrunnlaget skulle kanskje til et annet system. Si i fra til Økonomi!",
-            logLevel = LogLevel.WARN)
-        Feil ugyldigHenvisning(String behandlingId);
+        Feil behandlingFinnesIkkeIFagsaksystemet(Henvisning henvisning);
 
         @TekniskFeil(feilkode = "FPT-839288",
             feilmelding = "Mottok et ugyldig kravgrunnlag for saksnummer=%s henvisning=%s mottattXmlId=%s",
             logLevel = LogLevel.WARN)
-        Feil ugyldigKravgrunnlag(String saksnummer, String henvisning, Long mottattXmlId, KravgrunnlagValidator.UgyldigKravgrunnlagException cause);
+        Feil ugyldigKravgrunnlag(String saksnummer, Henvisning henvisning, Long mottattXmlId, KravgrunnlagValidator.UgyldigKravgrunnlagException cause);
     }
 
 }

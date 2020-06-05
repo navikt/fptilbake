@@ -10,11 +10,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class EksternBehandlingsinfoDto {
 
-    private Long id;
+    private Long id; //FIXME k9-tilbake fjern id fra felles EksternBehandlignsinfoDto
+    private Henvisning henvisning;
     private UUID uuid;
     private String behandlendeEnhetId;
     private String behandlendeEnhetNavn;
@@ -32,6 +34,14 @@ public class EksternBehandlingsinfoDto {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Henvisning getHenvisning() {
+        return henvisning;
+    }
+
+    public void setHenvisning(Henvisning henvisning) {
+        this.henvisning = henvisning;
     }
 
     public UUID getUuid() {

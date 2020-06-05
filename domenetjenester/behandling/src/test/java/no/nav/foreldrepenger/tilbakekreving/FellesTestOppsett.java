@@ -32,6 +32,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Ak
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.SærligGrunn;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fagsak.FagsakTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.Tillegsinformasjon;
@@ -62,7 +63,7 @@ public class FellesTestOppsett extends TestOppsett {
     protected Saksnummer saksnummer;
     protected Long fagsakId;
     protected Long internBehandlingId;
-    protected Long eksternBehandlingId;
+    protected Henvisning henvisning;
     protected UUID eksternBehandlingUuid;
     protected Behandling behandling;
 
@@ -153,14 +154,15 @@ public class FellesTestOppsett extends TestOppsett {
         saksnummer = sakDetaljer.getSaksnummer();
         fagsakId = sakDetaljer.getFagsakId();
         internBehandlingId = sakDetaljer.getInternBehandlingId();
-        eksternBehandlingId = sakDetaljer.getEksternBehandlingId();
+        henvisning = sakDetaljer.getHenvisning();
         eksternBehandlingUuid = sakDetaljer.getEksternUuid();
         behandling = sakDetaljer.getBehandling();
     }
 
     private Optional<EksternBehandlingsinfoDto> lagEksternBehandlingInfoDto() {
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto = new EksternBehandlingsinfoDto();
-        eksternBehandlingsinfoDto.setId(10001L);
+        eksternBehandlingsinfoDto.setId(10001L); //TODO k9-tilbake denne er fp-spesifikk
+        eksternBehandlingsinfoDto.setHenvisning(Henvisning.fraEksternBehandlingId(10001L));
         eksternBehandlingsinfoDto.setBehandlendeEnhetId(BEHANDLENDE_ENHET_ID);
         eksternBehandlingsinfoDto.setBehandlendeEnhetNavn(BEHANDLENDE_ENHET_NAVN);
         return Optional.of(eksternBehandlingsinfoDto);

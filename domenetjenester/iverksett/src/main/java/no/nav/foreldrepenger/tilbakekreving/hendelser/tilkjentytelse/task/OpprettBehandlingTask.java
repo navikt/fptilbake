@@ -10,6 +10,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -39,18 +40,16 @@ public class OpprettBehandlingTask implements ProsessTaskHandler {
         dataWrapper.validerTaskDataOpprettBehandling();
 
         String eksternBehandlingUuid = dataWrapper.getBehandlingUuid();
-        long eksternBehandlingId = dataWrapper.getEksternBehandlingId();
+        Henvisning henvisning = dataWrapper.getHenvisning();
         Saksnummer saksnummer = dataWrapper.getSaksnummer();
         AktørId aktørId = dataWrapper.getAktørId();
         BehandlingType behandlingType = dataWrapper.getBehandlingType();
         FagsakYtelseType fagsakYtelseType = dataWrapper.getFagsakYtelseType();
 
-        opprettBehandling(saksnummer, UUID.fromString(eksternBehandlingUuid), eksternBehandlingId, aktørId, fagsakYtelseType, behandlingType);
+        opprettBehandling(saksnummer, UUID.fromString(eksternBehandlingUuid), henvisning, aktørId, fagsakYtelseType, behandlingType);
     }
 
-    private void opprettBehandling(Saksnummer saksnummer, UUID eksternUuid, long eksternBehandlingId,
-                                   AktørId aktørId, FagsakYtelseType fagsakYtelseType,
-                                   BehandlingType behandlingType) {
-        behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer, eksternUuid, eksternBehandlingId, aktørId, fagsakYtelseType, behandlingType);
+    private void opprettBehandling(Saksnummer saksnummer, UUID eksternUuid, Henvisning henvisning, AktørId aktørId, FagsakYtelseType fagsakYtelseType, BehandlingType behandlingType) {
+        behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer, eksternUuid, henvisning, aktørId, fagsakYtelseType, behandlingType);
     }
 }
