@@ -10,6 +10,7 @@ import com.github.jknack.handlebars.Template;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselInfo;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottakerUtil;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.TekstformatererBrevFeil;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.CustomHelpers;
@@ -108,7 +109,7 @@ public class TekstformatererVarselbrev extends FellesTekstformaterer {
         varselbrevDokument.setVarseltekstFraSaksbehandler(varselbrevSamletInfo.getFritekstFraSaksbehandler());
         varselbrevDokument.setFeilutbetaltePerioder(varselbrevSamletInfo.getFeilutbetaltePerioder());
         varselbrevDokument.setFagsaktypeNavn(varselbrevSamletInfo.getBrevMetadata().getFagsaktypenavnPåSpråk());
-        varselbrevDokument.setMottakerNavn(varselbrevSamletInfo.getBrevMetadata().getMottakerAdresse().getMottakerNavn());
+        varselbrevDokument.setAnnenMottakerNavn(BrevMottakerUtil.getAnnenMottakerNavn(varselbrevSamletInfo.getBrevMetadata()));
         varselbrevDokument.setFinnesVerge(varselbrevSamletInfo.isFinnesVerge());
         settFagsaktype(varselbrevDokument, varselbrevSamletInfo.getBrevMetadata().getFagsaktype());
         settSenesteOgTidligsteDatoer(varselbrevDokument, varselbrevSamletInfo.getFeilutbetaltePerioder());
@@ -122,8 +123,6 @@ public class TekstformatererVarselbrev extends FellesTekstformaterer {
         varselbrevDokument.setKorrigert(true);
         varselbrevDokument.setVarsletDato(varselInfo.getOpprettetTidspunkt().toLocalDate());
         varselbrevDokument.setVarsletBeløp(varselInfo.getVarselBeløp());
-        varselbrevDokument.setMottakerNavn(varselbrevSamletInfo.getBrevMetadata().getMottakerAdresse().getMottakerNavn());
-        varselbrevDokument.setFinnesVerge(varselbrevSamletInfo.isFinnesVerge());
 
         varselbrevDokument.valider();
         return varselbrevDokument;

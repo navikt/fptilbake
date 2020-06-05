@@ -25,7 +25,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelse
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselInfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevAktørIdUtil;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.EksternDataForBrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.YtelseNavn;
@@ -82,7 +81,7 @@ public class ManueltVarselBrevTjeneste {
 
     public void sendManueltVarselBrev(Long behandlingId, String fritekst, BrevMottaker brevMottaker) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-        VarselbrevSamletInfo varselbrevSamletInfo = lagVarselBeløpForSending(fritekst, behandling, false);
+        VarselbrevSamletInfo varselbrevSamletInfo = lagVarselBeløpForSending(fritekst, behandling, brevMottaker,false);
 
         FritekstbrevData data = lagManueltVarselBrev(varselbrevSamletInfo);
 
@@ -94,13 +93,15 @@ public class ManueltVarselBrevTjeneste {
 
     public byte[] hentForhåndsvisningManueltVarselbrev(Long behandlingId, DokumentMalType malType, String fritekst) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
+        boolean finnesVerge = vergeRepository.finnesVerge(behandlingId);
+        BrevMottaker brevMottaker = finnesVerge ? BrevMottaker.VERGE : BrevMottaker.BRUKER;
         byte[] dokument = new byte[0];
         if (DokumentMalType.VARSEL_DOK.equals(malType)) {
-            VarselbrevSamletInfo varselbrevSamletInfo = lagVarselBeløpForSending(fritekst, behandling, false);
+            VarselbrevSamletInfo varselbrevSamletInfo = lagVarselBeløpForSending(fritekst, behandling, brevMottaker, false);
             FritekstbrevData data = lagManueltVarselBrev(varselbrevSamletInfo);
             dokument = bestillDokumentTjeneste.hentForhåndsvisningFritekstbrev(data);
         } else if (DokumentMalType.KORRIGERT_VARSEL_DOK.equals(malType)) {
-            VarselbrevSamletInfo varselbrevSamletInfo = lagVarselBeløpForSending(fritekst, behandling, true);
+            VarselbrevSamletInfo varselbrevSamletInfo = lagVarselBeløpForSending(fritekst, behandling, brevMottaker, true);
             VarselInfo varselInfo = varselRepository.finnEksaktVarsel(behandlingId);
 
             FritekstbrevData data = lagKorrigertVarselBrev(varselbrevSamletInfo, varselInfo);
@@ -111,7 +112,7 @@ public class ManueltVarselBrevTjeneste {
 
     public void sendKorrigertVarselBrev(Long behandlingId, String fritekst, BrevMottaker brevMottaker) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-        VarselbrevSamletInfo varselbrevSamletInfo = lagVarselBeløpForSending(fritekst, behandling, true);
+        VarselbrevSamletInfo varselbrevSamletInfo = lagVarselBeløpForSending(fritekst, behandling, brevMottaker, true);
         VarselInfo varselInfo = varselRepository.finnEksaktVarsel(behandlingId);
 
         FritekstbrevData data = lagKorrigertVarselBrev(varselbrevSamletInfo, varselInfo);
@@ -142,15 +143,15 @@ public class ManueltVarselBrevTjeneste {
             .build();
     }
 
-    private VarselbrevSamletInfo lagVarselBeløpForSending(String fritekst, Behandling behandling, boolean erKorrigert) {
+    private VarselbrevSamletInfo lagVarselBeløpForSending(String fritekst, Behandling behandling, BrevMottaker brevMottaker, boolean erKorrigert) {
         //sjekker om behandlingen har verge
         Optional<VergeEntitet> vergeEntitet = vergeRepository.finnVergeInformasjon(behandling.getId());
         boolean finnesVerge = vergeEntitet.isPresent();
+        String vergeNavn = BrevMottaker.VERGE.equals(brevMottaker) ? vergeEntitet.get().getNavn() : null;
 
         //Henter data fra tps
-        String aktørId = BrevAktørIdUtil.getMottakerAktørId(behandling,vergeEntitet);
-        Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(aktørId);
-        Adresseinfo adresseinfo = eksternDataForBrevTjeneste.hentAdresse(personinfo, vergeEntitet);
+        Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(behandling.getAktørId().getId());
+        Adresseinfo adresseinfo = eksternDataForBrevTjeneste.hentAdresse(personinfo, brevMottaker, vergeEntitet);
 
         //Henter fagsaktypenavn på riktig språk
         Språkkode mottakersSpråkkode = hentSpråkkode(behandling.getId());
@@ -173,6 +174,7 @@ public class ManueltVarselBrevTjeneste {
             fritekst,
             feilutbetalingFakta,
             finnesVerge,
+            vergeNavn,
             erKorrigert);
     }
 

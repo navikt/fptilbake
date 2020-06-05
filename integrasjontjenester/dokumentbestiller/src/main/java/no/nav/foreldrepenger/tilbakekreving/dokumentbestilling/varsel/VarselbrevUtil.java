@@ -42,7 +42,8 @@ public class VarselbrevUtil {
                                                                                FagsakYtelseType fagsakYtelseType,
                                                                                YtelseNavn ytelseNavn,
                                                                                String varselTekst,
-                                                                               boolean finnesVerge) {
+                                                                               boolean finnesVerge,
+                                                                               String vergeNavn) {
 
         EksternBehandlingsinfoDto grunninformasjon = eksternBehandlingsinfoDto.getGrunninformasjon();
         BrevMetadata metadata = new BrevMetadata.Builder()
@@ -52,6 +53,7 @@ public class VarselbrevUtil {
             .medMottakerAdresse(adresseinfo)
             .medSaksnummer(saksnummer.getVerdi())
             .medSakspartNavn(personinfo.getNavn())
+            .medVergeNavn(vergeNavn)
             .medFagsaktypenavnPåSpråk(ytelseNavn.getNavnPåBrukersSpråk())
             .medFagsaktype(fagsakYtelseType)
             .medSprakkode(eksternBehandlingsinfoDto.getGrunninformasjon().getSpråkkodeEllerDefault())
@@ -79,7 +81,8 @@ public class VarselbrevUtil {
                                                                                               Period ventetid,
                                                                                               FagsakYtelseType fagsakYtelseType,
                                                                                               YtelseNavn ytelseNavn,
-                                                                                              boolean finnesVerge) {
+                                                                                              boolean finnesVerge,
+                                                                                              String vergeNavn) {
 
         EksternBehandlingsinfoDto grunninformasjon = eksternBehandlingsinfo.getGrunninformasjon();
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
@@ -89,6 +92,7 @@ public class VarselbrevUtil {
             .medMottakerAdresse(adresseinfo)
             .medSaksnummer(saksnummer.getVerdi())
             .medSakspartNavn(eksternBehandlingsinfo.getPersonopplysninger().getNavn())
+            .medVergeNavn(vergeNavn)
             .medFagsaktype(fagsakYtelseType)
             .medSprakkode(grunninformasjon.getSpråkkodeEllerDefault())
             .medFagsaktypenavnPåSpråk(ytelseNavn.getNavnPåBrukersSpråk())
@@ -118,6 +122,7 @@ public class VarselbrevUtil {
         String friTekst,
         BehandlingFeilutbetalingFakta feilutbetalingFakta,
         boolean finnesVerge,
+        String vergeNavn,
         boolean erKorrigert) {
 
         BrevMetadata metadata = new BrevMetadata.Builder()
@@ -127,6 +132,7 @@ public class VarselbrevUtil {
             .medMottakerAdresse(adresseinfo)
             .medSaksnummer(behandling.getFagsak().getSaksnummer().getVerdi())
             .medSakspartNavn(personinfo.getNavn())
+            .medVergeNavn(vergeNavn)
             .medFagsaktype(fagsakYtelseType)
             .medSprakkode(språkkode)
             .medFagsaktypenavnPåSpråk(ytelseNavn.getNavnPåBrukersSpråk())

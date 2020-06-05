@@ -1,6 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel;
 
-import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -26,7 +25,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkko
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselInfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.HentForhåndsvisningVarselbrevDto;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevAktørIdUtil;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.EksternDataForBrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.YtelseNavn;
@@ -45,7 +43,6 @@ import no.nav.foreldrepenger.tilbakekreving.simulering.kontrakt.FeilutbetaltePer
 @Transactional
 public class VarselbrevTjeneste {
 
-    private static final Logger logger = LoggerFactory.getLogger(VarselbrevTjeneste.class);
     private static final String TITTEL_VARSELBREV_HISTORIKKINNSLAG = "Varselbrev Tilbakekreving";
     private static final String TITTEL_VARSELBREV_HISTORIKKINNSLAG_TIL_VERGE = "Varselbrev Tilbakekreving til Verge";
 
@@ -83,7 +80,7 @@ public class VarselbrevTjeneste {
     }
 
     public Optional<JournalpostIdOgDokumentId> sendVarselbrev(Long behandlingId, BrevMottaker brevMottaker) {
-        VarselbrevSamletInfo varselbrevSamletInfo = lagVarselbrevForSending(behandlingId);
+        VarselbrevSamletInfo varselbrevSamletInfo = lagVarselbrevForSending(behandlingId, brevMottaker);
         String overskrift = TekstformatererVarselbrev.lagVarselbrevOverskrift(varselbrevSamletInfo.getBrevMetadata());
         String brevtekst = TekstformatererVarselbrev.lagVarselbrevFritekst(varselbrevSamletInfo);
         FritekstbrevData data = new FritekstbrevData.Builder()
@@ -134,11 +131,12 @@ public class VarselbrevTjeneste {
         brevSporingRepository.lagre(brevSporing);
     }
 
-    private VarselbrevSamletInfo lagVarselbrevForSending(Long behandlingId) {
+    private VarselbrevSamletInfo lagVarselbrevForSending(Long behandlingId, BrevMottaker brevMottaker) {
         Behandling behandling = behandlingTjeneste.hentBehandling(behandlingId);
 
         Optional<VergeEntitet> vergeEntitet = vergeRepository.finnVergeInformasjon(behandlingId);
         boolean finnesVerge = vergeEntitet.isPresent();
+        String vergeNavn = BrevMottaker.VERGE.equals(brevMottaker) ? vergeEntitet.get().getNavn() : "";
 
         //Henter data fra fptilbakes eget repo for å finne behandlingsid brukt i fpsak, samt saksnummer
         EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandlingId);
@@ -148,9 +146,8 @@ public class VarselbrevTjeneste {
         Saksnummer saksnummer = behandling.getFagsak().getSaksnummer();
         SamletEksternBehandlingInfo eksternBehandlingsinfoDto = eksternDataForBrevTjeneste.hentYtelsesbehandlingFraFagsystemet(eksternBehandling.getEksternUuid(), Tillegsinformasjon.PERSONOPPLYSNINGER);
         //Henter data fra tps
-        String aktørId = BrevAktørIdUtil.getMottakerAktørId(behandling,vergeEntitet);
-        Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(aktørId);
-        Adresseinfo adresseinfo = eksternDataForBrevTjeneste.hentAdresse(personinfo,vergeEntitet);
+        Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(behandling.getAktørId().getId());
+        Adresseinfo adresseinfo =  eksternDataForBrevTjeneste.hentAdresse(personinfo,brevMottaker,vergeEntitet);
 
         //Henter fagsaktypenavn på riktig språk
         Språkkode mottakersSpråkkode = eksternBehandlingsinfoDto.getGrunninformasjon().getSpråkkodeEllerDefault();
@@ -178,7 +175,8 @@ public class VarselbrevTjeneste {
             fagsakYtelseType,
             ytelseNavn,
             varselTekst,
-            finnesVerge);
+            finnesVerge,
+            vergeNavn);
     }
 
     public VarselbrevSamletInfo lagVarselbrevForForhåndsvisning(UUID behandlingUuId, String varseltekst, FagsakYtelseType fagsakYtleseType) {
@@ -188,10 +186,11 @@ public class VarselbrevTjeneste {
         Behandling behandling = eksternBehandling.isPresent() ? behandlingRepository.hentBehandling(eksternBehandling.get().getInternId()) : null;
         Optional<VergeEntitet> vergeEntitet = behandling != null ? vergeRepository.finnVergeInformasjon(behandling.getId()) : Optional.empty();
         boolean finnesVerge = vergeEntitet.isPresent();
+        BrevMottaker brevMottaker = finnesVerge ? BrevMottaker.VERGE : BrevMottaker.BRUKER;
+        String vergeNavn = finnesVerge ? vergeEntitet.get().getNavn() : "";
 
-        String aktørId = finnesVerge ? BrevAktørIdUtil.getMottakerAktørId(behandling,vergeEntitet) : eksternBehandlingsinfo.getAktørId().getId();
-        Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(aktørId);
-        Adresseinfo adresseinfo = eksternDataForBrevTjeneste.hentAdresse(personinfo, vergeEntitet);
+        Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(eksternBehandlingsinfo.getAktørId().getId());
+        Adresseinfo adresseinfo = eksternDataForBrevTjeneste.hentAdresse(personinfo, brevMottaker, vergeEntitet);
         FeilutbetaltePerioderDto feilutbetaltePerioderDto = eksternDataForBrevTjeneste.hentFeilutbetaltePerioder(grunninformasjon.getId());
         Språkkode mottakersSpråkkode = grunninformasjon.getSpråkkodeEllerDefault();
         YtelseNavn ytelseNavn = eksternDataForBrevTjeneste.hentYtelsenavn(fagsakYtleseType, mottakersSpråkkode);
@@ -204,7 +203,8 @@ public class VarselbrevTjeneste {
             eksternDataForBrevTjeneste.getBrukersSvarfrist(),
             fagsakYtleseType,
             ytelseNavn,
-            finnesVerge);
+            finnesVerge,
+            vergeNavn);
     }
 
     private void lagreVarseltBeløp(Long behandlingId, Long varseltBeløp) {

@@ -41,7 +41,6 @@ import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.organisasjon.VirksomhetTjeneste;
 import no.nav.tjeneste.virksomhet.organisasjon.v4.binding.HentOrganisasjonOrganisasjonIkkeFunnet;
 import no.nav.tjeneste.virksomhet.organisasjon.v4.binding.HentOrganisasjonUgyldigInput;
 import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
@@ -59,7 +58,6 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
     private FaktaFeilutbetalingTjeneste mockFeilutbetalingTjeneste = mock(FaktaFeilutbetalingTjeneste.class);
     private FritekstbrevTjeneste mockFritekstbrevTjeneste = mock(FritekstbrevTjeneste.class);
     private PersoninfoAdapter mockPersoninfoAdapter = mock(PersoninfoAdapter.class);
-    private VirksomhetTjeneste mockVirksomhetTjeneste = mock(VirksomhetTjeneste.class);
 
     private ManueltVarselBrevTjeneste manueltVarselBrevTjeneste;
 
@@ -68,7 +66,7 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
     @Before
     public void setup() {
         HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepository,
-                mockPersoninfoAdapter);
+            mockPersoninfoAdapter);
         manueltVarselBrevTjeneste = new ManueltVarselBrevTjeneste(repositoryProvider, mockEksternDataForBrevTjeneste,
             mockFeilutbetalingTjeneste, mockFritekstbrevTjeneste, historikkinnslagTjeneste);
 
@@ -81,7 +79,7 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
         Personinfo personinfo = byggStandardPerson("Fiona", DUMMY_FØDSELSNUMMER, Språkkode.nn);
         String aktørId = behandling.getAktørId().getId();
         when(mockEksternDataForBrevTjeneste.hentPerson(aktørId)).thenReturn(personinfo);
-        when(mockEksternDataForBrevTjeneste.hentAdresse(any(Personinfo.class), any(Optional.class))).thenReturn(lagStandardNorskAdresse());
+        when(mockEksternDataForBrevTjeneste.hentAdresse(any(Personinfo.class), any(BrevMottaker.class), any(Optional.class))).thenReturn(lagStandardNorskAdresse());
         when(mockEksternDataForBrevTjeneste.getBrukersSvarfrist()).thenReturn(Period.ofWeeks(3));
 
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto = new EksternBehandlingsinfoDto();
@@ -115,7 +113,7 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
 
     @Test
     public void skal_sende_manuelt_varselbrev_med_verge() throws HentOrganisasjonOrganisasjonIkkeFunnet, HentOrganisasjonUgyldigInput {
-        vergeRepository.lagreVergeInformasjon(behandlingId,lagVerge());
+        vergeRepository.lagreVergeInformasjon(behandlingId, lagVerge());
         manueltVarselBrevTjeneste.sendManueltVarselBrev(behandlingId, VARSEL_TEKST, BrevMottaker.VERGE);
 
         Optional<VarselInfo> varselInfo = varselRepository.finnVarsel(behandlingId);
@@ -158,7 +156,7 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
 
     @Test
     public void skal_sende_korrigert_varselbrev_med_verge() {
-        vergeRepository.lagreVergeInformasjon(behandlingId,lagVerge());
+        vergeRepository.lagreVergeInformasjon(behandlingId, lagVerge());
         manueltVarselBrevTjeneste.sendManueltVarselBrev(behandlingId, VARSEL_TEKST, BrevMottaker.VERGE);
         manueltVarselBrevTjeneste.sendKorrigertVarselBrev(behandlingId, KORRIGERT_VARSEL_TEKST, BrevMottaker.VERGE);
 
@@ -191,7 +189,7 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
     @Test
     public void skal_forhåndsvise_korrigert_varselbrev() {
         when(mockFritekstbrevTjeneste.hentForhåndsvisningFritekstbrev(any(FritekstbrevData.class))).thenReturn(VARSEL_TEKST.getBytes());
-        varselRepository.lagre(behandlingId, KORRIGERT_VARSEL_TEKST,32000l);
+        varselRepository.lagre(behandlingId, KORRIGERT_VARSEL_TEKST, 32000l);
         byte[] data = manueltVarselBrevTjeneste.hentForhåndsvisningManueltVarselbrev(behandlingId, DokumentMalType.KORRIGERT_VARSEL_DOK, VARSEL_TEKST);
 
         assertThat(data).isNotEmpty();

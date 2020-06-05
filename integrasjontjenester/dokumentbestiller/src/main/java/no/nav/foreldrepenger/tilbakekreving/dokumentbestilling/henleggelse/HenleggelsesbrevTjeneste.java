@@ -19,7 +19,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevAktørIdUtil;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.EksternDataForBrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.YtelseNavn;
@@ -68,7 +67,7 @@ public class HenleggelsesbrevTjeneste {
 
     public Optional<JournalpostIdOgDokumentId> sendHenleggelsebrev(Long behandlingId, BrevMottaker brevMottaker) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-        HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = lagHenleggelsebrevForSending(behandling);
+        HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = lagHenleggelsebrevForSending(behandling,brevMottaker);
         FritekstbrevData fritekstbrevData = lagHenleggelsebrev(henleggelsesbrevSamletInfo);
         JournalpostIdOgDokumentId dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(fritekstbrevData);
         opprettHistorikkinnslag(behandling, dokumentreferanse, brevMottaker);
@@ -78,26 +77,29 @@ public class HenleggelsesbrevTjeneste {
 
     public byte[] hentForhåndsvisningHenleggelsebrev(Long behandlingId) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-        HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = lagHenleggelsebrevForSending(behandling);
+        boolean finnesVerge = vergeRepository.finnesVerge(behandlingId);
+        BrevMottaker brevMottaker = finnesVerge ? BrevMottaker.VERGE : BrevMottaker.BRUKER;
+        HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = lagHenleggelsebrevForSending(behandling, brevMottaker);
         FritekstbrevData fritekstbrevData = lagHenleggelsebrev(henleggelsesbrevSamletInfo);
         return bestillDokumentTjeneste.hentForhåndsvisningFritekstbrev(fritekstbrevData);
     }
 
-    private HenleggelsesbrevSamletInfo lagHenleggelsebrevForSending(Behandling behandling) {
+    private HenleggelsesbrevSamletInfo lagHenleggelsebrevForSending(Behandling behandling, BrevMottaker brevMottaker) {
         Long behandlingId = behandling.getId();
         Optional<BrevSporing> brevSporing = brevSporingRepository.hentSistSendtVarselbrev(behandlingId);
         if (brevSporing.isEmpty()) {
             throw HenleggelsesbrevFeil.FACTORY.kanIkkeSendeEllerForhåndsviseHenleggelsesBrev(behandlingId).toException();
         }
-        Optional<VergeEntitet> vergeEntitet = vergeRepository.finnVergeInformasjon(behandlingId);
         FagsakYtelseType fagsakYtelseType = behandling.getFagsak().getFagsakYtelseType();
         Språkkode språkkode = hentSpråkkode(behandlingId);
+        Optional<VergeEntitet> vergeEntitet = vergeRepository.finnVergeInformasjon(behandlingId);
+        boolean finnesVerge = vergeEntitet.isPresent();
+        String vergeNavn = BrevMottaker.VERGE.equals(brevMottaker) ? vergeEntitet.get().getNavn() : "";
 
         //Henter data fra tps
-        String aktørId = BrevAktørIdUtil.getMottakerAktørId(behandling, vergeEntitet);
         YtelseNavn ytelseNavn = eksternDataForBrevTjeneste.hentYtelsenavn(fagsakYtelseType, språkkode);
-        Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(aktørId);
-        Adresseinfo adresseinfo = eksternDataForBrevTjeneste.hentAdresse(personinfo, vergeEntitet);
+        Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(behandling.getAktørId().getId());
+        Adresseinfo adresseinfo = eksternDataForBrevTjeneste.hentAdresse(personinfo, brevMottaker, vergeEntitet);
 
         BrevMetadata metadata = new BrevMetadata.Builder()
             .medBehandlendeEnhetId(behandling.getBehandlendeEnhetId())
@@ -110,13 +112,14 @@ public class HenleggelsesbrevTjeneste {
             .medMottakerAdresse(adresseinfo)
             .medSaksnummer(behandling.getFagsak().getSaksnummer().getVerdi())
             .medSakspartNavn(personinfo.getNavn())
+            .medVergeNavn(vergeNavn)
             .medTittel(TITTEL_HENLEGGELSESBREV)
             .build();
 
         HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = new HenleggelsesbrevSamletInfo();
         henleggelsesbrevSamletInfo.setBrevMetadata(metadata);
         henleggelsesbrevSamletInfo.setVarsletDato(brevSporing.get().getOpprettetTidspunkt().toLocalDate());
-        henleggelsesbrevSamletInfo.setFinnesVerge(vergeEntitet.isPresent());
+        henleggelsesbrevSamletInfo.setFinnesVerge(finnesVerge);
         return henleggelsesbrevSamletInfo;
     }
 

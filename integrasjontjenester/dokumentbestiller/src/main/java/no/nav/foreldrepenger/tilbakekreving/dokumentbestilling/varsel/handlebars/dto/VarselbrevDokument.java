@@ -17,7 +17,7 @@ public class VarselbrevDokument extends BaseDokument {
     private LocalDate varsletDato;
     private Long varsletBeløp;
     private boolean finnesVerge;
-    private String mottakerNavn;
+    private String annenMottakerNavn;
 
     public Long getBeløp() {
         return beløp;
@@ -92,12 +92,12 @@ public class VarselbrevDokument extends BaseDokument {
     }
 
 
-    public String getMottakerNavn() {
-        return mottakerNavn;
+    public String getAnnenMottakerNavn() {
+        return annenMottakerNavn;
     }
 
-    public void setMottakerNavn(String mottakerNavn) {
-        this.mottakerNavn = mottakerNavn;
+    public void setAnnenMottakerNavn(String annenMottakerNavn) {
+        this.annenMottakerNavn = annenMottakerNavn;
     }
 
     public void valider() {
@@ -126,7 +126,7 @@ public class VarselbrevDokument extends BaseDokument {
         }
 
         if(finnesVerge){
-            Objects.requireNonNull(mottakerNavn,"mottakerNavn");
+            Objects.requireNonNull(annenMottakerNavn,"annenMottakerNavn");
         }
     }
 

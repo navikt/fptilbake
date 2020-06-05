@@ -8,7 +8,7 @@ public class HenleggelsesbrevDokument {
     private String fagsaktypeNavn;
     private LocalDate varsletDato;
     private boolean finnesVerge;
-    private String mottakerNavn;
+    private String annenMottakerNavn;
 
     public String getFagsaktypeNavn() {
         return fagsaktypeNavn;
@@ -35,19 +35,19 @@ public class HenleggelsesbrevDokument {
         this.finnesVerge = finnesVerge;
     }
 
-    public String getMottakerNavn() {
-        return mottakerNavn;
+    public String getAnnenMottakerNavn() {
+        return annenMottakerNavn;
     }
 
-    public void setMottakerNavn(String mottakerNavn) {
-        this.mottakerNavn = mottakerNavn;
+    public void setAnnenMottakerNavn(String annenMottakerNavn) {
+        this.annenMottakerNavn = annenMottakerNavn;
     }
 
     public void valider() {
         Objects.requireNonNull(getFagsaktypeNavn(), "fagsaktypeNavn kan ikke være null");
         Objects.requireNonNull(getVarsletDato(), "varsletDato kan ikke være null");
         if(isFinnesVerge()){
-            Objects.requireNonNull(getMottakerNavn(), "mottakerNavn kan ikke være null");
+            Objects.requireNonNull(getAnnenMottakerNavn(), "annenMottakerNavn kan ikke være null");
         }
     }
 }
