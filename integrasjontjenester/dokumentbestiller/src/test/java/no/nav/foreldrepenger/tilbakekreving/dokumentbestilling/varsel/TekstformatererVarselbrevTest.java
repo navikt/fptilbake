@@ -168,7 +168,7 @@ public class TekstformatererVarselbrevTest {
         varselbrevDokument.setFeilutbetaltePerioder(mockUtbetalingEnPeriode());
         varselbrevDokument.setFagsaktypeNavn("engangsstønad");
         varselbrevDokument.setEngangsstønad(true);
-        varselbrevDokument.valider();
+        varselbrevDokument.valider(); //NOSONAR
     }
 
     @Test
@@ -272,6 +272,8 @@ public class TekstformatererVarselbrevTest {
             .medSprakkode(Språkkode.nb)
             .medFagsaktypenavnPåSpråk("foreldrepenger")
             .medMottakerAdresse(lagAdresseInfo())
+            .medSakspartNavn("Test")
+            .medVergeNavn("John Doe")
             .build();
 
         VarselbrevSamletInfo varselbrevSamletInfo = new VarselbrevSamletInfo.Builder()
@@ -318,7 +320,7 @@ public class TekstformatererVarselbrevTest {
     }
 
     private Adresseinfo lagAdresseInfo(){
-        return new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE,new PersonIdent("123456"),"John Doe", PersonstatusType.BOSA).build();
+        return new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE,new PersonIdent("123456"),"Test", PersonstatusType.BOSA).build();
     }
 
 }
