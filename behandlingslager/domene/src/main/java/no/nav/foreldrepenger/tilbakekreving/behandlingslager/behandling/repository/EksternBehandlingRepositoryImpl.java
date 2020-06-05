@@ -15,6 +15,7 @@ import javax.persistence.TypedQuery;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
 
 @ApplicationScoped
@@ -41,7 +42,7 @@ public class EksternBehandlingRepositoryImpl implements EksternBehandlingReposit
             o.deaktiver();
             entityManager.persist(o);
         });
-        Optional<EksternBehandling> eksisterendeDeaktivert = hentEksisterendeDeaktivert(eksternBehandling.getInternId(),eksternBehandling.getEksternId());
+        Optional<EksternBehandling> eksisterendeDeaktivert = hentEksisterendeDeaktivert(eksternBehandling.getInternId(),eksternBehandling.getHenvisning());
         eksisterendeDeaktivert.ifPresentOrElse(o -> {
             o.reaktivate();
             entityManager.persist(o);
@@ -57,9 +58,10 @@ public class EksternBehandlingRepositoryImpl implements EksternBehandlingReposit
     }
 
     @Override
-    public Optional<EksternBehandling> hentFraEksternId(long eksternBehandlingId) {
+    public Optional<EksternBehandling> hentFraHenvisning(Henvisning henvisning) {
+        //FIXME k9-tilbake støtt henvisning for k9 (bytt fra ekstern_id til henvisning når migrert)
         TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where ekstern_id=:eksternId and aktiv='J'", EksternBehandling.class);
-        query.setParameter(EKSTERN_ID, eksternBehandlingId);
+        query.setParameter(EKSTERN_ID, henvisning.getVerdi());
         return hentUniktResultat(query);
     }
 
@@ -86,9 +88,10 @@ public class EksternBehandlingRepositoryImpl implements EksternBehandlingReposit
     }
 
     @Override
-    public boolean finnesEksternBehandling(long internId, long eksternId) {
+    public boolean finnesEksternBehandling(long internId, Henvisning henvisning) {
+        //FIXME k9-tilbake støtt Henvisning som ikke er bare tall (bytt ekstern_id->henvisning når migrert)
         TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where ekstern_id=:eksternId and intern_id=:internId and aktiv='J'", EksternBehandling.class);
-        query.setParameter(EKSTERN_ID, eksternId);
+        query.setParameter(EKSTERN_ID, henvisning.toLong());
         query.setParameter(INTERN_ID, internId);
         return !query.getResultList().isEmpty();
     }
@@ -114,10 +117,10 @@ public class EksternBehandlingRepositoryImpl implements EksternBehandlingReposit
         return hentUniktResultat(query);
     }
 
-    private Optional<EksternBehandling> hentEksisterendeDeaktivert(long internBehandlingId, long eksternBehandlingId){
+    private Optional<EksternBehandling> hentEksisterendeDeaktivert(long internBehandlingId, Henvisning henvisning){
         TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where intern_id=:internId and ekstern_id=:eksternId order by opprettetTidspunkt desc", EksternBehandling.class);
         query.setParameter(INTERN_ID, internBehandlingId);
-        query.setParameter(EKSTERN_ID, eksternBehandlingId);
+        query.setParameter(EKSTERN_ID, henvisning.toLong());
 
         return hentUniktResultat(query);
     }

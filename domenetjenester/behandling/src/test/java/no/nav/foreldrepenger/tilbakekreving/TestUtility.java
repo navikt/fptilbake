@@ -14,6 +14,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personop
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 
@@ -44,15 +45,16 @@ public class TestUtility {
         // generer data
         long fagsakId = genererFagsakId();
         long eksBehId = genererEksternBehandlingId();
+        Henvisning henvisning = Henvisning.fraEksternBehandlingId(eksBehId);
         Saksnummer saksnummer = genererSaksnummer();
         UUID eksternUuid = genererEksternUuid();
 
-        long intBehId = behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer, eksternUuid, eksBehId, aktørId,FagsakYtelseType.FORELDREPENGER,BEHANDLING_TYPE);
+        long intBehId = behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer, eksternUuid, henvisning, aktørId,FagsakYtelseType.FORELDREPENGER,BEHANDLING_TYPE);
 
         Behandling behandling = behandlingTjeneste.hentBehandling(intBehId);
 
         // opprett SakDetaljer
-        return new SakDetaljer(fagsakId, saksnummer, intBehId, eksBehId, eksternUuid, aktørId, BEHANDLING_TYPE, behandling);
+        return new SakDetaljer(fagsakId, saksnummer, intBehId, henvisning, eksternUuid, aktørId, BEHANDLING_TYPE, behandling);
     }
 
     public Optional<Personinfo> lagPersonInfo(AktørId aktørId) {
@@ -92,18 +94,18 @@ public class TestUtility {
         private Long fagsakId;
         private Saksnummer saksnummer;
         private Long internBehandlingId;
-        private Long eksternBehandlingId;
+        private Henvisning henvisning;
         private UUID eksternUuid;
         private AktørId aktørId;
         private BehandlingType behandlingType;
         private Behandling behandling;
 
-        public SakDetaljer(Long fagsakId, Saksnummer saksnummer, Long internBehandlingId, Long eksternBehandlingId,
+        public SakDetaljer(Long fagsakId, Saksnummer saksnummer, Long internBehandlingId, Henvisning henvisning,
                            UUID eksternUuid, AktørId aktørId, BehandlingType behandlingType, Behandling behandling) {
             this.fagsakId = fagsakId;
             this.saksnummer = saksnummer;
             this.internBehandlingId = internBehandlingId;
-            this.eksternBehandlingId = eksternBehandlingId;
+            this.henvisning=henvisning;
             this.eksternUuid = eksternUuid;
             this.aktørId = aktørId;
             this.behandlingType = behandlingType;
@@ -122,8 +124,8 @@ public class TestUtility {
             return internBehandlingId;
         }
 
-        public Long getEksternBehandlingId() {
-            return eksternBehandlingId;
+        public Henvisning getHenvisning() {
+            return henvisning;
         }
 
         public UUID getEksternUuid() {

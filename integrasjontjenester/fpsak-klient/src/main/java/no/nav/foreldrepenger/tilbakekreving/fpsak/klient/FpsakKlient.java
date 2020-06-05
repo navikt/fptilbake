@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.BehandlingResourceLinkDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.FagsakDto;
@@ -69,7 +70,8 @@ public class FpsakKlient {
         this.restClient = restClient;
     }
 
-    public boolean finnesBehandlingIFpsak(String saksnummer, Long eksternBehandlingId) {
+    public boolean finnesBehandlingIFpsak(String saksnummer, Henvisning henvisning) {
+        Long eksternBehandlingId = Long.valueOf(henvisning.getVerdi());
         List<EksternBehandlingsinfoDto> eksternBehandlinger = hentBehandlingForSaksnummer(saksnummer);
         if (!eksternBehandlinger.isEmpty()) {
             return eksternBehandlinger.stream()
@@ -81,9 +83,13 @@ public class FpsakKlient {
     public SamletEksternBehandlingInfo hentBehandlingsinfo(UUID eksternUuid, Tillegsinformasjon... tillegsinformasjon) {
         List<Tillegsinformasjon> ekstrainfo = Arrays.asList(tillegsinformasjon);
         SamletEksternBehandlingInfo.Builder builder = SamletEksternBehandlingInfo.builder(ekstrainfo);
-        Optional<EksternBehandlingsinfoDto> eksternBehandlingsinfoDtoOptional = hentBehandling(eksternUuid);
+        Optional<EksternBehandlingsinfoDto> eksternBehandlingsinfoDtoOptional = hentBehandlingOptional(eksternUuid);
 
         eksternBehandlingsinfoDtoOptional.ifPresent(eksternBehandlingsinfo -> {
+
+            //TODO k9-tilbake finn penere løsning for å tilby henvisning uten å modifisere eksisterende objekt
+            eksternBehandlingsinfo.setHenvisning(Henvisning.fraEksternBehandlingId(eksternBehandlingsinfo.getId()));
+
             builder.setGrunninformasjon(eksternBehandlingsinfo);
             List<BehandlingResourceLinkDto> lenker = eksternBehandlingsinfo.getLinks();
             for (BehandlingResourceLinkDto lenke : lenker) {
@@ -110,13 +116,18 @@ public class FpsakKlient {
         return builder.build();
     }
 
-    public Optional<EksternBehandlingsinfoDto> hentBehandling(UUID eksternUuid) {
+    public Optional<EksternBehandlingsinfoDto> hentBehandlingOptional(UUID eksternUuid) {
         URI endpoint = createUri(BEHANDLING_EP, PARAM_NAME_BEHANDLING_UUID, eksternUuid.toString());
         return get(endpoint, EksternBehandlingsinfoDto.class);
     }
 
+    public EksternBehandlingsinfoDto hentBehandling(UUID eksternUuid) {
+        return hentBehandlingOptional(eksternUuid)
+            .orElseThrow(() -> FpsakKlientFeil.FACTORY.fantIkkeEksternBehandlingForUuid(eksternUuid.toString()).toException());
+    }
+
     public Optional<TilbakekrevingValgDto> hentTilbakekrevingValg(UUID eksternUuid) {
-        Optional<EksternBehandlingsinfoDto> eksternBehandlingsinfoDtoOptional = hentBehandling(eksternUuid);
+        Optional<EksternBehandlingsinfoDto> eksternBehandlingsinfoDtoOptional = hentBehandlingOptional(eksternUuid);
         if (eksternBehandlingsinfoDtoOptional.isPresent()) {
             Optional<BehandlingResourceLinkDto> ressursLink = eksternBehandlingsinfoDtoOptional.get().getLinks().stream()
                 .filter(resourceLink -> Tillegsinformasjon.TILBAKEKREVINGSVALG.getFpsakRelasjonNavn().equals(resourceLink.getRel())).findAny();

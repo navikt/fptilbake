@@ -30,6 +30,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkTabellRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDataWrapper;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatus437;
@@ -136,11 +137,11 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
         Kravgrunnlag431 kravgrunnlag431 = kravgrunnlagMapper.mapTilDomene(kravgrunnlag);
         grunnlagRepository.lagre(behandling.getId(), kravgrunnlag431);
 
-        String grunnlagReferanse = kravgrunnlag431.getReferanse();
+        Henvisning grunnlagReferanse = kravgrunnlag431.getReferanse();
         EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandling.getId());
         if (!erReferanseRiktig(grunnlagReferanse, eksternBehandling)) {
             logger.info("Tilkoblet grunnlag har en annen referanse={} enn behandling for behandlingId={}", grunnlagReferanse, behandling.getId());
-            oppdatereEksternBehandlingMedRiktigReferanse(behandling, Long.valueOf(grunnlagReferanse));
+            oppdatereEksternBehandlingMedRiktigReferanse(behandling, grunnlagReferanse);
         }
     }
 
@@ -161,20 +162,20 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
         return stegtype;
     }
 
-    private boolean erReferanseRiktig(String grunnlagReferanse, EksternBehandling eksternBehandling) {
-        return grunnlagReferanse.equals(String.valueOf(eksternBehandling.getEksternId()));
+    private boolean erReferanseRiktig(Henvisning grunnlagReferanse, EksternBehandling eksternBehandling) {
+        return grunnlagReferanse.equals(eksternBehandling.getHenvisning());
     }
 
-    private void oppdatereEksternBehandlingMedRiktigReferanse(Behandling behandling, Long grunnlagReferanse) {
+    private void oppdatereEksternBehandlingMedRiktigReferanse(Behandling behandling, Henvisning grunnlagReferanse) {
         String saksnummer = behandling.getFagsak().getSaksnummer().getVerdi();
         List<EksternBehandlingsinfoDto> eksternBehandlinger = fpsakKlient.hentBehandlingForSaksnummer(saksnummer);
         if (!eksternBehandlinger.isEmpty()) {
             Optional<EksternBehandlingsinfoDto> eksternBehandlingsinfoDto = eksternBehandlinger.stream()
-                .filter(eksternBehandling -> eksternBehandling.getId().equals(grunnlagReferanse)).findFirst();
+                .filter(eksternBehandling -> grunnlagReferanse.equals(eksternBehandling.getHenvisning())).findFirst();
             if (eksternBehandlingsinfoDto.isPresent()) {
                 logger.info("Oppdaterer ekstern behandling referanse med referanse={} for behandlingId={}", grunnlagReferanse, behandling.getId());
                 EksternBehandlingsinfoDto fpsakEksternBehandling = eksternBehandlingsinfoDto.get();
-                EksternBehandling eksternBehandling = new EksternBehandling(behandling, fpsakEksternBehandling.getId(), fpsakEksternBehandling.getUuid());
+                EksternBehandling eksternBehandling = new EksternBehandling(behandling, fpsakEksternBehandling.getHenvisning(), fpsakEksternBehandling.getUuid());
                 eksternBehandlingRepository.lagre(eksternBehandling);
             }else {
                 throw FinnGrunnlagTaskFeil.FACTORY.grunnlagHarFeilReferanse(behandling.getId(),saksnummer).toException();

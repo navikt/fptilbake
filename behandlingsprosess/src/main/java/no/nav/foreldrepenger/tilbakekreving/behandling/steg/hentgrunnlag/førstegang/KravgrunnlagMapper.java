@@ -9,6 +9,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TpsAdapterWrapper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagBelop433;
@@ -36,16 +37,16 @@ public class KravgrunnlagMapper {
         this.tpsAdapterWrapper = tpsAdapterWrapper;
     }
 
-    public String finnBehandlngId(DetaljertKravgrunnlag kravgrunnlagDto) {
-        return kravgrunnlagDto.getReferanse();
+    public Henvisning finnHenvisning(DetaljertKravgrunnlag kravgrunnlagDto) {
+        return new Henvisning(kravgrunnlagDto.getReferanse());
     }
 
     public Kravgrunnlag431 mapTilDomene(DetaljertKravgrunnlag dto) {
-        Kravgrunnlag431 kravgrunnlag431 = formKravgrunnlag431(dto);
+        Kravgrunnlag431 kravgrunnlag431 = lagKravgrunnlag431(dto);
         for (DetaljertKravgrunnlagPeriode periodeDto : dto.getTilbakekrevingsPeriode()) {
-            KravgrunnlagPeriode432 kravgrunnlagPeriode432 = formKravgrunnlagPeriode432(kravgrunnlag431, periodeDto);
+            KravgrunnlagPeriode432 kravgrunnlagPeriode432 = lagKravgrunnlagPeriode432(kravgrunnlag431, periodeDto);
             for (DetaljertKravgrunnlagBelop postering : periodeDto.getTilbakekrevingsBelop()) {
-                KravgrunnlagBelop433 kravgrunnlagBelop433 = formKravgrunnlagBelop433(kravgrunnlagPeriode432, postering);
+                KravgrunnlagBelop433 kravgrunnlagBelop433 = lagKravgrunnlagBelop433(kravgrunnlagPeriode432, postering);
                 if (!erPosteringenPostitivYtel(kravgrunnlagBelop433)) {
                     kravgrunnlagPeriode432.leggTilBeløp(kravgrunnlagBelop433);
                 }
@@ -55,7 +56,7 @@ public class KravgrunnlagMapper {
         return kravgrunnlag431;
     }
 
-    private Kravgrunnlag431 formKravgrunnlag431(DetaljertKravgrunnlag dto) {
+    private Kravgrunnlag431 lagKravgrunnlag431(DetaljertKravgrunnlag dto) {
         GjelderType gjelderType = GjelderType.fraKode(dto.getTypeGjelderId().value());
         GjelderType utbetalingGjelderType = GjelderType.fraKode(dto.getTypeUtbetId().value());
         return Kravgrunnlag431.builder()
@@ -77,11 +78,11 @@ public class KravgrunnlagMapper {
             .medBehandlendeEnhet(dto.getEnhetBehandl())
             .medFeltKontroll(dto.getKontrollfelt())
             .medSaksBehId(dto.getSaksbehId())
-            .medReferanse(dto.getReferanse())
+            .medReferanse(new Henvisning(dto.getReferanse()))
             .build();
     }
 
-    private KravgrunnlagPeriode432 formKravgrunnlagPeriode432(Kravgrunnlag431 kravgrunnlag431, DetaljertKravgrunnlagPeriode dto) {
+    private KravgrunnlagPeriode432 lagKravgrunnlagPeriode432(Kravgrunnlag431 kravgrunnlag431, DetaljertKravgrunnlagPeriode dto) {
         LocalDate fom = konverter(dto.getPeriode().getFom());
         LocalDate tom = konverter(dto.getPeriode().getTom());
         return KravgrunnlagPeriode432.builder()
@@ -91,7 +92,7 @@ public class KravgrunnlagMapper {
             .build();
     }
 
-    private KravgrunnlagBelop433 formKravgrunnlagBelop433(KravgrunnlagPeriode432 kravgrunnlagPeriode432, DetaljertKravgrunnlagBelop dto) {
+    private KravgrunnlagBelop433 lagKravgrunnlagBelop433(KravgrunnlagPeriode432 kravgrunnlagPeriode432, DetaljertKravgrunnlagBelop dto) {
         KlasseType type = map(dto.getTypeKlasse());
         return KravgrunnlagBelop433.builder()
             .medKlasseType(type)

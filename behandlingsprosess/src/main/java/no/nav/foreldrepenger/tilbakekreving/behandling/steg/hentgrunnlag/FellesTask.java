@@ -2,6 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag;
 
 import java.util.Optional;
 
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagAggregate;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
@@ -20,13 +21,9 @@ public abstract class FellesTask {
         this.fpsakKlient = fpsakKlient;
     }
 
-    protected boolean erGyldigTall(String referanse) {
-        return referanse != null && referanse.matches("^\\d*$");
-    }
-
-    protected boolean erBehandlingFinnesIFpsak(String saksnummer, String henvisning) {
+    protected boolean finnesYtelsesbehandling(String saksnummer, Henvisning henvisning) {
         //FIXME k9-tilbake må begge formater for henvsning. Antar enklest å delegere til spesifikk implementasjon av saksbehandlingKlient
-        return fpsakKlient.finnesBehandlingIFpsak(saksnummer,Long.valueOf(henvisning));
+        return fpsakKlient.finnesBehandlingIFpsak(saksnummer,henvisning);
     }
 
     protected String finnSaksnummer(String fagsystemId) {

@@ -32,6 +32,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Ak
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.SærligGrunn;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fagsak.FagsakTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.Tillegsinformasjon;
@@ -62,7 +63,7 @@ public class FellesTestOppsett extends TestOppsett {
     protected Saksnummer saksnummer;
     protected Long fagsakId;
     protected Long internBehandlingId;
-    protected Long eksternBehandlingId;
+    protected Henvisning henvisning;
     protected UUID eksternBehandlingUuid;
     protected Behandling behandling;
 
@@ -86,8 +87,10 @@ public class FellesTestOppsett extends TestOppsett {
     public void init() {
         aktørId = testUtility.genererAktørId();
         when(mockTpsTjeneste.hentBrukerForAktør(aktørId)).thenReturn(testUtility.lagPersonInfo(aktørId));
-        when(mockFpsakKlient.hentBehandling(any(UUID.class))).thenReturn(lagEksternBehandlingInfoDto());
-        when(mockFpsakKlient.hentBehandlingsinfo(any(UUID.class), any(Tillegsinformasjon.class))).thenReturn(lagSamletEksternBehandlingInfo());
+        EksternBehandlingsinfoDto behandlingsinfoDto = lagEksternBehandlingInfoDto();
+        when(mockFpsakKlient.hentBehandlingOptional(any(UUID.class))).thenReturn(Optional.of(behandlingsinfoDto));
+        when(mockFpsakKlient.hentBehandling(any(UUID.class))).thenReturn(behandlingsinfoDto);
+        when(mockFpsakKlient.hentBehandlingsinfo(any(UUID.class), any(Tillegsinformasjon.class))).thenReturn(lagSamletEksternBehandlingInfo(behandlingsinfoDto));
 
         TestUtility.SakDetaljer sakDetaljer = testUtility.opprettFørstegangsBehandling(aktørId);
         mapSakDetaljer(sakDetaljer);
@@ -153,17 +156,18 @@ public class FellesTestOppsett extends TestOppsett {
         saksnummer = sakDetaljer.getSaksnummer();
         fagsakId = sakDetaljer.getFagsakId();
         internBehandlingId = sakDetaljer.getInternBehandlingId();
-        eksternBehandlingId = sakDetaljer.getEksternBehandlingId();
+        henvisning = sakDetaljer.getHenvisning();
         eksternBehandlingUuid = sakDetaljer.getEksternUuid();
         behandling = sakDetaljer.getBehandling();
     }
 
-    private Optional<EksternBehandlingsinfoDto> lagEksternBehandlingInfoDto() {
+    private EksternBehandlingsinfoDto lagEksternBehandlingInfoDto() {
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto = new EksternBehandlingsinfoDto();
-        eksternBehandlingsinfoDto.setId(10001L);
+        eksternBehandlingsinfoDto.setId(10001L); //TODO k9-tilbake denne er fp-spesifikk
+        eksternBehandlingsinfoDto.setHenvisning(Henvisning.fraEksternBehandlingId(10001L));
         eksternBehandlingsinfoDto.setBehandlendeEnhetId(BEHANDLENDE_ENHET_ID);
         eksternBehandlingsinfoDto.setBehandlendeEnhetNavn(BEHANDLENDE_ENHET_NAVN);
-        return Optional.of(eksternBehandlingsinfoDto);
+        return eksternBehandlingsinfoDto;
     }
 
     private PersonopplysningDto lagPersonOpplysningDto() {
@@ -172,9 +176,9 @@ public class FellesTestOppsett extends TestOppsett {
         return personopplysningDto;
     }
 
-    private SamletEksternBehandlingInfo lagSamletEksternBehandlingInfo() {
+    private SamletEksternBehandlingInfo lagSamletEksternBehandlingInfo(EksternBehandlingsinfoDto behandlingsinfoDto) {
         return SamletEksternBehandlingInfo.builder(Tillegsinformasjon.PERSONOPPLYSNINGER)
-            .setGrunninformasjon(lagEksternBehandlingInfoDto().get())
+            .setGrunninformasjon(behandlingsinfoDto)
             .setPersonopplysninger(lagPersonOpplysningDto()).build();
     }
 }

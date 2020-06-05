@@ -1,7 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.task;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -14,6 +13,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.TilkjentYtelseTestOppsett;
 
@@ -30,7 +30,7 @@ public class OpprettBehandlingTaskTest extends TilkjentYtelseTestOppsett {
 
     @Test
     public void test_skal_kalle_opprettBehandlingAutomatisk() {
-        HendelseTaskDataWrapper taskDataWrapper = HendelseTaskDataWrapper.lagWrapperForOpprettBehandling(EKSTERN_BEHANDLING_UUID.toString(), EKSTERN_BEHANDLING_ID, AKTØR_ID,SAKSNUMMER);
+        HendelseTaskDataWrapper taskDataWrapper = HendelseTaskDataWrapper.lagWrapperForOpprettBehandling(EKSTERN_BEHANDLING_UUID.toString(), HENVISNING, AKTØR_ID, SAKSNUMMER);
         taskDataWrapper.setFagsakYtelseType(FAGSAK_YTELSE_TYPE);
         taskDataWrapper.setBehandlingType(BehandlingType.TILBAKEKREVING);
 
@@ -38,13 +38,13 @@ public class OpprettBehandlingTaskTest extends TilkjentYtelseTestOppsett {
         opprettBehandlingTask.doTask(taskDataWrapper.getProsessTaskData());
 
         // verify
-        verify(mockBehandlingTjeneste).opprettBehandlingAutomatisk(any(Saksnummer.class), any(UUID.class), anyLong(),
+        verify(mockBehandlingTjeneste).opprettBehandlingAutomatisk(any(Saksnummer.class), any(UUID.class), any(Henvisning.class),
             any(AktørId.class), any(FagsakYtelseType.class), any(BehandlingType.class));
     }
 
     @Test
     public void test_skal_feile_på_manglende_task_property() {
-        HendelseTaskDataWrapper taskDataWrapper = HendelseTaskDataWrapper.lagWrapperForOpprettBehandling(EKSTERN_BEHANDLING_UUID.toString(), EKSTERN_BEHANDLING_ID, AKTØR_ID,SAKSNUMMER);
+        HendelseTaskDataWrapper taskDataWrapper = HendelseTaskDataWrapper.lagWrapperForOpprettBehandling(EKSTERN_BEHANDLING_UUID.toString(), HENVISNING, AKTØR_ID, SAKSNUMMER);
 
         expectedException.expect(NullPointerException.class);
 

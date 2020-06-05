@@ -5,6 +5,7 @@ import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TpsAdapterWrapper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatus437;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
@@ -24,10 +25,6 @@ public class KravVedtakStatusMapper {
         this.tpsAdapterWrapper = tpsAdapterWrapper;
     }
 
-    public String finnBehandlngId(KravOgVedtakstatus kravOgVedtakstatus) {
-        return kravOgVedtakstatus.getReferanse();
-    }
-
     public Long finnVedtakId(KravOgVedtakstatus kravOgVedtakstatus) {
         return kravOgVedtakstatus.getVedtakId().longValue();
     }
@@ -39,8 +36,9 @@ public class KravVedtakStatusMapper {
             .medFagomraadeKode(FagOmrådeKode.fraKode(kravOgVedtakstatus.getKodeFagomraade()))
             .medVedtakId(kravOgVedtakstatus.getVedtakId().longValue())
             .medFagSystemId(kravOgVedtakstatus.getFagsystemId())
-            .medReferanse(kravOgVedtakstatus.getReferanse())
+            .medReferanse(new Henvisning(kravOgVedtakstatus.getReferanse()))
             .medGjelderType(gjelderType)
-            .medGjelderVedtakId(tpsAdapterWrapper.hentAktørIdEllerOrganisajonNummer(kravOgVedtakstatus.getVedtakGjelderId(), gjelderType)).build();
+            .medGjelderVedtakId(tpsAdapterWrapper.hentAktørIdEllerOrganisajonNummer(kravOgVedtakstatus.getVedtakGjelderId(), gjelderType))
+            .build();
     }
 }

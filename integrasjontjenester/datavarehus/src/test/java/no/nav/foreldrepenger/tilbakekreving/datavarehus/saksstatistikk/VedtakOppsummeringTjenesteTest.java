@@ -48,6 +48,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.V
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelsePeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseRepository;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
@@ -85,6 +86,7 @@ public class VedtakOppsummeringTjenesteTest {
     private Behandling behandling;
     private Periode periode = Periode.of(LocalDate.of(2020, 1, 1), LocalDate.of(2020, 1, 31));
     private Saksnummer saksnummer;
+
     @Before
     public void setup() {
         repositoryRule.getEntityManager().setFlushMode(FlushModeType.AUTO);
@@ -96,14 +98,14 @@ public class VedtakOppsummeringTjenesteTest {
 
         behandlingId = behandling.getId();
         saksnummer = behandling.getFagsak().getSaksnummer();
-        EksternBehandling eksternBehandling = new EksternBehandling(behandling, 1l, UUID.randomUUID());
+        EksternBehandling eksternBehandling = new EksternBehandling(behandling, Henvisning.fraEksternBehandlingId(1l), UUID.randomUUID());
         eksternBehandlingRepository.lagre(eksternBehandling);
         lagKravgrunnlag();
         lagFakta();
     }
 
     @Test
-    public void skal_hente_vedtak_oppsummering_for_foreldelse_perioder(){
+    public void skal_hente_vedtak_oppsummering_for_foreldelse_perioder() {
         lagForeldelse();
         lagBehandlingVedtak();
         VedtakOppsummering vedtakOppsummering = vedtakOppsummeringTjeneste.hentVedtakOppsummering(behandlingId);
@@ -120,7 +122,7 @@ public class VedtakOppsummeringTjenesteTest {
     }
 
     @Test
-    public void skal_hente_vedtak_oppsummering_for_perioder_med_god_tro(){
+    public void skal_hente_vedtak_oppsummering_for_perioder_med_god_tro() {
         lagVilkårMedGodTro();
         lagBehandlingVedtak();
         VedtakOppsummering vedtakOppsummering = vedtakOppsummeringTjeneste.hentVedtakOppsummering(behandlingId);
@@ -137,7 +139,7 @@ public class VedtakOppsummeringTjenesteTest {
     }
 
     @Test
-    public void skal_hente_vedtak_oppsummering_for_perioder_med_aktsomhet(){
+    public void skal_hente_vedtak_oppsummering_for_perioder_med_aktsomhet() {
         lagVilkårMedAktsomhet();
         lagBehandlingVedtak();
         VedtakOppsummering vedtakOppsummering = vedtakOppsummeringTjeneste.hentVedtakOppsummering(behandlingId);
@@ -202,7 +204,7 @@ public class VedtakOppsummeringTjenesteTest {
         foreldelseRepository.lagre(behandlingId, vurdertForeldelse);
     }
 
-    private void lagVilkårMedAktsomhet(){
+    private void lagVilkårMedAktsomhet() {
         VilkårVurderingEntitet vilkårVurderingEntitet = new VilkårVurderingEntitet();
         VilkårVurderingPeriodeEntitet vilkårVurderingPeriodeEntitet = VilkårVurderingPeriodeEntitet.builder().medPeriode(periode)
             .medVilkårResultat(VilkårResultat.FORSTO_BURDE_FORSTÅTT)
@@ -221,10 +223,10 @@ public class VedtakOppsummeringTjenesteTest {
         vilkårVurderingAktsomhetEntitet.leggTilSærligGrunn(særligGrunnEntitet);
         vilkårVurderingPeriodeEntitet.setAktsomhet(vilkårVurderingAktsomhetEntitet);
         vilkårVurderingEntitet.leggTilPeriode(vilkårVurderingPeriodeEntitet);
-        vilkårsvurderingRepository.lagre(behandlingId,vilkårVurderingEntitet);
+        vilkårsvurderingRepository.lagre(behandlingId, vilkårVurderingEntitet);
     }
 
-    private void lagVilkårMedGodTro(){
+    private void lagVilkårMedGodTro() {
         VilkårVurderingEntitet vilkårVurderingEntitet = new VilkårVurderingEntitet();
         VilkårVurderingPeriodeEntitet vilkårVurderingPeriodeEntitet = VilkårVurderingPeriodeEntitet.builder().medPeriode(periode)
             .medVilkårResultat(VilkårResultat.GOD_TRO)
@@ -237,10 +239,10 @@ public class VedtakOppsummeringTjenesteTest {
             .medBegrunnelse("god tro begrunnelse").build();
         vilkårVurderingPeriodeEntitet.setGodTro(vilkårVurderingGodTroEntitet);
         vilkårVurderingEntitet.leggTilPeriode(vilkårVurderingPeriodeEntitet);
-        vilkårsvurderingRepository.lagre(behandlingId,vilkårVurderingEntitet);
+        vilkårsvurderingRepository.lagre(behandlingId, vilkårVurderingEntitet);
     }
 
-    private void lagBehandlingVedtak(){
+    private void lagBehandlingVedtak() {
         Behandlingsresultat behandlingsresultat = Behandlingsresultat.builder()
             .medBehandlingResultatType(BehandlingResultatType.FASTSATT)
             .medBehandling(behandling).build();
@@ -254,7 +256,7 @@ public class VedtakOppsummeringTjenesteTest {
         behandlingVedtakRepository.lagre(behandlingVedtak);
     }
 
-    private void lagKravgrunnlag(){
+    private void lagKravgrunnlag() {
         Kravgrunnlag431 kravgrunnlag431 = Kravgrunnlag431.builder().medEksternKravgrunnlagId("12345")
             .medVedtakId(12345l)
             .medBehandlendeEnhet("8020")
@@ -268,8 +270,9 @@ public class VedtakOppsummeringTjenesteTest {
             .medGjelderType(GjelderType.PERSON)
             .medFeltKontroll("2020")
             .medSaksBehId(ANSVARLIG_SAKSBEHANDLER)
-            .medFagSystemId(saksnummer.getVerdi()+"100")
-            .medReferanse("1").build();
+            .medFagSystemId(saksnummer.getVerdi() + "100")
+            .medReferanse(Henvisning.fraEksternBehandlingId(1L))
+            .build();
         KravgrunnlagPeriode432 kravgrunnlagPeriode432 = KravgrunnlagPeriode432.builder().medPeriode(periode)
             .medKravgrunnlag431(kravgrunnlag431)
             .medBeløpSkattMnd(BigDecimal.valueOf(100)).build();
@@ -287,7 +290,7 @@ public class VedtakOppsummeringTjenesteTest {
         kravgrunnlagPeriode432.leggTilBeløp(feilPostering);
         kravgrunnlagPeriode432.leggTilBeløp(ytelPostering);
         kravgrunnlag431.leggTilPeriode(kravgrunnlagPeriode432);
-        kravgrunnlagRepository.lagre(behandlingId,kravgrunnlag431);
+        kravgrunnlagRepository.lagre(behandlingId, kravgrunnlag431);
     }
 
 }

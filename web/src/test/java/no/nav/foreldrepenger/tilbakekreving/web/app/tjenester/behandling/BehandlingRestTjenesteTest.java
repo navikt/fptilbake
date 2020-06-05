@@ -46,6 +46,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVe
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.IverksettingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.BehandlingsprosessApplikasjonTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingDtoTjeneste;
@@ -243,7 +244,7 @@ public class BehandlingRestTjenesteTest {
     }
 
     private Optional<EksternBehandling> opprettEksternBehandling() {
-        return Optional.of(new EksternBehandling(mockBehandling(), 1l, UUID.fromString(EKSTERN_BEHANDLING_UUID)));
+        return Optional.of(new EksternBehandling(mockBehandling(), Henvisning.fraEksternBehandlingId(1l), UUID.fromString(EKSTERN_BEHANDLING_UUID)));
     }
 
 }

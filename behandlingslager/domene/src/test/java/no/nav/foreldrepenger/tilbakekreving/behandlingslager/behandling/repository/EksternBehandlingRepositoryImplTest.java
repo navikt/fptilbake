@@ -16,6 +16,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakReposi
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.test.TestFagsakUtil;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 
 public class EksternBehandlingRepositoryImplTest {
 
@@ -33,26 +34,26 @@ public class EksternBehandlingRepositoryImplTest {
         Behandling behandling = opprettBehandling();
         Long behandlingId = behandling.getId();
 
-        EksternBehandling eksternData = new EksternBehandling(behandling, 5555L, EKSTERN_UUID);
+        EksternBehandling eksternData = new EksternBehandling(behandling, Henvisning.fraEksternBehandlingId(5555L), EKSTERN_UUID);
         eksternBehandlingRepository.lagre(eksternData);
 
         EksternBehandling result = eksternBehandlingRepository.hentFraInternId(behandlingId);
 
         assertThat(result).isNotNull();
         assertThat(result.getInternId()).isEqualTo(behandlingId);
-        assertThat(result.getEksternId()).isEqualTo(5555L);
+        assertThat(result.getHenvisning()).isEqualTo(Henvisning.fraEksternBehandlingId(5555L));
         assertThat(result.getEksternUuid()).isEqualTo(EKSTERN_UUID);
     }
 
     @Test
     public void skal_hente_ekstern_data_med_ekstern_behandling_id() {
         Behandling behandling = opprettBehandling();
-        long eksternId = 5555L;
+        Henvisning henvisning = Henvisning.fraEksternBehandlingId(5555L);
 
-        EksternBehandling eksternBehandling = new EksternBehandling(behandling, eksternId, EKSTERN_UUID);
+        EksternBehandling eksternBehandling = new EksternBehandling(behandling, henvisning, EKSTERN_UUID);
         eksternBehandlingRepository.lagre(eksternBehandling);
 
-        Optional<EksternBehandling> result = eksternBehandlingRepository.hentFraEksternId(eksternId);
+        Optional<EksternBehandling> result = eksternBehandlingRepository.hentFraHenvisning(henvisning);
 
         assertThat(result).hasValue(eksternBehandling);
     }

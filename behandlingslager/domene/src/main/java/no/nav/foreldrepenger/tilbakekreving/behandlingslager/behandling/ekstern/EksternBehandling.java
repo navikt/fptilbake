@@ -15,6 +15,7 @@ import org.hibernate.annotations.NaturalId;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
 
 @Entity(name = "EksternBehandling")
@@ -28,7 +29,7 @@ public class EksternBehandling extends BaseEntitet {
     @Column(name = "intern_id", nullable = false)
     private Long internId;
 
-    //TODO k9-tilbake kan denne raden fjernes nå som vi har ekstern_uuid?
+    //TODO k9-tilbake fjern når henvisning er tatt i bruk
     @Column(name = "ekstern_id", nullable = false)
     private Long eksternId;
 
@@ -40,19 +41,20 @@ public class EksternBehandling extends BaseEntitet {
     @Column(name = "ekstern_uuid")
     private UUID eksternUuid;
 
-    //FIXME k9-tilbake legg til String henvisning, og migrer inn i eksisterende rader
+    private Henvisning henvisning;
 
     EksternBehandling() {
         // Hibernate
     }
 
-    public EksternBehandling(Behandling behandling, Long eksternId, UUID eksternUuid) {
+    public EksternBehandling(Behandling behandling, Henvisning henvisning, UUID eksternUuid) {
         Objects.requireNonNull(behandling, "behandlingId");
-        Objects.requireNonNull(eksternId, "eksternId");
+        Objects.requireNonNull(henvisning, "henvisning");
         Objects.requireNonNull(eksternUuid, "eksternUuid");
 
         this.internId = behandling.getId();
-        this.eksternId = eksternId;
+        this.eksternId = henvisning.toLong();
+        this.henvisning = henvisning;
         this.eksternUuid = eksternUuid;
     }
 
@@ -64,12 +66,15 @@ public class EksternBehandling extends BaseEntitet {
         return internId;
     }
 
-    public Long getEksternId() {
-        return eksternId;
-    }
-
     public Boolean getAktiv() {
         return aktiv;
+    }
+
+    public Henvisning getHenvisning(){
+        if (henvisning != null){
+            return henvisning;
+        }
+        return Henvisning.fraEksternBehandlingId(eksternId);
     }
 
     public void deaktiver() {
@@ -98,11 +103,11 @@ public class EksternBehandling extends BaseEntitet {
         }
         EksternBehandling that = (EksternBehandling) object;
         return Objects.equals(internId, that.internId) &&
-                Objects.equals(eksternId, that.eksternId);
+                Objects.equals(getHenvisning(), that.getHenvisning());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(internId, eksternId);
+        return Objects.hash(internId, getHenvisning());
     }
 }

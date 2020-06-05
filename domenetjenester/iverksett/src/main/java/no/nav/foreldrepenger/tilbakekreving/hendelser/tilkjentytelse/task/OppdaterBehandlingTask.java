@@ -7,6 +7,7 @@ import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -21,12 +22,12 @@ public class OppdaterBehandlingTask implements ProsessTaskHandler {
 
     private BehandlingTjeneste behandlingTjeneste;
 
-    OppdaterBehandlingTask(){
+    OppdaterBehandlingTask() {
         // for CDI proxy
     }
 
     @Inject
-    public OppdaterBehandlingTask(BehandlingTjeneste behandlingTjeneste){
+    public OppdaterBehandlingTask(BehandlingTjeneste behandlingTjeneste) {
         this.behandlingTjeneste = behandlingTjeneste;
     }
 
@@ -35,10 +36,10 @@ public class OppdaterBehandlingTask implements ProsessTaskHandler {
         HendelseTaskDataWrapper dataWrapper = new HendelseTaskDataWrapper(taskData);
         dataWrapper.validerTaskDataOppdaterBehandling();
 
-        Saksnummer saksnummer =  dataWrapper.getSaksnummer();
+        Saksnummer saksnummer = dataWrapper.getSaksnummer();
         UUID eksternUuid = UUID.fromString(dataWrapper.getBehandlingUuid());
-        long eksternBehandlingId = dataWrapper.getEksternBehandlingId();
+        Henvisning henvisning = dataWrapper.getHenvisning();
 
-        behandlingTjeneste.oppdaterBehandlingMedEksternReferanse(saksnummer,eksternBehandlingId,eksternUuid);
+        behandlingTjeneste.oppdaterBehandlingMedEksternReferanse(saksnummer, henvisning, eksternUuid);
     }
 }

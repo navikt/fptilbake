@@ -15,6 +15,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDataWrapper;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KodeAksjon;
@@ -41,8 +42,8 @@ public class HentKorrigertKravgrunnlagTask implements ProsessTaskHandler {
 
     public static final String TASKTYPE = "kravgrunnlag.korrigert.hent";
     public static final String KRAVGRUNNLAG_ID = "KRAVGRUNNLAG_ID";
-    public static final String ANSVARLIG_ENHET_NØS ="8020";  // fast verdi
-    public static final String OKO_SAKSBEH_ID="K231B433";  //fast verdi
+    public static final String ANSVARLIG_ENHET_NØS = "8020";  // fast verdi
+    public static final String OKO_SAKSBEH_ID = "K231B433";  //fast verdi
 
     private EksternBehandlingRepository eksternBehandlingRepository;
     private KravgrunnlagRepository kravgrunnlagRepository;
@@ -78,13 +79,13 @@ public class HentKorrigertKravgrunnlagTask implements ProsessTaskHandler {
         Kravgrunnlag431 korrigertKravgrunnlag = hentKravgrunnlagMapper.mapTilDomene(respons);
 
         KravgrunnlagValidator.validerGrunnlag(korrigertKravgrunnlag);
-        long eksternBehandlingId = Long.parseLong(korrigertKravgrunnlag.getReferanse());
-        if(!finnesEksternBehandling(behandlingId,eksternBehandlingId)){
+        Henvisning henvisning = korrigertKravgrunnlag.getReferanse();
+        if (!finnesEksternBehandling(behandlingId, henvisning)) {
             Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-            EksternBehandlingsinfoDto eksternBehandlingsinfoDto = hentEksternBehandlingFraFpsak(behandling,eksternBehandlingId);
+            EksternBehandlingsinfoDto eksternBehandlingsinfoDto = hentEksternBehandlingFraFpsak(behandling, henvisning);
             oppdaterEksternBehandling(behandling, eksternBehandlingsinfoDto);
         }
-        kravgrunnlagRepository.lagre(behandlingId,korrigertKravgrunnlag);
+        kravgrunnlagRepository.lagre(behandlingId, korrigertKravgrunnlag);
     }
 
     private HentKravgrunnlagDetaljDto forberedHentKravgrunnlagDetailRequest(String kravgrunnlagId, String ansvarligEnhet,
@@ -108,23 +109,24 @@ public class HentKorrigertKravgrunnlagTask implements ProsessTaskHandler {
         return økonomiConsumer.hentKravgrunnlag(behandlingId, request);
     }
 
-    private boolean finnesEksternBehandling(long behandlingId, long eksternBehandlingId){
-        return eksternBehandlingRepository.finnesEksternBehandling(behandlingId,eksternBehandlingId);
+    private boolean finnesEksternBehandling(long behandlingId, Henvisning henvisning) {
+        return eksternBehandlingRepository.finnesEksternBehandling(behandlingId, henvisning);
     }
 
-    private EksternBehandlingsinfoDto hentEksternBehandlingFraFpsak(Behandling behandling, long eksternBehandlingId){
+    //TODO k9-tilbake flytt til saksbehandlingKlient-er
+    private EksternBehandlingsinfoDto hentEksternBehandlingFraFpsak(Behandling behandling, Henvisning henvisning) {
         String saksnummer = behandling.getFagsak().getSaksnummer().getVerdi();
         List<EksternBehandlingsinfoDto> eksternBehandlinger = fpsakKlient.hentBehandlingForSaksnummer(saksnummer);
-        Optional<EksternBehandlingsinfoDto> eksternBehandling =  eksternBehandlinger.stream()
-            .filter(eksternBehandlingsinfoDto ->  eksternBehandlingsinfoDto.getId().equals(eksternBehandlingId)).findAny();
-        if(eksternBehandling.isEmpty()){
+        Optional<EksternBehandlingsinfoDto> eksternBehandling = eksternBehandlinger.stream()
+            .filter(eksternBehandlingsinfoDto -> eksternBehandlingsinfoDto.getHenvisning().equals(henvisning)).findAny();
+        if (eksternBehandling.isEmpty()) {
             throw HentKorrigertGrunnlagTaskFeil.FACTORY.behandlingFinnesIkkeIFpsak(behandling.getId()).toException();
         }
         return eksternBehandling.get();
     }
 
     private void oppdaterEksternBehandling(Behandling behandling, EksternBehandlingsinfoDto eksternBehandlingsinfoDto) {
-        EksternBehandling eksternBehandling = new EksternBehandling(behandling,eksternBehandlingsinfoDto.getId(),eksternBehandlingsinfoDto.getUuid());
+        EksternBehandling eksternBehandling = new EksternBehandling(behandling, eksternBehandlingsinfoDto.getHenvisning(), eksternBehandlingsinfoDto.getUuid());
         eksternBehandlingRepository.lagre(eksternBehandling);
     }
 

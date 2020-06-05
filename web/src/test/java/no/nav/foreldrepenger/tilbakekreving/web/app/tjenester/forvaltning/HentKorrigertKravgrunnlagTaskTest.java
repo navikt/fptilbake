@@ -37,6 +37,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.TpsAdapter;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
@@ -69,24 +70,25 @@ public class HentKorrigertKravgrunnlagTaskTest {
     private ØkonomiConsumer økonomiConsumerMock = mock(ØkonomiConsumer.class);
     private FpsakKlient fpsakKlientMock = mock(FpsakKlient.class);
     private HentKravgrunnlagMapper hentKravgrunnlagMapper = new HentKravgrunnlagMapper(tpsAdapterWrapper);
-    private HentKorrigertKravgrunnlagTask hentKorrigertGrunnlagTask = new HentKorrigertKravgrunnlagTask(repositoryProvider,hentKravgrunnlagMapper, økonomiConsumerMock, fpsakKlientMock);
+    private HentKorrigertKravgrunnlagTask hentKorrigertGrunnlagTask = new HentKorrigertKravgrunnlagTask(repositoryProvider, hentKravgrunnlagMapper, økonomiConsumerMock, fpsakKlientMock);
 
     private Behandling behandling;
     private long behandlingId;
+
     @Before
-    public void setup(){
+    public void setup() {
         repositoryRule.getEntityManager().setFlushMode(FlushModeType.AUTO);
         ScenarioSimple scenarioSimple = ScenarioSimple.simple();
         behandling = scenarioSimple.lagre(repositoryProvider);
         behandlingId = behandling.getId();
         when(tpsAdapterMock.hentAktørIdForPersonIdent(any(PersonIdent.class))).thenReturn(Optional.of(behandling.getFagsak().getAktørId()));
-        when(økonomiConsumerMock.hentKravgrunnlag(anyLong(),any(HentKravgrunnlagDetaljDto.class))).thenReturn(lagKravgrunnlag(true));
-        EksternBehandling eksternBehandling = new EksternBehandling(behandling,1l,UUID.randomUUID());
+        when(økonomiConsumerMock.hentKravgrunnlag(anyLong(), any(HentKravgrunnlagDetaljDto.class))).thenReturn(lagKravgrunnlag(true));
+        EksternBehandling eksternBehandling = new EksternBehandling(behandling, Henvisning.fraEksternBehandlingId(1l), UUID.randomUUID());
         eksternBehandlingRepository.lagre(eksternBehandling);
     }
 
     @Test
-    public void skal_hente_og_lagre_korrigert_kravgrunnlag_når_ekstern_behandlingid_er_samme_i_hentet_grunnlaget(){
+    public void skal_hente_og_lagre_korrigert_kravgrunnlag_når_ekstern_behandlingid_er_samme_i_hentet_grunnlaget() {
         ProsessTaskData prosessTaskData = lagProsessTaskData();
         assertThat(kravgrunnlagRepository.harGrunnlagForBehandlingId(behandlingId)).isFalse();
         hentKorrigertGrunnlagTask.doTask(prosessTaskData);
@@ -94,56 +96,58 @@ public class HentKorrigertKravgrunnlagTaskTest {
         assertThat(kravgrunnlagRepository.harGrunnlagForBehandlingId(behandlingId)).isTrue();
         EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandlingId);
         Kravgrunnlag431 kravgrunnlag431 = kravgrunnlagRepository.finnKravgrunnlag(behandlingId);
-        assertThat(eksternBehandling.getEksternId()).isEqualTo(Long.valueOf(kravgrunnlag431.getReferanse()));
-        verify(fpsakKlientMock,never()).hentBehandlingForSaksnummer(anyString());
+        assertThat(eksternBehandling.getHenvisning()).isEqualTo(kravgrunnlag431.getReferanse());
+        verify(fpsakKlientMock, never()).hentBehandlingForSaksnummer(anyString());
     }
 
     @Test
-    public void skal_ikke_hente_og_lagre_korrigert_kravgrunnlag_når_hentet_grunnlaget_er_ugyldig(){
-        when(økonomiConsumerMock.hentKravgrunnlag(anyLong(),any(HentKravgrunnlagDetaljDto.class))).thenReturn(lagKravgrunnlag(false));
+    public void skal_ikke_hente_og_lagre_korrigert_kravgrunnlag_når_hentet_grunnlaget_er_ugyldig() {
+        when(økonomiConsumerMock.hentKravgrunnlag(anyLong(), any(HentKravgrunnlagDetaljDto.class))).thenReturn(lagKravgrunnlag(false));
         ProsessTaskData prosessTaskData = lagProsessTaskData();
-        assertThrows("FPT-879715", IntegrasjonException.class,() -> hentKorrigertGrunnlagTask.doTask(prosessTaskData));
+        assertThrows("FPT-879715", IntegrasjonException.class, () -> hentKorrigertGrunnlagTask.doTask(prosessTaskData));
     }
 
     @Test
-    public void skal_hente_og_lagre_korrigert_kravgrunnlag_når_ekstern_behandlingid_ikke_er_samme_i_hentet_grunnlaget_men_finnes_i_fpsak(){
-        EksternBehandling eksternBehandling = new EksternBehandling(behandling,2l,UUID.randomUUID());
+    public void skal_hente_og_lagre_korrigert_kravgrunnlag_når_ekstern_behandlingid_ikke_er_samme_i_hentet_grunnlaget_men_finnes_i_fpsak() {
+        EksternBehandling eksternBehandling = new EksternBehandling(behandling, Henvisning.fraEksternBehandlingId(2l), UUID.randomUUID());
         eksternBehandlingRepository.lagre(eksternBehandling);
-        when(fpsakKlientMock.hentBehandlingForSaksnummer(anyString())).thenReturn(Lists.newArrayList(lagEksternBehandlingsInfo(1l),
+        when(fpsakKlientMock.hentBehandlingForSaksnummer(anyString())).thenReturn(Lists.newArrayList(
+            lagEksternBehandlingsInfo(1l),
             lagEksternBehandlingsInfo(2l)));
         ProsessTaskData prosessTaskData = lagProsessTaskData();
         assertThat(kravgrunnlagRepository.harGrunnlagForBehandlingId(behandlingId)).isFalse();
-        assertThat(eksternBehandling.getEksternId()).isEqualTo(2l);
+        assertThat(eksternBehandling.getHenvisning().toLong()).isEqualTo(2l);
         hentKorrigertGrunnlagTask.doTask(prosessTaskData);
 
         assertThat(kravgrunnlagRepository.harGrunnlagForBehandlingId(behandlingId)).isTrue();
         eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandlingId);
         Kravgrunnlag431 kravgrunnlag431 = kravgrunnlagRepository.finnKravgrunnlag(behandlingId);
-        assertThat(eksternBehandling.getEksternId()).isEqualTo(Long.valueOf(kravgrunnlag431.getReferanse()));
-        assertThat(eksternBehandling.getEksternId()).isEqualTo(1l);
-        verify(fpsakKlientMock,atLeastOnce()).hentBehandlingForSaksnummer(anyString());
+        assertThat(eksternBehandling.getHenvisning()).isEqualTo(kravgrunnlag431.getReferanse());
+        assertThat(eksternBehandling.getHenvisning().toLong()).isEqualTo(1l);
+        verify(fpsakKlientMock, atLeastOnce()).hentBehandlingForSaksnummer(anyString());
     }
 
     @Test
-    public void skal_ikke_hente_og_lagre_korrigert_kravgrunnlag_når_ekstern_behandlingid_ikke_er_samme_i_hentet_grunnlaget_og_ikke_finnes_i_fpsak(){
-        EksternBehandling eksternBehandling = new EksternBehandling(behandling,2l,UUID.randomUUID());
+    public void skal_ikke_hente_og_lagre_korrigert_kravgrunnlag_når_ekstern_behandlingid_ikke_er_samme_i_hentet_grunnlaget_og_ikke_finnes_i_fpsak() {
+        EksternBehandling eksternBehandling = new EksternBehandling(behandling, Henvisning.fraEksternBehandlingId(2l), UUID.randomUUID());
         eksternBehandlingRepository.lagre(eksternBehandling);
         when(fpsakKlientMock.hentBehandlingForSaksnummer(anyString())).thenReturn(Lists.newArrayList(lagEksternBehandlingsInfo(2l)));
         ProsessTaskData prosessTaskData = lagProsessTaskData();
-        assertThrows("FPT-587197", TekniskException.class,() -> hentKorrigertGrunnlagTask.doTask(prosessTaskData));
+        assertThrows("FPT-587197", TekniskException.class, () -> hentKorrigertGrunnlagTask.doTask(prosessTaskData));
     }
 
 
     private ProsessTaskData lagProsessTaskData() {
         ProsessTaskData prosessTaskData = new ProsessTaskData(HentKorrigertKravgrunnlagTask.TASKTYPE);
-        prosessTaskData.setBehandling(behandling.getFagsakId(),behandlingId,behandling.getAktørId().getId());
-        prosessTaskData.setProperty(HentKorrigertKravgrunnlagTask.KRAVGRUNNLAG_ID,String.valueOf("152806"));
+        prosessTaskData.setBehandling(behandling.getFagsakId(), behandlingId, behandling.getAktørId().getId());
+        prosessTaskData.setProperty(HentKorrigertKravgrunnlagTask.KRAVGRUNNLAG_ID, "152806");
         return prosessTaskData;
     }
 
-    private EksternBehandlingsinfoDto lagEksternBehandlingsInfo(Long eksternBehandlingId){
+    private EksternBehandlingsinfoDto lagEksternBehandlingsInfo(Long eksternBehandlingId) {
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto = new EksternBehandlingsinfoDto();
         eksternBehandlingsinfoDto.setId(eksternBehandlingId);
+        eksternBehandlingsinfoDto.setHenvisning(Henvisning.fraEksternBehandlingId(eksternBehandlingId));
         eksternBehandlingsinfoDto.setUuid(UUID.randomUUID());
         return eksternBehandlingsinfoDto;
     }
@@ -180,7 +184,7 @@ public class HentKorrigertKravgrunnlagTaskTest {
         periode.setFom(konvertDato(LocalDate.of(2016, 3, 16)));
         periode.setTom(konvertDato(LocalDate.of(2016, 3, 31)));
         kravgrunnlagPeriode1.setPeriode(periode);
-        if(erGyldig) {
+        if (erGyldig) {
             kravgrunnlagPeriode1.setBelopSkattMnd(BigDecimal.valueOf(600.00));
         }
         kravgrunnlagPeriode1.getTilbakekrevingsBelop().add(lagKravgrunnlagBeløp(BigDecimal.valueOf(6000.00), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TypeKlasseDto.FEIL));

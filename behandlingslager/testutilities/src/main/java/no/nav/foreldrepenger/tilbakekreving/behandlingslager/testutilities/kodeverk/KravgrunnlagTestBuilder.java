@@ -8,6 +8,7 @@ import java.util.function.Function;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagBelop433;
@@ -198,7 +199,7 @@ public class KravgrunnlagTestBuilder {
             .medGjelderType(GjelderType.PERSON)
             .medGjelderVedtakId("???")
             .medSaksBehId("Z111111")
-            .medReferanse(Long.toString(eksternBehandlingId))
+            .medReferanse(Henvisning.fraEksternBehandlingId(eksternBehandlingId))
             .medUtbetalesTilId("99999999999")
             .medUtbetIdType(GjelderType.PERSON)
             .build();

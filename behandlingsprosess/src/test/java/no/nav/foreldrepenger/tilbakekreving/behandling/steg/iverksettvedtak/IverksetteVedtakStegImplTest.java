@@ -41,6 +41,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.Iverksetting
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.SendVedtakHendelserTilDvhTask;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.task.SendVedtakFattetTilSelvbetjeningTask;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -189,7 +190,7 @@ public class IverksetteVedtakStegImplTest {
     }
 
     private void opprettEksternBehandling(Behandling behandling) {
-        EksternBehandling eksternBehandling = new EksternBehandling(behandling, 1l, UUID.randomUUID());
+        EksternBehandling eksternBehandling = new EksternBehandling(behandling, Henvisning.fraEksternBehandlingId(1l), UUID.randomUUID());
         eksternBehandlingRepository.lagre(eksternBehandling);
     }
 }

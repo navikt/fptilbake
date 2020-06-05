@@ -47,6 +47,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.TestFagsakUtil;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.TpsTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fagsak.FagsakTjeneste;
@@ -94,9 +95,11 @@ public class HåndterGamleKravgrunnlagBatchTjenesteTest extends FellesTestOppset
         System.setProperty("environment.name", "devimg");
         when(tpsAdapterMock.hentAktørIdForPersonIdent(any(PersonIdent.class))).thenReturn(Optional.of(behandling.getFagsak().getAktørId()));
         when(økonomiConsumerMock.hentKravgrunnlag(any(), any(HentKravgrunnlagDetaljDto.class))).thenReturn(lagDetaljertKravgrunnlagDto(true));
-        when(fpsakKlientMock.hentBehandlingForSaksnummer(anyString())).thenReturn(Lists.newArrayList(lagEksternBehandlingData()));
-        when(fpsakKlientMock.hentBehandlingsinfo(any(UUID.class), any(Tillegsinformasjon.class))).thenReturn(lagSamletEksternBehandlingData());
-        when(fpsakKlientMock.hentBehandling(any(UUID.class))).thenReturn(Optional.of(lagEksternBehandlingData()));
+        EksternBehandlingsinfoDto eksternBehandlingsinfoDto = lagEksternBehandlingData();
+        when(fpsakKlientMock.hentBehandlingForSaksnummer(anyString())).thenReturn(Lists.newArrayList(eksternBehandlingsinfoDto));
+        when(fpsakKlientMock.hentBehandlingsinfo(any(UUID.class), any(Tillegsinformasjon.class))).thenReturn(lagSamletEksternBehandlingData(eksternBehandlingsinfoDto));
+        when(fpsakKlientMock.hentBehandlingOptional(any(UUID.class))).thenReturn(Optional.of(eksternBehandlingsinfoDto));
+        when(fpsakKlientMock.hentBehandling(any(UUID.class))).thenReturn(eksternBehandlingsinfoDto);
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_YTEL.xml"));
     }
 
@@ -121,7 +124,7 @@ public class HåndterGamleKravgrunnlagBatchTjenesteTest extends FellesTestOppset
         ØkonomiXmlMottatt økonomiXmlMottatt = mottattXmlRepository.finnMottattXml(mottattXmlId);
         assertThat(økonomiXmlMottatt).isNotNull();
         assertThat(økonomiXmlMottatt.getSaksnummer()).isEqualTo("139015144");
-        assertThat(økonomiXmlMottatt.getEksternBehandlingId()).isNotEmpty();
+        assertThat(økonomiXmlMottatt.getHenvisning()).isNotNull();
         assertThat(økonomiXmlMottatt.isTilkoblet()).isTrue();
         long behandlingId = behandlinger.get(0).getId();
         assertThat(grunnlagRepository.harGrunnlagForBehandlingId(behandlingId)).isTrue();
@@ -304,17 +307,18 @@ public class HåndterGamleKravgrunnlagBatchTjenesteTest extends FellesTestOppset
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto = new EksternBehandlingsinfoDto();
         eksternBehandlingsinfoDto.setUuid(UUID.randomUUID());
         eksternBehandlingsinfoDto.setId(100000001l);
+        eksternBehandlingsinfoDto.setHenvisning(Henvisning.fraEksternBehandlingId(100000001l));
         return eksternBehandlingsinfoDto;
     }
 
-    private SamletEksternBehandlingInfo lagSamletEksternBehandlingData() {
+    private SamletEksternBehandlingInfo lagSamletEksternBehandlingData(EksternBehandlingsinfoDto eksternBehandlingsinfoDto) {
         FagsakDto fagsakDto = new FagsakDto();
         fagsakDto.setSaksnummer(139015144l);
         fagsakDto.setSakstype(FagsakYtelseType.FORELDREPENGER);
         PersonopplysningDto personopplysningDto = new PersonopplysningDto();
         personopplysningDto.setAktoerId(behandling.getAktørId().getId());
         SamletEksternBehandlingInfo samletEksternBehandlingInfo = SamletEksternBehandlingInfo.builder(Tillegsinformasjon.FAGSAK, Tillegsinformasjon.PERSONOPPLYSNINGER)
-            .setGrunninformasjon(lagEksternBehandlingData())
+            .setGrunninformasjon(eksternBehandlingsinfoDto)
             .setFagsak(fagsakDto)
             .setPersonopplysninger(personopplysningDto).build();
         return samletEksternBehandlingInfo;

@@ -10,6 +10,7 @@ import javax.persistence.Lob;
 import javax.persistence.Table;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkBaseEntitet;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
 
 /**
@@ -31,10 +32,11 @@ public class ØkonomiXmlMottatt extends KodeverkBaseEntitet {
     @Column(name = "melding", nullable = false)
     private String mottattXml;
 
-    //FIXME k9-tilbake opprett 'henvisning' og migrer ekstern_behandling_id til den.
     //FIXME k9-tilbake når migrert, kan ekstern_behandling_id fjernes
     @Column(name = "ekstern_behandling_id")
     private String eksternBehandlingId;
+
+    private Henvisning henvisning;
 
     @Column(name = "saksnummer")
     private String saksnummer;
@@ -62,8 +64,11 @@ public class ØkonomiXmlMottatt extends KodeverkBaseEntitet {
         return id;
     }
 
-    public String getEksternBehandlingId() {
-        return eksternBehandlingId;
+    public Henvisning getHenvisning() {
+        if (henvisning != null) {
+            return henvisning;
+        }
+        return new Henvisning(eksternBehandlingId);
     }
 
     public Long getSekvens() {
@@ -74,8 +79,9 @@ public class ØkonomiXmlMottatt extends KodeverkBaseEntitet {
         return tilkoblet;
     }
 
-    public void setEksternBehandling(String eksternBehandlingId, long sekvens) {
-        this.eksternBehandlingId = eksternBehandlingId;
+    public void setHenvisning(Henvisning henvisning, long sekvens) {
+        this.eksternBehandlingId = henvisning.getVerdi();
+        this.henvisning = henvisning;
         this.sekvens = sekvens;
     }
 

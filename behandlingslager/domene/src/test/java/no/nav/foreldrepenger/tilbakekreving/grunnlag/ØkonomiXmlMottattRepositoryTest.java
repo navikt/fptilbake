@@ -8,6 +8,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
 
@@ -46,20 +47,20 @@ public class ØkonomiXmlMottattRepositoryTest {
         String xml1 = "foo1";
         String xml2 = "foo2";
         String saksnummer = "1234345";
-        String eksternBehandlingId = "123";
+        Henvisning henvisning = Henvisning.fraEksternBehandlingId(123L);
         Long id1 = repository.lagreMottattXml(xml1);
-        repository.oppdaterMedHenvisningOgSaksnummer(eksternBehandlingId,saksnummer, id1);
+        repository.oppdaterMedHenvisningOgSaksnummer(henvisning,saksnummer, id1);
         em.flush();
         em.clear();
         Long id2 = repository.lagreMottattXml(xml2);
-        repository.oppdaterMedHenvisningOgSaksnummer(eksternBehandlingId, saksnummer, id2);
+        repository.oppdaterMedHenvisningOgSaksnummer(henvisning, saksnummer, id2);
 
         ØkonomiXmlMottatt lagret1 = em.find(ØkonomiXmlMottatt.class, id1);
         ØkonomiXmlMottatt lagret2 = em.find(ØkonomiXmlMottatt.class, id2);
         assertThat(lagret1.getSekvens()).isEqualTo(1);
         assertThat(lagret2.getSekvens()).isEqualTo(2);
-        assertThat(lagret1.getEksternBehandlingId()).isEqualTo(eksternBehandlingId);
-        assertThat(lagret2.getEksternBehandlingId()).isEqualTo(eksternBehandlingId);
+        assertThat(lagret1.getHenvisning()).isEqualTo(henvisning);
+        assertThat(lagret2.getHenvisning()).isEqualTo(henvisning);
         assertThat(lagret1.getSaksnummer()).isEqualTo(saksnummer);
         assertThat(lagret2.getSaksnummer()).isEqualTo(saksnummer);
     }

@@ -68,7 +68,7 @@ public class KravgrunnlagTjenesteTest extends FellesTestOppsett {
 
     @Test
     public void lagreTilbakekrevingsgrunnlagFraØkonomi() {
-        Kravgrunnlag431 kravgrunnlag = formKravgrunnlagDto(KravStatusKode.NYTT);
+        Kravgrunnlag431 kravgrunnlag = lagKravgrunnlagDto(KravStatusKode.NYTT);
         formPerioder(fom, tom, kravgrunnlag);
         kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(internBehandlingId, kravgrunnlag, true);
 
@@ -77,7 +77,7 @@ public class KravgrunnlagTjenesteTest extends FellesTestOppsett {
 
     @Test
     public void lagreTilbakekrevingsgrunnlagFraØkonomi_medEndretGrunnlag() {
-        Kravgrunnlag431 kravgrunnlag = formKravgrunnlagDto(KravStatusKode.ENDRET);
+        Kravgrunnlag431 kravgrunnlag = lagKravgrunnlagDto(KravStatusKode.ENDRET);
         formPerioder(fom, tom, kravgrunnlag);
         kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(internBehandlingId, kravgrunnlag, true);
 
@@ -86,7 +86,7 @@ public class KravgrunnlagTjenesteTest extends FellesTestOppsett {
 
     @Test
     public void lagreTilbakekrevingsgrunnlagFraØkonomi_medEndretGrunnlag_med_allerede_har_grunnlag() {
-        Kravgrunnlag431 kravgrunnlag = formKravgrunnlagDto(KravStatusKode.NYTT);
+        Kravgrunnlag431 kravgrunnlag = lagKravgrunnlagDto(KravStatusKode.NYTT);
         formPerioder(fom, tom, kravgrunnlag);
         kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(internBehandlingId, kravgrunnlag, true);
 
@@ -100,7 +100,7 @@ public class KravgrunnlagTjenesteTest extends FellesTestOppsett {
         vilkårsvurderingRepository.lagre(internBehandlingId, vilkårEntitet);
 
 
-        kravgrunnlag = formKravgrunnlagDto(KravStatusKode.ENDRET);
+        kravgrunnlag = lagKravgrunnlagDto(KravStatusKode.ENDRET);
         formPerioder(fom, tom, kravgrunnlag);
         kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(internBehandlingId, kravgrunnlag, true);
 
@@ -135,7 +135,7 @@ public class KravgrunnlagTjenesteTest extends FellesTestOppsett {
         return vilkårEntitet;
     }
 
-    private Kravgrunnlag431 formKravgrunnlagDto(KravStatusKode kravStatusKode) {
+    private Kravgrunnlag431 lagKravgrunnlagDto(KravStatusKode kravStatusKode) {
         return Kravgrunnlag431.builder()
             .medEksternKravgrunnlagId("123")
             .medVedtakId(10000L)

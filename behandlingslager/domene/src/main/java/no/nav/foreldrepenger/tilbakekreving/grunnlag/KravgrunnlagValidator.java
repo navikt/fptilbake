@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.vedtak.exception.IntegrasjonException;
@@ -42,8 +43,8 @@ public class KravgrunnlagValidator {
     }
 
     private static void validerReferanse(Kravgrunnlag431 kravgrunnlag) {
-        String referanse = kravgrunnlag.getReferanse();
-        if (StringUtils.isEmpty(referanse)) {
+        Henvisning referanse = kravgrunnlag.getReferanse();
+        if (referanse == null || StringUtils.isEmpty(referanse.getVerdi())) {
             throw KravgrunnlagFeil.FACTORY.manglerReferanse(kravgrunnlag.getEksternKravgrunnlagId()).toException();
         }
     }

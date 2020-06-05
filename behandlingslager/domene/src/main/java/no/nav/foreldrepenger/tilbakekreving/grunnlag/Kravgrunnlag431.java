@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -23,6 +25,7 @@ import org.hibernate.annotations.JoinFormula;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 
@@ -96,8 +99,10 @@ public class Kravgrunnlag431 extends BaseEntitet {
     @Column(name = "saksbeh_id", nullable = false)
     private String saksBehId;
 
-    @Column(name = "referanse")
-    private String referanse;
+    @AttributeOverrides({
+        @AttributeOverride(name = "henvisning", column = @Column(name = "referanse"))
+    })
+    private Henvisning referanse;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "kravgrunnlag431", cascade = CascadeType.PERSIST)
     private List<KravgrunnlagPeriode432> perioder = new ArrayList<>();
@@ -182,7 +187,7 @@ public class Kravgrunnlag431 extends BaseEntitet {
         return saksBehId;
     }
 
-    public String getReferanse() {
+    public Henvisning getReferanse(){
         return referanse;
     }
 
@@ -311,7 +316,7 @@ public class Kravgrunnlag431 extends BaseEntitet {
             return this;
         }
 
-        public Builder medReferanse(String referanse) {
+        public Builder medReferanse(Henvisning referanse) {
             this.kladd.referanse = referanse;
             return this;
         }

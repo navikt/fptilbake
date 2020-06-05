@@ -34,7 +34,7 @@ public class LesKravgrunnlagTaskTest extends FellesTestOppsett {
 
         boolean erGrunnlagFinnes = grunnlagRepository.harGrunnlagForBehandlingId(behandling.getId());
         assertThat(erGrunnlagFinnes).isTrue();
-        Optional<EksternBehandling> eksternBehandling = eksternBehandlingRepository.hentFraEksternId(FPSAK_BEHANDLING_ID);
+        Optional<EksternBehandling> eksternBehandling = eksternBehandlingRepository.hentFraHenvisning(HENVISNING);
         assertThat(eksternBehandling).isNotEmpty();
         assertThat(eksternBehandling.get().getInternId()).isEqualTo(behandling.getId());
         assertTilkobling();
@@ -42,7 +42,7 @@ public class LesKravgrunnlagTaskTest extends FellesTestOppsett {
 
     @Test
     public void skal_utføre_leskravgrunnlag_task_nårBehandlingFinnesIkkeIFpsak() {
-        when(fpsakKlientMock.finnesBehandlingIFpsak(fagsak.getSaksnummer().getVerdi(), FPSAK_BEHANDLING_ID)).thenReturn(false);
+        when(fpsakKlientMock.finnesBehandlingIFpsak(fagsak.getSaksnummer().getVerdi(), HENVISNING)).thenReturn(false);
 
         expectedException.expectMessage("FPT-587195");
         lesKravgrunnlagTask.doTask(lagProsessTaskData());
@@ -52,7 +52,7 @@ public class LesKravgrunnlagTaskTest extends FellesTestOppsett {
     public void skal_utføre_leskravgrunnlag_task_forUgyldigBehandling() {
         kravgrunnlagId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_YTEL_ugyldig_referanse.xml"));
 
-        expectedException.expectMessage("FPT-675363");
+        expectedException.expectMessage("Mottok et tilbakekrevingsgrunnlag fra Økonomi med henvisning som ikke er i støttet format. henvisning=ABC. Kravgrunnlaget skulle kanskje til et annet system. Si i fra til Økonomi!");
         lesKravgrunnlagTask.doTask(lagProsessTaskData());
     }
 
@@ -64,12 +64,12 @@ public class LesKravgrunnlagTaskTest extends FellesTestOppsett {
     }
 
     private void lagEksternBehandling() {
-        EksternBehandling eksternBehandling = new EksternBehandling(behandling, FPSAK_BEHANDLING_ID, FPSAK_BEHANDLING_UUID);
+        EksternBehandling eksternBehandling = new EksternBehandling(behandling, HENVISNING, FPSAK_BEHANDLING_UUID);
         eksternBehandlingRepository.lagre(eksternBehandling);
     }
 
     private void assertTilkobling() {
-        Optional<ØkonomiXmlMottatt> økonomiXmlMottatt = mottattXmlRepository.finnForEksternBehandlingId(String.valueOf(FPSAK_BEHANDLING_ID));
+        Optional<ØkonomiXmlMottatt> økonomiXmlMottatt = mottattXmlRepository.finnForHenvisning(HENVISNING);
         assertThat(økonomiXmlMottatt).isPresent();
         assertThat(økonomiXmlMottatt.get().isTilkoblet()).isTrue();
     }

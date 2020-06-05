@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.tilbakekrevingsvalg.VidereBehandling;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.BehandlingResourceLinkDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.KodeDto;
@@ -33,6 +34,7 @@ import no.nav.vedtak.felles.integrasjon.rest.OidcRestClient;
 public class FpsakKlientTest {
 
     private static final Long BEHANDLING_ID = 123456L;
+    private static final Henvisning HENVISNING = Henvisning.fraEksternBehandlingId(BEHANDLING_ID);
     private static final Long FAGSAK_ID = 1234L;
     private static final String SAKSNUMMER = "1256436";
     private static final UUID BEHANDLING_UUID = UUID.randomUUID();
@@ -78,7 +80,7 @@ public class FpsakKlientTest {
         JsonNode jsonNode = new ObjectMapper().convertValue(Lists.newArrayList(eksternBehandlingInfo), JsonNode.class);
         when(oidcRestClientMock.get(BEHANDLING_ALLE_URI, JsonNode.class)).thenReturn(jsonNode);
 
-        boolean erFinnesIFpsak = klient.finnesBehandlingIFpsak(SAKSNUMMER, BEHANDLING_ID);
+        boolean erFinnesIFpsak = klient.finnesBehandlingIFpsak(SAKSNUMMER, HENVISNING);
         assertThat(erFinnesIFpsak).isTrue();
     }
 
@@ -87,7 +89,7 @@ public class FpsakKlientTest {
         JsonNode jsonNode = new ObjectMapper().convertValue(Lists.newArrayList(), JsonNode.class);
         when(oidcRestClientMock.get(BEHANDLING_ALLE_URI, JsonNode.class)).thenReturn(jsonNode);
 
-        boolean erFinnesIFpsak = klient.finnesBehandlingIFpsak(SAKSNUMMER, BEHANDLING_ID);
+        boolean erFinnesIFpsak = klient.finnesBehandlingIFpsak(SAKSNUMMER, HENVISNING);
         assertThat(erFinnesIFpsak).isFalse();
     }
 

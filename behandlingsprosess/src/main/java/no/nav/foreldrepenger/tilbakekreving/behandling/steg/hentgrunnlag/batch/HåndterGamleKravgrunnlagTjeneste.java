@@ -19,6 +19,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.Tillegsinformasjon;
@@ -116,7 +117,7 @@ public class HåndterGamleKravgrunnlagTjeneste {
             KravgrunnlagValidator.validerGrunnlag(kravgrunnlag431);
             String saksnummer = finnSaksnummer(kravgrunnlag431.getFagSystemId());
             if (!finnesBehandling(saksnummer)) {
-                String henvisning = kravgrunnlag431.getReferanse();
+                Henvisning henvisning = kravgrunnlag431.getReferanse();
                 Optional<EksternBehandlingsinfoDto> ytelsebehandling = hentYtelsebehandlingFraFagsaksystemet(saksnummer, henvisning);
                 if (ytelsebehandling.isEmpty()) {
                     arkiverMotattXml(mottattXmlId, melding);
@@ -167,19 +168,18 @@ public class HåndterGamleKravgrunnlagTjeneste {
         return behandlinger.stream().filter(behandling -> !behandling.erAvsluttet()).findFirst();
     }
 
-    private Optional<EksternBehandlingsinfoDto> hentYtelsebehandlingFraFagsaksystemet(String saksnummer, String henvisning) {
-        //FIXME k9-tilbake Må tilpasse for å støtte også k9
-        Long fpsakBehandlingId = Long.valueOf(henvisning);
+    private Optional<EksternBehandlingsinfoDto> hentYtelsebehandlingFraFagsaksystemet(String saksnummer, Henvisning henvisning) {
         List<EksternBehandlingsinfoDto> eksternBehandlinger = fpsakKlient.hentBehandlingForSaksnummer(saksnummer);
         if (!eksternBehandlinger.isEmpty()) {
             return eksternBehandlinger.stream()
-                .filter(eksternBehandlingsinfoDto -> eksternBehandlingsinfoDto.getId().equals(fpsakBehandlingId)).findAny();
+                .filter(eksternBehandlingsinfoDto -> eksternBehandlingsinfoDto.getHenvisning().equals(henvisning)).findAny();
         }
+        //FIXME k9-tilbake Må tilpasse for å støtte også k9
         logger.warn("Saksnummer={} finnes ikke i fpsak", saksnummer);
         return Optional.empty();
     }
 
-    private void oppdaterMedHenvisningOgSaksnummer(Long mottattXmlId, String henvisning, String saksnummer) {
+    private void oppdaterMedHenvisningOgSaksnummer(Long mottattXmlId, Henvisning henvisning, String saksnummer) {
         mottattXmlRepository.oppdaterMedHenvisningOgSaksnummer(henvisning, saksnummer, mottattXmlId);
     }
 
@@ -188,15 +188,15 @@ public class HåndterGamleKravgrunnlagTjeneste {
         SamletEksternBehandlingInfo samletEksternBehandlingInfo = fpsakKlient.hentBehandlingsinfo(eksternBehandlingUuid, Tillegsinformasjon.FAGSAK, Tillegsinformasjon.PERSONOPPLYSNINGER);
         FagsakYtelseType fagsakYtelseType = samletEksternBehandlingInfo.getFagsak().getSakstype();
         Saksnummer saksnummer = samletEksternBehandlingInfo.getSaksnummer();
-        Long eksternBehandingId = eksternBehandlingData.getId(); //FIXME k9-tilbake vil ikke ha tilgang til k9-sak.behandlingId
+        Henvisning henvisning = eksternBehandlingData.getHenvisning();
         AktørId aktørId = samletEksternBehandlingInfo.getAktørId();
-        return behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer, eksternBehandlingUuid, eksternBehandingId, aktørId, fagsakYtelseType, BehandlingType.TILBAKEKREVING);
+        return behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer, eksternBehandlingUuid, henvisning, aktørId, fagsakYtelseType, BehandlingType.TILBAKEKREVING);
     }
 
     private void håndterGyldigkravgrunnlag(Long mottattXmlId, String saksnummer,
                                            Kravgrunnlag431 kravgrunnlag431,
                                            EksternBehandlingsinfoDto eksternBehandlingData) {
-        String henvisning = kravgrunnlag431.getReferanse();
+        Henvisning henvisning = kravgrunnlag431.getReferanse();
         oppdaterMedHenvisningOgSaksnummer(mottattXmlId, henvisning, saksnummer);
         if (kanOppretteBehandling()) {
             long behandlingId = opprettBehandling(eksternBehandlingData);
