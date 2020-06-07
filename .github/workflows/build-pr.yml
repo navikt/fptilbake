@@ -49,4 +49,4 @@ jobs:
         shell: bash
         run: |
           echo "Building $BUILD_VERSION"
-          mvn package --quiet --batch-mode --settings ./.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION}
+          mvn package -T2 --quiet --batch-mode --settings ./.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION}
