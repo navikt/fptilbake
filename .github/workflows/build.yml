@@ -6,7 +6,6 @@ on:
       - master   # Push events on master branch
 
 env:
-  ORACLE_IMAGE: docker.pkg.github.com/navikt/fpsak-autotest/oracle-flattened
   IMAGE_BASE: docker.pkg.github.com/${{ github.repository }}/fptilbake
   TZ: "Europe/Oslo"
 
@@ -17,35 +16,55 @@ jobs:
       - name: Sjekk ut kode
         uses: actions/checkout@v2
 
+      - name: Hent og start Oracle image
+        id: oracle
+        shell: bash
+        run: |
+          echo $GITHUB_TOKEN | docker login --username "x-access-token" --password-stdin https://docker.pkg.github.com
+          oracle/start-oracle.sh &
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+
       - name: Sett opp Java
         uses: actions/setup-java@v1
         with:
           java-version: 1.11
 
-      - name: Hent og start Oracle image
-        id: oracle
-        shell: bash
-        run: |
-          echo  $GITHUB_TOKEN | docker login --username "x-access-token" --password-stdin https://docker.pkg.github.com
-          echo "Henter og starter Oracle image $ORACLE_IMAGE"
-          docker-compose -f oracle/docker-compose.yml pull
-          rm -f nohup.out
-          docker-compose -f oracle/docker-compose.yml up oracle >nohup.out 2>&1 &
-          sh -c 'tail -n +0 -f nohup.out | { sed "/Disconnected/q" && kill $$; }' || true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
-
-      - uses: actions/cache@v1.1.2
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('pom.xml') }}
-          restore-keys: ${{ runner.os }}-maven-
-
       - name: Set build version
         run: |
           echo "::set-env name=BUILD_VERSION::$(date +%Y.%m.%d.%H%M%S)-$(echo $GITHUB_SHA | cut -c1-7)"
 
-      - name: Build artifacts & deploy
+      - uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: v2-${{ runner.os }}-maven-${{ hashFiles('pom.xml') }}
+          restore-keys: v2-${{ runner.os }}-maven-
+
+      - name: Build (kompiler)
+        env:
+          GITHUB_USERNAME: x-access-token
+          GITHUB_PASSWORD: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+        shell: bash
+        run: |
+          echo "Building $BUILD_VERSION"
+          mvn test-compile -P-migrer-db --quiet --batch-mode --settings ./.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION}
+
+      - name: Vent til oracle er oppe
+        id: vent-til-oracle-er-klar
+        shell: bash
+        run: |
+          oracle/vent-til-oracle-er-klar.sh
+
+      - name: Migrer database
+        env:
+          GITHUB_USERNAME: x-access-token
+          GITHUB_PASSWORD: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+        shell: bash
+        run: |
+          echo "Migrerer database"
+          mvn exec:java -pl migreringer --quiet --batch-mode --settings ./.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION}
+
+      - name: Build artifacts & deploy (inkl test)
         env:
           GITHUB_USERNAME: x-access-token
           GITHUB_PASSWORD: ${{ secrets.GITHUB_ACCESS_TOKEN }}
@@ -53,7 +72,7 @@ jobs:
         shell: bash
         run: |
           echo "Building artifacts $BUILD_VERSION"
-          mvn jacoco:prepare-agent install --quiet -e --batch-mode --settings ./.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION} -Dfile.encoding=UTF-8 -Djacoco.destFile=$(pwd)/target/jacoco.exec -Pgithub
+          mvn install --quiet -e --batch-mode --settings ./.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION} -Dfile.encoding=UTF-8 -Pgithub
           echo "Build artifacts"
           echo "::set-env name=TAG::$(mvn help:evaluate --batch-mode --settings ./.m2/settings.xml --file .flattened -Dexpression=project.version -q -DforceStdout)"
 
