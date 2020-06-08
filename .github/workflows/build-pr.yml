@@ -43,7 +43,7 @@ jobs:
         shell: bash
         run: |
           echo "Building $BUILD_VERSION"
-          mvn test-compile -P-migrer-db -T2 --quiet --batch-mode --settings ./.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION}
+          mvn package -DskipTests -P-migrer-db -T2 --quiet --batch-mode --settings ./.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION}
 
       - name: Vent til oracle er oppe
         id: vent-til-oracle-er-klar
