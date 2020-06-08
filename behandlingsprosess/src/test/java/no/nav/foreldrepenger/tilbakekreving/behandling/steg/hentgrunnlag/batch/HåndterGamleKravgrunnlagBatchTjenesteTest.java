@@ -80,10 +80,10 @@ public class HåndterGamleKravgrunnlagBatchTjenesteTest extends FellesTestOppset
     private NavBrukerRepository navBrukerRepository = new NavBrukerRepositoryImpl(repoRule.getEntityManager());
     private FagsakTjeneste fagsakTjeneste = new FagsakTjeneste(tpsTjenesteMock, fagsakRepository, navBrukerRepository);
     private BehandlingTjeneste behandlingTjeneste = new BehandlingTjenesteImpl(repositoryProvider, prosessTaskRepository, behandlingskontrollProvider,
-        fagsakTjeneste, historikkinnslagTjeneste, fpsakKlientMock, Period.ofWeeks(4));
+        fagsakTjeneste, historikkinnslagTjeneste, fagsystemKlientMock, Period.ofWeeks(4));
     private HåndterGamleKravgrunnlagTjeneste håndterGamleKravgrunnlagTjeneste = new HåndterGamleKravgrunnlagTjeneste(mottattXmlRepository, grunnlagRepository,
         hentKravgrunnlagMapper, lesKravgrunnlagMapper,
-        behandlingTjeneste, økonomiConsumerMock, fpsakKlientMock);
+        behandlingTjeneste, økonomiConsumerMock, fagsystemKlientMock);
     private Clock clock = Clock.fixed(Instant.parse(getDateString()), ZoneId.systemDefault());
     private HåndterGamleKravgrunnlagBatchTjeneste gamleKravgrunnlagBatchTjeneste = new HåndterGamleKravgrunnlagBatchTjeneste(håndterGamleKravgrunnlagTjeneste,
         clock, Period.ofWeeks(-1));
@@ -96,10 +96,10 @@ public class HåndterGamleKravgrunnlagBatchTjenesteTest extends FellesTestOppset
         when(tpsAdapterMock.hentAktørIdForPersonIdent(any(PersonIdent.class))).thenReturn(Optional.of(behandling.getFagsak().getAktørId()));
         when(økonomiConsumerMock.hentKravgrunnlag(any(), any(HentKravgrunnlagDetaljDto.class))).thenReturn(lagDetaljertKravgrunnlagDto(true));
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto = lagEksternBehandlingData();
-        when(fpsakKlientMock.hentBehandlingForSaksnummer(anyString())).thenReturn(Lists.newArrayList(eksternBehandlingsinfoDto));
-        when(fpsakKlientMock.hentBehandlingsinfo(any(UUID.class), any(Tillegsinformasjon.class))).thenReturn(lagSamletEksternBehandlingData(eksternBehandlingsinfoDto));
-        when(fpsakKlientMock.hentBehandlingOptional(any(UUID.class))).thenReturn(Optional.of(eksternBehandlingsinfoDto));
-        when(fpsakKlientMock.hentBehandling(any(UUID.class))).thenReturn(eksternBehandlingsinfoDto);
+        when(fagsystemKlientMock.hentBehandlingForSaksnummer(anyString())).thenReturn(Lists.newArrayList(eksternBehandlingsinfoDto));
+        when(fagsystemKlientMock.hentBehandlingsinfo(any(UUID.class), any(Tillegsinformasjon.class))).thenReturn(lagSamletEksternBehandlingData(eksternBehandlingsinfoDto));
+        when(fagsystemKlientMock.hentBehandlingOptional(any(UUID.class))).thenReturn(Optional.of(eksternBehandlingsinfoDto));
+        when(fagsystemKlientMock.hentBehandling(any(UUID.class))).thenReturn(eksternBehandlingsinfoDto);
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_YTEL.xml"));
     }
 
@@ -171,7 +171,7 @@ public class HåndterGamleKravgrunnlagBatchTjenesteTest extends FellesTestOppset
 
     @Test
     public void skal_kjøre_batch_for_å_prosessere_gammel_kravgrunnlag_når_eksternBehandling_ikke_finnes_i_fpsak() {
-        when(fpsakKlientMock.hentBehandlingForSaksnummer(anyString())).thenReturn(Lists.newArrayList());
+        when(fagsystemKlientMock.hentBehandlingForSaksnummer(anyString())).thenReturn(Lists.newArrayList());
         BatchArguments emptyBatchArguments = new EmptyBatchArguments(Collections.EMPTY_MAP);
         gamleKravgrunnlagBatchTjeneste.launch(emptyBatchArguments);
         assertThat(mottattXmlRepository.finnArkivertMottattXml(mottattXmlId)).isNotNull();
@@ -306,14 +306,13 @@ public class HåndterGamleKravgrunnlagBatchTjenesteTest extends FellesTestOppset
     private EksternBehandlingsinfoDto lagEksternBehandlingData() {
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto = new EksternBehandlingsinfoDto();
         eksternBehandlingsinfoDto.setUuid(UUID.randomUUID());
-        eksternBehandlingsinfoDto.setId(100000001l);
         eksternBehandlingsinfoDto.setHenvisning(Henvisning.fraEksternBehandlingId(100000001l));
         return eksternBehandlingsinfoDto;
     }
 
     private SamletEksternBehandlingInfo lagSamletEksternBehandlingData(EksternBehandlingsinfoDto eksternBehandlingsinfoDto) {
         FagsakDto fagsakDto = new FagsakDto();
-        fagsakDto.setSaksnummer(139015144l);
+        fagsakDto.setSaksnummer("139015144");
         fagsakDto.setSakstype(FagsakYtelseType.FORELDREPENGER);
         PersonopplysningDto personopplysningDto = new PersonopplysningDto();
         personopplysningDto.setAktoerId(behandling.getAktørId().getId());

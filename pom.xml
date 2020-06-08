@@ -234,12 +234,12 @@
             </dependency>
             <dependency>
                 <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
-                <artifactId>simulering</artifactId>
+                <artifactId>fpsak-klient</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
-                <artifactId>fpsak-klient</artifactId>
+                <artifactId>fagsystem-klient-api</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

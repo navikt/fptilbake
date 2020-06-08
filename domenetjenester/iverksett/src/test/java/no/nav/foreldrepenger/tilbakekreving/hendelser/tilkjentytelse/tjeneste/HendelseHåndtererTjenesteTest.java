@@ -16,7 +16,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.tilbakekrevingsvalg.VidereBehandling;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FagsystemKlient;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.TilbakekrevingValgDto;
 import no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.TilkjentYtelseTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.task.OppdaterBehandlingTask;
@@ -27,7 +27,7 @@ public class HendelseHåndtererTjenesteTest extends TilkjentYtelseTestOppsett {
 
     private HendelseHåndtererTjeneste hendelseHåndtererTjeneste;
 
-    private FpsakKlient restKlient = mock(FpsakKlient.class);
+    private FagsystemKlient restKlient = mock(FagsystemKlient.class);
 
     @Before
     public void setup() {
@@ -45,11 +45,11 @@ public class HendelseHåndtererTjenesteTest extends TilkjentYtelseTestOppsett {
         verify(prosessTaskRepository, atLeastOnce()).lagre(any(ProsessTaskData.class));
         List<ProsessTaskData> prosesser = prosessTaskRepository.finnIkkeStartet();
         assertThat(prosesser).isNotEmpty();
-        assertThat(erTaskFinnes(OpprettBehandlingTask.TASKTYPE,prosesser)).isTrue();
+        assertThat(erTaskFinnes(OpprettBehandlingTask.TASKTYPE, prosesser)).isTrue();
     }
 
     @Test
-    public void skal_opprette_prosesstask_når_tilbakekreving_oppdater_er_motatt_som_hendelse(){
+    public void skal_opprette_prosesstask_når_tilbakekreving_oppdater_er_motatt_som_hendelse() {
         VidereBehandling videreBehandling = VidereBehandling.TILBAKEKR_OPPDATER;
         TilbakekrevingValgDto tbkDataDto = new TilbakekrevingValgDto(videreBehandling);
         when(restKlient.hentTilbakekrevingValg(any(UUID.class))).thenReturn(Optional.of(tbkDataDto));
@@ -59,7 +59,7 @@ public class HendelseHåndtererTjenesteTest extends TilkjentYtelseTestOppsett {
         verify(prosessTaskRepository, atLeastOnce()).lagre(any(ProsessTaskData.class));
         List<ProsessTaskData> prosesser = prosessTaskRepository.finnIkkeStartet();
         assertThat(prosesser).isNotEmpty();
-        assertThat(erTaskFinnes(OppdaterBehandlingTask.TASKTYPE,prosesser)).isTrue();
+        assertThat(erTaskFinnes(OppdaterBehandlingTask.TASKTYPE, prosesser)).isTrue();
     }
 
     @Test
@@ -73,7 +73,7 @@ public class HendelseHåndtererTjenesteTest extends TilkjentYtelseTestOppsett {
         verifyZeroInteractions(prosessTaskRepository);
     }
 
-    private boolean erTaskFinnes(String taskType,List<ProsessTaskData> prosesser){
+    private boolean erTaskFinnes(String taskType, List<ProsessTaskData> prosesser) {
         return prosesser.stream()
             .anyMatch(prosess -> taskType.equals(prosess.getTaskType()));
     }

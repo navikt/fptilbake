@@ -2,18 +2,11 @@ package no.nav.foreldrepenger.tilbakekreving.pdfgen;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.Objects;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class FileStructureUtil {
-
-    private static final Logger logger = LoggerFactory.getLogger(FileStructureUtil.class);
 
     public static byte[] getColorProfile() {
         String location = "colorprofile/sRGB2014.icc";
@@ -24,9 +17,7 @@ public class FileStructureUtil {
         InputStream is = FileStructureUtil.class.getClassLoader().getResourceAsStream(location);
         Objects.requireNonNull(is, "Fant ikke resource " + location);
         try {
-            byte[] bytes = is.readAllBytes();
-            logger.info("Leste {} bytes fra {}", bytes.length, location);
-            return bytes;
+            return is.readAllBytes();
         } catch (IOException e) {
             throw new IllegalArgumentException("Klarte ikke å lese resource " + location);
         }

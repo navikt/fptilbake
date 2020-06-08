@@ -44,7 +44,7 @@ public class FaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
             .setGrunninformasjon(behandlingsinfoDto)
             .setTilbakekrevingvalg(new TilbakekrevingValgDto(VidereBehandling.TILBAKEKREV_I_INFOTRYGD))
             .build();
-        when(mockFpsakKlient.hentBehandlingsinfo(eksternBehandlingUuid, Tillegsinformasjon.TILBAKEKREVINGSVALG)).thenReturn(samletEksternBehandlingInfo);
+        when(mockFagsystemKlient.hentBehandlingsinfo(eksternBehandlingUuid, Tillegsinformasjon.TILBAKEKREVINGSVALG)).thenReturn(samletEksternBehandlingInfo);
     }
 
     @Test

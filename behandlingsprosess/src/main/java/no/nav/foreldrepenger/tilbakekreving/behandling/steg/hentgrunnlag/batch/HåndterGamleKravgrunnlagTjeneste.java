@@ -20,7 +20,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FagsystemKlient;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
@@ -49,7 +49,7 @@ public class HåndterGamleKravgrunnlagTjeneste {
     private KravgrunnlagMapper lesKravgrunnlagMapper;
     private BehandlingTjeneste behandlingTjeneste;
     private ØkonomiConsumer økonomiConsumer;
-    private FpsakKlient fpsakKlient;
+    private FagsystemKlient fagsystemKlient;
 
     private boolean skalGrunnlagSperres;
     private long antallBehandlingOprettet = 0;
@@ -65,14 +65,14 @@ public class HåndterGamleKravgrunnlagTjeneste {
                                             KravgrunnlagMapper lesKravgrunnlagMapper,
                                             BehandlingTjeneste behandlingTjeneste,
                                             ØkonomiConsumer økonomiConsumer,
-                                            FpsakKlient fpsakKlient) {
+                                            FagsystemKlient fagsystemKlient) {
         this.mottattXmlRepository = mottattXmlRepository;
         this.grunnlagRepository = grunnlagRepository;
         this.hentKravgrunnlagMapper = hentKravgrunnlagMapper;
         this.lesKravgrunnlagMapper = lesKravgrunnlagMapper;
         this.behandlingTjeneste = behandlingTjeneste;
         this.økonomiConsumer = økonomiConsumer;
-        this.fpsakKlient = fpsakKlient;
+        this.fagsystemKlient = fagsystemKlient;
     }
 
     protected List<ØkonomiXmlMottatt> hentGamleMeldinger(LocalDate bestemtDato) {
@@ -168,7 +168,7 @@ public class HåndterGamleKravgrunnlagTjeneste {
     }
 
     private Optional<EksternBehandlingsinfoDto> hentYtelsebehandlingFraFagsaksystemet(String saksnummer, Henvisning henvisning) {
-        List<EksternBehandlingsinfoDto> eksternBehandlinger = fpsakKlient.hentBehandlingForSaksnummer(saksnummer);
+        List<EksternBehandlingsinfoDto> eksternBehandlinger = fagsystemKlient.hentBehandlingForSaksnummer(saksnummer);
         if (!eksternBehandlinger.isEmpty()) {
             return eksternBehandlinger.stream()
                 .filter(eksternBehandlingsinfoDto -> eksternBehandlingsinfoDto.getHenvisning().equals(henvisning)).findAny();
@@ -184,8 +184,7 @@ public class HåndterGamleKravgrunnlagTjeneste {
 
     private long opprettBehandling(EksternBehandlingsinfoDto eksternBehandlingData) {
         UUID eksternBehandlingUuid = eksternBehandlingData.getUuid();
-        SamletEksternBehandlingInfo samletEksternBehandlingInfo = fpsakKlient.hentBehandlingsinfo(eksternBehandlingUuid, Tillegsinformasjon.FAGSAK,
-            Tillegsinformasjon.PERSONOPPLYSNINGER);
+        SamletEksternBehandlingInfo samletEksternBehandlingInfo = fagsystemKlient.hentBehandlingsinfo(eksternBehandlingUuid, Tillegsinformasjon.FAGSAK, Tillegsinformasjon.PERSONOPPLYSNINGER);
         FagsakYtelseType fagsakYtelseType = samletEksternBehandlingInfo.getFagsak().getSakstype();
         Saksnummer saksnummer = samletEksternBehandlingInfo.getSaksnummer();
         return behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternBehandlingUuid, fagsakYtelseType, BehandlingType.TILBAKEKREVING); //midlertidig fiks,endres til automatisk opprettelse

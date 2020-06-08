@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.simulering.klient;
+package no.nav.foreldrepenger.tilbakekreving.fpsak.klient.simulering;
 
 import java.net.URI;
 import java.util.Optional;
@@ -6,11 +6,11 @@ import java.util.Optional;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.simulering.kontrakt.FeilutbetaltePerioderDto;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.simulering.FeilutbetaltePerioderDto;
 import no.nav.vedtak.felles.integrasjon.rest.OidcRestClient;
 
 @ApplicationScoped
-public class FpOppdragRestKlientImpl implements FpOppdragRestKlient {
+public class FpoppdragRestKlient {
 
     private static final String FPOPPDRAG_HENT_FEILUTBETALINGER = "/simulering/feilutbetalte-perioder";
 
@@ -18,19 +18,18 @@ public class FpOppdragRestKlientImpl implements FpOppdragRestKlient {
     private OidcRestClient restClient;
     private URI uriHentFeilutbetalinger;
 
-    public FpOppdragRestKlientImpl() {
+    public FpoppdragRestKlient() {
         //for cdi proxy
     }
 
     @Inject
-    public FpOppdragRestKlientImpl(OidcRestClient restClient) {
+    public FpoppdragRestKlient(OidcRestClient restClient) {
         this.restClient = restClient;
         String fpoppdragBaseUrl = FpoppdragFelles.getFpoppdragBaseUrl();
         uriHentFeilutbetalinger = URI.create(fpoppdragBaseUrl + FPOPPDRAG_HENT_FEILUTBETALINGER);
     }
 
-    @Override
-    public Optional<FeilutbetaltePerioderDto> hentFeilutbetaltePerioder(Long behandlingId) {
-        return restClient.postReturnsOptional(uriHentFeilutbetalinger, new BehandlingIdDto(behandlingId), FeilutbetaltePerioderDto.class);
+    public Optional<FeilutbetaltePerioderDto> hentFeilutbetaltePerioder(long fpsakBehandlingId) {
+        return restClient.postReturnsOptional(uriHentFeilutbetalinger, new BehandlingIdDto(fpsakBehandlingId), FeilutbetaltePerioderDto.class);
     }
 }

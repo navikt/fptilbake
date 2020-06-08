@@ -64,7 +64,7 @@ import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.TpsAdapter;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FagsystemKlient;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.SlettGrunnlagEventPubliserer;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
@@ -91,7 +91,7 @@ public class FellesTestOppsett {
     private BehandlingskontrollEventPubliserer behandlingskontrollEventPublisererMock = mock(BehandlingskontrollEventPubliserer.class);
     protected final TpsAdapter tpsAdapterMock = mock(TpsAdapter.class);
     private PersoninfoAdapter personinfoAdapterMock = mock(PersoninfoAdapter.class);
-    protected final FpsakKlient fpsakKlientMock = mock(FpsakKlient.class);
+    protected final FagsystemKlient fagsystemKlientMock = mock(FagsystemKlient.class);
     protected final TpsAdapterWrapper tpsAdapterWrapper = new TpsAdapterWrapper(tpsAdapterMock);
     private BehandlingModellRepository behandlingModellRepositoryMock = mock(BehandlingModellRepository.class);
     private VarselresponsTjeneste varselresponsTjenesteMock = mock(VarselresponsTjeneste.class);
@@ -114,7 +114,7 @@ public class FellesTestOppsett {
     private InternalManipulerBehandling manipulerInternBehandling = new InternalManipulerBehandlingImpl(repositoryProvider);
     protected final KravgrunnlagTjeneste kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repositoryProvider, prosessTaskRepository, gjenopptaBehandlingTjeneste, behandlingskontrollTjeneste, mockSlettGrunnlagEventPubliserer);
     protected final KravgrunnlagMapper kravgrunnlagMapper = new KravgrunnlagMapper(tpsAdapterWrapper);
-    protected final LesKravgrunnlagTask lesKravgrunnlagTask = new LesKravgrunnlagTask(mottattXmlRepository, kravgrunnlagTjeneste, kravgrunnlagMapper, repositoryProvider, fpsakKlientMock);
+    protected final LesKravgrunnlagTask lesKravgrunnlagTask = new LesKravgrunnlagTask(mottattXmlRepository, kravgrunnlagTjeneste, kravgrunnlagMapper, repositoryProvider, fagsystemKlientMock);
 
     protected final KravgrunnlagMapper mapper = new KravgrunnlagMapper(tpsAdapterWrapper);
 

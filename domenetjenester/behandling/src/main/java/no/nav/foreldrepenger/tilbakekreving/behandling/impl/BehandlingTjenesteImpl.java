@@ -46,7 +46,7 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fagsak.FagsakTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FagsystemKlient;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
@@ -75,7 +75,7 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
     private BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste;
     private FagsakTjeneste fagsakTjeneste;
     private HistorikkinnslagTjeneste historikkinnslagTjeneste;
-    private FpsakKlient fpsakKlient;
+    private FagsystemKlient fagsystemKlient;
 
     private Period defaultVentefrist;
 
@@ -89,13 +89,13 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
                                   BehandlingskontrollProvider behandlingskontrollProvider,
                                   FagsakTjeneste fagsakTjeneste,
                                   HistorikkinnslagTjeneste historikkinnslagTjeneste,
-                                  FpsakKlient fpsakKlient,
+                                  FagsystemKlient fagsystemKlient,
                                   @KonfigVerdi("frist.brukerrespons.varsel") Period defaultVentefrist) {
         this.behandlingskontrollTjeneste = behandlingskontrollProvider.getBehandlingskontrollTjeneste();
         this.behandlingskontrollAsynkTjeneste = behandlingskontrollProvider.getBehandlingskontrollAsynkTjeneste();
         this.fagsakTjeneste = fagsakTjeneste;
         this.historikkinnslagTjeneste = historikkinnslagTjeneste;
-        this.fpsakKlient = fpsakKlient;
+        this.fagsystemKlient = fagsystemKlient;
         this.defaultVentefrist = defaultVentefrist;
 
         this.behandlingRepository = behandlingRepositoryProvider.getBehandlingRepository();
@@ -212,7 +212,7 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
     }
 
     private SamletEksternBehandlingInfo hentEksternBehandlingMedAktørId(UUID eksternUuid) {
-        return fpsakKlient.hentBehandlingsinfo(eksternUuid, Tillegsinformasjon.PERSONOPPLYSNINGER);
+        return fagsystemKlient.hentBehandlingsinfo(eksternUuid, Tillegsinformasjon.PERSONOPPLYSNINGER);
     }
 
 
@@ -228,7 +228,7 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
             eksternBehandlingsinfoDto = samletEksternBehandlingInfo.getGrunninformasjon();
             manueltOpprettet = true;
         } else {
-            eksternBehandlingsinfoDto = fpsakKlient.hentBehandling(eksternUuid);
+            eksternBehandlingsinfoDto = fagsystemKlient.hentBehandling(eksternUuid);
         }
         henvisning = hentHenvisningHvisIkkeFinnes(henvisning, eksternBehandlingsinfoDto);
 
@@ -302,7 +302,7 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
     private void hentVergeInformasjonFraFpsak(long behandlingId) {
         if (erTestMiljø()) {
             EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandlingId);
-            SamletEksternBehandlingInfo eksternBehandlingInfo = fpsakKlient.hentBehandlingsinfo(eksternBehandling.getEksternUuid(), Tillegsinformasjon.VERGE);
+            SamletEksternBehandlingInfo eksternBehandlingInfo = fagsystemKlient.hentBehandlingsinfo(eksternBehandling.getEksternUuid(), Tillegsinformasjon.VERGE);
             if (eksternBehandlingInfo.getVerge() != null) {
                 lagreVergeInformasjon(behandlingId, eksternBehandlingInfo.getVerge());
             }

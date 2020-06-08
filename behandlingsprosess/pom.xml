@@ -80,6 +80,11 @@
             <artifactId>domene-testutilities</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+            <artifactId>fpsak-klient</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>

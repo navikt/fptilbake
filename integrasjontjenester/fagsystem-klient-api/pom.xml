@@ -8,19 +8,20 @@
         <version>${revision}${sha1}${changelist}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>simulering</artifactId>
+    <artifactId>fagsystem-klient-api</artifactId>
     <packaging>jar</packaging>
-    <name>FPTILBAKE :: Integrasjontjenester - Simulering</name>
+    <name>FPTILBAKE :: Integrasjontjenester - Fagsystemklient - API</name>
 
     <dependencies>
-        <dependency>
-            <groupId>javax.enterprise</groupId>
-            <artifactId>cdi-api</artifactId>
-        </dependency>
         <dependency>
             <groupId>no.nav.foreldrepenger.felles.integrasjon</groupId>
             <artifactId>felles-integrasjon-rest-klient</artifactId>
         </dependency>
+        <dependency>
+            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+            <artifactId>behandlingslager-domene</artifactId>
+        </dependency>
+
         <!-- Test -->
         <dependency>
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
@@ -28,5 +29,6 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
 
 </project>

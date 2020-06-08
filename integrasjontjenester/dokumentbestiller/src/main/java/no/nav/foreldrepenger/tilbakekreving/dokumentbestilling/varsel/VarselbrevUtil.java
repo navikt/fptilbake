@@ -19,8 +19,8 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
-import no.nav.foreldrepenger.tilbakekreving.simulering.kontrakt.FeilutbetaltePerioderDto;
-import no.nav.foreldrepenger.tilbakekreving.simulering.kontrakt.PeriodeDto;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.simulering.FeilutbetaltePerioderDto;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.simulering.PeriodeDto;
 import no.nav.vedtak.sikkerhet.context.SubjectHandler;
 
 public class VarselbrevUtil {

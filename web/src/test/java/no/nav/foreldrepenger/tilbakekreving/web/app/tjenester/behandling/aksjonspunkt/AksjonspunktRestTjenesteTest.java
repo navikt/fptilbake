@@ -40,7 +40,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.Totrinnsvur
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fagsak.FagsakTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FagsystemKlient;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.BekreftedeAksjonspunkterDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.BekreftetAksjonspunktDto;
@@ -82,7 +82,7 @@ public class AksjonspunktRestTjenesteTest {
                 behandlingskontrollProvider,
                 mock(FagsakTjeneste.class),
                 mock(HistorikkinnslagTjeneste.class),
-                mock(FpsakKlient.class),
+                mock(FagsystemKlient.class),
                 DEFAULT_PERIOD);
 
         aksjonspunktRestTjeneste = new AksjonspunktRestTjeneste(behandlingRepositoryMock,

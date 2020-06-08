@@ -21,7 +21,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselInfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTypeMedUndertypeDto;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FagsystemKlient;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
@@ -36,16 +36,16 @@ public class FaktaFeilutbetalingTjeneste {
 
     private KravgrunnlagTjeneste kravgrunnlagTjeneste;
     private EksternBehandlingRepository eksternBehandlingRepository;
-    private FpsakKlient fpsakKlient;
+    private FagsystemKlient fagsystemKlient;
 
     FaktaFeilutbetalingTjeneste() {
         // for CDI proxy
     }
 
     @Inject
-    public FaktaFeilutbetalingTjeneste(BehandlingRepositoryProvider behandlingRepositoryProvider, KravgrunnlagTjeneste kravgrunnlagTjeneste, FpsakKlient fpsakKlient) {
+    public FaktaFeilutbetalingTjeneste(BehandlingRepositoryProvider behandlingRepositoryProvider, KravgrunnlagTjeneste kravgrunnlagTjeneste, FagsystemKlient fagsystemKlient) {
         this.kravgrunnlagTjeneste = kravgrunnlagTjeneste;
-        this.fpsakKlient = fpsakKlient;
+        this.fagsystemKlient = fagsystemKlient;
 
         this.faktaFeilutbetalingRepository = behandlingRepositoryProvider.getFaktaFeilutbetalingRepository();
         this.eksternBehandlingRepository = behandlingRepositoryProvider.getEksternBehandlingRepository();
@@ -70,7 +70,7 @@ public class FaktaFeilutbetalingTjeneste {
         Optional<VarselInfo> resultat = varselRepository.finnVarsel(behandlingId);
         UUID eksternUuid = eksternBehandling.getEksternUuid();
 
-        SamletEksternBehandlingInfo samletBehandlingInfo = fpsakKlient.hentBehandlingsinfo(eksternUuid, Tillegsinformasjon.TILBAKEKREVINGSVALG);
+        SamletEksternBehandlingInfo samletBehandlingInfo = fagsystemKlient.hentBehandlingsinfo(eksternUuid, Tillegsinformasjon.TILBAKEKREVINGSVALG);
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto = samletBehandlingInfo.getGrunninformasjon();
         TilbakekrevingValgDto tilbakekrevingValg = samletBehandlingInfo.getTilbakekrevingsvalg();
 

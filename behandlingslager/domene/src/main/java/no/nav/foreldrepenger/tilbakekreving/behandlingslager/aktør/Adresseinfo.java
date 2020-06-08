@@ -90,6 +90,7 @@ public class Adresseinfo {
         private PersonstatusType personstatus;
         private String vergeOrganisasjonNummer;
 
+        //TODO kan personstatus fjernes? Ser ikke ut som brukes
         public Builder(AdresseType gjeldende, PersonIdent fnr, String mottakerNavn, PersonstatusType personstatus) {
             this.gjeldendePostadresseType = gjeldende;
             this.fnr = fnr;
