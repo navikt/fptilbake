@@ -50,7 +50,7 @@ jobs:
         id: vent-til-oracle-er-klar
         shell: bash
         run: |
-          vent-til-oracle-er-klar.sh
+          oracle/vent-til-oracle-er-klar.sh
 
       - name: Migrer database
         env:
