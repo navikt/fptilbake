@@ -73,7 +73,7 @@ jobs:
         shell: bash
         run: |
           echo "Migrerer database"
-          mvn exec:java -pl migreringer
+          mvn exec:java -pl migreringer --quiet --batch-mode --settings ./.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION}
 
       - name: Build (test)
         env:
