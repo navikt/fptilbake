@@ -73,6 +73,7 @@ jobs:
         shell: bash
         run: |
           echo "Migrerer database"
+          export MAVEN_OPTS="-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
           mvn exec:java -pl migreringer --quiet --batch-mode --settings ./.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION}
 
       - name: Build (test)
@@ -82,4 +83,5 @@ jobs:
         shell: bash
         run: |
           echo "Building $BUILD_VERSION"
+          export MAVEN_OPTS="-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
           mvn package -T2 --quiet --batch-mode --settings ./.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION}
