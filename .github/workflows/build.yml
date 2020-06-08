@@ -35,11 +35,11 @@ jobs:
         run: |
           echo "::set-env name=BUILD_VERSION::$(date +%Y.%m.%d.%H%M%S)-$(echo $GITHUB_SHA | cut -c1-7)"
 
-      - uses: actions/cache@v1.1.2
+      - uses: actions/cache@v2
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('pom.xml') }}
-          restore-keys: ${{ runner.os }}-maven-
+          key: v2-${{ runner.os }}-maven-${{ hashFiles('pom.xml') }}
+          restore-keys: v2-${{ runner.os }}-maven-
 
       - name: Build (kompiler)
         env:
