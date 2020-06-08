@@ -2,6 +2,9 @@ name: Bygg pull request
 
 on: [pull_request]
 
+env:
+  TZ: "Europe/Oslo"
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -40,7 +43,7 @@ jobs:
         shell: bash
         run: |
           echo "Building $BUILD_VERSION"
-          mvn package -DskipTests -P-migrer-db -T2 --quiet --batch-mode --settings ./.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION}
+          mvn test-compile -P-migrer-db -T2 --quiet --batch-mode --settings ./.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION}
 
       - name: Vent til oracle er oppe
         id: vent-til-oracle-er-klar
@@ -66,4 +69,4 @@ jobs:
         run: |
           echo "Building $BUILD_VERSION"
           export MAVEN_OPTS="-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
-          mvn package -T2 --quiet --batch-mode --settings ./.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION}
+          mvn test -T2 --quiet --batch-mode --settings ./.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION}

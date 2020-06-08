@@ -7,6 +7,7 @@ on:
 
 env:
   IMAGE_BASE: docker.pkg.github.com/${{ github.repository }}/fptilbake
+  TZ: "Europe/Oslo"
 
 jobs:
   build:
@@ -46,7 +47,7 @@ jobs:
         shell: bash
         run: |
           echo "Building $BUILD_VERSION"
-          mvn package -DskipTests -P-migrer-db --quiet --batch-mode --settings ./.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION}
+          mvn test-compile -P-migrer-db --quiet --batch-mode --settings ./.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION}
 
       - name: Vent til oracle er oppe
         id: vent-til-oracle-er-klar
