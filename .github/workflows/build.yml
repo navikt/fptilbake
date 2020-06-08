@@ -54,21 +54,7 @@ jobs:
         id: vent-til-oracle-er-klar
         shell: bash
         run: |
-          ventet_sekunder=0
-          until [[ -f start-oracle.status ]] || [[ $ventet_sekunder -eq 180 ]]
-          do
-              echo "Oracle er ikke oppe enda, venter..."
-              sleep 1
-          done
-          if [ -f start-oracle.status ]
-          then
-              cat start-oracle.status
-              echo "Oracle er ferdig med oppstart"
-          else
-              echo "Timout ved venting på Oracle"
-          fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+          vent-til-oracle-er-klar.sh
 
       - name: Migrer database
         env:
