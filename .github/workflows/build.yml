@@ -77,7 +77,6 @@ jobs:
         shell: bash
         run: |
           echo "Migrerer database"
-          export MAVEN_OPTS="-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
           mvn exec:java -pl migreringer --quiet --batch-mode --settings ./.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION}
 
       - name: Build artifacts & deploy (inkl test)
@@ -88,7 +87,6 @@ jobs:
         shell: bash
         run: |
           echo "Building artifacts $BUILD_VERSION"
-          export MAVEN_OPTS="-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
           mvn install --quiet -e --batch-mode --settings ./.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION} -Dfile.encoding=UTF-8 -Pgithub
           echo "Build artifacts"
           echo "::set-env name=TAG::$(mvn help:evaluate --batch-mode --settings ./.m2/settings.xml --file .flattened -Dexpression=project.version -q -DforceStdout)"
