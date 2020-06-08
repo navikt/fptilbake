@@ -52,7 +52,7 @@ jobs:
         run: |
           oracle/vent-til-oracle-er-klar.sh
 
-      - name: Migrer database
+      - name: Migrer databasen
         env:
           GITHUB_USERNAME: x-access-token
           GITHUB_PASSWORD: ${{ secrets.GITHUB_ACCESS_TOKEN }}
