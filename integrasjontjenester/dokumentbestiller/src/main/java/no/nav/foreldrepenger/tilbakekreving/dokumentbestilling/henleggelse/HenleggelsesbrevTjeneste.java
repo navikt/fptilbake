@@ -94,7 +94,7 @@ public class HenleggelsesbrevTjeneste {
         Språkkode språkkode = hentSpråkkode(behandlingId);
         Optional<VergeEntitet> vergeEntitet = vergeRepository.finnVergeInformasjon(behandlingId);
         boolean finnesVerge = vergeEntitet.isPresent();
-        String vergeNavn = BrevMottaker.VERGE.equals(brevMottaker) ? vergeEntitet.get().getNavn() : "";
+        String vergeNavn = finnesVerge ? vergeEntitet.get().getNavn() : "";
 
         //Henter data fra tps
         YtelseNavn ytelseNavn = eksternDataForBrevTjeneste.hentYtelsenavn(fagsakYtelseType, språkkode);

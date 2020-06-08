@@ -147,7 +147,7 @@ public class ManueltVarselBrevTjeneste {
         //sjekker om behandlingen har verge
         Optional<VergeEntitet> vergeEntitet = vergeRepository.finnVergeInformasjon(behandling.getId());
         boolean finnesVerge = vergeEntitet.isPresent();
-        String vergeNavn = BrevMottaker.VERGE.equals(brevMottaker) ? vergeEntitet.get().getNavn() : null;
+        String vergeNavn = finnesVerge ? vergeEntitet.get().getNavn() : "";
 
         //Henter data fra tps
         Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(behandling.getAktørId().getId());

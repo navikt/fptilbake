@@ -137,7 +137,7 @@ public class VarselbrevTjeneste {
 
         Optional<VergeEntitet> vergeEntitet = vergeRepository.finnVergeInformasjon(behandlingId);
         boolean finnesVerge = vergeEntitet.isPresent();
-        String vergeNavn = BrevMottaker.VERGE.equals(brevMottaker) ? vergeEntitet.get().getNavn() : "";
+        String vergeNavn = finnesVerge ? vergeEntitet.get().getNavn() : "";
 
         //Henter data fra fptilbakes eget repo for å finne behandlingsid brukt i fpsak, samt saksnummer
         EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandlingId);
