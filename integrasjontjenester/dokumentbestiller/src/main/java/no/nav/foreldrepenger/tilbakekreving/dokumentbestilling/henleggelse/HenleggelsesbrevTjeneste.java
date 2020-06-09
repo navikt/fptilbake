@@ -113,13 +113,13 @@ public class HenleggelsesbrevTjeneste {
             .medSaksnummer(behandling.getFagsak().getSaksnummer().getVerdi())
             .medSakspartNavn(personinfo.getNavn())
             .medVergeNavn(vergeNavn)
+            .medFinnesVerge(finnesVerge)
             .medTittel(TITTEL_HENLEGGELSESBREV)
             .build();
 
         HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = new HenleggelsesbrevSamletInfo();
         henleggelsesbrevSamletInfo.setBrevMetadata(metadata);
         henleggelsesbrevSamletInfo.setVarsletDato(brevSporing.get().getOpprettetTidspunkt().toLocalDate());
-        henleggelsesbrevSamletInfo.setFinnesVerge(finnesVerge);
         return henleggelsesbrevSamletInfo;
     }
 

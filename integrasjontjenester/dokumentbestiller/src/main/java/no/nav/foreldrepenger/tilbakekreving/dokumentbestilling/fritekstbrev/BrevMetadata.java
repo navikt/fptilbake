@@ -8,6 +8,7 @@ public class BrevMetadata {
 
     private String sakspartId;
     private String sakspartNavn;
+    private boolean finnesVerge;
     private String vergeNavn;
     private Adresseinfo mottakerAdresse;
 
@@ -33,6 +34,10 @@ public class BrevMetadata {
 
     public String getSakspartNavn() {
         return sakspartNavn;
+    }
+
+    public boolean isFinnesVerge() {
+        return finnesVerge;
     }
 
     public String getVergeNavn() {
@@ -81,6 +86,11 @@ public class BrevMetadata {
 
         public Builder medSakspartNavn(String sakspartNavn) {
             this.metadata.sakspartNavn = sakspartNavn;
+            return this;
+        }
+
+        public Builder medFinnesVerge(boolean finnesVerge) {
+            this.metadata.finnesVerge = finnesVerge;
             return this;
         }
 

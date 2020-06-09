@@ -10,7 +10,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkko
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.HandlebarsData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.LocalDateTilLangtNorskFormatSerialiserer;
-import no.nav.vedtak.util.Objects;
 
 public class HbVedtaksbrevFelles implements HandlebarsData {
 
@@ -30,6 +29,10 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
     private String fritekstOppsummering;
     @JsonProperty("behandling")
     private HbBehandling behandling;
+    @JsonProperty("finnesVerge")
+    private boolean finnesVerge;
+    @JsonProperty("annenMottakerNavn")
+    private String annenMottakerNavn;
     private Språkkode språkkode = Språkkode.nb;
 
     private HbVedtaksbrevDatoer datoer;
@@ -56,6 +59,14 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
 
     public HbBehandling getBehandling() {
         return behandling;
+    }
+
+    public boolean isFinnesVerge() {
+        return finnesVerge;
+    }
+
+    public String getAnnenMottakerNavn() {
+        return annenMottakerNavn;
     }
 
     @Override
@@ -99,13 +110,16 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
         }
 
         public HbVedtaksbrevFelles build() {
-            Objects.check(kladd.hjemmel != null, "hjemmel er ikke satt");
-            Objects.check(kladd.søker != null, "søker er ikke satt");
-            Objects.check(kladd.sak != null, "sak-informasjon er ikke satt");
-            Objects.check(kladd.konfigurasjon != null, "konfigurasjon er ikke satt");
-            Objects.check(kladd.totalresultat != null, "totalresultat er ikke satt");
+            java.util.Objects.requireNonNull(kladd.hjemmel, "hjemmel er ikke satt");
+            java.util.Objects.requireNonNull(kladd.søker, "søker er ikke satt");
+            java.util.Objects.requireNonNull(kladd.sak, "sak-informasjon er ikke satt");
+            java.util.Objects.requireNonNull(kladd.konfigurasjon, "konfigurasjon er ikke satt");
+            java.util.Objects.requireNonNull(kladd.totalresultat, "totalresultat er ikke satt");
             if (kladd.varsel == null) {
-                Objects.check(kladd.sak.harDatoForFagsakvedtak(), "dato for fagsakvedtak/revurdering er ikke satt");
+                java.util.Objects.requireNonNull(kladd.sak.harDatoForFagsakvedtak(), "dato for fagsakvedtak/revurdering er ikke satt");
+            }
+            if(kladd.finnesVerge){
+                java.util.Objects.requireNonNull(kladd.annenMottakerNavn, "annenMottakerNavn kan ikke være null");
             }
             return kladd;
         }
@@ -159,6 +173,16 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
 
         public Builder medSpråkkode(Språkkode språkkode) {
             kladd.språkkode = språkkode;
+            return this;
+        }
+
+        public Builder medFinnesVerge(boolean finnesVerge) {
+            kladd.finnesVerge = finnesVerge;
+            return this;
+        }
+
+        public Builder medAnnenMottakerNavn(String annenMottakerNavn) {
+            kladd.annenMottakerNavn = annenMottakerNavn;
             return this;
         }
     }

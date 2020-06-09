@@ -6,6 +6,7 @@ import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottakerUtil;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.TekstformatererBrevFeil;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.FellesTekstformaterer;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.OverskriftBrevData;
@@ -52,6 +53,8 @@ class TekstformatererInnhentDokumentasjonbrev extends FellesTekstformaterer {
         innhentDokumentasjonBrevDokument.setFagsaktypeNavn(innhentDokumentasjonBrevSamletInfo.getBrevMetadata().getFagsaktypenavnPåSpråk());
         innhentDokumentasjonBrevDokument.setFritekstFraSaksbehandler(innhentDokumentasjonBrevSamletInfo.getFritekstFraSaksbehandler());
         innhentDokumentasjonBrevDokument.setFristDato(innhentDokumentasjonBrevSamletInfo.getFristDato());
+        innhentDokumentasjonBrevDokument.setFinnesVerge(innhentDokumentasjonBrevSamletInfo.getBrevMetadata().isFinnesVerge());
+        innhentDokumentasjonBrevDokument.setAnnenMottakerNavn(BrevMottakerUtil.getAnnenMottakerNavn(innhentDokumentasjonBrevSamletInfo.getBrevMetadata()));
 
         innhentDokumentasjonBrevDokument.valider();
         return innhentDokumentasjonBrevDokument;

@@ -1,7 +1,12 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.innhentdokumentasjon;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 import java.time.Period;
 
@@ -13,6 +18,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingM
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjenesteImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.DokumentBestillerTestOppsett;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
@@ -30,7 +36,7 @@ public class InnhentDokumentasjonbrevTaskTest extends DokumentBestillerTestOppse
         mockInnhentDokumentasjonbrevTjeneste = mock(InnhentDokumentasjonbrevTjeneste.class);
         behandlingskontrollTjeneste = new BehandlingskontrollTjenesteImpl(repositoryProvider, mockBehandlingModellRepository, null);
 
-        innhentDokumentasjonBrevTask = new InnhentDokumentasjonbrevTask(behandlingRepository,
+        innhentDokumentasjonBrevTask = new InnhentDokumentasjonbrevTask(repositoryProvider,
             mockInnhentDokumentasjonbrevTjeneste,
             behandlingskontrollTjeneste,
             Period.ofWeeks(3));
@@ -45,5 +51,19 @@ public class InnhentDokumentasjonbrevTaskTest extends DokumentBestillerTestOppse
         innhentDokumentasjonBrevTask.doTask(prosessTaskData);
         assertThat(behandling.isBehandlingPåVent()).isTrue();
         assertThat(behandling.getVenteårsak()).isEqualByComparingTo(Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING);
+    }
+
+    @Test
+    public void skal_sende_innhent_dokumentasjonbrev_og_sett_behandling_på_vent_når_verge_finnes() {
+        ProsessTaskData prosessTaskData = new ProsessTaskData(InnhentDokumentasjonbrevTask.TASKTYPE);
+        prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
+        prosessTaskData.setPayload("Ber om flere opplysninger");
+
+        vergeRepository.lagreVergeInformasjon(behandling.getId(), lagVerge());
+
+        innhentDokumentasjonBrevTask.doTask(prosessTaskData);
+        assertThat(behandling.isBehandlingPåVent()).isTrue();
+        assertThat(behandling.getVenteårsak()).isEqualByComparingTo(Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING);
+        verify(mockInnhentDokumentasjonbrevTjeneste, atLeast(2)).sendInnhentDokumentasjonBrev(anyLong(), anyString(), any(BrevMottaker.class));
     }
 }

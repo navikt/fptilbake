@@ -45,12 +45,12 @@ public class TekstformatererHenleggelsesbrevTest {
             .medMottakerAdresse(lagAdresseInfo())
             .medSakspartNavn("Test")
             .medVergeNavn("John Doe")
+            .medFinnesVerge(true)
             .build();
 
         HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = new HenleggelsesbrevSamletInfo();
         henleggelsesbrevSamletInfo.setBrevMetadata(brevMetadata);
         henleggelsesbrevSamletInfo.setVarsletDato(niendeMars);
-        henleggelsesbrevSamletInfo.setFinnesVerge(true);
         String generertBrev = TekstformatererHenleggelsesbrev.lagHenleggelsebrevFritekst(henleggelsesbrevSamletInfo);
         String fasit = les("/henleggelsesbrev/henleggelsesbrev.txt");
         String vergeTekst = les("/varselbrev/nb/verge.txt");
