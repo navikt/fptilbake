@@ -14,7 +14,6 @@ public class VarselbrevSamletInfo {
     private LocalDate fristdato;
     private BrevMetadata brevMetadata;
     private LocalDate revurderingVedtakDato;
-    private boolean finnesVerge;
 
     private VarselbrevSamletInfo() {
 
@@ -44,10 +43,6 @@ public class VarselbrevSamletInfo {
         return revurderingVedtakDato;
     }
 
-    public boolean isFinnesVerge() {
-        return finnesVerge;
-    }
-
     public static class Builder {
 
         private VarselbrevSamletInfo varselbrev = new VarselbrevSamletInfo();
@@ -74,11 +69,6 @@ public class VarselbrevSamletInfo {
 
         public Builder medFristdato(LocalDate fristdato) {
             this.varselbrev.fristdato = fristdato;
-            return this;
-        }
-
-        public Builder medFinnesVerge(boolean finnesVerge) {
-            this.varselbrev.finnesVerge = finnesVerge;
             return this;
         }
 

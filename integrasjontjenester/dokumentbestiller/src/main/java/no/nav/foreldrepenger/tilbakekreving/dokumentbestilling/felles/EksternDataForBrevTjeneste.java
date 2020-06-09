@@ -92,14 +92,6 @@ public class EksternDataForBrevTjeneste {
         return personinfo.get();
     }
 
-    public Adresseinfo hentAdresse(Personinfo personinfo, String aktørId) {
-        Optional<Adresseinfo> adresseinfo = Optional.of(personinfo).map(s -> tpsTjeneste.hentAdresseinformasjon(s.getPersonIdent()));
-        if (!adresseinfo.isPresent()) {
-            throw EksternDataForBrevFeil.FACTORY.fantIkkeAdresseForAktørId(aktørId).toException();
-        }
-        return adresseinfo.get();
-    }
-
     public Adresseinfo hentAdresse(Personinfo personinfo, BrevMottaker brevMottaker, Optional<VergeEntitet> vergeEntitet) {
         String aktørId = personinfo.getAktørId().getId();
         if(vergeEntitet.isPresent()){
@@ -112,6 +104,14 @@ public class EksternDataForBrevTjeneste {
             }
         }
         return hentAdresse(personinfo,aktørId);
+    }
+
+    private Adresseinfo hentAdresse(Personinfo personinfo, String aktørId) {
+        Optional<Adresseinfo> adresseinfo = Optional.of(personinfo).map(s -> tpsTjeneste.hentAdresseinformasjon(s.getPersonIdent()));
+        if (!adresseinfo.isPresent()) {
+            throw EksternDataForBrevFeil.FACTORY.fantIkkeAdresseForAktørId(aktørId).toException();
+        }
+        return adresseinfo.get();
     }
 
     private Adresseinfo hentOrganisasjonAdresse(String organisasjonNummer, String vergeNavn, Personinfo personinfo) {

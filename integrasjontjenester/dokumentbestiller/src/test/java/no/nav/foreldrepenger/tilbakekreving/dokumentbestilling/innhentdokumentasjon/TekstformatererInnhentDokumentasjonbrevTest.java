@@ -10,16 +10,20 @@ import java.util.Scanner;
 
 import org.junit.Test;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.AdresseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 
-public class TekstformatererInnhentDokumentasjonbrevTest {
+public class TekstformatererInnhentDokumentasjonbrevTest  {
 
     @Test
     public void skal_generere_innhentdokumentasjonbrev() throws Exception {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
             .medFagsaktypenavnPåSpråk("foreldrepenger")
             .medSprakkode(Språkkode.nb)
+            .medMottakerAdresse(lagStandardNorskAdresse())
             .build();
 
         InnhentDokumentasjonbrevSamletInfo innhentDokumentasjonBrevSamletInfo = InnhentDokumentasjonbrevSamletInfo.builder()
@@ -33,10 +37,33 @@ public class TekstformatererInnhentDokumentasjonbrevTest {
     }
 
     @Test
+    public void skal_generere_innhentdokumentasjonbrev_for_verge() throws Exception {
+        BrevMetadata brevMetadata = new BrevMetadata.Builder()
+            .medFagsaktypenavnPåSpråk("foreldrepenger")
+            .medSprakkode(Språkkode.nb)
+            .medMottakerAdresse(lagStandardNorskAdresse())
+            .medSakspartNavn("Test")
+            .medVergeNavn("John Doe")
+            .medFinnesVerge(true)
+            .build();
+
+        InnhentDokumentasjonbrevSamletInfo innhentDokumentasjonBrevSamletInfo = InnhentDokumentasjonbrevSamletInfo.builder()
+            .medBrevMetaData(brevMetadata)
+            .medFritekstFraSaksbehandler("Dette er ein fritekst.")
+            .medFristDato(LocalDate.of(2020, 3, 2))
+            .build();
+        String generertBrev = TekstformatererInnhentDokumentasjonbrev.lagInnhentDokumentasjonBrevFritekst(innhentDokumentasjonBrevSamletInfo);
+        String fasit = les("/innhentdokumentasjonbrev/innhentdokumentasjonbrev.txt");;
+        String vergeTekst = les("/varselbrev/nb/verge.txt");
+        assertThat(generertBrev).isEqualToNormalizingNewlines(fasit+"\n"+"\n"+ vergeTekst);
+    }
+
+    @Test
     public void skal_generere_innhentdokumentasjonbrev_nynorsk() throws Exception {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
             .medFagsaktypenavnPåSpråk("foreldrepenger")
             .medSprakkode(Språkkode.nn)
+            .medMottakerAdresse(lagStandardNorskAdresse())
             .build();
 
         InnhentDokumentasjonbrevSamletInfo innhentDokumentasjonBrevSamletInfo = InnhentDokumentasjonbrevSamletInfo.builder()
@@ -85,5 +112,18 @@ public class TekstformatererInnhentDokumentasjonbrevTest {
             scanner.useDelimiter("\\A");
             return scanner.hasNext() ? scanner.next() : null;
         }
+    }
+
+    private Adresseinfo lagStandardNorskAdresse() {
+        return new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE,
+            new PersonIdent("12345678901"),
+            "Test", null)
+            .medAdresselinje1("adresselinje 1")
+            .medAdresselinje2("adresselinje 2")
+            .medAdresselinje3("adresselinje 3")
+            .medLand("NOR")
+            .medPostNr("0688")
+            .medPoststed("OSLO")
+            .build();
     }
 }

@@ -274,6 +274,7 @@ public class TekstformatererVarselbrevTest {
             .medMottakerAdresse(lagAdresseInfo())
             .medSakspartNavn("Test")
             .medVergeNavn("John Doe")
+            .medFinnesVerge(true)
             .build();
 
         VarselbrevSamletInfo varselbrevSamletInfo = new VarselbrevSamletInfo.Builder()
@@ -283,7 +284,6 @@ public class TekstformatererVarselbrevTest {
             .medFristdato(FRIST_DATO)
             .medRevurderingVedtakDato(REVURDERING_VEDTAK_DATO)
             .medMetadata(metadata)
-            .medFinnesVerge(true)
             .build();
 
         String generertBrev = TekstformatererVarselbrev.lagVarselbrevFritekst(varselbrevSamletInfo);

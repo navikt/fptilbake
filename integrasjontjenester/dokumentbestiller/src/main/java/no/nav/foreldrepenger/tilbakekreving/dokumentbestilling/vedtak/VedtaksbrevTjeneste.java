@@ -41,6 +41,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.Ved
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.VergeRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
@@ -65,6 +67,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.V
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Avsnitt;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.HentForhåndvisningVedtaksbrevPdfDto;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.PeriodeMedTekstDto;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottakerUtil;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.EksternDataForBrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.YtelseNavn;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
@@ -97,6 +101,7 @@ import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagT
 public class VedtaksbrevTjeneste {
 
     private static final String TITTEL_VEDTAKSBREV_HISTORIKKINNSLAG = "Vedtaksbrev Tilbakekreving";
+    private static final String TITTEL_VEDTAKSBREV_HISTORIKKINNSLAG_TIL_VERGE = "Vedtaksbrev Tilbakekreving til verge";
     private static final String TITTEL_VEDTAK_TILBAKEBETALING = "Vedtak tilbakebetaling ";
     private static final String TITTEL_VEDTAK_INGEN_TILBAKEBETALING = "Vedtak ingen tilbakebetaling ";
     private static final int KLAGEFRIST_UKER = 6;
@@ -110,6 +115,7 @@ public class VedtaksbrevTjeneste {
     private VilkårsvurderingRepository vilkårsvurderingRepository;
     private VedtaksbrevFritekstRepository vedtaksbrevFritekstRepository;
     private BrevSporingRepository brevSporingRepository;
+    private VergeRepository vergeRepository;
 
     private BehandlingTjeneste behandlingTjeneste;
     private FritekstbrevTjeneste bestillDokumentTjeneste;
@@ -136,6 +142,7 @@ public class VedtaksbrevTjeneste {
         this.vilkårsvurderingRepository = behandlingRepositoryProvider.getVilkårsvurderingRepository();
         this.vedtaksbrevFritekstRepository = behandlingRepositoryProvider.getVedtaksbrevFritekstRepository();
         this.brevSporingRepository = behandlingRepositoryProvider.getBrevSporingRepository();
+        this.vergeRepository = behandlingRepositoryProvider.getVergeRepository();
 
         this.behandlingTjeneste = behandlingTjeneste;
         this.bestillDokumentTjeneste = bestillDokumentTjeneste;
@@ -148,8 +155,8 @@ public class VedtaksbrevTjeneste {
     public VedtaksbrevTjeneste() {
     }
 
-    public void sendVedtaksbrev(Long behandlingId) {
-        VedtaksbrevData vedtaksbrevData = hentDataForVedtaksbrev(behandlingId);
+    public void sendVedtaksbrev(Long behandlingId, BrevMottaker brevMottaker) {
+        VedtaksbrevData vedtaksbrevData = hentDataForVedtaksbrev(behandlingId, brevMottaker);
         HbVedtaksbrevData hbVedtaksbrevData = vedtaksbrevData.getVedtaksbrevData();
         FritekstbrevData data = new FritekstbrevData.Builder()
             .medOverskrift(TekstformatererVedtaksbrev.lagVedtaksbrevOverskrift(hbVedtaksbrevData, vedtaksbrevData.getMetadata().getSpråkkode()))
@@ -162,7 +169,7 @@ public class VedtaksbrevTjeneste {
         JournalpostIdOgDokumentId dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data, vedleggReferanse);
 
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-        opprettHistorikkinnslag(behandling, dokumentreferanse);
+        opprettHistorikkinnslag(behandling, dokumentreferanse, brevMottaker);
         lagreInfoOmVedtaksbrev(behandlingId, dokumentreferanse);
     }
 
@@ -172,7 +179,8 @@ public class VedtaksbrevTjeneste {
     }
 
     public byte[] hentForhåndsvisningVedtaksbrevMedVedleggSomPdf(HentForhåndvisningVedtaksbrevPdfDto dto) {
-        VedtaksbrevData vedtaksbrevData = hentDataForVedtaksbrev(dto.getBehandlingId(), dto.getOppsummeringstekst(), dto.getPerioderMedTekst());
+        VedtaksbrevData vedtaksbrevData = hentDataForVedtaksbrev(dto.getBehandlingId(), dto.getOppsummeringstekst(),
+            dto.getPerioderMedTekst(),getBrevMottaker(dto.getBehandlingId()));
         HbVedtaksbrevData hbVedtaksbrevData = vedtaksbrevData.getVedtaksbrevData();
         FritekstbrevData data = new FritekstbrevData.Builder()
             .medOverskrift(TekstformatererVedtaksbrev.lagVedtaksbrevOverskrift(hbVedtaksbrevData, vedtaksbrevData.getMetadata().getSpråkkode()))
@@ -197,15 +205,21 @@ public class VedtaksbrevTjeneste {
     }
 
     public List<Avsnitt> hentForhåndsvisningVedtaksbrevSomTekst(Long behandlingId) {
-        VedtaksbrevData vedtaksbrevData = hentDataForVedtaksbrev(behandlingId);
+        VedtaksbrevData vedtaksbrevData = hentDataForVedtaksbrev(behandlingId,getBrevMottaker(behandlingId));
         HbVedtaksbrevData hbVedtaksbrevData = vedtaksbrevData.getVedtaksbrevData();
         String hovedoverskrift = TekstformatererVedtaksbrev.lagVedtaksbrevOverskrift(hbVedtaksbrevData, vedtaksbrevData.getMetadata().getSpråkkode());
         return TekstformatererVedtaksbrev.lagVedtaksbrevDeltIAvsnitt(hbVedtaksbrevData, hovedoverskrift);
     }
 
-    private void opprettHistorikkinnslag(Behandling behandling, JournalpostIdOgDokumentId dokumentreferanse) {
+    private BrevMottaker getBrevMottaker(Long behandlingId) {
+        return vergeRepository.finnesVerge(behandlingId) ? BrevMottaker.VERGE : BrevMottaker.BRUKER;
+    }
+
+    private void opprettHistorikkinnslag(Behandling behandling, JournalpostIdOgDokumentId dokumentreferanse, BrevMottaker brevMottaker) {
+        String tittel = BrevMottaker.VERGE.equals(brevMottaker) ? TITTEL_VEDTAKSBREV_HISTORIKKINNSLAG_TIL_VERGE
+            : TITTEL_VEDTAKSBREV_HISTORIKKINNSLAG;
         historikkinnslagTjeneste.opprettHistorikkinnslagForBrevsending(behandling, dokumentreferanse.getJournalpostId(),
-            dokumentreferanse.getDokumentId(), TITTEL_VEDTAKSBREV_HISTORIKKINNSLAG);
+            dokumentreferanse.getDokumentId(), tittel);
     }
 
     private void lagreInfoOmVedtaksbrev(Long behandlingId, JournalpostIdOgDokumentId dokumentreferanse) {
@@ -218,13 +232,15 @@ public class VedtaksbrevTjeneste {
         brevSporingRepository.lagre(brevSporing);
     }
 
-    public VedtaksbrevData hentDataForVedtaksbrev(Long behandlingId) {
+    public VedtaksbrevData hentDataForVedtaksbrev(Long behandlingId, BrevMottaker brevMottaker) {
         String fritekstOppsummering = hentOppsummeringFritekst(behandlingId);
         List<PeriodeMedTekstDto> fritekstPerioder = hentFriteksterTilPerioder(behandlingId);
-        return hentDataForVedtaksbrev(behandlingId, fritekstOppsummering, fritekstPerioder);
+        return hentDataForVedtaksbrev(behandlingId, fritekstOppsummering, fritekstPerioder, brevMottaker);
     }
 
-    public VedtaksbrevData hentDataForVedtaksbrev(Long behandlingId, String oppsummeringFritekst, List<PeriodeMedTekstDto> perioderFritekst) {
+    public VedtaksbrevData hentDataForVedtaksbrev(Long behandlingId, String oppsummeringFritekst,
+                                                  List<PeriodeMedTekstDto> perioderFritekst,
+                                                  BrevMottaker brevMottaker) {
         Behandling behandling = behandlingTjeneste.hentBehandling(behandlingId);
         //TODO hent data fra fpsak i tidligere steg, og hent fra repository her
         SamletEksternBehandlingInfo fpsakBehandling = hentDataFraFpsak(behandlingId);
@@ -257,6 +273,8 @@ public class VedtaksbrevTjeneste {
             .map(brp -> lagBrevdataPeriode(brp, fakta, vilkårPerioder, foreldelse, perioderFritekst))
             .collect(Collectors.toList());
 
+        BrevMetadata brevMetadata = lagMetadataForVedtaksbrev(behandling, vedtakResultatType, fpsakBehandling, personinfo , brevMottaker);
+
         HbVedtaksbrevFelles.Builder vedtakDataBuilder = HbVedtaksbrevFelles.builder()
             .medSak(HbSak.build()
                 .medYtelsetype(behandling.getFagsak().getFagsakYtelseType())
@@ -286,10 +304,12 @@ public class VedtaksbrevTjeneste {
                 .medPerioder(perioder)
                 .build())
             .medSøker(utledSøker(personinfo))
-            .medSpråkkode(språkkode);
+            .medSpråkkode(språkkode)
+            .medFinnesVerge(brevMetadata.isFinnesVerge())
+            .medAnnenMottakerNavn(BrevMottakerUtil.getAnnenMottakerNavn(brevMetadata));
 
         HbVedtaksbrevData data = new HbVedtaksbrevData(vedtakDataBuilder.build(), perioder);
-        BrevMetadata brevMetadata = lagMetadataForVedtaksbrev(behandling, vedtakResultatType, fpsakBehandling, personinfo);
+
         return new VedtaksbrevData(data, brevMetadata);
     }
 
@@ -345,12 +365,17 @@ public class VedtaksbrevTjeneste {
         return varselInfo.map(VarselInfo::getVarselBeløp).orElse(null);
     }
 
-    BrevMetadata lagMetadataForVedtaksbrev(Behandling behandling, VedtakResultatType vedtakResultatType, SamletEksternBehandlingInfo eksternBehandlingsinfo, Personinfo personinfo) {
-        String aktørId = eksternBehandlingsinfo.getPersonopplysninger().getAktoerId();
+    BrevMetadata lagMetadataForVedtaksbrev(Behandling behandling, VedtakResultatType vedtakResultatType,
+                                           SamletEksternBehandlingInfo eksternBehandlingsinfo, Personinfo personinfo,
+                                           BrevMottaker brevMottaker) {
         FagsakYtelseType fagsakType = behandling.getFagsak().getFagsakYtelseType();
         Språkkode språkkode = eksternBehandlingsinfo.getGrunninformasjon().getSpråkkodeEllerDefault();
 
-        Adresseinfo adresseinfo = eksternDataForBrevTjeneste.hentAdresse(personinfo, aktørId);
+        Optional<VergeEntitet> vergeEntitet = vergeRepository.finnVergeInformasjon(behandling.getId());
+        boolean finnesVerge = vergeEntitet.isPresent();
+        String vergeNavn = finnesVerge ? vergeEntitet.get().getNavn() : "";
+
+        Adresseinfo adresseinfo = eksternDataForBrevTjeneste.hentAdresse(personinfo,brevMottaker,vergeEntitet);
         YtelseNavn ytelseNavn = eksternDataForBrevTjeneste.hentYtelsenavn(fagsakType, språkkode);
 
         boolean tilbakekreves = VedtakResultatType.FULL_TILBAKEBETALING.equals(vedtakResultatType) ||
@@ -368,6 +393,8 @@ public class VedtaksbrevTjeneste {
             .medSakspartNavn(personinfo.getNavn())
             .medSprakkode(eksternBehandlingsinfo.getGrunninformasjon().getSpråkkodeEllerDefault())
             .medTittel(finnTittelVedtaksbrev(ytelseNavn.getNavnPåBokmål(), tilbakekreves))
+            .medFinnesVerge(finnesVerge)
+            .medVergeNavn(vergeNavn)
             .build();
     }
 

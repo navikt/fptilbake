@@ -2,6 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.innhentdokumenta
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -18,8 +19,11 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.Bre
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.VergeRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.EksternDataForBrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.YtelseNavn;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
@@ -33,11 +37,12 @@ import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagT
 public class InnhentDokumentasjonbrevTjeneste {
 
     public static final String TITTEL_INNHENTDOKUMENTASJONBREV_HISTORIKKINNSLAG = "Innhent dokumentasjon Tilbakekreving";
-    private static final String TITTEL_INNHENTDOKUMENTASJONBREV_DOKPROD = "Innhent dokumentasjon tilbakekreving ";
+    public static final String TITTEL_INNHENTDOKUMENTASJONBREV_HISTORIKKINNSLAG_TIL_VERGE = "Innhent dokumentasjon Tilbakekreving til verge";
 
     private BehandlingRepository behandlingRepository;
     private EksternBehandlingRepository eksternBehandlingRepository;
     private BrevSporingRepository brevSporingRepository;
+    private VergeRepository vergeRepository;
 
     private FritekstbrevTjeneste bestillDokumentTjeneste;
     private EksternDataForBrevTjeneste eksternDataForBrevTjeneste;
@@ -55,27 +60,28 @@ public class InnhentDokumentasjonbrevTjeneste {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
         this.brevSporingRepository = repositoryProvider.getBrevSporingRepository();
+        this.vergeRepository = repositoryProvider.getVergeRepository();
 
         this.bestillDokumentTjeneste = fritekstbrevTjeneste;
         this.eksternDataForBrevTjeneste = eksternDataForBrevTjeneste;
         this.historikkinnslagTjeneste = historikkinnslagTjeneste;
     }
 
-    public void sendInnhentDokumentasjonBrev(Long behandlingId, String fritekst) {
+    public void sendInnhentDokumentasjonBrev(Long behandlingId, String fritekst, BrevMottaker brevMottaker) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
 
-        InnhentDokumentasjonbrevSamletInfo innhentDokumentasjonBrevSamletInfo = settOppInnhentDokumentasjonBrevSamletInfo(behandling, fritekst);
+        InnhentDokumentasjonbrevSamletInfo innhentDokumentasjonBrevSamletInfo = settOppInnhentDokumentasjonBrevSamletInfo(behandling, fritekst, brevMottaker);
         FritekstbrevData fritekstbrevData = lagInnhentDokumentasjonBrev(innhentDokumentasjonBrevSamletInfo);
 
         JournalpostIdOgDokumentId dokumentReferanse = bestillDokumentTjeneste.sendFritekstbrev(fritekstbrevData);
-        opprettHistorikkinnslag(behandling, dokumentReferanse, TITTEL_INNHENTDOKUMENTASJONBREV_HISTORIKKINNSLAG);
+        opprettHistorikkinnslag(behandling, dokumentReferanse, getTittel(brevMottaker));
         lagreInfoOmInnhentDokumentasjonBrev(behandlingId, dokumentReferanse);
     }
 
     public byte[] hentForhåndsvisningInnhentDokumentasjonBrev(Long behandlingId, String fritekst) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-
-        InnhentDokumentasjonbrevSamletInfo dokumentasjonBrevSamletInfo = settOppInnhentDokumentasjonBrevSamletInfo(behandling, fritekst);
+        BrevMottaker brevMottaker = vergeRepository.finnesVerge(behandlingId) ? BrevMottaker.VERGE : BrevMottaker.BRUKER;
+        InnhentDokumentasjonbrevSamletInfo dokumentasjonBrevSamletInfo = settOppInnhentDokumentasjonBrevSamletInfo(behandling, fritekst, brevMottaker);
         FritekstbrevData fritekstbrevData = lagInnhentDokumentasjonBrev(dokumentasjonBrevSamletInfo);
         return bestillDokumentTjeneste.hentForhåndsvisningFritekstbrev(fritekstbrevData);
     }
@@ -90,10 +96,16 @@ public class InnhentDokumentasjonbrevTjeneste {
             .build();
     }
 
-    private InnhentDokumentasjonbrevSamletInfo settOppInnhentDokumentasjonBrevSamletInfo(Behandling behandling, String fritekst) {
-        String aktørId = behandling.getAktørId().getId();
-        Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(aktørId);
-        Adresseinfo adresseinfo = eksternDataForBrevTjeneste.hentAdresse(personinfo, aktørId);
+    private InnhentDokumentasjonbrevSamletInfo settOppInnhentDokumentasjonBrevSamletInfo(Behandling behandling,
+                                                                                         String fritekst,
+                                                                                         BrevMottaker brevMottaker) {
+        //verge
+        Optional<VergeEntitet> vergeEntitet = vergeRepository.finnVergeInformasjon(behandling.getId());
+        boolean finnesVerge = vergeEntitet.isPresent();
+        String vergeNavn = finnesVerge ? vergeEntitet.get().getNavn() : "";
+
+        Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(behandling.getAktørId().getId());
+        Adresseinfo adresseinfo = eksternDataForBrevTjeneste.hentAdresse(personinfo, brevMottaker, vergeEntitet);
 
         Språkkode mottakersSpråkkode = hentSpråkkode(behandling.getId());
         FagsakYtelseType ytelseType = behandling.getFagsak().getFagsakYtelseType();
@@ -111,7 +123,9 @@ public class InnhentDokumentasjonbrevTjeneste {
             .medSprakkode(mottakersSpråkkode)
             .medFagsaktypenavnPåSpråk(ytelseNavn.getNavnPåBrukersSpråk())
             .medAnsvarligSaksbehandler(StringUtils.isNotEmpty(behandling.getAnsvarligSaksbehandler()) ? behandling.getAnsvarligSaksbehandler() : "VL")
-            .medTittel(TITTEL_INNHENTDOKUMENTASJONBREV_DOKPROD + ytelseNavn.getNavnPåBokmål())
+            .medTittel(getTittel(brevMottaker) + ytelseNavn.getNavnPåBokmål())
+            .medFinnesVerge(finnesVerge)
+            .medVergeNavn(vergeNavn)
             .build();
 
         return InnhentDokumentasjonbrevSamletInfo.builder()
@@ -143,5 +157,10 @@ public class InnhentDokumentasjonbrevTjeneste {
             .medBrevType(BrevType.INNHENT_DOKUMENTASJONBREV)
             .build();
         brevSporingRepository.lagre(brevSporing);
+    }
+
+    private String getTittel(BrevMottaker brevMottaker){
+      return BrevMottaker.VERGE.equals(brevMottaker) ? TITTEL_INNHENTDOKUMENTASJONBREV_HISTORIKKINNSLAG_TIL_VERGE
+            : TITTEL_INNHENTDOKUMENTASJONBREV_HISTORIKKINNSLAG;
     }
 }

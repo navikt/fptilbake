@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import java.time.Period;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -21,6 +22,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.DokumentBestillerTestOppsett;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.EksternDataForBrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevTjeneste;
@@ -59,7 +61,8 @@ public class InnhentDokumentasjonbrevTjenesteTest extends DokumentBestillerTestO
         Personinfo personinfo = byggStandardPerson("Fiona", DUMMY_FØDSELSNUMMER, Språkkode.nn);
         String aktørId = behandling.getAktørId().getId();
         when(mockEksternDataForBrevTjeneste.hentPerson(aktørId)).thenReturn(personinfo);
-        when(mockEksternDataForBrevTjeneste.hentAdresse(personinfo, aktørId)).thenReturn(lagStandardNorskAdresse());
+        when(mockEksternDataForBrevTjeneste.hentAdresse(any(Personinfo.class),any(BrevMottaker.class), any(Optional.class)))
+            .thenReturn(lagStandardNorskAdresse());
         when(mockEksternDataForBrevTjeneste.getBrukersSvarfrist()).thenReturn(Period.ofWeeks(2));
 
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto = new EksternBehandlingsinfoDto();
@@ -72,7 +75,7 @@ public class InnhentDokumentasjonbrevTjenesteTest extends DokumentBestillerTestO
 
     @Test
     public void skal_sende_innhent_dokumentasjonbrev() {
-        innhentDokumentasjonBrevTjeneste.sendInnhentDokumentasjonBrev(behandlingId, FLERE_OPPLYSNINGER);
+        innhentDokumentasjonBrevTjeneste.sendInnhentDokumentasjonBrev(behandlingId, FLERE_OPPLYSNINGER, BrevMottaker.BRUKER);
 
         List<BrevSporing> brevSporingsData = brevSporingRepository.hentBrevData(behandlingId, BrevType.INNHENT_DOKUMENTASJONBREV);
         assertThat(brevSporingsData.size()).isEqualTo(1);

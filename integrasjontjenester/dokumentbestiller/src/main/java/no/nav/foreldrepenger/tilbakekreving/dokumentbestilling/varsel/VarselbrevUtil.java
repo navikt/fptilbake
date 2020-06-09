@@ -53,6 +53,7 @@ public class VarselbrevUtil {
             .medMottakerAdresse(adresseinfo)
             .medSaksnummer(saksnummer.getVerdi())
             .medSakspartNavn(personinfo.getNavn())
+            .medFinnesVerge(finnesVerge)
             .medVergeNavn(vergeNavn)
             .medFagsaktypenavnPåSpråk(ytelseNavn.getNavnPåBrukersSpråk())
             .medFagsaktype(fagsakYtelseType)
@@ -68,7 +69,6 @@ public class VarselbrevUtil {
             .medFeilutbetaltePerioder(mapFeilutbetaltePerioder(feilutbetaltePerioderDto))
             .medFristdato(finnFristForTilbakemeldingFraBruker(LocalDateTime.now(), ventetid))
             .medRevurderingVedtakDato(grunninformasjon.getVedtakDato())
-            .medFinnesVerge(finnesVerge)
             .build();
     }
 
@@ -92,6 +92,7 @@ public class VarselbrevUtil {
             .medMottakerAdresse(adresseinfo)
             .medSaksnummer(saksnummer.getVerdi())
             .medSakspartNavn(eksternBehandlingsinfo.getPersonopplysninger().getNavn())
+            .medFinnesVerge(finnesVerge)
             .medVergeNavn(vergeNavn)
             .medFagsaktype(fagsakYtelseType)
             .medSprakkode(grunninformasjon.getSpråkkodeEllerDefault())
@@ -107,7 +108,6 @@ public class VarselbrevUtil {
             .medFeilutbetaltePerioder(mapFeilutbetaltePerioder(feilutbetaltePerioderDto))
             .medFristdato(finnFristForTilbakemeldingFraBruker(LocalDateTime.now(), ventetid))
             .medRevurderingVedtakDato(grunninformasjon.getVedtakDato())
-            .medFinnesVerge(finnesVerge)
             .build();
     }
 
@@ -132,6 +132,7 @@ public class VarselbrevUtil {
             .medMottakerAdresse(adresseinfo)
             .medSaksnummer(behandling.getFagsak().getSaksnummer().getVerdi())
             .medSakspartNavn(personinfo.getNavn())
+            .medFinnesVerge(finnesVerge)
             .medVergeNavn(vergeNavn)
             .medFagsaktype(fagsakYtelseType)
             .medSprakkode(språkkode)
@@ -147,7 +148,6 @@ public class VarselbrevUtil {
             .medFeilutbetaltePerioder(mapFeilutbetaltePerioder(feilutbetalingFakta))
             .medFristdato(finnFristForTilbakemeldingFraBruker(LocalDateTime.now(), ventetid))
             .medRevurderingVedtakDato(feilutbetalingFakta.getDatoForRevurderingsvedtak())
-            .medFinnesVerge(finnesVerge)
             .build();
     }
 
