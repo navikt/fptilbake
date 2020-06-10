@@ -6,10 +6,8 @@ import java.io.Writer;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -53,13 +51,12 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(FplosPubliserEventTask.class);
 
+    private ObjectMapper objectMapper = lagObjectMapper();
+
     private KravgrunnlagRepository grunnlagRepository;
     private BehandlingRepository behandlingRepository;
     private FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste;
     private FplosKafkaProducer fplosKafkaProducer;
-    private ObjectMapper objectMapper = new ObjectMapper();
-    private LocalDateTime kravgrunnlagManglerFristTid = null;
-    private String kravgrunnlagManglerAksjonspunktStatusKode = null;
 
     FplosPubliserEventTask() {
         // for CDI proxy
@@ -73,38 +70,34 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.faktaFeilutbetalingTjeneste = faktaFeilutbetalingTjeneste;
         this.fplosKafkaProducer = fplosKafkaProducer;
-
-        objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.registerModule(new Jdk8Module());
     }
 
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
         String eventName = prosessTaskData.getPropertyValue(PROPERTY_EVENT_NAME);
         Long behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
-        String fristTidVerdi = prosessTaskData.getPropertyValue(PROPERTY_KRAVGRUNNLAG_MANGLER_FRIST_TID);
-        kravgrunnlagManglerFristTid = fristTidVerdi != null ? LocalDateTime.parse(fristTidVerdi) : null;
-        kravgrunnlagManglerAksjonspunktStatusKode = prosessTaskData.getPropertyValue(PROPERTY_KRAVGRUNNLAG_MANGLER_AKSJONSPUNKT_STATUS_KODE);
+
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         Kravgrunnlag431 kravgrunnlag431 = grunnlagRepository.harGrunnlagForBehandlingId(behandlingId) ? grunnlagRepository.finnKravgrunnlag(behandlingId) : null;
         try {
-            fplosKafkaProducer.sendJsonMedNøkkel(behandling.getUuid().toString(), opprettEventJson(behandling, eventName, kravgrunnlag431));
+            fplosKafkaProducer.sendJsonMedNøkkel(behandling.getUuid().toString(), opprettEventJson(prosessTaskData, behandling, eventName, kravgrunnlag431));
             logger.info("Publiserer event:{} på kafka slik at f.eks fplos kan fordele oppgaven for videre behandling. BehandlingsId: {}", eventName, behandlingId);
         } catch (Exception e) {
             throw FplosPubliserEventTaskFeil.FACTORY.kanIkkePublisereFplosEventTilKafka(eventName, e).toException();
         }
     }
 
-    private String opprettEventJson(Behandling behandling, String eventName, Kravgrunnlag431 kravgrunnlag431) throws IOException {
-        TilbakebetalingBehandlingProsessEventDto behandlingProsessEventDto = getTilbakebetalingBehandlingProsessEventDto(behandling, eventName, kravgrunnlag431);
-        String jsonData = getJson(behandlingProsessEventDto);
-        logger.debug("Publiserer json data {} til Fplos for behandlingId={}", jsonData, behandling.getId());
-        return jsonData;
+    private String opprettEventJson(ProsessTaskData prosessTaskData, Behandling behandling, String eventName, Kravgrunnlag431 kravgrunnlag431) throws IOException {
+        TilbakebetalingBehandlingProsessEventDto behandlingProsessEventDto = getTilbakebetalingBehandlingProsessEventDto(prosessTaskData, behandling, eventName, kravgrunnlag431);
+        return getJson(behandlingProsessEventDto);
     }
 
-    public TilbakebetalingBehandlingProsessEventDto getTilbakebetalingBehandlingProsessEventDto(Behandling behandling, String eventName, Kravgrunnlag431 kravgrunnlag431) {
+    public TilbakebetalingBehandlingProsessEventDto getTilbakebetalingBehandlingProsessEventDto(ProsessTaskData prosessTaskData, Behandling behandling, String eventName, Kravgrunnlag431 kravgrunnlag431) {
         Fagsak fagsak = behandling.getFagsak();
         String saksnummer = fagsak.getSaksnummer().getVerdi();
+        String fristTidVerdi = prosessTaskData.getPropertyValue(PROPERTY_KRAVGRUNNLAG_MANGLER_FRIST_TID);
+        LocalDateTime kravgrunnlagManglerFristTid = fristTidVerdi != null ? LocalDateTime.parse(fristTidVerdi) : null;
+        String kravgrunnlagManglerAksjonspunktStatusKode = prosessTaskData.getPropertyValue(PROPERTY_KRAVGRUNNLAG_MANGLER_AKSJONSPUNKT_STATUS_KODE);
 
         Map<String, String> aksjonspunktKoderMedStatusListe = new HashMap<>();
         if (kravgrunnlagManglerFristTid != null) {
@@ -130,21 +123,22 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
             .medAksjonspunktKoderMedStatusListe(aksjonspunktKoderMedStatusListe)
             .medHref(String.format(DEFAULT_HREF, saksnummer, behandling.getId()))
             .medAnsvarligSaksbehandlerIdent(behandling.getAnsvarligSaksbehandler())
-            .medFørsteFeilutbetaling(hentFørsteFeilutbetalingDato(kravgrunnlag431))
+            .medFørsteFeilutbetaling(hentFørsteFeilutbetalingDato(kravgrunnlag431, kravgrunnlagManglerFristTid))
             .medFeilutbetaltBeløp(kravgrunnlag431 != null ? hentFeilutbetaltBeløp(behandling.getId()) : BigDecimal.ZERO)
             .build();
     }
 
-    private LocalDate hentFørsteFeilutbetalingDato(Kravgrunnlag431 kravgrunnlag431) {
+    private LocalDate hentFørsteFeilutbetalingDato(Kravgrunnlag431 kravgrunnlag431, LocalDateTime kravgrunnlagManglerFristTid) {
         if (kravgrunnlagManglerFristTid != null) {
             return kravgrunnlagManglerFristTid.toLocalDate();
         }
         if (kravgrunnlag431 == null) {
             return null;
         }
-        Optional<KravgrunnlagPeriode432> førstePeriode = kravgrunnlag431.getPerioder().stream()
-            .min(Comparator.comparing(KravgrunnlagPeriode432::getFom));
-        return førstePeriode.map(KravgrunnlagPeriode432::getFom).orElse(null);
+        return kravgrunnlag431.getPerioder().stream()
+            .map(KravgrunnlagPeriode432::getFom)
+            .min(LocalDate::compareTo)
+            .orElse(null);
     }
 
     private BigDecimal hentFeilutbetaltBeløp(Long behandlingId) {
@@ -156,6 +150,13 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
         objectMapper.writeValue(jsonWriter, behandlingProsessEventDto);
         jsonWriter.flush();
         return jsonWriter.toString();
+    }
+
+    private ObjectMapper lagObjectMapper() {
+        ObjectMapper om = new ObjectMapper();
+        om.registerModule(new JavaTimeModule());
+        om.registerModule(new Jdk8Module());
+        return om;
     }
 
 }
