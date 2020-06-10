@@ -259,8 +259,8 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
     }
 
     public List<ØkonomiXmlMottatt> finnAlleForHenvisning(Henvisning henvisning) {
-        TypedQuery<ØkonomiXmlMottatt> query = repoRule.getEntityManager().createQuery("from ØkonomiXmlMottatt where eksternBehandlingId=:eksternBehandlingId", ØkonomiXmlMottatt.class);
-        query.setParameter("eksternBehandlingId", henvisning.getVerdi());
+        TypedQuery<ØkonomiXmlMottatt> query = repoRule.getEntityManager().createQuery("from ØkonomiXmlMottatt where henvisning=:henvisning", ØkonomiXmlMottatt.class);
+        query.setParameter("henvisning", henvisning);
         return query.getResultList();
     }
 
