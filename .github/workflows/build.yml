@@ -37,8 +37,8 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: ~/.m2/repository
-          key: v2-${{ runner.os }}-maven-${{ hashFiles('pom.xml') }}
-          restore-keys: v2-${{ runner.os }}-maven-
+          key: v2-master-${{ runner.os }}-maven-${{ hashFiles('pom.xml') }}
+          restore-keys: v2-${{ runner.os }}-maven-${{ hashFiles('pom.xml') }}
 
       - name: Build (kompiler)
         env:
