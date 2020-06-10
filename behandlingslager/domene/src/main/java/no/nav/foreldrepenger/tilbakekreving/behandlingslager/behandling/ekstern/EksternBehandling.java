@@ -29,10 +29,6 @@ public class EksternBehandling extends BaseEntitet {
     @Column(name = "intern_id", nullable = false)
     private Long internId;
 
-    //TODO k9-tilbake fjern når henvisning er tatt i bruk
-    @Column(name = "ekstern_id", nullable = false)
-    private Long eksternId;
-
     @Convert(converter = BooleanToStringConverter.class)
     @Column(name = "aktiv", nullable = false)
     private Boolean aktiv = true;
@@ -53,7 +49,6 @@ public class EksternBehandling extends BaseEntitet {
         Objects.requireNonNull(eksternUuid, "eksternUuid");
 
         this.internId = behandling.getId();
-        this.eksternId = henvisning.toLong();
         this.henvisning = henvisning;
         this.eksternUuid = eksternUuid;
     }
@@ -70,11 +65,8 @@ public class EksternBehandling extends BaseEntitet {
         return aktiv;
     }
 
-    public Henvisning getHenvisning(){
-        if (henvisning != null){
-            return henvisning;
-        }
-        return Henvisning.fraEksternBehandlingId(eksternId);
+    public Henvisning getHenvisning() {
+        return henvisning;
     }
 
     public void deaktiver() {
@@ -103,7 +95,7 @@ public class EksternBehandling extends BaseEntitet {
         }
         EksternBehandling that = (EksternBehandling) object;
         return Objects.equals(internId, that.internId) &&
-                Objects.equals(getHenvisning(), that.getHenvisning());
+            Objects.equals(getHenvisning(), that.getHenvisning());
     }
 
     @Override

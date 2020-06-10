@@ -50,9 +50,8 @@ public class ØkonomiMottattXmlRepository {
     }
 
     public Optional<ØkonomiXmlMottatt> finnForHenvisning(Henvisning henvisning) {
-        //TODO k9-tilbake bytt kolonne når ferdigmigrert
-        TypedQuery<ØkonomiXmlMottatt> query = entityManager.createQuery("from ØkonomiXmlMottatt where eksternBehandlingId=:eksternBehandlingId", ØkonomiXmlMottatt.class);
-        query.setParameter("eksternBehandlingId", henvisning.getVerdi());
+        TypedQuery<ØkonomiXmlMottatt> query = entityManager.createQuery("from ØkonomiXmlMottatt where henvisning=:henvisning", ØkonomiXmlMottatt.class);
+        query.setParameter("henvisning", henvisning);
         return hentUniktResultat(query);
     }
 
@@ -115,9 +114,8 @@ public class ØkonomiMottattXmlRepository {
     }
 
     private Long finnHøyesteVersjonsnummer(Henvisning henvisning) {
-        //TODO k9-tilbake migrer kolonnenavn til 'henvisning'
-        Query query = entityManager.createNativeQuery("select max(sekvens) from oko_xml_mottatt where ekstern_behandling_id=:eksternBehandlingId");
-        query.setParameter("eksternBehandlingId", henvisning.getVerdi());
+        Query query = entityManager.createNativeQuery("select max(sekvens) from oko_xml_mottatt where henvisning=:henvisning");
+        query.setParameter("henvisning", henvisning.getVerdi());
         Object resultat = query.getSingleResult();
         return resultat != null ? ((BigDecimal) resultat).longValue() : null;
     }
