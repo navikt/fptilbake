@@ -12,6 +12,9 @@ import java.util.Map;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -46,6 +49,8 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
     public static final String PROPERTY_KRAVGRUNNLAG_MANGLER_AKSJONSPUNKT_STATUS_KODE = "kravgrunnlagManglerAksjonspunktStatusKode";
     public static final String DEFAULT_HREF = "/fpsak/fagsak/%s/behandling/%s/?punkt=default&fakta=default";
 
+    private static final Logger logger = LoggerFactory.getLogger(FplosPubliserEventTask.class);
+
     private ObjectMapper objectMapper = lagObjectMapper();
 
     private KravgrunnlagRepository grunnlagRepository;
@@ -76,6 +81,7 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
         Kravgrunnlag431 kravgrunnlag431 = grunnlagRepository.harGrunnlagForBehandlingId(behandlingId) ? grunnlagRepository.finnKravgrunnlag(behandlingId) : null;
         try {
             fplosKafkaProducer.sendJsonMedNøkkel(behandling.getUuid().toString(), opprettEventJson(prosessTaskData, behandling, eventName, kravgrunnlag431));
+            logger.info("Publiserer event:{} på kafka slik at f.eks fplos kan fordele oppgaven for videre behandling. BehandlingsId: {}", eventName, behandlingId);
         } catch (Exception e) {
             throw FplosPubliserEventTaskFeil.FACTORY.kanIkkePublisereFplosEventTilKafka(eventName, e).toException();
         }
