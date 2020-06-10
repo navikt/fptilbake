@@ -18,7 +18,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.revurde
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
@@ -185,12 +184,11 @@ public class HåndterGamleKravgrunnlagTjeneste {
 
     private long opprettBehandling(EksternBehandlingsinfoDto eksternBehandlingData) {
         UUID eksternBehandlingUuid = eksternBehandlingData.getUuid();
-        SamletEksternBehandlingInfo samletEksternBehandlingInfo = fpsakKlient.hentBehandlingsinfo(eksternBehandlingUuid, Tillegsinformasjon.FAGSAK, Tillegsinformasjon.PERSONOPPLYSNINGER);
+        SamletEksternBehandlingInfo samletEksternBehandlingInfo = fpsakKlient.hentBehandlingsinfo(eksternBehandlingUuid, Tillegsinformasjon.FAGSAK,
+            Tillegsinformasjon.PERSONOPPLYSNINGER);
         FagsakYtelseType fagsakYtelseType = samletEksternBehandlingInfo.getFagsak().getSakstype();
         Saksnummer saksnummer = samletEksternBehandlingInfo.getSaksnummer();
-        Henvisning henvisning = eksternBehandlingData.getHenvisning();
-        AktørId aktørId = samletEksternBehandlingInfo.getAktørId();
-        return behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer, eksternBehandlingUuid, henvisning, aktørId, fagsakYtelseType, BehandlingType.TILBAKEKREVING);
+        return behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternBehandlingUuid, fagsakYtelseType, BehandlingType.TILBAKEKREVING); //midlertidig fiks,endres til automatisk opprettelse
     }
 
     private void håndterGyldigkravgrunnlag(Long mottattXmlId, String saksnummer,
@@ -253,7 +251,7 @@ public class HåndterGamleKravgrunnlagTjeneste {
         boolean isEnabled = false;
         if (!Environment.current().isProd()) {
             isEnabled = true;
-        } else if (antallBehandlingOprettet < 0) {
+        } else if (antallBehandlingOprettet < 6) {
             logger.info("Antall behandling opprettet av batch-en er {}", antallBehandlingOprettet);
             isEnabled = true;
         }
