@@ -34,6 +34,7 @@ jobs:
         with:
           path: ~/.m2/repository
           key: v2-${{ runner.os }}-maven-${{ hashFiles('pom.xml') }}
+          restore-keys: v2-${{ runner.os }}-maven-
 
       - name: Build (kompiler)
         env:
