@@ -142,7 +142,11 @@ public class FpsakKlient {
     public List<EksternBehandlingsinfoDto> hentBehandlingForSaksnummer(String saksnummer) {
         URI endpoint = createUri(BEHANDLING_ALLE_EP, PARAM_NAME_SAKSNUMMER, saksnummer);
         JsonNode jsonNode = restClient.get(endpoint, JsonNode.class);
-        return lesResponsFraJsonNode(saksnummer, jsonNode);
+        List<EksternBehandlingsinfoDto> fpsakBehandlingInfoDto = lesResponsFraJsonNode(saksnummer, jsonNode);
+        for (EksternBehandlingsinfoDto dto : fpsakBehandlingInfoDto) {
+            dto.setHenvisning(Henvisning.fraEksternBehandlingId(dto.getId()));
+        }
+        return fpsakBehandlingInfoDto;
     }
 
     private List<EksternBehandlingsinfoDto> lesResponsFraJsonNode(String saksnummer, JsonNode jsonNode) {
