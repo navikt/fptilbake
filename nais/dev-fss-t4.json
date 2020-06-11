@@ -41,6 +41,7 @@
     "TILBAKEKREVING_BRUKERDIALOG_HENDELSE_V1_TOPIC_URL": "privat-tilbakekreving-brukerdialog-t4",
     "KAFKA_FPLOS_TOPIC": "privat-tilbakekreving-fploshendelse-v1-t4",
     "KAFKA_DVH_SAKSSTATISTIKK_TOPIC": "privat-tilbakekreving-dvh-saksstatistikk-v1",
-    "KAFKA_DVH_VEDTAK_TOPIC": "privat-tilbakekreving-dvh-vedtak-v1"
+    "KAFKA_DVH_VEDTAK_TOPIC": "privat-tilbakekreving-dvh-vedtak-v1",
+    "ORGANISASJON_V4_URL": "https://modapp-t4.adeo.no/ereg/ws/OrganisasjonService/v4"
   }
 }

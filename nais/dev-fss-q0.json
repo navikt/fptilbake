@@ -39,6 +39,7 @@
     "BOOTSTRAP_SERVERS": "b27apvl00045.preprod.local:8443,b27apvl00046.preprod.local:8443,b27apvl00047.preprod.local:8443",
     "FP_TILKJENTYTELSE_V1_TOPIC_URL": "privat-foreldrepenger-tilkjentytelse-v1-q0",
     "TILBAKEKREVING_BRUKERDIALOG_HENDELSE_V1_TOPIC_URL": "privat-tilbakekreving-brukerdialog-q0",
-    "KAFKA_FPLOS_TOPIC": "privat-tilbakekreving-fploshendelse-v1-q0"
+    "KAFKA_FPLOS_TOPIC": "privat-tilbakekreving-fploshendelse-v1-q0",
+    "ORGANISASJON_V4_URL": "https://modapp-q0.adeo.no/ereg/ws/OrganisasjonService/v4"
   }
 }
