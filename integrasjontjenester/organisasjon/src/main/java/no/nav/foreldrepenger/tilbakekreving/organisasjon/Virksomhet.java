@@ -10,7 +10,6 @@ public class Virksomhet {
     private String adresselinje1;
     private String adresselinje2;
     private String adresselinje3;
-    private String adresselinje4;
     private String landkode;
     private String postNr;
     private String poststed;
@@ -38,10 +37,6 @@ public class Virksomhet {
 
     public String getAdresselinje3() {
         return adresselinje3;
-    }
-
-    public String getAdresselinje4() {
-        return adresselinje4;
     }
 
     public String getLandkode() {
@@ -90,11 +85,6 @@ public class Virksomhet {
             this.mal = new Virksomhet();
         }
 
-        public Builder(Virksomhet virksomhet) {
-            this.mal = virksomhet;
-        }
-
-
         public Builder medOrgnr(String orgnr) {
 
             this.mal.orgnr = orgnr;
@@ -118,11 +108,6 @@ public class Virksomhet {
 
         public Builder medAdresselinje3(String adresselinje3) {
             this.mal.adresselinje3 = adresselinje3;
-            return this;
-        }
-
-        public Builder medAdresselinje4(String adresselinje4) {
-            this.mal.adresselinje4 = adresselinje4;
             return this;
         }
 

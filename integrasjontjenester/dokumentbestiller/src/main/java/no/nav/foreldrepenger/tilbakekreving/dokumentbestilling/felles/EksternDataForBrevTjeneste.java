@@ -27,8 +27,6 @@ import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehand
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.simulering.FeilutbetaltePerioderDto;
 import no.nav.foreldrepenger.tilbakekreving.organisasjon.Virksomhet;
 import no.nav.foreldrepenger.tilbakekreving.organisasjon.VirksomhetTjeneste;
-import no.nav.tjeneste.virksomhet.organisasjon.v4.binding.HentOrganisasjonOrganisasjonIkkeFunnet;
-import no.nav.tjeneste.virksomhet.organisasjon.v4.binding.HentOrganisasjonUgyldigInput;
 import no.nav.vedtak.konfig.KonfigVerdi;
 
 @ApplicationScoped
@@ -97,14 +95,8 @@ public class EksternDataForBrevTjeneste {
     }
 
     private Adresseinfo hentOrganisasjonAdresse(String organisasjonNummer, String vergeNavn, Personinfo personinfo) {
-        try {
-            Virksomhet virksomhet = virksomhetTjeneste.hentOrganisasjon(organisasjonNummer);
-            return fra(virksomhet, vergeNavn, personinfo);
-        } catch (HentOrganisasjonOrganisasjonIkkeFunnet e) {
-            throw EksternDataForBrevFeil.FACTORY.organisasjonIkkeFunnet(e).toException();
-        } catch (HentOrganisasjonUgyldigInput e) {
-            throw EksternDataForBrevFeil.FACTORY.ugyldigInput(e).toException();
-        }
+        Virksomhet virksomhet = virksomhetTjeneste.hentOrganisasjon(organisasjonNummer);
+        return fra(virksomhet, vergeNavn, personinfo);
     }
 
     public FeilutbetaltePerioderDto hentFeilutbetaltePerioder(Henvisning henvisning) {
@@ -131,7 +123,6 @@ public class EksternDataForBrevTjeneste {
         return adresseinfo.medAdresselinje1(virksomhet.getAdresselinje1())
             .medAdresselinje2(virksomhet.getAdresselinje2())
             .medAdresselinje3(virksomhet.getAdresselinje3())
-            .medAdresselinje4(virksomhet.getAdresselinje4())
             .medLand(virksomhet.getLandkode())
             .medPostNr(virksomhet.getPostNr())
             .medPoststed(virksomhet.getPoststed()).build();
