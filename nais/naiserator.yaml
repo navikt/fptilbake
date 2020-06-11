@@ -75,7 +75,7 @@ spec:
    - name: ABAC_ATTRIBUTT_DRIFT
      value: "no.nav.abac.attributter.foreldrepenger.drift"
    - name: APP_NAME
-     value: "fpsak"
+     value: "fptilbake"
    - name: APPDYNAMICS_CONTROLLER_HOST_NAME
      value: "appdynamics.adeo.no"
    - name: APPDYNAMICS_CONTROLLER_PORT
