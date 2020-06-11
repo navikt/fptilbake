@@ -78,7 +78,7 @@ public class FellesTestOppsett extends TestOppsett {
         behandlingskontrollProvider,
         fagsakTjeneste,
         mockHistorikkTjeneste,
-        mockFpsakKlient,
+        mockFagsystemKlient,
         defaultVentetid);
 
     protected TestUtility testUtility = new TestUtility(behandlingTjeneste);
@@ -88,9 +88,10 @@ public class FellesTestOppsett extends TestOppsett {
         aktørId = testUtility.genererAktørId();
         when(mockTpsTjeneste.hentBrukerForAktør(aktørId)).thenReturn(testUtility.lagPersonInfo(aktørId));
         EksternBehandlingsinfoDto behandlingsinfoDto = lagEksternBehandlingInfoDto();
-        when(mockFpsakKlient.hentBehandlingOptional(any(UUID.class))).thenReturn(Optional.of(behandlingsinfoDto));
-        when(mockFpsakKlient.hentBehandling(any(UUID.class))).thenReturn(behandlingsinfoDto);
-        when(mockFpsakKlient.hentBehandlingsinfo(any(UUID.class), any(Tillegsinformasjon.class))).thenReturn(lagSamletEksternBehandlingInfo(behandlingsinfoDto));
+        Optional<EksternBehandlingsinfoDto> optBehandlingsinfo = Optional.of(behandlingsinfoDto);
+        when(mockFagsystemKlient.hentBehandlingOptional(any(UUID.class))).thenReturn(optBehandlingsinfo);
+        when(mockFagsystemKlient.hentBehandling(any(UUID.class))).thenReturn(behandlingsinfoDto);
+        when(mockFagsystemKlient.hentBehandlingsinfo(any(UUID.class), any(Tillegsinformasjon.class))).thenReturn(lagSamletEksternBehandlingInfo(behandlingsinfoDto));
 
         TestUtility.SakDetaljer sakDetaljer = testUtility.opprettFørstegangsBehandling(aktørId);
         mapSakDetaljer(sakDetaljer);
@@ -163,7 +164,6 @@ public class FellesTestOppsett extends TestOppsett {
 
     private EksternBehandlingsinfoDto lagEksternBehandlingInfoDto() {
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto = new EksternBehandlingsinfoDto();
-        eksternBehandlingsinfoDto.setId(10001L); //TODO k9-tilbake denne er fp-spesifikk
         eksternBehandlingsinfoDto.setHenvisning(Henvisning.fraEksternBehandlingId(10001L));
         eksternBehandlingsinfoDto.setBehandlendeEnhetId(BEHANDLENDE_ENHET_ID);
         eksternBehandlingsinfoDto.setBehandlendeEnhetNavn(BEHANDLENDE_ENHET_NAVN);

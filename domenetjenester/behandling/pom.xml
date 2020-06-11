@@ -43,15 +43,11 @@
         </dependency>
         <dependency>
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
-            <artifactId>simulering</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
             <artifactId>behandling-gjenoppta</artifactId>
         </dependency>
         <dependency>
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
-            <artifactId>fpsak-klient</artifactId>
+            <artifactId>fagsystem-klient-api</artifactId>
         </dependency>
         <dependency>
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
@@ -65,6 +61,11 @@
         </dependency>
 
         <!-- Test -->
+        <dependency>
+            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+            <artifactId>fpsak-klient</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
             <artifactId>domene-testutilities</artifactId>

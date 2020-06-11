@@ -42,7 +42,7 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
     private HenleggBehandlingTjeneste henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repositoryProvider, prosessTaskRepository, behandlingskontrollTjeneste, historikkinnslagTjeneste);
     private KravVedtakStatusTjeneste kravVedtakStatusTjeneste = new KravVedtakStatusTjeneste(kravVedtakStatusRepository, prosessTaskRepository, repositoryProvider, henleggBehandlingTjeneste, behandlingskontrollTjeneste);
     private KravVedtakStatusMapper kravVedtakStatusMapper = new KravVedtakStatusMapper(tpsAdapterWrapper);
-    private LesKravvedtakStatusTask lesKravvedtakStatusTask = new LesKravvedtakStatusTask(mottattXmlRepository, repositoryProvider,        kravVedtakStatusTjeneste, kravVedtakStatusMapper, fpsakKlientMock);
+    private LesKravvedtakStatusTask lesKravvedtakStatusTask = new LesKravvedtakStatusTask(mottattXmlRepository, repositoryProvider, kravVedtakStatusTjeneste, kravVedtakStatusMapper, fagsystemKlientMock);
 
     private Long mottattXmlId;
 
@@ -116,7 +116,7 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
     public void skal_utføre_leskravvedtakstatus_task_for_behandling_som_finnes_ikke_iFpsak() {
         // den xml-en har behandlngId som finnes ikke i EksternBehandling
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_ugyldig.xml"));
-        when(fpsakKlientMock.finnesBehandlingIFpsak(anyString(), any(Henvisning.class))).thenReturn(false);
+        when(fagsystemKlientMock.finnesBehandlingIFpsak(anyString(), any(Henvisning.class))).thenReturn(false);
 
         expectedException.expectMessage("FPT-587196");
         lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LesKravvedtakStatusTask.TASKTYPE));
@@ -126,7 +126,7 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
     public void skal_utføre_leskravvedtakstatus_task_når_fptilbake_har_ingen_åpenBehandling() {
         // den xml-en har behandlngId som finnes ikke i EksternBehandling
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_ugyldig.xml"));
-        when(fpsakKlientMock.finnesBehandlingIFpsak(anyString(), any(Henvisning.class))).thenReturn(true);
+        when(fagsystemKlientMock.finnesBehandlingIFpsak(anyString(), any(Henvisning.class))).thenReturn(true);
 
         lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LesKravvedtakStatusTask.TASKTYPE));
 
@@ -242,7 +242,7 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         lesKravgrunnlagTask.doTask(lagProsessTaskData(mottattXmlId, LesKravgrunnlagTask.TASKTYPE));
         henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), BehandlingResultatType.HENLAGT_FEILOPPRETTET);
 
-        when(fpsakKlientMock.finnesBehandlingIFpsak(anyString(), any(Henvisning.class))).thenReturn(true);
+        when(fagsystemKlientMock.finnesBehandlingIFpsak(anyString(), any(Henvisning.class))).thenReturn(true);
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_SPER_annen_referanse.xml"));
         lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LesKravvedtakStatusTask.TASKTYPE));
 

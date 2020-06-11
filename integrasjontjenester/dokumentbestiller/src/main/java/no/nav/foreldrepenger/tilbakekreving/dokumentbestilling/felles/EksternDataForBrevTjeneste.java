@@ -21,44 +21,36 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRe
 import no.nav.foreldrepenger.tilbakekreving.domene.person.TpsTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FagsystemKlient;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.simulering.FeilutbetaltePerioderDto;
 import no.nav.foreldrepenger.tilbakekreving.organisasjon.Virksomhet;
 import no.nav.foreldrepenger.tilbakekreving.organisasjon.VirksomhetTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.simulering.klient.FpOppdragRestKlient;
-import no.nav.foreldrepenger.tilbakekreving.simulering.kontrakt.FeilutbetaltePerioderDto;
 import no.nav.tjeneste.virksomhet.organisasjon.v4.binding.HentOrganisasjonOrganisasjonIkkeFunnet;
 import no.nav.tjeneste.virksomhet.organisasjon.v4.binding.HentOrganisasjonUgyldigInput;
 import no.nav.vedtak.konfig.KonfigVerdi;
 
 @ApplicationScoped
 @Transactional
-//FIXME k9-tilbake
-// .. splitt eksternDataForBrevTjeneste i 2 (hvorav 1 del er for å hente fra fagsystemet)
-// .. lag 2 implementasjoner av fagsystemdelen
-// .. hentFeilutbetaltePerioder bør ta inn henvisning (eller intern behandlingId) og konvertere til eksernid/uuid
 public class EksternDataForBrevTjeneste {
 
-    private FpOppdragRestKlient fpOppdragKlient;
     private TpsTjeneste tpsTjeneste;
     private VirksomhetTjeneste virksomhetTjeneste;
     private KodeverkRepository kodeverkRepository;
-    private FpsakKlient fpsakKlient;
+    private FagsystemKlient fagsystemKlient;
     private Period brukersSvarfrist;
 
     @Inject
-    public EksternDataForBrevTjeneste(FpOppdragRestKlient fpOppdragKlient,
-                                      TpsTjeneste tpsTjeneste,
+    public EksternDataForBrevTjeneste(TpsTjeneste tpsTjeneste,
                                       VirksomhetTjeneste virksomhetTjeneste,
-                                      FpsakKlient fpsakKlient,
+                                      FagsystemKlient fagsystemKlient,
                                       KodeverkRepository kodeverkRepository,
                                       @KonfigVerdi(value = "brukertilbakemelding.venter.frist.lengde") Period brukersSvarfrist) {
-        this.fpOppdragKlient = fpOppdragKlient;
         this.tpsTjeneste = tpsTjeneste;
         this.virksomhetTjeneste = virksomhetTjeneste;
         this.kodeverkRepository = kodeverkRepository;
-        this.fpsakKlient = fpsakKlient;
+        this.fagsystemKlient = fagsystemKlient;
         this.brukersSvarfrist = brukersSvarfrist;
     }
 
@@ -66,6 +58,7 @@ public class EksternDataForBrevTjeneste {
         //NOSONAR
     }
 
+    //TODO dette er ikke ekstern data, flytt til annen tjeneste
     public Period getBrukersSvarfrist() {
         return brukersSvarfrist;
     }
@@ -77,41 +70,30 @@ public class EksternDataForBrevTjeneste {
     }
 
     public SamletEksternBehandlingInfo hentYtelsesbehandlingFraFagsystemet(UUID eksternUuid, Tillegsinformasjon... tillegsinformasjon) {
-        SamletEksternBehandlingInfo behandlingsinfo = fpsakKlient.hentBehandlingsinfo(eksternUuid, tillegsinformasjon);
-        if (behandlingsinfo.getGrunninformasjon() == null) {
-            throw EksternDataForBrevFeil.FACTORY.fantIkkeYtelesbehandlingIFagsystemet(eksternUuid.toString()).toException();
-        }
-        return behandlingsinfo;
+        return fagsystemKlient.hentBehandlingsinfo(eksternUuid, tillegsinformasjon);
     }
 
     public Personinfo hentPerson(String aktørId) {
-        Optional<Personinfo> personinfo = tpsTjeneste.hentBrukerForAktør(new AktørId(aktørId));
-        if (!personinfo.isPresent()) {
-            throw EksternDataForBrevFeil.FACTORY.fantIkkeAdresseForAktørId(aktørId).toException();
-        }
-        return personinfo.get();
+        return tpsTjeneste.hentBrukerForAktør(new AktørId(aktørId))
+            .orElseThrow(() -> EksternDataForBrevFeil.FACTORY.fantIkkePersoniTPS(aktørId).toException());
+    }
+
+    //TODO Bør endre signatur til (PersonIdent) siden det kun er den som brukes
+    public Adresseinfo hentAdresse(Personinfo personinfo) {
+        return tpsTjeneste.hentAdresseinformasjon(personinfo.getPersonIdent());
     }
 
     public Adresseinfo hentAdresse(Personinfo personinfo, BrevMottaker brevMottaker, Optional<VergeEntitet> vergeEntitet) {
-        String aktørId = personinfo.getAktørId().getId();
-        if(vergeEntitet.isPresent()){
+        if (vergeEntitet.isPresent()) {
             VergeEntitet verge = vergeEntitet.get();
-            if(VergeType.ADVOKAT.equals(verge.getVergeType())){
-                return hentOrganisasjonAdresse(verge.getOrganisasjonsnummer(),verge.getNavn(), personinfo);
-            }else if(BrevMottaker.VERGE.equals(brevMottaker)){
-                aktørId = verge.getVergeAktørId().getId();
+            if (VergeType.ADVOKAT.equals(verge.getVergeType())) {
+                return hentOrganisasjonAdresse(verge.getOrganisasjonsnummer(), verge.getNavn(), personinfo);
+            } else if (BrevMottaker.VERGE.equals(brevMottaker)) {
+                String aktørId = verge.getVergeAktørId().getId();
                 personinfo = hentPerson(aktørId);
             }
         }
-        return hentAdresse(personinfo,aktørId);
-    }
-
-    private Adresseinfo hentAdresse(Personinfo personinfo, String aktørId) {
-        Optional<Adresseinfo> adresseinfo = Optional.of(personinfo).map(s -> tpsTjeneste.hentAdresseinformasjon(s.getPersonIdent()));
-        if (!adresseinfo.isPresent()) {
-            throw EksternDataForBrevFeil.FACTORY.fantIkkeAdresseForAktørId(aktørId).toException();
-        }
-        return adresseinfo.get();
+        return hentAdresse(personinfo);
     }
 
     private Adresseinfo hentOrganisasjonAdresse(String organisasjonNummer, String vergeNavn, Personinfo personinfo) {
@@ -126,14 +108,10 @@ public class EksternDataForBrevTjeneste {
     }
 
     public FeilutbetaltePerioderDto hentFeilutbetaltePerioder(Henvisning henvisning) {
-        long fpsakBehandlingId = henvisning.toLong();
-        Optional<FeilutbetaltePerioderDto> feilutbetaltePerioderDto = fpOppdragKlient.hentFeilutbetaltePerioder(fpsakBehandlingId);
-        if (feilutbetaltePerioderDto.isEmpty()) {
-            throw EksternDataForBrevFeil.FACTORY.fantIkkeYtelesbehandlingISimuleringsapplikasjonen(fpsakBehandlingId).toException();
-        }
-        return feilutbetaltePerioderDto.get();
+        return fagsystemKlient.hentFeilutbetaltePerioder(henvisning);
     }
 
+    //TODO dette er ikke ekstern data, flytt til annen tjeneste
     public YtelseNavn hentYtelsenavn(FagsakYtelseType ytelsetype, Språkkode språkkode) {
         YtelseNavn ytelseNavn = new YtelseNavn();
         String ytelsePåBokmål = finnFagsaktypeNavnPåRiktigSpråk(ytelsetype, Språkkode.nb);

@@ -142,6 +142,11 @@
             <artifactId>fplos-klient</artifactId>
         </dependency>
         <dependency>
+            <!-- må legge til her får å få fpsak-klient på classpatwh -->
+            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+            <artifactId>fpsak-klient</artifactId>
+        </dependency>
+        <dependency>
             <groupId>no.nav.foreldrepenger.felles.sikkerhet</groupId>
             <artifactId>felles-sikkerhet</artifactId>
         </dependency>

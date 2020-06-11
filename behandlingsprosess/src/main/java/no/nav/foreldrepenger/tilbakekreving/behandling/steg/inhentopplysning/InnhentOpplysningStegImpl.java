@@ -18,7 +18,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FagsystemKlient;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
@@ -35,30 +35,34 @@ public class InnhentOpplysningStegImpl implements InnhentOpplysningSteg {
     private BehandlingRepository behandlingRepository;
     private KravgrunnlagRepository grunnlagRepository;
 
-    private FpsakKlient fpsakKlient;
+    private FagsystemKlient fagsystemKlient;
 
     public InnhentOpplysningStegImpl() {
         // for CDI proxy
     }
 
     @Inject
-    public InnhentOpplysningStegImpl(BehandlingRepositoryProvider repositoryProvider, FpsakKlient fpsakKlient) {
+    public InnhentOpplysningStegImpl(BehandlingRepositoryProvider repositoryProvider, FagsystemKlient fagsystemKlient) {
         this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
         this.varselRepository = repositoryProvider.getVarselRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
 
-        this.fpsakKlient = fpsakKlient;
+        this.fagsystemKlient = fagsystemKlient;
     }
 
     @Override
     public BehandleStegResultat utførSteg(BehandlingskontrollKontekst kontekst) {
+        //FIXME ?? tror ikke dette steget er i bruk
+
+
+
         Long behandlingId = kontekst.getBehandlingId();
         EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandlingId);
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         Saksnummer saksnummer = behandling.getFagsak().getSaksnummer();
 
-        SamletEksternBehandlingInfo samletEksternBehandlingInfo = fpsakKlient.hentBehandlingsinfo(eksternBehandling.getEksternUuid(), Tillegsinformasjon.VARSELTEKST);
+        SamletEksternBehandlingInfo samletEksternBehandlingInfo = fagsystemKlient.hentBehandlingsinfo(eksternBehandling.getEksternUuid(), Tillegsinformasjon.VARSELTEKST);
         String varselTekst = samletEksternBehandlingInfo.getVarseltekst();
         if (StringUtils.isNotEmpty(varselTekst)) {
             varselRepository.lagre(behandlingId, varselTekst, null);

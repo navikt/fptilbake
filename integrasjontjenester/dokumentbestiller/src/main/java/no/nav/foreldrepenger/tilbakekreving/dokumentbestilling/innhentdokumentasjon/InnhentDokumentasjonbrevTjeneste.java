@@ -3,6 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.innhentdokumenta
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.Optional;
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -21,8 +22,10 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.VergeRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.EksternDataForBrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.YtelseNavn;

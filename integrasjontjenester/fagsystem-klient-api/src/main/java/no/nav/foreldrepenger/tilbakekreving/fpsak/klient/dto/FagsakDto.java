@@ -8,15 +8,15 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FagsakDto {
 
-    private Long saksnummer;
+    private String saksnummer;
     private FagsakYtelseType sakstype;
 
-    public Saksnummer getSaksnummer() {
-        return new Saksnummer(Long.toString(saksnummer));
+    public void setSaksnummer(String saksnummer) {
+        this.saksnummer = saksnummer;
     }
 
-    public void setSaksnummer(Long saksnummer) {
-        this.saksnummer = saksnummer;
+    public Saksnummer getSaksnummer() {
+        return new Saksnummer(saksnummer);
     }
 
     public FagsakYtelseType getSakstype() {

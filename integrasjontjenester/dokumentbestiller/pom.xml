@@ -17,11 +17,7 @@
         <!-- interne avhengigheter -->
         <dependency>
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
-            <artifactId>fpsak-klient</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
-            <artifactId>simulering</artifactId>
+            <artifactId>fagsystem-klient-api</artifactId>
         </dependency>
         <dependency>
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
@@ -75,6 +71,11 @@
         <dependency>
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
             <artifactId>domene-testutilities</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+            <artifactId>fpsak-klient</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

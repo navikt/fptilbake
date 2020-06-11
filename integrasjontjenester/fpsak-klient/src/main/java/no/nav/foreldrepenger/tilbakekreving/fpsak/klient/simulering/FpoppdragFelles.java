@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.simulering.klient;
+package no.nav.foreldrepenger.tilbakekreving.fpsak.klient.simulering;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

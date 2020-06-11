@@ -15,7 +15,6 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class EksternBehandlingsinfoDto {
 
-    private Long id; //FIXME k9-tilbake fjern id fra felles EksternBehandlignsinfoDto
     private Henvisning henvisning;
     private UUID uuid;
     private String behandlendeEnhetId;
@@ -26,15 +25,6 @@ public class EksternBehandlingsinfoDto {
     private BehandlingsresultatDto behandlingsresultat;
     @JsonProperty("behandlingArsaker")
     private List<BehandlingÅrsakDto> behandlingÅrsaker = new ArrayList<>();
-    private List<BehandlingResourceLinkDto> links = new ArrayList<>();
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public Henvisning getHenvisning() {
         return henvisning;
@@ -105,13 +95,4 @@ public class EksternBehandlingsinfoDto {
     public void setBehandlingÅrsaker(List<BehandlingÅrsakDto> behandlingÅrsaker) {
         this.behandlingÅrsaker = behandlingÅrsaker;
     }
-
-    public List<BehandlingResourceLinkDto> getLinks() {
-        return links;
-    }
-
-    public void setLinks(List<BehandlingResourceLinkDto> links) {
-        this.links = links;
-    }
-
 }

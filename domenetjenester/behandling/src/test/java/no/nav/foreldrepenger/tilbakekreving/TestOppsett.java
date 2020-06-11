@@ -32,7 +32,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.Vilkårsvur
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseRepository;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.TpsTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FagsystemKlient;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.SlettGrunnlagEventPubliserer;
 import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkInnslagKonverter;
@@ -55,7 +55,7 @@ public class TestOppsett {
     protected BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste = mock(BehandlingskontrollAsynkTjeneste.class);
     protected TpsTjeneste mockTpsTjeneste = mock(TpsTjeneste.class);
     protected HistorikkinnslagTjeneste mockHistorikkTjeneste = mock(HistorikkinnslagTjeneste.class);
-    protected FpsakKlient mockFpsakKlient = mock(FpsakKlient.class);
+    protected FagsystemKlient mockFagsystemKlient = mock(FagsystemKlient.class);
     protected SlettGrunnlagEventPubliserer mockSlettGrunnlagEventPubliserer = mock(SlettGrunnlagEventPubliserer.class);
 
     protected BehandlingskontrollProvider behandlingskontrollProvider = new BehandlingskontrollProvider(behandlingskontrollTjeneste, behandlingskontrollAsynkTjeneste);
@@ -88,6 +88,6 @@ public class TestOppsett {
 
     protected BehandlingRevurderingTjeneste revurderingTjeneste = new BehandlingRevurderingTjeneste(repoProvider);
 
-    protected FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste = new FaktaFeilutbetalingTjeneste(repoProvider, kravgrunnlagTjeneste, mockFpsakKlient);
+    protected FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste = new FaktaFeilutbetalingTjeneste(repoProvider, kravgrunnlagTjeneste, mockFagsystemKlient);
 
 }

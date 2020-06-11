@@ -21,7 +21,7 @@ import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.SamletEksternBehand
 
 public class InnhentOpplysningStegImplTest extends FellesTestOppsett {
 
-    private InnhentOpplysningSteg innhentOpplysningSteg = new InnhentOpplysningStegImpl(repositoryProvider, fpsakKlientMock);
+    private InnhentOpplysningSteg innhentOpplysningSteg = new InnhentOpplysningStegImpl(repositoryProvider, fagsystemKlientMock);
     private VarselRepository varselRepository = repositoryProvider.getVarselRepository();
 
     @Before
@@ -36,7 +36,7 @@ public class InnhentOpplysningStegImplTest extends FellesTestOppsett {
         SamletEksternBehandlingInfo samletEksternBehandlingInfo = SamletEksternBehandlingInfo
             .builder(Tillegsinformasjon.VARSELTEKST)
             .setVarseltekst(varselTekst).build();
-        when(fpsakKlientMock.hentBehandlingsinfo(FPSAK_BEHANDLING_UUID, Tillegsinformasjon.VARSELTEKST)).thenReturn(samletEksternBehandlingInfo);
+        when(fagsystemKlientMock.hentBehandlingsinfo(FPSAK_BEHANDLING_UUID, Tillegsinformasjon.VARSELTEKST)).thenReturn(samletEksternBehandlingInfo);
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
 
         innhentOpplysningSteg.utførSteg(new BehandlingskontrollKontekst(fagsak.getId(), fagsak.getAktørId(), lås));
@@ -52,7 +52,7 @@ public class InnhentOpplysningStegImplTest extends FellesTestOppsett {
         SamletEksternBehandlingInfo samletEksternBehandlingInfo = SamletEksternBehandlingInfo
             .builder(Tillegsinformasjon.VARSELTEKST)
             .setVarseltekst("").build();
-        when(fpsakKlientMock.hentBehandlingsinfo(FPSAK_BEHANDLING_UUID, Tillegsinformasjon.VARSELTEKST)).thenReturn(samletEksternBehandlingInfo);
+        when(fagsystemKlientMock.hentBehandlingsinfo(FPSAK_BEHANDLING_UUID, Tillegsinformasjon.VARSELTEKST)).thenReturn(samletEksternBehandlingInfo);
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
 
         innhentOpplysningSteg.utførSteg(new BehandlingskontrollKontekst(fagsak.getId(), fagsak.getAktørId(), lås));

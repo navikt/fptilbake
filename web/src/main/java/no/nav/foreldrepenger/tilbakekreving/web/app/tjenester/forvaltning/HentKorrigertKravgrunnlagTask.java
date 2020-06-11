@@ -16,7 +16,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDataWrapper;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FagsystemKlient;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KodeAksjon;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
@@ -51,7 +51,7 @@ public class HentKorrigertKravgrunnlagTask implements ProsessTaskHandler {
 
     private HentKravgrunnlagMapper hentKravgrunnlagMapper;
     private ØkonomiConsumer økonomiConsumer;
-    private FpsakKlient fpsakKlient;
+    private FagsystemKlient fagsystemKlient;
 
     HentKorrigertKravgrunnlagTask() {
         // for CDI
@@ -61,14 +61,14 @@ public class HentKorrigertKravgrunnlagTask implements ProsessTaskHandler {
     public HentKorrigertKravgrunnlagTask(BehandlingRepositoryProvider repositoryProvider,
                                          HentKravgrunnlagMapper hentKravgrunnlagMapper,
                                          ØkonomiConsumer økonomiConsumer,
-                                         FpsakKlient fpsakKlient) {
+                                         FagsystemKlient fagsystemKlient) {
         this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
         this.kravgrunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
 
         this.hentKravgrunnlagMapper = hentKravgrunnlagMapper;
         this.økonomiConsumer = økonomiConsumer;
-        this.fpsakKlient = fpsakKlient;
+        this.fagsystemKlient = fagsystemKlient;
     }
 
     @Override
@@ -116,7 +116,7 @@ public class HentKorrigertKravgrunnlagTask implements ProsessTaskHandler {
     //TODO k9-tilbake flytt til saksbehandlingKlient-er
     private EksternBehandlingsinfoDto hentEksternBehandlingFraFpsak(Behandling behandling, Henvisning henvisning) {
         String saksnummer = behandling.getFagsak().getSaksnummer().getVerdi();
-        List<EksternBehandlingsinfoDto> eksternBehandlinger = fpsakKlient.hentBehandlingForSaksnummer(saksnummer);
+        List<EksternBehandlingsinfoDto> eksternBehandlinger = fagsystemKlient.hentBehandlingForSaksnummer(saksnummer);
         Optional<EksternBehandlingsinfoDto> eksternBehandling = eksternBehandlinger.stream()
             .filter(eksternBehandlingsinfoDto -> eksternBehandlingsinfoDto.getHenvisning().equals(henvisning)).findAny();
         if (eksternBehandling.isEmpty()) {

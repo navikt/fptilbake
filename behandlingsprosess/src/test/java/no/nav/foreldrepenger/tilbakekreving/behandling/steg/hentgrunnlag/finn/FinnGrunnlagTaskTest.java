@@ -46,7 +46,7 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
     private KravVedtakStatusTjeneste kravVedtakStatusTjeneste = new KravVedtakStatusTjeneste(kravVedtakStatusRepository, prosessTaskRepository, repositoryProvider, henleggBehandlingTjeneste, behandlingskontrollTjeneste);
     private KravVedtakStatusMapper kravVedtakStatusMapper = new KravVedtakStatusMapper(tpsAdapterWrapper);
 
-    private FinnGrunnlagTask finnGrunnlagTask = new FinnGrunnlagTask(repositoryProvider, mottattXmlRepository, kodeverkTabellRepository, kravVedtakStatusTjeneste, behandlingskontrollTjeneste, kravVedtakStatusMapper, kravgrunnlagMapper, fpsakKlientMock);
+    private FinnGrunnlagTask finnGrunnlagTask = new FinnGrunnlagTask(repositoryProvider, mottattXmlRepository, kodeverkTabellRepository, kravVedtakStatusTjeneste, behandlingskontrollTjeneste, kravVedtakStatusMapper, kravgrunnlagMapper, fagsystemKlientMock);
 
     private String saksnummer;
     private static final Long FPSAK_ANNEN_BEHANDLING_ID = 1174551L;
@@ -137,7 +137,7 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_YTEL_ENDR_samme_referanse.xml"));
         mottattXmlRepository.oppdaterMedHenvisningOgSaksnummer(ANNEN_HENVISNING, saksnummer, mottattXmlId);
 
-        mockFpsakKlientRespons();
+        mockFagsystemKlientRespons();
 
         ProsessTaskData prosessTaskData = opprettFinngrunnlagProsessTask();
         finnGrunnlagTask.doTask(prosessTaskData);
@@ -155,7 +155,7 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
         Long mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_YTEL_ENDR_samme_referanse.xml"));
         mottattXmlRepository.oppdaterMedHenvisningOgSaksnummer(ANNEN_HENVISNING, saksnummer, mottattXmlId);
 
-        mockFpsakKlientRespons();
+        mockFagsystemKlientRespons();
         ProsessTaskData prosessTaskData = opprettFinngrunnlagProsessTask();
         finnGrunnlagTask.doTask(prosessTaskData);
 
@@ -170,9 +170,9 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
     @Test
     public void skal_ikke_finne_og_håndtere_grunnlag_når_kravgrunnlag_har_feil_referanse() {
         EksternBehandlingsinfoDto førsteVedtak = new EksternBehandlingsinfoDto();
-        førsteVedtak.setId(FPSAK_BEHANDLING_ID);
+        førsteVedtak.setHenvisning(HENVISNING);
         førsteVedtak.setUuid(FPSAK_BEHANDLING_UUID);
-        when(fpsakKlientMock.hentBehandlingForSaksnummer(saksnummer)).thenReturn(Lists.newArrayList(førsteVedtak));
+        when(fagsystemKlientMock.hentBehandlingForSaksnummer(saksnummer)).thenReturn(Lists.newArrayList(førsteVedtak));
 
         Long mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_YTEL_ENDR_samme_referanse.xml"));
         mottattXmlRepository.oppdaterMedHenvisningOgSaksnummer(ANNEN_HENVISNING, saksnummer, mottattXmlId);
@@ -263,18 +263,16 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
         assertThat(xmlMeldinger).isEmpty();
     }
 
-    private void mockFpsakKlientRespons() {
+    private void mockFagsystemKlientRespons() {
         EksternBehandlingsinfoDto førsteVedtak = new EksternBehandlingsinfoDto();
-        førsteVedtak.setId(FPSAK_BEHANDLING_ID);
         førsteVedtak.setHenvisning(HENVISNING);
         førsteVedtak.setUuid(FPSAK_BEHANDLING_UUID);
 
         EksternBehandlingsinfoDto andreVedtak = new EksternBehandlingsinfoDto();
-        andreVedtak.setId(FPSAK_ANNEN_BEHANDLING_ID);
         førsteVedtak.setHenvisning(ANNEN_HENVISNING);
         andreVedtak.setUuid(UUID.randomUUID());
 
-        when(fpsakKlientMock.hentBehandlingForSaksnummer(saksnummer)).thenReturn(Lists.newArrayList(førsteVedtak, andreVedtak));
+        when(fagsystemKlientMock.hentBehandlingForSaksnummer(saksnummer)).thenReturn(Lists.newArrayList(førsteVedtak, andreVedtak));
     }
 
 }

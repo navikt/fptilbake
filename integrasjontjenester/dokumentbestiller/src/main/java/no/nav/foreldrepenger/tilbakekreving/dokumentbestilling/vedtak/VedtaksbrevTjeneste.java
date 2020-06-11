@@ -438,34 +438,42 @@ public class VedtaksbrevTjeneste {
     }
 
     private HbVurderinger utledVurderinger(Periode periode, List<VilkårVurderingPeriodeEntitet> vilkårPerioder, VurdertForeldelse foreldelse, PeriodeMedTekstDto fritekst) {
-        HbVurderinger.Builder builder = HbVurderinger.builder()
-            .medFritekstVilkår(fritekst != null ? fritekst.getVilkårAvsnitt() : null);
+        HbVurderinger.Builder builder = HbVurderinger.builder();
+        leggTilVilkårvurdering(builder, periode, vilkårPerioder, fritekst);
+        leggTilForeldelseVurdering(builder, periode, foreldelse);
+        return builder.build();
+    }
 
+    private void leggTilVilkårvurdering(HbVurderinger.Builder builder, Periode periode, List<VilkårVurderingPeriodeEntitet> vilkårPerioder, PeriodeMedTekstDto fritekst) {
+        builder.medFritekstVilkår(fritekst != null ? fritekst.getVilkårAvsnitt() : null);
         VilkårVurderingPeriodeEntitet vilkårvurdering = finnVilkårvurdering(periode, vilkårPerioder);
-        if (vilkårvurdering != null) {
-            builder.medVilkårResultat(vilkårvurdering.getVilkårResultat());
-            VilkårVurderingAktsomhetEntitet aktsomhet = vilkårvurdering.getAktsomhet();
-            if (aktsomhet != null) {
-                boolean unntasInnkrevingPgaLavtBeløp = Boolean.FALSE.equals(aktsomhet.getTilbakekrevSmåBeløp());
-                builder.medUnntasInnkrevingPgaLavtBeløp(unntasInnkrevingPgaLavtBeløp);
-                builder.medAktsomhetResultat(aktsomhet.getAktsomhet());
-                if (skalHaSærligeGrunner(aktsomhet.getAktsomhet(), unntasInnkrevingPgaLavtBeløp)) {
-                    Set<SærligGrunn> særligeGrunner = aktsomhet
-                        .getSærligGrunner().stream()
-                        .map(VilkårVurderingSærligGrunnEntitet::getGrunn)
-                        .collect(Collectors.toSet());
-                    String fritekstSærligeGrunner = fritekst != null ? fritekst.getSærligeGrunnerAvsnitt() : null;
-                    String fritekstSærligGrunnAnnet = fritekst != null ? fritekst.getSærligeGrunnerAnnetAvsnitt() : null;
-                    builder.medSærligeGrunner(særligeGrunner, fritekstSærligeGrunner, fritekstSærligGrunnAnnet);
-                }
-            }
-            VilkårVurderingGodTroEntitet godTro = vilkårvurdering.getGodTro();
-            if (godTro != null) {
-                builder.medAktsomhetResultat(AnnenVurdering.GOD_TRO);
-                builder.medBeløpIBehold(godTro.isBeløpErIBehold() ? godTro.getBeløpTilbakekreves() : BigDecimal.ZERO);
+        if (vilkårvurdering == null) {
+            return;
+        }
+        builder.medVilkårResultat(vilkårvurdering.getVilkårResultat());
+        VilkårVurderingAktsomhetEntitet aktsomhet = vilkårvurdering.getAktsomhet();
+        if (aktsomhet != null) {
+            boolean unntasInnkrevingPgaLavtBeløp = Boolean.FALSE.equals(aktsomhet.getTilbakekrevSmåBeløp());
+            builder.medUnntasInnkrevingPgaLavtBeløp(unntasInnkrevingPgaLavtBeløp);
+            builder.medAktsomhetResultat(aktsomhet.getAktsomhet());
+            if (skalHaSærligeGrunner(aktsomhet.getAktsomhet(), unntasInnkrevingPgaLavtBeløp)) {
+                Set<SærligGrunn> særligeGrunner = aktsomhet
+                    .getSærligGrunner().stream()
+                    .map(VilkårVurderingSærligGrunnEntitet::getGrunn)
+                    .collect(Collectors.toSet());
+                String fritekstSærligeGrunner = fritekst != null ? fritekst.getSærligeGrunnerAvsnitt() : null;
+                String fritekstSærligGrunnAnnet = fritekst != null ? fritekst.getSærligeGrunnerAnnetAvsnitt() : null;
+                builder.medSærligeGrunner(særligeGrunner, fritekstSærligeGrunner, fritekstSærligGrunnAnnet);
             }
         }
+        VilkårVurderingGodTroEntitet godTro = vilkårvurdering.getGodTro();
+        if (godTro != null) {
+            builder.medAktsomhetResultat(AnnenVurdering.GOD_TRO);
+            builder.medBeløpIBehold(godTro.isBeløpErIBehold() ? godTro.getBeløpTilbakekreves() : BigDecimal.ZERO);
+        }
+    }
 
+    private void leggTilForeldelseVurdering(HbVurderinger.Builder builder, Periode periode, VurdertForeldelse foreldelse) {
         VurdertForeldelsePeriode foreldelsePeriode = finnForeldelsePeriode(foreldelse, periode);
         if (foreldelsePeriode != null) {
             if (foreldelsePeriode.erForeldet()) {
@@ -475,8 +483,6 @@ public class VedtaksbrevTjeneste {
         } else {
             builder.medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT);
         }
-
-        return builder.build();
     }
 
     private HbResultat utledResultat(BeregningResultatPeriode resultatPeriode, VurdertForeldelse foreldelse) {

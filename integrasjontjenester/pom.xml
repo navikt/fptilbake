@@ -16,6 +16,7 @@
         <module>avstemming</module>
         <module>dokumentbestiller</module>
         <module>dokumentproduksjon-klient</module>
+        <module>fagsystem-klient-api</module>
         <module>fpsak-klient</module>
         <module>journalpost</module>
         <module>kafka-poller</module>
@@ -23,7 +24,6 @@
         <module>okonomistotte</module>
         <module>person</module>
         <module>pdfgen</module>
-        <module>simulering</module>
         <module>fplos-klient</module>
         <module>datavarehus</module>
         <module>selvbetjening-klient</module>

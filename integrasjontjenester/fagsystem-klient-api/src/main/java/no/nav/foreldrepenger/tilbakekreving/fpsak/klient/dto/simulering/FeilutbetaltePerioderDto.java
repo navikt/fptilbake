@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.simulering.kontrakt;
+package no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.simulering;
 
 import java.util.List;
 

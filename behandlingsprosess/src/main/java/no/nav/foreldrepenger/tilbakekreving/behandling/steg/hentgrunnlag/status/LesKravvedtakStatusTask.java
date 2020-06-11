@@ -17,7 +17,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FpsakKlient;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FagsystemKlient;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatus437;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagAggregate;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
@@ -56,8 +56,8 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
                                    BehandlingRepositoryProvider repositoryProvider,
                                    KravVedtakStatusTjeneste kravVedtakStatusTjeneste,
                                    KravVedtakStatusMapper statusMapper,
-                                   FpsakKlient fpsakKlient) {
-        super(repositoryProvider.getGrunnlagRepository(), fpsakKlient);
+                                   FagsystemKlient fagsystemKlient) {
+        super(repositoryProvider.getGrunnlagRepository(), fagsystemKlient);
         this.økonomiMottattXmlRepository = økonomiMottattXmlRepository;
         this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
