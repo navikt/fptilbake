@@ -21,7 +21,6 @@ import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
 @ApplicationScoped
 public class EksternBehandlingRepositoryImpl implements EksternBehandlingRepository {
 
-    private static final String EKSTERN_ID = "eksternId";
     private static final String EKSTERN_UUID = "eksternUuid";
     private static final String INTERN_ID = "internId";
     private EntityManager entityManager;
@@ -59,9 +58,8 @@ public class EksternBehandlingRepositoryImpl implements EksternBehandlingReposit
 
     @Override
     public Optional<EksternBehandling> hentFraHenvisning(Henvisning henvisning) {
-        //FIXME k9-tilbake støtt henvisning for k9 (bytt fra ekstern_id til henvisning når migrert)
-        TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where ekstern_id=:eksternId and aktiv='J'", EksternBehandling.class);
-        query.setParameter(EKSTERN_ID, henvisning.getVerdi());
+        TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where henvisning=:henvisning and aktiv='J'", EksternBehandling.class);
+        query.setParameter("henvisning", henvisning);
         return hentUniktResultat(query);
     }
 
@@ -89,9 +87,8 @@ public class EksternBehandlingRepositoryImpl implements EksternBehandlingReposit
 
     @Override
     public boolean finnesEksternBehandling(long internId, Henvisning henvisning) {
-        //FIXME k9-tilbake støtt Henvisning som ikke er bare tall (bytt ekstern_id->henvisning når migrert)
-        TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where ekstern_id=:eksternId and intern_id=:internId and aktiv='J'", EksternBehandling.class);
-        query.setParameter(EKSTERN_ID, henvisning.toLong());
+        TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where henvisning=:henvisning and intern_id=:internId and aktiv='J'", EksternBehandling.class);
+        query.setParameter("henvisning", henvisning);
         query.setParameter(INTERN_ID, internId);
         return !query.getResultList().isEmpty();
     }
@@ -118,9 +115,9 @@ public class EksternBehandlingRepositoryImpl implements EksternBehandlingReposit
     }
 
     private Optional<EksternBehandling> hentEksisterendeDeaktivert(long internBehandlingId, Henvisning henvisning){
-        TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where intern_id=:internId and ekstern_id=:eksternId order by opprettetTidspunkt desc", EksternBehandling.class);
+        TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where intern_id=:internId and henvisning=:henvisning order by opprettetTidspunkt desc", EksternBehandling.class);
         query.setParameter(INTERN_ID, internBehandlingId);
-        query.setParameter(EKSTERN_ID, henvisning.toLong());
+        query.setParameter("henvisning", henvisning);
 
         return hentUniktResultat(query);
     }

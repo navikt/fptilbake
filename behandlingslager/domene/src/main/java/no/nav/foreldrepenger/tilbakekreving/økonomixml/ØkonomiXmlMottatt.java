@@ -32,10 +32,6 @@ public class ØkonomiXmlMottatt extends KodeverkBaseEntitet {
     @Column(name = "melding", nullable = false)
     private String mottattXml;
 
-    //FIXME k9-tilbake når migrert, kan ekstern_behandling_id fjernes
-    @Column(name = "ekstern_behandling_id")
-    private String eksternBehandlingId;
-
     private Henvisning henvisning;
 
     @Column(name = "saksnummer")
@@ -65,10 +61,7 @@ public class ØkonomiXmlMottatt extends KodeverkBaseEntitet {
     }
 
     public Henvisning getHenvisning() {
-        if (henvisning != null) {
-            return henvisning;
-        }
-        return new Henvisning(eksternBehandlingId);
+        return henvisning;
     }
 
     public Long getSekvens() {
@@ -80,7 +73,6 @@ public class ØkonomiXmlMottatt extends KodeverkBaseEntitet {
     }
 
     public void setHenvisning(Henvisning henvisning, long sekvens) {
-        this.eksternBehandlingId = henvisning.getVerdi();
         this.henvisning = henvisning;
         this.sekvens = sekvens;
     }
