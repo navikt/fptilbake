@@ -80,7 +80,7 @@ public class BatchRestTjeneste {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)
     @Operation(tags = "batch", description = "Start batchjob", responses = {
-        @ApiResponse(responseCode = "200", description = "Starter batch og returnerer executionId", content = @Content(mediaType = "text")),
+        @ApiResponse(responseCode = "200", description = "Starter batch og returnerer executionId"),
         @ApiResponse(responseCode = "400", description = "Ukjent batch forespurt."),
         @ApiResponse(responseCode = "500", description = "Feilet pga ukjent feil.")
     })
