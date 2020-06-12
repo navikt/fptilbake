@@ -40,6 +40,6 @@
     "FP_TILKJENTYTELSE_V1_TOPIC_URL": "privat-foreldrepenger-tilkjentytelse-v1-q0",
     "TILBAKEKREVING_BRUKERDIALOG_HENDELSE_V1_TOPIC_URL": "privat-tilbakekreving-brukerdialog-q0",
     "KAFKA_FPLOS_TOPIC": "privat-tilbakekreving-fploshendelse-v1-q0",
-    "ORGANISASJON_V4_URL": "https://modapp-q0.adeo.no/ereg/ws/OrganisasjonService/v4"
+    "ORGANISASJON_RS_URL": "https://modapp-q0.adeo.no/ereg/api/v1/organisasjon"
   }
 }
