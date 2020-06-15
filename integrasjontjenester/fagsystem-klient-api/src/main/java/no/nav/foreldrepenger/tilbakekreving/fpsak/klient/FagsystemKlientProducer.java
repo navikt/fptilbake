@@ -10,12 +10,12 @@ import no.nav.vedtak.konfig.KonfigVerdi;
 @ApplicationScoped
 public class FagsystemKlientProducer {
 
-    @Inject
     private FagsystemKlient fagsystemKlient;
 
     FagsystemKlientProducer() {
     }
 
+    @Inject
     public FagsystemKlientProducer(@KonfigVerdi(value = "app.name") String applikasjon, @Fptilbake FagsystemKlient fpsakKlient) {
         //FIXME k9-tilbake, legg inn støtte her
         if ("fptilbake".equalsIgnoreCase(applikasjon)) {
