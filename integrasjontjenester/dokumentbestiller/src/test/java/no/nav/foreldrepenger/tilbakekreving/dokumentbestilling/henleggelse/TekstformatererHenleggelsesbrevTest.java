@@ -27,6 +27,7 @@ public class TekstformatererHenleggelsesbrevTest {
             .medFagsaktypenavnPåSpråk("foreldrepenger")
             .medSprakkode(Språkkode.nb)
             .medMottakerAdresse(lagAdresseInfo())
+            .medSakspartNavn("Test")
             .build();
 
         HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = new HenleggelsesbrevSamletInfo();
@@ -63,6 +64,7 @@ public class TekstformatererHenleggelsesbrevTest {
             .medFagsaktypenavnPåSpråk("foreldrepengar")
             .medSprakkode(Språkkode.nn)
             .medMottakerAdresse(lagAdresseInfo())
+            .medSakspartNavn("Test")
             .build();
 
         HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = new HenleggelsesbrevSamletInfo();
