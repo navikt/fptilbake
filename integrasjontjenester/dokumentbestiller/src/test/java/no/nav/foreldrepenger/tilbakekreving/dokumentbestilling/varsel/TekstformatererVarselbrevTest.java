@@ -40,6 +40,7 @@ public class TekstformatererVarselbrevTest {
             .medSprakkode(Språkkode.nn)
             .medFagsaktypenavnPåSpråk("svangerskapspengar")
             .medMottakerAdresse(lagAdresseInfo())
+            .medSakspartNavn("Test")
             .build();
 
         VarselbrevSamletInfo varselbrevSamletInfo = new VarselbrevSamletInfo.Builder()
@@ -64,6 +65,7 @@ public class TekstformatererVarselbrevTest {
             .medSprakkode(Språkkode.nb)
             .medFagsaktypenavnPåSpråk("eingongsstønad")
             .medMottakerAdresse(lagAdresseInfo())
+            .medSakspartNavn("Test")
             .build();
 
         VarselbrevSamletInfo varselbrevSamletInfo = new VarselbrevSamletInfo.Builder()
@@ -88,6 +90,7 @@ public class TekstformatererVarselbrevTest {
             .medSprakkode(Språkkode.nb)
             .medFagsaktypenavnPåSpråk("foreldrepenger")
             .medMottakerAdresse(lagAdresseInfo())
+            .medSakspartNavn("Test")
             .build();
 
         VarselbrevSamletInfo varselbrevSamletInfo = new VarselbrevSamletInfo.Builder()
@@ -112,6 +115,7 @@ public class TekstformatererVarselbrevTest {
             .medFagsaktype(foreldrepengerkode)
             .medFagsaktypenavnPåSpråk("foreldrepenger")
             .medMottakerAdresse(lagAdresseInfo())
+            .medSakspartNavn("Test")
             .build();
 
         VarselbrevSamletInfo varselbrevSamletInfo = new VarselbrevSamletInfo.Builder()
@@ -142,6 +146,7 @@ public class TekstformatererVarselbrevTest {
             .medSprakkode(Språkkode.en)
             .medFagsaktypenavnPåSpråk("foreldrepengar")
             .medMottakerAdresse(lagAdresseInfo())
+            .medSakspartNavn("Test")
             .build();
 
         VarselbrevSamletInfo varselbrevSamletInfo = new VarselbrevSamletInfo.Builder()
