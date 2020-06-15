@@ -65,6 +65,7 @@ public class TekstformatererInnhentDokumentasjonbrevTest  {
             .medFagsaktypenavnPåSpråk("foreldrepenger")
             .medSprakkode(Språkkode.nn)
             .medMottakerAdresse(lagStandardNorskAdresse())
+            .medSakspartNavn("Test")
             .build();
 
         InnhentDokumentasjonbrevSamletInfo innhentDokumentasjonBrevSamletInfo = InnhentDokumentasjonbrevSamletInfo.builder()
