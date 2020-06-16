@@ -85,7 +85,7 @@ public class EksternDataForBrevTjeneste {
         if (vergeEntitet.isPresent()) {
             VergeEntitet verge = vergeEntitet.get();
             if (VergeType.ADVOKAT.equals(verge.getVergeType())) {
-                return hentOrganisasjonAdresse(verge.getOrganisasjonsnummer(), verge.getNavn(), personinfo);
+                return hentOrganisasjonAdresse(verge.getOrganisasjonsnummer(), verge.getNavn(), personinfo, brevMottaker);
             } else if (BrevMottaker.VERGE.equals(brevMottaker)) {
                 String aktørId = verge.getVergeAktørId().getId();
                 personinfo = hentPerson(aktørId);
@@ -94,9 +94,9 @@ public class EksternDataForBrevTjeneste {
         return hentAdresse(personinfo);
     }
 
-    private Adresseinfo hentOrganisasjonAdresse(String organisasjonNummer, String vergeNavn, Personinfo personinfo) {
+    private Adresseinfo hentOrganisasjonAdresse(String organisasjonNummer, String vergeNavn, Personinfo personinfo, BrevMottaker brevMottaker) {
         Virksomhet virksomhet = virksomhetTjeneste.hentOrganisasjon(organisasjonNummer);
-        return fra(virksomhet, vergeNavn, personinfo);
+        return fra(virksomhet, vergeNavn, personinfo, brevMottaker);
     }
 
     public FeilutbetaltePerioderDto hentFeilutbetaltePerioder(Henvisning henvisning) {
@@ -117,8 +117,8 @@ public class EksternDataForBrevTjeneste {
         return ytelseNavn;
     }
 
-    private Adresseinfo fra(Virksomhet virksomhet, String vergeNavn, Personinfo personinfo) {
-        String navn = virksomhet.getNavn() + " c/o " + vergeNavn;
+    private Adresseinfo fra(Virksomhet virksomhet, String vergeNavn, Personinfo personinfo, BrevMottaker brevMottaker) {
+        String navn = BrevMottaker.VERGE.equals(brevMottaker) ? (virksomhet.getNavn() + "\n" + "v/ " + vergeNavn) : personinfo.getNavn();
         Adresseinfo.Builder adresseinfo = new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE, personinfo.getPersonIdent(), navn, personinfo.getPersonstatus());
         return adresseinfo.medAdresselinje1(virksomhet.getAdresselinje1())
             .medAdresselinje2(virksomhet.getAdresselinje2())
