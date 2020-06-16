@@ -30,7 +30,7 @@ public class BrevMottakerUtil {
         if (vergeEntitet.isPresent()) {
             VergeEntitet entitet = vergeEntitet.get();
             if (VergeType.ADVOKAT.equals(entitet.getVergeType())) {
-                vergeNavn = adresseinfo.getMottakerNavn(); // Når verge er advokat, viser vi verge navn som "Virksomhet navn v/ verge navn"
+                vergeNavn = adresseinfo.getAnnenMottakerNavn(); // Når verge er advokat, viser vi verge navn som "Virksomhet navn v/ verge navn"
             } else {
                 vergeNavn = entitet.getNavn();
             }

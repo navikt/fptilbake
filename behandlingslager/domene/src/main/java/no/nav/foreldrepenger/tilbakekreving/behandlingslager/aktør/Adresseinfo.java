@@ -20,6 +20,7 @@ public class Adresseinfo {
     private String land;
     private PersonstatusType personstatus;
     private String vergeOrganisasjonNummer;
+    private String annenMottakerNavn;
 
     private Adresseinfo() {
     }
@@ -76,6 +77,10 @@ public class Adresseinfo {
         return vergeOrganisasjonNummer;
     }
 
+    public String getAnnenMottakerNavn() {
+        return annenMottakerNavn;
+    }
+
     public static class Builder {
         private final AdresseType gjeldendePostadresseType;
         private final String mottakerNavn;
@@ -89,6 +94,7 @@ public class Adresseinfo {
         private String land;
         private PersonstatusType personstatus;
         private String vergeOrganisasjonNummer;
+        private String annenMottakerNavn;
 
         //TODO kan personstatus fjernes? Ser ikke ut som brukes
         public Builder(AdresseType gjeldende, PersonIdent fnr, String mottakerNavn, PersonstatusType personstatus) {
@@ -137,6 +143,11 @@ public class Adresseinfo {
             return this;
         }
 
+        public Builder medAnnenMottakerNavn(String annenMottakerNavn) {
+            this.annenMottakerNavn = annenMottakerNavn;
+            return this;
+        }
+
         public Adresseinfo build() {
             verifyStateForBuild();
             Adresseinfo adresseinfo = new Adresseinfo();
@@ -152,6 +163,7 @@ public class Adresseinfo {
             adresseinfo.land = this.land;
             adresseinfo.personstatus = this.personstatus;
             adresseinfo.vergeOrganisasjonNummer = this.vergeOrganisasjonNummer;
+            adresseinfo.annenMottakerNavn = this.annenMottakerNavn;
             return adresseinfo;
         }
 
