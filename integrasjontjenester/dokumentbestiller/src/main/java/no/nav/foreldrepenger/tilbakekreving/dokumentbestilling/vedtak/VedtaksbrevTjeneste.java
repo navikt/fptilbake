@@ -373,10 +373,10 @@ public class VedtaksbrevTjeneste {
 
         Optional<VergeEntitet> vergeEntitet = vergeRepository.finnVergeInformasjon(behandling.getId());
         boolean finnesVerge = vergeEntitet.isPresent();
-        String vergeNavn = finnesVerge ? vergeEntitet.get().getNavn() : "";
 
         Adresseinfo adresseinfo = eksternDataForBrevTjeneste.hentAdresse(personinfo,brevMottaker,vergeEntitet);
         YtelseNavn ytelseNavn = eksternDataForBrevTjeneste.hentYtelsenavn(fagsakType, språkkode);
+        String vergeNavn = BrevMottakerUtil.getVergeNavn(vergeEntitet,adresseinfo);
 
         boolean tilbakekreves = VedtakResultatType.FULL_TILBAKEBETALING.equals(vedtakResultatType) ||
             VedtakResultatType.DELVIS_TILBAKEBETALING.equals(vedtakResultatType);

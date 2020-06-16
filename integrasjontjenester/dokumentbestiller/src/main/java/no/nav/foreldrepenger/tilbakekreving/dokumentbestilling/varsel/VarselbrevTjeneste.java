@@ -26,6 +26,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselInfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.HentForhåndsvisningVarselbrevDto;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottakerUtil;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.EksternDataForBrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.YtelseNavn;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevData;
@@ -137,7 +138,6 @@ public class VarselbrevTjeneste {
 
         Optional<VergeEntitet> vergeEntitet = vergeRepository.finnVergeInformasjon(behandlingId);
         boolean finnesVerge = vergeEntitet.isPresent();
-        String vergeNavn = finnesVerge ? vergeEntitet.get().getNavn() : "";
 
         //Henter data fra fptilbakes eget repo for å finne behandlingsid brukt i fpsak, samt saksnummer
         EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandlingId);
@@ -149,6 +149,7 @@ public class VarselbrevTjeneste {
         //Henter data fra tps
         Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(behandling.getAktørId().getId());
         Adresseinfo adresseinfo =  eksternDataForBrevTjeneste.hentAdresse(personinfo,brevMottaker,vergeEntitet);
+        String vergeNavn = BrevMottakerUtil.getVergeNavn(vergeEntitet,adresseinfo);
 
         //Henter fagsaktypenavn på riktig språk
         Språkkode mottakersSpråkkode = eksternBehandlingsinfoDto.getGrunninformasjon().getSpråkkodeEllerDefault();
@@ -188,10 +189,11 @@ public class VarselbrevTjeneste {
         Optional<VergeEntitet> vergeEntitet = behandling != null ? vergeRepository.finnVergeInformasjon(behandling.getId()) : Optional.empty();
         boolean finnesVerge = vergeEntitet.isPresent();
         BrevMottaker brevMottaker = finnesVerge ? BrevMottaker.VERGE : BrevMottaker.BRUKER;
-        String vergeNavn = finnesVerge ? vergeEntitet.get().getNavn() : "";
 
         Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(eksternBehandlingsinfo.getAktørId().getId());
         Adresseinfo adresseinfo = eksternDataForBrevTjeneste.hentAdresse(personinfo, brevMottaker, vergeEntitet);
+        String vergeNavn = BrevMottakerUtil.getVergeNavn(vergeEntitet,adresseinfo);
+
         FeilutbetaltePerioderDto feilutbetaltePerioderDto = eksternDataForBrevTjeneste.hentFeilutbetaltePerioder(grunninformasjon.getHenvisning());
         Språkkode mottakersSpråkkode = grunninformasjon.getSpråkkodeEllerDefault();
         YtelseNavn ytelseNavn = eksternDataForBrevTjeneste.hentYtelsenavn(fagsakYtleseType, mottakersSpråkkode);

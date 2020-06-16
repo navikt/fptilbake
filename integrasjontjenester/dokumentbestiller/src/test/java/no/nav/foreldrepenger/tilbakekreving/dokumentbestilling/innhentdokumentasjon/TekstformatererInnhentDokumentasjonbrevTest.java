@@ -60,6 +60,38 @@ public class TekstformatererInnhentDokumentasjonbrevTest  {
     }
 
     @Test
+    public void skal_generere_innhentdokumentasjonbrev_for_verge_organisasjon() throws Exception {
+        Adresseinfo orgAdresse = new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE,
+            new PersonIdent("12345678901"),
+            "Semba AS c/o John Doe", null)
+            .medAdresselinje1("adresselinje 1")
+            .medAdresselinje2("adresselinje 2")
+            .medAdresselinje3("adresselinje 3")
+            .medLand("NOR")
+            .medPostNr("0688")
+            .medPoststed("OSLO")
+            .build();
+        BrevMetadata brevMetadata = new BrevMetadata.Builder()
+            .medFagsaktypenavnPåSpråk("foreldrepenger")
+            .medSprakkode(Språkkode.nb)
+            .medMottakerAdresse(orgAdresse)
+            .medSakspartNavn("Test")
+            .medVergeNavn("John Doe")
+            .medFinnesVerge(true)
+            .build();
+
+        InnhentDokumentasjonbrevSamletInfo innhentDokumentasjonBrevSamletInfo = InnhentDokumentasjonbrevSamletInfo.builder()
+            .medBrevMetaData(brevMetadata)
+            .medFritekstFraSaksbehandler("Dette er ein fritekst.")
+            .medFristDato(LocalDate.of(2020, 3, 2))
+            .build();
+        String generertBrev = TekstformatererInnhentDokumentasjonbrev.lagInnhentDokumentasjonBrevFritekst(innhentDokumentasjonBrevSamletInfo);
+        String fasit = les("/innhentdokumentasjonbrev/innhentdokumentasjonbrev.txt");;
+        String vergeTekst = "Brev med likt innhold er sendt til Test";
+        assertThat(generertBrev).isEqualToNormalizingNewlines(fasit+"\n"+"\n"+ vergeTekst);
+    }
+
+    @Test
     public void skal_generere_innhentdokumentasjonbrev_nynorsk() throws Exception {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
             .medFagsaktypenavnPåSpråk("foreldrepenger")
