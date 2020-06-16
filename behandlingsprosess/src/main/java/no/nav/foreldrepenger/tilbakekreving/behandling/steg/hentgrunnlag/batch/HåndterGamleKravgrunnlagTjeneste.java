@@ -37,6 +37,7 @@ import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlag;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagDto;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.HentKravgrunnlagDetaljDto;
+import no.nav.vedtak.util.env.Environment;
 
 @ApplicationScoped
 public class HåndterGamleKravgrunnlagTjeneste {
@@ -247,9 +248,9 @@ public class HåndterGamleKravgrunnlagTjeneste {
     //midlertidig kode. skal fjernes etter en stund
     private boolean kanOppretteBehandling() {
         boolean isEnabled = false;
-        /*if (!Environment.current().isProd()) {
+        if (!Environment.current().isProd()) {
             isEnabled = true;
-        } else */ if (getAntallBehandlingOprettet() < 6) {
+        } else if (getAntallBehandlingOprettet() < 5) {
             logger.info("Antall behandling opprettet av batch-en er {}", getAntallBehandlingOprettet());
             isEnabled = true;
         }
