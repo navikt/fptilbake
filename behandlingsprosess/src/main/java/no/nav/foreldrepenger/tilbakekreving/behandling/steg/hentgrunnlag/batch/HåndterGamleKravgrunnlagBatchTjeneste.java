@@ -59,6 +59,7 @@ public class HåndterGamleKravgrunnlagBatchTjeneste implements BatchTjeneste {
     public String launch(BatchArguments arguments) {
         String batchRun = BATCHNAVN + "-" + UUID.randomUUID();
         LocalDate iDag = LocalDate.now(clock);
+        håndterGamleKravgrunnlagTjeneste.setAntallBehandlingOprettet(0);
         if (iDag.getDayOfWeek().equals(DayOfWeek.SATURDAY) || iDag.getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
             logger.info("I dag er helg, kan ikke kjøre batch-en {}", BATCHNAVN);
             return batchRun;

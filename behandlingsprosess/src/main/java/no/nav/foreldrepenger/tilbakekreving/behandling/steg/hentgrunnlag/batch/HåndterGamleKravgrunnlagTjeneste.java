@@ -37,7 +37,6 @@ import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlag;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagDto;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.HentKravgrunnlagDetaljDto;
-import no.nav.vedtak.util.env.Environment;
 
 @ApplicationScoped
 public class HåndterGamleKravgrunnlagTjeneste {
@@ -52,7 +51,7 @@ public class HåndterGamleKravgrunnlagTjeneste {
     private FagsystemKlient fagsystemKlient;
 
     private boolean skalGrunnlagSperres;
-    private long antallBehandlingOprettet = 0;
+    private long antallBehandlingOprettet;
 
     HåndterGamleKravgrunnlagTjeneste() {
         // for CDI proxy
@@ -204,7 +203,7 @@ public class HåndterGamleKravgrunnlagTjeneste {
                 sperrGrunnlag(behandlingId, kravgrunnlag431.getEksternKravgrunnlagId());
                 skalGrunnlagSperres = false;
             }
-            antallBehandlingOprettet++;
+            setAntallBehandlingOprettet(getAntallBehandlingOprettet()+1);
         }
     }
 
@@ -248,13 +247,21 @@ public class HåndterGamleKravgrunnlagTjeneste {
     //midlertidig kode. skal fjernes etter en stund
     private boolean kanOppretteBehandling() {
         boolean isEnabled = false;
-        if (!Environment.current().isProd()) {
+        /*if (!Environment.current().isProd()) {
             isEnabled = true;
-        } else if (antallBehandlingOprettet < 6) {
-            logger.info("Antall behandling opprettet av batch-en er {}", antallBehandlingOprettet);
+        } else */ if (getAntallBehandlingOprettet() < 6) {
+            logger.info("Antall behandling opprettet av batch-en er {}", getAntallBehandlingOprettet());
             isEnabled = true;
         }
         logger.info("{} er {}", "Opprett behandling når kravgrunnlag venter etter fristen er ", isEnabled ? "skudd på" : "ikke skudd på");
         return isEnabled;
+    }
+
+    public long getAntallBehandlingOprettet() {
+        return antallBehandlingOprettet;
+    }
+
+    public void setAntallBehandlingOprettet(long antallBehandlingOprettet) {
+        this.antallBehandlingOprettet = antallBehandlingOprettet;
     }
 }
