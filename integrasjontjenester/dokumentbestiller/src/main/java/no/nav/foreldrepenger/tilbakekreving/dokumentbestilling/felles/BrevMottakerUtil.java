@@ -18,11 +18,9 @@ public class BrevMottakerUtil {
         String brukerNavn = brevMetadata.getSakspartNavn();
         String vergeNavn = brevMetadata.getVergeNavn();
 
-        String annenMottakerNavn = "";
+        String annenMottakerNavn = brukerNavn;
         if (mottakerNavn.equalsIgnoreCase(brukerNavn)) {
-            annenMottakerNavn = vergeNavn;
-        } else if (mottakerNavn.contains(vergeNavn)) {
-            annenMottakerNavn = brukerNavn;
+            annenMottakerNavn = vergeNavn.replaceAll("\n","");
         }
         return annenMottakerNavn;
     }
@@ -32,7 +30,7 @@ public class BrevMottakerUtil {
         if (vergeEntitet.isPresent()) {
             VergeEntitet entitet = vergeEntitet.get();
             if (VergeType.ADVOKAT.equals(entitet.getVergeType())) {
-                vergeNavn = adresseinfo.getMottakerNavn().replaceAll("\n",""); // Når verge er advokat, viser vi verge navn som "Virksomhet navn c/o verge navn"
+                vergeNavn = adresseinfo.getMottakerNavn(); // Når verge er advokat, viser vi verge navn som "Virksomhet navn v/ verge navn"
             } else {
                 vergeNavn = entitet.getNavn();
             }
