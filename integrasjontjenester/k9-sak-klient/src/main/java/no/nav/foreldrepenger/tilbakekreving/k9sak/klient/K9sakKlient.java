@@ -1,6 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.k9sak.klient;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,14 +15,6 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.K9tilbake;
@@ -64,14 +55,6 @@ public class K9sakKlient implements FagsystemKlient {
     private static final String K9_OPPDRAG_HENT_FEILUTBETALINGER = "/simulering/feilutbetalte-perioder";
 
     private OidcRestClient restClient;
-    private static ObjectMapper mapper;
-
-    static {
-        mapper = new ObjectMapper();
-        mapper.registerModule(new Jdk8Module());
-        mapper.registerModule(new JavaTimeModule());
-        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-    }
 
     @Inject
     public K9sakKlient(OidcRestClient restClient) {
@@ -137,11 +120,11 @@ public class K9sakKlient implements FagsystemKlient {
             .orElseThrow(() -> K9sakKlientFeil.FACTORY.fantIkkeYtelesbehandlingISimuleringsapplikasjonen(uuid).toException());
     }
 
+    static class ListeAvK9sakBehandlingInfoDto extends ArrayList<K9sakBehandlingInfoDto>{}
+
     private List<K9sakBehandlingInfoDto> hentK9sakBehandlingForSaksnummer(String saksnummer) {
         URI endpoint = createUri(BEHANDLING_ALLE_EP, PARAM_NAME_SAKSNUMMER, saksnummer);
-        JsonNode jsonNode = restClient.get(endpoint, JsonNode.class);
-        //TODO Fiks slik at denne kan leses på vanlig måte (json håndtert av OidcRestClient)
-        List<K9sakBehandlingInfoDto> behandlinger = lesResponsFraJsonNode(saksnummer, jsonNode);
+        List<K9sakBehandlingInfoDto> behandlinger = restClient.get(endpoint, ListeAvK9sakBehandlingInfoDto.class);
         for (K9sakBehandlingInfoDto dto : behandlinger) {
             dto.setHenvisning(hentHenvisning(dto.getUuid()));
         }
@@ -188,16 +171,6 @@ public class K9sakKlient implements FagsystemKlient {
 
     private Henvisning hentHenvisning(UUID uuid) {
         return K9HenvisningKonverterer.uuidTilHenvisning(uuid);
-    }
-
-    private List<K9sakBehandlingInfoDto> lesResponsFraJsonNode(String saksnummer, JsonNode jsonNode) {
-        ObjectReader reader = mapper.readerFor(new TypeReference<List<K9sakBehandlingInfoDto>>() {
-        });
-        try {
-            return reader.readValue(jsonNode);
-        } catch (IOException e) {
-            throw K9sakKlientFeil.FACTORY.lesResponsFeil(saksnummer, e).toException();
-        }
     }
 
     private PersonopplysningDto hentPersonopplysninger(BehandlingResourceLinkDto resourceLink) {

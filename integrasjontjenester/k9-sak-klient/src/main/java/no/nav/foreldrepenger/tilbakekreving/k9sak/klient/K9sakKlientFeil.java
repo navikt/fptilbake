@@ -1,6 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.k9sak.klient;
 
-import java.io.IOException;
 import java.util.UUID;
 
 import no.nav.vedtak.feil.Feil;
@@ -12,9 +11,6 @@ import no.nav.vedtak.feil.deklarasjon.IntegrasjonFeil;
 public interface K9sakKlientFeil extends DeklarerteFeil {
 
     K9sakKlientFeil FACTORY = FeilFactory.create(K9sakKlientFeil.class);
-
-    @IntegrasjonFeil(feilkode = "FPT-532525", feilmelding = "Å lese repons feiler for saksnummer:%s med feilmelding:%s", logLevel = LogLevel.WARN)
-    Feil lesResponsFeil(String saksnummer, IOException e);
 
     @IntegrasjonFeil(feilkode = "FPT-7428497", feilmelding = "Fant ingen ekstern behandling i K9sak for Uuid %s", logLevel = LogLevel.WARN)
     Feil fantIkkeEksternBehandlingForUuid(String uuId);

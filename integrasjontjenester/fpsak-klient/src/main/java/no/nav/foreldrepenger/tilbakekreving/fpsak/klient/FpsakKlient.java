@@ -1,6 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.fpsak.klient;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,14 +15,6 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.Fptilbake;
@@ -66,15 +57,6 @@ public class FpsakKlient implements FagsystemKlient {
     //fpoppdrag trenger ikke en egen klient
     //kanskje den til og med skal skrives om til at fpsak gir lenke (slik som for de andre tjenestene)
     private FpoppdragRestKlient fpoppdragKlient;
-
-    private static ObjectMapper mapper;
-
-    static {
-        mapper = new ObjectMapper();
-        mapper.registerModule(new Jdk8Module());
-        mapper.registerModule(new JavaTimeModule());
-        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-    }
 
     FpsakKlient() {
         // CDI
@@ -185,25 +167,15 @@ public class FpsakKlient implements FagsystemKlient {
             .orElseThrow(() -> FpsakKlientFeil.FACTORY.fantIkkeYtelesbehandlingISimuleringsapplikasjonen(fpsakBehandlingId).toException());
     }
 
+    static class ListeAvFpsakBehandlingInfoDto extends ArrayList<FpsakBehandlingInfoDto>{}
+
     public List<FpsakBehandlingInfoDto> hentFpsakBehandlingForSaksnummer(String saksnummer) {
         URI endpoint = createUri(BEHANDLING_ALLE_EP, PARAM_NAME_SAKSNUMMER, saksnummer);
-        JsonNode jsonNode = restClient.get(endpoint, JsonNode.class);
-        //TODO Fiks slik at denne kan leses på vanlig måte (json håndtert av OidcRestClient)
-        List<FpsakBehandlingInfoDto> behandlinger = lesResponsFraJsonNode(saksnummer, jsonNode);
+        List<FpsakBehandlingInfoDto> behandlinger = restClient.get(endpoint, ListeAvFpsakBehandlingInfoDto.class);
         for (FpsakBehandlingInfoDto dto : behandlinger) {
             dto.setHenvisning(Henvisning.fraEksternBehandlingId(dto.getId()));
         }
         return behandlinger;
-    }
-
-    private List<FpsakBehandlingInfoDto> lesResponsFraJsonNode(String saksnummer, JsonNode jsonNode) {
-        ObjectReader reader = mapper.readerFor(new TypeReference<List<FpsakBehandlingInfoDto>>() {
-        });
-        try {
-            return reader.readValue(jsonNode);
-        } catch (IOException e) {
-            throw FpsakKlientFeil.FACTORY.lesResponsFeil(saksnummer, e).toException();
-        }
     }
 
     private PersonopplysningDto hentPersonopplysninger(BehandlingResourceLinkDto resourceLink) {

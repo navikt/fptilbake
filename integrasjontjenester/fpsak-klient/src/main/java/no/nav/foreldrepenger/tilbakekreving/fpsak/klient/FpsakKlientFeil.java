@@ -1,6 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.fpsak.klient;
 
-import java.io.IOException;
 import java.util.UUID;
 
 import no.nav.vedtak.feil.Feil;
@@ -12,9 +11,6 @@ import no.nav.vedtak.feil.deklarasjon.IntegrasjonFeil;
 public interface FpsakKlientFeil extends DeklarerteFeil {
 
     FpsakKlientFeil FACTORY = FeilFactory.create(FpsakKlientFeil.class);
-
-    @IntegrasjonFeil(feilkode = "FPT-532524", feilmelding = "Å lese repons feiler for saksnummer:%s med feilmelding:%s", logLevel = LogLevel.WARN)
-    Feil lesResponsFeil(String saksnummer, IOException e);
 
     @IntegrasjonFeil(feilkode = "FPT-7428496", feilmelding = "Fant ingen ekstern behandling i Fpsak for Uuid %s", logLevel = LogLevel.WARN)
     Feil fantIkkeEksternBehandlingForUuid(String uuId);
