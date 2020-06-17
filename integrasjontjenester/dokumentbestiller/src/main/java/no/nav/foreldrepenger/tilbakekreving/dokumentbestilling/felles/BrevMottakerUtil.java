@@ -20,7 +20,7 @@ public class BrevMottakerUtil {
 
         String annenMottakerNavn = brukerNavn;
         if (mottakerNavn.equalsIgnoreCase(brukerNavn)) {
-            annenMottakerNavn = brevMetadata.isFinnesVerge() ? vergeNavn.replaceAll("\n","") : "";
+            annenMottakerNavn = brevMetadata.isFinnesVerge() ? vergeNavn : "";
         }
         return annenMottakerNavn;
     }

@@ -118,16 +118,31 @@ public class EksternDataForBrevTjeneste {
     }
 
     private Adresseinfo fra(Virksomhet virksomhet, String vergeNavn, Personinfo personinfo, BrevMottaker brevMottaker) {
-        String mottakerNavn = virksomhet.getNavn() + '\n' + " v/ " + vergeNavn;
-        String navn = BrevMottaker.VERGE.equals(brevMottaker) ? mottakerNavn : personinfo.getNavn();
-        Adresseinfo.Builder adresseinfo = new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE, personinfo.getPersonIdent(), navn, personinfo.getPersonstatus());
-        return adresseinfo.medAdresselinje1(virksomhet.getAdresselinje1())
-            .medAdresselinje2(virksomhet.getAdresselinje2())
-            .medAdresselinje3(virksomhet.getAdresselinje3())
-            .medLand(virksomhet.getLandkode())
-            .medPostNr(virksomhet.getPostNr())
-            .medPoststed(virksomhet.getPoststed())
-            .medAnnenMottakerNavn(mottakerNavn).build();
+        String organisasjonNavn = virksomhet.getNavn();
+        String vedVergeNavn = " v/ " + vergeNavn;
+        String annenMottakerNavn = organisasjonNavn + vedVergeNavn;
+        Adresseinfo.Builder adresseinfo;
+        if (BrevMottaker.VERGE.equals(brevMottaker)) {
+            adresseinfo = new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE, personinfo.getPersonIdent(), organisasjonNavn, personinfo.getPersonstatus());
+            adresseinfo.medAdresselinje1(vedVergeNavn)
+                .medAdresselinje2(virksomhet.getAdresselinje1())
+                .medAdresselinje3(virksomhet.getAdresselinje2())
+                .medAdresselinje4(virksomhet.getAdresselinje3())
+                .medLand(virksomhet.getLandkode())
+                .medPostNr(virksomhet.getPostNr())
+                .medPoststed(virksomhet.getPoststed())
+                .medAnnenMottakerNavn(personinfo.getNavn());
+        } else {
+            adresseinfo = new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE, personinfo.getPersonIdent(), personinfo.getNavn(), personinfo.getPersonstatus());
+            adresseinfo.medAdresselinje1(virksomhet.getAdresselinje1())
+                .medAdresselinje2(virksomhet.getAdresselinje2())
+                .medAdresselinje3(virksomhet.getAdresselinje3())
+                .medLand(virksomhet.getLandkode())
+                .medPostNr(virksomhet.getPostNr())
+                .medPoststed(virksomhet.getPoststed())
+                .medAnnenMottakerNavn(annenMottakerNavn);
+        }
+        return adresseinfo.build();
     }
 
 }
