@@ -2,6 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+// TODO: Er denne klassen i det heile tatt i bruk?
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class BehandlingIdDto {
     private Long behandlingId;

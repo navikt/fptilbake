@@ -5,6 +5,8 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingsinfoDto;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FpsakBehandlingInfoDto extends EksternBehandlingsinfoDto {
 
