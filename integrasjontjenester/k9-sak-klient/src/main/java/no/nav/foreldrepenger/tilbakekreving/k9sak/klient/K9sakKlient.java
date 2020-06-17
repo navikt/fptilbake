@@ -2,10 +2,8 @@ package no.nav.foreldrepenger.tilbakekreving.k9sak.klient;
 
 import java.io.IOException;
 import java.net.URI;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -27,8 +25,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.K9tilbake;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
@@ -68,9 +64,8 @@ public class K9sakKlient implements FagsystemKlient {
     private static final String K9_OPPDRAG_HENT_FEILUTBETALINGER = "/simulering/feilutbetalte-perioder";
 
     private OidcRestClient restClient;
-    private EksternBehandlingRepository eksternBehandlingRepository;
-
     private static ObjectMapper mapper;
+
     static {
         mapper = new ObjectMapper();
         mapper.registerModule(new Jdk8Module());
@@ -79,9 +74,8 @@ public class K9sakKlient implements FagsystemKlient {
     }
 
     @Inject
-    public K9sakKlient(OidcRestClient restClient, EksternBehandlingRepository eksternBehandlingRepository) {
+    public K9sakKlient(OidcRestClient restClient) {
         this.restClient = restClient;
-        this.eksternBehandlingRepository = eksternBehandlingRepository;
     }
 
     @Override
@@ -136,16 +130,11 @@ public class K9sakKlient implements FagsystemKlient {
 
     @Override
     public FeilutbetaltePerioderDto hentFeilutbetaltePerioder(Henvisning henvisning) {
-        // TODO: Denne er vel nødvendig, siden det ikkje ser ut til å være mulig å utlede Uuid frå henvisning?
-        Optional<EksternBehandling> eksternBehandling = eksternBehandlingRepository.hentFraHenvisning(henvisning);
-        if (eksternBehandling.isPresent()) {
-            URI hentFeilutbetalingerUri = URI.create(getK9OoppdragBaseUri() + K9_OPPDRAG_HENT_FEILUTBETALINGER);
-            String behandlingId = eksternBehandling.get().getEksternUuid().toString();
-            return restClient
-                .postReturnsOptional(hentFeilutbetalingerUri, new BehandlingIdDto(behandlingId), FeilutbetaltePerioderDto.class)
-                .orElseThrow(() -> K9sakKlientFeil.FACTORY.fantIkkeYtelesbehandlingISimuleringsapplikasjonen(behandlingId).toException());
-        }
-        return null;
+        UUID uuid = K9HenvisningKonverterer.henvisningTilUuid(henvisning);
+        URI hentFeilutbetalingerUri = URI.create(getK9OoppdragBaseUri() + K9_OPPDRAG_HENT_FEILUTBETALINGER);
+        return restClient
+            .postReturnsOptional(hentFeilutbetalingerUri, new BehandlingIdDto(uuid), FeilutbetaltePerioderDto.class)
+            .orElseThrow(() -> K9sakKlientFeil.FACTORY.fantIkkeYtelesbehandlingISimuleringsapplikasjonen(uuid).toException());
     }
 
     private List<K9sakBehandlingInfoDto> hentK9sakBehandlingForSaksnummer(String saksnummer) {
@@ -198,18 +187,7 @@ public class K9sakKlient implements FagsystemKlient {
     }
 
     private Henvisning hentHenvisning(UUID uuid) {
-        String utledetHenvisning = utledHenvisning(uuid);
-        return new Henvisning(utledetHenvisning);
-    }
-
-    static String utledHenvisning(UUID uuid) {
-        // TODO: Koden her er kopiert frå HenvisningUtleder i k9-oppdrag. Bør det være noko liknande i fptilbake?
-        ByteBuffer buffer = ByteBuffer.allocate(2 * Long.BYTES);
-        buffer.putLong(uuid.getMostSignificantBits());
-        buffer.putLong(uuid.getLeastSignificantBits());
-        String base64encodedWithPadding = Base64.getEncoder().encodeToString(buffer.array());
-        int paddingStart = base64encodedWithPadding.indexOf("=");
-        return paddingStart == -1 ? base64encodedWithPadding : base64encodedWithPadding.substring(0, paddingStart);
+        return K9HenvisningKonverterer.uuidTilHenvisning(uuid);
     }
 
     private List<K9sakBehandlingInfoDto> lesResponsFraJsonNode(String saksnummer, JsonNode jsonNode) {

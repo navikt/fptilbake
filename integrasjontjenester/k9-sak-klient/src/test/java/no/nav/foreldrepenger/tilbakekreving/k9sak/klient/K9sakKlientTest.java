@@ -20,7 +20,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.tilbakekrevingsvalg.VidereBehandling;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.Tillegsinformasjon;
@@ -38,7 +37,7 @@ public class K9sakKlientTest {
 
     private static final String SAKSNUMMER = "1256436";
     private static final UUID BEHANDLING_UUID = UUID.randomUUID();
-    private static final Henvisning HENVISNING = new Henvisning(K9sakKlient.utledHenvisning(BEHANDLING_UUID));
+    private static final Henvisning HENVISNING = K9HenvisningKonverterer.uuidTilHenvisning(BEHANDLING_UUID);
 
     private static final String BASE_URI = "http://k9-sak";
     private static final URI BEHANDLING_URI = URI.create(BASE_URI + "/k9/sak/api/behandling/backend-root?behandlingUuid=" + BEHANDLING_UUID);
@@ -50,9 +49,8 @@ public class K9sakKlientTest {
     public ExpectedException expectedException = ExpectedException.none();
 
     private OidcRestClient oidcRestClientMock = mock(OidcRestClient.class);
-    private EksternBehandlingRepository eksternBehandlingRepositoryMock = mock(EksternBehandlingRepository.class);
 
-    private K9sakKlient klient = new K9sakKlient(oidcRestClientMock, eksternBehandlingRepositoryMock);
+    private K9sakKlient klient = new K9sakKlient(oidcRestClientMock);
 
     @Test
     public void skal_hente_behandlingInfoDto() {

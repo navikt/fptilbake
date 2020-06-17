@@ -20,7 +20,7 @@ public interface K9sakKlientFeil extends DeklarerteFeil {
     Feil fantIkkeEksternBehandlingForUuid(String uuId);
 
     @IntegrasjonFeil(feilkode = "FPT-748280", feilmelding = "Fant ikke behandling med behandlingId %s k9-oppdrag", logLevel = LogLevel.WARN)
-    Feil fantIkkeYtelesbehandlingISimuleringsapplikasjonen(String behandlingId);
+    Feil fantIkkeYtelesbehandlingISimuleringsapplikasjonen(UUID eksternBehandlingUuid);
 
     @IntegrasjonFeil(feilkode = "FPT-841933", feilmelding = "Fant ikke behandling med behandingUuid %s i k9-sak", logLevel = LogLevel.WARN)
     Feil fantIkkeYtelesbehandlingIFagsystemet(UUID behandlingUuid);
