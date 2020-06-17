@@ -5,6 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import javax.enterprise.util.AnnotationLiteral;
 import javax.inject.Qualifier;
 
 @Qualifier
@@ -12,4 +13,6 @@ import javax.inject.Qualifier;
 @Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER})
 public @interface Fptilbake {
 
+    class FptilbakeAnnotationLiteral extends AnnotationLiteral<Fptilbake> implements Fptilbake {
+    }
 }

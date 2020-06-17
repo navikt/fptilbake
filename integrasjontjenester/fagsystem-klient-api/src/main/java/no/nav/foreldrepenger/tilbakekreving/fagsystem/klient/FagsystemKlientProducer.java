@@ -1,10 +1,12 @@
 package no.nav.foreldrepenger.tilbakekreving.fagsystem.klient;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.Fptilbake;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.K9tilbake;
 import no.nav.vedtak.konfig.KonfigVerdi;
 
 @ApplicationScoped
@@ -16,15 +18,16 @@ public class FagsystemKlientProducer {
     }
 
     @Inject
-    public FagsystemKlientProducer(@KonfigVerdi(value = "app.name") String applikasjon,
-                                   @Fptilbake FagsystemKlient fpsakKlient) {
-        if ("fptilbake".equalsIgnoreCase(applikasjon)) {
-            fagsystemKlient = fpsakKlient;
-// TODO: Korleis støtte konfigurasjon for både fptilbake og k9-tilbake?
-//        } else if ("k9tilbake".equals(applikasjon)) {
-//            fagsystemKlient = k9sakKlient;
-        } else {
-            throw new IllegalStateException("app.name er satt til " + applikasjon + " som ikke er en støttet verdi");
+    public FagsystemKlientProducer(@KonfigVerdi(value = "app.name") String applikasjon, Instance<FagsystemKlient> fagsystemklienter) {
+        switch (applikasjon) {
+            case "fptilbake":
+                fagsystemKlient = fagsystemklienter.select(new Fptilbake.FptilbakeAnnotationLiteral()).get();
+                break;
+            case "k9tilbake":
+                fagsystemKlient = fagsystemklienter.select(new K9tilbake.K9tilbakeAnnotationLiteral()).get();
+                break;
+            default:
+                throw new IllegalStateException("app.name er satt til " + applikasjon + " som ikke er en støttet verdi");
         }
     }
 
@@ -33,4 +36,6 @@ public class FagsystemKlientProducer {
     public FagsystemKlient produce() {
         return fagsystemKlient;
     }
+
+
 }
