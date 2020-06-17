@@ -16,8 +16,6 @@ import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.rules.ExpectedException;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.tilbakekrevingsvalg.VidereBehandling;
@@ -75,9 +73,9 @@ public class K9sakKlientTest {
     @Test
     public void skal_returnere_hvis_finnes_behandling_i_k9sak() {
         K9sakBehandlingInfoDto eksternBehandlingInfo = k9sakBehandlingInfoDto();
-
-        JsonNode jsonNode = new ObjectMapper().convertValue(Lists.newArrayList(eksternBehandlingInfo), JsonNode.class);
-        when(oidcRestClientMock.get(BEHANDLING_ALLE_URI, JsonNode.class)).thenReturn(jsonNode);
+        K9sakKlient.ListeAvK9sakBehandlingInfoDto liste = new K9sakKlient.ListeAvK9sakBehandlingInfoDto();
+        liste.add(eksternBehandlingInfo);
+        when(oidcRestClientMock.get(BEHANDLING_ALLE_URI, K9sakKlient.ListeAvK9sakBehandlingInfoDto.class)).thenReturn(liste);
 
         boolean erFinnesIFpsak = klient.finnesBehandlingIFagsystem(SAKSNUMMER, HENVISNING);
         assertThat(erFinnesIFpsak).isTrue();
@@ -85,8 +83,7 @@ public class K9sakKlientTest {
 
     @Test
     public void skal_returnere_tom_hvis_finnes_ikke_behandling_i_k9sak() {
-        JsonNode jsonNode = new ObjectMapper().convertValue(Lists.newArrayList(), JsonNode.class);
-        when(oidcRestClientMock.get(BEHANDLING_ALLE_URI, JsonNode.class)).thenReturn(jsonNode);
+        when(oidcRestClientMock.get(BEHANDLING_ALLE_URI, K9sakKlient.ListeAvK9sakBehandlingInfoDto.class)).thenReturn(new K9sakKlient.ListeAvK9sakBehandlingInfoDto());
 
         boolean erFinnesIFpsak = klient.finnesBehandlingIFagsystem(SAKSNUMMER, HENVISNING);
         assertThat(erFinnesIFpsak).isFalse();

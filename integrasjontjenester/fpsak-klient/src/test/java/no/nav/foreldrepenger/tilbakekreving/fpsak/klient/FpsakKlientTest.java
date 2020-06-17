@@ -17,20 +17,18 @@ import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.rules.ExpectedException;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.tilbakekrevingsvalg.VidereBehandling;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.Tillegsinformasjon;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.BehandlingResourceLinkDto;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.FpsakBehandlingInfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.KodeDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.PersonadresseDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.PersonopplysningDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.TilbakekrevingValgDto;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.BehandlingResourceLinkDto;
+import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.FpsakBehandlingInfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.simulering.FpoppdragRestKlient;
 import no.nav.vedtak.exception.IntegrasjonException;
 import no.nav.vedtak.felles.integrasjon.rest.OidcRestClient;
@@ -79,9 +77,9 @@ public class FpsakKlientTest {
     @Test
     public void skal_returnere_hvis_finnes_behandling_i_fpsak() {
         FpsakBehandlingInfoDto eksternBehandlingInfo = dokumentinfoDto();
-
-        JsonNode jsonNode = new ObjectMapper().convertValue(Lists.newArrayList(eksternBehandlingInfo), JsonNode.class);
-        when(oidcRestClientMock.get(BEHANDLING_ALLE_URI, JsonNode.class)).thenReturn(jsonNode);
+        FpsakKlient.ListeAvFpsakBehandlingInfoDto liste = new FpsakKlient.ListeAvFpsakBehandlingInfoDto();
+        liste.add(eksternBehandlingInfo);
+        when(oidcRestClientMock.get(BEHANDLING_ALLE_URI, FpsakKlient.ListeAvFpsakBehandlingInfoDto.class)).thenReturn(liste);
 
         boolean erFinnesIFpsak = klient.finnesBehandlingIFagsystem(SAKSNUMMER, HENVISNING);
         assertThat(erFinnesIFpsak).isTrue();
@@ -89,8 +87,7 @@ public class FpsakKlientTest {
 
     @Test
     public void skal_returnere_tom_hvis_finnes_ikke_behandling_i_fpsak() {
-        JsonNode jsonNode = new ObjectMapper().convertValue(Lists.newArrayList(), JsonNode.class);
-        when(oidcRestClientMock.get(BEHANDLING_ALLE_URI, JsonNode.class)).thenReturn(jsonNode);
+        when(oidcRestClientMock.get(BEHANDLING_ALLE_URI, FpsakKlient.ListeAvFpsakBehandlingInfoDto.class)).thenReturn(new FpsakKlient.ListeAvFpsakBehandlingInfoDto());
 
         boolean erFinnesIFpsak = klient.finnesBehandlingIFagsystem(SAKSNUMMER, HENVISNING);
         assertThat(erFinnesIFpsak).isFalse();
