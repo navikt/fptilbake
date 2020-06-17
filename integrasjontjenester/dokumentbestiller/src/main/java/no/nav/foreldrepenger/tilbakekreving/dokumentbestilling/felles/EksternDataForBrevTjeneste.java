@@ -119,8 +119,8 @@ public class EksternDataForBrevTjeneste {
 
     private Adresseinfo fra(Virksomhet virksomhet, String vergeNavn, Personinfo personinfo, BrevMottaker brevMottaker) {
         String organisasjonNavn = virksomhet.getNavn();
-        String vedVergeNavn = " v/ " + vergeNavn;
-        String annenMottakerNavn = organisasjonNavn + vedVergeNavn;
+        String vedVergeNavn = "v/ " + vergeNavn;
+        String annenMottakerNavn = organisasjonNavn + " " + vedVergeNavn;
         Adresseinfo.Builder adresseinfo;
         if (BrevMottaker.VERGE.equals(brevMottaker)) {
             adresseinfo = new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE, personinfo.getPersonIdent(), organisasjonNavn, personinfo.getPersonstatus());
