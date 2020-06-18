@@ -42,7 +42,6 @@ import no.nav.foreldrepenger.tilbakekreving.domene.person.TpsTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.Redirect;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
-import no.nav.vedtak.util.env.Environment;
 
 @ApplicationScoped
 @Path(VergeRestTjeneste.BASE_PATH)
@@ -82,9 +81,6 @@ public class VergeRestTjeneste {
     @BeskyttetRessurs(action = UPDATE, ressurs = FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response opprettVerge(@Parameter(description = "Behandling som skal få verge/fullmektig") @Valid BehandlingIdDto dto) throws URISyntaxException {
-        if(Environment.current().isProd()){
-            throw VergeFeil.FACTORY.harVergeSkruddAvIProd().toException();
-        }
         Behandling behandling = behandlingTjeneste.hentBehandling(dto.getBehandlingId());
         if (behandling.erSaksbehandlingAvsluttet() || behandling.isBehandlingPåVent()) {
             throw VergeFeil.FACTORY.kanIkkeOppretteVerge(behandling.getId()).toException();
