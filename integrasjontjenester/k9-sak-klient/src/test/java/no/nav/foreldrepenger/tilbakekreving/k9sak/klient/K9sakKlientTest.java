@@ -77,16 +77,16 @@ public class K9sakKlientTest {
         liste.add(eksternBehandlingInfo);
         when(oidcRestClientMock.get(BEHANDLING_ALLE_URI, K9sakKlient.ListeAvK9sakBehandlingInfoDto.class)).thenReturn(liste);
 
-        boolean erFinnesIFpsak = klient.finnesBehandlingIFagsystem(SAKSNUMMER, HENVISNING);
-        assertThat(erFinnesIFpsak).isTrue();
+        boolean erFinnesIK9sak = klient.finnesBehandlingIFagsystem(SAKSNUMMER, HENVISNING);
+        assertThat(erFinnesIK9sak).isTrue();
     }
 
     @Test
     public void skal_returnere_tom_hvis_finnes_ikke_behandling_i_k9sak() {
         when(oidcRestClientMock.get(BEHANDLING_ALLE_URI, K9sakKlient.ListeAvK9sakBehandlingInfoDto.class)).thenReturn(new K9sakKlient.ListeAvK9sakBehandlingInfoDto());
 
-        boolean erFinnesIFpsak = klient.finnesBehandlingIFagsystem(SAKSNUMMER, HENVISNING);
-        assertThat(erFinnesIFpsak).isFalse();
+        boolean erFinnesIK9sak = klient.finnesBehandlingIFagsystem(SAKSNUMMER, HENVISNING);
+        assertThat(erFinnesIK9sak).isFalse();
     }
 
     @Test
