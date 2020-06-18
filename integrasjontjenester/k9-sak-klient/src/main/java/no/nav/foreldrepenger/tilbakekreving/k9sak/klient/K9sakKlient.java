@@ -28,7 +28,6 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SoknadDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.TilbakekrevingValgDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.VarseltekstDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.simulering.FeilutbetaltePerioderDto;
-import no.nav.foreldrepenger.tilbakekreving.k9sak.klient.dto.BehandlingIdDto;
 import no.nav.foreldrepenger.tilbakekreving.k9sak.klient.dto.BehandlingResourceLinkDto;
 import no.nav.foreldrepenger.tilbakekreving.k9sak.klient.dto.K9sakBehandlingInfoDto;
 import no.nav.vedtak.felles.integrasjon.rest.OidcRestClient;
@@ -116,7 +115,7 @@ public class K9sakKlient implements FagsystemKlient {
         UUID uuid = K9HenvisningKonverterer.henvisningTilUuid(henvisning);
         URI hentFeilutbetalingerUri = URI.create(getK9OoppdragBaseUri() + K9_OPPDRAG_HENT_FEILUTBETALINGER);
         return restClient
-            .postReturnsOptional(hentFeilutbetalingerUri, new BehandlingIdDto(uuid), FeilutbetaltePerioderDto.class)
+            .postReturnsOptional(hentFeilutbetalingerUri, uuid, FeilutbetaltePerioderDto.class)
             .orElseThrow(() -> K9sakKlientFeil.FACTORY.fantIkkeYtelesbehandlingISimuleringsapplikasjonen(uuid).toException());
     }
 
