@@ -81,6 +81,10 @@ public class Adresseinfo {
         return annenMottakerNavn;
     }
 
+    public void setAnnenMottakerNavn(String annenMottakerNavn) {
+        this.annenMottakerNavn = annenMottakerNavn;
+    }
+
     public static class Builder {
         private final AdresseType gjeldendePostadresseType;
         private final String mottakerNavn;

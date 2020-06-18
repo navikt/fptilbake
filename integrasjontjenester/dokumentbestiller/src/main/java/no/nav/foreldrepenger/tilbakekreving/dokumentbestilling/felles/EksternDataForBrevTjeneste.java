@@ -84,13 +84,11 @@ public class EksternDataForBrevTjeneste {
     public Adresseinfo hentAdresse(Personinfo personinfo, BrevMottaker brevMottaker, Optional<VergeEntitet> vergeEntitet) {
         if (vergeEntitet.isPresent()) {
             VergeEntitet verge = vergeEntitet.get();
-            if (BrevMottaker.VERGE.equals(brevMottaker)) {
-                if (VergeType.ADVOKAT.equals(verge.getVergeType())) {
-                    return hentOrganisasjonAdresse(verge.getOrganisasjonsnummer(), verge.getNavn(), personinfo, brevMottaker);
-                } else {
-                    String aktørId = verge.getVergeAktørId().getId();
-                    personinfo = hentPerson(aktørId);
-                }
+            if (VergeType.ADVOKAT.equals(verge.getVergeType())) {
+                return hentOrganisasjonAdresse(verge.getOrganisasjonsnummer(), verge.getNavn(), personinfo, brevMottaker);
+            } else {
+                String aktørId = verge.getVergeAktørId().getId();
+                personinfo = hentPerson(aktørId);
             }
         }
         return hentAdresse(personinfo);
@@ -123,28 +121,22 @@ public class EksternDataForBrevTjeneste {
         String organisasjonNavn = virksomhet.getNavn();
         String vedVergeNavn = "v/ " + vergeNavn;
         String annenMottakerNavn = organisasjonNavn + " " + vedVergeNavn;
-        Adresseinfo.Builder adresseinfo;
+        Adresseinfo adresseinfo;
         if (BrevMottaker.VERGE.equals(brevMottaker)) {
-            adresseinfo = new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE, personinfo.getPersonIdent(), organisasjonNavn, personinfo.getPersonstatus());
-            adresseinfo.medAdresselinje1(vedVergeNavn)
+            Adresseinfo.Builder adresseinfoBuilder = new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE, personinfo.getPersonIdent(), organisasjonNavn, personinfo.getPersonstatus());
+            adresseinfo = adresseinfoBuilder.medAdresselinje1(vedVergeNavn)
                 .medAdresselinje2(virksomhet.getAdresselinje1())
                 .medAdresselinje3(virksomhet.getAdresselinje2())
                 .medAdresselinje4(virksomhet.getAdresselinje3())
                 .medLand(virksomhet.getLandkode())
                 .medPostNr(virksomhet.getPostNr())
                 .medPoststed(virksomhet.getPoststed())
-                .medAnnenMottakerNavn(personinfo.getNavn());
+                .medAnnenMottakerNavn(personinfo.getNavn()).build();
         } else {
-            adresseinfo = new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE, personinfo.getPersonIdent(), personinfo.getNavn(), personinfo.getPersonstatus());
-            adresseinfo.medAdresselinje1(virksomhet.getAdresselinje1())
-                .medAdresselinje2(virksomhet.getAdresselinje2())
-                .medAdresselinje3(virksomhet.getAdresselinje3())
-                .medLand(virksomhet.getLandkode())
-                .medPostNr(virksomhet.getPostNr())
-                .medPoststed(virksomhet.getPoststed())
-                .medAnnenMottakerNavn(annenMottakerNavn);
+            adresseinfo = hentAdresse(personinfo);
+            adresseinfo.setAnnenMottakerNavn(annenMottakerNavn);
         }
-        return adresseinfo.build();
+        return adresseinfo;
     }
 
 }
