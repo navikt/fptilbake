@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.fagsystem.klient;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
@@ -18,7 +19,7 @@ public class FagsystemKlientProducer {
     }
 
     @Inject
-    public FagsystemKlientProducer(@KonfigVerdi(value = "app.name") String applikasjon, Instance<FagsystemKlient> fagsystemklienter) {
+    public FagsystemKlientProducer(@KonfigVerdi(value = "app.name") String applikasjon, @Any Instance<FagsystemKlient> fagsystemklienter) {
         switch (applikasjon) {
             case "fptilbake":
                 fagsystemKlient = fagsystemklienter.select(new Fptilbake.FptilbakeAnnotationLiteral()).get();
