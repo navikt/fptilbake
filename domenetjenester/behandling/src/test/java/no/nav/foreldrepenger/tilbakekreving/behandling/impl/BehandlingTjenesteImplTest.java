@@ -57,7 +57,6 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
     @Before
     public void setup() {
         repoRule.getEntityManager().setFlushMode(FlushModeType.AUTO);
-        System.setProperty("environment.name", "devimg");
         when(mockFagsystemKlient.hentTilbakekrevingValg(eksternBehandlingUuid)).thenReturn(Optional.of(new TilbakekrevingValgDto(VidereBehandling.TILBAKEKREV_I_INFOTRYGD)));
         when(mockFagsystemKlient.hentBehandlingOptional(eksternBehandlingUuid)).thenReturn(Optional.of(lagEksternBehandlingsInfo()));
     }

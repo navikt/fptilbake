@@ -17,7 +17,4 @@ public interface VergeFeil extends DeklarerteFeil {
 
     @TekniskFeil(feilkode = "FPT-185321", feilmelding = "Behandling %s har allerede aksjonspunkt 5030 for verge/fullmektig", logLevel = LogLevel.WARN)
     Feil harAlleredeAksjonspunktForVerge(Long behandlingId);
-
-    @TekniskFeil(feilkode = "FPT-185322", feilmelding = "Verge funksjonalitet er ikke skrudd på i produksjon", logLevel = LogLevel.WARN)
-    Feil harVergeSkruddAvIProd();
 }

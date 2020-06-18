@@ -56,7 +56,6 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.konfig.KonfigVerdi;
 import no.nav.vedtak.util.StringUtils;
-import no.nav.vedtak.util.env.Environment;
 
 @ApplicationScoped
 @Transactional
@@ -300,12 +299,10 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
 
     //TODO verge bør flyttes til egen tjeneste, aller helst i eget 'hent fra saksbehandlingssystemet-steg'
     private void hentVergeInformasjonFraFpsak(long behandlingId) {
-        if (erTestMiljø()) {
-            EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandlingId);
-            SamletEksternBehandlingInfo eksternBehandlingInfo = fagsystemKlient.hentBehandlingsinfo(eksternBehandling.getEksternUuid(), Tillegsinformasjon.VERGE);
-            if (eksternBehandlingInfo.getVerge() != null) {
-                lagreVergeInformasjon(behandlingId, eksternBehandlingInfo.getVerge());
-            }
+        EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandlingId);
+        SamletEksternBehandlingInfo eksternBehandlingInfo = fagsystemKlient.hentBehandlingsinfo(eksternBehandling.getEksternUuid(), Tillegsinformasjon.VERGE);
+        if (eksternBehandlingInfo.getVerge() != null) {
+            lagreVergeInformasjon(behandlingId, eksternBehandlingInfo.getVerge());
         }
     }
 
@@ -326,14 +323,6 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
             }
             vergeRepository.lagreVergeInformasjon(behandlingId, builder.build());
         }
-    }
-
-    //midlertidig kode. skal fjernes etter en stund
-    private boolean erTestMiljø() {
-        //foreløpig kun på for testing
-        boolean isEnabled = !Environment.current().isProd();
-        logger.info("{} er {}", "Hent vergeInformasjon er", isEnabled ? "skudd på" : "ikke skudd på");
-        return isEnabled;
     }
 
 }
