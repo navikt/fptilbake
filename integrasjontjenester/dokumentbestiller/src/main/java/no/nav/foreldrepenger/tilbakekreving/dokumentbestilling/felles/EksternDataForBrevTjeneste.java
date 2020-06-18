@@ -84,11 +84,13 @@ public class EksternDataForBrevTjeneste {
     public Adresseinfo hentAdresse(Personinfo personinfo, BrevMottaker brevMottaker, Optional<VergeEntitet> vergeEntitet) {
         if (vergeEntitet.isPresent()) {
             VergeEntitet verge = vergeEntitet.get();
-            if (VergeType.ADVOKAT.equals(verge.getVergeType())) {
-                return hentOrganisasjonAdresse(verge.getOrganisasjonsnummer(), verge.getNavn(), personinfo, brevMottaker);
-            } else if (BrevMottaker.VERGE.equals(brevMottaker)) {
-                String aktørId = verge.getVergeAktørId().getId();
-                personinfo = hentPerson(aktørId);
+            if (BrevMottaker.VERGE.equals(brevMottaker)) {
+                if (VergeType.ADVOKAT.equals(verge.getVergeType())) {
+                    return hentOrganisasjonAdresse(verge.getOrganisasjonsnummer(), verge.getNavn(), personinfo, brevMottaker);
+                } else {
+                    String aktørId = verge.getVergeAktørId().getId();
+                    personinfo = hentPerson(aktørId);
+                }
             }
         }
         return hentAdresse(personinfo);
