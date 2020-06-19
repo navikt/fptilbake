@@ -113,7 +113,8 @@ public class HåndterGamleKravgrunnlagTjeneste {
     protected Optional<Long> håndterKravgrunnlagRespons(Long mottattXmlId, String melding, Kravgrunnlag431 kravgrunnlag431) {
         try {
             KravgrunnlagValidator.validerGrunnlag(kravgrunnlag431);
-            String saksnummer = finnSaksnummer(kravgrunnlag431.getFagSystemId());
+            String saksnummer = kravgrunnlag431.getSaksnummer().getVerdi();
+            //TODO k9-tilbake bytt String -> Saksnummer
             if (!finnesBehandling(saksnummer)) {
                 Henvisning henvisning = kravgrunnlag431.getReferanse();
                 Optional<EksternBehandlingsinfoDto> ytelsebehandling = hentYtelsebehandlingFraFagsaksystemet(saksnummer, henvisning);
@@ -214,10 +215,6 @@ public class HåndterGamleKravgrunnlagTjeneste {
         hentKravgrunnlagDetalj.setEnhetAnsvarlig(detaljertKravgrunnlag.getEnhetAnsvarlig());
         hentKravgrunnlagDetalj.setSaksbehId(detaljertKravgrunnlag.getSaksbehId());
         return hentKravgrunnlagDetalj;
-    }
-
-    private String finnSaksnummer(String fagsystemId) {
-        return fagsystemId.substring(0, fagsystemId.length() - 3);
     }
 
     private void lagreGrunnlag(long behandlingId, Kravgrunnlag431 kravgrunnlag431) {

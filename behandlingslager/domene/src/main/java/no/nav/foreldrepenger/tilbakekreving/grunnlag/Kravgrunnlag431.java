@@ -25,7 +25,9 @@ import org.hibernate.annotations.JoinFormula;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.FagsystemId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 
@@ -131,8 +133,8 @@ public class Kravgrunnlag431 extends BaseEntitet {
         return fagOmrådeKode;
     }
 
-    public String getFagSystemId() {
-        return fagSystemId;
+    public Saksnummer getSaksnummer() {
+        return FagsystemId.parse(fagSystemId).getSaksnummer();
     }
 
     public LocalDate getVedtakFagSystemDato() {
@@ -187,7 +189,7 @@ public class Kravgrunnlag431 extends BaseEntitet {
         return saksBehId;
     }
 
-    public Henvisning getReferanse(){
+    public Henvisning getReferanse() {
         return referanse;
     }
 
