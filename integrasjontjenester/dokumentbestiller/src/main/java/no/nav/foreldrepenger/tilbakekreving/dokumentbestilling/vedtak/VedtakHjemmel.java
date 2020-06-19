@@ -122,7 +122,7 @@ public class VedtakHjemmel {
         }
 
         String hjemmelTekst(Språkkode språkkode) {
-            return hjemmelTekster.get(språkkode);
+            return hjemmelTekster.getOrDefault(språkkode, hjemmelTekster.get(Språkkode.nb));
         }
     }
 }
