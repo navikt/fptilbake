@@ -10,7 +10,7 @@ public class FagsystemIdTest {
         String fagsakId = "141243251101";
 
         FagsystemId fagsystemId = FagsystemId.parse(fagsakId);
-        assertThat(fagsystemId.getSaksnummer()).isEqualTo("141243251");
+        assertThat(fagsystemId.getSaksnummer()).isEqualTo(new Saksnummer("141243251"));
         assertThat(fagsystemId.getLøpenummer()).isEqualTo(101);
         assertThat(fagsystemId.toString()).isEqualTo("141243251101");
     }
@@ -20,7 +20,7 @@ public class FagsystemIdTest {
         String fagsakId = "SEGAB-1";
 
         FagsystemId fagsystemId = FagsystemId.parse(fagsakId);
-        assertThat(fagsystemId.getSaksnummer()).isEqualTo("SEGAB");
+        assertThat(fagsystemId.getSaksnummer()).isEqualTo(new Saksnummer("SEGAB"));
         assertThat(fagsystemId.getLøpenummer()).isEqualTo(1);
         assertThat(fagsystemId.toString()).isEqualTo("SEGAB-1");
     }
@@ -31,7 +31,7 @@ public class FagsystemIdTest {
         String fagsakId = "FAG-FP-123-1";
 
         FagsystemId fagsystemId = FagsystemId.parse(fagsakId);
-        assertThat(fagsystemId.getSaksnummer()).isEqualTo(saksnummer);
+        assertThat(fagsystemId.getSaksnummer()).isEqualTo(new Saksnummer(saksnummer));
         assertThat(fagsystemId.getLøpenummer()).isEqualTo(1);
         assertThat(fagsystemId.toString()).isEqualTo(fagsakId);
     }
