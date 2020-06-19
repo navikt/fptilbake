@@ -147,6 +147,11 @@
             <artifactId>fpsak-klient</artifactId>
         </dependency>
         <dependency>
+            <!-- må legge til her får å få k9-sak-klient på classpath -->
+            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+            <artifactId>k9-sak-klient</artifactId>
+        </dependency>
+        <dependency>
             <groupId>no.nav.foreldrepenger.felles.sikkerhet</groupId>
             <artifactId>felles-sikkerhet</artifactId>
         </dependency>

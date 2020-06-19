@@ -239,6 +239,11 @@
             </dependency>
             <dependency>
                 <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+                <artifactId>k9-sak-klient</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
                 <artifactId>fagsystem-klient-api</artifactId>
                 <version>${project.version}</version>
             </dependency>

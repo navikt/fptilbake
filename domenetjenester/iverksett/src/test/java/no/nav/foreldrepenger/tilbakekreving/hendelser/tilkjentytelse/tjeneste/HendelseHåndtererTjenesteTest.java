@@ -16,8 +16,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.tilbakekrevingsvalg.VidereBehandling;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.FagsystemKlient;
-import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.TilbakekrevingValgDto;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.TilbakekrevingValgDto;
 import no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.TilkjentYtelseTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.task.OppdaterBehandlingTask;
 import no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.task.OpprettBehandlingTask;

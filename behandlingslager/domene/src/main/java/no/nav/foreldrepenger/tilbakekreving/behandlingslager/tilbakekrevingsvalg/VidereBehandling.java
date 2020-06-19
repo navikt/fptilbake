@@ -11,6 +11,7 @@ public class VidereBehandling extends Kodeliste {
 
     public static final String DISCRIMINATOR = "TILBAKEKR_VIDERE_BEH";
 
+    // TODO k9-tilbake: Må støtte kode i k9-sak - TILBAKEKR_OPPRETT
     public static final VidereBehandling TILBAKEKREV_I_INFOTRYGD = new VidereBehandling("TILBAKEKR_INFOTRYGD");
     public static final VidereBehandling IGNORER_TILBAKEKREVING = new VidereBehandling("TILBAKEKR_IGNORER");
     public static final VidereBehandling INNTREKK = new VidereBehandling("TILBAKEKR_INNTREKK");

@@ -116,7 +116,7 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
     public void skal_utføre_leskravvedtakstatus_task_for_behandling_som_finnes_ikke_iFpsak() {
         // den xml-en har behandlngId som finnes ikke i EksternBehandling
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_ugyldig.xml"));
-        when(fagsystemKlientMock.finnesBehandlingIFpsak(anyString(), any(Henvisning.class))).thenReturn(false);
+        when(fagsystemKlientMock.finnesBehandlingIFagsystem(anyString(), any(Henvisning.class))).thenReturn(false);
 
         expectedException.expectMessage("FPT-587196");
         lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LesKravvedtakStatusTask.TASKTYPE));
@@ -126,7 +126,7 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
     public void skal_utføre_leskravvedtakstatus_task_når_fptilbake_har_ingen_åpenBehandling() {
         // den xml-en har behandlngId som finnes ikke i EksternBehandling
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_ugyldig.xml"));
-        when(fagsystemKlientMock.finnesBehandlingIFpsak(anyString(), any(Henvisning.class))).thenReturn(true);
+        when(fagsystemKlientMock.finnesBehandlingIFagsystem(anyString(), any(Henvisning.class))).thenReturn(true);
 
         lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LesKravvedtakStatusTask.TASKTYPE));
 
@@ -242,7 +242,7 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         lesKravgrunnlagTask.doTask(lagProsessTaskData(mottattXmlId, LesKravgrunnlagTask.TASKTYPE));
         henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), BehandlingResultatType.HENLAGT_FEILOPPRETTET);
 
-        when(fagsystemKlientMock.finnesBehandlingIFpsak(anyString(), any(Henvisning.class))).thenReturn(true);
+        when(fagsystemKlientMock.finnesBehandlingIFagsystem(anyString(), any(Henvisning.class))).thenReturn(true);
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_SPER_annen_referanse.xml"));
         lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LesKravvedtakStatusTask.TASKTYPE));
 
