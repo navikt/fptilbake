@@ -9,8 +9,6 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
-import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
-
 @ApplicationScoped
 public class FaktaFeilutbetalingRepository {
 
@@ -21,7 +19,7 @@ public class FaktaFeilutbetalingRepository {
     }
 
     @Inject
-    public FaktaFeilutbetalingRepository(@VLPersistenceUnit EntityManager entityManager) {
+    public FaktaFeilutbetalingRepository(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 

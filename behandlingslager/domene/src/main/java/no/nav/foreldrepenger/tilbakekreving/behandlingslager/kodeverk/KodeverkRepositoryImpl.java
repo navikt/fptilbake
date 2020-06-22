@@ -35,7 +35,6 @@ import javax.persistence.metamodel.EntityType;
 import org.hibernate.jpa.QueryHints;
 
 import no.nav.vedtak.exception.TekniskException;
-import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
 import no.nav.vedtak.util.LRUCache;
 
 @ApplicationScoped
@@ -43,7 +42,7 @@ public class KodeverkRepositoryImpl implements KodeverkRepository {
 
     private static final long CACHE_ELEMENT_LIVE_TIME = TimeUnit.MILLISECONDS.convert(1, TimeUnit.MINUTES);
     private static final String KEY_KODEVERK = "kodeverk";
-    LRUCache<String, Kodeliste> kodelisteCache = new LRUCache<>(1000, CACHE_ELEMENT_LIVE_TIME);
+    private LRUCache<String, Kodeliste> kodelisteCache = new LRUCache<>(1000, CACHE_ELEMENT_LIVE_TIME);
     private EntityManager entityManager;
     private KodeverkTabellRepository kodeverkTabellRepository;
 
@@ -54,7 +53,7 @@ public class KodeverkRepositoryImpl implements KodeverkRepository {
     }
 
     @Inject
-    public KodeverkRepositoryImpl(@VLPersistenceUnit EntityManager entityManager) {
+    public KodeverkRepositoryImpl(EntityManager entityManager) {
         Objects.requireNonNull(entityManager, "entityManager"); //$NON-NLS-1$
         this.entityManager = entityManager;
         this.kodeverkTabellRepository = new KodeverkTabellRepositoryImpl(entityManager);

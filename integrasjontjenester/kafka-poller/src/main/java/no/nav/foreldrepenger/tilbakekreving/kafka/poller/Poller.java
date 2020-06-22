@@ -16,7 +16,6 @@ import no.nav.vedtak.feil.LogLevel;
 import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
 import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
 import no.nav.vedtak.felles.jpa.TransactionHandler;
-import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
 
 public class Poller implements Runnable {
 
@@ -32,7 +31,7 @@ public class Poller implements Runnable {
         //for CDI proxy
     }
 
-    Poller(@VLPersistenceUnit EntityManager entityManager, KafkaPoller kafkaPoller) {
+    Poller(EntityManager entityManager, KafkaPoller kafkaPoller) {
         this.entityManager = entityManager;
         this.kafkaPoller = kafkaPoller;
     }

@@ -11,7 +11,6 @@ import javax.persistence.TypedQuery;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandlingsresultat;
-import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
 
 @ApplicationScoped
 public class BehandlingresultatRepositoryImpl implements BehandlingresultatRepository {
@@ -23,7 +22,7 @@ public class BehandlingresultatRepositoryImpl implements BehandlingresultatRepos
     }
 
     @Inject
-    public BehandlingresultatRepositoryImpl(@VLPersistenceUnit EntityManager entityManager) {
+    public BehandlingresultatRepositoryImpl(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 

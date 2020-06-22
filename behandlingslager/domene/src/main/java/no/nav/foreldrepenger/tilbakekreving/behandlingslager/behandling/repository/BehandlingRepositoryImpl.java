@@ -22,7 +22,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsak;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
-import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
 
 @ApplicationScoped
 public class BehandlingRepositoryImpl implements BehandlingRepository {
@@ -33,7 +32,7 @@ public class BehandlingRepositoryImpl implements BehandlingRepository {
     private EntityManager entityManager;
 
     @Inject
-    public BehandlingRepositoryImpl(@VLPersistenceUnit EntityManager entityManager) {
+    public BehandlingRepositoryImpl(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 

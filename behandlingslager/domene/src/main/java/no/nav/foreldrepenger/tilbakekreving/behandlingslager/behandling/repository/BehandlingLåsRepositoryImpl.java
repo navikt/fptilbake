@@ -6,7 +6,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
-import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
 
 /**
  * @see BehandlingLås
@@ -20,7 +19,7 @@ public class BehandlingLåsRepositoryImpl implements BehandlingLåsRepository {
     }
 
     @Inject
-    public BehandlingLåsRepositoryImpl(@VLPersistenceUnit EntityManager entityManager) {
+    public BehandlingLåsRepositoryImpl(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 

@@ -10,7 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import no.nav.vedtak.felles.jpa.tid.DatoIntervallEntitet;
+import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
 @Entity(name = "KodelisteRelasjon")
 @Table(name = "KODELISTE_RELASJON")
@@ -34,10 +34,10 @@ public class KodelisteRelasjon {
 
     @Embedded
     @AttributeOverrides({
-            @AttributeOverride(name = "fomDato", column = @Column(name = "gyldig_fom")),
-            @AttributeOverride(name = "tomDato", column = @Column(name = "gyldig_tom"))
+        @AttributeOverride(name = "fom", column = @Column(name = "gyldig_fom")),
+        @AttributeOverride(name = "tom", column = @Column(name = "gyldig_tom"))
     })
-    private DatoIntervallEntitet gyldigIntervall;
+    private Periode gyldigIntervall;
 
     KodelisteRelasjon() {
         // proxy for hibernate
@@ -48,7 +48,7 @@ public class KodelisteRelasjon {
         this.kode1 = kode1;
         this.kodeverk2 = kodeverk2;
         this.kode2 = kode2;
-        this.gyldigIntervall = DatoIntervallEntitet.fraOgMedTilOgMed(gyldigFom, gyldigTom);
+        this.gyldigIntervall = Periode.of(gyldigFom, gyldigTom);
     }
 
     public String getKodeverk1() {
@@ -68,10 +68,10 @@ public class KodelisteRelasjon {
     }
 
     public LocalDate getGyldigFom() {
-        return gyldigIntervall.getFomDato();
+        return gyldigIntervall.getFom();
     }
 
     public LocalDate getGyldigTom() {
-        return gyldigIntervall.getTomDato();
+        return gyldigIntervall.getTom();
     }
 }

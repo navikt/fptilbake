@@ -9,8 +9,6 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
-import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
-
 @ApplicationScoped
 public class BehandlingVedtakRepository {
 
@@ -21,7 +19,7 @@ public class BehandlingVedtakRepository {
     }
 
     @Inject
-    public BehandlingVedtakRepository(@VLPersistenceUnit EntityManager entityManager) {
+    public BehandlingVedtakRepository( EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 

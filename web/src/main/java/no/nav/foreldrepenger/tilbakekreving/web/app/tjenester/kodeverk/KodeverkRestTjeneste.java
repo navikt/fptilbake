@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
+import javax.transaction.Transactional;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -20,13 +21,12 @@ import com.codahale.metrics.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.kodeverk.app.HentKodeverkTjeneste;
-import no.nav.vedtak.felles.jpa.Transaction;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.util.LRUCache;
 
 @Path("/kodeverk")
 @RequestScoped
-@Transaction
+@Transactional
 public class KodeverkRestTjeneste {
 
     private HentKodeverkTjeneste hentKodeverkTjeneste; // NOSONAR

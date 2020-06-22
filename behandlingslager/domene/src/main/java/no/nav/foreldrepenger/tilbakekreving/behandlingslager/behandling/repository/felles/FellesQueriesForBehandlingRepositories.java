@@ -18,7 +18,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.ReaktiveringStatus;
-import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
 
 @ApplicationScoped
 public class FellesQueriesForBehandlingRepositories {
@@ -30,7 +29,7 @@ public class FellesQueriesForBehandlingRepositories {
     }
 
     @Inject
-    public FellesQueriesForBehandlingRepositories(@VLPersistenceUnit EntityManager entityManager) {
+    public FellesQueriesForBehandlingRepositories( EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 

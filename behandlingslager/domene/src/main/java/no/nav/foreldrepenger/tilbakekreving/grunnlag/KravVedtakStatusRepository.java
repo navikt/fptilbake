@@ -10,7 +10,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
-import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
 
 @ApplicationScoped
 public class KravVedtakStatusRepository {
@@ -22,7 +21,7 @@ public class KravVedtakStatusRepository {
     }
 
     @Inject
-    public KravVedtakStatusRepository(@VLPersistenceUnit EntityManager entityManager) {
+    public KravVedtakStatusRepository( EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 

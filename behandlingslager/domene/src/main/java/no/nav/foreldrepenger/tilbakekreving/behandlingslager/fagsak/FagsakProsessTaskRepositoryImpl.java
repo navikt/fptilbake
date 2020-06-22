@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskStatusUtil;
 import no.nav.vedtak.felles.jpa.HibernateVerktøy;
-import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskEvent;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
@@ -50,7 +49,7 @@ public class FagsakProsessTaskRepositoryImpl implements FagsakProsessTaskReposit
     }
 
     @Inject
-    public FagsakProsessTaskRepositoryImpl(@VLPersistenceUnit EntityManager entityManager, ProsessTaskRepository prosessTaskRepository) {
+    public FagsakProsessTaskRepositoryImpl(EntityManager entityManager, ProsessTaskRepository prosessTaskRepository) {
         this.entityManager = entityManager;
         this.prosessTaskRepository = prosessTaskRepository;
     }
@@ -142,7 +141,7 @@ public class FagsakProsessTaskRepositoryImpl implements FagsakProsessTaskReposit
             Set<String> eksisterendeTaskTyper = eksisterendeTasks.stream().map(ProsessTaskData::getTaskType).collect(Collectors.toSet());
 
             if (feilet.isEmpty()) {
-                if(eksisterendeTaskTyper.containsAll(nyeTaskTyper)){
+                if (eksisterendeTaskTyper.containsAll(nyeTaskTyper)) {
                     return eksisterendeTasks.get(0).getGruppe();
                 } else {
                     return prosessTaskRepository.lagre(gruppe);
@@ -217,7 +216,9 @@ public class FagsakProsessTaskRepositoryImpl implements FagsakProsessTaskReposit
 
     }
 
-    /** Observerer og vedlikeholder relasjon mellom fagsak og prosess task for enklere søk (dvs. fjerner relasjon når FERDIG eller KJOERT). */
+    /**
+     * Observerer og vedlikeholder relasjon mellom fagsak og prosess task for enklere søk (dvs. fjerner relasjon når FERDIG eller KJOERT).
+     */
     public void observeProsessTask(@Observes ProsessTaskEvent ptEvent) {
 
         Long fagsakId = ptEvent.getFagsakId();

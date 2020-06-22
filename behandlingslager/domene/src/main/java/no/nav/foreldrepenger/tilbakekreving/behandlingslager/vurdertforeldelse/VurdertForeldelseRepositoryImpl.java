@@ -9,8 +9,6 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
-import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
-
 @ApplicationScoped
 public class VurdertForeldelseRepositoryImpl implements VurdertForeldelseRepository {
 
@@ -21,7 +19,7 @@ public class VurdertForeldelseRepositoryImpl implements VurdertForeldelseReposit
     }
 
     @Inject
-    public VurdertForeldelseRepositoryImpl(@VLPersistenceUnit EntityManager entityManager) {
+    public VurdertForeldelseRepositoryImpl( EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 

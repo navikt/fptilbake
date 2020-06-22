@@ -8,7 +8,6 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
-import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskEntitet;
 
@@ -22,7 +21,7 @@ public class UtvidetProsessTaskRepository {
     }
 
     @Inject
-    public UtvidetProsessTaskRepository(@VLPersistenceUnit EntityManager entityManager) {
+    public UtvidetProsessTaskRepository( EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 
