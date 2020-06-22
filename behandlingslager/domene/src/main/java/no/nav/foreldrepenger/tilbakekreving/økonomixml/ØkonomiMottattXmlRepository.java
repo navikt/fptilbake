@@ -14,7 +14,6 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
-import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
 
 @ApplicationScoped
 public class ØkonomiMottattXmlRepository {
@@ -25,7 +24,7 @@ public class ØkonomiMottattXmlRepository {
     }
 
     @Inject
-    public ØkonomiMottattXmlRepository(@VLPersistenceUnit EntityManager entityManager) {
+    public ØkonomiMottattXmlRepository( EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 

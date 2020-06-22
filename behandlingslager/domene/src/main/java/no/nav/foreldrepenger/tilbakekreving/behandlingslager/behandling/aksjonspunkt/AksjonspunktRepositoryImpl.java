@@ -17,7 +17,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepositoryImpl;
-import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
 
 /**
  * Håndter all endring av aksjonspunkt.
@@ -42,7 +41,7 @@ public class AksjonspunktRepositoryImpl implements AksjonspunktRepository {
     }
 
     @Inject
-    public AksjonspunktRepositoryImpl(@VLPersistenceUnit EntityManager entityManager, KodeverkRepository kodeverkRepository) {
+    public AksjonspunktRepositoryImpl(EntityManager entityManager, KodeverkRepository kodeverkRepository) {
         Objects.requireNonNull(kodeverkRepository, "kodeverkRepository");
         this.entityManager = entityManager;
         this.kodeverkRepository = kodeverkRepository;
@@ -63,13 +62,13 @@ public class AksjonspunktRepositoryImpl implements AksjonspunktRepository {
                                             BehandlingStegType behandlingStegType) {
         Objects.requireNonNull(behandlingStegType, "behandlingStegType");
         return leggTilAksjonspunkt(behandling, aksjonspunktDefinisjon, Optional.of(behandlingStegType), Optional.empty(), Optional.empty(),
-                Optional.empty());
+            Optional.empty());
     }
 
     @Override
     public Aksjonspunkt leggTilAksjonspunkt(Behandling behandling, AksjonspunktDefinisjon aksjonspunktDefinisjon) {
         return leggTilAksjonspunkt(behandling, aksjonspunktDefinisjon, Optional.empty(), Optional.empty(), Optional.empty(),
-                Optional.empty());
+            Optional.empty());
     }
 
     private Aksjonspunkt leggTilAksjonspunkt(Behandling behandling, AksjonspunktDefinisjon aksjonspunktDefinisjon,
@@ -86,8 +85,8 @@ public class AksjonspunktRepositoryImpl implements AksjonspunktRepository {
         // slå opp for å få riktig konfigurasjon.
         AksjonspunktDefinisjon ad = finnAksjonspunktDefinisjon(aksjonspunktDefinisjon);
         Aksjonspunkt.Builder adBuilder = behandlingStegType.isPresent()
-                ? new Aksjonspunkt.Builder(ad, behandlingStegType.get())
-                : new Aksjonspunkt.Builder(ad);
+            ? new Aksjonspunkt.Builder(ad, behandlingStegType.get())
+            : new Aksjonspunkt.Builder(ad);
 
         if (frist.isPresent()) {
             adBuilder.medFristTid(frist.get());
@@ -132,7 +131,7 @@ public class AksjonspunktRepositoryImpl implements AksjonspunktRepository {
                                              BehandlingStegType stegType,
                                              LocalDateTime fristTid, Venteårsak venteårsak) {
         AksjonspunktDefinisjon aksjonspunktDefinisjon = this
-                .finnAksjonspunktDefinisjon(aksjonspunktDefinisjonIn.getKode());
+            .finnAksjonspunktDefinisjon(aksjonspunktDefinisjonIn.getKode());
 
         log.info("Setter behandling på vent for steg={}, aksjonspunkt={}, fristTid={}, venteÅrsak={}", stegType, aksjonspunktDefinisjon, fristTid, venteårsak);
 
@@ -151,7 +150,7 @@ public class AksjonspunktRepositoryImpl implements AksjonspunktRepository {
         } else {
             // nytt aksjonspunkt
             aksjonspunkt = this.leggTilAksjonspunkt(behandling, aksjonspunktDefinisjon, Optional.empty(),
-                    Optional.ofNullable(fristTid), Optional.ofNullable(venteårsak), Optional.empty());
+                Optional.ofNullable(fristTid), Optional.ofNullable(venteårsak), Optional.empty());
         }
         aksjonspunkt.setBehandlingSteg(stegType);
         return aksjonspunkt;

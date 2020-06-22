@@ -8,19 +8,18 @@ import javax.persistence.EntityManager;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.NavBrukerKjønn;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
-import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
 
 @ApplicationScoped
 public class HistorikkRepository {
 
     private EntityManager entityManager;
 
-    HistorikkRepository(){
+    HistorikkRepository() {
         // CDI
     }
 
     @Inject
-    public HistorikkRepository(@VLPersistenceUnit EntityManager entityManager){
+    public HistorikkRepository(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 
@@ -28,13 +27,13 @@ public class HistorikkRepository {
 
         if (HistorikkAktør.SØKER.equals(historikkinnslag.getAktør()) && NavBrukerKjønn.UDEFINERT.equals(historikkinnslag.getKjoenn())) {
             RelasjonsRolleType kjoenn = entityManager
-                    .createQuery("select f.brukerRolle from Fagsak f where f.id = :fagsakId", RelasjonsRolleType.class) //$NON-NLS-1$
-                    .setParameter("fagsakId", historikkinnslag.getFagsakId()) // NOSONAR //$NON-NLS-1$
-                    .getSingleResult();
-            if(RelasjonsRolleType.erRegistrertForeldre(kjoenn)) {
-                if(kjoenn.equals(RelasjonsRolleType.MORA) || kjoenn.equals(RelasjonsRolleType.MEDMOR)) {
+                .createQuery("select f.brukerRolle from Fagsak f where f.id = :fagsakId", RelasjonsRolleType.class) //$NON-NLS-1$
+                .setParameter("fagsakId", historikkinnslag.getFagsakId()) // NOSONAR //$NON-NLS-1$
+                .getSingleResult();
+            if (RelasjonsRolleType.erRegistrertForeldre(kjoenn)) {
+                if (kjoenn.equals(RelasjonsRolleType.MORA) || kjoenn.equals(RelasjonsRolleType.MEDMOR)) {
                     historikkinnslag.setKjoenn(NavBrukerKjønn.KVINNE);
-                } else if(kjoenn.equals(RelasjonsRolleType.FARA)) {
+                } else if (kjoenn.equals(RelasjonsRolleType.FARA)) {
                     historikkinnslag.setKjoenn(NavBrukerKjønn.MANN);
                 }
             } else {
@@ -58,16 +57,16 @@ public class HistorikkRepository {
 
     public List<Historikkinnslag> hentHistorikkForSaksnummer(Saksnummer saksnummer) {
         return entityManager.createQuery(
-                "select h from Historikkinnslag h inner join Fagsak f On f.id = h.fagsakId where f.saksnummer= :saksnummer",
-                Historikkinnslag.class)
-                .setParameter("saksnummer", saksnummer)
-                .getResultList();
+            "select h from Historikkinnslag h inner join Fagsak f On f.id = h.fagsakId where f.saksnummer= :saksnummer",
+            Historikkinnslag.class)
+            .setParameter("saksnummer", saksnummer)
+            .getResultList();
     }
 
     private Long getFagsakId(long behandlingId) {
         return entityManager.createQuery("select b.fagsak.id from Behandling b where b.id = :behandlingId", Long.class) //$NON-NLS-1$
-                .setParameter("behandlingId", behandlingId) // NOSONAR
-                .getSingleResult();
+            .setParameter("behandlingId", behandlingId) // NOSONAR
+            .getSingleResult();
     }
 
     public List<Historikkinnslag> hentHistorikk(Long behandlingId) {
@@ -75,11 +74,11 @@ public class HistorikkRepository {
         Long fagsakId = getFagsakId(behandlingId);
 
         return entityManager.createQuery(
-                "select h from Historikkinnslag h where (h.behandlingId = :behandlingId OR h.behandlingId = NULL) AND h.fagsakId = :fagsakId ", //$NON-NLS-1$
-                Historikkinnslag.class)
-                .setParameter("fagsakId", fagsakId)// NOSONAR //$NON-NLS-1$
-                .setParameter("behandlingId", behandlingId) //$NON-NLS-1$
-                .getResultList();
+            "select h from Historikkinnslag h where (h.behandlingId = :behandlingId OR h.behandlingId = NULL) AND h.fagsakId = :fagsakId ", //$NON-NLS-1$
+            Historikkinnslag.class)
+            .setParameter("fagsakId", fagsakId)// NOSONAR //$NON-NLS-1$
+            .setParameter("behandlingId", behandlingId) //$NON-NLS-1$
+            .getResultList();
     }
 
 

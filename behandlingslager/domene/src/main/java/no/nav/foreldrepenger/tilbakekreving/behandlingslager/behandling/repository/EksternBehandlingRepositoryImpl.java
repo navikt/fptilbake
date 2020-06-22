@@ -16,7 +16,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
-import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
 
 @ApplicationScoped
 public class EksternBehandlingRepositoryImpl implements EksternBehandlingRepository {
@@ -30,7 +29,7 @@ public class EksternBehandlingRepositoryImpl implements EksternBehandlingReposit
     }
 
     @Inject
-    public EksternBehandlingRepositoryImpl(@VLPersistenceUnit EntityManager entityManager) {
+    public EksternBehandlingRepositoryImpl(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 
@@ -41,11 +40,11 @@ public class EksternBehandlingRepositoryImpl implements EksternBehandlingReposit
             o.deaktiver();
             entityManager.persist(o);
         });
-        Optional<EksternBehandling> eksisterendeDeaktivert = hentEksisterendeDeaktivert(eksternBehandling.getInternId(),eksternBehandling.getHenvisning());
+        Optional<EksternBehandling> eksisterendeDeaktivert = hentEksisterendeDeaktivert(eksternBehandling.getInternId(), eksternBehandling.getHenvisning());
         eksisterendeDeaktivert.ifPresentOrElse(o -> {
             o.reaktivate();
             entityManager.persist(o);
-        },() -> entityManager.persist(eksternBehandling));
+        }, () -> entityManager.persist(eksternBehandling));
         entityManager.flush();
     }
 
@@ -114,7 +113,7 @@ public class EksternBehandlingRepositoryImpl implements EksternBehandlingReposit
         return hentUniktResultat(query);
     }
 
-    private Optional<EksternBehandling> hentEksisterendeDeaktivert(long internBehandlingId, Henvisning henvisning){
+    private Optional<EksternBehandling> hentEksisterendeDeaktivert(long internBehandlingId, Henvisning henvisning) {
         TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where intern_id=:internId and henvisning=:henvisning order by opprettetTidspunkt desc", EksternBehandling.class);
         query.setParameter(INTERN_ID, internBehandlingId);
         query.setParameter("henvisning", henvisning);

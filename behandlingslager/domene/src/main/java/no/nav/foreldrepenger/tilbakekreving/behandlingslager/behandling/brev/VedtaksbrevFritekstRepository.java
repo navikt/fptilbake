@@ -10,7 +10,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
 import no.nav.vedtak.felles.jpa.HibernateVerktøy;
-import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
 
 @ApplicationScoped
 public class VedtaksbrevFritekstRepository {
@@ -22,7 +21,7 @@ public class VedtaksbrevFritekstRepository {
     }
 
     @Inject
-    public VedtaksbrevFritekstRepository(@VLPersistenceUnit EntityManager entityManager) {
+    public VedtaksbrevFritekstRepository(EntityManager entityManager) {
         Objects.requireNonNull(entityManager);
         this.entityManager = entityManager;
     }

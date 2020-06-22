@@ -11,7 +11,6 @@ import javax.persistence.TypedQuery;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeAggregateEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
-import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
 
 @ApplicationScoped
 public class VergeRepository {
@@ -23,7 +22,7 @@ public class VergeRepository {
     }
 
     @Inject
-    public VergeRepository(@VLPersistenceUnit EntityManager entityManager) {
+    public VergeRepository(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 
@@ -46,15 +45,15 @@ public class VergeRepository {
         return vergeAggregateEntitet.map(VergeAggregateEntitet::getVergeEntitet);
     }
 
-    public void fjernVergeInformasjon(long behandlingId){
+    public void fjernVergeInformasjon(long behandlingId) {
         Optional<VergeAggregateEntitet> vergeAggregateEntitet = hentVergeForBehandling(behandlingId);
         vergeAggregateEntitet.ifPresent(vergeAggregate -> {
             vergeAggregate.disable();
             entityManager.persist(vergeAggregate);
-        } );
+        });
     }
 
-    public boolean finnesVerge(long behandlingId){
+    public boolean finnesVerge(long behandlingId) {
         return finnVergeInformasjon(behandlingId).isPresent();
     }
 

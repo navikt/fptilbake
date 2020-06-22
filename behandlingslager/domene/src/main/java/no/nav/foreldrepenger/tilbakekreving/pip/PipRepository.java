@@ -14,7 +14,6 @@ import javax.persistence.Query;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakStatus;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.BehandlingInfo;
-import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
 
 @ApplicationScoped
 public class PipRepository {
@@ -26,7 +25,7 @@ public class PipRepository {
     }
 
     @Inject
-    public PipRepository(@VLPersistenceUnit EntityManager entityManager) {
+    public PipRepository( EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 

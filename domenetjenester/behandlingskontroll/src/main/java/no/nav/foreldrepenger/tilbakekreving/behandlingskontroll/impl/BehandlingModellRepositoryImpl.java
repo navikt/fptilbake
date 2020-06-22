@@ -20,7 +20,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingTypeStegSekvens;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepositoryImpl;
-import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
 
 @ApplicationScoped
 public class BehandlingModellRepositoryImpl implements BehandlingModellRepository {
@@ -34,11 +33,11 @@ public class BehandlingModellRepositoryImpl implements BehandlingModellRepositor
     }
 
     @Inject
-    public BehandlingModellRepositoryImpl(@VLPersistenceUnit EntityManager entityManager) {
+    public BehandlingModellRepositoryImpl( EntityManager entityManager) {
         Objects.requireNonNull(entityManager, "entityManager"); //$NON-NLS-1$
         this.entityManager = entityManager;
     }
-    
+
     @Override
     public KodeverkRepository getKodeverkRepository() {
         return new KodeverkRepositoryImpl(entityManager);
@@ -65,7 +64,7 @@ public class BehandlingModellRepositoryImpl implements BehandlingModellRepositor
     }
 
     private Object cacheKey(BehandlingType behandlingType) {
-        // lager en key av flere sammensatte elementer.  
+        // lager en key av flere sammensatte elementer.
         return Arrays.asList(behandlingType);
     }
 
@@ -74,7 +73,7 @@ public class BehandlingModellRepositoryImpl implements BehandlingModellRepositor
 
         List<BehandlingTypeStegSekvens> stegSekvens = finnBehandlingStegSekvens(type);
         modell.leggTil(stegSekvens);
-        
+
         return modell;
     }
 

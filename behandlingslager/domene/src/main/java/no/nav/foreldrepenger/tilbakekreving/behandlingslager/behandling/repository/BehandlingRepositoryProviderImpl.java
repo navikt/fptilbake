@@ -25,7 +25,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.Vilkårsvur
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
-import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
 
 /**
  * Provider for å enklere å kunne hente ut ulike repository uten for mange injection points.
@@ -59,7 +58,7 @@ public class BehandlingRepositoryProviderImpl implements BehandlingRepositoryPro
     }
 
     @Inject
-    public BehandlingRepositoryProviderImpl(@VLPersistenceUnit EntityManager entityManager) {
+    public BehandlingRepositoryProviderImpl(EntityManager entityManager) {
         Objects.requireNonNull(entityManager, "entityManager"); //$NON-NLS-1$
         this.entityManager = entityManager;
 

@@ -16,7 +16,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.VurderÅrsak;
-import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
 
 @ApplicationScoped
 public class KodeverkTabellRepositoryImpl implements KodeverkTabellRepository {
@@ -28,7 +27,7 @@ public class KodeverkTabellRepositoryImpl implements KodeverkTabellRepository {
     }
 
     @Inject
-    public KodeverkTabellRepositoryImpl(@VLPersistenceUnit EntityManager entityManager) {
+    public KodeverkTabellRepositoryImpl( EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 

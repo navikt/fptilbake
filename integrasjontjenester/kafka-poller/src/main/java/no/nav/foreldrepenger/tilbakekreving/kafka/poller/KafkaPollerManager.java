@@ -20,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.vedtak.apptjeneste.AppServiceHandler;
-import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
 import no.nav.vedtak.util.Tuple;
 
 @ApplicationScoped
@@ -60,7 +59,7 @@ public class KafkaPollerManager implements AppServiceHandler {
     }
 
     @Inject
-    public KafkaPollerManager(@VLPersistenceUnit EntityManager entityManager, @Any Instance<KafkaPoller> feedPollers) {
+    public KafkaPollerManager(EntityManager entityManager, @Any Instance<KafkaPoller> feedPollers) {
         Objects.requireNonNull(entityManager, "entityManager"); //$NON-NLS-1$
         Objects.requireNonNull(feedPollers, "feedPollers"); //$NON-NLS-1$
         this.entityManager = entityManager;

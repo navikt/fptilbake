@@ -23,7 +23,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Region;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodelisteRelasjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepositoryImpl;
-import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
 
 @ApplicationScoped
 public class BehandlingsgrunnlagKodeverkRepositoryImpl implements BehandlingsgrunnlagKodeverkRepository {
@@ -37,7 +36,7 @@ public class BehandlingsgrunnlagKodeverkRepositoryImpl implements Behandlingsgru
     }
 
     @Inject
-    public BehandlingsgrunnlagKodeverkRepositoryImpl(@VLPersistenceUnit EntityManager entityManager,
+    public BehandlingsgrunnlagKodeverkRepositoryImpl(EntityManager entityManager,
                                                      KodeverkRepository kodeverkRepository) {
         Objects.requireNonNull(entityManager, "entityManager"); //$NON-NLS-1$
         this.entityManager = entityManager;

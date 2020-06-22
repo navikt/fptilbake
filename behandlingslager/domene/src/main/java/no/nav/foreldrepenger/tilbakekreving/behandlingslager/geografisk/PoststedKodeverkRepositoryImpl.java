@@ -10,7 +10,6 @@ import javax.persistence.TypedQuery;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.AdresseType;
 import no.nav.vedtak.felles.jpa.HibernateVerktøy;
-import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
 
 @ApplicationScoped
 public class PoststedKodeverkRepositoryImpl implements PoststedKodeverkRepository {
@@ -22,7 +21,7 @@ public class PoststedKodeverkRepositoryImpl implements PoststedKodeverkRepositor
     }
 
     @Inject
-    public PoststedKodeverkRepositoryImpl(@VLPersistenceUnit EntityManager entityManager) {
+    public PoststedKodeverkRepositoryImpl(EntityManager entityManager) {
         Objects.requireNonNull(entityManager, "entityManager"); //$NON-NLS-1$
         this.entityManager = entityManager;
     }

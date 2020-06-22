@@ -12,8 +12,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
 import javax.persistence.TypedQuery;
 
-import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
-
 @ApplicationScoped
 public class VarselresponsRepositoryImpl implements VarselresponsRepository {
 
@@ -22,7 +20,7 @@ public class VarselresponsRepositoryImpl implements VarselresponsRepository {
     public VarselresponsRepositoryImpl() {}
 
     @Inject
-    public VarselresponsRepositoryImpl(@VLPersistenceUnit EntityManager entityManager) {
+    public VarselresponsRepositoryImpl( EntityManager entityManager) {
         Objects.requireNonNull(entityManager);
         this.entityManager = entityManager;
     }

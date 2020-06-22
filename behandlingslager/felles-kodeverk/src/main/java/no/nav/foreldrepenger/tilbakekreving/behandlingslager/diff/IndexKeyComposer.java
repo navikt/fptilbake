@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import no.nav.vedtak.felles.jpa.tid.DatoIntervallEntitet;
 
 /**
  * Hjelpemetoder for å raskere sette sammen en IndexKey fra flere deler.
@@ -42,10 +41,6 @@ final class IndexKeyComposer {
             return ((Number) obj).toString();
         } else if (IndexKey.class.isAssignableFrom(objClass)) {
             return ((IndexKey) obj).getIndexKey();
-        } else if (DatoIntervallEntitet.class.isAssignableFrom(objClass)) {
-            DatoIntervallEntitet periode = (DatoIntervallEntitet) obj;
-            return "[" + periode.getFomDato().format(DateTimeFormatter.ISO_DATE) + //$NON-NLS-1$
-                "," + periode.getTomDato().format(DateTimeFormatter.ISO_DATE) + "]"; //$NON-NLS-1$ //$NON-NLS-2$
         } else if (LocalDate.class.isAssignableFrom(objClass)) {
             LocalDate dt = (LocalDate) obj;
             return dt.format(DateTimeFormatter.ISO_DATE);

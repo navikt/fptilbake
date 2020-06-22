@@ -9,8 +9,6 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
-import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
-
 
 @ApplicationScoped
 public class ØkonomiSendtXmlRepository {
@@ -22,7 +20,7 @@ public class ØkonomiSendtXmlRepository {
     }
 
     @Inject
-    public ØkonomiSendtXmlRepository(@VLPersistenceUnit EntityManager entityManager) {
+    public ØkonomiSendtXmlRepository( EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 

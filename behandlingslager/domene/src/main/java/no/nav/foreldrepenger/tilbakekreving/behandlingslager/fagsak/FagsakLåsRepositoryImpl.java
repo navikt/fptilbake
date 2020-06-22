@@ -5,7 +5,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryFeil;
-import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
 
 public class FagsakLåsRepositoryImpl implements FagsakLåsRepository {
 
@@ -15,7 +14,7 @@ public class FagsakLåsRepositoryImpl implements FagsakLåsRepository {
     }
 
     @Inject
-    public FagsakLåsRepositoryImpl(@VLPersistenceUnit EntityManager entityManager) {
+    public FagsakLåsRepositoryImpl(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 
@@ -41,10 +40,10 @@ public class FagsakLåsRepositoryImpl implements FagsakLåsRepository {
 
     private Long låsFagsak(final Long fagsakId, LockModeType lockModeType) {
         Object[] resultFs = (Object[]) entityManager
-                .createQuery("select fs.id, fs.versjon from Fagsak fs where fs.id=:id") //$NON-NLS-1$
-                .setParameter("id", fagsakId) //$NON-NLS-1$
-                .setLockMode(lockModeType)
-                .getSingleResult();
+            .createQuery("select fs.id, fs.versjon from Fagsak fs where fs.id=:id") //$NON-NLS-1$
+            .setParameter("id", fagsakId) //$NON-NLS-1$
+            .setLockMode(lockModeType)
+            .getSingleResult();
         return (Long) resultFs[0];
     }
 
@@ -63,16 +62,16 @@ public class FagsakLåsRepositoryImpl implements FagsakLåsRepository {
         Long id = lås.getFagsakId();
         // NB - Oracle syntax
         Object versjon = entityManager.createNativeQuery("select versjon from FAGSAK where id =:fagsakId for update nowait")
-                .setParameter("fagsakId", id)
-                .getSingleResult();
+            .setParameter("fagsakId", id)
+            .getSingleResult();
 
         if (versjon == null) {
             throw BehandlingRepositoryFeil.FACTORY.fantIkkeEntitetForLåsing(Fagsak.class.getSimpleName(), id).toException();
         } else {
             int updated = entityManager.createNativeQuery("update FAGSAK set versjon=versjon+1 where id=:fagsakId and versjon=:versjon")
-                    .setParameter("fagsakId", id)
-                    .setParameter("versjon", versjon)
-                    .executeUpdate();
+                .setParameter("fagsakId", id)
+                .setParameter("versjon", versjon)
+                .executeUpdate();
             if (updated != 1) {
                 throw new IllegalStateException("Kunne ikke verifisere lås på Fagsak: " + id + ", fikk ikke oppdatert versjon " + versjon);
             }

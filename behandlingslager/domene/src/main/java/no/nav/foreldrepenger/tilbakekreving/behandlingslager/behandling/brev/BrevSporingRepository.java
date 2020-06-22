@@ -10,8 +10,6 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
-import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
-
 @ApplicationScoped
 public class BrevSporingRepository {
 
@@ -22,7 +20,7 @@ public class BrevSporingRepository {
     }
 
     @Inject
-    public BrevSporingRepository(@VLPersistenceUnit EntityManager entityManager) {
+    public BrevSporingRepository(EntityManager entityManager) {
         Objects.requireNonNull(entityManager);
         this.entityManager = entityManager;
     }

@@ -18,7 +18,6 @@ import no.nav.vedtak.feil.FeilFactory;
 import no.nav.vedtak.feil.LogLevel;
 import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
 import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
-import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
 
 @ApplicationScoped
 public class KravgrunnlagRepository {
@@ -34,7 +33,7 @@ public class KravgrunnlagRepository {
     }
 
     @Inject
-    public KravgrunnlagRepository(@VLPersistenceUnit EntityManager entityManager) {
+    public KravgrunnlagRepository( EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 

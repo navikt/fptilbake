@@ -14,7 +14,6 @@ import javax.persistence.TypedQuery;
 
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
-import no.nav.vedtak.felles.jpa.VLPersistenceUnit;
 
 @ApplicationScoped
 public class FagsakRepositoryImpl implements FagsakRepository {
@@ -26,7 +25,7 @@ public class FagsakRepositoryImpl implements FagsakRepository {
     }
 
     @Inject
-    public FagsakRepositoryImpl(@VLPersistenceUnit EntityManager entityManager) {
+    public FagsakRepositoryImpl(EntityManager entityManager) {
         Objects.requireNonNull(entityManager, "entityManager"); //$NON-NLS-1$
         this.entityManager = entityManager;
     }
