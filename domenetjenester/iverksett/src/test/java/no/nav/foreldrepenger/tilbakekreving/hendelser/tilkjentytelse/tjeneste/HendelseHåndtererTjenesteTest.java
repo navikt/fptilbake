@@ -49,6 +49,20 @@ public class HendelseHåndtererTjenesteTest extends TilkjentYtelseTestOppsett {
     }
 
     @Test
+    public void skal_opprette_prosesstask_når_tilbakekr_opprett_hendelse_er_mottatt() {
+        VidereBehandling videreBehandling = VidereBehandling.TILBAKEKR_OPPRETT;
+        TilbakekrevingValgDto tbkDataDto = new TilbakekrevingValgDto(videreBehandling);
+        when(restKlient.hentTilbakekrevingValg(any(UUID.class))).thenReturn(Optional.of(tbkDataDto));
+
+        hendelseHåndtererTjeneste.håndterHendelse(hendelseTaskDataWrapper);
+
+        verify(prosessTaskRepository, atLeastOnce()).lagre(any(ProsessTaskData.class));
+        List<ProsessTaskData> prosesser = prosessTaskRepository.finnIkkeStartet();
+        assertThat(prosesser).isNotEmpty();
+        assertThat(erTaskFinnes(OpprettBehandlingTask.TASKTYPE, prosesser)).isTrue();
+    }
+
+    @Test
     public void skal_opprette_prosesstask_når_tilbakekreving_oppdater_er_motatt_som_hendelse() {
         VidereBehandling videreBehandling = VidereBehandling.TILBAKEKR_OPPDATER;
         TilbakekrevingValgDto tbkDataDto = new TilbakekrevingValgDto(videreBehandling);
