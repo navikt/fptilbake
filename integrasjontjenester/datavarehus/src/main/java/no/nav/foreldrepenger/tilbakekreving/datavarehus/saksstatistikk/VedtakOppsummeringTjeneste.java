@@ -131,7 +131,7 @@ public class VedtakOppsummeringTjeneste {
                 vedtakPeriode.setSærligeGrunner(hentSærligGrunner(periodeEntitet));
             }
             vedtakPeriode.setVilkårResultat(UtvidetVilkårResultat.valueOf(periodeEntitet.getVilkårResultat().getKode()));
-            settBeløp(behandlingId, beregningResultat, vedtakPeriode);
+            settBeløp(beregningResultat, vedtakPeriode);
             settHendelser(behandlingId, vedtakPeriode);
             vilkårPerioder.add(vedtakPeriode);
         }
@@ -146,7 +146,7 @@ public class VedtakOppsummeringTjeneste {
                 vedtakPeriode.setFom(foreldelsePeriode.getFom());
                 vedtakPeriode.setTom(foreldelsePeriode.getPeriode().getTom());
                 vedtakPeriode.setVilkårResultat(UtvidetVilkårResultat.FORELDET);
-                settBeløp(behandlingId, beregningResultat, vedtakPeriode);
+                settBeløp(beregningResultat, vedtakPeriode);
                 settHendelser(behandlingId, vedtakPeriode);
                 foreldelsePerioder.add(vedtakPeriode);
             }
@@ -167,7 +167,7 @@ public class VedtakOppsummeringTjeneste {
         return null;
     }
 
-    private void settBeløp(long behandlingId, BeregningResultat beregningResultat, VedtakPeriode vedtakPeriode) {
+    private void settBeløp(BeregningResultat beregningResultat, VedtakPeriode vedtakPeriode) {
         Periode periode = new Periode(vedtakPeriode.getFom(), vedtakPeriode.getTom());
         Optional<BeregningResultatPeriode> resultatPeriode = beregningResultat.getBeregningResultatPerioder().stream()
             .filter(perioder -> perioder.getPeriode().equals(periode)).findAny();
