@@ -52,8 +52,8 @@ public class HendelseHåndtererTjeneste {
     }
 
     private boolean erRelevantHendelseForOpprettTilbakekreving(TilbakekrevingValgDto tbkData) {
-        //FIXME k9-tilbake k9-sak bruker en annen kode enn fpsak her
-        return VidereBehandling.TILBAKEKREV_I_INFOTRYGD.equals(tbkData.getVidereBehandling());
+        return VidereBehandling.TILBAKEKREV_I_INFOTRYGD.equals(tbkData.getVidereBehandling())
+            || VidereBehandling.TILBAKEKR_OPPRETT.equals(tbkData.getVidereBehandling());
     }
 
     private boolean erRelevantHendelseForOppdatereTilbakekreving(TilbakekrevingValgDto tbkData) {
