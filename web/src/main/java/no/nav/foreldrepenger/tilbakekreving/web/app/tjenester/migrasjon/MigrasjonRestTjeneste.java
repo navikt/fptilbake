@@ -28,6 +28,7 @@ import com.codahale.metrics.annotation.Timed;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.FagsystemId;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.ForvaltningTekniskRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
@@ -74,7 +75,7 @@ public class MigrasjonRestTjeneste {
                     documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
                     Document document = documentBuilder.parse(new InputSource(new StringReader(melding)));
                     String fagsystemId = document.getElementsByTagName("urn:fagsystemId").item(0).getTextContent();
-                    String saksnummer = finnSaksnummer(fagsystemId);
+                    String saksnummer = FagsystemId.parse(fagsystemId).getSaksnummer().getVerdi();
                     økonomiMottattXmlRepository.oppdaterSaksnummer(økonomiXmlMottatt.getId(), saksnummer);
                 } catch (ParserConfigurationException | SAXException | IOException e) {
                     logger.warn("kan ikke prossesere XML med Id={}.Fikk følgende problemer={}", økonomiXmlMottatt.getId(), e.getMessage());
@@ -84,7 +85,4 @@ public class MigrasjonRestTjeneste {
         return Response.status(Response.Status.OK).build();
     }
 
-    private String finnSaksnummer(String fagsystemId) {
-        return fagsystemId.substring(0, fagsystemId.length() - 3);
-    }
 }

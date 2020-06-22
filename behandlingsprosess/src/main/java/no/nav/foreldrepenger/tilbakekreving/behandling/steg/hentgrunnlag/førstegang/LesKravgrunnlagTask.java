@@ -16,6 +16,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.FagsystemId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
@@ -71,7 +72,8 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
         String råXml = økonomiMottattXmlRepository.hentMottattXml(mottattXmlId);
         DetaljertKravgrunnlag kravgrunnlagDto = KravgrunnlagXmlUnmarshaller.unmarshall(mottattXmlId, råXml);
         Henvisning henvisning = kravgrunnlagMapper.finnHenvisning(kravgrunnlagDto);
-        String saksnummer = finnSaksnummer(kravgrunnlagDto.getFagsystemId());
+        String saksnummer = FagsystemId.parse(kravgrunnlagDto.getFagsystemId()).getSaksnummer().getVerdi();
+        //TODO k9-tilbake bytt String->Saksnummer
         Kravgrunnlag431 kravgrunnlag = kravgrunnlagMapper.mapTilDomene(kravgrunnlagDto);
 
         boolean kravgrunnlagetErGyldig = validerKravgrunnlag(mottattXmlId, henvisning, saksnummer, kravgrunnlag);

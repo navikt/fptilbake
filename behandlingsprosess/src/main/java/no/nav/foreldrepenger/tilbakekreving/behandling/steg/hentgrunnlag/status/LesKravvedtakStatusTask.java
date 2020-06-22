@@ -16,6 +16,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.FagsystemId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatus437;
@@ -73,8 +74,8 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
 
         KravOgVedtakstatus kravOgVedtakstatus = KravVedtakStatusXmlUnmarshaller.unmarshall(mottattXmlId, råXml);
         KravVedtakStatus437 kravVedtakStatus437 = statusMapper.mapTilDomene(kravOgVedtakstatus);
-        String saksnummer = finnSaksnummer(kravOgVedtakstatus.getFagsystemId());
-
+        String saksnummer = FagsystemId.parse(kravOgVedtakstatus.getFagsystemId()).getSaksnummer().getVerdi();
+        //TODO k9-tilbake bytt String->Saksnummer
         Henvisning henvisning = kravVedtakStatus437.getReferanse();
         validerHenvisning(henvisning);
         økonomiMottattXmlRepository.oppdaterMedHenvisningOgSaksnummer(henvisning, saksnummer, mottattXmlId);

@@ -25,11 +25,6 @@ public abstract class FellesTask {
         return fagsystemKlient.finnesBehandlingIFagsystem(saksnummer, henvisning);
     }
 
-    protected String finnSaksnummer(String fagsystemId) {
-        //FIXME k9-tilbake Støtte begge formater
-        return fagsystemId.substring(0, fagsystemId.length() - 3);
-    }
-
     protected Optional<KravgrunnlagAggregate> finnGrunnlagForVedtakId(long vedtakId) {
         return grunnlagRepository.finnGrunnlagForVedtakId(vedtakId);
     }
