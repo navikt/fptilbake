@@ -6,13 +6,16 @@ import java.util.Optional;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandlingsresultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingresultatRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping.BehandlingResultatTypeMapper;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping.BehandlingStatusMapper;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping.BehandlingTypeMapper;
@@ -24,6 +27,7 @@ import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.BehandlingTi
 public class BehandlingTilstandTjeneste {
 
     private BehandlingRepository behandlingRepository;
+    private EksternBehandlingRepository eksternBehandlingRepository;
     private BehandlingresultatRepository behandlingresultatRepository;
 
     public BehandlingTilstandTjeneste() {
@@ -31,13 +35,15 @@ public class BehandlingTilstandTjeneste {
     }
 
     @Inject
-    public BehandlingTilstandTjeneste(BehandlingRepository behandlingRepository, BehandlingresultatRepository behandlingresultatRepository) {
-        this.behandlingRepository = behandlingRepository;
+    public BehandlingTilstandTjeneste(BehandlingRepositoryProvider repositoryProvider, BehandlingresultatRepository behandlingresultatRepository) {
+        this.behandlingRepository = repositoryProvider.getBehandlingRepository();
+        this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
         this.behandlingresultatRepository = behandlingresultatRepository;
     }
 
     public BehandlingTilstand hentBehandlingensTilstand(long behandlingId) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
+        EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandlingId);
         BehandlingResultatType behandlingResultatType = behandlingresultatRepository.hent(behandling)
             .map(Behandlingsresultat::getBehandlingResultatType)
             .orElse(BehandlingResultatType.IKKE_FASTSATT);
@@ -55,6 +61,7 @@ public class BehandlingTilstandTjeneste {
         tilstand.setYtelseType(YtelseTypeMapper.getYtelseType(behandling.getFagsak().getFagsakYtelseType()));
         tilstand.setSaksnummer(behandling.getFagsak().getSaksnummer().getVerdi());
         tilstand.setBehandlingUuid(behandling.getUuid());
+        tilstand.setReferertFagsakBehandlingUuid(eksternBehandling.getEksternUuid());
         tilstand.setBehandlingType(BehandlingTypeMapper.getBehandlingType(behandling.getType()));
         tilstand.setBehandlingStatus(BehandlingStatusMapper.getBehandlingStatus(behandling.getStatus()));
         tilstand.setBehandlingResultat(BehandlingResultatTypeMapper.getBehandlingResultatType(behandlingResultatType));

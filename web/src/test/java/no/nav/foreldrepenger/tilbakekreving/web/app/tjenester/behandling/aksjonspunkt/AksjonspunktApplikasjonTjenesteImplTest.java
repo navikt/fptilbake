@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.UUID;
 
 import javax.inject.Inject;
 
@@ -19,12 +20,12 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.AbstractTestScenario;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.VurderForeldelseDto;
 import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 import no.nav.vedtak.felles.testutilities.db.RepositoryRule;
@@ -46,13 +47,7 @@ public class AksjonspunktApplikasjonTjenesteImplTest {
     private BehandlingRepository behandlingRepository;
 
     @Inject
-    private FagsakRepository fagsakRepository;
-
-    @Inject
     private BehandlingRepositoryProvider repositoryProvider;
-
-    @Inject
-    private AksjonspunktRepository aksjonspunktRepository;
 
     private AbstractTestScenario<?> lagScenarioMedAksjonspunkt(AksjonspunktDefinisjon aksjonspunktDefinisjon) {
         ScenarioSimple scenario = ScenarioSimple.simple();
@@ -65,6 +60,8 @@ public class AksjonspunktApplikasjonTjenesteImplTest {
     public void test_skal_sette_aksjonspunkt_til_utført_og_lagre_behandling() {
         AbstractTestScenario<?> scenario = lagScenarioMedAksjonspunkt(AksjonspunktDefinisjon.VURDER_FORELDELSE);
         Behandling behandling = scenario.lagre(repositoryProvider);
+        EksternBehandling eksternBehandling = new EksternBehandling(behandling, Henvisning.fraEksternBehandlingId(1l), UUID.randomUUID());
+        repositoryProvider.getEksternBehandlingRepository().lagre(eksternBehandling);
 
         VurderForeldelseDto dto = new VurderForeldelseDto();
         dto.setForeldelsePerioder(Collections.singletonList(new ForeldelsePeriodeDto(FOM, TOM, ForeldelseVurderingType.IKKE_FORELDET, BEGRUNNELSE)));
