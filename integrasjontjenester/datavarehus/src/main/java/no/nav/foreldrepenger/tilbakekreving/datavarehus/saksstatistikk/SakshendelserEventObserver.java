@@ -18,6 +18,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.Behandlingskontr
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.prosesstask.UtvidetProsessTaskRepository;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping.BehandlingTilstandMapper;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.BehandlingTilstand;
+import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.DvhEventHendelse;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.util.env.Environment;
@@ -53,37 +54,37 @@ public class SakshendelserEventObserver {
     }
 
     public void observerAksjonpunktFunnetEvent(@Observes AksjonspunkterFunnetEvent event) {
-        klargjørSendingAvBehandlingensTilstand(event.getBehandlingId());
+        klargjørSendingAvBehandlingensTilstand(event.getBehandlingId(), DvhEventHendelse.AKSJONSPUNKT_OPPRETTET);
     }
 
     public void observerAksjonpunktUtførtEvent(@Observes AksjonspunktUtførtEvent event) {
-        klargjørSendingAvBehandlingensTilstand(event.getBehandlingId());
+        klargjørSendingAvBehandlingensTilstand(event.getBehandlingId(),DvhEventHendelse.AKSJONSPUNKT_UTFØRT);
     }
 
     public void observerAksjonpunktTilbakeførtEvent(@Observes AksjonspunktTilbakeførtEvent event) {
-        klargjørSendingAvBehandlingensTilstand(event.getBehandlingId());
+        klargjørSendingAvBehandlingensTilstand(event.getBehandlingId(), DvhEventHendelse.AKSJONSPUNKT_TILBAKEFØR);
     }
 
     public void observerBehandlingAvsluttetEvent(@Observes BehandlingStatusEvent.BehandlingAvsluttetEvent event) {
-        klargjørSendingAvBehandlingensTilstand(event.getBehandlingId());
+        klargjørSendingAvBehandlingensTilstand(event.getBehandlingId(), DvhEventHendelse.AKSJONSPUNKT_AVBRUTT);
     }
 
     public void observerAksjonspunktHarEndretBehandlendeEnhetEvent(@Observes BehandlingEnhetEvent event) {
-        klargjørSendingAvBehandlingensTilstand(event.getBehandlingId());
+        klargjørSendingAvBehandlingensTilstand(event.getBehandlingId(), DvhEventHendelse.AKSJONSPUNKT_HAR_ENDRET_BEHANDLENDE_ENHET);
     }
 
     public void observerStoppetEvent(@Observes BehandlingskontrollEvent.StoppetEvent event) {
-        klargjørSendingAvBehandlingensTilstand(event.getBehandlingId());
+        klargjørSendingAvBehandlingensTilstand(event.getBehandlingId(), DvhEventHendelse.BEHANDLINGSKONTROLL_EVENT);
     }
 
-    private void klargjørSendingAvBehandlingensTilstand(long behandlingId) {
+    private void klargjørSendingAvBehandlingensTilstand(long behandlingId, DvhEventHendelse eventHendelse) {
         if (isEnabled) {
             BehandlingTilstand tilstand = behandlingTilstandTjeneste.hentBehandlingensTilstand(behandlingId);
-            opprettProsessTask(behandlingId, tilstand);
+            opprettProsessTask(behandlingId, tilstand, eventHendelse);
         }
     }
 
-    private void opprettProsessTask(long behandlingId, BehandlingTilstand behandlingTilstand) {
+    private void opprettProsessTask(long behandlingId, BehandlingTilstand behandlingTilstand, DvhEventHendelse eventHendelse) {
         String gruppe = "dvh-sak-" + behandlingId;
 
         ProsessTaskData taskData = new ProsessTaskData(SendSakshendelserTilDvhTask.TASK_TYPE);
@@ -91,6 +92,7 @@ public class SakshendelserEventObserver {
         taskData.setProperty("behandlingId", Long.toString(behandlingId));
         taskData.setGruppe(gruppe);
         taskData.setSekvens(String.format("%04d", finnNesteSekvensnummer(gruppe)));
+        taskData.setProperty("eventHendlese", eventHendelse.name());
 
         prosessTaskRepository.lagre(taskData);
     }
