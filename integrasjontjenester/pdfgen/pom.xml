@@ -35,21 +35,14 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
         <dependency>
-            <!-- openhtmltopdf-pdfbox er ikke enig med seg selv hvilken versjon av pdfbox som skal brukes, tvinger denne (se dependency management i hoved-pom for versjon)-->
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>pdfbox</artifactId>
             <exclusions>
                 <exclusion>
-                    <!-- unngår commons-logging siden den forkludrer logging -->
                     <groupId>commons-logging</groupId>
                     <artifactId>commons-logging</artifactId>
-                </exclusion>
-                <exclusion>
-                    <!-- TODO fjern denne overstyringen -->
-                    <!-- setter eldre versjon for at det skal bygge med github actions, den klarer ikke laste ny versjon fra maven central -->
-                    <groupId>org.apache.pdfbox</groupId>
-                    <artifactId>xmpbox</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -66,33 +59,6 @@
                 <exclusion>
                     <groupId>org.apache.xmlgraphics</groupId>
                     <artifactId>xmlgraphics-commons</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>xml-apis</groupId>
-                    <artifactId>xml-apis</artifactId>
-                </exclusion>
-                <exclusion>
-                    <!-- TODO fjern denne overstyringen -->
-                    <!-- setter eldre versjon for at det skal bygge med github actions, den klarer ikke laste ny versjon fra maven central -->
-                    <groupId>org.apache.pdfbox</groupId>
-                    <artifactId>xmpbox</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <!-- openhtmltopdf-svg-support er ikke enig med seg selv hvilken versjon av xml-apis som skal brukes, tvinger denne (se dependency management i hoved-pom for versjon) -->
-            <groupId>xml-apis</groupId>
-            <artifactId>xml-apis</artifactId>
-        </dependency>
-        <dependency>
-            <!-- TODO fjern denne overstyringen -->
-            <!-- setter eldre versjon for at det skal bygge med github actions, den klarer ikke laste ny versjon fra maven central -->
-            <groupId>org.apache.pdfbox</groupId>
-            <artifactId>xmpbox</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

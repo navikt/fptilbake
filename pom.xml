@@ -431,7 +431,7 @@
             <dependency>
                 <groupId>org.apache.santuario</groupId>
                 <artifactId>xmlsec</artifactId>
-                <version>2.1.4</version>
+                <version>2.1.5</version>
             </dependency>
             <dependency>
                 <groupId>io.dropwizard.metrics</groupId>
@@ -595,7 +595,7 @@
             <dependency>
                 <groupId>org.apache.pdfbox</groupId>
                 <artifactId>pdfbox</artifactId>
-                <version>2.0.18</version>
+                <version>2.0.19</version>
             </dependency>
             <dependency>
                 <groupId>xml-apis</groupId>
@@ -621,11 +621,6 @@
                 <groupId>org.jasypt</groupId>
                 <artifactId>jasypt</artifactId>
                 <version>1.9.3</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.pdfbox</groupId>
-                <artifactId>xmpbox</artifactId>
-                <version>2.0.18</version>
             </dependency>
             <!--Java10 -->
             <dependency>
