@@ -67,7 +67,7 @@ public class BehandlingTilstandTjenesteTest {
         assertThat(tilstand.getYtelseType()).isEqualTo(YtelseType.FP);
         assertThat(tilstand.getSaksnummer()).isEqualTo(behandling.getFagsak().getSaksnummer().getVerdi());
         assertThat(tilstand.getBehandlingUuid()).isEqualTo(behandling.getUuid());
-        assertThat(tilstand.getReferteFagsakBehandling()).isEqualTo(EKSTERN_UUID);
+        assertThat(tilstand.getReferertFagsakBehandlingUuid()).isEqualTo(EKSTERN_UUID);
         assertThat(tilstand.getBehandlingType()).isEqualTo(BehandlingType.TILBAKEKREVING);
         assertThat(tilstand.getBehandlingStatus()).isEqualTo(BehandlingStatus.OPPRETTET);
         assertThat(tilstand.getBehandlingResultat()).isEqualTo(BehandlingResultat.IKKE_FASTSATT);
@@ -98,7 +98,7 @@ public class BehandlingTilstandTjenesteTest {
         assertThat(tilstand.getYtelseType()).isEqualTo(YtelseType.FP);
         assertThat(tilstand.getSaksnummer()).isEqualTo(behandling.getFagsak().getSaksnummer().getVerdi());
         assertThat(tilstand.getBehandlingUuid()).isEqualTo(behandling.getUuid());
-        assertThat(tilstand.getReferteFagsakBehandling()).isEqualTo(EKSTERN_UUID);
+        assertThat(tilstand.getReferertFagsakBehandlingUuid()).isEqualTo(EKSTERN_UUID);
         assertThat(tilstand.getBehandlingType()).isEqualTo(BehandlingType.TILBAKEKREVING);
         assertThat(tilstand.getBehandlingStatus()).isEqualTo(BehandlingStatus.AVSLUTTET);
         assertThat(tilstand.getBehandlingResultat()).isEqualTo(BehandlingResultat.FASTSATT);
@@ -124,7 +124,7 @@ public class BehandlingTilstandTjenesteTest {
         assertThat(tilstand.getYtelseType()).isEqualTo(YtelseType.FP);
         assertThat(tilstand.getSaksnummer()).isEqualTo(behandling.getFagsak().getSaksnummer().getVerdi());
         assertThat(tilstand.getBehandlingUuid()).isEqualTo(behandling.getUuid());
-        assertThat(tilstand.getReferteFagsakBehandling()).isEqualTo(EKSTERN_UUID);
+        assertThat(tilstand.getReferertFagsakBehandlingUuid()).isEqualTo(EKSTERN_UUID);
         assertThat(tilstand.getBehandlingType()).isEqualTo(BehandlingType.TILBAKEKREVING);
         assertThat(tilstand.getBehandlingStatus()).isEqualTo(BehandlingStatus.OPPRETTET);
         assertThat(tilstand.getBehandlingResultat()).isEqualTo(BehandlingResultat.IKKE_FASTSATT);

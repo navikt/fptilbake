@@ -98,7 +98,7 @@ public class VedtakOppsummeringTjeneste {
         vedtakOppsummering.setBehandlingType(BehandlingTypeMapper.getBehandlingType(behandling.getType()));
         vedtakOppsummering.setBehandlingOpprettetTid(tilOffsetDateTime(behandling.getOpprettetTidspunkt()));
         vedtakOppsummering.setVedtakFattetTid(tilOffsetDateTime(behandlingVedtak.get().getOpprettetTidspunkt()));
-        vedtakOppsummering.setReferteFagsakBehandling(eksternBehandling.getEksternUuid());
+        vedtakOppsummering.setReferertFagsakBehandlingUuid(eksternBehandling.getEksternUuid());
         vedtakOppsummering.setBehandlendeEnhetKode(behandling.getBehandlendeEnhetId());
         vedtakOppsummering.setErBehandlingManueltOpprettet(behandling.isManueltOpprettet());
         forrigeBehandling.ifPresent(forrige -> vedtakOppsummering.setForrigeBehandling(forrige.getUuid()));

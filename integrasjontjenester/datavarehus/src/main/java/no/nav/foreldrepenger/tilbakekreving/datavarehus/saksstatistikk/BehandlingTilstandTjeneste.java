@@ -61,7 +61,7 @@ public class BehandlingTilstandTjeneste {
         tilstand.setYtelseType(YtelseTypeMapper.getYtelseType(behandling.getFagsak().getFagsakYtelseType()));
         tilstand.setSaksnummer(behandling.getFagsak().getSaksnummer().getVerdi());
         tilstand.setBehandlingUuid(behandling.getUuid());
-        tilstand.setReferteFagsakBehandling(eksternBehandling.getEksternUuid());
+        tilstand.setReferertFagsakBehandlingUuid(eksternBehandling.getEksternUuid());
         tilstand.setBehandlingType(BehandlingTypeMapper.getBehandlingType(behandling.getType()));
         tilstand.setBehandlingStatus(BehandlingStatusMapper.getBehandlingStatus(behandling.getStatus()));
         tilstand.setBehandlingResultat(BehandlingResultatTypeMapper.getBehandlingResultatType(behandlingResultatType));

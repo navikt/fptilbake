@@ -19,7 +19,7 @@ public class BehandlingTilstand {
     private String saksnummer;
     private YtelseType ytelseType;
     private UUID behandlingUuid;
-    private UUID referteFagsakBehandling;
+    private UUID referertFagsakBehandlingUuid;
     private BehandlingType behandlingType;
     private BehandlingStatus behandlingStatus;
     private BehandlingResultat behandlingResultat;
@@ -76,12 +76,12 @@ public class BehandlingTilstand {
         this.behandlingUuid = behandlingUuid;
     }
 
-    public UUID getReferteFagsakBehandling() {
-        return referteFagsakBehandling;
+    public UUID getReferertFagsakBehandlingUuid() {
+        return referertFagsakBehandlingUuid;
     }
 
-    public void setReferteFagsakBehandling(UUID referteFagsakBehandling) {
-        this.referteFagsakBehandling = referteFagsakBehandling;
+    public void setReferertFagsakBehandlingUuid(UUID referertFagsakBehandlingUuid) {
+        this.referertFagsakBehandlingUuid = referertFagsakBehandlingUuid;
     }
 
     public BehandlingType getBehandlingType() {
