@@ -19,7 +19,9 @@ import com.codahale.metrics.health.HealthCheck;
 import com.codahale.metrics.health.HealthCheckRegistry;
 
 import no.nav.foreldrepenger.tilbakekreving.web.app.selftest.checks.ExtHealthCheck;
+import no.nav.foreldrepenger.tilbakekreving.web.app.selftest.checks.KravgrunnlagQueueHealthCheck;
 import no.nav.vedtak.konfig.KonfigVerdi;
+import no.nav.vedtak.util.env.Environment;
 
 @ApplicationScoped
 public class Selftests {
@@ -39,9 +41,9 @@ public class Selftests {
 
     @Inject
     public Selftests(
-            HealthCheckRegistry registry,
-            @Any Instance<ExtHealthCheck> healthChecks,
-            @KonfigVerdi(value = "application.name") String applicationName) {
+        HealthCheckRegistry registry,
+        @Any Instance<ExtHealthCheck> healthChecks,
+        @KonfigVerdi(value = "application.name") String applicationName) {
 
         this.registry = registry;
         this.healthChecks = healthChecks;
@@ -91,6 +93,10 @@ public class Selftests {
         String name = healthCheck.getClass().getName();
         if (erKritiskTjeneste.containsKey(name)) {
             throw SelftestFeil.FACTORY.dupliserteSelftestNavn(name).toException();
+        }
+        if ("true".equalsIgnoreCase(Environment.current().getProperty("test.only.disable.mq")) && name.contains(KravgrunnlagQueueHealthCheck.class.getName())) {
+            LOGGER.info("Registrerte IKKE health check {} siden den er skrudd av med test.only.disable.mq=true", name);
+            return;
         }
         registry.register(name, healthCheck);
         erKritiskTjeneste.put(name, healthCheck.erKritiskTjeneste());
