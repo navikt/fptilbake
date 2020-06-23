@@ -94,21 +94,23 @@ jobs:
           title: Deploy av ${{ env.TAG }}
           labels: deployment
           body: |
-            Kommenter med <b>/promote env namespace</b>, hvor <b>env</b> er et gyldig clusternavn og <b>namespace</b> et eksisterende namespace i det clusteret.
+            Kommenter med <b>/promote område env namespace</b>, hvor <b>område</b> er fp eller k9, <b>env</b> er et gyldig clusternavn og <b>namespace</b> et eksisterende namespace i det clusteret.
 
             <table>
-            <tr><th>Cluster</th><th>Namespace</th></tr>
-            <tr><td>dev-fss</td><td>t4, q0, q1</td></tr>
-            <tr><td>prod-fss</td><td>default</td></tr>
+            <tr><th>Område</th><th>Cluster</th><th>Namespace</th></tr>
+            <tr><td>fp</td><td>dev-fss</td><td>t4, q0, q1</td></tr>
+            <tr><td>fp</td><td>prod-fss</td><td>default</td></tr>
+            <tr><td>k9</td><td>dev-fss</td><td>default</td></tr>
+            <tr><td>k9</td><td>prod-fss</td><td>default</td></tr>
             </table>
 
-      - name: Trigg deploy til dev
+      - name: Trigg deploy av fptilbake til dev
         if: success()
         uses: peter-evans/create-or-update-comment@v1
         with:
           token: ${{ secrets.GITHUB_ACCESS_TOKEN }}
           issue-number: ${{ steps.createdeployissue.outputs.number }}
-          body: /promote dev-fss t4
+          body: /promote fp dev-fss t4
 
       - name: Rydd genererte artefakter fra cache før den lagres
         shell: bash
