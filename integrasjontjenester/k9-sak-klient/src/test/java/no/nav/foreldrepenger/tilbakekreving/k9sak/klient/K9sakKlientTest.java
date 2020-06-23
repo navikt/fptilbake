@@ -91,14 +91,13 @@ public class K9sakKlientTest {
 
     @Test
     public void skal_returnere_tilbakekreving_valg() {
-        // TODO k9-tilbake: Må støtte kode i k9-sak - TILBAKEKR_OPPRETT
-        TilbakekrevingValgDto tilbakekrevingValgDto = new TilbakekrevingValgDto(VidereBehandling.TILBAKEKREV_I_INFOTRYGD);
+        TilbakekrevingValgDto tilbakekrevingValgDto = new TilbakekrevingValgDto(VidereBehandling.TILBAKEKR_OPPRETT);
         when(oidcRestClientMock.getReturnsOptional(BEHANDLING_URI, K9sakBehandlingInfoDto.class)).thenReturn(Optional.of(k9sakBehandlingInfoDto()));
         when(oidcRestClientMock.getReturnsOptional(TILBAKEKREVING_VALG_URI, TilbakekrevingValgDto.class)).thenReturn(Optional.of(tilbakekrevingValgDto));
 
         Optional<TilbakekrevingValgDto> valgDto = klient.hentTilbakekrevingValg(BEHANDLING_UUID);
         assertThat(valgDto).isPresent();
-        assertThat(valgDto.get().getVidereBehandling()).isEqualByComparingTo(VidereBehandling.TILBAKEKREV_I_INFOTRYGD);
+        assertThat(valgDto.get().getVidereBehandling()).isEqualByComparingTo(VidereBehandling.TILBAKEKR_OPPRETT);
     }
 
     @Test
