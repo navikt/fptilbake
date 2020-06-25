@@ -54,18 +54,16 @@ public class ManueltSendSakshendleserTilDvhTaskTest {
         EksternBehandling eksternBehandling = new EksternBehandling(behandling, Henvisning.fraEksternBehandlingId(1l), UUID.randomUUID());
         repositoryProvider.getEksternBehandlingRepository().lagre(eksternBehandling);
         prosessTaskData = new ProsessTaskData(ManueltSendSakshendleserTilDvhTask.TASK_TYPE);
+        prosessTaskData.setProperty("startDato","25.06.2020");
+        prosessTaskData.setProperty("sisteDato","25.06.2020");
     }
 
     @Test
     public void skal_sende_behandling_opprettelse_sakshendelser_til_dvh() {
         prosessTaskData.setProperty("eventHendelse", DvhEventHendelse.AKSJONSPUNKT_OPPRETTET.name());
         manueltSendSakshendleserTilDvhTask.doTask(prosessTaskData);
-        List<ProsessTaskData> prosesser = taskRepository.finnAlle(ProsessTaskStatus.KLAR);
-        assertThat(prosesser.size()).isEqualTo(1);
-        prosessTaskData = prosesser.get(0);
-        assertThat(prosessTaskData.getBehandlingId()).isEqualTo(String.valueOf(behandling.getId()));
-        assertThat(prosessTaskData.getPayloadAsString()).isNotEmpty();
         verify(kafkaProducerMock, Mockito.atLeastOnce()).sendMelding(any(BehandlingTilstand.class));
+        fellesProsessTaskAssert();
     }
 
     @Test
@@ -73,11 +71,14 @@ public class ManueltSendSakshendleserTilDvhTaskTest {
         behandling.avsluttBehandling();
         prosessTaskData.setProperty("eventHendelse", DvhEventHendelse.AKSJONSPUNKT_AVBRUTT.name());
         manueltSendSakshendleserTilDvhTask.doTask(prosessTaskData);
+        verify(kafkaProducerMock, Mockito.atLeastOnce()).sendMelding(any(BehandlingTilstand.class));
+        fellesProsessTaskAssert();
+    }
+
+    private void fellesProsessTaskAssert(){
         List<ProsessTaskData> prosesser = taskRepository.finnAlle(ProsessTaskStatus.KLAR);
         assertThat(prosesser.size()).isEqualTo(1);
         prosessTaskData = prosesser.get(0);
-        assertThat(prosessTaskData.getBehandlingId()).isEqualTo(String.valueOf(behandling.getId()));
-        assertThat(prosessTaskData.getPayloadAsString()).isNotEmpty();
-        verify(kafkaProducerMock, Mockito.atLeastOnce()).sendMelding(any(BehandlingTilstand.class));
+        assertThat(prosessTaskData.getPropertyValue("antallBehandlinger")).isEqualTo("1");
     }
 }

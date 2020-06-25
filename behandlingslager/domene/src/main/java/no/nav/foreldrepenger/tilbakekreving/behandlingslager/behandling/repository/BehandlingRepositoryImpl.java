@@ -3,6 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposit
 import static no.nav.vedtak.felles.jpa.HibernateVerktøy.hentEksaktResultat;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -82,15 +83,19 @@ public class BehandlingRepositoryImpl implements BehandlingRepository {
     }
 
     @Override
-    public List<Behandling> hentAlleBehandlinger() {
-        TypedQuery<Behandling> query = getEntityManager().createQuery("from Behandling", Behandling.class); //$NON-NLS-1$
+    public List<Behandling> hentAlleBehandlinger(LocalDate førsteDato, LocalDate sisteDato) {
+        TypedQuery<Behandling> query = getEntityManager().createQuery("from Behandling where opprettet_tid>=:førsteDato and opprettet_tid<=:sisteDato", Behandling.class); //$NON-NLS-1$
+        query.setParameter("førsteDato",førsteDato.atStartOfDay());
+        query.setParameter("sisteDato",sisteDato.atTime(23,59, 59));
         return query.getResultList();
     }
 
     @Override
-    public List<Behandling> hentAlleAvsluttetBehandlinger() {
-        TypedQuery<Behandling> query = getEntityManager().createQuery("from Behandling where status=:status", Behandling.class); //$NON-NLS-1$
+    public List<Behandling> hentAlleAvsluttetBehandlinger(LocalDate førsteDato, LocalDate sisteDato) {
+        TypedQuery<Behandling> query = getEntityManager().createQuery("from Behandling where status=:status and avsluttet_dato>=:førsteDato and avsluttet_dato<=:sisteDato", Behandling.class); //$NON-NLS-1$
         query.setParameter("status",BehandlingStatus.AVSLUTTET);
+        query.setParameter("førsteDato",førsteDato.atStartOfDay());
+        query.setParameter("sisteDato",sisteDato.atTime(23,59, 59));
         return query.getResultList();
     }
 

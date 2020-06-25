@@ -1,6 +1,8 @@
 package no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk;
 
+import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -8,7 +10,6 @@ import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
-import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping.BehandlingTilstandMapper;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.BehandlingResultat;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.BehandlingTilstand;
@@ -45,30 +46,34 @@ public class ManueltSendSakshendleserTilDvhTask implements ProsessTaskHandler {
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
         DvhEventHendelse eventHendelse = DvhEventHendelse.valueOf(prosessTaskData.getPropertyValue("eventHendelse"));
+        LocalDate førsteDato = LocalDate.parse(prosessTaskData.getPropertyValue("startDato"), DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+        LocalDate sisteDato =  LocalDate.parse(prosessTaskData.getPropertyValue("sisteDato"), DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+        int antallBehandlinger = 0;
         if (DvhEventHendelse.AKSJONSPUNKT_OPPRETTET.equals(eventHendelse)) {
-            List<Behandling> behandlinger = behandlingRepository.hentAlleBehandlinger();
+            List<Behandling> behandlinger = behandlingRepository.hentAlleBehandlinger(førsteDato,sisteDato);
             for (Behandling behandling : behandlinger) {
                 BehandlingTilstand behandlingTilstand = behandlingTilstandTjeneste.hentBehandlingensTilstand(behandling.getId());
                 behandlingTilstand.setFunksjonellTid(behandling.getOpprettetTidspunkt().atZone(ZoneId.of("UTC")).toOffsetDateTime());
                 behandlingTilstand.setBehandlingStatus(BehandlingStatus.OPPRETTET);
                 behandlingTilstand.setBehandlingResultat(BehandlingResultat.IKKE_FASTSATT);
                 kafkaProducer.sendMelding(behandlingTilstand);
-                oppdaterProsessTask(prosessTaskData, behandling, behandlingTilstand);
+                antallBehandlinger ++;
             }
         } else if (DvhEventHendelse.AKSJONSPUNKT_AVBRUTT.equals(eventHendelse)) {
-            List<Behandling> behandlinger = behandlingRepository.hentAlleAvsluttetBehandlinger();
+            List<Behandling> behandlinger = behandlingRepository.hentAlleAvsluttetBehandlinger(førsteDato,sisteDato);
             for (Behandling behandling : behandlinger) {
                 BehandlingTilstand behandlingTilstand = behandlingTilstandTjeneste.hentBehandlingensTilstand(behandling.getId());
                 behandlingTilstand.setFunksjonellTid(behandling.getAvsluttetDato().atZone(ZoneId.of("UTC")).toOffsetDateTime());
                 kafkaProducer.sendMelding(behandlingTilstand);
-                oppdaterProsessTask(prosessTaskData, behandling, behandlingTilstand);
+                antallBehandlinger ++;
             }
         }
+        oppdaterProsessTask(prosessTaskData, antallBehandlinger);
     }
 
-    private void oppdaterProsessTask(ProsessTaskData prosessTaskData, Behandling behandling, BehandlingTilstand behandlingTilstand) {
-        prosessTaskData.setPayload(BehandlingTilstandMapper.tilJsonString(behandlingTilstand));
-        prosessTaskData.setProperty("behandlingId", Long.toString(behandling.getId()));
+    private void oppdaterProsessTask(ProsessTaskData prosessTaskData, int antallBehandlinger) {
+        prosessTaskData.setProperty("antallBehandlinger", String.valueOf(antallBehandlinger));
         taskRepository.lagre(prosessTaskData);
     }
+
 }

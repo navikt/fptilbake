@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository;
 
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -67,8 +68,8 @@ public interface BehandlingRepository extends BehandlingslagerRepository {
 
     String hentSaksnummerForBehandling(long behandlingId);
 
-    List<Behandling> hentAlleBehandlinger();
+    List<Behandling> hentAlleBehandlinger(LocalDate førsteDato, LocalDate sisteDato);
 
-    List<Behandling> hentAlleAvsluttetBehandlinger();
+    List<Behandling> hentAlleAvsluttetBehandlinger(LocalDate førsteDato, LocalDate sisteDato);
 
 }
