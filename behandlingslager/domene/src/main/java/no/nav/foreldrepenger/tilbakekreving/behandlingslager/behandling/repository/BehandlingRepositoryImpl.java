@@ -82,6 +82,19 @@ public class BehandlingRepositoryImpl implements BehandlingRepository {
     }
 
     @Override
+    public List<Behandling> hentAlleBehandlinger() {
+        TypedQuery<Behandling> query = getEntityManager().createQuery("from Behandling", Behandling.class); //$NON-NLS-1$
+        return query.getResultList();
+    }
+
+    @Override
+    public List<Behandling> hentAlleAvsluttetBehandlinger() {
+        TypedQuery<Behandling> query = getEntityManager().createQuery("from Behandling where status=:status", Behandling.class); //$NON-NLS-1$
+        query.setParameter("status",BehandlingStatus.AVSLUTTET);
+        return query.getResultList();
+    }
+
+    @Override
     public List<Behandling> hentBehandlingerSomIkkeErAvsluttetForFagsakId(Long fagsakId) {
         Objects.requireNonNull(fagsakId, KEY_FAGSAK_ID); //$NON-NLS-1$
 

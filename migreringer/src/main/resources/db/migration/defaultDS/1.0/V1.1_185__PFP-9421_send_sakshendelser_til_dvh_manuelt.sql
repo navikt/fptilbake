@@ -1,0 +1,1 @@
+INSERT INTO PROSESS_TASK_TYPE (KODE,NAVN,FEIL_MAKS_FORSOEK,BESKRIVELSE) VALUES ('dvh.send.sakshendelser.manuelt','Publiserer data til dvh for alle behandlinger','3','Publiserer data til dvh for alle behandlinger finnes i PROD');

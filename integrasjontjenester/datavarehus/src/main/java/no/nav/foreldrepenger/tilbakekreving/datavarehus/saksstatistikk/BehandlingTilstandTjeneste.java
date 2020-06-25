@@ -35,10 +35,10 @@ public class BehandlingTilstandTjeneste {
     }
 
     @Inject
-    public BehandlingTilstandTjeneste(BehandlingRepositoryProvider repositoryProvider, BehandlingresultatRepository behandlingresultatRepository) {
+    public BehandlingTilstandTjeneste(BehandlingRepositoryProvider repositoryProvider) {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
-        this.behandlingresultatRepository = behandlingresultatRepository;
+        this.behandlingresultatRepository = repositoryProvider.getBehandlingresultatRepository();
     }
 
     public BehandlingTilstand hentBehandlingensTilstand(long behandlingId) {
