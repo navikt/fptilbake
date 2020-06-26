@@ -39,7 +39,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjons
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.AksjonspunktDtoMapper;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.BekreftedeAksjonspunkterDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.BekreftetAksjonspunktDto;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
+import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.Redirect;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 
@@ -79,8 +79,8 @@ public class AksjonspunktRestTjeneste {
         })
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public Response getAksjonspunkter(@NotNull @QueryParam("behandlingId") @Valid BehandlingIdDto behandlingIdDto) throws URISyntaxException { // NOSONAR
-        Behandling behandling = behandlingRepository.hentBehandling(behandlingIdDto.getBehandlingId());
+    public Response getAksjonspunkter(@NotNull @QueryParam("behandlingUuid") @Valid BehandlingReferanse behandlingReferanse) { // NOSONAR
+        Behandling behandling = hentBehandling(behandlingReferanse);
         Collection<Totrinnsvurdering> totrinnsvurderinger = totrinnRepository.hentTotrinnsvurderinger(behandling);
         Set<AksjonspunktDto> dto = AksjonspunktDtoMapper.lagAksjonspunktDto(behandling, totrinnsvurderinger);
         CacheControl cc = new CacheControl();
@@ -107,10 +107,23 @@ public class AksjonspunktRestTjeneste {
     @BeskyttetRessurs(action = UPDATE, ressurs = FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response bekreft(@Parameter(description = "Liste over aksjonspunkt som skal bekreftes, inklusiv data som trengs for å løse de.") @Valid BekreftedeAksjonspunkterDto apDto) throws URISyntaxException { // NOSONAR
-        Long behandlingId = apDto.getBehandlingId().getBehandlingId();
+        BehandlingReferanse behandlingReferanse = apDto.getBehandlingId();
+        Long behandlingId = behandlingReferanse.erInternBehandlingId()
+            ? behandlingReferanse.getBehandlingId()
+            : hentBehandling(behandlingReferanse).getId();
         Collection<BekreftetAksjonspunktDto> bekreftedeAksjonspunktDtoer = apDto.getBekreftedeAksjonspunktDtoer();
         behandlingTjeneste.kanEndreBehandling(behandlingId, apDto.getBehandlingVersjon());
         aksjonspunktApplikasjonTjeneste.bekreftAksjonspunkter(bekreftedeAksjonspunktDtoer, behandlingId);
         return Redirect.tilBehandlingPollStatus(behandlingId);
+    }
+
+    private Behandling hentBehandling(BehandlingReferanse behandlingReferanse) {
+        Behandling behandling;
+        if (behandlingReferanse.erInternBehandlingId()) {
+            behandling = behandlingRepository.hentBehandling(behandlingReferanse.getBehandlingId());
+        } else {
+            behandling = behandlingRepository.hentBehandling(behandlingReferanse.getBehandlingUuid());
+        }
+        return behandling;
     }
 }

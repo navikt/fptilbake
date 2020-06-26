@@ -80,6 +80,11 @@ public class BehandlingRevurderingTjeneste {
         return true;
     }
 
+    public boolean kanRevurderingOpprettes(Behandling behandling) {
+        Optional<EksternBehandling> eksternBehandling = hentEksternBehandling(behandling.getId());
+        return eksternBehandling.isPresent() && kanOppretteRevurdering(eksternBehandling.get().getEksternUuid());
+    }
+
     public Optional<EksternBehandling> hentEksternBehandling(long behandlingId) {
         return eksternBehandlingRepository.hentOptionalFraInternId(behandlingId);
     }

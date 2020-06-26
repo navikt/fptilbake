@@ -12,23 +12,25 @@ import java.util.Map;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.FeilutbetalingPerioderDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.PeriodeDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurdertForeldelseTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
+import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 
 public class ForeldelseRestTjenesteTest {
 
     private static final long behandlingId = 123456;
-    private static final BehandlingIdDto idDto = new BehandlingIdDto(behandlingId);
+    private static final BehandlingReferanse idDto = new BehandlingReferanse(behandlingId);
 
     private VurdertForeldelseTjeneste vurdertForeldelseTjenesteMock = mock(VurdertForeldelseTjeneste.class);
     private KravgrunnlagBeregningTjeneste kravgrunnlagBeregningTjenesteMock =mock(KravgrunnlagBeregningTjeneste.class);
+    private BehandlingTjeneste behandlingTjeneste = mock(BehandlingTjeneste.class);
 
-    private ForeldelseRestTjeneste restTjeneste = new ForeldelseRestTjeneste(vurdertForeldelseTjenesteMock, kravgrunnlagBeregningTjenesteMock);
+    private ForeldelseRestTjeneste restTjeneste = new ForeldelseRestTjeneste(vurdertForeldelseTjenesteMock, kravgrunnlagBeregningTjenesteMock, behandlingTjeneste);
 
     @Test
     public void skal_kalle_hentLogiskePerioder() {

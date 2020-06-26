@@ -24,7 +24,7 @@ import no.nav.foreldrepenger.tilbakekreving.domene.person.TpsTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
+import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.testtjenester.GrunnlagRestTestTjenesteLocalDev;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.testtjenester.KravgrunnlagDto;
 
@@ -39,7 +39,7 @@ public class GrunnlagRestTestTjenesteTest {
     public void lagreUtbetalinger() throws Exception {
         Mockito.when(tpsTjenesteMock.hentAktørForFnr(PersonIdent.fra("12345678901"))).thenReturn(Optional.of(new AktørId(999999L)));
 
-        Response response = grunnlagTjeneste.lagreUtbetalinger(new BehandlingIdDto("1"), lagMockKravgrunnlagDto());
+        Response response = grunnlagTjeneste.lagreUtbetalinger(new BehandlingReferanse("1"), lagMockKravgrunnlagDto());
         assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_OK);
         verify(kravgrunnlagTjenesteMock, atLeastOnce()).lagreTilbakekrevingsgrunnlagFraØkonomi(anyLong(), any(Kravgrunnlag431.class), any(boolean.class));
     }

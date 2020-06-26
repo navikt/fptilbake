@@ -1,22 +1,20 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.AbacDto;
-import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
 import no.nav.vedtak.util.InputValideringRegex;
 
 public class BestillBrevDto implements AbacDto {
 
     @NotNull
-    @Min(0)
-    @Max(Long.MAX_VALUE)
-    private Long behandlingId;
+    @Valid
+    private BehandlingReferanse behandlingId;
 
     @NotNull
     @Size(min = 1, max = 100)
@@ -28,11 +26,11 @@ public class BestillBrevDto implements AbacDto {
     @Pattern(regexp = InputValideringRegex.FRITEKST)
     private String fritekst;
 
-    public Long getBehandlingId() {
+    public BehandlingReferanse getBehandlingId() {
         return behandlingId;
     }
 
-    public void setBehandlingId(Long behandlingId) {
+    public void setBehandlingId(BehandlingReferanse behandlingId) {
         this.behandlingId = behandlingId;
     }
 
@@ -54,6 +52,6 @@ public class BestillBrevDto implements AbacDto {
 
     @Override
     public AbacDataAttributter abacAttributter() {
-        return AbacDataAttributter.opprett().leggTil(StandardAbacAttributtType.BEHANDLING_ID, behandlingId);
+        return behandlingId.abacAttributter();
     }
 }

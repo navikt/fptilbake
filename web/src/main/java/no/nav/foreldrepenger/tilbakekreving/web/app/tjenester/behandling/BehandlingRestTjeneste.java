@@ -55,7 +55,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjons
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.AsyncPollingStatus;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingDtoTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
+import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingRettigheterDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.ByttBehandlendeEnhetDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.FpsakUuidDto;
@@ -165,11 +165,16 @@ public class BehandlingRestTjeneste {
         tags = "behandlinger",
         description = "Sjekk om revurdering kan opprettes")
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
-    public Response kanOpprettesRevurdering(@NotNull @QueryParam("behandlingId") @Valid BehandlingIdDto idDto) {
-        Optional<EksternBehandling> eksternBehandling = revurderingTjeneste.hentEksternBehandling(idDto.getBehandlingId());
+    public Response kanOpprettesRevurdering(@NotNull @QueryParam("behandlingId") @Parameter(description = "Intern behandlingId eller behandlingUuid for behandling") @Valid BehandlingReferanse idDto) {
         boolean kanRevurderingOprettes = false;
-        if (eksternBehandling.isPresent()) {
-            kanRevurderingOprettes = revurderingTjeneste.kanOppretteRevurdering(eksternBehandling.get().getEksternUuid());
+        if (idDto.erInternBehandlingId()) {
+            Optional<EksternBehandling> eksternBehandling = revurderingTjeneste.hentEksternBehandling(idDto.getBehandlingId());
+            if (eksternBehandling.isPresent()) {
+                kanRevurderingOprettes = revurderingTjeneste.kanOppretteRevurdering(eksternBehandling.get().getEksternUuid());
+            }
+        } else {
+            Behandling behandling = behandlingTjeneste.hentBehandling(idDto.getBehandlingUuid());
+            kanRevurderingOprettes = behandling != null && revurderingTjeneste.kanRevurderingOpprettes(behandling);
         }
         return Response.ok(kanRevurderingOprettes).build();
     }
@@ -268,7 +273,7 @@ public class BehandlingRestTjeneste {
         })
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public Response hentBehandling(@NotNull @Valid BehandlingIdDto idDto) throws URISyntaxException {
+    public Response hentBehandling(@NotNull @Valid BehandlingReferanse idDto) throws URISyntaxException {
         // sender alltid til poll status slik at vi får sjekket på utestående prosess tasks også.
         return Redirect.tilBehandlingPollStatus(idDto.getBehandlingId(), Optional.empty());
     }
@@ -286,7 +291,7 @@ public class BehandlingRestTjeneste {
         })
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public Response hentBehandlingMidlertidigStatus(@NotNull @QueryParam("behandlingId") @Valid BehandlingIdDto idDto,
+    public Response hentBehandlingMidlertidigStatus(@NotNull @QueryParam("behandlingId") @Valid BehandlingReferanse idDto,
                                                     @QueryParam("gruppe") @Valid ProsessTaskGruppeIdDto gruppeDto)
         throws URISyntaxException {
         Long behandlingId = idDto.getBehandlingId();
@@ -306,7 +311,7 @@ public class BehandlingRestTjeneste {
         })
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public Response hentBehandlingResultat(@NotNull @QueryParam("behandlingId") @Valid BehandlingIdDto idDto) {
+    public Response hentBehandlingResultat(@NotNull @QueryParam("behandlingId") @Valid BehandlingReferanse idDto) {
 
         var behandlingId = idDto.getBehandlingId();
         var behandling = behandlingsprosessTjeneste.hentBehandling(behandlingId);
@@ -387,7 +392,7 @@ public class BehandlingRestTjeneste {
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public BehandlingRettigheterDto hentBehandlingOperasjonRettigheter(
-        @NotNull @QueryParam("behandlingId") @Valid BehandlingIdDto behandlingIdDto
+        @NotNull @QueryParam("behandlingUuid") @Valid BehandlingReferanse behandlingReferanse
     ) {
         Boolean harSoknad = true;
         //TODO (TOR) Denne skal etterkvart returnere rettighetene knytta til behandlingsmeny i frontend

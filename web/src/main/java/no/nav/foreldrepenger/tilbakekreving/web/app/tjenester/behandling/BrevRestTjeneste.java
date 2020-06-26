@@ -24,10 +24,11 @@ import com.codahale.metrics.annotation.Timed;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.dokumentbestiller.DokumentMalType;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.brevmaler.DokumentBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.BrevmalDto;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BestillBrevDto;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 
@@ -41,14 +42,17 @@ public class BrevRestTjeneste {
     public static final String PATH_FRAGMENT = "/brev"; // NOSONAR
 
     private DokumentBehandlingTjeneste dokumentBehandlingTjeneste;
+    private BehandlingTjeneste behandlingTjeneste;
 
     public BrevRestTjeneste() {
         // CDI
     }
 
     @Inject
-    public BrevRestTjeneste(DokumentBehandlingTjeneste dokumentBehandlingTjeneste) {
+    public BrevRestTjeneste(DokumentBehandlingTjeneste dokumentBehandlingTjeneste,
+                            BehandlingTjeneste behandlingTjeneste) {
         this.dokumentBehandlingTjeneste = dokumentBehandlingTjeneste;
+        this.behandlingTjeneste = behandlingTjeneste;
     }
 
 
@@ -59,8 +63,9 @@ public class BrevRestTjeneste {
     @Operation(tags = "brev", description = "Henter liste over tilgjengelige brevtyper")
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK, sporingslogg = false)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public List<BrevmalDto> hentMaler(@Valid @QueryParam("behandlingId") BehandlingIdDto behandlingIdDto) {
-        return dokumentBehandlingTjeneste.hentBrevmalerFor(behandlingIdDto.getBehandlingId());
+    public List<BrevmalDto> hentMaler(@Valid @QueryParam("behandlingUuid") BehandlingReferanse behandlingReferanse) {
+        long behandlingId = hentBehandlingId(behandlingReferanse);
+        return dokumentBehandlingTjeneste.hentBrevmalerFor(behandlingId);
     }
 
     @POST
@@ -72,7 +77,8 @@ public class BrevRestTjeneste {
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response bestillBrev(@NotNull @Valid BestillBrevDto bestillBrevDto) {
         DokumentMalType malType = DokumentMalType.fraKode(bestillBrevDto.getBrevmalkode());
-        dokumentBehandlingTjeneste.bestillBrev(bestillBrevDto.getBehandlingId(), malType, bestillBrevDto.getFritekst());
+        long behandlingId = hentBehandlingId(bestillBrevDto.getBehandlingId());
+        dokumentBehandlingTjeneste.bestillBrev(behandlingId, malType, bestillBrevDto.getFritekst());
         return Response.ok().build();
     }
 
@@ -86,13 +92,19 @@ public class BrevRestTjeneste {
     public Response forhåndsvisBrev(@Parameter(description = "Inneholder kode til brevmal og data som skal flettes inn i brevet") @NotNull @Valid BestillBrevDto forhåndsvisBestillBrevDto) {
         DokumentMalType malType = DokumentMalType.fraKode(forhåndsvisBestillBrevDto.getBrevmalkode());
         String fritekst = forhåndsvisBestillBrevDto.getFritekst();
-        long behandlingId = forhåndsvisBestillBrevDto.getBehandlingId();
+        long behandlingId = hentBehandlingId(forhåndsvisBestillBrevDto.getBehandlingId());
         byte[] dokument = dokumentBehandlingTjeneste.forhåndsvisBrev(behandlingId, malType, fritekst);
 
         Response.ResponseBuilder responseBuilder = Response.ok(dokument);
         responseBuilder.type("application/pdf");
         responseBuilder.header("Content-Disposition", "filename=dokument.pdf");
         return responseBuilder.build();
+    }
+
+    private long hentBehandlingId(BehandlingReferanse behandlingReferanse) {
+        return behandlingReferanse.erInternBehandlingId()
+            ? behandlingReferanse.getBehandlingId()
+            : behandlingTjeneste.hentBehandlingId(behandlingReferanse.getBehandlingUuid());
     }
 
 }

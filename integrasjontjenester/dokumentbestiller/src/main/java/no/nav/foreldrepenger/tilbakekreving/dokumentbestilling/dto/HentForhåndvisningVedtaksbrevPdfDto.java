@@ -3,23 +3,20 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto;
 import java.util.List;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.AbacDto;
-import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
 import no.nav.vedtak.util.InputValideringRegex;
 
 public class HentForhåndvisningVedtaksbrevPdfDto implements AbacDto {
 
+    @Valid
     @NotNull
-    @Min(0)
-    @Max(Long.MAX_VALUE)
-    private Long behandlingId;
+    private BehandlingReferanse behandlingId;
 
     @Size(max = 1500, message = "Oppsummeringstekst er for lang")
     @Pattern(regexp = InputValideringRegex.FRITEKST)
@@ -30,11 +27,11 @@ public class HentForhåndvisningVedtaksbrevPdfDto implements AbacDto {
     @Valid
     private List<PeriodeMedTekstDto> perioderMedTekst;
 
-    public Long getBehandlingId() {
+    public BehandlingReferanse getBehandlingId() {
         return behandlingId;
     }
 
-    public void setBehandlingId(Long behandlingId) {
+    public void setBehandlingId(BehandlingReferanse behandlingId) {
         this.behandlingId = behandlingId;
     }
 
@@ -56,6 +53,6 @@ public class HentForhåndvisningVedtaksbrevPdfDto implements AbacDto {
 
     @Override
     public AbacDataAttributter abacAttributter() {
-        return AbacDataAttributter.opprett().leggTil(StandardAbacAttributtType.BEHANDLING_ID, getBehandlingId());
+        return behandlingId.abacAttributter();
     }
 }

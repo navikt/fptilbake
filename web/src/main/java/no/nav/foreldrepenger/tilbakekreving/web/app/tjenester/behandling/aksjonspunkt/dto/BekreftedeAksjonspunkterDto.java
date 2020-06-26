@@ -8,7 +8,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
+import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.AbacDto;
 import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
@@ -17,7 +17,7 @@ public class BekreftedeAksjonspunkterDto implements AbacDto {
 
     @Valid
     @NotNull
-    private BehandlingIdDto behandlingId;
+    private BehandlingReferanse behandlingId;
 
     @NotNull
     @Min(0)
@@ -28,16 +28,17 @@ public class BekreftedeAksjonspunkterDto implements AbacDto {
     @Valid
     private Collection<BekreftetAksjonspunktDto> bekreftedeAksjonspunktDtoer;
 
-    public static BekreftedeAksjonspunkterDto lagDto(Long behandlingId, Long behandlingVersjon,
+    public static BekreftedeAksjonspunkterDto lagDto(Long behandlingId,
+                                                     Long behandlingVersjon,
                                                      Collection<BekreftetAksjonspunktDto> bekreftedeAksjonspunktDtoer) {
         BekreftedeAksjonspunkterDto dto = new BekreftedeAksjonspunkterDto();
-        dto.behandlingId = new BehandlingIdDto(behandlingId);
+        dto.behandlingId = new BehandlingReferanse(behandlingId);
         dto.behandlingVersjon = behandlingVersjon;
         dto.bekreftedeAksjonspunktDtoer = bekreftedeAksjonspunktDtoer;
         return dto;
     }
 
-    public BehandlingIdDto getBehandlingId() {
+    public BehandlingReferanse getBehandlingId() {
         return behandlingId;
     }
 

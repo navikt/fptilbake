@@ -27,7 +27,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.ResponsKanal;
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
+import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 
 @Path(value = "/varsel/respons")
@@ -59,8 +59,8 @@ public class VarselresponsRestTjeneste {
         })
     @Path(value = "/hent-respons")
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
-    public Response finnRespons(@Valid @NotNull @QueryParam("behandlingId") BehandlingIdDto behandlingIdDto) {
-        Optional<VarselresponsDto> responsDto = responsTjeneste.hentRespons(behandlingIdDto.getBehandlingId()).map(VarselresponsDto::fraDomene);
+    public Response finnRespons(@Valid @NotNull @QueryParam("behandlingId") BehandlingReferanse behandlingReferanse) {
+        Optional<VarselresponsDto> responsDto = responsTjeneste.hentRespons(behandlingReferanse.getBehandlingId()).map(VarselresponsDto::fraDomene);
         if (responsDto.isPresent()) {
             return Response.ok(responsDto.get()).build();
         }

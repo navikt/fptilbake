@@ -35,7 +35,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodev
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType;
 import no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste.TilbakekrevingsvedtakTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
+import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiSendtXmlRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -65,7 +65,7 @@ public class ForvaltningBehandlingRestTjenesteTest {
         Behandling behandling = lagBehandling();
         behandling.avsluttBehandling();
 
-        Response response = forvaltningBehandlingRestTjeneste.tvingHenleggelseBehandling(new BehandlingIdDto(behandling.getId()));
+        Response response = forvaltningBehandlingRestTjeneste.tvingHenleggelseBehandling(new BehandlingReferanse(behandling.getId()));
         assertThat(response.getStatus()).isEqualTo(Response.Status.BAD_REQUEST.getStatusCode());
     }
 
@@ -73,7 +73,7 @@ public class ForvaltningBehandlingRestTjenesteTest {
     public void skal_tvinge_henlegg_behandling() {
         Behandling behandling = lagBehandling();
 
-        Response response = forvaltningBehandlingRestTjeneste.tvingHenleggelseBehandling(new BehandlingIdDto(behandling.getId()));
+        Response response = forvaltningBehandlingRestTjeneste.tvingHenleggelseBehandling(new BehandlingReferanse(behandling.getId()));
         assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
         assertProsessTask(TvingHenlegglBehandlingTask.TASKTYPE);
     }
@@ -83,7 +83,7 @@ public class ForvaltningBehandlingRestTjenesteTest {
         Behandling behandling = lagBehandling();
         behandling.avsluttBehandling();
 
-        Response response = forvaltningBehandlingRestTjeneste.tvingGjenopptaBehandling(new BehandlingIdDto(behandling.getId()));
+        Response response = forvaltningBehandlingRestTjeneste.tvingGjenopptaBehandling(new BehandlingReferanse(behandling.getId()));
         assertThat(response.getStatus()).isEqualTo(Response.Status.BAD_REQUEST.getStatusCode());
     }
 
@@ -91,7 +91,7 @@ public class ForvaltningBehandlingRestTjenesteTest {
     public void skal_ikke_tvinge_gjenoppta_behandling_når_behandling_ikke_er_på_vent() {
         Behandling behandling = lagBehandling();
 
-        Response response = forvaltningBehandlingRestTjeneste.tvingGjenopptaBehandling(new BehandlingIdDto(behandling.getId()));
+        Response response = forvaltningBehandlingRestTjeneste.tvingGjenopptaBehandling(new BehandlingReferanse(behandling.getId()));
         assertThat(response.getStatus()).isEqualTo(Response.Status.BAD_REQUEST.getStatusCode());
     }
 
@@ -100,7 +100,7 @@ public class ForvaltningBehandlingRestTjenesteTest {
         Behandling behandling = lagBehandling();
         behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, LocalDateTime.now().plusDays(3), Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
 
-        Response response = forvaltningBehandlingRestTjeneste.tvingGjenopptaBehandling(new BehandlingIdDto(behandling.getId()));
+        Response response = forvaltningBehandlingRestTjeneste.tvingGjenopptaBehandling(new BehandlingReferanse(behandling.getId()));
         assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
         assertProsessTask(GjenopptaBehandlingTask.TASKTYPE);
     }

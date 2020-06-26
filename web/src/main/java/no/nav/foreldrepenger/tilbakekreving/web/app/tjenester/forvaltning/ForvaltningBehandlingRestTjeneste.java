@@ -37,7 +37,7 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagValidator;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.TilbakekrevingsvedtakMarshaller;
 import no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste.TilbakekrevingsvedtakTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
+import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.MeldingType;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiSendtXmlRepository;
@@ -98,12 +98,12 @@ public class ForvaltningBehandlingRestTjeneste {
             @ApiResponse(responseCode = "500", description = "Feilet pga ukjent feil.")
         })
     @BeskyttetRessurs(action = CREATE, ressurs = DRIFT)
-    public Response tvingHenleggelseBehandling(@QueryParam("behandlingId") @NotNull @Valid BehandlingIdDto behandlingIdDto) {
-        Behandling behandling = behandlingRepository.hentBehandling(behandlingIdDto.getBehandlingId());
+    public Response tvingHenleggelseBehandling(@QueryParam("behandlingId") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
+        Behandling behandling = behandlingRepository.hentBehandling(behandlingReferanse.getBehandlingId());
         if (behandling.erAvsluttet()) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        logger.info("Tving henleggelse. Oppretter task for å henlegge behandlingId={}", behandlingIdDto.getBehandlingId());
+        logger.info("Tving henleggelse. Oppretter task for å henlegge behandlingId={}", behandlingReferanse.getBehandlingId());
         opprettHenleggBehandlingTask(behandling);
         return Response.ok().build();
     }
@@ -119,12 +119,12 @@ public class ForvaltningBehandlingRestTjeneste {
             @ApiResponse(responseCode = "500", description = "Feilet pga ukjent feil.")
         })
     @BeskyttetRessurs(action = CREATE, ressurs = DRIFT)
-    public Response tvingGjenopptaBehandling(@NotNull @QueryParam("behandlingId") @Valid BehandlingIdDto behandlingIdDto) {
-        Behandling behandling = behandlingRepository.hentBehandling(behandlingIdDto.getBehandlingId());
+    public Response tvingGjenopptaBehandling(@NotNull @QueryParam("behandlingId") @Valid BehandlingReferanse behandlingReferanse) {
+        Behandling behandling = behandlingRepository.hentBehandling(behandlingReferanse.getBehandlingId());
         if (behandling.erAvsluttet() || !behandling.isBehandlingPåVent()) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        logger.info("Tving gjenoppta. Oppretter task for å gjenoppta behandlingId={}", behandlingIdDto.getBehandlingId());
+        logger.info("Tving gjenoppta. Oppretter task for å gjenoppta behandlingId={}", behandlingReferanse.getBehandlingId());
         opprettGjenopptaBehandlingTask(behandling);
 
         return Response.ok().build();
@@ -186,8 +186,8 @@ public class ForvaltningBehandlingRestTjeneste {
             @ApiResponse(responseCode = "400", description = "Behandling eksisterer ikke")
         })
     @BeskyttetRessurs(action = READ, ressurs = DRIFT)
-    public Response hentOkoXmlForFeiletIverksetting(@NotNull @QueryParam("behandlingId") @Valid BehandlingIdDto behandlingIdDto) {
-        Long behandlingId = behandlingIdDto.getBehandlingId();
+    public Response hentOkoXmlForFeiletIverksetting(@NotNull @QueryParam("behandlingId") @Valid BehandlingReferanse behandlingReferanse) {
+        Long behandlingId = behandlingReferanse.getBehandlingId();
         logger.info("Henter xml til økonomi for behandling: {}", behandlingId);
 
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);

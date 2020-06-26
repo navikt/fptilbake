@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons.Varselrespons;
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.ResponsKanal;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
+import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.AppAbacAttributtType;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.AbacDto;
@@ -16,7 +16,7 @@ public class VarselresponsDto implements AbacDto {
 
     @Valid
     @NotNull
-    private BehandlingIdDto behandlingId;
+    private BehandlingReferanse behandlingId;
 
     @NotNull
     private Boolean akseptertFaktagrunnlag;
@@ -28,7 +28,7 @@ public class VarselresponsDto implements AbacDto {
     VarselresponsDto() {}
 
     public VarselresponsDto(Long behandlingId, ResponsKanal kildeKanal, Boolean akseptertFaktagrunnlag) {
-        this.behandlingId = new BehandlingIdDto(behandlingId);
+        this.behandlingId = new BehandlingReferanse(behandlingId);
         this.kildeKanal = kildeKanal;
         this.akseptertFaktagrunnlag = akseptertFaktagrunnlag;
     }
@@ -52,7 +52,7 @@ public class VarselresponsDto implements AbacDto {
 
     public static VarselresponsDto fraDomene(Varselrespons varselrespons) {
         VarselresponsDto dto = new VarselresponsDto();
-        dto.behandlingId = new BehandlingIdDto(varselrespons.getBehandlingId());
+        dto.behandlingId = new BehandlingReferanse(varselrespons.getBehandlingId());
         dto.akseptertFaktagrunnlag = varselrespons.getAkseptertFaktagrunnlag();
         return dto;
     }

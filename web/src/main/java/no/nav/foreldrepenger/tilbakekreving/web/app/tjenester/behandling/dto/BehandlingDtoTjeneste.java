@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -78,22 +79,23 @@ public class BehandlingDtoTjeneste {
     }
 
     private BehandlingDto lagBehandlingDto(Behandling behandling) {
+        UUID behandlingUuid = behandling.getUuid();
         BehandlingDto dto = new BehandlingDto();
         settStandardFelter(behandling, dto);
 
         // Behandlingsmeny-operasjoner
-        dto.leggTil(new ResourceLink("/fptilbake/api/behandlinger/handling-rettigheter?behandlingId=" + behandling.getId(), "handling-rettigheter", ResourceLink.HttpMethod.GET));
+        dto.leggTil(new ResourceLink("/fptilbake/api/behandlinger/handling-rettigheter?behandlingUuid=" + behandlingUuid, "handling-rettigheter", ResourceLink.HttpMethod.GET));
         dto.leggTil(new ResourceLink("/fptilbake/api/verge/behandlingsmeny", "finn-menyvalg-for-verge", ResourceLink.HttpMethod.GET));
 
         // Totrinnsbehandling
         if (BehandlingStatus.FATTER_VEDTAK.equals(behandling.getStatus())) {
-            dto.leggTil(new ResourceLink("/fptilbake/api/behandling/totrinnskontroll/arsaker?behandlingId=" + behandling.getId(), "totrinnskontroll-arsaker", ResourceLink.HttpMethod.GET));
+            dto.leggTil(new ResourceLink("/fptilbake/api/behandling/totrinnskontroll/arsaker?behandlingUuid=" + behandling.getId(), "totrinnskontroll-arsaker", ResourceLink.HttpMethod.GET));
             dto.leggTil(new ResourceLink("/fptilbake/api/behandling/aksjonspunkt", "bekreft-totrinnsaksjonspunkt", ResourceLink.HttpMethod.POST));
         } else if (BehandlingStatus.UTREDES.equals(behandling.getStatus())) {
-            dto.leggTil(new ResourceLink("/fptilbake/api/behandling/totrinnskontroll/arsaker_read_only?behandlingId=" + behandling.getId(), "totrinnskontroll-arsaker-readOnly", ResourceLink.HttpMethod.GET));
+            dto.leggTil(new ResourceLink("/fptilbake/api/behandling/totrinnskontroll/arsaker_read_only?behandlingUuid=" + behandling.getId(), "totrinnskontroll-arsaker-readOnly", ResourceLink.HttpMethod.GET));
         }
 
-        dto.leggTil(new ResourceLink("/fptilbake/api/brev/maler?behandlingId=" + behandling.getId(), "brev-maler", ResourceLink.HttpMethod.GET));
+        dto.leggTil(new ResourceLink("/fptilbake/api/brev/maler?behandlingUuid=" + behandlingUuid, "brev-maler", ResourceLink.HttpMethod.GET));
         dto.leggTil(new ResourceLink("/fptilbake/api/brev/bestill", "brev-bestill", ResourceLink.HttpMethod.POST));
         dto.leggTil(new ResourceLink("/fptilbake/api/brev/forhandsvis", "brev-forhandvis", ResourceLink.HttpMethod.POST));
         return dto;
@@ -183,6 +185,7 @@ public class BehandlingDtoTjeneste {
 
     private void settResourceLinks(Behandling behandling, UtvidetBehandlingDto dto, boolean behandlingHenlagt) {
         Long behandlingId = behandling.getId();
+        UUID behandlingUuid = behandling.getUuid();
         BehandlingModell behandlingModell = behandlingModellRepository.getModell(behandling.getType());
         BehandlingStegType bst = behandling.getAktivtBehandlingSteg();
 
@@ -194,27 +197,27 @@ public class BehandlingDtoTjeneste {
         boolean harVergeAksjonspunkt = behandling.getAksjonspunktMedDefinisjonOptional(AksjonspunktDefinisjon.AVKLAR_VERGE).isPresent();
         leggTilLenkerForBehandlingsoperasjoner(dto);
 
-        dto.leggTil(ResourceLink.get("/fptilbake/api/behandling/aksjonspunkt?behandlingId=" + behandlingId, "aksjonspunkter", null));
+        dto.leggTil(ResourceLink.get("/fptilbake/api/behandling/aksjonspunkt?behandlingUuid=" + behandlingUuid, "aksjonspunkter", null));
         if (BehandlingStegType.FAKTA_FEILUTBETALING.equals(bst) || harDataForFaktaFeilutbetaling) {
             dto.leggTil(ResourceLink.get("/fptilbake/api/feilutbetalingaarsak", "feilutbetalingAarsak", null));
-            dto.leggTil(ResourceLink.get("/fptilbake/api/behandlingfakta/hent-fakta/feilutbetaling?behandlingId=" + (long) behandlingId, "feilutbetalingFakta", null));
+            dto.leggTil(ResourceLink.get("/fptilbake/api/behandlingfakta/hent-fakta/feilutbetaling?behandlingUuid=" + behandlingUuid, "feilutbetalingFakta", null));
         }
 
         //FIXME det er i beste fall forvirrende å returnere både resultat og perioder som skal vurderes på samme navn "perioderForeldelse". Bør splittes tilsvarende hvordan det er for vilkårsvurdering
         if (harVurdertForeldelse) {
-            dto.leggTil(ResourceLink.get("/fptilbake/api/foreldelse/vurdert?behandlingId=" + behandlingId, FORELDELSE, null));
+            dto.leggTil(ResourceLink.get("/fptilbake/api/foreldelse/vurdert?behandlingUuid=" + behandlingUuid, FORELDELSE, null));
         } else if (harDataForFaktaFeilutbetaling) {
-            dto.leggTil(ResourceLink.get("/fptilbake/api/foreldelse?behandlingId=" + behandlingId, FORELDELSE, null));
+            dto.leggTil(ResourceLink.get("/fptilbake/api/foreldelse?behandlingUuid=" + behandlingUuid, FORELDELSE, null));
         }
         if (harDataForFaktaFeilutbetaling) {
-            dto.leggTil(ResourceLink.get("/fptilbake/api/vilkarsvurdering/perioder?behandlingId=" + behandlingId, "vilkarvurderingsperioder", null));
+            dto.leggTil(ResourceLink.get("/fptilbake/api/vilkarsvurdering/perioder?behandlingUuid=" + behandlingUuid, "vilkarvurderingsperioder", null));
         }
         if (iVilkårSteg || harDataForVilkårsvurdering) {
-            dto.leggTil(ResourceLink.get("/fptilbake/api/vilkarsvurdering/vurdert?behandlingId=" + behandlingId, "vilkarvurdering", null));
+            dto.leggTil(ResourceLink.get("/fptilbake/api/vilkarsvurdering/vurdert?behandlingUuid=" + behandlingUuid, "vilkarvurdering", null));
         }
         if (iEllerEtterForeslåVedtakSteg && !behandlingHenlagt) {
-            dto.leggTil(ResourceLink.get("/fptilbake/api/beregning/resultat?behandlingId=" + behandlingId, "beregningsresultat", null));
-            dto.leggTil(ResourceLink.get("/fptilbake/api/dokument/hent-vedtaksbrev?behandlingId=" + behandlingId, "vedtaksbrev", null));
+            dto.leggTil(ResourceLink.get("/fptilbake/api/beregning/resultat?behandlingUuid=" + behandlingUuid, "beregningsresultat", null));
+            dto.leggTil(ResourceLink.get("/fptilbake/api/dokument/hent-vedtaksbrev?behandlingUuid=" + behandlingUuid, "vedtaksbrev", null));
         }
         if (harVergeAksjonspunkt) {
             dto.leggTil(ResourceLink.get("/fptilbake/api/verge?behandlingId=" + behandlingId, "soeker-verge", null));
