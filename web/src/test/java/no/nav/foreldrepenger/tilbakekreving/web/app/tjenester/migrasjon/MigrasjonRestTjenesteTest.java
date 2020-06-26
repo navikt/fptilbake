@@ -69,7 +69,8 @@ public class MigrasjonRestTjenesteTest {
 
     @Test
     public void migrer_opprettelse_sakshendelser_til_dvh() {
-        Response response = migrasjonRestTjeneste.sendSakshendelserTilDvhForAlleEksisterendeBehandlinger(DvhEventHendelse.AKSJONSPUNKT_OPPRETTET.name());
+        EventHendelseDto eventHendelseDto = new EventHendelseDto(DvhEventHendelse.AKSJONSPUNKT_OPPRETTET.name());
+        Response response = migrasjonRestTjeneste.sendSakshendelserTilDvhForAlleEksisterendeBehandlinger(eventHendelseDto);
         assertThat(response.getStatus()).isEqualTo(200);
         List<ProsessTaskData> prosesser = taskRepository.finnAlle(ProsessTaskStatus.KLAR);
         assertThat(prosesser.size()).isEqualTo(1);
@@ -81,7 +82,8 @@ public class MigrasjonRestTjenesteTest {
     @Test
     public void migrer_avsluttelse_sakshendelser_til_dvh() {
         behandling.avsluttBehandling();
-        Response response = migrasjonRestTjeneste.sendSakshendelserTilDvhForAlleEksisterendeBehandlinger(DvhEventHendelse.AKSJONSPUNKT_AVBRUTT.name());
+        EventHendelseDto eventHendelseDto = new EventHendelseDto(DvhEventHendelse.AKSJONSPUNKT_AVBRUTT.name());
+        Response response = migrasjonRestTjeneste.sendSakshendelserTilDvhForAlleEksisterendeBehandlinger(eventHendelseDto);
         assertThat(response.getStatus()).isEqualTo(200);
         List<ProsessTaskData> prosesser = taskRepository.finnAlle(ProsessTaskStatus.KLAR);
         assertThat(prosesser.size()).isEqualTo(1);

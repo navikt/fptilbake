@@ -9,6 +9,7 @@ import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -108,8 +109,8 @@ public class MigrasjonRestTjeneste {
             @ApiResponse(responseCode = "500", description = "Feilet pga ukjent feil.")
         })
     @BeskyttetRessurs(action = BeskyttetRessursActionAttributt.CREATE, ressurs = BeskyttetRessursResourceAttributt.DRIFT)
-    public Response sendSakshendelserTilDvhForAlleEksisterendeBehandlinger(@QueryParam("eventHendelse") @NotNull String hendelse) {
-        DvhEventHendelse eventHendelse = DvhEventHendelse.valueOf(hendelse);
+    public Response sendSakshendelserTilDvhForAlleEksisterendeBehandlinger(@QueryParam("hendelse") @NotNull @Valid EventHendelseDto hendelse) {
+        DvhEventHendelse eventHendelse = DvhEventHendelse.valueOf(hendelse.getHendelse());
         if (DvhEventHendelse.AKSJONSPUNKT_OPPRETTET.equals(eventHendelse)) {
             List<Long> eksisterendeBehandlingIder = behandlingRepository.hentAlleBehandlingIder();
             for (Long behandlingId : eksisterendeBehandlingIder) {
