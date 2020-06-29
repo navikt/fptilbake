@@ -49,6 +49,12 @@ public class KravgrunnlagRepository {
             .medAktiv(true)
             .build();
         entityManager.persist(kravgrunnlag);
+        for (KravgrunnlagPeriode432 periode432 : kravgrunnlag.getPerioder()) {
+            entityManager.persist(periode432);
+            for (KravgrunnlagBelop433 belop433 : periode432.getKravgrunnlagBeloper433()) {
+                entityManager.persist(belop433);
+            }
+        }
         entityManager.persist(aggregate);
         entityManager.flush(); //TODO unngå flush i repository, det er typisk bare nyttig for tester
     }

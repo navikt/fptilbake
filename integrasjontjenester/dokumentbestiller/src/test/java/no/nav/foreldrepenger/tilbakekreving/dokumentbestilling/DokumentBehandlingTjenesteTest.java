@@ -12,8 +12,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.google.common.collect.Lists;
-
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporing;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevType;
@@ -176,7 +174,8 @@ public class DokumentBehandlingTjenesteTest extends DokumentBestillerTestOppsett
             .medTilbakekrevesBelop(BigDecimal.ZERO)
             .medOpprUtbetBelop(BigDecimal.ZERO)
             .medKravgrunnlagPeriode432(periode).build();
-        periode.setKravgrunnlagBeloper433(Lists.newArrayList(ytelBeløp, feilBeløp));
+        periode.leggTilBeløp(ytelBeløp);
+        periode.leggTilBeløp(feilBeløp);
         kravgrunnlag431.leggTilPeriode(periode);
 
         Long behandlingId = behandling.getId();
