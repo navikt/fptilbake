@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk;
 
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -69,7 +70,7 @@ public class BehandlingTilstandTjeneste {
         tilstand.setAnsvarligBeslutter(behandling.getAnsvarligBeslutter());
         tilstand.setAnsvarligSaksbehandler(behandling.getAnsvarligSaksbehandler());
         tilstand.setErBehandlingManueltOpprettet(behandling.isManueltOpprettet());
-        tilstand.setFunksjonellTid(OffsetDateTime.now());
+        tilstand.setFunksjonellTid(OffsetDateTime.now(ZoneOffset.UTC));
         tilstand.setVenterPåBruker(venterPåBruker);
         tilstand.setVenterPåØkonomi(venterPåØkonomi);
         forrigeBehandling.ifPresent(forrige -> tilstand.setForrigeBehandling(forrige.getUuid()));
