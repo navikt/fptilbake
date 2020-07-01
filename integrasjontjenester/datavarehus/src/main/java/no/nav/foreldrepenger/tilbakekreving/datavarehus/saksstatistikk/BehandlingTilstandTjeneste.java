@@ -44,7 +44,7 @@ public class BehandlingTilstandTjeneste {
 
     public BehandlingTilstand hentBehandlingensTilstand(long behandlingId) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-        EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandlingId);
+        EksternBehandling eksternBehandling = getEksternBehandling(behandlingId);
         BehandlingResultatType behandlingResultatType = behandlingresultatRepository.hent(behandling)
             .map(Behandlingsresultat::getBehandlingResultatType)
             .orElse(BehandlingResultatType.IKKE_FASTSATT);
@@ -76,5 +76,15 @@ public class BehandlingTilstandTjeneste {
         forrigeBehandling.ifPresent(forrige -> tilstand.setForrigeBehandling(forrige.getUuid()));
         behandlingsårsak.ifPresent(årsak -> tilstand.setRevurderingOpprettetÅrsak(BehandlingÅrsakMapper.getRevurderingÅrsak(årsak)));
         return tilstand;
+    }
+
+    private EksternBehandling getEksternBehandling(long behandlingId) {
+        EksternBehandling eksternBehandling;
+        if (eksternBehandlingRepository.finnesAktivtEksternBehandling(behandlingId)) {
+            eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandlingId);
+        } else {
+            eksternBehandling = eksternBehandlingRepository.hentForSisteAktivertInternId(behandlingId);
+        }
+        return eksternBehandling;
     }
 }
