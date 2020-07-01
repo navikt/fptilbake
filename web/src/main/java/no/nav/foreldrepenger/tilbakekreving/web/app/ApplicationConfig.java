@@ -63,7 +63,7 @@ public class ApplicationConfig extends Application {
 
         oas.info(info)
             .addServersItem(new Server()
-                .url("/fptilbake"));
+                .url("/fptilbake")).addServersItem(new Server().url("/k9-tilbake"));
         SwaggerConfiguration oasConfig = new SwaggerConfiguration()
             .openAPI(oas)
             .prettyPrint(true)

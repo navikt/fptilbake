@@ -1,8 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.web.server.jetty;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -12,16 +9,23 @@ import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class PropertiesUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PropertiesUtils.class);
 
     private static String TEMPLATE_FILNAVN = "app-dev.properties";
+    private static String TEMPLATE_K9_FILNAVN = "app-k9-dev.properties";
     private static String JETTY_SCHEMAS_LOCAL = "jetty_web_server.json";
 
     private static String DEV_FILNAVN = "app.properties";
+    private static String DEV_K9_FILNAVN = "app-k9.properties";
     private static String DEV_FILNAVN_LOCAL = "app-local.properties";
+    private static String DEV_K9_FILNAVN_LOCAL = "app-k9-local.properties";
     private static String VTP_FILNAVN_LOCAL = "app-vtp.properties";
+    //private static String VTP_K9_FILNAVN_LOCAL = "app-k9-vtp.properties";
 
     private PropertiesUtils() {
     }
@@ -50,6 +54,24 @@ public class PropertiesUtils {
         }
     }
 
+    static void lagK9PropertiesFilFraTemplate() throws IOException {
+        File devFil = new File(DEV_K9_FILNAVN);
+
+        ClassLoader classLoader = PropertiesUtils.class.getClassLoader();
+        File templateFil = new File(classLoader.getResource(TEMPLATE_K9_FILNAVN).getFile());
+
+        copyTemplateFile(templateFil, devFil, true);
+
+        // create local file
+        File localProps = new File(DEV_K9_FILNAVN_LOCAL);
+        if (!localProps.exists()) {
+            boolean fileCreated = localProps.createNewFile();
+            if (!fileCreated) {
+                LOGGER.error("Kunne ikke opprette properties-fil");
+            }
+        }
+    }
+
     private static void copyTemplateFile(File templateFil, File targetFil, boolean backup) throws IOException {
         if (!targetFil.exists()) {
             Files.copy(templateFil.toPath(), targetFil.toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -66,6 +88,15 @@ public class PropertiesUtils {
         File devFil = new File(DEV_FILNAVN);
         loadPropertyFile(devFil);
         loadPropertyFile(new File(DEV_FILNAVN_LOCAL));
+        if (vtp) {
+            loadPropertyFile(new File(VTP_FILNAVN_LOCAL));
+        }
+    }
+
+    static void initK9Properties(boolean vtp) {
+        File devFil = new File(DEV_K9_FILNAVN);
+        loadPropertyFile(devFil);
+        loadPropertyFile(new File(DEV_K9_FILNAVN_LOCAL));
         if (vtp) {
             loadPropertyFile(new File(VTP_FILNAVN_LOCAL));
         }
