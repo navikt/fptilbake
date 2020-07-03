@@ -25,7 +25,7 @@ public class PropertiesUtils {
     private static String DEV_FILNAVN_LOCAL = "app-local.properties";
     private static String DEV_K9_FILNAVN_LOCAL = "app-k9-local.properties";
     private static String VTP_FILNAVN_LOCAL = "app-vtp.properties";
-    private static String VTP_k9_FILNAVN_LOCAL = "app-vtp.properties";
+    private static String VTP_k9_FILNAVN_LOCAL = "app-k9-vtp.properties";
 
     private PropertiesUtils() {
     }
