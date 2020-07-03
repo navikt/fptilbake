@@ -38,7 +38,6 @@ export SYSTEM_PROPERTIES="$( grep -v "^#" $PROP_FILE | grep -v '^[[:space:]]*$' 
 
 ## Overstyr port for lokal kjøring
 export SERVER_PORT=8030
-export SERVER_PORT=8031
 
 ## Sett opp samme struktur som i Dockerfile
 DIR="conf"

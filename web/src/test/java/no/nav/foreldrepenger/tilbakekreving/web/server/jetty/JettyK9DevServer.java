@@ -49,7 +49,7 @@ public class JettyK9DevServer extends JettyServer {
     }
 
     public JettyK9DevServer() {
-        super(new JettyK9DevKonfigurasjon());
+        super(new JettyDevKonfigurasjon());
     }
 
     @Override
