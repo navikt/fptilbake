@@ -22,7 +22,7 @@ import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.util.StatusPrinter;
 
-public class JettyDevServer extends JettyServer {
+public class JettyFPDevServer extends JettyServer {
 
     /**
      * @see https://docs.oracle.com/en/java/javase/11/security/java-secure-socket-extension-jsse-reference-guide.html
@@ -43,11 +43,11 @@ public class JettyDevServer extends JettyServer {
             }
         }
 
-        JettyDevServer devServer = new JettyDevServer();
+        JettyFPDevServer devServer = new JettyFPDevServer();
         devServer.bootStrap();
     }
 
-    public JettyDevServer() {
+    public JettyFPDevServer() {
         super(new JettyDevKonfigurasjon());
     }
 
@@ -81,7 +81,7 @@ public class JettyDevServer extends JettyServer {
     protected void konfigurerMiljø() throws Exception {
         System.setProperty("develop-local", "true");
         PropertiesUtils.lagPropertiesFilFraTemplate();
-        PropertiesUtils.initProperties(JettyDevServer.vtp);
+        PropertiesUtils.initProperties(JettyFPDevServer.vtp);
     }
 
     @Override
