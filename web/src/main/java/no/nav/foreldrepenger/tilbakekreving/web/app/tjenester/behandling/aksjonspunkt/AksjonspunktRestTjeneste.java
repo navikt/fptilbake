@@ -107,7 +107,7 @@ public class AksjonspunktRestTjeneste {
     @BeskyttetRessurs(action = UPDATE, ressurs = FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response bekreft(@Parameter(description = "Liste over aksjonspunkt som skal bekreftes, inklusiv data som trengs for å løse de.") @Valid BekreftedeAksjonspunkterDto apDto) throws URISyntaxException { // NOSONAR
-        BehandlingReferanse behandlingReferanse = apDto.getBehandlingId();
+        BehandlingReferanse behandlingReferanse = apDto.getBehandlingReferanse();
         Long behandlingId = behandlingReferanse.erInternBehandlingId()
             ? behandlingReferanse.getBehandlingId()
             : hentBehandling(behandlingReferanse).getId();

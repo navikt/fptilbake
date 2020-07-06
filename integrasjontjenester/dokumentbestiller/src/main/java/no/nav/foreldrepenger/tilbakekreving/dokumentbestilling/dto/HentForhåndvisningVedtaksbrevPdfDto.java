@@ -7,6 +7,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.AbacDto;
@@ -16,7 +18,7 @@ public class HentForhåndvisningVedtaksbrevPdfDto implements AbacDto {
 
     @Valid
     @NotNull
-    private BehandlingReferanse behandlingId;
+    private BehandlingReferanse behandlingReferanse;
 
     @Size(max = 1500, message = "Oppsummeringstekst er for lang")
     @Pattern(regexp = InputValideringRegex.FRITEKST)
@@ -27,12 +29,19 @@ public class HentForhåndvisningVedtaksbrevPdfDto implements AbacDto {
     @Valid
     private List<PeriodeMedTekstDto> perioderMedTekst;
 
-    public BehandlingReferanse getBehandlingId() {
-        return behandlingId;
+    public BehandlingReferanse getBehandlingReferanse() {
+        return behandlingReferanse;
     }
 
-    public void setBehandlingId(BehandlingReferanse behandlingId) {
-        this.behandlingId = behandlingId;
+    // TODO: K9-tilbake. fjern når endringen er merget og prodsatt også i fpsak-frontend
+    @JsonSetter("behandlingId")
+    public void setBehandlingId(BehandlingReferanse behandlingReferanse) {
+        this.behandlingReferanse = behandlingReferanse;
+    }
+
+    @JsonSetter("behandlingUuid")
+    public void setBehandlingUuid(BehandlingReferanse behandlingReferanse) {
+        this.behandlingReferanse = behandlingReferanse;
     }
 
     public String getOppsummeringstekst() {
@@ -53,6 +62,6 @@ public class HentForhåndvisningVedtaksbrevPdfDto implements AbacDto {
 
     @Override
     public AbacDataAttributter abacAttributter() {
-        return behandlingId.abacAttributter();
+        return behandlingReferanse.abacAttributter();
     }
 }

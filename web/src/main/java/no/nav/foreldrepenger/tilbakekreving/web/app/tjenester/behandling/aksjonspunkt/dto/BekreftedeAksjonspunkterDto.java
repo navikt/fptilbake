@@ -8,6 +8,8 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.AbacDto;
@@ -17,7 +19,7 @@ public class BekreftedeAksjonspunkterDto implements AbacDto {
 
     @Valid
     @NotNull
-    private BehandlingReferanse behandlingId;
+    private BehandlingReferanse behandlingReferanse;
 
     @NotNull
     @Min(0)
@@ -32,14 +34,25 @@ public class BekreftedeAksjonspunkterDto implements AbacDto {
                                                      Long behandlingVersjon,
                                                      Collection<BekreftetAksjonspunktDto> bekreftedeAksjonspunktDtoer) {
         BekreftedeAksjonspunkterDto dto = new BekreftedeAksjonspunkterDto();
-        dto.behandlingId = new BehandlingReferanse(behandlingId);
+        dto.behandlingReferanse = new BehandlingReferanse(behandlingId);
         dto.behandlingVersjon = behandlingVersjon;
         dto.bekreftedeAksjonspunktDtoer = bekreftedeAksjonspunktDtoer;
         return dto;
     }
 
-    public BehandlingReferanse getBehandlingId() {
-        return behandlingId;
+    // TODO: K9-tilbake. fjern når endringen er merget og prodsatt også i fpsak-frontend
+    @JsonSetter("behandlingId")
+    public void setBehandlingId(BehandlingReferanse behandlingReferanse) {
+        this.behandlingReferanse = behandlingReferanse;
+    }
+
+    @JsonSetter("behandlingUuid")
+    public void setBehandlingUuid(BehandlingReferanse behandlingReferanse) {
+        this.behandlingReferanse = behandlingReferanse;
+    }
+
+    public BehandlingReferanse getBehandlingReferanse() {
+        return behandlingReferanse;
     }
 
     public Long getBehandlingVersjon() {
@@ -53,7 +66,7 @@ public class BekreftedeAksjonspunkterDto implements AbacDto {
     @Override
     public AbacDataAttributter abacAttributter() {
         AbacDataAttributter abac = AbacDataAttributter.opprett().leggTil(
-            StandardAbacAttributtType.BEHANDLING_ID, getBehandlingId().getBehandlingId());
+            StandardAbacAttributtType.BEHANDLING_ID, getBehandlingReferanse().getBehandlingId());
         bekreftedeAksjonspunktDtoer.forEach(apDto -> abac.leggTil(apDto.abacAttributter()));
         return abac;
     }

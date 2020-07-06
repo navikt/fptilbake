@@ -207,10 +207,10 @@ public class VedtaksbrevTjeneste {
 
     private Long hentBehandlingId(HentForhåndvisningVedtaksbrevPdfDto dto) {
         Long behandlingId;
-        if (dto.getBehandlingId().erInternBehandlingId()) {
-            behandlingId = dto.getBehandlingId().getBehandlingId();
+        if (dto.getBehandlingReferanse().erInternBehandlingId()) {
+            behandlingId = dto.getBehandlingReferanse().getBehandlingId();
         } else {
-            Behandling behandling = behandlingRepository.hentBehandling(dto.getBehandlingId().getBehandlingUuid());
+            Behandling behandling = behandlingRepository.hentBehandling(dto.getBehandlingReferanse().getBehandlingUuid());
             behandlingId = behandling.getId();
         }
         return behandlingId;

@@ -77,7 +77,7 @@ public class BrevRestTjeneste {
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response bestillBrev(@NotNull @Valid BestillBrevDto bestillBrevDto) {
         DokumentMalType malType = DokumentMalType.fraKode(bestillBrevDto.getBrevmalkode());
-        long behandlingId = hentBehandlingId(bestillBrevDto.getBehandlingId());
+        long behandlingId = hentBehandlingId(bestillBrevDto.getBehandlingReferanse());
         dokumentBehandlingTjeneste.bestillBrev(behandlingId, malType, bestillBrevDto.getFritekst());
         return Response.ok().build();
     }
@@ -92,7 +92,7 @@ public class BrevRestTjeneste {
     public Response forhåndsvisBrev(@Parameter(description = "Inneholder kode til brevmal og data som skal flettes inn i brevet") @NotNull @Valid BestillBrevDto forhåndsvisBestillBrevDto) {
         DokumentMalType malType = DokumentMalType.fraKode(forhåndsvisBestillBrevDto.getBrevmalkode());
         String fritekst = forhåndsvisBestillBrevDto.getFritekst();
-        long behandlingId = hentBehandlingId(forhåndsvisBestillBrevDto.getBehandlingId());
+        long behandlingId = hentBehandlingId(forhåndsvisBestillBrevDto.getBehandlingReferanse());
         byte[] dokument = dokumentBehandlingTjeneste.forhåndsvisBrev(behandlingId, malType, fritekst);
 
         Response.ResponseBuilder responseBuilder = Response.ok(dokument);
