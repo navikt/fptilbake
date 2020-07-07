@@ -79,7 +79,7 @@ public class AksjonspunktRestTjeneste {
         })
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public Response getAksjonspunkter(@NotNull @QueryParam("behandlingUuid") @Valid BehandlingReferanse behandlingReferanse) { // NOSONAR
+    public Response getAksjonspunkter(@NotNull @QueryParam("uuid") @Valid BehandlingReferanse behandlingReferanse) { // NOSONAR
         Behandling behandling = hentBehandling(behandlingReferanse);
         Collection<Totrinnsvurdering> totrinnsvurderinger = totrinnRepository.hentTotrinnsvurderinger(behandling);
         Set<AksjonspunktDto> dto = AksjonspunktDtoMapper.lagAksjonspunktDto(behandling, totrinnsvurderinger);

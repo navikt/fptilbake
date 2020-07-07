@@ -58,7 +58,7 @@ public class ForeldelseRestTjeneste {
     @GET
     @Operation(tags = "foreldelse", description = "Henter perioder som skal vurderes for foreldelse")
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
-    public FeilutbetalingPerioderDto hentLogiskePerioder(@QueryParam("behandlingUuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
+    public FeilutbetalingPerioderDto hentLogiskePerioder(@QueryParam("uuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
         return vurdertForeldelseTjeneste.hentFaktaPerioder(hentBehandlingId(behandlingReferanse));
     }
 
@@ -66,7 +66,7 @@ public class ForeldelseRestTjeneste {
     @Operation(tags = "foreldelse", description = "Hente allerede vurdert foreldelse perioder")
     @Path("/vurdert")
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
-    public FeilutbetalingPerioderDto hentVurdertPerioder(@QueryParam("behandlingUuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
+    public FeilutbetalingPerioderDto hentVurdertPerioder(@QueryParam("uuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
         return vurdertForeldelseTjeneste.henteVurdertForeldelse(hentBehandlingId(behandlingReferanse));
     }
 

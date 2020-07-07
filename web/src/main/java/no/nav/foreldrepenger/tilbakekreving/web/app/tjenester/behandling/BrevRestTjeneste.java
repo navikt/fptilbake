@@ -63,7 +63,7 @@ public class BrevRestTjeneste {
     @Operation(tags = "brev", description = "Henter liste over tilgjengelige brevtyper")
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK, sporingslogg = false)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public List<BrevmalDto> hentMaler(@Valid @QueryParam("behandlingUuid") BehandlingReferanse behandlingReferanse) {
+    public List<BrevmalDto> hentMaler(@Valid @QueryParam("uuid") BehandlingReferanse behandlingReferanse) {
         long behandlingId = hentBehandlingId(behandlingReferanse);
         return dokumentBehandlingTjeneste.hentBrevmalerFor(behandlingId);
     }

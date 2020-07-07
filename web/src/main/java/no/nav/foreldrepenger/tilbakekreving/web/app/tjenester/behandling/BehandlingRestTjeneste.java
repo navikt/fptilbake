@@ -392,7 +392,7 @@ public class BehandlingRestTjeneste {
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public BehandlingRettigheterDto hentBehandlingOperasjonRettigheter(
-        @NotNull @QueryParam("behandlingUuid") @Valid BehandlingReferanse behandlingReferanse
+        @NotNull @QueryParam("uuid") @Valid BehandlingReferanse behandlingReferanse
     ) {
         Boolean harSoknad = true;
         //TODO (TOR) Denne skal etterkvart returnere rettighetene knytta til behandlingsmeny i frontend

@@ -129,8 +129,8 @@ public class VergeRestTjeneste {
         })
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public VergeDto getVerge(@QueryParam(value = "behandlingId") @NotNull @Valid BehandlingReferanse dto) {
-        Long behandlingId = dto.getBehandlingId();
+    public VergeDto getVerge(@QueryParam(value = "uuid") @NotNull @Valid BehandlingReferanse dto) {
+        Long behandlingId = hentBehandlingId(dto);
         Optional<VergeEntitet> vergeEntitet = vergeTjeneste.hentVergeInformasjon(behandlingId);
         return vergeEntitet.isPresent() ? map(vergeEntitet.get()) : null;
     }
@@ -150,8 +150,8 @@ public class VergeRestTjeneste {
         })
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public Response hentBehandlingsmenyvalg(@NotNull @QueryParam("behandlingId") @Valid BehandlingReferanse behandlingReferanse) {
-        Behandling behandling = behandlingTjeneste.hentBehandling(behandlingReferanse.getBehandlingId());
+    public Response hentBehandlingsmenyvalg(@NotNull @QueryParam("uuid") @Valid BehandlingReferanse behandlingReferanse) {
+        Behandling behandling = hentBehandling(behandlingReferanse);
         Optional<VergeEntitet> vergeEntitet = vergeTjeneste.hentVergeInformasjon(behandling.getId());
         boolean kanBehandlingEndres = !behandling.erSaksbehandlingAvsluttet() && !behandling.isBehandlingPåVent();
         boolean finnesVerge = vergeEntitet.isPresent();
@@ -179,5 +179,19 @@ public class VergeRestTjeneste {
         vergeDto.setVergeType(vergeEntitet.getVergeType());
         vergeDto.setBegrunnelse(vergeEntitet.getBegrunnelse());
         return vergeDto;
+    }
+
+    private Long hentBehandlingId(BehandlingReferanse dto) {
+        return dto.erInternBehandlingId() ? dto.getBehandlingId() : hentBehandling(dto).getId();
+    }
+
+    private Behandling hentBehandling(BehandlingReferanse behandlingReferanse) {
+        Behandling behandling;
+        if (behandlingReferanse.erInternBehandlingId()) {
+            behandling = behandlingTjeneste.hentBehandling(behandlingReferanse.getBehandlingId());
+        } else {
+            behandling = behandlingTjeneste.hentBehandling(behandlingReferanse.getBehandlingUuid());
+        }
+        return behandling;
     }
 }

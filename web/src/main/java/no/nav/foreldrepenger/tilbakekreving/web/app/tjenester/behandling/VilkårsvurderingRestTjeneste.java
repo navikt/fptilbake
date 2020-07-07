@@ -52,7 +52,7 @@ public class VilkårsvurderingRestTjeneste {
     @Path("/perioder")
     @Operation(tags = "vilkårsvurdering", description = "Henter perioder som skal vurderes for vilkårsvurdering")
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
-    public DetaljerteFeilutbetalingsperioderDto hentDetailjertFeilutbetalingPerioder(@QueryParam("behandlingUuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
+    public DetaljerteFeilutbetalingsperioderDto hentDetailjertFeilutbetalingPerioder(@QueryParam("uuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
         DetaljerteFeilutbetalingsperioderDto perioderDto = new DetaljerteFeilutbetalingsperioderDto();
         perioderDto.setPerioder(vilkårsvurderingTjeneste.hentDetaljertFeilutbetalingPerioder(hentBehandlingId(behandlingReferanse)));
         perioderDto.setRettsgebyr(BigDecimal.valueOf(rettsgebyr));
@@ -63,7 +63,7 @@ public class VilkårsvurderingRestTjeneste {
     @Path("/vurdert")
     @Operation(tags = "vilkårsvurdering", description = "Henter allerede vurdert vilkårsvurdering")
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
-    public VilkårsvurderteDto hentVurdertPerioder(@QueryParam("behandlingUuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
+    public VilkårsvurderteDto hentVurdertPerioder(@QueryParam("uuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
         VilkårsvurderteDto vilkårsvurderteDto = new VilkårsvurderteDto();
         vilkårsvurderteDto.setVilkarsVurdertePerioder(vilkårsvurderingTjeneste.hentVilkårsvurdering(hentBehandlingId(behandlingReferanse)));
         return vilkårsvurderteDto;

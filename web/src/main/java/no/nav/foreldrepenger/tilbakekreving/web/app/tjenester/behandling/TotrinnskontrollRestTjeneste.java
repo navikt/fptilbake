@@ -49,7 +49,7 @@ public class TotrinnskontrollRestTjeneste {
     @Operation(tags = "totrinnskontroll", description = "Hent aksjonspunkter som skal til totrinnskontroll.", summary = "Returner aksjonspunkter til totrinnskontroll for behandling.")
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public List<TotrinnskontrollSkjermlenkeContextDto> hentTotrinnskontrollSkjermlenkeContext(@NotNull @QueryParam("behandlingUuid") @Valid BehandlingReferanse behandlingReferanse) {
+    public List<TotrinnskontrollSkjermlenkeContextDto> hentTotrinnskontrollSkjermlenkeContext(@NotNull @QueryParam("uuid") @Valid BehandlingReferanse behandlingReferanse) {
         Behandling behandling = hentBehandling(behandlingReferanse);
         return totrinnskontrollTjeneste.hentTotrinnsSkjermlenkeContext(behandling);
     }
@@ -60,12 +60,12 @@ public class TotrinnskontrollRestTjeneste {
     @Operation(tags = "totrinnskontroll", description = "Hent totrinnsvurderinger for aksjonspunkter.", summary = "Returner vurderinger for aksjonspunkter etter totrinnskontroll for behandling.")
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public List<TotrinnskontrollSkjermlenkeContextDto> hentTotrinnskontrollvurderingSkjermlenkeContext(@NotNull @QueryParam("behandlingUuid") @Valid BehandlingReferanse behandlingReferanse) {
+    public List<TotrinnskontrollSkjermlenkeContextDto> hentTotrinnskontrollvurderingSkjermlenkeContext(@NotNull @QueryParam("uuid") @Valid BehandlingReferanse behandlingReferanse) {
         Behandling behandling = hentBehandling(behandlingReferanse);
         return totrinnskontrollTjeneste.hentTotrinnsvurderingSkjermlenkeContext(behandling);
     }
 
-    private Behandling hentBehandling(@QueryParam("behandlingUuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
+    private Behandling hentBehandling(BehandlingReferanse behandlingReferanse) {
         Behandling behandling;
         if (behandlingReferanse.erInternBehandlingId()) {
             behandling = behandlingRepository.hentBehandling(behandlingReferanse.getBehandlingId());

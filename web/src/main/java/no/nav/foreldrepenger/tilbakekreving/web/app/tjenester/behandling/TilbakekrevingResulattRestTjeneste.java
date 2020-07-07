@@ -46,7 +46,7 @@ public class TilbakekrevingResulattRestTjeneste {
     @Path("/resultat")
     @Operation(tags = "beregning", description = "Henter beregningsresultat for tilbakekreving")
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
-    public BeregningResultat hentBeregningResultat(@QueryParam("behandlingUuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
+    public BeregningResultat hentBeregningResultat(@QueryParam("uuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
         return tilbakekrevingBeregningTjeneste.beregn(hentBehandlingId(behandlingReferanse));
     }
 

@@ -52,7 +52,7 @@ public class BehandlingFaktaRestTjeneste {
     )
     @Path("/hent-fakta/feilutbetaling")
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
-    public BehandlingFeilutbetalingFaktaDto hentFeilutbetalingFakta(@QueryParam(value = "behandlingUuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
+    public BehandlingFeilutbetalingFaktaDto hentFeilutbetalingFakta(@QueryParam(value = "uuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
         BehandlingFeilutbetalingFakta fakta = faktaFeilutbetalingTjeneste.hentBehandlingFeilutbetalingFakta(hentBehandlingId(behandlingReferanse));
         BehandlingFeilutbetalingFaktaDto dto = new BehandlingFeilutbetalingFaktaDto();
         dto.setBehandlingFakta(fakta);

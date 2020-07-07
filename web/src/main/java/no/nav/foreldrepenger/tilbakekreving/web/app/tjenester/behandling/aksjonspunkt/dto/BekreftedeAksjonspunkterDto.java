@@ -8,6 +8,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
@@ -42,11 +43,13 @@ public class BekreftedeAksjonspunkterDto implements AbacDto {
 
     // TODO: K9-tilbake. fjern når endringen er merget og prodsatt også i fpsak-frontend
     @JsonSetter("behandlingId")
+    @JsonProperty(value = "behandlingReferanse")
     public void setBehandlingId(BehandlingReferanse behandlingReferanse) {
         this.behandlingReferanse = behandlingReferanse;
     }
 
     @JsonSetter("behandlingUuid")
+    @JsonProperty(value = "behandlingReferanse")
     public void setBehandlingUuid(BehandlingReferanse behandlingReferanse) {
         this.behandlingReferanse = behandlingReferanse;
     }
