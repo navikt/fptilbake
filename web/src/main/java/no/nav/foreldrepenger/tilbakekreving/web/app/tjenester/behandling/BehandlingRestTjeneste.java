@@ -160,6 +160,7 @@ public class BehandlingRestTjeneste {
         return Response.ok(behandlingTjeneste.kanOppretteBehandling(saksnummer, eksternUUID)).build();
     }
 
+    // TODO: k9-tilbake. fjern når endringen er merget og prodsatt også i fpsak-frontend
     @GET
     @Path("/kan-revurdering-opprettes")
     @Operation(
@@ -167,6 +168,21 @@ public class BehandlingRestTjeneste {
         description = "Sjekk om revurdering kan opprettes")
     @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
     public Response kanOpprettesRevurdering(@NotNull @QueryParam("behandlingId") @Parameter(description = "Intern behandlingId eller behandlingUuid for behandling") @Valid BehandlingReferanse idDto) {
+        return vurderOmRevurderingKanOpprettes(idDto);
+    }
+
+    @GET
+    @Path("/kan-revurdering-opprettes-v2")
+    @Operation(
+        tags = "behandlinger",
+        description = "Sjekk om revurdering kan opprettes")
+    @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
+    public Response kanRevurderingOpprettes(@NotNull @QueryParam("uuid") @Parameter(description = "Intern behandlingId eller behandlingUuid for behandling") @Valid BehandlingReferanse idDto) {
+        return vurderOmRevurderingKanOpprettes(idDto);
+    }
+
+    // TODO: k9-tilbake. refactor når endringen er merget og prodsatt også i fpsak-frontend
+    private Response vurderOmRevurderingKanOpprettes(BehandlingReferanse idDto) {
         boolean kanRevurderingOprettes = false;
         if (idDto.erInternBehandlingId()) {
             Optional<EksternBehandling> eksternBehandling = revurderingTjeneste.hentEksternBehandling(idDto.getBehandlingId());

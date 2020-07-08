@@ -46,7 +46,7 @@ public class BestillBrevDto implements AbacDto {
         this.behandlingReferanse = behandlingReferanse;
     }
 
-    @JsonSetter("uuid")
+    @JsonSetter("behandlingUuid")
     @JsonProperty(value = "behandlingReferanse")
     public void setBehandlingUuid(BehandlingReferanse behandlingReferanse) {
         this.behandlingReferanse = behandlingReferanse;
@@ -56,17 +56,7 @@ public class BestillBrevDto implements AbacDto {
         return brevmalkode;
     }
 
-    // TODO: K9-tilbake. endre til JsonIgnore når endringen er merget og prodsatt også i fpsak-frontend
-    @JsonSetter("brevmalkode")
-    @JsonProperty(value = "brevmalkode")
     public void setBrevmalkode(String brevmalkode) {
-        this.brevmalkode = brevmalkode;
-    }
-
-    // Harmonisering mellom fpsak/k9-sak og fptilbake/k9-tilbake. I frontend og fpsak så brukes dokumentMal.
-    @JsonSetter("dokumentMal")
-    @JsonProperty(value = "brevmalkode")
-    public void setDokumentMal(String brevmalkode) {
         this.brevmalkode = brevmalkode;
     }
 
