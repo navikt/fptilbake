@@ -108,13 +108,11 @@ public class AksjonspunktRestTjeneste {
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response bekreft(@Parameter(description = "Liste over aksjonspunkt som skal bekreftes, inklusiv data som trengs for å løse de.") @Valid BekreftedeAksjonspunkterDto apDto) throws URISyntaxException { // NOSONAR
         BehandlingReferanse behandlingReferanse = apDto.getBehandlingReferanse();
-        Long behandlingId = behandlingReferanse.erInternBehandlingId()
-            ? behandlingReferanse.getBehandlingId()
-            : hentBehandling(behandlingReferanse).getId();
+        Behandling behandling = hentBehandling(behandlingReferanse);
         Collection<BekreftetAksjonspunktDto> bekreftedeAksjonspunktDtoer = apDto.getBekreftedeAksjonspunktDtoer();
-        behandlingTjeneste.kanEndreBehandling(behandlingId, apDto.getBehandlingVersjon());
-        aksjonspunktApplikasjonTjeneste.bekreftAksjonspunkter(bekreftedeAksjonspunktDtoer, behandlingId);
-        return Redirect.tilBehandlingPollStatus(behandlingId);
+        behandlingTjeneste.kanEndreBehandling(behandling.getId(), apDto.getBehandlingVersjon());
+        aksjonspunktApplikasjonTjeneste.bekreftAksjonspunkter(bekreftedeAksjonspunktDtoer, behandling.getId());
+        return Redirect.tilBehandlingPollStatus(behandling.getUuid());
     }
 
     private Behandling hentBehandling(BehandlingReferanse behandlingReferanse) {

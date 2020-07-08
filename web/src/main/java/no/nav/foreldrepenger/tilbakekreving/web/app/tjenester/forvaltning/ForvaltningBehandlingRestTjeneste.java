@@ -99,7 +99,7 @@ public class ForvaltningBehandlingRestTjeneste {
         })
     @BeskyttetRessurs(action = CREATE, ressurs = DRIFT)
     public Response tvingHenleggelseBehandling(@QueryParam("behandlingId") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
-        Behandling behandling = behandlingRepository.hentBehandling(behandlingReferanse.getBehandlingId());
+        Behandling behandling = hentBehandling(behandlingReferanse);
         if (behandling.erAvsluttet()) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
@@ -120,7 +120,7 @@ public class ForvaltningBehandlingRestTjeneste {
         })
     @BeskyttetRessurs(action = CREATE, ressurs = DRIFT)
     public Response tvingGjenopptaBehandling(@NotNull @QueryParam("behandlingId") @Valid BehandlingReferanse behandlingReferanse) {
-        Behandling behandling = behandlingRepository.hentBehandling(behandlingReferanse.getBehandlingId());
+        Behandling behandling = hentBehandling(behandlingReferanse);
         if (behandling.erAvsluttet() || !behandling.isBehandlingPåVent()) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
@@ -187,30 +187,33 @@ public class ForvaltningBehandlingRestTjeneste {
         })
     @BeskyttetRessurs(action = READ, ressurs = DRIFT)
     public Response hentOkoXmlForFeiletIverksetting(@NotNull @QueryParam("behandlingId") @Valid BehandlingReferanse behandlingReferanse) {
-        Long behandlingId = behandlingReferanse.getBehandlingId();
-        logger.info("Henter xml til økonomi for behandling: {}", behandlingId);
+        String behandlingRef = behandlingReferanse.erInternBehandlingId()
+            ? behandlingReferanse.getBehandlingId().toString()
+            : behandlingReferanse.getBehandlingUuid().toString();
+        logger.info("Henter xml til økonomi for behandling: {}", behandlingRef);
 
-        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
+        Behandling behandling = hentBehandling(behandlingReferanse);
         if (behandling == null) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
 
+        Long behandlingId = behandling.getId();
         Collection<String> meldinger = økonomiSendtXmlRepository.finnXml(behandlingId, MeldingType.VEDTAK);
         if (meldinger.isEmpty()) {
-            logger.info("Xml til økonomi ikke lagret i databasen for behandling: {}", behandlingId);
+            logger.info("Xml til økonomi ikke lagret i databasen for behandling: {}", behandlingRef);
             String xml = lagXmlTilØkonomi(behandlingId);
             return Response.ok()
                 .type(MediaType.APPLICATION_XML)
                 .entity(xml)
                 .build();
         } else if (meldinger.size() == 1) {
-            logger.info("Fant lagret xml til økonomi for behandling: {}", behandlingId);
+            logger.info("Fant lagret xml til økonomi for behandling: {}", behandlingRef);
             return Response.ok()
                 .type(MediaType.APPLICATION_XML)
                 .entity(meldinger.toArray()[0])
                 .build();
         } else {
-            logger.info("Fant {} lagrede xmler til økonomi for behandling: {}", meldinger.size(), behandlingId);
+            logger.info("Fant {} lagrede xmler til økonomi for behandling: {}", meldinger.size(), behandlingRef);
             return Response.ok()
                 .entity(meldinger)
                 .build();
@@ -278,5 +281,15 @@ public class ForvaltningBehandlingRestTjeneste {
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         prosessTaskData.setProperty("KRAVGRUNNLAG_ID", kravgrunnlagId);
         prosessTaskRepository.lagre(prosessTaskData);
+    }
+
+    private Behandling hentBehandling(BehandlingReferanse behandlingReferanse) {
+        Behandling behandling;
+        if (behandlingReferanse.erInternBehandlingId()) {
+            behandling = behandlingRepository.hentBehandling(behandlingReferanse.getBehandlingId());
+        } else {
+            behandling = behandlingRepository.hentBehandling(behandlingReferanse.getBehandlingUuid());
+        }
+        return behandling;
     }
 }

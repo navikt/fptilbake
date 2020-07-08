@@ -7,6 +7,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
@@ -33,13 +35,20 @@ public class HentForhåndvisningVedtaksbrevPdfDto implements AbacDto {
         return behandlingReferanse;
     }
 
+    @JsonIgnore
+    public void setBehandlingReferanse(BehandlingReferanse behandlingReferanse) {
+        this.behandlingReferanse = behandlingReferanse;
+    }
+
     // TODO: K9-tilbake. fjern når endringen er merget og prodsatt også i fpsak-frontend
     @JsonSetter("behandlingId")
+    @JsonProperty(value = "behandlingReferanse")
     public void setBehandlingId(BehandlingReferanse behandlingReferanse) {
         this.behandlingReferanse = behandlingReferanse;
     }
 
-    @JsonSetter("behandlingUuid")
+    @JsonSetter("uuid")
+    @JsonProperty(value = "behandlingReferanse")
     public void setBehandlingUuid(BehandlingReferanse behandlingReferanse) {
         this.behandlingReferanse = behandlingReferanse;
     }
@@ -62,6 +71,6 @@ public class HentForhåndvisningVedtaksbrevPdfDto implements AbacDto {
 
     @Override
     public AbacDataAttributter abacAttributter() {
-        return behandlingReferanse.abacAttributter();
+        return AbacDataAttributter.opprett().leggTil(behandlingReferanse.abacAttributter());
     }
 }

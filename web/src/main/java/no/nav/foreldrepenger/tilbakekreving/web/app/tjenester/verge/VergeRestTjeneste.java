@@ -89,7 +89,7 @@ public class VergeRestTjeneste {
             throw VergeFeil.FACTORY.harAlleredeAksjonspunktForVerge(behandling.getId()).toException();
         }
         vergeTjeneste.opprettVergeAksjonspunktOgHoppTilbakeTilFaktaHvisSenereSteg(behandling);
-        return Redirect.tilBehandlingPollStatus(behandling.getId());
+        return Redirect.tilBehandlingPollStatus(behandling.getUuid());
     }
 
     @POST
@@ -110,7 +110,7 @@ public class VergeRestTjeneste {
             throw VergeFeil.FACTORY.kanIkkeFjerneVerge(behandling.getId()).toException();
         }
         vergeTjeneste.fjernVergeGrunnlagOgAksjonspunkt(behandling);
-        return Redirect.tilBehandlingPollStatus(behandling.getId());
+        return Redirect.tilBehandlingPollStatus(behandling.getUuid());
     }
 
     @GET

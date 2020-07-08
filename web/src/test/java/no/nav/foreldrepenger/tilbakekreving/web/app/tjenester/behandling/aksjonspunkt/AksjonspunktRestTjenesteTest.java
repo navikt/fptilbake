@@ -13,6 +13,7 @@ import java.net.URISyntaxException;
 import java.time.Period;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import javax.ws.rs.core.Response;
 
@@ -114,10 +115,12 @@ public class AksjonspunktRestTjenesteTest {
         long behandlingId = 12345L;
         Behandling behandlingSpy = spy(behandling);
         when(behandlingSpy.getId()).thenReturn(behandlingId);
+        when(behandlingSpy.getUuid()).thenReturn(UUID.randomUUID());
 
         List<BekreftetAksjonspunktDto> aksjonspunkterDtoer = Collections.singletonList(new VurderForeldelseDto());
         BekreftedeAksjonspunkterDto dto = BekreftedeAksjonspunkterDto.lagDto(behandlingSpy.getId(), 2L, aksjonspunkterDtoer);
 
+        when(behandlingRepositoryMock.hentBehandling(anyLong())).thenReturn(behandlingSpy);
         when(behandlingRepositoryMock.erVersjonUendret(anyLong(), anyLong())).thenReturn(true);
 
         aksjonspunktRestTjeneste.bekreft(dto);

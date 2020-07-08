@@ -102,6 +102,8 @@ public class BehandlingRestTjenesteTest {
 
     @Test
     public void test_skal_opprette_ny_behandling() throws URISyntaxException {
+        when(behandlingTjenesteMock.hentBehandling(anyLong())).thenReturn(mockBehandling());
+
         behandlingRestTjeneste.opprettBehandling(opprettBehandlingDto(GYLDIG_SAKSNR, EKSTERN_BEHANDLING_UUID, FP_YTELSE_TYPE));
 
         verify(behandlingTjenesteMock).opprettBehandlingManuell(any(Saksnummer.class), any(UUID.class), any(FagsakYtelseType.class), any(BehandlingType.class));
