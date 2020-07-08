@@ -50,7 +50,7 @@ public class K9sakKlient implements FagsystemKlient {
     private static final String PARAM_NAME_SAKSNUMMER = "saksnummer";
 
     private static final String K9_OPPDRAG_BASE_URL = "http://k9-oppdrag/k9/oppdrag/api";
-    private static final String K9_OPPDRAG_OVERRIDE_URL = "fpoppdrag.override.url";
+    private static final String K9_OPPDRAG_OVERRIDE_URL = "k9oppdrag.override.url";
     private static final String K9_OPPDRAG_HENT_FEILUTBETALINGER = "/simulering/feilutbetalte-perioder";
 
     private OidcRestClient restClient;

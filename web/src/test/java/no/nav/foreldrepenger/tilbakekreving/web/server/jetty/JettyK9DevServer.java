@@ -22,7 +22,7 @@ import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.util.StatusPrinter;
 
-public class JettyDevServer extends JettyServer {
+public class JettyK9DevServer extends JettyServer {
 
     /**
      * @see https://docs.oracle.com/en/java/javase/11/security/java-secure-socket-extension-jsse-reference-guide.html
@@ -31,6 +31,7 @@ public class JettyDevServer extends JettyServer {
     private static final String TRUSTSTORE_PATH_PROP = "javax.net.ssl.trustStore";
     private static final String KEYSTORE_PASSW_PROP = "no.nav.modig.security.appcert.password";
     private static final String KEYSTORE_PATH_PROP = "no.nav.modig.security.appcert.keystore";
+    private static final String CONTEXT_PATH = "/k9-tilbake";
 
 
     private static final String VTP_ARGUMENT = "--vtp";
@@ -43,11 +44,11 @@ public class JettyDevServer extends JettyServer {
             }
         }
 
-        JettyDevServer devServer = new JettyDevServer();
+        JettyK9DevServer devServer = new JettyK9DevServer();
         devServer.bootStrap();
     }
 
-    public JettyDevServer() {
+    public JettyK9DevServer() {
         super(new JettyDevKonfigurasjon());
     }
 
@@ -80,8 +81,8 @@ public class JettyDevServer extends JettyServer {
     @Override
     protected void konfigurerMiljø() throws Exception {
         System.setProperty("develop-local", "true");
-        PropertiesUtils.lagPropertiesFilFraTemplate();
-        PropertiesUtils.initProperties(JettyDevServer.vtp);
+        PropertiesUtils.lagK9PropertiesFilFraTemplate();
+        PropertiesUtils.initK9Properties(JettyK9DevServer.vtp);
     }
 
     @Override
@@ -165,6 +166,7 @@ public class JettyDevServer extends JettyServer {
         WebAppContext webAppContext = super.createContext(appKonfigurasjon);
         // https://www.eclipse.org/jetty/documentation/9.4.x/troubleshooting-locked-files-on-windows.html
         webAppContext.setInitParameter("org.eclipse.jetty.servlet.Default.useFileMappedBuffer", "false");
+        webAppContext.setContextPath(CONTEXT_PATH);
         return webAppContext;
     }
 

@@ -62,8 +62,8 @@ public class ApplicationConfig extends Application {
             .description("REST grensesnitt for Vedtaksløsningen.");
 
         oas.info(info)
-            .addServersItem(new Server()
-                .url("/fptilbake"));
+            .addServersItem(new Server().url("/fptilbake"))
+            .addServersItem(new Server().url("/k9-tilbake"));
         SwaggerConfiguration oasConfig = new SwaggerConfiguration()
             .openAPI(oas)
             .prettyPrint(true)
