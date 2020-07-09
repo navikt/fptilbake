@@ -1,22 +1,24 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.varselrespons;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons.Varselrespons;
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.ResponsKanal;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.AppAbacAttributtType;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.AbacDto;
 
 public class VarselresponsDto implements AbacDto {
 
-    @Valid
     @NotNull
-    private BehandlingIdDto behandlingId;
+    @Min(0)
+    @Max(Long.MAX_VALUE)
+    private Long behandlingId;
 
     @NotNull
     private Boolean akseptertFaktagrunnlag;
@@ -28,13 +30,13 @@ public class VarselresponsDto implements AbacDto {
     VarselresponsDto() {}
 
     public VarselresponsDto(Long behandlingId, ResponsKanal kildeKanal, Boolean akseptertFaktagrunnlag) {
-        this.behandlingId = new BehandlingIdDto(behandlingId);
+        this.behandlingId = behandlingId;
         this.kildeKanal = kildeKanal;
         this.akseptertFaktagrunnlag = akseptertFaktagrunnlag;
     }
 
     public Long getBehandlingId() {
-        return behandlingId.getBehandlingId();
+        return behandlingId;
     }
 
     public Boolean getAkseptertFaktagrunnlag() {
@@ -52,7 +54,7 @@ public class VarselresponsDto implements AbacDto {
 
     public static VarselresponsDto fraDomene(Varselrespons varselrespons) {
         VarselresponsDto dto = new VarselresponsDto();
-        dto.behandlingId = new BehandlingIdDto(varselrespons.getBehandlingId());
+        dto.behandlingId = varselrespons.getBehandlingId();
         dto.akseptertFaktagrunnlag = varselrespons.getAkseptertFaktagrunnlag();
         return dto;
     }
