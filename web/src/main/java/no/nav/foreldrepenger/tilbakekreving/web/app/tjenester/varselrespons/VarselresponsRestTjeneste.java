@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.varselrespons;
+    package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.varselrespons;
 
 import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.READ;
 import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.UPDATE;
