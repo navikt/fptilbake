@@ -24,7 +24,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.AbacFagsakStat
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.CommonAttributter;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.ForeldrepengerAttributter;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.FpsakPipKlient;
-import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.PdpRequestBuilderImpl;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.FPPdpRequestBuilder;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.PipDto;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.sikkerhet.abac.AbacAttributtSamling;
@@ -34,7 +34,7 @@ import no.nav.vedtak.sikkerhet.abac.BeskyttetRessursResourceAttributt;
 import no.nav.vedtak.sikkerhet.abac.PdpRequest;
 import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
 
-public class PdpRequestBuilderImplTest {
+public class FPPdpRequestBuilderTest {
 
     private static final String DUMMY_ID_TOKEN = "dummyheader.dymmypayload.dummysignaturee";
     private static final String SAKSNUMMER = "5555";
@@ -53,7 +53,7 @@ public class PdpRequestBuilderImplTest {
     private PipRepository pipRepository = mock(PipRepository.class);
     private FpsakPipKlient fpsakPipKlient = mock(FpsakPipKlient.class);
 
-    private PdpRequestBuilderImpl requestBuilder = new PdpRequestBuilderImpl(pipRepository, fpsakPipKlient);
+    private FPPdpRequestBuilder requestBuilder = new FPPdpRequestBuilder(pipRepository, fpsakPipKlient);
 
     @Test
     public void skal_hente_behandling_og_fagsak_informasjon_når_input_er_behandling_id() {
