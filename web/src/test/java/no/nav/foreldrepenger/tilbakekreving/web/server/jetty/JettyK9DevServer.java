@@ -31,7 +31,7 @@ public class JettyK9DevServer extends JettyServer {
     private static final String TRUSTSTORE_PATH_PROP = "javax.net.ssl.trustStore";
     private static final String KEYSTORE_PASSW_PROP = "no.nav.modig.security.appcert.password";
     private static final String KEYSTORE_PATH_PROP = "no.nav.modig.security.appcert.keystore";
-    private static final String CONTEXT_PATH = "/k9-tilbake";
+    private static final String CONTEXT_PATH = "/k9/tilbake";
 
 
     private static final String VTP_ARGUMENT = "--vtp";
