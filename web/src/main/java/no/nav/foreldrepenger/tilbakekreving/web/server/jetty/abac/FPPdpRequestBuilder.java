@@ -15,6 +15,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakStatus;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.TilbakekrevingAbacAttributtType;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.Fptilbake;
 import no.nav.foreldrepenger.tilbakekreving.pip.PipBehandlingData;
 import no.nav.foreldrepenger.tilbakekreving.pip.PipRepository;
 import no.nav.vedtak.feil.Feil;
@@ -31,12 +32,13 @@ import no.nav.vedtak.sikkerhet.abac.PdpRequestBuilder;
 import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
 
 /**
- * Implementasjon av PDP request for denne applikasjonen.
+ * Implementasjon av PDP request for fptilbake.
  */
 @ApplicationScoped
 @Alternative
 @Priority(2)
-public class PdpRequestBuilderImpl implements PdpRequestBuilder {
+@Fptilbake
+public class FPPdpRequestBuilder implements PdpRequestBuilder {
 
     public static final String ABAC_DOMAIN = "foreldrepenger";
 
@@ -45,12 +47,12 @@ public class PdpRequestBuilderImpl implements PdpRequestBuilder {
     private PipRepository pipRepository;
     private FpsakPipKlient fpsakPipKlient;
 
-    PdpRequestBuilderImpl() {
+    FPPdpRequestBuilder() {
         // For CDI proxy
     }
 
     @Inject
-    public PdpRequestBuilderImpl(PipRepository pipRepository, FpsakPipKlient fpsakPipKlient) {
+    public FPPdpRequestBuilder(PipRepository pipRepository, FpsakPipKlient fpsakPipKlient) {
         this.pipRepository = pipRepository;
         this.fpsakPipKlient = fpsakPipKlient;
     }
