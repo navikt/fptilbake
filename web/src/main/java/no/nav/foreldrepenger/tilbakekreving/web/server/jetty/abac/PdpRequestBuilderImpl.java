@@ -6,26 +6,27 @@ import javax.enterprise.inject.Alternative;
 import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
-import javax.ws.rs.Produces;
 
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.Fptilbake;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.K9tilbake;
 import no.nav.vedtak.konfig.KonfigVerdi;
+import no.nav.vedtak.sikkerhet.abac.AbacAttributtSamling;
+import no.nav.vedtak.sikkerhet.abac.PdpRequest;
 import no.nav.vedtak.sikkerhet.abac.PdpRequestBuilder;
 
 @ApplicationScoped
 @Alternative
 @Priority(2)
-public class PdpRequestBuilderProducer {
+public class PdpRequestBuilderImpl implements PdpRequestBuilder {
 
-    private PdpRequestBuilder pdpRequestBuilder;
+    private TilbakekrevingPdpRequestBuilder pdpRequestBuilder;
 
-    PdpRequestBuilderProducer() {
+    PdpRequestBuilderImpl() {
     }
 
     @Inject
-    public PdpRequestBuilderProducer(@KonfigVerdi(value = "app.name") String applikasjon,
-                                     @Any Instance<PdpRequestBuilder> pdpRequestBuilders) {
+    public PdpRequestBuilderImpl(@KonfigVerdi(value = "app.name") String applikasjon,
+                                 @Any Instance<TilbakekrevingPdpRequestBuilder> pdpRequestBuilders) {
         System.out.println("Blir denne i det heile tatt kalla?");
         switch (applikasjon) {
             case "fptilbake":
@@ -41,9 +42,8 @@ public class PdpRequestBuilderProducer {
         }
     }
 
-    @Produces
-    @ApplicationScoped
-    public PdpRequestBuilder produce() {
-        return pdpRequestBuilder;
+    @Override
+    public PdpRequest lagPdpRequest(AbacAttributtSamling attributter) {
+        return pdpRequestBuilder.lagPdpRequest(attributter);
     }
 }

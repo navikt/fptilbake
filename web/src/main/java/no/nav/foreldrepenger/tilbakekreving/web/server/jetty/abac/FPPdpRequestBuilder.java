@@ -28,7 +28,6 @@ import no.nav.vedtak.sikkerhet.abac.AbacAttributtSamling;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.PdpKlient;
 import no.nav.vedtak.sikkerhet.abac.PdpRequest;
-import no.nav.vedtak.sikkerhet.abac.PdpRequestBuilder;
 import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
 
 /**
@@ -38,7 +37,7 @@ import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
 @Alternative
 @Priority(2)
 @Fptilbake
-public class FPPdpRequestBuilder implements PdpRequestBuilder {
+public class FPPdpRequestBuilder implements TilbakekrevingPdpRequestBuilder {
 
     public static final String ABAC_DOMAIN = "foreldrepenger";
 
@@ -59,6 +58,7 @@ public class FPPdpRequestBuilder implements PdpRequestBuilder {
 
     @Override
     public PdpRequest lagPdpRequest(AbacAttributtSamling attributter) {
+        System.out.println("Bruker PdpRequestBuilder for FP");
         MDC_EXTENDED_LOG_CONTEXT.remove("behandling");
         MDC_EXTENDED_LOG_CONTEXT.remove("fpsakBehandlingUuid");
         MDC_EXTENDED_LOG_CONTEXT.remove("behandlingUuid");

@@ -9,8 +9,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Alternative;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.TilbakekrevingAbacAttributtType;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.K9tilbake;
 import no.nav.foreldrepenger.tilbakekreving.pip.PipBehandlingData;
 import no.nav.foreldrepenger.tilbakekreving.pip.PipRepository;
@@ -18,7 +16,6 @@ import no.nav.vedtak.sikkerhet.abac.AbacAttributtSamling;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.PdpKlient;
 import no.nav.vedtak.sikkerhet.abac.PdpRequest;
-import no.nav.vedtak.sikkerhet.abac.PdpRequestBuilder;
 import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
 
 /**
@@ -28,7 +25,7 @@ import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
 @Alternative
 @Priority(2)
 @K9tilbake
-public class K9PdpRequestBuilder implements PdpRequestBuilder {
+public class K9PdpRequestBuilder implements TilbakekrevingPdpRequestBuilder {
 
     public static final String ABAC_DOMAIN = "k9";
 
