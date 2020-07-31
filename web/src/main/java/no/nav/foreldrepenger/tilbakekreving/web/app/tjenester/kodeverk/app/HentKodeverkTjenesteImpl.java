@@ -17,7 +17,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.DokumentKategori;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.DokumentTypeId;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KonsekvensForYtelsen;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Tema;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.VariantFormat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
@@ -69,7 +68,7 @@ class HentKodeverkTjenesteImpl implements HentKodeverkTjeneste {
         BehandlingType.class,
         BehandlingÅrsakType.class,
         BehandlingResultatType.class,
-        KonsekvensForYtelsen.class,
+        //KonsekvensForYtelsen.class,
         VidereBehandling.class,
         HendelseType.class,
         HendelseUnderType.class,

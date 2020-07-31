@@ -1,49 +1,95 @@
 package no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk;
 
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagFeil;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 
-@Entity(name = "KlasseType")
-@DiscriminatorValue(KlasseType.DISCRIMINATOR)
-public class KlasseType extends Kodeliste {
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
-    public static final String DISCRIMINATOR = "KLASSE_TYPE";
+@JsonFormat(shape = JsonFormat.Shape.STRING)
+@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
+public enum KlasseType implements Kodeverdi {
 
-    public static final KlasseType FEIL = new KlasseType("FEIL");
-    public static final KlasseType JUST = new KlasseType("JUST");
-    public static final KlasseType SKAT = new KlasseType("SKAT");
-    public static final KlasseType TREK = new KlasseType("TREK");
-    public static final KlasseType YTEL = new KlasseType("YTEL");
+    FEIL("FEIL"),
+    JUST("JUST"),
+    SKAT("SKAT"),
+    TREK("TREK"),
+    YTEL("YTEL");
 
-    private static Map<String, KlasseType> klasseTypeMap = new HashMap<>();
+    public static final String KODEVERK = "KLASSE_TYPE";
+
+    private static final Map<String, KlasseType> KODER = new LinkedHashMap<>();
+
+    @JsonValue
+    private String kode;
 
     static {
-        klasseTypeMap.put(FEIL.getKode(), FEIL);
-        klasseTypeMap.put(JUST.getKode(), JUST);
-        klasseTypeMap.put(SKAT.getKode(), SKAT);
-        klasseTypeMap.put(TREK.getKode(), TREK);
-        klasseTypeMap.put(YTEL.getKode(), YTEL);
-    }
-
-    KlasseType() {
-        // For hibernate
+        for (var v : values()) {
+            if (KODER.putIfAbsent(v.kode, v) != null) {
+                throw new IllegalArgumentException("Duplikat : " + v.kode);
+            }
+        }
     }
 
     private KlasseType(String kode) {
-        super(kode, DISCRIMINATOR);
+        this.kode = kode;
     }
 
-    public static KlasseType fraKode(String kode) {
-        if (klasseTypeMap.containsKey(kode)) {
-            return klasseTypeMap.get(kode);
+    @JsonCreator
+    public static KlasseType fraKode(@JsonProperty("kode") String kode) {
+        if (kode == null) {
+            return null;
         }
-        throw KravgrunnlagFeil.FEILFACTORY.ugyldigKlasseType(kode).toException();
+        var ad = KODER.get(kode);
+        if (ad == null) {
+            throw new IllegalArgumentException("Ukjent KlasseKode: " + kode);
+        }
+        return ad;
     }
 
+    public static Map<String, KlasseType> kodeMap() {
+        return Collections.unmodifiableMap(KODER);
+    }
+
+    @Override
+    public java.lang.String getKode() {
+        return kode;
+    }
+
+    @Override
+    public java.lang.String getOffisiellKode() {
+        return getKode();
+    }
+
+    @Override
+    public java.lang.String getKodeverk() {
+        return KODEVERK;
+    }
+
+    @Override
+    public java.lang.String getNavn() {
+        return null;
+    }
+
+    @Converter(autoApply = true)
+    public static class KodeverdiConverter implements AttributeConverter<KlasseType, String> {
+        @Override
+        public String convertToDatabaseColumn(KlasseType attribute) {
+            return attribute == null ? null : attribute.getKode();
+        }
+
+        @Override
+        public KlasseType convertToEntityAttribute(String dbData) {
+            return dbData == null ? null : fraKode(dbData);
+        }
+    }
 }

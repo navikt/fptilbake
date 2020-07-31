@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.Objects;
 
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -11,9 +12,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.JoinColumnOrFormula;
-import org.hibernate.annotations.JoinFormula;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
@@ -30,9 +28,9 @@ public class KravgrunnlagBelop433 extends BaseEntitet {
     @Column(name = "klasse_kode")
     private String klasseKode;
 
-    @ManyToOne(optional = false)
-    @JoinColumnOrFormula(column = @JoinColumn(name = "klasse_type", referencedColumnName = "kode", nullable = false))
-    @JoinColumnOrFormula(formula = @JoinFormula(referencedColumnName = "kodeverk", value = "'" + KlasseType.DISCRIMINATOR + "'"))
+    //@ManyToOne(optional = false)
+    @Convert(converter = KlasseType.KodeverdiConverter.class)
+    @Column(name = "klasse_type", nullable = false, updatable = false)
     private KlasseType klasseType;
 
     @Column(name = "oppr_utbet_belop")

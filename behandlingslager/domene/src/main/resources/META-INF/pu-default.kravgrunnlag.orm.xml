@@ -26,6 +26,5 @@
     <!-- kodeverk -->
     <entity class="no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Inntektskategori"/>
 </entity-mappings>
