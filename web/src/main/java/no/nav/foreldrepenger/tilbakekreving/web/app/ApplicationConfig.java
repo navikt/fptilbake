@@ -62,12 +62,7 @@ public class ApplicationConfig extends Application {
             .version("1.0")
             .description("REST grensesnitt for Vedtaksløsningen.");
 
-        if (APPLICATION_NAME_K9_TILBAKE.equals(System.getProperty("app.name"))) {
-            oas.info(info).addServersItem(new Server().url("/k9/tilbake"));
-        } else {
-            oas.info(info)
-                .addServersItem(new Server().url("/fptilbake"));
-        }
+        addServer(oas, info);
 
         SwaggerConfiguration oasConfig = new SwaggerConfiguration()
             .openAPI(oas)
@@ -83,6 +78,20 @@ public class ApplicationConfig extends Application {
                 .read();
         } catch (OpenApiConfigurationException e) {
             throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    private void addServer(OpenAPI oas, Info info) {
+        String applikasjon = System.getProperty("app.name");
+        switch (applikasjon) {
+            case "fptilbake":
+                oas.info(info).addServersItem(new Server().url("/fptilbake"));
+                break;
+            case "k9tilbake":
+                oas.info(info).addServersItem(new Server().url("/k9/tilbake"));
+                break;
+            default:
+                throw new IllegalStateException("app.name er satt til " + applikasjon + " som ikke er en støttet verdi");
         }
     }
 
