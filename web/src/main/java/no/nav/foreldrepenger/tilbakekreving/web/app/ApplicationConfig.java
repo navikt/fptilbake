@@ -53,6 +53,8 @@ import no.nav.vedtak.felles.prosesstask.rest.ProsessTaskRestTjeneste;
 public class ApplicationConfig extends Application {
 
     public static final String API_URI = "/api";
+    private static final String APPLIKASJON_NAVN_K9_TILBAKE = "k9tilbake";
+    private static final String APPLIKASJON_NAVN_FPTILBAKE = "fptilbake";
 
     public ApplicationConfig() {
         OpenAPI oas = new OpenAPI();
@@ -61,9 +63,8 @@ public class ApplicationConfig extends Application {
             .version("1.0")
             .description("REST grensesnitt for Vedtaksløsningen.");
 
-        oas.info(info)
-            .addServersItem(new Server().url("/fptilbake"))
-            .addServersItem(new Server().url("/k9/tilbake"));
+        oas.info(info).addServersItem(new Server().url(getContextPath()));
+
         SwaggerConfiguration oasConfig = new SwaggerConfiguration()
             .openAPI(oas)
             .prettyPrint(true)
@@ -78,6 +79,18 @@ public class ApplicationConfig extends Application {
                 .read();
         } catch (OpenApiConfigurationException e) {
             throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    private String getContextPath() {
+        String applikasjon = System.getProperty("app.name") != null ? System.getProperty("app.name") : "fptilbake";
+        switch (applikasjon) {
+            case APPLIKASJON_NAVN_FPTILBAKE:
+                return "/fptilbake";
+            case APPLIKASJON_NAVN_K9_TILBAKE:
+                return "/k9/tilbake";
+            default:
+                throw new IllegalStateException("app.name er satt til " + applikasjon + " som ikke er en støttet verdi");
         }
     }
 
