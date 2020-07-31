@@ -53,7 +53,8 @@ import no.nav.vedtak.felles.prosesstask.rest.ProsessTaskRestTjeneste;
 public class ApplicationConfig extends Application {
 
     public static final String API_URI = "/api";
-    public static final String APPLICATION_NAME_K9_TILBAKE = "k9tilbake";
+    public static final String APPLIKASJON_NAVN_K9_TILBAKE = "k9tilbake";
+    public static final String APPLIKASJON_NAVN_FPTILBAKE = "fptilbake";
 
     public ApplicationConfig() {
         OpenAPI oas = new OpenAPI();
@@ -83,18 +84,14 @@ public class ApplicationConfig extends Application {
 
     private String getContextPath() {
         String applikasjon = System.getProperty("app.name");
-        String contextPath = "";
         switch (applikasjon) {
-            case "fptilbake":
-                contextPath = "/fptilbake";
-                break;
-            case "k9tilbake":
-                contextPath = "/k9/tilbake";
-                break;
+            case APPLIKASJON_NAVN_FPTILBAKE:
+                return  "/fptilbake";
+            case APPLIKASJON_NAVN_K9_TILBAKE:
+                return "/k9/tilbake";
             default:
                 throw new IllegalStateException("app.name er satt til " + applikasjon + " som ikke er en støttet verdi");
         }
-        return contextPath;
     }
 
     @Override
