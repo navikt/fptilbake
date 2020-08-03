@@ -1,40 +1,39 @@
 package no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac;
 
-import javax.annotation.Priority;
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Alternative;
 import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Instance;
+import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.Fptilbake;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.K9tilbake;
 import no.nav.vedtak.konfig.KonfigVerdi;
-import no.nav.vedtak.sikkerhet.abac.AbacAttributtSamling;
-import no.nav.vedtak.sikkerhet.abac.PdpRequest;
 import no.nav.vedtak.sikkerhet.abac.PdpRequestBuilder;
 
 @ApplicationScoped
-@Alternative
-@Priority(2)
-public class PdpRequestBuilderImpl implements PdpRequestBuilder {
+public class PdpRequestBuilderPruducer {
 
-    private TilbakekrevingPdpRequestBuilder pdpRequestBuilder;
+    private static final Logger logger = LoggerFactory.getLogger(PdpRequestBuilderPruducer.class);
 
-    PdpRequestBuilderImpl() {
+    private PdpRequestBuilder pdpRequestBuilder;
+
+    PdpRequestBuilderPruducer() {
     }
 
     @Inject
-    public PdpRequestBuilderImpl(@KonfigVerdi(value = "app.name") String applikasjon,
-                                 @Any Instance<TilbakekrevingPdpRequestBuilder> pdpRequestBuilders) {
-        System.out.println("Blir denne i det heile tatt kalla?");
+    public PdpRequestBuilderPruducer(@KonfigVerdi(value = "app.name") String applikasjon,
+                                     @Any Instance<PdpRequestBuilder> pdpRequestBuilders) {
         switch (applikasjon) {
             case "fptilbake":
-                System.out.println("Bruker PdpRequestBuilder for fptilbake");
+                logger.info("Bruker PdpRequestBuilder for fptilbake");
                 pdpRequestBuilder = pdpRequestBuilders.select(new Fptilbake.FptilbakeAnnotationLiteral()).get();
                 break;
             case "k9tilbake":
-                System.out.println("Bruker PdpRequestBuilder for k9");
+                logger.info("Bruker PdpRequestBuilder for k9");
                 pdpRequestBuilder = pdpRequestBuilders.select(new K9tilbake.K9tilbakeAnnotationLiteral()).get();
                 break;
             default:
@@ -42,8 +41,9 @@ public class PdpRequestBuilderImpl implements PdpRequestBuilder {
         }
     }
 
-    @Override
-    public PdpRequest lagPdpRequest(AbacAttributtSamling attributter) {
-        return pdpRequestBuilder.lagPdpRequest(attributter);
+    @Produces
+    @ApplicationScoped
+    public PdpRequestBuilder lagPdpRequestBuilder() {
+        return pdpRequestBuilder;
     }
 }

@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac;
+package no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.fp;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -6,10 +6,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.annotation.Priority;
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Alternative;
 import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakStatus;
@@ -18,6 +19,8 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.TilbakekrevingAbacAttri
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.Fptilbake;
 import no.nav.foreldrepenger.tilbakekreving.pip.PipBehandlingData;
 import no.nav.foreldrepenger.tilbakekreving.pip.PipRepository;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.AppAbacAttributtType;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.CommonAttributter;
 import no.nav.vedtak.feil.Feil;
 import no.nav.vedtak.feil.FeilFactory;
 import no.nav.vedtak.feil.LogLevel;
@@ -28,20 +31,21 @@ import no.nav.vedtak.sikkerhet.abac.AbacAttributtSamling;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.PdpKlient;
 import no.nav.vedtak.sikkerhet.abac.PdpRequest;
+import no.nav.vedtak.sikkerhet.abac.PdpRequestBuilder;
 import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
 
 /**
  * Implementasjon av PDP request for fptilbake.
  */
 @ApplicationScoped
-@Alternative
-@Priority(2)
 @Fptilbake
-public class FPPdpRequestBuilder implements TilbakekrevingPdpRequestBuilder {
+public class FPPdpRequestBuilder implements PdpRequestBuilder {
 
     public static final String ABAC_DOMAIN = "foreldrepenger";
 
     private static final MdcExtendedLogContext MDC_EXTENDED_LOG_CONTEXT = MdcExtendedLogContext.getContext("prosess"); //$NON-NLS-1$
+
+    private static final Logger logger = LoggerFactory.getLogger(FPPdpRequestBuilder.class);
 
     private PipRepository pipRepository;
     private FpsakPipKlient fpsakPipKlient;
@@ -58,7 +62,7 @@ public class FPPdpRequestBuilder implements TilbakekrevingPdpRequestBuilder {
 
     @Override
     public PdpRequest lagPdpRequest(AbacAttributtSamling attributter) {
-        System.out.println("Bruker PdpRequestBuilder for FP");
+        logger.info("Bruker PdpRequestBuilder for FP");
         MDC_EXTENDED_LOG_CONTEXT.remove("behandling");
         MDC_EXTENDED_LOG_CONTEXT.remove("fpsakBehandlingUuid");
         MDC_EXTENDED_LOG_CONTEXT.remove("behandlingUuid");
@@ -81,7 +85,7 @@ public class FPPdpRequestBuilder implements TilbakekrevingPdpRequestBuilder {
             behandlingData = lagBehandlingData(behandlingId.get());
         } else if (behandlingUuid.isPresent()) {
             behandlingData = lagBehandlingData(behandlingUuid.get());
-        }else if (fpsakBehandlingId.isPresent()) {
+        } else if (fpsakBehandlingId.isPresent()) {
             behandlingData = hentFpsakBehandlingData(fpsakBehandlingId.get());
         }
 
@@ -92,7 +96,7 @@ public class FPPdpRequestBuilder implements TilbakekrevingPdpRequestBuilder {
         AbacDataAttributter utlededeAttributter = AbacDataAttributter.opprett();
         utlededeAttributter.leggTil(StandardAbacAttributtType.AKTØR_ID, aktørIder);
         fpsakBehandlingId.ifPresent(uuid -> utlededeAttributter.leggTil(TilbakekrevingAbacAttributtType.FPSAK_BEHANDLING_UUID, uuid));
-        behandlingUuid.ifPresent(uuid -> utlededeAttributter.leggTil(StandardAbacAttributtType.BEHANDLING_UUID,uuid));
+        behandlingUuid.ifPresent(uuid -> utlededeAttributter.leggTil(StandardAbacAttributtType.BEHANDLING_UUID, uuid));
         attributter.leggTil(utlededeAttributter);
 
         return behandlingData != null
