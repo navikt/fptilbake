@@ -28,7 +28,6 @@ public class KravgrunnlagBelop433 extends BaseEntitet {
     @Column(name = "klasse_kode")
     private String klasseKode;
 
-    //@ManyToOne(optional = false)
     @Convert(converter = KlasseType.KodeverdiConverter.class)
     @Column(name = "klasse_type", nullable = false, updatable = false)
     private KlasseType klasseType;

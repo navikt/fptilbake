@@ -10,6 +10,7 @@ import javax.persistence.Converter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 
@@ -19,11 +20,11 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public enum KlasseType implements Kodeverdi {
 
-    FEIL("FEIL"),
-    JUST("JUST"),
-    SKAT("SKAT"),
-    TREK("TREK"),
-    YTEL("YTEL");
+    FEIL("FEIL","Feilkonto"),
+    JUST("JUST","Justeringskonto"),
+    SKAT("SKAT","Skatt"),
+    TREK("TREK","Trekk"),
+    YTEL("YTEL","Ytelseskonto");
 
     public static final String KODEVERK = "KLASSE_TYPE";
 
@@ -31,6 +32,9 @@ public enum KlasseType implements Kodeverdi {
 
     @JsonValue
     private String kode;
+
+    @JsonIgnore
+    private String navn;
 
     static {
         for (var v : values()) {
@@ -42,6 +46,11 @@ public enum KlasseType implements Kodeverdi {
 
     private KlasseType(String kode) {
         this.kode = kode;
+    }
+
+    private KlasseType(String kode, String navn) {
+        this.kode = kode;
+        this.navn = navn;
     }
 
     @JsonCreator
@@ -77,7 +86,7 @@ public enum KlasseType implements Kodeverdi {
 
     @Override
     public java.lang.String getNavn() {
-        return null;
+        return navn;
     }
 
     @Converter(autoApply = true)

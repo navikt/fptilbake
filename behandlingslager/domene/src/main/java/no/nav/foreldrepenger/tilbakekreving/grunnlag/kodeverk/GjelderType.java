@@ -1,47 +1,104 @@
 package no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk;
 
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagFeil;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 
-@Entity(name = "GjelderType")
-@DiscriminatorValue(GjelderType.DISCRIMINATOR)
-public class GjelderType extends Kodeliste {
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
-    public static final String DISCRIMINATOR = "GJELDER_TYPE";
+@JsonFormat(shape = JsonFormat.Shape.STRING)
+@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
+public enum GjelderType implements Kodeverdi {
 
-    public static final GjelderType PERSON = new GjelderType("PERSON");
-    public static final GjelderType ORGANISASJON = new GjelderType("ORGANISASJON");
-    public static final GjelderType SAMHANDLER = new GjelderType("SAMHANDLER");
-    public static final GjelderType APPBRUKER = new GjelderType("APPBRUKER");
 
-    private static Map<String, GjelderType> gjelderTypeMap = new HashMap<>();
+    PERSON("PERSON","Person"),
+    ORGANISASJON("ORGANISASJON","Organisasjon"),
+    SAMHANDLER("SAMHANDLER","Samhandler"),
+    APPBRUKER("APPBRUKER","App bruker");
+
+    public static final String KODEVERK = "GJELDER_TYPE";
+
+    private static final Map<String, GjelderType> KODER = new LinkedHashMap<>();
+
+    @JsonValue
+    private String kode;
+
+    @JsonIgnore
+    private String navn;
 
     static {
-        gjelderTypeMap.put(PERSON.getKode(), PERSON);
-        gjelderTypeMap.put(ORGANISASJON.getKode(), ORGANISASJON);
-        gjelderTypeMap.put(SAMHANDLER.getKode(), SAMHANDLER);
-        gjelderTypeMap.put(APPBRUKER.getKode(), APPBRUKER);
-    }
-
-    GjelderType() {
-        // For hibernate
+        for (var v : values()) {
+            if (KODER.putIfAbsent(v.kode, v) != null) {
+                throw new IllegalArgumentException("Duplikat : " + v.kode);
+            }
+        }
     }
 
     private GjelderType(String kode) {
-        super(kode, DISCRIMINATOR);
+        this.kode = kode;
     }
 
-    public static GjelderType fraKode(String kode) {
-        if (gjelderTypeMap.containsKey(kode)) {
-            return gjelderTypeMap.get(kode);
+    private GjelderType(String kode, String navn) {
+        this.kode = kode;
+        this.navn = navn;
+    }
+
+    @JsonCreator
+    public static GjelderType fraKode(@JsonProperty("kode") String kode) {
+        if (kode == null) {
+            return null;
         }
-        throw KravgrunnlagFeil.FEILFACTORY.ugyldigGjelderType(kode).toException();
+        var ad = KODER.get(kode);
+        if (ad == null) {
+            throw new IllegalArgumentException("Ukjent KlasseKode: " + kode);
+        }
+        return ad;
     }
 
+    public static Map<String, GjelderType> kodeMap() {
+        return Collections.unmodifiableMap(KODER);
+    }
+
+    @Override
+    public String getKode() {
+        return kode;
+    }
+
+    @Override
+    public String getOffisiellKode() {
+        return getKode();
+    }
+
+    @Override
+    public String getKodeverk() {
+        return KODEVERK;
+    }
+
+    @Override
+    public String getNavn() {
+        return navn;
+    }
+
+    @Converter(autoApply = true)
+    public static class KodeverdiConverter implements AttributeConverter<GjelderType, String> {
+        @Override
+        public String convertToDatabaseColumn(GjelderType attribute) {
+            return attribute == null ? null : attribute.getKode();
+        }
+
+        @Override
+        public GjelderType convertToEntityAttribute(String dbData) {
+            return dbData == null ? null : fraKode(dbData);
+        }
+    }
 }

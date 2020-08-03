@@ -79,6 +79,6 @@ public enum KonsekvensForYtelsen implements Kodeverdi {
 
     @Override
     public java.lang.String getNavn() {
-        return null;
+        return navn;
     }
 }
