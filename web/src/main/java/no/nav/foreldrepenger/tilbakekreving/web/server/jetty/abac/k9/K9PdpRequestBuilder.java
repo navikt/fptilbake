@@ -1,33 +1,39 @@
-package no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac;
+package no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.annotation.Priority;
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Alternative;
 import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.K9tilbake;
 import no.nav.foreldrepenger.tilbakekreving.pip.PipBehandlingData;
 import no.nav.foreldrepenger.tilbakekreving.pip.PipRepository;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.AppAbacAttributtType;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.CommonAttributter;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.fp.FPPdpRequestBuilder;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.fp.ForeldrepengerAttributter;
 import no.nav.vedtak.sikkerhet.abac.AbacAttributtSamling;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.PdpKlient;
 import no.nav.vedtak.sikkerhet.abac.PdpRequest;
+import no.nav.vedtak.sikkerhet.abac.PdpRequestBuilder;
 import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
 
 /**
  * Implementasjon av PDP request for k9-tilbake.
  */
 @ApplicationScoped
-@Alternative
-@Priority(2)
 @K9tilbake
-public class K9PdpRequestBuilder implements TilbakekrevingPdpRequestBuilder {
+public class K9PdpRequestBuilder implements PdpRequestBuilder {
 
     public static final String ABAC_DOMAIN = "k9";
+
+    private static final Logger logger = LoggerFactory.getLogger(K9PdpRequestBuilder.class);
 
     private PipRepository pipRepository;
 
@@ -42,7 +48,7 @@ public class K9PdpRequestBuilder implements TilbakekrevingPdpRequestBuilder {
 
     @Override
     public PdpRequest lagPdpRequest(AbacAttributtSamling attributter) {
-        System.out.println("Bruker PdpRequestBuilder for k9");
+        logger.info("Bruker PdpRequestBuilder for k9");
 
         PipBehandlingData behandlingData = null;
 

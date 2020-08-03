@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac;
+package no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.fp;
 
 public class ForeldrepengerAttributter {
     public static final String FORELDREPENGER_FP_SAKSID = "no.nav.abac.attributter.foreldrepenger.fp_saksid";

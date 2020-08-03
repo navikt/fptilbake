@@ -1,23 +1,22 @@
-package no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac;
+package no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.fp;
 
 import java.util.List;
 import java.util.Optional;
 
-import javax.annotation.Priority;
-import javax.enterprise.context.Dependent;
-import javax.enterprise.inject.Alternative;
+import javax.enterprise.context.ApplicationScoped;
 
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.Fptilbake;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.CommonAttributter;
 import no.nav.vedtak.sikkerhet.abac.PdpRequest;
 import no.nav.vedtak.sikkerhet.pdp.XacmlRequestBuilderTjeneste;
 import no.nav.vedtak.sikkerhet.pdp.xacml.XacmlAttributeSet;
 import no.nav.vedtak.sikkerhet.pdp.xacml.XacmlRequestBuilder;
 
-@Dependent
-@Alternative
-@Priority(2)
-public class XacmlRequestBuilderTjenesteImpl implements XacmlRequestBuilderTjeneste {
+@ApplicationScoped
+@Fptilbake
+public class FpXacmlRequestBuilderTjeneste implements XacmlRequestBuilderTjeneste {
 
-    public XacmlRequestBuilderTjenesteImpl() {
+    public FpXacmlRequestBuilderTjeneste() {
     }
 
     @Override
