@@ -23,7 +23,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.CommonAttribut
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.fp.AbacBehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.fp.AbacFagsakStatus;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.fp.FPPdpRequestBuilder;
-import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.fp.ForeldrepengerAttributter;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.fp.FpAbacAttributter;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.fp.FpsakPipKlient;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.fp.PipDto;
 import no.nav.vedtak.exception.TekniskException;
@@ -65,9 +65,9 @@ public class FPPdpRequestBuilderTest {
 
         PdpRequest request = requestBuilder.lagPdpRequest(attributter);
         assertThat(request.getListOfString(CommonAttributter.RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE)).containsOnly(PERSON1, PERSON2);
-        assertThat(request.getString(ForeldrepengerAttributter.RESOURCE_FORELDREPENGER_SAK_ANSVARLIG_SAKSBEHANDLER)).isEqualTo(SAKSBEHANDLER);
-        assertThat(request.getString(ForeldrepengerAttributter.RESOURCE_FORELDREPENGER_SAK_SAKSSTATUS)).isEqualTo(AbacFagsakStatus.OPPRETTET.getEksternKode());
-        assertThat(request.getString(ForeldrepengerAttributter.RESOURCE_FORELDREPENGER_SAK_BEHANDLINGSSTATUS)).isEqualTo(AbacBehandlingStatus.UTREDES.getEksternKode());
+        assertThat(request.getString(FpAbacAttributter.RESOURCE_FORELDREPENGER_SAK_ANSVARLIG_SAKSBEHANDLER)).isEqualTo(SAKSBEHANDLER);
+        assertThat(request.getString(FpAbacAttributter.RESOURCE_FORELDREPENGER_SAK_SAKSSTATUS)).isEqualTo(AbacFagsakStatus.OPPRETTET.getEksternKode());
+        assertThat(request.getString(FpAbacAttributter.RESOURCE_FORELDREPENGER_SAK_BEHANDLINGSSTATUS)).isEqualTo(AbacBehandlingStatus.UTREDES.getEksternKode());
         assertThat(request.getString(CommonAttributter.XACML_1_0_ACTION_ACTION_ID)).isEqualTo(BeskyttetRessursActionAttributt.READ.getEksternKode());
     }
 
@@ -81,16 +81,16 @@ public class FPPdpRequestBuilderTest {
 
         PdpRequest request = requestBuilder.lagPdpRequest(attributter);
         assertThat(request.getListOfString(CommonAttributter.RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE)).containsOnly(PERSON1, PERSON2);
-        assertThat(request.getString(ForeldrepengerAttributter.RESOURCE_FORELDREPENGER_SAK_ANSVARLIG_SAKSBEHANDLER)).isEqualTo(SAKSBEHANDLER);
-        assertThat(request.getString(ForeldrepengerAttributter.RESOURCE_FORELDREPENGER_SAK_SAKSSTATUS)).isEqualTo(AbacFagsakStatus.OPPRETTET.getEksternKode());
-        assertThat(request.getString(ForeldrepengerAttributter.RESOURCE_FORELDREPENGER_SAK_BEHANDLINGSSTATUS)).isEqualTo(AbacBehandlingStatus.UTREDES.getEksternKode());
+        assertThat(request.getString(FpAbacAttributter.RESOURCE_FORELDREPENGER_SAK_ANSVARLIG_SAKSBEHANDLER)).isEqualTo(SAKSBEHANDLER);
+        assertThat(request.getString(FpAbacAttributter.RESOURCE_FORELDREPENGER_SAK_SAKSSTATUS)).isEqualTo(AbacFagsakStatus.OPPRETTET.getEksternKode());
+        assertThat(request.getString(FpAbacAttributter.RESOURCE_FORELDREPENGER_SAK_BEHANDLINGSSTATUS)).isEqualTo(AbacBehandlingStatus.UTREDES.getEksternKode());
         assertThat(request.getString(CommonAttributter.XACML_1_0_ACTION_ACTION_ID)).isEqualTo(BeskyttetRessursActionAttributt.READ.getEksternKode());
     }
 
     @Test
     public void skal_hente_behandlinginfo_fra_fpsak_når_input_er_fpsak_behandlingid() {
         AbacAttributtSamling attributter = byggAbacAttributtsamling().leggTil(
-            AbacDataAttributter.opprett().leggTil(TilbakekrevingAbacAttributtType.FPSAK_BEHANDLING_UUID, FPSAK_BEHANDLING_UUID));
+            AbacDataAttributter.opprett().leggTil(TilbakekrevingAbacAttributtType.YTELSEBEHANDLING_UUID, FPSAK_BEHANDLING_UUID));
 
         PipDto pipDto = new PipDto();
         pipDto.setAktørIder(Set.of(new AktørId(PERSON1)));
@@ -100,9 +100,9 @@ public class FPPdpRequestBuilderTest {
 
         PdpRequest request = requestBuilder.lagPdpRequest(attributter);
         assertThat(request.getListOfString(CommonAttributter.RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE)).containsOnly(PERSON1);
-        assertThat(request.getString(ForeldrepengerAttributter.RESOURCE_FORELDREPENGER_SAK_ANSVARLIG_SAKSBEHANDLER)).isNull();
-        assertThat(request.getString(ForeldrepengerAttributter.RESOURCE_FORELDREPENGER_SAK_SAKSSTATUS)).isEqualTo(AbacFagsakStatus.UNDER_BEHANDLING.getEksternKode());
-        assertThat(request.getString(ForeldrepengerAttributter.RESOURCE_FORELDREPENGER_SAK_BEHANDLINGSSTATUS)).isEqualTo(AbacBehandlingStatus.OPPRETTET.getEksternKode());
+        assertThat(request.getString(FpAbacAttributter.RESOURCE_FORELDREPENGER_SAK_ANSVARLIG_SAKSBEHANDLER)).isNull();
+        assertThat(request.getString(FpAbacAttributter.RESOURCE_FORELDREPENGER_SAK_SAKSSTATUS)).isEqualTo(AbacFagsakStatus.UNDER_BEHANDLING.getEksternKode());
+        assertThat(request.getString(FpAbacAttributter.RESOURCE_FORELDREPENGER_SAK_BEHANDLINGSSTATUS)).isEqualTo(AbacBehandlingStatus.OPPRETTET.getEksternKode());
         assertThat(request.getString(CommonAttributter.XACML_1_0_ACTION_ACTION_ID)).isEqualTo(BeskyttetRessursActionAttributt.READ.getEksternKode());
     }
 
@@ -116,7 +116,7 @@ public class FPPdpRequestBuilderTest {
 
         PdpRequest request = requestBuilder.lagPdpRequest(attributter);
         assertThat(request.getListOfString(CommonAttributter.RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE)).containsOnly(PERSON2);
-        assertThat(request.getString(ForeldrepengerAttributter.RESOURCE_FORELDREPENGER_SAK_ANSVARLIG_SAKSBEHANDLER)).isNull();
+        assertThat(request.getString(FpAbacAttributter.RESOURCE_FORELDREPENGER_SAK_ANSVARLIG_SAKSBEHANDLER)).isNull();
         assertThat(request.getString(CommonAttributter.XACML_1_0_ACTION_ACTION_ID)).isEqualTo(BeskyttetRessursActionAttributt.READ.getEksternKode());
     }
 
@@ -130,9 +130,9 @@ public class FPPdpRequestBuilderTest {
 
         PdpRequest request = requestBuilder.lagPdpRequest(attributter);
         assertThat(request.getListOfString(CommonAttributter.RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE)).containsOnly(PERSON1, PERSON2);
-        assertThat(request.getString(ForeldrepengerAttributter.RESOURCE_FORELDREPENGER_SAK_ANSVARLIG_SAKSBEHANDLER)).isNullOrEmpty();
-        assertThat(request.getString(ForeldrepengerAttributter.RESOURCE_FORELDREPENGER_SAK_SAKSSTATUS)).isEqualTo(AbacFagsakStatus.OPPRETTET.getEksternKode());
-        assertThat(request.getString(ForeldrepengerAttributter.RESOURCE_FORELDREPENGER_SAK_BEHANDLINGSSTATUS)).isEqualTo(AbacBehandlingStatus.UTREDES.getEksternKode());
+        assertThat(request.getString(FpAbacAttributter.RESOURCE_FORELDREPENGER_SAK_ANSVARLIG_SAKSBEHANDLER)).isNullOrEmpty();
+        assertThat(request.getString(FpAbacAttributter.RESOURCE_FORELDREPENGER_SAK_SAKSSTATUS)).isEqualTo(AbacFagsakStatus.OPPRETTET.getEksternKode());
+        assertThat(request.getString(FpAbacAttributter.RESOURCE_FORELDREPENGER_SAK_BEHANDLINGSSTATUS)).isEqualTo(AbacBehandlingStatus.UTREDES.getEksternKode());
         assertThat(request.getString(CommonAttributter.XACML_1_0_ACTION_ACTION_ID)).isEqualTo(BeskyttetRessursActionAttributt.READ.getEksternKode());
     }
 
@@ -159,7 +159,7 @@ public class FPPdpRequestBuilderTest {
         AbacAttributtSamling attributter = byggAbacAttributtsamling().leggTil(
             AbacDataAttributter.opprett()
                 .leggTil(StandardAbacAttributtType.BEHANDLING_ID, BEHANDLING_ID)
-                .leggTil(TilbakekrevingAbacAttributtType.FPSAK_BEHANDLING_UUID, FPSAK_BEHANDLING_UUID));
+                .leggTil(TilbakekrevingAbacAttributtType.YTELSEBEHANDLING_UUID, FPSAK_BEHANDLING_UUID));
 
         requestBuilder.lagPdpRequest(attributter);
     }
@@ -189,7 +189,7 @@ public class FPPdpRequestBuilderTest {
         AbacAttributtSamling attributter = byggAbacAttributtsamling().leggTil(
             AbacDataAttributter.opprett()
                 .leggTil(StandardAbacAttributtType.BEHANDLING_UUID, BEHANDLING_UUID)
-                .leggTil(TilbakekrevingAbacAttributtType.FPSAK_BEHANDLING_UUID, FPSAK_BEHANDLING_UUID));
+                .leggTil(TilbakekrevingAbacAttributtType.YTELSEBEHANDLING_UUID, FPSAK_BEHANDLING_UUID));
 
         requestBuilder.lagPdpRequest(attributter);
     }

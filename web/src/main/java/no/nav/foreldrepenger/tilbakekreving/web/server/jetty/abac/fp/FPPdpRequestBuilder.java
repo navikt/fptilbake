@@ -43,7 +43,7 @@ public class FPPdpRequestBuilder implements PdpRequestBuilder {
 
     public static final String ABAC_DOMAIN = "foreldrepenger";
 
-    private static final MdcExtendedLogContext MDC_EXTENDED_LOG_CONTEXT = MdcExtendedLogContext.getContext("prosess"); //$NON-NLS-1$
+    private static final MdcExtendedLogContext LOG_CONTEXT = MdcExtendedLogContext.getContext("prosess"); //$NON-NLS-1$
 
     private static final Logger logger = LoggerFactory.getLogger(FPPdpRequestBuilder.class);
 
@@ -63,13 +63,13 @@ public class FPPdpRequestBuilder implements PdpRequestBuilder {
     @Override
     public PdpRequest lagPdpRequest(AbacAttributtSamling attributter) {
         logger.info("Bruker PdpRequestBuilder for FP");
-        MDC_EXTENDED_LOG_CONTEXT.remove("behandling");
-        MDC_EXTENDED_LOG_CONTEXT.remove("fpsakBehandlingUuid");
-        MDC_EXTENDED_LOG_CONTEXT.remove("behandlingUuid");
+        LOG_CONTEXT.remove("behandling");
+        LOG_CONTEXT.remove("fpsakBehandlingUuid");
+        LOG_CONTEXT.remove("behandlingUuid");
 
         Optional<Long> behandlingId = utledBehandlingId(attributter);
         Optional<UUID> behandlingUuid = utledBehandlingUuId(attributter);
-        Optional<UUID> fpsakBehandlingId = utledFpsakBehandlingId(attributter);
+        Optional<UUID> fpsakBehandlingId = utledYtelsebehandlingUuid(attributter);
         if (behandlingId.isPresent() && fpsakBehandlingId.isPresent()) {
             throw PdpRequestBuilderFeil.FACTORY.ugyldigInputFlereBehandlinger(behandlingId.get(), fpsakBehandlingId.get()).toException();
         }
@@ -95,7 +95,7 @@ public class FPPdpRequestBuilder implements PdpRequestBuilder {
         //legger til utledede attributter til AbacAttributtSamling, slik at de kan bli logget til sporingslogg
         AbacDataAttributter utlededeAttributter = AbacDataAttributter.opprett();
         utlededeAttributter.leggTil(StandardAbacAttributtType.AKTØR_ID, aktørIder);
-        fpsakBehandlingId.ifPresent(uuid -> utlededeAttributter.leggTil(TilbakekrevingAbacAttributtType.FPSAK_BEHANDLING_UUID, uuid));
+        fpsakBehandlingId.ifPresent(uuid -> utlededeAttributter.leggTil(TilbakekrevingAbacAttributtType.YTELSEBEHANDLING_UUID, uuid));
         behandlingUuid.ifPresent(uuid -> utlededeAttributter.leggTil(StandardAbacAttributtType.BEHANDLING_UUID, uuid));
         attributter.leggTil(utlededeAttributter);
 
@@ -105,7 +105,7 @@ public class FPPdpRequestBuilder implements PdpRequestBuilder {
     }
 
     private PipBehandlingData hentFpsakBehandlingData(UUID fpsakBehandlingUuid) {
-        MDC_EXTENDED_LOG_CONTEXT.add("fpsakBehandlingUuid", fpsakBehandlingUuid);
+        LOG_CONTEXT.add("fpsakBehandlingUuid", fpsakBehandlingUuid);
         PipDto pipDto = fpsakPipKlient.hentPipdataForFpsakBehandling(fpsakBehandlingUuid);
         PipBehandlingData data = new PipBehandlingData();
         data.setFagsakstatus(pipDto.getFagsakStatus());
@@ -115,7 +115,7 @@ public class FPPdpRequestBuilder implements PdpRequestBuilder {
     }
 
     private PipBehandlingData lagBehandlingData(Long behandlingId) {
-        MDC_EXTENDED_LOG_CONTEXT.add("behandling", behandlingId);
+        LOG_CONTEXT.add("behandling", behandlingId);
         Optional<PipBehandlingData> behandlingDataOpt = pipRepository.hentBehandlingData(behandlingId);
         if (behandlingDataOpt.isPresent()) {
             return behandlingDataOpt.get();
@@ -125,7 +125,7 @@ public class FPPdpRequestBuilder implements PdpRequestBuilder {
     }
 
     private PipBehandlingData lagBehandlingData(UUID behandlingUuid) {
-        MDC_EXTENDED_LOG_CONTEXT.add("behandlingUuid", behandlingUuid);
+        LOG_CONTEXT.add("behandlingUuid", behandlingUuid);
         Optional<PipBehandlingData> behandlingDataOpt = pipRepository.hentBehandlingData(behandlingUuid);
         if (behandlingDataOpt.isPresent()) {
             return behandlingDataOpt.get();
@@ -141,7 +141,7 @@ public class FPPdpRequestBuilder implements PdpRequestBuilder {
         pdpRequest.put(CommonAttributter.XACML_1_0_ACTION_ACTION_ID, attributter.getActionType().getEksternKode());
         pdpRequest.put(CommonAttributter.RESOURCE_FELLES_RESOURCE_TYPE, attributter.getResource());
         pdpRequest.put(CommonAttributter.RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE, aktørId);
-        pdpRequest.put(ForeldrepengerAttributter.RESOURCE_FORELDREPENGER_SAK_AKSJONSPUNKT_TYPE, aksjonspunktType);
+        pdpRequest.put(FpAbacAttributter.RESOURCE_FORELDREPENGER_SAK_AKSJONSPUNKT_TYPE, aksjonspunktType);
         return pdpRequest;
     }
 
@@ -149,11 +149,11 @@ public class FPPdpRequestBuilder implements PdpRequestBuilder {
         PdpRequest pdpRequest = lagPdpRequest(attributter, aktørId, aksjonspunktType);
 
         oversettFagstatus(behandlingData.getFagsakstatus())
-            .ifPresent(it -> pdpRequest.put(ForeldrepengerAttributter.RESOURCE_FORELDREPENGER_SAK_SAKSSTATUS, it.getEksternKode()));
+            .ifPresent(it -> pdpRequest.put(FpAbacAttributter.RESOURCE_FORELDREPENGER_SAK_SAKSSTATUS, it.getEksternKode()));
         oversettBehandlingStatus(behandlingData.getStatusForBehandling())
-            .ifPresent(it -> pdpRequest.put(ForeldrepengerAttributter.RESOURCE_FORELDREPENGER_SAK_BEHANDLINGSSTATUS, it.getEksternKode()));
+            .ifPresent(it -> pdpRequest.put(FpAbacAttributter.RESOURCE_FORELDREPENGER_SAK_BEHANDLINGSSTATUS, it.getEksternKode()));
         behandlingData.getAnsvarligSaksbehandler()
-            .ifPresent(it -> pdpRequest.put(ForeldrepengerAttributter.RESOURCE_FORELDREPENGER_SAK_ANSVARLIG_SAKSBEHANDLER, it));
+            .ifPresent(it -> pdpRequest.put(FpAbacAttributter.RESOURCE_FORELDREPENGER_SAK_ANSVARLIG_SAKSBEHANDLER, it));
 
         return pdpRequest;
     }
@@ -200,8 +200,8 @@ public class FPPdpRequestBuilder implements PdpRequestBuilder {
         throw PdpRequestBuilderFeil.FACTORY.ugyldigInputFlereBehandlingUuider(behandlingUuider).toException();
     }
 
-    private Optional<UUID> utledFpsakBehandlingId(AbacAttributtSamling attributter) {
-        Set<UUID> behandlingUuider = attributter.getVerdier(TilbakekrevingAbacAttributtType.FPSAK_BEHANDLING_UUID);
+    private Optional<UUID> utledYtelsebehandlingUuid(AbacAttributtSamling attributter) {
+        Set<UUID> behandlingUuider = attributter.getVerdier(TilbakekrevingAbacAttributtType.YTELSEBEHANDLING_UUID);
         if (behandlingUuider.isEmpty()) {
             return Optional.empty();
         } else if (behandlingUuider.size() == 1) {

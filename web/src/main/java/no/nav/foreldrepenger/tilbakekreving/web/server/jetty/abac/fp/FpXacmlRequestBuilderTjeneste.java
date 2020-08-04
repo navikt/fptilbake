@@ -45,7 +45,7 @@ public class FpXacmlRequestBuilderTjeneste implements XacmlRequestBuilderTjenest
     }
 
     private int antallAksjonspunktTyper(PdpRequest pdpRequest) {
-        return pdpRequest.getAntall(ForeldrepengerAttributter.RESOURCE_FORELDREPENGER_SAK_AKSJONSPUNKT_TYPE);
+        return pdpRequest.getAntall(FpAbacAttributter.RESOURCE_FORELDREPENGER_SAK_AKSJONSPUNKT_TYPE);
     }
 
     private XacmlAttributeSet byggXacmlResourceAttrSet(PdpRequest pdpRequest, int index) {
@@ -61,13 +61,10 @@ public class FpXacmlRequestBuilderTjeneste implements XacmlRequestBuilderTjenest
             int kalkulertIndex = (index - antallFnrPåRequest) % Math.max(pdpRequest.getAntall(CommonAttributter.RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE), 1);
             setOptionalListValueinAttributeSet(resourceAttributeSet, pdpRequest, CommonAttributter.RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE, kalkulertIndex);
         }
-        setOptionalListValueinAttributeSet(resourceAttributeSet, pdpRequest, ForeldrepengerAttributter.RESOURCE_FORELDREPENGER_SAK_AKSJONSPUNKT_TYPE, (index / Math.max(antallIdenter(pdpRequest), 1)));
-        setOptionalValueinAttributeSet(resourceAttributeSet, pdpRequest, ForeldrepengerAttributter.RESOURCE_FORELDREPENGER_SAK_SAKSSTATUS);
-        setOptionalValueinAttributeSet(resourceAttributeSet, pdpRequest, ForeldrepengerAttributter.RESOURCE_FORELDREPENGER_SAK_BEHANDLINGSSTATUS);
-        setOptionalValueinAttributeSet(resourceAttributeSet, pdpRequest, ForeldrepengerAttributter.RESOURCE_FORELDREPENGER_SAK_ANSVARLIG_SAKSBEHANDLER);
-
-        int kalkulertOppgaveIndex = index % Math.max(pdpRequest.getAntall(ForeldrepengerAttributter.FORELDREPENGER_OPPGAVESTYRING_AVDELINGSENHET), 1);
-        setOptionalListValueinAttributeSet(resourceAttributeSet, pdpRequest, ForeldrepengerAttributter.FORELDREPENGER_OPPGAVESTYRING_AVDELINGSENHET, kalkulertOppgaveIndex);
+        setOptionalListValueinAttributeSet(resourceAttributeSet, pdpRequest, FpAbacAttributter.RESOURCE_FORELDREPENGER_SAK_AKSJONSPUNKT_TYPE, (index / Math.max(antallIdenter(pdpRequest), 1)));
+        setOptionalValueinAttributeSet(resourceAttributeSet, pdpRequest, FpAbacAttributter.RESOURCE_FORELDREPENGER_SAK_SAKSSTATUS);
+        setOptionalValueinAttributeSet(resourceAttributeSet, pdpRequest, FpAbacAttributter.RESOURCE_FORELDREPENGER_SAK_BEHANDLINGSSTATUS);
+        setOptionalValueinAttributeSet(resourceAttributeSet, pdpRequest, FpAbacAttributter.RESOURCE_FORELDREPENGER_SAK_ANSVARLIG_SAKSBEHANDLER);
 
         return resourceAttributeSet;
     }
