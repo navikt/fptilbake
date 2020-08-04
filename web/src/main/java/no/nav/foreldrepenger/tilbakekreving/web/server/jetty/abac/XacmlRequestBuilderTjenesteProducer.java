@@ -15,18 +15,18 @@ import no.nav.vedtak.konfig.KonfigVerdi;
 import no.nav.vedtak.sikkerhet.pdp.XacmlRequestBuilderTjeneste;
 
 @ApplicationScoped
-public class XacmlRequestBuilderTjenesteProcuer {
+public class XacmlRequestBuilderTjenesteProducer {
 
-    private static final Logger logger = LoggerFactory.getLogger(XacmlRequestBuilderTjenesteProcuer.class);
+    private static final Logger logger = LoggerFactory.getLogger(XacmlRequestBuilderTjenesteProducer.class);
 
     private XacmlRequestBuilderTjeneste xacmlRequestBuilderTjeneste;
 
-    XacmlRequestBuilderTjenesteProcuer() {
+    XacmlRequestBuilderTjenesteProducer() {
     }
 
     @Inject
-    public XacmlRequestBuilderTjenesteProcuer(@KonfigVerdi(value = "app.name") String applikasjon,
-                                              @Any Instance<XacmlRequestBuilderTjeneste> xacmlRequestBuilderTjenester) {
+    public XacmlRequestBuilderTjenesteProducer(@KonfigVerdi(value = "app.name") String applikasjon,
+                                               @Any Instance<XacmlRequestBuilderTjeneste> xacmlRequestBuilderTjenester) {
         switch (applikasjon) {
             case "fptilbake":
                 logger.info("Bruker XacmlRequestBuilderTjeneste for fptilbake");

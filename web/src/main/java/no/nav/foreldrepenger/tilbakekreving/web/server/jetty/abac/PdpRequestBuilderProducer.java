@@ -15,17 +15,17 @@ import no.nav.vedtak.konfig.KonfigVerdi;
 import no.nav.vedtak.sikkerhet.abac.PdpRequestBuilder;
 
 @ApplicationScoped
-public class PdpRequestBuilderPruducer {
+public class PdpRequestBuilderProducer {
 
-    private static final Logger logger = LoggerFactory.getLogger(PdpRequestBuilderPruducer.class);
+    private static final Logger logger = LoggerFactory.getLogger(PdpRequestBuilderProducer.class);
 
     private PdpRequestBuilder pdpRequestBuilder;
 
-    PdpRequestBuilderPruducer() {
+    PdpRequestBuilderProducer() {
     }
 
     @Inject
-    public PdpRequestBuilderPruducer(@KonfigVerdi(value = "app.name") String applikasjon,
+    public PdpRequestBuilderProducer(@KonfigVerdi(value = "app.name") String applikasjon,
                                      @Any Instance<PdpRequestBuilder> pdpRequestBuilders) {
         switch (applikasjon) {
             case "fptilbake":

@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.tilbakekrevingsgrunnlag;
+package no.nav.foreldrepenger.tilbakekreving.web.server.jetty.testtjenester;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -25,8 +25,6 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
-import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.testtjenester.GrunnlagRestTestTjenesteLocalDev;
-import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.testtjenester.KravgrunnlagDto;
 
 public class GrunnlagRestTestTjenesteTest {
 

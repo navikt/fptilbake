@@ -4,7 +4,7 @@ public class JettyDevKonfigurasjon extends JettyWebKonfigurasjon {
     private static final int SSL_SERVER_PORT = 8444;
     private static int DEFAULT_DEV_SERVER_PORT = 8030;
 
-    JettyDevKonfigurasjon(){
+    JettyDevKonfigurasjon() {
         super(DEFAULT_DEV_SERVER_PORT);
     }
 
