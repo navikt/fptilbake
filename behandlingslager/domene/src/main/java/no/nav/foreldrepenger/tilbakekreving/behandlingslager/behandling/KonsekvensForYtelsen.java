@@ -1,5 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling;
 
+import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -9,12 +11,11 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
-@JsonFormat(shape = JsonFormat.Shape.STRING)
-@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
 public enum KonsekvensForYtelsen implements Kodeverdi {
 
     FORELDREPENGER_OPPHØRER("FORELDREPENGER_OPPHØRER","Foreldrepenger opphører"),
@@ -31,14 +32,17 @@ public enum KonsekvensForYtelsen implements Kodeverdi {
 
     private static final Map<String, KonsekvensForYtelsen> KODER = new LinkedHashMap<>();
 
-    @JsonValue
     private String kode;
 
     @JsonIgnore
     private String navn;
 
-    private KonsekvensForYtelsen(String kode){ //NOSONAR
-        this.kode = kode;
+    static {
+        for (var v : values()) {
+            if (KODER.putIfAbsent(v.kode, v) != null) {
+                throw new IllegalArgumentException("Duplikat : " + v.kode);
+            }
+        }
     }
 
     private KonsekvensForYtelsen(String kode, String navn){
@@ -62,6 +66,7 @@ public enum KonsekvensForYtelsen implements Kodeverdi {
         return Collections.unmodifiableMap(KODER);
     }
 
+    @JsonProperty
     @Override
     public java.lang.String getKode() {
         return kode;
@@ -72,6 +77,7 @@ public enum KonsekvensForYtelsen implements Kodeverdi {
         return getKode();
     }
 
+    @JsonProperty
     @Override
     public java.lang.String getKodeverk() {
         return KODEVERK;

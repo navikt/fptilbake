@@ -3,16 +3,15 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.kodeverk;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Begrunnelse;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Tema;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KonsekvensForYtelsen;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.BasisKodeverdi;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.kodeverk.app.HentKodeverkTjeneste;
 
 public class KodeverkRestTjenesteTest {
@@ -25,15 +24,14 @@ public class KodeverkRestTjenesteTest {
         KodeverkRestTjeneste tjeneste = new KodeverkRestTjeneste(hentKodeverkTjeneste);
         Map<String, Object> gruppertKodeliste = tjeneste.hentGruppertKodeliste();
 
-        assertThat(gruppertKodeliste.keySet()).containsOnly(Tema.class.getSimpleName(), Begrunnelse.class.getSimpleName());
-        assertThat(gruppertKodeliste.get(Tema.class.getSimpleName()))
-                .isEqualTo(Arrays.asList(Tema.FORELDREPENGER, Tema.SYKEPENGER));
+        assertThat(gruppertKodeliste.keySet()).containsOnly(KonsekvensForYtelsen.class.getSimpleName());
+        assertThat(gruppertKodeliste.get(KonsekvensForYtelsen.class.getSimpleName()))
+                .isEqualTo(Arrays.asList(KonsekvensForYtelsen.ENDRING_I_BEREGNING, KonsekvensForYtelsen.ENDRING_I_UTTAK));
     }
 
-    private static Map<String, List<Kodeliste>> getGruppertKodeliste() {
-        Map<String, List<Kodeliste>> map = new HashMap<>();
-        map.put(Tema.class.getSimpleName(), Arrays.asList(Tema.FORELDREPENGER, Tema.SYKEPENGER));
-        map.put(Begrunnelse.class.getSimpleName(), Arrays.asList(Begrunnelse.ARBEID_OPPHOERT));
+    private static Map<String, Collection<? extends BasisKodeverdi>> getGruppertKodeliste() {
+        Map<String, Collection<? extends BasisKodeverdi>> map = new HashMap<>();
+        map.put(KonsekvensForYtelsen.class.getSimpleName(), Arrays.asList(KonsekvensForYtelsen.ENDRING_I_BEREGNING, KonsekvensForYtelsen.ENDRING_I_UTTAK));
         return map;
     }
 }
