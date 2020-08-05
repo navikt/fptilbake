@@ -2,7 +2,6 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning;
 
 import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.CREATE;
 import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.READ;
-import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursResourceAttributt.DRIFT;
 
 import java.util.Collection;
 
@@ -38,6 +37,7 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagValidator;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.TilbakekrevingsvedtakMarshaller;
 import no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste.TilbakekrevingsvedtakTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.MeldingType;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiSendtXmlRepository;
@@ -97,7 +97,7 @@ public class ForvaltningBehandlingRestTjeneste {
             @ApiResponse(responseCode = "400", description = "Behandlingen er avsluttet"),
             @ApiResponse(responseCode = "500", description = "Feilet pga ukjent feil.")
         })
-    @BeskyttetRessurs(action = CREATE, ressurs = DRIFT)
+    @BeskyttetRessurs(action = CREATE, property = AbacProperty.DRIFT)
     public Response tvingHenleggelseBehandling(@QueryParam("behandlingId") @NotNull @Valid BehandlingIdDto behandlingIdDto) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingIdDto.getBehandlingId());
         if (behandling.erAvsluttet()) {
@@ -118,7 +118,7 @@ public class ForvaltningBehandlingRestTjeneste {
             @ApiResponse(responseCode = "400", description = "Behandlingen er avsluttet eller behandlingen er ikke på vent"),
             @ApiResponse(responseCode = "500", description = "Feilet pga ukjent feil.")
         })
-    @BeskyttetRessurs(action = CREATE, ressurs = DRIFT)
+    @BeskyttetRessurs(action = CREATE, property = AbacProperty.DRIFT)
     public Response tvingGjenopptaBehandling(@NotNull @QueryParam("behandlingId") @Valid BehandlingIdDto behandlingIdDto) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingIdDto.getBehandlingId());
         if (behandling.erAvsluttet() || !behandling.isBehandlingPåVent()) {
@@ -140,7 +140,7 @@ public class ForvaltningBehandlingRestTjeneste {
             @ApiResponse(responseCode = "400", description = "Ulike problemer med request, typisk at man peker på feil XML eller behandling."),
             @ApiResponse(responseCode = "500", description = "Feilet pga ugyldig kravgrunnlag, eller ukjent feil.")
         })
-    @BeskyttetRessurs(action = CREATE, ressurs = DRIFT)
+    @BeskyttetRessurs(action = CREATE, property = AbacProperty.DRIFT)
     public Response tvingkobleBehandlingTilGrunnlag(@Valid @NotNull KobleBehandlingTilGrunnlagDto behandlingTilGrunnlagDto) {
         try {
             kobleBehandling(behandlingTilGrunnlagDto);
@@ -165,7 +165,7 @@ public class ForvaltningBehandlingRestTjeneste {
             @ApiResponse(responseCode = "200", description = "Hent korrigerte grunnlag og tilkoblet det med en behandling"),
             @ApiResponse(responseCode = "400", description = "Behandling er avsluttet eller ikke gyldig")
         })
-    @BeskyttetRessurs(action = CREATE, ressurs = DRIFT)
+    @BeskyttetRessurs(action = CREATE, property = AbacProperty.DRIFT)
     public Response hentKorrigertKravgrunnlag(@Valid @NotNull HentKorrigertKravgrunnlagDto hentKorrigertKravgrunnlagDto) {
         Behandling behandling = behandlingRepository.hentBehandling(hentKorrigertKravgrunnlagDto.getBehandlingId());
         if (behandling.erAvsluttet()) {
@@ -185,7 +185,7 @@ public class ForvaltningBehandlingRestTjeneste {
             @ApiResponse(responseCode = "200", description = "Hent xml til økonomi"),
             @ApiResponse(responseCode = "400", description = "Behandling eksisterer ikke")
         })
-    @BeskyttetRessurs(action = READ, ressurs = DRIFT)
+    @BeskyttetRessurs(action = READ, property = AbacProperty.DRIFT)
     public Response hentOkoXmlForFeiletIverksetting(@NotNull @QueryParam("behandlingId") @Valid BehandlingIdDto behandlingIdDto) {
         Long behandlingId = behandlingIdDto.getBehandlingId();
         logger.info("Henter xml til økonomi for behandling: {}", behandlingId);

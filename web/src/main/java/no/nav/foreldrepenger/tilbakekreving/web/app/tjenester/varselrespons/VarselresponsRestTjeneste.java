@@ -1,34 +1,34 @@
     package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.varselrespons;
 
-import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.READ;
-import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.UPDATE;
-import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursResourceAttributt.FAGSAK;
+    import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.READ;
+    import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.UPDATE;
 
-import java.util.Optional;
+    import java.util.Optional;
 
-import javax.enterprise.context.RequestScoped;
-import javax.inject.Inject;
-import javax.transaction.Transactional;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+    import javax.enterprise.context.RequestScoped;
+    import javax.inject.Inject;
+    import javax.transaction.Transactional;
+    import javax.validation.Valid;
+    import javax.validation.constraints.NotNull;
+    import javax.ws.rs.Consumes;
+    import javax.ws.rs.GET;
+    import javax.ws.rs.POST;
+    import javax.ws.rs.Path;
+    import javax.ws.rs.Produces;
+    import javax.ws.rs.QueryParam;
+    import javax.ws.rs.core.MediaType;
+    import javax.ws.rs.core.Response;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.varselrespons.ResponsKanal;
-import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
-import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
+    import io.swagger.v3.oas.annotations.Operation;
+    import io.swagger.v3.oas.annotations.media.Content;
+    import io.swagger.v3.oas.annotations.media.Schema;
+    import io.swagger.v3.oas.annotations.responses.ApiResponse;
+    import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjeneste;
+    import no.nav.foreldrepenger.tilbakekreving.varselrespons.ResponsKanal;
+    import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
+    import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
+    import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
+    import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 
 @Path(value = "/varsel/respons")
 @Produces(value = MediaType.APPLICATION_JSON)
@@ -58,7 +58,7 @@ public class VarselresponsRestTjeneste {
             @ApiResponse(responseCode = "404", description = "Response finnes ikke")
         })
     @Path(value = "/hent-respons")
-    @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
+    @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
     public Response finnRespons(@Valid @NotNull @QueryParam("behandlingId") BehandlingIdDto behandlingIdDto) {
         Optional<VarselresponsDto> responsDto = responsTjeneste.hentRespons(behandlingIdDto.getBehandlingId()).map(VarselresponsDto::fraDomene);
         if (responsDto.isPresent()) {
@@ -75,7 +75,7 @@ public class VarselresponsRestTjeneste {
             @ApiResponse(responseCode = "200", description = "Respons registrert")
         })
     @Path(value = "/registrer")
-    @BeskyttetRessurs(action = UPDATE, ressurs = FAGSAK)
+    @BeskyttetRessurs(action = UPDATE, property = AbacProperty.FAGSAK)
     public Response registrerBrukerrespons(@Valid @NotNull VarselresponsDto brukerRespons) {
         responsTjeneste.lagreRespons(brukerRespons.getBehandlingId(), ResponsKanal.SELVBETJENING, brukerRespons.getAkseptertFaktagrunnlag());
         gjenopptaBehandlingTjeneste.fortsettBehandling(brukerRespons.getBehandlingId());
