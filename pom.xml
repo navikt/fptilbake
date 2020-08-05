@@ -14,6 +14,7 @@
         <module>behandlingslager</module>
         <module>domenetjenester</module>
         <module>web</module>
+        <module>web-dev</module>
         <module>migreringer</module>
         <module>behandlingsprosess</module>
         <module>infrastrukturtjenester</module>

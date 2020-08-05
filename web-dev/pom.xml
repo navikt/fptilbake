@@ -10,7 +10,7 @@
     </parent>
 
     <groupId>no.nav.foreldrepenger.tilbakekreving.web</groupId>
-    <artifactId>no.nav.foreldrepenger.tilbakekreving.web-dev</artifactId>
+    <artifactId>web-dev</artifactId>
     <packaging>jar</packaging>
     <name>FPTILBAKE :: Web :: Development</name>
 
