@@ -23,16 +23,16 @@ public class K9sakPipKlient {
 
     private static final Logger logger = LoggerFactory.getLogger(K9sakPipKlient.class);
 
-    private static final String FPSAK_BASE_URL = "http://k9sak";
-    private static final String FPSAK_OVERRIDE_URL = "k9sak.override.url";
+    private static final String K9SAK_BASE_URL = "http://k9sak";
+    private static final String K9SAK_OVERRIDE_URL = "k9sak.override.url";
 
     private static final String PIP_BEHANDLING_ENDPOINT = "/k9/sak/api/pip/pipdata-for-behandling";
     private static final String PIP_SAK_ENDPOINT = "/k9/sak/api/pip/aktoer-for-sak";
 
     private SystemUserOidcRestClient restClient;
 
-    private URI endpointFpsakBehandlingPip;
-    private URI endpointFpsakSakPip;
+    private URI endpointK9sakBehandlingPip;
+    private URI endpointK9sakSakPip;
 
     public K9sakPipKlient() {
         // CDI
@@ -42,19 +42,19 @@ public class K9sakPipKlient {
     public K9sakPipKlient(SystemUserOidcRestClient restClient) {
         this.restClient = restClient;
         URI baseUri = baseUri();
-        this.endpointFpsakBehandlingPip = UriBuilder.fromUri(baseUri).path(PIP_BEHANDLING_ENDPOINT).build();
-        this.endpointFpsakSakPip = UriBuilder.fromUri(baseUri).path(PIP_SAK_ENDPOINT).build();
+        this.endpointK9sakBehandlingPip = UriBuilder.fromUri(baseUri).path(PIP_BEHANDLING_ENDPOINT).build();
+        this.endpointK9sakSakPip = UriBuilder.fromUri(baseUri).path(PIP_SAK_ENDPOINT).build();
     }
 
     public K9PipDto hentPipdataForK9sakBehandling(UUID behandlingUUid) {
-        URI uri = UriBuilder.fromUri(endpointFpsakBehandlingPip)
+        URI uri = UriBuilder.fromUri(endpointK9sakBehandlingPip)
             .queryParam("behandlingUuid", behandlingUUid.toString())
             .build();
         return restClient.get(uri, K9PipDto.class);
     }
 
     public Set<String> hentAktørIderSomString(Saksnummer saksnummer) {
-        URI uri = UriBuilder.fromUri(endpointFpsakSakPip)
+        URI uri = UriBuilder.fromUri(endpointK9sakSakPip)
             .queryParam("saksnummer", saksnummer.getVerdi())
             .build();
 
@@ -69,11 +69,11 @@ public class K9sakPipKlient {
     }
 
     private URI baseUri() {
-        String override = PropertyUtil.getProperty(FPSAK_OVERRIDE_URL);
+        String override = PropertyUtil.getProperty(K9SAK_OVERRIDE_URL);
         if (override != null && !override.isEmpty()) {
             logger.warn("Overstyrer fpsak base URL med {}", override);
             return URI.create(override);
         }
-        return URI.create(FPSAK_BASE_URL);
+        return URI.create(K9SAK_BASE_URL);
     }
 }
