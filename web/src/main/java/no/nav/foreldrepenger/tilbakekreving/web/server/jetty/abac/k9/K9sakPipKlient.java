@@ -71,7 +71,7 @@ public class K9sakPipKlient {
     private URI baseUri() {
         String override = PropertyUtil.getProperty(K9SAK_OVERRIDE_URL);
         if (override != null && !override.isEmpty()) {
-            logger.warn("Overstyrer fpsak base URL med {}", override);
+            logger.warn("Overstyrer k9sak base URL med {}", override);
             return URI.create(override);
         }
         return URI.create(K9SAK_BASE_URL);
