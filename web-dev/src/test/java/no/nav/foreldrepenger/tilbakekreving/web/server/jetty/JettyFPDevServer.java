@@ -37,6 +37,13 @@ public class JettyFPDevServer extends JettyServer {
     private static boolean vtp;
 
     public static void main(String[] args) throws Exception {
+        /* holder ikke å konfigurere disse i fptilbake.application.properties, da den ikke leses av Environment-klassen */
+        System.setProperty("abac.attributt.applikasjon", "no.nav.abac.attributter.foreldrepenger");
+        System.setProperty("abac.attributt.fagsak", "no.nav.abac.attributter.foreldrepenger.fagsak");
+        System.setProperty("abac.attributt.ventefrist", "no.nav.abac.attributter.foreldrepenger.fagsak.ventefrist");
+        System.setProperty("abac.attributt.drift", "no.nav.abac.attributter.foreldrepenger.drift");
+        System.setProperty("abac.attributt.batch", "no.nav.abac.attributter.foreldrepenger.batch");
+
         for (String arg : args) {
             if (arg.equals(VTP_ARGUMENT)) {
                 vtp = true;

@@ -38,6 +38,13 @@ public class JettyK9DevServer extends JettyServer {
     private static boolean vtp;
 
     public static void main(String[] args) throws Exception {
+        /* holder ikke å konfigurere disse i k9tilbake.application.properties, da den ikke leses av Environment-klassen */
+        System.setProperty("abac.attributt.applikasjon","no.nav.abac.attributter.k9");
+        System.setProperty("abac.attributt.fagsak","no.nav.abac.attributter.k9.fagsak");
+        System.setProperty("abac.attributt.ventefrist","no.nav.abac.attributter.k9.fagsak.ventefrist");
+        System.setProperty("abac.attributt.drift","no.nav.abac.attributter.k9.drift");
+        System.setProperty("abac.attributt.batch","no.nav.abac.attributter.k9.batch");
+
         for (String arg : args) {
             if (arg.equals(VTP_ARGUMENT)) {
                 vtp = true;

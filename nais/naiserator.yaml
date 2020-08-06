@@ -66,15 +66,23 @@ spec:
    - name: {{@key}}
      value: "{{this}}"
   {{/each}}
+   - name: APP_NAME
+     value: "fptilbake"
+   - name: ABAC_ATTRIBUTT_APPLIKASJON
+     value: "no.nav.abac.attributter.foreldrepenger"
+   - name: ABAC_ATTRIBUTT_FAGSAK
+     value: "no.nav.abac.attributter.foreldrepenger.fagsak"
+   - name: ABAC_ATTRIBUTT_VENTEFRIST
+     value: "no.nav.abac.attributter.foreldrepenger.fagsak.ventefrist"
+   - name: ABAC_ATTRIBUTT_BATCH
+     value: "no.nav.abac.attributter.foreldrepenger.batch"
+   - name: ABAC_ATTRIBUTT_DRIFT
+     value: "no.nav.abac.attributter.foreldrepenger.drift"
    - name: AUDITLOGGER_ENABLED
      value: "false"
    - name: AUDITLOGGER_VENDOR
      value: "fp"
    - name: AUDITLOGGER_PRODUCT
-     value: "fptilbake"
-   - name: ABAC_ATTRIBUTT_DRIFT
-     value: "no.nav.abac.attributter.foreldrepenger.drift"
-   - name: APP_NAME
      value: "fptilbake"
    - name: APPDYNAMICS_CONTROLLER_HOST_NAME
      value: "appdynamics.adeo.no"
