@@ -3,7 +3,6 @@ package no.nav.foreldrepenger.tilbakekreving.web.server.jetty.testtjenester;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType.ORGANISASJON;
 import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.UPDATE;
-import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursResourceAttributt.FAGSAK;
 
 import java.util.Optional;
 
@@ -39,6 +38,7 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.tilbakekrevingsgrunnlag.GrunnlagRestTestTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 
 @Path(GrunnlagRestTestTjenesteLocalDev.PATH_FRAGMENT)
@@ -66,7 +66,7 @@ public class GrunnlagRestTestTjenesteLocalDev implements GrunnlagRestTestTjenest
     @POST
     @Timed
     @Operation(tags = "kravgrunnlag", description = "Lagre tilbakekrevingsgrunnlag fra økonomi")
-    @BeskyttetRessurs(action = UPDATE, ressurs = FAGSAK)
+    @BeskyttetRessurs(action = UPDATE, property = AbacProperty.FAGSAK)
     public Response lagreUtbetalinger(@NotNull @QueryParam("behandlingId") @Valid BehandlingIdDto idDto,
                                       @NotNull @Valid KravgrunnlagDto kravgrunnlagDto) {
 

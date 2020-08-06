@@ -22,6 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.fp.FpXacmlRequestBuilderTjeneste;
 import no.nav.vedtak.sikkerhet.abac.AbacIdToken;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessursResourceAttributt;
@@ -37,12 +38,12 @@ public class XacmlRequestBuilderTjenesteImplTest {
     public static final String JWT_TOKEN = "ew0KICAidHlwIjogIkpXVCIsDQogICJraWQiOiAiZm9vIiwNCiAgImFsZyI6ICJSUzI1NiINCn0.ew0KICAiYXVkIjogIk9JREMiLA0KICAiYXpwIjogIk9JREMiLA0KICAiYXV0aF90aW1lIjogMTQ5ODAzOTkxNCwNCiAgImV4cCI6IDE0OTgwNDM1MTUsDQogICJpYXQiOiAxNDk4MDM5OTE1LA0KICAiaXNzIjogImh0dHBzOi8vZm9vLmJhci5ubzo0NDMvaXNzby9vYXV0aDIiLA0KICAicmVhbG0iOiAiLyIsDQogICJzdWIiOiAic29tZW9uZSIsDQogICJ0b2tlblR5cGUiOiAiSldUVG9rZW4iDQp9.asdf";
     private PdpKlientImpl pdpKlient;
     private PdpConsumer pdpConsumerMock;
-    private XacmlRequestBuilderTjenesteImpl xamlRequestBuilderTjeneste;
+    private FpXacmlRequestBuilderTjeneste xamlRequestBuilderTjeneste;
 
     @Before
     public void setUp() {
         pdpConsumerMock = mock(PdpConsumer.class);
-        xamlRequestBuilderTjeneste = new XacmlRequestBuilderTjenesteImpl();
+        xamlRequestBuilderTjeneste = new FpXacmlRequestBuilderTjeneste();
         pdpKlient = new PdpKlientImpl(pdpConsumerMock, xamlRequestBuilderTjeneste);
     }
 

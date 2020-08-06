@@ -35,13 +35,13 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.MigrerSakshendleserTilDvhTask;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.FagsystemId;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.DvhEventHendelse;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt;
-import no.nav.vedtak.sikkerhet.abac.BeskyttetRessursResourceAttributt;
 
 @Path("/migrasjon")
 @ApplicationScoped
@@ -77,7 +77,7 @@ public class MigrasjonRestTjeneste {
             @ApiResponse(responseCode = "200", description = "Migrasjon er ferdig"),
             @ApiResponse(responseCode = "500", description = "Feilet pga ukjent feil.")
         })
-    @BeskyttetRessurs(action = BeskyttetRessursActionAttributt.CREATE, ressurs = BeskyttetRessursResourceAttributt.DRIFT)
+    @BeskyttetRessurs(action = BeskyttetRessursActionAttributt.CREATE, property = AbacProperty.DRIFT)
     public Response migrereSaksnummerIOkoXmlMottatt() {
         List<ØkonomiXmlMottatt> xmlMeldinger = økonomiMottattXmlRepository.hentAlleMeldingerUtenSaksnummer();
         if (!xmlMeldinger.isEmpty()) {
@@ -108,7 +108,7 @@ public class MigrasjonRestTjeneste {
             @ApiResponse(responseCode = "200", description = "Migrasjon er ferdig"),
             @ApiResponse(responseCode = "500", description = "Feilet pga ukjent feil.")
         })
-    @BeskyttetRessurs(action = BeskyttetRessursActionAttributt.CREATE, ressurs = BeskyttetRessursResourceAttributt.DRIFT)
+    @BeskyttetRessurs(action = BeskyttetRessursActionAttributt.CREATE, property = AbacProperty.DRIFT)
     public Response sendSakshendelserTilDvhForAlleEksisterendeBehandlinger(@QueryParam("hendelse") @NotNull @Valid EventHendelseDto hendelse) {
         DvhEventHendelse eventHendelse = DvhEventHendelse.valueOf(hendelse.getHendelse());
         if (DvhEventHendelse.AKSJONSPUNKT_OPPRETTET.equals(eventHendelse)) {

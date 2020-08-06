@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac;
+package no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.fp;
 
 public enum AbacFagsakStatus {
     OPPRETTET("Opprettet"),

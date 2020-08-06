@@ -22,7 +22,7 @@ import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.util.StatusPrinter;
 
-public class JettyK9DevServer extends JettyServer {
+public class JettyFPDevServer extends JettyServer {
 
     /**
      * @see https://docs.oracle.com/en/java/javase/11/security/java-secure-socket-extension-jsse-reference-guide.html
@@ -31,24 +31,30 @@ public class JettyK9DevServer extends JettyServer {
     private static final String TRUSTSTORE_PATH_PROP = "javax.net.ssl.trustStore";
     private static final String KEYSTORE_PASSW_PROP = "no.nav.modig.security.appcert.password";
     private static final String KEYSTORE_PATH_PROP = "no.nav.modig.security.appcert.keystore";
-    private static final String CONTEXT_PATH = "/k9/tilbake";
 
 
     private static final String VTP_ARGUMENT = "--vtp";
     private static boolean vtp;
 
     public static void main(String[] args) throws Exception {
+        /* holder ikke å konfigurere disse i fptilbake.application.properties, da den ikke leses av Environment-klassen */
+        System.setProperty("abac.attributt.applikasjon", "no.nav.abac.attributter.foreldrepenger");
+        System.setProperty("abac.attributt.fagsak", "no.nav.abac.attributter.foreldrepenger.fagsak");
+        System.setProperty("abac.attributt.ventefrist", "no.nav.abac.attributter.foreldrepenger.fagsak.ventefrist");
+        System.setProperty("abac.attributt.drift", "no.nav.abac.attributter.foreldrepenger.drift");
+        System.setProperty("abac.attributt.batch", "no.nav.abac.attributter.foreldrepenger.batch");
+
         for (String arg : args) {
             if (arg.equals(VTP_ARGUMENT)) {
                 vtp = true;
             }
         }
 
-        JettyK9DevServer devServer = new JettyK9DevServer();
+        JettyFPDevServer devServer = new JettyFPDevServer();
         devServer.bootStrap();
     }
 
-    public JettyK9DevServer() {
+    public JettyFPDevServer() {
         super(new JettyDevKonfigurasjon());
     }
 
@@ -81,8 +87,8 @@ public class JettyK9DevServer extends JettyServer {
     @Override
     protected void konfigurerMiljø() throws Exception {
         System.setProperty("develop-local", "true");
-        PropertiesUtils.lagK9PropertiesFilFraTemplate();
-        PropertiesUtils.initK9Properties(JettyK9DevServer.vtp);
+        PropertiesUtils.lagPropertiesFilFraTemplate();
+        PropertiesUtils.initProperties(JettyFPDevServer.vtp);
     }
 
     @Override
@@ -166,7 +172,6 @@ public class JettyK9DevServer extends JettyServer {
         WebAppContext webAppContext = super.createContext(appKonfigurasjon);
         // https://www.eclipse.org/jetty/documentation/9.4.x/troubleshooting-locked-files-on-windows.html
         webAppContext.setInitParameter("org.eclipse.jetty.servlet.Default.useFileMappedBuffer", "false");
-        webAppContext.setContextPath(CONTEXT_PATH);
         return webAppContext;
     }
 

@@ -1,23 +1,22 @@
-package no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac;
+package no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.fp;
 
 import java.util.List;
 import java.util.Optional;
 
-import javax.annotation.Priority;
-import javax.enterprise.context.Dependent;
-import javax.enterprise.inject.Alternative;
+import javax.enterprise.context.ApplicationScoped;
 
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.Fptilbake;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.CommonAttributter;
 import no.nav.vedtak.sikkerhet.abac.PdpRequest;
 import no.nav.vedtak.sikkerhet.pdp.XacmlRequestBuilderTjeneste;
 import no.nav.vedtak.sikkerhet.pdp.xacml.XacmlAttributeSet;
 import no.nav.vedtak.sikkerhet.pdp.xacml.XacmlRequestBuilder;
 
-@Dependent
-@Alternative
-@Priority(2)
-public class XacmlRequestBuilderTjenesteImpl implements XacmlRequestBuilderTjeneste {
+@ApplicationScoped
+@Fptilbake
+public class FpXacmlRequestBuilderTjeneste implements XacmlRequestBuilderTjeneste {
 
-    public XacmlRequestBuilderTjenesteImpl() {
+    public FpXacmlRequestBuilderTjeneste() {
     }
 
     @Override
@@ -46,7 +45,7 @@ public class XacmlRequestBuilderTjenesteImpl implements XacmlRequestBuilderTjene
     }
 
     private int antallAksjonspunktTyper(PdpRequest pdpRequest) {
-        return pdpRequest.getAntall(ForeldrepengerAttributter.RESOURCE_FORELDREPENGER_SAK_AKSJONSPUNKT_TYPE);
+        return pdpRequest.getAntall(FpAbacAttributter.RESOURCE_FORELDREPENGER_SAK_AKSJONSPUNKT_TYPE);
     }
 
     private XacmlAttributeSet byggXacmlResourceAttrSet(PdpRequest pdpRequest, int index) {
@@ -62,13 +61,10 @@ public class XacmlRequestBuilderTjenesteImpl implements XacmlRequestBuilderTjene
             int kalkulertIndex = (index - antallFnrPåRequest) % Math.max(pdpRequest.getAntall(CommonAttributter.RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE), 1);
             setOptionalListValueinAttributeSet(resourceAttributeSet, pdpRequest, CommonAttributter.RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE, kalkulertIndex);
         }
-        setOptionalListValueinAttributeSet(resourceAttributeSet, pdpRequest, ForeldrepengerAttributter.RESOURCE_FORELDREPENGER_SAK_AKSJONSPUNKT_TYPE, (index / Math.max(antallIdenter(pdpRequest), 1)));
-        setOptionalValueinAttributeSet(resourceAttributeSet, pdpRequest, ForeldrepengerAttributter.RESOURCE_FORELDREPENGER_SAK_SAKSSTATUS);
-        setOptionalValueinAttributeSet(resourceAttributeSet, pdpRequest, ForeldrepengerAttributter.RESOURCE_FORELDREPENGER_SAK_BEHANDLINGSSTATUS);
-        setOptionalValueinAttributeSet(resourceAttributeSet, pdpRequest, ForeldrepengerAttributter.RESOURCE_FORELDREPENGER_SAK_ANSVARLIG_SAKSBEHANDLER);
-
-        int kalkulertOppgaveIndex = index % Math.max(pdpRequest.getAntall(ForeldrepengerAttributter.FORELDREPENGER_OPPGAVESTYRING_AVDELINGSENHET), 1);
-        setOptionalListValueinAttributeSet(resourceAttributeSet, pdpRequest, ForeldrepengerAttributter.FORELDREPENGER_OPPGAVESTYRING_AVDELINGSENHET, kalkulertOppgaveIndex);
+        setOptionalListValueinAttributeSet(resourceAttributeSet, pdpRequest, FpAbacAttributter.RESOURCE_FORELDREPENGER_SAK_AKSJONSPUNKT_TYPE, (index / Math.max(antallIdenter(pdpRequest), 1)));
+        setOptionalValueinAttributeSet(resourceAttributeSet, pdpRequest, FpAbacAttributter.RESOURCE_FORELDREPENGER_SAK_SAKSSTATUS);
+        setOptionalValueinAttributeSet(resourceAttributeSet, pdpRequest, FpAbacAttributter.RESOURCE_FORELDREPENGER_SAK_BEHANDLINGSSTATUS);
+        setOptionalValueinAttributeSet(resourceAttributeSet, pdpRequest, FpAbacAttributter.RESOURCE_FORELDREPENGER_SAK_ANSVARLIG_SAKSBEHANDLER);
 
         return resourceAttributeSet;
     }
