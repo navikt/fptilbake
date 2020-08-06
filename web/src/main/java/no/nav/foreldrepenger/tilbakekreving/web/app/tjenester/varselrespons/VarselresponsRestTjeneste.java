@@ -1,34 +1,34 @@
-    package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.varselrespons;
+package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.varselrespons;
 
-    import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.READ;
-    import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.UPDATE;
+import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.READ;
+import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.UPDATE;
 
-    import java.util.Optional;
+import java.util.Optional;
 
-    import javax.enterprise.context.RequestScoped;
-    import javax.inject.Inject;
-    import javax.transaction.Transactional;
-    import javax.validation.Valid;
-    import javax.validation.constraints.NotNull;
-    import javax.ws.rs.Consumes;
-    import javax.ws.rs.GET;
-    import javax.ws.rs.POST;
-    import javax.ws.rs.Path;
-    import javax.ws.rs.Produces;
-    import javax.ws.rs.QueryParam;
-    import javax.ws.rs.core.MediaType;
-    import javax.ws.rs.core.Response;
+import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
+import javax.transaction.Transactional;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
-    import io.swagger.v3.oas.annotations.Operation;
-    import io.swagger.v3.oas.annotations.media.Content;
-    import io.swagger.v3.oas.annotations.media.Schema;
-    import io.swagger.v3.oas.annotations.responses.ApiResponse;
-    import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjeneste;
-    import no.nav.foreldrepenger.tilbakekreving.varselrespons.ResponsKanal;
-    import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
-    import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
-    import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
-    import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.varselrespons.ResponsKanal;
+import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
+import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 
 @Path(value = "/varsel/respons")
 @Produces(value = MediaType.APPLICATION_JSON)
