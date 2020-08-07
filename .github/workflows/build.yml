@@ -94,7 +94,7 @@ jobs:
           title: Deploy av ${{ env.TAG }}
           labels: deployment
           body: |
-            Kommenter med <b>/promote env namespace</b>, hvor <b>env</b> er et gyldig clusternavn og <b>namespace</b> et eksisterende namespace i det clusteret.
+            Kommenter med  <b>/promote env namespace</b>, hvor <b>env</b> er et gyldig clusternavn og <b>namespace</b> et eksisterende namespace i det clusteret.
 
             <table>
             <tr><th>Cluster</th><th>Namespace</th></tr>
