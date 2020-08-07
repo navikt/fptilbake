@@ -1,19 +1,9 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk;
 
-import javax.persistence.MappedSuperclass;
-
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
 
-@MappedSuperclass
-public abstract class Vurdering extends Kodeliste {
+public interface Vurdering extends Kodeverdi {
 
-    Vurdering() {
-        // For hibernate
-    }
-
-    Vurdering(String kode, String discriminator) {
-        super(kode, discriminator);
-    }
 }
 

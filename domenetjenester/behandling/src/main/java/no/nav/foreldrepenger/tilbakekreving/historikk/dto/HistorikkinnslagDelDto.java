@@ -7,18 +7,19 @@ import java.util.Optional;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagDel;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagFelt;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 
 public class HistorikkinnslagDelDto {
-    private Kodeliste begrunnelse;
+    private Kodeverdi begrunnelse;
     private String begrunnelseFritekst;
     private HistorikkinnslagHendelseDto hendelse;
     private List<HistorikkinnslagOpplysningDto> opplysninger;
     private SkjermlenkeType skjermlenke;
-    private Kodeliste aarsak;
+    private Kodeverdi aarsak;
     private HistorikkInnslagTemaDto tema;
     private HistorikkInnslagGjeldendeFraDto gjeldendeFra;
     private String resultat;
@@ -35,12 +36,12 @@ public class HistorikkinnslagDelDto {
 
     private static HistorikkinnslagDelDto mapFra(HistorikkinnslagDel historikkinnslagDel, KodeverkRepository kodeverkRepository, AksjonspunktRepository aksjonspunktRepository) {
         HistorikkinnslagDelDto dto = new HistorikkinnslagDelDto();
-        historikkinnslagDel.getBegrunnelseFelt().ifPresent(begrunnelse -> dto.setBegrunnelse(finnÅrsakKodeListe(kodeverkRepository, begrunnelse).orElse(null)));
+        historikkinnslagDel.getBegrunnelseFelt().ifPresent(begrunnelse -> dto.setBegrunnelse(finnÅrsakKodeListe(begrunnelse).orElse(null)));
         if (dto.getBegrunnelse() == null) {
             historikkinnslagDel.getBegrunnelse().ifPresent(dto::setBegrunnelseFritekst);
         }
-        historikkinnslagDel.getAarsakFelt().ifPresent(aarsak -> dto.setAarsak(finnÅrsakKodeListe(kodeverkRepository, aarsak).orElse(null)));
-        historikkinnslagDel.getTema().ifPresent(felt -> dto.setTema(HistorikkInnslagTemaDto.mapFra(felt, kodeverkRepository)));
+        historikkinnslagDel.getAarsakFelt().ifPresent(aarsak -> dto.setAarsak(finnÅrsakKodeListe(aarsak).orElse(null)));
+        historikkinnslagDel.getTema().ifPresent(felt -> dto.setTema(HistorikkInnslagTemaDto.mapFra(felt)));
         historikkinnslagDel.getGjeldendeFraFelt().ifPresent(felt -> {
             if (felt.getNavn() != null && felt.getNavnVerdi() != null && felt.getTilVerdi() != null) {
                 dto.setGjeldendeFra(felt.getTilVerdi(), felt.getNavn(), felt.getNavnVerdi());
@@ -64,12 +65,12 @@ public class HistorikkinnslagDelDto {
             dto.setOpplysninger(HistorikkinnslagOpplysningDto.mapFra(historikkinnslagDel.getOpplysninger(), kodeverkRepository));
         }
         if (!historikkinnslagDel.getEndredeFelt().isEmpty()) {
-            dto.setEndredeFelter(HistorikkinnslagEndretFeltDto.mapFra(historikkinnslagDel.getEndredeFelt(), kodeverkRepository));
+            dto.setEndredeFelter(HistorikkinnslagEndretFeltDto.mapFra(historikkinnslagDel.getEndredeFelt()));
         }
         return dto;
     }
 
-    private static Optional<Kodeliste> finnÅrsakKodeListe(KodeverkRepository kodeverkRepository, HistorikkinnslagFelt aarsak) {
+    private static Optional<Kodeverdi> finnÅrsakKodeListe(HistorikkinnslagFelt aarsak) {
         String aarsakVerdi = aarsak.getTilVerdi();
         if (Objects.equals("-", aarsakVerdi)) {
             return Optional.empty();
@@ -77,15 +78,19 @@ public class HistorikkinnslagDelDto {
         if(aarsak.getKlTilVerdi() == null) {
             return Optional.empty();
         }
-        Optional<Class<Kodeliste>> aarsakClass = kodeverkRepository.finnKodelisteForKodeverk(aarsak.getKlTilVerdi());
-        return aarsakClass.map(aClass -> kodeverkRepository.finn(aClass, aarsakVerdi));
+
+        var kodeverdiMap = HistorikkInnslagTekstBuilder.KODEVERK_KODEVERDI_MAP.get(aarsak.getKlTilVerdi());
+        if (kodeverdiMap == null) {
+            throw new IllegalStateException("Har ikke støtte for HistorikkinnslagFelt#klTilVerdi=" + aarsak.getKlTilVerdi());
+        }
+        return Optional.ofNullable(kodeverdiMap.get(aarsakVerdi));
     }
 
-    public Kodeliste getBegrunnelse() {
+    public Kodeverdi getBegrunnelse() {
         return begrunnelse;
     }
 
-    public void setBegrunnelse(Kodeliste begrunnelse) {
+    public void setBegrunnelse(Kodeverdi begrunnelse) {
         this.begrunnelse = begrunnelse;
     }
 
@@ -113,11 +118,11 @@ public class HistorikkinnslagDelDto {
         this.skjermlenke = skjermlenke;
     }
 
-    public Kodeliste getAarsak() {
+    public Kodeverdi getAarsak() {
         return aarsak;
     }
 
-    public void setAarsak(Kodeliste aarsak) {
+    public void setAarsak(Kodeverdi aarsak) {
         this.aarsak = aarsak;
     }
 

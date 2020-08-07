@@ -1,55 +1,94 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk;
 
-import java.util.HashMap;
+import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
 
-import no.nav.vedtak.feil.Feil;
-import no.nav.vedtak.feil.FeilFactory;
-import no.nav.vedtak.feil.LogLevel;
-import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
-import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-@Entity(name = "Aksomhet")
-@DiscriminatorValue(Aktsomhet.DISCRIMINATOR)
-public class Aktsomhet extends Vurdering {
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
+public enum Aktsomhet implements Vurdering {
 
-    public static final String DISCRIMINATOR = "AKTSOMHET";
+    FORSETT("FORSETT","Forsett"),
+    GROVT_UAKTSOM("GROVT_UAKTSOM","Grov uaktsomhet"),
+    SIMPEL_UAKTSOM("SIMPEL_UAKTSOM","Simpel uaktsomhet");
 
-    public static final Aktsomhet FORSETT = new Aktsomhet("FORSETT");
-    public static final Aktsomhet GROVT_UAKTSOM = new Aktsomhet("GROVT_UAKTSOM");
-    public static final Aktsomhet SIMPEL_UAKTSOM = new Aktsomhet("SIMPEL_UAKTSOM");
+    private String kode;
+    private String navn;
 
-    private static final Map<String, Aktsomhet> aktsomhetMap = new HashMap<>();
+    public static final String KODEVERK = "AKTSOMHET";
+    private static final Map<String, Aktsomhet> KODER = new LinkedHashMap<>();
 
     static {
-        aktsomhetMap.put(FORSETT.getKode(), FORSETT);
-        aktsomhetMap.put(GROVT_UAKTSOM.getKode(), GROVT_UAKTSOM);
-        aktsomhetMap.put(SIMPEL_UAKTSOM.getKode(), SIMPEL_UAKTSOM);
-    }
-
-    Aktsomhet(String kode) {
-        super(kode, DISCRIMINATOR);
-    }
-
-    Aktsomhet() {
-        // For hibernate
-    }
-
-    public static Aktsomhet fraKode(String aktsomhet) {
-        if (aktsomhetMap.containsKey(aktsomhet)) {
-            return aktsomhetMap.get(aktsomhet);
+        for (var v : values()) {
+            if (KODER.putIfAbsent(v.kode, v) != null) {
+                throw new IllegalArgumentException("Duplikat : " + v.kode);
+            }
         }
-        throw AktsomhetFeil.FEILFACTORY.ugyldigAktsomhet(aktsomhet).toException();
     }
 
-    interface AktsomhetFeil extends DeklarerteFeil {
+    private Aktsomhet(String kode, String navn) {
+        this.kode = kode;
+        this.navn = navn;
+    }
 
-        AktsomhetFeil FEILFACTORY = FeilFactory.create(AktsomhetFeil.class);
+    @JsonCreator
+    public static Aktsomhet fraKode(@JsonProperty("kode") String kode) {
+        if (kode == null) {
+            return null;
+        }
+        var ad = KODER.get(kode);
+        if (ad == null) {
+            throw new IllegalArgumentException("Ukjent Fagsystem: " + kode);
+        }
+        return ad;
+    }
 
-        @TekniskFeil(feilkode = "FPT-312924", feilmelding = "Aktsomhet '%s' er ugyldig", logLevel = LogLevel.WARN)
-        Feil ugyldigAktsomhet(String aktsomhet);
+    public static Map<String, Aktsomhet> kodeMap() {
+        return Collections.unmodifiableMap(KODER);
+    }
+
+    @JsonProperty
+    @Override
+    public String getKode() {
+        return kode;
+    }
+
+    @Override
+    public String getOffisiellKode() {
+        return getKode();
+    }
+
+    @JsonProperty
+    @Override
+    public String getKodeverk() {
+        return KODEVERK;
+    }
+
+    @Override
+    public String getNavn() {
+        return navn;
+    }
+
+    @Converter(autoApply = true)
+    public static class KodeverdiConverter implements AttributeConverter<Aktsomhet, String> {
+        @Override
+        public String convertToDatabaseColumn(Aktsomhet attribute) {
+            return attribute == null ? null : attribute.getKode();
+        }
+
+        @Override
+        public Aktsomhet convertToEntityAttribute(String dbData) {
+            return dbData == null ? null : fraKode(dbData);
+        }
     }
 }

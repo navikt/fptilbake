@@ -5,6 +5,7 @@ import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Hi
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -16,8 +17,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.BasisKodeverdi;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.vedtak.feil.Feil;
 
@@ -31,6 +35,11 @@ public class HistorikkInnslagTekstBuilder {
     private int antallEndredeFelter = 0;
     private int antallAksjonspunkter = 0;
     private int antallOpplysninger = 0;
+
+    public static final Map<String, Map<String, ? extends Kodeverdi>> KODEVERK_KODEVERDI_MAP = Map.ofEntries(
+        new AbstractMap.SimpleEntry<>(Venteårsak.KODEVERK,Venteårsak.kodeMap()),
+        new AbstractMap.SimpleEntry<>(HistorikkBegrunnelseType.KODEVERK,HistorikkBegrunnelseType.kodeMap()),
+        new AbstractMap.SimpleEntry<>(HistorikkEndretFeltType.KODEVERK,HistorikkEndretFeltType.kodeMap()));
 
     public HistorikkInnslagTekstBuilder() {
         //
@@ -102,6 +111,14 @@ public class HistorikkInnslagTekstBuilder {
         return this;
     }
 
+    public <K extends BasisKodeverdi> HistorikkInnslagTekstBuilder medÅrsak(K årsak) {
+        HistorikkinnslagFelt.builder()
+            .medFeltType(HistorikkinnslagFeltType.AARSAK)
+            .medTilVerdi(årsak)
+            .build(historikkinnslagDelBuilder);
+        return this;
+    }
+
     public HistorikkInnslagTekstBuilder medTema(HistorikkEndretFeltType endretFeltType, String verdi) {
         HistorikkinnslagFelt.builder()
             .medFeltType(HistorikkinnslagFeltType.ANGÅR_TEMA)
@@ -131,6 +148,10 @@ public class HistorikkInnslagTekstBuilder {
         return medBegrunnelse(begrunnelse, true);
     }
 
+    public HistorikkInnslagTekstBuilder medBegrunnelse(Kodeverdi begrunnelse) {
+        return medBegrunnelse(begrunnelse, true);
+    }
+
     public HistorikkInnslagTekstBuilder medBegrunnelse(String begrunnelse) {
         String begrunnelseStr = formatString(begrunnelse);
         return medBegrunnelse(begrunnelseStr, true);
@@ -146,6 +167,15 @@ public class HistorikkInnslagTekstBuilder {
     }
 
     public <K extends Kodeliste> HistorikkInnslagTekstBuilder medBegrunnelse(K begrunnelse, boolean erBegrunnelseEndret) {
+        HistorikkinnslagFelt.builder()
+            .medFeltType(HistorikkinnslagFeltType.BEGRUNNELSE)
+            .medTilVerdi(begrunnelse)
+            .build(historikkinnslagDelBuilder);
+        this.begrunnelseEndret = erBegrunnelseEndret;
+        return this;
+    }
+
+    public <K extends BasisKodeverdi> HistorikkInnslagTekstBuilder medBegrunnelse(K begrunnelse, boolean erBegrunnelseEndret) {
         HistorikkinnslagFelt.builder()
             .medFeltType(HistorikkinnslagFeltType.BEGRUNNELSE)
             .medTilVerdi(begrunnelse)

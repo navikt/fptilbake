@@ -5,7 +5,6 @@ import java.util.List;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagFelt;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 
 public class HistorikkinnslagEndretFeltDto {
 
@@ -73,17 +72,17 @@ public class HistorikkinnslagEndretFeltDto {
         this.tilVerdi = tilVerdi;
     }
 
-    static List<HistorikkinnslagEndretFeltDto> mapFra(List<HistorikkinnslagFelt> endretFeltList, KodeverkRepository kodeverkRepository) {
+    static List<HistorikkinnslagEndretFeltDto> mapFra(List<HistorikkinnslagFelt> endretFeltList) {
         List<HistorikkinnslagEndretFeltDto> dto = new ArrayList<>();
         for (HistorikkinnslagFelt felt : endretFeltList) {
-            dto.add(mapFra(felt, kodeverkRepository));
+            dto.add(mapFra(felt));
         }
         return dto;
     }
 
-    private static HistorikkinnslagEndretFeltDto mapFra(HistorikkinnslagFelt endretFelt, KodeverkRepository kodeverkRepository) {
+    private static HistorikkinnslagEndretFeltDto mapFra(HistorikkinnslagFelt endretFelt) {
         HistorikkinnslagEndretFeltDto dto = new HistorikkinnslagEndretFeltDto();
-        HistorikkEndretFeltType endretFeltNavn = kodeverkRepository.finn(HistorikkEndretFeltType.class, endretFelt.getNavn());
+        HistorikkEndretFeltType endretFeltNavn = HistorikkEndretFeltType.fraKode(endretFelt.getNavn());
         dto.setEndretFeltNavn(endretFeltNavn);
         dto.setNavnVerdi(endretFelt.getNavnVerdi());
         dto.setKlNavn(endretFelt.getKlNavn());

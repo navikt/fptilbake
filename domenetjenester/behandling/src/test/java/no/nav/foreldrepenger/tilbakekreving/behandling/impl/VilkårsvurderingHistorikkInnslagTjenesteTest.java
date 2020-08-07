@@ -97,9 +97,9 @@ public class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOpp
         assertThat(getFraVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.ER_VILKÅRENE_TILBAKEKREVING_OPPFYLT)))
             .isEqualTo(repoProvider.getKodeverkRepository().finn(VilkårResultat.class, VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER.getKode()).getNavn());
         assertThat(getFraVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.MOTTAKER_UAKTSOMHET_GRAD)))
-            .isEqualTo(repoProvider.getKodeverkRepository().finn(Aktsomhet.class, Aktsomhet.SIMPEL_UAKTSOM.getKode()).getNavn());
+            .isEqualTo( Aktsomhet.SIMPEL_UAKTSOM.getNavn());
         assertThat(getTilVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.MOTTAKER_UAKTSOMHET_GRAD)))
-            .isEqualTo(repoProvider.getKodeverkRepository().finn(Aktsomhet.class, Aktsomhet.GROVT_UAKTSOM.getKode()).getNavn());
+            .isEqualTo(Aktsomhet.GROVT_UAKTSOM.getNavn());
         assertThat(getFraVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.ER_SÆRLIGE_GRUNNER_TIL_REDUKSJON))).isEqualTo(formGrunnTekst(forrigeAktsomhetEntitet));
         assertThat(getTilVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.ER_SÆRLIGE_GRUNNER_TIL_REDUKSJON))).isEqualTo(formGrunnTekst(nyVurdering.getPerioder().get(0).getAktsomhet()));
         assertThat(getFraVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.BELØP_TILBAKEKREVES))).isNull();
@@ -149,7 +149,7 @@ public class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOpp
         assertThat(getFraVerdi(historikkinnslagDel.getEndretFelt(HistorikkEndretFeltType.ER_VILKÅRENE_TILBAKEKREVING_OPPFYLT)))
             .isEqualTo(repoProvider.getKodeverkRepository().finn(VilkårResultat.class, VilkårResultat.GOD_TRO.getKode()).getNavn());
         assertThat(getTilVerdi(historikkinnslagDel.getEndretFelt(HistorikkEndretFeltType.MOTTAKER_UAKTSOMHET_GRAD)))
-            .isEqualTo(repoProvider.getKodeverkRepository().finn(Aktsomhet.class, Aktsomhet.GROVT_UAKTSOM.getKode()).getNavn());
+            .isEqualTo(Aktsomhet.GROVT_UAKTSOM.getNavn());
         assertThat(getFraVerdi(historikkinnslagDel.getEndretFelt(HistorikkEndretFeltType.MOTTAKER_UAKTSOMHET_GRAD)))
             .isEqualTo(null);
         assertThat(getTilVerdi(historikkinnslagDel.getEndretFelt(HistorikkEndretFeltType.BELØP_TILBAKEKREVES)))
@@ -287,7 +287,7 @@ public class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOpp
         fellesHistorikkinnslagDelAssert(andreDel, PERIODE_ANDRE_FØRSTE_DATO, TOM, AKTSOMHET_BEGRUNNELSE, ANDRE_PERIODE_BEGRUNNELSE);
 
         assertThat(getTilVerdi(andreDel.getEndretFelt(HistorikkEndretFeltType.MOTTAKER_UAKTSOMHET_GRAD)))
-            .isEqualTo(repoProvider.getKodeverkRepository().finn(Aktsomhet.class, Aktsomhet.GROVT_UAKTSOM.getKode()).getNavn());
+            .isEqualTo(Aktsomhet.GROVT_UAKTSOM.getNavn());
         assertThat(getFraVerdi(andreDel.getEndretFelt(HistorikkEndretFeltType.MOTTAKER_UAKTSOMHET_GRAD)))
             .isNull();
         assertThat(getTilVerdi(andreDel.getEndretFelt(HistorikkEndretFeltType.BELØP_TILBAKEKREVES)))

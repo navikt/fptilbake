@@ -13,6 +13,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Vi
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Vurdering;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.BigDecimalHeltallSerialiserer;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.KodelisteSomKodeSerialiserer;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.KodeverdiSomKodeSerialiserer;
 import no.nav.vedtak.util.Objects;
 
 public class HbVurderinger {
@@ -23,7 +24,7 @@ public class HbVurderinger {
     @JsonProperty("fritekst")
     private String fritekstVilkår;
     @JsonProperty("aktsomhet-resultat")
-    @JsonSerialize(using = KodelisteSomKodeSerialiserer.class)
+    @JsonSerialize(using = KodeverdiSomKodeSerialiserer.class)
     private Vurdering aktsomhetResultat;
     @JsonProperty("unntas-innkreving-pga-lavt-beløp")
     private boolean unntasInnkrevingPgaLavtBeløp;

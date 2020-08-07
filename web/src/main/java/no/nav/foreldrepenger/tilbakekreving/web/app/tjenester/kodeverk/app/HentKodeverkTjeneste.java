@@ -19,7 +19,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KonsekvensForYtelsen;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.VariantFormat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeType;
@@ -51,6 +50,11 @@ public class HentKodeverkTjeneste {
     static {
         Map<String, Collection<? extends Kodeverdi>> map = new LinkedHashMap<>();
         map.put(KonsekvensForYtelsen.class.getSimpleName(), KonsekvensForYtelsen.kodeMap().values());
+        map.put(Fagsystem.class.getSimpleName(), Fagsystem.kodeMap().values());
+        map.put(Venteårsak.class.getSimpleName(), Venteårsak.kodeMap().values());
+        map.put(Aktsomhet.class.getSimpleName(), Aktsomhet.kodeMap().values());
+        map.put(AnnenVurdering.class.getSimpleName(), AnnenVurdering.kodeMap().values());
+        map.put(HistorikkEndretFeltType.class.getSimpleName(), HistorikkEndretFeltType.kodeMap().values());
 
         Map<String, Collection<? extends Kodeverdi>> mapFiltered = new LinkedHashMap<>();
 
@@ -63,24 +67,17 @@ public class HentKodeverkTjeneste {
 
     private static List<Class<? extends Kodeliste>> KODEVERK_SOM_BRUKES_PÅ_KLIENT = Arrays.asList(
         // Legg inn kodelister etter behov
-        Fagsystem.class,
-        Venteårsak.class,
-        VariantFormat.class,
-        Aktsomhet.class,
         SærligGrunn.class,
         VilkårResultat.class,
-        AnnenVurdering.class,
         VedtakResultatType.class,
         ForeldelseVurderingType.class,
         HistorikkAktør.class,
-        HistorikkEndretFeltType.class,
         HistorikkOpplysningType.class,
         HistorikkinnslagType.class,
         SkjermlenkeType.class,
         BehandlingType.class,
         BehandlingÅrsakType.class,
         BehandlingResultatType.class,
-        //KonsekvensForYtelsen.class,
         VidereBehandling.class,
         HendelseType.class,
         HendelseUnderType.class,

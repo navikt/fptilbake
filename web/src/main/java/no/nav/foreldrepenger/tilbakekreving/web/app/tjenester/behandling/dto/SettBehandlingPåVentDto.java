@@ -2,12 +2,12 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto;
 
 import java.time.LocalDate;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.ValidKodeverk;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.AbacDto;
 import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
@@ -25,7 +25,7 @@ public class SettBehandlingPåVentDto implements AbacDto {
 
     private LocalDate frist;
 
-    @ValidKodeverk
+    @Valid
     private Venteårsak ventearsak;
 
     public Long getBehandlingId() {
