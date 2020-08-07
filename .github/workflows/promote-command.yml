@@ -16,8 +16,9 @@ jobs:
         run: |
           echo "::set-env name=TAG::$(echo ${{ github.event.client_payload.github.payload.issue.title }} | awk '{print $NF}' | awk -F- '{print $NF}')"
           echo "::set-env name=IMAGE::$IMAGE_BASE:$(echo ${{ github.event.client_payload.github.payload.issue.title }} | awk '{print $NF}')"
-          echo "::set-env name=CLUSTER::${{ github.event.client_payload.slash_command.arg1 }}"
-          echo "::set-env name=NAMESPACE::${{ github.event.client_payload.slash_command.arg2 }}"
+          echo "::set-env name=OMRAADE::${{ github.event.client_payload.slash_command.arg1 }}"
+          echo "::set-env name=CLUSTER::${{ github.event.client_payload.slash_command.arg2 }}"
+          echo "::set-env name=NAMESPACE::${{ github.event.client_payload.slash_command.arg3 }}"
 
       - name: Sjekk ut kode
         uses: actions/checkout@v1
@@ -30,8 +31,8 @@ jobs:
           PRINT_PAYLOAD: true
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: ${{ env.CLUSTER }}
-          RESOURCE: nais/naiserator.yaml
-          VARS: nais/${{ env.CLUSTER }}-${{ env.NAMESPACE }}.json
+          RESOURCE: nais/{{ env.OMRAADE }}/naiserator.yaml
+          VARS: nais/{{ env.OMRAADE }}/${{ env.CLUSTER }}-${{ env.NAMESPACE }}.json
 
       - name: Oppdater kommentar med deployment status ved feil
         if: failure()
@@ -57,4 +58,4 @@ jobs:
                             issue_number: ${{ github.event.client_payload.github.payload.issue.number }} }
             github.issues.createComment({...issue,
                                     body: 'promote til ${{ github.event.client_payload.slash_command.args }} utført'})
-            github.issues.addLabels({...issue, labels: ['deployment','${{ env.CLUSTER }}-${{ env.NAMESPACE }}']})
+            github.issues.addLabels({...issue, labels: ['deployment','${{ env.OMRAADE }} ${{ env.CLUSTER }}-${{ env.NAMESPACE }}']})
