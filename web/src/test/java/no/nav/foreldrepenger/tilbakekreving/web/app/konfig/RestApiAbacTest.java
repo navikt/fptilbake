@@ -7,6 +7,7 @@ import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -15,6 +16,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 import no.nav.vedtak.isso.config.ServerInfo;
 import no.nav.vedtak.sikkerhet.abac.AbacDto;
@@ -46,7 +48,7 @@ public class RestApiAbacTest {
     @Test
     public void sjekk_at_ingen_metoder_er_annotert_med_dummy_verdier() {
         for (Method metode : RestApiTester.finnAlleRestMetoder()) {
-            assertResourceEllerPropertyIAnnotering(metode);
+            assertPropertyIAnnotering(metode);
         }
     }
 
@@ -81,21 +83,34 @@ public class RestApiAbacTest {
         }
     }
 
-    private void assertResourceEllerPropertyIAnnotering(Method metode) {
+    private void assertPropertyIAnnotering(Method metode) {
         Class<?> klasse = metode.getDeclaringClass();
         BeskyttetRessurs annotation = metode.getAnnotation(BeskyttetRessurs.class);
-        if (annotation != null && !annotation.property().isEmpty()) {
-            if (annotation.property().equals("abac.attributt.drift")) {
-                return;
-            }
-            fail(klasse.getSimpleName() + "." + metode.getName() + " @" + annotation.getClass().getSimpleName() + " bruker ikke-støttet property: " + annotation.property());
+        if (annotation == null) {
+            fail(klasse.getSimpleName() + "." + metode.getName() + " Mangler @" + annotation.getClass().getSimpleName());
         }
-        if (annotation != null && annotation.action() == BeskyttetRessursActionAttributt.DUMMY) {
+        if (annotation.property().isEmpty()) {
+            fail(klasse.getSimpleName() + "." + metode.getName() + " Tom property @" + annotation.getClass().getSimpleName());
+        }
+        List<String> godkjenteProperties = Arrays.asList(
+            AbacProperty.APPLIKASJON,
+            AbacProperty.BATCH,
+            AbacProperty.DRIFT,
+            AbacProperty.FAGSAK,
+            AbacProperty.VENTEFRIST
+        );
+        if (annotation.ressurs() != BeskyttetRessursResourceAttributt.DUMMY) {
+            fail(klasse.getSimpleName() + "." + metode.getName() + " Skal ikke bruke ressurs, bruk property i @" + annotation.getClass().getSimpleName());
+        }
+        if (!annotation.resource().isEmpty()) {
+            fail(klasse.getSimpleName() + "." + metode.getName() + " Skal ikke bruke resource " + annotation.resource() + " , bruk property i @" + annotation.getClass().getSimpleName());
+        }
+        if (!godkjenteProperties.contains(annotation.property())) {
+            fail(klasse.getSimpleName() + "." + metode.getName() + " Skal ikke bruke ukjent property " + annotation.property() + " , bruk en av " + godkjenteProperties + "i @" + annotation.getClass().getSimpleName());
+        }
+        if (annotation.action() == BeskyttetRessursActionAttributt.DUMMY) {
             fail(klasse.getSimpleName() + "." + metode.getName() + " Ikke bruk DUMMY-verdi for "
                 + BeskyttetRessursActionAttributt.class.getSimpleName());
-        } else if (annotation != null && annotation.ressurs() == BeskyttetRessursResourceAttributt.DUMMY) {
-            fail(klasse.getSimpleName() + "." + metode.getName() + " Ikke bruk DUMMY-verdi for "
-                + BeskyttetRessursResourceAttributt.class.getSimpleName());
         }
     }
 

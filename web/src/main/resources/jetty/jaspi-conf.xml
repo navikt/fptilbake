@@ -16,5 +16,20 @@
         </serverAuthConfig>
         <persistent>true</persistent>
     </configProvider>
+    <configProvider>
+        <messageLayer>HTTP</messageLayer>
+        <appContext>server /k9/tilbake</appContext>
+        <description>description</description>
+        <serverAuthConfig>
+            <authenticationContextID>authenticationContextID2</authenticationContextID>
+            <protected>true</protected>
+            <serverAuthContext>
+                <serverAuthModule>
+                    <className>no.nav.foreldrepenger.tilbakekreving.web.server.jetty.JettyOidcAuthModule</className>
+                </serverAuthModule>
+            </serverAuthContext>
+        </serverAuthConfig>
+        <persistent>true</persistent>
+    </configProvider>
 
 </jaspi>

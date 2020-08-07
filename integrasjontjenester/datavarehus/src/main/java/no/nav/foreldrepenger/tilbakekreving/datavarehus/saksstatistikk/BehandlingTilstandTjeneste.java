@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk;
 
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -35,15 +36,15 @@ public class BehandlingTilstandTjeneste {
     }
 
     @Inject
-    public BehandlingTilstandTjeneste(BehandlingRepositoryProvider repositoryProvider, BehandlingresultatRepository behandlingresultatRepository) {
+    public BehandlingTilstandTjeneste(BehandlingRepositoryProvider repositoryProvider) {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
-        this.behandlingresultatRepository = behandlingresultatRepository;
+        this.behandlingresultatRepository = repositoryProvider.getBehandlingresultatRepository();
     }
 
     public BehandlingTilstand hentBehandlingensTilstand(long behandlingId) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-        EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandlingId);
+        EksternBehandling eksternBehandling = getEksternBehandling(behandlingId);
         BehandlingResultatType behandlingResultatType = behandlingresultatRepository.hent(behandling)
             .map(Behandlingsresultat::getBehandlingResultatType)
             .orElse(BehandlingResultatType.IKKE_FASTSATT);
@@ -69,11 +70,21 @@ public class BehandlingTilstandTjeneste {
         tilstand.setAnsvarligBeslutter(behandling.getAnsvarligBeslutter());
         tilstand.setAnsvarligSaksbehandler(behandling.getAnsvarligSaksbehandler());
         tilstand.setErBehandlingManueltOpprettet(behandling.isManueltOpprettet());
-        tilstand.setFunksjonellTid(OffsetDateTime.now());
+        tilstand.setFunksjonellTid(OffsetDateTime.now(ZoneOffset.UTC));
         tilstand.setVenterPåBruker(venterPåBruker);
         tilstand.setVenterPåØkonomi(venterPåØkonomi);
         forrigeBehandling.ifPresent(forrige -> tilstand.setForrigeBehandling(forrige.getUuid()));
         behandlingsårsak.ifPresent(årsak -> tilstand.setRevurderingOpprettetÅrsak(BehandlingÅrsakMapper.getRevurderingÅrsak(årsak)));
         return tilstand;
+    }
+
+    private EksternBehandling getEksternBehandling(long behandlingId) {
+        EksternBehandling eksternBehandling;
+        if (eksternBehandlingRepository.finnesAktivtEksternBehandling(behandlingId)) {
+            eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandlingId);
+        } else {
+            eksternBehandling = eksternBehandlingRepository.hentForSisteAktivertInternId(behandlingId);
+        }
+        return eksternBehandling;
     }
 }

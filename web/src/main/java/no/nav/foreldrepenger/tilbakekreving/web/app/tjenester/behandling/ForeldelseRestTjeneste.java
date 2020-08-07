@@ -2,7 +2,6 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.READ;
-import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursResourceAttributt.FAGSAK;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -29,6 +28,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.dto.PeriodeDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurdertForeldelseTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 @Path(ForeldelseRestTjeneste.PATH_FRAGMENT)
 @Produces(APPLICATION_JSON)
@@ -57,7 +57,7 @@ public class ForeldelseRestTjeneste {
 
     @GET
     @Operation(tags = "foreldelse", description = "Henter perioder som skal vurderes for foreldelse")
-    @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
+    @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
     public FeilutbetalingPerioderDto hentLogiskePerioder(@QueryParam("uuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
         return vurdertForeldelseTjeneste.hentFaktaPerioder(hentBehandlingId(behandlingReferanse));
     }
@@ -65,7 +65,7 @@ public class ForeldelseRestTjeneste {
     @GET
     @Operation(tags = "foreldelse", description = "Hente allerede vurdert foreldelse perioder")
     @Path("/vurdert")
-    @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
+    @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
     public FeilutbetalingPerioderDto hentVurdertPerioder(@QueryParam("uuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
         return vurdertForeldelseTjeneste.henteVurdertForeldelse(hentBehandlingId(behandlingReferanse));
     }
@@ -73,7 +73,7 @@ public class ForeldelseRestTjeneste {
     @POST
     @Operation(tags = "foreldelse", description = "Beregn feilutbetalingsbeløp for oppgitte perioder")
     @Path("/belop")
-    @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
+    @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
     public FeilutbetalingPerioderDto beregnBeløp(@NotNull @Valid FeilutbetalingPerioderDto perioderDto) {
         List<Periode> perioderFraDto = perioderDto.getPerioder().stream().map(PeriodeDto::tilPeriode).collect(Collectors.toList());
         Map<Periode, BigDecimal> feilutbetalinger = kravgrunnlagBeregningTjeneste.beregnFeilutbetaltBeløp(perioderDto.getBehandlingId(), perioderFraDto);

@@ -2,8 +2,6 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.batch;
 
 import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.CREATE;
 import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.READ;
-import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursResourceAttributt.BATCH;
-import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursResourceAttributt.DRIFT;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -32,6 +30,7 @@ import no.nav.foreldrepenger.batch.BatchSupportTjeneste;
 import no.nav.foreldrepenger.batch.BatchTjeneste;
 import no.nav.foreldrepenger.batch.feil.BatchFeil;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.batch.args.BatchArgumentsDto;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.log.util.LoggerUtils;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 
@@ -67,7 +66,7 @@ public class BatchRestTjeneste {
      */
     @GET
     @Path("/init")
-    @BeskyttetRessurs(action = READ, ressurs = DRIFT, sporingslogg = false)
+    @BeskyttetRessurs(action = READ, property = AbacProperty.DRIFT, sporingslogg = false)
     @Operation(tags = "batch", description = "denne gjør ingenting - brukes for å logge inn bruker som kjører batch")
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response init() {
@@ -84,7 +83,7 @@ public class BatchRestTjeneste {
         @ApiResponse(responseCode = "400", description = "Ukjent batch forespurt."),
         @ApiResponse(responseCode = "500", description = "Feilet pga ukjent feil.")
     })
-    @BeskyttetRessurs(action = CREATE, ressurs = BATCH)
+    @BeskyttetRessurs(action = CREATE, property = AbacProperty.BATCH)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response startBatch(@NotNull @QueryParam("batchName") @Valid BatchNameDto batchName, @Valid BatchArgumentsDto args) {
         String name = batchName.getVerdi();
@@ -111,7 +110,7 @@ public class BatchRestTjeneste {
         @ApiResponse(responseCode = "400", description = "Ukjent batch forespurt."),
         @ApiResponse(responseCode = "500", description = "Feilet pga ukjent feil.")
     })
-    @BeskyttetRessurs(action = READ, ressurs = DRIFT, sporingslogg = false)
+    @BeskyttetRessurs(action = READ, property = AbacProperty.DRIFT, sporingslogg = false)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response poll(@NotNull @QueryParam("executionId") @Valid BatchExecutionDto dto) {
         final String batchName = retrieveBatchServiceFrom(dto.getExecutionId());
@@ -132,7 +131,7 @@ public class BatchRestTjeneste {
         @ApiResponse(responseCode = "200", description = "Starter batch-scheduler."),
         @ApiResponse(responseCode = "500", description = "Feilet pga ukjent feil.")
     })
-    @BeskyttetRessurs(action = CREATE, ressurs = BATCH)
+    @BeskyttetRessurs(action = CREATE, property = AbacProperty.BATCH)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response autoRunBatch() {
         batchSupportTjeneste.startBatchSchedulerTask();

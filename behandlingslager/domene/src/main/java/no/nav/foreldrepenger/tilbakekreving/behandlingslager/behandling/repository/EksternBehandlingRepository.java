@@ -38,6 +38,8 @@ public interface EksternBehandlingRepository {
 
     boolean finnesEksternBehandling(long internId, Henvisning henvisning);
 
+    boolean finnesAktivtEksternBehandling(long internId);
+
     void deaktivateTilkobling(long internId);
 
     /**

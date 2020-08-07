@@ -70,7 +70,6 @@ public class IverksetteVedtakStegImplTest {
 
     @Before
     public void setup() {
-        System.setProperty("environment.name","devimg");
         repositoryRule.getEntityManager().setFlushMode(FlushModeType.AUTO);
         behandling = simple.lagre(repoProvider);
         BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(behandling);

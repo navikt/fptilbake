@@ -11,7 +11,7 @@ Kontaktinformasjon:
 
 # Kjør og test lokalt
 
-TODO
+TODO...
 
 # Domene
 

@@ -67,4 +67,8 @@ public interface BehandlingRepository extends BehandlingslagerRepository {
 
     String hentSaksnummerForBehandling(long behandlingId);
 
+    List<Long> hentAlleBehandlingIder();
+
+    List<Long> hentAlleAvsluttetBehandlingIder();
+
 }

@@ -108,6 +108,20 @@ public class KravgrunnlagValidatorTest {
     }
 
     @Test
+    public void skal_gi_feilmelding_når_perioden_ikke_har_postering_av_klasseType_YTEL() {
+        Periode periode1 = Periode.of(LocalDate.of(2020, 1, 1), LocalDate.of(2020, 1, 15));
+        KravgrunnlagPeriode432 kgPeriode = leggTilKravgrunnlagPeriode(kravgrunnlag, periode1, maxSkattJanuar);
+
+        BigDecimal skattOrd = BigDecimal.valueOf(50);
+        leggTilFeil(kgPeriode, 1000,skattOrd);
+
+        expectedException.expect(KravgrunnlagValidator.UgyldigKravgrunnlagException.class);
+        expectedException.expectMessage("Ugyldig kravgrunnlag for kravgrunnlagId 12341. Perioden 01.01.2020-15.01.2020 mangler postering med klasseType=YTEL.");
+
+        KravgrunnlagValidator.validerGrunnlag(kravgrunnlag);
+    }
+
+    @Test
     public void skal_gi_feilmelding_når_tilbakekreves_beløp_er_høyere_enn_differanse_mellom_nytt_og_gammelt_beløp() {
         Periode periode = Periode.of(LocalDate.of(2020, 1, 1), LocalDate.of(2020, 1, 10));
         KravgrunnlagPeriode432 kgPeriode = leggTilKravgrunnlagPeriode(kravgrunnlag, periode, BigDecimal.ZERO);

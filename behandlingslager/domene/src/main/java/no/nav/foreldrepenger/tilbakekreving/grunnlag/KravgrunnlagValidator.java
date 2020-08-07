@@ -32,6 +32,7 @@ public class KravgrunnlagValidator {
         KravgrunnlagValidator::validerOverlappendePerioder,
         KravgrunnlagValidator::validerSkatt,
         KravgrunnlagValidator::validerPerioderHarFeilutbetalingPostering,
+        KravgrunnlagValidator::validerPerioderHarYtelPostering,
         KravgrunnlagValidator::validerYtelseMotFeilutbetaling,
         KravgrunnlagValidator::validerYtelPosteringTilbakekrevesMotNyttOgOpprinneligUtbetalt
     );
@@ -66,6 +67,14 @@ public class KravgrunnlagValidator {
         for (KravgrunnlagPeriode432 periode : kravgrunnlag.getPerioder()) {
             if (periode.getKravgrunnlagBeloper433().stream().noneMatch(kgb -> KlasseType.FEIL.equals(kgb.getKlasseType()))) {
                 throw KravgrunnlagFeil.FACTORY.manglerKlasseTypeFeil(periode.getPeriode()).toException();
+            }
+        }
+    }
+
+    private static void validerPerioderHarYtelPostering(Kravgrunnlag431 kravgrunnlag) {
+        for (KravgrunnlagPeriode432 periode : kravgrunnlag.getPerioder()) {
+            if (periode.getKravgrunnlagBeloper433().stream().noneMatch(kgb -> KlasseType.YTEL.equals(kgb.getKlasseType()))) {
+                throw KravgrunnlagFeil.FACTORY.manglerKlasseTypeYtel(kravgrunnlag.getEksternKravgrunnlagId(), periode.getPeriode()).toException();
             }
         }
     }
@@ -178,6 +187,9 @@ public class KravgrunnlagValidator {
 
         @IntegrasjonFeil(feilkode = "FPT-727260", feilmelding = "Ugyldig kravgrunnlag. Perioden %s mangler postering med klasseType=FEIL.", logLevel = WARN, exceptionClass = UgyldigKravgrunnlagException.class)
         Feil manglerKlasseTypeFeil(Periode periode);
+
+        @IntegrasjonFeil(feilkode = "FPT-727261", feilmelding = "Ugyldig kravgrunnlag for kravgrunnlagId %s. Perioden %s mangler postering med klasseType=YTEL.", logLevel = WARN, exceptionClass = UgyldigKravgrunnlagException.class)
+        Feil manglerKlasseTypeYtel(String kravgrunnlagId, Periode periode);
 
         @IntegrasjonFeil(feilkode = "FPT-438893", feilmelding = "Ugyldig kravgrunnlag. Perioden %s er ikke innenfor en kalendermåned.", logLevel = WARN, exceptionClass = UgyldigKravgrunnlagException.class)
         Feil periodeIkkInnenforMåned(Periode periode);

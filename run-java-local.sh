@@ -19,7 +19,7 @@ export APP_CONFDIR="web/webapp/src/main/resources/jetty/"
 PROP_FILE="web/webapp/app.properties"
 PROP_FILE_LOCAL="web/webapp/app-local.properties"
 PROP_FILE_TEMPLATE="web/webapp/src/test/resources/app-dev.properties"
-[[ ! -f "${PROP_FILE?}" ]] && cp ${PROP_FILE_TEMPLATE?} ${PROP_FILE} && echo "Oppdater passwords i ${PROP_FILE_LOCAL}" && exit 1 
+[[ ! -f "${PROP_FILE?}" ]] && cp ${PROP_FILE_TEMPLATE?} ${PROP_FILE} && echo "Oppdater passwords i ${PROP_FILE_LOCAL}" && exit 1
 export SYSTEM_PROPERTIES="$( grep -v "^#" $PROP_FILE | grep -v '^[[:space:]]*$' | grep -v ' ' | sed -e 's/^/ -D/g' | tr '\n' ' ')"
 
 ## export app-local.properties også til env (inneholder hemmeligheter, eks. passord)

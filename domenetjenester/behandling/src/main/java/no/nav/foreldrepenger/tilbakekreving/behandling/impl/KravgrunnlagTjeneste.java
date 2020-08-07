@@ -90,8 +90,11 @@ public class KravgrunnlagTjeneste {
             List<KravgrunnlagBelop433> posteringer = kravgrunnlagPeriode432.getKravgrunnlagBeloper433().stream()
                 .filter(belop433 -> belop433.getKlasseType().equals(KlasseType.FEIL)).collect(Collectors.toList());
             if (!posteringer.isEmpty()) {
-                kravgrunnlagPeriode432.setKravgrunnlagBeloper433(posteringer);
-                feilutbetaltPerioder.add(kravgrunnlagPeriode432);
+                KravgrunnlagPeriode432 feilutbetaltPeriode = KravgrunnlagPeriode432.builder().medPeriode(kravgrunnlagPeriode432.getPeriode())
+                    .medKravgrunnlag431(kravgrunnlagPeriode432.getKravgrunnlag431())
+                    .medBeløpSkattMnd(kravgrunnlagPeriode432.getBeløpSkattMnd()).build();
+                posteringer.forEach(belop433 -> feilutbetaltPeriode.leggTilBeløp(belop433));
+                feilutbetaltPerioder.add(feilutbetaltPeriode);
             }
         }
         return feilutbetaltPerioder;

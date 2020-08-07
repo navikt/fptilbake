@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk;
 
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -29,13 +30,12 @@ public class SakshendelserKafkaProducer {
     }
 
     public void sendMelding(BehandlingTilstand hendelse) {
-        hendelse.setTekniskTid(OffsetDateTime.now()); //tidspunkt for sending
+        hendelse.setTekniskTid(OffsetDateTime.now(ZoneOffset.UTC)); //tidspunkt for sending
 
         String nøkkel = hendelse.getBehandlingUuid().toString();
         String verdi = BehandlingTilstandMapper.tilJsonString(hendelse);
         var melding = new ProducerRecord<>(topic, nøkkel, verdi);
         kafkaProducer.sendMelding(melding);
     }
-
 
 }

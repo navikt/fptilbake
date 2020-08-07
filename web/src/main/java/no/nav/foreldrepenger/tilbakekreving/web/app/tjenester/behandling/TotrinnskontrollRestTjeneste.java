@@ -1,7 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling;
 
 import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.READ;
-import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursResourceAttributt.FAGSAK;
 
 import java.util.List;
 
@@ -22,6 +21,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.TotrinnskontrollAksjonspunkterTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.totrinn.TotrinnskontrollSkjermlenkeContextDto;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 
 @Path("/behandling/totrinnskontroll")
@@ -47,7 +47,7 @@ public class TotrinnskontrollRestTjeneste {
     @Timed
     @Path("/arsaker")
     @Operation(tags = "totrinnskontroll", description = "Hent aksjonspunkter som skal til totrinnskontroll.", summary = "Returner aksjonspunkter til totrinnskontroll for behandling.")
-    @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
+    @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public List<TotrinnskontrollSkjermlenkeContextDto> hentTotrinnskontrollSkjermlenkeContext(@NotNull @QueryParam("uuid") @Valid BehandlingReferanse behandlingReferanse) {
         Behandling behandling = hentBehandling(behandlingReferanse);
@@ -58,7 +58,7 @@ public class TotrinnskontrollRestTjeneste {
     @Timed
     @Path("/arsaker_read_only")
     @Operation(tags = "totrinnskontroll", description = "Hent totrinnsvurderinger for aksjonspunkter.", summary = "Returner vurderinger for aksjonspunkter etter totrinnskontroll for behandling.")
-    @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
+    @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public List<TotrinnskontrollSkjermlenkeContextDto> hentTotrinnskontrollvurderingSkjermlenkeContext(@NotNull @QueryParam("uuid") @Valid BehandlingReferanse behandlingReferanse) {
         Behandling behandling = hentBehandling(behandlingReferanse);

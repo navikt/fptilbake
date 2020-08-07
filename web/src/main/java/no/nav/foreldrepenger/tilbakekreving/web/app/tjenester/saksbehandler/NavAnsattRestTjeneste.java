@@ -1,7 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.saksbehandler;
 
 import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.READ;
-import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursResourceAttributt.FAGSAK;
 
 import java.util.Collection;
 
@@ -15,6 +14,7 @@ import javax.ws.rs.core.MediaType;
 import io.swagger.v3.oas.annotations.Operation;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.saksbehandler.dto.InnloggetNavAnsattDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.util.LdapUtil;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.felles.integrasjon.ldap.LdapBruker;
 import no.nav.vedtak.felles.integrasjon.ldap.LdapBrukeroppslag;
 import no.nav.vedtak.konfig.KonfigVerdi;
@@ -60,7 +60,7 @@ public class NavAnsattRestTjeneste {
     @Operation(description = "Returnerer fullt navn for ident",
         summary = "Ident hentes fra sikkerhetskonteksten som er tilgjengelig etter innlogging.",
         tags = "nav-ansatt")
-    @BeskyttetRessurs(action = READ, ressurs = FAGSAK, sporingslogg = false)
+    @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK, sporingslogg = false)
     public InnloggetNavAnsattDto innloggetBruker() {
         String ident = SubjectHandler.getSubjectHandler().getUid();
         LdapBruker ldapBruker = new LdapBrukeroppslag().hentBrukerinformasjon(ident);

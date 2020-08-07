@@ -2,7 +2,6 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.READ;
-import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursResourceAttributt.FAGSAK;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -21,6 +20,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FaktaFeilutbetalingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BehandlingFeilutbetalingFakta;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingFeilutbetalingFaktaDto;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 
 @Path(BehandlingFaktaRestTjeneste.PATH_FRAGMENT)
@@ -51,7 +51,7 @@ public class BehandlingFaktaRestTjeneste {
         description = "Hent fakta om feilutbetaling"
     )
     @Path("/hent-fakta/feilutbetaling")
-    @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
+    @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
     public BehandlingFeilutbetalingFaktaDto hentFeilutbetalingFakta(@QueryParam(value = "uuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
         BehandlingFeilutbetalingFakta fakta = faktaFeilutbetalingTjeneste.hentBehandlingFeilutbetalingFakta(hentBehandlingId(behandlingReferanse));
         BehandlingFeilutbetalingFaktaDto dto = new BehandlingFeilutbetalingFaktaDto();

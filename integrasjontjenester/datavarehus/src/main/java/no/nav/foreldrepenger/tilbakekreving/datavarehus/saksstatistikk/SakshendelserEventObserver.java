@@ -21,7 +21,6 @@ import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.BehandlingTi
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.DvhEventHendelse;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
-import no.nav.vedtak.util.env.Environment;
 
 
 @ApplicationScoped
@@ -32,8 +31,6 @@ public class SakshendelserEventObserver {
     private ProsessTaskRepository prosessTaskRepository;
     private UtvidetProsessTaskRepository utvidetProsessTaskRepository;
     private BehandlingTilstandTjeneste behandlingTilstandTjeneste;
-
-    private boolean isEnabled;
 
     SakshendelserEventObserver() {
         // for CDI proxy
@@ -46,11 +43,6 @@ public class SakshendelserEventObserver {
         this.prosessTaskRepository = prosessTaskRepository;
         this.utvidetProsessTaskRepository = utvidetProsessTaskRepository;
         this.behandlingTilstandTjeneste = behandlingTilstandTjeneste;
-
-        //foreløpig kun på for testing
-        this.isEnabled = !Environment.current().isProd();
-
-        logger.info("{} er {}", SakshendelserEventObserver.class, isEnabled ? "skudd på" : "ikke skudd på");
     }
 
     public void observerAksjonpunktFunnetEvent(@Observes AksjonspunkterFunnetEvent event) {
@@ -58,7 +50,7 @@ public class SakshendelserEventObserver {
     }
 
     public void observerAksjonpunktUtførtEvent(@Observes AksjonspunktUtførtEvent event) {
-        klargjørSendingAvBehandlingensTilstand(event.getBehandlingId(),DvhEventHendelse.AKSJONSPUNKT_UTFØRT);
+        klargjørSendingAvBehandlingensTilstand(event.getBehandlingId(), DvhEventHendelse.AKSJONSPUNKT_UTFØRT);
     }
 
     public void observerAksjonpunktTilbakeførtEvent(@Observes AksjonspunktTilbakeførtEvent event) {
@@ -78,10 +70,8 @@ public class SakshendelserEventObserver {
     }
 
     private void klargjørSendingAvBehandlingensTilstand(long behandlingId, DvhEventHendelse eventHendelse) {
-        if (isEnabled) {
-            BehandlingTilstand tilstand = behandlingTilstandTjeneste.hentBehandlingensTilstand(behandlingId);
-            opprettProsessTask(behandlingId, tilstand, eventHendelse);
-        }
+        BehandlingTilstand tilstand = behandlingTilstandTjeneste.hentBehandlingensTilstand(behandlingId);
+        opprettProsessTask(behandlingId, tilstand, eventHendelse);
     }
 
     private void opprettProsessTask(long behandlingId, BehandlingTilstand behandlingTilstand, DvhEventHendelse eventHendelse) {

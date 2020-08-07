@@ -29,6 +29,6 @@ public class FpsakUuidDto implements AbacDto {
 
     @Override
     public AbacDataAttributter abacAttributter() {
-        return AbacDataAttributter.opprett().leggTil(TilbakekrevingAbacAttributtType.FPSAK_BEHANDLING_UUID, uuid);
+        return AbacDataAttributter.opprett().leggTil(TilbakekrevingAbacAttributtType.YTELSEBEHANDLING_UUID, uuid);
     }
 }

@@ -1,7 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.dokument;
 
 import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.READ;
-import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursResourceAttributt.FAGSAK;
 
 import java.util.List;
 
@@ -30,6 +29,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.HentForhåndv
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.henleggelse.HenleggelsesbrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.VarselbrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.VedtaksbrevTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 
 @Path("/dokument")
@@ -64,7 +64,7 @@ public class DokumentRestTjeneste {
     @Path("/forhandsvis-varselbrev")
     @Consumes(MediaType.APPLICATION_JSON)
     @Operation(tags = "dokument", description = "Returnerer en pdf som er en forhåndsvisning av varselbrevet")
-    @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
+    @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response hentForhåndsvisningVarselbrev(
         @Parameter(description = "Inneholder kode til brevmal og data som skal flettes inn i brevet") @Valid HentForhåndsvisningVarselbrevDto hentForhåndsvisningVarselbrevDto) { // NOSONAR
@@ -78,7 +78,7 @@ public class DokumentRestTjeneste {
     @Path("/hent-vedtaksbrev")
     @Consumes(MediaType.APPLICATION_JSON)
     @Operation(tags = "dokument", description = "Returnerer forhåndsvisning av vedtaksbrevet som tekst, slik at det kan vises i GUI for redigering")
-    @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
+    @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public ForhåndvisningVedtaksbrevTekstDto hentVedtaksbrevForRedigering(@NotNull @QueryParam ("uuid") @Valid BehandlingReferanse behandlingReferanse) { // NOSONAR
         Long behandlingId = hentBehandlingId(behandlingReferanse);
@@ -97,7 +97,7 @@ public class DokumentRestTjeneste {
     @Path("/forhandsvis-vedtaksbrev")
     @Consumes(MediaType.APPLICATION_JSON)
     @Operation(tags = "dokument", description = "Returnerer en pdf som er en forhåndsvisning av vedtaksbrevet")
-    @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
+    @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response hentForhåndsvisningVedtaksbrev(@Valid @NotNull HentForhåndvisningVedtaksbrevPdfDto vedtaksbrevPdfDto) { // NOSONAR
         byte[] dokument = vedtaksbrevTjeneste.hentForhåndsvisningVedtaksbrevMedVedleggSomPdf(vedtaksbrevPdfDto);
@@ -110,7 +110,7 @@ public class DokumentRestTjeneste {
     @Path("/forhandsvis-henleggelsesbrev")
     @Consumes(MediaType.APPLICATION_JSON)
     @Operation(tags = "dokument", description = "Returnerer en pdf som er en forhåndsvisning av henleggelsesbrevet")
-    @BeskyttetRessurs(action = READ, ressurs = FAGSAK)
+    @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response hentForhåndsvisningHenleggelsesbrev(@Valid @NotNull BehandlingReferanse behandlingReferanse) { // NOSONAR
         byte[] dokument;

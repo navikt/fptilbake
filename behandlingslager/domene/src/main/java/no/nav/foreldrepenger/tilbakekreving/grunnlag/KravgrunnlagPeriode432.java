@@ -9,7 +9,6 @@ import java.util.Objects;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -47,7 +46,7 @@ public class KravgrunnlagPeriode432 extends BaseEntitet {
     @JoinColumn(name = "krav_grunnlag_431_id", nullable = false, updatable = false)
     private Kravgrunnlag431 kravgrunnlag431;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "kravgrunnlagPeriode432", cascade = CascadeType.PERSIST)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "kravgrunnlagPeriode432")
     private List<KravgrunnlagBelop433> kravgrunnlagBeloper433 = new ArrayList<>();
 
     public Long getId() {
@@ -72,10 +71,6 @@ public class KravgrunnlagPeriode432 extends BaseEntitet {
 
     public List<KravgrunnlagBelop433> getKravgrunnlagBeloper433() {
         return Collections.unmodifiableList(kravgrunnlagBeloper433);
-    }
-
-    public void setKravgrunnlagBeloper433(List<KravgrunnlagBelop433> kravgrunnlagBeloper433) {
-        this.kravgrunnlagBeloper433 = kravgrunnlagBeloper433;
     }
 
     public void leggTilBeløp(KravgrunnlagBelop433 KravgrunnlagBelop433) { //NOSONAR

@@ -4,24 +4,17 @@ import no.nav.vedtak.sikkerhet.abac.AbacAttributtType;
 
 public enum TilbakekrevingAbacAttributtType implements AbacAttributtType {
 
-    FPSAK_BEHANDLING_UUID("fpsak-behandling-uuid");
+    YTELSEBEHANDLING_UUID("ytelsebehandling-uuid");
 
     private final String sporingsloggEksternKode;
-    private final boolean maskerOutput;
 
     TilbakekrevingAbacAttributtType(String sporingsloggEksternKode) {
         this.sporingsloggEksternKode = sporingsloggEksternKode;
-        this.maskerOutput = false;
-    }
-
-    TilbakekrevingAbacAttributtType(String sporingsloggEksternKode, boolean maskerOutput) {
-        this.sporingsloggEksternKode = sporingsloggEksternKode;
-        this.maskerOutput = maskerOutput;
     }
 
     @Override
     public boolean getMaskerOutput() {
-        return maskerOutput;
+        return false;
     }
 
     @Override

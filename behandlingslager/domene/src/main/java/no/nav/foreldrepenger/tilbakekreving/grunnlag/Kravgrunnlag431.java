@@ -8,7 +8,6 @@ import java.util.Objects;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -106,7 +105,7 @@ public class Kravgrunnlag431 extends BaseEntitet {
     })
     private Henvisning referanse;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "kravgrunnlag431", cascade = CascadeType.PERSIST)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "kravgrunnlag431")
     private List<KravgrunnlagPeriode432> perioder = new ArrayList<>();
 
     public Long getId() {

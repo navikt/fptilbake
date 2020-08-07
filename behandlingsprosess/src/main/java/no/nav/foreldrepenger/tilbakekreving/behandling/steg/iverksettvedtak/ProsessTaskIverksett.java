@@ -13,7 +13,6 @@ import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.task.SendVedtak
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
-import no.nav.vedtak.util.env.Environment;
 
 @ApplicationScoped
 public class ProsessTaskIverksett {
@@ -52,9 +51,7 @@ public class ProsessTaskIverksett {
             selvbetjeningTask.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
             taskRepository.lagre(selvbetjeningTask);
         }
-        if(erTestMiljø()){
             opprettDvhProsessTask(behandling);
-        }
     }
 
     private void opprettDvhProsessTask(Behandling behandling){
@@ -63,11 +60,4 @@ public class ProsessTaskIverksett {
         taskRepository.lagre(dvhProsessTaskData);
     }
 
-    //midlertidig kode. skal fjernes da dvh er klar
-    private boolean erTestMiljø(){
-        //foreløpig kun på for testing
-        boolean isEnabled = !Environment.current().isProd();
-        logger.info("{} er {}", "Send vedtak til DVH", isEnabled ? "skudd på" : "ikke skudd på");
-        return isEnabled;
-    }
 }
