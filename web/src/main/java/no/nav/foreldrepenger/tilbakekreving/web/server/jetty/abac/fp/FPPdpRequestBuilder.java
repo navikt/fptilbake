@@ -9,9 +9,6 @@ import java.util.UUID;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakStatus;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
@@ -45,8 +42,6 @@ public class FPPdpRequestBuilder implements PdpRequestBuilder {
 
     private static final MdcExtendedLogContext LOG_CONTEXT = MdcExtendedLogContext.getContext("prosess"); //$NON-NLS-1$
 
-    private static final Logger logger = LoggerFactory.getLogger(FPPdpRequestBuilder.class);
-
     private PipRepository pipRepository;
     private FpsakPipKlient fpsakPipKlient;
 
@@ -62,7 +57,6 @@ public class FPPdpRequestBuilder implements PdpRequestBuilder {
 
     @Override
     public PdpRequest lagPdpRequest(AbacAttributtSamling attributter) {
-        logger.info("Bruker PdpRequestBuilder for FP");
         LOG_CONTEXT.remove("behandling");
         LOG_CONTEXT.remove("fpsakBehandlingUuid");
         LOG_CONTEXT.remove("behandlingUuid");
