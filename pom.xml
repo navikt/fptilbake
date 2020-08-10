@@ -35,11 +35,11 @@
 
         <!-- Felles avhengigheter i prosjektet Disse skal ALLTID være en
             RELEASE-avhengighet UNNTAK: feature-brancher og lokalt -->
-        <felles.version>2.0.0-20200622121458-c41b7dc</felles.version>
-        <prosesstask.version>2.4.2-20200619122016-c3161d1</prosesstask.version>
-        <vl-fpsak-tidsserie.version>2.3-20200619101138-0b14d6b</vl-fpsak-tidsserie.version>
+        <felles.version>2.0.0-20200810080647-d5c4f94</felles.version>
+        <prosesstask.version>2.4.2-20200810080706-0586f95</prosesstask.version>
+        <vl-fpsak-tidsserie.version>2.3-20200810080723-bf4659f</vl-fpsak-tidsserie.version>
         <!-- Kontrakter -->
-        <fpkontrakter.version>5.1-20200619110032-a1c0ace</fpkontrakter.version>
+        <fpkontrakter.version>5.1-20200810151031-853914b</fpkontrakter.version>
 
         <surefire.version>2.22.2</surefire.version>
         <metrics.version>4.1.12.1</metrics.version>
