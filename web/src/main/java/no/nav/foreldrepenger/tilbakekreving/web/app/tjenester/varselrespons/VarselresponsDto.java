@@ -59,6 +59,6 @@ public class VarselresponsDto implements AbacDto {
 
     @Override
     public AbacDataAttributter abacAttributter() {
-        return AbacDataAttributter.opprett().leggTil(AppAbacAttributtType.BEHANDLING_ID, behandlingId);
+        return AbacDataAttributter.opprett().leggTil(behandlingId.abacAttributter());
     }
 }
