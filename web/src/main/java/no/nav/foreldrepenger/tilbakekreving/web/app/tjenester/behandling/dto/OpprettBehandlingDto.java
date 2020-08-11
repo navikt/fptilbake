@@ -33,7 +33,7 @@ public class OpprettBehandlingDto implements AbacDto {
     @ValidKodeverk
     private BehandlingÅrsakType behandlingArsakType;
 
-    @ValidKodeverk
+    @Valid
     private FagsakYtelseType fagsakYtelseType;
 
     //Gjelder kun for Tilbakekrevingsrevurdering

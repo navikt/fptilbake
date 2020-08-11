@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -43,22 +44,23 @@ public class FeilutbetalingÅrsakTjeneste {
     }
 
     private static List<HendelseUnderType> sortereBasertPåEkstradata(Set<HendelseUnderType> kodelistene) {
-        if (kodelistene.contains(null)) {
-            throw new IllegalArgumentException("Har null i " + kodelistene);
+        if (kodelistene.stream().anyMatch(Objects::isNull)) {
+            throw new IllegalStateException("Fins null i HendelseUnderType: " + kodelistene);
         }
+
         return kodelistene
             .stream()
-            .sorted(Comparator.comparing(kodeliste -> kodeliste.getSortering()))
+            .sorted(Comparator.comparing(HendelseUnderType::getSortering))
             .collect(Collectors.toList());
     }
 
     private static List<HendelseType> sortereBasertPåEkstradata2(Set<HendelseType> kodelistene) {
-        if (kodelistene.contains(null)) {
-            throw new IllegalArgumentException("Har null i " + kodelistene);
+        if (kodelistene.stream().anyMatch(Objects::isNull)) {
+            throw new IllegalStateException("Fins null i HendelseType: " + kodelistene);
         }
         return kodelistene
             .stream()
-            .sorted(Comparator.comparing(kodeliste -> kodeliste.getSortering()))
+            .sorted(Comparator.comparing(HendelseType::getSortering))
             .collect(Collectors.toList());
     }
 
