@@ -191,6 +191,9 @@ public class RestApiInputValideringDtoTest extends RestApiTester {
     }
 
     private static void validerRekursivt(Set<Class<?>> besøkteKlasser, Class<?> klasse, Class<?> forrigeKlasse) throws URISyntaxException {
+        if (klasse.isEnum()) {
+            return; //enum er OK
+        }
         if (erKodeverk(klasse)) {
             return;
         }
