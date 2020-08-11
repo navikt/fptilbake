@@ -6,6 +6,7 @@ import java.util.Objects;
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -43,11 +44,8 @@ public class FaktaFeilutbetalingPeriode extends BaseEntitet {
     })
     private Periode periode;
 
-    @ManyToOne
-    @JoinColumnsOrFormulas(value = {
-        @JoinColumnOrFormula(formula = @JoinFormula(value = "'" + HendelseType.DISCRIMINATOR + "'", referencedColumnName = "kodeverk")),
-        @JoinColumnOrFormula(column = @JoinColumn(name = "hendelse_type", referencedColumnName = "kode")),
-    })
+    @Convert(converter = HendelseType.KodeverdiConverter.class)
+    @Column(name = "hendelse_type")
     private HendelseType hendelseType;
 
     @ManyToOne

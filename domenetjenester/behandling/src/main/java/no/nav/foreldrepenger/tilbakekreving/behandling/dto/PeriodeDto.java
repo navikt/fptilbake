@@ -12,7 +12,6 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.IgnoreKodeverk;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.vedtak.util.InputValideringRegex;
 
@@ -30,7 +29,6 @@ public class PeriodeDto {
     private BigDecimal belop;
 
     @Valid
-    @IgnoreKodeverk //brukes bare ved output fra løsningingen, ikke som input
     private ForeldelseVurderingType foreldelseVurderingType;
 
     @Size(max = 4000)

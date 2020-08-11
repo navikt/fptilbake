@@ -15,7 +15,6 @@ import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.ValidKodeverk;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.SærligGrunn;
 import no.nav.vedtak.util.InputValideringRegex;
 
@@ -24,7 +23,7 @@ public class VilkårResultatAktsomhetDto {
     @Size(max = 5)
     @JsonProperty("sarligGrunner")
     @Valid
-    private List<@ValidKodeverk SærligGrunn> særligeGrunner = new ArrayList<>();
+    private List<@Valid SærligGrunn> særligeGrunner = new ArrayList<>();
 
     private boolean harGrunnerTilReduksjon;
 

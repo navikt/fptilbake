@@ -44,7 +44,7 @@ public enum AnnenVurdering implements Vurdering {
         }
         var ad = KODER.get(kode);
         if (ad == null) {
-            throw new IllegalArgumentException("Ukjent Fagsystem: " + kode);
+            throw new IllegalArgumentException("Ukjent AnnenVurdering: " + kode);
         }
         return ad;
     }

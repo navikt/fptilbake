@@ -1,5 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk;
 
+import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -17,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
 @JsonFormat(shape = JsonFormat.Shape.STRING)
-@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
+@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
 public enum KlasseType implements Kodeverdi {
 
     FEIL("FEIL","Feilkonto"),
@@ -60,7 +62,7 @@ public enum KlasseType implements Kodeverdi {
         }
         var ad = KODER.get(kode);
         if (ad == null) {
-            throw new IllegalArgumentException("Ukjent KlasseKode: " + kode);
+            throw new IllegalArgumentException("Ukjent KlasseType: " + kode);
         }
         return ad;
     }
@@ -70,22 +72,22 @@ public enum KlasseType implements Kodeverdi {
     }
 
     @Override
-    public java.lang.String getKode() {
+    public String getKode() {
         return kode;
     }
 
     @Override
-    public java.lang.String getOffisiellKode() {
+    public String getOffisiellKode() {
         return getKode();
     }
 
     @Override
-    public java.lang.String getKodeverk() {
+    public String getKodeverk() {
         return KODEVERK;
     }
 
     @Override
-    public java.lang.String getNavn() {
+    public String getNavn() {
         return navn;
     }
 

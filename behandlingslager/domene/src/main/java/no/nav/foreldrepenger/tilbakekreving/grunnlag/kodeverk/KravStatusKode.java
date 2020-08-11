@@ -1,5 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk;
 
+import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -17,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
 @JsonFormat(shape = JsonFormat.Shape.STRING)
-@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
+@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
 public enum KravStatusKode implements Kodeverdi {
 
     ANNULERT("ANNU","Kravgrunnlag annullert"),
@@ -64,7 +66,7 @@ public enum KravStatusKode implements Kodeverdi {
         }
         var ad = KODER.get(kode);
         if (ad == null) {
-            throw new IllegalArgumentException("Ukjent KlasseKode: " + kode);
+            throw new IllegalArgumentException("Ukjent KravStatusKode: " + kode);
         }
         return ad;
     }

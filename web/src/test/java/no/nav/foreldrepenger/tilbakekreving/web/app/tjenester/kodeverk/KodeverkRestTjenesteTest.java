@@ -11,7 +11,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KonsekvensForYtelsen;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.BasisKodeverdi;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.kodeverk.app.HentKodeverkTjeneste;
 
 public class KodeverkRestTjenesteTest {
@@ -29,8 +29,8 @@ public class KodeverkRestTjenesteTest {
                 .isEqualTo(Arrays.asList(KonsekvensForYtelsen.ENDRING_I_BEREGNING, KonsekvensForYtelsen.ENDRING_I_UTTAK));
     }
 
-    private static Map<String, Collection<? extends BasisKodeverdi>> getGruppertKodeliste() {
-        Map<String, Collection<? extends BasisKodeverdi>> map = new HashMap<>();
+    private static Map<String, Collection<? extends Kodeverdi>> getGruppertKodeliste() {
+        Map<String, Collection<? extends Kodeverdi>> map = new HashMap<>();
         map.put(KonsekvensForYtelsen.class.getSimpleName(), Arrays.asList(KonsekvensForYtelsen.ENDRING_I_BEREGNING, KonsekvensForYtelsen.ENDRING_I_UTTAK));
         return map;
     }

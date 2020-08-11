@@ -1,70 +1,116 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak;
 
-import java.util.HashMap;
+import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
-import no.nav.vedtak.feil.Feil;
-import no.nav.vedtak.feil.FeilFactory;
-import no.nav.vedtak.feil.LogLevel;
-import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
-import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-@Entity(name = "FagOmraadeKode")
-@DiscriminatorValue(FagOmrådeKode.DISCRIMINATOR)
-public class FagOmrådeKode extends Kodeliste {
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
-    public static final String DISCRIMINATOR = "FAG_OMRAADE_KODE";
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
+public enum FagOmrådeKode implements Kodeverdi {
 
-    public static final FagOmrådeKode FORELDREPENGER = new FagOmrådeKode("FP");
-    public static final FagOmrådeKode FORELDREPENGER_ARBEIDSGIVER = new FagOmrådeKode("FPREF");
-    public static final FagOmrådeKode SYKEPENGER = new FagOmrådeKode("SP");
-    public static final FagOmrådeKode SYKEPENGER_ARBEIDSGIVER = new FagOmrådeKode("SPREF");
-    public static final FagOmrådeKode PLEIEPENGER = new FagOmrådeKode("OOP");
-    public static final FagOmrådeKode PLEIEPENGER_ARBEIDSGIVER = new FagOmrådeKode("OOPREF");
-    public static final FagOmrådeKode ENGANGSSTØNAD = new FagOmrådeKode("REFUTG");
-    public static final FagOmrådeKode SVANGERSKAPSPENGER = new FagOmrådeKode("SVP");
-    public static final FagOmrådeKode SVANGERSKAPSPENGER_ARBEIDSGIVER = new FagOmrådeKode("SVPREF");
-    public static final FagOmrådeKode UDEFINERT = new FagOmrådeKode("-");
+    FORELDREPENGER("FP","Foreldrepenger"),
+    FORELDREPENGER_ARBEIDSGIVER("FPREF","Foreldrepenger refusjon"),
+    SYKEPENGER("SP","Sykepenger"),
+    SYKEPENGER_ARBEIDSGIVER("SPREF","Sykepenger refusjon"),
+    PLEIEPENGER_V1("OOP","Pleiepenger sykt barn"),
+    PLEIEPENGER_V1_ARBEIDSGIVER("OOPREF","Pleiepenger sykt barn"),
+    ENGANGSSTØNAD("REFUTG","Engangsstønad"),
+    SVANGERSKAPSPENGER("SVP","Svangerskapspenger"),
+    SVANGERSKAPSPENGER_ARBEIDSGIVER("SVPREF","Svangerskapspenger refusjon til arbeidsgiver"),
 
-    private static final Map<String, FagOmrådeKode> TILGJENGELIGE = new HashMap<>();
+    //K9
+    PLEIEPENGER_SYKT_BARN("PB","Pleiepenger sykt barn"),
+    PLEIEPENGER_SYKT_BARN_ARBEIDSGIVER("PBREF","Pleiepenger sykt barn"),
+    PLEIEPENGER_NÆRSTÅENDE("PN","Pleiepenger nærstående"),
+    PLEIEPENGER_NÆRSTÅENDE_ARBEIDSGIVER("PNREF","Pleiepenger nærstående"),
+    OMSORGSPENGER("OM","Omsorgspenger"),
+    OMSORGSPENGER_ARBEIDSGIVER("OMREF","Omsorgspenger"),
+    OPPLÆRINGSPENGER("OPP","Opplæringspenger"),
+    OPPLÆRINGSPENGER_ARBEIDSGIVER("OPPREF","Opplæringspenger"),
+    FRISINN("FRISINN","FRIlansere og Selstendig næringsdrivendes INNtektskompensasjon"),
+
+    UDEFINERT("-","udefinert");
+
+    private String kode;
+    private String navn;
+
+    public static final String KODEVERK = "FAG_OMRAADE_KODE";
+    private static final Map<String, FagOmrådeKode> KODER = new LinkedHashMap<>();
 
     static {
-        TILGJENGELIGE.put(FORELDREPENGER.getKode(), FORELDREPENGER);
-        TILGJENGELIGE.put(FORELDREPENGER_ARBEIDSGIVER.getKode(), FORELDREPENGER_ARBEIDSGIVER);
-        TILGJENGELIGE.put(SYKEPENGER.getKode(), SYKEPENGER);
-        TILGJENGELIGE.put(SYKEPENGER_ARBEIDSGIVER.getKode(), SYKEPENGER_ARBEIDSGIVER);
-        TILGJENGELIGE.put(PLEIEPENGER.getKode(), PLEIEPENGER);
-        TILGJENGELIGE.put(PLEIEPENGER_ARBEIDSGIVER.getKode(), PLEIEPENGER);
-        TILGJENGELIGE.put(ENGANGSSTØNAD.getKode(), ENGANGSSTØNAD);
-        TILGJENGELIGE.put(SVANGERSKAPSPENGER.getKode(), SVANGERSKAPSPENGER);
-        TILGJENGELIGE.put(SVANGERSKAPSPENGER_ARBEIDSGIVER.getKode(), SVANGERSKAPSPENGER_ARBEIDSGIVER);
-    }
-
-    FagOmrådeKode() {
-        //Hibernate
-    }
-
-    private FagOmrådeKode(String kode) {
-        super(kode, DISCRIMINATOR);
-    }
-
-    public static FagOmrådeKode fraKode(String kode) {
-        if (TILGJENGELIGE.containsKey(kode)) {
-            return TILGJENGELIGE.get(kode);
+        for (var v : values()) {
+            if (KODER.putIfAbsent(v.kode, v) != null) {
+                throw new IllegalArgumentException("Duplikat : " + v.kode);
+            }
         }
-        throw FagOmrådeKodeFeil.FEILFACTORY.ugyldigFagområdeKode(kode).toException();
     }
 
-    interface FagOmrådeKodeFeil extends DeklarerteFeil {
-
-        FagOmrådeKodeFeil FEILFACTORY = FeilFactory.create(FagOmrådeKodeFeil.class);
-
-        @TekniskFeil(feilkode = "FPT-312905", feilmelding = "FagOmrådeKode '%s' er ugyldig", logLevel = LogLevel.WARN)
-        Feil ugyldigFagområdeKode(String fagOmrådeKode);
+    private FagOmrådeKode(String kode, String navn) {
+        this.kode = kode;
+        this.navn = navn;
     }
 
+    @JsonCreator
+    public static FagOmrådeKode fraKode(@JsonProperty("kode") String kode) {
+        if (kode == null) {
+            return null;
+        }
+        var ad = KODER.get(kode);
+        if (ad == null) {
+            throw new IllegalArgumentException("Ukjent FagOmrådeKode: " + kode);
+        }
+        return ad;
+    }
+
+    public static Map<String, FagOmrådeKode> kodeMap() {
+        return Collections.unmodifiableMap(KODER);
+    }
+
+    @JsonProperty
+    @Override
+    public String getKode() {
+        return kode;
+    }
+
+    @Override
+    public String getOffisiellKode() {
+        return getKode();
+    }
+
+    @JsonProperty
+    @Override
+    public String getKodeverk() {
+        return KODEVERK;
+    }
+
+    @JsonProperty
+    @Override
+    public String getNavn() {
+        return navn;
+    }
+
+    @Converter(autoApply = true)
+    public static class KodeverdiConverter implements AttributeConverter<FagOmrådeKode, String> {
+        @Override
+        public String convertToDatabaseColumn(FagOmrådeKode attribute) {
+            return attribute == null ? null : attribute.getKode();
+        }
+
+        @Override
+        public FagOmrådeKode convertToEntityAttribute(String dbData) {
+            return dbData == null ? null : fraKode(dbData);
+        }
+    }
 }

@@ -68,23 +68,23 @@ public enum KonsekvensForYtelsen implements Kodeverdi {
 
     @JsonProperty
     @Override
-    public java.lang.String getKode() {
+    public String getKode() {
         return kode;
     }
 
     @Override
-    public java.lang.String getOffisiellKode() {
+    public String getOffisiellKode() {
         return getKode();
     }
 
     @JsonProperty
     @Override
-    public java.lang.String getKodeverk() {
+    public String getKodeverk() {
         return KODEVERK;
     }
 
     @Override
-    public java.lang.String getNavn() {
+    public String getNavn() {
         return navn;
     }
 }

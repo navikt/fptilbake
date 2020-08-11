@@ -192,7 +192,7 @@ public class TekstformatererVedtaksbrevAllePermutasjonerAvFaktaTest {
     }
 
     private List<HendelseMedUndertype> getFeilutbetalingsårsaker(FagsakYtelseType ytelseType) {
-        Set<HendelseType> hendelseTyper = kodeverkRepository.hentKodeRelasjonForKodeverk(FagsakYtelseType.class, HendelseType.class).get(ytelseType);
+        Set<HendelseType> hendelseTyper = HendelseType.getHendelseTyperForFagsakYtleseType(ytelseType);
         Map<HendelseType, Set<HendelseUnderType>> hendelseUndertypePrHendelseType = kodeverkRepository.hentKodeRelasjonForKodeverk(HendelseType.class, HendelseUnderType.class);
 
         List<HendelseMedUndertype> resultat = new ArrayList<>();

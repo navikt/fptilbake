@@ -16,7 +16,6 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.diff.IndexKey;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.BasisKodeverdi;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
@@ -211,7 +210,7 @@ public class HistorikkinnslagFelt extends BaseEntitet implements IndexKey {
             return this;
         }
 
-        public <K extends BasisKodeverdi> Builder medTilVerdi(K tilVerdi) {
+        public <K extends Kodeverdi> Builder medTilVerdi(K tilVerdi) {
             if (tilVerdi != null) {
                 kladd.tilVerdiKode = tilVerdi.getKode();
                 kladd.klTilVerdi = tilVerdi.getKodeverk();

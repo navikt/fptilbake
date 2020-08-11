@@ -1,60 +1,99 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk;
 
-import java.util.HashMap;
+import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
-import no.nav.vedtak.feil.Feil;
-import no.nav.vedtak.feil.FeilFactory;
-import no.nav.vedtak.feil.LogLevel;
-import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
-import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-@Entity(name = "SærligGrunn")
-@DiscriminatorValue(SærligGrunn.DISCRIMINATOR)
-public class SærligGrunn extends Kodeliste {
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
-    public static final String DISCRIMINATOR = "SAERLIG_GRUNN";
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
+public enum SærligGrunn implements Kodeverdi {
 
-    public static final SærligGrunn GRAD_AV_UAKTSOMHET = new SærligGrunn("GRAD_UAKTSOMHET");
-    public static final SærligGrunn HELT_ELLER_DELVIS_NAVS_FEIL = new SærligGrunn("HELT_ELLER_DELVIS_NAVS_FEIL");
-    public static final SærligGrunn STØRRELSE_BELØP = new SærligGrunn("STOERRELSE_BELOEP");
-    public static final SærligGrunn TID_FRA_UTBETALING = new SærligGrunn("TID_FRA_UTBETALING");
-    public static final SærligGrunn ANNET = new SærligGrunn("ANNET");
+    GRAD_AV_UAKTSOMHET("GRAD_UAKTSOMHET","Graden av uaktsomhet hos den kravet retter seg mot"),
+    HELT_ELLER_DELVIS_NAVS_FEIL("HELT_ELLER_DELVIS_NAVS_FEIL","Om feilen helt eller delvis kan tilskrives NAV"),
+    STØRRELSE_BELØP("STOERRELSE_BELOEP","Størrelsen på feilutbetalt beløp"),
+    TID_FRA_UTBETALING("TID_FRA_UTBETALING","Hvor lang tid siden utbetalingen fant sted"),
+    ANNET("ANNET","Annet");
 
-    private static final Map<String, SærligGrunn> særligGrunnerMap = new HashMap<>();
+    private String kode;
+    private String navn;
+
+    public static final String KODEVERK = "SAERLIG_GRUNN";
+    private static final Map<String, SærligGrunn> KODER = new LinkedHashMap<>();
 
     static {
-        særligGrunnerMap.put(GRAD_AV_UAKTSOMHET.getKode(), GRAD_AV_UAKTSOMHET);
-        særligGrunnerMap.put(HELT_ELLER_DELVIS_NAVS_FEIL.getKode(), HELT_ELLER_DELVIS_NAVS_FEIL);
-        særligGrunnerMap.put(STØRRELSE_BELØP.getKode(), STØRRELSE_BELØP);
-        særligGrunnerMap.put(TID_FRA_UTBETALING.getKode(), TID_FRA_UTBETALING);
-        særligGrunnerMap.put(ANNET.getKode(), ANNET);
-    }
-
-    SærligGrunn(String kode) {
-        super(kode, DISCRIMINATOR);
-    }
-
-    SærligGrunn() {
-        // For hibernate
-    }
-
-    public static SærligGrunn fraKode(String kode) {
-        if (særligGrunnerMap.containsKey(kode)) {
-            return særligGrunnerMap.get(kode);
+        for (var v : values()) {
+            if (KODER.putIfAbsent(v.kode, v) != null) {
+                throw new IllegalArgumentException("Duplikat : " + v.kode);
+            }
         }
-        throw SærligGrunnFeil.FEILFACTORY.ugyldigSærligGrunn(kode).toException();
     }
 
-    interface SærligGrunnFeil extends DeklarerteFeil {
+    private SærligGrunn(String kode, String navn) {
+        this.kode = kode;
+        this.navn = navn;
+    }
 
-        SærligGrunnFeil FEILFACTORY = FeilFactory.create(SærligGrunnFeil.class);
+    @JsonCreator
+    public static SærligGrunn fraKode(@JsonProperty("kode") String kode) {
+        if (kode == null) {
+            return null;
+        }
+        var ad = KODER.get(kode);
+        if (ad == null) {
+            throw new IllegalArgumentException("Ukjent SærligGrunn: " + kode);
+        }
+        return ad;
+    }
 
-        @TekniskFeil(feilkode = "FPT-312925", feilmelding = "SærligGrunn '%s' er ugyldig", logLevel = LogLevel.WARN)
-        Feil ugyldigSærligGrunn(String særligGrunn);
+    public static Map<String, SærligGrunn> kodeMap() {
+        return Collections.unmodifiableMap(KODER);
+    }
+
+    @JsonProperty
+    @Override
+    public String getKode() {
+        return kode;
+    }
+
+    @Override
+    public String getOffisiellKode() {
+        return getKode();
+    }
+
+    @JsonProperty
+    @Override
+    public String getKodeverk() {
+        return KODEVERK;
+    }
+
+    @JsonProperty
+    @Override
+    public String getNavn() {
+        return navn;
+    }
+
+    @Converter(autoApply = true)
+    public static class KodeverdiConverter implements AttributeConverter<SærligGrunn, String> {
+        @Override
+        public String convertToDatabaseColumn(SærligGrunn attribute) {
+            return attribute == null ? null : attribute.getKode();
+        }
+
+        @Override
+        public SærligGrunn convertToEntityAttribute(String dbData) {
+            return dbData == null ? null : fraKode(dbData);
+        }
     }
 }

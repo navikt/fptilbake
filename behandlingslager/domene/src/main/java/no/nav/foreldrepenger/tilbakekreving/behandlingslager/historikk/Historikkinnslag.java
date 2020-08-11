@@ -6,6 +6,7 @@ import java.util.Objects;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -40,10 +41,8 @@ public class Historikkinnslag extends BaseEntitet {
     @Column(name = "fagsak_id", nullable = false)
     private Long fagsakId;
 
-    @ManyToOne(optional = false)
-    @JoinColumnsOrFormulas({
-            @JoinColumnOrFormula(column = @JoinColumn(name = "historikk_aktoer_id", referencedColumnName = "kode", nullable = false)),
-            @JoinColumnOrFormula(formula = @JoinFormula(referencedColumnName = "kodeverk", value = "'" + HistorikkAktør.DISCRIMINATOR + "'"))})
+    @Convert(converter = HistorikkAktør.KodeverdiConverter.class)
+    @Column(name = "historikk_aktoer_id",nullable = false)
     private HistorikkAktør aktør = HistorikkAktør.UDEFINERT;
 
     @ManyToOne(optional = false)

@@ -48,7 +48,7 @@ public enum Aktsomhet implements Vurdering {
         }
         var ad = KODER.get(kode);
         if (ad == null) {
-            throw new IllegalArgumentException("Ukjent Fagsystem: " + kode);
+            throw new IllegalArgumentException("Ukjent Aktsomhet: " + kode);
         }
         return ad;
     }

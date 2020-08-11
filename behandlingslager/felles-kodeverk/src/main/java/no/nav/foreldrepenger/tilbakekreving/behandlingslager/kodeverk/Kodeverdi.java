@@ -1,12 +1,18 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk;
 
-/** Kodeverk som er portet til java. */
-public interface Kodeverdi extends BasisKodeverdi {
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.diff.IndexKey;
 
-    @Override
+public interface Kodeverdi extends IndexKey {
     String getKode();
 
-    @Override
+    String getOffisiellKode();
+
     String getKodeverk();
 
+    String getNavn();
+
+    @Override
+    default String getIndexKey() {
+        return getKode();
+    }
 }

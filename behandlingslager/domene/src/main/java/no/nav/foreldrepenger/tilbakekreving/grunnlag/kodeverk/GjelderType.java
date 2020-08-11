@@ -1,5 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk;
 
+import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -17,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
 @JsonFormat(shape = JsonFormat.Shape.STRING)
-@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
+@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
 public enum GjelderType implements Kodeverdi {
 
 
@@ -44,10 +46,6 @@ public enum GjelderType implements Kodeverdi {
         }
     }
 
-    private GjelderType(String kode) {
-        this.kode = kode;
-    }
-
     private GjelderType(String kode, String navn) {
         this.kode = kode;
         this.navn = navn;
@@ -60,7 +58,7 @@ public enum GjelderType implements Kodeverdi {
         }
         var ad = KODER.get(kode);
         if (ad == null) {
-            throw new IllegalArgumentException("Ukjent KlasseKode: " + kode);
+            throw new IllegalArgumentException("Ukjent GjelderType: " + kode);
         }
         return ad;
     }

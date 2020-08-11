@@ -56,7 +56,7 @@ public enum Venteårsak implements Kodeverdi {
         }
         var ad = KODER.get(kode);
         if (ad == null) {
-            throw new IllegalArgumentException("Ukjent Fagsystem: " + kode);
+            throw new IllegalArgumentException("Ukjent Venteårsak: " + kode);
         }
         return ad;
     }

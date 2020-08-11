@@ -1,28 +1,100 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-@Entity(name = "HistorikkAktør")
-@DiscriminatorValue(HistorikkAktør.DISCRIMINATOR)
-public class HistorikkAktør extends Kodeliste {
+import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
 
-    public static final String DISCRIMINATOR = "HISTORIKK_AKTOER"; //$NON-NLS-1$
-    public static final HistorikkAktør BESLUTTER = new HistorikkAktør("BESL"); //$NON-NLS-1$
-    public static final HistorikkAktør SAKSBEHANDLER = new HistorikkAktør("SBH"); //$NON-NLS-1$
-    public static final HistorikkAktør SØKER = new HistorikkAktør("SOKER"); //$NON-NLS-1$
-    public static final HistorikkAktør ARBEIDSGIVER = new HistorikkAktør("ARBEIDSGIVER"); //$NON-NLS-1$
-    public static final HistorikkAktør VEDTAKSLØSNINGEN = new HistorikkAktør("VL"); //$NON-NLS-1$
-    public static final HistorikkAktør UDEFINERT =  new HistorikkAktør("-"); //$NON-NLS-1$
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    public HistorikkAktør() {
-        //
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
+
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
+public enum HistorikkAktør implements Kodeverdi {
+
+    BESLUTTER("BESL","Beslutter"),
+    SAKSBEHANDLER("SBH","Saksbehandler"),
+    SØKER("SOKER","Søker"),
+    ARBEIDSGIVER("ARBEIDSGIVER","Arbeidsgiver"),
+    VEDTAKSLØSNINGEN("VL","Vedtaksløsningen"),
+    UDEFINERT("-","Ikke definert");
+
+    private String kode;
+    private String navn;
+
+    public static final String KODEVERK = "HISTORIKK_AKTOER";
+    private static Map<String, HistorikkAktør> KODER = new LinkedHashMap<>();
+
+    static {
+        for (var v : values()) {
+            if (KODER.putIfAbsent(v.kode, v) != null) {
+                throw new IllegalArgumentException("Duplikat : " + v.kode);
+            }
+        }
     }
 
-    public HistorikkAktør(String kode) {
-        super(kode, DISCRIMINATOR);
+    private HistorikkAktør(String kode, String navn) {
+        this.kode = kode;
+        this.navn = navn;
     }
 
+    @JsonCreator
+    public static HistorikkAktør fraKode(@JsonProperty("kode") String kode) {
+        if (kode == null) {
+            return null;
+        }
+        var ad = KODER.get(kode);
+        if (ad == null) {
+            throw new IllegalArgumentException("Ukjent HistorikkAktør: " + kode);
+        }
+        return ad;
+    }
+
+    public static Map<String, HistorikkAktør> kodeMap() {
+        return Collections.unmodifiableMap(KODER);
+    }
+
+    @JsonProperty
+    @Override
+    public java.lang.String getKode() {
+        return kode;
+    }
+
+    @Override
+    public java.lang.String getOffisiellKode() {
+        return getKode();
+    }
+
+    @JsonProperty
+    @Override
+    public java.lang.String getKodeverk() {
+        return KODEVERK;
+    }
+
+    @JsonProperty
+    @Override
+    public java.lang.String getNavn() {
+        return navn;
+    }
+
+    @Converter(autoApply = true)
+    public static class KodeverdiConverter implements AttributeConverter<HistorikkAktør, String> {
+        @Override
+        public String convertToDatabaseColumn(HistorikkAktør attribute) {
+            return attribute == null ? null : attribute.getKode();
+        }
+
+        @Override
+        public HistorikkAktør convertToEntityAttribute(String dbData) {
+            return dbData == null ? null : fraKode(dbData);
+        }
+    }
 }

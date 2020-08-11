@@ -165,7 +165,7 @@ public class VilkårsvurderingHistorikkInnslagTjeneste {
         grunnTekst.append(konvertFraBoolean(aktsomhetEntitet.getSærligGrunnerTilReduksjon()));
         grunnTekst.append(":");
         for (VilkårVurderingSærligGrunnEntitet særligGrunn : aktsomhetEntitet.getSærligGrunner()) {
-            SærligGrunn grunn = hentSærligGrunnKodeliste(særligGrunn.getGrunn());
+            SærligGrunn grunn = særligGrunn.getGrunn();
             StringBuilder tekst = new StringBuilder(grunn.getNavn());
             if (SærligGrunn.ANNET.equals(grunn)) {
                 tekst.append(":");
@@ -177,9 +177,6 @@ public class VilkårsvurderingHistorikkInnslagTjeneste {
         return grunnTekst.toString();
     }
 
-    private SærligGrunn hentSærligGrunnKodeliste(SærligGrunn grunn) {
-        return repositoryProvider.getKodeverkRepository().finn(SærligGrunn.class, grunn);
-    }
 
     private String getNavn(Kodeliste kode) {
         //TODO fjern oppslag, skal lagres med kode

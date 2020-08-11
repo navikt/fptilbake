@@ -15,13 +15,8 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.JoinColumnOrFormula;
-import org.hibernate.annotations.JoinFormula;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
@@ -49,9 +44,8 @@ public class Kravgrunnlag431 extends BaseEntitet {
     @Column(name = "krav_status_kode", nullable = false, updatable = false)
     private KravStatusKode kravStatusKode;
 
-    @ManyToOne(optional = false)
-    @JoinColumnOrFormula(column = @JoinColumn(name = "fag_omraade_kode", referencedColumnName = "kode", nullable = false))
-    @JoinColumnOrFormula(formula = @JoinFormula(referencedColumnName = "kodeverk", value = "'" + FagOmrådeKode.DISCRIMINATOR + "'"))
+    @Convert(converter = FagOmrådeKode.KodeverdiConverter.class)
+    @Column(name = "fag_omraade_kode", nullable = false)
     private FagOmrådeKode fagOmrådeKode;
 
     @Column(name = "fagsystem_id", nullable = false, updatable = false)

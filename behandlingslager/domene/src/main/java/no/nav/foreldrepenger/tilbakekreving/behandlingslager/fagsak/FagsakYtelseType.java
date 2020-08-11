@@ -1,54 +1,121 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak;
 
+import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
-import no.nav.vedtak.feil.Feil;
-import no.nav.vedtak.feil.FeilFactory;
-import no.nav.vedtak.feil.LogLevel;
-import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
-import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-@Entity(name = "FagsakYtelseType")
-@DiscriminatorValue(FagsakYtelseType.DISCRIMINATOR)
-public class FagsakYtelseType extends Kodeliste {
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
-    public static final String DISCRIMINATOR = "FAGSAK_YTELSE"; //$NON-NLS-1$
-    public static final FagsakYtelseType ENGANGSTØNAD = new FagsakYtelseType("ES"); //$NON-NLS-1$
-    public static final FagsakYtelseType FORELDREPENGER = new FagsakYtelseType("FP"); //$NON-NLS-1$
-    public static final FagsakYtelseType SVANGERSKAPSPENGER = new FagsakYtelseType("SVP"); //$NON-NLS-1$
-    public static final FagsakYtelseType UDEFINERT = new FagsakYtelseType("-"); //$NON-NLS-1$
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
+public enum FagsakYtelseType implements Kodeverdi {
 
-    private static final Map<String, FagsakYtelseType> YTELSE_TYPER = Map.of(
-        ENGANGSTØNAD.getKode(), ENGANGSTØNAD,
-        FORELDREPENGER.getKode(), FORELDREPENGER,
-        SVANGERSKAPSPENGER.getKode(), SVANGERSKAPSPENGER
-    );
 
-    FagsakYtelseType() {
-        // Hibernate
-    }
+    ENGANGSTØNAD("ES", "Engangsstønad","Eingongsstønad"),
+    FORELDREPENGER("FP", "Foreldrepenger","Foreldrepengar"),
+    SVANGERSKAPSPENGER("SVP", "Svangerskapspenger","Svangerskapspengar"),
 
-    public FagsakYtelseType(String kode) {
-        super(kode, DISCRIMINATOR);
-    }
+    //K9
+    FRISINN("FRISINN", "FRIlansere og Selvstendig næringsdrivendes INNtektskompensasjon",""),
+    PLEIEPENGER_SYKT_BARN("PSB", "Pleiepenger sykt barn",""),
+    PLEIEPENGER_NÆRSTÅENDE("PPN", "Pleiepenger nærstående",""),
+    OMSORGSPENGER("OMP", "Omsorgspenger",""),
+    OPPLÆRINGSPENGER("OLP", "Opplæringspenger",""),
 
-    public static FagsakYtelseType fraKode(String kode) {
-        if (YTELSE_TYPER.containsKey(kode)) {
-            return YTELSE_TYPER.get(kode);
+
+    UDEFINERT("-", "Ikke definert","Ikke Definert"); //$NON-NLS-1$
+
+    private String kode;
+    private String navn; //på bøkmål som standard
+    private String navnPåNynorsk;
+
+    public static final String KODEVERK = "FAGSAK_YTELSE"; //$NON-NLS-1$
+    private static final Map<String, FagsakYtelseType> KODER = new LinkedHashMap<>();
+
+    static {
+        for (var v : values()) {
+            if (KODER.putIfAbsent(v.kode, v) != null) {
+                throw new IllegalArgumentException("Duplikat : " + v.kode);
+            }
         }
-        throw FagsakYtelseTypeFeil.FEILFACTORY.ugyldigFagsakYtelseType(kode).toException();
     }
 
-    interface FagsakYtelseTypeFeil extends DeklarerteFeil {
+    private FagsakYtelseType(String kode, String navn, String navnPåNynorsk) {
+        this.kode = kode;
+        this.navn = navn;
+        this.navnPåNynorsk = navnPåNynorsk;
+    }
 
-        FagsakYtelseType.FagsakYtelseTypeFeil FEILFACTORY = FeilFactory.create(FagsakYtelseType.FagsakYtelseTypeFeil.class);
+    @JsonCreator
+    public static FagsakYtelseType fraKode(@JsonProperty("kode") String kode) {
+        if (kode == null) {
+            return null;
+        }
+        var ad = KODER.get(kode);
+        if (ad == null) {
+            throw new IllegalArgumentException("Ukjent FagsakYtelseType: " + kode);
+        }
+        return ad;
+    }
 
-        @TekniskFeil(feilkode = "FPT-312906", feilmelding = "FagsakYtelseType '%s' er ugyldig", logLevel = LogLevel.WARN)
-        Feil ugyldigFagsakYtelseType(String fagsakYtelseType);
+    public static Map<String, FagsakYtelseType> kodeMap() {
+        return Collections.unmodifiableMap(KODER);
+    }
+
+    @JsonProperty
+    @Override
+    public String getKode() {
+        return kode;
+    }
+
+    @Override
+    public String getOffisiellKode() {
+        return getKode();
+    }
+
+    @JsonProperty
+    @Override
+    public String getKodeverk() {
+        return KODEVERK;
+    }
+
+    @JsonProperty
+    @Override
+    public String getNavn() {
+        return navn;
+    }
+
+    @JsonProperty
+    public String getNavnPåNynorsk() {
+        return navnPåNynorsk;
+    }
+
+    @Converter(autoApply = true)
+    public static class KodeverdiConverter implements AttributeConverter<FagsakYtelseType, String> {
+        @Override
+        public String convertToDatabaseColumn(FagsakYtelseType attribute) {
+            return attribute == null ? null : attribute.getKode();
+        }
+
+        @Override
+        public FagsakYtelseType convertToEntityAttribute(String dbData) {
+            return dbData == null ? null : fraKode(dbData);
+        }
+    }
+
+    public static String finnFagsaktypenavnPåAngittSpråk(FagsakYtelseType fagsakYtelseType, Språkkode språkkode){
+        return Språkkode.nn.equals(språkkode) ? fagsakYtelseType.getNavnPåNynorsk() : fagsakYtelseType.getNavn();
     }
 
 }

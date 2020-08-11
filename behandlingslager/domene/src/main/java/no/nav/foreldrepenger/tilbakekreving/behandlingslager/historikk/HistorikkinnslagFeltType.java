@@ -62,7 +62,7 @@ public enum HistorikkinnslagFeltType implements Kodeverdi {
         }
         var ad = KODER.get(kode);
         if (ad == null) {
-            throw new IllegalArgumentException("Ukjent Fagsystem: " + kode);
+            throw new IllegalArgumentException("Ukjent HistorikkinnslagFeltType: " + kode);
         }
         return ad;
     }

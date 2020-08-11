@@ -2,6 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.tjeneste;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,7 +36,7 @@ public class FeilutbetalingÅrsakTjeneste {
     public List<HendelseTyperPrYtelseTypeDto> hentFeilutbetalingårsaker() {
         List<HendelseTyperPrYtelseTypeDto> resultat = new ArrayList<>();
 
-        Map<FagsakYtelseType, Set<HendelseType>> hendelseTypePrYtelseType = kodeverkRepository.hentKodeRelasjonForKodeverk(FagsakYtelseType.class, HendelseType.class);
+        Map<FagsakYtelseType, Set<HendelseType>> hendelseTypePrYtelseType = lagHendelseTypePrYtleseType();
         Map<HendelseType, Set<HendelseUnderType>> hendelseUndertypePrHendelseType = kodeverkRepository.hentKodeRelasjonForKodeverk(HendelseType.class, HendelseUnderType.class);
 
         for (Map.Entry<FagsakYtelseType, Set<HendelseType>> entry : hendelseTypePrYtelseType.entrySet()) {
@@ -52,6 +53,14 @@ public class FeilutbetalingÅrsakTjeneste {
         }
 
         return resultat;
+    }
+
+    private Map<FagsakYtelseType,Set<HendelseType>> lagHendelseTypePrYtleseType(){
+        Map<FagsakYtelseType,Set<HendelseType>> fagsakYtleseTypeHendelseTypeMap = new HashMap<>();
+        for(FagsakYtelseType fagsakYtelseType : FagsakYtelseType.values()){
+            fagsakYtleseTypeHendelseTypeMap.put(fagsakYtelseType,HendelseType.getHendelseTyperForFagsakYtleseType(fagsakYtelseType));
+        }
+        return fagsakYtleseTypeHendelseTypeMap;
     }
 
     private static <T extends Kodeliste> List<T> sortereBasertPåEkstradata(Set<T> kodelistene) {
