@@ -16,10 +16,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.JoinColumnOrFormula;
-import org.hibernate.annotations.JoinColumnsOrFormulas;
-import org.hibernate.annotations.JoinFormula;
-
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
@@ -48,11 +44,8 @@ public class FaktaFeilutbetalingPeriode extends BaseEntitet {
     @Column(name = "hendelse_type")
     private HendelseType hendelseType;
 
-    @ManyToOne
-    @JoinColumnsOrFormulas(value = {
-        @JoinColumnOrFormula(formula = @JoinFormula(value = "'" + HendelseUnderType.DISCRIMINATOR + "'", referencedColumnName = "kodeverk")),
-        @JoinColumnOrFormula(column = @JoinColumn(name = "hendelse_undertype", referencedColumnName = "kode")),
-    })
+    @Convert(converter = HendelseUnderType.KodeverdiConverter.class)
+    @Column(name = "hendelse_undertype")
     private HendelseUnderType hendelseUndertype;
 
     FaktaFeilutbetalingPeriode() {

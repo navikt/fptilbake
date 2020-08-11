@@ -13,7 +13,5 @@
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingAggregate"/>
 
-    <!--  kodeverk -->
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType"/>
 
 </entity-mappings>

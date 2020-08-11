@@ -60,6 +60,7 @@ public class HentKodeverkTjeneste {
         map.put(ForeldelseVurderingType.class.getSimpleName(), ForeldelseVurderingType.kodeMap().values());
         map.put(HistorikkAktør.class.getSimpleName(), HistorikkAktør.kodeMap().values());
         map.put(HendelseType.class.getSimpleName(), HendelseType.kodeMap().values());
+        map.put(HendelseUnderType.class.getSimpleName(), HendelseUnderType.kodeMap().values());
 
         Map<String, Collection<? extends Kodeverdi>> mapFiltered = new LinkedHashMap<>();
 
@@ -79,7 +80,6 @@ public class HentKodeverkTjeneste {
         BehandlingÅrsakType.class,
         BehandlingResultatType.class,
         VidereBehandling.class,
-        HendelseUnderType.class,
         VergeType.class
     );
 
