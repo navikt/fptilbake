@@ -7,6 +7,10 @@ public class HendelseUndertypePrHendelseType {
 
     private static final Map<HendelseType, Set<HendelseUnderType>> HIERARKI = Map.of();
 
+    static {
+        //TODO legg inn mapping her
+    }
+
     public static Map<HendelseType, Set<HendelseUnderType>> getHendelsetypeHierarki() {
         return HIERARKI;
     }

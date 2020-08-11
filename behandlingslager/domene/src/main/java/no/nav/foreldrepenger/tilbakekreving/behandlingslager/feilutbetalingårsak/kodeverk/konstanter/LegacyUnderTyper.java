@@ -9,6 +9,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
  */
 public interface LegacyUnderTyper {
 
-    HendelseUnderType LEGACY_ØKONOMI_UTBETALT_FOR_MYE = new HendelseUnderType("ØKONOMI_UTBETALT_FOR_MYE", "ØKONOMI_UTBETALT_FOR_MYE", "Feil i økonomi - utbetalt for mye", 1);
+    HendelseUnderType LEGACY_ØKONOMI_UTBETALT_FOR_MYE = HendelseUnderType.LEGACY_ØKONOMI_UTBETALT_FOR_MYE;
 
 }
