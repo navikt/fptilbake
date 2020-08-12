@@ -1,38 +1,108 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-@Entity(name = "HistorikkinnslagFeltType")
-@DiscriminatorValue(HistorikkinnslagFeltType.DISCRIMINATOR)
-public class HistorikkinnslagFeltType extends Kodeliste {
-    public static final String DISCRIMINATOR = "HISTORIKKINNSLAG_FELT_TYPE"; //$NON-NLS-1$
+import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
 
-    public static final HistorikkinnslagFeltType UDEFINIERT = new HistorikkinnslagFeltType("-");
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    public static final HistorikkinnslagFeltType AARSAK = new HistorikkinnslagFeltType("AARSAK");
-    public static final HistorikkinnslagFeltType BEGRUNNELSE = new HistorikkinnslagFeltType("BEGRUNNELSE");
-    public static final HistorikkinnslagFeltType HENDELSE = new HistorikkinnslagFeltType("HENDELSE");
-    public static final HistorikkinnslagFeltType RESULTAT = new HistorikkinnslagFeltType("RESULTAT");
-    public static final HistorikkinnslagFeltType OPPLYSNINGER = new HistorikkinnslagFeltType("OPPLYSNINGER");
-    public static final HistorikkinnslagFeltType ENDRET_FELT = new HistorikkinnslagFeltType("ENDRET_FELT");
-    public static final HistorikkinnslagFeltType SKJERMLENKE = new HistorikkinnslagFeltType("SKJERMLENKE");
-    public static final HistorikkinnslagFeltType GJELDENDE_FRA = new HistorikkinnslagFeltType("GJELDENDE_FRA");
-    public static final HistorikkinnslagFeltType AKSJONSPUNKT_BEGRUNNELSE = new HistorikkinnslagFeltType("AKSJONSPUNKT_BEGRUNNELSE");
-    public static final HistorikkinnslagFeltType AKSJONSPUNKT_GODKJENT = new HistorikkinnslagFeltType("AKSJONSPUNKT_GODKJENT");
-    public static final HistorikkinnslagFeltType AKSJONSPUNKT_KODE = new HistorikkinnslagFeltType("AKSJONSPUNKT_KODE");
-    public static final HistorikkinnslagFeltType AVKLART_SOEKNADSPERIODE = new HistorikkinnslagFeltType("AVKLART_SOEKNADSPERIODE");
-    public static final HistorikkinnslagFeltType ANGÅR_TEMA = new HistorikkinnslagFeltType("ANGÅR_TEMA");
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
+public enum HistorikkinnslagFeltType implements Kodeverdi {
 
-    public HistorikkinnslagFeltType() {
-        //
+    AARSAK("AARSAK"),
+    BEGRUNNELSE("BEGRUNNELSE"),
+    HENDELSE("HENDELSE"),
+    RESULTAT("RESULTAT"),
+    OPPLYSNINGER("OPPLYSNINGER"),
+    ENDRET_FELT("ENDRET_FELT"),
+    SKJERMLENKE("SKJERMLENKE"),
+    GJELDENDE_FRA("GJELDENDE_FRA"),
+    AKSJONSPUNKT_BEGRUNNELSE("AKSJONSPUNKT_BEGRUNNELSE"),
+    AKSJONSPUNKT_GODKJENT("AKSJONSPUNKT_GODKJENT"),
+    AKSJONSPUNKT_KODE("AKSJONSPUNKT_KODE"),
+    AVKLART_SOEKNADSPERIODE("AVKLART_SOEKNADSPERIODE"),
+    ANGÅR_TEMA("ANGÅR_TEMA"),
+
+    UDEFINIERT("-");
+
+    public static final String KODEVERK = "HISTORIKKINNSLAG_FELT_TYPE"; //$NON-NLS-1$
+
+    private static final Map<String, HistorikkinnslagFeltType> KODER = new LinkedHashMap<>();
+
+    private String kode;
+
+    static {
+        for (var v : values()) {
+            if (KODER.putIfAbsent(v.kode, v) != null) {
+                throw new IllegalArgumentException("Duplikat : " + v.kode);
+            }
+        }
     }
+
 
     private HistorikkinnslagFeltType(String kode) {
-        super(kode, DISCRIMINATOR);
+        this.kode = kode;
     }
 
+    @JsonCreator
+    public static HistorikkinnslagFeltType fraKode(@JsonProperty("kode") String kode) {
+        if (kode == null) {
+            return null;
+        }
+        var ad = KODER.get(kode);
+        if (ad == null) {
+            throw new IllegalArgumentException("Ukjent HistorikkinnslagFeltType: " + kode);
+        }
+        return ad;
+    }
+
+    public static Map<String, HistorikkinnslagFeltType> kodeMap() {
+        return Collections.unmodifiableMap(KODER);
+    }
+
+    @JsonProperty
+    @Override
+    public String getKode() {
+        return kode;
+    }
+
+    @Override
+    public String getOffisiellKode() {
+        return getKode();
+    }
+
+    @JsonProperty
+    @Override
+    public String getKodeverk() {
+        return KODEVERK;
+    }
+
+    @Override
+    public String getNavn() {
+        return null;
+    }
+
+    @Converter(autoApply = true)
+    public static class KodeverdiConverter implements AttributeConverter<HistorikkinnslagFeltType, String> {
+        @Override
+        public String convertToDatabaseColumn(HistorikkinnslagFeltType attribute) {
+            return attribute == null ? null : attribute.getKode();
+        }
+
+        @Override
+        public HistorikkinnslagFeltType convertToEntityAttribute(String dbData) {
+            return dbData == null ? null : fraKode(dbData);
+        }
+    }
 }

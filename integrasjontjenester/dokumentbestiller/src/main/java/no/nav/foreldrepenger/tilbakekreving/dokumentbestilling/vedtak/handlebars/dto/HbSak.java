@@ -6,13 +6,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.KodelisteSomKodeSerialiserer;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.KodeverdiSomKodeSerialiserer;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.LocalDateTilLangtNorskFormatSerialiserer;
 import no.nav.vedtak.util.Objects;
 
 public class HbSak {
     @JsonProperty("ytelsetype")
-    @JsonSerialize(using = KodelisteSomKodeSerialiserer.class)
+    @JsonSerialize(using = KodeverdiSomKodeSerialiserer.class)
     private FagsakYtelseType ytelsetype;
     @JsonProperty("er-fødsel")
     private boolean erFødsel;

@@ -1,61 +1,100 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk;
 
-import java.util.HashMap;
+import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
-import no.nav.vedtak.feil.Feil;
-import no.nav.vedtak.feil.FeilFactory;
-import no.nav.vedtak.feil.LogLevel;
-import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
-import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-@Entity(name = "VilkårResultat")
-@DiscriminatorValue(VilkårResultat.DISCRIMINATOR)
-public class VilkårResultat extends Kodeliste {
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
-    public static final String DISCRIMINATOR = "VILKAAR_RESULTAT";
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
+public enum VilkårResultat implements Kodeverdi {
 
-    public static final VilkårResultat FORSTO_BURDE_FORSTÅTT = new VilkårResultat("FORSTO_BURDE_FORSTAATT");
-    public static final VilkårResultat FEIL_OPPLYSNINGER_FRA_BRUKER = new VilkårResultat("FEIL_OPPLYSNINGER");
-    public static final VilkårResultat MANGELFULLE_OPPLYSNINGER_FRA_BRUKER = new VilkårResultat("MANGELFULL_OPPLYSNING");
-    public static final VilkårResultat GOD_TRO = new VilkårResultat("GOD_TRO");
+    FORSTO_BURDE_FORSTÅTT("FORSTO_BURDE_FORSTAATT","Ja, mottaker forsto eller burde forstått at utbetalingen skyldtes en feil (1. ledd, 1. punkt)"),
+    FEIL_OPPLYSNINGER_FRA_BRUKER("FEIL_OPPLYSNINGER","Ja, mottaker har forårsaket feilutbetalingen ved forsett eller uaktsomt gitt feilaktige opplysninger (1. ledd, 2 punkt)"),
+    MANGELFULLE_OPPLYSNINGER_FRA_BRUKER("MANGELFULL_OPPLYSNING","Ja, mottaker har forårsaket feilutbetalingen ved forsett eller uaktsomt gitt mangelfulle opplysninger (1. ledd, 2 punkt)"),
+    GOD_TRO("GOD_TRO","Nei, mottaker har mottatt beløpet i god tro (1. ledd)"),
+    UDEFINERT("-","Ikke Definert");
 
-    public static final VilkårResultat UDEFINERT = new VilkårResultat("-");
+    private String kode;
+    private String navn;
 
-    private static Map<String, VilkårResultat> vilkårResultatMap = new HashMap<>();
+    public static final String KODEVERK = "VILKAAR_RESULTAT";
+    private static Map<String, VilkårResultat> KODER = new LinkedHashMap<>();
 
     static {
-        vilkårResultatMap.put(FORSTO_BURDE_FORSTÅTT.getKode(), FORSTO_BURDE_FORSTÅTT);
-        vilkårResultatMap.put(FEIL_OPPLYSNINGER_FRA_BRUKER.getKode(), FEIL_OPPLYSNINGER_FRA_BRUKER);
-        vilkårResultatMap.put(MANGELFULLE_OPPLYSNINGER_FRA_BRUKER.getKode(), MANGELFULLE_OPPLYSNINGER_FRA_BRUKER);
-        vilkårResultatMap.put(GOD_TRO.getKode(), GOD_TRO);
-    }
-
-    private VilkårResultat(String kode) {
-        super(kode, DISCRIMINATOR);
-    }
-
-    VilkårResultat() {
-        // For hibernate
-    }
-
-    public static VilkårResultat fraKode(String kode) {
-        if (vilkårResultatMap.containsKey(kode)) {
-            return vilkårResultatMap.get(kode);
+        for (var v : values()) {
+            if (KODER.putIfAbsent(v.kode, v) != null) {
+                throw new IllegalArgumentException("Duplikat : " + v.kode);
+            }
         }
-        throw VilkårResultatFeil.FEILFACTORY.ugyldigVilkårResultat(kode).toException();
     }
 
-    interface VilkårResultatFeil extends DeklarerteFeil {
+    private VilkårResultat(String kode, String navn) {
+        this.kode = kode;
+        this.navn = navn;
+    }
 
-        VilkårResultatFeil FEILFACTORY = FeilFactory.create(VilkårResultatFeil.class);
+    @JsonCreator
+    public static VilkårResultat fraKode(@JsonProperty("kode") String kode) {
+        if (kode == null) {
+            return null;
+        }
+        var ad = KODER.get(kode);
+        if (ad == null) {
+            throw new IllegalArgumentException("Ukjent VilkårResultat: " + kode);
+        }
+        return ad;
+    }
 
-        @TekniskFeil(feilkode = "FPT-312923", feilmelding = "VilkårResultat '%s' er ugyldig", logLevel = LogLevel.WARN)
-        Feil ugyldigVilkårResultat(String vilkårResultat);
+    public static Map<String, VilkårResultat> kodeMap() {
+        return Collections.unmodifiableMap(KODER);
+    }
+
+    @JsonProperty
+    @Override
+    public String getKode() {
+        return kode;
+    }
+
+    @JsonProperty
+    @Override
+    public String getOffisiellKode() {
+        return getKode();
+    }
+
+    @Override
+    public String getKodeverk() {
+        return KODEVERK;
+    }
+
+    @JsonProperty
+    @Override
+    public String getNavn() {
+        return navn;
+    }
+
+    @Converter(autoApply = true)
+    public static class KodeverdiConverter implements AttributeConverter<VilkårResultat, String> {
+        @Override
+        public String convertToDatabaseColumn(VilkårResultat attribute) {
+            return attribute == null ? null : attribute.getKode();
+        }
+
+        @Override
+        public VilkårResultat convertToEntityAttribute(String dbData) {
+            return dbData == null ? null : fraKode(dbData);
+        }
     }
 
 }

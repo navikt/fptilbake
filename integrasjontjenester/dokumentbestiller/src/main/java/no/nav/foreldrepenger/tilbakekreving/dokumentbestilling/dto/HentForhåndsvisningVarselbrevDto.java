@@ -8,7 +8,6 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.ValidKodeverk;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.TilbakekrevingAbacAttributtType;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.AbacDto;
@@ -25,7 +24,7 @@ public class HentForhåndsvisningVarselbrevDto implements AbacDto {
     private String varseltekst;
 
     @NotNull
-    @ValidKodeverk
+    @Valid
     private FagsakYtelseType fagsakYtelseType;
 
     public UUID getBehandlingUuid() {

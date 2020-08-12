@@ -2,7 +2,6 @@ package no.nav.foreldrepenger.tilbakekreving.historikk.dto;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagFelt;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 
 class HistorikkInnslagTemaDto {
     private HistorikkEndretFeltType endretFeltNavn;
@@ -34,9 +33,9 @@ class HistorikkInnslagTemaDto {
     }
 
 
-    static HistorikkInnslagTemaDto mapFra(HistorikkinnslagFelt felt, KodeverkRepository kodeverkRepository) {
+    static HistorikkInnslagTemaDto mapFra(HistorikkinnslagFelt felt) {
         HistorikkInnslagTemaDto dto = new HistorikkInnslagTemaDto();
-        HistorikkEndretFeltType endretFeltNavn = kodeverkRepository.finn(HistorikkEndretFeltType.class, felt.getNavn());
+        HistorikkEndretFeltType endretFeltNavn = HistorikkEndretFeltType.fraKode(felt.getNavn());
         dto.setEndretFeltNavn(endretFeltNavn);
         dto.setNavnVerdi(felt.getNavnVerdi());
         dto.setKlNavn(felt.getKlNavn());

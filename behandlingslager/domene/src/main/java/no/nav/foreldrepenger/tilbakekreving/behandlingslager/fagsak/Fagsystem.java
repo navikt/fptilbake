@@ -1,67 +1,95 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak;
 
-import java.util.Comparator;
-import java.util.HashMap;
+import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Objects;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
 
-@Entity(name = "Fagsystem")
-@DiscriminatorValue(Fagsystem.DISCRIMINATOR)
-public class Fagsystem extends Kodeliste {
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
+public enum Fagsystem implements Kodeverdi {
 
-    public static final String DISCRIMINATOR = "FAGSYSTEM";
-    public static final Comparator<Fagsystem> NULLSAFE_COMPARATOR = Comparator.nullsFirst(Fagsystem::compareTo);
 
-    /**
-     * Konstanter for å skrive ned kodeverdi. For å hente ut andre data konfigurert, må disse leses fra databasen (eks.
-     * for å hente offisiell kode for et Nav kodeverk).
-     */
-    public static final Fagsystem FPSAK = new Fagsystem("FPSAK", "FS36");
-    public static final Fagsystem TPS = new Fagsystem("TPS", "FS03");
-    public static final Fagsystem JOARK = new Fagsystem("JOARK", "AS36");
-    public static final Fagsystem INFOTRYGD = new Fagsystem("INFOTRYGD", "IT01");
-    public static final Fagsystem ARENA = new Fagsystem("ARENA", "AO01");
-    public static final Fagsystem INNTEKT = new Fagsystem("INNTEKT", "FS28");
-    public static final Fagsystem MEDL = new Fagsystem("MEDL", "FS18");
-    public static final Fagsystem GOSYS = new Fagsystem("GOSYS", "FS22");
-    public static final Fagsystem ENHETSREGISTERET = new Fagsystem("ENHETSREGISTERET", "ER01");
-    public static final Fagsystem AAREGISTERET = new Fagsystem("AAREGISTERET", "AR01");
-    public static final Fagsystem FPTILBAKE = new Fagsystem("FPTILBAKE");
+    FPSAK("FPSAK", "FS36"),
+    TPS("TPS", "FS03"),
+    JOARK("JOARK", "AS36"),
+    INFOTRYGD("INFOTRYGD", "IT01"),
+    ARENA("ARENA", "AO01"),
+    INNTEKT("INNTEKT", "FS28"),
+    MEDL("MEDL", "FS18"),
+    GOSYS("GOSYS", "FS22"),
+    ENHETSREGISTERET("ENHETSREGISTERET", "ER01"),
+    AAREGISTERET("AAREGISTERET", "AR01"),
+    FPTILBAKE("FPTILBAKE",""),
+    K9TILBAKE("K9TILBAKE","");
 
-    private static final Map<String, Fagsystem> TILGJENGELIG = new HashMap<>();
+    public static final String KODEVERK = "FAGSYSTEM";
+
+    private static final Map<String, Fagsystem> KODER = new LinkedHashMap<>();
+
+    private String kode;
+
+    @JsonIgnore
+    private String offisiellKode;
 
     static {
-        TILGJENGELIG.put(Fagsystem.FPSAK.getKode(), Fagsystem.FPSAK);
-        TILGJENGELIG.put(Fagsystem.FPTILBAKE.getKode(), Fagsystem.FPTILBAKE);
-    }
-
-    /**
-     * Alle kodeverk må ha en verdi, det kan ikke være null i databasen. Denne koden gjør samme nytten.
-     */
-    public static final Fagsystem UDEFINERT = new Fagsystem("-");
-
-    public Fagsystem() {
-        // Hibernate trenger den
-    }
-
-    private Fagsystem(String kode) {
-        super(kode, DISCRIMINATOR);
+        for (var v : values()) {
+            if (KODER.putIfAbsent(v.kode, v) != null) {
+                throw new IllegalArgumentException("Duplikat : " + v.kode);
+            }
+        }
     }
 
     private Fagsystem(String kode, String offisiellKode) {
-        super(kode, DISCRIMINATOR, offisiellKode, null, null);
+        this.kode = kode;
+        this.offisiellKode = offisiellKode;
     }
 
-    public static Fagsystem fraKode(String kode) {
-        String ucKode = kode.toUpperCase();
-        Fagsystem sys = TILGJENGELIG.get(ucKode);
-        Objects.requireNonNull(sys);
-        return sys;
+    @JsonCreator
+    public static Fagsystem fraKode(@JsonProperty("kode") String kode) {
+        if (kode == null) {
+            return null;
+        }
+        var ad = KODER.get(kode);
+        if (ad == null) {
+            throw new IllegalArgumentException("Ukjent Fagsystem: " + kode);
+        }
+        return ad;
+    }
+
+    public static Map<String, Fagsystem> kodeMap() {
+        return Collections.unmodifiableMap(KODER);
+    }
+
+    @JsonProperty
+    @Override
+    public String getKode() {
+        return kode;
+    }
+
+    @Override
+    public String getOffisiellKode() {
+        return offisiellKode;
+    }
+
+    @JsonProperty
+    @Override
+    public String getKodeverk() {
+        return KODEVERK;
+    }
+
+    @Override
+    public String getNavn() {
+        return null;
     }
 }

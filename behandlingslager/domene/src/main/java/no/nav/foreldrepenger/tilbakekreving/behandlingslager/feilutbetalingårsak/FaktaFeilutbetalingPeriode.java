@@ -6,6 +6,7 @@ import java.util.Objects;
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,10 +15,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.JoinColumnOrFormula;
-import org.hibernate.annotations.JoinColumnsOrFormulas;
-import org.hibernate.annotations.JoinFormula;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
@@ -43,18 +40,12 @@ public class FaktaFeilutbetalingPeriode extends BaseEntitet {
     })
     private Periode periode;
 
-    @ManyToOne
-    @JoinColumnsOrFormulas(value = {
-        @JoinColumnOrFormula(formula = @JoinFormula(value = "'" + HendelseType.DISCRIMINATOR + "'", referencedColumnName = "kodeverk")),
-        @JoinColumnOrFormula(column = @JoinColumn(name = "hendelse_type", referencedColumnName = "kode")),
-    })
+    @Convert(converter = HendelseType.KodeverdiConverter.class)
+    @Column(name = "hendelse_type")
     private HendelseType hendelseType;
 
-    @ManyToOne
-    @JoinColumnsOrFormulas(value = {
-        @JoinColumnOrFormula(formula = @JoinFormula(value = "'" + HendelseUnderType.DISCRIMINATOR + "'", referencedColumnName = "kodeverk")),
-        @JoinColumnOrFormula(column = @JoinColumn(name = "hendelse_undertype", referencedColumnName = "kode")),
-    })
+    @Convert(converter = HendelseUnderType.KodeverdiConverter.class)
+    @Column(name = "hendelse_undertype")
     private HendelseUnderType hendelseUndertype;
 
     FaktaFeilutbetalingPeriode() {

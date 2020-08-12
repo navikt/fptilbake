@@ -5,15 +5,15 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.KodelisteSomKodeSerialiserer;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.KodeverdiSomKodeSerialiserer;
 import no.nav.vedtak.util.Objects;
 
 public class HbFakta {
     @JsonProperty("hendelsetype")
-    @JsonSerialize(using = KodelisteSomKodeSerialiserer.class)
+    @JsonSerialize(using = KodeverdiSomKodeSerialiserer.class)
     private HendelseType hendelsetype;
     @JsonProperty("hendelseundertype")
-    @JsonSerialize(using = KodelisteSomKodeSerialiserer.class)
+    @JsonSerialize(using = KodeverdiSomKodeSerialiserer.class)
     private HendelseUnderType hendelseundertype;
     @JsonProperty("fritekst-fakta")
     private String fritekstFakta;

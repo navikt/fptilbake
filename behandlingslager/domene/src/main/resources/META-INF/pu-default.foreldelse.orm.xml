@@ -13,7 +13,4 @@
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelse"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelsePeriode"/>
 
-    <!-- kodeverk -->
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType"/>
-
 </entity-mappings>

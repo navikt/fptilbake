@@ -2,19 +2,19 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.dto;
 
 import java.time.LocalDate;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.ValidKodeverk;
 import no.nav.vedtak.util.InputValideringRegex;
 
 public class ForeldelsePeriodeDto {
 
     private LocalDate fraDato;
     private LocalDate tilDato;
-    @ValidKodeverk
+    @Valid
     private ForeldelseVurderingType foreldelseVurderingType;
 
     @NotNull

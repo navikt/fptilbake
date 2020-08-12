@@ -41,7 +41,7 @@ import no.nav.vedtak.util.StringUtils;
 @MappedSuperclass
 @Table(name = "KODELISTE")
 @DiscriminatorColumn(name = "kodeverk")
-public abstract class Kodeliste extends KodeverkBaseEntitet implements Comparable<Kodeliste> {
+public abstract class Kodeliste extends KodeverkBaseEntitet implements Comparable<Kodeliste>, Kodeverdi {
     private static final String I18N_MELDINGER_KEY = "i18n.Meldinger"; //$NON-NLS-1$
 
     /**

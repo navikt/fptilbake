@@ -19,7 +19,9 @@ import org.junit.Test;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseTypePrYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUndertypePrHendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepositoryImpl;
@@ -221,8 +223,8 @@ public class DokumentasjonGeneratorFakta {
     }
 
     private List<HendelseMedUndertype> getFeilutbetalingsårsaker(FagsakYtelseType ytelseType) {
-        Set<HendelseType> hendelseTyper = kodeverkRepository.hentKodeRelasjonForKodeverk(FagsakYtelseType.class, HendelseType.class).get(ytelseType);
-        Map<HendelseType, Set<HendelseUnderType>> hendelseUndertypePrHendelseType = kodeverkRepository.hentKodeRelasjonForKodeverk(HendelseType.class, HendelseUnderType.class);
+        Set<HendelseType> hendelseTyper = HendelseTypePrYtelseType.getHendelsetyper(ytelseType);
+        Map<HendelseType, Set<HendelseUnderType>> hendelseUndertypePrHendelseType = HendelseUndertypePrHendelseType.getHendelsetypeHierarki();
 
         List<HendelseMedUndertype> resultat = new ArrayList<>();
         for (HendelseType hendelseType : hendelseTyper) {
@@ -240,14 +242,14 @@ public class DokumentasjonGeneratorFakta {
         @Override
         public int compare(HendelseMedUndertype o1, HendelseMedUndertype o2) {
             int hendelseCompare = Long.compare(
-                Long.parseLong(o1.getHendelseType().getEkstraData()),
-                Long.parseLong(o2.getHendelseType().getEkstraData()));
+                o1.getHendelseType().getSortering(),
+                o2.getHendelseType().getSortering());
             if (hendelseCompare != 0) {
                 return hendelseCompare;
             }
             return Long.compare(
-                Long.parseLong(o1.getHendelseUnderType().getEkstraData()),
-                Long.parseLong(o2.getHendelseUnderType().getEkstraData())
+                o1.getHendelseUnderType().getSortering(),
+                o2.getHendelseUnderType().getSortering()
             );
         }
     }

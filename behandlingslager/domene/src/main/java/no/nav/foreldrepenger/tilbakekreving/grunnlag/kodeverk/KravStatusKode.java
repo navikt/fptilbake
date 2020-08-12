@@ -1,57 +1,110 @@
 package no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk;
 
-import java.util.HashMap;
+import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagFeil;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 
-@Entity(name = "KravStatusKode")
-@DiscriminatorValue(KravStatusKode.DISCRIMINATOR)
-public class KravStatusKode extends Kodeliste {
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
-    public static final String DISCRIMINATOR = "KRAV_STATUS_KODE";
+@JsonFormat(shape = JsonFormat.Shape.STRING)
+@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
+public enum KravStatusKode implements Kodeverdi {
 
-    public static final KravStatusKode ANNULERT = new KravStatusKode("ANNU");
-    public static final KravStatusKode ANNULLERT_OMG = new KravStatusKode("ANOM");
-    public static final KravStatusKode AVSLUTTET = new KravStatusKode("AVSL");
-    public static final KravStatusKode BEHANDLET = new KravStatusKode("BEHA");
-    public static final KravStatusKode ENDRET = new KravStatusKode("ENDR");
-    public static final KravStatusKode FEIL = new KravStatusKode("FEIL");
-    public static final KravStatusKode MANUELL = new KravStatusKode("MANU");
-    public static final KravStatusKode NYTT = new KravStatusKode("NY");
-    public static final KravStatusKode SPERRET = new KravStatusKode("SPER");
+    ANNULERT("ANNU","Kravgrunnlag annullert"),
+    ANNULLERT_OMG("ANOM","Kravgrunnlag annullert ved omg"),
+    AVSLUTTET("AVSL","Avsluttet kravgrunnlag"),
+    BEHANDLET("BEHA","Kravgrunnlag ferdigbehandlet"),
+    ENDRET("ENDR","Endret kravgrunnlag"),
+    FEIL("FEIL","Feil på kravgrunnlag"),
+    MANUELL("MANU","Manuell behandling"),
+    NYTT("NY","Nytt kravgrunnlag"),
+    SPERRET("SPER","Kravgrunnlag sperret");
 
-    private static Map<String, KravStatusKode> kravStatusKodeMap = new HashMap<>();
+    public static final String KODEVERK = "KRAV_STATUS_KODE";
+
+    private static Map<String, KravStatusKode> KODER = new LinkedHashMap<>();
+
+    @JsonValue
+    private String kode;
+
+    @JsonIgnore
+    private String navn;
 
     static {
-        kravStatusKodeMap.put(ANNULERT.getKode(), ANNULERT);
-        kravStatusKodeMap.put(ANNULLERT_OMG.getKode(), ANNULLERT_OMG);
-        kravStatusKodeMap.put(AVSLUTTET.getKode(), AVSLUTTET);
-        kravStatusKodeMap.put(BEHANDLET.getKode(), BEHANDLET);
-        kravStatusKodeMap.put(ENDRET.getKode(), ENDRET);
-        kravStatusKodeMap.put(FEIL.getKode(), FEIL);
-        kravStatusKodeMap.put(MANUELL.getKode(), MANUELL);
-        kravStatusKodeMap.put(NYTT.getKode(), NYTT);
-        kravStatusKodeMap.put(SPERRET.getKode(), SPERRET);
-    }
-
-    KravStatusKode() {
-        // For hibernate
+        for (var v : values()) {
+            if (KODER.putIfAbsent(v.kode, v) != null) {
+                throw new IllegalArgumentException("Duplikat : " + v.kode);
+            }
+        }
     }
 
     private KravStatusKode(String kode) {
-        super(kode, DISCRIMINATOR);
+        this.kode = kode;
     }
 
-    public static KravStatusKode fraKode(String kode) {
-        if (kravStatusKodeMap.containsKey(kode)) {
-            return kravStatusKodeMap.get(kode);
+    private KravStatusKode(String kode, String navn){
+        this.kode = kode;
+        this.navn = navn;
+    }
+
+    @JsonCreator
+    public static KravStatusKode fraKode(@JsonProperty("kode") String kode) {
+        if (kode == null) {
+            return null;
         }
-        throw KravgrunnlagFeil.FEILFACTORY.ugyldigKravStatusKode(kode).toException();
+        var ad = KODER.get(kode);
+        if (ad == null) {
+            throw new IllegalArgumentException("Ukjent KravStatusKode: " + kode);
+        }
+        return ad;
     }
 
+    public static Map<String, KravStatusKode> kodeMap() {
+        return Collections.unmodifiableMap(KODER);
+    }
+
+    @Override
+    public String getKode() {
+        return kode;
+    }
+
+    @Override
+    public String getOffisiellKode() {
+        return getKode();
+    }
+
+    @Override
+    public String getKodeverk() {
+        return KODEVERK;
+    }
+
+    @Override
+    public String getNavn() {
+        return navn;
+    }
+
+    @Converter(autoApply = true)
+    public static class KodeverdiConverter implements AttributeConverter<KravStatusKode, String> {
+        @Override
+        public String convertToDatabaseColumn(KravStatusKode attribute) {
+            return attribute == null ? null : attribute.getKode();
+        }
+
+        @Override
+        public KravStatusKode convertToEntityAttribute(String dbData) {
+            return dbData == null ? null : fraKode(dbData);
+        }
+    }
 }

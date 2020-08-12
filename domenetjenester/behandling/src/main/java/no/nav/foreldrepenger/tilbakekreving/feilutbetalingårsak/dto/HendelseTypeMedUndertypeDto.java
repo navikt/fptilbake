@@ -1,19 +1,19 @@
 package no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.ValidKodeverk;
 
 public class HendelseTypeMedUndertypeDto {
 
     @NotNull
-    @ValidKodeverk
+    @Valid
     private HendelseType hendelseType;
 
     @NotNull
-    @ValidKodeverk
+    @Valid
     private HendelseUnderType hendelseUndertype;
 
     public HendelseTypeMedUndertypeDto() {

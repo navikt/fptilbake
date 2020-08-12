@@ -6,19 +6,15 @@ import java.util.Objects;
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.apache.http.util.Args;
-import org.hibernate.annotations.JoinColumnOrFormula;
-import org.hibernate.annotations.JoinColumnsOrFormulas;
-import org.hibernate.annotations.JoinFormula;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
@@ -42,11 +38,8 @@ public class VergeEntitet extends BaseEntitet {
     })
     private Periode gyldigPeriode; //NOSONAR
 
-    @ManyToOne
-    @JoinColumnsOrFormulas(value = {
-        @JoinColumnOrFormula(formula = @JoinFormula(value = "'" + VergeType.DISCRIMINATOR + "'", referencedColumnName = "kodeverk")),
-        @JoinColumnOrFormula(column = @JoinColumn(name = "verge_type", referencedColumnName = "kode")),
-    })
+    @Convert(converter = VergeType.KodeverdiConverter.class)
+    @Column(name = "verge_type")
     private VergeType vergeType = VergeType.UDEFINERT;
 
     @Column(name = "orgnr")

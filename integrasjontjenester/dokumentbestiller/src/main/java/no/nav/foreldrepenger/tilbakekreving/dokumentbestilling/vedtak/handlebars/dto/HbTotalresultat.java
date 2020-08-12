@@ -7,13 +7,13 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.BigDecimalHeltallSerialiserer;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.KodelisteSomKodeSerialiserer;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.KodeverdiSomKodeSerialiserer;
 import no.nav.vedtak.util.Objects;
 
 public class HbTotalresultat {
 
     @JsonProperty("hovedresultat")
-    @JsonSerialize(using = KodelisteSomKodeSerialiserer.class)
+    @JsonSerialize(using = KodeverdiSomKodeSerialiserer.class)
     private VedtakResultatType hovedresultat;
     @JsonProperty("totalt-tilbakekreves-beløp")
     @JsonSerialize(using = BigDecimalHeltallSerialiserer.class)

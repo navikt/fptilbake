@@ -1,12 +1,10 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkBaseEntitet;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
-import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
-import org.hibernate.annotations.JoinColumnOrFormula;
-import org.hibernate.annotations.JoinColumnsOrFormulas;
-import org.hibernate.annotations.JoinFormula;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Convert;
@@ -16,15 +14,14 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkBaseEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
+import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
 
 @Entity(name = "VilkårVurderingAktsomhet")
 @Table(name = "VILKAAR_AKTSOMHET")
@@ -38,11 +35,8 @@ public class VilkårVurderingAktsomhetEntitet extends KodeverkBaseEntitet {
     @JoinColumn(name = "vilkaar_periode_id", nullable = false, updatable = false)
     private VilkårVurderingPeriodeEntitet periode;
 
-    @ManyToOne
-    @JoinColumnsOrFormulas(value = {
-        @JoinColumnOrFormula(formula = @JoinFormula(value = "'" + Aktsomhet.DISCRIMINATOR + "'", referencedColumnName = "kodeverk")),
-        @JoinColumnOrFormula(column = @JoinColumn(name = "aktsomhet", referencedColumnName = "kode")),
-    })
+    @Convert(converter = Aktsomhet.KodeverdiConverter.class)
+    @Column(name = "aktsomhet")
     private Aktsomhet aktsomhet;
 
     @Convert(converter = BooleanToStringConverter.class)

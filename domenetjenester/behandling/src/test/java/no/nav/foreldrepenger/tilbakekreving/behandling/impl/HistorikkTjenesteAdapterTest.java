@@ -33,7 +33,7 @@ public class HistorikkTjenesteAdapterTest extends FellesTestOppsett {
         assertThat(historikkinnslagDto.getAktoer()).isEqualByComparingTo(HistorikkAktør.SAKSBEHANDLER);
         assertThat(historikkinnslagDto.getHistorikkinnslagDeler()).isNotEmpty();
         HistorikkinnslagDelDto historikkinnslagDelDto = historikkinnslagDto.getHistorikkinnslagDeler().get(0);
-        assertThat(historikkinnslagDelDto.getBegrunnelse()).isEqualByComparingTo(HistorikkBegrunnelseType.SAKSBEH_START_PA_NYTT);
+        assertThat(historikkinnslagDelDto.getBegrunnelse().getKode()).isEqualTo(HistorikkBegrunnelseType.SAKSBEH_START_PA_NYTT.getKode());
         assertThat(historikkinnslagDelDto.getEndredeFelter()).isNotEmpty();
         HistorikkinnslagEndretFeltDto historikkinnslagEndretFeltDto = historikkinnslagDelDto.getEndredeFelter().get(0);
         assertThat(historikkinnslagEndretFeltDto.getEndretFeltNavn()).isEqualByComparingTo(HistorikkEndretFeltType.BEHANDLING);

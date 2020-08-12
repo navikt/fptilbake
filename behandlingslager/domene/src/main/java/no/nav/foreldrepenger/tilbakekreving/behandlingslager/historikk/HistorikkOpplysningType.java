@@ -1,30 +1,90 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-@Entity(name = "HistorikkOpplysningType")
-@DiscriminatorValue(HistorikkOpplysningType.DISCRIMINATOR)
-public class HistorikkOpplysningType extends Kodeliste {
-    public static final String DISCRIMINATOR = "HISTORIKK_OPPLYSNING_TYPE"; //$NON-NLS-1$
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    public static final HistorikkOpplysningType UDEFINIERT = new HistorikkOpplysningType("-");
-    public static final HistorikkOpplysningType FODSELSDATO = new HistorikkOpplysningType("FODSELSDATO");
-    public static final HistorikkOpplysningType PERIODE_FOM = new HistorikkOpplysningType("PERIODE_FOM");
-    public static final HistorikkOpplysningType PERIODE_TOM = new HistorikkOpplysningType("PERIODE_TOM");
-    public static final HistorikkOpplysningType TILBAKEKREVING_OPPFYLT_BEGRUNNELSE = new HistorikkOpplysningType("TILBAKEKREVING_OPPFYLT_BEGRUNNELSE");
-    public static final HistorikkOpplysningType SÆRLIG_GRUNNER_BEGRUNNELSE = new HistorikkOpplysningType("SÆRLIG_GRUNNER_BEGRUNNELSE");
-    public static final HistorikkOpplysningType KRAVGRUNNLAG_VEDTAK_ID = new HistorikkOpplysningType("KRAVGRUNNLAG_VEDTAK_ID");
-    public static final HistorikkOpplysningType KRAVGRUNNLAG_STATUS = new HistorikkOpplysningType("KRAVGRUNNLAG_STATUS");
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
-    public HistorikkOpplysningType() {
-        //
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
+public enum HistorikkOpplysningType implements Kodeverdi {
+
+    FODSELSDATO("FODSELSDATO"),
+    PERIODE_FOM("PERIODE_FOM"),
+    PERIODE_TOM("PERIODE_TOM"),
+    TILBAKEKREVING_OPPFYLT_BEGRUNNELSE("TILBAKEKREVING_OPPFYLT_BEGRUNNELSE"),
+    SÆRLIG_GRUNNER_BEGRUNNELSE("SÆRLIG_GRUNNER_BEGRUNNELSE"),
+    KRAVGRUNNLAG_VEDTAK_ID("KRAVGRUNNLAG_VEDTAK_ID","ID"),
+    KRAVGRUNNLAG_STATUS("KRAVGRUNNLAG_STATUS","Status"),
+    UDEFINIERT("-");
+
+    private String kode;
+    private String navn;
+
+    public static final String KODEVERK = "HISTORIKK_OPPLYSNING_TYPE"; //$NON-NLS-1$
+    private static Map<String, HistorikkOpplysningType> KODER = new LinkedHashMap<>();
+
+    static {
+        for (var v : values()) {
+            if (KODER.putIfAbsent(v.kode, v) != null) {
+                throw new IllegalArgumentException("Duplikat : " + v.kode);
+            }
+        }
     }
 
-    public HistorikkOpplysningType(String kode) {
-        super(kode, DISCRIMINATOR);
+    private HistorikkOpplysningType(String kode) {
+        this.kode = kode;
     }
 
+    private HistorikkOpplysningType(String kode, String navn) {
+        this.kode = kode;
+        this.navn = navn;
+    }
+
+    @JsonCreator
+    public static HistorikkOpplysningType fraKode(@JsonProperty("kode") String kode) {
+        if (kode == null) {
+            return null;
+        }
+        var ad = KODER.get(kode);
+        if (ad == null) {
+            throw new IllegalArgumentException("Ukjent HistorikkOpplysningType: " + kode);
+        }
+        return ad;
+    }
+
+    public static Map<String, HistorikkOpplysningType> kodeMap() {
+        return Collections.unmodifiableMap(KODER);
+    }
+
+    @JsonProperty
+    @Override
+    public String getKode() {
+        return kode;
+    }
+
+    @Override
+    public String getOffisiellKode() {
+        return getKode();
+    }
+
+    @JsonProperty
+    @Override
+    public String getKodeverk() {
+        return KODEVERK;
+    }
+
+    @JsonProperty
+    @Override
+    public String getNavn() {
+        return navn;
+    }
 }

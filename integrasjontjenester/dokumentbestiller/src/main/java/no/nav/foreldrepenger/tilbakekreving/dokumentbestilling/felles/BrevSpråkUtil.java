@@ -1,7 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,25 +30,4 @@ public class BrevSpråkUtil {
         }
         return null;
     }
-
-    public static String finnFagsaktypenavnPåAngittSpråk(List<KodelisteNavnI18N> kodelisteNavnI18NList, Språkkode språkkode) {
-        KodelisteNavnI18N fagsaknavn = kodelisteNavnI18NList.stream()
-            .filter(fagsaktypenavn -> fagsaktypenavn.getSpråk().equals(språkkode.getKode()))
-            .findFirst()
-            .orElse(finnFagsaknavnPåDefaultSpråkvalg(kodelisteNavnI18NList));
-
-        return fagsaknavn != null && fagsaknavn.getNavn()!= null ? fagsaknavn.getNavn().toLowerCase() : null;
-    }
-
-    private static KodelisteNavnI18N finnFagsaknavnPåDefaultSpråkvalg(List<KodelisteNavnI18N> kodelisteNavnI18NList) {
-        Optional<KodelisteNavnI18N> fagsaktypeNavn = kodelisteNavnI18NList.stream()
-            .filter(fagsaktypenavn -> DEFAULT_SPRÅKKODE.getKode().equals(fagsaktypenavn.getSpråk()))
-            .findFirst();
-
-        if (!fagsaktypeNavn.isPresent()) {
-            LOGGER.warn("Kunne ikke finne fagsaktype på {}" , DEFAULT_SPRÅKKODE.getKode());
-        }
-        return fagsaktypeNavn.orElse(null);
-    }
-
 }

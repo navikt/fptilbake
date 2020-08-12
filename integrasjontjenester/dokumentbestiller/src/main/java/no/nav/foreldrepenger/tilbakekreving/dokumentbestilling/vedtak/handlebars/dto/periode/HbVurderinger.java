@@ -12,18 +12,18 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.S�
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Vurdering;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.BigDecimalHeltallSerialiserer;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.KodelisteSomKodeSerialiserer;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.KodeverdiSomKodeSerialiserer;
 import no.nav.vedtak.util.Objects;
 
 public class HbVurderinger {
 
     @JsonProperty("vilkår-resultat")
-    @JsonSerialize(using = KodelisteSomKodeSerialiserer.class)
+    @JsonSerialize(using = KodeverdiSomKodeSerialiserer.class)
     private VilkårResultat vilkårResultat;
     @JsonProperty("fritekst")
     private String fritekstVilkår;
     @JsonProperty("aktsomhet-resultat")
-    @JsonSerialize(using = KodelisteSomKodeSerialiserer.class)
+    @JsonSerialize(using = KodeverdiSomKodeSerialiserer.class)
     private Vurdering aktsomhetResultat;
     @JsonProperty("unntas-innkreving-pga-lavt-beløp")
     private boolean unntasInnkrevingPgaLavtBeløp;
@@ -31,7 +31,7 @@ public class HbVurderinger {
     @JsonProperty("særlige-grunner")
     private HbSærligeGrunner særligeGrunner;
 
-    @JsonSerialize(using = KodelisteSomKodeSerialiserer.class)
+    @JsonSerialize(using = KodeverdiSomKodeSerialiserer.class)
     @JsonProperty("foreldelsevurdering")
     private ForeldelseVurderingType foreldelsevurdering;
 

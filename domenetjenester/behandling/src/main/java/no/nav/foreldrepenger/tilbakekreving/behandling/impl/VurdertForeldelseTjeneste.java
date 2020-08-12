@@ -28,7 +28,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkOpplysningType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelse;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelsePeriode;
@@ -41,7 +40,6 @@ import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjeneste
 @Transactional
 public class VurdertForeldelseTjeneste {
 
-    private KodeverkRepository kodeverkRepository;
     private VurdertForeldelseRepository vurdertForeldelseRepository;
     private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository;
 
@@ -56,7 +54,6 @@ public class VurdertForeldelseTjeneste {
     @Inject
     public VurdertForeldelseTjeneste(BehandlingRepositoryProvider repositoryProvider, HistorikkTjenesteAdapter historikkTjenesteAdapter, KravgrunnlagBeregningTjeneste kravgrunnlagBeregningTjeneste) {
         this.vilkårsvurderingRepository = repositoryProvider.getVilkårsvurderingRepository();
-        this.kodeverkRepository = repositoryProvider.getKodeverkRepository();
         this.vurdertForeldelseRepository = repositoryProvider.getVurdertForeldelseRepository();
         this.faktaFeilutbetalingRepository = repositoryProvider.getFaktaFeilutbetalingRepository();
 
@@ -154,7 +151,7 @@ public class VurdertForeldelseTjeneste {
             // forrigeVurdertForeldelse finnes ikke
             if (forrigeVurdertForeldelse.isEmpty()) {
                 harEndret = true;
-                tekstBuilder.medEndretFelt(HistorikkEndretFeltType.FORELDELSE, null, finnForeldelseVurderingType(foreldelsePeriode.getForeldelseVurderingType()).getNavn());
+                tekstBuilder.medEndretFelt(HistorikkEndretFeltType.FORELDELSE, null, foreldelsePeriode.getForeldelseVurderingType().getNavn());
             } else {
                 harEndret = opprettInnslagNårForrigePerioderFinnes(behandlingId, forrigeVurdertForeldelse.get(), foreldelsePeriode, tekstBuilder);
             }
@@ -188,8 +185,8 @@ public class VurdertForeldelseTjeneste {
             !foreldelsePeriode.getForeldelseVurderingType().equals(forrigeForeldelsePeriode.get().getForeldelseVurderingType())) {
             harEndret = true;
             tekstBuilder.medEndretFelt(HistorikkEndretFeltType.FORELDELSE,
-                finnForeldelseVurderingType(forrigeForeldelsePeriode.get().getForeldelseVurderingType()).getNavn(),
-                finnForeldelseVurderingType(foreldelsePeriode.getForeldelseVurderingType()).getNavn());
+                forrigeForeldelsePeriode.get().getForeldelseVurderingType().getNavn(),
+                foreldelsePeriode.getForeldelseVurderingType().getNavn());
             // hvis saksbehandler endret vurdering type, må vi starte vilkårs på nytt
             if (ForeldelseVurderingType.FORELDET.equals(foreldelsePeriode.getForeldelseVurderingType())) {
                 sletteVilkårData(behandlingId);
@@ -197,7 +194,7 @@ public class VurdertForeldelseTjeneste {
 
         } else if (forrigeForeldelsePeriode.isEmpty()) { // nye perioder
             harEndret = true;
-            tekstBuilder.medEndretFelt(HistorikkEndretFeltType.FORELDELSE, null, finnForeldelseVurderingType(foreldelsePeriode.getForeldelseVurderingType()).getNavn());
+            tekstBuilder.medEndretFelt(HistorikkEndretFeltType.FORELDELSE, null, foreldelsePeriode.getForeldelseVurderingType().getNavn());
             // hvis saksbehandler deler opp perioder, må vi starte vilkårs på nytt
             sletteVilkårData(behandlingId);
         } else if (!forrigeForeldelsePeriode.isEmpty() && !foreldelsePeriode.getBegrunnelse().equals(forrigeForeldelsePeriode.get().getBegrunnelse())) {
@@ -209,10 +206,6 @@ public class VurdertForeldelseTjeneste {
 
     private void sletteVilkårData(Long behandlingId) {
         vilkårsvurderingRepository.slettVilkårsvurdering(behandlingId);
-    }
-
-    private ForeldelseVurderingType finnForeldelseVurderingType(ForeldelseVurderingType foreldelseVurderingType) {
-        return kodeverkRepository.finn(ForeldelseVurderingType.class, foreldelseVurderingType);
     }
 
 }

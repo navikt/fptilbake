@@ -1,132 +1,166 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling;
 
-import java.util.HashMap;
+import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
-import no.nav.vedtak.feil.Feil;
-import no.nav.vedtak.feil.FeilFactory;
-import no.nav.vedtak.feil.LogLevel;
-import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
-import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
-@Entity(name = "KlasseKode")
-@DiscriminatorValue(KlasseKode.DISCRIMINATOR)
-public class KlasseKode extends Kodeliste {
+@JsonFormat(shape = JsonFormat.Shape.STRING)
+@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
+public enum KlasseKode implements Kodeverdi {
 
-    public static final String DISCRIMINATOR = "KLASSE_KODE";
+    FPATAL("FPATAL"),
+    FPATFER("FPATFER"),
+    FPATFRI("FPATFRI"),
+    FPATORD("FPATORD"),
+    FPREFAGFER_IOP("FPREFAGFER-IOP"),
+    FPREFAG_IOP("FPREFAG-IOP"),
+    FPSNDDM_OP("FPSNDDM-OP"),
+    FPSNDFI("FPSNDFI"),
+    FPSNDJB_OP("FPSNDJB-OP"),
+    FPSND_OP("FPSND-OP"),
+    FSKTSKAT("FSKTSKAT"),
+    KL_KODE_FEIL_KORTTID("KL_KODE_FEIL_KORTTID"),
+    TBMOTOBS("TBMOTOBS"),
+    SPSND100D1DAGPFI("SPSND100D1DAGPFI"),
+    SPSND100D1DTRPFI("SPSND100D1DTRPFI"),
+    FPADATORD("FPADATORD"),
+    FPADATFRI("FPADATFRI"),
+    FPADSND_OP("FPADSND-OP"),
+    FPADATAL("FPADATAL"),
+    FPADATSJO("FPADATSJO"),
+    FPADSNDDM_OP("FPADSNDDM-OP"),
+    FPADSNDJB_OP("FPADSNDJB-OP"),
+    FPADSNDFI("FPADSNDFI"),
+    FPATSJO("FPATSJO"),
+    FPADREFAG_IOP("FPADREFAG-IOP"),
+    FPADREFAGFER_IOP("FPADREFAGFER-IOP"),
 
-    public static final KlasseKode FPATAL = new KlasseKode("FPATAL");
-    public static final KlasseKode FPATFER = new KlasseKode("FPATFER");
-    public static final KlasseKode FPATFRI = new KlasseKode("FPATFRI");
-    public static final KlasseKode FPATORD = new KlasseKode("FPATORD");
-    public static final KlasseKode FPREFAGFER_IOP = new KlasseKode("FPREFAGFER-IOP");
-    public static final KlasseKode FPREFAG_IOP = new KlasseKode("FPREFAG-IOP");
-    public static final KlasseKode FPSNDDM_OP = new KlasseKode("FPSNDDM-OP");
-    public static final KlasseKode FPSNDFI = new KlasseKode("FPSNDFI");
-    public static final KlasseKode FPSNDJB_OP = new KlasseKode("FPSNDJB-OP");
-    public static final KlasseKode FPSND_OP = new KlasseKode("FPSND-OP");
-    public static final KlasseKode FSKTSKAT = new KlasseKode("FSKTSKAT");
-    public static final KlasseKode KL_KODE_FEIL_KORTTID = new KlasseKode("KL_KODE_FEIL_KORTTID");
-    public static final KlasseKode TBMOTOBS = new KlasseKode("TBMOTOBS");
-    public static final KlasseKode SPSND100D1DAGPFI = new KlasseKode("SPSND100D1DAGPFI");
-    public static final KlasseKode SPSND100D1DTRPFI = new KlasseKode("SPSND100D1DTRPFI");
-    public static final KlasseKode FPADATORD = new KlasseKode("FPADATORD");
-    public static final KlasseKode FPADATFRI = new KlasseKode("FPADATFRI");
-    public static final KlasseKode FPADSND_OP = new KlasseKode("FPADSND-OP");
-    public static final KlasseKode FPADATAL = new KlasseKode("FPADATAL");
-    public static final KlasseKode FPADATSJO = new KlasseKode("FPADATSJO");
-    public static final KlasseKode FPADSNDDM_OP = new KlasseKode("FPADSNDDM-OP");
-    public static final KlasseKode FPADSNDJB_OP = new KlasseKode("FPADSNDJB-OP");
-    public static final KlasseKode FPADSNDFI = new KlasseKode("FPADSNDFI");
-    public static final KlasseKode FPATSJO = new KlasseKode("FPATSJO");
+    //ES Klassekoder
+    FPENAD_OP("FPENAD-OP"),
+    FPENFOD_OP("FPENFOD-OP"),
+    KL_KODE_FEIL_REFUTG("KL_KODE_FEIL_REFUTG"),
 
-    //ES klassekoder
-    public static final KlasseKode FPENAD_OP = new KlasseKode("FPENAD-OP");
-    public static final KlasseKode FPENFOD_OP = new KlasseKode("FPENFOD-OP");
-    public static final KlasseKode KL_KODE_FEIL_REFUTG = new KlasseKode("KL_KODE_FEIL_REFUTG");
-
-    //SVP klassekoder
-    public static final KlasseKode FPSVATORD = new KlasseKode("FPSVATORD");
-    public static final KlasseKode FPSVATFRI = new KlasseKode("FPSVATFRI");
-    public static final KlasseKode FPSVSND_OP = new KlasseKode("FPSVSND-OP");
-    public static final KlasseKode FPSVATAL = new KlasseKode("FPSVATAL");
-    public static final KlasseKode FPSVATSJO = new KlasseKode("FPSVATSJO");
-    public static final KlasseKode FPSVSNDDM_OP = new KlasseKode("FPSVSNDDM-OP");
-    public static final KlasseKode FPSVSNDJB_OP = new KlasseKode("FPSVSNDJB-OP");
-    public static final KlasseKode FPSVSNDFI = new KlasseKode("FPSVSNDFI");
+    //SVP Klassekoder
+    FPSVATORD("FPSVATORD"),
+    FPSVATFRI("FPSVATFRI"),
+    FPSVSND_OP("FPSVSND-OP"),
+    FPSVATAL("FPSVATAL"),
+    FPSVATSJO("FPSVATSJO"),
+    FPSVSNDDM_OP("FPSVSNDDM-OP"),
+    FPSVSNDJB_OP("FPSVSNDJB-OP"),
+    FPSVSNDFI("FPSVSNDFI"),
+    FPSVREFAG_IOP("FPSVREFAG-IOP"),
+    FPSVREFAGFER_IOP("FPSVREFAGFER-IOP"),
 
     //JUST klassekoder
-    public static final KlasseKode KL_KODE_JUST_KORTTID = new KlasseKode("KL_KODE_JUST_KORTTID");
+    KL_KODE_JUST_KORTTID("KL_KODE_JUST_KORTTID"),
 
+    //K9 klassekoder
+    FRISINN_FRILANS("FRISINN-FRILANS"),
+    FRISINN_SELVST_OP("FRISINN-SELVST-OP"),
+    OMATAL("OMATAL"),
+    OMATFRI("OMATFRI"),
+    OMATORD("OMATORD"),
+    OMATSJO("OMATSJO"),
+    OMREFAG_IOP("OMREFAG-IOP"),
+    OMSND_OP("OMSND-OP"),
+    OMSNDDM_OP("OMSNDDM-OP"),
+    OMSNDFI("OMSNDFI"),
+    OMSNDJB_OP("OMSNDJB-OP"),
+    OPPATAL("OPPATAL"),
+    OPPATFRI("OPPATFRI"),
+    OPPATORD("OPPATORD"),
+    OPPATSJO("OPPATSJO"),
+    OPPREFAG_IOP("OPPREFAG-IOP"),
+    OPPSND_OP("OPPSND-OP"),
+    OPPSNDDM_OP("OPPSNDDM-OP"),
+    OPPSNDFI("OPPSNDFI"),
+    OPPSNDJB_OP("OPPSNDJB-OP"),
+    PNBSATAL("PNBSATAL"),
+    PNBSATFRI("PNBSATFRI"),
+    PNBSATORD("PNBSATORD"),
+    PNBSATSJO("PNBSATSJO"),
+    PNBSREFAG_IOP("PNBSREFAG-IOP"),
+    PNBSSND_OP("PNBSSND-OP"),
+    PNBSSNDDM_OP("PNBSSNDDM-OP"),
+    PNBSSNDFI("PNBSSNDFI"),
+    PNBSSNDJB_OP("PNBSSNDJB-OP"),
+    PPNPATAL("PPNPATAL"),
+    PPNPATFRI("PPNPATFRI"),
+    PPNPATORD("PPNPATORD"),
+    PPNPATSJO("PPNPATSJO"),
+    PPNPREFAG_IOP("PPNPREFAG-IOP"),
+    PPNPSND_OP("PPNPSND-OP"),
+    PPNPSNDDM_OP("PPNPSNDDM-OP"),
+    PPNPSNDFI("PPNPSNDFI"),
+    PPNPSNDJB_OP("PPNPSNDJB-OP"),
+    SPATFER("SPATFER"),
+    SPREFAGFERPP_IOP("SPREFAGFERPP-IOP"),
 
-    public static final KlasseKode UDEFINERT = new KlasseKode("-");
+    UDEFINERT("-");
 
-    private static final Map<String, KlasseKode> TILGJENGELIGE = new HashMap<>();
+    public static final String KODEVERK = "KLASSE_KODE";
+
+    private static final Map<String, KlasseKode> KODER = new LinkedHashMap<>();
+
+    @JsonValue
+    private String kode;
 
     static {
-        TILGJENGELIGE.put(FPATAL.getKode(), FPATAL);
-        TILGJENGELIGE.put(FPATFER.getKode(), FPATFER);
-        TILGJENGELIGE.put(FPATFRI.getKode(), FPATFRI);
-        TILGJENGELIGE.put(FPATORD.getKode(), FPATORD);
-        TILGJENGELIGE.put(FPENAD_OP.getKode(), FPENAD_OP);
-        TILGJENGELIGE.put(FPENFOD_OP.getKode(), FPENFOD_OP);
-        TILGJENGELIGE.put(KL_KODE_FEIL_REFUTG.getKode(), KL_KODE_FEIL_REFUTG);
-        TILGJENGELIGE.put(FPREFAGFER_IOP.getKode(), FPREFAGFER_IOP);
-        TILGJENGELIGE.put(FPREFAG_IOP.getKode(), FPREFAG_IOP);
-        TILGJENGELIGE.put(FPSNDDM_OP.getKode(), FPSNDDM_OP);
-        TILGJENGELIGE.put(FPSNDFI.getKode(), FPSNDFI);
-        TILGJENGELIGE.put(FPSNDJB_OP.getKode(), FPSNDJB_OP);
-        TILGJENGELIGE.put(FPSND_OP.getKode(), FPSND_OP);
-        TILGJENGELIGE.put(FSKTSKAT.getKode(), FSKTSKAT);
-        TILGJENGELIGE.put(KL_KODE_FEIL_KORTTID.getKode(), KL_KODE_FEIL_KORTTID);
-        TILGJENGELIGE.put(TBMOTOBS.getKode(), TBMOTOBS);
-        TILGJENGELIGE.put(SPSND100D1DAGPFI.getKode(), SPSND100D1DAGPFI);
-        TILGJENGELIGE.put(SPSND100D1DTRPFI.getKode(), SPSND100D1DTRPFI);
-        TILGJENGELIGE.put(FPADATORD.getKode(), FPADATORD);
-        TILGJENGELIGE.put(FPADATFRI.getKode(), FPADATFRI);
-        TILGJENGELIGE.put(FPADSND_OP.getKode(), FPADSND_OP);
-        TILGJENGELIGE.put(FPADATAL.getKode(), FPADATAL);
-        TILGJENGELIGE.put(FPADATSJO.getKode(), FPADATSJO);
-        TILGJENGELIGE.put(FPADSNDDM_OP.getKode(), FPADSNDDM_OP);
-        TILGJENGELIGE.put(FPADSNDJB_OP.getKode(), FPADSNDJB_OP);
-        TILGJENGELIGE.put(FPADSNDFI.getKode(), FPADSNDFI);
-        TILGJENGELIGE.put(FPATSJO.getKode(), FPATSJO);
-        TILGJENGELIGE.put(FPSVATORD.getKode(), FPSVATORD);
-        TILGJENGELIGE.put(FPSVATFRI.getKode(), FPSVATFRI);
-        TILGJENGELIGE.put(FPSVSND_OP.getKode(), FPSVSND_OP);
-        TILGJENGELIGE.put(FPSVATAL.getKode(), FPSVATAL);
-        TILGJENGELIGE.put(FPSVATSJO.getKode(), FPSVATSJO);
-        TILGJENGELIGE.put(FPSVSNDDM_OP.getKode(), FPSVSNDDM_OP);
-        TILGJENGELIGE.put(FPSVSNDJB_OP.getKode(), FPSVSNDJB_OP);
-        TILGJENGELIGE.put(FPSVSNDFI.getKode(), FPSVSNDFI);
-        TILGJENGELIGE.put(KL_KODE_JUST_KORTTID.getKode(), KL_KODE_JUST_KORTTID);
-    }
-
-    KlasseKode() {
-        // Hibernate
-    }
-
-    public KlasseKode(String kode) {
-        super(kode, DISCRIMINATOR);
-    }
-
-    public static KlasseKode fraKode(String kode) {
-        if (TILGJENGELIGE.containsKey(kode)) {
-            return TILGJENGELIGE.get(kode);
+        for (var v : values()) {
+            if (KODER.putIfAbsent(v.kode, v) != null) {
+                throw new IllegalArgumentException("Duplikat : " + v.kode);
+            }
         }
-        throw KlasseKodeFeil.FEILFACTORY.ugyldigKlasseKode(kode).toException();
     }
 
-    interface KlasseKodeFeil extends DeklarerteFeil {
-
-        KlasseKodeFeil FEILFACTORY = FeilFactory.create(KlasseKodeFeil.class);
-
-        @TekniskFeil(feilkode = "FPT-312904", feilmelding = "KlasseKode '%s' er ugyldig", logLevel = LogLevel.WARN)
-        Feil ugyldigKlasseKode(String klasseKode);
+    private KlasseKode(String kode) {
+        this.kode = kode;
     }
 
+    @JsonCreator
+    public static KlasseKode fraKode(@JsonProperty("kode") String kode) {
+        if (kode == null) {
+            return null;
+        }
+        var ad = KODER.get(kode);
+        if (ad == null) {
+            throw new IllegalArgumentException("Ukjent KlasseKode: " + kode);
+        }
+        return ad;
+    }
+
+    public static Map<String, KlasseKode> kodeMap() {
+        return Collections.unmodifiableMap(KODER);
+    }
+
+    @Override
+    public String getKode() {
+        return kode;
+    }
+
+    @Override
+    public String getOffisiellKode() {
+        return getKode();
+    }
+
+    @Override
+    public String getKodeverk() {
+        return KODEVERK;
+    }
+
+    @Override
+    public String getNavn() {
+        return null;
+    }
 }

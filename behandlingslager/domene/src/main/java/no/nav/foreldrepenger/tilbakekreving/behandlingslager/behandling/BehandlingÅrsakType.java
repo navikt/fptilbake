@@ -10,7 +10,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
 @Entity(name = "BehandlingÅrsakType")
 @DiscriminatorValue(BehandlingÅrsakType.DISCRIMINATOR)
 public class BehandlingÅrsakType extends Kodeliste {
-
+    //TODO Denne klassen burde splitte i 2 klasser.
+    // En for Fptilbake Behandling Årsaker(Enum) og en for Fpsak/k9 sak behandling årsaker(kodeverk)
     public static final String DISCRIMINATOR = "BEHANDLING_AARSAK"; //$NON-NLS-1$
 
     public static final BehandlingÅrsakType RE_KLAGE_NFP = new BehandlingÅrsakType("RE_KLAGE_NFP"); //$NON-NLS-1$

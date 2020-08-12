@@ -98,7 +98,7 @@ public class HentKravgrunnlagTask implements ProsessTaskHandler {
         grunnlagMottattInnslag.setType(HistorikkinnslagType.NY_KRAVGRUNNLAG_MOTTAT);
         grunnlagMottattInnslag.setAktør(HistorikkAktør.VEDTAKSLØSNINGEN);
 
-        KravStatusKode grunnlagStatus = repositoryProvider.getKodeverkRepository().finn(KravStatusKode.class, kravgrunnlag431.getKravStatusKode());
+        KravStatusKode grunnlagStatus = kravgrunnlag431.getKravStatusKode();
         HistorikkInnslagTekstBuilder historiebygger = new HistorikkInnslagTekstBuilder()
             .medHendelse(HistorikkinnslagType.NY_KRAVGRUNNLAG_MOTTAT)
             .medOpplysning(HistorikkOpplysningType.KRAVGRUNNLAG_VEDTAK_ID, kravgrunnlag431.getVedtakId())
