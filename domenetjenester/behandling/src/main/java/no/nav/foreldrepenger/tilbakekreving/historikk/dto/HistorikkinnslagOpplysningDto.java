@@ -5,7 +5,6 @@ import java.util.stream.Collectors;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkOpplysningType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagFelt;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 
 public class HistorikkinnslagOpplysningDto {
 
@@ -28,13 +27,13 @@ public class HistorikkinnslagOpplysningDto {
         this.tilVerdi = tilVerdi;
     }
 
-    static List<HistorikkinnslagOpplysningDto> mapFra(List<HistorikkinnslagFelt> opplysninger, KodeverkRepository kodeverkRepository) {
-        return opplysninger.stream().map(o -> mapFra(o, kodeverkRepository)).collect(Collectors.toList());
+    static List<HistorikkinnslagOpplysningDto> mapFra(List<HistorikkinnslagFelt> opplysninger) {
+        return opplysninger.stream().map(HistorikkinnslagOpplysningDto::mapFra).collect(Collectors.toList());
     }
 
-    private static HistorikkinnslagOpplysningDto mapFra(HistorikkinnslagFelt opplysning, KodeverkRepository kodeverkRepository) {
+    private static HistorikkinnslagOpplysningDto mapFra(HistorikkinnslagFelt opplysning) {
         HistorikkinnslagOpplysningDto dto = new HistorikkinnslagOpplysningDto();
-        HistorikkOpplysningType opplysningType = kodeverkRepository.finn(HistorikkOpplysningType.class, opplysning.getNavn());
+        HistorikkOpplysningType opplysningType = HistorikkOpplysningType.fraKode(opplysning.getNavn());
         dto.setOpplysningType(opplysningType);
         dto.setTilVerdi(opplysning.getTilVerdi());
         return dto;

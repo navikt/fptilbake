@@ -60,7 +60,13 @@ public class HentKodeverkTjeneste {
         map.put(ForeldelseVurderingType.class.getSimpleName(), ForeldelseVurderingType.kodeMap().values());
         map.put(HistorikkAktør.class.getSimpleName(), HistorikkAktør.kodeMap().values());
         map.put(HendelseType.class.getSimpleName(), HendelseType.kodeMap().values());
+        map.put(HistorikkOpplysningType.class.getSimpleName(), HistorikkOpplysningType.kodeMap().values());
+        map.put(HistorikkinnslagType.class.getSimpleName(), HistorikkinnslagType.kodeMap().values());
+        map.put(SkjermlenkeType.class.getSimpleName(), SkjermlenkeType.kodeMap().values());
         map.put(HendelseUnderType.class.getSimpleName(), HendelseUnderType.kodeMap().values());
+        map.put(BehandlingResultatType.class.getSimpleName(), BehandlingResultatType.kodeMap().values());
+        map.put(VidereBehandling.class.getSimpleName(), VidereBehandling.kodeMap().values());
+        map.put(VergeType.class.getSimpleName(), VergeType.kodeMap().values());
 
         Map<String, Collection<? extends Kodeverdi>> mapFiltered = new LinkedHashMap<>();
 
@@ -73,14 +79,8 @@ public class HentKodeverkTjeneste {
 
     private static List<Class<? extends Kodeliste>> KODEVERK_SOM_BRUKES_PÅ_KLIENT = Arrays.asList(
         // Legg inn kodelister etter behov
-        HistorikkOpplysningType.class,
-        HistorikkinnslagType.class,
-        SkjermlenkeType.class,
         BehandlingType.class,
-        BehandlingÅrsakType.class,
-        BehandlingResultatType.class,
-        VidereBehandling.class,
-        VergeType.class
+        BehandlingÅrsakType.class
     );
 
     public HentKodeverkTjeneste() {

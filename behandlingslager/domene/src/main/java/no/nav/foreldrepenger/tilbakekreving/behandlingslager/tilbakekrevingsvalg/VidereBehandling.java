@@ -1,30 +1,85 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.tilbakekrevingsvalg;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-@Entity(name = "VidereBehandling")
-@DiscriminatorValue(VidereBehandling.DISCRIMINATOR)
-public class VidereBehandling extends Kodeliste {
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    public static final String DISCRIMINATOR = "TILBAKEKR_VIDERE_BEH";
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
-    public static final VidereBehandling TILBAKEKREV_I_INFOTRYGD = new VidereBehandling("TILBAKEKR_INFOTRYGD");
-    public static final VidereBehandling TILBAKEKR_OPPRETT = new VidereBehandling("TILBAKEKR_OPPRETT");
-    public static final VidereBehandling IGNORER_TILBAKEKREVING = new VidereBehandling("TILBAKEKR_IGNORER");
-    public static final VidereBehandling INNTREKK = new VidereBehandling("TILBAKEKR_INNTREKK");
-    public static final VidereBehandling TILBAKEKR_OPPDATER = new VidereBehandling("TILBAKEKR_OPPDATER");
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
+public enum VidereBehandling implements Kodeverdi {
 
-    public static final VidereBehandling UDEFINERT = new VidereBehandling("-");
+    TILBAKEKREV_I_INFOTRYGD("TILBAKEKR_INFOTRYGD", "Feilutbetaling med tilbakekreving"),
+    TILBAKEKR_OPPRETT("TILBAKEKR_OPPRETT", "Feilutbetaling med tilbakekreving"),
+    IGNORER_TILBAKEKREVING("TILBAKEKR_IGNORER", "Feilutbetaling, avvent samordning"),
+    INNTREKK("TILBAKEKR_INNTREKK", "Feilutbetaling hvor inntrekk dekker hele beløpet"),
+    TILBAKEKR_OPPDATER("TILBAKEKR_OPPDATER", "Endringer vil oppdatere eksisterende feilutbetalte perioder og beløp."),
 
-    VidereBehandling(){
-        // for hibernate
+    UDEFINERT("-", "UDefinert");
+
+    private String kode;
+    private String navn;
+
+    public static final String KODEVERK = "TILBAKEKR_VIDERE_BEH";
+    private static final Map<String, VidereBehandling> KODER = new LinkedHashMap<>();
+
+    static {
+        for (var v : values()) {
+            if (KODER.putIfAbsent(v.kode, v) != null) {
+                throw new IllegalArgumentException("Duplikat : " + v.kode);
+            }
+        }
     }
 
-    private VidereBehandling(String kode){
-        super(kode,DISCRIMINATOR);
+    private VidereBehandling(String kode, String navn) {
+        this.kode = kode;
+        this.navn = navn;
     }
 
+    @JsonCreator
+    public static VidereBehandling fraKode(@JsonProperty("kode") String kode) {
+        if (kode == null) {
+            return null;
+        }
+        var ad = KODER.get(kode);
+        if (ad == null) {
+            throw new IllegalArgumentException("Ukjent VidereBehandling: " + kode);
+        }
+        return ad;
+    }
+
+    public static Map<String, VidereBehandling> kodeMap() {
+        return Collections.unmodifiableMap(KODER);
+    }
+
+    @JsonProperty
+    @Override
+    public String getKode() {
+        return kode;
+    }
+
+    @Override
+    public String getOffisiellKode() {
+        return getKode();
+    }
+
+    @JsonProperty
+    @Override
+    public String getKodeverk() {
+        return KODEVERK;
+    }
+
+    @JsonProperty
+    @Override
+    public String getNavn() {
+        return navn;
+    }
 }

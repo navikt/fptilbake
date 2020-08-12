@@ -9,28 +9,24 @@ import javax.inject.Inject;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagDokumentLink;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 
 @ApplicationScoped
 public class HistorikkInnslagKonverter {
 
-    private KodeverkRepository kodeverkRepository;
     private AksjonspunktRepository aksjonspunktRepository;
 
     public HistorikkInnslagKonverter() {// NOSONAR
     }
 
     @Inject
-    public HistorikkInnslagKonverter(KodeverkRepository kodeverkRepository,
-                                     AksjonspunktRepository aksjonspunktRepository) {
-        this.kodeverkRepository = kodeverkRepository;
+    public HistorikkInnslagKonverter(AksjonspunktRepository aksjonspunktRepository) {
         this.aksjonspunktRepository = aksjonspunktRepository;
     }
 
     public HistorikkinnslagDto mapFra(Historikkinnslag historikkinnslag) {
         HistorikkinnslagDto dto = new HistorikkinnslagDto();
         dto.setBehandlingId(historikkinnslag.getBehandlingId());
-        List<HistorikkinnslagDelDto> historikkinnslagDeler = HistorikkinnslagDelDto.mapFra(historikkinnslag.getHistorikkinnslagDeler(), kodeverkRepository, aksjonspunktRepository);
+        List<HistorikkinnslagDelDto> historikkinnslagDeler = HistorikkinnslagDelDto.mapFra(historikkinnslag.getHistorikkinnslagDeler(), aksjonspunktRepository);
         dto.setHistorikkinnslagDeler(historikkinnslagDeler);
         List<HistorikkInnslagDokumentLinkDto> dokumentLinks = mapLenker(historikkinnslag.getDokumentLinker());
         dto.setDokumentLinks(dokumentLinks);

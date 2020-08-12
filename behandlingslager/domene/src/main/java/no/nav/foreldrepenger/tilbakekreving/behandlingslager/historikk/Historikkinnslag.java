@@ -45,10 +45,8 @@ public class Historikkinnslag extends BaseEntitet {
     @Column(name = "historikk_aktoer_id",nullable = false)
     private HistorikkAktør aktør = HistorikkAktør.UDEFINERT;
 
-    @ManyToOne(optional = false)
-    @JoinColumnsOrFormulas({
-            @JoinColumnOrFormula(column = @JoinColumn(name = "historikkinnslag_type", referencedColumnName = "kode", nullable = false)),
-            @JoinColumnOrFormula(formula = @JoinFormula(referencedColumnName = "kodeverk", value = "'" + HistorikkinnslagType.DISCRIMINATOR + "'"))})
+    @Convert(converter = HistorikkinnslagType.KodeverdiConverter.class)
+    @Column(name = "historikkinnslag_type",nullable = false)
     private HistorikkinnslagType type = HistorikkinnslagType.UDEFINIERT;
 
     @OneToMany(mappedBy = "historikkinnslag", cascade = CascadeType.ALL)

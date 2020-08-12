@@ -397,29 +397,29 @@ public class HistorikkInnslagTekstBuilder {
     private Optional<Feil> verify(HistorikkinnslagType historikkinnslagType, HistorikkinnslagDel historikkinnslagDel) {
         String type = historikkinnslagType.getMal();
 
-        if (HistorikkinnslagType.MAL_TYPE_1.equals(type)) {
+        if (HistorikkInnslagMal.MAL_TYPE_1.equals(type)) {
             return checkFieldsPresent(type, historikkinnslagDel, HistorikkinnslagFeltType.HENDELSE);
         }
-        if (HistorikkinnslagType.MAL_TYPE_2.equals(type)) {
+        if (HistorikkInnslagMal.MAL_TYPE_2.equals(type)) {
             return checkFieldsPresent(type, historikkinnslagDel, HistorikkinnslagFeltType.HENDELSE, HistorikkinnslagFeltType.SKJERMLENKE);
         }
-        if (HistorikkinnslagType.MAL_TYPE_3.equals(type)) {
+        if (HistorikkInnslagMal.MAL_TYPE_3.equals(type)) {
             return checkFieldsPresent(type, historikkinnslagDel, HistorikkinnslagFeltType.HENDELSE, HistorikkinnslagFeltType.AKSJONSPUNKT_KODE);
         }
-        if (HistorikkinnslagType.MAL_TYPE_4.equals(type)) {
+        if (HistorikkInnslagMal.MAL_TYPE_4.equals(type)) {
             return checkFieldsPresent(type, historikkinnslagDel, HistorikkinnslagFeltType.HENDELSE);
         }
-        if (HistorikkinnslagType.MAL_TYPE_5.equals(type) || HistorikkinnslagType.MAL_TYPE_7.equals(type) || HistorikkinnslagType.MAL_TYPE_8.equals(type)
-            || HistorikkinnslagType.MAL_TYPE_10.equals(type)) {
+        if (HistorikkInnslagMal.MAL_TYPE_5.equals(type) || HistorikkInnslagMal.MAL_TYPE_7.equals(type) || HistorikkInnslagMal.MAL_TYPE_8.equals(type)
+            || HistorikkInnslagMal.MAL_TYPE_10.equals(type)) {
             return checkAtLeastOnePresent(type, historikkinnslagDel, HistorikkinnslagFeltType.SKJERMLENKE,
                 HistorikkinnslagFeltType.HENDELSE,
                 HistorikkinnslagFeltType.ENDRET_FELT,
                 HistorikkinnslagFeltType.BEGRUNNELSE);
         }
-        if (HistorikkinnslagType.MAL_TYPE_6.equals(type)) {
+        if (HistorikkInnslagMal.MAL_TYPE_6.equals(type)) {
             return checkFieldsPresent(type, historikkinnslagDel, HistorikkinnslagFeltType.OPPLYSNINGER);
         }
-        if (HistorikkinnslagType.MAL_TYPE_9.equals(type)) {
+        if (HistorikkInnslagMal.MAL_TYPE_9.equals(type)) {
             return checkFieldsPresent(type, historikkinnslagDel, HistorikkinnslagFeltType.HENDELSE, HistorikkinnslagFeltType.ENDRET_FELT);
         }
         throw HistorikkInnsalgFeil.FACTORY.ukjentHistorikkinnslagType(type).toException();

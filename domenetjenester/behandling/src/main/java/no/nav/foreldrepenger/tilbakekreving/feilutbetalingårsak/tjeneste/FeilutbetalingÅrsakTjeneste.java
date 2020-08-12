@@ -29,12 +29,12 @@ public class FeilutbetalingÅrsakTjeneste {
 
         for (Map.Entry<FagsakYtelseType, Set<HendelseType>> entry : hendelseTypePrYtelseType.entrySet()) {
             FagsakYtelseType ytelseType = entry.getKey();
-            List<HendelseType> hendelseTyper = sortereBasertPåEkstradata2(entry.getValue());
+            List<HendelseType> hendelseTyper = sortereHendelseTypeBasertPåEkstradata2(entry.getValue());
 
             List<HendelseTypeMedUndertyperDto> dtoer = new ArrayList<>();
             for (HendelseType hendelseType : hendelseTyper) {
                 Set<HendelseUnderType> undertyper = hendelseUndertypePrHendelseType.get(hendelseType);
-                List<HendelseUnderType> sorterteUndertyper = sortereBasertPåEkstradata(undertyper);
+                List<HendelseUnderType> sorterteUndertyper = sortereHendelseUnderTypeBasertPåEkstradata(undertyper);
                 dtoer.add(new HendelseTypeMedUndertyperDto(hendelseType, sorterteUndertyper));
             }
             resultat.add(new HendelseTyperPrYtelseTypeDto(ytelseType, dtoer));
@@ -43,7 +43,7 @@ public class FeilutbetalingÅrsakTjeneste {
         return resultat;
     }
 
-    private static List<HendelseUnderType> sortereBasertPåEkstradata(Set<HendelseUnderType> kodelistene) {
+    private static List<HendelseUnderType> sortereHendelseUnderTypeBasertPåEkstradata(Set<HendelseUnderType> kodelistene) {
         if (kodelistene.stream().anyMatch(Objects::isNull)) {
             throw new IllegalStateException("Fins null i HendelseUnderType: " + kodelistene);
         }
@@ -54,7 +54,7 @@ public class FeilutbetalingÅrsakTjeneste {
             .collect(Collectors.toList());
     }
 
-    private static List<HendelseType> sortereBasertPåEkstradata2(Set<HendelseType> kodelistene) {
+    private static List<HendelseType> sortereHendelseTypeBasertPåEkstradata2(Set<HendelseType> kodelistene) {
         if (kodelistene.stream().anyMatch(Objects::isNull)) {
             throw new IllegalStateException("Fins null i HendelseType: " + kodelistene);
         }

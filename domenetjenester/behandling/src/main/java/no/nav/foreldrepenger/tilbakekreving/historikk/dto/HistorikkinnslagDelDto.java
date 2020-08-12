@@ -11,7 +11,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagDel;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagFelt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 
 public class HistorikkinnslagDelDto {
     private Kodeverdi begrunnelse;
@@ -26,15 +25,15 @@ public class HistorikkinnslagDelDto {
     private List<HistorikkinnslagEndretFeltDto> endredeFelter;
     private List<HistorikkinnslagTotrinnsVurderingDto> aksjonspunkter;
 
-    static List<HistorikkinnslagDelDto> mapFra(List<HistorikkinnslagDel> historikkinnslagDelList, KodeverkRepository kodeverkRepository, AksjonspunktRepository aksjonspunktRepository) {
+    static List<HistorikkinnslagDelDto> mapFra(List<HistorikkinnslagDel> historikkinnslagDelList, AksjonspunktRepository aksjonspunktRepository) {
         List<HistorikkinnslagDelDto> historikkinnslagDelDtoList = new ArrayList<>();
         for (HistorikkinnslagDel historikkinnslagDel : historikkinnslagDelList) {
-            historikkinnslagDelDtoList.add(mapFra(historikkinnslagDel, kodeverkRepository, aksjonspunktRepository));
+            historikkinnslagDelDtoList.add(mapFra(historikkinnslagDel, aksjonspunktRepository));
         }
         return historikkinnslagDelDtoList;
     }
 
-    private static HistorikkinnslagDelDto mapFra(HistorikkinnslagDel historikkinnslagDel, KodeverkRepository kodeverkRepository, AksjonspunktRepository aksjonspunktRepository) {
+    private static HistorikkinnslagDelDto mapFra(HistorikkinnslagDel historikkinnslagDel, AksjonspunktRepository aksjonspunktRepository) {
         HistorikkinnslagDelDto dto = new HistorikkinnslagDelDto();
         historikkinnslagDel.getBegrunnelseFelt().ifPresent(begrunnelse -> dto.setBegrunnelse(finnÅrsakKodeListe(begrunnelse).orElse(null)));
         if (dto.getBegrunnelse() == null) {
@@ -51,18 +50,18 @@ public class HistorikkinnslagDelDto {
         });
         historikkinnslagDel.getResultat().ifPresent(dto::setResultat);
         historikkinnslagDel.getHendelse().ifPresent(hendelse -> {
-            HistorikkinnslagHendelseDto hendelseDto = HistorikkinnslagHendelseDto.mapFra(hendelse, kodeverkRepository);
+            HistorikkinnslagHendelseDto hendelseDto = HistorikkinnslagHendelseDto.mapFra(hendelse);
             dto.setHendelse(hendelseDto);
         });
         historikkinnslagDel.getSkjermlenke().ifPresent(skjermlenke -> {
-            SkjermlenkeType type = kodeverkRepository.finn(SkjermlenkeType.class, skjermlenke);
+            SkjermlenkeType type = SkjermlenkeType.fraKode(skjermlenke);
             dto.setSkjermlenke(type);
         });
         if (!historikkinnslagDel.getTotrinnsvurderinger(aksjonspunktRepository).isEmpty()) {
             dto.setAksjonspunkter(HistorikkinnslagTotrinnsVurderingDto.mapFra(historikkinnslagDel.getTotrinnsvurderinger(aksjonspunktRepository)));
         }
         if (!historikkinnslagDel.getOpplysninger().isEmpty()) {
-            dto.setOpplysninger(HistorikkinnslagOpplysningDto.mapFra(historikkinnslagDel.getOpplysninger(), kodeverkRepository));
+            dto.setOpplysninger(HistorikkinnslagOpplysningDto.mapFra(historikkinnslagDel.getOpplysninger()));
         }
         if (!historikkinnslagDel.getEndredeFelt().isEmpty()) {
             dto.setEndredeFelter(HistorikkinnslagEndretFeltDto.mapFra(historikkinnslagDel.getEndredeFelt()));

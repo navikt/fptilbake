@@ -63,11 +63,9 @@
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.opptjening.ReferanseType"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Region"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.SivilstandType"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.VurderÅrsak"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.tilbakekrevingsvalg.VidereBehandling"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeType"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType"/>
 
 
 </entity-mappings>

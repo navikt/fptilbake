@@ -1,5 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk;
 
+import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -15,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
-@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
+@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
 public enum HendelseType implements Kodeverdi {
 
     MEDLEMSKAP_TYPE("MEDLEMSKAP", "§14-2 Medlemskap", 10),
@@ -47,8 +49,7 @@ public enum HendelseType implements Kodeverdi {
     SVP_BEREGNING_TYPE("SVP_BEREGNING_TYPE", "§14-4 5. ledd Beregning ", 60),
     SVP_UTTAK_TYPE("SVP_UTTAK_TYPE", "§14-4 Uttak", 70),
     SVP_OPPHØR("OPPHØR", "Opphør", 80),
-    SVP_ANNET_TYPE("SVP_ANNET_TYPE", "Annet", 999),
-    ;
+    SVP_ANNET_TYPE("SVP_ANNET_TYPE", "Annet", 999);
 
     public static final String KODEVERK = "HENDELSE_TYPE";
 

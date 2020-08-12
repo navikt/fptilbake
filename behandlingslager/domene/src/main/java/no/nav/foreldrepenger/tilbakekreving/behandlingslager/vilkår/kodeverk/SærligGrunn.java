@@ -8,6 +8,7 @@ import java.util.Map;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
+import javax.validation.constraints.Pattern;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -15,6 +16,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
+import no.nav.vedtak.util.InputValideringRegex;
 
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
@@ -26,7 +28,9 @@ public enum SærligGrunn implements Kodeverdi {
     TID_FRA_UTBETALING("TID_FRA_UTBETALING","Hvor lang tid siden utbetalingen fant sted"),
     ANNET("ANNET","Annet");
 
+    @Pattern(regexp = InputValideringRegex.KODEVERK)
     private String kode;
+    @Pattern(regexp = InputValideringRegex.FRITEKST)
     private String navn;
 
     public static final String KODEVERK = "SAERLIG_GRUNN";

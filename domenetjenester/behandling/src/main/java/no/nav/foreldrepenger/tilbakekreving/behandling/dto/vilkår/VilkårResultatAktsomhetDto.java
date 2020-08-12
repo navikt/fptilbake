@@ -23,7 +23,7 @@ public class VilkårResultatAktsomhetDto {
     @Size(max = 5)
     @JsonProperty("sarligGrunner")
     @Valid
-    private List<@Valid SærligGrunn> særligeGrunner = new ArrayList<>();
+    private List<SærligGrunn> særligeGrunner = new ArrayList<>();
 
     private boolean harGrunnerTilReduksjon;
 

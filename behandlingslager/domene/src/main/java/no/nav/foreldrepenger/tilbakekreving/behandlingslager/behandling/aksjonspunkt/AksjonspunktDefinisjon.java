@@ -77,12 +77,8 @@ public class AksjonspunktDefinisjon extends KodeverkTabell {
     @Column(name = "frist_periode")
     private String fristPeriode;
 
-
-    @ManyToOne()
-    @JoinColumnsOrFormulas({
-            @JoinColumnOrFormula(column = @JoinColumn(name = "skjermlenke_type", referencedColumnName = "kode", nullable = false)),
-            @JoinColumnOrFormula(formula = @JoinFormula(referencedColumnName = "kodeverk", value = "'" + SkjermlenkeType.DISCRIMINATOR
-                    + "'"))})
+    @Convert(converter = SkjermlenkeType.KodeverdiConverter.class)
+    @Column(name = "skjermlenke_type",nullable = false)
     private SkjermlenkeType skjermlenkeType = SkjermlenkeType.UDEFINERT;
 
     @ManyToOne
