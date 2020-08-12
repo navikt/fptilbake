@@ -244,7 +244,7 @@ public class HåndterGamleKravgrunnlagTjeneste {
     //midlertidig kode. skal fjernes etter en stund
     private boolean kanOppretteBehandling() {
         boolean isEnabled = false;
-        if (getAntallBehandlingOprettet() < 5) {
+        if (getAntallBehandlingOprettet() < 15) {
             logger.info("Antall behandling opprettet av batch-en er {}", getAntallBehandlingOprettet());
             isEnabled = true;
         }
