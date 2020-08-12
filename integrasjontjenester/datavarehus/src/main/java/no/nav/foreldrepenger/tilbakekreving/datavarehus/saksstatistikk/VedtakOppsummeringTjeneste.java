@@ -23,8 +23,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtakRepository;
@@ -125,7 +123,7 @@ public class VedtakOppsummeringTjeneste {
             vedtakPeriode.setTom(periodeEntitet.getPeriode().getTom());
             if (periodeEntitet.getAktsomhet() != null) {
                 vedtakPeriode.setAktsomhet(Aktsomhet.valueOf(periodeEntitet.getAktsomhetResultat().getKode()));
-                if(periodeEntitet.tilbakekrevesSmåbeløp() != null){
+                if (periodeEntitet.tilbakekrevesSmåbeløp() != null) {
                     vedtakPeriode.setHarBruktSjetteLedd(periodeEntitet.tilbakekrevesSmåbeløp());
                 }
                 vedtakPeriode.setSærligeGrunner(hentSærligGrunner(periodeEntitet));
@@ -141,7 +139,7 @@ public class VedtakOppsummeringTjeneste {
     private List<VedtakPeriode> hentForeldelsePerioder(long behandlingId, BeregningResultat beregningResultat, VurdertForeldelse vurdertForeldelse) {
         List<VedtakPeriode> foreldelsePerioder = new ArrayList<>();
         for (VurdertForeldelsePeriode foreldelsePeriode : vurdertForeldelse.getVurdertForeldelsePerioder()) {
-            if(foreldelsePeriode.erForeldet()){
+            if (foreldelsePeriode.erForeldet()) {
                 VedtakPeriode vedtakPeriode = new VedtakPeriode();
                 vedtakPeriode.setFom(foreldelsePeriode.getFom());
                 vedtakPeriode.setTom(foreldelsePeriode.getPeriode().getTom());
@@ -187,9 +185,8 @@ public class VedtakOppsummeringTjeneste {
                 .filter(faktaPeriode -> faktaPeriode.getPeriode().overlapper(periode)).findFirst();
             if (faktaFeilutbetalingPeriode.isPresent()) {
                 FaktaFeilutbetalingPeriode faktaPeriode = faktaFeilutbetalingPeriode.get();
-                vedtakPeriode.setHendelseTypeTekst(hentNavn(HendelseType.DISCRIMINATOR, faktaPeriode.getHendelseType().getKode()));
-                vedtakPeriode.setHendelseUndertypeTekst(faktaPeriode.getHendelseUndertype() != null ?
-                    hentNavn(HendelseUnderType.DISCRIMINATOR, faktaPeriode.getHendelseUndertype().getKode()) : "");
+                vedtakPeriode.setHendelseTypeTekst(faktaPeriode.getHendelseType().getNavn());
+                vedtakPeriode.setHendelseUndertypeTekst(faktaPeriode.getHendelseUndertype() != null ? faktaPeriode.getHendelseUndertype().getNavn() : "");
             }
         }
     }
@@ -198,7 +195,4 @@ public class VedtakOppsummeringTjeneste {
         return tidspunkt.atZone(ZoneId.of("UTC")).toOffsetDateTime();
     }
 
-    private String hentNavn(String kodeverk, String kode) {
-        return kodeverkRepository.hentKodeliste(kodeverk, kode).getNavn();
-    }
 }

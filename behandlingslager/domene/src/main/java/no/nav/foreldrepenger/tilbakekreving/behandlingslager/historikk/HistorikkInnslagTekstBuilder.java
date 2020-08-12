@@ -5,6 +5,7 @@ import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Hi
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -16,8 +17,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.vedtak.feil.Feil;
 
@@ -31,6 +34,10 @@ public class HistorikkInnslagTekstBuilder {
     private int antallEndredeFelter = 0;
     private int antallAksjonspunkter = 0;
     private int antallOpplysninger = 0;
+
+    public static final Map<String, Map<String, ? extends Kodeverdi>> KODEVERK_KODEVERDI_MAP = Map.ofEntries(
+        new AbstractMap.SimpleEntry<>(Venteårsak.KODEVERK,Venteårsak.kodeMap()),
+        new AbstractMap.SimpleEntry<>(HistorikkBegrunnelseType.KODEVERK,HistorikkBegrunnelseType.kodeMap()));
 
     public HistorikkInnslagTekstBuilder() {
         //
@@ -102,6 +109,14 @@ public class HistorikkInnslagTekstBuilder {
         return this;
     }
 
+    public <K extends Kodeverdi> HistorikkInnslagTekstBuilder medÅrsak(K årsak) {
+        HistorikkinnslagFelt.builder()
+            .medFeltType(HistorikkinnslagFeltType.AARSAK)
+            .medTilVerdi(årsak)
+            .build(historikkinnslagDelBuilder);
+        return this;
+    }
+
     public HistorikkInnslagTekstBuilder medTema(HistorikkEndretFeltType endretFeltType, String verdi) {
         HistorikkinnslagFelt.builder()
             .medFeltType(HistorikkinnslagFeltType.ANGÅR_TEMA)
@@ -112,6 +127,14 @@ public class HistorikkInnslagTekstBuilder {
     }
 
     public HistorikkInnslagTekstBuilder medResultat(Kodeliste resultat) {
+        HistorikkinnslagFelt.builder()
+            .medFeltType(HistorikkinnslagFeltType.RESULTAT)
+            .medTilVerdi(resultat)
+            .build(historikkinnslagDelBuilder);
+        return this;
+    }
+
+    public HistorikkInnslagTekstBuilder medResultat(Kodeverdi resultat) {
         HistorikkinnslagFelt.builder()
             .medFeltType(HistorikkinnslagFeltType.RESULTAT)
             .medTilVerdi(resultat)
@@ -131,6 +154,10 @@ public class HistorikkInnslagTekstBuilder {
         return medBegrunnelse(begrunnelse, true);
     }
 
+    public HistorikkInnslagTekstBuilder medBegrunnelse(Kodeverdi begrunnelse) {
+        return medBegrunnelse(begrunnelse, true);
+    }
+
     public HistorikkInnslagTekstBuilder medBegrunnelse(String begrunnelse) {
         String begrunnelseStr = formatString(begrunnelse);
         return medBegrunnelse(begrunnelseStr, true);
@@ -146,6 +173,15 @@ public class HistorikkInnslagTekstBuilder {
     }
 
     public <K extends Kodeliste> HistorikkInnslagTekstBuilder medBegrunnelse(K begrunnelse, boolean erBegrunnelseEndret) {
+        HistorikkinnslagFelt.builder()
+            .medFeltType(HistorikkinnslagFeltType.BEGRUNNELSE)
+            .medTilVerdi(begrunnelse)
+            .build(historikkinnslagDelBuilder);
+        this.begrunnelseEndret = erBegrunnelseEndret;
+        return this;
+    }
+
+    public <K extends Kodeverdi> HistorikkInnslagTekstBuilder medBegrunnelse(K begrunnelse, boolean erBegrunnelseEndret) {
         HistorikkinnslagFelt.builder()
             .medFeltType(HistorikkinnslagFeltType.BEGRUNNELSE)
             .medTilVerdi(begrunnelse)
@@ -361,29 +397,29 @@ public class HistorikkInnslagTekstBuilder {
     private Optional<Feil> verify(HistorikkinnslagType historikkinnslagType, HistorikkinnslagDel historikkinnslagDel) {
         String type = historikkinnslagType.getMal();
 
-        if (HistorikkinnslagType.MAL_TYPE_1.equals(type)) {
+        if (HistorikkInnslagMal.MAL_TYPE_1.equals(type)) {
             return checkFieldsPresent(type, historikkinnslagDel, HistorikkinnslagFeltType.HENDELSE);
         }
-        if (HistorikkinnslagType.MAL_TYPE_2.equals(type)) {
+        if (HistorikkInnslagMal.MAL_TYPE_2.equals(type)) {
             return checkFieldsPresent(type, historikkinnslagDel, HistorikkinnslagFeltType.HENDELSE, HistorikkinnslagFeltType.SKJERMLENKE);
         }
-        if (HistorikkinnslagType.MAL_TYPE_3.equals(type)) {
+        if (HistorikkInnslagMal.MAL_TYPE_3.equals(type)) {
             return checkFieldsPresent(type, historikkinnslagDel, HistorikkinnslagFeltType.HENDELSE, HistorikkinnslagFeltType.AKSJONSPUNKT_KODE);
         }
-        if (HistorikkinnslagType.MAL_TYPE_4.equals(type)) {
+        if (HistorikkInnslagMal.MAL_TYPE_4.equals(type)) {
             return checkFieldsPresent(type, historikkinnslagDel, HistorikkinnslagFeltType.HENDELSE);
         }
-        if (HistorikkinnslagType.MAL_TYPE_5.equals(type) || HistorikkinnslagType.MAL_TYPE_7.equals(type) || HistorikkinnslagType.MAL_TYPE_8.equals(type)
-            || HistorikkinnslagType.MAL_TYPE_10.equals(type)) {
+        if (HistorikkInnslagMal.MAL_TYPE_5.equals(type) || HistorikkInnslagMal.MAL_TYPE_7.equals(type) || HistorikkInnslagMal.MAL_TYPE_8.equals(type)
+            || HistorikkInnslagMal.MAL_TYPE_10.equals(type)) {
             return checkAtLeastOnePresent(type, historikkinnslagDel, HistorikkinnslagFeltType.SKJERMLENKE,
                 HistorikkinnslagFeltType.HENDELSE,
                 HistorikkinnslagFeltType.ENDRET_FELT,
                 HistorikkinnslagFeltType.BEGRUNNELSE);
         }
-        if (HistorikkinnslagType.MAL_TYPE_6.equals(type)) {
+        if (HistorikkInnslagMal.MAL_TYPE_6.equals(type)) {
             return checkFieldsPresent(type, historikkinnslagDel, HistorikkinnslagFeltType.OPPLYSNINGER);
         }
-        if (HistorikkinnslagType.MAL_TYPE_9.equals(type)) {
+        if (HistorikkInnslagMal.MAL_TYPE_9.equals(type)) {
             return checkFieldsPresent(type, historikkinnslagDel, HistorikkinnslagFeltType.HENDELSE, HistorikkinnslagFeltType.ENDRET_FELT);
         }
         throw HistorikkInnsalgFeil.FACTORY.ukjentHistorikkinnslagType(type).toException();

@@ -3,6 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk;
 import java.util.Objects;
 
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -11,14 +12,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.JoinColumnOrFormula;
-import org.hibernate.annotations.JoinFormula;
-
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.diff.IndexKey;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
 @Entity(name = "HistorikkinnslagFelt")
 @Table(name = "HISTORIKKINNSLAG_FELT")
@@ -35,9 +34,8 @@ public class HistorikkinnslagFelt extends BaseEntitet implements IndexKey {
     @JsonBackReference
     private HistorikkinnslagDel historikkinnslagDel;
 
-    @ManyToOne(optional = false)
-    @JoinColumnOrFormula(column = @JoinColumn(name = "historikkinnslag_felt_type", referencedColumnName = "kode", nullable = false))
-    @JoinColumnOrFormula(formula = @JoinFormula(referencedColumnName = "kodeverk", value = "'" + HistorikkinnslagFelt.DISCRIMINATOR + "'"))
+    @Convert(converter = HistorikkinnslagFeltType.KodeverdiConverter.class)
+    @Column(name = "historikkinnslag_felt_type", nullable = false)
     private HistorikkinnslagFeltType feltType;
 
     @Column(name = "navn")
@@ -178,6 +176,12 @@ public class HistorikkinnslagFelt extends BaseEntitet implements IndexKey {
             return this;
         }
 
+        public Builder medNavn(Kodeverdi kodeverdi) {
+            kladd.navn = kodeverdi.getKode();
+            kladd.klNavn = kodeverdi.getKodeverk();
+            return this;
+        }
+
         public Builder medFraVerdi(String fraVerdi) {
             kladd.fraVerdi = fraVerdi;
             return this;
@@ -199,6 +203,14 @@ public class HistorikkinnslagFelt extends BaseEntitet implements IndexKey {
         }
 
         public <K extends Kodeliste> Builder medTilVerdi(K tilVerdi) {
+            if (tilVerdi != null) {
+                kladd.tilVerdiKode = tilVerdi.getKode();
+                kladd.klTilVerdi = tilVerdi.getKodeverk();
+            }
+            return this;
+        }
+
+        public <K extends Kodeverdi> Builder medTilVerdi(K tilVerdi) {
             if (tilVerdi != null) {
                 kladd.tilVerdiKode = tilVerdi.getKode();
                 kladd.klTilVerdi = tilVerdi.getKodeverk();

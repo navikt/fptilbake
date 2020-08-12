@@ -16,13 +16,7 @@
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagFelt"/>
 
     <!-- kodeliste -->
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagFeltType"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltVerdiType"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkBegrunnelseType"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkOpplysningType"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkResultatType"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.RelasjonsRolleType"/>
 

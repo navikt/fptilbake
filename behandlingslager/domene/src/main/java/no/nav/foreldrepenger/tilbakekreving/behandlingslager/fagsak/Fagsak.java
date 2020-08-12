@@ -6,6 +6,7 @@ import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -54,9 +55,8 @@ public class Fagsak extends BaseEntitet {
     @Column(name = "versjon", nullable = false)
     private long versjon;
 
-    @ManyToOne(optional = false)
-    @JoinColumnOrFormula(column = @JoinColumn(name = "ytelse_type", referencedColumnName = "kode", nullable = false))
-    @JoinColumnOrFormula(formula = @JoinFormula(referencedColumnName = "kodeverk", value = "'" + FagsakYtelseType.DISCRIMINATOR + "'"))
+    @Convert(converter = FagsakYtelseType.KodeverdiConverter.class)
+    @Column(name="ytelse_type",nullable = false)
     private FagsakYtelseType fagsakYtelseType = FagsakYtelseType.FORELDREPENGER;
 
     Fagsak() {

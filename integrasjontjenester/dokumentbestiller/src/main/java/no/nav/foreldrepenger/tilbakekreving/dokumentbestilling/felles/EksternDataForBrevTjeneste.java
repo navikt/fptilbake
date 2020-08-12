@@ -1,7 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles;
 
 import java.time.Period;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -16,7 +15,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.Ve
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodelisteNavnI18N;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.TpsTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
@@ -61,12 +59,6 @@ public class EksternDataForBrevTjeneste {
         return brukersSvarfrist;
     }
 
-    public String finnFagsaktypeNavnPåRiktigSpråk(FagsakYtelseType fagsaktype, Språkkode sprakkode) {
-        FagsakYtelseType fagsakYtelseType = kodeverkRepository.finn(FagsakYtelseType.class, fagsaktype.getKode());
-        List<KodelisteNavnI18N> kodelisteNavnI18NList = fagsakYtelseType.getKodelisteNavnI18NList();
-        return BrevSpråkUtil.finnFagsaktypenavnPåAngittSpråk(kodelisteNavnI18NList, sprakkode);
-    }
-
     public SamletEksternBehandlingInfo hentYtelsesbehandlingFraFagsystemet(UUID eksternUuid, Tillegsinformasjon... tillegsinformasjon) {
         return fagsystemKlient.hentBehandlingsinfo(eksternUuid, tillegsinformasjon);
     }
@@ -106,11 +98,11 @@ public class EksternDataForBrevTjeneste {
     //TODO dette er ikke ekstern data, flytt til annen tjeneste
     public YtelseNavn hentYtelsenavn(FagsakYtelseType ytelsetype, Språkkode språkkode) {
         YtelseNavn ytelseNavn = new YtelseNavn();
-        String ytelsePåBokmål = finnFagsaktypeNavnPåRiktigSpråk(ytelsetype, Språkkode.nb);
+        String ytelsePåBokmål = ytelsetype.getNavn();
         ytelseNavn.setNavnPåBokmål(ytelsePåBokmål);
 
         if (språkkode != null && !språkkode.equals(Språkkode.nb)) {
-            ytelseNavn.setNavnPåBrukersSpråk(finnFagsaktypeNavnPåRiktigSpråk(ytelsetype, språkkode));
+            ytelseNavn.setNavnPåBrukersSpråk(FagsakYtelseType.finnFagsaktypenavnPåAngittSpråk(ytelsetype, språkkode));
         } else {
             ytelseNavn.setNavnPåBrukersSpråk(ytelsePåBokmål);
         }

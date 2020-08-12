@@ -3,6 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår;
 import java.util.Objects;
 
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -10,10 +11,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.JoinColumnOrFormula;
-import org.hibernate.annotations.JoinColumnsOrFormulas;
-import org.hibernate.annotations.JoinFormula;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.SærligGrunn;
@@ -30,11 +27,8 @@ public class VilkårVurderingSærligGrunnEntitet extends BaseEntitet {
     @JoinColumn(name = "vurder_aktsomhet_id", nullable = false, updatable = false)
     private VilkårVurderingAktsomhetEntitet vurdertAktsomhet;
 
-    @ManyToOne
-    @JoinColumnsOrFormulas(value = {
-            @JoinColumnOrFormula(formula = @JoinFormula(value = "'" + SærligGrunn.DISCRIMINATOR + "'", referencedColumnName = "kodeverk")),
-            @JoinColumnOrFormula(column = @JoinColumn(name = "saerlig_grunn", referencedColumnName = "kode")),
-    })
+    @Convert(converter = SærligGrunn.KodeverdiConverter.class)
+    @Column(name = "saerlig_grunn")
     private SærligGrunn grunn;
 
     @Column(name = "begrunnelse")

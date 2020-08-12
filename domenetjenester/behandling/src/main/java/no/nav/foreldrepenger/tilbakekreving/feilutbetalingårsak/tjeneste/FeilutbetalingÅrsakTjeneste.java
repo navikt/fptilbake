@@ -4,48 +4,37 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseTypePrYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUndertypePrHendelseType;
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTypeMedUndertyperDto;
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTyperPrYtelseTypeDto;
 
 @ApplicationScoped
 public class FeilutbetalingÅrsakTjeneste {
 
-    private KodeverkRepository kodeverkRepository;
-
-    FeilutbetalingÅrsakTjeneste() {
-        // For CDI
-    }
-
-    @Inject
-    public FeilutbetalingÅrsakTjeneste(KodeverkRepository kodeverkRepository) {
-        this.kodeverkRepository = kodeverkRepository;
-    }
-
     public List<HendelseTyperPrYtelseTypeDto> hentFeilutbetalingårsaker() {
         List<HendelseTyperPrYtelseTypeDto> resultat = new ArrayList<>();
 
-        Map<FagsakYtelseType, Set<HendelseType>> hendelseTypePrYtelseType = kodeverkRepository.hentKodeRelasjonForKodeverk(FagsakYtelseType.class, HendelseType.class);
-        Map<HendelseType, Set<HendelseUnderType>> hendelseUndertypePrHendelseType = kodeverkRepository.hentKodeRelasjonForKodeverk(HendelseType.class, HendelseUnderType.class);
+        Map<FagsakYtelseType, Set<HendelseType>> hendelseTypePrYtelseType = HendelseTypePrYtelseType.getHendelsetypeHierarki();
+        Map<HendelseType, Set<HendelseUnderType>> hendelseUndertypePrHendelseType = HendelseUndertypePrHendelseType.getHendelsetypeHierarki();
 
         for (Map.Entry<FagsakYtelseType, Set<HendelseType>> entry : hendelseTypePrYtelseType.entrySet()) {
             FagsakYtelseType ytelseType = entry.getKey();
-            List<HendelseType> hendelseTyper = sortereBasertPåEkstradata(entry.getValue());
+            List<HendelseType> hendelseTyper = sortereHendelseTypeBasertPåEkstradata2(entry.getValue());
 
             List<HendelseTypeMedUndertyperDto> dtoer = new ArrayList<>();
             for (HendelseType hendelseType : hendelseTyper) {
                 Set<HendelseUnderType> undertyper = hendelseUndertypePrHendelseType.get(hendelseType);
-                List<HendelseUnderType> sorterteUndertyper = sortereBasertPåEkstradata(undertyper);
+                List<HendelseUnderType> sorterteUndertyper = sortereHendelseUnderTypeBasertPåEkstradata(undertyper);
                 dtoer.add(new HendelseTypeMedUndertyperDto(hendelseType, sorterteUndertyper));
             }
             resultat.add(new HendelseTyperPrYtelseTypeDto(ytelseType, dtoer));
@@ -54,15 +43,24 @@ public class FeilutbetalingÅrsakTjeneste {
         return resultat;
     }
 
-    private static <T extends Kodeliste> List<T> sortereBasertPåEkstradata(Set<T> kodelistene) {
-        Set<T> manglerSortering = kodelistene.stream().filter(h -> h.getEkstraData() == null).collect(Collectors.toSet());
-        if (!manglerSortering.isEmpty()) {
-            throw new IllegalStateException("Utvikler-feil: mangler sorteringsfelt (settes i ekstra-data), gjelder " + manglerSortering);
+    private static List<HendelseUnderType> sortereHendelseUnderTypeBasertPåEkstradata(Set<HendelseUnderType> kodelistene) {
+        if (kodelistene.stream().anyMatch(Objects::isNull)) {
+            throw new IllegalStateException("Fins null i HendelseUnderType: " + kodelistene);
         }
 
         return kodelistene
             .stream()
-            .sorted(Comparator.comparing(kodeliste -> Long.valueOf(kodeliste.getEkstraData())))
+            .sorted(Comparator.comparing(HendelseUnderType::getSortering))
+            .collect(Collectors.toList());
+    }
+
+    private static List<HendelseType> sortereHendelseTypeBasertPåEkstradata2(Set<HendelseType> kodelistene) {
+        if (kodelistene.stream().anyMatch(Objects::isNull)) {
+            throw new IllegalStateException("Fins null i HendelseType: " + kodelistene);
+        }
+        return kodelistene
+            .stream()
+            .sorted(Comparator.comparing(HendelseType::getSortering))
             .collect(Collectors.toList());
     }
 

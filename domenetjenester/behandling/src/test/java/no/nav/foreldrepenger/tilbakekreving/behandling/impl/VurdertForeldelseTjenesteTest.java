@@ -68,7 +68,7 @@ public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
         assertThat(historikkinnslagDel.getBegrunnelse().get()).isEqualTo("ABC");
         assertThat(historikkinnslagDel.getSkjermlenke().get()).isEqualTo(SkjermlenkeType.FORELDELSE.getKode());
         assertThat(getTilVerdi(historikkinnslagDel.getEndretFelt(HistorikkEndretFeltType.FORELDELSE)))
-            .isEqualTo(finnForeldelseVurderingType(ForeldelseVurderingType.FORELDET).getNavn());
+            .isEqualTo(ForeldelseVurderingType.FORELDET.getNavn());
         assertThat(getFraVerdi(historikkinnslagDel.getEndretFelt(HistorikkEndretFeltType.FORELDELSE)))
             .isEqualTo(null);
     }
@@ -109,7 +109,7 @@ public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
         assertThat(førsteDel.getBegrunnelse().get()).isEqualTo("ABC");
         assertThat(førsteDel.getSkjermlenke().get()).isEqualTo(SkjermlenkeType.FORELDELSE.getKode());
         assertThat(getTilVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.FORELDELSE)))
-            .isEqualTo(finnForeldelseVurderingType(ForeldelseVurderingType.FORELDET).getNavn());
+            .isEqualTo(ForeldelseVurderingType.FORELDET.getNavn());
         assertThat(getFraVerdi(førsteDel.getEndretFelt(HistorikkEndretFeltType.FORELDELSE)))
             .isEqualTo(null);
 
@@ -119,7 +119,7 @@ public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
         assertThat(andreDel.getBegrunnelse().get()).isEqualTo("CDE");
         assertThat(andreDel.getSkjermlenke().get()).isEqualTo(SkjermlenkeType.FORELDELSE.getKode());
         assertThat(getTilVerdi(andreDel.getEndretFelt(HistorikkEndretFeltType.FORELDELSE)))
-            .isEqualTo(finnForeldelseVurderingType(ForeldelseVurderingType.TILLEGGSFRIST).getNavn());
+            .isEqualTo(ForeldelseVurderingType.TILLEGGSFRIST.getNavn());
         assertThat(getFraVerdi(andreDel.getEndretFelt(HistorikkEndretFeltType.FORELDELSE)))
             .isEqualTo(null);
     }
@@ -267,10 +267,6 @@ public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
             .medHendelseType(årsak)
             .medHendelseUndertype(underårsak)
             .medFeilutbetalinger(faktaFeilutbetaling).build();
-    }
-
-    private ForeldelseVurderingType finnForeldelseVurderingType(ForeldelseVurderingType foreldelseVurderingType) {
-        return repoProvider.getKodeverkRepository().finn(ForeldelseVurderingType.class, foreldelseVurderingType);
     }
 
     private Historikkinnslag fellesHistorikkInnslagAssert() {

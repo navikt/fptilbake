@@ -42,9 +42,6 @@
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.VurderÅrsakTotrinnsvurdering"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårType"/>
 
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode"/>
-
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeAggregateEntitet"/>
 
@@ -52,15 +49,10 @@
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.AdresseType"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktStatus"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktType"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.arkiv.ArkivFilType"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Begrunnelse"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegStatus"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.DokumentKategori"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.DokumentTypeId"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakStatus"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodelisteRelasjon"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Landkoder"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.MottakKanal"/>
@@ -71,15 +63,9 @@
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.opptjening.ReferanseType"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Region"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.SivilstandType"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Tema"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.VariantFormat"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.VurderÅrsak"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.tilbakekrevingsvalg.VidereBehandling"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KonsekvensForYtelsen"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeType"/>
+    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType"/>
 
 
 </entity-mappings>

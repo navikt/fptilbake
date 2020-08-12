@@ -62,9 +62,8 @@ public class Aksjonspunkt extends BaseEntitet {
     @JoinColumnOrFormula(formula = @JoinFormula(referencedColumnName = "kodeverk", value = "'" + AksjonspunktStatus.DISCRIMINATOR + "'"))
     private AksjonspunktStatus status;
 
-    @ManyToOne()
-    @JoinColumnOrFormula(column = @JoinColumn(name = "vent_aarsak", referencedColumnName = "kode", nullable = false))
-    @JoinColumnOrFormula(formula = @JoinFormula(referencedColumnName = "kodeverk", value = "'" + Venteårsak.DISCRIMINATOR + "'"))
+    @Convert(converter = Venteårsak.KodeverdiConverter.class)
+    @Column(name = "vent_aarsak", nullable = false, updatable = false)
     private Venteårsak venteårsak = Venteårsak.UDEFINERT;
 
     @Version

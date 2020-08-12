@@ -9,18 +9,14 @@ import java.util.Objects;
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.JoinColumnOrFormula;
-import org.hibernate.annotations.JoinFormula;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
@@ -44,14 +40,12 @@ public class Kravgrunnlag431 extends BaseEntitet {
     @Column(name = "vedtak_id", nullable = false, updatable = false)
     private Long vedtakId;
 
-    @ManyToOne(optional = false)
-    @JoinColumnOrFormula(column = @JoinColumn(name = "krav_status_kode", referencedColumnName = "kode", nullable = false))
-    @JoinColumnOrFormula(formula = @JoinFormula(referencedColumnName = "kodeverk", value = "'" + KravStatusKode.DISCRIMINATOR + "'"))
+    @Convert(converter = KravStatusKode.KodeverdiConverter.class)
+    @Column(name = "krav_status_kode", nullable = false, updatable = false)
     private KravStatusKode kravStatusKode;
 
-    @ManyToOne(optional = false)
-    @JoinColumnOrFormula(column = @JoinColumn(name = "fag_omraade_kode", referencedColumnName = "kode", nullable = false))
-    @JoinColumnOrFormula(formula = @JoinFormula(referencedColumnName = "kodeverk", value = "'" + FagOmrådeKode.DISCRIMINATOR + "'"))
+    @Convert(converter = FagOmrådeKode.KodeverdiConverter.class)
+    @Column(name = "fag_omraade_kode", nullable = false)
     private FagOmrådeKode fagOmrådeKode;
 
     @Column(name = "fagsystem_id", nullable = false, updatable = false)
@@ -66,17 +60,15 @@ public class Kravgrunnlag431 extends BaseEntitet {
     @Column(name = "gjelder_vedtak_id", nullable = false, updatable = false)
     private String gjelderVedtakId;
 
-    @ManyToOne(optional = false)
-    @JoinColumnOrFormula(column = @JoinColumn(name = "gjelder_type", referencedColumnName = "kode", nullable = false))
-    @JoinColumnOrFormula(formula = @JoinFormula(referencedColumnName = "kodeverk", value = "'" + GjelderType.DISCRIMINATOR + "'"))
+    @Convert(converter = GjelderType.KodeverdiConverter.class)
+    @Column(name = "gjelder_type", nullable = false, updatable = false)
     private GjelderType gjelderType;
 
     @Column(name = "utbetales_til_id", nullable = false, updatable = false)
     private String utbetalesTilId;
 
-    @ManyToOne(optional = false)
-    @JoinColumnOrFormula(column = @JoinColumn(name = "utbet_id_type", referencedColumnName = "kode", nullable = false))
-    @JoinColumnOrFormula(formula = @JoinFormula(referencedColumnName = "kodeverk", value = "'" + GjelderType.DISCRIMINATOR + "'"))
+    @Convert(converter = GjelderType.KodeverdiConverter.class)
+    @Column(name = "utbet_id_type", nullable = false, updatable = false)
     private GjelderType utbetGjelderType;
 
     @Column(name = "hjemmel_kode")

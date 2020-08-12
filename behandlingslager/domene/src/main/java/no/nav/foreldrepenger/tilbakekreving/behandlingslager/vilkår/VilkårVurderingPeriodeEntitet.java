@@ -7,6 +7,7 @@ import java.util.Objects;
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -53,11 +54,8 @@ public class VilkårVurderingPeriodeEntitet extends BaseEntitet {
     })
     private NavOppfulgt navOppfulgt = NavOppfulgt.UDEFINERT;
 
-    @ManyToOne
-    @JoinColumnsOrFormulas(value = {
-        @JoinColumnOrFormula(formula = @JoinFormula(value = "'" + VilkårResultat.DISCRIMINATOR + "'", referencedColumnName = "kodeverk")),
-        @JoinColumnOrFormula(column = @JoinColumn(name = "vilkaar_resultat", referencedColumnName = "kode")),
-    })
+    @Convert(converter = VilkårResultat.KodeverdiConverter.class)
+    @Column(name = "vilkaar_resultat")
     private VilkårResultat vilkårResultat = VilkårResultat.UDEFINERT;
 
     @Column(name = "begrunnelse", nullable = false, updatable = false)

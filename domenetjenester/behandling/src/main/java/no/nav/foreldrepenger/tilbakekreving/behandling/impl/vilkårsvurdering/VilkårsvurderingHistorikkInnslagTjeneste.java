@@ -29,11 +29,11 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingAktsomhetEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingPeriodeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingSærligGrunnEntitet;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.SærligGrunn;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
@@ -165,7 +165,7 @@ public class VilkårsvurderingHistorikkInnslagTjeneste {
         grunnTekst.append(konvertFraBoolean(aktsomhetEntitet.getSærligGrunnerTilReduksjon()));
         grunnTekst.append(":");
         for (VilkårVurderingSærligGrunnEntitet særligGrunn : aktsomhetEntitet.getSærligGrunner()) {
-            SærligGrunn grunn = hentSærligGrunnKodeliste(særligGrunn.getGrunn());
+            SærligGrunn grunn = særligGrunn.getGrunn();
             StringBuilder tekst = new StringBuilder(grunn.getNavn());
             if (SærligGrunn.ANNET.equals(grunn)) {
                 tekst.append(":");
@@ -177,9 +177,6 @@ public class VilkårsvurderingHistorikkInnslagTjeneste {
         return grunnTekst.toString();
     }
 
-    private SærligGrunn hentSærligGrunnKodeliste(SærligGrunn grunn) {
-        return repositoryProvider.getKodeverkRepository().finn(SærligGrunn.class, grunn);
-    }
 
     private String getNavn(Kodeliste kode) {
         //TODO fjern oppslag, skal lagres med kode
@@ -187,6 +184,13 @@ public class VilkårsvurderingHistorikkInnslagTjeneste {
             return null;
         }
         return repositoryProvider.getKodeverkRepository().finn(kode.getClass(), kode.getKode()).getNavn();
+    }
+
+    private String getNavn(Kodeverdi kode) {
+        if(kode == null) {
+            return null;
+        }
+        return kode.getNavn();
     }
 
     private String fraBoolean(Boolean verdi) {

@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -40,11 +41,8 @@ public class BehandlingVedtak extends BaseEntitet {
     @Column(name = "ANSVARLIG_SAKSBEHANDLER", nullable = false)
     private String ansvarligSaksbehandler;
 
-    @ManyToOne
-    @JoinColumnsOrFormulas({
-            @JoinColumnOrFormula(column = @JoinColumn(name = "vedtak_resultat_type", referencedColumnName = "kode", nullable = false)),
-            @JoinColumnOrFormula(formula = @JoinFormula(referencedColumnName = "kodeverk", value = "'" + VedtakResultatType.DISCRIMINATOR
-                + "'")) })
+    @Convert(converter = VedtakResultatType.KodeverdiConverter.class)
+    @Column(name = "vedtak_resultat_type", nullable = false)
     private VedtakResultatType vedtakResultatType = VedtakResultatType.UDEFINERT;
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)

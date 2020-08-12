@@ -1,63 +1,110 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling;
 
+import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-@Entity(name = "BehandlingResultatType")
-@DiscriminatorValue(BehandlingResultatType.DISCRIMINATOR)
-public class BehandlingResultatType extends Kodeliste {
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
-    public static final String DISCRIMINATOR = "BEHANDLING_RESULTAT_TYPE";
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
+public enum BehandlingResultatType implements Kodeverdi {
 
-    public static final BehandlingResultatType IKKE_FASTSATT = new BehandlingResultatType("IKKE_FASTSATT"); //$NON-NLS-1$
-    public static final BehandlingResultatType FASTSATT = new BehandlingResultatType("FASTSATT"); //$NON-NLS-1$
-    public static final BehandlingResultatType HENLAGT_FEILOPPRETTET = new BehandlingResultatType("HENLAGT_FEILOPPRETTET"); //$NON-NLS-1$
-    public static final BehandlingResultatType HENLAGT_KRAVGRUNNLAG_NULLSTILT = new BehandlingResultatType("HENLAGT_KRAVGRUNNLAG_NULLSTILT"); //$NON-NLS-1$
-    public static final BehandlingResultatType HENLAGT_TEKNISK_VEDLIKEHOLD = new BehandlingResultatType("HENLAGT_TEKNISK_VEDLIKEHOLD"); //$NON-NLS-1$
-    public static final BehandlingResultatType ENDRET = new BehandlingResultatType("ENDRET"); //$NON-NLS-1$
-    public static final BehandlingResultatType INGEN_ENDRING = new BehandlingResultatType("INGEN_ENDRING"); //$NON-NLS-1$
+    IKKE_FASTSATT("IKKE_FASTSATT","Ikke fastsatt"),
+    FASTSATT("FASTSATT","Resultatet er fastsatt"),
+    HENLAGT_FEILOPPRETTET("HENLAGT_FEILOPPRETTET","Henlagt, søknaden er feilopprettet"),
+    HENLAGT_KRAVGRUNNLAG_NULLSTILT("HENLAGT_KRAVGRUNNLAG_NULLSTILT","Kravgrunnlaget er nullstilt"),
+    HENLAGT_TEKNISK_VEDLIKEHOLD("HENLAGT_TEKNISK_VEDLIKEHOLD","Teknisk vedlikehold"),
+    ENDRET("ENDRET","Resultatet er endret i revurderingen"),
+    INGEN_ENDRING("INGEN_ENDRING","Ingen endring");
 
-    private static final Map<String, BehandlingResultatType> BEHANDLING_RESULTAT_TYPER = new HashMap<>() {{
-        put(IKKE_FASTSATT.getKode(), IKKE_FASTSATT);
-        put(FASTSATT.getKode(), FASTSATT);
-        put(HENLAGT_FEILOPPRETTET.getKode(), HENLAGT_FEILOPPRETTET);
-        put(HENLAGT_KRAVGRUNNLAG_NULLSTILT.getKode(), HENLAGT_KRAVGRUNNLAG_NULLSTILT);
-        put(HENLAGT_TEKNISK_VEDLIKEHOLD.getKode(), HENLAGT_TEKNISK_VEDLIKEHOLD);
-    }};
+    private String kode;
+    private String navn;
 
+    public static final String KODEVERK = "BEHANDLING_RESULTAT_TYPE";
+    private static final Map<String, BehandlingResultatType> KODER = new LinkedHashMap<>();
+    private static final Set<BehandlingResultatType> ALLE_HENLEGGELSESKODER = Collections.unmodifiableSet(new LinkedHashSet<>(
+        Arrays.asList(HENLAGT_KRAVGRUNNLAG_NULLSTILT, HENLAGT_FEILOPPRETTET, HENLAGT_TEKNISK_VEDLIKEHOLD)));
 
-    private static final Set<BehandlingResultatType> ALLE_HENLEGGELSESKODER = Collections.unmodifiableSet(new LinkedHashSet<>(Arrays.asList(HENLAGT_KRAVGRUNNLAG_NULLSTILT, HENLAGT_FEILOPPRETTET, HENLAGT_TEKNISK_VEDLIKEHOLD)));
-
-    protected BehandlingResultatType() {
-        // Hibernate trenger denne
+    static {
+        for (var v : values()) {
+            if (KODER.putIfAbsent(v.kode, v) != null) {
+                throw new IllegalArgumentException("Duplikat : " + v.kode);
+            }
+        }
     }
 
-    protected BehandlingResultatType(String kode) {
-        super(kode, DISCRIMINATOR);
+    private BehandlingResultatType(String kode, String navn) {
+        this.kode = kode;
+        this.navn = navn;
     }
 
     public static Set<BehandlingResultatType> getAlleHenleggelseskoder() {
         return ALLE_HENLEGGELSESKODER;
     }
 
-    public boolean erHenlagt() {
-        return ALLE_HENLEGGELSESKODER.contains(this);
-    }
-
-    public static BehandlingResultatType fraKode(String kode) {
-        if (BEHANDLING_RESULTAT_TYPER.containsKey(kode)) {
-            return BEHANDLING_RESULTAT_TYPER.get(kode);
+    @JsonCreator
+    public static BehandlingResultatType fraKode(@JsonProperty("kode") String kode) {
+        if (kode == null) {
+            return null;
         }
-        throw new IllegalArgumentException("Fant ikke " + BehandlingResultatType.class + " for kode '" + kode + "'");
+        var ad = KODER.get(kode);
+        if (ad == null) {
+            throw new IllegalArgumentException("Ukjent BehandlingResultatType: " + kode);
+        }
+        return ad;
     }
 
+    public static Map<String, BehandlingResultatType> kodeMap() {
+        return Collections.unmodifiableMap(KODER);
+    }
+
+    @JsonProperty
+    @Override
+    public String getKode() {
+        return kode;
+    }
+
+    @Override
+    public String getOffisiellKode() {
+        return getKode();
+    }
+
+    @JsonProperty
+    @Override
+    public String getKodeverk() {
+        return KODEVERK;
+    }
+
+    @JsonProperty
+    @Override
+    public String getNavn() {
+        return navn;
+    }
+
+    @Converter(autoApply = true)
+    public static class KodeverdiConverter implements AttributeConverter<BehandlingResultatType, String> {
+        @Override
+        public String convertToDatabaseColumn(BehandlingResultatType attribute) {
+            return attribute == null ? null : attribute.getKode();
+        }
+
+        @Override
+        public BehandlingResultatType convertToEntityAttribute(String dbData) {
+            return dbData == null ? null : fraKode(dbData);
+        }
+    }
 }

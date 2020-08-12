@@ -1,28 +1,100 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-@Entity(name = "VergeType")
-@DiscriminatorValue(VergeType.DISCRIMINATOR)
-public class VergeType extends Kodeliste {
+import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
 
-    public static final String DISCRIMINATOR = "VERGE_TYPE";
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    public static final VergeType BARN = new VergeType("BARN");
-    public static final VergeType FBARN = new VergeType("FBARN");
-    public static final VergeType VOKSEN = new VergeType("VOKSEN");
-    public static final VergeType ADVOKAT = new VergeType("ADVOKAT");
-    public static final VergeType ANNEN_F = new VergeType("ANNEN_F");
-    public static final VergeType UDEFINERT = new VergeType("-");
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
-    VergeType() {
-        // For Hibernate
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
+public enum VergeType implements Kodeverdi {
+
+    BARN("BARN","Verge for barn under 18 år"),
+    FBARN("FBARN","Verge for foreldreløst barn under 18 år"),
+    VOKSEN("VOKSEN","Verge for voksen"),
+    ADVOKAT("ADVOKAT","Advokat/advokatfullmektig"),
+    ANNEN_F("ANNEN_F","Annen fullmektig"),
+    UDEFINERT("-","UDefinert");
+
+    private String kode;
+    private String navn;
+
+    public static final String KODEVERK = "VERGE_TYPE";
+    private static final Map<String, VergeType> KODER = new LinkedHashMap<>();
+
+    static {
+        for (var v : values()) {
+            if (KODER.putIfAbsent(v.kode, v) != null) {
+                throw new IllegalArgumentException("Duplikat : " + v.kode);
+            }
+        }
     }
 
-    private VergeType(String kode) {
-        super(kode, DISCRIMINATOR);
+    private VergeType(String kode, String navn) {
+        this.kode = kode;
+        this.navn = navn;
+    }
+
+    @JsonCreator
+    public static VergeType fraKode(@JsonProperty("kode") String kode) {
+        if (kode == null) {
+            return null;
+        }
+        var ad = KODER.get(kode);
+        if (ad == null) {
+            throw new IllegalArgumentException("Ukjent VergeType: " + kode);
+        }
+        return ad;
+    }
+
+    public static Map<String, VergeType> kodeMap() {
+        return Collections.unmodifiableMap(KODER);
+    }
+
+    @JsonProperty
+    @Override
+    public String getKode() {
+        return kode;
+    }
+
+    @Override
+    public String getOffisiellKode() {
+        return getKode();
+    }
+
+    @JsonProperty
+    @Override
+    public String getKodeverk() {
+        return KODEVERK;
+    }
+
+    @JsonProperty
+    @Override
+    public String getNavn() {
+        return navn;
+    }
+
+    @Converter(autoApply = true)
+    public static class KodeverdiConverter implements AttributeConverter<VergeType, String> {
+        @Override
+        public String convertToDatabaseColumn(VergeType attribute) {
+            return attribute == null ? null : attribute.getKode();
+        }
+
+        @Override
+        public VergeType convertToEntityAttribute(String dbData) {
+            return dbData == null ? null : fraKode(dbData);
+        }
     }
 }

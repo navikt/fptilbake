@@ -2,7 +2,6 @@ package no.nav.foreldrepenger.tilbakekreving.historikk.dto;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagFelt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 
 public class HistorikkinnslagHendelseDto {
     private HistorikkinnslagType navn;
@@ -24,9 +23,9 @@ public class HistorikkinnslagHendelseDto {
         this.verdi = verdi;
     }
 
-    public static HistorikkinnslagHendelseDto mapFra(HistorikkinnslagFelt hendelse, KodeverkRepository kodeverkRepository) {
+    public static HistorikkinnslagHendelseDto mapFra(HistorikkinnslagFelt hendelse) {
         HistorikkinnslagHendelseDto dto = new HistorikkinnslagHendelseDto();
-        dto.navn = kodeverkRepository.finn(HistorikkinnslagType.class, hendelse.getNavn());
+        dto.navn = HistorikkinnslagType.fraKode(hendelse.getNavn());
         dto.verdi = hendelse.getTilVerdi();
         return dto;
     }

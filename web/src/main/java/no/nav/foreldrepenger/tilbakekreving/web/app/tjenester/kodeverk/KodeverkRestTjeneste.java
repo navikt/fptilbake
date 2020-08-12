@@ -3,7 +3,6 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.kodeverk;
 import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.READ;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -18,7 +17,6 @@ import javax.ws.rs.core.MediaType;
 import com.codahale.metrics.annotation.Timed;
 
 import io.swagger.v3.oas.annotations.Operation;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.kodeverk.app.HentKodeverkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
@@ -56,10 +54,10 @@ public class KodeverkRestTjeneste {
         return kodelisteCache.get("alle");
     }
 
-        private synchronized Map<String, Object> hentGruppertKodelisteTilCache() {
+    private synchronized Map<String, Object> hentGruppertKodelisteTilCache() {
         Map<String, Object> kodelisterGruppertPåType = new HashMap<>();
 
-        Map<String, List<Kodeliste>> grupperteKodelister = hentKodeverkTjeneste.hentGruppertKodeliste();
+        var grupperteKodelister = hentKodeverkTjeneste.hentGruppertKodeliste();
         grupperteKodelister.entrySet().forEach(e -> kodelisterGruppertPåType.put(e.getKey(), e.getValue()));
 
         return kodelisterGruppertPåType;

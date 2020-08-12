@@ -7,7 +7,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
 public class AvstemmingCsvFormatter {
     private static final String SKILLETEGN_KOLONNER = ";";
@@ -148,7 +148,7 @@ public class AvstemmingCsvFormatter {
             return dato.format(DATOFORMAT);
         }
 
-        private String format(Kodeliste kode) {
+        private String format(Kodeverdi kode) {
             return format(kode.getKode());
         }
 
