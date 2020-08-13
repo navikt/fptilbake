@@ -30,7 +30,7 @@ public class OpprettBehandlingDto implements AbacDto {
     @ValidKodeverk
     private BehandlingType behandlingType;
 
-    @ValidKodeverk
+    @Valid
     private BehandlingÅrsakType behandlingArsakType;
 
     @Valid
