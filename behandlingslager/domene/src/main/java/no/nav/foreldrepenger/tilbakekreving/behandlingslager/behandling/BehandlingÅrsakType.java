@@ -1,35 +1,102 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling;
 
+import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-@Entity(name = "BehandlingÅrsakType")
-@DiscriminatorValue(BehandlingÅrsakType.DISCRIMINATOR)
-public class BehandlingÅrsakType extends Kodeliste {
-    //TODO Denne klassen burde splitte i 2 klasser.
-    // En for Fptilbake Behandling Årsaker(Enum) og en for Fpsak/k9 sak behandling årsaker(kodeverk)
-    public static final String DISCRIMINATOR = "BEHANDLING_AARSAK"; //$NON-NLS-1$
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
-    public static final BehandlingÅrsakType RE_KLAGE_NFP = new BehandlingÅrsakType("RE_KLAGE_NFP"); //$NON-NLS-1$
-    public static final BehandlingÅrsakType RE_KLAGE_KA = new BehandlingÅrsakType("RE_KLAGE_KA"); //$NON-NLS-1$
-    public static final BehandlingÅrsakType RE_OPPLYSNINGER_OM_VILKÅR = new BehandlingÅrsakType("RE_VILKÅR"); //$NON-NLS-1$
-    public static final BehandlingÅrsakType RE_OPPLYSNINGER_OM_FORELDELSE = new BehandlingÅrsakType("RE_FORELDELSE"); //$NON-NLS-1$
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
+public enum BehandlingÅrsakType implements Kodeverdi {
 
-    public static final BehandlingÅrsakType UDEFINERT = new BehandlingÅrsakType("-"); //$NON-NLS-1$
+    RE_KLAGE_NFP("RE_KLAGE_NFP","Revurdering NFP omgjør vedtak basert på klage"),
+    RE_KLAGE_KA("RE_KLAGE_KA","Revurdering etter KA-behandlet klage"),
+    RE_OPPLYSNINGER_OM_VILKÅR("RE_VILKÅR","Nye opplysninger om vilkårsvurdering"),
+    RE_OPPLYSNINGER_OM_FORELDELSE("RE_FORELDELSE","Nye opplysninger om foreldelse"),
 
-    BehandlingÅrsakType() {
-        //for Hibernate
-    }
+    UDEFINERT("-","Ikke Definert");
 
-    private BehandlingÅrsakType(String kode) {
-        super(kode, DISCRIMINATOR);
-    }
+    private String kode;
+    private String navn;
 
-
+    public static final String KODEVERK = "BEHANDLING_AARSAK";
+    private static final Map<String, BehandlingÅrsakType> KODER = new LinkedHashMap<>();
     public static final Set<BehandlingÅrsakType> KLAGE_ÅRSAKER = Set.of(BehandlingÅrsakType.RE_KLAGE_KA, BehandlingÅrsakType.RE_KLAGE_NFP);
+
+    static {
+        for (var v : values()) {
+            if (KODER.putIfAbsent(v.kode, v) != null) {
+                throw new IllegalArgumentException("Duplikat : " + v.kode);
+            }
+        }
+    }
+
+    private BehandlingÅrsakType(String kode, String navn) {
+        this.kode = kode;
+        this.navn = navn;
+    }
+
+    @JsonCreator
+    public static BehandlingÅrsakType fraKode(@JsonProperty("kode") String kode) {
+        if (kode == null) {
+            return null;
+        }
+        var ad = KODER.get(kode);
+        if (ad == null) {
+            throw new IllegalArgumentException("Ukjent InternBehandlingÅrsakType: " + kode);
+        }
+        return ad;
+    }
+
+    public static Map<String, BehandlingÅrsakType> kodeMap() {
+        return Collections.unmodifiableMap(KODER);
+    }
+
+    @JsonProperty
+    @Override
+    public String getKode() {
+        return kode;
+    }
+
+    @Override
+    public String getOffisiellKode() {
+        return getKode();
+    }
+
+    @JsonProperty
+    @Override
+    public String getKodeverk() {
+        return KODEVERK;
+    }
+
+    @Override
+    public String getNavn() {
+        return navn;
+    }
+
+    @Converter(autoApply = true)
+    public static class KodeverdiConverter implements AttributeConverter<BehandlingÅrsakType, String> {
+        @Override
+        public String convertToDatabaseColumn(BehandlingÅrsakType attribute) {
+            return attribute == null ? null : attribute.getKode();
+        }
+
+        @Override
+        public BehandlingÅrsakType convertToEntityAttribute(String dbData) {
+            return dbData == null ? null : fraKode(dbData);
+        }
+    }
 
 }

@@ -17,6 +17,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
@@ -37,7 +39,9 @@ public class HistorikkInnslagTekstBuilder {
 
     public static final Map<String, Map<String, ? extends Kodeverdi>> KODEVERK_KODEVERDI_MAP = Map.ofEntries(
         new AbstractMap.SimpleEntry<>(Venteårsak.KODEVERK,Venteårsak.kodeMap()),
-        new AbstractMap.SimpleEntry<>(HistorikkBegrunnelseType.KODEVERK,HistorikkBegrunnelseType.kodeMap()));
+        new AbstractMap.SimpleEntry<>(HistorikkBegrunnelseType.KODEVERK,HistorikkBegrunnelseType.kodeMap()),
+        new AbstractMap.SimpleEntry<>(BehandlingÅrsakType.KODEVERK,BehandlingÅrsakType.kodeMap()),
+        new AbstractMap.SimpleEntry<>(BehandlingResultatType.KODEVERK, BehandlingResultatType.kodeMap()));
 
     public HistorikkInnslagTekstBuilder() {
         //
