@@ -17,7 +17,6 @@ import javax.inject.Inject;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.EksternBehandlingÅrsakType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KonsekvensForYtelsen;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
@@ -73,7 +72,7 @@ public class HentKodeverkTjeneste {
         Map<String, Collection<? extends Kodeverdi>> mapFiltered = new LinkedHashMap<>();
 
         map.entrySet().forEach(e -> {
-            mapFiltered.put(e.getKey(), e.getValue().stream().filter(f -> !"-".equals(f.getKode())).collect(Collectors.toSet()));
+            mapFiltered.put(e.getKey(), e.getValue().stream().filter(f -> !"-".equals(f.getKode())).collect(Collectors.toList()));
         });
 
         KODEVERDIER_SOM_BRUKES_PÅ_KLIENT = Collections.unmodifiableMap(mapFiltered);
@@ -81,8 +80,7 @@ public class HentKodeverkTjeneste {
 
     private static List<Class<? extends Kodeliste>> KODEVERK_SOM_BRUKES_PÅ_KLIENT = Arrays.asList(
         // Legg inn kodelister etter behov
-        BehandlingType.class,
-        EksternBehandlingÅrsakType.class
+        BehandlingType.class
     );
 
     public HentKodeverkTjeneste() {

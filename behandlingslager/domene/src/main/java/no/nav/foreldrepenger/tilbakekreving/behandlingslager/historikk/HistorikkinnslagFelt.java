@@ -197,6 +197,16 @@ public class HistorikkinnslagFelt extends BaseEntitet implements IndexKey {
             return this;
         }
 
+        public Builder medFraVerdi(Kodeverdi fraVerdi) {
+            if (fraVerdi != null) {
+                kladd.fraVerdiKode = fraVerdi.getKode();
+                kladd.klFraVerdi = fraVerdi.getKodeverk();
+            } else {
+                kladd.fraVerdiKode = null;
+            }
+            return this;
+        }
+
         public Builder medTilVerdi(String tilVerdi) {
             kladd.tilVerdi = tilVerdi;
             return this;
