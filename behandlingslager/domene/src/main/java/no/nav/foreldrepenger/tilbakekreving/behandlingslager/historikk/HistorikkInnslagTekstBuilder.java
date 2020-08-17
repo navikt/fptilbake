@@ -220,6 +220,17 @@ public class HistorikkInnslagTekstBuilder {
         return this;
     }
 
+    public <K extends Kodeverdi> HistorikkInnslagTekstBuilder medEndretFelt(HistorikkEndretFeltType historikkEndretFeltType, K fraVerdi, K tilVerdi) {
+        HistorikkinnslagFelt.builder()
+            .medFeltType(HistorikkinnslagFeltType.ENDRET_FELT)
+            .medNavn(historikkEndretFeltType)
+            .medFraVerdi(fraVerdi)
+            .medTilVerdi(tilVerdi)
+            .medSekvensNr(getNesteEndredeFeltSekvensNr())
+            .build(historikkinnslagDelBuilder);
+        return this;
+    }
+
     public <K extends Kodeliste> HistorikkInnslagTekstBuilder medEndretFelt(HistorikkEndretFeltType historikkEndretFeltType, String navnVerdi, K fraVerdi, K tilVerdi) {
         HistorikkinnslagFelt.builder()
             .medFeltType(HistorikkinnslagFeltType.ENDRET_FELT)
@@ -236,6 +247,10 @@ public class HistorikkInnslagTekstBuilder {
         if (fraVerdi instanceof Kodeliste || tilVerdi instanceof Kodeliste) {
             Kodeliste fraVerdiKl = (Kodeliste) fraVerdi;
             Kodeliste tilVerdiKl = (Kodeliste) tilVerdi;
+            return medEndretFelt(historikkEndretFeltType, fraVerdiKl, tilVerdiKl);
+        }else if (fraVerdi instanceof Kodeverdi || tilVerdi instanceof Kodeverdi) {
+            Kodeverdi fraVerdiKl = (Kodeverdi) fraVerdi;
+            Kodeverdi tilVerdiKl = (Kodeverdi) tilVerdi;
             return medEndretFelt(historikkEndretFeltType, fraVerdiKl, tilVerdiKl);
         }
         String fraVerdiStr = formatString(fraVerdi);

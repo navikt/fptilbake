@@ -21,8 +21,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 public enum VilkårResultat implements Kodeverdi {
 
     FORSTO_BURDE_FORSTÅTT("FORSTO_BURDE_FORSTAATT","Ja, mottaker forsto eller burde forstått at utbetalingen skyldtes en feil (1. ledd, 1. punkt)"),
-    FEIL_OPPLYSNINGER_FRA_BRUKER("FEIL_OPPLYSNINGER","Ja, mottaker har forårsaket feilutbetalingen ved forsett eller uaktsomt gitt feilaktige opplysninger (1. ledd, 2 punkt)"),
     MANGELFULLE_OPPLYSNINGER_FRA_BRUKER("MANGELFULL_OPPLYSNING","Ja, mottaker har forårsaket feilutbetalingen ved forsett eller uaktsomt gitt mangelfulle opplysninger (1. ledd, 2 punkt)"),
+    FEIL_OPPLYSNINGER_FRA_BRUKER("FEIL_OPPLYSNINGER","Ja, mottaker har forårsaket feilutbetalingen ved forsett eller uaktsomt gitt feilaktige opplysninger (1. ledd, 2 punkt)"),
     GOD_TRO("GOD_TRO","Nei, mottaker har mottatt beløpet i god tro (1. ledd)"),
     UDEFINERT("-","Ikke Definert");
 
@@ -40,7 +40,7 @@ public enum VilkårResultat implements Kodeverdi {
         }
     }
 
-    private VilkårResultat(String kode, String navn) {
+    VilkårResultat(String kode, String navn) {
         this.kode = kode;
         this.navn = navn;
     }
