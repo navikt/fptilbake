@@ -43,7 +43,7 @@ public enum BehandlingÅrsakType implements Kodeverdi {
         }
     }
 
-    private BehandlingÅrsakType(String kode, String navn) {
+    BehandlingÅrsakType(String kode, String navn) {
         this.kode = kode;
         this.navn = navn;
     }
