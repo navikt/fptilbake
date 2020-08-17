@@ -24,7 +24,7 @@ public class EksternBehandlingsinfoDto {
     private LocalDate vedtakDato;
     private BehandlingsresultatDto behandlingsresultat;
     @JsonProperty("behandlingArsaker")
-    private List<BehandlingÅrsakDto> behandlingÅrsaker = new ArrayList<>();
+    private List<EksternBehandlingÅrsakDto> behandlingÅrsaker = new ArrayList<>();
 
     public Henvisning getHenvisning() {
         return henvisning;
@@ -88,11 +88,11 @@ public class EksternBehandlingsinfoDto {
         this.behandlingsresultat = behandlingsresultat;
     }
 
-    public List<BehandlingÅrsakDto> getBehandlingÅrsaker() {
+    public List<EksternBehandlingÅrsakDto> getBehandlingÅrsaker() {
         return behandlingÅrsaker;
     }
 
-    public void setBehandlingÅrsaker(List<BehandlingÅrsakDto> behandlingÅrsaker) {
+    public void setBehandlingÅrsaker(List<EksternBehandlingÅrsakDto> behandlingÅrsaker) {
         this.behandlingÅrsaker = behandlingÅrsaker;
     }
 }

@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.BehandlingsresultatDto;
-import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.BehandlingÅrsakDto;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingÅrsakDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.TilbakekrevingValgDto;
 
 public class BehandlingFeilutbetalingFakta {
@@ -17,7 +17,7 @@ public class BehandlingFeilutbetalingFakta {
     private LocalDate totalPeriodeTom;
     private List<UtbetaltPeriode> perioder;
     private BehandlingsresultatDto behandlingsresultat;
-    private List<BehandlingÅrsakDto> behandlingÅrsaker;
+    private List<EksternBehandlingÅrsakDto> behandlingÅrsaker;
     private TilbakekrevingValgDto tilbakekrevingValg;
     private String begrunnelse;
 
@@ -53,7 +53,7 @@ public class BehandlingFeilutbetalingFakta {
         return behandlingsresultat;
     }
 
-    public List<BehandlingÅrsakDto> getBehandlingÅrsaker() {
+    public List<EksternBehandlingÅrsakDto> getBehandlingÅrsaker() {
         return behandlingÅrsaker;
     }
 
@@ -112,7 +112,7 @@ public class BehandlingFeilutbetalingFakta {
             return this;
         }
 
-        public Builder medBehandlingÅrsaker(List<BehandlingÅrsakDto> behandlingÅrsaker) {
+        public Builder medBehandlingÅrsaker(List<EksternBehandlingÅrsakDto> behandlingÅrsaker) {
             this.behandlingFeilutbetalingFakta.behandlingÅrsaker = behandlingÅrsaker;
             return this;
         }
