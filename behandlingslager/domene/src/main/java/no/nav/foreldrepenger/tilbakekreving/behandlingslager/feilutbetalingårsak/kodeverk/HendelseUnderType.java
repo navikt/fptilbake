@@ -101,6 +101,7 @@ public enum HendelseUnderType implements Kodeverdi {
     IKKE_SATT("-", null, 0),
     ;
 
+    public static final String KODERVERK = "HENDELSE_UNDERTYPE";
     private static final Map<String, HendelseUnderType> KODER = new LinkedHashMap<>();
 
     static {
@@ -151,7 +152,7 @@ public enum HendelseUnderType implements Kodeverdi {
     @JsonProperty
     @Override
     public String getKodeverk() {
-        return "HENDELSE_UNDERTYPE";
+        return KODERVERK;
     }
 
     @JsonProperty
