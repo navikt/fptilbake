@@ -23,9 +23,11 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegKo
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjenesteImpl;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.InternalManipulerBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.InternalManipulerBehandlingImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
@@ -104,19 +106,24 @@ public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
 
     @Test
     public void skal_ikke_henlegge_behandling_manuelt_når_grunnlag_finnes() {
-        KravgrunnlagMock mockMedFeilPostering = new KravgrunnlagMock(FOM, LocalDate.of(2016, 3, 31), KlasseType.FEIL,
-            BigDecimal.valueOf(11000), BigDecimal.ZERO);
-        KravgrunnlagMock mockMedYtelPostering = new KravgrunnlagMock(FOM, LocalDate.of(2016, 3, 31),
-            KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(11000));
-        mockMedYtelPostering.setKlasseKode(KlasseKode.FPADATAL);
-
-        Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedYtelPostering));
-        grunnlagRepository.lagre(internBehandlingId, kravgrunnlag431);
+        lagKravgrunnlag(behandling.getId());
 
         expectedException.expect(FunksjonellException.class);
         expectedException.expectMessage("FPT-663491");
 
         henleggBehandlingTjeneste.henleggBehandlingManuelt(behandling.getId(), behandlingsresultat, "");
+    }
+
+    @Test
+    public void kan_henlegge_tilbakekreving_revurdering_med_grunnlag(){
+        behandling.avsluttBehandling();
+        Behandling revurdering = revurderingTjeneste.opprettRevurdering(behandling.getId(), BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR);
+        Long revurderingBehandlingId = revurdering.getId();
+        lagKravgrunnlag(revurderingBehandlingId);
+
+        henleggBehandlingTjeneste.henleggBehandlingManuelt(revurderingBehandlingId,BehandlingResultatType.HENLAGT_FEILOPPRETTET,"");
+        assertThat(behandlingRepository.hentBehandling(revurderingBehandlingId).getStatus()).isEqualByComparingTo(BehandlingStatus.AVSLUTTET);
+        assertThat(repoProvider.getEksternBehandlingRepository().hentOptionalFraInternId(revurderingBehandlingId)).isEmpty();
     }
 
     @Test
@@ -186,6 +193,16 @@ public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
         assertHenleggelse();
     }
 
+    private void lagKravgrunnlag(long behandlingId) {
+        KravgrunnlagMock mockMedFeilPostering = new KravgrunnlagMock(FOM, LocalDate.of(2016, 3, 31), KlasseType.FEIL,
+            BigDecimal.valueOf(11000), BigDecimal.ZERO);
+        KravgrunnlagMock mockMedYtelPostering = new KravgrunnlagMock(FOM, LocalDate.of(2016, 3, 31),
+            KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(11000));
+        mockMedYtelPostering.setKlasseKode(KlasseKode.FPADATAL);
+
+        Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedYtelPostering));
+        grunnlagRepository.lagre(behandlingId, kravgrunnlag431);
+    }
 
     private void assertHenleggelse() {
         assertThat(historikkRepository.hentHistorikk(internBehandlingId)).isNotEmpty();

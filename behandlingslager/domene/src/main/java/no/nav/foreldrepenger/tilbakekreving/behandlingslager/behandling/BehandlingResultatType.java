@@ -26,6 +26,8 @@ public enum BehandlingResultatType implements Kodeverdi {
     IKKE_FASTSATT("IKKE_FASTSATT","Ikke fastsatt"),
     FASTSATT("FASTSATT","Resultatet er fastsatt"),
     HENLAGT_FEILOPPRETTET("HENLAGT_FEILOPPRETTET","Henlagt, søknaden er feilopprettet"),
+    HENLAGT_FEILOPPRETTET_MED_BREV("HENLAGT_FEILOPPRETTET_MED_BREV","Feilaktig opprettet - med henleggelsesbrev"),
+    HENLAGT_FEILOPPRETTET_UTEN_BREV("HENLAGT_FEILOPPRETTET_UTEN_BREV","Feilaktig opprettet - uten henleggelsesbrev"),
     HENLAGT_KRAVGRUNNLAG_NULLSTILT("HENLAGT_KRAVGRUNNLAG_NULLSTILT","Kravgrunnlaget er nullstilt"),
     HENLAGT_TEKNISK_VEDLIKEHOLD("HENLAGT_TEKNISK_VEDLIKEHOLD","Teknisk vedlikehold"),
     ENDRET("ENDRET","Resultatet er endret i revurderingen"),
@@ -37,7 +39,8 @@ public enum BehandlingResultatType implements Kodeverdi {
     public static final String KODEVERK = "BEHANDLING_RESULTAT_TYPE";
     private static final Map<String, BehandlingResultatType> KODER = new LinkedHashMap<>();
     private static final Set<BehandlingResultatType> ALLE_HENLEGGELSESKODER = Collections.unmodifiableSet(new LinkedHashSet<>(
-        Arrays.asList(HENLAGT_KRAVGRUNNLAG_NULLSTILT, HENLAGT_FEILOPPRETTET, HENLAGT_TEKNISK_VEDLIKEHOLD)));
+        Arrays.asList(HENLAGT_KRAVGRUNNLAG_NULLSTILT, HENLAGT_FEILOPPRETTET, HENLAGT_FEILOPPRETTET_MED_BREV,
+            HENLAGT_FEILOPPRETTET_UTEN_BREV, HENLAGT_TEKNISK_VEDLIKEHOLD)));
 
     static {
         for (var v : values()) {

@@ -21,6 +21,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositor
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
@@ -180,7 +181,8 @@ public class BehandlingDtoTjeneste {
     }
 
     private boolean kanHenleggeBehandling(Behandling behandling) {
-        return !behandling.erAvsluttet() && !grunnlagRepository.harGrunnlagForBehandlingId(behandling.getId());
+        return !behandling.erAvsluttet() && (BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandling.getType()) ||
+            !grunnlagRepository.harGrunnlagForBehandlingId(behandling.getId()));
     }
 
     private void leggTilLenkerForBehandlingsoperasjoner(BehandlingDto dto) {

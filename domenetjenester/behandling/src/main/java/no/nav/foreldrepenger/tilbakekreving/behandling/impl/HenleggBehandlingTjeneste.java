@@ -9,6 +9,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.Behandlingskontr
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
@@ -54,7 +55,8 @@ public class HenleggBehandlingTjeneste {
     }
 
     public void henleggBehandlingManuelt(long behandlingId, BehandlingResultatType årsakKode, String begrunnelse) {
-        if (grunnlagRepository.harGrunnlagForBehandlingId(behandlingId)) {
+        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
+        if (grunnlagRepository.harGrunnlagForBehandlingId(behandlingId) && BehandlingType.TILBAKEKREVING.equals(behandling.getType())) {
             throw BehandlingFeil.FACTORY.kanIkkeHenleggeBehandling(behandlingId).toException();
         }
         doHenleggBehandling(behandlingId, årsakKode, begrunnelse);
