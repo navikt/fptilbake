@@ -26,6 +26,8 @@ import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.K
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode.FPSVSNDFI;
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode.FPSVSNDJB_OP;
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode.FPSVSND_OP;
+import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode.FRISINN_FRILANS;
+import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode.FRISINN_SELVST_OP;
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Inntektskategori.ADOPSJON_ES;
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Inntektskategori.ARBEIDSLEDIG;
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Inntektskategori.ARBEIDSTAKER;
@@ -50,6 +52,7 @@ public class InntektskategoriKlassekodeMapper {
     private static final Map<KlasseKode, Inntektskategori> KLASSEKODE_INNTEKTSKATEGORI_MAP_FØDSEL;
     private static final Map<KlasseKode, Inntektskategori> KLASSEKODE_INNTEKTSKATEGORI_MAP_ADOPSJON;
     private static final Map<KlasseKode, Inntektskategori> KLASSEKODE_INNTEKTSKATEGORI_MAP_SVANGERSKAPPENGER;
+    private static final Map<KlasseKode, Inntektskategori> KLASSEKODE_INNTEKTSKATEGORI_MAP_FRISINN;
 
     private InntektskategoriKlassekodeMapper() {
     }
@@ -103,6 +106,13 @@ public class InntektskategoriKlassekodeMapper {
         );
     }
 
+    static {
+        KLASSEKODE_INNTEKTSKATEGORI_MAP_FRISINN = Map.of(
+            FRISINN_FRILANS, FRILANSER,
+            FRISINN_SELVST_OP, SELVSTENDIG_NÆRINGSDRIVENDE
+        );
+    }
+
     public static Inntektskategori finnInntekstkategoriMedKlasseKode(KlasseKode klasseKode) {
         if (KLASSEKODE_INNTEKTSKATEGORI_MAP_ENGANGSSTØNAD.containsKey(klasseKode)) {
             return KLASSEKODE_INNTEKTSKATEGORI_MAP_ENGANGSSTØNAD.get(klasseKode);
@@ -112,6 +122,8 @@ public class InntektskategoriKlassekodeMapper {
             return KLASSEKODE_INNTEKTSKATEGORI_MAP_ADOPSJON.get(klasseKode);
         } else if (KLASSEKODE_INNTEKTSKATEGORI_MAP_SVANGERSKAPPENGER.containsKey(klasseKode)) {
             return KLASSEKODE_INNTEKTSKATEGORI_MAP_SVANGERSKAPPENGER.get(klasseKode);
+        } else if (KLASSEKODE_INNTEKTSKATEGORI_MAP_FRISINN.containsKey(klasseKode)) {
+            return KLASSEKODE_INNTEKTSKATEGORI_MAP_FRISINN.get(klasseKode);
         }else {
             throw new IllegalStateException("Utvikler feil: Mangler mapping for klasseKode=" + klasseKode);
         }
