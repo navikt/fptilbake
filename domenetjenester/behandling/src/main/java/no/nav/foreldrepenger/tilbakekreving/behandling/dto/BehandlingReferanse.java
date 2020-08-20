@@ -31,12 +31,18 @@ import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
 @JsonInclude(Include.NON_NULL)
 public class BehandlingReferanse implements AbacDto {
 
+    private static final String NUM_REGEXP = "\\d{1,19}"; // Long
+
     public static final String NAME = "behandlingId";
 
+    /**
+     * Behandling Id - legacy Long, ny UUID.
+     */
     @JsonProperty(value = NAME, required = true)
-    @Size(max = 50)
     @NotNull
-    @Pattern(regexp = "^[\\p{Alnum}-]+$", message = "[${validatedValue}] matcher ikke tillatt pattern [{regexp}]")
+    @Size(min = 1, max = 100)
+    @Pattern(regexp = "^(" + NUM_REGEXP + ")|(" + IsUUID.UUID_REGEXP
+        + ")$", message = "Behandling Id ${validatedValue} matcher ikke tillatt pattern '{regexp}'")
     private String id;
 
     public BehandlingReferanse(Integer id) {
@@ -73,11 +79,11 @@ public class BehandlingReferanse implements AbacDto {
      * Denne er kun intern nøkkel, bør ikke eksponeres ut men foreløpig støttes både Long id og UUID id for behandling på grensesnittene.
      */
     public Long getBehandlingId() {
-        return id != null && isLong() ? Long.parseLong(id) : null;
+        return isLong() ? Long.parseLong(id) : null;
     }
 
     public UUID getBehandlingUuid() {
-        return id != null && !isLong() ? UUID.fromString(id) : null;
+        return !isLong() ? UUID.fromString(id) : null;
     }
 
     public String getId() {
