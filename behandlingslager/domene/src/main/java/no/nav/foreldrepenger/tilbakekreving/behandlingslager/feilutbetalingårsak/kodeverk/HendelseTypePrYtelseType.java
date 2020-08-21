@@ -39,7 +39,9 @@ public class HendelseTypePrYtelseType {
             HendelseType.ES_RETT_PAA_FORELDREPENGER_TYPE,
             HendelseType.ES_FEIL_UTBETALING_TYPE,
             HendelseType.ES_ANNET_TYPE,
-            HendelseType.MEDLEMSKAP_TYPE
+            HendelseType.MEDLEMSKAP_TYPE),
+        FagsakYtelseType.FRISINN, Set.of(
+            HendelseType.FRISINN_ANNET_TYPE
         )
     );
 
