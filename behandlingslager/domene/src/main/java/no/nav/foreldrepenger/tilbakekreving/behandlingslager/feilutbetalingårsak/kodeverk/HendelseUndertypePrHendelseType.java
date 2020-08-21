@@ -115,6 +115,9 @@ public class HendelseUndertypePrHendelseType {
             HendelseUnderType.MOR_IKKE_I_IP,
             HendelseUnderType.MOR_IKKE_I_KP,
             HendelseUnderType.MOR_IKKE_STUDERT));
+        h.put(HendelseType.FRISINN_ANNET_TYPE, Set.of(
+            HendelseUnderType.ANNET_FRITEKST
+        ));
         return h;
     }
 

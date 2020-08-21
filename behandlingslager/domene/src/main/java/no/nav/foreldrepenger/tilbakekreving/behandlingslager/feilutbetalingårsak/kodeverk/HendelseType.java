@@ -49,7 +49,9 @@ public enum HendelseType implements Kodeverdi {
     SVP_BEREGNING_TYPE("SVP_BEREGNING_TYPE", "§14-4 5. ledd Beregning ", 60),
     SVP_UTTAK_TYPE("SVP_UTTAK_TYPE", "§14-4 Uttak", 70),
     SVP_OPPHØR("OPPHØR", "Opphør", 80),
-    SVP_ANNET_TYPE("SVP_ANNET_TYPE", "Annet", 999);
+    SVP_ANNET_TYPE("SVP_ANNET_TYPE", "Annet", 999),
+
+    FRISINN_ANNET_TYPE("FRISINN_ANNET_TYPE", "Annet", 999);
 
     public static final String KODEVERK = "HENDELSE_TYPE";
 
