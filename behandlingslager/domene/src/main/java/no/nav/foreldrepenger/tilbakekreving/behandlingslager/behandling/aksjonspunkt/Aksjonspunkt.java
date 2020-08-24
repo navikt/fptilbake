@@ -63,7 +63,7 @@ public class Aksjonspunkt extends BaseEntitet {
     private AksjonspunktStatus status;
 
     @Convert(converter = Venteårsak.KodeverdiConverter.class)
-    @Column(name = "vent_aarsak", nullable = false, updatable = false)
+    @Column(name = "vent_aarsak", nullable = false)
     private Venteårsak venteårsak = Venteårsak.UDEFINERT;
 
     @Version
