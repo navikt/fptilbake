@@ -14,6 +14,7 @@ import no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.task.Hendel
 import no.nav.foreldrepenger.tilbakekreving.kafka.poller.PostTransactionHandler;
 import no.nav.foreldrepenger.tilbakekreving.kafka.util.KafkaConsumerFeil;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
+import no.nav.vedtak.konfig.KonfigVerdi;
 
 @ApplicationScoped
 public class TilkjentYtelseReader {
@@ -22,19 +23,27 @@ public class TilkjentYtelseReader {
 
     private TilkjentYtelseMeldingConsumer meldingConsumer;
     private ProsessTaskRepository prosessTaskRepository;
+    private String applikasjonNavn;
 
     TilkjentYtelseReader() {
         // CDI
     }
 
     @Inject
-    public TilkjentYtelseReader(TilkjentYtelseMeldingConsumer meldingConsumer, ProsessTaskRepository prosessTaskRepository) {
+    public TilkjentYtelseReader(TilkjentYtelseMeldingConsumer meldingConsumer,
+                                ProsessTaskRepository prosessTaskRepository,
+                                @KonfigVerdi("application.name") String applikasjonNavn) {
         this.meldingConsumer = meldingConsumer;
         this.prosessTaskRepository = prosessTaskRepository;
+        this.applikasjonNavn = applikasjonNavn;
     }
 
     public PostTransactionHandler hentOgBehandleMeldinger() {
-
+        // midlertidig kode, slettes når k9tilbake er klar til å lese meldinger fra k9-sak
+        if(applikasjonNavn != null && applikasjonNavn.equals("k9-tilbake")){
+            return () -> {
+            };
+        }
         List<TilkjentYtelseMelding> meldinger = meldingConsumer.lesMeldinger();
         if (meldinger.isEmpty()) {
             return () -> {
