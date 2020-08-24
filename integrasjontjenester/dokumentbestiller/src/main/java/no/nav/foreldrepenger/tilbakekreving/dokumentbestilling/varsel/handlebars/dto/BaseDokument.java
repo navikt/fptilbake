@@ -31,18 +31,6 @@ public class BaseDokument {
         this.ytelsetype = ytelsetype;
     }
 
-    public boolean isForeldrepenger() {
-        return sjekkFagsakYtelseType(FagsakYtelseType.FORELDREPENGER);
-    }
-
-    public boolean isEngangsstønad() {
-        return sjekkFagsakYtelseType(FagsakYtelseType.ENGANGSTØNAD);
-    }
-
-    public boolean isSvangerskapspenger() {
-        return sjekkFagsakYtelseType(FagsakYtelseType.SVANGERSKAPSPENGER);
-    }
-
     public boolean isKorrigert() {
         return isKorrigert;
     }
@@ -51,19 +39,32 @@ public class BaseDokument {
         isKorrigert = korrigert;
     }
 
-    public boolean isFrisinn() {
-        return sjekkFagsakYtelseType(FagsakYtelseType.FRISINN);
-    }
-
     public boolean isYtelseUtenSkatt() {
-        return isEngangsstønad();
+        return erYtelseType(FagsakYtelseType.ENGANGSTØNAD);
     }
 
     public boolean isYtelseMedSkatt() {
-        return isForeldrepenger() || isSvangerskapspenger() || isFrisinn();
+        return erYtelseType(FagsakYtelseType.FORELDREPENGER) || erYtelseType(FagsakYtelseType.SVANGERSKAPSPENGER) || erYtelseType(FagsakYtelseType.FRISINN);
     }
 
-    private boolean sjekkFagsakYtelseType(FagsakYtelseType ytelseType) {
+    @JsonProperty("skal-vise-renteinformasjon")
+    public boolean isSkalViseRenteinformasjon() {
+        return erYtelseType(FagsakYtelseType.FORELDREPENGER) || erYtelseType(FagsakYtelseType.SVANGERSKAPSPENGER) || erYtelseType(FagsakYtelseType.ENGANGSTØNAD);
+    }
+
+    public boolean isEngangsstønad() {
+        return erYtelseType(FagsakYtelseType.ENGANGSTØNAD);
+    }
+
+    public boolean isForeldrepenger() {
+        return erYtelseType(FagsakYtelseType.FORELDREPENGER);
+    }
+
+    public boolean isSvangerskapspenger() {
+        return erYtelseType(FagsakYtelseType.SVANGERSKAPSPENGER);
+    }
+
+    private boolean erYtelseType(FagsakYtelseType ytelseType) {
         return ytelseType.equals(this.ytelsetype);
     }
 }
