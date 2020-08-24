@@ -4,16 +4,28 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
-import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.LocalDateTilLangtNorskFormatSerialiserer;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbPeriode;
 
 public class VarselbrevDokument extends BaseDokument {
 
     private Long beløp;
+
+    @JsonSerialize(using = LocalDateTilLangtNorskFormatSerialiserer.class)
     private LocalDate endringsdato;
-    private List<Periode> feilutbetaltePerioder;
+
+    @JsonProperty("feilutbetaltePerioder")
+    private List<HbPeriode> feilutbetaltePerioder;
     private String varseltekstFraSaksbehandler;
+
+    @JsonSerialize(using = LocalDateTilLangtNorskFormatSerialiserer.class)
     private LocalDate fristdatoForTilbakemelding;
-    private Periode datoerHvisSammenhengendePeriode;
+    private HbPeriode datoerHvisSammenhengendePeriode;
+
+    @JsonSerialize(using = LocalDateTilLangtNorskFormatSerialiserer.class)
     private LocalDate varsletDato;
     private Long varsletBeløp;
     private boolean finnesVerge;
@@ -35,11 +47,11 @@ public class VarselbrevDokument extends BaseDokument {
         this.endringsdato = endringsdato;
     }
 
-    public List<Periode> getFeilutbetaltePerioder() {
+    public List<HbPeriode> getFeilutbetaltePerioder() {
         return feilutbetaltePerioder;
     }
 
-    public void setFeilutbetaltePerioder(List<Periode> feilutbetaltePerioder) {
+    public void setFeilutbetaltePerioder(List<HbPeriode> feilutbetaltePerioder) {
         this.feilutbetaltePerioder = feilutbetaltePerioder;
     }
 
@@ -59,11 +71,11 @@ public class VarselbrevDokument extends BaseDokument {
         this.fristdatoForTilbakemelding = fristdatoForTilbakemelding;
     }
 
-    public Periode getDatoerHvisSammenhengendePeriode() {
+    public HbPeriode getDatoerHvisSammenhengendePeriode() {
         return datoerHvisSammenhengendePeriode;
     }
 
-    public void setDatoerHvisSammenhengendePeriode(Periode datoerHvisSammenhengendePeriode) {
+    public void setDatoerHvisSammenhengendePeriode(HbPeriode datoerHvisSammenhengendePeriode) {
         this.datoerHvisSammenhengendePeriode = datoerHvisSammenhengendePeriode;
     }
 
@@ -113,7 +125,7 @@ public class VarselbrevDokument extends BaseDokument {
             if (feilutbetaltePerioder.size() == 1) {
                 Objects.requireNonNull(datoerHvisSammenhengendePeriode, "datoer for sammenhengende periode");
             } else if (feilutbetaltePerioder.size() > 1) {
-                for (Periode feilutbetaltPeriode : feilutbetaltePerioder) {
+                for (HbPeriode feilutbetaltPeriode : feilutbetaltePerioder) {
                     Objects.requireNonNull(feilutbetaltPeriode.getFom(), "fraogmed-dato for feilutbetalingsperiode");
                     Objects.requireNonNull(feilutbetaltPeriode.getTom(), "tilogmed-dato for feilutbetalingsperiode");
                 }

@@ -36,6 +36,10 @@ public class HbPeriode {
         return new HbPeriode(periode.getFom(), periode.getTom());
     }
 
+    public static HbPeriode of(LocalDate fom, LocalDate tom) {
+        return new HbPeriode(fom, tom);
+    }
+
     public LocalDate getFom() {
         return fom;
     }

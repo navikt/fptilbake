@@ -1,4 +1,6 @@
-{{~#* inline "ytelse-navn" ~}}{{#if engangsstønad}}eingongsstønaden{{else if svangerskapspenger}}svangerskapspengane{{else}}foreldrepengane{{/if}}{{~/inline~}}
+{{~#* inline "ytelse-navn" ~}}
+{{lookup-map ytelsetype FP="foreldrepengane" SVP="svangerskapspengane" ES="eingongsstønaden" FRISINN="inntektskompensasjonen"}}
+{{~/inline~}}
 _Dette legger vi vekt på i vurderinga vår
 For å avgjere om vi kan krevje tilbake, tek vi først stilling til dei tre øvste punkta i denne lista. Dersom resultatet blir at vi kan krevje tilbake, vurderer vi om du skal betale tilbake heile eller delar av beløpet.
 
@@ -13,9 +15,11 @@ om feilen kan vere NAV si skuld-*
 
 Sjølv om det er NAV som er skuld i feilutbetalinga, kan vi krevje at du betaler tilbake pengane.
 
+{{#if skal-vise-renteinformasjon}}
 Dersom du må betale tilbake, og du har gitt oss feil eller mangelfull informasjon, kan vi krevje at du betaler eit rentetillegg på ti prosent av beløpet du skuldar.
 
-Dette går fram av folketrygdlova §§ 22-15 og 22-17a.
+{{/if}}
+Dette går fram av folketrygdlova {{#if skal-vise-renteinformasjon}}§§ 22-15 og 22-17a{{else}}§ 22-15{{/if}}.
 _Slik uttaler du deg
 Du kan sende uttalen din ved å logge deg inn på foreldrepenger.nav.no. Du kan også sende uttalen din til oss i posten. Adressen finn du på nav.no/ettersendelser
 _Du har rett til innsyn

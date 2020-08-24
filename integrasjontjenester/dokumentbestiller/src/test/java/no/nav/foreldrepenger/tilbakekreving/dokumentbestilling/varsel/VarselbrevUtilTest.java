@@ -192,7 +192,8 @@ public class VarselbrevUtilTest {
         assertThat(varselbrev.getSumFeilutbetaling()).isEqualTo(feilutbetalingFakta.getAktuellFeilUtbetaltBeløp().longValue());
         assertThat(varselbrev.getBrevMetadata().getFagsaktypenavnPåSpråk()).isEqualTo("foreldrepenger");
         assertThat(varselbrev.getBrevMetadata().getTittel()).isEqualTo("Varsel tilbakebetaling foreldrepenger");
-        assertThat(varselbrev.getFeilutbetaltePerioder().get(0)).isEqualTo(utbetaltPeriode.tilPeriode());
+        assertThat(varselbrev.getFeilutbetaltePerioder().get(0).getFom()).isEqualTo(utbetaltPeriode.tilPeriode().getFom());
+        assertThat(varselbrev.getFeilutbetaltePerioder().get(0).getTom()).isEqualTo(utbetaltPeriode.tilPeriode().getTom());
 
         assertThat(varselbrev.getBrevMetadata().getSakspartNavn()).isEqualTo("Fiona");
         assertThat(varselbrev.getBrevMetadata().getSakspartId()).isEqualTo(PERSONNUMMER);
