@@ -9,6 +9,17 @@ public class BehandlingRelLinkPayloadDto {
 
     private UUID behandlingUuid;
 
+    public BehandlingRelLinkPayloadDto() {
+    }
+
+    public BehandlingRelLinkPayloadDto(UUID behandlingUuid) {
+        this.behandlingUuid = behandlingUuid;
+    }
+
+    public BehandlingRelLinkPayloadDto(String behandlingUuid) {
+        this.behandlingUuid = UUID.fromString(behandlingUuid);
+    }
+
     public UUID getBehandlingUuid() {
         return behandlingUuid;
     }
