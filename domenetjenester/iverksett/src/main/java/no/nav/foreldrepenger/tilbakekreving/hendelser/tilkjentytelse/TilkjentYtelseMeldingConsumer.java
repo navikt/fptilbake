@@ -53,10 +53,6 @@ public class TilkjentYtelseMeldingConsumer {
 
     public List<TilkjentYtelseMelding> lesMeldinger() {
         List<TilkjentYtelseMelding> meldinger = new ArrayList<>();
-        // midlertidig kode, slettes når k9tilbake er klar til å lese meldinger fra k9-sak
-        if(System.getProperty("app.name") != null && System.getProperty("app.name").equals("k9tilbake")){
-            return meldinger;
-        }
         ConsumerRecords<String, String> records = this.kafkaConsumer.poll(FeedProperties.TIMEOUT);
         for (ConsumerRecord<String, String> record : records) {
             meldinger.add(JsonDeserialiserer.deserialiser(record.value(), TilkjentYtelseMelding.class));

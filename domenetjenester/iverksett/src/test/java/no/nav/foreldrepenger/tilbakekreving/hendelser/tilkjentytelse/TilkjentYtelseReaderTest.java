@@ -21,7 +21,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
 public class TilkjentYtelseReaderTest extends TilkjentYtelseTestOppsett {
 
     private TilkjentYtelseMeldingConsumer meldingConsumer = mock(TilkjentYtelseMeldingConsumer.class);
-    private TilkjentYtelseReader tilkjentYtelseReader = new TilkjentYtelseReader(meldingConsumer, prosessTaskRepository);
+    private TilkjentYtelseReader tilkjentYtelseReader = new TilkjentYtelseReader(meldingConsumer, prosessTaskRepository,"fptilbake");
 
     @Test
     public void skal_hente_og_behandle_meldinger() {
@@ -44,6 +44,13 @@ public class TilkjentYtelseReaderTest extends TilkjentYtelseTestOppsett {
         assertThat(taskDataWrapper.getBehandlingUuid()).isEqualTo(EKSTERN_BEHANDLING_UUID.toString());
         assertThat(taskDataWrapper.getFagsakYtelseType()).isEqualByComparingTo(FagsakYtelseType.FORELDREPENGER);
         assertThat(taskDataWrapper.getSaksnummer()).isEqualTo(SAKSNUMMER);
+    }
+
+    @Test
+    public void skal_ikke_hente_meldinger_for_k9_tilbake(){
+        TilkjentYtelseReader tilkjentYtelseReader = new TilkjentYtelseReader(meldingConsumer, prosessTaskRepository,"k9-tilbake");
+        tilkjentYtelseReader.hentOgBehandleMeldinger();
+        verify(meldingConsumer,never()).lesMeldinger();
     }
 
     @Test
