@@ -2,10 +2,16 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.github.jknack.handlebars.Context;
 import com.github.jknack.handlebars.Handlebars;
+import com.github.jknack.handlebars.JsonNodeValueResolver;
 import com.github.jknack.handlebars.Template;
+import com.github.jknack.handlebars.context.JavaBeanValueResolver;
+import com.github.jknack.handlebars.context.MapValueResolver;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
@@ -18,9 +24,17 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.Felles
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.OverskriftBrevData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.handlebars.dto.BaseDokument;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.handlebars.dto.VarselbrevDokument;
-import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbPeriode;
 
 public class TekstformatererVarselbrev extends FellesTekstformaterer {
+
+    private static List<FagsakYtelseType> støttetTyper = new ArrayList<>();
+    static {
+        støttetTyper.add(FagsakYtelseType.FORELDREPENGER);
+        støttetTyper.add(FagsakYtelseType.ENGANGSTØNAD);
+        støttetTyper.add(FagsakYtelseType.SVANGERSKAPSPENGER);
+        støttetTyper.add(FagsakYtelseType.FRISINN);
+    }
 
     private TekstformatererVarselbrev() {
         // for static access
@@ -32,7 +46,7 @@ public class TekstformatererVarselbrev extends FellesTekstformaterer {
             VarselbrevDokument varselbrevDokument = mapTilVarselbrevDokument(
                 varselbrevSamletInfo);
 
-            return template.apply(varselbrevDokument);
+            return applyTemplate(template, varselbrevDokument);
         } catch (IOException e) {
             throw TekstformatererBrevFeil.FACTORY.feilVedTekstgenerering(e).toException();
         }
@@ -56,7 +70,7 @@ public class TekstformatererVarselbrev extends FellesTekstformaterer {
                 varselbrevSamletInfo,
                 varselInfo);
 
-            return template.apply(varselbrevDokument);
+            return applyTemplate(template, varselbrevDokument);
         } catch (IOException e) {
             throw TekstformatererBrevFeil.FACTORY.feilVedTekstgenerering(e).toException();
         }
@@ -76,28 +90,39 @@ public class TekstformatererVarselbrev extends FellesTekstformaterer {
 
     private static Template opprettHandlebarsTemplate(String filsti, Språkkode språkkode) throws IOException {
         Handlebars handlebars = opprettHandlebarsKonfigurasjon();
-        handlebars.registerHelper("datoformat", datoformatHelper());
+        handlebars.registerHelper("lookup-map", new CustomHelpers.MapLookupHelper());
         handlebars.registerHelper("kroner", new CustomHelpers.KroneFormattererMedTusenskille());
         return handlebars.compile(lagSpråkstøttetFilsti(filsti, språkkode));
     }
 
     private static void settFagsaktype(BaseDokument baseDokument, FagsakYtelseType fagsaktype) {
-        if (FagsakYtelseType.ENGANGSTØNAD.equals(fagsaktype)) {
-            baseDokument.setEngangsstønad(true);
-        } else if (FagsakYtelseType.FORELDREPENGER.equals(fagsaktype)) {
-            baseDokument.setForeldrepenger(true);
-        } else if (FagsakYtelseType.SVANGERSKAPSPENGER.equals(fagsaktype)) {
-            baseDokument.setSvangerskapspenger(true);
-        } else {
-            throw new IllegalArgumentException("Utviklerfeil - Kunne ikke finne fagsaktype: " + fagsaktype);
+        if (!støttetTyper.contains(fagsaktype)) {
+            throw new IllegalArgumentException("Utviklerfeil - ikkje støttet FagsakYtelseType: " + fagsaktype);
         }
+        baseDokument.setYtelsetype(fagsaktype);
     }
 
-    private static void settSenesteOgTidligsteDatoer(VarselbrevDokument varselbrevDokument, List<Periode> feilutbetaltPerioder) {
+    private static void settSenesteOgTidligsteDatoer(VarselbrevDokument varselbrevDokument, List<HbPeriode> feilutbetaltPerioder) {
         if (feilutbetaltPerioder != null && feilutbetaltPerioder.size() == 1) {
             LocalDate fom = feilutbetaltPerioder.get(0).getFom();
             LocalDate tom = feilutbetaltPerioder.get(0).getTom();
-            varselbrevDokument.setDatoerHvisSammenhengendePeriode(new Periode(fom, tom));
+            varselbrevDokument.setDatoerHvisSammenhengendePeriode(HbPeriode.of(fom, tom));
+        }
+    }
+
+    private static String applyTemplate(Template template, BaseDokument data) {
+        try {
+            //Går via JSON for å
+            //1. tilrettelegger for å flytte generering til PDF etc til ekstern applikasjon
+            //2. ha egen navngiving på variablene i template for enklere å lese template
+            //3. unngår at template feiler når variable endrer navn
+            JsonNode jsonNode = OM.valueToTree(data);
+            Context context = Context.newBuilder(jsonNode)
+                .resolver(JsonNodeValueResolver.INSTANCE, JavaBeanValueResolver.INSTANCE, MapValueResolver.INSTANCE)
+                .build();
+            return template.apply(context).stripLeading().stripTrailing();
+        } catch (IOException e) {
+            throw TekstformatererBrevFeil.FACTORY.feilVedTekstgenerering(e).toException();
         }
     }
 

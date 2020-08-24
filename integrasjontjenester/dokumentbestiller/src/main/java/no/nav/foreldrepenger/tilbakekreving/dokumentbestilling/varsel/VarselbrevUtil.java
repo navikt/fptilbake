@@ -15,6 +15,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelse
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.YtelseNavn;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbPeriode;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingsinfoDto;
@@ -157,17 +158,17 @@ public class VarselbrevUtil {
             TITTEL_VARSEL_TILBAKEBETALING + ytelseNavn.getNavnPåBokmål();
     }
 
-    private static List<Periode> mapFeilutbetaltePerioder(FeilutbetaltePerioderDto feilutbetaltePerioderDto) {
-        ArrayList<Periode> feilutbetaltPerioder = new ArrayList<>();
+    private static List<HbPeriode> mapFeilutbetaltePerioder(FeilutbetaltePerioderDto feilutbetaltePerioderDto) {
+        ArrayList<HbPeriode> feilutbetaltPerioder = new ArrayList<>();
         for (PeriodeDto periodeDto : feilutbetaltePerioderDto.getPerioder()) {
-            feilutbetaltPerioder.add(new Periode(periodeDto.getFom(), periodeDto.getTom()));
+            feilutbetaltPerioder.add(HbPeriode.of(periodeDto.getFom(), periodeDto.getTom()));
         }
         return feilutbetaltPerioder;
     }
 
-    private static List<Periode> mapFeilutbetaltePerioder(BehandlingFeilutbetalingFakta feilutbetalingFakta) {
+    private static List<HbPeriode> mapFeilutbetaltePerioder(BehandlingFeilutbetalingFakta feilutbetalingFakta) {
         return feilutbetalingFakta.getPerioder().stream()
-            .map(utbetaltPeriode -> new Periode(utbetaltPeriode.getFom(), utbetaltPeriode.getTom()))
+            .map(utbetaltPeriode -> HbPeriode.of(utbetaltPeriode.getFom(), utbetaltPeriode.getTom()))
             .collect(Collectors.toList());
     }
 

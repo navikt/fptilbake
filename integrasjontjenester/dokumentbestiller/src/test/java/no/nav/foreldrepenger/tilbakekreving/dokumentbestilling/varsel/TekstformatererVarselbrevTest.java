@@ -19,6 +19,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelse
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.handlebars.dto.VarselbrevDokument;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbPeriode;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
@@ -109,6 +110,31 @@ public class TekstformatererVarselbrevTest {
     }
 
     @Test
+    public void skal_generere_varseltekst_for_frisinn_med_enkelt_periode() throws IOException {
+        BrevMetadata metadata = new BrevMetadata.Builder()
+            .medFagsaktype(FagsakYtelseType.FRISINN)
+            .medSprakkode(Språkkode.nb)
+            .medFagsaktypenavnPåSpråk(FagsakYtelseType.FRISINN.getNavn())
+            .medMottakerAdresse(lagAdresseInfo())
+            .medSakspartNavn("Test")
+            .build();
+
+        VarselbrevSamletInfo varselbrevSamletInfo = new VarselbrevSamletInfo.Builder()
+            .medFritekstFraSaksbehandler("Dette er fritekst skrevet av saksbehandler.")
+            .medSumFeilutbetaling(595959L)
+            .medFeilutbetaltePerioder(mockFeilutbetalingerMedKunEnPeriode())
+            .medFristdato(FRIST_DATO)
+            .medRevurderingVedtakDato(REVURDERING_VEDTAK_DATO)
+            .medMetadata(metadata)
+            .build();
+
+        String generertBrev = TekstformatererVarselbrev.lagVarselbrevFritekst(varselbrevSamletInfo);
+
+        String fasit = les("/varselbrev/nb/FRISINN_en_periode.txt");
+        assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
+    }
+
+    @Test
     public void skal_mappe_verdier_fra_dtoer_til_komplett_tilbakekrevingsvarsel() {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
             .medSprakkode(Språkkode.nn)
@@ -161,25 +187,25 @@ public class TekstformatererVarselbrevTest {
         assertThat(varselbrev.getDatoerHvisSammenhengendePeriode()).isNull();
     }
 
-    public List<Periode> mockFeilutbetalingerMedKunEnPeriode() {
-        return List.of(new Periode(LocalDate.of(2019, 3, 3),
+    public List<HbPeriode> mockFeilutbetalingerMedKunEnPeriode() {
+        return List.of(HbPeriode.of(LocalDate.of(2019, 3, 3),
             LocalDate.of(2020, 3, 3)));
     }
 
     @Test
     public void skal_kontrollere_at_alle_nødvendige_verdier_for_komplett_brev_er_satt_for_engangsstønad() {
         VarselbrevDokument varselbrevDokument = lagTilbakekrevingvarselMedObligatoriskeVerdier();
-        varselbrevDokument.setDatoerHvisSammenhengendePeriode(new Periode(LocalDate.of(2019, 12, 12), LocalDate.of(2020, 1, 1)));
+        varselbrevDokument.setDatoerHvisSammenhengendePeriode(HbPeriode.of(LocalDate.of(2019, 12, 12), LocalDate.of(2020, 1, 1)));
         varselbrevDokument.setFeilutbetaltePerioder(mockUtbetalingEnPeriode());
         varselbrevDokument.setFagsaktypeNavn("engangsstønad");
-        varselbrevDokument.setEngangsstønad(true);
+        varselbrevDokument.setYtelsetype(FagsakYtelseType.ENGANGSTØNAD);
         varselbrevDokument.valider(); //NOSONAR
     }
 
     @Test
     public void skal_kaste_feil_dersom_ikke_nødvendige_verdier_for_komplett_brev_er_satt_for_engangsstønad() {
         VarselbrevDokument varselbrevDokument = lagTilbakekrevingvarselMedObligatoriskeVerdier();
-        varselbrevDokument.setEngangsstønad(true);
+        varselbrevDokument.setYtelsetype(FagsakYtelseType.ENGANGSTØNAD);
         varselbrevDokument.setFeilutbetaltePerioder(mockUtbetalingEnPeriode());
         varselbrevDokument.setFagsaktypeNavn("engangsstønad");
         varselbrevDokument.setDatoerHvisSammenhengendePeriode(null);
@@ -191,7 +217,7 @@ public class TekstformatererVarselbrevTest {
         VarselbrevDokument varselbrevDokument = lagTilbakekrevingvarselMedObligatoriskeVerdier();
         varselbrevDokument.setFeilutbetaltePerioder(mockUtbetalingEnPeriode());
         varselbrevDokument.setFagsaktypeNavn("foreldrepenger");
-        varselbrevDokument.setForeldrepenger(true);
+        varselbrevDokument.setYtelsetype(FagsakYtelseType.FORELDREPENGER);
         varselbrevDokument.setDatoerHvisSammenhengendePeriode(null);
         Assertions.assertThatNullPointerException().isThrownBy(varselbrevDokument::valider);
     }
@@ -298,9 +324,9 @@ public class TekstformatererVarselbrevTest {
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit+"\n"+"\n"+ vergeTekst);
     }
 
-    private List<Periode> mockFeilutbetalingerMedFlerePerioder() {
-        Periode periode1 = new Periode(LocalDate.of(2019, 3, 3), LocalDate.of(2020, 3, 3));
-        Periode periode2 = new Periode(LocalDate.of(2022, 3, 3), LocalDate.of(2024, 3, 3));
+    private List<HbPeriode> mockFeilutbetalingerMedFlerePerioder() {
+        HbPeriode periode1 = HbPeriode.of(LocalDate.of(2019, 3, 3), LocalDate.of(2020, 3, 3));
+        HbPeriode periode2 = HbPeriode.of(LocalDate.of(2022, 3, 3), LocalDate.of(2024, 3, 3));
         return List.of(periode1, periode2);
     }
 
@@ -312,8 +338,8 @@ public class TekstformatererVarselbrevTest {
         return varselbrevDokument;
     }
 
-    private List<Periode> mockUtbetalingEnPeriode() {
-        return List.of(new Periode(JANUAR_1_2019, JANUAR_30_2019));
+    private List<HbPeriode> mockUtbetalingEnPeriode() {
+        return List.of(HbPeriode.of(JANUAR_1_2019, JANUAR_30_2019));
     }
 
     private String les(String filnavn) throws IOException {

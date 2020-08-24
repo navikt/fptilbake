@@ -4,12 +4,12 @@ import java.time.LocalDate;
 import java.util.List;
 
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
-import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbPeriode;
 
 public class VarselbrevSamletInfo {
 
     private String fritekstFraSaksbehandler;
-    private List<Periode> feilutbetaltePerioder;
+    private List<HbPeriode> feilutbetaltePerioder;
     private Long sumFeilutbetaling;
     private LocalDate fristdato;
     private BrevMetadata brevMetadata;
@@ -31,7 +31,7 @@ public class VarselbrevSamletInfo {
         return fritekstFraSaksbehandler;
     }
 
-    public List<Periode> getFeilutbetaltePerioder() {
+    public List<HbPeriode> getFeilutbetaltePerioder() {
         return feilutbetaltePerioder;
     }
 
@@ -57,7 +57,7 @@ public class VarselbrevSamletInfo {
             return this;
         }
 
-        public Builder medFeilutbetaltePerioder(List<Periode> feilutbetaltePerioder) {
+        public Builder medFeilutbetaltePerioder(List<HbPeriode> feilutbetaltePerioder) {
             this.varselbrev.feilutbetaltePerioder = feilutbetaltePerioder;
             return this;
         }
