@@ -38,7 +38,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeType;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.TpsTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
+import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.Redirect;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
@@ -80,7 +80,7 @@ public class VergeRestTjeneste {
         })
     @BeskyttetRessurs(action = UPDATE, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public Response opprettVerge(@Parameter(description = "Behandling som skal få verge/fullmektig") @Valid BehandlingIdDto dto) throws URISyntaxException {
+    public Response opprettVerge(@Parameter(description = "Behandling som skal få verge/fullmektig") @Valid BehandlingReferanse dto) throws URISyntaxException {
         Behandling behandling = behandlingTjeneste.hentBehandling(dto.getBehandlingId());
         if (behandling.erSaksbehandlingAvsluttet() || behandling.isBehandlingPåVent()) {
             throw VergeFeil.FACTORY.kanIkkeOppretteVerge(behandling.getId()).toException();
@@ -89,7 +89,7 @@ public class VergeRestTjeneste {
             throw VergeFeil.FACTORY.harAlleredeAksjonspunktForVerge(behandling.getId()).toException();
         }
         vergeTjeneste.opprettVergeAksjonspunktOgHoppTilbakeTilFaktaHvisSenereSteg(behandling);
-        return Redirect.tilBehandlingPollStatus(behandling.getId());
+        return Redirect.tilBehandlingPollStatus(behandling.getUuid());
     }
 
     @POST
@@ -104,13 +104,13 @@ public class VergeRestTjeneste {
         })
     @BeskyttetRessurs(action = UPDATE, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public Response fjernVerge(@Parameter(description = "Behandling som skal få fjernet verge/fullmektig") @Valid BehandlingIdDto dto) throws URISyntaxException {
+    public Response fjernVerge(@Parameter(description = "Behandling som skal få fjernet verge/fullmektig") @Valid BehandlingReferanse dto) throws URISyntaxException {
         Behandling behandling = behandlingTjeneste.hentBehandling(dto.getBehandlingId());
         if (behandling.erSaksbehandlingAvsluttet() || behandling.isBehandlingPåVent()) {
             throw VergeFeil.FACTORY.kanIkkeFjerneVerge(behandling.getId()).toException();
         }
         vergeTjeneste.fjernVergeGrunnlagOgAksjonspunkt(behandling);
-        return Redirect.tilBehandlingPollStatus(behandling.getId());
+        return Redirect.tilBehandlingPollStatus(behandling.getUuid());
     }
 
     @GET
@@ -129,8 +129,8 @@ public class VergeRestTjeneste {
         })
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public VergeDto getVerge(@QueryParam(value = "behandlingId") @NotNull @Valid BehandlingIdDto dto) {
-        Long behandlingId = dto.getBehandlingId();
+    public VergeDto getVerge(@QueryParam(value = "uuid") @NotNull @Valid BehandlingReferanse dto) {
+        Long behandlingId = hentBehandlingId(dto);
         Optional<VergeEntitet> vergeEntitet = vergeTjeneste.hentVergeInformasjon(behandlingId);
         return vergeEntitet.isPresent() ? map(vergeEntitet.get()) : null;
     }
@@ -150,8 +150,8 @@ public class VergeRestTjeneste {
         })
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public Response hentBehandlingsmenyvalg(@NotNull @QueryParam("behandlingId") @Valid BehandlingIdDto behandlingIdDto) {
-        Behandling behandling = behandlingTjeneste.hentBehandling(behandlingIdDto.getBehandlingId());
+    public Response hentBehandlingsmenyvalg(@NotNull @QueryParam("uuid") @Valid BehandlingReferanse behandlingReferanse) {
+        Behandling behandling = hentBehandling(behandlingReferanse);
         Optional<VergeEntitet> vergeEntitet = vergeTjeneste.hentVergeInformasjon(behandling.getId());
         boolean kanBehandlingEndres = !behandling.erSaksbehandlingAvsluttet() && !behandling.isBehandlingPåVent();
         boolean finnesVerge = vergeEntitet.isPresent();
@@ -179,5 +179,19 @@ public class VergeRestTjeneste {
         vergeDto.setVergeType(vergeEntitet.getVergeType());
         vergeDto.setBegrunnelse(vergeEntitet.getBegrunnelse());
         return vergeDto;
+    }
+
+    private Long hentBehandlingId(BehandlingReferanse dto) {
+        return dto.erInternBehandlingId() ? dto.getBehandlingId() : hentBehandling(dto).getId();
+    }
+
+    private Behandling hentBehandling(BehandlingReferanse behandlingReferanse) {
+        Behandling behandling;
+        if (behandlingReferanse.erInternBehandlingId()) {
+            behandling = behandlingTjeneste.hentBehandling(behandlingReferanse.getBehandlingId());
+        } else {
+            behandling = behandlingTjeneste.hentBehandling(behandlingReferanse.getBehandlingUuid());
+        }
+        return behandling;
     }
 }

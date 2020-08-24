@@ -36,6 +36,7 @@ import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.Gjenop
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingFeil;
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingsTjenesteProvider;
+import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlendeEnhetTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingRevurderingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.HenleggBehandlingTjeneste;
@@ -53,7 +54,6 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjons
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.AsyncPollingStatus;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingDtoTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingRettigheterDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.ByttBehandlendeEnhetDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.FpsakUuidDto;
@@ -134,12 +134,13 @@ public class BehandlingRestTjeneste {
         BehandlingType behandlingType = opprettBehandlingDto.getBehandlingType();
         if (BehandlingType.TILBAKEKREVING.equals(behandlingType)) {
             Long behandlingId = behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternUuid, opprettBehandlingDto.getFagsakYtelseType(), behandlingType);
-            return Redirect.tilBehandlingPollStatus(behandlingId, Optional.empty());
+            Behandling behandling = behandlingTjeneste.hentBehandling(behandlingId);
+            return Redirect.tilBehandlingPollStatus(behandling.getUuid(), Optional.empty());
         } else if (BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandlingType)) {
             Long tbkBehandlingId = opprettBehandlingDto.getBehandlingId();
             Behandling revurdering = revurderingTjeneste.opprettRevurdering(tbkBehandlingId, opprettBehandlingDto.getBehandlingArsakType());
             String gruppe = behandlingskontrollAsynkTjeneste.asynkProsesserBehandling(revurdering);
-            return Redirect.tilBehandlingPollStatus(revurdering.getId(), Optional.of(gruppe));
+            return Redirect.tilBehandlingPollStatus(revurdering.getUuid(), Optional.of(gruppe));
         }
         return Response.ok().build();
     }
@@ -158,17 +159,38 @@ public class BehandlingRestTjeneste {
         return Response.ok(behandlingTjeneste.kanOppretteBehandling(saksnummer, eksternUUID)).build();
     }
 
+    // TODO: k9-tilbake. fjern når endringen er merget og prodsatt også i fpsak-frontend
     @GET
     @Path("/kan-revurdering-opprettes")
     @Operation(
         tags = "behandlinger",
         description = "Sjekk om revurdering kan opprettes")
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
-    public Response kanOpprettesRevurdering(@NotNull @QueryParam("behandlingId") @Valid BehandlingIdDto idDto) {
-        Optional<EksternBehandling> eksternBehandling = revurderingTjeneste.hentEksternBehandling(idDto.getBehandlingId());
+    public Response kanOpprettesRevurdering(@NotNull @QueryParam("behandlingId") @Parameter(description = "Intern behandlingId eller behandlingUuid for behandling") @Valid BehandlingReferanse idDto) {
+        return vurderOmRevurderingKanOpprettes(idDto);
+    }
+
+    @GET
+    @Path("/kan-revurdering-opprettes-v2")
+    @Operation(
+        tags = "behandlinger",
+        description = "Sjekk om revurdering kan opprettes")
+    @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
+    public Response kanRevurderingOpprettes(@NotNull @QueryParam("uuid") @Parameter(description = "Intern behandlingId eller behandlingUuid for behandling") @Valid BehandlingReferanse idDto) {
+        return vurderOmRevurderingKanOpprettes(idDto);
+    }
+
+    // TODO: k9-tilbake. refactor når endringen er merget og prodsatt også i fpsak-frontend
+    private Response vurderOmRevurderingKanOpprettes(BehandlingReferanse idDto) {
         boolean kanRevurderingOprettes = false;
-        if (eksternBehandling.isPresent()) {
-            kanRevurderingOprettes = revurderingTjeneste.kanOppretteRevurdering(eksternBehandling.get().getEksternUuid());
+        if (idDto.erInternBehandlingId()) {
+            Optional<EksternBehandling> eksternBehandling = revurderingTjeneste.hentEksternBehandling(idDto.getBehandlingId());
+            if (eksternBehandling.isPresent()) {
+                kanRevurderingOprettes = revurderingTjeneste.kanOppretteRevurdering(eksternBehandling.get().getEksternUuid());
+            }
+        } else {
+            Behandling behandling = behandlingTjeneste.hentBehandling(idDto.getBehandlingUuid());
+            kanRevurderingOprettes = behandling != null && revurderingTjeneste.kanRevurderingOpprettes(behandling);
         }
         return Response.ok(kanRevurderingOprettes).build();
     }
@@ -183,15 +205,15 @@ public class BehandlingRestTjeneste {
     @BeskyttetRessurs(action = UPDATE, property = AbacProperty.FAGSAK)
     public Response gjenopptaBehandling(@Parameter(description = "BehandlingId for behandling som skal gjenopptas") @Valid GjenopptaBehandlingDto dto)
         throws URISyntaxException {
-        Long behandlingId = dto.getBehandlingId();
+        Behandling behandling = getBehandling(dto.getBehandlingReferanse());
 
         // precondition - sjekk behandling versjon/lås
-        behandlingTjeneste.kanEndreBehandling(behandlingId, dto.getBehandlingVersjon());
+        behandlingTjeneste.kanEndreBehandling(behandling.getId(), dto.getBehandlingVersjon());
 
         // gjenoppta behandling
-        Optional<String> gruppeOpt = gjenopptaBehandlingTjeneste.fortsettBehandlingManuelt(behandlingId);
+        Optional<String> gruppeOpt = gjenopptaBehandlingTjeneste.fortsettBehandlingManuelt(behandling.getId());
 
-        return Redirect.tilBehandlingPollStatus(behandlingId, gruppeOpt);
+        return Redirect.tilBehandlingPollStatus(behandling.getUuid(), gruppeOpt);
     }
 
     @POST
@@ -267,9 +289,10 @@ public class BehandlingRestTjeneste {
         })
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public Response hentBehandling(@NotNull @Valid BehandlingIdDto idDto) throws URISyntaxException {
+    public Response hentBehandling(@NotNull @Valid BehandlingReferanse idDto) throws URISyntaxException {
         // sender alltid til poll status slik at vi får sjekket på utestående prosess tasks også.
-        return Redirect.tilBehandlingPollStatus(idDto.getBehandlingId(), Optional.empty());
+        Behandling behandling = getBehandling(idDto);
+        return Redirect.tilBehandlingPollStatus(behandling.getUuid(), Optional.empty());
     }
 
     @GET
@@ -285,14 +308,13 @@ public class BehandlingRestTjeneste {
         })
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public Response hentBehandlingMidlertidigStatus(@NotNull @QueryParam("behandlingId") @Valid BehandlingIdDto idDto,
+    public Response hentBehandlingMidlertidigStatus(@NotNull @QueryParam("uuid") @Valid BehandlingReferanse idDto,
                                                     @QueryParam("gruppe") @Valid ProsessTaskGruppeIdDto gruppeDto)
         throws URISyntaxException {
-        Long behandlingId = idDto.getBehandlingId();
+        Behandling behandling = getBehandling(idDto);
         String gruppe = gruppeDto == null ? null : gruppeDto.getGruppe();
-        Behandling behandling = behandlingsprosessTjeneste.hentBehandling(behandlingId);
         Optional<AsyncPollingStatus> prosessTaskGruppePågår = behandlingsprosessTjeneste.sjekkProsessTaskPågårForBehandling(behandling, gruppe);
-        return Redirect.tilBehandlingEllerPollStatus(behandlingId, prosessTaskGruppePågår.orElse(null));
+        return Redirect.tilBehandlingEllerPollStatus(behandling.getUuid(), prosessTaskGruppePågår.orElse(null));
     }
 
     @GET
@@ -305,14 +327,12 @@ public class BehandlingRestTjeneste {
         })
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public Response hentBehandlingResultat(@NotNull @QueryParam("behandlingId") @Valid BehandlingIdDto idDto) {
-
-        var behandlingId = idDto.getBehandlingId();
-        var behandling = behandlingsprosessTjeneste.hentBehandling(behandlingId);
+    public Response hentBehandlingResultat(@NotNull @QueryParam("uuid") @Valid BehandlingReferanse idDto) {
+        var behandling = getBehandling(idDto);
 
         AsyncPollingStatus taskStatus = behandlingsprosessTjeneste.sjekkProsessTaskPågårForBehandling(behandling, null).orElse(null);
 
-        UtvidetBehandlingDto dto = behandlingDtoTjeneste.hentUtvidetBehandlingResultat(idDto.getBehandlingId(), taskStatus);
+        UtvidetBehandlingDto dto = behandlingDtoTjeneste.hentUtvidetBehandlingResultat(behandling.getId(), taskStatus);
 
         Response.ResponseBuilder responseBuilder = Response.ok().entity(dto);
         return responseBuilder.build();
@@ -386,10 +406,20 @@ public class BehandlingRestTjeneste {
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public BehandlingRettigheterDto hentBehandlingOperasjonRettigheter(
-        @NotNull @QueryParam("behandlingId") @Valid BehandlingIdDto behandlingIdDto
+        @NotNull @QueryParam("uuid") @Valid BehandlingReferanse behandlingReferanse
     ) {
         Boolean harSoknad = true;
         //TODO (TOR) Denne skal etterkvart returnere rettighetene knytta til behandlingsmeny i frontend
         return new BehandlingRettigheterDto(harSoknad);
+    }
+
+    private Behandling getBehandling(BehandlingReferanse behandlingReferanse) {
+        Behandling behandling;
+        if (behandlingReferanse.erInternBehandlingId()) {
+            behandling = behandlingTjeneste.hentBehandling(behandlingReferanse.getBehandlingId());
+        } else {
+            behandling = behandlingTjeneste.hentBehandling(behandlingReferanse.getBehandlingUuid());
+        }
+        return behandling;
     }
 }

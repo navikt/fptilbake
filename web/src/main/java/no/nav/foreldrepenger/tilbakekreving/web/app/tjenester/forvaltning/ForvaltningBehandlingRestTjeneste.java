@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTask;
+import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TaskProperty;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.KravgrunnlagMapper;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.KravgrunnlagXmlUnmarshaller;
@@ -36,7 +37,6 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagValidator;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.TilbakekrevingsvedtakMarshaller;
 import no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste.TilbakekrevingsvedtakTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.MeldingType;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
@@ -98,12 +98,12 @@ public class ForvaltningBehandlingRestTjeneste {
             @ApiResponse(responseCode = "500", description = "Feilet pga ukjent feil.")
         })
     @BeskyttetRessurs(action = CREATE, property = AbacProperty.DRIFT)
-    public Response tvingHenleggelseBehandling(@QueryParam("behandlingId") @NotNull @Valid BehandlingIdDto behandlingIdDto) {
-        Behandling behandling = behandlingRepository.hentBehandling(behandlingIdDto.getBehandlingId());
+    public Response tvingHenleggelseBehandling(@QueryParam("behandlingId") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
+        Behandling behandling = hentBehandling(behandlingReferanse);
         if (behandling.erAvsluttet()) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        logger.info("Tving henleggelse. Oppretter task for å henlegge behandlingId={}", behandlingIdDto.getBehandlingId());
+        logger.info("Tving henleggelse. Oppretter task for å henlegge behandlingId={}", behandlingReferanse.getBehandlingId());
         opprettHenleggBehandlingTask(behandling);
         return Response.ok().build();
     }
@@ -119,12 +119,12 @@ public class ForvaltningBehandlingRestTjeneste {
             @ApiResponse(responseCode = "500", description = "Feilet pga ukjent feil.")
         })
     @BeskyttetRessurs(action = CREATE, property = AbacProperty.DRIFT)
-    public Response tvingGjenopptaBehandling(@NotNull @QueryParam("behandlingId") @Valid BehandlingIdDto behandlingIdDto) {
-        Behandling behandling = behandlingRepository.hentBehandling(behandlingIdDto.getBehandlingId());
+    public Response tvingGjenopptaBehandling(@NotNull @QueryParam("behandlingId") @Valid BehandlingReferanse behandlingReferanse) {
+        Behandling behandling = hentBehandling(behandlingReferanse);
         if (behandling.erAvsluttet() || !behandling.isBehandlingPåVent()) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        logger.info("Tving gjenoppta. Oppretter task for å gjenoppta behandlingId={}", behandlingIdDto.getBehandlingId());
+        logger.info("Tving gjenoppta. Oppretter task for å gjenoppta behandlingId={}", behandlingReferanse.getBehandlingId());
         opprettGjenopptaBehandlingTask(behandling);
 
         return Response.ok().build();
@@ -186,31 +186,34 @@ public class ForvaltningBehandlingRestTjeneste {
             @ApiResponse(responseCode = "400", description = "Behandling eksisterer ikke")
         })
     @BeskyttetRessurs(action = READ, property = AbacProperty.DRIFT)
-    public Response hentOkoXmlForFeiletIverksetting(@NotNull @QueryParam("behandlingId") @Valid BehandlingIdDto behandlingIdDto) {
-        Long behandlingId = behandlingIdDto.getBehandlingId();
-        logger.info("Henter xml til økonomi for behandling: {}", behandlingId);
+    public Response hentOkoXmlForFeiletIverksetting(@NotNull @QueryParam("behandlingId") @Valid BehandlingReferanse behandlingReferanse) {
+        String behandlingRef = behandlingReferanse.erInternBehandlingId()
+            ? behandlingReferanse.getBehandlingId().toString()
+            : behandlingReferanse.getBehandlingUuid().toString();
+        logger.info("Henter xml til økonomi for behandling: {}", behandlingRef);
 
-        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
+        Behandling behandling = hentBehandling(behandlingReferanse);
         if (behandling == null) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
 
+        Long behandlingId = behandling.getId();
         Collection<String> meldinger = økonomiSendtXmlRepository.finnXml(behandlingId, MeldingType.VEDTAK);
         if (meldinger.isEmpty()) {
-            logger.info("Xml til økonomi ikke lagret i databasen for behandling: {}", behandlingId);
+            logger.info("Xml til økonomi ikke lagret i databasen for behandling: {}", behandlingRef);
             String xml = lagXmlTilØkonomi(behandlingId);
             return Response.ok()
                 .type(MediaType.APPLICATION_XML)
                 .entity(xml)
                 .build();
         } else if (meldinger.size() == 1) {
-            logger.info("Fant lagret xml til økonomi for behandling: {}", behandlingId);
+            logger.info("Fant lagret xml til økonomi for behandling: {}", behandlingRef);
             return Response.ok()
                 .type(MediaType.APPLICATION_XML)
                 .entity(meldinger.toArray()[0])
                 .build();
         } else {
-            logger.info("Fant {} lagrede xmler til økonomi for behandling: {}", meldinger.size(), behandlingId);
+            logger.info("Fant {} lagrede xmler til økonomi for behandling: {}", meldinger.size(), behandlingRef);
             return Response.ok()
                 .entity(meldinger)
                 .build();
@@ -278,5 +281,15 @@ public class ForvaltningBehandlingRestTjeneste {
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         prosessTaskData.setProperty("KRAVGRUNNLAG_ID", kravgrunnlagId);
         prosessTaskRepository.lagre(prosessTaskData);
+    }
+
+    private Behandling hentBehandling(BehandlingReferanse behandlingReferanse) {
+        Behandling behandling;
+        if (behandlingReferanse.erInternBehandlingId()) {
+            behandling = behandlingRepository.hentBehandling(behandlingReferanse.getBehandlingId());
+        } else {
+            behandling = behandlingRepository.hentBehandling(behandlingReferanse.getBehandlingUuid());
+        }
+        return behandling;
     }
 }

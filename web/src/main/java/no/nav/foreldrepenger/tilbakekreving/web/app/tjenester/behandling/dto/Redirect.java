@@ -3,6 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.ws.rs.core.Response;
 
@@ -17,17 +18,17 @@ public final class Redirect {
         // no ctor
     }
 
-    public static Response tilBehandlingPollStatus(Long behandlingId, Optional<String> gruppeOpt) throws URISyntaxException {
-        URI uri = new URI("/behandlinger/status?behandlingId=" + behandlingId + (gruppeOpt.isPresent() ? "&gruppe=" + gruppeOpt.get() : ""));
+    public static Response tilBehandlingPollStatus(UUID uuid, Optional<String> gruppeOpt) throws URISyntaxException {
+        URI uri = new URI("/behandlinger/status?uuid=" + uuid + (gruppeOpt.isPresent() ? "&gruppe=" + gruppeOpt.get() : ""));
         return Response.accepted().location(uri).build();
     }
 
-    public static Response tilBehandlingPollStatus(Long behandlingId) throws URISyntaxException {
-        return tilBehandlingPollStatus(behandlingId, Optional.empty());
+    public static Response tilBehandlingPollStatus(UUID uuid) throws URISyntaxException {
+        return tilBehandlingPollStatus(uuid, Optional.empty());
     }
 
-    public static Response tilBehandlingEllerPollStatus(Long behandlingId, AsyncPollingStatus status) throws URISyntaxException {
-        String resultatUri = "/behandlinger/?behandlingId=" + behandlingId;
+    public static Response tilBehandlingEllerPollStatus(UUID uuid, AsyncPollingStatus status) throws URISyntaxException {
+        String resultatUri = "/behandlinger/?uuid=" + uuid;
         return buildResponse(status, resultatUri);
     }
 

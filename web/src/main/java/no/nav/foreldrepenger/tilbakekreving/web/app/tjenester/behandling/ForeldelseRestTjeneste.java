@@ -21,12 +21,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
 import io.swagger.v3.oas.annotations.Operation;
+import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.FeilutbetalingPerioderDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.PeriodeDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurdertForeldelseTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 @Path(ForeldelseRestTjeneste.PATH_FRAGMENT)
@@ -39,30 +40,34 @@ public class ForeldelseRestTjeneste {
     public static final String PATH_FRAGMENT = "/foreldelse";
     private VurdertForeldelseTjeneste vurdertForeldelseTjeneste;
     private KravgrunnlagBeregningTjeneste kravgrunnlagBeregningTjeneste;
+    private BehandlingTjeneste behandlingTjeneste;
 
     public ForeldelseRestTjeneste() {
         // For CDI
     }
 
     @Inject
-    public ForeldelseRestTjeneste(VurdertForeldelseTjeneste vurdertForeldelseTjeneste, KravgrunnlagBeregningTjeneste kravgrunnlagBeregningTjeneste) {
+    public ForeldelseRestTjeneste(VurdertForeldelseTjeneste vurdertForeldelseTjeneste,
+                                  KravgrunnlagBeregningTjeneste kravgrunnlagBeregningTjeneste,
+                                  BehandlingTjeneste behandlingTjeneste) {
         this.vurdertForeldelseTjeneste = vurdertForeldelseTjeneste;
         this.kravgrunnlagBeregningTjeneste = kravgrunnlagBeregningTjeneste;
+        this.behandlingTjeneste = behandlingTjeneste;
     }
 
     @GET
     @Operation(tags = "foreldelse", description = "Henter perioder som skal vurderes for foreldelse")
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
-    public FeilutbetalingPerioderDto hentLogiskePerioder(@QueryParam("behandlingId") @NotNull @Valid BehandlingIdDto behandlingIdDto) {
-        return vurdertForeldelseTjeneste.hentFaktaPerioder(behandlingIdDto.getBehandlingId());
+    public FeilutbetalingPerioderDto hentLogiskePerioder(@QueryParam("uuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
+        return vurdertForeldelseTjeneste.hentFaktaPerioder(hentBehandlingId(behandlingReferanse));
     }
 
     @GET
     @Operation(tags = "foreldelse", description = "Hente allerede vurdert foreldelse perioder")
     @Path("/vurdert")
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
-    public FeilutbetalingPerioderDto hentVurdertPerioder(@QueryParam("behandlingId") @NotNull @Valid BehandlingIdDto behandlingIdDto) {
-        return vurdertForeldelseTjeneste.henteVurdertForeldelse(behandlingIdDto.getBehandlingId());
+    public FeilutbetalingPerioderDto hentVurdertPerioder(@QueryParam("uuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
+        return vurdertForeldelseTjeneste.henteVurdertForeldelse(hentBehandlingId(behandlingReferanse));
     }
 
     @POST
@@ -78,4 +83,9 @@ public class ForeldelseRestTjeneste {
         return perioderDto;
     }
 
+    private Long hentBehandlingId(BehandlingReferanse behandlingReferanse) {
+        return behandlingReferanse.erInternBehandlingId()
+            ? behandlingReferanse.getBehandlingId()
+            : behandlingTjeneste.hentBehandlingId(behandlingReferanse.getBehandlingUuid());
+    }
 }

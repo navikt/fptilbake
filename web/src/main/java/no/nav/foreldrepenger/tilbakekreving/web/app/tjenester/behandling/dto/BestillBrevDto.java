@@ -1,22 +1,24 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
+
+import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.AbacDto;
-import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
 import no.nav.vedtak.util.InputValideringRegex;
 
 public class BestillBrevDto implements AbacDto {
 
     @NotNull
-    @Min(0)
-    @Max(Long.MAX_VALUE)
-    private Long behandlingId;
+    @Valid
+    private BehandlingReferanse behandlingReferanse;
 
     @NotNull
     @Size(min = 1, max = 100)
@@ -28,12 +30,26 @@ public class BestillBrevDto implements AbacDto {
     @Pattern(regexp = InputValideringRegex.FRITEKST)
     private String fritekst;
 
-    public Long getBehandlingId() {
-        return behandlingId;
+    public BehandlingReferanse getBehandlingReferanse() {
+        return behandlingReferanse;
     }
 
-    public void setBehandlingId(Long behandlingId) {
-        this.behandlingId = behandlingId;
+    @JsonIgnore
+    public void setBehandlingReferanse(BehandlingReferanse behandlingReferanse) {
+        this.behandlingReferanse = behandlingReferanse;
+    }
+
+    // TODO: K9-tilbake. fjern når endringen er merget og prodsatt også i fpsak-frontend
+    @JsonSetter("behandlingId")
+    @JsonProperty(value = "behandlingReferanse")
+    public void setBehandlingId(BehandlingReferanse behandlingReferanse) {
+        this.behandlingReferanse = behandlingReferanse;
+    }
+
+    @JsonSetter("behandlingUuid")
+    @JsonProperty(value = "behandlingReferanse")
+    public void setBehandlingUuid(BehandlingReferanse behandlingReferanse) {
+        this.behandlingReferanse = behandlingReferanse;
     }
 
     public String getBrevmalkode() {
@@ -54,6 +70,6 @@ public class BestillBrevDto implements AbacDto {
 
     @Override
     public AbacDataAttributter abacAttributter() {
-        return AbacDataAttributter.opprett().leggTil(StandardAbacAttributtType.BEHANDLING_ID, behandlingId);
+        return AbacDataAttributter.opprett().leggTil(behandlingReferanse.abacAttributter());
     }
 }

@@ -50,7 +50,7 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.BehandlingsprosessApplikasjonTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingDtoTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
+import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.FpsakUuidDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.HenleggBehandlingDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.KlageTilbakekrevingDto;
@@ -87,7 +87,7 @@ public class BehandlingRestTjenesteTest {
 
     private static SaksnummerDto saksnummerDto = new SaksnummerDto(GYLDIG_SAKSNR);
     private static FpsakUuidDto fpsakUuidDto = new FpsakUuidDto(EKSTERN_BEHANDLING_UUID);
-    private static BehandlingIdDto behandlingIdDto = new BehandlingIdDto(1l);
+    private static BehandlingReferanse behandlingReferanse = new BehandlingReferanse(1l);
     private static UuidDto uuidDto = new UuidDto(UUID.randomUUID());
 
     @Test
@@ -102,6 +102,8 @@ public class BehandlingRestTjenesteTest {
 
     @Test
     public void test_skal_opprette_ny_behandling() throws URISyntaxException {
+        when(behandlingTjenesteMock.hentBehandling(anyLong())).thenReturn(mockBehandling());
+
         behandlingRestTjeneste.opprettBehandling(opprettBehandlingDto(GYLDIG_SAKSNR, EKSTERN_BEHANDLING_UUID, FP_YTELSE_TYPE));
 
         verify(behandlingTjenesteMock).opprettBehandlingManuell(any(Saksnummer.class), any(UUID.class), any(FagsakYtelseType.class), any(BehandlingType.class));
@@ -151,7 +153,7 @@ public class BehandlingRestTjenesteTest {
         when(revurderingTjenesteMock.hentEksternBehandling(anyLong())).thenReturn(opprettEksternBehandling());
         when(revurderingTjenesteMock.kanOppretteRevurdering(any(UUID.class))).thenReturn(true);
 
-        Response response = behandlingRestTjeneste.kanOpprettesRevurdering(behandlingIdDto);
+        Response response = behandlingRestTjeneste.kanOpprettesRevurdering(behandlingReferanse);
         assertThat(response.getEntity()).isNotNull();
         boolean result = (boolean) response.getEntity();
         assertThat(result).isTrue();

@@ -137,6 +137,11 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
     }
 
     @Override
+    public Long hentBehandlingId(UUID behandlingUUId) {
+        return hentBehandling(behandlingUUId).getId();
+    }
+
+    @Override
     public Long opprettBehandlingManuell(Saksnummer saksnummer, UUID eksternUuid,
                                          FagsakYtelseType fagsakYtelseType, BehandlingType behandlingType) {
 

@@ -13,6 +13,7 @@ import java.net.URISyntaxException;
 import java.time.Period;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import javax.ws.rs.core.Response;
 
@@ -45,7 +46,7 @@ import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagT
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.BekreftedeAksjonspunkterDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.BekreftetAksjonspunktDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.VurderForeldelseDto;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
+import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 
 public class AksjonspunktRestTjenesteTest {
@@ -103,7 +104,7 @@ public class AksjonspunktRestTjenesteTest {
                                 .medAksjonspunktDefinisjon(AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING).build();
         when(totrinnRepositoryMock.hentTotrinnsvurderinger(any(Behandling.class))).thenReturn(Collections.singleton(ttv));
 
-        Response result = aksjonspunktRestTjeneste.getAksjonspunkter(new BehandlingIdDto("1234"));
+        Response result = aksjonspunktRestTjeneste.getAksjonspunkter(new BehandlingReferanse("1234"));
 
         assertThat(result.getStatus()).isEqualTo(HttpStatus.SC_OK);
         assertThat(result.getEntity()).isNotNull();
@@ -114,10 +115,12 @@ public class AksjonspunktRestTjenesteTest {
         long behandlingId = 12345L;
         Behandling behandlingSpy = spy(behandling);
         when(behandlingSpy.getId()).thenReturn(behandlingId);
+        when(behandlingSpy.getUuid()).thenReturn(UUID.randomUUID());
 
         List<BekreftetAksjonspunktDto> aksjonspunkterDtoer = Collections.singletonList(new VurderForeldelseDto());
         BekreftedeAksjonspunkterDto dto = BekreftedeAksjonspunkterDto.lagDto(behandlingSpy.getId(), 2L, aksjonspunkterDtoer);
 
+        when(behandlingRepositoryMock.hentBehandling(anyLong())).thenReturn(behandlingSpy);
         when(behandlingRepositoryMock.erVersjonUendret(anyLong(), anyLong())).thenReturn(true);
 
         aksjonspunktRestTjeneste.bekreft(dto);

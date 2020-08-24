@@ -16,9 +16,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
 import io.swagger.v3.oas.annotations.Operation;
+import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.vilkårsvurdering.VilkårsvurderingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.felles.Rettsgebyr;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
+import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.DetaljerteFeilutbetalingsperioderDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.VilkårsvurderteDto;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
@@ -32,6 +33,7 @@ public class VilkårsvurderingRestTjeneste {
 
     public static final String PATH_FRAGMENT = "/vilkarsvurdering";
     private VilkårsvurderingTjeneste vilkårsvurderingTjeneste;
+    private BehandlingTjeneste behandlingTjeneste;
     private Integer rettsgebyr;
 
     public VilkårsvurderingRestTjeneste() {
@@ -39,8 +41,10 @@ public class VilkårsvurderingRestTjeneste {
     }
 
     @Inject
-    public VilkårsvurderingRestTjeneste(VilkårsvurderingTjeneste vilkårsvurderingTjeneste) {
+    public VilkårsvurderingRestTjeneste(VilkårsvurderingTjeneste vilkårsvurderingTjeneste,
+                                        BehandlingTjeneste behandlingTjeneste) {
         this.vilkårsvurderingTjeneste = vilkårsvurderingTjeneste;
+        this.behandlingTjeneste = behandlingTjeneste;
         this.rettsgebyr = new Rettsgebyr().getGebyr();
     }
 
@@ -48,9 +52,9 @@ public class VilkårsvurderingRestTjeneste {
     @Path("/perioder")
     @Operation(tags = "vilkårsvurdering", description = "Henter perioder som skal vurderes for vilkårsvurdering")
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
-    public DetaljerteFeilutbetalingsperioderDto hentDetailjertFeilutbetalingPerioder(@QueryParam("behandlingId") @NotNull @Valid BehandlingIdDto behandlingIdDto) {
+    public DetaljerteFeilutbetalingsperioderDto hentDetailjertFeilutbetalingPerioder(@QueryParam("uuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
         DetaljerteFeilutbetalingsperioderDto perioderDto = new DetaljerteFeilutbetalingsperioderDto();
-        perioderDto.setPerioder(vilkårsvurderingTjeneste.hentDetaljertFeilutbetalingPerioder(behandlingIdDto.getBehandlingId()));
+        perioderDto.setPerioder(vilkårsvurderingTjeneste.hentDetaljertFeilutbetalingPerioder(hentBehandlingId(behandlingReferanse)));
         perioderDto.setRettsgebyr(BigDecimal.valueOf(rettsgebyr));
         return perioderDto;
     }
@@ -59,9 +63,15 @@ public class VilkårsvurderingRestTjeneste {
     @Path("/vurdert")
     @Operation(tags = "vilkårsvurdering", description = "Henter allerede vurdert vilkårsvurdering")
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
-    public VilkårsvurderteDto hentVurdertPerioder(@QueryParam("behandlingId") @NotNull @Valid BehandlingIdDto behandlingIdDto) {
+    public VilkårsvurderteDto hentVurdertPerioder(@QueryParam("uuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
         VilkårsvurderteDto vilkårsvurderteDto = new VilkårsvurderteDto();
-        vilkårsvurderteDto.setVilkarsVurdertePerioder(vilkårsvurderingTjeneste.hentVilkårsvurdering(behandlingIdDto.getBehandlingId()));
+        vilkårsvurderteDto.setVilkarsVurdertePerioder(vilkårsvurderingTjeneste.hentVilkårsvurdering(hentBehandlingId(behandlingReferanse)));
         return vilkårsvurderteDto;
+    }
+
+    private Long hentBehandlingId(BehandlingReferanse behandlingReferanse) {
+        return behandlingReferanse.erInternBehandlingId()
+            ? behandlingReferanse.getBehandlingId()
+            : behandlingTjeneste.hentBehandlingId(behandlingReferanse.getBehandlingUuid());
     }
 }

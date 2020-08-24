@@ -11,22 +11,24 @@ import java.util.Collections;
 
 import org.junit.Test;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FaktaFeilutbetalingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BehandlingFeilutbetalingFakta;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.UtbetaltPeriode;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingFeilutbetalingFaktaDto;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
 
 public class BehandlingFaktaRestTjenesteTest {
 
-    private FaktaFeilutbetalingTjeneste behandlingTjeneste = mock(FaktaFeilutbetalingTjeneste.class);
+    private FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste = mock(FaktaFeilutbetalingTjeneste.class);
+    private BehandlingTjeneste behandlingTjeneste = mock(BehandlingTjeneste.class);
 
-    private BehandlingFaktaRestTjeneste restTjeneste = new BehandlingFaktaRestTjeneste(behandlingTjeneste);
+    private BehandlingFaktaRestTjeneste restTjeneste = new BehandlingFaktaRestTjeneste(faktaFeilutbetalingTjeneste, behandlingTjeneste);
 
     @Test
     public void skalHenteFeilutbetalingFakta() {
-        when(behandlingTjeneste.hentBehandlingFeilutbetalingFakta(anyLong())).thenReturn(lagBehandlingFeilutbetalingFakta());
-        BehandlingIdDto dto = new BehandlingIdDto(123455L);
+        when(faktaFeilutbetalingTjeneste.hentBehandlingFeilutbetalingFakta(anyLong())).thenReturn(lagBehandlingFeilutbetalingFakta());
+        BehandlingReferanse dto = new BehandlingReferanse(123455L);
 
         BehandlingFeilutbetalingFaktaDto resultat = restTjeneste.hentFeilutbetalingFakta(dto);
 

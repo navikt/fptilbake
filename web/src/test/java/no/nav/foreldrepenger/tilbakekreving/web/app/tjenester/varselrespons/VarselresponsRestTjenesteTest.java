@@ -18,7 +18,7 @@ import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.Gjenop
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons.Varselrespons;
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.ResponsKanal;
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
+import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 
 public class VarselresponsRestTjenesteTest {
 
@@ -54,7 +54,7 @@ public class VarselresponsRestTjenesteTest {
                 .setAkseptertFaktagrunnlag(AKSEPTERT_GRUNNLAG)
                 .build()));
 
-        Response result = restTjeneste.finnRespons(new BehandlingIdDto(BEHANDLING_ID));
+        Response result = restTjeneste.finnRespons(new BehandlingReferanse(BEHANDLING_ID));
 
         assertThat(result.getStatus()).isEqualTo(200);
         assertThat(result.getEntity()).isInstanceOf(VarselresponsDto.class);

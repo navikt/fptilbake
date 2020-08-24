@@ -179,8 +179,9 @@ public class VedtaksbrevTjeneste {
     }
 
     public byte[] hentForhåndsvisningVedtaksbrevMedVedleggSomPdf(HentForhåndvisningVedtaksbrevPdfDto dto) {
-        VedtaksbrevData vedtaksbrevData = hentDataForVedtaksbrev(dto.getBehandlingId(), dto.getOppsummeringstekst(),
-            dto.getPerioderMedTekst(),getBrevMottaker(dto.getBehandlingId()));
+        Long behandlingId = hentBehandlingId(dto);
+        VedtaksbrevData vedtaksbrevData = hentDataForVedtaksbrev(behandlingId, dto.getOppsummeringstekst(),
+            dto.getPerioderMedTekst(),getBrevMottaker(behandlingId));
         HbVedtaksbrevData hbVedtaksbrevData = vedtaksbrevData.getVedtaksbrevData();
         FritekstbrevData data = new FritekstbrevData.Builder()
             .medOverskrift(TekstformatererVedtaksbrev.lagVedtaksbrevOverskrift(hbVedtaksbrevData, vedtaksbrevData.getMetadata().getSpråkkode()))
@@ -202,6 +203,17 @@ public class VedtaksbrevTjeneste {
             throw new RuntimeException("Fikk IO exception ved forhåndsvisning inkl vedlegg", e);
         }
         return baos.toByteArray();
+    }
+
+    private Long hentBehandlingId(HentForhåndvisningVedtaksbrevPdfDto dto) {
+        Long behandlingId;
+        if (dto.getBehandlingReferanse().erInternBehandlingId()) {
+            behandlingId = dto.getBehandlingReferanse().getBehandlingId();
+        } else {
+            Behandling behandling = behandlingRepository.hentBehandling(dto.getBehandlingReferanse().getBehandlingUuid());
+            behandlingId = behandling.getId();
+        }
+        return behandlingId;
     }
 
     public List<Avsnitt> hentForhåndsvisningVedtaksbrevSomTekst(Long behandlingId) {

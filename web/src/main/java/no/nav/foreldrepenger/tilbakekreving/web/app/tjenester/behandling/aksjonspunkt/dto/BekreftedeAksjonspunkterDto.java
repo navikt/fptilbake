@@ -8,16 +8,19 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingIdDto;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
+
+import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.AbacDto;
-import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
 
 public class BekreftedeAksjonspunkterDto implements AbacDto {
 
     @Valid
     @NotNull
-    private BehandlingIdDto behandlingId;
+    private BehandlingReferanse behandlingReferanse;
 
     @NotNull
     @Min(0)
@@ -28,17 +31,36 @@ public class BekreftedeAksjonspunkterDto implements AbacDto {
     @Valid
     private Collection<BekreftetAksjonspunktDto> bekreftedeAksjonspunktDtoer;
 
-    public static BekreftedeAksjonspunkterDto lagDto(Long behandlingId, Long behandlingVersjon,
+    public static BekreftedeAksjonspunkterDto lagDto(Long behandlingId,
+                                                     Long behandlingVersjon,
                                                      Collection<BekreftetAksjonspunktDto> bekreftedeAksjonspunktDtoer) {
         BekreftedeAksjonspunkterDto dto = new BekreftedeAksjonspunkterDto();
-        dto.behandlingId = new BehandlingIdDto(behandlingId);
+        dto.behandlingReferanse = new BehandlingReferanse(behandlingId);
         dto.behandlingVersjon = behandlingVersjon;
         dto.bekreftedeAksjonspunktDtoer = bekreftedeAksjonspunktDtoer;
         return dto;
     }
 
-    public BehandlingIdDto getBehandlingId() {
-        return behandlingId;
+    @JsonIgnore
+    public void setBehandlingReferanse(BehandlingReferanse behandlingReferanse) {
+        this.behandlingReferanse = behandlingReferanse;
+    }
+
+    // TODO: K9-tilbake. fjern når endringen er merget og prodsatt også i fpsak-frontend
+    @JsonSetter("behandlingId")
+    @JsonProperty(value = "behandlingReferanse")
+    public void setBehandlingId(BehandlingReferanse behandlingReferanse) {
+        this.behandlingReferanse = behandlingReferanse;
+    }
+
+    @JsonSetter("uuid")
+    @JsonProperty(value = "behandlingReferanse")
+    public void setBehandlingUuid(BehandlingReferanse behandlingReferanse) {
+        this.behandlingReferanse = behandlingReferanse;
+    }
+
+    public BehandlingReferanse getBehandlingReferanse() {
+        return behandlingReferanse;
     }
 
     public Long getBehandlingVersjon() {
@@ -51,8 +73,8 @@ public class BekreftedeAksjonspunkterDto implements AbacDto {
 
     @Override
     public AbacDataAttributter abacAttributter() {
-        AbacDataAttributter abac = AbacDataAttributter.opprett().leggTil(
-            StandardAbacAttributtType.BEHANDLING_ID, getBehandlingId().getBehandlingId());
+        AbacDataAttributter abac = AbacDataAttributter.opprett()
+            .leggTil(behandlingReferanse.abacAttributter());
         bekreftedeAksjonspunktDtoer.forEach(apDto -> abac.leggTil(apDto.abacAttributter()));
         return abac;
     }

@@ -33,6 +33,8 @@ public interface BehandlingTjeneste {
 
     Behandling hentBehandling(UUID behandlingUUId);
 
+    Long hentBehandlingId(UUID behandlingUUId);
+
     boolean erBehandlingHenlagt(Behandling behandling);
 
     boolean kanOppretteBehandling(Saksnummer saksnummer, UUID eksternUuid);

@@ -76,9 +76,18 @@ public class HenleggelsesbrevTjeneste {
         return Optional.ofNullable(dokumentreferanse);
     }
 
+    public byte[] hentForhåndsvisningHenleggelsebrev(UUID behandlingUuid) {
+        Behandling behandling = behandlingRepository.hentBehandling(behandlingUuid);
+        return hentForhåndsvisningHenleggelsebrev(behandling);
+    }
+
     public byte[] hentForhåndsvisningHenleggelsebrev(Long behandlingId) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-        boolean finnesVerge = vergeRepository.finnesVerge(behandlingId);
+        return hentForhåndsvisningHenleggelsebrev(behandling);
+    }
+
+    private byte[] hentForhåndsvisningHenleggelsebrev(Behandling behandling) {
+        boolean finnesVerge = vergeRepository.finnesVerge(behandling.getId());
         BrevMottaker brevMottaker = finnesVerge ? BrevMottaker.VERGE : BrevMottaker.BRUKER;
         HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = lagHenleggelsebrevForSending(behandling, brevMottaker);
         FritekstbrevData fritekstbrevData = lagHenleggelsebrev(henleggelsesbrevSamletInfo);
