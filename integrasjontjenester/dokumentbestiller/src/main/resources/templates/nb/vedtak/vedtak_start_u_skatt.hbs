@@ -15,7 +15,6 @@ Vi varslet deg {{varsel.varslet-dato}} om at du har fått {{kroner varsel.varsle
 Vi varslet deg {{varsel.varslet-dato}} om at du har fått {{kroner varsel.varslet-beløp}} for mye. Vi har behandlet saken din og du må ikke betale tilbake det feilutbetalte beløpet.
     {{/case}}
     {{/switch}}
-
 {{else}}
 {{~#* inline "brev-ytelse-endret" ~}}I brev {{sak.dato-fagsakvedtak}} fikk du melding om at {{>ytelse-produkt}} {{#if (eq sak.ytelsetype "ES")}}din{{else}}dine{{/if}} er endret. Endringen gjorde at du har fått utbetalt for mye.{{~/inline~}}
     {{#switch totalresultat.hovedresultat}}
@@ -29,9 +28,8 @@ Vi varslet deg {{varsel.varslet-dato}} om at du har fått {{kroner varsel.varsle
 {{>brev-ytelse-endret}} Du må ikke betale tilbake det du har fått for mye.
     {{/case}}
     {{/switch}}
-
 {{/if}}
 {{#if fritekst-oppsummering}}
-{{{fritekst-oppsummering}}}
 
+{{{fritekst-oppsummering}}}
 {{/if}}

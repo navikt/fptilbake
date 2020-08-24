@@ -368,6 +368,9 @@ public class VedtaksbrevTjeneste {
     private Tillegsinformasjon[] ønsketTillegsinformasjon(Behandling behandling) {
         List<Tillegsinformasjon> tillegsinformasjons = new ArrayList<>();
         tillegsinformasjons.add(Tillegsinformasjon.PERSONOPPLYSNINGER);
+
+        // Kan ikke hente søknadsinformasjon for FRISINN-behandlinger. Er ikke nødvendigvis en 1-til-1-mapping mellom behandling
+        // og søknad for FRISINN i k9-sak. Kan risikere exception i k9-sak og/eller exception i k9-tilbake
         if (!erFrisinn(behandling)) {
             tillegsinformasjons.add(Tillegsinformasjon.SØKNAD);
         }
