@@ -1,0 +1,123 @@
+{{#* inline "es-fakta-medlemskap"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "IKKE_BOSATT"}}
+Du var ikkje medlem av folketrygda {{> familie-hendelse}}, fordi du har opphalde deg så mykje i utlandet at du blir rekna som ikkje busett i Noreg, og du er heller ikkje arbeidstakar i Noreg. Derfor har du ikkje rett til {{> ytelse-navn}}.
+        {{/case}}
+        {{#case "MEDLEM_I_ANNET_LAND"}}
+Du var ikkje medlem av folketrygda {{> familie-hendelse}}, fordi du var omfatta av trygdeordninga i eit anna land. Derfor har du ikkje rett til {{> ytelse-navn}}.
+        {{/case}}
+        {{#case "IKKE_LOVLIG_OPPHOLD"}}
+Du var ikkje medlem av folketrygda {{> familie-hendelse}}, fordi du ikkje hadde opphaldsløyve i Noreg. Derfor har du ikkje rett til {{> ytelse-navn}}.
+        {{/case}}
+        {{#case "IKKE_OPPHOLDSRETT_EØS"}}
+Du var ikkje medlem av folketrygda {{> familie-hendelse}}. Fordi du ikkje har jobba eller hatt familie som forsørgde deg i Noreg, har du ikkje rett til opphald etter EØS avtalen. Derfor har du ikkje rett til {{> ytelse-navn}}.
+        {{/case}}
+        {{#case "UTVANDRET"}}
+Du var ikkje medlem av folketrygda {{> familie-hendelse}}, fordi du ikkje lenger var busett i eller arbeidstakar i Noreg. Derfor har du ikkje rett til {{> ytelse-navn}}.
+        {{/case}}
+    {{/switch}}
+
+Du har fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt.
+{{/inline}}
+{{#switch fakta.hendelsetype}}
+{{#case "MEDLEMSKAP"}}
+    {{> es-fakta-medlemskap}}
+{{/case}}
+{{#case "ES_FORELDREANSVAR_TYPE"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "ES_IKKE_MINDRE_SAMVAER"}}
+Du har berre rett til eingongsstønad dersom du har hatt eit samvær med {{> barnet}} før du overtok omsorga som er mindre enn éin dag i veka og annakvar helg. Du har hatt meir samvær med {{> barnet}} enn dette. Derfor har du ikkje rett til eingongsstønad.
+        {{/case}}
+        {{#case "ES_ANDRE_FORELDRE_DODD"}}
+Du har berre rett til eingongsstønad dersom du har foreldreansvaret. Fordi du ikkje har foreldreansvaret for {{> barnet}}, har du ikkje rett til eingongsstønad.
+        {{/case}}
+        {{#case "ES_FORELDREANSVAR_BARN_OVER_15"}}
+Du har berre rett til eingongsstønad når {{> barnet}} er under 15 år når du overtek omsorga. Fordi {{> barnet}} var fylt 15 år då du overtok omsorga, har du ikkje rett til eingongsstønad.
+        {{/case}}
+        {{#case "ES_IKKE_TILDELT"}}
+Du har berre rett til eingongsstønad dersom du har foreldreansvaret. Fordi du ikkje har foreldreansvaret for {{> barnet}}, har du ikkje rett til eingongsstønad.
+        {{/case}}
+    {{/switch}}
+
+Du har fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt.
+{{/case}}
+{{#case "ES_FEIL_UTBETALING_TYPE"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "ES_STONAD_FLERE_GANGER"}}
+Du har berre rett til éin eingongsstønad per barn. Fordi du har fått utbetalt eingongsstønad fleire gonger for {{> det-samme-barnet}}, har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt.
+        {{/case}}
+        {{#case "ØKONOMI_UTBETALT_FOR_MYE"}}
+Vi har gjort ein feil og betalt ut for mykje i eingongsstønad. Du skulle ha hatt {{kroner kravgrunnlag.riktig-beløp}}, men du fekk {{kroner kravgrunnlag.utbetalt-beløp}}. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt.
+        {{/case}}
+    {{/switch}}
+{{/case}}
+{{#case "ES_OMSORGSVILKAAR_TYPE"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "ES_FAR_IKKE_OMSORG"}}
+Du har berre rett til eingongsstønad dersom du har omsorga for {{> barnet}}. Fordi du ikkje har omsorga for {{> barnet}}, har du ikkje rett til eingongsstønad.
+
+Du har fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt.
+        {{/case}}
+        {{#case "ES_STONADEN_ALLEREDE_UTBETALT"}}
+Du har fått utbetalt eingongsstønad. Du har berre rett til eingongsstønad dersom han ikkje allereie er utbetalt til mor. Mor har fått utbetalt stønaden, og du har derfor fått for mykje utbetalt.
+        {{/case}}
+    {{/switch}}
+{{/case}}
+{{#case "ES_ADOPSJONSVILKAARET_TYPE"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "ES_STEBARN"}}
+Du har ikkje rett til eingongsstønad når du adopterer {{> barnet}} til {{#if søker.er-gift}}ektefellen{{else if søker.er-partner}}partnaren{{else}}sambuaren{{/if}} din. Fordi du har adoptert {{#if søker.er-gift}}ektefellen{{else if søker.er-partner}}partnaren{{else}}sambuaren{{/if}} din {{> sitt-barn}}, har du ikkje rett til eingongsstønad.
+        {{/case}}
+        {{#case "ES_IKKE_OPPFYLT"}}
+Du fekk utbetalt eingongsstønad fordi du skulle adoptere {{> barnet}}. Vi har ikkje fått ei gyldig adopsjonsbevilgning. Derfor har du ikkje rett til eingongsstønad.
+        {{/case}}
+        {{#case "ES_MANN_IKKE_ALENE"}}
+Du har berre rett til eingongsstønad dersom du adopterer {{> barnet}} åleine. Fordi du ikkje har åleineomsorga for {{> barnet}}, har du ikkje rett til eingongsstønad.
+        {{/case}}
+        {{#case "ES_BARN_OVER_15"}}
+Du har berre rett til eingongsstønad når {{> barnet}} er under 15 år når du overtek omsorga. Fordi {{> barnet}} var fylt 15 år då du overtok omsorga, har du ikkje rett til eingongsstønad.
+        {{/case}}
+    {{/switch}}
+
+Du har fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt.
+{{/case}}
+{{#case "ES_FORELDREANSVAR_FAR_TYPE"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "ES_FAR_IKKE_ALENE"}}
+Du har berre rett til eingongsstønad når du skal overta foreldreansvaret for {{> barnet}} etter barnelova kapittel 5. Fordi det ikkje er dokumentert at du skal ha foreldreansvaret åleine for {{> barnet}}, har du ikkje rett til eingongsstønad.
+        {{/case}}
+        {{#case "ES_FAR_IKKE_INNEN_STONADSPERIODE"}}
+Du har berre rett til eingongsstønad når du overtek omsorga innan 56 veker etter {{eq sak.er-adopsjon yes="adopsjonen" no="fødselen"}}. Du overtok omsorga for {{> barnet}} seinare enn dette. Derfor har du ikkje rett til eingongsstønad.
+        {{/case}}
+    {{/switch}}
+
+Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt.
+{{/case}}
+{{#case "ES_RETT_PAA_FORELDREPENGER_TYPE"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "ES_BRUKER_RETT_FORELDREPENGER"}}
+Du fekk først utbetalt eingongsstønad, men har i ettertid fått innvilga foreldrepengar.
+
+Du har ikkje rett til både eingongsstønad og foreldrepengar. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i eingongsstønad.
+        {{/case}}
+    {{/switch}}
+{{/case}}
+{{#case "ES_ANNET_TYPE"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "ANNET_FRITEKST"}}
+        {{/case}}
+    {{/switch}}
+{{/case}}
+{{#case "ES_FODSELSVILKAARET_TYPE"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "ES_BARN_IKKE_REGISTRERT"}}
+Du har berre rett til eingongsstønad dersom du føder eller adopterer barn. Vi har ikkje opplysningar som dokumenterer at du har fått eller adoptert barn. Derfor har du ikkje rett til eingongsstønad.
+
+Du har fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt.
+        {{/case}}
+        {{#case "ES_MOTTAKER_FAR_MEDMOR"}}
+Du har ikkje rett til eingongsstønad i denne perioden. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt.
+        {{/case}}
+    {{/switch}}
+{{/case}}
+{{/switch}}

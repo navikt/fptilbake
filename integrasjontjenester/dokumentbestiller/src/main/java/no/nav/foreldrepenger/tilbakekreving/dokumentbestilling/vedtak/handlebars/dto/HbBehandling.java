@@ -1,12 +1,12 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.LocalDateTilLangtNorskFormatSerialiserer;
-import no.nav.vedtak.util.Objects;
 
 public class HbBehandling {
 
@@ -42,7 +42,7 @@ public class HbBehandling {
 
         public HbBehandling build() {
             if (kladd.erRevurdering) {
-                Objects.check(kladd.originalBehandlingDatoFagsakvedtak != null, "vedtaksdato for original behandling er ikke satt");
+                Objects.requireNonNull(kladd.originalBehandlingDatoFagsakvedtak, "vedtaksdato for original behandling er ikke satt");
             }
             return kladd;
         }

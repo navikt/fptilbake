@@ -1,8 +1,8 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Objects;
 
-import no.nav.vedtak.util.Objects;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class HbHjemmel {
 
@@ -32,7 +32,7 @@ public class HbHjemmel {
         }
 
         public HbHjemmel build() {
-            Objects.check(kladd.lovhjemmelVedtak != null, "lovhjemmelVedtak er ikke satt");
+            Objects.requireNonNull(kladd.lovhjemmelVedtak, "lovhjemmelVedtak er ikke satt");
             return kladd;
         }
     }

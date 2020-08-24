@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -98,6 +99,11 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
         return datoer != null ? datoer.getOpphørsdatoIkkeOmsorg() : null;
     }
 
+    @JsonProperty("skal-ikke-vise-skatt")
+    private boolean isSkalIkkeViseSkattInformasjon() {
+        return FagsakYtelseType.ENGANGSTØNAD.equals(sak.getYtelsetype()) || (FagsakYtelseType.FRISINN.equals(sak.getYtelsetype()) && !totalresultat.harSkattetrekk());
+    }
+
     public VedtakResultatType getHovedresultat() {
         return totalresultat.getHovedresultat();
     }
@@ -110,16 +116,16 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
         }
 
         public HbVedtaksbrevFelles build() {
-            java.util.Objects.requireNonNull(kladd.hjemmel, "hjemmel er ikke satt");
-            java.util.Objects.requireNonNull(kladd.søker, "søker er ikke satt");
-            java.util.Objects.requireNonNull(kladd.sak, "sak-informasjon er ikke satt");
-            java.util.Objects.requireNonNull(kladd.konfigurasjon, "konfigurasjon er ikke satt");
-            java.util.Objects.requireNonNull(kladd.totalresultat, "totalresultat er ikke satt");
-            if (kladd.varsel == null) {
-                java.util.Objects.requireNonNull(kladd.sak.harDatoForFagsakvedtak(), "dato for fagsakvedtak/revurdering er ikke satt");
+            Objects.requireNonNull(kladd.hjemmel, "hjemmel er ikke satt");
+            Objects.requireNonNull(kladd.søker, "søker er ikke satt");
+            Objects.requireNonNull(kladd.sak, "sak-informasjon er ikke satt");
+            Objects.requireNonNull(kladd.konfigurasjon, "konfigurasjon er ikke satt");
+            Objects.requireNonNull(kladd.totalresultat, "totalresultat er ikke satt");
+            if (kladd.varsel == null && !kladd.sak.harDatoForFagsakvedtak()) {
+                throw new IllegalArgumentException("dato for fagsakvedtak/revurdering er ikke satt");
             }
-            if(kladd.finnesVerge){
-                java.util.Objects.requireNonNull(kladd.annenMottakerNavn, "annenMottakerNavn kan ikke være null");
+            if (kladd.finnesVerge){
+                Objects.requireNonNull(kladd.annenMottakerNavn, "annenMottakerNavn kan ikke være null");
             }
             return kladd;
         }

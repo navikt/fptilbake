@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -8,7 +9,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.KodeverdiSomKodeSerialiserer;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.LocalDateTilLangtNorskFormatSerialiserer;
-import no.nav.vedtak.util.Objects;
 
 public class HbSak {
     @JsonProperty("ytelsetype")
@@ -68,9 +68,13 @@ public class HbSak {
         }
 
         public HbSak build() {
-            Objects.check(kladd.erAdopsjon != kladd.erFødsel, "En og bare en av fødsel og adopsjon skal være satt");
-            Objects.check(kladd.ytelsetype != null, "Ytelse type er ikke satt");
-            Objects.check(kladd.antallBarn != null, "antallBarn er ikke satt");
+            Objects.requireNonNull(kladd.ytelsetype, "Ytelse type er ikke satt");
+            if (!FagsakYtelseType.FRISINN.equals(kladd.ytelsetype)) {
+                Objects.requireNonNull(kladd.antallBarn, "antallBarn er ikke satt");
+                if (kladd.erAdopsjon == kladd.erFødsel) {
+                    throw new IllegalArgumentException("En og bare en av fødsel og adopsjon skal være satt");
+                }
+            }
             return kladd;
         }
     }

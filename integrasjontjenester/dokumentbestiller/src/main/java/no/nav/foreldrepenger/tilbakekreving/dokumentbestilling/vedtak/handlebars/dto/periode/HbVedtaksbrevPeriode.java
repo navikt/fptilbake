@@ -1,11 +1,12 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode;
 
+import java.util.Objects;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
-import no.nav.vedtak.util.Objects;
 
 public class HbVedtaksbrevPeriode {
 
@@ -86,14 +87,15 @@ public class HbVedtaksbrevPeriode {
         }
 
         public HbVedtaksbrevPeriode build() {
-            Objects.check(kladd.periode != null, "periode er ikke satt");
-            Objects.check(kladd.kravgrunnlag != null, "kravgrunnlag er ikke satt");
-            Objects.check(kladd.fakta != null, "fakta er ikke satt");
-            Objects.check(kladd.vurderinger != null, "vurderinger er ikke satt");
-            Objects.check(kladd.resultat != null, "resultat er ikke satt");
+            Objects.requireNonNull(kladd.periode, "periode er ikke satt");
+            Objects.requireNonNull(kladd.kravgrunnlag, "kravgrunnlag er ikke satt");
+            Objects.requireNonNull(kladd.fakta, "fakta er ikke satt");
+            Objects.requireNonNull(kladd.vurderinger, "vurderinger er ikke satt");
+            Objects.requireNonNull(kladd.resultat, "resultat er ikke satt");
 
-            if (HendelseType.ØKONOMI_FEIL.equals(kladd.fakta.getHendelsetype()) || HendelseType.ES_FEIL_UTBETALING_TYPE.equals(kladd.fakta.getHendelsetype())) {
-                Objects.check(kladd.kravgrunnlag.harRiktigOgUtbetaltBeløp(), "har ikke satt riktig beløp og/eller utbetalt beløp");
+            if ((HendelseType.ØKONOMI_FEIL.equals(kladd.fakta.getHendelsetype()) || HendelseType.ES_FEIL_UTBETALING_TYPE.equals(kladd.fakta.getHendelsetype()))
+                && !kladd.kravgrunnlag.harRiktigOgUtbetaltBeløp()) {
+                throw new IllegalArgumentException("har ikke satt riktig beløp og/eller utbetalt beløp");
             }
 
             return kladd;

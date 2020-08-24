@@ -1,12 +1,12 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.BigDecimalHeltallSerialiserer;
-import no.nav.vedtak.util.Objects;
 
 public class HbResultat {
 
@@ -59,9 +59,9 @@ public class HbResultat {
         }
 
         public HbResultat build() {
-            Objects.check(kladd.tilbakekrevesBeløp != null, "tilbakekrevesbeløp er ikke satt");
-            Objects.check(kladd.renterBeløp != null, "renter er ikke satt");
-            Objects.check(nettoBeløp != null, "nettobeløp er ikke satt");
+            Objects.requireNonNull(kladd.tilbakekrevesBeløp, "tilbakekrevesbeløp er ikke satt");
+            Objects.requireNonNull(kladd.renterBeløp, "renter er ikke satt");
+            Objects.requireNonNull(nettoBeløp, "nettobeløp er ikke satt");
             kladd.tilbakekrevesBeløpMedRenter = kladd.tilbakekrevesBeløp.add(kladd.renterBeløp);
             kladd.tilbakekrevesBeløpUtenSkattMedRenter = nettoBeløp;
             return kladd;

@@ -1,0 +1,40 @@
+{{#* inline "fakta-medlemskap"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "IKKE_BOSATT"}}
+Du er ikkje medlem av folketrygda fordi du har opphalde deg så mykje i utlandet at du ikkje blir rekna som busett i Noreg, og du er heller ikkje arbeidstaker i Noreg. Derfor har du ikkje rett til {{> ytelse-navn}}.
+        {{/case}}
+        {{#case "MEDLEM_I_ANNET_LAND"}}
+Du er ikkje medlem av folketrygda fordi du er omfatta av trygdeordninga i eit anna land. Derfor har du ikkje rett til {{> ytelse-navn}}.
+        {{/case}}
+        {{#case "IKKE_LOVLIG_OPPHOLD"}}
+Du er ikkje medlem av folketrygda fordi du ikkje har opphaldsløyve i Noreg. Derfor har du ikkje rett til {{> ytelse-navn}}.
+        {{/case}}
+        {{#case "IKKE_OPPHOLDSRETT_EØS"}}
+Du er ikkje medlem av folketrygda. Fordi du ikkje har jobba eller hatt familie som forsørgde deg i Noreg, har du ikkje rett til opphald etter EØS avtalen. Derfor har du ikkje rett til {{> ytelse-navn}}.
+        {{/case}}
+        {{#case "UTVANDRET"}}
+Du er ikkje medlem av folketrygda fordi du har flytta frå Noreg og heller ikkje blir rekna som arbeidstakar i Noreg. Derfor har du ikkje rett til {{> ytelse-navn}}.
+        {{/case}}
+    {{/switch}}
+
+Du har fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt.
+{{/inline}}
+{{#* inline "fakta-økonomi-feil"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "OKONOMI_DOBBELUTBETALING"}}
+Vi har gjort ein feil og betalt ut {{> ytelse-navn}} to gonger i denne perioden. Du skulle ha hatt {{kroner kravgrunnlag.riktig-beløp}}, men du fekk {{kroner kravgrunnlag.utbetalt-beløp}}. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt.
+        {{/case}}
+        {{#case "OKONOMI_UTBETALT"}}
+Vi har gjort ein feil og betalt ut for mykje i {{> ytelse-navn}} i denne perioden. Du skulle ha hatt {{kroner kravgrunnlag.riktig-beløp}}, men du fekk {{kroner kravgrunnlag.utbetalt-beløp}}. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt.
+        {{/case}}
+        {{#case "OKONOMI_FEIL_TREKK"}}
+I denne perioden har vi ikkje trekt frå heile skattetrekket på beløpet vi har betalt ut. Du skulle ha fått {{kroner kravgrunnlag.riktig-beløp}}, men du fekk {{kroner kravgrunnlag.utbetalt-beløp}}. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt.
+        {{/case}}
+        {{#case "OKONOMI_FEIL_FERIEPENGER"}}
+I denne perioden har vi betalt ut for mykje i feriepengar. Du skulle ha fått {{kroner kravgrunnlag.riktig-beløp}}, men du fekk {{kroner kravgrunnlag.utbetalt-beløp}}. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt.
+        {{/case}}
+    {{/switch}}
+{{/inline}}
+{{#* inline "fakta-arbeidsgiver-refusjon"}}
+I denne perioden har du fått både utbetalt {{> ytelse-navn}} frå oss og lønn frå arbeidsgivaren. Det er arbeidsgivaren din som har rett til {{> ytelse-produkt}} fordi dei betaler ut full lønn til deg i den same perioden. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt.
+{{/inline}}

@@ -1,0 +1,90 @@
+{{> nn/vedtak/periode-fakta/periode_fakta_felles_fp_svp}}
+{{#* inline "tilrettelegging-mulig"}}
+Arbeidsgivaren kunne tilpasse eller endre arbeidsoppgåvene dine utan at det var fare for å skade barnet du ventar. Du har berre rett til svangerskapspengar om du må slutte å jobbe. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
+{{/inline}}
+{{#switch fakta.hendelsetype}}
+{{#case "MEDLEMSKAP"}}
+    {{> fakta-medlemskap}}
+{{/case}}
+{{#case "OKONOMI_FEIL"}}
+    {{> fakta-økonomi-feil}}
+{{/case}}
+{{#case "SVP_BEREGNING_TYPE"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "SVP_ENDRING_GRUNNLAG"}}
+Vi har endra berekninga av {{> ytelse-produkt}} dine. Du har derfor fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
+        {{/case}}
+    {{/switch}}
+{{/case}}
+{{#case "SVP_UTTAK_TYPE"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "SVP_ENDRING_PROSENT"}}
+Du har jobba samtidig som at du har fått utbetalt svangerskapspengar. Fordi du har fått endra det du tek ut i svangerskapspengar i denne perioden, er delar av beløpet du har fått utbetalt feil. Du har derfor fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
+        {{/case}}
+        {{#case "SVP_ENDRING_PERIODE"}}
+Du fekk innvilga svangerskapspengar i denne perioden. I etterkant er perioden blitt endra og du har derfor fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt.
+        {{/case}}
+    {{/switch}}
+{{/case}}
+{{#case "SVP_ARBEIDSGIVERS_FORHOLD_TYPE"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "SVP_TILRETTELEGGING_DELVIS_MULIG"}}
+{{> tilrettelegging-mulig}}
+        {{/case}}
+        {{#case "SVP_TILRETTELEGGING_FULLT_MULIG"}}
+{{> tilrettelegging-mulig}}
+        {{/case}}
+    {{/switch}}
+{{/case}}
+{{#case "SVP_FAKTA_TYPE"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "SVP_ENDRING_TERMINDATO"}}
+Du fekk utbetalt svangerskapspengar då det var mindre enn tre veker til termin. Vi kan berre gi svangerskapspengar fram til tre veker før du har termin. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
+        {{/case}}
+        {{#case "SVP_IKKE_HELSEFARLIG"}}
+Du kunne utføre arbeidsoppgåver utan at det var fare for å skade barnet du ventar. Du hadde derfor ikkje rett til svangerskapspengar og har fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
+        {{/case}}
+        {{#case "SVP_TIDLIG_FODSEL"}}
+Du fekk innvilga svangerskapspengar i denne perioden. Du kan berre få svangerskapspengar fram til barnet er født. Fordi du fødde før termin, har du fått utbetalt fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje.
+        {{/case}}
+    {{/switch}}
+{{/case}}
+{{#case "SVP_OPPTJENING_TYPE"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "SVP_IKKE_ARBEID"}}
+Du har ikkje hatt arbeidsinntekt eller inntekt som er likestilt med lønn i minst fire veker før du må slutte å jobbe. Derfor har du ikkje rett til svangerskapspengar.
+
+Du har fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
+        {{/case}}
+        {{#case "SVP_INNTEKT_UNDER"}}
+Du har berre rett til {{> ytelse-navn}} dersom du har tent meir enn {{kroner konfigurasjon.halvt-grunnbeløp}} i året{{> før-skatt}}. Inntekta di var lågare enn {{kroner konfigurasjon.halvt-grunnbeløp}} i året{{> før-skatt}}. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
+        {{/case}}
+        {{#case "SVP_INNTEKT_IKKE_TAP"}}
+Du har ikkje hatt arbeidsinntekt eller inntekt som er likestilt med lønn. Derfor har du ikkje rett til svangerskapspengar.
+        {{/case}}
+    {{/switch}}
+{{/case}}
+{{#case "OPPHØR"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "MOTTAKER_DØD"}}
+Vi har fått melding om at {{søker.navn}} døydde. Svangerskapspengane skulle ha vore stansa frå og med {{opphørsdato-død-søker}}.
+
+Fordi svangerskapspengane er blitt utbetalt frå denne datoen, er det utbetalt {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje.
+        {{/case}}
+        {{#case "MOTTAKER_IKKE_GRAVID"}}
+Vi har fått melding om at du ikkje lenger er gravid. Svangerskapspengane skulle ha vore stansa frå og med {{opphørsdato-ikke-gravid}}.
+
+Fordi svangerskapspengane er blitt utbetalt frå denne datoen, har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt.
+        {{/case}}
+    {{/switch}}
+{{/case}}
+{{#case "SVP_ANNET_TYPE"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "REFUSJON_ARBGIVER"}}
+{{> fakta-arbeidsgiver-refusjon}}
+        {{/case}}
+        {{#case "ANNET_FRITEKST"}}
+        {{/case}}
+    {{/switch}}
+{{/case}}
+{{/switch}}

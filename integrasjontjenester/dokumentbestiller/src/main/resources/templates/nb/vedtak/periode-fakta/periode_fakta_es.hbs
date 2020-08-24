@@ -1,0 +1,123 @@
+{{#* inline "es-fakta-medlemskap"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "IKKE_BOSATT"}}
+Du var ikke medlem av folketrygden {{> familie-hendelse}}, fordi du har oppholdt deg så mye i utlandet at du anses ikke som bosatt i Norge, og du er heller ikke arbeidstaker i Norge. Derfor har du ikke rett til {{> ytelse-navn}}.
+        {{/case}}
+        {{#case "MEDLEM_I_ANNET_LAND"}}
+Du var ikke medlem av folketrygden {{> familie-hendelse}}, fordi du var omfattet av trygdeordningen i et annet land. Derfor har du ikke rett til {{> ytelse-navn}}.
+        {{/case}}
+        {{#case "IKKE_LOVLIG_OPPHOLD"}}
+Du var ikke medlem av folketrygden {{> familie-hendelse}}, fordi du ikke hadde oppholdstillatelse. Derfor har du ikke rett til {{> ytelse-navn}}.
+        {{/case}}
+        {{#case "IKKE_OPPHOLDSRETT_EØS"}}
+Du var ikke medlem av folketrygden {{> familie-hendelse}}. Fordi du ikke har jobbet eller hatt familie som forsørget deg i Norge, har du ikke rett til opphold etter EØS avtalen. Derfor har du ikke rett til {{> ytelse-navn}}.
+        {{/case}}
+        {{#case "UTVANDRET"}}
+Du var ikke medlem av folketrygden {{> familie-hendelse}}, fordi du ikke lenger var bosatt eller arbeidstaker i Norge. Derfor har du ikke rett til {{> ytelse-navn}}.
+        {{/case}}
+    {{/switch}}
+
+Du har fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt.
+{{/inline}}
+{{#switch fakta.hendelsetype}}
+{{#case "MEDLEMSKAP"}}
+    {{> es-fakta-medlemskap}}
+{{/case}}
+{{#case "ES_FORELDREANSVAR_TYPE"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "ES_IKKE_MINDRE_SAMVAER"}}
+Du har kun rett til engangsstønad hvis du har hatt et samvær med {{> barnet}} før du overtok omsorgen som er mindre enn én dag i uken og annenhver helg. Du har hatt mer samvær med {{> barnet}} enn dette. Derfor har du ikke rett til engangsstønad.
+        {{/case}}
+        {{#case "ES_ANDRE_FORELDRE_DODD"}}
+Du har kun rett til engangsstønad hvis du har foreldreansvaret. Fordi du ikke har foreldreansvaret for {{> barnet}}, har du ikke rett til engangsstønad.
+        {{/case}}
+        {{#case "ES_FORELDREANSVAR_BARN_OVER_15"}}
+Du har kun rett til engangsstønad når {{> barnet}} er under 15 år når du overtar omsorgen. Fordi {{> barnet}} var fylt 15 år da du overtok omsorgen, har du ikke rett til engangsstønad.
+        {{/case}}
+        {{#case "ES_IKKE_TILDELT"}}
+Du har kun rett til engangsstønad hvis du har foreldreansvaret. Fordi du ikke har foreldreansvaret for {{> barnet}}, har du ikke rett til engangsstønad.
+        {{/case}}
+    {{/switch}}
+
+Du har fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt.
+{{/case}}
+{{#case "ES_FEIL_UTBETALING_TYPE"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "ES_STONAD_FLERE_GANGER"}}
+Du har kun rett til én engangsstønad per barn. Fordi du har fått utbetalt engangsstønad flere ganger for {{> det-samme-barnet}}, har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt.
+        {{/case}}
+        {{#case "ØKONOMI_UTBETALT_FOR_MYE"}}
+Vi har gjort en feil og utbetalt for mye i engangsstønad. Du skulle hatt {{kroner kravgrunnlag.riktig-beløp}}, men du fikk {{kroner kravgrunnlag.utbetalt-beløp}}. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt.
+        {{/case}}
+    {{/switch}}
+{{/case}}
+{{#case "ES_OMSORGSVILKAAR_TYPE"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "ES_FAR_IKKE_OMSORG"}}
+Du har kun rett til engangsstønad dersom du har omsorgen for {{> barnet}}. Fordi du ikke har omsorgen for {{> barnet}}, har du ikke rett til engangsstønad.
+
+Du har fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt.
+        {{/case}}
+        {{#case "ES_STONADEN_ALLEREDE_UTBETALT"}}
+Du har fått utbetalt engangsstønad. Du har kun rett til engangsstønad hvis den ikke allerede er utbetalt til mor. Mor har fått utbetalt stønaden, og du har derfor fått for mye utbetalt.
+        {{/case}}
+    {{/switch}}
+{{/case}}
+{{#case "ES_ADOPSJONSVILKAARET_TYPE"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "ES_STEBARN"}}
+Du har ikke rett til engangsstønad når du adopterer {{> barnet}} til {{#if søker.er-gift}}ektefellen{{else if søker.er-partner}}partneren{{else}}samboeren{{/if}} din. Fordi du har adoptert {{#if søker.er-gift}}ektefellen{{else if søker.er-partner}}partneren{{else}}samboeren{{/if}} din {{> sitt-barn}}, har du ikke rett til engangsstønad.
+        {{/case}}
+        {{#case "ES_IKKE_OPPFYLT"}}
+Du fikk utbetalt engangsstønad fordi du skulle adoptere {{> barnet}}. Vi har ikke mottatt en gyldig adopsjonsbevilgning. Derfor har du ikke rett til engangsstønad.
+        {{/case}}
+        {{#case "ES_MANN_IKKE_ALENE"}}
+Du har kun rett til engangsstønad dersom du adopterer {{> barnet}} alene. Fordi du ikke har aleneomsorgen for {{> barnet}}, har du ikke rett til engangsstønad.
+        {{/case}}
+        {{#case "ES_BARN_OVER_15"}}
+Du har kun rett til engangsstønad når {{> barnet}} er under 15 år når du overtar omsorgen. Fordi {{> barnet}} var fylt 15 år da du overtok omsorgen, har du ikke rett til engangsstønad.
+        {{/case}}
+    {{/switch}}
+
+Du har fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt.
+{{/case}}
+{{#case "ES_FORELDREANSVAR_FAR_TYPE"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "ES_FAR_IKKE_ALENE"}}
+Du har kun rett til engangsstønad når du skal overta foreldreansvaret for {{> barnet}} etter barneloven kapittel 5. Fordi det ikke er dokumentert at du skal ha foreldreansvaret alene for {{> barnet}}, har du ikke rett til engangsstønad.
+        {{/case}}
+        {{#case "ES_FAR_IKKE_INNEN_STONADSPERIODE"}}
+Du har kun rett til engangsstønad når du overtar omsorgen innen 56 uker etter {{eq sak.er-adopsjon yes="adopsjonen" no="fødselen"}}. Du overtok omsorgen for {{> barnet}} senere enn dette. Derfor har du ikke rett til engangsstønad.
+        {{/case}}
+    {{/switch}}
+
+Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt.
+{{/case}}
+{{#case "ES_RETT_PAA_FORELDREPENGER_TYPE"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "ES_BRUKER_RETT_FORELDREPENGER"}}
+Du fikk først utbetalt engangsstønad, men har i ettertid fått innvilget foreldrepenger.
+
+Du har ikke rett til både engangsstønad og foreldrepenger. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i engangsstønad.
+        {{/case}}
+    {{/switch}}
+{{/case}}
+{{#case "ES_ANNET_TYPE"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "ANNET_FRITEKST"}}
+        {{/case}}
+    {{/switch}}
+{{/case}}
+{{#case "ES_FODSELSVILKAARET_TYPE"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "ES_BARN_IKKE_REGISTRERT"}}
+Du har kun rett til engangsstønad hvis du føder eller adopterer barn. Vi har ikke opplysninger som dokumenterer at du har født eller adoptert barn. Derfor har du ikke rett til engangsstønad.
+
+Du har fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt.
+        {{/case}}
+        {{#case "ES_MOTTAKER_FAR_MEDMOR"}}
+Du har ikke rett til engangsstønad i denne perioden. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt.
+        {{/case}}
+    {{/switch}}
+{{/case}}
+{{/switch}}

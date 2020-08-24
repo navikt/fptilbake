@@ -1,0 +1,90 @@
+{{> nb/vedtak/periode-fakta/periode_fakta_felles_fp_svp}}
+{{#* inline "tilrettelegging-mulig"}}
+Arbeidsgiver kunne tilpasse eller endre arbeidsoppgavene dine uten at det var fare for å skade barnet du venter. Du har kun rett til svangerskapspenger om du må slutte å jobbe. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
+{{/inline}}
+{{#switch fakta.hendelsetype}}
+{{#case "MEDLEMSKAP"}}
+    {{> fakta-medlemskap}}
+{{/case}}
+{{#case "OKONOMI_FEIL"}}
+    {{> fakta-økonomi-feil}}
+{{/case}}
+{{#case "SVP_BEREGNING_TYPE"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "SVP_ENDRING_GRUNNLAG"}}
+Vi har endret beregningen av {{> ytelse-produkt}} dine. Du har derfor fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
+        {{/case}}
+    {{/switch}}
+{{/case}}
+{{#case "SVP_UTTAK_TYPE"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "SVP_ENDRING_PROSENT"}}
+Du har jobbet samtidig som at du har fått utbetalt svangerskapspenger. Fordi du har fått endret det du tar ut i svangerskapspenger i denne perioden, er deler av beløpet du har fått utbetalt feil. Du har derfor fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
+        {{/case}}
+        {{#case "SVP_ENDRING_PERIODE"}}
+Du fikk innvilget svangerskapspenger i denne perioden. I etterkant er perioden blitt endret og du har derfor fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt.
+        {{/case}}
+    {{/switch}}
+{{/case}}
+{{#case "SVP_ARBEIDSGIVERS_FORHOLD_TYPE"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "SVP_TILRETTELEGGING_DELVIS_MULIG"}}
+{{> tilrettelegging-mulig}}
+        {{/case}}
+        {{#case "SVP_TILRETTELEGGING_FULLT_MULIG"}}
+{{> tilrettelegging-mulig}}
+        {{/case}}
+    {{/switch}}
+{{/case}}
+{{#case "SVP_FAKTA_TYPE"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "SVP_ENDRING_TERMINDATO"}}
+Du fikk utbetalt svangerskapspenger når det var mindre enn tre uker til termin. Svangerskapspenger kan kun gis frem til tre uker før du har termin. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
+        {{/case}}
+        {{#case "SVP_IKKE_HELSEFARLIG"}}
+Du kunne utføre arbeidsoppgaver uten at det var fare for å skade barnet du venter. Du hadde derfor ikke rett til svangerskapspenger og har fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
+        {{/case}}
+        {{#case "SVP_TIDLIG_FODSEL"}}
+Du fikk innvilget svangerskapspenger i denne perioden. Du kan kun få svangerskapspenger fram til barnet er født. Fordi du fødte før termin har du fått utbetalt fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye.
+        {{/case}}
+    {{/switch}}
+{{/case}}
+{{#case "SVP_OPPTJENING_TYPE"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "SVP_IKKE_ARBEID"}}
+Du har ikke hatt arbeidsinntekt eller inntekt som er likestilt med lønn i minst fire uker før du må slutte å jobbe. Derfor har du ikke rett til svangerskapspenger.
+
+Du har fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
+        {{/case}}
+        {{#case "SVP_INNTEKT_UNDER"}}
+Du har kun rett til {{> ytelse-navn}} dersom du har tjent mer enn {{kroner konfigurasjon.halvt-grunnbeløp}} i året{{> før-skatt}}. Inntekten din var lavere enn {{kroner konfigurasjon.halvt-grunnbeløp}} i året{{> før-skatt}}. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt i denne perioden.
+        {{/case}}
+        {{#case "SVP_INNTEKT_IKKE_TAP"}}
+Du har ikke hatt arbeidsinntekt eller inntekt som er likestilt med lønn. Derfor har du ikke rett til svangerskapspenger.
+        {{/case}}
+    {{/switch}}
+{{/case}}
+{{#case "OPPHØR"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "MOTTAKER_DØD"}}
+Vi har fått melding om at {{søker.navn}} døde. Svangerskapspengene skulle vært stanset fra og med {{opphørsdato-død-søker}}.
+
+Fordi svangerskapspengene er blitt utbetalt fra denne datoen, er det utbetalt {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye.
+        {{/case}}
+        {{#case "MOTTAKER_IKKE_GRAVID"}}
+Vi har fått melding om at du ikke lenger er gravid. Svangerskapspengene skulle vært stanset fra og med {{opphørsdato-ikke-gravid}}.
+
+Fordi svangerskapspengene er blitt utbetalt fra denne datoen, har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt.
+        {{/case}}
+    {{/switch}}
+{{/case}}
+{{#case "SVP_ANNET_TYPE"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "REFUSJON_ARBGIVER"}}
+{{> fakta-arbeidsgiver-refusjon}}
+        {{/case}}
+        {{#case "ANNET_FRITEKST"}}
+        {{/case}}
+    {{/switch}}
+{{/case}}
+{{/switch}}

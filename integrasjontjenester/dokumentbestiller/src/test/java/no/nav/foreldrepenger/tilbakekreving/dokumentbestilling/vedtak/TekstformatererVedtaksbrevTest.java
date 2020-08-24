@@ -16,6 +16,7 @@ import org.junit.Test;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.EsHendelseUnderTyper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.FellesUndertyper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.FpHendelseUnderTyper;
@@ -36,6 +37,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevDatoer;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevFelles;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbFakta;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbKravgrunnlag;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbResultat;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbResultatTestBuilder;
@@ -341,6 +343,53 @@ public class TekstformatererVedtaksbrevTest {
 
         String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
         String fasit = les("/vedtaksbrev/SVP_forsett.txt");
+        assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
+    }
+
+    @Test
+    public void skal_generere_vedtaksbrev_for_FRISINN_og_forsett() throws Exception {
+        HbVedtaksbrevFelles vedtaksbrevData = lagTestBuilder()
+            .medSak(HbSak.build()
+                .medYtelsetype(FagsakYtelseType.FRISINN)
+                .build())
+            .medVedtakResultat(HbTotalresultat.builder()
+                .medHovedresultat(VedtakResultatType.FULL_TILBAKEBETALING)
+                .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(10000))
+                .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(10000))
+                .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.valueOf(10000))
+                .medTotaltRentebeløp(BigDecimal.valueOf(0))
+                .build())
+            .medLovhjemmelVedtak("Folketrygdloven § 22-15")
+            .medVarsel(HbVarsel.builder()
+                .medVarsletBeløp(BigDecimal.valueOf(10000))
+                .medVarsletDato(LocalDate.of(2020, 4, 4))
+                .build())
+            .medKonfigurasjon(HbKonfigurasjon.builder()
+                .medKlagefristUker(6)
+                .build())
+            .build();
+        List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
+            HbVedtaksbrevPeriode.builder()
+                .medPeriode(januar)
+                .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(10000)))
+                .medFakta(HbFakta.builder()
+                    .medHendelsetype(HendelseType.FRISINN_ANNET_TYPE)
+                    .medHendelseUndertype(HendelseUnderType.ANNET_FRITEKST)
+                    .medFritekstFakta("Dette er svindel!")
+                    .build())
+                .medVurderinger(HbVurderinger.builder()
+                    .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
+                    .medVilkårResultat(VilkårResultat.FORSTO_BURDE_FORSTÅTT)
+                    .medAktsomhetResultat(Aktsomhet.FORSETT)
+                    .build())
+                .medResultat(HbResultatTestBuilder.forTilbakekrevesBeløpOgRenter(10000, 0))
+                .build()
+        );
+
+        HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
+
+        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
+        String fasit = les("/vedtaksbrev/FRISINN_forsett.txt");
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 

@@ -1,12 +1,13 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode;
 
+import java.util.Objects;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.KodeverdiSomKodeSerialiserer;
-import no.nav.vedtak.util.Objects;
 
 public class HbFakta {
     @JsonProperty("hendelsetype")
@@ -60,8 +61,8 @@ public class HbFakta {
         }
 
         public HbFakta build() {
-            Objects.check(kladd.hendelsetype != null, "hendelsetype er ikke satt");
-            Objects.check(kladd.hendelseundertype != null, "hendelseundertype er ikke satt");
+            Objects.requireNonNull(kladd.hendelsetype, "hendelsetype er ikke satt");
+            Objects.requireNonNull(kladd.hendelseundertype, "hendelseundertype er ikke satt");
             return kladd;
         }
     }

@@ -1,0 +1,160 @@
+{{> nn/vedtak/periode-fakta/periode_fakta_felles_fp_svp}}
+{{#switch fakta.hendelsetype}}
+{{#case "MEDLEMSKAP"}}
+    {{> fakta-medlemskap}}
+{{/case}}
+{{#case "OKONOMI_FEIL"}}
+    {{> fakta-økonomi-feil}}
+{{/case}}
+{{#case "BEREGNING_TYPE"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "INNTEKT_UNDER"}}
+Du har berre rett til {{> ytelse-navn}} dersom du har tent meir enn {{kroner konfigurasjon.halvt-grunnbeløp}} i året{{> før-skatt}}. Inntekta di var lågare enn {{kroner konfigurasjon.halvt-grunnbeløp}} i året{{> før-skatt}}. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
+        {{/case}}
+        {{#case "ENDRING_GRUNNLAG"}}
+Vi har endra berekninga av {{> ytelse-produkt}} dine. Du har derfor fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
+        {{/case}}
+    {{/switch}}
+{{/case}}
+{{#case "OPPTJENING_TYPE"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "IKKE_INNTEKT"}}
+Du har ikkje hatt arbeidsinntekt eller inntekt som er likestilt med lønn i seks av dei siste ti månadene før perioden med foreldrepengar starta. Derfor har du ikkje rett til foreldrepengar.
+        {{/case}}
+        {{#case "IKKE_YRKESAKTIV"}}
+Du har ikkje jobba eller hatt pensjonsgivande inntekt. Derfor har du ikkje rett til foreldrepengar.
+        {{/case}}
+    {{/switch}}
+
+Du har fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
+{{/case}}
+{{#case "STONADSPERIODEN_TYPE"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "ENDRET_DEKNINGSGRAD"}}
+Du fekk innvilga 100 prosent foreldrepengar, men i ettertid har du fått gjort om foreldrepengane til 80 prosent. Du har derfor fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
+        {{/case}}
+        {{#case "FEIL_FLERBARNSDAGER"}}
+De har begge fått foreldrepengar i den same perioden, men berre éin av dykk skulle ha hatt foreldrepengar. Fordi den andre forelderen har rett til pengane, har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt denne perioden.
+        {{/case}}
+        {{#case "OPPHOR_BARN_DOD"}}
+Vi har fått melding om at {{> barnet-ditt}} døydde. Foreldrepengane skulle ha vore stansa frå og med {{opphørsdato-dødt-barn}}.
+
+Fordi foreldrepengane er blitt utbetalt frå denne datoen, har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt.
+        {{/case}}
+        {{#case "OPPHOR_MOTTAKER_DOD"}}
+Vi har fått melding om at {{søker.navn}} døydde. Foreldrepengane skulle ha vore stansa frå og med {{opphørsdato-død-søker}}.
+
+Fordi foreldrepengane er blitt utbetalt frå denne datoen, er det utbetalt {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje.
+        {{/case}}
+    {{/switch}}
+{{/case}}
+{{#case "UTTAK_GENERELT_TYPE"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "STONADSPERIODE_OVER_3"}}
+Du kan få foreldrepengar i inntil tre år etter at {{#if sak.er-adopsjon}}du overtok omsorga for {{/if}}{{> barnet-ditt}}{{#if sak.er-fødsel}} blei fødde{{/if}}. Fordi det har gått meir enn tre år, har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
+        {{/case}}
+        {{#case "NY_STONADSPERIODE"}}
+Du eller den andre forelderen har fått innvilga foreldrepengar for nytt barn. Du har ikkje rett til foreldrepengar dei dagane som er igjen frå den førre perioden med foreldrepengar. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
+        {{/case}}
+        {{#case "IKKE_OMSORG"}}
+Vi har fått opplysningar om at du ikkje hadde omsorga for {{> barnet}} frå og med {{opphørsdato-ikke-omsorg}}. Du har berre rett til foreldrepengar dersom du har omsorga for {{> barnet}}. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
+        {{/case}}
+        {{#case "MOTTAKER_I_ARBEID"}}
+Du har fått utbetalt foreldrepengar i den same perioden som du har jobba heiltid. Du kan ikkje få utbetalt foreldrepengar samtidig som du jobbar heiltid. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
+        {{/case}}
+        {{#case "FORELDRES_UTTAK"}}
+Fordi den andre forelderen har søkt og fått innvilga foreldrepengar i den same periode som du har fått foreldrepengar. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt.
+        {{/case}}
+        {{#case "STONADSPERIODE_MANGEL"}}
+Du har fått utbetalt foreldrepengar i denne perioden. Fordi du ikkje har rett på foreldrepengar, har du fått for mykje utbetalt.
+        {{/case}}
+    {{/switch}}
+{{/case}}
+{{#case "UTTAK_UTSETTELSE_TYPE"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "LOVBESTEMT_FERIE"}}
+Du fekk utsett foreldrepengane fordi du hadde ferie. I den same perioden har du fått utbetalt foreldrepengar. Du kan ikkje utsetje perioden og samtidig få foreldrepengar. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
+        {{/case}}
+        {{#case "ARBEID_HELTID"}}
+Du fekk utsett foreldrepengane fordi du jobba heiltid. I den same perioden har du fått utbetalt foreldrepengar. Du kan ikkje både utsetje og samtidig få foreldrepengar. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
+        {{/case}}
+        {{#case "MOTTAKER_HELT_AVHENGIG"}}
+Du fekk utsett foreldrepengane fordi du var heilt avhengig av hjelp til å ta deg av {{> barnet}}. I den same perioden har du fått utbetalt foreldrepengar. Du kan ikkje utsetje og samtidig få foreldrepengar. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
+        {{/case}}
+        {{#case "MOTTAKER_INNLAGT"}}
+Du fekk utsett foreldrepengane fordi du var innlagd i helseinstitusjon. I den same perioden har du fått utbetalt foreldrepengar. Du kan ikkje utsetje og samtidig få foreldrepengar.  Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
+        {{/case}}
+        {{#case "BARN_INNLAGT"}}
+Du fekk utsett foreldrepengane fordi {{> barnet-ditt}} var innlagd i helseinstitusjon. I den same perioden har du fått utbetalt foreldrepengar. Du kan ikkje utsetje og samtidig få foreldrepengar. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
+        {{/case}}
+    {{/switch}}
+{{/case}}
+{{#case "UTTAK_KVOTENE_TYPE"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "KVO_MOTTAKER_HELT_AVHENGIG"}}
+Du overførte kvoten til den andre forelderen fordi du var heilt avhengig av hjelp til å ta deg av {{> barnet}}. I den same perioden har du likevel fått utbetalt foreldrepengar. Du kan ikkje overføre kvoten og samtidig få foreldrepengar. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
+        {{/case}}
+        {{#case "KVO_MOTTAKER_INNLAGT"}}
+Du overførte kvoten til den andre forelderen fordi du var innlagd i helseinstitusjon. I den same perioden har du likevel fått utbetalt foreldrepengar. Du kan ikkje overføre kvoten og samtidig få foreldrepengar. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
+        {{/case}}
+        {{#case "KVO_SAMTIDIG_UTTAK"}}
+Den andre forelderen er innvilga foreldrepengar i same perioden som du har fått utbetalt foreldrepengar for. Fordi du har fått utbetalt meir i foreldrepengar enn du har rett til i denne perioden, har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} kroner for mykje utbetalt.
+        {{/case}}
+    {{/switch}}
+{{/case}}
+{{#case "VILKAAR_GENERELLE_TYPE"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "MOR_IKKE_ARBEID"}}
+Mor har ikkje jobba heiltid, slik ho må for at du skal ha rett til foreldrepengar i denne perioden. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt.
+        {{/case}}
+        {{#case "MOR_IKKE_STUDERT"}}
+Mor har ikkje studert på heiltid, slik ho må for at du skal ha rett på foreldrepengar i denne perioden. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt.
+        {{/case}}
+        {{#case "MOR_IKKE_ARBEID_OG_STUDER"}}
+Mor har ikkje jobba og teke utdanning som til sammen utgjør heiltid, slik ho må for at du skal ha rett på foreldrepengar i denne perioden. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt.
+        {{/case}}
+        {{#case "MOR_IKKE_HELT_AVHENGIG"}}
+Mor har ikkje vore heilt avhengig av hjelp for å ta seg av barnet, slik ho må for at du skal ha rett på foreldrepengar i denne perioden. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt.
+        {{/case}}
+        {{#case "MOR_IKKE_INNLAGT"}}
+Mor har ikkje vært innlagd i helseinstitusjon, slik ho må for at du skal ha rett til foreldrepengar i denne perioden. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt.
+        {{/case}}
+        {{#case "MOR_IKKE_I_IP"}}
+Mor har ikkje teke del i introduksjonsprogrammet for nyinnkomne innvandrarar etter kapittel 2, slik ho må for at du skal ha rett til foreldrepengar i denne perioden. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt.
+        {{/case}}
+        {{#case "MOR_IKKE_I_KP"}}
+Mor har ikkje teke del i kvalifiseringsprogrammet, slik ho må for at du skal ha rett til foreldrepengar i denne perioden. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt.
+        {{/case}}
+    {{/switch}}
+{{/case}}
+{{#case "KUN_RETT_TYPE"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "FEIL_I_ANTALL_DAGER"}}
+Du har ikkje rett til foreldrepengar i denne perioden. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt.
+        {{/case}}
+    {{/switch}}
+{{/case}}
+{{#case "UTTAK_ALENEOMSORG_TYPE"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "IKKE_ALENEOMSORG"}}
+Du hadde berre rett til foreldrepengar i denne perioden dersom du hadde hatt åleineomsorga for {{> barnet}}. Vi har fått opplyst at du ikkje hadde åleineomsorga. Derfor har du fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt i denne perioden.
+        {{/case}}
+    {{/switch}}
+{{/case}}
+{{#case "UTTAK_GRADERT_TYPE"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "GRADERT_UTTAK"}}
+Du har jobba samtidig som at du har fått utbetalt foreldrepengar. Fordi du har fått endra kor mykje du skal jobbe og kor mykje du tar ut i foreldrepengar, er delar av beløpet du har fått utbetalt feil. Du har derfor fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mykje utbetalt.
+        {{/case}}
+    {{/switch}}
+{{/case}}
+{{#case "FP_ANNET_HENDELSE_TYPE"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "REFUSJON_ARBGIVER"}}
+{{> fakta-arbeidsgiver-refusjon}}
+        {{/case}}
+        {{#case "ANNET_FRITEKST"}}
+        {{/case}}
+    {{/switch}}
+{{/case}}
+{{/switch}}
