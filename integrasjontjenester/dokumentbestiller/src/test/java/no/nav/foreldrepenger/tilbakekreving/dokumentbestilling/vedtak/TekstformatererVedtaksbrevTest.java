@@ -217,7 +217,7 @@ public class TekstformatererVedtaksbrevTest {
                 .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(1234567892))
                 .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(1234567892))
                 .medTotaltRentebeløp(BigDecimal.ZERO)
-                .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.valueOf(1234567892))
+                .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.valueOf(1234567000))
                 .build())
             .medLovhjemmelVedtak("Folketrygdloven § 22-15")
             .medVarsel(HbVarsel.builder()
@@ -485,7 +485,7 @@ public class TekstformatererVedtaksbrevTest {
     }
 
     @Test
-    public void skal_generere_vedtaksbrev_for_FP_med_og_uten_foreldelse() throws Exception {
+    public void skal_generere_vedtaksbrev_for_FP_med_og_uten_foreldelse_og_uten_skatt() throws Exception {
         HbVedtaksbrevFelles vedtaksbrevData = lagTestBuilder()
             .medSak(HbSak.build()
                 .medYtelsetype(FagsakYtelseType.FORELDREPENGER)

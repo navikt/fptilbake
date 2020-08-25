@@ -27,7 +27,7 @@ public enum FagsakYtelseType implements Kodeverdi {
     SVANGERSKAPSPENGER("SVP", "Svangerskapspenger","Svangerskapspengar"),
 
     //K9
-    FRISINN("FRISINN", "FRIlansere og Selvstendig næringsdrivendes INNtektskompensasjon",""),
+    FRISINN("FRISINN", "Kompensasjonsytelse for selvstendig næringsdrivende og frilansere","Kompensasjonsytelse for selvstendig næringsdrivende og frilansere"),
     PLEIEPENGER_SYKT_BARN("PSB", "Pleiepenger sykt barn",""),
     PLEIEPENGER_NÆRSTÅENDE("PPN", "Pleiepenger nærstående",""),
     OMSORGSPENGER("OMP", "Omsorgspenger",""),

@@ -101,7 +101,7 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
 
     @JsonProperty("skal-ikke-vise-skatt")
     private boolean isSkalIkkeViseSkattInformasjon() {
-        return FagsakYtelseType.ENGANGSTØNAD.equals(sak.getYtelsetype()) || (FagsakYtelseType.FRISINN.equals(sak.getYtelsetype()) && !totalresultat.harSkattetrekk());
+        return FagsakYtelseType.ENGANGSTØNAD.equals(sak.getYtelsetype()) || !totalresultat.harSkattetrekk();
     }
 
     public VedtakResultatType getHovedresultat() {
