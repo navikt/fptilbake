@@ -129,7 +129,7 @@ public class BehandlingRestTjeneste {
     @Path("/opprett")
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
     public Response opprettBehandling(@Valid @NotNull OpprettBehandlingDto opprettBehandlingDto) throws URISyntaxException {
-        Saksnummer saksnummer = new Saksnummer(opprettBehandlingDto.getSaksnummer());
+        Saksnummer saksnummer = new Saksnummer(opprettBehandlingDto.getSaksnummer().getVerdi());
         UUID eksternUuid = opprettBehandlingDto.getEksternUuid();
         BehandlingType behandlingType = opprettBehandlingDto.getBehandlingType();
         if (BehandlingType.TILBAKEKREVING.equals(behandlingType)) {

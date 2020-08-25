@@ -3,7 +3,6 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto;
 import java.util.UUID;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Digits;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -13,6 +12,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.ValidKodeverk;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.TilbakekrevingAbacAttributtType;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.SaksnummerDto;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.AbacDto;
 import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
@@ -20,8 +20,8 @@ import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
 public class OpprettBehandlingDto implements AbacDto {
 
     @NotNull
-    @Digits(integer = 50, fraction = 0)
-    private String saksnummer; // TODO bør bruke egen DTO
+    @Valid
+    private SaksnummerDto saksnummer; // TODO bør bruke egen DTO
 
     @NotNull
     @Valid
@@ -45,11 +45,11 @@ public class OpprettBehandlingDto implements AbacDto {
         // For CDI
     }
 
-    public String getSaksnummer() {
+    public SaksnummerDto getSaksnummer() {
         return saksnummer;
     }
 
-    public void setSaksnummer(String saksnummer) {
+    public void setSaksnummer(SaksnummerDto saksnummer) {
         this.saksnummer = saksnummer;
     }
 
@@ -97,7 +97,7 @@ public class OpprettBehandlingDto implements AbacDto {
     public AbacDataAttributter abacAttributter() {
         if (getBehandlingType().equals(BehandlingType.TILBAKEKREVING)) {
             return AbacDataAttributter.opprett()
-                .leggTil(StandardAbacAttributtType.SAKSNUMMER, saksnummer)
+                .leggTil(saksnummer.abacAttributter())
                 .leggTil(TilbakekrevingAbacAttributtType.YTELSEBEHANDLING_UUID, eksternUuid);
         } else if (getBehandlingType().equals(BehandlingType.REVURDERING_TILBAKEKREVING)) {
             return AbacDataAttributter.opprett()

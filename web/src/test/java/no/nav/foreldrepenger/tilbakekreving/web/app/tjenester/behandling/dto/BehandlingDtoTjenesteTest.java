@@ -74,7 +74,7 @@ public class BehandlingDtoTjenesteTest {
     private VilkårsvurderingRepository vilkårsvurderingRepository = repositoryProvider.getVilkårsvurderingRepository();
     private KravgrunnlagRepository grunnlagRepository = repositoryProvider.getGrunnlagRepository();
     private BehandlingModellRepository behandlingModellRepository = new BehandlingModellRepositoryImpl(repositoryRule.getEntityManager());
-    private BehandlingDtoTjeneste behandlingDtoTjeneste = new BehandlingDtoTjeneste(behandlingTjeneste, foreldelseTjeneste, repositoryProvider, behandlingModellRepository);
+    private BehandlingDtoTjeneste behandlingDtoTjeneste = new BehandlingDtoTjeneste(behandlingTjeneste, foreldelseTjeneste, repositoryProvider, behandlingModellRepository, "fptilbake");
 
     private Saksnummer saksnummer = new Saksnummer(GYLDIG_SAKSNR);
     private static final LocalDate FOM = LocalDate.now().minusMonths(1);

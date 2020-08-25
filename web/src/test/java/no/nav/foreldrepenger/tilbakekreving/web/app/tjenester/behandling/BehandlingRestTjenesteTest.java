@@ -223,7 +223,7 @@ public class BehandlingRestTjenesteTest {
 
     private OpprettBehandlingDto opprettBehandlingDto(String saksnr, String eksternUuid, FagsakYtelseType ytelseType) {
         OpprettBehandlingDto dto = new OpprettBehandlingDto();
-        dto.setSaksnummer(saksnr);
+        dto.setSaksnummer(new SaksnummerDto(saksnr));
         dto.setEksternUuid(eksternUuid);
         dto.setBehandlingType(BehandlingType.TILBAKEKREVING);
         dto.setFagsakYtelseType(ytelseType);

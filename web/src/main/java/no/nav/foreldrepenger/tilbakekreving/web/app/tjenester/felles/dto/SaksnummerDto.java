@@ -26,6 +26,10 @@ public class SaksnummerDto implements AbacDto {
         this.saksnummer = saksnummer;
     }
 
+    public SaksnummerDto(Long saksnummer) {
+        this.saksnummer = String.valueOf(saksnummer);
+    }
+
     public SaksnummerDto(Saksnummer saksnummer) {
         this.saksnummer = saksnummer.getVerdi();
     }
