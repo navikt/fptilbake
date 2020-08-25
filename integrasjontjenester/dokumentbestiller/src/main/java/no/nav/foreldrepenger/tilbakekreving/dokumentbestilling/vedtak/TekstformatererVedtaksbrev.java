@@ -42,8 +42,6 @@ class TekstformatererVedtaksbrev extends FellesTekstformaterer {
     private static String PARTIAL_PERIODE_VILKÅR = "vedtak/periode_vilkår";
     private static String PARTIAL_PERIODE_SÆRLIGE_GRUNNER = "vedtak/periode_særlige_grunner";
 
-     static final ObjectMapper OM = ObjectMapperForUtvekslingAvDataMedHandlebars.INSTANCE;
-
     private TekstformatererVedtaksbrev() {
         // for static access
     }

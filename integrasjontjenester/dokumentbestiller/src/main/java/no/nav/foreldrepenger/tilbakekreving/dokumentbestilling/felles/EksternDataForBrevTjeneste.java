@@ -98,11 +98,11 @@ public class EksternDataForBrevTjeneste {
     //TODO dette er ikke ekstern data, flytt til annen tjeneste
     public YtelseNavn hentYtelsenavn(FagsakYtelseType ytelsetype, Språkkode språkkode) {
         YtelseNavn ytelseNavn = new YtelseNavn();
-        String ytelsePåBokmål = ytelsetype.getNavn();
+        String ytelsePåBokmål = ytelsetype.getNavn().toLowerCase();
         ytelseNavn.setNavnPåBokmål(ytelsePåBokmål);
 
         if (språkkode != null && !språkkode.equals(Språkkode.nb)) {
-            ytelseNavn.setNavnPåBrukersSpråk(FagsakYtelseType.finnFagsaktypenavnPåAngittSpråk(ytelsetype, språkkode));
+            ytelseNavn.setNavnPåBrukersSpråk(FagsakYtelseType.finnFagsaktypenavnPåAngittSpråk(ytelsetype, språkkode).toLowerCase());
         } else {
             ytelseNavn.setNavnPåBrukersSpråk(ytelsePåBokmål);
         }
