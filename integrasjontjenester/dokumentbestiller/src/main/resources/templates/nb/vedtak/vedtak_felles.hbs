@@ -1,7 +1,7 @@
 {{~#* inline "ytelse-navn" ~}}
-{{lookup-map sak.ytelsetype FP="foreldrepenger" SVP="svangerskapspenger" ES="engangsstønad"}}
+{{lookup-map sak.ytelsetype FP="foreldrepenger" SVP="svangerskapspenger" ES="engangsstønad" FRISINN="kompensasjonsytelse for selvstendig næringsdrivende og frilansere"}}
 {{~/inline~}}
 {{~#* inline "ytelse-produkt" ~}}
-{{lookup-map sak.ytelsetype FP="foreldrepengene" SVP="svangerskapspengene" ES="engangsstønaden"}}
+{{lookup-map sak.ytelsetype FP="foreldrepengene" SVP="svangerskapspengene" ES="engangsstønaden" FRISINN="kompensasjonsytelsen"}}
 {{~/inline~}}
-{{#* inline "før-skatt"}}{{#if (neq sak.ytelsetype "ES")}} før skatt{{/if}}{{/inline}}
+{{#* inline "før-skatt"}}{{#if (not skal-ikke-vise-skatt)}} før skatt{{/if}}{{/inline}}

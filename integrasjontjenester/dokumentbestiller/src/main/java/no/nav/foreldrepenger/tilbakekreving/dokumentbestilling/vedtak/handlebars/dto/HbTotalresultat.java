@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -8,7 +9,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.BigDecimalHeltallSerialiserer;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.KodeverdiSomKodeSerialiserer;
-import no.nav.vedtak.util.Objects;
 
 public class HbTotalresultat {
 
@@ -33,6 +33,10 @@ public class HbTotalresultat {
 
     public VedtakResultatType getHovedresultat() {
         return hovedresultat;
+    }
+
+    public boolean harSkattetrekk() {
+        return totaltTilbakekrevesBeløpMedRenterUtenSkatt.compareTo(totaltTilbakekrevesBeløpMedRenter) < 0;
     }
 
     public static Builder builder(){
@@ -69,11 +73,11 @@ public class HbTotalresultat {
         }
 
         public HbTotalresultat build() {
-            Objects.check(kladd.hovedresultat != null, "hovedresultat er ikke satt");
-            Objects.check(kladd.totaltTilbakekrevesBeløp != null, "totaltTilbakekrevesBeløp er ikke satt");
-            Objects.check(kladd.totaltTilbakekrevesBeløpMedRenter != null, "totaltTilbakekrevesBeløpMedRenter er ikke satt");
-            Objects.check(kladd.totaltRentebeløp != null, "totaltRentebeløp er ikke satt");
-            Objects.check(kladd.totaltTilbakekrevesBeløpMedRenterUtenSkatt != null, "totaltTilbakekrevesBeløpMedRenterUtenSkatt er ikke satt");
+            Objects.requireNonNull(kladd.hovedresultat, "hovedresultat er ikke satt");
+            Objects.requireNonNull(kladd.totaltTilbakekrevesBeløp, "totaltTilbakekrevesBeløp er ikke satt");
+            Objects.requireNonNull(kladd.totaltTilbakekrevesBeløpMedRenter, "totaltTilbakekrevesBeløpMedRenter er ikke satt");
+            Objects.requireNonNull(kladd.totaltRentebeløp, "totaltRentebeløp er ikke satt");
+            Objects.requireNonNull(kladd.totaltTilbakekrevesBeløpMedRenterUtenSkatt, "totaltTilbakekrevesBeløpMedRenterUtenSkatt er ikke satt");
             return kladd;
         }
 

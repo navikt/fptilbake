@@ -113,7 +113,7 @@ public class TekstformatererVarselbrevTest {
         BrevMetadata metadata = new BrevMetadata.Builder()
             .medFagsaktype(FagsakYtelseType.FRISINN)
             .medSprakkode(Språkkode.nb)
-            .medFagsaktypenavnPåSpråk(FagsakYtelseType.FRISINN.getNavn())
+            .medFagsaktypenavnPåSpråk(FagsakYtelseType.FRISINN.getNavn().toLowerCase())
             .medMottakerAdresse(lagAdresseInfo())
             .medSakspartNavn("Test")
             .build();

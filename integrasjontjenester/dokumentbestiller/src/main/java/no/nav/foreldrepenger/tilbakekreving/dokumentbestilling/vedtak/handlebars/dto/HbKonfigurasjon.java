@@ -1,13 +1,13 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.BigDecimalHeltallSerialiserer;
 import no.nav.foreldrepenger.tilbakekreving.felles.Rettsgebyr;
-import no.nav.vedtak.util.Objects;
 
 public class HbKonfigurasjon {
 
@@ -46,9 +46,9 @@ public class HbKonfigurasjon {
         }
 
         public HbKonfigurasjon build() {
-            Objects.check(kladd.fireRettsgebyr != null, "fireRettsgebyr er ikke satt");
-            Objects.check(kladd.halvtGrunnbeløp != null, "halvtGrunnbeløp er ikke satt");
-            Objects.check(kladd.klagefristUker != null, "klagefristUker er ikke satt");
+            Objects.requireNonNull(kladd.fireRettsgebyr, "fireRettsgebyr er ikke satt");
+            Objects.requireNonNull(kladd.halvtGrunnbeløp, "halvtGrunnbeløp er ikke satt");
+            Objects.requireNonNull(kladd.klagefristUker, "klagefristUker er ikke satt");
             return kladd;
         }
     }

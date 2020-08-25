@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -255,7 +256,7 @@ public class VedtaksbrevTjeneste {
                                                   BrevMottaker brevMottaker) {
         Behandling behandling = behandlingTjeneste.hentBehandling(behandlingId);
         //TODO hent data fra fpsak i tidligere steg, og hent fra repository her
-        SamletEksternBehandlingInfo fpsakBehandling = hentDataFraFpsak(behandlingId);
+        SamletEksternBehandlingInfo fpsakBehandling = hentDataFraFpsak(behandling);
         Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(behandling.getAktørId().getId());
         Long varsletBeløp = finnVarsletBeløp(behandlingId);
         LocalDate varsletDato = finnVarsletDato(behandlingId);
@@ -287,14 +288,17 @@ public class VedtaksbrevTjeneste {
 
         BrevMetadata brevMetadata = lagMetadataForVedtaksbrev(behandling, vedtakResultatType, fpsakBehandling, personinfo , brevMottaker);
 
-        HbVedtaksbrevFelles.Builder vedtakDataBuilder = HbVedtaksbrevFelles.builder()
-            .medSak(HbSak.build()
-                .medYtelsetype(behandling.getFagsak().getFagsakYtelseType())
-                .medDatoFagsakvedtak(fpsakBehandling.getGrunninformasjon().getVedtakDato())
-                .medAntallBarn(fpsakBehandling.getAntallBarnSøktFor())
+        HbSak.Builder hbSakBuilder = HbSak.build()
+            .medYtelsetype(behandling.getFagsak().getFagsakYtelseType())
+            .medDatoFagsakvedtak(fpsakBehandling.getGrunninformasjon().getVedtakDato())
+            .medAntallBarn(fpsakBehandling.getAntallBarnSøktFor());
+        if (!erFrisinn(behandling)) {
+            hbSakBuilder
                 .medErFødsel(SøknadType.FØDSEL == fpsakBehandling.getSøknadType())
-                .medErAdopsjon(SøknadType.ADOPSJON == fpsakBehandling.getSøknadType())
-                .build())
+                .medErAdopsjon(SøknadType.ADOPSJON == fpsakBehandling.getSøknadType());
+        }
+        HbVedtaksbrevFelles.Builder vedtakDataBuilder = HbVedtaksbrevFelles.builder()
+            .medSak(hbSakBuilder.build())
             .medBehandling(HbBehandling.builder()
                 .medErRevurdering(erRevurdering)
                 .medOriginalBehandlingDatoFagsakvedtak(originalBehandlingVedtaksdato)
@@ -356,9 +360,21 @@ public class VedtaksbrevTjeneste {
             .build();
     }
 
-    private SamletEksternBehandlingInfo hentDataFraFpsak(Long behandlingId) {
-        UUID fpsakBehandlingUuid = eksternBehandlingRepository.hentFraInternId(behandlingId).getEksternUuid();
-        return eksternDataForBrevTjeneste.hentYtelsesbehandlingFraFagsystemet(fpsakBehandlingUuid, Tillegsinformasjon.PERSONOPPLYSNINGER, Tillegsinformasjon.SØKNAD);
+    private SamletEksternBehandlingInfo hentDataFraFpsak(Behandling behandling) {
+        UUID fpsakBehandlingUuid = eksternBehandlingRepository.hentFraInternId(behandling.getId()).getEksternUuid();
+        return eksternDataForBrevTjeneste.hentYtelsesbehandlingFraFagsystemet(fpsakBehandlingUuid, ønsketTillegsinformasjon(behandling));
+    }
+
+    private Tillegsinformasjon[] ønsketTillegsinformasjon(Behandling behandling) {
+        List<Tillegsinformasjon> tillegsinformasjons = new ArrayList<>();
+        tillegsinformasjons.add(Tillegsinformasjon.PERSONOPPLYSNINGER);
+
+        // Kan ikke hente søknadsinformasjon for FRISINN-behandlinger. Er ikke nødvendigvis en 1-til-1-mapping mellom behandling
+        // og søknad for FRISINN i k9-sak. Kan risikere exception i k9-sak og/eller exception i k9-tilbake
+        if (!erFrisinn(behandling)) {
+            tillegsinformasjons.add(Tillegsinformasjon.SØKNAD);
+        }
+        return tillegsinformasjons.toArray(Tillegsinformasjon[]::new);
     }
 
     private List<VilkårVurderingPeriodeEntitet> finnVilkårVurderingPerioder(Long behandlingId) {
@@ -560,5 +576,9 @@ public class VedtaksbrevTjeneste {
         } else {
             return TITTEL_VEDTAK_INGEN_TILBAKEBETALING + fagsaktypenavnBokmål;
         }
+    }
+
+    private boolean erFrisinn(Behandling behandling) {
+        return FagsakYtelseType.FRISINN.equals(behandling.getFagsak().getFagsakYtelseType());
     }
 }

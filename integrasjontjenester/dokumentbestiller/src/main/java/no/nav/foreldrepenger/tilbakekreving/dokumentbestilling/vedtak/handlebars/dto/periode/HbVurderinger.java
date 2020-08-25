@@ -2,6 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebar
 
 import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -13,7 +14,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Vi
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Vurdering;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.BigDecimalHeltallSerialiserer;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.KodeverdiSomKodeSerialiserer;
-import no.nav.vedtak.util.Objects;
 
 public class HbVurderinger {
 
@@ -101,15 +101,17 @@ public class HbVurderinger {
         }
 
         public HbVurderinger build() {
-            Objects.check(kladd.foreldelsevurdering != null, "foreldelsevurdering er ikke satt");
+            Objects.requireNonNull(kladd.foreldelsevurdering, "foreldelsevurdering er ikke satt");
             if (ForeldelseVurderingType.IKKE_VURDERT.equals(kladd.foreldelsevurdering) ||
                 ForeldelseVurderingType.IKKE_FORELDET.equals(kladd.foreldelsevurdering)) {
-                Objects.check(kladd.vilkårResultat != null, "vilkårResultat er ikke satt");
+                Objects.requireNonNull(kladd.vilkårResultat, "vilkårResultat er ikke satt");
             }
             if (AnnenVurdering.GOD_TRO.equals(kladd.aktsomhetResultat)) {
-                Objects.check(kladd.beløpIBehold != null, "beløp i behold er ikke satt");
+                Objects.requireNonNull(kladd.beløpIBehold, "beløp i behold er ikke satt");
             } else {
-                Objects.check(kladd.beløpIBehold == null, "beløp i behold skal ikke være satt når aktsomhetresultat er " + kladd.aktsomhetResultat);
+                if (kladd.beløpIBehold != null) {
+                    throw new IllegalArgumentException("beløp i behold skal ikke være satt når aktsomhetresultat er " + kladd.aktsomhetResultat);
+                }
             }
             return kladd;
         }
