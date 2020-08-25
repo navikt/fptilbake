@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jknack.handlebars.Context;
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.JsonNodeValueResolver;
@@ -22,7 +21,6 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.Tekstforma
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.CustomHelpers;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.FellesTekstformaterer;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.HandlebarsData;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.ObjectMapperForUtvekslingAvDataMedHandlebars;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevFelles;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevPeriodeOgFelles;
@@ -56,9 +54,13 @@ class TekstformatererVedtaksbrev extends FellesTekstformaterer {
     }
 
     static Avsnitt lagOppsummeringAvsnitt(HbVedtaksbrevData vedtaksbrevData, String hovedoverskrift) {
-        String tekst = konverterMedPartialTemplate("vedtak/vedtak_start", vedtaksbrevData);
+        String tekst = lagVedtakStart(vedtaksbrevData.getFelles());
         Avsnitt.Builder avsnittBuilder = new Avsnitt.Builder().medAvsnittstype(Avsnitt.Avsnittstype.OPPSUMMERING).medOverskrift(hovedoverskrift);
         return parseTekst(tekst, avsnittBuilder, null).build();
+    }
+
+    public static String lagVedtakStart(HbVedtaksbrevFelles vedtaksbrevFelles) {
+        return konverterMedPartialTemplate("vedtak/vedtak_start", vedtaksbrevFelles);
     }
 
     static List<Avsnitt> lagPerioderAvsnitt(HbVedtaksbrevData vedtaksbrevData) {
