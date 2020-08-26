@@ -104,14 +104,6 @@ jobs:
             <tr><td>k9</td><td>prod-fss</td><td>default</td></tr>
             </table>
 
-      - name: Trigg deploy av fptilbake til T4
-        if: success()
-        uses: peter-evans/create-or-update-comment@v1
-        with:
-          token: ${{ secrets.GITHUB_ACCESS_TOKEN }}
-          issue-number: ${{ steps.createdeployissue.outputs.number }}
-          body: /promote fp dev-fss t4
-
       - name: Trigg deploy av fptilbake til Q1
         if: success()
         uses: peter-evans/create-or-update-comment@v1
