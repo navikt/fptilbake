@@ -25,6 +25,7 @@ import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlSendt;
 import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakRequest;
 import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakResponse;
 import no.nav.vedtak.felles.integrasjon.aktør.klient.AktørConsumer;
+import no.nav.vedtak.konfig.KonfigVerdi;
 
 @ApplicationScoped
 public class AvstemmingTjeneste {
@@ -36,16 +37,22 @@ public class AvstemmingTjeneste {
     private ØkonomiSendtXmlRepository sendtXmlRepository;
     private AktørConsumer aktørConsumer;
 
+    private String avsender;
+
     AvstemmingTjeneste() {
         //for CDI proxy
     }
 
     @Inject
-    public AvstemmingTjeneste(ØkonomiSendtXmlRepository sendtXmlRepository, BehandlingRepositoryProvider behandlingRepositoryProvider, AktørConsumer aktørConsumer) {
+    public AvstemmingTjeneste(@KonfigVerdi(value = "app.name") String applikasjon,
+                              ØkonomiSendtXmlRepository sendtXmlRepository,
+                              BehandlingRepositoryProvider behandlingRepositoryProvider,
+                              AktørConsumer aktørConsumer) {
         this.sendtXmlRepository = sendtXmlRepository;
         this.behandlingRepository = behandlingRepositoryProvider.getBehandlingRepository();
         this.behandlingVedtakRepository = behandlingRepositoryProvider.getBehandlingVedtakRepository();
         this.aktørConsumer = aktørConsumer;
+        this.avsender = applikasjon;
     }
 
     public Optional<String> oppsummer(LocalDate dato) {
@@ -82,7 +89,7 @@ public class AvstemmingTjeneste {
             .orElseThrow(() -> new IllegalArgumentException("Avstemming feilet, fant ikke ident. Gjelder behandlingId=" + behandlingId));
 
         avstemmingCsvFormatter.leggTilRad(AvstemmingCsvFormatter.radBuilder()
-            .medAvsender("fptilbake")
+            .medAvsender(avsender)
             .medVedtakId(oppsummering.getØkonomiVedtakId())
             .medFnr(fnr)
             .medVedtaksdato(behandlingVedtak.getVedtaksdato())
