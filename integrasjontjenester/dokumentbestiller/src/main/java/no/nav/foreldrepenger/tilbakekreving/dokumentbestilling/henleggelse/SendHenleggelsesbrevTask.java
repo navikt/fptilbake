@@ -31,9 +31,10 @@ public class SendHenleggelsesbrevTask implements ProsessTaskHandler {
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
         Long behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
+        String fritekst = prosessTaskData.getPropertyValue("fritekst");
         if(vergeRepository.finnesVerge(behandlingId)){
-            henleggelsesbrevTjeneste.sendHenleggelsebrev(behandlingId, BrevMottaker.VERGE);
+            henleggelsesbrevTjeneste.sendHenleggelsebrev(behandlingId, fritekst, BrevMottaker.VERGE);
         }
-        henleggelsesbrevTjeneste.sendHenleggelsebrev(behandlingId, BrevMottaker.BRUKER);
+        henleggelsesbrevTjeneste.sendHenleggelsebrev(behandlingId, fritekst, BrevMottaker.BRUKER);
     }
 }

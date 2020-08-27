@@ -30,6 +30,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.Frit
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.JournalpostIdOgDokumentId;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
+import no.nav.vedtak.util.StringUtils;
 
 @ApplicationScoped
 public class HenleggelsesbrevTjeneste {
@@ -67,39 +68,44 @@ public class HenleggelsesbrevTjeneste {
         this.historikkinnslagTjeneste = historikkinnslagTjeneste;
     }
 
-    public Optional<JournalpostIdOgDokumentId> sendHenleggelsebrev(Long behandlingId, BrevMottaker brevMottaker) {
+    public Optional<JournalpostIdOgDokumentId> sendHenleggelsebrev(Long behandlingId, String fritekst, BrevMottaker brevMottaker) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-        HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = lagHenleggelsebrevForSending(behandling, brevMottaker);
-        FritekstbrevData fritekstbrevData = lagHenleggelsebrev(henleggelsesbrevSamletInfo);
+        HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = lagHenleggelsebrevForSending(behandling, fritekst, brevMottaker);
+        FritekstbrevData fritekstbrevData = BehandlingType.TILBAKEKREVING.equals(behandling.getType()) ?
+            lagHenleggelsebrev(henleggelsesbrevSamletInfo) : lagRevurderingHenleggelsebrev(henleggelsesbrevSamletInfo);
         JournalpostIdOgDokumentId dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(fritekstbrevData);
         opprettHistorikkinnslag(behandling, dokumentreferanse, brevMottaker);
         lagreInfoOmHenleggelsesbrev(behandlingId, dokumentreferanse);
         return Optional.ofNullable(dokumentreferanse);
     }
 
-    public byte[] hentForhåndsvisningHenleggelsebrev(UUID behandlingUuid) {
+    public byte[] hentForhåndsvisningHenleggelsebrev(UUID behandlingUuid, String fritekst) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingUuid);
-        return hentForhåndsvisningHenleggelsebrev(behandling);
+        return hentForhåndsvisningHenleggelsebrev(behandling, fritekst);
     }
 
-    public byte[] hentForhåndsvisningHenleggelsebrev(Long behandlingId) {
+    public byte[] hentForhåndsvisningHenleggelsebrev(Long behandlingId, String fritekst) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-        return hentForhåndsvisningHenleggelsebrev(behandling);
+        return hentForhåndsvisningHenleggelsebrev(behandling, fritekst);
     }
 
-    private byte[] hentForhåndsvisningHenleggelsebrev(Behandling behandling) {
+    private byte[] hentForhåndsvisningHenleggelsebrev(Behandling behandling, String fritekst) {
         boolean finnesVerge = vergeRepository.finnesVerge(behandling.getId());
         BrevMottaker brevMottaker = finnesVerge ? BrevMottaker.VERGE : BrevMottaker.BRUKER;
-        HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = lagHenleggelsebrevForSending(behandling, brevMottaker);
-        FritekstbrevData fritekstbrevData = lagHenleggelsebrev(henleggelsesbrevSamletInfo);
+        HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = lagHenleggelsebrevForSending(behandling, fritekst, brevMottaker);
+        FritekstbrevData fritekstbrevData = BehandlingType.TILBAKEKREVING.equals(behandling.getType()) ?
+            lagHenleggelsebrev(henleggelsesbrevSamletInfo) : lagRevurderingHenleggelsebrev(henleggelsesbrevSamletInfo);
         return bestillDokumentTjeneste.hentForhåndsvisningFritekstbrev(fritekstbrevData);
     }
 
-    private HenleggelsesbrevSamletInfo lagHenleggelsebrevForSending(Behandling behandling, BrevMottaker brevMottaker) {
+    private HenleggelsesbrevSamletInfo lagHenleggelsebrevForSending(Behandling behandling, String fritekst, BrevMottaker brevMottaker) {
         Long behandlingId = behandling.getId();
         Optional<BrevSporing> brevSporing = brevSporingRepository.hentSistSendtVarselbrev(behandlingId);
-        if (BehandlingType.TILBAKEKREVING.equals(behandling.getType()) && brevSporing.isEmpty()) {
+        BehandlingType behandlingType = behandling.getType();
+        if (BehandlingType.TILBAKEKREVING.equals(behandlingType) && brevSporing.isEmpty()) {
             throw HenleggelsesbrevFeil.FACTORY.kanIkkeSendeEllerForhåndsviseHenleggelsesBrev(behandlingId).toException();
+        }else if(BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandlingType) && StringUtils.nullOrEmpty(fritekst)){
+            throw HenleggelsesbrevFeil.FACTORY.kanIkkeSendeEllerForhåndsviseRevurderingHenleggelsesBrev(behandlingId).toException();
         }
         FagsakYtelseType fagsakYtelseType = behandling.getFagsak().getFagsakYtelseType();
         Språkkode språkkode = hentSpråkkode(behandlingId);
@@ -126,11 +132,13 @@ public class HenleggelsesbrevTjeneste {
             .medVergeNavn(vergeNavn)
             .medFinnesVerge(finnesVerge)
             .medTittel(TITTEL_HENLEGGELSESBREV)
+            .medBehandlingtype(behandlingType)
             .build();
 
         HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = new HenleggelsesbrevSamletInfo();
         henleggelsesbrevSamletInfo.setBrevMetadata(metadata);
-        henleggelsesbrevSamletInfo.setVarsletDato(brevSporing.get().getOpprettetTidspunkt().toLocalDate());
+        brevSporing.ifPresent(sporing -> henleggelsesbrevSamletInfo.setVarsletDato(sporing.getOpprettetTidspunkt().toLocalDate()));
+        henleggelsesbrevSamletInfo.setFritekstFraSaksbehandler(fritekst);
         return henleggelsesbrevSamletInfo;
     }
 
@@ -145,6 +153,14 @@ public class HenleggelsesbrevTjeneste {
             .medOverskrift(TekstformatererHenleggelsesbrev.lagHenleggelsebrevOverskrift(henleggelsesbrevSamletInfo))
             .medMetadata(henleggelsesbrevSamletInfo.getBrevMetadata())
             .medBrevtekst(TekstformatererHenleggelsesbrev.lagHenleggelsebrevFritekst(henleggelsesbrevSamletInfo))
+            .build();
+    }
+
+    private FritekstbrevData lagRevurderingHenleggelsebrev(HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo) {
+        return new FritekstbrevData.Builder()
+            .medOverskrift(TekstformatererHenleggelsesbrev.lagRevurderingHenleggelsebrevOverskrift(henleggelsesbrevSamletInfo))
+            .medMetadata(henleggelsesbrevSamletInfo.getBrevMetadata())
+            .medBrevtekst(TekstformatererHenleggelsesbrev.lagRevurderingHenleggelsebrevFritekst(henleggelsesbrevSamletInfo))
             .build();
     }
 

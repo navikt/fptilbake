@@ -1,15 +1,15 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto;
 
-import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
-import no.nav.vedtak.sikkerhet.abac.AbacDto;
-import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
-import no.nav.vedtak.util.InputValideringRegex;
-
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+
+import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
+import no.nav.vedtak.sikkerhet.abac.AbacDto;
+import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
+import no.nav.vedtak.util.InputValideringRegex;
 
 public class HenleggBehandlingDto implements AbacDto {
     @NotNull
@@ -25,6 +25,10 @@ public class HenleggBehandlingDto implements AbacDto {
     @Size(max = 4000)
     @Pattern(regexp = InputValideringRegex.FRITEKST)
     private String begrunnelse;
+
+    @Size(max = 10000)
+    @Pattern(regexp = InputValideringRegex.FRITEKST)
+    private String fritekst;
 
     @Min(0)
     @Max(Long.MAX_VALUE)
@@ -52,6 +56,14 @@ public class HenleggBehandlingDto implements AbacDto {
 
     public void setBegrunnelse(String begrunnelse) {
         this.begrunnelse = begrunnelse;
+    }
+
+    public String getFritekst() {
+        return fritekst;
+    }
+
+    public void setFritekst(String fritekst) {
+        this.fritekst = fritekst;
     }
 
     public Long getBehandlingVersjon() {

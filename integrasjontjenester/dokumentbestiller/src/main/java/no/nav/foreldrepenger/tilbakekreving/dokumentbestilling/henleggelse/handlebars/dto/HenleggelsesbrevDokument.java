@@ -9,6 +9,8 @@ public class HenleggelsesbrevDokument {
     private LocalDate varsletDato;
     private boolean finnesVerge;
     private String annenMottakerNavn;
+    private boolean tilbakekrevingRevurdering;
+    private String fritekstFraSaksbehandler;
 
     public String getFagsaktypeNavn() {
         return fagsaktypeNavn;
@@ -43,9 +45,29 @@ public class HenleggelsesbrevDokument {
         this.annenMottakerNavn = annenMottakerNavn;
     }
 
+    public boolean isTilbakekrevingRevurdering() {
+        return tilbakekrevingRevurdering;
+    }
+
+    public void setTilbakekrevingRevurdering(boolean tilbakekrevingRevurdering) {
+        this.tilbakekrevingRevurdering = tilbakekrevingRevurdering;
+    }
+
+    public String getFritekstFraSaksbehandler() {
+        return fritekstFraSaksbehandler;
+    }
+
+    public void setFritekstFraSaksbehandler(String fritekstFraSaksbehandler) {
+        this.fritekstFraSaksbehandler = fritekstFraSaksbehandler;
+    }
+
     public void valider() {
         Objects.requireNonNull(getFagsaktypeNavn(), "fagsaktypeNavn kan ikke være null");
-        Objects.requireNonNull(getVarsletDato(), "varsletDato kan ikke være null");
+        if(isTilbakekrevingRevurdering()){
+            Objects.requireNonNull(getFritekstFraSaksbehandler(), "fritekst kan ikke være null");
+        }else {
+            Objects.requireNonNull(getVarsletDato(), "varsletDato kan ikke være null");
+        }
         if(isFinnesVerge()){
             Objects.requireNonNull(getAnnenMottakerNavn(), "annenMottakerNavn kan ikke være null");
         }
