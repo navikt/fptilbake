@@ -212,6 +212,24 @@ public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
         List<ProsessTaskData> prosessTaskData = prosessTaskRepository.finnAlle(ProsessTaskStatus.KLAR);
         assertThat(prosessTaskData).isNotEmpty();
         assertThat(prosessTaskData.get(0).getTaskType()).isEqualTo("brev.sendhenleggelse");
+        assertHenleggelse(revuderingBehandlingId);
+    }
+
+    @Test
+    public void kan_sende_henleggelsesbrev_for_tilbakekreving_revurdering_med_henlagt_feilopprettet_med_brev_når_varsel_er_sendt() {
+        Long revuderingBehandlingId = opprettTilbakekrevingRevurdering();
+        JournalpostId journalpostId = new JournalpostId("123");
+        BrevSporing henleggelsesBrevsporing = new BrevSporing.Builder()
+            .medBehandlingId(revuderingBehandlingId)
+            .medJournalpostId(journalpostId)
+            .medDokumentId("123")
+            .medBrevType(BrevType.VARSEL_BREV).build();
+        brevSporingRepository.lagre(henleggelsesBrevsporing);
+
+        henleggBehandlingTjeneste.henleggBehandling(revuderingBehandlingId, BehandlingResultatType.HENLAGT_FEILOPPRETTET_MED_BREV);
+        List<ProsessTaskData> prosessTaskData = prosessTaskRepository.finnAlle(ProsessTaskStatus.KLAR);
+        assertThat(prosessTaskData).isNotEmpty();
+        assertThat(prosessTaskData.get(0).getTaskType()).isEqualTo("brev.sendhenleggelse");
         assertThat(prosessTaskData.get(1).getTaskType()).isEqualTo("send.beskjed.tilbakekreving.henlagt.selvbetjening");
         assertHenleggelse(revuderingBehandlingId);
     }
