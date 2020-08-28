@@ -105,14 +105,6 @@ public class HistorikkInnslagTekstBuilder {
         return this;
     }
 
-    public <K extends Kodeliste> HistorikkInnslagTekstBuilder medÅrsak(K årsak) {
-        HistorikkinnslagFelt.builder()
-            .medFeltType(HistorikkinnslagFeltType.AARSAK)
-            .medTilVerdi(årsak)
-            .build(historikkinnslagDelBuilder);
-        return this;
-    }
-
     public <K extends Kodeverdi> HistorikkInnslagTekstBuilder medÅrsak(K årsak) {
         HistorikkinnslagFelt.builder()
             .medFeltType(HistorikkinnslagFeltType.AARSAK)

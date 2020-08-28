@@ -9,6 +9,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.Behandlingskontr
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
@@ -53,18 +54,21 @@ public class HenleggBehandlingTjeneste {
         this.historikkinnslagTjeneste = historikkinnslagTjeneste;
     }
 
-    public void henleggBehandlingManuelt(long behandlingId, BehandlingResultatType årsakKode, String begrunnelse) {
-        if (grunnlagRepository.harGrunnlagForBehandlingId(behandlingId)) {
+    public void henleggBehandlingManuelt(long behandlingId, BehandlingResultatType årsakKode, String begrunnelse, String fritekst) {
+        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
+        BehandlingType behandlingType = behandling.getType();
+        if (BehandlingType.TILBAKEKREVING.equals(behandlingType) && grunnlagRepository.harGrunnlagForBehandlingId(behandlingId)) {
             throw BehandlingFeil.FACTORY.kanIkkeHenleggeBehandling(behandlingId).toException();
         }
-        doHenleggBehandling(behandlingId, årsakKode, begrunnelse);
+        doHenleggBehandling(behandlingId, årsakKode, begrunnelse, fritekst);
     }
 
     public void henleggBehandling(long behandlingId, BehandlingResultatType årsakKode) {
-        doHenleggBehandling(behandlingId, årsakKode, null);
+        doHenleggBehandling(behandlingId, årsakKode, null,null);
     }
 
-    private void doHenleggBehandling(long behandlingId, BehandlingResultatType årsakKode, String begrunnelse) {
+    private void doHenleggBehandling(long behandlingId, BehandlingResultatType årsakKode,
+                                     String begrunnelse, String fritekst) {
         BehandlingskontrollKontekst kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandlingId);
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
 
@@ -73,17 +77,20 @@ public class HenleggBehandlingTjeneste {
         }
         behandlingskontrollTjeneste.henleggBehandling(kontekst, årsakKode);
 
-        if (erDetSendtVarsel(behandlingId)) {
-            sendHenleggelsesbrev(behandling);
+        if (kanSendeHenleggeslsesBrev(behandling,årsakKode)) {
+            sendHenleggelsesbrev(behandling, fritekst);
+        }
+        if(erDetSendtVarsel(behandlingId)){
             informerSelvbetjening(behandling);
         }
         opprettHistorikkinnslag(behandling, årsakKode, begrunnelse);
         eksternBehandlingRepository.deaktivateTilkobling(behandlingId);
     }
 
-    private void sendHenleggelsesbrev(Behandling behandling) {
+    private void sendHenleggelsesbrev(Behandling behandling, String fritekst) {
         ProsessTaskData henleggelseBrevTask = new ProsessTaskData(HENLEGGELSESBREV_TASK_TYPE);
         henleggelseBrevTask.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
+        henleggelseBrevTask.setPayload(fritekst);
         henleggelseBrevTask.setCallIdFraEksisterende();
         prosessTaskRepository.lagre(henleggelseBrevTask);
     }
@@ -93,6 +100,15 @@ public class HenleggBehandlingTjeneste {
         selvbetjeningTask.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         selvbetjeningTask.setCallIdFraEksisterende();
         prosessTaskRepository.lagre(selvbetjeningTask);
+    }
+
+    private boolean kanSendeHenleggeslsesBrev(Behandling behandling, BehandlingResultatType behandlingResultatType) {
+        if (BehandlingType.TILBAKEKREVING.equals(behandling.getType())) {
+            return erDetSendtVarsel(behandling.getId());
+        }else if (BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandling.getType())) {
+            return BehandlingResultatType.HENLAGT_FEILOPPRETTET_MED_BREV.equals(behandlingResultatType);
+        }
+        return false;
     }
 
     private boolean erDetSendtVarsel(long behandlingId) {

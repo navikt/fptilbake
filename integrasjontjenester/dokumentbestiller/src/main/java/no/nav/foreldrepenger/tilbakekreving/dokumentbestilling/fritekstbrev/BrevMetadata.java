@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 
@@ -21,6 +22,7 @@ public class BrevMetadata {
     private Språkkode språkkode;
     private FagsakYtelseType fagsaktype;
     private String fagsaktypenavnPåSpråk;
+    private BehandlingType behandlingType;
 
     private String tittel;
 
@@ -74,6 +76,10 @@ public class BrevMetadata {
 
     public String getFagsaktypenavnPåSpråk() {
         return fagsaktypenavnPåSpråk;
+    }
+
+    public BehandlingType getBehandlingType() {
+        return behandlingType;
     }
 
     public static class Builder {
@@ -140,6 +146,10 @@ public class BrevMetadata {
 
         public Builder medMottakerAdresse(Adresseinfo mottakerAdresse) {
             this.metadata.mottakerAdresse = mottakerAdresse;
+            return this;
+        }
+        public Builder medBehandlingtype(BehandlingType behandlingType) {
+            this.metadata.behandlingType = behandlingType;
             return this;
         }
 

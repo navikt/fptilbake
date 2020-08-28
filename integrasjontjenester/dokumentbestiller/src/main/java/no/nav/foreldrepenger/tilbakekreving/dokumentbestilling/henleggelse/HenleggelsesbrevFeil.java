@@ -11,4 +11,9 @@ public interface HenleggelsesbrevFeil extends DeklarerteFeil {
 
     @FunksjonellFeil(feilkode = "FPT-110801", feilmelding = "Varselbrev er ikke sendt. Kan ikke forhåndsvise/sende henleggelsesbrev for behandlingId=%s.", løsningsforslag = "", logLevel = LogLevel.WARN)
     Feil kanIkkeSendeEllerForhåndsviseHenleggelsesBrev(Long behandlingId);
+
+    @FunksjonellFeil(feilkode = "FPT-110802",
+        feilmelding = "Kan ikke forhåndsvise/sende henleggelsesbrev uten fritekst for Tilbakekreving Revurdering med behandlingId=%s.",
+        løsningsforslag = "", logLevel = LogLevel.WARN)
+    Feil kanIkkeSendeEllerForhåndsviseRevurderingHenleggelsesBrev(Long behandlingId);
 }

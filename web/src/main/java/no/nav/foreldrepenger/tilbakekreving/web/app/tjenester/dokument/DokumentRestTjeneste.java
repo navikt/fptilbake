@@ -24,6 +24,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Avsnitt;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.ForhåndvisningVedtaksbrevTekstDto;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.HentForhåndsvisningHenleggelseslbrevDto;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.HentForhåndsvisningVarselbrevDto;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.HentForhåndvisningVedtaksbrevPdfDto;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.henleggelse.HenleggelsesbrevTjeneste;
@@ -112,12 +113,14 @@ public class DokumentRestTjeneste {
     @Operation(tags = "dokument", description = "Returnerer en pdf som er en forhåndsvisning av henleggelsesbrevet")
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public Response hentForhåndsvisningHenleggelsesbrev(@Valid @NotNull BehandlingReferanse behandlingReferanse) { // NOSONAR
+    public Response hentForhåndsvisningHenleggelsesbrev(@Valid @NotNull HentForhåndsvisningHenleggelseslbrevDto henleggelseslbrevDto) { // NOSONAR
         byte[] dokument;
+        BehandlingReferanse behandlingReferanse = henleggelseslbrevDto.getBehandlingReferanse();
+        String fritekst = henleggelseslbrevDto.getFritekst();
         if (behandlingReferanse.erInternBehandlingId()) {
-            dokument = henleggelsesbrevTjeneste.hentForhåndsvisningHenleggelsebrev(behandlingReferanse.getBehandlingId());
+            dokument = henleggelsesbrevTjeneste.hentForhåndsvisningHenleggelsebrev(behandlingReferanse.getBehandlingId(), fritekst);
         } else {
-            dokument = henleggelsesbrevTjeneste.hentForhåndsvisningHenleggelsebrev(behandlingReferanse.getBehandlingUuid());
+            dokument = henleggelsesbrevTjeneste.hentForhåndsvisningHenleggelsebrev(behandlingReferanse.getBehandlingUuid(), fritekst);
         }
         Response.ResponseBuilder responseBuilder = lagRespons(dokument);
         return responseBuilder.build();

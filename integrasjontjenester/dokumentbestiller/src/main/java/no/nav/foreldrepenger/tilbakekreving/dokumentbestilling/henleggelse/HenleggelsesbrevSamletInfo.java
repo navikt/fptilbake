@@ -8,6 +8,7 @@ public class HenleggelsesbrevSamletInfo {
 
     private BrevMetadata brevMetadata;
     private LocalDate varsletDato;
+    private String fritekstFraSaksbehandler;
 
     public BrevMetadata getBrevMetadata() {
         return brevMetadata;
@@ -23,5 +24,13 @@ public class HenleggelsesbrevSamletInfo {
 
     public void setVarsletDato(LocalDate varsletDato) {
         this.varsletDato = varsletDato;
+    }
+
+    public String getFritekstFraSaksbehandler() {
+        return fritekstFraSaksbehandler;
+    }
+
+    public void setFritekstFraSaksbehandler(String fritekstFraSaksbehandler) {
+        this.fritekstFraSaksbehandler = fritekstFraSaksbehandler;
     }
 }

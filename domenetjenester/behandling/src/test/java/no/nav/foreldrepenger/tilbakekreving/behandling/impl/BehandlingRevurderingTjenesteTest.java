@@ -72,7 +72,7 @@ public class BehandlingRevurderingTjenesteTest extends FellesTestOppsett {
 
     @Test
     public void kan_revurdering_ikke_opprettes_når_behandling_er_henlagt() {
-        henleggBehandlingTjeneste.henleggBehandlingManuelt(behandling.getId(), BehandlingResultatType.HENLAGT_FEILOPPRETTET, "");
+        henleggBehandlingTjeneste.henleggBehandlingManuelt(behandling.getId(), BehandlingResultatType.HENLAGT_FEILOPPRETTET, "","");
         assertThat(revurderingTjeneste.kanOppretteRevurdering(eksternBehandlingUuid)).isFalse();
     }
 
