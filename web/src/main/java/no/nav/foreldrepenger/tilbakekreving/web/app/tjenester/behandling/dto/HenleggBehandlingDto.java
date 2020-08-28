@@ -26,7 +26,7 @@ public class HenleggBehandlingDto implements AbacDto {
     @Pattern(regexp = InputValideringRegex.FRITEKST)
     private String begrunnelse;
 
-    @Size(max = 10000)
+    @Size(max = 2000)
     @Pattern(regexp = InputValideringRegex.FRITEKST)
     private String fritekst;
 

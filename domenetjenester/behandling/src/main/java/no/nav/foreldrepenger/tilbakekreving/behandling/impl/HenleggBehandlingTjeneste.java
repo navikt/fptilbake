@@ -90,7 +90,7 @@ public class HenleggBehandlingTjeneste {
     private void sendHenleggelsesbrev(Behandling behandling, String fritekst) {
         ProsessTaskData henleggelseBrevTask = new ProsessTaskData(HENLEGGELSESBREV_TASK_TYPE);
         henleggelseBrevTask.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
-        henleggelseBrevTask.setProperty("fritekst",fritekst);
+        henleggelseBrevTask.setPayload(fritekst);
         henleggelseBrevTask.setCallIdFraEksisterende();
         prosessTaskRepository.lagre(henleggelseBrevTask);
     }

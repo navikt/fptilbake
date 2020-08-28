@@ -20,7 +20,7 @@ public class HentForhåndsvisningHenleggelseslbrevDto implements AbacDto {
     @NotNull
     private BehandlingReferanse behandlingReferanse;
 
-    @Size(max = 10000, message = "Fritekst er for lang")
+    @Size(max = 2000, message = "Fritekst er for lang")
     @Pattern(regexp = InputValideringRegex.FRITEKST)
     private String fritekst;
 
