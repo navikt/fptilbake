@@ -50,7 +50,7 @@ public class AvstemmingTjenesteTest {
 
     @Before
     public void setup() {
-        avstemmingTjeneste = new AvstemmingTjeneste(sendtXmlRepository, behandlingRepositoryProvider, aktørConsumerMock);
+        avstemmingTjeneste = new AvstemmingTjeneste("fptilbake", sendtXmlRepository, behandlingRepositoryProvider, aktørConsumerMock);
         when(aktørConsumerMock.hentPersonIdentForAktørId(Mockito.any())).thenReturn(Optional.of("12345678901"));
     }
 

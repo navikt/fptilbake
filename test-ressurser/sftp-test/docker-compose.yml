@@ -11,6 +11,8 @@ services:
     - ${PWD}/keys/fptilbake2_key.pub:/home/fptilbake2/.ssh/keys/id_rsa.pub:ro
     - ${PWD}/tmp/fptilbake:/home/fptilbake/inbound
     - ${PWD}/tmp/fptilbake2:/home/fptilbake2/inbound
+    - ${PWD}/keys/fptilbake_key.pub:/home/k9tilbake/.ssh/keys/id_rsa.pub:ro
+    - ${PWD}/tmp/k9tilbake:/home/k9tilbake/inbound
     ports:
     - "50522:22"
     command: "last:bar:1010"

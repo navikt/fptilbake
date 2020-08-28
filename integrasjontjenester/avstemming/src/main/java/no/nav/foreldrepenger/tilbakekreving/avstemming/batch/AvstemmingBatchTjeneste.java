@@ -26,6 +26,7 @@ import no.nav.vedtak.feil.LogLevel;
 import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
 import no.nav.vedtak.feil.deklarasjon.IntegrasjonFeil;
 import no.nav.vedtak.felles.integrasjon.unleash.EnvironmentProperty;
+import no.nav.vedtak.konfig.KonfigVerdi;
 
 @ApplicationScoped
 public class AvstemmingBatchTjeneste implements BatchTjeneste {
@@ -36,8 +37,9 @@ public class AvstemmingBatchTjeneste implements BatchTjeneste {
     private static final DateTimeFormatter DATO_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
     private static final DateTimeFormatter DATO_TIDSPUNKT_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmm");
 
-    private static final String FILNAVN_MAL = "fptilbake-%s-%s-%s.csv";
+    private static final String FILNAVN_MAL = "%s-%s-%s-%s.csv";
 
+    private String applikasjon;
     private AvstemmingTjeneste avstemmingTjeneste;
     private AvstemmingSftpBatchTjeneste sftpBatchTjeneste;
 
@@ -48,8 +50,10 @@ public class AvstemmingBatchTjeneste implements BatchTjeneste {
     }
 
     @Inject
-    public AvstemmingBatchTjeneste(AvstemmingTjeneste avstemmingTjeneste,
+    public AvstemmingBatchTjeneste(@KonfigVerdi(value = "app.name") String applikasjon,
+                                   AvstemmingTjeneste avstemmingTjeneste,
                                    AvstemmingSftpBatchTjeneste sftpBatchTjeneste) {
+        this.applikasjon = applikasjon;
         this.avstemmingTjeneste = avstemmingTjeneste;
         this.sftpBatchTjeneste = sftpBatchTjeneste;
 
@@ -69,7 +73,7 @@ public class AvstemmingBatchTjeneste implements BatchTjeneste {
         if (resultat.isPresent()) {
             String forDato = dato.format(DATO_FORMATTER);
             String kjøreTidspunkt = LocalDateTime.now().format(DATO_TIDSPUNKT_FORMATTER);
-            String filnavn = String.format(FILNAVN_MAL, miljø, forDato, kjøreTidspunkt);
+            String filnavn = String.format(FILNAVN_MAL, applikasjon, miljø, forDato, kjøreTidspunkt);
             try {
                 sftpBatchTjeneste.put(resultat.get(), filnavn);
                 logger.info("Filen {} er overført til avstemming sftp", filnavn);
