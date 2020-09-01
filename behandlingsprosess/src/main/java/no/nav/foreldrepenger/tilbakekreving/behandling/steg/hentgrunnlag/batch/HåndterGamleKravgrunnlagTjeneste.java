@@ -17,6 +17,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.første
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.revurdering.HentKravgrunnlagMapper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
@@ -74,9 +75,9 @@ public class HåndterGamleKravgrunnlagTjeneste {
         this.fagsystemKlient = fagsystemKlient;
     }
 
-    protected List<ØkonomiXmlMottatt> hentGamleMeldinger(LocalDate bestemtDato) {
+    protected List<ØkonomiXmlMottatt> hentGamlekravgrunnlag(LocalDate bestemtDato) {
         logger.info("Henter kravgrunnlag som er eldre enn {}", bestemtDato);
-        return mottattXmlRepository.hentGamleUkobledeMottattXml(bestemtDato.atStartOfDay());
+        return mottattXmlRepository.hentGamleUkobledeKravgrunnlagXml(bestemtDato.atStartOfDay());
     }
 
     protected Optional<Kravgrunnlag431> hentKravgrunnlagFraØkonomi(ØkonomiXmlMottatt økonomiXmlMottatt) {
@@ -142,6 +143,7 @@ public class HåndterGamleKravgrunnlagTjeneste {
             if (skalGrunnlagSperres) {
                 logger.info("Mottatt Kravgrunnlaget med kravgrunnlagId={} for behandling med behandlingId={} er sperret hos økonomi. Derfor sperrer det i fptilbake også.",
                     kravgrunnlag431.getEksternKravgrunnlagId(), behandlingId);
+                settBehandlingPåVent(behandlingId);
                 sperrGrunnlag(behandlingId, kravgrunnlag431.getEksternKravgrunnlagId());
                 skalGrunnlagSperres = false;
             }
@@ -201,6 +203,7 @@ public class HåndterGamleKravgrunnlagTjeneste {
             lagreGrunnlag(behandlingId, kravgrunnlag431);
             tilkobleMottattXml(mottattXmlId);
             if (skalGrunnlagSperres) {
+                settBehandlingPåVent(behandlingId);
                 sperrGrunnlag(behandlingId, kravgrunnlag431.getEksternKravgrunnlagId());
                 skalGrunnlagSperres = false;
             }
@@ -230,6 +233,11 @@ public class HåndterGamleKravgrunnlagTjeneste {
     private void sperrGrunnlag(long behandlingId, String kravgrunnlagId) {
         grunnlagRepository.sperrGrunnlag(behandlingId);
         logger.info("Grunnlag med kravgrunnlagId={} er sperret for behandling={}", kravgrunnlagId, behandlingId);
+    }
+
+    private void settBehandlingPåVent(Long behandlingId) {
+        LocalDate fristDato = LocalDate.now().plusMonths(3);
+        behandlingTjeneste.settBehandlingPaVent(behandlingId,fristDato,Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
     }
 
     private Optional<Kravgrunnlag431> hentSperretKravgrunnlag(ØkonomiXmlMottatt økonomiXmlMottatt) {

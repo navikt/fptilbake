@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -19,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import no.nav.foreldrepenger.batch.BatchArguments;
 import no.nav.foreldrepenger.batch.BatchStatus;
 import no.nav.foreldrepenger.batch.BatchTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TaskProperty;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
 import no.nav.vedtak.konfig.KonfigVerdi;
@@ -67,11 +65,7 @@ public class HåndterGamleKravgrunnlagBatchTjeneste implements BatchTjeneste {
         LocalDate bestemtDato = iDag.minus(venteFrist.multipliedBy(2));// hardkoded for nå, en midlertidig løsning. Det blir fjernet når batchen lanseres fullstending i PROD
         logger.info("Håndterer kravgrunnlag som er eldre enn {} i batch {}", bestemtDato, batchRun);
 
-        List<ØkonomiXmlMottatt> alleGamleMeldinger = håndterGamleKravgrunnlagTjeneste.hentGamleMeldinger(bestemtDato);
-        List<ØkonomiXmlMottatt> alleGamleKravgrunnlag = alleGamleMeldinger.stream()
-            .filter(økonomiXmlMottatt -> økonomiXmlMottatt.getMottattXml().contains(TaskProperty.ROOT_ELEMENT_KRAVGRUNNLAG_XML))
-            .collect(Collectors.toList());
-
+        List<ØkonomiXmlMottatt> alleGamleKravgrunnlag = håndterGamleKravgrunnlagTjeneste.hentGamlekravgrunnlag(bestemtDato);
         if (alleGamleKravgrunnlag.isEmpty()) {
             logger.info("Det finnes ingen gammel kravgrunnlag før {}", bestemtDato);
         } else {
