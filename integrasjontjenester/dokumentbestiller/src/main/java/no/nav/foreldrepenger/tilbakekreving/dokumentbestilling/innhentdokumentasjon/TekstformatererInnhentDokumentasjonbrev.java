@@ -9,7 +9,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkko
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottakerUtil;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.TekstformatererBrevFeil;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.FellesTekstformaterer;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.OverskriftBrevData;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.dto.OverskriftBrevData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.innhentdokumentasjon.handlebars.dto.InnhentDokumentasjonbrevDokument;
 
 class TekstformatererInnhentDokumentasjonbrev extends FellesTekstformaterer {
@@ -24,7 +24,7 @@ class TekstformatererInnhentDokumentasjonbrev extends FellesTekstformaterer {
             InnhentDokumentasjonbrevDokument innhentDokumentasjonBrevDokument = mapTilInnhentDokumentasjonBrevDokument(
                 innhentDokumentasjonBrevSamletInfo);
 
-            return template.apply(innhentDokumentasjonBrevDokument);
+            return applyTemplate(template, innhentDokumentasjonBrevDokument);
         } catch (IOException e) {
             throw TekstformatererBrevFeil.FACTORY.feilVedTekstgenerering(e).toException();
         }
@@ -44,13 +44,13 @@ class TekstformatererInnhentDokumentasjonbrev extends FellesTekstformaterer {
 
     private static Template opprettHandlebarsTemplate(String filsti, Språkkode språkkode) throws IOException {
         Handlebars handlebars = opprettHandlebarsKonfigurasjon();
-        handlebars.registerHelper("datoformat", datoformatHelper());
         return handlebars.compile(lagSpråkstøttetFilsti(filsti, språkkode));
     }
 
     private static InnhentDokumentasjonbrevDokument mapTilInnhentDokumentasjonBrevDokument(InnhentDokumentasjonbrevSamletInfo innhentDokumentasjonBrevSamletInfo) {
         InnhentDokumentasjonbrevDokument innhentDokumentasjonBrevDokument = new InnhentDokumentasjonbrevDokument();
         innhentDokumentasjonBrevDokument.setFagsaktypeNavn(innhentDokumentasjonBrevSamletInfo.getBrevMetadata().getFagsaktypenavnPåSpråk());
+        innhentDokumentasjonBrevDokument.setYtelsetype(innhentDokumentasjonBrevSamletInfo.getBrevMetadata().getFagsaktype());
         innhentDokumentasjonBrevDokument.setFritekstFraSaksbehandler(innhentDokumentasjonBrevSamletInfo.getFritekstFraSaksbehandler());
         innhentDokumentasjonBrevDokument.setFristDato(innhentDokumentasjonBrevSamletInfo.getFristDato());
         innhentDokumentasjonBrevDokument.setFinnesVerge(innhentDokumentasjonBrevSamletInfo.getBrevMetadata().isFinnesVerge());

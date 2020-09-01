@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.AdresseType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
@@ -34,6 +35,26 @@ public class TekstformatererInnhentDokumentasjonbrevTest  {
             .build();
         String generertBrev = TekstformatererInnhentDokumentasjonbrev.lagInnhentDokumentasjonBrevFritekst(innhentDokumentasjonBrevSamletInfo);
         String fasit = les("/innhentdokumentasjonbrev/innhentdokumentasjonbrev.txt");;
+        assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
+    }
+
+    @Test
+    public void skal_generere_innhentdokumentasjonbrev_frisinn() throws Exception {
+        BrevMetadata brevMetadata = new BrevMetadata.Builder()
+            .medFagsaktypenavnPåSpråk(FagsakYtelseType.FRISINN.getNavn().toLowerCase())
+            .medFagsaktype(FagsakYtelseType.FRISINN)
+            .medSprakkode(Språkkode.nb)
+            .medMottakerAdresse(lagStandardNorskAdresse())
+            .medSakspartNavn("Test")
+            .build();
+
+        InnhentDokumentasjonbrevSamletInfo innhentDokumentasjonBrevSamletInfo = InnhentDokumentasjonbrevSamletInfo.builder()
+            .medBrevMetaData(brevMetadata)
+            .medFritekstFraSaksbehandler("Dette er ein fritekst.")
+            .medFristDato(LocalDate.of(2020, 3, 2))
+            .build();
+        String generertBrev = TekstformatererInnhentDokumentasjonbrev.lagInnhentDokumentasjonBrevFritekst(innhentDokumentasjonBrevSamletInfo);
+        String fasit = les("/innhentdokumentasjonbrev/innhentdokumentasjonbrev_frisinn.txt");;
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 

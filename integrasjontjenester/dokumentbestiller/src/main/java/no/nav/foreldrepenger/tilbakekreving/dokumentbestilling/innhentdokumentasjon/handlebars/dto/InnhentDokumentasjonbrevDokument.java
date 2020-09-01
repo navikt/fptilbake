@@ -3,21 +3,19 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.innhentdokumenta
 import java.time.LocalDate;
 import java.util.Objects;
 
-public class InnhentDokumentasjonbrevDokument {
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-    private String fagsaktypeNavn;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.LocalDateTilLangtNorskFormatSerialiserer;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.dto.BaseDokument;
+
+public class InnhentDokumentasjonbrevDokument extends BaseDokument {
+
     private String fritekstFraSaksbehandler;
+
+    @JsonSerialize(using = LocalDateTilLangtNorskFormatSerialiserer.class)
     private LocalDate fristDato;
     private boolean finnesVerge;
     private String annenMottakerNavn;
-
-    public String getFagsaktypeNavn() {
-        return fagsaktypeNavn;
-    }
-
-    public void setFagsaktypeNavn(String fagsaktypeNavn) {
-        this.fagsaktypeNavn = fagsaktypeNavn;
-    }
 
     public String getFritekstFraSaksbehandler() {
         return fritekstFraSaksbehandler;

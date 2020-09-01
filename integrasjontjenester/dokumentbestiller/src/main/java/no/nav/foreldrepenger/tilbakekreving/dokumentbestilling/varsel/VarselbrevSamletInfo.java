@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbPeriode;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.dto.periode.HbPeriode;
 
 public class VarselbrevSamletInfo {
 

@@ -42,6 +42,24 @@ public class TekstformatererHenleggelsesbrevTest {
     }
 
     @Test
+    public void skal_generere_henleggelsesbrev_frisinn() throws Exception {
+        BrevMetadata brevMetadata = new BrevMetadata.Builder()
+            .medFagsaktypenavnPåSpråk(FagsakYtelseType.FRISINN.getNavn().toLowerCase())
+            .medFagsaktype(FagsakYtelseType.FRISINN)
+            .medSprakkode(Språkkode.nb)
+            .medMottakerAdresse(lagAdresseInfo())
+            .medSakspartNavn("Test")
+            .build();
+
+        HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = new HenleggelsesbrevSamletInfo();
+        henleggelsesbrevSamletInfo.setBrevMetadata(brevMetadata);
+        henleggelsesbrevSamletInfo.setVarsletDato(niendeMars);
+        String generertBrev = TekstformatererHenleggelsesbrev.lagHenleggelsebrevFritekst(henleggelsesbrevSamletInfo);
+        String fasit = les("/henleggelsesbrev/henleggelsesbrev_frisinn.txt");
+        assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
+    }
+
+    @Test
     public void skal_generere_henleggelsesbrev_for_tilbakekreving_revurdering() throws Exception {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
             .medFagsaktypenavnPåSpråk("foreldrepenger")
@@ -56,6 +74,25 @@ public class TekstformatererHenleggelsesbrevTest {
         henleggelsesbrevSamletInfo.setFritekstFraSaksbehandler(REVURDERING_HENLEGGELSESBREV_FRITEKST);
         String generertBrev = TekstformatererHenleggelsesbrev.lagRevurderingHenleggelsebrevFritekst(henleggelsesbrevSamletInfo);
         String fasit = les("/henleggelsesbrev/henleggelsesbrev_revurdering.txt");
+        assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
+    }
+
+    @Test
+    public void skal_generere_henleggelsesbrev_for_tilbakekreving_revurdering_frisinn() throws Exception {
+        BrevMetadata brevMetadata = new BrevMetadata.Builder()
+            .medFagsaktypenavnPåSpråk(FagsakYtelseType.FRISINN.getNavn().toLowerCase())
+            .medFagsaktype(FagsakYtelseType.FRISINN)
+            .medSprakkode(Språkkode.nb)
+            .medMottakerAdresse(lagAdresseInfo())
+            .medSakspartNavn("Test")
+            .medBehandlingtype(BehandlingType.REVURDERING_TILBAKEKREVING)
+            .build();
+
+        HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = new HenleggelsesbrevSamletInfo();
+        henleggelsesbrevSamletInfo.setBrevMetadata(brevMetadata);
+        henleggelsesbrevSamletInfo.setFritekstFraSaksbehandler(REVURDERING_HENLEGGELSESBREV_FRITEKST);
+        String generertBrev = TekstformatererHenleggelsesbrev.lagRevurderingHenleggelsebrevFritekst(henleggelsesbrevSamletInfo);
+        String fasit = les("/henleggelsesbrev/henleggelsesbrev_revurdering_frisinn.txt");
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 

@@ -5,13 +5,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.github.jknack.handlebars.Context;
 import com.github.jknack.handlebars.Handlebars;
-import com.github.jknack.handlebars.JsonNodeValueResolver;
 import com.github.jknack.handlebars.Template;
-import com.github.jknack.handlebars.context.JavaBeanValueResolver;
-import com.github.jknack.handlebars.context.MapValueResolver;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
@@ -21,10 +16,10 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.Tekstforma
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.CustomHelpers;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.FellesTekstformaterer;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.OverskriftBrevData;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.handlebars.dto.BaseDokument;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.dto.OverskriftBrevData;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.dto.BaseDokument;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.handlebars.dto.VarselbrevDokument;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbPeriode;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.dto.periode.HbPeriode;
 
 public class TekstformatererVarselbrev extends FellesTekstformaterer {
 
@@ -107,22 +102,6 @@ public class TekstformatererVarselbrev extends FellesTekstformaterer {
             LocalDate fom = feilutbetaltPerioder.get(0).getFom();
             LocalDate tom = feilutbetaltPerioder.get(0).getTom();
             varselbrevDokument.setDatoerHvisSammenhengendePeriode(HbPeriode.of(fom, tom));
-        }
-    }
-
-    private static String applyTemplate(Template template, BaseDokument data) {
-        try {
-            //Går via JSON for å
-            //1. tilrettelegger for å flytte generering til PDF etc til ekstern applikasjon
-            //2. ha egen navngiving på variablene i template for enklere å lese template
-            //3. unngår at template feiler når variable endrer navn
-            JsonNode jsonNode = OM.valueToTree(data);
-            Context context = Context.newBuilder(jsonNode)
-                .resolver(JsonNodeValueResolver.INSTANCE, JavaBeanValueResolver.INSTANCE, MapValueResolver.INSTANCE)
-                .build();
-            return template.apply(context).stripLeading().stripTrailing();
-        } catch (IOException e) {
-            throw TekstformatererBrevFeil.FACTORY.feilVedTekstgenerering(e).toException();
         }
     }
 

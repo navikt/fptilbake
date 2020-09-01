@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode;
+package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.dto.periode;
 
 import java.time.LocalDate;
 

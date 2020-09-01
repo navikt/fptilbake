@@ -7,8 +7,10 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.LocalDateTilLangtNorskFormatSerialiserer;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbPeriode;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.dto.BaseDokument;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.dto.periode.HbPeriode;
 
 public class VarselbrevDokument extends BaseDokument {
 
@@ -30,6 +32,8 @@ public class VarselbrevDokument extends BaseDokument {
     private Long varsletBeløp;
     private boolean finnesVerge;
     private String annenMottakerNavn;
+
+    private boolean isKorrigert;
 
     public Long getBeløp() {
         return beløp;
@@ -103,13 +107,33 @@ public class VarselbrevDokument extends BaseDokument {
         this.finnesVerge = finnesVerge;
     }
 
-
     public String getAnnenMottakerNavn() {
         return annenMottakerNavn;
     }
 
     public void setAnnenMottakerNavn(String annenMottakerNavn) {
         this.annenMottakerNavn = annenMottakerNavn;
+    }
+
+    public boolean isKorrigert() {
+        return isKorrigert;
+    }
+
+    public void setKorrigert(boolean korrigert) {
+        isKorrigert = korrigert;
+    }
+
+    public boolean isYtelseUtenSkatt() {
+        return erYtelseType(FagsakYtelseType.ENGANGSTØNAD);
+    }
+
+    public boolean isYtelseMedSkatt() {
+        return erYtelseType(FagsakYtelseType.FORELDREPENGER) || erYtelseType(FagsakYtelseType.SVANGERSKAPSPENGER) || erYtelseType(FagsakYtelseType.FRISINN);
+    }
+
+    @JsonProperty("skal-vise-renteinformasjon")
+    public boolean isSkalViseRenteinformasjon() {
+        return erYtelseType(FagsakYtelseType.FORELDREPENGER) || erYtelseType(FagsakYtelseType.SVANGERSKAPSPENGER) || erYtelseType(FagsakYtelseType.ENGANGSTØNAD);
     }
 
     public void valider() {

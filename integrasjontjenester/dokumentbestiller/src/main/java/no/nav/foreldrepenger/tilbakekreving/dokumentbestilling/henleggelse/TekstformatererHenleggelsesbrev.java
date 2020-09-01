@@ -10,7 +10,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkko
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottakerUtil;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.TekstformatererBrevFeil;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.FellesTekstformaterer;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.OverskriftBrevData;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.dto.OverskriftBrevData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.henleggelse.handlebars.dto.HenleggelsesbrevDokument;
 
 class TekstformatererHenleggelsesbrev extends FellesTekstformaterer {
@@ -26,7 +26,7 @@ class TekstformatererHenleggelsesbrev extends FellesTekstformaterer {
             HenleggelsesbrevDokument henleggelsesbrevDokument = mapTilHenleggelsebrevDokument(
                 henleggelsesbrevSamletInfo);
 
-            return template.apply(henleggelsesbrevDokument);
+            return applyTemplate(template, henleggelsesbrevDokument);
         } catch (IOException e) {
             throw TekstformatererBrevFeil.FACTORY.feilVedTekstgenerering(e).toException();
         }
@@ -51,7 +51,7 @@ class TekstformatererHenleggelsesbrev extends FellesTekstformaterer {
             HenleggelsesbrevDokument henleggelsesbrevDokument = mapTilHenleggelsebrevDokument(
                 henleggelsesbrevSamletInfo);
 
-            return template.apply(henleggelsesbrevDokument);
+            return applyTemplate(template, henleggelsesbrevDokument);
         } catch (IOException e) {
             throw TekstformatererBrevFeil.FACTORY.feilVedTekstgenerering(e).toException();
         }
@@ -71,13 +71,13 @@ class TekstformatererHenleggelsesbrev extends FellesTekstformaterer {
 
     private static Template opprettHandlebarsTemplate(String filsti, Språkkode språkkode) throws IOException {
         Handlebars handlebars = opprettHandlebarsKonfigurasjon();
-        handlebars.registerHelper("datoformat", datoformatHelper());
         return handlebars.compile(lagSpråkstøttetFilsti(filsti, språkkode));
     }
 
     private static HenleggelsesbrevDokument mapTilHenleggelsebrevDokument(HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo) {
         HenleggelsesbrevDokument henleggelsesbrevDokument = new HenleggelsesbrevDokument();
         henleggelsesbrevDokument.setFagsaktypeNavn(henleggelsesbrevSamletInfo.getBrevMetadata().getFagsaktypenavnPåSpråk());
+        henleggelsesbrevDokument.setYtelsetype(henleggelsesbrevSamletInfo.getBrevMetadata().getFagsaktype());
         henleggelsesbrevDokument.setVarsletDato(henleggelsesbrevSamletInfo.getVarsletDato());
         henleggelsesbrevDokument.setFinnesVerge(henleggelsesbrevSamletInfo.getBrevMetadata().isFinnesVerge());
         henleggelsesbrevDokument.setAnnenMottakerNavn(BrevMottakerUtil.getAnnenMottakerNavn(henleggelsesbrevSamletInfo.getBrevMetadata()));

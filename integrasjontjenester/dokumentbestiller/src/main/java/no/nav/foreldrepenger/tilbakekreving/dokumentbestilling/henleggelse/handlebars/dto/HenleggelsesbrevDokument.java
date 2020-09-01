@@ -3,22 +3,19 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.henleggelse.hand
 import java.time.LocalDate;
 import java.util.Objects;
 
-public class HenleggelsesbrevDokument {
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-    private String fagsaktypeNavn;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.LocalDateTilLangtNorskFormatSerialiserer;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.dto.BaseDokument;
+
+public class HenleggelsesbrevDokument extends BaseDokument {
+
+    @JsonSerialize(using = LocalDateTilLangtNorskFormatSerialiserer.class)
     private LocalDate varsletDato;
     private boolean finnesVerge;
     private String annenMottakerNavn;
     private boolean tilbakekrevingRevurdering;
     private String fritekstFraSaksbehandler;
-
-    public String getFagsaktypeNavn() {
-        return fagsaktypeNavn;
-    }
-
-    public void setFagsaktypeNavn(String fagsaktypeNavn) {
-        this.fagsaktypeNavn = fagsaktypeNavn;
-    }
 
     public LocalDate getVarsletDato() {
         return varsletDato;
@@ -27,7 +24,6 @@ public class HenleggelsesbrevDokument {
     public void setVarsletDato(LocalDate varsletDato) {
         this.varsletDato = varsletDato;
     }
-
 
     public boolean isFinnesVerge() {
         return finnesVerge;
