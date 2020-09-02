@@ -9,7 +9,9 @@
   "maxReplicas": "3",
   "ingresses": [
     "https://fptilbake-q1.nais.preprod.local/",
-    "https://app-q1.adeo.no/fptilbake"
+    "https://app-q1.adeo.no/fptilbake",
+    "https://fptilbake.nais.preprod.local/",
+    "https://fptilbake.dev.adeo.no/"
   ],
   "env": {
     "LOADBALANCER_FQDN": "app-q1.adeo.no",
