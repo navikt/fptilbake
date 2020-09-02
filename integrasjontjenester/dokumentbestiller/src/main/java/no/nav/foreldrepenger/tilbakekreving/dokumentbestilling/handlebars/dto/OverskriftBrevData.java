@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars;
+package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.dto;
 
 public class OverskriftBrevData {
 

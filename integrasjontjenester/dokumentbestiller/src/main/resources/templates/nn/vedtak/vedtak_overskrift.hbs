@@ -1,12 +1,14 @@
-{{> nn/vedtak/vedtak_felles}}
+{{~#* inline "ytelsen" ~}}
+{{lookup-map sak.ytelsetype FP="foreldrepengane" SVP="svangerskapspengane" ES="eingongsstønaden" FRISINN="kompensasjonsytelse for selvstendig næringsdrivende og frilansere"}}
+{{~/inline~}}
 {{#switch totalresultat.hovedresultat}}
     {{#case "FULL_TILBAKEBETALING"}}
-Du må betale tilbake {{> ytelse-produkt}}
+Du må betale tilbake {{> ytelsen}}
     {{/case}}
     {{#case "DELVIS_TILBAKEBETALING"}}
-Du må betale tilbake {{> ytelse-produkt}}
+Du må betale tilbake {{> ytelsen}}
     {{/case}}
     {{#case "INGEN_TILBAKEBETALING"}}
-Du må ikkje betale tilbake {{> ytelse-produkt}}
+Du må ikkje betale tilbake {{> ytelsen}}
     {{/case}}
 {{/switch}}

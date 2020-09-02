@@ -19,7 +19,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelse
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.handlebars.dto.VarselbrevDokument;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbPeriode;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.dto.periode.HbPeriode;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 
 public class TekstformatererVarselbrevTest {

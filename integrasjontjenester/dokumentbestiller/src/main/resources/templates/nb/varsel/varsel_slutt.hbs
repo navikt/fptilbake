@@ -1,5 +1,5 @@
 {{~#* inline "ytelse-navn" ~}}
-{{lookup-map ytelsetype FP="foreldrepengene" SVP="svangerskapspengene" ES="engangsstønaden" FRISINN="inntektskompensasjonen"}}
+{{lookup-map ytelsetype FP="foreldrepengene" SVP="svangerskapspengene" ES="engangsstønaden" FRISINN="kompensasjonen"}}
 {{~/inline~}}
 _Dette legger vi vekt på i vurderingen vår
 For å avgjøre om vi kan kreve tilbake, tar vi først stilling til de tre øverste punktene i denne listen. Hvis resultatet blir at vi kan kreve tilbake, vurderer vi om du skal betale tilbake hele eller deler av beløpet.
@@ -22,10 +22,12 @@ Hvis du må betale tilbake, og du har gitt oss feil eller mangelfull informasjon
 Dette går fram av folketrygdloven {{#if skal-vise-renteinformasjon}}§§ 22-15 og 22-17a{{else}}§ 22-15{{/if}}.
 _Slik uttaler du deg
 Du kan sende uttalelsen din ved å logge deg inn på foreldrepenger.nav.no. Du kan også sende uttalelsen din til oss i posten. Adressen finner du på nav.no/ettersendelser.
+{{#if (neq ytelsetype "FRISINN") }}
 _Du har rett til innsyn
 På nav.no/dittnav kan du se dokumentene i saken din.
+{{/if}}
 _Har du spørsmål?
-Du finner nyttig informasjon på nav.no/familie.
+Du finner nyttig informasjon på nav.no{{#if (eq ytelsetype "FRISINN")}}. Du kan også kontakte oss på telefon 55553333.{{else}}/familie.{{/if}}
 
 
 Med vennlig hilsen

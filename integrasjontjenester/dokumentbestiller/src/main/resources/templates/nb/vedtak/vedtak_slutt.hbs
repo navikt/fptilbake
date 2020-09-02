@@ -22,10 +22,12 @@ Du kan klage innen {{konfigurasjon.klagefrist-uker}} uker fra den datoen du mott
 
 Du må som hovedregel begynne å betale beløpet tilbake, selv om du klager på dette vedtaket. Dette følger av forvaltningsloven § 42. Hvis du får vedtak om at du ikke trengte å betale tilbake hele eller deler av beløpet du skyldte, betaler vi pengene tilbake til deg.
 {{/if}}
+{{#if (neq sak.ytelsetype "FRISINN") }}
 _Du har rett til innsyn
 På nav.no/dittnav kan du se dokumentene i saken din.
+{{/if}}
 _Har du spørsmål?
-Du finner nyttig informasjon på nav.no/familie.
+Du finner nyttig informasjon på nav.no{{#if (eq sak.ytelsetype "FRISINN")}}. Du kan også kontakte oss på telefon 55553333.{{else}}/familie.{{/if}}
 
 Med vennlig hilsen
 NAV Familie- og pensjonsytelser{{#if finnesVerge}}

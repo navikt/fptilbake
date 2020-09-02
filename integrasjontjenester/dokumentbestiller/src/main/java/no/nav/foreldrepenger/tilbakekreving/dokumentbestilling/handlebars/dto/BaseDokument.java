@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.handlebars.dto;
+package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -13,7 +13,6 @@ public class BaseDokument {
     private FagsakYtelseType ytelsetype;
 
     private String fagsaktypeNavn;
-    private boolean isKorrigert;
 
     public String getFagsaktypeNavn() {
         return fagsaktypeNavn;
@@ -31,27 +30,6 @@ public class BaseDokument {
         this.ytelsetype = ytelsetype;
     }
 
-    public boolean isKorrigert() {
-        return isKorrigert;
-    }
-
-    public void setKorrigert(boolean korrigert) {
-        isKorrigert = korrigert;
-    }
-
-    public boolean isYtelseUtenSkatt() {
-        return erYtelseType(FagsakYtelseType.ENGANGSTØNAD);
-    }
-
-    public boolean isYtelseMedSkatt() {
-        return erYtelseType(FagsakYtelseType.FORELDREPENGER) || erYtelseType(FagsakYtelseType.SVANGERSKAPSPENGER) || erYtelseType(FagsakYtelseType.FRISINN);
-    }
-
-    @JsonProperty("skal-vise-renteinformasjon")
-    public boolean isSkalViseRenteinformasjon() {
-        return erYtelseType(FagsakYtelseType.FORELDREPENGER) || erYtelseType(FagsakYtelseType.SVANGERSKAPSPENGER) || erYtelseType(FagsakYtelseType.ENGANGSTØNAD);
-    }
-
     public boolean isEngangsstønad() {
         return erYtelseType(FagsakYtelseType.ENGANGSTØNAD);
     }
@@ -64,7 +42,7 @@ public class BaseDokument {
         return erYtelseType(FagsakYtelseType.SVANGERSKAPSPENGER);
     }
 
-    private boolean erYtelseType(FagsakYtelseType ytelseType) {
+    protected boolean erYtelseType(FagsakYtelseType ytelseType) {
         return ytelseType.equals(this.ytelsetype);
     }
 }
