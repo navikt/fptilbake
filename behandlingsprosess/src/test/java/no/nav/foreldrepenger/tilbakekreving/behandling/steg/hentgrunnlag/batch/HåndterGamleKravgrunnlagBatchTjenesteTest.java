@@ -163,9 +163,11 @@ public class HåndterGamleKravgrunnlagBatchTjenesteTest extends FellesTestOppset
         assertThat(økonomiXmlMottatt.isTilkoblet()).isTrue();
         List<Behandling> behandlinger = behandlingTjeneste.hentBehandlinger(new Saksnummer("139015144"));
         assertThat(behandlinger).isNotEmpty();
-        long behandlingId = behandlinger.get(0).getId();
+        Behandling nyBehandling = behandlinger.get(0);
+        long behandlingId = nyBehandling.getId();
         assertThat(grunnlagRepository.harGrunnlagForBehandlingId(behandlingId)).isTrue();
         assertThat(grunnlagRepository.erKravgrunnlagSperret(behandlingId)).isTrue();
+        assertThat(nyBehandling.isBehandlingPåVent()).isTrue();
     }
 
     @Test
