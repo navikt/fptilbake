@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 
 public class LocalDateTilKortNorskFormatSerialiserer extends JsonSerializer {
 
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd.MM.YYYY");
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
     @Override
     public void serialize(Object o, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
