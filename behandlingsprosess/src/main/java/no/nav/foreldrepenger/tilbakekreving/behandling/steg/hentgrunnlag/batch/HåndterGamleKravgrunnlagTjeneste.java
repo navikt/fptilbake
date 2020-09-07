@@ -1,7 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.batch;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -13,16 +12,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.KravgrunnlagMapperProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.KravgrunnlagMapper;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.KravgrunnlagXmlUnmarshaller;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.revurdering.HentKravgrunnlagMapper;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
@@ -53,7 +47,6 @@ public class HåndterGamleKravgrunnlagTjeneste {
     private HentKravgrunnlagMapper hentKravgrunnlagMapper;
     private KravgrunnlagMapper lesKravgrunnlagMapper;
     private BehandlingTjeneste behandlingTjeneste;
-    private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private ØkonomiConsumer økonomiConsumer;
     private FagsystemKlient fagsystemKlient;
 
@@ -67,17 +60,16 @@ public class HåndterGamleKravgrunnlagTjeneste {
     @Inject
     public HåndterGamleKravgrunnlagTjeneste(ØkonomiMottattXmlRepository mottattXmlRepository,
                                             KravgrunnlagRepository grunnlagRepository,
-                                            KravgrunnlagMapperProvider kravgrunnlagMapperProvider,
+                                            HentKravgrunnlagMapper hentKravgrunnlagMapper,
+                                            KravgrunnlagMapper kravgrunnlagMapper,
                                             BehandlingTjeneste behandlingTjeneste,
-                                            BehandlingskontrollTjeneste behandlingskontrollTjeneste,
                                             ØkonomiConsumer økonomiConsumer,
                                             FagsystemKlient fagsystemKlient) {
         this.mottattXmlRepository = mottattXmlRepository;
         this.grunnlagRepository = grunnlagRepository;
-        this.hentKravgrunnlagMapper = kravgrunnlagMapperProvider.getHentKravgrunnlagMapper();
-        this.lesKravgrunnlagMapper = kravgrunnlagMapperProvider.getKravgrunnlagMapper();
+        this.hentKravgrunnlagMapper = hentKravgrunnlagMapper;
+        this.lesKravgrunnlagMapper = kravgrunnlagMapper;
         this.behandlingTjeneste = behandlingTjeneste;
-        this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
         this.økonomiConsumer = økonomiConsumer;
         this.fagsystemKlient = fagsystemKlient;
     }
@@ -150,7 +142,6 @@ public class HåndterGamleKravgrunnlagTjeneste {
             if (skalGrunnlagSperres) {
                 logger.info("Mottatt Kravgrunnlaget med kravgrunnlagId={} for behandling med behandlingId={} er sperret hos økonomi. Derfor sperrer det i fptilbake også.",
                     kravgrunnlag431.getEksternKravgrunnlagId(), behandlingId);
-                settBehandlingPåVent(behandlingId);
                 sperrGrunnlag(behandlingId, kravgrunnlag431.getEksternKravgrunnlagId());
                 skalGrunnlagSperres = false;
             }
@@ -210,7 +201,6 @@ public class HåndterGamleKravgrunnlagTjeneste {
             lagreGrunnlag(behandlingId, kravgrunnlag431);
             tilkobleMottattXml(mottattXmlId);
             if (skalGrunnlagSperres) {
-                settBehandlingPåVent(behandlingId);
                 sperrGrunnlag(behandlingId, kravgrunnlag431.getEksternKravgrunnlagId());
                 skalGrunnlagSperres = false;
             }
@@ -240,13 +230,6 @@ public class HåndterGamleKravgrunnlagTjeneste {
     private void sperrGrunnlag(long behandlingId, String kravgrunnlagId) {
         grunnlagRepository.sperrGrunnlag(behandlingId);
         logger.info("Grunnlag med kravgrunnlagId={} er sperret for behandling={}", kravgrunnlagId, behandlingId);
-    }
-
-    private void settBehandlingPåVent(Long behandlingId) {
-        LocalDateTime fristDato = LocalDateTime.now().plusMonths(3);
-        Behandling behandling = behandlingTjeneste.hentBehandling(behandlingId);
-        behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, BehandlingStegType.TBKGSTEG,
-            fristDato, Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
     }
 
     private Optional<Kravgrunnlag431> hentSperretKravgrunnlag(ØkonomiXmlMottatt økonomiXmlMottatt) {
