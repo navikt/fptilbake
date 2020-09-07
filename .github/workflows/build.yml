@@ -94,14 +94,14 @@ jobs:
           title: Deploy av ${{ env.TAG }}
           labels: deployment
           body: |
-            Kommenter med <b>/promote_[fp/k9] namespace</b>, hvor <b>område</b> er fp eller k9, <b>env</b> er et gyldig clusternavn og <b>namespace</b> et eksisterende namespace i det clusteret.
+            Kommenter med <b>/promote område env namespace</b>, hvor <b>område</b> er fp eller k9, <b>env</b> er et gyldig clusternavn og <b>namespace</b> et eksisterende namespace i det clusteret.
 
             <table>
-            <tr><th>kommando</th><th>Cluster</th><th>Namespace</th></tr>
-            <tr><td>promote_fp</td><td>dev-fss</td><td>teamforeldrepenger</td></tr>
-            <tr><td>promote_fp</td><td>prod-fss</td><td>teamforeldrepenger,default</td></tr>
-            <tr><td>promote_k9</td><td>dev-fss</td><td>default</td></tr>
-            <tr><td>promote_k9</td><td>prod-fss</td><td>default</td></tr>
+            <tr><th>kommando</th><th>Område</th><th>Cluster</th><th>Namespace</th></tr>
+            <tr><td>promote</td><td>fp</td><td>dev-fss</td><td>teamforeldrepenger</td></tr>
+            <tr><td>promote</td><td>fp</td><td>prod-fss</td><td>teamforeldrepenger,default</td></tr>
+            <tr><td>promote</td><td>k9</td><td>dev-fss</td><td>default</td></tr>
+            <tr><td>promote</td><td>k9</td><td>prod-fss</td><td>default</td></tr>
             </table>
 
       - name: Trigg deploy av fptilbake til teamforeldrepenger
@@ -110,7 +110,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_ACCESS_TOKEN }}
           issue-number: ${{ steps.createdeployissue.outputs.number }}
-          body: /promote_fp dev-fss teamforeldrepenger
+          body: /promote fp dev-fss teamforeldrepenger
 
       - name: Rydd genererte artefakter fra cache før den lagres
         shell: bash
