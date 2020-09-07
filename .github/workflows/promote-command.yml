@@ -19,7 +19,12 @@ jobs:
           echo "::set-env name=OMRAADE::${{ github.event.client_payload.slash_command.arg1 }}"
           echo "::set-env name=CLUSTER::${{ github.event.client_payload.slash_command.arg2 }}"
           echo "::set-env name=NAMESPACE::${{ github.event.client_payload.slash_command.arg3 }}"
-          ::set-env name=NAID_DEPLOY_KEY::${{ github.event.client_payload.slash_command.arg3 }}
+          if  [[ ${{ github.event.client_payload.slash_command.arg3 }} -eq "fp" ]] then
+             ::set-env name=NAID_DEPLOY_KEY::"FPKEY"
+          else
+             ::set-env name=NAID_DEPLOY_KEY::"ULKEY"
+          fi
+
 
       - name: Sjekk ut kode
         uses: actions/checkout@v1
