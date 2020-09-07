@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.batch;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -12,11 +13,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.KravgrunnlagMapperProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.KravgrunnlagMapper;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.KravgrunnlagXmlUnmarshaller;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.revurdering.HentKravgrunnlagMapper;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
@@ -48,6 +53,7 @@ public class HåndterGamleKravgrunnlagTjeneste {
     private HentKravgrunnlagMapper hentKravgrunnlagMapper;
     private KravgrunnlagMapper lesKravgrunnlagMapper;
     private BehandlingTjeneste behandlingTjeneste;
+    private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private ØkonomiConsumer økonomiConsumer;
     private FagsystemKlient fagsystemKlient;
 
@@ -61,16 +67,17 @@ public class HåndterGamleKravgrunnlagTjeneste {
     @Inject
     public HåndterGamleKravgrunnlagTjeneste(ØkonomiMottattXmlRepository mottattXmlRepository,
                                             KravgrunnlagRepository grunnlagRepository,
-                                            HentKravgrunnlagMapper hentKravgrunnlagMapper,
-                                            KravgrunnlagMapper lesKravgrunnlagMapper,
+                                            KravgrunnlagMapperProvider kravgrunnlagMapperProvider,
                                             BehandlingTjeneste behandlingTjeneste,
+                                            BehandlingskontrollTjeneste behandlingskontrollTjeneste,
                                             ØkonomiConsumer økonomiConsumer,
                                             FagsystemKlient fagsystemKlient) {
         this.mottattXmlRepository = mottattXmlRepository;
         this.grunnlagRepository = grunnlagRepository;
-        this.hentKravgrunnlagMapper = hentKravgrunnlagMapper;
-        this.lesKravgrunnlagMapper = lesKravgrunnlagMapper;
+        this.hentKravgrunnlagMapper = kravgrunnlagMapperProvider.getHentKravgrunnlagMapper();
+        this.lesKravgrunnlagMapper = kravgrunnlagMapperProvider.getKravgrunnlagMapper();
         this.behandlingTjeneste = behandlingTjeneste;
+        this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
         this.økonomiConsumer = økonomiConsumer;
         this.fagsystemKlient = fagsystemKlient;
     }
@@ -207,7 +214,7 @@ public class HåndterGamleKravgrunnlagTjeneste {
                 sperrGrunnlag(behandlingId, kravgrunnlag431.getEksternKravgrunnlagId());
                 skalGrunnlagSperres = false;
             }
-            setAntallBehandlingOprettet(getAntallBehandlingOprettet()+1);
+            setAntallBehandlingOprettet(getAntallBehandlingOprettet() + 1);
         }
     }
 
@@ -236,8 +243,10 @@ public class HåndterGamleKravgrunnlagTjeneste {
     }
 
     private void settBehandlingPåVent(Long behandlingId) {
-        LocalDate fristDato = LocalDate.now().plusMonths(3);
-        behandlingTjeneste.settBehandlingPaVent(behandlingId,fristDato,Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
+        LocalDateTime fristDato = LocalDateTime.now().plusMonths(3);
+        Behandling behandling = behandlingTjeneste.hentBehandling(behandlingId);
+        behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, BehandlingStegType.TBKGSTEG,
+            fristDato, Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
     }
 
     private Optional<Kravgrunnlag431> hentSperretKravgrunnlag(ØkonomiXmlMottatt økonomiXmlMottatt) {

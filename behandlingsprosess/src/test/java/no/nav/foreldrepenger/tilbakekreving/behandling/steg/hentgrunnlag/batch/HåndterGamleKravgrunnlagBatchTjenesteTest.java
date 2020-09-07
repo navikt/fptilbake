@@ -32,6 +32,7 @@ import no.nav.foreldrepenger.batch.EmptyBatchArguments;
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjenesteImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.FellesTestOppsett;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.KravgrunnlagMapperProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.KravgrunnlagMapper;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.revurdering.HentKravgrunnlagMapper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollAsynkTjeneste;
@@ -74,6 +75,7 @@ public class HåndterGamleKravgrunnlagBatchTjenesteTest extends FellesTestOppset
 
     private HentKravgrunnlagMapper hentKravgrunnlagMapper = new HentKravgrunnlagMapper(tpsAdapterWrapper);
     private KravgrunnlagMapper lesKravgrunnlagMapper = new KravgrunnlagMapper(tpsAdapterWrapper);
+    private KravgrunnlagMapperProvider kravgrunnlagMapperProvider = new KravgrunnlagMapperProvider(lesKravgrunnlagMapper,hentKravgrunnlagMapper);
     private BehandlingskontrollProvider behandlingskontrollProvider = new BehandlingskontrollProvider(behandlingskontrollTjeneste, mock(BehandlingskontrollAsynkTjeneste.class));
     private TpsTjeneste tpsTjenesteMock = mock(TpsTjeneste.class);
     private ØkonomiConsumer økonomiConsumerMock = mock(ØkonomiConsumer.class);
@@ -82,8 +84,9 @@ public class HåndterGamleKravgrunnlagBatchTjenesteTest extends FellesTestOppset
     private BehandlingTjeneste behandlingTjeneste = new BehandlingTjenesteImpl(repositoryProvider, prosessTaskRepository, behandlingskontrollProvider,
         fagsakTjeneste, historikkinnslagTjeneste, fagsystemKlientMock, Period.ofWeeks(4));
     private HåndterGamleKravgrunnlagTjeneste håndterGamleKravgrunnlagTjeneste = new HåndterGamleKravgrunnlagTjeneste(mottattXmlRepository, grunnlagRepository,
-        hentKravgrunnlagMapper, lesKravgrunnlagMapper,
-        behandlingTjeneste, økonomiConsumerMock, fagsystemKlientMock);
+        kravgrunnlagMapperProvider,
+        behandlingTjeneste, behandlingskontrollTjeneste,
+        økonomiConsumerMock, fagsystemKlientMock);
     private Clock clock = Clock.fixed(Instant.parse(getDateString()), ZoneId.systemDefault());
     private HåndterGamleKravgrunnlagBatchTjeneste gamleKravgrunnlagBatchTjeneste = new HåndterGamleKravgrunnlagBatchTjeneste(håndterGamleKravgrunnlagTjeneste,
         clock, Period.ofWeeks(-1));
