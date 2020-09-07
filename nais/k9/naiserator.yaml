@@ -4,11 +4,11 @@ metadata:
   name: k9-tilbake
   namespace: {{namespace}}
   labels:
-    team: k9saksbehandling
+    team: teamukeloenn
 spec:
   image:  {{image}}
   port: 8080 # Required. The port number which is exposed by the container and should receive HTTP traffic.
-  team: k9saksbehandling
+  team: teamukeloenn
   ingresses:
   {{#each ingresses as |url|}}
      - {{url}}
