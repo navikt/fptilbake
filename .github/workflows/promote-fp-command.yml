@@ -1,4 +1,4 @@
-name: Promote-fp
+name: Promote_fp
 on:
   repository_dispatch:
     types: [promote-command]

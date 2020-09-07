@@ -1,4 +1,4 @@
-name: Promote-k9
+name: Promote_k9
 on:
   repository_dispatch:
     types: [promote-command]
