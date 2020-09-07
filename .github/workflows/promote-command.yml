@@ -26,7 +26,7 @@ jobs:
           ref: ${{ env.TAG }}
 
       - name: Promoter fptilbake til cluster og namespace
-        if: ${{ env.OMRAADE }} = 'fp'
+        if: env.OMRAADE == 'fp'
         uses: nais/deploy/actions/deploy@v1
         env:
           PRINT_PAYLOAD: true
@@ -36,7 +36,7 @@ jobs:
           VARS: nais/${{ env.OMRAADE }}/${{ env.CLUSTER }}-${{ env.NAMESPACE }}.json
 
       - name: Promoter k9-tilbake til cluster og namespace
-        if: ${{ env.OMRAADE }} = 'k9'
+        if: env.OMRAADE == 'k9'
         uses: nais/deploy/actions/deploy@v1
         env:
           PRINT_PAYLOAD: true
