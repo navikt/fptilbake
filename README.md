@@ -1,6 +1,11 @@
-fptilbake
+Applikasjonene fptilbake og k9-tilbake
 ===============
-Dette er repository for kildkode som dekker tilbakekrevingsløsning for foreldrepenger, svangerskapspenger og engangsstønad.
+
+Dette er repository for applikasjonene:
+ * fptilbake, en tilbakekrevingsapplikasjon for foreldrepenger, svangerskapspenger og engangsstønad.
+ * k9-tilbake, en tilbakekrevingsapplikasjon for frisinn og kapittel 9-ytelser: pleiepenger for sykt barn, pleiepenger for syk nærstående, omsorgspenger, opplæringspenger
+
+Løsningen deployes som to applikasjoner, for å understøtte de ulike områdenes behov på en god måte.
 
 Kontaktinformasjon:
 * slack-kanal: `#fp-tilbakekreving` 
@@ -11,12 +16,16 @@ Kontaktinformasjon:
 
 # Kjør og test lokalt
 
-TODO...
+Lokalt startes applikasjonene ved å kjøre en av klassene JettyFPDevServer eller JettyK9DevServer.
+
+Nødvendig konfigurasjon:
+* working directory må settes til å peke på modulen web (\web)
+* classpath skal peke på modulen web-dev (\web-dev)
 
 # Domene
 
 ## Fagsak
-Tilbakekrevingsbehanlinger knyttes til en fagsak fra et fagsystem (les: fpsak). Mottatte dokumenter journalføres koblet til fagsaken.
+Tilbakekrevingsbehanlinger knyttes til en fagsak fra et fagsystem (les: fpsak/k9-sak). Dokumenter som produseres kobles også til fagsaken i journalføringen.
 ## Behandling
 Det er flere typer behandlinger for tilbakekreving. De to førstnevnte er hovedbehandlingstypene. 
 1. Tilbakekrevingsbehandling.

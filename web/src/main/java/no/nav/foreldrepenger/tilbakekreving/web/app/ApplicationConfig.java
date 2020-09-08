@@ -53,7 +53,7 @@ import no.nav.vedtak.felles.prosesstask.rest.ProsessTaskRestTjeneste;
 public class ApplicationConfig extends Application {
 
     public static final String API_URI = "/api";
-    private static final String APPLIKASJON_NAVN_K9_TILBAKE = "k9tilbake";
+    private static final String APPLIKASJON_NAVN_K9_TILBAKE = "k9-tilbake";
     private static final String APPLIKASJON_NAVN_FPTILBAKE = "fptilbake";
 
     public ApplicationConfig() {
