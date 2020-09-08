@@ -24,7 +24,7 @@ public class FagsystemKlientProducer {
             case "fptilbake":
                 fagsystemKlient = fagsystemklienter.select(new Fptilbake.FptilbakeAnnotationLiteral()).get();
                 break;
-            case "k9tilbake":
+            case "k9-tilbake":
                 fagsystemKlient = fagsystemklienter.select(new K9tilbake.K9tilbakeAnnotationLiteral()).get();
                 break;
             default:

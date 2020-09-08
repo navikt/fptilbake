@@ -32,7 +32,7 @@ public class PdpRequestBuilderProducer {
                 logger.info("Bruker PdpRequestBuilder for fptilbake");
                 pdpRequestBuilder = pdpRequestBuilders.select(new Fptilbake.FptilbakeAnnotationLiteral()).get();
                 break;
-            case "k9tilbake":
+            case "k9-tilbake":
                 logger.info("Bruker PdpRequestBuilder for k9");
                 pdpRequestBuilder = pdpRequestBuilders.select(new K9tilbake.K9tilbakeAnnotationLiteral()).get();
                 break;

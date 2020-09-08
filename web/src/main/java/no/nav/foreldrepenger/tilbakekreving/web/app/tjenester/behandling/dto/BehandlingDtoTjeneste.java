@@ -78,7 +78,7 @@ public class BehandlingDtoTjeneste {
             case "fptilbake":
                 kontekstPath = "/fptilbake";
                 break;
-            case "k9tilbake":
+            case "k9-tilbake":
                 kontekstPath = "/k9/tilbake";
                 break;
             default:

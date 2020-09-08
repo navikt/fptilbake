@@ -32,7 +32,7 @@ public class XacmlRequestBuilderTjenesteProducer {
                 logger.info("Bruker XacmlRequestBuilderTjeneste for fptilbake");
                 xacmlRequestBuilderTjeneste = xacmlRequestBuilderTjenester.select(new Fptilbake.FptilbakeAnnotationLiteral()).get();
                 break;
-            case "k9tilbake":
+            case "k9-tilbake":
                 logger.info("Bruker XacmlRequestBuilderTjeneste for k9");
                 xacmlRequestBuilderTjeneste = xacmlRequestBuilderTjenester.select(new K9tilbake.K9tilbakeAnnotationLiteral()).get();
                 break;
