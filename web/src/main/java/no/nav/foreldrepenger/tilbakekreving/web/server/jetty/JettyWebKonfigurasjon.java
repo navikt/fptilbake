@@ -27,7 +27,7 @@ public class JettyWebKonfigurasjon implements AppKonfigurasjon {
             case "fptilbake":
                 return "/fptilbake";
             case "k9-tilbake":
-                return "/k9/tilbake";
+                return "/k9-tilbake";
             default:
                 throw new IllegalArgumentException("Ikke-støttet applikasjonsnavn: " + appname);
         }
