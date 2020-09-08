@@ -29,8 +29,6 @@ import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
 @RunWith(CdiRunner.class)
 public class RestApiAbacTest {
 
-    private static String PREV_LB_URL;
-
     /**
      * IKKE ignorer denne testen, sikrer at REST_MED_INNTEKTSMELDING-endepunkter får tilgangskontroll
      * <p>
@@ -134,13 +132,13 @@ public class RestApiAbacTest {
 
     @BeforeClass
     public static void setup() {
-        PREV_LB_URL = System.setProperty(ServerInfo.PROPERTY_KEY_LOADBALANCER_URL, "http://localhost:8090");
+        System.setProperty(ServerInfo.PROPERTY_KEY_LOADBALANCER_URL, "http://localhost:8090");
+        System.setProperty("application.name", "fptilbake");
     }
 
     @AfterClass
     public static void teardown() {
-        if (PREV_LB_URL != null) {
-            System.setProperty(ServerInfo.PROPERTY_KEY_LOADBALANCER_URL, PREV_LB_URL);
-        }
+        System.clearProperty(ServerInfo.PROPERTY_KEY_LOADBALANCER_URL);
+        System.clearProperty("application.name");
     }
 }

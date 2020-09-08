@@ -73,12 +73,14 @@ public class RestApiInputValideringDtoTest extends RestApiTester {
     @Parameterized.Parameters(name = "Validerer Dto - {0}")
     public static Collection<Object[]> getDtos() {
         System.setProperty("loadbalancer.url", "http://localhost:8030");
+        System.setProperty("application.name", "fptilbake");
         return WeldContext.getInstance().doWithScope(() -> finnAlleDtoTyper().stream().map(c -> new Object[]{c.getName(), c}).collect(Collectors.toSet()));
     }
 
     @After
     public void cleanup() {
         System.clearProperty("loadbalancer.url");
+        System.clearProperty("application.name");
     }
 
     public RestApiInputValideringDtoTest(@SuppressWarnings("unused") String name, Class<?> dto) {

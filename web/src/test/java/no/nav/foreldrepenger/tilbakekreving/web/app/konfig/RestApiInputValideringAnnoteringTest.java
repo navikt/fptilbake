@@ -9,6 +9,7 @@ import java.util.function.Function;
 import javax.validation.Valid;
 import javax.ws.rs.core.Context;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,6 +24,13 @@ public class RestApiInputValideringAnnoteringTest extends RestApiTester {
     @Before
     public void setup() {
         System.setProperty("loadbalancer.url", "http://localhost:8030");
+        System.setProperty("application.name", "fptilbake");
+    }
+
+    @After
+    public void cleanup() {
+        System.clearProperty("loadbalancer.url");
+        System.clearProperty("application.name");
     }
 
     /**
