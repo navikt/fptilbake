@@ -46,7 +46,7 @@ jobs:
         shell: bash
         run: |
           echo "Building $BUILD_VERSION"
-          mvn test-compile -P-migrer-db --quiet --batch-mode --settings ./.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION}
+          mvn test-compile -P-migrer-db --batch-mode --settings ./.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION}
 
       - name: Vent til oracle er oppe
         id: vent-til-oracle-er-klar
@@ -61,7 +61,7 @@ jobs:
         shell: bash
         run: |
           echo "Migrerer database"
-          mvn exec:java -pl migreringer --quiet --batch-mode --settings ./.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION}
+          mvn exec:java -pl migreringer --batch-mode --settings ./.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION}
 
       - name: Build artifacts & deploy (inkl test)
         env:
@@ -71,7 +71,7 @@ jobs:
         shell: bash
         run: |
           echo "Building artifacts $BUILD_VERSION"
-          mvn install --quiet -e --batch-mode --settings ./.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION} -Dfile.encoding=UTF-8 -Pgithub
+          mvn install -e --batch-mode --settings ./.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION} -Dfile.encoding=UTF-8 -Pgithub
           echo "Build artifacts"
           echo "::set-env name=TAG::$(mvn help:evaluate --batch-mode --settings ./.m2/settings.xml --file .flattened -Dexpression=project.version -q -DforceStdout)"
 
