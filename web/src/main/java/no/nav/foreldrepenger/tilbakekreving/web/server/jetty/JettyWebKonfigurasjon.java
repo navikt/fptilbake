@@ -1,12 +1,12 @@
 package no.nav.foreldrepenger.tilbakekreving.web.server.jetty;
 
 public class JettyWebKonfigurasjon implements AppKonfigurasjon {
-    private static final String CONTEXT_PATH = "/fptilbake";
     private static final String SWAGGER_HASH = "sha256-w6DoSiqz8+6cP13xAZftmJAdUupO32ZdbQZhwOvWf+U=";
 
     private Integer serverPort;
 
-    public JettyWebKonfigurasjon() {}
+    public JettyWebKonfigurasjon() {
+    }
 
     public JettyWebKonfigurasjon(int serverPort) {
         this.serverPort = serverPort;
@@ -22,7 +22,15 @@ public class JettyWebKonfigurasjon implements AppKonfigurasjon {
 
     @Override
     public String getContextPath() {
-        return CONTEXT_PATH;
+        String appname = System.getProperty("application.name");
+        switch (appname) {
+            case "fptilbake":
+                return "/fptilbake";
+            case "k9-tilbake":
+                return "/k9/tilbake";
+            default:
+                throw new IllegalArgumentException("Ikke-støttet applikasjonsnavn: " + appname);
+        }
     }
 
     @Override
