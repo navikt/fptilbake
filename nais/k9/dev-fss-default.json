@@ -13,7 +13,7 @@
   ],
   "env": {
     "LOADBALANCER_FQDN": "app-q1.adeo.no",
-    "ABAC_PDP_ENDPOINT_URL": "https://wasapp-q1.adeo.no/asm-pdp/authorize",
+    "ABAC_PDP_ENDPOINT_URL": "http://abac-k9/application/authorize",
     "SECURITYTOKENSERVICE_URL": "https://sts-q1.preprod.local/SecurityTokenServiceProvider/",
     "OIDC_OPENAM_JWKSURL": "https://isso-q.adeo.no:443/isso/oauth2/connect/jwk_uri",
     "OIDC_OPENAM_ISSUERURL": "https://isso-q.adeo.no:443/isso/oauth2",
