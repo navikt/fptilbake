@@ -79,7 +79,7 @@ public class BehandlingDtoTjeneste {
                 kontekstPath = "/fptilbake";
                 break;
             case "k9-tilbake":
-                kontekstPath = "/k9/tilbake";
+                kontekstPath = "/k9-tilbake";
                 break;
             default:
                 throw new IllegalStateException("app.name er satt til " + applikasjon + " som ikke er en støttet verdi");

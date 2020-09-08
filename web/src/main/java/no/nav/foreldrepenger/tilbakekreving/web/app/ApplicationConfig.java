@@ -88,7 +88,7 @@ public class ApplicationConfig extends Application {
             case APPLIKASJON_NAVN_FPTILBAKE:
                 return "/fptilbake";
             case APPLIKASJON_NAVN_K9_TILBAKE:
-                return "/k9/tilbake";
+                return "/k9-tilbake";
             default:
                 throw new IllegalStateException("app.name er satt til " + applikasjon + " som ikke er en støttet verdi");
         }

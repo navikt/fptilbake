@@ -9,7 +9,7 @@
   "maxReplicas": "2",
   "ingresses": [
     "https://k9-tilbake.nais.adeo.no",
-    "https://app.adeo.no/k9/tilbake/"
+    "https://app.adeo.no/k9-tilbake/"
   ],
   "env": {
     "LOADBALANCER_FQDN": "app.adeo.no",
