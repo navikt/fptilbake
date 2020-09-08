@@ -6,23 +6,16 @@ import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.K9tilbake;
 import no.nav.vedtak.sikkerhet.abac.PdpRequest;
-import no.nav.vedtak.sikkerhet.context.SubjectHandler;
 import no.nav.vedtak.sikkerhet.pdp.XacmlRequestBuilderTjeneste;
 import no.nav.vedtak.sikkerhet.pdp.xacml.XacmlAttributeSet;
 import no.nav.vedtak.sikkerhet.pdp.xacml.XacmlRequestBuilder;
 import no.nav.vedtak.util.Tuple;
-import no.nav.vedtak.util.env.Environment;
 
 @ApplicationScoped
 @K9tilbake
 public class K9XacmlRequestBuilderTjeneste implements XacmlRequestBuilderTjeneste {
-
-    private static final Logger logger = LoggerFactory.getLogger(K9XacmlRequestBuilderTjeneste.class);
 
     public K9XacmlRequestBuilderTjeneste() {
     }
@@ -44,13 +37,6 @@ public class K9XacmlRequestBuilderTjeneste implements XacmlRequestBuilderTjenest
                 populerResources(xacmlBuilder, pdpRequest, ident);
             }
         }
-
-
-        if (!Environment.current().isProd() && SubjectHandler.getSubjectHandler().getUid().equals("Z991225")){
-            //TODO Fjern logging når fikset
-            logger.info("xacml request {}", xacmlBuilder.build().toString());
-        }
-
 
         return xacmlBuilder;
     }
