@@ -65,9 +65,12 @@ public enum KlasseKode implements Kodeverdi {
     //JUST klassekoder
     KL_KODE_JUST_KORTTID("KL_KODE_JUST_KORTTID"),
 
-    //K9 klassekoder
+    //FRISINN klassekoder
     FRISINN_FRILANS("FRISINN-FRILANS"),
     FRISINN_SELVST_OP("FRISINN-SELVST-OP"),
+    KL_KODE_FEIL_KORONA("KL_KODE_FEIL_KORONA"),
+
+    //K9 klassekoder
     OMATAL("OMATAL"),
     OMATFRI("OMATFRI"),
     OMATORD("OMATORD"),
