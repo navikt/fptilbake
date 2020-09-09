@@ -38,7 +38,7 @@ public class HåndterGamleKravgrunnlagBatchTjeneste implements BatchTjeneste {
 
     @Inject
     public HåndterGamleKravgrunnlagBatchTjeneste(HåndterGamleKravgrunnlagTjeneste håndterGamleKravgrunnlagTjeneste,
-                                                 @KonfigVerdi(value = "grunnlag.alder") Period grunnlagAlder) {
+                                                 @KonfigVerdi(value = "automatisering.alder.kravgrunnlag") Period grunnlagAlder) {
         this.håndterGamleKravgrunnlagTjeneste = håndterGamleKravgrunnlagTjeneste;
         this.clock = Clock.systemDefaultZone();
         this.grunnlagAlder = grunnlagAlder;
@@ -47,7 +47,7 @@ public class HåndterGamleKravgrunnlagBatchTjeneste implements BatchTjeneste {
     // kun for test forbruk
     public HåndterGamleKravgrunnlagBatchTjeneste(HåndterGamleKravgrunnlagTjeneste håndterGamleKravgrunnlagTjeneste,
                                                  Clock clock,
-                                                 @KonfigVerdi(value = "grunnlag.alder") Period grunnlagAlder) {
+                                                 @KonfigVerdi(value = "automatisering.alder.kravgrunnlag") Period grunnlagAlder) {
         this.håndterGamleKravgrunnlagTjeneste = håndterGamleKravgrunnlagTjeneste;
         this.clock = clock;
         this.grunnlagAlder = grunnlagAlder;
