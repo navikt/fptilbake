@@ -104,13 +104,15 @@ jobs:
             <tr><td>promote</td><td>k9</td><td>prod-fss</td><td>default</td></tr>
             </table>
 
-      - name: Trigg deploy av fptilbake til dev-fss/teamforeldrepenger
+      - name: Trigger verdikjedetestene til fptilbake
         if: success()
-        uses: peter-evans/create-or-update-comment@v1
+        uses: peter-evans/repository-dispatch@v1
         with:
           token: ${{ secrets.GITHUB_ACCESS_TOKEN }}
-          issue-number: ${{ steps.createdeployissue.outputs.number }}
-          body: /promote fp dev-fss teamforeldrepenger
+          repository: navikt/fpsak-autotest
+          event-type: fptilbake-verdikjede
+          client-payload: '{ "trigger": "${{ github.repository }}", "version": "${{ env.TAG }}", "issue-number": "${{ steps.createdeployissue.outputs.number }}" }'
+
 
       - name: Trigg deploy av k9-tilbake til dev-fss/default
         if: success()
