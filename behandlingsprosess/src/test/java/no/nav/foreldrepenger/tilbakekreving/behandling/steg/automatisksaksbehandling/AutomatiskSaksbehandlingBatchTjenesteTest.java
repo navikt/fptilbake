@@ -95,7 +95,7 @@ public class AutomatiskSaksbehandlingBatchTjenesteTest {
 
         automatiskSaksbehandlingBatchTjeneste.launch(emptyBatchArguments);
         List<ProsessTaskData> prosessTasker = taskRepository.finnAlle(ProsessTaskStatus.KLAR);
-        assertThat(prosessTasker.size()).isEqualTo(0);
+        assertThat(prosessTasker).isEmpty();
     }
 
     @Test
@@ -104,7 +104,7 @@ public class AutomatiskSaksbehandlingBatchTjenesteTest {
 
         automatiskSaksbehandlingBatchTjeneste.launch(emptyBatchArguments);
         List<ProsessTaskData> prosessTasker = taskRepository.finnAlle(ProsessTaskStatus.KLAR);
-        assertThat(prosessTasker.size()).isEqualTo(0);
+        assertThat(prosessTasker).isEmpty();
     }
 
     @Test
@@ -113,7 +113,7 @@ public class AutomatiskSaksbehandlingBatchTjenesteTest {
 
         automatiskSaksbehandlingBatchTjeneste.launch(emptyBatchArguments);
         List<ProsessTaskData> prosessTasker = taskRepository.finnAlle(ProsessTaskStatus.KLAR);
-        assertThat(prosessTasker.size()).isEqualTo(0);
+        assertThat(prosessTasker).isEmpty();
     }
 
     @Test
@@ -122,7 +122,7 @@ public class AutomatiskSaksbehandlingBatchTjenesteTest {
 
         automatiskSaksbehandlingBatchTjeneste.launch(emptyBatchArguments);
         List<ProsessTaskData> prosessTasker = taskRepository.finnAlle(ProsessTaskStatus.KLAR);
-        assertThat(prosessTasker.size()).isEqualTo(0);
+        assertThat(prosessTasker).isEmpty();
     }
 
     @Test
@@ -131,7 +131,7 @@ public class AutomatiskSaksbehandlingBatchTjenesteTest {
 
         automatiskSaksbehandlingBatchTjeneste.launch(emptyBatchArguments);
         List<ProsessTaskData> prosessTasker = taskRepository.finnAlle(ProsessTaskStatus.KLAR);
-        assertThat(prosessTasker.size()).isEqualTo(0);
+        assertThat(prosessTasker).isEmpty();
     }
 
     @Test
@@ -146,7 +146,7 @@ public class AutomatiskSaksbehandlingBatchTjenesteTest {
 
         automatiskSaksbehandlingBatchTjeneste.launch(emptyBatchArguments);
         List<ProsessTaskData> prosessTasker = taskRepository.finnAlle(ProsessTaskStatus.KLAR);
-        assertThat(prosessTasker.size()).isEqualTo(0);
+        assertThat(prosessTasker).isEmpty();
     }
 
     private String getDateString() {

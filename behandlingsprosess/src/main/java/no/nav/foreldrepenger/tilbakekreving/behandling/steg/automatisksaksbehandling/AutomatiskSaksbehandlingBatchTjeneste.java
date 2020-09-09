@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -48,9 +49,9 @@ public class AutomatiskSaksbehandlingBatchTjeneste implements BatchTjeneste {
 
     // kun for testbruk
     protected AutomatiskSaksbehandlingBatchTjeneste(ProsessTaskRepository taskRepository,
-                                                 AutomatiskSaksbehandlingRepository automatiskSaksbehandlingRepository,
-                                                 Clock clock,
-                                                 @KonfigVerdi(value = "grunnlag.alder") Period grunnlagAlder) {
+                                                    AutomatiskSaksbehandlingRepository automatiskSaksbehandlingRepository,
+                                                    Clock clock,
+                                                    @KonfigVerdi(value = "automatisering.alder.kravgrunnlag") Period grunnlagAlder) {
         this.taskRepository = taskRepository;
         this.automatiskSaksbehandlingRepository = automatiskSaksbehandlingRepository;
         this.clock = clock;
@@ -67,13 +68,9 @@ public class AutomatiskSaksbehandlingBatchTjeneste implements BatchTjeneste {
             LocalDate bestemtDato = iDag.minus(grunnlagAlder);
             logger.info("Henter behandlinger som er eldre enn {} i batch {}", bestemtDato, batchRun);
             List<Behandling> behandlinger = automatiskSaksbehandlingRepository.hentAlleBehandlingerSomErKlarForAutomatiskSaksbehandling(bestemtDato);
-            if (behandlinger.isEmpty()) {
-                logger.info("Det finnes ingen behandlinger for å prosessere automatisk");
-            } else {
-                logger.info("Det finnes {} behandlinger som er klar for automatisk saksbehandling", behandlinger.size());
-                behandlinger.stream().filter(behandling -> !behandling.isBehandlingPåVent())
-                    .forEach(behandling -> opprettAutomatiskSaksbehandlingProsessTask(batchRun, behandling));
-            }
+            behandlinger = behandlinger.stream().filter(behandling -> !behandling.isBehandlingPåVent()).collect(Collectors.toList());
+            logger.info("Det finnes {} behandlinger som er klar for automatisk saksbehandling", behandlinger.size());
+            behandlinger.forEach(behandling -> opprettAutomatiskSaksbehandlingProsessTask(batchRun, behandling));
         }
         return batchRun;
     }
