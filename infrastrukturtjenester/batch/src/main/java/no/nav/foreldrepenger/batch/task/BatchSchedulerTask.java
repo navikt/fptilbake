@@ -16,6 +16,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
+import no.nav.vedtak.util.env.Environment;
 
 /**
  * Enkel scheduler for dagens situasjon der man kjører batcher mandag-fredag og det er noe variasjon i parametere.
@@ -70,6 +71,10 @@ public class BatchSchedulerTask implements ProsessTaskHandler {
             .map(Supplier::get)
             .collect(Collectors.toList());
 
+        if(Environment.current().isProd()){ // midlertidig kode, fjernes når automatisk saksbehandling prosess tasken er ferdig
+            batchOppsett.remove(3); // kjøres ikke automatisk saksbehandling batchen i PROD
+        }
+
         List<ProsessTaskData> batchtasks = batchOppsett.stream()
             .map(this::mapBatchConfigTilBatchRunnerTask)
             .collect(Collectors.toList());
@@ -89,4 +94,5 @@ public class BatchSchedulerTask implements ProsessTaskHandler {
         batchRunnerTask.setNesteKjøringEtter(LocalDateTime.of(dagensDato, config.getKjøreTidspunkt()));
         return batchRunnerTask;
     }
+
 }

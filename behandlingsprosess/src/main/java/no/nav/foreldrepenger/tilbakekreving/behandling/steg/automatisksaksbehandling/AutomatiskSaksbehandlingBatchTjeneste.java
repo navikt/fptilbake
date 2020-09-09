@@ -46,8 +46,8 @@ public class AutomatiskSaksbehandlingBatchTjeneste implements BatchTjeneste {
         this.grunnlagAlder = grunnlagAlder;
     }
 
-    // kun for test forbruk
-    public AutomatiskSaksbehandlingBatchTjeneste(ProsessTaskRepository taskRepository,
+    // kun for testbruk
+    protected AutomatiskSaksbehandlingBatchTjeneste(ProsessTaskRepository taskRepository,
                                                  AutomatiskSaksbehandlingRepository automatiskSaksbehandlingRepository,
                                                  Clock clock,
                                                  @KonfigVerdi(value = "grunnlag.alder") Period grunnlagAlder) {
@@ -62,7 +62,7 @@ public class AutomatiskSaksbehandlingBatchTjeneste implements BatchTjeneste {
         String batchRun = BATCHNAVN + EXECUTION_ID_SEPARATOR + UUID.randomUUID();
         LocalDate iDag = LocalDate.now(clock);
         if (iDag.getDayOfWeek().equals(DayOfWeek.SATURDAY) || iDag.getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
-            logger.info("I dag er helg, kan ikke kjøre batchen {}", BATCHNAVN);
+            logger.info("Kjører ikke batch {} i helgen. Iverksetting i saksbehandling avhenger av oppdragsystemet, som sannsynligvis har nedetid", BATCHNAVN);
         } else {
             LocalDate bestemtDato = iDag.minus(grunnlagAlder);
             logger.info("Henter behandlinger som er eldre enn {} i batch {}", bestemtDato, batchRun);

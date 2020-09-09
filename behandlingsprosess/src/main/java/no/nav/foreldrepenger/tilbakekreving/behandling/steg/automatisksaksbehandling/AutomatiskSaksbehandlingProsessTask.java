@@ -20,6 +20,7 @@ public class AutomatiskSaksbehandlingProsessTask implements ProsessTaskHandler {
 
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
+        logger.warn("Prosess-tasken er ikke ferdig ennå, saksbehandler ikke behandling automatisk!");
         //TODO
     }
 }

@@ -21,6 +21,10 @@ public class AutomatiskSaksbehandlingRepository {
 
     private EntityManager entityManager;
 
+    AutomatiskSaksbehandlingRepository(){
+        // for CDI
+    }
+
     @Inject
     public AutomatiskSaksbehandlingRepository(EntityManager entityManager) {
         this.entityManager = entityManager;
@@ -43,9 +47,9 @@ public class AutomatiskSaksbehandlingRepository {
             "and beløp.klasseType=:klasseType " +
             "group by b.id,f.fagsakYtelseType having " +
             "sum(beløp.nyBelop) <= case f.fagsakYtelseType " +
-            "when :fpYtelseType then :maksFpFeilutbetaltBeløp " +
-            "when :svpYtelseType then :maksSvpFeilutbetaltBeløp " +
-            "when :esYtelseType then :maksEsFeilutbetaltBeløp else -1 end " +
+            "when 'FP' then :maksFpFeilutbetaltBeløp " +
+            "when 'SVP' then :maksSvpFeilutbetaltBeløp " +
+            "when 'ES' then :maksEsFeilutbetaltBeløp else -1 end " +
             ") ", Behandling.class);
 
         query.setParameter("aksjonspunktDefinisjon", AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING);
@@ -54,11 +58,8 @@ public class AutomatiskSaksbehandlingRepository {
         query.setParameter("behandlingType", BehandlingType.TILBAKEKREVING);
         query.setParameter("bestemtDato", bestemtDato.atStartOfDay());
         query.setParameter("klasseType", KlasseType.FEIL);
-        query.setParameter("fpYtelseType", FagsakYtelseType.FORELDREPENGER.getKode());
         query.setParameter("maksFpFeilutbetaltBeløp", MaksFeilutbetaltBeløpPerYtelseType.getMaksFeilutbetaltBeløp(FagsakYtelseType.FORELDREPENGER));
-        query.setParameter("svpYtelseType", FagsakYtelseType.SVANGERSKAPSPENGER.getKode());
         query.setParameter("maksSvpFeilutbetaltBeløp", MaksFeilutbetaltBeløpPerYtelseType.getMaksFeilutbetaltBeløp(FagsakYtelseType.SVANGERSKAPSPENGER));
-        query.setParameter("esYtelseType", FagsakYtelseType.ENGANGSTØNAD.getKode());
         query.setParameter("maksEsFeilutbetaltBeløp", MaksFeilutbetaltBeløpPerYtelseType.getMaksFeilutbetaltBeløp(FagsakYtelseType.ENGANGSTØNAD));
         return query.getResultList();
     }
