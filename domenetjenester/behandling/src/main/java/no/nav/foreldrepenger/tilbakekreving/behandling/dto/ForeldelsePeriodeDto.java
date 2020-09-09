@@ -8,6 +8,7 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
+import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.vedtak.util.InputValideringRegex;
 
 public class ForeldelsePeriodeDto {
@@ -29,6 +30,13 @@ public class ForeldelsePeriodeDto {
     public ForeldelsePeriodeDto(LocalDate fraDato, LocalDate tilDato, ForeldelseVurderingType foreldelseVurderingType, String begrunnelse) {
         this.fraDato = fraDato;
         this.tilDato = tilDato;
+        this.foreldelseVurderingType = foreldelseVurderingType;
+        this.begrunnelse = begrunnelse;
+    }
+
+    public ForeldelsePeriodeDto(Periode periode, ForeldelseVurderingType foreldelseVurderingType, String begrunnelse) {
+        this.fraDato = periode.getFom();
+        this.tilDato = periode.getTom();
         this.foreldelseVurderingType = foreldelseVurderingType;
         this.begrunnelse = begrunnelse;
     }

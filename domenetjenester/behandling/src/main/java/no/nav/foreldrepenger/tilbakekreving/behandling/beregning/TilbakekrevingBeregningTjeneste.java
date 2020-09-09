@@ -72,7 +72,7 @@ public class TilbakekrevingBeregningTjeneste {
         BigDecimal totalFeilutbetaltBeløp = sum(beregningResultatPerioder, BeregningResultatPeriode::getFeilutbetaltBeløp);
 
         BeregningResultat beregningResultat = new BeregningResultat();
-        beregningResultat.setVedtakResultatType(bestemVedtakResultat(totalTilbakekrevingBeløp, totalFeilutbetaltBeløp));
+        beregningResultat.setVedtakResultatType(bestemVedtakResultat(behandlingId,totalTilbakekrevingBeløp, totalFeilutbetaltBeløp));
         beregningResultat.setBeregningResultatPerioder(beregningResultatPerioder);
         return beregningResultat;
     }
@@ -201,7 +201,11 @@ public class TilbakekrevingBeregningTjeneste {
         return perioderMedSkattProsent;
     }
 
-    private VedtakResultatType bestemVedtakResultat(BigDecimal tilbakekrevingBeløp, BigDecimal feilutbetaltBeløp) {
+    private VedtakResultatType bestemVedtakResultat(long behandlingId, BigDecimal tilbakekrevingBeløp, BigDecimal feilutbetaltBeløp) {
+        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
+        if (behandling.isAutomatiskSaksbehandlet()) {
+            return VedtakResultatType.INGEN_TILBAKEBETALING;
+        }
         if (tilbakekrevingBeløp.compareTo(BigDecimal.ZERO) == 0) {
             return VedtakResultatType.INGEN_TILBAKEBETALING;
         } else if (tilbakekrevingBeløp.compareTo(feilutbetaltBeløp) < 0) {

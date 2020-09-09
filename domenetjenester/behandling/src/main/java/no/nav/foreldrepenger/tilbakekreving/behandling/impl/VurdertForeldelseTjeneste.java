@@ -17,7 +17,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.dto.FeilutbetalingPeriode
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.ForeldelsePeriodeDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.PeriodeDto;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
@@ -42,6 +44,7 @@ public class VurdertForeldelseTjeneste {
 
     private VurdertForeldelseRepository vurdertForeldelseRepository;
     private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository;
+    private BehandlingRepository behandlingRepository;
 
     private HistorikkTjenesteAdapter historikkTjenesteAdapter;
     private VilkårsvurderingRepository vilkårsvurderingRepository;
@@ -56,6 +59,7 @@ public class VurdertForeldelseTjeneste {
         this.vilkårsvurderingRepository = repositoryProvider.getVilkårsvurderingRepository();
         this.vurdertForeldelseRepository = repositoryProvider.getVurdertForeldelseRepository();
         this.faktaFeilutbetalingRepository = repositoryProvider.getFaktaFeilutbetalingRepository();
+        this.behandlingRepository = repositoryProvider.getBehandlingRepository();
 
         this.historikkTjenesteAdapter = historikkTjenesteAdapter;
         this.kravgrunnlagBeregningTjeneste = kravgrunnlagBeregningTjeneste;
@@ -139,10 +143,11 @@ public class VurdertForeldelseTjeneste {
 
 
     private void lagInnslag(Long behandlingId, Optional<VurdertForeldelse> forrigeVurdertForeldelse, VurdertForeldelse vurdertForeldelseAggregate) {
+        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         Historikkinnslag historikkinnslag = new Historikkinnslag();
         historikkinnslag.setType(HistorikkinnslagType.FORELDELSE);
         historikkinnslag.setBehandlingId(behandlingId);
-        historikkinnslag.setAktør(HistorikkAktør.SAKSBEHANDLER);
+        historikkinnslag.setAktør(behandling.isAutomatiskSaksbehandlet() ? HistorikkAktør.VEDTAKSLØSNINGEN : HistorikkAktør.SAKSBEHANDLER);
 
         boolean behovForHistorikkInnslag = false;
         for (VurdertForeldelsePeriode foreldelsePeriode : vurdertForeldelseAggregate.getVurdertForeldelsePerioder()) {

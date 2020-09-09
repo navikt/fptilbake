@@ -40,7 +40,7 @@ public class AutomatiskSaksbehandlingBatchTjeneste implements BatchTjeneste {
     @Inject
     public AutomatiskSaksbehandlingBatchTjeneste(ProsessTaskRepository taskRepository,
                                                  AutomatiskSaksbehandlingRepository automatiskSaksbehandlingRepository,
-                                                 @KonfigVerdi(value = "grunnlag.alder") Period grunnlagAlder) {
+                                                 @KonfigVerdi(value = "automatisering.alder.kravgrunnlag") Period grunnlagAlder) {
         this.taskRepository = taskRepository;
         this.automatiskSaksbehandlingRepository = automatiskSaksbehandlingRepository;
         this.clock = Clock.systemDefaultZone();

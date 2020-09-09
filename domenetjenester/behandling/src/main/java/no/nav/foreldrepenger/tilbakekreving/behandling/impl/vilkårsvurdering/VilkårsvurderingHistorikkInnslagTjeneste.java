@@ -21,6 +21,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType;
@@ -116,10 +117,11 @@ public class VilkårsvurderingHistorikkInnslagTjeneste {
     }
 
     private void lagInnslag(Long behandlingId, List<Vilkårsendring> endringer) {
+        Behandling behandling = repositoryProvider.getBehandlingRepository().hentBehandling(behandlingId);
         Historikkinnslag historikkinnslag = new Historikkinnslag();
         historikkinnslag.setType(HistorikkinnslagType.TILBAKEKREVING);
         historikkinnslag.setBehandlingId(behandlingId);
-        historikkinnslag.setAktør(HistorikkAktør.SAKSBEHANDLER);
+        historikkinnslag.setAktør(behandling.isAutomatiskSaksbehandlet() ? HistorikkAktør.VEDTAKSLØSNINGEN : HistorikkAktør.SAKSBEHANDLER);
 
         for (Vilkårsendring vilkårsendring : endringer) {
             HistorikkInnslagTekstBuilder builder = lagTekstBuilderMedFellesFelt(vilkårsendring);
