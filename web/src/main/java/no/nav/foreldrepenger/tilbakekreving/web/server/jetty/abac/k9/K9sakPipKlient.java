@@ -23,7 +23,7 @@ public class K9sakPipKlient {
 
     private static final Logger logger = LoggerFactory.getLogger(K9sakPipKlient.class);
 
-    private static final String K9SAK_BASE_URL = "http://k9sak";
+    private static final String K9SAK_BASE_URL = "http://k9-sak";
     private static final String K9SAK_OVERRIDE_URL = "k9sak.override.url";
 
     private static final String PIP_BEHANDLING_ENDPOINT = "/k9/sak/api/pip/pipdata-for-behandling";
