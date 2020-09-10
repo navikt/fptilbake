@@ -161,6 +161,7 @@ public class TilbakekrevingBeregningTjeneste {
     }
 
     private List<GrunnlagPeriodeMedSkattProsent> lagGrunnlagPeriodeMedSkattProsent(Periode periode, Kravgrunnlag431 kravgrunnlag) {
+        BeregnBeløpUtil beregnBeløpUtil = BeregnBeløpUtil.forFagområde(kravgrunnlag.getFagOmrådeKode());
         List<KravgrunnlagPeriode432> kgPerioder = new ArrayList<>(kravgrunnlag.getPerioder());
         kgPerioder.sort(Comparator.comparing(p -> p.getPeriode().getFom()));
 
@@ -171,7 +172,7 @@ public class TilbakekrevingBeregningTjeneste {
                 .collect(Collectors.toList());
             List<GrunnlagPeriodeMedSkattProsent> periodeMedSkattProsent = kgBeløper.stream()
                 .map(kgBeløp -> {
-                    BigDecimal maksTilbakekrevesBeløp = BeregnBeløpUtil.beregnBeløpForPeriode(kgBeløp.getTilbakekrevesBelop(), periode, kgPeriode.getPeriode());
+                    BigDecimal maksTilbakekrevesBeløp = beregnBeløpUtil.beregnBeløpForPeriode(kgBeløp.getTilbakekrevesBelop(), periode, kgPeriode.getPeriode());
                     return new GrunnlagPeriodeMedSkattProsent(kgPeriode.getPeriode(), maksTilbakekrevesBeløp, kgBeløp.getSkattProsent());
                 })
                 .collect(Collectors.toList());
