@@ -28,11 +28,12 @@ public class VedtakHjemmel {
                                           VurdertForeldelse foreldelse,
                                           List<VilkårVurderingPeriodeEntitet> vilkårPerioder,
                                           EffektForBruker effektForBruker,
-                                          Språkkode språkkode) {
+                                          Språkkode språkkode,
+                                          boolean visHjemmelForRenter) {
         boolean foreldetVanlig = erNoeSattTilVanligForeldet(foreldelse);
         boolean foreldetMedTilleggsfrist = erTilleggsfristBenyttet(foreldelse);
         boolean ignorerteSmåbeløp = heleVurderingPgaSmåbeløp(vedtakResultatType, vilkårPerioder);
-        boolean renter = erRenterBenyttet(vilkårPerioder);
+        boolean renter = visHjemmelForRenter && erRenterBenyttet(vilkårPerioder);
 
         List<Hjemler> hjemler = new ArrayList<>();
         if (!vilkårPerioder.isEmpty()) {
