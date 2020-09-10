@@ -41,8 +41,15 @@ public class HendelseTypePrYtelseType {
             HendelseType.ES_ANNET_TYPE,
             HendelseType.MEDLEMSKAP_TYPE),
         FagsakYtelseType.FRISINN, Set.of(
-            HendelseType.FRISINN_ANNET_TYPE
-        )
+            HendelseType.FRISINN_ANNET_TYPE),
+        FagsakYtelseType.PLEIEPENGER_SYKT_BARN, Set.of(
+            HendelseType.PSB_ANNET_TYPE),
+        FagsakYtelseType.PLEIEPENGER_NÆRSTÅENDE, Set.of(
+            HendelseType.PPN_ANNET_TYPE),
+        FagsakYtelseType.OMSORGSPENGER, Set.of(
+            HendelseType.OMP_ANNET_TYPE),
+        FagsakYtelseType.OPPLÆRINGSPENGER, Set.of(
+            HendelseType.OLP_ANNET_TYPE)
     );
 
     public static Map<FagsakYtelseType, Set<HendelseType>> getHendelsetypeHierarki() {

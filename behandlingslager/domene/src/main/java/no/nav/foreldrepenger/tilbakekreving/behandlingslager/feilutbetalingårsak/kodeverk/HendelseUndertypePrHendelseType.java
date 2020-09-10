@@ -118,6 +118,18 @@ public class HendelseUndertypePrHendelseType {
         h.put(HendelseType.FRISINN_ANNET_TYPE, Set.of(
             HendelseUnderType.ANNET_FRITEKST
         ));
+        h.put(HendelseType.PSB_ANNET_TYPE, Set.of(
+            HendelseUnderType.ANNET_FRITEKST
+        ));
+        h.put(HendelseType.PPN_ANNET_TYPE, Set.of(
+            HendelseUnderType.ANNET_FRITEKST
+        ));
+        h.put(HendelseType.OMP_ANNET_TYPE, Set.of(
+            HendelseUnderType.ANNET_FRITEKST
+        ));
+        h.put(HendelseType.OLP_ANNET_TYPE, Set.of(
+            HendelseUnderType.ANNET_FRITEKST
+        ));
         return h;
     }
 
