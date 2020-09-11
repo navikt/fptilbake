@@ -100,16 +100,28 @@ public class VarselStegImpl implements VarselSteg {
     }
 
     private void opprettSendVarselTask(Behandling behandling) {
+        ProsessTaskGruppe taskGruppe = new ProsessTaskGruppe();
+
+        sendVarsel(behandling, taskGruppe);
+        sendBeskjedOmUtsendtVarsel(behandling, taskGruppe);
+
+        taskRepository.lagre(taskGruppe);
+    }
+
+    private void sendVarsel(Behandling behandling, ProsessTaskGruppe taskGruppe) {
         ProsessTaskData sendVarselbrev = new ProsessTaskData(SendVarselbrevTask.TASKTYPE);
         sendVarselbrev.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
-
-        ProsessTaskData sendBeskjedUtsendtVarsel = new ProsessTaskData(SendBeskjedUtsendtVarselTilSelvbetjeningTask.TASKTYPE);
-        sendBeskjedUtsendtVarsel.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
-
-        ProsessTaskGruppe taskGruppe = new ProsessTaskGruppe();
         taskGruppe.addNesteSekvensiell(sendVarselbrev);
-        taskGruppe.addNesteSekvensiell(sendBeskjedUtsendtVarsel);
-        taskRepository.lagre(taskGruppe);
+    }
+
+    private void sendBeskjedOmUtsendtVarsel(Behandling behandling, ProsessTaskGruppe taskGruppe) {
+        if (SendBeskjedUtsendtVarselTilSelvbetjeningTask.kanSendeVarsel(behandling)) {
+            ProsessTaskData sendBeskjedUtsendtVarsel = new ProsessTaskData(SendBeskjedUtsendtVarselTilSelvbetjeningTask.TASKTYPE);
+            sendBeskjedUtsendtVarsel.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
+            taskGruppe.addNesteSekvensiell(sendBeskjedUtsendtVarsel);
+        } else {
+            log.info("Sender ikke beskjed til selvbetjening for varsel for behandlingId={} i sak={}", behandling.getId(), behandling.getFagsak().getSaksnummer().getVerdi());
+        }
     }
 
     private boolean sjekkTilbakekrevingOpprettetUtenVarsel(Long behandlingId) {
