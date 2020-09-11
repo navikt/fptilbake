@@ -35,11 +35,11 @@
 
         <!-- Felles avhengigheter i prosjektet Disse skal ALLTID være en
             RELEASE-avhengighet UNNTAK: feature-brancher og lokalt -->
-        <felles.version>2.0.0-20200810080647-d5c4f94</felles.version>
-        <prosesstask.version>2.4.2-20200810080706-0586f95</prosesstask.version>
-        <vl-fpsak-tidsserie.version>2.3-20200810080723-bf4659f</vl-fpsak-tidsserie.version>
+        <felles.version>2.1.0-20200911062117-9337798</felles.version>
+        <prosesstask.version>2.4.3-20200821080802-12519de</prosesstask.version>
+        <vl-fpsak-tidsserie.version>2.3-20200901141100-c540133</vl-fpsak-tidsserie.version>
         <!-- Kontrakter -->
-        <fpkontrakter.version>5.1-20200810151031-853914b</fpkontrakter.version>
+        <fpkontrakter.version>5.1-20200907082654-6365c08</fpkontrakter.version>
 
         <surefire.version>2.22.2</surefire.version>
         <metrics.version>4.1.12.1</metrics.version>
@@ -426,6 +426,13 @@
                 <artifactId>jakarta.activation</artifactId>
                 <version>1.2.2</version>
             </dependency>
+            <dependency>
+                <!-- velger en transitiv avhengighet - felles ikke enig med seg selv, velger den som blir brukt i prod-scope i felles -->
+                <groupId>org.checkerframework</groupId>
+                <artifactId>checker-qual</artifactId>
+                <version>2.10.0</version>
+            </dependency>
+
 
             <dependency>
                 <groupId>org.apache.santuario</groupId>

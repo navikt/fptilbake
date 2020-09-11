@@ -33,7 +33,7 @@ import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.BehandlingResourceL
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.FpsakBehandlingInfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.simulering.FpoppdragRestKlient;
 import no.nav.vedtak.felles.integrasjon.rest.OidcRestClient;
-import no.nav.vedtak.konfig.PropertyUtil;
+import no.nav.vedtak.util.env.Environment;
 
 @ApplicationScoped
 @Fptilbake
@@ -230,7 +230,7 @@ public class FpsakKlient implements FagsystemKlient {
     }
 
     private URI baseUri() {
-        String override = PropertyUtil.getProperty(FPSAK_OVERRIDE_URL);
+        String override = Environment.current().getProperty(FPSAK_OVERRIDE_URL);
         if (override != null && !override.isEmpty()) {
             logger.info("Overstyrer fpsak base URL med {}", override);
             return URI.create(override);

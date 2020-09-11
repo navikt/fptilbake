@@ -31,8 +31,8 @@ import org.eclipse.jetty.webapp.WebInfConfiguration;
 import org.eclipse.jetty.webapp.WebXmlConfiguration;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.sikkerhet.SecurityFilter;
 import no.nav.vedtak.sikkerhet.context.SubjectHandler;
-import no.nav.vedtak.sikkerhetsfilter.SecurityFilter;
 
 abstract class AbstractJettyServer {
 

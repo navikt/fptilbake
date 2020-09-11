@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.vedtak.felles.integrasjon.rest.SystemUserOidcRestClient;
-import no.nav.vedtak.konfig.PropertyUtil;
+import no.nav.vedtak.util.env.Environment;
 
 @ApplicationScoped
 public class K9sakPipKlient {
@@ -69,7 +69,7 @@ public class K9sakPipKlient {
     }
 
     private URI baseUri() {
-        String override = PropertyUtil.getProperty(K9SAK_OVERRIDE_URL);
+        String override = Environment.current().getProperty(K9SAK_OVERRIDE_URL);
         if (override != null && !override.isEmpty()) {
             logger.warn("Overstyrer k9sak base URL med {}", override);
             return URI.create(override);
