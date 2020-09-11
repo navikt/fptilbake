@@ -8,8 +8,10 @@ import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.JournalpostIdOgDokumentId;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.journalpostapi.JournalpostApiKlient;
 import no.nav.journalpostapi.dto.BehandlingTema;
 import no.nav.journalpostapi.dto.Bruker;
@@ -25,6 +27,7 @@ import no.nav.journalpostapi.dto.dokument.Variantformat;
 import no.nav.journalpostapi.dto.opprett.OpprettJournalpostRequest;
 import no.nav.journalpostapi.dto.opprett.OpprettJournalpostResponse;
 import no.nav.journalpostapi.dto.sak.Arkivsaksystem;
+import no.nav.journalpostapi.dto.sak.FagsakSystem;
 import no.nav.journalpostapi.dto.sak.Sak;
 import no.nav.journalpostapi.dto.sak.Sakstype;
 import no.nav.vedtak.feil.Feil;
@@ -32,6 +35,7 @@ import no.nav.vedtak.feil.FeilFactory;
 import no.nav.vedtak.feil.LogLevel;
 import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
 import no.nav.vedtak.feil.deklarasjon.IntegrasjonFeil;
+import no.nav.vedtak.konfig.KonfigVerdi;
 
 @ApplicationScoped
 public class JournalføringTjeneste {
@@ -40,15 +44,17 @@ public class JournalføringTjeneste {
 
     private BehandlingRepository behandlingRepository;
     private JournalpostApiKlient journalpostApiKlient;
+    private String appName;
 
     JournalføringTjeneste() {
         //for CDI proxy
     }
 
     @Inject
-    public JournalføringTjeneste(BehandlingRepository behandlingRepository, JournalpostApiKlient journalpostApiKlient) {
+    public JournalføringTjeneste(BehandlingRepository behandlingRepository, JournalpostApiKlient journalpostApiKlient, @KonfigVerdi(value = "app.name") String appName) {
         this.behandlingRepository = behandlingRepository;
         this.journalpostApiKlient = journalpostApiKlient;
+        this.appName = appName;
     }
 
     public JournalpostIdOgDokumentId journalførVedlegg(Long behandlingId, byte[] vedleggPdf) {
@@ -64,10 +70,7 @@ public class JournalføringTjeneste {
             .medJournalførendeEnhet(behandling.getBehandlendeEnhetId())
             .medJournalposttype(Journalposttype.NOTAT)
             .medTittel("Oversikt over resultatet av tilbakebetalingssaken")
-            .medSak(Sak.builder()
-                .medSakstype(Sakstype.ARKIVSAK)
-                .medArkivsak(Arkivsaksystem.GSAK, behandling.getFagsak().getSaksnummer().getVerdi())
-                .build())
+            .medSak(lagSaksreferanse(behandling.getFagsak()))
             .medHoveddokument(Dokument.builder()
                 .medDokumentkategori(Dokumentkategori.Infobrev)
                 .medTittel("Oversikt over resultatet av tilbakebetalingssaken")
@@ -89,6 +92,31 @@ public class JournalføringTjeneste {
         }
         logger.info("Journalførte vedlegg for vedtaksbrev for behandlingId={} med journalpostid={}", behandlingId, journalpostId.getVerdi());
         return new JournalpostIdOgDokumentId(journalpostId, response.getDokumenter().get(0).getDokumentInfoId());
+    }
+
+    private Sak lagSaksreferanse(Fagsak fagsak) {
+        switch (appName) {
+            case "fptilbake":
+                return lagReferanseTilGsakSak(fagsak.getSaksnummer());
+            case "k9-tilbake":
+                return lagReferanseTilK9FagsystemSak(fagsak.getSaksnummer());
+            default:
+                throw new IllegalArgumentException("Ikke-støttet app.name: " + appName);
+        }
+    }
+
+    private Sak lagReferanseTilK9FagsystemSak(Saksnummer saksnummer) {
+        return Sak.builder()
+            .medSakstype(Sakstype.FAGSAK)
+            .medFagsak(FagsakSystem.K9SAK, saksnummer.getVerdi())
+            .build();
+    }
+
+    private Sak lagReferanseTilGsakSak(Saksnummer saksnummer) {
+        return Sak.builder()
+            .medSakstype(Sakstype.ARKIVSAK)
+            .medArkivsak(Arkivsaksystem.GSAK, saksnummer.getVerdi())
+            .build();
     }
 
     interface JournalføringTjenesteFeil extends DeklarerteFeil {
