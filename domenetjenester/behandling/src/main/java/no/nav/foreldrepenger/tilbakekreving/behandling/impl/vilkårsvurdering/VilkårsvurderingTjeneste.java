@@ -221,6 +221,7 @@ public class VilkårsvurderingTjeneste {
 
     private List<YtelseDto> henteYtelse(Long behandlingId, Periode feilutbetalingPeriode) {
         Kravgrunnlag431 kravgrunnlag = grunnlagRepository.finnKravgrunnlag(behandlingId);
+        BeregnBeløpUtil beregnBeløpUtil = BeregnBeløpUtil.forFagområde(kravgrunnlag.getFagOmrådeKode());
         List<YtelseDto> ytelser = new ArrayList<>();
         for (KravgrunnlagPeriode432 kgPeriode : kravgrunnlag.getPerioder()) {
             Periode grunnlagPeriode = kgPeriode.getPeriode();
@@ -229,7 +230,7 @@ public class VilkårsvurderingTjeneste {
                     .filter(belop433 -> KlasseType.YTEL.equals(belop433.getKlasseType()))
                     .filter(belop433 -> BigDecimal.ZERO.compareTo(belop433.getTilbakekrevesBelop()) != 0)
                     .collect(Collectors.toList());
-                ytelser.addAll(opprettYtelser(feilutbetalingPeriode, grunnlagPeriode, beloper));
+                ytelser.addAll(opprettYtelser(feilutbetalingPeriode, grunnlagPeriode, beloper, beregnBeløpUtil));
             }
         }
         return ytelser;
@@ -262,13 +263,13 @@ public class VilkårsvurderingTjeneste {
         return redusertBeløper;
     }
 
-    private List<YtelseDto> opprettYtelser(Periode feilutbetalingPeriode, Periode grunnlagPeriode, List<KravgrunnlagBelop433> beloper) {
+    private List<YtelseDto> opprettYtelser(Periode feilutbetalingPeriode, Periode grunnlagPeriode, List<KravgrunnlagBelop433> beloper, BeregnBeløpUtil beregnBeløpUtil) {
         List<YtelseDto> ytelser = new ArrayList<>();
         for (KravgrunnlagBelop433 belop : beloper) {
             Inntektskategori inntektskategori = finnesInntektsKategori(belop);
             YtelseDto ytelse = new YtelseDto();
             ytelse.setAktivitet(inntektskategori.getNavn());
-            ytelse.setBelop(BeregnBeløpUtil.beregnBeløpForPeriode(belop.getTilbakekrevesBelop(), feilutbetalingPeriode, grunnlagPeriode));
+            ytelse.setBelop(beregnBeløpUtil.beregnBeløpForPeriode(belop.getTilbakekrevesBelop(), feilutbetalingPeriode, grunnlagPeriode));
             ytelser.add(ytelse);
         }
         return ytelser;

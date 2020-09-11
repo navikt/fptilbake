@@ -94,14 +94,15 @@ public class KravgrunnlagBeregningTjeneste {
     }
 
     private BigDecimal beregnBeløp(Kravgrunnlag431 kravgrunnlag, Periode periode, Function<KravgrunnlagPeriode432, BigDecimal> beløpUtleder) {
+        BeregnBeløpUtil beregnBeløpUtil = BeregnBeløpUtil.forFagområde(kravgrunnlag.getFagOmrådeKode());
         List<KravgrunnlagPeriode432> kgPerioder = new ArrayList<>(kravgrunnlag.getPerioder());
         kgPerioder.sort(Comparator.comparing(p -> p.getPeriode().getFom()));
         BigDecimal sum = BigDecimal.ZERO;
         for (KravgrunnlagPeriode432 kgPeriode : kgPerioder) {
             BigDecimal beløp = beløpUtleder.apply(kgPeriode);
             if (isNotZero(beløp)) {
-                BigDecimal feilutbetaltBeløpPrVirkedag = BeregnBeløpUtil.beregnBeløpPrVirkedag(beløp, kgPeriode.getPeriode());
-                sum = sum.add(BeregnBeløpUtil.beregnBeløp(periode, kgPeriode.getPeriode(), feilutbetaltBeløpPrVirkedag));
+                BigDecimal feilutbetaltBeløpPrVirkedag = beregnBeløpUtil.beregnBeløpPrVirkedag(beløp, kgPeriode.getPeriode());
+                sum = sum.add(beregnBeløpUtil.beregnBeløp(periode, kgPeriode.getPeriode(), feilutbetaltBeløpPrVirkedag));
             }
         }
 
