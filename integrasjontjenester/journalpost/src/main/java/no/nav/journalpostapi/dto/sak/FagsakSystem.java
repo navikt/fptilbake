@@ -1,6 +1,8 @@
 package no.nav.journalpostapi.dto.sak;
 
-public enum FagsakSystem {
+import no.nav.journalpostapi.Kode;
+
+public enum FagsakSystem implements Kode {
     FORELDREPENGELØSNINGEN("FS36"),
     K9SAK("K9");
 
@@ -10,6 +12,7 @@ public enum FagsakSystem {
         this.kode = kode;
     }
 
+    @Override
     public String getKode() {
         return kode;
     }
