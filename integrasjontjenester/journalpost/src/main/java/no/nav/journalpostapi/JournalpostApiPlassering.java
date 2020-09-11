@@ -3,7 +3,7 @@ package no.nav.journalpostapi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.vedtak.konfig.PropertyUtil;
+import no.nav.vedtak.util.env.Environment;
 
 class JournalpostApiPlassering {
 
@@ -17,7 +17,7 @@ class JournalpostApiPlassering {
     }
 
     static String getBaseUrl() {
-        String overrideUrl = PropertyUtil.getProperty(JournalpostApiPlassering.OVERRIDE_URL);
+        String overrideUrl = Environment.current().getProperty(JournalpostApiPlassering.OVERRIDE_URL);
         if (overrideUrl != null && !overrideUrl.isEmpty()) {
             logger.info("Overstyrte URL til dokarkiv til {}", overrideUrl);
             return overrideUrl;

@@ -9,7 +9,7 @@ import javax.sql.DataSource;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
-import no.nav.vedtak.konfig.PropertyUtil;
+import no.nav.vedtak.util.env.Environment;
 
 class DataSourceKonfig {
 
@@ -24,9 +24,9 @@ class DataSourceKonfig {
 
     private DataSource createDatasource(String dataSourceName) {
         HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(PropertyUtil.getProperty(dataSourceName + ".url"));
-        config.setUsername(PropertyUtil.getProperty(dataSourceName + ".username"));
-        config.setPassword(PropertyUtil.getProperty(dataSourceName + ".password")); // NOSONAR false positive
+        config.setJdbcUrl(Environment.current().getProperty(dataSourceName + ".url"));
+        config.setUsername(Environment.current().getProperty(dataSourceName + ".username"));
+        config.setPassword(Environment.current().getProperty(dataSourceName + ".password")); // NOSONAR false positive
 
         config.setConnectionTimeout(1000);
         config.setMinimumIdle(2);

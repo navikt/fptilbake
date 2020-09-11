@@ -3,7 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.fpsak.klient.simulering;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.vedtak.konfig.PropertyUtil;
+import no.nav.vedtak.util.env.Environment;
 
 class FpoppdragFelles {
 
@@ -17,7 +17,7 @@ class FpoppdragFelles {
     }
 
     static String getFpoppdragBaseUrl() {
-        String overrideUrl = PropertyUtil.getProperty(FpoppdragFelles.FPOPPDRAG_OVERRIDE_URL);
+        String overrideUrl = Environment.current().getProperty(FpoppdragFelles.FPOPPDRAG_OVERRIDE_URL);
         if (overrideUrl != null && !overrideUrl.isEmpty()) {
             logger.info("Overstyrte URL til fpoppdrag til {}", overrideUrl);
             return overrideUrl;
