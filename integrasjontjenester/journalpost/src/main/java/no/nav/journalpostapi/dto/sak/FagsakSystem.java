@@ -1,7 +1,8 @@
 package no.nav.journalpostapi.dto.sak;
 
 public enum FagsakSystem {
-    FORELDREPENGELØSNINGEN("FS36");
+    FORELDREPENGELØSNINGEN("FS36"),
+    K9SAK("K9");
 
     private String kode;
 
