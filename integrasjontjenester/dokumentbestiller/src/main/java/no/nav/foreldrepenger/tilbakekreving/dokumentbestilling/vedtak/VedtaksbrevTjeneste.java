@@ -90,10 +90,10 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbResultat;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbVedtaksbrevPeriode;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbVurderinger;
-import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SøknadType;
+import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 
 
@@ -251,7 +251,8 @@ public class VedtaksbrevTjeneste {
         return hentDataForVedtaksbrev(behandlingId, fritekstOppsummering, fritekstPerioder, brevMottaker);
     }
 
-    public VedtaksbrevData hentDataForVedtaksbrev(Long behandlingId, String oppsummeringFritekst,
+    public VedtaksbrevData hentDataForVedtaksbrev(Long behandlingId,
+                                                  String oppsummeringFritekst,
                                                   List<PeriodeMedTekstDto> perioderFritekst,
                                                   BrevMottaker brevMottaker) {
         Behandling behandling = behandlingTjeneste.hentBehandling(behandlingId);
@@ -274,13 +275,14 @@ public class VedtaksbrevTjeneste {
         BigDecimal totaltTilbakekrevesBeløpMedRenterUtenSkatt = totaltTilbakekrevesMedRenter.subtract(totaltSkattetrekk);
 
         boolean erRevurdering = BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandling.getType());
+        boolean erFrisinn = erFrisinn(behandling);
         VedtakHjemmel.EffektForBruker effektForBruker = erRevurdering
             ? hentEffektForBruker(behandling, totaltTilbakekrevesMedRenter)
             : VedtakHjemmel.EffektForBruker.FØRSTEGANGSVEDTAK;
         LocalDate originalBehandlingVedtaksdato = erRevurdering ? finnOriginalBehandlingVedtaksdato(behandling) : null;
 
         Språkkode språkkode = fpsakBehandling.getGrunninformasjon().getSpråkkodeEllerDefault();
-        String hjemmelstekst = VedtakHjemmel.lagHjemmelstekst(vedtakResultatType, foreldelse, vilkårPerioder, effektForBruker, språkkode);
+        String hjemmelstekst = VedtakHjemmel.lagHjemmelstekst(vedtakResultatType, foreldelse, vilkårPerioder, effektForBruker, språkkode, !erFrisinn);
 
         List<HbVedtaksbrevPeriode> perioder = resulatPerioder.stream()
             .map(brp -> lagBrevdataPeriode(brp, fakta, vilkårPerioder, foreldelse, perioderFritekst))
@@ -292,7 +294,7 @@ public class VedtaksbrevTjeneste {
             .medYtelsetype(behandling.getFagsak().getFagsakYtelseType())
             .medDatoFagsakvedtak(fpsakBehandling.getGrunninformasjon().getVedtakDato())
             .medAntallBarn(fpsakBehandling.getAntallBarnSøktFor());
-        if (!erFrisinn(behandling)) {
+        if (!erFrisinn) {
             hbSakBuilder
                 .medErFødsel(SøknadType.FØDSEL == fpsakBehandling.getSøknadType())
                 .medErAdopsjon(SøknadType.ADOPSJON == fpsakBehandling.getSøknadType());

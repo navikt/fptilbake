@@ -23,10 +23,13 @@ class TilbakekrevingBeregnerVilkår {
         // for CDI
     }
 
-    static BeregningResultatPeriode beregn(VilkårVurderingPeriodeEntitet vilkårVurdering, FordeltKravgrunnlagBeløp delresultat, List<GrunnlagPeriodeMedSkattProsent> perioderMedSkattProsent) {
+    static BeregningResultatPeriode beregn(VilkårVurderingPeriodeEntitet vilkårVurdering,
+                                           FordeltKravgrunnlagBeløp delresultat,
+                                           List<GrunnlagPeriodeMedSkattProsent> perioderMedSkattProsent,
+                                           boolean beregnRenter) {
         Periode periode = vilkårVurdering.getPeriode();
         Vurdering vurdering = finnVurdering(vilkårVurdering);
-        boolean renter = finnRenter(vilkårVurdering);
+        boolean renter = beregnRenter && finnRenter(vilkårVurdering);
         BigDecimal andel = finnAndelAvBeløp(vilkårVurdering);
         BigDecimal manueltBeløp = finnManueltSattBeløp(vilkårVurdering);
         boolean ignoreresPgaLavtBeløp = Boolean.FALSE.equals(vilkårVurdering.tilbakekrevesSmåbeløp());
