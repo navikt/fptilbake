@@ -40,7 +40,6 @@ import no.nav.tjeneste.virksomhet.dokumentproduksjon.v2.meldinger.ProduserDokume
 import no.nav.tjeneste.virksomhet.dokumentproduksjon.v2.meldinger.ProduserDokumentutkastResponse;
 import no.nav.tjeneste.virksomhet.dokumentproduksjon.v2.meldinger.ProduserIkkeredigerbartDokumentRequest;
 import no.nav.tjeneste.virksomhet.dokumentproduksjon.v2.meldinger.ProduserIkkeredigerbartDokumentResponse;
-
 import no.nav.vedtak.felles.integrasjon.dokument.produksjon.v2.DokumentproduksjonConsumer;
 import no.nav.vedtak.felles.integrasjon.felles.ws.JaxbHelper;
 
@@ -80,7 +79,7 @@ public class FritekstbrevTjeneste {
     private JournalpostIdOgDokumentId sendEllerKlargjørFritekstbrev(FritekstbrevData data, boolean skalLeggeTilVedlegg) {
         Element ferdigXml = lagXmlDokument(data);
 
-        Dokumentbestillingsinformasjon dokumentbestillingsinfo = DokumentbestillingsinfoMapper.opprettDokumentbestillingsinformasjon(data.getBrevMetadata(), skalLeggeTilVedlegg);
+        Dokumentbestillingsinformasjon dokumentbestillingsinfo = DokumentbestillingsinfoMapper.opprett().opprettDokumentbestillingsinformasjon(data.getBrevMetadata(), skalLeggeTilVedlegg);
         ProduserIkkeredigerbartDokumentResponse bestillingSvar = sendBrevbestilling(ferdigXml, dokumentbestillingsinfo);
 
         String journalpostId = bestillingSvar.getJournalpostId();
