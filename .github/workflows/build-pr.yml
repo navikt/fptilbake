@@ -1,6 +1,13 @@
 name: Bygg pull request
 
-on: [pull_request]
+on:
+  pull_request:
+    paths-ignore:
+      - '.gitignore'
+      - '**.editorconfig'
+      - '**.md'
+      - '**.MD'
+      - 'docs/**'
 
 env:
   TZ: "Europe/Oslo"

@@ -4,6 +4,13 @@ on:
   push:
     branches:
       - master   # Push events on master branch
+    paths-ignore:
+      - '.gitignore'
+      - '**.editorconfig'
+      - '**.md'
+      - '**.MD'
+      - 'docs/**'
+      - 'web-dev/**'
 
 env:
   IMAGE_BASE: docker.pkg.github.com/${{ github.repository }}/fptilbake
