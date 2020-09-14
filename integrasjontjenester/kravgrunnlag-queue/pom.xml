@@ -18,7 +18,7 @@
             <artifactId>felles-bom</artifactId>
         </dependency>
         <dependency>
-            <groupId>no.nav.foreldrepenger.felles.integrasjon</groupId>
+            <groupId>no.nav.foreldrepenger.felles.ukelonn.integrasjon</groupId>
             <artifactId>felles-integrasjon-jms</artifactId>
         </dependency>
     </dependencies>

@@ -31,7 +31,7 @@ public class ApplicationServiceStarterImpl implements ApplicationServiceStarter 
         start(BatchTaskScheduler.class);
         start(KafkaPollerManager.class);
         if (Environment.current().isProd() || !"true".equalsIgnoreCase(Environment.current().getProperty("test.only.disable.mq"))) {
-            start(QueueConsumerManager.class);
+            startQueueConsumerManager();
         } else {
             logger.info("Startet IKKE QueueConsumerManager, den er disablet med test.only.disable.mq=true");
         }
@@ -58,4 +58,17 @@ public class ApplicationServiceStarterImpl implements ApplicationServiceStarter 
         CDI.current().select(klasse).get().stop();
     }
 
+    private void startQueueConsumerManager() {
+        if (services.contains(QueueConsumerManager.class)) {
+            logger.warn("Starter ikke {} siden den allerede er startet", QueueConsumerManager.class);
+        } else {
+            logger.info("Starter {}", QueueConsumerManager.class.getSimpleName());
+            CDI.current().select(QueueConsumerManager.class).get().start();
+        }
+    }
+
+    private void stoppQueueConsumerManager() {
+        logger.info("Stopper {}", QueueConsumerManager.class.getSimpleName());
+        CDI.current().select(QueueConsumerManager.class).get().stop();
+    }
 }
