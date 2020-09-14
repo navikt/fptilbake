@@ -10,7 +10,7 @@
             <protected>true</protected>
             <serverAuthContext>
                 <serverAuthModule>
-                    <className>no.nav.foreldrepenger.tilbakekreving.web.server.jetty.JettyOidcAuthModule</className>
+                    <className>no.nav.vedtak.sikkerhet.jaspic.OidcAuthModule</className>
                 </serverAuthModule>
             </serverAuthContext>
         </serverAuthConfig>
@@ -25,7 +25,7 @@
             <protected>true</protected>
             <serverAuthContext>
                 <serverAuthModule>
-                    <className>no.nav.foreldrepenger.tilbakekreving.web.server.jetty.JettyOidcAuthModule</className>
+                    <className>no.nav.vedtak.sikkerhet.jaspic.OidcAuthModule</className>
                 </serverAuthModule>
             </serverAuthContext>
         </serverAuthConfig>
