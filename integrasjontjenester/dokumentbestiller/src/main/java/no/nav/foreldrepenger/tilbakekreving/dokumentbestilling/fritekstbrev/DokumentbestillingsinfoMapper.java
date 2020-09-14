@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.AdresseUtil;
 import no.nav.tjeneste.virksomhet.dokumentproduksjon.v2.informasjon.Adresse;
@@ -19,21 +20,32 @@ public class DokumentbestillingsinfoMapper {
     private static final String NORGE_LANDKODE_DOKPRODINFO = "NO";
     private static final String UKJENT_LANDKODE_DOKPRODINFO = "???";
 
-    private DokumentbestillingsinfoMapper() {
-        // for static access
+    private final String appName;
+
+    private DokumentbestillingsinfoMapper(String appName) {
+        this.appName = appName;
     }
 
-    public static Dokumentbestillingsinformasjon opprettDokumentbestillingsinformasjon(BrevMetadata brevMetadata) {
+    public static DokumentbestillingsinfoMapper opprett() {
+        return new DokumentbestillingsinfoMapper(System.getProperty("application.name"));
+    }
+
+    public static DokumentbestillingsinfoMapper forK9() {
+        return new DokumentbestillingsinfoMapper("k9-tilbake");
+    }
+
+    public static DokumentbestillingsinfoMapper forFp() {
+        return new DokumentbestillingsinfoMapper("fptilbake");
+    }
+
+    public Dokumentbestillingsinformasjon opprettDokumentbestillingsinformasjon(BrevMetadata brevMetadata) {
         return opprettDokumentbestillingsinformasjon(brevMetadata, false);
     }
 
-    public static Dokumentbestillingsinformasjon opprettDokumentbestillingsinformasjon(BrevMetadata brevMetadata, boolean skalLeggeTilVedlegg) {
+    public Dokumentbestillingsinformasjon opprettDokumentbestillingsinformasjon(BrevMetadata brevMetadata, boolean skalLeggeTilVedlegg) {
         Dokumentbestillingsinformasjon dokumentinfo = new Dokumentbestillingsinformasjon();
 
-        Fagsystemer fptilbakeFagsystem = new Fagsystemer();
-        fptilbakeFagsystem.setKodeRef(Fagsystem.FPSAK.getOffisiellKode());
-        fptilbakeFagsystem.setValue(Fagsystem.FPSAK.getOffisiellKode());
-        dokumentinfo.setBestillendeFagsystem(fptilbakeFagsystem);
+        dokumentinfo.setBestillendeFagsystem(utledJournalførendeFagsystem());
         dokumentinfo.setUstrukturertTittel(brevMetadata.getTittel());
 
         dokumentinfo.setAdresse(settAdresse(brevMetadata.getMottakerAdresse()));
@@ -42,7 +54,6 @@ public class DokumentbestillingsinfoMapper {
         bruker.setIdent(brevMetadata.getSakspartId());
         bruker.setNavn(brevMetadata.getSakspartNavn());
         dokumentinfo.setBruker(bruker);
-
         dokumentinfo.setDokumenttypeId("000096");
         dokumentinfo.setFerdigstillForsendelse(!skalLeggeTilVedlegg);
         dokumentinfo.setInkludererEksterneVedlegg(skalLeggeTilVedlegg);
@@ -55,17 +66,79 @@ public class DokumentbestillingsinfoMapper {
         mottaker.setNavn(brevMetadata.getMottakerAdresse().getMottakerNavn());
         dokumentinfo.setMottaker(mottaker);
 
-        Fagomraader dokumenttilhørendeFagområde = new Fagomraader();
-        dokumenttilhørendeFagområde.setKodeRef("FOR"); //FIXME sett riktig fagområdekode //Egen for svangerskappenger??
-        dokumenttilhørendeFagområde.setValue("FOR");
-        dokumentinfo.setDokumenttilhoerendeFagomraade(dokumenttilhørendeFagområde);
-
-        Fagsystemer gsak = new Fagsystemer();
-        gsak.setKodeRef(Fagsystem.GOSYS.getOffisiellKode());
-        gsak.setValue(Fagsystem.GOSYS.getOffisiellKode());
-        dokumentinfo.setSakstilhoerendeFagsystem(gsak);
+        dokumentinfo.setDokumenttilhoerendeFagomraade(utledTilhørendeFagområde(brevMetadata.getFagsaktype()));
+        dokumentinfo.setSakstilhoerendeFagsystem(utledFagsakEier());
 
         return dokumentinfo;
+    }
+
+    private static Fagomraader utledTilhørendeFagområde(FagsakYtelseType fagsaktype) {
+        //se kodeverk-klienten, kodeverk = Tema
+        switch (fagsaktype) {
+            case ENGANGSTØNAD:
+            case FORELDREPENGER:
+            case SVANGERSKAPSPENGER: {
+                Fagomraader f = new Fagomraader();
+                f.setKodeRef("FOR");
+                f.setValue("FOR");
+                return f;
+            }
+            case PLEIEPENGER_SYKT_BARN:
+            case PLEIEPENGER_NÆRSTÅENDE:
+            case OMSORGSPENGER:
+            case OPPLÆRINGSPENGER: {
+                Fagomraader f = new Fagomraader();
+                f.setKodeRef("OMS");
+                f.setValue("OMS");
+                return f;
+            }
+            case FRISINN: {
+                Fagomraader f = new Fagomraader();
+                f.setKodeRef("FRI");
+                f.setValue("FRI");
+                return f;
+            }
+            default:
+                throw new IllegalArgumentException("Ikke-støttet fagsakytelsetype: " + fagsaktype);
+        }
+    }
+
+    private Fagsystemer utledJournalførendeFagsystem() {
+        switch (appName) {
+            case "fptilbake": {
+                Fagsystemer fpsak = new Fagsystemer();
+                fpsak.setKodeRef(Fagsystem.FPSAK.getOffisiellKode());
+                fpsak.setValue(Fagsystem.FPSAK.getOffisiellKode());
+                return fpsak;
+            }
+            case "k9-tilbake": {
+                Fagsystemer k9sak = new Fagsystemer();
+                k9sak.setKodeRef(Fagsystem.K9SAK.getOffisiellKode());
+                k9sak.setValue(Fagsystem.K9SAK.getOffisiellKode());
+                return k9sak;
+            }
+            default:
+                throw new IllegalArgumentException("Ikke-støttet application.name: " + appName);
+        }
+    }
+
+    private Fagsystemer utledFagsakEier() {
+        switch (appName) {
+            case "fptilbake": {
+                Fagsystemer gsak = new Fagsystemer();
+                gsak.setKodeRef(Fagsystem.GOSYS.getOffisiellKode());
+                gsak.setValue(Fagsystem.GOSYS.getOffisiellKode());
+                return gsak;
+            }
+            case "k9-tilbake": {
+                Fagsystemer k9sak = new Fagsystemer();
+                k9sak.setKodeRef(Fagsystem.K9SAK.getOffisiellKode());
+                k9sak.setValue(Fagsystem.K9SAK.getOffisiellKode());
+                return k9sak;
+            }
+            default:
+                throw new IllegalArgumentException("Ikke-støttet application.name: " + appName);
+        }
     }
 
     private static Adresse settAdresse(Adresseinfo mottakerAdresse) {
