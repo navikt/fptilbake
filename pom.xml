@@ -40,6 +40,7 @@
         <vl-fpsak-tidsserie.version>2.3-20200901141100-c540133</vl-fpsak-tidsserie.version>
         <!-- Kontrakter -->
         <fpkontrakter.version>5.1-20200907082654-6365c08</fpkontrakter.version>
+        <ukelonn.felles.version>1.0.0-20200914112449-039464d</ukelonn.felles.version>
 
         <surefire.version>2.22.2</surefire.version>
         <metrics.version>4.1.12.1</metrics.version>
@@ -313,6 +314,11 @@
             </dependency>
 
             <!-- Felles biblioteker og sikkerhet -->
+            <dependency>
+                <groupId>no.nav.foreldrepenger.felles.ukelonn.integrasjon</groupId>
+                <artifactId>felles-integrasjon-jms</artifactId>
+                <version>${ukelonn.felles.version}</version>
+            </dependency>
             <dependency>
                 <groupId>no.nav.foreldrepenger.felles</groupId>
                 <artifactId>felles</artifactId>
