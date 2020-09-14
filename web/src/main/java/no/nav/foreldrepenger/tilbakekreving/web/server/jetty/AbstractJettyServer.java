@@ -84,7 +84,6 @@ abstract class AbstractJettyServer {
 
     protected void konfigurerSikkerhet() {
         Security.setProperty(AuthConfigFactory.DEFAULT_FACTORY_SECURITY_PROPERTY, AuthConfigFactoryImpl.class.getCanonicalName());
-        System.setProperty(SubjectHandler.SUBJECTHANDLER_KEY, JettySubjectHandler.class.getName());
 
         File jaspiConf = new File(System.getProperty("conf", "./conf") + "/jaspi-conf.xml");
         if (!jaspiConf.exists()) {

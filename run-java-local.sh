@@ -47,8 +47,6 @@ fi
 
 cp web/webapp/target/classes/jetty/jaspi-conf.xml conf/
 cp web/webapp/target/test-classes/logback-dev.xml conf/logback.xml
-cp web/webapp/target/classes/jetty/login.conf conf/
-
 
 ## Sample JPDA settings for remote socket debugging
 #JAVA_OPTS="${JAVA_OPTS:-} -Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n"
