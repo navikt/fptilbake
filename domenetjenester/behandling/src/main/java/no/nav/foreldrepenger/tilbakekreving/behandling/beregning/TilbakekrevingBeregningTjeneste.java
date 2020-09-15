@@ -17,7 +17,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FordeltKravgrunnlagB
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BeregningResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingPeriodeEntitet;
@@ -39,6 +41,7 @@ public class TilbakekrevingBeregningTjeneste {
     private KravgrunnlagRepository kravgrunnlagRepository;
     private VurdertForeldelseRepository vurdertForeldelseRepository;
     private VilkårsvurderingRepository vilkårsvurderingRepository;
+    private BehandlingRepository behandlingRepository;
 
     private KravgrunnlagBeregningTjeneste kravgrunnlagBeregningTjeneste;
 
@@ -51,6 +54,7 @@ public class TilbakekrevingBeregningTjeneste {
         this.kravgrunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.vilkårsvurderingRepository = repositoryProvider.getVilkårsvurderingRepository();
         this.vurdertForeldelseRepository = repositoryProvider.getVurdertForeldelseRepository();
+        this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.kravgrunnlagBeregningTjeneste = kravgrunnlagBeregningTjeneste;
     }
 
@@ -66,7 +70,7 @@ public class TilbakekrevingBeregningTjeneste {
         BigDecimal totalFeilutbetaltBeløp = sum(beregningResultatPerioder, BeregningResultatPeriode::getFeilutbetaltBeløp);
 
         BeregningResultat beregningResultat = new BeregningResultat();
-        beregningResultat.setVedtakResultatType(bestemVedtakResultat(totalTilbakekrevingBeløp, totalFeilutbetaltBeløp));
+        beregningResultat.setVedtakResultatType(bestemVedtakResultat(behandlingId, totalTilbakekrevingBeløp, totalFeilutbetaltBeløp));
         beregningResultat.setBeregningResultatPerioder(beregningResultatPerioder);
         return beregningResultat;
     }
@@ -180,7 +184,11 @@ public class TilbakekrevingBeregningTjeneste {
         return perioderMedSkattProsent;
     }
 
-    private VedtakResultatType bestemVedtakResultat(BigDecimal tilbakekrevingBeløp, BigDecimal feilutbetaltBeløp) {
+    private VedtakResultatType bestemVedtakResultat(long behandlingId, BigDecimal tilbakekrevingBeløp, BigDecimal feilutbetaltBeløp) {
+        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
+        if (behandling.isAutomatiskSaksbehandlet()) {
+            return VedtakResultatType.INGEN_TILBAKEBETALING;
+        }
         if (tilbakekrevingBeløp.compareTo(BigDecimal.ZERO) == 0) {
             return VedtakResultatType.INGEN_TILBAKEBETALING;
         } else if (tilbakekrevingBeløp.compareTo(feilutbetaltBeløp) < 0) {

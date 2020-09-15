@@ -46,6 +46,7 @@ public class HistorikkTjenesteAdapter {
 
 
     public void lagInnslag(Historikkinnslag historikkinnslag) {
+        resetBuilder();
         historikkRepository.lagre(historikkinnslag);
     }
 
@@ -66,8 +67,6 @@ public class HistorikkTjenesteAdapter {
             innslag.setType(hisType);
             innslag.setBehandlingId(behandling.getId());
             builder.build(innslag);
-
-            resetBuilder();
 
             lagInnslag(innslag);
         }

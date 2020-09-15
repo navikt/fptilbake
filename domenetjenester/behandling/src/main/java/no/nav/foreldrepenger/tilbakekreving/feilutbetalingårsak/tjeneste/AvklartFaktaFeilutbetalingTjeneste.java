@@ -49,7 +49,7 @@ public class AvklartFaktaFeilutbetalingTjeneste {
         Historikkinnslag historikkinnslag = new Historikkinnslag();
         historikkinnslag.setType(HistorikkinnslagType.FAKTA_OM_FEILUTBETALING);
         historikkinnslag.setBehandlingId(behandling.getId());
-        historikkinnslag.setAktør(HistorikkAktør.SAKSBEHANDLER);
+        historikkinnslag.setAktør(behandling.isAutomatiskSaksbehandlet() ? HistorikkAktør.VEDTAKSLØSNINGEN : HistorikkAktør.SAKSBEHANDLER);
 
         // brukte denne objekt for å opprette bare en historikkinnslagDel når saksbehandler endret bare begrunnelse
         HistorikkinnslagDelDto historikkinnslagDelDto = new HistorikkinnslagDelDto();
@@ -79,7 +79,7 @@ public class AvklartFaktaFeilutbetalingTjeneste {
         }
     }
 
-    public void slettGammelFaktaData(@Observes KravgrunnlagEndretEvent event){
+    public void slettGammelFaktaData(@Observes KravgrunnlagEndretEvent event) {
         faktaFeilutbetalingRepository.slettFaktaFeilutbetaling(event.getBehandlingId());
     }
 

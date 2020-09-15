@@ -36,6 +36,7 @@ import javax.persistence.Version;
 
 import org.hibernate.annotations.JoinColumnOrFormula;
 import org.hibernate.annotations.JoinFormula;
+import org.hibernate.annotations.NaturalId;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.OrganisasjonsEnhet;
@@ -48,7 +49,6 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.BehandlingInfo;
 import no.nav.vedtak.feil.FeilFactory;
 import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
-import org.hibernate.annotations.NaturalId;
 
 // mapping for BehandlingInfo klassen
 @SqlResultSetMapping(name = "PipBehandlingInfo", classes = {
@@ -143,6 +143,10 @@ public class Behandling extends BaseEntitet {
     @Convert(converter = BooleanToStringConverter.class)
     @Column(name = "MANUELT_OPPRETTET", nullable = false)
     private boolean manueltOpprettet = false;
+
+    @Convert(converter = BooleanToStringConverter.class)
+    @Column(name = "AUTOMATISK_SAKSBEHANDLET", nullable = false)
+    private boolean automatiskSaksbehandlet = false;
 
     Behandling() {
         // Hibernate
@@ -532,6 +536,14 @@ public class Behandling extends BaseEntitet {
 
     public boolean isManueltOpprettet() {
         return manueltOpprettet;
+    }
+
+    public boolean isAutomatiskSaksbehandlet() {
+        return automatiskSaksbehandlet;
+    }
+
+    public void skruPåAutomatiskSaksbehandling() {
+        this.automatiskSaksbehandlet = true;
     }
 
     @SuppressWarnings("unchecked")
