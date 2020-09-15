@@ -29,7 +29,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkOpplysningType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingAktsomhetEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingEntitet;
@@ -177,15 +176,6 @@ public class VilkårsvurderingHistorikkInnslagTjeneste {
         }
         grunnTekst.append(String.join(",", grunnTekster));
         return grunnTekst.toString();
-    }
-
-
-    private String getNavn(Kodeliste kode) {
-        //TODO fjern oppslag, skal lagres med kode
-        if (kode == null) {
-            return null;
-        }
-        return repositoryProvider.getKodeverkRepository().finn(kode.getClass(), kode.getKode()).getNavn();
     }
 
     private String getNavn(Kodeverdi kode) {
