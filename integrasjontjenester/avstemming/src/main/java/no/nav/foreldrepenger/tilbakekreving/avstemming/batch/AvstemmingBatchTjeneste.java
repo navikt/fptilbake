@@ -25,8 +25,8 @@ import no.nav.vedtak.feil.FeilFactory;
 import no.nav.vedtak.feil.LogLevel;
 import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
 import no.nav.vedtak.feil.deklarasjon.IntegrasjonFeil;
-import no.nav.vedtak.felles.integrasjon.unleash.EnvironmentProperty;
 import no.nav.vedtak.konfig.KonfigVerdi;
+import no.nav.vedtak.util.env.Environment;
 
 @ApplicationScoped
 public class AvstemmingBatchTjeneste implements BatchTjeneste {
@@ -57,8 +57,7 @@ public class AvstemmingBatchTjeneste implements BatchTjeneste {
         this.avstemmingTjeneste = avstemmingTjeneste;
         this.sftpBatchTjeneste = sftpBatchTjeneste;
 
-        Optional<String> envName = EnvironmentProperty.getEnvironmentName();
-        miljø = envName.orElseThrow();
+        miljø = Environment.current().isProd() ? "p" : "q";
     }
 
     @Override
