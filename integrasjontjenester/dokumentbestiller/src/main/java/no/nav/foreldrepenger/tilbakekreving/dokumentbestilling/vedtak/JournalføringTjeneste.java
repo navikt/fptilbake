@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.JournalpostIdOgDokumentId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
@@ -63,10 +64,10 @@ public class JournalføringTjeneste {
         boolean forsøkFerdigstill = true;
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         OpprettJournalpostRequest request = OpprettJournalpostRequest.builder()
-            .medTema(Tema.FORELDREPENGER_SVANGERSKAPSPENGER)
+            .medTema(utledTema(behandling.getFagsak().getFagsakYtelseType()))
             .medBehandlingstema(BehandlingTema.TILBAKEBETALING)
             .medBruker(new Bruker(BrukerIdType.AktørId, behandling.getAktørId().getId()))
-            .medEksternReferanseId(behandlingId.toString()) //FIXME bytt til uuid
+            .medEksternReferanseId(behandling.getUuid().toString())
             .medJournalførendeEnhet(behandling.getBehandlendeEnhetId())
             .medJournalposttype(Journalposttype.NOTAT)
             .medTittel("Oversikt over resultatet av tilbakebetalingssaken")
@@ -94,6 +95,25 @@ public class JournalføringTjeneste {
         return new JournalpostIdOgDokumentId(journalpostId, response.getDokumenter().get(0).getDokumentInfoId());
     }
 
+    private static Tema utledTema(FagsakYtelseType fagsakYtelseType) {
+        switch (fagsakYtelseType) {
+
+            case ENGANGSTØNAD:
+            case FORELDREPENGER:
+            case SVANGERSKAPSPENGER:
+                return Tema.FORELDREPENGER_SVANGERSKAPSPENGER;
+            case FRISINN:
+                return Tema.FRISINN;
+            case PLEIEPENGER_SYKT_BARN:
+            case PLEIEPENGER_NÆRSTÅENDE:
+            case OMSORGSPENGER:
+            case OPPLÆRINGSPENGER:
+                return Tema.OMSORGSPENGER_PLEIEPENGER_OPPLÆRINGSPENGER;
+            default:
+                throw new IllegalArgumentException("Ikke-støttet ytelseType: " + fagsakYtelseType);
+        }
+    }
+
     private Sak lagSaksreferanse(Fagsak fagsak) {
         switch (appName) {
             case "fptilbake":
@@ -108,7 +128,7 @@ public class JournalføringTjeneste {
     private Sak lagReferanseTilK9FagsystemSak(Saksnummer saksnummer) {
         return Sak.builder()
             .medSakstype(Sakstype.FAGSAK)
-            .medFagsak(FagsakSystem.K9SAK, saksnummer.getVerdi())
+            .medFagsak(FagsakSystem.K9, saksnummer.getVerdi())
             .build();
     }
 

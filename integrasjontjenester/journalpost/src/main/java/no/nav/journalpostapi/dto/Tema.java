@@ -12,7 +12,8 @@ public enum Tema implements Kode {
     BARNETRYGD("BAR"),
     KONTANTSTØTTE("KON"),
     SUPPLERENDE_STØNAD("SUP"),
-    SYKEPENGER("SYK");
+    SYKEPENGER("SYK"),
+    FRISINN("FRI");
 
     private String kode;
 

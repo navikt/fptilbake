@@ -22,6 +22,7 @@ public enum Fagsystem implements Kodeverdi {
 
     FPSAK("FPSAK", "FS36"),
     K9SAK("K9SAK", "FS22"),
+    K9("K9", "K9"),
     TPS("TPS", "FS03"),
     JOARK("JOARK", "AS36"),
     INFOTRYGD("INFOTRYGD", "IT01"),
@@ -31,8 +32,8 @@ public enum Fagsystem implements Kodeverdi {
     GOSYS("GOSYS", "FS22"),
     ENHETSREGISTERET("ENHETSREGISTERET", "ER01"),
     AAREGISTERET("AAREGISTERET", "AR01"),
-    FPTILBAKE("FPTILBAKE",""),
-    K9TILBAKE("K9TILBAKE","");
+    FPTILBAKE("FPTILBAKE", ""),
+    K9TILBAKE("K9TILBAKE", "");
 
     public static final String KODEVERK = "FAGSYSTEM";
 
