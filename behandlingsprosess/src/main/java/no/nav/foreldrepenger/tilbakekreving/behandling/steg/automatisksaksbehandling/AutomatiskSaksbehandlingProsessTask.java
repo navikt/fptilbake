@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
@@ -18,6 +17,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDat
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
+import no.nav.vedtak.util.StringUtils;
 
 @ApplicationScoped
 @ProsessTask(AutomatiskSaksbehandlingProsessTask.TASKTYPE)
@@ -36,9 +36,9 @@ public class AutomatiskSaksbehandlingProsessTask implements ProsessTaskHandler {
     }
 
     @Inject
-    public AutomatiskSaksbehandlingProsessTask(BehandlingRepositoryProvider repositoryProvider,
+    public AutomatiskSaksbehandlingProsessTask(BehandlingRepository behandlingRepository,
                                                BehandlingskontrollTjeneste behandlingskontrollTjeneste) {
-        this.behandlingRepository = repositoryProvider.getBehandlingRepository();
+        this.behandlingRepository = behandlingRepository;
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
     }
 
@@ -47,8 +47,17 @@ public class AutomatiskSaksbehandlingProsessTask implements ProsessTaskHandler {
         Long behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
         logger.info("Startet automatisk saksbehandling for behandling={}",behandlingId);
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-        skruPåAutomatiskSaksbehandling(behandling);
-        startAutomatiskSaksbehandling(behandling);
+
+        if(behandling.isBehandlingPåVent()){
+            logger.warn("Behandling={} er på vent, kan ikke saksbehandle automatisk",behandlingId);
+        }else if(behandling.erAvsluttet()){
+            logger.warn("Behandling={} er allerede avsluttet, kan ikke saksbehandle automatisk",behandlingId);
+        }else if(!StringUtils.nullOrEmpty(behandling.getAnsvarligSaksbehandler())){
+            logger.warn("Behandling={} er allerede saksbehandlet, kan ikke saksbehandle automatisk",behandlingId);
+        }else {
+            skruPåAutomatiskSaksbehandling(behandling);
+            startAutomatiskSaksbehandling(behandling);
+        }
     }
 
     private void skruPåAutomatiskSaksbehandling(Behandling behandling) {

@@ -49,7 +49,7 @@ public class FatteVedtakStegImpl implements FatteVedtakSteg {
     }
 
     @Inject
-    FatteVedtakStegImpl(BehandlingRepositoryProvider repositoryProvider, TotrinnRepository totrinnRepository, TilbakekrevingBeregningTjeneste beregningTjeneste) {
+    public FatteVedtakStegImpl(BehandlingRepositoryProvider repositoryProvider, TotrinnRepository totrinnRepository, TilbakekrevingBeregningTjeneste beregningTjeneste) {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.totrinnRepository = totrinnRepository;
         this.behandlingresultatRepository = repositoryProvider.getBehandlingresultatRepository();
