@@ -4,7 +4,7 @@ import no.nav.journalpostapi.Kode;
 
 public enum FagsakSystem implements Kode {
     FORELDREPENGELØSNINGEN("FS36"),
-    K9SAK("K9");
+    K9SAK("FS22");
 
     private String kode;
 
