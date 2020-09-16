@@ -37,7 +37,6 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.SlettGrunnlagEventPubliserer;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 
 @ApplicationScoped
 public class KravgrunnlagTjeneste {
@@ -58,7 +57,6 @@ public class KravgrunnlagTjeneste {
 
     @Inject
     public KravgrunnlagTjeneste(BehandlingRepositoryProvider repositoryProvider,
-                                ProsessTaskRepository prosessTaskRepository,
                                 GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste,
                                 BehandlingskontrollTjeneste behandlingskontrollTjeneste,
                                 SlettGrunnlagEventPubliserer slettGrunnlagEventPubliserer) {
