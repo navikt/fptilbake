@@ -17,6 +17,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FordeltKravgrunnlagB
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BeregningResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.SaksbehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
@@ -203,7 +204,7 @@ public class TilbakekrevingBeregningTjeneste {
 
     private VedtakResultatType bestemVedtakResultat(long behandlingId, BigDecimal tilbakekrevingBeløp, BigDecimal feilutbetaltBeløp) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-        if (behandling.isAutomatiskSaksbehandlet()) {
+        if (SaksbehandlingType.AUTOMATISK_IKKE_INNKREVING_LAVT_BELØP.equals(behandling.getSaksbehandlingType())) {
             return VedtakResultatType.INGEN_TILBAKEBETALING;
         }
         if (tilbakekrevingBeløp.compareTo(BigDecimal.ZERO) == 0) {
