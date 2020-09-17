@@ -29,7 +29,7 @@ public class ForeslåVedtakTjenesteTest extends FellesTestOppsett {
         beregningResultat.setVedtakResultatType(VedtakResultatType.FULL_TILBAKEBETALING);
         when(beregningTjeneste.beregn(internBehandlingId)).thenReturn(beregningResultat);
 
-        foreslåVedtakTjeneste.lagHistorikkInnslagForForeslåVedtak(internBehandlingId, HistorikkAktør.SAKSBEHANDLER);
+        foreslåVedtakTjeneste.lagHistorikkInnslagForForeslåVedtak(internBehandlingId);
 
         List<Historikkinnslag> historikkInnslager = historikkRepository.hentHistorikkForSaksnummer(saksnummer);
         assertThat(historikkInnslager).isNotEmpty();

@@ -62,9 +62,8 @@ public class AutomatiskSaksbehandlingProsessTask implements ProsessTaskHandler {
 
     private void skruPåAutomatiskSaksbehandling(Behandling behandling) {
         BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(behandling);
-        behandling.skruPåAutomatiskSaksbehandling();
+        behandling.skruPåAutomatiskSaksbehandlingPgaInnkrevingAvLavtBeløp();
         behandling.setAnsvarligSaksbehandler("VL");
-        behandling.setAnsvarligBeslutter("VL");
         behandlingRepository.lagre(behandling, behandlingLås);
     }
 

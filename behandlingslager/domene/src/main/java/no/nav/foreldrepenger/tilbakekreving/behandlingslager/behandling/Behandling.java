@@ -39,6 +39,7 @@ import org.hibernate.annotations.JoinFormula;
 import org.hibernate.annotations.NaturalId;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.SaksbehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.OrganisasjonsEnhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
@@ -144,9 +145,9 @@ public class Behandling extends BaseEntitet {
     @Column(name = "MANUELT_OPPRETTET", nullable = false)
     private boolean manueltOpprettet = false;
 
-    @Convert(converter = BooleanToStringConverter.class)
-    @Column(name = "AUTOMATISK_SAKSBEHANDLET", nullable = false)
-    private boolean automatiskSaksbehandlet = false;
+    @Convert(converter = SaksbehandlingType.verdiConverter.class)
+    @Column(name = "SAKSBEHANDLING_TYPE", nullable = false)
+    private SaksbehandlingType saksbehandlingType = SaksbehandlingType.ORDINÆR;
 
     Behandling() {
         // Hibernate
@@ -538,12 +539,16 @@ public class Behandling extends BaseEntitet {
         return manueltOpprettet;
     }
 
-    public boolean isAutomatiskSaksbehandlet() {
-        return automatiskSaksbehandlet;
+    public SaksbehandlingType getSaksbehandlingType() {
+        return saksbehandlingType;
     }
 
-    public void skruPåAutomatiskSaksbehandling() {
-        this.automatiskSaksbehandlet = true;
+    public boolean isAutomatiskSaksbehandlet() {
+        return SaksbehandlingType.AUTOMATISK_IKKE_INNKREVING_LAVT_BELØP.equals(saksbehandlingType);
+    }
+
+    public void skruPåAutomatiskSaksbehandlingPgaInnkrevingAvLavtBeløp() {
+        this.saksbehandlingType = SaksbehandlingType.AUTOMATISK_IKKE_INNKREVING_LAVT_BELØP;
     }
 
     @SuppressWarnings("unchecked")

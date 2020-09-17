@@ -28,12 +28,6 @@ public class FaktaFeilutbetalingDto {
         this.årsak = feilutbetalingÅrsakDto;
     }
 
-    public FaktaFeilutbetalingDto(Periode periode, HendelseTypeMedUndertypeDto feilutbetalingÅrsakDto) {
-        this.fom = periode.getFom();
-        this.tom = periode.getTom();
-        this.årsak = feilutbetalingÅrsakDto;
-    }
-
     public LocalDate getFom() {
         return fom;
     }

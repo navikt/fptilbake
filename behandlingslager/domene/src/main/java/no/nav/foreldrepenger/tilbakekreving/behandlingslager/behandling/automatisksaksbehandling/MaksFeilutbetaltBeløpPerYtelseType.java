@@ -5,6 +5,7 @@ import java.util.EnumMap;
 import java.util.Map;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
+import no.nav.foreldrepenger.tilbakekreving.felles.HalvRettsgebyr;
 
 public class MaksFeilutbetaltBeløpPerYtelseType {
 
@@ -15,9 +16,9 @@ public class MaksFeilutbetaltBeløpPerYtelseType {
     private static Map<FagsakYtelseType,BigDecimal> maksFeilutbetaltBeløpPerYtelseTypeMap = new EnumMap<>(FagsakYtelseType.class);
 
     static {
-        maksFeilutbetaltBeløpPerYtelseTypeMap.put(FagsakYtelseType.FORELDREPENGER, BigDecimal.valueOf(586l));
-        maksFeilutbetaltBeløpPerYtelseTypeMap.put(FagsakYtelseType.ENGANGSTØNAD, BigDecimal.valueOf(586l));
-        maksFeilutbetaltBeløpPerYtelseTypeMap.put(FagsakYtelseType.SVANGERSKAPSPENGER, BigDecimal.valueOf(586l));
+        maksFeilutbetaltBeløpPerYtelseTypeMap.put(FagsakYtelseType.FORELDREPENGER, HalvRettsgebyr.getGebyr());
+        maksFeilutbetaltBeløpPerYtelseTypeMap.put(FagsakYtelseType.ENGANGSTØNAD, HalvRettsgebyr.getGebyr());
+        maksFeilutbetaltBeløpPerYtelseTypeMap.put(FagsakYtelseType.SVANGERSKAPSPENGER, HalvRettsgebyr.getGebyr());
     }
 
     public static BigDecimal getMaksFeilutbetaltBeløp(FagsakYtelseType fagsakYtelseType) {

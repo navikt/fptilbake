@@ -29,11 +29,11 @@ public class ForeslåVedtakTjeneste {
         this.historikkTjenesteAdapter = historikkTjenesteAdapter;
     }
 
-    public void lagHistorikkInnslagForForeslåVedtak(Long behandlingId, HistorikkAktør historikkAktør) {
+    public void lagHistorikkInnslagForForeslåVedtak(Long behandlingId) {
         Historikkinnslag historikkinnslag = new Historikkinnslag();
         historikkinnslag.setType(HistorikkinnslagType.FORSLAG_VEDTAK);
         historikkinnslag.setBehandlingId(behandlingId);
-        historikkinnslag.setAktør(historikkAktør);
+        historikkinnslag.setAktør(HistorikkAktør.SAKSBEHANDLER);
 
         HistorikkInnslagTekstBuilder tekstBuilder = historikkTjenesteAdapter.tekstBuilder();
 
