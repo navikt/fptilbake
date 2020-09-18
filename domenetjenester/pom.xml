@@ -17,7 +17,6 @@
         <module>behandling</module>
         <module>behandling-gjenoppta</module>
         <module>varselrespons</module>
-        <module>bom</module>
         <module>iverksett</module>
     </modules>
 
