@@ -2,6 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto;
 
 import java.time.LocalDate;
 
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
@@ -12,25 +13,27 @@ import no.nav.vedtak.util.InputValideringRegex;
 
 public class PeriodeMedTekstDto {
 
+    @NotNull
     private LocalDate fom;
 
+    @NotNull
     private LocalDate tom;
 
-    @Size(max = 1500, message = "Fritekst for fakta er for lang")
+    @Size(max = 4000, message = "Fritekst for fakta er for lang")
     @Pattern(regexp = InputValideringRegex.FRITEKST)
     private String faktaAvsnitt;
 
-    @Size(max = 1500, message = "Fritekst for vilkår er for lang")
+    @Size(max = 4000, message = "Fritekst for vilkår er for lang")
     @Pattern(regexp = InputValideringRegex.FRITEKST)
     @JsonProperty("vilkaarAvsnitt")
     private String vilkårAvsnitt;
 
-    @Size(max = 1500, message = "Fritekst for særlige grunner er for lang")
+    @Size(max = 4000, message = "Fritekst for særlige grunner er for lang")
     @Pattern(regexp = InputValideringRegex.FRITEKST)
     @JsonProperty("saerligeGrunnerAvsnitt")
     private String særligeGrunnerAvsnitt;
 
-    @Size(max = 1500, message = "Fritekst for særlige grunner annet er for lang")
+    @Size(max = 4000, message = "Fritekst for særlige grunner annet er for lang")
     @Pattern(regexp = InputValideringRegex.FRITEKST)
     @JsonProperty("saerligeGrunnerAnnetAvsnitt")
     private String særligeGrunnerAnnetAvsnitt;
@@ -51,7 +54,7 @@ public class PeriodeMedTekstDto {
         return tom;
     }
 
-    public Periode getPeriode(){
+    public Periode getPeriode() {
         return Periode.of(fom, tom);
     }
 
