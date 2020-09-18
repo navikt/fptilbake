@@ -264,11 +264,6 @@
             </dependency>
             <dependency>
                 <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
-                <artifactId>kafka-poller</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
                 <artifactId>dokumentbestiller</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -317,6 +312,11 @@
             <dependency>
                 <groupId>no.nav.foreldrepenger.felles.ukelonn.integrasjon</groupId>
                 <artifactId>journalpost-api-klient</artifactId>
+                <version>${ukelonn.felles.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.foreldrepenger.felles.ukelonn.integrasjon</groupId>
+                <artifactId>kafka-poller</artifactId>
                 <version>${ukelonn.felles.version}</version>
             </dependency>
             <dependency>

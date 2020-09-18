@@ -23,7 +23,7 @@
             <artifactId>felles-integrasjon-rest-klient</artifactId>
         </dependency>
         <dependency>
-            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+            <groupId>no.nav.foreldrepenger.felles.ukelonn.integrasjon</groupId>
             <artifactId>kafka-poller</artifactId>
         </dependency>
         <dependency>
