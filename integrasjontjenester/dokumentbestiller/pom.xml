@@ -50,13 +50,6 @@
             <artifactId>selvbetjening-klient</artifactId>
         </dependency>
 
-        <!-- NAV-avhengigheter -->
-        <dependency>
-            <groupId>no.nav.foreldrepenger.kontrakter</groupId>
-            <artifactId>dokumentbestiller-v1</artifactId>
-            <classifier>jaxb</classifier>
-        </dependency>
-
         <!-- eksterne avhengigheter -->
         <dependency>
             <groupId>com.github.jknack</groupId>
