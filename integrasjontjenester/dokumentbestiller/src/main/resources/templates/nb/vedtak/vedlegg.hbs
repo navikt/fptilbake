@@ -1,21 +1,24 @@
-    <h4>Oversikt over resultatet av tilbakebetalingssaken</h4>
+{{#* inline "linebreaks-header"}}{{#if totalresultat.totalt-rentebeløp}}<br/>{{/if}}{{#if (not skal-ikke-vise-skatt)}}<br/>{{/if}}{{/inline}}
+<h4>Oversikt over resultatet av tilbakebetalingssaken</h4>
     <table>
         <thead>
         <tr>
-{{#if totalresultat.totalt-rentebeløp}}
-            <th>Periode<br/><br/> </th>
-            <th>Feilutbetalt beløp<br/><br/> </th>
-            <th>Tilbakebetaling<br/><br/> </th>
-            <th>Renter<br/><br/> </th>
-            <th>Beløp før skatt<br/><br/> </th>
+            <th>Periode{{> linebreaks-header}} </th>
+            <th>Feilutbetalt beløp{{> linebreaks-header}} </th>
+            <th>Tilbakebetaling{{> linebreaks-header}} </th>
+        {{#if totalresultat.totalt-rentebeløp}}
+            <th>Renter{{> linebreaks-header}} </th>
+        {{/if}}
+        {{#if skal-ikke-vise-skatt}}
+            <th>Beløp du skal betale tilbake</th>
+        {{else}}
+            <th>Beløp før skatt{{> linebreaks-header}} </th>
+            {{#if totalresultat.totalt-rentebeløp}}
             <th>Beløp du skal betale<br/>tilbake etter skatt<br/>er trukket fra</th>
-{{else}}
-            <th>Periode<br/> </th>
-            <th>Feilutbetalt beløp<br/> </th>
-            <th>Tilbakebetaling<br/> </th>
-            <th>Beløp før skatt<br/> </th>
+            {{else}}
             <th>Beløp du skal betale tilbake<br/>etter skatt er trukket fra</th>
-{{/if}}
+            {{/if}}
+        {{/if}}
         </tr>
         </thead>
         <tbody>
@@ -33,7 +36,9 @@
 {{#if totalresultat.totalt-rentebeløp}}
             <td class="tall">{{#if resultat.renter-beløp}}{{kroner resultat.renter-beløp}}{{/if}}</td>
 {{/if}}
+{{#if (not skal-ikke-vise-skatt)}}
             <td class="tall">{{kroner resultat.tilbakekreves-beløp-med-renter}}</td>
+{{/if}}
             <td class="tall sum">{{kroner resultat.tilbakekreves-beløp-uten-skatt-med-renter}}</td>
         </tr>
 {{/each}}
@@ -44,7 +49,9 @@
 {{#if totalresultat.totalt-rentebeløp}}
             <td class="tall sumrad"></td>
 {{/if}}
+{{#if (not skal-ikke-vise-skatt)}}
             <td class="tall sumrad">{{kroner totalresultat.totalt-tilbakekreves-beløp-med-renter}}</td>
+{{/if}}
             <td class="tall sum sumrad">{{kroner totalresultat.totalt-tilbakekreves-beløp-med-renter-uten-skatt}}</td>
         </tr>
         </tbody>

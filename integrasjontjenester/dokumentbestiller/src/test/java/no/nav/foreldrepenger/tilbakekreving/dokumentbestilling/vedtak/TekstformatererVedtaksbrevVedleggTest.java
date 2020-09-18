@@ -60,7 +60,20 @@ public class TekstformatererVedtaksbrevVedleggTest {
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 
+    @Test
+    public void skal_generere_vedlegg_med_en_periode_uten_skatt() throws Exception {
+        HbVedtaksbrevData data = getVedtaksbrevData(Språkkode.nb, 10000, 30001, 30001, 0, 0);
+
+        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevVedleggHtml(data);
+        String fasit = les("/vedtaksbrev/vedlegg/vedlegg_uten_skatt.txt");
+        assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
+    }
+
     private HbVedtaksbrevData getVedtaksbrevData(Språkkode språkkode) {
+        return getVedtaksbrevData(språkkode, 33001, 30001, 20002, 0, 20002 - 16015);
+    }
+
+    private HbVedtaksbrevData getVedtaksbrevData(Språkkode språkkode, int varslet, int feilutbetalt, int tilbakekreves, int renter, int skatt) {
         HbVedtaksbrevFelles vedtaksbrevData = lagTestBuilder()
             .medSak(HbSak.build()
                 .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
@@ -69,14 +82,14 @@ public class TekstformatererVedtaksbrevVedleggTest {
                 .build())
             .medVedtakResultat(HbTotalresultat.builder()
                 .medHovedresultat(VedtakResultatType.DELVIS_TILBAKEBETALING)
-                .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(20002))
-                .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(20002))
-                .medTotaltRentebeløp(BigDecimal.valueOf(0))
-                .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.valueOf(16015))
+                .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(tilbakekreves))
+                .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(tilbakekreves + renter))
+                .medTotaltRentebeløp(BigDecimal.valueOf(renter))
+                .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.valueOf(tilbakekreves + renter - skatt))
                 .build())
             .medLovhjemmelVedtak("Folketrygdloven § 22-15")
             .medVarsel(HbVarsel.builder()
-                .medVarsletBeløp(BigDecimal.valueOf(33001))
+                .medVarsletBeløp(BigDecimal.valueOf(varslet))
                 .medVarsletDato(LocalDate.of(2020, 4, 4))
                 .build())
             .medSpråkkode(språkkode != null ? språkkode : Språkkode.nb)
@@ -84,7 +97,7 @@ public class TekstformatererVedtaksbrevVedleggTest {
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(januar)
-                .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(30001)))
+                .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(feilutbetalt)))
                 .medFakta(HendelseType.FP_ANNET_HENDELSE_TYPE, FellesUndertyper.REFUSJON_ARBEIDSGIVER)
                 .medVurderinger(HbVurderinger.builder()
                     .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
@@ -94,9 +107,9 @@ public class TekstformatererVedtaksbrevVedleggTest {
                     .medSærligeGrunner(Arrays.asList(SærligGrunn.TID_FRA_UTBETALING, SærligGrunn.STØRRELSE_BELØP), null, null)
                     .build())
                 .medResultat(HbResultat.builder()
-                    .medTilbakekrevesBeløpUtenSkatt(BigDecimal.valueOf(16015))
-                    .medTilbakekrevesBeløp(BigDecimal.valueOf(20002))
-                    .medRenterBeløp(BigDecimal.ZERO)
+                    .medTilbakekrevesBeløpUtenSkatt(BigDecimal.valueOf(tilbakekreves - skatt))
+                    .medTilbakekrevesBeløp(BigDecimal.valueOf(tilbakekreves))
+                    .medRenterBeløp(BigDecimal.valueOf(renter))
                     .build())
                 .build()
         );
