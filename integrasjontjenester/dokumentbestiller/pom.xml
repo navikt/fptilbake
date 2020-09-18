@@ -28,8 +28,8 @@
             <artifactId>behandling</artifactId>
         </dependency>
         <dependency>
-            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
-            <artifactId>dokumentproduksjon-klient</artifactId>
+            <groupId>no.nav.foreldrepenger.felles.ukelonn.integrasjon</groupId>
+            <artifactId>dokumentproduksjon-klient-v2</artifactId>
             <exclusions>
                 <exclusion>
                     <groupId>org.jvnet.jaxb2_commons</groupId>

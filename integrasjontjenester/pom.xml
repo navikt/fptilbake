@@ -15,7 +15,6 @@
     <modules>
         <module>avstemming</module>
         <module>dokumentbestiller</module>
-        <module>dokumentproduksjon-klient</module>
         <module>fagsystem-klient-api</module>
         <module>fpsak-klient</module>
         <module>k9-sak-klient</module>

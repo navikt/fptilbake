@@ -40,7 +40,7 @@
         <vl-fpsak-tidsserie.version>2.3-20200901141100-c540133</vl-fpsak-tidsserie.version>
         <!-- Kontrakter -->
         <fpkontrakter.version>5.1-20200907082654-6365c08</fpkontrakter.version>
-        <ukelonn.felles.version>1.0.0-20200914112449-039464d</ukelonn.felles.version>
+        <ukelonn.felles.version>1.0.0-20200918113358-f3ef51e</ukelonn.felles.version>
 
         <surefire.version>2.22.2</surefire.version>
         <metrics.version>4.1.12.1</metrics.version>
@@ -289,11 +289,6 @@
             </dependency>
             <dependency>
                 <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
-                <artifactId>dokumentproduksjon-klient</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
                 <artifactId>fplos-klient</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -317,6 +312,11 @@
             <dependency>
                 <groupId>no.nav.foreldrepenger.felles.ukelonn.integrasjon</groupId>
                 <artifactId>felles-integrasjon-jms</artifactId>
+                <version>${ukelonn.felles.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.foreldrepenger.felles.ukelonn.integrasjon</groupId>
+                <artifactId>dokumentproduksjon-klient-v2</artifactId>
                 <version>${ukelonn.felles.version}</version>
             </dependency>
             <dependency>
@@ -399,18 +399,6 @@
                 <groupId>no.nav.tjenester</groupId>
                 <artifactId>tilbakekreving-v1-tjenestespesifikasjon</artifactId>
                 <version>1.0.4</version>
-                <classifier>jaxws</classifier>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.tjenester.fim</groupId>
-                <artifactId>nav-fim-dokumentproduksjon-v2-tjenestespesifikasjon</artifactId>
-                <version>2.1.8</version>
-                <classifier>jaxws</classifier>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.tjenester</groupId>
-                <artifactId>nav-dokumentproduksjon-v3-tjenestespesifikasjon</artifactId>
-                <version>3.3.4</version>
                 <classifier>jaxws</classifier>
             </dependency>
             <!-- Eksterne -->
