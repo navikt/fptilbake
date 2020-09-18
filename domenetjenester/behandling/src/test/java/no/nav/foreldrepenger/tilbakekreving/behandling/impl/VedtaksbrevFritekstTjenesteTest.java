@@ -30,7 +30,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.FellesUndertyper;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
@@ -83,7 +83,7 @@ public class VedtaksbrevFritekstTjenesteTest {
         fakta.leggTilFeilutbetaltPeriode(FaktaFeilutbetalingPeriode.builder()
             .medFeilutbetalinger(fakta)
             .medHendelseType(HendelseType.FP_ANNET_HENDELSE_TYPE)
-            .medHendelseUndertype(FellesUndertyper.ANNET_FRITEKST)
+            .medHendelseUndertype(HendelseUnderType.ANNET_FRITEKST)
             .medPeriode(jan1, jan24)
             .build());
         faktaFeilutbetalingRepository.lagre(behandlingId, fakta);
@@ -110,7 +110,7 @@ public class VedtaksbrevFritekstTjenesteTest {
         fakta.leggTilFeilutbetaltPeriode(FaktaFeilutbetalingPeriode.builder()
             .medFeilutbetalinger(fakta)
             .medHendelseType(HendelseType.FP_ANNET_HENDELSE_TYPE)
-            .medHendelseUndertype(FellesUndertyper.ANNET_FRITEKST)
+            .medHendelseUndertype(HendelseUnderType.ANNET_FRITEKST)
             .medPeriode(jan1, jan24)
             .build());
         faktaFeilutbetalingRepository.lagre(behandlingId, fakta);

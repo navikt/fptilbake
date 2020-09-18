@@ -7,6 +7,10 @@ import java.util.Set;
 
 public class HendelseUndertypePrHendelseType {
 
+    private HendelseUndertypePrHendelseType(){
+        // sonar
+    }
+
     private static final Map<HendelseType, Set<HendelseUnderType>> HIERARKI = Collections.unmodifiableMap(lagMapping());
 
     private static Map<HendelseType, Set<HendelseUnderType>> lagMapping() {
@@ -46,6 +50,11 @@ public class HendelseUndertypePrHendelseType {
         h.put(HendelseType.FP_KUN_RETT_TYPE, Set.of(
             HendelseUnderType.FEIL_I_ANTALL_DAGER));
         h.put(HendelseType.MEDLEMSKAP_TYPE, Set.of(
+            HendelseUnderType.IKKE_BOSATT,
+            HendelseUnderType.IKKE_LOVLIG_OPPHOLD,
+            HendelseUnderType.MEDLEM_I_ANNET_LAND,
+            HendelseUnderType.UTVANDRET));
+        h.put(HendelseType.ES_MEDLEMSKAP_TYPE, Set.of(
             HendelseUnderType.IKKE_BOSATT,
             HendelseUnderType.IKKE_LOVLIG_OPPHOLD,
             HendelseUnderType.IKKE_OPPHOLDSRETT_EØS,

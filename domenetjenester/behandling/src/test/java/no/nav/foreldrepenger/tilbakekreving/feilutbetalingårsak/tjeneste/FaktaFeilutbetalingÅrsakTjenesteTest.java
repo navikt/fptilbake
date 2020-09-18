@@ -11,10 +11,6 @@ import org.junit.Test;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.FellesUndertyper;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.FpHendelseUnderTyper;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.MedlemskapHendelseUndertyper;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.SvpHendelseUnderTyper;
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTypeMedUndertyperDto;
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTyperPrYtelseTypeDto;
 
@@ -42,78 +38,77 @@ public class FaktaFeilutbetalingÅrsakTjenesteTest {
         );
 
         assertThat(mapAvResultat.get(HendelseType.MEDLEMSKAP_TYPE)).containsExactly(
-            MedlemskapHendelseUndertyper.UTVANDRET,
-            MedlemskapHendelseUndertyper.IKKE_BOSATT,
-            MedlemskapHendelseUndertyper.IKKE_OPPHOLDSRETT_EØS,
-            MedlemskapHendelseUndertyper.IKKE_LOVLIG_OPPHOLD,
-            MedlemskapHendelseUndertyper.MEDLEM_I_ANNET_LAND
+            HendelseUnderType.UTVANDRET,
+            HendelseUnderType.IKKE_BOSATT,
+            HendelseUnderType.IKKE_LOVLIG_OPPHOLD,
+            HendelseUnderType.MEDLEM_I_ANNET_LAND
         );
 
         assertThat(mapAvResultat.get(HendelseType.FP_OPPTJENING_TYPE)).containsExactly(
-            FpHendelseUnderTyper.IKKE_INNTEKT,
-            FpHendelseUnderTyper.IKKE_YRKESAKTIV
+            HendelseUnderType.IKKE_INNTEKT,
+            HendelseUnderType.IKKE_YRKESAKTIV
         );
 
         assertThat(mapAvResultat.get(HendelseType.FP_BEREGNING_TYPE)).containsExactly(
-            FpHendelseUnderTyper.ENDRING_GRUNNLAG,
-            FpHendelseUnderTyper.INNTEKT_UNDER
+            HendelseUnderType.ENDRING_GRUNNLAG,
+            HendelseUnderType.INNTEKT_UNDER
         );
 
         assertThat(mapAvResultat.get(HendelseType.FP_STONADSPERIODEN_TYPE)).containsExactly(
-            FpHendelseUnderTyper.ENDRET_DEKNINGSGRAD,
-            FpHendelseUnderTyper.FEIL_FLERBARNSDAGER,
-            FpHendelseUnderTyper.OPPHOR_BARN_DOD,
-            FpHendelseUnderTyper.OPPHOR_MOTTAKER_DOD
+            HendelseUnderType.ENDRET_DEKNINGSGRAD,
+            HendelseUnderType.FEIL_FLERBARNSDAGER,
+            HendelseUnderType.OPPHOR_BARN_DOD,
+            HendelseUnderType.OPPHOR_MOTTAKER_DOD
         );
 
         assertThat(mapAvResultat.get(HendelseType.FP_UTTAK_GENERELT_TYPE)).containsExactly(
-            FpHendelseUnderTyper.STONADSPERIODE_OVER_3,
-            FpHendelseUnderTyper.NY_STONADSPERIODE,
-            FpHendelseUnderTyper.IKKE_OMSORG,
-            FpHendelseUnderTyper.MOTTAKER_I_ARBEID,
-            FpHendelseUnderTyper.FORELDRES_UTTAK,
-            FpHendelseUnderTyper.STONADSPERIODE_MANGEL
+            HendelseUnderType.STONADSPERIODE_OVER_3,
+            HendelseUnderType.NY_STONADSPERIODE,
+            HendelseUnderType.IKKE_OMSORG,
+            HendelseUnderType.MOTTAKER_I_ARBEID,
+            HendelseUnderType.FORELDRES_UTTAK,
+            HendelseUnderType.STONADSPERIODE_MANGEL
         );
 
         assertThat(mapAvResultat.get(HendelseType.FP_UTTAK_UTSETTELSE_TYPE)).containsExactly(
-            FpHendelseUnderTyper.LOVBESTEMT_FERIE,
-            FpHendelseUnderTyper.ARBEID_HELTID,
-            FpHendelseUnderTyper.MOTTAKER_HELT_AVHENGIG,
-            FpHendelseUnderTyper.MOTTAKER_INNLAGT,
-            FpHendelseUnderTyper.BARN_INNLAGT
+            HendelseUnderType.LOVBESTEMT_FERIE,
+            HendelseUnderType.ARBEID_HELTID,
+            HendelseUnderType.MOTTAKER_HELT_AVHENGIG,
+            HendelseUnderType.MOTTAKER_INNLAGT,
+            HendelseUnderType.BARN_INNLAGT
         );
 
         assertThat(mapAvResultat.get(HendelseType.FP_UTTAK_KVOTENE_TYPE)).containsExactly(
-            FpHendelseUnderTyper.KVO_MOTTAKER_HELT_AVHENGIG,
-            FpHendelseUnderTyper.KVO_MOTTAKER_INNLAGT,
-            FpHendelseUnderTyper.KVO_SAMTIDIG_UTTAK
+            HendelseUnderType.KVO_MOTTAKER_HELT_AVHENGIG,
+            HendelseUnderType.KVO_MOTTAKER_INNLAGT,
+            HendelseUnderType.KVO_SAMTIDIG_UTTAK
         );
 
         assertThat(mapAvResultat.get(HendelseType.FP_VILKAAR_GENERELLE_TYPE)).containsExactly(
-            FpHendelseUnderTyper.MOR_IKKE_ARBEID,
-            FpHendelseUnderTyper.MOR_IKKE_STUDERT,
-            FpHendelseUnderTyper.MOR_IKKE_ARBEID_OG_STUDER,
-            FpHendelseUnderTyper.MOR_IKKE_HELT_AVHENGIG,
-            FpHendelseUnderTyper.MOR_IKKE_INNLAGT,
-            FpHendelseUnderTyper.MOR_IKKE_I_IP,
-            FpHendelseUnderTyper.MOR_IKKE_I_KP
+            HendelseUnderType.MOR_IKKE_ARBEID,
+            HendelseUnderType.MOR_IKKE_STUDERT,
+            HendelseUnderType.MOR_IKKE_ARBEID_OG_STUDER,
+            HendelseUnderType.MOR_IKKE_HELT_AVHENGIG,
+            HendelseUnderType.MOR_IKKE_INNLAGT,
+            HendelseUnderType.MOR_IKKE_I_IP,
+            HendelseUnderType.MOR_IKKE_I_KP
         );
 
         assertThat(mapAvResultat.get(HendelseType.FP_ANNET_HENDELSE_TYPE)).containsExactly(
-            FellesUndertyper.REFUSJON_ARBEIDSGIVER,
-            FellesUndertyper.ANNET_FRITEKST
+            HendelseUnderType.REFUSJON_ARBEIDSGIVER,
+            HendelseUnderType.ANNET_FRITEKST
         );
 
         assertThat(mapAvResultat.get(HendelseType.FP_KUN_RETT_TYPE)).containsOnly(
-            FpHendelseUnderTyper.FEIL_I_ANTALL_DAGER
+            HendelseUnderType.FEIL_I_ANTALL_DAGER
         );
 
         assertThat(mapAvResultat.get(HendelseType.FP_UTTAK_ALENEOMSORG_TYPE)).containsOnly(
-            FpHendelseUnderTyper.IKKE_ALENEOMSORG
+            HendelseUnderType.IKKE_ALENEOMSORG
         );
 
         assertThat(mapAvResultat.get(HendelseType.FP_UTTAK_GRADERT_TYPE)).containsOnly(
-            FpHendelseUnderTyper.GRADERT_UTTAK
+            HendelseUnderType.GRADERT_UTTAK
         );
 
     }
@@ -134,47 +129,113 @@ public class FaktaFeilutbetalingÅrsakTjenesteTest {
         );
 
         assertThat(mapAvResultat.get(HendelseType.MEDLEMSKAP_TYPE)).containsExactly(
-            MedlemskapHendelseUndertyper.UTVANDRET,
-            MedlemskapHendelseUndertyper.IKKE_BOSATT,
-            MedlemskapHendelseUndertyper.IKKE_OPPHOLDSRETT_EØS,
-            MedlemskapHendelseUndertyper.IKKE_LOVLIG_OPPHOLD,
-            MedlemskapHendelseUndertyper.MEDLEM_I_ANNET_LAND
+            HendelseUnderType.UTVANDRET,
+            HendelseUnderType.IKKE_BOSATT,
+            HendelseUnderType.IKKE_LOVLIG_OPPHOLD,
+            HendelseUnderType.MEDLEM_I_ANNET_LAND
         );
 
         assertThat(mapAvResultat.get(HendelseType.SVP_OPPHØR)).containsExactly(
-            SvpHendelseUnderTyper.MOTTAKER_DØD,
-            SvpHendelseUnderTyper.MOTTAKER_IKKE_GRAVID
+            HendelseUnderType.MOTTAKER_DØD,
+            HendelseUnderType.MOTTAKER_IKKE_GRAVID
         );
 
         assertThat(mapAvResultat.get(HendelseType.SVP_FAKTA_TYPE)).containsExactly(
-            SvpHendelseUnderTyper.SVP_ENDRING_TERMINDATO,
-            SvpHendelseUnderTyper.SVP_TIDLIG_FODSEL,
-            SvpHendelseUnderTyper.SVP_IKKE_HELSEFARLIG
+            HendelseUnderType.SVP_ENDRING_TERMINDATO,
+            HendelseUnderType.SVP_TIDLIG_FODSEL,
+            HendelseUnderType.SVP_IKKE_HELSEFARLIG
         );
 
         assertThat(mapAvResultat.get(HendelseType.SVP_ARBEIDSGIVERS_FORHOLD_TYPE)).containsExactly(
-            SvpHendelseUnderTyper.SVP_TILRETTELEGGING_FULLT_MULIG,
-            SvpHendelseUnderTyper.SVP_TILRETTELEGGING_DELVIS_MULIG
+            HendelseUnderType.SVP_TILRETTELEGGING_FULLT_MULIG,
+            HendelseUnderType.SVP_TILRETTELEGGING_DELVIS_MULIG
         );
 
         assertThat(mapAvResultat.get(HendelseType.SVP_OPPTJENING_TYPE)).containsExactly(
-            SvpHendelseUnderTyper.SVP_IKKE_ARBEID,
-            SvpHendelseUnderTyper.SVP_INNTEKT_IKKE_TAP,
-            SvpHendelseUnderTyper.SVP_INNTEKT_UNDER
+            HendelseUnderType.SVP_IKKE_ARBEID,
+            HendelseUnderType.SVP_INNTEKT_IKKE_TAP,
+            HendelseUnderType.SVP_INNTEKT_UNDER
         );
 
         assertThat(mapAvResultat.get(HendelseType.SVP_BEREGNING_TYPE)).containsExactly(
-            SvpHendelseUnderTyper.SVP_ENDRING_GRUNNLAG
+            HendelseUnderType.SVP_ENDRING_GRUNNLAG
         );
 
         assertThat(mapAvResultat.get(HendelseType.SVP_UTTAK_TYPE)).containsExactly(
-            SvpHendelseUnderTyper.SVP_ENDRING_PROSENT,
-            SvpHendelseUnderTyper.SVP_ENDRING_PERIODE
+            HendelseUnderType.SVP_ENDRING_PROSENT,
+            HendelseUnderType.SVP_ENDRING_PERIODE
         );
 
         assertThat(mapAvResultat.get(HendelseType.SVP_ANNET_TYPE)).containsOnly(
-            FellesUndertyper.REFUSJON_ARBEIDSGIVER,
-            FellesUndertyper.ANNET_FRITEKST
+            HendelseUnderType.REFUSJON_ARBEIDSGIVER,
+            HendelseUnderType.ANNET_FRITEKST
+        );
+    }
+
+    @Test
+    public void skal_ha_riktige_årsaker_og_underårsaker_for_engangstønad() {
+        Map<HendelseType, List<HendelseUnderType>> mapAvResultat = hentÅrsakerForYtelseType(FagsakYtelseType.ENGANGSTØNAD);
+
+        assertThat(mapAvResultat.keySet()).containsExactly(
+            HendelseType.ES_MEDLEMSKAP_TYPE,
+            HendelseType.ES_ADOPSJONSVILKAARET_TYPE,
+            HendelseType.ES_FODSELSVILKAARET_TYPE,
+            HendelseType.ES_FORELDREANSVAR_TYPE,
+            HendelseType.ES_OMSORGSVILKAAR_TYPE,
+            HendelseType.ES_FORELDREANSVAR_FAR_TYPE,
+            HendelseType.ES_RETT_PAA_FORELDREPENGER_TYPE,
+            HendelseType.ES_FEIL_UTBETALING_TYPE,
+            HendelseType.ES_ANNET_TYPE
+        );
+
+        assertThat(mapAvResultat.get(HendelseType.ES_MEDLEMSKAP_TYPE)).containsExactly(
+            HendelseUnderType.UTVANDRET,
+            HendelseUnderType.IKKE_BOSATT,
+            HendelseUnderType.IKKE_OPPHOLDSRETT_EØS,
+            HendelseUnderType.IKKE_LOVLIG_OPPHOLD,
+            HendelseUnderType.MEDLEM_I_ANNET_LAND
+        );
+
+        assertThat(mapAvResultat.get(HendelseType.ES_ADOPSJONSVILKAARET_TYPE)).containsExactly(
+            HendelseUnderType.ES_IKKE_OPPFYLT,
+            HendelseUnderType.ES_BARN_OVER_15,
+            HendelseUnderType.ES_MANN_IKKE_ALENE,
+            HendelseUnderType.ES_STEBARN
+        );
+
+        assertThat(mapAvResultat.get(HendelseType.ES_FODSELSVILKAARET_TYPE)).containsExactly(
+            HendelseUnderType.ES_BARN_IKKE_REGISTRERT,
+            HendelseUnderType.ES_MOTTAKER_FAR_MEDMOR
+        );
+
+        assertThat(mapAvResultat.get(HendelseType.ES_FORELDREANSVAR_TYPE)).containsExactly(
+            HendelseUnderType.ES_ANDRE_FORELDRE_DODD,
+            HendelseUnderType.ES_IKKE_TILDELT,
+            HendelseUnderType.ES_IKKE_MINDRE_SAMVAER,
+            HendelseUnderType.ES_FORELDREANSVAR_BARN_OVER_15
+        );
+
+        assertThat(mapAvResultat.get(HendelseType.ES_OMSORGSVILKAAR_TYPE)).containsExactly(
+            HendelseUnderType.ES_FAR_IKKE_OMSORG,
+            HendelseUnderType.ES_STONADEN_ALLEREDE_UTBETALT
+        );
+
+        assertThat(mapAvResultat.get(HendelseType.ES_FORELDREANSVAR_FAR_TYPE)).containsExactly(
+            HendelseUnderType.ES_FAR_IKKE_ALENE,
+            HendelseUnderType.ES_FAR_IKKE_INNEN_STONADSPERIODE
+        );
+
+        assertThat(mapAvResultat.get(HendelseType.ES_RETT_PAA_FORELDREPENGER_TYPE)).containsExactly(
+            HendelseUnderType.ES_BRUKER_RETT_FORELDREPENGER
+        );
+
+        assertThat(mapAvResultat.get(HendelseType.ES_FEIL_UTBETALING_TYPE)).containsExactly(
+            HendelseUnderType.ES_STONAD_FLERE_GANGER,
+            HendelseUnderType.LEGACY_ØKONOMI_UTBETALT_FOR_MYE
+        );
+
+        assertThat(mapAvResultat.get(HendelseType.ES_ANNET_TYPE)).containsExactly(
+            HendelseUnderType.ANNET_FRITEKST
         );
     }
 

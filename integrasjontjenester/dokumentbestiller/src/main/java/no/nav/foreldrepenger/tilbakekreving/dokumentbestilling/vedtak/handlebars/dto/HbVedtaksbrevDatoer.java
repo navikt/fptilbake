@@ -5,8 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.FpHendelseUnderTyper;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.SvpHendelseUnderTyper;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbVedtaksbrevPeriode;
 
 public class HbVedtaksbrevDatoer {
@@ -51,10 +49,10 @@ public class HbVedtaksbrevDatoer {
         public HbVedtaksbrevDatoer.Builder medPerioder(List<HbVedtaksbrevPeriode> perioder) {
             this.perioder = perioder;
 
-            kladd.opphørsdatoDødSøker = getFørsteDagForHendelseUnderType(SvpHendelseUnderTyper.MOTTAKER_DØD, FpHendelseUnderTyper.OPPHOR_MOTTAKER_DOD);
-            kladd.opphørsdatoDødtBarn = getFørsteDagForHendelseUnderType(FpHendelseUnderTyper.OPPHOR_BARN_DOD);
-            kladd.opphørsdatoIkkeGravid = getFørsteDagForHendelseUnderType(SvpHendelseUnderTyper.MOTTAKER_IKKE_GRAVID);
-            kladd.opphørsdatoIkkeOmsorg = getFørsteDagForHendelseUnderType(FpHendelseUnderTyper.IKKE_OMSORG);
+            kladd.opphørsdatoDødSøker = getFørsteDagForHendelseUnderType(HendelseUnderType.MOTTAKER_DØD, HendelseUnderType.OPPHOR_MOTTAKER_DOD);
+            kladd.opphørsdatoDødtBarn = getFørsteDagForHendelseUnderType(HendelseUnderType.OPPHOR_BARN_DOD);
+            kladd.opphørsdatoIkkeGravid = getFørsteDagForHendelseUnderType(HendelseUnderType.MOTTAKER_IKKE_GRAVID);
+            kladd.opphørsdatoIkkeOmsorg = getFørsteDagForHendelseUnderType(HendelseUnderType.IKKE_OMSORG);
             return this;
         }
 

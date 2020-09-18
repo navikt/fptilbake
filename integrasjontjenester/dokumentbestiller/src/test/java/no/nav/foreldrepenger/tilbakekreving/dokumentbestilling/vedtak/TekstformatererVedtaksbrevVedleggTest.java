@@ -15,8 +15,7 @@ import org.junit.Test;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.FellesUndertyper;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.ØkonomiUndertyper;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
@@ -98,7 +97,7 @@ public class TekstformatererVedtaksbrevVedleggTest {
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(januar)
                 .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(feilutbetalt)))
-                .medFakta(HendelseType.FP_ANNET_HENDELSE_TYPE, FellesUndertyper.REFUSJON_ARBEIDSGIVER)
+                .medFakta(HendelseType.FP_ANNET_HENDELSE_TYPE, HendelseUnderType.REFUSJON_ARBEIDSGIVER)
                 .medVurderinger(HbVurderinger.builder()
                     .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
                     .medVilkårResultat(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER)
@@ -141,7 +140,7 @@ public class TekstformatererVedtaksbrevVedleggTest {
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(januar)
                 .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(30001)))
-                .medFakta(HendelseType.FP_ANNET_HENDELSE_TYPE, FellesUndertyper.REFUSJON_ARBEIDSGIVER)
+                .medFakta(HendelseType.FP_ANNET_HENDELSE_TYPE, HendelseUnderType.REFUSJON_ARBEIDSGIVER)
                 .medVurderinger(HbVurderinger.builder()
                     .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
                     .medVilkårResultat(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER)
@@ -162,7 +161,7 @@ public class TekstformatererVedtaksbrevVedleggTest {
                     .medRiktigBeløp(BigDecimal.valueOf(3000))
                     .medUtbetaltBeløp(BigDecimal.valueOf(6000))
                     .build())
-                .medFakta(HendelseType.ØKONOMI_FEIL, ØkonomiUndertyper.DOBBELTUTBETALING)
+                .medFakta(HendelseType.ØKONOMI_FEIL, HendelseUnderType.DOBBELTUTBETALING)
                 .medVurderinger(HbVurderinger.builder()
                     .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
                     .medVilkårResultat(VilkårResultat.GOD_TRO)
@@ -182,7 +181,7 @@ public class TekstformatererVedtaksbrevVedleggTest {
                     .medRiktigBeløp(BigDecimal.valueOf(3000))
                     .medUtbetaltBeløp(BigDecimal.valueOf(6000))
                     .build())
-                .medFakta(HendelseType.ØKONOMI_FEIL, ØkonomiUndertyper.DOBBELTUTBETALING)
+                .medFakta(HendelseType.ØKONOMI_FEIL, HendelseUnderType.DOBBELTUTBETALING)
                 .medVurderinger(HbVurderinger.builder()
                     .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
                     .medVilkårResultat(VilkårResultat.FORSTO_BURDE_FORSTÅTT)
