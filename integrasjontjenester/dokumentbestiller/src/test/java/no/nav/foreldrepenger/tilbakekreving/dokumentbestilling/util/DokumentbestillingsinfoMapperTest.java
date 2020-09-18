@@ -71,7 +71,7 @@ public class DokumentbestillingsinfoMapperTest {
 
         assertThat(dokumentbestillingsinformasjon.getDokumenttilhoerendeFagomraade().getKodeRef()).isEqualTo("OMS");
         assertThat(dokumentbestillingsinformasjon.getSakstilhoerendeFagsystem().getKodeRef()).isEqualTo(Fagsystem.K9SAK.getOffisiellKode());
-        assertThat(dokumentbestillingsinformasjon.getBestillendeFagsystem().getKodeRef()).isEqualTo(Fagsystem.K9.getOffisiellKode());
+        assertThat(dokumentbestillingsinformasjon.getBestillendeFagsystem().getKodeRef()).isEqualTo(Fagsystem.K9SAK.getOffisiellKode());
     }
 
     @Test

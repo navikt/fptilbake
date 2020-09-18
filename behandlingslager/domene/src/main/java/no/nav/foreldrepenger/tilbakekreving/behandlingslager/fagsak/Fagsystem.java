@@ -21,8 +21,7 @@ public enum Fagsystem implements Kodeverdi {
 
 
     FPSAK("FPSAK", "FS36"),
-    K9SAK("K9SAK", "FS22"),
-    K9("K9", "K9"),
+    K9SAK("K9", "K9"),
     TPS("TPS", "FS03"),
     JOARK("JOARK", "AS36"),
     INFOTRYGD("INFOTRYGD", "IT01"),

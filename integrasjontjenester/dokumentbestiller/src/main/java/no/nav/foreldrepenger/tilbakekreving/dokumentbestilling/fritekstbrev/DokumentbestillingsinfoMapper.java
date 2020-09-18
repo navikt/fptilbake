@@ -113,8 +113,8 @@ public class DokumentbestillingsinfoMapper {
             }
             case "k9-tilbake": {
                 Fagsystemer k9sak = new Fagsystemer();
-                k9sak.setKodeRef(Fagsystem.K9.getOffisiellKode());
-                k9sak.setValue(Fagsystem.K9.getOffisiellKode());
+                k9sak.setKodeRef(Fagsystem.K9SAK.getOffisiellKode());
+                k9sak.setValue(Fagsystem.K9SAK.getOffisiellKode());
                 return k9sak;
             }
             default:

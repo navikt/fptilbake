@@ -128,7 +128,7 @@ public class JournalføringTjeneste {
     private Sak lagReferanseTilK9FagsystemSak(Saksnummer saksnummer) {
         return Sak.builder()
             .medSakstype(Sakstype.FAGSAK)
-            .medFagsak(FagsakSystem.K9, saksnummer.getVerdi())
+            .medFagsak(FagsakSystem.K9SAK, saksnummer.getVerdi())
             .build();
     }
 
