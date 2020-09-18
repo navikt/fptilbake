@@ -17,10 +17,10 @@ public class ForeslåVedtakDto extends BekreftetAksjonspunktDto {
     static final String AKSJONSPUNKT_KODE = "5004";
 
     @Valid
-    @Size(min = 0)
+    @Size(max = 100)
     private List<PeriodeMedTekstDto> perioderMedTekst;
 
-    @Size(max=1500)
+    @Size(max = 4000)
     @Pattern(regexp = InputValideringRegex.FRITEKST)
     private String oppsummeringstekst;
 
