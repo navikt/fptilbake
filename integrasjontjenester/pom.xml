@@ -15,12 +15,9 @@
     <modules>
         <module>avstemming</module>
         <module>dokumentbestiller</module>
-        <module>dokumentproduksjon-klient</module>
         <module>fagsystem-klient-api</module>
         <module>fpsak-klient</module>
         <module>k9-sak-klient</module>
-        <module>journalpost</module>
-        <module>kafka-poller</module>
         <module>kravgrunnlag-queue</module>
         <module>okonomistotte</module>
         <module>person</module>
