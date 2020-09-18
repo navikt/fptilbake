@@ -254,11 +254,6 @@
             </dependency>
             <dependency>
                 <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
-                <artifactId>okonomistotte</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
                 <artifactId>avstemming</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -317,6 +312,11 @@
             <dependency>
                 <groupId>no.nav.foreldrepenger.felles.ukelonn.integrasjon</groupId>
                 <artifactId>kafka-poller</artifactId>
+                <version>${ukelonn.felles.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.foreldrepenger.felles.ukelonn.integrasjon</groupId>
+                <artifactId>oekonomi-tilbakekreving-klient</artifactId>
                 <version>${ukelonn.felles.version}</version>
             </dependency>
             <dependency>
@@ -384,22 +384,10 @@
 
             <!-- NAV -->
             <dependency>
-                <groupId>no.nav.foreldrepenger.kontrakter</groupId>
-                <artifactId>dokumentbestiller-v1</artifactId>
-                <version>2.0_20190816101820_003f3bb</version>
-                <classifier>jaxb</classifier>
-            </dependency>
-            <dependency>
                 <groupId>no.nav.meldinger.virksomhet</groupId>
                 <artifactId>nav-virksomhet-tilbakekreving-v1-meldingsdefinisjon</artifactId>
                 <version>1.0.10</version>
                 <classifier>jaxb</classifier>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.tjenester</groupId>
-                <artifactId>tilbakekreving-v1-tjenestespesifikasjon</artifactId>
-                <version>1.0.4</version>
-                <classifier>jaxws</classifier>
             </dependency>
             <!-- Eksterne -->
             <dependency>

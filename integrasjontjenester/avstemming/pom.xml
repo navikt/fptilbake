@@ -22,8 +22,8 @@
             <artifactId>behandlingslager-domene</artifactId>
         </dependency>
         <dependency>
-            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
-            <artifactId>okonomistotte</artifactId>
+            <groupId>no.nav.foreldrepenger.felles.ukelonn.integrasjon</groupId>
+            <artifactId>oekonomi-tilbakekreving-klient</artifactId>
         </dependency>
         <dependency>
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
