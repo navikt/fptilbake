@@ -23,15 +23,20 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
 public enum BehandlingResultatType implements Kodeverdi {
 
-    IKKE_FASTSATT("IKKE_FASTSATT","Ikke fastsatt"),
-    FASTSATT("FASTSATT","Resultatet er fastsatt"),
-    HENLAGT_FEILOPPRETTET("HENLAGT_FEILOPPRETTET","Henlagt, søknaden er feilopprettet"),
-    HENLAGT_FEILOPPRETTET_MED_BREV("HENLAGT_FEILOPPRETTET_MED_BREV","Feilaktig opprettet - med henleggelsesbrev"),
-    HENLAGT_FEILOPPRETTET_UTEN_BREV("HENLAGT_FEILOPPRETTET_UTEN_BREV","Feilaktig opprettet - uten henleggelsesbrev"),
-    HENLAGT_KRAVGRUNNLAG_NULLSTILT("HENLAGT_KRAVGRUNNLAG_NULLSTILT","Kravgrunnlaget er nullstilt"),
-    HENLAGT_TEKNISK_VEDLIKEHOLD("HENLAGT_TEKNISK_VEDLIKEHOLD","Teknisk vedlikehold"),
-    ENDRET("ENDRET","Resultatet er endret i revurderingen"),
-    INGEN_ENDRING("INGEN_ENDRING","Ingen endring");
+    IKKE_FASTSATT("IKKE_FASTSATT", "Ikke fastsatt"),
+    FASTSATT("FASTSATT", "Resultatet er fastsatt"),
+    HENLAGT_FEILOPPRETTET("HENLAGT_FEILOPPRETTET", "Henlagt, søknaden er feilopprettet"),
+    HENLAGT_FEILOPPRETTET_MED_BREV("HENLAGT_FEILOPPRETTET_MED_BREV", "Feilaktig opprettet - med henleggelsesbrev"),
+    HENLAGT_FEILOPPRETTET_UTEN_BREV("HENLAGT_FEILOPPRETTET_UTEN_BREV", "Feilaktig opprettet - uten henleggelsesbrev"),
+    HENLAGT_KRAVGRUNNLAG_NULLSTILT("HENLAGT_KRAVGRUNNLAG_NULLSTILT", "Kravgrunnlaget er nullstilt"),
+    HENLAGT_TEKNISK_VEDLIKEHOLD("HENLAGT_TEKNISK_VEDLIKEHOLD", "Teknisk vedlikehold"),
+    ENDRET("ENDRET", "Resultatet er endret i revurderingen"),
+    INGEN_ENDRING("INGEN_ENDRING", "Ingen endring"),
+
+    HENLAGT("HENLAGT", "Henlagt"), // kun brukes for å vise behandling resultat i frontend
+    INGEN_TILBAKEKREVING("INGEN_TILBAKEKREVING", "Ingen Tilbakekreving"), // kun brukes for å vise behandling resultat i frontend
+    DELVIS_TILBAKEKREVING("DELVIS_TILBAKEKREVING", "Delvis Tilbakekreving"), // kun brukes for å vise behandling resultat i frontend
+    FULL_TILBAKEKREVING("FULL_TILBAKEKREVING", "Full Tilbakekreving"); // kun brukes for å vise behandling resultat i frontend
 
     private String kode;
     private String navn;

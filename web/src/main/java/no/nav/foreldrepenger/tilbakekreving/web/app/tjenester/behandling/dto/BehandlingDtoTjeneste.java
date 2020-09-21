@@ -19,14 +19,20 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingM
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandlingsresultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingresultatRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.VergeRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtakRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.BehandlingÅrsakDto;
@@ -51,6 +57,8 @@ public class BehandlingDtoTjeneste {
     private VilkårsvurderingRepository vilkårsvurderingRepository;
     private KravgrunnlagRepository grunnlagRepository;
     private VergeRepository vergeRepository;
+    private BehandlingVedtakRepository behandlingVedtakRepository;
+    private BehandlingresultatRepository behandlingresultatRepository;
 
     private BehandlingModellRepository behandlingModellRepository;
 
@@ -72,6 +80,8 @@ public class BehandlingDtoTjeneste {
         this.vilkårsvurderingRepository = repositoryProvider.getVilkårsvurderingRepository();
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.vergeRepository = repositoryProvider.getVergeRepository();
+        this.behandlingresultatRepository = repositoryProvider.getBehandlingresultatRepository();
+        this.behandlingVedtakRepository = repositoryProvider.getBehandlingVedtakRepository();
         this.behandlingModellRepository = behandlingModellRepository;
 
         switch (applikasjon) {
@@ -99,6 +109,7 @@ public class BehandlingDtoTjeneste {
         UuidDto uuidDto = new UuidDto(uuid);
         BehandlingDto dto = new BehandlingDto();
         settStandardFelter(behandling, dto);
+        dto.setBehandlingsresultat(lagBehandlingsresultat(behandling));
 
         // Behandlingsmeny-operasjoner
         dto.leggTil(get(kontekstPath + "/api/behandlinger/handling-rettigheter", "handling-rettigheter", uuidDto));
@@ -117,6 +128,45 @@ public class BehandlingDtoTjeneste {
         dto.leggTil(new ResourceLink(kontekstPath + "/api/brev/bestill", "brev-bestill", ResourceLink.HttpMethod.POST));
         dto.leggTil(new ResourceLink(kontekstPath + "/api/brev/forhandsvis", "brev-forhandvis", ResourceLink.HttpMethod.POST));
         return dto;
+    }
+
+    private BehandlingsresultatDto lagBehandlingsresultat(Behandling behandling) {
+        BehandlingsresultatDto dto = new BehandlingsresultatDto();
+        if (behandling.erAvsluttet()) {
+            Optional<Behandlingsresultat> behandlingResultatData = behandlingresultatRepository.hent(behandling);
+            behandlingResultatData.ifPresent(value -> {
+                Behandlingsresultat behandlingsresultat = value;
+                if (behandlingsresultat.erBehandlingHenlagt()) {
+                    dto.setType(BehandlingResultatType.HENLAGT);
+                } else {
+                    Optional<BehandlingVedtak> behandlingVedtakData = behandlingVedtakRepository.hentBehandlingvedtakForBehandlingId(behandling.getId());
+                    behandlingVedtakData.ifPresent(behandlingVedtak -> {
+                        BehandlingResultatType behandlingResultatType = settFraVedtakResultat(behandlingVedtak);
+                        dto.setType(behandlingResultatType);
+                    });
+                }
+            });
+        }
+        return dto;
+    }
+
+    private BehandlingResultatType settFraVedtakResultat(BehandlingVedtak behandlingVedtak) {
+        VedtakResultatType vedtakResultatType = behandlingVedtak.getVedtakResultatType();
+        BehandlingResultatType behandlingResultatType;
+        switch (vedtakResultatType) {
+            case INGEN_TILBAKEBETALING:
+                behandlingResultatType = BehandlingResultatType.INGEN_TILBAKEKREVING;
+                break;
+            case DELVIS_TILBAKEBETALING:
+                behandlingResultatType = BehandlingResultatType.DELVIS_TILBAKEKREVING;
+                break;
+            case FULL_TILBAKEBETALING:
+                behandlingResultatType = BehandlingResultatType.FULL_TILBAKEKREVING;
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + vedtakResultatType);
+        }
+        return behandlingResultatType;
     }
 
     public UtvidetBehandlingDto hentUtvidetBehandlingResultat(long behandlingId, AsyncPollingStatus taskStatus) {
