@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
+
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.BehandlingResultatType;
 
 public class BehandlingsresultatDto {
 

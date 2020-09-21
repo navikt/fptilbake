@@ -19,7 +19,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingM
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
@@ -38,6 +37,7 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.BehandlingÅrsakDto;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.web.app.rest.ResourceLink;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.BehandlingResultatType;
 import no.nav.vedtak.konfig.KonfigVerdi;
 
 /**
@@ -49,6 +49,7 @@ public class BehandlingDtoTjeneste {
 
     private static final String DATO_PATTERN = "yyyy-MM-dd";
     private static final String FORELDELSE = "perioderForeldelse";
+    private static final String AKSJONSPUNKT_API = "/api/behandling/aksjonspunkt";
 
     private BehandlingTjeneste behandlingTjeneste;
 
@@ -119,7 +120,7 @@ public class BehandlingDtoTjeneste {
         // Totrinnsbehandling
         if (BehandlingStatus.FATTER_VEDTAK.equals(behandling.getStatus())) {
             dto.leggTil(get(kontekstPath + "/api/behandling/totrinnskontroll/arsaker", "totrinnskontroll-arsaker", uuidDto));
-            dto.leggTil(new ResourceLink(kontekstPath + "/api/behandling/aksjonspunkt", "bekreft-totrinnsaksjonspunkt", ResourceLink.HttpMethod.POST));
+            dto.leggTil(new ResourceLink(kontekstPath + AKSJONSPUNKT_API, "bekreft-totrinnsaksjonspunkt", ResourceLink.HttpMethod.POST));
         } else if (BehandlingStatus.UTREDES.equals(behandling.getStatus())) {
             dto.leggTil(get(kontekstPath + "/api/behandling/totrinnskontroll/arsaker_read_only", "totrinnskontroll-arsaker-readOnly", uuidDto));
         }
@@ -243,7 +244,7 @@ public class BehandlingDtoTjeneste {
         dto.leggTil(new ResourceLink(kontekstPath + "/api/behandlinger/sett-pa-vent", "sett-behandling-pa-vent", ResourceLink.HttpMethod.POST));
         dto.leggTil(new ResourceLink(kontekstPath + "/api/behandlinger/endre-pa-vent", "endre-pa-vent", ResourceLink.HttpMethod.POST));
 
-        dto.leggTil(new ResourceLink(kontekstPath + "/api/behandling/aksjonspunkt", "lagre-aksjonspunkter", ResourceLink.HttpMethod.POST));
+        dto.leggTil(new ResourceLink(kontekstPath + AKSJONSPUNKT_API, "lagre-aksjonspunkter", ResourceLink.HttpMethod.POST));
 
         dto.leggTil(new ResourceLink(kontekstPath + "/api/foreldelse/belop", "beregne-feilutbetalt-belop", ResourceLink.HttpMethod.POST));
         if (!BehandlingStatus.AVSLUTTET.equals(dto.getStatus()) && !dto.isBehandlingPåVent()) {
@@ -266,7 +267,7 @@ public class BehandlingDtoTjeneste {
         boolean harVergeAksjonspunkt = behandling.getAksjonspunktMedDefinisjonOptional(AksjonspunktDefinisjon.AVKLAR_VERGE).isPresent();
         leggTilLenkerForBehandlingsoperasjoner(dto);
 
-        dto.leggTil(get(kontekstPath + "/api/behandling/aksjonspunkt", "aksjonspunkter", uuidDto));
+        dto.leggTil(get(kontekstPath + AKSJONSPUNKT_API, "aksjonspunkter", uuidDto));
         if (BehandlingStegType.FAKTA_FEILUTBETALING.equals(bst) || harDataForFaktaFeilutbetaling) {
             dto.leggTil(get(kontekstPath + "/api/feilutbetalingaarsak", "feilutbetalingAarsak"));
             dto.leggTil(get(kontekstPath + "/api/behandlingfakta/hent-fakta/feilutbetaling", "feilutbetalingFakta", uuidDto));

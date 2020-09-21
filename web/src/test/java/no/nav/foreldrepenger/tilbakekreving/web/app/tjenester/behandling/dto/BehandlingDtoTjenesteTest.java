@@ -28,7 +28,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingM
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegMockUtil;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
@@ -65,6 +64,7 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMockUtil;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.foreldrepenger.tilbakekreving.web.app.rest.ResourceLink;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.BehandlingResultatType;
 
 public class BehandlingDtoTjenesteTest {
 
@@ -350,7 +350,8 @@ public class BehandlingDtoTjenesteTest {
         Behandling behandling = lagBehandling(BehandlingStegType.FAKTA_FEILUTBETALING, BehandlingStatus.UTREDES);
         Behandlingsresultat behandlingsresultat = Behandlingsresultat.builder()
             .medBehandling(behandling)
-            .medBehandlingResultatType(BehandlingResultatType.HENLAGT_TEKNISK_VEDLIKEHOLD).build();
+            .medBehandlingResultatType(no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType.HENLAGT_TEKNISK_VEDLIKEHOLD)
+            .build();
         repositoryProvider.getBehandlingresultatRepository().lagre(behandlingsresultat);
         behandling.avsluttBehandling();
         when(behandlingTjeneste.hentBehandlinger(saksnummer)).thenReturn(Lists.newArrayList(behandling));
@@ -363,7 +364,8 @@ public class BehandlingDtoTjenesteTest {
         Behandling behandling = lagBehandling(BehandlingStegType.IVERKSETT_VEDTAK,BehandlingStatus.IVERKSETTER_VEDTAK);
         Behandlingsresultat behandlingsresultat = Behandlingsresultat.builder()
             .medBehandling(behandling)
-            .medBehandlingResultatType(BehandlingResultatType.FASTSATT).build();
+            .medBehandlingResultatType(no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType.FASTSATT)
+            .build();
         repositoryProvider.getBehandlingresultatRepository().lagre(behandlingsresultat);
         BehandlingVedtak behandlingVedtak = BehandlingVedtak.builder().medVedtakResultat(VedtakResultatType.DELVIS_TILBAKEBETALING)
             .medAnsvarligSaksbehandler("VL")
