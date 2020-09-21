@@ -23,11 +23,17 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingresultatRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.TotrinnRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.Totrinnsvurdering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.IverksettingStatus;
+import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
 import no.nav.vedtak.util.StringUtils;
 
 @BehandlingStegRef(kode = "FVEDSTEG")
@@ -42,19 +48,22 @@ public class FatteVedtakStegImpl implements FatteVedtakSteg {
     private BehandlingresultatRepository behandlingresultatRepository;
     private BehandlingVedtakRepository behandlingVedtakRepository;
     private TilbakekrevingBeregningTjeneste beregningTjeneste;
-
+    private HistorikkTjenesteAdapter historikkTjenesteAdapter;
 
     FatteVedtakStegImpl() {
         // for CDI proxy
     }
 
     @Inject
-    FatteVedtakStegImpl(BehandlingRepositoryProvider repositoryProvider, TotrinnRepository totrinnRepository, TilbakekrevingBeregningTjeneste beregningTjeneste) {
+    public FatteVedtakStegImpl(BehandlingRepositoryProvider repositoryProvider, TotrinnRepository totrinnRepository,
+                               TilbakekrevingBeregningTjeneste beregningTjeneste,
+                               HistorikkTjenesteAdapter historikkTjenesteAdapter) {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.totrinnRepository = totrinnRepository;
         this.behandlingresultatRepository = repositoryProvider.getBehandlingresultatRepository();
         this.behandlingVedtakRepository = repositoryProvider.getBehandlingVedtakRepository();
         this.beregningTjeneste = beregningTjeneste;
+        this.historikkTjenesteAdapter = historikkTjenesteAdapter;
     }
 
     @Override
@@ -70,6 +79,10 @@ public class FatteVedtakStegImpl implements FatteVedtakSteg {
         } else {
             //TODO Velge mer fingranulert ved revurdering
             opprettBehandlingVedtak(behandling, BehandlingResultatType.FASTSATT);
+            if(behandling.isAutomatiskSaksbehandlet()){
+                behandling.setAnsvarligBeslutter("VL");
+                lagHistorikksinnslagForAutomatiskSaksbehandling(behandling);
+            }
             return BehandleStegResultat.utførtUtenAksjonspunkter();
         }
     }
@@ -102,6 +115,23 @@ public class FatteVedtakStegImpl implements FatteVedtakSteg {
             return behandling.getAnsvarligSaksbehandler();
         }
         return DEFAULT_ANSVARLIG_SAKSBEHANDLER;
+    }
+
+    private void lagHistorikksinnslagForAutomatiskSaksbehandling(Behandling behandling){
+        Historikkinnslag historikkinnslag = new Historikkinnslag();
+        historikkinnslag.setType(HistorikkinnslagType.VEDTAK_FATTET_AUTOMATISK);
+        historikkinnslag.setBehandling(behandling);
+        historikkinnslag.setAktør(HistorikkAktør.VEDTAKSLØSNINGEN);
+
+        HistorikkInnslagTekstBuilder tekstBuilder = historikkTjenesteAdapter.tekstBuilder();
+
+        BeregningResultat beregningResultat = beregningTjeneste.beregn(behandling.getId());
+        tekstBuilder.medSkjermlenke(SkjermlenkeType.VEDTAK)
+            .medResultat(beregningResultat.getVedtakResultatType())
+            .medHendelse(HistorikkinnslagType.VEDTAK_FATTET_AUTOMATISK)
+            .build(historikkinnslag);
+
+        historikkTjenesteAdapter.lagInnslag(historikkinnslag);
     }
 
 }

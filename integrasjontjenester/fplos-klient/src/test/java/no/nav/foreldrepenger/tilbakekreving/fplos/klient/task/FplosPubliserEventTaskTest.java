@@ -39,11 +39,11 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelse
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
-import no.nav.foreldrepenger.tilbakekreving.fplos.klient.producer.FplosKafkaProducer;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
+import no.nav.foreldrepenger.tilbakekreving.fplos.klient.producer.FplosKafkaProducer;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMock;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMockUtil;
@@ -77,7 +77,7 @@ public class FplosPubliserEventTaskTest {
     private FagsystemKlient mockFagsystemKlient = mock(FagsystemKlient.class);
     private FplosKafkaProducer mockKafkaProducer = mock(FplosKafkaProducer.class);
 
-    private KravgrunnlagTjeneste kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repositoryProvider, prosessTaskRepository, mockGjenopptaBehandlingTjeneste,
+    private KravgrunnlagTjeneste kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repositoryProvider, mockGjenopptaBehandlingTjeneste,
         mockBehandlingskontrollTjeneste, mockEventPubliserer);
     private FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste = new FaktaFeilutbetalingTjeneste(repositoryProvider, kravgrunnlagTjeneste, mockFagsystemKlient);
     private InternalManipulerBehandling internalManipulerBehandling = new InternalManipulerBehandlingImpl(repositoryProvider);

@@ -49,6 +49,7 @@ public enum HistorikkinnslagType implements Kodeverdi {
     // type 2
     FORSLAG_VEDTAK("FORSLAG_VEDTAK", "Vedtak foreslått og sendt til beslutter", MAL_TYPE_2),
     VEDTAK_FATTET("VEDTAK_FATTET", "Vedtak fattet", MAL_TYPE_2),
+    VEDTAK_FATTET_AUTOMATISK("VEDTAK_FATTET_AUTOMATISK", "Vedtak automatisk fattet", MAL_TYPE_2),
     REGISTRER_OM_VERGE("REGISTRER_OM_VERGE", "Registering av opplysninger om verge/fullmektig", MAL_TYPE_2),
 
     // type 3

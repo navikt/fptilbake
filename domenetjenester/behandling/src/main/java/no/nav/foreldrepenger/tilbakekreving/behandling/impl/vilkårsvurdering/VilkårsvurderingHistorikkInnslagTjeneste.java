@@ -21,6 +21,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType;
@@ -28,7 +29,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkOpplysningType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingAktsomhetEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingEntitet;
@@ -116,10 +116,11 @@ public class VilkårsvurderingHistorikkInnslagTjeneste {
     }
 
     private void lagInnslag(Long behandlingId, List<Vilkårsendring> endringer) {
+        Behandling behandling = repositoryProvider.getBehandlingRepository().hentBehandling(behandlingId);
         Historikkinnslag historikkinnslag = new Historikkinnslag();
         historikkinnslag.setType(HistorikkinnslagType.TILBAKEKREVING);
         historikkinnslag.setBehandlingId(behandlingId);
-        historikkinnslag.setAktør(HistorikkAktør.SAKSBEHANDLER);
+        historikkinnslag.setAktør(behandling.isAutomatiskSaksbehandlet() ? HistorikkAktør.VEDTAKSLØSNINGEN : HistorikkAktør.SAKSBEHANDLER);
 
         for (Vilkårsendring vilkårsendring : endringer) {
             HistorikkInnslagTekstBuilder builder = lagTekstBuilderMedFellesFelt(vilkårsendring);
@@ -175,15 +176,6 @@ public class VilkårsvurderingHistorikkInnslagTjeneste {
         }
         grunnTekst.append(String.join(",", grunnTekster));
         return grunnTekst.toString();
-    }
-
-
-    private String getNavn(Kodeliste kode) {
-        //TODO fjern oppslag, skal lagres med kode
-        if (kode == null) {
-            return null;
-        }
-        return repositoryProvider.getKodeverkRepository().finn(kode.getClass(), kode.getKode()).getNavn();
     }
 
     private String getNavn(Kodeverdi kode) {

@@ -36,8 +36,10 @@ import javax.persistence.Version;
 
 import org.hibernate.annotations.JoinColumnOrFormula;
 import org.hibernate.annotations.JoinFormula;
+import org.hibernate.annotations.NaturalId;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.SaksbehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.OrganisasjonsEnhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
@@ -48,7 +50,6 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.BehandlingInfo;
 import no.nav.vedtak.feil.FeilFactory;
 import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
-import org.hibernate.annotations.NaturalId;
 
 // mapping for BehandlingInfo klassen
 @SqlResultSetMapping(name = "PipBehandlingInfo", classes = {
@@ -143,6 +144,10 @@ public class Behandling extends BaseEntitet {
     @Convert(converter = BooleanToStringConverter.class)
     @Column(name = "MANUELT_OPPRETTET", nullable = false)
     private boolean manueltOpprettet = false;
+
+    @Convert(converter = SaksbehandlingType.verdiConverter.class)
+    @Column(name = "SAKSBEHANDLING_TYPE", nullable = false)
+    private SaksbehandlingType saksbehandlingType = SaksbehandlingType.ORDINÆR;
 
     Behandling() {
         // Hibernate
@@ -532,6 +537,18 @@ public class Behandling extends BaseEntitet {
 
     public boolean isManueltOpprettet() {
         return manueltOpprettet;
+    }
+
+    public SaksbehandlingType getSaksbehandlingType() {
+        return saksbehandlingType;
+    }
+
+    public boolean isAutomatiskSaksbehandlet() {
+        return SaksbehandlingType.AUTOMATISK_IKKE_INNKREVING_LAVT_BELØP.equals(saksbehandlingType);
+    }
+
+    public void skruPåAutomatiskSaksbehandlingPgaInnkrevingAvLavtBeløp() {
+        this.saksbehandlingType = SaksbehandlingType.AUTOMATISK_IKKE_INNKREVING_LAVT_BELØP;
     }
 
     @SuppressWarnings("unchecked")

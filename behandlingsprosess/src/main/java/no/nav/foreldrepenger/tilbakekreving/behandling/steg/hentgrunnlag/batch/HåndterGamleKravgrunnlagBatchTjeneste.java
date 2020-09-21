@@ -30,7 +30,7 @@ public class HåndterGamleKravgrunnlagBatchTjeneste implements BatchTjeneste {
 
     private HåndterGamleKravgrunnlagTjeneste håndterGamleKravgrunnlagTjeneste;
     private Clock clock;
-    private Period venteFrist;
+    private Period grunnlagAlder;
 
     HåndterGamleKravgrunnlagBatchTjeneste() {
         // for CDI proxy
@@ -38,19 +38,19 @@ public class HåndterGamleKravgrunnlagBatchTjeneste implements BatchTjeneste {
 
     @Inject
     public HåndterGamleKravgrunnlagBatchTjeneste(HåndterGamleKravgrunnlagTjeneste håndterGamleKravgrunnlagTjeneste,
-                                                 @KonfigVerdi(value = "frist.grunnlag.tbkg") Period ventefrist) {
+                                                 @KonfigVerdi(value = "automatisering.alder.kravgrunnlag") Period grunnlagAlder) {
         this.håndterGamleKravgrunnlagTjeneste = håndterGamleKravgrunnlagTjeneste;
         this.clock = Clock.systemDefaultZone();
-        this.venteFrist = ventefrist;
+        this.grunnlagAlder = grunnlagAlder;
     }
 
     // kun for test forbruk
     public HåndterGamleKravgrunnlagBatchTjeneste(HåndterGamleKravgrunnlagTjeneste håndterGamleKravgrunnlagTjeneste,
                                                  Clock clock,
-                                                 @KonfigVerdi(value = "frist.grunnlag.tbkg") Period ventefrist) {
+                                                 @KonfigVerdi(value = "automatisering.alder.kravgrunnlag") Period grunnlagAlder) {
         this.håndterGamleKravgrunnlagTjeneste = håndterGamleKravgrunnlagTjeneste;
         this.clock = clock;
-        this.venteFrist = ventefrist;
+        this.grunnlagAlder = grunnlagAlder;
     }
 
     @Override
@@ -59,10 +59,10 @@ public class HåndterGamleKravgrunnlagBatchTjeneste implements BatchTjeneste {
         LocalDate iDag = LocalDate.now(clock);
         håndterGamleKravgrunnlagTjeneste.setAntallBehandlingOprettet(0);
         if (iDag.getDayOfWeek().equals(DayOfWeek.SATURDAY) || iDag.getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
-            logger.info("I dag er helg, kan ikke kjøre batch-en {}", BATCHNAVN);
+            logger.info("I dag er helg, kan ikke kjøre batchen {}", BATCHNAVN);
             return batchRun;
         }
-        LocalDate bestemtDato = iDag.minus(venteFrist.multipliedBy(2));// hardkoded for nå, en midlertidig løsning. Det blir fjernet når batchen lanseres fullstending i PROD
+        LocalDate bestemtDato = iDag.minus(grunnlagAlder);
         logger.info("Håndterer kravgrunnlag som er eldre enn {} i batch {}", bestemtDato, batchRun);
 
         List<ØkonomiXmlMottatt> alleGamleKravgrunnlag = håndterGamleKravgrunnlagTjeneste.hentGamlekravgrunnlag(bestemtDato);

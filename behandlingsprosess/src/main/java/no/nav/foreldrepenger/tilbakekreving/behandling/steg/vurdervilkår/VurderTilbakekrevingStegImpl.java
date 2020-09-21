@@ -6,16 +6,24 @@ import java.util.Optional;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.vilkårsvurdering.AutomatiskVurdertVilkårTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.automatisksaksbehandling.AutomatiskSaksbehandlingTaskProperties;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandleStegResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegRef;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingTypeRef;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.transisjoner.FellesTransisjoner;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelse;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseRepository;
 
 
 @BehandlingStegRef(kode = "VTILBSTEG")
@@ -23,23 +31,46 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.V
 @ApplicationScoped
 public class VurderTilbakekrevingStegImpl implements VurderTilbakekrevingSteg {
 
-    private BehandlingRepositoryProvider behandlingRepositoryProvider;
+    private static final Logger logger = LoggerFactory.getLogger(VurderTilbakekrevingStegImpl.class);
+
+    private VurdertForeldelseRepository vurdertForeldelseRepository;
+    private VilkårsvurderingRepository vilkårsvurderingRepository;
+    private BehandlingRepository behandlingRepository;
+    private AutomatiskVurdertVilkårTjeneste automatiskVurdertVilkårTjeneste;
+
+    VurderTilbakekrevingStegImpl() {
+        // for CDI
+    }
 
     @Inject
-    public VurderTilbakekrevingStegImpl(BehandlingRepositoryProvider behandlingRepositoryProvider) {
-        this.behandlingRepositoryProvider = behandlingRepositoryProvider;
+    public VurderTilbakekrevingStegImpl(BehandlingRepositoryProvider repositoryProvider,
+                                        AutomatiskVurdertVilkårTjeneste automatiskVurdertVilkårTjeneste) {
+        this.vurdertForeldelseRepository = repositoryProvider.getVurdertForeldelseRepository();
+        this.vilkårsvurderingRepository = repositoryProvider.getVilkårsvurderingRepository();
+        this.behandlingRepository = repositoryProvider.getBehandlingRepository();
+        this.automatiskVurdertVilkårTjeneste = automatiskVurdertVilkårTjeneste;
     }
 
     @Override
     public BehandleStegResultat utførSteg(BehandlingskontrollKontekst kontekst) {
         Long behandlingId = kontekst.getBehandlingId();
-
-        if (allePerioderErForeldet(behandlingId)){
-            deaktiverForrigeVilkårsvurdering(behandlingId);
-            return hoppFremoverTilVedtak();
+        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
+        if (behandling.isAutomatiskSaksbehandlet()) {
+            utførStegAutomatisk(behandling);
+            return BehandleStegResultat.utførtUtenAksjonspunkter();
+        } else {
+            if (allePerioderErForeldet(behandlingId)) {
+                deaktiverForrigeVilkårsvurdering(behandlingId);
+                return hoppFremoverTilVedtak();
+            }
+            return BehandleStegResultat.utførtMedAksjonspunkter(Collections.singletonList(AksjonspunktDefinisjon.VURDER_TILBAKEKREVING));
         }
+    }
 
-        return BehandleStegResultat.utførtMedAksjonspunkter(Collections.singletonList(AksjonspunktDefinisjon.VURDER_TILBAKEKREVING));
+    protected void utførStegAutomatisk(Behandling behandling) {
+        long behandlingId = behandling.getId();
+        logger.info("utfører vilkår steg automatisk for behandling={}", behandlingId);
+        automatiskVurdertVilkårTjeneste.automatiskVurdertVilkår(behandling, AutomatiskSaksbehandlingTaskProperties.AUTOMATISK_SAKSBEHANDLING_BEGUNNLESE);
     }
 
     private BehandleStegResultat hoppFremoverTilVedtak() {
@@ -48,16 +79,13 @@ public class VurderTilbakekrevingStegImpl implements VurderTilbakekrevingSteg {
     }
 
     private boolean allePerioderErForeldet(Long behandlingId) {
-        Optional<VurdertForeldelse> vurdertForeldelseOpt = behandlingRepositoryProvider.getVurdertForeldelseRepository().finnVurdertForeldelse(behandlingId);
-        if (vurdertForeldelseOpt.isPresent()) {
-            return vurdertForeldelseOpt.get().getVurdertForeldelsePerioder().stream()
-                .allMatch(foreldelsePeriodeDto -> ForeldelseVurderingType.FORELDET.equals(foreldelsePeriodeDto.getForeldelseVurderingType()));
-        }
-        return false;
+        Optional<VurdertForeldelse> vurdertForeldelseOpt = vurdertForeldelseRepository.finnVurdertForeldelse(behandlingId);
+        return vurdertForeldelseOpt.map(vurdertForeldelse -> vurdertForeldelse.getVurdertForeldelsePerioder().stream()
+            .allMatch(foreldelsePeriodeDto -> ForeldelseVurderingType.FORELDET.equals(foreldelsePeriodeDto.getForeldelseVurderingType()))).orElse(false);
     }
 
     private void deaktiverForrigeVilkårsvurdering(Long behandlingId) {
-        VilkårsvurderingRepository vilkårsvurderingRepository = behandlingRepositoryProvider.getVilkårsvurderingRepository();
         vilkårsvurderingRepository.slettVilkårsvurdering(behandlingId);
     }
+
 }

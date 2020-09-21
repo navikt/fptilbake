@@ -41,6 +41,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.Iverksetting
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.AnnenVurdering;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkInnslagKonverter;
+import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
 import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
 @RunWith(CdiRunner.class)
@@ -59,7 +61,10 @@ public class FatteVedtakStegImplTest {
 
     private TilbakekrevingBeregningTjeneste beregningTjeneste = Mockito.mock(TilbakekrevingBeregningTjeneste.class);
 
-    private FatteVedtakStegImpl fatteVedtakSteg = new FatteVedtakStegImpl(repositoryProvider, totrinnRepository, beregningTjeneste);
+    private HistorikkInnslagKonverter historikkInnslagKonverter = new HistorikkInnslagKonverter(repositoryProvider.getAksjonspunktRepository());
+    private HistorikkTjenesteAdapter historikkTjenesteAdapter = new HistorikkTjenesteAdapter(repositoryProvider.getHistorikkRepository(),historikkInnslagKonverter);
+
+    private FatteVedtakStegImpl fatteVedtakSteg = new FatteVedtakStegImpl(repositoryProvider, totrinnRepository, beregningTjeneste, historikkTjenesteAdapter);
 
     private BehandlingskontrollKontekst behandlingskontrollKontekst;
 

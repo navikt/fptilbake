@@ -56,7 +56,8 @@ public class VurderForeldelseAksjonspunktUtlederImpl implements VurderForeldelse
         return Optional.empty();
     }
 
-    protected boolean erForeldet(LocalDate dagensDato, LocalDate fradato) {
+    @Override
+    public boolean erForeldet(LocalDate dagensDato, LocalDate fradato) {
         LocalDate frist = dagensDato.minus(antallMånederFrist);
         return fradato.isBefore(frist);
     }

@@ -62,7 +62,7 @@ public class IverksetteVedtakStegImpl implements IverksetteVedtakSteg {
             vedtak.setIverksettingStatus(IverksettingStatus.UNDER_IVERKSETTING);
             behandlingVedtakRepository.lagre(vedtak);
 
-            boolean sendVedtaksbrev = !erRevurderingOpprettetForKlage(behandling);
+            boolean sendVedtaksbrev = !behandling.isAutomatiskSaksbehandlet() && !erRevurderingOpprettetForKlage(behandling);
             prosessTaskIverksett.opprettIverksettingstasker(behandling, sendVedtaksbrev);
             return BehandleStegResultat.settPåVent();
         }

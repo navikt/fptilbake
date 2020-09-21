@@ -16,6 +16,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
+import no.nav.vedtak.util.env.Environment;
 
 /**
  * Enkel scheduler for dagens situasjon der man kjører batcher mandag-fredag og det er noe variasjon i parametere.
@@ -32,6 +33,7 @@ public class BatchSchedulerTask implements ProsessTaskHandler {
     public static final String TASKTYPE = "batch.scheduler";
     public static final String BATCH_AVSTEMMING = "BFPT-001";
     public static final String BATCH_GAMLE_KRAVGRUNNLAG_UTEN_BEHANDLING = "BFPT-002";
+    public static final String BATCH_AUTOMATISK_SAKSBEHANDLING = "BFPT-003";
     public static final String BATCH_TA_AV_VENT = "BVL007";
 
     private BatchSupportTjeneste batchSupportTjeneste;
@@ -39,7 +41,8 @@ public class BatchSchedulerTask implements ProsessTaskHandler {
     private final List<Supplier<BatchConfig>> batchOppsettFelles = Arrays.asList(
         () -> new BatchConfig(6, 55, BATCH_AVSTEMMING, "dato=" + LocalDate.now().minusDays(1).format(DateTimeFormatter.ISO_DATE)),
         () -> new BatchConfig(7, 0, BATCH_TA_AV_VENT, null),
-        () -> new BatchConfig(8, 0, BATCH_GAMLE_KRAVGRUNNLAG_UTEN_BEHANDLING, null)
+        () -> new BatchConfig(7, 15, BATCH_GAMLE_KRAVGRUNNLAG_UTEN_BEHANDLING, null),
+        () -> new BatchConfig(7, 30, BATCH_AUTOMATISK_SAKSBEHANDLING, null)
     );
 
     private LocalDate dagensDato;
@@ -68,6 +71,10 @@ public class BatchSchedulerTask implements ProsessTaskHandler {
             .map(Supplier::get)
             .collect(Collectors.toList());
 
+        if(Environment.current().isProd()){ // midlertidig kode, fjernes når automatisk saksbehandling prosess tasken er ferdig
+            batchOppsett.remove(3); // kjøres ikke automatisk saksbehandling batchen i PROD
+        }
+
         List<ProsessTaskData> batchtasks = batchOppsett.stream()
             .map(this::mapBatchConfigTilBatchRunnerTask)
             .collect(Collectors.toList());
@@ -87,4 +94,5 @@ public class BatchSchedulerTask implements ProsessTaskHandler {
         batchRunnerTask.setNesteKjøringEtter(LocalDateTime.of(dagensDato, config.getKjøreTidspunkt()));
         return batchRunnerTask;
     }
+
 }
