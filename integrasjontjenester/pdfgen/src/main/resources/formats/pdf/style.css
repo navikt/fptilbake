@@ -96,16 +96,25 @@ body{
 h1 {
     font-size: 25px;
     font-weight: 700;
+    color: #3E3832;
 }
 
 h2 {
     font-size: 16px;
     margin: 10mm 0 1.5mm 0;
+    color: #3E3832;
+}
+
+h3 {
+    font-size: 16px;
+    margin: 10mm 0 -1.5mm 0;
+    color: #666463;
 }
 
 h4 {
     font-size: 16px;
     margin: 10mm 0 1.5mm 0;
+    color: #3E3832;
 }
 
 p {

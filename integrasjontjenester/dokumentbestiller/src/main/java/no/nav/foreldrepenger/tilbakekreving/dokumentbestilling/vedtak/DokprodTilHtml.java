@@ -15,7 +15,13 @@ public class DokprodTilHtml {
             }
             boolean overskrift = linje.startsWith("_");
             if (overskrift) {
-                builder.append("<h2>").append(linje.substring(1)).append("</h2>");
+                //FIXME finn på noe mer bedre å skille ut underoverskrifter. For eksempel la linjene slutte med space
+                boolean erUnderoverskrift = linje.trim().endsWith("?") || linje.trim().endsWith("Renter");
+                if (erUnderoverskrift) {
+                    builder.append("<h3>").append(linje.substring(1)).append("</h3>");
+                } else {
+                    builder.append("<h2>").append(linje.substring(1)).append("</h2>");
+                }
             } else {
                 builder.append("<p>").append(linje).append("</p>");
             }
