@@ -7,6 +7,10 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelse
 
 public class HendelseTypePrYtelseType {
 
+    private HendelseTypePrYtelseType(){
+        // sonar
+    }
+
     private static final Map<FagsakYtelseType, Set<HendelseType>> HIERARKI = Map.of(
         FagsakYtelseType.FORELDREPENGER, Set.of(
             HendelseType.MEDLEMSKAP_TYPE,
@@ -39,7 +43,7 @@ public class HendelseTypePrYtelseType {
             HendelseType.ES_RETT_PAA_FORELDREPENGER_TYPE,
             HendelseType.ES_FEIL_UTBETALING_TYPE,
             HendelseType.ES_ANNET_TYPE,
-            HendelseType.MEDLEMSKAP_TYPE),
+            HendelseType.ES_MEDLEMSKAP_TYPE),
         FagsakYtelseType.FRISINN, Set.of(
             HendelseType.FRISINN_ANNET_TYPE),
         FagsakYtelseType.PLEIEPENGER_SYKT_BARN, Set.of(

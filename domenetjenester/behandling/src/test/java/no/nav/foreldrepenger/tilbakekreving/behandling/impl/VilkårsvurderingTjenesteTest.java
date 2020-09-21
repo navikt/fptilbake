@@ -27,7 +27,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKo
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.FpHendelseUnderTyper;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingPeriodeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
@@ -68,7 +68,7 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         assertThat(førstePeriode.getFom()).isEqualTo(FOM);
         assertThat(førstePeriode.getTom()).isEqualTo(SISTE_DAG_I_FORELDELSE_PERIODE);
         assertThat(førstePeriode.getHendelseType()).isEqualTo(HendelseType.FP_UTTAK_UTSETTELSE_TYPE);
-        assertThat(førstePeriode.getHendelseUndertype()).isEqualTo(FpHendelseUnderTyper.ARBEID_HELTID);
+        assertThat(førstePeriode.getHendelseUndertype()).isEqualTo(HendelseUnderType.ARBEID_HELTID);
         assertThat(førstePeriode.getFeilutbetaling()).isEqualByComparingTo(BigDecimal.valueOf(31000));
         assertThat(førstePeriode.isForeldet()).isTrue();
 
@@ -85,7 +85,7 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         assertThat(andrePeriode.getFom()).isEqualTo(FØRSTE_DAG_I_FORELDELSE_PERIODE);
         assertThat(andrePeriode.getTom()).isEqualTo(TOM);
         assertThat(førstePeriode.getHendelseType()).isEqualTo(HendelseType.FP_UTTAK_UTSETTELSE_TYPE);
-        assertThat(førstePeriode.getHendelseUndertype()).isEqualTo(FpHendelseUnderTyper.ARBEID_HELTID);
+        assertThat(førstePeriode.getHendelseUndertype()).isEqualTo(HendelseUnderType.ARBEID_HELTID);
         assertThat(andrePeriode.getFeilutbetaling()).isEqualByComparingTo(BigDecimal.valueOf(20000));
         assertThat(andrePeriode.isForeldet()).isFalse();
 
@@ -112,7 +112,7 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         assertThat(periode.getOppfyltValg()).isEqualByComparingTo(VilkårResultat.UDEFINERT);
         assertThat(periode.getFeilutbetaling()).isEqualByComparingTo(BigDecimal.valueOf(51000));
         assertThat(periode.getHendelseType()).isEqualTo(HendelseType.FP_UTTAK_UTSETTELSE_TYPE);
-        assertThat(periode.getHendelseUndertype()).isEqualTo(FpHendelseUnderTyper.ARBEID_HELTID);
+        assertThat(periode.getHendelseUndertype()).isEqualTo(HendelseUnderType.ARBEID_HELTID);
         assertThat(periode.isForeldet()).isFalse();
 
         assertThat(periode.getYtelser().size()).isEqualTo(3);
@@ -158,7 +158,7 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         DetaljertFeilutbetalingPeriodeDto periode = perioder.get(0);
         assertThat(periode.getFeilutbetaling()).isEqualByComparingTo(BigDecimal.valueOf(32000));
         assertThat(periode.getHendelseType()).isEqualTo(HendelseType.FP_UTTAK_UTSETTELSE_TYPE);
-        assertThat(periode.getHendelseUndertype()).isEqualTo(FpHendelseUnderTyper.ARBEID_HELTID);
+        assertThat(periode.getHendelseUndertype()).isEqualTo(HendelseUnderType.ARBEID_HELTID);
         assertThat(periode.isForeldet()).isFalse();
 
         assertThat(periode.getRedusertBeloper().size()).isEqualTo(1);
@@ -465,7 +465,7 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         FaktaFeilutbetalingPeriode faktaFeilutbetalingPeriode = FaktaFeilutbetalingPeriode.builder()
             .medPeriode(FOM, TOM)
             .medHendelseType(HendelseType.FP_UTTAK_UTSETTELSE_TYPE)
-            .medHendelseUndertype(FpHendelseUnderTyper.ARBEID_HELTID)
+            .medHendelseUndertype(HendelseUnderType.ARBEID_HELTID)
             .medFeilutbetalinger(faktaFeilutbetaling)
             .build();
         faktaFeilutbetaling.leggTilFeilutbetaltPeriode(faktaFeilutbetalingPeriode);

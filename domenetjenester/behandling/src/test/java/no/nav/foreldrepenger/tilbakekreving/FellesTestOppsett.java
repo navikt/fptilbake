@@ -26,7 +26,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.FpHendelseUnderTyper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagFelt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.SærligGrunn;
@@ -51,7 +50,7 @@ public class FellesTestOppsett extends TestOppsett {
     protected static final LocalDate TOM = LocalDate.of(2016, 5, 31);
     protected static final Long SUM_INNTREKK = 1000L;
     protected static final HendelseType HENDELSE_TYPE = HendelseType.FP_UTTAK_UTSETTELSE_TYPE;
-    protected static final HendelseUnderType HENDELSE_UNDERTYPE = FpHendelseUnderTyper.ARBEID_HELTID;
+    protected static final HendelseUnderType HENDELSE_UNDERTYPE = HendelseUnderType.ARBEID_HELTID;
     protected static final String BEGRUNNELSE = "ABC";
     protected static final Period defaultVentetid = Period.ofWeeks(4);
     protected static final String BEHANDLENDE_ENHET_ID = "4833";

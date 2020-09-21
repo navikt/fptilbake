@@ -22,8 +22,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseTypePrYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUndertypePrHendelseType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.EsHendelseUnderTyper;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.SvpHendelseUnderTyper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
@@ -77,7 +75,7 @@ public class TekstformatererVedtaksbrevAllePermutasjonerAvFaktaTest {
             .build();
         Map<HendelseMedUndertype, String> resultat = lagFaktatekster(felles);
 
-        Set<HendelseMedUndertype> unntak1 = Set.of(new HendelseMedUndertype(HendelseType.SVP_ARBEIDSGIVERS_FORHOLD_TYPE, SvpHendelseUnderTyper.SVP_TILRETTELEGGING_FULLT_MULIG), new HendelseMedUndertype(HendelseType.SVP_ARBEIDSGIVERS_FORHOLD_TYPE, SvpHendelseUnderTyper.SVP_TILRETTELEGGING_DELVIS_MULIG));
+        Set<HendelseMedUndertype> unntak1 = Set.of(new HendelseMedUndertype(HendelseType.SVP_ARBEIDSGIVERS_FORHOLD_TYPE, HendelseUnderType.SVP_TILRETTELEGGING_FULLT_MULIG), new HendelseMedUndertype(HendelseType.SVP_ARBEIDSGIVERS_FORHOLD_TYPE, HendelseUnderType.SVP_TILRETTELEGGING_DELVIS_MULIG));
 
         sjekkVerdier(resultat, unntak1);
     }
@@ -93,8 +91,8 @@ public class TekstformatererVedtaksbrevAllePermutasjonerAvFaktaTest {
             .build();
         Map<HendelseMedUndertype, String> resultat = lagFaktatekster(felles);
 
-        Set<HendelseMedUndertype> unntak1 = Set.of(new HendelseMedUndertype(HendelseType.ES_FORELDREANSVAR_TYPE, EsHendelseUnderTyper.ES_IKKE_TILDELT), new HendelseMedUndertype(HendelseType.ES_FORELDREANSVAR_TYPE, EsHendelseUnderTyper.ES_ANDRE_FORELDRE_DODD));
-        Set<HendelseMedUndertype> unntak2 = Set.of(new HendelseMedUndertype(HendelseType.ES_ADOPSJONSVILKAARET_TYPE, EsHendelseUnderTyper.ES_BARN_OVER_15), new HendelseMedUndertype(HendelseType.ES_FORELDREANSVAR_TYPE, EsHendelseUnderTyper.ES_FORELDREANSVAR_BARN_OVER_15));
+        Set<HendelseMedUndertype> unntak1 = Set.of(new HendelseMedUndertype(HendelseType.ES_FORELDREANSVAR_TYPE, HendelseUnderType.ES_IKKE_TILDELT), new HendelseMedUndertype(HendelseType.ES_FORELDREANSVAR_TYPE, HendelseUnderType.ES_ANDRE_FORELDRE_DODD));
+        Set<HendelseMedUndertype> unntak2 = Set.of(new HendelseMedUndertype(HendelseType.ES_ADOPSJONSVILKAARET_TYPE, HendelseUnderType.ES_BARN_OVER_15), new HendelseMedUndertype(HendelseType.ES_FORELDREANSVAR_TYPE, HendelseUnderType.ES_FORELDREANSVAR_BARN_OVER_15));
 
         sjekkVerdier(resultat, unntak1, unntak2);
     }

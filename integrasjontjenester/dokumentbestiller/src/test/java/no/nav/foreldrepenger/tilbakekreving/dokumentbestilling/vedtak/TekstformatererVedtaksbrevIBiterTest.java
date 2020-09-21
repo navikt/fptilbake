@@ -13,8 +13,7 @@ import org.junit.Test;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.FpHendelseUnderTyper;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.ØkonomiUndertyper;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.AnnenVurdering;
@@ -71,7 +70,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(januar)
                 .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(30001)))
-                .medFakta(HendelseType.FP_UTTAK_GRADERT_TYPE, FpHendelseUnderTyper.GRADERT_UTTAK)
+                .medFakta(HendelseType.FP_UTTAK_GRADERT_TYPE, HendelseUnderType.GRADERT_UTTAK)
                 .medVurderinger(HbVurderinger.builder()
                     .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
                     .medVilkårResultat(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER)
@@ -89,7 +88,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
                     .medAktsomhetResultat(Aktsomhet.SIMPEL_UAKTSOM)
                     .medSærligeGrunner(Arrays.asList(SærligGrunn.HELT_ELLER_DELVIS_NAVS_FEIL, SærligGrunn.STØRRELSE_BELØP), null, null)
                     .build())
-                .medFakta(HendelseType.ØKONOMI_FEIL, ØkonomiUndertyper.DOBBELTUTBETALING)
+                .medFakta(HendelseType.ØKONOMI_FEIL, HendelseUnderType.DOBBELTUTBETALING)
                 .medKravgrunnlag(HbKravgrunnlag.builder()
                     .medFeilutbetaltBeløp(BigDecimal.valueOf(3000))
                     .medRiktigBeløp(BigDecimal.valueOf(3000))
@@ -128,7 +127,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
         HbVedtaksbrevPeriode periode = HbVedtaksbrevPeriode.builder()
             .medPeriode(januar)
             .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(30001)))
-            .medFakta(HendelseType.FP_UTTAK_GRADERT_TYPE, FpHendelseUnderTyper.GRADERT_UTTAK)
+            .medFakta(HendelseType.FP_UTTAK_GRADERT_TYPE, HendelseUnderType.GRADERT_UTTAK)
             .medVurderinger(HbVurderinger.builder()
                 .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
                 .medVilkårResultat(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER)
@@ -179,7 +178,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
         HbVedtaksbrevPeriode periode = HbVedtaksbrevPeriode.builder()
             .medPeriode(januar)
             .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(1000)))
-            .medFakta(HendelseType.FP_UTTAK_GRADERT_TYPE, FpHendelseUnderTyper.GRADERT_UTTAK)
+            .medFakta(HendelseType.FP_UTTAK_GRADERT_TYPE, HendelseUnderType.GRADERT_UTTAK)
             .medVurderinger(HbVurderinger.builder()
                 .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
                 .medVilkårResultat(VilkårResultat.GOD_TRO)
@@ -218,7 +217,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
         HbVedtaksbrevPeriode periode = HbVedtaksbrevPeriode.builder()
             .medPeriode(januar)
             .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(1000)))
-            .medFakta(HendelseType.FP_UTTAK_GRADERT_TYPE, FpHendelseUnderTyper.GRADERT_UTTAK)
+            .medFakta(HendelseType.FP_UTTAK_GRADERT_TYPE, HendelseUnderType.GRADERT_UTTAK)
             .medVurderinger(HbVurderinger.builder()
                 .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
                 .medVilkårResultat(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER)
@@ -260,7 +259,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
         HbVedtaksbrevPeriode periode = HbVedtaksbrevPeriode.builder()
             .medPeriode(januar)
             .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(1000)))
-            .medFakta(HendelseType.FP_UTTAK_GRADERT_TYPE, FpHendelseUnderTyper.GRADERT_UTTAK)
+            .medFakta(HendelseType.FP_UTTAK_GRADERT_TYPE, HendelseUnderType.GRADERT_UTTAK)
             .medVurderinger(HbVurderinger.builder()
                 .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
                 .medVilkårResultat(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER)

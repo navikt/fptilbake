@@ -30,10 +30,11 @@ public enum HendelseType implements Kodeverdi {
     FP_UTTAK_KVOTENE_TYPE("UTTAK_KVOTENE_TYPE", "§14-12 Uttak av kvotene", 70),
     FP_VILKAAR_GENERELLE_TYPE("VILKAAR_GENERELLE_TYPE", "§14-13 Generelle vilkår for fars uttak", 80),
     FP_KUN_RETT_TYPE("KUN_RETT_TYPE", "§14-14 Kun far/medmor rett", 90),
-    FP_UTTAK_ALENEOMSORG_TYPE("UTTAK_ALENEOMSORG_TYPE", "§14-15 Uttak ved aleneomsorg/samlivsbrudd", 100),
+    FP_UTTAK_ALENEOMSORG_TYPE("UTTAK_ALENEOMSORG_TYPE", "§14-15 Uttak ved aleneomsorg/samlivsbrudd", 100),//NOSONAR
     FP_UTTAK_GRADERT_TYPE("UTTAK_GRADERT_TYPE", "§14-16 Gradert uttak", 110),
-    FP_ANNET_HENDELSE_TYPE("FP_ANNET_HENDELSE_TYPE", "Annet", 999),
+    FP_ANNET_HENDELSE_TYPE("FP_ANNET_HENDELSE_TYPE", "Annet", 999),//NOSONAR
 
+    ES_MEDLEMSKAP_TYPE("ES_MEDLEMSKAP", "§14-2 Medlemskap", 10),
     ES_FODSELSVILKAARET_TYPE("ES_FODSELSVILKAARET_TYPE", "§14-17 1. ledd Fødselsvilkåret", 30),
     ES_ADOPSJONSVILKAARET_TYPE("ES_ADOPSJONSVILKAARET_TYPE", "§14-17 1. ledd Adopsjonsvilkåret", 20),
     ES_FORELDREANSVAR_TYPE("ES_FORELDREANSVAR_TYPE", "§14-17 2. ledd Foreldreansvar ", 40),
@@ -41,7 +42,7 @@ public enum HendelseType implements Kodeverdi {
     ES_FORELDREANSVAR_FAR_TYPE("ES_FORELDREANSVAR_FAR_TYPE", "§14-17 4. ledd Foreldreansvar far", 60),
     ES_RETT_PAA_FORELDREPENGER_TYPE("ES_RETT_PAA_FORELDREPENGER_TYPE", "Rett på foreldrepenger etter klage", 70),
     ES_FEIL_UTBETALING_TYPE("ES_FEIL_UTBETALING_TYPE", "Feil i utbetaling", 500),
-    ES_ANNET_TYPE("ES_ANNET_TYPE", "Annet", 999),
+    ES_ANNET_TYPE("ES_ANNET_TYPE", "Annet", 999),//NOSONAR
 
     SVP_FAKTA_TYPE("SVP_FAKTA_TYPE", "§14-4 Fakta om svangerskap", 20),
     SVP_ARBEIDSGIVERS_FORHOLD_TYPE("SVP_ARBEIDSGIVERS_FORHOLD_TYPE", "§14-4 1. ledd Arbeidsgivers forhold", 30),
@@ -49,13 +50,13 @@ public enum HendelseType implements Kodeverdi {
     SVP_BEREGNING_TYPE("SVP_BEREGNING_TYPE", "§14-4 5. ledd Beregning ", 60),
     SVP_UTTAK_TYPE("SVP_UTTAK_TYPE", "§14-4 Uttak", 70),
     SVP_OPPHØR("OPPHØR", "Opphør", 80),
-    SVP_ANNET_TYPE("SVP_ANNET_TYPE", "Annet", 999),
+    SVP_ANNET_TYPE("SVP_ANNET_TYPE", "Annet", 999),//NOSONAR
 
-    FRISINN_ANNET_TYPE("FRISINN_ANNET_TYPE", "Annet", 999),
-    PSB_ANNET_TYPE("PSB_TYPE", "Annet", 999),
-    PPN_ANNET_TYPE("PPN_TYPE", "Annet", 999),
-    OMP_ANNET_TYPE("OMP_TYPE", "Annet", 999),
-    OLP_ANNET_TYPE("OLP_TYPE", "Annet", 999),
+    FRISINN_ANNET_TYPE("FRISINN_ANNET_TYPE", "Annet", 999),//NOSONAR
+    PSB_ANNET_TYPE("PSB_TYPE", "Annet", 999),//NOSONAR
+    PPN_ANNET_TYPE("PPN_TYPE", "Annet", 999),//NOSONAR
+    OMP_ANNET_TYPE("OMP_TYPE", "Annet", 999),//NOSONAR
+    OLP_ANNET_TYPE("OLP_TYPE", "Annet", 999),//NOSONAR
 
 
     ;

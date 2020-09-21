@@ -23,7 +23,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.FpHendelseUnderTyper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkOpplysningType;
@@ -240,8 +239,8 @@ public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
 
         FaktaFeilutbetaling faktaFeilutbetaling = new FaktaFeilutbetaling();
 
-        faktaFeilutbetaling.leggTilFeilutbetaltPeriode(lagPeriode(FOM_1, sisteDagFørstePeriode, HendelseType.FP_UTTAK_UTSETTELSE_TYPE, FpHendelseUnderTyper.ARBEID_HELTID, faktaFeilutbetaling));
-        faktaFeilutbetaling.leggTilFeilutbetaltPeriode(lagPeriode(førsteDagAndrePeriode, TOM_1, HendelseType.FP_UTTAK_UTSETTELSE_TYPE, FpHendelseUnderTyper.ARBEID_HELTID, faktaFeilutbetaling));
+        faktaFeilutbetaling.leggTilFeilutbetaltPeriode(lagPeriode(FOM_1, sisteDagFørstePeriode, HendelseType.FP_UTTAK_UTSETTELSE_TYPE, HendelseUnderType.ARBEID_HELTID, faktaFeilutbetaling));
+        faktaFeilutbetaling.leggTilFeilutbetaltPeriode(lagPeriode(førsteDagAndrePeriode, TOM_1, HendelseType.FP_UTTAK_UTSETTELSE_TYPE, HendelseUnderType.ARBEID_HELTID, faktaFeilutbetaling));
         faktaFeilutbetaling.setBegrunnelse("begrunnelse");
 
         faktaFeilutbetalingRepository.lagre(internBehandlingId, faktaFeilutbetaling);

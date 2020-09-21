@@ -27,9 +27,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.FellesUndertyper;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.FpHendelseUnderTyper;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.konstanter.SvpHendelseUnderTyper;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
@@ -81,7 +79,7 @@ public class VedtaksbrevFritekstValidatorTest {
         fakta.leggTilFeilutbetaltPeriode(FaktaFeilutbetalingPeriode.builder()
             .medFeilutbetalinger(fakta)
             .medHendelseType(HendelseType.FP_ANNET_HENDELSE_TYPE)
-            .medHendelseUndertype(FellesUndertyper.ANNET_FRITEKST)
+            .medHendelseUndertype(HendelseUnderType.ANNET_FRITEKST)
             .medPeriode(jan1, jan24)
             .build());
         faktaFeilutbetalingRepository.lagre(behandlingId, fakta);
@@ -97,7 +95,7 @@ public class VedtaksbrevFritekstValidatorTest {
         fakta.leggTilFeilutbetaltPeriode(FaktaFeilutbetalingPeriode.builder()
             .medFeilutbetalinger(fakta)
             .medHendelseType(HendelseType.FP_BEREGNING_TYPE)
-            .medHendelseUndertype(FpHendelseUnderTyper.ENDRING_GRUNNLAG)
+            .medHendelseUndertype(HendelseUnderType.ENDRING_GRUNNLAG)
             .medPeriode(jan1, jan24)
             .build());
         faktaFeilutbetalingRepository.lagre(behandlingId, fakta);
@@ -118,7 +116,7 @@ public class VedtaksbrevFritekstValidatorTest {
         fakta.leggTilFeilutbetaltPeriode(FaktaFeilutbetalingPeriode.builder()
             .medFeilutbetalinger(fakta)
             .medHendelseType(HendelseType.SVP_BEREGNING_TYPE)
-            .medHendelseUndertype(SvpHendelseUnderTyper.SVP_ENDRING_GRUNNLAG)
+            .medHendelseUndertype(HendelseUnderType.SVP_ENDRING_GRUNNLAG)
             .medPeriode(jan1, jan24)
             .build());
         faktaFeilutbetalingRepository.lagre(behandlingId, fakta);
@@ -139,7 +137,7 @@ public class VedtaksbrevFritekstValidatorTest {
         fakta.leggTilFeilutbetaltPeriode(FaktaFeilutbetalingPeriode.builder()
             .medFeilutbetalinger(fakta)
             .medHendelseType(HendelseType.FP_UTTAK_GRADERT_TYPE)
-            .medHendelseUndertype(FpHendelseUnderTyper.GRADERT_UTTAK)
+            .medHendelseUndertype(HendelseUnderType.GRADERT_UTTAK)
             .medPeriode(jan1, jan24)
             .build());
         faktaFeilutbetalingRepository.lagre(revurderingBehandlingId, fakta);
@@ -155,7 +153,7 @@ public class VedtaksbrevFritekstValidatorTest {
         fakta.leggTilFeilutbetaltPeriode(FaktaFeilutbetalingPeriode.builder()
             .medFeilutbetalinger(fakta)
             .medHendelseType(HendelseType.FP_UTTAK_GRADERT_TYPE)
-            .medHendelseUndertype(FpHendelseUnderTyper.GRADERT_UTTAK)
+            .medHendelseUndertype(HendelseUnderType.GRADERT_UTTAK)
             .medPeriode(jan1, jan24)
             .build());
         faktaFeilutbetalingRepository.lagre(revurderingBehandlingId, fakta);
@@ -171,7 +169,7 @@ public class VedtaksbrevFritekstValidatorTest {
         fakta.leggTilFeilutbetaltPeriode(FaktaFeilutbetalingPeriode.builder()
             .medFeilutbetalinger(fakta)
             .medHendelseType(HendelseType.FP_UTTAK_GRADERT_TYPE)
-            .medHendelseUndertype(FpHendelseUnderTyper.GRADERT_UTTAK)
+            .medHendelseUndertype(HendelseUnderType.GRADERT_UTTAK)
             .medPeriode(jan1, jan24)
             .build());
         faktaFeilutbetalingRepository.lagre(behandlingId, fakta);
