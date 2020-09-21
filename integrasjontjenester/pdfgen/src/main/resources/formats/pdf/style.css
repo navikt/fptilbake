@@ -1,7 +1,33 @@
 /* WARNING: Uses CSS 2.1 */
 
+@page {
+    margin: 10%;
+    size: A4 portrait;
+    @bottom-right {
+        font-family: "Source Sans Pro", sans-serif;
+        color: #3E3832;
+        content: "Side " counter(page) " av " counter(pages);
+    }
+}
+
+@page tblpage {
+    /* sørger for at vedlegg havner på egen side */
+    size: A4 portrait;
+    @bottom-right {
+        font-family: "Source Sans Pro", sans-serif;
+        color: #3E3832;
+        content: "Side " counter(page) " av " counter(pages);
+    }
+}
+table, h4 {
+    /* sørger for at vedlegg havner på egen side */
+    page: tblpage;
+}
+
 * {
     font-family: "Source Sans Pro", sans-serif !important;
+    color: #3E3832;
+    border-spacing: 0;
 }
 
 html {
@@ -15,10 +41,6 @@ body{
     position: relative;
 }
 
-body::after {
-    content: '';
-    display: block;
-}
 
 #content {
     margin: 0;
@@ -26,6 +48,7 @@ body::after {
 
 #header {
     margin: 0;
+    margin: 1rem;
 }
 
 #footer {
@@ -37,10 +60,12 @@ body::after {
 }
 
 #nav_logo {
-    width: 30mm;
-    height: 18.9mm;
+    width: 15mm;
+    height: 9.1mm;
     margin: auto;
     padding: 0 0 10mm 0;
+    position: absolute;
+    right: 10mm;
 }
 
 .line_top {
@@ -69,28 +94,23 @@ body::after {
 }
 
 h1 {
-    font-size: 30px;
-    margin: 3mm 0 2mm 0;
+    font-size: 25px;
+    font-weight: 700;
 }
 
 h2 {
-    font-size: 26px;
-    margin: 3mm 0 1.5mm 0;
-}
-
-h3 {
-    font-size: 22px;
-    margin: 3mm 0 1.5mm 0;
+    font-size: 16px;
+    margin: 10mm 0 1.5mm 0;
 }
 
 h4 {
-    font-size: 18px;
-    margin: 3mm 0 1.5mm 0;
+    font-size: 16px;
+    margin: 10mm 0 1.5mm 0;
 }
 
 p {
     font-size: 16px;
-    margin: 0.5mm 0 0 0;
+    margin: 3mm 0 2mm 0;
 }
 
 table {

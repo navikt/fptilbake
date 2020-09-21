@@ -18,6 +18,10 @@ public class PdfGenerator {
 
     private String appendHtmlMetadata(String html, DocFormat format) {
         StringBuilder builder = new StringBuilder();
+        //nødvendig doctype for å støtte non-breaking space i openhtmltopdf
+        builder.append("<!DOCTYPE html PUBLIC");
+        builder.append(" \"-//OPENHTMLTOPDF//DOC XHTML Character Entities Only 1.0//EN\" \"\">");
+
         builder.append("<html>");
         builder.append("<head>");
         builder.append("<meta charset=\"UTF-8\" />");

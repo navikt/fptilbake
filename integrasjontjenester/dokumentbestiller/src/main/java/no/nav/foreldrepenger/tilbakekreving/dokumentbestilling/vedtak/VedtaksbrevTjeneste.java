@@ -50,6 +50,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselInfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtakRepository;
@@ -96,6 +97,8 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBe
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SøknadType;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.pdfgen.PdfGenerator;
+import no.nav.vedtak.util.env.Environment;
 
 
 @ApplicationScoped
@@ -126,6 +129,8 @@ public class VedtaksbrevTjeneste {
     private EksternDataForBrevTjeneste eksternDataForBrevTjeneste;
 
     private JournalføringTjeneste journalføringTjeneste;
+
+    private PdfGenerator pdfGenerator = new PdfGenerator();
 
     @Inject
     public VedtaksbrevTjeneste(BehandlingRepositoryProvider behandlingRepositoryProvider,
@@ -166,13 +171,27 @@ public class VedtaksbrevTjeneste {
             .medMetadata(vedtaksbrevData.getMetadata())
             .build();
 
-        byte[] vedlegg = lagVedtaksbrevVedleggTabellPdf(vedtaksbrevData);
-        JournalpostIdOgDokumentId vedleggReferanse = journalføringTjeneste.journalførVedlegg(behandlingId, vedlegg);
-        JournalpostIdOgDokumentId dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data, vedleggReferanse);
+
+        JournalpostIdOgDokumentId dokumentreferanse;
+        if (brukDokprod()) {
+            byte[] vedlegg = lagVedtaksbrevVedleggTabellPdf(vedtaksbrevData);
+            JournalpostIdOgDokumentId vedleggReferanse = journalføringTjeneste.journalførVedlegg(behandlingId, vedlegg);
+            dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data, vedleggReferanse);
+        } else {
+            String overskriftHtml = DokprodTilHtml.dokprodHovedoverskriftTilHtml(data.getOverskrift());
+            String innholdHtml = DokprodTilHtml.dokprodInnholdTilHtml(data.getBrevtekst());
+            String vedleggHtml = TekstformatererVedtaksbrev.lagVedtaksbrevVedleggHtml(vedtaksbrevData.getVedtaksbrevData());
+            pdfGenerator.genererPDF(overskriftHtml + innholdHtml + vedleggHtml);
+            dokumentreferanse = new JournalpostIdOgDokumentId(new JournalpostId("foo"), "bar");
+        }
 
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         opprettHistorikkinnslag(behandling, dokumentreferanse, brevMottaker);
         lagreInfoOmVedtaksbrev(behandlingId, dokumentreferanse);
+    }
+
+    private boolean brukDokprod() {
+        return Environment.current().isProd();
     }
 
     private byte[] lagVedtaksbrevVedleggTabellPdf(VedtaksbrevData vedtaksbrevData) {
@@ -183,7 +202,7 @@ public class VedtaksbrevTjeneste {
     public byte[] hentForhåndsvisningVedtaksbrevMedVedleggSomPdf(HentForhåndvisningVedtaksbrevPdfDto dto) {
         Long behandlingId = hentBehandlingId(dto);
         VedtaksbrevData vedtaksbrevData = hentDataForVedtaksbrev(behandlingId, dto.getOppsummeringstekst(),
-            dto.getPerioderMedTekst(),getBrevMottaker(behandlingId));
+            dto.getPerioderMedTekst(), getBrevMottaker(behandlingId));
         HbVedtaksbrevData hbVedtaksbrevData = vedtaksbrevData.getVedtaksbrevData();
         FritekstbrevData data = new FritekstbrevData.Builder()
             .medOverskrift(TekstformatererVedtaksbrev.lagVedtaksbrevOverskrift(hbVedtaksbrevData, vedtaksbrevData.getMetadata().getSpråkkode()))
@@ -191,20 +210,27 @@ public class VedtaksbrevTjeneste {
             .medMetadata(vedtaksbrevData.getMetadata())
             .build();
 
-        byte[] vedtaksbrevPdf = bestillDokumentTjeneste.hentForhåndsvisningFritekstbrev(data);
-        byte[] vedlegg = lagVedtaksbrevVedleggTabellPdf(vedtaksbrevData);
+        if (!brukDokprod()) {
+            String overskriftHtml = DokprodTilHtml.dokprodHovedoverskriftTilHtml(data.getOverskrift());
+            String innholdHtml = DokprodTilHtml.dokprodInnholdTilHtml(data.getBrevtekst());
+            String vedleggHtml = TekstformatererVedtaksbrev.lagVedtaksbrevVedleggHtml(vedtaksbrevData.getVedtaksbrevData());
+            return pdfGenerator.genererPDF(overskriftHtml + innholdHtml + vedleggHtml);
+        } else {
+            byte[] vedtaksbrevPdf = bestillDokumentTjeneste.hentForhåndsvisningFritekstbrev(data);
+            byte[] vedlegg = lagVedtaksbrevVedleggTabellPdf(vedtaksbrevData);
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        PDFMergerUtility mergerUtil = new PDFMergerUtility();
-        mergerUtil.setDestinationStream(baos);
-        mergerUtil.addSource(new ByteArrayInputStream(vedtaksbrevPdf));
-        mergerUtil.addSource(new ByteArrayInputStream(vedlegg));
-        try {
-            mergerUtil.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly());
-        } catch (IOException e) {
-            throw new RuntimeException("Fikk IO exception ved forhåndsvisning inkl vedlegg", e);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            PDFMergerUtility mergerUtil = new PDFMergerUtility();
+            mergerUtil.setDestinationStream(baos);
+            mergerUtil.addSource(new ByteArrayInputStream(vedtaksbrevPdf));
+            mergerUtil.addSource(new ByteArrayInputStream(vedlegg));
+            try {
+                mergerUtil.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly());
+            } catch (IOException e) {
+                throw new RuntimeException("Fikk IO exception ved forhåndsvisning inkl vedlegg", e);
+            }
+            return baos.toByteArray();
         }
-        return baos.toByteArray();
     }
 
     private Long hentBehandlingId(HentForhåndvisningVedtaksbrevPdfDto dto) {
@@ -219,7 +245,7 @@ public class VedtaksbrevTjeneste {
     }
 
     public List<Avsnitt> hentForhåndsvisningVedtaksbrevSomTekst(Long behandlingId) {
-        VedtaksbrevData vedtaksbrevData = hentDataForVedtaksbrev(behandlingId,getBrevMottaker(behandlingId));
+        VedtaksbrevData vedtaksbrevData = hentDataForVedtaksbrev(behandlingId, getBrevMottaker(behandlingId));
         HbVedtaksbrevData hbVedtaksbrevData = vedtaksbrevData.getVedtaksbrevData();
         String hovedoverskrift = TekstformatererVedtaksbrev.lagVedtaksbrevOverskrift(hbVedtaksbrevData, vedtaksbrevData.getMetadata().getSpråkkode());
         return TekstformatererVedtaksbrev.lagVedtaksbrevDeltIAvsnitt(hbVedtaksbrevData, hovedoverskrift);
@@ -291,7 +317,7 @@ public class VedtaksbrevTjeneste {
             .map(brp -> lagBrevdataPeriode(brp, fakta, vilkårPerioder, foreldelse, perioderFritekst))
             .collect(Collectors.toList());
 
-        BrevMetadata brevMetadata = lagMetadataForVedtaksbrev(behandling, vedtakResultatType, fpsakBehandling, personinfo , brevMottaker);
+        BrevMetadata brevMetadata = lagMetadataForVedtaksbrev(behandling, vedtakResultatType, fpsakBehandling, personinfo, brevMottaker);
 
         HbSak.Builder hbSakBuilder = HbSak.build()
             .medYtelsetype(behandling.getFagsak().getFagsakYtelseType())
@@ -408,9 +434,9 @@ public class VedtaksbrevTjeneste {
         Optional<VergeEntitet> vergeEntitet = vergeRepository.finnVergeInformasjon(behandling.getId());
         boolean finnesVerge = vergeEntitet.isPresent();
 
-        Adresseinfo adresseinfo = eksternDataForBrevTjeneste.hentAdresse(personinfo,brevMottaker,vergeEntitet);
+        Adresseinfo adresseinfo = eksternDataForBrevTjeneste.hentAdresse(personinfo, brevMottaker, vergeEntitet);
         YtelseNavn ytelseNavn = eksternDataForBrevTjeneste.hentYtelsenavn(fagsakType, språkkode);
-        String vergeNavn = BrevMottakerUtil.getVergeNavn(vergeEntitet,adresseinfo);
+        String vergeNavn = BrevMottakerUtil.getVergeNavn(vergeEntitet, adresseinfo);
 
         boolean tilbakekreves = VedtakResultatType.FULL_TILBAKEBETALING.equals(vedtakResultatType) ||
             VedtakResultatType.DELVIS_TILBAKEBETALING.equals(vedtakResultatType);
