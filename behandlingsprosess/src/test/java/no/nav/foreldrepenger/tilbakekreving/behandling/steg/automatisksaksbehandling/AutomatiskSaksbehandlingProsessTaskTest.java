@@ -66,6 +66,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Foreldel
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.InternalManipulerBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.InternalManipulerBehandlingImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingKandidaterRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
@@ -110,6 +111,7 @@ public class AutomatiskSaksbehandlingProsessTaskTest {
     private final BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProviderImpl(repositoryRule.getEntityManager());
     private final BehandlingRepository behandlingRepository = repositoryProvider.getBehandlingRepository();
     private final KravgrunnlagRepository kravgrunnlagRepository = repositoryProvider.getGrunnlagRepository();
+    private final AksjonspunktRepository aksjonspunktRepository = repositoryProvider.getAksjonspunktRepository();
     private final TotrinnRepository totrinnRepository = new TotrinnRepository(repositoryRule.getEntityManager());
     private final VarselresponsRepository varselresponsRepository = new VarselresponsRepositoryImpl(repositoryRule.getEntityManager());
     private final ProsessTaskRepository taskRepository = new ProsessTaskRepositoryImpl(repositoryRule.getEntityManager(), null, null);
@@ -117,7 +119,7 @@ public class AutomatiskSaksbehandlingProsessTaskTest {
     private final BehandlingVenterRepository behandlingVenterRepository = new BehandlingVenterRepositoryImpl(fellesQueriesForBehandlingRepositories);
     private final BehandlingKandidaterRepository behandlingKandidaterRepository = new BehandlingKandidaterRepository(fellesQueriesForBehandlingRepositories);
     private final InternalManipulerBehandling manipulerBehandling = new InternalManipulerBehandlingImpl(repositoryProvider);
-    private final HistorikkInnslagKonverter historikkInnslagKonverter = new HistorikkInnslagKonverter(repositoryProvider.getAksjonspunktRepository());
+    private final HistorikkInnslagKonverter historikkInnslagKonverter = new HistorikkInnslagKonverter(aksjonspunktRepository);
     private final HistorikkTjenesteAdapter historikkTjenesteAdapter = new HistorikkTjenesteAdapter(repositoryProvider.getHistorikkRepository(), historikkInnslagKonverter);
     private final AvklartFaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste = new AvklartFaktaFeilutbetalingTjeneste(repositoryProvider.getFaktaFeilutbetalingRepository(),
         historikkTjenesteAdapter);
@@ -136,7 +138,7 @@ public class AutomatiskSaksbehandlingProsessTaskTest {
         repositoryProvider);
     private final VilkårsvurderingTjeneste vilkårsvurderingTjeneste = new VilkårsvurderingTjeneste(vurdertForeldelseTjeneste, repositoryProvider,
         vilkårsvurderingHistorikkInnslagTjeneste, kravgrunnlagBeregningTjeneste);
-    private final AutomatiskVurdertVilkårTjeneste automatiskVurdertVilkårTjeneste = new AutomatiskVurdertVilkårTjeneste(vilkårsvurderingTjeneste);
+    private final AutomatiskVurdertVilkårTjeneste automatiskVurdertVilkårTjeneste = new AutomatiskVurdertVilkårTjeneste(vilkårsvurderingTjeneste, aksjonspunktRepository);
     private final TilbakekrevingBeregningTjeneste tilbakekrevingBeregningTjeneste = new TilbakekrevingBeregningTjeneste(repositoryProvider, kravgrunnlagBeregningTjeneste);
     private final ProsessTaskIverksett prosessTaskIverksett = new ProsessTaskIverksett(taskRepository, repositoryProvider.getBrevSporingRepository());
 

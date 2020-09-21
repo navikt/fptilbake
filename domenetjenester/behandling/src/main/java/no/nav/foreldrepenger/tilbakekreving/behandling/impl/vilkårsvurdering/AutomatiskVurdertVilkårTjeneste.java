@@ -12,6 +12,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.dto.vilkår.VilkårResult
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.vilkår.VilkårResultatInfoDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.vilkår.VilkårsvurderingPerioderDto;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
@@ -20,14 +23,17 @@ import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 public class AutomatiskVurdertVilkårTjeneste {
 
     private VilkårsvurderingTjeneste vilkårsvurderingTjeneste;
+    private AksjonspunktRepository aksjonspunktRepository;
 
     AutomatiskVurdertVilkårTjeneste() {
         // for CDI
     }
 
     @Inject
-    public AutomatiskVurdertVilkårTjeneste(VilkårsvurderingTjeneste vilkårsvurderingTjeneste) {
+    public AutomatiskVurdertVilkårTjeneste(VilkårsvurderingTjeneste vilkårsvurderingTjeneste,
+                                           AksjonspunktRepository aksjonspunktRepository) {
         this.vilkårsvurderingTjeneste = vilkårsvurderingTjeneste;
+        this.aksjonspunktRepository = aksjonspunktRepository;
     }
 
     public void automatiskVurdertVilkår(Behandling behandling, String begrunnelse) {
@@ -37,6 +43,8 @@ public class AutomatiskVurdertVilkårTjeneste {
             .map(periode -> lagVilkårsvurderingPeriode(periode.tilPeriode(), begrunnelse))
             .collect(Collectors.toList());
         vilkårsvurderingTjeneste.lagreVilkårsvurdering(behandlingId, vilkårsvurdertePerioder);
+        //Aksjonpunkt oppretter ikke automatisk for automatisk saksbehandling. Det opprettes manuelt for å vise vilkår data i frontend.
+        lagUtførtAksjonspunkt(behandling);
     }
 
     private VilkårsvurderingPerioderDto lagVilkårsvurderingPeriode(Periode periode, String begrunnelse) {
@@ -50,5 +58,10 @@ public class AutomatiskVurdertVilkårTjeneste {
         vilkårsvurderingPeriode.setVilkarResultatInfo(vilkårResultatInfoDto);
 
         return vilkårsvurderingPeriode;
+    }
+
+    private void lagUtførtAksjonspunkt(Behandling behandling){
+        Aksjonspunkt aksjonspunkt = aksjonspunktRepository.leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.VURDER_TILBAKEKREVING);
+        aksjonspunktRepository.setTilUtført(aksjonspunkt);
     }
 }
