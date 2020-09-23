@@ -36,6 +36,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProviderImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
@@ -50,11 +51,8 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMockUtil;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.SlettGrunnlagEventPubliserer;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.vedtak.felles.integrasjon.kafka.EventHendelse;
-import no.nav.vedtak.felles.integrasjon.kafka.Fagsystem;
 import no.nav.vedtak.felles.integrasjon.kafka.TilbakebetalingBehandlingProsessEventDto;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
-import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepositoryImpl;
 
 public class FplosPubliserEventTaskTest {
 
@@ -68,7 +66,6 @@ public class FplosPubliserEventTaskTest {
     public UnittestRepositoryRule repositoryRule = new UnittestRepositoryRule();
 
     private BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProviderImpl(repositoryRule.getEntityManager());
-    private ProsessTaskRepository prosessTaskRepository = new ProsessTaskRepositoryImpl(repositoryRule.getEntityManager(), null, null);
     private AksjonspunktRepository aksjonspunktRepository = repositoryProvider.getAksjonspunktRepository();
 
     private GjenopptaBehandlingTjeneste mockGjenopptaBehandlingTjeneste = mock(GjenopptaBehandlingTjeneste.class);
@@ -82,7 +79,7 @@ public class FplosPubliserEventTaskTest {
     private FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste = new FaktaFeilutbetalingTjeneste(repositoryProvider, kravgrunnlagTjeneste, mockFagsystemKlient);
     private InternalManipulerBehandling internalManipulerBehandling = new InternalManipulerBehandlingImpl(repositoryProvider);
 
-    private FplosPubliserEventTask fplosPubliserEventTask = new FplosPubliserEventTask(repositoryProvider, faktaFeilutbetalingTjeneste, mockKafkaProducer);
+    private FplosPubliserEventTask fplosPubliserEventTask = new FplosPubliserEventTask(repositoryProvider, faktaFeilutbetalingTjeneste, mockKafkaProducer,"fptilbake");
 
     private Behandling behandling;
     private ProsessTaskData prosessTaskData;
@@ -121,12 +118,12 @@ public class FplosPubliserEventTaskTest {
         assertThat(event.getAnsvarligSaksbehandlerIdent()).isNotEmpty();
 
         Map<String, String> aksjonpunkterMap = event.getAksjonspunktKoderMedStatusListe();
-        assertThat(aksjonpunkterMap).isNotEmpty();
-        assertThat(aksjonpunkterMap.get(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING.getKode())).isEqualTo(AksjonspunktStatus.OPPRETTET.getKode());
-        assertThat(aksjonpunkterMap.get(AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING.getKode())).isEqualTo(AksjonspunktStatus.OPPRETTET.getKode());
+        assertThat(aksjonpunkterMap).isNotEmpty()
+            .containsEntry(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING.getKode(), AksjonspunktStatus.OPPRETTET.getKode())
+            .containsEntry(AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING.getKode(), AksjonspunktStatus.OPPRETTET.getKode());
 
         assertThat(event.getEksternId()).isEqualByComparingTo(behandling.getUuid());
-        assertThat(event.getFagsystem()).isEqualByComparingTo(Fagsystem.FPTILBAKE);
+        assertThat(event.getFagsystem()).isEqualTo(Fagsystem.FPTILBAKE.getKode());
         assertThat(event.getEventHendelse()).isEqualByComparingTo(EventHendelse.AKSJONSPUNKT_OPPRETTET);
         assertThat(event.getAktørId()).isEqualTo(behandling.getAktørId().getId());
         assertThat(event.getYtelseTypeKode()).isEqualTo(FagsakYtelseType.FORELDREPENGER.getKode());
@@ -149,11 +146,11 @@ public class FplosPubliserEventTaskTest {
         assertThat(event.getFørsteFeilutbetaling()).isNull();
 
         Map<String, String> aksjonpunkterMap = event.getAksjonspunktKoderMedStatusListe();
-        assertThat(aksjonpunkterMap).isNotEmpty();
-        assertThat(aksjonpunkterMap.get(AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING.getKode())).isEqualTo(AksjonspunktStatus.OPPRETTET.getKode());
+        assertThat(aksjonpunkterMap).isNotEmpty()
+            .containsEntry(AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING.getKode(), AksjonspunktStatus.OPPRETTET.getKode());
 
         assertThat(event.getEksternId()).isEqualByComparingTo(behandling.getUuid());
-        assertThat(event.getFagsystem()).isEqualByComparingTo(Fagsystem.FPTILBAKE);
+        assertThat(event.getFagsystem()).isEqualTo(Fagsystem.FPTILBAKE.getKode());
         assertThat(event.getEventHendelse()).isEqualByComparingTo(EventHendelse.AKSJONSPUNKT_AVBRUTT);
         assertThat(event.getAktørId()).isEqualTo(behandling.getAktørId().getId());
         assertThat(event.getYtelseTypeKode()).isEqualTo(FagsakYtelseType.FORELDREPENGER.getKode());
@@ -179,11 +176,11 @@ public class FplosPubliserEventTaskTest {
         assertThat(event.getFørsteFeilutbetaling()).isEqualTo(fristTid.toLocalDate());
 
         Map<String, String> aksjonpunkterMap = event.getAksjonspunktKoderMedStatusListe();
-        assertThat(aksjonpunkterMap).isNotEmpty();
-        assertThat(aksjonpunkterMap.get(AksjonspunktDefinisjon.VURDER_HENLEGGELSE_MANGLER_KRAVGRUNNLAG.getKode())).isEqualTo(AksjonspunktStatus.OPPRETTET.getKode());
+        assertThat(aksjonpunkterMap).isNotEmpty()
+            .containsEntry(AksjonspunktDefinisjon.VURDER_HENLEGGELSE_MANGLER_KRAVGRUNNLAG.getKode(), AksjonspunktStatus.OPPRETTET.getKode());
 
         assertThat(event.getEksternId()).isEqualByComparingTo(behandling.getUuid());
-        assertThat(event.getFagsystem()).isEqualByComparingTo(Fagsystem.FPTILBAKE);
+        assertThat(event.getFagsystem()).isEqualTo(Fagsystem.FPTILBAKE.getKode());
         assertThat(event.getEventHendelse()).isEqualByComparingTo(EventHendelse.AKSJONSPUNKT_OPPRETTET);
         assertThat(event.getAktørId()).isEqualTo(behandling.getAktørId().getId());
         assertThat(event.getYtelseTypeKode()).isEqualTo(FagsakYtelseType.FORELDREPENGER.getKode());
@@ -209,11 +206,11 @@ public class FplosPubliserEventTaskTest {
         assertThat(event.getFørsteFeilutbetaling()).isEqualTo(fristTid.toLocalDate());
 
         Map<String, String> aksjonpunkterMap = event.getAksjonspunktKoderMedStatusListe();
-        assertThat(aksjonpunkterMap).isNotEmpty();
-        assertThat(aksjonpunkterMap.get(AksjonspunktDefinisjon.VURDER_HENLEGGELSE_MANGLER_KRAVGRUNNLAG.getKode())).isEqualTo(AksjonspunktStatus.AVBRUTT.getKode());
+        assertThat(aksjonpunkterMap).isNotEmpty()
+            .containsEntry(AksjonspunktDefinisjon.VURDER_HENLEGGELSE_MANGLER_KRAVGRUNNLAG.getKode(), AksjonspunktStatus.AVBRUTT.getKode());
 
         assertThat(event.getEksternId()).isEqualByComparingTo(behandling.getUuid());
-        assertThat(event.getFagsystem()).isEqualByComparingTo(Fagsystem.FPTILBAKE);
+        assertThat(event.getFagsystem()).isEqualTo(Fagsystem.FPTILBAKE.getKode());
         assertThat(event.getEventHendelse()).isEqualByComparingTo(EventHendelse.AKSJONSPUNKT_AVBRUTT);
         assertThat(event.getAktørId()).isEqualTo(behandling.getAktørId().getId());
         assertThat(event.getYtelseTypeKode()).isEqualTo(FagsakYtelseType.FORELDREPENGER.getKode());
