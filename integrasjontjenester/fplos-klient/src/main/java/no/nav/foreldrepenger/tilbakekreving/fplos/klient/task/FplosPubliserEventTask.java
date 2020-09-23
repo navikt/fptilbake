@@ -26,6 +26,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDataWrapper;
 import no.nav.foreldrepenger.tilbakekreving.fplos.klient.producer.FplosKafkaProducer;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
@@ -36,6 +37,7 @@ import no.nav.vedtak.felles.integrasjon.kafka.TilbakebetalingBehandlingProsessEv
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
+import no.nav.vedtak.konfig.KonfigVerdi;
 
 @ApplicationScoped
 @ProsessTask(FplosPubliserEventTask.TASKTYPE)
@@ -48,10 +50,10 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
     public static final String PROPERTY_KRAVGRUNNLAG_MANGLER_AKSJONSPUNKT_STATUS_KODE = "kravgrunnlagManglerAksjonspunktStatusKode";
     public static final String FP_DEFAULT_HREF = "/fpsak/fagsak/%s/behandling/%s/?punkt=default&fakta=default";
     public static final String K9_DEFAULT_HREF = "/k9/web/fagsak/%s/behandling/%s/?punkt=default&fakta=default";
-    public static final String APPLIKASJON_NAVN_K9_TILBAKE = "k9-tilbake";
-    public static final String APPLIKASJON_NAVN_FPTILBAKE = "fptilbake";
-    public static final String FAGSYSTEM_FPTILBAKE = "FPTILBAKE";
-    public static final String FAGSYSTEM_K9TILBAKE = "K9TILBAKE";
+    private static final String APPLIKASJON_NAVN_K9_TILBAKE = "k9-tilbake";
+    private static final String APPLIKASJON_NAVN_FPTILBAKE = "fptilbake";
+    private String fagsystem;
+    private String defaultHRef;
 
     private static final Logger logger = LoggerFactory.getLogger(FplosPubliserEventTask.class);
 
@@ -69,11 +71,25 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
     @Inject
     public FplosPubliserEventTask(BehandlingRepositoryProvider repositoryProvider,
                                   FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste,
-                                  FplosKafkaProducer fplosKafkaProducer) {
+                                  FplosKafkaProducer fplosKafkaProducer,
+                                  @KonfigVerdi("application.name") String applikasjonNavn) {
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.faktaFeilutbetalingTjeneste = faktaFeilutbetalingTjeneste;
         this.fplosKafkaProducer = fplosKafkaProducer;
+
+        switch (applikasjonNavn) {
+            case APPLIKASJON_NAVN_FPTILBAKE:
+                fagsystem = Fagsystem.FPTILBAKE.getKode();
+                defaultHRef = FP_DEFAULT_HREF;
+                break;
+            case APPLIKASJON_NAVN_K9_TILBAKE:
+                fagsystem = Fagsystem.K9TILBAKE.getKode();
+                defaultHRef = K9_DEFAULT_HREF;
+                break;
+            default:
+                throw new IllegalStateException("application.name er satt til " + applikasjonNavn + " som ikke er en støttet verdi");
+        }
     }
 
     @Override
@@ -114,7 +130,7 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
         return TilbakebetalingBehandlingProsessEventDto.builder()
             .medBehandlingStatus(behandling.getStatus().getKode())
             .medEksternId(behandling.getUuid())
-            .medFagsystem(getFagsystem())
+            .medFagsystem(fagsystem)
             .medSaksnummer(saksnummer)
             .medAktørId(behandling.getAktørId().getId())
             .medBehandlingSteg(behandling.getAktivtBehandlingSteg() == null ? null : behandling.getAktivtBehandlingSteg().getKode())
@@ -125,7 +141,7 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
             .medOpprettetBehandling(behandling.getOpprettetTidspunkt())
             .medYtelseTypeKode(fagsak.getFagsakYtelseType().getKode())
             .medAksjonspunktKoderMedStatusListe(aksjonspunktKoderMedStatusListe)
-            .medHref(String.format(getDefaultHref(), saksnummer, behandling.getId()))
+            .medHref(String.format(defaultHRef, saksnummer, behandling.getId()))
             .medAnsvarligSaksbehandlerIdent(behandling.getAnsvarligSaksbehandler())
             .medFørsteFeilutbetaling(hentFørsteFeilutbetalingDato(kravgrunnlag431, kravgrunnlagManglerFristTid))
             .medFeilutbetaltBeløp(kravgrunnlag431 != null ? hentFeilutbetaltBeløp(behandling.getId()) : BigDecimal.ZERO)
@@ -161,30 +177,6 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
         om.registerModule(new JavaTimeModule());
         om.registerModule(new Jdk8Module());
         return om;
-    }
-
-    private String getDefaultHref(){
-        String applikasjonNavn = System.getProperty("application.name");
-        switch (applikasjonNavn) {
-            case APPLIKASJON_NAVN_FPTILBAKE:
-                return FP_DEFAULT_HREF;
-            case APPLIKASJON_NAVN_K9_TILBAKE:
-                return K9_DEFAULT_HREF;
-            default:
-                throw new IllegalStateException("application.name er satt til " + applikasjonNavn + " som ikke er en støttet verdi");
-        }
-    }
-
-    private String getFagsystem(){
-        String applikasjonNavn = System.getProperty("application.name");
-        switch (applikasjonNavn) {
-            case APPLIKASJON_NAVN_FPTILBAKE:
-                return FAGSYSTEM_FPTILBAKE;
-            case APPLIKASJON_NAVN_K9_TILBAKE:
-                return FAGSYSTEM_K9TILBAKE;
-            default:
-                throw new IllegalStateException("application.name er satt til " + applikasjonNavn + " som ikke er en støttet verdi");
-        }
     }
 
 }
