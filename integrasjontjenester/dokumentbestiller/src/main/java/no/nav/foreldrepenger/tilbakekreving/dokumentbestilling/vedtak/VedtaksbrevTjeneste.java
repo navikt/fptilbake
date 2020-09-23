@@ -182,7 +182,7 @@ public class VedtaksbrevTjeneste {
             String logo = FileStructureUtil.readResourceAsString("pdf/nav_logo_svg.html");
             String header = TekstformatererHeader.lagHeader(vedtaksbrevData.getMetadata(), data.getOverskrift());
             String innholdHtml = DokprodTilHtml.dokprodInnholdTilHtml(data.getBrevtekst());
-            String vedleggHtml = TekstformatererVedtaksbrev.lagVedtaksbrevVedleggHtml(vedtaksbrevData.getVedtaksbrevData());
+            String vedleggHtml = TekstformatererVedtaksbrev.lagModerneVedtaksbrevVedleggHtml(vedtaksbrevData.getVedtaksbrevData());
             byte[] pdf = pdfGenerator.genererPDF(logo + header + innholdHtml + vedleggHtml);
             dokumentreferanse = journalføringTjeneste.journalførUtgåendeVedtaksbrev(behandlingId, pdf, vedtaksbrevData.getMetadata().getTittel(), vedtaksbrevData.getMetadata().getFagsaktype());
         }
@@ -216,7 +216,7 @@ public class VedtaksbrevTjeneste {
             String logo = FileStructureUtil.readResourceAsString("pdf/nav_logo_svg.html");
             String header = TekstformatererHeader.lagHeader(vedtaksbrevData.getMetadata(), data.getOverskrift());
             String innholdHtml = DokprodTilHtml.dokprodInnholdTilHtml(data.getBrevtekst());
-            String vedleggHtml = TekstformatererVedtaksbrev.lagVedtaksbrevVedleggHtml(vedtaksbrevData.getVedtaksbrevData());
+            String vedleggHtml = TekstformatererVedtaksbrev.lagModerneVedtaksbrevVedleggHtml(vedtaksbrevData.getVedtaksbrevData());
             return pdfGenerator.genererPDF(logo + header + innholdHtml + vedleggHtml);
         } else {
             byte[] vedtaksbrevPdf = bestillDokumentTjeneste.hentForhåndsvisningFritekstbrev(data);

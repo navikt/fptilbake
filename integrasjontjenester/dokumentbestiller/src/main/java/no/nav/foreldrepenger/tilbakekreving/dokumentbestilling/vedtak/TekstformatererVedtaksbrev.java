@@ -243,6 +243,11 @@ class TekstformatererVedtaksbrev extends FellesTekstformaterer {
         return applyTemplate(template, vedtaksbrevData);
     }
 
+    static String lagModerneVedtaksbrevVedleggHtml(HbVedtaksbrevData vedtaksbrevData) {
+        Template template = getTemplate("vedtak/vedlegg_uten_linebreaks", vedtaksbrevData.getSpråkkode());
+        return applyTemplate(template, vedtaksbrevData);
+    }
+
     static String lagVedtaksbrevOverskrift(HbVedtaksbrevData vedtaksbrevData, Språkkode språkkode) {
         Template template = getTemplate("vedtak/vedtak_overskrift", språkkode);
         return applyTemplate(template, vedtaksbrevData);

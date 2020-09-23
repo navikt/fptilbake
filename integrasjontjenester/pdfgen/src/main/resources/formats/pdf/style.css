@@ -85,19 +85,19 @@ body {
 }
 
 .line_top {
-    border-top: 1px black solid;
+    border-top: 1px #3E3832 solid;
 }
 
 .line_bottom {
-    border-bottom: 1px black solid;
+    border-bottom: 1px #3E3832 solid;
 }
 
 .line_left {
-    border-left: 1px black solid;
+    border-left: 1px #3E3832 solid;
 }
 
 .line_right {
-    border-right: 1px black solid;
+    border-right: 1px #3E3832 solid;
 }
 
 .block {
@@ -145,12 +145,12 @@ table {
 }
 
 table, th, td {
-    border: 1px solid black;
+    border: 1px solid #3E3832;
 }
 
 .sumrad {
-    border: 1px solid black;
-    border-top: 2px solid black;
+    border: 1px solid #3E3832;
+    border-top: 2px solid #3E3832;
 }
 
 th, td {
@@ -158,6 +158,19 @@ th, td {
     margin: 0;
     overflow: hidden;
 }
+
+th.sum, td.sum {
+    max-width: 40mm;
+}
+
+th.periode, td.periode {
+    width: 33mm;
+}
+
+th {
+    vertical-align: top;
+}
+
 
 thead {
     background-color: #c6d9f1;
