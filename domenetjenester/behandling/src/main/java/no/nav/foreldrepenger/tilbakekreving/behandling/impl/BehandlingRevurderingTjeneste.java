@@ -154,7 +154,7 @@ public class BehandlingRevurderingTjeneste {
 
         revurderingsInnslag.setBehandling(behandling);
         revurderingsInnslag.setType(HistorikkinnslagType.REVURD_OPPR);
-        revurderingsInnslag.setAktør(HistorikkAktør.VEDTAKSLØSNINGEN);
+        revurderingsInnslag.setAktør(HistorikkAktør.SAKSBEHANDLER);
 
         HistorikkInnslagTekstBuilder historiebygger = new HistorikkInnslagTekstBuilder()
             .medHendelse(HistorikkinnslagType.REVURD_OPPR)

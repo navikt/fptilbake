@@ -18,6 +18,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.revurde
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
@@ -184,10 +185,13 @@ public class HåndterGamleKravgrunnlagTjeneste {
 
     private long opprettBehandling(EksternBehandlingsinfoDto eksternBehandlingData) {
         UUID eksternBehandlingUuid = eksternBehandlingData.getUuid();
-        SamletEksternBehandlingInfo samletEksternBehandlingInfo = fagsystemKlient.hentBehandlingsinfo(eksternBehandlingUuid, Tillegsinformasjon.FAGSAK, Tillegsinformasjon.PERSONOPPLYSNINGER);
+        Henvisning henvisning = eksternBehandlingData.getHenvisning();
+        SamletEksternBehandlingInfo samletEksternBehandlingInfo = fagsystemKlient.hentBehandlingsinfo(eksternBehandlingUuid, Tillegsinformasjon.FAGSAK,
+            Tillegsinformasjon.PERSONOPPLYSNINGER);
         FagsakYtelseType fagsakYtelseType = samletEksternBehandlingInfo.getFagsak().getSakstype();
         Saksnummer saksnummer = samletEksternBehandlingInfo.getSaksnummer();
-        return behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternBehandlingUuid, fagsakYtelseType, BehandlingType.TILBAKEKREVING); //midlertidig fiks,endres til automatisk opprettelse
+        AktørId aktørId = samletEksternBehandlingInfo.getAktørId();
+        return behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer, eksternBehandlingUuid, henvisning, aktørId, fagsakYtelseType, BehandlingType.TILBAKEKREVING);
     }
 
     private void håndterGyldigkravgrunnlag(Long mottattXmlId, String saksnummer,
