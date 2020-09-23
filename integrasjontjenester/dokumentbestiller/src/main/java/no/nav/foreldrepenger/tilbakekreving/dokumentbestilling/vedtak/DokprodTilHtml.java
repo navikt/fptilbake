@@ -15,8 +15,7 @@ public class DokprodTilHtml {
             }
             boolean overskrift = linje.startsWith("_");
             if (overskrift) {
-                //FIXME finn på noe mer bedre å skille ut underoverskrifter. For eksempel la linjene slutte med space
-                boolean erUnderoverskrift = linje.trim().endsWith("?") || linje.trim().endsWith("Renter");
+                boolean erUnderoverskrift = false; //dropper underoverskrifter inntil videre
                 if (erUnderoverskrift) {
                     builder.append("<h3>").append(linje.substring(1)).append("</h3>");
                 } else {
