@@ -74,6 +74,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottak
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottakerUtil;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.EksternDataForBrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.YtelseNavn;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.header.TekstformatererHeader;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevTjeneste;
@@ -97,6 +98,7 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBe
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SøknadType;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.pdfgen.FileStructureUtil;
 import no.nav.foreldrepenger.tilbakekreving.pdfgen.PdfGenerator;
 import no.nav.vedtak.util.env.Environment;
 
@@ -178,10 +180,11 @@ public class VedtaksbrevTjeneste {
             JournalpostIdOgDokumentId vedleggReferanse = journalføringTjeneste.journalførVedlegg(behandlingId, vedlegg);
             dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data, vedleggReferanse);
         } else {
-            String overskriftHtml = DokprodTilHtml.dokprodHovedoverskriftTilHtml(data.getOverskrift());
+            String logo = FileStructureUtil.readResourceAsString("pdf/nav_logo_svg.html");
+            String header = TekstformatererHeader.lagHeader(vedtaksbrevData.getMetadata(), data.getOverskrift());
             String innholdHtml = DokprodTilHtml.dokprodInnholdTilHtml(data.getBrevtekst());
             String vedleggHtml = TekstformatererVedtaksbrev.lagVedtaksbrevVedleggHtml(vedtaksbrevData.getVedtaksbrevData());
-            pdfGenerator.genererPDF(overskriftHtml + innholdHtml + vedleggHtml);
+            pdfGenerator.genererPDF(logo + header + innholdHtml + vedleggHtml);
             dokumentreferanse = new JournalpostIdOgDokumentId(new JournalpostId("foo"), "bar");
         }
 
@@ -211,10 +214,11 @@ public class VedtaksbrevTjeneste {
             .build();
 
         if (!brukDokprod()) {
-            String overskriftHtml = DokprodTilHtml.dokprodHovedoverskriftTilHtml(data.getOverskrift());
+            String logo = FileStructureUtil.readResourceAsString("pdf/nav_logo_svg.html");
+            String header = TekstformatererHeader.lagHeader(vedtaksbrevData.getMetadata(), data.getOverskrift());
             String innholdHtml = DokprodTilHtml.dokprodInnholdTilHtml(data.getBrevtekst());
             String vedleggHtml = TekstformatererVedtaksbrev.lagVedtaksbrevVedleggHtml(vedtaksbrevData.getVedtaksbrevData());
-            return pdfGenerator.genererPDF(overskriftHtml + innholdHtml + vedleggHtml);
+            return pdfGenerator.genererPDF(logo + header + innholdHtml + vedleggHtml);
         } else {
             byte[] vedtaksbrevPdf = bestillDokumentTjeneste.hentForhåndsvisningFritekstbrev(data);
             byte[] vedlegg = lagVedtaksbrevVedleggTabellPdf(vedtaksbrevData);

@@ -9,6 +9,7 @@ public class DokprodTilHtml {
     static String dokprodInnholdTilHtml(String dokprod) {
         String[] linjer = dokprod.split("\n");
         StringBuilder builder = new StringBuilder();
+        boolean samepageStarted = false;
         for (String linje : linjer) {
             if (linje.isBlank()) {
                 continue;
@@ -16,6 +17,12 @@ public class DokprodTilHtml {
             boolean overskrift = linje.startsWith("_");
             if (overskrift) {
                 boolean erUnderoverskrift = false; //dropper underoverskrifter inntil videre
+                if (samepageStarted) {
+                    builder.append("</div>");
+                } else {
+                    samepageStarted = true;
+                }
+                builder.append("<div class=\"samepage\">");
                 if (erUnderoverskrift) {
                     builder.append("<h3>").append(linje.substring(1)).append("</h3>");
                 } else {
@@ -23,6 +30,10 @@ public class DokprodTilHtml {
                 }
             } else {
                 builder.append("<p>").append(linje).append("</p>");
+                if (samepageStarted) {
+                    samepageStarted = false;
+                    builder.append("</div>");
+                }
             }
         }
         return konverterNbsp(builder.toString());

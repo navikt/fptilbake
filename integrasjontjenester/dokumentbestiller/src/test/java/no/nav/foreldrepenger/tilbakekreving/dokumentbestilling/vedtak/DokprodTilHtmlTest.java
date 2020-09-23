@@ -12,7 +12,7 @@ public class DokprodTilHtmlTest {
             "_Overskrift\nFørste avsnitt\n\nAndre avsnitt\n\nTredje avsnitt"
         );
         Assertions.assertThat(resultat).isEqualTo(
-            "<h2>Overskrift</h2><p>Første avsnitt</p><p>Andre avsnitt</p><p>Tredje avsnitt</p>"
+            "<div class=\"samepage\"><h2>Overskrift</h2><p>Første avsnitt</p></div><p>Andre avsnitt</p><p>Tredje avsnitt</p>"
         );
     }
 
