@@ -15,8 +15,8 @@ public class HbBehandling {
     @JsonProperty("original-behandling-dato-fagsakvedtak")
     @JsonSerialize(using = LocalDateTilLangtNorskFormatSerialiserer.class)
     private LocalDate originalBehandlingDatoFagsakvedtak;
-    @JsonProperty("er-klage")
-    private boolean erKlage = false;
+
+    private boolean erRevurderingEtterKlage = false;
 
     private HbBehandling() {
     }
@@ -25,8 +25,8 @@ public class HbBehandling {
         return erRevurdering;
     }
 
-    public boolean erKlage() {
-        return erKlage;
+    public boolean erRevurderingEtterKlage() {
+        return erRevurderingEtterKlage;
     }
 
     public static Builder builder() {
@@ -41,8 +41,8 @@ public class HbBehandling {
             return this;
         }
 
-        public HbBehandling.Builder medErKlage(boolean erKlage) {
-            kladd.erKlage = erKlage;
+        public HbBehandling.Builder medErRevurderingEtterKlage(boolean erRevurderingEtterKlage) {
+            kladd.erRevurderingEtterKlage = erRevurderingEtterKlage;
             return this;
         }
 

@@ -35,7 +35,7 @@ public class VedtaksbrevFritekst {
 
     private static FritekstType utledFritekstTypeForOppsummering(HbVedtaksbrevData vedtaksbrevData) {
         HbBehandling hbBehandling = vedtaksbrevData.getFelles().getBehandling();
-        return hbBehandling.erRevurdering() && !hbBehandling.erKlage() ? FritekstType.PÅKREVET : FritekstType.VALGFRI;
+        return hbBehandling.erRevurdering() && !hbBehandling.erRevurderingEtterKlage() ? FritekstType.PÅKREVET : FritekstType.VALGFRI;
     }
 
     private static FritekstType utledFritekstTypeFakta(HendelseUnderType underType) {

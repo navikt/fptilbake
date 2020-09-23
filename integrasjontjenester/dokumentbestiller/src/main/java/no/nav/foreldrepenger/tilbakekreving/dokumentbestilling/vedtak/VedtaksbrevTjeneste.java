@@ -276,7 +276,7 @@ public class VedtaksbrevTjeneste {
         BigDecimal totaltTilbakekrevesBeløpMedRenterUtenSkatt = totaltTilbakekrevesMedRenter.subtract(totaltSkattetrekk);
 
         boolean erRevurdering = BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandling.getType());
-        boolean erKlage = behandling.getBehandlingÅrsaker().stream()
+        boolean erRevurderingEtterKlage = behandling.getBehandlingÅrsaker().stream()
             .anyMatch(ba -> ba.getBehandlingÅrsakType() == BehandlingÅrsakType.RE_KLAGE_KA || ba.getBehandlingÅrsakType() == BehandlingÅrsakType.RE_KLAGE_NFP);
         boolean erFrisinn = erFrisinn(behandling);
         VedtakHjemmel.EffektForBruker effektForBruker = erRevurdering
@@ -306,7 +306,7 @@ public class VedtaksbrevTjeneste {
             .medSak(hbSakBuilder.build())
             .medBehandling(HbBehandling.builder()
                 .medErRevurdering(erRevurdering)
-                .medErKlage(erKlage)
+                .medErRevurderingEtterKlage(erRevurderingEtterKlage)
                 .medOriginalBehandlingDatoFagsakvedtak(originalBehandlingVedtaksdato)
                 .build())
             .medVarsel(HbVarsel.forDatoOgBeløp(varsletDato, varsletBeløp))
