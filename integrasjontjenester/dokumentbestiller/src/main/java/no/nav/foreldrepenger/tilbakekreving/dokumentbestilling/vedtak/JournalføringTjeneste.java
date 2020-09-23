@@ -95,6 +95,50 @@ public class JournalføringTjeneste {
         return new JournalpostIdOgDokumentId(journalpostId, response.getDokumenter().get(0).getDokumentInfoId());
     }
 
+    public JournalpostIdOgDokumentId journalførUtgåendeVedtaksbrev(Long behandlingId, byte[] vedleggPdf, String tittel, FagsakYtelseType ytelseType) {
+        return journalførUtgåendeBrev(Dokumentkategori.Vedtaksbrev, behandlingId, vedleggPdf, tittel, ytelseType);
+    }
+
+    public JournalpostIdOgDokumentId journalførUtgåendeBrev(Long behandlingId, byte[] vedleggPdf, String tittel, FagsakYtelseType ytelseType) {
+        return journalførUtgåendeBrev(Dokumentkategori.Brev, behandlingId, vedleggPdf, tittel, ytelseType);
+    }
+
+    public JournalpostIdOgDokumentId journalførUtgåendeBrev(Dokumentkategori dokumentkategori, Long behandlingId, byte[] vedleggPdf, String tittel, FagsakYtelseType ytelseType) {
+        logger.info("Starter journalføring av {} for behandlingId={}", dokumentkategori, behandlingId);
+
+        boolean forsøkFerdigstill = true;
+        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
+        OpprettJournalpostRequest request = OpprettJournalpostRequest.builder()
+            .medTema(utledTema(behandling.getFagsak().getFagsakYtelseType()))
+            .medBehandlingstema(BehandlingTema.TILBAKEBETALING)
+            .medBruker(new Bruker(BrukerIdType.AktørId, behandling.getAktørId().getId()))
+            .medEksternReferanseId(behandling.getUuid().toString())
+            .medJournalførendeEnhet(behandling.getBehandlendeEnhetId())
+            .medJournalposttype(Journalposttype.UTGÅENDE)
+            .medTittel(tittel)
+            .medSak(lagSaksreferanse(behandling.getFagsak()))
+            .medHoveddokument(Dokument.builder()
+                .medDokumentkategori(dokumentkategori)
+                .medTittel(tittel)
+                .medBrevkode(ytelseType.getKode() + "-TILB")
+                .leggTilDokumentvariant(Dokumentvariant.builder()
+                    .medFilnavn(dokumentkategori == Dokumentkategori.Vedtaksbrev ? "vedtak.pdf" : "brev.pdf")
+                    .medVariantformat(Variantformat.Arkiv)
+                    .medDokument(vedleggPdf)
+                    .medFiltype(Filtype.PDFA)
+                    .build())
+                .build())
+            .build();
+
+        OpprettJournalpostResponse response = journalpostApiKlient.opprettJournalpost(request, forsøkFerdigstill);
+        JournalpostId journalpostId = new JournalpostId(response.getJournalpostId());
+        if (response.getDokumenter().size() != 1) {
+            throw JournalføringTjenesteFeil.FACTORY.uforventetAntallDokumenterIRespons(response.getDokumenter().size()).toException();
+        }
+        logger.info("Journalførte vedlegg for vedtaksbrev for behandlingId={} med journalpostid={}", behandlingId, journalpostId.getVerdi());
+        return new JournalpostIdOgDokumentId(journalpostId, response.getDokumenter().get(0).getDokumentInfoId());
+    }
+
     private static Tema utledTema(FagsakYtelseType fagsakYtelseType) {
         switch (fagsakYtelseType) {
 

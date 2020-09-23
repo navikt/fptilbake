@@ -50,7 +50,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselInfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtakRepository;
@@ -184,8 +183,8 @@ public class VedtaksbrevTjeneste {
             String header = TekstformatererHeader.lagHeader(vedtaksbrevData.getMetadata(), data.getOverskrift());
             String innholdHtml = DokprodTilHtml.dokprodInnholdTilHtml(data.getBrevtekst());
             String vedleggHtml = TekstformatererVedtaksbrev.lagVedtaksbrevVedleggHtml(vedtaksbrevData.getVedtaksbrevData());
-            pdfGenerator.genererPDF(logo + header + innholdHtml + vedleggHtml);
-            dokumentreferanse = new JournalpostIdOgDokumentId(new JournalpostId("foo"), "bar");
+            byte[] pdf = pdfGenerator.genererPDF(logo + header + innholdHtml + vedleggHtml);
+            dokumentreferanse = journalføringTjeneste.journalførUtgåendeVedtaksbrev(behandlingId, pdf, vedtaksbrevData.getMetadata().getTittel(), vedtaksbrevData.getMetadata().getFagsaktype());
         }
 
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
