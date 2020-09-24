@@ -244,7 +244,7 @@ public class VedtakOppsummeringTjenesteTest {
 
     private void lagBehandlingVedtak() {
         Behandlingsresultat behandlingsresultat = Behandlingsresultat.builder()
-            .medBehandlingResultatType(BehandlingResultatType.FASTSATT)
+            .medBehandlingResultatType(BehandlingResultatType.FULL_TILBAKEBETALING)
             .medBehandling(behandling).build();
         BehandlingVedtak behandlingVedtak = BehandlingVedtak.builder()
             .medVedtakResultat(VedtakResultatType.FULL_TILBAKEBETALING)

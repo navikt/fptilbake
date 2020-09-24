@@ -19,6 +19,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingM
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
@@ -31,13 +32,11 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtakRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.BehandlingÅrsakDto;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.web.app.rest.ResourceLink;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.BehandlingResultatType;
 import no.nav.vedtak.konfig.KonfigVerdi;
 
 /**
@@ -142,32 +141,12 @@ public class BehandlingDtoTjeneste {
                 } else {
                     Optional<BehandlingVedtak> behandlingVedtakData = behandlingVedtakRepository.hentBehandlingvedtakForBehandlingId(behandling.getId());
                     behandlingVedtakData.ifPresent(behandlingVedtak -> {
-                        BehandlingResultatType behandlingResultatType = settFraVedtakResultat(behandlingVedtak);
-                        dto.setType(behandlingResultatType);
+                        dto.setType(BehandlingResultatType.fraVedtakResultatType(behandlingVedtak.getVedtakResultatType()));
                     });
                 }
             });
         }
         return dto;
-    }
-
-    private BehandlingResultatType settFraVedtakResultat(BehandlingVedtak behandlingVedtak) {
-        VedtakResultatType vedtakResultatType = behandlingVedtak.getVedtakResultatType();
-        BehandlingResultatType behandlingResultatType;
-        switch (vedtakResultatType) {
-            case INGEN_TILBAKEBETALING:
-                behandlingResultatType = BehandlingResultatType.INGEN_TILBAKEKREVING;
-                break;
-            case DELVIS_TILBAKEBETALING:
-                behandlingResultatType = BehandlingResultatType.DELVIS_TILBAKEKREVING;
-                break;
-            case FULL_TILBAKEBETALING:
-                behandlingResultatType = BehandlingResultatType.FULL_TILBAKEKREVING;
-                break;
-            default:
-                throw new IllegalStateException("Unexpected value: " + vedtakResultatType);
-        }
-        return behandlingResultatType;
     }
 
     public UtvidetBehandlingDto hentUtvidetBehandlingResultat(long behandlingId, AsyncPollingStatus taskStatus) {

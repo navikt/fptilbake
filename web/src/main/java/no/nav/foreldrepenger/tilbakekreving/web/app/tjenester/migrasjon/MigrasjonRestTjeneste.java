@@ -31,7 +31,13 @@ import com.codahale.metrics.annotation.Timed;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandlingsresultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingresultatRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtakRepository;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.MigrerSakshendleserTilDvhTask;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.FagsystemId;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.DvhEventHendelse;
@@ -52,6 +58,8 @@ public class MigrasjonRestTjeneste {
 
     private ØkonomiMottattXmlRepository økonomiMottattXmlRepository;
     private BehandlingRepository behandlingRepository;
+    private BehandlingVedtakRepository behandlingVedtakRepository;
+    private BehandlingresultatRepository behandlingresultatRepository;
     private ProsessTaskRepository taskRepository;
 
     public MigrasjonRestTjeneste() {
@@ -60,10 +68,12 @@ public class MigrasjonRestTjeneste {
 
     @Inject
     public MigrasjonRestTjeneste(ØkonomiMottattXmlRepository økonomiMottattXmlRepository,
-                                 BehandlingRepository behandlingRepository,
+                                 BehandlingRepositoryProvider repositoryProvider,
                                  ProsessTaskRepository taskRepository) {
         this.økonomiMottattXmlRepository = økonomiMottattXmlRepository;
-        this.behandlingRepository = behandlingRepository;
+        this.behandlingRepository = repositoryProvider.getBehandlingRepository();
+        this.behandlingVedtakRepository = repositoryProvider.getBehandlingVedtakRepository();
+        this.behandlingresultatRepository = repositoryProvider.getBehandlingresultatRepository();
         this.taskRepository = taskRepository;
     }
 
@@ -130,6 +140,31 @@ public class MigrasjonRestTjeneste {
         prosessTaskData.setProperty("behandlingId", String.valueOf(behandlingId));
         prosessTaskData.setProperty("eventHendelse", eventHendelse.name());
         taskRepository.lagre(prosessTaskData);
+    }
+
+    @POST
+    @Timed
+    @Path("/vedtakResutat")
+    @Consumes(APPLICATION_JSON)
+    @Produces(APPLICATION_JSON)
+    @Operation(tags = "migrasjon", description = "Tjeneste for å migrere VedtakResultatType av BehandlingVedtak tabell i MidlertidigBehandlingResultatType i BehandlingResultat tabell",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Migrasjon er ferdig"),
+            @ApiResponse(responseCode = "500", description = "Feilet pga ukjent feil.")
+        })
+    @BeskyttetRessurs(action = BeskyttetRessursActionAttributt.CREATE, property = AbacProperty.DRIFT)
+    public Response migrerVedtakResultatTypeTilBehandlingResultat() {
+        List<BehandlingVedtak> behandlingVedtakListe = behandlingVedtakRepository.hentAlleBehandlingVedtak();
+        if (!behandlingVedtakListe.isEmpty()) {
+            for (BehandlingVedtak behandlingVedtak : behandlingVedtakListe) {
+                Behandlingsresultat gammelBehandlingResultat = behandlingVedtak.getBehandlingsresultat();
+                Behandlingsresultat oppdatertBehandlingResultat = Behandlingsresultat.builderEndreEksisterende(gammelBehandlingResultat)
+                    .medBehandling(gammelBehandlingResultat.getBehandling())
+                    .medBehandlingResultatType(BehandlingResultatType.fraVedtakResultatType(behandlingVedtak.getVedtakResultatType())).build();
+                behandlingresultatRepository.lagre(oppdatertBehandlingResultat);
+            }
+        }
+        return Response.status(Response.Status.OK).build();
     }
 
 }

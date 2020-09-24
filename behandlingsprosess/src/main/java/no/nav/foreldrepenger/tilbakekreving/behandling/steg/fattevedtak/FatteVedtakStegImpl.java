@@ -78,7 +78,7 @@ public class FatteVedtakStegImpl implements FatteVedtakSteg {
             return BehandleStegResultat.tilbakeførtMedAksjonspunkter(aksjonspunktDefinisjoner);
         } else {
             //TODO Velge mer fingranulert ved revurdering
-            opprettBehandlingVedtak(behandling, BehandlingResultatType.FASTSATT);
+            opprettBehandlingVedtak(behandling);
             if(behandling.isAutomatiskSaksbehandlet()){
                 behandling.setAnsvarligBeslutter("VL");
                 lagHistorikksinnslagForAutomatiskSaksbehandling(behandling);
@@ -92,18 +92,19 @@ public class FatteVedtakStegImpl implements FatteVedtakSteg {
             .anyMatch(totrinnsvurdering -> !TRUE.equals(totrinnsvurdering.isGodkjent()));
     }
 
-    private void opprettBehandlingVedtak(Behandling behandling, BehandlingResultatType behandlingResultatType) {
-        Behandlingsresultat behandlingsresultat = Behandlingsresultat.builder().medBehandling(behandling)
-            .medBehandlingResultatType(behandlingResultatType).build();
-        behandlingresultatRepository.lagre(behandlingsresultat);
+    private void opprettBehandlingVedtak(Behandling behandling) {
         BeregningResultat beregningResultat = beregningTjeneste.beregn(behandling.getId());
+
+        Behandlingsresultat behandlingsresultat = Behandlingsresultat.builder().medBehandling(behandling)
+            .medBehandlingResultatType(BehandlingResultatType.fraVedtakResultatType(beregningResultat.getVedtakResultatType())).build();
+        behandlingresultatRepository.lagre(behandlingsresultat);
 
         BehandlingVedtak behandlingVedtak = BehandlingVedtak.builder()
             .medAnsvarligSaksbehandler(finnSaksBehandler(behandling))
             .medBehandlingsresultat(behandlingsresultat)
             .medIverksettingStatus(IverksettingStatus.IKKE_IVERKSATT)
-            .medVedtaksdato(LocalDate.now())
-            .medVedtakResultat(beregningResultat.getVedtakResultatType()).build();
+            .medVedtakResultat(beregningResultat.getVedtakResultatType())
+            .medVedtaksdato(LocalDate.now()).build();
 
         behandlingVedtakRepository.lagre(behandlingVedtak);
     }

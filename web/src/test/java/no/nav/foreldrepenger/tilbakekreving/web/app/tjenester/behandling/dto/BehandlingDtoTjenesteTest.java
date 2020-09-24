@@ -28,6 +28,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingM
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegMockUtil;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
@@ -64,7 +65,6 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMockUtil;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.foreldrepenger.tilbakekreving.web.app.rest.ResourceLink;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.BehandlingResultatType;
 
 public class BehandlingDtoTjenesteTest {
 
@@ -364,7 +364,7 @@ public class BehandlingDtoTjenesteTest {
         Behandling behandling = lagBehandling(BehandlingStegType.IVERKSETT_VEDTAK,BehandlingStatus.IVERKSETTER_VEDTAK);
         Behandlingsresultat behandlingsresultat = Behandlingsresultat.builder()
             .medBehandling(behandling)
-            .medBehandlingResultatType(no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType.FASTSATT)
+            .medBehandlingResultatType(no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType.DELVIS_TILBAKEBETALING)
             .build();
         repositoryProvider.getBehandlingresultatRepository().lagre(behandlingsresultat);
         BehandlingVedtak behandlingVedtak = BehandlingVedtak.builder().medVedtakResultat(VedtakResultatType.DELVIS_TILBAKEBETALING)
@@ -377,7 +377,7 @@ public class BehandlingDtoTjenesteTest {
         when(behandlingTjeneste.hentBehandlinger(saksnummer)).thenReturn(Lists.newArrayList(behandling));
 
         List<BehandlingDto> behandlingDtoListe = behandlingDtoTjeneste.hentAlleBehandlinger(saksnummer);
-        assertBehandlingDto(behandling, behandlingDtoListe, BehandlingResultatType.DELVIS_TILBAKEKREVING);
+        assertBehandlingDto(behandling, behandlingDtoListe, BehandlingResultatType.DELVIS_TILBAKEBETALING);
     }
 
     private Behandling lagBehandling(BehandlingStegType behandlingStegType, BehandlingStatus behandlingStatus) {

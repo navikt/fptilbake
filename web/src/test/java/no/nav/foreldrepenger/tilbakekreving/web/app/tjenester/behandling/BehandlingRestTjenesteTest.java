@@ -200,7 +200,7 @@ public class BehandlingRestTjenesteTest {
         Behandling behandling = ScenarioSimple.simple().lagMocked();
         Behandlingsresultat behandlingsresultat = Behandlingsresultat.builder()
             .medBehandling(behandling)
-            .medBehandlingResultatType(BehandlingResultatType.FASTSATT).build();
+            .medBehandlingResultatType(BehandlingResultatType.FULL_TILBAKEBETALING).build();
         var vedtakDato = LocalDate.now();
         BehandlingVedtak behandlingVedtak = BehandlingVedtak.builder()
             .medBehandlingsresultat(behandlingsresultat)

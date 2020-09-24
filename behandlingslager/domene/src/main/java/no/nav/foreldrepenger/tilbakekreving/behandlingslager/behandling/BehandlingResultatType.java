@@ -18,6 +18,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
@@ -33,10 +34,10 @@ public enum BehandlingResultatType implements Kodeverdi {
     ENDRET("ENDRET", "Resultatet er endret i revurderingen"),
     INGEN_ENDRING("INGEN_ENDRING", "Ingen endring"),
 
-    HENLAGT("HENLAGT", "Henlagt"), // kun brukes for å vise behandling resultat i frontend
-    INGEN_TILBAKEKREVING("INGEN_TILBAKEKREVING", "Ingen Tilbakekreving"), // kun brukes for å vise behandling resultat i frontend
-    DELVIS_TILBAKEKREVING("DELVIS_TILBAKEKREVING", "Delvis Tilbakekreving"), // kun brukes for å vise behandling resultat i frontend
-    FULL_TILBAKEKREVING("FULL_TILBAKEKREVING", "Full Tilbakekreving"); // kun brukes for å vise behandling resultat i frontend
+    HENLAGT("HENLAGT", "Henlagt"),
+    INGEN_TILBAKEBETALING("INGEN_TILBAKEBETALING", "Ingen tilbakebetaling"),
+    DELVIS_TILBAKEBETALING("DELVIS_TILBAKEBETALING", "Delvis tilbakebetaling"),
+    FULL_TILBAKEBETALING("FULL_TILBAKEBETALING", "Tilbakebetaling");
 
     private String kode;
     private String navn;
@@ -55,7 +56,7 @@ public enum BehandlingResultatType implements Kodeverdi {
         }
     }
 
-    private BehandlingResultatType(String kode, String navn) {
+    BehandlingResultatType(String kode, String navn) {
         this.kode = kode;
         this.navn = navn;
     }
@@ -78,6 +79,19 @@ public enum BehandlingResultatType implements Kodeverdi {
 
     public static Map<String, BehandlingResultatType> kodeMap() {
         return Collections.unmodifiableMap(KODER);
+    }
+
+    public static BehandlingResultatType fraVedtakResultatType(VedtakResultatType vedtakResultatType){
+        switch (vedtakResultatType) {
+            case INGEN_TILBAKEBETALING:
+                return BehandlingResultatType.INGEN_TILBAKEBETALING;
+            case FULL_TILBAKEBETALING:
+                return BehandlingResultatType.FULL_TILBAKEBETALING;
+            case DELVIS_TILBAKEBETALING:
+                return BehandlingResultatType.DELVIS_TILBAKEBETALING;
+            default:
+                throw new IllegalArgumentException("Ukjent vedtakResultatType :" + vedtakResultatType);
+        }
     }
 
     @JsonProperty

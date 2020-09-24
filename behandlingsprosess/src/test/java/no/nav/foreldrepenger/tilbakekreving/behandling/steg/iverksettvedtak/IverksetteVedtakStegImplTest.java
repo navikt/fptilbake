@@ -156,7 +156,7 @@ public class IverksetteVedtakStegImplTest {
 
     private void opprettBehandlingVedtak(Behandling behandling, IverksettingStatus iverksettingStatus) {
         Behandlingsresultat behandlingsresultat = Behandlingsresultat.builder()
-            .medBehandlingResultatType(BehandlingResultatType.FASTSATT)
+            .medBehandlingResultatType(BehandlingResultatType.FULL_TILBAKEBETALING)
             .medBehandling(behandling).build();
         repoProvider.getBehandlingresultatRepository().lagre(behandlingsresultat);
 
