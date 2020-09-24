@@ -65,7 +65,7 @@ public class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
                 mockPersoninfoAdapter);
 
         henleggelsesbrevTjeneste = new HenleggelsesbrevTjeneste(repositoryProvider, mockEksternDataForBrevTjeneste,
-            mockFritekstbrevTjeneste, historikkinnslagTjeneste);
+            mockFritekstbrevTjeneste, historikkinnslagTjeneste, pdfBrevTjeneste);
         ProsessTaskRepository prosessTaskRepository = new ProsessTaskRepositoryImpl(repositoryRule.getEntityManager(),null,null);
         henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repositoryProvider,prosessTaskRepository,mock(BehandlingskontrollTjeneste.class),historikkinnslagTjeneste);
         henleggBehandlingTjeneste.henleggBehandlingManuelt(behandling.getId(), BehandlingResultatType.HENLAGT_KRAVGRUNNLAG_NULLSTILT,

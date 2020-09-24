@@ -50,7 +50,7 @@ public class InnhentDokumentasjonbrevTjenesteTest extends DokumentBestillerTestO
                 mockPersoninfoAdapter);
 
         innhentDokumentasjonBrevTjeneste = new InnhentDokumentasjonbrevTjeneste(repositoryProvider, mockFritekstbrevTjeneste, mockEksternDataForBrevTjeneste,
-            historikkinnslagTjeneste);
+            historikkinnslagTjeneste, pdfBrevTjeneste);
 
         behandlingId = behandling.getId();
         when(mockFritekstbrevTjeneste.sendFritekstbrev(any(FritekstbrevData.class))).thenReturn(lagJournalOgDokument());
