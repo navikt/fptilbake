@@ -76,6 +76,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottak
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.EksternDataForBrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.YtelseNavn;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.BrevData;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.BrevToggle;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.JournalføringTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.PdfBrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
@@ -101,7 +102,6 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBe
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SøknadType;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
-import no.nav.vedtak.util.env.Environment;
 
 
 @ApplicationScoped
@@ -180,7 +180,7 @@ public class VedtaksbrevTjeneste {
 
 
         JournalpostIdOgDokumentId dokumentreferanse;
-        if (brukDokprod()) {
+        if (BrevToggle.brukDokprod()) {
             byte[] vedlegg = lagVedtaksbrevVedleggTabellPdf(vedtaksbrevData);
             JournalpostIdOgDokumentId vedleggReferanse = journalføringTjeneste.journalførVedlegg(behandlingId, vedlegg);
             dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data, vedleggReferanse);
@@ -199,10 +199,6 @@ public class VedtaksbrevTjeneste {
         lagreInfoOmVedtaksbrev(behandlingId, dokumentreferanse);
     }
 
-    private boolean brukDokprod() {
-        return Environment.current().isProd();
-    }
-
     private byte[] lagVedtaksbrevVedleggTabellPdf(VedtaksbrevData vedtaksbrevData) {
         VedtaksbrevVedleggTjeneste vedleggTjeneste = new VedtaksbrevVedleggTjeneste();
         return vedleggTjeneste.lagVedlegg(vedtaksbrevData);
@@ -219,7 +215,7 @@ public class VedtaksbrevTjeneste {
             .medMetadata(vedtaksbrevData.getMetadata())
             .build();
 
-        if (!brukDokprod()) {
+        if (!BrevToggle.brukDokprod()) {
             return pdfBrevTjeneste.genererForhåndsvisning(BrevData.builder()
                 .setMottaker(getBrevMottaker(behandlingId))
                 .setMetadata(data.getBrevMetadata())

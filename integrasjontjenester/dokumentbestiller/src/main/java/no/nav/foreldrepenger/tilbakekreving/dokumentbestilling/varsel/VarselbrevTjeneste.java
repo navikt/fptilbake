@@ -29,6 +29,9 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottak
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottakerUtil;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.EksternDataForBrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.YtelseNavn;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.BrevData;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.BrevToggle;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.PdfBrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.JournalpostIdOgDokumentId;
@@ -59,13 +62,16 @@ public class VarselbrevTjeneste {
     private FritekstbrevTjeneste bestillDokumentTjeneste;
     private HistorikkinnslagTjeneste historikkinnslagTjeneste;
 
+    private PdfBrevTjeneste pdfBrevTjeneste;
+
 
     @Inject
     public VarselbrevTjeneste(BehandlingRepositoryProvider repositoryProvider,
                               EksternDataForBrevTjeneste eksternDataForBrevTjeneste,
                               BehandlingTjeneste behandlingTjeneste,
                               FritekstbrevTjeneste bestillDokumentTjeneste,
-                              HistorikkinnslagTjeneste historikkinnslagTjeneste) {
+                              HistorikkinnslagTjeneste historikkinnslagTjeneste,
+                              PdfBrevTjeneste pdfBrevTjeneste) {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
         this.varselRepository = repositoryProvider.getVarselRepository();
@@ -76,6 +82,7 @@ public class VarselbrevTjeneste {
         this.behandlingTjeneste = behandlingTjeneste;
         this.bestillDokumentTjeneste = bestillDokumentTjeneste;
         this.historikkinnslagTjeneste = historikkinnslagTjeneste;
+        this.pdfBrevTjeneste = pdfBrevTjeneste;
     }
 
     public VarselbrevTjeneste() {
@@ -91,7 +98,17 @@ public class VarselbrevTjeneste {
             .medMetadata(varselbrevSamletInfo.getBrevMetadata())
             .build();
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-        JournalpostIdOgDokumentId dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data);
+        JournalpostIdOgDokumentId dokumentreferanse;
+        if (BrevToggle.brukDokprod()) {
+            dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data);
+        } else {
+            dokumentreferanse = pdfBrevTjeneste.sendBrev(behandlingId, BrevData.builder()
+                .setMottaker(brevMottaker)
+                .setMetadata(data.getBrevMetadata())
+                .setOverskrift(data.getOverskrift())
+                .setBrevtekst(data.getBrevtekst())
+                .build());
+        }
         opprettHistorikkinnslag(behandling, dokumentreferanse, brevMottaker);
         lagreInfoOmVarselbrev(behandlingId, dokumentreferanse);
         return Optional.of(dokumentreferanse);
@@ -110,8 +127,16 @@ public class VarselbrevTjeneste {
             .medBrevtekst(brevtekst)
             .medMetadata(varselbrevSamletInfo.getBrevMetadata())
             .build();
-
-        return bestillDokumentTjeneste.hentForhåndsvisningFritekstbrev(data);
+        if (BrevToggle.brukDokprod()) {
+            return bestillDokumentTjeneste.hentForhåndsvisningFritekstbrev(data);
+        } else {
+            return pdfBrevTjeneste.genererForhåndsvisning(BrevData.builder()
+                .setMottaker(varselbrevSamletInfo.getBrevMetadata().isFinnesVerge() ? BrevMottaker.VERGE : BrevMottaker.BRUKER)
+                .setMetadata(data.getBrevMetadata())
+                .setOverskrift(data.getOverskrift())
+                .setBrevtekst(data.getBrevtekst())
+                .build());
+        }
     }
 
     private void opprettHistorikkinnslag(Behandling behandling, JournalpostIdOgDokumentId dokumentreferanse, BrevMottaker brevMottaker) {
@@ -148,8 +173,8 @@ public class VarselbrevTjeneste {
         SamletEksternBehandlingInfo eksternBehandlingsinfoDto = eksternDataForBrevTjeneste.hentYtelsesbehandlingFraFagsystemet(eksternBehandling.getEksternUuid(), Tillegsinformasjon.PERSONOPPLYSNINGER);
         //Henter data fra tps
         Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(behandling.getAktørId().getId());
-        Adresseinfo adresseinfo =  eksternDataForBrevTjeneste.hentAdresse(personinfo,brevMottaker,vergeEntitet);
-        String vergeNavn = BrevMottakerUtil.getVergeNavn(vergeEntitet,adresseinfo);
+        Adresseinfo adresseinfo = eksternDataForBrevTjeneste.hentAdresse(personinfo, brevMottaker, vergeEntitet);
+        String vergeNavn = BrevMottakerUtil.getVergeNavn(vergeEntitet, adresseinfo);
 
         //Henter fagsaktypenavn på riktig språk
         Språkkode mottakersSpråkkode = eksternBehandlingsinfoDto.getGrunninformasjon().getSpråkkodeEllerDefault();
@@ -192,7 +217,7 @@ public class VarselbrevTjeneste {
 
         Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(eksternBehandlingsinfo.getAktørId().getId());
         Adresseinfo adresseinfo = eksternDataForBrevTjeneste.hentAdresse(personinfo, brevMottaker, vergeEntitet);
-        String vergeNavn = BrevMottakerUtil.getVergeNavn(vergeEntitet,adresseinfo);
+        String vergeNavn = BrevMottakerUtil.getVergeNavn(vergeEntitet, adresseinfo);
 
         FeilutbetaltePerioderDto feilutbetaltePerioderDto = eksternDataForBrevTjeneste.hentFeilutbetaltePerioder(grunninformasjon.getHenvisning());
         Språkkode mottakersSpråkkode = grunninformasjon.getSpråkkodeEllerDefault();

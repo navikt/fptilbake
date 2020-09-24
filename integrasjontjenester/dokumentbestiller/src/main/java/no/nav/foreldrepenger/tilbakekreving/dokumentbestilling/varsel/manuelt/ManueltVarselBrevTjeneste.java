@@ -30,6 +30,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottak
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.EksternDataForBrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.YtelseNavn;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.BrevData;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.BrevToggle;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.PdfBrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevTjeneste;
@@ -39,7 +40,6 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.Varselbrev
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.VarselbrevUtil;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
-import no.nav.vedtak.util.env.Environment;
 
 @ApplicationScoped
 public class ManueltVarselBrevTjeneste {
@@ -86,10 +86,6 @@ public class ManueltVarselBrevTjeneste {
         this.pdfBrevTjeneste = pdfBrevTjeneste;
     }
 
-    private boolean brukDokprod() {
-        return Environment.current().isProd();
-    }
-
     public void sendManueltVarselBrev(Long behandlingId, String fritekst, BrevMottaker brevMottaker) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         VarselbrevSamletInfo varselbrevSamletInfo = lagVarselBeløpForSending(fritekst, behandling, brevMottaker, false);
@@ -97,7 +93,7 @@ public class ManueltVarselBrevTjeneste {
         FritekstbrevData data = lagManueltVarselBrev(varselbrevSamletInfo);
 
         JournalpostIdOgDokumentId dokumentreferanse;
-        if (brukDokprod()) {
+        if (BrevToggle.brukDokprod()) {
             dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data);
         } else {
             dokumentreferanse = pdfBrevTjeneste.sendBrev(behandlingId, BrevData.builder()
@@ -113,7 +109,7 @@ public class ManueltVarselBrevTjeneste {
     }
 
     public byte[] hentForhåndsvisningManueltVarselbrev(Long behandlingId, DokumentMalType malType, String fritekst) {
-        if (brukDokprod()) {
+        if (BrevToggle.brukDokprod()) {
             return hentForhåndsvisningManueltVarselbrevDokprod(behandlingId, malType, fritekst);
         } else {
             return hentForhåndsvisningManueltVarselbrevPdfgen(behandlingId, malType, fritekst);
@@ -169,7 +165,7 @@ public class ManueltVarselBrevTjeneste {
         FritekstbrevData data = lagKorrigertVarselBrev(varselbrevSamletInfo, varselInfo);
 
         JournalpostIdOgDokumentId dokumentreferanse;
-        if (brukDokprod()) {
+        if (BrevToggle.brukDokprod()) {
             dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data);
         } else {
             dokumentreferanse = pdfBrevTjeneste.sendBrev(behandlingId, BrevData.builder()
