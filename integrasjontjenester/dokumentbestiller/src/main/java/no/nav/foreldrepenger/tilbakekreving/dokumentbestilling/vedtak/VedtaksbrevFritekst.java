@@ -3,6 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VedtaksbrevFritekstKonfigurasjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Underavsnitt;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbBehandling;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbSærligeGrunner;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbVedtaksbrevPeriode;
@@ -33,7 +34,8 @@ public class VedtaksbrevFritekst {
     }
 
     private static FritekstType utledFritekstTypeForOppsummering(HbVedtaksbrevData vedtaksbrevData) {
-        return vedtaksbrevData.getFelles().getBehandling().erRevurdering() ? FritekstType.PÅKREVET : FritekstType.VALGFRI;
+        HbBehandling hbBehandling = vedtaksbrevData.getFelles().getBehandling();
+        return hbBehandling.erRevurdering() && !hbBehandling.erRevurderingEtterKlage() ? FritekstType.PÅKREVET : FritekstType.VALGFRI;
     }
 
     private static FritekstType utledFritekstTypeFakta(HendelseUnderType underType) {

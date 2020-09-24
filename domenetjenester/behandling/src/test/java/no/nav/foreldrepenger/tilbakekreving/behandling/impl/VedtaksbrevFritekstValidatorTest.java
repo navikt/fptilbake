@@ -16,6 +16,8 @@ import org.junit.runner.RunWith;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsak;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstOppsummering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstType;
@@ -62,14 +64,19 @@ public class VedtaksbrevFritekstValidatorTest {
     private Fagsak fagsak = Fagsak.opprettNy(new Saksnummer("123"), bruker);
     private Behandling behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).build();
     private Behandling revurderingBehandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.REVURDERING_TILBAKEKREVING).build();
+    private Behandling revurderingEtterKlageBehandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.REVURDERING_TILBAKEKREVING)
+        .medBehandlingÅrsak(BehandlingÅrsak.builder(BehandlingÅrsakType.RE_KLAGE_KA))
+        .build();
     private Long behandlingId;
     private Long revurderingBehandlingId;
+    private Long revurderingEtterKlageBehandlingId;
 
     @Before
     public void setUp() {
         fagsakRepository.lagre(fagsak);
         behandlingId = behandlingRepository.lagre(behandling, new BehandlingLås(null));
         revurderingBehandlingId = behandlingRepository.lagre(revurderingBehandling, new BehandlingLås(null));
+        revurderingEtterKlageBehandlingId = behandlingRepository.lagre(revurderingEtterKlageBehandling, new BehandlingLås(null));
     }
 
     @Test
@@ -160,6 +167,21 @@ public class VedtaksbrevFritekstValidatorTest {
 
         expectedException.expectMessage("Ugyldig input: Når det er revurdering, så er oppsummering fritekst påkrevet");
         validator.validerAtPåkrevdeFriteksterErSatt(revurderingBehandlingId, Collections.emptyList(), new VedtaksbrevFritekstOppsummering());
+    }
+
+    @Test
+    public void skal_ikke_feile_på_påkrevet_oppsummering_fritekst_mangler_for_revurdering_etter_klage() {
+        FaktaFeilutbetaling fakta = new FaktaFeilutbetaling();
+        fakta.setBegrunnelse("foo");
+        fakta.leggTilFeilutbetaltPeriode(FaktaFeilutbetalingPeriode.builder()
+            .medFeilutbetalinger(fakta)
+            .medHendelseType(HendelseType.FP_UTTAK_GRADERT_TYPE)
+            .medHendelseUndertype(HendelseUnderType.GRADERT_UTTAK)
+            .medPeriode(jan1, jan24)
+            .build());
+        faktaFeilutbetalingRepository.lagre(revurderingEtterKlageBehandlingId, fakta);
+
+        validator.validerAtPåkrevdeFriteksterErSatt(revurderingEtterKlageBehandlingId, Collections.emptyList(), null);
     }
 
     @Test

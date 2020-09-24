@@ -12,6 +12,7 @@ import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstOppsummering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstType;
@@ -63,7 +64,9 @@ public class VedtaksbrevFritekstValidator {
 
     private void validerAtPåkrevdOppsummeringErSatt(Long behandlingId, VedtaksbrevFritekstOppsummering vedtaksbrevFritekstOppsummering) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-        if (BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandling.getType()) &&
+        boolean erRevurderingEtterKlage = behandling.getBehandlingÅrsaker().stream()
+            .anyMatch(ba -> ba.getBehandlingÅrsakType() == BehandlingÅrsakType.RE_KLAGE_KA || ba.getBehandlingÅrsakType() == BehandlingÅrsakType.RE_KLAGE_NFP);
+        if (BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandling.getType()) && !erRevurderingEtterKlage &&
             (vedtaksbrevFritekstOppsummering == null || StringUtils.nullOrEmpty(vedtaksbrevFritekstOppsummering.getOppsummeringFritekst()))) {
             throw FritekstFeil.FACTORY.manglerPåkrevetOppsumering().toException();
         }

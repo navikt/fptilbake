@@ -16,11 +16,17 @@ public class HbBehandling {
     @JsonSerialize(using = LocalDateTilLangtNorskFormatSerialiserer.class)
     private LocalDate originalBehandlingDatoFagsakvedtak;
 
+    private boolean erRevurderingEtterKlage = false;
+
     private HbBehandling() {
     }
 
     public boolean erRevurdering() {
         return erRevurdering;
+    }
+
+    public boolean erRevurderingEtterKlage() {
+        return erRevurderingEtterKlage;
     }
 
     public static Builder builder() {
@@ -32,6 +38,11 @@ public class HbBehandling {
 
         public HbBehandling.Builder medErRevurdering(boolean erRevurdering) {
             kladd.erRevurdering = erRevurdering;
+            return this;
+        }
+
+        public HbBehandling.Builder medErRevurderingEtterKlage(boolean erRevurderingEtterKlage) {
+            kladd.erRevurderingEtterKlage = erRevurderingEtterKlage;
             return this;
         }
 
