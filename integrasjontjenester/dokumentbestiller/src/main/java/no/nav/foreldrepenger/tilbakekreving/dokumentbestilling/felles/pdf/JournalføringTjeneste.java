@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak;
+package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;

@@ -45,6 +45,11 @@ public class PdfGenerator {
         return builder.toString();
     }
 
+    public byte[] genererPDFMedLogo(String html) {
+        String logo = FileStructureUtil.readResourceAsString("pdf/nav_logo_svg.html");
+        return genererPDF(logo + html);
+    }
+
     public byte[] genererPDF(String html) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         genererPDF(html, baos);

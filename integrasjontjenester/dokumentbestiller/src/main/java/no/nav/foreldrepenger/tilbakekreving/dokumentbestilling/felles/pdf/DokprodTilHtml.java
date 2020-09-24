@@ -1,19 +1,38 @@
-package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak;
+package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf;
 
 public class DokprodTilHtml {
 
-    static String dokprodHovedoverskriftTilHtml(String dokprod) {
-        return "<h1>" + konverterNbsp(dokprod) + "</h1>";
-    }
-
-    static String dokprodInnholdTilHtml(String dokprod) {
+    public static String dokprodInnholdTilHtml(String dokprod) {
         String[] linjer = dokprod.split("\n");
         StringBuilder builder = new StringBuilder();
         boolean samepageStarted = false;
+        boolean inBulletpoints = false;
         for (String linje : linjer) {
             if (linje.isBlank()) {
                 continue;
             }
+            if (linje.startsWith("*-")) {
+                inBulletpoints = true;
+                linje = linje.substring(2);
+                builder.append("<ul>");
+                if (linje.isBlank()){
+                    continue;
+                }
+            }
+            if (inBulletpoints) {
+                if (linje.stripTrailing().endsWith("-*")) {
+                    builder.append("<li>").append(linje.replace("-*", "")).append("</li></ul>");
+                    inBulletpoints = false;
+                    if (samepageStarted) {
+                        samepageStarted = false;
+                        builder.append("</div>");
+                    }
+                } else {
+                    builder.append("<li>").append(linje).append("</li>");
+                }
+                continue;
+            }
+
             boolean overskrift = linje.startsWith("_");
             if (overskrift) {
                 boolean erUnderoverskrift = false; //dropper underoverskrifter inntil videre

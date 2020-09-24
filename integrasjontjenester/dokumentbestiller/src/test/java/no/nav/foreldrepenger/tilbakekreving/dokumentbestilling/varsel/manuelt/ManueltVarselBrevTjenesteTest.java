@@ -35,6 +35,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselReposi
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.DokumentBestillerTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.EksternDataForBrevTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.PdfBrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
@@ -56,6 +57,7 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
     private FaktaFeilutbetalingTjeneste mockFeilutbetalingTjeneste = mock(FaktaFeilutbetalingTjeneste.class);
     private FritekstbrevTjeneste mockFritekstbrevTjeneste = mock(FritekstbrevTjeneste.class);
     private PersoninfoAdapter mockPersoninfoAdapter = mock(PersoninfoAdapter.class);
+    private PdfBrevTjeneste mockPdfBrevTjeneste = mock(PdfBrevTjeneste.class);
 
     private ManueltVarselBrevTjeneste manueltVarselBrevTjeneste;
 
@@ -66,7 +68,7 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
         HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepository,
             mockPersoninfoAdapter);
         manueltVarselBrevTjeneste = new ManueltVarselBrevTjeneste(repositoryProvider, mockEksternDataForBrevTjeneste,
-            mockFeilutbetalingTjeneste, mockFritekstbrevTjeneste, historikkinnslagTjeneste);
+            mockFeilutbetalingTjeneste, mockFritekstbrevTjeneste, historikkinnslagTjeneste, mockPdfBrevTjeneste);
 
         behandlingId = behandling.getId();
         when(mockFeilutbetalingTjeneste.hentBehandlingFeilutbetalingFakta(behandlingId)).thenReturn(lagFeilutbetalingFakta());
