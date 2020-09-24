@@ -35,6 +35,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <!-- Optional, leave out if you do not need logging via slf4j. -->
+            <groupId>com.openhtmltopdf</groupId>
+            <artifactId>openhtmltopdf-slf4j</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.pdfbox</groupId>
@@ -56,10 +61,6 @@
                     <artifactId>commons-logging</artifactId>
                 </exclusion>
                 <!-- denne drar inn en annen versjon enn hva som brukes i openhtmltopdf-pdfbox -->
-                <exclusion>
-                    <groupId>org.apache.xmlgraphics</groupId>
-                    <artifactId>xmlgraphics-commons</artifactId>
-                </exclusion>
             </exclusions>
         </dependency>
 

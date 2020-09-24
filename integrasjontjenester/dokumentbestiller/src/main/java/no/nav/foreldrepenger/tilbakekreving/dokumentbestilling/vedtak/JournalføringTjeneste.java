@@ -6,18 +6,25 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.VergeRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.JournalpostIdOgDokumentId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.journalpostapi.JournalpostApiKlient;
+import no.nav.journalpostapi.dto.AvsenderMottaker;
 import no.nav.journalpostapi.dto.BehandlingTema;
 import no.nav.journalpostapi.dto.Bruker;
 import no.nav.journalpostapi.dto.BrukerIdType;
 import no.nav.journalpostapi.dto.Journalposttype;
+import no.nav.journalpostapi.dto.SenderMottakerIdType;
 import no.nav.journalpostapi.dto.Tema;
 import no.nav.journalpostapi.dto.Tilleggsopplysning;
 import no.nav.journalpostapi.dto.dokument.Dokument;
@@ -36,6 +43,7 @@ import no.nav.vedtak.feil.FeilFactory;
 import no.nav.vedtak.feil.LogLevel;
 import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
 import no.nav.vedtak.feil.deklarasjon.IntegrasjonFeil;
+import no.nav.vedtak.felles.integrasjon.aktør.klient.AktørConsumer;
 import no.nav.vedtak.konfig.KonfigVerdi;
 
 @ApplicationScoped
@@ -44,7 +52,9 @@ public class JournalføringTjeneste {
     private static final Logger logger = LoggerFactory.getLogger(JournalføringTjeneste.class);
 
     private BehandlingRepository behandlingRepository;
+    private VergeRepository vergeRepository;
     private JournalpostApiKlient journalpostApiKlient;
+    private AktørConsumer aktørConsumer;
     private String appName;
 
     JournalføringTjeneste() {
@@ -52,9 +62,11 @@ public class JournalføringTjeneste {
     }
 
     @Inject
-    public JournalføringTjeneste(BehandlingRepository behandlingRepository, JournalpostApiKlient journalpostApiKlient, @KonfigVerdi(value = "app.name") String appName) {
+    public JournalføringTjeneste(BehandlingRepository behandlingRepository, VergeRepository vergeRepository, JournalpostApiKlient journalpostApiKlient, AktørConsumer aktørConsumer, @KonfigVerdi(value = "app.name") String appName) {
         this.behandlingRepository = behandlingRepository;
+        this.vergeRepository = vergeRepository;
         this.journalpostApiKlient = journalpostApiKlient;
+        this.aktørConsumer = aktørConsumer;
         this.appName = appName;
     }
 
@@ -92,6 +104,86 @@ public class JournalføringTjeneste {
             throw JournalføringTjenesteFeil.FACTORY.uforventetAntallDokumenterIRespons(response.getDokumenter().size()).toException();
         }
         logger.info("Journalførte vedlegg for vedtaksbrev for behandlingId={} med journalpostid={}", behandlingId, journalpostId.getVerdi());
+        return new JournalpostIdOgDokumentId(journalpostId, response.getDokumenter().get(0).getDokumentInfoId());
+    }
+
+    public JournalpostIdOgDokumentId journalførUtgåendeVedtaksbrev(Long behandlingId, BrevMetadata brevMetadata, BrevMottaker brevMottaker, byte[] vedleggPdf) {
+        return journalførUtgåendeBrev(behandlingId, Dokumentkategori.Vedtaksbrev, brevMetadata, brevMottaker, vedleggPdf);
+    }
+
+    public JournalpostIdOgDokumentId journalførUtgåendeBrev(Long behandlingId, BrevMetadata brevMetadata, BrevMottaker brevMottaker, byte[] vedleggPdf) {
+        return journalførUtgåendeBrev(behandlingId, Dokumentkategori.Brev, brevMetadata, brevMottaker, vedleggPdf);
+    }
+
+    private AvsenderMottaker lagMottaker(Long behandlingId, BrevMottaker mottaker, BrevMetadata brevMetadata) {
+        Adresseinfo adresseinfo = brevMetadata.getMottakerAdresse();
+        switch (mottaker) {
+            case BRUKER:
+                return AvsenderMottaker.builder()
+                    .medId(SenderMottakerIdType.NorskIdent, adresseinfo.getPersonIdent().getIdent())
+                    .medNavn(adresseinfo.getMottakerNavn())
+                    .medLand(adresseinfo.getLand())
+                    .build();
+            case VERGE:
+                return lagMottakerVerge(behandlingId, adresseinfo);
+            default:
+                throw new IllegalArgumentException("Ikke-støttet mottaker: " + mottaker);
+        }
+    }
+
+    private AvsenderMottaker lagMottakerVerge(Long behandlingId, Adresseinfo adresseinfo) {
+        VergeEntitet verge = vergeRepository.finnVergeInformasjon(behandlingId).orElseThrow();
+        if (verge.getOrganisasjonsnummer() != null) {
+            return AvsenderMottaker.builder()
+                .medId(SenderMottakerIdType.Organisasjonsnummer, verge.getOrganisasjonsnummer())
+                .medNavn(verge.getNavn())
+                .medLand(adresseinfo.getLand())
+                .build();
+        } else {
+            String fnrVerge = aktørConsumer.hentPersonIdentForAktørId(verge.getVergeAktørId().getId()).orElseThrow();
+            return AvsenderMottaker.builder()
+                .medId(SenderMottakerIdType.NorskIdent, fnrVerge)
+                .medNavn(verge.getNavn())
+                .medNavn(adresseinfo.getMottakerNavn())
+                .build();
+        }
+    }
+
+
+    public JournalpostIdOgDokumentId journalførUtgåendeBrev(Long behandlingId, Dokumentkategori dokumentkategori, BrevMetadata brevMetadata, BrevMottaker brevMottaker, byte[] vedleggPdf) {
+        logger.info("Starter journalføring av {} til {} for behandlingId={}", dokumentkategori, brevMottaker, behandlingId);
+
+        boolean forsøkFerdigstill = true;
+        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
+        OpprettJournalpostRequest request = OpprettJournalpostRequest.builder()
+            .medTema(utledTema(behandling.getFagsak().getFagsakYtelseType()))
+            .medBehandlingstema(BehandlingTema.TILBAKEBETALING)
+            .medBruker(new Bruker(BrukerIdType.AktørId, behandling.getAktørId().getId()))
+            .medAvsenderMottaker(lagMottaker(behandlingId, brevMottaker, brevMetadata))
+            .medEksternReferanseId(behandling.getUuid().toString())
+            .medJournalførendeEnhet(behandling.getBehandlendeEnhetId())
+            .medJournalposttype(Journalposttype.UTGÅENDE)
+            .medTittel(brevMetadata.getTittel())
+            .medSak(lagSaksreferanse(behandling.getFagsak()))
+            .medHoveddokument(Dokument.builder()
+                .medDokumentkategori(dokumentkategori)
+                .medTittel(brevMetadata.getTittel())
+                .medBrevkode(brevMetadata.getFagsaktype().getKode() + "-TILB")
+                .leggTilDokumentvariant(Dokumentvariant.builder()
+                    .medFilnavn(dokumentkategori == Dokumentkategori.Vedtaksbrev ? "vedtak.pdf" : "brev.pdf")
+                    .medVariantformat(Variantformat.Arkiv)
+                    .medDokument(vedleggPdf)
+                    .medFiltype(Filtype.PDFA)
+                    .build())
+                .build())
+            .build();
+
+        OpprettJournalpostResponse response = journalpostApiKlient.opprettJournalpost(request, forsøkFerdigstill);
+        JournalpostId journalpostId = new JournalpostId(response.getJournalpostId());
+        if (response.getDokumenter().size() != 1) {
+            throw JournalføringTjenesteFeil.FACTORY.uforventetAntallDokumenterIRespons(response.getDokumenter().size()).toException();
+        }
+        logger.info("Journalførte utgående {} til {} for behandlingId={} med journalpostid={}", dokumentkategori, brevMottaker, behandlingId, journalpostId.getVerdi());
         return new JournalpostIdOgDokumentId(journalpostId, response.getDokumenter().get(0).getDokumentInfoId());
     }
 

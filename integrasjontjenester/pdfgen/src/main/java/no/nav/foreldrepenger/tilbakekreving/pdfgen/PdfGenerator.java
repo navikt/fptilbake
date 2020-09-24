@@ -10,14 +10,25 @@ import java.util.Map;
 import com.openhtmltopdf.extend.FSSupplier;
 import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
+import com.openhtmltopdf.slf4j.Slf4jLogger;
 import com.openhtmltopdf.svgsupport.BatikSVGDrawer;
+import com.openhtmltopdf.util.XRLog;
 
 public class PdfGenerator {
 
     private static final Map<String, byte[]> FONT_CACHE = new HashMap<>();
 
+    static {
+        XRLog.setLoggingEnabled(true);
+        XRLog.setLoggerImpl(new Slf4jLogger());
+    }
+
     private String appendHtmlMetadata(String html, DocFormat format) {
         StringBuilder builder = new StringBuilder();
+        //nødvendig doctype for å støtte non-breaking space i openhtmltopdf
+        builder.append("<!DOCTYPE html PUBLIC");
+        builder.append(" \"-//OPENHTMLTOPDF//DOC XHTML Character Entities Only 1.0//EN\" \"\">");
+
         builder.append("<html>");
         builder.append("<head>");
         builder.append("<meta charset=\"UTF-8\" />");
