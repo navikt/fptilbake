@@ -22,6 +22,8 @@ import org.apache.commons.lang.WordUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultatPeriode;
@@ -50,6 +52,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselInfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtakRepository;
@@ -66,6 +69,10 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.S�
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelse;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelsePeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseRepository;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dokdist.Adresse;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dokdist.DistribuerJournalpostRequest;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dokdist.DistribuerJournalpostResponse;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dokdist.DokdistKlient;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Avsnitt;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.HentForhåndvisningVedtaksbrevPdfDto;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.PeriodeMedTekstDto;
@@ -106,6 +113,8 @@ import no.nav.vedtak.util.env.Environment;
 @Transactional
 public class VedtaksbrevTjeneste {
 
+    private static final Logger logger = LoggerFactory.getLogger(VedtaksbrevTjeneste.class);
+
     private static final String TITTEL_VEDTAKSBREV_HISTORIKKINNSLAG = "Vedtaksbrev Tilbakekreving";
     private static final String TITTEL_VEDTAKSBREV_HISTORIKKINNSLAG_TIL_VERGE = "Vedtaksbrev Tilbakekreving til verge";
     private static final String TITTEL_VEDTAK_TILBAKEBETALING = "Vedtak tilbakebetaling ";
@@ -130,6 +139,7 @@ public class VedtaksbrevTjeneste {
     private EksternDataForBrevTjeneste eksternDataForBrevTjeneste;
 
     private JournalføringTjeneste journalføringTjeneste;
+    private DokdistKlient dokdistKlient;
 
     private PdfGenerator pdfGenerator = new PdfGenerator();
 
@@ -140,7 +150,8 @@ public class VedtaksbrevTjeneste {
                                EksternDataForBrevTjeneste eksternDataForBrevTjeneste,
                                FritekstbrevTjeneste bestillDokumentTjeneste,
                                HistorikkinnslagTjeneste historikkinnslagTjeneste,
-                               JournalføringTjeneste journalføringTjeneste) {
+                               JournalføringTjeneste journalføringTjeneste,
+                               DokdistKlient dokdistKlient) {
         this.behandlingRepository = behandlingRepositoryProvider.getBehandlingRepository();
         this.behandlingVedtakRepository = behandlingRepositoryProvider.getBehandlingVedtakRepository();
         this.eksternBehandlingRepository = behandlingRepositoryProvider.getEksternBehandlingRepository();
@@ -158,6 +169,7 @@ public class VedtaksbrevTjeneste {
         this.tilbakekrevingBeregningTjeneste = tilbakekrevingBeregningTjeneste;
         this.eksternDataForBrevTjeneste = eksternDataForBrevTjeneste;
         this.journalføringTjeneste = journalføringTjeneste;
+        this.dokdistKlient = dokdistKlient;
     }
 
     public VedtaksbrevTjeneste() {
@@ -184,12 +196,37 @@ public class VedtaksbrevTjeneste {
             String innholdHtml = DokprodTilHtml.dokprodInnholdTilHtml(data.getBrevtekst());
             String vedleggHtml = TekstformatererVedtaksbrev.lagVedtaksbrevVedleggHtml(vedtaksbrevData.getVedtaksbrevData());
             byte[] pdf = pdfGenerator.genererPDF(logo + header + innholdHtml + vedleggHtml);
-            dokumentreferanse = journalføringTjeneste.journalførUtgåendeVedtaksbrev(behandlingId, pdf, vedtaksbrevData.getMetadata().getTittel(), vedtaksbrevData.getMetadata().getFagsaktype());
+            dokumentreferanse = journalføringTjeneste.journalførUtgåendeVedtaksbrev(behandlingId, vedtaksbrevData.getMetadata(), brevMottaker, pdf);
+
+            //TODO bør gjøre distribuering i egen prosesstask for å unngå å jounalføre flere ganger hvis distribuering feiler
+            distribuerJournalpost(behandlingId, dokumentreferanse.getJournalpostId(), brevMottaker, vedtaksbrevData.getMetadata().getMottakerAdresse()
+            );
         }
 
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         opprettHistorikkinnslag(behandling, dokumentreferanse, brevMottaker);
         lagreInfoOmVedtaksbrev(behandlingId, dokumentreferanse);
+    }
+
+    private void distribuerJournalpost(Long behandlingId, JournalpostId journalpostId, BrevMottaker brevMottaker, Adresseinfo mottakerAdresse) {
+        DistribuerJournalpostRequest.Builder request = DistribuerJournalpostRequest.builder()
+            .medJournalpostId(journalpostId.getVerdi())
+            .medBestillendeFagsystem("K9")
+            .medDokumentProdApp(System.getProperty("application.name"));
+
+        if (brevMottaker != BrevMottaker.BRUKER) {
+            request.medAdresse(Adresse.builder()
+                .medAdresselinje1(mottakerAdresse.getAdresselinje1())
+                .medAdresselinje2(mottakerAdresse.getAdresselinje2())
+                .medAdresselinje3(mottakerAdresse.getAdresselinje3())
+                .medPostnummer(mottakerAdresse.getPostNr())
+                .medPoststed(mottakerAdresse.getPoststed())
+                .medLand(mottakerAdresse.getLand())
+                .build());
+        }
+
+        DistribuerJournalpostResponse response = dokdistKlient.distribuerJournalpost(request.build());
+        logger.info("Bestilt distribusjon av journalpost til {} for {] bestillingId ble {}", brevMottaker, behandlingId, response.getBestillingsId());
     }
 
     private boolean brukDokprod() {
