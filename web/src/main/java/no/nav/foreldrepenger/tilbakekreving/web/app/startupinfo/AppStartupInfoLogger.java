@@ -27,17 +27,10 @@ class AppStartupInfoLogger {
     private static final String OPPSTARTSINFO = "OPPSTARTSINFO";
     private static final String HILITE_SLUTT = "********";
     private static final String HILITE_START = HILITE_SLUTT;
-    private static final String KONFIGURASJON = "Konfigurasjon";
     private static final String SELFTEST = "Selftest";
     private static final String APPLIKASJONENS_STATUS = "Applikasjonens status";
-    private static final String SYSPROP = "System property";
-    private static final String ENVVAR = "Env. var";
     private static final String START = "start:";
     private static final String SLUTT = "slutt.";
-
-    private static final String SKIP_LOG_SYS_PROPS = "skipLogSysProps";
-    private static final String SKIP_LOG_ENV_VARS = "skipLogEnvVars";
-    private static final String TRUE = "true";
 
     AppStartupInfoLogger() {
         // for CDI proxy
@@ -50,35 +43,8 @@ class AppStartupInfoLogger {
 
     void logAppStartupInfo() {
         log(HILITE_START + " " + OPPSTARTSINFO + " " + START + " " + HILITE_SLUTT);
-        logKonfigurasjon();
         logSelftest();
         log(HILITE_START + " " + OPPSTARTSINFO + " " + SLUTT + " " + HILITE_SLUTT);
-    }
-
-    private void logKonfigurasjon() {
-        log(KONFIGURASJON + " " + START);
-
-        SystemPropertiesHelper sysPropsHelper = SystemPropertiesHelper.getInstance();
-        boolean skipSysProps = TRUE.equalsIgnoreCase(System.getProperty(SKIP_LOG_SYS_PROPS));
-        boolean skipEnvVars = TRUE.equalsIgnoreCase(System.getProperty(SKIP_LOG_ENV_VARS));
-
-        if (!skipSysProps) {
-            SortedMap<String, String> sysPropsMap = sysPropsHelper.filteredSortedProperties();
-            String sysPropFormat = SYSPROP + ": {}={}";
-            for (Entry<String, String> entry : sysPropsMap.entrySet()) {
-                log(sysPropFormat, LoggerUtils.removeLineBreaks(entry.getKey()), LoggerUtils.removeLineBreaks(entry.getValue()));
-            }
-        }
-
-        if (!skipEnvVars) {
-            SortedMap<String, String> envVarsMap = sysPropsHelper.filteredSortedEnvVars();
-            for (Entry<String, String> entry : envVarsMap.entrySet()) {
-                String envVarFormat = ENVVAR + ": {}={}";
-                log(envVarFormat, LoggerUtils.removeLineBreaks(entry.getKey()), LoggerUtils.removeLineBreaks(entry.getValue()));
-            }
-        }
-
-        log(KONFIGURASJON + " " + SLUTT);
     }
 
     private void logSelftest() {
