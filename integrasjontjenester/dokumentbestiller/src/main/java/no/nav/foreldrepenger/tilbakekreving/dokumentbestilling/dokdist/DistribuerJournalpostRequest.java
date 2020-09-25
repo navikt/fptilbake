@@ -21,7 +21,7 @@ public class DistribuerJournalpostRequest {
     /**
      * Fagsystemet som bestiller distribusjon
      */
-    @JsonProperty("bestillendeFagssystem")
+    @JsonProperty("bestillendeFagsystem")
     private String bestillendeFagsystem;
 
     @JsonProperty("adresse")
