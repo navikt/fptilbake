@@ -1,11 +1,11 @@
 package no.nav.foreldrepenger.tilbakekreving.grunnlag;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
@@ -16,9 +16,6 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 
 public class KravgrunnlagValidatorTest {
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     private Kravgrunnlag431 kravgrunnlag = lagKravgrunnlag(Henvisning.fraEksternBehandlingId(1000000L));
     private BigDecimal maxSkattJanuar = BigDecimal.valueOf(100);
@@ -37,10 +34,9 @@ public class KravgrunnlagValidatorTest {
     @Test
     public void skal_gi_feilmelding_ved_manglende_referanse_felt() {
         kravgrunnlag = lagKravgrunnlag(null);
-        expectedException.expect(KravgrunnlagValidator.UgyldigKravgrunnlagException.class);
-        expectedException.expectMessage("Ugyldig kravgrunnlag for kravgrunnlagId 12341. Mangler referanse");
 
-        KravgrunnlagValidator.validerGrunnlag(kravgrunnlag);
+        assertThrows(KravgrunnlagValidator.UgyldigKravgrunnlagException.class,() -> KravgrunnlagValidator.validerGrunnlag(kravgrunnlag),
+            "Ugyldig kravgrunnlag for kravgrunnlagId 12341. Mangler referanse");
     }
 
     @Test
@@ -52,10 +48,8 @@ public class KravgrunnlagValidatorTest {
         leggTilFeilutbetaling(kgPeriode1, 1000);
         leggTilFeilutbetaling(kgPeriode2, 1000);
 
-        expectedException.expect(KravgrunnlagValidator.UgyldigKravgrunnlagException.class);
-        expectedException.expectMessage("Ugyldig kravgrunnlag. Overlappende perioder 01.01.2020-10.01.2020 og 06.01.2020-31.01.2020.");
-
-        KravgrunnlagValidator.validerGrunnlag(kravgrunnlag);
+        assertThrows(KravgrunnlagValidator.UgyldigKravgrunnlagException.class,() -> KravgrunnlagValidator.validerGrunnlag(kravgrunnlag),
+            "Ugyldig kravgrunnlag. Overlappende perioder 01.01.2020-10.01.2020 og 06.01.2020-31.01.2020.");
     }
 
     @Test
@@ -68,10 +62,9 @@ public class KravgrunnlagValidatorTest {
         KravgrunnlagPeriode432 kgPeriode2 = leggTilKravgrunnlagPeriode(kravgrunnlag, periode2, maxSkattJanuar);
         leggTilFeilutbetaling(kgPeriode1, 500, skatteprosent);
         leggTilFeilutbetaling(kgPeriode2, 500, skatteprosent);
-        expectedException.expect(KravgrunnlagValidator.UgyldigKravgrunnlagException.class);
-        expectedException.expectMessage("Ugyldig kravgrunnlag. For måned 2020-01 er maks skatt 299, men maks tilbakekreving ganget med skattesats blir 300");
 
-        KravgrunnlagValidator.validerGrunnlag(kravgrunnlag);
+        assertThrows(KravgrunnlagValidator.UgyldigKravgrunnlagException.class,() -> KravgrunnlagValidator.validerGrunnlag(kravgrunnlag),
+            "Ugyldig kravgrunnlag. For måned 2020-01 er maks skatt 299, men maks tilbakekreving ganget med skattesats blir 300");
     }
 
     @Test
@@ -85,10 +78,8 @@ public class KravgrunnlagValidatorTest {
         leggTilYtel(kgPeriode, KlasseKode.FPADSND_OP, 100, skattNæringsdrivende);
         leggTilFeil(kgPeriode, 100 + 100 + 1, BigDecimal.ZERO);
 
-        expectedException.expect(KravgrunnlagValidator.UgyldigKravgrunnlagException.class);
-        expectedException.expectMessage("Ugyldig kravgrunnlag. For periode 01.01.2020-15.01.2020 er sum tilkakekreving fra YTEL 200, mens belopNytt i FEIL er 201. Det er forventet at disse er like.");
-
-        KravgrunnlagValidator.validerGrunnlag(kravgrunnlag);
+        assertThrows(KravgrunnlagValidator.UgyldigKravgrunnlagException.class,() -> KravgrunnlagValidator.validerGrunnlag(kravgrunnlag),
+            "Ugyldig kravgrunnlag. For periode 01.01.2020-15.01.2020 er sum tilkakekreving fra YTEL 200, mens belopNytt i FEIL er 201. Det er forventet at disse er like.");
     }
 
     @Test
@@ -101,10 +92,8 @@ public class KravgrunnlagValidatorTest {
         leggTilYtel(kgPeriode, KlasseKode.FPATORD, 0, skattOrd);
         leggTilYtel(kgPeriode, KlasseKode.FPADSND_OP, 0, skattNæringsdrivende);
 
-        expectedException.expect(KravgrunnlagValidator.UgyldigKravgrunnlagException.class);
-        expectedException.expectMessage("Ugyldig kravgrunnlag. Perioden 01.01.2020-15.01.2020 mangler postering med klasseType=FEIL.");
-
-        KravgrunnlagValidator.validerGrunnlag(kravgrunnlag);
+        assertThrows(KravgrunnlagValidator.UgyldigKravgrunnlagException.class,() -> KravgrunnlagValidator.validerGrunnlag(kravgrunnlag),
+            "Ugyldig kravgrunnlag. Perioden 01.01.2020-15.01.2020 mangler postering med klasseType=FEIL.");
     }
 
     @Test
@@ -115,10 +104,34 @@ public class KravgrunnlagValidatorTest {
         BigDecimal skattOrd = BigDecimal.valueOf(50);
         leggTilFeil(kgPeriode, 1000,skattOrd);
 
-        expectedException.expect(KravgrunnlagValidator.UgyldigKravgrunnlagException.class);
-        expectedException.expectMessage("Ugyldig kravgrunnlag for kravgrunnlagId 12341. Perioden 01.01.2020-15.01.2020 mangler postering med klasseType=YTEL.");
+        assertThrows(KravgrunnlagValidator.UgyldigKravgrunnlagException.class,() -> KravgrunnlagValidator.validerGrunnlag(kravgrunnlag),
+            "Ugyldig kravgrunnlag for kravgrunnlagId 12341. Perioden 01.01.2020-15.01.2020 mangler postering med klasseType=YTEL.");
+    }
 
-        KravgrunnlagValidator.validerGrunnlag(kravgrunnlag);
+    @Test
+    public void skal_gi_feilmelding_når_perioden_har_FEIL_postering_med_negativt_beløp(){
+        Periode periode1 = Periode.of(LocalDate.of(2020, 1, 1), LocalDate.of(2020, 1, 15));
+        KravgrunnlagPeriode432 kgPeriode = leggTilKravgrunnlagPeriode(kravgrunnlag, periode1, maxSkattJanuar);
+
+        BigDecimal skattOrd = BigDecimal.valueOf(50);
+        leggTilFeil(kgPeriode, -1000,skattOrd);
+        leggTilYtel(kgPeriode, KlasseKode.FPATORD, -1000, skattOrd);
+
+        assertThrows(KravgrunnlagValidator.UgyldigKravgrunnlagException.class,() -> KravgrunnlagValidator.validerGrunnlag(kravgrunnlag),
+            "Ugyldig kravgrunnlag. Perioden 01.01.2020-15.01.2020 har feil postering med negativ beløp");
+    }
+
+    @Test
+    public void skal_gi_feilmelding_når_perioden_har_YTEL_postering_med_negativt_beløp(){
+        Periode periode1 = Periode.of(LocalDate.of(2020, 1, 1), LocalDate.of(2020, 1, 15));
+        KravgrunnlagPeriode432 kgPeriode = leggTilKravgrunnlagPeriode(kravgrunnlag, periode1, maxSkattJanuar);
+
+        BigDecimal skattOrd = BigDecimal.valueOf(50);
+        leggTilFeil(kgPeriode, 1000,skattOrd);
+        leggTilYtel(kgPeriode, KlasseKode.FPATORD, -1000, skattOrd);
+
+        assertThrows(KravgrunnlagValidator.UgyldigKravgrunnlagException.class,() -> KravgrunnlagValidator.validerGrunnlag(kravgrunnlag),
+            "Ugyldig kravgrunnlag. Perioden 01.01.2020-15.01.2020 har feil postering med negativ beløp");
     }
 
     @Test
@@ -136,10 +149,8 @@ public class KravgrunnlagValidatorTest {
             .medSkattProsent(BigDecimal.valueOf(0))
             .build());
 
-        expectedException.expect(KravgrunnlagValidator.UgyldigKravgrunnlagException.class);
-        expectedException.expectMessage("Ugyldig kravgrunnlag. For perioden 01.01.2020-10.01.2020 finnes YTEL-postering med tilbakekrevesBeløp 1000 som er større enn differanse mellom nyttBeløp 200 og opprinneligBeløp 1000");
-
-        KravgrunnlagValidator.validerGrunnlag(kravgrunnlag);
+        assertThrows(KravgrunnlagValidator.UgyldigKravgrunnlagException.class,() -> KravgrunnlagValidator.validerGrunnlag(kravgrunnlag),
+            "Ugyldig kravgrunnlag. For perioden 01.01.2020-10.01.2020 finnes YTEL-postering med tilbakekrevesBeløp 1000 som er større enn differanse mellom nyttBeløp 200 og opprinneligBeløp 1000");
     }
 
     private void leggTilFeilutbetaling(KravgrunnlagPeriode432 kgPeriode, int feilutbetaltBeløp) {
