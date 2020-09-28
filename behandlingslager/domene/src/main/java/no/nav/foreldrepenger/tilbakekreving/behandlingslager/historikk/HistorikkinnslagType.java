@@ -38,7 +38,7 @@ public enum HistorikkinnslagType implements Kodeverdi {
     VEDLEGG_MOTTATT("VEDLEGG_MOTTATT", "Vedlegg mottatt", MAL_TYPE_1),
     BREV_SENT("BREV_SENT", "Brev sendt", MAL_TYPE_1),
     BREV_BESTILT("BREV_BESTILT", "Brev bestilt", MAL_TYPE_1),
-    REVURD_OPPR("REVURD_OPPR", "Revurdering opprettet", MAL_TYPE_1),
+    REVURD_OPPR("REVURD_OPPR", "Tilbakekreving Revurdering opprettet", MAL_TYPE_1),
     REGISTRER_PAPIRSØK("REGISTRER_PAPIRSØK", "Registrer papirsøknad", MAL_TYPE_1),
     MANGELFULL_SØKNAD("MANGELFULL_SØKNAD", "Mangelfull søknad", MAL_TYPE_1),
     INNSYN_OPPR("INNSYN_OPPR", "Innsynsbehandling opprettet", MAL_TYPE_1),
