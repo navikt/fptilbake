@@ -102,7 +102,7 @@ public class VarselbrevTjeneste {
         if (BrevToggle.brukDokprod()) {
             dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data);
         } else {
-            dokumentreferanse = pdfBrevTjeneste.sendBrev(behandlingId, BrevData.builder()
+            dokumentreferanse = pdfBrevTjeneste.sendBrevSomIkkeErVedtaksbrev(behandlingId, BrevData.builder()
                 .setMottaker(brevMottaker)
                 .setMetadata(data.getBrevMetadata())
                 .setOverskrift(data.getOverskrift())

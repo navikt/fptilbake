@@ -185,7 +185,7 @@ public class VedtaksbrevTjeneste {
             JournalpostIdOgDokumentId vedleggReferanse = journalføringTjeneste.journalførVedlegg(behandlingId, vedlegg);
             dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data, vedleggReferanse);
         } else {
-            dokumentreferanse = pdfBrevTjeneste.sendBrev(behandlingId, BrevData.builder()
+            dokumentreferanse = pdfBrevTjeneste.sendVedtaksbrev(behandlingId, BrevData.builder()
                 .setMottaker(brevMottaker)
                 .setMetadata(data.getBrevMetadata())
                 .setOverskrift(data.getOverskrift())

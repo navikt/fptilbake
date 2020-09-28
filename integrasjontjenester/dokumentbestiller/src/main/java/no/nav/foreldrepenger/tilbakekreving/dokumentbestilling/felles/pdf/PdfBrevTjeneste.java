@@ -8,6 +8,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottak
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.header.TekstformatererHeader;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.JournalpostIdOgDokumentId;
 import no.nav.foreldrepenger.tilbakekreving.pdfgen.PdfGenerator;
+import no.nav.journalpostapi.dto.dokument.Dokumentkategori;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 
@@ -33,10 +34,18 @@ public class PdfBrevTjeneste {
         return pdfGenerator.genererPDFMedLogo(html);
     }
 
-    public JournalpostIdOgDokumentId sendBrev(Long behandlingId, BrevData data) {
+    public JournalpostIdOgDokumentId sendVedtaksbrev(Long behandlingId, BrevData data) {
+        return sendBrev(behandlingId, data, Dokumentkategori.Vedtaksbrev);
+    }
+
+    public JournalpostIdOgDokumentId sendBrevSomIkkeErVedtaksbrev(Long behandlingId, BrevData data) {
+        return sendBrev(behandlingId, data, Dokumentkategori.Brev);
+    }
+
+    private JournalpostIdOgDokumentId sendBrev(Long behandlingId, BrevData data, Dokumentkategori dokumentkategori) {
         String html = lagHtml(data);
         byte[] pdf = pdfGenerator.genererPDFMedLogo(html);
-        JournalpostIdOgDokumentId dokumentreferanse = journalføringTjeneste.journalførUtgåendeVedtaksbrev(behandlingId, data.getMetadata(), data.getMottaker(), pdf);
+        JournalpostIdOgDokumentId dokumentreferanse = journalføringTjeneste.journalførUtgåendeBrev(behandlingId, dokumentkategori, data.getMetadata(), data.getMottaker(), pdf);
 
         ProsessTaskData prosessTaskData = new ProsessTaskData(PubliserJournalpostTask.TASKTYPE);
         prosessTaskData.setProperty("behandlingId", behandlingId.toString());

@@ -84,7 +84,7 @@ public class InnhentDokumentasjonbrevTjeneste {
         if (BrevToggle.brukDokprod()) {
             dokumentReferanse = bestillDokumentTjeneste.sendFritekstbrev(fritekstbrevData);
         } else {
-            dokumentReferanse = pdfBrevTjeneste.sendBrev(behandlingId, BrevData.builder()
+            dokumentReferanse = pdfBrevTjeneste.sendBrevSomIkkeErVedtaksbrev(behandlingId, BrevData.builder()
                 .setMottaker(brevMottaker)
                 .setMetadata(fritekstbrevData.getBrevMetadata())
                 .setOverskrift(fritekstbrevData.getOverskrift())

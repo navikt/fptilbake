@@ -84,7 +84,7 @@ public class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
         when(mockFritekstbrevTjeneste.sendFritekstbrev(any(FritekstbrevData.class))).thenReturn(lagJournalOgDokument());
         when(mockFritekstbrevTjeneste.hentForhåndsvisningFritekstbrev(any(FritekstbrevData.class))).thenReturn(varselTekst.getBytes());
 
-        when(mockPdfBrevTjeneste.sendBrev(anyLong(), any(BrevData.class))).thenReturn(lagJournalOgDokument());
+        when(mockPdfBrevTjeneste.sendBrevSomIkkeErVedtaksbrev(anyLong(), any(BrevData.class))).thenReturn(lagJournalOgDokument());
         when(mockPdfBrevTjeneste.genererForhåndsvisning( any(BrevData.class))).thenReturn(varselTekst.getBytes());
 
         when(mockEksternDataForBrevTjeneste.hentYtelsenavn(FagsakYtelseType.FORELDREPENGER, Språkkode.nb))

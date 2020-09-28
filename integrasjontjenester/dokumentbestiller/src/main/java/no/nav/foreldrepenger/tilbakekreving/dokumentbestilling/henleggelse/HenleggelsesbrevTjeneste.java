@@ -83,7 +83,7 @@ public class HenleggelsesbrevTjeneste {
         if (BrevToggle.brukDokprod()) {
             dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(fritekstbrevData);
         } else {
-            dokumentreferanse = pdfBrevTjeneste.sendBrev(behandlingId, BrevData.builder()
+            dokumentreferanse = pdfBrevTjeneste.sendBrevSomIkkeErVedtaksbrev(behandlingId, BrevData.builder()
                 .setMottaker(brevMottaker)
                 .setMetadata(fritekstbrevData.getBrevMetadata())
                 .setOverskrift(fritekstbrevData.getOverskrift())

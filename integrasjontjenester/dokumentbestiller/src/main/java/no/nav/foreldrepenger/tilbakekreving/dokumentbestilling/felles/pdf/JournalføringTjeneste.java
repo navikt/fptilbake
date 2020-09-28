@@ -107,14 +107,6 @@ public class JournalføringTjeneste {
         return new JournalpostIdOgDokumentId(journalpostId, response.getDokumenter().get(0).getDokumentInfoId());
     }
 
-    public JournalpostIdOgDokumentId journalførUtgåendeVedtaksbrev(Long behandlingId, BrevMetadata brevMetadata, BrevMottaker brevMottaker, byte[] vedleggPdf) {
-        return journalførUtgåendeBrev(behandlingId, Dokumentkategori.Vedtaksbrev, brevMetadata, brevMottaker, vedleggPdf);
-    }
-
-    public JournalpostIdOgDokumentId journalførUtgåendeBrev(Long behandlingId, BrevMetadata brevMetadata, BrevMottaker brevMottaker, byte[] vedleggPdf) {
-        return journalførUtgåendeBrev(behandlingId, Dokumentkategori.Brev, brevMetadata, brevMottaker, vedleggPdf);
-    }
-
     private AvsenderMottaker lagMottaker(Long behandlingId, BrevMottaker mottaker, BrevMetadata brevMetadata) {
         Adresseinfo adresseinfo = brevMetadata.getMottakerAdresse();
         switch (mottaker) {
@@ -148,7 +140,6 @@ public class JournalføringTjeneste {
                 .build();
         }
     }
-
 
     public JournalpostIdOgDokumentId journalførUtgåendeBrev(Long behandlingId, Dokumentkategori dokumentkategori, BrevMetadata brevMetadata, BrevMottaker brevMottaker, byte[] vedleggPdf) {
         logger.info("Starter journalføring av {} til {} for behandlingId={}", dokumentkategori, brevMottaker, behandlingId);

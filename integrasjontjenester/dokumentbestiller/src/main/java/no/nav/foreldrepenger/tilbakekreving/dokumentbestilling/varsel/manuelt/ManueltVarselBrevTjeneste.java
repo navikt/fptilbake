@@ -96,7 +96,7 @@ public class ManueltVarselBrevTjeneste {
         if (BrevToggle.brukDokprod()) {
             dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data);
         } else {
-            dokumentreferanse = pdfBrevTjeneste.sendBrev(behandlingId, BrevData.builder()
+            dokumentreferanse = pdfBrevTjeneste.sendBrevSomIkkeErVedtaksbrev(behandlingId, BrevData.builder()
                 .setMottaker(brevMottaker)
                 .setMetadata(data.getBrevMetadata())
                 .setOverskrift(data.getOverskrift())
@@ -168,7 +168,7 @@ public class ManueltVarselBrevTjeneste {
         if (BrevToggle.brukDokprod()) {
             dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data);
         } else {
-            dokumentreferanse = pdfBrevTjeneste.sendBrev(behandlingId, BrevData.builder()
+            dokumentreferanse = pdfBrevTjeneste.sendBrevSomIkkeErVedtaksbrev(behandlingId, BrevData.builder()
                 .setMottaker(brevMottaker)
                 .setOverskrift(data.getOverskrift())
                 .setBrevtekst(data.getBrevtekst())
