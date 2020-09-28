@@ -53,12 +53,12 @@ public class PdfBrevTjeneste {
         prosessTaskData.setProperty("mottaker", data.getMottaker().name());
         if (data.getMottaker() != BrevMottaker.BRUKER) {
             Adresseinfo mottakerAdresse = data.getMetadata().getMottakerAdresse();
-            prosessTaskData.setProperty("mottaker.adresselinje1", mottakerAdresse.getAdresselinje1());
-            prosessTaskData.setProperty("mottaker.adresselinje2", mottakerAdresse.getAdresselinje2());
-            prosessTaskData.setProperty("mottaker.adresselinje3", mottakerAdresse.getAdresselinje3());
-            prosessTaskData.setProperty("mottaker.postnr", mottakerAdresse.getPostNr());
-            prosessTaskData.setProperty("mottaker.poststed", mottakerAdresse.getPoststed());
-            prosessTaskData.setProperty("mottaker.land", mottakerAdresse.getLand());
+            setHvisHarVerdi(prosessTaskData, "mottaker.adresselinje1", mottakerAdresse.getAdresselinje1());
+            setHvisHarVerdi(prosessTaskData, "mottaker.adresselinje2", mottakerAdresse.getAdresselinje2());
+            setHvisHarVerdi(prosessTaskData, "mottaker.adresselinje3", mottakerAdresse.getAdresselinje3());
+            setHvisHarVerdi(prosessTaskData, "mottaker.postnr", mottakerAdresse.getPostNr());
+            setHvisHarVerdi(prosessTaskData, "mottaker.poststed", mottakerAdresse.getPoststed());
+            setHvisHarVerdi(prosessTaskData, "mottaker.land", mottakerAdresse.getLand());
             if (mottakerAdresse.getAdresselinje4() != null && !mottakerAdresse.getAdresselinje4().isBlank()) {
                 throw new IllegalArgumentException("adresselinje4 er ikke støttet av dokdist");
             }
@@ -66,6 +66,12 @@ public class PdfBrevTjeneste {
         prosessTaskRepository.lagre(prosessTaskData);
 
         return dokumentreferanse;
+    }
+
+    private static void setHvisHarVerdi(ProsessTaskData data, String navn, String verdi) {
+        if (verdi != null && !verdi.isBlank()) {
+            data.setProperty(navn, verdi);
+        }
     }
 
     private String lagHtml(BrevData data) {
