@@ -144,7 +144,7 @@ public class JournalføringTjeneste {
             return AvsenderMottaker.builder()
                 .medId(SenderMottakerIdType.NorskIdent, fnrVerge)
                 .medNavn(verge.getNavn())
-                .medNavn(adresseinfo.getMottakerNavn())
+                .medLand(adresseinfo.getLand())
                 .build();
         }
     }
