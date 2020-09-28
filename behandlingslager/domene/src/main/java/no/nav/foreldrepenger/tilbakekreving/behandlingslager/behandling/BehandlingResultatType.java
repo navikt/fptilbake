@@ -25,16 +25,15 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResult
 public enum BehandlingResultatType implements Kodeverdi {
 
     IKKE_FASTSATT("IKKE_FASTSATT", "Ikke fastsatt"),
-    FASTSATT("FASTSATT", "Resultatet er fastsatt"),
+    @Deprecated
+    FASTSATT("FASTSATT", "Resultatet er fastsatt"), //Ikke bruk denne BehandlingResultatType.Blir fjernes senere
     HENLAGT_FEILOPPRETTET("HENLAGT_FEILOPPRETTET", "Henlagt, søknaden er feilopprettet"),
     HENLAGT_FEILOPPRETTET_MED_BREV("HENLAGT_FEILOPPRETTET_MED_BREV", "Feilaktig opprettet - med henleggelsesbrev"),
     HENLAGT_FEILOPPRETTET_UTEN_BREV("HENLAGT_FEILOPPRETTET_UTEN_BREV", "Feilaktig opprettet - uten henleggelsesbrev"),
     HENLAGT_KRAVGRUNNLAG_NULLSTILT("HENLAGT_KRAVGRUNNLAG_NULLSTILT", "Kravgrunnlaget er nullstilt"),
     HENLAGT_TEKNISK_VEDLIKEHOLD("HENLAGT_TEKNISK_VEDLIKEHOLD", "Teknisk vedlikehold"),
-    ENDRET("ENDRET", "Resultatet er endret i revurderingen"),
-    INGEN_ENDRING("INGEN_ENDRING", "Ingen endring"),
 
-    HENLAGT("HENLAGT", "Henlagt"),
+    HENLAGT("HENLAGT", "Henlagt"), // kun brukes i frontend
     INGEN_TILBAKEBETALING("INGEN_TILBAKEBETALING", "Ingen tilbakebetaling"),
     DELVIS_TILBAKEBETALING("DELVIS_TILBAKEBETALING", "Delvis tilbakebetaling"),
     FULL_TILBAKEBETALING("FULL_TILBAKEBETALING", "Tilbakebetaling");

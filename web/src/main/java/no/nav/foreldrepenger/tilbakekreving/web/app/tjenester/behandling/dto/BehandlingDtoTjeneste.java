@@ -30,7 +30,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingresultatRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.VergeRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
@@ -139,10 +138,7 @@ public class BehandlingDtoTjeneste {
                 if (behandlingsresultat.erBehandlingHenlagt()) {
                     dto.setType(BehandlingResultatType.HENLAGT);
                 } else {
-                    Optional<BehandlingVedtak> behandlingVedtakData = behandlingVedtakRepository.hentBehandlingvedtakForBehandlingId(behandling.getId());
-                    behandlingVedtakData.ifPresent(behandlingVedtak -> {
-                        dto.setType(BehandlingResultatType.fraVedtakResultatType(behandlingVedtak.getVedtakResultatType()));
-                    });
+                    dto.setType(behandlingsresultat.getBehandlingResultatType());
                 }
             });
         }

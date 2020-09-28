@@ -155,14 +155,12 @@ public class MigrasjonRestTjeneste {
     @BeskyttetRessurs(action = BeskyttetRessursActionAttributt.CREATE, property = AbacProperty.DRIFT)
     public Response migrerVedtakResultatTypeTilBehandlingResultat() {
         List<BehandlingVedtak> behandlingVedtakListe = behandlingVedtakRepository.hentAlleBehandlingVedtak();
-        if (!behandlingVedtakListe.isEmpty()) {
-            for (BehandlingVedtak behandlingVedtak : behandlingVedtakListe) {
-                Behandlingsresultat gammelBehandlingResultat = behandlingVedtak.getBehandlingsresultat();
-                Behandlingsresultat oppdatertBehandlingResultat = Behandlingsresultat.builderEndreEksisterende(gammelBehandlingResultat)
-                    .medBehandling(gammelBehandlingResultat.getBehandling())
-                    .medBehandlingResultatType(BehandlingResultatType.fraVedtakResultatType(behandlingVedtak.getVedtakResultatType())).build();
-                behandlingresultatRepository.lagre(oppdatertBehandlingResultat);
-            }
+        for (BehandlingVedtak behandlingVedtak : behandlingVedtakListe) {
+            Behandlingsresultat gammelBehandlingResultat = behandlingVedtak.getBehandlingsresultat();
+            Behandlingsresultat oppdatertBehandlingResultat = Behandlingsresultat.builderEndreEksisterende(gammelBehandlingResultat)
+                .medBehandling(gammelBehandlingResultat.getBehandling())
+                .medBehandlingResultatType(BehandlingResultatType.fraVedtakResultatType(behandlingVedtak.getVedtakResultatType())).build();
+            behandlingresultatRepository.lagre(oppdatertBehandlingResultat);
         }
         return Response.status(Response.Status.OK).build();
     }
