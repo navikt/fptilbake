@@ -10,9 +10,7 @@ import javax.ws.rs.core.UriBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker;
+import no.nav.journalpostapi.dto.sak.FagsakSystem;
 import no.nav.vedtak.felles.integrasjon.rest.OidcRestClient;
 import no.nav.vedtak.konfig.KonfigVerdi;
 
@@ -23,15 +21,17 @@ public class DokdistKlient {
 
     private OidcRestClient oidcRestClient;
     private URI dokdistUri;
+    private String applicationName;
 
     DokdistKlient() {
         //for CDI proxy
     }
 
     @Inject
-    public DokdistKlient(OidcRestClient oidcRestClient, @KonfigVerdi(value = "dokdist.rest.distribuer.journalpost") String dokdistUrl) {
+    public DokdistKlient(OidcRestClient oidcRestClient, @KonfigVerdi(value = "dokdist.rest.distribuer.journalpost") String dokdistUrl, @KonfigVerdi("app.name") String applicationName) {
         this.oidcRestClient = oidcRestClient;
         this.dokdistUri = UriBuilder.fromUri(dokdistUrl).build();
+        this.applicationName = applicationName;
     }
 
     /**
@@ -41,25 +41,36 @@ public class DokdistKlient {
         return oidcRestClient.post(dokdistUri, request, DistribuerJournalpostResponse.class);
     }
 
-    public void distribuerJournalpost(JournalpostId journalpostId, BrevMottaker brevMottaker, Adresseinfo mottakerAdresse) {
-        DistribuerJournalpostRequest.Builder request = DistribuerJournalpostRequest.builder()
-            .medJournalpostId(journalpostId.getVerdi())
-            .medBestillendeFagsystem("K9")
-            .medDokumentProdApp(System.getProperty("application.name"));
+    public void distribuerJournalpostTilBruker(String journalpostId) {
+        DistribuerJournalpostRequest request = DistribuerJournalpostRequest.builder()
+            .medJournalpostId(journalpostId)
+            .medBestillendeFagsystem(getBestillendeFagsystem().getKode())
+            .medDokumentProdApp(applicationName)
+            .build();
+        DistribuerJournalpostResponse response = distribuerJournalpost(request);
+        logger.info("Bestilt distribusjon av journalpost til bruker, bestillingId ble {}", response.getBestillingsId());
+    }
 
-        if (brevMottaker != BrevMottaker.BRUKER) {
-            request.medAdresse(Adresse.builder()
-                .medAdresselinje1(mottakerAdresse.getAdresselinje1())
-                .medAdresselinje2(mottakerAdresse.getAdresselinje2())
-                .medAdresselinje3(mottakerAdresse.getAdresselinje3())
-                .medPostnummer(mottakerAdresse.getPostNr())
-                .medPoststed(mottakerAdresse.getPoststed())
-                .medLand(mottakerAdresse.getLand())
-                .build());
+    public void distribuerJournalpostTilVerge(String journalpostId, Adresse vergeAdresse) {
+        DistribuerJournalpostRequest request = DistribuerJournalpostRequest.builder()
+            .medJournalpostId(journalpostId)
+            .medBestillendeFagsystem(getBestillendeFagsystem().getKode())
+            .medDokumentProdApp(applicationName)
+            .medAdresse(vergeAdresse)
+            .build();
+        DistribuerJournalpostResponse response = distribuerJournalpost(request);
+        logger.info("Bestilt distribusjon av journalpost til Verge, bestillingId ble {}", response.getBestillingsId());
+    }
+
+    private FagsakSystem getBestillendeFagsystem() {
+        switch (applicationName) {
+            case "fptilbake":
+                return FagsakSystem.FORELDREPENGELØSNINGEN;
+            case "k9-tilbake":
+                return FagsakSystem.K9SAK;
+            default:
+                throw new IllegalArgumentException("Ikke-støttet app.name: " + applicationName);
         }
-
-        DistribuerJournalpostResponse response = distribuerJournalpost(request.build());
-        logger.info("Bestilt distribusjon av journalpost til {} for {] bestillingId ble {}", brevMottaker, response.getBestillingsId());
     }
 
 }
