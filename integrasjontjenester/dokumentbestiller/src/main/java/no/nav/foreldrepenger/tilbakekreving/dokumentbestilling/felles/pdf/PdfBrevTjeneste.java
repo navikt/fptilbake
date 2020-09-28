@@ -59,7 +59,7 @@ public class PdfBrevTjeneste {
             prosessTaskData.setProperty("mottaker.postnr", mottakerAdresse.getPostNr());
             prosessTaskData.setProperty("mottaker.poststed", mottakerAdresse.getPoststed());
             prosessTaskData.setProperty("mottaker.land", mottakerAdresse.getLand());
-            if (mottakerAdresse.getAdresselinje4() != null) {
+            if (mottakerAdresse.getAdresselinje4() != null && !mottakerAdresse.getAdresselinje4().isBlank()) {
                 throw new IllegalArgumentException("adresselinje4 er ikke støttet av dokdist");
             }
         }
