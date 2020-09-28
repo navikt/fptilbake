@@ -46,14 +46,14 @@ public class PubliserJournalpostTask implements ProsessTaskHandler {
     }
 
     private Adresse lesMottakerAdresseinfo(ProsessTaskData prosessTaskData) {
-        String land = prosessTaskData.getPropertyValue("mottaker-land");
+        String land = prosessTaskData.getPropertyValue("mottaker.land");
         return Adresse.builder()
             .medAdresseType(land == null || "NO".equals(land) ? AdresseType.NORSK : AdresseType.UTENLANDSK)
-            .medAdresselinje1(prosessTaskData.getPropertyValue("mottaker-adresselinje1"))
-            .medAdresselinje2(prosessTaskData.getPropertyValue("mottaker-adresselinje2"))
-            .medAdresselinje3(prosessTaskData.getPropertyValue("mottaker-adresselinje3"))
-            .medPostnummer(prosessTaskData.getPropertyValue("mottaker-postnr"))
-            .medPoststed(prosessTaskData.getPropertyValue("mottaker-poststed"))
+            .medAdresselinje1(prosessTaskData.getPropertyValue("mottaker.adresselinje1"))
+            .medAdresselinje2(prosessTaskData.getPropertyValue("mottaker.adresselinje2"))
+            .medAdresselinje3(prosessTaskData.getPropertyValue("mottaker.adresselinje3"))
+            .medPostnummer(prosessTaskData.getPropertyValue("mottaker.postnr"))
+            .medPoststed(prosessTaskData.getPropertyValue("mottaker.poststed"))
             .medLand(land)
             .build();
 

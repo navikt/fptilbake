@@ -44,12 +44,12 @@ public class PdfBrevTjeneste {
         prosessTaskData.setProperty("mottaker", data.getMottaker().name());
         if (data.getMottaker() != BrevMottaker.BRUKER) {
             Adresseinfo mottakerAdresse = data.getMetadata().getMottakerAdresse();
-            prosessTaskData.setProperty("mottaker-adresselinje1", mottakerAdresse.getAdresselinje1());
-            prosessTaskData.setProperty("mottaker-adresselinje2", mottakerAdresse.getAdresselinje2());
-            prosessTaskData.setProperty("mottaker-adresselinje3", mottakerAdresse.getAdresselinje3());
-            prosessTaskData.setProperty("mottaker-postnr", mottakerAdresse.getPostNr());
-            prosessTaskData.setProperty("mottaker-poststed", mottakerAdresse.getPoststed());
-            prosessTaskData.setProperty("mottaker-land", mottakerAdresse.getLand());
+            prosessTaskData.setProperty("mottaker.adresselinje1", mottakerAdresse.getAdresselinje1());
+            prosessTaskData.setProperty("mottaker.adresselinje2", mottakerAdresse.getAdresselinje2());
+            prosessTaskData.setProperty("mottaker.adresselinje3", mottakerAdresse.getAdresselinje3());
+            prosessTaskData.setProperty("mottaker.postnr", mottakerAdresse.getPostNr());
+            prosessTaskData.setProperty("mottaker.poststed", mottakerAdresse.getPoststed());
+            prosessTaskData.setProperty("mottaker.land", mottakerAdresse.getLand());
             if (mottakerAdresse.getAdresselinje4() != null) {
                 throw new IllegalArgumentException("adresselinje4 er ikke støttet av dokdist");
             }
