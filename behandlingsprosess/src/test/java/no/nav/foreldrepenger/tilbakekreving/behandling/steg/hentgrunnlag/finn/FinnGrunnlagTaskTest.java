@@ -151,6 +151,34 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
     }
 
     @Test
+    public void skal_finne_og_håndtere_ny_grunnlag_når_kravgrunnlag_finnes_med_samme_saksnummer_men_annen_ekstern_behandling_etter_første_grunnlaget_er_avsluttet() {
+        Long førsteGrunnlagXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_YTEL.xml"));
+        mottattXmlRepository.oppdaterMedHenvisningOgSaksnummer(HENVISNING, saksnummer, førsteGrunnlagXmlId);
+
+        Long mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_SPER.xml"));
+        mottattXmlRepository.oppdaterMedHenvisningOgSaksnummer(HENVISNING, saksnummer, mottattXmlId);
+
+        mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_AVSL.xml"));
+        mottattXmlRepository.oppdaterMedHenvisningOgSaksnummer(HENVISNING, saksnummer, mottattXmlId);
+
+        Long andreGrunnlagXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_YTEL_ENDR_samme_referanse.xml"));
+        mottattXmlRepository.oppdaterMedHenvisningOgSaksnummer(ANNEN_HENVISNING, saksnummer, andreGrunnlagXmlId);
+
+        mockFagsystemKlientRespons();
+
+        ProsessTaskData prosessTaskData = opprettFinngrunnlagProsessTask();
+        finnGrunnlagTask.doTask(prosessTaskData);
+
+        assertThat(grunnlagRepository.harGrunnlagForBehandlingId(behandling.getId())).isTrue();
+        assertThat(mottattXmlRepository.erMottattXmlTilkoblet(førsteGrunnlagXmlId)).isTrue();
+        assertThat(behandling.isBehandlingPåVent()).isFalse();
+        assertThat(eksternBehandlingRepository.hentFraHenvisning(ANNEN_HENVISNING)).isNotEmpty();
+
+        assertThat(mottattXmlRepository.erMottattXmlTilkoblet(andreGrunnlagXmlId)).isTrue();
+        assertThat(eksternBehandlingRepository.hentFraHenvisning(HENVISNING)).isEmpty();
+    }
+
+    @Test
     public void skal_finne_og_håndtere_grunnlag_og_oppdatere_fpsak_referanse_når_kravgrunnlag_referanse_er_forskjellige_enn_fpsak_referanse() {
         Long mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_YTEL_ENDR_samme_referanse.xml"));
         mottattXmlRepository.oppdaterMedHenvisningOgSaksnummer(ANNEN_HENVISNING, saksnummer, mottattXmlId);

@@ -138,10 +138,16 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
         grunnlagRepository.lagre(behandling.getId(), kravgrunnlag431);
 
         Henvisning grunnlagReferanse = kravgrunnlag431.getReferanse();
-        EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandling.getId());
-        if (!erReferanseRiktig(grunnlagReferanse, eksternBehandling)) {
-            logger.info("Tilkoblet grunnlag har en annen referanse={} enn behandling for behandlingId={}", grunnlagReferanse, behandling.getId());
+            Optional<EksternBehandling> eksternBehandling = eksternBehandlingRepository.hentOptionalFraInternId(behandling.getId());
+        if(eksternBehandling.isEmpty()){
+            logger.info("Siste aktivert ekstern behandling for behandling={} er deaktivert p.g.a avslutt melding. Ny eksternBehandling={} skal opprettes for behandlingen."
+                ,behandling.getId(),grunnlagReferanse);
             oppdatereEksternBehandlingMedRiktigReferanse(behandling, grunnlagReferanse);
+        }else {
+            if (!erReferanseRiktig(grunnlagReferanse, eksternBehandling.get())) {
+                logger.info("Tilkoblet grunnlag har en annen referanse={} enn behandling for behandlingId={}", grunnlagReferanse, behandling.getId());
+                oppdatereEksternBehandlingMedRiktigReferanse(behandling, grunnlagReferanse);
+            }
         }
     }
 
