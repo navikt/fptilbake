@@ -18,20 +18,25 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
 public enum BehandlingResultatType implements Kodeverdi {
 
-    IKKE_FASTSATT("IKKE_FASTSATT","Ikke fastsatt"),
-    FASTSATT("FASTSATT","Resultatet er fastsatt"),
-    HENLAGT_FEILOPPRETTET("HENLAGT_FEILOPPRETTET","Henlagt, søknaden er feilopprettet"),
-    HENLAGT_FEILOPPRETTET_MED_BREV("HENLAGT_FEILOPPRETTET_MED_BREV","Feilaktig opprettet - med henleggelsesbrev"),
-    HENLAGT_FEILOPPRETTET_UTEN_BREV("HENLAGT_FEILOPPRETTET_UTEN_BREV","Feilaktig opprettet - uten henleggelsesbrev"),
-    HENLAGT_KRAVGRUNNLAG_NULLSTILT("HENLAGT_KRAVGRUNNLAG_NULLSTILT","Kravgrunnlaget er nullstilt"),
-    HENLAGT_TEKNISK_VEDLIKEHOLD("HENLAGT_TEKNISK_VEDLIKEHOLD","Teknisk vedlikehold"),
-    ENDRET("ENDRET","Resultatet er endret i revurderingen"),
-    INGEN_ENDRING("INGEN_ENDRING","Ingen endring");
+    IKKE_FASTSATT("IKKE_FASTSATT", "Ikke fastsatt"),
+    @Deprecated
+    FASTSATT("FASTSATT", "Resultatet er fastsatt"), //Ikke bruk denne BehandlingResultatType.Blir fjernes senere
+    HENLAGT_FEILOPPRETTET("HENLAGT_FEILOPPRETTET", "Henlagt, søknaden er feilopprettet"),
+    HENLAGT_FEILOPPRETTET_MED_BREV("HENLAGT_FEILOPPRETTET_MED_BREV", "Feilaktig opprettet - med henleggelsesbrev"),
+    HENLAGT_FEILOPPRETTET_UTEN_BREV("HENLAGT_FEILOPPRETTET_UTEN_BREV", "Feilaktig opprettet - uten henleggelsesbrev"),
+    HENLAGT_KRAVGRUNNLAG_NULLSTILT("HENLAGT_KRAVGRUNNLAG_NULLSTILT", "Kravgrunnlaget er nullstilt"),
+    HENLAGT_TEKNISK_VEDLIKEHOLD("HENLAGT_TEKNISK_VEDLIKEHOLD", "Teknisk vedlikehold"),
+
+    HENLAGT("HENLAGT", "Henlagt"), // kun brukes i frontend
+    INGEN_TILBAKEBETALING("INGEN_TILBAKEBETALING", "Ingen tilbakebetaling"),
+    DELVIS_TILBAKEBETALING("DELVIS_TILBAKEBETALING", "Delvis tilbakebetaling"),
+    FULL_TILBAKEBETALING("FULL_TILBAKEBETALING", "Tilbakebetaling");
 
     private String kode;
     private String navn;
@@ -50,7 +55,7 @@ public enum BehandlingResultatType implements Kodeverdi {
         }
     }
 
-    private BehandlingResultatType(String kode, String navn) {
+    BehandlingResultatType(String kode, String navn) {
         this.kode = kode;
         this.navn = navn;
     }
@@ -73,6 +78,19 @@ public enum BehandlingResultatType implements Kodeverdi {
 
     public static Map<String, BehandlingResultatType> kodeMap() {
         return Collections.unmodifiableMap(KODER);
+    }
+
+    public static BehandlingResultatType fraVedtakResultatType(VedtakResultatType vedtakResultatType){
+        switch (vedtakResultatType) {
+            case INGEN_TILBAKEBETALING:
+                return BehandlingResultatType.INGEN_TILBAKEBETALING;
+            case FULL_TILBAKEBETALING:
+                return BehandlingResultatType.FULL_TILBAKEBETALING;
+            case DELVIS_TILBAKEBETALING:
+                return BehandlingResultatType.DELVIS_TILBAKEBETALING;
+            default:
+                throw new IllegalArgumentException("Ukjent vedtakResultatType :" + vedtakResultatType);
+        }
     }
 
     @JsonProperty

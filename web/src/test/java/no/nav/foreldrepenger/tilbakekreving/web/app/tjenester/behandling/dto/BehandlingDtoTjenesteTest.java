@@ -14,8 +14,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
+import javax.persistence.FlushModeType;
 
 import org.assertj.core.util.Lists;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -26,10 +28,12 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingM
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegMockUtil;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandlingsresultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
@@ -43,6 +47,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.IverksettingStatus;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingAktsomhetEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingPeriodeEntitet;
@@ -79,6 +86,11 @@ public class BehandlingDtoTjenesteTest {
     private Saksnummer saksnummer = new Saksnummer(GYLDIG_SAKSNR);
     private static final LocalDate FOM = LocalDate.now().minusMonths(1);
     private static final LocalDate TOM = LocalDate.now();
+
+    @Before
+    public void init(){
+        repositoryRule.getEntityManager().setFlushMode(FlushModeType.AUTO);
+    }
 
     @Test
     public void skal_hentUtvidetBehandlingResultat_medFaktaSteg() {
@@ -277,7 +289,8 @@ public class BehandlingDtoTjenesteTest {
         when(behandlingTjeneste.hentBehandlinger(saksnummer)).thenReturn(Lists.newArrayList(behandling));
 
         List<BehandlingDto> behandlingDtoListe = behandlingDtoTjeneste.hentAlleBehandlinger(saksnummer);
-        BehandlingDto behandlingDto = assertBehandlingDto(behandling, behandlingDtoListe);
+        BehandlingDto behandlingDto = assertBehandlingDto(behandling, behandlingDtoListe, BehandlingResultatType.IKKE_FASTSATT);
+
 
         assertThat(behandlingDto.getLinks().stream().map(ResourceLink::getRel).collect(Collectors.toList())).containsOnly(
             "totrinnskontroll-arsaker-readOnly",
@@ -294,7 +307,7 @@ public class BehandlingDtoTjenesteTest {
         when(behandlingTjeneste.hentBehandlinger(saksnummer)).thenReturn(Lists.newArrayList(behandling));
 
         List<BehandlingDto> behandlingDtoListe = behandlingDtoTjeneste.hentAlleBehandlinger(saksnummer);
-        BehandlingDto behandlingDto = assertBehandlingDto(behandling, behandlingDtoListe);
+        BehandlingDto behandlingDto = assertBehandlingDto(behandling, behandlingDtoListe, BehandlingResultatType.IKKE_FASTSATT);
 
         assertThat(behandlingDto.getLinks().stream().map(ResourceLink::getRel).collect(Collectors.toList())).containsOnly(
             "totrinnskontroll-arsaker",
@@ -332,6 +345,41 @@ public class BehandlingDtoTjenesteTest {
         assertThat(behandlingDto.isKanHenleggeBehandling()).isTrue();
     }
 
+    @Test
+    public void skal_hentAlleBehandlinger_når_behandling_er_henlagt() {
+        Behandling behandling = lagBehandling(BehandlingStegType.FAKTA_FEILUTBETALING, BehandlingStatus.UTREDES);
+        Behandlingsresultat behandlingsresultat = Behandlingsresultat.builder()
+            .medBehandling(behandling)
+            .medBehandlingResultatType(no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType.HENLAGT_TEKNISK_VEDLIKEHOLD)
+            .build();
+        repositoryProvider.getBehandlingresultatRepository().lagre(behandlingsresultat);
+        behandling.avsluttBehandling();
+        when(behandlingTjeneste.hentBehandlinger(saksnummer)).thenReturn(Lists.newArrayList(behandling));
+        List<BehandlingDto> behandlingDtoListe = behandlingDtoTjeneste.hentAlleBehandlinger(saksnummer);
+        assertBehandlingDto(behandling, behandlingDtoListe, BehandlingResultatType.HENLAGT);
+    }
+
+    @Test
+    public void skal_hentAlleBehandlinger_når_behandling_er_avsluttet(){
+        Behandling behandling = lagBehandling(BehandlingStegType.IVERKSETT_VEDTAK,BehandlingStatus.IVERKSETTER_VEDTAK);
+        Behandlingsresultat behandlingsresultat = Behandlingsresultat.builder()
+            .medBehandling(behandling)
+            .medBehandlingResultatType(no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType.DELVIS_TILBAKEBETALING)
+            .build();
+        repositoryProvider.getBehandlingresultatRepository().lagre(behandlingsresultat);
+        BehandlingVedtak behandlingVedtak = BehandlingVedtak.builder().medVedtakResultat(VedtakResultatType.DELVIS_TILBAKEBETALING)
+            .medAnsvarligSaksbehandler("VL")
+            .medBehandlingsresultat(behandlingsresultat)
+            .medVedtaksdato(LocalDate.now())
+            .medIverksettingStatus(IverksettingStatus.IVERKSATT).build();
+        repositoryProvider.getBehandlingVedtakRepository().lagre(behandlingVedtak);
+        behandling.avsluttBehandling();
+        when(behandlingTjeneste.hentBehandlinger(saksnummer)).thenReturn(Lists.newArrayList(behandling));
+
+        List<BehandlingDto> behandlingDtoListe = behandlingDtoTjeneste.hentAlleBehandlinger(saksnummer);
+        assertBehandlingDto(behandling, behandlingDtoListe, BehandlingResultatType.DELVIS_TILBAKEBETALING);
+    }
+
     private Behandling lagBehandling(BehandlingStegType behandlingStegType, BehandlingStatus behandlingStatus) {
         Long fagsakId = fagsakRepository.lagre(Fagsak.opprettNy(saksnummer,
             NavBruker.opprettNy(new AktørId(GYLDIG_AKTØR_ID), Språkkode.nb)));
@@ -345,7 +393,7 @@ public class BehandlingDtoTjenesteTest {
         return behandling;
     }
 
-    private BehandlingDto assertBehandlingDto(Behandling behandling, List<BehandlingDto> behandlingDtoListe) {
+    private BehandlingDto assertBehandlingDto(Behandling behandling, List<BehandlingDto> behandlingDtoListe, BehandlingResultatType behandlingResultatType) {
         assertThat(behandlingDtoListe).isNotEmpty();
         assertThat(behandlingDtoListe.size()).isEqualTo(1);
 
@@ -353,6 +401,7 @@ public class BehandlingDtoTjenesteTest {
         assertThat(behandlingDto.getFagsakId()).isEqualTo(behandling.getFagsakId());
         assertThat(behandlingDto.getType()).isEqualByComparingTo(BehandlingType.TILBAKEKREVING);
         assertThat(behandlingDto.isKanHenleggeBehandling()).isFalse();
+        assertThat(behandlingDto.getBehandlingsresultat().getType()).isEqualByComparingTo(behandlingResultatType);
         return behandlingDto;
     }
 

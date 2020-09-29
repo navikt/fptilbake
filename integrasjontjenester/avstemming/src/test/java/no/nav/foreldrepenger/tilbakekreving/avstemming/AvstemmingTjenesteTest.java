@@ -65,7 +65,7 @@ public class AvstemmingTjenesteTest {
         Behandling behandling = scenario
             .medDefaultKravgrunnlag()
             .medFullInnkreving()
-            .medBehandlingResultatType(BehandlingResultatType.FASTSATT)
+            .medBehandlingResultatType(BehandlingResultatType.FULL_TILBAKEBETALING)
             .medVedtak(LocalDate.now(), VedtakResultatType.FULL_TILBAKEBETALING)
             .lagre(behandlingRepositoryProvider);
 
@@ -83,7 +83,7 @@ public class AvstemmingTjenesteTest {
         Behandling behandling = scenario
             .medDefaultKravgrunnlag()
             .medFullInnkreving()
-            .medBehandlingResultatType(BehandlingResultatType.FASTSATT)
+            .medBehandlingResultatType(BehandlingResultatType.FULL_TILBAKEBETALING)
             .medVedtak(LocalDate.now(), VedtakResultatType.FULL_TILBAKEBETALING)
             .lagre(behandlingRepositoryProvider);
 
@@ -101,7 +101,7 @@ public class AvstemmingTjenesteTest {
         Behandling behandling = scenario
             .medDefaultKravgrunnlag()
             .medIngenInnkreving()
-            .medBehandlingResultatType(BehandlingResultatType.FASTSATT)
+            .medBehandlingResultatType(BehandlingResultatType.INGEN_TILBAKEBETALING)
             .medVedtak(LocalDate.now(), VedtakResultatType.INGEN_TILBAKEBETALING)
             .lagre(behandlingRepositoryProvider);
         when(aktørConsumerMock.hentPersonIdentForAktørId(Mockito.any())).thenReturn(Optional.of("12345678901"));
@@ -126,7 +126,7 @@ public class AvstemmingTjenesteTest {
             .medBehandlingType(BehandlingType.REVURDERING_TILBAKEKREVING)
             .medDefaultKravgrunnlag()
             .medIngenInnkreving()
-            .medBehandlingResultatType(BehandlingResultatType.FASTSATT)
+            .medBehandlingResultatType(BehandlingResultatType.INGEN_TILBAKEBETALING)
             .medVedtak(LocalDate.now(), VedtakResultatType.INGEN_TILBAKEBETALING)
             .lagre(behandlingRepositoryProvider);
 

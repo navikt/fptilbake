@@ -83,7 +83,9 @@ public class BehandlingTilstandTjenesteTest {
 
     @Test
     public void skal_utlede_behandlingtilstand_for_fattet_behandling() {
-        behandlingresultatRepository.lagre(Behandlingsresultat.builder().medBehandling(behandling).medBehandlingResultatType(BehandlingResultatType.FASTSATT).build());
+        behandlingresultatRepository.lagre(Behandlingsresultat.builder()
+            .medBehandling(behandling)
+            .medBehandlingResultatType(BehandlingResultatType.FULL_TILBAKEBETALING).build());
 
         behandling.setBehandlendeOrganisasjonsEnhet(new OrganisasjonsEnhet("1234", "foo bar"));
         behandling.setAnsvarligSaksbehandler("Z111111");
@@ -101,7 +103,7 @@ public class BehandlingTilstandTjenesteTest {
         assertThat(tilstand.getReferertFagsakBehandlingUuid()).isEqualTo(EKSTERN_UUID);
         assertThat(tilstand.getBehandlingType()).isEqualTo(BehandlingType.TILBAKEKREVING);
         assertThat(tilstand.getBehandlingStatus()).isEqualTo(BehandlingStatus.AVSLUTTET);
-        assertThat(tilstand.getBehandlingResultat()).isEqualTo(BehandlingResultat.FASTSATT);
+        assertThat(tilstand.getBehandlingResultat()).isEqualTo(BehandlingResultat.FULL_TILBAKEBETALING);
         assertThat(tilstand.venterPåBruker()).isFalse();
         assertThat(tilstand.venterPåØkonomi()).isFalse();
         assertThat(tilstand.erBehandlingManueltOpprettet()).isFalse();

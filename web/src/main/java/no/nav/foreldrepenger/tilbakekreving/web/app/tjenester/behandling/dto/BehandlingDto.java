@@ -40,6 +40,7 @@ public class BehandlingDto {
     private List<BehandlingÅrsakDto> behandlingÅrsaker;
     private boolean kanHenleggeBehandling;
     private boolean harVerge;
+    private BehandlingsresultatDto behandlingsresultat;
 
     /**
      * REST HATEOAS - pekere på data innhold som hentes fra andre url'er, eller handlinger som er tilgjengelig på behandling.
@@ -237,5 +238,13 @@ public class BehandlingDto {
 
     public void setHarVerge(boolean harVerge) {
         this.harVerge = harVerge;
+    }
+
+    public BehandlingsresultatDto getBehandlingsresultat() {
+        return behandlingsresultat;
+    }
+
+    public void setBehandlingsresultat(BehandlingsresultatDto behandlingsresultat) {
+        this.behandlingsresultat = behandlingsresultat;
     }
 }
