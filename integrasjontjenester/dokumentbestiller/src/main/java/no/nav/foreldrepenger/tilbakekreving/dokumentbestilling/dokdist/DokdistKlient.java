@@ -10,6 +10,7 @@ import javax.ws.rs.core.UriBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker;
 import no.nav.journalpostapi.dto.sak.FagsakSystem;
 import no.nav.vedtak.felles.integrasjon.rest.OidcRestClient;
 import no.nav.vedtak.konfig.KonfigVerdi;
@@ -41,25 +42,14 @@ public class DokdistKlient {
         return oidcRestClient.post(dokdistUri, request, DistribuerJournalpostResponse.class);
     }
 
-    public void distribuerJournalpostTilBruker(String journalpostId) {
+    public void distribuerJournalpost(String journalpostId, BrevMottaker mottaker) {
         DistribuerJournalpostRequest request = DistribuerJournalpostRequest.builder()
             .medJournalpostId(journalpostId)
             .medBestillendeFagsystem(getBestillendeFagsystem().getKode())
             .medDokumentProdApp(applicationName)
             .build();
         DistribuerJournalpostResponse response = distribuerJournalpost(request);
-        logger.info("Bestilt distribusjon av journalpost til bruker, bestillingId ble {}", response.getBestillingsId());
-    }
-
-    public void distribuerJournalpostTilVerge(String journalpostId, Adresse vergeAdresse) {
-        DistribuerJournalpostRequest request = DistribuerJournalpostRequest.builder()
-            .medJournalpostId(journalpostId)
-            .medBestillendeFagsystem(getBestillendeFagsystem().getKode())
-            .medDokumentProdApp(applicationName)
-            .medAdresse(vergeAdresse)
-            .build();
-        DistribuerJournalpostResponse response = distribuerJournalpost(request);
-        logger.info("Bestilt distribusjon av journalpost til Verge, bestillingId ble {}", response.getBestillingsId());
+        logger.info("Bestilt distribusjon av journalpost til {}, bestillingId ble {}", mottaker, response.getBestillingsId());
     }
 
     private FagsakSystem getBestillendeFagsystem() {

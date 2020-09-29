@@ -3,8 +3,6 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.header.TekstformatererHeader;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.JournalpostIdOgDokumentId;
 import no.nav.foreldrepenger.tilbakekreving.pdfgen.PdfGenerator;
@@ -51,27 +49,9 @@ public class PdfBrevTjeneste {
         prosessTaskData.setProperty("behandlingId", behandlingId.toString());
         prosessTaskData.setProperty("journalpostId", dokumentreferanse.getJournalpostId().getVerdi());
         prosessTaskData.setProperty("mottaker", data.getMottaker().name());
-        if (data.getMottaker() != BrevMottaker.BRUKER) {
-            Adresseinfo mottakerAdresse = data.getMetadata().getMottakerAdresse();
-            setHvisHarVerdi(prosessTaskData, "mottaker.adresselinje1", mottakerAdresse.getAdresselinje1());
-            setHvisHarVerdi(prosessTaskData, "mottaker.adresselinje2", mottakerAdresse.getAdresselinje2());
-            setHvisHarVerdi(prosessTaskData, "mottaker.adresselinje3", mottakerAdresse.getAdresselinje3());
-            setHvisHarVerdi(prosessTaskData, "mottaker.postnr", mottakerAdresse.getPostNr());
-            setHvisHarVerdi(prosessTaskData, "mottaker.poststed", mottakerAdresse.getPoststed());
-            setHvisHarVerdi(prosessTaskData, "mottaker.land", mottakerAdresse.getLand());
-            if (mottakerAdresse.getAdresselinje4() != null && !mottakerAdresse.getAdresselinje4().isBlank()) {
-                throw new IllegalArgumentException("adresselinje4 er ikke støttet av dokdist");
-            }
-        }
         prosessTaskRepository.lagre(prosessTaskData);
 
         return dokumentreferanse;
-    }
-
-    private static void setHvisHarVerdi(ProsessTaskData data, String navn, String verdi) {
-        if (verdi != null && !verdi.isBlank()) {
-            data.setProperty(navn, verdi);
-        }
     }
 
     private String lagHtml(BrevData data) {
