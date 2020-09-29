@@ -14,6 +14,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporing;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.DetaljertBrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.VergeRepository;
@@ -79,20 +80,20 @@ public class HenleggelsesbrevTjeneste {
         HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = lagHenleggelsebrevForSending(behandling, fritekst, brevMottaker);
         FritekstbrevData fritekstbrevData = BehandlingType.TILBAKEKREVING.equals(behandling.getType()) ?
             lagHenleggelsebrev(henleggelsesbrevSamletInfo) : lagRevurderingHenleggelsebrev(henleggelsesbrevSamletInfo);
-        JournalpostIdOgDokumentId dokumentreferanse;
         if (BrevToggle.brukDokprod()) {
-            dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(fritekstbrevData);
+            JournalpostIdOgDokumentId dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(fritekstbrevData);
+            opprettHistorikkinnslag(behandling, dokumentreferanse, brevMottaker);
+            lagreInfoOmHenleggelsesbrev(behandlingId, dokumentreferanse);
+            return Optional.ofNullable(dokumentreferanse);
         } else {
-            dokumentreferanse = pdfBrevTjeneste.sendBrevSomIkkeErVedtaksbrev(behandlingId, BrevData.builder()
+            JournalpostIdOgDokumentId dokumentreferanse = pdfBrevTjeneste.sendBrev(behandlingId, DetaljertBrevType.HENLEGGELSE, BrevData.builder()
                 .setMottaker(brevMottaker)
                 .setMetadata(fritekstbrevData.getBrevMetadata())
                 .setOverskrift(fritekstbrevData.getOverskrift())
                 .setBrevtekst(fritekstbrevData.getBrevtekst())
                 .build());
+            return Optional.ofNullable(dokumentreferanse);
         }
-        opprettHistorikkinnslag(behandling, dokumentreferanse, brevMottaker);
-        lagreInfoOmHenleggelsesbrev(behandlingId, dokumentreferanse);
-        return Optional.ofNullable(dokumentreferanse);
     }
 
     public byte[] hentForhåndsvisningHenleggelsebrev(UUID behandlingUuid, String fritekst) {

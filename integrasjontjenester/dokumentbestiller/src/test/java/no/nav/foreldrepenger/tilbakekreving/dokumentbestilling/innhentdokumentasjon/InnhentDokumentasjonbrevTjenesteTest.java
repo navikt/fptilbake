@@ -17,6 +17,7 @@ import org.junit.runner.RunWith;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporing;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.DetaljertBrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
@@ -60,7 +61,7 @@ public class InnhentDokumentasjonbrevTjenesteTest extends DokumentBestillerTestO
         when(mockFritekstbrevTjeneste.sendFritekstbrev(any(FritekstbrevData.class))).thenReturn(lagJournalOgDokument());
         when(mockFritekstbrevTjeneste.hentForhåndsvisningFritekstbrev(any(FritekstbrevData.class))).thenReturn(FLERE_OPPLYSNINGER.getBytes());
 
-        when(mockPdfBrevTjeneste.sendBrevSomIkkeErVedtaksbrev(anyLong(), any(BrevData.class))).thenReturn(lagJournalOgDokument());
+        when(mockPdfBrevTjeneste.sendBrev(anyLong(), any(DetaljertBrevType.class), any(BrevData.class))).thenReturn(lagJournalOgDokument());
         when(mockPdfBrevTjeneste.genererForhåndsvisning(any(BrevData.class))).thenReturn(FLERE_OPPLYSNINGER.getBytes());
 
         when(mockEksternDataForBrevTjeneste.hentYtelsenavn(FagsakYtelseType.FORELDREPENGER, Språkkode.nb))

@@ -40,6 +40,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Foreldel
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporing;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.DetaljertBrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstOppsummering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstRepository;
@@ -179,13 +180,15 @@ public class VedtaksbrevTjeneste {
             .build();
 
 
-        JournalpostIdOgDokumentId dokumentreferanse;
         if (BrevToggle.brukDokprod()) {
             byte[] vedlegg = lagVedtaksbrevVedleggTabellPdf(vedtaksbrevData);
             JournalpostIdOgDokumentId vedleggReferanse = journalføringTjeneste.journalførVedlegg(behandlingId, vedlegg);
-            dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data, vedleggReferanse);
+            JournalpostIdOgDokumentId dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data, vedleggReferanse);
+            Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
+            opprettHistorikkinnslag(behandling, dokumentreferanse, brevMottaker);
+            lagreInfoOmVedtaksbrev(behandlingId, dokumentreferanse);
         } else {
-            dokumentreferanse = pdfBrevTjeneste.sendVedtaksbrev(behandlingId, BrevData.builder()
+            pdfBrevTjeneste.sendBrev(behandlingId, DetaljertBrevType.VEDTAK, BrevData.builder()
                 .setMottaker(brevMottaker)
                 .setMetadata(data.getBrevMetadata())
                 .setOverskrift(data.getOverskrift())
@@ -193,10 +196,6 @@ public class VedtaksbrevTjeneste {
                 .setVedleggHtml(TekstformatererVedtaksbrev.lagVedtaksbrevVedleggHtml(vedtaksbrevData.getVedtaksbrevData()))
                 .build());
         }
-
-        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-        opprettHistorikkinnslag(behandling, dokumentreferanse, brevMottaker);
-        lagreInfoOmVedtaksbrev(behandlingId, dokumentreferanse);
     }
 
     private byte[] lagVedtaksbrevVedleggTabellPdf(VedtaksbrevData vedtaksbrevData) {

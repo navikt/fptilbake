@@ -10,6 +10,7 @@ import javax.ws.rs.core.UriBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker;
 import no.nav.journalpostapi.dto.sak.FagsakSystem;
 import no.nav.vedtak.felles.integrasjon.rest.OidcRestClient;
@@ -42,9 +43,9 @@ public class DokdistKlient {
         return oidcRestClient.post(dokdistUri, request, DistribuerJournalpostResponse.class);
     }
 
-    public void distribuerJournalpost(String journalpostId, BrevMottaker mottaker) {
+    public void distribuerJournalpost(JournalpostId journalpostId, BrevMottaker mottaker) {
         DistribuerJournalpostRequest request = DistribuerJournalpostRequest.builder()
-            .medJournalpostId(journalpostId)
+            .medJournalpostId(journalpostId.getVerdi())
             .medBestillendeFagsystem(getBestillendeFagsystem().getKode())
             .medDokumentProdApp(applicationName)
             .build();

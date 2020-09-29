@@ -17,6 +17,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporing;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.DetaljertBrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.VergeRepository;
@@ -80,19 +81,19 @@ public class InnhentDokumentasjonbrevTjeneste {
         InnhentDokumentasjonbrevSamletInfo innhentDokumentasjonBrevSamletInfo = settOppInnhentDokumentasjonBrevSamletInfo(behandling, fritekst, brevMottaker);
         FritekstbrevData fritekstbrevData = lagInnhentDokumentasjonBrev(innhentDokumentasjonBrevSamletInfo);
 
-        JournalpostIdOgDokumentId dokumentReferanse;
         if (BrevToggle.brukDokprod()) {
-            dokumentReferanse = bestillDokumentTjeneste.sendFritekstbrev(fritekstbrevData);
+            JournalpostIdOgDokumentId dokumentReferanse = bestillDokumentTjeneste.sendFritekstbrev(fritekstbrevData);
+            opprettHistorikkinnslag(behandling, dokumentReferanse, getTittel(brevMottaker));
+            lagreInfoOmInnhentDokumentasjonBrev(behandlingId, dokumentReferanse);
         } else {
-            dokumentReferanse = pdfBrevTjeneste.sendBrevSomIkkeErVedtaksbrev(behandlingId, BrevData.builder()
+            pdfBrevTjeneste.sendBrev(behandlingId, DetaljertBrevType.INNHENT_DOKUMETASJON, BrevData.builder()
                 .setMottaker(brevMottaker)
                 .setMetadata(fritekstbrevData.getBrevMetadata())
                 .setOverskrift(fritekstbrevData.getOverskrift())
                 .setBrevtekst(fritekstbrevData.getBrevtekst())
                 .build());
         }
-        opprettHistorikkinnslag(behandling, dokumentReferanse, getTittel(brevMottaker));
-        lagreInfoOmInnhentDokumentasjonBrev(behandlingId, dokumentReferanse);
+
     }
 
     public byte[] hentForhåndsvisningInnhentDokumentasjonBrev(Long behandlingId, String fritekst) {

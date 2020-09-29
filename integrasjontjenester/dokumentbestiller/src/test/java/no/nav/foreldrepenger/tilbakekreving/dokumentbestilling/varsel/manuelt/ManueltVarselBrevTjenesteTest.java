@@ -25,6 +25,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FaktaFeilutbetalingT
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BehandlingFeilutbetalingFakta;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.UtbetaltPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.DetaljertBrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.dokumentbestiller.DokumentMalType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
@@ -75,7 +76,7 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
         behandlingId = behandling.getId();
         when(mockFeilutbetalingTjeneste.hentBehandlingFeilutbetalingFakta(behandlingId)).thenReturn(lagFeilutbetalingFakta());
         when(mockFritekstbrevTjeneste.sendFritekstbrev(any(FritekstbrevData.class))).thenReturn(lagJournalOgDokument());
-        when(mockPdfBrevTjeneste.sendBrevSomIkkeErVedtaksbrev(anyLong(), any(BrevData.class))).thenReturn(lagJournalOgDokument());
+        when(mockPdfBrevTjeneste.sendBrev(anyLong(), any(DetaljertBrevType.class), anyLong(), any(BrevData.class))).thenReturn(lagJournalOgDokument());
 
         when(mockEksternDataForBrevTjeneste.hentYtelsenavn(FagsakYtelseType.FORELDREPENGER, Språkkode.nb))
             .thenReturn(lagYtelseNavn("foreldrepenger", "foreldrepenger"));

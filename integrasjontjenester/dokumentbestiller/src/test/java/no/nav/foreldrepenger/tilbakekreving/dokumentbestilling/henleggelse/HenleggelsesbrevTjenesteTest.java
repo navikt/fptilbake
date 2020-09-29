@@ -24,6 +24,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporing;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.DetaljertBrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
@@ -84,7 +85,7 @@ public class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
         when(mockFritekstbrevTjeneste.sendFritekstbrev(any(FritekstbrevData.class))).thenReturn(lagJournalOgDokument());
         when(mockFritekstbrevTjeneste.hentForhåndsvisningFritekstbrev(any(FritekstbrevData.class))).thenReturn(varselTekst.getBytes());
 
-        when(mockPdfBrevTjeneste.sendBrevSomIkkeErVedtaksbrev(anyLong(), any(BrevData.class))).thenReturn(lagJournalOgDokument());
+        when(mockPdfBrevTjeneste.sendBrev(anyLong(), any(DetaljertBrevType.class), any(BrevData.class))).thenReturn(lagJournalOgDokument());
         when(mockPdfBrevTjeneste.genererForhåndsvisning( any(BrevData.class))).thenReturn(varselTekst.getBytes());
 
         when(mockEksternDataForBrevTjeneste.hentYtelsenavn(FagsakYtelseType.FORELDREPENGER, Språkkode.nb))

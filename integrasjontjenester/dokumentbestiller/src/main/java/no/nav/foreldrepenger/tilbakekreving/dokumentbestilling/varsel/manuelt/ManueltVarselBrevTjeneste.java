@@ -16,6 +16,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporing;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.DetaljertBrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.VergeRepository;
@@ -92,20 +93,20 @@ public class ManueltVarselBrevTjeneste {
 
         FritekstbrevData data = lagManueltVarselBrev(varselbrevSamletInfo);
 
-        JournalpostIdOgDokumentId dokumentreferanse;
         if (BrevToggle.brukDokprod()) {
-            dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data);
+            JournalpostIdOgDokumentId dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data);
+            String tittel = BrevMottaker.VERGE.equals(brevMottaker) ? TITTEL_VARSELBREV_HISTORIKKINNSLAG_TIL_VERGE : TITTEL_VARSELBREV_HISTORIKKINNSLAG;
+            opprettHistorikkinnslag(behandling, dokumentreferanse, tittel);
+            lagreVarselData(behandlingId, dokumentreferanse, fritekst, varselbrevSamletInfo.getSumFeilutbetaling());
         } else {
-            dokumentreferanse = pdfBrevTjeneste.sendBrevSomIkkeErVedtaksbrev(behandlingId, BrevData.builder()
+            Long varsletFeilutbetaling = varselbrevSamletInfo.getSumFeilutbetaling();
+            pdfBrevTjeneste.sendBrev(behandlingId, DetaljertBrevType.VARSEL, varsletFeilutbetaling, BrevData.builder()
                 .setMottaker(brevMottaker)
                 .setMetadata(data.getBrevMetadata())
                 .setOverskrift(data.getOverskrift())
                 .setBrevtekst(data.getBrevtekst())
                 .build());
         }
-        String tittel = BrevMottaker.VERGE.equals(brevMottaker) ? TITTEL_VARSELBREV_HISTORIKKINNSLAG_TIL_VERGE : TITTEL_VARSELBREV_HISTORIKKINNSLAG;
-        opprettHistorikkinnslag(behandling, dokumentreferanse, tittel);
-        lagreVarselData(behandlingId, dokumentreferanse, fritekst, varselbrevSamletInfo.getSumFeilutbetaling());
     }
 
     public byte[] hentForhåndsvisningManueltVarselbrev(Long behandlingId, DokumentMalType malType, String fritekst) {
@@ -164,20 +165,21 @@ public class ManueltVarselBrevTjeneste {
 
         FritekstbrevData data = lagKorrigertVarselBrev(varselbrevSamletInfo, varselInfo);
 
-        JournalpostIdOgDokumentId dokumentreferanse;
         if (BrevToggle.brukDokprod()) {
-            dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data);
+            JournalpostIdOgDokumentId dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data);
+            String tittel = BrevMottaker.VERGE.equals(brevMottaker) ? TITTEL_KORRIGERT_VARSELBREV_HISTORIKKINNSLAG_TIL_VERGE : TITTEL_KORRIGERT_VARSELBREV_HISTORIKKINNSLAG;
+            opprettHistorikkinnslag(behandling, dokumentreferanse, tittel);
+            lagreVarselData(behandlingId, dokumentreferanse, fritekst, varselbrevSamletInfo.getSumFeilutbetaling());
         } else {
-            dokumentreferanse = pdfBrevTjeneste.sendBrevSomIkkeErVedtaksbrev(behandlingId, BrevData.builder()
+            Long varsletFeilutbetaling = varselbrevSamletInfo.getSumFeilutbetaling();
+            pdfBrevTjeneste.sendBrev(behandlingId, DetaljertBrevType.KORRIGERT_VARSEL, varsletFeilutbetaling, BrevData.builder()
                 .setMottaker(brevMottaker)
                 .setOverskrift(data.getOverskrift())
                 .setBrevtekst(data.getBrevtekst())
                 .setMetadata(data.getBrevMetadata())
                 .build());
         }
-        String tittel = BrevMottaker.VERGE.equals(brevMottaker) ? TITTEL_KORRIGERT_VARSELBREV_HISTORIKKINNSLAG_TIL_VERGE : TITTEL_KORRIGERT_VARSELBREV_HISTORIKKINNSLAG;
-        opprettHistorikkinnslag(behandling, dokumentreferanse, tittel);
-        lagreVarselData(behandlingId, dokumentreferanse, fritekst, varselbrevSamletInfo.getSumFeilutbetaling());
+
     }
 
     private FritekstbrevData lagManueltVarselBrev(VarselbrevSamletInfo varselbrevSamletInfo) {

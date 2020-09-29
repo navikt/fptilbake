@@ -3,6 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.DetaljertBrevType;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.header.TekstformatererHeader;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.JournalpostIdOgDokumentId;
 import no.nav.foreldrepenger.tilbakekreving.pdfgen.PdfGenerator;
@@ -32,26 +33,45 @@ public class PdfBrevTjeneste {
         return pdfGenerator.genererPDFMedLogo(html);
     }
 
-    public JournalpostIdOgDokumentId sendVedtaksbrev(Long behandlingId, BrevData data) {
-        return sendBrev(behandlingId, data, Dokumentkategori.Vedtaksbrev);
+    public JournalpostIdOgDokumentId sendBrev(Long behandlingId, DetaljertBrevType detaljertBrevType, BrevData data) {
+        return sendBrev(behandlingId, detaljertBrevType, null, data);
     }
 
-    public JournalpostIdOgDokumentId sendBrevSomIkkeErVedtaksbrev(Long behandlingId, BrevData data) {
-        return sendBrev(behandlingId, data, Dokumentkategori.Brev);
-    }
+    public JournalpostIdOgDokumentId sendBrev(Long behandlingId, DetaljertBrevType detaljertBrevType, Long varsletBeløp, BrevData data) {
+        valider(detaljertBrevType, varsletBeløp);
 
-    private JournalpostIdOgDokumentId sendBrev(Long behandlingId, BrevData data, Dokumentkategori dokumentkategori) {
         String html = lagHtml(data);
         byte[] pdf = pdfGenerator.genererPDFMedLogo(html);
-        JournalpostIdOgDokumentId dokumentreferanse = journalføringTjeneste.journalførUtgåendeBrev(behandlingId, dokumentkategori, data.getMetadata(), data.getMottaker(), pdf);
+        JournalpostIdOgDokumentId dokumentreferanse = journalføringTjeneste.journalførUtgåendeBrev(behandlingId, mapBrevTypeTilDokumentKategori(detaljertBrevType), data.getMetadata(), data.getMottaker(), pdf);
 
         ProsessTaskData prosessTaskData = new ProsessTaskData(PubliserJournalpostTask.TASKTYPE);
         prosessTaskData.setProperty("behandlingId", behandlingId.toString());
         prosessTaskData.setProperty("journalpostId", dokumentreferanse.getJournalpostId().getVerdi());
         prosessTaskData.setProperty("mottaker", data.getMottaker().name());
+        prosessTaskData.setProperty("detaljertBrevType", detaljertBrevType.name());
+        if (varsletBeløp != null) {
+            //TODO helst lag en løsning hvor varsletBeløp ikke er i generell kode for brev
+            prosessTaskData.setProperty("varsletBeloep", Long.toString(varsletBeløp));
+        }
         prosessTaskRepository.lagre(prosessTaskData);
 
         return dokumentreferanse;
+    }
+
+    private static void valider(DetaljertBrevType brevType, Long varsletBeløp) {
+        boolean erVarsel = brevType == DetaljertBrevType.VARSEL || brevType == DetaljertBrevType.KORRIGERT_VARSEL;
+        boolean harVarsletBeløp = varsletBeløp != null;
+        if (erVarsel != harVarsletBeløp) {
+            throw new IllegalArgumentException("Utvikler-feil: Varslet beløp skal brukes hvis, og bare hvis, brev gjelder varsel");
+        }
+    }
+
+    private Dokumentkategori mapBrevTypeTilDokumentKategori(DetaljertBrevType brevType) {
+        if (DetaljertBrevType.VEDTAK == brevType) {
+            return Dokumentkategori.Vedtaksbrev;
+        } else {
+            return Dokumentkategori.Brev;
+        }
     }
 
     private String lagHtml(BrevData data) {
