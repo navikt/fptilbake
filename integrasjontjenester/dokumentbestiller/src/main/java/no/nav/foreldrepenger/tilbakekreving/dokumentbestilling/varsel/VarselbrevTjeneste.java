@@ -106,7 +106,8 @@ public class VarselbrevTjeneste {
             return Optional.of(dokumentreferanse);
         } else {
             Long varsletFeilutbetaling = varselbrevSamletInfo.getSumFeilutbetaling();
-            JournalpostIdOgDokumentId dokumentreferanse = pdfBrevTjeneste.sendBrev(behandlingId, DetaljertBrevType.VARSEL, varsletFeilutbetaling, BrevData.builder()
+            String fritekst = varselbrevSamletInfo.getFritekstFraSaksbehandler();
+            JournalpostIdOgDokumentId dokumentreferanse = pdfBrevTjeneste.sendBrev(behandlingId, DetaljertBrevType.VARSEL, varsletFeilutbetaling, fritekst, BrevData.builder()
                 .setMottaker(brevMottaker)
                 .setMetadata(data.getBrevMetadata())
                 .setOverskrift(data.getOverskrift())

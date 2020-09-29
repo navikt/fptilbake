@@ -3,6 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.manuelt;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -70,7 +71,7 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
         behandlingId = behandling.getId();
         when(mockFeilutbetalingTjeneste.hentBehandlingFeilutbetalingFakta(behandlingId)).thenReturn(lagFeilutbetalingFakta());
         when(mockFritekstbrevTjeneste.sendFritekstbrev(any(FritekstbrevData.class))).thenReturn(lagJournalOgDokument());
-        when(mockPdfBrevTjeneste.sendBrev(anyLong(), any(DetaljertBrevType.class), anyLong(), any(BrevData.class))).thenReturn(lagJournalOgDokument());
+        when(mockPdfBrevTjeneste.sendBrev(anyLong(), any(DetaljertBrevType.class), anyLong(), anyString(), any(BrevData.class))).thenReturn(lagJournalOgDokument());
 
         when(mockEksternDataForBrevTjeneste.hentYtelsenavn(FagsakYtelseType.FORELDREPENGER, Språkkode.nb))
             .thenReturn(lagYtelseNavn("foreldrepenger", "foreldrepenger"));
@@ -92,7 +93,7 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
     public void skal_sende_manuelt_varselbrev() {
         manueltVarselBrevTjeneste.sendManueltVarselBrev(behandlingId, VARSEL_TEKST, BrevMottaker.BRUKER);
 
-        Mockito.verify(mockPdfBrevTjeneste).sendBrev(eq(behandlingId), eq(DetaljertBrevType.VARSEL), eq(Long.valueOf(9000L)), any(BrevData.class));
+        Mockito.verify(mockPdfBrevTjeneste).sendBrev(eq(behandlingId), eq(DetaljertBrevType.VARSEL), eq(Long.valueOf(9000L)), anyString(), any(BrevData.class));
     }
 
     @Test
@@ -106,7 +107,7 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
         manueltVarselBrevTjeneste.sendKorrigertVarselBrev(behandlingId, KORRIGERT_VARSEL_TEKST, BrevMottaker.BRUKER);
 
         //assert
-        Mockito.verify(mockPdfBrevTjeneste).sendBrev(eq(behandlingId), eq(DetaljertBrevType.KORRIGERT_VARSEL), eq(Long.valueOf(9000L)), any(BrevData.class));
+        Mockito.verify(mockPdfBrevTjeneste).sendBrev(eq(behandlingId), eq(DetaljertBrevType.KORRIGERT_VARSEL), eq(Long.valueOf(9000L)), anyString(), any(BrevData.class));
     }
 
     @Test
@@ -121,7 +122,7 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
         manueltVarselBrevTjeneste.sendKorrigertVarselBrev(behandlingId, VARSEL_TEKST, BrevMottaker.VERGE);
 
         //assert
-        Mockito.verify(mockPdfBrevTjeneste).sendBrev(eq(behandlingId), eq(DetaljertBrevType.KORRIGERT_VARSEL), eq(Long.valueOf(9000L)), any(BrevData.class));
+        Mockito.verify(mockPdfBrevTjeneste).sendBrev(eq(behandlingId), eq(DetaljertBrevType.KORRIGERT_VARSEL), eq(Long.valueOf(9000L)), anyString(), any(BrevData.class));
     }
 
     @Test

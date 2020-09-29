@@ -100,7 +100,7 @@ public class ManueltVarselBrevTjeneste {
             lagreVarselData(behandlingId, dokumentreferanse, fritekst, varselbrevSamletInfo.getSumFeilutbetaling());
         } else {
             Long varsletFeilutbetaling = varselbrevSamletInfo.getSumFeilutbetaling();
-            pdfBrevTjeneste.sendBrev(behandlingId, DetaljertBrevType.VARSEL, varsletFeilutbetaling, BrevData.builder()
+            pdfBrevTjeneste.sendBrev(behandlingId, DetaljertBrevType.VARSEL, varsletFeilutbetaling, fritekst, BrevData.builder()
                 .setMottaker(brevMottaker)
                 .setMetadata(data.getBrevMetadata())
                 .setOverskrift(data.getOverskrift())
@@ -172,7 +172,7 @@ public class ManueltVarselBrevTjeneste {
             lagreVarselData(behandlingId, dokumentreferanse, fritekst, varselbrevSamletInfo.getSumFeilutbetaling());
         } else {
             Long varsletFeilutbetaling = varselbrevSamletInfo.getSumFeilutbetaling();
-            pdfBrevTjeneste.sendBrev(behandlingId, DetaljertBrevType.KORRIGERT_VARSEL, varsletFeilutbetaling, BrevData.builder()
+            pdfBrevTjeneste.sendBrev(behandlingId, DetaljertBrevType.KORRIGERT_VARSEL, varsletFeilutbetaling, fritekst, BrevData.builder()
                 .setMottaker(brevMottaker)
                 .setOverskrift(data.getOverskrift())
                 .setBrevtekst(data.getBrevtekst())
