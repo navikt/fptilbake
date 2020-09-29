@@ -58,7 +58,7 @@ public class PubliserJournalpostTask implements ProsessTaskHandler {
     }
 
     private void lagreVarsletBeløp(Long behandlingId, Long varseltBeløp) {
-        varselRepository.lagreVarseltBeløp(behandlingId, varseltBeløp);
+        varselRepository.lagre(behandlingId, null, varseltBeløp);
     }
 
     private static JournalpostIdOgDokumentId finnJournalpostIdOgDokumentId(ProsessTaskData prosessTaskData) {
