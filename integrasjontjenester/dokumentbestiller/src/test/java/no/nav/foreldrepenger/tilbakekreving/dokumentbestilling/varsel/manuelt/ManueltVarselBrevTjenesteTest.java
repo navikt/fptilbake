@@ -3,14 +3,13 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.manuelt;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.Comparator;
-import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -18,6 +17,7 @@ import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 
 import com.google.common.collect.Lists;
 
@@ -29,10 +29,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.Det
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.dokumentbestiller.DokumentMalType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselInfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.DokumentBestillerTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker;
@@ -68,10 +64,8 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
 
     @Before
     public void setup() {
-        HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepository,
-            mockPersoninfoAdapter);
-        manueltVarselBrevTjeneste = new ManueltVarselBrevTjeneste(repositoryProvider, mockEksternDataForBrevTjeneste,
-            mockFeilutbetalingTjeneste, mockFritekstbrevTjeneste, historikkinnslagTjeneste, mockPdfBrevTjeneste);
+        HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepository, mockPersoninfoAdapter);
+        manueltVarselBrevTjeneste = new ManueltVarselBrevTjeneste(repositoryProvider, mockEksternDataForBrevTjeneste, mockFeilutbetalingTjeneste, mockFritekstbrevTjeneste, historikkinnslagTjeneste, mockPdfBrevTjeneste);
 
         behandlingId = behandling.getId();
         when(mockFeilutbetalingTjeneste.hentBehandlingFeilutbetalingFakta(behandlingId)).thenReturn(lagFeilutbetalingFakta());
@@ -98,88 +92,36 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
     public void skal_sende_manuelt_varselbrev() {
         manueltVarselBrevTjeneste.sendManueltVarselBrev(behandlingId, VARSEL_TEKST, BrevMottaker.BRUKER);
 
-        Optional<VarselInfo> varselInfo = varselRepository.finnVarsel(behandlingId);
-        assertThat(varselInfo).isPresent();
-        VarselInfo varsel = varselInfo.get();
-        assertThat(varsel.getVarselTekst()).isEqualTo(VARSEL_TEKST);
-        assertThat(varsel.getVarselBeløp()).isEqualTo(9000l);
-        assertThat(varsel.isAktiv()).isTrue();
-
-        assertThat(brevSporingRepository.harVarselBrevSendtForBehandlingId(behandlingId)).isTrue();
-
-        List<Historikkinnslag> historikkInnslager = historikkRepository.hentHistorikk(behandlingId);
-        assertThat(historikkInnslager.size()).isEqualTo(1);
-        Historikkinnslag historikkinnslag = historikkInnslager.get(0);
-        assertThat(historikkinnslag.getAktør()).isEqualByComparingTo(HistorikkAktør.VEDTAKSLØSNINGEN);
-        assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.BREV_SENT);
-        assertThat(historikkinnslag.getDokumentLinker().get(0).getLinkTekst()).isEqualTo(ManueltVarselBrevTjeneste.TITTEL_VARSELBREV_HISTORIKKINNSLAG);
-    }
-
-    @Test
-    public void skal_sende_manuelt_varselbrev_med_verge() {
-        vergeRepository.lagreVergeInformasjon(behandlingId, lagVerge());
-        manueltVarselBrevTjeneste.sendManueltVarselBrev(behandlingId, VARSEL_TEKST, BrevMottaker.VERGE);
-
-        Optional<VarselInfo> varselInfo = varselRepository.finnVarsel(behandlingId);
-        assertThat(varselInfo).isPresent();
-        VarselInfo varsel = varselInfo.get();
-        assertThat(varsel.getVarselTekst()).isEqualTo(VARSEL_TEKST);
-        assertThat(varsel.getVarselBeløp()).isEqualTo(9000l);
-        assertThat(varsel.isAktiv()).isTrue();
-
-        List<Historikkinnslag> historikkInnslager = historikkRepository.hentHistorikk(behandlingId);
-        assertThat(historikkInnslager.size()).isEqualTo(1);
-        Historikkinnslag historikkinnslag = historikkInnslager.get(0);
-        assertThat(historikkinnslag.getAktør()).isEqualByComparingTo(HistorikkAktør.VEDTAKSLØSNINGEN);
-        assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.BREV_SENT);
-        assertThat(historikkinnslag.getDokumentLinker().get(0).getLinkTekst()).isEqualTo(ManueltVarselBrevTjeneste.TITTEL_VARSELBREV_HISTORIKKINNSLAG_TIL_VERGE);
+        Mockito.verify(mockPdfBrevTjeneste).sendBrev(eq(behandlingId), eq(DetaljertBrevType.VARSEL), eq(Long.valueOf(9000L)), any(BrevData.class));
     }
 
     @Test
     public void skal_sende_korrigert_varselbrev() {
+        //arrange
         manueltVarselBrevTjeneste.sendManueltVarselBrev(behandlingId, VARSEL_TEKST, BrevMottaker.BRUKER);
+        varselRepository.lagre(behandlingId, VARSEL_TEKST, 100L);
+        Mockito.clearInvocations(mockPdfBrevTjeneste);
+
+        //act
         manueltVarselBrevTjeneste.sendKorrigertVarselBrev(behandlingId, KORRIGERT_VARSEL_TEKST, BrevMottaker.BRUKER);
 
-        Optional<VarselInfo> varselInfo = varselRepository.finnVarsel(behandlingId);
-        assertThat(varselInfo).isPresent();
-        VarselInfo varsel = varselInfo.get();
-        assertThat(varsel.getVarselTekst()).isEqualTo(KORRIGERT_VARSEL_TEKST);
-        assertThat(varsel.getVarselBeløp()).isEqualTo(9000l);
-        assertThat(varsel.isAktiv()).isTrue();
-
-        assertThat(brevSporingRepository.harVarselBrevSendtForBehandlingId(behandlingId)).isTrue();
-
-        List<Historikkinnslag> historikkInnslager = historikkRepository.hentHistorikk(behandlingId);
-        assertThat(historikkInnslager.size()).isEqualTo(2);
-        historikkInnslager.sort(Comparator.comparing(Historikkinnslag::getId));
-        Historikkinnslag historikkinnslag = historikkInnslager.get(1);
-        assertThat(historikkinnslag.getAktør()).isEqualByComparingTo(HistorikkAktør.VEDTAKSLØSNINGEN);
-        assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.BREV_SENT);
-        assertThat(historikkinnslag.getDokumentLinker().get(0).getLinkTekst()).isEqualTo(ManueltVarselBrevTjeneste.TITTEL_KORRIGERT_VARSELBREV_HISTORIKKINNSLAG);
+        //assert
+        Mockito.verify(mockPdfBrevTjeneste).sendBrev(eq(behandlingId), eq(DetaljertBrevType.KORRIGERT_VARSEL), eq(Long.valueOf(9000L)), any(BrevData.class));
     }
 
     @Test
     public void skal_sende_korrigert_varselbrev_med_verge() {
+        //arrange
+        manueltVarselBrevTjeneste.sendManueltVarselBrev(behandlingId, VARSEL_TEKST, BrevMottaker.BRUKER);
+        varselRepository.lagre(behandlingId, VARSEL_TEKST, 100L);
+        Mockito.clearInvocations(mockPdfBrevTjeneste);
         vergeRepository.lagreVergeInformasjon(behandlingId, lagVerge());
-        manueltVarselBrevTjeneste.sendManueltVarselBrev(behandlingId, VARSEL_TEKST, BrevMottaker.VERGE);
-        manueltVarselBrevTjeneste.sendKorrigertVarselBrev(behandlingId, KORRIGERT_VARSEL_TEKST, BrevMottaker.VERGE);
 
-        Optional<VarselInfo> varselInfo = varselRepository.finnVarsel(behandlingId);
-        assertThat(varselInfo).isPresent();
-        VarselInfo varsel = varselInfo.get();
-        assertThat(varsel.getVarselTekst()).isEqualTo(KORRIGERT_VARSEL_TEKST);
-        assertThat(varsel.getVarselBeløp()).isEqualTo(9000l);
-        assertThat(varsel.isAktiv()).isTrue();
+        //act
+        manueltVarselBrevTjeneste.sendKorrigertVarselBrev(behandlingId, VARSEL_TEKST, BrevMottaker.VERGE);
 
-        assertThat(brevSporingRepository.harVarselBrevSendtForBehandlingId(behandlingId)).isTrue();
-
-        List<Historikkinnslag> historikkInnslager = historikkRepository.hentHistorikk(behandlingId);
-        assertThat(historikkInnslager.size()).isEqualTo(2);
-        historikkInnslager.sort(Comparator.comparing(Historikkinnslag::getId));
-        Historikkinnslag historikkinnslag = historikkInnslager.get(1);
-        assertThat(historikkinnslag.getAktør()).isEqualByComparingTo(HistorikkAktør.VEDTAKSLØSNINGEN);
-        assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.BREV_SENT);
-        assertThat(historikkinnslag.getDokumentLinker().get(0).getLinkTekst()).isEqualTo(ManueltVarselBrevTjeneste.TITTEL_KORRIGERT_VARSELBREV_HISTORIKKINNSLAG_TIL_VERGE);
+        //assert
+        Mockito.verify(mockPdfBrevTjeneste).sendBrev(eq(behandlingId), eq(DetaljertBrevType.KORRIGERT_VARSEL), eq(Long.valueOf(9000L)), any(BrevData.class));
     }
 
     @Test

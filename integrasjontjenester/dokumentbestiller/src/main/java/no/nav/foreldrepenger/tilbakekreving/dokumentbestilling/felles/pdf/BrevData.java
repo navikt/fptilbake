@@ -39,6 +39,27 @@ public class BrevData {
         return new Builder();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        BrevData brevData = (BrevData) o;
+        return metadata.equals(brevData.metadata) &&
+            overskrift.equals(brevData.overskrift) &&
+            mottaker == brevData.mottaker &&
+            brevtekst.equals(brevData.brevtekst) &&
+            Objects.equals(vedleggHtml, brevData.vedleggHtml);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(metadata, overskrift, mottaker, brevtekst, vedleggHtml);
+    }
+
     public static class Builder {
         private BrevMetadata metadata;
         private String overskrift;

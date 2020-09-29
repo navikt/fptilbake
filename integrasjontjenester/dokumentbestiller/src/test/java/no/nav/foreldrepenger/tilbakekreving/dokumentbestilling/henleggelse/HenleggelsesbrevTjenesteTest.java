@@ -4,15 +4,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingRevurderingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.HenleggBehandlingTjeneste;
@@ -28,8 +29,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.Det
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.DokumentBestillerTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker;
@@ -52,6 +51,8 @@ import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 @RunWith(CdiRunner.class)
 public class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
 
+    private static final String REVURDERING_HENLEGGELSESBREV_FRITEKST = "Revurderingen ble henlagt";
+
     private EksternDataForBrevTjeneste mockEksternDataForBrevTjeneste = mock(EksternDataForBrevTjeneste.class);
     private FritekstbrevTjeneste mockFritekstbrevTjeneste = mock(FritekstbrevTjeneste.class);
     private PersoninfoAdapter mockPersoninfoAdapter = mock(PersoninfoAdapter.class);
@@ -62,7 +63,6 @@ public class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
     private BehandlingRevurderingTjeneste behandlingRevurderingTjeneste;
 
     private Long behandlingId;
-    private static final String REVURDERING_HENLEGGELSESBREV_FRITEKST = "Revurderingen ble henlagt";
 
     @Before
     public void setup() {
@@ -112,83 +112,7 @@ public class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
         Optional<JournalpostIdOgDokumentId> dokumentReferanse = henleggelsesbrevTjeneste.sendHenleggelsebrev(behandlingId, null,BrevMottaker.BRUKER);
         assertThat(dokumentReferanse).isPresent();
 
-        List<BrevSporing> brevSporing = brevSporingRepository.hentBrevData(behandlingId, BrevType.HENLEGGELSE_BREV);
-        assertThat(brevSporing).isNotEmpty();
-        assertThat(brevSporing.get(0).getDokumentId()).isEqualTo(dokumentReferanse.get().getDokumentId());
-
-        List<Historikkinnslag> historikkinnslager = historikkRepository.hentHistorikk(behandlingId);
-        assertThat(historikkinnslager).isNotEmpty();
-        assertThat(historikkinnslager.size()).isEqualTo(2);
-        assertThat(historikkinnslager.get(0).getType()).isEqualByComparingTo(HistorikkinnslagType.AVBRUTT_BEH);
-        assertThat(historikkinnslager.get(1).getType()).isEqualByComparingTo(HistorikkinnslagType.BREV_SENT);
-        assertThat(historikkinnslager.get(1).getDokumentLinker().get(0).getLinkTekst())
-            .isEqualTo(HenleggelsesbrevTjeneste.TITTEL_HENLEGGELSESBREV_HISTORIKKINNSLAG);
-    }
-
-    @Test
-    public void skal_sende_henleggelsesbrev_for_tilbakekreving_revurdering() {
-        behandling.avsluttBehandling();
-        Long revurderingBehandlingId = opprettOgForberedTilbakekrevingRevurdering();
-
-        Optional<JournalpostIdOgDokumentId> dokumentReferanse = henleggelsesbrevTjeneste.sendHenleggelsebrev(revurderingBehandlingId,
-            REVURDERING_HENLEGGELSESBREV_FRITEKST,BrevMottaker.BRUKER);
-        assertThat(dokumentReferanse).isPresent();
-
-        List<BrevSporing> brevSporing = brevSporingRepository.hentBrevData(revurderingBehandlingId, BrevType.HENLEGGELSE_BREV);
-        assertThat(brevSporing).isNotEmpty();
-        assertThat(brevSporing.get(0).getDokumentId()).isEqualTo(dokumentReferanse.get().getDokumentId());
-
-        List<Historikkinnslag> historikkinnslager = historikkRepository.hentHistorikk(revurderingBehandlingId);
-        assertThat(historikkinnslager).isNotEmpty();
-        assertThat(historikkinnslager.size()).isEqualTo(3);
-        assertThat(historikkinnslager.get(0).getType()).isEqualByComparingTo(HistorikkinnslagType.REVURD_OPPR);
-        assertThat(historikkinnslager.get(1).getType()).isEqualByComparingTo(HistorikkinnslagType.AVBRUTT_BEH);
-        assertThat(historikkinnslager.get(2).getType()).isEqualByComparingTo(HistorikkinnslagType.BREV_SENT);
-        assertThat(historikkinnslager.get(2).getDokumentLinker().get(0).getLinkTekst())
-            .isEqualTo(HenleggelsesbrevTjeneste.TITTEL_HENLEGGELSESBREV_HISTORIKKINNSLAG);
-    }
-
-    @Test
-    public void skal_sende_henleggelsesbrev_med_verge() {
-        vergeRepository.lagreVergeInformasjon(behandlingId,lagVerge());
-        lagreVarselBrevSporing();
-        Optional<JournalpostIdOgDokumentId> dokumentReferanse = henleggelsesbrevTjeneste.sendHenleggelsebrev(behandlingId, null, BrevMottaker.VERGE);
-        assertThat(dokumentReferanse).isPresent();
-
-        List<BrevSporing> brevSporing = brevSporingRepository.hentBrevData(behandlingId, BrevType.HENLEGGELSE_BREV);
-        assertThat(brevSporing).isNotEmpty();
-        assertThat(brevSporing.get(0).getDokumentId()).isEqualTo(dokumentReferanse.get().getDokumentId());
-
-        List<Historikkinnslag> historikkinnslager = historikkRepository.hentHistorikk(behandlingId);
-        assertThat(historikkinnslager).isNotEmpty();
-        assertThat(historikkinnslager.size()).isEqualTo(2);
-        assertThat(historikkinnslager.get(0).getType()).isEqualByComparingTo(HistorikkinnslagType.AVBRUTT_BEH);
-        assertThat(historikkinnslager.get(1).getType()).isEqualByComparingTo(HistorikkinnslagType.BREV_SENT);
-        assertThat(historikkinnslager.get(1).getDokumentLinker().get(0).getLinkTekst())
-            .isEqualTo(HenleggelsesbrevTjeneste.TITTEL_HENLEGGELSESBREV_HISTORIKKINNSLAG_TIL_VERGE);
-    }
-
-    @Test
-    public void skal_sende_henleggelsesbrev_for_tilbakekreving_revurdering_med_verge() {
-        vergeRepository.lagreVergeInformasjon(behandlingId,lagVerge());
-        Long revurderingBehandlingId = opprettOgForberedTilbakekrevingRevurdering();
-
-        Optional<JournalpostIdOgDokumentId> dokumentReferanse = henleggelsesbrevTjeneste.sendHenleggelsebrev(revurderingBehandlingId,
-            REVURDERING_HENLEGGELSESBREV_FRITEKST, BrevMottaker.VERGE);
-        assertThat(dokumentReferanse).isPresent();
-
-        List<BrevSporing> brevSporing = brevSporingRepository.hentBrevData(revurderingBehandlingId, BrevType.HENLEGGELSE_BREV);
-        assertThat(brevSporing).isNotEmpty();
-        assertThat(brevSporing.get(0).getDokumentId()).isEqualTo(dokumentReferanse.get().getDokumentId());
-
-        List<Historikkinnslag> historikkinnslager = historikkRepository.hentHistorikk(revurderingBehandlingId);
-        assertThat(historikkinnslager).isNotEmpty();
-        assertThat(historikkinnslager.size()).isEqualTo(3);
-        assertThat(historikkinnslager.get(0).getType()).isEqualByComparingTo(HistorikkinnslagType.REVURD_OPPR);
-        assertThat(historikkinnslager.get(1).getType()).isEqualByComparingTo(HistorikkinnslagType.AVBRUTT_BEH);
-        assertThat(historikkinnslager.get(2).getType()).isEqualByComparingTo(HistorikkinnslagType.BREV_SENT);
-        assertThat(historikkinnslager.get(2).getDokumentLinker().get(0).getLinkTekst())
-            .isEqualTo(HenleggelsesbrevTjeneste.TITTEL_HENLEGGELSESBREV_HISTORIKKINNSLAG_TIL_VERGE);
+        Mockito.verify(mockPdfBrevTjeneste).sendBrev(eq(behandlingId), eq(DetaljertBrevType.HENLEGGELSE), any(BrevData.class));
     }
 
     @Test

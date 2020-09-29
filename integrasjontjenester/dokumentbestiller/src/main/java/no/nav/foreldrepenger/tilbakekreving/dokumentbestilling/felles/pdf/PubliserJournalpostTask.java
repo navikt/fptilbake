@@ -53,7 +53,7 @@ public class PubliserJournalpostTask implements ProsessTaskHandler {
         brevSporingTjeneste.lagreInfoOmUtsendtBrev(behandlingId, dokumentreferanse, brevType);
         if (brevType.gjelderVarsel()) {
             //TODO vurder egen løsning for varsel, for å slippe spesialkode i generell prosesstask
-            lagreVarsletBeløp(behandlingId, Long.valueOf(prosessTaskData.getPropertyValue("varseltBeloep")));
+            lagreVarsletBeløp(behandlingId, Long.valueOf(prosessTaskData.getPropertyValue("varsletBeloep")));
         }
     }
 
