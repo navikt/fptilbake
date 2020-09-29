@@ -25,7 +25,7 @@ Du må ikkje betale tilbake det feilutbetalte beløpet.
     {{#if varsel.varslet-dato }}
 {{> varsel-tekst}}
     {{else}}
-I brev {{sak.dato-fagsakvedtak}} fekk du melding om at {{>ytelse-produkt}} {{#if (eq sak.ytelsetype "ES")}}din{{else}}dine{{/if}} er endra. Endringa gjorde at du har fått utbetalt for mykje.{{#if (eq totalresultat.hovedresultat "INGEN_TILBAKEBETALING")}} Du må ikkje betale tilbake det du har fått for mykje.{{/if}}
+I brev {{sak.dato-fagsakvedtak}} fekk du melding om at {{>ytelse-produkt}} {{>din-dine}} er endra. Endringa gjorde at du har fått utbetalt for mykje.{{#if (eq totalresultat.hovedresultat "INGEN_TILBAKEBETALING")}} Du må ikkje betale tilbake det du har fått for mykje.{{/if}}
     {{/if}}
 {{/if}}
 {{#if (neq totalresultat.hovedresultat "INGEN_TILBAKEBETALING")}}
