@@ -75,7 +75,7 @@ public class HenleggelsesbrevTjeneste {
         this.pdfBrevTjeneste = pdfBrevTjeneste;
     }
 
-    public Optional<JournalpostIdOgDokumentId> sendHenleggelsebrev(Long behandlingId, String fritekst, BrevMottaker brevMottaker) {
+    public void sendHenleggelsebrev(Long behandlingId, String fritekst, BrevMottaker brevMottaker) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = lagHenleggelsebrevForSending(behandling, fritekst, brevMottaker);
         FritekstbrevData fritekstbrevData = BehandlingType.TILBAKEKREVING.equals(behandling.getType()) ?
@@ -84,15 +84,13 @@ public class HenleggelsesbrevTjeneste {
             JournalpostIdOgDokumentId dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(fritekstbrevData);
             opprettHistorikkinnslag(behandling, dokumentreferanse, brevMottaker);
             lagreInfoOmHenleggelsesbrev(behandlingId, dokumentreferanse);
-            return Optional.ofNullable(dokumentreferanse);
         } else {
-            JournalpostIdOgDokumentId dokumentreferanse = pdfBrevTjeneste.sendBrev(behandlingId, DetaljertBrevType.HENLEGGELSE, BrevData.builder()
+            pdfBrevTjeneste.sendBrev(behandlingId, DetaljertBrevType.HENLEGGELSE, BrevData.builder()
                 .setMottaker(brevMottaker)
                 .setMetadata(fritekstbrevData.getBrevMetadata())
                 .setOverskrift(fritekstbrevData.getOverskrift())
                 .setBrevtekst(fritekstbrevData.getBrevtekst())
                 .build());
-            return Optional.ofNullable(dokumentreferanse);
         }
     }
 

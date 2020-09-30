@@ -3,7 +3,6 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.henleggelse;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -37,7 +36,6 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.BrevDa
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.PdfBrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.JournalpostIdOgDokumentId;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingsinfoDto;
@@ -67,26 +65,25 @@ public class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
     @Before
     public void setup() {
         HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepository,
-                mockPersoninfoAdapter);
+            mockPersoninfoAdapter);
 
         henleggelsesbrevTjeneste = new HenleggelsesbrevTjeneste(repositoryProvider, mockEksternDataForBrevTjeneste,
             mockFritekstbrevTjeneste, historikkinnslagTjeneste, mockPdfBrevTjeneste);
-        ProsessTaskRepository prosessTaskRepository = new ProsessTaskRepositoryImpl(repositoryRule.getEntityManager(),null,null);
-        henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repositoryProvider,prosessTaskRepository,mock(BehandlingskontrollTjeneste.class),historikkinnslagTjeneste);
+        ProsessTaskRepository prosessTaskRepository = new ProsessTaskRepositoryImpl(repositoryRule.getEntityManager(), null, null);
+        henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repositoryProvider, prosessTaskRepository, mock(BehandlingskontrollTjeneste.class), historikkinnslagTjeneste);
         henleggBehandlingTjeneste.henleggBehandlingManuelt(behandling.getId(), BehandlingResultatType.HENLAGT_KRAVGRUNNLAG_NULLSTILT,
-            "manuell henlagt",null);
+            "manuell henlagt", null);
         behandlingRevurderingTjeneste = new BehandlingRevurderingTjeneste(repositoryProvider);
 
         behandlingId = behandling.getId();
-        EksternBehandling eksternBehandling = new EksternBehandling(behandling, Henvisning.fraEksternBehandlingId(FPSAK_BEHANDLING_ID),FPSAK_BEHANDLING_UUID);
+        EksternBehandling eksternBehandling = new EksternBehandling(behandling, Henvisning.fraEksternBehandlingId(FPSAK_BEHANDLING_ID), FPSAK_BEHANDLING_UUID);
         eksternBehandlingRepository.lagre(eksternBehandling);
 
         String varselTekst = "hello";
         when(mockFritekstbrevTjeneste.sendFritekstbrev(any(FritekstbrevData.class))).thenReturn(lagJournalOgDokument());
         when(mockFritekstbrevTjeneste.hentForhåndsvisningFritekstbrev(any(FritekstbrevData.class))).thenReturn(varselTekst.getBytes());
 
-        when(mockPdfBrevTjeneste.sendBrev(anyLong(), any(DetaljertBrevType.class), any(BrevData.class))).thenReturn(lagJournalOgDokument());
-        when(mockPdfBrevTjeneste.genererForhåndsvisning( any(BrevData.class))).thenReturn(varselTekst.getBytes());
+        when(mockPdfBrevTjeneste.genererForhåndsvisning(any(BrevData.class))).thenReturn(varselTekst.getBytes());
 
         when(mockEksternDataForBrevTjeneste.hentYtelsenavn(FagsakYtelseType.FORELDREPENGER, Språkkode.nb))
             .thenReturn(lagYtelseNavn("foreldrepenger", "foreldrepenger"));
@@ -109,8 +106,7 @@ public class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
     @Test
     public void skal_sende_henleggelsesbrev() {
         lagreVarselBrevSporing();
-        Optional<JournalpostIdOgDokumentId> dokumentReferanse = henleggelsesbrevTjeneste.sendHenleggelsebrev(behandlingId, null,BrevMottaker.BRUKER);
-        assertThat(dokumentReferanse).isPresent();
+        henleggelsesbrevTjeneste.sendHenleggelsebrev(behandlingId, null, BrevMottaker.BRUKER);
 
         Mockito.verify(mockPdfBrevTjeneste).sendBrev(eq(behandlingId), eq(DetaljertBrevType.HENLEGGELSE), any(BrevData.class));
     }
@@ -118,25 +114,25 @@ public class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
     @Test
     public void skal_forhåndsvise_henleggelsebrev() {
         lagreVarselBrevSporing();
-        assertThat(henleggelsesbrevTjeneste.hentForhåndsvisningHenleggelsebrev(behandlingId,null)).isNotEmpty();
+        assertThat(henleggelsesbrevTjeneste.hentForhåndsvisningHenleggelsebrev(behandlingId, null)).isNotEmpty();
     }
 
     @Test
     public void skal_forhåndsvise_henleggelsebrev_for_tilbakekreving_revurdering() {
         Long revurderingBehandlingId = opprettOgForberedTilbakekrevingRevurdering();
-        assertThat(henleggelsesbrevTjeneste.hentForhåndsvisningHenleggelsebrev(revurderingBehandlingId,REVURDERING_HENLEGGELSESBREV_FRITEKST)).isNotEmpty();
+        assertThat(henleggelsesbrevTjeneste.hentForhåndsvisningHenleggelsebrev(revurderingBehandlingId, REVURDERING_HENLEGGELSESBREV_FRITEKST)).isNotEmpty();
     }
 
     @Test
     public void skal_ikke_sende_henleggelsesbrev_hvis_varselbrev_ikke_sendt() {
-        assertThrows("FPT-110801",FunksjonellException.class, () ->
+        assertThrows("FPT-110801", FunksjonellException.class, () ->
             henleggelsesbrevTjeneste.sendHenleggelsebrev(behandlingId, null, BrevMottaker.BRUKER));
     }
 
     @Test
     public void skal_ikke_sende_henleggelsesbrev_for_tilbakekreving_revurdering_uten_fritekst() {
         Long revurderingBehandlingId = opprettOgForberedTilbakekrevingRevurdering();
-        assertThrows("FPT-110802",FunksjonellException.class, () ->
+        assertThrows("FPT-110802", FunksjonellException.class, () ->
             henleggelsesbrevTjeneste.sendHenleggelsebrev(revurderingBehandlingId, null, BrevMottaker.BRUKER));
     }
 
@@ -149,12 +145,12 @@ public class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
         brevSporingRepository.lagre(brevSporing);
     }
 
-    private Long opprettOgForberedTilbakekrevingRevurdering(){
+    private Long opprettOgForberedTilbakekrevingRevurdering() {
         behandling.avsluttBehandling();
         Behandling revurdering = behandlingRevurderingTjeneste.opprettRevurdering(behandlingId, BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR);
         Long revurderingBehandlingId = revurdering.getId();
         henleggBehandlingTjeneste.henleggBehandlingManuelt(revurderingBehandlingId, BehandlingResultatType.HENLAGT_KRAVGRUNNLAG_NULLSTILT,
-            "manuell henlagt",REVURDERING_HENLEGGELSESBREV_FRITEKST);
+            "manuell henlagt", REVURDERING_HENLEGGELSESBREV_FRITEKST);
         return revurderingBehandlingId;
     }
 

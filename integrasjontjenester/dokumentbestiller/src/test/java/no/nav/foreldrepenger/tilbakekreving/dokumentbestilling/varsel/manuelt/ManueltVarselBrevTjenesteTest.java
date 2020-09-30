@@ -2,7 +2,6 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.manuelt;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -71,7 +70,6 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
         behandlingId = behandling.getId();
         when(mockFeilutbetalingTjeneste.hentBehandlingFeilutbetalingFakta(behandlingId)).thenReturn(lagFeilutbetalingFakta());
         when(mockFritekstbrevTjeneste.sendFritekstbrev(any(FritekstbrevData.class))).thenReturn(lagJournalOgDokument());
-        when(mockPdfBrevTjeneste.sendBrev(anyLong(), any(DetaljertBrevType.class), anyLong(), anyString(), any(BrevData.class))).thenReturn(lagJournalOgDokument());
 
         when(mockEksternDataForBrevTjeneste.hentYtelsenavn(FagsakYtelseType.FORELDREPENGER, Språkkode.nb))
             .thenReturn(lagYtelseNavn("foreldrepenger", "foreldrepenger"));

@@ -89,7 +89,7 @@ public class VarselbrevTjeneste {
     public VarselbrevTjeneste() {
     }
 
-    public Optional<JournalpostIdOgDokumentId> sendVarselbrev(Long behandlingId, BrevMottaker brevMottaker) {
+    public void sendVarselbrev(Long behandlingId, BrevMottaker brevMottaker) {
         VarselbrevSamletInfo varselbrevSamletInfo = lagVarselbrevForSending(behandlingId, brevMottaker);
         String overskrift = TekstformatererVarselbrev.lagVarselbrevOverskrift(varselbrevSamletInfo.getBrevMetadata());
         String brevtekst = TekstformatererVarselbrev.lagVarselbrevFritekst(varselbrevSamletInfo);
@@ -103,17 +103,15 @@ public class VarselbrevTjeneste {
             JournalpostIdOgDokumentId dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data);
             opprettHistorikkinnslag(behandling, dokumentreferanse, brevMottaker);
             lagreInfoOmVarselbrev(behandlingId, dokumentreferanse);
-            return Optional.of(dokumentreferanse);
         } else {
             Long varsletFeilutbetaling = varselbrevSamletInfo.getSumFeilutbetaling();
             String fritekst = varselbrevSamletInfo.getFritekstFraSaksbehandler();
-            JournalpostIdOgDokumentId dokumentreferanse = pdfBrevTjeneste.sendBrev(behandlingId, DetaljertBrevType.VARSEL, varsletFeilutbetaling, fritekst, BrevData.builder()
+            pdfBrevTjeneste.sendBrev(behandlingId, DetaljertBrevType.VARSEL, varsletFeilutbetaling, fritekst, BrevData.builder()
                 .setMottaker(brevMottaker)
                 .setMetadata(data.getBrevMetadata())
                 .setOverskrift(data.getOverskrift())
                 .setBrevtekst(data.getBrevtekst())
                 .build());
-            return Optional.of(dokumentreferanse);
         }
 
     }
