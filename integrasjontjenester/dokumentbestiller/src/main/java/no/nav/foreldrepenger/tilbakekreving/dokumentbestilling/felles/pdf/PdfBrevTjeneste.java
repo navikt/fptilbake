@@ -1,5 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf;
 
+import java.util.Optional;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -52,28 +54,15 @@ public class PdfBrevTjeneste {
     public JournalpostIdOgDokumentId sendBrev(Long behandlingId, DetaljertBrevType detaljertBrevType, Long varsletBeløp, String fritekst, BrevData data) {
         JournalpostIdOgDokumentId dokumentreferanse = lagOgJournalførBrev(behandlingId, detaljertBrevType, varsletBeløp, data);
 
-        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-
         ProsessTaskGruppe taskGruppe = new ProsessTaskGruppe();
         taskGruppe.addNesteSekvensiell(lagPubliserJournalpostTask(behandlingId, data, dokumentreferanse));
         taskGruppe.addNesteSekvensiell(lagSporingBrevTask(behandlingId, detaljertBrevType, data, dokumentreferanse));
         if (detaljertBrevType.gjelderVarsel()) {
             taskGruppe.addNesteSekvensiell(lagSporingVarselBrevTask(behandlingId, varsletBeløp, fritekst));
-            if (SendBeskjedUtsendtVarselTilSelvbetjeningTask.kanSendeVarsel(behandling)) {
-                taskGruppe.addNesteSekvensiell(lagSendBeskjedTilSelvbetjeningTask(behandling));
-            } else {
-                logger.info("Sender ikke beskjed til selvbetjening for varsel for behandlingId={} i sak={}", behandling.getId(), behandling.getFagsak().getSaksnummer().getVerdi());
-            }
+            lagSendBeskjedTilSelvbetjeningTask(behandlingId).ifPresent(taskGruppe::addNesteSekvensiell);
         }
         prosessTaskRepository.lagre(taskGruppe);
-
         return dokumentreferanse;
-    }
-
-    private ProsessTaskData lagSendBeskjedTilSelvbetjeningTask(Behandling behandling) {
-        ProsessTaskData sendBeskjedUtsendtVarsel = new ProsessTaskData(SendBeskjedUtsendtVarselTilSelvbetjeningTask.TASKTYPE);
-        sendBeskjedUtsendtVarsel.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
-        return sendBeskjedUtsendtVarsel;
     }
 
     private JournalpostIdOgDokumentId lagOgJournalførBrev(Long behandlingId, DetaljertBrevType detaljertBrevType, Long varsletBeløp, BrevData data) {
@@ -84,12 +73,12 @@ public class PdfBrevTjeneste {
         return journalføringTjeneste.journalførUtgåendeBrev(behandlingId, mapBrevTypeTilDokumentKategori(detaljertBrevType), data.getMetadata(), data.getMottaker(), pdf);
     }
 
-    private ProsessTaskData lagPubliserJournalpostTask(Long behandlingId, BrevData data, JournalpostIdOgDokumentId dokumentreferanse) {
-        ProsessTaskData dat = new ProsessTaskData(PubliserJournalpostTask.TASKTYPE);
-        dat.setProperty("behandlingId", behandlingId.toString());
-        dat.setProperty("journalpostId", dokumentreferanse.getJournalpostId().getVerdi());
-        dat.setProperty("mottaker", data.getMottaker().name());
-        return dat;
+    private ProsessTaskData lagPubliserJournalpostTask(Long behandlingId, BrevData brevdata, JournalpostIdOgDokumentId dokumentreferanse) {
+        ProsessTaskData data = new ProsessTaskData(PubliserJournalpostTask.TASKTYPE);
+        data.setProperty("behandlingId", behandlingId.toString());
+        data.setProperty("journalpostId", dokumentreferanse.getJournalpostId().getVerdi());
+        data.setProperty("mottaker", brevdata.getMottaker().name());
+        return data;
     }
 
     private ProsessTaskData lagSporingBrevTask(Long behandlingId, DetaljertBrevType detaljertBrevType, BrevData brevdata, JournalpostIdOgDokumentId dokumentreferanse) {
@@ -110,6 +99,18 @@ public class PdfBrevTjeneste {
         data.setProperty("varsletBeloep", Long.toString(varsletBeløp));
         data.setPayload(fritekst);
         return data;
+    }
+
+    private Optional<ProsessTaskData> lagSendBeskjedTilSelvbetjeningTask(Long behandlingId ){
+        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
+        if (SendBeskjedUtsendtVarselTilSelvbetjeningTask.kanSendeVarsel(behandling)) {
+            ProsessTaskData data = new ProsessTaskData(SendBeskjedUtsendtVarselTilSelvbetjeningTask.TASKTYPE);
+            data.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
+            return Optional.of(data);
+        } else {
+            logger.info("Sender ikke beskjed til selvbetjening for varsel for behandlingId={} i sak={}", behandling.getId(), behandling.getFagsak().getSaksnummer().getVerdi());
+            return Optional.empty();
+        }
     }
 
     private static void valider(DetaljertBrevType brevType, Long varsletBeløp) {
