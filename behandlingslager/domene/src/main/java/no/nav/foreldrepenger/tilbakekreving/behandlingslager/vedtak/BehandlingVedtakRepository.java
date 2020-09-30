@@ -40,7 +40,6 @@ public class BehandlingVedtakRepository {
 
     public List<BehandlingVedtak> hentAlleBehandlingVedtak(){
         TypedQuery<BehandlingVedtak> query = entityManager.createQuery("select vedtak FROM BehandlingVedtak vedtak join fetch vedtak.behandlingsresultat", BehandlingVedtak.class); //$NON-NLS-1$
-        query.setMaxResults(500);
         return query.getResultList();
     }
 }
