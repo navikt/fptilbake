@@ -111,7 +111,10 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
                     kobleGrunnlagMedBehandling(behandling, mottattXmlId, mottattXml);
                 } else if (mottattXml.contains(ROOT_ELEMENT_KRAV_VEDTAK_STATUS_XML) && grunnlagRepository.harGrunnlagForBehandlingId(behandlingId)) {
                     logger.info("xml er status xml med mottattXmlId={}", mottattXmlId);
-                    håndtereGrunnlagStatusForBehandling(behandlingId, mottattXmlId, mottattXml);
+                    boolean erAvsluttMelding = mottattXml.contains(KravStatusKode.AVSLUTTET.getKode());
+                    boolean finnesFlereMeldingerEtterAvsluttMelding = erAvsluttMelding &&
+                        (alleXmlMeldinger.size() > alleXmlMeldinger.indexOf(økonomiXmlMottatt) + 1);
+                    håndtereGrunnlagStatusForBehandling(behandlingId, mottattXmlId, mottattXml, finnesFlereMeldingerEtterAvsluttMelding);
                 } else {
                     logger.warn("xml rekkefølge er ikke riktig med mottattXmlId={}", mottattXmlId);
                 }
@@ -125,10 +128,14 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
 
     }
 
-    private void håndtereGrunnlagStatusForBehandling(Long behandlingId, Long mottattXmlId, String mottattXml) {
+
+    private void håndtereGrunnlagStatusForBehandling(Long behandlingId, Long mottattXmlId, String mottattXml, boolean finnesFlereMeldingerEtterAvsluttMelding) {
         KravOgVedtakstatus kravOgVedtakstatus = KravVedtakStatusXmlUnmarshaller.unmarshall(mottattXmlId, mottattXml);
         KravVedtakStatus437 kravVedtakStatus437 = kravVedtakStatusMapper.mapTilDomene(kravOgVedtakstatus);
-        kravVedtakStatusTjeneste.håndteresMottakAvKravVedtakStatus(behandlingId, kravVedtakStatus437);
+        // Hvis det finner flere meldinger etter AVSL melding, unngår vi AVSLUTT melding. Behandling kan ikke henlegges fordi det kan koble til et annet grunnlag.
+        if (!KravStatusKode.AVSLUTTET.equals(kravVedtakStatus437.getKravStatusKode()) || !finnesFlereMeldingerEtterAvsluttMelding) {
+            kravVedtakStatusTjeneste.håndteresMottakAvKravVedtakStatus(behandlingId, kravVedtakStatus437);
+        }
     }
 
     private void kobleGrunnlagMedBehandling(Behandling behandling, Long mottattXmlId, String mottattXml) {
@@ -138,16 +145,10 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
         grunnlagRepository.lagre(behandling.getId(), kravgrunnlag431);
 
         Henvisning grunnlagReferanse = kravgrunnlag431.getReferanse();
-            Optional<EksternBehandling> eksternBehandling = eksternBehandlingRepository.hentOptionalFraInternId(behandling.getId());
-        if(eksternBehandling.isEmpty()){
-            logger.info("Siste aktivert ekstern behandling for behandling={} er deaktivert p.g.a avslutt melding. Ny eksternBehandling={} skal opprettes for behandlingen."
-                ,behandling.getId(),grunnlagReferanse);
+        EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandling.getId());
+        if (!erReferanseRiktig(grunnlagReferanse, eksternBehandling)) {
+            logger.info("Tilkoblet grunnlag har en annen referanse={} enn behandling for behandlingId={}", grunnlagReferanse, behandling.getId());
             oppdatereEksternBehandlingMedRiktigReferanse(behandling, grunnlagReferanse);
-        }else {
-            if (!erReferanseRiktig(grunnlagReferanse, eksternBehandling.get())) {
-                logger.info("Tilkoblet grunnlag har en annen referanse={} enn behandling for behandlingId={}", grunnlagReferanse, behandling.getId());
-                oppdatereEksternBehandlingMedRiktigReferanse(behandling, grunnlagReferanse);
-            }
         }
     }
 

@@ -105,6 +105,7 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
         assertThat(kravVedtakStatusRepository.finnKravstatus(behandling.getId())).isNotEmpty();
         assertThat(grunnlagRepository.harGrunnlagForBehandlingId(behandling.getId())).isTrue();
         assertTilkobling();
+        assertThat(behandling.erAvsluttet()).isTrue();
     }
 
     @Test
@@ -176,7 +177,9 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
 
         assertThat(mottattXmlRepository.erMottattXmlTilkoblet(andreGrunnlagXmlId)).isTrue();
         assertThat(eksternBehandlingRepository.hentFraHenvisning(HENVISNING)).isEmpty();
+        assertThat(behandling.erAvsluttet()).isFalse();
     }
+
 
     @Test
     public void skal_finne_og_håndtere_grunnlag_og_oppdatere_fpsak_referanse_når_kravgrunnlag_referanse_er_forskjellige_enn_fpsak_referanse() {
