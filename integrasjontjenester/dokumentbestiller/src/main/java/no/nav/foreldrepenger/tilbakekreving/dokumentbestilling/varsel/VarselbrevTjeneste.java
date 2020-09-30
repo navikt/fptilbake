@@ -15,6 +15,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporing;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.DetaljertBrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
@@ -29,6 +30,9 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottak
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottakerUtil;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.EksternDataForBrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.YtelseNavn;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.BrevData;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.BrevToggle;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.PdfBrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.JournalpostIdOgDokumentId;
@@ -59,13 +63,16 @@ public class VarselbrevTjeneste {
     private FritekstbrevTjeneste bestillDokumentTjeneste;
     private HistorikkinnslagTjeneste historikkinnslagTjeneste;
 
+    private PdfBrevTjeneste pdfBrevTjeneste;
+
 
     @Inject
     public VarselbrevTjeneste(BehandlingRepositoryProvider repositoryProvider,
                               EksternDataForBrevTjeneste eksternDataForBrevTjeneste,
                               BehandlingTjeneste behandlingTjeneste,
                               FritekstbrevTjeneste bestillDokumentTjeneste,
-                              HistorikkinnslagTjeneste historikkinnslagTjeneste) {
+                              HistorikkinnslagTjeneste historikkinnslagTjeneste,
+                              PdfBrevTjeneste pdfBrevTjeneste) {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
         this.varselRepository = repositoryProvider.getVarselRepository();
@@ -76,12 +83,13 @@ public class VarselbrevTjeneste {
         this.behandlingTjeneste = behandlingTjeneste;
         this.bestillDokumentTjeneste = bestillDokumentTjeneste;
         this.historikkinnslagTjeneste = historikkinnslagTjeneste;
+        this.pdfBrevTjeneste = pdfBrevTjeneste;
     }
 
     public VarselbrevTjeneste() {
     }
 
-    public Optional<JournalpostIdOgDokumentId> sendVarselbrev(Long behandlingId, BrevMottaker brevMottaker) {
+    public void sendVarselbrev(Long behandlingId, BrevMottaker brevMottaker) {
         VarselbrevSamletInfo varselbrevSamletInfo = lagVarselbrevForSending(behandlingId, brevMottaker);
         String overskrift = TekstformatererVarselbrev.lagVarselbrevOverskrift(varselbrevSamletInfo.getBrevMetadata());
         String brevtekst = TekstformatererVarselbrev.lagVarselbrevFritekst(varselbrevSamletInfo);
@@ -91,10 +99,21 @@ public class VarselbrevTjeneste {
             .medMetadata(varselbrevSamletInfo.getBrevMetadata())
             .build();
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-        JournalpostIdOgDokumentId dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data);
-        opprettHistorikkinnslag(behandling, dokumentreferanse, brevMottaker);
-        lagreInfoOmVarselbrev(behandlingId, dokumentreferanse);
-        return Optional.of(dokumentreferanse);
+        if (BrevToggle.brukDokprod()) {
+            JournalpostIdOgDokumentId dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data);
+            opprettHistorikkinnslag(behandling, dokumentreferanse, brevMottaker);
+            lagreInfoOmVarselbrev(behandlingId, dokumentreferanse);
+        } else {
+            Long varsletFeilutbetaling = varselbrevSamletInfo.getSumFeilutbetaling();
+            String fritekst = varselbrevSamletInfo.getFritekstFraSaksbehandler();
+            pdfBrevTjeneste.sendBrev(behandlingId, DetaljertBrevType.VARSEL, varsletFeilutbetaling, fritekst, BrevData.builder()
+                .setMottaker(brevMottaker)
+                .setMetadata(data.getBrevMetadata())
+                .setOverskrift(data.getOverskrift())
+                .setBrevtekst(data.getBrevtekst())
+                .build());
+        }
+
     }
 
     public byte[] hentForhåndsvisningVarselbrev(HentForhåndsvisningVarselbrevDto hentForhåndsvisningVarselbrevDto) {
@@ -110,8 +129,16 @@ public class VarselbrevTjeneste {
             .medBrevtekst(brevtekst)
             .medMetadata(varselbrevSamletInfo.getBrevMetadata())
             .build();
-
-        return bestillDokumentTjeneste.hentForhåndsvisningFritekstbrev(data);
+        if (BrevToggle.brukDokprod()) {
+            return bestillDokumentTjeneste.hentForhåndsvisningFritekstbrev(data);
+        } else {
+            return pdfBrevTjeneste.genererForhåndsvisning(BrevData.builder()
+                .setMottaker(varselbrevSamletInfo.getBrevMetadata().isFinnesVerge() ? BrevMottaker.VERGE : BrevMottaker.BRUKER)
+                .setMetadata(data.getBrevMetadata())
+                .setOverskrift(data.getOverskrift())
+                .setBrevtekst(data.getBrevtekst())
+                .build());
+        }
     }
 
     private void opprettHistorikkinnslag(Behandling behandling, JournalpostIdOgDokumentId dokumentreferanse, BrevMottaker brevMottaker) {
@@ -148,8 +175,8 @@ public class VarselbrevTjeneste {
         SamletEksternBehandlingInfo eksternBehandlingsinfoDto = eksternDataForBrevTjeneste.hentYtelsesbehandlingFraFagsystemet(eksternBehandling.getEksternUuid(), Tillegsinformasjon.PERSONOPPLYSNINGER);
         //Henter data fra tps
         Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(behandling.getAktørId().getId());
-        Adresseinfo adresseinfo =  eksternDataForBrevTjeneste.hentAdresse(personinfo,brevMottaker,vergeEntitet);
-        String vergeNavn = BrevMottakerUtil.getVergeNavn(vergeEntitet,adresseinfo);
+        Adresseinfo adresseinfo = eksternDataForBrevTjeneste.hentAdresse(personinfo, brevMottaker, vergeEntitet);
+        String vergeNavn = BrevMottakerUtil.getVergeNavn(vergeEntitet, adresseinfo);
 
         //Henter fagsaktypenavn på riktig språk
         Språkkode mottakersSpråkkode = eksternBehandlingsinfoDto.getGrunninformasjon().getSpråkkodeEllerDefault();
@@ -165,7 +192,10 @@ public class VarselbrevTjeneste {
 
         VarselInfo varselInfo = varselRepository.finnEksaktVarsel(behandlingId);
         String varselTekst = varselInfo.getVarselTekst();
-        lagreVarseltBeløp(behandlingId, feilutbetaltePerioderDto.getSumFeilutbetaling());
+
+        if (BrevToggle.brukDokprod()) {
+            lagreVarseltBeløp(behandlingId, feilutbetaltePerioderDto.getSumFeilutbetaling());
+        }
 
         return VarselbrevUtil.sammenstillInfoFraFagsystemerForSending(
             eksternBehandlingsinfoDto,
@@ -192,7 +222,7 @@ public class VarselbrevTjeneste {
 
         Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(eksternBehandlingsinfo.getAktørId().getId());
         Adresseinfo adresseinfo = eksternDataForBrevTjeneste.hentAdresse(personinfo, brevMottaker, vergeEntitet);
-        String vergeNavn = BrevMottakerUtil.getVergeNavn(vergeEntitet,adresseinfo);
+        String vergeNavn = BrevMottakerUtil.getVergeNavn(vergeEntitet, adresseinfo);
 
         FeilutbetaltePerioderDto feilutbetaltePerioderDto = eksternDataForBrevTjeneste.hentFeilutbetaltePerioder(grunninformasjon.getHenvisning());
         Språkkode mottakersSpråkkode = grunninformasjon.getSpråkkodeEllerDefault();

@@ -40,6 +40,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Foreldel
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporing;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.DetaljertBrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstOppsummering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstRepository;
@@ -52,7 +53,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselInfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtakRepository;
@@ -69,10 +69,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.S�
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelse;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelsePeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseRepository;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dokdist.Adresse;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dokdist.DistribuerJournalpostRequest;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dokdist.DistribuerJournalpostResponse;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dokdist.DokdistKlient;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Avsnitt;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.HentForhåndvisningVedtaksbrevPdfDto;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.PeriodeMedTekstDto;
@@ -80,7 +76,10 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottak
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottakerUtil;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.EksternDataForBrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.YtelseNavn;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.header.TekstformatererHeader;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.BrevData;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.BrevToggle;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.JournalføringTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.PdfBrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevTjeneste;
@@ -104,9 +103,7 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBe
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SøknadType;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.pdfgen.FileStructureUtil;
-import no.nav.foreldrepenger.tilbakekreving.pdfgen.PdfGenerator;
-import no.nav.vedtak.util.env.Environment;
+import no.nav.foreldrepenger.tilbakekreving.pdfgen.DokumentVariant;
 
 
 @ApplicationScoped
@@ -139,9 +136,8 @@ public class VedtaksbrevTjeneste {
     private EksternDataForBrevTjeneste eksternDataForBrevTjeneste;
 
     private JournalføringTjeneste journalføringTjeneste;
-    private DokdistKlient dokdistKlient;
 
-    private PdfGenerator pdfGenerator = new PdfGenerator();
+    private PdfBrevTjeneste pdfBrevTjeneste;
 
     @Inject
     public VedtaksbrevTjeneste(BehandlingRepositoryProvider behandlingRepositoryProvider,
@@ -151,7 +147,7 @@ public class VedtaksbrevTjeneste {
                                FritekstbrevTjeneste bestillDokumentTjeneste,
                                HistorikkinnslagTjeneste historikkinnslagTjeneste,
                                JournalføringTjeneste journalføringTjeneste,
-                               DokdistKlient dokdistKlient) {
+                               PdfBrevTjeneste pdfBrevTjeneste) {
         this.behandlingRepository = behandlingRepositoryProvider.getBehandlingRepository();
         this.behandlingVedtakRepository = behandlingRepositoryProvider.getBehandlingVedtakRepository();
         this.eksternBehandlingRepository = behandlingRepositoryProvider.getEksternBehandlingRepository();
@@ -169,7 +165,7 @@ public class VedtaksbrevTjeneste {
         this.tilbakekrevingBeregningTjeneste = tilbakekrevingBeregningTjeneste;
         this.eksternDataForBrevTjeneste = eksternDataForBrevTjeneste;
         this.journalføringTjeneste = journalføringTjeneste;
-        this.dokdistKlient = dokdistKlient;
+        this.pdfBrevTjeneste = pdfBrevTjeneste;
     }
 
     public VedtaksbrevTjeneste() {
@@ -185,57 +181,27 @@ public class VedtaksbrevTjeneste {
             .build();
 
 
-        JournalpostIdOgDokumentId dokumentreferanse;
-        if (brukDokprod()) {
-            byte[] vedlegg = lagVedtaksbrevVedleggTabellPdf(vedtaksbrevData);
+        if (BrevToggle.brukDokprod()) {
+            byte[] vedlegg = lagVedtaksbrevVedleggTabellPdf(vedtaksbrevData, DokumentVariant.ENDELIG);
             JournalpostIdOgDokumentId vedleggReferanse = journalføringTjeneste.journalførVedlegg(behandlingId, vedlegg);
-            dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data, vedleggReferanse);
+            JournalpostIdOgDokumentId dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data, vedleggReferanse);
+            Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
+            opprettHistorikkinnslag(behandling, dokumentreferanse, brevMottaker);
+            lagreInfoOmVedtaksbrev(behandlingId, dokumentreferanse);
         } else {
-            String logo = FileStructureUtil.readResourceAsString("pdf/nav_logo_svg.html");
-            String header = TekstformatererHeader.lagHeader(vedtaksbrevData.getMetadata(), data.getOverskrift());
-            String innholdHtml = DokprodTilHtml.dokprodInnholdTilHtml(data.getBrevtekst());
-            String vedleggHtml = TekstformatererVedtaksbrev.lagVedtaksbrevVedleggHtml(vedtaksbrevData.getVedtaksbrevData());
-            byte[] pdf = pdfGenerator.genererPDF(logo + header + innholdHtml + vedleggHtml);
-            dokumentreferanse = journalføringTjeneste.journalførUtgåendeVedtaksbrev(behandlingId, vedtaksbrevData.getMetadata(), brevMottaker, pdf);
-
-            //TODO bør gjøre distribuering i egen prosesstask for å unngå å jounalføre flere ganger hvis distribuering feiler
-            distribuerJournalpost(behandlingId, dokumentreferanse.getJournalpostId(), brevMottaker, vedtaksbrevData.getMetadata().getMottakerAdresse()
-            );
-        }
-
-        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-        opprettHistorikkinnslag(behandling, dokumentreferanse, brevMottaker);
-        lagreInfoOmVedtaksbrev(behandlingId, dokumentreferanse);
-    }
-
-    private void distribuerJournalpost(Long behandlingId, JournalpostId journalpostId, BrevMottaker brevMottaker, Adresseinfo mottakerAdresse) {
-        DistribuerJournalpostRequest.Builder request = DistribuerJournalpostRequest.builder()
-            .medJournalpostId(journalpostId.getVerdi())
-            .medBestillendeFagsystem("K9")
-            .medDokumentProdApp(System.getProperty("application.name"));
-
-        if (brevMottaker != BrevMottaker.BRUKER) {
-            request.medAdresse(Adresse.builder()
-                .medAdresselinje1(mottakerAdresse.getAdresselinje1())
-                .medAdresselinje2(mottakerAdresse.getAdresselinje2())
-                .medAdresselinje3(mottakerAdresse.getAdresselinje3())
-                .medPostnummer(mottakerAdresse.getPostNr())
-                .medPoststed(mottakerAdresse.getPoststed())
-                .medLand(mottakerAdresse.getLand())
+            pdfBrevTjeneste.sendBrev(behandlingId, DetaljertBrevType.VEDTAK, BrevData.builder()
+                .setMottaker(brevMottaker)
+                .setMetadata(data.getBrevMetadata())
+                .setOverskrift(data.getOverskrift())
+                .setBrevtekst(data.getBrevtekst())
+                .setVedleggHtml(TekstformatererVedtaksbrev.lagVedtaksbrevVedleggHtml(vedtaksbrevData.getVedtaksbrevData()))
                 .build());
         }
-
-        DistribuerJournalpostResponse response = dokdistKlient.distribuerJournalpost(request.build());
-        logger.info("Bestilt distribusjon av journalpost til {} for {] bestillingId ble {}", brevMottaker, behandlingId, response.getBestillingsId());
     }
 
-    private boolean brukDokprod() {
-        return Environment.current().isProd();
-    }
-
-    private byte[] lagVedtaksbrevVedleggTabellPdf(VedtaksbrevData vedtaksbrevData) {
+    private byte[] lagVedtaksbrevVedleggTabellPdf(VedtaksbrevData vedtaksbrevData, DokumentVariant dokumentVariant) {
         VedtaksbrevVedleggTjeneste vedleggTjeneste = new VedtaksbrevVedleggTjeneste();
-        return vedleggTjeneste.lagVedlegg(vedtaksbrevData);
+        return vedleggTjeneste.lagVedlegg(vedtaksbrevData, dokumentVariant);
     }
 
     public byte[] hentForhåndsvisningVedtaksbrevMedVedleggSomPdf(HentForhåndvisningVedtaksbrevPdfDto dto) {
@@ -249,15 +215,17 @@ public class VedtaksbrevTjeneste {
             .medMetadata(vedtaksbrevData.getMetadata())
             .build();
 
-        if (!brukDokprod()) {
-            String logo = FileStructureUtil.readResourceAsString("pdf/nav_logo_svg.html");
-            String header = TekstformatererHeader.lagHeader(vedtaksbrevData.getMetadata(), data.getOverskrift());
-            String innholdHtml = DokprodTilHtml.dokprodInnholdTilHtml(data.getBrevtekst());
-            String vedleggHtml = TekstformatererVedtaksbrev.lagVedtaksbrevVedleggHtml(vedtaksbrevData.getVedtaksbrevData());
-            return pdfGenerator.genererPDF(logo + header + innholdHtml + vedleggHtml);
+        if (!BrevToggle.brukDokprod()) {
+            return pdfBrevTjeneste.genererForhåndsvisning(BrevData.builder()
+                .setMottaker(getBrevMottaker(behandlingId))
+                .setMetadata(data.getBrevMetadata())
+                .setOverskrift(data.getOverskrift())
+                .setBrevtekst(data.getBrevtekst())
+                .setVedleggHtml(TekstformatererVedtaksbrev.lagVedtaksbrevVedleggHtml(vedtaksbrevData.getVedtaksbrevData()))
+                .build());
         } else {
             byte[] vedtaksbrevPdf = bestillDokumentTjeneste.hentForhåndsvisningFritekstbrev(data);
-            byte[] vedlegg = lagVedtaksbrevVedleggTabellPdf(vedtaksbrevData);
+            byte[] vedlegg = lagVedtaksbrevVedleggTabellPdf(vedtaksbrevData, DokumentVariant.UTKAST);
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             PDFMergerUtility mergerUtil = new PDFMergerUtility();

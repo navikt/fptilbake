@@ -16,6 +16,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporing;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.DetaljertBrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.VergeRepository;
@@ -29,6 +30,9 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottak
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottakerUtil;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.EksternDataForBrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.YtelseNavn;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.BrevData;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.BrevToggle;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.PdfBrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.JournalpostIdOgDokumentId;
@@ -57,6 +61,8 @@ public class ManueltVarselBrevTjeneste {
     private FritekstbrevTjeneste bestillDokumentTjeneste;
     private HistorikkinnslagTjeneste historikkinnslagTjeneste;
 
+    private PdfBrevTjeneste pdfBrevTjeneste;
+
     ManueltVarselBrevTjeneste() {
         // for CDI
     }
@@ -66,8 +72,8 @@ public class ManueltVarselBrevTjeneste {
                                      EksternDataForBrevTjeneste eksternDataForBrevTjeneste,
                                      FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste,
                                      FritekstbrevTjeneste bestillDokumentTjeneste,
-                                     HistorikkinnslagTjeneste historikkinnslagTjeneste
-    ) {
+                                     HistorikkinnslagTjeneste historikkinnslagTjeneste,
+                                     PdfBrevTjeneste pdfBrevTjeneste) {
         this.varselRepository = repositoryProvider.getVarselRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.brevSporingRepository = repositoryProvider.getBrevSporingRepository();
@@ -78,37 +84,78 @@ public class ManueltVarselBrevTjeneste {
         this.faktaFeilutbetalingTjeneste = faktaFeilutbetalingTjeneste;
         this.bestillDokumentTjeneste = bestillDokumentTjeneste;
         this.historikkinnslagTjeneste = historikkinnslagTjeneste;
+        this.pdfBrevTjeneste = pdfBrevTjeneste;
     }
 
     public void sendManueltVarselBrev(Long behandlingId, String fritekst, BrevMottaker brevMottaker) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-        VarselbrevSamletInfo varselbrevSamletInfo = lagVarselBeløpForSending(fritekst, behandling, brevMottaker,false);
+        VarselbrevSamletInfo varselbrevSamletInfo = lagVarselBeløpForSending(fritekst, behandling, brevMottaker, false);
 
         FritekstbrevData data = lagManueltVarselBrev(varselbrevSamletInfo);
 
-        JournalpostIdOgDokumentId dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data);
-        String tittel = BrevMottaker.VERGE.equals(brevMottaker) ? TITTEL_VARSELBREV_HISTORIKKINNSLAG_TIL_VERGE : TITTEL_VARSELBREV_HISTORIKKINNSLAG;
-        opprettHistorikkinnslag(behandling, dokumentreferanse, tittel);
-        lagreVarselData(behandlingId, dokumentreferanse, fritekst, varselbrevSamletInfo.getSumFeilutbetaling());
+        if (BrevToggle.brukDokprod()) {
+            JournalpostIdOgDokumentId dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data);
+            String tittel = BrevMottaker.VERGE.equals(brevMottaker) ? TITTEL_VARSELBREV_HISTORIKKINNSLAG_TIL_VERGE : TITTEL_VARSELBREV_HISTORIKKINNSLAG;
+            opprettHistorikkinnslag(behandling, dokumentreferanse, tittel);
+            lagreVarselData(behandlingId, dokumentreferanse, fritekst, varselbrevSamletInfo.getSumFeilutbetaling());
+        } else {
+            Long varsletFeilutbetaling = varselbrevSamletInfo.getSumFeilutbetaling();
+            pdfBrevTjeneste.sendBrev(behandlingId, DetaljertBrevType.VARSEL, varsletFeilutbetaling, fritekst, BrevData.builder()
+                .setMottaker(brevMottaker)
+                .setMetadata(data.getBrevMetadata())
+                .setOverskrift(data.getOverskrift())
+                .setBrevtekst(data.getBrevtekst())
+                .build());
+        }
     }
 
     public byte[] hentForhåndsvisningManueltVarselbrev(Long behandlingId, DokumentMalType malType, String fritekst) {
+        if (BrevToggle.brukDokprod()) {
+            return hentForhåndsvisningManueltVarselbrevDokprod(behandlingId, malType, fritekst);
+        } else {
+            return hentForhåndsvisningManueltVarselbrevPdfgen(behandlingId, malType, fritekst);
+        }
+    }
+
+    public byte[] hentForhåndsvisningManueltVarselbrevDokprod(Long behandlingId, DokumentMalType malType, String fritekst) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         boolean finnesVerge = vergeRepository.finnesVerge(behandlingId);
         BrevMottaker brevMottaker = finnesVerge ? BrevMottaker.VERGE : BrevMottaker.BRUKER;
-        byte[] dokument = new byte[0];
         if (DokumentMalType.VARSEL_DOK.equals(malType)) {
             VarselbrevSamletInfo varselbrevSamletInfo = lagVarselBeløpForSending(fritekst, behandling, brevMottaker, false);
             FritekstbrevData data = lagManueltVarselBrev(varselbrevSamletInfo);
-            dokument = bestillDokumentTjeneste.hentForhåndsvisningFritekstbrev(data);
+            return bestillDokumentTjeneste.hentForhåndsvisningFritekstbrev(data);
         } else if (DokumentMalType.KORRIGERT_VARSEL_DOK.equals(malType)) {
             VarselbrevSamletInfo varselbrevSamletInfo = lagVarselBeløpForSending(fritekst, behandling, brevMottaker, true);
             VarselInfo varselInfo = varselRepository.finnEksaktVarsel(behandlingId);
 
             FritekstbrevData data = lagKorrigertVarselBrev(varselbrevSamletInfo, varselInfo);
-            dokument = bestillDokumentTjeneste.hentForhåndsvisningFritekstbrev(data);
+            return bestillDokumentTjeneste.hentForhåndsvisningFritekstbrev(data);
         }
-        return dokument;
+        return new byte[0]; //kaste exception istedet?
+    }
+
+    public byte[] hentForhåndsvisningManueltVarselbrevPdfgen(Long behandlingId, DokumentMalType malType, String fritekst) {
+        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
+        boolean finnesVerge = vergeRepository.finnesVerge(behandlingId);
+        BrevMottaker brevMottaker = finnesVerge ? BrevMottaker.VERGE : BrevMottaker.BRUKER;
+        FritekstbrevData data;
+        if (DokumentMalType.VARSEL_DOK.equals(malType)) {
+            VarselbrevSamletInfo varselbrevSamletInfo = lagVarselBeløpForSending(fritekst, behandling, brevMottaker, false);
+            data = lagManueltVarselBrev(varselbrevSamletInfo);
+        } else if (DokumentMalType.KORRIGERT_VARSEL_DOK.equals(malType)) {
+            VarselbrevSamletInfo varselbrevSamletInfo = lagVarselBeløpForSending(fritekst, behandling, brevMottaker, true);
+            VarselInfo varselInfo = varselRepository.finnEksaktVarsel(behandlingId);
+            data = lagKorrigertVarselBrev(varselbrevSamletInfo, varselInfo);
+        } else {
+            throw new IllegalArgumentException("Ikke-støttet DokumentMalType: " + malType);
+        }
+        return pdfBrevTjeneste.genererForhåndsvisning(BrevData.builder()
+            .setMottaker(brevMottaker)
+            .setOverskrift(data.getOverskrift())
+            .setBrevtekst(data.getBrevtekst())
+            .setMetadata(data.getBrevMetadata())
+            .build());
     }
 
     public void sendKorrigertVarselBrev(Long behandlingId, String fritekst, BrevMottaker brevMottaker) {
@@ -118,10 +165,21 @@ public class ManueltVarselBrevTjeneste {
 
         FritekstbrevData data = lagKorrigertVarselBrev(varselbrevSamletInfo, varselInfo);
 
-        JournalpostIdOgDokumentId dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data);
-        String tittel = BrevMottaker.VERGE.equals(brevMottaker) ? TITTEL_KORRIGERT_VARSELBREV_HISTORIKKINNSLAG_TIL_VERGE : TITTEL_KORRIGERT_VARSELBREV_HISTORIKKINNSLAG;
-        opprettHistorikkinnslag(behandling, dokumentreferanse, tittel);
-        lagreVarselData(behandlingId, dokumentreferanse, fritekst, varselbrevSamletInfo.getSumFeilutbetaling());
+        if (BrevToggle.brukDokprod()) {
+            JournalpostIdOgDokumentId dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data);
+            String tittel = BrevMottaker.VERGE.equals(brevMottaker) ? TITTEL_KORRIGERT_VARSELBREV_HISTORIKKINNSLAG_TIL_VERGE : TITTEL_KORRIGERT_VARSELBREV_HISTORIKKINNSLAG;
+            opprettHistorikkinnslag(behandling, dokumentreferanse, tittel);
+            lagreVarselData(behandlingId, dokumentreferanse, fritekst, varselbrevSamletInfo.getSumFeilutbetaling());
+        } else {
+            Long varsletFeilutbetaling = varselbrevSamletInfo.getSumFeilutbetaling();
+            pdfBrevTjeneste.sendBrev(behandlingId, DetaljertBrevType.KORRIGERT_VARSEL, varsletFeilutbetaling, fritekst, BrevData.builder()
+                .setMottaker(brevMottaker)
+                .setOverskrift(data.getOverskrift())
+                .setBrevtekst(data.getBrevtekst())
+                .setMetadata(data.getBrevMetadata())
+                .build());
+        }
+
     }
 
     private FritekstbrevData lagManueltVarselBrev(VarselbrevSamletInfo varselbrevSamletInfo) {
@@ -152,7 +210,7 @@ public class ManueltVarselBrevTjeneste {
         //Henter data fra tps
         Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(behandling.getAktørId().getId());
         Adresseinfo adresseinfo = eksternDataForBrevTjeneste.hentAdresse(personinfo, brevMottaker, vergeEntitet);
-        String vergeNavn = BrevMottakerUtil.getVergeNavn(vergeEntitet,adresseinfo);
+        String vergeNavn = BrevMottakerUtil.getVergeNavn(vergeEntitet, adresseinfo);
 
         //Henter fagsaktypenavn på riktig språk
         Språkkode mottakersSpråkkode = hentSpråkkode(behandling.getId());

@@ -4,6 +4,8 @@ import org.assertj.core.api.Assertions;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.DokprodTilHtml;
+
 public class DokprodTilHtmlTest {
 
     @Test
@@ -22,6 +24,20 @@ public class DokprodTilHtmlTest {
         String resultat = DokprodTilHtml.dokprodInnholdTilHtml("10\u00A0000\u00A0kroner");
         Assertions.assertThat(resultat).isEqualTo("<p>10&nbsp;000&nbsp;kroner</p>");
     }
+
+    @Test
+    public void skal_konvertere_bullet_points() {
+        String resultat = DokprodTilHtml.dokprodInnholdTilHtml("*-bulletpoint 1\nbulletpoint 2\nsiste bulletpoint-*");
+        Assertions.assertThat(resultat).isEqualTo("<ul><li>bulletpoint 1</li><li>bulletpoint 2</li><li>siste bulletpoint</li></ul>");
+    }
+
+    @Test
+    public void skal_konvertere_bullet_points_når_første_linje_er_tom() {
+        String resultat = DokprodTilHtml.dokprodInnholdTilHtml("*-\nbulletpoint 1\nbulletpoint 2\nsiste bulletpoint-*");
+        Assertions.assertThat(resultat).isEqualTo("<ul><li>bulletpoint 1</li><li>bulletpoint 2</li><li>siste bulletpoint</li></ul>");
+    }
+
+
 
     @Ignore("Ikke implementert støtte enda")
     @Test

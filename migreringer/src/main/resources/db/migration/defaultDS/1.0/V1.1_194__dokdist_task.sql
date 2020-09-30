@@ -1,0 +1,3 @@
+INSERT INTO PROSESS_TASK_TYPE (KODE,NAVN,FEIL_MAKS_FORSOEK,BESKRIVELSE) VALUES ('publiser.journalpost.dokdist','Publiserer journalpost vha dokdist','3','Publiserer journalpost vha dokdist');
+INSERT INTO PROSESS_TASK_TYPE (KODE,NAVN,FEIL_MAKS_FORSOEK,BESKRIVELSE) VALUES ('brev.sporing','Sporingsinfo og historikkinnslag for brev','3','Oppretter sporingsinfo og historikkinnslag for brev (generell)');
+INSERT INTO PROSESS_TASK_TYPE (KODE,NAVN,FEIL_MAKS_FORSOEK,BESKRIVELSE) VALUES ('brev.sporing.varsel','Sporingsinfo og historikkinnslag for varselbrev','3','Oppretter sporingsinfo og historikkinnslag for varselbrev');

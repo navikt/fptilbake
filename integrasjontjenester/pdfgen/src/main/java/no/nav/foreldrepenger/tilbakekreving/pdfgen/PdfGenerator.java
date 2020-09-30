@@ -23,36 +23,19 @@ public class PdfGenerator {
         XRLog.setLoggerImpl(new Slf4jLogger());
     }
 
-    private String appendHtmlMetadata(String html, DocFormat format) {
-        StringBuilder builder = new StringBuilder();
-        //nødvendig doctype for å støtte non-breaking space i openhtmltopdf
-        builder.append("<!DOCTYPE html PUBLIC");
-        builder.append(" \"-//OPENHTMLTOPDF//DOC XHTML Character Entities Only 1.0//EN\" \"\">");
-
-        builder.append("<html>");
-        builder.append("<head>");
-        builder.append("<meta charset=\"UTF-8\" />");
-        builder.append("<style>");
-        builder.append(hentCss(format));
-        builder.append("</style>");
-        builder.append("</head>");
-        builder.append("<body>");
-        builder.append("<div id=\"content\">");
-        builder.append(html);
-        builder.append("</div>");
-        builder.append("</body>");
-        builder.append("</html>");
-        return builder.toString();
+    public byte[] genererPDFMedLogo(String html, DokumentVariant dokumentVariant) {
+        String logo = FileStructureUtil.readResourceAsString("pdf/nav_logo_svg.html");
+        return genererPDF(logo + html, dokumentVariant);
     }
 
-    public byte[] genererPDF(String html) {
+    public byte[] genererPDF(String html, DokumentVariant dokumentVariant) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        genererPDF(html, baos);
+        genererPDF(html, baos, dokumentVariant);
         return baos.toByteArray();
     }
 
-    public void genererPDF(String htmlContent, ByteArrayOutputStream outputStream) {
-        String htmlDocument = appendHtmlMetadata(htmlContent, DocFormat.PDF);
+    private void genererPDF(String htmlContent, ByteArrayOutputStream outputStream, DokumentVariant dokumentVariant) {
+        String htmlDocument = appendHtmlMetadata(htmlContent, DocFormat.PDF, dokumentVariant);
         PdfRendererBuilder builder = new PdfRendererBuilder();
         try {
             builder
@@ -69,6 +52,39 @@ public class PdfGenerator {
                 .createPDF();
         } catch (IOException e) {
             throw new RuntimeException("Feil ved generering av pdf", e);
+        }
+    }
+
+    private String appendHtmlMetadata(String html, DocFormat format, DokumentVariant dokumentVariant) {
+        StringBuilder builder = new StringBuilder();
+        //nødvendig doctype for å støtte non-breaking space i openhtmltopdf
+        builder.append("<!DOCTYPE html PUBLIC");
+        builder.append(" \"-//OPENHTMLTOPDF//DOC XHTML Character Entities Only 1.0//EN\" \"\">");
+
+        builder.append("<html>");
+        builder.append("<head>");
+        builder.append("<meta charset=\"UTF-8\" />");
+        builder.append("<style>");
+        builder.append(hentCss(format));
+        builder.append("</style>");
+        builder.append("</head>");
+        builder.append(lagBodyStartTag(dokumentVariant));
+        builder.append("<div id=\"content\">");
+        builder.append(html);
+        builder.append("</div>");
+        builder.append("</body>");
+        builder.append("</html>");
+        return builder.toString();
+    }
+
+    private String lagBodyStartTag(DokumentVariant dokumentVariant) {
+        switch (dokumentVariant) {
+            case ENDELIG:
+                return "<body>";
+            case UTKAST:
+                return "<body class=\"utkast\">";
+            default:
+                throw new IllegalArgumentException("Ikke-støttet dokumentvariant: " + dokumentVariant);
         }
     }
 

@@ -25,6 +25,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselInfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons.Varselrespons;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.BrevToggle;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.SendVarselbrevTask;
 import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.task.SendBeskjedUtsendtVarselTilSelvbetjeningTask;
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
@@ -103,7 +104,10 @@ public class VarselStegImpl implements VarselSteg {
         ProsessTaskGruppe taskGruppe = new ProsessTaskGruppe();
 
         sendVarsel(behandling, taskGruppe);
-        sendBeskjedOmUtsendtVarsel(behandling, taskGruppe);
+
+        if (BrevToggle.brukDokprod()) {
+            sendBeskjedOmUtsendtVarsel(behandling, taskGruppe);
+        } //else opprett task fra senere task
 
         taskRepository.lagre(taskGruppe);
     }
