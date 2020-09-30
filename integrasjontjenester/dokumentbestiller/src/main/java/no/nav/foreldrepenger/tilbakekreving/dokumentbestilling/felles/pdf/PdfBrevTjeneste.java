@@ -14,6 +14,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskBehandlingUtil;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.header.TekstformatererHeader;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.JournalpostIdOgDokumentId;
+import no.nav.foreldrepenger.tilbakekreving.pdfgen.DokumentVariant;
 import no.nav.foreldrepenger.tilbakekreving.pdfgen.PdfGenerator;
 import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.task.SendBeskjedUtsendtVarselTilSelvbetjeningTask;
 import no.nav.journalpostapi.dto.dokument.Dokumentkategori;
@@ -45,7 +46,7 @@ public class PdfBrevTjeneste {
 
     public byte[] genererForhåndsvisning(BrevData data) {
         String html = lagHtml(data);
-        return pdfGenerator.genererPDFMedLogo(html);
+        return pdfGenerator.genererPDFMedLogo(html, DokumentVariant.UTKAST);
     }
 
     public void sendBrev(Long behandlingId, DetaljertBrevType detaljertBrevType, BrevData data) {
@@ -73,7 +74,7 @@ public class PdfBrevTjeneste {
 
     private JournalpostIdOgDokumentId lagOgJournalførBrev(Long behandlingId, DetaljertBrevType detaljertBrevType, BrevData data) {
         String html = lagHtml(data);
-        byte[] pdf = pdfGenerator.genererPDFMedLogo(html);
+        byte[] pdf = pdfGenerator.genererPDFMedLogo(html, DokumentVariant.ENDELIG);
         return journalføringTjeneste.journalførUtgåendeBrev(behandlingId, mapBrevTypeTilDokumentKategori(detaljertBrevType), data.getMetadata(), data.getMottaker(), pdf);
     }
 

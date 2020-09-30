@@ -103,6 +103,7 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBe
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SøknadType;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.pdfgen.DokumentVariant;
 
 
 @ApplicationScoped
@@ -181,7 +182,7 @@ public class VedtaksbrevTjeneste {
 
 
         if (BrevToggle.brukDokprod()) {
-            byte[] vedlegg = lagVedtaksbrevVedleggTabellPdf(vedtaksbrevData);
+            byte[] vedlegg = lagVedtaksbrevVedleggTabellPdf(vedtaksbrevData, DokumentVariant.ENDELIG);
             JournalpostIdOgDokumentId vedleggReferanse = journalføringTjeneste.journalførVedlegg(behandlingId, vedlegg);
             JournalpostIdOgDokumentId dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data, vedleggReferanse);
             Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
@@ -198,9 +199,9 @@ public class VedtaksbrevTjeneste {
         }
     }
 
-    private byte[] lagVedtaksbrevVedleggTabellPdf(VedtaksbrevData vedtaksbrevData) {
+    private byte[] lagVedtaksbrevVedleggTabellPdf(VedtaksbrevData vedtaksbrevData, DokumentVariant dokumentVariant) {
         VedtaksbrevVedleggTjeneste vedleggTjeneste = new VedtaksbrevVedleggTjeneste();
-        return vedleggTjeneste.lagVedlegg(vedtaksbrevData);
+        return vedleggTjeneste.lagVedlegg(vedtaksbrevData, dokumentVariant);
     }
 
     public byte[] hentForhåndsvisningVedtaksbrevMedVedleggSomPdf(HentForhåndvisningVedtaksbrevPdfDto dto) {
@@ -224,7 +225,7 @@ public class VedtaksbrevTjeneste {
                 .build());
         } else {
             byte[] vedtaksbrevPdf = bestillDokumentTjeneste.hentForhåndsvisningFritekstbrev(data);
-            byte[] vedlegg = lagVedtaksbrevVedleggTabellPdf(vedtaksbrevData);
+            byte[] vedlegg = lagVedtaksbrevVedleggTabellPdf(vedtaksbrevData, DokumentVariant.UTKAST);
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             PDFMergerUtility mergerUtil = new PDFMergerUtility();
