@@ -59,12 +59,11 @@ public class PdfBrevTjeneste {
         taskGruppe.addNesteSekvensiell(lagSporingBrevTask(behandlingId, detaljertBrevType, data, dokumentreferanse));
         if (detaljertBrevType.gjelderVarsel()) {
             taskGruppe.addNesteSekvensiell(lagSporingVarselBrevTask(behandlingId, varsletBeløp, fritekst));
-        }
-
-        if (SendBeskjedUtsendtVarselTilSelvbetjeningTask.kanSendeVarsel(behandling)) {
-            taskGruppe.addNesteSekvensiell(lagSendBeskjedTilSelvbetjeningTask(behandling));
-        } else {
-            logger.info("Sender ikke beskjed til selvbetjening for varsel for behandlingId={} i sak={}", behandling.getId(), behandling.getFagsak().getSaksnummer().getVerdi());
+            if (SendBeskjedUtsendtVarselTilSelvbetjeningTask.kanSendeVarsel(behandling)) {
+                taskGruppe.addNesteSekvensiell(lagSendBeskjedTilSelvbetjeningTask(behandling));
+            } else {
+                logger.info("Sender ikke beskjed til selvbetjening for varsel for behandlingId={} i sak={}", behandling.getId(), behandling.getFagsak().getSaksnummer().getVerdi());
+            }
         }
         prosessTaskRepository.lagre(taskGruppe);
 
