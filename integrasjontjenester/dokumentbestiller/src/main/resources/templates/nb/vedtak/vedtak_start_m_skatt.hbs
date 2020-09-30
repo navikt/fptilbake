@@ -2,13 +2,13 @@
 {{~#* inline "varsel-tekst" ~}}
     {{#switch totalresultat.hovedresultat}}
     {{#case "FULL_TILBAKEBETALING"}}
-Vi varslet deg {{varsel.varslet-dato}} om at du har fått utbetalt for mye.
+Vi varslet deg {{varsel.varslet-dato}} om at du har fått utbetalt for mye.{{>korrigert-total-beløp}}
     {{/case}}
     {{#case "DELVIS_TILBAKEBETALING"}}
-Vi varslet deg {{varsel.varslet-dato}} om at du har fått {{kroner varsel.varslet-beløp}} for mye.
+Vi varslet deg {{varsel.varslet-dato}} om at du har fått {{kroner varsel.varslet-beløp}} for mye.{{>korrigert-total-beløp}}
     {{/case}}
     {{#case "INGEN_TILBAKEBETALING"}}
-Vi varslet deg {{varsel.varslet-dato}} om at du har fått {{kroner varsel.varslet-beløp}} for mye. Vi har behandlet saken din og du må ikke betale tilbake det feilutbetalte beløpet.
+Vi varslet deg {{varsel.varslet-dato}} om at du har fått {{kroner varsel.varslet-beløp}} for mye.{{>korrigert-total-beløp}} Vi har behandlet saken din og du må ikke betale tilbake det feilutbetalte beløpet.
     {{/case}}
     {{/switch}}
 {{~/inline~}}

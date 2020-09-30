@@ -5,3 +5,6 @@
 {{lookup-map sak.ytelsetype FP="foreldrepengene" SVP="svangerskapspengene" ES="engangsstønaden" FRISINN="kompensasjonen"}}
 {{~/inline~}}
 {{#* inline "før-skatt"}}{{#if (not skal-ikke-vise-skatt)}} før skatt{{/if}}{{/inline}}
+{{~#* inline "korrigert-total-beløp" ~}}
+{{#if beløpet-er-korrigert}} Beløpet har blitt endret. Nytt feilutbetalt beløp utgjør {{kroner korrigert-beløp}} kroner.{{/if}}
+{{~/inline~}}

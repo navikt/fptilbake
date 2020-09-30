@@ -577,6 +577,51 @@ public class TekstformatererVedtaksbrevTest {
     }
 
     @Test
+    public void skal_generere_vedtaksbrev_for_FP_ingen_tilbakekreving_pga_lavt_beløp_med_korrigert_beløp() throws Exception {
+        HbVedtaksbrevFelles vedtaksbrevData = lagTestBuilder()
+            .medSak(HbSak.build()
+                .medErFødsel(true)
+                .medAntallBarn(5)
+                .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
+                .build())
+            .medVedtakResultat(HbTotalresultat.builder()
+                .medHovedresultat(VedtakResultatType.INGEN_TILBAKEBETALING)
+                .medTotaltTilbakekrevesBeløp(BigDecimal.ZERO)
+                .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.ZERO)
+                .medTotaltRentebeløp(BigDecimal.ZERO)
+                .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.ZERO)
+                .build())
+            .medLovhjemmelVedtak("Folketrygdloven § 22-15 6.ledd")
+            .medVarsel(HbVarsel.builder()
+                .medVarsletBeløp(BigDecimal.valueOf(15000))
+                .medVarsletDato(LocalDate.of(2020, 4, 4))
+                .build())
+            .medErBeløpetKorrigertNed(true)
+            .medKorrigertBeløp(BigDecimal.valueOf(1000))
+            .build();
+        List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
+            HbVedtaksbrevPeriode.builder()
+                .medPeriode(førsteNyttårsdag)
+                .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(500)))
+                .medFakta(HendelseType.FP_ANNET_HENDELSE_TYPE, HendelseUnderType.ANNET_FRITEKST, "foo bar baz")
+                .medVurderinger(HbVurderinger.builder()
+                    .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
+                    .medVilkårResultat(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER)
+                    .medAktsomhetResultat(Aktsomhet.SIMPEL_UAKTSOM)
+                    .medUnntasInnkrevingPgaLavtBeløp(true)
+                    .build())
+                .medResultat(HbResultatTestBuilder.forTilbakekrevesBeløp(0))
+                .build()
+        );
+
+        HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
+
+        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
+        String fasit = les("/vedtaksbrev/FP_ikke_tilbakekreves_med_korrigert_beløp.txt");
+        assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
+    }
+
+    @Test
     public void skal_generere_vedtaksbrev_overskrift_foreldrepenger_full_tilbakebetaling() {
         HbVedtaksbrevData data = lagBrevOverskriftTestoppsett(FagsakYtelseType.FORELDREPENGER, VedtakResultatType.FULL_TILBAKEBETALING, null);
 

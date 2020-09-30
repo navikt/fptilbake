@@ -6,13 +6,13 @@ Vi har vurdert saken din om tilbakebetaling på nytt. Derfor gjelder ikke det ti
 {{#if varsel.varslet-dato}}
     {{#switch totalresultat.hovedresultat}}
     {{#case "FULL_TILBAKEBETALING"}}
-Vi varslet deg {{varsel.varslet-dato}} om at du har fått utbetalt for mye. Du må betale tilbake {{kroner totalresultat.totalt-tilbakekreves-beløp-med-renter}}, som er hele det feilutbetalte beløpet.{{>evt-renter-utsagn}}
+Vi varslet deg {{varsel.varslet-dato}} om at du har fått utbetalt for mye.{{>korrigert-total-beløp}} Du må betale tilbake {{kroner totalresultat.totalt-tilbakekreves-beløp-med-renter}}, som er hele det feilutbetalte beløpet.{{>evt-renter-utsagn}}
     {{/case}}
     {{#case "DELVIS_TILBAKEBETALING"}}
-Vi varslet deg {{varsel.varslet-dato}} om at du har fått {{kroner varsel.varslet-beløp}} for mye. Du må betale tilbake {{kroner totalresultat.totalt-tilbakekreves-beløp-med-renter}}, som er deler av det feilutbetalte beløpet.{{>evt-renter-utsagn}}
+Vi varslet deg {{varsel.varslet-dato}} om at du har fått {{kroner varsel.varslet-beløp}} for mye.{{>korrigert-total-beløp}} Du må betale tilbake {{kroner totalresultat.totalt-tilbakekreves-beløp-med-renter}}, som er deler av det feilutbetalte beløpet.{{>evt-renter-utsagn}}
     {{/case}}
     {{#case "INGEN_TILBAKEBETALING"}}
-Vi varslet deg {{varsel.varslet-dato}} om at du har fått {{kroner varsel.varslet-beløp}} for mye. Vi har behandlet saken din og du må ikke betale tilbake det feilutbetalte beløpet.
+Vi varslet deg {{varsel.varslet-dato}} om at du har fått {{kroner varsel.varslet-beløp}} for mye.{{>korrigert-total-beløp}} Vi har behandlet saken din og du må ikke betale tilbake det feilutbetalte beløpet.
     {{/case}}
     {{/switch}}
 {{else}}

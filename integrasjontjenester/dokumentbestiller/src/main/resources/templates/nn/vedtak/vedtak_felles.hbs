@@ -1,7 +1,10 @@
 {{~#* inline "ytelse-navn" ~}}
-{{lookup-map sak.ytelsetype FP="foreldrepengar" SVP="svangerskapspengar" ES="eingongsstønad" FRISINN="kompensasjonsytelse for selvstendig næringsdrivende og frilansere"}}
+{{lookup-map sak.ytelsetype FP="foreldrepengar" SVP="svangerskapspengar" ES="eingongsstønad" FRISINN="kompensasjon"}}
 {{~/inline~}}
 {{~#* inline "ytelse-produkt" ~}}
 {{lookup-map sak.ytelsetype FP="foreldrepengane" SVP="svangerskapspengane" ES="eingongsstønaden" FRISINN="kompensasjonen"}}
 {{~/inline~}}
 {{#* inline "før-skatt"}}{{#if (not skal-ikke-vise-skatt)}} før skatt{{/if}}{{/inline}}
+{{~#* inline "korrigert-total-beløp" ~}}
+{{#if beløpet-er-korrigert}} Beløpet har blitt endra. Nytt feilutbetalt beløp utgjør {{kroner korrigert-beløp}} kroner.{{/if}}
+{{~/inline~}}
