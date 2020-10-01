@@ -36,10 +36,10 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
     @JsonProperty("annenMottakerNavn")
     private String annenMottakerNavn;
     private Språkkode språkkode = Språkkode.nb;
-    @JsonProperty("beløpet-er-korrigert")
-    private boolean erBeløpetKorrigertNed;
-    @JsonProperty("korrigert-beløp")
-    private BigDecimal korrigertBeløp;
+    @JsonProperty("feilutbetalt-beløp-er-korrigert-ned")
+    private boolean erFeilutbetaltBeløpKorrigertNed;
+    @JsonProperty("totalt-feilutbetalt-beløp")
+    private BigDecimal totaltFeilutbetaltBeløp;
 
     private HbVedtaksbrevDatoer datoer;
 
@@ -197,13 +197,13 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
             return this;
         }
 
-        public Builder medErBeløpetKorrigertNed(boolean erKorrigert) {
-            kladd.erBeløpetKorrigertNed = erKorrigert;
+        public Builder medErFeilutbetaltBeløpKorrigertNed(boolean erKorrigert) {
+            kladd.erFeilutbetaltBeløpKorrigertNed = erKorrigert;
             return this;
         }
 
-        public Builder medKorrigertBeløp(BigDecimal korrigertBeløp) {
-            kladd.korrigertBeløp = korrigertBeløp;
+        public Builder medTotaltFeilutbetaltBeløp(BigDecimal totaltFeilutbetaltBeløp) {
+            kladd.totaltFeilutbetaltBeløp = totaltFeilutbetaltBeløp;
             return this;
         }
     }

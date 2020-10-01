@@ -596,8 +596,8 @@ public class TekstformatererVedtaksbrevTest {
                 .medVarsletBeløp(BigDecimal.valueOf(15000))
                 .medVarsletDato(LocalDate.of(2020, 4, 4))
                 .build())
-            .medErBeløpetKorrigertNed(true)
-            .medKorrigertBeløp(BigDecimal.valueOf(1000))
+            .medErFeilutbetaltBeløpKorrigertNed(true)
+            .medTotaltFeilutbetaltBeløp(BigDecimal.valueOf(1000))
             .build();
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
             HbVedtaksbrevPeriode.builder()

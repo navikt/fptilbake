@@ -220,8 +220,8 @@ public class DokumentasjonGeneratorVedtakOppsummering {
                 .medVarsletBeløp(25000L)
                 .medVarsletDato(JANUAR_15)
                 .build())
-                .medErBeløpetKorrigertNed(true)
-                .medKorrigertBeløp(BigDecimal.valueOf(1000));
+                .medErFeilutbetaltBeløpKorrigertNed(true)
+                .medTotaltFeilutbetaltBeløp(BigDecimal.valueOf(1000));
         } else if (medVarsel) {
             fellesBuilder.medVarsel(HbVarsel.builder()
                 .medVarsletBeløp(1000L)
