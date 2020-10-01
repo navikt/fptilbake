@@ -36,12 +36,10 @@ public class DokumentasjonGeneratorVedtakOppsummering {
         FagsakYtelseType ytelseType = FagsakYtelseType.FORELDREPENGER;
         Språkkode nb = Språkkode.nb;
         for (VedtakResultatType resultatType : tilbakekrevingsResultat) {
-            for (boolean medVarsel : trueFalse){
-                genererVedtakStart(ytelseType, nb, resultatType, medVarsel, 1000, 10, 100);
-                genererVedtakStart(ytelseType, nb, resultatType, medVarsel, 1000, 0, 100);
-                genererVedtakStart(ytelseType, nb, resultatType, medVarsel, 1000, 10, 0);
-                genererVedtakStart(ytelseType, nb, resultatType, medVarsel, 1000, 0, 0);
+            for (boolean medVarsel : trueFalse) {
+                listVedtakStartAllePermutasjoner(ytelseType, nb, resultatType, medVarsel);
             }
+            listVedtakStartMedKorrigertBeløpAllePermutasjoner(ytelseType, nb, resultatType);
         }
     }
 
@@ -50,12 +48,10 @@ public class DokumentasjonGeneratorVedtakOppsummering {
         FagsakYtelseType ytelseType = FagsakYtelseType.FORELDREPENGER;
         Språkkode språkkode = Språkkode.nn;
         for (VedtakResultatType resultatType : tilbakekrevingsResultat) {
-            for (boolean medVarsel : trueFalse){
-                genererVedtakStart(ytelseType, språkkode, resultatType, medVarsel, 1000, 10, 100);
-                genererVedtakStart(ytelseType, språkkode, resultatType, medVarsel, 1000, 0, 100);
-                genererVedtakStart(ytelseType, språkkode, resultatType, medVarsel, 1000, 10, 0);
-                genererVedtakStart(ytelseType, språkkode, resultatType, medVarsel, 1000, 0, 0);
+            for (boolean medVarsel : trueFalse) {
+                listVedtakStartAllePermutasjoner(ytelseType, språkkode, resultatType, medVarsel);
             }
+            listVedtakStartMedKorrigertBeløpAllePermutasjoner(ytelseType, språkkode, resultatType);
         }
     }
 
@@ -64,10 +60,10 @@ public class DokumentasjonGeneratorVedtakOppsummering {
         FagsakYtelseType ytelseType = FagsakYtelseType.ENGANGSTØNAD;
         Språkkode nb = Språkkode.nb;
         for (VedtakResultatType resultatType : tilbakekrevingsResultat) {
-            for (boolean medVarsel : trueFalse){
-                genererVedtakStart(ytelseType, nb, resultatType, medVarsel, 1000, 10, 0);
-                genererVedtakStart(ytelseType, nb, resultatType, medVarsel, 1000, 0, 0);
+            for (boolean medVarsel : trueFalse) {
+                listVedtakStartUtenSkatt(ytelseType, nb, resultatType, medVarsel);
             }
+            listVedtakStartMedKorrigertBeløpUtenSkatt(ytelseType, nb, resultatType);
         }
     }
 
@@ -76,10 +72,10 @@ public class DokumentasjonGeneratorVedtakOppsummering {
         FagsakYtelseType ytelseType = FagsakYtelseType.ENGANGSTØNAD;
         Språkkode språkkode = Språkkode.nn;
         for (VedtakResultatType resultatType : tilbakekrevingsResultat) {
-            for (boolean medVarsel : trueFalse){
-                genererVedtakStart(ytelseType, språkkode, resultatType, medVarsel, 1000, 10, 0);
-                genererVedtakStart(ytelseType, språkkode, resultatType, medVarsel, 1000, 0, 0);
+            for (boolean medVarsel : trueFalse) {
+                listVedtakStartUtenSkatt(ytelseType, språkkode, resultatType, medVarsel);
             }
+            listVedtakStartMedKorrigertBeløpUtenSkatt(ytelseType, språkkode, resultatType);
         }
     }
 
@@ -88,12 +84,10 @@ public class DokumentasjonGeneratorVedtakOppsummering {
         FagsakYtelseType ytelseType = FagsakYtelseType.SVANGERSKAPSPENGER;
         Språkkode nb = Språkkode.nb;
         for (VedtakResultatType resultatType : tilbakekrevingsResultat) {
-            for (boolean medVarsel : trueFalse){
-                genererVedtakStart(ytelseType, nb, resultatType, medVarsel, 1000, 10, 100);
-                genererVedtakStart(ytelseType, nb, resultatType, medVarsel, 1000, 0, 100);
-                genererVedtakStart(ytelseType, nb, resultatType, medVarsel, 1000, 10, 0);
-                genererVedtakStart(ytelseType, nb, resultatType, medVarsel, 1000, 0, 0);
+            for (boolean medVarsel : trueFalse) {
+                listVedtakStartAllePermutasjoner(ytelseType, nb, resultatType, medVarsel);
             }
+            listVedtakStartMedKorrigertBeløpAllePermutasjoner(ytelseType, nb, resultatType);
         }
     }
 
@@ -102,12 +96,10 @@ public class DokumentasjonGeneratorVedtakOppsummering {
         FagsakYtelseType ytelseType = FagsakYtelseType.SVANGERSKAPSPENGER;
         Språkkode språkkode = Språkkode.nn;
         for (VedtakResultatType resultatType : tilbakekrevingsResultat) {
-            for (boolean medVarsel : trueFalse){
-                genererVedtakStart(ytelseType, språkkode, resultatType, medVarsel, 1000, 10, 100);
-                genererVedtakStart(ytelseType, språkkode, resultatType, medVarsel, 1000, 0, 100);
-                genererVedtakStart(ytelseType, språkkode, resultatType, medVarsel, 1000, 10, 0);
-                genererVedtakStart(ytelseType, språkkode, resultatType, medVarsel, 1000, 0, 0);
+            for (boolean medVarsel : trueFalse) {
+                listVedtakStartAllePermutasjoner(ytelseType, språkkode, resultatType, medVarsel);
             }
+            listVedtakStartMedKorrigertBeløpAllePermutasjoner(ytelseType, språkkode, resultatType);
         }
     }
 
@@ -116,10 +108,10 @@ public class DokumentasjonGeneratorVedtakOppsummering {
         FagsakYtelseType ytelseType = FagsakYtelseType.FRISINN;
         Språkkode nb = Språkkode.nb;
         for (VedtakResultatType resultatType : tilbakekrevingsResultat) {
-            for (boolean medVarsel : trueFalse){
-                genererVedtakStart(ytelseType, nb, resultatType, medVarsel, 1000, 0, 100);
-                genererVedtakStart(ytelseType, nb, resultatType, medVarsel, 1000, 0, 0);
+            for (boolean medVarsel : trueFalse) {
+                listVedtakStartUtenRenter(ytelseType, nb, resultatType, medVarsel);
             }
+            listVedtakStartMedKorrigertBeløpUtenRenter(ytelseType, nb, resultatType);
         }
     }
 
@@ -128,11 +120,45 @@ public class DokumentasjonGeneratorVedtakOppsummering {
         FagsakYtelseType ytelseType = FagsakYtelseType.FRISINN;
         Språkkode språkkode = Språkkode.nn;
         for (VedtakResultatType resultatType : tilbakekrevingsResultat) {
-            for (boolean medVarsel : trueFalse){
-                genererVedtakStart(ytelseType, språkkode, resultatType, medVarsel, 1000, 0, 100);
-                genererVedtakStart(ytelseType, språkkode, resultatType, medVarsel, 1000, 0, 0);
+            for (boolean medVarsel : trueFalse) {
+                listVedtakStartUtenRenter(ytelseType, språkkode, resultatType, medVarsel);
             }
+            listVedtakStartMedKorrigertBeløpUtenRenter(ytelseType, språkkode, resultatType);
         }
+    }
+
+    private void listVedtakStartAllePermutasjoner(FagsakYtelseType ytelseType, Språkkode nb, VedtakResultatType resultatType, boolean medVarsel) {
+        genererVedtakStart(ytelseType, nb, resultatType, medVarsel, 1000, 10, 100);
+        genererVedtakStart(ytelseType, nb, resultatType, medVarsel, 1000, 0, 100);
+        genererVedtakStart(ytelseType, nb, resultatType, medVarsel, 1000, 10, 0);
+        genererVedtakStart(ytelseType, nb, resultatType, medVarsel, 1000, 0, 0);
+    }
+
+    private void listVedtakStartUtenRenter(FagsakYtelseType ytelseType, Språkkode nb, VedtakResultatType resultatType, boolean medVarsel) {
+        genererVedtakStart(ytelseType, nb, resultatType, medVarsel, 1000, 0, 100);
+        genererVedtakStart(ytelseType, nb, resultatType, medVarsel, 1000, 0, 0);
+    }
+
+    private void listVedtakStartUtenSkatt(FagsakYtelseType ytelseType, Språkkode nb, VedtakResultatType resultatType, boolean medVarsel) {
+        genererVedtakStart(ytelseType, nb, resultatType, medVarsel, 1000, 10, 0);
+        genererVedtakStart(ytelseType, nb, resultatType, medVarsel, 1000, 0, 0);
+    }
+
+    private void listVedtakStartMedKorrigertBeløpAllePermutasjoner(FagsakYtelseType ytelseType, Språkkode nb, VedtakResultatType resultatType) {
+        genererVedtakStartMedKorrigertBeløp(ytelseType, nb, resultatType, 1000, 10, 100);
+        genererVedtakStartMedKorrigertBeløp(ytelseType, nb, resultatType, 1000, 0, 100);
+        genererVedtakStartMedKorrigertBeløp(ytelseType, nb, resultatType, 1000, 10, 0);
+        genererVedtakStartMedKorrigertBeløp(ytelseType, nb, resultatType, 1000, 0, 0);
+    }
+
+    private void listVedtakStartMedKorrigertBeløpUtenRenter(FagsakYtelseType ytelseType, Språkkode nb, VedtakResultatType resultatType) {
+        genererVedtakStartMedKorrigertBeløp(ytelseType, nb, resultatType, 1000, 0, 100);
+        genererVedtakStartMedKorrigertBeløp(ytelseType, nb, resultatType, 1000, 0, 0);
+    }
+
+    private void listVedtakStartMedKorrigertBeløpUtenSkatt(FagsakYtelseType ytelseType, Språkkode nb, VedtakResultatType resultatType) {
+        genererVedtakStartMedKorrigertBeløp(ytelseType, nb, resultatType, 1000, 10, 0);
+        genererVedtakStartMedKorrigertBeløp(ytelseType, nb, resultatType, 1000, 0, 0);
     }
 
     private void genererVedtakStart(FagsakYtelseType ytelseType,
@@ -142,6 +168,26 @@ public class DokumentasjonGeneratorVedtakOppsummering {
                                     int totalt,
                                     int renter,
                                     int skatt) {
+        genererVedtakStart(ytelseType, språkkode, tilbakebetaling, medVarsel, totalt, renter, skatt, false);
+    }
+
+    private void genererVedtakStartMedKorrigertBeløp(FagsakYtelseType ytelseType,
+                                                     Språkkode språkkode,
+                                                     VedtakResultatType tilbakebetaling,
+                                                     int totalt,
+                                                     int renter,
+                                                     int skatt) {
+        genererVedtakStart(ytelseType, språkkode, tilbakebetaling, true, totalt, renter, skatt, true);
+    }
+
+    private void genererVedtakStart(FagsakYtelseType ytelseType,
+                                    Språkkode språkkode,
+                                    VedtakResultatType tilbakebetaling,
+                                    boolean medVarsel,
+                                    int totalt,
+                                    int renter,
+                                    int skatt,
+                                    boolean medKorrigertBeløp) {
         HbSak.Builder sakBuilder = HbSak.build()
             .medYtelsetype(ytelseType)
             .medAntallBarn(1)
@@ -169,9 +215,16 @@ public class DokumentasjonGeneratorVedtakOppsummering {
                 .medKlagefristUker(6)
                 .build())
             .medLovhjemmelVedtak("");
-        if (medVarsel) {
+        if (medKorrigertBeløp) {
             fellesBuilder.medVarsel(HbVarsel.builder()
-                .medVarsletBeløp(1000l)
+                .medVarsletBeløp(25000L)
+                .medVarsletDato(JANUAR_15)
+                .build())
+                .medErFeilutbetaltBeløpKorrigertNed(true)
+                .medTotaltFeilutbetaltBeløp(BigDecimal.valueOf(1000));
+        } else if (medVarsel) {
+            fellesBuilder.medVarsel(HbVarsel.builder()
+                .medVarsletBeløp(1000L)
                 .medVarsletDato(JANUAR_15)
                 .build());
         }
@@ -179,23 +232,28 @@ public class DokumentasjonGeneratorVedtakOppsummering {
             .medSpråkkode(språkkode).build();
         String vedtakStart = TekstformatererVedtaksbrev.lagVedtakStart(felles);
 
-        prettyPrint(tilbakebetaling, medVarsel, renter, skatt, vedtakStart);
+        prettyPrint(tilbakebetaling, medVarsel, renter, skatt, vedtakStart, medKorrigertBeløp);
     }
 
     private void prettyPrint(VedtakResultatType tilbakebetaling,
                              boolean medVarsel,
                              int renter,
                              int skatt,
-                             String generertTekst) {
-        System.out.println("*[ " + tilbakebetaling.getNavn() + " - "
+                             String generertTekst,
+                             boolean medKorrigertBeløp) {
+        System.out.println("*[ "
+            + tilbakebetaling.getNavn() + " - "
             + (medVarsel ? "med varsel" : "uten varsel") + " - "
             + (skatt != 0 ? "med skatt" : "uten skatt") + " - "
-            + (renter != 0 ? "med renter" : "uten renter") + " ]*");
+            + (renter != 0 ? "med renter" : "uten renter")
+            + (medKorrigertBeløp ? " - med korrigert beløp" : "")
+            + " ]*");
         String parametrisertTekst = generertTekst
             .replaceAll(" 1\u00A0010\u00A0kroner", " <skyldig beløp> kroner")
             .replaceAll(" 1\u00A0000\u00A0kroner", " <skyldig beløp> kroner")
             .replaceAll(" 910\u00A0kroner", " <skyldig beløp uten skatt> kroner")
             .replaceAll(" 900\u00A0kroner", " <skyldig beløp uten skatt> kroner")
+            .replaceAll(" 25\u00A0000\u00A0kroner", " <varslet beløp> kroner")
             .replaceAll("15. januar 2020", medVarsel ? "<varseldato>" : "<vedtaksdato>")
             .replaceAll("\\[", "[ ")
             .replaceAll("]", " ]");

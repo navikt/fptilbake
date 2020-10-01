@@ -1,5 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -35,6 +36,10 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
     @JsonProperty("annenMottakerNavn")
     private String annenMottakerNavn;
     private Språkkode språkkode = Språkkode.nb;
+    @JsonProperty("feilutbetalt-beløp-er-korrigert-ned")
+    private boolean erFeilutbetaltBeløpKorrigertNed;
+    @JsonProperty("totalt-feilutbetalt-beløp")
+    private BigDecimal totaltFeilutbetaltBeløp;
 
     private HbVedtaksbrevDatoer datoer;
 
@@ -189,6 +194,16 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
 
         public Builder medAnnenMottakerNavn(String annenMottakerNavn) {
             kladd.annenMottakerNavn = annenMottakerNavn;
+            return this;
+        }
+
+        public Builder medErFeilutbetaltBeløpKorrigertNed(boolean erKorrigert) {
+            kladd.erFeilutbetaltBeløpKorrigertNed = erKorrigert;
+            return this;
+        }
+
+        public Builder medTotaltFeilutbetaltBeløp(BigDecimal totaltFeilutbetaltBeløp) {
+            kladd.totaltFeilutbetaltBeløp = totaltFeilutbetaltBeløp;
             return this;
         }
     }

@@ -309,6 +309,9 @@ public class VedtaksbrevTjeneste {
         BigDecimal totaltRentebeløp = summer(resulatPerioder, BeregningResultatPeriode::getRenteBeløp);
         BigDecimal totaltTilbakekrevesBeløpMedRenterUtenSkatt = totaltTilbakekrevesMedRenter.subtract(totaltSkattetrekk);
 
+        BigDecimal totaltFeilutbetaltBeløp = summer(resulatPerioder, BeregningResultatPeriode::getFeilutbetaltBeløp);
+        boolean erFeilutbetaltBeløpKorrigertNed = varsletBeløp != null && totaltFeilutbetaltBeløp.longValue() < varsletBeløp;
+
         boolean erRevurdering = BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandling.getType());
         boolean erRevurderingEtterKlage = behandling.getBehandlingÅrsaker().stream()
             .anyMatch(ba -> ba.getBehandlingÅrsakType() == BehandlingÅrsakType.RE_KLAGE_KA || ba.getBehandlingÅrsakType() == BehandlingÅrsakType.RE_KLAGE_NFP);
@@ -344,6 +347,8 @@ public class VedtaksbrevTjeneste {
                 .medOriginalBehandlingDatoFagsakvedtak(originalBehandlingVedtaksdato)
                 .build())
             .medVarsel(HbVarsel.forDatoOgBeløp(varsletDato, varsletBeløp))
+            .medErFeilutbetaltBeløpKorrigertNed(erFeilutbetaltBeløpKorrigertNed)
+            .medTotaltFeilutbetaltBeløp(totaltFeilutbetaltBeløp)
             .medFritekstOppsummering(oppsummeringFritekst)
             .medLovhjemmelVedtak(hjemmelstekst)
             .medVedtakResultat(HbTotalresultat.builder()

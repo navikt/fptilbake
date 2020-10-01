@@ -22,8 +22,12 @@
 {{/case}}
 {{/switch}}
 {{#if fakta.fritekst-fakta}}
-   {{#if (neq fakta.hendelseundertype "ANNET_FRITEKST")}}
-
-   {{/if}}
+    {{#if (eq fakta.hendelseundertype "ANNET_FRITEKST")}}
 {{{fakta.fritekst-fakta}}}
+
+Du har fått {{kroner kravgrunnlag.feilutbetalt-beløp}} for mye utbetalt.
+    {{else}}
+
+{{{fakta.fritekst-fakta}}}
+    {{/if}}
 {{/if}}
