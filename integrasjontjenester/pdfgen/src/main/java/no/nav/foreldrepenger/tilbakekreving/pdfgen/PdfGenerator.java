@@ -14,6 +14,8 @@ import com.openhtmltopdf.slf4j.Slf4jLogger;
 import com.openhtmltopdf.svgsupport.BatikSVGDrawer;
 import com.openhtmltopdf.util.XRLog;
 
+import no.nav.foreldrepenger.tilbakekreving.pdfgen.validering.PdfaValidator;
+
 public class PdfGenerator {
 
     private static final Map<String, byte[]> FONT_CACHE = new HashMap<>();
@@ -31,20 +33,33 @@ public class PdfGenerator {
     public byte[] genererPDF(String html, DokumentVariant dokumentVariant) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         genererPDF(html, baos, dokumentVariant);
-        return baos.toByteArray();
+        byte[] bytes = baos.toByteArray();
+
+        if (dokumentVariant == DokumentVariant.ENDELIG) {
+            //validering er for treig for å brukes for interaktiv bruk, tar typisk 1-2 sekunder pr dokument
+            //validering er også bare nødvendig før journalføring, så det er OK
+            PdfaValidator.validatePdf(bytes);
+        }
+
+        return bytes;
     }
 
     private void genererPDF(String htmlContent, ByteArrayOutputStream outputStream, DokumentVariant dokumentVariant) {
         String htmlDocument = appendHtmlMetadata(htmlContent, DocFormat.PDF, dokumentVariant);
+
+        //trenger komplett normalfont for å passere PDF/A-validering, inntil pdfbox/openhtmltopdf forbedrer subset-funksjonalitet
+        //bruker subset for forhåndsvisning for å få raskere respons
+        boolean inkluderKomplettNormalfont = dokumentVariant == DokumentVariant.ENDELIG;
+
         PdfRendererBuilder builder = new PdfRendererBuilder();
         try {
             builder
-                .useFont(fontSupplier("SourceSansPro-Regular.ttf"), "Source Sans Pro", 400, BaseRendererBuilder.FontStyle.NORMAL, true)
+                .useFont(fontSupplier("SourceSansPro-Regular.ttf"), "Source Sans Pro", 400, BaseRendererBuilder.FontStyle.NORMAL, !inkluderKomplettNormalfont)
                 .useFont(fontSupplier("SourceSansPro-Bold.ttf"), "Source Sans Pro", 700, BaseRendererBuilder.FontStyle.OBLIQUE, true)
                 .useFont(fontSupplier("SourceSansPro-It.ttf"), "Source Sans Pro", 400, BaseRendererBuilder.FontStyle.ITALIC, true)
                 .useColorProfile(FileStructureUtil.getColorProfile())
                 .useSVGDrawer(new BatikSVGDrawer())
-                .usePdfAConformance(PdfRendererBuilder.PdfAConformance.PDFA_2_U)
+                .usePdfAConformance(PdfRendererBuilder.PdfAConformance.PDFA_2_A)
                 .withHtmlContent(htmlDocument, "")
                 .toStream(outputStream)
                 .useFastMode()
