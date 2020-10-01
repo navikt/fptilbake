@@ -19,7 +19,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.TilbakekrevingsvedtakMarshaller;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiResponsMarshaller;
@@ -66,7 +65,7 @@ public class AvstemmingTjenesteTest {
             .medDefaultKravgrunnlag()
             .medFullInnkreving()
             .medBehandlingResultatType(BehandlingResultatType.FULL_TILBAKEBETALING)
-            .medVedtak(LocalDate.now(), VedtakResultatType.FULL_TILBAKEBETALING)
+            .medVedtak(LocalDate.now())
             .lagre(behandlingRepositoryProvider);
 
         Long behandlingId = behandling.getId();
@@ -84,7 +83,7 @@ public class AvstemmingTjenesteTest {
             .medDefaultKravgrunnlag()
             .medFullInnkreving()
             .medBehandlingResultatType(BehandlingResultatType.FULL_TILBAKEBETALING)
-            .medVedtak(LocalDate.now(), VedtakResultatType.FULL_TILBAKEBETALING)
+            .medVedtak(LocalDate.now())
             .lagre(behandlingRepositoryProvider);
 
         Long behandlingId = behandling.getId();
@@ -102,7 +101,7 @@ public class AvstemmingTjenesteTest {
             .medDefaultKravgrunnlag()
             .medIngenInnkreving()
             .medBehandlingResultatType(BehandlingResultatType.INGEN_TILBAKEBETALING)
-            .medVedtak(LocalDate.now(), VedtakResultatType.INGEN_TILBAKEBETALING)
+            .medVedtak(LocalDate.now())
             .lagre(behandlingRepositoryProvider);
         when(aktørConsumerMock.hentPersonIdentForAktørId(Mockito.any())).thenReturn(Optional.of("12345678901"));
 
@@ -127,7 +126,7 @@ public class AvstemmingTjenesteTest {
             .medDefaultKravgrunnlag()
             .medIngenInnkreving()
             .medBehandlingResultatType(BehandlingResultatType.INGEN_TILBAKEBETALING)
-            .medVedtak(LocalDate.now(), VedtakResultatType.INGEN_TILBAKEBETALING)
+            .medVedtak(LocalDate.now())
             .lagre(behandlingRepositoryProvider);
 
         Long behandlingId = behandling.getId();

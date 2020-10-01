@@ -40,7 +40,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkko
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.IverksettingStatus;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingAktsomhetEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingGodTroEntitet;
@@ -83,7 +82,6 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
     private VilkårVurderingEntitet vilkårsvurdering;
     private BehandlingResultatType behandlingResultatType;
     private LocalDate vedtaksdato;
-    private VedtakResultatType vedtakResultatType;
 
     protected AbstractTestScenario() {
         AktørId aktørId = new AktørId(nyId());
@@ -109,9 +107,8 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
         return (S) this;
     }
 
-    public S medVedtak(LocalDate vedtaksdato, VedtakResultatType vedtakResultatType) {
+    public S medVedtak(LocalDate vedtaksdato) {
         this.vedtaksdato = vedtaksdato;
-        this.vedtakResultatType = vedtakResultatType;
         return (S) this;
     }
 
@@ -367,7 +364,6 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
             if (vedtaksdato != null) {
                 BehandlingVedtak vedtak = BehandlingVedtak.builder()
                     .medBehandlingsresultat(behandlingsresultat)
-                    .medVedtakResultat(vedtakResultatType)
                     .medVedtaksdato(vedtaksdato)
                     .medIverksettingStatus(IverksettingStatus.IKKE_IVERKSATT)
                     .medAnsvarligSaksbehandler("Z111111")

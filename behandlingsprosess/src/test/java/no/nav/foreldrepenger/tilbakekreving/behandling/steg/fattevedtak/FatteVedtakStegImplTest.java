@@ -97,8 +97,8 @@ public class FatteVedtakStegImplTest {
         assertThat(vedtak).isPresent();
         BehandlingVedtak behandlingVedtak = vedtak.get();
         assertThat(behandlingVedtak.getIverksettingStatus()).isEqualByComparingTo(IverksettingStatus.IKKE_IVERKSATT);
-        assertThat(behandlingVedtak.getVedtakResultatType()).isEqualByComparingTo(VedtakResultatType.DELVIS_TILBAKEBETALING);
-        assertThat(behandlingVedtak.getBehandlingsresultat().getBehandlingResultatType()).isEqualByComparingTo(BehandlingResultatType.DELVIS_TILBAKEBETALING);
+        assertThat(behandlingVedtak.getBehandlingsresultat().getBehandlingResultatType())
+            .isEqualByComparingTo(BehandlingResultatType.DELVIS_TILBAKEBETALING);
     }
 
     @Test
