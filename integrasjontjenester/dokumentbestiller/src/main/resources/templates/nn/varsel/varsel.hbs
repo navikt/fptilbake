@@ -1,11 +1,12 @@
+{{> nn/varsel/varsel_felles}}
 {{#if ytelseUtenSkatt}}
 Du har {{datoerHvisSammenhengendePeriode.fom}} fått {{kroner beløp}} for mykje utbetalt i eingongsstønad.
 
 {{else if datoerHvisSammenhengendePeriode.fom}}
-Du har fått {{kroner beløp}} for mykje utbetalt i {{fagsaktypeNavn}} frå og med {{datoerHvisSammenhengendePeriode.fom }} til og med {{datoerHvisSammenhengendePeriode.tom}}. Dette er før skatt.
+Du har fått {{kroner beløp}} for mykje utbetalt i {{>ytelse-navn}} frå og med {{datoerHvisSammenhengendePeriode.fom }} til og med {{datoerHvisSammenhengendePeriode.tom}}. Dette er før skatt.
 
 {{else}}
-Du har fått {{kroner beløp}} for mykje utbetalt i {{fagsaktypeNavn}}. Dette er før skatt.
+Du har fått {{kroner beløp}} for mykje utbetalt i {{>ytelse-navn}}. Dette er før skatt.
 
 Periodane du har fått for mykje utbetalt for, er:
 *-{{#each feilutbetaltePerioder }}
