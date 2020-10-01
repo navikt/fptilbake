@@ -135,25 +135,32 @@ public class KravgrunnlagTjeneste {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         if (KravStatusKode.ENDRET.equals(kravgrunnlag431.getKravStatusKode())) {
             //TODO KravgrunnlagTjeneste bør ikke være ansvarlig for å bytte steg/sette på vent. Bør heller ha en tjeneste/observer som lytter og flytter til riktig steg/på vent.
-            logger.info("Mottok endret kravgrunnlag for behandlingId={}", behandlingId);
-            if (!kravgrunnlagetErGyldig) {
-                logger.info("Setter behandling på vent pga kravgrunnlag endret til et ugyldig kravgrunnlag for behandlingId={}", behandlingId);
-                behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, BehandlingStegType.TBKGSTEG,
-                    LocalDateTime.now().plusDays(7), Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
-            } else {
-                boolean erForbiFaktaSteg = behandlingskontrollTjeneste.erStegPassert(behandling, FAKTA_FEILUTBETALING);
-                //forutsatt at FPTILBAKE allrede har fått SPER melding for den behandlingen og sett behandling på vent med VenteÅrsak VENT_PÅ_TILBAKEKREVINGSGRUNNLAG
-                if (erForbiFaktaSteg) {
-                    logger.info("Hopper tilbake til {} pga endret kravgrunnlag for behandlingId={}", FAKTA_FEILUTBETALING.getKode(), behandlingId);
-                    BehandlingskontrollKontekst kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandling);
-                    behandlingskontrollTjeneste.settAutopunkterTilUtført(kontekst, false);
-                    behandlingskontrollTjeneste.behandlingTilbakeføringTilTidligereBehandlingSteg(kontekst, FAKTA_FEILUTBETALING);
-                }
-                fyrKravgrunnlagEndretEvent(behandlingId);
-                gjenopptaBehandlingTjeneste.fortsettBehandlingMedGrunnlag(behandlingId);
-            }
+            håndterEndretkravgrunnlagFraØkonomi(behandling,kravgrunnlag431,kravgrunnlagetErGyldig);
+        }else {
+            kravgrunnlagRepository.lagre(behandlingId, kravgrunnlag431);
+            gjenopptaBehandlingTjeneste.fortsettBehandlingMedGrunnlag(behandlingId);
         }
+    }
+
+    private void håndterEndretkravgrunnlagFraØkonomi(Behandling behandling,Kravgrunnlag431 kravgrunnlag431, boolean kravgrunnlagetErGyldig ){
+        long behandlingId = behandling.getId();
+        logger.info("Mottok endret kravgrunnlag for behandlingId={}", behandlingId);
         kravgrunnlagRepository.lagre(behandlingId, kravgrunnlag431);
+        if (!kravgrunnlagetErGyldig) {
+            logger.info("Setter behandling på vent pga kravgrunnlag endret til et ugyldig kravgrunnlag for behandlingId={}", behandlingId);
+            behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, BehandlingStegType.TBKGSTEG, LocalDateTime.now().plusDays(7), Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
+        }else {
+            boolean erForbiFaktaSteg = behandlingskontrollTjeneste.erStegPassert(behandling, FAKTA_FEILUTBETALING);
+            //forutsatt at FPTILBAKE allrede har fått SPER melding for den behandlingen og sett behandling på vent med VenteÅrsak VENT_PÅ_TILBAKEKREVINGSGRUNNLAG
+            if (erForbiFaktaSteg) {
+                logger.info("Hopper tilbake til {} pga endret kravgrunnlag for behandlingId={}", FAKTA_FEILUTBETALING.getKode(), behandlingId);
+                BehandlingskontrollKontekst kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandling);
+                behandlingskontrollTjeneste.settAutopunkterTilUtført(kontekst, false);
+                behandlingskontrollTjeneste.behandlingTilbakeføringTilTidligereBehandlingSteg(kontekst, FAKTA_FEILUTBETALING);
+            }
+            fyrKravgrunnlagEndretEvent(behandlingId);
+            gjenopptaBehandlingTjeneste.fortsettBehandlingMedGrunnlag(behandlingId);
+        }
     }
 
     private void fyrKravgrunnlagEndretEvent(Long behandlingId) {
