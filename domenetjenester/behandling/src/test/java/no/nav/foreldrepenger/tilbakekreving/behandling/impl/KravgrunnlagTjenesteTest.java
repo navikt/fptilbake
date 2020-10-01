@@ -85,6 +85,15 @@ public class KravgrunnlagTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
+    public void lagreTilbakekrevingsgrunnlagFraØkonomi_med_ugyldig_endret_grunnlag() {
+        Kravgrunnlag431 kravgrunnlag = lagKravgrunnlagDto(KravStatusKode.ENDRET);
+        formPerioder(fom, tom, kravgrunnlag);
+        kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(internBehandlingId, kravgrunnlag, false);
+
+        assertKravgrunnlag();
+    }
+
+    @Test
     public void lagreTilbakekrevingsgrunnlagFraØkonomi_medEndretGrunnlag_med_allerede_har_grunnlag() {
         Kravgrunnlag431 kravgrunnlag = lagKravgrunnlagDto(KravStatusKode.NYTT);
         formPerioder(fom, tom, kravgrunnlag);
