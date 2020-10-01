@@ -56,6 +56,15 @@ public class LesKravgrunnlagTaskTest extends FellesTestOppsett {
         lesKravgrunnlagTask.doTask(lagProsessTaskData());
     }
 
+    @Test
+    public void skal_utføre_les_kravgrunnlag_task_for_ugyldig_kravgrunnlag(){
+        kravgrunnlagId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_ugyldig_ENDR_negativ_beløp.xml"));
+        lagEksternBehandling();
+        lesKravgrunnlagTask.doTask(lagProsessTaskData());
+        assertTilkobling();
+        assertThat(behandling.isBehandlingPåVent()).isTrue();
+    }
+
     private ProsessTaskData lagProsessTaskData() {
         ProsessTaskData prosessTaskData = new ProsessTaskData(LesKravgrunnlagTask.TASKTYPE);
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());

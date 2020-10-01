@@ -146,7 +146,7 @@ public class KravgrunnlagTjeneste {
                 behandlingskontrollTjeneste.settAutopunkterTilUtført(kontekst, false);
                 behandlingskontrollTjeneste.behandlingTilbakeføringTilTidligereBehandlingSteg(kontekst, FAKTA_FEILUTBETALING);
             }
-            if (!kravgrunnlagetErGyldig && erFørFaktaSteg) {
+            if (!kravgrunnlagetErGyldig) {
                 logger.info("Setter behandling på vent pga kravgrunnlag endret til et ugyldig kravgrunnlag for behandlingId={}", behandlingId);
                 behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, BehandlingStegType.TBKGSTEG, LocalDateTime.now().plusDays(7), Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
             }
