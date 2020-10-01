@@ -16,6 +16,15 @@
 
     <dependencies>
         <dependency>
+            <groupId>no.nav.foreldrepenger.felles</groupId>
+            <artifactId>felles-feil</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.verapdf</groupId>
+            <artifactId>validation-model</artifactId>
+            <version>1.4.5</version>
+        </dependency>
+        <dependency>
             <groupId>com.openhtmltopdf</groupId>
             <artifactId>openhtmltopdf-core</artifactId>
         </dependency>
