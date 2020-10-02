@@ -63,8 +63,9 @@ public class AvklartVergeTjenesteTest extends FellesTestOppsett {
     public void skal_ikke_lagre_verge_informasjon_når_verge_er_advokat_men_orgnummer_ikke_finnes()  {
         VergeDto vergeDto = lagVergeDto(VergeType.ADVOKAT);
         when(virksomhetTjenesteMock.validerOrganisasjon(anyString())).thenReturn(false);
-        Assert.assertThrows("OrgansisasjonNummer er ikke gyldig", IllegalStateException.class,
+        var e= Assert.assertThrows(IllegalStateException.class,
             () -> avklartVergeTjeneste.lagreVergeInformasjon(internBehandlingId, vergeDto));
+        assertThat(e.getMessage()).contains("OrgansisasjonNummer er ikke gyldig");
     }
 
     private void fellesVergeAssert(VergeDto vergeDto, VergeEntitet vergeEntitet) {
@@ -84,7 +85,7 @@ public class AvklartVergeTjenesteTest extends FellesTestOppsett {
         assertThat(historikkinnslagDeler).isNotEmpty();
         assertThat(historikkinnslagDeler.size()).isEqualTo(1);
         assertThat(historikkinnslagDeler.get(0).getSkjermlenke()).isNotEmpty();
-        assertThat(historikkinnslagDeler.get(0).getSkjermlenke().get()).isEqualTo(SkjermlenkeType.FAKTA_OM_VERGE.getKode());
+        assertThat(historikkinnslagDeler.get(0).getSkjermlenke().get()).contains(SkjermlenkeType.FAKTA_OM_VERGE.getKode());
         assertThat(historikkinnslagDeler.get(0).getHendelse()).isNotEmpty();
     }
 

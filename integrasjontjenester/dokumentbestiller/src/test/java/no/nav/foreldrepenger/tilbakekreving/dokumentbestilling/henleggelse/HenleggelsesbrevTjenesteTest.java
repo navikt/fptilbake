@@ -125,15 +125,17 @@ public class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
 
     @Test
     public void skal_ikke_sende_henleggelsesbrev_hvis_varselbrev_ikke_sendt() {
-        assertThrows("FPT-110801", FunksjonellException.class, () ->
+        var e = assertThrows(FunksjonellException.class, () ->
             henleggelsesbrevTjeneste.sendHenleggelsebrev(behandlingId, null, BrevMottaker.BRUKER));
+        assertThat(e.getMessage()).contains("FPT-110801");
     }
 
     @Test
     public void skal_ikke_sende_henleggelsesbrev_for_tilbakekreving_revurdering_uten_fritekst() {
         Long revurderingBehandlingId = opprettOgForberedTilbakekrevingRevurdering();
-        assertThrows("FPT-110802", FunksjonellException.class, () ->
+        var e= assertThrows(FunksjonellException.class, () ->
             henleggelsesbrevTjeneste.sendHenleggelsebrev(revurderingBehandlingId, null, BrevMottaker.BRUKER));
+        assertThat(e.getMessage()).contains("FPT-110802");
     }
 
     private void lagreVarselBrevSporing() {

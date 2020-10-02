@@ -79,7 +79,8 @@ public class IverksetteVedtakStegImplTest {
 
     @Test
     public void skal_ikke_utføre_iverksette_vedtak_steg_hvis_vedtak_ikke_finnes() {
-        assertThrows("FPT-131240", TekniskException.class, () -> iverksetteVedtakSteg.utførSteg(behandlingskontrollKontekst));
+        var e= assertThrows(TekniskException.class, () -> iverksetteVedtakSteg.utførSteg(behandlingskontrollKontekst));
+        assertThat(e.getMessage()).contains("FPT-131240");
     }
 
     @Test

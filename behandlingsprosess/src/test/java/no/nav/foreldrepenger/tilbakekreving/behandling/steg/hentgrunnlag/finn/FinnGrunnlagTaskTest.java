@@ -212,7 +212,8 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
         mottattXmlRepository.oppdaterMedHenvisningOgSaksnummer(ANNEN_HENVISNING, saksnummer, mottattXmlId);
 
         ProsessTaskData prosessTaskData = opprettFinngrunnlagProsessTask();
-        assertThrows("FPT-783524", TekniskException.class, () -> finnGrunnlagTask.doTask(prosessTaskData));
+        var e= assertThrows(TekniskException.class, () -> finnGrunnlagTask.doTask(prosessTaskData));
+        assertThat(e.getMessage()).contains("FPT-783524");
     }
 
     @Test

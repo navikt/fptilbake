@@ -163,8 +163,10 @@ public class BehandlingTjenesteImplTest extends FellesTestOppsett {
         SamletEksternBehandlingInfo samletEksternBehandlingInfo = lagSamletEksternBehandlingInfo(VergeType.BARN);
         when(mockFagsystemKlient.hentBehandlingsinfo(any(UUID.class), any(Tillegsinformasjon.class))).thenReturn(samletEksternBehandlingInfo);
         when(mockTpsTjeneste.hentAktørForFnr(any(PersonIdent.class))).thenReturn(Optional.empty());
-        Assert.assertThrows("FPT-7428494", TekniskException.class, () -> behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer, UUID.randomUUID(),
+        UUID uuid = UUID.randomUUID();
+        var e= Assert.assertThrows(TekniskException.class, () -> behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer, uuid,
             henvisning, aktørId, FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING));
+        assertThat(e.getMessage()).contains("FPT-7428494");
     }
 
     @Test
