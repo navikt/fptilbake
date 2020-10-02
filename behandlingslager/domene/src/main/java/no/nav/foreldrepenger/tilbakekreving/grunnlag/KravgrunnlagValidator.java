@@ -33,7 +33,7 @@ public class KravgrunnlagValidator {
         KravgrunnlagValidator::validerSkatt,
         KravgrunnlagValidator::validerPerioderHarFeilutbetalingPostering,
         KravgrunnlagValidator::validerPerioderHarYtelPostering,
-        KravgrunnlagValidator::validerPerioderHarNegativFeilutbetaltBeløp,
+        KravgrunnlagValidator::validerPerioderHarFeilPosteringMedNegativFeilutbetaltBeløp,
         KravgrunnlagValidator::validerYtelseMotFeilutbetaling,
         KravgrunnlagValidator::validerYtelPosteringTilbakekrevesMotNyttOgOpprinneligUtbetalt
     );
@@ -131,12 +131,10 @@ public class KravgrunnlagValidator {
         }
     }
 
-    private static void validerPerioderHarNegativFeilutbetaltBeløp(Kravgrunnlag431 kravgrunnlag) {
+    private static void validerPerioderHarFeilPosteringMedNegativFeilutbetaltBeløp(Kravgrunnlag431 kravgrunnlag) {
         for (KravgrunnlagPeriode432 periode : kravgrunnlag.getPerioder()) {
             for (KravgrunnlagBelop433 belop433 : periode.getKravgrunnlagBeloper433()) {
-                if (belop433.getNyBelop().compareTo(BigDecimal.ZERO) < 0 ||
-                    belop433.getOpprUtbetBelop().compareTo(BigDecimal.ZERO) < 0 ||
-                    belop433.getTilbakekrevesBelop().compareTo(BigDecimal.ZERO) < 0) {
+                if(KlasseType.FEIL.equals(belop433.getKlasseType()) && belop433.getNyBelop().compareTo(BigDecimal.ZERO) < 0){
                     throw KravgrunnlagFeil.FACTORY.feilBeløp(periode.getPeriode()).toException();
                 }
             }
@@ -222,7 +220,7 @@ public class KravgrunnlagValidator {
         @IntegrasjonFeil(feilkode = "FPT-615761", feilmelding = "Ugyldig kravgrunnlag. For perioden %s finnes YTEL-postering med tilbakekrevesBeløp %s som er større enn differanse mellom nyttBeløp %s og opprinneligBeløp %s", logLevel = WARN, exceptionClass = UgyldigKravgrunnlagException.class)
         Feil ytelPosteringHvorTilbakekrevesIkkeStemmerMedNyttOgOpprinneligBeløp(Periode periode, BigDecimal tilbakekrevesBeløp, BigDecimal nyttBeløp, BigDecimal opprinneligBeløp);
 
-        @IntegrasjonFeil(feilkode = "FPT-930247", feilmelding = "Ugyldig kravgrunnlag. Perioden %s har postering med negativ beløp", logLevel = WARN, exceptionClass = UgyldigKravgrunnlagException.class)
+        @IntegrasjonFeil(feilkode = "FPT-930247", feilmelding = "Ugyldig kravgrunnlag. Perioden %s har FEIL postering med negativ beløp", logLevel = WARN, exceptionClass = UgyldigKravgrunnlagException.class)
         Feil feilBeløp(Periode periode);
     }
 }

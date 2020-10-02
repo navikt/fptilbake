@@ -104,7 +104,8 @@ public class HentKorrigertKravgrunnlagTaskTest {
     public void skal_ikke_hente_og_lagre_korrigert_kravgrunnlag_når_hentet_grunnlaget_er_ugyldig() {
         when(økonomiConsumerMock.hentKravgrunnlag(anyLong(), any(HentKravgrunnlagDetaljDto.class))).thenReturn(lagKravgrunnlag(false));
         ProsessTaskData prosessTaskData = lagProsessTaskData();
-        assertThrows("FPT-879715", IntegrasjonException.class, () -> hentKorrigertGrunnlagTask.doTask(prosessTaskData));
+        var e= assertThrows(IntegrasjonException.class, () -> hentKorrigertGrunnlagTask.doTask(prosessTaskData));
+        assertThat(e.getMessage()).contains("FPT-734548");
     }
 
     @Test
@@ -133,7 +134,8 @@ public class HentKorrigertKravgrunnlagTaskTest {
         eksternBehandlingRepository.lagre(eksternBehandling);
         when(fagsystemKlient.hentBehandlingForSaksnummer(anyString())).thenReturn(Lists.newArrayList(lagEksternBehandlingsInfo(2l)));
         ProsessTaskData prosessTaskData = lagProsessTaskData();
-        assertThrows("FPT-587197", TekniskException.class, () -> hentKorrigertGrunnlagTask.doTask(prosessTaskData));
+        var e= assertThrows(TekniskException.class, () -> hentKorrigertGrunnlagTask.doTask(prosessTaskData));
+        assertThat(e.getMessage()).contains("FPT-587197");
     }
 
 

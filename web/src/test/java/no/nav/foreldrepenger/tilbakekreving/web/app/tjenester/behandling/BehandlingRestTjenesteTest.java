@@ -184,7 +184,8 @@ public class BehandlingRestTjenesteTest {
     public void skal_ikke_returnere_vedtak_info_hvis_tilbakekreving_ikke_er_avsluttet() {
         Behandling behandling = ScenarioSimple.simple().lagMocked();
         when(behandlingTjenesteMock.hentBehandling(any(UUID.class))).thenReturn(behandling);
-        assertThrows("FPT-763492", TekniskException.class, () -> behandlingRestTjeneste.hentTilbakekrevingsVedtakInfo(uuidDto));
+        var e = assertThrows(TekniskException.class, () -> behandlingRestTjeneste.hentTilbakekrevingsVedtakInfo(uuidDto));
+        assertThat(e.getMessage()).contains("FPT-763492");
     }
 
     @Test
@@ -192,7 +193,8 @@ public class BehandlingRestTjenesteTest {
         Behandling behandling = ScenarioSimple.simple().lagMocked();
         behandling.avsluttBehandling();
         when(behandlingTjenesteMock.hentBehandling(any(UUID.class))).thenReturn(behandling);
-        assertThrows("FPT-763492", TekniskException.class, () -> behandlingRestTjeneste.hentTilbakekrevingsVedtakInfo(uuidDto));
+        var e = assertThrows(TekniskException.class, () -> behandlingRestTjeneste.hentTilbakekrevingsVedtakInfo(uuidDto));
+        assertThat(e.getMessage()).contains("FPT-763492");
     }
 
     @Test
