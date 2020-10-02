@@ -40,7 +40,7 @@ body {
     padding: 0;
     margin: 0;
     position: relative;
-
+    line-height: 100%;
 }
 
 body.utkast {
@@ -50,7 +50,6 @@ body.utkast {
 
 #person {
     color: #807d7c;
-    font-weight: 500;
 }
 
 #content {
@@ -76,14 +75,14 @@ body.utkast {
 
 #dato {
     position: absolute;
-    right: 0;
+    right: 10mm;
     top: 25mm;
     margin: auto;
 }
 
 #brevmottaker {
-    padding-top: 50mm;
-    padding-bottom: 10mm;
+    padding-top: 30mm;
+    padding-bottom: 20mm;
 }
 
 .samepage {
@@ -116,7 +115,7 @@ body.utkast {
 }
 
 h1 {
-    font-size: 25px;
+    font-size: 22px;
     font-weight: 700;
     color: #3E3832;
 }
