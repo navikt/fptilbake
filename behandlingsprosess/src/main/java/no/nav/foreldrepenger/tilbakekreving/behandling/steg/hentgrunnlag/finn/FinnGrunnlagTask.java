@@ -111,7 +111,10 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
                     kobleGrunnlagMedBehandling(behandling, mottattXmlId, mottattXml);
                 } else if (mottattXml.contains(ROOT_ELEMENT_KRAV_VEDTAK_STATUS_XML) && grunnlagRepository.harGrunnlagForBehandlingId(behandlingId)) {
                     logger.info("xml er status xml med mottattXmlId={}", mottattXmlId);
-                    håndtereGrunnlagStatusForBehandling(behandlingId, mottattXmlId, mottattXml);
+                    boolean erAvsluttMelding = mottattXml.contains(KravStatusKode.AVSLUTTET.getKode());
+                    boolean finnesFlereMeldingerEtterAvsluttMelding = erAvsluttMelding &&
+                        (alleXmlMeldinger.size() > alleXmlMeldinger.indexOf(økonomiXmlMottatt) + 1);
+                    håndtereGrunnlagStatusForBehandling(behandlingId, mottattXmlId, mottattXml, finnesFlereMeldingerEtterAvsluttMelding);
                 } else {
                     logger.warn("xml rekkefølge er ikke riktig med mottattXmlId={}", mottattXmlId);
                 }
@@ -125,10 +128,14 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
 
     }
 
-    private void håndtereGrunnlagStatusForBehandling(Long behandlingId, Long mottattXmlId, String mottattXml) {
+
+    private void håndtereGrunnlagStatusForBehandling(Long behandlingId, Long mottattXmlId, String mottattXml, boolean finnesFlereMeldingerEtterAvsluttMelding) {
         KravOgVedtakstatus kravOgVedtakstatus = KravVedtakStatusXmlUnmarshaller.unmarshall(mottattXmlId, mottattXml);
         KravVedtakStatus437 kravVedtakStatus437 = kravVedtakStatusMapper.mapTilDomene(kravOgVedtakstatus);
-        kravVedtakStatusTjeneste.håndteresMottakAvKravVedtakStatus(behandlingId, kravVedtakStatus437);
+        // Hvis det finner flere meldinger etter AVSL melding, unngår vi AVSLUTT melding. Behandling kan ikke henlegges fordi det kan koble til et annet grunnlag.
+        if (!KravStatusKode.AVSLUTTET.equals(kravVedtakStatus437.getKravStatusKode()) || !finnesFlereMeldingerEtterAvsluttMelding) {
+            kravVedtakStatusTjeneste.håndteresMottakAvKravVedtakStatus(behandlingId, kravVedtakStatus437);
+        }
     }
 
     private void kobleGrunnlagMedBehandling(Behandling behandling, Long mottattXmlId, String mottattXml) {
