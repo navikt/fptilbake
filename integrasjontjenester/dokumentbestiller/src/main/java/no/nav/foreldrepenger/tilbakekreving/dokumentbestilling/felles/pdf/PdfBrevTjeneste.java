@@ -12,6 +12,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.DetaljertBrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskBehandlingUtil;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.header.TekstformatererHeader;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.JournalpostIdOgDokumentId;
 import no.nav.foreldrepenger.tilbakekreving.pdfgen.DokumentVariant;
@@ -65,7 +66,7 @@ public class PdfBrevTjeneste {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         taskGruppe.addNesteSekvensiell(lagPubliserJournalpostTask(behandling, data, dokumentreferanse));
         taskGruppe.addNesteSekvensiell(lagSporingBrevTask(behandling, detaljertBrevType, data, dokumentreferanse));
-        if (detaljertBrevType.gjelderVarsel()) {
+        if (detaljertBrevType.gjelderVarsel() && data.getMottaker() == BrevMottaker.BRUKER) {
             taskGruppe.addNesteSekvensiell(lagSporingVarselBrevTask(behandling, varsletBeløp, fritekst));
             lagSendBeskjedTilSelvbetjeningTask(behandling).ifPresent(taskGruppe::addNesteSekvensiell);
         }
