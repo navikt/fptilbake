@@ -26,6 +26,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingresultatRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.prosesstask.UtvidetProsessTaskRepository;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatusRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagValidator;
@@ -39,9 +40,11 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
 
     private KravVedtakStatusRepository kravVedtakStatusRepository = new KravVedtakStatusRepository(repoRule.getEntityManager());
     private BehandlingresultatRepository behandlingresultatRepository = new BehandlingresultatRepositoryImpl(repoRule.getEntityManager());
+    private UtvidetProsessTaskRepository utvidetProsessTaskRepository = new UtvidetProsessTaskRepository(repoRule.getEntityManager());
 
     private HenleggBehandlingTjeneste henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repositoryProvider, prosessTaskRepository, behandlingskontrollTjeneste, historikkinnslagTjeneste);
-    private KravVedtakStatusTjeneste kravVedtakStatusTjeneste = new KravVedtakStatusTjeneste(kravVedtakStatusRepository, prosessTaskRepository, repositoryProvider, henleggBehandlingTjeneste, behandlingskontrollTjeneste);
+    private KravVedtakStatusTjeneste kravVedtakStatusTjeneste = new KravVedtakStatusTjeneste(kravVedtakStatusRepository, prosessTaskRepository, utvidetProsessTaskRepository,
+        repositoryProvider, henleggBehandlingTjeneste, behandlingskontrollTjeneste);
     private KravVedtakStatusMapper kravVedtakStatusMapper = new KravVedtakStatusMapper(tpsAdapterWrapper);
     private LesKravvedtakStatusTask lesKravvedtakStatusTask = new LesKravvedtakStatusTask(mottattXmlRepository, repositoryProvider, kravVedtakStatusTjeneste, kravVedtakStatusMapper, fagsystemKlientMock);
 

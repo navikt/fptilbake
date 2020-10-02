@@ -27,6 +27,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkTabellRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkTabellRepositoryImpl;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.prosesstask.UtvidetProsessTaskRepository;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatusRepository;
@@ -41,9 +42,11 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
 
     private KravVedtakStatusRepository kravVedtakStatusRepository = new KravVedtakStatusRepository(repoRule.getEntityManager());
     private KodeverkTabellRepository kodeverkTabellRepository = new KodeverkTabellRepositoryImpl(repoRule.getEntityManager());
+    private UtvidetProsessTaskRepository utvidetProsessTaskRepository = new UtvidetProsessTaskRepository(repoRule.getEntityManager());
 
     private HenleggBehandlingTjeneste henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repositoryProvider, prosessTaskRepository, behandlingskontrollTjeneste, historikkinnslagTjeneste);
-    private KravVedtakStatusTjeneste kravVedtakStatusTjeneste = new KravVedtakStatusTjeneste(kravVedtakStatusRepository, prosessTaskRepository, repositoryProvider, henleggBehandlingTjeneste, behandlingskontrollTjeneste);
+    private KravVedtakStatusTjeneste kravVedtakStatusTjeneste = new KravVedtakStatusTjeneste(kravVedtakStatusRepository, prosessTaskRepository, utvidetProsessTaskRepository,
+        repositoryProvider, henleggBehandlingTjeneste, behandlingskontrollTjeneste);
     private KravVedtakStatusMapper kravVedtakStatusMapper = new KravVedtakStatusMapper(tpsAdapterWrapper);
 
     private FinnGrunnlagTask finnGrunnlagTask = new FinnGrunnlagTask(repositoryProvider, mottattXmlRepository, kodeverkTabellRepository, kravVedtakStatusTjeneste, behandlingskontrollTjeneste, kravVedtakStatusMapper, kravgrunnlagMapper, fagsystemKlientMock);
@@ -281,6 +284,41 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
         ProsessTaskData prosessTaskData = opprettFinngrunnlagProsessTask();
         finnGrunnlagTask.doTask(prosessTaskData);
 
+    }
+
+    @Test
+    public void skal_finne_og_håndtere_flere_endr_meldinger_for_en_behandling() {
+        Long mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_YTEL.xml"));
+        mottattXmlRepository.oppdaterMedHenvisningOgSaksnummer(HENVISNING, saksnummer, mottattXmlId);
+
+        mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_SPER.xml"));
+        mottattXmlRepository.oppdaterMedHenvisningOgSaksnummer(HENVISNING, saksnummer, mottattXmlId);
+
+        mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_ENDR.xml"));
+        mottattXmlRepository.oppdaterMedHenvisningOgSaksnummer(HENVISNING, saksnummer, mottattXmlId);
+
+        mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_YTEL_ENDR_samme_referanse.xml"));
+        mottattXmlRepository.oppdaterMedHenvisningOgSaksnummer(ANNEN_HENVISNING, saksnummer, mottattXmlId);
+
+        mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_SPER.xml"));
+        mottattXmlRepository.oppdaterMedHenvisningOgSaksnummer(ANNEN_HENVISNING, saksnummer, mottattXmlId);
+
+        mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_ENDR.xml"));
+        mottattXmlRepository.oppdaterMedHenvisningOgSaksnummer(ANNEN_HENVISNING, saksnummer, mottattXmlId);
+
+        ProsessTaskData prosessTaskData = opprettFinngrunnlagProsessTask();
+        finnGrunnlagTask.doTask(prosessTaskData);
+
+        assertThat(behandling.isBehandlingPåVent()).isFalse();
+        assertThat(grunnlagRepository.harGrunnlagForBehandlingId(behandling.getId())).isTrue();
+        assertThat(grunnlagRepository.erKravgrunnlagSperret(behandling.getId())).isFalse();
+
+        List<ProsessTaskData> prosessTasker = prosessTaskRepository.finnAlle(ProsessTaskStatus.KLAR);
+        assertThat(prosessTasker).isNotEmpty().hasSize(2);
+        assertThat(prosessTasker.get(0).getTaskType()).isEqualTo(FortsettBehandlingTaskProperties.TASKTYPE);
+        assertThat(prosessTasker.get(0).getSekvens()).isEqualTo("1");
+        assertThat(prosessTasker.get(1).getTaskType()).isEqualTo(FortsettBehandlingTaskProperties.TASKTYPE);
+        assertThat(prosessTasker.get(1).getSekvens()).isEqualTo("2");
     }
 
     private ProsessTaskData opprettFinngrunnlagProsessTask() {
