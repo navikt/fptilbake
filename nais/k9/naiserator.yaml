@@ -75,8 +75,6 @@ spec:
      value: "no.nav.abac.attributter.k9.fagsak"
    - name: ABAC_ATTRIBUTT_VENTEFRIST
      value: "no.nav.abac.attributter.k9.fagsak.ventefrist"
-   - name: ABAC_ATTRIBUTT_DRIFT
-     value: "no.nav.abac.attributter.k9.drift"
    - name: ABAC_ATTRIBUTT_BATCH
      value: "no.nav.abac.attributter.k9.batch"
    - name: AUDITLOGGER_ENABLED
