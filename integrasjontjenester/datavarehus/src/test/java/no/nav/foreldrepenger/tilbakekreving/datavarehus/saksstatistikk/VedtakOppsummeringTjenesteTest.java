@@ -34,7 +34,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodev
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.IverksettingStatus;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingAktsomhetEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingGodTroEntitet;
@@ -247,7 +246,6 @@ public class VedtakOppsummeringTjenesteTest {
             .medBehandlingResultatType(BehandlingResultatType.FULL_TILBAKEBETALING)
             .medBehandling(behandling).build();
         BehandlingVedtak behandlingVedtak = BehandlingVedtak.builder()
-            .medVedtakResultat(VedtakResultatType.FULL_TILBAKEBETALING)
             .medIverksettingStatus(IverksettingStatus.IVERKSATT)
             .medVedtaksdato(LocalDate.now())
             .medAnsvarligSaksbehandler("Z12345")

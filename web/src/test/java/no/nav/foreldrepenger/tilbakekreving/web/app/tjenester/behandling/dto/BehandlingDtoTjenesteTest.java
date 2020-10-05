@@ -49,7 +49,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkko
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.IverksettingStatus;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingAktsomhetEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingPeriodeEntitet;
@@ -364,10 +363,10 @@ public class BehandlingDtoTjenesteTest {
         Behandling behandling = lagBehandling(BehandlingStegType.IVERKSETT_VEDTAK,BehandlingStatus.IVERKSETTER_VEDTAK);
         Behandlingsresultat behandlingsresultat = Behandlingsresultat.builder()
             .medBehandling(behandling)
-            .medBehandlingResultatType(no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType.DELVIS_TILBAKEBETALING)
+            .medBehandlingResultatType(BehandlingResultatType.DELVIS_TILBAKEBETALING)
             .build();
         repositoryProvider.getBehandlingresultatRepository().lagre(behandlingsresultat);
-        BehandlingVedtak behandlingVedtak = BehandlingVedtak.builder().medVedtakResultat(VedtakResultatType.DELVIS_TILBAKEBETALING)
+        BehandlingVedtak behandlingVedtak = BehandlingVedtak.builder()
             .medAnsvarligSaksbehandler("VL")
             .medBehandlingsresultat(behandlingsresultat)
             .medVedtaksdato(LocalDate.now())

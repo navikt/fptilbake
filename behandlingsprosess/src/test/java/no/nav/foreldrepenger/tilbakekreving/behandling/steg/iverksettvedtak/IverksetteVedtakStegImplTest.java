@@ -38,7 +38,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodev
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.IverksettingStatus;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.SendVedtakHendelserTilDvhTask;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
@@ -162,7 +161,6 @@ public class IverksetteVedtakStegImplTest {
         repoProvider.getBehandlingresultatRepository().lagre(behandlingsresultat);
 
         BehandlingVedtak behandlingVedtak = BehandlingVedtak.builder()
-            .medVedtakResultat(VedtakResultatType.FULL_TILBAKEBETALING)
             .medAnsvarligSaksbehandler("VL")
             .medIverksettingStatus(iverksettingStatus)
             .medVedtaksdato(LocalDate.now())
@@ -174,7 +172,8 @@ public class IverksetteVedtakStegImplTest {
         Optional<BehandlingVedtak> vedtak = behandlingVedtakRepository.hentBehandlingvedtakForBehandlingId(behandling.getId());
         assertThat(vedtak).isPresent();
         BehandlingVedtak behandlingVedtak = vedtak.get();
-        assertThat(behandlingVedtak.getVedtakResultatType()).isEqualByComparingTo(VedtakResultatType.FULL_TILBAKEBETALING);
+        assertThat(behandlingVedtak.getBehandlingsresultat().getBehandlingResultatType())
+            .isEqualByComparingTo(BehandlingResultatType.FULL_TILBAKEBETALING);
         assertThat(behandlingVedtak.getIverksettingStatus()).isEqualByComparingTo(IverksettingStatus.UNDER_IVERKSETTING);
     }
 

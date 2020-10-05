@@ -7,9 +7,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import javax.persistence.FlushModeType;
@@ -21,16 +19,11 @@ import org.junit.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandlingsresultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProviderImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingresultatRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.IverksettingStatus;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.DvhEventHendelse;
@@ -97,26 +90,6 @@ public class MigrasjonRestTjenesteTest {
         ProsessTaskData prosessTaskData = prosesser.get(0);
         assertThat(prosessTaskData.getPropertyValue("eventHendelse")).isEqualTo(DvhEventHendelse.AKSJONSPUNKT_AVBRUTT.name());
         assertThat(prosessTaskData.getPropertyValue("behandlingId")).isEqualTo(String.valueOf(behandling.getId()));
-    }
-
-    @Test
-    public void migrer_vedtakresultattype_til_behandlingsresultat(){
-        Behandlingsresultat behandlingsresultat = Behandlingsresultat.builder()
-            .medBehandlingResultatType(BehandlingResultatType.FASTSATT)
-            .medBehandling(behandling).build();
-        behandlingresultatRepository.lagre(behandlingsresultat);
-        BehandlingVedtak behandlingVedtak = BehandlingVedtak.builder().medIverksettingStatus(IverksettingStatus.IVERKSATT)
-            .medVedtaksdato(LocalDate.now())
-            .medBehandlingsresultat(behandlingsresultat)
-            .medVedtakResultat(VedtakResultatType.DELVIS_TILBAKEBETALING)
-            .medAnsvarligSaksbehandler("VL").build();
-        repositoryProvider.getBehandlingVedtakRepository().lagre(behandlingVedtak);
-        behandling.avsluttBehandling();
-        migrasjonRestTjeneste.migrerVedtakResultatTypeTilBehandlingResultat();
-        Optional<Behandlingsresultat> resultat = behandlingresultatRepository.hent(behandling);
-        assertThat(resultat).isPresent();
-        behandlingsresultat = resultat.get();
-        assertThat(behandlingsresultat.getBehandlingResultatType()).isEqualByComparingTo(BehandlingResultatType.fraVedtakResultatType(VedtakResultatType.DELVIS_TILBAKEBETALING));
     }
 
     private String getInputXML(String filename) {

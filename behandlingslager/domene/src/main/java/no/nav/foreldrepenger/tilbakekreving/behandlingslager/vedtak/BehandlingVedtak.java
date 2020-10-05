@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 import javax.persistence.Column;
-import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -41,10 +40,6 @@ public class BehandlingVedtak extends BaseEntitet {
     @Column(name = "ANSVARLIG_SAKSBEHANDLER", nullable = false)
     private String ansvarligSaksbehandler;
 
-    @Convert(converter = VedtakResultatType.KodeverdiConverter.class)
-    @Column(name = "vedtak_resultat_type", nullable = false)
-    private VedtakResultatType vedtakResultatType = VedtakResultatType.UDEFINERT;
-
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "BEHANDLING_RESULTAT_ID", nullable = false, updatable = false, unique = true)
     private Behandlingsresultat behandlingsresultat;
@@ -72,10 +67,6 @@ public class BehandlingVedtak extends BaseEntitet {
         return ansvarligSaksbehandler;
     }
 
-    public VedtakResultatType getVedtakResultatType() {
-        return Objects.equals(VedtakResultatType.UDEFINERT, vedtakResultatType) ? null : vedtakResultatType;
-    }
-
     public Behandlingsresultat getBehandlingsresultat() {
         return behandlingsresultat;
     }
@@ -90,13 +81,12 @@ public class BehandlingVedtak extends BaseEntitet {
         }
         BehandlingVedtak vedtak = (BehandlingVedtak) object;
         return Objects.equals(vedtaksdato, vedtak.getVedtaksdato())
-            && Objects.equals(ansvarligSaksbehandler, vedtak.getAnsvarligSaksbehandler())
-            && Objects.equals(getVedtakResultatType(), vedtak.getVedtakResultatType());
+            && Objects.equals(ansvarligSaksbehandler, vedtak.getAnsvarligSaksbehandler());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(vedtaksdato, ansvarligSaksbehandler, getVedtakResultatType());
+        return Objects.hash(vedtaksdato, ansvarligSaksbehandler);
     }
 
     public static Builder builder() {
@@ -124,11 +114,6 @@ public class BehandlingVedtak extends BaseEntitet {
             return this;
         }
 
-        public Builder medVedtakResultat(VedtakResultatType vedtakResultatType) {
-            this.kladd.vedtakResultatType = vedtakResultatType;
-            return this;
-        }
-
         public Builder medBehandlingsresultat(Behandlingsresultat behandlingsresultat) {
             this.kladd.behandlingsresultat = behandlingsresultat;
             return this;
@@ -148,7 +133,6 @@ public class BehandlingVedtak extends BaseEntitet {
         public void verifyStateForBuild() {
             Objects.requireNonNull(this.kladd.vedtaksdato, "vedtaksdato");
             Objects.requireNonNull(this.kladd.ansvarligSaksbehandler, "ansvarligSaksbehandler");
-            Objects.requireNonNull(this.kladd.vedtakResultatType, "vedtakResultatType");
         }
     }
 

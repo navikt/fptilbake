@@ -103,7 +103,6 @@ public class FatteVedtakStegImpl implements FatteVedtakSteg {
             .medAnsvarligSaksbehandler(finnSaksBehandler(behandling))
             .medBehandlingsresultat(behandlingsresultat)
             .medIverksettingStatus(IverksettingStatus.IKKE_IVERKSATT)
-            .medVedtakResultat(beregningResultat.getVedtakResultatType())
             .medVedtaksdato(LocalDate.now()).build();
 
         behandlingVedtakRepository.lagre(behandlingVedtak);

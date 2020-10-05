@@ -45,7 +45,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkko
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.IverksettingStatus;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
@@ -208,8 +207,7 @@ public class BehandlingRestTjenesteTest {
             .medBehandlingsresultat(behandlingsresultat)
             .medVedtaksdato(vedtakDato)
             .medIverksettingStatus(IverksettingStatus.IVERKSATT)
-            .medAnsvarligSaksbehandler("VL")
-            .medVedtakResultat(VedtakResultatType.FULL_TILBAKEBETALING).build();
+            .medAnsvarligSaksbehandler("VL").build();
         behandling.avsluttBehandling();
 
         when(behandlingTjenesteMock.hentBehandling(any(UUID.class))).thenReturn(behandling);

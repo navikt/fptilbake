@@ -6,9 +6,6 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javax.persistence.AttributeConverter;
-import javax.persistence.Converter;
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -18,12 +15,11 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
-public enum VedtakResultatType implements Kodeverdi {
+public enum VedtakResultatType implements Kodeverdi { //Kun brukes for å sende data til frontend
 
     FULL_TILBAKEBETALING("FULL_TILBAKEBETALING","Tilbakebetaling"),
     DELVIS_TILBAKEBETALING("DELVIS_TILBAKEBETALING","Delvis tilbakebetaling"),
-    INGEN_TILBAKEBETALING("INGEN_TILBAKEBETALING","Ingen tilbakebetaling"),
-    UDEFINERT("-","Ikke definert");
+    INGEN_TILBAKEBETALING("INGEN_TILBAKEBETALING","Ingen tilbakebetaling");
 
     private String kode;
     private String navn;
@@ -39,7 +35,7 @@ public enum VedtakResultatType implements Kodeverdi {
         }
     }
 
-    private VedtakResultatType(String kode, String navn) {
+    VedtakResultatType(String kode, String navn) {
         this.kode = kode;
         this.navn = navn;
     }
@@ -81,18 +77,5 @@ public enum VedtakResultatType implements Kodeverdi {
     @Override
     public String getNavn() {
         return navn;
-    }
-
-    @Converter(autoApply = true)
-    public static class KodeverdiConverter implements AttributeConverter<VedtakResultatType, String> {
-        @Override
-        public String convertToDatabaseColumn(VedtakResultatType attribute) {
-            return attribute == null ? null : attribute.getKode();
-        }
-
-        @Override
-        public VedtakResultatType convertToEntityAttribute(String dbData) {
-            return dbData == null ? null : fraKode(dbData);
-        }
     }
 }
