@@ -3,12 +3,10 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.steg.iverksettvedtak;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporingRepository;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.SendVedtakHendelserTilDvhTask;
+import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.task.SendBeskjedUtsendtVarselTilSelvbetjeningTask;
 import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.task.SendVedtakFattetTilSelvbetjeningTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
@@ -16,9 +14,6 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 
 @ApplicationScoped
 public class ProsessTaskIverksett {
-
-    private static final Logger logger = LoggerFactory.getLogger(ProsessTaskIverksett.class);
-
 
     private ProsessTaskRepository taskRepository;
     private BrevSporingRepository brevSporingRepository;
@@ -28,8 +23,7 @@ public class ProsessTaskIverksett {
     }
 
     @Inject
-    public ProsessTaskIverksett(ProsessTaskRepository taskRepository,
-                                BrevSporingRepository brevSporingRepository) {
+    public ProsessTaskIverksett(ProsessTaskRepository taskRepository, BrevSporingRepository brevSporingRepository) {
         this.taskRepository = taskRepository;
         this.brevSporingRepository = brevSporingRepository;
     }
@@ -46,17 +40,17 @@ public class ProsessTaskIverksett {
 
         taskRepository.lagre(taskGruppe);
 
-        if (brevSporingRepository.harVarselBrevSendtForBehandlingId(behandling.getId())) {
+        if (SendBeskjedUtsendtVarselTilSelvbetjeningTask.kanSendeVarsel(behandling) && brevSporingRepository.harVarselBrevSendtForBehandlingId(behandling.getId())) {
             ProsessTaskData selvbetjeningTask = new ProsessTaskData(SendVedtakFattetTilSelvbetjeningTask.TASKTYPE);
             selvbetjeningTask.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
             taskRepository.lagre(selvbetjeningTask);
         }
-            opprettDvhProsessTask(behandling);
+        opprettDvhProsessTask(behandling);
     }
 
-    private void opprettDvhProsessTask(Behandling behandling){
+    private void opprettDvhProsessTask(Behandling behandling) {
         ProsessTaskData dvhProsessTaskData = new ProsessTaskData(SendVedtakHendelserTilDvhTask.TASKTYPE);
-        dvhProsessTaskData.setBehandling(behandling.getFagsakId(),behandling.getId(),behandling.getAktørId().getId());
+        dvhProsessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         taskRepository.lagre(dvhProsessTaskData);
     }
 
