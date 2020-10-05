@@ -16,6 +16,7 @@ import java.util.Optional;
 import java.util.stream.IntStream;
 
 import javax.inject.Inject;
+import javax.persistence.FlushModeType;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -63,6 +64,7 @@ public class KravgrunnlagTjenesteTest extends FellesTestOppsett {
 
     @Before
     public void setup() {
+        repoRule.getEntityManager().setFlushMode(FlushModeType.AUTO);
         when(mockTpsTjeneste.hentAktørForFnr(new PersonIdent(SSN))).thenReturn(Optional.of(aktørId));
         when(behandlingskontrollTjeneste.erStegPassert(any(Behandling.class), any(BehandlingStegType.class))).thenReturn(true);
         kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repoProvider, mockGjenopptaBehandlingTjeneste, behandlingskontrollTjeneste, eventPubliserer);
