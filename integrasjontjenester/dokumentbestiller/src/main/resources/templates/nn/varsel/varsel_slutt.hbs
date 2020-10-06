@@ -21,8 +21,11 @@ Dersom du må betale tilbake, og du har gitt oss feil eller mangelfull informasj
 {{/if}}
 Dette går fram av folketrygdlova {{#if skal-vise-renteinformasjon}}§§ 22-15 og 22-17a{{else}}§ 22-15{{/if}}.
 _Slik uttaler du deg
-Du kan sende uttalen din ved å logge deg inn på foreldrepenger.nav.no. Du kan også sende uttalen din til oss i posten. Adressen finn du på nav.no/ettersendelser.
+{{#if (eq ytelsetype "FRISINN") }}
+Du har rett til å uttale deg og komme med ein tilbakemelding på dette varselet. For å uttale deg logger du deg inn på Ditt NAV, og bruker tjenesten "Skriv til oss". Under tema for kva slags beskjed du skal sende vel du "Jobbsøker".
+{{/if}}
 {{#if (neq ytelsetype "FRISINN") }}
+Du kan sende uttalen din ved å logge deg inn på foreldrepenger.nav.no. Du kan også sende uttalen din til oss i posten. Adressen finn du på nav.no/ettersendelser.
 _Du har rett til innsyn
 På nav.no/dittnav kan du sjå dokumenta i saka di.
 {{/if}}
