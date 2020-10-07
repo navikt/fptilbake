@@ -50,8 +50,8 @@ public class DokprodTilHtml {
                         builder.append("<h2>").append(linje.substring(1)).append("</h2>");
                     }
                 } else {
-                    if (!harAvsnitt){
-                        harAvsnitt=true;
+                    if (!harAvsnitt) {
+                        harAvsnitt = true;
                         builder.append("<p>");
                     } else {
                         builder.append("<br/>");
@@ -59,7 +59,7 @@ public class DokprodTilHtml {
                     builder.append(linje);
                 }
             }
-            if (harAvsnitt){
+            if (harAvsnitt) {
                 builder.append("</p>");
             }
             if (samepageStarted) {
@@ -67,7 +67,7 @@ public class DokprodTilHtml {
                 builder.append("</div>");
             }
         }
-        return konverterNbsp(builder.toString());
+        return ekstraLinjeskiftFørHilsing(konverterNbsp(builder.toString()));
     }
 
     private static String[] hentAvsnittene(String dokprod) {
@@ -80,5 +80,11 @@ public class DokprodTilHtml {
         String utf8nonBreakingSpace = "\u00A0";
         String htmlNonBreakingSpace = "&nbsp;";
         return s.replaceAll(utf8nonBreakingSpace, htmlNonBreakingSpace);
+    }
+
+    static String ekstraLinjeskiftFørHilsing(String s) {
+        return s
+            .replace("<p>Med vennlig hilsen", "<p class=\"hilsen\">Med vennlig hilsen")
+            .replace("<p>Med vennleg helsing", "<p class=\"hilsen\">Med vennleg helsing");
     }
 }

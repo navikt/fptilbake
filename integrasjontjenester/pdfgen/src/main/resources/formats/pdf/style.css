@@ -144,6 +144,10 @@ p {
     margin: 3mm 0 2mm 0;
 }
 
+p.hilsen {
+    margin-top: 10mm;
+}
+
 table {
     border-collapse: collapse;
     border-spacing: 0;
