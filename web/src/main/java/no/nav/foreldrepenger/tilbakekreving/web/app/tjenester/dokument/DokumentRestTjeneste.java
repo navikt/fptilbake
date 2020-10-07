@@ -24,11 +24,13 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Avsnitt;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.ForhåndvisningVedtaksbrevTekstDto;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.HentForhåndsvisningFritekstVedtaksbrevDto;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.HentForhåndsvisningHenleggelseslbrevDto;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.HentForhåndsvisningVarselbrevDto;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.HentForhåndvisningVedtaksbrevPdfDto;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.henleggelse.HenleggelsesbrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.VarselbrevTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.FritekstVedtaksbrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.VedtaksbrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
@@ -43,16 +45,19 @@ public class DokumentRestTjeneste {
     private VarselbrevTjeneste varselbrevTjeneste;
     private VedtaksbrevTjeneste vedtaksbrevTjeneste;
     private HenleggelsesbrevTjeneste henleggelsesbrevTjeneste;
+    private FritekstVedtaksbrevTjeneste fritekstVedtaksbrevTjeneste;
     private BehandlingTjeneste behandlingTjeneste;
 
     @Inject
     public DokumentRestTjeneste(VarselbrevTjeneste varselbrevTjeneste,
                                 VedtaksbrevTjeneste vedtaksbrevTjeneste,
                                 HenleggelsesbrevTjeneste henleggelsesbrevTjeneste,
+                                FritekstVedtaksbrevTjeneste fritekstVedtaksbrevTjeneste,
                                 BehandlingTjeneste behandlingTjeneste) {
         this.varselbrevTjeneste = varselbrevTjeneste;
         this.vedtaksbrevTjeneste = vedtaksbrevTjeneste;
         this.henleggelsesbrevTjeneste = henleggelsesbrevTjeneste;
+        this.fritekstVedtaksbrevTjeneste = fritekstVedtaksbrevTjeneste;
         this.behandlingTjeneste = behandlingTjeneste;
     }
 
@@ -122,6 +127,20 @@ public class DokumentRestTjeneste {
         } else {
             dokument = henleggelsesbrevTjeneste.hentForhåndsvisningHenleggelsebrev(behandlingReferanse.getBehandlingUuid(), fritekst);
         }
+        Response.ResponseBuilder responseBuilder = lagRespons(dokument);
+        return responseBuilder.build();
+    }
+
+    @POST
+    @Timed
+    @Path("/forhandsvis-fritekst-vedtaksbrev")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Operation(tags = "dokument", description = "Returnerer en pdf som er en forhåndsvisning av varselbrevet")
+    @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
+    @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
+    public Response hentForhåndsvisningFritekstVedtaksbrev(
+        @Parameter(description = "Inneholder kode til brevmal og data som skal flettes inn i brevet") @Valid HentForhåndsvisningFritekstVedtaksbrevDto hentForhåndsvisningFritekstVedtaksbrevDto) { // NOSONAR
+        byte[] dokument = fritekstVedtaksbrevTjeneste.hentForhåndsvisningFritekstVedtaksbrev(hentForhåndsvisningFritekstVedtaksbrevDto);
         Response.ResponseBuilder responseBuilder = lagRespons(dokument);
         return responseBuilder.build();
     }
