@@ -7,7 +7,6 @@ import no.nav.vedtak.util.env.Environment;
 public class BrevToggle {
 
     public static boolean brukDokprod() {
-        boolean erFptilbake = "fptilbake".equals(Objects.requireNonNull(System.getProperty("application.name")));
-        return erFptilbake && Environment.current().isProd();
+        return Environment.current().isProd() && "fptilbake".equals(Objects.requireNonNull(System.getProperty("application.name")));
     }
 }
