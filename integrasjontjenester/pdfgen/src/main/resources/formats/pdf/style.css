@@ -70,12 +70,12 @@ body.utkast {
     margin: auto;
     padding: 0 0 10mm 0;
     position: absolute;
-    right: 10mm;
+    right: 0;
 }
 
 #dato {
     position: absolute;
-    right: 10mm;
+    right: 0;
     top: 25mm;
     margin: auto;
 }
