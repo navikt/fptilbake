@@ -1,7 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.DokprodTilHtml;
@@ -37,9 +36,6 @@ public class DokprodTilHtmlTest {
         Assertions.assertThat(resultat).isEqualTo("<ul><li>bulletpoint 1</li><li>bulletpoint 2</li><li>siste bulletpoint</li></ul>");
     }
 
-
-
-    @Ignore("Ikke implementert støtte enda")
     @Test
     public void skal_konvertere_halvhjertede_avsnitt() {
         //halvhjertet avsnitt er hvor det er tatt kun ett linjeskift.
