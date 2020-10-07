@@ -40,10 +40,21 @@ public class DokprodTilHtmlTest {
     public void skal_konvertere_halvhjertede_avsnitt() {
         //halvhjertet avsnitt er hvor det er tatt kun ett linjeskift.
         String resultat = DokprodTilHtml.dokprodInnholdTilHtml(
+            "Foo\nBar"
+        );
+        Assertions.assertThat(resultat).isEqualTo(
+            "<p>Foo<br/>Bar</p>"
+        );
+    }
+
+    @Test
+    public void skal_spesialbehandle_hilsen() {
+        //halvhjertet avsnitt er hvor det er tatt kun ett linjeskift.
+        String resultat = DokprodTilHtml.dokprodInnholdTilHtml(
             "Med vennlig hilsen\nNAV Familie- og pensjonsytelser"
         );
         Assertions.assertThat(resultat).isEqualTo(
-            "<p>Med vennlig hilsen<br/>NAV Familie- og pensjonsytelser</p>"
+            "<p class=\"hilsen\">Med vennlig hilsen<br/>NAV Familie- og pensjonsytelser</p>"
         );
     }
 }
