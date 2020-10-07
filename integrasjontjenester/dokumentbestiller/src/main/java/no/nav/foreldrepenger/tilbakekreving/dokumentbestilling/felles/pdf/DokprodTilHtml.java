@@ -3,59 +3,77 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf;
 public class DokprodTilHtml {
 
     public static String dokprodInnholdTilHtml(String dokprod) {
-        String[] linjer = dokprod.split("\n");
         StringBuilder builder = new StringBuilder();
+
+        String[] avsnittene = hentAvsnittene(dokprod);
+
         boolean samepageStarted = false;
-        boolean inBulletpoints = false;
-        for (String linje : linjer) {
-            if (linje.isBlank()) {
-                continue;
-            }
-            if (linje.startsWith("*-")) {
-                inBulletpoints = true;
-                linje = linje.substring(2);
-                builder.append("<ul>");
-                if (linje.isBlank()){
+        for (String avsnitt : avsnittene) {
+            boolean inBulletpoints = false;
+            boolean harAvsnitt = false;
+            String[] linjer = avsnitt.split("\n\r?");
+            for (String linje : linjer) {
+                if (linje.isBlank()) {
+                    builder.append("<br/>");
                     continue;
                 }
-            }
-            if (inBulletpoints) {
-                if (linje.stripTrailing().endsWith("-*")) {
-                    builder.append("<li>").append(linje.replace("-*", "")).append("</li></ul>");
-                    inBulletpoints = false;
+                if (linje.startsWith("*-")) {
+                    inBulletpoints = true;
+                    linje = linje.substring(2);
+                    builder.append("<ul>");
+                    if (linje.isBlank()) {
+                        continue;
+                    }
+                }
+                if (inBulletpoints) {
+                    if (linje.stripTrailing().endsWith("-*")) {
+                        builder.append("<li>").append(linje.replace("-*", "")).append("</li></ul>");
+                        inBulletpoints = false;
+                    } else {
+                        builder.append("<li>").append(linje).append("</li>");
+                    }
+                    continue;
+                }
+
+                boolean overskrift = linje.startsWith("_");
+                if (overskrift) {
+                    boolean erUnderoverskrift = false; //dropper underoverskrifter inntil videre
                     if (samepageStarted) {
-                        samepageStarted = false;
                         builder.append("</div>");
+                    } else {
+                        samepageStarted = true;
+                    }
+                    builder.append("<div class=\"samepage\">");
+                    if (erUnderoverskrift) {
+                        builder.append("<h3>").append(linje.substring(1)).append("</h3>");
+                    } else {
+                        builder.append("<h2>").append(linje.substring(1)).append("</h2>");
                     }
                 } else {
-                    builder.append("<li>").append(linje).append("</li>");
+                    if (!harAvsnitt){
+                        harAvsnitt=true;
+                        builder.append("<p>");
+                    } else {
+                        builder.append("<br/>");
+                    }
+                    builder.append(linje);
                 }
-                continue;
             }
-
-            boolean overskrift = linje.startsWith("_");
-            if (overskrift) {
-                boolean erUnderoverskrift = false; //dropper underoverskrifter inntil videre
-                if (samepageStarted) {
-                    builder.append("</div>");
-                } else {
-                    samepageStarted = true;
-                }
-                builder.append("<div class=\"samepage\">");
-                if (erUnderoverskrift) {
-                    builder.append("<h3>").append(linje.substring(1)).append("</h3>");
-                } else {
-                    builder.append("<h2>").append(linje.substring(1)).append("</h2>");
-                }
-            } else {
-                builder.append("<p>").append(linje).append("</p>");
-                if (samepageStarted) {
-                    samepageStarted = false;
-                    builder.append("</div>");
-                }
+            if (harAvsnitt){
+                builder.append("</p>");
+            }
+            if (samepageStarted) {
+                samepageStarted = false;
+                builder.append("</div>");
             }
         }
         return konverterNbsp(builder.toString());
+    }
+
+    private static String[] hentAvsnittene(String dokprod) {
+        //avsnitt ved dobbelt linjeskift
+        //avsnitt ved overskrift (linje starter med _)
+        return dokprod.split("(\n\r?\n\r?)|(\n\r?(?=_))");
     }
 
     static String konverterNbsp(String s) {
