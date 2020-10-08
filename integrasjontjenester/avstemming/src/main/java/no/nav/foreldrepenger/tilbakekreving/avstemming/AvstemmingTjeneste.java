@@ -58,19 +58,29 @@ public class AvstemmingTjeneste {
     public Optional<String> oppsummer(LocalDate dato) {
         Collection<ØkonomiXmlSendt> sendteVedtak = sendtXmlRepository.finn(MeldingType.VEDTAK, dato);
         AvstemmingCsvFormatter avstemmingCsvFormatter = new AvstemmingCsvFormatter();
+        int antallFeilet = 0;
+        int antallFørstegangsvedtakUtenTilbakekreving = 0;
         for (ØkonomiXmlSendt sendtVedtak : sendteVedtak) {
             if (!erSendtOK(sendtVedtak)) {
+                antallFeilet++;
                 continue;
             }
             Behandling behandling = behandlingRepository.hentBehandling(sendtVedtak.getBehandlingId());
             TilbakekrevingsvedtakOppsummering oppsummering = oppsummer(sendtVedtak);
             if (erFørstegangsvedtakUtenTilbakekreving(behandling, oppsummering)) {
+                antallFørstegangsvedtakUtenTilbakekreving++;
                 continue;
             }
             leggTilAvstemmingsdataForVedtaket(avstemmingCsvFormatter, behandling, oppsummering);
 
         }
-        logger.info("Avstemmingdata for {} ble hentet. Av {} sendte meldinger var {} med OK kvittering og kan sendes til avstemming", dato, sendteVedtak.size(), avstemmingCsvFormatter.getAntallRader());
+        if (antallFeilet == 0) {
+            logger.info("Avstemmer {}. Sender {} vedtak til avstemming. Totalt ble {} vedtak sendt til OS dette døgnet. {} førstegangsvedtak uten tilbakekreving sendes ikke til avstemming",
+                dato, avstemmingCsvFormatter.getAntallRader(), sendteVedtak.size(), antallFørstegangsvedtakUtenTilbakekreving);
+        } else {
+            logger.warn("Avstemmer {}. Sender {} vedtak til avstemming. Totalt ble {} vedtak sendt til OS dette døgnet. {} førstegangsvedtak uten tilbakekreving sendes ikke til avstemming. {} vedtak fikk negativ kvittering fra OS og sendes ikke til avstemming",
+                dato, avstemmingCsvFormatter.getAntallRader(), sendteVedtak.size(), antallFørstegangsvedtakUtenTilbakekreving, antallFeilet);
+        }
         if (avstemmingCsvFormatter.getAntallRader() == 0) {
             return Optional.empty();
         }
