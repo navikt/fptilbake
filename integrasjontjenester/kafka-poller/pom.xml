@@ -3,54 +3,51 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>domenetjenester</artifactId>
+        <artifactId>integrasjontjenester</artifactId>
         <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
         <version>${revision}${sha1}${changelist}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
-    <artifactId>domenetjenester-iverksett</artifactId>
+    <artifactId>kafka-poller</artifactId>
     <packaging>jar</packaging>
-    <name>FPTILBAKE :: Domenetjenester - Iverksett</name>
+    <name>FPTILBAKE :: Integrasjontjenester - kafka-poller</name>
 
     <dependencies>
         <dependency>
-            <groupId>no.nav.foreldrepenger.felles.integrasjon</groupId>
-            <artifactId>felles-integrasjon-rest-klient</artifactId>
-        </dependency>
-        <dependency>
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
-            <artifactId>dokumentbestiller</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.foreldrepenger.felles.ukelonn.integrasjon</groupId>
-            <artifactId>oekonomi-tilbakekreving-klient</artifactId>
-        </dependency>
-        <!-- Test avhengigheter -->
-        <dependency>
-            <groupId>no.nav.foreldrepenger.felles</groupId>
-            <artifactId>felles-testutilities</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
-            <artifactId>domene-testutilities</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
-            <artifactId>migreringer</artifactId>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
-            <artifactId>fpsak-klient</artifactId>
-            <scope>test</scope>
+            <artifactId>fagsystem-klient-api</artifactId>
         </dependency>
         <dependency>
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
             <artifactId>behandling</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.foreldrepenger.felles.ukelonn.integrasjon</groupId>
+            <artifactId>kafka-poller</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.foreldrepenger.kontrakter</groupId>
+            <artifactId>fp-tilkjent-ytelse-v1</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+            <artifactId>k9-sak-klient</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+                    <artifactId>behandlingslager-domene</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-annotation</artifactId>
+        </dependency>
+        <!-- Test -->
+        <dependency>
+            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+            <artifactId>domene-testutilities</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
