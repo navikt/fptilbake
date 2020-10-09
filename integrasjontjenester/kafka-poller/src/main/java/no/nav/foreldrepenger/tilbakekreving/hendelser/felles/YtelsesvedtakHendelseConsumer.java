@@ -6,7 +6,7 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 
 import no.nav.vedtak.konfig.KonfigVerdi;
 
-public class HendelseMeldingConsumer {
+public class YtelsesvedtakHendelseConsumer {
 
     protected static final int TIMEOUT = 1000;
     protected static final String BOOTSTRAP_SERVERS = "bootstrap.servers";

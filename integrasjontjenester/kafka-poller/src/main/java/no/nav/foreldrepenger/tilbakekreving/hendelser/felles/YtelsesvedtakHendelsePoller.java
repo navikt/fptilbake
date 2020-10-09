@@ -9,16 +9,16 @@ import no.nav.foreldrepenger.tilbakekreving.kafka.poller.KafkaPoller;
 import no.nav.foreldrepenger.tilbakekreving.kafka.poller.PostTransactionHandler;
 
 @ApplicationScoped
-public class TilbakekrevingKafkaPoller implements KafkaPoller {
+public class YtelsesvedtakHendelsePoller implements KafkaPoller {
 
     private HendelseReader hendelseReader;
 
-    TilbakekrevingKafkaPoller(){
+    YtelsesvedtakHendelsePoller(){
         // for CDI
     }
 
     @Inject
-    public TilbakekrevingKafkaPoller(HendelseReader hendelseReader) {
+    public YtelsesvedtakHendelsePoller(HendelseReader hendelseReader) {
         this.hendelseReader = hendelseReader;
     }
 

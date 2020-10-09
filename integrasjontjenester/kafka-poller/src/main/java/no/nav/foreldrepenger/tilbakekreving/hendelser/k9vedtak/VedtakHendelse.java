@@ -13,6 +13,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 
+//denne kontrakten er eid av k9-teamet. Kopierte klassen fra k9-sak.
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class VedtakHendelse {
 
