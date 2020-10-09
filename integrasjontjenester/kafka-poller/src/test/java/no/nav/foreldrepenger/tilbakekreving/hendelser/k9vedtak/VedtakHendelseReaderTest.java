@@ -5,6 +5,9 @@ import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -59,12 +62,31 @@ public class VedtakHendelseReaderTest {
         assertThrows(NullPointerException.class,() -> vedtakHendelseReader.hentOgBehandleMeldinger());
     }
 
+    @Test
+    public void skal_lese_men_ikke_håndtere_k9_vedtak_hendelser_for_omsorgspenger(){
+        VedtakHendelse vedtakHendelse = lagVedtakHendelse();
+        vedtakHendelse.setFagsakYtelseType(FagsakYtelseType.OMSORGSPENGER);
+        when(meldingConsumerMock.lesMeldinger()).thenReturn(Lists.newArrayList(vedtakHendelse));
+        List<ProsessTaskData> tasker = taskRepository.finnAlle(ProsessTaskStatus.KLAR);
+        assertThat(tasker).isEmpty();
+    }
+
+    @Test
+    public void skal_lese_men_ikke_håndtere_historiske_k9_vedtak_hendelser(){
+        VedtakHendelse vedtakHendelse = lagVedtakHendelse();
+        vedtakHendelse.setVedtattTidspunkt(LocalDateTime.of(LocalDate.of(2020,10,5), LocalTime.MIDNIGHT));
+        when(meldingConsumerMock.lesMeldinger()).thenReturn(Lists.newArrayList(vedtakHendelse));
+        List<ProsessTaskData> tasker = taskRepository.finnAlle(ProsessTaskStatus.KLAR);
+        assertThat(tasker).isEmpty();
+    }
+
     public VedtakHendelse lagVedtakHendelse(){
         VedtakHendelse vedtakHendelse = new VedtakHendelse();
         vedtakHendelse.setAktør(new AktørId(AKTØR_ID));
         vedtakHendelse.setBehandlingId(BEHANDLING_UUID);
         vedtakHendelse.setFagsakYtelseType(FagsakYtelseType.FRISINN);
         vedtakHendelse.setSaksnummer(SAKSNUMMER);
+        vedtakHendelse.setVedtattTidspunkt(LocalDateTime.now().plusDays(3));
         return vedtakHendelse;
     }
 }

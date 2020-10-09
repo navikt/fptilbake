@@ -1,5 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.hendelser.k9vedtak;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import javax.validation.Valid;
@@ -35,6 +36,11 @@ public class VedtakHendelse {
     @JsonProperty("aktør")
     private AktørId aktør;
 
+    @NotNull
+    @Valid
+    @JsonProperty("vedtattTidspunkt")
+    private LocalDateTime vedtattTidspunkt;
+
     public AktørId getAktør() {
         return aktør;
     }
@@ -67,4 +73,11 @@ public class VedtakHendelse {
         this.behandlingId = behandlingId;
     }
 
+    public LocalDateTime getVedtattTidspunkt() {
+        return vedtattTidspunkt;
+    }
+
+    public void setVedtattTidspunkt(LocalDateTime vedtattTidspunkt) {
+        this.vedtattTidspunkt = vedtattTidspunkt;
+    }
 }
