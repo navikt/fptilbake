@@ -17,6 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.Fptilbake;
+import no.nav.foreldrepenger.tilbakekreving.hendelser.felles.HendelseReader;
 import no.nav.foreldrepenger.tilbakekreving.hendelser.felles.task.HåndterHendelseTask;
 import no.nav.foreldrepenger.tilbakekreving.kafka.poller.PostTransactionHandler;
 import no.nav.foreldrepenger.tilbakekreving.kafka.util.KafkaConsumerFeil;
@@ -24,7 +26,8 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 
 @ApplicationScoped
-public class TilkjentYtelseReader {
+@Fptilbake
+public class TilkjentYtelseReader implements HendelseReader {
 
     private static final Logger logger = LoggerFactory.getLogger(TilkjentYtelseReader.class);
 
@@ -42,6 +45,7 @@ public class TilkjentYtelseReader {
         this.prosessTaskRepository = prosessTaskRepository;
     }
 
+    @Override
     public PostTransactionHandler hentOgBehandleMeldinger() {
         List<TilkjentYtelseMelding> meldinger = meldingConsumer.lesMeldinger();
         if (meldinger.isEmpty()) {

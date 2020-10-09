@@ -19,6 +19,8 @@ import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.K9tilbake;
+import no.nav.foreldrepenger.tilbakekreving.hendelser.felles.HendelseReader;
 import no.nav.foreldrepenger.tilbakekreving.hendelser.felles.task.HåndterHendelseTask;
 import no.nav.foreldrepenger.tilbakekreving.k9sak.klient.K9HenvisningKonverterer;
 import no.nav.foreldrepenger.tilbakekreving.kafka.poller.PostTransactionHandler;
@@ -27,10 +29,11 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 
 @ApplicationScoped
-public class VedtakHendelseReader {
+@K9tilbake
+public class VedtakHendelseReader implements HendelseReader {
 
     private static final Logger logger = LoggerFactory.getLogger(VedtakHendelseReader.class);
-    public static final LocalDateTime BESTEMT_VEDTAK_DATO = LocalDateTime.of(LocalDate.of(2020,10,12), LocalTime.MIDNIGHT);
+    public static final LocalDateTime BESTEMT_VEDTAK_DATO = LocalDateTime.of(LocalDate.of(2020,10,9), LocalTime.MIDNIGHT);
 
     private VedtakHendelseMeldingConsumer meldingConsumer;
     private ProsessTaskRepository prosessTaskRepository;
@@ -46,6 +49,7 @@ public class VedtakHendelseReader {
         this.prosessTaskRepository = prosessTaskRepository;
     }
 
+    @Override
     public PostTransactionHandler hentOgBehandleMeldinger() {
         List<VedtakHendelse> meldinger = meldingConsumer.lesMeldinger();
         if (meldinger.isEmpty()) {
@@ -81,9 +85,9 @@ public class VedtakHendelseReader {
         if(kanHåndtereMelding(melding)){
             prosessTaskRepository.lagre(lagProsessTaskData(melding));
         }else {
-            logger.info("Melding for behandling={} kan ikke håndteres.Unngår det per nå.",melding.getBehandlingId());
+            logger.info("Melding om vedtak for behandling={} for {} med vedtakstidspunkt {} ble ignorert etter regler for ytelsetype og vedtaktidspunkt",
+                melding.getBehandlingId(), melding.getFagsakYtelseType(), melding.getVedtattTidspunkt());
         }
-
     }
 
     private void validereMelding(VedtakHendelse melding) {
