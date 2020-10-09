@@ -33,7 +33,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 public class VedtakHendelseReader implements HendelseReader {
 
     private static final Logger logger = LoggerFactory.getLogger(VedtakHendelseReader.class);
-    public static final LocalDateTime BESTEMT_VEDTAK_DATO = LocalDateTime.of(LocalDate.of(2020,10,9), LocalTime.MIDNIGHT);
+    public static final LocalDateTime BESTEMT_VEDTAK_DATO = LocalDateTime.of(LocalDate.of(2020,10,12), LocalTime.MIDNIGHT);
 
     private VedtakHendelseMeldingConsumer meldingConsumer;
     private ProsessTaskRepository prosessTaskRepository;
