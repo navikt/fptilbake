@@ -8,9 +8,9 @@
         <version>${revision}${sha1}${changelist}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>kafka-poller</artifactId>
+    <artifactId>ytelsesvedtak-kafka-poller</artifactId>
     <packaging>jar</packaging>
-    <name>FPTILBAKE :: Integrasjontjenester - kafka-poller</name>
+    <name>FPTILBAKE :: Integrasjontjenester - ytelsesvedtak-kafka-poller</name>
 
     <dependencies>
         <dependency>

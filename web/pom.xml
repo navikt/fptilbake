@@ -165,7 +165,7 @@
         </dependency>
         <dependency>
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
-            <artifactId>kafka-poller</artifactId>
+            <artifactId>ytelsesvedtak-kafka-poller</artifactId>
         </dependency>
         <dependency>
             <groupId>no.nav.foreldrepenger.felles.sikkerhet</groupId>
