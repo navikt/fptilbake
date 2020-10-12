@@ -25,7 +25,6 @@ import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
-import no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.tjeneste.TbkBeløp;
 import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
 

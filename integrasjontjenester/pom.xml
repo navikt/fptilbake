@@ -25,6 +25,7 @@
         <module>datavarehus</module>
         <module>selvbetjening-klient</module>
         <module>organisasjon</module>
+        <module>kafka-poller</module>
     </modules>
 
 </project>
