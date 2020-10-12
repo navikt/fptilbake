@@ -131,7 +131,7 @@ public class BatchRestTjeneste {
         @ApiResponse(responseCode = "200", description = "Starter batch-scheduler."),
         @ApiResponse(responseCode = "500", description = "Feilet pga ukjent feil.")
     })
-    @BeskyttetRessurs(action = CREATE, property = AbacProperty.BATCH)
+    @BeskyttetRessurs(action = CREATE, property = AbacProperty.DRIFT, sporingslogg = false)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response autoRunBatch() {
         batchSupportTjeneste.startBatchSchedulerTask();
