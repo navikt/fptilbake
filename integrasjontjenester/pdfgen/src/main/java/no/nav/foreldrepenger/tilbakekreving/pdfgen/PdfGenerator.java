@@ -59,7 +59,7 @@ public class PdfGenerator {
                 .useFont(fontSupplier("SourceSansPro-It.ttf"), "Source Sans Pro", 400, BaseRendererBuilder.FontStyle.ITALIC, true)
                 .useColorProfile(FileStructureUtil.getColorProfile())
                 .useSVGDrawer(new BatikSVGDrawer())
-                .usePdfAConformance(PdfRendererBuilder.PdfAConformance.PDFA_2_A)
+                .usePdfAConformance(PdfRendererBuilder.PdfAConformance.PDFA_2_U)
                 .withHtmlContent(htmlDocument, "")
                 .toStream(outputStream)
                 .useFastMode()
