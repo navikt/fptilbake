@@ -78,7 +78,10 @@ public class DokprodTilHtml {
 
     static String konverterNbsp(String s) {
         String utf8nonBreakingSpace = "\u00A0";
-        String htmlNonBreakingSpace = "&nbsp;";
+
+        //FIXME fungerer ikke å åpne i adobe acrobat reader som pdf/a??
+        //String htmlNonBreakingSpace = "&nbsp;";
+        String htmlNonBreakingSpace = " ";
         return s.replaceAll(utf8nonBreakingSpace, htmlNonBreakingSpace);
     }
 
