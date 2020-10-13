@@ -419,7 +419,7 @@ public class BehandlingRestTjeneste {
     }
 
     @GET
-    @Path("/handling-oppretting")
+    @Path("/handling-rettigheter-v2")
     @Operation(
         tags = "behandlinger",
         description = "Rettigheter for behandlinger og fagsak")

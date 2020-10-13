@@ -112,7 +112,7 @@ public class BehandlingDtoTjeneste {
 
         // Behandlingsmeny-operasjoner
         dto.leggTil(get(kontekstPath + "/api/behandlinger/handling-rettigheter", "handling-rettigheter", uuidDto));
-        dto.leggTil(get(kontekstPath + "/api/behandlinger/handling-oppretting", "handling-oppretting", uuidDto));
+        dto.leggTil(get(kontekstPath + "/api/behandlinger/handling-rettigheter-v2", "handling-rettigheter-v2", uuidDto));
         // Denne håndteres litt spesielt i frontend, så må gjøres på denne måten
         dto.leggTil(get(kontekstPath + "/api/verge/behandlingsmeny?uuid=" + uuid, "finn-menyvalg-for-verge"));
 
