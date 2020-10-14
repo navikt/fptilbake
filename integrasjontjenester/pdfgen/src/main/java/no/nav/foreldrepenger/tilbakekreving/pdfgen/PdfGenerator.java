@@ -42,7 +42,7 @@ public class PdfGenerator {
         byte[] bytes = baos.toByteArray();
 
         //Midlertidig kode, kan fjernes i desember 2020. appdynamics kan brukes for å oppdage trege tilfeller
-        logger.info("Produserte PDF fra html {} kB tok {] ms", bytes.length / 1024, System.currentTimeMillis() - t0);
+        logger.info("Produserte PDF fra html {} kB tok {} ms", bytes.length / 1024, System.currentTimeMillis() - t0);
 
         if (dokumentVariant == DokumentVariant.ENDELIG) {
             //validering er for treig for å brukes for interaktiv bruk, tar typisk 1-2 sekunder pr dokument
@@ -51,7 +51,7 @@ public class PdfGenerator {
             PdfaValidator.validatePdf(bytes);
 
             //Midlertidig kode, kan fjernes i desember 2020. logger tidsforbruk for å vurdere om validering også skal gjøres på forhåndsvisning
-            logger.info("Validerte PDF/A {} kB tok {] ms", bytes.length / 1024, System.currentTimeMillis() - t0);
+            logger.info("Validerte PDF/A {} kB tok {} ms", bytes.length / 1024, System.currentTimeMillis() - t0);
         }
 
         return bytes;
