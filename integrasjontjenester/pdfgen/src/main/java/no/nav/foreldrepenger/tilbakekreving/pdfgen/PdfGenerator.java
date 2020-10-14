@@ -7,6 +7,9 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.openhtmltopdf.extend.FSSupplier;
 import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
@@ -18,7 +21,9 @@ import no.nav.foreldrepenger.tilbakekreving.pdfgen.validering.PdfaValidator;
 
 public class PdfGenerator {
 
+    private static final Logger logger = LoggerFactory.getLogger(PdfGenerator.class);
     private static final Map<String, byte[]> FONT_CACHE = new HashMap<>();
+
 
     static {
         XRLog.setLoggingEnabled(true);
@@ -89,7 +94,13 @@ public class PdfGenerator {
         builder.append("</div>");
         builder.append("</body>");
         builder.append("</html>");
-        return builder.toString();
+        String s = builder.toString();
+
+        String medBareUnixLineEndings = s.replaceAll("\r", "");
+
+        logger.info("Inputstreng til pdfgenerator {} før erstatning {} etter. Diff {}", s.length(), medBareUnixLineEndings.length(), s.length() - medBareUnixLineEndings.length());
+
+        return medBareUnixLineEndings;
     }
 
     private String lagBodyStartTag(DokumentVariant dokumentVariant) {
