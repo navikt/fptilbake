@@ -31,7 +31,6 @@ public class PdfGenerator {
     }
 
     public byte[] genererPDF(String html, DokumentVariant dokumentVariant) {
-        dokumentVariant = DokumentVariant.ENDELIG;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         genererPDF(html, baos, dokumentVariant);
         byte[] bytes = baos.toByteArray();
