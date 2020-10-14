@@ -33,7 +33,7 @@ table, h4 {
 }
 
 html {
-    height: 100%;
+    height: 0; /* unngår blank side til slutt */
 }
 
 body {
