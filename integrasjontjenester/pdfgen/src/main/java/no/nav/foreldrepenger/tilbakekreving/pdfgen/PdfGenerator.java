@@ -69,6 +69,7 @@ public class PdfGenerator {
                 .useColorProfile(FileStructureUtil.getColorProfile())
                 .useSVGDrawer(new BatikSVGDrawer())
                 .usePdfAConformance(PdfRendererBuilder.PdfAConformance.PDFA_2_U)
+                .withProducer("nav.no") //får nav.no isdf openhtmltopdf som producer ine i metadata i pdf
                 .withHtmlContent(htmlDocument, "")
                 .toStream(outputStream)
                 .useFastMode()
