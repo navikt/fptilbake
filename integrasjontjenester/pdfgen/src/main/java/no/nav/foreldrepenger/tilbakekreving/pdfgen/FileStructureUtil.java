@@ -9,8 +9,8 @@ import java.util.Objects;
 public class FileStructureUtil {
 
     public static byte[] getColorProfile() {
-        String location = "colorprofile/sRGB2014.icc";
-        return readResource(location);
+        //colorprofile fra https://pippin.gimp.org/sRGBz/
+        return readResource("colorprofile/sRGBz.icc");
     }
 
     public static byte[] readResource(String location) {

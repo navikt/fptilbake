@@ -22,9 +22,7 @@ public class DokprodTilHtmlTest {
         // utf8nonBreakingSpace = "\u00A0";
         String resultat = DokprodTilHtml.dokprodInnholdTilHtml("10\u00A0000\u00A0kroner");
 
-        //FIXME forhåpentligvis kan det blir slik... tatt bort for å få tli å virke i adobe acrobat reader
-        //Assertions.assertThat(resultat).isEqualTo("<p>10&nbsp;000&nbsp;kroner</p>");
-        Assertions.assertThat(resultat).isEqualTo("<p>10 000 kroner</p>");
+        Assertions.assertThat(resultat).isEqualTo("<p>10&nbsp;000&nbsp;kroner</p>");
     }
 
     @Test
