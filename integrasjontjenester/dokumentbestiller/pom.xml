@@ -38,7 +38,7 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>no.nav.foreldrepenger.felles.ukelonn.integrasjon</groupId>
+            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
             <artifactId>journalpost-api-klient</artifactId>
         </dependency>
         <dependency>

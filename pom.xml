@@ -297,6 +297,11 @@
                 <artifactId>ytelsesvedtak-kafka-poller</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+                <artifactId>journalpost-api-klient</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- Felles biblioteker og sikkerhet -->
             <dependency>
@@ -307,11 +312,6 @@
             <dependency>
                 <groupId>no.nav.foreldrepenger.felles.ukelonn.integrasjon</groupId>
                 <artifactId>dokumentproduksjon-klient-v2</artifactId>
-                <version>${ukelonn.felles.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.foreldrepenger.felles.ukelonn.integrasjon</groupId>
-                <artifactId>journalpost-api-klient</artifactId>
                 <version>${ukelonn.felles.version}</version>
             </dependency>
             <dependency>
