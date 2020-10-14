@@ -32,6 +32,8 @@ public class PdfGenerator {
 
     public byte[] genererPDFMedLogo(String html, DokumentVariant dokumentVariant) {
         String logo = FileStructureUtil.readResourceAsString("pdf/nav_logo_svg.html");
+        //FIXME ta med logo
+        logo = "";
         return genererPDF(logo + html, dokumentVariant);
     }
 
