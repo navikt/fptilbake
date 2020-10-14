@@ -8,7 +8,7 @@
 {{#if adresse.adresselinje4}}{{adresse.adresselinje4}}<br/>{{/if}}
 {{#if adresse.postNr}}{{adresse.postNr}}{{/if}}
 {{#if adresse.poststed}}{{adresse.poststed}}<br/>{{/if}}
-{{#if (and adresse.land (or (neq adresse.land "NO") (neq adresse.land "NOR")))}}{{adresse.land}}{{/if}}
+{{#if (and adresse.land (and (neq adresse.land "NO") (neq adresse.land "NOR")))}}{{adresse.land}}{{/if}}
 </div>
 <h1>{{brev.overskrift}}</h1>
 <div id="person">
