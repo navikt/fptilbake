@@ -9,8 +9,11 @@ import java.util.Objects;
 public class FileStructureUtil {
 
     public static byte[] getColorProfile() {
-        String location = "colorprofile/sRGB2014.icc";
-        return readResource(location);
+        //colorprofile bundlet med pdfbox
+        //return readResource("org/apache/pdfbox/resources/icc/ISOcoated_v2_300_bas.icc");
+
+        //colorprofile fra http://color.org/srgbprofiles.xalter
+        return readResource("colorprofile/sRGB_v4_ICC_preference.icc");
     }
 
     public static byte[] readResource(String location) {

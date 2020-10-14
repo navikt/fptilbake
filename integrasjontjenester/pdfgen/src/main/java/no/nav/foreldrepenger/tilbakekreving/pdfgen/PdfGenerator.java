@@ -32,8 +32,6 @@ public class PdfGenerator {
 
     public byte[] genererPDFMedLogo(String html, DokumentVariant dokumentVariant) {
         String logo = FileStructureUtil.readResourceAsString("pdf/nav_logo_svg.html");
-        //FIXME ta med logo
-        logo = "";
         return genererPDF(logo + html, dokumentVariant);
     }
 
@@ -66,6 +64,7 @@ public class PdfGenerator {
                 .useFont(fontSupplier("SourceSansPro-It.ttf"), "Source Sans Pro", 400, BaseRendererBuilder.FontStyle.ITALIC, true)
                 .useColorProfile(FileStructureUtil.getColorProfile())
                 .useSVGDrawer(new BatikSVGDrawer())
+                .usePdfVersion(1.5f /* bruk 1.5 med pdf/a 2.* og 1.4 med pdf/a 1* */)
                 .usePdfAConformance(PdfRendererBuilder.PdfAConformance.PDFA_2_U)
                 .withHtmlContent(htmlDocument, "")
                 .toStream(outputStream)
@@ -80,8 +79,8 @@ public class PdfGenerator {
     private String appendHtmlMetadata(String html, DocFormat format, DokumentVariant dokumentVariant) {
         StringBuilder builder = new StringBuilder();
         //nødvendig doctype for å støtte non-breaking space i openhtmltopdf
-        //builder.append("<!DOCTYPE html PUBLIC");
-        //builder.append(" \"-//OPENHTMLTOPDF//DOC XHTML Character Entities Only 1.0//EN\" \"\">");
+        builder.append("<!DOCTYPE html PUBLIC");
+        builder.append(" \"-//OPENHTMLTOPDF//DOC XHTML Character Entities Only 1.0//EN\" \"\">");
 
         builder.append("<html>");
         builder.append("<head>");
@@ -96,13 +95,7 @@ public class PdfGenerator {
         builder.append("</div>");
         builder.append("</body>");
         builder.append("</html>");
-        String s = builder.toString();
-
-        String medBareUnixLineEndings = s.replaceAll("\r", "");
-
-        logger.info("Inputstreng til pdfgenerator {} før erstatning {} etter. Diff {}", s.length(), medBareUnixLineEndings.length(), s.length() - medBareUnixLineEndings.length());
-
-        return medBareUnixLineEndings;
+        return builder.toString();
     }
 
     private String lagBodyStartTag(DokumentVariant dokumentVariant) {
