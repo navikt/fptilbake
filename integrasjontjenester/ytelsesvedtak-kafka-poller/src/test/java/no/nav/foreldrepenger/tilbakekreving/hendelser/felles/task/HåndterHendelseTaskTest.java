@@ -5,31 +5,31 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.hendelse.HendelseTaskDataWrapper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.hendelse.TaskProperties;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.hendelser.felles.tjeneste.HendelseHåndtererTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.TilkjentYtelseMelding;
-import no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.TilkjentYtelseTestOppsett;
+import no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.TilkkjentYtelseMeldingTestUtil;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 
-public class HåndterHendelseTaskTest extends TilkjentYtelseTestOppsett {
+public class HåndterHendelseTaskTest {
 
-    HendelseHåndtererTjeneste hendelseHåndterer = mock(HendelseHåndtererTjeneste.class);
-    HåndterHendelseTask håndterHendelseTask;
 
-    @Before
-    public void setup() {
-        håndterHendelseTask = new HåndterHendelseTask(hendelseHåndterer);
-    }
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
+    private HendelseHåndtererTjeneste hendelseHåndterer = mock(HendelseHåndtererTjeneste.class);
+    private HåndterHendelseTask håndterHendelseTask = new HåndterHendelseTask(hendelseHåndterer);
 
     @Test
     public void test_skal_kalle_hendelseHåndterer() {
         //
-        ProsessTaskData prosessTaskData = lagProsessTaskData(opprettTilkjentYtelseMelding());
+        ProsessTaskData prosessTaskData = lagProsessTaskData(TilkkjentYtelseMeldingTestUtil.opprettTilkjentYtelseMelding());
 
         // act
         håndterHendelseTask.doTask(prosessTaskData);
@@ -38,7 +38,7 @@ public class HåndterHendelseTaskTest extends TilkjentYtelseTestOppsett {
         verify(hendelseHåndterer, atLeastOnce()).håndterHendelse(any(HendelseTaskDataWrapper.class));
     }
 
-    private ProsessTaskData lagProsessTaskData(TilkjentYtelseMelding melding){
+    private ProsessTaskData lagProsessTaskData(TilkjentYtelseMelding melding) {
         Henvisning henvisning = Henvisning.fraEksternBehandlingId(melding.getBehandlingId());
         ProsessTaskData td = new ProsessTaskData(HåndterHendelseTask.TASKTYPE);
         td.setAktørId(melding.getAktørId().getId());

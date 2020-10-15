@@ -14,19 +14,22 @@ import org.junit.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.hendelse.HendelseTaskDataWrapper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
+import no.nav.foreldrepenger.tilbakekreving.hendelser.ProsessTaskRepositoryMock;
 import no.nav.foreldrepenger.tilbakekreving.kafka.poller.PostTransactionHandler;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
 
-public class TilkjentYtelseReaderTest extends TilkjentYtelseTestOppsett {
+public class TilkjentYtelseReaderTest {
 
     private TilkjentYtelseMeldingConsumer meldingConsumer = mock(TilkjentYtelseMeldingConsumer.class);
+    private ProsessTaskRepository prosessTaskRepository = new ProsessTaskRepositoryMock();
     private TilkjentYtelseReader tilkjentYtelseReader = new TilkjentYtelseReader(meldingConsumer, prosessTaskRepository);
 
     @Test
     public void skal_hente_og_behandle_meldinger() {
         //Arrange
-        TilkjentYtelseMelding tilkjentYtelseMelding = opprettTilkjentYtelseMelding();
+        TilkjentYtelseMelding tilkjentYtelseMelding = TilkkjentYtelseMeldingTestUtil.opprettTilkjentYtelseMelding();
         when(meldingConsumer.lesMeldinger()).thenReturn(Collections.singletonList(tilkjentYtelseMelding));
 
         //Act
@@ -36,19 +39,18 @@ public class TilkjentYtelseReaderTest extends TilkjentYtelseTestOppsett {
         List<ProsessTaskData> prosessTaskDataList = prosessTaskRepository.finnAlle(ProsessTaskStatus.KLAR);
         assertThat(prosessTaskDataList).hasSize(1);
         ProsessTaskData prosessTaskData = prosessTaskDataList.get(0);
-        verify(prosessTaskRepository).lagre(prosessTaskData);
 
         HendelseTaskDataWrapper taskDataWrapper = new HendelseTaskDataWrapper(prosessTaskData);
-        assertThat(taskDataWrapper.getHenvisning()).isEqualTo(HENVISNING);
-        assertThat(taskDataWrapper.getAktørId()).isEqualTo(AKTØR_ID);
-        assertThat(taskDataWrapper.getBehandlingUuid()).isEqualTo(EKSTERN_BEHANDLING_UUID.toString());
+        assertThat(taskDataWrapper.getHenvisning()).isEqualTo(TilkkjentYtelseMeldingTestUtil.HENVISNING);
+        assertThat(taskDataWrapper.getAktørId()).isEqualTo(TilkkjentYtelseMeldingTestUtil.AKTØR_ID);
+        assertThat(taskDataWrapper.getBehandlingUuid()).isEqualTo(TilkkjentYtelseMeldingTestUtil.EKSTERN_BEHANDLING_UUID.toString());
         assertThat(taskDataWrapper.getFagsakYtelseType()).isEqualByComparingTo(FagsakYtelseType.FORELDREPENGER);
-        assertThat(taskDataWrapper.getSaksnummer()).isEqualTo(SAKSNUMMER);
+        assertThat(taskDataWrapper.getSaksnummer()).isEqualTo(TilkkjentYtelseMeldingTestUtil.SAKSNUMMER);
     }
 
     @Test
     public void skal_vente_med_commit_sync_til_transaksjonen_er_ferdig() {
-        TilkjentYtelseMelding tilkjentYtelseMelding = opprettTilkjentYtelseMelding();
+        TilkjentYtelseMelding tilkjentYtelseMelding = TilkkjentYtelseMeldingTestUtil.opprettTilkjentYtelseMelding();
         when(meldingConsumer.lesMeldinger()).thenReturn(Collections.singletonList(tilkjentYtelseMelding));
         PostTransactionHandler postTransactionHandler = tilkjentYtelseReader.hentOgBehandleMeldinger();
 
