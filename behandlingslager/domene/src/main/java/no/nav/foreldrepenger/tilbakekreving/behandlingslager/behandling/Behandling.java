@@ -551,6 +551,11 @@ public class Behandling extends BaseEntitet {
         this.saksbehandlingType = SaksbehandlingType.AUTOMATISK_IKKE_INNKREVING_LAVT_BELØP;
     }
 
+    public boolean erBehandlingRevurderingOgHarÅrsakFeilutbetalingBortfalt(){
+        return BehandlingType.REVURDERING_TILBAKEKREVING.equals(this.behandlingType) && this.behandlingÅrsaker.stream()
+            .anyMatch(behandlingÅrsak -> BehandlingÅrsakType.RE_FEILUTBETALT_BELØP_HELT_ELLER_DELVIS_BORTFALT.equals(behandlingÅrsak.getBehandlingÅrsakType()));
+    }
+
     @SuppressWarnings("unchecked")
     private static <V extends BaseEntitet> Comparator<V> compareOpprettetTid() {
         return (Comparator<V>) COMPARATOR_OPPRETTET_TID;

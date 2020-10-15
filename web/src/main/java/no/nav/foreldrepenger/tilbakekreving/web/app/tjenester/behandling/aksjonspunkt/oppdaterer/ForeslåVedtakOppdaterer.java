@@ -8,6 +8,8 @@ import java.util.function.Function;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import org.apache.cxf.common.util.CollectionUtils;
+
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.ForeslåVedtakTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VedtaksbrevFritekstTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.totrinn.TotrinnTjeneste;
@@ -16,6 +18,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstOppsummering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstType;
@@ -44,8 +47,11 @@ public class ForeslåVedtakOppdaterer implements AksjonspunktOppdaterer<Foreslå
     @Override
     public void oppdater(ForeslåVedtakDto dto, Behandling behandling) {
         Long behandlingId = behandling.getId();
-
-        vedtaksbrevFritekstTjeneste.lagreFriteksterFraSaksbehandler(behandlingId, lagOppsummeringstekst(behandlingId, dto), lagPerioderMedTekst(behandlingId, dto.getPerioderMedTekst()));
+        BrevType brevType = BrevType.VEDTAK_BREV;
+        if(behandling.erBehandlingRevurderingOgHarÅrsakFeilutbetalingBortfalt()){
+            brevType = BrevType.FRITEKST_VEDTAK_BREV;
+        }
+        vedtaksbrevFritekstTjeneste.lagreFriteksterFraSaksbehandler(behandlingId, lagOppsummeringstekst(behandlingId, dto, brevType), lagPerioderMedTekst(behandlingId, dto.getPerioderMedTekst()));
         foreslåVedtakTjeneste.lagHistorikkInnslagForForeslåVedtak(behandlingId);
 
         opprettEllerReåpne(behandling, AksjonspunktDefinisjon.FATTE_VEDTAK);
@@ -54,11 +60,13 @@ public class ForeslåVedtakOppdaterer implements AksjonspunktOppdaterer<Foreslå
 
     private List<VedtaksbrevFritekstPeriode> lagPerioderMedTekst(Long behandlingId, List<PeriodeMedTekstDto> perioderMedTekst) {
         List<VedtaksbrevFritekstPeriode> fritekstPerioder = new ArrayList<>();
-        for (PeriodeMedTekstDto periodeDto : perioderMedTekst) {
-            lagFritekstPeriode(behandlingId, periodeDto, PeriodeMedTekstDto::getFaktaAvsnitt, VedtaksbrevFritekstType.FAKTA_AVSNITT).ifPresent(fritekstPerioder::add);
-            lagFritekstPeriode(behandlingId, periodeDto, PeriodeMedTekstDto::getVilkårAvsnitt, VedtaksbrevFritekstType.VILKAAR_AVSNITT).ifPresent(fritekstPerioder::add);
-            lagFritekstPeriode(behandlingId, periodeDto, PeriodeMedTekstDto::getSærligeGrunnerAvsnitt, VedtaksbrevFritekstType.SAERLIGE_GRUNNER_AVSNITT).ifPresent(fritekstPerioder::add);
-            lagFritekstPeriode(behandlingId, periodeDto, PeriodeMedTekstDto::getSærligeGrunnerAnnetAvsnitt, VedtaksbrevFritekstType.SAERLIGE_GRUNNER_ANNET_AVSNITT).ifPresent(fritekstPerioder::add);
+        if (!CollectionUtils.isEmpty(perioderMedTekst)) {
+            for (PeriodeMedTekstDto periodeDto : perioderMedTekst) {
+                lagFritekstPeriode(behandlingId, periodeDto, PeriodeMedTekstDto::getFaktaAvsnitt, VedtaksbrevFritekstType.FAKTA_AVSNITT).ifPresent(fritekstPerioder::add);
+                lagFritekstPeriode(behandlingId, periodeDto, PeriodeMedTekstDto::getVilkårAvsnitt, VedtaksbrevFritekstType.VILKAAR_AVSNITT).ifPresent(fritekstPerioder::add);
+                lagFritekstPeriode(behandlingId, periodeDto, PeriodeMedTekstDto::getSærligeGrunnerAvsnitt, VedtaksbrevFritekstType.SAERLIGE_GRUNNER_AVSNITT).ifPresent(fritekstPerioder::add);
+                lagFritekstPeriode(behandlingId, periodeDto, PeriodeMedTekstDto::getSærligeGrunnerAnnetAvsnitt, VedtaksbrevFritekstType.SAERLIGE_GRUNNER_ANNET_AVSNITT).ifPresent(fritekstPerioder::add);
+            }
         }
         return fritekstPerioder;
     }
@@ -80,10 +88,11 @@ public class ForeslåVedtakOppdaterer implements AksjonspunktOppdaterer<Foreslå
             .build();
     }
 
-    private VedtaksbrevFritekstOppsummering lagOppsummeringstekst(Long behandlingId, ForeslåVedtakDto dto) {
+    private VedtaksbrevFritekstOppsummering lagOppsummeringstekst(Long behandlingId, ForeslåVedtakDto dto, BrevType brevType) {
         if (dto.getOppsummeringstekst() != null) {
             return new VedtaksbrevFritekstOppsummering.Builder()
                 .medOppsummeringFritekst(dto.getOppsummeringstekst())
+                .medBrevType(brevType.getKode())
                 .medBehandlingId(behandlingId).build();
         } else {
             return null;

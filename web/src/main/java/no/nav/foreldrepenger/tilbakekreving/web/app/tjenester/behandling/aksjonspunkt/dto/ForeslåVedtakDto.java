@@ -20,7 +20,7 @@ public class ForeslåVedtakDto extends BekreftetAksjonspunktDto {
     @Size(max = 100)
     private List<PeriodeMedTekstDto> perioderMedTekst;
 
-    @Size(max = 4000)
+    @Size(max = 10000)
     @Pattern(regexp = InputValideringRegex.FRITEKST)
     private String oppsummeringstekst;
 

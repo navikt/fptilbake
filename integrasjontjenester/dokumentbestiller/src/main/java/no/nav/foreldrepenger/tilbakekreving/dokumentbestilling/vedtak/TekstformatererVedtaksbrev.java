@@ -21,6 +21,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.Tekstforma
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.CustomHelpers;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.FellesTekstformaterer;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.HandlebarsData;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.FritekstVedtaksbrevData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevFelles;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevPeriodeOgFelles;
@@ -246,6 +247,16 @@ class TekstformatererVedtaksbrev extends FellesTekstformaterer {
     static String lagVedtaksbrevOverskrift(HbVedtaksbrevData vedtaksbrevData, Språkkode språkkode) {
         Template template = getTemplate("vedtak/vedtak_overskrift", språkkode);
         return applyTemplate(template, vedtaksbrevData);
+    }
+
+    static String lagFritekstVedtaksbrevOverskrift(FritekstVedtaksbrevData fritekstVedtaksbrevData) {
+        Template template = getTemplate("vedtak/fritekst/fritekst_overskrift", fritekstVedtaksbrevData.getSpråkkode());
+        return applyTemplate(template, fritekstVedtaksbrevData);
+    }
+
+    static String lagFritekstVedtaksbrev(FritekstVedtaksbrevData fritekstVedtaksbrevData) {
+        Template template = getTemplate("vedtak/fritekst/fritekst", fritekstVedtaksbrevData.getSpråkkode());
+        return applyTemplate(template, fritekstVedtaksbrevData);
     }
 
     static String lagFaktaTekst(HbVedtaksbrevPeriodeOgFelles periode) {

@@ -1,5 +1,5 @@
 {{~#* inline "ytelsen" ~}}
-    {{lookup-map ytelsetype FP="foreldrepengene" SVP="svangerskapspengene" ES="engangsstønaden" FRISINN="kompensasjonsytelse for selvstendig næringsdrivende og frilansere"}}
+    {{lookup-map ytelsetype FP="foreldrepengane" SVP="svangerskapspengane" ES="eingongsstønaden" FRISINN="kompensasjonsytelse for selvstendig næringsdrivende og frilansere"}}
 {{~/inline~}}
 {{#switch hovedresultat}}
     {{#case "FULL_TILBAKEBETALING"}}
@@ -9,6 +9,6 @@
         Du må betale tilbake {{> ytelsen}}
     {{/case}}
     {{#case "INGEN_TILBAKEBETALING"}}
-        Du må ikke betale tilbake {{> ytelsen}}
+        Du må ikkje betale tilbake {{> ytelsen}}
     {{/case}}
 {{/switch}}

@@ -1,0 +1,27 @@
+{{{fritekst}}}
+
+{{#if (neq hovedresultat "INGEN_TILBAKEBETALING")}}
+    {{#if (neq ytelsetype "ES")}}
+_Skatt
+NAV gjev opplysningar til Skatteetaten. Skatteetaten vil vurdere om det er grunnlag for å endre skatteoppgjer.
+    {{/if}}
+_Korleis betale tilbake pengane du skuldar
+NAV Innkreving vil korrigere beløpet du skal betale tilbake. Du finn meir informasjon på nav.no/innkreving.
+{{/if}}
+_Du har rett til å klage
+Du kan klage innan {{klagefrist-uker}} veker frå den datoen du fekk vedtaket. Du finn skjema og informasjon på nav.no/klage.
+{{#if (neq hovedresultat "INGEN_TILBAKEBETALING")}}
+
+Du må som hovudregel begynne å betale beløpet tilbake, sjølv om du klagar på dette vedtaket. Dette følgjer av forvaltningslova § 42. Vi vil betale tilbake pengane du har betalt inn, om du får vedtak om at du ikkje trong å betale tilbake heile eller delar av beløpet du skulda.
+{{/if}}
+{{#if (neq ytelsetype "FRISINN") }}
+_Du har rett til innsyn
+På nav.no/dittnav kan du sjå dokumenta i saka di.
+{{/if}}
+_Har du spørsmål?
+Du finner nyttig informasjon på nav.no/familie.{{#if (eq sak.ytelsetype "FRISINN")}} Du kan også kontakte oss på telefon 55553333.{{/if}}
+
+Med vennleg helsing
+NAV Familie- og pensjonsytelsar{{#if finnesVerge}}
+
+Brev med likt innhald er sendt til {{annenMottakerNavn}}{{/if}}

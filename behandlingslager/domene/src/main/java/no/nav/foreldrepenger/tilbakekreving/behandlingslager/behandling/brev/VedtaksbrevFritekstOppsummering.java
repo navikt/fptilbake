@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
@@ -22,8 +23,12 @@ public class VedtaksbrevFritekstOppsummering extends BaseEntitet {
     @Column(name = "BEHANDLING_ID", nullable = false, updatable = false)
     private Long behandlingId;
 
+    @Lob
     @Column(name = "OPPSUMMERING_FRITEKST")
     private String oppsummeringFritekst;
+
+    @Column(name = "BREV_TYPE")
+    private String brevType = BrevType.VEDTAK_BREV.getKode();
 
     public VedtaksbrevFritekstOppsummering() {
     }
@@ -44,12 +49,8 @@ public class VedtaksbrevFritekstOppsummering extends BaseEntitet {
         this.id = id;
     }
 
-    public void setBehandlingId(Long behandlingId) {
-        this.behandlingId = behandlingId;
-    }
-
-    public void setOppsummeringFritekst(String oppsummeringFritekst) {
-        this.oppsummeringFritekst = oppsummeringFritekst;
+    public String getBrevType() {
+        return brevType;
     }
 
     public static class Builder {
@@ -66,8 +67,14 @@ public class VedtaksbrevFritekstOppsummering extends BaseEntitet {
             return this;
         }
 
+        public VedtaksbrevFritekstOppsummering.Builder medBrevType(String brevType) {
+            vedtaksbrevFritekstOppsummering.brevType = brevType;
+            return this;
+        }
+
         public VedtaksbrevFritekstOppsummering build() {
             Objects.requireNonNull(vedtaksbrevFritekstOppsummering.behandlingId);
+            Objects.requireNonNull(vedtaksbrevFritekstOppsummering.brevType);
             return vedtaksbrevFritekstOppsummering;
         }
     }

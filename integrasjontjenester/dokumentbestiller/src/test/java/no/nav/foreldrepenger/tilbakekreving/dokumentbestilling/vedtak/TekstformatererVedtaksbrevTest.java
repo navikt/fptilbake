@@ -23,6 +23,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Ak
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.AnnenVurdering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.SærligGrunn;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.FritekstVedtaksbrevData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbBehandling;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbKonfigurasjon;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbPerson;
@@ -655,6 +656,53 @@ public class TekstformatererVedtaksbrevTest {
         String overskrift = TekstformatererVedtaksbrev.lagVedtaksbrevOverskrift(data, Språkkode.nn);
         String fasit = "Du må ikkje betale tilbake eingongsstønaden";
         assertThat(overskrift).isEqualToNormalizingNewlines(fasit);
+    }
+
+    @Test
+    public void skal_genere_fritekst_vedtaksbrev_overskrift_for_FP_med_full_tilbakebetaling(){
+        FritekstVedtaksbrevData fritekstVedtaksbrevData = lagFritekstVedtaksbrevData(VedtakResultatType.FULL_TILBAKEBETALING, FagsakYtelseType.FORELDREPENGER);
+
+        String overskrift = TekstformatererVedtaksbrev.lagFritekstVedtaksbrevOverskrift(fritekstVedtaksbrevData);
+        String fasit = "Du må betale tilbake foreldrepengene";
+        assertThat(overskrift).isNotEmpty();
+        assertThat(overskrift).isEqualToNormalizingNewlines(fasit);
+    }
+
+    @Test
+    public void skal_genere_fritekst_vedtaksbrev_overskrift_for_frisinn_med_ingen_tilbakebetaling(){
+        FritekstVedtaksbrevData fritekstVedtaksbrevData = lagFritekstVedtaksbrevData(VedtakResultatType.INGEN_TILBAKEBETALING, FagsakYtelseType.FRISINN);
+
+        String overskrift = TekstformatererVedtaksbrev.lagFritekstVedtaksbrevOverskrift(fritekstVedtaksbrevData);
+        String fasit = "Du må ikke betale tilbake kompensasjonsytelse for selvstendig næringsdrivende og frilansere";
+        assertThat(overskrift).isNotEmpty();
+        assertThat(overskrift).isEqualToNormalizingNewlines(fasit);
+    }
+
+    @Test
+    public void skal_genere_fritekst_vedtaksbrev_for_FP_med_full_tilbakebetaling() throws IOException{
+        FritekstVedtaksbrevData fritekstVedtaksbrevData = lagFritekstVedtaksbrevData(VedtakResultatType.FULL_TILBAKEBETALING, FagsakYtelseType.FORELDREPENGER);
+        String generertBrev = TekstformatererVedtaksbrev.lagFritekstVedtaksbrev(fritekstVedtaksbrevData);
+        assertThat(generertBrev).isNotEmpty();
+        String fasit = les("/vedtaksbrev/Fritekst_Vedtaksbrev_FP_full_tilbakebetaling.txt");
+        assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
+    }
+
+    @Test
+    public void skal_genere_fritekst_vedtaksbrev_for_ES_med_ingen_tilbakebetaling() throws IOException{
+        FritekstVedtaksbrevData fritekstVedtaksbrevData = lagFritekstVedtaksbrevData(VedtakResultatType.INGEN_TILBAKEBETALING, FagsakYtelseType.ENGANGSTØNAD);
+        String generertBrev = TekstformatererVedtaksbrev.lagFritekstVedtaksbrev(fritekstVedtaksbrevData);
+        assertThat(generertBrev).isNotEmpty();
+        String fasit = les("/vedtaksbrev/Fritekst_Vedtaksbrev_ES_ingen_tilbakebetaling.txt");
+        assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
+    }
+
+    private FritekstVedtaksbrevData lagFritekstVedtaksbrevData(VedtakResultatType ingenTilbakebetaling, FagsakYtelseType frisinn) {
+        return FritekstVedtaksbrevData.builder()
+            .medHovedResultat(ingenTilbakebetaling)
+            .medFritekst("sender fritekst vedtaksbrev")
+            .medKlagefristUker(6)
+            .medYtelsetype(frisinn)
+            .medSpråkKode(Språkkode.nb).build();
     }
 
     private HbVedtaksbrevData lagBrevOverskriftTestoppsett(FagsakYtelseType ytelsetype,

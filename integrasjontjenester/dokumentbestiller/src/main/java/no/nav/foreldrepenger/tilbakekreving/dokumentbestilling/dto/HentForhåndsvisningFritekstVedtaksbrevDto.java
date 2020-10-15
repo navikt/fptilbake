@@ -1,33 +1,50 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto;
 
-import java.util.UUID;
-
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.TilbakekrevingAbacAttributtType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
+
+import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.AbacDto;
 import no.nav.vedtak.util.InputValideringRegex;
 
 public class HentForhåndsvisningFritekstVedtaksbrevDto implements AbacDto {
 
-    @NotNull
     @Valid
-    private UUID behandlingUuid;
+    @NotNull
+    private BehandlingReferanse behandlingReferanse;
 
     @Size(max = 10000, message = "fritekst er for lang")
     @Pattern(regexp = InputValideringRegex.FRITEKST)
+    @JsonProperty("oppsummeringstekst")
     private String fritekst;
 
-    public UUID getBehandlingUuid() {
-        return behandlingUuid;
+    public BehandlingReferanse getBehandlingReferanse() {
+        return behandlingReferanse;
     }
 
-    public void setBehandlingUuid(UUID behandlingUuid) {
-        this.behandlingUuid = behandlingUuid;
+    @JsonIgnore
+    public void setBehandlingReferanse(BehandlingReferanse behandlingReferanse) {
+        this.behandlingReferanse = behandlingReferanse;
+    }
+
+    // TODO: K9-tilbake. fjern når endringen er merget og prodsatt også i fpsak-frontend
+    @JsonSetter("behandlingId")
+    @JsonProperty(value = "behandlingReferanse")
+    public void setBehandlingId(BehandlingReferanse behandlingReferanse) {
+        this.behandlingReferanse = behandlingReferanse;
+    }
+
+    @JsonSetter("uuid")
+    @JsonProperty(value = "behandlingReferanse")
+    public void setBehandlingUuid(BehandlingReferanse behandlingReferanse) {
+        this.behandlingReferanse = behandlingReferanse;
     }
 
     public String getFritekst() {
@@ -40,6 +57,6 @@ public class HentForhåndsvisningFritekstVedtaksbrevDto implements AbacDto {
 
     @Override
     public AbacDataAttributter abacAttributter() {
-        return AbacDataAttributter.opprett().leggTil(TilbakekrevingAbacAttributtType.YTELSEBEHANDLING_UUID, behandlingUuid);
+        return AbacDataAttributter.opprett().leggTil(behandlingReferanse.abacAttributter());
     }
 }
