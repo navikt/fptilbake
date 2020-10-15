@@ -173,30 +173,34 @@ public class VedtaksbrevTjeneste {
     }
 
     public void sendVedtaksbrev(Long behandlingId, BrevMottaker brevMottaker) {
-        VedtaksbrevData vedtaksbrevData = hentDataForVedtaksbrev(behandlingId, brevMottaker);
-        HbVedtaksbrevData hbVedtaksbrevData = vedtaksbrevData.getVedtaksbrevData();
-        FritekstbrevData data = new FritekstbrevData.Builder()
-            .medOverskrift(TekstformatererVedtaksbrev.lagVedtaksbrevOverskrift(hbVedtaksbrevData, vedtaksbrevData.getMetadata().getSpråkkode()))
-            .medBrevtekst(TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(hbVedtaksbrevData))
-            .medMetadata(vedtaksbrevData.getMetadata())
-            .build();
+        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
+        if(behandling.erBehandlingRevurderingOgHarÅrsakFeilutbetalingBortfalt()){
+            sendFritekstVedtaksbrev(behandlingId, brevMottaker);
+        }else {
+            VedtaksbrevData vedtaksbrevData = hentDataForVedtaksbrev(behandlingId, brevMottaker);
+            HbVedtaksbrevData hbVedtaksbrevData = vedtaksbrevData.getVedtaksbrevData();
+            FritekstbrevData data = new FritekstbrevData.Builder()
+                .medOverskrift(TekstformatererVedtaksbrev.lagVedtaksbrevOverskrift(hbVedtaksbrevData, vedtaksbrevData.getMetadata().getSpråkkode()))
+                .medBrevtekst(TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(hbVedtaksbrevData))
+                .medMetadata(vedtaksbrevData.getMetadata())
+                .build();
 
 
-        if (BrevToggle.brukDokprod()) {
-            byte[] vedlegg = lagVedtaksbrevVedleggTabellPdf(vedtaksbrevData, DokumentVariant.ENDELIG);
-            JournalpostIdOgDokumentId vedleggReferanse = journalføringTjeneste.journalførVedlegg(behandlingId, vedlegg);
-            JournalpostIdOgDokumentId dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data, vedleggReferanse);
-            Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-            opprettHistorikkinnslag(behandling, dokumentreferanse, brevMottaker);
-            lagreInfoOmVedtaksbrev(behandlingId, dokumentreferanse);
-        } else {
-            pdfBrevTjeneste.sendBrev(behandlingId, DetaljertBrevType.VEDTAK, BrevData.builder()
-                .setMottaker(brevMottaker)
-                .setMetadata(data.getBrevMetadata())
-                .setOverskrift(data.getOverskrift())
-                .setBrevtekst(data.getBrevtekst())
-                .setVedleggHtml(TekstformatererVedtaksbrev.lagVedtaksbrevVedleggHtml(vedtaksbrevData.getVedtaksbrevData()))
-                .build());
+            if (BrevToggle.brukDokprod()) {
+                byte[] vedlegg = lagVedtaksbrevVedleggTabellPdf(vedtaksbrevData, DokumentVariant.ENDELIG);
+                JournalpostIdOgDokumentId vedleggReferanse = journalføringTjeneste.journalførVedlegg(behandlingId, vedlegg);
+                JournalpostIdOgDokumentId dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data, vedleggReferanse);
+                opprettHistorikkinnslag(behandling, dokumentreferanse, brevMottaker);
+                lagreInfoOmVedtaksbrev(behandlingId, dokumentreferanse);
+            } else {
+                pdfBrevTjeneste.sendBrev(behandlingId, DetaljertBrevType.VEDTAK, BrevData.builder()
+                    .setMottaker(brevMottaker)
+                    .setMetadata(data.getBrevMetadata())
+                    .setOverskrift(data.getOverskrift())
+                    .setBrevtekst(data.getBrevtekst())
+                    .setVedleggHtml(TekstformatererVedtaksbrev.lagVedtaksbrevVedleggHtml(vedtaksbrevData.getVedtaksbrevData()))
+                    .build());
+            }
         }
     }
 
@@ -265,10 +269,6 @@ public class VedtaksbrevTjeneste {
         }
         return new ForhåndvisningVedtaksbrevTekstDto(avsnitt, oppsummeringFritekst);
     }
-
-    /*public String hentOppsummeringFritekst(Long behandlingId){
-
-    }*/
 
     private BrevMottaker getBrevMottaker(Long behandlingId) {
         return vergeRepository.finnesVerge(behandlingId) ? BrevMottaker.VERGE : BrevMottaker.BRUKER;
@@ -434,7 +434,7 @@ public class VedtaksbrevTjeneste {
         }
     }
 
-    public void sendFritekstVedtaksbrev(Long behandlingId, BrevMottaker brevMottaker){
+    private void sendFritekstVedtaksbrev(Long behandlingId, BrevMottaker brevMottaker){
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         Optional<VedtaksbrevFritekstOppsummering> fritekstOppsummering = vedtaksbrevFritekstRepository.hentVedtaksbrevOppsummering(behandlingId);
         if(fritekstOppsummering.isEmpty()){

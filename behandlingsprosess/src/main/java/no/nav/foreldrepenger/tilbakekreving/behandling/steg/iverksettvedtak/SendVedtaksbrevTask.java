@@ -6,8 +6,6 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.VergeRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDataWrapper;
@@ -26,7 +24,6 @@ public class SendVedtaksbrevTask implements ProsessTaskHandler {
 
     private static final Logger log = LoggerFactory.getLogger(SendVedtaksbrevTask.class);
 
-    private BehandlingRepository behandlingRepository;
     private VergeRepository vergeRepository;
     private VedtaksbrevTjeneste vedtaksbrevTjeneste;
 
@@ -35,10 +32,8 @@ public class SendVedtaksbrevTask implements ProsessTaskHandler {
     }
 
     @Inject
-    public SendVedtaksbrevTask(BehandlingRepository behandlingRepository,
-                               VergeRepository vergeRepository,
+    public SendVedtaksbrevTask(VergeRepository vergeRepository,
                                VedtaksbrevTjeneste vedtaksbrevTjeneste) {
-        this.behandlingRepository = behandlingRepository;
         this.vergeRepository = vergeRepository;
         this.vedtaksbrevTjeneste = vedtaksbrevTjeneste;
     }
@@ -46,20 +41,10 @@ public class SendVedtaksbrevTask implements ProsessTaskHandler {
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
         Long behandlingId = ProsessTaskDataWrapper.wrap(prosessTaskData).getBehandlingId();
-        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-        boolean finnesVerge = vergeRepository.finnesVerge(behandlingId);
-
-        if (behandling.erBehandlingRevurderingOgHarÅrsakFeilutbetalingBortfalt()) {
-            if (finnesVerge) {
-                vedtaksbrevTjeneste.sendFritekstVedtaksbrev(behandlingId, BrevMottaker.VERGE);
-            }
-            vedtaksbrevTjeneste.sendFritekstVedtaksbrev(behandlingId, BrevMottaker.BRUKER);
-        } else {
-            if (finnesVerge) {
-                vedtaksbrevTjeneste.sendVedtaksbrev(behandlingId, BrevMottaker.VERGE);
-            }
-            vedtaksbrevTjeneste.sendVedtaksbrev(behandlingId, BrevMottaker.BRUKER);
+        if (vergeRepository.finnesVerge(behandlingId)) {
+            vedtaksbrevTjeneste.sendVedtaksbrev(behandlingId, BrevMottaker.VERGE);
         }
+        vedtaksbrevTjeneste.sendVedtaksbrev(behandlingId, BrevMottaker.BRUKER);
         log.info("Utført for behandling: {}", behandlingId);
     }
 }

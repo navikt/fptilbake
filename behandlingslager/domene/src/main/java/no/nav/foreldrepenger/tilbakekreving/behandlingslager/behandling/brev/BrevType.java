@@ -15,8 +15,6 @@ public class BrevType extends Kodeliste {
 
     public static final BrevType VEDTAK_BREV = new BrevType("VEDTAK");
 
-    public static final BrevType FRITEKST_VEDTAK_BREV = new BrevType("FRITEKST_VEDTAK");
-
     public static final BrevType HENLEGGELSE_BREV = new BrevType("HENLEGGELSE");
 
     public static final BrevType INNHENT_DOKUMENTASJONBREV = new BrevType("INNHENT_DOKUMENTASJON");

@@ -18,10 +18,10 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstOppsummering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevType;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.PeriodeMedTekstDto;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.DtoTilServiceAdapter;
@@ -47,9 +47,9 @@ public class ForeslåVedtakOppdaterer implements AksjonspunktOppdaterer<Foreslå
     @Override
     public void oppdater(ForeslåVedtakDto dto, Behandling behandling) {
         Long behandlingId = behandling.getId();
-        BrevType brevType = BrevType.VEDTAK_BREV;
+        VedtaksbrevType brevType = VedtaksbrevType.ORDINÆR;
         if(behandling.erBehandlingRevurderingOgHarÅrsakFeilutbetalingBortfalt()){
-            brevType = BrevType.FRITEKST_VEDTAK_BREV;
+            brevType = VedtaksbrevType.FRITEKST;
         }
         vedtaksbrevFritekstTjeneste.lagreFriteksterFraSaksbehandler(behandlingId, lagOppsummeringstekst(behandlingId, dto, brevType), lagPerioderMedTekst(behandlingId, dto.getPerioderMedTekst()));
         foreslåVedtakTjeneste.lagHistorikkInnslagForForeslåVedtak(behandlingId);
@@ -88,11 +88,11 @@ public class ForeslåVedtakOppdaterer implements AksjonspunktOppdaterer<Foreslå
             .build();
     }
 
-    private VedtaksbrevFritekstOppsummering lagOppsummeringstekst(Long behandlingId, ForeslåVedtakDto dto, BrevType brevType) {
+    private VedtaksbrevFritekstOppsummering lagOppsummeringstekst(Long behandlingId, ForeslåVedtakDto dto, VedtaksbrevType brevType) {
         if (dto.getOppsummeringstekst() != null) {
             return new VedtaksbrevFritekstOppsummering.Builder()
                 .medOppsummeringFritekst(dto.getOppsummeringstekst())
-                .medBrevType(brevType.getKode())
+                .medBrevType(brevType)
                 .medBehandlingId(behandlingId).build();
         } else {
             return null;

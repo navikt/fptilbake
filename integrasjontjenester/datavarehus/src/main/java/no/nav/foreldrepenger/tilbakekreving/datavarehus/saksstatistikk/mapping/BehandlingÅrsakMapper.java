@@ -12,7 +12,7 @@ public class BehandlingÅrsakMapper {
         BehandlingÅrsakType.RE_KLAGE_NFP, RevurderingOpprettetÅrsak.KLAGE_NFP,
         BehandlingÅrsakType.RE_OPPLYSNINGER_OM_FORELDELSE, RevurderingOpprettetÅrsak.OPPLYSNINGER_OM_FORELDELSE,
         BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR, RevurderingOpprettetÅrsak.OPPLYSNINGER_OM_VILKÅR,
-        BehandlingÅrsakType.RE_FEILUTBETALT_BELØP_HELT_ELLER_DELVIS_BORTFALT, RevurderingOpprettetÅrsak.RE_FEILBELØP_BORTFALT);
+        BehandlingÅrsakType.RE_FEILUTBETALT_BELØP_HELT_ELLER_DELVIS_BORTFALT, RevurderingOpprettetÅrsak.FEILUTBETALING_BORTFALT);
 
     public static RevurderingOpprettetÅrsak getRevurderingÅrsak(BehandlingÅrsak behandlingÅrsak) {
         return getRevurderingÅrsak(behandlingÅrsak.getBehandlingÅrsakType());

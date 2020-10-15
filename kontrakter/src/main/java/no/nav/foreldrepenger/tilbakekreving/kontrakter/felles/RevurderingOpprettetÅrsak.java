@@ -5,5 +5,5 @@ public enum RevurderingOpprettetÅrsak {
     KLAGE_KA,
     OPPLYSNINGER_OM_VILKÅR,
     OPPLYSNINGER_OM_FORELDELSE,
-    RE_FEILBELØP_BORTFALT,
+    FEILUTBETALING_BORTFALT,
 }

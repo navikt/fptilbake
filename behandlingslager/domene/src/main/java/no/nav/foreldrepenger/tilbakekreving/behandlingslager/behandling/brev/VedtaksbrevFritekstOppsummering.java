@@ -28,7 +28,7 @@ public class VedtaksbrevFritekstOppsummering extends BaseEntitet {
     private String oppsummeringFritekst;
 
     @Column(name = "BREV_TYPE")
-    private String brevType = BrevType.VEDTAK_BREV.getKode();
+    private VedtaksbrevType brevType = VedtaksbrevType.ORDINÆR;
 
     public VedtaksbrevFritekstOppsummering() {
     }
@@ -49,7 +49,7 @@ public class VedtaksbrevFritekstOppsummering extends BaseEntitet {
         this.id = id;
     }
 
-    public String getBrevType() {
+    public VedtaksbrevType getBrevType() {
         return brevType;
     }
 
@@ -67,7 +67,7 @@ public class VedtaksbrevFritekstOppsummering extends BaseEntitet {
             return this;
         }
 
-        public VedtaksbrevFritekstOppsummering.Builder medBrevType(String brevType) {
+        public VedtaksbrevFritekstOppsummering.Builder medBrevType(VedtaksbrevType brevType) {
             vedtaksbrevFritekstOppsummering.brevType = brevType;
             return this;
         }
