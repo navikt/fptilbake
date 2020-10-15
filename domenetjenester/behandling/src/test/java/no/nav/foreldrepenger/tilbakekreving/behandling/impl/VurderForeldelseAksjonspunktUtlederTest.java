@@ -7,11 +7,9 @@ import java.time.Period;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
-import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
+public class VurderForeldelseAksjonspunktUtlederTest {
 
-public class VurderForeldelseAksjonspunktUtlederImplTest {
-
-    VurderForeldelseAksjonspunktUtlederImpl vurderForeldelseAksjonspunktUtleder = new VurderForeldelseAksjonspunktUtlederImpl(Period.ofMonths(30), null, null);
+    VurderForeldelseAksjonspunktUtleder vurderForeldelseAksjonspunktUtleder = new VurderForeldelseAksjonspunktUtleder(Period.ofMonths(30), null, null);
 
     @Test
     public void skalVæreForeldet() {

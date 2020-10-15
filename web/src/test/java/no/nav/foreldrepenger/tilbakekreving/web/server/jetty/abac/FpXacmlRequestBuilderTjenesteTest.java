@@ -33,7 +33,7 @@ import no.nav.vedtak.sikkerhet.pdp.PdpKlientImpl;
 import no.nav.vedtak.sikkerhet.pdp.xacml.XacmlRequestBuilder;
 import no.nav.vedtak.sikkerhet.pdp.xacml.XacmlResponseWrapper;
 
-public class XacmlRequestBuilderTjenesteImplTest {
+public class FpXacmlRequestBuilderTjenesteTest {
 
     public static final String JWT_TOKEN = "ew0KICAidHlwIjogIkpXVCIsDQogICJraWQiOiAiZm9vIiwNCiAgImFsZyI6ICJSUzI1NiINCn0.ew0KICAiYXVkIjogIk9JREMiLA0KICAiYXpwIjogIk9JREMiLA0KICAiYXV0aF90aW1lIjogMTQ5ODAzOTkxNCwNCiAgImV4cCI6IDE0OTgwNDM1MTUsDQogICJpYXQiOiAxNDk4MDM5OTE1LA0KICAiaXNzIjogImh0dHBzOi8vZm9vLmJhci5ubzo0NDMvaXNzby9vYXV0aDIiLA0KICAicmVhbG0iOiAiLyIsDQogICJzdWIiOiAic29tZW9uZSIsDQogICJ0b2tlblR5cGUiOiAiSldUVG9rZW4iDQp9.asdf";
     private PdpKlientImpl pdpKlient;

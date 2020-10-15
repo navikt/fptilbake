@@ -27,7 +27,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.InternalManipulerBehandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.InternalManipulerBehandlingImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.automatisksaksbehandling.AutomatiskSaksbehandlingRepository;
@@ -60,7 +59,7 @@ public class AutomatiskSaksbehandlingBatchTjenesteTest {
     private Behandling behandling;
 
     private BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(repositoryRule.getEntityManager());
-    private InternalManipulerBehandling manipulerBehandling = new InternalManipulerBehandlingImpl(repositoryProvider);
+    private InternalManipulerBehandling manipulerBehandling = new InternalManipulerBehandling(repositoryProvider);
     private ProsessTaskRepository taskRepository = new ProsessTaskRepositoryImpl(repositoryRule.getEntityManager(), null, null);
     private AutomatiskSaksbehandlingRepository automatiskSaksbehandlingRepository = new AutomatiskSaksbehandlingRepository(repositoryRule.getEntityManager());
     private Clock clock = Clock.fixed(Instant.parse(getDateString()), ZoneId.systemDefault());

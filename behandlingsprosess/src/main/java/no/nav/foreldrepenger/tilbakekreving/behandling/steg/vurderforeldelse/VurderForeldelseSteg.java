@@ -10,8 +10,8 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.VurderForeldelseAksjonspunktUtleder;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.AutomatiskVurdertForeldelseTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurderForeldelseAksjonspunktUtleder;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.automatisksaksbehandling.AutomatiskSaksbehandlingTaskProperties;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandleStegResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingSteg;

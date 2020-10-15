@@ -10,7 +10,6 @@ import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.batch.BatchSupportTjeneste;
 import no.nav.foreldrepenger.batch.BatchTjeneste;
 import no.nav.foreldrepenger.batch.task.BatchSchedulerTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -20,17 +19,17 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTypeInfo;
 
 @ApplicationScoped
-public class BatchSupportTjenesteImpl implements BatchSupportTjeneste {
+public class BatchSupportTjeneste {
 
     private ProsessTaskRepository prosessTaskRepository;
     private Map<String, BatchTjeneste> batchTjenester;
 
-    public BatchSupportTjenesteImpl() { //NOSONAR
+    public BatchSupportTjeneste() { //NOSONAR
         this.batchTjenester = new HashMap<>();
     }
 
     @Inject
-    public BatchSupportTjenesteImpl(ProsessTaskRepository prosessTaskRepository, @Any Instance<BatchTjeneste> batchTjenester) {
+    public BatchSupportTjeneste(ProsessTaskRepository prosessTaskRepository, @Any Instance<BatchTjeneste> batchTjenester) {
         this.batchTjenester = new HashMap<>();
         for (BatchTjeneste batchTjeneste : batchTjenester) {
             this.batchTjenester.put(batchTjeneste.getBatchName(), batchTjeneste);
@@ -38,7 +37,6 @@ public class BatchSupportTjenesteImpl implements BatchSupportTjeneste {
         this.prosessTaskRepository = prosessTaskRepository;
     }
 
-    @Override
     public void startBatchSchedulerTask() {
         boolean eksisterende = prosessTaskRepository.finnIkkeStartet().stream()
             .map(ProsessTaskData::getTaskType)
@@ -49,17 +47,14 @@ public class BatchSupportTjenesteImpl implements BatchSupportTjeneste {
         }
     }
 
-    @Override
     public void opprettScheduledTasks(ProsessTaskGruppe gruppe) {
         prosessTaskRepository.lagre(gruppe);
     }
 
-    @Override
     public BatchTjeneste finnBatchTjenesteForNavn(String batchNavn) {
         return batchTjenester.get(batchNavn);
     }
 
-    @Override
     public void retryAlleProsessTasksFeilet() {
         List<ProsessTaskData> ptdList = this.prosessTaskRepository.finnAlle(ProsessTaskStatus.FEILET);
         if (ptdList.isEmpty()) {

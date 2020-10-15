@@ -42,7 +42,7 @@ import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
 @RunWith(CdiRunner.class)
-public class BehandlingskontrollTjenesteImplTest {
+public class BehandlingskontrollTjenesteTest {
 
     @Rule
     public final UnittestRepositoryRule repoRule = new UnittestRepositoryRule();
@@ -108,7 +108,7 @@ public class BehandlingskontrollTjenesteImplTest {
     private static final BehandlingStegType STEG_4 = TestBehandlingStegType.STEG_4;
     private static final BehandlingStegType STEG_5 = TestBehandlingStegType.STEG_5;
 
-    private BehandlingskontrollTjenesteImpl kontrollTjeneste;
+    private BehandlingskontrollTjeneste kontrollTjeneste;
 
     private Behandling behandling;
 
@@ -282,7 +282,7 @@ public class BehandlingskontrollTjenesteImplTest {
 
         BehandlingModellRepository behandlingModellRepository = Mockito.mock(BehandlingModellRepository.class);
         Mockito.when(behandlingModellRepository.getModell(Mockito.any())).thenReturn(this.behandlingModellForTest.modell);
-        this.kontrollTjeneste = new BehandlingskontrollTjenesteImpl(repositoryProvider, behandlingModellRepository,
+        this.kontrollTjeneste = new BehandlingskontrollTjeneste(repositoryProvider, behandlingModellRepository,
                 eventPubliserer) {
             @Override
             protected BehandlingStegUtfall doProsesserBehandling(BehandlingskontrollKontekst kontekst, BehandlingModell modell, BehandlingModellVisitor visitor) {
@@ -359,7 +359,7 @@ public class BehandlingskontrollTjenesteImplTest {
         Mockito.when(behandlingModellRepository.getModell(Mockito.any())).thenReturn(modell);
         Mockito.when(behandlingModellRepository.getBehandlingStegKonfigurasjon()).thenReturn(BehandlingStegKonfigurasjon.lagDummy());
         Mockito.when(behandlingModellRepository.getKodeverkRepository()).thenReturn(kodeverkRepository);
-        this.kontrollTjeneste = new BehandlingskontrollTjenesteImpl(repositoryProvider, behandlingModellRepository,
+        this.kontrollTjeneste = new BehandlingskontrollTjeneste(repositoryProvider, behandlingModellRepository,
                 eventPubliserer);
     }
 

@@ -17,10 +17,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingFeil;
-import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollAsynkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollProvider;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollAsynkTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.OrganisasjonsEnhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
@@ -59,9 +58,9 @@ import no.nav.vedtak.util.StringUtils;
 
 @ApplicationScoped
 @Transactional
-public class BehandlingTjenesteImpl implements BehandlingTjeneste {
+public class BehandlingTjeneste {
 
-    private static final Logger logger = LoggerFactory.getLogger(BehandlingTjenesteImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(BehandlingTjeneste.class);
     public static final String FINN_KRAVGRUNNLAG_TASK = "kravgrunnlag.finn";
 
     private BehandlingRepository behandlingRepository;
@@ -78,18 +77,18 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
 
     private Period defaultVentefrist;
 
-    BehandlingTjenesteImpl() {
+    BehandlingTjeneste() {
         // CDI
     }
 
     @Inject
-    public BehandlingTjenesteImpl(BehandlingRepositoryProvider behandlingRepositoryProvider,
-                                  ProsessTaskRepository prosessTaskRepository,
-                                  BehandlingskontrollProvider behandlingskontrollProvider,
-                                  FagsakTjeneste fagsakTjeneste,
-                                  HistorikkinnslagTjeneste historikkinnslagTjeneste,
-                                  FagsystemKlient fagsystemKlient,
-                                  @KonfigVerdi("frist.brukerrespons.varsel") Period defaultVentefrist) {
+    public BehandlingTjeneste(BehandlingRepositoryProvider behandlingRepositoryProvider,
+                              ProsessTaskRepository prosessTaskRepository,
+                              BehandlingskontrollProvider behandlingskontrollProvider,
+                              FagsakTjeneste fagsakTjeneste,
+                              HistorikkinnslagTjeneste historikkinnslagTjeneste,
+                              FagsystemKlient fagsystemKlient,
+                              @KonfigVerdi("frist.brukerrespons.varsel") Period defaultVentefrist) {
         this.behandlingskontrollTjeneste = behandlingskontrollProvider.getBehandlingskontrollTjeneste();
         this.behandlingskontrollAsynkTjeneste = behandlingskontrollProvider.getBehandlingskontrollAsynkTjeneste();
         this.fagsakTjeneste = fagsakTjeneste;
@@ -105,18 +104,15 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
         this.prosessTaskRepository = prosessTaskRepository;
     }
 
-    @Override
     public List<Behandling> hentBehandlinger(Saksnummer saksnummer) {
         return behandlingRepository.hentAlleBehandlingerForSaksnummer(saksnummer);
     }
 
-    @Override
     public void settBehandlingPaVent(Long behandlingsId, LocalDate frist, Venteårsak venteårsak) {
         AksjonspunktDefinisjon aksjonspunktDefinisjon = AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING;
         doSetBehandlingPåVent(behandlingsId, aksjonspunktDefinisjon, frist, venteårsak);
     }
 
-    @Override
     public void endreBehandlingPåVent(Long behandlingId, LocalDate frist, Venteårsak venteårsak) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         if (!behandling.isBehandlingPåVent()) {
@@ -126,22 +122,18 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
         doSetBehandlingPåVent(behandlingId, aksjonspunktDefinisjon, frist, venteårsak);
     }
 
-    @Override
     public Behandling hentBehandling(Long behandlingId) {
         return behandlingRepository.hentBehandling(behandlingId);
     }
 
-    @Override
     public Behandling hentBehandling(UUID behandlingUUId) {
         return behandlingRepository.hentBehandling(behandlingUUId);
     }
 
-    @Override
     public Long hentBehandlingId(UUID behandlingUUId) {
         return hentBehandling(behandlingUUId).getId();
     }
 
-    @Override
     public Long opprettBehandlingManuell(Saksnummer saksnummer, UUID eksternUuid,
                                          FagsakYtelseType fagsakYtelseType, BehandlingType behandlingType) {
 
@@ -152,7 +144,6 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
         return behandling.getId();
     }
 
-    @Override
     public Long opprettBehandlingAutomatisk(Saksnummer saksnummer, UUID eksternUuid, Henvisning henvisning,
                                             AktørId aktørId, FagsakYtelseType fagsakYtelseType,
                                             BehandlingType behandlingType) {
@@ -161,7 +152,6 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
         return behandling.getId();
     }
 
-    @Override
     public void kanEndreBehandling(Long behandlingId, Long versjon) {
         Boolean kanEndreBehandling = behandlingRepository.erVersjonUendret(behandlingId, versjon);
         if (!kanEndreBehandling) {
@@ -169,18 +159,15 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
         }
     }
 
-    @Override
     public boolean erBehandlingHenlagt(Behandling behandling) {
         Optional<Behandlingsresultat> behandlingsresultat = behandlingresultatRepository.hent(behandling);
         return behandlingsresultat.isPresent() && behandlingsresultat.get().erBehandlingHenlagt();
     }
 
-    @Override
     public boolean kanOppretteBehandling(Saksnummer saksnummer, UUID eksternUuid) {
         return !(harÅpenBehandling(saksnummer) || finnesTilbakekrevingsbehandlingForYtelsesbehandlingen(eksternUuid));
     }
 
-    @Override
     public void oppdaterBehandlingMedEksternReferanse(Saksnummer saksnummer, Henvisning henvisning, UUID eksternUuid) {
         List<Behandling> behandlinger = behandlingRepository.hentAlleBehandlingerForSaksnummer(saksnummer);
         if (behandlinger.isEmpty()) {
@@ -198,7 +185,6 @@ public class BehandlingTjenesteImpl implements BehandlingTjeneste {
         }
     }
 
-    @Override
     public Optional<BehandlingVedtak> hentBehandlingvedtakForBehandlingId(long behandlingId) {
         return behandlingVedtakRepository.hentBehandlingvedtakForBehandlingId(behandlingId);
     }

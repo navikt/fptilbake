@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollAsynkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.task.FortsettBehandlingTaskProperties;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsessTaskRepository;
@@ -17,24 +16,24 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskSta
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
 
 @ApplicationScoped
-public class BehandlingskontrollAsynkTjenesteImpl implements BehandlingskontrollAsynkTjeneste {
+public class BehandlingskontrollAsynkTjeneste {
 
     private ProsessTaskRepository prosessTaskRepository;
     private FagsakProsessTaskRepository fagsakProsessTaskRepository;
 
-    BehandlingskontrollAsynkTjenesteImpl() {
+    BehandlingskontrollAsynkTjeneste() {
         // CDI
     }
 
     @Inject
-    public BehandlingskontrollAsynkTjenesteImpl(ProsessTaskRepository prosessTaskRepository, FagsakProsessTaskRepository fagsakProsessTaskRepository) {
+    public BehandlingskontrollAsynkTjeneste(ProsessTaskRepository prosessTaskRepository, FagsakProsessTaskRepository fagsakProsessTaskRepository) {
         this.prosessTaskRepository = prosessTaskRepository;
         this.fagsakProsessTaskRepository = fagsakProsessTaskRepository;
     }
 
-    @Override
     public Map<String, ProsessTaskData> sjekkProsessTaskPågår(Long fagsakId, Long behandlingId, String gruppe) {
 
         Map<String, List<ProsessTaskData>> statusProsessTasks = sjekkStatusProsessTasksGrouped(fagsakId, behandlingId, gruppe);
@@ -48,12 +47,21 @@ public class BehandlingskontrollAsynkTjenesteImpl implements Behandlingskontroll
         return nestePerGruppe;
     }
 
-    @Override
+    /**
+         * Sjekker om prosess tasks pågår nå for angitt behandling. Returnerer neste utestående tasks per gruppe for status (KLAR, FEILET, VENTER),
+         * men ikke FERDIG, SUSPENDERT (unntatt der matcher angitt gruppe)
+         *
+         * Hvis gruppe angis sjekkes kun angitt gruppe. Dersom denne er null returneres status for alle åpne grupper (ikke-ferdig) for angitt
+         * behandling. Tasks som er {@link ProsessTaskStatus#FERDIG eller ProsessTaskStatus#KJOERT} ignoreres i resultatet når gruppe ikke er angitt.
+         */
     public Map<String, ProsessTaskData> sjekkProsessTaskPågårForBehandling(Behandling behandling, String gruppe) {
         return sjekkProsessTaskPågår(behandling.getFagsakId(), behandling.getId(), gruppe);
     }
 
-    @Override
+    /**
+         * Merge ny gruppe med eksisterende, hvis tidligere gruppe er i gang ignoreres input gruppe her. Hvis tidligere gruppe har feil, overskrives
+         * denne (ny skrives, gamle fjernes). For å merge sees det på individuelle tasks inne i gruppen (da gruppe id kan være forskjellig uansett).
+         */
     public String lagreNyGruppeKunHvisIkkeAlleredeFinnesOgIngenHarFeilet(Long fagsakId, Long behandlingId, ProsessTaskGruppe gruppe) {
         return fagsakProsessTaskRepository.lagreNyGruppeKunHvisIkkeAlleredeFinnesOgIngenHarFeilet(fagsakId, behandlingId, gruppe);
     }
@@ -86,7 +94,11 @@ public class BehandlingskontrollAsynkTjenesteImpl implements Behandlingskontroll
         return tasks.stream().collect(Collectors.groupingBy(ProsessTaskData::getGruppe));
     }
 
-    @Override
+    /**
+         * Kjør prosess asynkront (i egen prosess task) videre.
+         *
+         * @return gruppe assignet til prosess task
+         */
     public String asynkProsesserBehandling(Behandling behandling) {
         ProsessTaskData taskData = new ProsessTaskData(FortsettBehandlingTaskProperties.TASKTYPE);
         taskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());

@@ -24,13 +24,11 @@ import org.mockito.Mockito;
 import com.google.common.collect.Lists;
 
 import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjenesteImpl;
-import no.nav.foreldrepenger.tilbakekreving.behandling.VurderForeldelseAksjonspunktUtleder;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.AutomatiskVurdertForeldelseTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurderForeldelseAksjonspunktUtlederImpl;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurderForeldelseAksjonspunktUtleder;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurdertForeldelseTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.vilkårsvurdering.AutomatiskVurdertVilkårTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.vilkårsvurdering.VilkårsvurderingHistorikkInnslagTjeneste;
@@ -51,11 +49,10 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.steg.vurdervilkår.Vurder
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingModell;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingSteg;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegKonfigurasjon;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollEventPubliserer;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjenesteImpl;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegStatus;
@@ -63,7 +60,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.InternalManipulerBehandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.InternalManipulerBehandlingImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
@@ -94,7 +90,6 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkInnslagKonverter;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjenesteImpl;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
@@ -115,18 +110,18 @@ public class AutomatiskSaksbehandlingProsessTaskTest {
     private final FellesQueriesForBehandlingRepositories fellesQueriesForBehandlingRepositories = new FellesQueriesForBehandlingRepositories(repositoryRule.getEntityManager());
     private final BehandlingVenterRepository behandlingVenterRepository = new BehandlingVenterRepository(fellesQueriesForBehandlingRepositories);
     private final BehandlingKandidaterRepository behandlingKandidaterRepository = new BehandlingKandidaterRepository(fellesQueriesForBehandlingRepositories);
-    private final InternalManipulerBehandling manipulerBehandling = new InternalManipulerBehandlingImpl(repositoryProvider);
+    private final InternalManipulerBehandling manipulerBehandling = new InternalManipulerBehandling(repositoryProvider);
     private final HistorikkInnslagKonverter historikkInnslagKonverter = new HistorikkInnslagKonverter(aksjonspunktRepository);
     private final HistorikkTjenesteAdapter historikkTjenesteAdapter = new HistorikkTjenesteAdapter(repositoryProvider.getHistorikkRepository(), historikkInnslagKonverter);
     private final AvklartFaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste = new AvklartFaktaFeilutbetalingTjeneste(repositoryProvider.getFaktaFeilutbetalingRepository(),
         historikkTjenesteAdapter);
-    private final VarselresponsTjeneste varselresponsTjeneste = new VarselresponsTjenesteImpl(varselresponsRepository);
-    private final GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjenesteImpl(taskRepository, behandlingKandidaterRepository,
+    private final VarselresponsTjeneste varselresponsTjeneste = new VarselresponsTjeneste(varselresponsRepository);
+    private final GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjeneste(taskRepository, behandlingKandidaterRepository,
         behandlingVenterRepository, repositoryProvider, varselresponsTjeneste);
     private final KravgrunnlagTjeneste kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repositoryProvider, gjenopptaBehandlingTjeneste,
         null, null);
     private final AutomatiskFaktaFastsettelseTjeneste faktaFastsettelseTjeneste = new AutomatiskFaktaFastsettelseTjeneste(faktaFeilutbetalingTjeneste,kravgrunnlagTjeneste);
-    private final VurderForeldelseAksjonspunktUtleder vurderForeldelseAksjonspunktUtleder = new VurderForeldelseAksjonspunktUtlederImpl(Period.ofWeeks(-1),
+    private final VurderForeldelseAksjonspunktUtleder vurderForeldelseAksjonspunktUtleder = new VurderForeldelseAksjonspunktUtleder(Period.ofWeeks(-1),
         kravgrunnlagRepository, behandlingRepository);
     private final KravgrunnlagBeregningTjeneste kravgrunnlagBeregningTjeneste = new KravgrunnlagBeregningTjeneste(kravgrunnlagRepository);
     private final VurdertForeldelseTjeneste vurdertForeldelseTjeneste = new VurdertForeldelseTjeneste(repositoryProvider, historikkTjenesteAdapter, kravgrunnlagBeregningTjeneste);
@@ -141,7 +136,7 @@ public class AutomatiskSaksbehandlingProsessTaskTest {
 
     private final BehandlingModellRepository behandlingModellRepositoryMock = Mockito.mock(BehandlingModellRepository.class);
     private final BehandlingskontrollEventPubliserer behandlingskontrollEventPublisererMock = mock(BehandlingskontrollEventPubliserer.class);
-    private final BehandlingskontrollTjeneste behandlingskontrollTjeneste = new BehandlingskontrollTjenesteImpl(repositoryProvider, behandlingModellRepositoryMock,
+    private final BehandlingskontrollTjeneste behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(repositoryProvider, behandlingModellRepositoryMock,
         behandlingskontrollEventPublisererMock);
     private final AutomatiskSaksbehandlingProsessTask automatiskSaksbehandlingProsessTask = new AutomatiskSaksbehandlingProsessTask(behandlingRepository, behandlingskontrollTjeneste);
     ScenarioSimple scenarioSimple = ScenarioSimple.simple();

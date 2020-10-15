@@ -31,7 +31,7 @@ import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 import no.nav.vedtak.felles.testutilities.db.RepositoryRule;
 
 @RunWith(CdiRunner.class)
-public class AksjonspunktApplikasjonTjenesteImplTest {
+public class AksjonspunktApplikasjonTjenesteTest {
 
     private static final String BEGRUNNELSE = "begrunnelse";
     private static final LocalDate FOM = LocalDate.now().minusDays(40);

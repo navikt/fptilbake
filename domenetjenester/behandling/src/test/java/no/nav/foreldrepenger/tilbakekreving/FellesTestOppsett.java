@@ -14,12 +14,11 @@ import org.junit.Before;
 
 import com.google.common.collect.Lists;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.vilkår.VilkårResultatAktsomhetDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.vilkår.VilkårResultatAnnetDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.vilkår.VilkårResultatGodTroDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.vilkår.VilkårsvurderingPerioderDto;
-import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjenesteImpl;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
@@ -71,7 +70,7 @@ public class FellesTestOppsett extends TestOppsett {
         repoProvider.getFagsakRepository(),
         brukerRepository);
 
-    protected BehandlingTjeneste behandlingTjeneste = new BehandlingTjenesteImpl(
+    protected BehandlingTjeneste behandlingTjeneste = new BehandlingTjeneste(
         repoProvider,
         prosessTaskRepository,
         behandlingskontrollProvider,

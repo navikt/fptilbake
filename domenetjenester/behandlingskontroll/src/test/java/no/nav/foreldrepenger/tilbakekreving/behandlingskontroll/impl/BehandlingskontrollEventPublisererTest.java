@@ -60,7 +60,7 @@ public class BehandlingskontrollEventPublisererTest {
     AksjonspunktRepository aksjonspunktRepository;
 
     // No Inject
-    BehandlingskontrollTjenesteImpl kontrollTjeneste;
+    BehandlingskontrollTjeneste kontrollTjeneste;
 
     @Before
     public void setup() {
@@ -68,7 +68,7 @@ public class BehandlingskontrollEventPublisererTest {
 
         BehandlingModellImpl behandlingModell = byggModell();
 
-        kontrollTjeneste = new BehandlingskontrollTjenesteImpl(repositoryProvider, behandlingModellRepository, eventPubliserer) {
+        kontrollTjeneste = new BehandlingskontrollTjeneste(repositoryProvider, behandlingModellRepository, eventPubliserer) {
             @Override
             protected BehandlingModellImpl getModell(Behandling behandling) {
                 return behandlingModell;

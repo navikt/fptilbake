@@ -19,8 +19,8 @@ import org.apache.http.HttpStatus;
 import org.junit.Rule;
 import org.junit.Test;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.verge.VergeTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
@@ -31,7 +31,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.Ve
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
-import no.nav.foreldrepenger.tilbakekreving.domene.person.TpsTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.domene.person.impl.TpsTjeneste;
 import no.nav.vedtak.exception.TekniskException;
 
 public class VergeRestTjenesteTest {

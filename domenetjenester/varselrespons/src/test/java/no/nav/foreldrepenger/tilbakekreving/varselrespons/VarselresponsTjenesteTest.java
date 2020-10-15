@@ -20,7 +20,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons.Vars
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons.VarselresponsRepository;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 
-public class VarselresponsTjenesteImplTest {
+public class VarselresponsTjenesteTest {
 
     private static Long BEHANDLING_ID;
     private static final ResponsKanal RESPONS_KANAL = ResponsKanal.SELVBETJENING;
@@ -42,7 +42,7 @@ public class VarselresponsTjenesteImplTest {
         behandlingRepository = new BehandlingRepository(repositoryRule.getEntityManager());
         fagsakRepository = new FagsakRepository(repositoryRule.getEntityManager());
         repository = new VarselresponsRepository(repositoryRule.getEntityManager());
-        varselresponsTjeneste = new VarselresponsTjenesteImpl(repository);
+        varselresponsTjeneste = new VarselresponsTjeneste(repository);
 
         BEHANDLING_ID = opprettBehandling();
     }

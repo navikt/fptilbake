@@ -6,26 +6,24 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
-import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.TpsAdapter;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 
 @ApplicationScoped
-public class PersoninfoAdapterImpl implements PersoninfoAdapter {
+public class PersoninfoAdapter {
 
     private TpsAdapter tpsAdapter;
 
-    public PersoninfoAdapterImpl() {
+    public PersoninfoAdapter() {
         // for CDI proxy
     }
 
     @Inject
-    public PersoninfoAdapterImpl(TpsAdapter tpsAdapter) {
+    public PersoninfoAdapter(TpsAdapter tpsAdapter) {
         this.tpsAdapter = tpsAdapter;
     }
 
-    @Override
     public Personinfo innhentSaksopplysningerForSøker(AktørId aktørId) {
         return hentKjerneinformasjon(aktørId);
     }

@@ -34,7 +34,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegUt
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingTransisjonEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.transisjoner.StegTransisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.transisjoner.TransisjonIdentifikator;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -46,7 +45,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandlingsresultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.InternalManipulerBehandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.InternalManipulerBehandlingImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepository;
@@ -65,9 +63,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakLåsRe
  * UTVIKLERHÅNDBOK).
  */
 @RequestScoped // må være RequestScoped sålenge ikke nøstet prosessering støttes.
-public class BehandlingskontrollTjenesteImpl implements BehandlingskontrollTjeneste {
+public class BehandlingskontrollTjeneste {
 
-    private static final Logger logger = LoggerFactory.getLogger(BehandlingskontrollTjenesteImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(BehandlingskontrollTjeneste.class);
 
     private AksjonspunktRepository aksjonspunktRepository;
     private BehandlingRepositoryProvider repositoryProvider;
@@ -86,7 +84,7 @@ public class BehandlingskontrollTjenesteImpl implements BehandlingskontrollTjene
      */
     private AtomicBoolean nøstetProsseringGuard = new AtomicBoolean();
 
-    BehandlingskontrollTjenesteImpl() {
+    BehandlingskontrollTjeneste() {
         // for CDI proxy
     }
 
@@ -94,15 +92,15 @@ public class BehandlingskontrollTjenesteImpl implements BehandlingskontrollTjene
      * SE KOMMENTAR ØVERST
      */
     @Inject
-    public BehandlingskontrollTjenesteImpl(BehandlingRepositoryProvider repositoryProvider,
-                                           BehandlingModellRepository behandlingModellRepository,
-                                           BehandlingskontrollEventPubliserer eventPubliserer) {
+    public BehandlingskontrollTjeneste(BehandlingRepositoryProvider repositoryProvider,
+                                       BehandlingModellRepository behandlingModellRepository,
+                                       BehandlingskontrollEventPubliserer eventPubliserer) {
 
         this.repositoryProvider = repositoryProvider;
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.behandlingresultatRepository = repositoryProvider.getBehandlingresultatRepository();
         this.behandlingModellRepository = behandlingModellRepository;
-        this.manipulerInternBehandling = new InternalManipulerBehandlingImpl(repositoryProvider);
+        this.manipulerInternBehandling = new InternalManipulerBehandling(repositoryProvider);
         this.behandlingStegKonfigurasjon = behandlingModellRepository.getBehandlingStegKonfigurasjon();
         this.aksjonspunktRepository = repositoryProvider.getAksjonspunktRepository();
         this.fagsakLåsRepository = repositoryProvider.getFagsakLåsRepository();
@@ -111,7 +109,13 @@ public class BehandlingskontrollTjenesteImpl implements BehandlingskontrollTjene
         }
     }
 
-    @Override
+    /**
+         * Prosesser behandling fra dit den sist har kommet.
+         * Avhengig av vurderingspunkt (inngang- og utgang-kriterier) vil steget kjøres på nytt.
+         *
+         * @param kontekst
+         *            - kontekst for prosessering. Opprettes gjennom {@link #initBehandlingskontroll(Long)}
+         */
     public void prosesserBehandling(BehandlingskontrollKontekst kontekst) {
         Behandling behandling = hentBehandling(kontekst);
         if (behandling.erAvsluttet()) {
@@ -123,7 +127,15 @@ public class BehandlingskontrollTjenesteImpl implements BehandlingskontrollTjene
         prosesserBehandling(kontekst, modell, stegVisitor);
     }
 
-    @Override
+    /**
+         * Prosesser forutsatt behandling er i angitt steg og status venter og steget.
+         * Vil kalle gjenopptaSteg for angitt steg, senere vanlig framdrift
+         *
+         * @param kontekst
+         *            - kontekst for prosessering. Opprettes gjennom {@link #initBehandlingskontroll(Long)}
+         * @param behandlingStegType
+         *            - precondition steg
+         */
     public void prosesserBehandlingGjenopptaHvisStegVenter(BehandlingskontrollKontekst kontekst, BehandlingStegType behandlingStegType) {
         Behandling behandling = hentBehandling(kontekst);
         if (behandling.erAvsluttet()) {
@@ -155,7 +167,11 @@ public class BehandlingskontrollTjenesteImpl implements BehandlingskontrollTjene
         return behandlingStegUtfall;
     }
 
-    @Override
+    /**
+         * Prosesser behandling enten fra akitvt steg eller steg angitt av aksjonspunktDefinsjonerKoder dersom noen er eldre
+         *
+         * @see #prosesserBehandling(BehandlingskontrollKontekst)
+         */
     public void behandlingTilbakeføringTilTidligsteAksjonspunkt(BehandlingskontrollKontekst kontekst,
                                                                 Collection<String> oppdaterteAksjonspunkter, boolean erOverstyring) {
         if (CollectionUtils.isEmpty(oppdaterteAksjonspunkter)) {
@@ -176,7 +192,6 @@ public class BehandlingskontrollTjenesteImpl implements BehandlingskontrollTjene
         }
     }
 
-    @Override
     public boolean behandlingTilbakeføringHvisTidligereBehandlingSteg(BehandlingskontrollKontekst kontekst,
                                                                       BehandlingStegType tidligereStegType) {
 
@@ -194,7 +209,13 @@ public class BehandlingskontrollTjenesteImpl implements BehandlingskontrollTjene
         return erSenereSteg(modell, aktivtBehandlingSteg, tidligereStegType);
     }
 
-    @Override
+    /**
+         * FLytt prosesen til et tidlligere steg.
+         *
+         * @throws IllegalStateException
+         *             dersom tidligereSteg er etter aktivt steg i behandlingen (i følge BehandlingsModell for gitt
+         *             BehandlingType).
+         */
     public void behandlingTilbakeføringTilTidligereBehandlingSteg(BehandlingskontrollKontekst kontekst,
                                                                   BehandlingStegType tidligereStegType) {
 
@@ -214,7 +235,6 @@ public class BehandlingskontrollTjenesteImpl implements BehandlingskontrollTjene
 
     }
 
-    @Override
     public int sammenlignRekkefølge(Behandling behandling, BehandlingStegType stegA, BehandlingStegType stegB) {
         BehandlingModell modell = getModell(behandling);
         return modell.erStegAFørStegB(stegA, stegB) ? -1
@@ -222,7 +242,17 @@ public class BehandlingskontrollTjenesteImpl implements BehandlingskontrollTjene
                 : 0;
     }
 
-    @Override
+    /**
+         * Flytt prosessen til senere steg. Hopper over eventuelt mellomliggende steg.
+         *
+         * Alle mellomliggende steg og aksjonspunkt vil bli satt til AVBRUTT når dette skjer. Prosessen vil ikke kjøres.
+         * Det gjelder også dersom neste steg er det definerte neste steget i prosessen (som normalt skulle blitt kalt
+         * gjennom {@link #prosesserBehandling(BehandlingskontrollKontekst)}.
+         *
+         * @throws IllegalStateException
+         *             dersom senereSteg er før eller lik aktivt steg i behandlingen (i følge BehandlingsModell for gitt
+         *             BehandlingType).
+         */
     public void behandlingFramføringTilSenereBehandlingSteg(BehandlingskontrollKontekst kontekst,
                                                             BehandlingStegType senereSteg) {
         final BehandlingStegStatus statusInngang = getStatusKonfigurasjon().getInngang();
@@ -241,7 +271,13 @@ public class BehandlingskontrollTjenesteImpl implements BehandlingskontrollTjene
 
     }
 
-    @Override
+    /**
+         * Initier ny Behandlingskontroll, oppretter kontekst som brukes til sikre at parallle behandlinger og kjøringer går
+         * i tur og orden. Dette skjer gjennom å opprette en {@link BehandlingLås} som legges ved ved lagring.
+         *
+         * @param behandlingId
+         *            - må være med
+         */
     public BehandlingskontrollKontekst initBehandlingskontroll(Long behandlingId) {
         Objects.requireNonNull(behandlingId, "behandlingId"); //$NON-NLS-1$
 
@@ -249,7 +285,13 @@ public class BehandlingskontrollTjenesteImpl implements BehandlingskontrollTjene
         return initBehandlingskontroll(behandling);
     }
 
-    @Override
+    /**
+         * Initierer ny behandlingskontroll for en ny behandling, som ikke er lagret i behandlingsRepository
+         * og derfor ikke har fått tildelt behandlingId
+         *
+         * @param behandling
+         *            - må være med
+         */
     public BehandlingskontrollKontekst initBehandlingskontroll(Behandling behandling) {
         Objects.requireNonNull(behandling, "behandling"); //$NON-NLS-1$
         // først lås
@@ -259,7 +301,14 @@ public class BehandlingskontrollTjenesteImpl implements BehandlingskontrollTjene
         return new BehandlingskontrollKontekst(behandling.getFagsakId(), behandling.getAktørId(), lås);
     }
 
-    @Override
+    /**
+         * Markerer ett eller flere aksjonspunkter som utført og oppdaterer status og steg på bakgrunn av det.
+         * <p>
+         * Bør bare kalles dersom status eller begrunnelse for Utført endres.
+         *
+         * @param behandlingStegType
+         *            - steg utført i.
+         */
     public void aksjonspunkterUtført(BehandlingskontrollKontekst kontekst, List<Aksjonspunkt> aksjonspunkter,
                                      BehandlingStegType behandlingStegType) {
         if (!aksjonspunkter.isEmpty()) {
@@ -267,8 +316,10 @@ public class BehandlingskontrollTjenesteImpl implements BehandlingskontrollTjene
         }
     }
 
+    /**
+         * Markerer at ett eller flere aksjonspunkter er funnet i et gitt behandlingsteg
+         */
     // for symmetri med aksjonspunkterUtført
-    @Override
     public void aksjonspunkterFunnet(BehandlingskontrollKontekst kontekst, BehandlingStegType behandlingStegType,
                                      List<Aksjonspunkt> aksjonspunkter) {
         // handlinger som skal skje når funnet
@@ -277,12 +328,13 @@ public class BehandlingskontrollTjenesteImpl implements BehandlingskontrollTjene
         }
     }
 
-    @Override
     public BehandlingStegKonfigurasjon getBehandlingStegKonfigurasjon() {
         return behandlingStegKonfigurasjon;
     }
 
-    @Override
+    /**
+         * Lagrer en ny behandling i behandlingRepository og fyrer av event om at en Behandling er opprettet
+         */
     public void opprettBehandling(BehandlingskontrollKontekst kontekst, Behandling behandling) {
         final FagsakLås fagsakLås = fagsakLåsRepository.taLås(behandling.getFagsak());
         behandlingRepository.lagre(behandling, kontekst.getSkriveLås());
@@ -290,7 +342,19 @@ public class BehandlingskontrollTjenesteImpl implements BehandlingskontrollTjene
         eventPubliserer.fireEvent(kontekst, null, behandling.getStatus());
     }
 
-    @Override
+    /**
+         * Opprett ny behandling for gitt fagsak og BehandlingType.
+         * <p>
+         * Vil alltid opprette ny behandling, selv om det finnes eksisterende åpen behandling på fagsaken.
+         *
+         * @param fagsak
+         *            - fagsak med eller uten eksisterende behandling
+         * @param behandlingType
+         *            - type behandling
+         * @param behandlingOppdaterer
+         *            - funksjon for oppdatering av grunnlag
+         * @return Behandling - nylig opprettet og lagret.
+         */
     public Behandling opprettNyBehandling(Fagsak fagsak, BehandlingType behandlingType, Consumer<Behandling> behandlingOppdaterer) {
         Behandling.Builder behandlingBuilder = Behandling.nyBehandlingFor(fagsak, behandlingType);
         Behandling nyBehandling = behandlingBuilder.build();
@@ -301,7 +365,23 @@ public class BehandlingskontrollTjenesteImpl implements BehandlingskontrollTjene
         return nyBehandling;
     }
 
-    @Override
+    /**
+         * Oppretter eller oppdaterer en behandling.
+         * <p>
+         * <ul>
+         * <li>Oppdaterer eksisterende behandling hvis det finnes en åpen behandling.</li>
+         * <li>Oppretter ny behanding dersom det ikke finnes eksisterende åpen behandling.</li>
+         * <li>Benytter grunnlag fra tidligere behandling hvis det finnes eksisterende avsluttede behandlinger.</li>
+         * </ul>
+         *
+         * @param fagsak
+         *            - fagsak med eller uten eksisterende behandling
+         * @param behandlingType
+         *            - type behandling
+         * @param behandlingOppdaterer
+         *            - funksjon for å oppdatere grunnlag eller behandling under arbeid
+         * @return Behandling - opprettet eller oppdatert, og lagret.
+         */
     public Behandling opprettNyEllerOppdaterEksisterendeBehandling(Fagsak fagsak, BehandlingType behandlingType,
                                                                    Consumer<Behandling> behandlingOppdaterer) {
         Optional<Behandling> behandlingOpt = behandlingRepository.hentSisteBehandlingForFagsakId(fagsak.getId(), behandlingType);
@@ -327,13 +407,30 @@ public class BehandlingskontrollTjenesteImpl implements BehandlingskontrollTjene
 
     }
 
-    @Override
+    /**
+         * Setter behandlingen på vent.
+         *
+         * @param behandling
+         * @param aksjonspunktDefinisjon hvilket Aksjonspunkt skal holde i 'ventingen'
+         * @param fristTid Frist før Behandlingen å adresseres
+         * @param venteårsak Årsak til ventingen.
+         *
+         */
     public Aksjonspunkt settBehandlingPåVentUtenSteg(Behandling behandling, AksjonspunktDefinisjon aksjonspunktDefinisjonIn,
                                                      LocalDateTime fristTid, Venteårsak venteårsak) {
         return settBehandlingPåVent(behandling, aksjonspunktDefinisjonIn, null, fristTid, venteårsak);
     }
 
-    @Override
+    /**
+         * Setter behandlingen på vent med angitt hvilket steg det står i.
+         *
+         * @param behandling
+         * @param aksjonspunktDefinisjon hvilket Aksjonspunkt skal holde i 'ventingen'
+         * @param BehandlingStegType stegType aksjonspunktet står i.
+         * @param fristTid Frist før Behandlingen å adresseres
+         * @param venteårsak Årsak til ventingen.
+         *
+         */
     public Aksjonspunkt settBehandlingPåVent(Behandling behandling, AksjonspunktDefinisjon aksjonspunktDefinisjonIn,
                                              BehandlingStegType stegType, LocalDateTime fristTid, Venteårsak venteårsak) {
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
@@ -347,7 +444,11 @@ public class BehandlingskontrollTjenesteImpl implements BehandlingskontrollTjene
         return aksjonspunkt;
     }
 
-    @Override
+    /**
+         * Setter autopunkter til utført (som en del av å gjenoppta behandlingen). Dette klargjør kun behandligen for
+         * prosessering, men vil ikke drive prosessen videre.
+         * Bruk {@link #prosesserBehandling(BehandlingskontrollKontekst)} el. tilsvarende for det.
+         */
     public void settAutopunkterTilUtført(BehandlingskontrollKontekst kontekst, boolean erHenleggelse) {
         Behandling behandling = hentBehandling(kontekst);
         List<Aksjonspunkt> åpneAutopunkter = behandling.getÅpneAksjonspunkter(AksjonspunktType.AUTOPUNKT);
@@ -363,7 +464,13 @@ public class BehandlingskontrollTjenesteImpl implements BehandlingskontrollTjene
         }
     }
 
-    @Override
+    /**
+         * Setter autopunkter av en spessifik aksjonspunktdefinisjon til utført. Dette klargjør kun behandligen for
+         * prosessering, men vil ikke drive prosessen videre.
+         *
+         * @param aksjonspunktDefinisjon Aksjonspunktdefinisjon til de aksjonspunktene som skal lukkes
+         *            Bruk {@link #prosesserBehandling(BehandlingskontrollKontekst)} el. tilsvarende for det.
+         */
     public void settAutopunktTilUtført(AksjonspunktDefinisjon aksjonspunktDefinisjon, BehandlingskontrollKontekst kontekst) {
         Behandling behandling = hentBehandling(kontekst);
         Optional<Aksjonspunkt> aksjonspunktMedDefinisjonOptional = behandling.getAksjonspunktMedDefinisjonOptional(aksjonspunktDefinisjon);
@@ -377,7 +484,10 @@ public class BehandlingskontrollTjenesteImpl implements BehandlingskontrollTjene
         });
     }
 
-    @Override
+    /**
+         * Setter tilbake aktivt steg hvis autopunkt er av type fødsel AUTO_VENT_PÅ_FØDSELREGISTRERING.
+         * Dette er et spesialtilfelle som krever at steget kjøres om igjen (eneste kjente tilfelle)
+         */
     public void taBehandlingAvVent(Behandling behandling, BehandlingskontrollKontekst kontekst) {
         // Kjør steget på nytt ved gjenopptakelse fra venting, når aksjonspunktet er markert for dette
         List<Aksjonspunkt> aksjonspunkterSomMedførerTilbakehopp = behandling.getÅpneAksjonspunkter().stream()
@@ -398,7 +508,7 @@ public class BehandlingskontrollTjenesteImpl implements BehandlingskontrollTjene
         }
     }
 
-    @Override
+    /** Henlegg en behandling */
     public void henleggBehandling(BehandlingskontrollKontekst kontekst, BehandlingResultatType årsak) {
         // valider invarianter
         Objects.requireNonNull(årsak, "årsak"); //$NON-NLS-1$
@@ -456,7 +566,10 @@ public class BehandlingskontrollTjenesteImpl implements BehandlingskontrollTjene
         behandlingresultatRepository.lagre(behandlingsresultat);
     }
 
-    @Override
+    /**
+         * Ny metode som forbereder en behandling for prosessering - setter autopunkt til utført og evt tilbakeføring ved gjenopptak.
+         * Behandlingen skal være klar til prosessering uten åpne autopunkt når kallet er ferdig.
+         */
     public void taBehandlingAvVentSetAlleAutopunktUtført(Behandling behandling, BehandlingskontrollKontekst kontekst) {
         List<Aksjonspunkt> aksjonspunkterSomMedførerTilbakehopp = behandling.getÅpneAksjonspunkter().stream()
             .filter(Aksjonspunkt::tilbakehoppVedGjenopptakelse)
@@ -482,7 +595,6 @@ public class BehandlingskontrollTjenesteImpl implements BehandlingskontrollTjene
         eventPubliserer.fireEvent(event);
     }
 
-    @Override
     public boolean erStegPassert(Behandling behandling, BehandlingStegType behandlingSteg) {
 
         BehandlingModell modell = getModell(behandling);
@@ -491,7 +603,14 @@ public class BehandlingskontrollTjenesteImpl implements BehandlingskontrollTjene
         return !modell.erStegAFørStegB(aktivtSteg, behandlingSteg) && !aktivtSteg.equals(behandlingSteg);
     }
 
-    @Override
+    /**
+         * Sjekker i behandlingsmodellen om aksjonspunktet skal løses i eller etter det angitte steget.
+         *
+         * @param behandling
+         * @param behandlingSteg steget som aksjonspunktet skal sjekkes mot
+         * @param aksjonspunktDefinisjon aksjonspunktet som skal sjekkes
+         * @return true dersom aksjonspunktet skal løses i eller etter det angitte steget.
+         */
     public boolean skalAksjonspunktReaktiveresIEllerEtterSteg(Behandling behandling, BehandlingStegType behandlingSteg,
                                                               AksjonspunktDefinisjon apDef) {
 
@@ -509,7 +628,6 @@ public class BehandlingskontrollTjenesteImpl implements BehandlingskontrollTjene
     }
 
     // TODO: (PK-49128) Midlertidig løsning for å filtrere aksjonspunkter til høyre for steg i hendelsemodul
-    @Override
     public Set<String> finnAksjonspunktDefinisjonerFraOgMed(Behandling behandling, BehandlingStegType steg, boolean medInngangOgså) {
         BehandlingModell modell = getModell(behandling);
         return modell.finnAksjonspunktDefinisjonerFraOgMed(steg, medInngangOgså);
@@ -672,7 +790,6 @@ public class BehandlingskontrollTjenesteImpl implements BehandlingskontrollTjene
     }
 
 
-    @Override
     public void fremoverTransisjon(TransisjonIdentifikator transisjonId, BehandlingskontrollKontekst kontekst) {
         Behandling behandling = behandlingRepository.hentBehandling(kontekst.getBehandlingId());
         Optional<BehandlingStegTilstand> stegTilstandFør = behandling.getBehandlingStegTilstand();
@@ -692,7 +809,6 @@ public class BehandlingskontrollTjenesteImpl implements BehandlingskontrollTjene
         eventPubliserer.fireEvent(event);
     }
 
-    @Override
     public boolean inneholderSteg(Behandling behandling, BehandlingStegType behandlingStegType) {
         BehandlingModell modell = getModell(behandling);
         return modell.hvertSteg()
@@ -739,7 +855,7 @@ public class BehandlingskontrollTjenesteImpl implements BehandlingskontrollTjene
         return nyBehandling;
     }
 
-    @Override
+    /** Oppdaterer behandling. (lagrer) */
     public void oppdaterBehandling(Behandling behandling, BehandlingskontrollKontekst kontekst) {
         behandlingRepository.lagre(behandling, kontekst.getSkriveLås());
     }

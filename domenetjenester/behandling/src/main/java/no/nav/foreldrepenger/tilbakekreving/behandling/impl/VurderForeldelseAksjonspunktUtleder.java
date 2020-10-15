@@ -7,7 +7,6 @@ import java.util.Optional;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.VurderForeldelseAksjonspunktUtleder;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsak;
@@ -20,25 +19,24 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.vedtak.konfig.KonfigVerdi;
 
 @ApplicationScoped
-public class VurderForeldelseAksjonspunktUtlederImpl implements VurderForeldelseAksjonspunktUtleder {
+public class VurderForeldelseAksjonspunktUtleder {
 
     private Period antallMånederFrist;
     private KravgrunnlagRepository grunnlagRepository;
     private BehandlingRepository behandlingRepository;
 
-    VurderForeldelseAksjonspunktUtlederImpl() {
+    VurderForeldelseAksjonspunktUtleder() {
         // For CDI
     }
 
     @Inject
-    public VurderForeldelseAksjonspunktUtlederImpl(@KonfigVerdi("foreldelse.antallmaaneder") Period antallMånederFrist, KravgrunnlagRepository grunnlagRepository,
-                                                   BehandlingRepository behandlingRepository) {
+    public VurderForeldelseAksjonspunktUtleder(@KonfigVerdi("foreldelse.antallmaaneder") Period antallMånederFrist, KravgrunnlagRepository grunnlagRepository,
+                                               BehandlingRepository behandlingRepository) {
         this.antallMånederFrist = antallMånederFrist;
         this.grunnlagRepository = grunnlagRepository;
         this.behandlingRepository = behandlingRepository;
     }
 
-    @Override
     public Optional<AksjonspunktDefinisjon> utledAksjonspunkt(Long behandlingId) {
         // Henter perioder og vurderer foreldelse
         Kravgrunnlag431 kravgrunnlag = grunnlagRepository.finnKravgrunnlag(behandlingId);
@@ -56,7 +54,6 @@ public class VurderForeldelseAksjonspunktUtlederImpl implements VurderForeldelse
         return Optional.empty();
     }
 
-    @Override
     public boolean erForeldet(LocalDate dagensDato, LocalDate fradato) {
         LocalDate frist = dagensDato.minus(antallMånederFrist);
         return fradato.isBefore(frist);

@@ -48,7 +48,7 @@ import no.nav.vedtak.felles.prosesstask.api.TaskStatus;
 import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
 @RunWith(CdiRunner.class)
-public class GjenopptaBehandlingTjenesteImplTest {
+public class GjenopptaBehandlingTjenesteTest {
 
     private GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste;
 
@@ -76,7 +76,7 @@ public class GjenopptaBehandlingTjenesteImplTest {
 
     @Before
     public void setup() {
-        gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjenesteImpl(mockProsesstaskRepository,
+        gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjeneste(mockProsesstaskRepository,
             behandlingKandidaterRepository,
             behandlingVenterRepository,
             repositoryProvider,

@@ -49,7 +49,7 @@ public class TpsAdapterImplTest {
     private AktørConsumerMedCache aktørConsumerMock = Mockito.mock(AktørConsumerMedCache.class);
     private PersonConsumer personProxyServiceMock = Mockito.mock(PersonConsumer.class);
 
-    TpsTjenesteImpl tpsTjeneste = Mockito.mock(TpsTjenesteImpl.class);
+    TpsTjeneste tpsTjeneste = Mockito.mock(TpsTjeneste.class);
     private final AktørId aktørId = new AktørId("1337");
     private final PersonIdent fnr = new PersonIdent("11112222333");
 
