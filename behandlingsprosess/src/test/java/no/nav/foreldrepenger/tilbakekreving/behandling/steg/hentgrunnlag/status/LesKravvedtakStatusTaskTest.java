@@ -23,7 +23,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingresultatRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingresultatRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.prosesstask.UtvidetProsessTaskRepository;
@@ -39,7 +38,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
 public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
 
     private KravVedtakStatusRepository kravVedtakStatusRepository = new KravVedtakStatusRepository(repoRule.getEntityManager());
-    private BehandlingresultatRepository behandlingresultatRepository = new BehandlingresultatRepositoryImpl(repoRule.getEntityManager());
+    private BehandlingresultatRepository behandlingresultatRepository = new BehandlingresultatRepository(repoRule.getEntityManager());
     private UtvidetProsessTaskRepository utvidetProsessTaskRepository = new UtvidetProsessTaskRepository(repoRule.getEntityManager());
 
     private HenleggBehandlingTjeneste henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repositoryProvider, prosessTaskRepository, behandlingskontrollTjeneste, historikkinnslagTjeneste);

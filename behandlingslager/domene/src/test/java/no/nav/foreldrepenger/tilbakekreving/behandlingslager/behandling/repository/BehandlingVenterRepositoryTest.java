@@ -27,15 +27,15 @@ import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 
-public class BehandlingVenterRepositoryImplTest {
+public class BehandlingVenterRepositoryTest {
 
     @Rule
     public final UnittestRepositoryRule reporule = new UnittestRepositoryRule();
     private final EntityManager entityManager = reporule.getEntityManager();
 
     private final FellesQueriesForBehandlingRepositories fellesQueriesForBehandlingRepositories = new FellesQueriesForBehandlingRepositories(entityManager);
-    private final BehandlingVenterRepositoryImpl repository = new BehandlingVenterRepositoryImpl(fellesQueriesForBehandlingRepositories);
-    private final BehandlingRepositoryProviderImpl repositoryProvider = new BehandlingRepositoryProviderImpl(entityManager);
+    private final BehandlingVenterRepository repository = new BehandlingVenterRepository(fellesQueriesForBehandlingRepositories);
+    private final BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(entityManager);
 
     private final AksjonspunktRepository aksjonspunktRepository = repositoryProvider.getAksjonspunktRepository();
     private final BehandlingRepository behandlingRepository = repositoryProvider.getBehandlingRepository();

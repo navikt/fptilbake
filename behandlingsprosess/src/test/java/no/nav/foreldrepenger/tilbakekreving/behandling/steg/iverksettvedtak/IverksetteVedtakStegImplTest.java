@@ -18,7 +18,6 @@ import org.mockito.Mockito;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandleStegResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.transisjoner.FellesTransisjoner;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
@@ -31,7 +30,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.Bre
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProviderImpl;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
@@ -54,7 +53,7 @@ public class IverksetteVedtakStegImplTest {
     @Rule
     public UnittestRepositoryRule repositoryRule = new UnittestRepositoryRule();
 
-    private BehandlingRepositoryProvider repoProvider = new BehandlingRepositoryProviderImpl(repositoryRule.getEntityManager());
+    private BehandlingRepositoryProvider repoProvider = new BehandlingRepositoryProvider(repositoryRule.getEntityManager());
     private ProsessTaskRepository prosessTaskRepository = new ProsessTaskRepositoryImpl(repositoryRule.getEntityManager(), null, Mockito.mock(ProsessTaskEventPubliserer.class));
     private BrevSporingRepository brevSporingRepository = new BrevSporingRepository(repositoryRule.getEntityManager());
     private ProsessTaskIverksett prosessTaskIverksett = new ProsessTaskIverksett(prosessTaskRepository, brevSporingRepository);

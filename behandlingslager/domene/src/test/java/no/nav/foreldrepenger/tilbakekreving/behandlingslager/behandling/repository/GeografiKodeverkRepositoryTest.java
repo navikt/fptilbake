@@ -14,11 +14,11 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personop
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Region;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 
-public class BehandlingsgrunnlagKodeverkRepositoryImplTest {
+public class GeografiKodeverkRepositoryTest {
 
     @Rule
     public UnittestRepositoryRule repoRule = new UnittestRepositoryRule();
-    private BehandlingsgrunnlagKodeverkRepository repo = new BehandlingsgrunnlagKodeverkRepositoryImpl(repoRule.getEntityManager());
+    private GeografiKodeverkRepository repo = new GeografiKodeverkRepository(repoRule.getEntityManager());
 
     @Test
     public void skal_verifisere_kodeverk_som_mottas_fra_regelmotor() {

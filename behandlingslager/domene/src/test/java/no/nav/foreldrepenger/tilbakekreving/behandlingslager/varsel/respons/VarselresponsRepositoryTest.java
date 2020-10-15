@@ -13,21 +13,19 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.test.TestFagsakUtil;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 
-public class VarselresponsRepositoryImplTest {
+public class VarselresponsRepositoryTest {
 
     private static Long BEHANDLING_ID;
     private static final String KILDE = "MANU";
 
     private BehandlingRepository behandlingRepository;
     private FagsakRepository fagsakRepository;
-    private VarselresponsRepositoryImpl repository;
+    private VarselresponsRepository repository;
 
     @Rule
     public final UnittestRepositoryRule repoRule = new UnittestRepositoryRule();
@@ -37,9 +35,9 @@ public class VarselresponsRepositoryImplTest {
 
     @Before
     public void setup() {
-        behandlingRepository = new BehandlingRepositoryImpl(repoRule.getEntityManager());
-        fagsakRepository = new FagsakRepositoryImpl(repoRule.getEntityManager());
-        repository = new VarselresponsRepositoryImpl(repoRule.getEntityManager());
+        behandlingRepository = new BehandlingRepository(repoRule.getEntityManager());
+        fagsakRepository = new FagsakRepository(repoRule.getEntityManager());
+        repository = new VarselresponsRepository(repoRule.getEntityManager());
 
         BEHANDLING_ID = opprettBehandling();
     }

@@ -9,12 +9,12 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRe
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 
-public class SpråkKodeverkRepositoryImplTest {
+public class SpråkKodeverkRepositoryTest {
 
     @Rule
     public UnittestRepositoryRule repoRule = new UnittestRepositoryRule();
     private KodeverkRepository kodeverkRepository = new KodeverkRepositoryImpl(repoRule.getEntityManager());
-    private SpråkKodeverkRepository repo = new SpråkKodeverkRepositoryImpl(kodeverkRepository);
+    private SpråkKodeverkRepository repo = new SpråkKodeverkRepository(kodeverkRepository);
 
     @Test
     public void skal_hente_språkKodeverk_for_språkkode() {

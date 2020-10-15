@@ -12,26 +12,24 @@ import javax.persistence.EntityManager;
 import org.junit.Rule;
 import org.junit.Test;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.test.TestFagsakUtil;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 
-public class BehandlingRepositoryImplTest {
+public class BehandlingRepositoryTest {
 
     @Rule
     public final UnittestRepositoryRule repoRule = new UnittestRepositoryRule();
     private final EntityManager entityManager = repoRule.getEntityManager();
-    private final BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProviderImpl(entityManager);
+    private final BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(entityManager);
     private final BehandlingRepository behandlingRepository = repositoryProvider.getBehandlingRepository();
 
-    private final FagsakRepository fagsakRepository = new FagsakRepositoryImpl(entityManager);
+    private final FagsakRepository fagsakRepository = new FagsakRepository(entityManager);
     private final NavBruker bruker = TestFagsakUtil.genererBruker();
     private final Fagsak fagsak = TestFagsakUtil.opprettFagsak(bruker);
 

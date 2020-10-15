@@ -17,7 +17,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.NavBrukerKjønn;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.PersonstatusType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.SivilstandType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingsgrunnlagKodeverkRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.GeografiKodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Landkoder;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Region;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.SpråkKodeverkRepository;
@@ -42,7 +42,7 @@ public class TpsOversetter {
     public static final Logger logger = LoggerFactory.getLogger(TpsOversetter.class);
 
     private NavBrukerKodeverkRepository navBrukerKodeverkRepository;
-    private BehandlingsgrunnlagKodeverkRepository behandlingsgrunnlagKodeverkRepository;
+    private GeografiKodeverkRepository behandlingsgrunnlagKodeverkRepository;
     private SpråkKodeverkRepository språkKodeverkRepository;
     private TpsAdresseOversetter tpsAdresseOversetter;
 
@@ -52,7 +52,7 @@ public class TpsOversetter {
 
     @Inject
     public TpsOversetter(NavBrukerKodeverkRepository navBrukerKodeverkRepository,
-                         BehandlingsgrunnlagKodeverkRepository behandlingsgrunnlagKodeverkRepository,
+                         GeografiKodeverkRepository behandlingsgrunnlagKodeverkRepository,
                          SpråkKodeverkRepository språkKodeverkRepository,
                          TpsAdresseOversetter tpsAdresseOversetter) {
         this.navBrukerKodeverkRepository = navBrukerKodeverkRepository;

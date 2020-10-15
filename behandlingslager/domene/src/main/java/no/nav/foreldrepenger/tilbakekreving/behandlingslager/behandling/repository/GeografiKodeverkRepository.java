@@ -25,47 +25,43 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRe
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepositoryImpl;
 
 @ApplicationScoped
-public class BehandlingsgrunnlagKodeverkRepositoryImpl implements BehandlingsgrunnlagKodeverkRepository {
+public class GeografiKodeverkRepository {
 
     private EntityManager entityManager;
 
     private KodeverkRepository kodeverkRepository;
 
-    BehandlingsgrunnlagKodeverkRepositoryImpl() {
+    GeografiKodeverkRepository() {
         // for CDI proxy
     }
 
     @Inject
-    public BehandlingsgrunnlagKodeverkRepositoryImpl(EntityManager entityManager,
-                                                     KodeverkRepository kodeverkRepository) {
+    public GeografiKodeverkRepository(EntityManager entityManager,
+                                      KodeverkRepository kodeverkRepository) {
         Objects.requireNonNull(entityManager, "entityManager"); //$NON-NLS-1$
         this.entityManager = entityManager;
         this.kodeverkRepository = kodeverkRepository;
     }
 
-    public BehandlingsgrunnlagKodeverkRepositoryImpl(EntityManager entityManager) {
+    public GeografiKodeverkRepository(EntityManager entityManager) {
         this.entityManager = entityManager;
         if (entityManager != null) {
             this.kodeverkRepository = new KodeverkRepositoryImpl(entityManager);
         }
     }
 
-    @Override
     public SivilstandType finnSivilstandType(String kode) {
         return kodeverkRepository.finn(SivilstandType.class, kode);
     }
 
-    @Override
     public Landkoder finnLandkode(String kode) {
         return kodeverkRepository.finn(Landkoder.class, kode);
     }
 
-    @Override
     public List<PersonstatusType> personstatusTyperFortsattBehandling() {
         return kodeverkRepository.finnListe(PersonstatusType.class, Arrays.asList("DØD", "BOSA", "UTVA"));
     }
 
-    @Override
     public Region finnHøyestRangertRegion(List<String> statsborgerskap) {
         Set<Region> regioner = new HashSet<>();
         for (String skap : statsborgerskap) {
@@ -74,7 +70,6 @@ public class BehandlingsgrunnlagKodeverkRepositoryImpl implements Behandlingsgru
         return regioner.stream().min(Comparator.comparing(this::rangerRegion)).get();
     }
 
-    @Override
     public Map<Landkoder, Region> finnRegionForStatsborgerskap(List<Landkoder> statsborgerskap) {
         final HashMap<Landkoder, Region> landRegion = new HashMap<>();
         for (Landkoder landkode : statsborgerskap) {
@@ -95,7 +90,6 @@ public class BehandlingsgrunnlagKodeverkRepositoryImpl implements Behandlingsgru
         return 3;
     }
 
-    @Override
     public List<Region> finnRegioner(String kode) {
         TypedQuery<KodelisteRelasjon> query = entityManager.createQuery("from KodelisteRelasjon where kodeverk1 = 'REGION' AND kodeverk2 = 'LANDKODER' AND kode2=:kode", KodelisteRelasjon.class);
         query.setParameter("kode", kode);

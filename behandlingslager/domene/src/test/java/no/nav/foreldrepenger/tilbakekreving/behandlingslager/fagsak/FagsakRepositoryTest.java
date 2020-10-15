@@ -15,12 +15,12 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.vedtak.felles.testutilities.db.Repository;
 
-public class FagsakRepositoryImplTest {
+public class FagsakRepositoryTest {
 
     @Rule
     public UnittestRepositoryRule repoRule = new UnittestRepositoryRule();
     private Repository repository = repoRule.getRepository();
-    private FagsakRepositoryImpl fagsakRepository = new FagsakRepositoryImpl(repoRule.getEntityManager());
+    private FagsakRepository fagsakRepository = new FagsakRepository(repoRule.getEntityManager());
 
     @Test
     public void skal_finne_eksakt_fagsak_gitt_id() {

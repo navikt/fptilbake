@@ -16,7 +16,6 @@ import com.google.common.collect.Lists;
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollEventPubliserer;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjenesteImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
@@ -35,7 +34,7 @@ import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
 @RunWith(CdiRunner.class)
 public class VergeTjenesteTest extends FellesTestOppsett {
-    private BehandlingModellRepository behandlingModellRepository = new BehandlingModellRepositoryImpl(repoRule.getEntityManager());
+    private BehandlingModellRepository behandlingModellRepository = new BehandlingModellRepository(repoRule.getEntityManager());
     private BehandlingskontrollEventPubliserer eventPublisererMock = mock(BehandlingskontrollEventPubliserer.class);
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste = new BehandlingskontrollTjenesteImpl(repoProvider, behandlingModellRepository, eventPublisererMock);
     private VergeTjeneste vergeTjeneste = new VergeTjeneste(behandlingskontrollTjeneste, behandlingskontrollAsynkTjeneste,

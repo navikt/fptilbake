@@ -23,7 +23,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.AdresseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.NavBrukerKjønn;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.PersonstatusType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingsgrunnlagKodeverkRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.GeografiKodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Region;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.SpråkKodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
@@ -67,8 +67,8 @@ public class TpsAdapterImplTest {
         return mockNavBrukerKodeverkRepository;
     }
 
-    private BehandlingsgrunnlagKodeverkRepository lagMockBehandlingsgrunnlagKodeverkRepository() {
-        BehandlingsgrunnlagKodeverkRepository mockBehandlingsgrunnlagKodeverkRepository = mock(BehandlingsgrunnlagKodeverkRepository.class);
+    private GeografiKodeverkRepository lagMockBehandlingsgrunnlagKodeverkRepository() {
+        GeografiKodeverkRepository mockBehandlingsgrunnlagKodeverkRepository = mock(GeografiKodeverkRepository.class);
         when(mockBehandlingsgrunnlagKodeverkRepository.finnHøyestRangertRegion(Collections.singletonList(anyString()))).thenReturn(Region.NORDEN);
         return mockBehandlingsgrunnlagKodeverkRepository;
     }

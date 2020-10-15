@@ -23,16 +23,12 @@ import org.mockito.junit.MockitoRule;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBrukerKodeverkRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBrukerKodeverkRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.PersonstatusType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingsgrunnlagKodeverkRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingsgrunnlagKodeverkRepositoryImpl;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.GeografiKodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.PoststedKodeverkRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.PoststedKodeverkRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Region;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.SpråkKodeverkRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.SpråkKodeverkRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
@@ -78,10 +74,10 @@ public class TpsOversetterTest {
     @Rule
     public final UnittestRepositoryRule repoRule = new UnittestRepositoryRule();
 
-    private NavBrukerKodeverkRepository brukerKodeverkRepository = new NavBrukerKodeverkRepositoryImpl(new KodeverkRepositoryImpl(repoRule.getEntityManager()));
-    private BehandlingsgrunnlagKodeverkRepository bgKodeverkRepository = new BehandlingsgrunnlagKodeverkRepositoryImpl(repoRule.getEntityManager());
-    private SpråkKodeverkRepository språkKodeverkRepository = new SpråkKodeverkRepositoryImpl(new KodeverkRepositoryImpl(repoRule.getEntityManager()));
-    private PoststedKodeverkRepository poststedKodeverkRepository = new PoststedKodeverkRepositoryImpl(repoRule.getEntityManager());
+    private NavBrukerKodeverkRepository brukerKodeverkRepository = new NavBrukerKodeverkRepository(new KodeverkRepositoryImpl(repoRule.getEntityManager()));
+    private GeografiKodeverkRepository bgKodeverkRepository = new GeografiKodeverkRepository(repoRule.getEntityManager());
+    private SpråkKodeverkRepository språkKodeverkRepository = new SpråkKodeverkRepository(new KodeverkRepositoryImpl(repoRule.getEntityManager()));
+    private PoststedKodeverkRepository poststedKodeverkRepository = new PoststedKodeverkRepository(repoRule.getEntityManager());
 
     @Mock
     private Bruker bruker;
@@ -310,7 +306,7 @@ public class TpsOversetterTest {
 
     @Test
     public void skal_defaulte_til_bokmål_om_foretrukket_språk_er_NO() throws Exception {
-        BehandlingsgrunnlagKodeverkRepository grunnlagRepo = Mockito.mock(BehandlingsgrunnlagKodeverkRepository.class);
+        GeografiKodeverkRepository grunnlagRepo = Mockito.mock(GeografiKodeverkRepository.class);
         when(grunnlagRepo.finnHøyestRangertRegion(Collections.singletonList(ArgumentMatchers.anyString()))).thenReturn(Region.UDEFINERT);
 
         tpsOversetter = new TpsOversetter(brukerKodeverkRepository, bgKodeverkRepository, språkKodeverkRepository, tpsAdresseOversetter);
@@ -325,7 +321,7 @@ public class TpsOversetterTest {
     @Test
     public void skal_oversette_statsborgerskap() throws Exception {
         // Arrange
-        BehandlingsgrunnlagKodeverkRepository grunnlagRepo = Mockito.mock(BehandlingsgrunnlagKodeverkRepository.class);
+        GeografiKodeverkRepository grunnlagRepo = Mockito.mock(GeografiKodeverkRepository.class);
         no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Landkoder norge = no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Landkoder.NOR;
         when(grunnlagRepo.finnLandkode(norge.getKode())).thenReturn(norge);
         when(grunnlagRepo.finnHøyestRangertRegion(any())).thenReturn(Region.NORDEN);

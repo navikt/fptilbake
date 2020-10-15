@@ -18,11 +18,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.impl.vilkårsvurdering.Vi
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollAsynkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBrukerRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBrukerRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProviderImpl;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
@@ -60,8 +58,8 @@ public class TestOppsett {
 
     protected BehandlingskontrollProvider behandlingskontrollProvider = new BehandlingskontrollProvider(behandlingskontrollTjeneste, behandlingskontrollAsynkTjeneste);
 
-    protected BehandlingRepositoryProvider repoProvider = new BehandlingRepositoryProviderImpl(em);
-    protected NavBrukerRepository brukerRepository = new NavBrukerRepositoryImpl(em);
+    protected BehandlingRepositoryProvider repoProvider = new BehandlingRepositoryProvider(em);
+    protected NavBrukerRepository brukerRepository = new NavBrukerRepository(em);
     protected KodeverkRepository kodeverkRepository = repoProvider.getKodeverkRepository();
     protected KravgrunnlagRepository grunnlagRepository = repoProvider.getGrunnlagRepository();
     protected HistorikkRepository historikkRepository = repoProvider.getHistorikkRepository();

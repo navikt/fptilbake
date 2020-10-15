@@ -26,11 +26,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingTransi
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingTypeRef;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.TestBehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.TestBehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.observer.StegTransisjon;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegTilstand;
@@ -38,12 +36,11 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.VurderingspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProviderImpl;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepositoryImpl;
@@ -62,11 +59,11 @@ public class FremoverhoppTest {
     public UnittestRepositoryRule repoRule = new UnittestRepositoryRule();
     private EntityManager em = repoRule.getEntityManager();
     private KodeverkRepository kodeverkRepository = new KodeverkRepositoryImpl(em);
-    private AksjonspunktRepository aksjonspunktRepository = new AksjonspunktRepositoryImpl(em, kodeverkRepository);
-    private BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProviderImpl(em);
+    private AksjonspunktRepository aksjonspunktRepository = new AksjonspunktRepository(em, kodeverkRepository);
+    private BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(em);
     private final BehandlingRepository behandlingRepository = repositoryProvider.getBehandlingRepository();
 
-    private BehandlingModellRepository behandlingModellRepository = new BehandlingModellRepositoryImpl(em);
+    private BehandlingModellRepository behandlingModellRepository = new BehandlingModellRepository(em);
 
     private BehandlingskontrollFremoverhoppTransisjonEventObserver observer =
             new BehandlingskontrollFremoverhoppTransisjonEventObserver(repositoryProvider, behandlingModellRepository);

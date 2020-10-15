@@ -22,7 +22,6 @@ import org.junit.Test;
 import no.nav.foreldrepenger.batch.BatchArguments;
 import no.nav.foreldrepenger.batch.BatchStatus;
 import no.nav.foreldrepenger.batch.EmptyBatchArguments;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
@@ -34,7 +33,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.automatisksaksbehandling.AutomatiskSaksbehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporing;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProviderImpl;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
@@ -60,7 +59,7 @@ public class AutomatiskSaksbehandlingBatchTjenesteTest {
     private static final String ENHET = "8020";
     private Behandling behandling;
 
-    private BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProviderImpl(repositoryRule.getEntityManager());
+    private BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(repositoryRule.getEntityManager());
     private InternalManipulerBehandling manipulerBehandling = new InternalManipulerBehandlingImpl(repositoryProvider);
     private ProsessTaskRepository taskRepository = new ProsessTaskRepositoryImpl(repositoryRule.getEntityManager(), null, null);
     private AutomatiskSaksbehandlingRepository automatiskSaksbehandlingRepository = new AutomatiskSaksbehandlingRepository(repositoryRule.getEntityManager());

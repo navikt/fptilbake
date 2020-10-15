@@ -11,12 +11,12 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRe
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 
-public class NavBrukerKodeverkRepositoryImplTest {
+public class NavBrukerKodeverkRepositoryTest {
 
     @Rule
     public UnittestRepositoryRule repoRule = new UnittestRepositoryRule();
     private KodeverkRepository kodeverkRepository = new KodeverkRepositoryImpl(repoRule.getEntityManager());
-    private NavBrukerKodeverkRepository repo = new NavBrukerKodeverkRepositoryImpl(kodeverkRepository);
+    private NavBrukerKodeverkRepository repo = new NavBrukerKodeverkRepository(kodeverkRepository);
 
     @Test
     public void skal_hente_bruker_kjønn_kodeverk_for_kode() {

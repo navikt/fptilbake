@@ -13,14 +13,11 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.TestFagsakUtil;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons.Varselrespons;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons.VarselresponsRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons.VarselresponsRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 
 public class VarselresponsTjenesteImplTest {
@@ -42,9 +39,9 @@ public class VarselresponsTjenesteImplTest {
 
     @Before
     public void setup() {
-        behandlingRepository = new BehandlingRepositoryImpl(repositoryRule.getEntityManager());
-        fagsakRepository = new FagsakRepositoryImpl(repositoryRule.getEntityManager());
-        repository = new VarselresponsRepositoryImpl(repositoryRule.getEntityManager());
+        behandlingRepository = new BehandlingRepository(repositoryRule.getEntityManager());
+        fagsakRepository = new FagsakRepository(repositoryRule.getEntityManager());
+        repository = new VarselresponsRepository(repositoryRule.getEntityManager());
         varselresponsTjeneste = new VarselresponsTjenesteImpl(repository);
 
         BEHANDLING_ID = opprettBehandling();

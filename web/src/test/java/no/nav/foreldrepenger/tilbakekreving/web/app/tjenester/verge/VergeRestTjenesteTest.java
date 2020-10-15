@@ -22,11 +22,10 @@ import org.junit.Test;
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.verge.VergeTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProviderImpl;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.KildeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeType;
@@ -43,7 +42,7 @@ public class VergeRestTjenesteTest {
     private BehandlingTjeneste behandlingTjenesteMock = mock(BehandlingTjeneste.class);
     private TpsTjeneste tpsTjenesteMock = mock(TpsTjeneste.class);
     private VergeRestTjeneste vergeRestTjeneste = new VergeRestTjeneste(behandlingTjenesteMock, vergeTjenesteMock, tpsTjenesteMock);
-    final BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProviderImpl(repositoryRule.getEntityManager());
+    final BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(repositoryRule.getEntityManager());
 
     @Test
     public void kan_ikke_opprette_verge_når_behandling_er_avsluttet() {

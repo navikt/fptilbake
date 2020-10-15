@@ -38,7 +38,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.Behandlingskontr
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBrukerRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBrukerRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
@@ -77,7 +76,7 @@ public class HåndterGamleKravgrunnlagBatchTjenesteTest extends FellesTestOppset
     private BehandlingskontrollProvider behandlingskontrollProvider = new BehandlingskontrollProvider(behandlingskontrollTjeneste, mock(BehandlingskontrollAsynkTjeneste.class));
     private TpsTjeneste tpsTjenesteMock = mock(TpsTjeneste.class);
     private ØkonomiConsumer økonomiConsumerMock = mock(ØkonomiConsumer.class);
-    private NavBrukerRepository navBrukerRepository = new NavBrukerRepositoryImpl(repoRule.getEntityManager());
+    private NavBrukerRepository navBrukerRepository = new NavBrukerRepository(repoRule.getEntityManager());
     private FagsakTjeneste fagsakTjeneste = new FagsakTjeneste(tpsTjenesteMock, fagsakRepository, navBrukerRepository);
     private BehandlingTjeneste behandlingTjeneste = new BehandlingTjenesteImpl(repositoryProvider, prosessTaskRepository, behandlingskontrollProvider,
         fagsakTjeneste, historikkinnslagTjeneste, fagsystemKlientMock, Period.ofWeeks(4));

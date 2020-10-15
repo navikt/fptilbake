@@ -13,21 +13,20 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.test.TestFagsakUtil;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 
-public class EksternBehandlingRepositoryImplTest {
+public class EksternBehandlingRepositoryTest {
 
     private static final UUID EKSTERN_UUID = UUID.randomUUID();
     @Rule
     public UnittestRepositoryRule repoRule = new UnittestRepositoryRule();
 
-    private BehandlingRepository behandlingRepository = new BehandlingRepositoryImpl(repoRule.getEntityManager());
-    private FagsakRepository fagsakRepository = new FagsakRepositoryImpl(repoRule.getEntityManager());
+    private BehandlingRepository behandlingRepository = new BehandlingRepository(repoRule.getEntityManager());
+    private FagsakRepository fagsakRepository = new FagsakRepository(repoRule.getEntityManager());
 
-    private EksternBehandlingRepository eksternBehandlingRepository = new EksternBehandlingRepositoryImpl(repoRule.getEntityManager());
+    private EksternBehandlingRepository eksternBehandlingRepository = new EksternBehandlingRepository(repoRule.getEntityManager());
 
     @Test
     public void skal_lagre_ned_ekstern_behandling_data() {

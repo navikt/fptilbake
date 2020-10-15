@@ -41,7 +41,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingM
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollEventPubliserer;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjenesteImpl;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
@@ -51,11 +50,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Internal
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingKandidaterRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProviderImpl;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingVenterRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingVenterRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.felles.FellesQueriesForBehandlingRepositories;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
@@ -98,15 +95,15 @@ public class FellesTestOppsett {
     private VarselresponsTjeneste varselresponsTjenesteMock = mock(VarselresponsTjeneste.class);
     private SlettGrunnlagEventPubliserer mockSlettGrunnlagEventPubliserer = mock(SlettGrunnlagEventPubliserer.class);
 
-    protected final BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProviderImpl(repoRule.getEntityManager());
+    protected final BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(repoRule.getEntityManager());
     protected final BehandlingRepository behandlingRepository = repositoryProvider.getBehandlingRepository();
     protected final FagsakRepository fagsakRepository = repositoryProvider.getFagsakRepository();
     protected final KravgrunnlagRepository grunnlagRepository = repositoryProvider.getGrunnlagRepository();
     protected final ProsessTaskRepository prosessTaskRepository = new ProsessTaskRepositoryImpl(repoRule.getEntityManager(), null, eventPublisererMock);
     protected final ØkonomiMottattXmlRepository mottattXmlRepository = new ØkonomiMottattXmlRepository(repoRule.getEntityManager());
-    protected final EksternBehandlingRepository eksternBehandlingRepository = new EksternBehandlingRepositoryImpl(repoRule.getEntityManager());
+    protected final EksternBehandlingRepository eksternBehandlingRepository = new EksternBehandlingRepository(repoRule.getEntityManager());
     private final FellesQueriesForBehandlingRepositories fellesQueriesForBehandlingRepositories = new FellesQueriesForBehandlingRepositories(repoRule.getEntityManager());
-    protected final BehandlingVenterRepository behandlingVenterRepository = new BehandlingVenterRepositoryImpl(fellesQueriesForBehandlingRepositories);
+    protected final BehandlingVenterRepository behandlingVenterRepository = new BehandlingVenterRepository(fellesQueriesForBehandlingRepositories);
     protected final BehandlingKandidaterRepository behandlingKandidaterRepository = new BehandlingKandidaterRepository(fellesQueriesForBehandlingRepositories);
 
     protected final GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjenesteImpl(prosessTaskRepository, behandlingKandidaterRepository, behandlingVenterRepository, repositoryProvider, varselresponsTjenesteMock);

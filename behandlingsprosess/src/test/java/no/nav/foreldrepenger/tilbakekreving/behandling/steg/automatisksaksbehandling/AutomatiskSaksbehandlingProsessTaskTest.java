@@ -56,7 +56,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingM
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollEventPubliserer;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjenesteImpl;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegStatus;
@@ -71,9 +70,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingKandidaterRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProviderImpl;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingVenterRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingVenterRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.felles.FellesQueriesForBehandlingRepositories;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
@@ -83,7 +81,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.TotrinnRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons.VarselresponsRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons.VarselresponsRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingPeriodeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
@@ -108,15 +105,15 @@ public class AutomatiskSaksbehandlingProsessTaskTest {
     @Rule
     public UnittestRepositoryRule repositoryRule = new UnittestRepositoryRule();
 
-    private final BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProviderImpl(repositoryRule.getEntityManager());
+    private final BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(repositoryRule.getEntityManager());
     private final BehandlingRepository behandlingRepository = repositoryProvider.getBehandlingRepository();
     private final KravgrunnlagRepository kravgrunnlagRepository = repositoryProvider.getGrunnlagRepository();
     private final AksjonspunktRepository aksjonspunktRepository = repositoryProvider.getAksjonspunktRepository();
     private final TotrinnRepository totrinnRepository = new TotrinnRepository(repositoryRule.getEntityManager());
-    private final VarselresponsRepository varselresponsRepository = new VarselresponsRepositoryImpl(repositoryRule.getEntityManager());
+    private final VarselresponsRepository varselresponsRepository = new VarselresponsRepository(repositoryRule.getEntityManager());
     private final ProsessTaskRepository taskRepository = new ProsessTaskRepositoryImpl(repositoryRule.getEntityManager(), null, null);
     private final FellesQueriesForBehandlingRepositories fellesQueriesForBehandlingRepositories = new FellesQueriesForBehandlingRepositories(repositoryRule.getEntityManager());
-    private final BehandlingVenterRepository behandlingVenterRepository = new BehandlingVenterRepositoryImpl(fellesQueriesForBehandlingRepositories);
+    private final BehandlingVenterRepository behandlingVenterRepository = new BehandlingVenterRepository(fellesQueriesForBehandlingRepositories);
     private final BehandlingKandidaterRepository behandlingKandidaterRepository = new BehandlingKandidaterRepository(fellesQueriesForBehandlingRepositories);
     private final InternalManipulerBehandling manipulerBehandling = new InternalManipulerBehandlingImpl(repositoryProvider);
     private final HistorikkInnslagKonverter historikkInnslagKonverter = new HistorikkInnslagKonverter(aksjonspunktRepository);

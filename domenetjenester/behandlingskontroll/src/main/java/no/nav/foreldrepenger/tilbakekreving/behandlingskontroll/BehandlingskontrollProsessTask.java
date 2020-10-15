@@ -17,7 +17,7 @@ public abstract class BehandlingskontrollProsessTask implements ProsessTaskHandl
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
 
     protected BehandlingskontrollProsessTask(BehandlingRepository behandlingRepository,
-            BehandlingskontrollTjeneste behandlingskontrollTjeneste) {
+                                             BehandlingskontrollTjeneste behandlingskontrollTjeneste) {
         this.behandlingRepository = behandlingRepository;
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
     }

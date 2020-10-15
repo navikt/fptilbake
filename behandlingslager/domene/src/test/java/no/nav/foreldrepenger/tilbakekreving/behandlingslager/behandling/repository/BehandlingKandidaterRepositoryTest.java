@@ -10,7 +10,6 @@ import javax.persistence.EntityManager;
 import org.junit.Rule;
 import org.junit.Test;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
@@ -35,7 +34,7 @@ public class BehandlingKandidaterRepositoryTest {
 
     private final FellesQueriesForBehandlingRepositories fellesQueriesForBehandlingRepositories = new FellesQueriesForBehandlingRepositories(entityManager);
     private final BehandlingKandidaterRepository behandlingKandidaterRepository = new BehandlingKandidaterRepository(fellesQueriesForBehandlingRepositories);
-    private final BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProviderImpl(entityManager);
+    private final BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(entityManager);
 
     private final AksjonspunktRepository aksjonspunktRepository = repositoryProvider.getAksjonspunktRepository();
     private final BehandlingRepository behandlingRepository = repositoryProvider.getBehandlingRepository();

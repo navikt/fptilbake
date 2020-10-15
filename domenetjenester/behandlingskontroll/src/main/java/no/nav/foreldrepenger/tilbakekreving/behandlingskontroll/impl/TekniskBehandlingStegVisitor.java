@@ -7,9 +7,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegMo
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegProsesseringResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegTilstand;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.TekniskRepository;
 import no.nav.vedtak.felles.jpa.savepoint.Work;
 import no.nav.vedtak.log.mdc.MdcExtendedLogContext;
