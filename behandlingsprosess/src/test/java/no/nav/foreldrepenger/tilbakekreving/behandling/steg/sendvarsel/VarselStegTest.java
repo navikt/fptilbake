@@ -42,7 +42,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
 @RunWith(CdiRunner.class)
-public class VarselStegImplTest {
+public class VarselStegTest {
 
     @Rule
     public final UnittestRepositoryRule repoRule = new UnittestRepositoryRule();
@@ -124,7 +124,7 @@ public class VarselStegImplTest {
     }
 
     private VarselSteg steg() {
-        return new VarselStegImpl(
+        return new VarselSteg(
             repositoryProvider,
             behandlingskontrollTjeneste,
             varselresponsTjeneste,

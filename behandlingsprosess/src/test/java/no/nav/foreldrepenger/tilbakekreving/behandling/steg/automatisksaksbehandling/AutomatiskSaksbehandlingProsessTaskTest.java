@@ -35,19 +35,19 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurdertForeldelseTje
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.vilkårsvurdering.AutomatiskVurdertVilkårTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.vilkårsvurdering.VilkårsvurderingHistorikkInnslagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.vilkårsvurdering.VilkårsvurderingTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.faktafeilutbetaling.FaktaFeilutbetalingStegImpl;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.faktaverge.FaktaVergeStegImpl;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.fattevedtak.FatteVedtakStegImpl;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.foreslåvedtak.ForeslåVedtakStegImpl;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.faktafeilutbetaling.FaktaFeilutbetalingSteg;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.faktaverge.FaktaVergeSteg;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.fattevedtak.FatteVedtakSteg;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.foreslåvedtak.ForeslåVedtakSteg;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TestStegKonfig;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.MottattGrunnlagStegImpl;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.MottattGrunnlagSteg;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.iverksettvedtak.AvsluttBehandlingTask;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.iverksettvedtak.IverksetteVedtakStegImpl;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.iverksettvedtak.IverksetteVedtakSteg;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.iverksettvedtak.ProsessTaskIverksett;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.iverksettvedtak.SendVedtaksbrevTask;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.iverksettvedtak.SendØkonomiTibakekerevingsVedtakTask;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.vurderforeldelse.VurderForeldelseStegImpl;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.vurdervilkår.VurderTilbakekrevingStegImpl;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.vurderforeldelse.VurderForeldelseSteg;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.vurdervilkår.VurderTilbakekrevingSteg;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingModell;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingSteg;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegKonfigurasjon;
@@ -249,19 +249,19 @@ public class AutomatiskSaksbehandlingProsessTaskTest {
 
     private BehandlingModell lagDummyBehandlingsModell() {
         List<TestStegKonfig> steg = Lists.newArrayList(
-            new TestStegKonfig(BehandlingStegType.FAKTA_VERGE, BehandlingType.TILBAKEKREVING, new FaktaVergeStegImpl(behandlingRepository)),
-            new TestStegKonfig(BehandlingStegType.TBKGSTEG, BehandlingType.TILBAKEKREVING, new MottattGrunnlagStegImpl(behandlingRepository, behandlingskontrollTjeneste,
+            new TestStegKonfig(BehandlingStegType.FAKTA_VERGE, BehandlingType.TILBAKEKREVING, new FaktaVergeSteg(behandlingRepository)),
+            new TestStegKonfig(BehandlingStegType.TBKGSTEG, BehandlingType.TILBAKEKREVING, new MottattGrunnlagSteg(behandlingRepository, behandlingskontrollTjeneste,
                 gjenopptaBehandlingTjeneste, null, Period.ofWeeks(-1))),
             new TestStegKonfig(BehandlingStegType.FAKTA_FEILUTBETALING, BehandlingType.TILBAKEKREVING,
-                new FaktaFeilutbetalingStegImpl(behandlingRepository,faktaFastsettelseTjeneste)),
-            new TestStegKonfig(BehandlingStegType.FORELDELSEVURDERINGSTEG, BehandlingType.TILBAKEKREVING, new VurderForeldelseStegImpl(repositoryProvider,
+                new FaktaFeilutbetalingSteg(behandlingRepository,faktaFastsettelseTjeneste)),
+            new TestStegKonfig(BehandlingStegType.FORELDELSEVURDERINGSTEG, BehandlingType.TILBAKEKREVING, new VurderForeldelseSteg(repositoryProvider,
                 vurderForeldelseAksjonspunktUtleder, automatiskVurdertForeldelseTjeneste)),
             new TestStegKonfig(BehandlingStegType.VTILBSTEG, BehandlingType.TILBAKEKREVING,
-                new VurderTilbakekrevingStegImpl(repositoryProvider, automatiskVurdertVilkårTjeneste)),
-            new TestStegKonfig(BehandlingStegType.FORESLÅ_VEDTAK, BehandlingType.TILBAKEKREVING, new ForeslåVedtakStegImpl(behandlingRepository)),
-            new TestStegKonfig(BehandlingStegType.FATTE_VEDTAK, BehandlingType.TILBAKEKREVING, new FatteVedtakStegImpl(repositoryProvider, totrinnRepository,
+                new VurderTilbakekrevingSteg(repositoryProvider, automatiskVurdertVilkårTjeneste)),
+            new TestStegKonfig(BehandlingStegType.FORESLÅ_VEDTAK, BehandlingType.TILBAKEKREVING, new ForeslåVedtakSteg(behandlingRepository)),
+            new TestStegKonfig(BehandlingStegType.FATTE_VEDTAK, BehandlingType.TILBAKEKREVING, new FatteVedtakSteg(repositoryProvider, totrinnRepository,
                 tilbakekrevingBeregningTjeneste, historikkTjenesteAdapter)),
-            new TestStegKonfig(BehandlingStegType.IVERKSETT_VEDTAK, BehandlingType.TILBAKEKREVING, new IverksetteVedtakStegImpl(repositoryProvider, prosessTaskIverksett)));
+            new TestStegKonfig(BehandlingStegType.IVERKSETT_VEDTAK, BehandlingType.TILBAKEKREVING, new IverksetteVedtakSteg(repositoryProvider, prosessTaskIverksett)));
 
         BehandlingModellImpl.TriFunction<BehandlingStegType, BehandlingType, BehandlingSteg> finnSteg = map(steg);
         BehandlingModellImpl modell = new BehandlingModellImpl(BehandlingType.TILBAKEKREVING, finnSteg);

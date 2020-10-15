@@ -16,7 +16,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
 @RunWith(CdiRunner.class)
-public class HentgrunnlagStegImplTest extends FellesTestOppsett {
+public class HentgrunnlagStegTest extends FellesTestOppsett {
 
     @Test
     public void utførSteg_medUtenAksjonspunkter() {
@@ -30,7 +30,7 @@ public class HentgrunnlagStegImplTest extends FellesTestOppsett {
         assertThat(stegResultat.getAksjonspunktListe()).isEmpty();
     }
 
-    private HentgrunnlagStegImpl steg() {
-        return new HentgrunnlagStegImpl(prosessTaskRepository, behandlingRepository);
+    private HentgrunnlagSteg steg() {
+        return new HentgrunnlagSteg(prosessTaskRepository, behandlingRepository);
     }
 }

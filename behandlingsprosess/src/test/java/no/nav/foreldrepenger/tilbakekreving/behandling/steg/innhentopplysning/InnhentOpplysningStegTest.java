@@ -10,7 +10,6 @@ import org.junit.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.inhentopplysning.InnhentOpplysningSteg;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.inhentopplysning.InnhentOpplysningStegImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
@@ -19,9 +18,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselReposi
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
 
-public class InnhentOpplysningStegImplTest extends FellesTestOppsett {
+public class InnhentOpplysningStegTest extends FellesTestOppsett {
 
-    private InnhentOpplysningSteg innhentOpplysningSteg = new InnhentOpplysningStegImpl(repositoryProvider, fagsystemKlientMock);
+    private InnhentOpplysningSteg innhentOpplysningSteg = new InnhentOpplysningSteg(repositoryProvider, fagsystemKlientMock);
     private VarselRepository varselRepository = repositoryProvider.getVarselRepository();
 
     @Before

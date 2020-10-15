@@ -48,7 +48,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
 import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskEventPubliserer;
 import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepositoryImpl;
 
-public class IverksetteVedtakStegImplTest {
+public class IverksetteVedtakStegTest {
 
     @Rule
     public UnittestRepositoryRule repositoryRule = new UnittestRepositoryRule();
@@ -57,7 +57,7 @@ public class IverksetteVedtakStegImplTest {
     private ProsessTaskRepository prosessTaskRepository = new ProsessTaskRepositoryImpl(repositoryRule.getEntityManager(), null, Mockito.mock(ProsessTaskEventPubliserer.class));
     private BrevSporingRepository brevSporingRepository = new BrevSporingRepository(repositoryRule.getEntityManager());
     private ProsessTaskIverksett prosessTaskIverksett = new ProsessTaskIverksett(prosessTaskRepository, brevSporingRepository);
-    private IverksetteVedtakSteg iverksetteVedtakSteg = new IverksetteVedtakStegImpl(repoProvider, prosessTaskIverksett);
+    private IverksetteVedtakSteg iverksetteVedtakSteg = new IverksetteVedtakSteg(repoProvider, prosessTaskIverksett);
     private BehandlingVedtakRepository behandlingVedtakRepository = repoProvider.getBehandlingVedtakRepository();
     private BehandlingRepository behandlingRepository = repoProvider.getBehandlingRepository();
     private EksternBehandlingRepository eksternBehandlingRepository = repoProvider.getEksternBehandlingRepository();

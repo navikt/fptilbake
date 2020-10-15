@@ -11,9 +11,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.transisjoner.Fel
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 
-public class FaktaVergeStegImplTest extends FellesTestOppsett {
+public class FaktaVergeStegTest extends FellesTestOppsett {
 
-    private FaktaVergeSteg faktaVergeSteg = new FaktaVergeStegImpl(behandlingRepository);
+    private FaktaVergeSteg faktaVergeSteg = new FaktaVergeSteg(behandlingRepository);
 
     @Test
     public void skal_utføre_steg_hvis_verge_aksjonspunkt_finnes() {

@@ -11,7 +11,6 @@ import org.mockito.Mockito;
 import com.google.common.collect.Lists;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.FellesTestOppsett;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.GrunnlagSteg;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandleStegResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingManglerKravgrunnlagFristenUtløptEventPubliserer;
@@ -21,7 +20,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMockUtil;
 
-public class MottattGrunnlagStegImplTest extends FellesTestOppsett {
+public class MottattGrunnlagStegTest extends FellesTestOppsett {
 
     private BehandlingManglerKravgrunnlagFristenUtløptEventPubliserer utløptEventPublisererMock = Mockito.mock(BehandlingManglerKravgrunnlagFristenUtløptEventPubliserer.class);
 
@@ -59,8 +58,8 @@ public class MottattGrunnlagStegImplTest extends FellesTestOppsett {
         assertThat(behandling.isBehandlingPåVent()).isTrue();
     }
 
-    private GrunnlagSteg steg() {
-        return new MottattGrunnlagStegImpl(behandlingRepository, behandlingskontrollTjeneste, gjenopptaBehandlingTjeneste, utløptEventPublisererMock, Period.ofWeeks(4));
+    private MottattGrunnlagSteg steg() {
+        return new MottattGrunnlagSteg(behandlingRepository, behandlingskontrollTjeneste, gjenopptaBehandlingTjeneste, utløptEventPublisererMock, Period.ofWeeks(4));
     }
 
 }

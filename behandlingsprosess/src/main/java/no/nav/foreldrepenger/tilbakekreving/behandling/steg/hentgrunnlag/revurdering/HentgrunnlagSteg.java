@@ -3,9 +3,9 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.revurd
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.GrunnlagSteg;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TaskProperty;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandleStegResultat;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingSteg;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegRef;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingTypeRef;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
@@ -17,17 +17,17 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 @BehandlingStegRef(kode = "HENTGRUNNLAGSTEG")
 @BehandlingTypeRef
 @ApplicationScoped
-public class HentgrunnlagStegImpl implements GrunnlagSteg {
+public class HentgrunnlagSteg implements BehandlingSteg {
 
     private ProsessTaskRepository prosessTaskRepository;
     private BehandlingRepository behandlingRepository;
 
-    public HentgrunnlagStegImpl() {
+    public HentgrunnlagSteg() {
         // CDI
     }
 
     @Inject
-    public HentgrunnlagStegImpl(ProsessTaskRepository prosessTaskRepository, BehandlingRepository behandlingRepository) {
+    public HentgrunnlagSteg(ProsessTaskRepository prosessTaskRepository, BehandlingRepository behandlingRepository) {
         this.prosessTaskRepository = prosessTaskRepository;
         this.behandlingRepository = behandlingRepository;
     }
@@ -36,7 +36,7 @@ public class HentgrunnlagStegImpl implements GrunnlagSteg {
     public BehandleStegResultat utførSteg(BehandlingskontrollKontekst kontekst) {
         Long behandlingId = kontekst.getBehandlingId();
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-        Long origBehandlingId = behandling.getBehandlingÅrsaker().get(0).getOriginalBehandling().get().getId();
+        Long origBehandlingId = behandling.getBehandlingÅrsaker().get(0).getOriginalBehandling().orElseThrow().getId();
 
         // opprett prosess task for å hente grunnlag
         ProsessTaskData hentxmlTask = new ProsessTaskData(HentKravgrunnlagTask.TASKTYPE);

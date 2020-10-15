@@ -8,8 +8,8 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.GrunnlagSteg;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandleStegResultat;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingSteg;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegRef;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingTypeRef;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
@@ -26,7 +26,7 @@ import no.nav.vedtak.konfig.KonfigVerdi;
 @BehandlingStegRef(kode = "TBKGSTEG")
 @BehandlingTypeRef
 @ApplicationScoped
-public class MottattGrunnlagStegImpl implements GrunnlagSteg {
+public class MottattGrunnlagSteg implements BehandlingSteg {
 
     private BehandlingRepository behandlingRepository;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
@@ -34,16 +34,16 @@ public class MottattGrunnlagStegImpl implements GrunnlagSteg {
     private BehandlingManglerKravgrunnlagFristenUtløptEventPubliserer utløptEventPubliserer;
     private Period ventefrist;
 
-    public MottattGrunnlagStegImpl() {
+    public MottattGrunnlagSteg() {
         // CDI
     }
 
     @Inject
-    public MottattGrunnlagStegImpl(BehandlingRepository behandlingRepository,
-                                   BehandlingskontrollTjeneste behandlingskontrollTjeneste,
-                                   GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste,
-                                   BehandlingManglerKravgrunnlagFristenUtløptEventPubliserer utløptEventPubliserer,
-                                   @KonfigVerdi(value = "frist.grunnlag.tbkg") Period ventefrist) {
+    public MottattGrunnlagSteg(BehandlingRepository behandlingRepository,
+                               BehandlingskontrollTjeneste behandlingskontrollTjeneste,
+                               GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste,
+                               BehandlingManglerKravgrunnlagFristenUtløptEventPubliserer utløptEventPubliserer,
+                               @KonfigVerdi(value = "frist.grunnlag.tbkg") Period ventefrist) {
         this.behandlingRepository = behandlingRepository;
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
         this.gjenopptaBehandlingTjeneste = gjenopptaBehandlingTjeneste;
@@ -73,7 +73,6 @@ public class MottattGrunnlagStegImpl implements GrunnlagSteg {
             return BehandleStegResultat.utførtUtenAksjonspunkter();
         }
 
-
         LocalDateTime fristTid = hentFrist(behandling);
         behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, BehandlingStegType.TBKGSTEG,
             fristTid, Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
@@ -82,7 +81,7 @@ public class MottattGrunnlagStegImpl implements GrunnlagSteg {
             /* Hvis fristen har gått ut, og grunnlag fra økonomi ikke har blitt mottatt, publiserer BehandlingFristenUtløptEvent for å sende data til FPLOS .
              * Etter hvert kan saksbehandler se oppgaven i fplos.Saksbehandler kan åpne oppgaven som åpner behandling på vent med mer informasjon.
              */
-            utløptEventPubliserer.fireEvent(behandling,fristTid);
+            utløptEventPubliserer.fireEvent(behandling, fristTid);
         }
         return BehandleStegResultat.settPåVent();
     }

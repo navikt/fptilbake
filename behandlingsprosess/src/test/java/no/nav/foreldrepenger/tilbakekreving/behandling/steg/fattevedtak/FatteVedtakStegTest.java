@@ -45,7 +45,7 @@ import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjeneste
 import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
 @RunWith(CdiRunner.class)
-public class FatteVedtakStegImplTest {
+public class FatteVedtakStegTest {
 
     @Rule
     public UnittestRepositoryRule repositoryRule = new UnittestRepositoryRule();
@@ -63,7 +63,7 @@ public class FatteVedtakStegImplTest {
     private HistorikkInnslagKonverter historikkInnslagKonverter = new HistorikkInnslagKonverter(repositoryProvider.getAksjonspunktRepository());
     private HistorikkTjenesteAdapter historikkTjenesteAdapter = new HistorikkTjenesteAdapter(repositoryProvider.getHistorikkRepository(),historikkInnslagKonverter);
 
-    private FatteVedtakStegImpl fatteVedtakSteg = new FatteVedtakStegImpl(repositoryProvider, totrinnRepository, beregningTjeneste, historikkTjenesteAdapter);
+    private FatteVedtakSteg fatteVedtakSteg = new FatteVedtakSteg(repositoryProvider, totrinnRepository, beregningTjeneste, historikkTjenesteAdapter);
 
     private BehandlingskontrollKontekst behandlingskontrollKontekst;
 
