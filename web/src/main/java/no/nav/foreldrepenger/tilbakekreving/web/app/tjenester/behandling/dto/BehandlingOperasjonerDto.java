@@ -49,4 +49,8 @@ public class BehandlingOperasjonerDto {
     public boolean isBehandlingKanSettesPaVent() {
         return behandlingKanSettesPaVent;
     }
+
+    public VergeBehandlingsmenyEnum getVergeBehandlingsmeny() {
+        return vergeBehandlingsmeny;
+    }
 }
