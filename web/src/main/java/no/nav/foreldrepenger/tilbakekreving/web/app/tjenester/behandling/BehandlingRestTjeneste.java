@@ -119,6 +119,7 @@ public class BehandlingRestTjeneste {
         this.behandlingskontrollAsynkTjeneste = behandlingskontrollAsynkTjeneste;
         this.behandlendeEnhetTjeneste = behandlingsTjenesteProvider.getEnhetTjeneste();
         this.fristenEndretEventPubliserer = fristenEndretEventPubliserer;
+        this.vergeTjeneste = vergeTjeneste;
     }
 
     @GET
