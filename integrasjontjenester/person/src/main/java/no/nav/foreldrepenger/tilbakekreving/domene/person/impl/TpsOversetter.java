@@ -19,7 +19,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personop
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.SivilstandType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.GeografiKodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Landkoder;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Region;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.SpråkKodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
@@ -78,7 +77,6 @@ public class TpsOversetter {
         PersonstatusType personstatus = tilPersonstatusType(bruker.getPersonstatus());
 
         Landkoder landkoder = utledLandkode(bruker.getStatsborgerskap());
-        Region region = behandlingsgrunnlagKodeverkRepository.finnHøyestRangertRegion(Collections.singletonList(landkoder.getKode()));
 
         String diskresjonskode = bruker.getDiskresjonskode() == null ? null : bruker.getDiskresjonskode().getValue();
         String geografiskTilknytning = bruker.getGeografiskTilknytning() != null ? bruker.getGeografiskTilknytning().getGeografiskTilknytning() : null;
@@ -97,7 +95,6 @@ public class TpsOversetter {
                 .medNavBrukerKjønn(kjønn)
                 .medPersonstatusType(personstatus)
                 .medStatsborgerskap(new no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Statsborgerskap(landkoder.getKode()))
-                .medRegion(region)
                 .medUtlandsadresse(utlandsadresse)
                 .medForetrukketSpråk(bestemForetrukketSpråk(bruker))
                 .medGegrafiskTilknytning(geografiskTilknytning)

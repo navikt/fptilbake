@@ -3,13 +3,11 @@ package no.nav.foreldrepenger.tilbakekreving.domene.person.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.Optional;
 
 import org.junit.Before;
@@ -24,7 +22,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.AdresseT
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.NavBrukerKjønn;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.PersonstatusType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.GeografiKodeverkRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Region;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.SpråkKodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
@@ -56,8 +53,9 @@ public class TpsAdapterImplTest {
     @Before
     public void setup() {
         TpsAdresseOversetter tpsAdresseOversetter = new TpsAdresseOversetter(lagMockNavBrukerKodeverkRepository(), null);
+
         TpsOversetter tpsOversetter = new TpsOversetter(
-            lagMockNavBrukerKodeverkRepository(), lagMockBehandlingsgrunnlagKodeverkRepository(), lagMockSpråkKodeverkRepository(), tpsAdresseOversetter);
+            lagMockNavBrukerKodeverkRepository(), mock(GeografiKodeverkRepository.class), lagMockSpråkKodeverkRepository(), tpsAdresseOversetter);
         tpsAdapterImpl = new TpsAdapterImpl(aktørConsumerMock, personProxyServiceMock, tpsOversetter);
     }
 
@@ -65,12 +63,6 @@ public class TpsAdapterImplTest {
         NavBrukerKodeverkRepository mockNavBrukerKodeverkRepository = mock(NavBrukerKodeverkRepository.class);
         when(mockNavBrukerKodeverkRepository.finnBrukerKjønn(any(String.class))).thenReturn(NavBrukerKjønn.KVINNE);
         return mockNavBrukerKodeverkRepository;
-    }
-
-    private GeografiKodeverkRepository lagMockBehandlingsgrunnlagKodeverkRepository() {
-        GeografiKodeverkRepository mockBehandlingsgrunnlagKodeverkRepository = mock(GeografiKodeverkRepository.class);
-        when(mockBehandlingsgrunnlagKodeverkRepository.finnHøyestRangertRegion(Collections.singletonList(anyString()))).thenReturn(Region.NORDEN);
-        return mockBehandlingsgrunnlagKodeverkRepository;
     }
 
     private SpråkKodeverkRepository lagMockSpråkKodeverkRepository() {
@@ -126,19 +118,6 @@ public class TpsAdapterImplTest {
         assertThat(personinfo.getPersonIdent()).isEqualTo(fnr);
         assertThat(personinfo.getNavn()).isEqualTo(navn);
         assertThat(personinfo.getFødselsdato()).isEqualTo(fødselsdato);
-    }
-
-    private HentGeografiskTilknytningResponse mockHentGeografiskTilknytningResponse(String kommune, String diskresjonskode) {
-        HentGeografiskTilknytningResponse response = new HentGeografiskTilknytningResponse();
-        Kommune k = new Kommune();
-        k.setGeografiskTilknytning(kommune);
-        response.setGeografiskTilknytning(k);
-
-        Diskresjonskoder dk = new Diskresjonskoder();
-        dk.setValue(diskresjonskode);
-        response.setDiskresjonskode(dk);
-
-        return response;
     }
 
     @Test(expected = TekniskException.class)

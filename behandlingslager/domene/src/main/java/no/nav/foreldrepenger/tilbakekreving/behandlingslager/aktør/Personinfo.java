@@ -11,7 +11,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personop
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.PersonstatusType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.SivilstandType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Landkoder;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Region;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
@@ -27,7 +26,6 @@ public class Personinfo {
     private PersonstatusType personstatus;
     private NavBrukerKjønn kjønn;
     private Statsborgerskap statsborgerskap;
-    private Region region;
     private String utlandsadresse;
     private String geografiskTilknytning;
     private String diskresjonskode;
@@ -87,10 +85,6 @@ public class Personinfo {
 
     public String getUtlandsadresse() {
         return utlandsadresse;
-    }
-
-    public Region getRegion() {
-        return region;
     }
 
     public String getAdresseLandkode() {
@@ -190,11 +184,6 @@ public class Personinfo {
 
         public Builder medStatsborgerskap(Statsborgerskap statsborgerskap) {
             personinfoMal.statsborgerskap = statsborgerskap;
-            return this;
-        }
-
-        public Builder medRegion(Region region) {
-            personinfoMal.region = region;
             return this;
         }
 
