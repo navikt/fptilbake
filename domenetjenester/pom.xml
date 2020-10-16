@@ -16,7 +16,6 @@
         <module>behandlingskontroll</module>
         <module>behandling</module>
         <module>behandling-gjenoppta</module>
-        <module>varselrespons</module>
         <module>iverksett</module>
     </modules>
 

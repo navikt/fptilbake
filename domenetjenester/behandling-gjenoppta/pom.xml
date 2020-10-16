@@ -18,10 +18,6 @@
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
             <artifactId>behandlingskontroll</artifactId>
         </dependency>
-        <dependency>
-            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
-            <artifactId>varselrespons</artifactId>
-        </dependency>
 
         <!-- behandlings-steg -->
 

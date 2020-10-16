@@ -147,10 +147,6 @@
         </dependency>
         <dependency>
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
-            <artifactId>varselrespons</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
             <artifactId>fplos-klient</artifactId>
         </dependency>
         <dependency>
