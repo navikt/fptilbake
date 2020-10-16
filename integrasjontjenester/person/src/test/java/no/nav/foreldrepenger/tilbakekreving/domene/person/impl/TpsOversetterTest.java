@@ -66,7 +66,7 @@ public class TpsOversetterTest {
     public final UnittestRepositoryRule repoRule = new UnittestRepositoryRule();
 
     private KodeverkRepository kodeverkRepository = new KodeverkRepositoryImpl(repoRule.getEntityManager());
-    private GeografiKodeverkRepository bgKodeverkRepository = new GeografiKodeverkRepository(repoRule.getEntityManager());
+    private GeografiKodeverkRepository bgKodeverkRepository = new GeografiKodeverkRepository(kodeverkRepository);
     private SpråkKodeverkRepository språkKodeverkRepository = new SpråkKodeverkRepository(new KodeverkRepositoryImpl(repoRule.getEntityManager()));
     private PoststedKodeverkRepository poststedKodeverkRepository = new PoststedKodeverkRepository(repoRule.getEntityManager());
 
