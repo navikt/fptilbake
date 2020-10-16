@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBrukerKodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.NavBrukerKjønn;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.SivilstandType;
@@ -19,6 +18,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Landkoder;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.SpråkKodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.Aktoer;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.Bruker;
@@ -37,7 +37,7 @@ public class TpsOversetter {
 
     public static final Logger logger = LoggerFactory.getLogger(TpsOversetter.class);
 
-    private NavBrukerKodeverkRepository navBrukerKodeverkRepository;
+    private KodeverkRepository kodeverkRepository;
     private GeografiKodeverkRepository behandlingsgrunnlagKodeverkRepository;
     private SpråkKodeverkRepository språkKodeverkRepository;
     private TpsAdresseOversetter tpsAdresseOversetter;
@@ -47,11 +47,11 @@ public class TpsOversetter {
     }
 
     @Inject
-    public TpsOversetter(NavBrukerKodeverkRepository navBrukerKodeverkRepository,
+    public TpsOversetter(KodeverkRepository kodeverkRepository,
                          GeografiKodeverkRepository behandlingsgrunnlagKodeverkRepository,
                          SpråkKodeverkRepository språkKodeverkRepository,
                          TpsAdresseOversetter tpsAdresseOversetter) {
-        this.navBrukerKodeverkRepository = navBrukerKodeverkRepository;
+        this.kodeverkRepository = kodeverkRepository;
         this.behandlingsgrunnlagKodeverkRepository = behandlingsgrunnlagKodeverkRepository;
         this.språkKodeverkRepository = språkKodeverkRepository;
         this.tpsAdresseOversetter = tpsAdresseOversetter;
@@ -125,7 +125,7 @@ public class TpsOversetter {
     private NavBrukerKjønn tilBrukerKjønn(Kjoenn kjoenn) {
         return Optional.ofNullable(kjoenn)
             .map(Kjoenn::getKjoenn)
-            .map(kj -> navBrukerKodeverkRepository.finnBrukerKjønn(kj.getValue()))
+            .map(kj -> kodeverkRepository.finn(NavBrukerKjønn.class, kj.getValue()))
             .orElse(NavBrukerKjønn.UDEFINERT);
     }
 

@@ -15,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBrukerKodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.AdresseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Poststed;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.PoststedKodeverkRepository;
@@ -44,7 +43,6 @@ public class TpsAdresseOversetter {
     private static final String HARDKODET_POSTSTED = "UKJENT";
     private static final String POSTNUMMER_POSTSTED = "^\\d{4} \\D*";  // Mønster for postnummer og poststed, f.eks. "0034 OSLO"
 
-    private NavBrukerKodeverkRepository navBrukerKodeverkRepository;
     private PoststedKodeverkRepository poststedKodeverkRepository;
 
     TpsAdresseOversetter() {
@@ -52,8 +50,7 @@ public class TpsAdresseOversetter {
     }
 
     @Inject
-    public TpsAdresseOversetter(NavBrukerKodeverkRepository navBrukerKodeverkRepository, PoststedKodeverkRepository poststedKodeverkRepository) {
-        this.navBrukerKodeverkRepository = navBrukerKodeverkRepository;
+    public TpsAdresseOversetter(PoststedKodeverkRepository poststedKodeverkRepository) {
         this.poststedKodeverkRepository = poststedKodeverkRepository;
     }
 

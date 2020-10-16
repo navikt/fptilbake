@@ -16,13 +16,13 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBrukerKodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.AdresseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.NavBrukerKjønn;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.GeografiKodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.SpråkKodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.tjeneste.virksomhet.person.v3.binding.HentPersonPersonIkkeFunnet;
@@ -48,17 +48,15 @@ public class TpsAdapterImplTest {
 
     @Before
     public void setup() {
-        TpsAdresseOversetter tpsAdresseOversetter = new TpsAdresseOversetter(lagMockNavBrukerKodeverkRepository(), null);
-
-        TpsOversetter tpsOversetter = new TpsOversetter(
-            lagMockNavBrukerKodeverkRepository(), mock(GeografiKodeverkRepository.class), lagMockSpråkKodeverkRepository(), tpsAdresseOversetter);
+        TpsAdresseOversetter tpsAdresseOversetter = new TpsAdresseOversetter(null);
+        TpsOversetter tpsOversetter = new TpsOversetter(mockKodeverkRepository(), mock(GeografiKodeverkRepository.class), lagMockSpråkKodeverkRepository(), tpsAdresseOversetter);
         tpsAdapterImpl = new TpsAdapterImpl(aktørConsumerMock, personProxyServiceMock, tpsOversetter);
     }
 
-    private NavBrukerKodeverkRepository lagMockNavBrukerKodeverkRepository() {
-        NavBrukerKodeverkRepository mockNavBrukerKodeverkRepository = mock(NavBrukerKodeverkRepository.class);
-        when(mockNavBrukerKodeverkRepository.finnBrukerKjønn(any(String.class))).thenReturn(NavBrukerKjønn.KVINNE);
-        return mockNavBrukerKodeverkRepository;
+    private KodeverkRepository mockKodeverkRepository() {
+        KodeverkRepository kodeverkRepository = mock(KodeverkRepository.class);
+        when(kodeverkRepository.finn(Mockito.eq(NavBrukerKjønn.class), any(String.class))).thenReturn(NavBrukerKjønn.KVINNE);
+        return kodeverkRepository;
     }
 
     private SpråkKodeverkRepository lagMockSpråkKodeverkRepository() {
