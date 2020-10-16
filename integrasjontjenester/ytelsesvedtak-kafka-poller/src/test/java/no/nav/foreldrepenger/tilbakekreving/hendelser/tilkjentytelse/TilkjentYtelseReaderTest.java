@@ -9,18 +9,30 @@ import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import org.junit.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.hendelse.HendelseTaskDataWrapper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
+import no.nav.foreldrepenger.tilbakekreving.hendelser.ProsessTaskRepositoryMock;
 import no.nav.foreldrepenger.tilbakekreving.kafka.poller.PostTransactionHandler;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
 
-public class TilkjentYtelseReaderTest extends TilkjentYtelseTestOppsett {
+public class TilkjentYtelseReaderTest {
+    private static final Saksnummer SAKSNUMMER = new Saksnummer("1234");
+    private static final AktørId AKTØR_ID = new AktørId("1234567898765");
+    private static final Long EKSTERN_BEHANDLING_ID = 123L;
+    private static final UUID EKSTERN_BEHANDLING_UUID = UUID.randomUUID();
+    private static final Henvisning HENVISNING = Henvisning.fraEksternBehandlingId(EKSTERN_BEHANDLING_ID);
 
     private TilkjentYtelseMeldingConsumer meldingConsumer = mock(TilkjentYtelseMeldingConsumer.class);
+    private ProsessTaskRepository prosessTaskRepository = new ProsessTaskRepositoryMock();
     private TilkjentYtelseReader tilkjentYtelseReader = new TilkjentYtelseReader(meldingConsumer, prosessTaskRepository);
 
     @Test
@@ -36,7 +48,6 @@ public class TilkjentYtelseReaderTest extends TilkjentYtelseTestOppsett {
         List<ProsessTaskData> prosessTaskDataList = prosessTaskRepository.finnAlle(ProsessTaskStatus.KLAR);
         assertThat(prosessTaskDataList).hasSize(1);
         ProsessTaskData prosessTaskData = prosessTaskDataList.get(0);
-        verify(prosessTaskRepository).lagre(prosessTaskData);
 
         HendelseTaskDataWrapper taskDataWrapper = new HendelseTaskDataWrapper(prosessTaskData);
         assertThat(taskDataWrapper.getHenvisning()).isEqualTo(HENVISNING);
@@ -70,6 +81,18 @@ public class TilkjentYtelseReaderTest extends TilkjentYtelseTestOppsett {
         List<ProsessTaskData> prosessTaskDataList = prosessTaskRepository.finnAlle(ProsessTaskStatus.KLAR);
         assertThat(prosessTaskDataList).isEmpty();
         verify(meldingConsumer, never()).manualCommitSync();
+    }
+
+    private static TilkjentYtelseMelding opprettTilkjentYtelseMelding() {
+        TilkjentYtelseMelding melding = new TilkjentYtelseMelding();
+        melding.setAktørId(AKTØR_ID.getId());
+        melding.setBehandlingId(EKSTERN_BEHANDLING_ID);
+        melding.setIverksettingSystem("FPSAK");
+        melding.setBehandlingUuid(EKSTERN_BEHANDLING_UUID);
+        melding.setFagsakYtelseType(FagsakYtelseType.FORELDREPENGER.getKode());
+        melding.setSaksnummer("1234");
+
+        return melding;
     }
 
 
