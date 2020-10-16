@@ -1,7 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.domene.person.impl;
 
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,7 +14,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBrukerKodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.NavBrukerKjønn;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.PersonstatusType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.SivilstandType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.GeografiKodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Landkoder;
@@ -29,7 +27,6 @@ import no.nav.tjeneste.virksomhet.person.v3.informasjon.Foedselsdato;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.Kjoenn;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.Person;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.PersonIdent;
-import no.nav.tjeneste.virksomhet.person.v3.informasjon.Personstatus;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.Spraak;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.Statsborgerskap;
 import no.nav.vedtak.felles.integrasjon.felles.ws.DateUtil;
@@ -74,7 +71,6 @@ public class TpsOversetter {
         PersonIdent pi = (PersonIdent) aktoer;
         String ident = pi.getIdent().getIdent();
         NavBrukerKjønn kjønn = tilBrukerKjønn(bruker.getKjoenn());
-        PersonstatusType personstatus = tilPersonstatusType(bruker.getPersonstatus());
 
         Landkoder landkoder = utledLandkode(bruker.getStatsborgerskap());
 
@@ -85,24 +81,23 @@ public class TpsOversetter {
         SivilstandType sivilstandType = bruker.getSivilstand() == null ? null : behandlingsgrunnlagKodeverkRepository.finnSivilstandType(bruker.getSivilstand().getSivilstand().getValue());
 
         return Personinfo.builder()
-                .medAktørId(aktørId)
-                .medPersonIdent(no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent.fra(ident))
-                .medNavn(navn)
-                .medAdresse(adresse)
-                .medAdresseLandkode(adresseLandkode)
-                .medFødselsdato(fødselsdato)
-                .medDødsdato(dødsdato)
-                .medNavBrukerKjønn(kjønn)
-                .medPersonstatusType(personstatus)
-                .medStatsborgerskap(new no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Statsborgerskap(landkoder.getKode()))
-                .medUtlandsadresse(utlandsadresse)
-                .medForetrukketSpråk(bestemForetrukketSpråk(bruker))
-                .medGegrafiskTilknytning(geografiskTilknytning)
-                .medDiskresjonsKode(diskresjonskode)
-                .medAdresseInfoList(adresseinfoList)
-                .medSivilstandType(sivilstandType)
-                .medLandkode(landkoder)
-                .build();
+            .medAktørId(aktørId)
+            .medPersonIdent(no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent.fra(ident))
+            .medNavn(navn)
+            .medAdresse(adresse)
+            .medAdresseLandkode(adresseLandkode)
+            .medFødselsdato(fødselsdato)
+            .medDødsdato(dødsdato)
+            .medNavBrukerKjønn(kjønn)
+            .medStatsborgerskap(new no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Statsborgerskap(landkoder.getKode()))
+            .medUtlandsadresse(utlandsadresse)
+            .medForetrukketSpråk(bestemForetrukketSpråk(bruker))
+            .medGegrafiskTilknytning(geografiskTilknytning)
+            .medDiskresjonsKode(diskresjonskode)
+            .medAdresseInfoList(adresseinfoList)
+            .medSivilstandType(sivilstandType)
+            .medLandkode(landkoder)
+            .build();
     }
 
     public Adresseinfo tilAdresseinfo(Person person) {
@@ -129,13 +124,9 @@ public class TpsOversetter {
 
     private NavBrukerKjønn tilBrukerKjønn(Kjoenn kjoenn) {
         return Optional.ofNullable(kjoenn)
-                .map(Kjoenn::getKjoenn)
-                .map(kj -> navBrukerKodeverkRepository.finnBrukerKjønn(kj.getValue()))
-                .orElse(NavBrukerKjønn.UDEFINERT);
-    }
-
-    private PersonstatusType tilPersonstatusType(Personstatus personstatus) {
-        return navBrukerKodeverkRepository.finnPersonstatus(personstatus.getPersonstatus().getValue());
+            .map(Kjoenn::getKjoenn)
+            .map(kj -> navBrukerKodeverkRepository.finnBrukerKjønn(kj.getValue()))
+            .orElse(NavBrukerKjønn.UDEFINERT);
     }
 
     private Landkoder utledLandkode(Statsborgerskap statsborgerskap) {

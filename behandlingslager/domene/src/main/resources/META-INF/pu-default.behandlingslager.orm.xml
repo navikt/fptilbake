@@ -56,7 +56,6 @@
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodelisteRelasjon"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Landkoder"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.NavBrukerKjønn"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.PersonstatusType"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Poststed"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.ReaktiveringStatus"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.SivilstandType"/>

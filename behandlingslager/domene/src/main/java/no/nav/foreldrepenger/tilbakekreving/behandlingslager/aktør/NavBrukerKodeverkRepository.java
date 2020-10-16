@@ -6,7 +6,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.NavBrukerKjønn;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.PersonstatusType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 
 /**
@@ -31,7 +30,4 @@ public class NavBrukerKodeverkRepository {
         return kodeverkRepository.finn(NavBrukerKjønn.class, kode);
     }
 
-    public PersonstatusType finnPersonstatus(String kode) {
-        return kodeverkRepository.finn(PersonstatusType.class, kode);
-    }
 }

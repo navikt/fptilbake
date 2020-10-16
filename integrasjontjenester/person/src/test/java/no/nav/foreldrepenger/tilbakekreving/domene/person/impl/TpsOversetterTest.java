@@ -21,7 +21,6 @@ import org.mockito.junit.MockitoRule;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBrukerKodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.PersonstatusType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.GeografiKodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.PoststedKodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.SpråkKodeverkRepository;
@@ -44,8 +43,6 @@ import no.nav.tjeneste.virksomhet.person.v3.informasjon.MidlertidigPostadresseUt
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.NorskIdent;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.PersonIdent;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.Personnavn;
-import no.nav.tjeneste.virksomhet.person.v3.informasjon.Personstatus;
-import no.nav.tjeneste.virksomhet.person.v3.informasjon.Personstatuser;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.Postadresse;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.Postadressetyper;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.PostboksadresseNorsk;
@@ -265,7 +262,7 @@ public class TpsOversetterTest {
     }
 
     @Test
-    public void skal_ha_med_foretrukket_språk_når_finnes() throws Exception {
+    public void skal_ha_med_foretrukket_språk_når_finnes() {
         tpsOversetter = new TpsOversetter(brukerKodeverkRepository, bgKodeverkRepository, språkKodeverkRepository, tpsAdresseOversetter);
 
         Spraak språk = new Spraak();
@@ -276,7 +273,7 @@ public class TpsOversetterTest {
     }
 
     @Test
-    public void skal_default_til_bokmål_om_foretrukket_språk_ikke_er_satt() throws Exception {
+    public void skal_default_til_bokmål_om_foretrukket_språk_ikke_er_satt() {
 
         tpsOversetter = new TpsOversetter(brukerKodeverkRepository, bgKodeverkRepository, språkKodeverkRepository, tpsAdresseOversetter);
 
@@ -286,7 +283,7 @@ public class TpsOversetterTest {
     }
 
     @Test
-    public void skal_defaulte_til_bokmål_om_foretrukket_språk_ikke_er_støttet() throws Exception {
+    public void skal_defaulte_til_bokmål_om_foretrukket_språk_ikke_er_støttet() {
 
         tpsOversetter = new TpsOversetter(brukerKodeverkRepository, bgKodeverkRepository, språkKodeverkRepository, tpsAdresseOversetter);
 
@@ -298,7 +295,7 @@ public class TpsOversetterTest {
     }
 
     @Test
-    public void skal_defaulte_til_bokmål_om_foretrukket_språk_er_NO() throws Exception {
+    public void skal_defaulte_til_bokmål_om_foretrukket_språk_er_NO() {
         GeografiKodeverkRepository grunnlagRepo = Mockito.mock(GeografiKodeverkRepository.class);
 
         tpsOversetter = new TpsOversetter(brukerKodeverkRepository, bgKodeverkRepository, språkKodeverkRepository, tpsAdresseOversetter);
@@ -326,14 +323,6 @@ public class TpsOversetterTest {
         assertThat(personinfo.getStatsborgerskap().getLandkode()).isEqualTo(norge.getKode());
     }
 
-    private void initMockBrukerPersonstatus(PersonstatusType personstatusType) {
-        Personstatus tpsPersonstatus = new Personstatus();
-        Personstatuser tpsPersonstatuser = new Personstatuser();
-        tpsPersonstatuser.setValue(personstatusType.getKode());
-        tpsPersonstatus.setPersonstatus(tpsPersonstatuser);
-        when(bruker.getPersonstatus()).thenReturn(tpsPersonstatus);
-    }
-
     private void initMockBostedsadresseMedPostboksAdresseForBruker() {
         when(bruker.getGjeldendePostadressetype()).thenReturn(tilPostadressetyper("BOSTEDSADRESSE"));
         when(bruker.getBostedsadresse()).thenReturn(bostedsadresse);
@@ -346,8 +335,6 @@ public class TpsOversetterTest {
         kjønnstype.setValue("K");
         kjønn.setKjoenn(kjønnstype);
         when(bruker.getKjoenn()).thenReturn(kjønn);
-
-        initMockBrukerPersonstatus(PersonstatusType.BOSA);
 
         Statsborgerskap statsborgerskap = new Statsborgerskap();
         Landkoder land = new Landkoder();

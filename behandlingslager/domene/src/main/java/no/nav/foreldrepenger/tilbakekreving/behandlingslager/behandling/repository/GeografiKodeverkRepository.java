@@ -1,14 +1,11 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.PersonstatusType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.SivilstandType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Landkoder;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
@@ -46,10 +43,6 @@ public class GeografiKodeverkRepository {
 
     public Landkoder finnLandkode(String kode) {
         return kodeverkRepository.finn(Landkoder.class, kode);
-    }
-
-    public List<PersonstatusType> personstatusTyperFortsattBehandling() {
-        return kodeverkRepository.finnListe(PersonstatusType.class, Arrays.asList("DØD", "BOSA", "UTVA"));
     }
 
 }

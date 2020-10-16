@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.NavBrukerKjønn;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.PersonstatusType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.SivilstandType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Landkoder;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
@@ -23,7 +22,6 @@ public class Personinfo {
     private String adresse;
     private LocalDate fødselsdato;
     private LocalDate dødsdato;
-    private PersonstatusType personstatus;
     private NavBrukerKjønn kjønn;
     private Statsborgerskap statsborgerskap;
     private String utlandsadresse;
@@ -53,10 +51,6 @@ public class Personinfo {
 
     public NavBrukerKjønn getKjønn() {
         return kjønn;
-    }
-
-    public PersonstatusType getPersonstatus() {
-        return personstatus;
     }
 
     public LocalDate getFødselsdato() {
@@ -92,8 +86,8 @@ public class Personinfo {
     }
 
     /**
-     * @deprecated Ikke bruk denne metoden. Bruk språkkode i grunninformasjonen fra fpsak.
      * @return Språkkode fra tps
+     * @deprecated Ikke bruk denne metoden. Bruk språkkode i grunninformasjonen fra fpsak.
      */
     public Språkkode getForetrukketSpråk() {
         return foretrukketSpråk;
@@ -145,7 +139,9 @@ public class Personinfo {
             return this;
         }
 
-        /** @deprecated Bruk {@link #medPersonIdent(PersonIdent)} i stedet! */
+        /**
+         * @deprecated Bruk {@link #medPersonIdent(PersonIdent)} i stedet!
+         */
         @Deprecated
         public Builder medFnr(String fnr) {
             personinfoMal.personIdent = PersonIdent.fra(fnr);
@@ -169,11 +165,6 @@ public class Personinfo {
 
         public Builder medDødsdato(LocalDate dødsdato) {
             personinfoMal.dødsdato = dødsdato;
-            return this;
-        }
-
-        public Builder medPersonstatusType(PersonstatusType personstatus) {
-            personinfoMal.personstatus = personstatus;
             return this;
         }
 

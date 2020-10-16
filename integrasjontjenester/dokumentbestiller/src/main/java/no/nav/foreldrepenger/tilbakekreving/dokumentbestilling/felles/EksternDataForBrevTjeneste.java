@@ -78,7 +78,7 @@ public class EksternDataForBrevTjeneste {
             VergeEntitet verge = vergeEntitet.get();
             if (VergeType.ADVOKAT.equals(verge.getVergeType())) {
                 return hentOrganisasjonAdresse(verge.getOrganisasjonsnummer(), verge.getNavn(), personinfo, brevMottaker);
-            } else if(BrevMottaker.VERGE.equals(brevMottaker)){
+            } else if (BrevMottaker.VERGE.equals(brevMottaker)) {
                 String aktørId = verge.getVergeAktørId().getId();
                 personinfo = hentPerson(aktørId);
             }
@@ -115,7 +115,7 @@ public class EksternDataForBrevTjeneste {
         String annenMottakerNavn = organisasjonNavn + " " + vedVergeNavn;
         Adresseinfo adresseinfo;
         if (BrevMottaker.VERGE.equals(brevMottaker)) {
-            Adresseinfo.Builder adresseinfoBuilder = new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE, personinfo.getPersonIdent(), organisasjonNavn, personinfo.getPersonstatus());
+            Adresseinfo.Builder adresseinfoBuilder = new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE, personinfo.getPersonIdent(), organisasjonNavn);
             adresseinfo = adresseinfoBuilder.medAdresselinje1(vedVergeNavn)
                 .medAdresselinje2(virksomhet.getAdresselinje1())
                 .medAdresselinje3(virksomhet.getAdresselinje2())

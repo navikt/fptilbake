@@ -20,7 +20,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBrukerKod
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.AdresseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.NavBrukerKjønn;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.PersonstatusType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.GeografiKodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.SpråkKodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
@@ -29,9 +28,6 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.tjeneste.virksomhet.person.v3.binding.HentPersonPersonIkkeFunnet;
 import no.nav.tjeneste.virksomhet.person.v3.binding.HentPersonSikkerhetsbegrensning;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.Bruker;
-import no.nav.tjeneste.virksomhet.person.v3.informasjon.Diskresjonskoder;
-import no.nav.tjeneste.virksomhet.person.v3.informasjon.Kommune;
-import no.nav.tjeneste.virksomhet.person.v3.meldinger.HentGeografiskTilknytningResponse;
 import no.nav.tjeneste.virksomhet.person.v3.meldinger.HentPersonRequest;
 import no.nav.tjeneste.virksomhet.person.v3.meldinger.HentPersonResponse;
 import no.nav.vedtak.exception.ManglerTilgangException;
@@ -148,10 +144,7 @@ public class TpsAdapterImplTest {
         final String addresse = "Veien 17";
 
         TpsOversetter tpsOversetterMock = Mockito.mock(TpsOversetter.class);
-        Adresseinfo.Builder builder = new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE,
-            new PersonIdent("11112222333"),
-            "Tjoms",
-            PersonstatusType.BOSA);
+        Adresseinfo.Builder builder = new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE, new PersonIdent("11112222333"), "Tjoms");
         Adresseinfo adresseinfoExpected = builder.medAdresselinje1(addresse).build();
 
         when(tpsOversetterMock.tilAdresseinfo(eq(person))).thenReturn(adresseinfoExpected);

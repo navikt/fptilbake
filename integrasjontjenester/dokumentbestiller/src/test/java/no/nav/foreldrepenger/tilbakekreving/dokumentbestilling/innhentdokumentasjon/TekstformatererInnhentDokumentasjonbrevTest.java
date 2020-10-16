@@ -17,7 +17,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkko
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 
-public class TekstformatererInnhentDokumentasjonbrevTest  {
+public class TekstformatererInnhentDokumentasjonbrevTest {
 
     @Test
     public void skal_generere_innhentdokumentasjonbrev() throws Exception {
@@ -34,7 +34,8 @@ public class TekstformatererInnhentDokumentasjonbrevTest  {
             .medFristDato(LocalDate.of(2020, 3, 2))
             .build();
         String generertBrev = TekstformatererInnhentDokumentasjonbrev.lagInnhentDokumentasjonBrevFritekst(innhentDokumentasjonBrevSamletInfo);
-        String fasit = les("/innhentdokumentasjonbrev/innhentdokumentasjonbrev.txt");;
+        String fasit = les("/innhentdokumentasjonbrev/innhentdokumentasjonbrev.txt");
+        ;
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 
@@ -54,7 +55,8 @@ public class TekstformatererInnhentDokumentasjonbrevTest  {
             .medFristDato(LocalDate.of(2020, 3, 2))
             .build();
         String generertBrev = TekstformatererInnhentDokumentasjonbrev.lagInnhentDokumentasjonBrevFritekst(innhentDokumentasjonBrevSamletInfo);
-        String fasit = les("/innhentdokumentasjonbrev/innhentdokumentasjonbrev_frisinn.txt");;
+        String fasit = les("/innhentdokumentasjonbrev/innhentdokumentasjonbrev_frisinn.txt");
+        ;
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 
@@ -75,16 +77,15 @@ public class TekstformatererInnhentDokumentasjonbrevTest  {
             .medFristDato(LocalDate.of(2020, 3, 2))
             .build();
         String generertBrev = TekstformatererInnhentDokumentasjonbrev.lagInnhentDokumentasjonBrevFritekst(innhentDokumentasjonBrevSamletInfo);
-        String fasit = les("/innhentdokumentasjonbrev/innhentdokumentasjonbrev.txt");;
+        String fasit = les("/innhentdokumentasjonbrev/innhentdokumentasjonbrev.txt");
+        ;
         String vergeTekst = les("/varselbrev/nb/verge.txt");
-        assertThat(generertBrev).isEqualToNormalizingNewlines(fasit+"\n"+"\n"+ vergeTekst);
+        assertThat(generertBrev).isEqualToNormalizingNewlines(fasit + "\n" + "\n" + vergeTekst);
     }
 
     @Test
     public void skal_generere_innhentdokumentasjonbrev_for_verge_organisasjon() throws Exception {
-        Adresseinfo orgAdresse = new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE,
-            new PersonIdent("12345678901"),
-            "Semba AS c/o John Doe", null)
+        Adresseinfo orgAdresse = new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE, new PersonIdent("12345678901"), "Semba AS c/o John Doe")
             .medAdresselinje1("adresselinje 1")
             .medAdresselinje2("adresselinje 2")
             .medAdresselinje3("adresselinje 3")
@@ -107,9 +108,10 @@ public class TekstformatererInnhentDokumentasjonbrevTest  {
             .medFristDato(LocalDate.of(2020, 3, 2))
             .build();
         String generertBrev = TekstformatererInnhentDokumentasjonbrev.lagInnhentDokumentasjonBrevFritekst(innhentDokumentasjonBrevSamletInfo);
-        String fasit = les("/innhentdokumentasjonbrev/innhentdokumentasjonbrev.txt");;
+        String fasit = les("/innhentdokumentasjonbrev/innhentdokumentasjonbrev.txt");
+        ;
         String vergeTekst = "Brev med likt innhold er sendt til Test";
-        assertThat(generertBrev).isEqualToNormalizingNewlines(fasit+"\n"+"\n"+ vergeTekst);
+        assertThat(generertBrev).isEqualToNormalizingNewlines(fasit + "\n" + "\n" + vergeTekst);
     }
 
     @Test
@@ -127,7 +129,8 @@ public class TekstformatererInnhentDokumentasjonbrevTest  {
             .medFristDato(LocalDate.of(2020, 3, 2))
             .build();
         String generertBrev = TekstformatererInnhentDokumentasjonbrev.lagInnhentDokumentasjonBrevFritekst(innhentDokumentasjonBrevSamletInfo);
-        String fasit = les("/innhentdokumentasjonbrev/innhentdokumentasjonbrev_nn.txt");;
+        String fasit = les("/innhentdokumentasjonbrev/innhentdokumentasjonbrev_nn.txt");
+        ;
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 
@@ -170,9 +173,7 @@ public class TekstformatererInnhentDokumentasjonbrevTest  {
     }
 
     private Adresseinfo lagStandardNorskAdresse() {
-        return new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE,
-            new PersonIdent("12345678901"),
-            "Test", null)
+        return new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE, new PersonIdent("12345678901"), "Test")
             .medAdresselinje1("adresselinje 1")
             .medAdresselinje2("adresselinje 2")
             .medAdresselinje3("adresselinje 3")

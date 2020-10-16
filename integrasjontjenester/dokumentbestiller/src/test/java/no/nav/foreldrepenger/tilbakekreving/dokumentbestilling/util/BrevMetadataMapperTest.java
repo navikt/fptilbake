@@ -1,5 +1,11 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.util;
 
+import java.util.List;
+
+import org.assertj.core.api.Assertions;
+import org.junit.Test;
+import org.mockito.Mockito;
+
 import no.nav.foreldrepenger.integrasjon.dokument.felles.AvsenderAdresseType;
 import no.nav.foreldrepenger.integrasjon.dokument.felles.FellesType;
 import no.nav.foreldrepenger.integrasjon.dokument.felles.IdKodeType;
@@ -14,14 +20,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Landkode
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodelisteNavnI18N;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMetadataMapper;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
-import org.assertj.core.api.Assertions;
-import org.junit.Test;
-import org.mockito.Mockito;
-
-import java.util.List;
 
 public class BrevMetadataMapperTest {
 
@@ -32,15 +33,15 @@ public class BrevMetadataMapperTest {
     public void skal_mappe_behandlingsinfo_fra_fpsak_til_xmlen() {
 
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
-                .medMottakerAdresse(lagStandardNorskAdresse())
-                .medSakspartId("12345678900")
-                .medSakspartNavn("Ola Nordmann")
-                .medSaksnummer("saksnummer 665544")
-                .medBehandlendeEnhetId("behandlendeenhetId 556677")
-                .medBehandlendeEnhetNavn("behandlende enhet i Bærum")
-                .medAnsvarligSaksbehandler("Beslutter Harald")
-                .medSprakkode(Språkkode.nn)
-                .build();
+            .medMottakerAdresse(lagStandardNorskAdresse())
+            .medSakspartId("12345678900")
+            .medSakspartNavn("Ola Nordmann")
+            .medSaksnummer("saksnummer 665544")
+            .medBehandlendeEnhetId("behandlendeenhetId 556677")
+            .medBehandlendeEnhetNavn("behandlende enhet i Bærum")
+            .medAnsvarligSaksbehandler("Beslutter Harald")
+            .medSprakkode(Språkkode.nn)
+            .build();
 
         //resultat av mapping:
         FellesType fellesTypeResultat = brevMetadataMapper.leggTilMetadataIDokumentet(brevMetadata);
@@ -84,21 +85,19 @@ public class BrevMetadataMapperTest {
 
         Mockito.when(kodeverkRepositoryMock.finn(Mockito.any(), Mockito.anyString())).thenReturn(landkoder);
 
-        Adresseinfo adresseinfo = new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE,
-                new PersonIdent("12345678900"),
-                "Jens Trallala", null)
-                .medAdresselinje1("utenlandsk adresselinje 1")
-                .medAdresselinje2("utenlandsk adresselinje 2")
-                .medAdresselinje3("utenlandsk adresselinje 3")
-                .medLand("SWE")
-                .medPostNr("0898")
-                .medPoststed("Berlin")
-                .build();
+        Adresseinfo adresseinfo = new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE, new PersonIdent("12345678900"), "Jens Trallala")
+            .medAdresselinje1("utenlandsk adresselinje 1")
+            .medAdresselinje2("utenlandsk adresselinje 2")
+            .medAdresselinje3("utenlandsk adresselinje 3")
+            .medLand("SWE")
+            .medPostNr("0898")
+            .medPoststed("Berlin")
+            .build();
 
         BrevMetadata metadata = new BrevMetadata.Builder()
-                .medMottakerAdresse(adresseinfo)
-                .medSprakkode(Språkkode.nn)
-                .build();
+            .medMottakerAdresse(adresseinfo)
+            .medSprakkode(Språkkode.nn)
+            .build();
 
         FellesType fellesTypeResultat = brevMetadataMapper.leggTilMetadataIDokumentet(metadata);
         MottakerAdresseType mottakerAdresse = fellesTypeResultat.getMottaker().getMottakerAdresse();
@@ -129,16 +128,14 @@ public class BrevMetadataMapperTest {
     }
 
     private Adresseinfo lagStandardNorskAdresse() {
-        return new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE,
-                new PersonIdent("12345678901"),
-                "Jens Trallala", null)
-                .medAdresselinje1("adresselinje 1")
-                .medAdresselinje2("adresselinje 2")
-                .medAdresselinje3("adresselinje 3")
-                .medLand("NOR")
-                .medPostNr("0688")
-                .medPoststed("OSLO")
-                .build();
+        return new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE, new PersonIdent("12345678901"), "Jens Trallala")
+            .medAdresselinje1("adresselinje 1")
+            .medAdresselinje2("adresselinje 2")
+            .medAdresselinje3("adresselinje 3")
+            .medLand("NOR")
+            .medPostNr("0688")
+            .medPoststed("OSLO")
+            .build();
     }
 
 }

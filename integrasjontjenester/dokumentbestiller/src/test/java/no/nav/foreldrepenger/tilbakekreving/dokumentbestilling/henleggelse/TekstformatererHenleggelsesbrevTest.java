@@ -13,7 +13,6 @@ import org.junit.Test;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.AdresseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.PersonstatusType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
@@ -113,7 +112,7 @@ public class TekstformatererHenleggelsesbrevTest {
         String generertBrev = TekstformatererHenleggelsesbrev.lagHenleggelsebrevFritekst(henleggelsesbrevSamletInfo);
         String fasit = les("/henleggelsesbrev/henleggelsesbrev.txt");
         String vergeTekst = les("/varselbrev/nb/verge.txt");
-        assertThat(generertBrev).isEqualToNormalizingNewlines(fasit+"\n"+"\n"+ vergeTekst);
+        assertThat(generertBrev).isEqualToNormalizingNewlines(fasit + "\n" + "\n" + vergeTekst);
     }
 
     @Test
@@ -134,7 +133,7 @@ public class TekstformatererHenleggelsesbrevTest {
         String generertBrev = TekstformatererHenleggelsesbrev.lagRevurderingHenleggelsebrevFritekst(henleggelsesbrevSamletInfo);
         String fasit = les("/henleggelsesbrev/henleggelsesbrev_revurdering.txt");
         String vergeTekst = les("/varselbrev/nb/verge.txt");
-        assertThat(generertBrev).isEqualToNormalizingNewlines(fasit+"\n"+"\n"+ vergeTekst);
+        assertThat(generertBrev).isEqualToNormalizingNewlines(fasit + "\n" + "\n" + vergeTekst);
     }
 
     @Test
@@ -227,7 +226,7 @@ public class TekstformatererHenleggelsesbrevTest {
         }
     }
 
-    private Adresseinfo lagAdresseInfo(){
-        return new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE,new PersonIdent("123456"),"Test", PersonstatusType.BOSA).build();
+    private Adresseinfo lagAdresseInfo() {
+        return new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE, new PersonIdent("123456"), "Test").build();
     }
 }

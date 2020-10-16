@@ -17,7 +17,6 @@ import org.junit.rules.ExpectedException;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.AdresseType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.PersonstatusType;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.TpsAdapter;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
@@ -103,7 +102,7 @@ public class TpsTjenesteTest {
 
         @Override
         public Adresseinfo hentAdresseinformasjon(PersonIdent fnr) {
-            return new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE, fnr, NAVN, PersonstatusType.BOSA)
+            return new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE, fnr, NAVN)
                     .medAdresselinje1(ADR1)
                     .medAdresselinje2(ADR2)
                     .medAdresselinje3(ADR3)
