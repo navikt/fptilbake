@@ -5,20 +5,26 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+import java.util.UUID;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.hendelse.HendelseTaskDataWrapper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.hendelse.TaskProperties;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.hendelser.felles.tjeneste.HendelseHåndtererTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.TilkjentYtelseMelding;
-import no.nav.foreldrepenger.tilbakekreving.hendelser.tilkjentytelse.TilkkjentYtelseMeldingTestUtil;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 
 public class HåndterHendelseTaskTest {
 
+    private static final AktørId AKTØR_ID = new AktørId("1234567898765");
+    private static final Long EKSTERN_BEHANDLING_ID = 123L;
+    private static final UUID EKSTERN_BEHANDLING_UUID = UUID.randomUUID();
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -26,10 +32,11 @@ public class HåndterHendelseTaskTest {
     private HendelseHåndtererTjeneste hendelseHåndterer = mock(HendelseHåndtererTjeneste.class);
     private HåndterHendelseTask håndterHendelseTask = new HåndterHendelseTask(hendelseHåndterer);
 
+
     @Test
     public void test_skal_kalle_hendelseHåndterer() {
         //
-        ProsessTaskData prosessTaskData = lagProsessTaskData(TilkkjentYtelseMeldingTestUtil.opprettTilkjentYtelseMelding());
+        ProsessTaskData prosessTaskData = lagProsessTaskData(opprettTilkjentYtelseMelding());
 
         // act
         håndterHendelseTask.doTask(prosessTaskData);
@@ -48,6 +55,17 @@ public class HåndterHendelseTaskTest {
         td.setProperty(TaskProperties.SAKSNUMMER, melding.getSaksnummer().getVerdi());
         td.setProperty(TaskProperties.FAGSAK_YTELSE_TYPE, melding.getFagsakYtelseType());
         return td;
+    }
+
+    public static TilkjentYtelseMelding opprettTilkjentYtelseMelding() {
+        TilkjentYtelseMelding melding = new TilkjentYtelseMelding();
+        melding.setAktørId(AKTØR_ID.getId());
+        melding.setBehandlingId(EKSTERN_BEHANDLING_ID);
+        melding.setIverksettingSystem("FPSAK");
+        melding.setBehandlingUuid(EKSTERN_BEHANDLING_UUID);
+        melding.setFagsakYtelseType(FagsakYtelseType.FORELDREPENGER.getKode());
+        melding.setSaksnummer("1234");
+        return melding;
     }
 
 }

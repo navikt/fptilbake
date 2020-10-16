@@ -9,11 +9,15 @@ import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import org.junit.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.hendelse.HendelseTaskDataWrapper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.hendelser.ProsessTaskRepositoryMock;
 import no.nav.foreldrepenger.tilbakekreving.kafka.poller.PostTransactionHandler;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -21,6 +25,11 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
 
 public class TilkjentYtelseReaderTest {
+    private static final Saksnummer SAKSNUMMER = new Saksnummer("1234");
+    private static final AktørId AKTØR_ID = new AktørId("1234567898765");
+    private static final Long EKSTERN_BEHANDLING_ID = 123L;
+    private static final UUID EKSTERN_BEHANDLING_UUID = UUID.randomUUID();
+    private static final Henvisning HENVISNING = Henvisning.fraEksternBehandlingId(EKSTERN_BEHANDLING_ID);
 
     private TilkjentYtelseMeldingConsumer meldingConsumer = mock(TilkjentYtelseMeldingConsumer.class);
     private ProsessTaskRepository prosessTaskRepository = new ProsessTaskRepositoryMock();
@@ -29,7 +38,7 @@ public class TilkjentYtelseReaderTest {
     @Test
     public void skal_hente_og_behandle_meldinger() {
         //Arrange
-        TilkjentYtelseMelding tilkjentYtelseMelding = TilkkjentYtelseMeldingTestUtil.opprettTilkjentYtelseMelding();
+        TilkjentYtelseMelding tilkjentYtelseMelding = opprettTilkjentYtelseMelding();
         when(meldingConsumer.lesMeldinger()).thenReturn(Collections.singletonList(tilkjentYtelseMelding));
 
         //Act
@@ -41,16 +50,16 @@ public class TilkjentYtelseReaderTest {
         ProsessTaskData prosessTaskData = prosessTaskDataList.get(0);
 
         HendelseTaskDataWrapper taskDataWrapper = new HendelseTaskDataWrapper(prosessTaskData);
-        assertThat(taskDataWrapper.getHenvisning()).isEqualTo(TilkkjentYtelseMeldingTestUtil.HENVISNING);
-        assertThat(taskDataWrapper.getAktørId()).isEqualTo(TilkkjentYtelseMeldingTestUtil.AKTØR_ID);
-        assertThat(taskDataWrapper.getBehandlingUuid()).isEqualTo(TilkkjentYtelseMeldingTestUtil.EKSTERN_BEHANDLING_UUID.toString());
+        assertThat(taskDataWrapper.getHenvisning()).isEqualTo(HENVISNING);
+        assertThat(taskDataWrapper.getAktørId()).isEqualTo(AKTØR_ID);
+        assertThat(taskDataWrapper.getBehandlingUuid()).isEqualTo(EKSTERN_BEHANDLING_UUID.toString());
         assertThat(taskDataWrapper.getFagsakYtelseType()).isEqualByComparingTo(FagsakYtelseType.FORELDREPENGER);
-        assertThat(taskDataWrapper.getSaksnummer()).isEqualTo(TilkkjentYtelseMeldingTestUtil.SAKSNUMMER);
+        assertThat(taskDataWrapper.getSaksnummer()).isEqualTo(SAKSNUMMER);
     }
 
     @Test
     public void skal_vente_med_commit_sync_til_transaksjonen_er_ferdig() {
-        TilkjentYtelseMelding tilkjentYtelseMelding = TilkkjentYtelseMeldingTestUtil.opprettTilkjentYtelseMelding();
+        TilkjentYtelseMelding tilkjentYtelseMelding = opprettTilkjentYtelseMelding();
         when(meldingConsumer.lesMeldinger()).thenReturn(Collections.singletonList(tilkjentYtelseMelding));
         PostTransactionHandler postTransactionHandler = tilkjentYtelseReader.hentOgBehandleMeldinger();
 
@@ -72,6 +81,18 @@ public class TilkjentYtelseReaderTest {
         List<ProsessTaskData> prosessTaskDataList = prosessTaskRepository.finnAlle(ProsessTaskStatus.KLAR);
         assertThat(prosessTaskDataList).isEmpty();
         verify(meldingConsumer, never()).manualCommitSync();
+    }
+
+    private static TilkjentYtelseMelding opprettTilkjentYtelseMelding() {
+        TilkjentYtelseMelding melding = new TilkjentYtelseMelding();
+        melding.setAktørId(AKTØR_ID.getId());
+        melding.setBehandlingId(EKSTERN_BEHANDLING_ID);
+        melding.setIverksettingSystem("FPSAK");
+        melding.setBehandlingUuid(EKSTERN_BEHANDLING_UUID);
+        melding.setFagsakYtelseType(FagsakYtelseType.FORELDREPENGER.getKode());
+        melding.setSaksnummer("1234");
+
+        return melding;
     }
 
 
