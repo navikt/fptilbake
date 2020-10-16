@@ -15,9 +15,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import no.nav.foreldrepenger.batch.BatchArguments;
-import no.nav.foreldrepenger.batch.BatchSupportTjeneste;
 import no.nav.foreldrepenger.batch.BatchTjeneste;
 import no.nav.foreldrepenger.batch.feil.InvalidArgumentsVLBatchException;
+import no.nav.foreldrepenger.batch.impl.BatchSupportTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.batch.args.BatchArgumentsDto;
 
 public class BatchRestTjenesteTest {

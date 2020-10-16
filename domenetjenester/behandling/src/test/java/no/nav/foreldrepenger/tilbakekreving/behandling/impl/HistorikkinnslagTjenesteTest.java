@@ -18,9 +18,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagDokumentLink;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
-import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.TpsAdapter;
-import no.nav.foreldrepenger.tilbakekreving.domene.person.impl.PersoninfoAdapterImpl;
+import no.nav.foreldrepenger.tilbakekreving.domene.person.impl.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.impl.TpsAdapterImpl;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.impl.TpsOversetter;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
@@ -36,7 +35,7 @@ public class HistorikkinnslagTjenesteTest extends FellesTestOppsett {
     private TpsOversetter mockTpsOversetter = mock(TpsOversetter.class);
 
     private TpsAdapter tpsAdapter = new TpsAdapterImpl(mockAktørConsumer, mockPersonConsumer, mockTpsOversetter);
-    private PersoninfoAdapter personinfoAdapter = new PersoninfoAdapterImpl(tpsAdapter);
+    private PersoninfoAdapter personinfoAdapter = new PersoninfoAdapter(tpsAdapter);
     private HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepository, personinfoAdapter);
 
     @Test

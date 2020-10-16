@@ -1,0 +1,80 @@
+package no.nav.foreldrepenger.batch.impl;
+
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Any;
+import javax.enterprise.inject.Instance;
+import javax.inject.Inject;
+
+import no.nav.foreldrepenger.batch.BatchTjeneste;
+import no.nav.foreldrepenger.batch.task.BatchSchedulerTask;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTypeInfo;
+
+@ApplicationScoped
+public class BatchSupportTjeneste {
+
+    private ProsessTaskRepository prosessTaskRepository;
+    private Map<String, BatchTjeneste> batchTjenester;
+
+    public BatchSupportTjeneste() { //NOSONAR
+        this.batchTjenester = new HashMap<>();
+    }
+
+    @Inject
+    public BatchSupportTjeneste(ProsessTaskRepository prosessTaskRepository, @Any Instance<BatchTjeneste> batchTjenester) {
+        this.batchTjenester = new HashMap<>();
+        for (BatchTjeneste batchTjeneste : batchTjenester) {
+            this.batchTjenester.put(batchTjeneste.getBatchName(), batchTjeneste);
+        }
+        this.prosessTaskRepository = prosessTaskRepository;
+    }
+
+    public void startBatchSchedulerTask() {
+        boolean eksisterende = prosessTaskRepository.finnIkkeStartet().stream()
+            .map(ProsessTaskData::getTaskType)
+            .anyMatch(BatchSchedulerTask.TASKTYPE::equals);
+        if (!eksisterende) {
+            ProsessTaskData taskData = new ProsessTaskData(BatchSchedulerTask.TASKTYPE);
+            prosessTaskRepository.lagre(taskData);
+        }
+    }
+
+    public void opprettScheduledTasks(ProsessTaskGruppe gruppe) {
+        prosessTaskRepository.lagre(gruppe);
+    }
+
+    public BatchTjeneste finnBatchTjenesteForNavn(String batchNavn) {
+        return batchTjenester.get(batchNavn);
+    }
+
+    public void retryAlleProsessTasksFeilet() {
+        List<ProsessTaskData> ptdList = this.prosessTaskRepository.finnAlle(ProsessTaskStatus.FEILET);
+        if (ptdList.isEmpty()) {
+            return;
+        }
+        LocalDateTime nå = LocalDateTime.now();
+        Map<String, Integer> taskTypesMaxForsøk = new HashMap<>();
+        ptdList.stream().map(ProsessTaskData::getTaskType).distinct()
+            .forEach(tasktype -> taskTypesMaxForsøk.put(tasktype,
+                prosessTaskRepository.finnProsessTaskType(tasktype).map(ProsessTaskTypeInfo::getMaksForsøk).orElse(1)));
+        ptdList.forEach((ptd) -> {
+            ptd.setStatus(ProsessTaskStatus.KLAR);
+            ptd.setNesteKjøringEtter(nå);
+            ptd.setSisteFeilKode((String)null);
+            ptd.setSisteFeil((String)null);
+            if (taskTypesMaxForsøk.get(ptd.getTaskType()).equals(ptd.getAntallFeiledeForsøk())) {
+                ptd.setAntallFeiledeForsøk(ptd.getAntallFeiledeForsøk() - 1);
+            }
+            this.prosessTaskRepository.lagre(ptd);
+        });
+    }
+
+}

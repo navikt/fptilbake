@@ -1,15 +1,47 @@
 package no.nav.foreldrepenger.tilbakekreving.varselrespons;
 
+import java.util.Objects;
 import java.util.Optional;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons.Varselrespons;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons.VarselresponsRepository;
 
-public interface VarselresponsTjeneste {
+@ApplicationScoped
+public class VarselresponsTjeneste {
 
-    void lagreRespons(long behandlingId, ResponsKanal responsKanal, Boolean akseptertFaktagrunnlag);
+    private VarselresponsRepository varselresponsRepository;
 
-    void lagreRespons(long behandlingId, ResponsKanal kanal);
+    public VarselresponsTjeneste() {
+        // CDI
+    }
 
-    Optional<Varselrespons> hentRespons(long behandlingId);
+    @Inject
+    public VarselresponsTjeneste(VarselresponsRepository varselresponsRepository) {
+        this.varselresponsRepository = varselresponsRepository;
+    }
+
+    public void lagreRespons(long behandlingId, ResponsKanal responsKanal, Boolean akseptertFaktagrunnlag) {
+        Objects.requireNonNull(behandlingId);
+        Optional<Varselrespons> eksisterende = varselresponsRepository.hentRespons(behandlingId);
+        if (!eksisterende.isPresent()) {
+            Varselrespons varselrespons = Varselrespons.builder()
+                    .medBehandlingId(behandlingId)
+                    .setAkseptertFaktagrunnlag(akseptertFaktagrunnlag)
+                    .setKilde(responsKanal.getDbKode())
+                    .build();
+            varselresponsRepository.lagre(varselrespons);
+        }
+    }
+
+    public void lagreRespons(long behandlingId, ResponsKanal kanal) {
+        lagreRespons(behandlingId, kanal, null);
+    }
+
+    public Optional<Varselrespons> hentRespons(long behandlingId) {
+        return varselresponsRepository.hentRespons(behandlingId);
+    }
 
 }
