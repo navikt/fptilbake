@@ -47,7 +47,7 @@ public class DokdistKlient {
         DistribuerJournalpostRequest request = DistribuerJournalpostRequest.builder()
             .medJournalpostId(journalpostId.getVerdi())
             .medBestillendeFagsystem(getBestillendeFagsystem().getKode())
-            .medDokumentProdApp(applicationName)
+            .medDokumentProdApp(getDokumentProdAppKode())
             .build();
         DistribuerJournalpostResponse response = distribuerJournalpost(request);
         logger.info("Bestilt distribusjon av journalpost til {}, bestillingId ble {}", mottaker, response.getBestillingsId());
@@ -59,6 +59,18 @@ public class DokdistKlient {
                 return FagsakSystem.FORELDREPENGELØSNINGEN;
             case "k9-tilbake":
                 return FagsakSystem.K9SAK;
+            default:
+                throw new IllegalArgumentException("Ikke-støttet app.name: " + applicationName);
+        }
+    }
+
+    private String getDokumentProdAppKode() {
+        /* koder avtalt med team som eier dokdist */
+        switch (applicationName) {
+            case "fptilbake":
+                return "FPTILBAKE";
+            case "k9-tilbake":
+                return "K9_TILBAKE";
             default:
                 throw new IllegalArgumentException("Ikke-støttet app.name: " + applicationName);
         }
