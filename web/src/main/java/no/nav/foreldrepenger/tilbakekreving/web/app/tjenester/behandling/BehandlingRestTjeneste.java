@@ -50,7 +50,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
@@ -439,15 +438,14 @@ public class BehandlingRestTjeneste {
             .map(b -> new BehandlingOperasjonerDto(b.getUuid(), true, true,
                 b.isBehandlingPåVent(), !b.isBehandlingPåVent(), false, viseVerge(b)))
             .collect(Collectors.toList());
-        var oppretting = List.of(new BehandlingOpprettingDto(BehandlingType.TILBAKEKREVING, true),
+        var oppretting = List.of(new BehandlingOpprettingDto(BehandlingType.TILBAKEKREVING, behandlingTjeneste.hentBehandlinger(saksnummer).stream().allMatch(Behandling::erSaksbehandlingAvsluttet)),
             new BehandlingOpprettingDto(BehandlingType.REVURDERING_TILBAKEKREVING, behandlingTjeneste.hentBehandlinger(saksnummer).stream().anyMatch(revurderingTjeneste::kanRevurderingOpprettes)));
         return new SakRettigheterDto(false, oppretting, rettigheter);
     }
 
     private VergeBehandlingsmenyEnum viseVerge(Behandling behandling) {
-        Optional<VergeEntitet> vergeEntitet = vergeTjeneste.hentVergeInformasjon(behandling.getId());
         boolean kanBehandlingEndres = !behandling.erSaksbehandlingAvsluttet() && !behandling.isBehandlingPåVent();
-        boolean finnesVerge = vergeEntitet.isPresent();
+        boolean finnesVerge = vergeTjeneste.hentVergeInformasjon(behandling.getId()).isPresent();
         if (kanBehandlingEndres) {
             return finnesVerge ? VergeBehandlingsmenyEnum.FJERN : VergeBehandlingsmenyEnum.OPPRETT;
         }
