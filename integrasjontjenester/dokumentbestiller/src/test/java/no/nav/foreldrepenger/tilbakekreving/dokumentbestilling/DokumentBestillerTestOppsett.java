@@ -107,9 +107,7 @@ public class DokumentBestillerTestOppsett {
     }
 
     protected Adresseinfo lagStandardNorskAdresse() {
-        return new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE,
-            new PersonIdent("12345678901"),
-            "Jens Trallala", null)
+        return new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE, new PersonIdent("12345678901"), "Jens Trallala")
             .medAdresselinje1("adresselinje 1")
             .medAdresselinje2("adresselinje 2")
             .medAdresselinje3("adresselinje 3")

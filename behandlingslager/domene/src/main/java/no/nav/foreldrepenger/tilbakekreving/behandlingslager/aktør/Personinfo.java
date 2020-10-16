@@ -8,10 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.NavBrukerKjønn;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.PersonstatusType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.SivilstandType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Landkoder;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Region;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
@@ -24,10 +22,8 @@ public class Personinfo {
     private String adresse;
     private LocalDate fødselsdato;
     private LocalDate dødsdato;
-    private PersonstatusType personstatus;
     private NavBrukerKjønn kjønn;
     private Statsborgerskap statsborgerskap;
-    private Region region;
     private String utlandsadresse;
     private String geografiskTilknytning;
     private String diskresjonskode;
@@ -55,10 +51,6 @@ public class Personinfo {
 
     public NavBrukerKjønn getKjønn() {
         return kjønn;
-    }
-
-    public PersonstatusType getPersonstatus() {
-        return personstatus;
     }
 
     public LocalDate getFødselsdato() {
@@ -89,17 +81,13 @@ public class Personinfo {
         return utlandsadresse;
     }
 
-    public Region getRegion() {
-        return region;
-    }
-
     public String getAdresseLandkode() {
         return adresseLandkode;
     }
 
     /**
-     * @deprecated Ikke bruk denne metoden. Bruk språkkode i grunninformasjonen fra fpsak.
      * @return Språkkode fra tps
+     * @deprecated Ikke bruk denne metoden. Bruk språkkode i grunninformasjonen fra fpsak.
      */
     public Språkkode getForetrukketSpråk() {
         return foretrukketSpråk;
@@ -151,7 +139,9 @@ public class Personinfo {
             return this;
         }
 
-        /** @deprecated Bruk {@link #medPersonIdent(PersonIdent)} i stedet! */
+        /**
+         * @deprecated Bruk {@link #medPersonIdent(PersonIdent)} i stedet!
+         */
         @Deprecated
         public Builder medFnr(String fnr) {
             personinfoMal.personIdent = PersonIdent.fra(fnr);
@@ -178,11 +168,6 @@ public class Personinfo {
             return this;
         }
 
-        public Builder medPersonstatusType(PersonstatusType personstatus) {
-            personinfoMal.personstatus = personstatus;
-            return this;
-        }
-
         public Builder medNavBrukerKjønn(NavBrukerKjønn kjønn) {
             personinfoMal.kjønn = kjønn;
             return this;
@@ -190,11 +175,6 @@ public class Personinfo {
 
         public Builder medStatsborgerskap(Statsborgerskap statsborgerskap) {
             personinfoMal.statsborgerskap = statsborgerskap;
-            return this;
-        }
-
-        public Builder medRegion(Region region) {
-            personinfoMal.region = region;
             return this;
         }
 

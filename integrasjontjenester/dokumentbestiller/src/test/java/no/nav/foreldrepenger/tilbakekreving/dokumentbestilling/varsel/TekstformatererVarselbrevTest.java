@@ -14,12 +14,11 @@ import org.junit.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.AdresseType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.PersonstatusType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.handlebars.dto.VarselbrevDokument;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.dto.periode.HbPeriode;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.handlebars.dto.VarselbrevDokument;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 
 public class TekstformatererVarselbrevTest {
@@ -296,7 +295,7 @@ public class TekstformatererVarselbrevTest {
     }
 
     @Test
-    public void skal_generere_varselbrev_for_verge() throws IOException{
+    public void skal_generere_varselbrev_for_verge() throws IOException {
         BrevMetadata metadata = new BrevMetadata.Builder()
             .medFagsaktype(foreldrepengerkode)
             .medSprakkode(Språkkode.nb)
@@ -320,7 +319,7 @@ public class TekstformatererVarselbrevTest {
 
         String fasit = les("/varselbrev/nb/FP_en_periode.txt");
         String vergeTekst = les("/varselbrev/nb/verge.txt");
-        assertThat(generertBrev).isEqualToNormalizingNewlines(fasit+"\n"+"\n"+ vergeTekst);
+        assertThat(generertBrev).isEqualToNormalizingNewlines(fasit + "\n" + "\n" + vergeTekst);
     }
 
     private List<HbPeriode> mockFeilutbetalingerMedFlerePerioder() {
@@ -349,8 +348,8 @@ public class TekstformatererVarselbrevTest {
         }
     }
 
-    private Adresseinfo lagAdresseInfo(){
-        return new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE,new PersonIdent("123456"),"Test", PersonstatusType.BOSA).build();
+    private Adresseinfo lagAdresseInfo() {
+        return new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE, new PersonIdent("123456"), "Test").build();
     }
 
 }
