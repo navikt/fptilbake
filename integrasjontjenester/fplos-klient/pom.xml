@@ -15,7 +15,7 @@
     <dependencies>
         <dependency>
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
-            <artifactId>behandling</artifactId>
+            <artifactId>domenetjenester</artifactId>
         </dependency>
         <dependency>
             <groupId>no.nav.foreldrepenger.kontrakter.topics</groupId>
