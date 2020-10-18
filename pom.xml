@@ -12,6 +12,7 @@
 
     <modules>
         <module>behandlingslager</module>
+        <module>behandlingskontroll</module>
         <module>domenetjenester</module>
         <module>web</module>
         <module>web-dev</module>

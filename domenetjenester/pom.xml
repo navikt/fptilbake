@@ -13,7 +13,6 @@
     <name>FPTILBAKE :: Domenetjenester</name>
 
     <modules>
-        <module>behandlingskontroll</module>
         <module>behandling</module>
         <module>iverksett</module>
     </modules>
