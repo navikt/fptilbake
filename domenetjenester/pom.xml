@@ -48,6 +48,10 @@
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
             <artifactId>person</artifactId>
         </dependency>
+        <dependency>
+            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+            <artifactId>avstemming</artifactId>
+        </dependency>
 
 
         <!-- Test avhengigheter -->

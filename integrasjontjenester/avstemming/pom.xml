@@ -21,24 +21,6 @@
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
             <artifactId>behandlingslager-domene</artifactId>
         </dependency>
-        <dependency>
-            <groupId>no.nav.foreldrepenger.felles.ukelonn.integrasjon</groupId>
-            <artifactId>oekonomi-tilbakekreving-klient</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
-            <artifactId>batch</artifactId>
-        </dependency>
-
-        <!--felles-->
-        <dependency>
-            <groupId>no.nav.foreldrepenger.felles.integrasjon</groupId>
-            <artifactId>aktoer-klient</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.foreldrepenger.felles.integrasjon</groupId>
-            <artifactId>unleash-klient</artifactId>
-        </dependency>
 
         <!-- eksterne avhengigheter -->
         <dependency>
@@ -53,14 +35,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <!-- bruker for å lage iverksetting-xml for test -->
-            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
-            <artifactId>behandlingsprosess</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
-            <artifactId>fpsak-klient</artifactId>
+            <!-- brukes av avstemming tjeneste test -->
+            <groupId>no.nav.foreldrepenger.felles.ukelonn.integrasjon</groupId>
+            <artifactId>oekonomi-tilbakekreving-klient</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
