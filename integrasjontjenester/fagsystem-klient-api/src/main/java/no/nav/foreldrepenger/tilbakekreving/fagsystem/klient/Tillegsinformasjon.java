@@ -5,7 +5,7 @@ public enum Tillegsinformasjon {
     VARSELTEKST("tilbakekrevingsvarsel-fritekst"),
     SØKNAD("soknad"),
     TILBAKEKREVINGSVALG("tilbakekreving-valg", "tilbakekrevingvalg"),
-    FAGSAK("fagsak"),
+    FAGSAK("fagsak-backend"),
     VERGE("verge");
 
     private String fpsakRelasjonNavn;
