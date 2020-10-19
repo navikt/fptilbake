@@ -116,7 +116,6 @@ public class DokumentRestTjeneste {
     public Response hentForhåndsvisningHenleggelsesbrev(@Valid @NotNull HentForhåndsvisningHenleggelseslbrevDto henleggelseslbrevDto) { // NOSONAR
         byte[] dokument;
         BehandlingReferanse behandlingReferanse = henleggelseslbrevDto.getBehandlingReferanse();
-        System.out.println("behandlingReferanse: " + behandlingReferanse);
         String fritekst = henleggelseslbrevDto.getFritekst();
         if (behandlingReferanse.erInternBehandlingId()) {
             dokument = henleggelsesbrevTjeneste.hentForhåndsvisningHenleggelsebrev(behandlingReferanse.getBehandlingId(), fritekst);
