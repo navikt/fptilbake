@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
@@ -14,6 +15,7 @@ import java.util.Scanner;
 import org.junit.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
@@ -23,7 +25,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Ak
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.AnnenVurdering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.SærligGrunn;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.FritekstVedtaksbrevData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbBehandling;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbKonfigurasjon;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbPerson;
@@ -650,59 +651,21 @@ public class TekstformatererVedtaksbrevTest {
     }
 
     @Test
-    public void skal_generere_vedtaksbrev_overskrift_engangstønad_ingen_tilbakebetaling_nynorsk() {
-        HbVedtaksbrevData data = lagBrevOverskriftTestoppsett(FagsakYtelseType.ENGANGSTØNAD, VedtakResultatType.INGEN_TILBAKEBETALING, Språkkode.nn);
-
-        String overskrift = TekstformatererVedtaksbrev.lagVedtaksbrevOverskrift(data, Språkkode.nn);
-        String fasit = "Du må ikkje betale tilbake eingongsstønaden";
-        assertThat(overskrift).isEqualToNormalizingNewlines(fasit);
-    }
-
-    @Test
-    public void skal_genere_fritekst_vedtaksbrev_overskrift_for_FP_med_full_tilbakebetaling(){
-        FritekstVedtaksbrevData fritekstVedtaksbrevData = lagFritekstVedtaksbrevData(VedtakResultatType.FULL_TILBAKEBETALING, FagsakYtelseType.FORELDREPENGER);
-
-        String overskrift = TekstformatererVedtaksbrev.lagFritekstVedtaksbrevOverskrift(fritekstVedtaksbrevData);
-        String fasit = "Du må betale tilbake foreldrepengene";
-        assertThat(overskrift).isNotEmpty();
-        assertThat(overskrift).isEqualToNormalizingNewlines(fasit);
-    }
-
-    @Test
-    public void skal_genere_fritekst_vedtaksbrev_overskrift_for_frisinn_med_ingen_tilbakebetaling(){
-        FritekstVedtaksbrevData fritekstVedtaksbrevData = lagFritekstVedtaksbrevData(VedtakResultatType.INGEN_TILBAKEBETALING, FagsakYtelseType.FRISINN);
-
-        String overskrift = TekstformatererVedtaksbrev.lagFritekstVedtaksbrevOverskrift(fritekstVedtaksbrevData);
-        String fasit = "Du må ikke betale tilbake kompensasjonsytelse for selvstendig næringsdrivende og frilansere";
-        assertThat(overskrift).isNotEmpty();
-        assertThat(overskrift).isEqualToNormalizingNewlines(fasit);
-    }
-
-    @Test
-    public void skal_genere_fritekst_vedtaksbrev_for_FP_med_full_tilbakebetaling() throws IOException{
-        FritekstVedtaksbrevData fritekstVedtaksbrevData = lagFritekstVedtaksbrevData(VedtakResultatType.FULL_TILBAKEBETALING, FagsakYtelseType.FORELDREPENGER);
-        String generertBrev = TekstformatererVedtaksbrev.lagFritekstVedtaksbrev(fritekstVedtaksbrevData);
+    public void skal_generere_fritekst_og_uten_perioder_vedtaksbrev_for_FP_med_full_tilbakebetaling() throws IOException{
+        HbVedtaksbrevData fritekstVedtaksbrevData = lagFritekstVedtaksbrevData(FagsakYtelseType.FORELDREPENGER, VedtakResultatType.FULL_TILBAKEBETALING, Språkkode.nb);
+        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(fritekstVedtaksbrevData);
         assertThat(generertBrev).isNotEmpty();
         String fasit = les("/vedtaksbrev/Fritekst_Vedtaksbrev_FP_full_tilbakebetaling.txt");
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 
     @Test
-    public void skal_genere_fritekst_vedtaksbrev_for_ES_med_ingen_tilbakebetaling() throws IOException{
-        FritekstVedtaksbrevData fritekstVedtaksbrevData = lagFritekstVedtaksbrevData(VedtakResultatType.INGEN_TILBAKEBETALING, FagsakYtelseType.ENGANGSTØNAD);
-        String generertBrev = TekstformatererVedtaksbrev.lagFritekstVedtaksbrev(fritekstVedtaksbrevData);
+    public void skal_generere_fritekst_og_uten_perioder_vedtaksbrev_for_ES_med_ingen_tilbakebetaling() throws IOException{
+        HbVedtaksbrevData fritekstVedtaksbrevData = lagFritekstVedtaksbrevData(FagsakYtelseType.ENGANGSTØNAD, VedtakResultatType.INGEN_TILBAKEBETALING, Språkkode.nb);
+        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(fritekstVedtaksbrevData);
         assertThat(generertBrev).isNotEmpty();
         String fasit = les("/vedtaksbrev/Fritekst_Vedtaksbrev_ES_ingen_tilbakebetaling.txt");
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
-    }
-
-    private FritekstVedtaksbrevData lagFritekstVedtaksbrevData(VedtakResultatType ingenTilbakebetaling, FagsakYtelseType frisinn) {
-        return FritekstVedtaksbrevData.builder()
-            .medHovedResultat(ingenTilbakebetaling)
-            .medFritekst("sender fritekst vedtaksbrev")
-            .medKlagefristUker(6)
-            .medYtelsetype(frisinn)
-            .medSpråkKode(Språkkode.nb).build();
     }
 
     private HbVedtaksbrevData lagBrevOverskriftTestoppsett(FagsakYtelseType ytelsetype,
@@ -728,6 +691,35 @@ public class TekstformatererVedtaksbrevTest {
         return new HbVedtaksbrevData(vedtaksbrevFelles, Collections.emptyList());
     }
 
+    private HbVedtaksbrevData lagFritekstVedtaksbrevData(FagsakYtelseType ytelsetype,
+                                                         VedtakResultatType hovedresultat,
+                                                         Språkkode språkkode) {
+        HbVedtaksbrevFelles vedtaksbrevFelles = lagTestBuilder()
+            .medSak(HbSak.build()
+                .medErFødsel(true)
+                .medYtelsetype(ytelsetype)
+                .medAntallBarn(1)
+                .medDatoFagsakvedtak(LocalDate.now())
+                .build())
+            .medVedtakResultat(HbTotalresultat.builder()
+                .medTotaltTilbakekrevesBeløp(BigDecimal.ZERO)
+                .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.ZERO)
+                .medTotaltRentebeløp(BigDecimal.ZERO)
+                .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.ZERO)
+                .medHovedresultat(hovedresultat)
+                .build())
+            .medBehandling(HbBehandling.builder()
+                .medErRevurdering(true)
+                .medOriginalBehandlingDatoFagsakvedtak(LocalDate.of(2020, 3, 4))
+                .build())
+            .medLovhjemmelVedtak("Folketrygdloven § 22-15")
+            .medSpråkkode(språkkode != null ? språkkode : Språkkode.nb)
+            .medFritekstOppsummering("sender fritekst vedtaksbrev")
+            .medVedtaksbrevType(VedtaksbrevType.FRITEKST_VEDTAK_OG_UTEN_PERIODE)
+            .build();
+        return new HbVedtaksbrevData(vedtaksbrevFelles, Collections.emptyList());
+    }
+
     private HbVedtaksbrevFelles.Builder lagTestBuilder() {
         return HbVedtaksbrevFelles.builder()
             .medKonfigurasjon(HbKonfigurasjon.builder()
@@ -742,7 +734,7 @@ public class TekstformatererVedtaksbrevTest {
 
     private String les(String filnavn) throws IOException {
         try (InputStream resource = getClass().getResourceAsStream(filnavn);
-             Scanner scanner = new Scanner(resource, "UTF-8")) {
+             Scanner scanner = new Scanner(resource, StandardCharsets.UTF_8)) {
             scanner.useDelimiter("\\A");
             return scanner.hasNext() ? scanner.next() : null;
         }

@@ -16,6 +16,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstOppsummering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
@@ -57,7 +58,9 @@ public class VedtaksbrevFritekstValidator {
             .ifPresent(vilkårVurderingEntitet -> validerSærligeGrunnerAnnet(vilkårVurderingEntitet, vedtaksbrevFritekstPerioder));
 
         FaktaFeilutbetaling faktaFeilutbetaling = faktaFeilutbetalingRepository.finnFaktaOmFeilutbetaling(behandlingId).orElseThrow();
-        validerFritekstFakta(faktaFeilutbetaling, vedtaksbrevFritekstPerioder);
+        if (vedtaksbrevFritekstOppsummering == null || vedtaksbrevFritekstOppsummering.getBrevType() == VedtaksbrevType.ORDINÆR) {
+            validerFritekstFakta(faktaFeilutbetaling, vedtaksbrevFritekstPerioder);
+        }
 
         validerAtPåkrevdOppsummeringErSatt(behandlingId, vedtaksbrevFritekstOppsummering);
     }

@@ -2,6 +2,8 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.dokument;
 
 import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.READ;
 
+import java.util.List;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -20,8 +22,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Avsnitt;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.ForhåndvisningVedtaksbrevTekstDto;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.HentForhåndsvisningFritekstVedtaksbrevDto;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.HentForhåndsvisningHenleggelseslbrevDto;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.HentForhåndsvisningVarselbrevDto;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.HentForhåndvisningVedtaksbrevPdfDto;
@@ -81,7 +83,8 @@ public class DokumentRestTjeneste {
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public ForhåndvisningVedtaksbrevTekstDto hentVedtaksbrevForRedigering(@NotNull @QueryParam ("uuid") @Valid BehandlingReferanse behandlingReferanse) { // NOSONAR
         Long behandlingId = hentBehandlingId(behandlingReferanse);
-        return vedtaksbrevTjeneste.hentForhåndsvisningVedtaksbrevSomTekst(behandlingId);
+        List<Avsnitt> avsnittene = vedtaksbrevTjeneste.hentForhåndsvisningVedtaksbrevSomTekst(behandlingId);
+        return new ForhåndvisningVedtaksbrevTekstDto(avsnittene);
     }
 
     private Long hentBehandlingId(@QueryParam("behandlingUuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
@@ -113,26 +116,13 @@ public class DokumentRestTjeneste {
     public Response hentForhåndsvisningHenleggelsesbrev(@Valid @NotNull HentForhåndsvisningHenleggelseslbrevDto henleggelseslbrevDto) { // NOSONAR
         byte[] dokument;
         BehandlingReferanse behandlingReferanse = henleggelseslbrevDto.getBehandlingReferanse();
+        System.out.println("behandlingReferanse: " + behandlingReferanse);
         String fritekst = henleggelseslbrevDto.getFritekst();
         if (behandlingReferanse.erInternBehandlingId()) {
             dokument = henleggelsesbrevTjeneste.hentForhåndsvisningHenleggelsebrev(behandlingReferanse.getBehandlingId(), fritekst);
         } else {
             dokument = henleggelsesbrevTjeneste.hentForhåndsvisningHenleggelsebrev(behandlingReferanse.getBehandlingUuid(), fritekst);
         }
-        Response.ResponseBuilder responseBuilder = lagRespons(dokument);
-        return responseBuilder.build();
-    }
-
-    @POST
-    @Timed
-    @Path("/forhandsvis-fritekst-vedtaksbrev")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Operation(tags = "dokument", description = "Returnerer en pdf som er en forhåndsvisning av varselbrevet")
-    @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
-    @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public Response hentForhåndsvisningFritekstVedtaksbrev(
-        @Parameter(description = "Inneholder kode til brevmal og data som skal flettes inn i brevet") @Valid HentForhåndsvisningFritekstVedtaksbrevDto hentForhåndsvisningFritekstVedtaksbrevDto) { // NOSONAR
-        byte[] dokument = vedtaksbrevTjeneste.hentForhåndsvisningFritekstVedtaksbrev(hentForhåndsvisningFritekstVedtaksbrevDto);
         Response.ResponseBuilder responseBuilder = lagRespons(dokument);
         return responseBuilder.build();
     }

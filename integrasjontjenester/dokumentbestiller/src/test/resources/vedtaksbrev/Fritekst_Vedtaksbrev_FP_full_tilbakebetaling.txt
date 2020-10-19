@@ -1,5 +1,7 @@
 sender fritekst vedtaksbrev
 
+_Lovhjemmelen vi har brukt
+Vedtaket er gjort etter Folketrygdloven § 22-15.
 _Skatt
 NAV gir opplysninger til Skatteetaten. Skatteetaten vil vurdere om det er grunnlag for å endre skatteoppgjør.
 _Hvordan betale tilbake pengene du skylder

@@ -7,6 +7,7 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
@@ -29,6 +30,7 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
     private HbKonfigurasjon konfigurasjon;
     @JsonProperty("fritekst-oppsummering")
     private String fritekstOppsummering;
+    private VedtaksbrevType vedtaksbrevType;
     @JsonProperty("behandling")
     private HbBehandling behandling;
     @JsonProperty("finnesVerge")
@@ -61,6 +63,10 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
 
     public void setFritekstOppsummering(String fritekstOppsummering) {
         this.fritekstOppsummering = fritekstOppsummering;
+    }
+
+    public VedtaksbrevType getVedtaksbrevType() {
+        return vedtaksbrevType;
     }
 
     public HbBehandling getBehandling() {
@@ -107,6 +113,11 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
     @JsonProperty("skal-ikke-vise-skatt")
     private boolean isSkalIkkeViseSkattInformasjon() {
         return FagsakYtelseType.ENGANGSTØNAD.equals(sak.getYtelsetype()) || !totalresultat.harSkattetrekk();
+    }
+
+    @JsonProperty("har-vedlegg")
+    public boolean isMedVedlegg() {
+        return vedtaksbrevType != VedtaksbrevType.FRITEKST_VEDTAK_OG_UTEN_PERIODE;
     }
 
     public VedtakResultatType getHovedresultat() {
@@ -162,6 +173,11 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
 
         public Builder medFritekstOppsummering(String fritekstOppsummering) {
             kladd.fritekstOppsummering = fritekstOppsummering;
+            return this;
+        }
+
+        public Builder medVedtaksbrevType(VedtaksbrevType type) {
+            kladd.vedtaksbrevType = type;
             return this;
         }
 
