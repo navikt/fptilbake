@@ -23,7 +23,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingEntitet;
@@ -52,7 +51,6 @@ public class VedtakOppsummeringTjeneste {
     private VilkårsvurderingRepository vilkårsvurderingRepository;
     private VurdertForeldelseRepository foreldelseRepository;
     private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository;
-    private KodeverkRepository kodeverkRepository;
     private TilbakekrevingBeregningTjeneste beregningTjeneste;
 
     VedtakOppsummeringTjeneste() {
@@ -68,7 +66,6 @@ public class VedtakOppsummeringTjeneste {
         this.vilkårsvurderingRepository = repositoryProvider.getVilkårsvurderingRepository();
         this.foreldelseRepository = repositoryProvider.getVurdertForeldelseRepository();
         this.faktaFeilutbetalingRepository = repositoryProvider.getFaktaFeilutbetalingRepository();
-        this.kodeverkRepository = repositoryProvider.getKodeverkRepository();
         this.beregningTjeneste = beregningTjeneste;
     }
 
