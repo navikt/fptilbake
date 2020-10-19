@@ -15,7 +15,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjenesteImpl;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.DokumentBestillerTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker;
@@ -28,13 +28,13 @@ public class InnhentDokumentasjonbrevTaskTest extends DokumentBestillerTestOppse
     private InnhentDokumentasjonbrevTjeneste mockInnhentDokumentasjonbrevTjeneste;
     private BehandlingModellRepository mockBehandlingModellRepository = mock(BehandlingModellRepository.class);
 
-    private BehandlingskontrollTjenesteImpl behandlingskontrollTjeneste;
+    private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private InnhentDokumentasjonbrevTask innhentDokumentasjonBrevTask;
 
     @Before
     public void setup() {
         mockInnhentDokumentasjonbrevTjeneste = mock(InnhentDokumentasjonbrevTjeneste.class);
-        behandlingskontrollTjeneste = new BehandlingskontrollTjenesteImpl(repositoryProvider, mockBehandlingModellRepository, null);
+        behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(repositoryProvider, mockBehandlingModellRepository, null);
 
         innhentDokumentasjonBrevTask = new InnhentDokumentasjonbrevTask(repositoryProvider,
             mockInnhentDokumentasjonbrevTjeneste,

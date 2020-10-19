@@ -11,7 +11,6 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
 
 import no.nav.foreldrepenger.tilbakekreving.avstemming.sftp.SftpKonfig;
-import no.nav.foreldrepenger.tilbakekreving.avstemming.sftp.SftpKonfigImpl;
 import no.nav.foreldrepenger.tilbakekreving.avstemming.sftp.SftpTjeneste;
 import no.nav.vedtak.konfig.KonfigVerdi;
 
@@ -32,7 +31,7 @@ class AvstemmingSftpBatchTjeneste extends SftpTjeneste {
                                        @KonfigVerdi(value = "AVSTEMMING_SFTP_KEY_PUBLIC") String publicKey,
                                        @KonfigVerdi(value = "AVSTEMMING_SFTP_KEY_PASSPHRASE", required = false) String passphrase,
                                        @KonfigVerdi(value = "AVSTEMMING_SFTP_DIRECTORY", defaultVerdi = "inbound") String directory) throws Exception {
-        SftpKonfigImpl.Builder builder = SftpKonfigImpl.builder(username, host)
+        SftpKonfig.Builder builder = SftpKonfig.builder(username, host)
             .medPort(port)
             .medDirectory(directory)
             .medKeyAsParams(base64Decode(privateKey), base64Decode(publicKey), passphrase);

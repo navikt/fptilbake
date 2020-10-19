@@ -20,7 +20,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingMangle
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingManglerKravgrunnlagFristenUtløptEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStatusEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollEvent;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;

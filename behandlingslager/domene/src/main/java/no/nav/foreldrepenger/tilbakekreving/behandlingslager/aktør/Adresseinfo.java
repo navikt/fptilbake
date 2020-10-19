@@ -3,7 +3,6 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør;
 import java.util.Objects;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.AdresseType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.PersonstatusType;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 
 public class Adresseinfo {
@@ -18,7 +17,6 @@ public class Adresseinfo {
     private String postNr;
     private String poststed;
     private String land;
-    private PersonstatusType personstatus;
     private String vergeOrganisasjonNummer;
     private String annenMottakerNavn;
 
@@ -65,14 +63,6 @@ public class Adresseinfo {
         return gjeldendePostadresseType;
     }
 
-    public PersonstatusType getPersonstatus() {
-        return personstatus;
-    }
-
-    public void setPersonstatus(PersonstatusType personstatus) {
-        this.personstatus = personstatus;
-    }
-
     public String getVergeOrganisasjonNummer() {
         return vergeOrganisasjonNummer;
     }
@@ -96,17 +86,15 @@ public class Adresseinfo {
         private String postNr;
         private String poststed;
         private String land;
-        private PersonstatusType personstatus;
         private String vergeOrganisasjonNummer;
         private String annenMottakerNavn;
 
-        //TODO kan personstatus fjernes? Ser ikke ut som brukes
-        public Builder(AdresseType gjeldende, PersonIdent fnr, String mottakerNavn, PersonstatusType personstatus) {
+        public Builder(AdresseType gjeldende, PersonIdent fnr, String mottakerNavn) {
             this.gjeldendePostadresseType = gjeldende;
             this.fnr = fnr;
             this.mottakerNavn = mottakerNavn;
-            this.personstatus = personstatus;
         }
+
         public Builder medAdresselinje1(String adresselinje1) {
             this.adresselinje1 = adresselinje1;
             return this;
@@ -165,7 +153,6 @@ public class Adresseinfo {
             adresseinfo.postNr = this.postNr;
             adresseinfo.poststed = this.poststed;
             adresseinfo.land = this.land;
-            adresseinfo.personstatus = this.personstatus;
             adresseinfo.vergeOrganisasjonNummer = this.vergeOrganisasjonNummer;
             adresseinfo.annenMottakerNavn = this.annenMottakerNavn;
             return adresseinfo;

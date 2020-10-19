@@ -21,11 +21,9 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurdertForeldelseTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepositoryImpl;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
@@ -37,7 +35,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProviderImpl;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
@@ -70,7 +68,7 @@ public class BehandlingDtoTjenesteTest {
     @Rule
     public UnittestRepositoryRule repositoryRule = new UnittestRepositoryRule();
     private final EntityManager entityManager = repositoryRule.getEntityManager();
-    private BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProviderImpl(entityManager);
+    private BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(entityManager);
 
     private BehandlingRepository behandlingRepository = repositoryProvider.getBehandlingRepository();
     private FagsakRepository fagsakRepository = repositoryProvider.getFagsakRepository();
@@ -79,7 +77,7 @@ public class BehandlingDtoTjenesteTest {
     private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository = repositoryProvider.getFaktaFeilutbetalingRepository();
     private VilkårsvurderingRepository vilkårsvurderingRepository = repositoryProvider.getVilkårsvurderingRepository();
     private KravgrunnlagRepository grunnlagRepository = repositoryProvider.getGrunnlagRepository();
-    private BehandlingModellRepository behandlingModellRepository = new BehandlingModellRepositoryImpl(repositoryRule.getEntityManager());
+    private BehandlingModellRepository behandlingModellRepository = new BehandlingModellRepository(repositoryRule.getEntityManager());
     private BehandlingDtoTjeneste behandlingDtoTjeneste = new BehandlingDtoTjeneste(behandlingTjeneste, foreldelseTjeneste, repositoryProvider, behandlingModellRepository, "fptilbake");
 
     private Saksnummer saksnummer = new Saksnummer(GYLDIG_SAKSNR);

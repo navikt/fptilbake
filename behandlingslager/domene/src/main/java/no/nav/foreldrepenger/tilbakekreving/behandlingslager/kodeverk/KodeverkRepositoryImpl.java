@@ -56,7 +56,7 @@ public class KodeverkRepositoryImpl implements KodeverkRepository {
     public KodeverkRepositoryImpl(EntityManager entityManager) {
         Objects.requireNonNull(entityManager, "entityManager"); //$NON-NLS-1$
         this.entityManager = entityManager;
-        this.kodeverkTabellRepository = new KodeverkTabellRepositoryImpl(entityManager);
+        this.kodeverkTabellRepository = new KodeverkTabellRepository(entityManager);
     }
 
     @Override

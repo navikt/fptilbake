@@ -3,6 +3,9 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingskontroll;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollAsynkTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
+
 @ApplicationScoped
 public class BehandlingskontrollProvider {
 

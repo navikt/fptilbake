@@ -17,10 +17,8 @@ import org.junit.rules.ExpectedException;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.AdresseType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.PersonstatusType;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.TpsAdapter;
-import no.nav.foreldrepenger.tilbakekreving.domene.person.TpsTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.tjeneste.virksomhet.person.v3.binding.HentPersonSikkerhetsbegrensning;
@@ -55,7 +53,7 @@ public class TpsTjenesteTest {
         AKTØR_ID_VED_FNR.put(FNR, AKTØR_ID);
         AKTØR_ID_VED_FNR.put(ENDRET_FNR, ENDRET_AKTØR_ID);
 
-        tpsTjeneste = new TpsTjenesteImpl(new TpsAdapterMock());
+        tpsTjeneste = new TpsTjeneste(new TpsAdapterMock());
     }
 
     @Test
@@ -104,7 +102,7 @@ public class TpsTjenesteTest {
 
         @Override
         public Adresseinfo hentAdresseinformasjon(PersonIdent fnr) {
-            return new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE, fnr, NAVN, PersonstatusType.BOSA)
+            return new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE, fnr, NAVN)
                     .medAdresselinje1(ADR1)
                     .medAdresselinje2(ADR2)
                     .medAdresselinje3(ADR3)

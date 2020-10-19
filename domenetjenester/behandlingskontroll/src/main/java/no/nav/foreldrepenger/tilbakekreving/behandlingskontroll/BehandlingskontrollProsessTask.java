@@ -1,5 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingskontroll;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDataWrapper;
@@ -17,7 +18,7 @@ public abstract class BehandlingskontrollProsessTask implements ProsessTaskHandl
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
 
     protected BehandlingskontrollProsessTask(BehandlingRepository behandlingRepository,
-            BehandlingskontrollTjeneste behandlingskontrollTjeneste) {
+                                             BehandlingskontrollTjeneste behandlingskontrollTjeneste) {
         this.behandlingRepository = behandlingRepository;
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
     }

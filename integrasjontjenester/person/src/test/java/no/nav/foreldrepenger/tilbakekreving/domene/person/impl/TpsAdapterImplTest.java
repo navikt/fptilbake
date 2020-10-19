@@ -3,13 +3,11 @@ package no.nav.foreldrepenger.tilbakekreving.domene.person.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.Optional;
 
 import org.junit.Before;
@@ -18,23 +16,18 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBrukerKodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.AdresseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.NavBrukerKjønn;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.PersonstatusType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingsgrunnlagKodeverkRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Region;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.GeografiKodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.SpråkKodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.tjeneste.virksomhet.person.v3.binding.HentPersonPersonIkkeFunnet;
 import no.nav.tjeneste.virksomhet.person.v3.binding.HentPersonSikkerhetsbegrensning;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.Bruker;
-import no.nav.tjeneste.virksomhet.person.v3.informasjon.Diskresjonskoder;
-import no.nav.tjeneste.virksomhet.person.v3.informasjon.Kommune;
-import no.nav.tjeneste.virksomhet.person.v3.meldinger.HentGeografiskTilknytningResponse;
 import no.nav.tjeneste.virksomhet.person.v3.meldinger.HentPersonRequest;
 import no.nav.tjeneste.virksomhet.person.v3.meldinger.HentPersonResponse;
 import no.nav.vedtak.exception.ManglerTilgangException;
@@ -49,28 +42,21 @@ public class TpsAdapterImplTest {
     private AktørConsumerMedCache aktørConsumerMock = Mockito.mock(AktørConsumerMedCache.class);
     private PersonConsumer personProxyServiceMock = Mockito.mock(PersonConsumer.class);
 
-    TpsTjenesteImpl tpsTjeneste = Mockito.mock(TpsTjenesteImpl.class);
+    TpsTjeneste tpsTjeneste = Mockito.mock(TpsTjeneste.class);
     private final AktørId aktørId = new AktørId("1337");
     private final PersonIdent fnr = new PersonIdent("11112222333");
 
     @Before
     public void setup() {
-        TpsAdresseOversetter tpsAdresseOversetter = new TpsAdresseOversetter(lagMockNavBrukerKodeverkRepository(), null);
-        TpsOversetter tpsOversetter = new TpsOversetter(
-            lagMockNavBrukerKodeverkRepository(), lagMockBehandlingsgrunnlagKodeverkRepository(), lagMockSpråkKodeverkRepository(), tpsAdresseOversetter);
+        TpsAdresseOversetter tpsAdresseOversetter = new TpsAdresseOversetter(null);
+        TpsOversetter tpsOversetter = new TpsOversetter(mockKodeverkRepository(), mock(GeografiKodeverkRepository.class), lagMockSpråkKodeverkRepository(), tpsAdresseOversetter);
         tpsAdapterImpl = new TpsAdapterImpl(aktørConsumerMock, personProxyServiceMock, tpsOversetter);
     }
 
-    private NavBrukerKodeverkRepository lagMockNavBrukerKodeverkRepository() {
-        NavBrukerKodeverkRepository mockNavBrukerKodeverkRepository = mock(NavBrukerKodeverkRepository.class);
-        when(mockNavBrukerKodeverkRepository.finnBrukerKjønn(any(String.class))).thenReturn(NavBrukerKjønn.KVINNE);
-        return mockNavBrukerKodeverkRepository;
-    }
-
-    private BehandlingsgrunnlagKodeverkRepository lagMockBehandlingsgrunnlagKodeverkRepository() {
-        BehandlingsgrunnlagKodeverkRepository mockBehandlingsgrunnlagKodeverkRepository = mock(BehandlingsgrunnlagKodeverkRepository.class);
-        when(mockBehandlingsgrunnlagKodeverkRepository.finnHøyestRangertRegion(Collections.singletonList(anyString()))).thenReturn(Region.NORDEN);
-        return mockBehandlingsgrunnlagKodeverkRepository;
+    private KodeverkRepository mockKodeverkRepository() {
+        KodeverkRepository kodeverkRepository = mock(KodeverkRepository.class);
+        when(kodeverkRepository.finn(Mockito.eq(NavBrukerKjønn.class), any(String.class))).thenReturn(NavBrukerKjønn.KVINNE);
+        return kodeverkRepository;
     }
 
     private SpråkKodeverkRepository lagMockSpråkKodeverkRepository() {
@@ -128,19 +114,6 @@ public class TpsAdapterImplTest {
         assertThat(personinfo.getFødselsdato()).isEqualTo(fødselsdato);
     }
 
-    private HentGeografiskTilknytningResponse mockHentGeografiskTilknytningResponse(String kommune, String diskresjonskode) {
-        HentGeografiskTilknytningResponse response = new HentGeografiskTilknytningResponse();
-        Kommune k = new Kommune();
-        k.setGeografiskTilknytning(kommune);
-        response.setGeografiskTilknytning(k);
-
-        Diskresjonskoder dk = new Diskresjonskoder();
-        dk.setValue(diskresjonskode);
-        response.setDiskresjonskode(dk);
-
-        return response;
-    }
-
     @Test(expected = TekniskException.class)
     public void skal_få_exception_når_tjenesten_ikke_kan_finne_personen() throws Exception {
         Mockito.when(personProxyServiceMock.hentPersonResponse(Mockito.any()))
@@ -169,10 +142,7 @@ public class TpsAdapterImplTest {
         final String addresse = "Veien 17";
 
         TpsOversetter tpsOversetterMock = Mockito.mock(TpsOversetter.class);
-        Adresseinfo.Builder builder = new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE,
-            new PersonIdent("11112222333"),
-            "Tjoms",
-            PersonstatusType.BOSA);
+        Adresseinfo.Builder builder = new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE, new PersonIdent("11112222333"), "Tjoms");
         Adresseinfo adresseinfoExpected = builder.medAdresselinje1(addresse).build();
 
         when(tpsOversetterMock.tilAdresseinfo(eq(person))).thenReturn(adresseinfoExpected);
