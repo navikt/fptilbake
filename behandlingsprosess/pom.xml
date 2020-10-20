@@ -26,10 +26,6 @@
         <!-- interne -->
         <dependency>
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
-            <artifactId>behandling</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
             <artifactId>behandlingslager-domene</artifactId>
         </dependency>
         <dependency>
@@ -44,7 +40,7 @@
         </dependency>
         <dependency>
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
-            <artifactId>domenetjenester-iverksett</artifactId>
+            <artifactId>domenetjenester</artifactId>
         </dependency>
         <dependency>
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
