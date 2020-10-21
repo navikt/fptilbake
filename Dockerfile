@@ -6,7 +6,10 @@ RUN mkdir /app/lib
 RUN mkdir /app/conf
 
 # lag en gruppe og en sysembruker (-r) uten passord, uten hjemme-katalog, uten shell.
-RUN groupadd -r applikasjon && useradd -r -s /bin/false -g applikasjon applikasjon
+# Endre så eier til appdynamics-loggene slik at de kan skrives til
+RUN groupadd -r applikasjon \
+ && useradd -r -s /bin/false -g applikasjon applikasjon \
+ && chown applikasjon  /opt/appdynamics/ver*/logs
 
 # Config
 COPY web/target/classes/logback.xml /app/conf/

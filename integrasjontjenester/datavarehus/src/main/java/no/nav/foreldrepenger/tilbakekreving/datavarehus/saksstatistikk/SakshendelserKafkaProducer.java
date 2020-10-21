@@ -24,7 +24,7 @@ public class SakshendelserKafkaProducer {
     }
 
     @Inject
-    public SakshendelserKafkaProducer(DvhKafkaProducer kafkaProducer, @KonfigVerdi(value = "kafka.dvh.saksstatistikk.topic", defaultVerdi = "privat-tilbakekreving-dvh-saksstatistikk-v1") String topic) {
+    public SakshendelserKafkaProducer(DvhKafkaProducer kafkaProducer, @KonfigVerdi(value = "kafka.dvh.saksstatistikk.topic") String topic) {
         this.kafkaProducer = kafkaProducer;
         this.topic = topic;
     }

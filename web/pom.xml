@@ -77,16 +77,6 @@
     </build>
 
     <dependencies>
-
-        <dependency>
-            <groupId>no.finn.unleash</groupId>
-            <artifactId>unleash-client-java</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.foreldrepenger.felles.integrasjon</groupId>
-            <artifactId>unleash-klient</artifactId>
-        </dependency>
-
         <!-- Database håndtering -->
         <dependency>
             <groupId>com.zaxxer</groupId>
@@ -135,7 +125,7 @@
         </dependency>
         <dependency>
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
-            <artifactId>behandling</artifactId>
+            <artifactId>domenetjenester</artifactId>
         </dependency>
         <dependency>
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>

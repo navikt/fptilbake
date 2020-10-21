@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>domenetjenester</artifactId>
+        <artifactId>fptilbake</artifactId>
         <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
         <version>${revision}${sha1}${changelist}</version>
     </parent>

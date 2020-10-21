@@ -129,8 +129,10 @@ public class HåndterGamleKravgrunnlagTjeneste {
                 håndterKravgrunnlagHvisBehandlingFinnes(mottattXmlId, kravgrunnlag431, saksnummer);
             }
         } catch (KravgrunnlagValidator.UgyldigKravgrunnlagException e) {
-            logger.warn("Kravgrunnlag med id={} er ugyldig og feiler med følgende exception:{}",
-                kravgrunnlag431.getEksternKravgrunnlagId(), e.getMessage());
+            logger.warn("Kravgrunnlag for saksnummer{} med id={} er ugyldig og feiler med følgende exception:{}",
+                kravgrunnlag431.getSaksnummer(),
+                kravgrunnlag431.getEksternKravgrunnlagId(),
+                e.getMessage());
         }
         return Optional.empty();
     }

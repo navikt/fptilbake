@@ -295,6 +295,7 @@ public class BehandlingDtoTjenesteTest {
             "brev-bestill",
             "brev-forhandvis",
             "handling-rettigheter",
+            "handling-rettigheter-v2",
             "finn-menyvalg-for-verge");
     }
 
@@ -313,6 +314,7 @@ public class BehandlingDtoTjenesteTest {
             "brev-bestill",
             "brev-forhandvis",
             "handling-rettigheter",
+            "handling-rettigheter-v2",
             "finn-menyvalg-for-verge");
     }
 
@@ -337,6 +339,7 @@ public class BehandlingDtoTjenesteTest {
             "brev-bestill",
             "brev-forhandvis",
             "handling-rettigheter",
+            "handling-rettigheter-v2",
             "finn-menyvalg-for-verge");
 
         assertThat(behandlingDto.isKanHenleggeBehandling()).isTrue();

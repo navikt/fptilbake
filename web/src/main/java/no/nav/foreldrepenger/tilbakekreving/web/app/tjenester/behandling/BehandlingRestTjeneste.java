@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -40,11 +41,13 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlendeEnhetTjen
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingRevurderingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.HenleggBehandlingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.verge.VergeTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingManglerKravgrunnlagFristenEndretEventPubliserer;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollAsynkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.OrganisasjonsEnhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
@@ -54,6 +57,8 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjons
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.AsyncPollingStatus;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingDtoTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingOperasjonerDto;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingOpprettingDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingRettigheterDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.ByttBehandlendeEnhetDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.FpsakUuidDto;
@@ -63,11 +68,13 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.Kla
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.OpprettBehandlingDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.ProsessTaskGruppeIdDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.Redirect;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.SakRettigheterDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.SettBehandlingPåVentDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.UtvidetBehandlingDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.UuidDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.SaksnummerDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.SøkestrengDto;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.VergeBehandlingsmenyEnum;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 
@@ -88,6 +95,7 @@ public class BehandlingRestTjeneste {
     private BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste;
     private BehandlendeEnhetTjeneste behandlendeEnhetTjeneste;
     private BehandlingManglerKravgrunnlagFristenEndretEventPubliserer fristenEndretEventPubliserer;
+    private VergeTjeneste vergeTjeneste;
 
     public BehandlingRestTjeneste() {
         // CDI
@@ -96,18 +104,21 @@ public class BehandlingRestTjeneste {
     @Inject
     public BehandlingRestTjeneste(BehandlingsTjenesteProvider behandlingsTjenesteProvider,
                                   BehandlingDtoTjeneste behandlingDtoTjeneste,
+                                  VergeTjeneste vergeTjeneste,
                                   BehandlingsprosessApplikasjonTjeneste behandlingsprosessTjeneste,
                                   BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste,
                                   BehandlingManglerKravgrunnlagFristenEndretEventPubliserer fristenEndretEventPubliserer) {
         this.behandlingTjeneste = behandlingsTjenesteProvider.getBehandlingTjeneste();
         this.gjenopptaBehandlingTjeneste = behandlingsTjenesteProvider.getGjenopptaBehandlingTjeneste();
         this.behandlingDtoTjeneste = behandlingDtoTjeneste;
+        this.vergeTjeneste = vergeTjeneste;
         this.behandlingsprosessTjeneste = behandlingsprosessTjeneste;
         this.henleggBehandlingTjeneste = behandlingsTjenesteProvider.getHenleggBehandlingTjeneste();
         this.revurderingTjeneste = behandlingsTjenesteProvider.getRevurderingTjeneste();
         this.behandlingskontrollAsynkTjeneste = behandlingskontrollAsynkTjeneste;
         this.behandlendeEnhetTjeneste = behandlingsTjenesteProvider.getEnhetTjeneste();
         this.fristenEndretEventPubliserer = fristenEndretEventPubliserer;
+        this.vergeTjeneste = vergeTjeneste;
     }
 
     @GET
@@ -411,6 +422,34 @@ public class BehandlingRestTjeneste {
         Boolean harSoknad = true;
         //TODO (TOR) Denne skal etterkvart returnere rettighetene knytta til behandlingsmeny i frontend
         return new BehandlingRettigheterDto(harSoknad);
+    }
+
+    @GET
+    @Path("/handling-rettigheter-v2")
+    @Operation(
+        tags = "behandlinger",
+        description = "Rettigheter for behandlinger og fagsak")
+    @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
+    public SakRettigheterDto hentBehandlingOperasjonRettigheterV2(@NotNull @QueryParam("saksnummer") @Valid SaksnummerDto saksnummerDto) {
+        Saksnummer saksnummer = new Saksnummer(saksnummerDto.getVerdi());
+
+        var rettigheter = behandlingTjeneste.hentBehandlinger(saksnummer).stream()
+            .filter(b -> BehandlingStatus.OPPRETTET.equals(b.getStatus()) || BehandlingStatus.UTREDES.equals(b.getStatus()))
+            .map(b -> new BehandlingOperasjonerDto(b.getUuid(), true, true,
+                b.isBehandlingPåVent(), !b.isBehandlingPåVent(), false, viseVerge(b)))
+            .collect(Collectors.toList());
+        var oppretting = List.of(new BehandlingOpprettingDto(BehandlingType.TILBAKEKREVING, behandlingTjeneste.hentBehandlinger(saksnummer).stream().allMatch(Behandling::erSaksbehandlingAvsluttet)),
+            new BehandlingOpprettingDto(BehandlingType.REVURDERING_TILBAKEKREVING, behandlingTjeneste.hentBehandlinger(saksnummer).stream().anyMatch(revurderingTjeneste::kanRevurderingOpprettes)));
+        return new SakRettigheterDto(false, oppretting, rettigheter);
+    }
+
+    private VergeBehandlingsmenyEnum viseVerge(Behandling behandling) {
+        boolean kanBehandlingEndres = !behandling.erSaksbehandlingAvsluttet() && !behandling.isBehandlingPåVent();
+        boolean finnesVerge = vergeTjeneste.hentVergeInformasjon(behandling.getId()).isPresent();
+        if (kanBehandlingEndres) {
+            return finnesVerge ? VergeBehandlingsmenyEnum.FJERN : VergeBehandlingsmenyEnum.OPPRETT;
+        }
+        return VergeBehandlingsmenyEnum.SKJUL;
     }
 
     private Behandling getBehandling(BehandlingReferanse behandlingReferanse) {

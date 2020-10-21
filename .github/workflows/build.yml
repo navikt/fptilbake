@@ -30,7 +30,7 @@ jobs:
           echo $GITHUB_TOKEN | docker login --username "x-access-token" --password-stdin https://docker.pkg.github.com
           oracle/start-oracle.sh &
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
 
       - name: Sett opp Java
         uses: actions/setup-java@v1
@@ -50,7 +50,7 @@ jobs:
       - name: Build (kompiler)
         env:
           GITHUB_USERNAME: x-access-token
-          GITHUB_PASSWORD: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+          GITHUB_PASSWORD: ${{ secrets.GH_ACCESS_TOKEN }}
         shell: bash
         run: |
           echo "Building $BUILD_VERSION"
@@ -65,7 +65,7 @@ jobs:
       - name: Migrer database
         env:
           GITHUB_USERNAME: x-access-token
-          GITHUB_PASSWORD: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+          GITHUB_PASSWORD: ${{ secrets.GH_ACCESS_TOKEN }}
         shell: bash
         run: |
           echo "Migrerer database"
@@ -74,7 +74,7 @@ jobs:
       - name: Build artifacts & deploy (inkl test)
         env:
           GITHUB_USERNAME: x-access-token
-          GITHUB_PASSWORD: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+          GITHUB_PASSWORD: ${{ secrets.GH_ACCESS_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
         run: |
@@ -86,7 +86,7 @@ jobs:
       - name: Bygg og push docker-image for distribuering
         env:
           GITHUB_USERNAME: x-access-token
-          GITHUB_PASSWORD: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+          GITHUB_PASSWORD: ${{ secrets.GH_ACCESS_TOKEN }}
         run: |
           docker build --pull --tag ${IMAGE_BASE}:${TAG} --tag ${IMAGE_BASE}:latest . | awk '{ print strftime("[%Y-%m-%d %H:%M:%S]"), $0 }'
           echo "$GITHUB_PASSWORD" | docker login --username "$GITHUB_USERNAME" --password-stdin https://docker.pkg.github.com
@@ -116,7 +116,7 @@ jobs:
         if: success()
         uses: peter-evans/create-or-update-comment@v1
         with:
-          token: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+          token: ${{ secrets.GH_ACCESS_TOKEN }}
           issue-number: ${{ steps.createdeployissue.outputs.number }}
           body: /promote fp dev-fss teamforeldrepenger
 
@@ -124,7 +124,7 @@ jobs:
         if: success()
         uses: peter-evans/create-or-update-comment@v1
         with:
-          token: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+          token: ${{ secrets.GH_ACCESS_TOKEN }}
           issue-number: ${{ steps.createdeployissue.outputs.number }}
           body: /promote k9 dev-fss default
 
