@@ -3,6 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev;
 import java.util.Objects;
 
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -27,6 +28,7 @@ public class VedtaksbrevFritekstOppsummering extends BaseEntitet {
     @Column(name = "OPPSUMMERING_FRITEKST")
     private String oppsummeringFritekst;
 
+    @Convert(converter = VedtaksbrevType.verdiConverter.class)
     @Column(name = "BREV_TYPE")
     private VedtaksbrevType brevType = VedtaksbrevType.ORDINÆR;
 

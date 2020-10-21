@@ -346,7 +346,7 @@ public class VedtaksbrevTjeneste {
                 .medErFødsel(SøknadType.FØDSEL == fagsystemBehandling.getSøknadType())
                 .medErAdopsjon(SøknadType.ADOPSJON == fagsystemBehandling.getSøknadType());
         }
-        VedtaksbrevType vedtaksbrevType = skalHaVedtakFritekstOgUtenPerioder ? VedtaksbrevType.FRITEKST_VEDTAK_OG_UTEN_PERIODE : VedtaksbrevType.ORDINÆR;
+        VedtaksbrevType vedtaksbrevType = skalHaVedtakFritekstOgUtenPerioder ? VedtaksbrevType.FRITEKST_FEILUTBETALING_BORTFALT : VedtaksbrevType.ORDINÆR;
         HbVedtaksbrevFelles.Builder vedtakDataBuilder = HbVedtaksbrevFelles.builder()
             .medSak(hbSakBuilder.build())
             .medBehandling(HbBehandling.builder()

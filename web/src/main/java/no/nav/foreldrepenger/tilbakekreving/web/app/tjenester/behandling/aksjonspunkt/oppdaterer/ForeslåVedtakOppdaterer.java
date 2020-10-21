@@ -49,7 +49,7 @@ public class ForeslåVedtakOppdaterer implements AksjonspunktOppdaterer<Foreslå
         Long behandlingId = behandling.getId();
         VedtaksbrevType brevType = VedtaksbrevType.ORDINÆR;
         if(behandling.erBehandlingRevurderingOgHarÅrsakFeilutbetalingBortfalt()){
-            brevType = VedtaksbrevType.FRITEKST;
+            brevType = VedtaksbrevType.FRITEKST_FEILUTBETALING_BORTFALT;
         }
         vedtaksbrevFritekstTjeneste.lagreFriteksterFraSaksbehandler(behandlingId, lagOppsummeringstekst(behandlingId, dto, brevType), lagPerioderMedTekst(behandlingId, dto.getPerioderMedTekst()));
         foreslåVedtakTjeneste.lagHistorikkInnslagForForeslåVedtak(behandlingId);
@@ -60,13 +60,11 @@ public class ForeslåVedtakOppdaterer implements AksjonspunktOppdaterer<Foreslå
 
     private List<VedtaksbrevFritekstPeriode> lagPerioderMedTekst(Long behandlingId, List<PeriodeMedTekstDto> perioderMedTekst) {
         List<VedtaksbrevFritekstPeriode> fritekstPerioder = new ArrayList<>();
-        if (!CollectionUtils.isEmpty(perioderMedTekst)) {
-            for (PeriodeMedTekstDto periodeDto : perioderMedTekst) {
-                lagFritekstPeriode(behandlingId, periodeDto, PeriodeMedTekstDto::getFaktaAvsnitt, VedtaksbrevFritekstType.FAKTA_AVSNITT).ifPresent(fritekstPerioder::add);
-                lagFritekstPeriode(behandlingId, periodeDto, PeriodeMedTekstDto::getVilkårAvsnitt, VedtaksbrevFritekstType.VILKAAR_AVSNITT).ifPresent(fritekstPerioder::add);
-                lagFritekstPeriode(behandlingId, periodeDto, PeriodeMedTekstDto::getSærligeGrunnerAvsnitt, VedtaksbrevFritekstType.SAERLIGE_GRUNNER_AVSNITT).ifPresent(fritekstPerioder::add);
-                lagFritekstPeriode(behandlingId, periodeDto, PeriodeMedTekstDto::getSærligeGrunnerAnnetAvsnitt, VedtaksbrevFritekstType.SAERLIGE_GRUNNER_ANNET_AVSNITT).ifPresent(fritekstPerioder::add);
-            }
+        for (PeriodeMedTekstDto periodeDto : perioderMedTekst) {
+            lagFritekstPeriode(behandlingId, periodeDto, PeriodeMedTekstDto::getFaktaAvsnitt, VedtaksbrevFritekstType.FAKTA_AVSNITT).ifPresent(fritekstPerioder::add);
+            lagFritekstPeriode(behandlingId, periodeDto, PeriodeMedTekstDto::getVilkårAvsnitt, VedtaksbrevFritekstType.VILKAAR_AVSNITT).ifPresent(fritekstPerioder::add);
+            lagFritekstPeriode(behandlingId, periodeDto, PeriodeMedTekstDto::getSærligeGrunnerAvsnitt, VedtaksbrevFritekstType.SAERLIGE_GRUNNER_AVSNITT).ifPresent(fritekstPerioder::add);
+            lagFritekstPeriode(behandlingId, periodeDto, PeriodeMedTekstDto::getSærligeGrunnerAnnetAvsnitt, VedtaksbrevFritekstType.SAERLIGE_GRUNNER_ANNET_AVSNITT).ifPresent(fritekstPerioder::add);
         }
         return fritekstPerioder;
     }

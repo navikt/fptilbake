@@ -99,6 +99,7 @@ public class TekstformatererVedtaksbrevTest {
                 .medKlagefristUker(6)
                 .build())
             .medSpråkkode(språkkode != null ? språkkode : Språkkode.nb)
+            .medVedtaksbrevType(VedtaksbrevType.ORDINÆR)
             .build();
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
             HbVedtaksbrevPeriode.builder()
@@ -171,6 +172,7 @@ public class TekstformatererVedtaksbrevTest {
             .medDatoer(HbVedtaksbrevDatoer.builder()
                 .medPerioder(perioder)
                 .build())
+            .medVedtaksbrevType(VedtaksbrevType.ORDINÆR)
             .build();
         HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
 
@@ -222,6 +224,7 @@ public class TekstformatererVedtaksbrevTest {
                 .medVarsletDato(LocalDate.of(2019, 1, 3))
                 .build())
             .medFritekstOppsummering("Skynd deg å betale, vi trenger pengene med en gang!")
+            .medVedtaksbrevType(VedtaksbrevType.ORDINÆR)
             .build();
 
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
@@ -321,6 +324,7 @@ public class TekstformatererVedtaksbrevTest {
             .medKonfigurasjon(HbKonfigurasjon.builder()
                 .medKlagefristUker(6)
                 .build())
+            .medVedtaksbrevType(VedtaksbrevType.ORDINÆR)
             .build();
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
             HbVedtaksbrevPeriode.builder()
@@ -364,6 +368,7 @@ public class TekstformatererVedtaksbrevTest {
             .medKonfigurasjon(HbKonfigurasjon.builder()
                 .medKlagefristUker(6)
                 .build())
+            .medVedtaksbrevType(VedtaksbrevType.ORDINÆR)
             .build();
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
             HbVedtaksbrevPeriode.builder()
@@ -410,6 +415,7 @@ public class TekstformatererVedtaksbrevTest {
                 .medVarsletBeløp(BigDecimal.valueOf(10000))
                 .medVarsletDato(LocalDate.of(2020, 4, 4))
                 .build())
+            .medVedtaksbrevType(VedtaksbrevType.ORDINÆR)
             .build();
 
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
@@ -454,6 +460,7 @@ public class TekstformatererVedtaksbrevTest {
                 .medVarsletBeløp(BigDecimal.valueOf(500000))
                 .medVarsletDato(LocalDate.of(2020, 4, 4))
                 .build())
+            .medVedtaksbrevType(VedtaksbrevType.ORDINÆR)
             .build();
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
             HbVedtaksbrevPeriode.builder()
@@ -498,6 +505,7 @@ public class TekstformatererVedtaksbrevTest {
                 .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.valueOf(1000))
                 .build())
             .medLovhjemmelVedtak("Folketrygdloven § 22-15")
+            .medVedtaksbrevType(VedtaksbrevType.ORDINÆR)
             .build();
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
             HbVedtaksbrevPeriode.builder()
@@ -555,6 +563,7 @@ public class TekstformatererVedtaksbrevTest {
                 .medVarsletBeløp(BigDecimal.valueOf(500))
                 .medVarsletDato(LocalDate.of(2020, 4, 4))
                 .build())
+            .medVedtaksbrevType(VedtaksbrevType.ORDINÆR)
             .build();
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
             HbVedtaksbrevPeriode.builder()
@@ -600,6 +609,7 @@ public class TekstformatererVedtaksbrevTest {
                 .build())
             .medErFeilutbetaltBeløpKorrigertNed(true)
             .medTotaltFeilutbetaltBeløp(BigDecimal.valueOf(1000))
+            .medVedtaksbrevType(VedtaksbrevType.ORDINÆR)
             .build();
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
             HbVedtaksbrevPeriode.builder()
@@ -715,7 +725,7 @@ public class TekstformatererVedtaksbrevTest {
             .medLovhjemmelVedtak("Folketrygdloven § 22-15")
             .medSpråkkode(språkkode != null ? språkkode : Språkkode.nb)
             .medFritekstOppsummering("sender fritekst vedtaksbrev")
-            .medVedtaksbrevType(VedtaksbrevType.FRITEKST_VEDTAK_OG_UTEN_PERIODE)
+            .medVedtaksbrevType(VedtaksbrevType.FRITEKST_FEILUTBETALING_BORTFALT)
             .build();
         return new HbVedtaksbrevData(vedtaksbrevFelles, Collections.emptyList());
     }

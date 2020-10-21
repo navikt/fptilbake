@@ -63,10 +63,14 @@ class TekstformatererVedtaksbrev extends FellesTekstformaterer {
     }
 
     public static String lagVedtakStart(HbVedtaksbrevFelles vedtaksbrevFelles) {
-        if (vedtaksbrevFelles.getVedtaksbrevType() == VedtaksbrevType.FRITEKST_VEDTAK_OG_UTEN_PERIODE) {
-            return konverterMedPartialTemplate("vedtak/fritekstVedtakOgUtenPeriode/fritekstVedtakOgUtenPeriode_start", vedtaksbrevFelles);
+        switch (vedtaksbrevFelles.getVedtaksbrevType()) {
+            case FRITEKST_FEILUTBETALING_BORTFALT:
+                return konverterMedPartialTemplate("vedtak/fritekstVedtakOgUtenPeriode/fritekstVedtakOgUtenPeriode_start", vedtaksbrevFelles);
+            case ORDINÆR:
+                return konverterMedPartialTemplate("vedtak/vedtak_start", vedtaksbrevFelles);
+            default:
+                throw new IllegalArgumentException("Utviklerfeil: ustøttet VedtaksbrevType(" + vedtaksbrevFelles.getVedtaksbrevType() + ") i VedtaksbrevFormatterer");
         }
-        return konverterMedPartialTemplate("vedtak/vedtak_start", vedtaksbrevFelles);
     }
 
     static List<Avsnitt> lagPerioderAvsnitt(HbVedtaksbrevData vedtaksbrevData) {
@@ -240,10 +244,14 @@ class TekstformatererVedtaksbrev extends FellesTekstformaterer {
     }
 
     static String lagVedtaksbrevFritekst(HbVedtaksbrevData vedtaksbrevData) {
-        if (vedtaksbrevData.getFelles().getVedtaksbrevType() == VedtaksbrevType.FRITEKST_VEDTAK_OG_UTEN_PERIODE) {
-            return lagVedtaksbrev("vedtak/fritekstVedtakOgUtenPeriode/fritekstVedtakOgUtenPeriode", vedtaksbrevData);
+        switch (vedtaksbrevData.getFelles().getVedtaksbrevType()) {
+            case FRITEKST_FEILUTBETALING_BORTFALT:
+                return lagVedtaksbrev("vedtak/fritekstVedtakOgUtenPeriode/fritekstVedtakOgUtenPeriode", vedtaksbrevData);
+            case ORDINÆR:
+                return lagVedtaksbrev("vedtak/vedtak", vedtaksbrevData);
+            default:
+                throw new IllegalArgumentException("Utviklerfeil: ustøttet VedtaksbrevType(" + vedtaksbrevData.getFelles().getVedtaksbrevType() + ") i VedtaksbrevFormatterer");
         }
-        return lagVedtaksbrev("vedtak/vedtak", vedtaksbrevData);
     }
 
     private static String lagVedtaksbrev(String mal, HbVedtaksbrevData vedtaksbrevData) {
