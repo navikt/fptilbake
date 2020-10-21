@@ -1,5 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling;
 
+import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -30,6 +31,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlendeEnhetTjen
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingRevurderingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.HenleggBehandlingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.verge.VergeTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingManglerKravgrunnlagFristenEndretEventPubliserer;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollAsynkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker;
@@ -39,6 +41,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandlingsresultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
@@ -56,6 +60,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.Kla
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.OpprettBehandlingDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.UuidDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.SaksnummerDto;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.VergeBehandlingsmenyEnum;
 import no.nav.vedtak.exception.TekniskException;
 
 public class BehandlingRestTjenesteTest {
@@ -80,8 +85,9 @@ public class BehandlingRestTjenesteTest {
     private BehandlingsTjenesteProvider behandlingsTjenesteProvider = new BehandlingsTjenesteProvider(behandlingTjenesteMock, gjenopptaBehandlingTjenesteMock,
         henleggBehandlingTjenesteMock, revurderingTjenesteMock, behandlendeEnhetTjenesteMock);
     private BehandlingManglerKravgrunnlagFristenEndretEventPubliserer fristenEndretEventPubliserer = mock(BehandlingManglerKravgrunnlagFristenEndretEventPubliserer.class);
+    private VergeTjeneste vergeTjenesteMock = mock(VergeTjeneste.class);
 
-    private BehandlingRestTjeneste behandlingRestTjeneste = new BehandlingRestTjeneste(behandlingsTjenesteProvider, behandlingDtoTjenesteMock,
+    private BehandlingRestTjeneste behandlingRestTjeneste = new BehandlingRestTjeneste(behandlingsTjenesteProvider, behandlingDtoTjenesteMock, vergeTjenesteMock,
         behandlingsprosessTjeneste, behandlingskontrollAsynkTjenesteMock,fristenEndretEventPubliserer);
 
     private static SaksnummerDto saksnummerDto = new SaksnummerDto(GYLDIG_SAKSNR);
@@ -177,6 +183,42 @@ public class BehandlingRestTjenesteTest {
         Response response = behandlingRestTjeneste.harÅpenTilbakekrevingBehandling(saksnummerDto);
         assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_OK);
         assertThat(response.getEntity()).isEqualTo(false);
+    }
+
+    @Test
+    public void skal_gi_rettigheter_for_vise_verge() {
+        Behandling behandling = ScenarioSimple.simple().lagMocked();
+        when(behandlingTjenesteMock.hentBehandlinger(any(Saksnummer.class))).thenReturn(Lists.newArrayList(behandling));
+        var response = behandlingRestTjeneste.hentBehandlingOperasjonRettigheterV2(saksnummerDto);
+        assertThat(response.getBehandlingTillatteOperasjoner()).hasSize(1);
+        assertThat(response.getBehandlingTillatteOperasjoner().get(0).getVergeBehandlingsmeny()).isEqualTo(VergeBehandlingsmenyEnum.OPPRETT);
+        assertThat(response.getBehandlingTillatteOperasjoner().get(0).isBehandlingKanGjenopptas()).isFalse();
+        assertThat(response.getBehandlingTillatteOperasjoner().get(0).isBehandlingKanSettesPaVent()).isTrue();
+        assertThat(response.getBehandlingTypeKanOpprettes().stream().filter(b -> BehandlingType.TILBAKEKREVING.equals(b.getBehandlingType())).findAny())
+            .hasValueSatisfying(v -> assertThat(v.isKanOppretteBehandling()).isFalse());
+        assertThat(response.getBehandlingTypeKanOpprettes().stream().filter(b -> BehandlingType.REVURDERING_TILBAKEKREVING.equals(b.getBehandlingType())).findAny())
+            .hasValueSatisfying(v -> assertThat(v.isKanOppretteBehandling()).isFalse());
+
+        when(vergeTjenesteMock.hentVergeInformasjon(anyLong())).thenReturn(Optional.of(VergeEntitet.builder()
+            .medBegrunnelse("bla").medKilde("bla").medOrganisasjonnummer("999999999").medNavn("Vegard Verge").medVergeType(VergeType.ADVOKAT).build()));
+        response = behandlingRestTjeneste.hentBehandlingOperasjonRettigheterV2(saksnummerDto);
+        assertThat(response.getBehandlingTillatteOperasjoner().get(0).getVergeBehandlingsmeny()).isEqualTo(VergeBehandlingsmenyEnum.FJERN);
+
+        behandling.avsluttBehandling();
+        response = behandlingRestTjeneste.hentBehandlingOperasjonRettigheterV2(saksnummerDto);
+        assertThat(response.getBehandlingTillatteOperasjoner()).isEmpty();
+        assertThat(response.getBehandlingTypeKanOpprettes().stream().filter(b -> BehandlingType.TILBAKEKREVING.equals(b.getBehandlingType())).findAny())
+            .hasValueSatisfying(v -> assertThat(v.isKanOppretteBehandling()).isTrue());
+        assertThat(response.getBehandlingTypeKanOpprettes().stream().filter(b -> BehandlingType.REVURDERING_TILBAKEKREVING.equals(b.getBehandlingType())).findAny())
+            .hasValueSatisfying(v -> assertThat(v.isKanOppretteBehandling()).isFalse());
+
+        when(revurderingTjenesteMock.kanRevurderingOpprettes(any(Behandling.class))).thenReturn(true);
+        response = behandlingRestTjeneste.hentBehandlingOperasjonRettigheterV2(saksnummerDto);
+        assertThat(response.getBehandlingTillatteOperasjoner()).isEmpty();
+        assertThat(response.getBehandlingTypeKanOpprettes().stream().filter(b -> BehandlingType.TILBAKEKREVING.equals(b.getBehandlingType())).findAny())
+            .hasValueSatisfying(v -> assertThat(v.isKanOppretteBehandling()).isTrue());
+        assertThat(response.getBehandlingTypeKanOpprettes().stream().filter(b -> BehandlingType.REVURDERING_TILBAKEKREVING.equals(b.getBehandlingType())).findAny())
+            .hasValueSatisfying(v -> assertThat(v.isKanOppretteBehandling()).isTrue());
     }
 
     @Test
