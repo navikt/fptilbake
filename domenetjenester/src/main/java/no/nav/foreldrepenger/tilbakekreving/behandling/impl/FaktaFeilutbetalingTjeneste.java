@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -54,7 +55,7 @@ public class FaktaFeilutbetalingTjeneste {
 
     }
 
-    public LogiskPeriodeMedFaktaDto hentFeilutbetalingÅrsak(Long behandlingId, LogiskPeriode logiskPeriode, FaktaFeilutbetaling fakta) {
+    static LogiskPeriodeMedFaktaDto leggPåFakta(LogiskPeriode logiskPeriode, FaktaFeilutbetaling fakta) {
         LogiskPeriodeMedFaktaDto resultat = LogiskPeriodeMedFaktaDto.lagPeriode(logiskPeriode.getPeriode(), logiskPeriode.getFeilutbetaltBeløp());
 
         if (fakta != null) {
@@ -77,11 +78,10 @@ public class FaktaFeilutbetalingTjeneste {
 
         List<LogiskPeriode> logiskePerioder = kravgrunnlagTjeneste.utledLogiskPeriode(behandlingId);
         FaktaFeilutbetaling fakta = faktaFeilutbetalingRepository.finnFaktaOmFeilutbetaling(behandlingId).orElse(null);
-        List<LogiskPeriodeMedFaktaDto> logiskePerioderMedFakta = new ArrayList<>();
-        ;
-        for (LogiskPeriode logiskPeriode : logiskePerioder) {
-            logiskePerioderMedFakta.add(hentFeilutbetalingÅrsak(behandlingId, logiskPeriode, fakta));
-        }
+        List<LogiskPeriodeMedFaktaDto> logiskePerioderMedFakta = logiskePerioder.stream()
+            .map(logiskPeriode -> leggPåFakta(logiskPeriode, fakta))
+            .collect(Collectors.toList());
+
         String begrunnelse = hentFaktaBegrunnelse(behandlingId);
         Long tidligereVarseltBeløp = resultat.map(VarselInfo::getVarselBeløp).orElse(null);
         return BehandlingFeilutbetalingFakta.builder()
@@ -115,7 +115,7 @@ public class FaktaFeilutbetalingTjeneste {
 
     }
 
-    private HendelseTypeMedUndertypeDto mapFra(Optional<FaktaFeilutbetalingPeriode> årsak) {
+    private static HendelseTypeMedUndertypeDto mapFra(Optional<FaktaFeilutbetalingPeriode> årsak) {
         if (årsak.isPresent()) {
             FaktaFeilutbetalingPeriode faktaFeilutbetalingPeriode = årsak.get();
             return new HendelseTypeMedUndertypeDto(faktaFeilutbetalingPeriode.getHendelseType(), faktaFeilutbetalingPeriode.getHendelseUndertype());
