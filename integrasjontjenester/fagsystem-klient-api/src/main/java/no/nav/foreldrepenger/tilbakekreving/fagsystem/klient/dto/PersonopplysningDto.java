@@ -16,6 +16,7 @@ public class PersonopplysningDto {
     private String fødselsnummer;
     private List<PersonopplysningDto> barnSoktFor = new ArrayList<>();
     private List<PersonadresseDto> adresser = new ArrayList<>();
+    private Integer antallBarn;
 
     public String getFødselsnummer() {
         return fødselsnummer;
@@ -64,4 +65,13 @@ public class PersonopplysningDto {
     public void setBarnSoktFor(List<PersonopplysningDto> barnSoktFor) {
         this.barnSoktFor = barnSoktFor;
     }
+
+    public Integer getAntallBarn() {
+        return antallBarn;
+    }
+
+    public void setAntallBarn(Integer antallBarn) {
+        this.antallBarn = antallBarn;
+    }
+
 }

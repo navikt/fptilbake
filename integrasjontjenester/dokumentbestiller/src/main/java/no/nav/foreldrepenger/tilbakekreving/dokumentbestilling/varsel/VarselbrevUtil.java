@@ -77,6 +77,7 @@ public class VarselbrevUtil {
                                                                                               String varseltekst,
                                                                                               Adresseinfo adresseinfo,
                                                                                               SamletEksternBehandlingInfo eksternBehandlingsinfo,
+                                                                                              Personinfo personinfo,
                                                                                               FeilutbetaltePerioderDto feilutbetaltePerioderDto,
                                                                                               Period ventetid,
                                                                                               FagsakYtelseType fagsakYtelseType,
@@ -88,10 +89,10 @@ public class VarselbrevUtil {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
             .medBehandlendeEnhetId(grunninformasjon.getBehandlendeEnhetId())
             .medBehandlendeEnhetNavn(grunninformasjon.getBehandlendeEnhetNavn())
-            .medSakspartId(eksternBehandlingsinfo.getPersonopplysninger().getFødselsnummer())
+            .medSakspartId(personinfo.getPersonIdent().getIdent())
             .medMottakerAdresse(adresseinfo)
             .medSaksnummer(saksnummer.getVerdi())
-            .medSakspartNavn(eksternBehandlingsinfo.getPersonopplysninger().getNavn())
+            .medSakspartNavn(personinfo.getNavn())
             .medFinnesVerge(finnesVerge)
             .medVergeNavn(vergeNavn)
             .medFagsaktype(fagsakYtelseType)

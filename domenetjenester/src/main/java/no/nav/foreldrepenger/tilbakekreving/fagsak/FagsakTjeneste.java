@@ -63,6 +63,10 @@ public class FagsakTjeneste {
         return aktørId.get();
     }
 
+    public String hentNavnForAktør(AktørId aktørId){
+        return tpsTjeneste.hentBrukerForAktør(aktørId).map(Personinfo::getNavn).orElseThrow(() -> BehandlingFeil.FACTORY.fantIkkePersonMedAktørId().toException());
+    }
+
     private NavBruker hentNavBruker(AktørId aktørId) {
         NavBruker navBruker;
         Optional<NavBruker> navBrukerOptional = navBrukerRepository.hent(aktørId);

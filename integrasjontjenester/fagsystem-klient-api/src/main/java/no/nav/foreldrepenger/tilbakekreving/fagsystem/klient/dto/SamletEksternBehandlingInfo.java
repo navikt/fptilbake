@@ -65,7 +65,7 @@ public class SamletEksternBehandlingInfo {
     }
 
     public int getAntallBarnSøktFor() {
-        return getPersonopplysninger().getBarnSoktFor().size();
+        return getPersonopplysninger().getAntallBarn() != null ? personopplysninger.getAntallBarn() : getPersonopplysninger().getBarnSoktFor().size();
     }
 
     SamletEksternBehandlingInfo() {

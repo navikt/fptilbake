@@ -232,6 +232,7 @@ public class VarselbrevTjeneste {
             varseltekst,
             adresseinfo,
             eksternBehandlingsinfo,
+            personinfo,
             feilutbetaltePerioderDto,
             eksternDataForBrevTjeneste.getBrukersSvarfrist(),
             fagsakYtleseType,
