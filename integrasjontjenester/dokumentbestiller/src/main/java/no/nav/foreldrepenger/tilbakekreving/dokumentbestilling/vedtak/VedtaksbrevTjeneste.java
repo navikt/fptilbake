@@ -298,75 +298,50 @@ public class VedtaksbrevTjeneste {
         //TODO hent data fra fpsak i tidligere steg, og hent fra repository her
         SamletEksternBehandlingInfo fagsystemBehandling = hentDataFraFagsystem(behandling);
         Personinfo personinfo = eksternDataForBrevTjeneste.hentPerson(behandling.getAktørId().getId());
-        Long varsletBeløp = finnVarsletBeløp(behandlingId);
-        LocalDate varsletDato = finnVarsletDato(behandlingId);
         BeregningResultat beregnetResultat = tilbakekrevingBeregningTjeneste.beregn(behandlingId);
+
+        BrevMetadata brevMetadata = lagMetadataForVedtaksbrev(behandling, fagsystemBehandling, personinfo, beregnetResultat.getVedtakResultatType(), brevMottaker);
+        HbVedtaksbrevData data = lagHbVedtaksbrevData(behandling, fagsystemBehandling, personinfo, beregnetResultat, oppsummeringFritekst, perioderFritekst, brevMetadata);
+
+        return new VedtaksbrevData(data, brevMetadata);
+    }
+
+    private HbVedtaksbrevData lagHbVedtaksbrevData(Behandling behandling,
+                                                   SamletEksternBehandlingInfo fagsystemBehandling,
+                                                   Personinfo personinfo,
+                                                   BeregningResultat beregnetResultat,
+                                                   String oppsummeringFritekst,
+                                                   List<PeriodeMedTekstDto> perioderFritekst,
+                                                   BrevMetadata brevMetadata) {
         List<BeregningResultatPeriode> resulatPerioder = beregnetResultat.getBeregningResultatPerioder();
         VedtakResultatType vedtakResultatType = beregnetResultat.getVedtakResultatType();
-        FaktaFeilutbetaling fakta = faktaRepository.finnFaktaOmFeilutbetaling(behandlingId).orElseThrow();
-        List<VilkårVurderingPeriodeEntitet> vilkårPerioder = finnVilkårVurderingPerioder(behandlingId);
-        VurdertForeldelse foreldelse = foreldelseRepository.finnVurdertForeldelse(behandlingId).orElse(null);
 
-        BigDecimal totaltTilbakekrevesUtenRenter = summer(resulatPerioder, BeregningResultatPeriode::getTilbakekrevingBeløpUtenRenter);
-        BigDecimal totaltTilbakekrevesMedRenter = summer(resulatPerioder, BeregningResultatPeriode::getTilbakekrevingBeløp);
-        BigDecimal totaltSkattetrekk = summer(resulatPerioder, BeregningResultatPeriode::getSkattBeløp);
-        BigDecimal totaltRentebeløp = summer(resulatPerioder, BeregningResultatPeriode::getRenteBeløp);
-        BigDecimal totaltTilbakekrevesBeløpMedRenterUtenSkatt = totaltTilbakekrevesMedRenter.subtract(totaltSkattetrekk);
+        List<VilkårVurderingPeriodeEntitet> vilkårPerioder = finnVilkårVurderingPerioder(behandling.getId());
+        VurdertForeldelse foreldelse = foreldelseRepository.finnVurdertForeldelse(behandling.getId()).orElse(null);
+        VedtaksbrevType vedtaksbrevType = behandling.utledVedtaksbrevType();
+        HbVedtaksResultatBeløp hbVedtaksResultatBeløp = new HbVedtaksResultatBeløp(resulatPerioder);
 
-        BigDecimal totaltFeilutbetaltBeløp = summer(resulatPerioder, BeregningResultatPeriode::getFeilutbetaltBeløp);
-        boolean erFeilutbetaltBeløpKorrigertNed = varsletBeløp != null && totaltFeilutbetaltBeløp.longValue() < varsletBeløp;
+        VedtakHjemmel.EffektForBruker effektForBruker = utledEffektForBruker(behandling, hbVedtaksResultatBeløp);
+        String hjemmelstekst = VedtakHjemmel.lagHjemmelstekst(vedtakResultatType, foreldelse, vilkårPerioder, effektForBruker, brevMetadata.getSpråkkode(), erIkkeFrisinn(behandling));
 
-        boolean skalHaVedtakFritekstOgUtenPerioder = behandling.erBehandlingRevurderingOgHarÅrsakFeilutbetalingBortfalt();
-        boolean erRevurdering = BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandling.getType());
-        boolean erRevurderingEtterKlage = behandling.getBehandlingÅrsaker().stream()
-            .anyMatch(ba -> ba.getBehandlingÅrsakType() == BehandlingÅrsakType.RE_KLAGE_KA || ba.getBehandlingÅrsakType() == BehandlingÅrsakType.RE_KLAGE_NFP);
-        boolean erFrisinn = erFrisinn(behandling);
-        VedtakHjemmel.EffektForBruker effektForBruker = erRevurdering
-            ? hentEffektForBruker(behandling, totaltTilbakekrevesMedRenter)
-            : VedtakHjemmel.EffektForBruker.FØRSTEGANGSVEDTAK;
-        LocalDate originalBehandlingVedtaksdato = erRevurdering ? finnOriginalBehandlingVedtaksdato(behandling) : null;
+        List<HbVedtaksbrevPeriode> perioder = lagHbVedtaksbrevPerioder(behandling.getId(), perioderFritekst, resulatPerioder, vilkårPerioder, foreldelse, vedtaksbrevType);
+        HbTotalresultat hbTotalresultat = lagHbTotalresultat(vedtakResultatType, hbVedtaksResultatBeløp);
+        HbSak sak = lagHbSak(behandling, fagsystemBehandling);
+        HbBehandling hbBehandling = lagHbBehandling(behandling);
 
-        Språkkode språkkode = fagsystemBehandling.getGrunninformasjon().getSpråkkodeEllerDefault();
-        String hjemmelstekst = VedtakHjemmel.lagHjemmelstekst(vedtakResultatType, foreldelse, vilkårPerioder, effektForBruker, språkkode, !erFrisinn);
-
-        List<HbVedtaksbrevPeriode> perioder = !skalHaVedtakFritekstOgUtenPerioder
-            ? resulatPerioder.stream()
-                .map(brp -> lagBrevdataPeriode(brp, fakta, vilkårPerioder, foreldelse, perioderFritekst))
-                .collect(Collectors.toList())
-            : Collections.emptyList();
-
-        BrevMetadata brevMetadata = lagMetadataForVedtaksbrev(behandling, vedtakResultatType, fagsystemBehandling, personinfo, brevMottaker);
-
-        HbSak.Builder hbSakBuilder = HbSak.build()
-            .medYtelsetype(behandling.getFagsak().getFagsakYtelseType())
-            .medDatoFagsakvedtak(fagsystemBehandling.getGrunninformasjon().getVedtakDato())
-            .medAntallBarn(fagsystemBehandling.getAntallBarnSøktFor());
-        if (!erFrisinn) {
-            hbSakBuilder
-                .medErFødsel(SøknadType.FØDSEL == fagsystemBehandling.getSøknadType())
-                .medErAdopsjon(SøknadType.ADOPSJON == fagsystemBehandling.getSøknadType());
-        }
-        VedtaksbrevType vedtaksbrevType = skalHaVedtakFritekstOgUtenPerioder ? VedtaksbrevType.FRITEKST_FEILUTBETALING_BORTFALT : VedtaksbrevType.ORDINÆR;
+        Long varsletBeløp = finnVarsletBeløp(behandling.getId());
+        LocalDate varsletDato = finnVarsletDato(behandling.getId());
+        boolean erFeilutbetaltBeløpKorrigertNed = varsletBeløp != null && hbVedtaksResultatBeløp.totaltFeilutbetaltBeløp.longValue() < varsletBeløp;
         HbVedtaksbrevFelles.Builder vedtakDataBuilder = HbVedtaksbrevFelles.builder()
-            .medSak(hbSakBuilder.build())
-            .medBehandling(HbBehandling.builder()
-                .medErRevurdering(erRevurdering)
-                .medErRevurderingEtterKlage(erRevurderingEtterKlage)
-                .medOriginalBehandlingDatoFagsakvedtak(originalBehandlingVedtaksdato)
-                .build())
+            .medSak(sak)
+            .medBehandling(hbBehandling)
             .medVarsel(HbVarsel.forDatoOgBeløp(varsletDato, varsletBeløp))
             .medErFeilutbetaltBeløpKorrigertNed(erFeilutbetaltBeløpKorrigertNed)
-            .medTotaltFeilutbetaltBeløp(totaltFeilutbetaltBeløp)
+            .medTotaltFeilutbetaltBeløp(hbVedtaksResultatBeløp.totaltFeilutbetaltBeløp)
             .medFritekstOppsummering(oppsummeringFritekst)
             .medVedtaksbrevType(vedtaksbrevType)
             .medLovhjemmelVedtak(hjemmelstekst)
-            .medVedtakResultat(HbTotalresultat.builder()
-                .medHovedresultat(vedtakResultatType)
-                .medTotaltTilbakekrevesBeløp(totaltTilbakekrevesUtenRenter)
-                .medTotaltRentebeløp(totaltRentebeløp)
-                .medTotaltTilbakekrevesBeløpMedRenter(totaltTilbakekrevesMedRenter)
-                .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(totaltTilbakekrevesBeløpMedRenterUtenSkatt)
-                .build())
+            .medVedtakResultat(hbTotalresultat)
             .medKonfigurasjon(HbKonfigurasjon.builder()
                 .medKlagefristUker(KLAGEFRIST_UKER)
                 .build())
@@ -374,13 +349,64 @@ public class VedtaksbrevTjeneste {
                 .medPerioder(perioder)
                 .build())
             .medSøker(utledSøker(personinfo))
-            .medSpråkkode(språkkode)
+            .medSpråkkode(brevMetadata.getSpråkkode())
             .medFinnesVerge(brevMetadata.isFinnesVerge())
             .medAnnenMottakerNavn(BrevMottakerUtil.getAnnenMottakerNavn(brevMetadata));
 
-        HbVedtaksbrevData data = new HbVedtaksbrevData(vedtakDataBuilder.build(), perioder);
+        return new HbVedtaksbrevData(vedtakDataBuilder.build(), perioder);
+    }
 
-        return new VedtaksbrevData(data, brevMetadata);
+    private VedtakHjemmel.EffektForBruker utledEffektForBruker(Behandling behandling, HbVedtaksResultatBeløp hbVedtaksResultatBeløp) {
+        boolean erRevurdering = BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandling.getType());
+        return erRevurdering
+            ? hentEffektForBruker(behandling, hbVedtaksResultatBeløp.totaltTilbakekrevesMedRenter)
+            : VedtakHjemmel.EffektForBruker.FØRSTEGANGSVEDTAK;
+    }
+
+    private HbTotalresultat lagHbTotalresultat(VedtakResultatType vedtakResultatType,
+                                               HbVedtaksResultatBeløp hbVedtaksResultatBeløp) {
+        return HbTotalresultat.builder()
+                .medHovedresultat(vedtakResultatType)
+                .medTotaltTilbakekrevesBeløp(hbVedtaksResultatBeløp.totaltTilbakekrevesUtenRenter)
+                .medTotaltRentebeløp(hbVedtaksResultatBeløp.totaltRentebeløp)
+                .medTotaltTilbakekrevesBeløpMedRenter(hbVedtaksResultatBeløp.totaltTilbakekrevesMedRenter)
+                .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(hbVedtaksResultatBeløp.totaltTilbakekrevesBeløpMedRenterUtenSkatt)
+                .build();
+    }
+
+    private HbBehandling lagHbBehandling(Behandling behandling) {
+        boolean erRevurdering = BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandling.getType());
+        boolean erRevurderingEtterKlage = behandling.getBehandlingÅrsaker().stream()
+            .anyMatch(ba -> ba.getBehandlingÅrsakType() == BehandlingÅrsakType.RE_KLAGE_KA || ba.getBehandlingÅrsakType() == BehandlingÅrsakType.RE_KLAGE_NFP);
+        LocalDate originalBehandlingVedtaksdato = erRevurdering ? finnOriginalBehandlingVedtaksdato(behandling) : null;
+        return HbBehandling.builder()
+                .medErRevurdering(erRevurdering)
+                .medErRevurderingEtterKlage(erRevurderingEtterKlage)
+                .medOriginalBehandlingDatoFagsakvedtak(originalBehandlingVedtaksdato)
+                .build();
+    }
+
+    private HbSak lagHbSak(Behandling behandling,
+                           SamletEksternBehandlingInfo fagsystemBehandling) {
+        HbSak.Builder hbSakBuilder = HbSak.build()
+            .medYtelsetype(behandling.getFagsak().getFagsakYtelseType())
+            .medDatoFagsakvedtak(fagsystemBehandling.getGrunninformasjon().getVedtakDato())
+            .medAntallBarn(fagsystemBehandling.getAntallBarnSøktFor());
+        if (erIkkeFrisinn(behandling)) {
+            hbSakBuilder
+                .medErFødsel(SøknadType.FØDSEL == fagsystemBehandling.getSøknadType())
+                .medErAdopsjon(SøknadType.ADOPSJON == fagsystemBehandling.getSøknadType());
+        }
+        return hbSakBuilder.build();
+    }
+
+    private List<HbVedtaksbrevPeriode> lagHbVedtaksbrevPerioder(Long behandlingId, List<PeriodeMedTekstDto> perioderFritekst, List<BeregningResultatPeriode> resulatPerioder, List<VilkårVurderingPeriodeEntitet> vilkårPerioder, VurdertForeldelse foreldelse, VedtaksbrevType vedtaksbrevType) {
+        FaktaFeilutbetaling fakta = faktaRepository.finnFaktaOmFeilutbetaling(behandlingId).orElseThrow();
+        return vedtaksbrevType.equals(VedtaksbrevType.FRITEKST_FEILUTBETALING_BORTFALT)
+                ? Collections.emptyList()
+                : resulatPerioder.stream()
+                    .map(brp -> lagBrevdataPeriode(brp, fakta, vilkårPerioder, foreldelse, perioderFritekst))
+                    .collect(Collectors.toList());
     }
 
     private VedtakHjemmel.EffektForBruker hentEffektForBruker(Behandling behandling, BigDecimal totaltTilbakekrevesMedRenter) {
@@ -425,7 +451,7 @@ public class VedtaksbrevTjeneste {
 
         // Kan ikke hente søknadsinformasjon for FRISINN-behandlinger. Er ikke nødvendigvis en 1-til-1-mapping mellom behandling
         // og søknad for FRISINN i k9-sak. Kan risikere exception i k9-sak og/eller exception i k9-tilbake
-        if (!erFrisinn(behandling)) {
+        if (erIkkeFrisinn(behandling)) {
             tillegsinformasjons.add(Tillegsinformasjon.SØKNAD);
         }
         return tillegsinformasjons.toArray(Tillegsinformasjon[]::new);
@@ -447,8 +473,10 @@ public class VedtaksbrevTjeneste {
         return varselInfo.map(VarselInfo::getVarselBeløp).orElse(null);
     }
 
-    BrevMetadata lagMetadataForVedtaksbrev(Behandling behandling, VedtakResultatType vedtakResultatType,
-                                           SamletEksternBehandlingInfo eksternBehandlingsinfo, Personinfo personinfo,
+    BrevMetadata lagMetadataForVedtaksbrev(Behandling behandling,
+                                           SamletEksternBehandlingInfo eksternBehandlingsinfo,
+                                           Personinfo personinfo,
+                                           VedtakResultatType vedtakResultatType,
                                            BrevMottaker brevMottaker) {
         FagsakYtelseType fagsakType = behandling.getFagsak().getFagsakYtelseType();
         Språkkode språkkode = eksternBehandlingsinfo.getGrunninformasjon().getSpråkkodeEllerDefault();
@@ -473,7 +501,7 @@ public class VedtaksbrevTjeneste {
             .medFagsaktypenavnPåSpråk(ytelseNavn.getNavnPåBrukersSpråk())
             .medSakspartId(personinfo.getPersonIdent().getIdent())
             .medSakspartNavn(personinfo.getNavn())
-            .medSprakkode(eksternBehandlingsinfo.getGrunninformasjon().getSpråkkodeEllerDefault())
+            .medSprakkode(språkkode)
             .medTittel(finnTittelVedtaksbrev(ytelseNavn.getNavnPåBokmål(), tilbakekreves))
             .medFinnesVerge(finnesVerge)
             .medVergeNavn(vergeNavn)
@@ -632,7 +660,27 @@ public class VedtaksbrevTjeneste {
         }
     }
 
-    private boolean erFrisinn(Behandling behandling) {
-        return FagsakYtelseType.FRISINN.equals(behandling.getFagsak().getFagsakYtelseType());
+    private boolean erIkkeFrisinn(Behandling behandling) {
+        return !FagsakYtelseType.FRISINN.equals(behandling.getFagsak().getFagsakYtelseType());
+    }
+
+    private class HbVedtaksResultatBeløp {
+
+        private final BigDecimal totaltTilbakekrevesUtenRenter;
+        private final BigDecimal totaltTilbakekrevesMedRenter;
+        private final BigDecimal totaltRentebeløp;
+        private final BigDecimal totaltTilbakekrevesBeløpMedRenterUtenSkatt;
+        private final BigDecimal totaltFeilutbetaltBeløp;
+
+        private HbVedtaksResultatBeløp(List<BeregningResultatPeriode> resulatPerioder) {
+            totaltTilbakekrevesUtenRenter = summer(resulatPerioder, BeregningResultatPeriode::getTilbakekrevingBeløpUtenRenter);
+            totaltTilbakekrevesMedRenter = summer(resulatPerioder, BeregningResultatPeriode::getTilbakekrevingBeløp);
+            totaltRentebeløp = summer(resulatPerioder, BeregningResultatPeriode::getRenteBeløp);
+
+            BigDecimal totaltSkattetrekk = summer(resulatPerioder, BeregningResultatPeriode::getSkattBeløp);
+            totaltTilbakekrevesBeløpMedRenterUtenSkatt = totaltTilbakekrevesMedRenter.subtract(totaltSkattetrekk);
+
+            totaltFeilutbetaltBeløp = summer(resulatPerioder, BeregningResultatPeriode::getFeilutbetaltBeløp);
+        }
     }
 }

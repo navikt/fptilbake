@@ -45,6 +45,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.BehandlingInfo;
@@ -551,7 +552,11 @@ public class Behandling extends BaseEntitet {
         this.saksbehandlingType = SaksbehandlingType.AUTOMATISK_IKKE_INNKREVING_LAVT_BELØP;
     }
 
-    public boolean erBehandlingRevurderingOgHarÅrsakFeilutbetalingBortfalt(){
+    public VedtaksbrevType utledVedtaksbrevType() {
+        return erBehandlingRevurderingOgHarÅrsakFeilutbetalingBortfalt() ? VedtaksbrevType.FRITEKST_FEILUTBETALING_BORTFALT : VedtaksbrevType.ORDINÆR;
+    }
+
+    private boolean erBehandlingRevurderingOgHarÅrsakFeilutbetalingBortfalt(){
         return BehandlingType.REVURDERING_TILBAKEKREVING.equals(this.behandlingType) && this.behandlingÅrsaker.stream()
             .anyMatch(behandlingÅrsak -> BehandlingÅrsakType.RE_FEILUTBETALT_BELØP_HELT_ELLER_DELVIS_BORTFALT.equals(behandlingÅrsak.getBehandlingÅrsakType()));
     }

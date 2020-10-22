@@ -47,10 +47,7 @@ public class ForeslåVedtakOppdaterer implements AksjonspunktOppdaterer<Foreslå
     @Override
     public void oppdater(ForeslåVedtakDto dto, Behandling behandling) {
         Long behandlingId = behandling.getId();
-        VedtaksbrevType brevType = VedtaksbrevType.ORDINÆR;
-        if(behandling.erBehandlingRevurderingOgHarÅrsakFeilutbetalingBortfalt()){
-            brevType = VedtaksbrevType.FRITEKST_FEILUTBETALING_BORTFALT;
-        }
+        VedtaksbrevType brevType = behandling.utledVedtaksbrevType();
         vedtaksbrevFritekstTjeneste.lagreFriteksterFraSaksbehandler(behandlingId, lagOppsummeringstekst(behandlingId, dto, brevType), lagPerioderMedTekst(behandlingId, dto.getPerioderMedTekst()));
         foreslåVedtakTjeneste.lagHistorikkInnslagForForeslåVedtak(behandlingId);
 
