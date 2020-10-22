@@ -15,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.modell.UtbetaltPeriode;
+import no.nav.foreldrepenger.tilbakekreving.behandling.modell.LogiskPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -64,7 +64,7 @@ public class KravgrunnlagTjeneste {
     }
 
 
-    public List<UtbetaltPeriode> utledLogiskPeriode(Long behandlingId) {
+    public List<LogiskPeriode> utledLogiskPeriode(Long behandlingId) {
         return LogiskPeriodeTjeneste.utledLogiskPeriode(finnFeilutbetalingPrPeriode(behandlingId));
     }
 

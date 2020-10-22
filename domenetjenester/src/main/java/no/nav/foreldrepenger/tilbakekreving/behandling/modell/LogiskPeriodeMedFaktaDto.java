@@ -9,14 +9,14 @@ import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTyp
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class UtbetaltPeriode {
+public class LogiskPeriodeMedFaktaDto {
 
     private LocalDate fom;
     private LocalDate tom;
     private BigDecimal belop;
     private HendelseTypeMedUndertypeDto feilutbetalingÅrsakDto;
 
-    private UtbetaltPeriode() {
+    private LogiskPeriodeMedFaktaDto() {
         // bruk statisk metode for å lage utbetalt periode
     }
 
@@ -44,13 +44,17 @@ public class UtbetaltPeriode {
         this.feilutbetalingÅrsakDto = feilutbetalingÅrsakDto;
     }
 
-    public static UtbetaltPeriode lagPeriode(LocalDate fom, LocalDate tom, BigDecimal belop) {
+    public static LogiskPeriodeMedFaktaDto lagPeriode(Periode periode, BigDecimal belop) {
+        return lagPeriode(periode.getFom(), periode.getTom(), belop);
+    }
+
+    public static LogiskPeriodeMedFaktaDto lagPeriode(LocalDate fom, LocalDate tom, BigDecimal belop) {
         if (fom == null || tom == null) {
             throw new IllegalStateException("utviklerfeil: ikke-komplett periode - sjekk at fom og tom er gyldige verdier");
         } else if (fom.isAfter(tom)) {
             throw new IllegalStateException("fra og med dato er etter til og med dato");
         }
-        UtbetaltPeriode periode = new UtbetaltPeriode();
+        LogiskPeriodeMedFaktaDto periode = new LogiskPeriodeMedFaktaDto();
         periode.fom = fom;
         periode.tom = tom;
         periode.belop = belop;

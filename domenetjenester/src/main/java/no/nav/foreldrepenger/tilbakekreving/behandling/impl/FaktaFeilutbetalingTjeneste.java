@@ -2,6 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -10,7 +11,8 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BehandlingFeilutbetalingFakta;
-import no.nav.foreldrepenger.tilbakekreving.behandling.modell.UtbetaltPeriode;
+import no.nav.foreldrepenger.tilbakekreving.behandling.modell.LogiskPeriode;
+import no.nav.foreldrepenger.tilbakekreving.behandling.modell.LogiskPeriodeMedFaktaDto;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
@@ -26,7 +28,6 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBe
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.TilbakekrevingValgDto;
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTypeMedUndertypeDto;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432;
 
 @ApplicationScoped
 public class FaktaFeilutbetalingTjeneste {
@@ -53,16 +54,16 @@ public class FaktaFeilutbetalingTjeneste {
 
     }
 
-    public void hentFeilutbetalingÅrsak(Long behandlingId, UtbetaltPeriode utbetaltPeriode) {
-        Optional<FaktaFeilutbetaling> fakta = faktaFeilutbetalingRepository.finnFaktaOmFeilutbetaling(behandlingId);
-        if (fakta.isPresent()) {
-            Optional<FaktaFeilutbetalingPeriode> feilutbetalingPeriodeÅrsak = fakta.get()
-                .getFeilutbetaltPerioder()
-                .stream()
-                .filter(periodeÅrsak -> utbetaltPeriode.tilPeriode().equals(periodeÅrsak.getPeriode()))
+    public LogiskPeriodeMedFaktaDto hentFeilutbetalingÅrsak(Long behandlingId, LogiskPeriode logiskPeriode, FaktaFeilutbetaling fakta) {
+        LogiskPeriodeMedFaktaDto resultat = LogiskPeriodeMedFaktaDto.lagPeriode(logiskPeriode.getPeriode(), logiskPeriode.getFeilutbetaltBeløp());
+
+        if (fakta != null) {
+            Optional<FaktaFeilutbetalingPeriode> feilutbetalingPeriodeÅrsak = fakta.getFeilutbetaltPerioder().stream()
+                .filter(periodeÅrsak -> logiskPeriode.getPeriode().equals(periodeÅrsak.getPeriode()))
                 .findFirst();
-            utbetaltPeriode.setFeilutbetalingÅrsakDto(mapFra(feilutbetalingPeriodeÅrsak));
+            resultat.setFeilutbetalingÅrsakDto(mapFra(feilutbetalingPeriodeÅrsak));
         }
+        return resultat;
     }
 
     public BehandlingFeilutbetalingFakta hentBehandlingFeilutbetalingFakta(Long behandlingId) {
@@ -74,39 +75,44 @@ public class FaktaFeilutbetalingTjeneste {
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto = samletBehandlingInfo.getGrunninformasjon();
         TilbakekrevingValgDto tilbakekrevingValg = samletBehandlingInfo.getTilbakekrevingsvalg();
 
-        List<UtbetaltPeriode> utbetaltPerioder = kravgrunnlagTjeneste.utledLogiskPeriode(behandlingId);
-        BigDecimal aktuellFeilUtbetaltBeløp = BigDecimal.ZERO;
-        LocalDate totalPeriodeFom = null;
-        LocalDate totalPeriodeTom = null;
-        for (UtbetaltPeriode utbetaltPeriode : utbetaltPerioder) {
-            aktuellFeilUtbetaltBeløp = aktuellFeilUtbetaltBeløp.add(utbetaltPeriode.getBelop());
-            hentFeilutbetalingÅrsak(behandlingId, utbetaltPeriode);
-            totalPeriodeFom = totalPeriodeFom == null || totalPeriodeFom.isAfter(utbetaltPeriode.getFom()) ? utbetaltPeriode.getFom() : totalPeriodeFom;
-            totalPeriodeTom = totalPeriodeTom == null || totalPeriodeTom.isBefore(utbetaltPeriode.getTom()) ? utbetaltPeriode.getTom() : totalPeriodeTom;
+        List<LogiskPeriode> logiskePerioder = kravgrunnlagTjeneste.utledLogiskPeriode(behandlingId);
+        FaktaFeilutbetaling fakta = faktaFeilutbetalingRepository.finnFaktaOmFeilutbetaling(behandlingId).orElse(null);
+        List<LogiskPeriodeMedFaktaDto> logiskePerioderMedFakta = new ArrayList<>();
+        ;
+        for (LogiskPeriode logiskPeriode : logiskePerioder) {
+            logiskePerioderMedFakta.add(hentFeilutbetalingÅrsak(behandlingId, logiskPeriode, fakta));
         }
         String begrunnelse = hentFaktaBegrunnelse(behandlingId);
-        Periode totalPeriode = new Periode(totalPeriodeFom, totalPeriodeTom);
-        return lagBehandlingFeilUtbetalingFakta(resultat, aktuellFeilUtbetaltBeløp, utbetaltPerioder, totalPeriode, eksternBehandlingsinfoDto, tilbakekrevingValg, begrunnelse);
-    }
-
-
-    private BehandlingFeilutbetalingFakta lagBehandlingFeilUtbetalingFakta(Optional<VarselInfo> varselEntitet, BigDecimal aktuellFeilUtbetaltBeløp,
-                                                                           List<UtbetaltPeriode> utbetaltPerioder, Periode totalPeriode,
-                                                                           EksternBehandlingsinfoDto eksternBehandlingsinfoDto, TilbakekrevingValgDto tilbakekrevingValgDto,
-                                                                           String begrunnelse) {
-        Long tidligereVarseltBeløp = varselEntitet.isPresent() ? varselEntitet.get().getVarselBeløp() : null;
+        Long tidligereVarseltBeløp = resultat.map(VarselInfo::getVarselBeløp).orElse(null);
         return BehandlingFeilutbetalingFakta.builder()
-            .medPerioder(utbetaltPerioder)
-            .medAktuellFeilUtbetaltBeløp(aktuellFeilUtbetaltBeløp)
+            .medPerioder(logiskePerioderMedFakta)
+            .medAktuellFeilUtbetaltBeløp(sumFeilutbetaltBeløp(logiskePerioder))
             .medTidligereVarsletBeløp(tidligereVarseltBeløp)
-            .medTotalPeriodeFom(totalPeriode.getFom())
-            .medTotalPeriodeTom(totalPeriode.getTom())
+            .medTotalPeriode(omkringliggendePeriode(logiskePerioder))
             .medDatoForRevurderingsvedtak(eksternBehandlingsinfoDto.getVedtakDato())
             .medBehandlingsResultat(eksternBehandlingsinfoDto.getBehandlingsresultat())
             .medBehandlingÅrsaker(eksternBehandlingsinfoDto.getBehandlingÅrsaker())
-            .medTilbakekrevingValg(tilbakekrevingValgDto)
+            .medTilbakekrevingValg(tilbakekrevingValg)
             .medBegrunnelse(begrunnelse)
             .build();
+    }
+
+    private Periode omkringliggendePeriode(List<LogiskPeriode> perioder) {
+        LocalDate totalPeriodeFom = null;
+        LocalDate totalPeriodeTom = null;
+        for (LogiskPeriode periode : perioder) {
+            totalPeriodeFom = totalPeriodeFom == null || totalPeriodeFom.isAfter(periode.getFom()) ? periode.getFom() : totalPeriodeFom;
+            totalPeriodeTom = totalPeriodeTom == null || totalPeriodeTom.isBefore(periode.getTom()) ? periode.getTom() : totalPeriodeTom;
+        }
+        return new Periode(totalPeriodeFom, totalPeriodeTom);
+    }
+
+    private BigDecimal sumFeilutbetaltBeløp(List<LogiskPeriode> perioder) {
+        return perioder.stream()
+            .map(LogiskPeriode::getFeilutbetaltBeløp)
+            .reduce(BigDecimal::add)
+            .orElse(BigDecimal.ZERO);
+
     }
 
     private HendelseTypeMedUndertypeDto mapFra(Optional<FaktaFeilutbetalingPeriode> årsak) {

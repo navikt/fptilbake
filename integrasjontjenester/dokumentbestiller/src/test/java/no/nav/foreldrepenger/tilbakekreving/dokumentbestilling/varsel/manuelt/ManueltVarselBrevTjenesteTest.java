@@ -23,7 +23,7 @@ import com.google.common.collect.Lists;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FaktaFeilutbetalingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BehandlingFeilutbetalingFakta;
-import no.nav.foreldrepenger.tilbakekreving.behandling.modell.UtbetaltPeriode;
+import no.nav.foreldrepenger.tilbakekreving.behandling.modell.LogiskPeriodeMedFaktaDto;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.DetaljertBrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.dokumentbestiller.DokumentMalType;
@@ -143,11 +143,11 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
     }
 
     private BehandlingFeilutbetalingFakta lagFeilutbetalingFakta() {
-        UtbetaltPeriode utbetaltPeriode = UtbetaltPeriode.lagPeriode(LocalDate.of(2019, 10, 1),
+        LogiskPeriodeMedFaktaDto logiskPeriodeMedFaktaDto = LogiskPeriodeMedFaktaDto.lagPeriode(LocalDate.of(2019, 10, 1),
             LocalDate.of(2019, 10, 30),
             BigDecimal.valueOf(9000));
         return BehandlingFeilutbetalingFakta.builder().medAktuellFeilUtbetaltBeløp(BigDecimal.valueOf(9000))
-            .medPerioder(Lists.newArrayList(utbetaltPeriode))
+            .medPerioder(Lists.newArrayList(logiskPeriodeMedFaktaDto))
             .medDatoForRevurderingsvedtak(LocalDate.now()).build();
     }
 }

@@ -15,7 +15,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FaktaFeilutbetalingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BehandlingFeilutbetalingFakta;
-import no.nav.foreldrepenger.tilbakekreving.behandling.modell.UtbetaltPeriode;
+import no.nav.foreldrepenger.tilbakekreving.behandling.modell.LogiskPeriodeMedFaktaDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingFeilutbetalingFaktaDto;
 
 public class BehandlingFaktaRestTjenesteTest {
@@ -39,7 +39,7 @@ public class BehandlingFaktaRestTjenesteTest {
         return BehandlingFeilutbetalingFakta.builder()
             .medAktuellFeilUtbetaltBeløp(BigDecimal.valueOf(2500))
             .medDatoForRevurderingsvedtak(LocalDate.now().minusDays(40))
-            .medPerioder(Collections.singletonList(UtbetaltPeriode.lagPeriode(LocalDate.now().minusDays(120), LocalDate.now().minusDays(80), BigDecimal.valueOf(20000))))
+            .medPerioder(Collections.singletonList(LogiskPeriodeMedFaktaDto.lagPeriode(LocalDate.now().minusDays(120), LocalDate.now().minusDays(80), BigDecimal.valueOf(20000))))
             .medTidligereVarsletBeløp(3000l)
             .medTotalPeriodeFom(LocalDate.now().minusDays(150))
             .medTotalPeriodeTom(LocalDate.now().minusDays(70))

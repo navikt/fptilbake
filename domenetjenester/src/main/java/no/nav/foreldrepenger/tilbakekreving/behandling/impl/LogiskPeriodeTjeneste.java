@@ -8,16 +8,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.modell.UtbetaltPeriode;
+import no.nav.foreldrepenger.tilbakekreving.behandling.modell.LogiskPeriode;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
 public class LogiskPeriodeTjeneste {
 
-    public static List<UtbetaltPeriode> utledLogiskPeriode(SortedMap<Periode, BigDecimal> feilutbetalingPrPeriode) {
+    public static List<LogiskPeriode> utledLogiskPeriode(SortedMap<Periode, BigDecimal> feilutbetalingPrPeriode) {
         LocalDate førsteDag = null;
         LocalDate sisteDag = null;
-        BigDecimal belopPerPeriode = BigDecimal.ZERO;
-        List<UtbetaltPeriode> beregnetPerioider = new ArrayList<>();
+        BigDecimal logiskPeriodeBeløp = BigDecimal.ZERO;
+        List<LogiskPeriode> resultat = new ArrayList<>();
         for (Map.Entry<Periode, BigDecimal> entry : feilutbetalingPrPeriode.entrySet()) {
             Periode periode = entry.getKey();
             BigDecimal feilutbetaltBeløp = entry.getValue();
@@ -26,18 +26,18 @@ public class LogiskPeriodeTjeneste {
                 sisteDag = periode.getTom();
             } else {
                 if (harUkedagerMellom(sisteDag, periode.getFom())) {
-                    beregnetPerioider.add(UtbetaltPeriode.lagPeriode(førsteDag, sisteDag, belopPerPeriode));
+                    resultat.add(LogiskPeriode.lagPeriode(førsteDag, sisteDag, logiskPeriodeBeløp));
                     førsteDag = periode.getFom();
-                    belopPerPeriode = BigDecimal.ZERO;
+                    logiskPeriodeBeløp = BigDecimal.ZERO;
                 }
                 sisteDag = periode.getTom();
             }
-            belopPerPeriode = belopPerPeriode.add(feilutbetaltBeløp);
+            logiskPeriodeBeløp = logiskPeriodeBeløp.add(feilutbetaltBeløp);
         }
-        if (BigDecimal.ZERO.compareTo(belopPerPeriode) != 0) {
-            beregnetPerioider.add(UtbetaltPeriode.lagPeriode(førsteDag, sisteDag, belopPerPeriode));
+        if (BigDecimal.ZERO.compareTo(logiskPeriodeBeløp) != 0) {
+            resultat.add(LogiskPeriode.lagPeriode(førsteDag, sisteDag, logiskPeriodeBeløp));
         }
-        return beregnetPerioider;
+        return resultat;
     }
 
     private static boolean harUkedagerMellom(LocalDate dag1, LocalDate dag2) {

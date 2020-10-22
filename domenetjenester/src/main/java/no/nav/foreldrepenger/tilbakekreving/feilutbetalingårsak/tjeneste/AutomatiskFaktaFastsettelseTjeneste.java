@@ -8,7 +8,7 @@ import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.FaktaFeilutbetalingDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.modell.UtbetaltPeriode;
+import no.nav.foreldrepenger.tilbakekreving.behandling.modell.LogiskPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
@@ -32,7 +32,7 @@ public class AutomatiskFaktaFastsettelseTjeneste {
     }
 
     public void fastsettFaktaAutomatisk(Behandling behandling, String begrunnelse) {
-        List<UtbetaltPeriode> logiskePerioder = kravgrunnlagTjeneste.utledLogiskPeriode(behandling.getId());
+        List<LogiskPeriode> logiskePerioder = kravgrunnlagTjeneste.utledLogiskPeriode(behandling.getId());
         HendelseTypeMedUndertypeDto hendelseTypeMedUndertypeDto = setHendelseTypeOgHendelseUndertype(behandling);
 
         List<FaktaFeilutbetalingDto> faktaFeilutbetalinger = logiskePerioder.stream()
