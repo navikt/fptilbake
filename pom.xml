@@ -245,11 +245,6 @@
             </dependency>
             <dependency>
                 <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
-                <artifactId>domenetjenester</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
                 <artifactId>pdfgen</artifactId>
                 <version>${project.version}</version>
             </dependency>
