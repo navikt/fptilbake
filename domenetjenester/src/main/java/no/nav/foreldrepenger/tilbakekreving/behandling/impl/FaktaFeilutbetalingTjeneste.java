@@ -74,9 +74,8 @@ public class FaktaFeilutbetalingTjeneste {
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto = samletBehandlingInfo.getGrunninformasjon();
         TilbakekrevingValgDto tilbakekrevingValg = samletBehandlingInfo.getTilbakekrevingsvalg();
 
-        List<KravgrunnlagPeriode432> feilutbetaltPerioder = kravgrunnlagTjeneste.finnKravgrunnlagPerioderMedFeilutbetaltPosteringer(behandlingId);
+        List<UtbetaltPeriode> utbetaltPerioder = kravgrunnlagTjeneste.utledLogiskPeriode(behandlingId);
         BigDecimal aktuellFeilUtbetaltBeløp = BigDecimal.ZERO;
-        List<UtbetaltPeriode> utbetaltPerioder = kravgrunnlagTjeneste.utledLogiskPeriode(feilutbetaltPerioder);
         LocalDate totalPeriodeFom = null;
         LocalDate totalPeriodeTom = null;
         for (UtbetaltPeriode utbetaltPeriode : utbetaltPerioder) {
