@@ -17,6 +17,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.header.Tek
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.JournalpostIdOgDokumentId;
 import no.nav.foreldrepenger.tilbakekreving.pdfgen.DokumentVariant;
 import no.nav.foreldrepenger.tilbakekreving.pdfgen.PdfGenerator;
+import no.nav.foreldrepenger.tilbakekreving.selvbetjening.SelvbetjeningTilbakekrevingStøtte;
 import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.task.SendBeskjedUtsendtVarselTilSelvbetjeningTask;
 import no.nav.journalpostapi.dto.dokument.Dokumentkategori;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -108,7 +109,7 @@ public class PdfBrevTjeneste {
     }
 
     private Optional<ProsessTaskData> lagSendBeskjedTilSelvbetjeningTask(Behandling behandling) {
-        if (SendBeskjedUtsendtVarselTilSelvbetjeningTask.kanSendeVarsel(behandling)) {
+        if (SelvbetjeningTilbakekrevingStøtte.harStøtteFor(behandling)) {
             ProsessTaskData data = new ProsessTaskData(SendBeskjedUtsendtVarselTilSelvbetjeningTask.TASKTYPE);
             ProsessTaskBehandlingUtil.setBehandling(data, behandling);
             return Optional.of(data);

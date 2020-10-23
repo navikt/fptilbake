@@ -1,12 +1,12 @@
 package no.nav.foreldrepenger.tilbakekreving.fagsystem.klient;
 
 public enum Tillegsinformasjon {
-    PERSONOPPLYSNINGER("soeker-personopplysninger"),
+    PERSONOPPLYSNINGER("personopplysninger-tilbake", "soeker-personopplysninger"),
     VARSELTEKST("tilbakekrevingsvarsel-fritekst"),
     SØKNAD("soknad"),
     TILBAKEKREVINGSVALG("tilbakekreving-valg", "tilbakekrevingvalg"),
-    FAGSAK("fagsak-backend"),
-    VERGE("verge");
+    FAGSAK("fagsak-backend", "fagsak"),
+    VERGE("verge-backend", "verge");
 
     private String fpsakRelasjonNavn;
     private String k9sakRelasjonNavn;
