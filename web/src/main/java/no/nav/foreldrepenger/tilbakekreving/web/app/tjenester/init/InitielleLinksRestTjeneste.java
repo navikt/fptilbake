@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -19,6 +20,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.Behandl
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.historikk.HistorikkRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.kodeverk.KodeverkRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
+import no.nav.vedtak.konfig.KonfigVerdi;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 
 @Path("/init-fetch")
@@ -29,8 +31,23 @@ public class InitielleLinksRestTjeneste {
 
     private static final String API_URI = "/api";
 
+    private String kontekstPath;
+
     public InitielleLinksRestTjeneste() {
-        // for CDI proxy
+    }
+
+    @Inject
+    public InitielleLinksRestTjeneste(@KonfigVerdi(value = "app.name") String applikasjon) {
+        switch (applikasjon) {
+            case "fptilbake":
+                kontekstPath = "/fptilbake";
+                break;
+            case "k9-tilbake":
+                kontekstPath = "/k9/tilbake";
+                break;
+            default:
+                throw new IllegalStateException("app.name er satt til " + applikasjon + " som ikke er en støttet verdi");
+        }
     }
 
     @GET
@@ -43,7 +60,6 @@ public class InitielleLinksRestTjeneste {
         List<ResourceLink> saklenker = new ArrayList<>();
         saklenker.add(get(HistorikkRestTjeneste.HISTORIKK_PATH, "tilbake-historikk"));
         saklenker.add(get(BehandlingRestTjeneste.SAK_RETTIGHETER_PATH, "tilbake-sak-rettigheter"));
-        saklenker.add(get(BehandlingRestTjeneste.BEHANDLING_RETTIGHETER_PATH, "tilbake-behandling-rettigheter"));
         saklenker.add(get(BehandlingRestTjeneste.BEHANDLING_ALLE_PATH, "tilbake-alle-behandlinger"));
         saklenker.add(get(BehandlingRestTjeneste.BEHANDLING_KAN_OPPRETTES_PATH, "tilbake-kan-opprette-behandling"));
         saklenker.add(get(BehandlingRestTjeneste.REVURDERING_KAN_OPPRETTES_PATH, "tilbake-kan-opprette-revurdering"));
@@ -52,7 +68,7 @@ public class InitielleLinksRestTjeneste {
     }
 
     private ResourceLink get(String url, String relasjon) {
-        return ResourceLink.get(API_URI + url, relasjon, null);
+        return ResourceLink.get(kontekstPath + API_URI + url, relasjon, null);
     }
 
 }
