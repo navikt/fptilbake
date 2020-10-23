@@ -24,7 +24,7 @@ public class VedtaksbrevFritekstOppsummering extends BaseEntitet {
     private Long behandlingId;
 
     @Lob
-    @Column(name = "OPPSUMMERING_FRITEKST")
+    @Column(name = "FRITEKST")
     private String oppsummeringFritekst;
 
     public VedtaksbrevFritekstOppsummering() {
