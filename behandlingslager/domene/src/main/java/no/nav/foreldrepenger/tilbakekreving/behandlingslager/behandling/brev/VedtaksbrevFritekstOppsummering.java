@@ -3,7 +3,6 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev;
 import java.util.Objects;
 
 import javax.persistence.Column;
-import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -28,10 +27,6 @@ public class VedtaksbrevFritekstOppsummering extends BaseEntitet {
     @Column(name = "OPPSUMMERING_FRITEKST")
     private String oppsummeringFritekst;
 
-    @Convert(converter = VedtaksbrevType.verdiConverter.class)
-    @Column(name = "BREV_TYPE")
-    private VedtaksbrevType brevType = VedtaksbrevType.ORDINÆR;
-
     public VedtaksbrevFritekstOppsummering() {
     }
 
@@ -51,8 +46,15 @@ public class VedtaksbrevFritekstOppsummering extends BaseEntitet {
         this.id = id;
     }
 
-    public VedtaksbrevType getBrevType() {
-        return brevType;
+    public static int maxFritekstLengde(VedtaksbrevType brevType) {
+        switch (brevType) {
+            case FRITEKST_FEILUTBETALING_BORTFALT:
+                return 10000;
+            case ORDINÆR:
+                return 4000;
+            default:
+                throw new IllegalArgumentException("Utviklerfeil: ustøttet VedtaksbrevType(" + brevType + ") i VedtaksbrevFritekstOppsummering");
+        }
     }
 
     public static class Builder {
@@ -69,14 +71,8 @@ public class VedtaksbrevFritekstOppsummering extends BaseEntitet {
             return this;
         }
 
-        public VedtaksbrevFritekstOppsummering.Builder medBrevType(VedtaksbrevType brevType) {
-            vedtaksbrevFritekstOppsummering.brevType = brevType;
-            return this;
-        }
-
         public VedtaksbrevFritekstOppsummering build() {
             Objects.requireNonNull(vedtaksbrevFritekstOppsummering.behandlingId);
-            Objects.requireNonNull(vedtaksbrevFritekstOppsummering.brevType);
             return vedtaksbrevFritekstOppsummering;
         }
     }

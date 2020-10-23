@@ -117,7 +117,7 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
 
     @JsonProperty("har-vedlegg")
     public boolean isMedVedlegg() {
-        return vedtaksbrevType != VedtaksbrevType.FRITEKST_FEILUTBETALING_BORTFALT;
+        return vedtaksbrevType == VedtaksbrevType.ORDINÆR;
     }
 
     public VedtakResultatType getHovedresultat() {

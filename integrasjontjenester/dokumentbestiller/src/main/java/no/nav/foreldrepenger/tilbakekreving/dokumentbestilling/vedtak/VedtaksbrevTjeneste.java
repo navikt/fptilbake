@@ -26,6 +26,7 @@ import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultatPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VedtaksbrevFritekstValidator;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BeregningResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
@@ -209,6 +210,7 @@ public class VedtaksbrevTjeneste {
         VedtaksbrevData vedtaksbrevData = hentDataForVedtaksbrev(behandlingId, dto.getOppsummeringstekst(),
             dto.getPerioderMedTekst(), getBrevMottaker(behandlingId));
         HbVedtaksbrevData hbVedtaksbrevData = vedtaksbrevData.getVedtaksbrevData();
+        validerFritekstOppsummering(hbVedtaksbrevData.getFelles().getVedtaksbrevType(), dto.getOppsummeringstekst());
         FritekstbrevData data = new FritekstbrevData.Builder()
             .medOverskrift(TekstformatererVedtaksbrev.lagVedtaksbrevOverskrift(hbVedtaksbrevData, vedtaksbrevData.getMetadata().getSpråkkode()))
             .medBrevtekst(TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(hbVedtaksbrevData))
@@ -242,6 +244,12 @@ public class VedtaksbrevTjeneste {
                 throw new RuntimeException("Fikk IO exception ved forhåndsvisning inkl vedlegg", e);
             }
             return baos.toByteArray();
+        }
+    }
+
+    private void validerFritekstOppsummering(VedtaksbrevType vedtaksbrevType, String oppsummeringFritekst) {
+        if (oppsummeringFritekst != null && oppsummeringFritekst.length() >= VedtaksbrevFritekstOppsummering.maxFritekstLengde(vedtaksbrevType)) {
+            throw VedtaksbrevFritekstValidator.FritekstFeil.FACTORY.fritekstOppsumeringForLang().toException();
         }
     }
 

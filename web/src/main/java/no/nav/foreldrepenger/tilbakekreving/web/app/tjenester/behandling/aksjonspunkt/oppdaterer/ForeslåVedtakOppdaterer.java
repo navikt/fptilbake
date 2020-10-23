@@ -8,8 +8,6 @@ import java.util.function.Function;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.apache.cxf.common.util.CollectionUtils;
-
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.ForeslåVedtakTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VedtaksbrevFritekstTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.totrinn.TotrinnTjeneste;
@@ -48,7 +46,7 @@ public class ForeslåVedtakOppdaterer implements AksjonspunktOppdaterer<Foreslå
     public void oppdater(ForeslåVedtakDto dto, Behandling behandling) {
         Long behandlingId = behandling.getId();
         VedtaksbrevType brevType = behandling.utledVedtaksbrevType();
-        vedtaksbrevFritekstTjeneste.lagreFriteksterFraSaksbehandler(behandlingId, lagOppsummeringstekst(behandlingId, dto, brevType), lagPerioderMedTekst(behandlingId, dto.getPerioderMedTekst()));
+        vedtaksbrevFritekstTjeneste.lagreFriteksterFraSaksbehandler(behandlingId, lagOppsummeringstekst(behandlingId, dto), lagPerioderMedTekst(behandlingId, dto.getPerioderMedTekst()), brevType);
         foreslåVedtakTjeneste.lagHistorikkInnslagForForeslåVedtak(behandlingId);
 
         opprettEllerReåpne(behandling, AksjonspunktDefinisjon.FATTE_VEDTAK);
@@ -83,11 +81,10 @@ public class ForeslåVedtakOppdaterer implements AksjonspunktOppdaterer<Foreslå
             .build();
     }
 
-    private VedtaksbrevFritekstOppsummering lagOppsummeringstekst(Long behandlingId, ForeslåVedtakDto dto, VedtaksbrevType brevType) {
+    private VedtaksbrevFritekstOppsummering lagOppsummeringstekst(Long behandlingId, ForeslåVedtakDto dto) {
         if (dto.getOppsummeringstekst() != null) {
             return new VedtaksbrevFritekstOppsummering.Builder()
                 .medOppsummeringFritekst(dto.getOppsummeringstekst())
-                .medBrevType(brevType)
                 .medBehandlingId(behandlingId).build();
         } else {
             return null;

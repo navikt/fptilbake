@@ -65,7 +65,7 @@ class TekstformatererVedtaksbrev extends FellesTekstformaterer {
     public static String lagVedtakStart(HbVedtaksbrevFelles vedtaksbrevFelles) {
         switch (vedtaksbrevFelles.getVedtaksbrevType()) {
             case FRITEKST_FEILUTBETALING_BORTFALT:
-                return konverterMedPartialTemplate("vedtak/fritekstVedtakOgUtenPeriode/fritekstVedtakOgUtenPeriode_start", vedtaksbrevFelles);
+                return konverterMedPartialTemplate("vedtak/fritekstFeilutbetalingBortfalt/fritekstFeilutbetalingBortfalt_start", vedtaksbrevFelles);
             case ORDINÆR:
                 return konverterMedPartialTemplate("vedtak/vedtak_start", vedtaksbrevFelles);
             default:
@@ -246,7 +246,7 @@ class TekstformatererVedtaksbrev extends FellesTekstformaterer {
     static String lagVedtaksbrevFritekst(HbVedtaksbrevData vedtaksbrevData) {
         switch (vedtaksbrevData.getFelles().getVedtaksbrevType()) {
             case FRITEKST_FEILUTBETALING_BORTFALT:
-                return lagVedtaksbrev("vedtak/fritekstVedtakOgUtenPeriode/fritekstVedtakOgUtenPeriode", vedtaksbrevData);
+                return lagVedtaksbrev("vedtak/fritekstFeilutbetalingBortfalt/fritekstFeilutbetalingBortfalt", vedtaksbrevData);
             case ORDINÆR:
                 return lagVedtaksbrev("vedtak/vedtak", vedtaksbrevData);
             default:
