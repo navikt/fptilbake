@@ -27,6 +27,8 @@ import no.nav.vedtak.util.LRUCache;
 @Transactional
 public class KodeverkRestTjeneste {
 
+    public static final String KODERVERK_PATH = "/kodeverk";
+
     private HentKodeverkTjeneste hentKodeverkTjeneste; // NOSONAR
 
     private static final long CACHE_ELEMENT_LIVE_TIME_MS = TimeUnit.MILLISECONDS.convert(60, TimeUnit.MINUTES);

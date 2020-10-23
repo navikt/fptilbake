@@ -41,6 +41,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlendeEnhetTjen
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingRevurderingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.HenleggBehandlingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.totrinn.TotrinnTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.verge.VergeTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingManglerKravgrunnlagFristenEndretEventPubliserer;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollAsynkTjeneste;
@@ -77,6 +78,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.Søkest
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.VergeBehandlingsmenyEnum;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
+import no.nav.vedtak.sikkerhet.context.SubjectHandler;
 
 @Path(BehandlingRestTjeneste.PATH_FRAGMENT)
 @Produces(APPLICATION_JSON)
@@ -85,6 +87,24 @@ import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 @Transactional
 public class BehandlingRestTjeneste {
     public static final String PATH_FRAGMENT = "/behandlinger";
+
+    private static final String SAK_RETTIGHETER_PART_PATH = "/sak-rettigheter";
+    public static final String SAK_RETTIGHETER_PATH = PATH_FRAGMENT + SAK_RETTIGHETER_PART_PATH;
+    private static final String BEHANDLING_RETTIGHETER_PART_PATH = "/behandling-rettigheter";
+    public static final String BEHANDLING_RETTIGHETER_PATH = PATH_FRAGMENT + BEHANDLING_RETTIGHETER_PART_PATH;
+
+    // TODO: remove in contract phase
+    private static final String HANDLING_RETTIGHETER_PART_PATH = "/handling-rettigheter-v2";
+    public static final String HANDLING_RETTIGHETER_PATH = PATH_FRAGMENT + HANDLING_RETTIGHETER_PART_PATH;
+
+    private static final String BEHANDLING_ALLE_PART_PATH = "/alle";
+    public static final String BEHANDLING_ALLE_PATH = PATH_FRAGMENT + BEHANDLING_ALLE_PART_PATH;
+
+    private static final String BEHANDLING_KAN_OPPRETTES_PART_PATH = "/kan-opprettes";
+    public static final String BEHANDLING_KAN_OPPRETTES_PATH = PATH_FRAGMENT + BEHANDLING_KAN_OPPRETTES_PART_PATH;
+    private static final String REVURDERING_KAN_OPPRETTES_PART_PATH = "/kan-revurdering-opprettes-v2";
+    public static final String REVURDERING_KAN_OPPRETTES_PATH = PATH_FRAGMENT + REVURDERING_KAN_OPPRETTES_PART_PATH;
+
 
     private BehandlingTjeneste behandlingTjeneste;
     private GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste;
@@ -95,6 +115,7 @@ public class BehandlingRestTjeneste {
     private BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste;
     private BehandlendeEnhetTjeneste behandlendeEnhetTjeneste;
     private BehandlingManglerKravgrunnlagFristenEndretEventPubliserer fristenEndretEventPubliserer;
+    private TotrinnTjeneste totrinnTjeneste;
     private VergeTjeneste vergeTjeneste;
 
     public BehandlingRestTjeneste() {
@@ -105,6 +126,7 @@ public class BehandlingRestTjeneste {
     public BehandlingRestTjeneste(BehandlingsTjenesteProvider behandlingsTjenesteProvider,
                                   BehandlingDtoTjeneste behandlingDtoTjeneste,
                                   VergeTjeneste vergeTjeneste,
+                                  TotrinnTjeneste totrinnTjeneste,
                                   BehandlingsprosessApplikasjonTjeneste behandlingsprosessTjeneste,
                                   BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste,
                                   BehandlingManglerKravgrunnlagFristenEndretEventPubliserer fristenEndretEventPubliserer) {
@@ -119,6 +141,7 @@ public class BehandlingRestTjeneste {
         this.behandlendeEnhetTjeneste = behandlingsTjenesteProvider.getEnhetTjeneste();
         this.fristenEndretEventPubliserer = fristenEndretEventPubliserer;
         this.vergeTjeneste = vergeTjeneste;
+        this.totrinnTjeneste = totrinnTjeneste;
     }
 
     @GET
@@ -157,7 +180,7 @@ public class BehandlingRestTjeneste {
     }
 
     @GET
-    @Path("/kan-opprettes")
+    @Path(BEHANDLING_KAN_OPPRETTES_PART_PATH)
     @Operation(
         tags = "behandlinger",
         description = "Sjekk om behandling kan opprettes")
@@ -182,7 +205,7 @@ public class BehandlingRestTjeneste {
     }
 
     @GET
-    @Path("/kan-revurdering-opprettes-v2")
+    @Path(REVURDERING_KAN_OPPRETTES_PART_PATH)
     @Operation(
         tags = "behandlinger",
         description = "Sjekk om revurdering kan opprettes")
@@ -276,7 +299,7 @@ public class BehandlingRestTjeneste {
     }
 
     @GET
-    @Path("/alle")
+    @Path(BEHANDLING_ALLE_PART_PATH)
     @Timed
     @Operation(
         tags = "behandlinger",
@@ -425,7 +448,7 @@ public class BehandlingRestTjeneste {
     }
 
     @GET
-    @Path("/handling-rettigheter-v2")
+    @Path(HANDLING_RETTIGHETER_PART_PATH)
     @Operation(
         tags = "behandlinger",
         description = "Rettigheter for behandlinger og fagsak")
@@ -435,12 +458,40 @@ public class BehandlingRestTjeneste {
 
         var rettigheter = behandlingTjeneste.hentBehandlinger(saksnummer).stream()
             .filter(b -> BehandlingStatus.OPPRETTET.equals(b.getStatus()) || BehandlingStatus.UTREDES.equals(b.getStatus()))
-            .map(b -> new BehandlingOperasjonerDto(b.getUuid(), true, false,
-                b.isBehandlingPåVent(), !b.isBehandlingPåVent(), false, viseVerge(b)))
+            .map(this::lovligeOperasjoner)
             .collect(Collectors.toList());
         var oppretting = List.of(new BehandlingOpprettingDto(BehandlingType.TILBAKEKREVING, behandlingTjeneste.hentBehandlinger(saksnummer).stream().allMatch(Behandling::erSaksbehandlingAvsluttet)),
             new BehandlingOpprettingDto(BehandlingType.REVURDERING_TILBAKEKREVING, behandlingTjeneste.hentBehandlinger(saksnummer).stream().anyMatch(revurderingTjeneste::kanRevurderingOpprettes)));
         return new SakRettigheterDto(false, oppretting, rettigheter);
+    }
+
+    @GET
+    @Path(SAK_RETTIGHETER_PART_PATH)
+    @Operation(
+        tags = "behandlinger",
+        description = "Henter rettigheter for lovlige behandlingsoprettinger for sak")
+    @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
+    @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
+    public SakRettigheterDto hentRettigheterSak(@NotNull @QueryParam("saksnummer") @Valid SaksnummerDto saksnummerDto) {
+        Saksnummer saksnummer = new Saksnummer(saksnummerDto.getVerdi());
+        var kanOppretteTilbake = behandlingTjeneste.hentBehandlinger(saksnummer).stream().allMatch(Behandling::erSaksbehandlingAvsluttet);
+        var kanOppretteRevurdering = behandlingTjeneste.hentBehandlinger(saksnummer).stream().anyMatch(revurderingTjeneste::kanRevurderingOpprettes);
+        var oppretting = List.of(new BehandlingOpprettingDto(BehandlingType.TILBAKEKREVING, kanOppretteTilbake),
+            new BehandlingOpprettingDto(BehandlingType.REVURDERING_TILBAKEKREVING, kanOppretteRevurdering));
+        return new SakRettigheterDto(false, oppretting, List.of());
+    }
+
+    @GET
+    @Path(BEHANDLING_RETTIGHETER_PART_PATH)
+    @Operation(
+        tags = "behandlinger",
+        description = "Henter rettigheter for lovlige behandlingsoperasjoner")
+    @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
+    @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
+    public BehandlingOperasjonerDto hentMenyOpsjoner(@NotNull @QueryParam(UuidDto.NAME) @Parameter(description = UuidDto.DESC) @Valid UuidDto uuidDto) {
+        UUID behandlingUUId = uuidDto.getBehandlingUuid();
+        Behandling behandling = behandlingTjeneste.hentBehandling(behandlingUUId);
+        return lovligeOperasjoner(behandling);
     }
 
     private VergeBehandlingsmenyEnum viseVerge(Behandling behandling) {
@@ -460,5 +511,27 @@ public class BehandlingRestTjeneste {
             behandling = behandlingTjeneste.hentBehandling(behandlingReferanse.getBehandlingUuid());
         }
         return behandling;
+    }
+
+    private BehandlingOperasjonerDto lovligeOperasjoner(Behandling b) {
+        if (b.erSaksbehandlingAvsluttet()) {
+            return BehandlingOperasjonerDto.builder(b.getUuid()).build(); // Skal ikke foreta menyvalg lenger
+        } else if (BehandlingStatus.FATTER_VEDTAK.equals(b.getStatus())) {
+            boolean tilgokjenning = b.getAnsvarligSaksbehandler() != null && !b.getAnsvarligSaksbehandler().equalsIgnoreCase(SubjectHandler.getSubjectHandler().getUid());
+            return BehandlingOperasjonerDto.builder(b.getUuid()).medTilGodkjenning(tilgokjenning).build();
+        } else {
+            boolean totrinnRetur = totrinnTjeneste.hentTotrinnsvurderinger(b).stream().anyMatch(tt -> !tt.isGodkjent());
+            return BehandlingOperasjonerDto.builder(b.getUuid())
+                .medTilGodkjenning(false)
+                .medFraBeslutter(!b.isBehandlingPåVent() && totrinnRetur)
+                .medKanBytteEnhet(true)
+                .medKanHenlegges(true)
+                .medKanSettesPaVent(!b.isBehandlingPåVent())
+                .medKanGjenopptas(b.isBehandlingPåVent())
+                .medKanOpnesForEndringer(false)
+                .medKanSendeMelding(!b.isBehandlingPåVent())
+                .medVergemeny(viseVerge(b))
+                .build();
+        }
     }
 }
