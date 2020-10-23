@@ -6,6 +6,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.Ve
 
 public class VergeDto {
 
+    private String aktoerId;
     private String navn;
     private String fnr;
     private LocalDate gyldigFom;
@@ -14,6 +15,14 @@ public class VergeDto {
     private String organisasjonsnummer;
 
     public VergeDto() { //NOSONAR
+    }
+
+    public String getAktoerId() {
+        return aktoerId;
+    }
+
+    public void setAktoerId(String aktoerId) {
+        this.aktoerId = aktoerId;
     }
 
     public void setNavn(String navn) {

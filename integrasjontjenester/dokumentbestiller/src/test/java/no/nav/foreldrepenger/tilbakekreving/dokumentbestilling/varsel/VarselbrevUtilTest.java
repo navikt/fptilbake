@@ -60,6 +60,9 @@ public class VarselbrevUtilTest {
         personopplysningDto.setNavn("Fiona");
         personopplysningDto.setFødselsnummer(PERSONNUMMER);
 
+        Personinfo personinfo = Personinfo.builder().medAktørId(new AktørId("1234567890011")).medPersonIdent(new PersonIdent(PERSONNUMMER))
+            .medNavn("Fiona").medNavBrukerKjønn(NavBrukerKjønn.KVINNE).medFødselsdato(LocalDate.now().minusDays(1)).build();
+
         YtelseNavn ytelseNavn = lagYtelseNavn("eingongsstønad", "engangsstønad");
 
         SamletEksternBehandlingInfo behandingsinfo = SamletEksternBehandlingInfo.builder(Tillegsinformasjon.PERSONOPPLYSNINGER)
@@ -72,6 +75,7 @@ public class VarselbrevUtilTest {
             VARSEL_TEKST,
             adresseinfo,
             behandingsinfo,
+            personinfo,
             feilutbetaltePerioderDto,
             Period.ofWeeks(3),
             FagsakYtelseType.ENGANGSTØNAD,
@@ -89,8 +93,8 @@ public class VarselbrevUtilTest {
         assertThat(varselbrev.getBrevMetadata().getFagsaktypenavnPåSpråk()).isEqualTo("eingongsstønad");
         assertThat(varselbrev.getBrevMetadata().getTittel()).isEqualTo("Varsel tilbakebetaling engangsstønad");
 
-        assertThat(varselbrev.getBrevMetadata().getSakspartNavn()).isEqualTo(behandingsinfo.getPersonopplysninger().getNavn());
-        assertThat(varselbrev.getBrevMetadata().getSakspartId()).isEqualTo(behandingsinfo.getPersonopplysninger().getFødselsnummer());
+        assertThat(varselbrev.getBrevMetadata().getSakspartNavn()).isEqualTo(personinfo.getNavn());
+        assertThat(varselbrev.getBrevMetadata().getSakspartId()).isEqualTo(personinfo.getPersonIdent().getIdent());
 
         assertThat(varselbrev.getFeilutbetaltePerioder().get(0).getFom()).isEqualTo(feilutbetaltePerioderDto.getPerioder().get(0).getFom());
         assertThat(varselbrev.getFeilutbetaltePerioder().get(0).getTom()).isEqualTo(feilutbetaltePerioderDto.getPerioder().get(0).getTom());

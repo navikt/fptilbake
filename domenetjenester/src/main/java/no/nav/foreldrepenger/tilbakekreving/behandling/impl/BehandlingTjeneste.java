@@ -311,6 +311,10 @@ public class BehandlingTjeneste {
                 builder.medOrganisasjonnummer(vergeDto.getOrganisasjonsnummer());
             } else if (!StringUtils.nullOrEmpty(vergeDto.getFnr())) {
                 builder.medVergeAktørId(fagsakTjeneste.hentAktørForFnr(vergeDto.getFnr()));
+            } else if (!StringUtils.nullOrEmpty(vergeDto.getAktoerId())) {
+                var aktørId = new AktørId(vergeDto.getAktoerId());
+                builder.medVergeAktørId(aktørId);
+                builder.medNavn(fagsakTjeneste.hentNavnForAktør(aktørId));
             }
             vergeRepository.lagreVergeInformasjon(behandlingId, builder.build());
         }

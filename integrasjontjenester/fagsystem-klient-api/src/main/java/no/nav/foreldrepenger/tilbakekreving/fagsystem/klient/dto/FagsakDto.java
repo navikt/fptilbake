@@ -10,6 +10,7 @@ public class FagsakDto {
 
     private String saksnummer;
     private FagsakYtelseType sakstype;
+    private String aktoerId;
 
     public void setSaksnummer(String saksnummer) {
         this.saksnummer = saksnummer;
@@ -25,5 +26,13 @@ public class FagsakDto {
 
     public void setSakstype(FagsakYtelseType sakstype) {
         this.sakstype = sakstype;
+    }
+
+    public String getAktoerId() {
+        return aktoerId;
+    }
+
+    public void setAktoerId(String aktoerId) {
+        this.aktoerId = aktoerId;
     }
 }
