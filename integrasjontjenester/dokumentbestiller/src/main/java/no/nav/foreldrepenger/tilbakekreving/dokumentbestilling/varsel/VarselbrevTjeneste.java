@@ -99,7 +99,7 @@ public class VarselbrevTjeneste {
             .medMetadata(varselbrevSamletInfo.getBrevMetadata())
             .build();
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-        if (BrevToggle.brukDokprod()) {
+        if (BrevToggle.brukDokprod(BrevType.VARSEL_BREV)) {
             JournalpostIdOgDokumentId dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data);
             opprettHistorikkinnslag(behandling, dokumentreferanse, brevMottaker);
             lagreInfoOmVarselbrev(behandlingId, dokumentreferanse);
@@ -129,7 +129,7 @@ public class VarselbrevTjeneste {
             .medBrevtekst(brevtekst)
             .medMetadata(varselbrevSamletInfo.getBrevMetadata())
             .build();
-        if (BrevToggle.brukDokprod()) {
+        if (BrevToggle.brukDokprod(BrevType.VARSEL_BREV)) {
             return bestillDokumentTjeneste.hentForhåndsvisningFritekstbrev(data);
         } else {
             return pdfBrevTjeneste.genererForhåndsvisning(BrevData.builder()
@@ -193,7 +193,7 @@ public class VarselbrevTjeneste {
         VarselInfo varselInfo = varselRepository.finnEksaktVarsel(behandlingId);
         String varselTekst = varselInfo.getVarselTekst();
 
-        if (BrevToggle.brukDokprod()) {
+        if (BrevToggle.brukDokprod(BrevType.VARSEL_BREV)) {
             lagreVarseltBeløp(behandlingId, feilutbetaltePerioderDto.getSumFeilutbetaling());
         }
 

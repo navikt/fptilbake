@@ -80,7 +80,7 @@ public class HenleggelsesbrevTjeneste {
         HenleggelsesbrevSamletInfo henleggelsesbrevSamletInfo = lagHenleggelsebrevForSending(behandling, fritekst, brevMottaker);
         FritekstbrevData fritekstbrevData = BehandlingType.TILBAKEKREVING.equals(behandling.getType()) ?
             lagHenleggelsebrev(henleggelsesbrevSamletInfo) : lagRevurderingHenleggelsebrev(henleggelsesbrevSamletInfo);
-        if (BrevToggle.brukDokprod()) {
+        if (BrevToggle.brukDokprod(BrevType.HENLEGGELSE_BREV)) {
             JournalpostIdOgDokumentId dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(fritekstbrevData);
             opprettHistorikkinnslag(behandling, dokumentreferanse, brevMottaker);
             lagreInfoOmHenleggelsesbrev(behandlingId, dokumentreferanse);
@@ -111,7 +111,7 @@ public class HenleggelsesbrevTjeneste {
         FritekstbrevData fritekstbrevData = BehandlingType.TILBAKEKREVING.equals(behandling.getType()) ?
             lagHenleggelsebrev(henleggelsesbrevSamletInfo) : lagRevurderingHenleggelsebrev(henleggelsesbrevSamletInfo);
 
-        if (BrevToggle.brukDokprod()) {
+        if (BrevToggle.brukDokprod(BrevType.HENLEGGELSE_BREV)) {
             return bestillDokumentTjeneste.hentForhåndsvisningFritekstbrev(fritekstbrevData);
         } else {
             return pdfBrevTjeneste.genererForhåndsvisning(BrevData.builder()

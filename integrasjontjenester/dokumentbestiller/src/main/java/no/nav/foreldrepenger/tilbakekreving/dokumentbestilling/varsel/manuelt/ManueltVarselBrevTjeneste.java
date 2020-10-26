@@ -93,7 +93,7 @@ public class ManueltVarselBrevTjeneste {
 
         FritekstbrevData data = lagManueltVarselBrev(varselbrevSamletInfo);
 
-        if (BrevToggle.brukDokprod()) {
+        if (BrevToggle.brukDokprod(BrevType.VARSEL_BREV)) {
             JournalpostIdOgDokumentId dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data);
             String tittel = BrevMottaker.VERGE.equals(brevMottaker) ? TITTEL_VARSELBREV_HISTORIKKINNSLAG_TIL_VERGE : TITTEL_VARSELBREV_HISTORIKKINNSLAG;
             opprettHistorikkinnslag(behandling, dokumentreferanse, tittel);
@@ -110,7 +110,7 @@ public class ManueltVarselBrevTjeneste {
     }
 
     public byte[] hentForhåndsvisningManueltVarselbrev(Long behandlingId, DokumentMalType malType, String fritekst) {
-        if (BrevToggle.brukDokprod()) {
+        if (BrevToggle.brukDokprod(BrevType.VARSEL_BREV)) {
             return hentForhåndsvisningManueltVarselbrevDokprod(behandlingId, malType, fritekst);
         } else {
             return hentForhåndsvisningManueltVarselbrevPdfgen(behandlingId, malType, fritekst);
@@ -165,7 +165,7 @@ public class ManueltVarselBrevTjeneste {
 
         FritekstbrevData data = lagKorrigertVarselBrev(varselbrevSamletInfo, varselInfo);
 
-        if (BrevToggle.brukDokprod()) {
+        if (BrevToggle.brukDokprod(BrevType.VARSEL_BREV)) {
             JournalpostIdOgDokumentId dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data);
             String tittel = BrevMottaker.VERGE.equals(brevMottaker) ? TITTEL_KORRIGERT_VARSELBREV_HISTORIKKINNSLAG_TIL_VERGE : TITTEL_KORRIGERT_VARSELBREV_HISTORIKKINNSLAG;
             opprettHistorikkinnslag(behandling, dokumentreferanse, tittel);
