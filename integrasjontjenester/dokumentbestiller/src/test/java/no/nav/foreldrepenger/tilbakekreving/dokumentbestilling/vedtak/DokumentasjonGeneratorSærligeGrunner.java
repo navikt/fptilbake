@@ -230,7 +230,7 @@ public class DokumentasjonGeneratorSærligeGrunner {
                 .medHovedresultat(VedtakResultatType.FULL_TILBAKEBETALING)
                 .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(1000))
                 .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(1100))
-                .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.valueOf(1100))
+                .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.valueOf(900))
                 .medTotaltRentebeløp(BigDecimal.valueOf(100))
                 .build())
             .medLovhjemmelVedtak("foo")

@@ -8,6 +8,7 @@ import java.util.List;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
@@ -214,7 +215,8 @@ public class DokumentasjonGeneratorVedtakOppsummering {
             .medKonfigurasjon(HbKonfigurasjon.builder()
                 .medKlagefristUker(6)
                 .build())
-            .medLovhjemmelVedtak("");
+            .medLovhjemmelVedtak("")
+            .medVedtaksbrevType(VedtaksbrevType.ORDINÆR);
         if (medKorrigertBeløp) {
             fellesBuilder.medVarsel(HbVarsel.builder()
                 .medVarsletBeløp(25000L)
