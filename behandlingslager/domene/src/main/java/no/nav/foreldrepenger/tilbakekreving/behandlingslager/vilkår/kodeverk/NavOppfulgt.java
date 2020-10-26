@@ -1,31 +1,90 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
+import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
 
-@Entity(name = "NavOppfulgt")
-@DiscriminatorValue(NavOppfulgt.DISCRIMINATOR)
-public class NavOppfulgt extends Kodeliste {
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    public static final String DISCRIMINATOR = "NAV_OPPFULGT";
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
-    public static final NavOppfulgt NAV_KAN_IKKE_LASTES = new NavOppfulgt("NAV_ULASTBAR");
-    public static final NavOppfulgt HAR_IKKE_FULGT_OPP = new NavOppfulgt("HAR_IKKE_FULGT_OPP");
-    public static final NavOppfulgt HAR_BENYTTET_FEIL = new NavOppfulgt("HAR_BENYTTET_FEIL");
-    public static final NavOppfulgt HAR_IKKE_SJEKKET = new NavOppfulgt("HAR_IKKE_SJEKKET");
-    public static final NavOppfulgt BEREGNINGS_FEIL = new NavOppfulgt("BEREGNINGS_FEIL");
-    public static final NavOppfulgt HAR_UTFØRT_FEIL = new NavOppfulgt("HAR_UTFOERT_FEIL");
-    public static final NavOppfulgt HAR_SENDT_TIL_FEIL_MOTTAKER = new NavOppfulgt("HAR_SENDT_TIL_FEIL_MOTTAKER");
+public enum NavOppfulgt implements Kodeverdi {
 
-    public static final NavOppfulgt UDEFINERT = new NavOppfulgt("-");
+    NAV_KAN_IKKE_LASTES("NAV_ULASTBAR"),
+    HAR_IKKE_FULGT_OPP("HAR_IKKE_FULGT_OPP"),
+    HAR_BENYTTET_FEIL("HAR_BENYTTET_FEIL"),
+    HAR_IKKE_SJEKKET("HAR_IKKE_SJEKKET"),
+    BEREGNINGS_FEIL("BEREGNINGS_FEIL"),
+    HAR_UTFØRT_FEIL("HAR_UTFOERT_FEIL"),
+    HAR_SENDT_TIL_FEIL_MOTTAKER("HAR_SENDT_TIL_FEIL_MOTTAKER"),
 
-    NavOppfulgt(String kode) {
-        super(kode, DISCRIMINATOR);
+    UDEFINERT("-");
+
+    public static final String KODEVERK = "NAV_OPPFULGT";
+    private static final Map<String, NavOppfulgt> KODER = new LinkedHashMap<>();
+
+    private String kode;
+
+    static {
+        for (var v : values()) {
+            if (KODER.putIfAbsent(v.kode, v) != null) {
+                throw new IllegalArgumentException("Duplikat : " + v.kode);
+            }
+        }
     }
 
-    NavOppfulgt() {
-        // For hibernate
+    NavOppfulgt(String kode) {
+       this.kode = kode;
+    }
+
+    public static NavOppfulgt fraKode(@JsonProperty("kode") String kode) {
+        if (kode == null) {
+            return null;
+        }
+        var ad = KODER.get(kode);
+        if (ad == null) {
+            throw new IllegalArgumentException("Ukjent NavOppfulgt: " + kode);
+        }
+        return ad;
+    }
+
+    public static Map<String, NavOppfulgt> kodeMap() {
+        return Collections.unmodifiableMap(KODER);
+    }
+
+    @Override
+    public String getKode() {
+        return kode;
+    }
+
+    @Override
+    public String getOffisiellKode() {
+        return getKode();
+    }
+
+    @Override
+    public String getKodeverk() {
+        return KODEVERK;
+    }
+
+    @Override
+    public String getNavn() {
+        return null;
+    }
+
+    @Converter(autoApply = true)
+    public static class KodeverdiConverter implements AttributeConverter<NavOppfulgt, String> {
+        @Override
+        public String convertToDatabaseColumn(NavOppfulgt attribute) {
+            return attribute == null ? null : attribute.getKode();
+        }
+
+        @Override
+        public NavOppfulgt convertToEntityAttribute(String dbData) {
+            return dbData == null ? null : fraKode(dbData);
+        }
     }
 }

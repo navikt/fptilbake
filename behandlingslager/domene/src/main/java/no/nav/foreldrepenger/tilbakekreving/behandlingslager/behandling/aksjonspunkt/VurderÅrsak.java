@@ -1,33 +1,97 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
+
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
 
-@Entity(name = "VurderÅrsak")
-@DiscriminatorValue(VurderÅrsak.DISCRIMINATOR)
-public class VurderÅrsak extends Kodeliste {
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
+public enum VurderÅrsak implements Kodeverdi {
 
-    public static final String DISCRIMINATOR = "VURDER_AARSAK";
+    FEIL_FAKTA("FEIL_FAKTA"),
+    FEIL_LOV("FEIL_LOV"),
+    FEIL_REGEL("FEIL_REGEL"),
+    ANNET("ANNET"),
+    UDEFINERT("-"); //$NON-NLS-1$
 
-    public static final VurderÅrsak FEIL_FAKTA = new VurderÅrsak("FEIL_FAKTA"); //$NON-NLS-1$
-    public static final VurderÅrsak FEIL_LOV = new VurderÅrsak("FEIL_LOV"); //$NON-NLS-1$
-    public static final VurderÅrsak FEIL_REGEL = new VurderÅrsak("FEIL_REGEL"); //$NON-NLS-1$
-    public static final VurderÅrsak ANNET = new VurderÅrsak("ANNET"); //$NON-NLS-1$
+    public static final String KODEVERK = "VURDER_AARSAK";
+    private static final Map<String, VurderÅrsak> KODER = new LinkedHashMap<>();
 
-    public static final VurderÅrsak UDEFINERT = new VurderÅrsak("-"); //$NON-NLS-1$
+    private String kode;
 
-    public VurderÅrsak() {
+    static {
+        for (var v : values()) {
+            if (KODER.putIfAbsent(v.kode, v) != null) {
+                throw new IllegalArgumentException("Duplikat : " + v.kode);
+            }
+        }
     }
 
-    public VurderÅrsak(String kode) {
-        super(kode, DISCRIMINATOR);
+    VurderÅrsak(String kode) {
+        this.kode = kode;
     }
 
-    public VurderÅrsak(VurderÅrsak vurderÅrsak) {
-        this(vurderÅrsak.getKode());
+    @JsonCreator
+    public static VurderÅrsak fraKode(@JsonProperty("kode") String kode) {
+        if (kode == null) {
+            return null;
+        }
+        var ad = KODER.get(kode);
+        if (ad == null) {
+            throw new IllegalArgumentException("Ukjent VurderÅrsak: " + kode);
+        }
+        return ad;
     }
 
+    public static Map<String, VurderÅrsak> kodeMap() {
+        return Collections.unmodifiableMap(KODER);
+    }
+
+    @Converter(autoApply = true)
+    public static class KodeverdiConverter implements AttributeConverter<VurderÅrsak, String> {
+        @Override
+        public String convertToDatabaseColumn(VurderÅrsak attribute) {
+            return attribute == null ? null : attribute.getKode();
+        }
+
+        @Override
+        public VurderÅrsak convertToEntityAttribute(String dbData) {
+            return dbData == null ? null : fraKode(dbData);
+        }
+    }
+
+    @JsonProperty
+    @Override
+    public String getKode() {
+        return kode;
+    }
+
+    @Override
+    public String getOffisiellKode() {
+        return getKode();
+    }
+
+    @JsonProperty
+    @Override
+    public String getKodeverk() {
+        return KODEVERK;
+    }
+
+    @Override
+    public String getNavn() {
+        return null;
+    }
 }

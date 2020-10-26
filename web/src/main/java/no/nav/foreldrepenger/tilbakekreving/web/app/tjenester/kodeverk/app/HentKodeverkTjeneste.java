@@ -68,6 +68,7 @@ public class HentKodeverkTjeneste {
         map.put(VidereBehandling.class.getSimpleName(), VidereBehandling.kodeMap().values());
         map.put(VergeType.class.getSimpleName(), VergeType.kodeMap().values());
         map.put(BehandlingÅrsakType.class.getSimpleName(), BehandlingÅrsakType.kodeMap().values());
+        map.put(BehandlingType.class.getSimpleName(), BehandlingType.kodeMap().values());
 
         Map<String, Collection<? extends Kodeverdi>> mapFiltered = new LinkedHashMap<>();
 
@@ -79,8 +80,6 @@ public class HentKodeverkTjeneste {
     }
 
     private static List<Class<? extends Kodeliste>> KODEVERK_SOM_BRUKES_PÅ_KLIENT = Arrays.asList(
-        // Legg inn kodelister etter behov
-        BehandlingType.class
     );
 
     public HentKodeverkTjeneste() {

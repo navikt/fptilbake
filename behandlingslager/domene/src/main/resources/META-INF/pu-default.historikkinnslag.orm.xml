@@ -15,10 +15,5 @@
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagDokumentLink"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagFelt"/>
 
-    <!-- kodeliste -->
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltVerdiType"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkResultatType"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.RelasjonsRolleType"/>
-
 
 </entity-mappings>

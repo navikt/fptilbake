@@ -1,35 +1,65 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-@Entity(name = "SivilstandType")
-@DiscriminatorValue(SivilstandType.DISCRIMINATOR)
-public class SivilstandType extends Kodeliste {
-    public static final String DISCRIMINATOR = "SIVILSTAND_TYPE";
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    public static final SivilstandType ETTERLATT           = new SivilstandType("ENKE");  //$NON-NLS-1$
-    public static final SivilstandType GIFT                = new SivilstandType("GIFT");  //$NON-NLS-1$
-    public static final SivilstandType GJENLEVENDE_PARTNER = new SivilstandType("GJPA");  //$NON-NLS-1$
-    public static final SivilstandType GIFT_ADSKILT        = new SivilstandType("GLAD");  //$NON-NLS-1$
-    public static final SivilstandType UOPPGITT            = new SivilstandType("NULL");  //$NON-NLS-1$
-    public static final SivilstandType REGISTRERT_PARTNER  = new SivilstandType("REPA");  //$NON-NLS-1$
-    public static final SivilstandType SAMBOER             = new SivilstandType("SAMB");  //$NON-NLS-1$
-    public static final SivilstandType SEPARERT_PARTNER    = new SivilstandType("SEPA");  //$NON-NLS-1$
-    public static final SivilstandType SEPARERT            = new SivilstandType("SEPR");  //$NON-NLS-1$
-    public static final SivilstandType SKILT               = new SivilstandType("SKIL");  //$NON-NLS-1$
-    public static final SivilstandType SKILT_PARTNER       = new SivilstandType("SKPA");  //$NON-NLS-1$
-    public static final SivilstandType UGIFT               = new SivilstandType("UGIF");  //$NON-NLS-1$
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
+public enum SivilstandType implements Kodeverdi {
+    ETTERLATT("ENKE"),
+    GIFT("GIFT"),
+    GJENLEVENDE_PARTNER("GJPA"),
+    GIFT_ADSKILT("GLAD"),
+    UOPPGITT("NULL"),
+    REGISTRERT_PARTNER ("REPA"),
+    SAMBOER("SAMB"),
+    SEPARERT_PARTNER("SEPA"),
+    SEPARERT("SEPR"),
+    SKILT("SKIL"),
+    SKILT_PARTNER("SKPA"),
+    UGIFT("UGIF");
 
-    protected SivilstandType() {
-        // Hibernate trenger en
+    public static final String KODEVERK = "SIVILSTAND_TYPE";
+    private static final Map<String, SivilstandType> KODER = new LinkedHashMap<>();
+
+    private String kode;
+
+    static {
+        for (var v : values()) {
+            if (KODER.putIfAbsent(v.kode, v) != null) {
+                throw new IllegalArgumentException("Duplikat : " + v.kode);
+            }
+        }
     }
 
-    private SivilstandType(String kode) {
-        super(kode, DISCRIMINATOR);
+    SivilstandType(String kode) {
+        this.kode = kode;
+    }
+
+    @JsonCreator
+    public static SivilstandType fraKode(@JsonProperty("kode") String kode) {
+        if (kode == null) {
+            return null;
+        }
+        var ad = KODER.get(kode);
+        if (ad == null) {
+            throw new IllegalArgumentException("Ukjent SivilstandType: " + kode);
+        }
+        return ad;
+    }
+
+    public static Map<String, SivilstandType> kodeMap() {
+        return Collections.unmodifiableMap(KODER);
     }
 
     public boolean erGift() {
@@ -42,5 +72,27 @@ public class SivilstandType extends Kodeliste {
 
     public boolean erEtterlatt() {
         return ETTERLATT.equals(this);
+    }
+
+    @JsonProperty
+    @Override
+    public String getKode() {
+        return kode;
+    }
+
+    @Override
+    public String getOffisiellKode() {
+        return null;
+    }
+
+    @JsonProperty
+    @Override
+    public String getKodeverk() {
+        return KODEVERK;
+    }
+
+    @Override
+    public String getNavn() {
+        return null;
     }
 }

@@ -13,6 +13,8 @@ import javax.persistence.TypedQuery;
 
 import org.hibernate.jpa.QueryHints;
 
+import com.google.common.collect.Lists;
+
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingModell;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegKonfigurasjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegStatus;
@@ -43,7 +45,7 @@ public class BehandlingModellRepository {
     }
 
     public BehandlingStegKonfigurasjon getBehandlingStegKonfigurasjon() {
-        List<BehandlingStegStatus> list = getKodeverkRepository().hentAlle(BehandlingStegStatus.class);
+        List<BehandlingStegStatus> list = Lists.newArrayList(BehandlingStegStatus.values());
         return new BehandlingStegKonfigurasjon(list);
     }
 
@@ -79,9 +81,9 @@ public class BehandlingModellRepository {
     }
 
     private List<BehandlingTypeStegSekvens> finnBehandlingStegSekvens(BehandlingType type) {
-        String jpql = "from BehandlingTypeStegSekvens btss where btss.behandlingType.kode=:behandlingType ORDER BY btss.sekvensNr ASC"; //$NON-NLS-1$
+        String jpql = "from BehandlingTypeStegSekvens btss where btss.behandlingType=:behandlingType ORDER BY btss.sekvensNr ASC"; //$NON-NLS-1$
         TypedQuery<BehandlingTypeStegSekvens> query = entityManager.createQuery(jpql, BehandlingTypeStegSekvens.class);
-        query.setParameter("behandlingType", type.getKode()); //$NON-NLS-1$
+        query.setParameter("behandlingType", type); //$NON-NLS-1$
         query.setHint(QueryHints.HINT_READONLY, "true");//$NON-NLS-1$
         return query.getResultList();
     }

@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
@@ -19,10 +18,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.AdresseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.NavBrukerKjønn;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.GeografiKodeverkRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.SpråkKodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.tjeneste.virksomhet.person.v3.binding.HentPersonPersonIkkeFunnet;
@@ -42,28 +38,14 @@ public class TpsAdapterImplTest {
     private AktørConsumerMedCache aktørConsumerMock = Mockito.mock(AktørConsumerMedCache.class);
     private PersonConsumer personProxyServiceMock = Mockito.mock(PersonConsumer.class);
 
-    TpsTjeneste tpsTjeneste = Mockito.mock(TpsTjeneste.class);
     private final AktørId aktørId = new AktørId("1337");
     private final PersonIdent fnr = new PersonIdent("11112222333");
 
     @Before
     public void setup() {
         TpsAdresseOversetter tpsAdresseOversetter = new TpsAdresseOversetter(null);
-        TpsOversetter tpsOversetter = new TpsOversetter(mockKodeverkRepository(), mock(GeografiKodeverkRepository.class), lagMockSpråkKodeverkRepository(), tpsAdresseOversetter);
+        TpsOversetter tpsOversetter = new TpsOversetter(tpsAdresseOversetter);
         tpsAdapterImpl = new TpsAdapterImpl(aktørConsumerMock, personProxyServiceMock, tpsOversetter);
-    }
-
-    private KodeverkRepository mockKodeverkRepository() {
-        KodeverkRepository kodeverkRepository = mock(KodeverkRepository.class);
-        when(kodeverkRepository.finn(Mockito.eq(NavBrukerKjønn.class), any(String.class))).thenReturn(NavBrukerKjønn.KVINNE);
-        return kodeverkRepository;
-    }
-
-    private SpråkKodeverkRepository lagMockSpråkKodeverkRepository() {
-        SpråkKodeverkRepository språkRepo = Mockito.mock(SpråkKodeverkRepository.class);
-        when(språkRepo.finnSpråkMedKodeverkEiersKode("NN")).thenReturn(Optional.of(Språkkode.nn));
-        when(språkRepo.finnSpråkMedKodeverkEiersKode("NB")).thenReturn(Optional.of(Språkkode.nb));
-        return språkRepo;
     }
 
     @Test

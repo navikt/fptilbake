@@ -23,6 +23,4 @@
     <entity class="no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatusAggregate"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatus437"/>
 
-    <!-- kodeverk -->
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Inntektskategori"/>
 </entity-mappings>

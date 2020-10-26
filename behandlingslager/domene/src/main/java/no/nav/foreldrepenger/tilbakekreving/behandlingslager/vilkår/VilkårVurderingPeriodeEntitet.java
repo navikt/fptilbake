@@ -18,10 +18,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.JoinColumnOrFormula;
-import org.hibernate.annotations.JoinColumnsOrFormulas;
-import org.hibernate.annotations.JoinFormula;
-
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.NavOppfulgt;
@@ -47,11 +43,8 @@ public class VilkårVurderingPeriodeEntitet extends BaseEntitet {
     })
     private Periode periode;
 
-    @ManyToOne
-    @JoinColumnsOrFormulas(value = {
-        @JoinColumnOrFormula(formula = @JoinFormula(value = "'" + NavOppfulgt.DISCRIMINATOR + "'", referencedColumnName = "kodeverk")),
-        @JoinColumnOrFormula(column = @JoinColumn(name = "nav_oppfulgt", referencedColumnName = "kode")),
-    })
+    @Convert(converter = NavOppfulgt.KodeverdiConverter.class)
+    @Column(name = "nav_oppfulgt")
     private NavOppfulgt navOppfulgt = NavOppfulgt.UDEFINERT;
 
     @Convert(converter = VilkårResultat.KodeverdiConverter.class)

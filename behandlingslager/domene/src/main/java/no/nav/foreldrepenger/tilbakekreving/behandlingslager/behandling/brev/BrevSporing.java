@@ -3,16 +3,12 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev;
 import java.util.Objects;
 
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.JoinColumnOrFormula;
-import org.hibernate.annotations.JoinFormula;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkBaseEntitet;
@@ -34,9 +30,8 @@ public class BrevSporing extends KodeverkBaseEntitet {
     @Column(name = "DOKUMENT_ID", nullable = false)
     private String dokumentId;
 
-    @ManyToOne(optional = false)
-    @JoinColumnOrFormula(column = @JoinColumn(name = "brev_type", referencedColumnName = "kode", nullable = false))
-    @JoinColumnOrFormula(formula = @JoinFormula(referencedColumnName = "kodeverk", value = "'" + BrevType.DISCRIMINATOR + "'"))
+    @Convert(converter = BrevType.KodeverdiConverter.class)
+    @Column(name = "brev_type", nullable = false)
     private BrevType brevType = BrevType.UDEFINERT;
 
     public BrevSporing() {

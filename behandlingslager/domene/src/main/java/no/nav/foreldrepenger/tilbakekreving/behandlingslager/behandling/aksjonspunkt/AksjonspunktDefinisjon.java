@@ -15,10 +15,6 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.JoinColumnOrFormula;
-import org.hibernate.annotations.JoinColumnsOrFormulas;
-import org.hibernate.annotations.JoinFormula;
-
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkTabell;
 import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
@@ -47,12 +43,8 @@ public class AksjonspunktDefinisjon extends KodeverkTabell {
     // kun brukes for å sende data til fplos når behandling venter på grunnlaget etter fristen
     public static final AksjonspunktDefinisjon VURDER_HENLEGGELSE_MANGLER_KRAVGRUNNLAG = new AksjonspunktDefinisjon("8001");
 
-
-    @ManyToOne(optional = false)
-    @JoinColumnsOrFormulas({
-            @JoinColumnOrFormula(column = @JoinColumn(name = "aksjonspunkt_type", referencedColumnName = "kode", nullable = false)),
-            @JoinColumnOrFormula(formula = @JoinFormula(referencedColumnName = "kodeverk", value = "'" + AksjonspunktType.DISCRIMINATOR
-                    + "'"))})
+    @Convert(converter = AksjonspunktType.KodeverdiConverter.class)
+    @Column(name = "aksjonspunkt_type", nullable = false)
     private AksjonspunktType aksjonspunktType = AksjonspunktType.UDEFINERT;
 
     /**

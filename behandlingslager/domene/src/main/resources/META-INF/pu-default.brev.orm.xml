@@ -19,10 +19,4 @@
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons.Varselrespons"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselInfo"/>
 
-
-    <!-- kodeverk -->
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.dokumentbestiller.DokumentMalType"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevType"/>
-
-
 </entity-mappings>
