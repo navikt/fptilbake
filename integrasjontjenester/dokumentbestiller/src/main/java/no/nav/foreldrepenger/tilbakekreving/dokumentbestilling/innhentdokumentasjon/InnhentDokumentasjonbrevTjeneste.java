@@ -81,7 +81,7 @@ public class InnhentDokumentasjonbrevTjeneste {
         InnhentDokumentasjonbrevSamletInfo innhentDokumentasjonBrevSamletInfo = settOppInnhentDokumentasjonBrevSamletInfo(behandling, fritekst, brevMottaker);
         FritekstbrevData fritekstbrevData = lagInnhentDokumentasjonBrev(innhentDokumentasjonBrevSamletInfo);
 
-        if (BrevToggle.brukDokprod()) {
+        if (BrevToggle.brukDokprod(BrevType.INNHENT_DOKUMENTASJONBREV)) {
             JournalpostIdOgDokumentId dokumentReferanse = bestillDokumentTjeneste.sendFritekstbrev(fritekstbrevData);
             opprettHistorikkinnslag(behandling, dokumentReferanse, getTittel(brevMottaker));
             lagreInfoOmInnhentDokumentasjonBrev(behandlingId, dokumentReferanse);
@@ -101,7 +101,7 @@ public class InnhentDokumentasjonbrevTjeneste {
         BrevMottaker brevMottaker = vergeRepository.finnesVerge(behandlingId) ? BrevMottaker.VERGE : BrevMottaker.BRUKER;
         InnhentDokumentasjonbrevSamletInfo dokumentasjonBrevSamletInfo = settOppInnhentDokumentasjonBrevSamletInfo(behandling, fritekst, brevMottaker);
         FritekstbrevData fritekstbrevData = lagInnhentDokumentasjonBrev(dokumentasjonBrevSamletInfo);
-        if (BrevToggle.brukDokprod()) {
+        if (BrevToggle.brukDokprod(BrevType.INNHENT_DOKUMENTASJONBREV)) {
             return bestillDokumentTjeneste.hentForhåndsvisningFritekstbrev(fritekstbrevData);
         } else {
             return pdfBrevTjeneste.genererForhåndsvisning(BrevData.builder()
