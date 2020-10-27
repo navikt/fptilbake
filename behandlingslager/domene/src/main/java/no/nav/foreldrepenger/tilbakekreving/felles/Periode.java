@@ -2,6 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.felles;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -11,6 +12,7 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class Periode {
 
+    public static final Comparator<Periode> COMPARATOR = Comparator.comparing(Periode::getFom).thenComparing(Periode::getTom);
     private static final DateTimeFormatter DATO_FORMAT = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
     @Column(name = "fom")
