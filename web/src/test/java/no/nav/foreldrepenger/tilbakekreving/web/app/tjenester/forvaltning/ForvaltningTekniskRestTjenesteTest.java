@@ -20,7 +20,7 @@ public class ForvaltningTekniskRestTjenesteTest {
     public UnittestRepositoryRule repositoryRule = new UnittestRepositoryRule();
 
     private ProsessTaskRepository prosessTaskRepository = new ProsessTaskRepositoryImpl(repositoryRule.getEntityManager(), null, null);
-    private ForvaltningTekniskRestTjeneste forvaltningTekniskRestTjeneste = new ForvaltningTekniskRestTjeneste(prosessTaskRepository);
+    private ForvaltningTekniskRestTjeneste forvaltningTekniskRestTjeneste = new ForvaltningTekniskRestTjeneste(prosessTaskRepository, null, null);
 
     @Test
     public void skal_sett_task_ferdig_hvis_task_finnes() {
