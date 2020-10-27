@@ -59,14 +59,6 @@ public class BehandlingskontrollTjenesteTest {
         }
     }
 
-    /*static enum BehandlingTypeForTest implements BehandlingType {
-        BT_TEST;
-
-        protected BehandlingTypeForTest(String kode) {
-            super(kode);
-        }
-    }*/
-
     static class BehandlingModellForTest {
         BehandlingType behandlingType = BehandlingType.TILBAKEKREVING;
 

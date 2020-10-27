@@ -13,8 +13,6 @@ import javax.persistence.TypedQuery;
 
 import org.hibernate.jpa.QueryHints;
 
-import com.google.common.collect.Lists;
-
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingModell;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegKonfigurasjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegStatus;
@@ -45,7 +43,7 @@ public class BehandlingModellRepository {
     }
 
     public BehandlingStegKonfigurasjon getBehandlingStegKonfigurasjon() {
-        List<BehandlingStegStatus> list = Lists.newArrayList(BehandlingStegStatus.values());
+        List<BehandlingStegStatus> list = Arrays.asList(BehandlingStegStatus.values());
         return new BehandlingStegKonfigurasjon(list);
     }
 
@@ -58,7 +56,7 @@ public class BehandlingModellRepository {
      */
     public BehandlingModell getModell(BehandlingType behandlingType) {
         Object key = cacheKey(behandlingType);
-        cachedModell.computeIfAbsent(key, (kode) -> byggModell(behandlingType));
+        cachedModell.computeIfAbsent(key, kode -> byggModell(behandlingType));
         return cachedModell.get(key);
     }
 

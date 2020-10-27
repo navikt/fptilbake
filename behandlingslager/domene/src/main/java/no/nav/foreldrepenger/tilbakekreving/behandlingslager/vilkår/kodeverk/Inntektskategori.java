@@ -10,8 +10,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
 public enum Inntektskategori implements Kodeverdi {
 
-    FØDSEL_ES("FØDSEL", "Fødsel"),
-    ADOPSJON_ES("ADOPSJON", "Adopsjon"),
+    FØDSEL_ES("FØDSEL", "Fødsel"), //TODO skal fjernes
+    ADOPSJON_ES("ADOPSJON", "Adopsjon"), //TODO skal fjernes
     ARBEIDSTAKER("ARBEIDSTAKER", "Arbeidstaker"),
     FRILANSER("FRILANSER", "Frilanser"),
     SELVSTENDIG_NÆRINGSDRIVENDE("SELVSTENDIG_NÆRINGSDRIVENDE", "Selvstendig Næringsdrivende"),

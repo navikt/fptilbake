@@ -1,14 +1,9 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.kodeverk.app;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -29,9 +24,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkEndretFeltType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkOpplysningType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.tilbakekrevingsvalg.VidereBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
@@ -41,8 +34,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Vi
 
 @ApplicationScoped
 public class HentKodeverkTjeneste {
-
-    private KodeverkRepository kodeverkRepository;
 
     public static final Map<String, Collection<? extends Kodeverdi>> KODEVERDIER_SOM_BRUKES_PÅ_KLIENT;
 
@@ -72,41 +63,20 @@ public class HentKodeverkTjeneste {
 
         Map<String, Collection<? extends Kodeverdi>> mapFiltered = new LinkedHashMap<>();
 
-        map.entrySet().forEach(e -> {
-            mapFiltered.put(e.getKey(), e.getValue().stream().filter(f -> !"-".equals(f.getKode())).collect(Collectors.toList()));
-        });
+        map.entrySet().forEach(e -> mapFiltered.put(e.getKey(), e.getValue().stream()
+            .filter(f -> !"-".equals(f.getKode()))
+            .collect(Collectors.toList())));
 
         KODEVERDIER_SOM_BRUKES_PÅ_KLIENT = Collections.unmodifiableMap(mapFiltered);
     }
 
-    private static List<Class<? extends Kodeliste>> KODEVERK_SOM_BRUKES_PÅ_KLIENT = Arrays.asList(
-    );
-
+    @Inject
     public HentKodeverkTjeneste() {
         // For CDI
     }
 
-    @Inject
-    public HentKodeverkTjeneste(KodeverkRepository kodeverkRepository) {
-        Objects.requireNonNull(kodeverkRepository, "kodeverkRepository"); //$NON-NLS-1$
-        this.kodeverkRepository = kodeverkRepository;
-    }
 
-
-    public Map<String, Collection<? extends Kodeverdi>> hentGruppertKodeliste() {
-        Map<String, Set<? extends Kodeliste>> kodelister = new HashMap<>();
-        KODEVERK_SOM_BRUKES_PÅ_KLIENT.forEach(k -> {
-            //TODO (TOR) Kjører repository-kall for kvar kodeliste. Er nok ikkje naudsynt
-            Set<Kodeliste> filtrertKodeliste = kodeverkRepository.hentAlle(k).stream()
-                .filter(ads -> !"-".equals(ads.getKode()))
-                .collect(Collectors.toSet());
-            kodelister.put(k.getSimpleName(), filtrertKodeliste);
-        });
-
-        // slå sammen kodeverdi og kodeliste maps
-        Map<String, Collection<? extends Kodeverdi>> kodelistMap = new LinkedHashMap<>(kodelister);
-        kodelistMap.putAll(KODEVERDIER_SOM_BRUKES_PÅ_KLIENT);
-
-        return kodelistMap;
+    public Map<String, Collection<? extends Kodeverdi>> hentGruppertKodeliste() { //NOSONAR
+        return new LinkedHashMap<>(KODEVERDIER_SOM_BRUKES_PÅ_KLIENT);
     }
 }
