@@ -435,7 +435,7 @@ public class BehandlingRestTjeneste {
 
         var rettigheter = behandlingTjeneste.hentBehandlinger(saksnummer).stream()
             .filter(b -> BehandlingStatus.OPPRETTET.equals(b.getStatus()) || BehandlingStatus.UTREDES.equals(b.getStatus()))
-            .map(b -> new BehandlingOperasjonerDto(b.getUuid(), true, true,
+            .map(b -> new BehandlingOperasjonerDto(b.getUuid(), true, false,
                 b.isBehandlingPåVent(), !b.isBehandlingPåVent(), false, viseVerge(b)))
             .collect(Collectors.toList());
         var oppretting = List.of(new BehandlingOpprettingDto(BehandlingType.TILBAKEKREVING, behandlingTjeneste.hentBehandlinger(saksnummer).stream().allMatch(Behandling::erSaksbehandlingAvsluttet)),
