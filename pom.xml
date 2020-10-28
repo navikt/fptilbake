@@ -240,6 +240,11 @@
             </dependency>
             <dependency>
                 <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+                <artifactId>kodeverk-klient</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
                 <artifactId>dokumentbestiller</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -369,6 +374,11 @@
                 <artifactId>nav-virksomhet-tilbakekreving-v1-meldingsdefinisjon</artifactId>
                 <version>1.0.10</version>
                 <classifier>jaxb</classifier>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.tjenestespesifikasjoner</groupId>
+                <artifactId>nav-fim-kodeverk-v2-tjenestespesifikasjon</artifactId>
+                <version>1.2020.10.07-08.40-90b3ab7bad15</version>
             </dependency>
             <!-- Eksterne -->
             <dependency>
