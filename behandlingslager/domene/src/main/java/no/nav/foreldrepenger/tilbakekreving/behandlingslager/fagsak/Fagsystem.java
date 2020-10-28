@@ -51,7 +51,7 @@ public enum Fagsystem implements Kodeverdi {
         }
     }
 
-    private Fagsystem(String kode, String offisiellKode) {
+    Fagsystem(String kode, String offisiellKode) {
         this.kode = kode;
         this.offisiellKode = offisiellKode;
     }

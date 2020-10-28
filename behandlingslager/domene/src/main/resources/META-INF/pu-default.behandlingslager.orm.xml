@@ -40,26 +40,12 @@
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.Totrinnsvurdering"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.Totrinnresultatgrunnlag"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.VurderÅrsakTotrinnsvurdering"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårType"/>
 
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeAggregateEntitet"/>
 
     <!--###################-->
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.AdresseType"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktStatus"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktType"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegStatus"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakStatus"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodelisteRelasjon"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Landkoder"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.NavBrukerKjønn"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Poststed"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.ReaktiveringStatus"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.SivilstandType"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.VurderÅrsak"/>
 
 </entity-mappings>

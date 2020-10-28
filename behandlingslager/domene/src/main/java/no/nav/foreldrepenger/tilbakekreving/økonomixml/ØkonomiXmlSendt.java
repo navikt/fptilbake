@@ -1,17 +1,13 @@
 package no.nav.foreldrepenger.tilbakekreving.økonomixml;
 
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.JoinColumnOrFormula;
-import org.hibernate.annotations.JoinFormula;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 
@@ -34,9 +30,8 @@ public class ØkonomiXmlSendt extends BaseEntitet {
     @Lob
     private String kvitteringXml;
 
-    @ManyToOne(optional = false)
-    @JoinColumnOrFormula(column = @JoinColumn(name = "melding_type", referencedColumnName = "kode", nullable = false))
-    @JoinColumnOrFormula(formula = @JoinFormula(referencedColumnName = "kodeverk", value = "'" + MeldingType.DISCRIMINATOR + "'"))
+    @Convert(converter = MeldingType.KodeverdiConverter.class)
+    @Column(name = "melding_type", nullable = false)
     private MeldingType meldingType;
 
     private ØkonomiXmlSendt() {

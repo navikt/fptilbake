@@ -11,14 +11,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.JoinColumnOrFormula;
-import org.hibernate.annotations.JoinColumnsOrFormulas;
-import org.hibernate.annotations.JoinFormula;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -55,10 +49,8 @@ public class Historikkinnslag extends BaseEntitet {
     @OneToMany(mappedBy = "historikkinnslag")
     private List<HistorikkinnslagDel> historikkinnslagDeler = new ArrayList<>();
 
-    @ManyToOne(optional = false)
-    @JoinColumnsOrFormulas({
-            @JoinColumnOrFormula(column = @JoinColumn(name = "bruker_kjoenn", referencedColumnName = "kode", nullable = false)),
-            @JoinColumnOrFormula(formula = @JoinFormula(referencedColumnName = "kodeverk", value = "'" + NavBrukerKjønn.DISCRIMINATOR + "'"))})
+    @Convert(converter = NavBrukerKjønn.KodeverdiConverter.class)
+    @Column(name = "bruker_kjoenn",nullable = false)
     private NavBrukerKjønn kjoenn = NavBrukerKjønn.UDEFINERT;
 
     public Long getId() {

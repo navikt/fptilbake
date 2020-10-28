@@ -179,7 +179,7 @@ public class VedtaksbrevTjeneste {
             .medMetadata(vedtaksbrevData.getMetadata())
             .build();
 
-        if (BrevToggle.brukDokprod()) {
+        if (BrevToggle.brukDokprod(BrevType.VEDTAK_BREV)) {
             byte[] vedlegg = lagVedtaksbrevVedleggTabellPdf(vedtaksbrevData, DokumentVariant.ENDELIG);
             JournalpostIdOgDokumentId vedleggReferanse = journalføringTjeneste.journalførVedlegg(behandlingId, vedlegg);
             JournalpostIdOgDokumentId dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data, vedleggReferanse);
@@ -217,7 +217,7 @@ public class VedtaksbrevTjeneste {
             .medMetadata(vedtaksbrevData.getMetadata())
             .build();
 
-        if (!BrevToggle.brukDokprod()) {
+        if (!BrevToggle.brukDokprod(BrevType.VEDTAK_BREV)) {
             BrevData.Builder brevData = BrevData.builder()
                 .setMottaker(getBrevMottaker(behandlingId))
                 .setMetadata(data.getBrevMetadata())

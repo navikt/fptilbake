@@ -5,17 +5,13 @@ import java.util.Objects;
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.JoinColumnOrFormula;
-import org.hibernate.annotations.JoinFormula;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
@@ -38,9 +34,8 @@ public class VedtaksbrevFritekstPeriode extends BaseEntitet {
     })
     private Periode periode;
 
-    @ManyToOne(optional = false)
-    @JoinColumnOrFormula(column = @JoinColumn(name = "FRITEKST_TYPE", referencedColumnName = "kode", nullable = false))
-    @JoinColumnOrFormula(formula = @JoinFormula(referencedColumnName = "kodeverk", value = "'" + VedtaksbrevFritekstType.DISCRIMINATOR + "'"))
+    @Convert(converter = VedtaksbrevFritekstType.KodeverdiConverter.class)
+    @Column(name = "FRITEKST_TYPE", nullable = false)
     private VedtaksbrevFritekstType fritekstType;
 
     @Column(name = "FRITEKST", nullable = false)

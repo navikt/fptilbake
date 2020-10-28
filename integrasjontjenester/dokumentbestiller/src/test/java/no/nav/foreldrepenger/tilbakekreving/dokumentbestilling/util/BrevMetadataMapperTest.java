@@ -1,7 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.util;
 
-import java.util.List;
-
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -18,7 +16,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.AdresseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Landkoder;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodelisteNavnI18N;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMetadataMapper;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
@@ -77,19 +74,11 @@ public class BrevMetadataMapperTest {
     @Test
     public void skal_sette_utenlandsk_adresse() {
 
-        Landkoder landkoder = new Landkoder();
-        KodelisteNavnI18N kodelisteNavnI18N = new KodelisteNavnI18N();
-        kodelisteNavnI18N.setNavn("SVERIGE");
-        kodelisteNavnI18N.setSpråk("NB");
-        landkoder.setKodelisteNavnI18NList(List.of(kodelisteNavnI18N));
-
-        Mockito.when(kodeverkRepositoryMock.finn(Mockito.any(), Mockito.anyString())).thenReturn(landkoder);
-
         Adresseinfo adresseinfo = new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE, new PersonIdent("12345678900"), "Jens Trallala")
             .medAdresselinje1("utenlandsk adresselinje 1")
             .medAdresselinje2("utenlandsk adresselinje 2")
             .medAdresselinje3("utenlandsk adresselinje 3")
-            .medLand("SWE")
+            .medLand(Landkoder.SWE.getKode())
             .medPostNr("0898")
             .medPoststed("Berlin")
             .build();

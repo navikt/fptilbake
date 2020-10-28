@@ -1,35 +1,80 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-@Entity(name = "Inntektskategori")
-@DiscriminatorValue(Inntektskategori.DISCRIMINATOR)
-public class Inntektskategori extends Kodeliste {
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
-    public static final String DISCRIMINATOR = "INNTEKTS_KATEGORI";
+public enum Inntektskategori implements Kodeverdi {
 
-    public static final Inntektskategori FØDSEL_ES = new Inntektskategori("FØDSEL"); //$NON-NLS-1$
-    public static final Inntektskategori ADOPSJON_ES = new Inntektskategori("ADOPSJON"); //$NON-NLS-1$
-    public static final Inntektskategori ARBEIDSTAKER = new Inntektskategori("ARBEIDSTAKER"); //$NON-NLS-1$
-    public static final Inntektskategori FRILANSER = new Inntektskategori("FRILANSER"); //$NON-NLS-1$
-    public static final Inntektskategori SELVSTENDIG_NÆRINGSDRIVENDE = new Inntektskategori("SELVSTENDIG_NÆRINGSDRIVENDE"); //$NON-NLS-1$
-    public static final Inntektskategori ARBEIDSLEDIG = new Inntektskategori("ARBEIDSLEDIG"); //$NON-NLS-1$
-    public static final Inntektskategori SJØMANN = new Inntektskategori("SJØMANN"); //$NON-NLS-1$
-    public static final Inntektskategori DAGMAMMA = new Inntektskategori("DAGMAMMA"); //$NON-NLS-1$
-    public static final Inntektskategori JORDBRUKER = new Inntektskategori("JORDBRUKER"); //$NON-NLS-1$
-    public static final Inntektskategori FISKER = new Inntektskategori("FISKER"); //$NON-NLS-1$
-    public static final Inntektskategori FERIEPENGER_ARBEIDSTAKER = new Inntektskategori("FERIEPENGER_ARBEIDSTAKER"); //$NON-NLS-1$
+    FØDSEL_ES("FØDSEL", "Fødsel"), //TODO skal fjernes
+    ADOPSJON_ES("ADOPSJON", "Adopsjon"), //TODO skal fjernes
+    ARBEIDSTAKER("ARBEIDSTAKER", "Arbeidstaker"),
+    FRILANSER("FRILANSER", "Frilanser"),
+    SELVSTENDIG_NÆRINGSDRIVENDE("SELVSTENDIG_NÆRINGSDRIVENDE", "Selvstendig Næringsdrivende"),
+    ARBEIDSLEDIG("ARBEIDSLEDIG", "Arbeidsledig"),
+    SJØMANN("SJØMANN", "Sjømann"),
+    DAGMAMMA("DAGMAMMA", "Dagmamma"),
+    JORDBRUKER("JORDBRUKER", "Jordbruker"),
+    FISKER("FISKER", "Fisker"),
+    FERIEPENGER_ARBEIDSTAKER("FERIEPENGER_ARBEIDSTAKER", "Feriepenger arbeidstaker"),
 
-    public static final Inntektskategori UDEFINERT = new Inntektskategori("-"); //$NON-NLS-1$
+    UDEFINERT("-", "Ikke Definert");
 
-    Inntektskategori() {
-        // Hibernate trenger en
+    public static final String KODEVERK = "INNTEKTS_KATEGORI";
+    private static final Map<String, Inntektskategori> KODER = new LinkedHashMap<>();
+
+    private String kode;
+    private String navn;
+
+    static {
+        for (var v : values()) {
+            if (KODER.putIfAbsent(v.kode, v) != null) {
+                throw new IllegalArgumentException("Duplikat : " + v.kode);
+            }
+        }
     }
 
-    private Inntektskategori(String kode) {
-        super(kode, DISCRIMINATOR);
+    Inntektskategori(String kode, String navn) {
+        this.kode = kode;
+        this.navn = navn;
+    }
+
+    public static Inntektskategori fraKode(@JsonProperty("kode") String kode) {
+        if (kode == null) {
+            return null;
+        }
+        var ad = KODER.get(kode);
+        if (ad == null) {
+            throw new IllegalArgumentException("Ukjent Inntektskategori: " + kode);
+        }
+        return ad;
+    }
+
+    public static Map<String, Inntektskategori> kodeMap() {
+        return Collections.unmodifiableMap(KODER);
+    }
+
+    @Override
+    public String getKode() {
+        return kode;
+    }
+
+    @Override
+    public String getOffisiellKode() {
+        return getKode();
+    }
+
+    @Override
+    public String getKodeverk() {
+        return KODEVERK;
+    }
+
+    @Override
+    public String getNavn() {
+        return navn;
     }
 }

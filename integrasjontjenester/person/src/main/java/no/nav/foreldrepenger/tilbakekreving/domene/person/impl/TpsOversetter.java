@@ -14,11 +14,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.NavBrukerKjønn;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.SivilstandType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.GeografiKodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Landkoder;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.SpråkKodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.Aktoer;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.Bruker;
@@ -37,23 +34,14 @@ public class TpsOversetter {
 
     public static final Logger logger = LoggerFactory.getLogger(TpsOversetter.class);
 
-    private KodeverkRepository kodeverkRepository;
-    private GeografiKodeverkRepository behandlingsgrunnlagKodeverkRepository;
-    private SpråkKodeverkRepository språkKodeverkRepository;
     private TpsAdresseOversetter tpsAdresseOversetter;
 
-    public TpsOversetter() {
+    TpsOversetter() {
         // CDI Proxy
     }
 
     @Inject
-    public TpsOversetter(KodeverkRepository kodeverkRepository,
-                         GeografiKodeverkRepository behandlingsgrunnlagKodeverkRepository,
-                         SpråkKodeverkRepository språkKodeverkRepository,
-                         TpsAdresseOversetter tpsAdresseOversetter) {
-        this.kodeverkRepository = kodeverkRepository;
-        this.behandlingsgrunnlagKodeverkRepository = behandlingsgrunnlagKodeverkRepository;
-        this.språkKodeverkRepository = språkKodeverkRepository;
+    public TpsOversetter(TpsAdresseOversetter tpsAdresseOversetter) {
         this.tpsAdresseOversetter = tpsAdresseOversetter;
     }
 
@@ -78,7 +66,7 @@ public class TpsOversetter {
         String geografiskTilknytning = bruker.getGeografiskTilknytning() != null ? bruker.getGeografiskTilknytning().getGeografiskTilknytning() : null;
 
         List<Adresseinfo> adresseinfoList = tpsAdresseOversetter.lagListeMedAdresseInfo(bruker);
-        SivilstandType sivilstandType = bruker.getSivilstand() == null ? null : behandlingsgrunnlagKodeverkRepository.finnSivilstandType(bruker.getSivilstand().getSivilstand().getValue());
+        SivilstandType sivilstandType = bruker.getSivilstand() == null ? null : SivilstandType.fraKode(bruker.getSivilstand().getSivilstand().getValue());
 
         return Personinfo.builder()
             .medAktørId(aktørId)
@@ -125,14 +113,14 @@ public class TpsOversetter {
     private NavBrukerKjønn tilBrukerKjønn(Kjoenn kjoenn) {
         return Optional.ofNullable(kjoenn)
             .map(Kjoenn::getKjoenn)
-            .map(kj -> kodeverkRepository.finn(NavBrukerKjønn.class, kj.getValue()))
+            .map(kj -> NavBrukerKjønn.fraKode(kj.getValue()))
             .orElse(NavBrukerKjønn.UDEFINERT);
     }
 
     private Landkoder utledLandkode(Statsborgerskap statsborgerskap) {
         Landkoder landkode = Landkoder.UDEFINERT;
         if (Optional.ofNullable(statsborgerskap).isPresent()) {
-            landkode = behandlingsgrunnlagKodeverkRepository.finnLandkode(statsborgerskap.getLand().getValue());
+            landkode = Landkoder.fraKode(statsborgerskap.getLand().getValue());
         }
         return landkode;
     }
@@ -144,7 +132,7 @@ public class TpsOversetter {
         if (språk == null || "NO".equals(språk.getValue())) {
             return defaultSpråk;
         }
-        Optional<Språkkode> kode = språkKodeverkRepository.finnSpråkMedKodeverkEiersKode(språk.getValue());
+        Optional<Språkkode> kode = Optional.of(Språkkode.fraKode(språk.getValue()));
         if (kode.isPresent()) {
             return kode.get();
         }

@@ -59,16 +59,8 @@ public class BehandlingskontrollTjenesteTest {
         }
     }
 
-    static class BehandlingTypeForTest extends BehandlingType {
-        public static final BehandlingType BT_TEST = new BehandlingTypeForTest("BT-TEST");
-
-        protected BehandlingTypeForTest(String kode) {
-            super(kode);
-        }
-    }
-
     static class BehandlingModellForTest {
-        BehandlingType behandlingType = BehandlingTypeForTest.BT_TEST;
+        BehandlingType behandlingType = BehandlingType.TILBAKEKREVING;
 
         // random liste av aksjonspunkt og steg i en definert rekkefølge for å kunne sette opp modellen
         AksjonspunktDefinisjon a2_0 = TestAksjonspunktDefinisjon.AP_1;
@@ -130,7 +122,7 @@ public class BehandlingskontrollTjenesteTest {
         opprettStatiskModell();
 
         ScenarioSimple scenario = ScenarioSimple.simple()
-                .medBehandlingType(BehandlingTypeForTest.BT_TEST);
+                .medBehandlingType(BehandlingType.TILBAKEKREVING);
         behandling = scenario.lagre(repositoryProvider);
 
         manipulerInternBehandling.forceOppdaterBehandlingSteg(behandling, STEG_3);

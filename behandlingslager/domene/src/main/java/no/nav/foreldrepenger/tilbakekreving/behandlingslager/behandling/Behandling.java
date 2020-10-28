@@ -34,8 +34,6 @@ import javax.persistence.SqlResultSetMapping;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
-import org.hibernate.annotations.JoinColumnOrFormula;
-import org.hibernate.annotations.JoinFormula;
 import org.hibernate.annotations.NaturalId;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
@@ -100,17 +98,15 @@ public class Behandling extends BaseEntitet {
     @JoinColumn(name = "fagsak_id", nullable = false, updatable = false)
     private Fagsak fagsak;
 
-    @ManyToOne(optional = false)
-    @JoinColumnOrFormula(column = @JoinColumn(name = "behandling_status", referencedColumnName = "kode", nullable = false))
-    @JoinColumnOrFormula(formula = @JoinFormula(referencedColumnName = "kodeverk", value = "'" + BehandlingStatus.DISCRIMINATOR + "'"))
+    @Convert(converter = BehandlingStatus.KodeverdiConverter.class)
+    @Column(name = "behandling_status", nullable = false)
     private BehandlingStatus status = BehandlingStatus.OPPRETTET;
 
     @OneToMany(cascade = {CascadeType.ALL}, orphanRemoval = true, mappedBy = "behandling")
     private List<BehandlingStegTilstand> behandlingStegTilstander = new ArrayList<>(1);
 
-    @ManyToOne(optional = false)
-    @JoinColumnOrFormula(column = @JoinColumn(name = "behandling_type", referencedColumnName = "kode", nullable = false))
-    @JoinColumnOrFormula(formula = @JoinFormula(referencedColumnName = "kodeverk", value = "'" + BehandlingType.DISCRIMINATOR + "'"))
+    @Convert(converter = BehandlingType.KodeverdiConverter.class)
+    @Column(name = "behandling_type", nullable = false)
     private BehandlingType behandlingType = BehandlingType.UDEFINERT;
 
     // CascadeType.ALL + orphanRemoval=true må til for at aksjonspunkter skal bli slettet fra databasen ved fjerning fra HashSet
@@ -385,7 +381,7 @@ public class Behandling extends BaseEntitet {
 
     public List<Aksjonspunkt> getÅpneAksjonspunkter(AksjonspunktType aksjonspunktType) {
         return getÅpneAksjonspunkterStream()
-            .filter(ad -> Objects.equals(aksjonspunktType, ad.getAksjonspunktDefinisjon().getAksjonspunktType()))
+            .filter(ad -> aksjonspunktType.equals(ad.getAksjonspunktDefinisjon().getAksjonspunktType()))
             .collect(Collectors.toList());
     }
 

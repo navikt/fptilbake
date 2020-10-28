@@ -240,6 +240,11 @@
             </dependency>
             <dependency>
                 <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+                <artifactId>kodeverk-klient</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
                 <artifactId>dokumentbestiller</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -369,6 +374,11 @@
                 <artifactId>nav-virksomhet-tilbakekreving-v1-meldingsdefinisjon</artifactId>
                 <version>1.0.10</version>
                 <classifier>jaxb</classifier>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.tjenestespesifikasjoner</groupId>
+                <artifactId>nav-fim-kodeverk-v2-tjenestespesifikasjon</artifactId>
+                <version>1.2020.10.07-08.40-90b3ab7bad15</version>
             </dependency>
             <!-- Eksterne -->
             <dependency>
@@ -589,7 +599,7 @@
                     versjon -->
                 <groupId>joda-time</groupId>
                 <artifactId>joda-time</artifactId>
-                <version>2.10.7</version>
+                <version>2.10.8</version>
             </dependency>
             <dependency>
                 <groupId>org.jasypt</groupId>

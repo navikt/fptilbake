@@ -1,32 +1,87 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
+import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
 
-@Entity(name = "BrevType")
-@DiscriminatorValue(BrevType.DISCRIMINATOR)
-public class BrevType extends Kodeliste {
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    public static final String DISCRIMINATOR = "BREV_TYPE";
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
-    public static final BrevType VARSEL_BREV = new BrevType("VARSEL");
+public enum BrevType implements Kodeverdi {
 
-    public static final BrevType VEDTAK_BREV = new BrevType("VEDTAK");
+     VARSEL_BREV("VARSEL"),
+     VEDTAK_BREV("VEDTAK"),
+     HENLEGGELSE_BREV("HENLEGGELSE"),
+     INNHENT_DOKUMENTASJONBREV("INNHENT_DOKUMENTASJON"),
+     UDEFINERT("-");
 
-    public static final BrevType HENLEGGELSE_BREV = new BrevType("HENLEGGELSE");
+    public static final String KODEVERK = "BREV_TYPE";
+    private static final Map<String, BrevType> KODER = new LinkedHashMap<>();
 
-    public static final BrevType INNHENT_DOKUMENTASJONBREV = new BrevType("INNHENT_DOKUMENTASJON");
+    private String kode;
 
-    public static final BrevType UDEFINERT = new BrevType("-");
-
-    BrevType(){
-        //Hibernate
+    static {
+        for (var v : values()) {
+            if (KODER.putIfAbsent(v.kode, v) != null) {
+                throw new IllegalArgumentException("Duplikat : " + v.kode);
+            }
+        }
     }
 
-    private BrevType(String kode){
-        super(kode,DISCRIMINATOR);
+    BrevType(String kode){
+        this.kode = kode;
+    }
+
+    public static BrevType fraKode(@JsonProperty("kode") String kode) {
+        if (kode == null) {
+            return null;
+        }
+        var ad = KODER.get(kode);
+        if (ad == null) {
+            throw new IllegalArgumentException("Ukjent BrevType: " + kode);
+        }
+        return ad;
+    }
+
+    public static Map<String, BrevType> kodeMap() {
+        return Collections.unmodifiableMap(KODER);
+    }
+
+    @Override
+    public String getKode() {
+        return kode;
+    }
+
+    @Override
+    public String getOffisiellKode() {
+        return getKode();
+    }
+
+    @Override
+    public String getKodeverk() {
+        return KODEVERK;
+    }
+
+    @Override
+    public String getNavn() {
+        return null;
+    }
+
+    @Converter(autoApply = true)
+    public static class KodeverdiConverter implements AttributeConverter<BrevType, String> {
+        @Override
+        public String convertToDatabaseColumn(BrevType attribute) {
+            return attribute == null ? null : attribute.getKode();
+        }
+
+        @Override
+        public BrevType convertToEntityAttribute(String dbData) {
+            return dbData == null ? null : fraKode(dbData);
+        }
     }
 }
 

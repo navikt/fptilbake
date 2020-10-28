@@ -1,27 +1,32 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling;
 
+import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
-@Entity(name = "AdresseType")
-@DiscriminatorValue(AdresseType.DISCRIMINATOR)
-public class AdresseType extends Kodeliste {
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
+public enum AdresseType implements Kodeverdi {
 
-    public static final String DISCRIMINATOR = "ADRESSE_TYPE";
+    BOSTEDSADRESSE("BOSTEDSADRESSE"),
+    POSTADRESSE("POSTADRESSE"),
+    POSTADRESSE_UTLAND("POSTADRESSE_UTLAND"),
+    MIDLERTIDIG_POSTADRESSE_NORGE("MIDLERTIDIG_POSTADRESSE_NORGE"),
+    MIDLERTIDIG_POSTADRESSE_UTLAND("MIDLERTIDIG_POSTADRESSE_UTLAND"),
+    UKJENT_ADRESSE("UKJENT_ADRESSE");
 
-    public static final AdresseType BOSTEDSADRESSE                 = new AdresseType("BOSTEDSADRESSE");  //$NON-NLS-1$
-    public static final AdresseType POSTADRESSE                    = new AdresseType("POSTADRESSE");  //$NON-NLS-1$
-    public static final AdresseType POSTADRESSE_UTLAND             = new AdresseType("POSTADRESSE_UTLAND");  //$NON-NLS-1$
-    public static final AdresseType MIDLERTIDIG_POSTADRESSE_NORGE  = new AdresseType("MIDLERTIDIG_POSTADRESSE_NORGE");  //$NON-NLS-1$
-    public static final AdresseType MIDLERTIDIG_POSTADRESSE_UTLAND = new AdresseType("MIDLERTIDIG_POSTADRESSE_UTLAND");  //$NON-NLS-1$
-    public static final AdresseType UKJENT_ADRESSE                 = new AdresseType("UKJENT_ADRESSE");  //$NON-NLS-1$
-
+    public static final String KODEVERK = "ADRESSE_TYPE";
     public static final List<AdresseType> kjentePostadressetyper = Collections.unmodifiableList(
         Arrays.asList(
             AdresseType.BOSTEDSADRESSE,
@@ -32,12 +37,55 @@ public class AdresseType extends Kodeliste {
             AdresseType.UKJENT_ADRESSE
         )
     );
+    private static final Map<String, AdresseType> KODER = new LinkedHashMap<>();
 
-    public AdresseType() {
-        // Hibernate trenger en
+    private String kode;
+
+    static {
+        for (var v : values()) {
+            if (KODER.putIfAbsent(v.kode, v) != null) {
+                throw new IllegalArgumentException("Duplikat : " + v.kode);
+            }
+        }
     }
 
-    public AdresseType(String kode) {
-        super(kode, DISCRIMINATOR);
+    AdresseType(String kode) {
+        this.kode = kode;
+    }
+
+    @JsonCreator
+    public static AdresseType fraKode(@JsonProperty("kode") String kode) {
+        if (kode == null) {
+            return null;
+        }
+        var ad = KODER.get(kode);
+
+        return ad;
+    }
+
+    public static Map<String, AdresseType> kodeMap() {
+        return Collections.unmodifiableMap(KODER);
+    }
+
+    @JsonProperty
+    @Override
+    public String getKode() {
+        return kode;
+    }
+
+    @Override
+    public String getOffisiellKode() {
+        return getKode();
+    }
+
+    @JsonProperty
+    @Override
+    public String getKodeverk() {
+        return KODEVERK;
+    }
+
+    @Override
+    public String getNavn() {
+        return null;
     }
 }

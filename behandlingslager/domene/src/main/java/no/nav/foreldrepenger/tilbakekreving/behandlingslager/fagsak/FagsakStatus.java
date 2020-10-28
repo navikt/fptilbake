@@ -1,27 +1,96 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
+
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
 
-@Entity(name = "FagsakStatus")
-@DiscriminatorValue(FagsakStatus.DISCRIMINATOR)
-public class FagsakStatus extends Kodeliste {
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
+public enum FagsakStatus implements Kodeverdi {
 
-    public static final String DISCRIMINATOR = "FAGSAK_STATUS";
-    public static final FagsakStatus OPPRETTET = new FagsakStatus("OPPR");
-    public static final FagsakStatus UNDER_BEHANDLING = new FagsakStatus("UBEH");
-    public static final FagsakStatus AVSLUTTET = new FagsakStatus("AVSLU");
+    OPPRETTET("OPPR"),
+    UNDER_BEHANDLING("UBEH"),
+    AVSLUTTET("AVSLU");
+
+    public static final String KODEVERK = "FAGSAK_STATUS";
     public static final FagsakStatus DEFAULT = OPPRETTET;
+    private static final Map<String, FagsakStatus> KODER = new LinkedHashMap<>();
 
-    FagsakStatus() {
-        // Hibernate trenger den
+    private String kode;
+
+    static {
+        for (var v : values()) {
+            if (KODER.putIfAbsent(v.kode, v) != null) {
+                throw new IllegalArgumentException("Duplikat : " + v.kode);
+            }
+        }
     }
 
     FagsakStatus(String kode) {
-        super(kode, DISCRIMINATOR);
+        this.kode = kode;
     }
 
+    @JsonCreator
+    public static FagsakStatus fraKode(@JsonProperty("kode") String kode) {
+        if (kode == null) {
+            return null;
+        }
+        var ad = KODER.get(kode);
+        if (ad == null) {
+            throw new IllegalArgumentException("Ukjent FagsakStatus: " + kode);
+        }
+        return ad;
+    }
+
+    public static Map<String, FagsakStatus> kodeMap() {
+        return Collections.unmodifiableMap(KODER);
+    }
+
+    @Converter(autoApply = true)
+    public static class KodeverdiConverter implements AttributeConverter<FagsakStatus, String> {
+        @Override
+        public String convertToDatabaseColumn(FagsakStatus attribute) {
+            return attribute == null ? null : attribute.getKode();
+        }
+
+        @Override
+        public FagsakStatus convertToEntityAttribute(String dbData) {
+            return dbData == null ? null : fraKode(dbData);
+        }
+    }
+
+    @JsonProperty
+    @Override
+    public String getKode() {
+        return kode;
+    }
+
+    @Override
+    public String getOffisiellKode() {
+        return getKode();
+    }
+
+    @JsonProperty
+    @Override
+    public String getKodeverk() {
+        return KODEVERK;
+    }
+
+    @Override
+    public String getNavn() {
+        return null;
+    }
 }

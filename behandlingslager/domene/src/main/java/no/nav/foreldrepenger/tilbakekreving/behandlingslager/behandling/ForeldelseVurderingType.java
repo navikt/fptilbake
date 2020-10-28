@@ -40,7 +40,7 @@ public enum ForeldelseVurderingType implements Kodeverdi {
         }
     }
 
-    private ForeldelseVurderingType(String kode, String navn) {
+    ForeldelseVurderingType(String kode, String navn) {
         this.kode = kode;
         this.navn = navn;
     }

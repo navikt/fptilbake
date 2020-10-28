@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -59,7 +61,7 @@ public class FatteVedtakTjeneste {
                 aksjonspunktRepository.setReåpnet(aksjonspunkt);
                 aksjonspunktRepository.setToTrinnsBehandlingKreves(aksjonspunkt);
             }
-            Collection<VurderÅrsak> vurderÅrsaker = kodeverkTabellRepository.finnVurderÅrsaker(aks.getVurderÅrsakskoder());
+            Set<VurderÅrsak> vurderÅrsaker = aks.getVurderÅrsakskoder().stream().map(VurderÅrsak :: fraKode).collect(Collectors.toSet());
 
             Totrinnsvurdering totrinnsvurdering = Totrinnsvurdering.builder().medBehandling(behandling)
                     .medAksjonspunktDefinisjon(aksjonspunkt.getAksjonspunktDefinisjon())

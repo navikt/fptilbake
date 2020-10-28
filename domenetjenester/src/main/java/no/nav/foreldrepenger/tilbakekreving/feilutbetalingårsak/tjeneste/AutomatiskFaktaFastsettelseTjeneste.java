@@ -8,13 +8,12 @@ import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.FaktaFeilutbetalingDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.modell.UtbetaltPeriode;
+import no.nav.foreldrepenger.tilbakekreving.behandling.modell.LogiskPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTypeMedUndertypeDto;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432;
 
 @ApplicationScoped
 public class AutomatiskFaktaFastsettelseTjeneste {
@@ -33,8 +32,7 @@ public class AutomatiskFaktaFastsettelseTjeneste {
     }
 
     public void fastsettFaktaAutomatisk(Behandling behandling, String begrunnelse) {
-        List<KravgrunnlagPeriode432> feilutbetaltePerioder = kravgrunnlagTjeneste.finnKravgrunnlagPerioderMedFeilutbetaltPosteringer(behandling.getId());
-        List<UtbetaltPeriode> logiskePerioder = kravgrunnlagTjeneste.utledLogiskPeriode(feilutbetaltePerioder);
+        List<LogiskPeriode> logiskePerioder = kravgrunnlagTjeneste.utledLogiskPeriode(behandling.getId());
         HendelseTypeMedUndertypeDto hendelseTypeMedUndertypeDto = setHendelseTypeOgHendelseUndertype(behandling);
 
         List<FaktaFeilutbetalingDto> faktaFeilutbetalinger = logiskePerioder.stream()

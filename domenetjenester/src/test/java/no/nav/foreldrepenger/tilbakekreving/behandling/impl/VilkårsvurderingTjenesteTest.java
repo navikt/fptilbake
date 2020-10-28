@@ -198,7 +198,7 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         DetaljertFeilutbetalingPeriodeDto periode = perioder.get(0);
         assertThat(periode.getYtelser().size()).isEqualTo(1);
         YtelseDto ytelseDto = periode.getYtelser().get(0);
-        assertThat(ytelseDto.getAktivitet()).isEqualTo(kodeverkRepository.finn(Inntektskategori.class, Inntektskategori.ARBEIDSLEDIG).getNavn());
+        assertThat(ytelseDto.getAktivitet()).isEqualTo(Inntektskategori.ARBEIDSLEDIG.getNavn());
         assertThat(ytelseDto.getBelop()).isEqualTo(BigDecimal.valueOf(32000));
     }
 

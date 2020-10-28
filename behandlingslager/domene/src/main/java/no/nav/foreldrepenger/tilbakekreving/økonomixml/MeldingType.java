@@ -1,25 +1,84 @@
 package no.nav.foreldrepenger.tilbakekreving.økonomixml;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
+import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
 
-@Entity(name = "MeldingType")
-@DiscriminatorValue(MeldingType.DISCRIMINATOR)
-public class MeldingType extends Kodeliste {
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    public static final String DISCRIMINATOR = "MELDING_TYPE";
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
-    public static final MeldingType VEDTAK = new MeldingType("VEDTAK");
-    public static final MeldingType ANNULERE_GRUNNLAG = new MeldingType("ANNULERE_GRUNNLAG");
+public enum MeldingType implements Kodeverdi {
 
-    MeldingType() {
-        // For hibernate
+    VEDTAK("VEDTAK"),
+    ANNULERE_GRUNNLAG("ANNULERE_GRUNNLAG");
+
+    public static final String KODEVERK = "MELDING_TYPE";
+    private static final Map<String, MeldingType> KODER = new LinkedHashMap<>();
+
+    private String kode;
+
+    static {
+        for (var v : values()) {
+            if (KODER.putIfAbsent(v.kode, v) != null) {
+                throw new IllegalArgumentException("Duplikat : " + v.kode);
+            }
+        }
     }
 
-    private MeldingType(String kode) {
-        super(kode, DISCRIMINATOR);
+    MeldingType(String kode) {
+        this.kode = kode;
+    }
+
+    public static MeldingType fraKode(@JsonProperty("kode") String kode) {
+        if (kode == null) {
+            return null;
+        }
+        var ad = KODER.get(kode);
+        if (ad == null) {
+            throw new IllegalArgumentException("Ukjent MeldingType: " + kode);
+        }
+        return ad;
+    }
+
+    public static Map<String, MeldingType> kodeMap() {
+        return Collections.unmodifiableMap(KODER);
+    }
+
+    @Override
+    public String getKode() {
+        return kode;
+    }
+
+    @Override
+    public String getOffisiellKode() {
+        return getKode();
+    }
+
+    @Override
+    public String getKodeverk() {
+        return KODEVERK;
+    }
+
+    @Override
+    public String getNavn() {
+        return null;
+    }
+
+    @Converter(autoApply = true)
+    public static class KodeverdiConverter implements AttributeConverter<MeldingType, String> {
+        @Override
+        public String convertToDatabaseColumn(MeldingType attribute) {
+            return attribute == null ? null : attribute.getKode();
+        }
+
+        @Override
+        public MeldingType convertToEntityAttribute(String dbData) {
+            return dbData == null ? null : fraKode(dbData);
+        }
     }
 }
 

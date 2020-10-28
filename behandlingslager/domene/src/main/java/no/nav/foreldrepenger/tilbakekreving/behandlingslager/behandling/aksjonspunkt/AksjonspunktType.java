@@ -1,35 +1,66 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt;
 
+import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Objects;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
 
-@Entity(name = "AksjonspunktType")
-@DiscriminatorValue(AksjonspunktType.DISCRIMINATOR)
-public class AksjonspunktType extends Kodeliste {
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
+public enum AksjonspunktType implements Kodeverdi {
 
-    public static final String DISCRIMINATOR = "AKSJONSPUNKT_TYPE";
-    public static final AksjonspunktType MANUELL = new AksjonspunktType("MANU"); //$NON-NLS-1$
-    public static final AksjonspunktType AUTOPUNKT = new AksjonspunktType("AUTO"); //$NON-NLS-1$
-    public static final AksjonspunktType OVERSTYRING = new AksjonspunktType("OVST"); //$NON-NLS-1$
-    public static final AksjonspunktType SAKSBEHANDLEROVERSTYRING = new AksjonspunktType("SAOV"); //$NON-NLS-1$
-    public static final AksjonspunktType UDEFINERT = new AksjonspunktType("-"); //$NON-NLS-1$
+    MANUELL("MANU", "Manuell"),
+    AUTOPUNKT("AUTO", "Autopunkt"),
+    OVERSTYRING("OVST", "Overstyring"),
+    SAKSBEHANDLEROVERSTYRING("SAOV", "Saksbehandleroverstyring"),
+    UDEFINERT("-", "Ikke Definert");
 
-    @SuppressWarnings("unused")
-    private AksjonspunktType() {
-        // Hibernate
+    public static final String KODEVERK = "AKSJONSPUNKT_TYPE";
+    private static final Map<String, AksjonspunktType> KODER = new LinkedHashMap<>();
+
+    private String kode;
+    private String navn;
+
+    static {
+        for (var v : values()) {
+            if (KODER.putIfAbsent(v.kode, v) != null) {
+                throw new IllegalArgumentException("Duplikat : " + v.kode);
+            }
+        }
     }
 
-    public AksjonspunktType(String kode) {
-        super(kode, DISCRIMINATOR);
+    AksjonspunktType(String kode, String navn) {
+        this.kode = kode;
+        this.navn = navn;
     }
 
-    public boolean erManuell() {
-        return Objects.equals(this, MANUELL);
+    @JsonCreator
+    public static AksjonspunktType fraKode(@JsonProperty("kode") String kode) {
+        if (kode == null) {
+            return null;
+        }
+        var ad = KODER.get(kode);
+        if (ad == null) {
+            throw new IllegalArgumentException("Ukjent AksjonspunktType: " + kode);
+        }
+        return ad;
+    }
+
+    public static Map<String, AksjonspunktType> kodeMap() {
+        return Collections.unmodifiableMap(KODER);
     }
 
     public boolean erAutopunkt() {
@@ -38,5 +69,41 @@ public class AksjonspunktType extends Kodeliste {
 
     public boolean erOverstyringpunkt() {
         return Objects.equals(this, OVERSTYRING) || Objects.equals(this, SAKSBEHANDLEROVERSTYRING);
+    }
+
+    @JsonProperty
+    @Override
+    public String getKode() {
+        return kode;
+    }
+
+    @Override
+    public String getOffisiellKode() {
+        return getKode();
+    }
+
+    @JsonProperty
+    @Override
+    public String getKodeverk() {
+        return KODEVERK;
+    }
+
+    @JsonProperty
+    @Override
+    public String getNavn() {
+        return navn;
+    }
+
+    @Converter(autoApply = true)
+    public static class KodeverdiConverter implements AttributeConverter<AksjonspunktType, String> {
+        @Override
+        public String convertToDatabaseColumn(AksjonspunktType attribute) {
+            return attribute == null ? null : attribute.getKode();
+        }
+
+        @Override
+        public AksjonspunktType convertToEntityAttribute(String dbData) {
+            return dbData == null ? null : fraKode(dbData);
+        }
     }
 }

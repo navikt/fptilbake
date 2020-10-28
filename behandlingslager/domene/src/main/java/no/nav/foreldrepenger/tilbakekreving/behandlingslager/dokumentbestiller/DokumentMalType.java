@@ -1,60 +1,68 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.dokumentbestiller;
 
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
-import no.nav.vedtak.feil.Feil;
-import no.nav.vedtak.feil.FeilFactory;
-import no.nav.vedtak.feil.LogLevel;
-import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
-import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
-@Entity(name = "DokumentMalType")
-@DiscriminatorValue(DokumentMalType.DISCRIMINATOR)
-public class DokumentMalType extends Kodeliste {
+public enum DokumentMalType implements Kodeverdi {
 
-    public static final String DISCRIMINATOR = "DOKUMENT_MAL_TYPE";
+    INNHENT_DOK("INNHEN"),
+    FRITEKST_DOK("FRITKS"),
+    VARSEL_DOK("VARS"),
+    KORRIGERT_VARSEL_DOK("KORRIGVARS");
 
-    public static final DokumentMalType INNHENT_DOK = new DokumentMalType("INNHEN");
-    public static final DokumentMalType FRITEKST_DOK = new DokumentMalType("FRITKS");
-    public static final DokumentMalType VARSEL_DOK = new DokumentMalType("VARS");
-    public static final DokumentMalType KORRIGERT_VARSEL_DOK = new DokumentMalType("KORRIGVARS");
+    public static final String KODEVERK = "DOKUMENT_MAL_TYPE";
+    private static final Map<String, DokumentMalType> KODER = new LinkedHashMap<>();
 
-    private static Map<String, DokumentMalType> malTypeMap = new HashMap<>();
-
+    private String kode;
     static {
-        malTypeMap.put(DokumentMalType.INNHENT_DOK.getKode(), DokumentMalType.INNHENT_DOK);
-        malTypeMap.put(DokumentMalType.FRITEKST_DOK.getKode(), DokumentMalType.FRITEKST_DOK);
-        malTypeMap.put(DokumentMalType.VARSEL_DOK.getKode(), DokumentMalType.VARSEL_DOK);
-        malTypeMap.put(DokumentMalType.KORRIGERT_VARSEL_DOK.getKode(), DokumentMalType.KORRIGERT_VARSEL_DOK);
-    }
-
-
-    DokumentMalType() {
-        // Hibernate trenger default konstruktør
+        for (var v : values()) {
+            if (KODER.putIfAbsent(v.kode, v) != null) {
+                throw new IllegalArgumentException("Duplikat : " + v.kode);
+            }
+        }
     }
 
     DokumentMalType(String kode) {
-        super(kode, DISCRIMINATOR);
+        this.kode = kode;
     }
 
-    public static DokumentMalType fraKode(String kode) {
-        if (malTypeMap.containsKey(kode)) {
-            return malTypeMap.get(kode);
+    public static DokumentMalType fraKode(@JsonProperty("kode") String kode) {
+        if (kode == null) {
+            return null;
         }
-        throw DokumentMalTypeFeil.FACTORY.ugyldigDokumentMalType(kode).toException();
+        var ad = KODER.get(kode);
+        if (ad == null) {
+            throw new IllegalArgumentException("Ukjent DokumentMalType: " + kode);
+        }
+        return ad;
     }
 
-    interface DokumentMalTypeFeil extends DeklarerteFeil {
-        DokumentMalTypeFeil FACTORY = FeilFactory.create(DokumentMalTypeFeil.class);
-
-        @TekniskFeil(feilkode = "FPT-312922", feilmelding = "DokumentMalType '%s' er ugyldig", logLevel = LogLevel.WARN)
-        Feil ugyldigDokumentMalType(String kode);
-
+    public static Map<String, DokumentMalType> kodeMap() {
+        return Collections.unmodifiableMap(KODER);
     }
 
+    @Override
+    public String getKode() {
+        return kode;
+    }
+
+    @Override
+    public String getOffisiellKode() {
+        return getKode();
+    }
+
+    @Override
+    public String getKodeverk() {
+        return KODEVERK;
+    }
+
+    @Override
+    public String getNavn() {
+        return null;
+    }
 }

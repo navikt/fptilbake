@@ -15,7 +15,6 @@ import no.nav.foreldrepenger.integrasjon.dokument.felles.SakspartType;
 import no.nav.foreldrepenger.integrasjon.dokument.felles.SignerendeSaksbehandlerType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Landkoder;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
 import no.nav.vedtak.felles.integrasjon.felles.ws.DateUtil;
@@ -93,9 +92,9 @@ public class BrevMetadataMapper {
         adresse.setAdresselinje1(adresseinfo.getAdresselinje1());
         adresse.setAdresselinje2(adresseinfo.getAdresselinje2());
         adresse.setAdresselinje3(adresseinfo.getAdresselinje3());
-        Landkoder land = adresseinfo.getLand() == null ? kodeverkRepository.finn(Landkoder.class, Landkoder.NOR) :
-            kodeverkRepository.finn(Landkoder.class, adresseinfo.getLand());
-        adresse.setLand(BrevSpråkUtil.finnLandnavnPåSpråk(land.getKodelisteNavnI18NList(), Språkkode.nb));
+        Landkoder land = adresseinfo.getLand() == null ? Landkoder.NOR :
+            Landkoder.fraKode(adresseinfo.getLand());
+        adresse.setLand(land.getNavn());
         return adresse;
     }
 

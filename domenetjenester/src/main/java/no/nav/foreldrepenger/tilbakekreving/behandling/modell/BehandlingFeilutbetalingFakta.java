@@ -7,6 +7,7 @@ import java.util.List;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.BehandlingsresultatDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingÅrsakDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.TilbakekrevingValgDto;
+import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
 public class BehandlingFeilutbetalingFakta {
 
@@ -15,7 +16,7 @@ public class BehandlingFeilutbetalingFakta {
     private LocalDate datoForRevurderingsvedtak;
     private LocalDate totalPeriodeFom;
     private LocalDate totalPeriodeTom;
-    private List<UtbetaltPeriode> perioder;
+    private List<LogiskPeriodeMedFaktaDto> perioder;
     private BehandlingsresultatDto behandlingsresultat;
     private List<EksternBehandlingÅrsakDto> behandlingÅrsaker;
     private TilbakekrevingValgDto tilbakekrevingValg;
@@ -45,7 +46,7 @@ public class BehandlingFeilutbetalingFakta {
         return totalPeriodeTom;
     }
 
-    public List<UtbetaltPeriode> getPerioder() {
+    public List<LogiskPeriodeMedFaktaDto> getPerioder() {
         return perioder;
     }
 
@@ -92,6 +93,12 @@ public class BehandlingFeilutbetalingFakta {
             return this;
         }
 
+        public Builder medTotalPeriode(Periode totalPeriode) {
+            this.behandlingFeilutbetalingFakta.totalPeriodeFom = totalPeriode.getFom();
+            this.behandlingFeilutbetalingFakta.totalPeriodeTom = totalPeriode.getTom();
+            return this;
+        }
+
         public Builder medTotalPeriodeFom(LocalDate totalPeriodeFom) {
             this.behandlingFeilutbetalingFakta.totalPeriodeFom = totalPeriodeFom;
             return this;
@@ -102,7 +109,7 @@ public class BehandlingFeilutbetalingFakta {
             return this;
         }
 
-        public Builder medPerioder(List<UtbetaltPeriode> perioder) {
+        public Builder medPerioder(List<LogiskPeriodeMedFaktaDto> perioder) {
             this.behandlingFeilutbetalingFakta.perioder = perioder;
             return this;
         }

@@ -13,7 +13,7 @@ import org.junit.Test;
 import com.google.common.collect.Lists;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BehandlingFeilutbetalingFakta;
-import no.nav.foreldrepenger.tilbakekreving.behandling.modell.UtbetaltPeriode;
+import no.nav.foreldrepenger.tilbakekreving.behandling.modell.LogiskPeriodeMedFaktaDto;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.OrganisasjonsEnhet;
@@ -156,11 +156,13 @@ public class VarselbrevUtilTest {
 
     @Test
     public void skal_sammenstille_data_fra_grunnlag_og_tps_for_åsende_manuelt_varselbrev() {
-        UtbetaltPeriode utbetaltPeriode = UtbetaltPeriode.lagPeriode(LocalDate.of(2019, 10, 1),
+        LogiskPeriodeMedFaktaDto logiskPeriodeMedFaktaDto = LogiskPeriodeMedFaktaDto.lagPeriode(LocalDate.of(2019, 10, 1),
             LocalDate.of(2019, 10, 30),
             BigDecimal.valueOf(9000));
-        BehandlingFeilutbetalingFakta feilutbetalingFakta = BehandlingFeilutbetalingFakta.builder().medAktuellFeilUtbetaltBeløp(BigDecimal.valueOf(9000))
-            .medPerioder(Lists.newArrayList(utbetaltPeriode)).build();
+        BehandlingFeilutbetalingFakta feilutbetalingFakta = BehandlingFeilutbetalingFakta.builder()
+            .medAktuellFeilUtbetaltBeløp(BigDecimal.valueOf(9000))
+            .medPerioder(Lists.newArrayList(logiskPeriodeMedFaktaDto))
+            .build();
 
         Saksnummer saksnummer = new Saksnummer("11111111");
         NavBruker navBruker = NavBruker.opprettNy(new AktørId("1232132423"), Språkkode.nb);
@@ -196,8 +198,8 @@ public class VarselbrevUtilTest {
         assertThat(varselbrev.getSumFeilutbetaling()).isEqualTo(feilutbetalingFakta.getAktuellFeilUtbetaltBeløp().longValue());
         assertThat(varselbrev.getBrevMetadata().getFagsaktypenavnPåSpråk()).isEqualTo("foreldrepenger");
         assertThat(varselbrev.getBrevMetadata().getTittel()).isEqualTo("Varsel tilbakebetaling foreldrepenger");
-        assertThat(varselbrev.getFeilutbetaltePerioder().get(0).getFom()).isEqualTo(utbetaltPeriode.tilPeriode().getFom());
-        assertThat(varselbrev.getFeilutbetaltePerioder().get(0).getTom()).isEqualTo(utbetaltPeriode.tilPeriode().getTom());
+        assertThat(varselbrev.getFeilutbetaltePerioder().get(0).getFom()).isEqualTo(logiskPeriodeMedFaktaDto.tilPeriode().getFom());
+        assertThat(varselbrev.getFeilutbetaltePerioder().get(0).getTom()).isEqualTo(logiskPeriodeMedFaktaDto.tilPeriode().getTom());
 
         assertThat(varselbrev.getBrevMetadata().getSakspartNavn()).isEqualTo("Fiona");
         assertThat(varselbrev.getBrevMetadata().getSakspartId()).isEqualTo(PERSONNUMMER);

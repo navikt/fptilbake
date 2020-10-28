@@ -8,10 +8,10 @@ import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.dokumentbestiller.DokumentMalType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.BrevmalDto;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.BrevToggle;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.innhentdokumentasjon.InnhentDokumentasjonbrevFeil;
@@ -32,7 +32,6 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 public class DokumentBehandlingTjeneste {
 
     private BehandlingRepository behandlingRepository;
-    private KodeverkRepository kodeverkRepository;
     private BrevSporingRepository brevSporingRepository;
     private KravgrunnlagRepository grunnlagRepository;
     private ProsessTaskRepository prosessTaskRepository;
@@ -53,7 +52,6 @@ public class DokumentBehandlingTjeneste {
                                       ManueltVarselBrevTjeneste manueltVarselBrevTjeneste,
                                       InnhentDokumentasjonbrevTjeneste innhentDokumentasjonBrevTjeneste) {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
-        this.kodeverkRepository = repositoryProvider.getKodeverkRepository();
         this.brevSporingRepository = repositoryProvider.getBrevSporingRepository();
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.prosessTaskRepository = prosessTaskRepository;
@@ -67,7 +65,7 @@ public class DokumentBehandlingTjeneste {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         List<DokumentMalType> gyldigBrevMaler = new ArrayList<>();
 
-        gyldigBrevMaler.add(kodeverkRepository.finn(DokumentMalType.class, DokumentMalType.INNHENT_DOK));
+        gyldigBrevMaler.add(DokumentMalType.INNHENT_DOK);
 
         leggTilVarselBrevmaler(behandlingId, gyldigBrevMaler);
 
@@ -75,7 +73,6 @@ public class DokumentBehandlingTjeneste {
     }
 
     public void bestillBrev(Long behandlingId, DokumentMalType malType, String fritekst) {
-        malType = kodeverkRepository.finn(DokumentMalType.class, malType);
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         if (DokumentMalType.VARSEL_DOK.equals(malType) || DokumentMalType.KORRIGERT_VARSEL_DOK.equals(malType)) {
             håndteresManueltSendVarsel(behandling, malType, fritekst);
@@ -98,9 +95,9 @@ public class DokumentBehandlingTjeneste {
 
     private void leggTilVarselBrevmaler(Long behandlingId, List<DokumentMalType> gyldigBrevMaler) {
         if (!brevSporingRepository.harVarselBrevSendtForBehandlingId(behandlingId)) {
-            gyldigBrevMaler.add(kodeverkRepository.finn(DokumentMalType.class, DokumentMalType.VARSEL_DOK));
+            gyldigBrevMaler.add(DokumentMalType.VARSEL_DOK);
         } else {
-            gyldigBrevMaler.add(kodeverkRepository.finn(DokumentMalType.class, DokumentMalType.KORRIGERT_VARSEL_DOK));
+            gyldigBrevMaler.add(DokumentMalType.KORRIGERT_VARSEL_DOK);
         }
     }
 
@@ -136,7 +133,7 @@ public class DokumentBehandlingTjeneste {
 
         ProsessTaskGruppe taskGruppe = new ProsessTaskGruppe();
         taskGruppe.addNesteSekvensiell(sendVarselbrev);
-        if (BrevToggle.brukDokprod()) {
+        if (BrevToggle.brukDokprod(BrevType.VARSEL_BREV)) {
             taskGruppe.addNesteSekvensiell(sendBeskjedUtsendtVarsel);
         }
         prosessTaskRepository.lagre(taskGruppe);

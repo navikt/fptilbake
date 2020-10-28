@@ -45,7 +45,7 @@ public enum KonsekvensForYtelsen implements Kodeverdi {
         }
     }
 
-    private KonsekvensForYtelsen(String kode, String navn){
+    KonsekvensForYtelsen(String kode, String navn){
         this.kode = kode;
         this.navn = navn;
     }

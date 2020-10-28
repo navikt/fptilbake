@@ -1,14 +1,24 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling;
 
+import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
 
 /**
@@ -17,42 +27,61 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
  * Kommer kun til anvendelse dersom det oppstår aksjonspunkter eller noe må legges på vent i et steg. Hvis ikke
  * flyter et rett igjennom til UTFØRT.
  */
-@Entity(name = "BehandlingStegStatus")
-@DiscriminatorValue(BehandlingStegStatus.DISCRIMINATOR)
-public class BehandlingStegStatus extends Kodeliste {
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
+public enum BehandlingStegStatus implements Kodeverdi {
 
-    public static final String DISCRIMINATOR = "BEHANDLING_STEG_STATUS"; //$NON-NLS-1$
-
-    public static final BehandlingStegStatus INNGANG = new BehandlingStegStatus("INNGANG"); //$NON-NLS-1$
-
+    INNGANG("INNGANG"),
     /**
      * midlertidig intern tilstand når steget startes (etter inngang).
      */
-    public static final BehandlingStegStatus STARTET = new BehandlingStegStatus("STARTET"); //$NON-NLS-1$
+    STARTET("STARTET"),
+    VENTER("VENTER"),
+    UTGANG("UTGANG"),
+    AVBRUTT("AVBRUTT"),
+    UTFØRT("UTFØRT"),
+    FREMOVERFØRT("FREMOVERFØRT"),
+    TILBAKEFØRT("TILBAKEFØRT"),
+    /**
+     * Kun for intern bruk.
+     */
+    UDEFINERT("-");
 
-    public static final BehandlingStegStatus VENTER = new BehandlingStegStatus("VENTER"); //$NON-NLS-1$
-    public static final BehandlingStegStatus UTGANG = new BehandlingStegStatus("UTGANG"); //$NON-NLS-1$
-    public static final BehandlingStegStatus AVBRUTT = new BehandlingStegStatus("AVBRUTT"); //$NON-NLS-1$
-    public static final BehandlingStegStatus UTFØRT = new BehandlingStegStatus("UTFØRT"); //$NON-NLS-1$
-    public static final BehandlingStegStatus FREMOVERFØRT = new BehandlingStegStatus("FREMOVERFØRT"); //$NON-NLS-1$
-    public static final BehandlingStegStatus TILBAKEFØRT = new BehandlingStegStatus("TILBAKEFØRT"); //$NON-NLS-1$
+    public static final String KODEVERK = "BEHANDLING_STEG_STATUS";
+    private static final Map<String, BehandlingStegStatus> KODER = new LinkedHashMap<>();
 
     private static final Set<BehandlingStegStatus> KAN_UTFØRE_STEG = new HashSet<>(Arrays.asList(STARTET, VENTER));
     private static final Set<BehandlingStegStatus> KAN_FORTSETTE_NESTE = new HashSet<>(Arrays.asList(UTFØRT, FREMOVERFØRT));
     private static final Set<BehandlingStegStatus> SLUTT_STATUSER = new HashSet<>(Arrays.asList(AVBRUTT, UTFØRT, TILBAKEFØRT));
 
-    /**
-     * Kun for intern bruk.
-     */
-    public static final BehandlingStegStatus UDEFINERT = new BehandlingStegStatus("-"); //$NON-NLS-1$
+    private String kode;
 
-
-    BehandlingStegStatus() {
-        // Hibernate trenger den
+    static {
+        for (var v : values()) {
+            if (KODER.putIfAbsent(v.kode, v) != null) {
+                throw new IllegalArgumentException("Duplikat : " + v.kode);
+            }
+        }
     }
 
-    private BehandlingStegStatus(String kode) {
-        super(kode, DISCRIMINATOR);
+    BehandlingStegStatus(String kode) {
+        this.kode = kode;
+    }
+
+    @JsonCreator
+    public static BehandlingStegStatus fraKode(@JsonProperty("kode") String kode) {
+        if (kode == null) {
+            return null;
+        }
+        var ad = KODER.get(kode);
+        if (ad == null) {
+            throw new IllegalArgumentException("Ukjent BehandlingStegStatus: " + kode);
+        }
+        return ad;
+    }
+
+    public static Map<String, BehandlingStegStatus> kodeMap() {
+        return Collections.unmodifiableMap(KODER);
     }
 
     public boolean kanUtføreSteg() {
@@ -73,5 +102,40 @@ public class BehandlingStegStatus extends Kodeliste {
 
     public static boolean erVedUtgang(BehandlingStegStatus stegStatus) {
         return Objects.equals(UTGANG, stegStatus);
+    }
+
+    @JsonProperty
+    @Override
+    public String getKode() {
+        return kode;
+    }
+
+    @Override
+    public String getOffisiellKode() {
+        return getKode();
+    }
+
+    @JsonProperty
+    @Override
+    public String getKodeverk() {
+        return KODEVERK;
+    }
+
+    @Override
+    public String getNavn() {
+        return null;
+    }
+
+    @Converter(autoApply = true)
+    public static class KodeverdiConverter implements AttributeConverter<BehandlingStegStatus, String> {
+        @Override
+        public String convertToDatabaseColumn(BehandlingStegStatus attribute) {
+            return attribute == null ? null : attribute.getKode();
+        }
+
+        @Override
+        public BehandlingStegStatus convertToEntityAttribute(String dbData) {
+            return dbData == null ? null : fraKode(dbData);
+        }
     }
 }

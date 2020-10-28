@@ -17,9 +17,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
-import org.hibernate.annotations.JoinColumnOrFormula;
-import org.hibernate.annotations.JoinFormula;
-
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
@@ -38,9 +35,8 @@ public class Fagsak extends BaseEntitet {
     @JoinColumn(name = "bruker_id", nullable = false)
     private NavBruker navBruker;
 
-    @ManyToOne(optional = false)
-    @JoinColumnOrFormula(column = @JoinColumn(name = "fagsak_status", referencedColumnName = "kode", nullable = false))
-    @JoinColumnOrFormula(formula = @JoinFormula(referencedColumnName = "kodeverk", value = "'" + FagsakStatus.DISCRIMINATOR + "'"))
+    @Convert(converter = FagsakStatus.KodeverdiConverter.class)
+    @Column(name = "fagsak_status", nullable = false)
     private FagsakStatus fagsakStatus = FagsakStatus.DEFAULT;
 
     /**

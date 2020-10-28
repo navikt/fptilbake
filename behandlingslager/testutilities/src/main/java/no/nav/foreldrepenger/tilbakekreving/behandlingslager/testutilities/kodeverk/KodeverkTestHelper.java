@@ -1,10 +1,8 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -20,8 +18,6 @@ import org.mockito.Mockito;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.VurderÅrsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodelisteRelasjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
@@ -75,25 +71,6 @@ public class KodeverkTestHelper {
                 Constructor<BehandlingStegType> ctor = BehandlingStegType.class.getDeclaredConstructor(String.class);
                 ctor.setAccessible(true);
                 return ctor.newInstance(kode);
-            });
-            Mockito.when(mock.finnVenteårsak(Mockito.anyString())).thenAnswer(invocation -> {
-                String kode = invocation.getArgument(0);
-                Constructor<Venteårsak> ctor = Venteårsak.class.getDeclaredConstructor(String.class);
-                ctor.setAccessible(true);
-                return ctor.newInstance(kode);
-            });
-            Mockito.when(mock.finnVurderÅrsaker(Mockito.anyCollection())).thenAnswer(invocation -> {
-                Collection<String> koder = invocation.getArgument(0);
-                Constructor<VurderÅrsak> ctor = VurderÅrsak.class.getDeclaredConstructor(String.class);
-                ctor.setAccessible(true);
-
-                return koder.stream().map(k -> {
-                    try {
-                        return ctor.newInstance(k);
-                    } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                        throw new IllegalArgumentException("Kan ikke opprette " + VurderÅrsak.class.getName() + " med kode " + k);
-                    }
-                }).collect(Collectors.toSet());
             });
             Mockito.when(mock.finnAksjonspunktDefinisjon(Mockito.anyString())).thenAnswer(invocation -> {
                 String kode = invocation.getArgument(0);

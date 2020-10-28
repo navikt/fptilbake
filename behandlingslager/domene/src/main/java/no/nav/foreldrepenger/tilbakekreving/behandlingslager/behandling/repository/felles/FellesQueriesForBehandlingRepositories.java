@@ -41,9 +41,9 @@ public class FellesQueriesForBehandlingRepositories {
             "select distinct b" +
                 " from Aksjonspunkt ap" +
                 " inner join ap.behandling b on ap.behandling.id = b.id" +
-                " where ap.status.kode = :åpneAksjonspunktKoder" +
-                " and ap.reaktiveringStatus.kode = :reaktiverkode" +
-                " and ap.aksjonspunktDefinisjon.aksjonspunktType.kode = :autopunktkode" +
+                " where ap.status = :åpneAksjonspunktKoder" +
+                " and ap.reaktiveringStatus = :reaktiveringStatus" +
+                " and ap.aksjonspunktDefinisjon.aksjonspunktType = :autopunktkode" +
                 " and ap.aksjonspunktDefinisjon.kode in (:køetKode)",
             Behandling.class);
 
@@ -61,9 +61,9 @@ public class FellesQueriesForBehandlingRepositories {
                 " where b.id = :behandlingId " +
                 " and exists (select 1 from Aksjonspunkt ap " +
                 "             where ap.behandling = b " +
-                "             and ap.status.kode = :åpneAksjonspunktKoder" +
-                "             and ap.reaktiveringStatus.kode = :reaktiverkode" +
-                "             and ap.aksjonspunktDefinisjon.aksjonspunktType.kode = :autopunktkode" +
+                "             and ap.status = :åpneAksjonspunktKoder" +
+                "             and ap.reaktiveringStatus = :reaktiveringStatus" +
+                "             and ap.aksjonspunktDefinisjon.aksjonspunktType = :autopunktkode" +
                 "             and ap.aksjonspunktDefinisjon.kode in (:køetKode)" +
                 "            )",
             Behandling.class);
@@ -81,9 +81,9 @@ public class FellesQueriesForBehandlingRepositories {
 
     private void setParametre(TypedQuery<Behandling> query, AksjonspunktDefinisjon[] aksjonspunktDefinisjoner) {
         query.setHint(QueryHints.HINT_READONLY, "true");
-        query.setParameter("åpneAksjonspunktKoder", AksjonspunktStatus.getÅpneAksjonspunktKoder());
-        query.setParameter("autopunktkode", AksjonspunktType.AUTOPUNKT.getKode());
-        query.setParameter("reaktiverkode", ReaktiveringStatus.AKTIV.getKode());
+        query.setParameter("åpneAksjonspunktKoder", AksjonspunktStatus.getÅpneAksjonspunktStatuser());
+        query.setParameter("autopunktkode", AksjonspunktType.AUTOPUNKT);
+        query.setParameter("reaktiveringStatus", ReaktiveringStatus.AKTIV);
         query.setParameter("køetKode", Arrays.stream(aksjonspunktDefinisjoner).map(AksjonspunktDefinisjon::getKode).collect(Collectors.toList()));
     }
 

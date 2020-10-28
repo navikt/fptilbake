@@ -1,27 +1,93 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
+import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
+
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
 
-@Entity(name = "ReaktiveringStatus")
-@DiscriminatorValue(ReaktiveringStatus.DISCRIMINATOR)
-public class ReaktiveringStatus extends Kodeliste {
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
+public enum ReaktiveringStatus implements Kodeverdi {
 
-    public static final String DISCRIMINATOR = "REAKTIVERING_STATUS";
+    AKTIV("AKTIV"),
+    INAKTIV("INAKTIV"),
+    SLETTET("SLETTET");
 
-    public static final ReaktiveringStatus AKTIV = new ReaktiveringStatus("AKTIV"); //$NON-NLS-1$
-    public static final ReaktiveringStatus INAKTIV = new ReaktiveringStatus("INAKTIV"); //$NON-NLS-1$
-    public static final ReaktiveringStatus SLETTET = new ReaktiveringStatus("SLETTET"); //$NON-NLS-1$
+    public static final String KODEVERK = "REAKTIVERING_STATUS";
+    private static final Map<String, ReaktiveringStatus> KODER = new LinkedHashMap<>();
 
-    @SuppressWarnings("unused")
-    private ReaktiveringStatus() {
-        // Hibernate
+    private String kode;
+
+    static {
+        for (var v : values()) {
+            if (KODER.putIfAbsent(v.kode, v) != null) {
+                throw new IllegalArgumentException("Duplikat : " + v.kode);
+            }
+        }
     }
 
-    public ReaktiveringStatus(String kode) {
-        super(kode, DISCRIMINATOR);
+    ReaktiveringStatus(String kode) {
+        this.kode = kode;
+    }
+
+    @JsonCreator
+    public static ReaktiveringStatus fraKode(@JsonProperty("kode") String kode) {
+        if (kode == null) {
+            return null;
+        }
+        var ad = KODER.get(kode);
+        if (ad == null) {
+            throw new IllegalArgumentException("Ukjent SivilstandType: " + kode);
+        }
+        return ad;
+    }
+
+    public static Map<String, ReaktiveringStatus> kodeMap() {
+        return Collections.unmodifiableMap(KODER);
+    }
+
+    @Converter(autoApply = true)
+    public static class KodeverdiConverter implements AttributeConverter<ReaktiveringStatus, String> {
+        @Override
+        public String convertToDatabaseColumn(ReaktiveringStatus attribute) {
+            return attribute == null ? null : attribute.getKode();
+        }
+
+        @Override
+        public ReaktiveringStatus convertToEntityAttribute(String dbData) {
+            return dbData == null ? null : fraKode(dbData);
+        }
+    }
+
+    @JsonProperty
+    @Override
+    public String getKode() {
+        return kode;
+    }
+
+    @Override
+    public String getOffisiellKode() {
+        return getKode();
+    }
+
+    @JsonProperty
+    @Override
+    public String getKodeverk() {
+        return KODEVERK;
+    }
+
+    @Override
+    public String getNavn() {
+        return null;
     }
 }

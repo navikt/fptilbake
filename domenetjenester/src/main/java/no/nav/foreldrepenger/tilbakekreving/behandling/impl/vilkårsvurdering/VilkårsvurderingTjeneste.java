@@ -298,9 +298,7 @@ public class VilkårsvurderingTjeneste {
     }
 
     private Inntektskategori finnesInntektsKategori(KravgrunnlagBelop433 belop) {
-        Inntektskategori inntektskategori = InntektskategoriKlassekodeMapper.finnInntekstkategoriMedKlasseKode(belop.getKlasseKodeKodeverk());
-        inntektskategori = kodeverkRepository.finn(Inntektskategori.class, inntektskategori.getKode());
-        return inntektskategori;
+        return InntektskategoriKlassekodeMapper.finnInntekstkategoriMedKlasseKode(belop.getKlasseKodeKodeverk());
     }
 
     private List<YtelseDto> oppsummereYtelser(List<YtelseDto> ytelser) {

@@ -5,7 +5,6 @@ import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 
 
@@ -39,25 +38,16 @@ public class InternalManipulerBehandling {
                                             BehandlingStegStatus sluttStatusForEksisterendeSteg) {
 
         // finn riktig mapping av kodeverk slik at vi får med dette når Behandling brukes videre.
-        BehandlingStegStatus nesteStatus = canonicalize(nesteStegStatus);
-        BehandlingStegStatus sluttStatus = canonicalize(
-                (sluttStatusForEksisterendeSteg == null ? BehandlingStegStatus.UTFØRT : sluttStatusForEksisterendeSteg));
+        BehandlingStegStatus sluttStatus = sluttStatusForEksisterendeSteg == null ? BehandlingStegStatus.UTFØRT : sluttStatusForEksisterendeSteg;
         BehandlingStegType canonStegType = canonicalize(stegType);
 
         // Oppdater behandling til den nye stegtilstanden
         BehandlingStegTilstand stegTilstand = new BehandlingStegTilstand(behandling, canonStegType);
-        stegTilstand.setBehandlingStegStatus(nesteStatus);
+        stegTilstand.setBehandlingStegStatus(nesteStegStatus);
         behandling.oppdaterBehandlingStegOgStatus(stegTilstand, sluttStatus);
     }
 
     private BehandlingStegType canonicalize(BehandlingStegType stegType) {
         return stegType == null ? null : behandlingRepository.finnBehandlingStegType(stegType.getKode());
     }
-
-    @SuppressWarnings("unchecked")
-    protected <V extends Kodeliste> V canonicalize(V kodeliste) {
-        return kodeliste == null ? null
-                : (V) kodeverkRepository.finn(kodeliste.getClass(), kodeliste.getKode());
-    }
-
 }
