@@ -1,13 +1,13 @@
 create table poststed (
-    poststednummer varchar(16) not null
+    poststednummer varchar2(16 char) not null
         constraint pk_poststed
             primary key,
-    poststednavn varchar(256) not null,
+    poststednavn varchar2(256 char) not null,
     gyldigfom date not null,
     gyldigtom date DEFAULT to_date('31.12.9999', 'dd.mm.yyyy') not null,
-    opprettet_av varchar(20) default 'VL' not null,
+    opprettet_av varchar2(20 char) default 'VL' not null,
     opprettet_tid timestamp(3) default LOCALTIMESTAMP not null,
-    endret_av varchar(20),
+    endret_av varchar2(20 char),
     endret_tid timestamp(3)
 );
 
