@@ -1,85 +1,102 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling;
 
+import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-import javax.persistence.Transient;
+import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
-import no.nav.vedtak.feil.Feil;
-import no.nav.vedtak.feil.FeilFactory;
-import no.nav.vedtak.feil.LogLevel;
-import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
-import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
-import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-@Entity(name = "BehandlingType")
-@DiscriminatorValue(BehandlingType.DISCRIMINATOR)
-public class BehandlingType extends Kodeliste {
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
-    public static final String DISCRIMINATOR = "BEHANDLING_TYPE";
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
+public enum BehandlingType implements Kodeverdi {
 
-    /**
-     * Konstanter for å skrive ned kodeverdi. For å hente ut andre data konfigurert, må disse leses fra databasen (eks.
-     * for å hente offisiell kode for et Nav kodeverk).
-     */
-    public static final BehandlingType TILBAKEKREVING = new BehandlingType("BT-007"); //$NON-NLS-1$
-    public static final BehandlingType REVURDERING_TILBAKEKREVING = new BehandlingType("BT-009"); //$NON-NLS-1$
-    /**
-     * Alle kodeverk må ha en verdi, det kan ikke være null i databasen. Denne koden gjør samme nytten.
-     */
-    public static final BehandlingType UDEFINERT = new BehandlingType("-"); //$NON-NLS-1$
+    TILBAKEKREVING("BT-007", "Tilbakekreving"),
+    REVURDERING_TILBAKEKREVING("BT-009", "Tilbakekreving revurdering"),
+    UDEFINERT("-", "Ikke definert");
 
+    public static final String KODEVERK = "BEHANDLING_TYPE";
     private static final Map<String, BehandlingType> TILGJENGELIGE = Map.of(
         REVURDERING_TILBAKEKREVING.getKode(), REVURDERING_TILBAKEKREVING,
         TILBAKEKREVING.getKode(), TILBAKEKREVING
     );
+    private static final Map<String, BehandlingType> KODER = new LinkedHashMap<>();
 
-    @Transient
-    private Integer behandlingstidFristUker;
-    @Transient
-    private Boolean behandlingstidVarselbrev;
+    private String kode;
+    private String navn;
 
-    protected BehandlingType() {
-        // Hibernate trenger den
-    }
-
-    protected BehandlingType(String kode) {
-        super(kode, DISCRIMINATOR);
-    }
-
-    public int getBehandlingstidFristUker() {
-        if (behandlingstidFristUker == null) {
-            String behandlingstidFristUkerStr = getJsonField("behandlingstidFristUker");
-            behandlingstidFristUker = Integer.parseInt(behandlingstidFristUkerStr);
-        }
-        return behandlingstidFristUker;
-    }
-
-    public boolean isBehandlingstidVarselbrev() {
-        if (behandlingstidVarselbrev == null) {
-            behandlingstidVarselbrev = false;
-            String behandlingstidVarselbrevStr = getJsonField("behandlingstidVarselbrev");
-            if (behandlingstidVarselbrevStr != null) {
-                this.behandlingstidVarselbrev = new BooleanToStringConverter().convertToEntityAttribute(behandlingstidVarselbrevStr);
+    static {
+        for (var v : values()) {
+            if (KODER.putIfAbsent(v.kode, v) != null) {
+                throw new IllegalArgumentException("Duplikat : " + v.kode);
             }
         }
-        return behandlingstidVarselbrev;
     }
 
-    public static BehandlingType fraKode(String kode) {
-        if (TILGJENGELIGE.containsKey(kode)) {
-            return TILGJENGELIGE.get(kode);
+    BehandlingType(String kode, String navn) {
+        this.kode = kode;
+        this.navn = navn;
+    }
+
+
+    @JsonCreator
+    public static BehandlingType fraKode(@JsonProperty("kode") String kode) {
+        if (kode == null) {
+            return null;
         }
-        throw BehandlingTypeFeil.FEILFACTORY.ugyldigBehandlingType(kode).toException();
+        var ad = KODER.get(kode);
+        if (ad == null) {
+            throw new IllegalArgumentException("Ukjent BehandlingType: " + kode);
+        }
+        return ad;
     }
 
-    interface BehandlingTypeFeil extends DeklarerteFeil {
+    public static Map<String, BehandlingType> kodeMap() {
+        return Collections.unmodifiableMap(KODER);
+    }
 
-        BehandlingTypeFeil FEILFACTORY = FeilFactory.create(BehandlingTypeFeil.class);
+    @JsonProperty
+    @Override
+    public String getKode() {
+        return kode;
+    }
 
-        @TekniskFeil(feilkode = "FPT-312906", feilmelding = "BehandlingType '%s' er ugyldig", logLevel = LogLevel.WARN)
-        Feil ugyldigBehandlingType(String behandlingType);
+    @Override
+    public String getOffisiellKode() {
+        return getKode();
+    }
+
+    @JsonProperty
+    @Override
+    public String getKodeverk() {
+        return KODEVERK;
+    }
+
+    @JsonProperty
+    @Override
+    public String getNavn() {
+        return navn;
+    }
+
+    @Converter(autoApply = true)
+    public static class KodeverdiConverter implements AttributeConverter<BehandlingType, String> {
+        @Override
+        public String convertToDatabaseColumn(BehandlingType attribute) {
+            return attribute == null ? null : attribute.getKode();
+        }
+
+        @Override
+        public BehandlingType convertToEntityAttribute(String dbData) {
+            return dbData == null ? null : fraKode(dbData);
+        }
     }
 }

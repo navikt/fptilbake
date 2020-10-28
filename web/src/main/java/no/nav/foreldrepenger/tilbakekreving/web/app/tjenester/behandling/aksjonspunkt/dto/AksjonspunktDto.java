@@ -6,7 +6,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.VurderÅrsak;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårType;
 
 public class AksjonspunktDto {
     private AksjonspunktDefinisjon definisjon;
@@ -18,7 +17,6 @@ public class AksjonspunktDto {
     private AksjonspunktType aksjonspunktType;
     private Boolean kanLoses;
     private Boolean erAktivt;
-    private VilkårType vilkårType;
 
     public AksjonspunktDto() {
     }
@@ -45,10 +43,6 @@ public class AksjonspunktDto {
 
     public void setBesluttersBegrunnelse(String besluttersBegrunnelse) {
         this.besluttersBegrunnelse = besluttersBegrunnelse;
-    }
-
-    public void setVilkårType(VilkårType vilkårType) {
-        this.vilkårType = vilkårType;
     }
 
     public void setAksjonspunktType(AksjonspunktType aksjonspunktType) {
@@ -99,7 +93,4 @@ public class AksjonspunktDto {
         return erAktivt;
     }
 
-    public VilkårType getVilkårType() {
-        return vilkårType;
-    }
 }

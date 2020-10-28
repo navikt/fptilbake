@@ -4,20 +4,16 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Version;
-
-import org.hibernate.annotations.JoinColumnOrFormula;
-import org.hibernate.annotations.JoinColumnsOrFormulas;
-import org.hibernate.annotations.JoinFormula;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandlingsresultat;
@@ -44,11 +40,8 @@ public class BehandlingVedtak extends BaseEntitet {
     @JoinColumn(name = "BEHANDLING_RESULTAT_ID", nullable = false, updatable = false, unique = true)
     private Behandlingsresultat behandlingsresultat;
 
-    @ManyToOne(optional = false)
-    @JoinColumnsOrFormulas({
-            @JoinColumnOrFormula(column = @JoinColumn(name = "iverksetting_status", referencedColumnName = "kode", nullable = false)),
-            @JoinColumnOrFormula(formula = @JoinFormula(referencedColumnName = "kodeverk", value = "'" + IverksettingStatus.DISCRIMINATOR
-                + "'")) })
+    @Convert(converter = IverksettingStatus.KodeverdiConverter.class)
+    @Column(name = "iverksetting_status", nullable = false)
     private IverksettingStatus iverksettingStatus = IverksettingStatus.UDEFINERT;
 
     private BehandlingVedtak() {

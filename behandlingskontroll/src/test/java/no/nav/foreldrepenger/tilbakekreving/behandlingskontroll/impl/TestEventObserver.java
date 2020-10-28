@@ -23,7 +23,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegTilstand;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
 
 @ApplicationScoped
@@ -124,7 +124,7 @@ public class TestEventObserver {
     private static String hentKode(Optional<BehandlingStegTilstand> behandlingStegTilstand) {
         return behandlingStegTilstand
             .map(BehandlingStegTilstand::getBehandlingStegStatus)
-            .map(Kodeliste::getKode)
+            .map(Kodeverdi::getKode)
             .orElse("");
     }
 

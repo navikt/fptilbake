@@ -2,6 +2,8 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn;
 
 import java.util.Objects;
 
+import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -9,10 +11,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.JoinColumnOrFormula;
-import org.hibernate.annotations.JoinColumnsOrFormulas;
-import org.hibernate.annotations.JoinFormula;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.VurderÅrsak;
@@ -30,11 +28,8 @@ public class VurderÅrsakTotrinnsvurdering extends BaseEntitet implements IndexK
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_VURDER_AARSAK_TTVURDERING")
     private Long id;
 
-    @ManyToOne(optional = false)
-    @JoinColumnsOrFormulas({
-            @JoinColumnOrFormula(column = @JoinColumn(name = "aarsak_type", referencedColumnName = "kode", nullable = false, updatable = false)),
-            @JoinColumnOrFormula(formula = @JoinFormula(referencedColumnName = "kodeverk", value = "'" + VurderÅrsak.DISCRIMINATOR
-                    + "'"))})
+    @Convert(converter = VurderÅrsak.KodeverdiConverter.class)
+    @Column(name = "aarsak_type", nullable = false, updatable = false)
     private VurderÅrsak årsaksType;
 
     @ManyToOne(optional = false)

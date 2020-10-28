@@ -27,11 +27,11 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingTypeRe
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.TestBehandlingStegType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.TestBehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegTilstand;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepository;
@@ -42,8 +42,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
@@ -60,8 +58,7 @@ public class TilbakehoppTest {
     @Rule
     public UnittestRepositoryRule repoRule = new UnittestRepositoryRule();
     private EntityManager em = repoRule.getEntityManager();
-    private KodeverkRepository kodeverkRepository = new KodeverkRepositoryImpl(em);
-    private AksjonspunktRepository aksjonspunktRepository = new AksjonspunktRepository(em, kodeverkRepository);
+    private AksjonspunktRepository aksjonspunktRepository = new AksjonspunktRepository(em);
     private BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(em);
     private final BehandlingRepository behandlingRepository = repositoryProvider.getBehandlingRepository();
 
@@ -161,15 +158,13 @@ public class TilbakehoppTest {
         // har et manuelt aksjonspunkt per vurderingspunkt for å støtte å legge aksjonspunkter hvor testene ønsker
         // har et overstyring-aksjonspunkt per vurderingspunkt for å støtte å legge overstyring-aksjonspunkter hvor testene ønsker
 
-        sql("INSERT INTO KODELISTE (id, kodeverk, kode, ekstra_data) values (seq_kodeliste.nextval, 'BEHANDLING_TYPE', 'BT-TEST', '{behandlingstidFristUker: 3}')");
-
         sql("INSERT INTO BEHANDLING_STEG_TYPE (KODE, NAVN, BEHANDLING_STATUS_DEF, BESKRIVELSE) VALUES ('STEG-1', 'test-steg-1', 'UTRED', 'test')");
         sql("INSERT INTO BEHANDLING_STEG_TYPE (KODE, NAVN, BEHANDLING_STATUS_DEF, BESKRIVELSE) VALUES ('STEG-2', 'test-steg-2', 'UTRED', 'test')");
         sql("INSERT INTO BEHANDLING_STEG_TYPE (KODE, NAVN, BEHANDLING_STATUS_DEF, BESKRIVELSE) VALUES ('STEG-3', 'test-steg-3', 'UTRED', 'test')");
 
-        sql("INSERT INTO BEHANDLING_TYPE_STEG_SEKV (ID, BEHANDLING_TYPE, BEHANDLING_STEG_TYPE, SEKVENS_NR) VALUES (SEQ_BEHANDLING_TYPE_STEG_SEKV.nextval, 'BT-TEST', 'STEG-1', 1)");
-        sql("INSERT INTO BEHANDLING_TYPE_STEG_SEKV (ID, BEHANDLING_TYPE, BEHANDLING_STEG_TYPE, SEKVENS_NR) VALUES (SEQ_BEHANDLING_TYPE_STEG_SEKV.nextval, 'BT-TEST', 'STEG-2', 2)");
-        sql("INSERT INTO BEHANDLING_TYPE_STEG_SEKV (ID, BEHANDLING_TYPE, BEHANDLING_STEG_TYPE, SEKVENS_NR) VALUES (SEQ_BEHANDLING_TYPE_STEG_SEKV.nextval, 'BT-TEST', 'STEG-3', 3)");
+        sql("INSERT INTO BEHANDLING_TYPE_STEG_SEKV (ID, BEHANDLING_TYPE, BEHANDLING_STEG_TYPE, SEKVENS_NR) VALUES (SEQ_BEHANDLING_TYPE_STEG_SEKV.nextval, 'BT-007', 'STEG-1', 1)");
+        sql("INSERT INTO BEHANDLING_TYPE_STEG_SEKV (ID, BEHANDLING_TYPE, BEHANDLING_STEG_TYPE, SEKVENS_NR) VALUES (SEQ_BEHANDLING_TYPE_STEG_SEKV.nextval, 'BT-007', 'STEG-2', 2)");
+        sql("INSERT INTO BEHANDLING_TYPE_STEG_SEKV (ID, BEHANDLING_TYPE, BEHANDLING_STEG_TYPE, SEKVENS_NR) VALUES (SEQ_BEHANDLING_TYPE_STEG_SEKV.nextval, 'BT-007', 'STEG-3', 3)");
 
         sql("INSERT INTO VURDERINGSPUNKT_DEF (KODE, BEHANDLING_STEG, VURDERINGSPUNKT_TYPE, NAVN) VALUES ('STEG-1.INN', 'STEG-1', 'INN', 'STEG-1.INN')");
         sql("INSERT INTO VURDERINGSPUNKT_DEF (KODE, BEHANDLING_STEG, VURDERINGSPUNKT_TYPE, NAVN) VALUES ('STEG-2.INN', 'STEG-2', 'INN', 'STEG-2.INN')");
@@ -333,7 +328,7 @@ public class TilbakehoppTest {
         BehandlingStegType idSteg = behandlingRepository.finnBehandlingStegType(identifisertI.getKode());
 
         Behandling behandling = ScenarioSimple.simple().lagre(repositoryProvider);
-        this.behandling = Behandling.nyBehandlingFor(behandling.getFagsak(), TestBehandlingType.TEST).build();
+        this.behandling = Behandling.nyBehandlingFor(behandling.getFagsak(), BehandlingType.TILBAKEKREVING).build();
         behandlingLås = behandlingRepository.taSkriveLås(this.behandling);
         behandlingRepository.lagre(this.behandling, behandlingLås);
         Aksjonspunkt ap = aksjonspunktRepository.leggTilAksjonspunkt(this.behandling, ad, idSteg);
@@ -381,7 +376,7 @@ public class TilbakehoppTest {
     }
 
     @BehandlingStegRef(kode = "STEG-1")
-    @BehandlingTypeRef("BT-TEST")
+    @BehandlingTypeRef("BT-007")
     public static class TestSteg1 extends AbstractTestSteg {
 
         public TestSteg1() {
@@ -390,7 +385,7 @@ public class TilbakehoppTest {
     }
 
     @BehandlingStegRef(kode = "STEG-2")
-    @BehandlingTypeRef("BT-TEST")
+    @BehandlingTypeRef("BT-007")
     public static class TestSteg2 extends AbstractTestSteg {
 
         public TestSteg2() {
@@ -399,7 +394,7 @@ public class TilbakehoppTest {
     }
 
     @BehandlingStegRef(kode = "STEG-3")
-    @BehandlingTypeRef("BT-TEST")
+    @BehandlingTypeRef("BT-007")
     public static class TestSteg3 extends AbstractTestSteg {
 
         public TestSteg3() {

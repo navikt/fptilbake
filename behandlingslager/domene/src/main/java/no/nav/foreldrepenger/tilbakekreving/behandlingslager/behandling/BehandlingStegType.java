@@ -7,17 +7,13 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.Valid;
 import javax.validation.constraints.Size;
-
-import org.hibernate.annotations.JoinColumnOrFormula;
-import org.hibernate.annotations.JoinColumnsOrFormulas;
-import org.hibernate.annotations.JoinFormula;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.VurderingspunktDefinisjon;
@@ -47,11 +43,8 @@ public class BehandlingStegType extends KodeverkTabell {
      * Definisjon av hvilken status behandlingen skal rapporteres som når dette steget er aktivt.
      */
     @Valid
-    @ManyToOne
-    @JoinColumnsOrFormulas({
-            @JoinColumnOrFormula(column = @JoinColumn(name = "behandling_status_def", referencedColumnName = "kode", nullable = false)),
-            @JoinColumnOrFormula(formula = @JoinFormula(referencedColumnName = "kodeverk", value = "'" + BehandlingStatus.DISCRIMINATOR
-                    + "'"))})
+    @Convert(converter = BehandlingStatus.KodeverdiConverter.class)
+    @Column(name = "behandling_status_def", nullable = false)
     private BehandlingStatus definertBehandlingStatus;
 
     protected BehandlingStegType() {

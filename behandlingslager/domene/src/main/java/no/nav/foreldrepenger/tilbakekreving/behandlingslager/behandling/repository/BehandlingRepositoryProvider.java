@@ -61,7 +61,7 @@ public class BehandlingRepositoryProvider {
         this.behandlingRepository = new BehandlingRepository(entityManager);
         this.behandlingresultatRepository = new BehandlingresultatRepository(entityManager);
         this.fagsakRepository = new FagsakRepository(entityManager);
-        this.aksjonspunktRepository = new AksjonspunktRepository(entityManager, this.kodeverkRepository);
+        this.aksjonspunktRepository = new AksjonspunktRepository(entityManager);
         this.historikkRepository = new HistorikkRepository(entityManager);
         this.behandlingLåsRepository = new BehandlingLåsRepository(entityManager);
         this.fagsakLåsRepository = new FagsakLåsRepository(entityManager);

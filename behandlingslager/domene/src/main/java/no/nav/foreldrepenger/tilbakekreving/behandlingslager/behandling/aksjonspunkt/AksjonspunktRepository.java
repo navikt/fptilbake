@@ -1,6 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt;
 
-import static no.nav.vedtak.util.Objects.check;
+import static org.apache.http.util.Asserts.check;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -15,8 +15,6 @@ import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepositoryImpl;
 
 /**
  * Håndter all endring av aksjonspunkt.
@@ -27,32 +25,18 @@ public class AksjonspunktRepository {
     private static final Logger log = LoggerFactory.getLogger(AksjonspunktRepository.class);
 
     private EntityManager entityManager;
-    private KodeverkRepository kodeverkRepository;
 
     AksjonspunktRepository() {
         // CDI
     }
 
+    @Inject
     public AksjonspunktRepository(EntityManager entityManager) {
         this.entityManager = entityManager;
-        if (entityManager != null) {
-            this.kodeverkRepository = new KodeverkRepositoryImpl(entityManager);
-        }
-    }
-
-    @Inject
-    public AksjonspunktRepository(EntityManager entityManager, KodeverkRepository kodeverkRepository) {
-        Objects.requireNonNull(kodeverkRepository, "kodeverkRepository");
-        this.entityManager = entityManager;
-        this.kodeverkRepository = kodeverkRepository;
     }
 
     public AksjonspunktDefinisjon finnAksjonspunktDefinisjon(String kode) {
         return entityManager.find(AksjonspunktDefinisjon.class, kode);
-    }
-
-    public AksjonspunktStatus finnAksjonspunktStatus(String kode) {
-        return kodeverkRepository.finn(AksjonspunktStatus.class, kode);
     }
 
     public Aksjonspunkt leggTilAksjonspunkt(Behandling behandling, AksjonspunktDefinisjon aksjonspunktDefinisjon,
@@ -160,7 +144,7 @@ public class AksjonspunktRepository {
     public boolean setTilUtført(Aksjonspunkt aksjonspunkt) {
         validerAktivt(aksjonspunkt);
         log.info("Setter aksjonspunkt utført: {}", aksjonspunkt.getAksjonspunktDefinisjon());
-        return aksjonspunkt.setStatus(finnAksjonspunktStatus(AksjonspunktStatus.UTFØRT));
+        return aksjonspunkt.setStatus(AksjonspunktStatus.UTFØRT);
     }
 
     public void reaktiver(Aksjonspunkt aksjonspunkt) {
@@ -175,20 +159,16 @@ public class AksjonspunktRepository {
         aksjonspunkt.setAktivStatus(ReaktiveringStatus.INAKTIV);
     }
 
-    private AksjonspunktStatus finnAksjonspunktStatus(AksjonspunktStatus ap) {
-        return entityManager != null ? finnAksjonspunktStatus(ap.getKode()) : ap;
-    }
-
     public void setTilAvbrutt(Aksjonspunkt aksjonspunkt) {
         validerAktivt(aksjonspunkt);
         log.info("Setter aksjonspunkt avbrutt: {}", aksjonspunkt.getAksjonspunktDefinisjon());
-        aksjonspunkt.setStatus(finnAksjonspunktStatus(AksjonspunktStatus.AVBRUTT));
+        aksjonspunkt.setStatus(AksjonspunktStatus.AVBRUTT);
     }
 
     public void setReåpnet(Aksjonspunkt aksjonspunkt) {
         validerAktivt(aksjonspunkt);
         log.info("Setter aksjonspunkt reåpnet: {}", aksjonspunkt.getAksjonspunktDefinisjon());
-        aksjonspunkt.setStatus(finnAksjonspunktStatus(AksjonspunktStatus.OPPRETTET));
+        aksjonspunkt.setStatus(AksjonspunktStatus.OPPRETTET);
     }
 
     public void setFrist(Aksjonspunkt ap, LocalDateTime fristTid, Venteårsak venteårsak) {

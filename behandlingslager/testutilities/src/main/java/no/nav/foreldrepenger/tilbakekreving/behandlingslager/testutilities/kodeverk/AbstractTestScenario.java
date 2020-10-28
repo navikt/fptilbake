@@ -321,7 +321,6 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
         mockBehandlingRepository = mockBehandlingRepository();
 
         lagre(repositoryProvider); // NOSONAR //$NON-NLS-1$
-        Whitebox.setInternalState(behandling.getType(), "ekstraData", "{ \"behandlingstidFristUker\" : 6, \"behandlingstidVarselbrev\" : \"N\" }");
         return mockBehandlingRepository;
     }
 

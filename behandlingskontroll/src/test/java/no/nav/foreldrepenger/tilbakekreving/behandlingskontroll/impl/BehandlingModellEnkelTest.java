@@ -18,7 +18,7 @@ public class BehandlingModellEnkelTest {
     private static final BehandlingStegType STEG_2 = TestBehandlingStegType.STEG_2;
     private static final BehandlingStegType STEG_3 = TestBehandlingStegType.STEG_3;
 
-    private static final BehandlingType BEHANDLING_TYPE = TestBehandlingType.TEST;
+    private static final BehandlingType BEHANDLING_TYPE = BehandlingType.TILBAKEKREVING;
 
     private final DummySteg dummyBehandlingSteg_1 = new DummySteg();
     private final DummySteg dummyBehandlingSteg_2 = new DummySteg();

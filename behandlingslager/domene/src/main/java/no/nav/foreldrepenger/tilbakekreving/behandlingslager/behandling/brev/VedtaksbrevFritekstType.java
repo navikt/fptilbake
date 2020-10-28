@@ -1,28 +1,85 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
+import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
 
-@Entity(name = "VedtaksbrevFritekstType")
-@DiscriminatorValue(VedtaksbrevFritekstType.DISCRIMINATOR)
-public class VedtaksbrevFritekstType extends Kodeliste {
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    public static final String DISCRIMINATOR = "FRITEKST_TYPE"; //??
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
-    public static final VedtaksbrevFritekstType FAKTA_AVSNITT = new VedtaksbrevFritekstType("FAKTA_AVSNITT"); //$NON-NLS-1$
-    public static final VedtaksbrevFritekstType VILKAAR_AVSNITT = new VedtaksbrevFritekstType("VILKAAR_AVSNITT"); //$NON-NLS-1$
-    public static final VedtaksbrevFritekstType SAERLIGE_GRUNNER_AVSNITT = new VedtaksbrevFritekstType("SAERLIGE_GRUNNER_AVSNITT"); //$NON-NLS-1$
-    public static final VedtaksbrevFritekstType SAERLIGE_GRUNNER_ANNET_AVSNITT = new VedtaksbrevFritekstType("SAERLIGE_GRUNNER_ANNET_AVSNITT"); //$NON-NLS-1$
+public enum VedtaksbrevFritekstType implements Kodeverdi {
 
-    VedtaksbrevFritekstType(){
-        // hibernate
+    FAKTA_AVSNITT("FAKTA_AVSNITT"),
+    VILKAAR_AVSNITT("VILKAAR_AVSNITT"),
+    SAERLIGE_GRUNNER_AVSNITT("SAERLIGE_GRUNNER_AVSNITT"),
+    SAERLIGE_GRUNNER_ANNET_AVSNITT("SAERLIGE_GRUNNER_ANNET_AVSNITT");
+
+    public static final String KODEVERK = "FRITEKST_TYPE";
+    private static final Map<String, VedtaksbrevFritekstType> KODER = new LinkedHashMap<>();
+
+    private String kode;
+
+    static {
+        for (var v : values()) {
+            if (KODER.putIfAbsent(v.kode, v) != null) {
+                throw new IllegalArgumentException("Duplikat : " + v.kode);
+            }
+        }
     }
 
-
-    public VedtaksbrevFritekstType(String kode) {
-        super(kode, DISCRIMINATOR);
+    VedtaksbrevFritekstType(String kode) {
+        this.kode = kode;
     }
 
+    public static VedtaksbrevFritekstType fraKode(@JsonProperty("kode") String kode) {
+        if (kode == null) {
+            return null;
+        }
+        var ad = KODER.get(kode);
+        if (ad == null) {
+            throw new IllegalArgumentException("Ukjent VedtaksbrevFritekstType: " + kode);
+        }
+        return ad;
+    }
+
+    public static Map<String, VedtaksbrevFritekstType> kodeMap() {
+        return Collections.unmodifiableMap(KODER);
+    }
+
+    @Override
+    public String getKode() {
+        return kode;
+    }
+
+    @Override
+    public String getOffisiellKode() {
+        return getKode();
+    }
+
+    @Override
+    public String getKodeverk() {
+        return KODEVERK;
+    }
+
+    @Override
+    public String getNavn() {
+        return null;
+    }
+
+    @Converter(autoApply = true)
+    public static class KodeverdiConverter implements AttributeConverter<VedtaksbrevFritekstType, String> {
+        @Override
+        public String convertToDatabaseColumn(VedtaksbrevFritekstType attribute) {
+            return attribute == null ? null : attribute.getKode();
+        }
+
+        @Override
+        public VedtaksbrevFritekstType convertToEntityAttribute(String dbData) {
+            return dbData == null ? null : fraKode(dbData);
+        }
+    }
 }

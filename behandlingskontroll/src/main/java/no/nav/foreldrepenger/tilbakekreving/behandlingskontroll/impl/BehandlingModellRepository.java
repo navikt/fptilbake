@@ -43,7 +43,7 @@ public class BehandlingModellRepository {
     }
 
     public BehandlingStegKonfigurasjon getBehandlingStegKonfigurasjon() {
-        List<BehandlingStegStatus> list = getKodeverkRepository().hentAlle(BehandlingStegStatus.class);
+        List<BehandlingStegStatus> list = Arrays.asList(BehandlingStegStatus.values());
         return new BehandlingStegKonfigurasjon(list);
     }
 
@@ -56,7 +56,7 @@ public class BehandlingModellRepository {
      */
     public BehandlingModell getModell(BehandlingType behandlingType) {
         Object key = cacheKey(behandlingType);
-        cachedModell.computeIfAbsent(key, (kode) -> byggModell(behandlingType));
+        cachedModell.computeIfAbsent(key, kode -> byggModell(behandlingType));
         return cachedModell.get(key);
     }
 
@@ -79,9 +79,9 @@ public class BehandlingModellRepository {
     }
 
     private List<BehandlingTypeStegSekvens> finnBehandlingStegSekvens(BehandlingType type) {
-        String jpql = "from BehandlingTypeStegSekvens btss where btss.behandlingType.kode=:behandlingType ORDER BY btss.sekvensNr ASC"; //$NON-NLS-1$
+        String jpql = "from BehandlingTypeStegSekvens btss where btss.behandlingType=:behandlingType ORDER BY btss.sekvensNr ASC"; //$NON-NLS-1$
         TypedQuery<BehandlingTypeStegSekvens> query = entityManager.createQuery(jpql, BehandlingTypeStegSekvens.class);
-        query.setParameter("behandlingType", type.getKode()); //$NON-NLS-1$
+        query.setParameter("behandlingType", type); //$NON-NLS-1$
         query.setHint(QueryHints.HINT_READONLY, "true");//$NON-NLS-1$
         return query.getResultList();
     }

@@ -13,7 +13,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.ReaktiveringStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.Totrinnsvurdering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.VurderÅrsakTotrinnsvurdering;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårType;
 
 public class AksjonspunktDtoMapper {
 
@@ -34,7 +33,6 @@ public class AksjonspunktDtoMapper {
         AksjonspunktDto dto = new AksjonspunktDto();
         dto.setDefinisjon(aksjonspunktDefinisjon);
         dto.setStatus(aksjonspunkt.getStatus());
-        dto.setVilkårType(VilkårType.UDEFINERT); //TODO Hvordan blir dette?
         dto.setToTrinnsBehandling(aksjonspunkt.isToTrinnsBehandling() || aksjonspunktDefinisjon.getDefaultTotrinnBehandling());
 
         Optional<Totrinnsvurdering> vurdering = ttVurderinger.stream().filter(v -> v.getAksjonspunktDefinisjon() == aksjonspunkt.getAksjonspunktDefinisjon()).findFirst();

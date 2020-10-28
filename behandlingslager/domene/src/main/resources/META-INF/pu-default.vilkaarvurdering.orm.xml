@@ -19,7 +19,4 @@
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingGodTroEntitet"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingSærligGrunnEntitet"/>
 
-    <!-- kodeverk -->
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.NavOppfulgt"/>
-
 </entity-mappings>

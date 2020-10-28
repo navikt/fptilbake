@@ -44,7 +44,7 @@ public enum Venteårsak implements Kodeverdi {
         }
     }
 
-    private Venteårsak(String kode, String navn) {
+    Venteårsak(String kode, String navn) {
         this.kode = kode;
         this.navn = navn;
     }

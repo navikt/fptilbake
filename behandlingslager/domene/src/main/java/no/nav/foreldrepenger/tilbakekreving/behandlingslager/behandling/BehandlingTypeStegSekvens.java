@@ -3,6 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling;
 import java.util.Objects;
 
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -10,9 +11,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.JoinColumnOrFormula;
-import org.hibernate.annotations.JoinFormula;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 
@@ -25,9 +23,8 @@ public class BehandlingTypeStegSekvens extends BaseEntitet {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_BEHANDLING_TYPE_STEG_SEKV")
     private Long id;
 
-    @ManyToOne(optional = false)
-    @JoinColumnOrFormula(column = @JoinColumn(name = "behandling_type", referencedColumnName = "kode", nullable = false))
-    @JoinColumnOrFormula(formula = @JoinFormula(referencedColumnName = "kodeverk", value = "'" + BehandlingType.DISCRIMINATOR + "'"))
+    @Convert(converter = BehandlingType.KodeverdiConverter.class)
+    @Column(name = "behandling_type", nullable = false)
     private BehandlingType behandlingType;
 
     @ManyToOne(optional = false)

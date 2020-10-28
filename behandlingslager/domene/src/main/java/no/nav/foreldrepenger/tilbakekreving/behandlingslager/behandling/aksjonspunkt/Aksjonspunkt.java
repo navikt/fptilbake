@@ -23,9 +23,6 @@ import javax.persistence.Table;
 import javax.persistence.Version;
 
 import org.hibernate.annotations.BatchSize;
-import org.hibernate.annotations.JoinColumnOrFormula;
-import org.hibernate.annotations.JoinColumnsOrFormulas;
-import org.hibernate.annotations.JoinFormula;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -57,9 +54,8 @@ public class Aksjonspunkt extends BaseEntitet {
     @JoinColumn(name = "behandling_id", nullable = false, updatable = false)
     private Behandling behandling;
 
-    @ManyToOne()
-    @JoinColumnOrFormula(column = @JoinColumn(name = "aksjonspunkt_status", referencedColumnName = "kode", nullable = false))
-    @JoinColumnOrFormula(formula = @JoinFormula(referencedColumnName = "kodeverk", value = "'" + AksjonspunktStatus.DISCRIMINATOR + "'"))
+    @Convert(converter = AksjonspunktStatus.KodeverdiConverter.class)
+    @Column(name = "aksjonspunkt_status", nullable = false)
     private AksjonspunktStatus status;
 
     @Convert(converter = Venteårsak.KodeverdiConverter.class)
@@ -82,11 +78,8 @@ public class Aksjonspunkt extends BaseEntitet {
      * Angir om aksjonspunktet er aktivt. NB: Ikke samme som status.
      * Inaktive aksjonspunkter er historiske som ble kopiert når en revurdering ble opprettet. De eksisterer for å kunne vise den opprinnelige begrunnelsen, uten at saksbehandler må ta stilling til det på nytt..
      */
-    @ManyToOne()
-    @JoinColumnsOrFormulas({
-            @JoinColumnOrFormula(column = @JoinColumn(name = "REAKTIVERING_STATUS", referencedColumnName = "kode", nullable = false)),
-            @JoinColumnOrFormula(formula = @JoinFormula(referencedColumnName = "kodeverk", value = "'" + ReaktiveringStatus.DISCRIMINATOR
-                    + "'"))})
+    @Convert(converter = ReaktiveringStatus.KodeverdiConverter.class)
+    @Column(name = "REAKTIVERING_STATUS", nullable = false)
     private ReaktiveringStatus reaktiveringStatus = ReaktiveringStatus.AKTIV;
 
     @Convert(converter = BooleanToStringConverter.class)

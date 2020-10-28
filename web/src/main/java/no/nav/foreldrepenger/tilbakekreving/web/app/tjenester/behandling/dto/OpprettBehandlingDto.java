@@ -10,7 +10,6 @@ import javax.validation.constraints.NotNull;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.ValidKodeverk;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.TilbakekrevingAbacAttributtType;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.SaksnummerDto;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
@@ -27,7 +26,7 @@ public class OpprettBehandlingDto implements AbacDto {
     @Valid
     private UUID eksternUuid;
 
-    @ValidKodeverk
+    @Valid
     private BehandlingType behandlingType;
 
     @Valid

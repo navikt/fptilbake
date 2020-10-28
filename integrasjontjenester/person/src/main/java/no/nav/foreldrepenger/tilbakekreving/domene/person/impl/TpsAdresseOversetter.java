@@ -120,7 +120,7 @@ public class TpsAdresseOversetter {
     }
 
     Optional<AdresseType> finnGjeldendePostadressetype(Bruker bruker) {
-        return poststedKodeverkRepository.finnAdresseType(bruker.getGjeldendePostadressetype().getValue());
+        return Optional.ofNullable(AdresseType.fraKode(bruker.getGjeldendePostadressetype().getValue()));
     }
 
     Adresseinfo konverterStrukturertAdresse(Bruker bruker,

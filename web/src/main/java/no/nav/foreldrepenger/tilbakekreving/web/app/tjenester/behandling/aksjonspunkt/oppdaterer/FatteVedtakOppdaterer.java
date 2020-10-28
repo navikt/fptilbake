@@ -15,7 +15,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.VurderÅrsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.DtoTilServiceAdapter;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.AksjonspunktGodkjenningDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.FatteVedtakDto;
@@ -56,6 +55,6 @@ public class FatteVedtakOppdaterer implements AksjonspunktOppdaterer<FatteVedtak
         if (arsaker == null) {
             return Collections.emptySet();
         }
-        return arsaker.stream().map(Kodeliste::getKode).collect(Collectors.toSet());
+        return arsaker.stream().map(VurderÅrsak::getKode).collect(Collectors.toSet());
     }
 }
