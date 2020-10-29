@@ -22,7 +22,7 @@ public class HentForhåndvisningVedtaksbrevPdfDto implements AbacDto {
     @NotNull
     private BehandlingReferanse behandlingReferanse;
 
-    @Size(max = 4000, message = "Oppsummeringstekst er for lang")
+    @Size(max = 10000, message = "Oppsummeringstekst er for lang")
     @Pattern(regexp = InputValideringRegex.FRITEKST)
     private String oppsummeringstekst;
 

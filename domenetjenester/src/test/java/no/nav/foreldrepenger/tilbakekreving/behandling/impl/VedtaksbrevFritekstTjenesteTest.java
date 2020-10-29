@@ -22,6 +22,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.Ved
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
@@ -94,7 +95,7 @@ public class VedtaksbrevFritekstTjenesteTest {
             new VedtaksbrevFritekstPeriode.Builder().medBehandlingId(behandlingId).medFritekst("foo").medFritekstType(VedtaksbrevFritekstType.FAKTA_AVSNITT).medPeriode(Periode.of(jan3, jan24)).build()
         );
 
-        tjeneste.lagreFriteksterFraSaksbehandler(behandlingId, oppsummering, fritekstperioder);
+        tjeneste.lagreFriteksterFraSaksbehandler(behandlingId, oppsummering, fritekstperioder, VedtaksbrevType.ORDINÆR);
         repoRule.getEntityManager().flush();
 
         List<VedtaksbrevFritekstPeriode> fritekster = vedtaksbrevFritekstRepository.hentVedtaksbrevPerioderMedTekst(behandlingId);
@@ -118,7 +119,7 @@ public class VedtaksbrevFritekstTjenesteTest {
         VedtaksbrevFritekstOppsummering oppsummering = new VedtaksbrevFritekstOppsummering.Builder().medBehandlingId(behandlingId).build();
         List<VedtaksbrevFritekstPeriode> fritekstperioder = Collections.emptyList();
         expectedException.expectMessage("Ugyldig input");
-        tjeneste.lagreFriteksterFraSaksbehandler(behandlingId, oppsummering, fritekstperioder);
+        tjeneste.lagreFriteksterFraSaksbehandler(behandlingId, oppsummering, fritekstperioder, VedtaksbrevType.ORDINÆR);
     }
 
 

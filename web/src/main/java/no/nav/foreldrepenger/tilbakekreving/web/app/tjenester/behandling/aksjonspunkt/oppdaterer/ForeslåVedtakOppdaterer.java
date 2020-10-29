@@ -19,6 +19,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstOppsummering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevType;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.PeriodeMedTekstDto;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.DtoTilServiceAdapter;
@@ -44,8 +45,8 @@ public class ForeslåVedtakOppdaterer implements AksjonspunktOppdaterer<Foreslå
     @Override
     public void oppdater(ForeslåVedtakDto dto, Behandling behandling) {
         Long behandlingId = behandling.getId();
-
-        vedtaksbrevFritekstTjeneste.lagreFriteksterFraSaksbehandler(behandlingId, lagOppsummeringstekst(behandlingId, dto), lagPerioderMedTekst(behandlingId, dto.getPerioderMedTekst()));
+        VedtaksbrevType brevType = behandling.utledVedtaksbrevType();
+        vedtaksbrevFritekstTjeneste.lagreFriteksterFraSaksbehandler(behandlingId, lagOppsummeringstekst(behandlingId, dto), lagPerioderMedTekst(behandlingId, dto.getPerioderMedTekst()), brevType);
         foreslåVedtakTjeneste.lagHistorikkInnslagForForeslåVedtak(behandlingId);
 
         opprettEllerReåpne(behandling, AksjonspunktDefinisjon.FATTE_VEDTAK);

@@ -8,6 +8,7 @@ import javax.inject.Inject;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstOppsummering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevType;
 
 @ApplicationScoped
 public class VedtaksbrevFritekstTjeneste {
@@ -25,8 +26,11 @@ public class VedtaksbrevFritekstTjeneste {
         this.vedtaksbrevFritekstRepository = vedtaksbrevFritekstRepository;
     }
 
-    public void lagreFriteksterFraSaksbehandler(Long behandlingId, VedtaksbrevFritekstOppsummering vedtaksbrevFritekstOppsummering, List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder) {
-        validator.validerAtPåkrevdeFriteksterErSatt(behandlingId, vedtaksbrevFritekstPerioder, vedtaksbrevFritekstOppsummering);
+    public void lagreFriteksterFraSaksbehandler(Long behandlingId,
+                                                VedtaksbrevFritekstOppsummering vedtaksbrevFritekstOppsummering,
+                                                List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder,
+                                                VedtaksbrevType brevType) {
+        validator.validerAtPåkrevdeFriteksterErSatt(behandlingId, vedtaksbrevFritekstPerioder, vedtaksbrevFritekstOppsummering, brevType);
 
         vedtaksbrevFritekstRepository.slettOppsummering(behandlingId);
         vedtaksbrevFritekstRepository.slettPerioderMedFritekster(behandlingId);

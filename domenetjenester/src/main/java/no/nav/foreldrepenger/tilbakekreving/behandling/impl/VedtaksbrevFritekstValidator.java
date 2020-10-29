@@ -1,5 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
+import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstOppsummering.maxFritekstLengde;
 import static no.nav.vedtak.feil.LogLevel.WARN;
 
 import java.time.LocalDate;
@@ -16,6 +17,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstOppsummering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
@@ -52,14 +54,26 @@ public class VedtaksbrevFritekstValidator {
 
     public void validerAtPåkrevdeFriteksterErSatt(Long behandlingId,
                                                   List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder,
-                                                  VedtaksbrevFritekstOppsummering vedtaksbrevFritekstOppsummering) {
+                                                  VedtaksbrevFritekstOppsummering vedtaksbrevFritekstOppsummering,
+                                                  VedtaksbrevType brevType) {
         vilkårsvurderingRepository.finnVilkårsvurdering(behandlingId)
             .ifPresent(vilkårVurderingEntitet -> validerSærligeGrunnerAnnet(vilkårVurderingEntitet, vedtaksbrevFritekstPerioder));
 
         FaktaFeilutbetaling faktaFeilutbetaling = faktaFeilutbetalingRepository.finnFaktaOmFeilutbetaling(behandlingId).orElseThrow();
-        validerFritekstFakta(faktaFeilutbetaling, vedtaksbrevFritekstPerioder);
+        if (brevType == VedtaksbrevType.ORDINÆR) {
+            validerFritekstFakta(faktaFeilutbetaling, vedtaksbrevFritekstPerioder);
+        }
 
+        validerFritekstLengde(vedtaksbrevFritekstOppsummering, brevType);
         validerAtPåkrevdOppsummeringErSatt(behandlingId, vedtaksbrevFritekstOppsummering);
+    }
+
+    private void validerFritekstLengde(VedtaksbrevFritekstOppsummering vedtaksbrevFritekstOppsummering, VedtaksbrevType brevType) {
+        if (vedtaksbrevFritekstOppsummering != null
+            && vedtaksbrevFritekstOppsummering.getOppsummeringFritekst() != null
+            && vedtaksbrevFritekstOppsummering.getOppsummeringFritekst().length() >= maxFritekstLengde(brevType)) {
+            throw FritekstFeil.FACTORY.fritekstOppsumeringForLang().toException();
+        }
     }
 
     private void validerAtPåkrevdOppsummeringErSatt(Long behandlingId, VedtaksbrevFritekstOppsummering vedtaksbrevFritekstOppsummering) {
@@ -122,7 +136,7 @@ public class VedtaksbrevFritekstValidator {
             .collect(Collectors.toList());
     }
 
-    interface FritekstFeil extends DeklarerteFeil {
+    public interface FritekstFeil extends DeklarerteFeil {
 
         FritekstFeil FACTORY = FeilFactory.create(FritekstFeil.class);
 
@@ -131,5 +145,8 @@ public class VedtaksbrevFritekstValidator {
 
         @TekniskFeil(feilkode = "FPT-063091", feilmelding = "Ugyldig input: Når det er revurdering, så er oppsummering fritekst påkrevet.", logLevel = WARN)
         Feil manglerPåkrevetOppsumering();
+
+        @TekniskFeil(feilkode = "FPT-063092", feilmelding = "Ugyldig input: Oppsummeringstekst er for lang.", logLevel = WARN)
+        Feil fritekstOppsumeringForLang();
     }
 }

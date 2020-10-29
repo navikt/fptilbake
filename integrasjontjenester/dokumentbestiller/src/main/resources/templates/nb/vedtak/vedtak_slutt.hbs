@@ -30,9 +30,13 @@ _Har du spørsmål?
 Du finner nyttig informasjon på nav.no{{#if (eq sak.ytelsetype "FRISINN")}}. Du kan også kontakte oss på telefon 55553333.{{else}}/familie.{{/if}}
 
 Med vennlig hilsen
-NAV Familie- og pensjonsytelser{{#if finnesVerge}}
+NAV Familie- og pensjonsytelser
+{{#if finnesVerge}}
 
-Brev med likt innhold er sendt til {{annenMottakerNavn}}{{/if}}
+Brev med likt innhold er sendt til {{annenMottakerNavn}}
+{{/if}}
+{{#if har-vedlegg}}
 
 
 Vedlegg: Resultatet av tilbakebetalingssaken
+{{/if}}

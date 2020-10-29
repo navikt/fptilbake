@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
@@ -22,7 +23,8 @@ public class VedtaksbrevFritekstOppsummering extends BaseEntitet {
     @Column(name = "BEHANDLING_ID", nullable = false, updatable = false)
     private Long behandlingId;
 
-    @Column(name = "OPPSUMMERING_FRITEKST")
+    @Lob
+    @Column(name = "FRITEKST")
     private String oppsummeringFritekst;
 
     public VedtaksbrevFritekstOppsummering() {
@@ -44,12 +46,15 @@ public class VedtaksbrevFritekstOppsummering extends BaseEntitet {
         this.id = id;
     }
 
-    public void setBehandlingId(Long behandlingId) {
-        this.behandlingId = behandlingId;
-    }
-
-    public void setOppsummeringFritekst(String oppsummeringFritekst) {
-        this.oppsummeringFritekst = oppsummeringFritekst;
+    public static int maxFritekstLengde(VedtaksbrevType brevType) {
+        switch (brevType) {
+            case FRITEKST_FEILUTBETALING_BORTFALT:
+                return 10000;
+            case ORDINÆR:
+                return 4000;
+            default:
+                throw new IllegalArgumentException("Utviklerfeil: ustøttet VedtaksbrevType(" + brevType + ") i VedtaksbrevFritekstOppsummering");
+        }
     }
 
     public static class Builder {

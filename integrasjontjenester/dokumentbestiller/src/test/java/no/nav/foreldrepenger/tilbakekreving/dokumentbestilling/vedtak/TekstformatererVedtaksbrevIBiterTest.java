@@ -11,6 +11,7 @@ import java.util.List;
 import org.junit.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
@@ -65,6 +66,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
                 .medVarsletBeløp(BigDecimal.valueOf(33001))
                 .medVarsletDato(LocalDate.of(2020, 4, 4))
                 .build())
+            .medVedtaksbrevType(VedtaksbrevType.ORDINÆR)
             .build();
         List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
             HbVedtaksbrevPeriode.builder()

@@ -14,6 +14,7 @@ import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.context.JavaBeanValueResolver;
 import com.github.jknack.handlebars.context.MapValueResolver;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Avsnitt;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Underavsnitt;
@@ -36,9 +37,9 @@ import no.nav.vedtak.util.StringUtils;
 class TekstformatererVedtaksbrev extends FellesTekstformaterer {
     private static Map<String, Template> TEMPLATE_CACHE = new HashMap<>();
 
-    private static String PARTIAL_PERIODE_FAKTA = "vedtak/periode_fakta";
-    private static String PARTIAL_PERIODE_VILKÅR = "vedtak/periode_vilkår";
-    private static String PARTIAL_PERIODE_SÆRLIGE_GRUNNER = "vedtak/periode_særlige_grunner";
+    private static final String PARTIAL_PERIODE_FAKTA = "vedtak/periode_fakta";
+    private static final String PARTIAL_PERIODE_VILKÅR = "vedtak/periode_vilkår";
+    private static final String PARTIAL_PERIODE_SÆRLIGE_GRUNNER = "vedtak/periode_særlige_grunner";
 
     private TekstformatererVedtaksbrev() {
         // for static access
@@ -48,7 +49,9 @@ class TekstformatererVedtaksbrev extends FellesTekstformaterer {
         List<Avsnitt> resultat = new ArrayList<>();
         VedtaksbrevFritekst.settInnMarkeringForFritekst(vedtaksbrevData);
         resultat.add(lagOppsummeringAvsnitt(vedtaksbrevData, hovedoverskrift));
-        resultat.addAll(lagPerioderAvsnitt(vedtaksbrevData));
+        if (vedtaksbrevData.getFelles().getVedtaksbrevType() == VedtaksbrevType.ORDINÆR) {
+            resultat.addAll(lagPerioderAvsnitt(vedtaksbrevData));
+        }
         resultat.add(lagAvsluttendeAvsnitt(vedtaksbrevData));
         return resultat;
     }
@@ -60,7 +63,14 @@ class TekstformatererVedtaksbrev extends FellesTekstformaterer {
     }
 
     public static String lagVedtakStart(HbVedtaksbrevFelles vedtaksbrevFelles) {
-        return konverterMedPartialTemplate("vedtak/vedtak_start", vedtaksbrevFelles);
+        switch (vedtaksbrevFelles.getVedtaksbrevType()) {
+            case FRITEKST_FEILUTBETALING_BORTFALT:
+                return konverterMedPartialTemplate("vedtak/fritekstFeilutbetalingBortfalt/fritekstFeilutbetalingBortfalt_start", vedtaksbrevFelles);
+            case ORDINÆR:
+                return konverterMedPartialTemplate("vedtak/vedtak_start", vedtaksbrevFelles);
+            default:
+                throw new IllegalArgumentException("Utviklerfeil: ustøttet VedtaksbrevType(" + vedtaksbrevFelles.getVedtaksbrevType() + ") i VedtaksbrevFormatterer");
+        }
     }
 
     static List<Avsnitt> lagPerioderAvsnitt(HbVedtaksbrevData vedtaksbrevData) {
@@ -234,7 +244,18 @@ class TekstformatererVedtaksbrev extends FellesTekstformaterer {
     }
 
     static String lagVedtaksbrevFritekst(HbVedtaksbrevData vedtaksbrevData) {
-        Template template = getTemplate("vedtak/vedtak", vedtaksbrevData.getSpråkkode());
+        switch (vedtaksbrevData.getFelles().getVedtaksbrevType()) {
+            case FRITEKST_FEILUTBETALING_BORTFALT:
+                return lagVedtaksbrev("vedtak/fritekstFeilutbetalingBortfalt/fritekstFeilutbetalingBortfalt", vedtaksbrevData);
+            case ORDINÆR:
+                return lagVedtaksbrev("vedtak/vedtak", vedtaksbrevData);
+            default:
+                throw new IllegalArgumentException("Utviklerfeil: ustøttet VedtaksbrevType(" + vedtaksbrevData.getFelles().getVedtaksbrevType() + ") i VedtaksbrevFormatterer");
+        }
+    }
+
+    private static String lagVedtaksbrev(String mal, HbVedtaksbrevData vedtaksbrevData) {
+        Template template = getTemplate(mal, vedtaksbrevData.getSpråkkode());
         return applyTemplate(template, vedtaksbrevData);
     }
 
