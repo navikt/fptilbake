@@ -55,6 +55,10 @@ public class HenleggBehandlingTjeneste {
         this.historikkinnslagTjeneste = historikkinnslagTjeneste;
     }
 
+    public boolean kanHenleggeBehandlingManuelt(long behandlingId, BehandlingType type) {
+        return !(BehandlingType.TILBAKEKREVING.equals(type) && grunnlagRepository.harGrunnlagForBehandlingId(behandlingId));
+    }
+
     public void henleggBehandlingManuelt(long behandlingId, BehandlingResultatType årsakKode, String begrunnelse, String fritekst) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         BehandlingType behandlingType = behandling.getType();

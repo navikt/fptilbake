@@ -39,6 +39,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.fordeling.FordelRe
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.ForvaltningBehandlingRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.ForvaltningTekniskRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.historikk.HistorikkRestTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.init.InitielleLinksRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.kodeverk.KodeverkRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.konfig.KonfigRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.migrasjon.MigrasjonRestTjeneste;
@@ -107,6 +108,7 @@ public class ApplicationConfig extends Application {
 
         classes.add(ProsessTaskRestTjeneste.class);
 
+        classes.add(InitielleLinksRestTjeneste.class);
         classes.add(KodeverkRestTjeneste.class);
         classes.add(BehandlingRestTjeneste.class);
         classes.add(AksjonspunktRestTjeneste.class);

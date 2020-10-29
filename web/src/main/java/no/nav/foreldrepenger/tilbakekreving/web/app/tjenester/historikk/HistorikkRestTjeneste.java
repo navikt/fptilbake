@@ -35,6 +35,9 @@ import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 @ApplicationScoped
 @Transactional
 public class HistorikkRestTjeneste {
+
+    public static final String HISTORIKK_PATH = "/historikk";
+
     private HistorikkTjenesteAdapter historikkTjeneste;
 
     public HistorikkRestTjeneste() {
