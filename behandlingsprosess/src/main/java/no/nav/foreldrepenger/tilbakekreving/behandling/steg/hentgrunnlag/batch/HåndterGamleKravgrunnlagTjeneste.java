@@ -1,6 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.batch;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -52,7 +51,6 @@ public class HåndterGamleKravgrunnlagTjeneste {
     private FagsystemKlient fagsystemKlient;
 
     private boolean skalGrunnlagSperres;
-    private long antallBehandlingOprettet;
 
     HåndterGamleKravgrunnlagTjeneste() {
         // for CDI proxy
@@ -73,11 +71,6 @@ public class HåndterGamleKravgrunnlagTjeneste {
         this.behandlingTjeneste = behandlingTjeneste;
         this.økonomiConsumer = økonomiConsumer;
         this.fagsystemKlient = fagsystemKlient;
-    }
-
-    protected List<ØkonomiXmlMottatt> hentGamlekravgrunnlag(LocalDate bestemtDato) {
-        logger.info("Henter kravgrunnlag som er eldre enn {}", bestemtDato);
-        return mottattXmlRepository.hentGamleUkobledeKravgrunnlagXml(bestemtDato.atStartOfDay());
     }
 
     protected Optional<Kravgrunnlag431> hentKravgrunnlagFraØkonomi(ØkonomiXmlMottatt økonomiXmlMottatt) {
@@ -105,10 +98,11 @@ public class HåndterGamleKravgrunnlagTjeneste {
         mottattXmlRepository.arkiverMottattXml(mottattXmlId, melding);
     }
 
-    protected void slettMottattGamleKravgrunnlag(List<Long> gammelKravgrunnlagListe) {
+    protected void slettMottattUgyldigKravgrunnlag(long mottattXmlId) {
         // slettes kun xmlene fra OKO_XML_MOTTATT som er arkivert
-        gammelKravgrunnlagListe.stream().filter(mottattXMlId -> mottattXmlRepository.erMottattXmlArkivert(mottattXMlId))
-            .forEach(mottattXmlId -> mottattXmlRepository.slettMottattXml(mottattXmlId));
+        if(mottattXmlRepository.erMottattXmlArkivert(mottattXmlId)){
+            mottattXmlRepository.slettMottattXml(mottattXmlId);
+        }
     }
 
     protected Optional<Long> håndterKravgrunnlagRespons(Long mottattXmlId, String melding, Kravgrunnlag431 kravgrunnlag431) {
@@ -135,6 +129,10 @@ public class HåndterGamleKravgrunnlagTjeneste {
                 e.getMessage());
         }
         return Optional.empty();
+    }
+
+    protected ØkonomiXmlMottatt hentGammeltKravgrunnlag(Long mottattXmlId) {
+        return mottattXmlRepository.finnMottattXml(mottattXmlId);
     }
 
     private void håndterKravgrunnlagHvisBehandlingFinnes(Long mottattXmlId, Kravgrunnlag431 kravgrunnlag431, String saksnummer) {
@@ -201,16 +199,13 @@ public class HåndterGamleKravgrunnlagTjeneste {
                                            EksternBehandlingsinfoDto eksternBehandlingData) {
         Henvisning henvisning = kravgrunnlag431.getReferanse();
         oppdaterMedHenvisningOgSaksnummer(mottattXmlId, henvisning, saksnummer);
-        if (kanOppretteBehandling()) {
-            long behandlingId = opprettBehandling(eksternBehandlingData);
-            logger.info("Behandling opprettet med behandlingId={}", behandlingId);
-            lagreGrunnlag(behandlingId, kravgrunnlag431);
-            tilkobleMottattXml(mottattXmlId);
-            if (skalGrunnlagSperres) {
-                sperrGrunnlag(behandlingId, kravgrunnlag431.getEksternKravgrunnlagId());
-                skalGrunnlagSperres = false;
-            }
-            setAntallBehandlingOprettet(getAntallBehandlingOprettet() + 1);
+        long behandlingId = opprettBehandling(eksternBehandlingData);
+        logger.info("Behandling opprettet med behandlingId={}", behandlingId);
+        lagreGrunnlag(behandlingId, kravgrunnlag431);
+        tilkobleMottattXml(mottattXmlId);
+        if (skalGrunnlagSperres) {
+            sperrGrunnlag(behandlingId, kravgrunnlag431.getEksternKravgrunnlagId());
+            skalGrunnlagSperres = false;
         }
     }
 
@@ -247,22 +242,4 @@ public class HåndterGamleKravgrunnlagTjeneste {
         return Optional.of(kravgrunnlag431);
     }
 
-    //midlertidig kode. skal fjernes etter en stund
-    private boolean kanOppretteBehandling() {
-        boolean isEnabled = false;
-        if (getAntallBehandlingOprettet() < 30) {
-            logger.info("Antall behandling opprettet av batch-en er {}", getAntallBehandlingOprettet());
-            isEnabled = true;
-        }
-        logger.info("{} er {}", "Opprett behandling når kravgrunnlag venter etter fristen er ", isEnabled ? "skudd på" : "ikke skudd på");
-        return isEnabled;
-    }
-
-    public long getAntallBehandlingOprettet() {
-        return antallBehandlingOprettet;
-    }
-
-    public void setAntallBehandlingOprettet(long antallBehandlingOprettet) {
-        this.antallBehandlingOprettet = antallBehandlingOprettet;
-    }
 }

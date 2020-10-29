@@ -4,9 +4,7 @@ import java.time.Clock;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -18,8 +16,9 @@ import org.slf4j.LoggerFactory;
 import no.nav.foreldrepenger.batch.BatchArguments;
 import no.nav.foreldrepenger.batch.BatchStatus;
 import no.nav.foreldrepenger.batch.BatchTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
-import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
+import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.konfig.KonfigVerdi;
 
 @ApplicationScoped
@@ -28,7 +27,8 @@ public class HåndterGamleKravgrunnlagBatchTjeneste implements BatchTjeneste {
     private static final Logger logger = LoggerFactory.getLogger(HåndterGamleKravgrunnlagBatchTjeneste.class);
     private static final String BATCHNAVN = "BFPT-002";
 
-    private HåndterGamleKravgrunnlagTjeneste håndterGamleKravgrunnlagTjeneste;
+    private ØkonomiMottattXmlRepository mottattXmlRepository;
+    private ProsessTaskRepository taskRepository;
     private Clock clock;
     private Period grunnlagAlder;
 
@@ -37,18 +37,22 @@ public class HåndterGamleKravgrunnlagBatchTjeneste implements BatchTjeneste {
     }
 
     @Inject
-    public HåndterGamleKravgrunnlagBatchTjeneste(HåndterGamleKravgrunnlagTjeneste håndterGamleKravgrunnlagTjeneste,
+    public HåndterGamleKravgrunnlagBatchTjeneste(ØkonomiMottattXmlRepository mottattXmlRepository,
+                                                 ProsessTaskRepository taskRepository,
                                                  @KonfigVerdi(value = "automatisering.alder.kravgrunnlag") Period grunnlagAlder) {
-        this.håndterGamleKravgrunnlagTjeneste = håndterGamleKravgrunnlagTjeneste;
+        this.mottattXmlRepository = mottattXmlRepository;
+        this.taskRepository = taskRepository;
         this.clock = Clock.systemDefaultZone();
         this.grunnlagAlder = grunnlagAlder;
     }
 
     // kun for test forbruk
-    public HåndterGamleKravgrunnlagBatchTjeneste(HåndterGamleKravgrunnlagTjeneste håndterGamleKravgrunnlagTjeneste,
+    public HåndterGamleKravgrunnlagBatchTjeneste(ØkonomiMottattXmlRepository mottattXmlRepository,
+                                                 ProsessTaskRepository taskRepository,
                                                  Clock clock,
                                                  @KonfigVerdi(value = "automatisering.alder.kravgrunnlag") Period grunnlagAlder) {
-        this.håndterGamleKravgrunnlagTjeneste = håndterGamleKravgrunnlagTjeneste;
+        this.mottattXmlRepository = mottattXmlRepository;
+        this.taskRepository = taskRepository;
         this.clock = clock;
         this.grunnlagAlder = grunnlagAlder;
     }
@@ -57,40 +61,37 @@ public class HåndterGamleKravgrunnlagBatchTjeneste implements BatchTjeneste {
     public String launch(BatchArguments arguments) {
         String batchRun = BATCHNAVN + "-" + UUID.randomUUID();
         LocalDate iDag = LocalDate.now(clock);
-        håndterGamleKravgrunnlagTjeneste.setAntallBehandlingOprettet(0);
         if (iDag.getDayOfWeek().equals(DayOfWeek.SATURDAY) || iDag.getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
             logger.info("I dag er helg, kan ikke kjøre batchen {}", BATCHNAVN);
-            return batchRun;
-        }
-        LocalDate bestemtDato = iDag.minus(grunnlagAlder);
-        logger.info("Håndterer kravgrunnlag som er eldre enn {} i batch {}", bestemtDato, batchRun);
-
-        List<ØkonomiXmlMottatt> alleGamleKravgrunnlag = håndterGamleKravgrunnlagTjeneste.hentGamlekravgrunnlag(bestemtDato);
-        if (alleGamleKravgrunnlag.isEmpty()) {
-            logger.info("Det finnes ingen gammel kravgrunnlag før {}", bestemtDato);
         } else {
-            logger.info("Det finnes {} gamle kravgrunnlag før {}", alleGamleKravgrunnlag.size(), bestemtDato);
-            håndterGamleKravgrunnlag(alleGamleKravgrunnlag);
+            LocalDate bestemtDato = iDag.minus(grunnlagAlder);
+            logger.info("Håndterer kravgrunnlag som er eldre enn {} i batch {}", bestemtDato, batchRun);
+
+            List<Long> alleGamleKravgrunnlag = hentGamlekravgrunnlag(bestemtDato);
+            if (alleGamleKravgrunnlag.isEmpty()) {
+                logger.info("Det finnes ingen gammel kravgrunnlag før {}", bestemtDato);
+            } else {
+                logger.info("Det finnes {} gamle kravgrunnlag før {}", alleGamleKravgrunnlag.size(), bestemtDato);
+                lagProsessTask(batchRun, alleGamleKravgrunnlag);
+            }
         }
         return batchRun;
     }
 
-    private void håndterGamleKravgrunnlag(List<ØkonomiXmlMottatt> alleGamleKravgrunnlag) {
-        List<Long> slettesXmlListe = new ArrayList<>();
-        for (ØkonomiXmlMottatt økonomiXmlMottatt : alleGamleKravgrunnlag) {
-            Long mottattXmlId = økonomiXmlMottatt.getId();
-            Optional<Kravgrunnlag431> respons = håndterGamleKravgrunnlagTjeneste.hentKravgrunnlagFraØkonomi(økonomiXmlMottatt);
-            if (respons.isEmpty()) {
-                slettesXmlListe.add(mottattXmlId);
-            } else {
-                Optional<Long> ugyldigkravgrunnlag = håndterGamleKravgrunnlagTjeneste.
-                    håndterKravgrunnlagRespons(mottattXmlId, økonomiXmlMottatt.getMottattXml(), respons.get());
-                ugyldigkravgrunnlag.ifPresent(slettesXmlListe::add);
-            }
+    private void lagProsessTask(String batchRun, List<Long> alleGamleKravgrunnlag) {
+        String gruppe = "gammel-kravgrunnlag" + batchRun;
+        for (Long mottattXmlId : alleGamleKravgrunnlag) {
+            ProsessTaskData prosessTaskData = new ProsessTaskData(HåndterGamleKravgrunnlagTask.TASKTYPE);
+            prosessTaskData.setProperty("mottattXmlId",String.valueOf(mottattXmlId));
+            prosessTaskData.setCallIdFraEksisterende();
+            prosessTaskData.setGruppe(gruppe);
+            taskRepository.lagre(prosessTaskData);
         }
-        if (!slettesXmlListe.isEmpty()) {
-            håndterGamleKravgrunnlagTjeneste.slettMottattGamleKravgrunnlag(slettesXmlListe);
-        }
+    }
+
+    private List<Long> hentGamlekravgrunnlag(LocalDate bestemtDato) {
+        logger.info("Henter kravgrunnlag som er eldre enn {}", bestemtDato);
+        return mottattXmlRepository.hentGamleUkobledeKravgrunnlagXmlIds(bestemtDato.atStartOfDay());
     }
 
     @Override
