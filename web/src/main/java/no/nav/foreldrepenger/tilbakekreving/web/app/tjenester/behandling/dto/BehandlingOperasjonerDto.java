@@ -17,6 +17,10 @@ public class BehandlingOperasjonerDto {
     private boolean behandlingTilGodkjenning;
     private VergeBehandlingsmenyEnum vergeBehandlingsmeny;
 
+    public UUID getUuid() {
+        return uuid;
+    }
+
     public boolean isBehandlingKanBytteEnhet() {
         return behandlingKanBytteEnhet;
     }
