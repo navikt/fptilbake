@@ -10,15 +10,17 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
 public enum DokumentMalType implements Kodeverdi {
 
-    INNHENT_DOK("INNHEN"),
-    FRITEKST_DOK("FRITKS"),
-    VARSEL_DOK("VARS"),
-    KORRIGERT_VARSEL_DOK("KORRIGVARS");
+    INNHENT_DOK("INNHEN", "Innhent dokumentasjon"),
+    FRITEKST_DOK("FRITKS", "Fritekstbrev"),
+    VARSEL_DOK("VARS", "Varsel om tilbakekreving"),
+    KORRIGERT_VARSEL_DOK("KORRIGVARS", "Korrigert varsel om tilbakebetaling");
 
     public static final String KODEVERK = "DOKUMENT_MAL_TYPE";
     private static final Map<String, DokumentMalType> KODER = new LinkedHashMap<>();
 
     private String kode;
+    private String navn;
+
     static {
         for (var v : values()) {
             if (KODER.putIfAbsent(v.kode, v) != null) {
@@ -27,8 +29,9 @@ public enum DokumentMalType implements Kodeverdi {
         }
     }
 
-    DokumentMalType(String kode) {
+    DokumentMalType(String kode, String navn) {
         this.kode = kode;
+        this.navn = navn;
     }
 
     public static DokumentMalType fraKode(@JsonProperty("kode") String kode) {
@@ -63,6 +66,6 @@ public enum DokumentMalType implements Kodeverdi {
 
     @Override
     public String getNavn() {
-        return null;
+        return navn;
     }
 }
