@@ -50,6 +50,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
@@ -79,6 +80,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.VergeBehandl
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.context.SubjectHandler;
+import no.nav.vedtak.util.env.Environment;
 
 @Path(BehandlingRestTjeneste.PATH_FRAGMENT)
 @Produces(APPLICATION_JSON)
@@ -171,12 +173,21 @@ public class BehandlingRestTjeneste {
             Behandling behandling = behandlingTjeneste.hentBehandling(behandlingId);
             return Redirect.tilBehandlingPollStatus(behandling.getUuid(), Optional.empty());
         } else if (BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandlingType)) {
+            validerAktivertFunksjonalitetForRevurdering(opprettBehandlingDto);
             Long tbkBehandlingId = opprettBehandlingDto.getBehandlingId();
             Behandling revurdering = revurderingTjeneste.opprettRevurdering(tbkBehandlingId, opprettBehandlingDto.getBehandlingArsakType());
             String gruppe = behandlingskontrollAsynkTjeneste.asynkProsesserBehandling(revurdering);
             return Redirect.tilBehandlingPollStatus(revurdering.getUuid(), Optional.of(gruppe));
         }
         return Response.ok().build();
+    }
+
+    static void validerAktivertFunksjonalitetForRevurdering(OpprettBehandlingDto dto) {
+        if (Environment.current().isProd()
+            && dto.getBehandlingType() == BehandlingType.REVURDERING_TILBAKEKREVING
+            && dto.getBehandlingArsakType() == BehandlingÅrsakType.RE_FEILUTBETALT_BELØP_HELT_ELLER_DELVIS_BORTFALT) {
+            throw new IllegalArgumentException("Behandlingsårsaken 'Feilutbetalt beløp helt eller delvis bortfalt' er ikke lansert enda. Forvent at funksjonaliteten kan tas i bruk i løpet av uke 45 i 2020.");
+        }
     }
 
     @GET
