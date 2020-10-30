@@ -21,16 +21,17 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
 public enum VurderÅrsak implements Kodeverdi {
 
-    FEIL_FAKTA("FEIL_FAKTA"),
-    FEIL_LOV("FEIL_LOV"),
-    FEIL_REGEL("FEIL_REGEL"),
-    ANNET("ANNET"),
-    UDEFINERT("-"); //$NON-NLS-1$
+    FEIL_FAKTA("FEIL_FAKTA", "Feil fakta"),
+    FEIL_LOV("FEIL_LOV", "Feil lovanvendelse"),
+    FEIL_REGEL("FEIL_REGEL", "Feil regelforståelse"),
+    ANNET("ANNET", "Annet"),
+    UDEFINERT("-", "Ikke definert"); //$NON-NLS-1$
 
     public static final String KODEVERK = "VURDER_AARSAK";
     private static final Map<String, VurderÅrsak> KODER = new LinkedHashMap<>();
 
     private String kode;
+    private String navn;
 
     static {
         for (var v : values()) {
@@ -40,8 +41,9 @@ public enum VurderÅrsak implements Kodeverdi {
         }
     }
 
-    VurderÅrsak(String kode) {
+    VurderÅrsak(String kode, String navn) {
         this.kode = kode;
+        this.navn = navn;
     }
 
     @JsonCreator
@@ -92,6 +94,6 @@ public enum VurderÅrsak implements Kodeverdi {
 
     @Override
     public String getNavn() {
-        return null;
+        return navn;
     }
 }
