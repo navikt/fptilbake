@@ -21,7 +21,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 public class HåndterGamleKravgrunnlagTask implements ProsessTaskHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(HåndterGamleKravgrunnlagTask.class);
-    public static final String TASKTYPE = "gammelt.kravgrunnlag.håndter";
+    public static final String TASKTYPE = "kravgrunnlag.gammelt.håndter";
 
     private HåndterGamleKravgrunnlagTjeneste håndterGamleKravgrunnlagTjeneste;
 
@@ -38,13 +38,14 @@ public class HåndterGamleKravgrunnlagTask implements ProsessTaskHandler {
     public void doTask(ProsessTaskData prosessTaskData) {
         Long mottattXmlId = Long.valueOf(prosessTaskData.getPropertyValue("mottattXmlId"));
         logger.info("Håndterer gammelt kravgrunnlag med id={}", mottattXmlId);
+        GrunnlagStatus grunnlagStatus = new GrunnlagStatus();
         ØkonomiXmlMottatt økonomiXmlMottatt = håndterGamleKravgrunnlagTjeneste.hentGammeltKravgrunnlag(mottattXmlId);
-        Optional<Kravgrunnlag431> respons = håndterGamleKravgrunnlagTjeneste.hentKravgrunnlagFraØkonomi(økonomiXmlMottatt);
+        Optional<Kravgrunnlag431> respons = håndterGamleKravgrunnlagTjeneste.hentKravgrunnlagFraØkonomi(økonomiXmlMottatt, grunnlagStatus);
         if (respons.isEmpty()) {
             håndterGamleKravgrunnlagTjeneste.slettMottattUgyldigKravgrunnlag(mottattXmlId);
         } else {
             Optional<Long> ugyldigkravgrunnlag = håndterGamleKravgrunnlagTjeneste.
-                håndterKravgrunnlagRespons(mottattXmlId, økonomiXmlMottatt.getMottattXml(), respons.get());
+                håndterKravgrunnlagRespons(mottattXmlId, økonomiXmlMottatt.getMottattXml(), respons.get(), grunnlagStatus);
             ugyldigkravgrunnlag.ifPresent(håndterGamleKravgrunnlagTjeneste::slettMottattUgyldigKravgrunnlag);
         }
     }
