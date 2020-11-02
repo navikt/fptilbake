@@ -252,17 +252,17 @@ public class VilkårsvurderingHistorikkInnslagTjenesteTest extends FellesTestOpp
         List<String> grunnTekster = new ArrayList<>();
         StringBuilder grunnTekst = new StringBuilder();
         grunnTekst.append(aktsomhetEntitet.getSærligGrunnerTilReduksjon() ? JA : NEI);
-        grunnTekst.append(":");
+        grunnTekst.append(": ");
         for (VilkårVurderingSærligGrunnEntitet særligGrunn : aktsomhetEntitet.getSærligGrunner()) {
             SærligGrunn grunn = særligGrunn.getGrunn();
             StringBuilder tekst = new StringBuilder(grunn.getNavn());
             if (SærligGrunn.ANNET.equals(grunn)) {
-                tekst.append(":");
+                tekst.append(": ");
                 tekst.append(særligGrunn.getBegrunnelse());
             }
             grunnTekster.add(tekst.toString());
         }
-        grunnTekst.append(String.join(",", grunnTekster));
+        grunnTekst.append(String.join(", ", grunnTekster));
         return grunnTekst.toString();
     }
 
