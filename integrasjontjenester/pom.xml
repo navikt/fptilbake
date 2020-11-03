@@ -26,7 +26,6 @@
         <module>selvbetjening-klient</module>
         <module>organisasjon</module>
         <module>ytelsesvedtak-kafka-poller</module>
-        <module>journalpost-api-klient</module>
         <module>kodeverk-klient</module>
     </modules>
 
