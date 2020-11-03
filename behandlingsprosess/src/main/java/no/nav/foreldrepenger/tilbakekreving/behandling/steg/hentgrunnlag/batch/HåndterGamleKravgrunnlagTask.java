@@ -24,12 +24,12 @@ public class HåndterGamleKravgrunnlagTask implements ProsessTaskHandler {
 
     private HåndterGamleKravgrunnlagTjeneste håndterGamleKravgrunnlagTjeneste;
 
-    HåndterGamleKravgrunnlagTask(){
+    HåndterGamleKravgrunnlagTask() {
         // for CDI
     }
 
     @Inject
-    public HåndterGamleKravgrunnlagTask(HåndterGamleKravgrunnlagTjeneste håndterGamleKravgrunnlagTjeneste){
+    public HåndterGamleKravgrunnlagTask(HåndterGamleKravgrunnlagTjeneste håndterGamleKravgrunnlagTjeneste) {
         this.håndterGamleKravgrunnlagTjeneste = håndterGamleKravgrunnlagTjeneste;
     }
 
@@ -38,8 +38,8 @@ public class HåndterGamleKravgrunnlagTask implements ProsessTaskHandler {
         Long mottattXmlId = Long.valueOf(prosessTaskData.getPropertyValue("mottattXmlId"));
         logger.info("Håndterer gammelt kravgrunnlag med id={}", mottattXmlId);
         ØkonomiXmlMottatt økonomiXmlMottatt = håndterGamleKravgrunnlagTjeneste.hentGammeltKravgrunnlag(mottattXmlId);
-        GrunnlagMedStatus respons = håndterGamleKravgrunnlagTjeneste.hentKravgrunnlagFraØkonomi(økonomiXmlMottatt);
-        if (respons.getGrunnlag().isEmpty()) {
+        KravgrunnlagMedStatus respons = håndterGamleKravgrunnlagTjeneste.hentKravgrunnlagFraØkonomi(økonomiXmlMottatt);
+        if (!respons.harKravgrunnlag()) {
             håndterGamleKravgrunnlagTjeneste.slettMottattUgyldigKravgrunnlag(mottattXmlId);
         } else {
             Optional<Long> ugyldigkravgrunnlag = håndterGamleKravgrunnlagTjeneste.
