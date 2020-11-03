@@ -90,9 +90,9 @@ public class ØkonomiMottattXmlRepository {
         entityManager.persist(entity);
     }
 
-    public List<ØkonomiXmlMottatt> hentGamleUkobledeKravgrunnlagXml(LocalDateTime dato) {
-        TypedQuery<ØkonomiXmlMottatt> query = entityManager.createQuery("from ØkonomiXmlMottatt where tilkoblet='N' and opprettetTidspunkt < :dato"+
-            " and melding like '%detaljertKravgrunnlagMelding%'", ØkonomiXmlMottatt.class);
+    public List<Long> hentGamleUkobledeKravgrunnlagXmlIds(LocalDateTime dato) {
+        TypedQuery<Long> query = entityManager.createQuery("select id from ØkonomiXmlMottatt where tilkoblet='N' and opprettetTidspunkt < :dato"+
+            " and melding like '%detaljertKravgrunnlagMelding%'", Long.class);
         query.setParameter("dato", dato);
         return query.getResultList();
     }

@@ -1,6 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.batch;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -51,9 +50,6 @@ public class HåndterGamleKravgrunnlagTjeneste {
     private ØkonomiConsumer økonomiConsumer;
     private FagsystemKlient fagsystemKlient;
 
-    private boolean skalGrunnlagSperres;
-    private long antallBehandlingOprettet;
-
     HåndterGamleKravgrunnlagTjeneste() {
         // for CDI proxy
     }
@@ -75,19 +71,14 @@ public class HåndterGamleKravgrunnlagTjeneste {
         this.fagsystemKlient = fagsystemKlient;
     }
 
-    protected List<ØkonomiXmlMottatt> hentGamlekravgrunnlag(LocalDate bestemtDato) {
-        logger.info("Henter kravgrunnlag som er eldre enn {}", bestemtDato);
-        return mottattXmlRepository.hentGamleUkobledeKravgrunnlagXml(bestemtDato.atStartOfDay());
-    }
-
-    protected Optional<Kravgrunnlag431> hentKravgrunnlagFraØkonomi(ØkonomiXmlMottatt økonomiXmlMottatt) {
+    protected KravgrunnlagMedStatus hentKravgrunnlagFraØkonomi(ØkonomiXmlMottatt økonomiXmlMottatt) {
         String melding = økonomiXmlMottatt.getMottattXml();
         long mottattXmlId = økonomiXmlMottatt.getId();
         DetaljertKravgrunnlag detaljertKravgrunnlag = KravgrunnlagXmlUnmarshaller.unmarshall(mottattXmlId, melding);
         HentKravgrunnlagDetaljDto hentKravgrunnlagDetalj = forberedHentKravgrunnlagRequest(detaljertKravgrunnlag);
         try {
             DetaljertKravgrunnlagDto detaljertKravgrunnlagDto = økonomiConsumer.hentKravgrunnlag(null, hentKravgrunnlagDetalj);
-            return Optional.of(hentKravgrunnlagMapper.mapTilDomene(detaljertKravgrunnlagDto));
+            return KravgrunnlagMedStatus.forIkkeSperretKravgrunnlag(hentKravgrunnlagMapper.mapTilDomene(detaljertKravgrunnlagDto));
         } catch (ManglendeKravgrunnlagException e) {
             logger.info("Kravgrunnlag mangler i økonomi med følgende respons:{}", e.getMessage());
             arkiverMotattXml(mottattXmlId, melding);
@@ -98,20 +89,23 @@ public class HåndterGamleKravgrunnlagTjeneste {
             // ikke arkiver xml i tilfelle ukjent feil kommer fra økonomi
             logger.warn(e.getMessage());
         }
-        return Optional.empty();
+        return KravgrunnlagMedStatus.utenGrunnlag();
     }
 
     protected void arkiverMotattXml(Long mottattXmlId, String melding) {
         mottattXmlRepository.arkiverMottattXml(mottattXmlId, melding);
     }
 
-    protected void slettMottattGamleKravgrunnlag(List<Long> gammelKravgrunnlagListe) {
+    protected void slettMottattUgyldigKravgrunnlag(long mottattXmlId) {
         // slettes kun xmlene fra OKO_XML_MOTTATT som er arkivert
-        gammelKravgrunnlagListe.stream().filter(mottattXMlId -> mottattXmlRepository.erMottattXmlArkivert(mottattXMlId))
-            .forEach(mottattXmlId -> mottattXmlRepository.slettMottattXml(mottattXmlId));
+        if (mottattXmlRepository.erMottattXmlArkivert(mottattXmlId)) {
+            mottattXmlRepository.slettMottattXml(mottattXmlId);
+        }
     }
 
-    protected Optional<Long> håndterKravgrunnlagRespons(Long mottattXmlId, String melding, Kravgrunnlag431 kravgrunnlag431) {
+    protected Optional<Long> håndterKravgrunnlagRespons(Long mottattXmlId, String melding,
+                                                        KravgrunnlagMedStatus kravgrunnlagMedStatus) {
+        Kravgrunnlag431 kravgrunnlag431 = kravgrunnlagMedStatus.getKravgrunnlag();
         try {
             KravgrunnlagValidator.validerGrunnlag(kravgrunnlag431);
             String saksnummer = kravgrunnlag431.getSaksnummer().getVerdi();
@@ -123,10 +117,10 @@ public class HåndterGamleKravgrunnlagTjeneste {
                     arkiverMotattXml(mottattXmlId, melding);
                     return Optional.of(mottattXmlId);
                 } else {
-                    håndterGyldigkravgrunnlag(mottattXmlId, saksnummer, kravgrunnlag431, ytelsebehandling.get());
+                    håndterGyldigkravgrunnlag(mottattXmlId, saksnummer, kravgrunnlagMedStatus, ytelsebehandling.get());
                 }
             } else {
-                håndterKravgrunnlagHvisBehandlingFinnes(mottattXmlId, kravgrunnlag431, saksnummer);
+                håndterKravgrunnlagHvisBehandlingFinnes(mottattXmlId, kravgrunnlagMedStatus, saksnummer);
             }
         } catch (KravgrunnlagValidator.UgyldigKravgrunnlagException e) {
             logger.warn("Kravgrunnlag for saksnummer{} med id={} er ugyldig og feiler med følgende exception:{}",
@@ -137,16 +131,22 @@ public class HåndterGamleKravgrunnlagTjeneste {
         return Optional.empty();
     }
 
-    private void håndterKravgrunnlagHvisBehandlingFinnes(Long mottattXmlId, Kravgrunnlag431 kravgrunnlag431, String saksnummer) {
+    protected ØkonomiXmlMottatt hentGammeltKravgrunnlag(Long mottattXmlId) {
+        return mottattXmlRepository.finnMottattXml(mottattXmlId);
+    }
+
+    private void håndterKravgrunnlagHvisBehandlingFinnes(Long mottattXmlId,
+                                                         KravgrunnlagMedStatus kravgrunnlagMedStatus,
+                                                         String saksnummer) {
+        Kravgrunnlag431 kravgrunnlag431 = kravgrunnlagMedStatus.getKravgrunnlag();
         hentAktivBehandling(saksnummer).ifPresent(behandling -> {
             var behandlingId = behandling.getId();
             logger.info("Lagrer mottatt kravgrunnlaget for behandling med behandlingId={}", behandlingId);
             grunnlagRepository.lagre(behandlingId, kravgrunnlag431);
-            if (skalGrunnlagSperres) {
+            if (kravgrunnlagMedStatus.erKravgrunnlagSperret()) {
                 logger.info("Mottatt Kravgrunnlaget med kravgrunnlagId={} for behandling med behandlingId={} er sperret hos økonomi. Derfor sperrer det i fptilbake også.",
                     kravgrunnlag431.getEksternKravgrunnlagId(), behandlingId);
                 sperrGrunnlag(behandlingId, kravgrunnlag431.getEksternKravgrunnlagId());
-                skalGrunnlagSperres = false;
             }
         });
         tilkobleMottattXml(mottattXmlId);
@@ -197,20 +197,17 @@ public class HåndterGamleKravgrunnlagTjeneste {
     }
 
     private void håndterGyldigkravgrunnlag(Long mottattXmlId, String saksnummer,
-                                           Kravgrunnlag431 kravgrunnlag431,
+                                           KravgrunnlagMedStatus kravgrunnlagMedStatus,
                                            EksternBehandlingsinfoDto eksternBehandlingData) {
+        Kravgrunnlag431 kravgrunnlag431 = kravgrunnlagMedStatus.getKravgrunnlag();
         Henvisning henvisning = kravgrunnlag431.getReferanse();
         oppdaterMedHenvisningOgSaksnummer(mottattXmlId, henvisning, saksnummer);
-        if (kanOppretteBehandling()) {
-            long behandlingId = opprettBehandling(eksternBehandlingData);
-            logger.info("Behandling opprettet med behandlingId={}", behandlingId);
-            lagreGrunnlag(behandlingId, kravgrunnlag431);
-            tilkobleMottattXml(mottattXmlId);
-            if (skalGrunnlagSperres) {
-                sperrGrunnlag(behandlingId, kravgrunnlag431.getEksternKravgrunnlagId());
-                skalGrunnlagSperres = false;
-            }
-            setAntallBehandlingOprettet(getAntallBehandlingOprettet() + 1);
+        long behandlingId = opprettBehandling(eksternBehandlingData);
+        logger.info("Behandling opprettet med behandlingId={}", behandlingId);
+        lagreGrunnlag(behandlingId, kravgrunnlag431);
+        tilkobleMottattXml(mottattXmlId);
+        if (kravgrunnlagMedStatus.erKravgrunnlagSperret()) {
+            sperrGrunnlag(behandlingId, kravgrunnlag431.getEksternKravgrunnlagId());
         }
     }
 
@@ -238,31 +235,12 @@ public class HåndterGamleKravgrunnlagTjeneste {
         logger.info("Grunnlag med kravgrunnlagId={} er sperret for behandling={}", kravgrunnlagId, behandlingId);
     }
 
-    private Optional<Kravgrunnlag431> hentSperretKravgrunnlag(ØkonomiXmlMottatt økonomiXmlMottatt) {
+    private KravgrunnlagMedStatus hentSperretKravgrunnlag(ØkonomiXmlMottatt økonomiXmlMottatt) {
         long mottattXmlId = økonomiXmlMottatt.getId();
         String melding = økonomiXmlMottatt.getMottattXml();
         DetaljertKravgrunnlag detaljertKravgrunnlag = KravgrunnlagXmlUnmarshaller.unmarshall(mottattXmlId, melding);
         Kravgrunnlag431 kravgrunnlag431 = lesKravgrunnlagMapper.mapTilDomene(detaljertKravgrunnlag);
-        skalGrunnlagSperres = true;
-        return Optional.of(kravgrunnlag431);
+        return KravgrunnlagMedStatus.forSperretKravgrunnlag(kravgrunnlag431);
     }
 
-    //midlertidig kode. skal fjernes etter en stund
-    private boolean kanOppretteBehandling() {
-        boolean isEnabled = false;
-        if (getAntallBehandlingOprettet() < 30) {
-            logger.info("Antall behandling opprettet av batch-en er {}", getAntallBehandlingOprettet());
-            isEnabled = true;
-        }
-        logger.info("{} er {}", "Opprett behandling når kravgrunnlag venter etter fristen er ", isEnabled ? "skudd på" : "ikke skudd på");
-        return isEnabled;
-    }
-
-    public long getAntallBehandlingOprettet() {
-        return antallBehandlingOprettet;
-    }
-
-    public void setAntallBehandlingOprettet(long antallBehandlingOprettet) {
-        this.antallBehandlingOprettet = antallBehandlingOprettet;
-    }
 }

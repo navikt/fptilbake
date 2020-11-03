@@ -86,7 +86,7 @@ public class ForvaltningTekniskRestTjeneste {
     @POST
     @Path("/synk-postnummer")
     @Produces(MediaType.APPLICATION_JSON)
-    @Operation(description = "Hente og lagre kodeverk Postnummer", tags = "forvaltning")
+    @Operation(description = "Hente og lagre kodeverk Postnummer", tags = "FORVALTNING-teknisk")
     @BeskyttetRessurs(action = CREATE, property = AbacProperty.DRIFT)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response synkPostnummer() {
@@ -97,7 +97,7 @@ public class ForvaltningTekniskRestTjeneste {
     @GET
     @Path("/hent-postnummer")
     @Produces(MediaType.APPLICATION_JSON)
-    @Operation(description = "Hente lokale Postnummer", tags = "forvaltning")
+    @Operation(description = "Hente lokale Postnummer", tags = "FORVALTNING-teknisk")
     @BeskyttetRessurs(action = CREATE, property = AbacProperty.DRIFT)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public Response hentPostnummer() {
