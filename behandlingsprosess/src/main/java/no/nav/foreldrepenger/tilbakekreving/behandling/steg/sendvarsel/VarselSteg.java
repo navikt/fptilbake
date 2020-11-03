@@ -21,16 +21,12 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselInfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons.Varselrespons;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.BrevToggle;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.SendVarselbrevTask;
-import no.nav.foreldrepenger.tilbakekreving.selvbetjening.SelvbetjeningTilbakekrevingStøtte;
-import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.task.SendBeskjedUtsendtVarselTilSelvbetjeningTask;
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
@@ -108,10 +104,6 @@ public class VarselSteg implements BehandlingSteg {
 
         sendVarsel(behandling, taskGruppe);
 
-        if (BrevToggle.brukDokprod(BrevType.VARSEL_BREV)) {
-            sendBeskjedOmUtsendtVarsel(behandling, taskGruppe);
-        } //else opprett task fra senere task
-
         taskRepository.lagre(taskGruppe);
     }
 
@@ -119,16 +111,6 @@ public class VarselSteg implements BehandlingSteg {
         ProsessTaskData sendVarselbrev = new ProsessTaskData(SendVarselbrevTask.TASKTYPE);
         sendVarselbrev.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         taskGruppe.addNesteSekvensiell(sendVarselbrev);
-    }
-
-    private void sendBeskjedOmUtsendtVarsel(Behandling behandling, ProsessTaskGruppe taskGruppe) {
-        if (SelvbetjeningTilbakekrevingStøtte.harStøtteFor(behandling)) {
-            ProsessTaskData sendBeskjedUtsendtVarsel = new ProsessTaskData(SendBeskjedUtsendtVarselTilSelvbetjeningTask.TASKTYPE);
-            sendBeskjedUtsendtVarsel.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
-            taskGruppe.addNesteSekvensiell(sendBeskjedUtsendtVarsel);
-        } else {
-            log.info("Sender ikke beskjed til selvbetjening for varsel for behandlingId={} i sak={}", behandling.getId(), behandling.getFagsak().getSaksnummer().getVerdi());
-        }
     }
 
     private boolean sjekkTilbakekrevingOpprettetUtenVarsel(Long behandlingId) {

@@ -23,12 +23,8 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottak
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.EksternDataForBrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.BrevData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.PdfBrevTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevData;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.domene.person.impl.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
-import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
 @RunWith(CdiRunner.class)
@@ -37,8 +33,6 @@ public class InnhentDokumentasjonbrevTjenesteTest extends DokumentBestillerTestO
     private static final String FLERE_OPPLYSNINGER = "Vi trenger flere opplysninger";
 
     private EksternDataForBrevTjeneste mockEksternDataForBrevTjeneste = mock(EksternDataForBrevTjeneste.class);
-    private FritekstbrevTjeneste mockFritekstbrevTjeneste = mock(FritekstbrevTjeneste.class);
-    private PersoninfoAdapter mockPersoninfoAdapter = mock(PersoninfoAdapter.class);
     private PdfBrevTjeneste mockPdfBrevTjeneste = mock(PdfBrevTjeneste.class);
 
     private InnhentDokumentasjonbrevTjeneste innhentDokumentasjonBrevTjeneste;
@@ -46,15 +40,9 @@ public class InnhentDokumentasjonbrevTjenesteTest extends DokumentBestillerTestO
 
     @Before
     public void setup() {
-        HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepository,
-            mockPersoninfoAdapter);
-
-        innhentDokumentasjonBrevTjeneste = new InnhentDokumentasjonbrevTjeneste(repositoryProvider, mockFritekstbrevTjeneste, mockEksternDataForBrevTjeneste,
-            historikkinnslagTjeneste, mockPdfBrevTjeneste);
+        innhentDokumentasjonBrevTjeneste = new InnhentDokumentasjonbrevTjeneste(repositoryProvider, mockEksternDataForBrevTjeneste, mockPdfBrevTjeneste);
 
         behandlingId = behandling.getId();
-        when(mockFritekstbrevTjeneste.sendFritekstbrev(any(FritekstbrevData.class))).thenReturn(lagJournalOgDokument());
-        when(mockFritekstbrevTjeneste.hentForhåndsvisningFritekstbrev(any(FritekstbrevData.class))).thenReturn(FLERE_OPPLYSNINGER.getBytes());
 
         when(mockPdfBrevTjeneste.genererForhåndsvisning(any(BrevData.class))).thenReturn(FLERE_OPPLYSNINGER.getBytes());
 

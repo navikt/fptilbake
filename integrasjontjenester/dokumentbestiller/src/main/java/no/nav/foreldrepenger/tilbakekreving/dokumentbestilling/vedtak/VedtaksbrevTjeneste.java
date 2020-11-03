@@ -1,8 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -18,10 +15,9 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 
-import org.apache.commons.lang.WordUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.pdfbox.io.MemoryUsageSetting;
-import org.apache.pdfbox.multipdf.PDFMergerUtility;
+
+import com.github.jknack.handlebars.internal.text.WordUtils;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultatPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingBeregningTjeneste;
@@ -37,7 +33,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporing;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.DetaljertBrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstOppsummering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstPeriode;
@@ -77,13 +72,9 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottak
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.EksternDataForBrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.YtelseNavn;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.BrevData;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.BrevToggle;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.JournalføringTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.PdfBrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevData;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.JournalpostIdOgDokumentId;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbBehandling;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbKonfigurasjon;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbPerson;
@@ -102,7 +93,6 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SøknadType;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
-import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.pdfgen.DokumentVariant;
 
 
@@ -110,8 +100,6 @@ import no.nav.foreldrepenger.tilbakekreving.pdfgen.DokumentVariant;
 @Transactional
 public class VedtaksbrevTjeneste {
 
-    private static final String TITTEL_VEDTAKSBREV_HISTORIKKINNSLAG = "Vedtaksbrev Tilbakekreving";
-    private static final String TITTEL_VEDTAKSBREV_HISTORIKKINNSLAG_TIL_VERGE = "Vedtaksbrev Tilbakekreving til verge";
     private static final String TITTEL_VEDTAK_TILBAKEBETALING = "Vedtak tilbakebetaling ";
     private static final String TITTEL_VEDTAK_INGEN_TILBAKEBETALING = "Vedtak ingen tilbakebetaling ";
     private static final int KLAGEFRIST_UKER = 6;
@@ -128,12 +116,8 @@ public class VedtaksbrevTjeneste {
     private VergeRepository vergeRepository;
 
     private BehandlingTjeneste behandlingTjeneste;
-    private FritekstbrevTjeneste bestillDokumentTjeneste;
-    private HistorikkinnslagTjeneste historikkinnslagTjeneste;
     private TilbakekrevingBeregningTjeneste tilbakekrevingBeregningTjeneste;
     private EksternDataForBrevTjeneste eksternDataForBrevTjeneste;
-
-    private JournalføringTjeneste journalføringTjeneste;
 
     private PdfBrevTjeneste pdfBrevTjeneste;
 
@@ -142,9 +126,6 @@ public class VedtaksbrevTjeneste {
                                TilbakekrevingBeregningTjeneste tilbakekrevingBeregningTjeneste,
                                BehandlingTjeneste behandlingTjeneste,
                                EksternDataForBrevTjeneste eksternDataForBrevTjeneste,
-                               FritekstbrevTjeneste bestillDokumentTjeneste,
-                               HistorikkinnslagTjeneste historikkinnslagTjeneste,
-                               JournalføringTjeneste journalføringTjeneste,
                                PdfBrevTjeneste pdfBrevTjeneste) {
         this.behandlingRepository = behandlingRepositoryProvider.getBehandlingRepository();
         this.behandlingVedtakRepository = behandlingRepositoryProvider.getBehandlingVedtakRepository();
@@ -158,11 +139,8 @@ public class VedtaksbrevTjeneste {
         this.vergeRepository = behandlingRepositoryProvider.getVergeRepository();
 
         this.behandlingTjeneste = behandlingTjeneste;
-        this.bestillDokumentTjeneste = bestillDokumentTjeneste;
-        this.historikkinnslagTjeneste = historikkinnslagTjeneste;
         this.tilbakekrevingBeregningTjeneste = tilbakekrevingBeregningTjeneste;
         this.eksternDataForBrevTjeneste = eksternDataForBrevTjeneste;
-        this.journalføringTjeneste = journalføringTjeneste;
         this.pdfBrevTjeneste = pdfBrevTjeneste;
     }
 
@@ -179,25 +157,15 @@ public class VedtaksbrevTjeneste {
             .medMetadata(vedtaksbrevData.getMetadata())
             .build();
 
-        if (BrevToggle.brukDokprod(BrevType.VEDTAK_BREV)) {
-            byte[] vedlegg = lagVedtaksbrevVedleggTabellPdf(vedtaksbrevData, DokumentVariant.ENDELIG);
-            JournalpostIdOgDokumentId vedleggReferanse = journalføringTjeneste.journalførVedlegg(behandlingId, vedlegg);
-            JournalpostIdOgDokumentId dokumentreferanse = bestillDokumentTjeneste.sendFritekstbrev(data, vedleggReferanse);
-            Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-            opprettHistorikkinnslag(behandling, dokumentreferanse, brevMottaker);
-            lagreInfoOmVedtaksbrev(behandlingId, dokumentreferanse);
-        } else {
-            BrevData.Builder brevData = BrevData.builder()
-                .setMottaker(brevMottaker)
-                .setMetadata(data.getBrevMetadata())
-                .setOverskrift(data.getOverskrift())
-                .setBrevtekst(data.getBrevtekst());
-            if (vedtaksbrevData.getVedtaksbrevData().getFelles().isMedVedlegg()) {
-                brevData
-                    .setVedleggHtml(TekstformatererVedtaksbrev.lagVedtaksbrevVedleggHtml(vedtaksbrevData.getVedtaksbrevData()));
-            }
-            pdfBrevTjeneste.sendBrev(behandlingId, DetaljertBrevType.VEDTAK, brevData.build());
+        BrevData.Builder brevData = BrevData.builder()
+            .setMottaker(brevMottaker)
+            .setMetadata(data.getBrevMetadata())
+            .setOverskrift(data.getOverskrift())
+            .setBrevtekst(data.getBrevtekst());
+        if (vedtaksbrevData.getVedtaksbrevData().getFelles().isMedVedlegg()) {
+            brevData.setVedleggHtml(TekstformatererVedtaksbrev.lagVedtaksbrevVedleggHtml(vedtaksbrevData.getVedtaksbrevData()));
         }
+        pdfBrevTjeneste.sendBrev(behandlingId, DetaljertBrevType.VEDTAK, brevData.build());
     }
 
     private byte[] lagVedtaksbrevVedleggTabellPdf(VedtaksbrevData vedtaksbrevData, DokumentVariant dokumentVariant) {
@@ -217,34 +185,16 @@ public class VedtaksbrevTjeneste {
             .medMetadata(vedtaksbrevData.getMetadata())
             .build();
 
-        if (!BrevToggle.brukDokprod(BrevType.VEDTAK_BREV)) {
-            BrevData.Builder brevData = BrevData.builder()
-                .setMottaker(getBrevMottaker(behandlingId))
-                .setMetadata(data.getBrevMetadata())
-                .setOverskrift(data.getOverskrift())
-                .setBrevtekst(data.getBrevtekst());
-            if (hbVedtaksbrevData.getFelles().isMedVedlegg()) {
-                brevData
-                    .setVedleggHtml(TekstformatererVedtaksbrev.lagVedtaksbrevVedleggHtml(vedtaksbrevData.getVedtaksbrevData()));
-            }
-            return pdfBrevTjeneste.genererForhåndsvisning(brevData
-                .build());
-        } else {
-            byte[] vedtaksbrevPdf = bestillDokumentTjeneste.hentForhåndsvisningFritekstbrev(data);
-            byte[] vedlegg = lagVedtaksbrevVedleggTabellPdf(vedtaksbrevData, DokumentVariant.UTKAST);
-
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            PDFMergerUtility mergerUtil = new PDFMergerUtility();
-            mergerUtil.setDestinationStream(baos);
-            mergerUtil.addSource(new ByteArrayInputStream(vedtaksbrevPdf));
-            mergerUtil.addSource(new ByteArrayInputStream(vedlegg));
-            try {
-                mergerUtil.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly());
-            } catch (IOException e) {
-                throw new RuntimeException("Fikk IO exception ved forhåndsvisning inkl vedlegg", e);
-            }
-            return baos.toByteArray();
+        BrevData.Builder brevData = BrevData.builder()
+            .setMottaker(getBrevMottaker(behandlingId))
+            .setMetadata(data.getBrevMetadata())
+            .setOverskrift(data.getOverskrift())
+            .setBrevtekst(data.getBrevtekst());
+        if (hbVedtaksbrevData.getFelles().isMedVedlegg()) {
+            brevData.setVedleggHtml(TekstformatererVedtaksbrev.lagVedtaksbrevVedleggHtml(vedtaksbrevData.getVedtaksbrevData()));
         }
+        return pdfBrevTjeneste.genererForhåndsvisning(brevData
+            .build());
     }
 
     private void validerFritekstOppsummering(VedtaksbrevType vedtaksbrevType, String oppsummeringFritekst) {
@@ -275,23 +225,6 @@ public class VedtaksbrevTjeneste {
         return vergeRepository.finnesVerge(behandlingId) ? BrevMottaker.VERGE : BrevMottaker.BRUKER;
     }
 
-    private void opprettHistorikkinnslag(Behandling behandling, JournalpostIdOgDokumentId dokumentreferanse, BrevMottaker brevMottaker) {
-        String tittel = BrevMottaker.VERGE.equals(brevMottaker) ? TITTEL_VEDTAKSBREV_HISTORIKKINNSLAG_TIL_VERGE
-            : TITTEL_VEDTAKSBREV_HISTORIKKINNSLAG;
-        historikkinnslagTjeneste.opprettHistorikkinnslagForBrevsending(behandling, dokumentreferanse.getJournalpostId(),
-            dokumentreferanse.getDokumentId(), tittel);
-    }
-
-    private void lagreInfoOmVedtaksbrev(Long behandlingId, JournalpostIdOgDokumentId dokumentreferanse) {
-        BrevSporing brevSporing = new BrevSporing.Builder()
-            .medBehandlingId(behandlingId)
-            .medDokumentId(dokumentreferanse.getDokumentId())
-            .medJournalpostId(dokumentreferanse.getJournalpostId())
-            .medBrevType(BrevType.VEDTAK_BREV)
-            .build();
-        brevSporingRepository.lagre(brevSporing);
-    }
-
     public VedtaksbrevData hentDataForVedtaksbrev(Long behandlingId, BrevMottaker brevMottaker) {
         String fritekstOppsummering = hentOppsummeringFritekst(behandlingId);
         List<PeriodeMedTekstDto> fritekstPerioder = hentFriteksterTilPerioder(behandlingId);
@@ -299,9 +232,9 @@ public class VedtaksbrevTjeneste {
     }
 
     private VedtaksbrevData hentDataForVedtaksbrev(Long behandlingId,
-                                                  String oppsummeringFritekst,
-                                                  List<PeriodeMedTekstDto> perioderFritekst,
-                                                  BrevMottaker brevMottaker) {
+                                                   String oppsummeringFritekst,
+                                                   List<PeriodeMedTekstDto> perioderFritekst,
+                                                   BrevMottaker brevMottaker) {
         Behandling behandling = behandlingTjeneste.hentBehandling(behandlingId);
         //TODO hent data fra fpsak i tidligere steg, og hent fra repository her
         SamletEksternBehandlingInfo fagsystemBehandling = hentDataFraFagsystem(behandling);
@@ -374,12 +307,12 @@ public class VedtaksbrevTjeneste {
     private HbTotalresultat lagHbTotalresultat(VedtakResultatType vedtakResultatType,
                                                HbVedtaksResultatBeløp hbVedtaksResultatBeløp) {
         return HbTotalresultat.builder()
-                .medHovedresultat(vedtakResultatType)
-                .medTotaltTilbakekrevesBeløp(hbVedtaksResultatBeløp.totaltTilbakekrevesUtenRenter)
-                .medTotaltRentebeløp(hbVedtaksResultatBeløp.totaltRentebeløp)
-                .medTotaltTilbakekrevesBeløpMedRenter(hbVedtaksResultatBeløp.totaltTilbakekrevesMedRenter)
-                .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(hbVedtaksResultatBeløp.totaltTilbakekrevesBeløpMedRenterUtenSkatt)
-                .build();
+            .medHovedresultat(vedtakResultatType)
+            .medTotaltTilbakekrevesBeløp(hbVedtaksResultatBeløp.totaltTilbakekrevesUtenRenter)
+            .medTotaltRentebeløp(hbVedtaksResultatBeløp.totaltRentebeløp)
+            .medTotaltTilbakekrevesBeløpMedRenter(hbVedtaksResultatBeløp.totaltTilbakekrevesMedRenter)
+            .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(hbVedtaksResultatBeløp.totaltTilbakekrevesBeløpMedRenterUtenSkatt)
+            .build();
     }
 
     private HbBehandling lagHbBehandling(Behandling behandling) {
@@ -388,10 +321,10 @@ public class VedtaksbrevTjeneste {
             .anyMatch(ba -> ba.getBehandlingÅrsakType() == BehandlingÅrsakType.RE_KLAGE_KA || ba.getBehandlingÅrsakType() == BehandlingÅrsakType.RE_KLAGE_NFP);
         LocalDate originalBehandlingVedtaksdato = erRevurdering ? finnOriginalBehandlingVedtaksdato(behandling) : null;
         return HbBehandling.builder()
-                .medErRevurdering(erRevurdering)
-                .medErRevurderingEtterKlage(erRevurderingEtterKlage)
-                .medOriginalBehandlingDatoFagsakvedtak(originalBehandlingVedtaksdato)
-                .build();
+            .medErRevurdering(erRevurdering)
+            .medErRevurderingEtterKlage(erRevurderingEtterKlage)
+            .medOriginalBehandlingDatoFagsakvedtak(originalBehandlingVedtaksdato)
+            .build();
     }
 
     private HbSak lagHbSak(Behandling behandling,
@@ -411,10 +344,10 @@ public class VedtaksbrevTjeneste {
     private List<HbVedtaksbrevPeriode> lagHbVedtaksbrevPerioder(Long behandlingId, List<PeriodeMedTekstDto> perioderFritekst, List<BeregningResultatPeriode> resulatPerioder, List<VilkårVurderingPeriodeEntitet> vilkårPerioder, VurdertForeldelse foreldelse, VedtaksbrevType vedtaksbrevType) {
         FaktaFeilutbetaling fakta = faktaRepository.finnFaktaOmFeilutbetaling(behandlingId).orElseThrow();
         return vedtaksbrevType.equals(VedtaksbrevType.FRITEKST_FEILUTBETALING_BORTFALT)
-                ? Collections.emptyList()
-                : resulatPerioder.stream()
-                    .map(brp -> lagBrevdataPeriode(brp, fakta, vilkårPerioder, foreldelse, perioderFritekst))
-                    .collect(Collectors.toList());
+            ? Collections.emptyList()
+            : resulatPerioder.stream()
+            .map(brp -> lagBrevdataPeriode(brp, fakta, vilkårPerioder, foreldelse, perioderFritekst))
+            .collect(Collectors.toList());
     }
 
     private VedtakHjemmel.EffektForBruker hentEffektForBruker(Behandling behandling, BigDecimal totaltTilbakekrevesMedRenter) {

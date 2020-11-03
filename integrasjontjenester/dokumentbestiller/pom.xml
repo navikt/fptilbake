@@ -28,16 +28,6 @@
             <artifactId>domenetjenester</artifactId>
         </dependency>
         <dependency>
-            <groupId>no.nav.foreldrepenger.felles.ukelonn.integrasjon</groupId>
-            <artifactId>dokumentproduksjon-klient-v2</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.jvnet.jaxb2_commons</groupId>
-                    <artifactId>jaxb2-basics-runtime</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
             <artifactId>journalpost-api-klient</artifactId>
         </dependency>

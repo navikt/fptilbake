@@ -41,7 +41,7 @@
         <vl-fpsak-tidsserie.version>2.3-20200901141100-c540133</vl-fpsak-tidsserie.version>
         <!-- Kontrakter -->
         <fpkontrakter.version>5.1-20200923133920-c1d8fa1</fpkontrakter.version>
-        <ukelonn.felles.version>1.0.0-20200918143229-46217ca</ukelonn.felles.version>
+        <ukelonn.felles.version>1.0.0-20201103111417-22cb7b8</ukelonn.felles.version>
 
         <surefire.version>2.22.2</surefire.version>
         <metrics.version>4.1.14</metrics.version>
@@ -288,11 +288,6 @@
             <dependency>
                 <groupId>no.nav.foreldrepenger.felles.ukelonn.integrasjon</groupId>
                 <artifactId>felles-integrasjon-jms</artifactId>
-                <version>${ukelonn.felles.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.foreldrepenger.felles.ukelonn.integrasjon</groupId>
-                <artifactId>dokumentproduksjon-klient-v2</artifactId>
                 <version>${ukelonn.felles.version}</version>
             </dependency>
             <dependency>
