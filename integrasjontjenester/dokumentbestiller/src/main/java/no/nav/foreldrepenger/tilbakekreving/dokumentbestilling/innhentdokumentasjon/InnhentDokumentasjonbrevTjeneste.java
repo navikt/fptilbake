@@ -13,9 +13,6 @@ import org.apache.commons.lang3.StringUtils;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporing;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.DetaljertBrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
@@ -29,14 +26,10 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottak
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.EksternDataForBrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.YtelseNavn;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.BrevData;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.BrevToggle;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.PdfBrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevData;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.JournalpostIdOgDokumentId;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
-import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 
 @ApplicationScoped
 public class InnhentDokumentasjonbrevTjeneste {
@@ -46,12 +39,8 @@ public class InnhentDokumentasjonbrevTjeneste {
 
     private BehandlingRepository behandlingRepository;
     private EksternBehandlingRepository eksternBehandlingRepository;
-    private BrevSporingRepository brevSporingRepository;
     private VergeRepository vergeRepository;
-
-    private FritekstbrevTjeneste bestillDokumentTjeneste;
     private EksternDataForBrevTjeneste eksternDataForBrevTjeneste;
-    private HistorikkinnslagTjeneste historikkinnslagTjeneste;
 
     private PdfBrevTjeneste pdfBrevTjeneste;
 
@@ -61,17 +50,13 @@ public class InnhentDokumentasjonbrevTjeneste {
 
     @Inject
     public InnhentDokumentasjonbrevTjeneste(BehandlingRepositoryProvider repositoryProvider,
-                                            FritekstbrevTjeneste fritekstbrevTjeneste,
                                             EksternDataForBrevTjeneste eksternDataForBrevTjeneste,
-                                            HistorikkinnslagTjeneste historikkinnslagTjeneste, PdfBrevTjeneste pdfBrevTjeneste) {
+                                            PdfBrevTjeneste pdfBrevTjeneste) {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
-        this.brevSporingRepository = repositoryProvider.getBrevSporingRepository();
         this.vergeRepository = repositoryProvider.getVergeRepository();
 
-        this.bestillDokumentTjeneste = fritekstbrevTjeneste;
         this.eksternDataForBrevTjeneste = eksternDataForBrevTjeneste;
-        this.historikkinnslagTjeneste = historikkinnslagTjeneste;
         this.pdfBrevTjeneste = pdfBrevTjeneste;
     }
 
@@ -81,18 +66,12 @@ public class InnhentDokumentasjonbrevTjeneste {
         InnhentDokumentasjonbrevSamletInfo innhentDokumentasjonBrevSamletInfo = settOppInnhentDokumentasjonBrevSamletInfo(behandling, fritekst, brevMottaker);
         FritekstbrevData fritekstbrevData = lagInnhentDokumentasjonBrev(innhentDokumentasjonBrevSamletInfo);
 
-        if (BrevToggle.brukDokprod(BrevType.INNHENT_DOKUMENTASJONBREV)) {
-            JournalpostIdOgDokumentId dokumentReferanse = bestillDokumentTjeneste.sendFritekstbrev(fritekstbrevData);
-            opprettHistorikkinnslag(behandling, dokumentReferanse, getTittel(brevMottaker));
-            lagreInfoOmInnhentDokumentasjonBrev(behandlingId, dokumentReferanse);
-        } else {
-            pdfBrevTjeneste.sendBrev(behandlingId, DetaljertBrevType.INNHENT_DOKUMETASJON, BrevData.builder()
-                .setMottaker(brevMottaker)
-                .setMetadata(fritekstbrevData.getBrevMetadata())
-                .setOverskrift(fritekstbrevData.getOverskrift())
-                .setBrevtekst(fritekstbrevData.getBrevtekst())
-                .build());
-        }
+        pdfBrevTjeneste.sendBrev(behandlingId, DetaljertBrevType.INNHENT_DOKUMETASJON, BrevData.builder()
+            .setMottaker(brevMottaker)
+            .setMetadata(fritekstbrevData.getBrevMetadata())
+            .setOverskrift(fritekstbrevData.getOverskrift())
+            .setBrevtekst(fritekstbrevData.getBrevtekst())
+            .build());
 
     }
 
@@ -101,16 +80,12 @@ public class InnhentDokumentasjonbrevTjeneste {
         BrevMottaker brevMottaker = vergeRepository.finnesVerge(behandlingId) ? BrevMottaker.VERGE : BrevMottaker.BRUKER;
         InnhentDokumentasjonbrevSamletInfo dokumentasjonBrevSamletInfo = settOppInnhentDokumentasjonBrevSamletInfo(behandling, fritekst, brevMottaker);
         FritekstbrevData fritekstbrevData = lagInnhentDokumentasjonBrev(dokumentasjonBrevSamletInfo);
-        if (BrevToggle.brukDokprod(BrevType.INNHENT_DOKUMENTASJONBREV)) {
-            return bestillDokumentTjeneste.hentForhåndsvisningFritekstbrev(fritekstbrevData);
-        } else {
-            return pdfBrevTjeneste.genererForhåndsvisning(BrevData.builder()
-                .setMottaker(brevMottaker)
-                .setMetadata(fritekstbrevData.getBrevMetadata())
-                .setOverskrift(fritekstbrevData.getOverskrift())
-                .setBrevtekst(fritekstbrevData.getBrevtekst())
-                .build());
-        }
+        return pdfBrevTjeneste.genererForhåndsvisning(BrevData.builder()
+            .setMottaker(brevMottaker)
+            .setMetadata(fritekstbrevData.getBrevMetadata())
+            .setOverskrift(fritekstbrevData.getOverskrift())
+            .setBrevtekst(fritekstbrevData.getBrevtekst())
+            .build());
     }
 
     private FritekstbrevData lagInnhentDokumentasjonBrev(InnhentDokumentasjonbrevSamletInfo dokumentasjonBrevSamletInfo) {
@@ -166,24 +141,6 @@ public class InnhentDokumentasjonbrevTjeneste {
         UUID fpsakBehandlingUuid = eksternBehandlingRepository.hentFraInternId(behandlingId).getEksternUuid();
         SamletEksternBehandlingInfo samletEksternBehandlingInfo = eksternDataForBrevTjeneste.hentYtelsesbehandlingFraFagsystemet(fpsakBehandlingUuid);
         return samletEksternBehandlingInfo.getGrunninformasjon().getSpråkkodeEllerDefault();
-    }
-
-    private void opprettHistorikkinnslag(Behandling behandling, JournalpostIdOgDokumentId dokumentreferanse, String tittel) {
-        historikkinnslagTjeneste.opprettHistorikkinnslagForBrevsending(
-            behandling,
-            dokumentreferanse.getJournalpostId(),
-            dokumentreferanse.getDokumentId(),
-            tittel);
-    }
-
-    private void lagreInfoOmInnhentDokumentasjonBrev(Long behandlingId, JournalpostIdOgDokumentId dokumentreferanse) {
-        BrevSporing brevSporing = new BrevSporing.Builder()
-            .medBehandlingId(behandlingId)
-            .medDokumentId(dokumentreferanse.getDokumentId())
-            .medJournalpostId(dokumentreferanse.getJournalpostId())
-            .medBrevType(BrevType.INNHENT_DOKUMENTASJONBREV)
-            .build();
-        brevSporingRepository.lagre(brevSporing);
     }
 
     private String getTittel(BrevMottaker brevMottaker) {

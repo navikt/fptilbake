@@ -35,12 +35,9 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottak
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.EksternDataForBrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.BrevData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.PdfBrevTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevData;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.impl.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
-import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
 @RunWith(CdiRunner.class)
@@ -54,7 +51,6 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
 
     private EksternDataForBrevTjeneste mockEksternDataForBrevTjeneste = mock(EksternDataForBrevTjeneste.class);
     private FaktaFeilutbetalingTjeneste mockFeilutbetalingTjeneste = mock(FaktaFeilutbetalingTjeneste.class);
-    private FritekstbrevTjeneste mockFritekstbrevTjeneste = mock(FritekstbrevTjeneste.class);
     private PersoninfoAdapter mockPersoninfoAdapter = mock(PersoninfoAdapter.class);
     private PdfBrevTjeneste mockPdfBrevTjeneste = mock(PdfBrevTjeneste.class);
 
@@ -64,12 +60,10 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
 
     @Before
     public void setup() {
-        HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepository, mockPersoninfoAdapter);
-        manueltVarselBrevTjeneste = new ManueltVarselBrevTjeneste(repositoryProvider, mockEksternDataForBrevTjeneste, mockFeilutbetalingTjeneste, mockFritekstbrevTjeneste, historikkinnslagTjeneste, mockPdfBrevTjeneste);
+        manueltVarselBrevTjeneste = new ManueltVarselBrevTjeneste(repositoryProvider, mockEksternDataForBrevTjeneste, mockFeilutbetalingTjeneste, mockPdfBrevTjeneste);
 
         behandlingId = behandling.getId();
         when(mockFeilutbetalingTjeneste.hentBehandlingFeilutbetalingFakta(behandlingId)).thenReturn(lagFeilutbetalingFakta());
-        when(mockFritekstbrevTjeneste.sendFritekstbrev(any(FritekstbrevData.class))).thenReturn(lagJournalOgDokument());
 
         when(mockEksternDataForBrevTjeneste.hentYtelsenavn(FagsakYtelseType.FORELDREPENGER, Språkkode.nb))
             .thenReturn(lagYtelseNavn("foreldrepenger", "foreldrepenger"));
@@ -125,7 +119,6 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
 
     @Test
     public void skal_forhåndsvise_manuelt_varselbrev() {
-        when(mockFritekstbrevTjeneste.hentForhåndsvisningFritekstbrev(any(FritekstbrevData.class))).thenReturn(VARSEL_TEKST.getBytes());
         when(mockPdfBrevTjeneste.genererForhåndsvisning(any(BrevData.class))).thenReturn(VARSEL_TEKST.getBytes());
         byte[] data = manueltVarselBrevTjeneste.hentForhåndsvisningManueltVarselbrev(behandlingId, DokumentMalType.VARSEL_DOK, VARSEL_TEKST);
 
@@ -134,7 +127,6 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
 
     @Test
     public void skal_forhåndsvise_korrigert_varselbrev() {
-        when(mockFritekstbrevTjeneste.hentForhåndsvisningFritekstbrev(any(FritekstbrevData.class))).thenReturn(VARSEL_TEKST.getBytes());
         when(mockPdfBrevTjeneste.genererForhåndsvisning(any(BrevData.class))).thenReturn(VARSEL_TEKST.getBytes());
         varselRepository.lagre(behandlingId, KORRIGERT_VARSEL_TEKST, 32000l);
         byte[] data = manueltVarselBrevTjeneste.hentForhåndsvisningManueltVarselbrev(behandlingId, DokumentMalType.KORRIGERT_VARSEL_DOK, VARSEL_TEKST);
