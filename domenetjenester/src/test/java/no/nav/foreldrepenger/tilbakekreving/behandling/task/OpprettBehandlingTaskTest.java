@@ -1,12 +1,12 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.task;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import java.util.UUID;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -18,7 +18,7 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 
-public class OpprettBehandlingTaskTest  {
+public class OpprettBehandlingTaskTest {
     private static final Long EKSTERN_BEHANDLING_ID = 123L;
     private static final Henvisning HENVISNING = Henvisning.fraEksternBehandlingId(EKSTERN_BEHANDLING_ID);
     private static final Saksnummer SAKSNUMMER = new Saksnummer("1234");
@@ -55,7 +55,7 @@ public class OpprettBehandlingTaskTest  {
             AKTØR_ID, SAKSNUMMER);
 
         // act
-        Assert.assertThrows(NullPointerException.class,() -> opprettBehandlingTask.doTask(taskDataWrapper.getProsessTaskData()));
+        assertThrows(NullPointerException.class, () -> opprettBehandlingTask.doTask(taskDataWrapper.getProsessTaskData()));
     }
 
 }

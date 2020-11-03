@@ -18,6 +18,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.TempAvledeKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
@@ -64,11 +65,12 @@ public enum BehandlingResultatType implements Kodeverdi {
         return ALLE_HENLEGGELSESKODER;
     }
 
-    @JsonCreator
-    public static BehandlingResultatType fraKode(@JsonProperty("kode") String kode) {
-        if (kode == null) {
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+    public static BehandlingResultatType fraKode(@JsonProperty(value = "kode") Object node) {
+        if (node == null) {
             return null;
         }
+        String kode = TempAvledeKode.getVerdi(BehandlingResultatType.class, node, "kode");
         var ad = KODER.get(kode);
         if (ad == null) {
             throw new IllegalArgumentException("Ukjent BehandlingResultatType: " + kode);

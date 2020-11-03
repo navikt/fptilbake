@@ -36,7 +36,7 @@ public enum HistorikkEndretFeltVerdiType implements Kodeverdi {
         this.kode = kode;
     }
 
-    @JsonCreator
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static HistorikkEndretFeltVerdiType fraKode(@JsonProperty("kode") String kode) {
         if (kode == null) {
             return null;

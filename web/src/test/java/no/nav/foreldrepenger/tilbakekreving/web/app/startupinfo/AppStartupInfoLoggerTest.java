@@ -5,23 +5,28 @@ import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
 
+import org.assertj.core.api.Assertions;
+import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 
 import com.codahale.metrics.health.HealthCheck;
 
-import no.nav.foreldrepenger.tilbakekreving.test.LogSniffer;
+import ch.qos.logback.classic.Level;
 import no.nav.foreldrepenger.tilbakekreving.web.app.selftest.SelftestResultat;
 import no.nav.foreldrepenger.tilbakekreving.web.app.selftest.Selftests;
 import no.nav.foreldrepenger.tilbakekreving.web.app.selftest.checks.ExtHealthCheck;
+import no.nav.vedtak.log.util.MemoryAppender;
 
 public class AppStartupInfoLoggerTest {
-
-    @Rule
-    public final LogSniffer logSniffer = new LogSniffer();
+    private static MemoryAppender logSniffer = MemoryAppender.sniff(AppStartupInfoLogger.class);
 
     private AppStartupInfoLogger logger;
+
+    @After
+    public void afterEach() {
+        logSniffer.reset();
+    }
 
     @Before
     public void setup() {
@@ -52,9 +57,9 @@ public class AppStartupInfoLoggerTest {
     public void test() {
         logger.logAppStartupInfo();
 
-        logSniffer.assertHasInfoMessage("OPPSTARTSINFO start");
-        logSniffer.assertHasInfoMessage("OPPSTARTSINFO slutt");
-        logSniffer.assertNoErrorsOrWarnings();
-
+        Assertions.assertThat(logSniffer.contains("OPPSTARTSINFO start", Level.INFO)).isTrue();
+        Assertions.assertThat(logSniffer.contains("OPPSTARTSINFO slutt", Level.INFO)).isTrue();
+        Assertions.assertThat(logSniffer.contains("", Level.WARN)).isFalse();
+        Assertions.assertThat(logSniffer.contains("", Level.ERROR)).isFalse();
     }
 }

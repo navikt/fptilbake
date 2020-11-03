@@ -16,6 +16,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.TempAvledeKode;
 import no.nav.vedtak.util.InputValideringRegex;
 
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
@@ -49,11 +50,12 @@ public enum SærligGrunn implements Kodeverdi {
         this.navn = navn;
     }
 
-    @JsonCreator
-    public static SærligGrunn fraKode(@JsonProperty("kode") String kode) {
-        if (kode == null) {
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+    public static SærligGrunn fraKode(@JsonProperty(value = "kode") Object node) {
+        if (node == null) {
             return null;
         }
+        String kode = TempAvledeKode.getVerdi(SærligGrunn.class, node, "kode");
         var ad = KODER.get(kode);
         if (ad == null) {
             throw new IllegalArgumentException("Ukjent SærligGrunn: " + kode);

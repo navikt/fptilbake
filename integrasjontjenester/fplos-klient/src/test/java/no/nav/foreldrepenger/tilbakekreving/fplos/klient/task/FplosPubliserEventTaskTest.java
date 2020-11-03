@@ -36,12 +36,14 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.tilbakekrevingsvalg.VidereBehandling;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.TilbakekrevingValgDto;
 import no.nav.foreldrepenger.tilbakekreving.fplos.klient.producer.FplosKafkaProducer;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMock;
@@ -77,7 +79,7 @@ public class FplosPubliserEventTaskTest {
     private FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste = new FaktaFeilutbetalingTjeneste(repositoryProvider, kravgrunnlagTjeneste, mockFagsystemKlient);
     private InternalManipulerBehandling internalManipulerBehandling = new InternalManipulerBehandling(repositoryProvider);
 
-    private FplosPubliserEventTask fplosPubliserEventTask = new FplosPubliserEventTask(repositoryProvider, faktaFeilutbetalingTjeneste, mockKafkaProducer,"fptilbake");
+    private FplosPubliserEventTask fplosPubliserEventTask = new FplosPubliserEventTask(repositoryProvider, faktaFeilutbetalingTjeneste, mockKafkaProducer, "fptilbake");
 
     private Behandling behandling;
     private ProsessTaskData prosessTaskData;
@@ -95,6 +97,7 @@ public class FplosPubliserEventTaskTest {
         doNothing().when(mockKafkaProducer).sendJsonMedNøkkel(anyString(), anyString());
         SamletEksternBehandlingInfo samletEksternBehandlingInfo = SamletEksternBehandlingInfo.builder(Tillegsinformasjon.TILBAKEKREVINGSVALG)
             .setGrunninformasjon(new EksternBehandlingsinfoDto())
+            .setTilbakekrevingvalg(new TilbakekrevingValgDto(VidereBehandling.TILBAKEKR_OPPRETT))
             .build();
         when(mockFagsystemKlient.hentBehandlingsinfo(FPSAK_BEHANDLING_UUID, Tillegsinformasjon.TILBAKEKREVINGSVALG)).thenReturn(samletEksternBehandlingInfo);
     }

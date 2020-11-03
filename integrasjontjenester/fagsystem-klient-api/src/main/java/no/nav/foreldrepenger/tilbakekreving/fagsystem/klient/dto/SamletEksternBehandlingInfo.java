@@ -3,12 +3,17 @@ package no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.Tillegsinformasjon;
 import no.nav.vedtak.util.Objects;
 
 public class SamletEksternBehandlingInfo {
+
+    private static final Logger logger = LoggerFactory.getLogger(SamletEksternBehandlingInfo.class);
 
     private Collection<Tillegsinformasjon> tilleggsinformasjonHentet;
     private EksternBehandlingsinfoDto grunninformasjon;
@@ -53,7 +58,9 @@ public class SamletEksternBehandlingInfo {
     }
 
     public AktørId getAktørId() {
-        return new AktørId(getPersonopplysninger().getAktoerId());
+        PersonopplysningDto po = getPersonopplysninger();
+        String aktoerId = po.getAktoerId();
+        return new AktørId(aktoerId);
     }
 
     public SøknadType getSøknadType() {
@@ -128,6 +135,25 @@ public class SamletEksternBehandlingInfo {
         }
 
         public SamletEksternBehandlingInfo build() {
+            //TODO når verifisert i prod, gjør om logging til å kaste exceptions
+            if (kladd.tilleggsinformasjonHentet.contains(Tillegsinformasjon.PERSONOPPLYSNINGER) && kladd.personopplysninger == null) {
+                logger.warn("Etterspurte PERSONOPPLYSNINGER, men fikk ikke dette fra fagsystemet");
+            }
+            if (kladd.tilleggsinformasjonHentet.contains(Tillegsinformasjon.TILBAKEKREVINGSVALG) && kladd.tilbakekrevingsvalg == null) {
+                logger.warn("Etterspurte TILBAKEKREVINGSVALG, men fikk ikke dette fra fagsystemet");
+            }
+            if (kladd.tilleggsinformasjonHentet.contains(Tillegsinformasjon.FAGSAK) && kladd.fagsak == null) {
+                logger.warn("Etterspurte FAGSAK, men fikk ikke dette fra fagsystemet");
+            }
+            if (kladd.tilleggsinformasjonHentet.contains(Tillegsinformasjon.SØKNAD) && kladd.søknad == null) {
+                logger.warn("Etterspurte SØKNAD, men fikk ikke dette fra fagsystemet");
+            }
+            if (kladd.tilleggsinformasjonHentet.contains(Tillegsinformasjon.VERGE) && kladd.verge == null) {
+                logger.warn("Etterspurte VERGE, men fikk ikke dette fra fagsystemet");
+            }
+            if (kladd.tilleggsinformasjonHentet.contains(Tillegsinformasjon.VARSELTEKST) && kladd.varseltekst == null) {
+                logger.warn("Etterspurte VARSELTEKST, men fikk ikke dette fra fagsystemet");
+            }
             return kladd;
         }
     }

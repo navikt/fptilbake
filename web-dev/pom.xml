@@ -25,12 +25,6 @@
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
             <artifactId>testutilities</artifactId>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>no.nav.foreldrepenger.felles.sikkerhet</groupId>
-                    <artifactId>felles-sikkerhet-testutilities</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>

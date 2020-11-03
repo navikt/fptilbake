@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.impl.verge;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -9,7 +10,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -60,10 +60,10 @@ public class AvklartVergeTjenesteTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_ikke_lagre_verge_informasjon_når_verge_er_advokat_men_orgnummer_ikke_finnes()  {
+    public void skal_ikke_lagre_verge_informasjon_når_verge_er_advokat_men_orgnummer_ikke_finnes() {
         VergeDto vergeDto = lagVergeDto(VergeType.ADVOKAT);
         when(virksomhetTjenesteMock.validerOrganisasjon(anyString())).thenReturn(false);
-        var e= Assert.assertThrows(IllegalStateException.class,
+        var e = assertThrows(IllegalStateException.class,
             () -> avklartVergeTjeneste.lagreVergeInformasjon(internBehandlingId, vergeDto));
         assertThat(e.getMessage()).contains("OrgansisasjonNummer er ikke gyldig");
     }

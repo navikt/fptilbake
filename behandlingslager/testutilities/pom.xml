@@ -20,6 +20,10 @@
             <artifactId>behandlingslager-domene</artifactId>
         </dependency>
         <dependency>
+            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+            <artifactId>testutilities</artifactId>
+        </dependency>
+        <dependency>
             <groupId>no.nav.foreldrepenger.felles</groupId>
             <artifactId>felles-testutilities</artifactId>
         </dependency>

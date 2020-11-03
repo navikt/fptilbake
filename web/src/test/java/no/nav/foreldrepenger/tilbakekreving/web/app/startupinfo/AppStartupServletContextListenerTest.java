@@ -6,20 +6,25 @@ import static org.mockito.Mockito.verify;
 
 import javax.servlet.ServletContextEvent;
 
+import org.assertj.core.api.Assertions;
+import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 
-import no.nav.foreldrepenger.tilbakekreving.test.LogSniffer;
+import ch.qos.logback.classic.Level;
+import no.nav.vedtak.log.util.MemoryAppender;
 
 public class AppStartupServletContextListenerTest {
 
-    private AppStartupServletContextListener listener; // objekter vi tester
+    private static MemoryAppender logSniffer = MemoryAppender.sniff(AppStartupServletContextListener.class);
 
+    private AppStartupServletContextListener listener; // objekter vi tester
     private AppStartupInfoLogger mockAppStartupInfoLogger;
 
-    @Rule
-    public final LogSniffer logSniffer = new LogSniffer();
+    @After
+    public void afterEach() {
+        logSniffer.reset();
+    }
 
     @Before
     public void setup() {
@@ -41,7 +46,7 @@ public class AppStartupServletContextListenerTest {
 
         listener.contextInitialized(mock(ServletContextEvent.class));
 
-        logSniffer.assertHasErrorMessage("FPT-753407");
+        Assertions.assertThat(logSniffer.contains("FPT-753407", Level.ERROR)).isTrue();
     }
 
     @Test

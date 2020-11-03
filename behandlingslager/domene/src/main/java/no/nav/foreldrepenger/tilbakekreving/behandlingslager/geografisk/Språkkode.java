@@ -15,6 +15,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.TempAvledeKode;
 
 
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
@@ -44,11 +45,12 @@ public enum Språkkode implements Kodeverdi {
         this.kode = kode;
     }
 
-    @JsonCreator
-    public static Språkkode fraKode(@JsonProperty("kode") String kode) {
-        if (kode == null) {
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+    public static Språkkode fraKode(@JsonProperty(value = "kode") Object node) {
+        if (node == null) {
             return null;
         }
+        String kode = TempAvledeKode.getVerdi(Språkkode.class, node, "kode");
         var ad = KODER.get(kode);
         if (ad == null) {
             return Språkkode.nb;

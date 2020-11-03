@@ -114,8 +114,16 @@ public class VarselbrevUtilTest {
 
         YtelseNavn ytelseNavn = lagYtelseNavn("svangerskapspengar", "svangerskapspenger");
 
+        PersonopplysningDto personopplysninger = new PersonopplysningDto();
+        personopplysninger.setAktoerId("1");
+        personopplysninger.setFødselsnummer(PERSONNUMMER);
+        personopplysninger.setHarVerge(false);
+        personopplysninger.setNavn("Fiona");
+        personopplysninger.setAntallBarn(1);
+
         SamletEksternBehandlingInfo behandingsinfo = SamletEksternBehandlingInfo.builder(Tillegsinformasjon.PERSONOPPLYSNINGER)
             .setGrunninformasjon(eksternBehandlingsinfoDto)
+            .setPersonopplysninger(personopplysninger)
             .build();
 
         VarselbrevSamletInfo varselbrev = VarselbrevUtil.sammenstillInfoFraFagsystemerForSending(

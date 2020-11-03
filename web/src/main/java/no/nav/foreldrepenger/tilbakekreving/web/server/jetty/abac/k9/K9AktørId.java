@@ -35,7 +35,7 @@ public class K9AktørId implements Serializable, Comparable<K9AktørId> {
         this(Objects.requireNonNull(aktørId, "aktørId").toString());
     }
 
-    @JsonCreator
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public K9AktørId(@NotNull @Size(max = 20) @Pattern(regexp = "^\\d+$", message = "AktørId [${validatedValue}] matcher ikke tillatt pattern [{regexp}]") String aktørId) {
         this.aktørId = Objects.requireNonNull(nonEmpty(aktørId), "aktørId");
     }
