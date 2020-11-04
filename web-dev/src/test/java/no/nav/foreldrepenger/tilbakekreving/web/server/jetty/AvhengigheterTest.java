@@ -6,7 +6,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import no.nav.foreldrepenger.tilbakekreving.avstemming.batch.AvstemmingBatchTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.SakshendelserEventObserver;
 import no.nav.foreldrepenger.tilbakekreving.fplos.klient.observer.FplosEventObserver;
 import no.nav.foreldrepenger.tilbakekreving.hendelser.felles.YtelsesvedtakHendelsePoller;
@@ -24,6 +23,5 @@ public class AvhengigheterTest {
         Assertions.assertThat(CDI.current().select(FplosEventObserver.class).isResolvable()).isTrue();
         Assertions.assertThat(CDI.current().select(KravgrunnlagAsyncJmsConsumer.class).isResolvable()).isTrue();
         Assertions.assertThat(CDI.current().select(YtelsesvedtakHendelsePoller.class).isResolvable()).isTrue();
-        Assertions.assertThat(CDI.current().select(AvstemmingBatchTjeneste.class).isResolvable()).isTrue();
     }
 }

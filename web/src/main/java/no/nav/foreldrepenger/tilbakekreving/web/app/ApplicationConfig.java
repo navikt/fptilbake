@@ -24,7 +24,6 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.ConstraintViolati
 import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.JsonMappingExceptionMapper;
 import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.JsonParseExceptionMapper;
 import no.nav.foreldrepenger.tilbakekreving.web.app.konfig.FellesKlasserForRest;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.batch.BatchRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.BehandlingFaktaRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.BehandlingRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.BrevRestTjeneste;
@@ -113,7 +112,6 @@ public class ApplicationConfig extends Application {
         classes.add(KodeverkRestTjeneste.class);
         classes.add(BehandlingRestTjeneste.class);
         classes.add(AksjonspunktRestTjeneste.class);
-        classes.add(BatchRestTjeneste.class);
         classes.add(KonfigRestTjeneste.class);
         classes.add(NavAnsattRestTjeneste.class);
         classes.add(HistorikkRestTjeneste.class);
