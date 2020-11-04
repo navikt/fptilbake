@@ -10,11 +10,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.prometheus.client.hotspot.DefaultExports;
+import no.nav.foreldrepenger.tilbakekreving.batch.scheduler.BatchTaskScheduler;
 import no.nav.foreldrepenger.tilbakekreving.kafka.poller.KafkaPollerManager;
 import no.nav.vedtak.apptjeneste.AppServiceHandler;
 import no.nav.vedtak.felles.integrasjon.jms.QueueConsumerManager;
 import no.nav.vedtak.felles.prosesstask.impl.TaskManager;
-import no.nav.vedtak.felles.prosesstask.impl.cron.BatchTaskScheduler;
 import no.nav.vedtak.util.env.Environment;
 
 @ApplicationScoped
@@ -46,7 +46,7 @@ public class ApplicationServiceStarter {
         if (services.contains(klasse)) {
             logger.warn("Starter ikke {} siden den allerede er startet", klasse);
         } else {
-            logger.info("Starter {}", klasse.getSimpleName());
+            logger.info("StarterStarter {}", klasse.getSimpleName());
             CDI.current().select(klasse).get().start();
         }
     }
@@ -63,10 +63,5 @@ public class ApplicationServiceStarter {
             logger.info("Starter {}", QueueConsumerManager.class.getSimpleName());
             CDI.current().select(QueueConsumerManager.class).get().start();
         }
-    }
-
-    private void stoppQueueConsumerManager() {
-        logger.info("Stopper {}", QueueConsumerManager.class.getSimpleName());
-        CDI.current().select(QueueConsumerManager.class).get().stop();
     }
 }

@@ -13,33 +13,33 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.foreldrepenger.batch.BatchArguments;
-import no.nav.foreldrepenger.batch.BatchStatus;
-import no.nav.foreldrepenger.batch.BatchTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.konfig.KonfigVerdi;
 
 @ApplicationScoped
-public class HåndterGamleKravgrunnlagBatchTjeneste implements BatchTjeneste {
+@ProsessTask(HåndterGamleKravgrunnlagBatchTask.BATCHNAVN)
+public class HåndterGamleKravgrunnlagBatchTask implements ProsessTaskHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(HåndterGamleKravgrunnlagBatchTjeneste.class);
-    private static final String BATCHNAVN = "BFPT-002";
+    private static final Logger logger = LoggerFactory.getLogger(HåndterGamleKravgrunnlagBatchTask.class);
+    public static final String BATCHNAVN = "BFPT-002";
 
     private ØkonomiMottattXmlRepository mottattXmlRepository;
     private ProsessTaskRepository taskRepository;
     private Clock clock;
     private Period grunnlagAlder;
 
-    HåndterGamleKravgrunnlagBatchTjeneste() {
+    HåndterGamleKravgrunnlagBatchTask() {
         // for CDI proxy
     }
 
     @Inject
-    public HåndterGamleKravgrunnlagBatchTjeneste(ØkonomiMottattXmlRepository mottattXmlRepository,
-                                                 ProsessTaskRepository taskRepository,
-                                                 @KonfigVerdi(value = "automatisering.alder.kravgrunnlag") Period grunnlagAlder) {
+    public HåndterGamleKravgrunnlagBatchTask(ØkonomiMottattXmlRepository mottattXmlRepository,
+                                             ProsessTaskRepository taskRepository,
+                                             @KonfigVerdi(value = "automatisering.alder.kravgrunnlag") Period grunnlagAlder) {
         this.mottattXmlRepository = mottattXmlRepository;
         this.taskRepository = taskRepository;
         this.clock = Clock.systemDefaultZone();
@@ -47,10 +47,10 @@ public class HåndterGamleKravgrunnlagBatchTjeneste implements BatchTjeneste {
     }
 
     // kun for test forbruk
-    public HåndterGamleKravgrunnlagBatchTjeneste(ØkonomiMottattXmlRepository mottattXmlRepository,
-                                                 ProsessTaskRepository taskRepository,
-                                                 Clock clock,
-                                                 @KonfigVerdi(value = "automatisering.alder.kravgrunnlag") Period grunnlagAlder) {
+    public HåndterGamleKravgrunnlagBatchTask(ØkonomiMottattXmlRepository mottattXmlRepository,
+                                             ProsessTaskRepository taskRepository,
+                                             Clock clock,
+                                             @KonfigVerdi(value = "automatisering.alder.kravgrunnlag") Period grunnlagAlder) {
         this.mottattXmlRepository = mottattXmlRepository;
         this.taskRepository = taskRepository;
         this.clock = clock;
@@ -58,7 +58,7 @@ public class HåndterGamleKravgrunnlagBatchTjeneste implements BatchTjeneste {
     }
 
     @Override
-    public String launch(BatchArguments arguments) {
+    public void doTask(ProsessTaskData prosessTaskData) {
         String batchRun = BATCHNAVN + "-" + UUID.randomUUID();
         LocalDate iDag = LocalDate.now(clock);
         if (iDag.getDayOfWeek().equals(DayOfWeek.SATURDAY) || iDag.getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
@@ -75,14 +75,13 @@ public class HåndterGamleKravgrunnlagBatchTjeneste implements BatchTjeneste {
                 lagProsessTask(batchRun, alleGamleKravgrunnlag);
             }
         }
-        return batchRun;
     }
 
     private void lagProsessTask(String batchRun, List<Long> alleGamleKravgrunnlag) {
         String gruppe = "gammel-kravgrunnlag" + batchRun;
         for (Long mottattXmlId : alleGamleKravgrunnlag) {
             ProsessTaskData prosessTaskData = new ProsessTaskData(HåndterGamleKravgrunnlagTask.TASKTYPE);
-            prosessTaskData.setProperty("mottattXmlId",String.valueOf(mottattXmlId));
+            prosessTaskData.setProperty("mottattXmlId", String.valueOf(mottattXmlId));
             prosessTaskData.setCallIdFraEksisterende();
             prosessTaskData.setGruppe(gruppe);
             taskRepository.lagre(prosessTaskData);
@@ -93,16 +92,4 @@ public class HåndterGamleKravgrunnlagBatchTjeneste implements BatchTjeneste {
         logger.info("Henter kravgrunnlag som er eldre enn {}", bestemtDato);
         return mottattXmlRepository.hentGamleUkobledeKravgrunnlagXmlIds(bestemtDato.atStartOfDay());
     }
-
-    @Override
-    public BatchStatus status(String batchInstanceNumber) {
-        // Antar her at alt har gått bra siden denne er en synkron jobb.
-        return BatchStatus.OK;
-    }
-
-    @Override
-    public String getBatchName() {
-        return BATCHNAVN;
-    }
-
 }
