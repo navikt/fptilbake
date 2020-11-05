@@ -2,6 +2,9 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -25,7 +28,10 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekst.FritekstbrevTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekst.SendFritekstbrevTask;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.AbacDto;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
@@ -41,6 +47,7 @@ public class ForvaltningFritekstbrevRestTjeneste {
     private static final Logger logger = LoggerFactory.getLogger(ForvaltningFritekstbrevRestTjeneste.class);
 
     private FritekstbrevTjeneste fritekstbrevTjeneste;
+    private ProsessTaskRepository prosessTaskRepository;
     private BehandlingRepository behandlingRepository;
 
     public ForvaltningFritekstbrevRestTjeneste() {
@@ -48,8 +55,9 @@ public class ForvaltningFritekstbrevRestTjeneste {
     }
 
     @Inject
-    public ForvaltningFritekstbrevRestTjeneste(FritekstbrevTjeneste fritekstbrevTjeneste, BehandlingRepository behandlingRepository) {
+    public ForvaltningFritekstbrevRestTjeneste(FritekstbrevTjeneste fritekstbrevTjeneste, ProsessTaskRepository prosessTaskRepository, BehandlingRepository behandlingRepository) {
         this.fritekstbrevTjeneste = fritekstbrevTjeneste;
+        this.prosessTaskRepository = prosessTaskRepository;
         this.behandlingRepository = behandlingRepository;
     }
 
@@ -125,9 +133,20 @@ public class ForvaltningFritekstbrevRestTjeneste {
     @BeskyttetRessurs(action = BeskyttetRessursActionAttributt.CREATE, property = AbacProperty.DRIFT)
     public Response sendBrev(@Valid @NotNull FritekstbrevDto dto) {
         Behandling behandling = behandlingRepository.hentBehandling(dto.getBehandlingId());
+
+        ProsessTaskData task = new ProsessTaskData(SendFritekstbrevTask.TASKTYPE);
+        task.setPayload(dto.getFritekst());
+        task.setProperty("behandlingId", Long.toString(dto.getBehandlingId()));
+        task.setProperty("tittel", base64encode(dto.getTittel()));
+        task.setProperty("overskrift", base64encode(dto.getOverskrift()));
+        String taskId = prosessTaskRepository.lagre(task);
         fritekstbrevTjeneste.sendFritekstbrev(behandling, dto.getTittel(), dto.getOverskrift(), dto.getFritekst(), dto.getMottaker());
-        logger.info("Bestilte utsending av fritekstbrev for " + dto.getBehandlingId() + " til " + dto.getMottaker());
+        logger.info("Bestilte utsending av fritekstbrev for " + dto.getBehandlingId() + " til " + dto.getMottaker() + "gjennom prosesstask med id " + taskId);
         return Response.ok().build();
+    }
+
+    private static String base64encode(String input) {
+        return Base64.getEncoder().encodeToString(input.getBytes(StandardCharsets.UTF_8));
     }
 
     private Response.ResponseBuilder lagRespons(byte[] dokument) {
