@@ -41,7 +41,7 @@ public class SendFritekstbrevTask implements ProsessTaskHandler {
         BrevMottaker brevMottaker = BrevMottaker.valueOf(prosessTaskData.getPropertyValue("mottaker"));
 
         fritekstbrevTjeneste.sendFritekstbrev(behandlingId, tittel, overskrift, fritekst, brevMottaker);
-        logger.info("Sendte fritekstbrev til " + brevMottaker + " for " + behandlingId);
+        logger.info("Sendte fritekstbrev til {} for {}", brevMottaker, behandlingId);
     }
 
     private static String base64decode(String base64) {

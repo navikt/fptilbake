@@ -132,16 +132,13 @@ public class ForvaltningFritekstbrevRestTjeneste {
     @Operation(tags = "FORVALTNING-brev", description = "Tjeneste for å sende et fritekstbrev.")
     @BeskyttetRessurs(action = BeskyttetRessursActionAttributt.CREATE, property = AbacProperty.DRIFT)
     public Response sendBrev(@Valid @NotNull FritekstbrevDto dto) {
-        Behandling behandling = behandlingRepository.hentBehandling(dto.getBehandlingId());
-
         ProsessTaskData task = new ProsessTaskData(SendFritekstbrevTask.TASKTYPE);
         task.setPayload(dto.getFritekst());
         task.setProperty("behandlingId", Long.toString(dto.getBehandlingId()));
         task.setProperty("tittel", base64encode(dto.getTittel()));
         task.setProperty("overskrift", base64encode(dto.getOverskrift()));
         String taskId = prosessTaskRepository.lagre(task);
-        fritekstbrevTjeneste.sendFritekstbrev(behandling, dto.getTittel(), dto.getOverskrift(), dto.getFritekst(), dto.getMottaker());
-        logger.info("Bestilte utsending av fritekstbrev for " + dto.getBehandlingId() + " til " + dto.getMottaker() + "gjennom prosesstask med id " + taskId);
+        logger.info("Opprettet task med id={} for utsending av fritekstbrev for behandlingId={}  til {}", taskId, dto.getBehandlingId(), dto.getMottaker());
         return Response.ok().build();
     }
 

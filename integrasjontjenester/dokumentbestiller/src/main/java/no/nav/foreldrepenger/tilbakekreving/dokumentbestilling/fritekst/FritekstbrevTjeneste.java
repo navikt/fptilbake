@@ -31,16 +31,12 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBe
 @ApplicationScoped
 public class FritekstbrevTjeneste {
 
-    private static final String TITTEL_FRITEKSTBREV = "Fritekstbrev relatert til tilbakekrevingssaken";
-
     private BehandlingRepository behandlingRepository;
     private EksternBehandlingRepository eksternBehandlingRepository;
     private VergeRepository vergeRepository;
 
     private EksternDataForBrevTjeneste eksternDataForBrevTjeneste;
-
     private PdfBrevTjeneste pdfBrevTjeneste;
-
 
     FritekstbrevTjeneste() {
         // for CDI
@@ -60,7 +56,7 @@ public class FritekstbrevTjeneste {
 
     public void sendFritekstbrev(Long behandlingId, String tittel, String overskrift, String fritekst, BrevMottaker brevMottaker) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-        sendFritekstbrev(behandlingId, tittel, overskrift, fritekst, brevMottaker);
+        sendFritekstbrev(behandling, tittel, overskrift, fritekst, brevMottaker);
     }
 
     public void sendFritekstbrev(Behandling behandling, String tittel, String overskrift, String fritekst, BrevMottaker brevMottaker) {
@@ -72,11 +68,6 @@ public class FritekstbrevTjeneste {
             .setOverskrift(fritekstbrevData.getOverskrift())
             .setBrevtekst(fritekstbrevData.getBrevtekst())
             .build());
-    }
-
-    public byte[] hentForhåndsvisningFritekstbrev(UUID behandlingUuid, String tittel, String overskrift, String fritekst) {
-        Behandling behandling = behandlingRepository.hentBehandling(behandlingUuid);
-        return hentForhåndsvisningFritekstbrev(behandling, tittel, overskrift, fritekst);
     }
 
     public byte[] hentForhåndsvisningFritekstbrev(Behandling behandling, String tittel, String overskrift, String fritekst) {
