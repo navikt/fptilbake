@@ -13,7 +13,6 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
-import no.nav.vedtak.util.env.Environment;
 
 @ApplicationScoped
 @ProsessTask(OppdaterBehandlingTask.TASKTYPE)
@@ -35,12 +34,6 @@ public class OppdaterBehandlingTask implements ProsessTaskHandler {
 
     @Override
     public void doTask(ProsessTaskData taskData) {
-        if (Environment.current().isProd()) {
-            //FIXME midlertidig unngå prosesstasken pga produksjonshendelse i Kafka.
-            //FIXME denne skal fikses så snart som mulig
-            return;
-        }
-
         HendelseTaskDataWrapper dataWrapper = new HendelseTaskDataWrapper(taskData);
         dataWrapper.validerTaskDataOppdaterBehandling();
 
