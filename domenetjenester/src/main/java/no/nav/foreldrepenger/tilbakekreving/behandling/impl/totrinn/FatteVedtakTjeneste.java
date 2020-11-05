@@ -25,7 +25,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagTotrinnsvurdering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkTabellRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.Totrinnsvurdering;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.SkjermlenkeTjeneste;
 import no.nav.vedtak.sikkerhet.context.SubjectHandler;
@@ -34,7 +33,6 @@ import no.nav.vedtak.sikkerhet.context.SubjectHandler;
 public class FatteVedtakTjeneste {
 
     private AksjonspunktRepository aksjonspunktRepository;
-    private KodeverkTabellRepository kodeverkTabellRepository;
     private TotrinnTjeneste totrinnTjeneste;
     private HistorikkRepository historikkRepository;
 
@@ -45,7 +43,6 @@ public class FatteVedtakTjeneste {
     @Inject
     public FatteVedtakTjeneste(BehandlingRepositoryProvider repositoryProvider, TotrinnTjeneste totrinnTjeneste) {
         this.aksjonspunktRepository = repositoryProvider.getAksjonspunktRepository();
-        this.kodeverkTabellRepository = repositoryProvider.getKodeverkRepository().getKodeverkTabellRepository();
         this.historikkRepository = repositoryProvider.getHistorikkRepository();
         this.totrinnTjeneste = totrinnTjeneste;
     }
@@ -61,7 +58,7 @@ public class FatteVedtakTjeneste {
                 aksjonspunktRepository.setReåpnet(aksjonspunkt);
                 aksjonspunktRepository.setToTrinnsBehandlingKreves(aksjonspunkt);
             }
-            Set<VurderÅrsak> vurderÅrsaker = aks.getVurderÅrsakskoder().stream().map(VurderÅrsak :: fraKode).collect(Collectors.toSet());
+            Set<VurderÅrsak> vurderÅrsaker = aks.getVurderÅrsakskoder().stream().map(VurderÅrsak::fraKode).collect(Collectors.toSet());
 
             Totrinnsvurdering totrinnsvurdering = Totrinnsvurdering.builder().medBehandling(behandling)
                     .medAksjonspunktDefinisjon(aksjonspunkt.getAksjonspunktDefinisjon())

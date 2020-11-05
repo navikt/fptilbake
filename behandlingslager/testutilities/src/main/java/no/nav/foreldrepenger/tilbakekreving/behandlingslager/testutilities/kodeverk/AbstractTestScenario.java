@@ -36,7 +36,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.IverksettingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingAktsomhetEntitet;
@@ -216,11 +215,6 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
         }).when(aksjonspunktRepository).finnAksjonspunktDefinisjon(Mockito.any());
 
         FagsakRepository mockFagsakRepository = mockFagsakRepository();
-        KodeverkRepository kodeverkRepository = KodeverkTestHelper.getKodeverkRepository();
-        // ikke ideelt å la mocks returnere mocks, men forenkler enormt mye test kode, forhindrer feil oppsett, så det
-        // blir enklere å refactorere
-
-        when(repositoryProvider.getKodeverkRepository()).thenReturn(kodeverkRepository);
         when(repositoryProvider.getBehandlingRepository()).thenReturn(behandlingRepository);
         when(repositoryProvider.getFagsakRepository()).thenReturn(mockFagsakRepository);
         when(repositoryProvider.getAksjonspunktRepository()).thenReturn(aksjonspunktRepository);

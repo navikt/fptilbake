@@ -34,7 +34,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.InntektskategoriKlassekodeMapper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingPeriodeEntitet;
@@ -54,7 +53,6 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 @Transactional
 public class VilkårsvurderingTjeneste {
 
-    private KodeverkRepository kodeverkRepository;
     private KravgrunnlagRepository grunnlagRepository;
     private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository;
     private VilkårsvurderingRepository vilkårsvurderingRepository;
@@ -70,7 +68,6 @@ public class VilkårsvurderingTjeneste {
     @Inject
     public VilkårsvurderingTjeneste(VurdertForeldelseTjeneste foreldelseTjeneste, BehandlingRepositoryProvider behandlingRepositoryProvider,
                                     VilkårsvurderingHistorikkInnslagTjeneste vilkårsvurderingHistorikkInnslagTjeneste, KravgrunnlagBeregningTjeneste kravgrunnlagBeregningTjeneste) {
-        this.kodeverkRepository = behandlingRepositoryProvider.getKodeverkRepository();
         this.grunnlagRepository = behandlingRepositoryProvider.getGrunnlagRepository();
         this.faktaFeilutbetalingRepository = behandlingRepositoryProvider.getFaktaFeilutbetalingRepository();
         this.vilkårsvurderingRepository = behandlingRepositoryProvider.getVilkårsvurderingRepository();
@@ -146,7 +143,7 @@ public class VilkårsvurderingTjeneste {
         return perioder;
     }
 
-    public void slettGammelVilkårData(@Observes KravgrunnlagEndretEvent event){
+    public void slettGammelVilkårData(@Observes KravgrunnlagEndretEvent event) {
         vilkårsvurderingRepository.slettVilkårsvurdering(event.getBehandlingId());
     }
 

@@ -23,7 +23,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.TotrinnRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
@@ -60,7 +59,6 @@ public class TestOppsett {
 
     protected BehandlingRepositoryProvider repoProvider = new BehandlingRepositoryProvider(em);
     protected NavBrukerRepository brukerRepository = new NavBrukerRepository(em);
-    protected KodeverkRepository kodeverkRepository = repoProvider.getKodeverkRepository();
     protected KravgrunnlagRepository grunnlagRepository = repoProvider.getGrunnlagRepository();
     protected HistorikkRepository historikkRepository = repoProvider.getHistorikkRepository();
     protected FaktaFeilutbetalingRepository faktaFeilutbetalingRepository = repoProvider.getFaktaFeilutbetalingRepository();

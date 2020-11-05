@@ -18,8 +18,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegKo
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingTypeStegSekvens;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepositoryImpl;
 
 @ApplicationScoped
 public class BehandlingModellRepository {
@@ -36,10 +34,6 @@ public class BehandlingModellRepository {
     public BehandlingModellRepository(EntityManager entityManager) {
         Objects.requireNonNull(entityManager, "entityManager"); //$NON-NLS-1$
         this.entityManager = entityManager;
-    }
-
-    public KodeverkRepository getKodeverkRepository() {
-        return new KodeverkRepositoryImpl(entityManager);
     }
 
     public BehandlingStegKonfigurasjon getBehandlingStegKonfigurasjon() {
