@@ -85,6 +85,7 @@ public class ForvaltningFritekstbrevRestTjeneste {
         private Long behandlingId;
 
         @NotNull
+        @Valid
         private BrevMottaker mottaker;
 
         public Long getBehandlingId() {
@@ -123,6 +124,7 @@ public class ForvaltningFritekstbrevRestTjeneste {
         private String fritekst;
 
         @NotNull
+        @Valid
         private BrevMottaker mottaker;
 
         public Long getBehandlingId() {
