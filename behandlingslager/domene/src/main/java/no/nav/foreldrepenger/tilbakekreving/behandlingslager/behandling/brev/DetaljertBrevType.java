@@ -6,6 +6,7 @@ public enum DetaljertBrevType {
     KORRIGERT_VARSEL(BrevType.VARSEL_BREV),
     VEDTAK(BrevType.VEDTAK_BREV),
     HENLEGGELSE(BrevType.HENLEGGELSE_BREV),
+    FRITEKST(BrevType.FRITEKST),
     INNHENT_DOKUMETASJON(BrevType.INNHENT_DOKUMENTASJONBREV);
 
     private BrevType brevType;

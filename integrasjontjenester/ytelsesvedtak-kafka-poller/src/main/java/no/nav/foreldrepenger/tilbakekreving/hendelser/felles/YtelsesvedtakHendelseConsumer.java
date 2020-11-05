@@ -21,7 +21,7 @@ public class YtelsesvedtakHendelseConsumer {
         properties.setProperty("client.id", applikasjonNavn);
         properties.setProperty("enable.auto.commit", "false");
         properties.setProperty("max.poll.records", "20");
-        properties.setProperty("auto.offset.reset", "earliest"); // TODO sett til 'none' når det har blitt lest fra køen i produksjon
+        properties.setProperty("auto.offset.reset", "latest");
         return properties;
     }
 
