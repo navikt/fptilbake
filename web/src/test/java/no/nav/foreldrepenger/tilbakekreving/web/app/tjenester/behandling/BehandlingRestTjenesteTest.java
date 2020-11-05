@@ -1,6 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling;
 
-import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -54,7 +53,6 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.BehandlingsprosessApplikasjonTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.TotrinnskontrollAksjonspunkterTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingDtoTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.FpsakUuidDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.HenleggBehandlingDto;
@@ -191,35 +189,41 @@ public class BehandlingRestTjenesteTest {
     public void skal_gi_rettigheter_for_vise_verge() {
         Behandling behandling = ScenarioSimple.simple().lagMocked();
         when(behandlingTjenesteMock.hentBehandlinger(any(Saksnummer.class))).thenReturn(Lists.newArrayList(behandling));
-        var response = behandlingRestTjeneste.hentBehandlingOperasjonRettigheterV2(saksnummerDto);
-        assertThat(response.getBehandlingTillatteOperasjoner()).hasSize(1);
-        assertThat(response.getBehandlingTillatteOperasjoner().get(0).getVergeBehandlingsmeny()).isEqualTo(VergeBehandlingsmenyEnum.OPPRETT);
-        assertThat(response.getBehandlingTillatteOperasjoner().get(0).isBehandlingKanGjenopptas()).isFalse();
-        assertThat(response.getBehandlingTillatteOperasjoner().get(0).isBehandlingKanSettesPaVent()).isTrue();
-        assertThat(response.getBehandlingTypeKanOpprettes().stream().filter(b -> BehandlingType.TILBAKEKREVING.equals(b.getBehandlingType())).findAny())
+        when(behandlingTjenesteMock.hentBehandling(any(UUID.class))).thenReturn(behandling);
+        var behandlingUuid = new UuidDto(behandling.getUuid());
+        var response = behandlingRestTjeneste.hentMenyOpsjoner(behandlingUuid);
+        assertThat(response.getVergeBehandlingsmeny()).isEqualTo(VergeBehandlingsmenyEnum.OPPRETT);
+        assertThat(response.isBehandlingKanGjenopptas()).isFalse();
+        assertThat(response.isBehandlingKanSettesPaVent()).isTrue();
+
+        var sakResponse = behandlingRestTjeneste.hentRettigheterSak(saksnummerDto);
+        assertThat(sakResponse.getBehandlingTypeKanOpprettes().stream().filter(b -> BehandlingType.TILBAKEKREVING.equals(b.getBehandlingType())).findAny())
             .hasValueSatisfying(v -> assertThat(v.isKanOppretteBehandling()).isFalse());
-        assertThat(response.getBehandlingTypeKanOpprettes().stream().filter(b -> BehandlingType.REVURDERING_TILBAKEKREVING.equals(b.getBehandlingType())).findAny())
+        assertThat(sakResponse.getBehandlingTypeKanOpprettes().stream().filter(b -> BehandlingType.REVURDERING_TILBAKEKREVING.equals(b.getBehandlingType())).findAny())
             .hasValueSatisfying(v -> assertThat(v.isKanOppretteBehandling()).isFalse());
 
         when(vergeTjenesteMock.hentVergeInformasjon(anyLong())).thenReturn(Optional.of(VergeEntitet.builder()
             .medBegrunnelse("bla").medKilde("bla").medOrganisasjonnummer("999999999").medNavn("Vegard Verge").medVergeType(VergeType.ADVOKAT).build()));
-        response = behandlingRestTjeneste.hentBehandlingOperasjonRettigheterV2(saksnummerDto);
-        assertThat(response.getBehandlingTillatteOperasjoner().get(0).getVergeBehandlingsmeny()).isEqualTo(VergeBehandlingsmenyEnum.FJERN);
+        response = behandlingRestTjeneste.hentMenyOpsjoner(behandlingUuid);
+        assertThat(response.getVergeBehandlingsmeny()).isEqualTo(VergeBehandlingsmenyEnum.FJERN);
 
         behandling.avsluttBehandling();
-        response = behandlingRestTjeneste.hentBehandlingOperasjonRettigheterV2(saksnummerDto);
-        assertThat(response.getBehandlingTillatteOperasjoner()).isEmpty();
-        assertThat(response.getBehandlingTypeKanOpprettes().stream().filter(b -> BehandlingType.TILBAKEKREVING.equals(b.getBehandlingType())).findAny())
+        response = behandlingRestTjeneste.hentMenyOpsjoner(behandlingUuid);
+        assertThat(response.isBehandlingKanHenlegges()).isFalse();
+
+        sakResponse = behandlingRestTjeneste.hentRettigheterSak(saksnummerDto);
+        assertThat(sakResponse.getBehandlingTypeKanOpprettes().stream().filter(b -> BehandlingType.TILBAKEKREVING.equals(b.getBehandlingType())).findAny())
             .hasValueSatisfying(v -> assertThat(v.isKanOppretteBehandling()).isTrue());
-        assertThat(response.getBehandlingTypeKanOpprettes().stream().filter(b -> BehandlingType.REVURDERING_TILBAKEKREVING.equals(b.getBehandlingType())).findAny())
+        assertThat(sakResponse.getBehandlingTypeKanOpprettes().stream().filter(b -> BehandlingType.REVURDERING_TILBAKEKREVING.equals(b.getBehandlingType())).findAny())
             .hasValueSatisfying(v -> assertThat(v.isKanOppretteBehandling()).isFalse());
 
         when(revurderingTjenesteMock.kanRevurderingOpprettes(any(Behandling.class))).thenReturn(true);
-        response = behandlingRestTjeneste.hentBehandlingOperasjonRettigheterV2(saksnummerDto);
-        assertThat(response.getBehandlingTillatteOperasjoner()).isEmpty();
-        assertThat(response.getBehandlingTypeKanOpprettes().stream().filter(b -> BehandlingType.TILBAKEKREVING.equals(b.getBehandlingType())).findAny())
+        response = behandlingRestTjeneste.hentMenyOpsjoner(behandlingUuid);
+        assertThat(response.isBehandlingKanHenlegges()).isFalse();
+        sakResponse = behandlingRestTjeneste.hentRettigheterSak(saksnummerDto);
+        assertThat(sakResponse.getBehandlingTypeKanOpprettes().stream().filter(b -> BehandlingType.TILBAKEKREVING.equals(b.getBehandlingType())).findAny())
             .hasValueSatisfying(v -> assertThat(v.isKanOppretteBehandling()).isTrue());
-        assertThat(response.getBehandlingTypeKanOpprettes().stream().filter(b -> BehandlingType.REVURDERING_TILBAKEKREVING.equals(b.getBehandlingType())).findAny())
+        assertThat(sakResponse.getBehandlingTypeKanOpprettes().stream().filter(b -> BehandlingType.REVURDERING_TILBAKEKREVING.equals(b.getBehandlingType())).findAny())
             .hasValueSatisfying(v -> assertThat(v.isKanOppretteBehandling()).isTrue());
     }
 

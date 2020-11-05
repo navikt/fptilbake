@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -94,10 +93,6 @@ public class BehandlingRestTjeneste {
     public static final String SAK_RETTIGHETER_PATH = PATH_FRAGMENT + SAK_RETTIGHETER_PART_PATH;
     private static final String BEHANDLING_RETTIGHETER_PART_PATH = "/behandling-rettigheter";
     public static final String BEHANDLING_RETTIGHETER_PATH = PATH_FRAGMENT + BEHANDLING_RETTIGHETER_PART_PATH;
-
-    // TODO: remove in contract phase
-    private static final String HANDLING_RETTIGHETER_PART_PATH = "/handling-rettigheter-v2";
-    public static final String HANDLING_RETTIGHETER_PATH = PATH_FRAGMENT + HANDLING_RETTIGHETER_PART_PATH;
 
     private static final String BEHANDLING_ALLE_PART_PATH = "/alle";
     public static final String BEHANDLING_ALLE_PATH = PATH_FRAGMENT + BEHANDLING_ALLE_PART_PATH;
@@ -456,24 +451,6 @@ public class BehandlingRestTjeneste {
         Boolean harSoknad = true;
         //TODO (TOR) Denne skal etterkvart returnere rettighetene knytta til behandlingsmeny i frontend
         return new BehandlingRettigheterDto(harSoknad);
-    }
-
-    @GET
-    @Path(HANDLING_RETTIGHETER_PART_PATH)
-    @Operation(
-        tags = "behandlinger",
-        description = "Rettigheter for behandlinger og fagsak")
-    @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
-    public SakRettigheterDto hentBehandlingOperasjonRettigheterV2(@NotNull @QueryParam("saksnummer") @Valid SaksnummerDto saksnummerDto) {
-        Saksnummer saksnummer = new Saksnummer(saksnummerDto.getVerdi());
-
-        var rettigheter = behandlingTjeneste.hentBehandlinger(saksnummer).stream()
-            .filter(b -> BehandlingStatus.OPPRETTET.equals(b.getStatus()) || BehandlingStatus.UTREDES.equals(b.getStatus()))
-            .map(this::lovligeOperasjoner)
-            .collect(Collectors.toList());
-        var oppretting = List.of(new BehandlingOpprettingDto(BehandlingType.TILBAKEKREVING, behandlingTjeneste.hentBehandlinger(saksnummer).stream().allMatch(Behandling::erSaksbehandlingAvsluttet)),
-            new BehandlingOpprettingDto(BehandlingType.REVURDERING_TILBAKEKREVING, behandlingTjeneste.hentBehandlinger(saksnummer).stream().anyMatch(revurderingTjeneste::kanRevurderingOpprettes)));
-        return new SakRettigheterDto(false, oppretting, rettigheter);
     }
 
     @GET

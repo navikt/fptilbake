@@ -63,7 +63,6 @@ public class InitielleLinksRestTjeneste {
         saklenker.add(get(BehandlingRestTjeneste.BEHANDLING_ALLE_PATH, "tilbake-alle-behandlinger"));
         saklenker.add(get(BehandlingRestTjeneste.BEHANDLING_KAN_OPPRETTES_PATH, "tilbake-kan-opprette-behandling"));
         saklenker.add(get(BehandlingRestTjeneste.REVURDERING_KAN_OPPRETTES_PATH, "tilbake-kan-opprette-revurdering"));
-        saklenker.add(get(BehandlingRestTjeneste.HANDLING_RETTIGHETER_PATH, "tilbake-handling-rettigheter-v2")); // TODO: Remove in contract-phase
         return new InitLinksDto(lenkene, List.of(), saklenker);
     }
 

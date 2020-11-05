@@ -17,13 +17,13 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.impl.totrinn.TotrinnTjene
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.VurderÅrsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.Totrinnsvurdering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.VurderÅrsakTotrinnsvurdering;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.SkjermlenkeTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.totrinn.TotrinnskontrollAksjonspunkterDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.totrinn.TotrinnskontrollSkjermlenkeContextDto;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.totrinn.TotrinnskontrollVurderÅrsak;
 
 @ApplicationScoped
 public class TotrinnskontrollAksjonspunkterTjeneste {
@@ -103,10 +103,9 @@ public class TotrinnskontrollAksjonspunkterTjeneste {
                 .medVurderPaNyttArsaker(hentVurderPåNyttÅrsaker(totrinnsvurdering)).build();
     }
 
-    private Set<TotrinnskontrollVurderÅrsak> hentVurderPåNyttÅrsaker(Totrinnsvurdering totrinnsvurdering) {
+    private Set<VurderÅrsak> hentVurderPåNyttÅrsaker(Totrinnsvurdering totrinnsvurdering) {
         return totrinnsvurdering.getVurderÅrsaker().stream()
                 .map(VurderÅrsakTotrinnsvurdering::getÅrsaksType)
-                .map(arsakType -> new TotrinnskontrollVurderÅrsak(arsakType.getKode(), arsakType.getNavn()))
                 .collect(Collectors.toSet());
     }
 

@@ -95,7 +95,7 @@ public class TotrinnskontrollAksjonspunkterTjenesteTest {
         assertThat(totrinnskontrollAksjonspunkterDto.getAksjonspunktKode()).isEqualTo(AksjonspunktDefinisjon.VURDER_TILBAKEKREVING.getKode());
         assertThat(totrinnskontrollAksjonspunkterDto.getTotrinnskontrollGodkjent()).isNull();
         assertThat(totrinnskontrollAksjonspunkterDto.getBesluttersBegrunnelse()).isEqualTo("annet");
-        assertThat(totrinnskontrollAksjonspunkterDto.getArsaker().stream().findFirst().get().getKode()).isEqualTo(VurderÅrsak.ANNET.getKode());
+        assertThat(totrinnskontrollAksjonspunkterDto.getArsaker()).contains(VurderÅrsak.ANNET);
     }
 
     @Test
