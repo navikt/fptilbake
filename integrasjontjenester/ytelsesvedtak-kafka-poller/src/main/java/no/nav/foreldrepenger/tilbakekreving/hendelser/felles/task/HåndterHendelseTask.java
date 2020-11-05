@@ -9,6 +9,7 @@ import no.nav.foreldrepenger.tilbakekreving.hendelser.felles.tjeneste.HendelseH�
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
+import no.nav.vedtak.util.env.Environment;
 
 @ApplicationScoped
 @ProsessTask(H책ndterHendelseTask.TASKTYPE)
@@ -30,6 +31,13 @@ public class H책ndterHendelseTask implements ProsessTaskHandler {
 
     @Override
     public void doTask(ProsessTaskData taskData) {
+        if (Environment.current().isProd()) {
+            //FIXME midlertidig unng책 prosesstasken pga produksjonshendelse i Kafka.
+            //FIXME denne skal fikses s책 snart som mulig
+            return;
+        }
+
+
         HendelseTaskDataWrapper dataWrapper = new HendelseTaskDataWrapper(taskData);
         dataWrapper.validerTaskDataH책ndterHendelse();
 
