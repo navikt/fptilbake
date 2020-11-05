@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import io.swagger.v3.oas.annotations.Operation;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekst.FritekstbrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekst.SendFritekstbrevTask;
@@ -59,6 +60,45 @@ public class ForvaltningFritekstbrevRestTjeneste {
         this.fritekstbrevTjeneste = fritekstbrevTjeneste;
         this.prosessTaskRepository = prosessTaskRepository;
         this.behandlingRepository = behandlingRepository;
+    }
+
+    public static class BehandlingIdDto implements AbacDto {
+        @Valid
+        @Min(0)
+        @Max(4000000)
+        private Long behandlingId;
+
+        public Long getBehandlingId() {
+            return behandlingId;
+        }
+
+        @Override
+        public AbacDataAttributter abacAttributter() {
+            return AbacDataAttributter.opprett().leggTil(StandardAbacAttributtType.BEHANDLING_ID, getBehandlingId());
+        }
+    }
+
+    public static class BehandlingIdOgMottakerDto implements AbacDto {
+        @Valid
+        @Min(0)
+        @Max(4000000)
+        private Long behandlingId;
+
+        @NotNull
+        private BrevMottaker mottaker;
+
+        public Long getBehandlingId() {
+            return behandlingId;
+        }
+
+        public BrevMottaker getMottaker() {
+            return mottaker;
+        }
+
+        @Override
+        public AbacDataAttributter abacAttributter() {
+            return AbacDataAttributter.opprett().leggTil(StandardAbacAttributtType.BEHANDLING_ID, getBehandlingId());
+        }
     }
 
     public static class FritekstbrevDto implements AbacDto {
@@ -140,6 +180,73 @@ public class ForvaltningFritekstbrevRestTjeneste {
         String taskId = prosessTaskRepository.lagre(task);
         logger.info("Opprettet task med id={} for utsending av fritekstbrev for behandlingId={}  til {}", taskId, dto.getBehandlingId(), dto.getMottaker());
         return Response.ok().build();
+    }
+
+    @POST
+    @Path("/forhåndsvis-brev-feilutsendt-varsel")
+    @Consumes(APPLICATION_JSON)
+    @Produces(APPLICATION_JSON)
+    @Operation(tags = "FORVALTNING-brev", description = "Tjeneste for å forhåndsvise brev ang feilutsendt varsel.")
+    //ingen sporingslogg siden ingen data for bruker vises
+    @BeskyttetRessurs(action = BeskyttetRessursActionAttributt.CREATE, property = AbacProperty.DRIFT, sporingslogg = false)
+    public Response forhåndsvisBrevFeilutsendtVarsel(@Valid @NotNull BehandlingIdDto dto) {
+        Behandling behandling = behandlingRepository.hentBehandling(dto.getBehandlingId());
+        FagsakYtelseType ytelseType = behandling.getFagsak().getFagsakYtelseType();
+
+        byte[] dokument = fritekstbrevTjeneste.hentForhåndsvisningFritekstbrev(behandling, getTittelFeilutesendtVarselbrev(), getOverskriftFeilutesendtVarselbrev(ytelseType), getInnholdFeilutsendtVarselbrev(ytelseType));
+        Response.ResponseBuilder responseBuilder = lagRespons(dokument);
+        return responseBuilder.build();
+    }
+
+    @POST
+    @Path("/send-feilutsendt-varsel")
+    @Consumes(APPLICATION_JSON)
+    @Produces(APPLICATION_JSON)
+    @Operation(tags = "FORVALTNING-brev", description = "Tjeneste for å sende brev ang feilutsendt varsel.")
+    @BeskyttetRessurs(action = BeskyttetRessursActionAttributt.CREATE, property = AbacProperty.DRIFT)
+    public Response sendBrev(@Valid @NotNull BehandlingIdOgMottakerDto dto) {
+        Behandling behandling = behandlingRepository.hentBehandling(dto.getBehandlingId());
+        FagsakYtelseType ytelseType = behandling.getFagsak().getFagsakYtelseType();
+
+        ProsessTaskData task = new ProsessTaskData(SendFritekstbrevTask.TASKTYPE);
+        task.setPayload(getInnholdFeilutsendtVarselbrev(ytelseType));
+        task.setProperty("behandlingId", Long.toString(dto.getBehandlingId()));
+        task.setProperty("tittel", base64encode(getTittelFeilutesendtVarselbrev()));
+        task.setProperty("overskrift", base64encode(getOverskriftFeilutesendtVarselbrev(ytelseType)));
+        String taskId = prosessTaskRepository.lagre(task);
+        logger.info("Opprettet task med id={} for utsending av fritekstbrev for behandlingId={}  til {}", taskId, dto.getBehandlingId(), dto.getMottaker());
+        return Response.ok().build();
+    }
+
+    static String getTittelFeilutesendtVarselbrev() {
+        return "Feilsendt varselbrev pga teknisk feil";
+    }
+
+    static String getOverskriftFeilutesendtVarselbrev(FagsakYtelseType ytelseType) {
+        switch (ytelseType) {
+            case ENGANGSTØNAD:
+                return "Brev vedrørende feilutbetaling av engangsstønad";
+            case FORELDREPENGER:
+                return "Brev vedrørende feilutbetaling av foreldrepenger";
+            case SVANGERSKAPSPENGER:
+                return "Brev vedrørende feilutbetaling av svangerskapspenger";
+            default:
+                throw new IllegalArgumentException("Ikke-støttet ytelse-type: " + ytelseType);
+        }
+    }
+
+    static String getInnholdFeilutsendtVarselbrev(FagsakYtelseType ytelseType) {
+        String hilsen = "\n\nMed vennlig hilsen\nNAV Familie- og pensjonsytelser";
+        switch (ytelseType) {
+            case ENGANGSTØNAD:
+                return "Det har på grunn av en teknisk feil blitt sendt brev til deg om at NAV vurderer om du må betale tilbake engangsstønad. Vi ber deg se bort fra dette brevet, datert 5. november 2020. Vi beklager feilen og ulempen dette har medført for deg." + hilsen;
+            case FORELDREPENGER:
+                return "Det har på grunn av en teknisk feil blitt sendt brev til deg om at NAV vurderer om du må betale tilbake foreldrepenger. Vi ber deg se bort fra dette brevet, datert 5. november 2020. Vi beklager feilen og ulempen dette har medført for deg." + hilsen;
+            case SVANGERSKAPSPENGER:
+                return "Det har på grunn av en teknisk feil blitt sendt brev til deg om at NAV vurderer om du må betale tilbake svangerskapspenger. Vi ber deg se bort fra dette brevet, datert 5. november 2020. Vi beklager feilen og ulempen dette har medført for deg." + hilsen;
+            default:
+                throw new IllegalArgumentException("Ikke-støttet ytelse-type: " + ytelseType);
+        }
     }
 
     private static String base64encode(String input) {
