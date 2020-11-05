@@ -14,16 +14,20 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
@@ -66,6 +70,7 @@ public class ForvaltningFritekstbrevRestTjeneste {
         @Valid
         @Min(0)
         @Max(4000000)
+        @QueryParam("behandlingId")
         private Long behandlingId;
 
         public Long getBehandlingId() {
@@ -154,12 +159,11 @@ public class ForvaltningFritekstbrevRestTjeneste {
     }
 
     @POST
-    @Path("/forhåndsvis-fritekst-brev")
+    @Path("/forhaandsvis-fritekst-brev")
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
     @Operation(tags = "FORVALTNING-brev", description = "Tjeneste for å forhåndsvise et fritekstbrev.")
-    //ingen sporingslogg siden ingen data for bruker vises
-    @BeskyttetRessurs(action = BeskyttetRessursActionAttributt.CREATE, property = AbacProperty.DRIFT, sporingslogg = false)
+    @BeskyttetRessurs(action = BeskyttetRessursActionAttributt.CREATE, property = AbacProperty.DRIFT)
     public Response forhåndsvisBrev(@Valid @NotNull FritekstbrevDto dto) {
         Behandling behandling = behandlingRepository.hentBehandling(dto.getBehandlingId());
         byte[] dokument = fritekstbrevTjeneste.hentForhåndsvisningFritekstbrev(behandling, dto.getTittel(), dto.getOverskrift(), dto.getFritekst());
@@ -184,15 +188,14 @@ public class ForvaltningFritekstbrevRestTjeneste {
         return Response.ok().build();
     }
 
-    @POST
-    @Path("/forhåndsvis-brev-feilutsendt-varsel")
+    @GET
+    @Path("/forhaandsvis-brev-feilutsendt-varsel")
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
     @Operation(tags = "FORVALTNING-brev", description = "Tjeneste for å forhåndsvise brev ang feilutsendt varsel.")
-    //ingen sporingslogg siden ingen data for bruker vises
-    @BeskyttetRessurs(action = BeskyttetRessursActionAttributt.CREATE, property = AbacProperty.DRIFT, sporingslogg = false)
-    public Response forhåndsvisBrevFeilutsendtVarsel(@Valid @NotNull BehandlingIdDto dto) {
-        Behandling behandling = behandlingRepository.hentBehandling(dto.getBehandlingId());
+    @BeskyttetRessurs(action = BeskyttetRessursActionAttributt.CREATE, property = AbacProperty.DRIFT)
+    public Response forhåndsvisBrevFeilutsendtVarselGet(@Parameter(description = "BehandlingId") @BeanParam @Valid @NotNull BehandlingIdDto behandligId) {
+        Behandling behandling = behandlingRepository.hentBehandling(behandligId.getBehandlingId());
         FagsakYtelseType ytelseType = behandling.getFagsak().getFagsakYtelseType();
 
         byte[] dokument = fritekstbrevTjeneste.hentForhåndsvisningFritekstbrev(behandling, getTittelFeilutesendtVarselbrev(), getOverskriftFeilutesendtVarselbrev(ytelseType), getInnholdFeilutsendtVarselbrev(ytelseType));
