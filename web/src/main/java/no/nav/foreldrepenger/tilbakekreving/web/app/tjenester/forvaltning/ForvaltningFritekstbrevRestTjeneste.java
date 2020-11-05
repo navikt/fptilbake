@@ -183,6 +183,7 @@ public class ForvaltningFritekstbrevRestTjeneste {
         task.setProperty("behandlingId", Long.toString(dto.getBehandlingId()));
         task.setProperty("tittel", base64encode(dto.getTittel()));
         task.setProperty("overskrift", base64encode(dto.getOverskrift()));
+        task.setProperty("mottaker", dto.getMottaker().name());
         String taskId = prosessTaskRepository.lagre(task);
         logger.info("Opprettet task med id={} for utsending av fritekstbrev for behandlingId={}  til {}", taskId, dto.getBehandlingId(), dto.getMottaker());
         return Response.ok().build();
@@ -218,6 +219,7 @@ public class ForvaltningFritekstbrevRestTjeneste {
         task.setProperty("behandlingId", Long.toString(dto.getBehandlingId()));
         task.setProperty("tittel", base64encode(getTittelFeilutesendtVarselbrev()));
         task.setProperty("overskrift", base64encode(getOverskriftFeilutesendtVarselbrev(ytelseType)));
+        task.setProperty("mottaker", dto.getMottaker().name());
         String taskId = prosessTaskRepository.lagre(task);
         logger.info("Opprettet task med id={} for utsending av fritekstbrev for behandlingId={}  til {}", taskId, dto.getBehandlingId(), dto.getMottaker());
         return Response.ok().build();
