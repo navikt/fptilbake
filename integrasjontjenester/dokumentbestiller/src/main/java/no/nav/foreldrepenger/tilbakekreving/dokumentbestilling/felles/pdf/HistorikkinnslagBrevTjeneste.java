@@ -1,5 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf;
 
+import java.util.Objects;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -26,10 +28,10 @@ public class HistorikkinnslagBrevTjeneste {
         this.behandlingRepository = behandlingRepository;
     }
 
-    public void opprettHistorikkinnslagBrevSendt(Long behandlingId, JournalpostIdOgDokumentId dokumentreferanse, DetaljertBrevType detaljertBrevType, BrevMottaker brevMottaker) {
+    public void opprettHistorikkinnslagBrevSendt(Long behandlingId, JournalpostIdOgDokumentId dokumentreferanse, DetaljertBrevType detaljertBrevType, BrevMottaker brevMottaker, String tittel) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-        String tittel = finnHistorikkinnslagTittel(detaljertBrevType, brevMottaker);
-        opprettHistorikkinnslag(behandling, dokumentreferanse, tittel);
+        String historikkinnslagTittel = finnHistorikkinnslagTittel(detaljertBrevType, brevMottaker, tittel);
+        opprettHistorikkinnslag(behandling, dokumentreferanse, historikkinnslagTittel);
     }
 
     private void opprettHistorikkinnslag(Behandling behandling, JournalpostIdOgDokumentId dokumentreferanse, String tittel) {
@@ -40,7 +42,10 @@ public class HistorikkinnslagBrevTjeneste {
             tittel);
     }
 
-    private String finnHistorikkinnslagTittel(DetaljertBrevType detaljertBrevType, BrevMottaker brevMottaker) {
+    private String finnHistorikkinnslagTittel(DetaljertBrevType detaljertBrevType, BrevMottaker brevMottaker, String tittel) {
+        if (detaljertBrevType == DetaljertBrevType.FRITEKST) {
+            return Objects.requireNonNull(tittel);
+        }
         switch (brevMottaker) {
             case BRUKER:
                 return finnHistorikkinnslagTittelBrevTilBruker(detaljertBrevType);

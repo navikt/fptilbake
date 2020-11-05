@@ -1,5 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -57,6 +59,7 @@ public class PdfBrevTjeneste {
 
     public void sendBrev(Long behandlingId, DetaljertBrevType detaljertBrevType, Long varsletBeløp, String fritekst, BrevData data) {
         valider(detaljertBrevType, varsletBeløp);
+        valider(detaljertBrevType, data);
 
         JournalpostIdOgDokumentId dokumentreferanse = lagOgJournalførBrev(behandlingId, detaljertBrevType, data);
         lagTaskerForUtsendingOgSporing(behandlingId, detaljertBrevType, varsletBeløp, fritekst, data, dokumentreferanse);
@@ -96,6 +99,9 @@ public class PdfBrevTjeneste {
         data.setProperty("dokumentId", dokumentreferanse.getDokumentId());
         data.setProperty("mottaker", brevdata.getMottaker().name());
         data.setProperty("detaljertBrevType", detaljertBrevType.name());
+        if (brevdata.getTittel() != null) {
+            data.setProperty("tittel", Base64.getEncoder().encodeToString(brevdata.getTittel().getBytes(StandardCharsets.UTF_8)));
+        }
         return data;
     }
 
@@ -123,6 +129,12 @@ public class PdfBrevTjeneste {
         boolean harVarsletBeløp = varsletBeløp != null;
         if (brevType.gjelderVarsel() != harVarsletBeløp) {
             throw new IllegalArgumentException("Utvikler-feil: Varslet beløp skal brukes hvis, og bare hvis, brev gjelder varsel");
+        }
+    }
+
+    private static void valider(DetaljertBrevType brevType, BrevData data) {
+        if (brevType == DetaljertBrevType.FRITEKST && data.getTittel() == null) {
+            throw new IllegalArgumentException("Utvikler-feil: For brevType = " + brevType + " må tittel være satt");
         }
     }
 

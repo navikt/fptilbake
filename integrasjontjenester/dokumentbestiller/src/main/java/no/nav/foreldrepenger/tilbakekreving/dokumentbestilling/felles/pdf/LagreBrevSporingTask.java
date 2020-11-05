@@ -1,5 +1,8 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -39,9 +42,17 @@ public class LagreBrevSporingTask implements ProsessTaskHandler {
         BrevMottaker mottaker = BrevMottaker.valueOf(prosessTaskData.getPropertyValue("mottaker"));
         JournalpostIdOgDokumentId dokumentreferanse = finnJournalpostIdOgDokumentId(prosessTaskData);
         DetaljertBrevType brevType = DetaljertBrevType.valueOf(prosessTaskData.getPropertyValue("detaljertBrevType"));
+        String tittel = base64Decode(prosessTaskData.getPropertyValue("tittel"));
 
-        historikkinnslagBrevTjeneste.opprettHistorikkinnslagBrevSendt(behandlingId, dokumentreferanse, brevType, mottaker);
+        historikkinnslagBrevTjeneste.opprettHistorikkinnslagBrevSendt(behandlingId, dokumentreferanse, brevType, mottaker, tittel);
         brevSporingTjeneste.lagreInfoOmUtsendtBrev(behandlingId, dokumentreferanse, brevType);
+    }
+
+    private String base64Decode(String tittel) {
+        if (tittel == null) {
+            return null;
+        }
+        return new String(Base64.getDecoder().decode(tittel.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8);
     }
 
     private static JournalpostIdOgDokumentId finnJournalpostIdOgDokumentId(ProsessTaskData prosessTaskData) {

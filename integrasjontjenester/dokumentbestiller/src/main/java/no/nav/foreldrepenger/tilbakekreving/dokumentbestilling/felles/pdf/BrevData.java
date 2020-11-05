@@ -7,6 +7,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.Brev
 
 public class BrevData {
     private BrevMetadata metadata;
+    private String tittel;
     private String overskrift;
     private BrevMottaker mottaker;
     private String brevtekst;
@@ -17,6 +18,10 @@ public class BrevData {
 
     public BrevMetadata getMetadata() {
         return metadata;
+    }
+
+    public String getTittel() {
+        return tittel;
     }
 
     public String getOverskrift() {
@@ -49,6 +54,7 @@ public class BrevData {
         }
         BrevData brevData = (BrevData) o;
         return metadata.equals(brevData.metadata) &&
+            Objects.equals(tittel, brevData.tittel) &&
             overskrift.equals(brevData.overskrift) &&
             mottaker == brevData.mottaker &&
             brevtekst.equals(brevData.brevtekst) &&
@@ -57,11 +63,12 @@ public class BrevData {
 
     @Override
     public int hashCode() {
-        return Objects.hash(metadata, overskrift, mottaker, brevtekst, vedleggHtml);
+        return Objects.hash(metadata, overskrift, tittel, mottaker, brevtekst, vedleggHtml);
     }
 
     public static class Builder {
         private BrevMetadata metadata;
+        private String tittel;
         private String overskrift;
         private BrevMottaker mottaker;
         private String brevtekst;
@@ -77,6 +84,11 @@ public class BrevData {
 
         public Builder setOverskrift(String overskrift) {
             this.overskrift = overskrift;
+            return this;
+        }
+
+        public Builder setTittel(String tittel) {
+            this.tittel = tittel;
             return this;
         }
 
@@ -103,6 +115,7 @@ public class BrevData {
 
             BrevData data = new BrevData();
             data.metadata = metadata;
+            data.tittel = tittel;
             data.overskrift = overskrift;
             data.mottaker = mottaker;
             data.brevtekst = brevtekst;

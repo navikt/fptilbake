@@ -65,6 +65,7 @@ public class FritekstbrevTjeneste {
         pdfBrevTjeneste.sendBrev(behandling.getId(), DetaljertBrevType.FRITEKST, BrevData.builder()
             .setMottaker(brevMottaker)
             .setMetadata(fritekstbrevData.getBrevMetadata())
+            .setTittel(fritekstbrevData.getTittel())
             .setOverskrift(fritekstbrevData.getOverskrift())
             .setBrevtekst(fritekstbrevData.getBrevtekst())
             .build());
@@ -133,6 +134,7 @@ public class FritekstbrevTjeneste {
 
     private FritekstbrevData lagFritekstbrev(FritekstbrevSamletInfo fritekstbrevSamletInfo) {
         return new FritekstbrevData.Builder()
+            .medTittel(fritekstbrevSamletInfo.getBrevMetadata().getTittel())
             .medOverskrift(fritekstbrevSamletInfo.getOverskrift())
             .medBrevtekst(fritekstbrevSamletInfo.getFritekstFraSaksbehandler())
             .medMetadata(fritekstbrevSamletInfo.getBrevMetadata())

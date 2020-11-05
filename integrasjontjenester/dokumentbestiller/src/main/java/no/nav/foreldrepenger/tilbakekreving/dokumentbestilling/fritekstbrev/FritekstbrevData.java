@@ -4,9 +4,14 @@ import java.util.Objects;
 
 public class FritekstbrevData {
 
+    private String tittel;
     private String overskrift;
     private String brevtekst;
     private BrevMetadata brevMetadata;
+
+    public String getTittel() {
+        return tittel;
+    }
 
     public String getOverskrift() {
         return overskrift;
@@ -28,6 +33,11 @@ public class FritekstbrevData {
 
         public Builder medOverskrift(String overskrift) {
             kladd.overskrift = overskrift;
+            return this;
+        }
+
+        public Builder medTittel(String tittel) {
+            kladd.tittel = tittel;
             return this;
         }
 
