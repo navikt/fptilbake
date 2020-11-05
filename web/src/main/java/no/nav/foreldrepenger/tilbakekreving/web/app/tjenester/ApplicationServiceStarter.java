@@ -26,8 +26,12 @@ public class ApplicationServiceStarter {
     public void startServices() {
         DefaultExports.initialize();
 
-        start(TaskManager.class);
-        start(BatchTaskScheduler.class);
+        //FIX stopper utførelse av prosesstasker
+        if (!Environment.current().isProd()) {
+            start(TaskManager.class);
+            start(BatchTaskScheduler.class);
+        }
+
         start(KafkaPollerManager.class);
         if (Environment.current().isProd() || !"true".equalsIgnoreCase(Environment.current().getProperty("test.only.disable.mq"))) {
             startQueueConsumerManager();
