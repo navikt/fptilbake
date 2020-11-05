@@ -45,7 +45,7 @@ import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepositoryImpl;
 import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
 @RunWith(CdiRunner.class)
-public class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
+public class FritekstbrevTjenesteTest extends DokumentBestillerTestOppsett {
 
     private static final String REVURDERING_HENLEGGELSESBREV_FRITEKST = "Revurderingen ble henlagt";
 

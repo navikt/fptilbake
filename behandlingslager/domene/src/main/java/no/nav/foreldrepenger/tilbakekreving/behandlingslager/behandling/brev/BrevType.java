@@ -13,11 +13,12 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
 public enum BrevType implements Kodeverdi {
 
-     VARSEL_BREV("VARSEL"),
-     VEDTAK_BREV("VEDTAK"),
-     HENLEGGELSE_BREV("HENLEGGELSE"),
-     INNHENT_DOKUMENTASJONBREV("INNHENT_DOKUMENTASJON"),
-     UDEFINERT("-");
+    VARSEL_BREV("VARSEL"),
+    VEDTAK_BREV("VEDTAK"),
+    HENLEGGELSE_BREV("HENLEGGELSE"),
+    INNHENT_DOKUMENTASJONBREV("INNHENT_DOKUMENTASJON"),
+    FRITEKST("FRITEKSTBREV"),
+    UDEFINERT("-");
 
     public static final String KODEVERK = "BREV_TYPE";
     private static final Map<String, BrevType> KODER = new LinkedHashMap<>();
@@ -32,7 +33,7 @@ public enum BrevType implements Kodeverdi {
         }
     }
 
-    BrevType(String kode){
+    BrevType(String kode) {
         this.kode = kode;
     }
 
