@@ -33,7 +33,7 @@ import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
  * Brukes for å liste ut alle alternativer som kan genereres for særlige grunner
  */
 @Ignore("Kjøres ved behov for å regenerere dokumentasjon")
-public class DokumentasjonGeneratorSærligeGrunner {
+public class DokumentasjonGeneratorPeriodeSærligeGrunner {
 
     private final Periode januar = Periode.of(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 1, 31));
 
