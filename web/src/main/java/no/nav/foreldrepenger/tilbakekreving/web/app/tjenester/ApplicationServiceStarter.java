@@ -48,7 +48,7 @@ public class ApplicationServiceStarter {
         if (services.contains(klasse)) {
             logger.warn("Starter ikke {} siden den allerede er startet", klasse);
         } else {
-            logger.info("StarterStarter {}", klasse.getSimpleName());
+            logger.info("Starter {}", klasse.getSimpleName());
             CDI.current().select(klasse).get().start();
         }
     }

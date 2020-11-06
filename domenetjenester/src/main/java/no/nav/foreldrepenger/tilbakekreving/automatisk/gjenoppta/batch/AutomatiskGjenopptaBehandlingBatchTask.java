@@ -19,7 +19,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 @ProsessTask(AutomatiskGjenopptaBehandlingBatchTask.BATCHNAVN)
 public class AutomatiskGjenopptaBehandlingBatchTask implements ProsessTaskHandler {
 
-    public static final String BATCHNAVN = "BVL007";
+    public static final String BATCHNAVN = "batch.ta.behandling.av.vent";
     private static final Logger logger = LoggerFactory.getLogger(AutomatiskGjenopptaBehandlingBatchTask.class);
 
     private GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste;

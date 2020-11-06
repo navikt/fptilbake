@@ -32,7 +32,7 @@ import no.nav.vedtak.util.env.Environment;
 public class AvstemmingBatchTask implements ProsessTaskHandler {
 
     private Logger logger = LoggerFactory.getLogger(AvstemmingBatchTask.class);
-    public static final String BATCHNAVN = "BFPT-001";
+    public static final String BATCHNAVN = "batch.avstemming";
 
     private static final DateTimeFormatter DATO_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
     private static final DateTimeFormatter DATO_TIDSPUNKT_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmm");

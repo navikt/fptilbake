@@ -25,7 +25,7 @@ import no.nav.vedtak.konfig.KonfigVerdi;
 public class HåndterGamleKravgrunnlagBatchTask implements ProsessTaskHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(HåndterGamleKravgrunnlagBatchTask.class);
-    public static final String BATCHNAVN = "BFPT-002";
+    public static final String BATCHNAVN = "batch.håndter.gamle.kravgrunnlag";
 
     private ØkonomiMottattXmlRepository mottattXmlRepository;
     private ProsessTaskRepository taskRepository;

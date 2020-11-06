@@ -27,7 +27,7 @@ import no.nav.vedtak.konfig.KonfigVerdi;
 public class AutomatiskSaksbehandlingBatchTask implements ProsessTaskHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(AutomatiskSaksbehandlingBatchTask.class);
-    static final String BATCHNAVN = "BFPT-003";
+    static final String BATCHNAVN = "batch.automatisk.saksbehandling";
     private static final String EXECUTION_ID_SEPARATOR = "-";
 
     private ProsessTaskRepository taskRepository;
