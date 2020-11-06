@@ -37,7 +37,6 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.BehandlingÅrsa
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.web.app.rest.ResourceLink;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.BehandlingRestTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.SaksnummerDto;
 import no.nav.vedtak.konfig.KonfigVerdi;
 
 /**
@@ -114,7 +113,6 @@ public class BehandlingDtoTjeneste {
 
         // Behandlingsmeny-operasjoner
         dto.leggTil(get(kontekstPath + "/api/behandlinger/handling-rettigheter", "handling-rettigheter", uuidDto));
-        dto.leggTil(get(kontekstPath + "/api/behandlinger/handling-rettigheter-v2", "handling-rettigheter-v2", new SaksnummerDto(behandling.getFagsak().getSaksnummer())));
         dto.leggTil(get(kontekstPath + "/api" + BehandlingRestTjeneste.BEHANDLING_RETTIGHETER_PATH, "behandling-rettigheter", uuidDto));
         // Denne håndteres litt spesielt i frontend, så må gjøres på denne måten
         dto.leggTil(get(kontekstPath + "/api/verge/behandlingsmeny?uuid=" + uuid, "finn-menyvalg-for-verge"));

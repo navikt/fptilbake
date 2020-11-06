@@ -4,6 +4,8 @@ import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.VurderÅrsak;
+
 public class TotrinnskontrollAksjonspunkterDto {
     @JsonProperty("aksjonspunktKode")
     private String aksjonspunktKode;
@@ -15,7 +17,7 @@ public class TotrinnskontrollAksjonspunkterDto {
     private Boolean totrinnskontrollGodkjent;
 
     @JsonProperty("vurderPaNyttArsaker")
-    private Set<TotrinnskontrollVurderÅrsak> arsaker;
+    private Set<VurderÅrsak> arsaker;
 
 
     public String getAksjonspunktKode() {
@@ -31,7 +33,7 @@ public class TotrinnskontrollAksjonspunkterDto {
         return totrinnskontrollGodkjent;
     }
 
-    public Set<TotrinnskontrollVurderÅrsak> getArsaker() {
+    public Set<VurderÅrsak> getArsaker() {
         return arsaker;
     }
 
@@ -57,7 +59,7 @@ public class TotrinnskontrollAksjonspunkterDto {
             return this;
         }
 
-        public Builder medVurderPaNyttArsaker(Set<TotrinnskontrollVurderÅrsak> vurderPaNyttArsaker) {
+        public Builder medVurderPaNyttArsaker(Set<VurderÅrsak> vurderPaNyttArsaker) {
             kladd.arsaker = vurderPaNyttArsaker;
             return this;
         }
