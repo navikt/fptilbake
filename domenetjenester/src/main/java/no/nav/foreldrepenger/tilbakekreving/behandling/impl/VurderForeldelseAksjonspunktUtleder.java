@@ -30,7 +30,7 @@ public class VurderForeldelseAksjonspunktUtleder {
     }
 
     @Inject
-    public VurderForeldelseAksjonspunktUtleder(@KonfigVerdi("foreldelse.antallmaaneder") Period antallMånederFrist, KravgrunnlagRepository grunnlagRepository,
+    public VurderForeldelseAksjonspunktUtleder(@KonfigVerdi(value = "foreldelse.antallmaaneder", defaultVerdi = "P30M") Period antallMånederFrist, KravgrunnlagRepository grunnlagRepository,
                                                BehandlingRepository behandlingRepository) {
         this.antallMånederFrist = antallMånederFrist;
         this.grunnlagRepository = grunnlagRepository;
