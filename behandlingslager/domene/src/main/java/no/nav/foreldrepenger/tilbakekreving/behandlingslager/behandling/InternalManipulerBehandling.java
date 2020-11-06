@@ -5,12 +5,10 @@ import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 
 
 @ApplicationScoped
 public class InternalManipulerBehandling {
-    private KodeverkRepository kodeverkRepository;
     private BehandlingRepository behandlingRepository;
 
     public InternalManipulerBehandling() {
@@ -20,20 +18,25 @@ public class InternalManipulerBehandling {
     @Inject
     public InternalManipulerBehandling(BehandlingRepositoryProvider repositoryProvider) {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
-        this.kodeverkRepository = repositoryProvider.getKodeverkRepository();
     }
 
-    /** Sett til angitt steg, default steg status, default slutt status for andre åpne steg. */
+    /**
+     * Sett til angitt steg, default steg status, default slutt status for andre åpne steg.
+     */
     public void forceOppdaterBehandlingSteg(Behandling behandling, BehandlingStegType stegType) {
         forceOppdaterBehandlingSteg(behandling, stegType, BehandlingStegStatus.UDEFINERT);
     }
 
-    /** Sett Behandling til angitt steg, angitt steg status, defalt slutt status for andre åpne steg. */
+    /**
+     * Sett Behandling til angitt steg, angitt steg status, defalt slutt status for andre åpne steg.
+     */
     public void forceOppdaterBehandlingSteg(Behandling behandling, BehandlingStegType stegType, BehandlingStegStatus stegStatus) {
         forceOppdaterBehandlingSteg(behandling, stegType, stegStatus, BehandlingStegStatus.UTFØRT);
     }
 
-    /** Sett Behandling til angitt steg, angitt steg status, angitt slutt status for andre åpne steg. */
+    /**
+     * Sett Behandling til angitt steg, angitt steg status, angitt slutt status for andre åpne steg.
+     */
     public void forceOppdaterBehandlingSteg(Behandling behandling, BehandlingStegType stegType, BehandlingStegStatus nesteStegStatus,
                                             BehandlingStegStatus sluttStatusForEksisterendeSteg) {
 

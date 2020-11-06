@@ -40,10 +40,10 @@ public class FortsettBehandlingTask implements ProsessTaskHandler {
     }
 
     @Inject
-    public FortsettBehandlingTask(BehandlingRepositoryProvider repositoryProvider) {
+    public FortsettBehandlingTask(BehandlingRepositoryProvider repositoryProvider, KodeverkTabellRepository kodeverkTabellRepository) {
         behandlingRepository = repositoryProvider.getBehandlingRepository();
         aksjonspunktRepository = repositoryProvider.getAksjonspunktRepository();
-        kodeverkTabellRepository = repositoryProvider.getKodeverkRepository().getKodeverkTabellRepository();
+        this.kodeverkTabellRepository = kodeverkTabellRepository;
     }
 
     @Override

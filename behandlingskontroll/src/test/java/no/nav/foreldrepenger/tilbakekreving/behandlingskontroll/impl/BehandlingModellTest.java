@@ -421,8 +421,6 @@ public class BehandlingModellTest {
 
     @Before
     public void opprettStatiskModell() {
-        sql("INSERT INTO KODELISTE (id, kodeverk, kode, ekstra_data) values (seq_kodeliste.nextval, 'BEHANDLING_TYPE', 'BT-TEST2', '{behandlingstidFristUker: 3}')");
-
         sql("INSERT INTO BEHANDLING_STEG_TYPE (KODE, NAVN, BEHANDLING_STATUS_DEF, BESKRIVELSE) VALUES ('STEG-1', 'test-steg-1', 'UTRED', 'test')");
         sql("INSERT INTO BEHANDLING_STEG_TYPE (KODE, NAVN, BEHANDLING_STATUS_DEF, BESKRIVELSE) VALUES ('STEG-2', 'test-steg-2', 'UTRED', 'test')");
         sql("INSERT INTO BEHANDLING_STEG_TYPE (KODE, NAVN, BEHANDLING_STATUS_DEF, BESKRIVELSE) VALUES ('STEG-3', 'test-steg-3', 'UTRED', 'test')");

@@ -36,7 +36,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Internal
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.VurderingspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
@@ -79,11 +78,11 @@ public class BehandlingskontrollTjenesteTest {
         DummySteg steg5 = new DummySteg();
 
         List<TestStegKonfig> modellData = Arrays.asList(
-                new TestStegKonfig(STEG_1, behandlingType, steg1, ap(), ap()),
-                new TestStegKonfig(STEG_2, behandlingType, steg2, ap(a2_0), ap(a2_1)),
-                new TestStegKonfig(STEG_3, behandlingType, steg3, ap(a3_0), ap(a3_1)),
-                new TestStegKonfig(STEG_4, behandlingType, steg4, ap(a4_0), ap(a4_1)),
-                new TestStegKonfig(STEG_5, behandlingType, steg5, ap(a5_0), ap(a5_1))
+            new TestStegKonfig(STEG_1, behandlingType, steg1, ap(), ap()),
+            new TestStegKonfig(STEG_2, behandlingType, steg2, ap(a2_0), ap(a2_1)),
+            new TestStegKonfig(STEG_3, behandlingType, steg3, ap(a3_0), ap(a3_1)),
+            new TestStegKonfig(STEG_4, behandlingType, steg4, ap(a4_0), ap(a4_1)),
+            new TestStegKonfig(STEG_5, behandlingType, steg5, ap(a5_0), ap(a5_1))
         );
 
         BehandlingModellImpl modell = setupModell(behandlingType, modellData);
@@ -109,9 +108,6 @@ public class BehandlingskontrollTjenesteTest {
     private BehandlingskontrollEventPublisererForTest eventPubliserer = new BehandlingskontrollEventPublisererForTest();
 
     @Inject
-    private KodeverkRepository kodeverkRepository;
-
-    @Inject
     private InternalManipulerBehandling manipulerInternBehandling;
 
     @Inject
@@ -122,7 +118,7 @@ public class BehandlingskontrollTjenesteTest {
         opprettStatiskModell();
 
         ScenarioSimple scenario = ScenarioSimple.simple()
-                .medBehandlingType(BehandlingType.TILBAKEKREVING);
+            .medBehandlingType(BehandlingType.TILBAKEKREVING);
         behandling = scenario.lagre(repositoryProvider);
 
         manipulerInternBehandling.forceOppdaterBehandlingSteg(behandling, STEG_3);
@@ -148,9 +144,9 @@ public class BehandlingskontrollTjenesteTest {
         Assertions.assertThat(behandling.getBehandlingStegTilstandHistorikk()).hasSize(2);
 
         sjekkBehandlingStegTilstandHistorikk(behandling, STEG_3,
-                BehandlingStegStatus.TILBAKEFØRT);
+            BehandlingStegStatus.TILBAKEFØRT);
         sjekkBehandlingStegTilstandHistorikk(behandling, STEG_2,
-                BehandlingStegStatus.INNGANG);
+            BehandlingStegStatus.INNGANG);
 
     }
 
@@ -170,9 +166,9 @@ public class BehandlingskontrollTjenesteTest {
         Assertions.assertThat(behandling.getBehandlingStegTilstandHistorikk()).hasSize(2);
 
         sjekkBehandlingStegTilstandHistorikk(behandling, STEG_3,
-                BehandlingStegStatus.TILBAKEFØRT);
+            BehandlingStegStatus.TILBAKEFØRT);
         sjekkBehandlingStegTilstandHistorikk(behandling, STEG_2,
-                BehandlingStegStatus.UTGANG);
+            BehandlingStegStatus.UTGANG);
 
     }
 
@@ -190,9 +186,9 @@ public class BehandlingskontrollTjenesteTest {
         Assertions.assertThat(behandling.getBehandlingStegTilstandHistorikk()).hasSize(2);
 
         sjekkBehandlingStegTilstandHistorikk(behandling, STEG_3,
-                BehandlingStegStatus.TILBAKEFØRT);
+            BehandlingStegStatus.TILBAKEFØRT);
         sjekkBehandlingStegTilstandHistorikk(behandling, STEG_2,
-                BehandlingStegStatus.UTGANG);
+            BehandlingStegStatus.UTGANG);
 
     }
 
@@ -224,13 +220,13 @@ public class BehandlingskontrollTjenesteTest {
         Assertions.assertThat(behandling.getBehandlingStegTilstandHistorikk()).hasSize(2);
 
         sjekkBehandlingStegTilstandHistorikk(behandling, STEG_3,
-                BehandlingStegStatus.AVBRUTT);
+            BehandlingStegStatus.AVBRUTT);
 
         // NB: skipper STEP_4
         sjekkBehandlingStegTilstandHistorikk(behandling, STEG_4);
 
         sjekkBehandlingStegTilstandHistorikk(behandling, STEG_5,
-                BehandlingStegStatus.INNGANG);
+            BehandlingStegStatus.INNGANG);
 
     }
 
@@ -245,7 +241,7 @@ public class BehandlingskontrollTjenesteTest {
 
         // Arrange
         manipulerInternBehandling.forceOppdaterBehandlingSteg(behandling, STEG_4, BehandlingStegStatus.UTGANG,
-                BehandlingStegStatus.AVBRUTT);
+            BehandlingStegStatus.AVBRUTT);
 
         Assertions.assertThat(behandling.getAktivtBehandlingSteg()).isEqualTo(STEG_4);
         Assertions.assertThat(behandling.getBehandlingStegStatus()).isEqualTo(BehandlingStegStatus.UTGANG);
@@ -263,7 +259,7 @@ public class BehandlingskontrollTjenesteTest {
         Assertions.assertThat(behandling.getBehandlingStegTilstandHistorikk()).hasSize(3);
 
         sjekkBehandlingStegTilstandHistorikk(
-                behandling, STEG_4, BehandlingStegStatus.TILBAKEFØRT, BehandlingStegStatus.INNGANG);
+            behandling, STEG_4, BehandlingStegStatus.TILBAKEFØRT, BehandlingStegStatus.INNGANG);
 
         Assertions.assertThat(behandling.getBehandlingStegTilstand(STEG_4).get().getBehandlingStegStatus()).isEqualTo(BehandlingStegStatus.INNGANG);
 
@@ -275,7 +271,7 @@ public class BehandlingskontrollTjenesteTest {
         BehandlingModellRepository behandlingModellRepository = Mockito.mock(BehandlingModellRepository.class);
         Mockito.when(behandlingModellRepository.getModell(Mockito.any())).thenReturn(this.behandlingModellForTest.modell);
         this.kontrollTjeneste = new BehandlingskontrollTjeneste(repositoryProvider, behandlingModellRepository,
-                eventPubliserer) {
+            eventPubliserer) {
             @Override
             protected BehandlingStegUtfall doProsesserBehandling(BehandlingskontrollKontekst kontekst, BehandlingModell modell, BehandlingModellVisitor visitor) {
                 kontrollTjeneste.prosesserBehandling(kontekst);
@@ -307,10 +303,10 @@ public class BehandlingskontrollTjenesteTest {
     private void sjekkBehandlingStegTilstandHistorikk(Behandling behandling, BehandlingStegType stegType,
                                                       BehandlingStegStatus... stegStatuser) {
         Assertions.assertThat(
-                behandling.getBehandlingStegTilstandHistorikk()
-                        .filter(bst -> stegType == null || Objects.equals(bst.getBehandlingSteg(), stegType))
-                        .map(bst -> bst.getBehandlingStegStatus()))
-                .containsExactly(stegStatuser);
+            behandling.getBehandlingStegTilstandHistorikk()
+                .filter(bst -> stegType == null || Objects.equals(bst.getBehandlingSteg(), stegType))
+                .map(bst -> bst.getBehandlingStegStatus()))
+            .containsExactly(stegStatuser);
     }
 
     private static List<AksjonspunktDefinisjon> ap(AksjonspunktDefinisjon... aksjonspunktDefinisjoner) {
@@ -329,12 +325,12 @@ public class BehandlingskontrollTjenesteTest {
             modell.leggTil(modStegType, behandlingType);
 
             ModifiserbarBehandlingModell.ModifiserbarVurderingspunktDefinisjon modVurderingspunktInngang = ModifiserbarBehandlingModell.fra(modStegType,
-                    VurderingspunktDefinisjon.Type.INNGANG);
+                VurderingspunktDefinisjon.Type.INNGANG);
             modStegType.leggTilVurderingspunkt(modVurderingspunktInngang);
             modVurderingspunktInngang.leggTil(konfig.getInngangAksjonspunkter());
 
             ModifiserbarBehandlingModell.ModifiserbarVurderingspunktDefinisjon modVurderingspunktUtgang = ModifiserbarBehandlingModell.fra(modStegType,
-                    VurderingspunktDefinisjon.Type.UTGANG);
+                VurderingspunktDefinisjon.Type.UTGANG);
             modStegType.leggTilVurderingspunkt(modVurderingspunktUtgang);
             modVurderingspunktUtgang.leggTil(konfig.getUtgangAksjonspunkter());
 
@@ -350,14 +346,10 @@ public class BehandlingskontrollTjenesteTest {
         BehandlingModellRepository behandlingModellRepository = Mockito.mock(BehandlingModellRepository.class);
         Mockito.when(behandlingModellRepository.getModell(Mockito.any())).thenReturn(modell);
         Mockito.when(behandlingModellRepository.getBehandlingStegKonfigurasjon()).thenReturn(BehandlingStegKonfigurasjon.lagDummy());
-        Mockito.when(behandlingModellRepository.getKodeverkRepository()).thenReturn(kodeverkRepository);
-        this.kontrollTjeneste = new BehandlingskontrollTjeneste(repositoryProvider, behandlingModellRepository,
-                eventPubliserer);
+        this.kontrollTjeneste = new BehandlingskontrollTjeneste(repositoryProvider, behandlingModellRepository, eventPubliserer);
     }
 
     private void opprettStatiskModell() {
-        sql("INSERT INTO KODELISTE (id, kodeverk, kode, ekstra_data) values (seq_kodeliste.nextval, 'BEHANDLING_TYPE', 'BT-TEST', '{behandlingstidFristUker: 3}')");
-
         sql("INSERT INTO BEHANDLING_STEG_TYPE (KODE, NAVN, BEHANDLING_STATUS_DEF, BESKRIVELSE) VALUES ('STEG-1', 'test-steg-1', 'UTRED', 'test')");
         sql("INSERT INTO BEHANDLING_STEG_TYPE (KODE, NAVN, BEHANDLING_STATUS_DEF, BESKRIVELSE) VALUES ('STEG-2', 'test-steg-2', 'UTRED', 'test')");
         sql("INSERT INTO BEHANDLING_STEG_TYPE (KODE, NAVN, BEHANDLING_STATUS_DEF, BESKRIVELSE) VALUES ('STEG-3', 'test-steg-3', 'UTRED', 'test')");

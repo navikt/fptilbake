@@ -13,8 +13,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakLåsRe
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkRepositoryImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
@@ -29,7 +27,6 @@ public class BehandlingRepositoryProvider {
 
     private EntityManager entityManager;
     private FagsakRepository fagsakRepository;
-    private KodeverkRepositoryImpl kodeverkRepository;
     private AksjonspunktRepository aksjonspunktRepository;
     private BehandlingRepository behandlingRepository;
     private BehandlingresultatRepository behandlingresultatRepository;
@@ -57,7 +54,6 @@ public class BehandlingRepositoryProvider {
         Objects.requireNonNull(entityManager, "entityManager"); //$NON-NLS-1$
         this.entityManager = entityManager;
 
-        this.kodeverkRepository = new KodeverkRepositoryImpl(entityManager);
         this.behandlingRepository = new BehandlingRepository(entityManager);
         this.behandlingresultatRepository = new BehandlingresultatRepository(entityManager);
         this.fagsakRepository = new FagsakRepository(entityManager);
@@ -87,10 +83,6 @@ public class BehandlingRepositoryProvider {
 
     public BehandlingresultatRepository getBehandlingresultatRepository() {
         return behandlingresultatRepository;
-    }
-
-    public KodeverkRepository getKodeverkRepository() {
-        return kodeverkRepository;
     }
 
     public AksjonspunktRepository getAksjonspunktRepository() {

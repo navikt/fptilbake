@@ -45,7 +45,6 @@
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeAggregateEntitet"/>
 
     <!--###################-->
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodelisteRelasjon"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Poststed"/>
 
 </entity-mappings>
