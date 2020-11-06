@@ -123,11 +123,12 @@ public class PipRepository {
         if (aksjonspunktkoder.isEmpty()) {
             return Collections.emptySet();
         }
-        String sql = "select distinct def.AKSJONSPUNKT_TYPE where def.kode in (:aksjonspunktkoder)";
+        String sql = "select distinct def.AKSJONSPUNKT_TYPE from aksjonspunkt_def def where def.kode in (:aksjonspunktkoder)";
         Query query = entityManager.createNativeQuery(sql);
         query.setParameter("aksjonspunktkoder", aksjonspunktkoder);
         List<String> aksjonspunktTyper = query.getResultList();
         return aksjonspunktTyper.stream()
+            .map(AksjonspunktType::fraKode)
             .map(AKSJONSPUNKT_TYPE_TIL_ABAC_KODE::get)
             .collect(Collectors.toSet());
     }
