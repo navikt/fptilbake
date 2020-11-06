@@ -12,6 +12,7 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.DatasourceConfiguration;
@@ -19,6 +20,7 @@ import no.nav.vedtak.felles.lokal.dbstoette.ConnectionHandler;
 import no.nav.vedtak.felles.lokal.dbstoette.DBConnectionProperties;
 
 /** Tester at alle migreringer følger standarder for navn og god praksis. */
+@Ignore("Ignorert pga migreringsscript som utsettes til neste prodsetting")
 public class SjekkDbStrukturTest {
 
     private static final String HJELP = "\n\nDu har nylig lagt til en ny tabell eller kolonne som ikke er dokumentert ihht. gjeldende regler for dokumentasjon."
