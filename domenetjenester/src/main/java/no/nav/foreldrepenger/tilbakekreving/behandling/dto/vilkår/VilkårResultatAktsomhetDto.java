@@ -27,7 +27,7 @@ public class VilkårResultatAktsomhetDto {
 
     private boolean harGrunnerTilReduksjon;
 
-    @DecimalMin("0.01")
+    @DecimalMin("0.00")
     @DecimalMax("99.99")
     @Digits(integer = 3, fraction = 2)
     private BigDecimal andelTilbakekreves;
