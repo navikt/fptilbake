@@ -36,9 +36,9 @@ alter table historikkinnslag drop column KL_BRUKER_KJOENN;
 alter table historikkinnslag drop column KL_HISTORIKKINNSLAG_TYPE;
 
 --fjerner ikke fra HISTORIKKINNSLAG_FELT, da disse ser ut til å være i bruk
-comment on column HISTORIKKINNSLAG_FELT.KL_NAVN is 'Hvilket kodeverk som er brukt for NAVN';
-comment on column HISTORIKKINNSLAG_FELT.KL_FRA_VERDI is 'Hvilket kodeverk som er brukt for FRA_VERDI';
-comment on column HISTORIKKINNSLAG_FELT.KL_TIL_VERDI is 'Hvilket kodeverk som er brukt for TIL_VERDI';
+comment on column HISTORIKKINNSLAG_FELT.KL_NAVN is 'Hvilket kodeverk/enum som er brukt for NAVN';
+comment on column HISTORIKKINNSLAG_FELT.KL_FRA_VERDI is 'Hvilket kodeverk/enum som er brukt for FRA_VERDI';
+comment on column HISTORIKKINNSLAG_FELT.KL_TIL_VERDI is 'Hvilket kodeverk/enum som er brukt for TIL_VERDI';
 
 alter table krav_grunnlag_431 drop column KL_KRAV_STATUS_KODE;
 alter table krav_grunnlag_431 drop column KL_FAG_OMRAADE_KODE;
