@@ -38,11 +38,6 @@ public class DokumentasjonGeneratorPeriodeVilkår {
         VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER,
         VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER,
     };
-    private static Vurdering[] vurderinger = new Vurdering[] {
-        Aktsomhet.SIMPEL_UAKTSOM,
-        Aktsomhet.GROVT_UAKTSOM,
-        Aktsomhet.FORSETT
-    };
     private static ForeldelseVurderingType[] foreldelseVurderinger = new ForeldelseVurderingType[] {
         ForeldelseVurderingType.IKKE_VURDERT,
         ForeldelseVurderingType.IKKE_FORELDET,
@@ -92,7 +87,7 @@ public class DokumentasjonGeneratorPeriodeVilkår {
 
     private void lagVilkårstekster(FagsakYtelseType ytelsetype, Språkkode språkkode) {
         for (VilkårResultat resultat : vilkårResultat) {
-            for (Vurdering vurdering : vurderinger) {
+            for (Vurdering vurdering : Aktsomhet.values()) {
                 for (ForeldelseVurderingType foreldelseVurdering : foreldelseVurderinger) {
                     lagResultatOgVurderingTekster(ytelsetype, språkkode, resultat, vurdering, foreldelseVurdering, false, false, false);
                     lagResultatOgVurderingTekster(ytelsetype, språkkode, resultat, vurdering, foreldelseVurdering, true, false, false);
@@ -112,7 +107,7 @@ public class DokumentasjonGeneratorPeriodeVilkår {
             }
         }
 
-        lagResultatOgVurderingTekster(ytelsetype, språkkode, VilkårResultat.UDEFINERT, null, ForeldelseVurderingType.FORELDET, false, false, false);
+        lagResultatOgVurderingTekster(ytelsetype, språkkode, VilkårResultat.UDEFINERT, AnnenVurdering.FORELDET, ForeldelseVurderingType.FORELDET, false, false, false);
     }
 
     private void lagResultatOgVurderingTekster(FagsakYtelseType ytelsetype, Språkkode språkkode, VilkårResultat resultat, Vurdering vurdering, ForeldelseVurderingType foreldelsevurdering, boolean fritekst, boolean pengerIBehold, boolean lavtBeløp) {
