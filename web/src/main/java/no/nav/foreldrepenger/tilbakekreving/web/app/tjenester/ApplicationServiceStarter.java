@@ -14,7 +14,6 @@ import no.nav.foreldrepenger.tilbakekreving.kafka.poller.KafkaPollerManager;
 import no.nav.vedtak.apptjeneste.AppServiceHandler;
 import no.nav.vedtak.felles.integrasjon.jms.QueueConsumerManager;
 import no.nav.vedtak.felles.prosesstask.impl.TaskManager;
-import no.nav.vedtak.felles.prosesstask.impl.cron.BatchTaskScheduler;
 import no.nav.vedtak.util.env.Environment;
 
 @ApplicationScoped
@@ -27,7 +26,8 @@ public class ApplicationServiceStarter {
         DefaultExports.initialize();
 
         start(TaskManager.class);
-        start(BatchTaskScheduler.class);
+        //FIXME skru på BatchTaskScheduler i commit som tar i bruk nye batcher
+        //start(BatchTaskScheduler.class);
         start(KafkaPollerManager.class);
 
         if (Environment.current().isProd() || !"true".equalsIgnoreCase(Environment.current().getProperty("test.only.disable.mq"))) {
