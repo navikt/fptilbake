@@ -10,6 +10,7 @@ import javax.persistence.Converter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.TempAvledeKode;
 
 public enum MeldingType implements Kodeverdi {
 
@@ -33,10 +34,11 @@ public enum MeldingType implements Kodeverdi {
         this.kode = kode;
     }
 
-    public static MeldingType fraKode(@JsonProperty("kode") String kode) {
-        if (kode == null) {
+    public static MeldingType fraKode(@JsonProperty(value = "kode") Object node) {
+        if (node == null) {
             return null;
         }
+        String kode = TempAvledeKode.getVerdi(MeldingType.class, node, "kode");
         var ad = KODER.get(kode);
         if (ad == null) {
             throw new IllegalArgumentException("Ukjent MeldingType: " + kode);

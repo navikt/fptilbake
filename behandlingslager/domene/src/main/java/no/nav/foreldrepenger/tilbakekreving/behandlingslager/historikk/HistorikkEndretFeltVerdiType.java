@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.TempAvledeKode;
 
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
@@ -37,10 +38,11 @@ public enum HistorikkEndretFeltVerdiType implements Kodeverdi {
     }
 
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
-    public static HistorikkEndretFeltVerdiType fraKode(@JsonProperty("kode") String kode) {
-        if (kode == null) {
+    public static HistorikkEndretFeltVerdiType fraKode(@JsonProperty(value = "kode") Object node) {
+        if (node == null) {
             return null;
         }
+        String kode = TempAvledeKode.getVerdi(HistorikkEndretFeltVerdiType.class, node, "kode");
         var ad = KODER.get(kode);
         if (ad == null) {
             throw new IllegalArgumentException("Ukjent HistorikkEndretFeltVerdiType: " + kode);
