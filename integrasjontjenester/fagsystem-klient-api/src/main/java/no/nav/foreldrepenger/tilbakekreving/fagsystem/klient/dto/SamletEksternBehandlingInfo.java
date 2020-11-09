@@ -2,6 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.function.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -135,26 +136,20 @@ public class SamletEksternBehandlingInfo {
         }
 
         public SamletEksternBehandlingInfo build() {
-            //TODO når verifisert i prod, gjør om logging til å kaste exceptions
-            if (kladd.tilleggsinformasjonHentet.contains(Tillegsinformasjon.PERSONOPPLYSNINGER) && kladd.personopplysninger == null) {
-                logger.warn("Etterspurte PERSONOPPLYSNINGER, men fikk ikke dette fra fagsystemet");
-            }
-            if (kladd.tilleggsinformasjonHentet.contains(Tillegsinformasjon.TILBAKEKREVINGSVALG) && kladd.tilbakekrevingsvalg == null) {
-                logger.warn("Etterspurte TILBAKEKREVINGSVALG, men fikk ikke dette fra fagsystemet");
-            }
-            if (kladd.tilleggsinformasjonHentet.contains(Tillegsinformasjon.FAGSAK) && kladd.fagsak == null) {
-                logger.warn("Etterspurte FAGSAK, men fikk ikke dette fra fagsystemet");
-            }
-            if (kladd.tilleggsinformasjonHentet.contains(Tillegsinformasjon.SØKNAD) && kladd.søknad == null) {
-                logger.warn("Etterspurte SØKNAD, men fikk ikke dette fra fagsystemet");
-            }
-            if (kladd.tilleggsinformasjonHentet.contains(Tillegsinformasjon.VERGE) && kladd.verge == null) {
-                logger.warn("Etterspurte VERGE, men fikk ikke dette fra fagsystemet");
-            }
-            if (kladd.tilleggsinformasjonHentet.contains(Tillegsinformasjon.VARSELTEKST) && kladd.varseltekst == null) {
-                logger.warn("Etterspurte VARSELTEKST, men fikk ikke dette fra fagsystemet");
-            }
+            valider(Tillegsinformasjon.PERSONOPPLYSNINGER, SamletEksternBehandlingInfo::getPersonopplysninger);
+            valider(Tillegsinformasjon.TILBAKEKREVINGSVALG, SamletEksternBehandlingInfo::getTilbakekrevingsvalg);
+            valider(Tillegsinformasjon.FAGSAK, SamletEksternBehandlingInfo::getFagsak);
+            valider(Tillegsinformasjon.SØKNAD, SamletEksternBehandlingInfo::getSøknad);
+            valider(Tillegsinformasjon.VERGE, SamletEksternBehandlingInfo::getVerge);
+            valider(Tillegsinformasjon.VARSELTEKST, SamletEksternBehandlingInfo::getVarseltekst);
             return kladd;
+        }
+
+        private void valider(Tillegsinformasjon tillegsinformasjon, Function<SamletEksternBehandlingInfo, Object> opplysningsSupplier) {
+            if (kladd.tilleggsinformasjonHentet.contains(tillegsinformasjon) && opplysningsSupplier.apply(kladd) == null) {
+                //TODO når verifisert i prod, gjør om logging til å kaste exceptions
+                logger.info("Etterspurte {}, men fikk ikke dette fra fagsystemet", tillegsinformasjon);
+            }
         }
     }
 
