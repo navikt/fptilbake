@@ -17,6 +17,8 @@ import com.fasterxml.jackson.databind.node.TextNode;
  * <p>
  *
  * @deprecated endre grensesnitt til @JsonValue istdf @JsonProperty + @JsonCreator
+ * <p>
+ * Fjernes nå alle applikasjonene er over til å bruke jackson 2.11 (eller nyere) og bruker samme format for enums
  */
 @Deprecated(since = "2020-11-04")
 public class TempAvledeKode {
