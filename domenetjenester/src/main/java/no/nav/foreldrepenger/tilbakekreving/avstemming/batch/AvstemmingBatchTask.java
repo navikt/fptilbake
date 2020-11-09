@@ -63,7 +63,7 @@ public class AvstemmingBatchTask implements ProsessTaskHandler {
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
         String batchRun = BATCHNAVN + "-" + UUID.randomUUID();
-        LocalDate dato = LocalDate.parse(prosessTaskData.getPropertyValue("dato"));
+        LocalDate dato = LocalDate.now().minusDays(1);
         logger.info("Kjører avstemming for {} i batch {}", dato, batchRun);
 
         Optional<String> resultat = avstemmingTjeneste.oppsummer(dato);

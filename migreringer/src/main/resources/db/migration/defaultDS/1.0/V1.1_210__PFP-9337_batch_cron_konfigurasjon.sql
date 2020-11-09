@@ -9,3 +9,5 @@ INSERT INTO PROSESS_TASK_TYPE (KODE,NAVN,FEIL_MAKS_FORSOEK,BESKRIVELSE,CRON_EXPR
 
 INSERT INTO PROSESS_TASK_TYPE (KODE,NAVN,FEIL_MAKS_FORSOEK,BESKRIVELSE,CRON_EXPRESSION)
   VALUES ('batch.automatisk.saksbehandling','Automatisk Saksbehandling','3','Batch for å automatisk saksbehandle gamle saker med lavt beløp','0 30 7 ? * MON-FRI');
+
+DELETE FROM PROSESS_TASK WHERE TASK_TYPE='batch.scheduler' AND STATUS='KLAR';
