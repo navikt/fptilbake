@@ -3,7 +3,6 @@ package no.nav.foreldrepenger.tilbakekreving.avstemming.batch;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -16,23 +15,24 @@ import org.slf4j.LoggerFactory;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
 
-import no.nav.foreldrepenger.batch.BatchArguments;
-import no.nav.foreldrepenger.batch.BatchStatus;
-import no.nav.foreldrepenger.batch.BatchTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.avstemming.AvstemmingTjeneste;
 import no.nav.vedtak.feil.Feil;
 import no.nav.vedtak.feil.FeilFactory;
 import no.nav.vedtak.feil.LogLevel;
 import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
 import no.nav.vedtak.feil.deklarasjon.IntegrasjonFeil;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 import no.nav.vedtak.konfig.KonfigVerdi;
 import no.nav.vedtak.util.env.Environment;
 
 @ApplicationScoped
-public class AvstemmingBatchTjeneste implements BatchTjeneste {
+@ProsessTask(AvstemmingBatchTask.BATCHNAVN)
+public class AvstemmingBatchTask implements ProsessTaskHandler {
 
-    private Logger logger = LoggerFactory.getLogger(AvstemmingBatchTjeneste.class);
-    private static final String BATCHNAVN = "BFPT-001";
+    private Logger logger = LoggerFactory.getLogger(AvstemmingBatchTask.class);
+    public static final String BATCHNAVN = "batch.avstemming";
 
     private static final DateTimeFormatter DATO_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
     private static final DateTimeFormatter DATO_TIDSPUNKT_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmm");
@@ -45,14 +45,14 @@ public class AvstemmingBatchTjeneste implements BatchTjeneste {
 
     private String miljø;
 
-    AvstemmingBatchTjeneste() {
+    AvstemmingBatchTask() {
         //for CDI proxy
     }
 
     @Inject
-    public AvstemmingBatchTjeneste(@KonfigVerdi(value = "app.name") String applikasjon,
-                                   AvstemmingTjeneste avstemmingTjeneste,
-                                   AvstemmingSftpBatchTjeneste sftpBatchTjeneste) {
+    public AvstemmingBatchTask(@KonfigVerdi(value = "app.name") String applikasjon,
+                               AvstemmingTjeneste avstemmingTjeneste,
+                               AvstemmingSftpBatchTjeneste sftpBatchTjeneste) {
         this.applikasjon = applikasjon;
         this.avstemmingTjeneste = avstemmingTjeneste;
         this.sftpBatchTjeneste = sftpBatchTjeneste;
@@ -61,10 +61,9 @@ public class AvstemmingBatchTjeneste implements BatchTjeneste {
     }
 
     @Override
-    public String launch(BatchArguments arguments) {
+    public void doTask(ProsessTaskData prosessTaskData) {
         String batchRun = BATCHNAVN + "-" + UUID.randomUUID();
-        AvstemmingBatchArgumenter argumenter = (AvstemmingBatchArgumenter) arguments;
-        LocalDate dato = argumenter.getDato();
+        LocalDate dato = LocalDate.now().minusDays(1);
         logger.info("Kjører avstemming for {} i batch {}", dato, batchRun);
 
         Optional<String> resultat = avstemmingTjeneste.oppsummer(dato);
@@ -80,24 +79,6 @@ public class AvstemmingBatchTjeneste implements BatchTjeneste {
                 throw SftpFeilmelding.FEILFACTORY.overføringFeilet(filnavn, e).toException();
             }
         }
-
-        return batchRun;
-    }
-
-    @Override
-    public BatchStatus status(String batchInstanceNumber) {
-        // Antar her at alt har gått bra siden denne er en synkron jobb.
-        return BatchStatus.OK;
-    }
-
-    @Override
-    public String getBatchName() {
-        return BATCHNAVN;
-    }
-
-    @Override
-    public AvstemmingBatchArgumenter createArguments(Map<String, String> jobArguments) {
-        return new AvstemmingBatchArgumenter(jobArguments);
     }
 
     interface SftpFeilmelding extends DeklarerteFeil {
