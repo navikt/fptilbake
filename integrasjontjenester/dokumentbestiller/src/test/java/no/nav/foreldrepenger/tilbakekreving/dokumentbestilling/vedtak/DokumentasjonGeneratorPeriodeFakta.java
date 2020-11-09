@@ -41,7 +41,7 @@ import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
 
 @Ignore("Kjøres ved behov for å regenerere dokumentasjon")
-public class DokumentasjonGeneratorFakta {
+public class DokumentasjonGeneratorPeriodeFakta {
 
     private final Periode januar = Periode.of(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 1, 31));
 
