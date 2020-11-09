@@ -1,11 +1,11 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.startupinfo;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
 
-import org.assertj.core.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,9 +57,9 @@ public class AppStartupInfoLoggerTest {
     public void test() {
         logger.logAppStartupInfo();
 
-        Assertions.assertThat(logSniffer.contains("OPPSTARTSINFO start", Level.INFO)).isTrue();
-        Assertions.assertThat(logSniffer.contains("OPPSTARTSINFO slutt", Level.INFO)).isTrue();
-        Assertions.assertThat(logSniffer.contains("", Level.WARN)).isFalse();
-        Assertions.assertThat(logSniffer.contains("", Level.ERROR)).isFalse();
+        assertThat(logSniffer.contains("OPPSTARTSINFO start", Level.INFO)).isTrue();
+        assertThat(logSniffer.contains("OPPSTARTSINFO slutt", Level.INFO)).isTrue();
+        assertThat(logSniffer.contains("", Level.WARN)).isFalse();
+        assertThat(logSniffer.contains("", Level.ERROR)).isFalse();
     }
 }
