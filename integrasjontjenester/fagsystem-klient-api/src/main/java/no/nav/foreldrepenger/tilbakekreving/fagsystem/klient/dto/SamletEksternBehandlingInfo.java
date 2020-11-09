@@ -2,6 +2,10 @@ package no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.function.Function;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
@@ -9,6 +13,8 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.Tillegsinformasjon;
 import no.nav.vedtak.util.Objects;
 
 public class SamletEksternBehandlingInfo {
+
+    private static final Logger logger = LoggerFactory.getLogger(SamletEksternBehandlingInfo.class);
 
     private Collection<Tillegsinformasjon> tilleggsinformasjonHentet;
     private EksternBehandlingsinfoDto grunninformasjon;
@@ -53,7 +59,9 @@ public class SamletEksternBehandlingInfo {
     }
 
     public AktørId getAktørId() {
-        return new AktørId(getPersonopplysninger().getAktoerId());
+        PersonopplysningDto po = getPersonopplysninger();
+        String aktoerId = po.getAktoerId();
+        return new AktørId(aktoerId);
     }
 
     public SøknadType getSøknadType() {
@@ -128,7 +136,20 @@ public class SamletEksternBehandlingInfo {
         }
 
         public SamletEksternBehandlingInfo build() {
+            valider(Tillegsinformasjon.PERSONOPPLYSNINGER, SamletEksternBehandlingInfo::getPersonopplysninger);
+            valider(Tillegsinformasjon.TILBAKEKREVINGSVALG, SamletEksternBehandlingInfo::getTilbakekrevingsvalg);
+            valider(Tillegsinformasjon.FAGSAK, SamletEksternBehandlingInfo::getFagsak);
+            valider(Tillegsinformasjon.SØKNAD, SamletEksternBehandlingInfo::getSøknad);
+            valider(Tillegsinformasjon.VERGE, SamletEksternBehandlingInfo::getVerge);
+            valider(Tillegsinformasjon.VARSELTEKST, SamletEksternBehandlingInfo::getVarseltekst);
             return kladd;
+        }
+
+        private void valider(Tillegsinformasjon tillegsinformasjon, Function<SamletEksternBehandlingInfo, Object> opplysningsSupplier) {
+            if (kladd.tilleggsinformasjonHentet.contains(tillegsinformasjon) && opplysningsSupplier.apply(kladd) == null) {
+                //TODO når verifisert i prod, gjør om logging til å kaste exceptions
+                logger.info("Etterspurte {}, men fikk ikke dette fra fagsystemet", tillegsinformasjon);
+            }
         }
     }
 

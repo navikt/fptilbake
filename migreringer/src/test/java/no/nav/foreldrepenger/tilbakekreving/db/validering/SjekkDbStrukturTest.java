@@ -2,7 +2,6 @@ package no.nav.foreldrepenger.tilbakekreving.db.validering;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.FileNotFoundException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,30 +11,25 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.DatasourceConfiguration;
-import no.nav.vedtak.felles.lokal.dbstoette.ConnectionHandler;
-import no.nav.vedtak.felles.lokal.dbstoette.DBConnectionProperties;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.Databaseskjemainitialisering;
 
-/** Tester at alle migreringer følger standarder for navn og god praksis. */
-@Ignore("Ignorert pga migreringsscript som utsettes til neste prodsetting")
+/**
+ * Tester at alle migreringer følger standarder for navn og god praksis.
+ */
 public class SjekkDbStrukturTest {
 
     private static final String HJELP = "\n\nDu har nylig lagt til en ny tabell eller kolonne som ikke er dokumentert ihht. gjeldende regler for dokumentasjon."
         + "\nVennligst gå over sql scriptene og dokumenter tabellene på korrekt måte.";
 
     private static DataSource ds;
-
     private static String schema;
 
     @BeforeClass
-    public static void setup() throws FileNotFoundException {
-        List<DBConnectionProperties> connectionProperties = DatasourceConfiguration.UNIT_TEST.get();
-
-        DBConnectionProperties dbconp = DBConnectionProperties.finnDefault(connectionProperties).get();
-        ds = ConnectionHandler.opprettFra(dbconp);
+    public static void setup() {
+        var dbconp = Databaseskjemainitialisering.defaultProperties();
+        ds = Databaseskjemainitialisering.ds(dbconp);
         schema = dbconp.getSchema();
     }
 
@@ -44,8 +38,8 @@ public class SjekkDbStrukturTest {
         String sql = "SELECT table_name FROM all_tab_comments WHERE (comments IS NULL OR comments in ('', 'MISSING COLUMN COMMENT')) AND owner=sys_context('userenv', 'current_schema') AND table_name NOT LIKE 'schema_%' AND table_name not like '%_MOCK'";
         List<String> avvik = new ArrayList<>();
         try (Connection conn = ds.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql);
-                ResultSet rs = stmt.executeQuery()) {
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
                 avvik.add(rs.getString(1));
@@ -77,22 +71,14 @@ public class SjekkDbStrukturTest {
             + " ORDER BY t.table_name, t.column_name ";
 
         try (Connection conn = ds.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql);
-                ResultSet rs = stmt.executeQuery()) {
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
                 avvik.add("\n" + rs.getString(1));
             }
 
         }
-
-        String error = "Mangler dokumentasjon for " + avvik.size() + " kolonner. " + avvik + "\n " + HJELP;
-        println();
-        System.err.println(error);
-        int sz = avvik.size();
-        assertThat(sz).isLessThanOrEqualTo(17);
-
-//        assumeTrue(error, avvik.size() == 0); // Fjerne denne når denne ikke lenger ignorerer
 
         assertThat(avvik).withFailMessage("Mangler dokumentasjon for %s kolonner. %s\n %s", avvik.size(), avvik, HJELP).isEmpty();
     }
@@ -124,7 +110,7 @@ public class SjekkDbStrukturTest {
         List<String> avvik = new ArrayList<>();
         StringBuilder tekst = new StringBuilder();
         try (Connection conn = ds.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, schema);
 
@@ -139,9 +125,9 @@ public class SjekkDbStrukturTest {
 
         }
         int sz = avvik.size();
-        String manglerIndeks = "Kolonner som inngår i Foreign Keys skal ha indekser (ikke KL_ kolonner).\nMangler indekser for ";
+        String manglerIndeks = "Kolonner som inngår i Foreign Keys skal ha indeker (ikke KL_ kolonner).\nMangler indekser for ";
 
-        assertThat(avvik).withFailMessage(manglerIndeks + sz + " foreign keys\n" + tekst ).isEmpty();
+        assertThat(avvik).withFailMessage(manglerIndeks + sz + " foreign keys\n" + tekst).isEmpty();
 
     }
 
@@ -156,7 +142,7 @@ public class SjekkDbStrukturTest {
         List<String> avvik = new ArrayList<>();
         StringBuilder tekst = new StringBuilder();
         try (Connection conn = ds.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, schema);
 
@@ -186,7 +172,7 @@ public class SjekkDbStrukturTest {
         List<String> avvik = new ArrayList<>();
         StringBuilder tekst = new StringBuilder();
         try (Connection conn = ds.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, schema);
 
@@ -219,7 +205,7 @@ public class SjekkDbStrukturTest {
         List<String> avvik = new ArrayList<>();
         StringBuilder tekst = new StringBuilder();
         try (Connection conn = ds.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, schema);
 
@@ -267,14 +253,15 @@ public class SjekkDbStrukturTest {
         List<String> avvik = new ArrayList<>();
         StringBuilder tekst = new StringBuilder();
         try (Connection conn = ds.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, schema);
 
             try (ResultSet rs = stmt.executeQuery()) {
 
                 while (rs.next()) {
-                    String t = rs.getString(1) + ", " + rs.getString(2) + ", " + rs.getString(3) + ", " + rs.getString(4)+ ", " + rs.getString(5)+ ", " + rs.getString(6)+ ", " + rs.getString(7)+ ", " + rs.getString(8)+ ", " + rs.getString(9);
+                    String t = rs.getString(1) + ", " + rs.getString(2) + ", " + rs.getString(3) + ", " + rs.getString(4) + ", " + rs.getString(5)
+                        + ", " + rs.getString(6) + ", " + rs.getString(7) + ", " + rs.getString(8) + ", " + rs.getString(9);
                     avvik.add(t);
                     tekst.append(t).append("\n");
                 }
@@ -301,14 +288,14 @@ public class SjekkDbStrukturTest {
         List<String> avvik = new ArrayList<>();
         StringBuilder tekst = new StringBuilder();
         try (Connection conn = ds.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, schema);
 
             try (ResultSet rs = stmt.executeQuery()) {
 
                 while (rs.next()) {
-                    String t = rs.getString(1) + ", " + rs.getString(2) + ", " + rs.getString(3) + ", " + rs.getString(4)+ ", " + rs.getString(5);
+                    String t = rs.getString(1) + ", " + rs.getString(2) + ", " + rs.getString(3) + ", " + rs.getString(4) + ", " + rs.getString(5);
                     avvik.add(t);
                     tekst.append(t).append("\n");
                 }
@@ -331,7 +318,7 @@ public class SjekkDbStrukturTest {
         List<String> avvik = new ArrayList<>();
         StringBuilder tekst = new StringBuilder();
         try (Connection conn = ds.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, schema);
 
@@ -347,18 +334,32 @@ public class SjekkDbStrukturTest {
         }
 
         int sz = avvik.size();
-        println();
         String feilTekst = "Feil bruk av datatype, skal ikke ha FLOAT eller DOUBLE (bruk NUMBER for alle desimaltall, spesielt der penger representeres). Antall feil=";
-        System.err.println("\n\n" + feilTekst + sz + ".\n\nTabell, Index, Kolonne, data type\n" + tekst + "\n\n");
-
-        assertThat(sz).isLessThanOrEqualTo(17);
 
         assertThat(avvik).withFailMessage(feilTekst + +sz + "\n\nTabell, Kolonne, Datatype\n" + tekst).isEmpty();
 
     }
 
-    private void println() {
-        System.out.print("\n\n-------------------------------------------------------------------------------------------------------------------\n");
+    @Test
+    public void sjekk_at_status_verdiene_i_prosess_task_tabellen_er_også_i_pollingSQL() throws Exception {
+        String sql = "SELECT SEARCH_CONDITION\n" +
+            "FROM all_constraints\n" +
+            "WHERE table_name = 'PROSESS_TASK'\n" +
+            "AND constraint_name = 'CHK_PROSESS_TASK_STATUS'\n" +
+            "AND owner = sys_context('userenv','current_schema')";
+
+        List<String> statusVerdier = new ArrayList<>();
+        try (Connection conn = ds.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                statusVerdier.add(rs.getString(1));
+            }
+
+        }
+        String feilTekst = "Ved innføring av ny stause må sqlen i TaskManager_pollTask.sql må oppdateres ";
+        assertThat(statusVerdier).withFailMessage(feilTekst)
+            .containsExactly("status in ('KLAR', 'FEILET', 'VENTER_SVAR', 'SUSPENDERT', 'VETO', 'FERDIG', 'KJOERT')");
     }
 }
-

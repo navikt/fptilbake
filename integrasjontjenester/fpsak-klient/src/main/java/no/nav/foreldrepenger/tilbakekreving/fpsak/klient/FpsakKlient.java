@@ -167,7 +167,8 @@ public class FpsakKlient implements FagsystemKlient {
             .orElseThrow(() -> FpsakKlientFeil.FACTORY.fantIkkeYtelesbehandlingISimuleringsapplikasjonen(fpsakBehandlingId).toException());
     }
 
-    static class ListeAvFpsakBehandlingInfoDto extends ArrayList<FpsakBehandlingInfoDto>{}
+    static class ListeAvFpsakBehandlingInfoDto extends ArrayList<FpsakBehandlingInfoDto> {
+    }
 
     public List<FpsakBehandlingInfoDto> hentFpsakBehandlingForSaksnummer(String saksnummer) {
         URI endpoint = createUri(BEHANDLING_ALLE_EP, PARAM_NAME_SAKSNUMMER, saksnummer);
@@ -180,7 +181,11 @@ public class FpsakKlient implements FagsystemKlient {
 
     private PersonopplysningDto hentPersonopplysninger(BehandlingResourceLinkDto resourceLink) {
         URI endpoint = URI.create(baseUri() + resourceLink.getHref());
-        return get(endpoint, PersonopplysningDto.class).orElseThrow(() -> new IllegalArgumentException("Forventet å finne personopplysninger på lenken: " + endpoint));
+        PersonopplysningDto dto = get(endpoint, PersonopplysningDto.class).orElseThrow(() -> new IllegalArgumentException("Forventet å finne personopplysninger på lenken: " + endpoint));
+        if (dto == null) {
+            throw new IllegalArgumentException("Fikk null personopplysninger på lenken: " + endpoint);
+        }
+        return dto;
     }
 
     private Optional<VarseltekstDto> hentVarseltekst(BehandlingResourceLinkDto resourceLink) {

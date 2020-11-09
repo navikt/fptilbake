@@ -10,6 +10,7 @@ import javax.persistence.Converter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.TempAvledeKode;
 
 public enum NavOppfulgt implements Kodeverdi {
 
@@ -40,10 +41,11 @@ public enum NavOppfulgt implements Kodeverdi {
        this.kode = kode;
     }
 
-    public static NavOppfulgt fraKode(@JsonProperty("kode") String kode) {
-        if (kode == null) {
+    public static NavOppfulgt fraKode(@JsonProperty(value = "kode") Object node) {
+        if (node == null) {
             return null;
         }
+        String kode = TempAvledeKode.getVerdi(NavOppfulgt.class, node, "kode");
         var ad = KODER.get(kode);
         if (ad == null) {
             throw new IllegalArgumentException("Ukjent NavOppfulgt: " + kode);

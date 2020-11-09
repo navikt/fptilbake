@@ -20,10 +20,6 @@
             <artifactId>jul-to-slf4j</artifactId>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>no.nav.foreldrepenger.felles</groupId>
-            <artifactId>felles-testutilities</artifactId>
-        </dependency>
     </dependencies>
 
 </project>

@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
@@ -13,7 +14,6 @@ import java.util.UUID;
 
 import javax.persistence.FlushModeType;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -164,7 +164,7 @@ public class BehandlingTjenesteTest extends FellesTestOppsett {
         when(mockFagsystemKlient.hentBehandlingsinfo(any(UUID.class), any(Tillegsinformasjon.class))).thenReturn(samletEksternBehandlingInfo);
         when(mockTpsTjeneste.hentAktørForFnr(any(PersonIdent.class))).thenReturn(Optional.empty());
         UUID uuid = UUID.randomUUID();
-        var e= Assert.assertThrows(TekniskException.class, () -> behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer, uuid,
+        var e= assertThrows(TekniskException.class, () -> behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer, uuid,
             henvisning, aktørId, FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING));
         assertThat(e.getMessage()).contains("FPT-7428494");
     }
