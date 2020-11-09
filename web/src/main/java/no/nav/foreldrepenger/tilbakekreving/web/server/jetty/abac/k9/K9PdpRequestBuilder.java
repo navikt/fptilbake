@@ -64,7 +64,6 @@ public class K9PdpRequestBuilder implements PdpRequestBuilder {
 
     @Override
     public PdpRequest lagPdpRequest(AbacAttributtSamling attributter) {
-        logger.info("Bruker PdpRequestBuilder for K9");
         LOG_CONTEXT.remove("behandling");
         LOG_CONTEXT.remove("k9sakBehandlingUuid");
         LOG_CONTEXT.remove("behandlingUuid");
