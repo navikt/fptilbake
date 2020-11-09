@@ -168,7 +168,7 @@ public class BehandlingRestTjeneste {
             Behandling behandling = behandlingTjeneste.hentBehandling(behandlingId);
             return Redirect.tilBehandlingPollStatus(behandling.getUuid(), Optional.empty());
         } else if (BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandlingType)) {
-            validerAktivertFunksjonalitetForRevurdering(opprettBehandlingDto);
+//            validerAktivertFunksjonalitetForRevurdering(opprettBehandlingDto);
             Long tbkBehandlingId = opprettBehandlingDto.getBehandlingId();
             Behandling revurdering = revurderingTjeneste.opprettRevurdering(tbkBehandlingId, opprettBehandlingDto.getBehandlingArsakType());
             String gruppe = behandlingskontrollAsynkTjeneste.asynkProsesserBehandling(revurdering);
