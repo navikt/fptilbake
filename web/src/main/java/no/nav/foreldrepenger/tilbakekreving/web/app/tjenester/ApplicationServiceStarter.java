@@ -27,8 +27,7 @@ public class ApplicationServiceStarter {
         DefaultExports.initialize();
 
         start(TaskManager.class);
-        //FIXME skru på BatchTaskScheduler i commit som tar i bruk nye batcher
-        //start(BatchTaskScheduler.class);
+        start(BatchTaskScheduler.class);
         start(KafkaPollerManager.class);
 
         if (Environment.current().isProd() || !"true".equalsIgnoreCase(Environment.current().getProperty("test.only.disable.mq"))) {
