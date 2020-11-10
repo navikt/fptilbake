@@ -9,7 +9,6 @@ import org.junit.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType;
@@ -68,12 +67,6 @@ public class BehandlingRevurderingTjenesteTest extends FellesTestOppsett {
         Historikkinnslag historikkinnslag = historikkinnslager.get(0);
         assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.REVURD_OPPR);
         assertThat(historikkinnslag.getAktør()).isEqualByComparingTo(HistorikkAktør.SAKSBEHANDLER);
-    }
-
-    @Test
-    public void kan_revurdering_ikke_opprettes_når_behandling_er_henlagt() {
-        henleggBehandlingTjeneste.henleggBehandlingManuelt(behandling.getId(), BehandlingResultatType.HENLAGT_FEILOPPRETTET, "","");
-        assertThat(revurderingTjeneste.kanOppretteRevurdering(eksternBehandlingUuid)).isFalse();
     }
 
     @Test

@@ -1,6 +1,8 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -26,6 +28,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.InternalManipulerBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
@@ -110,6 +113,20 @@ public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
         expectedException.expectMessage("FPT-663491");
 
         henleggBehandlingTjeneste.henleggBehandlingManuelt(behandling.getId(), behandlingsresultat, "", "");
+    }
+
+    @Test
+    public void kan_ikke_henlegge_behandling_når_behandling_opprettes_nå(){
+        assertFalse(henleggBehandlingTjeneste.kanHenleggeBehandlingManuelt(behandling));
+    }
+
+    @Test
+    public void kan_henlegge_behandling_når_behandling_opprettes_før_bestemte_dager(){
+        Behandling behandling = mock(Behandling.class);
+        when(behandling.getOpprettetTidspunkt()).thenReturn(LocalDateTime.now().minusDays(8l));
+        when(behandling.getType()).thenReturn(BehandlingType.TILBAKEKREVING);
+        when(behandling.getStatus()).thenReturn(BehandlingStatus.UTREDES);
+        assertTrue(henleggBehandlingTjeneste.kanHenleggeBehandlingManuelt(behandling));
     }
 
     @Test

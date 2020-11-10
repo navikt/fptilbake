@@ -513,7 +513,7 @@ public class BehandlingRestTjeneste {
                 .medTilGodkjenning(false)
                 .medFraBeslutter(!b.isBehandlingPåVent() && totrinnRetur)
                 .medKanBytteEnhet(true)
-                .medKanHenlegges(henleggBehandlingTjeneste.kanHenleggeBehandlingManuelt(b.getId(), b.getType()))
+                .medKanHenlegges(henleggBehandlingTjeneste.kanHenleggeBehandlingManuelt(b))
                 .medKanSettesPaVent(!b.isBehandlingPåVent())
                 .medKanGjenopptas(b.isBehandlingPåVent())
                 .medKanOpnesForEndringer(false)
