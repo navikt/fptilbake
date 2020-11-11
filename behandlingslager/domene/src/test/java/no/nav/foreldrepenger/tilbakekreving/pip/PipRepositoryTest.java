@@ -2,14 +2,13 @@ package no.nav.foreldrepenger.tilbakekreving.pip;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
-import com.google.common.collect.Sets;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
@@ -27,7 +26,7 @@ public class PipRepositoryTest {
     @Rule
     public UnittestRepositoryRule repositoryRule = new UnittestRepositoryRule();
 
-    private static final String SAKSBEHANDLER="Z12345";
+    private static final String SAKSBEHANDLER = "Z12345";
 
     private PipRepository pipRepository = new PipRepository(repositoryRule.getEntityManager());
 
@@ -36,13 +35,13 @@ public class PipRepositoryTest {
     private Behandling behandling;
 
     @Before
-    public void setup(){
+    public void setup() {
         Fagsak fagsak = TestFagsakUtil.opprettFagsak();
         repositoryProvider.getFagsakRepository().lagre(fagsak);
         behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).build();
         behandling.setAnsvarligSaksbehandler(SAKSBEHANDLER);
         BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(behandling);
-        behandlingRepository.lagre(behandling,behandlingLås);
+        behandlingRepository.lagre(behandling, behandlingLås);
     }
 
     @Test
@@ -73,16 +72,16 @@ public class PipRepositoryTest {
     }
 
     @Test
-    public void skal_hentAksjonspunkttypeForAksjonspunktkoder_medGyldigAkskonspunktKode(){
-        Set<String> aksjonspunktTyper = pipRepository.hentAksjonspunkttypeForAksjonspunktkoder(Sets.newHashSet("5001","7001"));
+    public void skal_hentAksjonspunkttypeForAksjonspunktkoder_medGyldigAkskonspunktKode() {
+        Set<String> aksjonspunktTyper = pipRepository.hentAksjonspunkttypeForAksjonspunktkoder(Set.of("5001", "7001"));
         assertThat(aksjonspunktTyper).isNotEmpty();
         assertThat(aksjonspunktTyper).contains("Manuell");
         assertThat(aksjonspunktTyper).contains("Auto");
     }
 
     @Test
-    public void skal_hentAksjonspunkttypeForAksjonspunktkoder_medTomAkskonspunktKode(){
-        Set<String> aksjonspunktTyper = pipRepository.hentAksjonspunkttypeForAksjonspunktkoder(Sets.newHashSet());
+    public void skal_hentAksjonspunkttypeForAksjonspunktkoder_medTomAkskonspunktKode() {
+        Set<String> aksjonspunktTyper = pipRepository.hentAksjonspunkttypeForAksjonspunktkoder(Collections.emptySet());
         assertThat(aksjonspunktTyper).isEmpty();
     }
 }

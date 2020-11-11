@@ -1,11 +1,9 @@
 package no.nav.foreldrepenger.tilbakekreving.avstemming.batch;
 
-import java.io.IOException;
+import java.util.Base64;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-
-import org.jboss.resteasy.util.Base64;
 
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
@@ -30,7 +28,7 @@ class AvstemmingSftpBatchTjeneste extends SftpTjeneste {
                                        @KonfigVerdi(value = "AVSTEMMING_SFTP_KEY_PRIVATE") String privateKey,
                                        @KonfigVerdi(value = "AVSTEMMING_SFTP_KEY_PUBLIC") String publicKey,
                                        @KonfigVerdi(value = "AVSTEMMING_SFTP_KEY_PASSPHRASE", required = false) String passphrase,
-                                       @KonfigVerdi(value = "AVSTEMMING_SFTP_DIRECTORY", defaultVerdi = "inbound") String directory) throws Exception {
+                                       @KonfigVerdi(value = "AVSTEMMING_SFTP_DIRECTORY", defaultVerdi = "inbound") String directory) {
         SftpKonfig.Builder builder = SftpKonfig.builder(username, host)
             .medPort(port)
             .medDirectory(directory)
@@ -42,8 +40,8 @@ class AvstemmingSftpBatchTjeneste extends SftpTjeneste {
         put(filinnhold, filnavn, this.sftpKonfig);
     }
 
-    private String base64Decode(String encoded) throws IOException {
-        byte[] decoded = Base64.decode(encoded);
+    private String base64Decode(String encoded) {
+        byte[] decoded = Base64.getDecoder().decode(encoded);
         return new String(decoded);
     }
 }

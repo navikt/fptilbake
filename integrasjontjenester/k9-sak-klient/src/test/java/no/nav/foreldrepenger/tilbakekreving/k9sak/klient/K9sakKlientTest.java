@@ -6,6 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -15,8 +16,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.rules.ExpectedException;
-
-import com.google.common.collect.Lists;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.tilbakekrevingsvalg.VidereBehandling;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
@@ -151,6 +150,6 @@ public class K9sakKlientTest {
         BehandlingResourceLinkDto varselTekstRessursLink = new BehandlingResourceLinkDto();
         varselTekstRessursLink.setHref("/k9/sak/api/behandling/tilbakekreving/varseltekst?behandlingUuid=" + BEHANDLING_UUID.toString());
         varselTekstRessursLink.setRel("tilbakekrevingsvarsel-fritekst");
-        return Lists.newArrayList(personOpplysningerRessursLink, tilbakekrevingvalgRessursLink, varselTekstRessursLink);
+        return Arrays.asList(personOpplysningerRessursLink, tilbakekrevingvalgRessursLink, varselTekstRessursLink);
     }
 }
