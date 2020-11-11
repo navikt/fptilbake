@@ -77,7 +77,7 @@ public class HenleggBehandlingTjeneste {
     public void henleggBehandlingManuelt(long behandlingId, BehandlingResultatType årsakKode, String begrunnelse, String fritekst) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         if (BehandlingType.TILBAKEKREVING.equals(behandling.getType()) &&
-            (grunnlagRepository.harGrunnlagForBehandlingId(behandling.getId()) ||
+            (grunnlagRepository.harGrunnlagForBehandlingId(behandling.getId()) &&
             !erBehandlingOpprettetAutomatiskFørBestemteDager(behandling))) {
             throw BehandlingFeil.FACTORY.kanIkkeHenleggeBehandling(behandlingId).toException();
         }
