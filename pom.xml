@@ -50,17 +50,12 @@
         <hamcrest.version>1.3</hamcrest.version>
         <junit.version>5.7.0</junit.version>
         <logstash.version>6.4</logstash.version>
-
-        <!-- Transitive avh. versjoner for å sikre unikhet (enforcer dependencyConvergence).
-            Skal ikke benyttes direkte av vår egen kode. -->
-        <apache.ws.xmlschema.version>2.2.5</apache.ws.xmlschema.version>
-        <javaslang.version>2.0.6</javaslang.version>
-
-        <owaspencoder.version>1.2.3</owaspencoder.version>
-
+        <resteasy.version>4.5.8.Final</resteasy.version>
         <ojdbc.version>19.3.0.0</ojdbc.version>
         <abac-attribute-constants.version>3.3.13</abac-attribute-constants.version>
-
+        <owaspencoder.version>1.2.3</owaspencoder.version>
+        <apache.ws.xmlschema.version>2.2.5</apache.ws.xmlschema.version>
+        <javaslang.version>2.0.6</javaslang.version>
     </properties>
     <dependencies>
 
