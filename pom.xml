@@ -381,21 +381,6 @@
                 <artifactId>resteasy-core</artifactId>
                 <version>${resteasy.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.jboss.resteasy</groupId>
-                <artifactId>resteasy-jaxrs</artifactId>
-                <version>${resteasy.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.resteasy</groupId>
-                <artifactId>resteasy-validator-provider</artifactId>
-                <version>${resteasy.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.resteasy</groupId>
-                <artifactId>resteasy-cdi</artifactId>
-                <version>${resteasy.version}</version>
-            </dependency>
 
             <dependency>
                 <groupId>com.fasterxml.woodstox</groupId>
@@ -871,13 +856,6 @@
                                         <dependency>org.apache.cxf:*</dependency>
                                     </dependencies>
                                 </requireSameVersions>
-                                <requireSameVersions>
-                                    <dependencies>
-                                        <!-- sørger for at resteasy er på samme versjon for alle avhengigheter  -->
-                                        <dependency>org.jboss.resteasy:*</dependency>
-                                    </dependencies>
-                                </requireSameVersions>
-
                             </rules>
                         </configuration>
                     </execution>
