@@ -437,7 +437,12 @@
                 <artifactId>checker-qual</artifactId>
                 <version>3.7.1</version>
             </dependency>
-
+            <dependency>
+                <!-- velger en transitiv avhengighet -->
+                <groupId>org.jboss.spec.javax.xml.bind</groupId>
+                <artifactId>jboss-jaxb-api_2.3_spec</artifactId>
+                <version>2.0.0.Final</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.apache.santuario</groupId>
