@@ -56,7 +56,7 @@ public final class Redirect {
     private static URI honorXForwardedProto(URI location) {
         URI newLocation = null;
         if (relativLocationAndRequestAvailable(location)) {
-            HttpRequest httpRequest = ResteasyProviderFactory.getContextData(HttpRequest.class);
+            HttpRequest httpRequest = ResteasyProviderFactory.getInstance().getContextData(HttpRequest.class);
             String xForwardedProto = getXForwardedProtoHeader(httpRequest);
 
             if (mismatchedScheme(xForwardedProto, httpRequest)) {
@@ -78,8 +78,8 @@ public final class Redirect {
 
     private static boolean relativLocationAndRequestAvailable(URI location) {
         return location != null &&
-                !location.isAbsolute() &&
-                ResteasyProviderFactory.getContextData(HttpRequest.class) != null;
+            !location.isAbsolute() &&
+            ResteasyProviderFactory.getInstance().getContextData(HttpRequest.class) != null;
     }
 
     /**
@@ -95,12 +95,12 @@ public final class Redirect {
 
     private static boolean mismatchedScheme(String xForwardedProto, HttpRequest httpRequest) {
         return xForwardedProto != null &&
-                !xForwardedProto.equalsIgnoreCase(httpRequest.getUri().getBaseUri().getScheme());
+            !xForwardedProto.equalsIgnoreCase(httpRequest.getUri().getBaseUri().getScheme());
     }
 
     private static URI leggTilBaseUri(URI resultatUri) {
         // tvinger resultatUri til å være en absolutt URI (passer med Location Header og Location felt når kommer i payload)
-    	Response response = Response.noContent().location(resultatUri).build();
-		return response.getLocation();
+        Response response = Response.noContent().location(resultatUri).build();
+        return response.getLocation();
     }
 }
