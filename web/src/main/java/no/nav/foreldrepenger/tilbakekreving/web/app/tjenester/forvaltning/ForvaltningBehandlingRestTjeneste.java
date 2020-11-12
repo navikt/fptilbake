@@ -4,6 +4,7 @@ import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.CREAT
 import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.READ;
 
 import java.util.Collection;
+import java.util.UUID;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -37,6 +38,9 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagValidator;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.TilbakekrevingsvedtakMarshaller;
 import no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste.TilbakekrevingsvedtakTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.dto.HentKorrigertKravgrunnlagDto;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.dto.KobleBehandlingTilGrunnlagDto;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.dto.KorrigertHenvisningDto;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.MeldingType;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
@@ -154,6 +158,25 @@ public class ForvaltningBehandlingRestTjeneste {
             logger.info(message, e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(message + e.getMessage()).build();
         }
+    }
+
+    @POST
+    @Path("/korriger-henvisning")
+    @Operation(
+        tags = "FORVALTNING-behandling",
+        description = "Tjeneste for å korrigere henvisningen til en behandling",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "400", description = "Ulike problemer med request, typisk at man peker på feil eksternBehandlingUuid eller behandling!"),
+            @ApiResponse(responseCode = "500", description = "Ukjent feil!")
+        })
+    @BeskyttetRessurs(action = CREATE, property = AbacProperty.DRIFT)
+    public Response korrigerHenvisning(@Valid @NotNull KorrigertHenvisningDto korrigertHenvisningDto) {
+        Behandling behandling = behandlingRepository.hentBehandling(korrigertHenvisningDto.getBehandlingId());
+        UUID eksternBehandlingUuid = korrigertHenvisningDto.getEksternBehandlingUuid();
+        logger.info("Korrigerer henvisning. Oppretter task for å korrigere henvisning={} behandlingId={}", eksternBehandlingUuid, behandling.getId());
+        opprettKorrigertHenvisningTask(behandling, eksternBehandlingUuid);
+        return Response.ok().build();
     }
 
     @POST
@@ -280,6 +303,13 @@ public class ForvaltningBehandlingRestTjeneste {
         ProsessTaskData prosessTaskData = new ProsessTaskData(HentKorrigertKravgrunnlagTask.TASKTYPE);
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         prosessTaskData.setProperty("KRAVGRUNNLAG_ID", kravgrunnlagId);
+        prosessTaskRepository.lagre(prosessTaskData);
+    }
+
+    private void opprettKorrigertHenvisningTask(Behandling behandling, UUID eksternBehandlingUuid) {
+        ProsessTaskData prosessTaskData = new ProsessTaskData(KorrigertHenvisningTask.TASKTYPE);
+        prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
+        prosessTaskData.setProperty("eksternUuid", eksternBehandlingUuid.toString());
         prosessTaskRepository.lagre(prosessTaskData);
     }
 

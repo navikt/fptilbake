@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning;
+package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.dto;
 
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.Max;
