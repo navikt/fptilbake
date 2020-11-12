@@ -30,7 +30,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingresultatRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.VergeRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.BehandlingÅrsakDto;
@@ -49,6 +48,7 @@ public class BehandlingDtoTjeneste {
     private static final String DATO_PATTERN = "yyyy-MM-dd";
     private static final String FORELDELSE = "perioderForeldelse";
     private static final String AKSJONSPUNKT_API = "/api/behandling/aksjonspunkt";
+    private static final long OPPRETTELSE_DAGER_BEGRENSNING = 6L;
 
     private BehandlingTjeneste behandlingTjeneste;
 
@@ -57,7 +57,6 @@ public class BehandlingDtoTjeneste {
     private VilkårsvurderingRepository vilkårsvurderingRepository;
     private KravgrunnlagRepository grunnlagRepository;
     private VergeRepository vergeRepository;
-    private BehandlingVedtakRepository behandlingVedtakRepository;
     private BehandlingresultatRepository behandlingresultatRepository;
 
     private BehandlingModellRepository behandlingModellRepository;
@@ -81,7 +80,6 @@ public class BehandlingDtoTjeneste {
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.vergeRepository = repositoryProvider.getVergeRepository();
         this.behandlingresultatRepository = repositoryProvider.getBehandlingresultatRepository();
-        this.behandlingVedtakRepository = repositoryProvider.getBehandlingVedtakRepository();
         this.behandlingModellRepository = behandlingModellRepository;
 
         switch (applikasjon) {
@@ -210,7 +208,12 @@ public class BehandlingDtoTjeneste {
 
     private boolean kanHenleggeBehandling(Behandling behandling) {
         return !behandling.erAvsluttet() && (BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandling.getType()) ||
-            !grunnlagRepository.harGrunnlagForBehandlingId(behandling.getId()));
+            (erBehandlingOpprettetAutomatiskFørBestemteDager(behandling) && !grunnlagRepository.harGrunnlagForBehandlingId(behandling.getId())));
+    }
+
+    private boolean erBehandlingOpprettetAutomatiskFørBestemteDager(Behandling behandling) {
+        return !behandling.isManueltOpprettet() && behandling.getOpprettetTidspunkt().isBefore(
+            LocalDate.now().atStartOfDay().minusDays(OPPRETTELSE_DAGER_BEGRENSNING));
     }
 
     private void leggTilLenkerForBehandlingsoperasjoner(BehandlingDto dto) {
