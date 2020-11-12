@@ -37,7 +37,7 @@ public class HenleggBehandlingTjeneste {
 
     private static final String HENLEGGELSESBREV_TASK_TYPE = "brev.sendhenleggelse";
     private static final String SELVBETJENING_HENLAGT_TASKTYPE = "send.beskjed.tilbakekreving.henlagt.selvbetjening";
-    private static final long OPPRETTELSE_DAGER_BEGRENSNING = 7L;
+    private static final long OPPRETTELSE_DAGER_BEGRENSNING = 6L;
 
     HenleggBehandlingTjeneste() {
         // CDI

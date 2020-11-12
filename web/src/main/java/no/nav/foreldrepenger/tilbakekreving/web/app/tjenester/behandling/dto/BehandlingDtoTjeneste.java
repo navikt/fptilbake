@@ -48,7 +48,7 @@ public class BehandlingDtoTjeneste {
     private static final String DATO_PATTERN = "yyyy-MM-dd";
     private static final String FORELDELSE = "perioderForeldelse";
     private static final String AKSJONSPUNKT_API = "/api/behandling/aksjonspunkt";
-    private static final long OPPRETTELSE_DAGER_BEGRENSNING = 7L;
+    private static final long OPPRETTELSE_DAGER_BEGRENSNING = 6L;
 
     private BehandlingTjeneste behandlingTjeneste;
 
