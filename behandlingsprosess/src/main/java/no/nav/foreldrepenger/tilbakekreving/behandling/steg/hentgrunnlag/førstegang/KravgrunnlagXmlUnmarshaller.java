@@ -16,7 +16,7 @@ import no.nav.vedtak.felles.integrasjon.felles.ws.JaxbHelper;
 
 public class KravgrunnlagXmlUnmarshaller {
 
-    private static final String XSD_PLASSERING = "xsd/no/nav/melding/virksomhet/tilbakekreving/kravgrunnlag_detalj.xsd";
+    private static final String XSD_PLASSERING = "xsd/kravgrunnlag_detalj.xsd";
 
     public static DetaljertKravgrunnlag unmarshall(Long mottattXmlId, String xml) {
 

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="urn:no:nav:tilbakekreving:kravgrunnlag:hentliste:v1"
+            xmlns="urn:no:nav:tilbakekreving:kravgrunnlag:hentliste:v1"
+            xmlns:typer="urn:no:nav:tilbakekreving:typer:v1"
+            attributeFormDefault="qualified"
+            elementFormDefault="qualified">
+
+    <xsd:import namespace="urn:no:nav:tilbakekreving:typer:v1" schemaLocation="typer/typer.xsd"/>
+
+    <xsd:element name="hentKravgrunnlagListeRequest">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="hentKravgrunnlagListe" type="HentKravgrunnlagListe"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:complexType name="HentKravgrunnlagListe">
+        <xsd:annotation>
+            <xsd:documentation>420 - Hent kravgrunnlag</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="kodeAksjon" type="typer:KodeAksjon"/>
+            <xsd:element name="gjelderId" type="typer:FnrOrgnr" minOccurs="0"/>
+            <xsd:element name="typeGjelder" type="typer:TypeGjelder" minOccurs="0"/>
+            <xsd:element name="utbetalesTilId" type="typer:FnrOrgnr" minOccurs="0"/>
+            <xsd:element name="typeUtbet" type="typer:TypeGjelder" minOccurs="0"/>
+            <xsd:element name="enhetAnsvarlig" type="xsd:string"/>
+            <xsd:element name="kodeFaggruppe" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="kodeFagomraade" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="fagsystemId" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="kravgrunnlagId" type="xsd:integer" minOccurs="0"/>
+            <xsd:element name="saksbehId" type="typer:Saksbehandler"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+</xsd:schema>

@@ -58,12 +58,6 @@
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
             <artifactId>kravgrunnlag-queue</artifactId>
         </dependency>
-        <dependency>
-            <groupId>no.nav.meldinger.virksomhet</groupId>
-            <artifactId>nav-virksomhet-tilbakekreving-v1-meldingsdefinisjon</artifactId>
-            <classifier>jaxb</classifier>
-        </dependency>
-
 
         <!-- Test avhengigheter -->
         <dependency>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="urn:no:nav:tilbakekreving:kravgrunnlag:annuller_retur:v1"
+            xmlns="urn:no:nav:tilbakekreving:kravgrunnlag:annuller_retur:v1"
+            xmlns:anl="urn:no:nav:tilbakekreving:kravgrunnlag:annuller:v1"
+            xmlns:typer="urn:no:nav:tilbakekreving:typer:v1"
+            attributeFormDefault="qualified"
+            elementFormDefault="qualified">
+
+    <xsd:import namespace="urn:no:nav:tilbakekreving:typer:v1" schemaLocation="typer/typer.xsd"/>
+    <xsd:import namespace="urn:no:nav:tilbakekreving:kravgrunnlag:annuller:v1" schemaLocation="kravgrunnlag_annuller.xsd"/>
+
+    <xsd:element name="annullerKravgrunnlagResponse">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="mmel" type="typer:Mmel"/>
+                <xsd:element name="annullerKravgrunnlag" type="anl:AnnullerKravgrunnlag"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+
+</xsd:schema>
