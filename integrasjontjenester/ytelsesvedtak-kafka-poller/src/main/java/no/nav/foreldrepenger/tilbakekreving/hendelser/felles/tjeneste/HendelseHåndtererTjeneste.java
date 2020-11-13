@@ -45,7 +45,8 @@ public class HendelseHåndtererTjeneste {
                 logger.info("Hendelse={} er relevant for tilbakekreving opprett for henvisning={}", tbkData.getVidereBehandling(), henvisning);
                 lagOpprettBehandlingTask(hendelseTaskDataWrapper);
             } else if (erRelevantHendelseForOppdatereTilbakekreving(tbkData)) {
-                logger.info("Mottok hendelse={}. Det vil unngås for henvisning={}", tbkData.getVidereBehandling(), henvisning);
+                logger.info("Hendelse={} for henvisning={} var tidligere relevant for å oppdatere behandling. Nå ignoreres den",
+                    tbkData.getVidereBehandling(), henvisning);
             }
         }
     }
