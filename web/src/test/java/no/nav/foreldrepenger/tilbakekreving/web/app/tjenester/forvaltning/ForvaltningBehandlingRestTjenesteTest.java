@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import javax.ws.rs.core.Response;
 
@@ -34,6 +35,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodev
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType;
 import no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste.TilbakekrevingsvedtakTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.dto.HentKorrigertKravgrunnlagDto;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.dto.KobleBehandlingTilGrunnlagDto;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.dto.KorrigertHenvisningDto;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiSendtXmlRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -187,7 +191,18 @@ public class ForvaltningBehandlingRestTjenesteTest {
         assertThat(respons.getStatus()).isEqualTo(Response.Status.BAD_REQUEST.getStatusCode());
     }
 
+    @Test
+    public void skal_opprette_prosess_tasken_når_henvisning_korrigeres(){
+        Behandling behandling = lagBehandling();
+        UUID eksternUuid = UUID.randomUUID();
+        KorrigertHenvisningDto korrigertHenvisningDto = new KorrigertHenvisningDto(behandling.getId(), eksternUuid);
 
+        Response respons = forvaltningBehandlingRestTjeneste.korrigerHenvisning(korrigertHenvisningDto);
+        assertThat(respons.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
+        ProsessTaskData korrigertHenvisningProsessTask = assertProsessTask(KorrigertHenvisningTask.TASKTYPE);
+        assertThat(korrigertHenvisningProsessTask.getBehandlingId()).isEqualTo(String.valueOf(behandling.getId()));
+        assertThat(korrigertHenvisningProsessTask.getPropertyValue("eksternUuid")).isEqualTo(eksternUuid.toString());
+    }
 
     private Behandling lagBehandling() {
         Fagsak fagsak = TestFagsakUtil.opprettFagsak();
@@ -250,10 +265,12 @@ public class ForvaltningBehandlingRestTjenesteTest {
             "</urn:detaljertKravgrunnlagMelding>\n";
     }
 
-    private void assertProsessTask(String tasktype) {
+    private ProsessTaskData assertProsessTask(String tasktype) {
         List<ProsessTaskData> prosessTasker = prosessTaskRepository.finnAlle(ProsessTaskStatus.FERDIG, ProsessTaskStatus.KLAR);
         assertThat(prosessTasker).isNotEmpty();
         assertThat(prosessTasker.size()).isEqualTo(1);
+        ProsessTaskData prosessTaskData = prosessTasker.get(0);
         assertThat(prosessTasker.get(0).getTaskType()).isEqualTo(tasktype);
+        return prosessTaskData;
     }
 }
