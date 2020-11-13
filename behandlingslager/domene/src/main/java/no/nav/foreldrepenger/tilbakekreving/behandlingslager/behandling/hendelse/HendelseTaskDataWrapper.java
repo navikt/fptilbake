@@ -6,7 +6,6 @@ import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.h
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.hendelse.TaskProperties.EKSTERN_BEHANDLING_UUID;
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.hendelse.TaskProperties.FAGSAK_YTELSE_TYPE;
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.hendelse.TaskProperties.HENVISNING;
-import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.hendelse.TaskProperties.OPPDATER_BEHANDLING_TASK_TYPE;
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.hendelse.TaskProperties.OPPRETT_BEHANDLING_TASK_TYPE;
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.hendelse.TaskProperties.SAKSNUMMER;
 
@@ -105,12 +104,6 @@ public class HendelseTaskDataWrapper {
 
     public static HendelseTaskDataWrapper lagWrapperForOpprettBehandling(String behandlingUuid, Henvisning henvisning, AktørId aktørId, Saksnummer saksnummer) {
         ProsessTaskData td = lagProsessTaskDataMedFellesProperty(OPPRETT_BEHANDLING_TASK_TYPE, aktørId, henvisning,
-            behandlingUuid, saksnummer);
-        return new HendelseTaskDataWrapper(td);
-    }
-
-    public static HendelseTaskDataWrapper lagWrapperForOppdaterBehandling(String behandlingUuid, Henvisning henvisning, AktørId aktørId, Saksnummer saksnummer) {
-        ProsessTaskData td = lagProsessTaskDataMedFellesProperty(OPPDATER_BEHANDLING_TASK_TYPE, aktørId, henvisning,
             behandlingUuid, saksnummer);
         return new HendelseTaskDataWrapper(td);
     }

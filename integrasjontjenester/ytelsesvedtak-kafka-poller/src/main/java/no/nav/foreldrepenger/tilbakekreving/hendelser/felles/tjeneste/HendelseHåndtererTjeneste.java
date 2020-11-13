@@ -44,9 +44,6 @@ public class HendelseHåndtererTjeneste {
             if (erRelevantHendelseForOpprettTilbakekreving(tbkData)) {
                 logger.info("Hendelse={} er relevant for tilbakekreving opprett for henvisning={}", tbkData.getVidereBehandling(), henvisning);
                 lagOpprettBehandlingTask(hendelseTaskDataWrapper);
-            } else if (erRelevantHendelseForOppdatereTilbakekreving(tbkData)) {
-                logger.info("Hendelse={} er relevant for å oppdatere eksistende tilbakekreving med henvisning={}", tbkData.getVidereBehandling(), henvisning);
-                lagOppdaterBehandlingTask(hendelseTaskDataWrapper);
             }
         }
     }
@@ -54,10 +51,6 @@ public class HendelseHåndtererTjeneste {
     private boolean erRelevantHendelseForOpprettTilbakekreving(TilbakekrevingValgDto tbkData) {
         return VidereBehandling.TILBAKEKREV_I_INFOTRYGD.equals(tbkData.getVidereBehandling())
             || VidereBehandling.TILBAKEKR_OPPRETT.equals(tbkData.getVidereBehandling());
-    }
-
-    private boolean erRelevantHendelseForOppdatereTilbakekreving(TilbakekrevingValgDto tbkData) {
-        return VidereBehandling.TILBAKEKR_OPPDATER.equals(tbkData.getVidereBehandling());
     }
 
     private void lagOpprettBehandlingTask(HendelseTaskDataWrapper hendelseTaskDataWrapper) {
@@ -68,15 +61,6 @@ public class HendelseHåndtererTjeneste {
 
         taskData.setFagsakYtelseType(hendelseTaskDataWrapper.getFagsakYtelseType());
         taskData.setBehandlingType(BehandlingType.TILBAKEKREVING);
-
-        taskRepository.lagre(taskData.getProsessTaskData());
-    }
-
-    private void lagOppdaterBehandlingTask(HendelseTaskDataWrapper hendelseTaskDataWrapper) {
-        HendelseTaskDataWrapper taskData = HendelseTaskDataWrapper.lagWrapperForOppdaterBehandling(hendelseTaskDataWrapper.getBehandlingUuid(),
-            hendelseTaskDataWrapper.getHenvisning(),
-            hendelseTaskDataWrapper.getAktørId(),
-            hendelseTaskDataWrapper.getSaksnummer());
 
         taskRepository.lagre(taskData.getProsessTaskData());
     }

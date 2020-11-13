@@ -11,7 +11,6 @@ import java.util.UUID;
 
 import org.junit.Test;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.task.OppdaterBehandlingTask;
 import no.nav.foreldrepenger.tilbakekreving.behandling.task.OpprettBehandlingTask;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.hendelse.HendelseTaskDataWrapper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.hendelse.TaskProperties;
@@ -62,19 +61,6 @@ public class HendelseHåndtererTjenesteTest {
         List<ProsessTaskData> prosesser = prosessTaskRepository.finnIkkeStartet();
         assertThat(prosesser).isNotEmpty();
         assertThat(erTaskFinnes(OpprettBehandlingTask.TASKTYPE, prosesser)).isTrue();
-    }
-
-    @Test
-    public void skal_opprette_prosesstask_når_tilbakekreving_oppdater_er_motatt_som_hendelse() {
-        VidereBehandling videreBehandling = VidereBehandling.TILBAKEKR_OPPDATER;
-        TilbakekrevingValgDto tbkDataDto = new TilbakekrevingValgDto(videreBehandling);
-        when(restKlient.hentTilbakekrevingValg(any(UUID.class))).thenReturn(Optional.of(tbkDataDto));
-
-        hendelseHåndtererTjeneste.håndterHendelse(hendelseTaskDataWrapper);
-
-        List<ProsessTaskData> prosesser = prosessTaskRepository.finnIkkeStartet();
-        assertThat(prosesser).isNotEmpty();
-        assertThat(erTaskFinnes(OppdaterBehandlingTask.TASKTYPE, prosesser)).isTrue();
     }
 
     @Test
