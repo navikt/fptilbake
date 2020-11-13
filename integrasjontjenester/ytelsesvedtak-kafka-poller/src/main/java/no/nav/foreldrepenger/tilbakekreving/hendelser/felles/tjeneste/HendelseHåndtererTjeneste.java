@@ -45,8 +45,8 @@ public class HendelseHåndtererTjeneste {
                 logger.info("Hendelse={} er relevant for tilbakekreving opprett for henvisning={}", tbkData.getVidereBehandling(), henvisning);
                 lagOpprettBehandlingTask(hendelseTaskDataWrapper);
             } else if (erRelevantHendelseForOppdatereTilbakekreving(tbkData)) {
-                logger.info("Hendelse={} er relevant for å oppdatere eksistende tilbakekreving med henvisning={}", tbkData.getVidereBehandling(), henvisning);
-                lagOppdaterBehandlingTask(hendelseTaskDataWrapper);
+                logger.info("Hendelse={} for henvisning={} var tidligere relevant for å oppdatere behandling. Nå ignoreres den",
+                    tbkData.getVidereBehandling(), henvisning);
             }
         }
     }
@@ -68,15 +68,6 @@ public class HendelseHåndtererTjeneste {
 
         taskData.setFagsakYtelseType(hendelseTaskDataWrapper.getFagsakYtelseType());
         taskData.setBehandlingType(BehandlingType.TILBAKEKREVING);
-
-        taskRepository.lagre(taskData.getProsessTaskData());
-    }
-
-    private void lagOppdaterBehandlingTask(HendelseTaskDataWrapper hendelseTaskDataWrapper) {
-        HendelseTaskDataWrapper taskData = HendelseTaskDataWrapper.lagWrapperForOppdaterBehandling(hendelseTaskDataWrapper.getBehandlingUuid(),
-            hendelseTaskDataWrapper.getHenvisning(),
-            hendelseTaskDataWrapper.getAktørId(),
-            hendelseTaskDataWrapper.getSaksnummer());
 
         taskRepository.lagre(taskData.getProsessTaskData());
     }
