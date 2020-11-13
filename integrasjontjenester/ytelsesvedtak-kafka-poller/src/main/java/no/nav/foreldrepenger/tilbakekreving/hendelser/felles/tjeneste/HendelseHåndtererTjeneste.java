@@ -44,6 +44,8 @@ public class HendelseHåndtererTjeneste {
             if (erRelevantHendelseForOpprettTilbakekreving(tbkData)) {
                 logger.info("Hendelse={} er relevant for tilbakekreving opprett for henvisning={}", tbkData.getVidereBehandling(), henvisning);
                 lagOpprettBehandlingTask(hendelseTaskDataWrapper);
+            } else if (erRelevantHendelseForOppdatereTilbakekreving(tbkData)) {
+                logger.info("Mottok hendelse={}. Det vil unngås for henvisning={}", tbkData.getVidereBehandling(), henvisning);
             }
         }
     }
@@ -51,6 +53,10 @@ public class HendelseHåndtererTjeneste {
     private boolean erRelevantHendelseForOpprettTilbakekreving(TilbakekrevingValgDto tbkData) {
         return VidereBehandling.TILBAKEKREV_I_INFOTRYGD.equals(tbkData.getVidereBehandling())
             || VidereBehandling.TILBAKEKR_OPPRETT.equals(tbkData.getVidereBehandling());
+    }
+
+    private boolean erRelevantHendelseForOppdatereTilbakekreving(TilbakekrevingValgDto tbkData) {
+        return VidereBehandling.TILBAKEKR_OPPDATER.equals(tbkData.getVidereBehandling());
     }
 
     private void lagOpprettBehandlingTask(HendelseTaskDataWrapper hendelseTaskDataWrapper) {
