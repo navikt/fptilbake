@@ -16,7 +16,7 @@ import no.nav.vedtak.felles.integrasjon.felles.ws.JaxbHelper;
 
 public class KravVedtakStatusXmlUnmarshaller {
 
-    private static final String XSD_PLASSERING = "xsd/no/nav/melding/virksomhet/tilbakekreving/krav_og_vedtakstatus.xsd";
+    private static final String XSD_PLASSERING = "xsd/krav_og_vedtakstatus.xsd";
 
     public static KravOgVedtakstatus unmarshall(Long mottattXmlId, String xml) {
 

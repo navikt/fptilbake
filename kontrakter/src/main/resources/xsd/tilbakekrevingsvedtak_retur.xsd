@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="urn:no:nav:tilbakekreving:tilbakekrevingsvedtak:vedtak:retur:v1"
+            xmlns="urn:no:nav:tilbakekreving:tilbakekrevingsvedtak:vedtak:retur:v1"
+            xmlns:tkv="urn:no:nav:tilbakekreving:tilbakekrevingsvedtak:vedtak:v1"
+            xmlns:typer="urn:no:nav:tilbakekreving:typer:v1"
+            attributeFormDefault="qualified"
+            elementFormDefault="qualified">
+
+    <xsd:import namespace="urn:no:nav:tilbakekreving:typer:v1" schemaLocation="typer/typer.xsd"/>
+    <xsd:import namespace="urn:no:nav:tilbakekreving:tilbakekrevingsvedtak:vedtak:v1" schemaLocation="tilbakekrevingsvedtak.xsd"/>
+
+    <xsd:element name="tilbakekrevingsvedtakResponse">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="mmel" type="typer:Mmel"/>
+                <xsd:element name="tilbakekrevingsvedtak" type="tkv:Tilbakekrevingsvedtak"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+
+</xsd:schema>

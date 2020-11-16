@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="urn:no:nav:tilbakekreving:kravgrunnlag:detalj:retur:v1"
+            xmlns="urn:no:nav:tilbakekreving:kravgrunnlag:detalj:retur:v1"
+            xmlns:det="urn:no:nav:tilbakekreving:kravgrunnlag:detalj:v1"
+            xmlns:typer="urn:no:nav:tilbakekreving:typer:v1"
+            attributeFormDefault="qualified"
+            elementFormDefault="qualified">
+
+    <xsd:import namespace="urn:no:nav:tilbakekreving:typer:v1" schemaLocation="typer/typer.xsd"/>
+    <xsd:import namespace="urn:no:nav:tilbakekreving:kravgrunnlag:detalj:v1" schemaLocation="kravgrunnlag_detalj.xsd"/>
+
+    <xsd:element name="detaljertKravgrunnlagResponse">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="mmel" type="typer:Mmel"/>
+                <xsd:element name="detaljertKravgrunnlag" type="det:DetaljertKravgrunnlag" minOccurs="0"/>
+            </xsd:sequence>
+        </xsd:complexType>
+
+    </xsd:element>
+
+</xsd:schema>

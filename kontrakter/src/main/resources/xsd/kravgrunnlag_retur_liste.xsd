@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="urn:no:nav:tilbakekreving:kravgrunnlag:retur:v1"
+            xmlns="urn:no:nav:tilbakekreving:kravgrunnlag:retur:v1"
+            xmlns:typer="urn:no:nav:tilbakekreving:typer:v1"
+            attributeFormDefault="qualified"
+            elementFormDefault="qualified">
+
+    <xsd:import namespace="urn:no:nav:tilbakekreving:typer:v1" schemaLocation="typer/typer.xsd"/>
+
+    <xsd:element name="hentKravgrunnlagResponse">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="mmel" type="typer:Mmel"/>
+                <xsd:element name="kravgrunnlagListe" type="ReturnertKravgrunnlag" minOccurs="0" maxOccurs="unbounded"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:complexType name="ReturnertKravgrunnlag">
+        <xsd:annotation>
+            <xsd:documentation>421 - Returnert kravgrunnlag</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="kravgrunnlagId" type="xsd:integer"/>
+            <xsd:element name="kodeStatusKrav" type="xsd:string"/>
+            <xsd:element name="gjelderId" type="typer:FnrOrgnr"/>
+            <xsd:element name="typeGjelderId" type="typer:TypeGjelder"/>
+            <xsd:element name="utbetalesTilId" type="typer:FnrOrgnr"/>
+            <xsd:element name="typeUtbetId" type="typer:TypeGjelder"/>
+            <xsd:element name="kodeFagomraade" type="xsd:string"/>
+            <xsd:element name="fagsystemId" type="xsd:string"/>
+            <xsd:element name="datoVedtakFagsystem" type="xsd:date" minOccurs="0"/>
+            <xsd:element name="enhetBosted" type="xsd:string"/>
+            <xsd:element name="enhetAnsvarlig" type="xsd:string"/>
+            <xsd:element name="datoKravDannet" type="xsd:date"/>
+            <xsd:element name="periode" type="typer:Periode"/>
+            <xsd:element name="belopSumFeilutbetalt" type="typer:belop"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+</xsd:schema>
