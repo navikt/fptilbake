@@ -43,7 +43,7 @@
         <ukelonn.felles.version>1.0.0-20201112153109-57c44d0</ukelonn.felles.version>
 
         <surefire.version>2.22.2</surefire.version>
-        <metrics.version>4.1.14</metrics.version>
+        <metrics.version>4.1.15</metrics.version>
         <prometheus.version>0.9.0</prometheus.version>
         <geronimo.jaspi.version>2.0.0</geronimo.jaspi.version>
         <geronimo.osgi.version>1.1</geronimo.osgi.version>
