@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.persistence.TypedQuery;
 
@@ -17,16 +18,27 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.impl.HenleggBehandlingTje
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.LesKravgrunnlagTask;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.task.FortsettBehandlingTaskProperties;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandlingsresultat;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.InternalManipulerBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingresultatRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.prosesstask.UtvidetProsessTaskRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.TestFagsakUtil;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatusRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagValidator;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
@@ -46,17 +58,19 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         repositoryProvider, henleggBehandlingTjeneste, behandlingskontrollTjeneste);
     private KravVedtakStatusMapper kravVedtakStatusMapper = new KravVedtakStatusMapper(tpsAdapterWrapper);
     private LesKravvedtakStatusTask lesKravvedtakStatusTask = new LesKravvedtakStatusTask(mottattXmlRepository, repositoryProvider, kravVedtakStatusTjeneste, kravVedtakStatusMapper, fagsystemKlientMock);
+    private InternalManipulerBehandling manipulerInternBehandling = new InternalManipulerBehandling(repositoryProvider);
 
     private Long mottattXmlId;
-
-    //TODO bør ikke bruke samme navn som i parent-klassens konstanter, det skaper lett forvirring
-    private static final Long FPSAK_BEHANDLING_ID = 1174551l;
-    private static final Henvisning HENVISNING = Henvisning.fraEksternBehandlingId(FPSAK_BEHANDLING_ID);
+    private static final long REFERANSE = 1174551l;
+    private Behandling behandling;
+    private static final Henvisning HENVISNING = Henvisning.fraEksternBehandlingId(REFERANSE);
 
     @Before
     public void setup() {
-        EksternBehandling eksternBehandling = new EksternBehandling(behandling, HENVISNING, FPSAK_BEHANDLING_UUID);
-        eksternBehandlingRepository.lagre(eksternBehandling);
+        behandling = lagBehandling();
+        lagEksternBehandling(behandling);
+        manipulerInternBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.TBKGSTEG);
+        when(fagsystemKlientMock.hentBehandlingForSaksnummer("139015144")).thenReturn(lagResponsFraFagsystemKlient());
     }
 
     @Test
@@ -147,20 +161,15 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
 
     @Test
     public void skal_utføre_leskravvedtakstatus_task_for_behandling_som_allerede_har_grunnlag() {
-        repoRule.getEntityManager().createQuery("delete from EksternBehandling").executeUpdate();
-        EksternBehandling eksternBehandling = new EksternBehandling(behandling, Henvisning.fraEksternBehandlingId(100000001L), FPSAK_BEHANDLING_UUID);
-        eksternBehandlingRepository.lagre(eksternBehandling);
-
-        mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_FEIL.xml"));
+        mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_FEIL_samme_referanse.xml"));
         lesKravgrunnlagTask.doTask(lagProsessTaskData(mottattXmlId, LesKravgrunnlagTask.TASKTYPE));
 
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_SPER.xml"));
         lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LesKravvedtakStatusTask.TASKTYPE));
 
-        eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandling.getId());
+        EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraInternId(behandling.getId());
         assertThat(eksternBehandling.getHenvisning()).isEqualTo(HENVISNING);
 
-        assertThat(mottattXmlRepository.finnForHenvisning(HENVISNING)).isPresent();
         assertThat(behandling.isBehandlingPåVent()).isTrue();
         assertThat(behandling.getAksjonspunktFor(AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)).isNotNull();
         assertThat(behandling.getVenteårsak()).isEqualByComparingTo(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
@@ -168,7 +177,9 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         assertThat(kravVedtakStatusRepository.finnKravstatus(behandling.getId())).isEqualTo(Optional.of(KravStatusKode.SPERRET));
 
         assertThat(grunnlagRepository.erKravgrunnlagSperret(behandling.getId())).isTrue();
-        assertTilkobling();
+        List<ØkonomiXmlMottatt> mottattMeldinger = finnAlleForHenvisning(HENVISNING);
+        assertThat(mottattMeldinger).isNotEmpty();
+        assertThat(mottattMeldinger.stream().filter(økonomiXmlMottatt -> !økonomiXmlMottatt.isTilkoblet()).findAny()).isEmpty();
     }
 
     @Test
@@ -276,10 +287,32 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         assertThat(økonomiXmlMottatt.get().isTilkoblet()).isTrue();
     }
 
-    public List<ØkonomiXmlMottatt> finnAlleForHenvisning(Henvisning henvisning) {
+    private List<ØkonomiXmlMottatt> finnAlleForHenvisning(Henvisning henvisning) {
         TypedQuery<ØkonomiXmlMottatt> query = repoRule.getEntityManager().createQuery("from ØkonomiXmlMottatt where henvisning=:henvisning", ØkonomiXmlMottatt.class);
         query.setParameter("henvisning", henvisning);
         return query.getResultList();
+    }
+
+    private Behandling lagBehandling() {
+        NavBruker navBruker = NavBruker.opprettNy(TestFagsakUtil.genererBruker().getAktørId(), Språkkode.nb);
+        Fagsak fagsak = Fagsak.opprettNy(new Saksnummer("139015144"), navBruker);
+        fagsakRepository.lagre(fagsak);
+        Behandling behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).build();
+        BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(behandling);
+        behandlingRepository.lagre(behandling, behandlingLås);
+        return behandling;
+    }
+
+    private void lagEksternBehandling(Behandling behandling){
+        EksternBehandling eksternBehandling = new EksternBehandling(behandling, Henvisning.fraEksternBehandlingId(REFERANSE), UUID.randomUUID());
+        eksternBehandlingRepository.lagre(eksternBehandling);
+    }
+
+    private List<EksternBehandlingsinfoDto> lagResponsFraFagsystemKlient(){
+        EksternBehandlingsinfoDto eksternBehandlingsinfoDto = new EksternBehandlingsinfoDto();
+        eksternBehandlingsinfoDto.setUuid(UUID.randomUUID());
+        eksternBehandlingsinfoDto.setHenvisning(Henvisning.fraEksternBehandlingId(REFERANSE));
+        return List.of(eksternBehandlingsinfoDto);
     }
 
 }
