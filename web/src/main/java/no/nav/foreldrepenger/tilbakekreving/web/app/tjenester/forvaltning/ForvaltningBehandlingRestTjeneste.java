@@ -26,6 +26,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTask;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
+import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TaskProperty;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.KravgrunnlagMapper;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.KravgrunnlagXmlUnmarshaller;
@@ -70,6 +71,7 @@ public class ForvaltningBehandlingRestTjeneste {
     private KravgrunnlagMapper kravgrunnlagMapper;
     private ØkonomiSendtXmlRepository økonomiSendtXmlRepository;
     private TilbakekrevingsvedtakTjeneste tilbakekrevingsvedtakTjeneste;
+    private KravgrunnlagTjeneste kravgrunnlagTjeneste;
 
     public ForvaltningBehandlingRestTjeneste() {
         // for CDI
@@ -81,7 +83,8 @@ public class ForvaltningBehandlingRestTjeneste {
                                              ØkonomiMottattXmlRepository mottattXmlRepository,
                                              KravgrunnlagMapper kravgrunnlagMapper,
                                              ØkonomiSendtXmlRepository økonomiSendtXmlRepository,
-                                             TilbakekrevingsvedtakTjeneste tilbakekrevingsvedtakTjeneste) {
+                                             TilbakekrevingsvedtakTjeneste tilbakekrevingsvedtakTjeneste,
+                                             KravgrunnlagTjeneste kravgrunnlagTjeneste) {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.prosessTaskRepository = prosessTaskRepository;
         this.mottattXmlRepository = mottattXmlRepository;
@@ -89,6 +92,7 @@ public class ForvaltningBehandlingRestTjeneste {
         this.kravgrunnlagMapper = kravgrunnlagMapper;
         this.økonomiSendtXmlRepository = økonomiSendtXmlRepository;
         this.tilbakekrevingsvedtakTjeneste = tilbakekrevingsvedtakTjeneste;
+        this.kravgrunnlagTjeneste = kravgrunnlagTjeneste;
     }
 
     @POST
@@ -198,6 +202,29 @@ public class ForvaltningBehandlingRestTjeneste {
         opprettHentKorrigertGrunnlagTask(behandling, hentKorrigertKravgrunnlagDto.getKravgrunnlagId());
         return Response.ok().build();
     }
+
+    @POST
+    @Path("/tilbakefør-behandling-til-fakta")
+    @Operation(
+        tags = "FORVALTNING-behandling",
+        description = "Tjeneste for å tilbakeføre behandling til FAKTA steg",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "400", description = "Behandling er avsluttet eller behandling er på vent"),
+            @ApiResponse(responseCode = "500", description = "Ukjent feil!")
+        })
+    @BeskyttetRessurs(action = CREATE, property = AbacProperty.DRIFT)
+    public Response tilbakeførBehandlingTilFaktaSteg(@NotNull @QueryParam("behandlingId") @Valid BehandlingReferanse behandlingReferanse) {
+        Behandling behandling = hentBehandling(behandlingReferanse);
+        if (behandling.erAvsluttet()) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Kan ikke flyttes, behandlingen er avsluttet!").build();
+        } else if (behandling.isBehandlingPåVent()) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Kan ikke flyttes, behandlingen er på vent!").build();
+        }
+        kravgrunnlagTjeneste.tilbakeførBehandlingTilFaktaSteg(behandling);
+        return Response.ok().build();
+    }
+
 
     @POST
     @Path("/hent-oko-xml-feilet-iverksetting")
@@ -322,4 +349,5 @@ public class ForvaltningBehandlingRestTjeneste {
         }
         return behandling;
     }
+
 }
