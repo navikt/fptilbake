@@ -10,8 +10,13 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @ApplicationScoped
 public class BehandlingVedtakRepository {
+
+    private static final Logger logger = LoggerFactory.getLogger(BehandlingVedtakRepository.class);
 
     private EntityManager entityManager;
 
@@ -25,6 +30,11 @@ public class BehandlingVedtakRepository {
     }
 
     public void lagre(BehandlingVedtak behandlingVedtak) {
+        if (behandlingVedtak.getId() != null) {
+            logger.warn("BehandlingVedtak ble oppdatert for behandling={}, dette skal normalt aldri skje. Eneste kjente situasjon hvor det kan skje er " +
+                    "at tilbakeføring til tidligere steg var nødvendig fordi kravgrunnlag ble endret etter vedtaket ble fattet.",
+                behandlingVedtak.getBehandlingsresultat().getId());
+        }
         entityManager.persist(behandlingVedtak);
         entityManager.flush();
     }
