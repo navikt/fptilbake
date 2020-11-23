@@ -86,6 +86,10 @@ public class BehandlingVedtak extends BaseEntitet {
         return new Builder();
     }
 
+    public static BehandlingVedtak.Builder builderEndreEksisterende(BehandlingVedtak behandlingVedtak) {
+        return new BehandlingVedtak.Builder(behandlingVedtak, true);
+    }
+
     public IverksettingStatus getIverksettingStatus() {
         return Objects.equals(IverksettingStatus.UDEFINERT, iverksettingStatus) ? null : iverksettingStatus;
     }
@@ -96,6 +100,16 @@ public class BehandlingVedtak extends BaseEntitet {
 
     public static class Builder {
         private BehandlingVedtak kladd = new BehandlingVedtak();
+
+        public Builder() {
+            // tom constructor
+        }
+
+        Builder(BehandlingVedtak gammeltResultat, boolean endreEksisterende) {
+            if (endreEksisterende) {
+                kladd = gammeltResultat;
+            }
+        }
 
         public Builder medVedtaksdato(LocalDate vedtaksdato) {
             this.kladd.vedtaksdato = vedtaksdato;

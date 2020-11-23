@@ -5,6 +5,7 @@ import static java.lang.Boolean.TRUE;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -95,18 +96,45 @@ public class FatteVedtakSteg implements BehandlingSteg {
 
     private void opprettBehandlingVedtak(Behandling behandling) {
         BeregningResultat beregningResultat = beregningTjeneste.beregn(behandling.getId());
+        BehandlingResultatType behandlingResultatType = BehandlingResultatType.fraVedtakResultatType(beregningResultat.getVedtakResultatType());
 
-        Behandlingsresultat behandlingsresultat = Behandlingsresultat.builder().medBehandling(behandling)
-            .medBehandlingResultatType(BehandlingResultatType.fraVedtakResultatType(beregningResultat.getVedtakResultatType())).build();
-        behandlingresultatRepository.lagre(behandlingsresultat);
-
-        BehandlingVedtak behandlingVedtak = BehandlingVedtak.builder()
-            .medAnsvarligSaksbehandler(finnSaksBehandler(behandling))
-            .medBehandlingsresultat(behandlingsresultat)
-            .medIverksettingStatus(IverksettingStatus.IKKE_IVERKSATT)
-            .medVedtaksdato(LocalDate.now()).build();
-
+        Optional<BehandlingVedtak> eksisterendeVedtak = behandlingVedtakRepository.hentBehandlingvedtakForBehandlingId(behandling.getId());
+        Behandlingsresultat behandlingsresultat;
+        BehandlingVedtak behandlingVedtak;
+        if (eksisterendeVedtak.isPresent()) {
+            BehandlingVedtak eksisterende = eksisterendeVedtak.get();
+            behandlingsresultat = oppdaterBehandlingsResultat(behandling, eksisterende.getBehandlingsresultat(), behandlingResultatType);
+            behandlingVedtak = BehandlingVedtak.builderEndreEksisterende(eksisterende)
+                .medAnsvarligSaksbehandler(finnSaksBehandler(behandling))
+                .medBehandlingsresultat(behandlingsresultat)
+                .medIverksettingStatus(IverksettingStatus.IKKE_IVERKSATT)
+                .medVedtaksdato(LocalDate.now()).build();
+        } else {
+            behandlingsresultat = opprettBehandlingsResultat(behandling, behandlingResultatType);
+            behandlingVedtak = BehandlingVedtak.builder()
+                .medAnsvarligSaksbehandler(finnSaksBehandler(behandling))
+                .medBehandlingsresultat(behandlingsresultat)
+                .medIverksettingStatus(IverksettingStatus.IKKE_IVERKSATT)
+                .medVedtaksdato(LocalDate.now()).build();
+        }
         behandlingVedtakRepository.lagre(behandlingVedtak);
+    }
+
+    private Behandlingsresultat opprettBehandlingsResultat(Behandling behandling, BehandlingResultatType behandlingResultatType){
+        Behandlingsresultat behandlingsresultat =Behandlingsresultat.builder().medBehandling(behandling)
+            .medBehandlingResultatType(behandlingResultatType).build();
+        behandlingresultatRepository.lagre(behandlingsresultat);
+        return behandlingsresultat;
+    }
+
+    private Behandlingsresultat oppdaterBehandlingsResultat(Behandling behandling, Behandlingsresultat eksisterende,
+                                                            BehandlingResultatType behandlingResultatType){
+        Behandlingsresultat behandlingsresultat = Behandlingsresultat.builderEndreEksisterende(eksisterende)
+            .medBehandling(behandling)
+            .medBehandlingResultatType(behandlingResultatType)
+            .build();
+        behandlingresultatRepository.lagre(behandlingsresultat);
+        return behandlingsresultat;
     }
 
     private static String finnSaksBehandler(Behandling behandling) {

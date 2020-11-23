@@ -36,6 +36,7 @@ public enum HistorikkinnslagType implements Kodeverdi {
     BEH_MAN_GJEN("BEH_MAN_GJEN", "Gjenoppta behandling", MAL_TYPE_1),
     BEH_STARTET("BEH_STARTET", "Behandling startet", MAL_TYPE_1),
     BEH_STARTET_PÅ_NYTT("BEH_STARTET_PÅ_NYTT", "Behandling startet på nytt", MAL_TYPE_1),
+    BEH_STARTET_FORFRA("BEH_STARTET_FORFRA", "Behandling startet forfra", MAL_TYPE_1),
     VEDLEGG_MOTTATT("VEDLEGG_MOTTATT", "Vedlegg mottatt", MAL_TYPE_1),
     BREV_SENT("BREV_SENT", "Brev sendt", MAL_TYPE_1),
     BREV_BESTILT("BREV_BESTILT", "Brev bestilt", MAL_TYPE_1),

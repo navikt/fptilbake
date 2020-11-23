@@ -24,6 +24,11 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagBelop433;
@@ -37,9 +42,11 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 public class KravgrunnlagTjeneste {
 
     private static final Logger logger = LoggerFactory.getLogger(KravgrunnlagTjeneste.class);
+    public static final String BEGRUNNELSE_BEHANDLING_STARTET_FORFRA = "Tilbakekreving startes forfra på grunn av endring i feilutbetalt beløp og/eller perioder";
 
     private KravgrunnlagRepository kravgrunnlagRepository;
     private BehandlingRepository behandlingRepository;
+    private HistorikkRepository historikkRepository;
     private GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
 
@@ -57,6 +64,7 @@ public class KravgrunnlagTjeneste {
                                 SlettGrunnlagEventPubliserer slettGrunnlagEventPubliserer) {
         this.kravgrunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
+        this.historikkRepository = repositoryProvider.getHistorikkRepository();
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
         this.gjenopptaBehandlingTjeneste = gjenopptaBehandlingTjeneste;
 
@@ -105,22 +113,40 @@ public class KravgrunnlagTjeneste {
             logger.info("Setter behandling på vent pga kravgrunnlag endret til et ugyldig kravgrunnlag for behandlingId={}", behandlingId);
             behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, BehandlingStegType.TBKGSTEG, LocalDateTime.now().plusDays(7), Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
         } else {
-            boolean erForbiFaktaSteg = behandlingskontrollTjeneste.erStegPassert(behandling, FAKTA_FEILUTBETALING);
-            //forutsatt at FPTILBAKE allrede har fått SPER melding for den behandlingen og sett behandling på vent med VenteÅrsak VENT_PÅ_TILBAKEKREVINGSGRUNNLAG
-            if (erForbiFaktaSteg) {
-                logger.info("Hopper tilbake til {} pga endret kravgrunnlag for behandlingId={}", FAKTA_FEILUTBETALING.getKode(), behandlingId);
-                BehandlingskontrollKontekst kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandling);
-                behandlingskontrollTjeneste.settAutopunkterTilUtført(kontekst, false);
-                behandlingskontrollTjeneste.behandlingTilbakeføringTilTidligereBehandlingSteg(kontekst, FAKTA_FEILUTBETALING);
-            }
-            fyrKravgrunnlagEndretEvent(behandlingId);
-            gjenopptaBehandlingTjeneste.fortsettBehandlingMedGrunnlag(behandlingId);
+            tilbakeførBehandlingTilFaktaSteg(behandling);
         }
+    }
+
+    public void tilbakeførBehandlingTilFaktaSteg(Behandling behandling){
+        long behandlingId = behandling.getId();
+        boolean erForbiFaktaSteg = behandlingskontrollTjeneste.erStegPassert(behandling, FAKTA_FEILUTBETALING);
+        //forutsatt at FPTILBAKE allrede har fått SPER melding for den behandlingen og sett behandling på vent med VenteÅrsak VENT_PÅ_TILBAKEKREVINGSGRUNNLAG
+        if (erForbiFaktaSteg) {
+            logger.info("Hopper tilbake til {} pga endret kravgrunnlag for behandlingId={}", FAKTA_FEILUTBETALING.getKode(), behandlingId);
+            BehandlingskontrollKontekst kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandling);
+            behandlingskontrollTjeneste.settAutopunkterTilUtført(kontekst, false);
+            behandlingskontrollTjeneste.behandlingTilbakeføringTilTidligereBehandlingSteg(kontekst, FAKTA_FEILUTBETALING);
+            opprettHistorikkinnslagForBehandlingStartetForfra(behandling);
+        }
+        fyrKravgrunnlagEndretEvent(behandlingId);
+        gjenopptaBehandlingTjeneste.fortsettBehandlingMedGrunnlag(behandlingId);
     }
 
     private void fyrKravgrunnlagEndretEvent(Long behandlingId) {
         logger.info("Sletter gammel grunnlag data for behandlingId={}", behandlingId);
         kravgrunnlagEventPubliserer.fireKravgrunnlagEndretEvent(behandlingId);
+    }
+
+    private void opprettHistorikkinnslagForBehandlingStartetForfra(Behandling behandling) {
+        Historikkinnslag historikkinnslag = new Historikkinnslag();
+        historikkinnslag.setType(HistorikkinnslagType.BEH_STARTET_FORFRA);
+        historikkinnslag.setAktør(HistorikkAktør.VEDTAKSLØSNINGEN);
+        HistorikkInnslagTekstBuilder historikkInnslagTekstBuilder = new HistorikkInnslagTekstBuilder()
+            .medHendelse(HistorikkinnslagType.BEH_STARTET_FORFRA)
+            .medBegrunnelse(BEGRUNNELSE_BEHANDLING_STARTET_FORFRA);
+        historikkInnslagTekstBuilder.build(historikkinnslag);
+        historikkinnslag.setBehandling(behandling);
+        historikkRepository.lagre(historikkinnslag);
     }
 
 }
