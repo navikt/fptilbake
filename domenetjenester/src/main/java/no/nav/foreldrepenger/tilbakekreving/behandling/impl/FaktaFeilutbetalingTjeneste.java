@@ -2,7 +2,6 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -11,6 +10,7 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingFeil;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BehandlingFeilutbetalingFakta;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.LogiskPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.LogiskPeriodeMedFaktaDto;
@@ -22,6 +22,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselInfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingsinfoDto;
@@ -29,15 +30,18 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBe
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.TilbakekrevingValgDto;
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.dto.HendelseTypeMedUndertypeDto;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 
 @ApplicationScoped
 public class FaktaFeilutbetalingTjeneste {
 
     private VarselRepository varselRepository;
     private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository;
+    private EksternBehandlingRepository eksternBehandlingRepository;
+    private KravgrunnlagRepository grunnlagRepository;
 
     private KravgrunnlagTjeneste kravgrunnlagTjeneste;
-    private EksternBehandlingRepository eksternBehandlingRepository;
     private FagsystemKlient fagsystemKlient;
 
     FaktaFeilutbetalingTjeneste() {
@@ -45,14 +49,16 @@ public class FaktaFeilutbetalingTjeneste {
     }
 
     @Inject
-    public FaktaFeilutbetalingTjeneste(BehandlingRepositoryProvider behandlingRepositoryProvider, KravgrunnlagTjeneste kravgrunnlagTjeneste, FagsystemKlient fagsystemKlient) {
+    public FaktaFeilutbetalingTjeneste(BehandlingRepositoryProvider behandlingRepositoryProvider,
+                                       KravgrunnlagTjeneste kravgrunnlagTjeneste,
+                                       FagsystemKlient fagsystemKlient) {
         this.kravgrunnlagTjeneste = kravgrunnlagTjeneste;
         this.fagsystemKlient = fagsystemKlient;
 
         this.faktaFeilutbetalingRepository = behandlingRepositoryProvider.getFaktaFeilutbetalingRepository();
         this.eksternBehandlingRepository = behandlingRepositoryProvider.getEksternBehandlingRepository();
         this.varselRepository = behandlingRepositoryProvider.getVarselRepository();
-
+        this.grunnlagRepository = behandlingRepositoryProvider.getGrunnlagRepository();
     }
 
     static LogiskPeriodeMedFaktaDto leggPåFakta(LogiskPeriode logiskPeriode, FaktaFeilutbetaling fakta) {
@@ -68,10 +74,8 @@ public class FaktaFeilutbetalingTjeneste {
     }
 
     public BehandlingFeilutbetalingFakta hentBehandlingFeilutbetalingFakta(Long behandlingId) {
-        EksternBehandling eksternBehandling = eksternBehandlingRepository.hentForSisteAktivertInternId(behandlingId);
         Optional<VarselInfo> resultat = varselRepository.finnVarsel(behandlingId);
-        UUID eksternUuid = eksternBehandling.getEksternUuid();
-
+        UUID eksternUuid = hentEksternUuid(behandlingId);
         SamletEksternBehandlingInfo samletBehandlingInfo = fagsystemKlient.hentBehandlingsinfo(eksternUuid, Tillegsinformasjon.TILBAKEKREVINGSVALG);
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto = samletBehandlingInfo.getGrunninformasjon();
         TilbakekrevingValgDto tilbakekrevingValg = samletBehandlingInfo.getTilbakekrevingsvalg();
@@ -95,6 +99,24 @@ public class FaktaFeilutbetalingTjeneste {
             .medTilbakekrevingValg(tilbakekrevingValg)
             .medBegrunnelse(begrunnelse)
             .build();
+    }
+
+    private UUID hentEksternUuid(Long behandlingId) {
+        Optional<EksternBehandling> eksternBehandling = eksternBehandlingRepository.hentOptionalFraInternId(behandlingId);
+        UUID eksternUuid;
+        if(eksternBehandling.isPresent()){
+            eksternUuid = eksternBehandling.get().getEksternUuid();
+        }else { // Når behandlinger er avsluttet p.g.a henleggelse, finner ikke aktive Henvisning.
+            // Så henter referanse fra koblede grunnlag som ikke kan endres.
+            Kravgrunnlag431 kravgrunnlag431 = grunnlagRepository.finnKravgrunnlag(behandlingId);
+            Henvisning henvisning = kravgrunnlag431.getReferanse();
+            eksternBehandling = eksternBehandlingRepository.hentEksisterendeDeaktivert(behandlingId, henvisning);
+            if(eksternBehandling.isEmpty()){ // Teknisk Feil: referansen til grunnlaget må finne i EksternBehandling
+                throw BehandlingFeil.FACTORY.fantIkkeBehandlingMedHenvisning(behandlingId, henvisning).toException();
+            }
+            eksternUuid = eksternBehandling.get().getEksternUuid();
+        }
+        return eksternUuid;
     }
 
     private Periode omkringliggendePeriode(List<LogiskPeriode> perioder) {
