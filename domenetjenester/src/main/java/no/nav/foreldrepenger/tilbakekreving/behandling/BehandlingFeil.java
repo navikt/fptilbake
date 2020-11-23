@@ -4,6 +4,7 @@ import static no.nav.vedtak.feil.LogLevel.WARN;
 
 import java.util.UUID;
 
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.vedtak.feil.Feil;
 import no.nav.vedtak.feil.FeilFactory;
@@ -27,7 +28,8 @@ public interface BehandlingFeil extends DeklarerteFeil {
     @TekniskFeil(feilkode = "FPT-7428494", feilmelding = "Fant ikke person med fnr", logLevel = LogLevel.WARN)
     Feil fantIkkePersonIdentMedFnr();
 
-
+    @TekniskFeil(feilkode = "FPT-7428495", feilmelding = "Fant ikke behandling med behandlingId %s and henvisning %s", logLevel = LogLevel.WARN)
+    Feil fantIkkeBehandlingMedHenvisning(long behandlingId, Henvisning henvisning);
 
     @FunksjonellFeil(feilkode = "FPT-992332", feilmelding = "BehandlingId %s er ikke satt på vent, og ventefrist kan derfor ikke oppdateres", løsningsforslag = "Forsett saksbehandlingen", logLevel = WARN)
     Feil kanIkkeEndreVentefristForBehandlingIkkePaVent(Long behandlingId);

@@ -22,6 +22,7 @@ public class EksternBehandlingRepository {
 
     private static final String EKSTERN_UUID = "eksternUuid";
     private static final String INTERN_ID = "internId";
+    private static final String HENVISNING = "henvisning";
     private EntityManager entityManager;
 
     EksternBehandlingRepository() {
@@ -63,7 +64,7 @@ public class EksternBehandlingRepository {
 
     public Optional<EksternBehandling> hentFraHenvisning(Henvisning henvisning) {
         TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where henvisning=:henvisning and aktiv='J'", EksternBehandling.class);
-        query.setParameter("henvisning", henvisning);
+        query.setParameter(HENVISNING, henvisning);
         return hentUniktResultat(query);
     }
 
@@ -98,7 +99,7 @@ public class EksternBehandlingRepository {
 
     public boolean finnesEksternBehandling(long internId, Henvisning henvisning) {
         TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where henvisning=:henvisning and intern_id=:internId and aktiv='J'", EksternBehandling.class);
-        query.setParameter("henvisning", henvisning);
+        query.setParameter(HENVISNING, henvisning);
         query.setParameter(INTERN_ID, internId);
         return !query.getResultList().isEmpty();
     }
@@ -132,10 +133,10 @@ public class EksternBehandlingRepository {
         return hentUniktResultat(query);
     }
 
-    private Optional<EksternBehandling> hentEksisterendeDeaktivert(long internBehandlingId, Henvisning henvisning) {
+    public Optional<EksternBehandling> hentEksisterendeDeaktivert(long internBehandlingId, Henvisning henvisning) {
         TypedQuery<EksternBehandling> query = entityManager.createQuery("from EksternBehandling where intern_id=:internId and henvisning=:henvisning order by opprettetTidspunkt desc", EksternBehandling.class);
         query.setParameter(INTERN_ID, internBehandlingId);
-        query.setParameter("henvisning", henvisning);
+        query.setParameter(HENVISNING, henvisning);
 
         return hentUniktResultat(query);
     }

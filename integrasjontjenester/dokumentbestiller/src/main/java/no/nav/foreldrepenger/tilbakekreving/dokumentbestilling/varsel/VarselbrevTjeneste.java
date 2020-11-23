@@ -80,7 +80,6 @@ public class VarselbrevTjeneste {
             .medBrevtekst(brevtekst)
             .medMetadata(varselbrevSamletInfo.getBrevMetadata())
             .build();
-        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         Long varsletFeilutbetaling = varselbrevSamletInfo.getSumFeilutbetaling();
         String fritekst = varselbrevSamletInfo.getFritekstFraSaksbehandler();
         pdfBrevTjeneste.sendBrev(behandlingId, DetaljertBrevType.VARSEL, varsletFeilutbetaling, fritekst, BrevData.builder()

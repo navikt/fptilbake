@@ -5,7 +5,10 @@ import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Optional;
 import java.util.Set;
+
+import javax.persistence.FlushModeType;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -18,6 +21,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.EksternBehandlingÅrsakType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KonsekvensForYtelsen;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.tilbakekrevingsvalg.VidereBehandling;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.Tillegsinformasjon;
@@ -30,7 +34,10 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.Ytelsesbehandli
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMock;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMockUtil;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 
 public class FaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
 
@@ -39,6 +46,7 @@ public class FaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
 
     @Before
     public void setup() {
+        repoRule.getEntityManager().setFlushMode(FlushModeType.AUTO);
         EksternBehandlingsinfoDto behandlingsinfoDto = lagEksternBehandlingsInfo();
         SamletEksternBehandlingInfo samletEksternBehandlingInfo = new SamletEksternBehandlingInfo.Builder(Set.of(Tillegsinformasjon.TILBAKEKREVINGSVALG))
             .setGrunninformasjon(behandlingsinfoDto)
@@ -83,15 +91,36 @@ public class FaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
     public void skal_hente_feilutbetalingFakta_med_enkel_periode_når_behandling_er_henlagt() {
         KravgrunnlagMock mockMedFeilPostering = lagKravgrunnlag(FOM, TOM, KlasseType.FEIL, BigDecimal.valueOf(10000), BigDecimal.ZERO);
         KravgrunnlagMock mockMedYtelPostering = lagKravgrunnlag(FOM, TOM, KlasseType.YTEL, BigDecimal.ZERO, BigDecimal.valueOf(10000));
-
-        Kravgrunnlag431 kravgrunnlag431 = KravgrunnlagMockUtil.lagMockObject(Lists.newArrayList(mockMedFeilPostering, mockMedYtelPostering));
+        //TODO
+        Kravgrunnlag431 kravgrunnlag431 = Kravgrunnlag431.builder()
+            .medVedtakId(100000l)
+            .medEksternKravgrunnlagId("12123")
+            .medKravStatusKode(KravStatusKode.NYTT)
+            .medFagomraadeKode(FagOmrådeKode.FORELDREPENGER)
+            .medFagSystemId(saksnummer+"100")
+            .medGjelderVedtakId("100000000")
+            .medGjelderType(GjelderType.ORGANISASJON)
+            .medUtbetalesTilId("100000000")
+            .medUtbetIdType(GjelderType.ORGANISASJON)
+            .medAnsvarligEnhet("8020")
+            .medBehandlendeEnhet("8020")
+            .medBostedEnhet("8020")
+            .medFeltKontroll("00")
+            .medSaksBehId("Z991035")
+            .medReferanse(henvisning)
+            .build();
+        KravgrunnlagPeriode432 feilPeriode = KravgrunnlagMockUtil.lagMockPeriode(mockMedFeilPostering, kravgrunnlag431);
+        KravgrunnlagPeriode432 ytelPeriode = KravgrunnlagMockUtil.lagMockPeriode(mockMedYtelPostering, kravgrunnlag431);
+        kravgrunnlag431.leggTilPeriode(feilPeriode);
+        kravgrunnlag431.leggTilPeriode(ytelPeriode);
 
         grunnlagRepository.lagre(internBehandlingId, kravgrunnlag431);
         varselRepository.lagre(internBehandlingId, "hello", 23000l);
 
         henleggBehandlingTjeneste.henleggBehandling(internBehandlingId, BehandlingResultatType.HENLAGT_FEILOPPRETTET);
-        EksternBehandling eksternBehandling = repoProvider.getEksternBehandlingRepository().hentForSisteAktivertInternId(behandling.getId());
-        assertThat(eksternBehandling.getAktiv()).isFalse();
+        Optional<EksternBehandling> eksternBehandling = repoProvider.getEksternBehandlingRepository().hentEksisterendeDeaktivert(behandling.getId(),henvisning);
+        assertThat(eksternBehandling).isPresent();
+        assertThat(eksternBehandling.get().getAktiv()).isFalse();
 
         BehandlingFeilutbetalingFakta fakta = faktaFeilutbetalingTjeneste.hentBehandlingFeilutbetalingFakta(internBehandlingId);
         fellesFaktaResponsSjekk(fakta);
