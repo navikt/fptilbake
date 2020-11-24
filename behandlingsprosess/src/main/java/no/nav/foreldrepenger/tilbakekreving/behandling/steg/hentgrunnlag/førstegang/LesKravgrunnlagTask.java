@@ -61,7 +61,7 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
                                KravgrunnlagMapper kravgrunnlagMapper,
                                BehandlingRepositoryProvider repositoryProvider,
                                FagsystemKlient fagsystemKlient) {
-        super(repositoryProvider.getGrunnlagRepository(), fagsystemKlient);
+        super(fagsystemKlient);
         this.økonomiMottattXmlRepository = økonomiMottattXmlRepository;
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();

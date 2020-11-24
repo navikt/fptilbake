@@ -1,7 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.status;
 
 import java.util.Optional;
-import java.util.UUID;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -11,16 +10,13 @@ import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.FellesTask;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TaskProperty;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.FagsystemId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatus437;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagAggregate;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.tilbakekreving.status.v1.KravOgVedtakstatus;
 import no.nav.vedtak.feil.Feil;
@@ -42,7 +38,6 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
 
     private ØkonomiMottattXmlRepository økonomiMottattXmlRepository;
     private EksternBehandlingRepository eksternBehandlingRepository;
-    private BehandlingRepository behandlingRepository;
 
     private KravVedtakStatusTjeneste kravVedtakStatusTjeneste;
     private KravVedtakStatusMapper statusMapper;
@@ -58,10 +53,9 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
                                    KravVedtakStatusTjeneste kravVedtakStatusTjeneste,
                                    KravVedtakStatusMapper statusMapper,
                                    FagsystemKlient fagsystemKlient) {
-        super(repositoryProvider.getGrunnlagRepository(), fagsystemKlient);
+        super(fagsystemKlient);
         this.økonomiMottattXmlRepository = økonomiMottattXmlRepository;
         this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
-        this.behandlingRepository = repositoryProvider.getBehandlingRepository();
 
         this.kravVedtakStatusTjeneste = kravVedtakStatusTjeneste;
         this.statusMapper = statusMapper;
@@ -79,9 +73,6 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
         Henvisning henvisning = kravVedtakStatus437.getReferanse();
         validerHenvisning(henvisning);
         økonomiMottattXmlRepository.oppdaterMedHenvisningOgSaksnummer(henvisning, saksnummer, mottattXmlId);
-
-        long vedtakId = statusMapper.finnVedtakId(kravOgVedtakstatus);
-        oppdatereEksternBehandling(vedtakId, henvisning);
 
         Optional<EksternBehandling> behandlingKobling = hentKoblingTilInternBehandling(henvisning);
         if (behandlingKobling.isPresent()) {
@@ -110,36 +101,6 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
         if (!finnesYtelsesbehandling(saksnummer, henvisning)) {
             throw LesKravvedtakStatusTaskFeil.FACTORY.behandlingFinnesIkkeIFpsak(henvisning).toException();
         }
-    }
-
-    private void oppdatereEksternBehandling(long vedtakId, Henvisning henvisning) {
-        Optional<KravgrunnlagAggregate> aggregateOpt = finnGrunnlagForVedtakId(vedtakId);
-        if (aggregateOpt.isPresent()) {
-            logger.info("Grunnlag finnes allerede for vedtakId={}", vedtakId);
-            KravgrunnlagAggregate aggregate = aggregateOpt.get();
-            Henvisning referanse = aggregate.getGrunnlagØkonomi().getReferanse();
-            Long behandlingId = aggregate.getBehandlingId();
-            Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-            if (behandling.erAvsluttet()) {
-                logger.info("Behandling {} er avsluttet og kan ikke tilkobles med meldingen", behandling.getId());
-                return;
-            }
-            boolean eksternBehandlingFinnes = eksternBehandlingRepository.finnesEksternBehandling(behandlingId, henvisning);
-            if (!referanse.equals(henvisning) && !eksternBehandlingFinnes) {
-                UUID eksternUUID = hentUUIDFraEksternBehandling(behandlingId);
-                logger.info("Oppdaterer eksternBehandling for behandlingId={} med ny henvisning={}", behandlingId, henvisning);
-                EksternBehandling eksternBehandling = new EksternBehandling(behandling, henvisning, eksternUUID);
-                eksternBehandlingRepository.lagre(eksternBehandling);
-            } else {
-                logger.info("henvisning={} finnes allerede. Oppdaterer ikke eksternBehandling", henvisning);
-            }
-
-        }
-    }
-
-    private UUID hentUUIDFraEksternBehandling(long behandlingId) {
-        EksternBehandling forrigeEksternBehandling = eksternBehandlingRepository.hentFraInternId(behandlingId);
-        return forrigeEksternBehandling.getEksternUuid();
     }
 
     public interface LesKravvedtakStatusTaskFeil extends DeklarerteFeil {
