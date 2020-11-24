@@ -15,6 +15,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.Ved
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.AnnenVurdering;
@@ -234,12 +235,13 @@ public class TekstformatererVedtaksbrevIBiterTest {
             .build();
 
         String generertTekst = TekstformatererVedtaksbrev.lagSærligeGrunnerTekst(felles, periode);
-        assertThat(generertTekst).contains("Vi har vurdert om det er grunner til å redusere beløpet. Vi har lagt vekt på at du må ha forstått at beløpet du fikk utbetalt var feil, og det er ingen bestemte grunner til å redusere beløpet. Derfor må du betale tilbake hele beløpet.");
+        assertThat(generertTekst).contains("Vi har vurdert om det er grunner til å redusere beløpet. Vi har lagt vekt på at du ikke har gitt oss alle nødvendige opplysninger tidsnok til at vi kunne unngå feilutbetalingen. Derfor må du betale tilbake hele beløpet.");
     }
 
     @Test
     public void skal_ha_riktig_tekst_for_særlige_grunner_når_det_er_reduksjon_av_beløp() {
         HbVedtaksbrevFelles felles = lagTestBuilder()
+            .medSpråkkode(Språkkode.nn)
             .medSak(HbSak.build()
                 .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
                 .medErFødsel(true)
@@ -265,7 +267,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
             .medVurderinger(HbVurderinger.builder()
                 .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
                 .medVilkårResultat(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER)
-                .medAktsomhetResultat(Aktsomhet.GROVT_UAKTSOM)
+                .medAktsomhetResultat(Aktsomhet.SIMPEL_UAKTSOM)
                 .medSærligeGrunner(Collections.singletonList(SærligGrunn.GRAD_AV_UAKTSOMHET), null, null)
                 .build())
             .medResultat(HbResultat.builder()
@@ -277,7 +279,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
 
         String generertTekst = TekstformatererVedtaksbrev.lagSærligeGrunnerTekst(felles, periode);
         assertThat(generertTekst)
-            .contains("Vi har lagt vekt på at du må ha forstått at du fikk penger du ikke har rett til. Vi vurderer likevel at uaktsomheten din har vært så liten at vi har redusert beløpet du må betale tilbake.")
+            .contains("Vi har lagt vekt på at du ikkje har gitt oss alle nødvendige opplysningar tidsnok til at vi kunne unngå feilutbetalinga. Vi vurderer likevel at aktløysa di har vore så lita at vi har redusert beløpet du må betale tilbake.")
             .contains("Du må betale 500 kroner");
     }
 
