@@ -38,84 +38,54 @@ public class DokumentasjonGeneratorPeriodeSærligeGrunner {
     private final Periode januar = Periode.of(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 1, 31));
 
     @Test
-    public void list_ut_særlige_grunner_simpel_uaktsomhet_feil_opplysninger() {
+    public void list_ut_særlige_grunner_simpel_uaktsomhet_forstod() {
         HbVedtaksbrevFelles felles = lagFellesdel(null);
-
-        boolean[] boolske = {false, true};
-
-        for (boolean sgNav : boolske) {
-            for (boolean sgBeløp : boolske) {
-                for (boolean sgTid : boolske) {
-                    for (boolean reduksjon : boolske) {
-                        for (boolean sgAnnet : boolske) {
-                            HbVedtaksbrevPeriode periode = lagPeriodeDel(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER, Aktsomhet.SIMPEL_UAKTSOM, sgNav, sgBeløp, sgTid, sgAnnet, reduksjon);
-                            String s = TekstformatererVedtaksbrev.lagSærligeGrunnerTekst(felles, periode);
-                            String overskrift = overskrift(sgNav, sgBeløp, sgTid, sgAnnet, reduksjon);
-                            String prettyprint = prettyprint(s, overskrift);
-
-                            System.out.println();
-                            System.out.println(prettyprint);
-                        }
-                    }
-                }
-            }
-        }
+        lagSærligeGrunnerTekster(felles, VilkårResultat.FORSTO_BURDE_FORSTÅTT, Aktsomhet.SIMPEL_UAKTSOM);
     }
 
     @Test
-    public void list_ut_særlige_grunner_simpel_uaktsomhet_feil_opplysninger_forstod() {
-        HbVedtaksbrevFelles felles = lagFellesdel(null);
-
-        boolean[] boolske = {false, true};
-
-        for (boolean sgNav : boolske) {
-            for (boolean sgBeløp : boolske) {
-                for (boolean sgTid : boolske) {
-                    for (boolean reduksjon : boolske) {
-                        for (boolean sgAnnet : boolske) {
-                            HbVedtaksbrevPeriode periode = lagPeriodeDel(VilkårResultat.FORSTO_BURDE_FORSTÅTT, Aktsomhet.SIMPEL_UAKTSOM, sgNav, sgBeløp, sgTid, sgAnnet, reduksjon);
-                            String s = TekstformatererVedtaksbrev.lagSærligeGrunnerTekst(felles, periode);
-                            String overskrift = overskrift(sgNav, sgBeløp, sgTid, sgAnnet, reduksjon);
-                            String prettyprint = prettyprint(s, overskrift);
-
-                            System.out.println();
-                            System.out.println(prettyprint);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    @Test
-    public void list_ut_særlige_grunner_simpel_uaktsomhet_nynorsk() {
+    public void list_ut_særlige_grunner_simpel_uaktsomhet_forstod_nynorsk() {
         HbVedtaksbrevFelles felles = lagFellesdel(Språkkode.nn);
-
-        boolean[] boolske = {false, true};
-
-        for (boolean sgNav : boolske) {
-            for (boolean sgBeløp : boolske) {
-                for (boolean sgTid : boolske) {
-                    for (boolean reduksjon : boolske) {
-                        for (boolean sgAnnet : boolske) {
-                            HbVedtaksbrevPeriode periode = lagPeriodeDel(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER, Aktsomhet.SIMPEL_UAKTSOM, sgNav, sgBeløp, sgTid, sgAnnet, reduksjon);
-                            String s = TekstformatererVedtaksbrev.lagSærligeGrunnerTekst(felles, periode);
-                            String overskrift = overskrift(sgNav, sgBeløp, sgTid, sgAnnet, reduksjon);
-                            String prettyprint = prettyprint(s, overskrift);
-
-                            System.out.println();
-                            System.out.println(prettyprint);
-                        }
-                    }
-                }
-            }
-        }
+        lagSærligeGrunnerTekster(felles, VilkårResultat.FORSTO_BURDE_FORSTÅTT, Aktsomhet.SIMPEL_UAKTSOM);
     }
 
     @Test
-    public void list_ut_særlige_grunner_grov_uaktsomhet() {
+    public void list_ut_særlige_grunner_grov_uaktsomhet_forstod() {
         HbVedtaksbrevFelles felles = lagFellesdel(null);
+        lagSærligeGrunnerTekster(felles, VilkårResultat.FORSTO_BURDE_FORSTÅTT, Aktsomhet.GROVT_UAKTSOM);
+    }
 
+    @Test
+    public void list_ut_særlige_grunner_grov_uaktsomhet_forstod_nynorsk() {
+        HbVedtaksbrevFelles felles = lagFellesdel(Språkkode.nn);
+        lagSærligeGrunnerTekster(felles, VilkårResultat.FORSTO_BURDE_FORSTÅTT, Aktsomhet.GROVT_UAKTSOM);
+    }
+
+    @Test
+    public void list_ut_særlige_grunner_simpel_uaktsomhet_feil_mangelfulle_opplysninger() {
+        HbVedtaksbrevFelles felles = lagFellesdel(null);
+        lagSærligeGrunnerTekster(felles, VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER, Aktsomhet.SIMPEL_UAKTSOM);
+    }
+
+    @Test
+    public void list_ut_særlige_grunner_simpel_uaktsomhet_feil_mangelfulle_opplysninger_nynorsk() {
+        HbVedtaksbrevFelles felles = lagFellesdel(Språkkode.nn);
+        lagSærligeGrunnerTekster(felles, VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER, Aktsomhet.SIMPEL_UAKTSOM);
+    }
+
+    @Test
+    public void list_ut_særlige_grunner_grov_uaktsomhet_feil_mangelfulle_opplysninger() {
+        HbVedtaksbrevFelles felles = lagFellesdel(null);
+        lagSærligeGrunnerTekster(felles, VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER, Aktsomhet.GROVT_UAKTSOM);
+    }
+
+    @Test
+    public void list_ut_særlige_grunner_grov_uaktsomhet_feil_mangelfulle_opplysninger_nynorsk() {
+        HbVedtaksbrevFelles felles = lagFellesdel(Språkkode.nn);
+        lagSærligeGrunnerTekster(felles, VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER, Aktsomhet.GROVT_UAKTSOM);
+    }
+
+    private void lagSærligeGrunnerTekster(HbVedtaksbrevFelles felles, VilkårResultat forstoBurdeForstått, Aktsomhet simpelUaktsom) {
         boolean[] boolske = {false, true};
 
         for (boolean sgNav : boolske) {
@@ -123,13 +93,7 @@ public class DokumentasjonGeneratorPeriodeSærligeGrunner {
                 for (boolean sgTid : boolske) {
                     for (boolean reduksjon : boolske) {
                         for (boolean sgAnnet : boolske) {
-                            HbVedtaksbrevPeriode periode = lagPeriodeDel(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER, Aktsomhet.GROVT_UAKTSOM, sgNav, sgBeløp, sgTid, sgAnnet, reduksjon);
-                            String s = TekstformatererVedtaksbrev.lagSærligeGrunnerTekst(felles, periode);
-                            String overskrift = overskrift(sgNav, sgBeløp, sgTid, sgAnnet, reduksjon);
-                            String prettyprint = prettyprint(s, overskrift);
-
-                            System.out.println();
-                            System.out.println(prettyprint);
+                            lagSærligeGrunnerTekster(felles, forstoBurdeForstått, simpelUaktsom, sgNav, sgBeløp, sgTid, reduksjon, sgAnnet);
                         }
                     }
                 }
@@ -137,29 +101,21 @@ public class DokumentasjonGeneratorPeriodeSærligeGrunner {
         }
     }
 
-    @Test
-    public void list_ut_særlige_grunner_grov_uaktsomhet_nynorsk() {
-        HbVedtaksbrevFelles felles = lagFellesdel(Språkkode.nn);
+    private void lagSærligeGrunnerTekster(HbVedtaksbrevFelles felles,
+                                          VilkårResultat vilkårResultat,
+                                          Aktsomhet aktsomhet,
+                                          boolean sgNav,
+                                          boolean sgBeløp,
+                                          boolean sgTid,
+                                          boolean reduksjon,
+                                          boolean sgAnnet) {
+        HbVedtaksbrevPeriode periode = lagPeriodeDel(vilkårResultat, aktsomhet, sgNav, sgBeløp, sgTid, sgAnnet, reduksjon);
+        String s = TekstformatererVedtaksbrev.lagSærligeGrunnerTekst(felles, periode);
+        String overskrift = overskrift(sgNav, sgBeløp, sgTid, sgAnnet, reduksjon);
+        String prettyprint = prettyprint(s, overskrift);
 
-        boolean[] boolske = {false, true};
-
-        for (boolean sgNav : boolske) {
-            for (boolean sgBeløp : boolske) {
-                for (boolean sgTid : boolske) {
-                    for (boolean reduksjon : boolske) {
-                        for (boolean sgAnnet : boolske) {
-                            HbVedtaksbrevPeriode periode = lagPeriodeDel(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER, Aktsomhet.GROVT_UAKTSOM, sgNav, sgBeløp, sgTid, sgAnnet, reduksjon);
-                            String s = TekstformatererVedtaksbrev.lagSærligeGrunnerTekst(felles, periode);
-                            String overskrift = overskrift(sgNav, sgBeløp, sgTid, sgAnnet, reduksjon);
-                            String prettyprint = prettyprint(s, overskrift);
-
-                            System.out.println();
-                            System.out.println(prettyprint);
-                        }
-                    }
-                }
-            }
-        }
+        System.out.println();
+        System.out.println(prettyprint);
     }
 
     private String overskrift(boolean sgNav, boolean sgBeløp, boolean sgTid, boolean sgAnnet, boolean reduksjon) {
