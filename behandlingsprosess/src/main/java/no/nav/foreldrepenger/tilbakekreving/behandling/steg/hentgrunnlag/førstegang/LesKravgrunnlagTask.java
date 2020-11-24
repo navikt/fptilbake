@@ -2,7 +2,6 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.først
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -14,14 +13,11 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.FellesTask;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TaskProperty;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.FagsystemId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
@@ -48,7 +44,6 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
     private ØkonomiMottattXmlRepository økonomiMottattXmlRepository;
     private KravgrunnlagTjeneste kravgrunnlagTjeneste;
     private KravgrunnlagMapper kravgrunnlagMapper;
-    private BehandlingRepository behandlingRepository;
     private EksternBehandlingRepository eksternBehandlingRepository;
 
     LesKravgrunnlagTask() {
@@ -61,9 +56,8 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
                                KravgrunnlagMapper kravgrunnlagMapper,
                                BehandlingRepositoryProvider repositoryProvider,
                                FagsystemKlient fagsystemKlient) {
-        super(fagsystemKlient);
+        super(repositoryProvider.getBehandlingRepository(), fagsystemKlient);
         this.økonomiMottattXmlRepository = økonomiMottattXmlRepository;
-        this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
 
         this.kravgrunnlagTjeneste = kravgrunnlagTjeneste;
@@ -116,21 +110,6 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
         if (!Henvisning.erGyldig(henvisning)) {
             throw LesKravgrunnlagTaskFeil.FACTORY.ugyldigHenvisning(henvisning).toException();
         }
-    }
-
-    private List<Behandling> hentBehandlingerForSaksnummer(String saksnummer) {
-        return behandlingRepository.hentAlleBehandlingerForSaksnummer(new Saksnummer(saksnummer));
-    }
-
-    private Optional<Behandling> finnÅpenTilbakekrevingBehandling(String saksnummer){
-        List<Behandling> behandlinger = hentBehandlingerForSaksnummer(saksnummer);
-        List<Behandling> åpneBehandlinger = behandlinger.stream()
-            .filter(beh -> BehandlingType.TILBAKEKREVING.equals(beh.getType()))
-            .filter(beh -> !beh.erAvsluttet()).collect(Collectors.toList());
-        if(åpneBehandlinger.size() > 1){
-            throw new IllegalArgumentException("Utvikler feil: Kan ikke ha flere åpne behandling for saksnummer="+ saksnummer);
-        }
-        return åpneBehandlinger.stream().findAny();
     }
 
     private void validerBehandlingsEksistens(Henvisning henvisning, String saksnummer) {

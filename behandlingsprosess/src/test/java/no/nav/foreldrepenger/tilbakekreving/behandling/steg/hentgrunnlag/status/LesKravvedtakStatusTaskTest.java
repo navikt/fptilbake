@@ -1,6 +1,8 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.status;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -71,6 +73,9 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         lagEksternBehandling(behandling);
         manipulerInternBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.TBKGSTEG);
         when(fagsystemKlientMock.hentBehandlingForSaksnummer("139015144")).thenReturn(lagResponsFraFagsystemKlient());
+
+        mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_FEIL_samme_referanse.xml"));
+        lesKravgrunnlagTask.doTask(lagProsessTaskData(mottattXmlId, LesKravgrunnlagTask.TASKTYPE));
     }
 
     @Test
@@ -78,13 +83,12 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_SPER.xml"));
         lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LesKravvedtakStatusTask.TASKTYPE));
 
-        assertThat(mottattXmlRepository.finnForHenvisning(HENVISNING)).isPresent();
+        assertTrue(mottattXmlRepository.erMottattXmlTilkoblet(mottattXmlId));
         assertThat(behandling.isBehandlingPåVent()).isTrue();
         assertThat(behandling.getAksjonspunktFor(AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)).isNotNull();
         assertThat(behandling.getVenteårsak()).isEqualByComparingTo(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
 
         assertThat(kravVedtakStatusRepository.finnKravstatus(behandling.getId())).isEqualTo(Optional.of(KravStatusKode.SPERRET));
-        assertTilkobling();
     }
 
     @Test
@@ -92,13 +96,12 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_MANU.xml"));
         lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LesKravvedtakStatusTask.TASKTYPE));
 
-        assertThat(mottattXmlRepository.finnForHenvisning(HENVISNING)).isPresent();
+        assertTrue(mottattXmlRepository.erMottattXmlTilkoblet(mottattXmlId));
         assertThat(behandling.isBehandlingPåVent()).isTrue();
         assertThat(behandling.getAksjonspunktFor(AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG)).isNotNull();
         assertThat(behandling.getVenteårsak()).isEqualByComparingTo(Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
 
         assertThat(kravVedtakStatusRepository.finnKravstatus(behandling.getId())).isEqualTo(Optional.of(KravStatusKode.MANUELL));
-        assertTilkobling();
     }
 
     @Test
@@ -106,7 +109,7 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_AVSL.xml"));
         lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LesKravvedtakStatusTask.TASKTYPE));
 
-        assertThat(mottattXmlRepository.finnForHenvisning(HENVISNING)).isPresent();
+        assertTrue(mottattXmlRepository.erMottattXmlTilkoblet(mottattXmlId));
         assertThat(behandling.erAvsluttet()).isTrue();
         Optional<Behandlingsresultat> resultat = behandlingresultatRepository.hent(behandling);
         assertThat(resultat).isPresent();
@@ -118,7 +121,6 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         assertThat(historikkinnslager.size()).isEqualTo(1);
         Historikkinnslag historikkinnslag = historikkinnslager.get(0);
         assertThat(historikkinnslag.getType()).isEqualByComparingTo(HistorikkinnslagType.AVBRUTT_BEH);
-        assertTilkobling();
     }
 
     @Test
@@ -184,9 +186,6 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
 
     @Test
     public void skal_utføre_leskravvedtakstatus_task_for_behandling_som_allerede_har_grunnlag_med_samme_referanse() {
-        mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_FEIL_samme_referanse.xml"));
-        lesKravgrunnlagTask.doTask(lagProsessTaskData(mottattXmlId, LesKravgrunnlagTask.TASKTYPE));
-
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_SPER.xml"));
         lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LesKravvedtakStatusTask.TASKTYPE));
 
@@ -205,9 +204,6 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
 
     @Test
     public void skal_utføre_leskravvedtakststatustask_for_mottatt_endr_melding_med_gyldig_behandling() {
-        mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_FEIL_samme_referanse.xml"));
-        lesKravgrunnlagTask.doTask(lagProsessTaskData(mottattXmlId, LesKravgrunnlagTask.TASKTYPE));
-
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_SPER.xml"));
         lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LesKravvedtakStatusTask.TASKTYPE));
 
@@ -230,21 +226,18 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
     }
 
     @Test
-    public void skal_ikke_utføre_leskravvedtakststatustask_for_mottatt_endr_melding_når_grunnlag_ikke_finnes() {
-        expectedException.expect(TekniskException.class);
-        expectedException.expectMessage("FPT-107929");
-
-        mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_ENDR_samme_referanse.xml"));
+    public void skal_ikke_utføre_leskravvedtakststatustask_for_mottatt_sper_melding_når_koblede_grunnlag_ikke_finnes(){
+        grunnlagRepository.getEntityManager().createNativeQuery("update GR_KRAV_GRUNNLAG set aktiv='N' where behandling_id="+behandling.getId()).executeUpdate();
+        mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_SPER.xml"));
         lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LesKravvedtakStatusTask.TASKTYPE));
+
+        assertFalse(mottattXmlRepository.erMottattXmlTilkoblet(mottattXmlId));
     }
 
     @Test
     public void skal_ikke_utføre_leskravvedtakststatustask_for_mottatt_endr_melding_når_grunnlag_ikke_sperret() {
         expectedException.expect(TekniskException.class);
         expectedException.expectMessage("FPT-107929");
-
-        mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_FEIL_samme_referanse.xml"));
-        lesKravgrunnlagTask.doTask(lagProsessTaskData(mottattXmlId, LesKravgrunnlagTask.TASKTYPE));
 
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_ENDR_samme_referanse.xml"));
         lesKravvedtakStatusTask.doTask(lagProsessTaskData(mottattXmlId, LesKravvedtakStatusTask.TASKTYPE));
@@ -281,11 +274,6 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         assertThat(xmlMottatt.get().isTilkoblet()).isFalse();
     }
 
-    private void assertTilkobling() {
-        Optional<ØkonomiXmlMottatt> økonomiXmlMottatt = mottattXmlRepository.finnForHenvisning(HENVISNING);
-        assertThat(økonomiXmlMottatt).isPresent();
-        assertThat(økonomiXmlMottatt.get().isTilkoblet()).isTrue();
-    }
 
     private List<ØkonomiXmlMottatt> finnAlleForHenvisning(Henvisning henvisning) {
         TypedQuery<ØkonomiXmlMottatt> query = repoRule.getEntityManager().createQuery("from ØkonomiXmlMottatt where henvisning=:henvisning", ØkonomiXmlMottatt.class);
