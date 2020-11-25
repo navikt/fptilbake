@@ -49,7 +49,8 @@ public class AutomatiskSaksbehandlingRepository {
             "sum(beløp.nyBelop) <= case f.fagsakYtelseType " +
             "when 'FP' then :maksFpFeilutbetaltBeløp " +
             "when 'SVP' then :maksSvpFeilutbetaltBeløp " +
-            "when 'ES' then :maksEsFeilutbetaltBeløp else -1 end " +
+            "when 'ES' then :maksEsFeilutbetaltBeløp " +
+            "when 'FRISINN' then :maksFrisinnFeilutbetaltBeløp else -1 end " +
             ") ", Behandling.class);
 
         query.setParameter("aksjonspunktDefinisjon", AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING);
@@ -61,6 +62,7 @@ public class AutomatiskSaksbehandlingRepository {
         query.setParameter("maksFpFeilutbetaltBeløp", MaksFeilutbetaltBeløpPerYtelseType.getMaksFeilutbetaltBeløp(FagsakYtelseType.FORELDREPENGER));
         query.setParameter("maksSvpFeilutbetaltBeløp", MaksFeilutbetaltBeløpPerYtelseType.getMaksFeilutbetaltBeløp(FagsakYtelseType.SVANGERSKAPSPENGER));
         query.setParameter("maksEsFeilutbetaltBeløp", MaksFeilutbetaltBeløpPerYtelseType.getMaksFeilutbetaltBeløp(FagsakYtelseType.ENGANGSTØNAD));
+        query.setParameter("maksFrisinnFeilutbetaltBeløp", MaksFeilutbetaltBeløpPerYtelseType.getMaksFeilutbetaltBeløp(FagsakYtelseType.FRISINN));
         return query.getResultList();
     }
 }
