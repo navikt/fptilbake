@@ -83,8 +83,7 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
                 økonomiMottattXmlRepository.opprettTilkobling(mottattXmlId);
                 logger.info("Tilkoblet kravVedtakStatus med id={} saksnummer={} behandlingId={}", mottattXmlId, saksnummer, behandlingId);
             } else {
-                logger.info("Ignorerte kravVedtakStatus med id={} saksnummer={}. Behandling med behandlingId={} er ikke koblet med et kravgrunnlag",
-                    mottattXmlId, saksnummer, behandlingId);
+                throw LesKravvedtakStatusTaskFeil.FACTORY.ugyldigVedtakId(vedtakId, mottattXmlId).toException();
             }
 
         } else {
@@ -123,6 +122,12 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
             feilmelding = "Mottok et kravOgVedtakStatus fra Økonomi med henvisning i ikke-støttet format, henvisning=%s. KravOgVedtakStatus skulle kanskje til et annet system. Si i fra til Økonomi!",
             logLevel = LogLevel.WARN)
         Feil ugyldigHenvisning(Henvisning henvisning);
+
+        @TekniskFeil(feilkode = "FPT-675365",
+            feilmelding = "Mottok et kravOgVedtakStatus fra Økonomi med vedtakId som ikke finnes, vedtakId=%s, mottattXmlId=%s. " +
+                "KravOgVedtakStatus skulle kanskje til et annet system. Si i fra til Økonomi!",
+            logLevel = LogLevel.WARN)
+        Feil ugyldigVedtakId(long vedtakId, long mottattXmlId);
 
     }
 
