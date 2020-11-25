@@ -1,0 +1,33 @@
+erDiagram
+          Kravgrunnlag ||..|{ KravgrunnlagPeriode: ""
+          KravgrunnlagPeriode ||--|{ KravgrunnlagBelop : inneholder
+
+
+
+erDiagram
+          VilkaarVurdering ||--|{ VilkaarVurderingPeriode: ""
+          VilkaarVurderingPeriode ||--o| VilkaarVurderingAktsomhet : ""
+          VilkaarVurderingPeriode ||--o| VilkaarVurderingGodTro : ""
+          VilkaarVurderingAktsomhet ||--o{ VilkaarVurderingSaerligGrunn : ""
+
+
+stateDiagram-v2
+    state join_state <<join>>
+    Kravgrunnlag --> join_state
+    Foreldelsevurdering --> join_state
+    Vilkårsvurdering --> join_state
+    gjelderFrisinn(J/N) --> join_state
+    join_state--> Beregningsresultat
+
+
+stateDiagram-v2
+    state join_state <<join>>
+    Kravgrunnlag --> join_state
+    Foreldelsevurdering --> join_state
+    Vilkårsvurdering --> join_state
+    gjelderFrisinn(J/N) --> join_state
+    join_state--> Beregningsresultat
+    state join_state2 <<join>>
+    Kravgrunnlag --> join_state2
+    Beregningsresultat --> join_state2
+    join_state2 --> Vedtak_til_oppdragssystemet
