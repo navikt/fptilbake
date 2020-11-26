@@ -184,7 +184,7 @@ public class AktørTjeneste {
                 .sivilstand(new SivilstandResponseProjection().type());
 
 
-            var person = pdlKlient.hentPerson(query, projection, Tema.FOR);
+            var person = pdlKlient.hentPerson(query, projection, tema);
 
             var fødselsdato = person.getFoedsel().stream()
                 .map(Foedsel::getFoedselsdato)
