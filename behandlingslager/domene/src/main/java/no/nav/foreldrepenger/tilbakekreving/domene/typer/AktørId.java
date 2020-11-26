@@ -18,7 +18,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.diff.IndexKey;
  * DNR til FNR i Folkeregisteret. Tilsvarende vil den kunne referere personer som har ident fra et utenlandsk system.
  */
 @Embeddable
-public class AktørId implements Serializable, IndexKey {
+public class AktørId implements Serializable, Comparable<AktørId>, IndexKey {
     private static final String CHARS = "a-z0-9_:-";
 
     private static final String VALID_REGEXP = "^(-?[1-9]|[a-z0])[" + CHARS + "]*$";
@@ -49,7 +49,7 @@ public class AktørId implements Serializable, IndexKey {
         }
         this.aktørId = aktørId;
     }
-    
+
     @Override
     public String getIndexKey() {
         return aktørId;
@@ -57,6 +57,12 @@ public class AktørId implements Serializable, IndexKey {
 
     public String getId() {
         return aktørId;
+    }
+
+    @Override
+    public int compareTo(AktørId o) {
+        // TODO: Burde ikke finnes - er er pga LRU-cache
+        return aktørId.compareTo(o.aktørId);
     }
 
     @Override

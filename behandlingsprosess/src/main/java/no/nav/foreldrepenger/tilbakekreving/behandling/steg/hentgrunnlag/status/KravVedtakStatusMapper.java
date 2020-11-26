@@ -3,7 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.status
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TpsAdapterWrapper;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.PersonOrganisasjonWrapper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatus437;
@@ -14,14 +14,14 @@ import no.nav.tilbakekreving.status.v1.KravOgVedtakstatus;
 @ApplicationScoped
 public class KravVedtakStatusMapper {
 
-    private TpsAdapterWrapper tpsAdapterWrapper;
+    private PersonOrganisasjonWrapper tpsAdapterWrapper;
 
     KravVedtakStatusMapper() {
         // for CDI proxy
     }
 
     @Inject
-    public KravVedtakStatusMapper(TpsAdapterWrapper tpsAdapterWrapper) {
+    public KravVedtakStatusMapper(PersonOrganisasjonWrapper tpsAdapterWrapper) {
         this.tpsAdapterWrapper = tpsAdapterWrapper;
     }
 

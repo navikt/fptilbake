@@ -29,7 +29,7 @@ import org.junit.Test;
 import com.google.common.collect.Lists;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TpsAdapterWrapper;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.PersonOrganisasjonWrapper;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.KravgrunnlagMapper;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.revurdering.HentKravgrunnlagMapper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollProvider;
@@ -50,13 +50,10 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKo
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.TestFagsakUtil;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
-import no.nav.foreldrepenger.tilbakekreving.domene.person.TpsAdapter;
-import no.nav.foreldrepenger.tilbakekreving.domene.person.impl.PersoninfoAdapter;
-import no.nav.foreldrepenger.tilbakekreving.domene.person.impl.TpsTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
@@ -93,13 +90,11 @@ public class HåndterGamleKravgrunnlagTaskTest {
     @Rule
     public UnittestRepositoryRule repositoryRule = new UnittestRepositoryRule();
 
-    private final TpsAdapter tpsAdapterMock = mock(TpsAdapter.class);
-    private final TpsAdapterWrapper tpsAdapterWrapper = new TpsAdapterWrapper(tpsAdapterMock);
-    private final TpsTjeneste tpsTjenesteMock = mock(TpsTjeneste.class);
+    private final PersoninfoAdapter tpsTjenesteMock = mock(PersoninfoAdapter.class);
+    private final PersonOrganisasjonWrapper tpsAdapterWrapper = new PersonOrganisasjonWrapper(tpsTjenesteMock);
     private final ØkonomiConsumer økonomiConsumerMock = mock(ØkonomiConsumer.class);
     private final BehandlingModellRepository behandlingModellRepositoryMock = mock(BehandlingModellRepository.class);
     private final BehandlingskontrollEventPubliserer behandlingskontrollEventPublisererMock = mock(BehandlingskontrollEventPubliserer.class);
-    private final PersoninfoAdapter personinfoAdapterMock = mock(PersoninfoAdapter.class);
     private final FagsystemKlient fagsystemKlientMock = mock(FagsystemKlient.class);
 
     private final BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(repositoryRule.getEntityManager());
@@ -117,7 +112,7 @@ public class HåndterGamleKravgrunnlagTaskTest {
     private final BehandlingskontrollProvider behandlingskontrollProvider = new BehandlingskontrollProvider(behandlingskontrollTjeneste,
         mock(BehandlingskontrollAsynkTjeneste.class));
     private final HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(repositoryProvider.getHistorikkRepository(),
-        personinfoAdapterMock);
+        null);
 
     private final FagsakTjeneste fagsakTjeneste = new FagsakTjeneste(tpsTjenesteMock, fagsakRepository, navBrukerRepository);
     private final BehandlingTjeneste behandlingTjeneste = new BehandlingTjeneste(repositoryProvider, prosessTaskRepository, behandlingskontrollProvider,
@@ -134,7 +129,7 @@ public class HåndterGamleKravgrunnlagTaskTest {
     public void setup() {
         behandling = ScenarioSimple.simple().lagMocked();
         when(tpsTjenesteMock.hentBrukerForAktør(any(AktørId.class))).thenReturn(lagPersonInfo(behandling.getFagsak().getAktørId()));
-        when(tpsAdapterMock.hentAktørIdForPersonIdent(any(PersonIdent.class))).thenReturn(Optional.of(behandling.getFagsak().getAktørId()));
+        when(tpsTjenesteMock.hentAktørForFnr(any(PersonIdent.class))).thenReturn(Optional.of(behandling.getFagsak().getAktørId()));
         when(økonomiConsumerMock.hentKravgrunnlag(any(), any(HentKravgrunnlagDetaljDto.class))).thenReturn(lagDetaljertKravgrunnlagDto(true));
         EksternBehandlingsinfoDto eksternBehandlingsinfoDto = lagEksternBehandlingData();
         when(fagsystemKlientMock.hentBehandlingForSaksnummer(anyString())).thenReturn(Lists.newArrayList(eksternBehandlingsinfoDto));
@@ -367,8 +362,6 @@ public class HåndterGamleKravgrunnlagTaskTest {
             .medNavBrukerKjønn(NavBrukerKjønn.KVINNE)
             .medPersonIdent(new PersonIdent(aktørId.getId()))
             .medNavn("testnavn")
-            .medAdresse("test adresse")
-            .medForetrukketSpråk(Språkkode.nb)
             .build();
         return Optional.of(personinfo);
     }

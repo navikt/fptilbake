@@ -102,7 +102,6 @@ public class DokumentBestillerTestOppsett {
             .medAktørId(new AktørId(9000000030014L))
             .medFødselsdato(LocalDate.of(1990, 2, 2))
             .medNavBrukerKjønn(NavBrukerKjønn.KVINNE)
-            .medForetrukketSpråk(språkkode)
             .build();
     }
 

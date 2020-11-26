@@ -1,7 +1,9 @@
-package no.nav.foreldrepenger.tilbakekreving.domene.person.impl;
+package no.nav.foreldrepenger.tilbakekreving.domene.person;
 
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.NavBrukerKjønn.KVINNE;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -9,22 +11,22 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.AdresseType;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
-import no.nav.foreldrepenger.tilbakekreving.domene.person.TpsAdapter;
+import no.nav.foreldrepenger.tilbakekreving.domene.person.impl.TpsAdapter;
+import no.nav.foreldrepenger.tilbakekreving.domene.person.impl.TpsException;
+import no.nav.foreldrepenger.tilbakekreving.domene.person.impl.TpsFeilmeldinger;
+import no.nav.foreldrepenger.tilbakekreving.domene.person.pdl.AktørTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.tjeneste.virksomhet.person.v3.binding.HentPersonSikkerhetsbegrensning;
 import no.nav.vedtak.feil.FeilFactory;
 
-public class TpsTjenesteTest {
+public class PersoninfoAdapterTest {
 
     private static Map<AktørId, PersonIdent> FNR_VED_AKTØR_ID = new HashMap<>();
     private static Map<PersonIdent, AktørId> AKTØR_ID_VED_FNR = new HashMap<>();
@@ -38,22 +40,16 @@ public class TpsTjenesteTest {
 
     private static final String NAVN = "Anne-Berit Hjartdal";
 
-    private TpsTjeneste tpsTjeneste;
+    private PersoninfoAdapter tpsTjeneste;
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
-
-    @Rule
-    public UnittestRepositoryRule repoRule = new UnittestRepositoryRule();
-
-    @Before
+    @BeforeEach
     public void oppsett() {
         FNR_VED_AKTØR_ID.put(AKTØR_ID, FNR);
         FNR_VED_AKTØR_ID.put(ENDRET_AKTØR_ID, ENDRET_FNR);
         AKTØR_ID_VED_FNR.put(FNR, AKTØR_ID);
         AKTØR_ID_VED_FNR.put(ENDRET_FNR, ENDRET_AKTØR_ID);
 
-        tpsTjeneste = new TpsTjeneste(new TpsAdapterMock());
+        tpsTjeneste = new PersoninfoAdapter(new TpsAdapterMock(), mock(AktørTjeneste.class));
     }
 
     @Test
@@ -64,12 +60,10 @@ public class TpsTjenesteTest {
 
     @Test
     public void skal_kaste_feil_ved_tjenesteexception_dersom_aktør_ikke_er_cachet() {
-        expectedException.expect(TpsException.class);
-
-        tpsTjeneste.hentBrukerForAktør(AKTØR_ID_SOM_TRIGGER_EXCEPTION);
+        assertThrows(TpsException.class, () -> tpsTjeneste.hentBrukerForAktør(AKTØR_ID_SOM_TRIGGER_EXCEPTION));
     }
 
-    private class TpsAdapterMock implements TpsAdapter {
+    private class TpsAdapterMock extends TpsAdapter {
         private static final String ADR1 = "Adresselinje1";
         private static final String ADR2 = "Adresselinje2";
         private static final String ADR3 = "Adresselinje3";

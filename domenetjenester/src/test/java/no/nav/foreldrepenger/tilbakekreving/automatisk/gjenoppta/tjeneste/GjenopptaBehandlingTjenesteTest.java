@@ -114,7 +114,7 @@ public class GjenopptaBehandlingTjenesteTest {
 
         when(mockProsesstaskRepository.lagre(any(ProsessTaskData.class))).thenReturn("Call_123");
 
-        gjenopptaBehandlingTjeneste.fortsettBehandlingManuelt(behandlingId);
+        gjenopptaBehandlingTjeneste.fortsettBehandlingManuelt(behandlingId, HistorikkAktør.SAKSBEHANDLER);
         assertThat(behandling.isBehandlingPåVent()).isTrue();
         List<Historikkinnslag> historikkinnslager = repositoryProvider.getHistorikkRepository().hentHistorikk(behandlingId);
         assertThat(historikkinnslager.size()).isEqualTo(1);

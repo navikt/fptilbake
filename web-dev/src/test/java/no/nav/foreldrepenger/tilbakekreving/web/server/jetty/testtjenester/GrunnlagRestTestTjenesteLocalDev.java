@@ -25,7 +25,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingFeil;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
-import no.nav.foreldrepenger.tilbakekreving.domene.person.impl.TpsTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
@@ -50,7 +50,7 @@ public class GrunnlagRestTestTjenesteLocalDev implements GrunnlagRestTestTjenest
 
     static final String PATH_FRAGMENT = "/grunnlag";
 
-    private TpsTjeneste tpsTjeneste;
+    private PersoninfoAdapter tpsTjeneste;
     private KravgrunnlagTjeneste kravgrunnlagTjeneste;
 
     public GrunnlagRestTestTjenesteLocalDev() {
@@ -58,7 +58,7 @@ public class GrunnlagRestTestTjenesteLocalDev implements GrunnlagRestTestTjenest
     }
 
     @Inject
-    public GrunnlagRestTestTjenesteLocalDev(TpsTjeneste tpsTjeneste, KravgrunnlagTjeneste kravgrunnlagTjeneste) {
+    public GrunnlagRestTestTjenesteLocalDev(PersoninfoAdapter tpsTjeneste, KravgrunnlagTjeneste kravgrunnlagTjeneste) {
         this.tpsTjeneste = tpsTjeneste;
         this.kravgrunnlagTjeneste = kravgrunnlagTjeneste;
     }

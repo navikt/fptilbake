@@ -18,7 +18,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.AdresseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.NavBrukerKjønn;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.tjeneste.virksomhet.person.v3.binding.HentPersonPersonIkkeFunnet;
@@ -33,7 +32,7 @@ import no.nav.vedtak.felles.integrasjon.person.PersonConsumer;
 
 public class TpsAdapterImplTest {
 
-    private TpsAdapterImpl tpsAdapterImpl;
+    private TpsAdapter tpsAdapterImpl;
 
     private AktørConsumerMedCache aktørConsumerMock = Mockito.mock(AktørConsumerMedCache.class);
     private PersonConsumer personProxyServiceMock = Mockito.mock(PersonConsumer.class);
@@ -45,7 +44,7 @@ public class TpsAdapterImplTest {
     public void setup() {
         TpsAdresseOversetter tpsAdresseOversetter = new TpsAdresseOversetter(null);
         TpsOversetter tpsOversetter = new TpsOversetter(tpsAdresseOversetter);
-        tpsAdapterImpl = new TpsAdapterImpl(aktørConsumerMock, personProxyServiceMock, tpsOversetter);
+        tpsAdapterImpl = new TpsAdapter(aktørConsumerMock, personProxyServiceMock, tpsOversetter);
     }
 
     @Test
@@ -82,11 +81,10 @@ public class TpsAdapterImplTest {
             .medFødselsdato(fødselsdato)
             .medNavBrukerKjønn(kjønn)
             .medAktørId(aktørId)
-            .medForetrukketSpråk(Språkkode.nb)
             .build();
 
         Mockito.when(tpsOversetterMock.tilBrukerInfo(Mockito.any(AktørId.class), eq(person))).thenReturn(personinfo0);
-        tpsAdapterImpl = new TpsAdapterImpl(aktørConsumerMock, personProxyServiceMock, tpsOversetterMock);
+        tpsAdapterImpl = new TpsAdapter(aktørConsumerMock, personProxyServiceMock, tpsOversetterMock);
 
         Personinfo personinfo = tpsAdapterImpl.hentKjerneinformasjon(fnr, aktørId);
         assertNotNull(personinfo);
@@ -128,7 +126,7 @@ public class TpsAdapterImplTest {
         Adresseinfo adresseinfoExpected = builder.medAdresselinje1(addresse).build();
 
         when(tpsOversetterMock.tilAdresseinfo(eq(person))).thenReturn(adresseinfoExpected);
-        tpsAdapterImpl = new TpsAdapterImpl(aktørConsumerMock, personProxyServiceMock, tpsOversetterMock);
+        tpsAdapterImpl = new TpsAdapter(aktørConsumerMock, personProxyServiceMock, tpsOversetterMock);
 
         Adresseinfo adresseinfoActual = tpsAdapterImpl.hentAdresseinformasjon(fnr);
 

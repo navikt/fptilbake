@@ -6,7 +6,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TpsAdapterWrapper;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.PersonOrganisasjonWrapper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
@@ -26,14 +26,14 @@ import no.nav.vedtak.felles.integrasjon.felles.ws.DateUtil;
 @ApplicationScoped
 public class KravgrunnlagMapper {
 
-    private TpsAdapterWrapper tpsAdapterWrapper;
+    private PersonOrganisasjonWrapper tpsAdapterWrapper;
 
     KravgrunnlagMapper() {
         //for CDI proxy
     }
 
     @Inject
-    public KravgrunnlagMapper(TpsAdapterWrapper tpsAdapterWrapper) {
+    public KravgrunnlagMapper(PersonOrganisasjonWrapper tpsAdapterWrapper) {
         this.tpsAdapterWrapper = tpsAdapterWrapper;
     }
 

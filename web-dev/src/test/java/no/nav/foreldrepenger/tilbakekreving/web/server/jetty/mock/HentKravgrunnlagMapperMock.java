@@ -6,7 +6,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TpsAdapterWrapper;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.PersonOrganisasjonWrapper;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.revurdering.HentKravgrunnlagMapper;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType;
 
@@ -16,7 +16,7 @@ public class HentKravgrunnlagMapperMock extends HentKravgrunnlagMapper {
     private Logger logger = LoggerFactory.getLogger(HentKravgrunnlagMapperMock.class);
 
     @Inject
-    public HentKravgrunnlagMapperMock(TpsAdapterWrapper tpsAdapterWrapper) {
+    public HentKravgrunnlagMapperMock(PersonOrganisasjonWrapper tpsAdapterWrapper) {
         super(tpsAdapterWrapper);
     }
 

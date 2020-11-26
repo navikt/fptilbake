@@ -15,7 +15,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.Ve
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
-import no.nav.foreldrepenger.tilbakekreving.domene.person.impl.TpsTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
@@ -30,13 +30,13 @@ import no.nav.vedtak.konfig.KonfigVerdi;
 @Transactional
 public class EksternDataForBrevTjeneste {
 
-    private TpsTjeneste tpsTjeneste;
+    private PersoninfoAdapter tpsTjeneste;
     private VirksomhetTjeneste virksomhetTjeneste;
     private FagsystemKlient fagsystemKlient;
     private Period brukersSvarfrist;
 
     @Inject
-    public EksternDataForBrevTjeneste(TpsTjeneste tpsTjeneste,
+    public EksternDataForBrevTjeneste(PersoninfoAdapter tpsTjeneste,
                                       VirksomhetTjeneste virksomhetTjeneste,
                                       FagsystemKlient fagsystemKlient,
                                       @KonfigVerdi(value = "brukertilbakemelding.venter.frist.lengde") Period brukersSvarfrist) {

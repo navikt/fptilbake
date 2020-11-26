@@ -16,7 +16,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
-import no.nav.foreldrepenger.tilbakekreving.domene.person.impl.TpsTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
+import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
@@ -24,7 +25,7 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 @ApplicationScoped
 public class FagsakTjeneste {
 
-    private TpsTjeneste tpsTjeneste;
+    private PersoninfoAdapter tpsTjeneste;
     private FagsakRepository fagsakRepository;
     private NavBrukerRepository navBrukerRepository;
 
@@ -33,14 +34,14 @@ public class FagsakTjeneste {
     }
 
     @Inject
-    public FagsakTjeneste(TpsTjeneste tpsTjeneste, FagsakRepository fagsakRepository, NavBrukerRepository navBrukerRepository) {
+    public FagsakTjeneste(PersoninfoAdapter tpsTjeneste, FagsakRepository fagsakRepository, NavBrukerRepository navBrukerRepository) {
         this.tpsTjeneste = tpsTjeneste;
         this.fagsakRepository = fagsakRepository;
         this.navBrukerRepository = navBrukerRepository;
     }
 
-    public Fagsak opprettFagsak(Saksnummer saksnummer, AktørId aktørId, FagsakYtelseType fagsakYtelseType) {
-        NavBruker bruker = hentNavBruker(aktørId);
+    public Fagsak opprettFagsak(Saksnummer saksnummer, AktørId aktørId, FagsakYtelseType fagsakYtelseType, Språkkode språkkode) {
+        NavBruker bruker = hentNavBruker(aktørId, språkkode);
         Fagsak fagsak = Fagsak.opprettNy(saksnummer, bruker);
         fagsak.setFagsakYtelseType(fagsakYtelseType);
 
@@ -67,16 +68,8 @@ public class FagsakTjeneste {
         return tpsTjeneste.hentBrukerForAktør(aktørId).map(Personinfo::getNavn).orElseThrow(() -> BehandlingFeil.FACTORY.fantIkkePersonMedAktørId().toException());
     }
 
-    private NavBruker hentNavBruker(AktørId aktørId) {
-        NavBruker navBruker;
-        Optional<NavBruker> navBrukerOptional = navBrukerRepository.hent(aktørId);
-        if (!navBrukerOptional.isPresent()) {
-            Personinfo personinfo = tpsTjeneste.hentBrukerForAktør(aktørId).orElseThrow(() -> BehandlingFeil.FACTORY.fantIkkePersonMedAktørId().toException());
-            navBruker = NavBruker.opprettNy(personinfo.getAktørId(), personinfo.getForetrukketSpråk());
-        } else {
-            navBruker = navBrukerOptional.get();
-        }
-        return navBruker;
+    private NavBruker hentNavBruker(AktørId aktørId, Språkkode språkkode) {
+        return navBrukerRepository.hent(aktørId).orElseGet(() -> NavBruker.opprettNy(aktørId, språkkode));
     }
 
     private Fagsak lagreFagsak(Fagsak fagsak, Saksnummer saksnummer) {

@@ -251,7 +251,7 @@ public class BehandlingRestTjeneste {
         behandlingTjeneste.kanEndreBehandling(behandling.getId(), dto.getBehandlingVersjon());
 
         // gjenoppta behandling
-        Optional<String> gruppeOpt = gjenopptaBehandlingTjeneste.fortsettBehandlingManuelt(behandling.getId());
+        Optional<String> gruppeOpt = gjenopptaBehandlingTjeneste.fortsettBehandlingManuelt(behandling.getId(), HistorikkAktør.SAKSBEHANDLER);
 
         return Redirect.tilBehandlingPollStatus(behandling.getUuid(), gruppeOpt);
     }

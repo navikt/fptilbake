@@ -27,7 +27,6 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.innhentdokumentas
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.innhentdokumentasjon.InnhentDokumentasjonbrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.manuelt.ManueltVarselBrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.manuelt.SendManueltVarselbrevTask;
-import no.nav.foreldrepenger.tilbakekreving.domene.person.impl.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagBelop433;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432;
@@ -45,7 +44,6 @@ public class DokumentBehandlingTjenesteTest extends DokumentBestillerTestOppsett
 
     private ProsessTaskRepository prosessTaskRepository;
 
-    private final PersoninfoAdapter mockPersoninfoAdapter = mock(PersoninfoAdapter.class);
     private ManueltVarselBrevTjeneste mockManueltVarselBrevTjeneste = mock(ManueltVarselBrevTjeneste.class);
     private InnhentDokumentasjonbrevTjeneste mockInnhentDokumentasjonbrevTjeneste = mock(InnhentDokumentasjonbrevTjeneste.class);
 
@@ -54,7 +52,7 @@ public class DokumentBehandlingTjenesteTest extends DokumentBestillerTestOppsett
     @Before
     public void setup() {
         prosessTaskRepository = new ProsessTaskRepositoryImpl(repositoryRule.getEntityManager(), null, null);
-        HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepository, mockPersoninfoAdapter);
+        HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepository, null);
         dokumentBehandlingTjeneste = new DokumentBehandlingTjeneste(repositoryProvider, prosessTaskRepository, historikkinnslagTjeneste,
             mockManueltVarselBrevTjeneste, mockInnhentDokumentasjonbrevTjeneste);
     }

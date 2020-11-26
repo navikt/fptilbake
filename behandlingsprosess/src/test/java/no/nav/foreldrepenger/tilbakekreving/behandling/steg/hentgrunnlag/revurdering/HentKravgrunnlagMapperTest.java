@@ -42,7 +42,7 @@ public class HentKravgrunnlagMapperTest extends FellesTestOppsett {
 
     @Test
     public void skal_mapTilDomene_fraHentgrunnlagrespons(){
-        Mockito.when(tpsAdapterMock.hentAktørIdForPersonIdent(PersonIdent.fra("12345678901"))).thenReturn(Optional.of(new AktørId(999999L)));
+        Mockito.when(personinfoAdapterMock.hentAktørForFnr(PersonIdent.fra("12345678901"))).thenReturn(Optional.of(new AktørId(999999L)));
 
         Kravgrunnlag431 kravgrunnlag431 = mapper.mapTilDomene(hentGrunnlag());
         assertThat(kravgrunnlag431).isNotNull();
@@ -77,7 +77,7 @@ public class HentKravgrunnlagMapperTest extends FellesTestOppsett {
 
     @Test
     public void skal_ignorere_belop_postering_med_positiv_ytel() {
-        Mockito.when(tpsAdapterMock.hentAktørIdForPersonIdent(PersonIdent.fra("12345678901"))).thenReturn(Optional.of(new AktørId(999999L)));
+        Mockito.when(personinfoAdapterMock.hentAktørForFnr(PersonIdent.fra("12345678901"))).thenReturn(Optional.of(new AktørId(999999L)));
 
         DetaljertKravgrunnlagBelopDto feilPostering = hentBeløp(BigDecimal.valueOf(1794), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, TypeKlasseDto.FEIL);
         DetaljertKravgrunnlagBelopDto ytelPostering = hentBeløp(BigDecimal.ZERO, BigDecimal.valueOf(1794), BigDecimal.valueOf(3270),

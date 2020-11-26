@@ -222,7 +222,7 @@ public class BehandlingTjeneste {
         }
         henvisning = hentHenvisningHvisIkkeFinnes(henvisning, eksternBehandlingsinfoDto);
 
-        Fagsak fagsak = fagsakTjeneste.opprettFagsak(saksnummer, aktørId, fagsakYtelseType);
+        Fagsak fagsak = fagsakTjeneste.opprettFagsak(saksnummer, aktørId, fagsakYtelseType, eksternBehandlingsinfoDto.getSpråkkodeEllerDefault());
 
         Behandling behandling = Behandling.nyBehandlingFor(fagsak, behandlingType)
             .medManueltOpprettet(manueltOpprettet).build();

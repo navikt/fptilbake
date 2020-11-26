@@ -18,7 +18,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagDokumentLink;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
-import no.nav.foreldrepenger.tilbakekreving.domene.person.impl.PersoninfoAdapter;
+import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 
 @ApplicationScoped
@@ -46,7 +46,7 @@ public class HistorikkinnslagTjeneste {
 
         Historikkinnslag historikkinnslag = new Historikkinnslag.Builder()
             .medAktør(historikkAktør)
-            .medKjoenn(setKjønn(aktørId))
+            .medKjoenn(setKjønn(aktørId, historikkAktør))
             .medType(historikkinnslagType)
             .medBehandlingId(behandlingId)
             .medFagsakId(fagsakId)
@@ -88,7 +88,7 @@ public class HistorikkinnslagTjeneste {
     public void opprettHistorikkinnslagForBrevBestilt(Behandling behandling, DokumentMalType malType){
         Historikkinnslag historikkinnslag = new Historikkinnslag.Builder()
             .medAktør(HistorikkAktør.SAKSBEHANDLER)
-            .medKjoenn(setKjønn(behandling.getAktørId()))
+            .medKjoenn(setKjønn(behandling.getAktørId(), HistorikkAktør.SAKSBEHANDLER))
             .medType(HistorikkinnslagType.BREV_BESTILT)
             .medBehandlingId(behandling.getId())
             .medFagsakId(behandling.getFagsakId()).build();
@@ -116,7 +116,9 @@ public class HistorikkinnslagTjeneste {
             Collections.emptyList());
     }
 
-    private NavBrukerKjønn setKjønn(AktørId aktørId) {
+    private NavBrukerKjønn setKjønn(AktørId aktørId, HistorikkAktør historikkAktør) {
+        if (!HistorikkAktør.SØKER.equals(historikkAktør))
+            return NavBrukerKjønn.UDEFINERT;
         Personinfo personinfo = personinfoAdapter.innhentSaksopplysningerForSøker(aktørId);
         if (personinfo != null) {
             return personinfo.getKjønn();

@@ -26,7 +26,7 @@ public class KravgrunnlagMapperTest extends FellesTestOppsett {
         String xml = getInputXML("xml/kravgrunnlag_periode_FEIL.xml");
         DetaljertKravgrunnlag input = KravgrunnlagXmlUnmarshaller.unmarshall(0L, xml);
 
-        Mockito.when(tpsAdapterMock.hentAktørIdForPersonIdent(PersonIdent.fra("12345678901"))).thenReturn(Optional.of(new AktørId(999999L)));
+        Mockito.when(personinfoAdapterMock.hentAktørForFnr(PersonIdent.fra("12345678901"))).thenReturn(Optional.of(new AktørId(999999L)));
 
         Kravgrunnlag431 oversatt = mapper.mapTilDomene(input);
         assertThat(oversatt.getEksternKravgrunnlagId()).isEqualTo("123456789");
@@ -51,7 +51,7 @@ public class KravgrunnlagMapperTest extends FellesTestOppsett {
         String xml = getInputXML("xml/kravgrunnlag_periode_YTEL.xml");
         DetaljertKravgrunnlag input = KravgrunnlagXmlUnmarshaller.unmarshall(0L, xml);
 
-        Mockito.when(tpsAdapterMock.hentAktørIdForPersonIdent(PersonIdent.fra("12345678901"))).thenReturn(Optional.of(new AktørId(999999L)));
+        Mockito.when(personinfoAdapterMock.hentAktørForFnr(PersonIdent.fra("12345678901"))).thenReturn(Optional.of(new AktørId(999999L)));
 
         Kravgrunnlag431 oversatt = mapper.mapTilDomene(input);
         assertThat(oversatt.getUtbetalesTilId()).isEqualTo("999999"); //aktørId
@@ -77,7 +77,7 @@ public class KravgrunnlagMapperTest extends FellesTestOppsett {
         String xml = getInputXML("xml/kravgrunnlag_periode_POSITIV_YTEL.xml");
         DetaljertKravgrunnlag input = KravgrunnlagXmlUnmarshaller.unmarshall(0L, xml);
 
-        Mockito.when(tpsAdapterMock.hentAktørIdForPersonIdent(PersonIdent.fra("12345678901"))).thenReturn(Optional.of(new AktørId(999999L)));
+        Mockito.when(personinfoAdapterMock.hentAktørForFnr(PersonIdent.fra("12345678901"))).thenReturn(Optional.of(new AktørId(999999L)));
 
         Kravgrunnlag431 oversatt = mapper.mapTilDomene(input);
         assertThat(oversatt.getUtbetalesTilId()).isEqualTo("999999"); //aktørId
