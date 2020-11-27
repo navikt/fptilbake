@@ -34,7 +34,7 @@ public class VilkårsvurderingRestTjeneste {
     public static final String PATH_FRAGMENT = "/vilkarsvurdering";
     private VilkårsvurderingTjeneste vilkårsvurderingTjeneste;
     private BehandlingTjeneste behandlingTjeneste;
-    private Integer rettsgebyr;
+    private BigDecimal rettsgebyr;
 
     public VilkårsvurderingRestTjeneste() {
         // for CDI
@@ -45,7 +45,7 @@ public class VilkårsvurderingRestTjeneste {
                                         BehandlingTjeneste behandlingTjeneste) {
         this.vilkårsvurderingTjeneste = vilkårsvurderingTjeneste;
         this.behandlingTjeneste = behandlingTjeneste;
-        this.rettsgebyr = new Rettsgebyr().getGebyr();
+        this.rettsgebyr = Rettsgebyr.getGebyr();
     }
 
     @GET
@@ -55,7 +55,7 @@ public class VilkårsvurderingRestTjeneste {
     public DetaljerteFeilutbetalingsperioderDto hentDetailjertFeilutbetalingPerioder(@QueryParam("uuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
         DetaljerteFeilutbetalingsperioderDto perioderDto = new DetaljerteFeilutbetalingsperioderDto();
         perioderDto.setPerioder(vilkårsvurderingTjeneste.hentDetaljertFeilutbetalingPerioder(hentBehandlingId(behandlingReferanse)));
-        perioderDto.setRettsgebyr(BigDecimal.valueOf(rettsgebyr));
+        perioderDto.setRettsgebyr(rettsgebyr);
         return perioderDto;
     }
 
