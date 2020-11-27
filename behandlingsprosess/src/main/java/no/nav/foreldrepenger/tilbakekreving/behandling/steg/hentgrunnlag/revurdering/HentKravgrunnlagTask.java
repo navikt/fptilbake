@@ -1,14 +1,21 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.revurdering;
 
 import java.math.BigInteger;
+import java.util.List;
+import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TaskProperty;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
@@ -16,6 +23,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDataWrapper;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KodeAksjon;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
@@ -33,13 +43,17 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 @FagsakProsesstaskRekkefølge(gruppeSekvens = true)
 public class HentKravgrunnlagTask implements ProsessTaskHandler {
 
+    private static final Logger logger = LoggerFactory.getLogger(HentKravgrunnlagTask.class);
+
     private BehandlingRepositoryProvider repositoryProvider;
     private KravgrunnlagRepository grunnlagRepository;
+    private EksternBehandlingRepository eksternBehandlingRepository;
 
     private KravgrunnlagTjeneste kravgrunnlagTjeneste;
     private HentKravgrunnlagMapper kravgrunnlagMapper;
 
     private ØkonomiConsumer økonomiConsumer;
+    private FagsystemKlient fagsystemKlient;
 
     public static final String TASKTYPE = "kravgrunnlag.hent";
 
@@ -48,14 +62,19 @@ public class HentKravgrunnlagTask implements ProsessTaskHandler {
     }
 
     @Inject
-    public HentKravgrunnlagTask(BehandlingRepositoryProvider repositoryProvider, KravgrunnlagTjeneste kravgrunnlagTjeneste,
-                                HentKravgrunnlagMapper kravgrunnlagMapper, ØkonomiConsumer økonomiConsumer) {
+    public HentKravgrunnlagTask(BehandlingRepositoryProvider repositoryProvider,
+                                KravgrunnlagTjeneste kravgrunnlagTjeneste,
+                                HentKravgrunnlagMapper kravgrunnlagMapper,
+                                ØkonomiConsumer økonomiConsumer,
+                                FagsystemKlient fagsystemKlient) {
         this.repositoryProvider = repositoryProvider;
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
+        this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
 
         this.kravgrunnlagTjeneste = kravgrunnlagTjeneste;
         this.kravgrunnlagMapper = kravgrunnlagMapper;
         this.økonomiConsumer = økonomiConsumer;
+        this.fagsystemKlient = fagsystemKlient;
     }
 
     @Override
@@ -68,7 +87,10 @@ public class HentKravgrunnlagTask implements ProsessTaskHandler {
 
         KravgrunnlagValidator.validerGrunnlag(kravgrunnlag431);
 
+        String saksnummer = kravgrunnlag431.getSaksnummer().getVerdi();
+        Henvisning henvisning = kravgrunnlag431.getReferanse();
         kravgrunnlagTjeneste.lagreTilbakekrevingsgrunnlagFraØkonomi(behandlingId, kravgrunnlag431, true);
+        oppdaterHenvisningFraGrunnlag(behandling,saksnummer, henvisning);
         lagHistorikkInnslagForMotattKravgrunnlag(behandling, kravgrunnlag431);
     }
 
@@ -106,5 +128,23 @@ public class HentKravgrunnlagTask implements ProsessTaskHandler {
         historiebygger.build(grunnlagMottattInnslag);
 
         repositoryProvider.getHistorikkRepository().lagre(grunnlagMottattInnslag);
+    }
+
+    private void oppdaterHenvisningFraGrunnlag(Behandling behandling, String saksnummer, Henvisning grunnlagHenvisning) {
+        List<EksternBehandlingsinfoDto> eksternBehandlinger = hentBehandlingerFraFagsystem(saksnummer);
+        Optional<EksternBehandlingsinfoDto> eksternBehandlingsinfoDto = eksternBehandlinger.stream()
+            .filter(eksternBehandling -> grunnlagHenvisning.equals(eksternBehandling.getHenvisning())).findFirst();
+        if (eksternBehandlingsinfoDto.isPresent()) {
+            logger.info("Oppdaterer EksternBehandling henvisning={} for behandlingId={}", grunnlagHenvisning, behandling.getId());
+            EksternBehandlingsinfoDto eksternBehandlingDto = eksternBehandlingsinfoDto.get();
+            EksternBehandling eksternBehandling = new EksternBehandling(behandling, eksternBehandlingDto.getHenvisning(), eksternBehandlingDto.getUuid());
+            eksternBehandlingRepository.lagre(eksternBehandling);
+        } else {
+            throw HentKravgrunnlagTaskFeil.FACTORY.behandlingFinnesIkkeIFagsaksystemet(saksnummer, grunnlagHenvisning).toException();
+        }
+    }
+
+    private List<EksternBehandlingsinfoDto> hentBehandlingerFraFagsystem(String saksnummer) {
+        return fagsystemKlient.hentBehandlingForSaksnummer(saksnummer);
     }
 }

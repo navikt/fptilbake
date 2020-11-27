@@ -132,7 +132,7 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
         }
     }
 
-    public interface LesKravgrunnlagTaskFeil extends DeklarerteFeil {
+    interface LesKravgrunnlagTaskFeil extends DeklarerteFeil {
 
         LesKravgrunnlagTaskFeil FACTORY = FeilFactory.create(LesKravgrunnlagTaskFeil.class);
 
