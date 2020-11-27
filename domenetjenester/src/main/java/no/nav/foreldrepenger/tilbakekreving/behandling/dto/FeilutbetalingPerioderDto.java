@@ -22,7 +22,7 @@ public class FeilutbetalingPerioderDto implements AbacDto {
     @NotNull
     @Size(min = 1, max = 100)
     @Valid
-    private List<PeriodeDto> perioder;
+    private List<ForeldelsePeriodeMedBeløpDto> perioder;
 
     public Long getBehandlingId() {
         return behandlingId;
@@ -32,11 +32,11 @@ public class FeilutbetalingPerioderDto implements AbacDto {
         this.behandlingId = behandlingId;
     }
 
-    public List<PeriodeDto> getPerioder() {
+    public List<ForeldelsePeriodeMedBeløpDto> getPerioder() {
         return perioder;
     }
 
-    public void setPerioder(List<PeriodeDto> perioder) {
+    public void setPerioder(List<ForeldelsePeriodeMedBeløpDto> perioder) {
         this.perioder = perioder;
     }
 

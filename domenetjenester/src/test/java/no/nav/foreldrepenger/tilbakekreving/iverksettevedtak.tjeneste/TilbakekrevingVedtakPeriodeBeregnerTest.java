@@ -112,6 +112,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
             .medPeriode(uke1)
             .medForeldelseVurderingType(ForeldelseVurderingType.FORELDET)
             .medBegrunnelse("foo")
+            .medForeldelsesFrist(uke1.getFom().plusMonths(8))
             .build());
         foreldelseRepository.lagre(behandlingId, foreldelse);
 

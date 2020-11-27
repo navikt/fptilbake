@@ -17,6 +17,9 @@ public class ForeldelsePeriodeDto {
     @Valid
     private ForeldelseVurderingType foreldelseVurderingType;
 
+    private LocalDate foreldelsesfrist;
+    private LocalDate oppdagelsesDato;
+
     @NotNull
     @Size(max = 4000)
     @Pattern(regexp = InputValideringRegex.FRITEKST)
@@ -30,6 +33,15 @@ public class ForeldelsePeriodeDto {
         this.fraDato = fraDato;
         this.tilDato = tilDato;
         this.foreldelseVurderingType = foreldelseVurderingType;
+        this.begrunnelse = begrunnelse;
+    }
+
+    public ForeldelsePeriodeDto(LocalDate fraDato, LocalDate tilDato, ForeldelseVurderingType foreldelseVurderingType, LocalDate foreldelsesfrist, LocalDate oppdagelsesDato, String begrunnelse) {
+        this.fraDato = fraDato;
+        this.tilDato = tilDato;
+        this.foreldelseVurderingType = foreldelseVurderingType;
+        this.foreldelsesfrist = foreldelsesfrist;
+        this.oppdagelsesDato = oppdagelsesDato;
         this.begrunnelse = begrunnelse;
     }
 
@@ -55,6 +67,22 @@ public class ForeldelsePeriodeDto {
 
     public void setForeldelseVurderingType(ForeldelseVurderingType foreldelseVurderingType) {
         this.foreldelseVurderingType = foreldelseVurderingType;
+    }
+
+    public LocalDate getForeldelsesfrist() {
+        return foreldelsesfrist;
+    }
+
+    public void setForeldelsesfrist(LocalDate foreldelsesfrist) {
+        this.foreldelsesfrist = foreldelsesfrist;
+    }
+
+    public LocalDate getOppdagelsesDato() {
+        return oppdagelsesDato;
+    }
+
+    public void setOppdagelsesDato(LocalDate oppdagelsesDato) {
+        this.oppdagelsesDato = oppdagelsesDato;
     }
 
     public String getBegrunnelse() {

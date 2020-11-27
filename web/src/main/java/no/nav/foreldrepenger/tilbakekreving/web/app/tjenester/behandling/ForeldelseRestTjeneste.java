@@ -23,7 +23,7 @@ import javax.ws.rs.QueryParam;
 import io.swagger.v3.oas.annotations.Operation;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.FeilutbetalingPerioderDto;
-import no.nav.foreldrepenger.tilbakekreving.behandling.dto.PeriodeDto;
+import no.nav.foreldrepenger.tilbakekreving.behandling.dto.ForeldelsePeriodeMedBeløpDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurdertForeldelseTjeneste;
@@ -75,9 +75,9 @@ public class ForeldelseRestTjeneste {
     @Path("/belop")
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
     public FeilutbetalingPerioderDto beregnBeløp(@NotNull @Valid FeilutbetalingPerioderDto perioderDto) {
-        List<Periode> perioderFraDto = perioderDto.getPerioder().stream().map(PeriodeDto::tilPeriode).collect(Collectors.toList());
+        List<Periode> perioderFraDto = perioderDto.getPerioder().stream().map(ForeldelsePeriodeMedBeløpDto::tilPeriode).collect(Collectors.toList());
         Map<Periode, BigDecimal> feilutbetalinger = kravgrunnlagBeregningTjeneste.beregnFeilutbetaltBeløp(perioderDto.getBehandlingId(), perioderFraDto);
-        for (PeriodeDto dto : perioderDto.getPerioder()) {
+        for (ForeldelsePeriodeMedBeløpDto dto : perioderDto.getPerioder()) {
             dto.setBelop(feilutbetalinger.get(dto.tilPeriode()));
         }
         return perioderDto;

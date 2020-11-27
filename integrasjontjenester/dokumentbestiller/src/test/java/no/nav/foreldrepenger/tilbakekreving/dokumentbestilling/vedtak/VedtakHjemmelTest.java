@@ -68,14 +68,22 @@ public class VedtakHjemmelTest {
 
     @Test
     public void skal_gi_riktig_hjemmel_når_alt_er_foreldet() {
-        VurdertForeldelse vurdertForeldelse = lagForeldelseperiode(periode, f -> f.medForeldelseVurderingType(ForeldelseVurderingType.FORELDET));
+        VurdertForeldelse vurdertForeldelse = lagForeldelseperiode(periode, f -> {
+            f.medForeldelseVurderingType(ForeldelseVurderingType.FORELDET);
+            f.medForeldelsesFrist(periode.getFom().plusMonths(11));
+            return f;
+        });
 
         assertThat(VedtakHjemmel.lagHjemmelstekst(VedtakResultatType.INGEN_TILBAKEBETALING, vurdertForeldelse, Collections.emptyList(), VedtakHjemmel.EffektForBruker.FØRSTEGANGSVEDTAK, Språkkode.nb, true)).isEqualTo("foreldelsesloven §§ 2 og 3");
     }
 
     @Test
     public void skal_gi_riktig_hjemmel_når_noe_er_foreldet_uten_tilleggsfrist_og_ikke_renter() {
-        VurdertForeldelse vurdertForeldelse = lagForeldelseperiode(periode, f -> f.medForeldelseVurderingType(ForeldelseVurderingType.FORELDET));
+        VurdertForeldelse vurdertForeldelse = lagForeldelseperiode(periode, f -> {
+            f.medForeldelseVurderingType(ForeldelseVurderingType.FORELDET);
+            f.medForeldelsesFrist(periode.getFom().plusMonths(11));
+            return f;
+        });
         List<VilkårVurderingPeriodeEntitet> vurderingPerioder = aktsomhet(periode, a -> a.medAktsomhet(Aktsomhet.GROVT_UAKTSOM).medIleggRenter(false));
 
         assertThat(VedtakHjemmel.lagHjemmelstekst(VedtakResultatType.INGEN_TILBAKEBETALING, vurdertForeldelse, vurderingPerioder, VedtakHjemmel.EffektForBruker.FØRSTEGANGSVEDTAK, Språkkode.nb, true)).isEqualTo("folketrygdloven § 22-15 og foreldelsesloven §§ 2 og 3");
@@ -91,7 +99,12 @@ public class VedtakHjemmelTest {
 
     @Test
     public void skal_gi_riktig_hjemmel_når_det_er_både_foreldelse_med_tilleggsfrist_og_ikke_renter() {
-        VurdertForeldelse vurdertForeldelse = lagForeldelseperiode(periode, f -> f.medForeldelseVurderingType(ForeldelseVurderingType.TILLEGGSFRIST));
+        VurdertForeldelse vurdertForeldelse = lagForeldelseperiode(periode, f -> {
+            f.medForeldelseVurderingType(ForeldelseVurderingType.TILLEGGSFRIST);
+            f.medForeldelsesFrist(periode.getFom().plusMonths(11));
+            f.medOppdagelseDato(periode.getFom().plusMonths(5));
+            return f;
+        });
         List<VilkårVurderingPeriodeEntitet> vurderingPerioder = aktsomhet(periode, a -> a.medAktsomhet(Aktsomhet.GROVT_UAKTSOM).medIleggRenter(false));
 
         assertThat(VedtakHjemmel.lagHjemmelstekst(VedtakResultatType.INGEN_TILBAKEBETALING, vurdertForeldelse, vurderingPerioder, VedtakHjemmel.EffektForBruker.FØRSTEGANGSVEDTAK, Språkkode.nb, true)).isEqualTo("folketrygdloven § 22-15 og foreldelsesloven §§ 2, 3 og 10");
@@ -99,7 +112,12 @@ public class VedtakHjemmelTest {
 
     @Test
     public void skal_gi_riktig_hjemmel_når_det_er_både_foreldelse_med_tilleggsfrist_og_renter() {
-        VurdertForeldelse vurdertForeldelse = lagForeldelseperiode(periode, f -> f.medForeldelseVurderingType(ForeldelseVurderingType.TILLEGGSFRIST));
+        VurdertForeldelse vurdertForeldelse = lagForeldelseperiode(periode, f -> {
+            f.medForeldelseVurderingType(ForeldelseVurderingType.TILLEGGSFRIST);
+            f.medForeldelsesFrist(periode.getFom().plusMonths(11));
+            f.medOppdagelseDato(periode.getFom().plusMonths(5));
+            return f;
+        });
         List<VilkårVurderingPeriodeEntitet> vurderingPerioder = aktsomhet(periode, a -> a.medAktsomhet(Aktsomhet.GROVT_UAKTSOM).medIleggRenter(true));
 
         assertThat(VedtakHjemmel.lagHjemmelstekst(VedtakResultatType.INGEN_TILBAKEBETALING, vurdertForeldelse, vurderingPerioder, VedtakHjemmel.EffektForBruker.FØRSTEGANGSVEDTAK, Språkkode.nb, true))
@@ -116,7 +134,12 @@ public class VedtakHjemmelTest {
 
     @Test
     public void skal_gi_riktig_hjemmel_når_det_er_både_foreldelse_med_tilleggsfrist_og_renter_er_klage() {
-        VurdertForeldelse vurdertForeldelse = lagForeldelseperiode(periode, f -> f.medForeldelseVurderingType(ForeldelseVurderingType.TILLEGGSFRIST));
+        VurdertForeldelse vurdertForeldelse = lagForeldelseperiode(periode, f -> {
+            f.medForeldelseVurderingType(ForeldelseVurderingType.TILLEGGSFRIST);
+            f.medForeldelsesFrist(periode.getFom().plusMonths(11));
+            f.medOppdagelseDato(periode.getFom().plusMonths(5));
+            return f;
+        });
         List<VilkårVurderingPeriodeEntitet> vurderingPerioder = aktsomhet(periode, a -> a.medAktsomhet(Aktsomhet.GROVT_UAKTSOM).medIleggRenter(true));
 
         assertThat(VedtakHjemmel.lagHjemmelstekst(VedtakResultatType.INGEN_TILBAKEBETALING, vurdertForeldelse, vurderingPerioder, VedtakHjemmel.EffektForBruker.ENDRET_TIL_GUNST_FOR_BRUKER, Språkkode.nb, true))
@@ -127,7 +150,8 @@ public class VedtakHjemmelTest {
         VurdertForeldelse vurdertForeldelse = new VurdertForeldelse();
         VurdertForeldelsePeriode.Builder periodeBuilder = new VurdertForeldelsePeriode.Builder()
             .medVurdertForeldelse(vurdertForeldelse)
-            .medPeriode(periode);
+            .medPeriode(periode)
+            .medForeldelseVurderingType(ForeldelseVurderingType.UDEFINERT);
         vurdertForeldelse.leggTilVurderForeldelsePerioder(oppsett.apply(periodeBuilder).build());
         return vurdertForeldelse;
     }

@@ -46,7 +46,7 @@ public class TotrinnTjenesteTest extends FellesTestOppsett {
         repoProvider.getFaktaFeilutbetalingRepository().lagre(internBehandlingId, lagFaktaFeilutbetaling());
         vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, Collections.singletonList(
             new ForeldelsePeriodeDto(FOM, TOM,
-                ForeldelseVurderingType.FORELDET, "ABC")));
+                ForeldelseVurderingType.FORELDET, FOM.plusYears(3), null, "ABC")));
         List<VilkårsvurderingPerioderDto> vilkårPerioder = Lists.newArrayList(
             formVilkårsvurderingPerioderDto(VilkårResultat.GOD_TRO, FOM, TOM, Aktsomhet.FORSETT));
         vilkårsvurderingTjeneste.lagreVilkårsvurdering(internBehandlingId, vilkårPerioder);

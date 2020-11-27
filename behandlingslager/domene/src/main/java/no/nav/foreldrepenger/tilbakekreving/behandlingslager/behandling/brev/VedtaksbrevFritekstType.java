@@ -15,6 +15,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.TempAvlede
 public enum VedtaksbrevFritekstType implements Kodeverdi {
 
     FAKTA_AVSNITT("FAKTA_AVSNITT"),
+    FORELDELSE_AVSNITT("FORELDELSE_AVSNITT"),
     VILKAAR_AVSNITT("VILKAAR_AVSNITT"),
     SAERLIGE_GRUNNER_AVSNITT("SAERLIGE_GRUNNER_AVSNITT"),
     SAERLIGE_GRUNNER_ANNET_AVSNITT("SAERLIGE_GRUNNER_ANNET_AVSNITT");

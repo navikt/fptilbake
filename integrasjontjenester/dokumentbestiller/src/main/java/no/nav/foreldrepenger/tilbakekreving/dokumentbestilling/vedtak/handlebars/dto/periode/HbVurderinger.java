@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Objects;
 
@@ -14,6 +15,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Vi
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Vurdering;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.BigDecimalHeltallSerialiserer;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.KodeverdiSomKodeSerialiserer;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.LocalDateTilLangtNorskFormatSerialiserer;
 
 public class HbVurderinger {
 
@@ -34,6 +36,17 @@ public class HbVurderinger {
     @JsonSerialize(using = KodeverdiSomKodeSerialiserer.class)
     @JsonProperty("foreldelsevurdering")
     private ForeldelseVurderingType foreldelsevurdering;
+
+    @JsonProperty("foreldelsesfrist")
+    @JsonSerialize(using = LocalDateTilLangtNorskFormatSerialiserer.class)
+    private LocalDate foreldelsesfrist;
+
+    @JsonProperty("oppdagelses-dato")
+    @JsonSerialize(using = LocalDateTilLangtNorskFormatSerialiserer.class)
+    private LocalDate oppdagelsesDato;
+
+    @JsonProperty("fritekst-foreldelse")
+    private String fritekstForeldelse;
 
     @JsonProperty("beløp-i-behold")
     @JsonSerialize(using = BigDecimalHeltallSerialiserer.class)
@@ -56,6 +69,19 @@ public class HbVurderinger {
 
     public String getFritekstVilkår() {
         return fritekstVilkår;
+    }
+
+    public String getFritekstForeldelse() {
+        return fritekstForeldelse;
+    }
+
+    public void setFritekstForeldelse(String fritekstForeldelse) {
+        this.fritekstForeldelse = fritekstForeldelse;
+    }
+
+    @JsonProperty("har-foreldelse-avsnitt")
+    public boolean harForeldelseAvsnitt() {
+        return ForeldelseVurderingType.FORELDET.equals(foreldelsevurdering) || ForeldelseVurderingType.TILLEGGSFRIST.equals(foreldelsevurdering);
     }
 
     public static class Builder {
@@ -86,6 +112,21 @@ public class HbVurderinger {
             return this;
         }
 
+        public HbVurderinger.Builder medForeldelsesfrist(LocalDate foreldelsesfrist) {
+            kladd.foreldelsesfrist = foreldelsesfrist;
+            return this;
+        }
+
+        public HbVurderinger.Builder medOppdagelsesDato(LocalDate oppdagelsesDato) {
+            kladd.oppdagelsesDato = oppdagelsesDato;
+            return this;
+        }
+
+        public HbVurderinger.Builder medFritekstForeldelse(String fritekstForeldelse) {
+            kladd.fritekstForeldelse = fritekstForeldelse;
+            return this;
+        }
+
         public HbVurderinger.Builder medBeløpIBehold(BigDecimal beløpIBehold) {
             kladd.beløpIBehold = beløpIBehold;
             return this;
@@ -105,7 +146,13 @@ public class HbVurderinger {
             if (ForeldelseVurderingType.IKKE_VURDERT.equals(kladd.foreldelsevurdering) ||
                 ForeldelseVurderingType.IKKE_FORELDET.equals(kladd.foreldelsevurdering)) {
                 Objects.requireNonNull(kladd.vilkårResultat, "vilkårResultat er ikke satt");
+            } else if (ForeldelseVurderingType.FORELDET.equals(kladd.foreldelsevurdering)) {
+                Objects.requireNonNull(kladd.foreldelsesfrist, "foreldelsesfrist er ikke satt");
+            } else if (ForeldelseVurderingType.TILLEGGSFRIST.equals(kladd.foreldelsevurdering)) {
+                Objects.requireNonNull(kladd.foreldelsesfrist, "foreldelsesfrist er ikke satt");
+                Objects.requireNonNull(kladd.oppdagelsesDato, "oppdagelsesDato er ikke satt");
             }
+
             if (AnnenVurdering.GOD_TRO.equals(kladd.aktsomhetResultat)) {
                 Objects.requireNonNull(kladd.beløpIBehold, "beløp i behold er ikke satt");
             } else {

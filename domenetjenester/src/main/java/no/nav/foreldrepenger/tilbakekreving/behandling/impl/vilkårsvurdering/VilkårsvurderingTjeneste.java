@@ -22,7 +22,7 @@ import org.apache.cxf.common.util.CollectionUtils;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.DetaljertFeilutbetalingPeriodeDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.FeilutbetalingPerioderDto;
-import no.nav.foreldrepenger.tilbakekreving.behandling.dto.PeriodeDto;
+import no.nav.foreldrepenger.tilbakekreving.behandling.dto.ForeldelsePeriodeMedBeløpDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.RedusertBeløpDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.YtelseDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.vilkår.VilkårsvurderingPerioderDto;
@@ -151,7 +151,7 @@ public class VilkårsvurderingTjeneste {
         List<DetaljertFeilutbetalingPeriodeDto> feilutbetalingPerioder = new ArrayList<>();
         FeilutbetalingPerioderDto feilutbetalingPerioderDto = foreldelseTjeneste.henteVurdertForeldelse(behandlingId);
 
-        for (PeriodeDto periode : feilutbetalingPerioderDto.getPerioder()) {
+        for (ForeldelsePeriodeMedBeløpDto periode : feilutbetalingPerioderDto.getPerioder()) {
             HendelseTypeMedUndertypeDto årsak = hentHendelseType(faktaFeilutbetalingPerioder, new Periode(periode.getFom(), periode.getTom()));
 
             DetaljertFeilutbetalingPeriodeDto periodeDto = new DetaljertFeilutbetalingPeriodeDto(periode.getFom(), periode.getTom(),
@@ -190,7 +190,7 @@ public class VilkårsvurderingTjeneste {
 
         //TODO unødvendig if
         if (!CollectionUtils.isEmpty(feilutbetalingPerioderDto.getPerioder())) {
-            Optional<PeriodeDto> periode = feilutbetalingPerioderDto.getPerioder().stream()
+            Optional<ForeldelsePeriodeMedBeløpDto> periode = feilutbetalingPerioderDto.getPerioder().stream()
                 //TODO bruk en Periode-implementasjon og overlap-funksjon
                 .filter(periodeDto -> fom.equals(periodeDto.getFom()) && tom.equals(periodeDto.getTom()))
                 .filter(periodeDto -> ForeldelseVurderingType.FORELDET.equals(periodeDto.getForeldelseVurderingType()))

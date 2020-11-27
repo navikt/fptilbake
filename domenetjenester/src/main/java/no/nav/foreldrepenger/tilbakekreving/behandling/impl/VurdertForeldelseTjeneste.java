@@ -15,7 +15,7 @@ import javax.transaction.Transactional;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.FeilutbetalingPerioderDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.ForeldelsePeriodeDto;
-import no.nav.foreldrepenger.tilbakekreving.behandling.dto.PeriodeDto;
+import no.nav.foreldrepenger.tilbakekreving.behandling.dto.ForeldelsePeriodeMedBeløpDto;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
@@ -80,20 +80,20 @@ public class VurdertForeldelseTjeneste {
         Optional<FaktaFeilutbetaling> fakta = faktaFeilutbetalingRepository.finnFaktaOmFeilutbetaling(behandlingId);
         FeilutbetalingPerioderDto perioderDto = new FeilutbetalingPerioderDto();
         perioderDto.setBehandlingId(behandlingId);
-        List<PeriodeDto> perioder = new ArrayList<>();
+        List<ForeldelsePeriodeMedBeløpDto> perioder = new ArrayList<>();
         if (fakta.isPresent() && !fakta.get().getFeilutbetaltPerioder().isEmpty()) {
             for (FaktaFeilutbetalingPeriode faktaFeilutbetalingPeriode : fakta.get().getFeilutbetaltPerioder()) {
-                PeriodeDto periode = new PeriodeDto();
+                ForeldelsePeriodeMedBeløpDto periode = new ForeldelsePeriodeMedBeløpDto();
                 periode.setPeriode(faktaFeilutbetalingPeriode.getPeriode());
                 periode.setForeldelseVurderingType(ForeldelseVurderingType.UDEFINERT);
                 perioder.add(periode);
             }
 
-            List<Periode> råPerioder = perioder.stream().map(PeriodeDto::tilPeriode).collect(Collectors.toList());
+            List<Periode> råPerioder = perioder.stream().map(ForeldelsePeriodeMedBeløpDto::tilPeriode).collect(Collectors.toList());
             Map<Periode, BigDecimal> feilPrPeriode = kravgrunnlagBeregningTjeneste.beregnFeilutbetaltBeløp(behandlingId, råPerioder);
 
-            for (PeriodeDto periodeDto : perioder) {
-                periodeDto.setBelop(feilPrPeriode.get(periodeDto.tilPeriode()));
+            for (ForeldelsePeriodeMedBeløpDto foreldelsePeriodeMedBeløpDto : perioder) {
+                foreldelsePeriodeMedBeløpDto.setBelop(feilPrPeriode.get(foreldelsePeriodeMedBeløpDto.tilPeriode()));
             }
 
             perioderDto.setPerioder(perioder);
@@ -108,17 +108,19 @@ public class VurdertForeldelseTjeneste {
             VurdertForeldelse vurdertForeldelse = vurdertForeldelseOpt.get();
             List<Periode> vfPerioder = vurdertForeldelse.getVurdertForeldelsePerioder().stream().map(VurdertForeldelsePeriode::getPeriode).collect(Collectors.toList());
             Map<Periode, BigDecimal> feilutbetaltBeløpPrPeriode = kravgrunnlagBeregningTjeneste.beregnFeilutbetaltBeløp(behandlingId, vfPerioder);
-            List<PeriodeDto> resultat = new ArrayList<>();
+            List<ForeldelsePeriodeMedBeløpDto> resultat = new ArrayList<>();
             List<VurdertForeldelsePeriode> foreldelsePerioder = new ArrayList<>(vurdertForeldelse.getVurdertForeldelsePerioder());
             foreldelsePerioder.sort(Comparator.comparing(VurdertForeldelsePeriode::getFom));
             for (VurdertForeldelsePeriode vurdertForeldelsePeriode : foreldelsePerioder) {
-                PeriodeDto periodeDto = new PeriodeDto();
+                ForeldelsePeriodeMedBeløpDto fmfPeriodeDto = new ForeldelsePeriodeMedBeløpDto();
                 Periode periode = vurdertForeldelsePeriode.getPeriode();
-                periodeDto.setPeriode(periode);
-                periodeDto.setForeldelseVurderingType(vurdertForeldelsePeriode.getForeldelseVurderingType());
-                periodeDto.setBegrunnelse(vurdertForeldelsePeriode.getBegrunnelse());
-                periodeDto.setBelop(feilutbetaltBeløpPrPeriode.get(periode));
-                resultat.add(periodeDto);
+                fmfPeriodeDto.setPeriode(periode);
+                fmfPeriodeDto.setForeldelseVurderingType(vurdertForeldelsePeriode.getForeldelseVurderingType());
+                fmfPeriodeDto.setForeldelsesfrist(vurdertForeldelsePeriode.getForeldelsesfrist());
+                fmfPeriodeDto.setOppdagelsesDato(vurdertForeldelsePeriode.getOppdagelsesDato());
+                fmfPeriodeDto.setBegrunnelse(vurdertForeldelsePeriode.getBegrunnelse());
+                fmfPeriodeDto.setBelop(feilutbetaltBeløpPrPeriode.get(periode));
+                resultat.add(fmfPeriodeDto);
             }
             feilutbetalingPerioderDto.setPerioder(resultat);
         }
@@ -134,11 +136,20 @@ public class VurdertForeldelseTjeneste {
     }
 
     private VurdertForeldelsePeriode lagVurdertForeldelse(VurdertForeldelse vurdertForeldelse, ForeldelsePeriodeDto foreldelsePeriodeDto) {
-        return VurdertForeldelsePeriode.builder().medVurdertForeldelse(vurdertForeldelse)
+        VurdertForeldelsePeriode.Builder periodeBuilder = VurdertForeldelsePeriode.builder()
+            .medVurdertForeldelse(vurdertForeldelse)
             .medForeldelseVurderingType(foreldelsePeriodeDto.getForeldelseVurderingType())
             .medPeriode(foreldelsePeriodeDto.getFraDato(), foreldelsePeriodeDto.getTilDato())
-            .medBegrunnelse(foreldelsePeriodeDto.getBegrunnelse())
-            .build();
+            .medBegrunnelse(foreldelsePeriodeDto.getBegrunnelse());
+        if (ForeldelseVurderingType.FORELDET.equals(foreldelsePeriodeDto.getForeldelseVurderingType())) {
+            periodeBuilder
+                .medForeldelsesFrist(foreldelsePeriodeDto.getForeldelsesfrist());
+        } else if (ForeldelseVurderingType.TILLEGGSFRIST.equals(foreldelsePeriodeDto.getForeldelseVurderingType())) {
+            periodeBuilder
+                .medForeldelsesFrist(foreldelsePeriodeDto.getForeldelsesfrist())
+                .medOppdagelseDato(foreldelsePeriodeDto.getOppdagelsesDato());
+        }
+        return periodeBuilder.build();
     }
 
 
@@ -152,11 +163,11 @@ public class VurdertForeldelseTjeneste {
         boolean behovForHistorikkInnslag = false;
         for (VurdertForeldelsePeriode foreldelsePeriode : vurdertForeldelseAggregate.getVurdertForeldelsePerioder()) {
             HistorikkInnslagTekstBuilder tekstBuilder = historikkTjenesteAdapter.tekstBuilder();
-            boolean harEndret = false;
+            boolean harEndret;
             // forrigeVurdertForeldelse finnes ikke
             if (forrigeVurdertForeldelse.isEmpty()) {
                 harEndret = true;
-                tekstBuilder.medEndretFelt(HistorikkEndretFeltType.FORELDELSE, null, foreldelsePeriode.getForeldelseVurderingType().getNavn());
+                lagNyttInnslag(foreldelsePeriode, tekstBuilder);
             } else {
                 harEndret = opprettInnslagNårForrigePerioderFinnes(behandlingId, forrigeVurdertForeldelse.get(), foreldelsePeriode, tekstBuilder);
             }
@@ -177,7 +188,9 @@ public class VurdertForeldelseTjeneste {
 
     }
 
-    private boolean opprettInnslagNårForrigePerioderFinnes(Long behandlingId, VurdertForeldelse forrigeVurdertForeldelse, VurdertForeldelsePeriode foreldelsePeriode,
+    private boolean opprettInnslagNårForrigePerioderFinnes(Long behandlingId,
+                                                           VurdertForeldelse forrigeVurdertForeldelse,
+                                                           VurdertForeldelsePeriode foreldelsePeriode,
                                                            HistorikkInnslagTekstBuilder tekstBuilder) {
 
         Optional<VurdertForeldelsePeriode> forrigeForeldelsePeriode = forrigeVurdertForeldelse.getVurdertForeldelsePerioder()
@@ -186,20 +199,11 @@ public class VurdertForeldelseTjeneste {
             .findAny();
         boolean harEndret = false;
         // samme perioder med endret foreldelse vurdering type
-        if (!forrigeForeldelsePeriode.isEmpty() &&
-            !foreldelsePeriode.getForeldelseVurderingType().equals(forrigeForeldelsePeriode.get().getForeldelseVurderingType())) {
-            harEndret = true;
-            tekstBuilder.medEndretFelt(HistorikkEndretFeltType.FORELDELSE,
-                forrigeForeldelsePeriode.get().getForeldelseVurderingType().getNavn(),
-                foreldelsePeriode.getForeldelseVurderingType().getNavn());
-            // hvis saksbehandler endret vurdering type, må vi starte vilkårs på nytt
-            if (ForeldelseVurderingType.FORELDET.equals(foreldelsePeriode.getForeldelseVurderingType())) {
-                sletteVilkårData(behandlingId);
-            }
-
+        if (forrigeForeldelsePeriode.isPresent()) {
+            harEndret = lagEndretInnslag(behandlingId, foreldelsePeriode, tekstBuilder, forrigeForeldelsePeriode.get());
         } else if (forrigeForeldelsePeriode.isEmpty()) { // nye perioder
             harEndret = true;
-            tekstBuilder.medEndretFelt(HistorikkEndretFeltType.FORELDELSE, null, foreldelsePeriode.getForeldelseVurderingType().getNavn());
+            lagNyttInnslag(foreldelsePeriode, tekstBuilder);
             // hvis saksbehandler deler opp perioder, må vi starte vilkårs på nytt
             sletteVilkårData(behandlingId);
         } else if (!forrigeForeldelsePeriode.isEmpty() && !foreldelsePeriode.getBegrunnelse().equals(forrigeForeldelsePeriode.get().getBegrunnelse())) {
@@ -208,6 +212,47 @@ public class VurdertForeldelseTjeneste {
         return harEndret;
     }
 
+    private boolean lagEndretInnslag(Long behandlingId,
+                                     VurdertForeldelsePeriode foreldelsePeriode,
+                                     HistorikkInnslagTekstBuilder tekstBuilder,
+                                     VurdertForeldelsePeriode forrigeForeldelsePeriode) {
+        boolean harEndret = false;
+        if (!foreldelsePeriode.getForeldelseVurderingType().equals(forrigeForeldelsePeriode.getForeldelseVurderingType())) {
+            harEndret = true;
+            tekstBuilder.medEndretFelt(HistorikkEndretFeltType.FORELDELSE,
+                forrigeForeldelsePeriode.getForeldelseVurderingType().getNavn(),
+                foreldelsePeriode.getForeldelseVurderingType().getNavn());
+            // hvis saksbehandler endret vurdering type, må vi starte vilkårs på nytt
+            if (ForeldelseVurderingType.FORELDET.equals(foreldelsePeriode.getForeldelseVurderingType())) {
+                sletteVilkårData(behandlingId);
+            }
+        }
+        if ((ForeldelseVurderingType.FORELDET.equals(foreldelsePeriode.getForeldelseVurderingType()) || ForeldelseVurderingType.TILLEGGSFRIST.equals(foreldelsePeriode.getForeldelseVurderingType()))
+            && ((foreldelsePeriode.getForeldelsesfrist() != null && !foreldelsePeriode.getForeldelsesfrist().equals(forrigeForeldelsePeriode.getForeldelsesfrist()))
+                || (forrigeForeldelsePeriode.getForeldelsesfrist() != null && !forrigeForeldelsePeriode.getForeldelsesfrist().equals(foreldelsePeriode.getForeldelsesfrist())))
+        ) {
+            tekstBuilder.medEndretFelt(HistorikkEndretFeltType.FORELDELSESFRIST, forrigeForeldelsePeriode.getForeldelsesfrist(), foreldelsePeriode.getForeldelsesfrist());
+            harEndret = true;
+        }
+        if (ForeldelseVurderingType.TILLEGGSFRIST.equals(foreldelsePeriode.getForeldelseVurderingType())
+            && (foreldelsePeriode.getOppdagelsesDato() != null && !foreldelsePeriode.getOppdagelsesDato().equals(forrigeForeldelsePeriode.getOppdagelsesDato()))
+                || (forrigeForeldelsePeriode.getOppdagelsesDato() != null && !forrigeForeldelsePeriode.getOppdagelsesDato().equals(foreldelsePeriode.getOppdagelsesDato()))
+        ) {
+            tekstBuilder.medEndretFelt(HistorikkEndretFeltType.OPPDAGELSES_DATO, forrigeForeldelsePeriode.getOppdagelsesDato(), foreldelsePeriode.getOppdagelsesDato());
+            harEndret = true;
+        }
+        return harEndret;
+    }
+
+    private void lagNyttInnslag(VurdertForeldelsePeriode foreldelsePeriode, HistorikkInnslagTekstBuilder tekstBuilder) {
+        tekstBuilder.medEndretFelt(HistorikkEndretFeltType.FORELDELSE, null, foreldelsePeriode.getForeldelseVurderingType().getNavn());
+        if (foreldelsePeriode.getForeldelsesfrist() != null) {
+            tekstBuilder.medEndretFelt(HistorikkEndretFeltType.FORELDELSESFRIST, null, foreldelsePeriode.getForeldelsesfrist());
+        }
+        if (foreldelsePeriode.getOppdagelsesDato() != null) {
+            tekstBuilder.medEndretFelt(HistorikkEndretFeltType.OPPDAGELSES_DATO, null, foreldelsePeriode.getOppdagelsesDato());
+        }
+    }
 
     private void sletteVilkårData(Long behandlingId) {
         vilkårsvurderingRepository.slettVilkårsvurdering(behandlingId);

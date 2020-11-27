@@ -16,7 +16,7 @@ import com.google.common.collect.Lists;
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.FeilutbetalingPerioderDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.ForeldelsePeriodeDto;
-import no.nav.foreldrepenger.tilbakekreving.behandling.dto.PeriodeDto;
+import no.nav.foreldrepenger.tilbakekreving.behandling.dto.ForeldelsePeriodeMedBeløpDto;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
@@ -47,7 +47,7 @@ public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
         LocalDate sisteDato = LocalDate.of(2019, 2, 19);
         vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, Collections.singletonList(
             new ForeldelsePeriodeDto(FØRSTE_DATO, sisteDato,
-                ForeldelseVurderingType.FORELDET, "ABC")));
+                ForeldelseVurderingType.FORELDET, FØRSTE_DATO.plusMonths(6), null, "ABC")));
 
         Optional<VurdertForeldelse> vurdertForeldelseOptional = vurdertForeldelseRepository.finnVurdertForeldelse(internBehandlingId);
         assertThat(vurdertForeldelseOptional).isPresent();
@@ -80,9 +80,9 @@ public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
 
         vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, Lists.newArrayList(
             new ForeldelsePeriodeDto(FØRSTE_DATO, førstePeriodeSisteDato,
-                ForeldelseVurderingType.FORELDET, "ABC"),
+                ForeldelseVurderingType.FORELDET, FØRSTE_DATO.plusMonths(8), null, "ABC"),
             new ForeldelsePeriodeDto(andrePeriodeFørsteDato, andrePeriodeSisteDato,
-                ForeldelseVurderingType.TILLEGGSFRIST, "CDE")));
+                ForeldelseVurderingType.TILLEGGSFRIST, andrePeriodeFørsteDato.plusMonths(8), andrePeriodeFørsteDato.plusMonths(5), "CDE")));
 
         Optional<VurdertForeldelse> vurdertForeldelseOptional = vurdertForeldelseRepository.finnVurdertForeldelse(internBehandlingId);
         assertThat(vurdertForeldelseOptional).isPresent();
@@ -137,12 +137,12 @@ public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
         grunnlagRepository.lagre(internBehandlingId, kravgrunnlag431);
         vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, Lists.newArrayList(
             new ForeldelsePeriodeDto(FOM_1, LocalDate.of(2016, 3, 28),
-                ForeldelseVurderingType.FORELDET, "ABC")));
+                ForeldelseVurderingType.FORELDET, FOM_1.plusYears(3), null, "ABC")));
 
         FeilutbetalingPerioderDto perioderDto = vurdertForeldelseTjeneste.henteVurdertForeldelse(internBehandlingId);
 
         assertThat(perioderDto.getPerioder().size()).isEqualTo(1);
-        perioderDto.getPerioder().sort(Comparator.comparing(PeriodeDto::getFom));
+        perioderDto.getPerioder().sort(Comparator.comparing(ForeldelsePeriodeMedBeløpDto::getFom));
         assertThat(perioderDto.getPerioder().get(0).getFom()).isEqualTo(FOM_1);
         assertThat(perioderDto.getPerioder().get(0).getTom()).isEqualTo(LocalDate.of(2016, 3, 28));
         assertThat(perioderDto.getPerioder().get(0).getForeldelseVurderingType()).isEqualTo(ForeldelseVurderingType.FORELDET);
@@ -161,12 +161,12 @@ public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
         grunnlagRepository.lagre(internBehandlingId, kravgrunnlag);
         vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, Lists.newArrayList(
             new ForeldelsePeriodeDto(FOM_1, LocalDate.of(2016, 3, 20),
-                ForeldelseVurderingType.FORELDET, "ABC")));
+                ForeldelseVurderingType.FORELDET, FOM_1.plusYears(3), null, "ABC")));
 
         FeilutbetalingPerioderDto perioderDto = vurdertForeldelseTjeneste.henteVurdertForeldelse(internBehandlingId);
 
         assertThat(perioderDto.getPerioder().size()).isEqualTo(1);
-        perioderDto.getPerioder().sort(Comparator.comparing(PeriodeDto::getFom));
+        perioderDto.getPerioder().sort(Comparator.comparing(ForeldelsePeriodeMedBeløpDto::getFom));
         assertThat(perioderDto.getPerioder().get(0).getFom()).isEqualTo(FOM_1);
         assertThat(perioderDto.getPerioder().get(0).getTom()).isEqualTo(LocalDate.of(2016, 3, 20));
         assertThat(perioderDto.getPerioder().get(0).getForeldelseVurderingType()).isEqualTo(ForeldelseVurderingType.FORELDET);
@@ -193,16 +193,16 @@ public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
         grunnlagRepository.lagre(internBehandlingId, kravgrunnlag431);
         vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, Lists.newArrayList(
             new ForeldelsePeriodeDto(FOM_1, LocalDate.of(2016, 3, 20),
-                ForeldelseVurderingType.FORELDET, "ABC"),
+                ForeldelseVurderingType.FORELDET, FOM_1.plusYears(3), null, "ABC"),
             new ForeldelsePeriodeDto(LocalDate.of(2016, 3, 21), LocalDate.of(2016, 3, 24),
-                ForeldelseVurderingType.FORELDET, "CDE"),
+                ForeldelseVurderingType.FORELDET, FOM_1.plusYears(3).plusMonths(2), null, "CDE"),
             new ForeldelsePeriodeDto(LocalDate.of(2016, 3, 26), TOM_1,
-                ForeldelseVurderingType.TILLEGGSFRIST, "EFG")));
+                ForeldelseVurderingType.TILLEGGSFRIST, FOM_1.plusYears(3).plusMonths(3), FOM_1.plusYears(2), "EFG")));
 
         FeilutbetalingPerioderDto perioderDto = vurdertForeldelseTjeneste.henteVurdertForeldelse(internBehandlingId);
 
         assertThat(perioderDto.getPerioder().size()).isEqualTo(3);
-        perioderDto.getPerioder().sort(Comparator.comparing(PeriodeDto::getFom));
+        perioderDto.getPerioder().sort(Comparator.comparing(ForeldelsePeriodeMedBeløpDto::getFom));
         assertThat(perioderDto.getPerioder().get(0).getFom()).isEqualTo(FOM_1);
         assertThat(perioderDto.getPerioder().get(0).getTom()).isEqualTo(LocalDate.of(2016, 3, 20));
         assertThat(perioderDto.getPerioder().get(0).getForeldelseVurderingType()).isEqualTo(ForeldelseVurderingType.FORELDET);
@@ -248,8 +248,8 @@ public class VurdertForeldelseTjenesteTest extends FellesTestOppsett {
         FeilutbetalingPerioderDto feilutbetalingPerioder = vurdertForeldelseTjeneste.hentFaktaPerioder(internBehandlingId);
         assertThat(feilutbetalingPerioder.getPerioder().size()).isEqualTo(2);
 
-        List<PeriodeDto> perioder = feilutbetalingPerioder.getPerioder();
-        perioder.sort(Comparator.comparing(PeriodeDto::getFom));
+        List<ForeldelsePeriodeMedBeløpDto> perioder = feilutbetalingPerioder.getPerioder();
+        perioder.sort(Comparator.comparing(ForeldelsePeriodeMedBeløpDto::getFom));
 
         assertThat(perioder.get(0).getBelop()).isEqualTo(BigDecimal.valueOf(22000));
         assertThat(perioder.get(0).getFom()).isEqualTo(FOM_1);

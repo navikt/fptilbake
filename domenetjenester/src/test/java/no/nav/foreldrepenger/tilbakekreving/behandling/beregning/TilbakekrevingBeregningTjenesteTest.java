@@ -43,7 +43,7 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
         Periode periode = new Periode(LocalDate.of(2019, 5, 1), LocalDate.of(2019, 5, 3));
 
         lagKravgrunnlag(internBehandlingId, periode, BigDecimal.ZERO);
-        lagForeldelse(internBehandlingId, periode, ForeldelseVurderingType.IKKE_FORELDET);
+        lagForeldelse(internBehandlingId, periode, ForeldelseVurderingType.IKKE_FORELDET, null);
         lagVilkårsvurderingMedForsett(internBehandlingId, periode);
 
         flush();
@@ -94,7 +94,7 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
         Periode periode = new Periode(LocalDate.of(2019, 5, 1), LocalDate.of(2019, 5, 3));
 
         lagKravgrunnlag(internBehandlingId, periode, BigDecimal.ZERO);
-        lagForeldelse(internBehandlingId, periode, ForeldelseVurderingType.FORELDET);
+        lagForeldelse(internBehandlingId, periode, ForeldelseVurderingType.FORELDET, periode.getFom().plusMonths(8));
 
         flush();
 
@@ -121,7 +121,7 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
         Periode periode = new Periode(LocalDate.of(2019, 5, 1), LocalDate.of(2019, 5, 3));
 
         lagKravgrunnlag(internBehandlingId, periode, BigDecimal.valueOf(10));
-        lagForeldelse(internBehandlingId, periode, ForeldelseVurderingType.IKKE_FORELDET);
+        lagForeldelse(internBehandlingId, periode, ForeldelseVurderingType.IKKE_FORELDET, null);
         lagVilkårsvurderingMedForsett(internBehandlingId, periode);
 
         flush();
@@ -149,7 +149,7 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
         Periode periode = new Periode(LocalDate.of(2019, 5, 1), LocalDate.of(2019, 5, 3));
 
         lagKravgrunnlag(internBehandlingId, periode, BigDecimal.valueOf(10));
-        lagForeldelse(internBehandlingId, periode, ForeldelseVurderingType.IKKE_FORELDET);
+        lagForeldelse(internBehandlingId, periode, ForeldelseVurderingType.IKKE_FORELDET, null);
         lagVilkårsvurderingMedForsett(internBehandlingId, periode);
 
         flush();
@@ -189,7 +189,7 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
 
         grunnlagRepository.lagre(internBehandlingId, grunnlag);
 
-        lagForeldelse(internBehandlingId, logiskPeriode, ForeldelseVurderingType.IKKE_FORELDET);
+        lagForeldelse(internBehandlingId, logiskPeriode, ForeldelseVurderingType.IKKE_FORELDET, null);
         lagVilkårsvurderingMedForsett(internBehandlingId, logiskPeriode);
 
         flush();
@@ -222,7 +222,7 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
         grunnlag.leggTilPeriode(grunnlagPeriode1);
         grunnlagRepository.lagre(internBehandlingId, grunnlag);
 
-        lagForeldelse(internBehandlingId, logiskPeriode, ForeldelseVurderingType.IKKE_FORELDET);
+        lagForeldelse(internBehandlingId, logiskPeriode, ForeldelseVurderingType.IKKE_FORELDET, null);
         lagVilkårsvurderingMedForsett(internBehandlingId, logiskPeriode);
 
         flush();
@@ -260,7 +260,7 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
         grunnlag.leggTilPeriode(grunnlagPeriode);
         grunnlagRepository.lagre(internBehandlingId, grunnlag);
 
-        lagForeldelse(internBehandlingId, logiskPeriode, ForeldelseVurderingType.IKKE_FORELDET);
+        lagForeldelse(internBehandlingId, logiskPeriode, ForeldelseVurderingType.IKKE_FORELDET, null);
         lagVilkårsvurderingMedForsett(internBehandlingId, vurderingperiode1, vurderingperiode2);
 
         flush();
@@ -292,7 +292,7 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
         grunnlag.leggTilPeriode(grunnlagPeriode1);
         grunnlagRepository.lagre(internBehandlingId, grunnlag);
 
-        lagForeldelse(internBehandlingId, logiskPeriode, ForeldelseVurderingType.IKKE_FORELDET);
+        lagForeldelse(internBehandlingId, logiskPeriode, ForeldelseVurderingType.IKKE_FORELDET, null);
 
         VilkårVurderingEntitet vurdering = new VilkårVurderingEntitet();
         VilkårVurderingPeriodeEntitet vurdering0 = VilkårVurderingPeriodeEntitet.builder()
@@ -364,13 +364,14 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
         vilkårsvurderingRepository.lagre(behandlingId, vurdering);
     }
 
-    private void lagForeldelse(Long behandlingId, Periode periode, ForeldelseVurderingType resultat) {
+    private void lagForeldelse(Long behandlingId, Periode periode, ForeldelseVurderingType resultat, LocalDate foreldelsesFrist) {
         VurdertForeldelse vurdertForeldelse = new VurdertForeldelse();
         vurdertForeldelse.leggTilVurderForeldelsePerioder(VurdertForeldelsePeriode.builder()
             .medPeriode(periode)
             .medBegrunnelse("foo")
             .medForeldelseVurderingType(resultat)
             .medVurdertForeldelse(vurdertForeldelse)
+            .medForeldelsesFrist(foreldelsesFrist)
             .build());
         vurdertForeldelseRepository.lagre(behandlingId, vurdertForeldelse);
     }

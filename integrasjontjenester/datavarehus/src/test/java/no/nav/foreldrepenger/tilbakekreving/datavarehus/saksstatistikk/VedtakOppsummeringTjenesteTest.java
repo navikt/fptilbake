@@ -197,7 +197,9 @@ public class VedtakOppsummeringTjenesteTest {
         VurdertForeldelsePeriode foreldelsePeriode = VurdertForeldelsePeriode.builder().medPeriode(periode)
             .medForeldelseVurderingType(ForeldelseVurderingType.FORELDET)
             .medVurdertForeldelse(vurdertForeldelse)
-            .medBegrunnelse("foreldelse begrunnelse").build();
+            .medBegrunnelse("foreldelse begrunnelse")
+            .medForeldelsesFrist(periode.getFom().plusMonths(8))
+            .build();
         vurdertForeldelse.leggTilVurderForeldelsePerioder(foreldelsePeriode);
         foreldelseRepository.lagre(behandlingId, vurdertForeldelse);
     }

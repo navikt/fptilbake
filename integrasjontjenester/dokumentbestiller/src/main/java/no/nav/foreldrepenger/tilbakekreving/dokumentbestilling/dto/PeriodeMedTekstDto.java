@@ -23,6 +23,11 @@ public class PeriodeMedTekstDto {
     @Pattern(regexp = InputValideringRegex.FRITEKST)
     private String faktaAvsnitt;
 
+    @Size(max = 4000, message = "Fritekst for foreldelse er for lang")
+    @Pattern(regexp = InputValideringRegex.FRITEKST)
+    @JsonProperty("foreldelseAvsnitt")
+    private String foreldelseAvsnitt;
+
     @Size(max = 4000, message = "Fritekst for vilkår er for lang")
     @Pattern(regexp = InputValideringRegex.FRITEKST)
     @JsonProperty("vilkaarAvsnitt")
@@ -64,6 +69,14 @@ public class PeriodeMedTekstDto {
 
     public void setFaktaAvsnitt(String faktaAvsnitt) {
         this.faktaAvsnitt = faktaAvsnitt;
+    }
+
+    public String getForeldelseAvsnitt() {
+        return foreldelseAvsnitt;
+    }
+
+    public void setForeldelseAvsnitt(String foreldelseAvsnitt) {
+        this.foreldelseAvsnitt = foreldelseAvsnitt;
     }
 
     public String getVilkårAvsnitt() {

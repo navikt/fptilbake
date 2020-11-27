@@ -39,6 +39,8 @@ public class VedtaksbrevUtil {
                 periodeMedTekst.setSærligeGrunnerAvsnitt(fritekst);
             } else if (VedtaksbrevFritekstType.SAERLIGE_GRUNNER_ANNET_AVSNITT.equals(fritekstType)) {
                 periodeMedTekst.setSærligeGrunnerAnnetAvsnitt(fritekst);
+            } else if (VedtaksbrevFritekstType.FORELDELSE_AVSNITT.equals(fritekstType)) {
+                periodeMedTekst.setForeldelseAvsnitt(fritekst);
             } else {
                 throw new IllegalArgumentException("Utvikler-feil: mangler håndtering for fritekstType:" + fritekstType);
             }

@@ -30,7 +30,9 @@ public enum HistorikkEndretFeltType implements Kodeverdi {
     TILBAKEKREV_SMÅBELOEP("TILBAKEKREV_SMAABELOEP","Skal beløp under 4 rettsgebyr(6.ledd) tilbakekreves?"),
     ER_BELØPET_BEHOLD("BELOEP_ER_I_BEHOLD","Er beløpet i behold?"),
     ILEGG_RENTER("ILEGG_RENTER","Skal det tilegges renter?"),
-    FORELDELSE("FORELDELSE","Foreldelse");
+    FORELDELSE("FORELDELSE","Foreldelse"),
+    FORELDELSESFRIST("FORELDELSESFRIST", "Foreldelsesfrist"),
+    OPPDAGELSES_DATO("OPPDAGELSES_DATO", "Dato for når feilutbetaling ble oppdaget");
 
     private String kode;
     private String navn;
