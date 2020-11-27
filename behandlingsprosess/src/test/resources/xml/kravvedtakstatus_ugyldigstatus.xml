@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <urn:endringKravOgVedtakstatus xmlns:urn="urn:no:nav:tilbakekreving:status:v1">
     <urn:kravOgVedtakstatus>
-        <urn:vedtakId>208408</urn:vedtakId>
+        <urn:vedtakId>100</urn:vedtakId>
         <urn:kodeStatusKrav>BEHA</urn:kodeStatusKrav>
         <urn:kodeFagomraade>FP</urn:kodeFagomraade>
         <urn:fagsystemId>139015144100</urn:fagsystemId>

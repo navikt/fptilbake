@@ -25,10 +25,6 @@ public class KravVedtakStatusMapper {
         this.tpsAdapterWrapper = tpsAdapterWrapper;
     }
 
-    public Long finnVedtakId(KravOgVedtakstatus kravOgVedtakstatus) {
-        return kravOgVedtakstatus.getVedtakId().longValue();
-    }
-
     public KravVedtakStatus437 mapTilDomene(KravOgVedtakstatus kravOgVedtakstatus) {
         GjelderType gjelderType = GjelderType.fraKode(kravOgVedtakstatus.getTypeGjelderId().value());
         return KravVedtakStatus437.builder()
