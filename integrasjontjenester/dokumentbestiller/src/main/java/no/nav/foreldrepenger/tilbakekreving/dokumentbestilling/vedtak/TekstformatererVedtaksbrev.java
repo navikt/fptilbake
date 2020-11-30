@@ -276,9 +276,14 @@ class TekstformatererVedtaksbrev extends FellesTekstformaterer {
         return konverterMedPartialTemplate(PARTIAL_PERIODE_FAKTA, periode);
     }
 
+    /**
+     * Hjelpemetode brukt i tester og generering av dokumentasjon.
+     */
     static String lagVilkårTekst(HbVedtaksbrevPeriodeOgFelles periode) {
         StringBuilder vilkårTekst = new StringBuilder();
         if (periode.getPeriode().getVurderinger().harForeldelseAvsnitt()) {
+            // dobbelt linjeskift trengs for at den genererte teksten til dokumentasjon har lik formattering som i vedtaksbrevet.
+            // linjeskiftene "forsvinner" når Foreldelse- og Vilkår-templatane blir generert hver for seg
             vilkårTekst.append(konverterMedPartialTemplate(PARTIAL_PERIODE_FORELDELSE, periode)).append("\n\n");
         }
         vilkårTekst.append(konverterMedPartialTemplate(PARTIAL_PERIODE_VILKÅR, periode));
