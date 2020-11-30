@@ -3,7 +3,6 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
@@ -28,10 +27,12 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbVurderinger;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
-@Ignore
+//@Ignore
 public class DokumentasjonGeneratorPeriodeVilkår {
 
-    private final Periode januar = Periode.of(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 1, 16));
+    private final Periode JANUAR = Periode.of(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 1, 16));
+    private final LocalDate FORELDELSESFRIST = LocalDate.of(2019, 12, 1);
+    private final LocalDate OPPDAGELSES_DATO = LocalDate.of(2019, 3, 1);
 
     private static VilkårResultat[] vilkårResultat = new VilkårResultat[] {
         VilkårResultat.FORSTO_BURDE_FORSTÅTT,
@@ -42,6 +43,11 @@ public class DokumentasjonGeneratorPeriodeVilkår {
         ForeldelseVurderingType.IKKE_VURDERT,
         ForeldelseVurderingType.IKKE_FORELDET,
         ForeldelseVurderingType.TILLEGGSFRIST
+    };
+    private static Aktsomhet[] aktsomheter = new Aktsomhet[] {
+        Aktsomhet.SIMPEL_UAKTSOM,
+        Aktsomhet.GROVT_UAKTSOM,
+        Aktsomhet.FORSETT
     };
     private static boolean[] trueFalse = new boolean[] { true, false};
 
@@ -87,7 +93,7 @@ public class DokumentasjonGeneratorPeriodeVilkår {
 
     private void lagVilkårstekster(FagsakYtelseType ytelsetype, Språkkode språkkode) {
         for (VilkårResultat resultat : vilkårResultat) {
-            for (Vurdering vurdering : Aktsomhet.values()) {
+            for (Vurdering vurdering : aktsomheter) {
                 for (ForeldelseVurderingType foreldelseVurdering : foreldelseVurderinger) {
                     lagResultatOgVurderingTekster(ytelsetype, språkkode, resultat, vurdering, foreldelseVurdering, false, false, false);
                     lagResultatOgVurderingTekster(ytelsetype, språkkode, resultat, vurdering, foreldelseVurdering, true, false, false);
@@ -170,9 +176,21 @@ public class DokumentasjonGeneratorPeriodeVilkår {
             vurderingerBuilder
                 .medBeløpIBehold(pengerIBehold ? BigDecimal.valueOf(3999) : BigDecimal.ZERO);
         }
+        if (ForeldelseVurderingType.FORELDET.equals(foreldelsevurdering)) {
+            vurderingerBuilder.medForeldelsesfrist(FORELDELSESFRIST);
+            if (fritekst) {
+                vurderingerBuilder.medFritekstForeldelse("[fritekst her]");
+            }
+        } else if (ForeldelseVurderingType.TILLEGGSFRIST.equals(foreldelsevurdering)) {
+            vurderingerBuilder.medForeldelsesfrist(FORELDELSESFRIST);
+            vurderingerBuilder.medOppdagelsesDato(OPPDAGELSES_DATO);
+            if (fritekst) {
+                vurderingerBuilder.medFritekstForeldelse("[fritekst her]");
+            }
+        }
         HbVurderinger vurderinger = vurderingerBuilder.build();
         HbVedtaksbrevPeriode.Builder periodeBuilder = HbVedtaksbrevPeriode.builder()
-            .medPeriode(januar)
+            .medPeriode(JANUAR)
             .medResultat(HbResultat.builder()
                 .medTilbakekrevesBeløp(BigDecimal.valueOf(9999))
                 .medRenterBeløp(BigDecimal.ZERO)
@@ -244,6 +262,8 @@ public class DokumentasjonGeneratorPeriodeVilkår {
             .replaceAll(" 3\u00A0999\u00A0kroner", " <beløp i behold> kroner")
             .replaceAll("1. januar 2019", "<periode start>")
             .replaceAll("16. januar 2019", "<periode slutt>")
+            .replaceAll("1. mars 2019", "<oppdagelsesdato>")
+            .replaceAll("1. desember 2019", "<foreldelsesfrist>")
 
             .replaceAll("\\[", "[ ")
             .replaceAll("]", " ]");

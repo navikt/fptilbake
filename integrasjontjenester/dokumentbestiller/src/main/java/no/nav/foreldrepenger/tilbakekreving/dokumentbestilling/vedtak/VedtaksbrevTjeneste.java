@@ -491,7 +491,7 @@ public class VedtaksbrevTjeneste {
     private HbVurderinger utledVurderinger(Periode periode, List<VilkårVurderingPeriodeEntitet> vilkårPerioder, VurdertForeldelse foreldelse, PeriodeMedTekstDto fritekst) {
         HbVurderinger.Builder builder = HbVurderinger.builder();
         leggTilVilkårvurdering(builder, periode, vilkårPerioder, fritekst);
-        leggTilForeldelseVurdering(builder, periode, foreldelse);
+        leggTilForeldelseVurdering(builder, periode, foreldelse, fritekst);
         return builder.build();
     }
 
@@ -524,13 +524,16 @@ public class VedtaksbrevTjeneste {
         }
     }
 
-    private void leggTilForeldelseVurdering(HbVurderinger.Builder builder, Periode periode, VurdertForeldelse foreldelse) {
+    private void leggTilForeldelseVurdering(HbVurderinger.Builder builder, Periode periode, VurdertForeldelse foreldelse, PeriodeMedTekstDto fritekst) {
         VurdertForeldelsePeriode foreldelsePeriode = finnForeldelsePeriode(foreldelse, periode);
         if (foreldelsePeriode != null) {
             if (foreldelsePeriode.erForeldet()) {
                 builder.medAktsomhetResultat(AnnenVurdering.FORELDET);
             }
             builder.medForeldelsevurdering(foreldelsePeriode.getForeldelseVurderingType());
+            builder.medForeldelsesfrist(foreldelsePeriode.getForeldelsesfrist());
+            builder.medOppdagelsesDato(foreldelsePeriode.getOppdagelsesDato());
+            builder.medFritekstForeldelse(fritekst != null ? fritekst.getForeldelseAvsnitt() : null);
         } else {
             builder.medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT);
         }

@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
@@ -42,6 +43,12 @@ public class VurdertForeldelsePeriode extends BaseEntitet {
     @Column(name = "foreldelse_vurdering_type",nullable = false)
     private ForeldelseVurderingType foreldelseVurderingType;
 
+    @Column(name = "foreldelsesfrist")
+    private LocalDate foreldelsesfrist;
+
+    @Column(name = "oppdagelses_dato")
+    private LocalDate oppdagelsesDato;
+
     @Column(name = "begrunnelse", nullable = false)
     private String begrunnelse;
 
@@ -72,6 +79,14 @@ public class VurdertForeldelsePeriode extends BaseEntitet {
 
     public ForeldelseVurderingType getForeldelseVurderingType() {
         return foreldelseVurderingType;
+    }
+
+    public LocalDate getForeldelsesfrist() {
+        return foreldelsesfrist;
+    }
+
+    public LocalDate getOppdagelsesDato() {
+        return oppdagelsesDato;
     }
 
     public String getBegrunnelse() {
@@ -106,12 +121,28 @@ public class VurdertForeldelsePeriode extends BaseEntitet {
             return this;
         }
 
+        public Builder medForeldelsesFrist(LocalDate foreldelsesFrist) {
+            this.kladd.foreldelsesfrist = foreldelsesFrist;
+            return this;
+        }
+
+        public Builder medOppdagelseDato(LocalDate oppdagelseDato) {
+            this.kladd.oppdagelsesDato = oppdagelseDato;
+            return this;
+        }
+
         public Builder medBegrunnelse(String begrunnelse) {
             this.kladd.begrunnelse = begrunnelse;
             return this;
         }
 
         public VurdertForeldelsePeriode build() {
+            if (ForeldelseVurderingType.TILLEGGSFRIST.equals(kladd.foreldelseVurderingType)) {
+                Objects.requireNonNull(kladd.oppdagelsesDato, "oppdagelsesdato");
+                Objects.requireNonNull(kladd.foreldelsesfrist, "foreldelsesFrist");
+            } else if (ForeldelseVurderingType.FORELDET.equals(kladd.foreldelseVurderingType)) {
+                Objects.requireNonNull(kladd.foreldelsesfrist, "foreldelsesFrist");
+            }
             return kladd;
         }
     }

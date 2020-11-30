@@ -64,7 +64,7 @@ public class AksjonspunktApplikasjonTjenesteTest {
         repositoryProvider.getEksternBehandlingRepository().lagre(eksternBehandling);
 
         VurderForeldelseDto dto = new VurderForeldelseDto();
-        dto.setForeldelsePerioder(Collections.singletonList(new ForeldelsePeriodeDto(FOM, TOM, ForeldelseVurderingType.IKKE_FORELDET, BEGRUNNELSE)));
+        dto.setForeldelsePerioder(Collections.singletonList(new ForeldelsePeriodeDto(FOM, TOM, ForeldelseVurderingType.IKKE_FORELDET, null, null, BEGRUNNELSE)));
 
         aksjonspunktApplikasjonTjeneste.bekreftAksjonspunkter(Collections.singletonList(dto), behandling.getId());
 

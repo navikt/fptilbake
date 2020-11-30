@@ -14,7 +14,7 @@ import org.mockito.Mockito;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.FeilutbetalingPerioderDto;
-import no.nav.foreldrepenger.tilbakekreving.behandling.dto.PeriodeDto;
+import no.nav.foreldrepenger.tilbakekreving.behandling.dto.ForeldelsePeriodeMedBeløpDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurdertForeldelseTjeneste;
@@ -48,18 +48,18 @@ public class ForeldelseRestTjenesteTest {
 
     @Test
     public void skal_få_med_feilutbetalt_beløp() {
-        PeriodeDto periodeDto = new PeriodeDto();
-        periodeDto.setFom(LocalDate.now().minusDays(10));
-        periodeDto.setTom(LocalDate.now().minusDays(2));
-        periodeDto.setBelop(BigDecimal.valueOf(5000));
-        periodeDto.setForeldelseVurderingType(ForeldelseVurderingType.IKKE_FORELDET);
-        periodeDto.setBegrunnelse("Begrunnelse");
+        ForeldelsePeriodeMedBeløpDto foreldelsePeriodeMedBeløpDto = new ForeldelsePeriodeMedBeløpDto();
+        foreldelsePeriodeMedBeløpDto.setFom(LocalDate.now().minusDays(10));
+        foreldelsePeriodeMedBeløpDto.setTom(LocalDate.now().minusDays(2));
+        foreldelsePeriodeMedBeløpDto.setBelop(BigDecimal.valueOf(5000));
+        foreldelsePeriodeMedBeløpDto.setForeldelseVurderingType(ForeldelseVurderingType.IKKE_FORELDET);
+        foreldelsePeriodeMedBeløpDto.setBegrunnelse("Begrunnelse");
 
         FeilutbetalingPerioderDto dto = new FeilutbetalingPerioderDto();
-        dto.setPerioder(Collections.singletonList(periodeDto));
+        dto.setPerioder(Collections.singletonList(foreldelsePeriodeMedBeløpDto));
         dto.setBehandlingId(1000L);
 
-        Map<Periode, BigDecimal> feilutbetaltePerioder = Map.of(Periode.of(periodeDto.getFom(), periodeDto.getTom()), BigDecimal.valueOf(3999));
+        Map<Periode, BigDecimal> feilutbetaltePerioder = Map.of(Periode.of(foreldelsePeriodeMedBeløpDto.getFom(), foreldelsePeriodeMedBeløpDto.getTom()), BigDecimal.valueOf(3999));
         Mockito.when(kravgrunnlagBeregningTjenesteMock.beregnFeilutbetaltBeløp(Mockito.anyLong(), Mockito.any())).thenReturn(feilutbetaltePerioder);
 
         FeilutbetalingPerioderDto resultat = restTjeneste.beregnBeløp(dto);

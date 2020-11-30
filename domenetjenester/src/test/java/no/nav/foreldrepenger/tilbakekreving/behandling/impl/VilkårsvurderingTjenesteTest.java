@@ -44,8 +44,12 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
     private static final String AKTIVITET_FISKER = "Fisker";
     private static final String AKTIVITET_ARBEIDSLEDIG = "Arbeidsledig";
     private static final String AKTIVITET_SJØMANN = "Sjømann";
-    private static final LocalDate SISTE_DAG_I_FORELDELSE_PERIODE = LocalDate.of(2016, 4, 28);
-    private static final LocalDate FØRSTE_DAG_I_FORELDELSE_PERIODE = LocalDate.of(2016, 4, 29);
+    private static final LocalDate SISTE_DAG_I_FORELDET_PERIODE = LocalDate.of(2016, 4, 8);
+    private static final LocalDate FØRSTE_DAG_I_TILLEGGSFRIST_PERIODE = LocalDate.of(2016, 4, 9);
+    private static final LocalDate SISTE_DAG_I_TILLEGGSFRIST_PERIODE = LocalDate.of(2016, 4, 28);
+    private static final LocalDate FØRSTE_DAG_I_IKKE_FORELDET_PERIODE = LocalDate.of(2016, 4, 29);
+    private static final LocalDate FORELDELSESFRIST = FellesTestOppsett.FOM.plusYears(3).minusDays(60);
+    private static final LocalDate OPPDAGELSES_DATO = FellesTestOppsett.FOM.plusYears(2);
 
     @Test
     public void hentDetaljertFeilutbetalingPerioder_nårPerioderErForeldet() {
@@ -53,23 +57,25 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         lagreFaktaTestdata();
 
         vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, Lists.newArrayList(
-            new ForeldelsePeriodeDto(FOM, SISTE_DAG_I_FORELDELSE_PERIODE,
-                ForeldelseVurderingType.FORELDET, "ABC"),
-            new ForeldelsePeriodeDto(FØRSTE_DAG_I_FORELDELSE_PERIODE, TOM,
-                ForeldelseVurderingType.IKKE_FORELDET, "CDE")));
+            new ForeldelsePeriodeDto(FOM, SISTE_DAG_I_FORELDET_PERIODE,
+                ForeldelseVurderingType.FORELDET, FORELDELSESFRIST, null, "ABC"),
+            new ForeldelsePeriodeDto(FØRSTE_DAG_I_TILLEGGSFRIST_PERIODE, SISTE_DAG_I_TILLEGGSFRIST_PERIODE,
+                ForeldelseVurderingType.TILLEGGSFRIST, FORELDELSESFRIST, OPPDAGELSES_DATO, "ABC"),
+            new ForeldelsePeriodeDto(FØRSTE_DAG_I_IKKE_FORELDET_PERIODE, TOM,
+                ForeldelseVurderingType.IKKE_FORELDET, null, null, "CDE")));
 
         List<DetaljertFeilutbetalingPeriodeDto> perioder = vilkårsvurderingTjeneste.hentDetaljertFeilutbetalingPerioder(internBehandlingId);
         assertThat(perioder).isNotEmpty();
-        assertThat(perioder.size()).isEqualTo(2);
+        assertThat(perioder.size()).isEqualTo(3);
         perioder.sort(Comparator.comparing(DetaljertFeilutbetalingPeriodeDto::getFom));
 
         DetaljertFeilutbetalingPeriodeDto førstePeriode = perioder.get(0);
         assertThat(førstePeriode.getOppfyltValg()).isEqualByComparingTo(VilkårResultat.UDEFINERT);
         assertThat(førstePeriode.getFom()).isEqualTo(FOM);
-        assertThat(førstePeriode.getTom()).isEqualTo(SISTE_DAG_I_FORELDELSE_PERIODE);
+        assertThat(førstePeriode.getTom()).isEqualTo(SISTE_DAG_I_FORELDET_PERIODE);
         assertThat(førstePeriode.getHendelseType()).isEqualTo(HendelseType.FP_UTTAK_UTSETTELSE_TYPE);
         assertThat(førstePeriode.getHendelseUndertype()).isEqualTo(HendelseUnderType.ARBEID_HELTID);
-        assertThat(førstePeriode.getFeilutbetaling()).isEqualByComparingTo(BigDecimal.valueOf(31000));
+        assertThat(førstePeriode.getFeilutbetaling()).isEqualByComparingTo(BigDecimal.valueOf(17000));
         assertThat(førstePeriode.isForeldet()).isTrue();
 
         assertThat(førstePeriode.getYtelser().size()).isEqualTo(2);
@@ -77,25 +83,40 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         assertThat(førstePeriode.getYtelser().get(0).getAktivitet()).isEqualTo(AKTIVITET_ARBEIDSLEDIG);
         assertThat(førstePeriode.getYtelser().get(0).getBelop()).isEqualByComparingTo(BigDecimal.valueOf(11000));
         assertThat(førstePeriode.getYtelser().get(1).getAktivitet()).isEqualTo(AKTIVITET_FISKER);
-        assertThat(førstePeriode.getYtelser().get(1).getBelop()).isEqualByComparingTo(BigDecimal.valueOf(20000));
+        assertThat(førstePeriode.getYtelser().get(1).getBelop()).isEqualByComparingTo(BigDecimal.valueOf(6000));
         assertThat(førstePeriode.getRedusertBeloper().size()).isEqualTo(0);
 
         DetaljertFeilutbetalingPeriodeDto andrePeriode = perioder.get(1);
         assertThat(andrePeriode.getOppfyltValg()).isEqualByComparingTo(VilkårResultat.UDEFINERT);
-        assertThat(andrePeriode.getFom()).isEqualTo(FØRSTE_DAG_I_FORELDELSE_PERIODE);
-        assertThat(andrePeriode.getTom()).isEqualTo(TOM);
+        assertThat(andrePeriode.getFom()).isEqualTo(FØRSTE_DAG_I_TILLEGGSFRIST_PERIODE);
+        assertThat(andrePeriode.getTom()).isEqualTo(SISTE_DAG_I_TILLEGGSFRIST_PERIODE);
         assertThat(førstePeriode.getHendelseType()).isEqualTo(HendelseType.FP_UTTAK_UTSETTELSE_TYPE);
         assertThat(førstePeriode.getHendelseUndertype()).isEqualTo(HendelseUnderType.ARBEID_HELTID);
-        assertThat(andrePeriode.getFeilutbetaling()).isEqualByComparingTo(BigDecimal.valueOf(20000));
+        assertThat(andrePeriode.getFeilutbetaling()).isEqualByComparingTo(BigDecimal.valueOf(14000));
         assertThat(andrePeriode.isForeldet()).isFalse();
 
-        assertThat(andrePeriode.getYtelser().size()).isEqualTo(2);
+        assertThat(andrePeriode.getYtelser().size()).isEqualTo(1);
         andrePeriode.getYtelser().sort(Comparator.comparing(YtelseDto::getAktivitet));
         assertThat(andrePeriode.getYtelser().get(0).getAktivitet()).isEqualTo(AKTIVITET_FISKER);
-        assertThat(andrePeriode.getYtelser().get(0).getBelop()).isEqualByComparingTo(BigDecimal.valueOf(1000));
-        assertThat(andrePeriode.getYtelser().get(1).getAktivitet()).isEqualTo(AKTIVITET_SJØMANN);
-        assertThat(andrePeriode.getYtelser().get(1).getBelop()).isEqualByComparingTo(BigDecimal.valueOf(19000));
+        assertThat(andrePeriode.getYtelser().get(0).getBelop()).isEqualByComparingTo(BigDecimal.valueOf(14000));
         assertThat(andrePeriode.getRedusertBeloper().size()).isEqualTo(0);
+
+        DetaljertFeilutbetalingPeriodeDto tredjePeriode = perioder.get(2);
+        assertThat(tredjePeriode.getOppfyltValg()).isEqualByComparingTo(VilkårResultat.UDEFINERT);
+        assertThat(tredjePeriode.getFom()).isEqualTo(FØRSTE_DAG_I_IKKE_FORELDET_PERIODE);
+        assertThat(tredjePeriode.getTom()).isEqualTo(TOM);
+        assertThat(førstePeriode.getHendelseType()).isEqualTo(HendelseType.FP_UTTAK_UTSETTELSE_TYPE);
+        assertThat(førstePeriode.getHendelseUndertype()).isEqualTo(HendelseUnderType.ARBEID_HELTID);
+        assertThat(tredjePeriode.getFeilutbetaling()).isEqualByComparingTo(BigDecimal.valueOf(20000));
+        assertThat(tredjePeriode.isForeldet()).isFalse();
+
+        assertThat(tredjePeriode.getYtelser().size()).isEqualTo(2);
+        tredjePeriode.getYtelser().sort(Comparator.comparing(YtelseDto::getAktivitet));
+        assertThat(tredjePeriode.getYtelser().get(0).getAktivitet()).isEqualTo(AKTIVITET_FISKER);
+        assertThat(tredjePeriode.getYtelser().get(0).getBelop()).isEqualByComparingTo(BigDecimal.valueOf(1000));
+        assertThat(tredjePeriode.getYtelser().get(1).getAktivitet()).isEqualTo(AKTIVITET_SJØMANN);
+        assertThat(tredjePeriode.getYtelser().get(1).getBelop()).isEqualByComparingTo(BigDecimal.valueOf(19000));
+        assertThat(tredjePeriode.getRedusertBeloper().size()).isEqualTo(0);
     }
 
     @Test
@@ -279,14 +300,14 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         lagreFaktaTestdata();
 
         vurdertForeldelseTjeneste.lagreVurdertForeldelseGrunnlag(internBehandlingId, Lists.newArrayList(
-            new ForeldelsePeriodeDto(FOM, SISTE_DAG_I_FORELDELSE_PERIODE,
-                ForeldelseVurderingType.FORELDET, "ABC"),
-            new ForeldelsePeriodeDto(FØRSTE_DAG_I_FORELDELSE_PERIODE, TOM,
-                ForeldelseVurderingType.IKKE_FORELDET, "CDE")));
+            new ForeldelsePeriodeDto(FOM, SISTE_DAG_I_FORELDET_PERIODE,
+                ForeldelseVurderingType.FORELDET, FORELDELSESFRIST, null, "ABC"),
+            new ForeldelsePeriodeDto(FØRSTE_DAG_I_IKKE_FORELDET_PERIODE, TOM,
+                ForeldelseVurderingType.IKKE_FORELDET, null, null, "CDE")));
 
         List<VilkårsvurderingPerioderDto> vilkårPerioder = Lists.newArrayList(
-            formVilkårsvurderingPerioderDto(VilkårResultat.FORSTO_BURDE_FORSTÅTT, FOM, SISTE_DAG_I_FORELDELSE_PERIODE, Aktsomhet.SIMPEL_UAKTSOM),
-            formVilkårsvurderingPerioderDto(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER, FØRSTE_DAG_I_FORELDELSE_PERIODE, TOM, Aktsomhet.GROVT_UAKTSOM));
+            formVilkårsvurderingPerioderDto(VilkårResultat.FORSTO_BURDE_FORSTÅTT, FOM, SISTE_DAG_I_FORELDET_PERIODE, Aktsomhet.SIMPEL_UAKTSOM),
+            formVilkårsvurderingPerioderDto(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER, FØRSTE_DAG_I_IKKE_FORELDET_PERIODE, TOM, Aktsomhet.GROVT_UAKTSOM));
         vilkårsvurderingTjeneste.lagreVilkårsvurdering(internBehandlingId, vilkårPerioder);
 
         Optional<VilkårVurderingEntitet> aggregateEntitet = repoProvider.getVilkårsvurderingRepository().finnVilkårsvurdering(internBehandlingId);
@@ -295,7 +316,7 @@ public class VilkårsvurderingTjenesteTest extends FellesTestOppsett {
         assertThat(vilkårEntitet.getPerioder().size()).isEqualTo(1);
 
         VilkårVurderingPeriodeEntitet periode = vilkårEntitet.getPerioder().get(0);
-        assertThat(periode.getPeriode()).isEqualTo(Periode.of(FØRSTE_DAG_I_FORELDELSE_PERIODE, TOM));
+        assertThat(periode.getPeriode()).isEqualTo(Periode.of(FØRSTE_DAG_I_IKKE_FORELDET_PERIODE, TOM));
         assertThat(periode.getGodTro()).isNull();
         assertThat(periode.getAktsomhet().getAktsomhet()).isEqualByComparingTo(Aktsomhet.GROVT_UAKTSOM);
         assertThat(periode.getAktsomhet().getSærligGrunnerTilReduksjon()).isFalse();

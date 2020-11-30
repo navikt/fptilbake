@@ -11,6 +11,7 @@ public class Underavsnitt {
 
     public enum Underavsnittstype {
         FAKTA,
+        FORELDELSE,
         VILKÅR,
         SÆRLIGEGRUNNER,
         SÆRLIGEGRUNNER_ANNET

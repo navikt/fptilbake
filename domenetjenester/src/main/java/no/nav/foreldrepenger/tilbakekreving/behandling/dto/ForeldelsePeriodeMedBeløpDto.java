@@ -15,7 +15,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Foreldel
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.vedtak.util.InputValideringRegex;
 
-public class PeriodeDto {
+public class ForeldelsePeriodeMedBeløpDto {
 
     @NotNull
     private LocalDate fom;
@@ -30,6 +30,9 @@ public class PeriodeDto {
 
     @Valid
     private ForeldelseVurderingType foreldelseVurderingType;
+
+    private LocalDate foreldelsesfrist;
+    private LocalDate oppdagelsesDato;
 
     @Size(max = 4000)
     @Pattern(regexp = InputValideringRegex.FRITEKST)
@@ -53,6 +56,14 @@ public class PeriodeDto {
 
     public ForeldelseVurderingType getForeldelseVurderingType() {
         return foreldelseVurderingType;
+    }
+
+    public LocalDate getForeldelsesfrist() {
+        return foreldelsesfrist;
+    }
+
+    public LocalDate getOppdagelsesDato() {
+        return oppdagelsesDato;
     }
 
     public String getBegrunnelse() {
@@ -82,6 +93,14 @@ public class PeriodeDto {
 
     public void setForeldelseVurderingType(ForeldelseVurderingType foreldelseVurderingType) {
         this.foreldelseVurderingType = foreldelseVurderingType;
+    }
+
+    public void setForeldelsesfrist(LocalDate foreldelsesfrist) {
+        this.foreldelsesfrist = foreldelsesfrist;
+    }
+
+    public void setOppdagelsesDato(LocalDate oppdagelsesDato) {
+        this.oppdagelsesDato = oppdagelsesDato;
     }
 
     public void setBegrunnelse(String begrunnelse) {

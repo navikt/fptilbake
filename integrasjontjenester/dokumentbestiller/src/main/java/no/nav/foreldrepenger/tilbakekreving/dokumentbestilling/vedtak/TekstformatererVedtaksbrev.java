@@ -38,6 +38,7 @@ class TekstformatererVedtaksbrev extends FellesTekstformaterer {
     private static Map<String, Template> TEMPLATE_CACHE = new HashMap<>();
 
     private static final String PARTIAL_PERIODE_FAKTA = "vedtak/periode_fakta";
+    private static final String PARTIAL_PERIODE_FORELDELSE = "vedtak/periode_foreldelse";
     private static final String PARTIAL_PERIODE_VILKÅR = "vedtak/periode_vilkår";
     private static final String PARTIAL_PERIODE_SÆRLIGE_GRUNNER = "vedtak/periode_særlige_grunner";
 
@@ -90,6 +91,7 @@ class TekstformatererVedtaksbrev extends FellesTekstformaterer {
     private static Avsnitt lagPeriodeAvsnitt(HbVedtaksbrevPeriodeOgFelles data) {
         String overskrift = konverterMedPartialTemplate("vedtak/periode_overskrift", data);
         String faktatekst = konverterMedPartialTemplate(PARTIAL_PERIODE_FAKTA, data);
+        String foreldelseTekst = konverterMedPartialTemplate(PARTIAL_PERIODE_FORELDELSE, data);
         String vilkårTekst = konverterMedPartialTemplate(PARTIAL_PERIODE_VILKÅR, data);
         String særligeGrunnerTekst = konverterMedPartialTemplate(PARTIAL_PERIODE_SÆRLIGE_GRUNNER, data);
         String avsluttendeTekst = konverterMedPartialTemplate("vedtak/periode_slutt", data);
@@ -102,6 +104,7 @@ class TekstformatererVedtaksbrev extends FellesTekstformaterer {
         }
 
         parseTekst(faktatekst, avsnittBuilder, Underavsnitt.Underavsnittstype.FAKTA);
+        parseTekst(foreldelseTekst, avsnittBuilder, Underavsnitt.Underavsnittstype.FORELDELSE);
         parseTekst(vilkårTekst, avsnittBuilder, Underavsnitt.Underavsnittstype.VILKÅR);
         parseTekst(særligeGrunnerTekst, avsnittBuilder, Underavsnitt.Underavsnittstype.SÆRLIGEGRUNNER);
         parseTekst(avsluttendeTekst, avsnittBuilder, null);
@@ -273,8 +276,18 @@ class TekstformatererVedtaksbrev extends FellesTekstformaterer {
         return konverterMedPartialTemplate(PARTIAL_PERIODE_FAKTA, periode);
     }
 
+    /**
+     * Hjelpemetode brukt i tester og generering av dokumentasjon.
+     */
     static String lagVilkårTekst(HbVedtaksbrevPeriodeOgFelles periode) {
-        return konverterMedPartialTemplate(PARTIAL_PERIODE_VILKÅR, periode);
+        StringBuilder vilkårTekst = new StringBuilder();
+        if (periode.getPeriode().getVurderinger().harForeldelseAvsnitt()) {
+            // dobbelt linjeskift trengs for at den genererte teksten til dokumentasjon har lik formattering som i vedtaksbrevet.
+            // linjeskiftene "forsvinner" når Foreldelse- og Vilkår-templatane blir generert hver for seg
+            vilkårTekst.append(konverterMedPartialTemplate(PARTIAL_PERIODE_FORELDELSE, periode)).append("\n\n");
+        }
+        vilkårTekst.append(konverterMedPartialTemplate(PARTIAL_PERIODE_VILKÅR, periode));
+        return vilkårTekst.toString();
     }
 
     static String lagSærligeGrunnerTekst(HbVedtaksbrevFelles felles, HbVedtaksbrevPeriode periode) {

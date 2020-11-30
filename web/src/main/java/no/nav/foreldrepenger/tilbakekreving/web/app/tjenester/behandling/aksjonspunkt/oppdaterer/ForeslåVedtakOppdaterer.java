@@ -57,6 +57,7 @@ public class ForeslåVedtakOppdaterer implements AksjonspunktOppdaterer<Foreslå
         List<VedtaksbrevFritekstPeriode> fritekstPerioder = new ArrayList<>();
         for (PeriodeMedTekstDto periodeDto : perioderMedTekst) {
             lagFritekstPeriode(behandlingId, periodeDto, PeriodeMedTekstDto::getFaktaAvsnitt, VedtaksbrevFritekstType.FAKTA_AVSNITT).ifPresent(fritekstPerioder::add);
+            lagFritekstPeriode(behandlingId, periodeDto, PeriodeMedTekstDto::getForeldelseAvsnitt, VedtaksbrevFritekstType.FORELDELSE_AVSNITT).ifPresent(fritekstPerioder::add);
             lagFritekstPeriode(behandlingId, periodeDto, PeriodeMedTekstDto::getVilkårAvsnitt, VedtaksbrevFritekstType.VILKAAR_AVSNITT).ifPresent(fritekstPerioder::add);
             lagFritekstPeriode(behandlingId, periodeDto, PeriodeMedTekstDto::getSærligeGrunnerAvsnitt, VedtaksbrevFritekstType.SAERLIGE_GRUNNER_AVSNITT).ifPresent(fritekstPerioder::add);
             lagFritekstPeriode(behandlingId, periodeDto, PeriodeMedTekstDto::getSærligeGrunnerAnnetAvsnitt, VedtaksbrevFritekstType.SAERLIGE_GRUNNER_ANNET_AVSNITT).ifPresent(fritekstPerioder::add);

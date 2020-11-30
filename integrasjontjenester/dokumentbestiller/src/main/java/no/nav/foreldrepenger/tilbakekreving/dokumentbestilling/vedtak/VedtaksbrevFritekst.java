@@ -21,6 +21,7 @@ public class VedtaksbrevFritekst {
             periode.getFakta().setFritekstFakta(markerFritekst(fritekstTypeForFakta, periode.getFakta().getFritekstFakta(), Underavsnitt.Underavsnittstype.FAKTA));
             HbVurderinger vurderinger = periode.getVurderinger();
             if (vurderinger != null) {
+                vurderinger.setFritekstForeldelse(markerValgfriFritekst(vurderinger.getFritekstForeldelse(), Underavsnitt.Underavsnittstype.FORELDELSE));
                 vurderinger.setFritekstVilkår(markerValgfriFritekst(vurderinger.getFritekstVilkår(), Underavsnitt.Underavsnittstype.VILKÅR));
             }
             HbSærligeGrunner sg = vurderinger.getSærligeGrunner();
