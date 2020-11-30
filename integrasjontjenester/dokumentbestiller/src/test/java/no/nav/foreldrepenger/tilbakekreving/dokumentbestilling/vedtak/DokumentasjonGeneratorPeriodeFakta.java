@@ -126,6 +126,33 @@ public class DokumentasjonGeneratorPeriodeFakta {
         prettyPrint(resultat);
     }
 
+    @Test
+    public void list_ut_permutasjoner_for_FRISINN() {
+        HbVedtaksbrevFelles felles = lagFellesBuilder()
+            .medSak(HbSak.build()
+                .medYtelsetype(FagsakYtelseType.FRISINN)
+                .medErFødsel(true)
+                .medAntallBarn(1)
+                .build())
+            .build();
+        Map<HendelseMedUndertype, String> resultat = lagFaktatekster(felles);
+        prettyPrint(resultat);
+    }
+
+    @Test
+    public void list_ut_permutasjoner_for_FRISINN_nynorsk() {
+        HbVedtaksbrevFelles felles = lagFellesBuilder()
+            .medSak(HbSak.build()
+                .medYtelsetype(FagsakYtelseType.FRISINN)
+                .medErFødsel(true)
+                .medAntallBarn(1)
+                .build())
+            .medSpråkkode(Språkkode.nn)
+            .build();
+        Map<HendelseMedUndertype, String> resultat = lagFaktatekster(felles);
+        prettyPrint(resultat);
+    }
+
     private void prettyPrint(Map<HendelseMedUndertype, String> resultat) {
         for (Map.Entry<HendelseMedUndertype, String> entry : resultat.entrySet()) {
             HendelseMedUndertype typer = entry.getKey();

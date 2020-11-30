@@ -115,6 +115,7 @@ public class DokumentasjonGeneratorPeriodeVilkår {
         }
 
         lagResultatOgVurderingTekster(ytelsetype, språkkode, VilkårResultat.UDEFINERT, AnnenVurdering.FORELDET, ForeldelseVurderingType.FORELDET, false, false, false);
+        lagResultatOgVurderingTekster(ytelsetype, språkkode, VilkårResultat.UDEFINERT, AnnenVurdering.FORELDET, ForeldelseVurderingType.FORELDET, true, false, false);
     }
 
     private void lagResultatOgVurderingTekster(FagsakYtelseType ytelsetype, Språkkode språkkode, VilkårResultat resultat, Vurdering vurdering, ForeldelseVurderingType foreldelsevurdering, boolean fritekst, boolean pengerIBehold, boolean lavtBeløp) {
