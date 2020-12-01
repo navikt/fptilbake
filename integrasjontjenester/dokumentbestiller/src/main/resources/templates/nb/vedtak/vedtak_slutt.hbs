@@ -7,14 +7,20 @@ Vedtaket er gjort etter {{hjemmel.lovhjemmel-vedtak}}.
 {{#if (neq totalresultat.hovedresultat "INGEN_TILBAKEBETALING")}}
     {{#if (neq sak.ytelsetype "ES")}}
 _Skatt
+        {{#if skal-ikke-vise-skatt }}
 NAV gir opplysninger til Skatteetaten. Skatteetaten vil vurdere om det er grunnlag for å endre skatteoppgjør.
+        {{else}}
+Beløpet du skal betale tilbake etter skatt er trukket fra, er beregnet etter ditt gjennomsnittlige skattetrekk per måned. Det betyr at beløpet du skal betale tilbake etter skatt, ikke alltid er likt med det beløpet du mottok på konto.
+
+NAV gir opplysninger til Skattetaten om skattebeløpet og om beløpet du skal betale tilbake før skatt er trukket fra. Skatteetaten vil vurdere om det er grunnlag for å endre skatteoppgjør.
+        {{/if}}
     {{/if}}
 _Hvordan betale tilbake pengene du skylder
-{{#if behandling.er-revurdering}}
+    {{#if behandling.er-revurdering}}
 NAV Innkreving vil korrigere beløpet du skal betale tilbake. Du finner mer informasjon på nav.no/innkreving.
-{{else}}
+    {{else}}
 Du vil motta krav fra NAV Innkreving på det beløpet du skal betale tilbake. Du finner mer informasjon på nav.no/innkreving.
-{{/if}}
+    {{/if}}
 {{/if}}
 _Du har rett til å klage
 Du kan klage innen {{konfigurasjon.klagefrist-uker}} uker fra den datoen du mottok vedtaket. Du finner skjema og informasjon på nav.no/klage.
