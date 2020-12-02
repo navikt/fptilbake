@@ -112,6 +112,10 @@ public class VedtaksbrevFritekstPeriode extends BaseEntitet {
         public VedtaksbrevFritekstPeriode build() {
             Objects.requireNonNull(vedtaksbrevFritekstPeriode.behandlingId);
             Objects.requireNonNull(vedtaksbrevFritekstPeriode.periode);
+            Objects.requireNonNull(vedtaksbrevFritekstPeriode.fritekstType);
+            if (vedtaksbrevFritekstPeriode.fritekst == null || vedtaksbrevFritekstPeriode.fritekst.isBlank()) {
+                throw new IllegalArgumentException("Mangler fritekst");
+            }
             return vedtaksbrevFritekstPeriode;
         }
     }
