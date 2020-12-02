@@ -39,7 +39,14 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbVurderinger;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
-
+/**
+ * Brukes for å generere faktatekster for perioder. Resultatet er tekster med markup, som med "Insert markup"-macroen
+ * kan limes inn i Confluence, og dermed bli formattert tekst.
+ *
+ * Confluence:
+ * FP/SVP/ES: https://confluence.adeo.no/display/TVF/Generert+dokumentasjon
+ * FRISINN: https://confluence.adeo.no/display/MODNAV/Generert+dokumentasjon
+ */
 @Ignore("Kjøres ved behov for å regenerere dokumentasjon")
 public class DokumentasjonGeneratorPeriodeFakta {
 
