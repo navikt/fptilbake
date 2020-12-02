@@ -42,7 +42,7 @@ public class LesKravgrunnlagTaskTest extends FellesTestOppsett {
     @Before
     public void setup() {
         kravgrunnlagId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_YTEL.xml"));
-        when(tpsAdapterMock.hentAktørIdForPersonIdent(any(PersonIdent.class))).thenReturn(Optional.of(fagsak.getAktørId()));
+        when(personinfoAdapterMock.hentAktørForFnr(any(PersonIdent.class))).thenReturn(Optional.of(fagsak.getAktørId()));
         behandling = lagBehandling();
         saksnummer = behandling.getFagsak().getSaksnummer().getVerdi();
     }

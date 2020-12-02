@@ -3,14 +3,9 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør;
 import static java.util.Objects.requireNonNull;
 
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.NavBrukerKjønn;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.SivilstandType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Landkoder;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 
@@ -19,19 +14,9 @@ public class Personinfo {
     private AktørId aktørId;
     private String navn;
     private PersonIdent personIdent;
-    private String adresse;
     private LocalDate fødselsdato;
     private LocalDate dødsdato;
     private NavBrukerKjønn kjønn;
-    private Statsborgerskap statsborgerskap;
-    private String utlandsadresse;
-    private String geografiskTilknytning;
-    private String diskresjonskode;
-    private Språkkode foretrukketSpråk;
-    private String adresseLandkode;
-    private Landkoder landkode;
-
-    private List<Adresseinfo> adresseInfoList = new ArrayList<>();
     private SivilstandType sivilstand;
 
     private Personinfo() {
@@ -57,60 +42,12 @@ public class Personinfo {
         return fødselsdato;
     }
 
-    public int getAlder() {
-        return (int) ChronoUnit.YEARS.between(fødselsdato, LocalDate.now());
-    }
-
-    public boolean erKvinne() {
-        return kjønn.equals(NavBrukerKjønn.KVINNE);
-    }
-
-    public String getAdresse() {
-        return adresse;
-    }
-
     public LocalDate getDødsdato() {
         return dødsdato;
     }
 
-    public Statsborgerskap getStatsborgerskap() {
-        return statsborgerskap;
-    }
-
-    public String getUtlandsadresse() {
-        return utlandsadresse;
-    }
-
-    public String getAdresseLandkode() {
-        return adresseLandkode;
-    }
-
-    /**
-     * @return Språkkode fra tps
-     * @deprecated Ikke bruk denne metoden. Bruk språkkode i grunninformasjonen fra fpsak.
-     */
-    public Språkkode getForetrukketSpråk() {
-        return foretrukketSpråk;
-    }
-
-    public String getGeografiskTilknytning() {
-        return geografiskTilknytning;
-    }
-
-    public String getDiskresjonskode() {
-        return diskresjonskode;
-    }
-
-    public List<Adresseinfo> getAdresseInfoList() {
-        return adresseInfoList;
-    }
-
     public SivilstandType getSivilstandType() {
         return sivilstand;
-    }
-
-    public Landkoder getLandkode() {
-        return landkode;
     }
 
     @Override
@@ -139,22 +76,8 @@ public class Personinfo {
             return this;
         }
 
-        /**
-         * @deprecated Bruk {@link #medPersonIdent(PersonIdent)} i stedet!
-         */
-        @Deprecated
-        public Builder medFnr(String fnr) {
-            personinfoMal.personIdent = PersonIdent.fra(fnr);
-            return this;
-        }
-
         public Builder medPersonIdent(PersonIdent fnr) {
             personinfoMal.personIdent = fnr;
-            return this;
-        }
-
-        public Builder medAdresse(String adresse) {
-            personinfoMal.adresse = adresse;
             return this;
         }
 
@@ -173,48 +96,8 @@ public class Personinfo {
             return this;
         }
 
-        public Builder medStatsborgerskap(Statsborgerskap statsborgerskap) {
-            personinfoMal.statsborgerskap = statsborgerskap;
-            return this;
-        }
-
-        public Builder medUtlandsadresse(String utlandsadresse) {
-            personinfoMal.utlandsadresse = utlandsadresse;
-            return this;
-        }
-
-        public Builder medGegrafiskTilknytning(String geoTilkn) {
-            personinfoMal.geografiskTilknytning = geoTilkn;
-            return this;
-        }
-
-        public Builder medDiskresjonsKode(String diskresjonsKode) {
-            personinfoMal.diskresjonskode = diskresjonsKode;
-            return this;
-        }
-
-        public Builder medForetrukketSpråk(Språkkode språk) {
-            personinfoMal.foretrukketSpråk = språk;
-            return this;
-        }
-
-        public Builder medAdresseLandkode(String adresseLandkode) {
-            personinfoMal.adresseLandkode = adresseLandkode;
-            return this;
-        }
-
-        public Builder medAdresseInfoList(List<Adresseinfo> adresseinfoArrayList) {
-            personinfoMal.adresseInfoList = adresseinfoArrayList;
-            return this;
-        }
-
         public Builder medSivilstandType(SivilstandType sivilstandType) {
             personinfoMal.sivilstand = sivilstandType;
-            return this;
-        }
-
-        public Builder medLandkode(Landkoder landkode) {
-            personinfoMal.landkode = landkode;
             return this;
         }
 

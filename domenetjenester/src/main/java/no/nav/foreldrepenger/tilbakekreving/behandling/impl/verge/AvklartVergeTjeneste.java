@@ -17,7 +17,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
-import no.nav.foreldrepenger.tilbakekreving.domene.person.impl.TpsTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
@@ -27,7 +27,7 @@ import no.nav.foreldrepenger.tilbakekreving.organisasjon.VirksomhetTjeneste;
 public class AvklartVergeTjeneste {
 
     private VergeRepository vergeRepository;
-    private TpsTjeneste tpsTjeneste;
+    private PersoninfoAdapter tpsTjeneste;
     private VirksomhetTjeneste virksomhetTjeneste;
     private HistorikkTjenesteAdapter historikkTjenesteAdapter;
 
@@ -37,7 +37,7 @@ public class AvklartVergeTjeneste {
 
     @Inject
     public AvklartVergeTjeneste(VergeRepository vergeRepository,
-                                TpsTjeneste tpsTjeneste,
+                                PersoninfoAdapter tpsTjeneste,
                                 VirksomhetTjeneste virksomhetTjeneste,
                                 HistorikkTjenesteAdapter historikkTjenesteAdapter) {
         this.vergeRepository = vergeRepository;

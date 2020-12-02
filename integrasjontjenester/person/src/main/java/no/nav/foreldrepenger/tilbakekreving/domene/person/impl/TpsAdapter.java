@@ -7,7 +7,6 @@ import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
-import no.nav.foreldrepenger.tilbakekreving.domene.person.TpsAdapter;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.tjeneste.virksomhet.person.v3.binding.HentPersonPersonIkkeFunnet;
@@ -22,34 +21,30 @@ import no.nav.vedtak.felles.integrasjon.aktør.klient.DetFinnesFlereAktørerMedS
 import no.nav.vedtak.felles.integrasjon.person.PersonConsumer;
 
 @ApplicationScoped
-public class TpsAdapterImpl implements TpsAdapter {
+public class TpsAdapter {
 
     private AktørConsumerMedCache aktørConsumer;
     private PersonConsumer personConsumer;
     private TpsOversetter tpsOversetter;
 
-    public TpsAdapterImpl() {
+    public TpsAdapter() {
         // CDI proxy
     }
 
     @Inject
-    public TpsAdapterImpl(AktørConsumerMedCache aktørConsumer, PersonConsumer personConsumer, TpsOversetter tpsOversetter) {
+    public TpsAdapter(AktørConsumerMedCache aktørConsumer, PersonConsumer personConsumer, TpsOversetter tpsOversetter) {
         this.aktørConsumer = aktørConsumer;
         this.personConsumer = personConsumer;
         this.tpsOversetter = tpsOversetter;
     }
 
-    @Override
     public Optional<PersonIdent> hentIdentForAktørId(AktørId aktørId) {
         return aktørConsumer.hentPersonIdentForAktørId(aktørId.getId()).map(PersonIdent::new);
     }
 
-    @Override
     public Personinfo hentKjerneinformasjon(PersonIdent personIdent, AktørId aktørId) {
         HentPersonRequest request = new HentPersonRequest();
         request.setAktoer(TpsUtil.lagPersonIdent(personIdent.getIdent()));
-        request.getInformasjonsbehov().add(Informasjonsbehov.ADRESSE);
-        request.getInformasjonsbehov().add(Informasjonsbehov.KOMMUNIKASJON);
         try {
             return håndterPersoninfoRespons(aktørId, request);
         } catch (HentPersonPersonIkkeFunnet e) {
@@ -59,7 +54,6 @@ public class TpsAdapterImpl implements TpsAdapter {
         }
     }
 
-    @Override
     public Adresseinfo hentAdresseinformasjon(PersonIdent personIdent) {
         HentPersonRequest request = new HentPersonRequest();
         request.getInformasjonsbehov().add(Informasjonsbehov.ADRESSE);
@@ -75,7 +69,6 @@ public class TpsAdapterImpl implements TpsAdapter {
         }
     }
 
-    @Override
     public Optional<AktørId> hentAktørIdForPersonIdent(PersonIdent personIdent) {
         if (personIdent.erFdatNummer()) {
             // har ikke tildelt personnr

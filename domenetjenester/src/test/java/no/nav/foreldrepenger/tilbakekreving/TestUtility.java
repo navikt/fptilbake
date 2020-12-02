@@ -12,7 +12,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.NavBrukerKjønn;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
@@ -64,8 +63,6 @@ public class TestUtility {
                 .medNavBrukerKjønn(NavBrukerKjønn.KVINNE)
                 .medPersonIdent(new PersonIdent(aktørId.getId()))
                 .medNavn("testnavn")
-                .medAdresse("test adresse")
-                .medForetrukketSpråk(Språkkode.nb)
                 .build();
         return Optional.of(personinfo);
     }

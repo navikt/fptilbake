@@ -55,8 +55,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.TestFagsakUtil;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
-import no.nav.foreldrepenger.tilbakekreving.domene.person.TpsAdapter;
-import no.nav.foreldrepenger.tilbakekreving.domene.person.impl.PersoninfoAdapter;
+import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
@@ -84,10 +83,9 @@ public class FellesTestOppsett {
 
     private ProsessTaskEventPubliserer eventPublisererMock = mock(ProsessTaskEventPubliserer.class);
     private BehandlingskontrollEventPubliserer behandlingskontrollEventPublisererMock = mock(BehandlingskontrollEventPubliserer.class);
-    protected final TpsAdapter tpsAdapterMock = mock(TpsAdapter.class);
-    private PersoninfoAdapter personinfoAdapterMock = mock(PersoninfoAdapter.class);
+    protected PersoninfoAdapter personinfoAdapterMock = mock(PersoninfoAdapter.class);
     protected final FagsystemKlient fagsystemKlientMock = mock(FagsystemKlient.class);
-    protected final TpsAdapterWrapper tpsAdapterWrapper = new TpsAdapterWrapper(tpsAdapterMock);
+    protected final PersonOrganisasjonWrapper tpsAdapterWrapper = new PersonOrganisasjonWrapper(personinfoAdapterMock);
     private BehandlingModellRepository behandlingModellRepositoryMock = mock(BehandlingModellRepository.class);
     private VarselresponsTjeneste varselresponsTjenesteMock = mock(VarselresponsTjeneste.class);
     private SlettGrunnlagEventPubliserer mockSlettGrunnlagEventPubliserer = mock(SlettGrunnlagEventPubliserer.class);
@@ -125,7 +123,7 @@ public class FellesTestOppsett {
         behandling = lagBehandling(null);
         manipulerInternBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.TBKGSTEG);
 
-        when(tpsAdapterMock.hentAktørIdForPersonIdent(any(PersonIdent.class))).thenReturn(Optional.of(fagsak.getAktørId()));
+        when(personinfoAdapterMock.hentAktørForFnr(any(PersonIdent.class))).thenReturn(Optional.of(fagsak.getAktørId()));
         when(behandlingModellRepositoryMock.getBehandlingStegKonfigurasjon()).thenReturn(BehandlingStegKonfigurasjon.lagDummy());
         when(behandlingModellRepositoryMock.getModell(any(BehandlingType.class))).thenReturn(lagDummyBehandlingsModell());
 

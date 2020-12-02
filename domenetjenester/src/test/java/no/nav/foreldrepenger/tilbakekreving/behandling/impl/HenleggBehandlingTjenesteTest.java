@@ -41,7 +41,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.Bre
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
-import no.nav.foreldrepenger.tilbakekreving.domene.person.impl.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMock;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMockUtil;
@@ -83,7 +82,7 @@ public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
 
         manipulerInternBehandling = new InternalManipulerBehandling(repoProvider);
         behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(repoProvider, mockBehandlingModellRepository, null);
-        historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepository, mock(PersoninfoAdapter.class));
+        historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepository, null);
         henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repoProvider, prosessTaskRepository, behandlingskontrollTjeneste, historikkinnslagTjeneste);
     }
 

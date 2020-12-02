@@ -1,7 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.domene.person.impl;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -14,8 +13,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.NavBrukerKjønn;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.SivilstandType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Landkoder;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.Aktoer;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.Bruker;
@@ -24,10 +21,7 @@ import no.nav.tjeneste.virksomhet.person.v3.informasjon.Foedselsdato;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.Kjoenn;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.Person;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.PersonIdent;
-import no.nav.tjeneste.virksomhet.person.v3.informasjon.Spraak;
-import no.nav.tjeneste.virksomhet.person.v3.informasjon.Statsborgerskap;
 import no.nav.vedtak.felles.integrasjon.felles.ws.DateUtil;
-import no.nav.vedtak.log.util.LoggerUtils;
 
 @ApplicationScoped
 public class TpsOversetter {
@@ -48,9 +42,6 @@ public class TpsOversetter {
     public Personinfo tilBrukerInfo(AktørId aktørId, Bruker bruker) {
 
         String navn = bruker.getPersonnavn().getSammensattNavn();
-        String adresse = tpsAdresseOversetter.finnAdresseFor(bruker);
-        String adresseLandkode = tpsAdresseOversetter.finnAdresseLandkodeFor(bruker);
-        String utlandsadresse = tpsAdresseOversetter.finnUtlandsadresseFor(bruker);
 
         LocalDate fødselsdato = finnFødselsdato(bruker);
         LocalDate dødsdato = finnDødsdato(bruker);
@@ -60,31 +51,16 @@ public class TpsOversetter {
         String ident = pi.getIdent().getIdent();
         NavBrukerKjønn kjønn = tilBrukerKjønn(bruker.getKjoenn());
 
-        Landkoder landkoder = utledLandkode(bruker.getStatsborgerskap());
-
-        String diskresjonskode = bruker.getDiskresjonskode() == null ? null : bruker.getDiskresjonskode().getValue();
-        String geografiskTilknytning = bruker.getGeografiskTilknytning() != null ? bruker.getGeografiskTilknytning().getGeografiskTilknytning() : null;
-
-        List<Adresseinfo> adresseinfoList = tpsAdresseOversetter.lagListeMedAdresseInfo(bruker);
         SivilstandType sivilstandType = bruker.getSivilstand() == null ? null : SivilstandType.fraKode(bruker.getSivilstand().getSivilstand().getValue());
 
         return Personinfo.builder()
             .medAktørId(aktørId)
             .medPersonIdent(no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent.fra(ident))
             .medNavn(navn)
-            .medAdresse(adresse)
-            .medAdresseLandkode(adresseLandkode)
             .medFødselsdato(fødselsdato)
             .medDødsdato(dødsdato)
             .medNavBrukerKjønn(kjønn)
-            .medStatsborgerskap(new no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Statsborgerskap(landkoder.getKode()))
-            .medUtlandsadresse(utlandsadresse)
-            .medForetrukketSpråk(bestemForetrukketSpråk(bruker))
-            .medGegrafiskTilknytning(geografiskTilknytning)
-            .medDiskresjonsKode(diskresjonskode)
-            .medAdresseInfoList(adresseinfoList)
             .medSivilstandType(sivilstandType)
-            .medLandkode(landkoder)
             .build();
     }
 
@@ -117,28 +93,4 @@ public class TpsOversetter {
             .orElse(NavBrukerKjønn.UDEFINERT);
     }
 
-    private Landkoder utledLandkode(Statsborgerskap statsborgerskap) {
-        Landkoder landkode = Landkoder.UDEFINERT;
-        if (Optional.ofNullable(statsborgerskap).isPresent()) {
-            landkode = Landkoder.fraKode(statsborgerskap.getLand().getValue());
-        }
-        return landkode;
-    }
-
-    private Språkkode bestemForetrukketSpråk(Bruker person) {
-        Språkkode defaultSpråk = Språkkode.nb;
-        Spraak språk = person.getMaalform();
-        // For å slippe å håndtere foreldet forkortelse "NO" andre steder i løsningen
-        if (språk == null || "NO".equals(språk.getValue())) {
-            return defaultSpråk;
-        }
-        Optional<Språkkode> kode = Optional.of(Språkkode.fraKode(språk.getValue()));
-        if (kode.isPresent()) {
-            return kode.get();
-        }
-        if (logger.isInfoEnabled()) {
-            logger.info("Mottok ukjent språkkode: '{}'. Defaulter til '{}'", LoggerUtils.removeLineBreaks(språk.getValue()), defaultSpråk.getKode()); //NOSONAR
-        }
-        return defaultSpråk;
-    }
 }

@@ -31,7 +31,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.Ve
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
-import no.nav.foreldrepenger.tilbakekreving.domene.person.impl.TpsTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.vedtak.exception.TekniskException;
 
 public class VergeRestTjenesteTest {
@@ -40,7 +40,7 @@ public class VergeRestTjenesteTest {
 
     private VergeTjeneste vergeTjenesteMock = mock(VergeTjeneste.class);
     private BehandlingTjeneste behandlingTjenesteMock = mock(BehandlingTjeneste.class);
-    private TpsTjeneste tpsTjenesteMock = mock(TpsTjeneste.class);
+    private PersoninfoAdapter tpsTjenesteMock = mock(PersoninfoAdapter.class);
     private VergeRestTjeneste vergeRestTjeneste = new VergeRestTjeneste(behandlingTjenesteMock, vergeTjenesteMock, tpsTjenesteMock);
     final BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(repositoryRule.getEntityManager());
 

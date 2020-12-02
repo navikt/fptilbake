@@ -38,7 +38,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeType;
-import no.nav.foreldrepenger.tilbakekreving.domene.person.impl.TpsTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.Redirect;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
@@ -53,7 +53,7 @@ public class VergeRestTjeneste {
     static final String BASE_PATH = "/verge";
     private BehandlingTjeneste behandlingTjeneste;
     private VergeTjeneste vergeTjeneste;
-    private TpsTjeneste tpsTjeneste;
+    private PersoninfoAdapter tpsTjeneste;
 
     public VergeRestTjeneste() {
     }
@@ -61,7 +61,7 @@ public class VergeRestTjeneste {
     @Inject
     public VergeRestTjeneste(BehandlingTjeneste behandlingTjeneste,
                              VergeTjeneste vergeTjeneste,
-                             TpsTjeneste tpsTjeneste) {
+                             PersoninfoAdapter tpsTjeneste) {
         this.behandlingTjeneste = behandlingTjeneste;
         this.vergeTjeneste = vergeTjeneste;
         this.tpsTjeneste = tpsTjeneste;

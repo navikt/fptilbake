@@ -18,11 +18,8 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.PoststedKodeverkRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.Bostedsadresse;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.Bruker;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.Foedselsdato;
@@ -42,7 +39,6 @@ import no.nav.tjeneste.virksomhet.person.v3.informasjon.Postadresse;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.Postadressetyper;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.PostboksadresseNorsk;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.Postnummer;
-import no.nav.tjeneste.virksomhet.person.v3.informasjon.Spraak;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.Statsborgerskap;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.UstrukturertAdresse;
 import no.nav.vedtak.exception.VLException;
@@ -249,65 +245,6 @@ public class TpsOversetterTest {
 
         assertThat(adresseinfo).isNotNull();
         assertThat(adresseinfo.getAdresselinje1()).isEqualTo(USTRUKTURERT_GATEADRESSE1);
-    }
-
-    @Test
-    public void skal_ha_med_foretrukket_språk_når_finnes() {
-        tpsOversetter = new TpsOversetter(tpsAdresseOversetter);
-
-        Spraak språk = new Spraak();
-        språk.setValue("NN");
-        when(bruker.getMaalform()).thenReturn(språk);
-        Personinfo personinfo = tpsOversetter.tilBrukerInfo(new AktørId("123"), bruker);
-        assertThat(personinfo.getForetrukketSpråk()).isEqualTo(Språkkode.nn);
-    }
-
-    @Test
-    public void skal_default_til_bokmål_om_foretrukket_språk_ikke_er_satt() {
-
-        tpsOversetter = new TpsOversetter(tpsAdresseOversetter);
-
-        when(bruker.getMaalform()).thenReturn(null);
-        Personinfo personinfo = tpsOversetter.tilBrukerInfo(new AktørId("123"), bruker);
-        assertThat(personinfo.getForetrukketSpråk()).isEqualTo(Språkkode.nb);
-    }
-
-    @Test
-    public void skal_defaulte_til_bokmål_om_foretrukket_språk_ikke_er_støttet() {
-
-        tpsOversetter = new TpsOversetter(tpsAdresseOversetter);
-
-        Spraak språk = new Spraak();
-        språk.setValue("SVORSK");
-        when(bruker.getMaalform()).thenReturn(språk);
-        Personinfo personinfo = tpsOversetter.tilBrukerInfo(new AktørId("123"), bruker);
-        assertThat(personinfo.getForetrukketSpråk()).isEqualTo(Språkkode.nb);
-    }
-
-    @Test
-    public void skal_defaulte_til_bokmål_om_foretrukket_språk_er_NO() {
-
-        tpsOversetter = new TpsOversetter(tpsAdresseOversetter);
-
-        Spraak språk = new Spraak();
-        språk.setValue("NO");
-        when(bruker.getMaalform()).thenReturn(språk);
-        Personinfo personinfo = tpsOversetter.tilBrukerInfo(new AktørId("123"), bruker);
-        assertThat(personinfo.getForetrukketSpråk()).isEqualTo(Språkkode.nb);
-    }
-
-    @Test
-    public void skal_oversette_statsborgerskap() {
-        // Arrange
-        no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Landkoder norge = no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Landkoder.NOR;
-        tpsOversetter = new TpsOversetter(tpsAdresseOversetter);
-
-        // Act
-        Personinfo personinfo = tpsOversetter.tilBrukerInfo(new AktørId("123"), bruker);
-
-        // Assert
-        assertThat(personinfo.getLandkode()).isEqualTo(norge);
-        assertThat(personinfo.getStatsborgerskap().getLandkode()).isEqualTo(norge.getKode());
     }
 
     private void initMockBostedsadresseMedPostboksAdresseForBruker() {

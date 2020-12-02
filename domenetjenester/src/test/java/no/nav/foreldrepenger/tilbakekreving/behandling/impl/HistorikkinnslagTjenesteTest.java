@@ -13,29 +13,21 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagDokumentLink;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
-import no.nav.foreldrepenger.tilbakekreving.domene.person.TpsAdapter;
-import no.nav.foreldrepenger.tilbakekreving.domene.person.impl.PersoninfoAdapter;
-import no.nav.foreldrepenger.tilbakekreving.domene.person.impl.TpsAdapterImpl;
-import no.nav.foreldrepenger.tilbakekreving.domene.person.impl.TpsOversetter;
+import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
-import no.nav.vedtak.felles.integrasjon.aktør.klient.AktørConsumerMedCache;
-import no.nav.vedtak.felles.integrasjon.person.PersonConsumer;
 
 public class HistorikkinnslagTjenesteTest extends FellesTestOppsett {
 
     private static final JournalpostId JOURNALPOST_ID = new JournalpostId("389426448");
     private static final String DOKUMENT_ID = "417743491";
-    private AktørConsumerMedCache mockAktørConsumer = mock(AktørConsumerMedCache.class);
-    private PersonConsumer mockPersonConsumer = mock(PersonConsumer.class);
-    private TpsOversetter mockTpsOversetter = mock(TpsOversetter.class);
 
-    private TpsAdapter tpsAdapter = new TpsAdapterImpl(mockAktørConsumer, mockPersonConsumer, mockTpsOversetter);
-    private PersoninfoAdapter personinfoAdapter = new PersoninfoAdapter(tpsAdapter);
+    private PersoninfoAdapter personinfoAdapter = mock(PersoninfoAdapter.class);
     private HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepository, personinfoAdapter);
 
     @Test
@@ -68,7 +60,7 @@ public class HistorikkinnslagTjenesteTest extends FellesTestOppsett {
 
     @Test
     public void opprettHistorikkinnslagForOpprettetTilbakekreving_med_manuelt() {
-        Fagsak fagsak = fagsakTjeneste.opprettFagsak(saksnummer,aktørId, FagsakYtelseType.FORELDREPENGER);
+        Fagsak fagsak = fagsakTjeneste.opprettFagsak(saksnummer,aktørId, FagsakYtelseType.FORELDREPENGER, Språkkode.DEFAULT);
         Behandling behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).medManueltOpprettet(true).build();
         BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(behandling);
         behandlingRepository.lagre(behandling,behandlingLås);

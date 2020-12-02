@@ -88,7 +88,7 @@ public class GjenopptaBehandlingTjeneste {
          * @param behandlingId
          * @return
          */
-    public Optional<String> fortsettBehandlingManuelt(long behandlingId) {
+    public Optional<String> fortsettBehandlingManuelt(long behandlingId, HistorikkAktør historikkAktør) {
         Optional<Behandling> behandlingOpt = behandlingVenterRepository.hentBehandlingPåVent(behandlingId);
         if (behandlingOpt.isPresent()) {
             Behandling behandling = behandlingOpt.get();
@@ -100,7 +100,7 @@ public class GjenopptaBehandlingTjeneste {
         }
         Optional<String> callId = fortsettBehandling(behandlingId);
         if (callId.isPresent()) {
-            opprettHistorikkInnslagForManueltGjenopptaBehandling(behandlingId);
+            opprettHistorikkInnslagForManueltGjenopptaBehandling(behandlingId, historikkAktør);
         }
         return callId;
     }
@@ -179,9 +179,9 @@ public class GjenopptaBehandlingTjeneste {
         return prosessTaskRepository.lagre(prosessTaskData);
     }
 
-    private void opprettHistorikkInnslagForManueltGjenopptaBehandling(long behandlingId) {
+    private void opprettHistorikkInnslagForManueltGjenopptaBehandling(long behandlingId, HistorikkAktør historikkAktør) {
         Historikkinnslag historikkinnslag = new Historikkinnslag();
-        historikkinnslag.setAktør(HistorikkAktør.SAKSBEHANDLER);
+        historikkinnslag.setAktør(historikkAktør);
         historikkinnslag.setType(HistorikkinnslagType.BEH_MAN_GJEN);
         historikkinnslag.setBehandlingId(behandlingId);
 
