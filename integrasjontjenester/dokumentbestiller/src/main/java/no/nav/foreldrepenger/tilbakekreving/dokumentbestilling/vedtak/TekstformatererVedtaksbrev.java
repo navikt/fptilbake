@@ -295,6 +295,10 @@ class TekstformatererVedtaksbrev extends FellesTekstformaterer {
         return konverterMedPartialTemplate(PARTIAL_PERIODE_SÆRLIGE_GRUNNER, data);
     }
 
+    static String lagVedtakSluttTekst(HbVedtaksbrevData data) {
+        return konverterMedPartialTemplate("vedtak/vedtak_slutt", data);
+    }
+
     private static String konverterMedPartialTemplate(String partial, HandlebarsData handlebarsData) {
         Template template = getTemplateFraPartial(partial, handlebarsData.getSpråkkode());
         return applyTemplate(template, handlebarsData);
