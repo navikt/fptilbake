@@ -284,7 +284,7 @@ public class ForvaltningBehandlingRestTjeneste {
         if (!behandling.isBehandlingPåVent()) {
             throw new UgyldigTvingKoblingForespørselException("Behandling med id " + behandlingId + " er ikke på vent");
         }
-        if (!Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG.equals(behandling.getVenteårsak())) {
+        if (!Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG.equals(behandling.getVenteårsak()) && !Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING.equals(behandling.getVenteårsak())) {
             throw new UgyldigTvingKoblingForespørselException("Behandling med id " + behandlingId + " venter ikke på tilbakekrevingsgrunnlag");
         }
         ØkonomiXmlMottatt mottattXml = mottattXmlRepository.finnMottattXml(mottattXmlId);
