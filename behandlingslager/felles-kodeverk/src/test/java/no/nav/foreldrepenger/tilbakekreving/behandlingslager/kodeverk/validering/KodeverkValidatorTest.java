@@ -1,6 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.validering;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
@@ -13,8 +13,8 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkTabell;
@@ -26,7 +26,7 @@ public class KodeverkValidatorTest {
     private static final String KODEVERK_KODE_FEIL_MELDING = "kodeverk kode feilet validering";
     private static Validator validator;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUp() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
@@ -50,38 +50,38 @@ public class KodeverkValidatorTest {
     public void testSkalFeilePåTomInputForListe() {
         TestListeAvKodeliste kl = new TestListeAvKodeliste("", "");
         Set<ConstraintViolation<TestListeAvKodeliste>> violations = validator.validate(kl);
-        assertEquals(1, violations.size());
-        assertEquals(KODEVERK_KODE_FEIL_MELDING, violations.iterator().next().getMessage());
+        assertThat(violations).hasSize(1);
+        assertThat(violations.iterator().next().getMessage()).isEqualTo(KODEVERK_KODE_FEIL_MELDING);
     }
 
     @Test
     public void testSkalFeilePåTomInput() {
         TestKodeliste kl = new TestKodeliste("", "");
         Set<ConstraintViolation<TestKodeliste>> violations = validator.validate(kl);
-        assertEquals(1, violations.size());
-        assertEquals(KODEVERK_KODE_FEIL_MELDING, violations.iterator().next().getMessage());
+        assertThat(violations).hasSize(1);
+        assertThat(violations.iterator().next().getMessage()).isEqualTo(KODEVERK_KODE_FEIL_MELDING);
     }
 
     @Test
     public void testSkalFeilePåUgyldigeTegnIKode() {
         TestKodeliste kl = new TestKodeliste(KEY_ARKIV_FILTYPE, "P[^$");
         Set<ConstraintViolation<TestKodeliste>> violations = validator.validate(kl);
-        assertEquals(1, violations.size());
-        assertEquals(KODEVERK_KODE_FEIL_MELDING, violations.iterator().next().getMessage());
+        assertThat(violations).hasSize(1);
+        assertThat(violations.iterator().next().getMessage()).isEqualTo(KODEVERK_KODE_FEIL_MELDING);
     }
 
     @Test
     public void testSkalFeilePåUgyldigeTegnIKodeverk() {
         TestKodeliste kl = new TestKodeliste("#¤#2aS", "PDF");
         Set<ConstraintViolation<TestKodeliste>> violations = validator.validate(kl);
-        assertEquals(1, violations.size());
+        assertThat(violations).hasSize(1);
     }
 
     @Test
     public void testSkalFeilePåUgyldigeTegnINavn() {
         TestKodeverkTabell kt = new TestKodeverkTabell("PDF");
         Set<ConstraintViolation<TestKodeverkTabell>> violations = validator.validate(kt);
-        assertEquals(1, violations.size());
+        assertThat(violations).hasSize(1);
     }
 
     @Test
@@ -91,8 +91,8 @@ public class KodeverkValidatorTest {
                         "jjjjjjjjjjjjjasdfghjklqwertyuiasdfgdsfasjjjfhsjhkjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj"
         );
         Set<ConstraintViolation<TestKodeliste>> violations = validator.validate(kl);
-        assertEquals(1, violations.size());
-        assertEquals(KODEVERK_KODE_FEIL_MELDING, violations.iterator().next().getMessage());
+        assertThat(violations).hasSize(1);
+        assertThat(violations.iterator().next().getMessage()).isEqualTo(KODEVERK_KODE_FEIL_MELDING);
     }
 
     static class KodeverkL extends Kodeliste {

@@ -17,11 +17,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import javax.persistence.EntityManager;
 import javax.persistence.FlushModeType;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.google.common.collect.Lists;
 
@@ -54,7 +54,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.TestFagsakUtil;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
@@ -69,63 +69,88 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskEventPubliserer;
 import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepositoryImpl;
 
-public class FellesTestOppsett {
-
-    @Rule
-    public final UnittestRepositoryRule repoRule = new UnittestRepositoryRule();
-
-    @Rule
-    public final ExpectedException expectedException = ExpectedException.none();
+@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
+public abstract class FellesTestOppsett {
 
     protected static final Long FPSAK_BEHANDLING_ID = 100000001L;
     protected static final Henvisning HENVISNING = Henvisning.fraEksternBehandlingId(FPSAK_BEHANDLING_ID);
     protected static final UUID FPSAK_BEHANDLING_UUID = UUID.randomUUID();
 
-    private ProsessTaskEventPubliserer eventPublisererMock = mock(ProsessTaskEventPubliserer.class);
-    private BehandlingskontrollEventPubliserer behandlingskontrollEventPublisererMock = mock(BehandlingskontrollEventPubliserer.class);
+    private final ProsessTaskEventPubliserer eventPublisererMock = mock(ProsessTaskEventPubliserer.class);
+    private final BehandlingskontrollEventPubliserer behandlingskontrollEventPublisererMock = mock(
+        BehandlingskontrollEventPubliserer.class);
     protected PersoninfoAdapter personinfoAdapterMock = mock(PersoninfoAdapter.class);
     protected final FagsystemKlient fagsystemKlientMock = mock(FagsystemKlient.class);
     protected final PersonOrganisasjonWrapper tpsAdapterWrapper = new PersonOrganisasjonWrapper(personinfoAdapterMock);
-    private BehandlingModellRepository behandlingModellRepositoryMock = mock(BehandlingModellRepository.class);
-    private VarselresponsTjeneste varselresponsTjenesteMock = mock(VarselresponsTjeneste.class);
-    private SlettGrunnlagEventPubliserer mockSlettGrunnlagEventPubliserer = mock(SlettGrunnlagEventPubliserer.class);
+    private final BehandlingModellRepository behandlingModellRepositoryMock = mock(BehandlingModellRepository.class);
+    private final VarselresponsTjeneste varselresponsTjenesteMock = mock(VarselresponsTjeneste.class);
+    private final SlettGrunnlagEventPubliserer mockSlettGrunnlagEventPubliserer = mock(
+        SlettGrunnlagEventPubliserer.class);
 
-    protected final BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(repoRule.getEntityManager());
-    protected final BehandlingRepository behandlingRepository = repositoryProvider.getBehandlingRepository();
-    protected final FagsakRepository fagsakRepository = repositoryProvider.getFagsakRepository();
-    protected final KravgrunnlagRepository grunnlagRepository = repositoryProvider.getGrunnlagRepository();
-    protected final ProsessTaskRepository prosessTaskRepository = new ProsessTaskRepositoryImpl(repoRule.getEntityManager(), null, eventPublisererMock);
-    protected final ØkonomiMottattXmlRepository mottattXmlRepository = new ØkonomiMottattXmlRepository(repoRule.getEntityManager());
-    protected final EksternBehandlingRepository eksternBehandlingRepository = new EksternBehandlingRepository(repoRule.getEntityManager());
-    private final FellesQueriesForBehandlingRepositories fellesQueriesForBehandlingRepositories = new FellesQueriesForBehandlingRepositories(repoRule.getEntityManager());
-    protected final BehandlingVenterRepository behandlingVenterRepository = new BehandlingVenterRepository(fellesQueriesForBehandlingRepositories);
-    protected final BehandlingKandidaterRepository behandlingKandidaterRepository = new BehandlingKandidaterRepository(fellesQueriesForBehandlingRepositories);
+    protected BehandlingRepositoryProvider repositoryProvider;
+    protected BehandlingRepository behandlingRepository;
+    protected FagsakRepository fagsakRepository;
+    protected KravgrunnlagRepository grunnlagRepository;
+    protected ProsessTaskRepository prosessTaskRepository;
+    protected ØkonomiMottattXmlRepository mottattXmlRepository;
+    protected EksternBehandlingRepository eksternBehandlingRepository;
+    protected BehandlingVenterRepository behandlingVenterRepository;
+    protected BehandlingKandidaterRepository behandlingKandidaterRepository;
 
-    protected final GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjeneste(prosessTaskRepository, behandlingKandidaterRepository, behandlingVenterRepository, repositoryProvider, varselresponsTjenesteMock);
-    protected final HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(repositoryProvider.getHistorikkRepository(), personinfoAdapterMock);
-    protected final BehandlingskontrollTjeneste behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(repositoryProvider, behandlingModellRepositoryMock, behandlingskontrollEventPublisererMock);
-    private InternalManipulerBehandling manipulerInternBehandling = new InternalManipulerBehandling(repositoryProvider);
-    protected final KravgrunnlagTjeneste kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repositoryProvider, gjenopptaBehandlingTjeneste, behandlingskontrollTjeneste, mockSlettGrunnlagEventPubliserer);
-    protected final KravgrunnlagMapper kravgrunnlagMapper = new KravgrunnlagMapper(tpsAdapterWrapper);
-    protected final LesKravgrunnlagTask lesKravgrunnlagTask = new LesKravgrunnlagTask(mottattXmlRepository, kravgrunnlagTjeneste, kravgrunnlagMapper, repositoryProvider, fagsystemKlientMock);
+    protected GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste;
+    protected HistorikkinnslagTjeneste historikkinnslagTjeneste;
+    protected BehandlingskontrollTjeneste behandlingskontrollTjeneste;
+    protected KravgrunnlagTjeneste kravgrunnlagTjeneste;
+    protected KravgrunnlagMapper kravgrunnlagMapper;
+    protected LesKravgrunnlagTask lesKravgrunnlagTask;
 
     protected final KravgrunnlagMapper mapper = new KravgrunnlagMapper(tpsAdapterWrapper);
 
+    protected EntityManager entityManager;
 
     public Fagsak fagsak;
     public Behandling behandling;
 
-    @Before
-    public void init() {
-        repoRule.getEntityManager().setFlushMode(FlushModeType.AUTO);
+    //BeforeEach kalles både her og i subklasse
+    @BeforeEach
+    public final void init(EntityManager entityManager) {
+        this.entityManager = entityManager;
+        repositoryProvider = new BehandlingRepositoryProvider(entityManager);
+        behandlingRepository = repositoryProvider.getBehandlingRepository();
+        fagsakRepository = repositoryProvider.getFagsakRepository();
+        grunnlagRepository = repositoryProvider.getGrunnlagRepository();
+        prosessTaskRepository = new ProsessTaskRepositoryImpl(entityManager, null, eventPublisererMock);
+        mottattXmlRepository = new ØkonomiMottattXmlRepository(entityManager);
+        eksternBehandlingRepository = new EksternBehandlingRepository(entityManager);
+        FellesQueriesForBehandlingRepositories fellesQueriesForBehandlingRepositories = new FellesQueriesForBehandlingRepositories(
+            entityManager);
+        behandlingVenterRepository = new BehandlingVenterRepository(fellesQueriesForBehandlingRepositories);
+        behandlingKandidaterRepository = new BehandlingKandidaterRepository(fellesQueriesForBehandlingRepositories);
+        gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjeneste(prosessTaskRepository,
+            behandlingKandidaterRepository, behandlingVenterRepository, repositoryProvider, varselresponsTjenesteMock);
+        historikkinnslagTjeneste = new HistorikkinnslagTjeneste(repositoryProvider.getHistorikkRepository(),
+            personinfoAdapterMock);
+        behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(repositoryProvider,
+            behandlingModellRepositoryMock, behandlingskontrollEventPublisererMock);
+        InternalManipulerBehandling manipulerInternBehandling = new InternalManipulerBehandling(repositoryProvider);
+        kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repositoryProvider, gjenopptaBehandlingTjeneste,
+            behandlingskontrollTjeneste, mockSlettGrunnlagEventPubliserer);
+        kravgrunnlagMapper = new KravgrunnlagMapper(tpsAdapterWrapper);
+        lesKravgrunnlagTask = new LesKravgrunnlagTask(mottattXmlRepository, kravgrunnlagTjeneste, kravgrunnlagMapper,
+            repositoryProvider, fagsystemKlientMock);
+
+        entityManager.setFlushMode(FlushModeType.AUTO);
         fagsak = TestFagsakUtil.opprettFagsak();
         fagsakRepository.lagre(fagsak);
         behandling = lagBehandling(null);
         manipulerInternBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.TBKGSTEG);
 
-        when(personinfoAdapterMock.hentAktørForFnr(any(PersonIdent.class))).thenReturn(Optional.of(fagsak.getAktørId()));
-        when(behandlingModellRepositoryMock.getBehandlingStegKonfigurasjon()).thenReturn(BehandlingStegKonfigurasjon.lagDummy());
-        when(behandlingModellRepositoryMock.getModell(any(BehandlingType.class))).thenReturn(lagDummyBehandlingsModell());
+        when(personinfoAdapterMock.hentAktørForFnr(any(PersonIdent.class))).thenReturn(
+            Optional.of(fagsak.getAktørId()));
+        when(behandlingModellRepositoryMock.getBehandlingStegKonfigurasjon()).thenReturn(
+            BehandlingStegKonfigurasjon.lagDummy());
+        when(behandlingModellRepositoryMock.getModell(any(BehandlingType.class))).thenReturn(
+            lagDummyBehandlingsModell());
 
     }
 
@@ -140,7 +165,8 @@ public class FellesTestOppsett {
 
     public Behandling lagBehandling(BehandlingÅrsak.Builder builder) {
         Behandling behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.REVURDERING_TILBAKEKREVING)
-            .medBehandlingÅrsak(builder).build();
+            .medBehandlingÅrsak(builder)
+            .build();
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
         Long behandlingId = behandlingRepository.lagre(behandling, lås);
         return behandlingRepository.hentBehandling(behandlingId);
@@ -155,8 +181,10 @@ public class FellesTestOppsett {
     private BehandlingModell lagDummyBehandlingsModell() {
         List<TestStegKonfig> steg = Lists.newArrayList(
             new TestStegKonfig(BehandlingStegType.TBKGSTEG, BehandlingType.TILBAKEKREVING, new MottattGrunnlagSteg()),
-            new TestStegKonfig(BehandlingStegType.FAKTA_FEILUTBETALING, BehandlingType.TILBAKEKREVING, new FaktaFeilutbetalingSteg(behandlingRepository,null)),
-            new TestStegKonfig(BehandlingStegType.IVERKSETT_VEDTAK, BehandlingType.TILBAKEKREVING, new IverksetteVedtakSteg(repositoryProvider, null)));
+            new TestStegKonfig(BehandlingStegType.FAKTA_FEILUTBETALING, BehandlingType.TILBAKEKREVING,
+                new FaktaFeilutbetalingSteg(behandlingRepository, null)),
+            new TestStegKonfig(BehandlingStegType.IVERKSETT_VEDTAK, BehandlingType.TILBAKEKREVING,
+                new IverksetteVedtakSteg(repositoryProvider, null)));
 
         BehandlingModellImpl.TriFunction<BehandlingStegType, BehandlingType, BehandlingSteg> finnSteg = map(steg);
         BehandlingModellImpl modell = new BehandlingModellImpl(BehandlingType.TILBAKEKREVING, finnSteg);
@@ -171,7 +199,8 @@ public class FellesTestOppsett {
             List<?> key = Arrays.asList(konfig.getBehandlingStegType(), konfig.getBehandlingType());
             resolver.put(key, konfig.getSteg());
         }
-        BehandlingModellImpl.TriFunction<BehandlingStegType, BehandlingType, BehandlingSteg> func = (t, u) -> resolver.get(Arrays.asList(t, u));
+        BehandlingModellImpl.TriFunction<BehandlingStegType, BehandlingType, BehandlingSteg> func = (t, u) -> resolver.get(
+            Arrays.asList(t, u));
         return func;
     }
 }

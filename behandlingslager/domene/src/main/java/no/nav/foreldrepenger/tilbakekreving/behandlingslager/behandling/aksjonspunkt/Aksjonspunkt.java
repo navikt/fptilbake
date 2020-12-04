@@ -292,6 +292,10 @@ public class Aksjonspunkt extends BaseEntitet {
         this.venteårsak = venteårsak;
     }
 
+    public void setId(long id) {
+        this.id = id;
+    }
+
     /**
      * Intern Builder. Bruk {@link AksjonspunktRepository} til å legge til og endre {@link Aksjonspunkt}.
      */

@@ -9,8 +9,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.FaktaFeilutbetalingDto;
@@ -33,19 +33,22 @@ import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjeneste
 
 public class AvklartFaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
 
-    private HistorikkInnslagKonverter historikkInnslagKonverter = new HistorikkInnslagKonverter(repoProvider.getAksjonspunktRepository());
-    private HistorikkTjenesteAdapter historikkTjenesteAdapter = new HistorikkTjenesteAdapter(historikkRepository, historikkInnslagKonverter);
+    private HistorikkTjenesteAdapter historikkTjenesteAdapter;
 
-    private AvklartFaktaFeilutbetalingTjeneste avklartFaktaFeilutbetalingTjeneste = new AvklartFaktaFeilutbetalingTjeneste(faktaFeilutbetalingRepository, historikkTjenesteAdapter);
+    private AvklartFaktaFeilutbetalingTjeneste avklartFaktaFeilutbetalingTjeneste;
 
     private Behandling nyBehandling;
 
-    @Before
+    @BeforeEach
     public void setup() {
-        ScenarioSimple scenario = ScenarioSimple.simple();
+        var scenario = ScenarioSimple.simple();
         scenario.medBehandlingType(BehandlingType.TILBAKEKREVING);
         scenario.leggTilAksjonspunkt(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING, BehandlingStegType.FAKTA_FEILUTBETALING);
         nyBehandling = scenario.lagre(repoProvider);
+        var historikkInnslagKonverter = new HistorikkInnslagKonverter(
+            repoProvider.getAksjonspunktRepository());
+        historikkTjenesteAdapter = new HistorikkTjenesteAdapter(historikkRepository, historikkInnslagKonverter);
+        avklartFaktaFeilutbetalingTjeneste = new AvklartFaktaFeilutbetalingTjeneste(faktaFeilutbetalingRepository, historikkTjenesteAdapter);
     }
 
     @Test

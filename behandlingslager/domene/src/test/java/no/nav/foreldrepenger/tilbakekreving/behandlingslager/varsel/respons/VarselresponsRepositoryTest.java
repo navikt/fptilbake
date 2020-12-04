@@ -4,10 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Optional;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import javax.persistence.EntityManager;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
@@ -16,8 +17,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.test.TestFagsakUtil;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
 
+@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public class VarselresponsRepositoryTest {
 
     private static Long BEHANDLING_ID;
@@ -27,17 +29,11 @@ public class VarselresponsRepositoryTest {
     private FagsakRepository fagsakRepository;
     private VarselresponsRepository repository;
 
-    @Rule
-    public final UnittestRepositoryRule repoRule = new UnittestRepositoryRule();
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
-
-    @Before
-    public void setup() {
-        behandlingRepository = new BehandlingRepository(repoRule.getEntityManager());
-        fagsakRepository = new FagsakRepository(repoRule.getEntityManager());
-        repository = new VarselresponsRepository(repoRule.getEntityManager());
+    @BeforeEach
+    public void setup(EntityManager entityManager) {
+        behandlingRepository = new BehandlingRepository(entityManager);
+        fagsakRepository = new FagsakRepository(entityManager);
+        repository = new VarselresponsRepository(entityManager);
 
         BEHANDLING_ID = opprettBehandling();
     }

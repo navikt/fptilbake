@@ -3,6 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl;
 import static no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.AksjonspunktResultat.opprettForAksjonspunkt;
 import static no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.AksjonspunktResultat.opprettForAksjonspunktMedCallback;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -15,11 +16,8 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegModell;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegProsesseringResultat;
@@ -35,23 +33,14 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
-import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
 
-@SuppressWarnings("resource")
-@RunWith(CdiRunner.class)
+@CdiDbAwareTest
 public class BehandlingModellTest {
 
     private static final LocalDateTime FRIST_TID = LocalDateTime.now().plusWeeks(4);
 
     private final BehandlingType behandlingType = BehandlingType.TILBAKEKREVING;
-
-    @Rule
-    public final ExpectedException expectedException = ExpectedException.none();
-
-    @Rule
-    public final UnittestRepositoryRule repoRule = new UnittestRepositoryRule();
-    private EntityManager em = repoRule.getEntityManager();
 
     private static final BehandlingStegType STEG_1 = TestBehandlingStegType.STEG_1;
     private static final BehandlingStegType STEG_2 = TestBehandlingStegType.STEG_2;
@@ -66,6 +55,9 @@ public class BehandlingModellTest {
 
     @Inject
     private AksjonspunktRepository aksjonspunktRepository;
+
+    @Inject
+    private EntityManager em;
 
     private final DummySteg nullSteg = new DummySteg();
     private final DummyVenterSteg nullVenterSteg = new DummyVenterSteg();
@@ -259,7 +251,7 @@ public class BehandlingModellTest {
         assertThat(gjenoppta.kjørteSteg).isEqualTo(Arrays.asList(STEG_2, STEG_3));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void skal_feile_ved_gjenopptak_vanlig_steg() {
         // Arrange
         List<TestStegKonfig> modellData = Arrays.asList(
@@ -273,7 +265,7 @@ public class BehandlingModellTest {
 
         // Act 1
         BehandlingStegVisitorVenterUtenLagring visitor = lagVisitorVenter(behandling);
-        modell.prosesserFra(STEG_1, visitor);
+        assertThrows(IllegalStateException.class, () -> modell.prosesserFra(STEG_1, visitor));
     }
 
     @Test
@@ -419,7 +411,7 @@ public class BehandlingModellTest {
         return new BehandlingStegVisitorVenterUtenLagring(repositoryProvider, kontrollTjeneste, kontekst, BehandlingskontrollEventPubliserer.NULL_EVENT_PUB);
     }
 
-    @Before
+    @BeforeEach
     public void opprettStatiskModell() {
         sql("INSERT INTO BEHANDLING_STEG_TYPE (KODE, NAVN, BEHANDLING_STATUS_DEF, BESKRIVELSE) VALUES ('STEG-1', 'test-steg-1', 'UTRED', 'test')");
         sql("INSERT INTO BEHANDLING_STEG_TYPE (KODE, NAVN, BEHANDLING_STATUS_DEF, BESKRIVELSE) VALUES ('STEG-2', 'test-steg-2', 'UTRED', 'test')");

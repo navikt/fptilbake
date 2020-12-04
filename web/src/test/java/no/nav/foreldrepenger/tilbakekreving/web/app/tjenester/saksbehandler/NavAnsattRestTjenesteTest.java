@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.saksbehandler.dto.InnloggetNavAnsattDto;
 import no.nav.vedtak.felles.integrasjon.ldap.LdapBruker;
@@ -21,7 +21,7 @@ public class NavAnsattRestTjenesteTest {
 
     private NavAnsattRestTjeneste saksbehandlerTjeneste;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         saksbehandlerTjeneste = new NavAnsattRestTjeneste(gruppenavnSaksbehandler, gruppenavnVeileder, gruppenavnBeslutter, gruppenavnOverstyrer, gruppenavnEgenAnsatt, gruppenavnKode6, gruppenavnKode7);
     }

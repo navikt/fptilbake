@@ -5,8 +5,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.junit.Rule;
-import org.junit.Test;
+import javax.persistence.EntityManager;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
@@ -14,19 +17,25 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.test.TestFagsakUtil;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 
+@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public class EksternBehandlingRepositoryTest {
 
     private static final UUID EKSTERN_UUID = UUID.randomUUID();
-    @Rule
-    public UnittestRepositoryRule repoRule = new UnittestRepositoryRule();
 
-    private BehandlingRepository behandlingRepository = new BehandlingRepository(repoRule.getEntityManager());
-    private FagsakRepository fagsakRepository = new FagsakRepository(repoRule.getEntityManager());
+    private BehandlingRepository behandlingRepository;
+    private FagsakRepository fagsakRepository;
 
-    private EksternBehandlingRepository eksternBehandlingRepository = new EksternBehandlingRepository(repoRule.getEntityManager());
+    private EksternBehandlingRepository eksternBehandlingRepository;
+
+    @BeforeEach
+    void setUp(EntityManager entityManager) {
+        behandlingRepository = new BehandlingRepository(entityManager);
+        fagsakRepository = new FagsakRepository(entityManager);
+        eksternBehandlingRepository = new EksternBehandlingRepository(entityManager);
+    }
 
     @Test
     public void skal_lagre_ned_ekstern_behandling_data() {

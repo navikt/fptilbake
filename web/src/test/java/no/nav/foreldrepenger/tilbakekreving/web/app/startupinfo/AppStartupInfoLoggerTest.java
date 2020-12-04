@@ -6,9 +6,9 @@ import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.codahale.metrics.health.HealthCheck;
 
@@ -23,12 +23,12 @@ public class AppStartupInfoLoggerTest {
 
     private AppStartupInfoLogger logger;
 
-    @After
+    @AfterEach
     public void afterEach() {
         logSniffer.reset();
     }
 
-    @Before
+    @BeforeEach
     public void setup() {
 
         SelftestResultat samletResultat = new SelftestResultat();

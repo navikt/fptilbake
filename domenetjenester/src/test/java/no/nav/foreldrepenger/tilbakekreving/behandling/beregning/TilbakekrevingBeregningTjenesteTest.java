@@ -6,8 +6,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BeregningResultat;
@@ -31,12 +31,15 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
-import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
-@RunWith(CdiRunner.class)
 public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
 
-    private TilbakekrevingBeregningTjeneste tjeneste = new TilbakekrevingBeregningTjeneste(repoProvider, kravgrunnlagBeregningTjeneste);
+    private TilbakekrevingBeregningTjeneste tjeneste;
+
+    @BeforeEach
+    void setUp() {
+        tjeneste = new TilbakekrevingBeregningTjeneste(repoProvider, kravgrunnlagBeregningTjeneste);
+    }
 
     @Test
     public void skal_beregne_tilbakekrevingsbeløp_for_periode_som_ikke_er_foreldet() {
@@ -46,7 +49,7 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
         lagForeldelse(internBehandlingId, periode, ForeldelseVurderingType.IKKE_FORELDET, null);
         lagVilkårsvurderingMedForsett(internBehandlingId, periode);
 
-        flush();
+        entityManager.flush();
 
         BeregningResultat beregningResultat = tjeneste.beregn(internBehandlingId);
         List<BeregningResultatPeriode> resultat = beregningResultat.getBeregningResultatPerioder();
@@ -71,7 +74,7 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
         lagKravgrunnlag(internBehandlingId, periode, BigDecimal.ZERO);
         lagVilkårsvurderingMedForsett(internBehandlingId, periode);
 
-        flush();
+        entityManager.flush();
 
         BeregningResultat beregningResultat = tjeneste.beregn(internBehandlingId);
         List<BeregningResultatPeriode> resultat = beregningResultat.getBeregningResultatPerioder();
@@ -96,7 +99,7 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
         lagKravgrunnlag(internBehandlingId, periode, BigDecimal.ZERO);
         lagForeldelse(internBehandlingId, periode, ForeldelseVurderingType.FORELDET, periode.getFom().plusMonths(8));
 
-        flush();
+        entityManager.flush();
 
         BeregningResultat beregningResultat = tjeneste.beregn(internBehandlingId);
         List<BeregningResultatPeriode> resultat = beregningResultat.getBeregningResultatPerioder();
@@ -124,7 +127,7 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
         lagForeldelse(internBehandlingId, periode, ForeldelseVurderingType.IKKE_FORELDET, null);
         lagVilkårsvurderingMedForsett(internBehandlingId, periode);
 
-        flush();
+        entityManager.flush();
 
         BeregningResultat beregningResultat = tjeneste.beregn(internBehandlingId);
         List<BeregningResultatPeriode> resultat = beregningResultat.getBeregningResultatPerioder();
@@ -152,7 +155,7 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
         lagForeldelse(internBehandlingId, periode, ForeldelseVurderingType.IKKE_FORELDET, null);
         lagVilkårsvurderingMedForsett(internBehandlingId, periode);
 
-        flush();
+        entityManager.flush();
 
         BeregningResultat beregningResultat = tjeneste.beregn(internBehandlingId);
         List<BeregningResultatPeriode> resultat = beregningResultat.getBeregningResultatPerioder();
@@ -192,7 +195,7 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
         lagForeldelse(internBehandlingId, logiskPeriode, ForeldelseVurderingType.IKKE_FORELDET, null);
         lagVilkårsvurderingMedForsett(internBehandlingId, logiskPeriode);
 
-        flush();
+        entityManager.flush();
 
         BeregningResultat beregningResultat = tjeneste.beregn(internBehandlingId);
         List<BeregningResultatPeriode> resultat = beregningResultat.getBeregningResultatPerioder();
@@ -225,7 +228,7 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
         lagForeldelse(internBehandlingId, logiskPeriode, ForeldelseVurderingType.IKKE_FORELDET, null);
         lagVilkårsvurderingMedForsett(internBehandlingId, logiskPeriode);
 
-        flush();
+        entityManager.flush();
 
         BeregningResultat beregningResultat = tjeneste.beregn(internBehandlingId);
         List<BeregningResultatPeriode> resultat = beregningResultat.getBeregningResultatPerioder();
@@ -263,7 +266,7 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
         lagForeldelse(internBehandlingId, logiskPeriode, ForeldelseVurderingType.IKKE_FORELDET, null);
         lagVilkårsvurderingMedForsett(internBehandlingId, vurderingperiode1, vurderingperiode2);
 
-        flush();
+        entityManager.flush();
 
         BeregningResultat beregningResultat = tjeneste.beregn(internBehandlingId);
         List<BeregningResultatPeriode> resultat = beregningResultat.getBeregningResultatPerioder();
@@ -322,7 +325,7 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
         vurdering.leggTilPeriode(vurdering1);
         vilkårsvurderingRepository.lagre(internBehandlingId, vurdering);
 
-        flush();
+        entityManager.flush();
 
         BeregningResultat beregningResultat = tjeneste.beregn(internBehandlingId);
         List<BeregningResultatPeriode> resultat = beregningResultat.getBeregningResultatPerioder();
@@ -339,10 +342,6 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
         assertThat(brp1.getSkattBeløp()).isEqualByComparingTo(BigDecimal.valueOf(240));
         assertThat(brp1.getRenteBeløp()).isEqualByComparingTo(BigDecimal.valueOf(128));
         assertThat(brp1.getTilbakekrevingBeløpEtterSkatt()).isEqualByComparingTo(BigDecimal.valueOf(1278 - 240 + 128));
-    }
-
-    private void flush() {
-        repoRule.getEntityManager().flush();
     }
 
     private void lagVilkårsvurderingMedForsett(Long behandlingId, Periode... perioder) {

@@ -11,8 +11,8 @@ import java.util.Optional;
 
 import javax.ws.rs.core.Response;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
@@ -31,7 +31,7 @@ public class VarselresponsRestTjenesteTest {
 
     private VarselresponsTjeneste varselresponsTjeneste;
 
-    @Before
+    @BeforeEach
     public void setup() {
         varselresponsTjeneste = mock(VarselresponsTjeneste.class);
         gjenopptaBehandlingTjeneste = mock(GjenopptaBehandlingTjeneste.class);

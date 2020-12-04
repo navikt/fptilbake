@@ -3,7 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.k9sak.klient;
 import java.util.UUID;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 

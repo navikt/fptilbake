@@ -10,10 +10,9 @@ import java.util.Optional;
 
 import javax.persistence.EntityManager;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 
 import com.google.common.collect.Lists;
@@ -39,38 +38,38 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVe
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.IverksettingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.AnnenVurdering;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
 import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkInnslagKonverter;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
-import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
-@RunWith(CdiRunner.class)
+@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public class FatteVedtakStegTest {
 
-    @Rule
-    public UnittestRepositoryRule repositoryRule = new UnittestRepositoryRule();
+    private BehandlingRepositoryProvider repositoryProvider;
 
-    private EntityManager em = repositoryRule.getEntityManager();
+    private BehandlingRepository behandlingRepository;
 
-    private BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(em);
+    private TotrinnRepository totrinnRepository;
 
-    private BehandlingRepository behandlingRepository = repositoryProvider.getBehandlingRepository();
-
-    private TotrinnRepository totrinnRepository = new TotrinnRepository(em);
-
-    private TilbakekrevingBeregningTjeneste beregningTjeneste = Mockito.mock(TilbakekrevingBeregningTjeneste.class);
-
-    private HistorikkInnslagKonverter historikkInnslagKonverter = new HistorikkInnslagKonverter(repositoryProvider.getAksjonspunktRepository());
-    private HistorikkTjenesteAdapter historikkTjenesteAdapter = new HistorikkTjenesteAdapter(repositoryProvider.getHistorikkRepository(),historikkInnslagKonverter);
-
-    private FatteVedtakSteg fatteVedtakSteg = new FatteVedtakSteg(repositoryProvider, totrinnRepository, beregningTjeneste, historikkTjenesteAdapter);
+    private FatteVedtakSteg fatteVedtakSteg;
 
     private BehandlingskontrollKontekst behandlingskontrollKontekst;
 
     private Behandling behandling;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    public void setup(EntityManager em) {
+        repositoryProvider = new BehandlingRepositoryProvider(em);
+        behandlingRepository = repositoryProvider.getBehandlingRepository();
+        totrinnRepository = new TotrinnRepository(em);
+        HistorikkInnslagKonverter historikkInnslagKonverter = new HistorikkInnslagKonverter(
+            repositoryProvider.getAksjonspunktRepository());
+        HistorikkTjenesteAdapter historikkTjenesteAdapter = new HistorikkTjenesteAdapter(
+            repositoryProvider.getHistorikkRepository(), historikkInnslagKonverter);
+        TilbakekrevingBeregningTjeneste beregningTjeneste = Mockito.mock(TilbakekrevingBeregningTjeneste.class);
+        fatteVedtakSteg = new FatteVedtakSteg(repositoryProvider, totrinnRepository, beregningTjeneste,
+            historikkTjenesteAdapter);
+
         Fagsak fagsak = TestFagsakUtil.opprettFagsak();
         repositoryProvider.getFagsakRepository().lagre(fagsak);
         behandling = lagBehandling(fagsak);

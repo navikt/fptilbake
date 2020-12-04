@@ -5,8 +5,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
@@ -37,7 +37,7 @@ import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
  * FP/SVP/ES: https://confluence.adeo.no/display/TVF/Generert+dokumentasjon
  * FRISINN: https://confluence.adeo.no/display/MODNAV/Generert+dokumentasjon
  */
-@Ignore("Kjøres ved behov for å regenerere dokumentasjon")
+@Disabled("Kjøres ved behov for å regenerere dokumentasjon")
 public class DokumentasjonGeneratorPeriodeSærligeGrunner {
 
     private final Periode januar = Periode.of(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 1, 31));

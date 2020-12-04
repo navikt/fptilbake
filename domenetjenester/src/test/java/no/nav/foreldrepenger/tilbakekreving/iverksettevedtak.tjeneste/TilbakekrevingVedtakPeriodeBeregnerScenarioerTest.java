@@ -7,11 +7,10 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
@@ -21,21 +20,17 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodev
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.VilkårsvurderingTestBuilder;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
-import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
 
 /**
  * tester her er basert på regneark med eksempler for tilbakekreving
  */
-@RunWith(CdiRunner.class)
+@CdiDbAwareTest
 public class TilbakekrevingVedtakPeriodeBeregnerScenarioerTest {
-
-    @Rule
-    public UnittestRepositoryRule repositoryRule = new UnittestRepositoryRule();
 
     private ScenarioSimple simple = ScenarioSimple.simple();
 
@@ -47,6 +42,8 @@ public class TilbakekrevingVedtakPeriodeBeregnerScenarioerTest {
     public VilkårsvurderingRepository vilkårsvurderingRepository;
     @Inject
     public TilbakekrevingVedtakPeriodeBeregner beregner;
+    @Inject
+    public EntityManager entityManager;
 
     private static final PeriodeParser PP2018 = new PeriodeParser(2018);
 
@@ -133,8 +130,8 @@ public class TilbakekrevingVedtakPeriodeBeregnerScenarioerTest {
     }
 
     private void flushAndClear() {
-        repositoryRule.getEntityManager().flush();
-        repositoryRule.getEntityManager().clear();
+        entityManager.flush();
+        entityManager.clear();
     }
 
     static class PeriodeParser {

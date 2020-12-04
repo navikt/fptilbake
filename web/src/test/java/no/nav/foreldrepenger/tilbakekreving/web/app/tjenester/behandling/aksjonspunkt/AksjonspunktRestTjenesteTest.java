@@ -18,10 +18,8 @@ import java.util.UUID;
 import javax.ws.rs.core.Response;
 
 import org.apache.http.HttpStatus;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
@@ -50,10 +48,6 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 
 public class AksjonspunktRestTjenesteTest {
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
-
-    private static final Long FAGSAK_ID = 12345L;
     private static final Saksnummer SAKSNUMMER = new Saksnummer("12345");
     private static final NavBruker NAV_BRUKER = NavBruker.opprettNy(new AktørId(12345L), Språkkode.nb);
     private static final Period DEFAULT_PERIOD = Period.ofWeeks(4);
@@ -73,7 +67,7 @@ public class AksjonspunktRestTjenesteTest {
 
     private Behandling behandling;
 
-    @Before
+    @BeforeEach
     public void setup() {
         when(repositoryProviderMock.getBehandlingRepository()).thenReturn(behandlingRepositoryMock);
 

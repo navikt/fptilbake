@@ -8,11 +8,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import javax.persistence.EntityManager;
 import javax.persistence.FlushModeType;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandleStegResultat;
@@ -38,7 +39,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVe
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.IverksettingStatus;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.SendVedtakHendelserTilDvhTask;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.task.SendVedtakFattetTilSelvbetjeningTask;
 import no.nav.vedtak.exception.TekniskException;
@@ -48,27 +49,36 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
 import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskEventPubliserer;
 import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepositoryImpl;
 
+@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public class IverksetteVedtakStegTest {
 
-    @Rule
-    public UnittestRepositoryRule repositoryRule = new UnittestRepositoryRule();
+    private BehandlingRepositoryProvider repoProvider;
+    private ProsessTaskRepository prosessTaskRepository;
+    private BrevSporingRepository brevSporingRepository;
+    private IverksetteVedtakSteg iverksetteVedtakSteg;
+    private BehandlingVedtakRepository behandlingVedtakRepository;
+    private BehandlingRepository behandlingRepository;
+    private EksternBehandlingRepository eksternBehandlingRepository;
+    private EntityManager entityManager;
 
-    private BehandlingRepositoryProvider repoProvider = new BehandlingRepositoryProvider(repositoryRule.getEntityManager());
-    private ProsessTaskRepository prosessTaskRepository = new ProsessTaskRepositoryImpl(repositoryRule.getEntityManager(), null, Mockito.mock(ProsessTaskEventPubliserer.class));
-    private BrevSporingRepository brevSporingRepository = new BrevSporingRepository(repositoryRule.getEntityManager());
-    private ProsessTaskIverksett prosessTaskIverksett = new ProsessTaskIverksett(prosessTaskRepository, brevSporingRepository);
-    private IverksetteVedtakSteg iverksetteVedtakSteg = new IverksetteVedtakSteg(repoProvider, prosessTaskIverksett);
-    private BehandlingVedtakRepository behandlingVedtakRepository = repoProvider.getBehandlingVedtakRepository();
-    private BehandlingRepository behandlingRepository = repoProvider.getBehandlingRepository();
-    private EksternBehandlingRepository eksternBehandlingRepository = repoProvider.getEksternBehandlingRepository();
-
-    private ScenarioSimple simple = ScenarioSimple.simple();
+    private final ScenarioSimple simple = ScenarioSimple.simple();
     private Behandling behandling;
     private BehandlingskontrollKontekst behandlingskontrollKontekst;
 
-    @Before
-    public void setup() {
-        repositoryRule.getEntityManager().setFlushMode(FlushModeType.AUTO);
+    @BeforeEach
+    public void setup(EntityManager entityManager) {
+        this.entityManager = entityManager;
+        repoProvider = new BehandlingRepositoryProvider(entityManager);
+        prosessTaskRepository = new ProsessTaskRepositoryImpl(entityManager, null, Mockito.mock(ProsessTaskEventPubliserer.class));
+        brevSporingRepository = new BrevSporingRepository(entityManager);
+        var prosessTaskIverksett = new ProsessTaskIverksett(prosessTaskRepository,
+            brevSporingRepository);
+        iverksetteVedtakSteg = new IverksetteVedtakSteg(repoProvider, prosessTaskIverksett);
+        behandlingVedtakRepository = repoProvider.getBehandlingVedtakRepository();
+        behandlingRepository = repoProvider.getBehandlingRepository();
+        eksternBehandlingRepository = repoProvider.getEksternBehandlingRepository();
+
+        entityManager.setFlushMode(FlushModeType.AUTO);
         behandling = simple.lagre(repoProvider);
         BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(behandling);
         behandlingskontrollKontekst = new BehandlingskontrollKontekst(behandling.getFagsakId(), behandling.getAktørId(), behandlingLås);
@@ -184,7 +194,7 @@ public class IverksetteVedtakStegTest {
             .medBrevType(BrevType.VARSEL_BREV)
             .build();
         brevSporingRepository.lagre(brevSporing);
-        repositoryRule.getEntityManager().flush();
+        entityManager.flush();
     }
 
     private void opprettEksternBehandling(Behandling behandling) {

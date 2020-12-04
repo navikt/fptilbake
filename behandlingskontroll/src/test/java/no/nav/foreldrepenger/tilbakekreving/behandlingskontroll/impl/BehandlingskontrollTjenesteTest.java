@@ -1,6 +1,12 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,12 +18,8 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingModell;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingModellVisitor;
@@ -37,28 +39,22 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.VurderingspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
-import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
 
-@RunWith(CdiRunner.class)
+@CdiDbAwareTest
 public class BehandlingskontrollTjenesteTest {
 
-    @Rule
-    public final UnittestRepositoryRule repoRule = new UnittestRepositoryRule();
-
-    private EntityManager em = repoRule.getEntityManager();
-
-
     private final class BehandlingskontrollEventPublisererForTest extends BehandlingskontrollEventPubliserer {
-        private List<BehandlingEvent> events = new ArrayList<>();
 
+        private List<BehandlingEvent> events = new ArrayList<>();
         @Override
         protected void doFireEvent(BehandlingEvent event) {
             events.add(event);
         }
-    }
 
+    }
     static class BehandlingModellForTest {
+
         BehandlingType behandlingType = BehandlingType.TILBAKEKREVING;
 
         // random liste av aksjonspunkt og steg i en definert rekkefølge for å kunne sette opp modellen
@@ -88,10 +84,7 @@ public class BehandlingskontrollTjenesteTest {
         BehandlingModellImpl modell = setupModell(behandlingType, modellData);
     }
 
-    @Rule
-    public final ExpectedException expectedException = ExpectedException.none();
-
-    private BehandlingModellForTest behandlingModellForTest = new BehandlingModellForTest();
+    private final BehandlingModellForTest behandlingModellForTest = new BehandlingModellForTest();
 
     private static final BehandlingStegType STEG_1 = TestBehandlingStegType.STEG_1;
     private static final BehandlingStegType STEG_2 = TestBehandlingStegType.STEG_2;
@@ -99,13 +92,16 @@ public class BehandlingskontrollTjenesteTest {
     private static final BehandlingStegType STEG_4 = TestBehandlingStegType.STEG_4;
     private static final BehandlingStegType STEG_5 = TestBehandlingStegType.STEG_5;
 
+    @Inject
+    private EntityManager em;
+
     private BehandlingskontrollTjeneste kontrollTjeneste;
 
     private Behandling behandling;
 
     private BehandlingskontrollKontekst kontekst;
 
-    private BehandlingskontrollEventPublisererForTest eventPubliserer = new BehandlingskontrollEventPublisererForTest();
+    private final BehandlingskontrollEventPublisererForTest eventPubliserer = new BehandlingskontrollEventPublisererForTest();
 
     @Inject
     private InternalManipulerBehandling manipulerInternBehandling;
@@ -113,7 +109,7 @@ public class BehandlingskontrollTjenesteTest {
     @Inject
     private BehandlingRepositoryProvider repositoryProvider;
 
-    @Before
+    @BeforeEach
     public void setup() {
         opprettStatiskModell();
 
@@ -125,9 +121,9 @@ public class BehandlingskontrollTjenesteTest {
 
         initBehandlingskontrollTjeneste(this.behandlingModellForTest.modell);
 
-        kontekst = Mockito.mock(BehandlingskontrollKontekst.class);
-        Mockito.when(kontekst.getBehandlingId()).thenReturn(behandling.getId());
-        Mockito.when(kontekst.getFagsakId()).thenReturn(behandling.getFagsakId());
+        kontekst = mock(BehandlingskontrollKontekst.class);
+        lenient().when(kontekst.getBehandlingId()).thenReturn(behandling.getId());
+        lenient().when(kontekst.getFagsakId()).thenReturn(behandling.getFagsakId());
     }
 
     @Test
@@ -230,10 +226,9 @@ public class BehandlingskontrollTjenesteTest {
 
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void skal_kaste_exception_dersom_ugyldig_tilbakeføring() {
-        kontrollTjeneste.behandlingTilbakeføringTilTidligereBehandlingSteg(kontekst, STEG_4);
-
+        assertThrows(IllegalStateException.class, () -> kontrollTjeneste.behandlingTilbakeføringTilTidligereBehandlingSteg(kontekst, STEG_4));
     }
 
     @Test
@@ -268,8 +263,8 @@ public class BehandlingskontrollTjenesteTest {
     @Test
     public void skal_ha_guard_mot_nøstet_behandlingskontroll_ved_prossesering_tilbakeføring_og_framføring() throws Exception {
 
-        BehandlingModellRepository behandlingModellRepository = Mockito.mock(BehandlingModellRepository.class);
-        Mockito.when(behandlingModellRepository.getModell(Mockito.any())).thenReturn(this.behandlingModellForTest.modell);
+        BehandlingModellRepository behandlingModellRepository = mock(BehandlingModellRepository.class);
+        when(behandlingModellRepository.getModell(any())).thenReturn(this.behandlingModellForTest.modell);
         this.kontrollTjeneste = new BehandlingskontrollTjeneste(repositoryProvider, behandlingModellRepository,
             eventPubliserer) {
             @Override
@@ -279,10 +274,9 @@ public class BehandlingskontrollTjenesteTest {
             }
         };
 
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("Støtter ikke nøstet prosessering");
-
-        this.kontrollTjeneste.prosesserBehandling(kontekst);
+        assertThatThrownBy(() -> this.kontrollTjeneste.prosesserBehandling(kontekst))
+            .hasMessageContaining("Støtter ikke nøstet prosessering")
+            .isInstanceOf(IllegalStateException.class);
     }
 
     @Test
@@ -343,9 +337,9 @@ public class BehandlingskontrollTjenesteTest {
     }
 
     private void initBehandlingskontrollTjeneste(BehandlingModellImpl modell) {
-        BehandlingModellRepository behandlingModellRepository = Mockito.mock(BehandlingModellRepository.class);
-        Mockito.when(behandlingModellRepository.getModell(Mockito.any())).thenReturn(modell);
-        Mockito.when(behandlingModellRepository.getBehandlingStegKonfigurasjon()).thenReturn(BehandlingStegKonfigurasjon.lagDummy());
+        BehandlingModellRepository behandlingModellRepository = mock(BehandlingModellRepository.class);
+        lenient().when(behandlingModellRepository.getModell(any())).thenReturn(modell);
+        when(behandlingModellRepository.getBehandlingStegKonfigurasjon()).thenReturn(BehandlingStegKonfigurasjon.lagDummy());
         this.kontrollTjeneste = new BehandlingskontrollTjeneste(repositoryProvider, behandlingModellRepository, eventPubliserer);
     }
 

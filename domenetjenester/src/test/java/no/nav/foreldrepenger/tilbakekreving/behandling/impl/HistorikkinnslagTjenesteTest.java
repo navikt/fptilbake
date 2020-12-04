@@ -5,7 +5,8 @@ import static org.mockito.Mockito.mock;
 
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -27,8 +28,13 @@ public class HistorikkinnslagTjenesteTest extends FellesTestOppsett {
     private static final JournalpostId JOURNALPOST_ID = new JournalpostId("389426448");
     private static final String DOKUMENT_ID = "417743491";
 
-    private PersoninfoAdapter personinfoAdapter = mock(PersoninfoAdapter.class);
-    private HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepository, personinfoAdapter);
+    private final PersoninfoAdapter personinfoAdapter = mock(PersoninfoAdapter.class);
+    private HistorikkinnslagTjeneste historikkinnslagTjeneste;
+
+    @BeforeEach
+    void setUp() {
+        historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepository, personinfoAdapter);
+    }
 
     @Test
     public void skal_opprette_historikkinnslag_for_utsendt_brev() {

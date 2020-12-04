@@ -10,9 +10,8 @@ import static org.mockito.Mockito.verify;
 
 import java.time.Period;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
@@ -20,9 +19,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.DokumentBestillerTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
-@RunWith(CdiRunner.class)
 public class InnhentDokumentasjonbrevTaskTest extends DokumentBestillerTestOppsett {
 
     private InnhentDokumentasjonbrevTjeneste mockInnhentDokumentasjonbrevTjeneste;
@@ -31,7 +28,7 @@ public class InnhentDokumentasjonbrevTaskTest extends DokumentBestillerTestOppse
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private InnhentDokumentasjonbrevTask innhentDokumentasjonBrevTask;
 
-    @Before
+    @BeforeEach
     public void setup() {
         mockInnhentDokumentasjonbrevTjeneste = mock(InnhentDokumentasjonbrevTjeneste.class);
         behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(repositoryProvider, mockBehandlingModellRepository, null);

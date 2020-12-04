@@ -6,7 +6,8 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingBeregningTjeneste;
@@ -20,8 +21,14 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.VedtakResult
 
 public class ForeslåVedtakTjenesteTest extends FellesTestOppsett {
 
-    private TilbakekrevingBeregningTjeneste beregningTjeneste = mock(TilbakekrevingBeregningTjeneste.class);
-    private ForeslåVedtakTjeneste foreslåVedtakTjeneste = new ForeslåVedtakTjeneste(beregningTjeneste, historikkTjenesteAdapter);
+    private TilbakekrevingBeregningTjeneste beregningTjeneste;
+    private ForeslåVedtakTjeneste foreslåVedtakTjeneste;
+
+    @BeforeEach
+    void setUp() {
+        beregningTjeneste = mock(TilbakekrevingBeregningTjeneste.class);
+        foreslåVedtakTjeneste = new ForeslåVedtakTjeneste(beregningTjeneste, historikkTjenesteAdapter);
+    }
 
     @Test
     public void lagHistorikkInnslagForForeslåVedtak() {

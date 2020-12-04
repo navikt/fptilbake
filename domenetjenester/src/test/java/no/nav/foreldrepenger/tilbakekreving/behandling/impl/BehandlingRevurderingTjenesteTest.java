@@ -1,11 +1,13 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -26,15 +28,19 @@ import no.nav.vedtak.exception.FunksjonellException;
 
 public class BehandlingRevurderingTjenesteTest extends FellesTestOppsett {
 
-    private HenleggBehandlingTjeneste henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repoProvider, prosessTaskRepository, behandlingskontrollTjeneste, mockHistorikkTjeneste);
-    private VergeRepository vergeRepository = repoProvider.getVergeRepository();
+    private VergeRepository vergeRepository;
+
+    @BeforeEach
+    void setUp() {
+        vergeRepository = repoProvider.getVergeRepository();
+    }
 
     @Test
     public void opprettRevurdering_nårTbkBehandlingErIkkeAvsluttet() {
-        expectedException.expect(FunksjonellException.class);
-        expectedException.expectMessage("FPT-663487");
+        assertThatThrownBy(() -> revurderingTjeneste.opprettRevurdering(behandling.getId(), BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR))
+            .isInstanceOf(FunksjonellException.class)
+            .hasMessageContaining("FPT-663487");
 
-        revurderingTjeneste.opprettRevurdering(behandling.getId(), BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR);
     }
 
     @Test

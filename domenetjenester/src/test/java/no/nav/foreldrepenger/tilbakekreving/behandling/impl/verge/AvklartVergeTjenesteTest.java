@@ -10,7 +10,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
@@ -27,9 +28,16 @@ import no.nav.foreldrepenger.tilbakekreving.organisasjon.VirksomhetTjeneste;
 
 public class AvklartVergeTjenesteTest extends FellesTestOppsett {
 
-    private VergeRepository vergeRepository = new VergeRepository(repoRule.getEntityManager());
-    private VirksomhetTjeneste virksomhetTjenesteMock = Mockito.mock(VirksomhetTjeneste.class);
-    private AvklartVergeTjeneste avklartVergeTjeneste = new AvklartVergeTjeneste(vergeRepository, mockTpsTjeneste, virksomhetTjenesteMock, historikkTjenesteAdapter);
+    private VergeRepository vergeRepository;
+    private VirksomhetTjeneste virksomhetTjenesteMock;
+    private AvklartVergeTjeneste avklartVergeTjeneste;
+
+    @BeforeEach
+    void setUp() {
+        vergeRepository = new VergeRepository(entityManager);
+        virksomhetTjenesteMock = Mockito.mock(VirksomhetTjeneste.class);
+        avklartVergeTjeneste = new AvklartVergeTjeneste(vergeRepository, mockTpsTjeneste, virksomhetTjenesteMock, historikkTjenesteAdapter);
+    }
 
     @Test
     public void skal_lagre_verge_informasjon_når_verge_er_advokat() {

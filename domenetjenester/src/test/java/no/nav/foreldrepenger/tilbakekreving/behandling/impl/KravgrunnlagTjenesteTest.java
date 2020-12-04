@@ -18,9 +18,8 @@ import java.util.stream.IntStream;
 import javax.inject.Inject;
 import javax.persistence.FlushModeType;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjeneste;
@@ -44,15 +43,13 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.SlettGrunnlagEventPublisere
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
-import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
-@RunWith(CdiRunner.class)
 public class KravgrunnlagTjenesteTest extends FellesTestOppsett {
 
     private static final String SSN = "11112222333";
     private static final String ENHET = "8020";
 
-    private GjenopptaBehandlingTjeneste mockGjenopptaBehandlingTjeneste = mock(GjenopptaBehandlingTjeneste.class);
+    private final GjenopptaBehandlingTjeneste mockGjenopptaBehandlingTjeneste = mock(GjenopptaBehandlingTjeneste.class);
 
     @Inject
     private SlettGrunnlagEventPubliserer eventPubliserer;
@@ -62,9 +59,9 @@ public class KravgrunnlagTjenesteTest extends FellesTestOppsett {
     private static final LocalDate fom = LocalDate.of(2016, 3, 15);
     private static final LocalDate tom = LocalDate.of(2016, 3, 18);
 
-    @Before
+    @BeforeEach
     public void setup() {
-        repoRule.getEntityManager().setFlushMode(FlushModeType.AUTO);
+        entityManager.setFlushMode(FlushModeType.AUTO);
         when(mockTpsTjeneste.hentAktørForFnr(new PersonIdent(SSN))).thenReturn(Optional.of(aktørId));
         when(behandlingskontrollTjeneste.erStegPassert(any(Behandling.class), any(BehandlingStegType.class))).thenReturn(true);
         kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repoProvider, mockGjenopptaBehandlingTjeneste, behandlingskontrollTjeneste, eventPubliserer);

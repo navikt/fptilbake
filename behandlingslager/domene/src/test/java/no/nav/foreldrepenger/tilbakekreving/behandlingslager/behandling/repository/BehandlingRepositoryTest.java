@@ -9,8 +9,9 @@ import java.util.Optional;
 
 import javax.persistence.EntityManager;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -18,21 +19,24 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.test.TestFagsakUtil;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 
+@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public class BehandlingRepositoryTest {
 
-    @Rule
-    public final UnittestRepositoryRule repoRule = new UnittestRepositoryRule();
-    private final EntityManager entityManager = repoRule.getEntityManager();
-    private final BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(entityManager);
-    private final BehandlingRepository behandlingRepository = repositoryProvider.getBehandlingRepository();
-
-    private final FagsakRepository fagsakRepository = new FagsakRepository(entityManager);
     private final NavBruker bruker = TestFagsakUtil.genererBruker();
     private final Fagsak fagsak = TestFagsakUtil.opprettFagsak(bruker);
 
+    private BehandlingRepository behandlingRepository;
+    private FagsakRepository fagsakRepository;
+
+    @BeforeEach
+    void setUp(EntityManager entityManager) {
+        BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(entityManager);
+        behandlingRepository = repositoryProvider.getBehandlingRepository();
+        fagsakRepository = new FagsakRepository(entityManager);
+    }
 
     @Test
     public void skal_finne_behandling_gitt_id() {
@@ -57,7 +61,7 @@ public class BehandlingRepositoryTest {
 
         Behandling behandling1a = Behandling.nyBehandlingFor(fagsak1, BehandlingType.TILBAKEKREVING).build();
         Behandling behandling1b = Behandling.nyBehandlingFor(fagsak1, BehandlingType.TILBAKEKREVING).build();
-        Behandling behandling2 = Behandling.nyBehandlingFor(fagsak2,BehandlingType.TILBAKEKREVING).build();
+        Behandling behandling2 = Behandling.nyBehandlingFor(fagsak2, BehandlingType.TILBAKEKREVING).build();
         lagreBehandling(behandling1a, behandling1b, behandling2);
 
         List<Behandling> resultat = behandlingRepository.hentAlleBehandlingerForSaksnummer(new Saksnummer("GSAK1000"));
@@ -87,7 +91,8 @@ public class BehandlingRepositoryTest {
 
         lagreBehandling(builder);
 
-        Optional<Behandling> sisteBehandling = behandlingRepository.hentSisteBehandlingForFagsakId(fagsak.getId(), BehandlingType.TILBAKEKREVING);
+        Optional<Behandling> sisteBehandling = behandlingRepository.hentSisteBehandlingForFagsakId(fagsak.getId(),
+            BehandlingType.TILBAKEKREVING);
 
         assertThat(sisteBehandling).isPresent();
         assertThat(sisteBehandling.get().getFagsakId()).isEqualTo(fagsak.getId());
@@ -131,7 +136,8 @@ public class BehandlingRepositoryTest {
 
         lagreBehandling(behandling);
 
-        Behandling nyBehandling = behandlingRepository.opprettNyBehandlingBasertPåTidligere(behandling, BehandlingType.REVURDERING_TILBAKEKREVING);
+        Behandling nyBehandling = behandlingRepository.opprettNyBehandlingBasertPåTidligere(behandling,
+            BehandlingType.REVURDERING_TILBAKEKREVING);
 
         assertThat(nyBehandling).isNotNull();
         assertThat(nyBehandling.getType()).isEqualByComparingTo(BehandlingType.REVURDERING_TILBAKEKREVING);
@@ -139,7 +145,7 @@ public class BehandlingRepositoryTest {
 
     private Map<String, Object> opprettBuilderForBehandlingMedFagsakId() {
         Long fagsakId = fagsakRepository.lagre(fagsak);
-        Behandling.Builder builder = Behandling.nyBehandlingFor(fagsak,BehandlingType.TILBAKEKREVING);
+        Behandling.Builder builder = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING);
 
         Map<String, Object> map = new HashMap<>();
         map.put("fagsakId", fagsakId);
@@ -150,7 +156,7 @@ public class BehandlingRepositoryTest {
 
     private Behandling.Builder opprettBuilderForBehandling() {
         fagsakRepository.lagre(fagsak);
-        return Behandling.nyBehandlingFor(fagsak,BehandlingType.TILBAKEKREVING);
+        return Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING);
 
     }
 }

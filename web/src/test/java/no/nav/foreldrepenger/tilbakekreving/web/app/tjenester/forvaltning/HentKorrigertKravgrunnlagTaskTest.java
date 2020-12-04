@@ -18,12 +18,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import javax.persistence.EntityManager;
 import javax.persistence.FlushModeType;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.google.common.collect.Lists;
 
@@ -34,7 +35,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
@@ -56,33 +57,35 @@ import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.integrasjon.felles.ws.DateUtil;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 
+@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public class HentKorrigertKravgrunnlagTaskTest {
 
-    @Rule
-    public UnittestRepositoryRule repositoryRule = new UnittestRepositoryRule();
-
-    private BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(repositoryRule.getEntityManager());
-    private KravgrunnlagRepository kravgrunnlagRepository = repositoryProvider.getGrunnlagRepository();
-    private EksternBehandlingRepository eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
-    private PersoninfoAdapter tpsAdapterMock = mock(PersoninfoAdapter.class);
-    private PersonOrganisasjonWrapper tpsAdapterWrapper = new PersonOrganisasjonWrapper(tpsAdapterMock);
-    private ØkonomiConsumer økonomiConsumerMock = mock(ØkonomiConsumer.class);
-    private FagsystemKlient fagsystemKlient = mock(FagsystemKlient.class);
-    private HentKravgrunnlagMapper hentKravgrunnlagMapper = new HentKravgrunnlagMapper(tpsAdapterWrapper);
-    private HentKorrigertKravgrunnlagTask hentKorrigertGrunnlagTask = new HentKorrigertKravgrunnlagTask(repositoryProvider, hentKravgrunnlagMapper, økonomiConsumerMock, fagsystemKlient);
+    private final PersoninfoAdapter tpsAdapterMock = mock(PersoninfoAdapter.class);
+    private final PersonOrganisasjonWrapper tpsAdapterWrapper = new PersonOrganisasjonWrapper(tpsAdapterMock);
+    private final ØkonomiConsumer økonomiConsumerMock = mock(ØkonomiConsumer.class);
+    private final FagsystemKlient fagsystemKlient = mock(FagsystemKlient.class);
+    private KravgrunnlagRepository kravgrunnlagRepository;
+    private EksternBehandlingRepository eksternBehandlingRepository;
+    private HentKorrigertKravgrunnlagTask hentKorrigertGrunnlagTask;
 
     private Behandling behandling;
     private long behandlingId;
 
-    @Before
-    public void setup() {
-        repositoryRule.getEntityManager().setFlushMode(FlushModeType.AUTO);
+    @BeforeEach
+    public void setup(EntityManager entityManager) {
+        BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(entityManager);
+        kravgrunnlagRepository = repositoryProvider.getGrunnlagRepository();
+        eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
+        HentKravgrunnlagMapper hentKravgrunnlagMapper = new HentKravgrunnlagMapper(tpsAdapterWrapper);
+        hentKorrigertGrunnlagTask = new HentKorrigertKravgrunnlagTask(repositoryProvider, hentKravgrunnlagMapper, økonomiConsumerMock, fagsystemKlient);
+
+        entityManager.setFlushMode(FlushModeType.AUTO);
         ScenarioSimple scenarioSimple = ScenarioSimple.simple();
         behandling = scenarioSimple.lagre(repositoryProvider);
         behandlingId = behandling.getId();
         when(tpsAdapterMock.hentAktørForFnr(any(PersonIdent.class))).thenReturn(Optional.of(behandling.getFagsak().getAktørId()));
         when(økonomiConsumerMock.hentKravgrunnlag(anyLong(), any(HentKravgrunnlagDetaljDto.class))).thenReturn(lagKravgrunnlag(true));
-        EksternBehandling eksternBehandling = new EksternBehandling(behandling, Henvisning.fraEksternBehandlingId(1l), UUID.randomUUID());
+        EksternBehandling eksternBehandling = new EksternBehandling(behandling, Henvisning.fraEksternBehandlingId(1L), UUID.randomUUID());
         eksternBehandlingRepository.lagre(eksternBehandling);
     }
 

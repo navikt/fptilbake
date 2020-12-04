@@ -7,9 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollAsynkTjeneste;
@@ -23,11 +21,8 @@ public class BehandlingsprosessApplikasjonTjenesteTest {
 
     private static final String GRUPPE_1 = "gruppe1";
 
-    @Rule
-    public final ExpectedException expected = ExpectedException.none();
-
     private final ProsessTaskData taskData = new ProsessTaskData("taskType1");
-    private Behandling behandling;
+    private final Behandling behandling;
 
     public BehandlingsprosessApplikasjonTjenesteTest() {
         this.taskData.setGruppe(GRUPPE_1);
@@ -35,7 +30,7 @@ public class BehandlingsprosessApplikasjonTjenesteTest {
     }
 
     @Test
-    public void skal_returnere_gruppe_når_ikke_er_kjørt() throws Exception {
+    public void skal_returnere_gruppe_når_ikke_er_kjørt() {
 
         BehandlingsprosessApplikasjonTjenesteImpl sut = initSut(GRUPPE_1, taskData);
         Optional<AsyncPollingStatus> status = sut.sjekkProsessTaskPågårForBehandling(behandling, null);
@@ -46,7 +41,7 @@ public class BehandlingsprosessApplikasjonTjenesteTest {
     }
 
     @Test
-    public void skal_ikke_returnere_gruppe_når_er_kjørt() throws Exception {
+    public void skal_ikke_returnere_gruppe_når_er_kjørt() {
         markerFerdig(taskData);
 
         BehandlingsprosessApplikasjonTjenesteImpl sut = initSut(GRUPPE_1, taskData);
@@ -59,7 +54,7 @@ public class BehandlingsprosessApplikasjonTjenesteTest {
     }
 
     @Test
-    public void skal_kaste_exception_når_task_har_feilet_null_gruppe() throws Exception {
+    public void skal_kaste_exception_når_task_har_feilet_null_gruppe() {
         markerFeilet(taskData);
 
         BehandlingsprosessApplikasjonTjenesteImpl sut = initSut(GRUPPE_1, taskData);
@@ -69,7 +64,7 @@ public class BehandlingsprosessApplikasjonTjenesteTest {
     }
 
     @Test
-    public void skal_kaste_exception_når_task_har_feilet_angitt_gruppe() throws Exception {
+    public void skal_kaste_exception_når_task_har_feilet_angitt_gruppe() {
         markerFeilet(taskData);
 
         BehandlingsprosessApplikasjonTjenesteImpl sut = initSut(GRUPPE_1, taskData);
@@ -80,7 +75,7 @@ public class BehandlingsprosessApplikasjonTjenesteTest {
     }
 
     @Test
-    public void skal_kaste_exception_når_task_neste_kjøring_er_utsatt() throws Exception {
+    public void skal_kaste_exception_når_task_neste_kjøring_er_utsatt() {
         taskData.medNesteKjøringEtter(LocalDateTime.now().plusHours(1));
 
         BehandlingsprosessApplikasjonTjenesteImpl sut = initSut(GRUPPE_1, taskData);

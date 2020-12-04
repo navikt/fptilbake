@@ -15,11 +15,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.persistence.EntityManager;
 import javax.ws.rs.core.Response;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.google.common.collect.Lists;
 
@@ -59,7 +60,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.TestFagsakUtil;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons.VarselresponsRepository;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.SlettGrunnlagEventPubliserer;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType;
 import no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste.TilbakekrevingsvedtakTjeneste;
@@ -74,44 +75,57 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
 import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepositoryImpl;
 
+@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public class ForvaltningBehandlingRestTjenesteTest {
 
-    @Rule
-    public UnittestRepositoryRule repositoryRule = new UnittestRepositoryRule();
+    private ProsessTaskRepository prosessTaskRepository;
+    private BehandlingRepositoryProvider repositoryProvider;
+    private FagsakRepository fagsakRepository;
+    private BehandlingRepository behandlingRepository;
+    private HistorikkRepository historikkRepository;
+    private ØkonomiMottattXmlRepository mottattXmlRepository;
 
-    private ProsessTaskRepository prosessTaskRepository = new ProsessTaskRepositoryImpl(repositoryRule.getEntityManager(), null, null);
-    private BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(repositoryRule.getEntityManager());
-    private FagsakRepository fagsakRepository = repositoryProvider.getFagsakRepository();
-    private BehandlingRepository behandlingRepository = repositoryProvider.getBehandlingRepository();
-    private HistorikkRepository historikkRepository = repositoryProvider.getHistorikkRepository();
-    private ØkonomiMottattXmlRepository mottattXmlRepository = new ØkonomiMottattXmlRepository(repositoryRule.getEntityManager());
-    private FellesQueriesForBehandlingRepositories fellesQueriesForBehandlingRepositories = new FellesQueriesForBehandlingRepositories(repositoryRule.getEntityManager());
-    private BehandlingKandidaterRepository behandlingKandidaterRepository = new BehandlingKandidaterRepository(fellesQueriesForBehandlingRepositories);
-    private BehandlingVenterRepository behandlingVenterRepository = new BehandlingVenterRepository(fellesQueriesForBehandlingRepositories);
-    private VarselresponsRepository varselresponsRepository = new VarselresponsRepository(repositoryRule.getEntityManager());
-
-    private PersonOrganisasjonWrapper mockTpsAdapterWrapper = mock(PersonOrganisasjonWrapper.class);
-    private KravgrunnlagMapper kravgrunnlagMapper = new KravgrunnlagMapper(mockTpsAdapterWrapper);
-    private BehandlingModellRepository mockBehandlingModellRepository = mock(BehandlingModellRepository.class);
-    private BehandlingskontrollTjeneste behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(repositoryProvider,
-        mockBehandlingModellRepository, mock(BehandlingskontrollEventPubliserer.class));
-    private ØkonomiSendtXmlRepository økonomiSendtXmlRepository = new ØkonomiSendtXmlRepository(repositoryRule.getEntityManager());
-    private TilbakekrevingsvedtakTjeneste tilbakekrevingsvedtakTjeneste = mock(TilbakekrevingsvedtakTjeneste.class);
-    private SlettGrunnlagEventPubliserer mockSlettGrunnlagEventPubliserer = mock(SlettGrunnlagEventPubliserer.class);
-    private InternalManipulerBehandling manipulerBehandling = new InternalManipulerBehandling(repositoryProvider);
-    private VarselresponsTjeneste varselresponsTjeneste = new VarselresponsTjeneste(varselresponsRepository);
-    private GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjeneste(prosessTaskRepository, behandlingKandidaterRepository,
-        behandlingVenterRepository, repositoryProvider,varselresponsTjeneste );
-    private KravgrunnlagTjeneste kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repositoryProvider,gjenopptaBehandlingTjeneste,
-        behandlingskontrollTjeneste, mockSlettGrunnlagEventPubliserer);
-    private ForvaltningBehandlingRestTjeneste forvaltningBehandlingRestTjeneste = new ForvaltningBehandlingRestTjeneste(repositoryProvider,
-        prosessTaskRepository, mottattXmlRepository, kravgrunnlagMapper,
-        økonomiSendtXmlRepository, tilbakekrevingsvedtakTjeneste, kravgrunnlagTjeneste);
+    private PersonOrganisasjonWrapper mockTpsAdapterWrapper;
+    private BehandlingModellRepository mockBehandlingModellRepository;
+    private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
+    private InternalManipulerBehandling manipulerBehandling;
+    private ForvaltningBehandlingRestTjeneste forvaltningBehandlingRestTjeneste;
 
     private Behandling behandling;
 
-    @Before
-    public void setup(){
+    @BeforeEach
+    public void setup(EntityManager entityManager) {
+        prosessTaskRepository = new ProsessTaskRepositoryImpl(entityManager, null, null);
+        repositoryProvider = new BehandlingRepositoryProvider(entityManager);
+        fagsakRepository = repositoryProvider.getFagsakRepository();
+        behandlingRepository = repositoryProvider.getBehandlingRepository();
+        historikkRepository = repositoryProvider.getHistorikkRepository();
+        mottattXmlRepository = new ØkonomiMottattXmlRepository(entityManager);
+        FellesQueriesForBehandlingRepositories fellesQueriesForBehandlingRepositories = new FellesQueriesForBehandlingRepositories(
+            entityManager);
+        BehandlingKandidaterRepository behandlingKandidaterRepository = new BehandlingKandidaterRepository(
+            fellesQueriesForBehandlingRepositories);
+        BehandlingVenterRepository behandlingVenterRepository = new BehandlingVenterRepository(
+            fellesQueriesForBehandlingRepositories);
+        VarselresponsRepository varselresponsRepository = new VarselresponsRepository(entityManager);
+        mockTpsAdapterWrapper = mock(PersonOrganisasjonWrapper.class);
+        KravgrunnlagMapper kravgrunnlagMapper = new KravgrunnlagMapper(mockTpsAdapterWrapper);
+        mockBehandlingModellRepository = mock(BehandlingModellRepository.class);
+        behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(repositoryProvider,
+            mockBehandlingModellRepository, mock(BehandlingskontrollEventPubliserer.class));
+        ØkonomiSendtXmlRepository økonomiSendtXmlRepository = new ØkonomiSendtXmlRepository(entityManager);
+        TilbakekrevingsvedtakTjeneste tilbakekrevingsvedtakTjeneste = mock(TilbakekrevingsvedtakTjeneste.class);
+        SlettGrunnlagEventPubliserer mockSlettGrunnlagEventPubliserer = mock(SlettGrunnlagEventPubliserer.class);
+        manipulerBehandling = new InternalManipulerBehandling(repositoryProvider);
+        VarselresponsTjeneste varselresponsTjeneste = new VarselresponsTjeneste(varselresponsRepository);
+        GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjeneste(prosessTaskRepository,
+            behandlingKandidaterRepository, behandlingVenterRepository, repositoryProvider, varselresponsTjeneste);
+        KravgrunnlagTjeneste kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repositoryProvider,
+            gjenopptaBehandlingTjeneste, behandlingskontrollTjeneste, mockSlettGrunnlagEventPubliserer);
+        forvaltningBehandlingRestTjeneste = new ForvaltningBehandlingRestTjeneste(repositoryProvider,
+            prosessTaskRepository, mottattXmlRepository, kravgrunnlagMapper, økonomiSendtXmlRepository,
+            tilbakekrevingsvedtakTjeneste, kravgrunnlagTjeneste);
+
         behandling = lagBehandling();
     }
 
@@ -119,13 +133,15 @@ public class ForvaltningBehandlingRestTjenesteTest {
     public void skal_ikke_tvinge_henlegg_behandling_når_behandling_er_allerede_avsluttet() {
         behandling.avsluttBehandling();
 
-        Response response = forvaltningBehandlingRestTjeneste.tvingHenleggelseBehandling(new BehandlingReferanse(behandling.getId()));
+        Response response = forvaltningBehandlingRestTjeneste.tvingHenleggelseBehandling(
+            new BehandlingReferanse(behandling.getId()));
         assertThat(response.getStatus()).isEqualTo(Response.Status.BAD_REQUEST.getStatusCode());
     }
 
     @Test
     public void skal_tvinge_henlegg_behandling() {
-        Response response = forvaltningBehandlingRestTjeneste.tvingHenleggelseBehandling(new BehandlingReferanse(behandling.getId()));
+        Response response = forvaltningBehandlingRestTjeneste.tvingHenleggelseBehandling(
+            new BehandlingReferanse(behandling.getId()));
         assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
         assertProsessTask(TvingHenlegglBehandlingTask.TASKTYPE);
     }
@@ -134,66 +150,86 @@ public class ForvaltningBehandlingRestTjenesteTest {
     public void skal_ikke_tvinge_gjenoppta_behandling_når_behandling_er_avsluttet() {
         behandling.avsluttBehandling();
 
-        Response response = forvaltningBehandlingRestTjeneste.tvingGjenopptaBehandling(new BehandlingReferanse(behandling.getId()));
+        Response response = forvaltningBehandlingRestTjeneste.tvingGjenopptaBehandling(
+            new BehandlingReferanse(behandling.getId()));
         assertThat(response.getStatus()).isEqualTo(Response.Status.BAD_REQUEST.getStatusCode());
     }
 
     @Test
     public void skal_ikke_tvinge_gjenoppta_behandling_når_behandling_ikke_er_på_vent() {
-        Response response = forvaltningBehandlingRestTjeneste.tvingGjenopptaBehandling(new BehandlingReferanse(behandling.getId()));
+        Response response = forvaltningBehandlingRestTjeneste.tvingGjenopptaBehandling(
+            new BehandlingReferanse(behandling.getId()));
         assertThat(response.getStatus()).isEqualTo(Response.Status.BAD_REQUEST.getStatusCode());
     }
 
     @Test
     public void skal_ikke_tvinge_gjenoppta_behandling() {
-        behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, LocalDateTime.now().plusDays(3), Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
+        behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(behandling,
+            AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, LocalDateTime.now().plusDays(3),
+            Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
 
-        Response response = forvaltningBehandlingRestTjeneste.tvingGjenopptaBehandling(new BehandlingReferanse(behandling.getId()));
+        Response response = forvaltningBehandlingRestTjeneste.tvingGjenopptaBehandling(
+            new BehandlingReferanse(behandling.getId()));
         assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
         assertProsessTask(GjenopptaBehandlingTask.TASKTYPE);
     }
 
     @Test
     public void skal_ikke_tvinge_koble_grunnlag_når_behandling_er_ikke_på_vent() {
-        Response response = forvaltningBehandlingRestTjeneste.tvingkobleBehandlingTilGrunnlag(new KobleBehandlingTilGrunnlagDto(behandling.getId(), 1l));
+        Response response = forvaltningBehandlingRestTjeneste.tvingkobleBehandlingTilGrunnlag(
+            new KobleBehandlingTilGrunnlagDto(behandling.getId(), 1l));
         assertThat(response.getStatus()).isEqualTo(Response.Status.BAD_REQUEST.getStatusCode());
     }
 
     @Test
     public void skal_ikke_tvinge_koble_grunnlag_når_behandling_er_ikke_på_vent_på_tilbakekrevingsgrunnlag() {
-        behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, LocalDateTime.now().plusDays(3), Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING);
+        behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(behandling,
+            AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, LocalDateTime.now().plusDays(3),
+            Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING);
 
-        Response response = forvaltningBehandlingRestTjeneste.tvingkobleBehandlingTilGrunnlag(new KobleBehandlingTilGrunnlagDto(behandling.getId(), 1l));
+        Response response = forvaltningBehandlingRestTjeneste.tvingkobleBehandlingTilGrunnlag(
+            new KobleBehandlingTilGrunnlagDto(behandling.getId(), 1l));
         assertThat(response.getStatus()).isEqualTo(Response.Status.BAD_REQUEST.getStatusCode());
     }
 
     @Test
     public void skal_ikke_tvinge_koble_grunnlag_når_mottattXml_er_status_melding() {
-        behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, LocalDateTime.now().plusDays(3), Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
-        Long mottattXmlId = mottattXmlRepository.lagreMottattXml("<?xml version=\"1.0\" encoding=\"utf-8\"?><urn:endringKravOgVedtakstatus xmlns:urn=\"urn:no:nav:tilbakekreving:status:v1\"/>");
+        behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(behandling,
+            AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, LocalDateTime.now().plusDays(3),
+            Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
+        Long mottattXmlId = mottattXmlRepository.lagreMottattXml(
+            "<?xml version=\"1.0\" encoding=\"utf-8\"?><urn:endringKravOgVedtakstatus xmlns:urn=\"urn:no:nav:tilbakekreving:status:v1\"/>");
 
-        Response response = forvaltningBehandlingRestTjeneste.tvingkobleBehandlingTilGrunnlag(new KobleBehandlingTilGrunnlagDto(behandling.getId(), mottattXmlId));
+        Response response = forvaltningBehandlingRestTjeneste.tvingkobleBehandlingTilGrunnlag(
+            new KobleBehandlingTilGrunnlagDto(behandling.getId(), mottattXmlId));
         assertThat(response.getStatus()).isEqualTo(Response.Status.BAD_REQUEST.getStatusCode());
     }
 
     @Test
     public void skal_ikke_tvinge_koble_grunnlag_når_mottattXml_er_allerede_koblet() {
-        behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, LocalDateTime.now().plusDays(3), Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
+        behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(behandling,
+            AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, LocalDateTime.now().plusDays(3),
+            Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
         Long mottattXmlId = mottattXmlRepository.lagreMottattXml(getKravgrunnlagXml(true));
         mottattXmlRepository.opprettTilkobling(mottattXmlId);
 
-        Response response = forvaltningBehandlingRestTjeneste.tvingkobleBehandlingTilGrunnlag(new KobleBehandlingTilGrunnlagDto(behandling.getId(), mottattXmlId));
+        Response response = forvaltningBehandlingRestTjeneste.tvingkobleBehandlingTilGrunnlag(
+            new KobleBehandlingTilGrunnlagDto(behandling.getId(), mottattXmlId));
         assertThat(response.getStatus()).isEqualTo(Response.Status.BAD_REQUEST.getStatusCode());
     }
 
     @Test
     public void skal_tvinge_koble_grunnlag_når_mottattXml_er_grunnlag() {
-        behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, LocalDateTime.now().plusDays(3), Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
+        behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(behandling,
+            AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, LocalDateTime.now().plusDays(3),
+            Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
         Long mottattXmlId = mottattXmlRepository.lagreMottattXml(getKravgrunnlagXml(true));
 
-        when(mockTpsAdapterWrapper.hentAktørIdEllerOrganisajonNummer(anyString(), any(GjelderType.class))).thenReturn("123");
+        when(mockTpsAdapterWrapper.hentAktørIdEllerOrganisajonNummer(anyString(), any(GjelderType.class))).thenReturn(
+            "123");
 
-        Response response = forvaltningBehandlingRestTjeneste.tvingkobleBehandlingTilGrunnlag(new KobleBehandlingTilGrunnlagDto(behandling.getId(), mottattXmlId));
+        Response response = forvaltningBehandlingRestTjeneste.tvingkobleBehandlingTilGrunnlag(
+            new KobleBehandlingTilGrunnlagDto(behandling.getId(), mottattXmlId));
         assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
         assertThat(repositoryProvider.getGrunnlagRepository().harGrunnlagForBehandlingId(behandling.getId())).isTrue();
         assertThat(mottattXmlRepository.erMottattXmlTilkoblet(mottattXmlId)).isTrue();
@@ -201,35 +237,41 @@ public class ForvaltningBehandlingRestTjenesteTest {
 
     @Test
     public void skal_ikke_tvinge_koble_grunnlag_når_kravgrunnlaget_er_ugyldig() {
-        behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, LocalDateTime.now().plusDays(3), Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
+        behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(behandling,
+            AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, LocalDateTime.now().plusDays(3),
+            Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
         Long mottattXmlId = mottattXmlRepository.lagreMottattXml(getKravgrunnlagXml(false));
 
-        when(mockTpsAdapterWrapper.hentAktørIdEllerOrganisajonNummer(anyString(), any(GjelderType.class))).thenReturn("123");
+        when(mockTpsAdapterWrapper.hentAktørIdEllerOrganisajonNummer(anyString(), any(GjelderType.class))).thenReturn(
+            "123");
 
-        Response response = forvaltningBehandlingRestTjeneste.tvingkobleBehandlingTilGrunnlag(new KobleBehandlingTilGrunnlagDto(behandling.getId(), mottattXmlId));
+        Response response = forvaltningBehandlingRestTjeneste.tvingkobleBehandlingTilGrunnlag(
+            new KobleBehandlingTilGrunnlagDto(behandling.getId(), mottattXmlId));
         assertThat(response.getStatus()).isEqualTo(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
         assertThat(repositoryProvider.getGrunnlagRepository().harGrunnlagForBehandlingId(behandling.getId())).isFalse();
         assertThat(mottattXmlRepository.erMottattXmlTilkoblet(mottattXmlId)).isFalse();
     }
 
     @Test
-    public void skal_hente_korrigert_kravgrunnlag(){
-        HentKorrigertKravgrunnlagDto hentKorrigertKravgrunnlagDto = new HentKorrigertKravgrunnlagDto(behandling.getId(),"");
+    public void skal_hente_korrigert_kravgrunnlag() {
+        HentKorrigertKravgrunnlagDto hentKorrigertKravgrunnlagDto = new HentKorrigertKravgrunnlagDto(behandling.getId(),
+            "");
         Response respons = forvaltningBehandlingRestTjeneste.hentKorrigertKravgrunnlag(hentKorrigertKravgrunnlagDto);
         assertThat(respons.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
         assertProsessTask(HentKorrigertKravgrunnlagTask.TASKTYPE);
     }
 
     @Test
-    public void skal_ikke_hente_korrigert_kravgrunnlag_når_behandling_er_avsluttet(){
+    public void skal_ikke_hente_korrigert_kravgrunnlag_når_behandling_er_avsluttet() {
         behandling.avsluttBehandling();
-        HentKorrigertKravgrunnlagDto hentKorrigertKravgrunnlagDto = new HentKorrigertKravgrunnlagDto(behandling.getId(),"");
+        HentKorrigertKravgrunnlagDto hentKorrigertKravgrunnlagDto = new HentKorrigertKravgrunnlagDto(behandling.getId(),
+            "");
         Response respons = forvaltningBehandlingRestTjeneste.hentKorrigertKravgrunnlag(hentKorrigertKravgrunnlagDto);
         assertThat(respons.getStatus()).isEqualTo(Response.Status.BAD_REQUEST.getStatusCode());
     }
 
     @Test
-    public void skal_opprette_prosess_tasken_når_henvisning_korrigeres(){
+    public void skal_opprette_prosess_tasken_når_henvisning_korrigeres() {
         UUID eksternUuid = UUID.randomUUID();
         KorrigertHenvisningDto korrigertHenvisningDto = new KorrigertHenvisningDto(behandling.getId(), eksternUuid);
 
@@ -241,9 +283,11 @@ public class ForvaltningBehandlingRestTjenesteTest {
     }
 
     @Test
-    public void skal_flytte_behandling_til_fakta_steg_når_behandling_er_i_iverksettelse_steg(){
-        when(mockBehandlingModellRepository.getBehandlingStegKonfigurasjon()).thenReturn(BehandlingStegKonfigurasjon.lagDummy());
-        when(mockBehandlingModellRepository.getModell(any(BehandlingType.class))).thenReturn(lagDummyBehandlingsModell());
+    public void skal_flytte_behandling_til_fakta_steg_når_behandling_er_i_iverksettelse_steg() {
+        when(mockBehandlingModellRepository.getBehandlingStegKonfigurasjon()).thenReturn(
+            BehandlingStegKonfigurasjon.lagDummy());
+        when(mockBehandlingModellRepository.getModell(any(BehandlingType.class))).thenReturn(
+            lagDummyBehandlingsModell());
         manipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.IVERKSETT_VEDTAK);
 
         forvaltningBehandlingRestTjeneste.tilbakeførBehandlingTilFaktaSteg(new BehandlingReferanse(behandling.getId()));
@@ -254,26 +298,31 @@ public class ForvaltningBehandlingRestTjenesteTest {
         assertEquals(HistorikkinnslagType.BEH_STARTET_FORFRA, historikkinnslag.getType());
         assertEquals(HistorikkAktør.VEDTAKSLØSNINGEN, historikkinnslag.getAktør());
         assertThat(historikkinnslag.getHistorikkinnslagDeler()).isNotEmpty().hasSize(1);
-        boolean begrunnelseFinnes = historikkinnslag.getHistorikkinnslagDeler().stream()
-            .anyMatch(historikkinnslagDel -> historikkinnslagDel.getBegrunnelse().isPresent() &&
-                KravgrunnlagTjeneste.BEGRUNNELSE_BEHANDLING_STARTET_FORFRA.equals(historikkinnslagDel.getBegrunnelse().get()));
+        boolean begrunnelseFinnes = historikkinnslag.getHistorikkinnslagDeler()
+            .stream()
+            .anyMatch(historikkinnslagDel -> historikkinnslagDel.getBegrunnelse().isPresent()
+                && KravgrunnlagTjeneste.BEGRUNNELSE_BEHANDLING_STARTET_FORFRA.equals(
+                historikkinnslagDel.getBegrunnelse().get()));
         assertTrue(begrunnelseFinnes);
     }
 
     @Test
-    public void skal_ikke_flytte_behandling_til_fakta_steg_når_behandling_allerede_er_avsluttet(){
+    public void skal_ikke_flytte_behandling_til_fakta_steg_når_behandling_allerede_er_avsluttet() {
         behandling.avsluttBehandling();
 
-        Response response = forvaltningBehandlingRestTjeneste.tilbakeførBehandlingTilFaktaSteg(new BehandlingReferanse(behandling.getId()));
+        Response response = forvaltningBehandlingRestTjeneste.tilbakeførBehandlingTilFaktaSteg(
+            new BehandlingReferanse(behandling.getId()));
         assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
 
     @Test
-    public void skal_ikke_flytte_behandling_til_fakta_steg_når_behandling_er_på_vent(){
-        behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING,
-            LocalDateTime.now().plusDays(3), Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING);
+    public void skal_ikke_flytte_behandling_til_fakta_steg_når_behandling_er_på_vent() {
+        behandlingskontrollTjeneste.settBehandlingPåVentUtenSteg(behandling,
+            AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, LocalDateTime.now().plusDays(3),
+            Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING);
 
-        Response response = forvaltningBehandlingRestTjeneste.tilbakeførBehandlingTilFaktaSteg(new BehandlingReferanse(behandling.getId()));
+        Response response = forvaltningBehandlingRestTjeneste.tilbakeførBehandlingTilFaktaSteg(
+            new BehandlingReferanse(behandling.getId()));
         assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
 
@@ -288,59 +337,49 @@ public class ForvaltningBehandlingRestTjenesteTest {
     }
 
     private String getKravgrunnlagXml(boolean gyldig) {
-        return "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
-            "<urn:detaljertKravgrunnlagMelding xmlns:urn=\"urn:no:nav:tilbakekreving:kravgrunnlag:detalj:v1\"\n" +
-            "                                  xmlns:mmel=\"urn:no:nav:tilbakekreving:typer:v1\">\n" +
-            "    <urn:detaljertKravgrunnlag>\n" +
-            "        <urn:kravgrunnlagId>123456789</urn:kravgrunnlagId>\n" +
-            "        <urn:vedtakId>100</urn:vedtakId>\n" +
-            "        <urn:kodeStatusKrav>NY</urn:kodeStatusKrav>\n" +
-            "        <urn:kodeFagomraade>FP</urn:kodeFagomraade>\n" +
-            "        <urn:fagsystemId>100001</urn:fagsystemId>\n" +
-            "        <!--Optional:-->\n" +
-            "        <urn:datoVedtakFagsystem>2007-10-26</urn:datoVedtakFagsystem>\n" +
-            "        <urn:vedtakGjelderId>12345678901</urn:vedtakGjelderId>\n" +
-            "        <urn:typeGjelderId>PERSON</urn:typeGjelderId>\n" +
-            "        <urn:utbetalesTilId>12345678901</urn:utbetalesTilId>\n" +
-            "        <urn:typeUtbetId>PERSON</urn:typeUtbetId>\n" +
-            "        <urn:enhetAnsvarlig>8020</urn:enhetAnsvarlig>\n" +
-            "        <urn:enhetBosted>8020</urn:enhetBosted>\n" +
-            "        <urn:enhetBehandl>8020</urn:enhetBehandl>\n" +
-            "        <urn:kontrollfelt>kontrolll-123</urn:kontrollfelt>\n" +
-            "        <urn:saksbehId>Z111111</urn:saksbehId>\n" +
-            "        <!--Optional:-->\n" +
-            "        <urn:referanse>100000001</urn:referanse>\n" +
-            "        <!--1 or more repetitions:-->\n" +
-            "        <urn:tilbakekrevingsPeriode>\n" +
-            "            <urn:periode>\n" +
-            "                <mmel:fom>2018-11-01+01:00</mmel:fom>\n" +
-            "                <mmel:tom>2018-11-22+02:00</mmel:tom>\n" +
-            "            </urn:periode>\n" +
-            "            <urn:belopSkattMnd>0.00</urn:belopSkattMnd>\n" +
-            "            <!--1 or more repetitions:-->\n" +
-            "            <urn:tilbakekrevingsBelop>\n" +
-            "                <urn:kodeKlasse>FPATORD</urn:kodeKlasse>\n" +
-            "                <urn:typeKlasse>YTEL</urn:typeKlasse>\n" +
-            "                <urn:belopOpprUtbet>9000.00</urn:belopOpprUtbet>\n" +
-            "                <urn:belopNy>0.00</urn:belopNy>\n" +
-            "                <urn:belopTilbakekreves>9000.00</urn:belopTilbakekreves>\n" +
-            String.format("  <urn:skattProsent>%d.0000</urn:skattProsent>\n", gyldig ? 0 : 100) +
-            "            </urn:tilbakekrevingsBelop>\n" +
-            "            <urn:tilbakekrevingsBelop>\n" +
-            "                <urn:kodeKlasse>KL_KODE_FEIL_KORTTID</urn:kodeKlasse>\n" +
-            "                <urn:typeKlasse>FEIL</urn:typeKlasse>\n" +
-            "                <urn:belopOpprUtbet>0.00</urn:belopOpprUtbet>\n" +
-            "                <urn:belopNy>9000.00</urn:belopNy>\n" +
-            "                <urn:belopTilbakekreves>0.00</urn:belopTilbakekreves>\n" +
-            "                <urn:skattProsent>0.0000</urn:skattProsent>\n" +
-            "            </urn:tilbakekrevingsBelop>\n" +
-            "        </urn:tilbakekrevingsPeriode>\n" +
-            "    </urn:detaljertKravgrunnlag>\n" +
-            "</urn:detaljertKravgrunnlagMelding>\n";
+        return "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+            + "<urn:detaljertKravgrunnlagMelding xmlns:urn=\"urn:no:nav:tilbakekreving:kravgrunnlag:detalj:v1\"\n"
+            + "                                  xmlns:mmel=\"urn:no:nav:tilbakekreving:typer:v1\">\n"
+            + "    <urn:detaljertKravgrunnlag>\n" + "        <urn:kravgrunnlagId>123456789</urn:kravgrunnlagId>\n"
+            + "        <urn:vedtakId>100</urn:vedtakId>\n" + "        <urn:kodeStatusKrav>NY</urn:kodeStatusKrav>\n"
+            + "        <urn:kodeFagomraade>FP</urn:kodeFagomraade>\n"
+            + "        <urn:fagsystemId>100001</urn:fagsystemId>\n" + "        <!--Optional:-->\n"
+            + "        <urn:datoVedtakFagsystem>2007-10-26</urn:datoVedtakFagsystem>\n"
+            + "        <urn:vedtakGjelderId>12345678901</urn:vedtakGjelderId>\n"
+            + "        <urn:typeGjelderId>PERSON</urn:typeGjelderId>\n"
+            + "        <urn:utbetalesTilId>12345678901</urn:utbetalesTilId>\n"
+            + "        <urn:typeUtbetId>PERSON</urn:typeUtbetId>\n"
+            + "        <urn:enhetAnsvarlig>8020</urn:enhetAnsvarlig>\n"
+            + "        <urn:enhetBosted>8020</urn:enhetBosted>\n"
+            + "        <urn:enhetBehandl>8020</urn:enhetBehandl>\n"
+            + "        <urn:kontrollfelt>kontrolll-123</urn:kontrollfelt>\n"
+            + "        <urn:saksbehId>Z111111</urn:saksbehId>\n" + "        <!--Optional:-->\n"
+            + "        <urn:referanse>100000001</urn:referanse>\n" + "        <!--1 or more repetitions:-->\n"
+            + "        <urn:tilbakekrevingsPeriode>\n" + "            <urn:periode>\n"
+            + "                <mmel:fom>2018-11-01+01:00</mmel:fom>\n"
+            + "                <mmel:tom>2018-11-22+02:00</mmel:tom>\n" + "            </urn:periode>\n"
+            + "            <urn:belopSkattMnd>0.00</urn:belopSkattMnd>\n"
+            + "            <!--1 or more repetitions:-->\n" + "            <urn:tilbakekrevingsBelop>\n"
+            + "                <urn:kodeKlasse>FPATORD</urn:kodeKlasse>\n"
+            + "                <urn:typeKlasse>YTEL</urn:typeKlasse>\n"
+            + "                <urn:belopOpprUtbet>9000.00</urn:belopOpprUtbet>\n"
+            + "                <urn:belopNy>0.00</urn:belopNy>\n"
+            + "                <urn:belopTilbakekreves>9000.00</urn:belopTilbakekreves>\n" + String.format(
+            "  <urn:skattProsent>%d.0000</urn:skattProsent>\n", gyldig ? 0 : 100)
+            + "            </urn:tilbakekrevingsBelop>\n" + "            <urn:tilbakekrevingsBelop>\n"
+            + "                <urn:kodeKlasse>KL_KODE_FEIL_KORTTID</urn:kodeKlasse>\n"
+            + "                <urn:typeKlasse>FEIL</urn:typeKlasse>\n"
+            + "                <urn:belopOpprUtbet>0.00</urn:belopOpprUtbet>\n"
+            + "                <urn:belopNy>9000.00</urn:belopNy>\n"
+            + "                <urn:belopTilbakekreves>0.00</urn:belopTilbakekreves>\n"
+            + "                <urn:skattProsent>0.0000</urn:skattProsent>\n"
+            + "            </urn:tilbakekrevingsBelop>\n" + "        </urn:tilbakekrevingsPeriode>\n"
+            + "    </urn:detaljertKravgrunnlag>\n" + "</urn:detaljertKravgrunnlagMelding>\n";
     }
 
     private ProsessTaskData assertProsessTask(String tasktype) {
-        List<ProsessTaskData> prosessTasker = prosessTaskRepository.finnAlle(ProsessTaskStatus.FERDIG, ProsessTaskStatus.KLAR);
+        List<ProsessTaskData> prosessTasker = prosessTaskRepository.finnAlle(ProsessTaskStatus.FERDIG,
+            ProsessTaskStatus.KLAR);
         assertThat(prosessTasker).isNotEmpty();
         assertThat(prosessTasker.size()).isEqualTo(1);
         ProsessTaskData prosessTaskData = prosessTasker.get(0);
@@ -351,8 +390,10 @@ public class ForvaltningBehandlingRestTjenesteTest {
     private BehandlingModell lagDummyBehandlingsModell() {
         List<TestStegKonfig> steg = Lists.newArrayList(
             new TestStegKonfig(BehandlingStegType.TBKGSTEG, BehandlingType.TILBAKEKREVING, new MottattGrunnlagSteg()),
-            new TestStegKonfig(BehandlingStegType.FAKTA_FEILUTBETALING, BehandlingType.TILBAKEKREVING, new FaktaFeilutbetalingSteg(behandlingRepository,null)),
-            new TestStegKonfig(BehandlingStegType.IVERKSETT_VEDTAK, BehandlingType.TILBAKEKREVING, new IverksetteVedtakSteg(repositoryProvider, null)));
+            new TestStegKonfig(BehandlingStegType.FAKTA_FEILUTBETALING, BehandlingType.TILBAKEKREVING,
+                new FaktaFeilutbetalingSteg(behandlingRepository, null)),
+            new TestStegKonfig(BehandlingStegType.IVERKSETT_VEDTAK, BehandlingType.TILBAKEKREVING,
+                new IverksetteVedtakSteg(repositoryProvider, null)));
 
         BehandlingModellImpl.TriFunction<BehandlingStegType, BehandlingType, BehandlingSteg> finnSteg = map(steg);
         BehandlingModellImpl modell = new BehandlingModellImpl(BehandlingType.TILBAKEKREVING, finnSteg);
@@ -367,7 +408,8 @@ public class ForvaltningBehandlingRestTjenesteTest {
             List<?> key = Arrays.asList(konfig.getBehandlingStegType(), konfig.getBehandlingType());
             resolver.put(key, konfig.getSteg());
         }
-        BehandlingModellImpl.TriFunction<BehandlingStegType, BehandlingType, BehandlingSteg> func = (t, u) -> resolver.get(Arrays.asList(t, u));
+        BehandlingModellImpl.TriFunction<BehandlingStegType, BehandlingType, BehandlingSteg> func = (t, u) -> resolver.get(
+            Arrays.asList(t, u));
         return func;
     }
 

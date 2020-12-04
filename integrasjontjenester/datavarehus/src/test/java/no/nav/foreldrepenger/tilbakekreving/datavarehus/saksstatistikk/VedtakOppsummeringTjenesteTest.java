@@ -7,11 +7,12 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
+import javax.persistence.EntityManager;
 import javax.persistence.FlushModeType;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagBeregningTjeneste;
@@ -45,7 +46,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Vi
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelse;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelsePeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseRepository;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
@@ -62,37 +63,47 @@ import no.nav.foreldrepenger.tilbakekreving.kontrakter.vedtak.UtvidetVilkårResu
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.vedtak.VedtakOppsummering;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.vedtak.VedtakPeriode;
 
+@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public class VedtakOppsummeringTjenesteTest {
 
     private static final String ANSVARLIG_SAKSBEHANDLER = "Z13456";
     private static final String ANSVARLIG_BESLUTTER = "Z12456";
-    @Rule
-    public UnittestRepositoryRule repositoryRule = new UnittestRepositoryRule();
-    private BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(repositoryRule.getEntityManager());
-    private EksternBehandlingRepository eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
-    private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository = repositoryProvider.getFaktaFeilutbetalingRepository();
-    private VurdertForeldelseRepository foreldelseRepository = repositoryProvider.getVurdertForeldelseRepository();
-    private VilkårsvurderingRepository vilkårsvurderingRepository = repositoryProvider.getVilkårsvurderingRepository();
-    private BehandlingVedtakRepository behandlingVedtakRepository = repositoryProvider.getBehandlingVedtakRepository();
-    private KravgrunnlagRepository kravgrunnlagRepository = repositoryProvider.getGrunnlagRepository();
 
-    private KravgrunnlagBeregningTjeneste kravgrunnlagBeregningTjeneste = new KravgrunnlagBeregningTjeneste(kravgrunnlagRepository);
-    private TilbakekrevingBeregningTjeneste tilbakekrevingBeregningTjeneste = new TilbakekrevingBeregningTjeneste(repositoryProvider, kravgrunnlagBeregningTjeneste);
-    private VedtakOppsummeringTjeneste vedtakOppsummeringTjeneste = new VedtakOppsummeringTjeneste(repositoryProvider, tilbakekrevingBeregningTjeneste);
+    private BehandlingRepositoryProvider repositoryProvider;
+    private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository;
+    private VurdertForeldelseRepository foreldelseRepository;
+    private VilkårsvurderingRepository vilkårsvurderingRepository;
+    private BehandlingVedtakRepository behandlingVedtakRepository;
+    private KravgrunnlagRepository kravgrunnlagRepository;
+
+    private VedtakOppsummeringTjeneste vedtakOppsummeringTjeneste;
 
     private long behandlingId;
     private Behandling behandling;
-    private Periode periode = Periode.of(LocalDate.of(2020, 1, 1), LocalDate.of(2020, 1, 31));
+    private final Periode periode = Periode.of(LocalDate.of(2020, 1, 1), LocalDate.of(2020, 1, 31));
     private Saksnummer saksnummer;
 
-    @Before
-    public void setup() {
-        repositoryRule.getEntityManager().setFlushMode(FlushModeType.AUTO);
+    @BeforeEach
+    public void setup(EntityManager entityManager) {
+        repositoryProvider = new BehandlingRepositoryProvider(entityManager);
+        EksternBehandlingRepository eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
+        faktaFeilutbetalingRepository = repositoryProvider.getFaktaFeilutbetalingRepository();
+        foreldelseRepository = repositoryProvider.getVurdertForeldelseRepository();
+        vilkårsvurderingRepository = repositoryProvider.getVilkårsvurderingRepository();
+        behandlingVedtakRepository = repositoryProvider.getBehandlingVedtakRepository();
+        kravgrunnlagRepository = repositoryProvider.getGrunnlagRepository();
+        KravgrunnlagBeregningTjeneste kravgrunnlagBeregningTjeneste = new KravgrunnlagBeregningTjeneste(
+            kravgrunnlagRepository);
+        TilbakekrevingBeregningTjeneste tilbakekrevingBeregningTjeneste = new TilbakekrevingBeregningTjeneste(
+            repositoryProvider, kravgrunnlagBeregningTjeneste);
+        vedtakOppsummeringTjeneste = new VedtakOppsummeringTjeneste(repositoryProvider, tilbakekrevingBeregningTjeneste);
+
+        entityManager.setFlushMode(FlushModeType.AUTO);
         behandling = ScenarioSimple.simple().lagre(repositoryProvider);
         behandling.setAnsvarligSaksbehandler(ANSVARLIG_SAKSBEHANDLER);
         behandling.setAnsvarligBeslutter(ANSVARLIG_BESLUTTER);
         behandling.setBehandlendeEnhetId("8020");
-        repositoryRule.getEntityManager().persist(behandling);
+        entityManager.persist(behandling);
 
         behandlingId = behandling.getId();
         saksnummer = behandling.getFagsak().getSaksnummer();

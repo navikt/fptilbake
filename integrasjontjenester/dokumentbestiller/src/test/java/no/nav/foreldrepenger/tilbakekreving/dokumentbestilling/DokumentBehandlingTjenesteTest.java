@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 
 import java.math.BigDecimal;
@@ -8,9 +9,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporing;
@@ -37,9 +37,7 @@ import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagT
 import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.task.SendBeskjedUtsendtVarselTilSelvbetjeningTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepositoryImpl;
-import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
-@RunWith(CdiRunner.class)
 public class DokumentBehandlingTjenesteTest extends DokumentBestillerTestOppsett {
 
     private ProsessTaskRepository prosessTaskRepository;
@@ -49,9 +47,9 @@ public class DokumentBehandlingTjenesteTest extends DokumentBestillerTestOppsett
 
     private DokumentBehandlingTjeneste dokumentBehandlingTjeneste;
 
-    @Before
+    @BeforeEach
     public void setup() {
-        prosessTaskRepository = new ProsessTaskRepositoryImpl(repositoryRule.getEntityManager(), null, null);
+        prosessTaskRepository = new ProsessTaskRepositoryImpl(entityManager, null, null);
         HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepository, null);
         dokumentBehandlingTjeneste = new DokumentBehandlingTjeneste(repositoryProvider, prosessTaskRepository, historikkinnslagTjeneste,
             mockManueltVarselBrevTjeneste, mockInnhentDokumentasjonbrevTjeneste);
@@ -117,8 +115,8 @@ public class DokumentBehandlingTjenesteTest extends DokumentBestillerTestOppsett
 
     @Test
     public void skal_ikke_kunne_bestille_varselbrev_når_grunnlag_ikke_finnes() {
-        expectedException.expectMessage("FPT-612900");
-        dokumentBehandlingTjeneste.bestillBrev(behandling.getId(), DokumentMalType.VARSEL_DOK, "Bestilt varselbrev");
+        assertThatThrownBy(() -> dokumentBehandlingTjeneste.bestillBrev(behandling.getId(), DokumentMalType.VARSEL_DOK, "Bestilt varselbrev"))
+            .hasMessageContaining("FPT-612900");
     }
 
     @Test
@@ -137,8 +135,8 @@ public class DokumentBehandlingTjenesteTest extends DokumentBestillerTestOppsett
 
     @Test
     public void skal_ikke_kunne_bestille_innhent_dokumentasjonbrev_når_grunnlag_ikke_finnes() {
-        expectedException.expectMessage("FPT-612901");
-        dokumentBehandlingTjeneste.bestillBrev(behandling.getId(), DokumentMalType.INNHENT_DOK, "Bestilt innhent dokumentasjon");
+        assertThatThrownBy(() -> dokumentBehandlingTjeneste.bestillBrev(behandling.getId(), DokumentMalType.INNHENT_DOK, "Bestilt innhent dokumentasjon"))
+            .hasMessageContaining("FPT-612901");
     }
 
     private Long opprettOgLagreKravgrunnlagPåBehandling() {
@@ -193,7 +191,7 @@ public class DokumentBehandlingTjenesteTest extends DokumentBestillerTestOppsett
             .medBrevType(BrevType.VARSEL_BREV)
             .build();
         brevSporingRepository.lagre(brevSporing);
-        repositoryRule.getEntityManager().flush();
+        entityManager.flush();
     }
 
 }

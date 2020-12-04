@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
@@ -14,8 +15,8 @@ import java.util.UUID;
 
 import javax.persistence.FlushModeType;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.Lists;
 
@@ -53,13 +54,14 @@ import no.nav.vedtak.exception.TekniskException;
 public class BehandlingTjenesteTest extends FellesTestOppsett {
 
     private static final LocalDate NOW = LocalDate.now();
-    private VergeRepository vergeRepository = repoProvider.getVergeRepository();
+    private VergeRepository vergeRepository;
 
-    @Before
+    @BeforeEach
     public void setup() {
-        repoRule.getEntityManager().setFlushMode(FlushModeType.AUTO);
+        entityManager.setFlushMode(FlushModeType.AUTO);
         when(mockFagsystemKlient.hentTilbakekrevingValg(eksternBehandlingUuid)).thenReturn(Optional.of(new TilbakekrevingValgDto(VidereBehandling.TILBAKEKREV_I_INFOTRYGD)));
         when(mockFagsystemKlient.hentBehandlingOptional(eksternBehandlingUuid)).thenReturn(Optional.of(lagEksternBehandlingsInfo()));
+        vergeRepository = repoProvider.getVergeRepository();
     }
 
     @Test
@@ -72,8 +74,10 @@ public class BehandlingTjenesteTest extends FellesTestOppsett {
 
     @Test
     public void skal_opprette_behandling_automatisk_med_allerede_åpen_behandling() {
-        expectedException.expectMessage("FPT-663486");
-        behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer, eksternBehandlingUuid, henvisning, aktørId, FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING);
+        assertThatThrownBy(() -> behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer,
+            eksternBehandlingUuid, henvisning, aktørId, FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING))
+            .hasMessageContaining("FPT-663486");
+
     }
 
     @Test
@@ -86,8 +90,9 @@ public class BehandlingTjenesteTest extends FellesTestOppsett {
 
     @Test
     public void skal_opprette_behandling_manuell_med_allerede_åpen_behandling() {
-        expectedException.expectMessage("FPT-663486");
-        behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternBehandlingUuid, FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING);
+        assertThatThrownBy(() -> behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternBehandlingUuid,
+            FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING))
+            .hasMessageContaining("FPT-663486");
     }
 
     @Test
@@ -104,9 +109,9 @@ public class BehandlingTjenesteTest extends FellesTestOppsett {
     @Test
     public void skal_opprette_behandling_manuell_med_allerede_avsluttet_behandling_med_samme_fpsak_revurdering() {
         avsluttBehandling();
-        expectedException.expectMessage("FPT-663488");
-
-        behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternBehandlingUuid, FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING);
+        assertThatThrownBy(() -> behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternBehandlingUuid,
+            FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING))
+            .hasMessageContaining("FPT-663488");
     }
 
     @Test
@@ -227,7 +232,7 @@ public class BehandlingTjenesteTest extends FellesTestOppsett {
     @Test
     public void skal_oppdatere_behandling_medEksternReferanse() {
         UUID eksternUuid = testUtility.genererEksternUuid();
-        long eksternBehandlingId = 5l;
+        long eksternBehandlingId = 5L;
         Henvisning nyHenvisning = Henvisning.fraEksternBehandlingId(eksternBehandlingId);
         behandlingTjeneste.oppdaterBehandlingMedEksternReferanse(saksnummer, nyHenvisning, eksternUuid);
 
@@ -239,9 +244,9 @@ public class BehandlingTjenesteTest extends FellesTestOppsett {
     @Test
     public void skal_oppdatere_behandling_medEksternReferanse_med_ugyldig_saksnummer() {
         UUID eksternUuid = testUtility.genererEksternUuid();
-        expectedException.expectMessage("FPT-663490");
-
-        behandlingTjeneste.oppdaterBehandlingMedEksternReferanse(new Saksnummer("1233434"), Henvisning.fraEksternBehandlingId(5l), eksternUuid);
+        assertThatThrownBy(() -> behandlingTjeneste.oppdaterBehandlingMedEksternReferanse(new Saksnummer("1233434"),
+            Henvisning.fraEksternBehandlingId(5L), eksternUuid))
+            .hasMessageContaining("FPT-663490");
     }
 
     private void avsluttBehandling() {

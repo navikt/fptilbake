@@ -7,8 +7,8 @@ import static org.mockito.Mockito.verify;
 
 import java.util.UUID;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
@@ -29,7 +29,7 @@ public class OpprettBehandlingTaskTest {
     BehandlingTjeneste mockBehandlingTjeneste = mock(BehandlingTjeneste.class);
     OpprettBehandlingTask opprettBehandlingTask;
 
-    @Before
+    @BeforeEach
     public void setup() {
         opprettBehandlingTask = new OpprettBehandlingTask(mockBehandlingTjeneste);
     }

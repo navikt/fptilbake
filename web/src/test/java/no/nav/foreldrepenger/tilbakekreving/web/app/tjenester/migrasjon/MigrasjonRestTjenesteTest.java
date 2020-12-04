@@ -10,20 +10,20 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
 
+import javax.persistence.EntityManager;
 import javax.persistence.FlushModeType;
 import javax.ws.rs.core.Response;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingresultatRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.DvhEventHendelse;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
@@ -32,27 +32,27 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
 import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepositoryImpl;
 
+@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public class MigrasjonRestTjenesteTest {
 
-    @Rule
-    public UnittestRepositoryRule repositoryRule = new UnittestRepositoryRule();
-
-    private ØkonomiMottattXmlRepository økonomiMottattXmlRepository = new ØkonomiMottattXmlRepository(repositoryRule.getEntityManager());
-    private BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(repositoryRule.getEntityManager());
-    private EksternBehandlingRepository eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
-    private BehandlingresultatRepository behandlingresultatRepository = repositoryProvider.getBehandlingresultatRepository();
-    private ProsessTaskRepository taskRepository = new ProsessTaskRepositoryImpl(repositoryRule.getEntityManager(), null, null);
-    private MigrasjonRestTjeneste migrasjonRestTjeneste = new MigrasjonRestTjeneste(økonomiMottattXmlRepository, repositoryProvider, taskRepository);
+    private ØkonomiMottattXmlRepository økonomiMottattXmlRepository;
+    private ProsessTaskRepository taskRepository;
+    private MigrasjonRestTjeneste migrasjonRestTjeneste;
 
     private Behandling behandling;
 
-    @Before
-    public void setup() {
-        repositoryRule.getEntityManager().setFlushMode(FlushModeType.AUTO);
+    @BeforeEach
+    public void setup(EntityManager entityManager) {
+        entityManager.setFlushMode(FlushModeType.AUTO);
         ScenarioSimple scenarioSimple = ScenarioSimple.simple();
+        BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(entityManager);
         behandling = scenarioSimple.lagre(repositoryProvider);
         EksternBehandling eksternBehandling = new EksternBehandling(behandling, Henvisning.fraEksternBehandlingId(1l), UUID.randomUUID());
+        EksternBehandlingRepository eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
         eksternBehandlingRepository.lagre(eksternBehandling);
+        økonomiMottattXmlRepository = new ØkonomiMottattXmlRepository(entityManager);
+        taskRepository = new ProsessTaskRepositoryImpl(entityManager, null, null);
+        migrasjonRestTjeneste = new MigrasjonRestTjeneste(økonomiMottattXmlRepository, repositoryProvider, taskRepository);
     }
 
     @Test

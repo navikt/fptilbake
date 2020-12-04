@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.web.server.jetty;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -8,9 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakStatus;
@@ -26,11 +25,11 @@ import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.fp.FPPdpReques
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.fp.FpAbacAttributter;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.fp.FpsakPipKlient;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.fp.PipDto;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.sikkerhet.abac.AbacAttributtSamling;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt;
-import no.nav.vedtak.sikkerhet.abac.BeskyttetRessursResourceAttributt;
 import no.nav.vedtak.sikkerhet.abac.PdpRequest;
 import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
 
@@ -47,13 +46,10 @@ public class FPPdpRequestBuilderTest {
     private static final String BEHANDLING_STATUS = "UTRED";
     private static final String SAKSBEHANDLER = "Z12345";
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+    private final PipRepository pipRepository = mock(PipRepository.class);
+    private final FpsakPipKlient fpsakPipKlient = mock(FpsakPipKlient.class);
 
-    private PipRepository pipRepository = mock(PipRepository.class);
-    private FpsakPipKlient fpsakPipKlient = mock(FpsakPipKlient.class);
-
-    private FPPdpRequestBuilder requestBuilder = new FPPdpRequestBuilder(pipRepository, fpsakPipKlient);
+    private final FPPdpRequestBuilder requestBuilder = new FPPdpRequestBuilder(pipRepository, fpsakPipKlient);
 
     @Test
     public void skal_hente_behandling_og_fagsak_informasjon_når_input_er_behandling_id() {
@@ -138,66 +134,56 @@ public class FPPdpRequestBuilderTest {
 
     @Test
     public void skal_kaste_feil_ved_flere_behandlingIder() {
-        expectedException.expect(TekniskException.class);
-        expectedException.expectMessage("FPT-426124");
-
         AbacAttributtSamling attributter = byggAbacAttributtsamling().leggTil(
             AbacDataAttributter.opprett()
                 .leggTil(StandardAbacAttributtType.BEHANDLING_ID, BEHANDLING_ID)
                 .leggTil(StandardAbacAttributtType.BEHANDLING_ID, 85392L));
 
-        requestBuilder.lagPdpRequest(attributter);
+        assertThatThrownBy(() -> requestBuilder.lagPdpRequest(attributter))
+            .isInstanceOf(TekniskException.class)
+            .hasMessageContaining("FPT-426124");
     }
 
     @Test
     public void skal_kaste_feil_ved_både_behandlingId_og_fpsak_behandlingUuid() {
-        expectedException.expect(TekniskException.class);
-        expectedException.expectMessage("FPT-317633");
-        expectedException.expectMessage(BEHANDLING_ID.toString());
-        expectedException.expectMessage(FPSAK_BEHANDLING_UUID.toString());
-
         AbacAttributtSamling attributter = byggAbacAttributtsamling().leggTil(
             AbacDataAttributter.opprett()
                 .leggTil(StandardAbacAttributtType.BEHANDLING_ID, BEHANDLING_ID)
                 .leggTil(TilbakekrevingAbacAttributtType.YTELSEBEHANDLING_UUID, FPSAK_BEHANDLING_UUID));
 
-        requestBuilder.lagPdpRequest(attributter);
+        assertThatThrownBy(() -> requestBuilder.lagPdpRequest(attributter))
+            .isInstanceOf(TekniskException.class)
+            .hasMessageContainingAll("FPT-317633", BEHANDLING_ID.toString(), FPSAK_BEHANDLING_UUID.toString());
     }
 
     @Test
     public void skal_kaste_feil_ved_både_behandlingId_og_behandlingUuid() {
-        expectedException.expect(TekniskException.class);
-        expectedException.expectMessage("FPT-317633");
-        expectedException.expectMessage(BEHANDLING_ID.toString());
-        expectedException.expectMessage(BEHANDLING_UUID.toString());
-
         AbacAttributtSamling attributter = byggAbacAttributtsamling().leggTil(
             AbacDataAttributter.opprett()
                 .leggTil(StandardAbacAttributtType.BEHANDLING_ID, BEHANDLING_ID)
                 .leggTil(StandardAbacAttributtType.BEHANDLING_UUID, BEHANDLING_UUID));
 
-        requestBuilder.lagPdpRequest(attributter);
+        assertThatThrownBy(() -> requestBuilder.lagPdpRequest(attributter))
+            .isInstanceOf(TekniskException.class)
+            .hasMessageContainingAll("FPT-317633", BEHANDLING_ID.toString(), BEHANDLING_UUID.toString());
     }
 
     @Test
     public void skal_kaste_feil_ved_både_behandlingUuid_og_fpsak_behandlingUuid() {
-        expectedException.expect(TekniskException.class);
-        expectedException.expectMessage("FPT-317634");
-        expectedException.expectMessage(BEHANDLING_UUID.toString());
-        expectedException.expectMessage(FPSAK_BEHANDLING_UUID.toString());
-
         AbacAttributtSamling attributter = byggAbacAttributtsamling().leggTil(
             AbacDataAttributter.opprett()
                 .leggTil(StandardAbacAttributtType.BEHANDLING_UUID, BEHANDLING_UUID)
                 .leggTil(TilbakekrevingAbacAttributtType.YTELSEBEHANDLING_UUID, FPSAK_BEHANDLING_UUID));
 
-        requestBuilder.lagPdpRequest(attributter);
+        assertThatThrownBy(() -> requestBuilder.lagPdpRequest(attributter))
+            .isInstanceOf(TekniskException.class)
+            .hasMessageContainingAll("FPT-317634", BEHANDLING_UUID.toString(), FPSAK_BEHANDLING_UUID.toString());
     }
 
     private AbacAttributtSamling byggAbacAttributtsamling() {
         AbacAttributtSamling attributtSamling = AbacAttributtSamling.medJwtToken(DUMMY_ID_TOKEN);
         attributtSamling.setActionType(BeskyttetRessursActionAttributt.READ);
-        attributtSamling.setResource(BeskyttetRessursResourceAttributt.FAGSAK.getEksternKode());
+        attributtSamling.setResource(AbacProperty.FAGSAK);
         return attributtSamling;
     }
 

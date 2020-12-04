@@ -7,12 +7,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.jose4j.base64url.Base64;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import com.jcraft.jsch.JSchException;
 
-@Ignore("Må starte docker-kontaineren sftp-test manuelt. Testen brukt under utvikling og til eksempel ved seinere implementering av sftp-tjenester")
+@Disabled("Må starte docker-kontaineren sftp-test manuelt. Testen brukt under utvikling og til eksempel ved seinere implementering av sftp-tjenester")
 public class AvstemmingSftpBatchTjenesteTest {
 
     private static final String HOST = "localhost";
@@ -66,7 +66,7 @@ public class AvstemmingSftpBatchTjenesteTest {
         assertTrue(Files.exists(opprettetFil), "Filen skulle nå ha blitt opprettet");
     }
 
-    @Test(expected = JSchException.class)
+    @Test
     public void lagreAvstemmingsfil_feiler_med_feil_port() throws Exception {
         String privkeyFileUrl = keyDir + "fptilbake_key";
 
@@ -79,7 +79,7 @@ public class AvstemmingSftpBatchTjenesteTest {
         String filnavn = "avstemming_" + timeMillis + ".txt";
 
         AvstemmingSftpBatchTjeneste sftpTjeneste = new AvstemmingSftpBatchTjeneste("fptilbake", HOST, 22, encodeString(privKey), encodeString(pubKey), null, DIRECTORY);
-        sftpTjeneste.put("Dette skulle vært avstemmingsinformasjon, men er bare en tekst", filnavn);
+        assertThrows(JSchException.class, () -> sftpTjeneste.put("Dette skulle vært avstemmingsinformasjon, men er bare en tekst", filnavn));
     }
 
     private String encodeString(String decoded) {

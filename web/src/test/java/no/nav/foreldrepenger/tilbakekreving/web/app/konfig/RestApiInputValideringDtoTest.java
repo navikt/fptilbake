@@ -48,10 +48,10 @@ import javax.validation.constraints.Null;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
-import org.junit.After;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -61,39 +61,31 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.IgnoreKode
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkTabell;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.ValidKodeverk;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.foreldrepenger.tilbakekreving.web.app.IndexClasses;
-import no.nav.vedtak.felles.testutilities.cdi.WeldContext;
 
-@RunWith(Parameterized.class)
+@CdiDbAwareTest
 public class RestApiInputValideringDtoTest extends RestApiTester {
 
-    private Class<?> dto;
-
-    @Parameterized.Parameters(name = "Validerer Dto - {0}")
-    public static Collection<Object[]> getDtos() {
+    @BeforeAll
+    static void beforeAll() {
         System.setProperty("loadbalancer.url", "http://localhost:8030");
         System.setProperty("application.name", "fptilbake");
-        return WeldContext.getInstance().doWithScope(() -> finnAlleDtoTyper().stream().map(c -> new Object[]{c.getName(), c}).collect(Collectors.toSet()));
     }
 
-    @After
-    public void cleanup() {
+    @AfterAll
+    static void cleanup() {
         System.clearProperty("loadbalancer.url");
         System.clearProperty("application.name");
     }
 
-    public RestApiInputValideringDtoTest(@SuppressWarnings("unused") String name, Class<?> dto) {
-        this.dto = dto;
-    }
-
     /**
      * IKKE ignorer eller fjern denne testen, den sørger for at inputvalidering er i orden for REST-grensesnittene
-     * <p>
-     * Kontakt Team Humle hvis du trenger hjelp til å endre koden din slik at den går igjennom her
      */
-    @Test
-    public void alle_felter_i_objekter_som_brukes_som_inputDTO_skal_enten_ha_valideringsannotering_eller_være_av_godkjent_type() throws Exception {
+    @ParameterizedTest
+    @MethodSource("finnAlleDtoTyper")
+    public void alle_felter_i_objekter_som_brukes_som_inputDTO_skal_enten_ha_valideringsannotering_eller_være_av_godkjent_type(Class<?> dto) throws Exception {
         Set<Class<?>> validerteKlasser = new HashSet<>(); // trengs for å unngå løkker og unngå å validere samme klasse flere multipliser dobbelt
         validerRekursivt(validerteKlasser, dto, null);
     }

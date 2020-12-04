@@ -14,9 +14,11 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.UUID;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import javax.persistence.EntityManager;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.google.common.collect.Lists;
 
@@ -37,7 +39,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelse
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.tilbakekrevingsvalg.VidereBehandling;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.Tillegsinformasjon;
@@ -54,6 +56,7 @@ import no.nav.vedtak.felles.integrasjon.kafka.EventHendelse;
 import no.nav.vedtak.felles.integrasjon.kafka.TilbakebetalingBehandlingProsessEventDto;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 
+@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public class FplosPubliserEventTaskTest {
 
     private static final LocalDate FOM_1 = LocalDate.of(2019, 12, 1);
@@ -62,31 +65,34 @@ public class FplosPubliserEventTaskTest {
     private static final LocalDate TOM_2 = LocalDate.of(2020, 1, 31);
     private static final UUID FPSAK_BEHANDLING_UUID = UUID.randomUUID();
 
-    @Rule
-    public UnittestRepositoryRule repositoryRule = new UnittestRepositoryRule();
+    private BehandlingRepositoryProvider repositoryProvider;
+    private AksjonspunktRepository aksjonspunktRepository;
 
-    private BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(repositoryRule.getEntityManager());
-    private AksjonspunktRepository aksjonspunktRepository = repositoryProvider.getAksjonspunktRepository();
+    private FplosKafkaProducer mockKafkaProducer;
 
-    private GjenopptaBehandlingTjeneste mockGjenopptaBehandlingTjeneste = mock(GjenopptaBehandlingTjeneste.class);
-    private BehandlingskontrollTjeneste mockBehandlingskontrollTjeneste = mock(BehandlingskontrollTjeneste.class);
-    private SlettGrunnlagEventPubliserer mockEventPubliserer = mock(SlettGrunnlagEventPubliserer.class);
-    private FagsystemKlient mockFagsystemKlient = mock(FagsystemKlient.class);
-    private FplosKafkaProducer mockKafkaProducer = mock(FplosKafkaProducer.class);
+    private InternalManipulerBehandling internalManipulerBehandling;
 
-    private KravgrunnlagTjeneste kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repositoryProvider, mockGjenopptaBehandlingTjeneste,
-        mockBehandlingskontrollTjeneste, mockEventPubliserer);
-    private FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste = new FaktaFeilutbetalingTjeneste(repositoryProvider, kravgrunnlagTjeneste, mockFagsystemKlient);
-    private InternalManipulerBehandling internalManipulerBehandling = new InternalManipulerBehandling(repositoryProvider);
-
-    private FplosPubliserEventTask fplosPubliserEventTask = new FplosPubliserEventTask(repositoryProvider, faktaFeilutbetalingTjeneste, mockKafkaProducer, "fptilbake");
+    private FplosPubliserEventTask fplosPubliserEventTask;
 
     private Behandling behandling;
     private ProsessTaskData prosessTaskData;
-    private Kravgrunnlag431 kravgrunnlag431;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    public void setup(EntityManager entityManager) {
+        repositoryProvider = new BehandlingRepositoryProvider(entityManager);
+        aksjonspunktRepository = repositoryProvider.getAksjonspunktRepository();
+        GjenopptaBehandlingTjeneste mockGjenopptaBehandlingTjeneste = mock(GjenopptaBehandlingTjeneste.class);
+        BehandlingskontrollTjeneste mockBehandlingskontrollTjeneste = mock(BehandlingskontrollTjeneste.class);
+        SlettGrunnlagEventPubliserer mockEventPubliserer = mock(SlettGrunnlagEventPubliserer.class);
+        FagsystemKlient mockFagsystemKlient = mock(FagsystemKlient.class);
+        mockKafkaProducer = mock(FplosKafkaProducer.class);
+        KravgrunnlagTjeneste kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repositoryProvider,
+            mockGjenopptaBehandlingTjeneste, mockBehandlingskontrollTjeneste, mockEventPubliserer);
+        FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste = new FaktaFeilutbetalingTjeneste(repositoryProvider,
+            kravgrunnlagTjeneste, mockFagsystemKlient);
+        internalManipulerBehandling = new InternalManipulerBehandling(repositoryProvider);
+        fplosPubliserEventTask = new FplosPubliserEventTask(repositoryProvider, faktaFeilutbetalingTjeneste, mockKafkaProducer, "fptilbake");
+
         behandling = ScenarioSimple.simple().lagre(repositoryProvider);
         behandling.setAnsvarligSaksbehandler("1234");
         EksternBehandling eksternBehandling = new EksternBehandling(behandling, Henvisning.fraEksternBehandlingId(1l), FPSAK_BEHANDLING_UUID);
@@ -107,12 +113,13 @@ public class FplosPubliserEventTaskTest {
         aksjonspunktRepository.leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING, BehandlingStegType.FAKTA_FEILUTBETALING);
         aksjonspunktRepository.leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, BehandlingStegType.VARSEL);
         internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.FAKTA_FEILUTBETALING);
-        kravgrunnlag431 = lagkravgrunnlag();
+        Kravgrunnlag431 kravgrunnlag431 = lagkravgrunnlag();
 
         fplosPubliserEventTask.doTask(prosessTaskData);
 
         verify(mockKafkaProducer, atLeastOnce()).sendJsonMedNøkkel(anyString(), anyString());
-        TilbakebetalingBehandlingProsessEventDto event = fplosPubliserEventTask.getTilbakebetalingBehandlingProsessEventDto(prosessTaskData, behandling, EventHendelse.AKSJONSPUNKT_OPPRETTET.name(), kravgrunnlag431);
+        TilbakebetalingBehandlingProsessEventDto event = fplosPubliserEventTask.getTilbakebetalingBehandlingProsessEventDto(prosessTaskData, behandling, EventHendelse.AKSJONSPUNKT_OPPRETTET.name(),
+            kravgrunnlag431);
 
         assertThat(event.getFeilutbetaltBeløp()).isEqualByComparingTo(BigDecimal.valueOf(22000));
         assertThat(event.getFørsteFeilutbetaling()).isEqualTo(FOM_1);

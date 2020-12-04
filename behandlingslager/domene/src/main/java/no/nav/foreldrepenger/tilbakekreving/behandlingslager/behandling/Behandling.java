@@ -197,6 +197,10 @@ public class Behandling extends BaseEntitet {
         return status;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     /**
      * Oppdater behandlingssteg og tilhørende status.
      * <p>

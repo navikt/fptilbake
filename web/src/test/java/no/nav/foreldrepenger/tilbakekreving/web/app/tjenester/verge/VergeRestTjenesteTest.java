@@ -13,11 +13,13 @@ import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.util.Optional;
 
+import javax.persistence.EntityManager;
 import javax.ws.rs.core.Response;
 
 import org.apache.http.HttpStatus;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
@@ -30,19 +32,23 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.Ki
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.vedtak.exception.TekniskException;
 
+@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public class VergeRestTjenesteTest {
-    @Rule
-    public UnittestRepositoryRule repositoryRule = new UnittestRepositoryRule();
 
-    private VergeTjeneste vergeTjenesteMock = mock(VergeTjeneste.class);
-    private BehandlingTjeneste behandlingTjenesteMock = mock(BehandlingTjeneste.class);
-    private PersoninfoAdapter tpsTjenesteMock = mock(PersoninfoAdapter.class);
-    private VergeRestTjeneste vergeRestTjeneste = new VergeRestTjeneste(behandlingTjenesteMock, vergeTjenesteMock, tpsTjenesteMock);
-    final BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(repositoryRule.getEntityManager());
+    private final VergeTjeneste vergeTjenesteMock = mock(VergeTjeneste.class);
+    private final BehandlingTjeneste behandlingTjenesteMock = mock(BehandlingTjeneste.class);
+    private final PersoninfoAdapter tpsTjenesteMock = mock(PersoninfoAdapter.class);
+    private final VergeRestTjeneste vergeRestTjeneste = new VergeRestTjeneste(behandlingTjenesteMock, vergeTjenesteMock, tpsTjenesteMock);
+    private BehandlingRepositoryProvider repositoryProvider;
+
+    @BeforeEach
+    void setUp(EntityManager entityManager) {
+        repositoryProvider = new BehandlingRepositoryProvider(entityManager);
+    }
 
     @Test
     public void kan_ikke_opprette_verge_når_behandling_er_avsluttet() {

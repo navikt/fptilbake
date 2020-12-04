@@ -7,8 +7,8 @@ import java.util.Collections;
 import javax.ws.rs.core.Response;
 
 import org.jboss.resteasy.spi.ApplicationException;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Test;
 
 import ch.qos.logback.classic.Level;
 import no.nav.vedtak.exception.VLException;
@@ -22,12 +22,12 @@ import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
 import no.nav.vedtak.log.util.MemoryAppender;
 
 public class GeneralRestExceptionMapperTest {
-    private static MemoryAppender logSniffer = MemoryAppender.sniff(GeneralRestExceptionMapper.class);
+    private static final MemoryAppender logSniffer = MemoryAppender.sniff(GeneralRestExceptionMapper.class);
 
-    private GeneralRestExceptionMapper generalRestExceptionMapper = new GeneralRestExceptionMapper();
+    private final GeneralRestExceptionMapper generalRestExceptionMapper = new GeneralRestExceptionMapper();
 
-    @After
-    public void afterEach() {
+    @AfterAll
+    static void afterAll() {
         logSniffer.reset();
     }
 

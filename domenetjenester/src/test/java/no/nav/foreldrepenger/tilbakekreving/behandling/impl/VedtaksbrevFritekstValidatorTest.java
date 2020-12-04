@@ -1,5 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
@@ -7,11 +9,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -32,47 +31,39 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
-import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
-@RunWith(CdiRunner.class)
+@CdiDbAwareTest
 public class VedtaksbrevFritekstValidatorTest {
-    @Rule
-    public UnittestRepositoryRule repoRule = new UnittestRepositoryRule();
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     @Inject
     private BehandlingRepository behandlingRepository;
     @Inject
     private FagsakRepository fagsakRepository;
-
     @Inject
     private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository;
-
     @Inject
     private VedtaksbrevFritekstValidator validator;
 
-    private LocalDate jan1 = LocalDate.of(2019, 1, 1);
-    private LocalDate jan3 = LocalDate.of(2019, 1, 3);
-    private LocalDate jan24 = LocalDate.of(2019, 1, 24);
+    private final LocalDate jan1 = LocalDate.of(2019, 1, 1);
+    private final LocalDate jan3 = LocalDate.of(2019, 1, 3);
+    private final LocalDate jan24 = LocalDate.of(2019, 1, 24);
 
-    private NavBruker bruker = NavBruker.opprettNy(new AktørId(1L), Språkkode.nb);
-    private Fagsak fagsak = Fagsak.opprettNy(new Saksnummer("123"), bruker);
-    private Behandling behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).build();
-    private Behandling revurderingBehandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.REVURDERING_TILBAKEKREVING).build();
-    private Behandling revurderingEtterKlageBehandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.REVURDERING_TILBAKEKREVING)
+    private final NavBruker bruker = NavBruker.opprettNy(new AktørId(1L), Språkkode.nb);
+    private final Fagsak fagsak = Fagsak.opprettNy(new Saksnummer("123"), bruker);
+    private final Behandling behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).build();
+    private final Behandling revurderingBehandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.REVURDERING_TILBAKEKREVING).build();
+    private final Behandling revurderingEtterKlageBehandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.REVURDERING_TILBAKEKREVING)
         .medBehandlingÅrsak(BehandlingÅrsak.builder(BehandlingÅrsakType.RE_KLAGE_KA))
         .build();
     private Long behandlingId;
     private Long revurderingBehandlingId;
     private Long revurderingEtterKlageBehandlingId;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         fagsakRepository.lagre(fagsak);
         behandlingId = behandlingRepository.lagre(behandling, new BehandlingLås(null));
@@ -92,8 +83,8 @@ public class VedtaksbrevFritekstValidatorTest {
             .build());
         faktaFeilutbetalingRepository.lagre(behandlingId, fakta);
 
-        expectedException.expectMessage("Ugyldig input: Når 'ANNET_FRITEKST' er valgt er fritekst påkrevet. Mangler for periode 01.01.2019-24.01.2019 og avsnitt FAKTA_AVSNITT");
-        validator.validerAtPåkrevdeFriteksterErSatt(behandlingId, Collections.emptyList(), null, VedtaksbrevType.ORDINÆR);
+        assertThatThrownBy(() -> validator.validerAtPåkrevdeFriteksterErSatt(behandlingId, Collections.emptyList(), null, VedtaksbrevType.ORDINÆR))
+            .hasMessageContaining("Ugyldig input: Når 'ANNET_FRITEKST' er valgt er fritekst påkrevet. Mangler for periode 01.01.2019-24.01.2019 og avsnitt FAKTA_AVSNITT");
     }
 
     @Test
@@ -112,9 +103,8 @@ public class VedtaksbrevFritekstValidatorTest {
             new VedtaksbrevFritekstPeriode.Builder().medBehandlingId(behandlingId).medFritekst("foo").medFritekstType(VedtaksbrevFritekstType.FAKTA_AVSNITT).medPeriode(Periode.of(jan1, jan3)).build()
         );
 
-        expectedException.expectMessage("Når 'ENDRING_GRUNNLAG' er valgt er fritekst påkrevet. Mangler for periode 04.01.2019-24.01.2019 og avsnitt FAKTA_AVSNITT");
-
-        validator.validerAtPåkrevdeFriteksterErSatt(behandlingId, fritekstperioder, null, VedtaksbrevType.ORDINÆR);
+        assertThatThrownBy(() -> validator.validerAtPåkrevdeFriteksterErSatt(behandlingId, fritekstperioder, null, VedtaksbrevType.ORDINÆR))
+            .hasMessageContaining("Når 'ENDRING_GRUNNLAG' er valgt er fritekst påkrevet. Mangler for periode 04.01.2019-24.01.2019 og avsnitt FAKTA_AVSNITT");
     }
 
     @Test
@@ -134,8 +124,8 @@ public class VedtaksbrevFritekstValidatorTest {
             new VedtaksbrevFritekstPeriode.Builder().medBehandlingId(behandlingId).medFritekst("foo").medFritekstType(VedtaksbrevFritekstType.FAKTA_AVSNITT).medPeriode(Periode.of(jan3, jan24)).build()
         );
 
-        expectedException.expectMessage("Når 'SVP_ENDRING_GRUNNLAG' er valgt er fritekst påkrevet. Mangler for periode 02.01.2019-02.01.2019 og avsnitt FAKTA_AVSNITT");
-        validator.validerAtPåkrevdeFriteksterErSatt(behandlingId, fritekstperioder, null, VedtaksbrevType.ORDINÆR);
+        assertThatThrownBy(() -> validator.validerAtPåkrevdeFriteksterErSatt(behandlingId, fritekstperioder, null, VedtaksbrevType.ORDINÆR))
+            .hasMessageContaining("Når 'SVP_ENDRING_GRUNNLAG' er valgt er fritekst påkrevet. Mangler for periode 02.01.2019-02.01.2019 og avsnitt FAKTA_AVSNITT");
     }
 
     @Test
@@ -150,8 +140,8 @@ public class VedtaksbrevFritekstValidatorTest {
             .build());
         faktaFeilutbetalingRepository.lagre(revurderingBehandlingId, fakta);
 
-        expectedException.expectMessage("Ugyldig input: Når det er revurdering, så er oppsummering fritekst påkrevet");
-        validator.validerAtPåkrevdeFriteksterErSatt(revurderingBehandlingId, Collections.emptyList(), null, VedtaksbrevType.ORDINÆR);
+        assertThatThrownBy(() -> validator.validerAtPåkrevdeFriteksterErSatt(revurderingBehandlingId, Collections.emptyList(), null, VedtaksbrevType.ORDINÆR))
+            .hasMessageContaining("Ugyldig input: Når det er revurdering, så er oppsummering fritekst påkrevet");
     }
 
     @Test
@@ -166,8 +156,8 @@ public class VedtaksbrevFritekstValidatorTest {
             .build());
         faktaFeilutbetalingRepository.lagre(revurderingBehandlingId, fakta);
 
-        expectedException.expectMessage("Ugyldig input: Når det er revurdering, så er oppsummering fritekst påkrevet");
-        validator.validerAtPåkrevdeFriteksterErSatt(revurderingBehandlingId, Collections.emptyList(), new VedtaksbrevFritekstOppsummering(), VedtaksbrevType.ORDINÆR);
+        assertThatThrownBy(() -> validator.validerAtPåkrevdeFriteksterErSatt(revurderingBehandlingId, Collections.emptyList(), new VedtaksbrevFritekstOppsummering(), VedtaksbrevType.ORDINÆR))
+            .hasMessageContaining("Ugyldig input: Når det er revurdering, så er oppsummering fritekst påkrevet");
     }
 
     @Test
@@ -222,8 +212,8 @@ public class VedtaksbrevFritekstValidatorTest {
                 "Aliquam lacinia, tellus a pellentesque scelerisque, ipsum dolor suscipit turpis, non luctus est ligula et ligula. Duis lectus nunc, laoreet vitae elit ut, porta rhoncus arcu. Sed posuere ornare tellus, vitae pretium augue semper vel. Ut viverra, sem sed fermentum commodo, dui nullam.")
             .build();
 
-        expectedException.expectMessage("Ugyldig input: Oppsummeringstekst er for lang.");
-        validator.validerAtPåkrevdeFriteksterErSatt(behandlingId, Collections.emptyList(), fritekstOppsummering, VedtaksbrevType.ORDINÆR);
+        assertThatThrownBy(() -> validator.validerAtPåkrevdeFriteksterErSatt(behandlingId, Collections.emptyList(), fritekstOppsummering, VedtaksbrevType.ORDINÆR))
+            .hasMessageContaining("Ugyldig input: Oppsummeringstekst er for lang.");
     }
 
     @Test
@@ -259,7 +249,7 @@ public class VedtaksbrevFritekstValidatorTest {
                 "Sed lacinia, metus sed commodo scelerisque, arcu turpis tincidunt eros, vel pharetra mauris nisi a quam. Nam consectetur mattis velit, imperdiet vestibulum magna pellentesque vel. Curabitur mollis velit ac nisi eleifend dapibus. Mauris porttitor mi ut ipsum elementum, ac sollicitudin ipsum auctor. Etiam egestas risus vitae felis tempus fringilla. Aliquam facilisis risus ut lacus fringilla, non suscipit sapien bibendum. Vivamus consequat metus eget elit eleifend viverra. Sed pharetra neque justo, ut euismod enim lobortis quis. Praesent consectetur luctus enim, non tincidunt risus mollis eget. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Integer fringilla, lacus ut iaculis aliquet, justo tortor blandit dolor, ac fermentum orci lorem at mi. Phasellus dignissim elementum quam, sit amet maximus nisl sagittis ac. Orci varius natoque penatibus et magnis metus.")
             .build();
 
-        expectedException.expectMessage("Ugyldig input: Oppsummeringstekst er for lang.");
-        validator.validerAtPåkrevdeFriteksterErSatt(behandlingId, Collections.emptyList(), fritekstOppsummering, VedtaksbrevType.FRITEKST_FEILUTBETALING_BORTFALT);
+        assertThatThrownBy(() -> validator.validerAtPåkrevdeFriteksterErSatt(behandlingId, Collections.emptyList(), fritekstOppsummering, VedtaksbrevType.FRITEKST_FEILUTBETALING_BORTFALT))
+            .hasMessageContaining("Ugyldig input: Oppsummeringstekst er for lang.");
     }
 }

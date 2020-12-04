@@ -3,24 +3,31 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak;
 import java.util.List;
 import java.util.Optional;
 
+import javax.persistence.EntityManager;
+
 import org.assertj.core.api.Assertions;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.test.TestFagsakUtil;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
-import no.nav.vedtak.felles.testutilities.db.Repository;
 
+@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public class FagsakRepositoryTest {
 
-    @Rule
-    public UnittestRepositoryRule repoRule = new UnittestRepositoryRule();
-    private Repository repository = repoRule.getRepository();
-    private FagsakRepository fagsakRepository = new FagsakRepository(repoRule.getEntityManager());
+    private FagsakRepository fagsakRepository;
+    private EntityManager entityManager;
+
+    @BeforeEach
+    void setUp(EntityManager entityManager) {
+        this.entityManager = entityManager;
+        fagsakRepository = new FagsakRepository(entityManager);
+    }
 
     @Test
     public void skal_finne_eksakt_fagsak_gitt_id() {
@@ -72,8 +79,9 @@ public class FagsakRepositoryTest {
 
         // Opprett fagsak
         Fagsak fagsak = TestFagsakUtil.opprettFagsak(saksnummer, bruker);
-        repository.lagre(fagsak);
-        repository.flushAndClear();
+        entityManager.persist(fagsak);
+        entityManager.flush();
+        entityManager.clear();
         return fagsak;
     }
 
@@ -84,8 +92,9 @@ public class FagsakRepositoryTest {
         // Opprett fagsak
         Fagsak fagsak = TestFagsakUtil.opprettFagsak(saksnummer, bruker);
         fagsak.setSaksnummer(saksnummer);
-        repository.lagre(fagsak);
-        repository.flushAndClear();
+        entityManager.persist(fagsak);
+        entityManager.flush();
+        entityManager.clear();
         return fagsak;
     }
 }

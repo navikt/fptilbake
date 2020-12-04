@@ -7,10 +7,9 @@ import java.util.Arrays;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
@@ -19,19 +18,16 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodev
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.VilkårsvurderingTestBuilder;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsvedtakDto;
-import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
-@RunWith(CdiRunner.class)
+@CdiDbAwareTest
 public class TilbakekrevingsvedtakTjenesteTest {
-    @Rule
-    public UnittestRepositoryRule repositoryRule = new UnittestRepositoryRule();
 
-    private ScenarioSimple simple = ScenarioSimple.simple();
+    private final ScenarioSimple simple = ScenarioSimple.simple();
 
     @Inject
     public BehandlingRepositoryProvider behandlingRepositoryProvider;
@@ -40,11 +36,11 @@ public class TilbakekrevingsvedtakTjenesteTest {
     @Inject
     public VilkårsvurderingRepository vilkårsvurderingRepository;
     @Inject
-    public TilbakekrevingVedtakPeriodeBeregner beregner;
-    @Inject
     public TilbakekrevingsvedtakTjeneste tjeneste;
+    @Inject
+    public EntityManager entityManager;
 
-    private Periode uke = Periode.of(LocalDate.of(2019, 6, 24), LocalDate.of(2019, 6, 30));
+    private final Periode uke = Periode.of(LocalDate.of(2019, 6, 24), LocalDate.of(2019, 6, 30));
 
     @Test
     public void skal_sende_regne_ut_perioder_og_konvertere_til_dto() {
@@ -76,7 +72,7 @@ public class TilbakekrevingsvedtakTjenesteTest {
     }
 
     private void flushAndClear() {
-        repositoryRule.getEntityManager().flush();
-        repositoryRule.getEntityManager().clear();
+        entityManager.flush();
+        entityManager.clear();
     }
 }

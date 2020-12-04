@@ -108,7 +108,7 @@ public class Fagsak extends BaseEntitet {
         return fagsakStatus;
     }
 
-    private void setFagsakStatus(FagsakStatus fagsakStatus) {
+    public void setFagsakStatus(FagsakStatus fagsakStatus) {
         this.fagsakStatus = fagsakStatus;
     }
 
@@ -146,4 +146,7 @@ public class Fagsak extends BaseEntitet {
         return Objects.hash(saksnummer, navBruker);
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
 }
