@@ -8,10 +8,8 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -19,7 +17,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.TilbakekrevingsvedtakMarshaller;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiResponsMarshaller;
 import no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste.TilbakekrevingsvedtakTjeneste;
@@ -30,12 +28,10 @@ import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakResponse;
 import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsvedtakDto;
 import no.nav.tilbakekreving.typer.v1.MmelDto;
 import no.nav.vedtak.felles.integrasjon.aktør.klient.AktørConsumer;
-import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
-@RunWith(CdiRunner.class)
+@CdiDbAwareTest
 public class AvstemmingTjenesteTest {
-    @Rule
-    public UnittestRepositoryRule repositoryRule = new UnittestRepositoryRule();
+
     @Inject
     private BehandlingRepositoryProvider behandlingRepositoryProvider;
     @Inject
@@ -47,7 +43,7 @@ public class AvstemmingTjenesteTest {
     private AvstemmingTjeneste avstemmingTjeneste;
     private ScenarioSimple scenario = ScenarioSimple.simple();
 
-    @Before
+    @BeforeEach
     public void setup() {
         avstemmingTjeneste = new AvstemmingTjeneste("fptilbake", sendtXmlRepository, behandlingRepositoryProvider, aktørConsumerMock);
         when(aktørConsumerMock.hentPersonIdentForAktørId(Mockito.any())).thenReturn(Optional.of("12345678901"));

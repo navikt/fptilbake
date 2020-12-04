@@ -7,8 +7,9 @@ import java.util.Set;
 
 import javax.persistence.EntityManager;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -22,23 +23,29 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.test.TestFagsakUtil;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 
+@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public class BehandlingKandidaterRepositoryTest {
 
-    @Rule
-    public final UnittestRepositoryRule reporule = new UnittestRepositoryRule();
-    private final EntityManager entityManager = reporule.getEntityManager();
+    private BehandlingKandidaterRepository behandlingKandidaterRepository;
 
-    private final FellesQueriesForBehandlingRepositories fellesQueriesForBehandlingRepositories = new FellesQueriesForBehandlingRepositories(entityManager);
-    private final BehandlingKandidaterRepository behandlingKandidaterRepository = new BehandlingKandidaterRepository(fellesQueriesForBehandlingRepositories);
-    private final BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(entityManager);
+    private AksjonspunktRepository aksjonspunktRepository;
+    private BehandlingRepository behandlingRepository;
+    private FagsakRepository fagsakRepository;
 
-    private final AksjonspunktRepository aksjonspunktRepository = repositoryProvider.getAksjonspunktRepository();
-    private final BehandlingRepository behandlingRepository = repositoryProvider.getBehandlingRepository();
-    private final FagsakRepository fagsakRepository = repositoryProvider.getFagsakRepository();
+    @BeforeEach
+    void setUp(EntityManager entityManager) {
+        FellesQueriesForBehandlingRepositories fellesQueriesForBehandlingRepositories = new FellesQueriesForBehandlingRepositories(
+            entityManager);
+        behandlingKandidaterRepository = new BehandlingKandidaterRepository(fellesQueriesForBehandlingRepositories);
+        BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(entityManager);
+        fagsakRepository = repositoryProvider.getFagsakRepository();
+        aksjonspunktRepository = repositoryProvider.getAksjonspunktRepository();
+        behandlingRepository = repositoryProvider.getBehandlingRepository();
+    }
 
     @Test
     public void test_skalHenteBehandlingerSomVenterPåBrukerResponsHvorTidsfristUtgåttEllerTilbakekrevinggrunnlag() {

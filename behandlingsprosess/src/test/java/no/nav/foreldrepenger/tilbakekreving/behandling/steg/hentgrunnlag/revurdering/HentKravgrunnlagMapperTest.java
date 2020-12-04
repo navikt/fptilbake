@@ -10,7 +10,7 @@ import java.util.Optional;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import com.google.common.collect.Lists;

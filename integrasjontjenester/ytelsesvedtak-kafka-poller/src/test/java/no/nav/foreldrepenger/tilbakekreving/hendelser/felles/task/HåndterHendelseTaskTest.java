@@ -7,9 +7,7 @@ import static org.mockito.Mockito.verify;
 
 import java.util.UUID;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.hendelse.HendelseTaskDataWrapper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.hendelse.TaskProperties;
@@ -26,11 +24,8 @@ public class HåndterHendelseTaskTest {
     private static final Long EKSTERN_BEHANDLING_ID = 123L;
     private static final UUID EKSTERN_BEHANDLING_UUID = UUID.randomUUID();
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
-
-    private HendelseHåndtererTjeneste hendelseHåndterer = mock(HendelseHåndtererTjeneste.class);
-    private HåndterHendelseTask håndterHendelseTask = new HåndterHendelseTask(hendelseHåndterer);
+    private final HendelseHåndtererTjeneste hendelseHåndterer = mock(HendelseHåndtererTjeneste.class);
+    private final HåndterHendelseTask håndterHendelseTask = new HåndterHendelseTask(hendelseHåndterer);
 
 
     @Test

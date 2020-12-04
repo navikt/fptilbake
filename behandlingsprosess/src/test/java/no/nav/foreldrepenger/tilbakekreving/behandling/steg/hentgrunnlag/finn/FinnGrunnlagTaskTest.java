@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.finn;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
@@ -9,8 +10,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.Lists;
 
@@ -39,23 +40,29 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
 
 public class FinnGrunnlagTaskTest extends FellesTestOppsett {
 
-    private KravVedtakStatusRepository kravVedtakStatusRepository = new KravVedtakStatusRepository(repoRule.getEntityManager());
-    private KodeverkTabellRepository kodeverkTabellRepository = new KodeverkTabellRepository(repoRule.getEntityManager());
-    private UtvidetProsessTaskRepository utvidetProsessTaskRepository = new UtvidetProsessTaskRepository(repoRule.getEntityManager());
+    private KravVedtakStatusRepository kravVedtakStatusRepository;
 
-    private HenleggBehandlingTjeneste henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repositoryProvider, prosessTaskRepository, behandlingskontrollTjeneste, historikkinnslagTjeneste);
-    private KravVedtakStatusTjeneste kravVedtakStatusTjeneste = new KravVedtakStatusTjeneste(kravVedtakStatusRepository, prosessTaskRepository, utvidetProsessTaskRepository,
-        repositoryProvider, henleggBehandlingTjeneste, behandlingskontrollTjeneste);
-    private KravVedtakStatusMapper kravVedtakStatusMapper = new KravVedtakStatusMapper(tpsAdapterWrapper);
-
-    private FinnGrunnlagTask finnGrunnlagTask = new FinnGrunnlagTask(repositoryProvider, mottattXmlRepository, kodeverkTabellRepository, kravVedtakStatusTjeneste, behandlingskontrollTjeneste, kravVedtakStatusMapper, kravgrunnlagMapper, fagsystemKlientMock);
+    private FinnGrunnlagTask finnGrunnlagTask;
 
     private String saksnummer;
     private static final Long FPSAK_ANNEN_BEHANDLING_ID = 1174551L;
     private static final Henvisning ANNEN_HENVISNING = Henvisning.fraEksternBehandlingId(FPSAK_ANNEN_BEHANDLING_ID);
 
-    @Before
+    @BeforeEach
     public void setup() {
+        kravVedtakStatusRepository = new KravVedtakStatusRepository(entityManager);
+        KodeverkTabellRepository kodeverkTabellRepository = new KodeverkTabellRepository(entityManager);
+        UtvidetProsessTaskRepository utvidetProsessTaskRepository = new UtvidetProsessTaskRepository(
+            entityManager);
+        HenleggBehandlingTjeneste henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repositoryProvider,
+            prosessTaskRepository, behandlingskontrollTjeneste, historikkinnslagTjeneste);
+        KravVedtakStatusTjeneste kravVedtakStatusTjeneste = new KravVedtakStatusTjeneste(kravVedtakStatusRepository,
+            prosessTaskRepository, utvidetProsessTaskRepository, repositoryProvider, henleggBehandlingTjeneste,
+            behandlingskontrollTjeneste);
+        KravVedtakStatusMapper kravVedtakStatusMapper = new KravVedtakStatusMapper(tpsAdapterWrapper);
+        finnGrunnlagTask = new FinnGrunnlagTask(repositoryProvider, mottattXmlRepository, kodeverkTabellRepository,
+            kravVedtakStatusTjeneste, behandlingskontrollTjeneste, kravVedtakStatusMapper, kravgrunnlagMapper, fagsystemKlientMock);
+
         EksternBehandling eksternBehandling = new EksternBehandling(behandling, HENVISNING, FPSAK_BEHANDLING_UUID);
         eksternBehandlingRepository.lagre(eksternBehandling);
         saksnummer = behandling.getFagsak().getSaksnummer().getVerdi();
@@ -278,12 +285,11 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_SPER.xml"));
         mottattXmlRepository.oppdaterMedHenvisningOgSaksnummer(HENVISNING, saksnummer, mottattXmlId);
 
-        expectedException.expect(TekniskException.class);
-        expectedException.expectMessage("FPT-107929");
 
         ProsessTaskData prosessTaskData = opprettFinngrunnlagProsessTask();
-        finnGrunnlagTask.doTask(prosessTaskData);
-
+        assertThatThrownBy(() -> finnGrunnlagTask.doTask(prosessTaskData))
+            .isInstanceOf(TekniskException.class)
+            .hasMessageContaining("FPT-107929");
     }
 
     @Test

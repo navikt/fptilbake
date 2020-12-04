@@ -3,18 +3,20 @@ package no.nav.foreldrepenger.tilbakekreving.web.server.jetty;
 import javax.enterprise.inject.spi.CDI;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.avstemming.AvstemmingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.SakshendelserEventObserver;
 import no.nav.foreldrepenger.tilbakekreving.fplos.klient.observer.FplosEventObserver;
 import no.nav.foreldrepenger.tilbakekreving.hendelser.felles.YtelsesvedtakHendelsePoller;
 import no.nav.foreldrepenger.tilbakekreving.kravgrunnlag.queue.consumer.KravgrunnlagAsyncJmsConsumer;
-import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
+import no.nav.vedtak.felles.testutilities.cdi.WeldContext;
 
-@RunWith(CdiRunner.class)
 public class AvhengigheterTest {
+
+    static {
+        WeldContext.getInstance(); // init cdi container
+    }
 
     @Test
     public void skal_ha_følgende_tjenester_på_classpath_slik_at_de_kjører() {

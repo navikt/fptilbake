@@ -6,25 +6,20 @@ import java.util.HashMap;
 import java.util.SortedMap;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.Timeout;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class SystemPropertiesHelperTest {
 
     private SystemPropertiesHelper helper; // objektet som testes
 
-    @Rule
-    public Timeout timeout = Timeout.seconds(2);
-
-    @Before
+    @BeforeEach
     public void setup() {
         helper = SystemPropertiesHelper.getInstance();
     }
 
     @Test
-    public void test_sysProps() throws InterruptedException {
+    public void test_sysProps() {
         SortedMap<String, String> sysProps = helper.filteredSortedProperties();
 
         assertThat(sysProps).isNotNull();

@@ -9,10 +9,12 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import javax.persistence.EntityManager;
+
 import org.assertj.core.util.Lists;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.ForeslåVedtakTjeneste;
@@ -36,34 +38,42 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.TestFagsakUtil;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.PeriodeMedTekstDto;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.ForeslåVedtakDto;
 
+@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public class ForeslåVedtakOppdatererTest {
 
-    @Rule
-    public UnittestRepositoryRule repositoryRule = new UnittestRepositoryRule();
+    private EntityManager entityManager;
+    private BehandlingRepositoryProvider repositoryProvider;
+    private BehandlingRepository behandlingRepository;
+    private VedtaksbrevFritekstRepository vedtaksbrevFritekstRepository;
 
-    private BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(repositoryRule.getEntityManager());
-    private BehandlingRepository behandlingRepository = repositoryProvider.getBehandlingRepository();
-    private AksjonspunktRepository aksjonspunktRepository = repositoryProvider.getAksjonspunktRepository();
-    private VedtaksbrevFritekstRepository vedtaksbrevFritekstRepository = new VedtaksbrevFritekstRepository(repositoryRule.getEntityManager());
+    private ForeslåVedtakOppdaterer foreslåVedtakOppdaterer;
 
-    private TilbakekrevingBeregningTjeneste beregningTjenesteMock = mock(TilbakekrevingBeregningTjeneste.class);
-    private HistorikkTjenesteAdapter historikkTjenesteAdapterMock = mock(HistorikkTjenesteAdapter.class);
-    private ForeslåVedtakTjeneste foreslåVedtakTjeneste = new ForeslåVedtakTjeneste(beregningTjenesteMock, historikkTjenesteAdapterMock);
-    private TotrinnTjeneste totrinnTjenesteMock = mock(TotrinnTjeneste.class);
-    private VilkårsvurderingRepository vilkårsvurderingRepository = mock(VilkårsvurderingRepository.class);
-    private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository = mock(FaktaFeilutbetalingRepository.class);
+    @BeforeEach
+    public void setup(EntityManager entityManager) {
+        this.entityManager = entityManager;
+        repositoryProvider = new BehandlingRepositoryProvider(entityManager);
+        behandlingRepository = repositoryProvider.getBehandlingRepository();
+        AksjonspunktRepository aksjonspunktRepository = repositoryProvider.getAksjonspunktRepository();
+        vedtaksbrevFritekstRepository = new VedtaksbrevFritekstRepository(entityManager);
+        TilbakekrevingBeregningTjeneste beregningTjenesteMock = mock(TilbakekrevingBeregningTjeneste.class);
+        HistorikkTjenesteAdapter historikkTjenesteAdapterMock = mock(HistorikkTjenesteAdapter.class);
+        ForeslåVedtakTjeneste foreslåVedtakTjeneste = new ForeslåVedtakTjeneste(beregningTjenesteMock,
+            historikkTjenesteAdapterMock);
+        TotrinnTjeneste totrinnTjenesteMock = mock(TotrinnTjeneste.class);
+        VilkårsvurderingRepository vilkårsvurderingRepository = mock(VilkårsvurderingRepository.class);
+        FaktaFeilutbetalingRepository faktaFeilutbetalingRepository = mock(FaktaFeilutbetalingRepository.class);
+        VedtaksbrevFritekstValidator vedtaksbrevFritekstValidator = new VedtaksbrevFritekstValidator(
+            faktaFeilutbetalingRepository, vilkårsvurderingRepository, behandlingRepository);
+        VedtaksbrevFritekstTjeneste vedtaksbrevFritekstTjeneste = new VedtaksbrevFritekstTjeneste(
+            vedtaksbrevFritekstValidator, vedtaksbrevFritekstRepository);
+        foreslåVedtakOppdaterer = new ForeslåVedtakOppdaterer(foreslåVedtakTjeneste, totrinnTjenesteMock,
+            aksjonspunktRepository, vedtaksbrevFritekstTjeneste);
 
-    private VedtaksbrevFritekstValidator vedtaksbrevFritekstValidator = new VedtaksbrevFritekstValidator(faktaFeilutbetalingRepository, vilkårsvurderingRepository, behandlingRepository);
-    private VedtaksbrevFritekstTjeneste vedtaksbrevFritekstTjeneste = new VedtaksbrevFritekstTjeneste(vedtaksbrevFritekstValidator, vedtaksbrevFritekstRepository);
-    private ForeslåVedtakOppdaterer foreslåVedtakOppdaterer = new ForeslåVedtakOppdaterer(foreslåVedtakTjeneste, totrinnTjenesteMock, aksjonspunktRepository, vedtaksbrevFritekstTjeneste);
-
-    @Before
-    public void setup() {
         when(historikkTjenesteAdapterMock.tekstBuilder()).thenReturn(new HistorikkInnslagTekstBuilder());
         when(beregningTjenesteMock.beregn(anyLong())).thenReturn(new BeregningResultat());
         when(faktaFeilutbetalingRepository.finnFaktaOmFeilutbetaling(anyLong())).thenReturn(Optional.of(new FaktaFeilutbetaling()));
@@ -73,7 +83,7 @@ public class ForeslåVedtakOppdatererTest {
     public void oppdater_medFaktaAvsnitt() {
         Behandling behandling = lagMockBehandling();
         foreslåVedtakOppdaterer.oppdater(lagMockForeslåVedtak("fakta", null, null), behandling);
-        repositoryRule.getEntityManager().flush();
+        entityManager.flush();
 
         fellesAssert(behandling);
         List<VedtaksbrevFritekstPeriode> perioder = vedtaksbrevFritekstRepository.hentVedtaksbrevPerioderMedTekst(behandling.getId());
@@ -89,7 +99,7 @@ public class ForeslåVedtakOppdatererTest {
     public void oppdater_medVilkårAvsnitt() {
         Behandling behandling = lagMockBehandling();
         foreslåVedtakOppdaterer.oppdater(lagMockForeslåVedtak(null, null, "vilkår"), behandling);
-        repositoryRule.getEntityManager().flush();
+        entityManager.flush();
 
         fellesAssert(behandling);
         List<VedtaksbrevFritekstPeriode> perioder = vedtaksbrevFritekstRepository.hentVedtaksbrevPerioderMedTekst(behandling.getId());
@@ -105,7 +115,7 @@ public class ForeslåVedtakOppdatererTest {
     public void oppdater_medSærligGrunnerAvsnitt() {
         Behandling behandling = lagMockBehandling();
         foreslåVedtakOppdaterer.oppdater(lagMockForeslåVedtak(null, "særligGrunner", null), behandling);
-        repositoryRule.getEntityManager().flush();
+        entityManager.flush();
 
         fellesAssert(behandling);
         List<VedtaksbrevFritekstPeriode> perioder = vedtaksbrevFritekstRepository.hentVedtaksbrevPerioderMedTekst(behandling.getId());

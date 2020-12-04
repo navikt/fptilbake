@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -12,8 +13,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TaskProperty;
@@ -39,7 +40,7 @@ public class LesKravgrunnlagTaskTest extends FellesTestOppsett {
     private Behandling behandling;
     private String saksnummer;
 
-    @Before
+    @BeforeEach
     public void setup() {
         kravgrunnlagId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_YTEL.xml"));
         when(personinfoAdapterMock.hentAktørForFnr(any(PersonIdent.class))).thenReturn(Optional.of(fagsak.getAktørId()));
@@ -70,16 +71,18 @@ public class LesKravgrunnlagTaskTest extends FellesTestOppsett {
     public void skal_ikke_utføre_leskravgrunnlag_task_nårBehandlingFinnesIkkeIFpsak() {
         when(fagsystemKlientMock.finnesBehandlingIFagsystem(fagsak.getSaksnummer().getVerdi(), HENVISNING)).thenReturn(false);
 
-        expectedException.expectMessage("FPT-587195");
-        lesKravgrunnlagTask.doTask(lagProsessTaskData());
+        assertThatThrownBy(() -> lesKravgrunnlagTask.doTask(lagProsessTaskData()))
+            .hasMessageContaining("FPT-587195");
     }
 
     @Test
     public void skal_ikke_utføre_leskravgrunnlag_task_forUgyldigBehandling() {
         kravgrunnlagId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_YTEL_ugyldig_referanse.xml"));
 
-        expectedException.expectMessage("Mottok et tilbakekrevingsgrunnlag fra Økonomi med henvisning som ikke er i støttet format. henvisning=ABC. Kravgrunnlaget skulle kanskje til et annet system. Si i fra til Økonomi!");
-        lesKravgrunnlagTask.doTask(lagProsessTaskData());
+        assertThatThrownBy(() -> lesKravgrunnlagTask.doTask(lagProsessTaskData()))
+            .hasMessageContaining("Mottok et tilbakekrevingsgrunnlag fra Økonomi med henvisning som ikke er i støttet format."
+                + " henvisning=ABC. Kravgrunnlaget skulle kanskje til et annet system. Si i fra til Økonomi!");
+
     }
 
     @Test

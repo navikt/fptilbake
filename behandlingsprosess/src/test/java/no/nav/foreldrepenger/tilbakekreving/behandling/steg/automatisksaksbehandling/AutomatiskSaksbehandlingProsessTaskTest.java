@@ -14,11 +14,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.persistence.EntityManager;
 import javax.persistence.FlushModeType;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 
 import com.google.common.collect.Lists;
@@ -83,7 +84,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Ak
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelse;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.SendVedtakHendelserTilDvhTask;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.tjeneste.AutomatiskFaktaFastsettelseTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.tjeneste.AvklartFaktaFeilutbetalingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
@@ -95,63 +96,99 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
 import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepositoryImpl;
 
+@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public class AutomatiskSaksbehandlingProsessTaskTest {
 
-    @Rule
-    public UnittestRepositoryRule repositoryRule = new UnittestRepositoryRule();
+    private BehandlingRepositoryProvider repositoryProvider;
+    private BehandlingRepository behandlingRepository;
+    private TotrinnRepository totrinnRepository;
+    private ProsessTaskRepository taskRepository;
+    private HistorikkTjenesteAdapter historikkTjenesteAdapter;
+    private GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste;
+    private AutomatiskFaktaFastsettelseTjeneste faktaFastsettelseTjeneste;
+    private VurderForeldelseAksjonspunktUtleder vurderForeldelseAksjonspunktUtleder;
+    private AutomatiskVurdertForeldelseTjeneste automatiskVurdertForeldelseTjeneste;
+    private AutomatiskVurdertVilkårTjeneste automatiskVurdertVilkårTjeneste;
+    private TilbakekrevingBeregningTjeneste tilbakekrevingBeregningTjeneste;
+    private ProsessTaskIverksett prosessTaskIverksett;
 
-    private final BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(repositoryRule.getEntityManager());
-    private final BehandlingRepository behandlingRepository = repositoryProvider.getBehandlingRepository();
-    private final KravgrunnlagRepository kravgrunnlagRepository = repositoryProvider.getGrunnlagRepository();
-    private final AksjonspunktRepository aksjonspunktRepository = repositoryProvider.getAksjonspunktRepository();
-    private final TotrinnRepository totrinnRepository = new TotrinnRepository(repositoryRule.getEntityManager());
-    private final VarselresponsRepository varselresponsRepository = new VarselresponsRepository(repositoryRule.getEntityManager());
-    private final ProsessTaskRepository taskRepository = new ProsessTaskRepositoryImpl(repositoryRule.getEntityManager(), null, null);
-    private final FellesQueriesForBehandlingRepositories fellesQueriesForBehandlingRepositories = new FellesQueriesForBehandlingRepositories(repositoryRule.getEntityManager());
-    private final BehandlingVenterRepository behandlingVenterRepository = new BehandlingVenterRepository(fellesQueriesForBehandlingRepositories);
-    private final BehandlingKandidaterRepository behandlingKandidaterRepository = new BehandlingKandidaterRepository(fellesQueriesForBehandlingRepositories);
-    private final InternalManipulerBehandling manipulerBehandling = new InternalManipulerBehandling(repositoryProvider);
-    private final HistorikkInnslagKonverter historikkInnslagKonverter = new HistorikkInnslagKonverter(aksjonspunktRepository);
-    private final HistorikkTjenesteAdapter historikkTjenesteAdapter = new HistorikkTjenesteAdapter(repositoryProvider.getHistorikkRepository(), historikkInnslagKonverter);
-    private final AvklartFaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste = new AvklartFaktaFeilutbetalingTjeneste(repositoryProvider.getFaktaFeilutbetalingRepository(),
-        historikkTjenesteAdapter);
-    private final VarselresponsTjeneste varselresponsTjeneste = new VarselresponsTjeneste(varselresponsRepository);
-    private final GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjeneste(taskRepository, behandlingKandidaterRepository,
-        behandlingVenterRepository, repositoryProvider, varselresponsTjeneste);
-    private final KravgrunnlagTjeneste kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repositoryProvider, gjenopptaBehandlingTjeneste,
-        null, null);
-    private final AutomatiskFaktaFastsettelseTjeneste faktaFastsettelseTjeneste = new AutomatiskFaktaFastsettelseTjeneste(faktaFeilutbetalingTjeneste,kravgrunnlagTjeneste);
-    private final VurderForeldelseAksjonspunktUtleder vurderForeldelseAksjonspunktUtleder = new VurderForeldelseAksjonspunktUtleder(Period.ofWeeks(-1),
-        kravgrunnlagRepository, behandlingRepository);
-    private final KravgrunnlagBeregningTjeneste kravgrunnlagBeregningTjeneste = new KravgrunnlagBeregningTjeneste(kravgrunnlagRepository);
-    private final VurdertForeldelseTjeneste vurdertForeldelseTjeneste = new VurdertForeldelseTjeneste(repositoryProvider, historikkTjenesteAdapter, kravgrunnlagBeregningTjeneste);
-    private final AutomatiskVurdertForeldelseTjeneste automatiskVurdertForeldelseTjeneste = new AutomatiskVurdertForeldelseTjeneste(vurderForeldelseAksjonspunktUtleder,vurdertForeldelseTjeneste);
-    private final VilkårsvurderingHistorikkInnslagTjeneste vilkårsvurderingHistorikkInnslagTjeneste = new VilkårsvurderingHistorikkInnslagTjeneste(historikkTjenesteAdapter,
-        repositoryProvider);
-    private final VilkårsvurderingTjeneste vilkårsvurderingTjeneste = new VilkårsvurderingTjeneste(vurdertForeldelseTjeneste, repositoryProvider,
-        vilkårsvurderingHistorikkInnslagTjeneste, kravgrunnlagBeregningTjeneste);
-    private final AutomatiskVurdertVilkårTjeneste automatiskVurdertVilkårTjeneste = new AutomatiskVurdertVilkårTjeneste(vilkårsvurderingTjeneste, aksjonspunktRepository);
-    private final TilbakekrevingBeregningTjeneste tilbakekrevingBeregningTjeneste = new TilbakekrevingBeregningTjeneste(repositoryProvider, kravgrunnlagBeregningTjeneste);
-    private final ProsessTaskIverksett prosessTaskIverksett = new ProsessTaskIverksett(taskRepository, repositoryProvider.getBrevSporingRepository());
-
-    private final BehandlingModellRepository behandlingModellRepositoryMock = Mockito.mock(BehandlingModellRepository.class);
-    private final BehandlingskontrollEventPubliserer behandlingskontrollEventPublisererMock = mock(BehandlingskontrollEventPubliserer.class);
-    private final BehandlingskontrollTjeneste behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(repositoryProvider, behandlingModellRepositoryMock,
-        behandlingskontrollEventPublisererMock);
-    private final AutomatiskSaksbehandlingProsessTask automatiskSaksbehandlingProsessTask = new AutomatiskSaksbehandlingProsessTask(behandlingRepository, behandlingskontrollTjeneste);
+    private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
+    private AutomatiskSaksbehandlingProsessTask automatiskSaksbehandlingProsessTask;
     ScenarioSimple scenarioSimple = ScenarioSimple.simple();
     private Behandling behandling;
     private Long behandlingId;
 
-    @Before
-    public void setup() {
-        repositoryRule.getEntityManager().setFlushMode(FlushModeType.AUTO);
-        behandling = scenarioSimple.medBehandlingType(BehandlingType.TILBAKEKREVING).medDefaultKravgrunnlag().lagre(repositoryProvider);
-        behandlingId = behandling.getId();
-        manipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.FAKTA_FEILUTBETALING, BehandlingStegStatus.UTGANG);
+    @BeforeEach
+    public void setup(EntityManager entityManager) {
+        repositoryProvider = new BehandlingRepositoryProvider(entityManager);
+        behandlingRepository = repositoryProvider.getBehandlingRepository();
+        KravgrunnlagRepository kravgrunnlagRepository = repositoryProvider.getGrunnlagRepository();
+        AksjonspunktRepository aksjonspunktRepository = repositoryProvider.getAksjonspunktRepository();
+        totrinnRepository = new TotrinnRepository(entityManager);
+        VarselresponsRepository varselresponsRepository = new VarselresponsRepository(entityManager);
+        taskRepository = new ProsessTaskRepositoryImpl(entityManager, null, null);
+        FellesQueriesForBehandlingRepositories fellesQueriesForBehandlingRepositories = new FellesQueriesForBehandlingRepositories(
+            entityManager);
+        BehandlingVenterRepository behandlingVenterRepository = new BehandlingVenterRepository(
+            fellesQueriesForBehandlingRepositories);
+        BehandlingKandidaterRepository behandlingKandidaterRepository = new BehandlingKandidaterRepository(
+            fellesQueriesForBehandlingRepositories);
+        InternalManipulerBehandling manipulerBehandling = new InternalManipulerBehandling(repositoryProvider);
+        HistorikkInnslagKonverter historikkInnslagKonverter = new HistorikkInnslagKonverter(aksjonspunktRepository);
+        historikkTjenesteAdapter = new HistorikkTjenesteAdapter(repositoryProvider.getHistorikkRepository(),
+            historikkInnslagKonverter);
+        AvklartFaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste = new AvklartFaktaFeilutbetalingTjeneste(
+            repositoryProvider.getFaktaFeilutbetalingRepository(), historikkTjenesteAdapter);
 
-        when(behandlingModellRepositoryMock.getBehandlingStegKonfigurasjon()).thenReturn(BehandlingStegKonfigurasjon.lagDummy());
-        when(behandlingModellRepositoryMock.getModell(any(BehandlingType.class))).thenReturn(lagDummyBehandlingsModell());
+        VarselresponsTjeneste varselresponsTjeneste = new VarselresponsTjeneste(varselresponsRepository);
+        gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjeneste(taskRepository, behandlingKandidaterRepository,
+            behandlingVenterRepository, repositoryProvider, varselresponsTjeneste);
+
+        KravgrunnlagTjeneste kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repositoryProvider,
+            gjenopptaBehandlingTjeneste, null, null);
+
+        faktaFastsettelseTjeneste = new AutomatiskFaktaFastsettelseTjeneste(faktaFeilutbetalingTjeneste,
+            kravgrunnlagTjeneste);
+        vurderForeldelseAksjonspunktUtleder = new VurderForeldelseAksjonspunktUtleder(Period.ofWeeks(-1),
+            kravgrunnlagRepository, behandlingRepository);
+
+        KravgrunnlagBeregningTjeneste kravgrunnlagBeregningTjeneste = new KravgrunnlagBeregningTjeneste(
+            kravgrunnlagRepository);
+        VurdertForeldelseTjeneste vurdertForeldelseTjeneste = new VurdertForeldelseTjeneste(repositoryProvider,
+            historikkTjenesteAdapter, kravgrunnlagBeregningTjeneste);
+        automatiskVurdertForeldelseTjeneste = new AutomatiskVurdertForeldelseTjeneste(
+            vurderForeldelseAksjonspunktUtleder, vurdertForeldelseTjeneste);
+        VilkårsvurderingHistorikkInnslagTjeneste vilkårsvurderingHistorikkInnslagTjeneste = new VilkårsvurderingHistorikkInnslagTjeneste(
+            historikkTjenesteAdapter, repositoryProvider);
+
+        VilkårsvurderingTjeneste vilkårsvurderingTjeneste = new VilkårsvurderingTjeneste(vurdertForeldelseTjeneste,
+            repositoryProvider, vilkårsvurderingHistorikkInnslagTjeneste, kravgrunnlagBeregningTjeneste);
+
+        automatiskVurdertVilkårTjeneste = new AutomatiskVurdertVilkårTjeneste(vilkårsvurderingTjeneste,
+            aksjonspunktRepository);
+        tilbakekrevingBeregningTjeneste = new TilbakekrevingBeregningTjeneste(repositoryProvider,
+            kravgrunnlagBeregningTjeneste);
+        prosessTaskIverksett = new ProsessTaskIverksett(taskRepository, repositoryProvider.getBrevSporingRepository());
+        BehandlingModellRepository behandlingModellRepositoryMock = Mockito.mock(BehandlingModellRepository.class);
+        BehandlingskontrollEventPubliserer behandlingskontrollEventPublisererMock = mock(
+            BehandlingskontrollEventPubliserer.class);
+        behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(repositoryProvider,
+            behandlingModellRepositoryMock, behandlingskontrollEventPublisererMock);
+
+        automatiskSaksbehandlingProsessTask = new AutomatiskSaksbehandlingProsessTask(behandlingRepository,
+            behandlingskontrollTjeneste);
+        entityManager.setFlushMode(FlushModeType.AUTO);
+        behandling = scenarioSimple.medBehandlingType(BehandlingType.TILBAKEKREVING)
+            .medDefaultKravgrunnlag()
+            .lagre(repositoryProvider);
+        behandlingId = behandling.getId();
+        manipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.FAKTA_FEILUTBETALING,
+            BehandlingStegStatus.UTGANG);
+
+        when(behandlingModellRepositoryMock.getBehandlingStegKonfigurasjon()).thenReturn(
+            BehandlingStegKonfigurasjon.lagDummy());
+        when(behandlingModellRepositoryMock.getModell(any(BehandlingType.class))).thenReturn(
+            lagDummyBehandlingsModell());
     }
 
     @Test
@@ -165,51 +202,79 @@ public class AutomatiskSaksbehandlingProsessTaskTest {
 
         List<ProsessTaskData> prosessTasker = taskRepository.finnAlle(ProsessTaskStatus.KLAR);
         assertThat(prosessTasker.size()).isEqualTo(3);
-        List<String> prosessTaskNavn = prosessTasker.stream().map(ProsessTaskData::getTaskType).collect(Collectors.toList());
+        List<String> prosessTaskNavn = prosessTasker.stream()
+            .map(ProsessTaskData::getTaskType)
+            .collect(Collectors.toList());
         assertThat(prosessTaskNavn.contains(SendVedtaksbrevTask.TASKTYPE)).isFalse();
         assertThat(prosessTaskNavn.contains(AvsluttBehandlingTask.TASKTYPE)).isTrue();
         assertThat(prosessTaskNavn.contains(SendØkonomiTibakekerevingsVedtakTask.TASKTYPE)).isTrue();
         assertThat(prosessTaskNavn.contains(SendVedtakHendelserTilDvhTask.TASKTYPE)).isTrue();
 
-        Optional<FaktaFeilutbetaling> faktaFeilutbetalingData = repositoryProvider.getFaktaFeilutbetalingRepository().finnFaktaOmFeilutbetaling(behandlingId);
+        Optional<FaktaFeilutbetaling> faktaFeilutbetalingData = repositoryProvider.getFaktaFeilutbetalingRepository()
+            .finnFaktaOmFeilutbetaling(behandlingId);
         assertThat(faktaFeilutbetalingData).isPresent();
         FaktaFeilutbetaling faktaFeilutbetaling = faktaFeilutbetalingData.get();
-        assertThat(faktaFeilutbetaling.getBegrunnelse()).isEqualTo(AutomatiskSaksbehandlingTaskProperties.AUTOMATISK_SAKSBEHANDLING_BEGUNNLESE);
-        assertThat(faktaFeilutbetaling.getFeilutbetaltPerioder().stream()
-            .allMatch(faktaFeilutbetalingPeriode ->
-                HendelseType.FP_ANNET_HENDELSE_TYPE.equals(faktaFeilutbetalingPeriode.getHendelseType()))).isTrue();
-        assertThat(faktaFeilutbetaling.getFeilutbetaltPerioder().stream()
-            .allMatch(faktaFeilutbetalingPeriode ->HendelseUnderType.ANNET_FRITEKST.equals(faktaFeilutbetalingPeriode.getHendelseUndertype()))).isTrue();
+        assertThat(faktaFeilutbetaling.getBegrunnelse()).isEqualTo(
+            AutomatiskSaksbehandlingTaskProperties.AUTOMATISK_SAKSBEHANDLING_BEGUNNLESE);
+        assertThat(faktaFeilutbetaling.getFeilutbetaltPerioder()
+            .stream()
+            .allMatch(faktaFeilutbetalingPeriode -> HendelseType.FP_ANNET_HENDELSE_TYPE.equals(
+                faktaFeilutbetalingPeriode.getHendelseType()))).isTrue();
+        assertThat(faktaFeilutbetaling.getFeilutbetaltPerioder()
+            .stream()
+            .allMatch(faktaFeilutbetalingPeriode -> HendelseUnderType.ANNET_FRITEKST.equals(
+                faktaFeilutbetalingPeriode.getHendelseUndertype()))).isTrue();
 
-        Optional<VurdertForeldelse> vurdertForeldelseData = repositoryProvider.getVurdertForeldelseRepository().finnVurdertForeldelse(behandlingId);
+        Optional<VurdertForeldelse> vurdertForeldelseData = repositoryProvider.getVurdertForeldelseRepository()
+            .finnVurdertForeldelse(behandlingId);
         assertThat(vurdertForeldelseData).isPresent();
         VurdertForeldelse vurdertForeldelse = vurdertForeldelseData.get();
-        assertThat(vurdertForeldelse.getVurdertForeldelsePerioder().stream()
-            .allMatch(vurdertForeldelsePeriode -> ForeldelseVurderingType.IKKE_FORELDET.equals(vurdertForeldelsePeriode.getForeldelseVurderingType()))).isTrue();
-        assertThat(vurdertForeldelse.getVurdertForeldelsePerioder().stream()
-            .allMatch(vurdertForeldelsePeriode -> AutomatiskSaksbehandlingTaskProperties.AUTOMATISK_SAKSBEHANDLING_BEGUNNLESE.equals(vurdertForeldelsePeriode.getBegrunnelse()))).isTrue();
+        assertThat(vurdertForeldelse.getVurdertForeldelsePerioder()
+            .stream()
+            .allMatch(vurdertForeldelsePeriode -> ForeldelseVurderingType.IKKE_FORELDET.equals(
+                vurdertForeldelsePeriode.getForeldelseVurderingType()))).isTrue();
+        assertThat(vurdertForeldelse.getVurdertForeldelsePerioder()
+            .stream()
+            .allMatch(
+                vurdertForeldelsePeriode -> AutomatiskSaksbehandlingTaskProperties.AUTOMATISK_SAKSBEHANDLING_BEGUNNLESE.equals(
+                    vurdertForeldelsePeriode.getBegrunnelse()))).isTrue();
 
-        Optional<VilkårVurderingEntitet> vilkårsVurderingData = repositoryProvider.getVilkårsvurderingRepository().finnVilkårsvurdering(behandlingId);
+        Optional<VilkårVurderingEntitet> vilkårsVurderingData = repositoryProvider.getVilkårsvurderingRepository()
+            .finnVilkårsvurdering(behandlingId);
         assertThat(vilkårsVurderingData).isPresent();
         VilkårVurderingEntitet vilkårVurderingEntitet = vilkårsVurderingData.get();
-        assertThat(vilkårVurderingEntitet.getPerioder().stream().allMatch(periode -> VilkårResultat.FORSTO_BURDE_FORSTÅTT.equals(periode.getVilkårResultat()))).isTrue();
-        assertThat(vilkårVurderingEntitet.getPerioder().stream().allMatch(periode -> Aktsomhet.SIMPEL_UAKTSOM.equals(periode.getAktsomhetResultat()))).isTrue();
-        assertThat(vilkårVurderingEntitet.getPerioder().stream().allMatch(periode ->
-            AutomatiskSaksbehandlingTaskProperties.AUTOMATISK_SAKSBEHANDLING_BEGUNNLESE.equals(periode.getBegrunnelseAktsomhet()))).isTrue();
-        assertThat(vilkårVurderingEntitet.getPerioder().stream().allMatch(periode ->
-            AutomatiskSaksbehandlingTaskProperties.AUTOMATISK_SAKSBEHANDLING_BEGUNNLESE.equals(periode.getBegrunnelse()))).isTrue();
-        assertThat(vilkårVurderingEntitet.getPerioder().stream().allMatch(VilkårVurderingPeriodeEntitet::tilbakekrevesSmåbeløp)).isFalse();
+        assertThat(vilkårVurderingEntitet.getPerioder()
+            .stream()
+            .allMatch(periode -> VilkårResultat.FORSTO_BURDE_FORSTÅTT.equals(periode.getVilkårResultat()))).isTrue();
+        assertThat(vilkårVurderingEntitet.getPerioder()
+            .stream()
+            .allMatch(periode -> Aktsomhet.SIMPEL_UAKTSOM.equals(periode.getAktsomhetResultat()))).isTrue();
+        assertThat(vilkårVurderingEntitet.getPerioder()
+            .stream()
+            .allMatch(periode -> AutomatiskSaksbehandlingTaskProperties.AUTOMATISK_SAKSBEHANDLING_BEGUNNLESE.equals(
+                periode.getBegrunnelseAktsomhet()))).isTrue();
+        assertThat(vilkårVurderingEntitet.getPerioder()
+            .stream()
+            .allMatch(periode -> AutomatiskSaksbehandlingTaskProperties.AUTOMATISK_SAKSBEHANDLING_BEGUNNLESE.equals(
+                periode.getBegrunnelse()))).isTrue();
+        assertThat(vilkårVurderingEntitet.getPerioder()
+            .stream()
+            .allMatch(VilkårVurderingPeriodeEntitet::tilbakekrevesSmåbeløp)).isFalse();
 
-        List<Historikkinnslag> historikkinnslager = repositoryProvider.getHistorikkRepository().hentHistorikk(behandlingId);
-        assertThat(historikkinnslager.stream().allMatch(historikkinnslag -> HistorikkAktør.VEDTAKSLØSNINGEN.equals(historikkinnslag.getAktør()))).isTrue();
+        List<Historikkinnslag> historikkinnslager = repositoryProvider.getHistorikkRepository()
+            .hentHistorikk(behandlingId);
+        assertThat(historikkinnslager.stream()
+            .allMatch(
+                historikkinnslag -> HistorikkAktør.VEDTAKSLØSNINGEN.equals(historikkinnslag.getAktør()))).isTrue();
 
         assertThat(totrinnRepository.hentTotrinngrunnlag(behandling)).isEmpty();
     }
 
     @Test
     public void skal_ikke_saksbehandle_automatisk_når_behandling_er_på_vent() {
-        behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG,
-            BehandlingStegType.FAKTA_FEILUTBETALING, LocalDateTime.now().plusDays(2), Venteårsak.AVVENTER_DOKUMENTASJON);
+        behandlingskontrollTjeneste.settBehandlingPåVent(behandling,
+            AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, BehandlingStegType.FAKTA_FEILUTBETALING,
+            LocalDateTime.now().plusDays(2), Venteårsak.AVVENTER_DOKUMENTASJON);
         automatiskSaksbehandlingProsessTask.doTask(lagProsesTaskData());
         assertThat(behandling.isAutomatiskSaksbehandlet()).isFalse();
         assertThat(behandling.getStatus()).isEqualByComparingTo(BehandlingStatus.UTREDES);
@@ -228,7 +293,7 @@ public class AutomatiskSaksbehandlingProsessTaskTest {
     public void skal_ikke_saksbehandle_automatisk_når_behandling_er_allerede_saksbehandlet() {
         behandling.setAnsvarligSaksbehandler("1234");
         BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(behandling);
-        behandlingRepository.lagre(behandling,behandlingLås);
+        behandlingRepository.lagre(behandling, behandlingLås);
 
         automatiskSaksbehandlingProsessTask.doTask(lagProsesTaskData());
         assertThat(behandling.isAutomatiskSaksbehandlet()).isFalse();
@@ -244,19 +309,25 @@ public class AutomatiskSaksbehandlingProsessTaskTest {
 
     private BehandlingModell lagDummyBehandlingsModell() {
         List<TestStegKonfig> steg = Lists.newArrayList(
-            new TestStegKonfig(BehandlingStegType.FAKTA_VERGE, BehandlingType.TILBAKEKREVING, new FaktaVergeSteg(behandlingRepository)),
-            new TestStegKonfig(BehandlingStegType.TBKGSTEG, BehandlingType.TILBAKEKREVING, new MottattGrunnlagSteg(behandlingRepository, behandlingskontrollTjeneste,
-                gjenopptaBehandlingTjeneste, null, Period.ofWeeks(-1))),
+            new TestStegKonfig(BehandlingStegType.FAKTA_VERGE, BehandlingType.TILBAKEKREVING,
+                new FaktaVergeSteg(behandlingRepository)),
+            new TestStegKonfig(BehandlingStegType.TBKGSTEG, BehandlingType.TILBAKEKREVING,
+                new MottattGrunnlagSteg(behandlingRepository, behandlingskontrollTjeneste, gjenopptaBehandlingTjeneste,
+                    null, Period.ofWeeks(-1))),
             new TestStegKonfig(BehandlingStegType.FAKTA_FEILUTBETALING, BehandlingType.TILBAKEKREVING,
-                new FaktaFeilutbetalingSteg(behandlingRepository,faktaFastsettelseTjeneste)),
-            new TestStegKonfig(BehandlingStegType.FORELDELSEVURDERINGSTEG, BehandlingType.TILBAKEKREVING, new VurderForeldelseSteg(repositoryProvider,
-                vurderForeldelseAksjonspunktUtleder, automatiskVurdertForeldelseTjeneste)),
+                new FaktaFeilutbetalingSteg(behandlingRepository, faktaFastsettelseTjeneste)),
+            new TestStegKonfig(BehandlingStegType.FORELDELSEVURDERINGSTEG, BehandlingType.TILBAKEKREVING,
+                new VurderForeldelseSteg(repositoryProvider, vurderForeldelseAksjonspunktUtleder,
+                    automatiskVurdertForeldelseTjeneste)),
             new TestStegKonfig(BehandlingStegType.VTILBSTEG, BehandlingType.TILBAKEKREVING,
                 new VurderTilbakekrevingSteg(repositoryProvider, automatiskVurdertVilkårTjeneste)),
-            new TestStegKonfig(BehandlingStegType.FORESLÅ_VEDTAK, BehandlingType.TILBAKEKREVING, new ForeslåVedtakSteg(behandlingRepository)),
-            new TestStegKonfig(BehandlingStegType.FATTE_VEDTAK, BehandlingType.TILBAKEKREVING, new FatteVedtakSteg(repositoryProvider, totrinnRepository,
-                tilbakekrevingBeregningTjeneste, historikkTjenesteAdapter)),
-            new TestStegKonfig(BehandlingStegType.IVERKSETT_VEDTAK, BehandlingType.TILBAKEKREVING, new IverksetteVedtakSteg(repositoryProvider, prosessTaskIverksett)));
+            new TestStegKonfig(BehandlingStegType.FORESLÅ_VEDTAK, BehandlingType.TILBAKEKREVING,
+                new ForeslåVedtakSteg(behandlingRepository)),
+            new TestStegKonfig(BehandlingStegType.FATTE_VEDTAK, BehandlingType.TILBAKEKREVING,
+                new FatteVedtakSteg(repositoryProvider, totrinnRepository, tilbakekrevingBeregningTjeneste,
+                    historikkTjenesteAdapter)),
+            new TestStegKonfig(BehandlingStegType.IVERKSETT_VEDTAK, BehandlingType.TILBAKEKREVING,
+                new IverksetteVedtakSteg(repositoryProvider, prosessTaskIverksett)));
 
         BehandlingModellImpl.TriFunction<BehandlingStegType, BehandlingType, BehandlingSteg> finnSteg = map(steg);
         BehandlingModellImpl modell = new BehandlingModellImpl(BehandlingType.TILBAKEKREVING, finnSteg);

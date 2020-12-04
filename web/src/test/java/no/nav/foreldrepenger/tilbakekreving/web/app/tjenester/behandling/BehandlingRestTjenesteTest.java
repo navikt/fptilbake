@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -17,9 +18,7 @@ import java.util.UUID;
 import javax.ws.rs.core.Response;
 
 import org.apache.http.HttpStatus;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.Lists;
 
@@ -71,9 +70,6 @@ public class BehandlingRestTjenesteTest {
     public static final String EKSTERN_BEHANDLING_UUID = UUID.randomUUID().toString();
     private static final FagsakYtelseType FP_YTELSE_TYPE = FagsakYtelseType.FORELDREPENGER;
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
-
     private BehandlingTjeneste behandlingTjenesteMock = mock(BehandlingTjeneste.class);
     private GjenopptaBehandlingTjeneste gjenopptaBehandlingTjenesteMock = mock(GjenopptaBehandlingTjeneste.class);
     private BehandlingDtoTjeneste behandlingDtoTjenesteMock = mock(BehandlingDtoTjeneste.class);
@@ -92,17 +88,16 @@ public class BehandlingRestTjenesteTest {
 
     private static SaksnummerDto saksnummerDto = new SaksnummerDto(GYLDIG_SAKSNR);
     private static FpsakUuidDto fpsakUuidDto = new FpsakUuidDto(EKSTERN_BEHANDLING_UUID);
-    private static BehandlingReferanse behandlingReferanse = new BehandlingReferanse(1l);
+    private static BehandlingReferanse behandlingReferanse = new BehandlingReferanse(1L);
     private static UuidDto uuidDto = new UuidDto(UUID.randomUUID());
 
     @Test
-    public void test_opprett_behandling_skal_feile_med_ugyldig_saksnummer() throws URISyntaxException {
+    public void test_opprett_behandling_skal_feile_med_ugyldig_saksnummer() {
         OpprettBehandlingDto dto = opprettBehandlingDto(UGYLDIG_SAKSNR, EKSTERN_BEHANDLING_UUID, FP_YTELSE_TYPE);
 
-        expectedException.expect(IllegalArgumentException.class); // ved rest-kall vil jax validering slå inn og resultere i en FeltFeil
-        expectedException.expectMessage("Ugyldig saksnummer");
-
-        behandlingRestTjeneste.opprettBehandling(dto);
+        assertThatThrownBy(() -> behandlingRestTjeneste.opprettBehandling(dto)) // ved rest-kall vil jax validering slå inn og resultere i en FeltFeil
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("Ugyldig saksnummer");
     }
 
     @Test
@@ -123,7 +118,7 @@ public class BehandlingRestTjenesteTest {
         OpprettBehandlingDto opprettBehandlingDto = opprettBehandlingDto(GYLDIG_SAKSNR, EKSTERN_BEHANDLING_UUID, FP_YTELSE_TYPE);
         opprettBehandlingDto.setBehandlingType(BehandlingType.REVURDERING_TILBAKEKREVING);
         opprettBehandlingDto.setBehandlingArsakType(BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR);
-        opprettBehandlingDto.setBehandlingId(1l);
+        opprettBehandlingDto.setBehandlingId(1L);
 
         Response response = behandlingRestTjeneste.opprettBehandling(opprettBehandlingDto);
 
@@ -297,7 +292,7 @@ public class BehandlingRestTjenesteTest {
     }
 
     private Optional<EksternBehandling> opprettEksternBehandling() {
-        return Optional.of(new EksternBehandling(mockBehandling(), Henvisning.fraEksternBehandlingId(1l), UUID.fromString(EKSTERN_BEHANDLING_UUID)));
+        return Optional.of(new EksternBehandling(mockBehandling(), Henvisning.fraEksternBehandlingId(1L), UUID.fromString(EKSTERN_BEHANDLING_UUID)));
     }
 
 }

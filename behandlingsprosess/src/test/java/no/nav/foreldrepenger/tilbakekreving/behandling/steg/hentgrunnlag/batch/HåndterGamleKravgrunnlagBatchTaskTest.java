@@ -17,35 +17,37 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
 
+import javax.persistence.EntityManager;
 import javax.persistence.FlushModeType;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
 import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepositoryImpl;
 
+@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public class HåndterGamleKravgrunnlagBatchTaskTest {
 
-    @Rule
-    public UnittestRepositoryRule repositoryRule = new UnittestRepositoryRule();
-
-    private final ProsessTaskRepository prosessTaskRepository = new ProsessTaskRepositoryImpl(repositoryRule.getEntityManager(),null, null);
-    private final ØkonomiMottattXmlRepository mottattXmlRepository = new ØkonomiMottattXmlRepository(repositoryRule.getEntityManager());
+    private ProsessTaskRepository prosessTaskRepository;
+    private ØkonomiMottattXmlRepository mottattXmlRepository;
     private final Clock clock = Clock.fixed(Instant.parse(getDateString()), ZoneId.systemDefault());
-    private final HåndterGamleKravgrunnlagBatchTask gamleKravgrunnlagBatchTjeneste = new HåndterGamleKravgrunnlagBatchTask(mottattXmlRepository,
-        prosessTaskRepository, clock, Period.ofWeeks(-1));
+    private HåndterGamleKravgrunnlagBatchTask gamleKravgrunnlagBatchTjeneste;
     Long mottattXmlId = null;
 
-    @Before
-    public void setup() {
-        repositoryRule.getEntityManager().setFlushMode(FlushModeType.AUTO);
+    @BeforeEach
+    public void setup(EntityManager entityManager) {
+        entityManager.setFlushMode(FlushModeType.AUTO);
+        mottattXmlRepository = new ØkonomiMottattXmlRepository(entityManager);
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML());
+        prosessTaskRepository = new ProsessTaskRepositoryImpl(entityManager, null, null);
+        gamleKravgrunnlagBatchTjeneste = new HåndterGamleKravgrunnlagBatchTask(mottattXmlRepository,
+            prosessTaskRepository, clock, Period.ofWeeks(-1));
     }
 
     @Test

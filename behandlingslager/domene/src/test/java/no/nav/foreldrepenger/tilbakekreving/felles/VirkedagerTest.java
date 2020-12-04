@@ -8,13 +8,13 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class VirkedagerTest {
     private Map<DayOfWeek, LocalDate> uke;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         LocalDate iDag = LocalDate.now();
         LocalDate mandag = iDag.minusDays(iDag.getDayOfWeek().getValue() - DayOfWeek.MONDAY.getValue());

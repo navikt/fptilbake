@@ -4,10 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Optional;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import javax.persistence.EntityManager;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
@@ -18,8 +19,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakReposi
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.TestFagsakUtil;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons.Varselrespons;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons.VarselresponsRepository;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
 
+@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public class VarselresponsTjenesteTest {
 
     private static Long BEHANDLING_ID;
@@ -29,19 +31,11 @@ public class VarselresponsTjenesteTest {
     private FagsakRepository fagsakRepository;
     private VarselresponsTjeneste varselresponsTjeneste;
 
-    @Rule
-    public final UnittestRepositoryRule repositoryRule = new UnittestRepositoryRule();
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
-
-    private VarselresponsRepository repository;
-
-    @Before
-    public void setup() {
-        behandlingRepository = new BehandlingRepository(repositoryRule.getEntityManager());
-        fagsakRepository = new FagsakRepository(repositoryRule.getEntityManager());
-        repository = new VarselresponsRepository(repositoryRule.getEntityManager());
+    @BeforeEach
+    public void setup(EntityManager entityManager) {
+        behandlingRepository = new BehandlingRepository(entityManager);
+        fagsakRepository = new FagsakRepository(entityManager);
+        VarselresponsRepository repository = new VarselresponsRepository(entityManager);
         varselresponsTjeneste = new VarselresponsTjeneste(repository);
 
         BEHANDLING_ID = opprettBehandling();

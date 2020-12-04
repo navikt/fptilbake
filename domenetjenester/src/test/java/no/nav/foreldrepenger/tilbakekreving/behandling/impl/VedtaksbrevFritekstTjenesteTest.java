@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -8,12 +9,10 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -33,45 +32,38 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
-import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
-@RunWith(CdiRunner.class)
+@CdiDbAwareTest
 public class VedtaksbrevFritekstTjenesteTest {
-
-    @Rule
-    public UnittestRepositoryRule repoRule = new UnittestRepositoryRule();
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     @Inject
     private BehandlingRepository behandlingRepository;
     @Inject
     private FagsakRepository fagsakRepository;
-
     @Inject
     private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository;
     @Inject
     private VedtaksbrevFritekstRepository vedtaksbrevFritekstRepository;
-
     @Inject
     private VedtaksbrevFritekstTjeneste tjeneste;
+    @Inject
+    private EntityManager entityManager;
 
-    private LocalDate jan1 = LocalDate.of(2019, 1, 1);
-    private LocalDate jan2 = LocalDate.of(2019, 1, 2);
-    private LocalDate jan3 = LocalDate.of(2019, 1, 3);
-    private LocalDate jan24 = LocalDate.of(2019, 1, 24);
+    private final LocalDate jan1 = LocalDate.of(2019, 1, 1);
+    private final LocalDate jan2 = LocalDate.of(2019, 1, 2);
+    private final LocalDate jan3 = LocalDate.of(2019, 1, 3);
+    private final LocalDate jan24 = LocalDate.of(2019, 1, 24);
 
-    private NavBruker bruker = NavBruker.opprettNy(new AktørId(1L), Språkkode.nb);
-    private Fagsak fagsak = Fagsak.opprettNy(new Saksnummer("123"), bruker);
-    private Behandling behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).build();
+    private final NavBruker bruker = NavBruker.opprettNy(new AktørId(1L), Språkkode.nb);
+    private final Fagsak fagsak = Fagsak.opprettNy(new Saksnummer("123"), bruker);
+    private final Behandling behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).build();
     private Long behandlingId;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         fagsakRepository.lagre(fagsak);
         behandlingId = behandlingRepository.lagre(behandling, new BehandlingLås(null));
@@ -89,16 +81,24 @@ public class VedtaksbrevFritekstTjenesteTest {
             .build());
         faktaFeilutbetalingRepository.lagre(behandlingId, fakta);
 
-        VedtaksbrevFritekstOppsummering oppsummering = new VedtaksbrevFritekstOppsummering.Builder().medBehandlingId(behandlingId).build();
+        VedtaksbrevFritekstOppsummering oppsummering = new VedtaksbrevFritekstOppsummering.Builder().medBehandlingId(
+            behandlingId).build();
         List<VedtaksbrevFritekstPeriode> fritekstperioder = Arrays.asList(
-            new VedtaksbrevFritekstPeriode.Builder().medBehandlingId(behandlingId).medFritekst("foo").medFritekstType(VedtaksbrevFritekstType.FAKTA_AVSNITT).medPeriode(Periode.of(jan1, jan2)).build(),
-            new VedtaksbrevFritekstPeriode.Builder().medBehandlingId(behandlingId).medFritekst("foo").medFritekstType(VedtaksbrevFritekstType.FAKTA_AVSNITT).medPeriode(Periode.of(jan3, jan24)).build()
-        );
+            new VedtaksbrevFritekstPeriode.Builder().medBehandlingId(behandlingId)
+                .medFritekst("foo")
+                .medFritekstType(VedtaksbrevFritekstType.FAKTA_AVSNITT)
+                .medPeriode(Periode.of(jan1, jan2))
+                .build(), new VedtaksbrevFritekstPeriode.Builder().medBehandlingId(behandlingId)
+                .medFritekst("foo")
+                .medFritekstType(VedtaksbrevFritekstType.FAKTA_AVSNITT)
+                .medPeriode(Periode.of(jan3, jan24))
+                .build());
 
         tjeneste.lagreFriteksterFraSaksbehandler(behandlingId, oppsummering, fritekstperioder, VedtaksbrevType.ORDINÆR);
-        repoRule.getEntityManager().flush();
+        entityManager.flush();
 
-        List<VedtaksbrevFritekstPeriode> fritekster = vedtaksbrevFritekstRepository.hentVedtaksbrevPerioderMedTekst(behandlingId);
+        List<VedtaksbrevFritekstPeriode> fritekster = vedtaksbrevFritekstRepository.hentVedtaksbrevPerioderMedTekst(
+            behandlingId);
         assertThat(fritekster).hasSize(2);
         assertThat(fritekster.get(0).getFritekst()).isEqualTo("foo");
         assertThat(fritekster.get(1).getFritekst()).isEqualTo("foo");
@@ -116,10 +116,12 @@ public class VedtaksbrevFritekstTjenesteTest {
             .build());
         faktaFeilutbetalingRepository.lagre(behandlingId, fakta);
 
-        VedtaksbrevFritekstOppsummering oppsummering = new VedtaksbrevFritekstOppsummering.Builder().medBehandlingId(behandlingId).build();
+        VedtaksbrevFritekstOppsummering oppsummering = new VedtaksbrevFritekstOppsummering.Builder().medBehandlingId(
+            behandlingId).build();
         List<VedtaksbrevFritekstPeriode> fritekstperioder = Collections.emptyList();
-        expectedException.expectMessage("Ugyldig input");
-        tjeneste.lagreFriteksterFraSaksbehandler(behandlingId, oppsummering, fritekstperioder, VedtaksbrevType.ORDINÆR);
+
+        assertThatThrownBy(() -> tjeneste.lagreFriteksterFraSaksbehandler(behandlingId, oppsummering, fritekstperioder,
+            VedtaksbrevType.ORDINÆR)).hasMessageContaining("Ugyldig input");
     }
 
 

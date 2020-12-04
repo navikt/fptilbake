@@ -5,7 +5,8 @@ import static org.mockito.Mockito.mock;
 
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingEnhetEventPubliserer;
@@ -19,8 +20,14 @@ public class BehandlendeEnhetTest extends FellesTestOppsett {
 
     private static final String NY_ENHET_ID = "4849";
     private static final String NY_ENHET_NAVN = "NAV Familie- og pensjonsytelser Tromsø";
-    private BehandlingEnhetEventPubliserer mockEventPubliserer = mock(BehandlingEnhetEventPubliserer.class);
-    private BehandlendeEnhetTjeneste behandlendeEnhetTjeneste = new BehandlendeEnhetTjeneste(repoProvider,mockEventPubliserer);
+    private BehandlingEnhetEventPubliserer mockEventPubliserer;
+    private BehandlendeEnhetTjeneste behandlendeEnhetTjeneste;
+
+    @BeforeEach
+    void setUp() {
+        mockEventPubliserer = mock(BehandlingEnhetEventPubliserer.class);
+        behandlendeEnhetTjeneste = new BehandlendeEnhetTjeneste(repoProvider, mockEventPubliserer);
+    }
 
     @Test
     public void skal_byttBehandlendeEnhet_med_gyldig_behandling() {

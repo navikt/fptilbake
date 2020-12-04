@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import java.time.Period;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class VurderForeldelseAksjonspunktUtlederTest {
 

@@ -11,13 +11,12 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
-import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
+import no.nav.vedtak.felles.testutilities.cdi.WeldContext;
 import no.nav.vedtak.isso.config.ServerInfo;
 import no.nav.vedtak.sikkerhet.abac.AbacDto;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
@@ -25,9 +24,23 @@ import no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessursResourceAttributt;
 import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
 
-
-@RunWith(CdiRunner.class)
 public class RestApiAbacTest {
+
+    static {
+        WeldContext.getInstance(); // init cdi container
+    }
+
+    @BeforeAll
+    public static void setup() {
+        System.setProperty(ServerInfo.PROPERTY_KEY_LOADBALANCER_URL, "http://localhost:8090");
+        System.setProperty("application.name", "fptilbake");
+    }
+
+    @AfterAll
+    public static void teardown() {
+        System.clearProperty(ServerInfo.PROPERTY_KEY_LOADBALANCER_URL);
+        System.clearProperty("application.name");
+    }
 
     /**
      * IKKE ignorer denne testen, sikrer at REST_MED_INNTEKTSMELDING-endepunkter får tilgangskontroll
@@ -35,7 +48,7 @@ public class RestApiAbacTest {
      * Kontakt Team Humle hvis du trenger hjelp til å endre koden din slik at den går igjennom her     *
      */
     @Test
-    public void test_at_alle_restmetoder_er_annotert_med_BeskyttetRessurs() throws Exception {
+    public void test_at_alle_restmetoder_er_annotert_med_BeskyttetRessurs() {
         for (Method restMethod : RestApiTester.finnAlleRestMetoder()) {
             if (restMethod.getAnnotation(BeskyttetRessurs.class) == null) {
                 throw new AssertionError("Mangler @" + BeskyttetRessurs.class.getSimpleName() + "-annotering på " + restMethod);
@@ -56,7 +69,7 @@ public class RestApiAbacTest {
      * Kontakt Team Humle hvis du trenger hjelp til å endre koden din slik at den går igjennom her     *
      */
     @Test
-    public void test_at_alle_input_parametre_til_restmetoder_implementer_AbacDto() throws Exception {
+    public void test_at_alle_input_parametre_til_restmetoder_implementer_AbacDto() {
         String feilmelding = "Parameter på %s.%s av type %s må implementere " + AbacDto.class.getSimpleName() + ".\n";
         StringBuilder feilmeldinger = new StringBuilder();
 
@@ -124,21 +137,9 @@ public class RestApiAbacTest {
         IgnorerteInputTyper(String className) {
             this.className = className;
         }
-
         static boolean ignore(Class<?> klasse) {
             return Arrays.stream(IgnorerteInputTyper.values()).anyMatch(e -> e.className.equals(klasse.getName()));
         }
-    }
 
-    @BeforeClass
-    public static void setup() {
-        System.setProperty(ServerInfo.PROPERTY_KEY_LOADBALANCER_URL, "http://localhost:8090");
-        System.setProperty("application.name", "fptilbake");
-    }
-
-    @AfterClass
-    public static void teardown() {
-        System.clearProperty(ServerInfo.PROPERTY_KEY_LOADBALANCER_URL);
-        System.clearProperty("application.name");
     }
 }

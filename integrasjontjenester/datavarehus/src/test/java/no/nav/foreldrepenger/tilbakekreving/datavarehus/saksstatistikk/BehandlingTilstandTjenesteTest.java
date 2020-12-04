@@ -8,11 +8,10 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.OrganisasjonsEnhet;
@@ -25,21 +24,16 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingresultatRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping.BehandlingTilstandMapper;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.BehandlingResultat;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.YtelseType;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.BehandlingTilstand;
-import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
-import no.nav.vedtak.felles.testutilities.db.RepositoryRule;
 
-@RunWith(CdiRunner.class)
+@CdiDbAwareTest
 public class BehandlingTilstandTjenesteTest {
-
-    @Rule
-    public RepositoryRule repositoryRule = new UnittestRepositoryRule();
 
     @Inject
     private BehandlingRepositoryProvider behandlingRepositoryProvider;
@@ -49,11 +43,13 @@ public class BehandlingTilstandTjenesteTest {
     private BehandlingresultatRepository behandlingresultatRepository;
     @Inject
     private BehandlingTilstandTjeneste tjeneste;
+    @Inject
+    private EntityManager entityManager;
 
     private Behandling behandling;
     private static final UUID EKSTERN_UUID = UUID.randomUUID();
 
-    @Before
+    @BeforeEach
     public void setup(){
         behandling = ScenarioSimple.simple().lagre(behandlingRepositoryProvider);
         EksternBehandling eksternBehandling = new EksternBehandling(behandling, Henvisning.fraEksternBehandlingId(1l), EKSTERN_UUID);
@@ -91,9 +87,9 @@ public class BehandlingTilstandTjenesteTest {
         behandling.setAnsvarligSaksbehandler("Z111111");
         behandling.setAnsvarligBeslutter("Z111112");
         behandling.avsluttBehandling();
-        repositoryRule.getEntityManager().persist(behandling);
-        repositoryRule.getEntityManager().flush();
-        repositoryRule.getEntityManager().clear();
+        entityManager.persist(behandling);
+        entityManager.flush();
+        entityManager.clear();
 
         BehandlingTilstand tilstand = tjeneste.hentBehandlingensTilstand(behandling.getId());
 
@@ -118,8 +114,8 @@ public class BehandlingTilstandTjenesteTest {
     public void skal_utlede_behandlingstilstand_for_behandling_på_vent() {
         System.setProperty("frist.brukerrespons.varsel", "P3W");
         behandlingTjeneste.settBehandlingPaVent(behandling.getId(), LocalDate.now().plusDays(1), Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING);
-        repositoryRule.getEntityManager().flush();
-        repositoryRule.getEntityManager().clear();
+        entityManager.flush();
+        entityManager.clear();
 
         BehandlingTilstand tilstand = tjeneste.hentBehandlingensTilstand(behandling.getId());
 

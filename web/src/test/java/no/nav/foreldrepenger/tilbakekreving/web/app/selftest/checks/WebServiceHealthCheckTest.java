@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.xml.ws.WebServiceException;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class WebServiceHealthCheckTest {
 
@@ -13,7 +13,7 @@ public class WebServiceHealthCheckTest {
 
     private static final String EXCEPTION_MSG = "SOAP is bad";
 
-    @Before
+    @BeforeEach
     public void setup() {
         healthCheck = new MyWebServiceHealthCheck();
     }

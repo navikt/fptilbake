@@ -10,8 +10,8 @@ import java.util.Set;
 
 import javax.persistence.FlushModeType;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.Lists;
 
@@ -42,17 +42,19 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 public class FaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
 
     private static final LocalDate NOW = LocalDate.now();
-    private HenleggBehandlingTjeneste henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repoProvider, prosessTaskRepository, behandlingskontrollTjeneste, mockHistorikkTjeneste);
+    private HenleggBehandlingTjeneste henleggBehandlingTjeneste;
 
-    @Before
+    @BeforeEach
     public void setup() {
-        repoRule.getEntityManager().setFlushMode(FlushModeType.AUTO);
+        entityManager.setFlushMode(FlushModeType.AUTO);
         EksternBehandlingsinfoDto behandlingsinfoDto = lagEksternBehandlingsInfo();
         SamletEksternBehandlingInfo samletEksternBehandlingInfo = new SamletEksternBehandlingInfo.Builder(Set.of(Tillegsinformasjon.TILBAKEKREVINGSVALG))
             .setGrunninformasjon(behandlingsinfoDto)
             .setTilbakekrevingvalg(new TilbakekrevingValgDto(VidereBehandling.TILBAKEKREV_I_INFOTRYGD))
             .build();
         when(mockFagsystemKlient.hentBehandlingsinfo(eksternBehandlingUuid, Tillegsinformasjon.TILBAKEKREVINGSVALG)).thenReturn(samletEksternBehandlingInfo);
+        henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repoProvider, prosessTaskRepository,
+            behandlingskontrollTjeneste, mockHistorikkTjeneste);
     }
 
     @Test

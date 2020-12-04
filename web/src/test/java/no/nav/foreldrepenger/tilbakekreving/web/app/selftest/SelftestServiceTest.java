@@ -10,8 +10,8 @@ import java.time.LocalDateTime;
 
 import javax.ws.rs.core.Response;
 
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import com.codahale.metrics.health.HealthCheck;
 
@@ -19,14 +19,14 @@ import ch.qos.logback.classic.Level;
 import no.nav.vedtak.log.util.MemoryAppender;
 
 public class SelftestServiceTest {
-    private static MemoryAppender logSniffer = MemoryAppender.sniff(SelftestService.class);
+    private static final MemoryAppender logSniffer = MemoryAppender.sniff(SelftestService.class);
     private static final String MSG_KRITISK_FEIL = "kritisk feil";
     private static final String MSG_IKKEKRITISK_FEIL = "ikke-kritisk feil";
 
     private Selftests mockSelftests = mock(Selftests.class);
     private SelftestService service = new SelftestService(mockSelftests);
 
-    @After
+    @AfterEach
     public void afterEach() {
         logSniffer.reset();
     }

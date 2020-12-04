@@ -12,10 +12,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.junit.Rule;
-import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.tilbakekrevingsvalg.VidereBehandling;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
@@ -41,9 +39,6 @@ public class FpsakKlientTest {
     private static final URI BEHANDLING_ALLE_URI = URI.create(BASE_URI + "/fpsak/api/behandlinger/alle?saksnummer=" + SAKSNUMMER);
     private static final URI PERSONOPPLYSNING_URI = URI.create(BASE_URI + "/fpsak/api/behandling/person/personopplysninger?uuid=" + BEHANDLING_UUID);
     private static final URI TILBAKEKREVING_VALG_URI = URI.create(BASE_URI + "/fpsak/api/behandling/tilbakekreving/valg?uuid=" + BEHANDLING_UUID);
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     private OidcRestClient oidcRestClientMock = mock(OidcRestClient.class);
     private FpoppdragRestKlient fpoppdragRestKlient = mock(FpoppdragRestKlient.class);

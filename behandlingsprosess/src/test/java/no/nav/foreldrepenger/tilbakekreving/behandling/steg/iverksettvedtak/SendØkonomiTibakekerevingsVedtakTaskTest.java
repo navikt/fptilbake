@@ -2,22 +2,20 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.steg.iverksettvedtak;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import javax.inject.Inject;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiConsumer;
 import no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste.TilbakekrevingsvedtakTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.MeldingType;
@@ -26,16 +24,10 @@ import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakRequest;
 import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakResponse;
 import no.nav.tilbakekreving.typer.v1.MmelDto;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
 
-@RunWith(CdiRunner.class)
+@CdiDbAwareTest
 public class SendØkonomiTibakekerevingsVedtakTaskTest {
-
-    @Rule
-    public UnittestRepositoryRule repositoryRule = new UnittestRepositoryRule();
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     @Inject
     private BehandlingRepositoryProvider behandlingRepositoryProvider;
@@ -44,11 +36,11 @@ public class SendØkonomiTibakekerevingsVedtakTaskTest {
     @Inject
     private ØkonomiSendtXmlRepository økonomiSendtXmlRepository;
 
-    private ØkonomiConsumer økonomiConsumer = Mockito.mock(ØkonomiConsumer.class);
+    private final ØkonomiConsumer økonomiConsumer = Mockito.mock(ØkonomiConsumer.class);
 
     private SendØkonomiTibakekerevingsVedtakTask task;
 
-    @Before
+    @BeforeEach
     public void setup(){
          task = new SendØkonomiTibakekerevingsVedtakTask(tilbakekrevingsvedtakTjeneste, økonomiConsumer, økonomiSendtXmlRepository);
     }
@@ -81,9 +73,8 @@ public class SendØkonomiTibakekerevingsVedtakTaskTest {
         Behandling behandling = scenario.lagre(behandlingRepositoryProvider);
         ProsessTaskData data = lagProsessTaskKonfigurasjon(behandling);
 
-        expectedException.expectMessage("Fikk feil fra OS ved iverksetting av behandling");
-
-        task.doTask(data);
+        assertThatThrownBy(() -> task.doTask(data))
+            .hasMessageContaining("Fikk feil fra OS ved iverksetting av behandling");
     }
 
     private ProsessTaskData lagProsessTaskKonfigurasjon(Behandling behandling) {

@@ -10,11 +10,9 @@ import java.util.Optional;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegOvergangEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegStatusEvent;
@@ -30,10 +28,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
-import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
 
-@RunWith(CdiRunner.class)
+@CdiDbAwareTest
 public class BehandlingskontrollEventPublisererTest {
     private final BehandlingType behandlingType = BehandlingType.TILBAKEKREVING;
 
@@ -42,27 +39,24 @@ public class BehandlingskontrollEventPublisererTest {
     private static final BehandlingStegType STEG_3 = TestBehandlingStegType.STEG_3;
     private static final BehandlingStegType STEG_4 = TestBehandlingStegType.STEG_4;
 
-    @Rule
-    public final UnittestRepositoryRule repoRule = new UnittestRepositoryRule();
-
-    private EntityManager em = repoRule.getEntityManager();
+    @Inject
+    private EntityManager em;
 
     @Inject
-    BehandlingskontrollEventPubliserer eventPubliserer;
+    private BehandlingskontrollEventPubliserer eventPubliserer;
 
     @Inject
-    BehandlingRepositoryProvider repositoryProvider;
+    private BehandlingRepositoryProvider repositoryProvider;
 
     @Inject
-    BehandlingModellRepository behandlingModellRepository;
+    private BehandlingModellRepository behandlingModellRepository;
 
     @Inject
-    AksjonspunktRepository aksjonspunktRepository;
+    private AksjonspunktRepository aksjonspunktRepository;
 
-    // No Inject
-    BehandlingskontrollTjeneste kontrollTjeneste;
+    private BehandlingskontrollTjeneste kontrollTjeneste;
 
-    @Before
+    @BeforeEach
     public void setup() {
         opprettStatiskModell();
 
@@ -78,13 +72,13 @@ public class BehandlingskontrollEventPublisererTest {
         TestEventObserver.startCapture();
     }
 
-    @After
+    @AfterEach
     public void after() {
         TestEventObserver.reset();
     }
 
     @Test
-    public void skal_fyre_event_for_aksjonspunkt_funnet_ved_prosessering() throws Exception {
+    public void skal_fyre_event_for_aksjonspunkt_funnet_ved_prosessering() {
         ScenarioSimple scenario = ScenarioSimple.simple();
         Behandling behandling = scenario.lagre(repositoryProvider);
 
@@ -98,7 +92,7 @@ public class BehandlingskontrollEventPublisererTest {
     }
 
     @Test
-    public void skal_fyre_event_for_behandlingskontroll_startet_stoppet_ved_prosessering() throws Exception {
+    public void skal_fyre_event_for_behandlingskontroll_startet_stoppet_ved_prosessering() {
         // Arrange
         ScenarioSimple scenario = nyttScenario(STEG_1);
 
@@ -118,7 +112,7 @@ public class BehandlingskontrollEventPublisererTest {
     }
 
     @Test
-    public void skal_fyre_event_for_behandlingskontroll_behandlingsteg_status_endring_ved_prosessering() throws Exception {
+    public void skal_fyre_event_for_behandlingskontroll_behandlingsteg_status_endring_ved_prosessering() {
         // Arrange
         ScenarioSimple scenario = nyttScenario(STEG_1);
 
@@ -153,7 +147,7 @@ public class BehandlingskontrollEventPublisererTest {
     }
 
     @Test
-    public void skal_fyre_event_for_behandlingskontroll_tilbakeføring_ved_prosessering() throws Exception {
+    public void skal_fyre_event_for_behandlingskontroll_tilbakeføring_ved_prosessering() {
         // Arrange
         ScenarioSimple scenario = nyttScenario(STEG_3);
         scenario.leggTilAksjonspunkt(TestAksjonspunktDefinisjon.AP_5, STEG_4);
@@ -173,7 +167,7 @@ public class BehandlingskontrollEventPublisererTest {
     }
 
     @Test
-    public void skal_fyre_event_for_behandlingskontroll_behandlingsteg_overgang_ved_prosessering() throws Exception {
+    public void skal_fyre_event_for_behandlingskontroll_behandlingsteg_overgang_ved_prosessering() {
         // Arrange
         ScenarioSimple scenario = nyttScenario(STEG_1);
 

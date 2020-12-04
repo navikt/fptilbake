@@ -4,22 +4,26 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.persistence.EntityManager;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
 
+@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public class ØkonomiXmlMottattRepositoryTest {
 
-    @Rule
-    public final UnittestRepositoryRule repoRule = new UnittestRepositoryRule();
+    private ØkonomiMottattXmlRepository repository;
+    private EntityManager em;
 
-    private EntityManager em = repoRule.getEntityManager();
-
-    private ØkonomiMottattXmlRepository repository = new ØkonomiMottattXmlRepository(em);
+    @BeforeEach
+    void setUp(EntityManager em) {
+        this.em = em;
+        repository = new ØkonomiMottattXmlRepository(em);
+    }
 
     @Test
     public void skal_lagre_grunnlag_xml() {

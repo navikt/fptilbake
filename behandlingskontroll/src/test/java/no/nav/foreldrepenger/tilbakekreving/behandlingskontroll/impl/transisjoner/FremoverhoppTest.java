@@ -14,9 +14,9 @@ import javax.persistence.EntityManager;
 
 import org.assertj.core.api.AbstractComparableAssert;
 import org.assertj.core.api.Assertions;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandleStegResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingSteg;
@@ -43,8 +43,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
 
+@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public class FremoverhoppTest {
 
     public static final BehandlingStegType STEG_1 = TestBehandlingStegType.STEG_1;
@@ -53,20 +54,50 @@ public class FremoverhoppTest {
 
     static List<no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.observer.StegTransisjon> transisjoner = new ArrayList<>();
 
-    @Rule
-    public UnittestRepositoryRule repoRule = new UnittestRepositoryRule();
-    private EntityManager em = repoRule.getEntityManager();
-    private AksjonspunktRepository aksjonspunktRepository = new AksjonspunktRepository(em);
-    private BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(em);
-    private final BehandlingRepository behandlingRepository = repositoryProvider.getBehandlingRepository();
+    private EntityManager em;
+    private AksjonspunktRepository aksjonspunktRepository;
+    private BehandlingRepositoryProvider repositoryProvider;
+    private BehandlingRepository behandlingRepository;
 
-    private BehandlingModellRepository behandlingModellRepository = new BehandlingModellRepository(em);
-
-    private BehandlingskontrollFremoverhoppTransisjonEventObserver observer =
-            new BehandlingskontrollFremoverhoppTransisjonEventObserver(repositoryProvider, behandlingModellRepository);
+    private BehandlingskontrollFremoverhoppTransisjonEventObserver observer;
 
     private Behandling behandling;
     private BehandlingLås behandlingLås;
+
+    @BeforeEach
+    public void opprettStatiskModell(EntityManager entityManager) {
+        this.em = entityManager;
+        aksjonspunktRepository = new AksjonspunktRepository(em);
+        repositoryProvider = new BehandlingRepositoryProvider(em);
+        behandlingRepository = repositoryProvider.getBehandlingRepository();
+        BehandlingModellRepository behandlingModellRepository = new BehandlingModellRepository(em);
+        observer = new BehandlingskontrollFremoverhoppTransisjonEventObserver(repositoryProvider,
+            behandlingModellRepository);
+
+        sql("INSERT INTO BEHANDLING_STEG_TYPE (KODE, NAVN, BEHANDLING_STATUS_DEF, BESKRIVELSE) VALUES ('STEG-1', 'test-steg-1', 'UTRED', 'test')");
+        sql("INSERT INTO BEHANDLING_STEG_TYPE (KODE, NAVN, BEHANDLING_STATUS_DEF, BESKRIVELSE) VALUES ('STEG-2', 'test-steg-2', 'UTRED', 'test')");
+        sql("INSERT INTO BEHANDLING_STEG_TYPE (KODE, NAVN, BEHANDLING_STATUS_DEF, BESKRIVELSE) VALUES ('STEG-3', 'test-steg-3', 'UTRED', 'test')");
+
+        sql("INSERT INTO BEHANDLING_TYPE_STEG_SEKV (ID, BEHANDLING_TYPE, BEHANDLING_STEG_TYPE, SEKVENS_NR) VALUES (SEQ_BEHANDLING_TYPE_STEG_SEKV.nextval, 'BT-009', 'STEG-1', 1)");
+        sql("INSERT INTO BEHANDLING_TYPE_STEG_SEKV (ID, BEHANDLING_TYPE, BEHANDLING_STEG_TYPE, SEKVENS_NR) VALUES (SEQ_BEHANDLING_TYPE_STEG_SEKV.nextval, 'BT-009', 'STEG-2', 2)");
+        sql("INSERT INTO BEHANDLING_TYPE_STEG_SEKV (ID, BEHANDLING_TYPE, BEHANDLING_STEG_TYPE, SEKVENS_NR) VALUES (SEQ_BEHANDLING_TYPE_STEG_SEKV.nextval, 'BT-009', 'STEG-3', 3)");
+
+        sql("INSERT INTO VURDERINGSPUNKT_DEF (KODE, BEHANDLING_STEG, VURDERINGSPUNKT_TYPE, NAVN) VALUES ('STEG-1.INN', 'STEG-1', 'INN', 'STEG-1.INN')");
+        sql("INSERT INTO VURDERINGSPUNKT_DEF (KODE, BEHANDLING_STEG, VURDERINGSPUNKT_TYPE, NAVN) VALUES ('STEG-2.INN', 'STEG-2', 'INN', 'STEG-2.INN')");
+        sql("INSERT INTO VURDERINGSPUNKT_DEF (KODE, BEHANDLING_STEG, VURDERINGSPUNKT_TYPE, NAVN) VALUES ('STEG-3.INN', 'STEG-3', 'INN', 'STEG-3.INN')");
+        sql("INSERT INTO VURDERINGSPUNKT_DEF (KODE, BEHANDLING_STEG, VURDERINGSPUNKT_TYPE, NAVN) VALUES ('STEG-1.UT', 'STEG-1', 'UT', 'STEG-1.UT')");
+        sql("INSERT INTO VURDERINGSPUNKT_DEF (KODE, BEHANDLING_STEG, VURDERINGSPUNKT_TYPE, NAVN) VALUES ('STEG-2.UT', 'STEG-2', 'UT', 'STEG-2.UT')");
+        sql("INSERT INTO VURDERINGSPUNKT_DEF (KODE, BEHANDLING_STEG, VURDERINGSPUNKT_TYPE, NAVN) VALUES ('STEG-3.UT', 'STEG-3', 'UT', 'STEG-3.UT')");
+
+        sql("INSERT INTO AKSJONSPUNKT_DEF (KODE, NAVN, VURDERINGSPUNKT, TOTRINN_BEHANDLING_DEFAULT, VILKAR_TYPE, SKJERMLENKE_TYPE) VALUES ('STEG-1-INN', 'STEG-1-INN', 'STEG-1.INN', 'N', '-', '-')");
+        sql("INSERT INTO AKSJONSPUNKT_DEF (KODE, NAVN, VURDERINGSPUNKT, TOTRINN_BEHANDLING_DEFAULT, VILKAR_TYPE, SKJERMLENKE_TYPE) VALUES ('STEG-2-INN', 'STEG-2-INN', 'STEG-2.INN', 'N', '-', '-')");
+        sql("INSERT INTO AKSJONSPUNKT_DEF (KODE, NAVN, VURDERINGSPUNKT, TOTRINN_BEHANDLING_DEFAULT, VILKAR_TYPE, SKJERMLENKE_TYPE) VALUES ('STEG-3-INN', 'STEG-3-INN', 'STEG-3.INN', 'N', '-', '-')");
+        sql("INSERT INTO AKSJONSPUNKT_DEF (KODE, NAVN, VURDERINGSPUNKT, TOTRINN_BEHANDLING_DEFAULT, VILKAR_TYPE, SKJERMLENKE_TYPE) VALUES ('STEG-1-UT', 'STEG-1-UT', 'STEG-1.UT', 'N', '-', '-')");
+        sql("INSERT INTO AKSJONSPUNKT_DEF (KODE, NAVN, VURDERINGSPUNKT, TOTRINN_BEHANDLING_DEFAULT, VILKAR_TYPE, SKJERMLENKE_TYPE) VALUES ('STEG-2-UT', 'STEG-2-UT', 'STEG-2.UT', 'N', '-', '-')");
+        sql("INSERT INTO AKSJONSPUNKT_DEF (KODE, NAVN, VURDERINGSPUNKT, TOTRINN_BEHANDLING_DEFAULT, VILKAR_TYPE, SKJERMLENKE_TYPE) VALUES ('STEG-3-UT', 'STEG-3-UT', 'STEG-3.UT', 'N', '-', '-')");
+
+        em.flush();
+    }
 
     @Test
     public void skal_avbryte_aksjonspunkt_som_skulle_vært_håndtert_i_mellomliggende_steg() {
@@ -104,34 +135,6 @@ public class FremoverhoppTest {
         Assertions.assertThat(transisjonerVedFremoverhopp(fra(STEG_1, UTGANG), til(STEG_3))).containsOnly(no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.observer.StegTransisjon.hoppFremoverOver(STEG_2));
         Assertions.assertThat(transisjonerVedFremoverhopp(fra(STEG_2, INNGANG), til(STEG_3))).containsOnly(no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.observer.StegTransisjon.hoppFremoverOver(STEG_2));
         Assertions.assertThat(transisjonerVedFremoverhopp(fra(STEG_2, UTGANG), til(STEG_3))).isEmpty();
-    }
-
-    @Before
-    public void opprettStatiskModell() {
-
-        sql("INSERT INTO BEHANDLING_STEG_TYPE (KODE, NAVN, BEHANDLING_STATUS_DEF, BESKRIVELSE) VALUES ('STEG-1', 'test-steg-1', 'UTRED', 'test')");
-        sql("INSERT INTO BEHANDLING_STEG_TYPE (KODE, NAVN, BEHANDLING_STATUS_DEF, BESKRIVELSE) VALUES ('STEG-2', 'test-steg-2', 'UTRED', 'test')");
-        sql("INSERT INTO BEHANDLING_STEG_TYPE (KODE, NAVN, BEHANDLING_STATUS_DEF, BESKRIVELSE) VALUES ('STEG-3', 'test-steg-3', 'UTRED', 'test')");
-
-        sql("INSERT INTO BEHANDLING_TYPE_STEG_SEKV (ID, BEHANDLING_TYPE, BEHANDLING_STEG_TYPE, SEKVENS_NR) VALUES (SEQ_BEHANDLING_TYPE_STEG_SEKV.nextval, 'BT-009', 'STEG-1', 1)");
-        sql("INSERT INTO BEHANDLING_TYPE_STEG_SEKV (ID, BEHANDLING_TYPE, BEHANDLING_STEG_TYPE, SEKVENS_NR) VALUES (SEQ_BEHANDLING_TYPE_STEG_SEKV.nextval, 'BT-009', 'STEG-2', 2)");
-        sql("INSERT INTO BEHANDLING_TYPE_STEG_SEKV (ID, BEHANDLING_TYPE, BEHANDLING_STEG_TYPE, SEKVENS_NR) VALUES (SEQ_BEHANDLING_TYPE_STEG_SEKV.nextval, 'BT-009', 'STEG-3', 3)");
-
-        sql("INSERT INTO VURDERINGSPUNKT_DEF (KODE, BEHANDLING_STEG, VURDERINGSPUNKT_TYPE, NAVN) VALUES ('STEG-1.INN', 'STEG-1', 'INN', 'STEG-1.INN')");
-        sql("INSERT INTO VURDERINGSPUNKT_DEF (KODE, BEHANDLING_STEG, VURDERINGSPUNKT_TYPE, NAVN) VALUES ('STEG-2.INN', 'STEG-2', 'INN', 'STEG-2.INN')");
-        sql("INSERT INTO VURDERINGSPUNKT_DEF (KODE, BEHANDLING_STEG, VURDERINGSPUNKT_TYPE, NAVN) VALUES ('STEG-3.INN', 'STEG-3', 'INN', 'STEG-3.INN')");
-        sql("INSERT INTO VURDERINGSPUNKT_DEF (KODE, BEHANDLING_STEG, VURDERINGSPUNKT_TYPE, NAVN) VALUES ('STEG-1.UT', 'STEG-1', 'UT', 'STEG-1.UT')");
-        sql("INSERT INTO VURDERINGSPUNKT_DEF (KODE, BEHANDLING_STEG, VURDERINGSPUNKT_TYPE, NAVN) VALUES ('STEG-2.UT', 'STEG-2', 'UT', 'STEG-2.UT')");
-        sql("INSERT INTO VURDERINGSPUNKT_DEF (KODE, BEHANDLING_STEG, VURDERINGSPUNKT_TYPE, NAVN) VALUES ('STEG-3.UT', 'STEG-3', 'UT', 'STEG-3.UT')");
-
-        sql("INSERT INTO AKSJONSPUNKT_DEF (KODE, NAVN, VURDERINGSPUNKT, TOTRINN_BEHANDLING_DEFAULT, VILKAR_TYPE, SKJERMLENKE_TYPE) VALUES ('STEG-1-INN', 'STEG-1-INN', 'STEG-1.INN', 'N', '-', '-')");
-        sql("INSERT INTO AKSJONSPUNKT_DEF (KODE, NAVN, VURDERINGSPUNKT, TOTRINN_BEHANDLING_DEFAULT, VILKAR_TYPE, SKJERMLENKE_TYPE) VALUES ('STEG-2-INN', 'STEG-2-INN', 'STEG-2.INN', 'N', '-', '-')");
-        sql("INSERT INTO AKSJONSPUNKT_DEF (KODE, NAVN, VURDERINGSPUNKT, TOTRINN_BEHANDLING_DEFAULT, VILKAR_TYPE, SKJERMLENKE_TYPE) VALUES ('STEG-3-INN', 'STEG-3-INN', 'STEG-3.INN', 'N', '-', '-')");
-        sql("INSERT INTO AKSJONSPUNKT_DEF (KODE, NAVN, VURDERINGSPUNKT, TOTRINN_BEHANDLING_DEFAULT, VILKAR_TYPE, SKJERMLENKE_TYPE) VALUES ('STEG-1-UT', 'STEG-1-UT', 'STEG-1.UT', 'N', '-', '-')");
-        sql("INSERT INTO AKSJONSPUNKT_DEF (KODE, NAVN, VURDERINGSPUNKT, TOTRINN_BEHANDLING_DEFAULT, VILKAR_TYPE, SKJERMLENKE_TYPE) VALUES ('STEG-2-UT', 'STEG-2-UT', 'STEG-2.UT', 'N', '-', '-')");
-        sql("INSERT INTO AKSJONSPUNKT_DEF (KODE, NAVN, VURDERINGSPUNKT, TOTRINN_BEHANDLING_DEFAULT, VILKAR_TYPE, SKJERMLENKE_TYPE) VALUES ('STEG-3-UT', 'STEG-3-UT', 'STEG-3.UT', 'N', '-', '-')");
-
-        em.flush();
     }
 
     private void sql(String sql) {

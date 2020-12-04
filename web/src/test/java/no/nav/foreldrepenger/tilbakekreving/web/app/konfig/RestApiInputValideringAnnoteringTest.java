@@ -9,25 +9,21 @@ import java.util.function.Function;
 import javax.validation.Valid;
 import javax.ws.rs.core.Context;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
-
-@RunWith(CdiRunner.class)
 public class RestApiInputValideringAnnoteringTest extends RestApiTester {
 
     private Function<Method, String> printKlasseOgMetodeNavn = (method -> String.format("%s.%s", method.getDeclaringClass(), method.getName()));
 
-    @Before
+    @BeforeEach
     public void setup() {
         System.setProperty("loadbalancer.url", "http://localhost:8030");
         System.setProperty("application.name", "fptilbake");
     }
 
-    @After
+    @AfterEach
     public void cleanup() {
         System.clearProperty("loadbalancer.url");
         System.clearProperty("application.name");

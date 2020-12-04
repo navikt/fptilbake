@@ -7,7 +7,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.Lists;
 
@@ -29,7 +30,12 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 
 public class TotrinnTjenesteTest extends FellesTestOppsett {
 
-    private TotrinnTjeneste totrinnTjeneste = new TotrinnTjeneste(totrinnRepository, repoProvider);
+    private TotrinnTjeneste totrinnTjeneste;
+
+    @BeforeEach
+    void setUp() {
+        totrinnTjeneste = new TotrinnTjeneste(totrinnRepository, repoProvider);
+    }
 
     @Test
     public void settNyttTotrinnsgrunnlag() {

@@ -7,26 +7,26 @@ import static org.mockito.Mockito.verify;
 import javax.servlet.ServletContextEvent;
 
 import org.assertj.core.api.Assertions;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import ch.qos.logback.classic.Level;
 import no.nav.vedtak.log.util.MemoryAppender;
 
 public class AppStartupServletContextListenerTest {
 
-    private static MemoryAppender logSniffer = MemoryAppender.sniff(AppStartupServletContextListener.class);
+    private static final MemoryAppender logSniffer = MemoryAppender.sniff(AppStartupServletContextListener.class);
 
     private AppStartupServletContextListener listener; // objekter vi tester
     private AppStartupInfoLogger mockAppStartupInfoLogger;
 
-    @After
+    @AfterEach
     public void afterEach() {
         logSniffer.reset();
     }
 
-    @Before
+    @BeforeEach
     public void setup() {
         listener = new AppStartupServletContextListener();
         mockAppStartupInfoLogger = mock(AppStartupInfoLogger.class);

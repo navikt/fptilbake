@@ -4,11 +4,10 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
 import javax.persistence.FlushModeType;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
@@ -30,27 +29,20 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.TestFagsakUtil;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.YtelseNavn;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.JournalpostIdOgDokumentId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 
-public class DokumentBestillerTestOppsett {
+@CdiDbAwareTest
+public abstract class DokumentBestillerTestOppsett {
 
     protected static final long FPSAK_BEHANDLING_ID = 99051L;
     protected static final Henvisning HENVISNING = Henvisning.fraEksternBehandlingId(FPSAK_BEHANDLING_ID);
     protected static final UUID FPSAK_BEHANDLING_UUID = UUID.randomUUID();
     protected static final String DUMMY_FØDSELSNUMMER = "31018143212";
-
-    @Rule
-    public UnittestRepositoryRule repositoryRule = new UnittestRepositoryRule();
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     @Inject
     protected BehandlingRepositoryProvider repositoryProvider;
@@ -66,14 +58,17 @@ public class DokumentBestillerTestOppsett {
     protected VergeRepository vergeRepository;
     @Inject
     private FagsakRepository fagsakRepository;
+    @Inject
+    protected EntityManager entityManager;
 
     protected Fagsak fagsak;
     protected Behandling behandling;
     protected EksternBehandling eksternBehandling;
 
-    @Before
+    //BeforeEach kalles både her og i subklasse
+    @BeforeEach
     public void init() {
-        repositoryRule.getEntityManager().setFlushMode(FlushModeType.AUTO);
+        entityManager.setFlushMode(FlushModeType.AUTO);
         fagsak = TestFagsakUtil.opprettFagsak();
         fagsakRepository.lagre(fagsak);
         behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).build();
@@ -88,11 +83,6 @@ public class DokumentBestillerTestOppsett {
         ytelseNavn.setNavnPåBrukersSpråk(navnPåBrukersSpråk);
         ytelseNavn.setNavnPåBokmål(navnPåBokmål);
         return ytelseNavn;
-    }
-
-    protected JournalpostIdOgDokumentId lagJournalOgDokument() {
-        JournalpostId journalpostId = new JournalpostId(12344l);
-        return new JournalpostIdOgDokumentId(journalpostId, "qwr12334");
     }
 
     protected Personinfo byggStandardPerson(String navn, String personnummer, Språkkode språkkode) {

@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.time.LocalDateTime;
 import java.time.Period;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import com.google.common.collect.Lists;
@@ -22,7 +22,8 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMockUtil;
 
 public class MottattGrunnlagStegTest extends FellesTestOppsett {
 
-    private BehandlingManglerKravgrunnlagFristenUtløptEventPubliserer utløptEventPublisererMock = Mockito.mock(BehandlingManglerKravgrunnlagFristenUtløptEventPubliserer.class);
+    private BehandlingManglerKravgrunnlagFristenUtløptEventPubliserer utløptEventPublisererMock =
+        Mockito.mock(BehandlingManglerKravgrunnlagFristenUtløptEventPubliserer.class);
 
     @Test
     public void skal_sette_behandling_på_vent() {

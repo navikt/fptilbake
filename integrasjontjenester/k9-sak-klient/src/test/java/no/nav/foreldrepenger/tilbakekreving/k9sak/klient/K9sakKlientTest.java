@@ -12,10 +12,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.junit.Rule;
-import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.tilbakekrevingsvalg.VidereBehandling;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
@@ -42,12 +40,9 @@ public class K9sakKlientTest {
     private static final URI PERSONOPPLYSNING_URI = URI.create(BASE_URI + "/k9/sak/api/behandling/person/personopplysninger?behandlingUuid=" + BEHANDLING_UUID);
     private static final URI TILBAKEKREVING_VALG_URI = URI.create(BASE_URI + "/k9/sak/api/behandling/tilbakekreving/valg?behandlingUuid=" + BEHANDLING_UUID);
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+    private final OidcRestClient oidcRestClientMock = mock(OidcRestClient.class);
 
-    private OidcRestClient oidcRestClientMock = mock(OidcRestClient.class);
-
-    private K9sakKlient klient = new K9sakKlient(oidcRestClientMock);
+    private final K9sakKlient klient = new K9sakKlient(oidcRestClientMock);
 
     @Test
     public void skal_hente_behandlingInfoDto() {

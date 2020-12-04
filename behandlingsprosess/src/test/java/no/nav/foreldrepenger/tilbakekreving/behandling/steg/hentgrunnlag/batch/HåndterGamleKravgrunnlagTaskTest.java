@@ -20,11 +20,12 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
+import javax.persistence.EntityManager;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.google.common.collect.Lists;
 
@@ -52,7 +53,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakReposi
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.TestFagsakUtil;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
@@ -85,10 +86,8 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepositoryImpl;
 
+@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public class HåndterGamleKravgrunnlagTaskTest {
-
-    @Rule
-    public UnittestRepositoryRule repositoryRule = new UnittestRepositoryRule();
 
     private final PersoninfoAdapter tpsTjenesteMock = mock(PersoninfoAdapter.class);
     private final PersonOrganisasjonWrapper tpsAdapterWrapper = new PersonOrganisasjonWrapper(tpsTjenesteMock);
@@ -97,36 +96,44 @@ public class HåndterGamleKravgrunnlagTaskTest {
     private final BehandlingskontrollEventPubliserer behandlingskontrollEventPublisererMock = mock(BehandlingskontrollEventPubliserer.class);
     private final FagsystemKlient fagsystemKlientMock = mock(FagsystemKlient.class);
 
-    private final BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(repositoryRule.getEntityManager());
-    private final FagsakRepository fagsakRepository = repositoryProvider.getFagsakRepository();
-    private final BehandlingRepository behandlingRepository = repositoryProvider.getBehandlingRepository();
-    private final ØkonomiMottattXmlRepository mottattXmlRepository = new ØkonomiMottattXmlRepository(repositoryRule.getEntityManager());
-    private final KravgrunnlagRepository grunnlagRepository = repositoryProvider.getGrunnlagRepository();
-    private final ProsessTaskRepository prosessTaskRepository = new ProsessTaskRepositoryImpl(repositoryRule.getEntityManager(), null, null);
-    private final NavBrukerRepository navBrukerRepository = new NavBrukerRepository(repositoryRule.getEntityManager());
+    private FagsakRepository fagsakRepository;
+    private BehandlingRepository behandlingRepository;
+    private ØkonomiMottattXmlRepository mottattXmlRepository;
+    private KravgrunnlagRepository grunnlagRepository;
 
-    private final BehandlingskontrollTjeneste behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(repositoryProvider,
-        behandlingModellRepositoryMock, behandlingskontrollEventPublisererMock);
-    private final HentKravgrunnlagMapper hentKravgrunnlagMapper = new HentKravgrunnlagMapper(tpsAdapterWrapper);
-    private final KravgrunnlagMapper lesKravgrunnlagMapper = new KravgrunnlagMapper(tpsAdapterWrapper);
-    private final BehandlingskontrollProvider behandlingskontrollProvider = new BehandlingskontrollProvider(behandlingskontrollTjeneste,
-        mock(BehandlingskontrollAsynkTjeneste.class));
-    private final HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(repositoryProvider.getHistorikkRepository(),
-        null);
+    private HentKravgrunnlagMapper hentKravgrunnlagMapper;
 
-    private final FagsakTjeneste fagsakTjeneste = new FagsakTjeneste(tpsTjenesteMock, fagsakRepository, navBrukerRepository);
-    private final BehandlingTjeneste behandlingTjeneste = new BehandlingTjeneste(repositoryProvider, prosessTaskRepository, behandlingskontrollProvider,
-        fagsakTjeneste, historikkinnslagTjeneste, fagsystemKlientMock, Period.ofWeeks(4));
-    private final HåndterGamleKravgrunnlagTjeneste håndterGamleKravgrunnlagTjeneste = new HåndterGamleKravgrunnlagTjeneste(mottattXmlRepository, grunnlagRepository,
-        hentKravgrunnlagMapper, lesKravgrunnlagMapper,
-        behandlingTjeneste, økonomiConsumerMock, fagsystemKlientMock);
-    private final HåndterGamleKravgrunnlagTask håndterGamleKravgrunnlagTask = new HåndterGamleKravgrunnlagTask(håndterGamleKravgrunnlagTjeneste);
+    private BehandlingTjeneste behandlingTjeneste;
+    private HåndterGamleKravgrunnlagTask håndterGamleKravgrunnlagTask;
 
     private Behandling behandling;
     Long mottattXmlId = null;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    public void setup(EntityManager entityManager) {
+        BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(entityManager);
+        fagsakRepository = repositoryProvider.getFagsakRepository();
+        behandlingRepository = repositoryProvider.getBehandlingRepository();
+        mottattXmlRepository = new ØkonomiMottattXmlRepository(entityManager);
+        grunnlagRepository = repositoryProvider.getGrunnlagRepository();
+        ProsessTaskRepository prosessTaskRepository = new ProsessTaskRepositoryImpl(entityManager, null, null);
+        NavBrukerRepository navBrukerRepository = new NavBrukerRepository(entityManager);
+        BehandlingskontrollTjeneste behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(repositoryProvider,
+            behandlingModellRepositoryMock, behandlingskontrollEventPublisererMock);
+        hentKravgrunnlagMapper = new HentKravgrunnlagMapper(tpsAdapterWrapper);
+        KravgrunnlagMapper lesKravgrunnlagMapper = new KravgrunnlagMapper(tpsAdapterWrapper);
+        BehandlingskontrollProvider behandlingskontrollProvider = new BehandlingskontrollProvider(
+            behandlingskontrollTjeneste, mock(BehandlingskontrollAsynkTjeneste.class));
+        HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(
+            repositoryProvider.getHistorikkRepository(), null);
+        FagsakTjeneste fagsakTjeneste = new FagsakTjeneste(tpsTjenesteMock, fagsakRepository, navBrukerRepository);
+        behandlingTjeneste = new BehandlingTjeneste(repositoryProvider, prosessTaskRepository,
+            behandlingskontrollProvider, fagsakTjeneste, historikkinnslagTjeneste, fagsystemKlientMock, Period.ofWeeks(4));
+        HåndterGamleKravgrunnlagTjeneste håndterGamleKravgrunnlagTjeneste = new HåndterGamleKravgrunnlagTjeneste(
+            mottattXmlRepository, grunnlagRepository, hentKravgrunnlagMapper, lesKravgrunnlagMapper, behandlingTjeneste,
+            økonomiConsumerMock, fagsystemKlientMock);
+        håndterGamleKravgrunnlagTask = new HåndterGamleKravgrunnlagTask(håndterGamleKravgrunnlagTjeneste);
+
         behandling = ScenarioSimple.simple().lagMocked();
         when(tpsTjenesteMock.hentBrukerForAktør(any(AktørId.class))).thenReturn(lagPersonInfo(behandling.getFagsak().getAktørId()));
         when(tpsTjenesteMock.hentAktørForFnr(any(PersonIdent.class))).thenReturn(Optional.of(behandling.getFagsak().getAktørId()));

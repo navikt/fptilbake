@@ -14,9 +14,8 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import com.google.common.collect.Lists;
@@ -37,9 +36,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.BrevDa
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.PdfBrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
-import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
-@RunWith(CdiRunner.class)
 public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett {
 
     private static final String VARSEL_TEKST = "Sender manuelt varselbrev";
@@ -56,7 +53,7 @@ public class ManueltVarselBrevTjenesteTest extends DokumentBestillerTestOppsett 
 
     private Long behandlingId;
 
-    @Before
+    @BeforeEach
     public void setup() {
         manueltVarselBrevTjeneste = new ManueltVarselBrevTjeneste(repositoryProvider, mockEksternDataForBrevTjeneste, mockFeilutbetalingTjeneste, mockPdfBrevTjeneste);
 

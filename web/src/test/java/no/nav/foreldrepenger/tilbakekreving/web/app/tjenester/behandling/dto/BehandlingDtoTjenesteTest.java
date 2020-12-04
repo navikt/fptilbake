@@ -20,9 +20,9 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.FlushModeType;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.google.common.collect.Lists;
 
@@ -58,7 +58,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurd
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
@@ -68,30 +68,38 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.foreldrepenger.tilbakekreving.web.app.rest.ResourceLink;
 
+@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public class BehandlingDtoTjenesteTest {
 
-    @Rule
-    public UnittestRepositoryRule repositoryRule = new UnittestRepositoryRule();
-    private final EntityManager entityManager = repositoryRule.getEntityManager();
-    private BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(entityManager);
+    private BehandlingRepositoryProvider repositoryProvider;
 
-    private BehandlingRepository behandlingRepository = repositoryProvider.getBehandlingRepository();
-    private FagsakRepository fagsakRepository = repositoryProvider.getFagsakRepository();
-    private BehandlingTjeneste behandlingTjeneste = mock(BehandlingTjeneste.class);
-    private VurdertForeldelseTjeneste foreldelseTjeneste = mock(VurdertForeldelseTjeneste.class);
-    private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository = repositoryProvider.getFaktaFeilutbetalingRepository();
-    private VilkårsvurderingRepository vilkårsvurderingRepository = repositoryProvider.getVilkårsvurderingRepository();
-    private KravgrunnlagRepository grunnlagRepository = repositoryProvider.getGrunnlagRepository();
-    private BehandlingModellRepository behandlingModellRepository = new BehandlingModellRepository(repositoryRule.getEntityManager());
-    private BehandlingDtoTjeneste behandlingDtoTjeneste = new BehandlingDtoTjeneste(behandlingTjeneste, foreldelseTjeneste, repositoryProvider, behandlingModellRepository, "fptilbake");
+    private BehandlingRepository behandlingRepository;
+    private FagsakRepository fagsakRepository;
+    private BehandlingTjeneste behandlingTjeneste;
+    private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository;
+    private VilkårsvurderingRepository vilkårsvurderingRepository;
+    private KravgrunnlagRepository grunnlagRepository;
+    private BehandlingDtoTjeneste behandlingDtoTjeneste;
 
-    private Saksnummer saksnummer = new Saksnummer(GYLDIG_SAKSNR);
+    private final Saksnummer saksnummer = new Saksnummer(GYLDIG_SAKSNR);
     private static final LocalDate FOM = LocalDate.now().minusMonths(1);
     private static final LocalDate TOM = LocalDate.now();
 
-    @Before
-    public void init() {
-        repositoryRule.getEntityManager().setFlushMode(FlushModeType.AUTO);
+    @BeforeEach
+    public void init(EntityManager entityManager) {
+        repositoryProvider = new BehandlingRepositoryProvider(entityManager);
+        behandlingRepository = repositoryProvider.getBehandlingRepository();
+        fagsakRepository = repositoryProvider.getFagsakRepository();
+        behandlingTjeneste = mock(BehandlingTjeneste.class);
+        VurdertForeldelseTjeneste foreldelseTjeneste = mock(VurdertForeldelseTjeneste.class);
+        faktaFeilutbetalingRepository = repositoryProvider.getFaktaFeilutbetalingRepository();
+        vilkårsvurderingRepository = repositoryProvider.getVilkårsvurderingRepository();
+        grunnlagRepository = repositoryProvider.getGrunnlagRepository();
+        BehandlingModellRepository behandlingModellRepository = new BehandlingModellRepository(entityManager);
+        behandlingDtoTjeneste = new BehandlingDtoTjeneste(behandlingTjeneste, foreldelseTjeneste, repositoryProvider,
+            behandlingModellRepository, "fptilbake");
+
+        entityManager.setFlushMode(FlushModeType.AUTO);
     }
 
     @Test

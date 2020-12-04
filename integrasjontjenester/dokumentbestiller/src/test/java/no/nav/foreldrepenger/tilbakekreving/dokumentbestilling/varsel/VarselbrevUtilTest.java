@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.Lists;
 

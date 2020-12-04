@@ -10,10 +10,8 @@ import java.util.UUID;
 
 import javax.inject.Inject;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandleStegResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
@@ -35,36 +33,34 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.TestFagsakUtil;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
-import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
-@RunWith(CdiRunner.class)
+@CdiDbAwareTest
 public class VarselStegTest {
-
-    @Rule
-    public final UnittestRepositoryRule repoRule = new UnittestRepositoryRule();
 
     @Inject
     private ProsessTaskRepository prosessTaskRepository;
-
     @Inject
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
+    @Inject
+    private BehandlingRepositoryProvider repositoryProvider;
+    @Inject
+    private FagsakRepository fagsakRepository;
+    @Inject
+    private HistorikkRepository historikkRepository;
+    @Inject
+    private BehandlingRepository behandlingRepository;
+    @Inject
+    private VarselRepository varselRepository;
 
-    private BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(repoRule.getEntityManager());
-
-    private FagsakRepository fagsakRepository = repositoryProvider.getFagsakRepository();
-    private HistorikkRepository historikkRepository = repositoryProvider.getHistorikkRepository();
-    private BehandlingRepository behandlingRepository = repositoryProvider.getBehandlingRepository();
-    private VarselRepository varselRepository = repositoryProvider.getVarselRepository();
-
-    private VarselresponsTjeneste varselresponsTjeneste = mock(VarselresponsTjeneste.class);
+    private final VarselresponsTjeneste varselresponsTjeneste = mock(VarselresponsTjeneste.class);
     private Fagsak fagsak;
     private Behandling behandling;
 
-    @Before
+    @BeforeEach
     public void setup() {
         fagsak = TestFagsakUtil.opprettFagsak();
         fagsakRepository.lagre(fagsak);

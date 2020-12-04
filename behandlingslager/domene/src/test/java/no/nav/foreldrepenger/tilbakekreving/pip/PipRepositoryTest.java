@@ -6,38 +6,39 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import javax.persistence.EntityManager;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.test.TestFagsakUtil;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
 
+@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public class PipRepositoryTest {
-
-    @Rule
-    public UnittestRepositoryRule repositoryRule = new UnittestRepositoryRule();
 
     private static final String SAKSBEHANDLER = "Z12345";
 
-    private PipRepository pipRepository = new PipRepository(repositoryRule.getEntityManager());
+    private PipRepository pipRepository;
 
-    private BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(repositoryRule.getEntityManager());
-    private BehandlingRepository behandlingRepository = repositoryProvider.getBehandlingRepository();
     private Behandling behandling;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    public void setup(EntityManager entityManager) {
+        BehandlingRepository behandlingRepository = new BehandlingRepository(entityManager);
+        pipRepository = new PipRepository(entityManager);
+
         Fagsak fagsak = TestFagsakUtil.opprettFagsak();
-        repositoryProvider.getFagsakRepository().lagre(fagsak);
+        new FagsakRepository(entityManager).lagre(fagsak);
         behandling = Behandling.nyBehandlingFor(fagsak, BehandlingType.TILBAKEKREVING).build();
         behandling.setAnsvarligSaksbehandler(SAKSBEHANDLER);
         BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(behandling);

@@ -47,7 +47,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Vi
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
-import no.nav.vedtak.felles.testutilities.Whitebox;
 
 /**
  * Default test scenario builder for å definere opp testdata med enkle defaults.
@@ -250,10 +249,10 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
                 Long id = beh.getId();
                 if (id == null) {
                     id = nyId();
-                    Whitebox.setInternalState(beh, "id", id);
+                    behandling.setId(id);
                 }
 
-                beh.getAksjonspunkter().forEach(punkt -> Whitebox.setInternalState(punkt, "id", nyId()));
+                beh.getAksjonspunkter().forEach(punkt -> punkt.setId(nyId()));
 
                 return id;
             });
@@ -279,7 +278,7 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
             Long id = fagsak.getId();
             if (id == null) {
                 id = fagsakId;
-                Whitebox.setInternalState(fagsak, "id", id);
+                fagsak.setId(id);
             }
             return id;
         });
@@ -287,7 +286,7 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
         // oppdater fagsakstatus
         Mockito.doAnswer(invocation -> {
             FagsakStatus status = invocation.getArgument(1);
-            Whitebox.setInternalState(fagsak, "fagsakStatus", status);
+            fagsak.setFagsakStatus(status);
             return null;
         }).when(fagsakRepository)
             .oppdaterFagsakStatus(eq(fagsakId), Mockito.any(FagsakStatus.class));

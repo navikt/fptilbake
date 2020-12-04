@@ -9,9 +9,8 @@ import static org.mockito.Mockito.when;
 import java.time.Period;
 import java.util.Optional;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
@@ -25,9 +24,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.BrevDa
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.pdf.PdfBrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
-import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 
-@RunWith(CdiRunner.class)
 public class InnhentDokumentasjonbrevTjenesteTest extends DokumentBestillerTestOppsett {
 
     private static final String FLERE_OPPLYSNINGER = "Vi trenger flere opplysninger";
@@ -38,7 +35,7 @@ public class InnhentDokumentasjonbrevTjenesteTest extends DokumentBestillerTestO
     private InnhentDokumentasjonbrevTjeneste innhentDokumentasjonBrevTjeneste;
     private Long behandlingId;
 
-    @Before
+    @BeforeEach
     public void setup() {
         innhentDokumentasjonBrevTjeneste = new InnhentDokumentasjonbrevTjeneste(repositoryProvider, mockEksternDataForBrevTjeneste, mockPdfBrevTjeneste);
 

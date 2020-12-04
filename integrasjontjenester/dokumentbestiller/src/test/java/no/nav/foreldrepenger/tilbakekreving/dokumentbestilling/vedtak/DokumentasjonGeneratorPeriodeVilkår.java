@@ -3,8 +3,8 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
@@ -36,7 +36,7 @@ import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
  * FP/SVP/ES: https://confluence.adeo.no/display/TVF/Generert+dokumentasjon
  * FRISINN: https://confluence.adeo.no/display/MODNAV/Generert+dokumentasjon
  */
-@Ignore("Kjøres ved behov for å regenerere dokumentasjon")
+@Disabled("Kjøres ved behov for å regenerere dokumentasjon")
 public class DokumentasjonGeneratorPeriodeVilkår {
 
     private final Periode JANUAR = Periode.of(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 1, 16));

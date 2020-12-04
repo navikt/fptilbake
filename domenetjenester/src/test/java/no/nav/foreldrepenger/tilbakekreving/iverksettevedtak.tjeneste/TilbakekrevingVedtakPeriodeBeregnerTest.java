@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -12,11 +13,9 @@ import java.util.Map;
 import java.util.function.Function;
 
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
@@ -30,26 +29,20 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.Vilkårsvur
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelse;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelsePeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelseRepository;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.vedtak.exception.TekniskException;
-import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
 import no.nav.vedtak.util.Objects;
 
-@RunWith(CdiRunner.class)
+@CdiDbAwareTest
 public class TilbakekrevingVedtakPeriodeBeregnerTest {
 
     public static final DateTimeFormatter DATO_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    @Rule
-    public UnittestRepositoryRule repositoryRule = new UnittestRepositoryRule();
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
-
-    private ScenarioSimple simple = ScenarioSimple.simple();
+    private final ScenarioSimple simple = ScenarioSimple.simple();
 
     @Inject
     public BehandlingRepositoryProvider behandlingRepositoryProvider;
@@ -59,15 +52,16 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
     public VilkårsvurderingRepository vilkårsvurderingRepository;
     @Inject
     public TilbakekrevingVedtakPeriodeBeregner beregner;
-
     @Inject
     public VurdertForeldelseRepository foreldelseRepository;
+    @Inject
+    private EntityManager entityManager;
 
-    private LocalDate dag1 = LocalDate.of(2019, 7, 1);
-    private Periode uke1 = Periode.of(dag1, dag1.plusDays(6));
-    private Periode uke2 = uke1.plusDays(7);
-    private Periode uke3 = uke1.plusDays(14);
-    private Periode uke1og2 = Periode.omsluttende(uke1, uke2);
+    private final LocalDate dag1 = LocalDate.of(2019, 7, 1);
+    private final Periode uke1 = Periode.of(dag1, dag1.plusDays(6));
+    private final Periode uke2 = uke1.plusDays(7);
+    private final Periode uke3 = uke1.plusDays(14);
+    private final Periode uke1og2 = Periode.omsluttende(uke1, uke2);
 
     @Test
     public void skal_sende_tilbake_perioder_fra_grunnlag_ved_full_innkreving_og_ingen_splitting() {
@@ -585,10 +579,9 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
 
         //TODO det bør helt klart feile tidligere i løypa istedet for på dette punktet. Legger validering her nå for å
         // ha ekstra sikring mot feil
-        expectedException.expect(TekniskException.class);
-        expectedException.expectMessage("har 10 virkedager, forventer en-til-en, men ovelapper mot beregningsresultat med 5 dager");
-
-        beregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
+        assertThatThrownBy(() -> beregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag))
+            .isInstanceOf(TekniskException.class)
+            .hasMessageContaining("har 10 virkedager, forventer en-til-en, men ovelapper mot beregningsresultat med 5 dager");
     }
 
     @Test
@@ -610,10 +603,9 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
 
         //TODO det bør helt klart feile tidligere i løypa istedet for på dette punktet. Legger validering her nå for å
         // ha ekstra sikring mot feil
-        expectedException.expect(TekniskException.class);
-        expectedException.expectMessage("har 10 virkedager, forventer en-til-en, men ovelapper mot kravgrunnlag med 5 dager");
-
-        beregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
+        assertThatThrownBy(() -> beregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag))
+            .isInstanceOf(TekniskException.class)
+            .hasMessageContaining("har 10 virkedager, forventer en-til-en, men ovelapper mot kravgrunnlag med 5 dager");
     }
 
     private static BigDecimal finSumAv(Collection<TilbakekrevingPeriode> perioder, Function<TilbakekrevingBeløp, BigDecimal> hva, KlasseType klasseType) {
@@ -625,7 +617,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
     }
 
     private void flushAndClear() {
-        repositoryRule.getEntityManager().flush();
-        repositoryRule.getEntityManager().clear();
+        entityManager.flush();
+        entityManager.clear();
     }
 }

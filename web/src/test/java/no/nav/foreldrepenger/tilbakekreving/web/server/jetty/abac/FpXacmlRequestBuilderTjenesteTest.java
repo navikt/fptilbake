@@ -18,8 +18,8 @@ import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.fp.FpXacmlRequestBuilderTjeneste;
@@ -40,7 +40,7 @@ public class FpXacmlRequestBuilderTjenesteTest {
     private PdpConsumer pdpConsumerMock;
     private FpXacmlRequestBuilderTjeneste xamlRequestBuilderTjeneste;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         pdpConsumerMock = mock(PdpConsumer.class);
         xamlRequestBuilderTjeneste = new FpXacmlRequestBuilderTjeneste();

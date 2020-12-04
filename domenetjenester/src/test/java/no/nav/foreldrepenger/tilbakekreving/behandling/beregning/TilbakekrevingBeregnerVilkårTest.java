@@ -6,8 +6,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.Lists;
 
@@ -26,7 +26,7 @@ public class TilbakekrevingBeregnerVilkårTest {
     private GrunnlagPeriodeMedSkattProsent grunnlagPeriodeMedSkattProsent;
     private VilkårVurderingPeriodeEntitet forstoBurdeForstattVurdering;
 
-    @Before
+    @BeforeEach
     public void setup(){
         vurdering = new VilkårVurderingPeriodeEntitet.Builder()
             .medVilkårResultat(VilkårResultat.FEIL_OPPLYSNINGER_FRA_BRUKER)

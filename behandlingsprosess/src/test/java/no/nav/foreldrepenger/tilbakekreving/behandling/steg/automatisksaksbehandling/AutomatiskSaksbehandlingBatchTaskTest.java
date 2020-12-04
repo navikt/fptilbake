@@ -12,11 +12,12 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
+import javax.persistence.EntityManager;
 import javax.persistence.FlushModeType;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegStatus;
@@ -32,7 +33,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
@@ -46,27 +47,32 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
 import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepositoryImpl;
 
+@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public class AutomatiskSaksbehandlingBatchTaskTest {
 
-    @Rule
-    public UnittestRepositoryRule repositoryRule = new UnittestRepositoryRule();
-    private ScenarioSimple scenarioSimple = ScenarioSimple.simple();
     private static final String ENHET = "8020";
+
+    private final ScenarioSimple scenarioSimple = ScenarioSimple.simple();
     private Behandling behandling;
 
-    private BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(repositoryRule.getEntityManager());
-    private InternalManipulerBehandling manipulerBehandling = new InternalManipulerBehandling(repositoryProvider);
-    private ProsessTaskRepository taskRepository = new ProsessTaskRepositoryImpl(repositoryRule.getEntityManager(), null, null);
-    private AutomatiskSaksbehandlingRepository automatiskSaksbehandlingRepository = new AutomatiskSaksbehandlingRepository(repositoryRule.getEntityManager());
-    private Clock clock = Clock.fixed(Instant.parse(getDateString()), ZoneId.systemDefault());
-    private AutomatiskSaksbehandlingBatchTask automatiskSaksbehandlingBatchTask = new AutomatiskSaksbehandlingBatchTask(taskRepository, automatiskSaksbehandlingRepository, clock, Period.ofWeeks(-1));
+    private BehandlingRepositoryProvider repositoryProvider;
+    private ProsessTaskRepository taskRepository;
+    private AutomatiskSaksbehandlingRepository automatiskSaksbehandlingRepository;
+    private final Clock clock = Clock.fixed(Instant.parse(getDateString()), ZoneId.systemDefault());
+    private AutomatiskSaksbehandlingBatchTask automatiskSaksbehandlingBatchTask;
 
-    @Before
-    public void setup() {
-        repositoryRule.getEntityManager().setFlushMode(FlushModeType.AUTO);
+    @BeforeEach
+    public void setup(EntityManager entityManager) {
+        entityManager.setFlushMode(FlushModeType.AUTO);
         scenarioSimple.leggTilAksjonspunkt(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING, BehandlingStegType.FAKTA_FEILUTBETALING);
+        repositoryProvider = new BehandlingRepositoryProvider(entityManager);
+        InternalManipulerBehandling manipulerBehandling = new InternalManipulerBehandling(repositoryProvider);
+        taskRepository = new ProsessTaskRepositoryImpl(entityManager, null, null);
+        automatiskSaksbehandlingRepository = new AutomatiskSaksbehandlingRepository(entityManager);
+        automatiskSaksbehandlingBatchTask = new AutomatiskSaksbehandlingBatchTask(taskRepository, automatiskSaksbehandlingRepository, clock, Period.ofWeeks(-1));
         behandling = scenarioSimple.medBehandlingType(BehandlingType.TILBAKEKREVING).lagre(repositoryProvider);
-        lagKravgrunnlag(behandling.getId(), BigDecimal.valueOf(500l), behandling.getFagsak().getSaksnummer().getVerdi(), 123l);
+        lagKravgrunnlag(behandling.getId(), BigDecimal.valueOf(500L), behandling.getFagsak().getSaksnummer().getVerdi(),
+            123L);
         manipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.FAKTA_FEILUTBETALING, BehandlingStegStatus.UTGANG);
     }
 

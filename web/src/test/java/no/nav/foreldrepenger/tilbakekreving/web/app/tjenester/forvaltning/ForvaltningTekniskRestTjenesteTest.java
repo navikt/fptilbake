@@ -4,23 +4,30 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
-import org.junit.Rule;
-import org.junit.Test;
+import javax.persistence.EntityManager;
 
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
 import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepositoryImpl;
 import no.nav.vedtak.felles.prosesstask.rest.dto.ProsessTaskIdDto;
 
+@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public class ForvaltningTekniskRestTjenesteTest {
 
-    @Rule
-    public UnittestRepositoryRule repositoryRule = new UnittestRepositoryRule();
+    private ProsessTaskRepository prosessTaskRepository;
+    private ForvaltningTekniskRestTjeneste forvaltningTekniskRestTjeneste;
 
-    private ProsessTaskRepository prosessTaskRepository = new ProsessTaskRepositoryImpl(repositoryRule.getEntityManager(), null, null);
-    private ForvaltningTekniskRestTjeneste forvaltningTekniskRestTjeneste = new ForvaltningTekniskRestTjeneste(prosessTaskRepository, null, null);
+    @BeforeEach
+    void setUp(EntityManager entityManager) {
+        prosessTaskRepository = new ProsessTaskRepositoryImpl(entityManager, null, null);
+        forvaltningTekniskRestTjeneste = new ForvaltningTekniskRestTjeneste(prosessTaskRepository, null, null);
+    }
 
     @Test
     public void skal_sett_task_ferdig_hvis_task_finnes() {

@@ -5,7 +5,7 @@ import java.time.ZoneOffset;
 import java.util.UUID;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.BehandlingResultat;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.felles.BehandlingStatus;

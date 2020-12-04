@@ -5,7 +5,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.VedtakAksjonspunktData;
@@ -16,8 +17,14 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.VurderÅrsa
 
 public class FatteVedtakTjenesteTest extends FellesTestOppsett {
 
-    private TotrinnTjeneste totrinnTjeneste = new TotrinnTjeneste(totrinnRepository, repoProvider);
-    private FatteVedtakTjeneste fatteVedtakTjeneste = new FatteVedtakTjeneste(repoProvider, totrinnTjeneste);
+    private TotrinnTjeneste totrinnTjeneste;
+    private FatteVedtakTjeneste fatteVedtakTjeneste;
+
+    @BeforeEach
+    void setUp() {
+        totrinnTjeneste = new TotrinnTjeneste(totrinnRepository, repoProvider);
+        fatteVedtakTjeneste = new FatteVedtakTjeneste(repoProvider, totrinnTjeneste);
+    }
 
     @Test
     public void opprettTotrinnsVurdering_nårAksjonspunktErGodkjent() {

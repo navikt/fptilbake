@@ -7,9 +7,11 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import javax.persistence.EntityManager;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.AksjonspunktTilbakeførtEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.AksjonspunktUtførtEvent;
@@ -34,45 +36,50 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.prosesstask.UtvidetProsessTaskRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
 import no.nav.foreldrepenger.tilbakekreving.fplos.klient.task.FplosPubliserEventTask;
 import no.nav.vedtak.felles.integrasjon.kafka.EventHendelse;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepositoryImpl;
 
+@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public class FplosEventObserverTest {
 
-    @Rule
-    public UnittestRepositoryRule repositoryRule = new UnittestRepositoryRule();
+    private AksjonspunktRepository aksjonspunktRepository;
 
-    private BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(repositoryRule.getEntityManager());
-    private AksjonspunktRepository aksjonspunktRepository = repositoryProvider.getAksjonspunktRepository();
+    private ProsessTaskRepository prosessTaskRepository;
 
-    private UtvidetProsessTaskRepository utvidetProsessTaskRepository = new UtvidetProsessTaskRepository(repositoryRule.getEntityManager());
-    private ProsessTaskRepository prosessTaskRepository = new ProsessTaskRepositoryImpl(repositoryRule.getEntityManager(), null, null);
+    private BehandlingModell mockBehandlingModell;
 
-    private BehandlingModellRepository mockBehandlingModellRepository = mock(BehandlingModellRepository.class);
-    private BehandlingModell mockBehandlingModell = mock(BehandlingModell.class);
-    private BehandlingskontrollTjeneste behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(repositoryProvider, mockBehandlingModellRepository,
-        mock(BehandlingskontrollEventPubliserer.class));
+    private FplosEventObserver fplosEventObserver;
 
-    private FplosEventObserver fplosEventObserver = new FplosEventObserver(repositoryProvider.getBehandlingRepository(), utvidetProsessTaskRepository, prosessTaskRepository, behandlingskontrollTjeneste);
-
-    private InternalManipulerBehandling internalManipulerBehandling = new InternalManipulerBehandling(repositoryProvider);
+    private InternalManipulerBehandling internalManipulerBehandling;
 
     private Behandling behandling;
     private BehandlingskontrollKontekst behandlingskontrollKontekst;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    public void setup(EntityManager entityManager) {
+        BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(entityManager);
+        aksjonspunktRepository = repositoryProvider.getAksjonspunktRepository();
+        UtvidetProsessTaskRepository utvidetProsessTaskRepository = new UtvidetProsessTaskRepository(entityManager);
+        prosessTaskRepository = new ProsessTaskRepositoryImpl(entityManager, null, null);
+        BehandlingModellRepository mockBehandlingModellRepository = mock(BehandlingModellRepository.class);
+        mockBehandlingModell = mock(BehandlingModell.class);
+        BehandlingskontrollTjeneste behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(repositoryProvider,
+            mockBehandlingModellRepository, mock(BehandlingskontrollEventPubliserer.class));
+        fplosEventObserver = new FplosEventObserver(repositoryProvider.getBehandlingRepository(),
+            utvidetProsessTaskRepository, prosessTaskRepository, behandlingskontrollTjeneste);
+        internalManipulerBehandling = new InternalManipulerBehandling(repositoryProvider);
+
         behandling = ScenarioSimple.simple().lagre(repositoryProvider);
         behandlingskontrollKontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandling);
         when(mockBehandlingModellRepository.getModell(BehandlingType.TILBAKEKREVING)).thenReturn(mockBehandlingModell);
     }
 
     @Test
-    public void skal_publisere_data_når_manuell_aksjonspunkt_er_oppretttet() {
+    public void skal_publisere_data_når_manuell_aksjonspunkt_er_opprettet() {
         aksjonspunktRepository.leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING,
             BehandlingStegType.FAKTA_FEILUTBETALING);
         AksjonspunkterFunnetEvent aksjonspunkterFunnetEvent = new AksjonspunkterFunnetEvent(behandlingskontrollKontekst, behandling.getÅpneAksjonspunkter(),

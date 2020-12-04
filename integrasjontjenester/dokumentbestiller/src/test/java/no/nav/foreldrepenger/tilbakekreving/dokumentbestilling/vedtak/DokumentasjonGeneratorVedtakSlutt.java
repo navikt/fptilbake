@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevType;
@@ -40,7 +40,7 @@ import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
  * FP/SVP/ES: https://confluence.adeo.no/display/TVF/Generert+dokumentasjon
  * FRISINN: https://confluence.adeo.no/display/MODNAV/Generert+dokumentasjon
  */
-@Ignore("Kjøres ved behov for å regenerere dokumentasjon")
+@Disabled("Kjøres ved behov for å regenerere dokumentasjon")
 public class DokumentasjonGeneratorVedtakSlutt {
 
     private static final Periode PERIODE1 = Periode.of(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 1, 16));

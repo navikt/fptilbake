@@ -2,7 +2,8 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.steg.faktaverge;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandleStegResultat;
@@ -13,7 +14,12 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 
 public class FaktaVergeStegTest extends FellesTestOppsett {
 
-    private FaktaVergeSteg faktaVergeSteg = new FaktaVergeSteg(behandlingRepository);
+    private FaktaVergeSteg faktaVergeSteg;
+
+    @BeforeEach
+    void setUp() {
+        faktaVergeSteg = new FaktaVergeSteg(behandlingRepository);
+    }
 
     @Test
     public void skal_utføre_steg_hvis_verge_aksjonspunkt_finnes() {

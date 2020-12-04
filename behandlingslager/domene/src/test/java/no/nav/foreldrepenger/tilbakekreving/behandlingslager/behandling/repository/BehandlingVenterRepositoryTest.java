@@ -7,9 +7,9 @@ import java.util.Optional;
 
 import javax.persistence.EntityManager;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -23,26 +23,27 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.test.TestFagsakUtil;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.UnittestRepositoryRule;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 
+@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public class BehandlingVenterRepositoryTest {
 
-    @Rule
-    public final UnittestRepositoryRule reporule = new UnittestRepositoryRule();
-    private final EntityManager entityManager = reporule.getEntityManager();
+    private BehandlingVenterRepository repository;
 
-    private final FellesQueriesForBehandlingRepositories fellesQueriesForBehandlingRepositories = new FellesQueriesForBehandlingRepositories(entityManager);
-    private final BehandlingVenterRepository repository = new BehandlingVenterRepository(fellesQueriesForBehandlingRepositories);
-    private final BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(entityManager);
+    private AksjonspunktRepository aksjonspunktRepository;
+    private BehandlingRepository behandlingRepository;
+    private FagsakRepository fagsakRepository;
 
-    private final AksjonspunktRepository aksjonspunktRepository = repositoryProvider.getAksjonspunktRepository();
-    private final BehandlingRepository behandlingRepository = repositoryProvider.getBehandlingRepository();
-    private final FagsakRepository fagsakRepository = repositoryProvider.getFagsakRepository();
-
-    @Before
-    public void setUp() {
+    @BeforeEach
+    public void setUp(EntityManager entityManager) {
+        var fellesQueriesForBehandlingRepositories = new FellesQueriesForBehandlingRepositories(entityManager);
+        repository = new BehandlingVenterRepository(fellesQueriesForBehandlingRepositories);
+        var repositoryProvider = new BehandlingRepositoryProvider(entityManager);
+        aksjonspunktRepository = repositoryProvider.getAksjonspunktRepository();
+        behandlingRepository = repositoryProvider.getBehandlingRepository();
+        fagsakRepository = repositoryProvider.getFagsakRepository();
     }
 
     @Test
@@ -106,7 +107,8 @@ public class BehandlingVenterRepositoryTest {
 
         // opprett behandling
         Behandling behandling = Behandling.nyBehandlingFor(fagsak, behandlingType)
-                .medOpprettetDato(LocalDateTime.now()).build();
+            .medOpprettetDato(LocalDateTime.now())
+            .build();
 
         // lagre behandling
         Long id = lagreBehandling(behandling);
@@ -121,20 +123,14 @@ public class BehandlingVenterRepositoryTest {
     }
 
     private void settVenterPåBrukerRespons(Behandling behandling, LocalDateTime frist) {
-        aksjonspunktRepository.settBehandlingPåVent(behandling,
-                AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING,
-                BehandlingStegType.VARSEL,
-                frist,
-                Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING);
+        aksjonspunktRepository.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING,
+            BehandlingStegType.VARSEL, frist, Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING);
         lagreBehandling(behandling);
     }
 
     private void settVenterPåTilbakekrevinggrunnlag(Behandling behandling) {
-        aksjonspunktRepository.settBehandlingPåVent(behandling,
-                AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG,
-                BehandlingStegType.VARSEL,
-                null,
-                Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
+        aksjonspunktRepository.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG,
+            BehandlingStegType.VARSEL, null, Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
         lagreBehandling(behandling);
     }
 

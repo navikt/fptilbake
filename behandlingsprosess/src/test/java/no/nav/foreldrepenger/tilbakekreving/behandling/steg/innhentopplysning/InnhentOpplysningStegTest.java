@@ -5,8 +5,8 @@ import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.inhentopplysning.InnhentOpplysningSteg;
@@ -20,11 +20,14 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBe
 
 public class InnhentOpplysningStegTest extends FellesTestOppsett {
 
-    private InnhentOpplysningSteg innhentOpplysningSteg = new InnhentOpplysningSteg(repositoryProvider, fagsystemKlientMock);
-    private VarselRepository varselRepository = repositoryProvider.getVarselRepository();
+    private InnhentOpplysningSteg innhentOpplysningSteg;
+    private VarselRepository varselRepository;
 
-    @Before
+    @BeforeEach
     public void setup(){
+        innhentOpplysningSteg = new InnhentOpplysningSteg(repositoryProvider, fagsystemKlientMock);
+        varselRepository = repositoryProvider.getVarselRepository();
+
         EksternBehandling eksternBehandling = new EksternBehandling(behandling, HENVISNING, FPSAK_BEHANDLING_UUID);
         eksternBehandlingRepository.lagre(eksternBehandling);
     }
