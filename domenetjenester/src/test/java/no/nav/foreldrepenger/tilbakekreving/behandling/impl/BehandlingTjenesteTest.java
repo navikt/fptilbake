@@ -69,6 +69,7 @@ public class BehandlingTjenesteTest extends FellesTestOppsett {
         avsluttBehandling();
         Long behandlingId = behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer, UUID.randomUUID(), henvisning, aktørId, FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING);
         fellesBehandlingAssert(behandlingId, false);
+        assertThat(prosessTaskRepository.finnProsessTaskType(BehandlingTjeneste.FINN_KRAVGRUNNLAG_TASK)).isNotEmpty();
     }
 
 

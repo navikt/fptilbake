@@ -148,7 +148,8 @@ public class BehandlingTjeneste {
                                             AktørId aktørId, FagsakYtelseType fagsakYtelseType,
                                             BehandlingType behandlingType) {
         Behandling behandling = opprettFørstegangsbehandling(saksnummer, eksternUuid, henvisning, aktørId, fagsakYtelseType, behandlingType);
-        behandlingskontrollAsynkTjeneste.asynkProsesserBehandling(behandling);
+        String gruppe = behandlingskontrollAsynkTjeneste.asynkProsesserBehandling(behandling);
+        opprettFinnGrunnlagTask(behandling, gruppe);
         return behandling.getId();
     }
 

@@ -14,10 +14,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.FagsystemId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatus437;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagAggregate;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.tilbakekreving.status.v1.KravOgVedtakstatus;
@@ -80,24 +78,14 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
         Optional<Behandling> åpenTilbakekrevingBehandling = finnÅpenTilbakekrevingBehandling(saksnummer);
         if (åpenTilbakekrevingBehandling.isPresent()) {
             Long behandlingId = åpenTilbakekrevingBehandling.get().getId();
-            if (harTilkobletGrunnlag(vedtakId, new Saksnummer(saksnummer))) {
-                kravVedtakStatusTjeneste.håndteresMottakAvKravVedtakStatus(behandlingId, kravVedtakStatus437);
-                økonomiMottattXmlRepository.opprettTilkobling(mottattXmlId);
-                logger.info("Tilkoblet kravVedtakStatus med id={} saksnummer={} behandlingId={}", mottattXmlId, saksnummer, behandlingId);
-            } else {
-                throw LesKravvedtakStatusTaskFeil.FACTORY.ugyldigVedtakId(vedtakId, saksnummer, mottattXmlId).toException();
-            }
-
+            kravVedtakStatusTjeneste.håndteresMottakAvKravVedtakStatus(behandlingId, kravVedtakStatus437);
+            økonomiMottattXmlRepository.opprettTilkobling(mottattXmlId);
+            logger.info("Tilkoblet kravVedtakStatus med id={} saksnummer={} behandlingId={}", mottattXmlId, saksnummer, behandlingId);
         } else {
             validerBehandlingsEksistens(henvisning, saksnummer);
             logger.info("Ignorerte kravVedtakStatus med id={} saksnummer={}. Fantes ikke tilbakekrevingsbehandling", mottattXmlId, saksnummer);
         }
 
-    }
-
-    private boolean harTilkobletGrunnlag(long vedtakId, Saksnummer saksnummer) {
-        Optional<KravgrunnlagAggregate> kravgrunnlag = kravgrunnlagRepository.finnGrunnlagForVedtakId(vedtakId);
-        return kravgrunnlag.isPresent() && saksnummer.equals(kravgrunnlag.get().getGrunnlagØkonomi().getSaksnummer());
     }
 
     private void validerHenvisning(Henvisning henvisning) {
@@ -125,12 +113,6 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
             feilmelding = "Mottok et kravOgVedtakStatus fra Økonomi med henvisning i ikke-støttet format, henvisning=%s. KravOgVedtakStatus skulle kanskje til et annet system. Si i fra til Økonomi!",
             logLevel = LogLevel.WARN)
         Feil ugyldigHenvisning(Henvisning henvisning);
-
-        @TekniskFeil(feilkode = "FPT-675365",
-            feilmelding = "Mottok et kravOgVedtakStatus fra Økonomi med vedtakId=%s som ikke finnes for saksnummer=%s mottattXmlId=%s. " +
-                "KravOgVedtakStatus skulle kanskje til et annet system. Si i fra til Økonomi!",
-            logLevel = LogLevel.WARN)
-        Feil ugyldigVedtakId(long vedtakId, String saksnummer , long mottattXmlId);
 
     }
 
