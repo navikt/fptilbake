@@ -55,7 +55,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
 
 public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
 
-    private static final String HENLEGGELSE_BREV_TASKTYPE = "brev.sendhenleggelse";
+
     private final BehandlingModellRepository mockBehandlingModellRepository = mock(BehandlingModellRepository.class);
     private final BehandlingModell modell = mock(BehandlingModell.class);
 
@@ -190,9 +190,7 @@ public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
         henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), behandlingsresultat);
 
         List<ProsessTaskData> prosessTaskData = prosessTaskRepository.finnAlle(ProsessTaskStatus.KLAR);
-        assertThat(prosessTaskData).isNotEmpty();
-        assertThat(prosessTaskData.stream().filter(taskData -> HENLEGGELSE_BREV_TASKTYPE.equals(taskData.getTaskType()))
-            .findAny()).isEmpty();
+        assertThat(prosessTaskData).isEmpty();
         assertHenleggelse(internBehandlingId);
     }
 
@@ -203,9 +201,7 @@ public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
             BehandlingResultatType.HENLAGT_FEILOPPRETTET_UTEN_BREV);
 
         List<ProsessTaskData> prosessTaskData = prosessTaskRepository.finnAlle(ProsessTaskStatus.KLAR);
-        assertThat(prosessTaskData).isNotEmpty();
-        assertThat(prosessTaskData.stream().filter(taskData -> HENLEGGELSE_BREV_TASKTYPE.equals(taskData.getTaskType()))
-            .findAny()).isEmpty();
+        assertThat(prosessTaskData).isEmpty();
         assertHenleggelse(revuderingBehandlingId);
     }
 
@@ -222,10 +218,8 @@ public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
         henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), behandlingsresultat);
         List<ProsessTaskData> prosessTaskData = prosessTaskRepository.finnAlle(ProsessTaskStatus.KLAR);
         assertThat(prosessTaskData).isNotEmpty();
-        assertThat(prosessTaskData.stream().filter(taskData -> HENLEGGELSE_BREV_TASKTYPE.equals(taskData.getTaskType()))
-            .findAny()).isPresent();
-        assertThat(prosessTaskData.stream().filter(taskData -> "send.beskjed.tilbakekreving.henlagt.selvbetjening".equals(taskData.getTaskType()))
-            .findAny()).isPresent();
+        assertThat(prosessTaskData.get(0).getTaskType()).isEqualTo("brev.sendhenleggelse");
+        assertThat(prosessTaskData.get(1).getTaskType()).isEqualTo("send.beskjed.tilbakekreving.henlagt.selvbetjening");
         assertHenleggelse(internBehandlingId);
     }
 
@@ -237,8 +231,7 @@ public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
 
         List<ProsessTaskData> prosessTaskData = prosessTaskRepository.finnAlle(ProsessTaskStatus.KLAR);
         assertThat(prosessTaskData).isNotEmpty();
-        assertThat(prosessTaskData.stream().filter(taskData -> HENLEGGELSE_BREV_TASKTYPE.equals(taskData.getTaskType()))
-            .findAny()).isPresent();
+        assertThat(prosessTaskData.get(0).getTaskType()).isEqualTo("brev.sendhenleggelse");
         assertHenleggelse(revuderingBehandlingId);
     }
 
@@ -257,10 +250,8 @@ public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
             BehandlingResultatType.HENLAGT_FEILOPPRETTET_MED_BREV);
         List<ProsessTaskData> prosessTaskData = prosessTaskRepository.finnAlle(ProsessTaskStatus.KLAR);
         assertThat(prosessTaskData).isNotEmpty();
-        assertThat(prosessTaskData.stream().filter(taskData -> HENLEGGELSE_BREV_TASKTYPE.equals(taskData.getTaskType()))
-            .findAny()).isPresent();
-        assertThat(prosessTaskData.stream().filter(taskData -> "send.beskjed.tilbakekreving.henlagt.selvbetjening".equals(taskData.getTaskType()))
-            .findAny()).isPresent();
+        assertThat(prosessTaskData.get(0).getTaskType()).isEqualTo("brev.sendhenleggelse");
+        assertThat(prosessTaskData.get(1).getTaskType()).isEqualTo("send.beskjed.tilbakekreving.henlagt.selvbetjening");
         assertHenleggelse(revuderingBehandlingId);
     }
 
@@ -289,5 +280,4 @@ public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
             BehandlingStatus.AVSLUTTET);
         assertThat(repoProvider.getEksternBehandlingRepository().hentOptionalFraInternId(behandlingId)).isEmpty();
     }
-
 }
