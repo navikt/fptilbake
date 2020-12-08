@@ -13,6 +13,7 @@ public class K9AbacAttributter {
     public static final String RESOURCE_K9_SAK_SAKSSTATUS = "no.nav.abac.attributter.resource.k9.sak.saksstatus";
     public static final String RESOURCE_K9_SAK_BEHANDLINGSSTATUS = "no.nav.abac.attributter.resource.k9.sak.behandlingsstatus";
     public static final String RESOURCE_K9_SAK_AKSJONSPUNKT_TYPE = "no.nav.abac.attributter.resource.k9.sak.aksjonspunkt_type";
+    public static final String RESOURCE_K9_SAK_SAKSNUMMER = "no.nav.abac.attributter.resource.k9.saksnr";
     public static final String RESOURCE_K9_SAK_ANSVARLIG_SAKSBEHANDLER = "no.nav.abac.attributter.resource.k9.sak.ansvarlig_saksbehandler";
 
 }
