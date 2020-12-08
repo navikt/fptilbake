@@ -27,12 +27,10 @@ public class K9sakPipKlient {
     private static final String K9SAK_OVERRIDE_URL = "k9sak.override.url";
 
     private static final String PIP_BEHANDLING_ENDPOINT = "/k9/sak/api/pip/pipdata-for-behandling";
-    private static final String PIP_SAK_ENDPOINT = "/k9/sak/api/pip/aktoer-for-sak";
 
     private SystemUserOidcRestClient restClient;
 
     private URI endpointK9sakBehandlingPip;
-    private URI endpointK9sakSakPip;
 
     public K9sakPipKlient() {
         // CDI
@@ -43,7 +41,6 @@ public class K9sakPipKlient {
         this.restClient = restClient;
         URI baseUri = baseUri();
         this.endpointK9sakBehandlingPip = UriBuilder.fromUri(baseUri).path(PIP_BEHANDLING_ENDPOINT).build();
-        this.endpointK9sakSakPip = UriBuilder.fromUri(baseUri).path(PIP_SAK_ENDPOINT).build();
     }
 
     public K9PipDto hentPipdataForK9sakBehandling(UUID behandlingUUid) {
@@ -51,21 +48,6 @@ public class K9sakPipKlient {
             .queryParam("behandlingUuid", behandlingUUid.toString())
             .build();
         return restClient.get(uri, K9PipDto.class);
-    }
-
-    public Set<String> hentAktørIderSomString(Saksnummer saksnummer) {
-        URI uri = UriBuilder.fromUri(endpointK9sakSakPip)
-            .queryParam("saksnummer", saksnummer.getVerdi())
-            .build();
-
-        return restClient.get(uri, HashSet.class);
-    }
-
-    public Set<AktørId> hentAktørIder(Saksnummer saksnummer) {
-        Set<String> aktørIder = hentAktørIderSomString(saksnummer);
-        return aktørIder.stream()
-            .map(AktørId::new)
-            .collect(Collectors.toSet());
     }
 
     private URI baseUri() {

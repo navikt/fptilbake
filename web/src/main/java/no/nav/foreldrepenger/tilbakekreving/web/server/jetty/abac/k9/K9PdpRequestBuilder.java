@@ -10,13 +10,9 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakStatus;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.TilbakekrevingAbacAttributtType;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.K9tilbake;
 import no.nav.foreldrepenger.tilbakekreving.pip.PipBehandlingData;
@@ -47,7 +43,6 @@ public class K9PdpRequestBuilder implements PdpRequestBuilder {
 
     public static final String ABAC_DOMAIN = "k9";
     private static final MdcExtendedLogContext LOG_CONTEXT = MdcExtendedLogContext.getContext("prosess"); //$NON-NLS-1$
-    private static final Logger logger = LoggerFactory.getLogger(K9PdpRequestBuilder.class);
 
     private PipRepository pipRepository;
     private K9sakPipKlient k9sakPipKlient;
@@ -64,6 +59,7 @@ public class K9PdpRequestBuilder implements PdpRequestBuilder {
 
     @Override
     public PdpRequest lagPdpRequest(AbacAttributtSamling attributter) {
+        LOG_CONTEXT.remove("saksnummer");
         LOG_CONTEXT.remove("behandling");
         LOG_CONTEXT.remove("k9sakBehandlingUuid");
         LOG_CONTEXT.remove("behandlingUuid");
@@ -100,9 +96,26 @@ public class K9PdpRequestBuilder implements PdpRequestBuilder {
         behandlingUuid.ifPresent(uuid -> utlededeAttributter.leggTil(StandardAbacAttributtType.BEHANDLING_UUID, uuid));
         attributter.leggTil(utlededeAttributter);
 
+        String saksnummer = utledSaksnummer(attributter, behandlingData);
+
         return behandlingData != null
-            ? lagPdpRequest(attributter, aktørIder, aksjonspunkttype, behandlingData)
-            : lagPdpRequest(attributter, aktørIder, aksjonspunkttype);
+            ? lagPdpRequest(attributter, aktørIder, saksnummer, aksjonspunkttype, behandlingData)
+            : lagPdpRequest(attributter, aktørIder, saksnummer, aksjonspunkttype);
+    }
+
+    private String utledSaksnummer(AbacAttributtSamling attributter, PipBehandlingData behandlingData) {
+        Set<String> saksnumre = new HashSet<>();
+        saksnumre.addAll(attributter.getVerdier(AppAbacAttributtType.SAKSNUMMER));
+        if (behandlingData != null && behandlingData.getSaksnummer() != null) {
+            saksnumre.add(behandlingData.getSaksnummer());
+        }
+        if (saksnumre.isEmpty()) {
+            return null;
+        }
+        if (saksnumre.size() == 1) {
+            return saksnumre.iterator().next();
+        }
+        throw new IllegalArgumentException("Ikke støttet å ha to saksnumre samtidig");
     }
 
     private PipBehandlingData hentK9sakBehandlingData(UUID k9sakBehandlingUuid) {
@@ -135,7 +148,7 @@ public class K9PdpRequestBuilder implements PdpRequestBuilder {
         }
     }
 
-    private PdpRequest lagPdpRequest(AbacAttributtSamling attributter, Set<String> aktørId, Collection<String> aksjonspunktType) {
+    private PdpRequest lagPdpRequest(AbacAttributtSamling attributter, Set<String> aktørId, String saksnummer, Collection<String> aksjonspunktType) {
         PdpRequest pdpRequest = new PdpRequest();
         pdpRequest.put(CommonAttributter.RESOURCE_FELLES_DOMENE, ABAC_DOMAIN);
         pdpRequest.put(PdpKlient.ENVIRONMENT_AUTH_TOKEN, attributter.getIdToken());
@@ -143,11 +156,15 @@ public class K9PdpRequestBuilder implements PdpRequestBuilder {
         pdpRequest.put(CommonAttributter.RESOURCE_FELLES_RESOURCE_TYPE, attributter.getResource());
         pdpRequest.put(CommonAttributter.RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE, aktørId);
         pdpRequest.put(K9AbacAttributter.RESOURCE_K9_SAK_AKSJONSPUNKT_TYPE, aksjonspunktType);
+        if (saksnummer != null) {
+            LOG_CONTEXT.add("saksnummer", saksnummer);
+            pdpRequest.put(K9AbacAttributter.RESOURCE_K9_SAK_SAKSNUMMER, saksnummer);
+        }
         return pdpRequest;
     }
 
-    private PdpRequest lagPdpRequest(AbacAttributtSamling attributter, Set<String> aktørId, Collection<String> aksjonspunktType, PipBehandlingData behandlingData) {
-        PdpRequest pdpRequest = lagPdpRequest(attributter, aktørId, aksjonspunktType);
+    private PdpRequest lagPdpRequest(AbacAttributtSamling attributter, Set<String> aktørId, String saksnummer, Collection<String> aksjonspunktType, PipBehandlingData behandlingData) {
+        PdpRequest pdpRequest = lagPdpRequest(attributter, aktørId, saksnummer, aksjonspunktType);
 
         oversettFagstatus(behandlingData.getFagsakstatus())
             .ifPresent(it -> pdpRequest.put(K9AbacAttributter.RESOURCE_K9_SAK_SAKSSTATUS, it.getEksternKode()));
@@ -155,6 +172,7 @@ public class K9PdpRequestBuilder implements PdpRequestBuilder {
             .ifPresent(it -> pdpRequest.put(K9AbacAttributter.RESOURCE_K9_SAK_BEHANDLINGSSTATUS, it.getEksternKode()));
         behandlingData.getAnsvarligSaksbehandler()
             .ifPresent(it -> pdpRequest.put(K9AbacAttributter.RESOURCE_K9_SAK_ANSVARLIG_SAKSBEHANDLER, it));
+
 
         return pdpRequest;
     }
@@ -218,9 +236,6 @@ public class K9PdpRequestBuilder implements PdpRequestBuilder {
             resultat.addAll(behandlingData.getAktørIdSomStrenger());
         }
         Set<String> saksnumre = attributter.getVerdier(AppAbacAttributtType.SAKSNUMMER);
-        if (saksnumre.size() == 1) {
-            resultat.addAll(k9sakPipKlient.hentAktørIderSomString(new Saksnummer(saksnumre.iterator().next())));
-        }
         if (saksnumre.size() > 1) {
             throw PdpRequestBuilderFeil.FACTORY.ugyldigInputFlereSaksnumre(saksnumre).toException();
         }
