@@ -2,7 +2,6 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.status
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -233,16 +232,6 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
         assertThat(prosessTasker).isNotEmpty();
         assertThat(prosessTasker.size()).isEqualTo(1);
         assertThat(prosessTasker.get(0).getTaskType()).isEqualTo(FortsettBehandlingTaskProperties.TASKTYPE);
-    }
-
-    @Test
-    public void skal_ikke_utføre_leskravvedtakststatustask_for_mottatt_sper_melding_når_koblede_grunnlag_ikke_finnes(){
-        grunnlagRepository.getEntityManager().createNativeQuery("update GR_KRAV_GRUNNLAG set aktiv='N' where behandling_id="+behandling.getId()).executeUpdate();
-        mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravvedtakstatus_SPER.xml"));
-        ProsessTaskData prosessTaskData = lagProsessTaskData(mottattXmlId, LesKravvedtakStatusTask.TASKTYPE);
-        var e = assertThrows(TekniskException.class, () ->
-            lesKravvedtakStatusTask.doTask(prosessTaskData));
-        assertThat(e.getMessage()).contains("FPT-675365");
     }
 
     @Test
