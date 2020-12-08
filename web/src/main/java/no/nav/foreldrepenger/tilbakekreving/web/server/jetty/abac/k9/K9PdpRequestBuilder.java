@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakStatus;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.TilbakekrevingAbacAttributtType;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.K9tilbake;
 import no.nav.foreldrepenger.tilbakekreving.pip.PipBehandlingData;
@@ -218,9 +217,6 @@ public class K9PdpRequestBuilder implements PdpRequestBuilder {
             resultat.addAll(behandlingData.getAktørIdSomStrenger());
         }
         Set<String> saksnumre = attributter.getVerdier(AppAbacAttributtType.SAKSNUMMER);
-        if (saksnumre.size() == 1) {
-            resultat.addAll(k9sakPipKlient.hentAktørIderSomString(new Saksnummer(saksnumre.iterator().next())));
-        }
         if (saksnumre.size() > 1) {
             throw PdpRequestBuilderFeil.FACTORY.ugyldigInputFlereSaksnumre(saksnumre).toException();
         }
