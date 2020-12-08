@@ -5,9 +5,8 @@ import java.util.Optional;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
-import no.nav.foreldrepenger.tilbakekreving.domene.person.impl.TpsAdapter;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.NavBrukerKjønn;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.pdl.AktørTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
@@ -15,7 +14,6 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 @ApplicationScoped
 public class PersoninfoAdapter {
 
-    private TpsAdapter tpsAdapter;
     private AktørTjeneste aktørTjeneste;
 
     public PersoninfoAdapter() {
@@ -23,37 +21,30 @@ public class PersoninfoAdapter {
     }
 
     @Inject
-    public PersoninfoAdapter(TpsAdapter tpsAdapter, AktørTjeneste aktørTjeneste) {
-        this.tpsAdapter = tpsAdapter;
+    public PersoninfoAdapter(AktørTjeneste aktørTjeneste) {
         this.aktørTjeneste = aktørTjeneste;
     }
 
-    public Personinfo innhentSaksopplysningerForSøker(AktørId aktørId) {
-        return hentPerson(aktørId).orElse(null);
+    public NavBrukerKjønn hentKjønnForAktør(AktørId aktørId) {
+        try {
+            return aktørTjeneste.hentKjønnForAktør(aktørId);
+        } catch (Exception e) {
+            return NavBrukerKjønn.UDEFINERT;
+        }
     }
 
     public Optional<Personinfo> hentBrukerForAktør(AktørId aktørId) {
-        return hentPerson(aktørId);
+        return aktørTjeneste.hentPersonIdentForAktørId(aktørId).map(pi -> aktørTjeneste.hentPersoninfo(aktørId, pi));
     }
 
-    private Optional<Personinfo> hentPerson(AktørId aktørId) {
-        var pi = tpsAdapter.hentIdentForAktørId(aktørId);
-        aktørTjeneste.hentPersonIdentForAktørId(aktørId, pi);
-        if (pi.isEmpty())
-            return Optional.empty();
-        var info = tpsAdapter.hentKjerneinformasjon(pi.get(), aktørId);
-        aktørTjeneste.hentPersoninfo(aktørId, pi.get(), info);
-        return Optional.ofNullable(info);
+    public Optional<PersonIdent> hentFnrForAktør(AktørId aktørId) {
+        return aktørTjeneste.hentPersonIdentForAktørId(aktørId);
     }
 
     public Optional<AktørId> hentAktørForFnr(PersonIdent fnr) {
-        var fraTps = tpsAdapter.hentAktørIdForPersonIdent(fnr);
-        aktørTjeneste.hentAktørIdForPersonIdent(fnr, fraTps);
-        return fraTps;
+        return aktørTjeneste.hentAktørIdForPersonIdent(fnr);
     }
 
-    public Adresseinfo hentAdresseinformasjon(PersonIdent personIdent) {
-        return tpsAdapter.hentAdresseinformasjon(personIdent);
-    }
+
 
 }

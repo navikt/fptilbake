@@ -218,10 +218,6 @@
             <artifactId>jboss-jaxb-api_2.3_spec</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>no.nav.foreldrepenger.felles.integrasjon</groupId>
-            <artifactId>person-klient</artifactId>
-        </dependency>
         <!-- TODO (Frode M): sjekk om vi trenger ldap-klient -->
         <dependency>
             <groupId>no.nav.foreldrepenger.felles.integrasjon</groupId>

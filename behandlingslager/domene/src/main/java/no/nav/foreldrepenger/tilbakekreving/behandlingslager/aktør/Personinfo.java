@@ -4,7 +4,6 @@ import static java.util.Objects.requireNonNull;
 
 import java.time.LocalDate;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.NavBrukerKjønn;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.SivilstandType;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
@@ -16,7 +15,6 @@ public class Personinfo {
     private PersonIdent personIdent;
     private LocalDate fødselsdato;
     private LocalDate dødsdato;
-    private NavBrukerKjønn kjønn;
     private SivilstandType sivilstand;
 
     private Personinfo() {
@@ -32,10 +30,6 @@ public class Personinfo {
 
     public String getNavn() {
         return navn;
-    }
-
-    public NavBrukerKjønn getKjønn() {
-        return kjønn;
     }
 
     public LocalDate getFødselsdato() {
@@ -91,11 +85,6 @@ public class Personinfo {
             return this;
         }
 
-        public Builder medNavBrukerKjønn(NavBrukerKjønn kjønn) {
-            personinfoMal.kjønn = kjønn;
-            return this;
-        }
-
         public Builder medSivilstandType(SivilstandType sivilstandType) {
             personinfoMal.sivilstand = sivilstandType;
             return this;
@@ -105,8 +94,6 @@ public class Personinfo {
             requireNonNull(personinfoMal.aktørId, "Navbruker må ha aktørId"); //$NON-NLS-1$
             requireNonNull(personinfoMal.personIdent, "Navbruker må ha fødselsnummer"); //$NON-NLS-1$
             requireNonNull(personinfoMal.navn, "Navbruker må ha navn"); //$NON-NLS-1$
-            requireNonNull(personinfoMal.fødselsdato, "Navbruker må ha fødselsdato"); //$NON-NLS-1$
-            requireNonNull(personinfoMal.kjønn, "Navbruker må ha kjønn"); //$NON-NLS-1$
             return personinfoMal;
         }
 

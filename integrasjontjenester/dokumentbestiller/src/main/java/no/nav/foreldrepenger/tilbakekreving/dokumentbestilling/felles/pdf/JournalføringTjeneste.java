@@ -17,6 +17,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Journalpo
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.JournalpostIdOgDokumentId;
+import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.journalpostapi.JournalpostApiKlient;
 import no.nav.journalpostapi.dto.AvsenderMottaker;
@@ -43,7 +45,6 @@ import no.nav.vedtak.feil.FeilFactory;
 import no.nav.vedtak.feil.LogLevel;
 import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
 import no.nav.vedtak.feil.deklarasjon.IntegrasjonFeil;
-import no.nav.vedtak.felles.integrasjon.aktør.klient.AktørConsumer;
 import no.nav.vedtak.konfig.KonfigVerdi;
 
 @ApplicationScoped
@@ -54,7 +55,7 @@ public class JournalføringTjeneste {
     private BehandlingRepository behandlingRepository;
     private VergeRepository vergeRepository;
     private JournalpostApiKlient journalpostApiKlient;
-    private AktørConsumer aktørConsumer;
+    private PersoninfoAdapter aktørConsumer;
     private String appName;
 
     JournalføringTjeneste() {
@@ -62,7 +63,7 @@ public class JournalføringTjeneste {
     }
 
     @Inject
-    public JournalføringTjeneste(BehandlingRepository behandlingRepository, VergeRepository vergeRepository, JournalpostApiKlient journalpostApiKlient, AktørConsumer aktørConsumer, @KonfigVerdi(value = "app.name") String appName) {
+    public JournalføringTjeneste(BehandlingRepository behandlingRepository, VergeRepository vergeRepository, JournalpostApiKlient journalpostApiKlient, PersoninfoAdapter aktørConsumer, @KonfigVerdi(value = "app.name") String appName) {
         this.behandlingRepository = behandlingRepository;
         this.vergeRepository = vergeRepository;
         this.journalpostApiKlient = journalpostApiKlient;
@@ -114,29 +115,26 @@ public class JournalføringTjeneste {
                 return AvsenderMottaker.builder()
                     .medId(SenderMottakerIdType.NorskIdent, adresseinfo.getPersonIdent().getIdent())
                     .medNavn(adresseinfo.getMottakerNavn())
-                    .medLand(adresseinfo.getLand())
                     .build();
             case VERGE:
-                return lagMottakerVerge(behandlingId, adresseinfo);
+                return lagMottakerVerge(behandlingId);
             default:
                 throw new IllegalArgumentException("Ikke-støttet mottaker: " + mottaker);
         }
     }
 
-    private AvsenderMottaker lagMottakerVerge(Long behandlingId, Adresseinfo adresseinfo) {
+    private AvsenderMottaker lagMottakerVerge(Long behandlingId) {
         VergeEntitet verge = vergeRepository.finnVergeInformasjon(behandlingId).orElseThrow();
         if (verge.getOrganisasjonsnummer() != null) {
             return AvsenderMottaker.builder()
                 .medId(SenderMottakerIdType.Organisasjonsnummer, verge.getOrganisasjonsnummer())
                 .medNavn(verge.getNavn())
-                .medLand(adresseinfo.getLand())
                 .build();
         } else {
-            String fnrVerge = aktørConsumer.hentPersonIdentForAktørId(verge.getVergeAktørId().getId()).orElseThrow();
+            String fnrVerge = aktørConsumer.hentFnrForAktør(verge.getVergeAktørId()).map(PersonIdent::getIdent).orElseThrow();
             return AvsenderMottaker.builder()
                 .medId(SenderMottakerIdType.NorskIdent, fnrVerge)
                 .medNavn(verge.getNavn())
-                .medLand(adresseinfo.getLand())
                 .build();
         }
     }

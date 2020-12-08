@@ -10,7 +10,6 @@ import javax.transaction.Transactional;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.AdresseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
@@ -64,9 +63,8 @@ public class EksternDataForBrevTjeneste {
             .orElseThrow(() -> EksternDataForBrevFeil.FACTORY.fantIkkePersoniTPS(aktørId).toException());
     }
 
-    //TODO Bør endre signatur til (PersonIdent) siden det kun er den som brukes
     public Adresseinfo hentAdresse(Personinfo personinfo) {
-        return tpsTjeneste.hentAdresseinformasjon(personinfo.getPersonIdent());
+        return new Adresseinfo.Builder(personinfo.getPersonIdent(), personinfo.getNavn()).build();
     }
 
     public Adresseinfo hentAdresse(Personinfo personinfo, BrevMottaker brevMottaker, Optional<VergeEntitet> vergeEntitet) {
@@ -111,14 +109,7 @@ public class EksternDataForBrevTjeneste {
         String annenMottakerNavn = organisasjonNavn + " " + vedVergeNavn;
         Adresseinfo adresseinfo;
         if (BrevMottaker.VERGE.equals(brevMottaker)) {
-            Adresseinfo.Builder adresseinfoBuilder = new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE, personinfo.getPersonIdent(), organisasjonNavn);
-            adresseinfo = adresseinfoBuilder.medAdresselinje1(vedVergeNavn)
-                .medAdresselinje2(virksomhet.getAdresselinje1())
-                .medAdresselinje3(virksomhet.getAdresselinje2())
-                .medAdresselinje4(virksomhet.getAdresselinje3())
-                .medLand(virksomhet.getLandkode())
-                .medPostNr(virksomhet.getPostNr())
-                .medPoststed(virksomhet.getPoststed())
+            adresseinfo = new Adresseinfo.Builder(personinfo.getPersonIdent(), organisasjonNavn)
                 .medAnnenMottakerNavn(personinfo.getNavn()).build();
         } else {
             adresseinfo = hentAdresse(personinfo);

@@ -366,7 +366,6 @@ public class HåndterGamleKravgrunnlagTaskTest {
         Personinfo personinfo = Personinfo.builder()
             .medAktørId(aktørId)
             .medFødselsdato(LocalDate.now().minusYears(20))
-            .medNavBrukerKjønn(NavBrukerKjønn.KVINNE)
             .medPersonIdent(new PersonIdent(aktørId.getId()))
             .medNavn("testnavn")
             .build();

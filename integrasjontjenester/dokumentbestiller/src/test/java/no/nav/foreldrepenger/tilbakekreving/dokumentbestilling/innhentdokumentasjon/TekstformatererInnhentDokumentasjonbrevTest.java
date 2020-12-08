@@ -11,7 +11,6 @@ import java.util.Scanner;
 import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.AdresseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
@@ -85,13 +84,7 @@ public class TekstformatererInnhentDokumentasjonbrevTest {
 
     @Test
     public void skal_generere_innhentdokumentasjonbrev_for_verge_organisasjon() throws Exception {
-        Adresseinfo orgAdresse = new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE, new PersonIdent("12345678901"), "Semba AS c/o John Doe")
-            .medAdresselinje1("adresselinje 1")
-            .medAdresselinje2("adresselinje 2")
-            .medAdresselinje3("adresselinje 3")
-            .medLand("NOR")
-            .medPostNr("0688")
-            .medPoststed("OSLO")
+        Adresseinfo orgAdresse = new Adresseinfo.Builder(new PersonIdent("12345678901"), "Semba AS c/o John Doe")
             .build();
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
             .medFagsaktypenavnPåSpråk("foreldrepenger")
@@ -173,13 +166,7 @@ public class TekstformatererInnhentDokumentasjonbrevTest {
     }
 
     private Adresseinfo lagStandardNorskAdresse() {
-        return new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE, new PersonIdent("12345678901"), "Test")
-            .medAdresselinje1("adresselinje 1")
-            .medAdresselinje2("adresselinje 2")
-            .medAdresselinje3("adresselinje 3")
-            .medLand("NOR")
-            .medPostNr("0688")
-            .medPoststed("OSLO")
+        return new Adresseinfo.Builder(new PersonIdent("12345678901"), "Test")
             .build();
     }
 }

@@ -85,7 +85,7 @@ public class AktørTjeneste {
         this.tema = "fptilbake".equals(applikasjon) ? Tema.FOR : Tema.OMS;
     }
 
-    public Optional<AktørId> hentAktørIdForPersonIdent(PersonIdent personIdent, Optional<AktørId> aktørFraTps) {
+    public Optional<AktørId> hentAktørIdForPersonIdent(PersonIdent personIdent) {
         if (personIdent.erFdatNummer()) {
             // har ikke tildelt personnr
             return Optional.empty();
@@ -109,27 +109,15 @@ public class AktørTjeneste {
             if (PdlKlient.PDL_KLIENT_NOT_FOUND_KODE.equals(v.getKode())) {
                 return Optional.empty();
             }
-            LOG.info("TILBAKE PDL AKTØRID hentaktørid error", v);
-            return Optional.empty();
-        } catch (Exception e) {
-            LOG.info("TILBAKE PDL AKTØRID hentaktørid error", e);
-            return Optional.empty();
+            throw v;
         }
 
         var aktørId = identliste.getIdenter().stream().findFirst().map(IdentInformasjon::getIdent).map(AktørId::new);
-        var antall = identliste.getIdenter().size();
         aktørId.ifPresent(a -> cacheIdentTilAktørId.put(personIdent, a)); // Kan ikke legge til i cache aktørId -> ident ettersom ident kan være ikke-current
-        if (antall == 1 && Objects.equals(aktørFraTps, aktørId)) {
-            LOG.info("FPOPPDRAG PDL AKTØRID: like aktørid");
-        } else if (antall != 1 && Objects.equals(aktørFraTps, aktørId)) {
-            LOG.info("FPOPPDRAG PDL AKTØRID: ulikt antall aktørid {}", antall);
-        } else {
-            LOG.info("FPOPPDRAG PDL AKTØRID: ulike aktørid TPS og PDL, antall {}", antall);
-        }
         return aktørId;
     }
 
-    public Optional<PersonIdent> hentPersonIdentForAktørId(AktørId aktørId, Optional<PersonIdent> fraTps) {
+    public Optional<PersonIdent> hentPersonIdentForAktørId(AktørId aktørId) {
         var fraCache = cacheAktørIdTilIdent.get(aktørId);
         if (fraCache != null) {
             return Optional.of(fraCache);
@@ -149,72 +137,62 @@ public class AktørTjeneste {
             if (PdlKlient.PDL_KLIENT_NOT_FOUND_KODE.equals(v.getKode())) {
                 return Optional.empty();
             }
-            LOG.info("TILBAKE PDL AKTØRID hentident error", v);
-            return Optional.empty();
-        } catch (Exception e) {
-            LOG.info("TILBAKE PDL AKTØRID hentident error", e);
-            return Optional.empty();
+            throw v;
         }
 
         var ident = identliste.getIdenter().stream().findFirst().map(IdentInformasjon::getIdent).map(PersonIdent::new);
-        var antall = identliste.getIdenter().size();
         ident.ifPresent(i -> {
             cacheAktørIdTilIdent.put(aktørId, i);
             cacheIdentTilAktørId.put(i, aktørId); // OK her, men ikke over ettersom dette er gjeldende mapping
         });
-        if (antall == 1 && Objects.equals(ident, fraTps)) {
-            LOG.info("FPOPPDRAG PDL AKTØRID: like identer");
-        } else if (antall != 1 && Objects.equals(ident, fraTps)) {
-            LOG.info("FPOPPDRAG PDL AKTØRID: ulikt antall identer {}", antall);
-        } else {
-            LOG.info("FPOPPDRAG PDL AKTØRID: ulike identer TPS og PDL antall {}", antall);
-        }
         return ident;
     }
 
-    public void hentPersoninfo(AktørId aktørId, PersonIdent personIdent, Personinfo fraTPS) {
-        try {
-            var query = new HentPersonQueryRequest();
-            query.setIdent(aktørId.getId());
-            var projection = new PersonResponseProjection()
-                .navn(new NavnResponseProjection().forkortetNavn().fornavn().mellomnavn().etternavn())
-                .foedsel(new FoedselResponseProjection().foedselsdato())
-                .doedsfall(new DoedsfallResponseProjection().doedsdato())
-                .kjoenn(new KjoennResponseProjection().kjoenn())
-                .sivilstand(new SivilstandResponseProjection().type());
+    public NavBrukerKjønn hentKjønnForAktør(AktørId aktørId) {
+        var query = new HentPersonQueryRequest();
+        query.setIdent(aktørId.getId());
+        var projection = new PersonResponseProjection()
+            .kjoenn(new KjoennResponseProjection().kjoenn());
 
+        var person = pdlKlient.hentPerson(query, projection, tema);
 
-            var person = pdlKlient.hentPerson(query, projection, tema);
-
-            var fødselsdato = person.getFoedsel().stream()
-                .map(Foedsel::getFoedselsdato)
-                .filter(Objects::nonNull)
-                .findFirst().map(d -> LocalDate.parse(d, DateTimeFormatter.ISO_LOCAL_DATE)).orElse(null);
-            var dødssdato = person.getDoedsfall().stream()
-                .map(Doedsfall::getDoedsdato)
-                .filter(Objects::nonNull)
-                .findFirst().map(d -> LocalDate.parse(d, DateTimeFormatter.ISO_LOCAL_DATE)).orElse(null);
-            var sivilstand = person.getSivilstand().stream()
-                .map(Sivilstand::getType)
-                .findFirst()
-                .map(st -> SIVSTAND_FRA_FREG.getOrDefault(st, SivilstandType.UOPPGITT)).orElse(SivilstandType.UOPPGITT);
-            var fraPDL = new Personinfo.Builder().medAktørId(aktørId).medPersonIdent(personIdent)
-                .medNavn(person.getNavn().stream().map(AktørTjeneste::mapNavn).filter(Objects::nonNull).findFirst().orElse("MANGLER NAVN"))
-                .medFødselsdato(fødselsdato)
-                .medDødsdato(dødssdato)
-                .medNavBrukerKjønn(mapKjønn(person))
-                .medSivilstandType(sivilstand)
-                .build();
-
-            if (!erLike(fraPDL, fraTPS)) {
-                var avvik = finnAvvik(fraTPS, fraPDL);
-                LOG.info("TILBAKE PDL FULL: avvik {}", avvik);
-            }
-        } catch (Exception e) {
-            LOG.info("TILBAKE PDL FULL: error", e);
-        }
+        return mapKjønn(person);
     }
 
+    public Personinfo hentPersoninfo(AktørId aktørId, PersonIdent personIdent) {
+        var query = new HentPersonQueryRequest();
+        query.setIdent(aktørId.getId());
+        var projection = new PersonResponseProjection()
+            .navn(new NavnResponseProjection().forkortetNavn().fornavn().mellomnavn().etternavn())
+            .foedsel(new FoedselResponseProjection().foedselsdato())
+            .doedsfall(new DoedsfallResponseProjection().doedsdato())
+            .sivilstand(new SivilstandResponseProjection().type());
+
+        var person = pdlKlient.hentPerson(query, projection, tema);
+
+        var fødselsdato = person.getFoedsel().stream()
+            .map(Foedsel::getFoedselsdato)
+            .filter(Objects::nonNull)
+            .findFirst().map(d -> LocalDate.parse(d, DateTimeFormatter.ISO_LOCAL_DATE)).orElse(null);
+        var dødsdato = person.getDoedsfall().stream()
+            .map(Doedsfall::getDoedsdato)
+            .filter(Objects::nonNull)
+            .findFirst().map(d -> LocalDate.parse(d, DateTimeFormatter.ISO_LOCAL_DATE)).orElse(null);
+        var sivilstand = person.getSivilstand().stream()
+            .map(Sivilstand::getType)
+            .findFirst()
+            .map(st -> SIVSTAND_FRA_FREG.getOrDefault(st, SivilstandType.UOPPGITT)).orElse(SivilstandType.UOPPGITT);
+
+        return new Personinfo.Builder()
+            .medAktørId(aktørId).medPersonIdent(personIdent)
+            .medNavn(person.getNavn().stream().map(AktørTjeneste::mapNavn).filter(Objects::nonNull).findFirst().orElse("MANGLER NAVN"))
+            .medFødselsdato(fødselsdato)
+            .medDødsdato(dødsdato)
+            .medSivilstandType(sivilstand)
+            .build();
+    }
+
+    // Mulighet - skriv om til nullsafe fornavn + mellomnavn + etternavn. Forkortet = TPS
     private static String mapNavn(Navn navn) {
         if (navn.getForkortetNavn() != null)
             return navn.getForkortetNavn();
@@ -231,23 +209,4 @@ public class AktørTjeneste {
         return KjoennType.KVINNE.equals(kode) ? NavBrukerKjønn.KVINNE : NavBrukerKjønn.UDEFINERT;
     }
 
-    private static boolean erLike(Personinfo pdl, Personinfo tps) {
-        if (tps == null && pdl == null) return true;
-        if (pdl == null || tps == null || tps.getClass() != pdl.getClass()) return false;
-        return // Objects.equals(pdl.getNavn(), tps.getNavn()) && - avvik skyldes tegnsett
-            Objects.equals(pdl.getFødselsdato(), tps.getFødselsdato()) &&
-                Objects.equals(pdl.getDødsdato(), tps.getDødsdato()) &&
-                pdl.getKjønn() == tps.getKjønn() &&
-                pdl.getSivilstandType() == tps.getSivilstandType();
-    }
-
-    private static String finnAvvik(Personinfo tps, Personinfo pdl) {
-        //String navn = Objects.equals(tps.getNavn(), pdl.getNavn()) ? "" : " navn ";
-        String kjonn = Objects.equals(tps.getKjønn(), pdl.getKjønn()) ? "" : " kjønn ";
-        String fdato = Objects.equals(tps.getFødselsdato(), pdl.getFødselsdato()) ? "" : " fødsel ";
-        String ddato = Objects.equals(tps.getDødsdato(), pdl.getDødsdato()) ? "" : " død ";
-        String sivstand = Objects.equals(tps.getSivilstandType(), pdl.getSivilstandType()) ? "" : " sivilst " + tps.getSivilstandType().getKode() + " PDL " + pdl.getSivilstandType().getKode();
-
-        return "Avvik" + kjonn + fdato + ddato + sivstand ;
-    }
 }

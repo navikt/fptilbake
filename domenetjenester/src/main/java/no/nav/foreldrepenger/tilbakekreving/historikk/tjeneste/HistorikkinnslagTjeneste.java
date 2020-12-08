@@ -6,7 +6,6 @@ import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.NavBrukerKjønn;
@@ -119,11 +118,7 @@ public class HistorikkinnslagTjeneste {
     private NavBrukerKjønn setKjønn(AktørId aktørId, HistorikkAktør historikkAktør) {
         if (!HistorikkAktør.SØKER.equals(historikkAktør))
             return NavBrukerKjønn.UDEFINERT;
-        Personinfo personinfo = personinfoAdapter.innhentSaksopplysningerForSøker(aktørId);
-        if (personinfo != null) {
-            return personinfo.getKjønn();
-        }
-        return NavBrukerKjønn.UDEFINERT;
+        return personinfoAdapter.hentKjønnForAktør(aktørId);
     }
 
     private boolean historikkinnslagForBehandlingStartetErLoggetTidligere(Long behandlingId, HistorikkinnslagType historikkinnslagType) {
