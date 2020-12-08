@@ -15,17 +15,15 @@ public class HeaderData extends BaseDokument { //TODO Trenger ikke BaseDokument 
     @JsonIgnore
     private Språkkode språkkode;
 
-    private Adresse adresse;
     private Person person;
     private Brev brev;
 
     public HeaderData(BrevMetadata brevMetadata, String overskrift) {
-        this(brevMetadata.getSpråkkode(), new Adresse(brevMetadata.getMottakerAdresse()), brevMetadata.getSakspartNavn(), new PersonIdent(brevMetadata.getSakspartId()), overskrift);
+        this(brevMetadata.getSpråkkode(), brevMetadata.getSakspartNavn(), new PersonIdent(brevMetadata.getSakspartId()), overskrift);
     }
 
-    public HeaderData(Språkkode språkkode, Adresse adresse, String navn, PersonIdent fnr, String overskrift) {
+    public HeaderData(Språkkode språkkode, String navn, PersonIdent fnr, String overskrift) {
         this.språkkode = språkkode;
-        this.adresse = adresse;
         this.person = new Person(navn, fnr);
         this.brev = new Brev(overskrift);
     }
@@ -36,10 +34,6 @@ public class HeaderData extends BaseDokument { //TODO Trenger ikke BaseDokument 
 
     public Språkkode getSpråkkode() {
         return språkkode;
-    }
-
-    public Adresse getAdresse() {
-        return adresse;
     }
 
     public Brev getBrev() {

@@ -1,16 +1,5 @@
 <div id="dato">Dato: {{brev.dato}}</div>
-<div id="brevmottaker">
-{{#if adresse.mottakerNavn}}{{adresse.mottakerNavn}}<br/>{{/if}}
-{{#if adresse.personIdent}}{{adresse.personIdent}}<br/>{{/if}}
-{{#if adresse.adresselinje1}}{{adresse.adresselinje1}}<br/>{{/if}}
-{{#if adresse.adresselinje2}}{{adresse.adresselinje2}}<br/>{{/if}}
-{{#if adresse.adresselinje3}}{{adresse.adresselinje3}}<br/>{{/if}}
-{{#if adresse.adresselinje4}}{{adresse.adresselinje4}}<br/>{{/if}}
-{{#if adresse.postNr}}{{adresse.postNr}}{{/if}}
-{{#if adresse.poststed}}{{adresse.poststed}}<br/>{{/if}}
-{{#if (and adresse.land (and (neq adresse.land "NO") (neq adresse.land "NOR")))}}{{adresse.land}}{{/if}}
-</div>
-<h1>{{brev.overskrift}}</h1>
+<h1 id="hovedoverskrift">{{brev.overskrift}}</h1>
 <div id="person">
 Navn: {{person.navn}}<br/>
 Fødselsnummer: {{person.fnr}}

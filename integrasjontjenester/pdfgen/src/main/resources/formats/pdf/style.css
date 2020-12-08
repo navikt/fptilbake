@@ -51,6 +51,7 @@ body.utkast {
 
 #person {
     color: #807d7c;
+    margin-bottom: 10mm;
 }
 
 #content {
@@ -81,9 +82,8 @@ body.utkast {
     margin: auto;
 }
 
-#brevmottaker {
+#hovedoverskrift {
     padding-top: 30mm;
-    padding-bottom: 20mm;
 }
 
 .samepage {
