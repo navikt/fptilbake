@@ -16,6 +16,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtakRepository;
+import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.TilbakekrevingsvedtakMarshaller;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiKvitteringTolk;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiResponsMarshaller;
@@ -24,7 +26,6 @@ import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiSendtXmlReposito
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlSendt;
 import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakRequest;
 import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakResponse;
-import no.nav.vedtak.felles.integrasjon.aktør.klient.AktørConsumer;
 import no.nav.vedtak.konfig.KonfigVerdi;
 
 @ApplicationScoped
@@ -35,7 +36,7 @@ public class AvstemmingTjeneste {
     private BehandlingRepository behandlingRepository;
     private BehandlingVedtakRepository behandlingVedtakRepository;
     private ØkonomiSendtXmlRepository sendtXmlRepository;
-    private AktørConsumer aktørConsumer;
+    private PersoninfoAdapter aktørConsumer;
 
     private String avsender;
 
@@ -47,7 +48,7 @@ public class AvstemmingTjeneste {
     public AvstemmingTjeneste(@KonfigVerdi(value = "app.name") String applikasjon,
                               ØkonomiSendtXmlRepository sendtXmlRepository,
                               BehandlingRepositoryProvider behandlingRepositoryProvider,
-                              AktørConsumer aktørConsumer) {
+                              PersoninfoAdapter aktørConsumer) {
         this.sendtXmlRepository = sendtXmlRepository;
         this.behandlingRepository = behandlingRepositoryProvider.getBehandlingRepository();
         this.behandlingVedtakRepository = behandlingRepositoryProvider.getBehandlingVedtakRepository();
@@ -95,7 +96,7 @@ public class AvstemmingTjeneste {
         Long behandlingId = behandling.getId();
         BehandlingVedtak behandlingVedtak = behandlingVedtakRepository.hentBehandlingvedtakForBehandlingId(behandlingId).orElseThrow();
 
-        String fnr = aktørConsumer.hentPersonIdentForAktørId(behandling.getAktørId().getId())
+        String fnr = aktørConsumer.hentFnrForAktør(behandling.getAktørId()).map(PersonIdent::getIdent)
             .orElseThrow(() -> new IllegalArgumentException("Avstemming feilet, fant ikke ident. Gjelder behandlingId=" + behandlingId));
 
         avstemmingCsvFormatter.leggTilRad(AvstemmingCsvFormatter.radBuilder()

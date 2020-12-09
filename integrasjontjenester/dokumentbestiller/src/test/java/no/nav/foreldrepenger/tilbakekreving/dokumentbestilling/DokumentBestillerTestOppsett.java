@@ -11,7 +11,6 @@ import org.junit.jupiter.api.BeforeEach;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.AdresseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporingRepository;
@@ -91,18 +90,11 @@ public abstract class DokumentBestillerTestOppsett {
             .medNavn(navn)
             .medAktørId(new AktørId(9000000030014L))
             .medFødselsdato(LocalDate.of(1990, 2, 2))
-            .medNavBrukerKjønn(NavBrukerKjønn.KVINNE)
             .build();
     }
 
     protected Adresseinfo lagStandardNorskAdresse() {
-        return new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE, new PersonIdent("12345678901"), "Jens Trallala")
-            .medAdresselinje1("adresselinje 1")
-            .medAdresselinje2("adresselinje 2")
-            .medAdresselinje3("adresselinje 3")
-            .medLand("NOR")
-            .medPostNr("0688")
-            .medPoststed("OSLO")
+        return new Adresseinfo.Builder(new PersonIdent("12345678901"), "Jens Trallala")
             .build();
     }
 

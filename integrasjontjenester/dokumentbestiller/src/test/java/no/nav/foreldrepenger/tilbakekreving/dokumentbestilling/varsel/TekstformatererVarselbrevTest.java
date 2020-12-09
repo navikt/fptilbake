@@ -13,7 +13,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.AdresseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
@@ -349,7 +348,7 @@ public class TekstformatererVarselbrevTest {
     }
 
     private Adresseinfo lagAdresseInfo() {
-        return new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE, new PersonIdent("123456"), "Test").build();
+        return new Adresseinfo.Builder(new PersonIdent("123456"), "Test").build();
     }
 
 }

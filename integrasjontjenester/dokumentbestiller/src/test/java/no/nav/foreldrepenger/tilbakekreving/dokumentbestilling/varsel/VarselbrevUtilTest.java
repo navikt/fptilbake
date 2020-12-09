@@ -18,7 +18,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.OrganisasjonsEnhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.AdresseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.personopplysning.NavBrukerKjønn;
@@ -61,7 +60,7 @@ public class VarselbrevUtilTest {
         personopplysningDto.setFødselsnummer(PERSONNUMMER);
 
         Personinfo personinfo = Personinfo.builder().medAktørId(new AktørId("1234567890011")).medPersonIdent(new PersonIdent(PERSONNUMMER))
-            .medNavn("Fiona").medNavBrukerKjønn(NavBrukerKjønn.KVINNE).medFødselsdato(LocalDate.now().minusDays(1)).build();
+            .medNavn("Fiona").medFødselsdato(LocalDate.now().minusDays(1)).build();
 
         YtelseNavn ytelseNavn = lagYtelseNavn("eingongsstønad", "engangsstønad");
 
@@ -226,18 +225,11 @@ public class VarselbrevUtilTest {
             .medNavn(navn)
             .medAktørId(new AktørId(9000000030014L))
             .medFødselsdato(LocalDate.of(1990, 2, 2))
-            .medNavBrukerKjønn(NavBrukerKjønn.KVINNE)
             .build();
     }
 
     private Adresseinfo lagStandardNorskAdresse() {
-        return new Adresseinfo.Builder(AdresseType.BOSTEDSADRESSE, new PersonIdent("12345678901"), "Jens Trallala")
-            .medAdresselinje1("adresselinje 1")
-            .medAdresselinje2("adresselinje 2")
-            .medAdresselinje3("adresselinje 3")
-            .medLand("NOR")
-            .medPostNr("0688")
-            .medPoststed("OSLO")
+        return new Adresseinfo.Builder(new PersonIdent("12345678901"), "Test Person")
             .build();
     }
 

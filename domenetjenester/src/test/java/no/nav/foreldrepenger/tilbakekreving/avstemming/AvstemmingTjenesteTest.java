@@ -18,6 +18,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
+import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.TilbakekrevingsvedtakMarshaller;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiResponsMarshaller;
 import no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste.TilbakekrevingsvedtakTjeneste;
@@ -27,7 +29,6 @@ import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakRequest;
 import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakResponse;
 import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsvedtakDto;
 import no.nav.tilbakekreving.typer.v1.MmelDto;
-import no.nav.vedtak.felles.integrasjon.aktør.klient.AktørConsumer;
 
 @CdiDbAwareTest
 public class AvstemmingTjenesteTest {
@@ -39,14 +40,14 @@ public class AvstemmingTjenesteTest {
     @Inject
     private TilbakekrevingsvedtakTjeneste tilbakekrevingsvedtakTjeneste;
 
-    private AktørConsumer aktørConsumerMock = Mockito.mock(AktørConsumer.class);
+    private PersoninfoAdapter aktørConsumerMock = Mockito.mock(PersoninfoAdapter.class);
     private AvstemmingTjeneste avstemmingTjeneste;
     private ScenarioSimple scenario = ScenarioSimple.simple();
 
     @BeforeEach
     public void setup() {
         avstemmingTjeneste = new AvstemmingTjeneste("fptilbake", sendtXmlRepository, behandlingRepositoryProvider, aktørConsumerMock);
-        when(aktørConsumerMock.hentPersonIdentForAktørId(Mockito.any())).thenReturn(Optional.of("12345678901"));
+        when(aktørConsumerMock.hentFnrForAktør(Mockito.any())).thenReturn(Optional.of(new PersonIdent("12345678901")));
     }
 
     @Test
@@ -99,7 +100,7 @@ public class AvstemmingTjenesteTest {
             .medBehandlingResultatType(BehandlingResultatType.INGEN_TILBAKEBETALING)
             .medVedtak(LocalDate.now())
             .lagre(behandlingRepositoryProvider);
-        when(aktørConsumerMock.hentPersonIdentForAktørId(Mockito.any())).thenReturn(Optional.of("12345678901"));
+        when(aktørConsumerMock.hentFnrForAktør(Mockito.any())).thenReturn(Optional.of(new PersonIdent("12345678901")));
 
         Long behandlingId = behandling.getId();
         Long xmlId = lagOgLagreVedtak(behandlingId);

@@ -13,7 +13,6 @@ public class AvsenderMottaker {
     @JsonSerialize(using = KodelisteSomKodeSerialiserer.class)
     private SenderMottakerIdType idType;
     private String navn;
-    private String land;
 
     private AvsenderMottaker() {
     }
@@ -34,10 +33,6 @@ public class AvsenderMottaker {
         return navn;
     }
 
-    public String getLand() {
-        return land;
-    }
-
     public static class Builder {
 
         private AvsenderMottaker kladd = new AvsenderMottaker();
@@ -50,11 +45,6 @@ public class AvsenderMottaker {
 
         public Builder medNavn(String navn) {
             kladd.navn = navn;
-            return this;
-        }
-
-        public Builder medLand(String land) {
-            kladd.land = land;
             return this;
         }
 

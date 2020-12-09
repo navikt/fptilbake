@@ -15,12 +15,13 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.Bre
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
+import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.dto.Hendelse;
 import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.dto.SelvbetjeningMelding;
 import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.producer.SelvbetjeningMeldingProducer;
-import no.nav.vedtak.felles.integrasjon.aktør.klient.AktørConsumerMedCache;
 import no.nav.vedtak.util.env.Environment;
 
 @ApplicationScoped
@@ -32,7 +33,7 @@ public class SelvbetjeningTjeneste {
     private BrevSporingRepository brevSporingRepository;
     private BehandlingRepository behandlingRepository;
     private SelvbetjeningMeldingProducer meldingProducer;
-    private AktørConsumerMedCache aktørConsumer;
+    private PersoninfoAdapter aktørConsumer;
 
     SelvbetjeningTjeneste() {
         // for CDI proxy
@@ -41,7 +42,7 @@ public class SelvbetjeningTjeneste {
     @Inject
     public SelvbetjeningTjeneste(BehandlingRepositoryProvider repositoryProvider,
                                  SelvbetjeningMeldingProducer meldingProducer,
-                                 AktørConsumerMedCache aktørConsumer) {
+                                 PersoninfoAdapter aktørConsumer) {
         this.brevSporingRepository = repositoryProvider.getBrevSporingRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.meldingProducer = meldingProducer;
@@ -53,7 +54,7 @@ public class SelvbetjeningTjeneste {
         BrevSporing varselSporing = brevSporingRepository.hentSistSendtVarselbrev(behandlingId).orElseThrow();
 
         AktørId aktørId = behandling.getAktørId();
-        Optional<String> personIdent = aktørConsumer.hentPersonIdentForAktørId(aktørId.getId());
+        Optional<String> personIdent = aktørConsumer.hentFnrForAktør(aktørId).map(PersonIdent::getIdent);
         SelvbetjeningMelding svInfo = lagSelvbetjeningMelding(behandling, varselSporing, aktørId, personIdent.get(), hendelse);
 
         logMelding("Sender", hendelse, personIdent.get());
