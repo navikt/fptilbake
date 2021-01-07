@@ -37,7 +37,7 @@
             <artifactId>fagsystem-klient-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>no.nav.foreldrepenger.felles.ukelonn.integrasjon</groupId>
+            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
             <artifactId>oekonomi-tilbakekreving-klient</artifactId>
         </dependency>
         <dependency>
