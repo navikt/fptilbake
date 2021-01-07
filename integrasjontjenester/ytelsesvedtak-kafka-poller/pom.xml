@@ -22,7 +22,7 @@
             <artifactId>domenetjenester</artifactId>
         </dependency>
         <dependency>
-            <groupId>no.nav.foreldrepenger.felles.ukelonn.integrasjon</groupId>
+            <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
             <artifactId>kafka-poller</artifactId>
         </dependency>
         <dependency>

@@ -11,7 +11,7 @@
 
     <artifactId>oekonomi-tilbakekreving-klient</artifactId>
     <packaging>jar</packaging>
-    <name>Felles :: Integrasjon :: oekonomi-tilbakekreving-klient</name>
+    <name>FPTILBAKE :: Integrasjontjenester :: oekonomi-tilbakekreving-klient</name>
 
     <dependencies>
         <dependency>

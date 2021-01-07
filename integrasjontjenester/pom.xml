@@ -25,6 +25,7 @@
         <module>datavarehus</module>
         <module>selvbetjening-klient</module>
         <module>organisasjon</module>
+        <module>kafka-poller</module>
         <module>ytelsesvedtak-kafka-poller</module>
         <module>journalpost-api-klient</module>
         <module>oekonomi-tilbakekreving-klient</module>
