@@ -217,6 +217,11 @@
             </dependency>
             <dependency>
                 <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+                <artifactId>oekonomi-tilbakekreving-klient</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
                 <artifactId>kravgrunnlag-queue</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -262,6 +267,11 @@
             </dependency>
             <dependency>
                 <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
+                <artifactId>kafka-poller</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
                 <artifactId>journalpost-api-klient</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -270,16 +280,6 @@
             <dependency>
                 <groupId>no.nav.foreldrepenger.felles.ukelonn.integrasjon</groupId>
                 <artifactId>felles-integrasjon-jms</artifactId>
-                <version>${ukelonn.felles.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.foreldrepenger.felles.ukelonn.integrasjon</groupId>
-                <artifactId>kafka-poller</artifactId>
-                <version>${ukelonn.felles.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.foreldrepenger.felles.ukelonn.integrasjon</groupId>
-                <artifactId>oekonomi-tilbakekreving-klient</artifactId>
                 <version>${ukelonn.felles.version}</version>
             </dependency>
             <dependency>
