@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import no.nav.foreldrepenger.tilbakekreving.felles.Ukedager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +23,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResult
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BeregningResultat;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
-import no.nav.foreldrepenger.tilbakekreving.felles.Virkedager;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagBelop433;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432;
@@ -105,7 +105,7 @@ public class TilbakekrevingVedtakPeriodeBeregner {
         Periode kPeriode = kgPeriode.getPeriode();
         int virkedagerOverlapp = virkedagerOverlapp(kPeriode, bgPeriode.getPeriode());
         int kgBehandledeVirkedager = kgTidligereBehandledeVirkedager.get(kPeriode);
-        int kgPeriodeVirkedager = Virkedager.beregnAntallVirkedager(kPeriode);
+        int kgPeriodeVirkedager = Ukedager.beregnAntallVirkedager(kPeriode);
         Skalering kgTidligereSkalering = Skalering.opprett(kgBehandledeVirkedager, kgPeriodeVirkedager);
         Skalering kgKumulativSkalering = Skalering.opprett(kgBehandledeVirkedager + virkedagerOverlapp, kgPeriodeVirkedager);
         kgTidligereBehandledeVirkedager.put(kPeriode, kgBehandledeVirkedager + virkedagerOverlapp);
@@ -311,7 +311,7 @@ public class TilbakekrevingVedtakPeriodeBeregner {
 
     private static int virkedagerOverlapp(Periode a, Periode b) {
         return a.overlap(b)
-            .map(Virkedager::beregnAntallVirkedager)
+            .map(Ukedager::beregnAntallVirkedager)
             .orElse(0);
     }
 
@@ -337,12 +337,12 @@ public class TilbakekrevingVedtakPeriodeBeregner {
 
     private static void validerBeregningsresultatMotKravgrunnlag(List<KravgrunnlagPeriode432> kgPerioder, List<BeregningResultatPeriode> brPerioder) {
         for (BeregningResultatPeriode brPeriode : brPerioder) {
-            int brTotalDager = Virkedager.beregnAntallVirkedager(brPeriode.getPeriode());
+            int brTotalDager = Ukedager.beregnAntallVirkedager(brPeriode.getPeriode());
             int brOverlappDager = 0;
             for (KravgrunnlagPeriode432 kgPeriode : kgPerioder) {
                 Optional<Periode> overlapp = kgPeriode.getPeriode().overlap(brPeriode.getPeriode());
                 if (overlapp.isPresent()) {
-                    brOverlappDager += Virkedager.beregnAntallVirkedager(overlapp.get());
+                    brOverlappDager += Ukedager.beregnAntallVirkedager(overlapp.get());
                 }
             }
             if (brTotalDager != brOverlappDager) {
@@ -353,12 +353,12 @@ public class TilbakekrevingVedtakPeriodeBeregner {
 
     private static void validerKravgrunnlagMotBeregningsresultat(List<KravgrunnlagPeriode432> kgPerioder, List<BeregningResultatPeriode> brPerioder) {
         for (KravgrunnlagPeriode432 kgPeriode : kgPerioder) {
-            int kgTotalDager = Virkedager.beregnAntallVirkedager(kgPeriode.getPeriode());
+            int kgTotalDager = Ukedager.beregnAntallVirkedager(kgPeriode.getPeriode());
             int kgOverlappDager = 0;
             for (BeregningResultatPeriode brPeriode : brPerioder) {
                 Optional<Periode> overlapp = kgPeriode.getPeriode().overlap(brPeriode.getPeriode());
                 if (overlapp.isPresent()) {
-                    kgOverlappDager += Virkedager.beregnAntallVirkedager(overlapp.get());
+                    kgOverlappDager += Ukedager.beregnAntallVirkedager(overlapp.get());
                 }
             }
             if (kgTotalDager != kgOverlappDager) {

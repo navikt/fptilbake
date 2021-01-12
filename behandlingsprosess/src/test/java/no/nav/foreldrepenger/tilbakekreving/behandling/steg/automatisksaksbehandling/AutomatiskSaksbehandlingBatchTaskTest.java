@@ -97,8 +97,18 @@ public class AutomatiskSaksbehandlingBatchTaskTest {
     }
 
     @Test
+    public void skal_ikke_kjøre_batch_hvis_hellidag() {
+        Clock helgeClock = Clock.fixed(Instant.parse("2021-05-17T12:00:00.00Z"), ZoneId.systemDefault());
+        AutomatiskSaksbehandlingBatchTask automatiskSaksbehandlingBatchTask = new AutomatiskSaksbehandlingBatchTask(taskRepository, automatiskSaksbehandlingRepository, helgeClock, Period.ofWeeks(-1));
+
+        automatiskSaksbehandlingBatchTask.doTask(lagProsessTaskData());
+        List<ProsessTaskData> prosessTasker = taskRepository.finnAlle(ProsessTaskStatus.KLAR);
+        assertThat(prosessTasker).isEmpty();
+    }
+
+    @Test
     public void skal_ikke_opprette_prosess_tasker_for_behandlinger_med_større_feilutbetalt_beløp() {
-        lagKravgrunnlag(behandling.getId(), BigDecimal.valueOf(1500l), behandling.getFagsak().getSaksnummer().getVerdi(), 123l);
+        lagKravgrunnlag(behandling.getId(), BigDecimal.valueOf(1500L), behandling.getFagsak().getSaksnummer().getVerdi(), 123L);
 
         automatiskSaksbehandlingBatchTask.doTask(lagProsessTaskData());
         List<ProsessTaskData> prosessTasker = taskRepository.finnAlle(ProsessTaskStatus.KLAR);
@@ -140,7 +150,7 @@ public class AutomatiskSaksbehandlingBatchTaskTest {
             .medJournalpostId(new JournalpostId("dkasfjsklfsd"))
             .medBrevType(BrevType.VARSEL_BREV)
             .build();
-        repositoryProvider.getBrevSporingRepository().lagre(brevSporing);;
+        repositoryProvider.getBrevSporingRepository().lagre(brevSporing);
 
         automatiskSaksbehandlingBatchTask.doTask(lagProsessTaskData());
         List<ProsessTaskData> prosessTasker = taskRepository.finnAlle(ProsessTaskStatus.KLAR);
@@ -161,7 +171,7 @@ public class AutomatiskSaksbehandlingBatchTaskTest {
             .medGjelderType(GjelderType.PERSON).medGjelderVedtakId("???")
             .medUtbetIdType(GjelderType.PERSON).medUtbetalesTilId("???")
             .medFeltKontroll("2019-11-22-19.09.31.458065").medKravStatusKode(KravStatusKode.NYTT)
-            .medVedtakId(123l).medSaksBehId("K231B433")
+            .medVedtakId(123L).medSaksBehId("K231B433")
             .medReferanse(Henvisning.fraEksternBehandlingId(referanse)).medVedtakFagSystemDato(LocalDate.now())
             .build();
 

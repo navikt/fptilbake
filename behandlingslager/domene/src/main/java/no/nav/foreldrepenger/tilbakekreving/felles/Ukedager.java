@@ -1,19 +1,19 @@
 package no.nav.foreldrepenger.tilbakekreving.felles;
 
-import static java.lang.Math.toIntExact;
-
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
-public class Virkedager {
+import static java.lang.Math.toIntExact;
+
+public class Ukedager {
 
     private static int DAGER_PR_UKE = 7;
     private static int VIRKEDAGER_PR_UKE = 5;
     private static int HELGEDAGER_PR_UKE = DAGER_PR_UKE - VIRKEDAGER_PR_UKE;
 
-    private Virkedager() {
+    private Ukedager() {
         // For å unngå instanser
     }
 
