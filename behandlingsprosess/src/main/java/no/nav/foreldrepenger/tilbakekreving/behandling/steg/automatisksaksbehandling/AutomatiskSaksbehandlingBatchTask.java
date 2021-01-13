@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import no.nav.foreldrepenger.tilbakekreving.felles.Helligdager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,8 +61,11 @@ public class AutomatiskSaksbehandlingBatchTask implements ProsessTaskHandler {
     public void doTask(ProsessTaskData prosessTaskData) {
         String batchRun = BATCHNAVN + EXECUTION_ID_SEPARATOR + UUID.randomUUID();
         LocalDate iDag = LocalDate.now(clock);
-        if (iDag.getDayOfWeek().equals(DayOfWeek.SATURDAY) || iDag.getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
-            logger.info("Kjører ikke batch {} i helgen. Iverksetting i saksbehandling avhenger av oppdragsystemet, som sannsynligvis har nedetid", BATCHNAVN);
+        DayOfWeek dagensUkedag = DayOfWeek.from(iDag);
+
+        // Ingenting å kjøre i helger eller helligdager enn så lenge
+        if (Helligdager.erHelligdagEllerHelg(iDag)) {
+            logger.info("Kjører ikke batch {} i helgen eller helligdag. Iverksetting i saksbehandling avhenger av oppdragsystemet, som sannsynligvis har nedetid", BATCHNAVN);
         } else {
             LocalDate bestemtDato = iDag.minus(grunnlagAlder);
             logger.info("Henter behandlinger som er eldre enn {} i batch {}", bestemtDato, batchRun);

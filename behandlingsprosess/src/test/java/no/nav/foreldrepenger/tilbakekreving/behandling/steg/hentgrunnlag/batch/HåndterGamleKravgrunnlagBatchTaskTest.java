@@ -60,6 +60,15 @@ public class HåndterGamleKravgrunnlagBatchTaskTest {
     }
 
     @Test
+    public void skal_ikke_kjøre_batch_på_helligdager() {
+        Clock clock = Clock.fixed(Instant.parse("2020-12-25T12:00:00.00Z"), ZoneId.systemDefault());
+        HåndterGamleKravgrunnlagBatchTask gamleKravgrunnlagBatchTjeneste = new HåndterGamleKravgrunnlagBatchTask(mottattXmlRepository,
+            prosessTaskRepository, clock, Period.ofWeeks(-1));
+        gamleKravgrunnlagBatchTjeneste.doTask(lagProsessTaskData());
+        assertThat(prosessTaskRepository.finnAlle(ProsessTaskStatus.KLAR)).isEmpty();
+    }
+
+    @Test
     public void skal_kjøre_batch_og_opprette_prosess_task_for_grunnlag(){
         gamleKravgrunnlagBatchTjeneste.doTask(lagProsessTaskData());
         List<ProsessTaskData> prosessTasker = prosessTaskRepository.finnAlle(ProsessTaskStatus.KLAR);

@@ -1,12 +1,12 @@
 package no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.batch;
 
 import java.time.Clock;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import no.nav.foreldrepenger.tilbakekreving.felles.Helligdager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,8 +45,8 @@ public class AutomatiskGjenopptaBehandlingBatchTask implements ProsessTaskHandle
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
         LocalDate iDag = LocalDate.now(clock);
-        if (iDag.getDayOfWeek().equals(DayOfWeek.SATURDAY) || iDag.getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
-            logger.info("I dag er helg, kan ikke kjøre batch-en {}", BATCHNAVN);
+        if (Helligdager.erHelligdagEllerHelg(iDag)) {
+            logger.info("I dag er helg/helligdag, kan ikke kjøre batch-en {}", BATCHNAVN);
         }else {
             gjenopptaBehandlingTjeneste.automatiskGjenopptaBehandlinger();
         }

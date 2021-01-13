@@ -1,24 +1,22 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.batch;
 
-import java.time.Clock;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.Period;
-import java.util.List;
-import java.util.UUID;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import no.nav.foreldrepenger.tilbakekreving.felles.Helligdager;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.konfig.KonfigVerdi;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import java.time.Clock;
+import java.time.LocalDate;
+import java.time.Period;
+import java.util.List;
+import java.util.UUID;
 
 @ApplicationScoped
 @ProsessTask(HåndterGamleKravgrunnlagBatchTask.BATCHNAVN)
@@ -61,8 +59,10 @@ public class HåndterGamleKravgrunnlagBatchTask implements ProsessTaskHandler {
     public void doTask(ProsessTaskData prosessTaskData) {
         String batchRun = BATCHNAVN + "-" + UUID.randomUUID();
         LocalDate iDag = LocalDate.now(clock);
-        if (iDag.getDayOfWeek().equals(DayOfWeek.SATURDAY) || iDag.getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
-            logger.info("I dag er helg, kan ikke kjøre batchen {}", BATCHNAVN);
+
+        // oppdragssystemtet er nede i helger og helligdager
+        if (Helligdager.erHelligdagEllerHelg(iDag)) {
+            logger.info("I dag er helg/helligdag, kan ikke kjøre batchen {}", BATCHNAVN);
         } else {
             LocalDate bestemtDato = iDag.minus(grunnlagAlder);
             logger.info("Håndterer kravgrunnlag som er eldre enn {} i batch {}", bestemtDato, batchRun);

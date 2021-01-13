@@ -7,7 +7,7 @@ import java.util.Optional;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
-import no.nav.foreldrepenger.tilbakekreving.felles.Virkedager;
+import no.nav.foreldrepenger.tilbakekreving.felles.Ukedager;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagBelop433;
 
 public class BeregnBeløpUtil {
@@ -23,7 +23,7 @@ public class BeregnBeløpUtil {
     }
 
     public BigDecimal beregnBeløpPrVirkedag(BigDecimal beløp, Periode periode) {
-        int antallVirkedager = Virkedager.beregnAntallVirkedager(periode);
+        int antallVirkedager = Ukedager.beregnAntallVirkedager(periode);
         if (forEngangsstønad && antallVirkedager == 0) { //Gjelder kun ved Engangsstønad (REFUTG) som treffer en ikke vanlig virkedag.
             return beløp;
         }
@@ -34,7 +34,7 @@ public class BeregnBeløpUtil {
         Optional<Periode> overlap = grunnlagPeriode.overlap(foreldetPeriode);
         if (overlap.isPresent()) {
             Periode overlapInterval = overlap.get();
-            int antallVirkedager = Virkedager.beregnAntallVirkedager(overlapInterval);
+            int antallVirkedager = Ukedager.beregnAntallVirkedager(overlapInterval);
             if (forEngangsstønad && antallVirkedager == 0) { //Gjelder kun ved Engangsstønad (REFUTG) som treffer en ikke vanlig virkedag.
                 return beløpPrVirkedag;
             }
