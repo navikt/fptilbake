@@ -23,7 +23,7 @@ public class LogiskPeriodeTjenesteTest {
 
     @Test
     public void tom_input_skal_gi_tom_output() {
-        List<LogiskPeriode> resultat = LogiskPeriodeTjeneste.utledLogiskPeriode(InputBuilder.builder().build());
+        List<LogiskPeriode> resultat = LogiskPeriodeTjeneste.forDagytelse().utledLogiskPeriode(InputBuilder.builder().build());
         Assertions.assertThat(resultat).isEmpty();
     }
 
@@ -31,13 +31,13 @@ public class LogiskPeriodeTjenesteTest {
     public void en_periode_skal_fortsette_som_samme_periode() {
         Periode periode1 = Periode.of(uke_1_onsdag, uke_1_lørdag);
         SortedMap<Periode, BigDecimal> input = InputBuilder.builder().leggTil(periode1, BigDecimal.ONE).build();
-        List<LogiskPeriode> resultat = LogiskPeriodeTjeneste.utledLogiskPeriode(input);
+        List<LogiskPeriode> resultat = LogiskPeriodeTjeneste.forDagytelse().utledLogiskPeriode(input);
         Assertions.assertThat(resultat).hasSize(1);
         assertSamme(resultat.get(0), periode1, BigDecimal.ONE);
     }
 
     @Test
-    public void intilliggende_perioder_skal_slås_sammen_og_summere_verdi() {
+    public void intilliggende_perioder_skal_slås_sammen_og_summere_verdi_for_dagytelse() {
         Periode periode1 = Periode.of(uke_1_onsdag, uke_1_onsdag);
         Periode periode2 = Periode.of(uke_1_torsdag, uke_1_torsdag);
         Periode periode3 = Periode.of(uke_1_fredag, uke_2_mandag);
@@ -46,7 +46,22 @@ public class LogiskPeriodeTjenesteTest {
             .leggTil(periode2, BigDecimal.ONE)
             .leggTil(periode3, BigDecimal.ONE)
             .build();
-        List<LogiskPeriode> resultat = LogiskPeriodeTjeneste.utledLogiskPeriode(input);
+        List<LogiskPeriode> resultat = LogiskPeriodeTjeneste.forDagytelse().utledLogiskPeriode(input);
+        Assertions.assertThat(resultat).hasSize(1);
+        assertSamme(resultat.get(0), Periode.of(periode1.getFom(), periode3.getTom()), BigDecimal.valueOf(3));
+    }
+
+    @Test
+    public void intilliggende_perioder_skal_slås_sammen_og_summere_verdi_for_dag7() {
+        Periode periode1 = Periode.of(uke_1_onsdag, uke_1_onsdag);
+        Periode periode2 = Periode.of(uke_1_torsdag, uke_1_torsdag);
+        Periode periode3 = Periode.of(uke_1_fredag, uke_2_mandag);
+        SortedMap<Periode, BigDecimal> input = InputBuilder.builder()
+            .leggTil(periode1, BigDecimal.ONE)
+            .leggTil(periode2, BigDecimal.ONE)
+            .leggTil(periode3, BigDecimal.ONE)
+            .build();
+        List<LogiskPeriode> resultat = LogiskPeriodeTjeneste.forDag7().utledLogiskPeriode(input);
         Assertions.assertThat(resultat).hasSize(1);
         assertSamme(resultat.get(0), Periode.of(periode1.getFom(), periode3.getTom()), BigDecimal.valueOf(3));
     }
@@ -59,47 +74,61 @@ public class LogiskPeriodeTjenesteTest {
             .leggTil(periode1, BigDecimal.ONE)
             .leggTil(periode2, BigDecimal.ONE)
             .build();
-        List<LogiskPeriode> resultat = LogiskPeriodeTjeneste.utledLogiskPeriode(input);
+        List<LogiskPeriode> resultat = LogiskPeriodeTjeneste.forDagytelse().utledLogiskPeriode(input);
         Assertions.assertThat(resultat).hasSize(2);
         assertSamme(resultat.get(0), periode1, BigDecimal.ONE);
         assertSamme(resultat.get(1), periode2, BigDecimal.ONE);
     }
 
     @Test
-    public void perioder_som_er_skilt_med_helg_skal_slås_sammen() {
+    public void perioder_som_er_skilt_med_helg_skal_slås_sammen_for_dagytelser() {
         Periode periode1 = Periode.of(uke_1_onsdag, uke_1_fredag);
         Periode periode2 = Periode.of(uke_2_mandag, uke_2_mandag);
         SortedMap<Periode, BigDecimal> input = InputBuilder.builder()
             .leggTil(periode1, BigDecimal.ONE)
             .leggTil(periode2, BigDecimal.ONE)
             .build();
-        List<LogiskPeriode> resultat = LogiskPeriodeTjeneste.utledLogiskPeriode(input);
+        List<LogiskPeriode> resultat = LogiskPeriodeTjeneste.forDagytelse().utledLogiskPeriode(input);
         Assertions.assertThat(resultat).hasSize(1);
         assertSamme(resultat.get(0), Periode.of(uke_1_onsdag, uke_2_mandag), BigDecimal.valueOf(2));
     }
 
     @Test
-    public void perioder_som_er_skilt_med_en_lørdag_skal_slås_sammen() {
+    public void perioder_som_er_skilt_med_helg_skal_ikke_slås_sammen_for_dag7() {
+        Periode periode1 = Periode.of(uke_1_onsdag, uke_1_fredag);
+        Periode periode2 = Periode.of(uke_2_mandag, uke_2_mandag);
+        SortedMap<Periode, BigDecimal> input = InputBuilder.builder()
+            .leggTil(periode1, BigDecimal.ONE)
+            .leggTil(periode2, BigDecimal.ONE)
+            .build();
+        List<LogiskPeriode> resultat = LogiskPeriodeTjeneste.forDag7().utledLogiskPeriode(input);
+        Assertions.assertThat(resultat).hasSize(2);
+        assertSamme(resultat.get(0), periode1, BigDecimal.ONE);
+        assertSamme(resultat.get(1), periode2, BigDecimal.ONE);
+    }
+
+    @Test
+    public void perioder_som_er_skilt_med_en_lørdag_skal_slås_sammen_for_dagytelse() {
         Periode periode1 = Periode.of(uke_1_onsdag, uke_1_fredag);
         Periode periode2 = Periode.of(uke_1_søndag, uke_2_mandag);
         SortedMap<Periode, BigDecimal> input = InputBuilder.builder()
             .leggTil(periode1, BigDecimal.ONE)
             .leggTil(periode2, BigDecimal.ONE)
             .build();
-        List<LogiskPeriode> resultat = LogiskPeriodeTjeneste.utledLogiskPeriode(input);
+        List<LogiskPeriode> resultat = LogiskPeriodeTjeneste.forDagytelse().utledLogiskPeriode(input);
         Assertions.assertThat(resultat).hasSize(1);
         assertSamme(resultat.get(0), Periode.of(uke_1_onsdag, uke_2_mandag), BigDecimal.valueOf(2));
     }
 
     @Test
-    public void perioder_som_er_skilt_med_en_søndag_skal_slås_sammen() {
+    public void perioder_som_er_skilt_med_en_søndag_skal_slås_sammen_for_dagytelse() {
         Periode periode1 = Periode.of(uke_1_onsdag, uke_1_lørdag);
         Periode periode2 = Periode.of(uke_2_mandag, uke_2_mandag);
         SortedMap<Periode, BigDecimal> input = InputBuilder.builder()
             .leggTil(periode1, BigDecimal.ONE)
             .leggTil(periode2, BigDecimal.ONE)
             .build();
-        List<LogiskPeriode> resultat = LogiskPeriodeTjeneste.utledLogiskPeriode(input);
+        List<LogiskPeriode> resultat = LogiskPeriodeTjeneste.forDagytelse().utledLogiskPeriode(input);
         Assertions.assertThat(resultat).hasSize(1);
         assertSamme(resultat.get(0), Periode.of(uke_1_onsdag, uke_2_mandag), BigDecimal.valueOf(2));
     }

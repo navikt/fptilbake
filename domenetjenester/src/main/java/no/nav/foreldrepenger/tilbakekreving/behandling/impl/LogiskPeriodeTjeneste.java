@@ -3,17 +3,37 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.LogiskPeriode;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
 public class LogiskPeriodeTjeneste {
 
-    public static List<LogiskPeriode> utledLogiskPeriode(SortedMap<Periode, BigDecimal> feilutbetalingPrPeriode) {
+    private boolean ytelseIHelg;
+
+    LogiskPeriodeTjeneste(boolean ytelseIHelg) {
+        this.ytelseIHelg = ytelseIHelg;
+    }
+
+    public static LogiskPeriodeTjeneste forDagytelse() {
+        return new LogiskPeriodeTjeneste(false);
+    }
+
+    public static LogiskPeriodeTjeneste forDag7() {
+        return new LogiskPeriodeTjeneste(true);
+    }
+
+    public static LogiskPeriodeTjeneste forYtelseType(FagsakYtelseType ytelseType) {
+        return new LogiskPeriodeTjeneste(ytelseType == FagsakYtelseType.OMSORGSPENGER || ytelseType == FagsakYtelseType.ENGANGSTØNAD);
+    }
+
+    public List<LogiskPeriode> utledLogiskPeriode(SortedMap<Periode, BigDecimal> feilutbetalingPrPeriode) {
         LocalDate førsteDag = null;
         LocalDate sisteDag = null;
         BigDecimal logiskPeriodeBeløp = BigDecimal.ZERO;
@@ -25,7 +45,7 @@ public class LogiskPeriodeTjeneste {
                 førsteDag = periode.getFom();
                 sisteDag = periode.getTom();
             } else {
-                if (harUkedagerMellom(sisteDag, periode.getFom())) {
+                if (harYtelsedagerMellom(sisteDag, periode.getFom())) {
                     resultat.add(LogiskPeriode.lagPeriode(førsteDag, sisteDag, logiskPeriodeBeløp));
                     førsteDag = periode.getFom();
                     logiskPeriodeBeløp = BigDecimal.ZERO;
@@ -38,6 +58,14 @@ public class LogiskPeriodeTjeneste {
             resultat.add(LogiskPeriode.lagPeriode(førsteDag, sisteDag, logiskPeriodeBeløp));
         }
         return resultat;
+    }
+
+    private boolean harYtelsedagerMellom(LocalDate dag1, LocalDate dag2) {
+        if (ytelseIHelg) {
+            return ChronoUnit.DAYS.between(dag1, dag2) > 1;
+        } else {
+            return harUkedagerMellom(dag1, dag2);
+        }
     }
 
     private static boolean harUkedagerMellom(LocalDate dag1, LocalDate dag2) {

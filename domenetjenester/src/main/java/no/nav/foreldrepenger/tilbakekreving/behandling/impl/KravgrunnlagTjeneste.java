@@ -24,6 +24,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkRepository;
@@ -73,7 +74,9 @@ public class KravgrunnlagTjeneste {
 
 
     public List<LogiskPeriode> utledLogiskPeriode(Long behandlingId) {
-        return LogiskPeriodeTjeneste.utledLogiskPeriode(finnFeilutbetalingPrPeriode(behandlingId));
+        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
+        FagsakYtelseType ytelseType = behandling.getFagsak().getFagsakYtelseType();
+        return LogiskPeriodeTjeneste.forYtelseType(ytelseType).utledLogiskPeriode(finnFeilutbetalingPrPeriode(behandlingId));
     }
 
     private SortedMap<Periode, BigDecimal> finnFeilutbetalingPrPeriode(Long behandlingId) {
@@ -117,7 +120,7 @@ public class KravgrunnlagTjeneste {
         }
     }
 
-    public void tilbakeførBehandlingTilFaktaSteg(Behandling behandling){
+    public void tilbakeførBehandlingTilFaktaSteg(Behandling behandling) {
         long behandlingId = behandling.getId();
         boolean erForbiFaktaSteg = behandlingskontrollTjeneste.erStegPassert(behandling, FAKTA_FEILUTBETALING);
         //forutsatt at FPTILBAKE allrede har fått SPER melding for den behandlingen og sett behandling på vent med VenteÅrsak VENT_PÅ_TILBAKEKREVINGSGRUNNLAG
