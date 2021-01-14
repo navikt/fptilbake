@@ -193,6 +193,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         );
     }
 
+    @Test
     public void skal_fordele_på_ulike_klassekoder_med_ulik_skatt() {
         Behandling behandling = simple.lagre(behandlingRepositoryProvider);
         Long behandlingId = behandling.getId();
