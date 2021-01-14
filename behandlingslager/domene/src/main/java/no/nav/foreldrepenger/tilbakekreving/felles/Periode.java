@@ -2,6 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.felles;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
@@ -123,5 +124,13 @@ public class Periode {
 
     public Periode plusDays(int dager) {
         return Periode.of(fom.plusDays(dager), tom.plusDays(dager));
+    }
+
+    public int antallKalenderdager() {
+        return (int) ChronoUnit.DAYS.between(fom, tom) + 1;
+    }
+
+    public int antallUkedager() {
+        return Ukedager.beregnAntallVirkedager(fom, tom);
     }
 }

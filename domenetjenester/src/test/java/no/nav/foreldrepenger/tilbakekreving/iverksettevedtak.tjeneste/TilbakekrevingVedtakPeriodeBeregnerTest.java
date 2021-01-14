@@ -15,6 +15,7 @@ import java.util.function.Function;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -51,17 +52,24 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
     @Inject
     public VilkårsvurderingRepository vilkårsvurderingRepository;
     @Inject
-    public TilbakekrevingVedtakPeriodeBeregner beregner;
+    public TilbakekrevingVedtakPeriodeBeregnerProducer beregnerProducer;
     @Inject
     public VurdertForeldelseRepository foreldelseRepository;
     @Inject
     private EntityManager entityManager;
+
+    public TilbakekrevingVedtakPeriodeBeregner dagytelseBeregner;
 
     private final LocalDate dag1 = LocalDate.of(2019, 7, 1);
     private final Periode uke1 = Periode.of(dag1, dag1.plusDays(6));
     private final Periode uke2 = uke1.plusDays(7);
     private final Periode uke3 = uke1.plusDays(14);
     private final Periode uke1og2 = Periode.omsluttende(uke1, uke2);
+
+    @BeforeEach
+    public void lagBeregner() {
+        dagytelseBeregner = beregnerProducer.lagVedtakPeriodeBeregner(false);
+    }
 
     @Test
     public void skal_sende_tilbake_perioder_fra_grunnlag_ved_full_innkreving_og_ingen_splitting() {
@@ -81,7 +89,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
 
         flushAndClear();
 
-        List<TilbakekrevingPeriode> resultat = beregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
+        List<TilbakekrevingPeriode> resultat = dagytelseBeregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
         assertThat(resultat).containsOnly(TilbakekrevingPeriode.med(uke1).medRenter(900)
             .medBeløp(TbkBeløp.feil(9000))
             .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(11000).medTilbakekrevBeløp(9000).medUinnkrevdBeløp(0).medSkattBeløp(0)));
@@ -112,7 +120,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
 
         flushAndClear();
 
-        List<TilbakekrevingPeriode> resultat = beregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
+        List<TilbakekrevingPeriode> resultat = dagytelseBeregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
         assertThat(resultat).containsOnly(TilbakekrevingPeriode.med(uke1).medRenter(0)
             .medBeløp(TbkBeløp.feil(9000))
             .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(11000).medTilbakekrevBeløp(0).medUinnkrevdBeløp(9000).medSkattBeløp(0)));
@@ -140,7 +148,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
 
         flushAndClear();
 
-        List<TilbakekrevingPeriode> resultat = beregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
+        List<TilbakekrevingPeriode> resultat = dagytelseBeregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
         assertThat(resultat).containsOnly(
             TilbakekrevingPeriode.med(uke1).medRenter(100)
                 .medBeløp(TbkBeløp.feil(1000))
@@ -172,7 +180,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
 
         flushAndClear();
 
-        List<TilbakekrevingPeriode> resultat = beregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
+        List<TilbakekrevingPeriode> resultat = dagytelseBeregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
         assertThat(resultat).containsOnly(
             TilbakekrevingPeriode.med(uke1og2).medRenter(200)
                 .medBeløp(TbkBeløp.feil(2000))
@@ -202,7 +210,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
 
         flushAndClear();
 
-        List<TilbakekrevingPeriode> resultat = beregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
+        List<TilbakekrevingPeriode> resultat = dagytelseBeregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
         assertThat(resultat).containsOnly(
             TilbakekrevingPeriode.med(uke1).medRenter(250)
                 .medBeløp(TbkBeløp.feil(2500))
@@ -237,7 +245,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
 
         flushAndClear();
 
-        List<TilbakekrevingPeriode> resultat = beregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
+        List<TilbakekrevingPeriode> resultat = dagytelseBeregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
 
         assertThat(finSumAv(resultat, TilbakekrevingBeløp::getTilbakekrevBeløp, KlasseType.YTEL)).isEqualByComparingTo(BigDecimal.valueOf(1000));
         assertThat(finSumAv(resultat, TilbakekrevingBeløp::getUinnkrevdBeløp, KlasseType.YTEL)).isEqualByComparingTo(BigDecimal.valueOf(2000));
@@ -276,7 +284,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
 
         flushAndClear();
 
-        List<TilbakekrevingPeriode> resultat = beregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
+        List<TilbakekrevingPeriode> resultat = dagytelseBeregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
 
         assertThat(finSumAv(resultat, TilbakekrevingBeløp::getNyttBeløp, KlasseType.FEIL)).isEqualByComparingTo(BigDecimal.valueOf(1000));
         assertThat(finSumAv(resultat, TilbakekrevingBeløp::getUtbetaltBeløp, KlasseType.YTEL)).isEqualByComparingTo(BigDecimal.valueOf(1000));
@@ -313,7 +321,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
 
         flushAndClear();
 
-        List<TilbakekrevingPeriode> resultat = beregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
+        List<TilbakekrevingPeriode> resultat = dagytelseBeregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
 
         assertThat(finSumAv(resultat, TilbakekrevingBeløp::getNyttBeløp, KlasseType.FEIL)).isEqualByComparingTo(BigDecimal.valueOf(1000));
         assertThat(finSumAv(resultat, TilbakekrevingBeløp::getUtbetaltBeløp, KlasseType.YTEL)).isEqualByComparingTo(BigDecimal.valueOf(1000));
@@ -344,7 +352,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
 
         flushAndClear();
 
-        List<TilbakekrevingPeriode> resultat = beregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
+        List<TilbakekrevingPeriode> resultat = dagytelseBeregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
 
         assertThat(finSumAv(resultat, TilbakekrevingBeløp::getNyttBeløp, KlasseType.FEIL)).isEqualByComparingTo(BigDecimal.valueOf(1000));
         assertThat(finSumAv(resultat, TilbakekrevingBeløp::getUtbetaltBeløp, KlasseType.YTEL)).isEqualByComparingTo(BigDecimal.valueOf(1000));
@@ -375,7 +383,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
 
         flushAndClear();
 
-        List<TilbakekrevingPeriode> resultat = beregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
+        List<TilbakekrevingPeriode> resultat = dagytelseBeregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
 
         assertThat(finSumAv(resultat, TilbakekrevingBeløp::getNyttBeløp, KlasseType.FEIL)).isEqualByComparingTo(BigDecimal.valueOf(1000));
         assertThat(finSumAv(resultat, TilbakekrevingBeløp::getUtbetaltBeløp, KlasseType.YTEL)).isEqualByComparingTo(BigDecimal.valueOf(1000));
@@ -411,7 +419,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
 
         flushAndClear();
 
-        List<TilbakekrevingPeriode> resultat = beregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
+        List<TilbakekrevingPeriode> resultat = dagytelseBeregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
 
         assertThat(finSumAv(resultat, TilbakekrevingBeløp::getNyttBeløp, KlasseType.FEIL)).isEqualByComparingTo(BigDecimal.valueOf(3180));
         assertThat(finSumAv(resultat, TilbakekrevingBeløp::getUtbetaltBeløp, KlasseType.YTEL)).isEqualByComparingTo(BigDecimal.valueOf(6380));
@@ -468,7 +476,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
 
         flushAndClear();
 
-        List<TilbakekrevingPeriode> resultat = beregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
+        List<TilbakekrevingPeriode> resultat = dagytelseBeregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
 
         //det viktigste her er at skatt fordeles slik at den ikke overstiger "kvoten" skatt pr mnd slik det er definert i grunnlaget
         //det er viktig at det kommer 1 kr skatt pr periode i januar,
@@ -534,7 +542,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
 
         flushAndClear();
 
-        List<TilbakekrevingPeriode> resultat = beregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
+        List<TilbakekrevingPeriode> resultat = dagytelseBeregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
 
         //fordeling av skatt mellom perioder er ikke kritisk, men sum pr måned MÅ være under grensen for måneden
         assertThat(resultat).containsOnly(
@@ -579,7 +587,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
 
         //TODO det bør helt klart feile tidligere i løypa istedet for på dette punktet. Legger validering her nå for å
         // ha ekstra sikring mot feil
-        assertThatThrownBy(() -> beregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag))
+        assertThatThrownBy(() -> dagytelseBeregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag))
             .isInstanceOf(TekniskException.class)
             .hasMessageContaining("har 10 virkedager, forventer en-til-en, men ovelapper mot beregningsresultat med 5 dager");
     }
@@ -603,7 +611,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
 
         //TODO det bør helt klart feile tidligere i løypa istedet for på dette punktet. Legger validering her nå for å
         // ha ekstra sikring mot feil
-        assertThatThrownBy(() -> beregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag))
+        assertThatThrownBy(() -> dagytelseBeregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag))
             .isInstanceOf(TekniskException.class)
             .hasMessageContaining("har 10 virkedager, forventer en-til-en, men ovelapper mot kravgrunnlag med 5 dager");
     }

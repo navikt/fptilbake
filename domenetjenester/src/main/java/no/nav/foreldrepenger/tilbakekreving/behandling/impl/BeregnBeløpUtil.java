@@ -2,58 +2,45 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.List;
 import java.util.Optional;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
-import no.nav.foreldrepenger.tilbakekreving.felles.Ukedager;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagBelop433;
 
 public class BeregnBeløpUtil {
 
-    private boolean forEngangsstønad;
+    private boolean helgHarYtelsedager;
 
     public static BeregnBeløpUtil forFagområde(FagOmrådeKode fagOmrådeKode) {
-        return new BeregnBeløpUtil(fagOmrådeKode == FagOmrådeKode.ENGANGSSTØNAD);
+        return new BeregnBeløpUtil(fagOmrådeKode == FagOmrådeKode.OMSORGSPENGER || fagOmrådeKode == FagOmrådeKode.ENGANGSSTØNAD);
     }
 
-    public BeregnBeløpUtil(boolean forEngangsstønad) {
-        this.forEngangsstønad = forEngangsstønad;
+    public BeregnBeløpUtil(boolean helgHarYtelsedager) {
+        this.helgHarYtelsedager = helgHarYtelsedager;
     }
 
-    public BigDecimal beregnBeløpPrVirkedag(BigDecimal beløp, Periode periode) {
-        int antallVirkedager = Ukedager.beregnAntallVirkedager(periode);
-        if (forEngangsstønad && antallVirkedager == 0) { //Gjelder kun ved Engangsstønad (REFUTG) som treffer en ikke vanlig virkedag.
-            return beløp;
-        }
-        return beløp.divide(BigDecimal.valueOf(antallVirkedager), 2, RoundingMode.HALF_UP);
+    public BigDecimal beregnBeløpPrYtelsedag(BigDecimal beløp, Periode periode) {
+        int antallYtelsedager = antallYtelsedager(periode);
+        return beløp.divide(BigDecimal.valueOf(antallYtelsedager), 2, RoundingMode.HALF_UP);
     }
 
-    public BigDecimal beregnBeløp(Periode foreldetPeriode, Periode grunnlagPeriode, BigDecimal beløpPrVirkedag) {
-        Optional<Periode> overlap = grunnlagPeriode.overlap(foreldetPeriode);
-        if (overlap.isPresent()) {
-            Periode overlapInterval = overlap.get();
-            int antallVirkedager = Ukedager.beregnAntallVirkedager(overlapInterval);
-            if (forEngangsstønad && antallVirkedager == 0) { //Gjelder kun ved Engangsstønad (REFUTG) som treffer en ikke vanlig virkedag.
-                return beløpPrVirkedag;
-            }
-            return beløpPrVirkedag.multiply(BigDecimal.valueOf(antallVirkedager));
+    public BigDecimal beregnBeløp(Periode foreldetPeriode, Periode grunnlagPeriode, BigDecimal beløpPrYtelsedag) {
+        Optional<Periode> muligOverlapp = grunnlagPeriode.overlap(foreldetPeriode);
+        if (muligOverlapp.isPresent()) {
+            Periode overlapp = muligOverlapp.get();
+            int antallYtelsedagerOverlapp = antallYtelsedager(overlapp);
+            return beløpPrYtelsedag.multiply(BigDecimal.valueOf(antallYtelsedagerOverlapp));
         }
         return BigDecimal.ZERO;
     }
 
-    public BigDecimal beregnBeløpForPeriode(BigDecimal tilbakekrevesBeløp, Periode feilutbetalingPeriode, Periode periode) {
-        BigDecimal grunnlagBelopPerUkeDager = beregnBeløpPrVirkedag(tilbakekrevesBeløp, periode);
-        BigDecimal ytelseBeløp = beregnBeløp(feilutbetalingPeriode, periode, grunnlagBelopPerUkeDager);
-        return ytelseBeløp.setScale(0, RoundingMode.HALF_UP);
+    public int antallYtelsedager(Periode periode) {
+        return helgHarYtelsedager ? periode.antallKalenderdager() : periode.antallUkedager();
     }
 
-    public static BigDecimal beregnBelop(List<KravgrunnlagBelop433> beloper433) {
-        BigDecimal belopPerPeriode = BigDecimal.ZERO;
-        for (KravgrunnlagBelop433 belop433 : beloper433) {
-            belopPerPeriode = belopPerPeriode.add(belop433.getNyBelop());
-        }
-        return belopPerPeriode;
+    public BigDecimal beregnBeløpForPeriode(BigDecimal tilbakekrevesBeløp, Periode feilutbetalingPeriode, Periode periode) {
+        BigDecimal grunnlagBelopPerUkeDager = beregnBeløpPrYtelsedag(tilbakekrevesBeløp, periode);
+        BigDecimal ytelseBeløp = beregnBeløp(feilutbetalingPeriode, periode, grunnlagBelopPerUkeDager);
+        return ytelseBeløp.setScale(0, RoundingMode.HALF_UP);
     }
 }

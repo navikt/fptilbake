@@ -12,10 +12,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
-import no.nav.foreldrepenger.tilbakekreving.felles.Ukedager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,21 +30,17 @@ import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
 import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
 import no.nav.vedtak.util.Objects;
 
-@ApplicationScoped
 public class TilbakekrevingVedtakPeriodeBeregner {
 
     private static final int GRENSE_AVRUNDINGSFEIL = 5;
     private static final Logger logger = LoggerFactory.getLogger(TilbakekrevingVedtakPeriodeBeregner.class);
 
     private TilbakekrevingBeregningTjeneste beregningTjeneste;
+    private boolean helgHarYtelsedager;
 
-    TilbakekrevingVedtakPeriodeBeregner() {
-        //for CDI proxy
-    }
-
-    @Inject
-    public TilbakekrevingVedtakPeriodeBeregner(TilbakekrevingBeregningTjeneste beregningTjeneste) {
+    public TilbakekrevingVedtakPeriodeBeregner(TilbakekrevingBeregningTjeneste beregningTjeneste, boolean helgHarYtelsedager) {
         this.beregningTjeneste = beregningTjeneste;
+        this.helgHarYtelsedager = helgHarYtelsedager;
     }
 
     public List<TilbakekrevingPeriode> lagTilbakekrevingsPerioder(Long behandlingId, Kravgrunnlag431 kravgrunnlag431) {
@@ -61,12 +53,12 @@ public class TilbakekrevingVedtakPeriodeBeregner {
         List<BeregningResultatPeriode> brPerioder = sortertePerioder(beregningResultat);
         validerInput(kgPerioder, brPerioder);
 
-        Map<Periode, Integer> kgTidligereBehandledeVirkedager = initVirkedagerMap(kgPerioder);
+        Map<Periode, Integer> kgTidligereBehandledeYtelsedager = initYtelsedagerMap(kgPerioder);
         Map<YearMonth, BigDecimal> kgGjenståendeMuligSkattetrekk = initMuligSkattetrekk(kgPerioder);
 
         List<TilbakekrevingPeriode> resultat = new ArrayList<>();
         for (BeregningResultatPeriode bgPeriode : brPerioder) {
-            List<TilbakekrevingPeriode> bgResultatPerioder = lagTilbakekrevingPerioder(bgPeriode, kgPerioder, kgTidligereBehandledeVirkedager);
+            List<TilbakekrevingPeriode> bgResultatPerioder = lagTilbakekrevingPerioder(bgPeriode, kgPerioder, kgTidligereBehandledeYtelsedager);
             justerAvrunding(bgPeriode, bgResultatPerioder);
             oppdaterGjenståendeSkattetrekk(bgResultatPerioder, kgGjenståendeMuligSkattetrekk);
             justerAvrundingSkatt(bgPeriode, bgResultatPerioder, kgGjenståendeMuligSkattetrekk);
@@ -89,7 +81,7 @@ public class TilbakekrevingVedtakPeriodeBeregner {
                 logger.warn("Ignorerte periode {} ved iverksetting, siden hadde ingen postering med klasseType=FEIL", kgPeriode.getPeriode());
                 continue;
             }
-            if (virkedagerOverlapp(kgPeriode.getPeriode(), bgPeriode.getPeriode()) > 0) {
+            if (ytelsedagerOverlapp(kgPeriode.getPeriode(), bgPeriode.getPeriode()) > 0) {
                 resultat.add(lagTilbakekrevingsperiode(bgPeriode, kgTidligereBehandledeVirkedager, andelSkalering, kgPeriode));
             }
         }
@@ -101,13 +93,17 @@ public class TilbakekrevingVedtakPeriodeBeregner {
             .noneMatch(kgb -> KlasseType.FEIL.equals(kgb.getKlasseType()));
     }
 
+    private int antallYtelsedager(Periode periode) {
+        return helgHarYtelsedager ? periode.antallKalenderdager() : periode.antallUkedager();
+    }
+
     private TilbakekrevingPeriode lagTilbakekrevingsperiode(BeregningResultatPeriode bgPeriode, Map<Periode, Integer> kgTidligereBehandledeVirkedager, Skalering andelSkalering, KravgrunnlagPeriode432 kgPeriode) {
         Periode kPeriode = kgPeriode.getPeriode();
-        int virkedagerOverlapp = virkedagerOverlapp(kPeriode, bgPeriode.getPeriode());
+        int virkedagerOverlapp = ytelsedagerOverlapp(kPeriode, bgPeriode.getPeriode());
         int kgBehandledeVirkedager = kgTidligereBehandledeVirkedager.get(kPeriode);
-        int kgPeriodeVirkedager = Ukedager.beregnAntallVirkedager(kPeriode);
-        Skalering kgTidligereSkalering = Skalering.opprett(kgBehandledeVirkedager, kgPeriodeVirkedager);
-        Skalering kgKumulativSkalering = Skalering.opprett(kgBehandledeVirkedager + virkedagerOverlapp, kgPeriodeVirkedager);
+        int kgPeriodeYtelsedager = antallYtelsedager(kPeriode);
+        Skalering kgTidligereSkalering = Skalering.opprett(kgBehandledeVirkedager, kgPeriodeYtelsedager);
+        Skalering kgKumulativSkalering = Skalering.opprett(kgBehandledeVirkedager + virkedagerOverlapp, kgPeriodeYtelsedager);
         kgTidligereBehandledeVirkedager.put(kPeriode, kgBehandledeVirkedager + virkedagerOverlapp);
 
         TilbakekrevingPeriode tp = new TilbakekrevingPeriode(kPeriode.overlap(bgPeriode.getPeriode()).orElseThrow());
@@ -303,15 +299,15 @@ public class TilbakekrevingVedtakPeriodeBeregner {
         return kumulativtSkalert.subtract(tidligereSkalert);
     }
 
-    private static Map<Periode, Integer> initVirkedagerMap(List<KravgrunnlagPeriode432> kgPerioder) {
-        Map<Periode, Integer> kgBehandledeVirkedager = new HashMap<>();
-        kgPerioder.forEach(p -> kgBehandledeVirkedager.put(p.getPeriode(), 0));
-        return kgBehandledeVirkedager;
+    private static Map<Periode, Integer> initYtelsedagerMap(List<KravgrunnlagPeriode432> kgPerioder) {
+        Map<Periode, Integer> kgBehandledeYtelsedager = new HashMap<>();
+        kgPerioder.forEach(p -> kgBehandledeYtelsedager.put(p.getPeriode(), 0));
+        return kgBehandledeYtelsedager;
     }
 
-    private static int virkedagerOverlapp(Periode a, Periode b) {
+    private int ytelsedagerOverlapp(Periode a, Periode b) {
         return a.overlap(b)
-            .map(Ukedager::beregnAntallVirkedager)
+            .map(this::antallYtelsedager)
             .orElse(0);
     }
 
@@ -330,39 +326,39 @@ public class TilbakekrevingVedtakPeriodeBeregner {
     }
 
 
-    private static void validerInput(List<KravgrunnlagPeriode432> kgPerioder, List<BeregningResultatPeriode> brPerioder) {
+    private void validerInput(List<KravgrunnlagPeriode432> kgPerioder, List<BeregningResultatPeriode> brPerioder) {
         validerKravgrunnlagMotBeregningsresultat(kgPerioder, brPerioder);
         validerBeregningsresultatMotKravgrunnlag(kgPerioder, brPerioder);
     }
 
-    private static void validerBeregningsresultatMotKravgrunnlag(List<KravgrunnlagPeriode432> kgPerioder, List<BeregningResultatPeriode> brPerioder) {
+    private void validerBeregningsresultatMotKravgrunnlag(List<KravgrunnlagPeriode432> kgPerioder, List<BeregningResultatPeriode> brPerioder) {
         for (BeregningResultatPeriode brPeriode : brPerioder) {
-            int brTotalDager = Ukedager.beregnAntallVirkedager(brPeriode.getPeriode());
+            int brTotalDager = antallYtelsedager(brPeriode.getPeriode());
             int brOverlappDager = 0;
             for (KravgrunnlagPeriode432 kgPeriode : kgPerioder) {
                 Optional<Periode> overlapp = kgPeriode.getPeriode().overlap(brPeriode.getPeriode());
                 if (overlapp.isPresent()) {
-                    brOverlappDager += Ukedager.beregnAntallVirkedager(overlapp.get());
+                    brOverlappDager += antallYtelsedager(overlapp.get());
                 }
             }
             if (brTotalDager != brOverlappDager) {
-                throw TilbakekrevingVedtakPeriodeBeregnerFeil.FACTORY.inputvalideringFeiletBrPerioderOverlappKgPerioder(brPeriode.getPeriode(), brTotalDager, brOverlappDager).toException();
+                throw TilbakekrevingVedtakPeriodeBeregnerFeil.FACTORY.inputvalideringFeiletBrPerioderOverlappKgPerioder(brPeriode.getPeriode(), brTotalDager, helgHarYtelsedager ? "kalenderdager" : "virkedager", brOverlappDager).toException();
             }
         }
     }
 
-    private static void validerKravgrunnlagMotBeregningsresultat(List<KravgrunnlagPeriode432> kgPerioder, List<BeregningResultatPeriode> brPerioder) {
+    private void validerKravgrunnlagMotBeregningsresultat(List<KravgrunnlagPeriode432> kgPerioder, List<BeregningResultatPeriode> brPerioder) {
         for (KravgrunnlagPeriode432 kgPeriode : kgPerioder) {
-            int kgTotalDager = Ukedager.beregnAntallVirkedager(kgPeriode.getPeriode());
+            int kgTotalDager = antallYtelsedager(kgPeriode.getPeriode());
             int kgOverlappDager = 0;
             for (BeregningResultatPeriode brPeriode : brPerioder) {
                 Optional<Periode> overlapp = kgPeriode.getPeriode().overlap(brPeriode.getPeriode());
                 if (overlapp.isPresent()) {
-                    kgOverlappDager += Ukedager.beregnAntallVirkedager(overlapp.get());
+                    kgOverlappDager += antallYtelsedager(overlapp.get());
                 }
             }
             if (kgTotalDager != kgOverlappDager) {
-                throw TilbakekrevingVedtakPeriodeBeregnerFeil.FACTORY.inputvalideringFeiletKgPerioderOverlappBrPerioder(kgPeriode.getPeriode(), kgTotalDager, kgOverlappDager).toException();
+                throw TilbakekrevingVedtakPeriodeBeregnerFeil.FACTORY.inputvalideringFeiletKgPerioderOverlappBrPerioder(kgPeriode.getPeriode(), kgTotalDager, helgHarYtelsedager ? "kalenderdager" : "virkedager", kgOverlappDager).toException();
             }
         }
     }
@@ -413,11 +409,11 @@ public class TilbakekrevingVedtakPeriodeBeregner {
         @TekniskFeil(feilkode = "FPT-812610", feilmelding = "Avrundingsfeil i periode %s i vedtak. Skattebeløp er satt %s for høyt for perioden", logLevel = LogLevel.WARN)
         Feil avrundingsfeilForMyeSkatt(Periode periode, BigDecimal diff);
 
-        @TekniskFeil(feilkode = "FPT-685113", feilmelding = "Kravgrunnlagperiode %s har %s virkedager, forventer en-til-en, men ovelapper mot beregningsresultat med %s dager", logLevel = LogLevel.ERROR)
-        Feil inputvalideringFeiletKgPerioderOverlappBrPerioder(Periode periode, int kgVirkedager, int overlappVirkedager);
+        @TekniskFeil(feilkode = "FPT-685113", feilmelding = "Kravgrunnlagperiode %s har %s %s, forventer en-til-en, men ovelapper mot beregningsresultat med %s dager", logLevel = LogLevel.ERROR)
+        Feil inputvalideringFeiletKgPerioderOverlappBrPerioder(Periode periode, int kgYtelsedager, String dagbeskrivelse, int overlappYtelsedager);
 
-        @TekniskFeil(feilkode = "FPT-745657", feilmelding = "Beregningsresultatperiode %s har %s virkedager, forventer en-til-en, men ovelapper mot kravgrunnlag med %s dager", logLevel = LogLevel.ERROR)
-        Feil inputvalideringFeiletBrPerioderOverlappKgPerioder(Periode periode, int kgVirkedager, int overlappVirkedager);
+        @TekniskFeil(feilkode = "FPT-745657", feilmelding = "Beregningsresultatperiode %s har %s %s, forventer en-til-en, men ovelapper mot kravgrunnlag med %s dager", logLevel = LogLevel.ERROR)
+        Feil inputvalideringFeiletBrPerioderOverlappKgPerioder(Periode periode, int kgYtelsedager, String dagbeskrivelse, int overlappYtelsedager);
 
     }
 }

@@ -1,11 +1,11 @@
 package no.nav.foreldrepenger.tilbakekreving.felles;
 
+import static java.lang.Math.toIntExact;
+
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
-
-import static java.lang.Math.toIntExact;
 
 public class Ukedager {
 
@@ -15,11 +15,6 @@ public class Ukedager {
 
     private Ukedager() {
         // For å unngå instanser
-    }
-
-    public static int beregnAntallVirkedager(Periode periode) {
-        Objects.requireNonNull(periode);
-        return beregnAntallVirkedager(periode.getFom(), periode.getTom());
     }
 
     public static int beregnAntallVirkedager(LocalDate fom, LocalDate tom) {

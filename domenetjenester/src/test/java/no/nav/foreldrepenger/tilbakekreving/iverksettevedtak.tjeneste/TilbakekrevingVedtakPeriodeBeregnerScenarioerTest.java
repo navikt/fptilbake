@@ -10,6 +10,7 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -31,6 +32,7 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
  */
 @CdiDbAwareTest
 public class TilbakekrevingVedtakPeriodeBeregnerScenarioerTest {
+    private static final PeriodeParser PP2018 = new PeriodeParser(2018);
 
     private ScenarioSimple simple = ScenarioSimple.simple();
 
@@ -41,11 +43,16 @@ public class TilbakekrevingVedtakPeriodeBeregnerScenarioerTest {
     @Inject
     public VilkårsvurderingRepository vilkårsvurderingRepository;
     @Inject
-    public TilbakekrevingVedtakPeriodeBeregner beregner;
+    public TilbakekrevingVedtakPeriodeBeregnerProducer beregnerProducer;
     @Inject
     public EntityManager entityManager;
 
-    private static final PeriodeParser PP2018 = new PeriodeParser(2018);
+    private TilbakekrevingVedtakPeriodeBeregner dagytelseBeregner;
+
+    @BeforeEach
+    public void lagBeregner() {
+        dagytelseBeregner = beregnerProducer.lagVedtakPeriodeBeregner(false);
+    }
 
     @Test
     public void scenario_oppør_med_flere_vurderinger() {
@@ -72,7 +79,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerScenarioerTest {
 
         flushAndClear();
 
-        List<TilbakekrevingPeriode> resultat = beregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
+        List<TilbakekrevingPeriode> resultat = dagytelseBeregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
         Assertions.assertThat(resultat).containsOnly(
             TilbakekrevingPeriode.med(PP2018.periode("16/3-31/3")).medRenter(0)
                 .medBeløp(TbkBeløp.feil(11000))
@@ -115,7 +122,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerScenarioerTest {
 
         flushAndClear();
 
-        List<TilbakekrevingPeriode> resultat = beregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
+        List<TilbakekrevingPeriode> resultat = dagytelseBeregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
         Assertions.assertThat(resultat).containsOnly(
             TilbakekrevingPeriode.med(PP2018.periode("10/4-30/4")).medRenter(0)
                 .medBeløp(TbkBeløp.feil(7500))
