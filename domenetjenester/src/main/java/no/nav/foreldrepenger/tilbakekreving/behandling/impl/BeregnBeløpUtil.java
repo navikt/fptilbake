@@ -5,6 +5,7 @@ import java.math.RoundingMode;
 import java.util.Optional;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.HelgHarYtelsedager;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
 public class BeregnBeløpUtil {
@@ -12,7 +13,7 @@ public class BeregnBeløpUtil {
     private boolean helgHarYtelsedager;
 
     public static BeregnBeløpUtil forFagområde(FagOmrådeKode fagOmrådeKode) {
-        return new BeregnBeløpUtil(fagOmrådeKode == FagOmrådeKode.OMSORGSPENGER || fagOmrådeKode == FagOmrådeKode.ENGANGSSTØNAD);
+        return new BeregnBeløpUtil(HelgHarYtelsedager.helgHarYtelsedager(fagOmrådeKode));
     }
 
     public BeregnBeløpUtil(boolean helgHarYtelsedager) {
