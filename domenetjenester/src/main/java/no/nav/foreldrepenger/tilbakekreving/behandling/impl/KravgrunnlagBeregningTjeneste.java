@@ -33,12 +33,13 @@ public class KravgrunnlagBeregningTjeneste {
         this.grunnlagRepository = grunnlagRepository;
     }
 
-    public Map<Periode, FordeltKravgrunnlagBeløp> fordelKravgrunnlagBeløpPåPerioder(Long behandlingId, List<Periode> perioder) {
+    //TODO Konvertere klassen til en ren beregner-klasse. Like enkelt å hente kravgrunnlag fra utsiden og sende inn som parameter
+    public Map<Periode, BigDecimal> beregnFeilutbetaltBeløp(Long behandlingId, List<Periode> perioder) {
         Kravgrunnlag431 kravgrunnlag = grunnlagRepository.finnKravgrunnlag(behandlingId);
-        return fordelKravgrunnlagBeløpPåPerioder(kravgrunnlag, perioder);
+        return beregnFeilutbetaltBeløp(kravgrunnlag, perioder);
     }
 
-    public Map<Periode, FordeltKravgrunnlagBeløp> fordelKravgrunnlagBeløpPåPerioder(Kravgrunnlag431 kravgrunnlag, List<Periode> perioder) {
+    public static Map<Periode, FordeltKravgrunnlagBeløp> fordelKravgrunnlagBeløpPåPerioder(Kravgrunnlag431 kravgrunnlag, List<Periode> perioder) {
         var map = new HashMap<Periode, FordeltKravgrunnlagBeløp>();
         for (Periode periode : perioder) {
             BigDecimal feilutbetaltBeløp = beregnFeilutbetaltBeløp(kravgrunnlag, periode);
@@ -49,12 +50,7 @@ public class KravgrunnlagBeregningTjeneste {
         return map;
     }
 
-    public Map<Periode, BigDecimal> beregnFeilutbetaltBeløp(Long behandlingId, List<Periode> perioder) {
-        Kravgrunnlag431 kravgrunnlag = grunnlagRepository.finnKravgrunnlag(behandlingId);
-        return beregnFeilutbetaltBeløp(kravgrunnlag, perioder);
-    }
-
-    public Map<Periode, BigDecimal> beregnFeilutbetaltBeløp(Kravgrunnlag431 kravgrunnlag, List<Periode> perioder) {
+    public static Map<Periode, BigDecimal> beregnFeilutbetaltBeløp(Kravgrunnlag431 kravgrunnlag, List<Periode> perioder) {
         var map = new HashMap<Periode, BigDecimal>();
         for (Periode periode : perioder) {
             BigDecimal feilutbetaltBeløp = beregnFeilutbetaltBeløp(kravgrunnlag, periode);
@@ -63,7 +59,7 @@ public class KravgrunnlagBeregningTjeneste {
         return map;
     }
 
-    private BigDecimal beregnFeilutbetaltBeløp(Kravgrunnlag431 kravgrunnlag, Periode periode) {
+    private static BigDecimal beregnFeilutbetaltBeløp(Kravgrunnlag431 kravgrunnlag, Periode periode) {
         Function<KravgrunnlagPeriode432, BigDecimal> feilutbetaltBeløpUtleder = kgPeriode -> kgPeriode.getKravgrunnlagBeloper433().stream()
             .filter(kgBeløp -> kgBeløp.getKlasseType().equals(KlasseType.FEIL))
             .map(KravgrunnlagBelop433::getNyBelop)
@@ -74,7 +70,7 @@ public class KravgrunnlagBeregningTjeneste {
     /**
      * Utbetalt beløp er ikke justert med trekk, det er OK for vår bruk
      */
-    private BigDecimal beregnUtbetaltYtelseBeløp(Kravgrunnlag431 kravgrunnlag, Periode periode) {
+    private static BigDecimal beregnUtbetaltYtelseBeløp(Kravgrunnlag431 kravgrunnlag, Periode periode) {
         Function<KravgrunnlagPeriode432, BigDecimal> feilutbetaltBeløpUtleder = kgPeriode -> kgPeriode.getKravgrunnlagBeloper433().stream()
             .filter(kgBeløp -> kgBeløp.getKlasseType().equals(KlasseType.YTEL))
             .map(KravgrunnlagBelop433::getOpprUtbetBelop)
@@ -85,7 +81,7 @@ public class KravgrunnlagBeregningTjeneste {
     /**
      * Riktig beløp er ikke justert med trekk, det er OK for vår bruk
      */
-    private BigDecimal beregnRiktigYtelseBeløp(Kravgrunnlag431 kravgrunnlag, Periode periode) {
+    private static BigDecimal beregnRiktigYtelseBeløp(Kravgrunnlag431 kravgrunnlag, Periode periode) {
         Function<KravgrunnlagPeriode432, BigDecimal> feilutbetaltBeløpUtleder = kgPeriode -> kgPeriode.getKravgrunnlagBeloper433().stream()
             .filter(kgBeløp -> kgBeløp.getKlasseType().equals(KlasseType.YTEL))
             .map(KravgrunnlagBelop433::getNyBelop)
@@ -93,7 +89,7 @@ public class KravgrunnlagBeregningTjeneste {
         return beregnBeløp(kravgrunnlag, periode, feilutbetaltBeløpUtleder);
     }
 
-    private BigDecimal beregnBeløp(Kravgrunnlag431 kravgrunnlag, Periode periode, Function<KravgrunnlagPeriode432, BigDecimal> beløpUtleder) {
+    private static BigDecimal beregnBeløp(Kravgrunnlag431 kravgrunnlag, Periode periode, Function<KravgrunnlagPeriode432, BigDecimal> beløpUtleder) {
         BeregnBeløpUtil beregnBeløpUtil = BeregnBeløpUtil.forFagområde(kravgrunnlag.getFagOmrådeKode());
         List<KravgrunnlagPeriode432> kgPerioder = new ArrayList<>(kravgrunnlag.getPerioder());
         kgPerioder.sort(Comparator.comparing(p -> p.getPeriode().getFom()));

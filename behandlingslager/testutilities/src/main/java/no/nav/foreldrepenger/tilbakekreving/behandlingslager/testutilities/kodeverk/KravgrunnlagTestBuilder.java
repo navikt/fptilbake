@@ -21,9 +21,15 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 public class KravgrunnlagTestBuilder {
 
     private KravgrunnlagRepository kravgrunnlagRepository;
+    private FagOmrådeKode fagOmrådeKode = FagOmrådeKode.FORELDREPENGER;
 
     public KravgrunnlagTestBuilder(KravgrunnlagRepository kravgrunnlagRepository) {
         this.kravgrunnlagRepository = kravgrunnlagRepository;
+    }
+
+    public KravgrunnlagTestBuilder medFagområde(FagOmrådeKode fagOmrådeKode) {
+        this.fagOmrådeKode = fagOmrådeKode;
+        return this;
     }
 
     public static KravgrunnlagTestBuilder medRepo(KravgrunnlagRepository repo) {
@@ -168,7 +174,7 @@ public class KravgrunnlagTestBuilder {
         return kg;
     }
 
-    private static Kravgrunnlag431 lagKravgrunnlag(Map<Periode, List<KgBeløp>> beløp, Function<Periode, Integer> skattBeløpMnd) {
+    private Kravgrunnlag431 lagKravgrunnlag(Map<Periode, List<KgBeløp>> beløp, Function<Periode, Integer> skattBeløpMnd) {
         Kravgrunnlag431 kg = lagKravgrunnlag();
         for (Map.Entry<Periode, List<KgBeløp>> entry : beløp.entrySet()) {
             KravgrunnlagPeriode432 kgPeriode = new KravgrunnlagPeriode432.Builder()
@@ -184,12 +190,12 @@ public class KravgrunnlagTestBuilder {
         return kg;
     }
 
-    private static Kravgrunnlag431 lagKravgrunnlag() {
+    private Kravgrunnlag431 lagKravgrunnlag() {
         Long eksternBehandlingId = 1000000L;
         return new Kravgrunnlag431.Builder()
             .medEksternKravgrunnlagId("12341")
             .medFagSystemId("GSAKNR-12312")
-            .medFagomraadeKode(FagOmrådeKode.FORELDREPENGER)
+            .medFagomraadeKode(fagOmrådeKode)
             .medKravStatusKode(KravStatusKode.NYTT)
             .medVedtakId(1412L)
             .medAnsvarligEnhet("8020")

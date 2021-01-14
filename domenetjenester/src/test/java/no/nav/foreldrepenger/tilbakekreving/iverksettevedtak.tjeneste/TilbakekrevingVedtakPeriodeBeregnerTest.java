@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.math.BigDecimal;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
@@ -15,6 +16,7 @@ import java.util.function.Function;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -22,6 +24,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.KravgrunnlagTestBuilder;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.KravgrunnlagTestBuilder.KgBeløp;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
@@ -59,6 +62,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
     private EntityManager entityManager;
 
     public TilbakekrevingVedtakPeriodeBeregner dagytelseBeregner;
+    public TilbakekrevingVedtakPeriodeBeregner dag7ytelseBeregner;
 
     private final LocalDate dag1 = LocalDate.of(2019, 7, 1);
     private final Periode uke1 = Periode.of(dag1, dag1.plusDays(6));
@@ -69,6 +73,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
     @BeforeEach
     public void lagBeregner() {
         dagytelseBeregner = beregnerProducer.lagVedtakPeriodeBeregner(false);
+        dag7ytelseBeregner = beregnerProducer.lagVedtakPeriodeBeregner(true);
     }
 
     @Test
@@ -157,6 +162,46 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
             TilbakekrevingPeriode.med(uke2).medRenter(200)
                 .medBeløp(TbkBeløp.feil(2000))
                 .medBeløp(TbkBeløp.ytelse(KlasseKode.FPATORD).medNyttBeløp(0).medUtbetBeløp(2000).medTilbakekrevBeløp(2000).medUinnkrevdBeløp(0).medSkattBeløp(0))
+        );
+    }
+
+    @Test
+    public void skal_fordele_en_lang_vedtaksperiode_ut_på_2_grunnlagsperioder_hvor_en_er_helg__dag7_omsorgspenger() {
+        Behandling behandling = simple.lagre(behandlingRepositoryProvider);
+        Long behandlingId = behandling.getId();
+
+        Assertions.assertThat(dag1.getDayOfWeek()).isEqualTo(DayOfWeek.MONDAY);
+        Periode ukedagene = Periode.of(dag1, dag1.plusDays(4));
+        Periode helg = Periode.of(dag1.plusDays(5), dag1.plusDays(6));
+
+        Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository)
+            .medFagområde(FagOmrådeKode.OMSORGSPENGER)
+            .lagreKravgrunnlag(behandlingId, Map.of(
+            ukedagene, Arrays.asList(
+                KgBeløp.feil(5000),
+                KgBeløp.ytelse(KlasseKode.OMATORD).medUtbetBeløp(5000).medTilbakekrevBeløp(5000))
+            ,
+            helg, Arrays.asList(
+                KgBeløp.feil(1000),
+                KgBeløp.ytelse(KlasseKode.OMATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000))
+            )
+        );
+
+        VilkårsvurderingTestBuilder.medRepo(vilkårsvurderingRepository).lagre(behandlingId, Map.of(
+            uke1, VilkårsvurderingTestBuilder.VVurdering.forsett()
+        ));
+
+        flushAndClear();
+
+        List<TilbakekrevingPeriode> resultat = dag7ytelseBeregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
+        assertThat(resultat).containsOnly(
+            TilbakekrevingPeriode.med(ukedagene).medRenter(500)
+                .medBeløp(TbkBeløp.feil(5000))
+                .medBeløp(TbkBeløp.ytelse(KlasseKode.OMATORD).medNyttBeløp(0).medUtbetBeløp(5000).medTilbakekrevBeløp(5000).medUinnkrevdBeløp(0).medSkattBeløp(0)),
+
+            TilbakekrevingPeriode.med(helg).medRenter(100)
+                .medBeløp(TbkBeløp.feil(1000))
+                .medBeløp(TbkBeløp.ytelse(KlasseKode.OMATORD).medNyttBeløp(0).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medUinnkrevdBeløp(0).medSkattBeløp(0))
         );
     }
 
