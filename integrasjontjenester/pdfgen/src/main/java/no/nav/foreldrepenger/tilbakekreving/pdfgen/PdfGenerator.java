@@ -7,9 +7,6 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.openhtmltopdf.extend.FSSupplier;
 import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
@@ -22,7 +19,6 @@ import no.nav.foreldrepenger.tilbakekreving.pdfgen.validering.PdfaValidator;
 public class PdfGenerator {
 
     private static final Map<String, byte[]> FONT_CACHE = new HashMap<>();
-    private static final Logger logger = LoggerFactory.getLogger(PdfGenerator.class);
 
     static {
         XRLog.setLoggingEnabled(true);
@@ -37,21 +33,13 @@ public class PdfGenerator {
     public byte[] genererPDF(String html, DokumentVariant dokumentVariant) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        long t0 = System.currentTimeMillis();
         genererPDF(html, baos, dokumentVariant);
         byte[] bytes = baos.toByteArray();
-
-        //Midlertidig kode, kan fjernes i desember 2020. appdynamics kan brukes for å oppdage trege tilfeller
-        logger.info("Produserte PDF fra html {} kB tok {} ms", bytes.length / 1024, System.currentTimeMillis() - t0);
 
         if (dokumentVariant == DokumentVariant.ENDELIG) {
             //validering er for treig for å brukes for interaktiv bruk, tar typisk 1-2 sekunder pr dokument
             //validering er også bare nødvendig før journalføring, så det er OK
-            t0 = System.currentTimeMillis();
             PdfaValidator.validatePdf(bytes);
-
-            //Midlertidig kode, kan fjernes i desember 2020. logger tidsforbruk for å vurdere om validering også skal gjøres på forhåndsvisning
-            logger.info("Validerte PDF/A {} kB tok {} ms", bytes.length / 1024, System.currentTimeMillis() - t0);
         }
 
         return bytes;
