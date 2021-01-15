@@ -62,11 +62,13 @@ public class LogiskPeriodeTjeneste {
     }
 
     private boolean harYtelsedagerMellom(LocalDate dag1, LocalDate dag2) {
-        if (helgHarYtelsedager) {
-            return ChronoUnit.DAYS.between(dag1, dag2) > 1;
-        } else {
-            return harUkedagerMellom(dag1, dag2);
-        }
+        return helgHarYtelsedager
+            ? harKalenderdagerMellom(dag1, dag2)
+            : harUkedagerMellom(dag1, dag2);
+    }
+
+    private static boolean harKalenderdagerMellom(LocalDate dag1, LocalDate dag2) {
+        return ChronoUnit.DAYS.between(dag1, dag2) > 1;
     }
 
     private static boolean harUkedagerMellom(LocalDate dag1, LocalDate dag2) {
