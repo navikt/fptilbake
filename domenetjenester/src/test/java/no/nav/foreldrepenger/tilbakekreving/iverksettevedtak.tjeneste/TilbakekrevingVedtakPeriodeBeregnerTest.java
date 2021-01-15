@@ -25,6 +25,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Foreldel
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.KravgrunnlagTestBuilder;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.KravgrunnlagTestBuilder.KgBeløp;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
@@ -167,6 +168,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
 
     @Test
     public void skal_fordele_en_lang_vedtaksperiode_ut_på_2_grunnlagsperioder_hvor_en_er_helg__dag7_omsorgspenger() {
+        simple.getFagsak().setFagsakYtelseType(FagsakYtelseType.OMSORGSPENGER);
         Behandling behandling = simple.lagre(behandlingRepositoryProvider);
         Long behandlingId = behandling.getId();
 
@@ -177,15 +179,15 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository)
             .medFagområde(FagOmrådeKode.OMSORGSPENGER)
             .lagreKravgrunnlag(behandlingId, Map.of(
-            ukedagene, Arrays.asList(
-                KgBeløp.feil(5000),
-                KgBeløp.ytelse(KlasseKode.OMATORD).medUtbetBeløp(5000).medTilbakekrevBeløp(5000))
-            ,
-            helg, Arrays.asList(
-                KgBeløp.feil(1000),
-                KgBeløp.ytelse(KlasseKode.OMATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000))
-            )
-        );
+                ukedagene, Arrays.asList(
+                    KgBeløp.feil(5000),
+                    KgBeløp.ytelse(KlasseKode.OMATORD).medUtbetBeløp(5000).medTilbakekrevBeløp(5000))
+                ,
+                helg, Arrays.asList(
+                    KgBeløp.feil(1000),
+                    KgBeløp.ytelse(KlasseKode.OMATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000))
+                )
+            );
 
         VilkårsvurderingTestBuilder.medRepo(vilkårsvurderingRepository).lagre(behandlingId, Map.of(
             uke1, VilkårsvurderingTestBuilder.VVurdering.forsett()
