@@ -11,14 +11,15 @@ import java.util.SortedMap;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.LogiskPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.HelgHarYtelsedager;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
 public class LogiskPeriodeTjeneste {
 
-    private boolean ytelseIHelg;
+    private final boolean helgHarYtelsedager;
 
-    LogiskPeriodeTjeneste(boolean ytelseIHelg) {
-        this.ytelseIHelg = ytelseIHelg;
+    private LogiskPeriodeTjeneste(boolean helgHarYtelsedager) {
+        this.helgHarYtelsedager = helgHarYtelsedager;
     }
 
     public static LogiskPeriodeTjeneste forDagytelse() {
@@ -30,7 +31,7 @@ public class LogiskPeriodeTjeneste {
     }
 
     public static LogiskPeriodeTjeneste forYtelseType(FagsakYtelseType ytelseType) {
-        return new LogiskPeriodeTjeneste(ytelseType == FagsakYtelseType.OMSORGSPENGER || ytelseType == FagsakYtelseType.ENGANGSTØNAD);
+        return new LogiskPeriodeTjeneste(HelgHarYtelsedager.helgHarYtelsedager(ytelseType));
     }
 
     public List<LogiskPeriode> utledLogiskPeriode(SortedMap<Periode, BigDecimal> feilutbetalingPrPeriode) {
@@ -61,7 +62,7 @@ public class LogiskPeriodeTjeneste {
     }
 
     private boolean harYtelsedagerMellom(LocalDate dag1, LocalDate dag2) {
-        if (ytelseIHelg) {
+        if (helgHarYtelsedager) {
             return ChronoUnit.DAYS.between(dag1, dag2) > 1;
         } else {
             return harUkedagerMellom(dag1, dag2);
