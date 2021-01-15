@@ -24,6 +24,10 @@ public class BeregnBeløpUtilTest {
         Periode kravgrunnlagPeriode = Periode.of(mandag, søndag);
         Periode vilkårPeriode = Periode.of(lørdag, nesteSøndag);
 
+
+        //beløp pr ytelsesdag = beløp/antall ukedager i perioden
+        Assertions.assertThat(beløpUtil.beregnBeløpPrYtelsedag(BigDecimal.valueOf(500), kravgrunnlagPeriode)).isEqualByComparingTo(BigDecimal.valueOf(100));
+
         BigDecimal feilPerDag = BigDecimal.valueOf(100);
         BigDecimal resultat = beløpUtil.beregnBeløp(kravgrunnlagPeriode, vilkårPeriode, feilPerDag);
 
@@ -44,5 +48,25 @@ public class BeregnBeløpUtilTest {
         BigDecimal resultat = beløpUtil.beregnBeløp(kravgrunnlagPeriode, vilkårPeriode, feilPerDag);
 
         Assertions.assertThat(resultat).isEqualByComparingTo(BigDecimal.valueOf(100000));
+    }
+
+    @Test
+    void skal_ta_med_helger_for_omsorgspenger() {
+        BeregnBeløpUtil beløpUtil = BeregnBeløpUtil.forFagområde(FagOmrådeKode.ENGANGSSTØNAD);
+
+        LocalDate mandag = LocalDate.of(2020, 9, 7);
+        LocalDate fredag = mandag.plusDays(4);
+        LocalDate lørdag = mandag.plusDays(5);
+
+        Periode kravgrunnlagPeriode = Periode.of(fredag, lørdag);
+        Periode vilkårPeriode = Periode.of(fredag, lørdag);
+
+        //beløp pr ytelsesdag = beløp/antall kalenderdager i perioden
+        Assertions.assertThat(beløpUtil.beregnBeløpPrYtelsedag(BigDecimal.valueOf(2000), Periode.of(fredag, lørdag))).isEqualByComparingTo(BigDecimal.valueOf(1000));
+
+        BigDecimal feilPerDag = BigDecimal.valueOf(1000);
+        BigDecimal resultat = beløpUtil.beregnBeløp(kravgrunnlagPeriode, vilkårPeriode, feilPerDag);
+
+        Assertions.assertThat(resultat).isEqualByComparingTo(BigDecimal.valueOf(2000));
     }
 }
