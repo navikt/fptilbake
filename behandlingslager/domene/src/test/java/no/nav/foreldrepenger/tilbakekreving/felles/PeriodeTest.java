@@ -2,6 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.felles;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 
 import org.junit.jupiter.api.Test;
@@ -34,5 +35,18 @@ public class PeriodeTest {
         assertThat(Periode.of(d1, d2).erOmsluttetAv(Periode.of(d1, d2))).isTrue();
         assertThat(Periode.of(d1, d3).erOmsluttetAv(Periode.of(d1, d2))).isFalse();
         assertThat(Periode.of(d1, d2).erOmsluttetAv(Periode.of(d1, d3))).isTrue();
+    }
+
+    @Test
+    void skal_gi_antall_kalenderdager() {
+        assertThat(Periode.of(d1, d1).antallKalenderdager()).isEqualTo(1);
+        assertThat(Periode.of(d1, d1.plusDays(6)).antallKalenderdager()).isEqualTo(7);
+    }
+
+    @Test
+    void skal_gi_antall_ukedager() {
+        assertThat(d1.getDayOfWeek()).isEqualTo(DayOfWeek.TUESDAY);
+        assertThat(Periode.of(d1, d1).antallUkedager()).isEqualTo(1);
+        assertThat(Periode.of(d1, d1.plusDays(6)).antallUkedager()).isEqualTo(5);
     }
 }
