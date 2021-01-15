@@ -18,8 +18,8 @@
             <artifactId>felles-bom</artifactId>
         </dependency>
         <dependency>
-            <groupId>no.nav.foreldrepenger.felles.ukelonn.integrasjon</groupId>
-            <artifactId>felles-integrasjon-jms</artifactId>
+            <groupId>no.nav.vedtak.felles</groupId>
+            <artifactId>jms-integrasjon</artifactId>
         </dependency>
     </dependencies>
 
