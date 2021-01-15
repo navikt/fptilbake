@@ -38,7 +38,7 @@ public class TilbakekrevingBeregningTjenesteTest extends FellesTestOppsett {
 
     @BeforeEach
     void setUp() {
-        tjeneste = new TilbakekrevingBeregningTjeneste(repoProvider, kravgrunnlagBeregningTjeneste);
+        tjeneste = new TilbakekrevingBeregningTjeneste(repoProvider);
     }
 
     @Test

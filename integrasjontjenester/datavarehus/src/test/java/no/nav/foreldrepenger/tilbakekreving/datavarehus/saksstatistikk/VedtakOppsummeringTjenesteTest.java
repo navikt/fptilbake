@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingBeregningTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandlingsresultat;
@@ -92,10 +91,7 @@ public class VedtakOppsummeringTjenesteTest {
         vilkårsvurderingRepository = repositoryProvider.getVilkårsvurderingRepository();
         behandlingVedtakRepository = repositoryProvider.getBehandlingVedtakRepository();
         kravgrunnlagRepository = repositoryProvider.getGrunnlagRepository();
-        KravgrunnlagBeregningTjeneste kravgrunnlagBeregningTjeneste = new KravgrunnlagBeregningTjeneste(
-            kravgrunnlagRepository);
-        TilbakekrevingBeregningTjeneste tilbakekrevingBeregningTjeneste = new TilbakekrevingBeregningTjeneste(
-            repositoryProvider, kravgrunnlagBeregningTjeneste);
+        TilbakekrevingBeregningTjeneste tilbakekrevingBeregningTjeneste = new TilbakekrevingBeregningTjeneste(repositoryProvider);
         vedtakOppsummeringTjeneste = new VedtakOppsummeringTjeneste(repositoryProvider, tilbakekrevingBeregningTjeneste);
 
         entityManager.setFlushMode(FlushModeType.AUTO);

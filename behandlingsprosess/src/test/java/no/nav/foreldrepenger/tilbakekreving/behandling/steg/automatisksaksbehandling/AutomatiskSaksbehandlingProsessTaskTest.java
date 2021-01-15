@@ -120,6 +120,7 @@ public class AutomatiskSaksbehandlingProsessTaskTest {
 
     @BeforeEach
     public void setup(EntityManager entityManager) {
+        //TODO rydde her.. er det mulig å heller bruke CDI for å injecte det som trengs???
         repositoryProvider = new BehandlingRepositoryProvider(entityManager);
         behandlingRepository = repositoryProvider.getBehandlingRepository();
         KravgrunnlagRepository kravgrunnlagRepository = repositoryProvider.getGrunnlagRepository();
@@ -127,56 +128,38 @@ public class AutomatiskSaksbehandlingProsessTaskTest {
         totrinnRepository = new TotrinnRepository(entityManager);
         VarselresponsRepository varselresponsRepository = new VarselresponsRepository(entityManager);
         taskRepository = new ProsessTaskRepositoryImpl(entityManager, null, null);
-        FellesQueriesForBehandlingRepositories fellesQueriesForBehandlingRepositories = new FellesQueriesForBehandlingRepositories(
-            entityManager);
-        BehandlingVenterRepository behandlingVenterRepository = new BehandlingVenterRepository(
-            fellesQueriesForBehandlingRepositories);
-        BehandlingKandidaterRepository behandlingKandidaterRepository = new BehandlingKandidaterRepository(
-            fellesQueriesForBehandlingRepositories);
+        FellesQueriesForBehandlingRepositories fellesQueriesForBehandlingRepositories = new FellesQueriesForBehandlingRepositories(entityManager);
+        BehandlingVenterRepository behandlingVenterRepository = new BehandlingVenterRepository(fellesQueriesForBehandlingRepositories);
+        BehandlingKandidaterRepository behandlingKandidaterRepository = new BehandlingKandidaterRepository(fellesQueriesForBehandlingRepositories);
         InternalManipulerBehandling manipulerBehandling = new InternalManipulerBehandling(repositoryProvider);
         HistorikkInnslagKonverter historikkInnslagKonverter = new HistorikkInnslagKonverter(aksjonspunktRepository);
-        historikkTjenesteAdapter = new HistorikkTjenesteAdapter(repositoryProvider.getHistorikkRepository(),
-            historikkInnslagKonverter);
+        historikkTjenesteAdapter = new HistorikkTjenesteAdapter(repositoryProvider.getHistorikkRepository(), historikkInnslagKonverter);
         AvklartFaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste = new AvklartFaktaFeilutbetalingTjeneste(
             repositoryProvider.getFaktaFeilutbetalingRepository(), historikkTjenesteAdapter);
 
         VarselresponsTjeneste varselresponsTjeneste = new VarselresponsTjeneste(varselresponsRepository);
-        gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjeneste(taskRepository, behandlingKandidaterRepository,
-            behandlingVenterRepository, repositoryProvider, varselresponsTjeneste);
+        gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjeneste(taskRepository, behandlingKandidaterRepository, behandlingVenterRepository, repositoryProvider, varselresponsTjeneste);
 
-        KravgrunnlagTjeneste kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repositoryProvider,
-            gjenopptaBehandlingTjeneste, null, null);
+        KravgrunnlagTjeneste kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repositoryProvider, gjenopptaBehandlingTjeneste, null, null);
 
-        faktaFastsettelseTjeneste = new AutomatiskFaktaFastsettelseTjeneste(faktaFeilutbetalingTjeneste,
-            kravgrunnlagTjeneste);
-        vurderForeldelseAksjonspunktUtleder = new VurderForeldelseAksjonspunktUtleder(Period.ofWeeks(-1),
-            kravgrunnlagRepository, behandlingRepository);
+        faktaFastsettelseTjeneste = new AutomatiskFaktaFastsettelseTjeneste(faktaFeilutbetalingTjeneste, kravgrunnlagTjeneste);
+        vurderForeldelseAksjonspunktUtleder = new VurderForeldelseAksjonspunktUtleder(Period.ofWeeks(-1), kravgrunnlagRepository, behandlingRepository);
 
-        KravgrunnlagBeregningTjeneste kravgrunnlagBeregningTjeneste = new KravgrunnlagBeregningTjeneste(
-            kravgrunnlagRepository);
-        VurdertForeldelseTjeneste vurdertForeldelseTjeneste = new VurdertForeldelseTjeneste(repositoryProvider,
-            historikkTjenesteAdapter, kravgrunnlagBeregningTjeneste);
-        automatiskVurdertForeldelseTjeneste = new AutomatiskVurdertForeldelseTjeneste(
-            vurderForeldelseAksjonspunktUtleder, vurdertForeldelseTjeneste);
-        VilkårsvurderingHistorikkInnslagTjeneste vilkårsvurderingHistorikkInnslagTjeneste = new VilkårsvurderingHistorikkInnslagTjeneste(
-            historikkTjenesteAdapter, repositoryProvider);
+        KravgrunnlagBeregningTjeneste kravgrunnlagBeregningTjeneste = new KravgrunnlagBeregningTjeneste(kravgrunnlagRepository);
+        VurdertForeldelseTjeneste vurdertForeldelseTjeneste = new VurdertForeldelseTjeneste(repositoryProvider, historikkTjenesteAdapter, kravgrunnlagBeregningTjeneste);
+        automatiskVurdertForeldelseTjeneste = new AutomatiskVurdertForeldelseTjeneste(vurderForeldelseAksjonspunktUtleder, vurdertForeldelseTjeneste);
+        VilkårsvurderingHistorikkInnslagTjeneste vilkårsvurderingHistorikkInnslagTjeneste = new VilkårsvurderingHistorikkInnslagTjeneste(historikkTjenesteAdapter, repositoryProvider);
 
-        VilkårsvurderingTjeneste vilkårsvurderingTjeneste = new VilkårsvurderingTjeneste(vurdertForeldelseTjeneste,
-            repositoryProvider, vilkårsvurderingHistorikkInnslagTjeneste, kravgrunnlagBeregningTjeneste);
+        VilkårsvurderingTjeneste vilkårsvurderingTjeneste = new VilkårsvurderingTjeneste(vurdertForeldelseTjeneste, repositoryProvider, vilkårsvurderingHistorikkInnslagTjeneste, kravgrunnlagBeregningTjeneste);
 
-        automatiskVurdertVilkårTjeneste = new AutomatiskVurdertVilkårTjeneste(vilkårsvurderingTjeneste,
-            aksjonspunktRepository);
-        tilbakekrevingBeregningTjeneste = new TilbakekrevingBeregningTjeneste(repositoryProvider,
-            kravgrunnlagBeregningTjeneste);
+        automatiskVurdertVilkårTjeneste = new AutomatiskVurdertVilkårTjeneste(vilkårsvurderingTjeneste, aksjonspunktRepository);
+        tilbakekrevingBeregningTjeneste = new TilbakekrevingBeregningTjeneste(repositoryProvider);
         prosessTaskIverksett = new ProsessTaskIverksett(taskRepository, repositoryProvider.getBrevSporingRepository());
         BehandlingModellRepository behandlingModellRepositoryMock = Mockito.mock(BehandlingModellRepository.class);
-        BehandlingskontrollEventPubliserer behandlingskontrollEventPublisererMock = mock(
-            BehandlingskontrollEventPubliserer.class);
-        behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(repositoryProvider,
-            behandlingModellRepositoryMock, behandlingskontrollEventPublisererMock);
+        BehandlingskontrollEventPubliserer behandlingskontrollEventPublisererMock = mock(BehandlingskontrollEventPubliserer.class);
+        behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(repositoryProvider, behandlingModellRepositoryMock, behandlingskontrollEventPublisererMock);
 
-        automatiskSaksbehandlingProsessTask = new AutomatiskSaksbehandlingProsessTask(behandlingRepository,
-            behandlingskontrollTjeneste);
+        automatiskSaksbehandlingProsessTask = new AutomatiskSaksbehandlingProsessTask(behandlingRepository, behandlingskontrollTjeneste);
         entityManager.setFlushMode(FlushModeType.AUTO);
         behandling = scenarioSimple.medBehandlingType(BehandlingType.TILBAKEKREVING)
             .medDefaultKravgrunnlag()

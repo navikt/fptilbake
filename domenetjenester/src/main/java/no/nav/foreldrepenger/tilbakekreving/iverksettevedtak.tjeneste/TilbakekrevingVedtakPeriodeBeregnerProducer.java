@@ -5,11 +5,17 @@ import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.HelgHarYtelsedager;
 
 @ApplicationScoped
 public class TilbakekrevingVedtakPeriodeBeregnerProducer {
 
     private TilbakekrevingBeregningTjeneste beregningTjeneste;
+
+
+    TilbakekrevingVedtakPeriodeBeregnerProducer() {
+        //for CDI proxy
+    }
 
     @Inject
     public TilbakekrevingVedtakPeriodeBeregnerProducer(TilbakekrevingBeregningTjeneste beregningTjeneste) {
@@ -17,7 +23,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerProducer {
     }
 
     public TilbakekrevingVedtakPeriodeBeregner lagVedtakPeriodeBeregner(FagsakYtelseType ytelseType) {
-        return lagVedtakPeriodeBeregner(ytelseType == FagsakYtelseType.OMSORGSPENGER || ytelseType == FagsakYtelseType.ENGANGSTØNAD);
+        return lagVedtakPeriodeBeregner(HelgHarYtelsedager.helgHarYtelsedager(ytelseType));
     }
 
     public TilbakekrevingVedtakPeriodeBeregner lagVedtakPeriodeBeregner(boolean helgHarYtelsedager) {
