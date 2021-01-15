@@ -2,7 +2,6 @@ package no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -33,11 +32,6 @@ public class TilbakekrevingPeriode {
 
     public TilbakekrevingPeriode medBeløp(TilbakekrevingBeløp beløp) {
         this.beløp.add(beløp);
-        return this;
-    }
-
-    public TilbakekrevingPeriode medBeløp(Collection<TilbakekrevingBeløp> beløp) {
-        this.beløp.addAll(beløp);
         return this;
     }
 

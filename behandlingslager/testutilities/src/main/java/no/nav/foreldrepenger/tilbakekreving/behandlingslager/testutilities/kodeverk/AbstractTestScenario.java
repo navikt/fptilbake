@@ -86,15 +86,6 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
         fagsak = lagFagsak(bruker);
     }
 
-    protected AbstractTestScenario(AktørId aktørId) {
-        NavBruker bruker = NavBruker.opprettNy(aktørId, Språkkode.nb);
-        fagsak = lagFagsak(bruker);
-    }
-
-    protected AbstractTestScenario(NavBruker navBruker) {
-        fagsak = lagFagsak(navBruker);
-    }
-
     private Fagsak lagFagsak(NavBruker bruker) {
         return Fagsak.opprettNy(eksternSaksnummer, bruker);
     }
@@ -265,7 +256,6 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
         mockBehandlingRepository();
         return repositoryProvider;
     }
-
 
     public FagsakRepository mockFagsakRepository() {
         FagsakRepository fagsakRepository = mock(FagsakRepository.class);
