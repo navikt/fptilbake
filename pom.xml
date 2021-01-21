@@ -285,6 +285,19 @@
                 <groupId>no.nav.vedtak.felles</groupId>
                 <artifactId>jms-integrasjon</artifactId>
                 <version>2.0.0</version>
+
+                <exclusions>
+                    <exclusion>
+                        <!-- denne drar inn en versjon som ikke fungerer i prod p.t. -->
+                        <groupId>com.ibm.mq</groupId>
+                        <artifactId>com.ibm.mq.allclient</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.ibm.mq</groupId>
+                <artifactId>com.ibm.mq.allclient</artifactId>
+                <version>9.2.0.1</version>
             </dependency>
             <dependency>
                 <groupId>no.nav.foreldrepenger.felles</groupId>

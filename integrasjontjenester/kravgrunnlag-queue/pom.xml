@@ -21,6 +21,11 @@
             <groupId>no.nav.vedtak.felles</groupId>
             <artifactId>jms-integrasjon</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.ibm.mq</groupId>
+            <artifactId>com.ibm.mq.allclient</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>
