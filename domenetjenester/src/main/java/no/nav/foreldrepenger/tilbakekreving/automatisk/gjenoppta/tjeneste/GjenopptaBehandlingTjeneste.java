@@ -61,33 +61,42 @@ public class GjenopptaBehandlingTjeneste {
     }
 
     /**
-         * Finner behandlinger som står på vent, som kan fortsettes automatisk.
-         * @return
-         */
+     * Finner behandlinger som står på vent, som kan fortsettes automatisk.
+     *
+     * @return
+     */
     public String automatiskGjenopptaBehandlinger() {
+        final String callId = hentCallId();
         Set<Behandling> behandlinger = behandlingKandidaterRepository.finnBehandlingerForAutomatiskGjenopptagelse();
 
-        final String callId = hentCallId();
-
-        behandlinger.forEach(behandling -> {
-            long behandlingId = behandling.getId();
-            String nyCallId = callId + behandlingId;
-            if (kanGjenopptaSteg(behandlingId) || !grunnlagRepository.harGrunnlagForBehandlingId(behandlingId)) {
-                opprettFortsettBehandlingTask(behandling, nyCallId);
-            } else {
-                logger.info("Behandling med id={} har et sperret kravgrunnlag, kan ikke gjenopptatt,", behandlingId);
-            }
-        });
-
+        for (Behandling behandling : behandlinger) {
+            gjenopptaBehandlingOmMulig(callId, behandling);
+        }
         return "-";
     }
 
+    public void gjenopptaBehandlingOmMulig(String callId, Behandling behandling) {
+        long behandlingId = behandling.getId();
+        String nyCallId = callId + behandlingId;
+        KravgrunnlagTilstand status = kanGjennopptaStatus(behandlingId);
+        if (status == KravgrunnlagTilstand.OK || status == KravgrunnlagTilstand.KRAVGRUNNLAG_MANGLER) {
+            opprettFortsettBehandlingTask(behandling, nyCallId);
+        } else if (status == KravgrunnlagTilstand.KRAVGRUNNLAG_ER_SPERRET) {
+            logger.info("Behandling med id={} har et sperret kravgrunnlag, kan ikke gjenopptas,", behandlingId);
+        } else if (status == KravgrunnlagTilstand.KRAVGRUNNLAG_ER_UGYLDIG) {
+            logger.info("Behandling med id={} har et ugyldig kravgrunnlag, kan ikke gjenopptas,", behandlingId);
+        } else {
+            throw new IllegalArgumentException("Ikke-støttet status: " + status);
+        }
+    }
+
     /**
-         * Fortsetter behandling manuelt, registrerer brukerrespons hvis i varsel-steg
-         * og venter på brukerrespons.
-         * @param behandlingId
-         * @return
-         */
+     * Fortsetter behandling manuelt, registrerer brukerrespons hvis i varsel-steg
+     * og venter på brukerrespons.
+     *
+     * @param behandlingId
+     * @return
+     */
     public Optional<String> fortsettBehandlingManuelt(long behandlingId, HistorikkAktør historikkAktør) {
         Optional<Behandling> behandlingOpt = behandlingVenterRepository.hentBehandlingPåVent(behandlingId);
         if (behandlingOpt.isPresent()) {
@@ -106,10 +115,11 @@ public class GjenopptaBehandlingTjeneste {
     }
 
     /**
-         * Fortsetter behandling ved registrering av grunnlag dersom behandling er i TBKGSTEG.
-         * @param behandlingId
-         * @return
-         */
+     * Fortsetter behandling ved registrering av grunnlag dersom behandling er i TBKGSTEG.
+     *
+     * @param behandlingId
+     * @return
+     */
     public Optional<String> fortsettBehandlingMedGrunnlag(long behandlingId) {
         Optional<Behandling> behandlingOpt = behandlingVenterRepository.hentBehandlingPåVent(behandlingId);
         if (behandlingOpt.isPresent()) {
@@ -122,10 +132,11 @@ public class GjenopptaBehandlingTjeneste {
     }
 
     /**
-         * Fortsetter behandling, oppretter FortsettBehandlingTask
-         * @param behandlingId
-         * @return prosesstask gruppe ID
-         */
+     * Fortsetter behandling, oppretter FortsettBehandlingTask
+     *
+     * @param behandlingId
+     * @return prosesstask gruppe ID
+     */
     public Optional<String> fortsettBehandling(long behandlingId) {
         Optional<Behandling> behandlingOpt = behandlingVenterRepository.hentBehandlingPåVent(behandlingId);
 
@@ -141,23 +152,43 @@ public class GjenopptaBehandlingTjeneste {
     }
 
     /**
-         * Henter status for prosesstaskgruppe
-         * @param gruppe
-         * @return
-         */
+     * Henter status for prosesstaskgruppe
+     *
+     * @param gruppe
+     * @return
+     */
     public List<TaskStatus> hentStatusForGjenopptaBehandlingGruppe(String gruppe) {
         return prosessTaskRepository.finnStatusForTaskIGruppe(GjenopptaBehandlingTask.TASKTYPE, gruppe);
     }
 
     /**
-         * Sjekk om behandling kan ta av vent
-         * @param behandlingId
-         * @return
-         */
+     * Sjekk om behandling kan ta av vent
+     *
+     * @param behandlingId
+     * @return
+     */
     public boolean kanGjenopptaSteg(long behandlingId) {
-        return grunnlagRepository.harGrunnlagForBehandlingId(behandlingId)
-            && !grunnlagRepository.erKravgrunnlagSperret(behandlingId)
-            && grunnlagRepository.erKravgrunnlagSomForventet(behandlingId);
+        return kanGjennopptaStatus(behandlingId) == KravgrunnlagTilstand.OK;
+    }
+
+    private KravgrunnlagTilstand kanGjennopptaStatus(long behandlingId) {
+        if (!grunnlagRepository.harGrunnlagForBehandlingId(behandlingId)) {
+            return KravgrunnlagTilstand.KRAVGRUNNLAG_MANGLER;
+        }
+        if (grunnlagRepository.erKravgrunnlagSperret(behandlingId)) {
+            return KravgrunnlagTilstand.KRAVGRUNNLAG_ER_SPERRET;
+        }
+        if (!grunnlagRepository.erKravgrunnlagSomForventet(behandlingId)) {
+            return KravgrunnlagTilstand.KRAVGRUNNLAG_ER_UGYLDIG;
+        }
+        return KravgrunnlagTilstand.OK;
+    }
+
+    public enum KravgrunnlagTilstand {
+        OK,
+        KRAVGRUNNLAG_MANGLER,
+        KRAVGRUNNLAG_ER_SPERRET,
+        KRAVGRUNNLAG_ER_UGYLDIG
     }
 
     private String hentCallId() {
