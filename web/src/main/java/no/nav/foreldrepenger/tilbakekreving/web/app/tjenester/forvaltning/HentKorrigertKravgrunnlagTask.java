@@ -85,7 +85,7 @@ public class HentKorrigertKravgrunnlagTask implements ProsessTaskHandler {
             EksternBehandlingsinfoDto eksternBehandlingsinfoDto = hentEksternBehandlingFraFpsak(behandling, henvisning);
             oppdaterEksternBehandling(behandling, eksternBehandlingsinfoDto);
         }
-        kravgrunnlagRepository.lagre(behandlingId, korrigertKravgrunnlag);
+        kravgrunnlagRepository.lagreOgFiksDuplikateKravgrunnlag(behandlingId, korrigertKravgrunnlag);
     }
 
     private HentKravgrunnlagDetaljDto forberedHentKravgrunnlagDetailRequest(String kravgrunnlagId, String ansvarligEnhet,
