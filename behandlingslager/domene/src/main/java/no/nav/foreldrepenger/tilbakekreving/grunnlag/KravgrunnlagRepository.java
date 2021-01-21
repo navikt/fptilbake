@@ -3,6 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.grunnlag;
 import static no.nav.vedtak.felles.jpa.HibernateVerktøy.hentEksaktResultat;
 import static no.nav.vedtak.felles.jpa.HibernateVerktøy.hentUniktResultat;
 
+import java.util.List;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -33,16 +34,32 @@ public class KravgrunnlagRepository {
     }
 
     @Inject
-    public KravgrunnlagRepository( EntityManager entityManager) {
+    public KravgrunnlagRepository(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 
     public void lagre(Long behandlingId, Kravgrunnlag431 kravgrunnlag) {
-        Optional<KravgrunnlagAggregateEntity> forrigeGrunnlag = finnKravgrunnlagOptional(behandlingId);
-        if (forrigeGrunnlag.isPresent()) {
-            forrigeGrunnlag.get().disable();
-            entityManager.persist(forrigeGrunnlag.get());
+        Optional<KravgrunnlagAggregateEntity> forrigeKravgrunnlag = finnKravgrunnlagOptional(behandlingId);
+        if (forrigeKravgrunnlag.isPresent()) {
+            forrigeKravgrunnlag.get().disable();
+            entityManager.persist(forrigeKravgrunnlag.get());
         }
+        lagreNyttKravgrunnlag(behandlingId, kravgrunnlag);
+    }
+
+    public void lagreOgFiksDuplikateKravgrunnlag(Long behandlingId, Kravgrunnlag431 kravgrunnlag) {
+        List<KravgrunnlagAggregateEntity> forrigeKravgrunnlag = finnAktiveKravgrunnlag(behandlingId);
+        for (KravgrunnlagAggregateEntity forrige : forrigeKravgrunnlag) {
+            forrige.disable();
+            entityManager.persist(forrige);
+            if (forrigeKravgrunnlag.size() > 1) {
+                logger.warn("Fikser duplikate kravgrunnlag, disabler kravgrunnlagAggregateEntity {} for behandling {}", forrige.getId(), behandlingId);
+            }
+        }
+        lagreNyttKravgrunnlag(behandlingId, kravgrunnlag);
+    }
+
+    private void lagreNyttKravgrunnlag(Long behandlingId, Kravgrunnlag431 kravgrunnlag) {
         KravgrunnlagAggregateEntity aggregate = new KravgrunnlagAggregateEntity.Builder()
             .medGrunnlagØkonomi(kravgrunnlag)
             .medBehandlingId(behandlingId)
@@ -124,6 +141,11 @@ public class KravgrunnlagRepository {
     private Optional<KravgrunnlagAggregateEntity> finnKravgrunnlagOptional(Long behandlingId) {
         TypedQuery<KravgrunnlagAggregateEntity> query = lagFinnKravgrunnlagQuery(behandlingId);
         return hentUniktResultat(query);
+    }
+
+    private List<KravgrunnlagAggregateEntity> finnAktiveKravgrunnlag(Long behandlingId) {
+        TypedQuery<KravgrunnlagAggregateEntity> query = lagFinnKravgrunnlagQuery(behandlingId);
+        return query.getResultList();
     }
 
     private TypedQuery<KravgrunnlagAggregateEntity> lagFinnKravgrunnlagQuery(Long behandlingId) {
