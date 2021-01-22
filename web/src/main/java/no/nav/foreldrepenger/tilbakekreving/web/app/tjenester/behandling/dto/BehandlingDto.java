@@ -215,7 +215,13 @@ public class BehandlingDto {
         this.førsteÅrsak = førsteÅrsak;
     }
 
+    @Deprecated (forRemoval = true, since = "dato=22.01.2020") //skal bruke norske tegn (se under)
     @JsonProperty("behandlingArsaker")
+    public List<BehandlingÅrsakDto> getBehandlingArsaker() {
+        return behandlingÅrsaker;
+    }
+
+    @JsonProperty("behandlingÅrsaker")
     public List<BehandlingÅrsakDto> getBehandlingÅrsaker() {
         return behandlingÅrsaker;
     }
