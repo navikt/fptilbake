@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
+import javax.persistence.Version;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 
@@ -26,6 +27,10 @@ public class VedtaksbrevFritekstOppsummering extends BaseEntitet {
     @Lob
     @Column(name = "FRITEKST")
     private String oppsummeringFritekst;
+
+    @Version
+    @Column(name = "versjon", nullable = false)
+    private long versjon;
 
     public VedtaksbrevFritekstOppsummering() {
     }

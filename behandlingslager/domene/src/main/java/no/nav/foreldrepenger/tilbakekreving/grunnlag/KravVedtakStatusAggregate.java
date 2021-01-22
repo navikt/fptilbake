@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Version;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
@@ -33,6 +34,10 @@ class KravVedtakStatusAggregate extends BaseEntitet {
     @Convert(converter = BooleanToStringConverter.class)
     @Column(name = "aktiv", nullable = false)
     private boolean aktiv = true;
+
+    @Version
+    @Column(name = "versjon", nullable = false)
+    private long versjon;
 
     KravVedtakStatusAggregate() {
         // Hibernate

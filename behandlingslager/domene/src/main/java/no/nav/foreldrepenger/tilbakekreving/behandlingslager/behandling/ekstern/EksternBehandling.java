@@ -10,6 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Version;
 
 import org.hibernate.annotations.NaturalId;
 
@@ -38,6 +39,10 @@ public class EksternBehandling extends BaseEntitet {
     private UUID eksternUuid;
 
     private Henvisning henvisning;
+
+    @Version
+    @Column(name = "versjon", nullable = false)
+    private long versjon;
 
     EksternBehandling() {
         // Hibernate

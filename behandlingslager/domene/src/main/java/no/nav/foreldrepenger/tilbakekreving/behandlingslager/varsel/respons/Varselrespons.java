@@ -9,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Version;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
@@ -30,6 +31,10 @@ public class Varselrespons extends BaseEntitet {
 
     @Column(name = "kilde", nullable = false)
     private String kilde;
+
+    @Version
+    @Column(name = "versjon", nullable = false)
+    private long versjon;
 
     private Varselrespons() {
         // Hibernate

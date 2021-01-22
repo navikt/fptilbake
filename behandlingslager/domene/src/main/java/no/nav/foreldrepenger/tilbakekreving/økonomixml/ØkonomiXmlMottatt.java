@@ -8,6 +8,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
+import javax.persistence.Version;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkBaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
@@ -43,6 +44,10 @@ public class ØkonomiXmlMottatt extends KodeverkBaseEntitet {
     @Convert(converter = BooleanToStringConverter.class)
     @Column(name = "tilkoblet", nullable = false)
     private boolean tilkoblet = false;
+
+    @Version
+    @Column(name = "versjon", nullable = false)
+    private long versjon;
 
     ØkonomiXmlMottatt() {
         //for hibernate

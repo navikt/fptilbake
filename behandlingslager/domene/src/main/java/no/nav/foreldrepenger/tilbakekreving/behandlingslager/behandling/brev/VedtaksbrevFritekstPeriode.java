@@ -12,6 +12,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Version;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
@@ -40,6 +41,10 @@ public class VedtaksbrevFritekstPeriode extends BaseEntitet {
 
     @Column(name = "FRITEKST", nullable = false)
     private String fritekst;
+
+    @Version
+    @Column(name = "versjon", nullable = false)
+    private long versjon;
 
     public VedtaksbrevFritekstPeriode() {
     }
