@@ -9,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Version;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkBaseEntitet;
@@ -33,6 +34,10 @@ public class BrevSporing extends KodeverkBaseEntitet {
     @Convert(converter = BrevType.KodeverdiConverter.class)
     @Column(name = "brev_type", nullable = false)
     private BrevType brevType = BrevType.UDEFINERT;
+
+    @Version
+    @Column(name = "versjon", nullable = false)
+    private long versjon;
 
     public BrevSporing() {
     }

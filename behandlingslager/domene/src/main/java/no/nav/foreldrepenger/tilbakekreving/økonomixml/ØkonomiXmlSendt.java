@@ -8,6 +8,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
+import javax.persistence.Version;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 
@@ -33,6 +34,10 @@ public class ØkonomiXmlSendt extends BaseEntitet {
     @Convert(converter = MeldingType.KodeverdiConverter.class)
     @Column(name = "melding_type", nullable = false)
     private MeldingType meldingType;
+
+    @Version
+    @Column(name = "versjon", nullable = false)
+    private long versjon;
 
     private ØkonomiXmlSendt() {
     }
