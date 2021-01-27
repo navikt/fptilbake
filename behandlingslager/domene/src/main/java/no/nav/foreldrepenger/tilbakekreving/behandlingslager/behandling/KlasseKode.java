@@ -65,6 +65,7 @@ public enum KlasseKode implements Kodeverdi {
 
     //JUST klassekoder
     KL_KODE_JUST_KORTTID("KL_KODE_JUST_KORTTID"),
+    KL_KODE_JUST_REFUTG("KL_KODE_JUST_REFUTG"),
 
     //FRISINN klassekoder
     FRISINN_FRILANS("FRISINN-FRILANS"),
