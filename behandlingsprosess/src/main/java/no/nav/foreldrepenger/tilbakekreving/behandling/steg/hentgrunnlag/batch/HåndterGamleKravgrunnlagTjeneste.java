@@ -41,7 +41,7 @@ import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.HentKravgrunnlagDetaljDto;
 @ApplicationScoped
 public class HåndterGamleKravgrunnlagTjeneste {
 
-    private static final Logger logger = LoggerFactory.getLogger(HåndterGamleKravgrunnlagTjeneste.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HåndterGamleKravgrunnlagTjeneste.class);
     private ØkonomiMottattXmlRepository mottattXmlRepository;
     private KravgrunnlagRepository grunnlagRepository;
     private HentKravgrunnlagMapper hentKravgrunnlagMapper;
@@ -78,17 +78,19 @@ public class HåndterGamleKravgrunnlagTjeneste {
         HentKravgrunnlagDetaljDto hentKravgrunnlagDetalj = forberedHentKravgrunnlagRequest(detaljertKravgrunnlag);
         try {
             DetaljertKravgrunnlagDto detaljertKravgrunnlagDto = økonomiConsumer.hentKravgrunnlag(null, hentKravgrunnlagDetalj);
+            LOG.info("Referanse fra WS: {}", detaljertKravgrunnlagDto.getReferanse());
             return KravgrunnlagMedStatus.forIkkeSperretKravgrunnlag(hentKravgrunnlagMapper.mapTilDomene(detaljertKravgrunnlagDto));
         } catch (ManglendeKravgrunnlagException e) {
-            logger.info("Kravgrunnlag mangler i økonomi med følgende respons:{}", e.getMessage());
+            LOG.info("Kravgrunnlag mangler i økonomi med følgende respons:{}", e.getMessage());
             arkiverMotattXml(mottattXmlId, melding);
         } catch (SperringKravgrunnlagException e) {
-            logger.info("Kravgrunnlag er sperret med følgende respons:{}", e.getMessage());
+            LOG.info("Kravgrunnlag er sperret med følgende respons:{}", e.getMessage());
             return hentSperretKravgrunnlag(økonomiXmlMottatt);
         } catch (UkjentOppdragssystemException e) {
             // ikke arkiver xml i tilfelle ukjent feil kommer fra økonomi
-            logger.warn(e.getMessage());
+            LOG.warn(e.getMessage());
         }
+        LOG.info("Finner ikke grunnlag.");
         return KravgrunnlagMedStatus.utenGrunnlag();
     }
 
@@ -107,6 +109,7 @@ public class HåndterGamleKravgrunnlagTjeneste {
                                                         KravgrunnlagMedStatus kravgrunnlagMedStatus) {
         Kravgrunnlag431 kravgrunnlag431 = kravgrunnlagMedStatus.getKravgrunnlag();
         try {
+            LOG.info("Referanse før validering: {}", kravgrunnlag431.getReferanse());
             KravgrunnlagValidator.validerGrunnlag(kravgrunnlag431);
             String saksnummer = kravgrunnlag431.getSaksnummer().getVerdi();
             //TODO k9-tilbake bytt String -> Saksnummer
@@ -123,7 +126,7 @@ public class HåndterGamleKravgrunnlagTjeneste {
                 håndterKravgrunnlagHvisBehandlingFinnes(mottattXmlId, kravgrunnlagMedStatus, saksnummer);
             }
         } catch (KravgrunnlagValidator.UgyldigKravgrunnlagException e) {
-            logger.warn("Kravgrunnlag for saksnummer{} med id={} er ugyldig og feiler med følgende exception:{}",
+            LOG.warn("Kravgrunnlag for saksnummer{} med id={} er ugyldig og feiler med følgende exception:{}",
                 kravgrunnlag431.getSaksnummer(),
                 kravgrunnlag431.getEksternKravgrunnlagId(),
                 e.getMessage());
@@ -141,10 +144,10 @@ public class HåndterGamleKravgrunnlagTjeneste {
         Kravgrunnlag431 kravgrunnlag431 = kravgrunnlagMedStatus.getKravgrunnlag();
         hentAktivBehandling(saksnummer).ifPresent(behandling -> {
             var behandlingId = behandling.getId();
-            logger.info("Lagrer mottatt kravgrunnlaget for behandling med behandlingId={}", behandlingId);
+            LOG.info("Lagrer mottatt kravgrunnlaget for behandling med behandlingId={}", behandlingId);
             grunnlagRepository.lagre(behandlingId, kravgrunnlag431);
             if (kravgrunnlagMedStatus.erKravgrunnlagSperret()) {
-                logger.info("Mottatt Kravgrunnlaget med kravgrunnlagId={} for behandling med behandlingId={} er sperret hos økonomi. Derfor sperrer det i fptilbake også.",
+                LOG.info("Mottatt Kravgrunnlaget med kravgrunnlagId={} for behandling med behandlingId={} er sperret hos økonomi. Derfor sperrer det i fptilbake også.",
                     kravgrunnlag431.getEksternKravgrunnlagId(), behandlingId);
                 sperrGrunnlag(behandlingId, kravgrunnlag431.getEksternKravgrunnlagId());
             }
@@ -156,9 +159,9 @@ public class HåndterGamleKravgrunnlagTjeneste {
         Optional<Behandling> aktivBehandling = hentAktivBehandling(saksnummer);
         if (aktivBehandling.isPresent()) {
             long behandlingId = aktivBehandling.get().getId();
-            logger.info("Behandling med behandlingId={} finnes allerede for saksnummer={}.Kan ikke opprette behandling igjen!", behandlingId, saksnummer);
+            LOG.info("Behandling med behandlingId={} finnes allerede for saksnummer={}.Kan ikke opprette behandling igjen!", behandlingId, saksnummer);
             if (grunnlagRepository.harGrunnlagForBehandlingId(behandlingId) && !grunnlagRepository.erKravgrunnlagSperret(behandlingId)) {
-                logger.info("Behandling med behandlingId={} har et aktivt grunnlag", behandlingId);
+                LOG.info("Behandling med behandlingId={} har et aktivt grunnlag", behandlingId);
             }
             return true;
         }
@@ -177,7 +180,7 @@ public class HåndterGamleKravgrunnlagTjeneste {
                 .filter(eksternBehandlingsinfoDto -> eksternBehandlingsinfoDto.getHenvisning().equals(henvisning)).findAny();
         }
         //FIXME k9-tilbake Må tilpasse for å støtte også k9
-        logger.warn("Saksnummer={} finnes ikke i fpsak", saksnummer);
+        LOG.warn("Saksnummer={} finnes ikke i fpsak", saksnummer);
         return Optional.empty();
     }
 
@@ -203,7 +206,7 @@ public class HåndterGamleKravgrunnlagTjeneste {
         Henvisning henvisning = kravgrunnlag431.getReferanse();
         oppdaterMedHenvisningOgSaksnummer(mottattXmlId, henvisning, saksnummer);
         long behandlingId = opprettBehandling(eksternBehandlingData);
-        logger.info("Behandling opprettet med behandlingId={}", behandlingId);
+        LOG.info("Behandling opprettet med behandlingId={}", behandlingId);
         lagreGrunnlag(behandlingId, kravgrunnlag431);
         tilkobleMottattXml(mottattXmlId);
         if (kravgrunnlagMedStatus.erKravgrunnlagSperret()) {
@@ -222,17 +225,17 @@ public class HåndterGamleKravgrunnlagTjeneste {
 
     private void lagreGrunnlag(long behandlingId, Kravgrunnlag431 kravgrunnlag431) {
         grunnlagRepository.lagre(behandlingId, kravgrunnlag431);
-        logger.info("Hentet kravgrunnlag med kravgrunnlagId={} lagret for behandlingId={}", kravgrunnlag431.getEksternKravgrunnlagId(), behandlingId);
+        LOG.info("Hentet kravgrunnlag med kravgrunnlagId={} lagret for behandlingId={}", kravgrunnlag431.getEksternKravgrunnlagId(), behandlingId);
     }
 
     private void tilkobleMottattXml(long mottattXmlId) {
         mottattXmlRepository.opprettTilkobling(mottattXmlId);
-        logger.info("Mottatt XML med id={} er tilkoblet", mottattXmlId);
+        LOG.info("Mottatt XML med id={} er tilkoblet", mottattXmlId);
     }
 
     private void sperrGrunnlag(long behandlingId, String kravgrunnlagId) {
         grunnlagRepository.sperrGrunnlag(behandlingId);
-        logger.info("Grunnlag med kravgrunnlagId={} er sperret for behandling={}", kravgrunnlagId, behandlingId);
+        LOG.info("Grunnlag med kravgrunnlagId={} er sperret for behandling={}", kravgrunnlagId, behandlingId);
     }
 
     private KravgrunnlagMedStatus hentSperretKravgrunnlag(ØkonomiXmlMottatt økonomiXmlMottatt) {

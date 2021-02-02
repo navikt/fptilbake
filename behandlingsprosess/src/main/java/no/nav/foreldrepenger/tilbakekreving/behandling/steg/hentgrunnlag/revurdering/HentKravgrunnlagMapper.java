@@ -6,7 +6,11 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.PersonOrganisasjonWrapper;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.batch.HåndterGamleKravgrunnlagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
@@ -26,6 +30,8 @@ import no.nav.vedtak.felles.integrasjon.felles.ws.DateUtil;
 @ApplicationScoped
 public class HentKravgrunnlagMapper {
 
+    private static final Logger LOG = LoggerFactory.getLogger(HentKravgrunnlagMapper.class);
+
     private PersonOrganisasjonWrapper tpsAdapterWrapper;
 
     HentKravgrunnlagMapper() {
@@ -39,6 +45,7 @@ public class HentKravgrunnlagMapper {
 
     public Kravgrunnlag431 mapTilDomene(DetaljertKravgrunnlagDto dto) {
         Kravgrunnlag431 kravgrunnlag431 = formKravgrunnlag431(dto);
+        LOG.info("Referanse etter mapping: {}", kravgrunnlag431.getReferanse());
         for (DetaljertKravgrunnlagPeriodeDto periodeDto : dto.getTilbakekrevingsPeriode()) {
             KravgrunnlagPeriode432 kravgrunnlagPeriode432 = formKravgrunnlagPeriode432(kravgrunnlag431, periodeDto);
             for (DetaljertKravgrunnlagBelopDto postering : periodeDto.getTilbakekrevingsBelop()) {

@@ -42,6 +42,7 @@ public class HåndterGamleKravgrunnlagTask implements ProsessTaskHandler {
         if (!respons.harKravgrunnlag()) {
             håndterGamleKravgrunnlagTjeneste.slettMottattUgyldigKravgrunnlag(mottattXmlId);
         } else {
+            logger.info("Referanse etter henting fra WS og mapping: {}", respons.getKravgrunnlag().getReferanse());
             Optional<Long> ugyldigkravgrunnlag = håndterGamleKravgrunnlagTjeneste.
                 håndterKravgrunnlagRespons(mottattXmlId, økonomiXmlMottatt.getMottattXml(), respons);
             ugyldigkravgrunnlag.ifPresent(håndterGamleKravgrunnlagTjeneste::slettMottattUgyldigKravgrunnlag);
