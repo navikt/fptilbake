@@ -15,6 +15,4 @@ COPY export-vault.sh /init-scripts/export-vault.sh
 COPY web/target/lib/*.jar /app/lib/
 COPY web/target/app.jar /app/
 
-ENV JAVA_OPTS="-XX:MaxRAMPercentage=75.0 -Djava.security.egd=file:/dev/./urandom -Duser.timezone=Europe/Oslo "
-
-
+ENV JAVA_OPTS="-XX:MaxRAMPercentage=75.0 -Djava.security.egd=file:/dev/./uranfdom -Duser.timezone=Europe/Oslo "
