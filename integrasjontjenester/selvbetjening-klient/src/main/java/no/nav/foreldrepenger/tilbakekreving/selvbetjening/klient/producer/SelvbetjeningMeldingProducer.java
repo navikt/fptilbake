@@ -56,7 +56,7 @@ public class SelvbetjeningMeldingProducer {
     @Inject
     SelvbetjeningMeldingProducer(@KonfigVerdi("tilbakekreving.brukerdialog.hendelse.v1.topic.url") String topic,
                                  @KonfigVerdi("bootstrap.servers") String bootstrapServers,
-                                 @KonfigVerdi("application.name") String clientId,
+                                 @KonfigVerdi("app.name") String clientId,
                                  @KonfigVerdi("systembruker.username") String username,
                                  @KonfigVerdi("systembruker.password") String password) {
         Properties properties = new Properties();

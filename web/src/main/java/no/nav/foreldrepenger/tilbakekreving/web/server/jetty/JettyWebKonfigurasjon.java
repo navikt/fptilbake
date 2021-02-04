@@ -1,8 +1,10 @@
 package no.nav.foreldrepenger.tilbakekreving.web.server.jetty;
 
+import no.nav.vedtak.util.env.Environment;
+
 public class JettyWebKonfigurasjon implements AppKonfigurasjon {
     private static final String SWAGGER_HASH = "sha256-w6DoSiqz8+6cP13xAZftmJAdUupO32ZdbQZhwOvWf+U=";
-
+    private static final Environment ENV = Environment.current();
     private Integer serverPort;
 
     public JettyWebKonfigurasjon() {
@@ -22,7 +24,7 @@ public class JettyWebKonfigurasjon implements AppKonfigurasjon {
 
     @Override
     public String getContextPath() {
-        String appname = System.getProperty("application.name");
+        String appname = ENV.getProperty("app.name");
         switch (appname) {
             case "fptilbake":
                 return "/fptilbake";

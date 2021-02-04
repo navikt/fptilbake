@@ -20,13 +20,13 @@ public class RestApiInputValideringAnnoteringTest extends RestApiTester {
     @BeforeEach
     public void setup() {
         System.setProperty("loadbalancer.url", "http://localhost:8030");
-        System.setProperty("application.name", "fptilbake");
+        System.setProperty("app.name", "fptilbake");
     }
 
     @AfterEach
     public void cleanup() {
         System.clearProperty("loadbalancer.url");
-        System.clearProperty("application.name");
+        System.clearProperty("app.name");
     }
 
     /**

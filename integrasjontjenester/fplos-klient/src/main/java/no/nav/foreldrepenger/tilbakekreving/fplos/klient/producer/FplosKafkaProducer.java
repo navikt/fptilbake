@@ -39,7 +39,7 @@ public class FplosKafkaProducer {
     @Inject
     public FplosKafkaProducer(@KonfigVerdi("kafka.fplos.topic") String topic,
                               @KonfigVerdi("bootstrap.servers") String bootstrapServers,
-                              @KonfigVerdi("application.name") String clientId,
+                              @KonfigVerdi("app.name") String clientId,
                               @KonfigVerdi("systembruker.username") String username,
                               @KonfigVerdi("systembruker.password") String password) {
         Properties properties = new Properties();
