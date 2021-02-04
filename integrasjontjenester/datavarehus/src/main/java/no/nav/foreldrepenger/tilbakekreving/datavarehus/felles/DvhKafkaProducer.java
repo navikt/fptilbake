@@ -33,7 +33,7 @@ public class DvhKafkaProducer {
 
     @Inject
     public DvhKafkaProducer(@KonfigVerdi("bootstrap.servers") String bootstrapServers,
-                            @KonfigVerdi("application.name") String clientId,
+                            @KonfigVerdi("app.name") String clientId,
                             @KonfigVerdi("systembruker.username") String username,
                             @KonfigVerdi("systembruker.password") String password) {
 

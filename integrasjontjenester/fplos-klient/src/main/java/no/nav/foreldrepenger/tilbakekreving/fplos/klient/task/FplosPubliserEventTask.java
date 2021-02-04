@@ -72,7 +72,7 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
     public FplosPubliserEventTask(BehandlingRepositoryProvider repositoryProvider,
                                   FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste,
                                   FplosKafkaProducer fplosKafkaProducer,
-                                  @KonfigVerdi("application.name") String applikasjonNavn) {
+                                  @KonfigVerdi("app.name") String applikasjonNavn) {
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.faktaFeilutbetalingTjeneste = faktaFeilutbetalingTjeneste;
@@ -88,7 +88,7 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
                 defaultHRef = K9_DEFAULT_HREF;
                 break;
             default:
-                throw new IllegalStateException("application.name er satt til " + applikasjonNavn + " som ikke er en støttet verdi");
+                throw new IllegalStateException("app.name er satt til " + applikasjonNavn + " som ikke er en støttet verdi");
         }
     }
 
