@@ -22,7 +22,7 @@ public class JettyWebKonfigurasjon implements AppKonfigurasjon {
 
     @Override
     public String getContextPath() {
-        String appname = System.getProperty("app.name");
+        String appname = System.getProperty("application.name");
         switch (appname) {
             case "fptilbake":
                 return "/fptilbake";
