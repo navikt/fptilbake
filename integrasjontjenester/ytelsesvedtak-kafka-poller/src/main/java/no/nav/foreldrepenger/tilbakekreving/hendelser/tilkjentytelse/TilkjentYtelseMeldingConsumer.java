@@ -30,7 +30,7 @@ public class TilkjentYtelseMeldingConsumer extends YtelsesvedtakHendelseConsumer
     @Inject
     public TilkjentYtelseMeldingConsumer(@KonfigVerdi(FEED_URL) String topic,
                                          @KonfigVerdi(BOOTSTRAP_SERVERS) String bootstrapServers,
-                                         @KonfigVerdi("application.name") String applikasjonNavn,
+                                         @KonfigVerdi("app.name") String applikasjonNavn,
                                          @KonfigVerdi("systembruker.username") String username,
                                          @KonfigVerdi("systembruker.password") String password) {
         Properties properties = lagFellesProperty(bootstrapServers, applikasjonNavn);

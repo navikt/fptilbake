@@ -47,10 +47,13 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.tilbakekrevingsgru
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.varselrespons.VarselresponsRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.VergeRestTjeneste;
 import no.nav.vedtak.felles.prosesstask.rest.ProsessTaskRestTjeneste;
+import no.nav.vedtak.util.env.Environment;
 
 
 @ApplicationPath(ApplicationConfig.API_URI)
 public class ApplicationConfig extends Application {
+
+    private static final Environment ENV = Environment.current();
 
     public static final String API_URI = "/api";
     private static final String APPLIKASJON_NAVN_K9_TILBAKE = "k9-tilbake";
@@ -83,14 +86,14 @@ public class ApplicationConfig extends Application {
     }
 
     private String getContextPath() {
-        String applikasjon = System.getProperty("application.name");
+        String applikasjon= ENV.getProperty("app.name");
         switch (applikasjon) {
             case APPLIKASJON_NAVN_FPTILBAKE:
                 return "/fptilbake";
             case APPLIKASJON_NAVN_K9_TILBAKE:
                 return "/k9/tilbake";
             default:
-                throw new IllegalStateException("application.name er satt til " + applikasjon + " som ikke er en støttet verdi");
+                throw new IllegalStateException("app.name er satt til " + applikasjon + " som ikke er en støttet verdi");
         }
     }
 
