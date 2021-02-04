@@ -33,13 +33,13 @@ public class RestApiAbacTest {
     @BeforeAll
     public static void setup() {
         System.setProperty(ServerInfo.PROPERTY_KEY_LOADBALANCER_URL, "http://localhost:8090");
-        System.setProperty("app.name", "fptilbake");
+        System.setProperty("application.name", "fptilbake");
     }
 
     @AfterAll
     public static void teardown() {
         System.clearProperty(ServerInfo.PROPERTY_KEY_LOADBALANCER_URL);
-        System.clearProperty("app.name");
+        System.clearProperty("application.name");
     }
 
     /**

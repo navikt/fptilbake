@@ -71,13 +71,13 @@ public class RestApiInputValideringDtoTest extends RestApiTester {
     @BeforeAll
     static void beforeAll() {
         System.setProperty("loadbalancer.url", "http://localhost:8030");
-        System.setProperty("app.name", "fptilbake");
+        System.setProperty("application.name", "fptilbake");
     }
 
     @AfterAll
     static void cleanup() {
         System.clearProperty("loadbalancer.url");
-        System.clearProperty("app.name");
+        System.clearProperty("application.name");
     }
 
     /**
