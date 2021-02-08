@@ -37,7 +37,7 @@ jobs:
         run: |
           echo "BUILD_VERSION=$(date +%Y.%m.%d.%H%M%S)-$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
 
-      - uses: actions/cache@v2
+      - uses: actions/cache@v2.1.4
         with:
           path: ~/.m2/repository
           key: v2-${{ runner.os }}-maven-${{ hashFiles('pom.xml') }}
