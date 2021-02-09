@@ -1,37 +1,38 @@
 package no.nav.foreldrepenger.tilbakekreving.kafka.poller;
 
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import ch.qos.logback.classic.Level;
-import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
+import no.nav.vedtak.log.util.MemoryAppender;
 
-@RunWith(CdiRunner.class)
+@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public class PollerTest {
 
-    @Rule
-    public LogSniffer logSniffer = new LogSniffer(Level.ALL);
+    public MemoryAppender logSniffer;
 
     private Poller poller;
     private KafkaPoller kafkaPoller;
 
-    @Before
+    @BeforeEach
     public void setUp() {
+        logSniffer = MemoryAppender.sniff(Poller.class);
         kafkaPoller = mock(KafkaPoller.class);
-        when(kafkaPoller.getName()).thenReturn("UnitTestPoller");
+        lenient().when(kafkaPoller.getName()).thenReturn("UnitTestPoller");
         poller = new Poller();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
-        logSniffer.clearLog();
+        logSniffer.reset();
     }
 
     @Test
@@ -39,7 +40,7 @@ public class PollerTest {
         Poller pollerSomFårNPE = new Poller(null, null);
 
         pollerSomFårNPE.run();
-        logSniffer.assertHasWarnMessage("FP-852160:Kunne ikke polle kafka hendelser, venter til neste runde(runde=1)");
+        Assertions.assertThat(logSniffer.search("FP-852160:Kunne ikke polle kafka hendelser, venter til neste runde(runde=1)")).isNotEmpty();
     }
 
     @Test
@@ -47,6 +48,6 @@ public class PollerTest {
         doThrow(new RuntimeException()).when(kafkaPoller).poll();
         poller.run();
 
-        logSniffer.assertHasWarnMessage("FP-852160:Kunne ikke polle kafka hendelser, venter til neste runde(runde=1)");
+        Assertions.assertThat(logSniffer.search("FP-852160:Kunne ikke polle kafka hendelser, venter til neste runde(runde=1)", Level.WARN)).isNotEmpty();
     }
 }

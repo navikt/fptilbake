@@ -35,7 +35,6 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.vedtak.exception.TekniskException;
-import no.nav.vedtak.util.Objects;
 
 @CdiDbAwareTest
 public class TilbakekrevingVedtakPeriodeBeregnerTest {
@@ -491,7 +490,6 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
 
     static KravgrunnlagTestBuilder.KgPeriode grunnlagPeriode(String periodeTekst, int utbetalt, int nytt, int tilbakekreves, String skatteprosent, int maxSkattMnd) {
         Periode periode = parsePeriode(periodeTekst);
-        Objects.check(tilbakekreves == utbetalt - nytt, "Tilbakekreves er feil");
         List<KgBeløp> kgBeløp = Arrays.asList(
             KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(utbetalt).medNyttBeløp(nytt).medTilbakekrevBeløp(tilbakekreves).medSkattProsent(new BigDecimal(skatteprosent)),
             KgBeløp.feil(tilbakekreves).medSkattProsent(new BigDecimal(skatteprosent)));

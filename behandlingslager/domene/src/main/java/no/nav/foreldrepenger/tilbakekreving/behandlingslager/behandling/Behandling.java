@@ -116,8 +116,8 @@ public class Behandling extends BaseEntitet {
     /**
      * Er egentlig OneToOne, men må mappes slik da JPA/Hibernate ikke støtter OneToOne på annet enn shared PK.
      */
-    @OneToMany(mappedBy = "behandling")
-    private Set<BehandlingÅrsak> behandlingÅrsaker = new HashSet<>();
+    @OneToMany(mappedBy = "behandling", targetEntity = BehandlingÅrsak.class)
+    private Set<BehandlingÅrsak> behandlingÅrsaker = new HashSet<>(1);
 
     @Version
     @Column(name = "versjon", nullable = false)

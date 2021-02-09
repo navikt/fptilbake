@@ -1,7 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.kafka.poller;
 
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.util.Iterator;
 
@@ -9,49 +9,50 @@ import javax.enterprise.inject.Instance;
 import javax.persistence.EntityManager;
 
 import org.assertj.core.api.Assertions;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 
-import ch.qos.logback.classic.Level;
-import no.nav.vedtak.felles.testutilities.cdi.CdiRunner;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
+import no.nav.vedtak.log.util.MemoryAppender;
 
-@RunWith(CdiRunner.class)
+@Execution(ExecutionMode.SAME_THREAD)
+@CdiDbAwareTest
 public class KafkaPollerManagerTest {
 
-    @Rule
-    public LogSniffer logSniffer = new LogSniffer(Level.ALL);
+    public MemoryAppender logSniffer;
 
     private KafkaPollerManager manager;
-    private EntityManager em = Mockito.mock(EntityManager.class);
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    public void setUp(EntityManager entityManager) {
+        logSniffer = MemoryAppender.sniff(KafkaPollerManager.class);
         @SuppressWarnings("unchecked")
         Instance<KafkaPoller> feedPollers = mock(Instance.class);
         @SuppressWarnings("unchecked")
         Iterator<KafkaPoller> iterator = mock(Iterator.class);
 
-        when(feedPollers.get()).thenReturn(new TestKafkaPoller());
-        when(feedPollers.iterator()).thenReturn(iterator);
-        when(iterator.hasNext()).thenReturn(true, false);
-        when(iterator.next()).thenReturn(new TestKafkaPoller());
-        manager = new KafkaPollerManager(em, feedPollers);
+        lenient().when(feedPollers.get()).thenReturn(new TestKafkaPoller());
+        lenient().when(feedPollers.iterator()).thenReturn(iterator);
+        lenient().when(iterator.hasNext()).thenReturn(true, false);
+        lenient().when(iterator.next()).thenReturn(new TestKafkaPoller());
+        manager = new KafkaPollerManager(entityManager, feedPollers);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
-        logSniffer.clearLog();
+        logSniffer.reset();
     }
+
 
     @Test
     public void skal_legge_til_poller() {
         manager.start();
-        logSniffer.assertHasInfoMessage("Created thread for feed polling KafkaPollerManager-UnitTestPoller-poller");
-        Assertions.assertThat(logSniffer.countEntries("Lagt til ny poller til pollingtjeneste. poller=UnitTestPoller, delayBetweenPollingMillis=50")).isEqualTo(1);
+        Assertions.assertThat(logSniffer.countEntries("Created thread for feed polling KafkaPollerManager-UnitTestPoller-poller")).isEqualTo(1);
+        // MemoryAppender tar ikke debug ....
+        //Assertions.assertThat(logSniffer.search("Lagt til ny poller til pollingtjeneste. poller=UnitTestPoller, delayBetweenPollingMillis=50", Level.DEBUG).size()).isEqualTo(1);
     }
 
     private class TestKafkaPoller implements KafkaPoller {

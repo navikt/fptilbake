@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.Tillegsinformasjon;
-import no.nav.vedtak.util.Objects;
 
 public class SamletEksternBehandlingInfo {
 
@@ -30,27 +29,27 @@ public class SamletEksternBehandlingInfo {
     }
 
     public PersonopplysningDto getPersonopplysninger() {
-        Objects.check(tilleggsinformasjonHentet.contains(Tillegsinformasjon.PERSONOPPLYSNINGER), "Utvikler-feil: har ikke hentet personopplysninger");
+        check(tilleggsinformasjonHentet.contains(Tillegsinformasjon.PERSONOPPLYSNINGER), "Utvikler-feil: har ikke hentet personopplysninger");
         return personopplysninger;
     }
 
     public String getVarseltekst() {
-        Objects.check(tilleggsinformasjonHentet.contains(Tillegsinformasjon.VARSELTEKST), "Utvikler-feil: har ikke hentet varseltekst");
+        check(tilleggsinformasjonHentet.contains(Tillegsinformasjon.VARSELTEKST), "Utvikler-feil: har ikke hentet varseltekst");
         return varseltekst;
     }
 
     public TilbakekrevingValgDto getTilbakekrevingsvalg() {
-        Objects.check(tilleggsinformasjonHentet.contains(Tillegsinformasjon.TILBAKEKREVINGSVALG), "Utvikler-feil: har ikke hentet tilbakekrevingsvalg");
+        check(tilleggsinformasjonHentet.contains(Tillegsinformasjon.TILBAKEKREVINGSVALG), "Utvikler-feil: har ikke hentet tilbakekrevingsvalg");
         return tilbakekrevingsvalg;
     }
 
     public SoknadDto getSøknad() {
-        Objects.check(tilleggsinformasjonHentet.contains(Tillegsinformasjon.SØKNAD), "Utvikler-feil: har ikke hentet søknad");
+        check(tilleggsinformasjonHentet.contains(Tillegsinformasjon.SØKNAD), "Utvikler-feil: har ikke hentet søknad");
         return søknad;
     }
 
     public FagsakDto getFagsak() {
-        Objects.check(tilleggsinformasjonHentet.contains(Tillegsinformasjon.FAGSAK), "Utvikler-feil: har ikke hentet fagsak");
+        check(tilleggsinformasjonHentet.contains(Tillegsinformasjon.FAGSAK), "Utvikler-feil: har ikke hentet fagsak");
         return fagsak;
     }
 
@@ -150,6 +149,12 @@ public class SamletEksternBehandlingInfo {
                 //TODO når verifisert i prod, gjør om logging til å kaste exceptions
                 logger.info("Etterspurte {}, men fikk ikke dette fra fagsystemet", tillegsinformasjon);
             }
+        }
+    }
+
+    private static void check(boolean check, String message, Object... params) {
+        if (!check) {
+            throw new IllegalArgumentException(String.format(message, params));
         }
     }
 

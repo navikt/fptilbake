@@ -31,7 +31,6 @@ import no.nav.vedtak.feil.FeilFactory;
 import no.nav.vedtak.feil.LogLevel;
 import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
 import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
-import no.nav.vedtak.util.Objects;
 import no.nav.vedtak.util.StringUtils;
 
 class TekstformatererVedtaksbrev extends FellesTekstformaterer {
@@ -174,13 +173,13 @@ class TekstformatererVedtaksbrev extends FellesTekstformaterer {
         List<String> fritekstLinjer = null;
         for (String linje : splittet) {
             if (VedtaksbrevFritekst.erFritekstStart(linje)) {
-                Objects.check(!leserFritekst, "Feil med vedtaksbrev, har markering for 2 fritekst-start etter hverandre");
+                check(!leserFritekst, "Feil med vedtaksbrev, har markering for 2 fritekst-start etter hverandre");
                 fritekstPåkrevet = VedtaksbrevFritekst.erFritekstPåkrevetStart(linje);
                 underavsnittstype = parseUnderavsnittstype(linje);
                 leserFritekst = true;
                 fritekstLinjer = new ArrayList<>();
             } else if (VedtaksbrevFritekst.erFritekstSlutt(linje)) {
-                Objects.check(leserFritekst, "Feil med vedtaksbrev, fikk markering for fritekst-slutt før fritekst-start");
+                check(leserFritekst, "Feil med vedtaksbrev, fikk markering for fritekst-slutt før fritekst-start");
                 TekstType tekstType = fritekstPåkrevet ? TekstType.PÅKREVET_FRITEKST : TekstType.FRITEKST;
                 resultat.add(new TekstElement(tekstType, fritekstLinjer.isEmpty() ? null : String.join("\n", fritekstLinjer), underavsnittstype));
                 leserFritekst = false;
@@ -195,6 +194,12 @@ class TekstformatererVedtaksbrev extends FellesTekstformaterer {
             }
         }
         return resultat;
+    }
+
+    private static void check(boolean check, String message, Object... params) {
+        if (!check) {
+            throw new IllegalArgumentException(String.format(message, params));
+        }
     }
 
     enum TekstType {

@@ -41,9 +41,9 @@ import no.nav.pdl.Sivilstand;
 import no.nav.pdl.SivilstandResponseProjection;
 import no.nav.pdl.Sivilstandstype;
 import no.nav.vedtak.exception.VLException;
+import no.nav.vedtak.felles.integrasjon.pdl.Pdl;
 import no.nav.vedtak.felles.integrasjon.pdl.PdlKlient;
-import no.nav.vedtak.felles.integrasjon.pdl.Tema;
-import no.nav.vedtak.konfig.KonfigVerdi;
+import no.nav.vedtak.felles.integrasjon.rest.jersey.Jersey;
 import no.nav.vedtak.util.LRUCache;
 
 @ApplicationScoped
@@ -70,19 +70,17 @@ public class AktørTjeneste {
     private LRUCache<AktørId, PersonIdent> cacheAktørIdTilIdent;
     private LRUCache<PersonIdent, AktørId> cacheIdentTilAktørId;
 
-    private PdlKlient pdlKlient;
-    private Tema tema;
+    private Pdl pdlKlient;
 
     AktørTjeneste() {
         // CDI
     }
 
     @Inject
-    public AktørTjeneste(PdlKlient pdlKlient, @KonfigVerdi(value = "app.name") String applikasjon) {
+    public AktørTjeneste(@Jersey Pdl pdlKlient) {
         this.pdlKlient = pdlKlient;
         this.cacheAktørIdTilIdent = new LRUCache<>(DEFAULT_CACHE_SIZE, DEFAULT_CACHE_TIMEOUT);
         this.cacheIdentTilAktørId = new LRUCache<>(DEFAULT_CACHE_SIZE, DEFAULT_CACHE_TIMEOUT);
-        this.tema = "fptilbake".equals(applikasjon) ? Tema.FOR : Tema.OMS;
     }
 
     public Optional<AktørId> hentAktørIdForPersonIdent(PersonIdent personIdent) {
@@ -104,7 +102,7 @@ public class AktørTjeneste {
         final Identliste identliste;
 
         try {
-            identliste = pdlKlient.hentIdenter(request, projection, tema);
+            identliste = pdlKlient.hentIdenter(request, projection);
         } catch (VLException v) {
             if (PdlKlient.PDL_KLIENT_NOT_FOUND_KODE.equals(v.getKode())) {
                 return Optional.empty();
@@ -132,7 +130,7 @@ public class AktørTjeneste {
         final Identliste identliste;
 
         try {
-            identliste = pdlKlient.hentIdenter(request, projection, tema);
+            identliste = pdlKlient.hentIdenter(request, projection);
         } catch (VLException v) {
             if (PdlKlient.PDL_KLIENT_NOT_FOUND_KODE.equals(v.getKode())) {
                 return Optional.empty();
@@ -154,7 +152,7 @@ public class AktørTjeneste {
         var projection = new PersonResponseProjection()
             .kjoenn(new KjoennResponseProjection().kjoenn());
 
-        var person = pdlKlient.hentPerson(query, projection, tema);
+        var person = pdlKlient.hentPerson(query, projection);
 
         return mapKjønn(person);
     }
@@ -168,7 +166,7 @@ public class AktørTjeneste {
             .doedsfall(new DoedsfallResponseProjection().doedsdato())
             .sivilstand(new SivilstandResponseProjection().type());
 
-        var person = pdlKlient.hentPerson(query, projection, tema);
+        var person = pdlKlient.hentPerson(query, projection);
 
         var fødselsdato = person.getFoedsel().stream()
             .map(Foedsel::getFoedselsdato)

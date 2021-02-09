@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.felles.Ukedager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +22,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResult
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BeregningResultat;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
+import no.nav.foreldrepenger.tilbakekreving.felles.Ukedager;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagBelop433;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432;
@@ -32,7 +32,6 @@ import no.nav.vedtak.feil.FeilFactory;
 import no.nav.vedtak.feil.LogLevel;
 import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
 import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
-import no.nav.vedtak.util.Objects;
 
 @ApplicationScoped
 public class TilbakekrevingVedtakPeriodeBeregner {
@@ -385,9 +384,15 @@ public class TilbakekrevingVedtakPeriodeBeregner {
     }
 
     private static YearMonth fraPeriode(Periode periode) {
-        Objects.check(periode.getFom().getYear() == periode.getTom().getYear()
+        check(periode.getFom().getYear() == periode.getTom().getYear()
             && periode.getFom().getMonthValue() == periode.getTom().getMonthValue(), "Kan ikke konvertere " + periode + " til måned, da den strekker seg over flere måneder");
         return YearMonth.of(periode.getFom().getYear(), periode.getFom().getMonthValue());
+    }
+
+    private static void check(boolean check, String message, Object... params) {
+        if (!check) {
+            throw new IllegalArgumentException(String.format(message, params));
+        }
     }
 
     private static void rapporterAvrundingsfeil(BigDecimal diff, Feil feil) {

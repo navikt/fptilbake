@@ -22,10 +22,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import no.nav.foreldrepenger.tilbakekreving.web.app.abac.FPTilbakeBeskyttetRessursAttributt;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.fp.FpXacmlRequestBuilderTjeneste;
 import no.nav.vedtak.sikkerhet.abac.AbacIdToken;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt;
-import no.nav.vedtak.sikkerhet.abac.BeskyttetRessursResourceAttributt;
 import no.nav.vedtak.sikkerhet.abac.PdpKlient;
 import no.nav.vedtak.sikkerhet.abac.PdpRequest;
 import no.nav.vedtak.sikkerhet.pdp.PdpConsumer;
@@ -149,7 +149,7 @@ public class FpXacmlRequestBuilderTjenesteTest {
         PdpRequest request = new PdpRequest();
         request.put(CommonAttributter.RESOURCE_FELLES_DOMENE, "foreldrepenger");
         request.put(CommonAttributter.XACML_1_0_ACTION_ACTION_ID, BeskyttetRessursActionAttributt.READ.getEksternKode());
-        request.put(CommonAttributter.RESOURCE_FELLES_RESOURCE_TYPE, BeskyttetRessursResourceAttributt.FAGSAK.getEksternKode());
+        request.put(CommonAttributter.RESOURCE_FELLES_RESOURCE_TYPE, FPTilbakeBeskyttetRessursAttributt.FAGSAK);
         return request;
     }
 
