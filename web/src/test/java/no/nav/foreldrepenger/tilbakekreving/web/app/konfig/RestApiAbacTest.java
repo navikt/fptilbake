@@ -15,13 +15,13 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import no.nav.foreldrepenger.tilbakekreving.web.app.abac.FPTilbakeBeskyttetRessursAttributt;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.felles.testutilities.cdi.WeldContext;
 import no.nav.vedtak.isso.config.ServerInfo;
 import no.nav.vedtak.sikkerhet.abac.AbacDto;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt;
-import no.nav.vedtak.sikkerhet.abac.BeskyttetRessursResourceAttributt;
 import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
 
 public class RestApiAbacTest {
@@ -110,7 +110,7 @@ public class RestApiAbacTest {
             AbacProperty.FAGSAK,
             AbacProperty.VENTEFRIST
         );
-        if (annotation.ressurs() != BeskyttetRessursResourceAttributt.DUMMY) {
+        if (!annotation.resource().equals(FPTilbakeBeskyttetRessursAttributt.DUMMY)) {
             fail(klasse.getSimpleName() + "." + metode.getName() + " Skal ikke bruke ressurs, bruk property i @" + annotation.getClass().getSimpleName());
         }
         if (!annotation.resource().isEmpty()) {

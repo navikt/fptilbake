@@ -3,13 +3,12 @@ package no.nav.foreldrepenger.tilbakekreving.avstemming.sftp;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 
-import no.nav.vedtak.util.Objects;
 
 public class SftpKonfig {
 
     public static final String JSCH_CHANNEL_TYPE_SFTP = "sftp";
     public static final int JSCH_DEFAULT_PORT = 22;
-    
+
     private String username;
     private String host;
     private int port = SftpKonfig.JSCH_DEFAULT_PORT;
@@ -132,23 +131,29 @@ public class SftpKonfig {
         }
 
         public SftpKonfig build() {
-            Objects.check(kladd.username != null, "må ha username for sftp");
-            Objects.check(kladd.host != null, "må ha host for sftp");
+            check(kladd.username != null, "må ha username for sftp");
+            check(kladd.host != null, "må ha host for sftp");
             if (kladd.hasKeyFile) {
                 if (kladd.isKeyFileByParams) {
-                    Objects.check(kladd.privateKey != null, "må ha privateKey for sftp med nøkkel");
-                    Objects.check(kladd.publicKey != null, "må ha publicKey for sftp med nøkkel");
+                    check(kladd.privateKey != null, "må ha privateKey for sftp med nøkkel");
+                    check(kladd.publicKey != null, "må ha publicKey for sftp med nøkkel");
                 } else {
-                    Objects.check(kladd.keyFileUrl != null, "må ha keyFile for sftp med fil");
+                    check(kladd.keyFileUrl != null, "må ha keyFile for sftp med fil");
                 }
             } else {
-                Objects.check(kladd.password != null, "må ha password for sftp");
+                check(kladd.password != null, "må ha password for sftp");
             }
             return kladd;
         }
 
         private byte[] getKeyFilePassphrase(String passphrase) {
             return passphrase != null && passphrase.length() > 0 ? passphrase.getBytes() : null;
+        }
+    }
+
+    private static void check(boolean check, String message, Object... params) {
+        if (!check) {
+            throw new IllegalArgumentException(String.format(message, params));
         }
     }
 }

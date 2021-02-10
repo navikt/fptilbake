@@ -214,6 +214,12 @@ public class JournalføringTjeneste {
     }
 
     private Sak lagReferanseTilGsakSak(Saksnummer saksnummer) {
+        if (Long.parseLong(saksnummer.getVerdi()) > 152000000L) {
+            return Sak.builder()
+                .medSakstype(Sakstype.FAGSAK)
+                .medFagsak(FagsakSystem.FORELDREPENGELØSNINGEN, saksnummer.getVerdi())
+                .build();
+        }
         return Sak.builder()
             .medSakstype(Sakstype.ARKIVSAK)
             .medArkivsak(Arkivsaksystem.GSAK, saksnummer.getVerdi())

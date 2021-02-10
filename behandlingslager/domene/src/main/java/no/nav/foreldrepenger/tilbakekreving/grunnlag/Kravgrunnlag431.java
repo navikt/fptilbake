@@ -219,7 +219,9 @@ public class Kravgrunnlag431 extends BaseEntitet {
         private Kravgrunnlag431 kladd = new Kravgrunnlag431();
 
         public Builder medEksternKravgrunnlagId(String eksternKravgrunnlagId) {
-            no.nav.vedtak.util.Objects.check(eksternKravgrunnlagId.length() < 10, "Forventer at kravgrunnlagId er maks 9 siffer. KravgrunnlagId=" + eksternKravgrunnlagId);
+            if (eksternKravgrunnlagId.length() >= 10) {
+                throw new IllegalArgumentException("Forventer at kravgrunnlagId er maks 9 siffer. KravgrunnlagId=" + eksternKravgrunnlagId);
+            }
             this.kladd.eksternKravgrunnlagId = eksternKravgrunnlagId;
             return this;
         }
