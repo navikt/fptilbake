@@ -19,7 +19,6 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.Brev
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.JournalpostIdOgDokumentId;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.journalpostapi.JournalpostApiKlient;
 import no.nav.journalpostapi.dto.AvsenderMottaker;
 import no.nav.journalpostapi.dto.BehandlingTema;
@@ -36,10 +35,8 @@ import no.nav.journalpostapi.dto.dokument.Filtype;
 import no.nav.journalpostapi.dto.dokument.Variantformat;
 import no.nav.journalpostapi.dto.opprett.OpprettJournalpostRequest;
 import no.nav.journalpostapi.dto.opprett.OpprettJournalpostResponse;
-import no.nav.journalpostapi.dto.sak.Arkivsaksystem;
 import no.nav.journalpostapi.dto.sak.FagsakSystem;
 import no.nav.journalpostapi.dto.sak.Sak;
-import no.nav.journalpostapi.dto.sak.Sakstype;
 import no.nav.vedtak.feil.Feil;
 import no.nav.vedtak.feil.FeilFactory;
 import no.nav.vedtak.feil.LogLevel;
@@ -198,32 +195,12 @@ public class JournalføringTjeneste {
     private Sak lagSaksreferanse(Fagsak fagsak) {
         switch (appName) {
             case "fptilbake":
-                return lagReferanseTilGsakSak(fagsak.getSaksnummer());
+                return new Sak(fagsak.getSaksnummer().getVerdi(), FagsakSystem.FORELDREPENGELØSNINGEN);
             case "k9-tilbake":
-                return lagReferanseTilK9FagsystemSak(fagsak.getSaksnummer());
+                return new Sak(fagsak.getSaksnummer().getVerdi(), FagsakSystem.K9SAK);
             default:
                 throw new IllegalArgumentException("Ikke-støttet app.name: " + appName);
         }
-    }
-
-    private Sak lagReferanseTilK9FagsystemSak(Saksnummer saksnummer) {
-        return Sak.builder()
-            .medSakstype(Sakstype.FAGSAK)
-            .medFagsak(FagsakSystem.K9SAK, saksnummer.getVerdi())
-            .build();
-    }
-
-    private Sak lagReferanseTilGsakSak(Saksnummer saksnummer) {
-        if (Long.parseLong(saksnummer.getVerdi()) > 152000000L) {
-            return Sak.builder()
-                .medSakstype(Sakstype.FAGSAK)
-                .medFagsak(FagsakSystem.FORELDREPENGELØSNINGEN, saksnummer.getVerdi())
-                .build();
-        }
-        return Sak.builder()
-            .medSakstype(Sakstype.ARKIVSAK)
-            .medArkivsak(Arkivsaksystem.GSAK, saksnummer.getVerdi())
-            .build();
     }
 
     interface JournalføringTjenesteFeil extends DeklarerteFeil {
