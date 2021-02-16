@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 
-import org.apache.cxf.common.util.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -174,7 +173,7 @@ public class BehandlingskontrollTjeneste {
          */
     public void behandlingTilbakeføringTilTidligsteAksjonspunkt(BehandlingskontrollKontekst kontekst,
                                                                 Collection<String> oppdaterteAksjonspunkter, boolean erOverstyring) {
-        if (CollectionUtils.isEmpty(oppdaterteAksjonspunkter)) {
+        if ((oppdaterteAksjonspunkter == null) || oppdaterteAksjonspunkter.isEmpty()) {
             return;
         }
 

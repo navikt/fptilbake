@@ -13,8 +13,8 @@ import io.prometheus.client.hotspot.DefaultExports;
 import no.nav.foreldrepenger.tilbakekreving.kafka.poller.KafkaPollerManager;
 import no.nav.vedtak.apptjeneste.AppServiceHandler;
 import no.nav.vedtak.felles.integrasjon.jms.QueueConsumerManager;
+import no.nav.vedtak.felles.prosesstask.impl.BatchTaskScheduler;
 import no.nav.vedtak.felles.prosesstask.impl.TaskManager;
-import no.nav.vedtak.felles.prosesstask.impl.cron.BatchTaskScheduler;
 import no.nav.vedtak.util.env.Environment;
 
 @ApplicationScoped
