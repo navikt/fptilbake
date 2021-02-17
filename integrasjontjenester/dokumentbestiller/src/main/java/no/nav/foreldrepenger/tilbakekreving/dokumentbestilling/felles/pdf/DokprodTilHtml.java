@@ -56,7 +56,7 @@ public class DokprodTilHtml {
                     } else {
                         builder.append("<br/>");
                     }
-                    builder.append(linje);
+                    builder.append(linje.replaceAll("&(?!amp;)", "&amp;"));
                 }
             }
             if (harAvsnitt) {
