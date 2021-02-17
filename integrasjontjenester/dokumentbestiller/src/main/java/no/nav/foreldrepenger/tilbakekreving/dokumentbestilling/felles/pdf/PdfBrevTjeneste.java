@@ -79,6 +79,9 @@ public class PdfBrevTjeneste {
 
     private JournalpostIdOgDokumentId lagOgJournalførBrev(Long behandlingId, DetaljertBrevType detaljertBrevType, BrevData data) {
         String html = lagHtml(data);
+        if (behandlingId == 12012) {
+            logger.info("Html: {}", html);
+        }
         byte[] pdf = pdfGenerator.genererPDFMedLogo(html, DokumentVariant.ENDELIG);
         return journalføringTjeneste.journalførUtgåendeBrev(behandlingId, mapBrevTypeTilDokumentKategori(detaljertBrevType), data.getMetadata(), data.getMottaker(), pdf);
     }
