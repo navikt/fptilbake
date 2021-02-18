@@ -200,12 +200,6 @@
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-core</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.jboss.spec.javax.xml.bind</groupId>
-                    <artifactId>jboss-jaxb-api_2.3_spec</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
@@ -214,21 +208,6 @@
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-cdi</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.foreldrepenger.felles.integrasjon</groupId>
-            <artifactId>felles-integrasjon-rest</artifactId>
-            <exclusions>
-                <exclusion>
-                    <!-- denne inkluderer to versjoner av samme, må velge en (se under) -->
-                    <groupId>org.jboss.spec.javax.xml.bind</groupId>
-                    <artifactId>jboss-jaxb-api_2.3_spec</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.spec.javax.xml.bind</groupId>
-            <artifactId>jboss-jaxb-api_2.3_spec</artifactId>
         </dependency>
 
         <!-- TODO (Frode M): sjekk om vi trenger ldap-klient -->

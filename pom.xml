@@ -411,30 +411,13 @@
                 <artifactId>ojdbc8</artifactId>
                 <version>${ojdbc.version}</version>
             </dependency>
-            <!-- bean validation -->
-            <dependency>
-                <groupId>org.glassfish</groupId>
-                <artifactId>jakarta.el</artifactId>
-                <version>3.0.3</version>
-            </dependency>
 
-            <dependency>
-                <!-- velger en transitiv avhengighet - felles ikke enig med seg selv -->
-                <groupId>com.sun.activation</groupId>
-                <artifactId>jakarta.activation</artifactId>
-                <version>1.2.2</version>
-            </dependency>
+
             <dependency>
                 <!-- velger en transitiv avhengighet - felles ikke enig med seg selv, velger den som blir brukt i prod-scope i felles -->
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
                 <version>3.10.0</version>
-            </dependency>
-            <dependency>
-                <!-- velger en transitiv avhengighet -->
-                <groupId>org.jboss.spec.javax.xml.bind</groupId>
-                <artifactId>jboss-jaxb-api_2.3_spec</artifactId>
-                <version>2.0.1.Final</version>
             </dependency>
 
             <dependency>
