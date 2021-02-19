@@ -16,6 +16,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.MediaType;
@@ -46,6 +47,7 @@ import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 @Path("/behandling/aksjonspunkt")
 @RequestScoped
 @Transactional
+@Produces(MediaType.APPLICATION_JSON)
 public class AksjonspunktRestTjeneste {
 
     private BehandlingRepository behandlingRepository;
@@ -75,7 +77,7 @@ public class AksjonspunktRestTjeneste {
         tags = "aksjonspunkt",
         description = "Hent aksjonspunter for en behandling",
         responses = {
-            @ApiResponse(responseCode = "200", description = "Aksjonspunkter", content = @Content(array = @ArraySchema(schema = @Schema(implementation = AksjonspunktDto.class))))
+            @ApiResponse(responseCode = "200", description = "Aksjonspunkter", content = @Content(array = @ArraySchema(uniqueItems = true, arraySchema = @Schema(implementation = Set.class), schema = @Schema(implementation = AksjonspunktDto.class)), mediaType = MediaType.APPLICATION_JSON))
         })
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
