@@ -3,7 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.fagsystem.klient;
 public enum Tillegsinformasjon {
     PERSONOPPLYSNINGER("personopplysninger-tilbake", "soeker-personopplysninger"),
     VARSELTEKST("tilbakekrevingsvarsel-fritekst"),
-    SØKNAD("soknad"),
+    SØKNAD("soknad-backend"),
     TILBAKEKREVINGSVALG("tilbakekreving-valg", "tilbakekrevingvalg"),
     FAGSAK("fagsak-backend", "fagsak"),
     VERGE("verge-backend", "verge");
