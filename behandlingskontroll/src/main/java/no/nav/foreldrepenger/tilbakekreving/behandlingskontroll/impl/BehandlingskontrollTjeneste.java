@@ -494,7 +494,7 @@ public class BehandlingskontrollTjeneste {
             .collect(Collectors.toList());
 
         if (aksjonspunkterSomMedførerTilbakehopp.size() > 1) {
-            throw BehandlingskontrollFeil.FACTORY.kanIkkeGjenopptaBehandlingFantFlereAksjonspunkterSomMedførerTilbakehopp(behandling.getId()).toException();
+            throw BehandlingskontrollFeil.kanIkkeGjenopptaBehandlingFantFlereAksjonspunkterSomMedførerTilbakehopp(behandling.getId());
         }
         if (aksjonspunkterSomMedførerTilbakehopp.size() == 1) {
             Aksjonspunkt ap = aksjonspunkterSomMedførerTilbakehopp.get(0);
@@ -528,7 +528,7 @@ public class BehandlingskontrollTjeneste {
         Behandling behandling = hentBehandling(kontekst);
 
         if (behandling.erSaksbehandlingAvsluttet()) {
-            throw BehandlingskontrollFeil.FACTORY.kanIkkeHenleggeAvsluttetBehandling(behandling.getId()).toException();
+            throw BehandlingskontrollFeil.kanIkkeHenleggeAvsluttetBehandling(behandling.getId());
         }
 
         // sett årsak
@@ -575,7 +575,7 @@ public class BehandlingskontrollTjeneste {
             .collect(Collectors.toList());
 
         if (aksjonspunkterSomMedførerTilbakehopp.size() > 1) {
-            throw BehandlingskontrollFeil.FACTORY.kanIkkeGjenopptaBehandlingFantFlereAksjonspunkterSomMedførerTilbakehopp(behandling.getId()).toException();
+            throw BehandlingskontrollFeil.kanIkkeGjenopptaBehandlingFantFlereAksjonspunkterSomMedførerTilbakehopp(behandling.getId());
         }
         settAutopunkterTilUtført(kontekst, false);
         if (aksjonspunkterSomMedførerTilbakehopp.size() == 1) {

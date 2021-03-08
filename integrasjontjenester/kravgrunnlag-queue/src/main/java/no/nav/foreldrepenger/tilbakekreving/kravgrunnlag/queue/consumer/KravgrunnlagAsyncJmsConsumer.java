@@ -14,11 +14,6 @@ import javax.jms.TextMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.vedtak.feil.Feil;
-import no.nav.vedtak.feil.FeilFactory;
-import no.nav.vedtak.feil.LogLevel;
-import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
-import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
 import no.nav.vedtak.felles.integrasjon.jms.InternalQueueConsumer;
 import no.nav.vedtak.felles.integrasjon.jms.JmsKonfig;
 import no.nav.vedtak.felles.integrasjon.jms.precond.DefaultDatabaseOppePreconditionChecker;
@@ -54,7 +49,7 @@ public class KravgrunnlagAsyncJmsConsumer extends InternalQueueConsumer {
         if (message instanceof TextMessage) {
             håndterMelding((TextMessage) message);
         } else {
-            FeilFactory.create(KravgrunnlagAsyncJmsConsumerFeil.class).ikkeStøttetMessage(message.getClass()).log(logger);
+            logger.warn(String.format("FPT-832935: Mottok på ikke støttet message av klasse %s. Kø-elementet ble ignorert", message.getClass().getName()));
         }
     }
 
@@ -78,11 +73,4 @@ public class KravgrunnlagAsyncJmsConsumer extends InternalQueueConsumer {
     protected void setQueue(Queue queue) {
         super.setQueue(queue);
     }
-
-
-    interface KravgrunnlagAsyncJmsConsumerFeil extends DeklarerteFeil {
-        @TekniskFeil(feilkode = "FPT-832935", feilmelding = "Mottok på ikke støttet message av klasse %s. Kø-elementet ble ignorert", logLevel = LogLevel.WARN)
-        Feil ikkeStøttetMessage(Class<? extends Message> klasse);
-    }
-
 }

@@ -150,7 +150,7 @@ public class JettyFPDevServer extends JettyServer {
     protected List<Connector> createConnectors(AppKonfigurasjon appKonfigurasjon, Server server) {
         List<Connector> connectors = super.createConnectors(appKonfigurasjon, server);
 
-        SslContextFactory sslContextFactory = new SslContextFactory.Server();
+        SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
         sslContextFactory.setKeyStorePath(System.getProperty("no.nav.modig.security.appcert.keystore"));
         sslContextFactory.setKeyStorePassword(System.getProperty("no.nav.modig.security.appcert.password"));
         sslContextFactory.setKeyManagerPassword(System.getProperty("no.nav.modig.security.appcert.password"));

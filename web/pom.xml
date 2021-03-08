@@ -78,10 +78,6 @@
                     <rules>
                         <bannedDependencies>
                             <searchTransitive>true</searchTransitive>
-                            <excludes>
-                                <!-- skal ikke ha commons-logging, bruker jcl-over-slf4j istedet for redirect til logback -->
-                                <exclude>commons-logging:commons-logging</exclude>
-                            </excludes>
                         </bannedDependencies>
                     </rules>
                 </configuration>

@@ -13,12 +13,15 @@ import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.util.resource.ResourceCollection;
 import org.eclipse.jetty.webapp.MetaData;
 import org.eclipse.jetty.webapp.WebAppContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.web.app.ApplicationConfig;
 import no.nav.vedtak.isso.IssoApplication;
 
 public class JettyServer extends AbstractJettyServer {
 
+    private static final Logger LOG = LoggerFactory.getLogger(JettyServer.class);
     private DataSourceKonfig dataSourceKonfig;
 
     public JettyServer() {
@@ -71,20 +74,24 @@ public class JettyServer extends AbstractJettyServer {
     }
 
     private void temporært() {
-        // FIXME (u139158): PFP-1176 Skriv om i OpenAmIssoHealthCheck og AuthorizationRequestBuilder når Jboss dør
+        // FIXME: PFP-1176 Skriv om i OpenAmIssoHealthCheck og AuthorizationRequestBuilder når Jboss dør
         if (System.getenv("OIDC_OPENAM_HOSTURL") != null) {
+            LOG.info("Trickser med OIDC_OPENAM_HOSTURL");
             System.setProperty("OpenIdConnect.issoHost", System.getenv("OIDC_OPENAM_HOSTURL"));
         }
-        // FIXME (u139158): PFP-1176 Skriv om i AuthorizationRequestBuilder og IdTokenAndRefreshTokenProvider når Jboss dør
+        // FIXME: PFP-1176 Skriv om i AuthorizationRequestBuilder og IdTokenAndRefreshTokenProvider når Jboss dør
         if (System.getenv("OIDC_OPENAM_AGENTNAME") != null) {
+            LOG.info("Trickser med OIDC_OPENAM_AGENTNAME");
             System.setProperty("OpenIdConnect.username", System.getenv("OIDC_OPENAM_AGENTNAME"));
         }
-        // FIXME (u139158): PFP-1176 Skriv om i IdTokenAndRefreshTokenProvider når Jboss dør
+        // FIXME: PFP-1176 Skriv om i IdTokenAndRefreshTokenProvider når Jboss dør
         if (System.getenv("OIDC_OPENAM_PASSWORD") != null) {
+            LOG.info("Trickser med OIDC_OPENAM_PASSWORD");
             System.setProperty("OpenIdConnect.password", System.getenv("OIDC_OPENAM_PASSWORD"));
         }
-        // FIXME (u139158): PFP-1176 Skriv om i BaseJmsKonfig når Jboss dør
+        // FIXME: PFP-1176 Skriv om i BaseJmsKonfig når Jboss dør
         if (System.getenv("FPSAK_CHANNEL_NAME") != null) {
+            LOG.info("Trickser med FPSAK_CHANNEL_NAME");
             System.setProperty("mqGateway02.channel", System.getenv("FPSAK_CHANNEL_NAME"));
         }
     }
@@ -119,9 +126,12 @@ public class JettyServer extends AbstractJettyServer {
         // Find path to class-files while starting jetty from development environment.
         List<Class<?>> appClasses = Arrays.asList(ApplicationConfig.class, IssoApplication.class);
 
-        List<Resource> resources = appClasses.stream().map(c -> Resource.newResource(c.getProtectionDomain().getCodeSource().getLocation())).collect(Collectors.toList());
+        List<Resource> resources = appClasses.stream()
+            .map(c -> Resource.newResource(c.getProtectionDomain().getCodeSource().getLocation()))
+            .distinct()
+            .collect(Collectors.toList());
 
-        metaData.setWebInfClassesDirs(resources);
+        metaData.setWebInfClassesResources(resources);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.startupinfo;
 
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedMap;
 
@@ -69,23 +70,14 @@ class AppStartupInfoLogger {
     }
 
     private void log(HealthCheck.Result result) {
-        if (result.getDetails() != null) {
-            OppstartFeil.FACTORY.selftestStatus(
-                    getStatus(result.isHealthy()),
-                    (String) result.getDetails().get(ExtHealthCheck.DETAIL_DESCRIPTION),
-                    (String) result.getDetails().get(ExtHealthCheck.DETAIL_ENDPOINT),
-                    (String) result.getDetails().get(ExtHealthCheck.DETAIL_RESPONSE_TIME),
-                    result.getMessage()
-            ).log(logger);
-        } else {
-            OppstartFeil.FACTORY.selftestStatus(
-                    getStatus(result.isHealthy()),
-                    null,
-                    null,
-                    null,
-                    result.getMessage()
-            ).log(logger);
-        }
+        var details = result.getDetails();
+        var detailsNotNull = details != null;
+        logger.info(String.format("FPT-753409: Selftest %s: %s. Endpoint: %s. Responstid: %s. Feilmelding: %s.",
+            getStatus(result.isHealthy()),
+            detailsNotNull ? details.get(ExtHealthCheck.DETAIL_DESCRIPTION) : null,
+            detailsNotNull ? details.get(ExtHealthCheck.DETAIL_ENDPOINT) : null,
+            detailsNotNull ? details.get(ExtHealthCheck.DETAIL_RESPONSE_TIME) : null,
+            result.getMessage()));
     }
 
     private String getStatus(boolean isHealthy) {

@@ -92,7 +92,7 @@ public class Selftests {
     private void registrer(ExtHealthCheck healthCheck) {
         String name = healthCheck.getClass().getName();
         if (erKritiskTjeneste.containsKey(name)) {
-            throw SelftestFeil.FACTORY.dupliserteSelftestNavn(name).toException();
+            throw SelftestFeil.dupliserteSelftestNavn(name);
         }
         if ("true".equalsIgnoreCase(Environment.current().getProperty("test.only.disable.mq")) && name.contains(KravgrunnlagQueueHealthCheck.class.getName())) {
             LOGGER.info("Registrerte IKKE health check {} siden den er skrudd av med test.only.disable.mq=true", name);
@@ -119,7 +119,7 @@ public class Selftests {
 
             }
         } catch (IOException e) {
-            SelftestFeil.FACTORY.klarteIkkeÅLeseBuildTimePropertiesFil(e).log(LOGGER);
+            LOGGER.error(SelftestFeil.klarteIkkeÅLeseBuildTimePropertiesFil(e).getMessage(), e);
             // Ikke re-throw - dette er ikke kritisk
         }
 

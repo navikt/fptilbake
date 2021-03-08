@@ -1,5 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi;
 
+import javax.enterprise.context.Dependent;
+import javax.xml.ws.WebServiceException;
 import javax.xml.ws.soap.SOAPFaultException;
 
 import org.slf4j.Logger;
@@ -16,9 +18,10 @@ import no.nav.tilbakekreving.kravgrunnlag.annuller.v1.AnnullerKravgrunnlagDto;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagDto;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.HentKravgrunnlagDetaljDto;
 import no.nav.tilbakekreving.typer.v1.MmelDto;
-import no.nav.vedtak.felles.integrasjon.felles.ws.SoapWebServiceFeil;
+import no.nav.vedtak.exception.IntegrasjonException;
 
 //TODO denne klassen bør ha deafult scope
+@Dependent
 public class ØkonomiConsumerImpl implements ØkonomiConsumer {
 
     private static final String SERVICE_IDENTIFIER = "TilbakekrevingServiceV1";
@@ -35,7 +38,7 @@ public class ØkonomiConsumerImpl implements ØkonomiConsumer {
         try {
             return port.tilbakekrevingsvedtak(vedtak);
         } catch (SOAPFaultException e) { // NOSONAR
-            throw SoapWebServiceFeil.FACTORY.soapFaultIwebserviceKall(SERVICE_IDENTIFIER, e).toException();
+            throw SoapWebServiceFeil.soapFaultIwebserviceKall(SERVICE_IDENTIFIER, e);
         }
     }
 
@@ -74,7 +77,7 @@ public class ØkonomiConsumerImpl implements ØkonomiConsumer {
         try {
             return port.kravgrunnlagHentDetalj(hentKravgrunnlagRequest);
         } catch (SOAPFaultException e) { // NOSONAR
-            throw SoapWebServiceFeil.FACTORY.soapFaultIwebserviceKall(SERVICE_IDENTIFIER, e).toException();
+            throw SoapWebServiceFeil.soapFaultIwebserviceKall(SERVICE_IDENTIFIER, e);
         }
     }
 
@@ -84,7 +87,7 @@ public class ØkonomiConsumerImpl implements ØkonomiConsumer {
         try {
             return port.kravgrunnlagAnnuler(annulerRequest);
         } catch (SOAPFaultException e) { // NOSONAR
-            throw SoapWebServiceFeil.FACTORY.soapFaultIwebserviceKall(SERVICE_IDENTIFIER, e).toException();
+            throw SoapWebServiceFeil.soapFaultIwebserviceKall(SERVICE_IDENTIFIER, e);
         }
     }
 
@@ -106,4 +109,10 @@ public class ØkonomiConsumerImpl implements ØkonomiConsumer {
         }
     }
 
+    private static class SoapWebServiceFeil {
+
+        static IntegrasjonException soapFaultIwebserviceKall(String webservice, WebServiceException e) {
+            return new IntegrasjonException("F-942048", String.format("SOAP tjenesten [ %s ] returnerte en SOAP Fault:", webservice), e);
+        }
+    }
 }

@@ -5,28 +5,32 @@ import static no.nav.vedtak.feil.LogLevel.WARN;
 
 import java.io.IOException;
 
+import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.feil.Feil;
 import no.nav.vedtak.feil.FeilFactory;
 import no.nav.vedtak.feil.LogLevel;
 import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
 import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
 
-interface SelftestFeil extends DeklarerteFeil {
+public class SelftestFeil {
 
-    SelftestFeil FACTORY = FeilFactory.create(SelftestFeil.class);
+    static TekniskException klarteIkkeÅLeseBuildTimePropertiesFil(IOException e) {
+        return new TekniskException("FPT-635121", "Klarte ikke å lese build time properties fil", e);
+    }
 
-    @TekniskFeil(feilkode = "FPT-635121", feilmelding = "Klarte ikke å lese build time properties fil", logLevel = LogLevel.ERROR)
-    Feil klarteIkkeÅLeseBuildTimePropertiesFil(IOException e);
+    static TekniskException dupliserteSelftestNavn(String name) {
+        return new TekniskException("FPT-287026", String.format("Dupliserte selftest navn %s", name));
+    }
 
-    @TekniskFeil(feilkode = "FPT-287026", feilmelding = "Dupliserte selftest navn %s", logLevel = WARN)
-    Feil dupliserteSelftestNavn(String name);
+    static TekniskException uventetSelftestFeil(IOException e) {
+        return new TekniskException("FPT-409676", "Uventet feil", e);
+    }
 
-    @TekniskFeil(feilkode = "FPT-409676", feilmelding = "Uventet feil", logLevel = ERROR)
-    Feil uventetSelftestFeil(IOException e);
+    static TekniskException kritiskSelftestFeilet(String description, String endpoint, String responseTime, String message) {
+        return new TekniskException("FPT-932415", String.format("Selftest ERROR: %s. Endpoint: %s. Responstid: %s. Feilmelding: %s.", description, endpoint, responseTime, message));
+    }
 
-    @TekniskFeil(feilkode = "FPT-932415", feilmelding = "Selftest ERROR: %s. Endpoint: %s. Responstid: %s. Feilmelding: %s.", logLevel = ERROR)
-    Feil kritiskSelftestFeilet(String description, String endpoint, String responseTime, String message);
-
-    @TekniskFeil(feilkode = "984256", feilmelding = "Selftest ERROR: %s. Endpoint: %s. Responstid: %s. Feilmelding: %s.", logLevel = WARN)
-    Feil ikkeKritiskSelftestFeilet(String description, String endpoint, String responsTime, String message);
+    static TekniskException ikkeKritiskSelftestFeilet(String description, String endpoint, String responseTime, String message) {
+        return new TekniskException("FPT-984256", String.format("Selftest ERROR: %s. Endpoint: %s. Responstid: %s. Feilmelding: %s.", description, endpoint, responseTime, message));
+    }
 }

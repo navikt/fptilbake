@@ -1,7 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.grunnlag;
 
-import static no.nav.vedtak.feil.LogLevel.WARN;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -19,15 +17,10 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.vedtak.exception.IntegrasjonException;
-import no.nav.vedtak.feil.Feil;
-import no.nav.vedtak.feil.FeilFactory;
-import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
-import no.nav.vedtak.feil.deklarasjon.IntegrasjonFeil;
 
 public class KravgrunnlagValidator {
 
     private static final List<Consumer<Kravgrunnlag431>> VALIDATORER = Arrays.asList(
-        KravgrunnlagValidator::validerReferanse,
         KravgrunnlagValidator::validerPeriodeInnenforMåned,
         KravgrunnlagValidator::validerOverlappendePerioder,
         KravgrunnlagValidator::validerSkatt,
@@ -35,8 +28,9 @@ public class KravgrunnlagValidator {
         KravgrunnlagValidator::validerPerioderHarYtelPostering,
         KravgrunnlagValidator::validerPerioderHarFeilPosteringMedNegativFeilutbetaltBeløp,
         KravgrunnlagValidator::validerYtelseMotFeilutbetaling,
-        KravgrunnlagValidator::validerYtelPosteringTilbakekrevesMotNyttOgOpprinneligUtbetalt
-    );
+        KravgrunnlagValidator::validerYtelPosteringTilbakekrevesMotNyttOgOpprinneligUtbetalt,
+        KravgrunnlagValidator::validerReferanse
+        );
 
     public static void validerGrunnlag(Kravgrunnlag431 kravgrunnlag) throws UgyldigKravgrunnlagException {
         for (var validator : VALIDATORER) {
@@ -47,7 +41,7 @@ public class KravgrunnlagValidator {
     private static void validerReferanse(Kravgrunnlag431 kravgrunnlag) {
         Henvisning referanse = kravgrunnlag.getReferanse();
         if (referanse == null || StringUtils.isEmpty(referanse.getVerdi())) {
-            throw KravgrunnlagFeil.FACTORY.manglerReferanse(kravgrunnlag.getEksternKravgrunnlagId()).toException();
+            throw KravgrunnlagFeil.manglerReferanse(kravgrunnlag.getEksternKravgrunnlagId());
         }
     }
 
@@ -59,7 +53,7 @@ public class KravgrunnlagValidator {
             YearMonth fomMåned = YearMonth.of(fom.getYear(), fom.getMonth());
             YearMonth tomMåned = YearMonth.of(tom.getYear(), tom.getMonth());
             if (!fomMåned.equals(tomMåned)) {
-                throw KravgrunnlagFeil.FACTORY.periodeIkkInnenforMåned(kravgrunnlag.getEksternKravgrunnlagId(), p).toException();
+                throw KravgrunnlagFeil.periodeIkkInnenforMåned(kravgrunnlag.getEksternKravgrunnlagId(), p);
             }
         }
     }
@@ -67,7 +61,7 @@ public class KravgrunnlagValidator {
     private static void validerPerioderHarFeilutbetalingPostering(Kravgrunnlag431 kravgrunnlag) {
         for (KravgrunnlagPeriode432 periode : kravgrunnlag.getPerioder()) {
             if (periode.getKravgrunnlagBeloper433().stream().noneMatch(kgb -> KlasseType.FEIL.equals(kgb.getKlasseType()))) {
-                throw KravgrunnlagFeil.FACTORY.manglerKlasseTypeFeil(kravgrunnlag.getEksternKravgrunnlagId(), periode.getPeriode()).toException();
+                throw KravgrunnlagFeil.manglerKlasseTypeFeil(kravgrunnlag.getEksternKravgrunnlagId(), periode.getPeriode());
             }
         }
     }
@@ -75,7 +69,7 @@ public class KravgrunnlagValidator {
     private static void validerPerioderHarYtelPostering(Kravgrunnlag431 kravgrunnlag) {
         for (KravgrunnlagPeriode432 periode : kravgrunnlag.getPerioder()) {
             if (periode.getKravgrunnlagBeloper433().stream().noneMatch(kgb -> KlasseType.YTEL.equals(kgb.getKlasseType()))) {
-                throw KravgrunnlagFeil.FACTORY.manglerKlasseTypeYtel(kravgrunnlag.getEksternKravgrunnlagId(), periode.getPeriode()).toException();
+                throw KravgrunnlagFeil.manglerKlasseTypeYtel(kravgrunnlag.getEksternKravgrunnlagId(), periode.getPeriode());
             }
         }
     }
@@ -89,7 +83,7 @@ public class KravgrunnlagValidator {
             Periode forrige = sortertePerioder.get(i - 1);
             Periode denne = sortertePerioder.get(i);
             if (!denne.getFom().isAfter(forrige.getTom())) {
-                throw KravgrunnlagFeil.FACTORY.overlappendePerioder(kravgrunnlag.getEksternKravgrunnlagId(), forrige, denne).toException();
+                throw KravgrunnlagFeil.overlappendePerioder(kravgrunnlag.getEksternKravgrunnlagId(), forrige, denne);
             }
         }
     }
@@ -112,22 +106,22 @@ public class KravgrunnlagValidator {
                 beløpSkattMnd = periode.getBeløpSkattMnd();
             } else {
                 if (beløpSkattMnd.compareTo(periode.getBeløpSkattMnd()) != 0) {
-                    throw KravgrunnlagFeil.FACTORY.feilSkatt(måned).toException();
+                    throw KravgrunnlagFeil.feilSkatt(måned);
                 }
             }
             for (KravgrunnlagBelop433 postering : periode.getKravgrunnlagBeloper433()) {
                 if (postering.getSkattProsent() == null) {
-                    throw KravgrunnlagFeil.FACTORY.manglerFelt("skattProsent", periode.getPeriode()).toException();
+                    throw KravgrunnlagFeil.manglerFelt("skattProsent", periode.getPeriode());
                 }
                 sumSkatt = sumSkatt.add(postering.getTilbakekrevesBelop().multiply(postering.getSkattProsent()));
             }
         }
         sumSkatt = sumSkatt.divide(BigDecimal.valueOf(100), 0, RoundingMode.DOWN);
         if (beløpSkattMnd == null) {
-            throw KravgrunnlagFeil.FACTORY.manglerMaksSkatt(måned).toException();
+            throw KravgrunnlagFeil.manglerMaksSkatt(måned);
         }
         if (sumSkatt.compareTo(beløpSkattMnd) > 0) {
-            throw KravgrunnlagFeil.FACTORY.feilSkatt(måned, beløpSkattMnd, sumSkatt).toException();
+            throw KravgrunnlagFeil.feilSkatt(måned, beløpSkattMnd, sumSkatt);
         }
     }
 
@@ -135,7 +129,7 @@ public class KravgrunnlagValidator {
         for (KravgrunnlagPeriode432 periode : kravgrunnlag.getPerioder()) {
             for (KravgrunnlagBelop433 belop433 : periode.getKravgrunnlagBeloper433()) {
                 if (KlasseType.FEIL.equals(belop433.getKlasseType()) && belop433.getNyBelop().compareTo(BigDecimal.ZERO) < 0) {
-                    throw KravgrunnlagFeil.FACTORY.feilBeløp(kravgrunnlag.getEksternKravgrunnlagId(), periode.getPeriode()).toException();
+                    throw KravgrunnlagFeil.feilBeløp(kravgrunnlag.getEksternKravgrunnlagId(), periode.getPeriode());
                 }
             }
         }
@@ -154,7 +148,7 @@ public class KravgrunnlagValidator {
                 .reduce(BigDecimal::add)
                 .orElse(BigDecimal.ZERO);
             if (sumNyttBelopFraFeilposteringer.compareTo(sumTilbakekrevesFraYtelsePosteringer) != 0) {
-                throw KravgrunnlagFeil.FACTORY.feilYtelseEllerFeilutbetaling(kravgrunnlag.getEksternKravgrunnlagId(), periode.getPeriode(), sumTilbakekrevesFraYtelsePosteringer, sumNyttBelopFraFeilposteringer).toException();
+                throw KravgrunnlagFeil.feilYtelseEllerFeilutbetaling(kravgrunnlag.getEksternKravgrunnlagId(), periode.getPeriode(), sumTilbakekrevesFraYtelsePosteringer, sumNyttBelopFraFeilposteringer);
             }
         }
     }
@@ -165,8 +159,12 @@ public class KravgrunnlagValidator {
                 if (KlasseType.YTEL.equals(kgBeløp.getKlasseType())) {
                     BigDecimal diff = kgBeløp.getOpprUtbetBelop().subtract(kgBeløp.getNyBelop());
                     if (kgBeløp.getTilbakekrevesBelop().compareTo(diff) > 0) {
-                        throw KravgrunnlagFeil.FACTORY.ytelPosteringHvorTilbakekrevesIkkeStemmerMedNyttOgOpprinneligBeløp(kravgrunnlag.getEksternKravgrunnlagId(),
-                            periode.getPeriode(), kgBeløp.getTilbakekrevesBelop(), kgBeløp.getNyBelop(), kgBeløp.getOpprUtbetBelop()).toException();
+                        throw KravgrunnlagFeil.ytelPosteringHvorTilbakekrevesIkkeStemmerMedNyttOgOpprinneligBeløp(
+                            kravgrunnlag.getEksternKravgrunnlagId(),
+                            periode.getPeriode(),
+                            kgBeløp.getTilbakekrevesBelop(),
+                            kgBeløp.getNyBelop(),
+                            kgBeløp.getOpprUtbetBelop());
                     }
                 }
             }
@@ -179,49 +177,59 @@ public class KravgrunnlagValidator {
     }
 
     public static class UgyldigKravgrunnlagException extends IntegrasjonException {
-
-        public UgyldigKravgrunnlagException(Feil feil) {
-            super(feil);
+        public UgyldigKravgrunnlagException(String kode, String message) {
+            super(kode, message);
         }
     }
 
-    interface KravgrunnlagFeil extends DeklarerteFeil {
-        KravgrunnlagFeil FACTORY = FeilFactory.create(KravgrunnlagFeil.class);
+    public static class KravgrunnlagFeil {
 
-        @IntegrasjonFeil(feilkode = "FPT-879715", feilmelding = "Ugyldig kravgrunnlag. Mangler forventet felt %s for periode %s.", logLevel = WARN, exceptionClass = UgyldigKravgrunnlagException.class)
-        Feil manglerFelt(String felt, Periode periode);
+        static IntegrasjonException manglerFelt(String felt, Periode periode) {
+            return new UgyldigKravgrunnlagException("FPT-879715", String.format("Ugyldig kravgrunnlag. Mangler forventet felt %s for periode %s.", felt, periode));
+        }
 
-        @IntegrasjonFeil(feilkode = "FPT-879716", feilmelding = "Ugyldig kravgrunnlag for kravgrunnlagId %s. Mangler referanse.", logLevel = WARN, exceptionClass = UgyldigKravgrunnlagException.class)
-        Feil manglerReferanse(String kravgrunnlagId);
+        static IntegrasjonException manglerReferanse(String kravgrunnlagId) {
+            return new UgyldigKravgrunnlagException("FPT-879716", String.format("Ugyldig kravgrunnlag for kravgrunnlagId %s. Mangler referanse.", kravgrunnlagId));
+        }
 
-        @IntegrasjonFeil(feilkode = "FPT-936521", feilmelding = "Ugyldig kravgrunnlag for kravgrunnlagId %s. Overlappende perioder %s og %s.", logLevel = WARN, exceptionClass = UgyldigKravgrunnlagException.class)
-        Feil overlappendePerioder(String kravgrunnlagId, Periode a, Periode b);
+        static IntegrasjonException overlappendePerioder(String kravgrunnlagId, Periode a, Periode b) {
+            return new UgyldigKravgrunnlagException("FPT-936521", String.format("Ugyldig kravgrunnlag for kravgrunnlagId %s. Overlappende perioder %s og %s.", kravgrunnlagId, a, b));
+        }
 
-        @IntegrasjonFeil(feilkode = "FPT-727260", feilmelding = "Ugyldig kravgrunnlag for kravgrunnlagId %s. Perioden %s mangler postering med klasseType=FEIL.", logLevel = WARN, exceptionClass = UgyldigKravgrunnlagException.class)
-        Feil manglerKlasseTypeFeil(String kravgrunnlagId, Periode periode);
+        static IntegrasjonException manglerKlasseTypeFeil(String kravgrunnlagId, Periode periode) {
+            return new UgyldigKravgrunnlagException("FPT-727260", String.format("Ugyldig kravgrunnlag for kravgrunnlagId %s. Perioden %s mangler postering med klasseType=FEIL.", kravgrunnlagId, periode));
+        }
 
-        @IntegrasjonFeil(feilkode = "FPT-727261", feilmelding = "Ugyldig kravgrunnlag for kravgrunnlagId %s. Perioden %s mangler postering med klasseType=YTEL.", logLevel = WARN, exceptionClass = UgyldigKravgrunnlagException.class)
-        Feil manglerKlasseTypeYtel(String kravgrunnlagId, Periode periode);
+        static IntegrasjonException manglerKlasseTypeYtel(String kravgrunnlagId, Periode periode) {
+            return new UgyldigKravgrunnlagException("FPT-727261", String.format("Ugyldig kravgrunnlag for kravgrunnlagId %s. Perioden %s mangler postering med klasseType=YTEL.", kravgrunnlagId, periode));
+        }
 
-        @IntegrasjonFeil(feilkode = "FPT-438893", feilmelding = "Ugyldig kravgrunnlag for kravgrunnlagId %s. Perioden %s er ikke innenfor en kalendermåned.", logLevel = WARN, exceptionClass = UgyldigKravgrunnlagException.class)
-        Feil periodeIkkInnenforMåned(String kravgrunnlagId, Periode periode);
+        static IntegrasjonException periodeIkkInnenforMåned(String kravgrunnlagId, Periode periode) {
+            return new UgyldigKravgrunnlagException("FPT-438893", String.format("Ugyldig kravgrunnlag for kravgrunnlagId %s. Perioden %s er ikke innenfor en kalendermåned.", kravgrunnlagId, periode));
+        }
 
-        @IntegrasjonFeil(feilkode = "FPT-734548", feilmelding = "Ugyldig kravgrunnlag. Mangler max skatt for måned %s", logLevel = WARN, exceptionClass = UgyldigKravgrunnlagException.class)
-        Feil manglerMaksSkatt(YearMonth måned);
+        static IntegrasjonException manglerMaksSkatt(YearMonth måned) {
+            return new UgyldigKravgrunnlagException("FPT-734548", String.format("Ugyldig kravgrunnlag. Mangler max skatt for måned %s", måned));
+        }
 
-        @IntegrasjonFeil(feilkode = "FPT-560295", feilmelding = "Ugyldig kravgrunnlag. For måned %s er opplyses ulike verdier maks skatt i ulike perioder", logLevel = WARN, exceptionClass = UgyldigKravgrunnlagException.class)
-        Feil feilSkatt(YearMonth måned);
+        static IntegrasjonException feilSkatt(YearMonth måned) {
+            return new UgyldigKravgrunnlagException("FPT-560295", String.format("Ugyldig kravgrunnlag. For måned %s er opplyses ulike verdier maks skatt i ulike perioder", måned));
+        }
 
-        @IntegrasjonFeil(feilkode = "FPT-930235", feilmelding = "Ugyldig kravgrunnlag. For måned %s er maks skatt %s, men maks tilbakekreving ganget med skattesats blir %s", logLevel = WARN, exceptionClass = UgyldigKravgrunnlagException.class)
-        Feil feilSkatt(YearMonth måned, BigDecimal maxSkatt, BigDecimal maxUtregnbarSkatt);
+        static IntegrasjonException feilSkatt(YearMonth måned, BigDecimal maxSkatt, BigDecimal maxUtregnbarSkatt) {
+            return new UgyldigKravgrunnlagException("FPT-930235", String.format("Ugyldig kravgrunnlag. For måned %s er maks skatt %s, men maks tilbakekreving ganget med skattesats blir %s", måned, maxSkatt, maxUtregnbarSkatt));
+        }
 
-        @IntegrasjonFeil(feilkode = "FPT-361605", feilmelding = "Ugyldig kravgrunnlag for kravgrunnlagId %s. For periode %s er sum tilkakekreving fra YTEL %s, mens belopNytt i FEIL er %s. Det er forventet at disse er like.", logLevel = WARN, exceptionClass = UgyldigKravgrunnlagException.class)
-        Feil feilYtelseEllerFeilutbetaling(String kravgrunnlagId, Periode periode, BigDecimal sumTilbakekrevingYtel, BigDecimal belopNyttFraFeilpostering);
+        static IntegrasjonException feilYtelseEllerFeilutbetaling(String kravgrunnlagId, Periode periode, BigDecimal sumTilbakekrevingYtel, BigDecimal belopNyttFraFeilpostering) {
+            return new UgyldigKravgrunnlagException("FPT-361605", String.format("Ugyldig kravgrunnlag for kravgrunnlagId %s. For periode %s er sum tilkakekreving fra YTEL %s, mens belopNytt i FEIL er %s. Det er forventet at disse er like.", kravgrunnlagId, periode, sumTilbakekrevingYtel, belopNyttFraFeilpostering));
+        }
 
-        @IntegrasjonFeil(feilkode = "FPT-615761", feilmelding = "Ugyldig kravgrunnlag for kravgrunnlagId %s. For perioden %s finnes YTEL-postering med tilbakekrevesBeløp %s som er større enn differanse mellom nyttBeløp %s og opprinneligBeløp %s", logLevel = WARN, exceptionClass = UgyldigKravgrunnlagException.class)
-        Feil ytelPosteringHvorTilbakekrevesIkkeStemmerMedNyttOgOpprinneligBeløp(String kravgrunnlagId, Periode periode, BigDecimal tilbakekrevesBeløp, BigDecimal nyttBeløp, BigDecimal opprinneligBeløp);
+        static IntegrasjonException ytelPosteringHvorTilbakekrevesIkkeStemmerMedNyttOgOpprinneligBeløp(String kravgrunnlagId, Periode periode, BigDecimal tilbakekrevesBeløp, BigDecimal nyttBeløp, BigDecimal opprinneligBeløp) {
+            return new UgyldigKravgrunnlagException("FPT-615761", String.format("Ugyldig kravgrunnlag for kravgrunnlagId %s. For perioden %s finnes YTEL-postering med tilbakekrevesBeløp %s som er større enn differanse mellom nyttBeløp %s og opprinneligBeløp %s", kravgrunnlagId, periode, tilbakekrevesBeløp, nyttBeløp, opprinneligBeløp));
+        }
 
-        @IntegrasjonFeil(feilkode = "FPT-930247", feilmelding = "Ugyldig kravgrunnlag for kravgrunnlagId %s. Perioden %s har FEIL postering med negativ beløp", logLevel = WARN, exceptionClass = UgyldigKravgrunnlagException.class)
-        Feil feilBeløp(String kravgrunnlagId, Periode periode);
+        static IntegrasjonException feilBeløp(String kravgrunnlagId, Periode periode) {
+            return new UgyldigKravgrunnlagException("FPT-930247", String.format("Ugyldig kravgrunnlag for kravgrunnlagId %s. Perioden %s har FEIL postering med negativ beløp", kravgrunnlagId, periode));
+        }
     }
 }

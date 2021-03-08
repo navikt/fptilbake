@@ -9,12 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.kafka.RequestContextHandler;
+import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.exception.VLException;
-import no.nav.vedtak.feil.Feil;
-import no.nav.vedtak.feil.FeilFactory;
-import no.nav.vedtak.feil.LogLevel;
-import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
-import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
 import no.nav.vedtak.felles.jpa.TransactionHandler;
 
 public class Poller implements Runnable {
@@ -41,7 +37,7 @@ public class Poller implements Runnable {
         try {
             RequestContextHandler.doWithRequestContext(this::doPollWithEntityManager);
         } catch (VLException e) { //NOSONAR
-            e.log(logger);
+            logger.warn(e.getMessage());
         } catch (Exception e) {
             logger.error("Uventet feil i polling", e);
         }
@@ -59,7 +55,7 @@ public class Poller implements Runnable {
             return null;
         } catch (Exception e) {
             backoffRound.incrementAndGet();
-            throw Feilene.FACTORY.kunneIkkePolleKafkaHendelser(backoffRound.get(), e).toException();
+            throw new TekniskException("FP-852160", String.format("Kunne ikke polle kafka hendelser, venter til neste runde(runde=%s)", backoffRound.get()), e);
         }
     }
 
@@ -85,12 +81,5 @@ public class Poller implements Runnable {
         protected PostTransactionHandler doWork(EntityManager entityManager) {
             return doPoll();
         }
-    }
-
-    interface Feilene extends DeklarerteFeil {
-        Feilene FACTORY = FeilFactory.create(Feilene.class);
-
-        @TekniskFeil(feilkode = "FP-852160", feilmelding = "Kunne ikke polle kafka hendelser, venter til neste runde(runde=%s)", logLevel = LogLevel.INHERIT)
-        Feil kunneIkkePolleKafkaHendelser(Integer round, Exception cause);
     }
 }
