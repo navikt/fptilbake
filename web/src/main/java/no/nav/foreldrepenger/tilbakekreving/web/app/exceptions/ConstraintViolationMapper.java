@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.AksjonspunktKode;
+import no.nav.vedtak.exception.FunksjonellException;
 import no.nav.vedtak.feil.Feil;
 
 public class ConstraintViolationMapper implements ExceptionMapper<ConstraintViolationException> {
@@ -37,13 +38,18 @@ public class ConstraintViolationMapper implements ExceptionMapper<ConstraintViol
         }
         List<String> feltNavn = feilene.stream().map(FeltFeilDto::getNavn).collect(Collectors.toList());
         List<String> koder = feilene.stream().map(FeltFeilDto::getMetainformasjon).filter(Objects::nonNull).collect(Collectors.toList());
-        Feil feil = koder.isEmpty()
-            ? FeltValideringFeil.FACTORY.feltverdiKanIkkeValideres(feltNavn)
-            : FeltValideringFeil.FACTORY.feltverdiKanIkkeValideres(feltNavn, koder);
-        feil.log(log);
+
+        FunksjonellException feil;
+        if (koder.isEmpty()) {
+            feil = FeltValideringFeil.feltverdiKanIkkeValideres(feltNavn);
+        } else {
+            feil = FeltValideringFeil.feltverdiKanIkkeValideres(feltNavn, koder);
+        }
+        log.warn(feil.getMessage());
+
         return Response
             .status(Response.Status.BAD_REQUEST)
-            .entity(new FeilDto(feil.getFeilmelding(), feilene))
+            .entity(new FeilDto(feil.getMessage(), feilene))
             .type(MediaType.APPLICATION_JSON)
             .build();
     }

@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskStatusUtil;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.AsyncPollingStatus;
-import no.nav.vedtak.feil.Feil;
+import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
 
@@ -18,19 +18,20 @@ public class VurderProsessTaskStatusForPollingApi {
 
     private static final Logger log = LoggerFactory.getLogger(VurderProsessTaskStatusForPollingApi.class);
 
-    private ProsessTaskFeilmelder feilmelder;
     private Long entityId;
 
-    public interface ProsessTaskFeilmelder {
-        Feil feilIProsessTaskGruppe(String callId, Long entityId, String gruppe, Long taskId, ProsessTaskStatus taskStatus);
+    private static class ProsessTaskFeilmelder {
 
-        Feil utsattKjøringAvProsessTask(String callId, Long entityId, String gruppe, Long taskId, ProsessTaskStatus taskStatus, LocalDateTime nesteKjøringEtter);
+        static TekniskException utsattKjøringAvProsessTask(String callId, Long entityId, String gruppe, Long taskId, ProsessTaskStatus taskStatus, LocalDateTime nesteKjøringEtter) {
+            return new TekniskException("FPT-193309", String.format("[%1$s]. Forespørsel på behandling [id=%2$s] som er utsatt i påvente av task [id=%4$s], Gruppe [%3$s] kjøres ikke før senere. Task status=%5$s, planlagt neste kjøring=%6$s", callId, entityId, gruppe, taskId, taskStatus, nesteKjøringEtter));
+        }
 
-        Feil venterPåSvar(String callId, Long entityId, String gruppe, Long id, ProsessTaskStatus status);
+        static TekniskException venterPåSvar(String callId, Long entityId, String gruppe, Long id, ProsessTaskStatus status) {
+            return new TekniskException("FPT-193310", String.format("[%1$s]. Forespørsel på behandling [id=%2$s] som venter på svar fra annet system (task [id=%4$s], gruppe [%3$s] kjøres ikke før det er mottatt). Task status=%5$s", callId, entityId, gruppe, id, status));
+        }
     }
 
-    public VurderProsessTaskStatusForPollingApi(ProsessTaskFeilmelder feilmelder, Long entityId) {
-        this.feilmelder = feilmelder;
+    public VurderProsessTaskStatusForPollingApi(Long entityId) {
         this.entityId = entityId;
     }
 
@@ -72,23 +73,26 @@ public class VurderProsessTaskStatusForPollingApi {
     }
 
     private Optional<AsyncPollingStatus> håndterFeil(String gruppe, ProsessTaskData task, String callId) {
-        Feil feil = feilmelder.feilIProsessTaskGruppe(callId, entityId, gruppe, task.getId(), task.getStatus());
-        feil.log(log);
+        log.warn(String.format("FPT-193308:[%1$s]. Forespørsel på behandling [id=%2$s] som ikke kan fortsette, Problemer med task gruppe [%3$s]. Siste prosesstask[id=%4$s] status=%5$s", callId, entityId, gruppe, task.getId(), task.getStatus()));
 
         AsyncPollingStatus status = new AsyncPollingStatus(AsyncPollingStatus.Status.HALTED, null, task.getSisteFeil());
         return Optional.of(status); // fortsett å polle på gruppe, er ikke ferdig.
     }
 
     private Optional<AsyncPollingStatus> ventPåSvar(String gruppe, ProsessTaskData task, String callId) {
-        Feil feil = feilmelder.venterPåSvar(callId, entityId, gruppe, task.getId(), task.getStatus());
-        feil.log(log);
+        var feil = ProsessTaskFeilmelder.venterPåSvar(callId, entityId, gruppe, task.getId(), task.getStatus());
+        logWarn(feil);
 
         AsyncPollingStatus status = new AsyncPollingStatus(
                 AsyncPollingStatus.Status.DELAYED,
                 task.getNesteKjøringEtter(),
-                feil.getFeilmelding());
+                feil.getMessage());
 
         return Optional.of(status); // er ikke ferdig, men ok å videresende til visning av behandling med feilmelding der.
+    }
+
+    private void logWarn(TekniskException feil) {
+        log.warn("{}: {}", feil.getKode(), feil.getMessage());
     }
 
     private Optional<AsyncPollingStatus> ventPåKlar(String gruppe, LocalDateTime maksTidFørNesteKjøring, ProsessTaskData task, String callId) {
@@ -102,14 +106,14 @@ public class VurderProsessTaskStatusForPollingApi {
 
             return Optional.of(status); // fortsett å polle på gruppe, er ikke ferdig.
         } else {
-            Feil feil = feilmelder.utsattKjøringAvProsessTask(
+            var feil = ProsessTaskFeilmelder.utsattKjøringAvProsessTask(
                     callId, entityId, gruppe, task.getId(), task.getStatus(), task.getNesteKjøringEtter());
-            feil.log(log);
+            logWarn(feil);
 
             AsyncPollingStatus status = new AsyncPollingStatus(
                     AsyncPollingStatus.Status.DELAYED,
                     task.getNesteKjøringEtter(),
-                    feil.getFeilmelding());
+                    feil.getMessage());
 
             return Optional.of(status);
         }

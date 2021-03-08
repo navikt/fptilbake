@@ -24,11 +24,7 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagValidator;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlag;
-import no.nav.vedtak.feil.Feil;
-import no.nav.vedtak.feil.FeilFactory;
-import no.nav.vedtak.feil.LogLevel;
-import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
-import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
+import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
@@ -101,20 +97,20 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
         } catch (KravgrunnlagValidator.UgyldigKravgrunnlagException e) {
             //logger feilen i kravgrunnlaget sammen med metainformasjon slik at feilen kan følges opp
             //prosessen får fortsette, slik at prosessen hopper tilbake hvis den er i fakta-steget eller senere
-            LesKravgrunnlagTaskFeil.FACTORY.ugyldigKravgrunnlag(saksnummer, henvisning, mottattXmlId, e).log(logger);
+            logger.warn(String.format("FPT-839288: Mottok et ugyldig kravgrunnlag for saksnummer=%s henvisning=%s mottattXmlId=%s", saksnummer, henvisning, mottattXmlId), e);
             return false;
         }
     }
 
     private static void validerHenvisning(Henvisning henvisning){
         if (!Henvisning.erGyldig(henvisning)) {
-            throw LesKravgrunnlagTaskFeil.FACTORY.ugyldigHenvisning(henvisning).toException();
+            throw LesKravgrunnlagTaskFeil.ugyldigHenvisning(henvisning);
         }
     }
 
     private void validerBehandlingsEksistens(Henvisning henvisning, String saksnummer) {
         if (!finnesYtelsesbehandling(saksnummer, henvisning)) {
-            throw LesKravgrunnlagTaskFeil.FACTORY.behandlingFinnesIkkeIFagsaksystemet(saksnummer, henvisning).toException();
+            throw LesKravgrunnlagTaskFeil.behandlingFinnesIkkeIFagsaksystemet(saksnummer, henvisning);
         }
     }
 
@@ -128,29 +124,19 @@ public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandle
             EksternBehandling eksternBehandling = new EksternBehandling(behandling, eksternBehandlingDto.getHenvisning(), eksternBehandlingDto.getUuid());
             eksternBehandlingRepository.lagre(eksternBehandling);
         } else {
-            throw LesKravgrunnlagTaskFeil.FACTORY.behandlingFinnesIkkeIFagsaksystemet(saksnummer, grunnlagHenvisning).toException();
+            throw LesKravgrunnlagTaskFeil.behandlingFinnesIkkeIFagsaksystemet(saksnummer, grunnlagHenvisning);
         }
     }
 
-    interface LesKravgrunnlagTaskFeil extends DeklarerteFeil {
+    private static class LesKravgrunnlagTaskFeil  {
 
-        LesKravgrunnlagTaskFeil FACTORY = FeilFactory.create(LesKravgrunnlagTaskFeil.class);
+        static TekniskException behandlingFinnesIkkeIFagsaksystemet(String saksnummer, Henvisning henvisning) {
+            return new TekniskException("FPT-587195", String.format("Mottok et tilbakekrevingsgrunnlag fra Økonomi for en behandling som ikke finnes i Fagsaksystemet for saksnummer=%s, henvisning=%s. Kravgrunnlaget skulle kanskje til et annet system. Si i fra til Økonomi!", saksnummer, henvisning));
+        }
 
-        @TekniskFeil(feilkode = "FPT-587195",
-            feilmelding = "Mottok et tilbakekrevingsgrunnlag fra Økonomi for en behandling som ikke finnes i Fagsaksystemet for saksnummer=%s, henvisning=%s. Kravgrunnlaget skulle kanskje til et annet system. Si i fra til Økonomi!",
-            logLevel = LogLevel.WARN)
-        Feil behandlingFinnesIkkeIFagsaksystemet(String saksnummer, Henvisning henvisning);
-
-        @TekniskFeil(feilkode = "FPT-675363",
-            feilmelding = "Mottok et tilbakekrevingsgrunnlag fra Økonomi med henvisning som ikke er i støttet format. henvisning=%s. Kravgrunnlaget skulle kanskje til et annet system. Si i fra til Økonomi!",
-            logLevel = LogLevel.WARN)
-        Feil ugyldigHenvisning(Henvisning henvisning);
-
-        @TekniskFeil(feilkode = "FPT-839288",
-            feilmelding = "Mottok et ugyldig kravgrunnlag for saksnummer=%s henvisning=%s mottattXmlId=%s",
-            logLevel = LogLevel.WARN)
-        Feil ugyldigKravgrunnlag(String saksnummer, Henvisning henvisning, Long mottattXmlId, KravgrunnlagValidator.UgyldigKravgrunnlagException cause);
-
+        static TekniskException ugyldigHenvisning(Henvisning henvisning) {
+            return new TekniskException("FPT-675363", String.format("Mottok et tilbakekrevingsgrunnlag fra Økonomi med henvisning som ikke er i støttet format. henvisning=%s. Kravgrunnlaget skulle kanskje til et annet system. Si i fra til Økonomi!", henvisning));
+        }
     }
 
 }

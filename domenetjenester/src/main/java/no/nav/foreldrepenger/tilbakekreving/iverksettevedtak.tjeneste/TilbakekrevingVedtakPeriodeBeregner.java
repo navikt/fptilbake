@@ -27,11 +27,7 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagBelop433;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
-import no.nav.vedtak.feil.Feil;
-import no.nav.vedtak.feil.FeilFactory;
-import no.nav.vedtak.feil.LogLevel;
-import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
-import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
+import no.nav.vedtak.exception.TekniskException;
 
 @ApplicationScoped
 public class TilbakekrevingVedtakPeriodeBeregner {
@@ -174,7 +170,7 @@ public class TilbakekrevingVedtakPeriodeBeregner {
             i++;
         }
         if (diff.signum() != 0) {
-            rapporterAvrundingsfeil(diff, TilbakekrevingVedtakPeriodeBeregnerFeil.FACTORY.avrundingsfeilForLiteInnkrevet(periode, diff.abs()));
+            rapporterAvrundingsfeil(diff, TilbakekrevingVedtakPeriodeBeregnerFeil.avrundingsfeilForLiteInnkrevet(periode, diff.abs()));
         }
     }
 
@@ -190,7 +186,7 @@ public class TilbakekrevingVedtakPeriodeBeregner {
             i++;
         }
         if (diff.signum() != 0) {
-            rapporterAvrundingsfeil(diff, TilbakekrevingVedtakPeriodeBeregnerFeil.FACTORY.avrundingsfeilForMyeInnkrevet(periode, diff.abs()));
+            rapporterAvrundingsfeil(diff, TilbakekrevingVedtakPeriodeBeregnerFeil.avrundingsfeilForMyeInnkrevet(periode, diff.abs()));
         }
     }
 
@@ -227,13 +223,13 @@ public class TilbakekrevingVedtakPeriodeBeregner {
         if (diff.signum() == 0) {
             return;
         }
-        Feil feil = diff.signum() == -1
-            ? TilbakekrevingVedtakPeriodeBeregnerFeil.FACTORY.avrundingsfeilForLiteSkatt(bergningsperiode, diff.negate())
-            : TilbakekrevingVedtakPeriodeBeregnerFeil.FACTORY.avrundingsfeilForMyeSkatt(bergningsperiode, diff);
+        TekniskException feil = diff.signum() == -1
+            ? TilbakekrevingVedtakPeriodeBeregnerFeil.avrundingsfeilForLiteSkatt(bergningsperiode, diff.negate())
+            : TilbakekrevingVedtakPeriodeBeregnerFeil.avrundingsfeilForMyeSkatt(bergningsperiode, diff);
         if (diff.abs().intValue() > GRENSE_AVRUNDINGSFEIL) {
-            throw feil.toException();
+            throw feil;
         }
-        feil.log(logger);
+        logWarn(feil);
     }
 
     private void oppdaterGjenståendeSkattetrekk(List<TilbakekrevingPeriode> perioder, Map<YearMonth, BigDecimal> kgGjenståendeMuligSkattetrekk) {
@@ -345,7 +341,7 @@ public class TilbakekrevingVedtakPeriodeBeregner {
                 }
             }
             if (brTotalDager != brOverlappDager) {
-                throw TilbakekrevingVedtakPeriodeBeregnerFeil.FACTORY.inputvalideringFeiletBrPerioderOverlappKgPerioder(brPeriode.getPeriode(), brTotalDager, brOverlappDager).toException();
+                throw TilbakekrevingVedtakPeriodeBeregnerFeil.inputvalideringFeiletBrPerioderOverlappKgPerioder(brPeriode.getPeriode(), brTotalDager, brOverlappDager);
             }
         }
     }
@@ -361,7 +357,7 @@ public class TilbakekrevingVedtakPeriodeBeregner {
                 }
             }
             if (kgTotalDager != kgOverlappDager) {
-                throw TilbakekrevingVedtakPeriodeBeregnerFeil.FACTORY.inputvalideringFeiletKgPerioderOverlappBrPerioder(kgPeriode.getPeriode(), kgTotalDager, kgOverlappDager).toException();
+                throw TilbakekrevingVedtakPeriodeBeregnerFeil.inputvalideringFeiletKgPerioderOverlappBrPerioder(kgPeriode.getPeriode(), kgTotalDager, kgOverlappDager);
             }
         }
     }
@@ -395,34 +391,41 @@ public class TilbakekrevingVedtakPeriodeBeregner {
         }
     }
 
-    private static void rapporterAvrundingsfeil(BigDecimal diff, Feil feil) {
+    private static void rapporterAvrundingsfeil(BigDecimal diff, TekniskException e) {
         if (diff.abs().intValue() > GRENSE_AVRUNDINGSFEIL) {
-            throw feil.toException();
+            throw e;
         }
-        feil.log(logger);
+        logWarn(e);
     }
 
-    interface TilbakekrevingVedtakPeriodeBeregnerFeil extends DeklarerteFeil {
+    private static void logWarn(TekniskException e) {
+        logger.warn(String.format("%s: %s", e.getKode(), e.getMessage()));
+    }
 
-        TilbakekrevingVedtakPeriodeBeregnerFeil FACTORY = FeilFactory.create(TilbakekrevingVedtakPeriodeBeregnerFeil.class);
+    static class TilbakekrevingVedtakPeriodeBeregnerFeil  {
 
-        @TekniskFeil(feilkode = "FPT-870164", feilmelding = "Avrundingsfeil i periode %s i vedtak. Krever inn %s for mye for perioden", logLevel = LogLevel.WARN)
-        Feil avrundingsfeilForMyeInnkrevet(Periode periode, BigDecimal diff);
+        static TekniskException avrundingsfeilForMyeInnkrevet(Periode periode, BigDecimal diff) {
+            return new TekniskException("FPT-870164", String.format("Avrundingsfeil i periode %s i vedtak. Krever inn %s for mye for perioden", periode, diff));
+        }
 
-        @TekniskFeil(feilkode = "FPT-480533", feilmelding = "Avrundingsfeil i periode %s i vedtak. Krever inn %s for lite for perioden", logLevel = LogLevel.WARN)
-        Feil avrundingsfeilForLiteInnkrevet(Periode periode, BigDecimal diff);
+        static TekniskException avrundingsfeilForLiteInnkrevet(Periode periode, BigDecimal diff) {
+            return new TekniskException("FPT-480533", String.format("Avrundingsfeil i periode %s i vedtak. Krever inn %s for lite for perioden", periode, diff));
+        }
 
-        @TekniskFeil(feilkode = "FPT-925291", feilmelding = "Avrundingsfeil i periode %s i vedtak. Skattebeløp er satt %s for lite for perioden", logLevel = LogLevel.WARN)
-        Feil avrundingsfeilForLiteSkatt(Periode periode, BigDecimal diff);
+        static TekniskException avrundingsfeilForLiteSkatt(Periode periode, BigDecimal diff) {
+            return new TekniskException("FPT-925291", String.format("Avrundingsfeil i periode %s i vedtak. Skattebeløp er satt %s for lite for perioden", periode, diff));
+        }
 
-        @TekniskFeil(feilkode = "FPT-812610", feilmelding = "Avrundingsfeil i periode %s i vedtak. Skattebeløp er satt %s for høyt for perioden", logLevel = LogLevel.WARN)
-        Feil avrundingsfeilForMyeSkatt(Periode periode, BigDecimal diff);
+        static TekniskException avrundingsfeilForMyeSkatt(Periode periode, BigDecimal diff) {
+            return new TekniskException("FPT-812610", String.format("Avrundingsfeil i periode %s i vedtak. Skattebeløp er satt %s for høyt for perioden", periode, diff));
+        }
 
-        @TekniskFeil(feilkode = "FPT-685113", feilmelding = "Kravgrunnlagperiode %s har %s virkedager, forventer en-til-en, men ovelapper mot beregningsresultat med %s dager", logLevel = LogLevel.ERROR)
-        Feil inputvalideringFeiletKgPerioderOverlappBrPerioder(Periode periode, int kgVirkedager, int overlappVirkedager);
+        static TekniskException inputvalideringFeiletKgPerioderOverlappBrPerioder(Periode periode, int kgVirkedager, int overlappVirkedager) {
+            return new TekniskException("FPT-685113", String.format("Kravgrunnlagperiode %s har %s virkedager, forventer en-til-en, men ovelapper mot beregningsresultat med %s dager", periode , kgVirkedager, overlappVirkedager));
+        }
 
-        @TekniskFeil(feilkode = "FPT-745657", feilmelding = "Beregningsresultatperiode %s har %s virkedager, forventer en-til-en, men ovelapper mot kravgrunnlag med %s dager", logLevel = LogLevel.ERROR)
-        Feil inputvalideringFeiletBrPerioderOverlappKgPerioder(Periode periode, int kgVirkedager, int overlappVirkedager);
-
+        static TekniskException inputvalideringFeiletBrPerioderOverlappKgPerioder(Periode periode, int kgVirkedager, int overlappVirkedager) {
+            return new TekniskException("FPT-745657", String.format("Beregningsresultatperiode %s har %s virkedager, forventer en-til-en, men ovelapper mot kravgrunnlag med %s dager", periode, kgVirkedager, overlappVirkedager));
+        }
     }
 }

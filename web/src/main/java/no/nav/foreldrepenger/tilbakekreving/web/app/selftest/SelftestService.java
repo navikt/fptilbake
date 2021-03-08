@@ -21,11 +21,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
 import no.nav.foreldrepenger.tilbakekreving.web.app.selftest.checks.ExtHealthCheck;
+import no.nav.vedtak.exception.TekniskException;
 
 @RequestScoped
 public class SelftestService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SelftestService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SelftestService.class);
     private static final String RESPONSE_ENCODING = "UTF-8";
     private static final String RESPONSE_CACHE_KEY = "Cache-Control";
     private static final String RESPONSE_CACHE_VAL = "must-revalidate,no-cache,no-store";
@@ -73,7 +74,7 @@ public class SelftestService {
             byte[] utfEncoded = output.getBytes(Charset.forName(RESPONSE_ENCODING));
             builder.entity(utfEncoded);
         } catch (IOException e) {
-            SelftestFeil.FACTORY.uventetSelftestFeil(e).log(LOGGER);
+            LOG.error(SelftestFeil.uventetSelftestFeil(e).getMessage(), e);
         }
 
         return builder.build();
@@ -90,29 +91,27 @@ public class SelftestService {
     }
 
     private void kritiskeFeilTilLogg(List<HealthCheck.Result> resultat) {
-        resultat.forEach(entry -> {
-            if (!entry.isHealthy()) {
-                SelftestFeil.FACTORY.kritiskSelftestFeilet(
-                        getDetailValue(entry, ExtHealthCheck.DETAIL_DESCRIPTION),
-                        getDetailValue(entry, ExtHealthCheck.DETAIL_ENDPOINT),
-                        getDetailValue(entry, ExtHealthCheck.DETAIL_RESPONSE_TIME),
-                        entry.getMessage()
-                ).toException().log(LOGGER);
-            }
-        });
+        resultat.stream().filter(result -> !result.isHealthy()).forEach(entry -> LOG.error(lagKritiskMelding(entry).getMessage()));
+    }
+
+    private TekniskException lagKritiskMelding(HealthCheck.Result entry) {
+        return SelftestFeil.kritiskSelftestFeilet(
+            getDetailValue(entry, ExtHealthCheck.DETAIL_DESCRIPTION),
+            getDetailValue(entry, ExtHealthCheck.DETAIL_ENDPOINT),
+            getDetailValue(entry, ExtHealthCheck.DETAIL_RESPONSE_TIME),
+            entry.getMessage());
     }
 
     private void ikkeKritiskFeilTilLogg(List<HealthCheck.Result> resultat) {
-        resultat.forEach(entry -> {
-            if (!entry.isHealthy()) {
-                SelftestFeil.FACTORY.ikkeKritiskSelftestFeilet(
-                        getDetailValue(entry, ExtHealthCheck.DETAIL_DESCRIPTION),
-                        getDetailValue(entry, ExtHealthCheck.DETAIL_ENDPOINT),
-                        getDetailValue(entry, ExtHealthCheck.DETAIL_RESPONSE_TIME),
-                        entry.getMessage()
-                ).toException().log(LOGGER);
-            }
-        });
+        resultat.stream().filter(result -> !result.isHealthy()).forEach(entry -> LOG.warn(lagIkkeKritiskMelding(entry).getMessage()));
+    }
+
+    private TekniskException lagIkkeKritiskMelding(HealthCheck.Result entry) {
+        return SelftestFeil.ikkeKritiskSelftestFeilet(
+            getDetailValue(entry, ExtHealthCheck.DETAIL_DESCRIPTION),
+            getDetailValue(entry, ExtHealthCheck.DETAIL_ENDPOINT),
+            getDetailValue(entry, ExtHealthCheck.DETAIL_RESPONSE_TIME),
+            entry.getMessage());
     }
 
     private String getDetailValue(HealthCheck.Result resultat, String key) {

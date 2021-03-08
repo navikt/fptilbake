@@ -7,6 +7,7 @@ import java.util.Optional;
 import javax.sql.DataSource;
 
 import org.eclipse.jetty.plus.jndi.EnvEntry;
+import org.flywaydb.core.Flyway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,25 +18,20 @@ import no.nav.vedtak.util.env.Environment;
 
 public final class Databaseskjemainitialisering {
 
+    private static final Logger LOG = LoggerFactory.getLogger(Databaseskjemainitialisering.class);
     private static final Environment ENV = Environment.current();
 
     public static final List<DBProperties> UNIT_TEST = List.of(cfg("fptilbake.default"));
 
     public static final List<DBProperties> DBA = List.of(cfg("fptilbake.dba"));
 
-    private static final Logger LOG = LoggerFactory.getLogger(Databaseskjemainitialisering.class);
-
     public static void main(String[] args) {
         migrer();
     }
 
     public static void migrer() {
-        try {
             migrer(DBA);
             migrer(UNIT_TEST);
-        } catch (Exception e) {
-            throw new RuntimeException("Feil under migrering av enhetstest-skjemaer", e);
-        }
     }
 
     public static void settJdniOppslag() {
@@ -59,19 +55,17 @@ public final class Databaseskjemainitialisering {
     }
 
     private static void migrer(DataSource ds, DBProperties props) {
-        var cfg = new FlywayKonfig(ds);
-        if (!cfg
-                .medUsername(props.getUser())
-                .medSqlLokasjon(scriptLocation(props))
-                .medCleanup(props.isMigrateClean())
-                .medMetadataTabell(props.getVersjonstabell())
-                .migrerDb()) {
-            LOG.warn(
-                    "Kunne ikke starte inkrementell oppdatering av databasen. Det finnes trolig endringer i allerede kjørte script.\nKjører full migrering...");
-            if (!cfg.medCleanup(true).migrerDb()) {
-                throw new IllegalStateException("\n\nFeil i script. Avslutter...");
-            }
+        LOG.info("Migrerer {}", props.getSchema());
+        Flyway flyway = new Flyway();
+        flyway.setBaselineOnMigrate(true);
+        flyway.setDataSource(ds);
+        flyway.setTable("schema_version");
+        flyway.setLocations(scriptLocation(props));
+        flyway.setCleanOnValidationError(true);
+        if (!ENV.isLocal()) {
+            throw new IllegalStateException("Forventer at denne migreringen bare kjøres lokalt");
         }
+        flyway.migrate();
     }
 
     private static DBProperties cfg(String prefix) {

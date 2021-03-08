@@ -3,23 +3,14 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.exceptions;
 
 import java.util.List;
 
-import no.nav.vedtak.feil.Feil;
-import no.nav.vedtak.feil.FeilFactory;
-import no.nav.vedtak.feil.LogLevel;
-import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
-import no.nav.vedtak.feil.deklarasjon.FunksjonellFeil;
+import no.nav.vedtak.exception.FunksjonellException;
 
-interface FeltValideringFeil extends DeklarerteFeil{
+public class FeltValideringFeil {
 
-    FeltValideringFeil FACTORY = FeilFactory.create(FeltValideringFeil.class);
-
-    @FunksjonellFeil(feilkode = "FPT-328673",
-        feilmelding = "Det oppstod en valideringsfeil på felt %s. Vennligst kontroller at alle feltverdier er korrekte.",
-        løsningsforslag = "Kontroller at alle feltverdier er korrekte" ,logLevel = LogLevel.WARN)
-    Feil feltverdiKanIkkeValideres(List<String> feltnavn);
-
-    @FunksjonellFeil(feilkode = "FPT-328673",
-        feilmelding = "Det oppstod en valideringsfeil på felt %s for aksjonspunktkode %s. Vennligst kontroller at alle feltverdier er korrekte.",
-        løsningsforslag = "Kontroller at alle feltverdier er korrekte" ,logLevel = LogLevel.WARN)
-    Feil feltverdiKanIkkeValideres(List<String> feltnavn, List<String> aksjonspunktKoder);
+    static FunksjonellException feltverdiKanIkkeValideres(List<String> feltnavn) {
+        return new FunksjonellException("FPT-328673", String.format("Det oppstod en valideringsfeil på felt %s. Vennligst kontroller at alle feltverdier er korrekte.", feltnavn), "Kontroller at alle feltverdier er korrekte");
+    }
+    static FunksjonellException feltverdiKanIkkeValideres(List<String> feltnavn, List<String> aksjonspunktKoder) {
+        return new FunksjonellException("FPT-328673", String.format("Det oppstod en valideringsfeil på felt %s for aksjonspunktkode %s. Vennligst kontroller at alle feltverdier er korrekte.", feltnavn, aksjonspunktKoder), "Kontroller at alle feltverdier er korrekte");
+    }
 }

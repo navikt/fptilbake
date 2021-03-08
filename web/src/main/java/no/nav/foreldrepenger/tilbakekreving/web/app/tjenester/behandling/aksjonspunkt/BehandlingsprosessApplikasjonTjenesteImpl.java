@@ -11,13 +11,10 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.VurderProsessTaskStatusForPollingApi;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.AsyncPollingStatus;
-import no.nav.vedtak.feil.FeilFactory;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 
 @ApplicationScoped
 public class BehandlingsprosessApplikasjonTjenesteImpl implements BehandlingsprosessApplikasjonTjeneste {
-
-    private static final BehandlingsprosessApplikasjonFeil FEIL = FeilFactory.create(BehandlingsprosessApplikasjonFeil.class);
 
     BehandlingRepository behandlingRepository;
     BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste;
@@ -48,6 +45,6 @@ public class BehandlingsprosessApplikasjonTjenesteImpl implements Behandlingspro
         Long behandlingId = behandling.getId();
 
         Map<String, ProsessTaskData> nesteTask = behandlingskontrollAsynkTjeneste.sjekkProsessTaskPågårForBehandling(behandling, gruppe);
-        return new VurderProsessTaskStatusForPollingApi(FEIL, behandlingId).sjekkStatusNesteProsessTask(gruppe, nesteTask);
+        return new VurderProsessTaskStatusForPollingApi(behandlingId).sjekkStatusNesteProsessTask(gruppe, nesteTask);
     }
 }

@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonParseException;
 
+import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.feil.Feil;
 import no.nav.vedtak.feil.FeilFactory;
 import no.nav.vedtak.feil.LogLevel;
@@ -21,22 +22,20 @@ public class JsonParseExceptionMapper implements ExceptionMapper<JsonParseExcept
 
     @Override
     public Response toResponse(JsonParseException exception) {
-        Feil feil = JsonMappingFeil.FACTORY.jsonParseFeil(exception.getMessage(), exception);
-        feil.log(log);
+        var feil = JsonMappingFeil.jsonParseFeil(exception.getMessage(), exception);
+        log.warn(feil.getMessage(), feil);
+
         return Response
             .status(Response.Status.BAD_REQUEST)
-            .entity(new FeilDto(feil.getFeilmelding()))
+            .entity(new FeilDto(feil.getMessage()))
             .type(MediaType.APPLICATION_JSON)
             .build();
     }
 
-
-    interface JsonMappingFeil extends DeklarerteFeil {
-
-        JsonMappingFeil FACTORY = FeilFactory.create(JsonMappingFeil.class);
-
-        @TekniskFeil(feilkode = "FPT-299955", feilmelding = "JSON-parsing feil: %s", logLevel = LogLevel.WARN)
-        Feil jsonParseFeil(String feilmelding, JsonParseException e);
+    private static class JsonMappingFeil {
+        static TekniskException jsonParseFeil(String feilmelding, JsonParseException e) {
+            return new TekniskException("FPT-299955", String.format("JSON-parsing feil: %s", feilmelding), e);
+        }
     }
 
 }

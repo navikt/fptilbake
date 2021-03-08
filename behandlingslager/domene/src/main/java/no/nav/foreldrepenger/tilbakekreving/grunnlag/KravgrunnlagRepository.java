@@ -14,12 +14,6 @@ import javax.persistence.TypedQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.vedtak.feil.Feil;
-import no.nav.vedtak.feil.FeilFactory;
-import no.nav.vedtak.feil.LogLevel;
-import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
-import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
-
 @ApplicationScoped
 public class KravgrunnlagRepository {
 
@@ -104,7 +98,7 @@ public class KravgrunnlagRepository {
             KravgrunnlagValidator.validerGrunnlag(kravgrunnlag.getGrunnlagØkonomi());
             return true;
         } catch (KravgrunnlagValidator.UgyldigKravgrunnlagException e) {
-            e.getFeil().log(logger);
+            logger.warn(e.getMessage());
             return false;
         }
     }
@@ -124,7 +118,7 @@ public class KravgrunnlagRepository {
             aggregate.get().sperr();
             entityManager.persist(aggregate.get());
         } else {
-            KravgrunnlagRepositoryFeil.FEILFACTORY.kanIkkeSperreGrunnlagSomIkkeFinnes(behandlingId).log(logger);
+            logger.warn("FPT-710434: Forsøker å sperre kravgrunnlag, men det finnes ikke noe kravgrunnlag for behandlingId={}", behandlingId);
         }
     }
 
@@ -134,7 +128,7 @@ public class KravgrunnlagRepository {
             aggregate.get().opphev();
             entityManager.persist(aggregate.get());
         } else {
-            KravgrunnlagRepositoryFeil.FEILFACTORY.kanIkkeOppheveGrunnlagSomIkkeFinnes(behandlingId).log(logger);
+            logger.warn("FPT-710435: Forsøker å oppheve kravgrunnlag, men det finnes ikke noe kravgrunnlag for behandlingId={}", behandlingId);
         }
     }
 
@@ -158,16 +152,5 @@ public class KravgrunnlagRepository {
 
     public EntityManager getEntityManager() {
         return entityManager;
-    }
-
-    interface KravgrunnlagRepositoryFeil extends DeklarerteFeil {
-
-        KravgrunnlagRepositoryFeil FEILFACTORY = FeilFactory.create(KravgrunnlagRepositoryFeil.class);
-
-        @TekniskFeil(feilkode = "FPT-710434", feilmelding = "Forsøker å sperre kravgrunnlag, men det finnes ikke noe kravgrunnlag for behandlingId=%s", logLevel = LogLevel.WARN)
-        Feil kanIkkeSperreGrunnlagSomIkkeFinnes(Long behandlingId);
-
-        @TekniskFeil(feilkode = "FPT-710435", feilmelding = "Forsøker å oppheve kravgrunnlag, men det finnes ikke noe kravgrunnlag for behandlingId=%s", logLevel = LogLevel.WARN)
-        Feil kanIkkeOppheveGrunnlagSomIkkeFinnes(Long behandlingId);
     }
 }

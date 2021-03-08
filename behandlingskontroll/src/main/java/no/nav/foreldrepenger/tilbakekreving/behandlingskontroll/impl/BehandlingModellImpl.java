@@ -62,7 +62,6 @@ public class BehandlingModellImpl implements AutoCloseable, BehandlingModell {
     /**
      * Default modell bruker steg implementert vha. CDI.
      *
-     * @param modellRepository
      */
     public BehandlingModellImpl(BehandlingType behandlingType) {
         this(behandlingType, true);
@@ -71,7 +70,6 @@ public class BehandlingModellImpl implements AutoCloseable, BehandlingModell {
     /**
      * Default modell bruker steg implementert vha. CDI.
      *
-     * @param modellRepository
      * @param destroyOnClose   - hvorvidt #close skal gjøre noe.
      */
     public BehandlingModellImpl(BehandlingType behandlingType, boolean destroyOnClose) {
@@ -454,10 +452,10 @@ public class BehandlingModellImpl implements AutoCloseable, BehandlingModell {
             }
 
             if (instance2.isUnsatisfied()) {
-                BehandlingskontrollFeil.FACTORY.utilfredsstiltAvhengighetVedOppslag(stegType, behandlingType).log(logger);
+                logger.warn("FPT-105127: Utilfredsstilt avhengighet ved oppslag av behandlingssteg: {}, behandlingType {}.", stegType, behandlingType);
             }
             if (instance2.isAmbiguous()) {
-                BehandlingskontrollFeil.FACTORY.ambivalentAvhengighetVedOppslag(stegType, behandlingType).log(logger);
+                logger.warn("FPT-105128 : Ambivalent avhengighet ved oppslag av behandlingssteg: {}, behandlingType {}.", stegType, behandlingType);
             }
             return instance2;
         }

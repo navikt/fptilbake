@@ -24,8 +24,7 @@ public class AppStartupServletContextListener implements ServletContextListener 
         try {
             appStartupInfoLogger.logAppStartupInfo();
         } catch (Exception e) {
-            OppstartFeil.FACTORY.uventetExceptionVedOppstart(e).log(logger);
-            // men ikke re-throw - vi ønsker ikke at oppstart skal feile pga. feil i logging
+            logger.error("FPT-753407: Uventet exception ved oppstart", e);
         }
     }
 
