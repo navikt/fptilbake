@@ -6,18 +6,22 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.web.app.selftest.checks.DatabaseHealthCheck;
+import no.nav.foreldrepenger.tilbakekreving.web.app.selftest.checks.KravgrunnlagQueueHealthCheck;
 
 @ApplicationScoped
 public class Selftests {
 
     private DatabaseHealthCheck databaseHealthCheck;
+    private KravgrunnlagQueueHealthCheck kravgrunnlagQueueHealthCheck;
 
     private boolean isReady;
     private LocalDateTime sistOppdatertTid = LocalDateTime.now().minusDays(1);
 
     @Inject
-    public Selftests(DatabaseHealthCheck databaseHealthCheck) {
+    public Selftests(DatabaseHealthCheck databaseHealthCheck,
+                     KravgrunnlagQueueHealthCheck kravgrunnlagQueueHealthCheck) {
         this.databaseHealthCheck = databaseHealthCheck;
+        this.kravgrunnlagQueueHealthCheck = kravgrunnlagQueueHealthCheck;
     }
 
     Selftests() {
@@ -36,7 +40,7 @@ public class Selftests {
 
     private synchronized void oppdaterSelftestResultatHvisNødvendig() {
         if (sistOppdatertTid.isBefore(LocalDateTime.now().minusSeconds(30))) {
-            isReady = databaseHealthCheck.isOK();
+            isReady = databaseHealthCheck.isOK() && kravgrunnlagQueueHealthCheck.isOk();
             sistOppdatertTid = LocalDateTime.now();
         }
     }
