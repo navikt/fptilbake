@@ -26,8 +26,6 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.webapp.Configuration;
-import org.eclipse.jetty.webapp.JettyWebXmlConfiguration;
-import org.eclipse.jetty.webapp.MetaInfConfiguration;
 import org.eclipse.jetty.webapp.WebAppConfiguration;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.jetty.webapp.WebInfConfiguration;
@@ -35,7 +33,6 @@ import org.eclipse.jetty.webapp.WebXmlConfiguration;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.sikkerhet.SecurityFilter;
-import no.nav.vedtak.sikkerhet.context.SubjectHandler;
 
 abstract class AbstractJettyServer {
 
@@ -51,6 +48,8 @@ abstract class AbstractJettyServer {
      */
     protected static final Configuration[] CONFIGURATIONS = new Configuration[]{
         new WebAppConfiguration(),
+        new WebInfConfiguration(),
+        new WebXmlConfiguration(),
         new AnnotationConfiguration(),
         new EnvConfiguration(),
         new PlusConfiguration(),

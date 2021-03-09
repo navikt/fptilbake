@@ -9,23 +9,26 @@ import javax.ws.rs.core.Response;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 
-import no.nav.foreldrepenger.tilbakekreving.web.app.selftest.SelftestService;
+import no.nav.foreldrepenger.tilbakekreving.web.app.selftest.Selftests;
 
-public class NaisRestTjenesteTest {
+public class HealthCheckRestServiceTest {
 
-    private NaisRestTjeneste restTjeneste;
+    private HealthCheckRestService restTjeneste;
 
-    private ApplicationServiceStarter serviceStarterMock = mock(ApplicationServiceStarter.class);
-    private SelftestService selftestServiceMock = mock(SelftestService.class);
+    private final Selftests selftestsMock = mock(Selftests.class);
 
     @BeforeEach
     public void setup() {
-        restTjeneste = new NaisRestTjeneste(serviceStarterMock, selftestServiceMock);
+        restTjeneste = new HealthCheckRestService(selftestsMock);
     }
 
     @Test
     public void test_isAlive_skal_returnere_status_200() {
+        when(selftestsMock.isReady()).thenReturn(true);
+        restTjeneste.setIsContextStartupReady(true);
+
         Response response = restTjeneste.isAlive();
 
         assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
@@ -33,7 +36,8 @@ public class NaisRestTjenesteTest {
 
     @Test
     public void test_isReady_skal_returnere_service_unavailable_når_kritiske_selftester_feiler() {
-        when(selftestServiceMock.kritiskTjenesteFeilet()).thenReturn(true);
+        when(selftestsMock.isReady()).thenReturn(false);
+        restTjeneste.setIsContextStartupReady(true);
 
         Response response = restTjeneste.isReady();
 
@@ -42,18 +46,12 @@ public class NaisRestTjenesteTest {
 
     @Test
     public void test_isReady_skal_returnere_status_ok_når_selftester_er_ok() {
-        when(selftestServiceMock.kritiskTjenesteFeilet()).thenReturn(false);
+        when(selftestsMock.isReady()).thenReturn(true);
+        restTjeneste.setIsContextStartupReady(true);
 
         Response response = restTjeneste.isReady();
 
         assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
     }
 
-    @Test
-    public void test_preStop_skal_kalle_stopServices_og_returnere_status_ok() {
-        Response response = restTjeneste.preStop();
-
-        verify(serviceStarterMock).stopServices();
-        assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
-    }
 }

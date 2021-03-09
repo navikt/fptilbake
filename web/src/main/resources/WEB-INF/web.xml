@@ -25,27 +25,19 @@
 
     <!-- Listeners her slik at vi kan styre rekkefølgen de kjøres i: -->
     <listener>
-        <listener-class>no.nav.foreldrepenger.tilbakekreving.web.app.selftest.HealthCheckServletContextListener</listener-class>
-    </listener>
-    <listener>
         <listener-class>no.nav.foreldrepenger.tilbakekreving.web.app.startupinfo.AppStartupServletContextListener</listener-class>
     </listener>
     <listener>
         <listener-class>no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.ApplicationContextListener</listener-class>
-    </listener>
-    <listener>
-        <listener-class>no.nav.vedtak.sikkerhet.jaspic.SamAutoRegistration</listener-class>
     </listener>
 
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>Ubeskyttet</web-resource-name>
             <url-pattern>/cb</url-pattern>
-            <url-pattern>/internal/isAlive</url-pattern>
-            <url-pattern>/internal/isReady</url-pattern>
-            <url-pattern>/internal/selftest</url-pattern>
+            <url-pattern>/internal/health/isAlive</url-pattern>
+            <url-pattern>/internal/health/isReady</url-pattern>
             <url-pattern>/internal/metrics/prometheus</url-pattern>
-            <url-pattern>/internal/preStop</url-pattern>
         </web-resource-collection>
     </security-constraint>
     <security-constraint>
@@ -57,6 +49,17 @@
             <!-- From Servlet spec 3.1 "**" means any authenticated user ref: https://community.oracle.com/blogs/swchan2/2013/04/19/role-servlet-31-security-constraint -->
             <role-name>**</role-name>
         </auth-constraint>
+    </security-constraint>
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>HTTP metoder beskyttet</web-resource-name>
+            <url-pattern>/*</url-pattern>
+            <http-method>HEAD</http-method>
+            <http-method>TRACE</http-method>
+            <http-method>OPTIONS</http-method>
+            <http-method>DELETE</http-method>
+        </web-resource-collection>
+        <auth-constraint />
     </security-constraint>
 </web-app>
 

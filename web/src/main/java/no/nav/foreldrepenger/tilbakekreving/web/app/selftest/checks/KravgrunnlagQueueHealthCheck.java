@@ -18,7 +18,7 @@ public class KravgrunnlagQueueHealthCheck extends QueueHealthCheck {
     }
 
     @Override
-    protected String getDescriptionSuffix() {
+    public String getDescriptionSuffix() {
         return "Kravgrunnlag";
     }
 }
