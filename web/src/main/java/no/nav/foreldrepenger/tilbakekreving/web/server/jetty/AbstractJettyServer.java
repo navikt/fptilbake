@@ -26,6 +26,9 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.webapp.Configuration;
+import org.eclipse.jetty.webapp.JettyWebXmlConfiguration;
+import org.eclipse.jetty.webapp.MetaInfConfiguration;
+import org.eclipse.jetty.webapp.WebAppConfiguration;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.jetty.webapp.WebInfConfiguration;
 import org.eclipse.jetty.webapp.WebXmlConfiguration;
@@ -47,8 +50,7 @@ abstract class AbstractJettyServer {
      * nedstrippet sett med Jetty configurations for raskere startup.
      */
     protected static final Configuration[] CONFIGURATIONS = new Configuration[]{
-        new WebInfConfiguration(),
-        new WebXmlConfiguration(),
+        new WebAppConfiguration(),
         new AnnotationConfiguration(),
         new EnvConfiguration(),
         new PlusConfiguration(),
