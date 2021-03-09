@@ -1,140 +1,68 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.selftest;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Any;
-import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.codahale.metrics.health.HealthCheck;
-import com.codahale.metrics.health.HealthCheckRegistry;
-
-import no.nav.foreldrepenger.tilbakekreving.web.app.selftest.checks.ExtHealthCheck;
-import no.nav.foreldrepenger.tilbakekreving.web.app.selftest.checks.KravgrunnlagQueueHealthCheck;
-import no.nav.vedtak.konfig.KonfigVerdi;
-import no.nav.vedtak.util.env.Environment;
+import no.nav.foreldrepenger.tilbakekreving.web.app.selftest.checks.DatabaseHealthCheck;
 
 @ApplicationScoped
 public class Selftests {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Selftests.class);
+    private DatabaseHealthCheck databaseHealthCheck;
 
-    private HealthCheckRegistry registry;
-    private Map<String, Boolean> erKritiskTjeneste = new HashMap<>();
-
-    private Instance<ExtHealthCheck> healthChecks;
-
-    private boolean hasSetupChecks;
-
-    private String applicationName;
-
-    private static final String BUILD_PROPERTIES = "build.properties";
+    private boolean isReady;
+    private LocalDateTime sistOppdatertTid = LocalDateTime.now().minusDays(1);
 
     @Inject
-    public Selftests(
-        HealthCheckRegistry registry,
-        @Any Instance<ExtHealthCheck> healthChecks,
-        @KonfigVerdi(value = "app.name") String applicationName) {
-
-        this.registry = registry;
-        this.healthChecks = healthChecks;
-        this.applicationName = applicationName;
+    public Selftests(DatabaseHealthCheck databaseHealthCheck) {
+        this.databaseHealthCheck = databaseHealthCheck;
     }
 
     Selftests() {
         // for CDI proxy
     }
 
-    public SelftestResultat run() {
-        return run(false);
+    public Selftests.Resultat run() {
+        oppdaterSelftestResultatHvisNødvendig();
+        return new Selftests.Resultat(isReady, databaseHealthCheck.getDescription(), databaseHealthCheck.getEndpoint());
     }
 
-    public SelftestResultat run(boolean kunKritiskeTester) {
-        setupChecks();
-
-        SelftestResultat samletResultat = new SelftestResultat();
-        populateBuildtimeProperties(samletResultat);
-        samletResultat.setTimestamp(LocalDateTime.now());
-
-        for (String name : registry.getNames()) {
-            Boolean kritiskTjeneste = erKritiskTjeneste.get(name);
-            if (kunKritiskeTester && !kritiskTjeneste) {
-                continue;
-            }
-            HealthCheck.Result result = registry.runHealthCheck(name);
-            if (kritiskTjeneste) {
-                samletResultat.leggTilResultatForKritiskTjeneste(result);
-            } else {
-                samletResultat.leggTilResultatForIkkeKritiskTjeneste(result);
-            }
-        }
-        return samletResultat;
+    public boolean isReady() {
+        // Bruk denne for NAIS-respons og skill omfanget her.
+        return run().isReady();
     }
 
-    private void setupChecks() {
-        if (!hasSetupChecks) {
-            for (ExtHealthCheck healthCheck : healthChecks) {
-                registrer(healthCheck);
-            }
-            hasSetupChecks = true;
+    private synchronized void oppdaterSelftestResultatHvisNødvendig() {
+        if (sistOppdatertTid.isBefore(LocalDateTime.now().minusSeconds(30))) {
+            isReady = databaseHealthCheck.isOK();
+            sistOppdatertTid = LocalDateTime.now();
         }
     }
 
-    private void registrer(ExtHealthCheck healthCheck) {
-        String name = healthCheck.getClass().getName();
-        if (erKritiskTjeneste.containsKey(name)) {
-            throw SelftestFeil.dupliserteSelftestNavn(name);
-        }
-        if ("true".equalsIgnoreCase(Environment.current().getProperty("test.only.disable.mq")) && name.contains(KravgrunnlagQueueHealthCheck.class.getName())) {
-            LOGGER.info("Registrerte IKKE health check {} siden den er skrudd av med test.only.disable.mq=true", name);
-            return;
-        }
-        registry.register(name, healthCheck);
-        erKritiskTjeneste.put(name, healthCheck.erKritiskTjeneste());
-    }
+    public static class Resultat {
+        private final boolean isReady;
+        private final String description;
+        private final String endpoint;
 
-    private void populateBuildtimeProperties(SelftestResultat samletResultat) {
-        String version = null;
-        String revision = null;
-        String timestamp = null;
-
-        try (InputStream is = this.getClass().getClassLoader().getResourceAsStream(BUILD_PROPERTIES)) {
-            Properties prop = new Properties();
-            if (is != null) {
-                // det er forventet at build.properties-filen ikke er tilgjengelig lokalt.
-                // unngår derfor å forsøke å lese den.
-                prop.load(is);
-                version = prop.getProperty("version");
-                revision = prop.getProperty("revision");
-                timestamp = prop.getProperty("timestamp");
-
-            }
-        } catch (IOException e) {
-            LOGGER.error(SelftestFeil.klarteIkkeÅLeseBuildTimePropertiesFil(e).getMessage(), e);
-            // Ikke re-throw - dette er ikke kritisk
+        public Resultat(boolean isReady, String description, String endpoint) {
+            this.isReady = isReady;
+            this.description = description;
+            this.endpoint = endpoint;
         }
 
-        samletResultat.setVersion(buildtimePropertyValueIfNull(version));
-        samletResultat.setApplication(applicationName);
-        samletResultat.setRevision(buildtimePropertyValueIfNull(revision));
-        samletResultat.setBuildTime(buildtimePropertyValueIfNull(timestamp));
-    }
-
-    private String buildtimePropertyValueIfNull(String value) {
-        String newValue = value;
-        if (newValue == null) {
-            newValue = "?.?.?";
+        public boolean isReady() {
+            return isReady;
         }
-        return newValue;
+
+        public String getDescription() {
+            return description;
+        }
+
+        public String getEndpoint() {
+            return endpoint;
+        }
     }
 
 }

@@ -3,10 +3,15 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.selftest.checks;
 import javax.jms.JMSException;
 import javax.jms.JMSRuntimeException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import no.nav.vedtak.felles.integrasjon.jms.QueueSelftest;
 import no.nav.vedtak.felles.integrasjon.jms.pausing.MQExceptionUtil;
 
-public abstract class QueueHealthCheck extends ExtHealthCheck {
+public abstract class QueueHealthCheck {
+
+    private static final Logger LOG = LoggerFactory.getLogger(DatabaseHealthCheck.class);
 
     private QueueSelftest client;
 
@@ -18,14 +23,12 @@ public abstract class QueueHealthCheck extends ExtHealthCheck {
         this.client = client;
     }
 
-    @Override
     protected String getDescription() {
         return "Test av meldingskø for " + getDescriptionSuffix();
     }
 
     protected abstract String getDescriptionSuffix();
 
-    @Override
     protected String getEndpoint() {
         String endpoint;
         try {
@@ -36,22 +39,13 @@ public abstract class QueueHealthCheck extends ExtHealthCheck {
         return endpoint;
     }
 
-    @Override
-    protected InternalResult performCheck() {
-        InternalResult intTestRes = new InternalResult();
-
+    public boolean isOk() {
         try {
             client.testConnection();
-            intTestRes.setOk(true);
-        } catch (JMSRuntimeException e) { // NOSONAR
-            intTestRes.setMessage(MQExceptionUtil.extract(e));
-        } catch (JMSException e) { // NOSONAR
-            intTestRes.setMessage(MQExceptionUtil.extract(e));
-        } catch (Exception e) {
-            intTestRes.setException(e);
+        } catch (JMSRuntimeException | JMSException e) { // NOSONAR
+            LOG.warn("Feil ved meldingskø helsesjekk {}", getDescriptionSuffix());
         }
 
-        intTestRes.noteResponseTime();
-        return intTestRes;
+        return true;
     }
 }

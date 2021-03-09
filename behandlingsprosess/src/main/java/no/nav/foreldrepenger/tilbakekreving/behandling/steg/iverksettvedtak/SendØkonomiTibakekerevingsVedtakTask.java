@@ -21,6 +21,7 @@ import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakRequest;
 import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakResponse;
 import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsvedtakDto;
 import no.nav.tilbakekreving.typer.v1.MmelDto;
+import no.nav.vedtak.exception.IntegrasjonException;
 import no.nav.vedtak.feil.Feil;
 import no.nav.vedtak.feil.FeilFactory;
 import no.nav.vedtak.feil.LogLevel;
@@ -81,7 +82,7 @@ public class SendØkonomiTibakekerevingsVedtakTask implements ProsessTaskHandler
                 rwsp.doWork(() -> {
                     //setter savepoint før feilen kastes, slik at kvitteringen blir lagret. Kaster feil for å feile prosesstasken, samt trigge logging
                     String detaljer = kvittering != null ? ØkonomiConsumerFeil.formaterKvittering(kvittering) : " Fikk ikke kvittering fra OS";
-                    throw Feilene.FACTORY.fikkFeilkodeVedIverksetting(behandlingId, detaljer).toException();
+                    throw new IntegrasjonException("FPT-609912", String.format("Fikk feil fra OS ved iverksetting av behandlingId=%s.%s", behandlingId, detaljer));
                 });
             }
             return null;
@@ -105,12 +106,5 @@ public class SendØkonomiTibakekerevingsVedtakTask implements ProsessTaskHandler
         String responsXml = ØkonomiResponsMarshaller.marshall(respons, behandlingId);
         økonomiSendtXmlRepository.oppdatereKvittering(sendtXmlId, responsXml);
         logger.info("oppdatert respons-xml for behandling={}", behandlingId);
-    }
-
-    interface Feilene extends DeklarerteFeil {
-        Feilene FACTORY = FeilFactory.create(Feilene.class);
-
-        @IntegrasjonFeil(feilkode = "FPT-609912", feilmelding = "Fikk feil fra OS ved iverksetting av behandlingId=%s.%s", logLevel = LogLevel.WARN)
-        Feil fikkFeilkodeVedIverksetting(Long behandlingId, String infoFraKvittering);
     }
 }

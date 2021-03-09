@@ -13,7 +13,7 @@ spec:
      - {{url}}
   {{/each}}
   liveness: # HTTP endpoint that signals 200 OK when the application is running.
-    path: /fptilbake/internal/isAlive
+    path: /fptilbake/internal/health/isAlive
     initialDelay: 30
     timeout: 5
     periodSeconds: 10     # How often (in seconds) to perform the probe. Default to 10 seconds
@@ -21,7 +21,7 @@ spec:
     # nais will try failureThreshold times before giving up and restarting the Pod
     # Defaults to 3
   readiness: # HTTP endpoint that signals 200 OK when it is okay to start routing traffic to the application.
-    path: /fptilbake/internal/isReady
+    path: /fptilbake/internal/health/isReady
     initialDelay: 30
     timeout: 5
     periodSeconds: 10

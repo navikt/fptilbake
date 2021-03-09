@@ -11,49 +11,39 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
-@ApplicationScoped
-public class DatabaseHealthCheck extends ExtHealthCheck {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+@ApplicationScoped
+public class DatabaseHealthCheck {
+
+    private static final Logger LOG = LoggerFactory.getLogger(DatabaseHealthCheck.class);
     private static final String JDBC_DEFAULT_DS = "jdbc/defaultDS";
+    private static final String SQL_QUERY = "select 1 from FAGSAK where rownum=1";
 
     private String jndiName;
 
-    private static final String SQL_QUERY = "select 1 from FAGSAK where rownum=1";
-    // må være rask, og bruke et stabilt tabell-navn
-
-    private String endpoint = null; // ukjent frem til første gangs test
+    private String endpoint = null;
 
     public DatabaseHealthCheck() {
         this.jndiName = JDBC_DEFAULT_DS;
     }
 
-    @Override
-    protected String getDescription() {
+    public String getDescription() {
         return "Test av databaseforbindelse (" + jndiName + ")";
     }
 
-    @Override
-    protected String getEndpoint() {
+    public String getEndpoint() {
         return endpoint;
     }
 
-    @Override
-    public boolean erKritiskTjeneste() {
-        return true;
-    }
+    public boolean isOK() {
 
-    @Override
-    protected InternalResult performCheck() {
-
-        InternalResult intTestRes = new InternalResult();
-
-        DataSource dataSource = null;
+        DataSource dataSource ;
         try {
             dataSource = (DataSource) new InitialContext().lookup(jndiName);
         } catch (NamingException e) {
-            intTestRes.setMessage("Feil ved JNDI-oppslag for " + jndiName + " - " + e);
-            intTestRes.setException(e);
-            return intTestRes;
+            return false;
         }
 
         try (Connection connection = dataSource.getConnection()) {
@@ -66,14 +56,11 @@ public class DatabaseHealthCheck extends ExtHealthCheck {
                 }
             }
         } catch (SQLException e) {
-            intTestRes.setMessage("Feil ved SQL-spørring (" + SQL_QUERY + ") mot databasen");
-            intTestRes.setException(e);
-            return intTestRes;
+            LOG.warn("Feil ved SQL-spørring {} mot databasen", SQL_QUERY);
+            return false;
         }
 
-        intTestRes.noteResponseTime();
-        intTestRes.setOk(true);
-        return intTestRes;
+        return true;
     }
 
     private String extractEndpoint(Connection connection) {
