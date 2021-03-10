@@ -1,7 +1,7 @@
 Applikasjonene fptilbake og k9-tilbake
 ===============
 
-Dette er repository for applikasjonene:
+Dette er repository for applikasjonene:  
  * fptilbake, en tilbakekrevingsapplikasjon for foreldrepenger, svangerskapspenger og engangsstønad.
  * k9-tilbake, en tilbakekrevingsapplikasjon for frisinn og kapittel 9-ytelser: pleiepenger for sykt barn, pleiepenger for syk nærstående, omsorgspenger, opplæringspenger
 
