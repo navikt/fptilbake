@@ -10,6 +10,7 @@ public class FagsakDto {
 
     private String saksnummer;
     private FagsakYtelseType sakstype;
+    private FagsakYtelseType fagsakYtelseType;
     private String aktoerId;
 
     public void setSaksnummer(String saksnummer) {
@@ -21,11 +22,19 @@ public class FagsakDto {
     }
 
     public FagsakYtelseType getSakstype() {
-        return sakstype;
+        return sakstype != null ? sakstype : fagsakYtelseType;
     }
 
     public void setSakstype(FagsakYtelseType sakstype) {
         this.sakstype = sakstype;
+    }
+
+    public FagsakYtelseType getFagsakYtelseType() {
+        return fagsakYtelseType != null ? fagsakYtelseType : sakstype;
+    }
+
+    public void setFagsakYtelseType(FagsakYtelseType fagsakYtelseType) {
+        this.fagsakYtelseType = fagsakYtelseType;
     }
 
     public String getAktoerId() {
