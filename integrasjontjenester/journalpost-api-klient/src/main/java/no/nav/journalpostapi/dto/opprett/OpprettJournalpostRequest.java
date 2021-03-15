@@ -26,7 +26,7 @@ public class OpprettJournalpostRequest {
     private BehandlingTema behandlingstema;
     private Bruker bruker;
     private List<Dokument> dokumenter;
-    private String eksternReferanseId;
+    private String eksternReferanseId = null;
     @JsonProperty("journalfoerendeEnhet")
     private Integer journalførendeEnhet;
     @JsonSerialize(using = KodelisteSomKodeSerialiserer.class)
@@ -126,11 +126,6 @@ public class OpprettJournalpostRequest {
 
         public Builder medJournalførendeEnhet(String journalførendeEnhet) {
             kladd.journalførendeEnhet = Integer.valueOf(journalførendeEnhet);
-            return this;
-        }
-
-        public Builder medEksternReferanseId(String eksternReferanseId) {
-            kladd.eksternReferanseId = eksternReferanseId;
             return this;
         }
 
