@@ -36,7 +36,7 @@
         <!-- Felles avhengigheter i prosjektet Disse skal ALLTID være en
             RELEASE-avhengighet UNNTAK: feature-brancher og lokalt -->
         <felles.version>3.1.11</felles.version>
-        <prosesstask.version>2.5.15</prosesstask.version>
+        <prosesstask.version>2.5.16</prosesstask.version>
         <vl-fpsak-tidsserie.version>2.5.5</vl-fpsak-tidsserie.version>
         <!-- Kontrakter -->
         <fpkontrakter.version>5.1-20201118182725-764a023</fpkontrakter.version>
