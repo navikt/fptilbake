@@ -7,12 +7,8 @@ import org.xml.sax.SAXException;
 
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlag;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagMelding;
-import no.nav.vedtak.feil.Feil;
-import no.nav.vedtak.feil.FeilFactory;
-import no.nav.vedtak.feil.LogLevel;
-import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
-import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
-import no.nav.vedtak.felles.integrasjon.felles.ws.JaxbHelper;
+import no.nav.vedtak.exception.TekniskException;
+import no.nav.vedtak.xmlutils.JaxbHelper;
 
 public class KravgrunnlagXmlUnmarshaller {
 
@@ -26,29 +22,14 @@ public class KravgrunnlagXmlUnmarshaller {
             if (kravgrunnlag != null) {
                 return kravgrunnlag;
             }
-            throw KravgrunnlagXmlUnmarshallFeil.FACTORY.meldingUtenKravgrunnlag(mottattXmlId).toException();
+            throw new TekniskException("FPT-624792", String.format("Mottok kravgrunnlag-melding id=%s uten kravgrunnlag", mottattXmlId));
         } catch (JAXBException e) {
-            throw KravgrunnlagXmlUnmarshallFeil.FACTORY.unmarshallingFeilet(mottattXmlId, e).toException();
+            throw new TekniskException("FPT-764415", String.format("Feil ved unmarshalling av kravgrunnlag med id=%s", mottattXmlId), e);
         } catch (XMLStreamException e) {
-            throw KravgrunnlagXmlUnmarshallFeil.FACTORY.unmarshallingFeilet(mottattXmlId, e).toException();
+            throw new TekniskException("FPT-508233", String.format("Feil ved unmarshalling av kravgrunnlag med id=%s", mottattXmlId), e);
         } catch (SAXException e) {
-            throw KravgrunnlagXmlUnmarshallFeil.FACTORY.unmarshallingFeilet(mottattXmlId, e).toException();
+            throw new TekniskException("FPT-992414", String.format("Feil ved unmarshalling av kravgrunnlag med id=%s", mottattXmlId), e);
         }
     }
 
-    interface KravgrunnlagXmlUnmarshallFeil extends DeklarerteFeil {
-        KravgrunnlagXmlUnmarshallFeil FACTORY = FeilFactory.create(KravgrunnlagXmlUnmarshallFeil.class);
-
-        @TekniskFeil(feilkode = "FPT-764415", feilmelding = "Feil ved unmarshalling av kravgrunnlag med id=%s", logLevel = LogLevel.ERROR)
-        Feil unmarshallingFeilet(Long kravgrunnlagXmlId, JAXBException cause);
-
-        @TekniskFeil(feilkode = "FPT-508233", feilmelding = "Feil ved unmarshalling av kravgrunnlag med id=%s", logLevel = LogLevel.ERROR)
-        Feil unmarshallingFeilet(Long kravgrunnlagXmlId, XMLStreamException cause);
-
-        @TekniskFeil(feilkode = "FPT-992414", feilmelding = "Feil ved unmarshalling av kravgrunnlag med id=%s", logLevel = LogLevel.ERROR)
-        Feil unmarshallingFeilet(Long kravgrunnlagXmlId, SAXException cause);
-
-        @TekniskFeil(feilkode = "FPT-624792", feilmelding = "Mottok kravgrunnlag-melding uten kravgrunnlag", logLevel = LogLevel.WARN)
-        Feil meldingUtenKravgrunnlag(Long kravgrunnlagXmlIde);
-    }
 }

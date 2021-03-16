@@ -34,6 +34,7 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiConsumer;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagDto;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.HentKravgrunnlagDetaljDto;
+import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
@@ -140,7 +141,8 @@ public class HentKravgrunnlagTask implements ProsessTaskHandler {
             EksternBehandling eksternBehandling = new EksternBehandling(behandling, eksternBehandlingDto.getHenvisning(), eksternBehandlingDto.getUuid());
             eksternBehandlingRepository.lagre(eksternBehandling);
         } else {
-            throw HentKravgrunnlagTaskFeil.FACTORY.behandlingFinnesIkkeIFagsaksystemet(saksnummer, grunnlagHenvisning).toException();
+            throw new TekniskException("FPT-587169",
+                String.format("Hentet et tilbakekrevingsgrunnlag fra Økonomi for en behandling som ikke finnes i Fagsaksystemet for saksnummer=%s, henvisning=%s. Kravgrunnlaget skulle kanskje til et annet system. Si i fra til Økonomi!", saksnummer, grunnlagHenvisning));
         }
     }
 

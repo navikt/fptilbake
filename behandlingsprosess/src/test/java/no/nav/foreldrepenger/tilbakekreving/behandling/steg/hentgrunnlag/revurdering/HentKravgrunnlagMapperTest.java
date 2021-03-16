@@ -32,7 +32,7 @@ import no.nav.tilbakekreving.typer.v1.JaNeiDto;
 import no.nav.tilbakekreving.typer.v1.PeriodeDto;
 import no.nav.tilbakekreving.typer.v1.TypeGjelderDto;
 import no.nav.tilbakekreving.typer.v1.TypeKlasseDto;
-import no.nav.vedtak.felles.integrasjon.felles.ws.DateUtil;
+import no.nav.vedtak.xmlutils.DateUtil;
 
 public class HentKravgrunnlagMapperTest extends FellesTestOppsett {
 

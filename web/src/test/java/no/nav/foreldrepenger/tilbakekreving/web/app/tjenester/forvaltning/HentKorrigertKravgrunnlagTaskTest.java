@@ -54,8 +54,8 @@ import no.nav.tilbakekreving.typer.v1.TypeGjelderDto;
 import no.nav.tilbakekreving.typer.v1.TypeKlasseDto;
 import no.nav.vedtak.exception.IntegrasjonException;
 import no.nav.vedtak.exception.TekniskException;
-import no.nav.vedtak.felles.integrasjon.felles.ws.DateUtil;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
+import no.nav.vedtak.xmlutils.DateUtil;
 
 @ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public class HentKorrigertKravgrunnlagTaskTest {

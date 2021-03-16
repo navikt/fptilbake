@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.PersonOrganisasjonWrapper;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.batch.HåndterGamleKravgrunnlagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
@@ -25,7 +24,7 @@ import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagBelopDt
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagDto;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagPeriodeDto;
 import no.nav.tilbakekreving.typer.v1.TypeKlasseDto;
-import no.nav.vedtak.felles.integrasjon.felles.ws.DateUtil;
+import no.nav.vedtak.xmlutils.DateUtil;
 
 @ApplicationScoped
 public class HentKravgrunnlagMapper {
@@ -120,20 +119,14 @@ public class HentKravgrunnlagMapper {
     }
 
     private KlasseType map(TypeKlasseDto typeKlasse) {
-        switch (typeKlasse) {
-            case FEIL:
-                return KlasseType.FEIL;
-            case JUST:
-                return KlasseType.JUST;
-            case SKAT:
-                return KlasseType.SKAT;
-            case TREK:
-                return KlasseType.TREK;
-            case YTEL:
-                return KlasseType.YTEL;
-            default:
-                throw new IllegalArgumentException("Ukjent klassetype: " + typeKlasse);
-        }
+        return switch (typeKlasse) {
+            case FEIL -> KlasseType.FEIL;
+            case JUST -> KlasseType.JUST;
+            case SKAT -> KlasseType.SKAT;
+            case TREK -> KlasseType.TREK;
+            case YTEL -> KlasseType.YTEL;
+            default -> throw new IllegalArgumentException("Ukjent klassetype: " + typeKlasse);
+        };
     }
 
     private String finnKlasseKode(String klasseKode, KlasseType klasseType) {

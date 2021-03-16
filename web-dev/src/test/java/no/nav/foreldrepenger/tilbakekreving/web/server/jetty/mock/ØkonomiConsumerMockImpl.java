@@ -25,8 +25,8 @@ import no.nav.tilbakekreving.typer.v1.MmelDto;
 import no.nav.tilbakekreving.typer.v1.PeriodeDto;
 import no.nav.tilbakekreving.typer.v1.TypeGjelderDto;
 import no.nav.tilbakekreving.typer.v1.TypeKlasseDto;
-import no.nav.vedtak.felles.integrasjon.felles.ws.DateUtil;
 import no.nav.vedtak.sikkerhet.context.SubjectHandler;
+import no.nav.vedtak.xmlutils.DateUtil;
 
 class ØkonomiConsumerMockImpl implements ØkonomiConsumer {
 
