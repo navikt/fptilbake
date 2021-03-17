@@ -26,11 +26,7 @@ import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiConsume
 import no.nav.foreldrepenger.tilbakekreving.web.app.util.StringUtils;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagDto;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.HentKravgrunnlagDetaljDto;
-import no.nav.vedtak.feil.Feil;
-import no.nav.vedtak.feil.FeilFactory;
-import no.nav.vedtak.feil.LogLevel;
-import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
-import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
+import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
@@ -120,7 +116,8 @@ public class HentKorrigertKravgrunnlagTask implements ProsessTaskHandler {
         Optional<EksternBehandlingsinfoDto> eksternBehandling = eksternBehandlinger.stream()
             .filter(eksternBehandlingsinfoDto -> eksternBehandlingsinfoDto.getHenvisning().equals(henvisning)).findAny();
         if (eksternBehandling.isEmpty()) {
-            throw HentKorrigertGrunnlagTaskFeil.FACTORY.behandlingFinnesIkkeIFpsak(behandling.getId()).toException();
+            throw new TekniskException("FPT-587197",
+                String.format("Hentet et kravgrunnlag fra Økonomi for en behandling som ikke finnes i fpsak. behandlingId=%s. Kravgrunnlaget skulle kanskje til et annet system. Si i fra til Økonomi!", behandling.getId()));
         }
         return eksternBehandling.get();
     }
@@ -130,15 +127,5 @@ public class HentKorrigertKravgrunnlagTask implements ProsessTaskHandler {
         eksternBehandlingRepository.lagre(eksternBehandling);
     }
 
-
-    public interface HentKorrigertGrunnlagTaskFeil extends DeklarerteFeil {
-
-        HentKorrigertGrunnlagTaskFeil FACTORY = FeilFactory.create(HentKorrigertGrunnlagTaskFeil.class);
-
-        @TekniskFeil(feilkode = "FPT-587197",
-            feilmelding = "Hentet et kravgrunnlag fra Økonomi for en behandling som ikke finnes i fpsak. behandlingId=%s. Kravgrunnlaget skulle kanskje til et annet system. Si i fra til Økonomi!",
-            logLevel = LogLevel.WARN)
-        Feil behandlingFinnesIkkeIFpsak(Long behandlingId);
-    }
 
 }

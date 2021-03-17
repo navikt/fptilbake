@@ -23,6 +23,12 @@
             <groupId>org.verapdf</groupId>
             <artifactId>validation-model</artifactId>
             <version>1.18.2</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.xml.bind</groupId>
+                    <artifactId>jaxb-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.openhtmltopdf</groupId>

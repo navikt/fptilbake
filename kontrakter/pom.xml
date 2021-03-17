@@ -78,7 +78,6 @@
                 <artifactId>maven-jaxb2-plugin</artifactId>
                 <version>0.14.0</version>
                 <configuration>
-                    <markGenerated>true</markGenerated>
                     <enableIntrospection>true</enableIntrospection>
                     <plugins>
                         <plugin>

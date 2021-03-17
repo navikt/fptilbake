@@ -7,12 +7,8 @@ import org.xml.sax.SAXException;
 
 import no.nav.tilbakekreving.status.v1.EndringKravOgVedtakstatus;
 import no.nav.tilbakekreving.status.v1.KravOgVedtakstatus;
-import no.nav.vedtak.feil.Feil;
-import no.nav.vedtak.feil.FeilFactory;
-import no.nav.vedtak.feil.LogLevel;
-import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
-import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
-import no.nav.vedtak.felles.integrasjon.felles.ws.JaxbHelper;
+import no.nav.vedtak.exception.TekniskException;
+import no.nav.vedtak.xmlutils.JaxbHelper;
 
 public class KravVedtakStatusXmlUnmarshaller {
 
@@ -26,29 +22,14 @@ public class KravVedtakStatusXmlUnmarshaller {
             if (kravOgVedtakstatus != null) {
                 return kravOgVedtakstatus;
             }
-            throw KravVedtakStatusXmlUnmarshallFeil.FACTORY.meldingUtenKravVedtakStatus(mottattXmlId).toException();
+            throw new TekniskException("FPT-624793", String.format("Mottok kravOgVedtakstatus-melding id=%s uten kravOgVedtakstatus", mottattXmlId));
         } catch (JAXBException e) {
-            throw KravVedtakStatusXmlUnmarshallFeil.FACTORY.unmarshallingFeilet(mottattXmlId, e).toException();
+            throw new TekniskException("FPT-764416", String.format("Feil ved unmarshalling av kravOgVedtakstatusXml med id=%s", mottattXmlId), e);
         } catch (XMLStreamException e) {
-            throw KravVedtakStatusXmlUnmarshallFeil.FACTORY.unmarshallingFeilet(mottattXmlId, e).toException();
+            throw new TekniskException("FPT-508234", String.format("Feil ved unmarshalling av kravOgVedtakstatusXml med id=%s", mottattXmlId), e);
         } catch (SAXException e) {
-            throw KravVedtakStatusXmlUnmarshallFeil.FACTORY.unmarshallingFeilet(mottattXmlId, e).toException();
+            throw new TekniskException("FPT-992415", String.format("Feil ved unmarshalling av kravOgVedtakstatusXml med id=%s", mottattXmlId), e);
         }
     }
 
-    interface KravVedtakStatusXmlUnmarshallFeil extends DeklarerteFeil {
-        KravVedtakStatusXmlUnmarshallFeil FACTORY = FeilFactory.create(KravVedtakStatusXmlUnmarshallFeil.class);
-
-        @TekniskFeil(feilkode = "FPT-764416", feilmelding = "Feil ved unmarshalling av kravOgVedtakstatusXml med id=%s", logLevel = LogLevel.ERROR)
-        Feil unmarshallingFeilet(Long kravgrunnlagXmlId, JAXBException cause);
-
-        @TekniskFeil(feilkode = "FPT-508234", feilmelding = "Feil ved unmarshalling av kravOgVedtakstatusXml med id=%s", logLevel = LogLevel.ERROR)
-        Feil unmarshallingFeilet(Long kravgrunnlagXmlId, XMLStreamException cause);
-
-        @TekniskFeil(feilkode = "FPT-992415", feilmelding = "Feil ved unmarshalling av kravOgVedtakstatusXml med id=%s", logLevel = LogLevel.ERROR)
-        Feil unmarshallingFeilet(Long kravgrunnlagXmlId, SAXException cause);
-
-        @TekniskFeil(feilkode = "FPT-624793", feilmelding = "Mottok kravOgVedtakstatus-melding uten kravOgVedtakstatus", logLevel = LogLevel.WARN)
-        Feil meldingUtenKravVedtakStatus(Long kravgrunnlagXmlIde);
-    }
 }

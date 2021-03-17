@@ -21,7 +21,7 @@ import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlag;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagBelop;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagPeriode;
 import no.nav.tilbakekreving.typer.v1.TypeKlasse;
-import no.nav.vedtak.felles.integrasjon.felles.ws.DateUtil;
+import no.nav.vedtak.xmlutils.DateUtil;
 
 @ApplicationScoped
 public class KravgrunnlagMapper {
@@ -114,20 +114,14 @@ public class KravgrunnlagMapper {
     }
 
     private KlasseType map(TypeKlasse typeKlasse) {
-        switch (typeKlasse) {
-            case FEIL:
-                return KlasseType.FEIL;
-            case JUST:
-                return KlasseType.JUST;
-            case SKAT:
-                return KlasseType.SKAT;
-            case TREK:
-                return KlasseType.TREK;
-            case YTEL:
-                return KlasseType.YTEL;
-            default:
-                throw new IllegalArgumentException("Ukjent klassetype: " + typeKlasse);
-        }
+        return switch (typeKlasse) {
+            case FEIL -> KlasseType.FEIL;
+            case JUST -> KlasseType.JUST;
+            case SKAT -> KlasseType.SKAT;
+            case TREK -> KlasseType.TREK;
+            case YTEL -> KlasseType.YTEL;
+            default -> throw new IllegalArgumentException("Ukjent klassetype: " + typeKlasse);
+        };
     }
 
     private String finnKlasseKode(String klasseKode, KlasseType klasseType) {
