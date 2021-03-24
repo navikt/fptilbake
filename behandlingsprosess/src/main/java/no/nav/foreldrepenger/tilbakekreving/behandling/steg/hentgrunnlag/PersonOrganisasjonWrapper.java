@@ -20,22 +20,22 @@ import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
 @ApplicationScoped
 public class PersonOrganisasjonWrapper {
 
-    private PersoninfoAdapter tps;
+    private PersoninfoAdapter pdl;
 
     PersonOrganisasjonWrapper(){
         // for CDI proxy
     }
 
     @Inject
-    public PersonOrganisasjonWrapper(PersoninfoAdapter tps){
-        this.tps = tps;
+    public PersonOrganisasjonWrapper(PersoninfoAdapter pdl){
+        this.pdl = pdl;
     }
 
     public String hentAktørIdEllerOrganisajonNummer(String fnrEllerOrgNo, GjelderType gjelderType) {
         if (gjelderType.equals(ORGANISASJON)) {
             return fnrEllerOrgNo;
         } else {
-            Optional<AktørId> aktørId = tps.hentAktørForFnr(PersonIdent.fra(fnrEllerOrgNo));
+            Optional<AktørId> aktørId = pdl.hentAktørForFnr(PersonIdent.fra(fnrEllerOrgNo));
             return aktørId.map(AktørId::getId)
                 .orElseThrow(() -> PersonOrganisasjonWrapper.PersonOrganisasjonWrapperFeil.FACTORY.fantIkkePersonIdentMedFnr().toException());
         }

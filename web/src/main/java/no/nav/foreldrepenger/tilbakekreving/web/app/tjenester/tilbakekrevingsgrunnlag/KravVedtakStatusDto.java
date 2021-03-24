@@ -1,5 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.tilbakekrevingsgrunnlag;
 
-public interface GrunnlagRestTestTjeneste {
+public class KravVedtakStatusDto extends DetaljertKravgrunnlagDto {
 
 }

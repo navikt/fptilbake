@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.web.server.jetty.testtjenester;
+package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.tilbakekrevingsgrunnlag;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;

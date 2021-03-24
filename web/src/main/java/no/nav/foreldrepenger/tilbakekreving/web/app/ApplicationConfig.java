@@ -6,12 +6,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.enterprise.inject.Instance;
-import javax.enterprise.inject.spi.CDI;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
-
-import org.jboss.weld.interceptor.util.proxy.TargetInstanceProxy;
 
 import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
@@ -43,7 +39,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.kodeverk.KodeverkR
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.konfig.KonfigRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.migrasjon.MigrasjonRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.saksbehandler.NavAnsattRestTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.tilbakekrevingsgrunnlag.GrunnlagRestTestTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.tilbakekrevingsgrunnlag.GrunnlagRestTestTjenesteLocalDev;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.varselrespons.VarselresponsRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.VergeRestTjeneste;
 import no.nav.vedtak.felles.prosesstask.rest.ProsessTaskRestTjeneste;
@@ -133,13 +129,8 @@ public class ApplicationConfig extends Application {
         classes.add(MigrasjonRestTjeneste.class);
         classes.add(VergeRestTjeneste.class);
 
-        //HAXX GrunnlagRestTjenesteTest skal bare være tilgjengelig for lokal utvikling, brukes for å sette opp test
-        //hvis denne legges til i en egen Application isdf i denne, kan man ikke bruke swagger for å nå tjenesten
-        //bruker derfor CDI for å slå opp klassen
-        Instance<GrunnlagRestTestTjeneste> grunnlagTestTjeneste = CDI.current().select(GrunnlagRestTestTjeneste.class);
-        if (!grunnlagTestTjeneste.isUnsatisfied()) {
-            TargetInstanceProxy proxy = (TargetInstanceProxy) grunnlagTestTjeneste.get();
-            classes.add(proxy.weld_getTargetClass());
+        if (ENV.isLocal()) {
+            classes.add(GrunnlagRestTestTjenesteLocalDev.class);
         }
 
         return Collections.unmodifiableSet(classes);
