@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.AksjonspunktKode;
 import no.nav.vedtak.exception.FunksjonellException;
-import no.nav.vedtak.feil.Feil;
 
 public class ConstraintViolationMapper implements ExceptionMapper<ConstraintViolationException> {
 
@@ -47,8 +46,7 @@ public class ConstraintViolationMapper implements ExceptionMapper<ConstraintViol
         }
         log.warn(feil.getMessage());
 
-        return Response
-            .status(Response.Status.BAD_REQUEST)
+        return Response.status(Response.Status.BAD_REQUEST)
             .entity(new FeilDto(feil.getMessage(), feilene))
             .type(MediaType.APPLICATION_JSON)
             .build();
