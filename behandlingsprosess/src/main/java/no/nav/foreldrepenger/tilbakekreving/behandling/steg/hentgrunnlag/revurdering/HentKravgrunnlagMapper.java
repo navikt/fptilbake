@@ -31,15 +31,15 @@ public class HentKravgrunnlagMapper {
 
     private static final Logger LOG = LoggerFactory.getLogger(HentKravgrunnlagMapper.class);
 
-    private PersonOrganisasjonWrapper tpsAdapterWrapper;
+    private PersonOrganisasjonWrapper pdlAdapterWrapper;
 
     HentKravgrunnlagMapper() {
         //for CDI proxy
     }
 
     @Inject
-    public HentKravgrunnlagMapper(PersonOrganisasjonWrapper tpsAdapterWrapper) {
-        this.tpsAdapterWrapper = tpsAdapterWrapper;
+    public HentKravgrunnlagMapper(PersonOrganisasjonWrapper pdlAdapterWrapper) {
+        this.pdlAdapterWrapper = pdlAdapterWrapper;
     }
 
     public Kravgrunnlag431 mapTilDomene(DetaljertKravgrunnlagDto dto) {
@@ -84,7 +84,7 @@ public class HentKravgrunnlagMapper {
     }
 
     protected String hentAktoerId(GjelderType identType, String ident) {
-        return tpsAdapterWrapper.hentAktørIdEllerOrganisajonNummer(ident, identType);
+        return pdlAdapterWrapper.hentAktørIdEllerOrganisajonNummer(ident, identType);
     }
 
     private KravgrunnlagPeriode432 formKravgrunnlagPeriode432(Kravgrunnlag431 kravgrunnlag431, DetaljertKravgrunnlagPeriodeDto dto) {

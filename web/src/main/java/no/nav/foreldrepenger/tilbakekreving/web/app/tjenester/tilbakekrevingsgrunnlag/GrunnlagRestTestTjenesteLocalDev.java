@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.web.server.jetty.testtjenester;
+package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.tilbakekrevingsgrunnlag;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType.ORGANISASJON;
@@ -18,8 +18,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-import com.codahale.metrics.annotation.Timed;
-
 import io.swagger.v3.oas.annotations.Operation;
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingFeil;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
@@ -37,7 +35,6 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagValidator;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
-import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.tilbakekrevingsgrunnlag.GrunnlagRestTestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 
@@ -46,7 +43,7 @@ import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 @Consumes(APPLICATION_JSON)
 @ApplicationScoped
 @Transactional
-public class GrunnlagRestTestTjenesteLocalDev implements GrunnlagRestTestTjeneste {
+public class GrunnlagRestTestTjenesteLocalDev {
 
     static final String PATH_FRAGMENT = "/grunnlag";
 
@@ -64,7 +61,6 @@ public class GrunnlagRestTestTjenesteLocalDev implements GrunnlagRestTestTjenest
     }
 
     @POST
-    @Timed
     @Operation(tags = "kravgrunnlag", description = "Lagre tilbakekrevingsgrunnlag fra økonomi")
     @BeskyttetRessurs(action = UPDATE, property = AbacProperty.FAGSAK)
     public Response lagreUtbetalinger(@NotNull @QueryParam("behandlingId") @Valid BehandlingReferanse idDto,
