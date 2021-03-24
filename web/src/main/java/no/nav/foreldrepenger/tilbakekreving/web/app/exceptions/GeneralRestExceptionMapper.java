@@ -1,7 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.exceptions;
 
-import java.util.stream.Collectors;
-
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -28,10 +26,6 @@ public class GeneralRestExceptionMapper implements ExceptionMapper<ApplicationEx
     @Override
     public Response toResponse(ApplicationException exception) {
         var cause = exception.getCause();
-
-        if (cause instanceof Valideringsfeil) {
-            return handleValideringsfeil((Valideringsfeil) cause);
-        }
         if (cause instanceof TomtResultatException) {
             return handleTomtResultatFeil((TomtResultatException) cause);
         }
@@ -51,13 +45,6 @@ public class GeneralRestExceptionMapper implements ExceptionMapper<ApplicationEx
             .entity(new FeilDto(FeilType.TOMT_RESULTAT_FEIL, tomtResultatException.getMessage()))
             .type(MediaType.APPLICATION_JSON)
             .build();
-    }
-
-    private Response handleValideringsfeil(Valideringsfeil valideringsfeil) {
-        var feltNavn = valideringsfeil.getFeltfeil().stream().map(FeltFeilDto::getNavn).collect(Collectors.toList());
-        var dto = new FeilDto(FeltValideringFeil.feltverdiKanIkkeValideres(feltNavn).getMessage(),
-            valideringsfeil.getFeltfeil());
-        return Response.status(Response.Status.BAD_REQUEST).entity(dto).type(MediaType.APPLICATION_JSON).build();
     }
 
     private Response handleVLException(VLException vlException, String callId) {

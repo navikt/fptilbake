@@ -2,8 +2,6 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.exceptions;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Collections;
-
 import javax.ws.rs.core.Response;
 
 import org.jboss.resteasy.spi.ApplicationException;
@@ -25,22 +23,6 @@ public class GeneralRestExceptionMapperTest {
     @AfterAll
     static void afterAll() {
         logSniffer.reset();
-    }
-
-    @Test
-    public void skalMappeValideringsfeil() {
-        FeltFeilDto feltFeilDto = new FeltFeilDto("Et feltnavn", "En feilmelding");
-        Valideringsfeil valideringsfeil = new Valideringsfeil(Collections.singleton(feltFeilDto));
-
-        Response response = generalRestExceptionMapper.toResponse(new ApplicationException(valideringsfeil));
-
-        assertThat(response.getStatus()).isEqualTo(400);
-        assertThat(response.getEntity()).isInstanceOf(FeilDto.class);
-        FeilDto feilDto = (FeilDto) response.getEntity();
-
-        assertThat(feilDto.getFeilmelding()).contains("Det oppstod en valideringsfeil på felt [Et feltnavn]. Vennligst kontroller at alle feltverdier er korrekte.");
-        assertThat(feilDto.getFeltFeil()).hasSize(1);
-        assertThat(feilDto.getFeltFeil().iterator().next()).isEqualTo(feltFeilDto);
     }
 
     @Test
