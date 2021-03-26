@@ -37,6 +37,7 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
+import no.nav.vedtak.util.env.Environment;
 
 @Path(GrunnlagRestTestTjenesteLocalDev.PATH_FRAGMENT)
 @Produces(APPLICATION_JSON)
@@ -65,6 +66,10 @@ public class GrunnlagRestTestTjenesteLocalDev {
     @BeskyttetRessurs(action = UPDATE, property = AbacProperty.FAGSAK)
     public Response lagreUtbetalinger(@NotNull @QueryParam("behandlingId") @Valid BehandlingReferanse idDto,
                                       @NotNull @Valid KravgrunnlagDto kravgrunnlagDto) {
+
+        if (!Environment.current().isLocal()) {
+            throw new IllegalStateException("Dette er ikke lov å kjøre dette i produksjon eller dev!!!");
+        }
 
         Kravgrunnlag431 kravgrunnlag = lagKravgrunnlag(kravgrunnlagDto.getKravGrunnlag());
         KravgrunnlagValidator.validerGrunnlag(kravgrunnlag);
