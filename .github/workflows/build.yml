@@ -14,6 +14,9 @@ on:
 
 env:
   IMAGE_BASE: docker.pkg.github.com/${{ github.repository }}/fptilbake
+  IMAGE_BASE_CR: ghcr.io/${{ github.repository }}
+  GITHUB_USERNAME: x-access-token
+  GITHUB_PASSWORD: ${{ secrets.GH_ACCESS_TOKEN }} # Cannot use GITHUB_TOKEN: https://github.community/t/github-token-cannot-access-private-packages/16621#M2148
   TZ: "Europe/Oslo"
 
 jobs:
@@ -23,60 +26,45 @@ jobs:
       - name: Sjekk ut kode
         uses: actions/checkout@v2
 
-      - name: Hent og start Oracle image
-        id: oracle
-        shell: bash
-        run: |
-          echo $GITHUB_TOKEN | docker login --username "x-access-token" --password-stdin https://docker.pkg.github.com
-          oracle/start-oracle.sh &
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
-
-      - name: Sett opp Java
-        uses: actions/setup-java@v1
-        with:
-          java-version: 1.15
-
-      - name: Set build version
-        run: |
-          echo "BUILD_VERSION=$(date +%Y.%m.%d.%H%M%S)-$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
-
       - uses: actions/cache@v2
         with:
           path: ~/.m2/repository
           key: v2-${{ runner.os }}-maven-${{ hashFiles('pom.xml') }}
           restore-keys: v2-${{ runner.os }}-maven-
 
-      - name: Build (kompiler)
-        env:
-          GITHUB_USERNAME: x-access-token
-          GITHUB_PASSWORD: ${{ secrets.GH_ACCESS_TOKEN }}
+      - uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: 15
+
+      - name: Log into ghcr registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Hent og start Oracle image
+        id: oracle
         shell: bash
+        run: |
+          .oracle/start-oracle.sh &
+      - name: Set build version
+        run: |
+          echo "BUILD_VERSION=$(date +%Y.%m.%d.%H%M%S)-$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
+
+      - name: Build (kompiler)
         run: |
           echo "Building $BUILD_VERSION"
           mvn test-compile -P-migrer-db --batch-mode --settings ./.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION}
 
       - name: Vent til oracle er oppe
         id: vent-til-oracle-er-klar
-        shell: bash
         run: |
-          oracle/vent-til-oracle-er-klar.sh
+          .oracle/vent-til-oracle-er-klar.sh
 
       - name: Migrer database
-        env:
-          GITHUB_USERNAME: x-access-token
-          GITHUB_PASSWORD: ${{ secrets.GH_ACCESS_TOKEN }}
-        shell: bash
         run: |
           echo "Migrerer database"
           mvn exec:java -pl migreringer --batch-mode --settings ./.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION}
 
       - name: Build artifacts & deploy (inkl test)
-        env:
-          GITHUB_USERNAME: x-access-token
-          GITHUB_PASSWORD: ${{ secrets.GH_ACCESS_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        shell: bash
         run: |
           echo "Building artifacts $BUILD_VERSION"
           mvn install -e --batch-mode --settings ./.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION} -Dfile.encoding=UTF-8 -Pgithub
@@ -84,14 +72,11 @@ jobs:
           echo "TAG=$(mvn help:evaluate --batch-mode --settings ./.m2/settings.xml --file .flattened -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
 
       - name: Bygg og push docker-image for distribuering
-        env:
-          GITHUB_USERNAME: x-access-token
-          GITHUB_PASSWORD: ${{ secrets.GH_ACCESS_TOKEN }}
-        run: |
-          docker build --pull --tag ${IMAGE_BASE}:${TAG} --tag ${IMAGE_BASE}:latest . | awk '{ print strftime("[%Y-%m-%d %H:%M:%S]"), $0 }'
+        run: | # Fjern publisering av image til docker.pkg.github.com når avhengighetene er fjernet!
+          docker build --pull --tag ${IMAGE_BASE}:${TAG} --tag ${IMAGE_BASE}:latest --tag ${IMAGE_BASE_CR}:${TAG} --tag ${IMAGE_BASE_CR}:latest . | awk '{ print strftime("[%Y-%m-%d %H:%M:%S]"), $0 }'
           echo "$GITHUB_PASSWORD" | docker login --username "$GITHUB_USERNAME" --password-stdin https://docker.pkg.github.com
-          docker push ${IMAGE_BASE}:latest
-          docker push ${IMAGE_BASE}:${TAG}
+          docker push ${IMAGE_BASE} --all-tags
+          docker push ${IMAGE_BASE_CR} --all-tags
 
       - name: Opprett deployment issue
         if: success()
@@ -112,28 +97,30 @@ jobs:
             <tr><td>promote</td><td>k9</td><td>prod-fss</td><td>default</td></tr>
             </table>
 
-      - name: Trigger verdikjedetestene i fpsak-autotest prosjektet
-        if: success()
-        uses: peter-evans/repository-dispatch@v1
+      - uses: navikt/github-app-token-generator@v1
+        id: get-token
         with:
-          token: ${{ secrets.GH_ACCESS_TOKEN }}
-          repository: navikt/fpsak-autotest
-          event-type: fptilbake-verdikjede
-          client-payload: '{ "trigger": "${{ github.repository }}", "version": "${{ env.TAG }}", "issue-number": "" }'
+          private-key: ${{ secrets.FP_PRIVATE_KEY }}
+          app-id: ${{ secrets.FP_APP_ID }}
 
-      - name: Trigg deploy av fptilbake til dev-fss/teamforeldrepenger
-        if: success()
-        uses: peter-evans/create-or-update-comment@v1
-        with:
-          token: ${{ secrets.GH_ACCESS_TOKEN }}
-          issue-number: ${{ steps.createdeployissue.outputs.number }}
-          body: /promote fp dev-fss teamforeldrepenger
+      - name: Trigger tester for FP
+        shell: bash
+        run: |
+          curl -XPOST -u "x-access-token:${{ steps.get-token.outputs.token }}" \
+          -H "Accept: application/vnd.github.v3+json" \
+          https://api.github.com/repos/navikt/fpsak-autotest/actions/workflows/trigger.yml/dispatches \
+          -d '{"ref":"master",
+                  "inputs":{
+                      "trigger": "${{ github.repository }}",
+                      "version": "${{ env.TAG }}",
+                      "issue_number": "${{ steps.createdeployissue.outputs.number }}"
+                  }}'
 
       - name: Trigg deploy av k9-tilbake til dev-fss/default
         if: success()
         uses: peter-evans/create-or-update-comment@v1
         with:
-          token: ${{ secrets.GH_ACCESS_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           issue-number: ${{ steps.createdeployissue.outputs.number }}
           body: /promote k9 dev-fss default
 
