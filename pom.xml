@@ -42,7 +42,7 @@
         <fpkontrakter.version>5.1-20201118182725-764a023</fpkontrakter.version>
 
         <surefire.version>2.22.2</surefire.version>
-        <metrics.version>4.1.18</metrics.version>
+        <metrics.version>4.1.19</metrics.version>
         <prometheus.version>0.10.0</prometheus.version>
         <geronimo.jaspi.version>2.0.0</geronimo.jaspi.version>
         <geronimo.osgi.version>1.1</geronimo.osgi.version>
@@ -702,7 +702,7 @@
             <dependency>
                 <groupId>io.github.classgraph</groupId>
                 <artifactId>classgraph</artifactId>
-                <version>4.8.102</version>
+                <version>4.8.104</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
