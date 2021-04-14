@@ -85,8 +85,8 @@ public class VedtakHendelseReader implements HendelseReader {
         if(kanHåndtereMelding(melding)){
             prosessTaskRepository.lagre(lagProsessTaskData(melding));
         }else {
-            logger.info("Melding om vedtak for behandling={} for {} med vedtakstidspunkt {} ble ignorert etter regler for ytelsetype og vedtaktidspunkt",
-                melding.getBehandlingId(), melding.getFagsakYtelseType(), melding.getVedtattTidspunkt());
+            logger.info("Melding om vedtak for {} for behandling={} for {} med vedtakstidspunkt {} ble ignorert etter regler for ytelsetype og vedtaktidspunkt",
+                melding.getFagsakYtelseType(), melding.getBehandlingId(), melding.getFagsakYtelseType(), melding.getVedtattTidspunkt());
         }
     }
 

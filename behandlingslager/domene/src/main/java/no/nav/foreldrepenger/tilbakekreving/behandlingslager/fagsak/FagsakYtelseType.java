@@ -34,6 +34,10 @@ public enum FagsakYtelseType implements Kodeverdi {
     OMSORGSPENGER("OMP", "Omsorgspenger",""),
     OPPLÆRINGSPENGER("OLP", "Opplæringspenger",""),
 
+    //K9-rammevedtak (kan ignoreres for tilbakekreving, men må være i listen for at VedtakHendelse skal parse alle vedtak)
+    OMSORGSPENGER_KS("OMP_KS", "Ekstra omsorgsdager kronisk syk", ""),
+    OMSORGSPENGER_MA("OMP_MA", "Ekstra omsorgsdager midlertidig alene", ""),
+
 
     UDEFINERT("-", "Ikke definert","Ikke Definert"); //$NON-NLS-1$
 
