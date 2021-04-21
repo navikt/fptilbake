@@ -3,7 +3,6 @@ package no.nav.foreldrepenger.tilbakekreving.web.server.jetty;
 import no.nav.vedtak.util.env.Environment;
 
 public class JettyWebKonfigurasjon implements AppKonfigurasjon {
-    private static final String SWAGGER_HASH = "sha256-w6DoSiqz8+6cP13xAZftmJAdUupO32ZdbQZhwOvWf+U=";
     private static final Environment ENV = Environment.current();
     private Integer serverPort;
 
@@ -38,10 +37,5 @@ public class JettyWebKonfigurasjon implements AppKonfigurasjon {
     @Override
     public int getSslPort() {
         throw new IllegalStateException("SSL port should only be used locally");
-    }
-
-    @Override
-    public String getSwaggerHash() {
-        return SWAGGER_HASH;
     }
 }

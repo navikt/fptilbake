@@ -32,8 +32,6 @@ import org.eclipse.jetty.webapp.WebInfConfiguration;
 import org.eclipse.jetty.webapp.WebXmlConfiguration;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
-import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.sikkerhet.SecurityFilter;
-
 abstract class AbstractJettyServer {
 
     /**
@@ -91,15 +89,6 @@ abstract class AbstractJettyServer {
             throw new IllegalStateException("Missing required file: " + jaspiConf.getAbsolutePath());
         }
         System.setProperty("org.apache.geronimo.jaspic.configurationFile", jaspiConf.getAbsolutePath());
-
-        konfigurerSwaggerHash();
-    }
-
-    /**
-     * @see SecurityFilter#getSwaggerHash()
-     */
-    protected void konfigurerSwaggerHash() {
-        System.setProperty(SecurityFilter.SWAGGER_HASH_KEY, appKonfigurasjon.getSwaggerHash());
     }
 
     protected abstract void konfigurerJndi() throws Exception;
