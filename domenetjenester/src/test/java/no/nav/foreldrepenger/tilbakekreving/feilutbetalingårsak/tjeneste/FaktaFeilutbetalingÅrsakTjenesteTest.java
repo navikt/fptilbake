@@ -96,7 +96,8 @@ public class FaktaFeilutbetalingÅrsakTjenesteTest {
 
         assertThat(mapAvResultat.get(HendelseType.FP_ANNET_HENDELSE_TYPE)).containsExactly(
             HendelseUnderType.REFUSJON_ARBEIDSGIVER,
-            HendelseUnderType.ANNET_FRITEKST
+            HendelseUnderType.ANNET_FRITEKST,
+            HendelseUnderType.FEIL_FERIEPENGER_4G
         );
 
         assertThat(mapAvResultat.get(HendelseType.FP_KUN_RETT_TYPE)).containsOnly(
@@ -166,9 +167,10 @@ public class FaktaFeilutbetalingÅrsakTjenesteTest {
             HendelseUnderType.SVP_ENDRING_PERIODE
         );
 
-        assertThat(mapAvResultat.get(HendelseType.SVP_ANNET_TYPE)).containsOnly(
+        assertThat(mapAvResultat.get(HendelseType.SVP_ANNET_TYPE)).containsExactly(
             HendelseUnderType.REFUSJON_ARBEIDSGIVER,
-            HendelseUnderType.ANNET_FRITEKST
+            HendelseUnderType.ANNET_FRITEKST,
+            HendelseUnderType.FEIL_FERIEPENGER_4G
         );
     }
 

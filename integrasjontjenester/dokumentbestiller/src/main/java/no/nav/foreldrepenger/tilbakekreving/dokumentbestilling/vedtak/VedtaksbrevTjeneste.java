@@ -15,6 +15,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
 import org.apache.commons.lang3.StringUtils;
 
 import com.github.jknack.handlebars.internal.text.WordUtils;
@@ -279,6 +280,7 @@ public class VedtaksbrevTjeneste {
             .medVarsel(HbVarsel.forDatoOgBeløp(varsletDato, varsletBeløp))
             .medErFeilutbetaltBeløpKorrigertNed(erFeilutbetaltBeløpKorrigertNed)
             .medTotaltFeilutbetaltBeløp(hbVedtaksResultatBeløp.totaltFeilutbetaltBeløp)
+            .medSkalFjerneTekstFeriepenger(skalFjerneTekstFeriepenger(perioder))
             .medFritekstOppsummering(oppsummeringFritekst)
             .medVedtaksbrevType(vedtaksbrevType)
             .medLovhjemmelVedtak(hjemmelstekst)
@@ -297,6 +299,9 @@ public class VedtaksbrevTjeneste {
         return new HbVedtaksbrevData(vedtakDataBuilder.build(), perioder);
     }
 
+    private boolean skalFjerneTekstFeriepenger(List<HbVedtaksbrevPeriode> perioder) {
+        return perioder.stream().anyMatch(p-> HendelseUnderType.FEIL_FERIEPENGER_4G.equals(p.getFakta().getHendelseundertype()));
+    }
     private VedtakHjemmel.EffektForBruker utledEffektForBruker(Behandling behandling, HbVedtaksResultatBeløp hbVedtaksResultatBeløp) {
         boolean erRevurdering = BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandling.getType());
         return erRevurdering

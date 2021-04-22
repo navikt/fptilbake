@@ -1,3 +1,6 @@
+{{~#* inline "ytelsen" ~}}
+    {{lookup-map sak.ytelsetype FP="foreldrepengene" SVP="svangerskapspengene" ES="engangsstønaden" FRISINN="kompensasjonsytelse for selvstendig næringsdrivende og frilansere"}}
+{{~/inline~}}
 {{~#* inline "evt-renter-utsagn" ~}}{{#if totalresultat.totalt-rentebeløp}} Dette beløpet er med renter.{{/if}}{{~/inline~}}
 {{#if behandling.er-revurdering}}
 Vi har vurdert saken din om tilbakebetaling på nytt. Derfor gjelder ikke det tidligere vedtaket av {{behandling.original-behandling-dato-fagsakvedtak}} om tilbakebetaling av {{>ytelse-produkt}}.
@@ -16,6 +19,9 @@ Vi varslet deg {{varsel.varslet-dato}} om at du har fått {{kroner varsel.varsle
     {{/case}}
     {{/switch}}
 {{else}}
+{{#if skalFjerneTekstFeriepenger}}
+Du mottok {{> ytelsen}} i 2019 og tjente opp rett til feriepenger, som ble utbetalt i mai 2020. Feriepengene er endret i våre systemer på grunn av en feil i feriepengeutbetalingen i mai 2020. Du må ikke betale tilbake det du har fått for mye.
+{{else}}
 {{~#* inline "brev-ytelse-endret" ~}}I brev {{sak.dato-fagsakvedtak}} fikk du melding om at {{>ytelse-produkt}} {{>din-dine}} er endret. Endringen gjorde at du har fått utbetalt for mye.{{~/inline~}}
     {{#switch totalresultat.hovedresultat}}
     {{#case "FULL_TILBAKEBETALING"}}
@@ -28,6 +34,7 @@ Vi varslet deg {{varsel.varslet-dato}} om at du har fått {{kroner varsel.varsle
 {{>brev-ytelse-endret}} Du må ikke betale tilbake det du har fått for mye.
     {{/case}}
     {{/switch}}
+{{/if}}
 {{/if}}
 {{#if fritekst-oppsummering}}
 

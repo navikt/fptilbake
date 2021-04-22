@@ -42,6 +42,9 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
     private boolean erFeilutbetaltBeløpKorrigertNed;
     @JsonProperty("totalt-feilutbetalt-beløp")
     private BigDecimal totaltFeilutbetaltBeløp;
+    @JsonProperty("skalFjerneTekstFeriepenger")
+    private boolean skalFjerneTekstFeriepenger;
+
 
     private HbVedtaksbrevDatoer datoer;
 
@@ -220,6 +223,11 @@ public class HbVedtaksbrevFelles implements HandlebarsData {
 
         public Builder medTotaltFeilutbetaltBeløp(BigDecimal totaltFeilutbetaltBeløp) {
             kladd.totaltFeilutbetaltBeløp = totaltFeilutbetaltBeløp;
+            return this;
+        }
+
+        public Builder medSkalFjerneTekstFeriepenger(boolean medSkalFjerneTekstFeriepenger) {
+            kladd.skalFjerneTekstFeriepenger = medSkalFjerneTekstFeriepenger;
             return this;
         }
     }
