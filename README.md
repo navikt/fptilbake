@@ -1,3 +1,4 @@
+
 Applikasjonene fptilbake og k9-tilbake
 ===============
 
@@ -119,7 +120,7 @@ Det er en rekke data som brukes av fptilbake, og som hentes on-demand fra saksbe
 
 ## Prosess for Tilbakekrevingsbehandling
 
-Hovedflyten for behandlinger av typen Tilbakekrevingsbehandling er:
+Hovedflyten for behandlinger av typen Tilbakekrevingsbehandling er: 
 1. Send varselbrev til bruker
 1. Vent inntil følgende er oppfylt:
     1. Skaff kravgrunnlag fra Oppdragsystemet.
