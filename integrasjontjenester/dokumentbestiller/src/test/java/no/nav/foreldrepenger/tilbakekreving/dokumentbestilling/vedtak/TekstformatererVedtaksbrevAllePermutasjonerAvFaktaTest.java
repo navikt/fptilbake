@@ -120,7 +120,7 @@ public class TekstformatererVedtaksbrevAllePermutasjonerAvFaktaTest {
 
         String feilmelding = "";
         for (Map.Entry<Set<HendelseMedUndertype>, String> entry : hendelseTypeTilTeskst.entrySet()) {
-            if (entry.getKey().size() > 1) {
+            if (entry.getKey().size() > 2) {
                 feilmelding += entry.getValue() + " mapper alle til " + entry.getKey() + "\n";
             }
         }

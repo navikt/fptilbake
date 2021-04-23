@@ -1,3 +1,6 @@
+{{~#* inline "ytelsen" ~}}
+    {{lookup-map sak.ytelsetype FP="foreldrepengane" SVP="svangerskapspengane" ES="eingongsstønaden" FRISINN="kompensasjonsytelse for selvstendig næringsdrivende og frilansere"}}
+{{~/inline~}}
 {{~#* inline "evt-renter-utsagn" ~}}{{#if totalresultat.totalt-rentebeløp}} Dette beløpet er med renter.{{/if}}{{~/inline~}}
 {{#if behandling.er-revurdering}}
 Vi har vurdert saka di om tilbakebetaling på nytt. Derfor gjeld ikkje det tidlegare vedtaket av {{behandling.original-behandling-dato-fagsakvedtak}} om tilbakebetaling av {{>ytelse-produkt}}.
@@ -17,6 +20,9 @@ Vi varsla deg {{varsel.varslet-dato}} om at du har fått {{kroner varsel.varslet
     {{/switch}}
 
 {{else}}
+{{#if skalFjerneTekstFeriepenger}}
+Du mottok {{> ytelsen}} i 2019 og tente opp rett til feriepengar, som vart utbetalte i mai 2020. Feriepengane er endra i systema våre på grunn av ein feil i feriepengeutbetalinga i mai 2020. Du må ikkje betala tilbake det du har fått for mykje.
+{{else}}
 {{~#* inline "brev-ytelse-endret" ~}}I brev {{sak.dato-fagsakvedtak}} fikk du melding om at {{>ytelse-produkt}} {{>din-dine}} er endra. Endringa gjorde at du har fått utbetalt for mykje.{{~/inline~}}
     {{#switch totalresultat.hovedresultat}}
     {{#case "FULL_TILBAKEBETALING"}}
@@ -30,6 +36,7 @@ Vi varsla deg {{varsel.varslet-dato}} om at du har fått {{kroner varsel.varslet
     {{/case}}
     {{/switch}}
 
+{{/if}}
 {{/if}}
 {{#if fritekst-oppsummering}}
 {{{fritekst-oppsummering}}}

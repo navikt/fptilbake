@@ -9,6 +9,6 @@ Du må betale tilbake {{> ytelsen}}
 Du må betale tilbake {{> ytelsen}}
     {{/case}}
     {{#case "INGEN_TILBAKEBETALING"}}
-Du må ikke betale tilbake {{> ytelsen}}
+Du må ikke betale tilbake {{#if skalFjerneTekstFeriepenger}}feriepengene{{else}}{{> ytelsen}}{{/if}}
     {{/case}}
 {{/switch}}

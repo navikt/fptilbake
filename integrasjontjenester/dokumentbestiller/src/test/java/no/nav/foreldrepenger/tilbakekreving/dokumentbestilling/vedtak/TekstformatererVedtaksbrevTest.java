@@ -48,6 +48,7 @@ public class TekstformatererVedtaksbrevTest {
     private final Periode februar = Periode.of(LocalDate.of(2019, 2, 1), LocalDate.of(2019, 2, 28));
     private final Periode mars = Periode.of(LocalDate.of(2019, 3, 1), LocalDate.of(2019, 3, 31));
     private final Periode april = Periode.of(LocalDate.of(2019, 4, 1), LocalDate.of(2019, 4, 30));
+    private final Periode mai = Periode.of(LocalDate.of(2020, 5, 1), LocalDate.of(2020, 5, 31));
     private final Periode førsteNyttårsdag = Periode.of(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 1, 1));
 
     @Test
@@ -180,6 +181,105 @@ public class TekstformatererVedtaksbrevTest {
         String fasit = les("/vedtaksbrev/FP_ingen_tilbakekreving.txt");
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
+
+    @Test
+    public void skal_generere_vedtaksbrev_for_FP_uten_tilbakekreving_med_tekst_feil_feriepenger() throws Exception {
+        List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
+            HbVedtaksbrevPeriode.builder()
+                .medPeriode(januar)
+                .medKravgrunnlag(HbKravgrunnlag.builder()
+                    .medFeilutbetaltBeløp(BigDecimal.valueOf(1000))
+                    .build())
+                .medFakta(HendelseType.FP_ANNET_HENDELSE_TYPE, HendelseUnderType.FEIL_FERIEPENGER_4G)
+                .medVurderinger(HbVurderinger.builder()
+                    .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
+                    .medVilkårResultat(VilkårResultat.GOD_TRO)
+                    .medAktsomhetResultat(AnnenVurdering.GOD_TRO)
+                    .medBeløpIBehold(BigDecimal.ZERO)
+                    .build())
+                .medResultat(HbResultatTestBuilder.forTilbakekrevesBeløp(0))
+                .build()
+        );
+        HbVedtaksbrevFelles vedtaksbrevData = lagTestBuilder()
+            .medSak(HbSak.build()
+                .medYtelsetype(FagsakYtelseType.FORELDREPENGER)
+                .medErFødsel(true)
+                .medAntallBarn(1)
+                .medDatoFagsakvedtak(LocalDate.of(2019, 3, 21))
+                .build())
+            .medVedtakResultat(HbTotalresultat.builder()
+                .medHovedresultat(VedtakResultatType.INGEN_TILBAKEBETALING)
+                .medTotaltTilbakekrevesBeløp(BigDecimal.ZERO)
+                .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.ZERO)
+                .medTotaltRentebeløp(BigDecimal.ZERO)
+                .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.ZERO)
+                .build())
+            .medLovhjemmelVedtak("Folketrygdloven § 22-15")
+            .medDatoer(HbVedtaksbrevDatoer.builder()
+                .medPerioder(perioder)
+                .build())
+            .medVedtaksbrevType(VedtaksbrevType.ORDINÆR)
+            .medSkalFjerneTekstFeriepenger(skalFjerneTekstFeriepenger(perioder))
+            .build();
+        HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
+
+        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
+        String fasit = les("/vedtaksbrev/FP_ingen_tilbakekreving_feil_feriepenger.txt");
+        assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
+    }
+
+
+    @Test
+    public void skal_generere_vedtaksbrev_SVP_ingenTilbakebetaling_feilFeriepenger() throws Exception {
+        List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
+            HbVedtaksbrevPeriode.builder()
+                .medPeriode(mai)
+                .medKravgrunnlag(HbKravgrunnlag.builder()
+                    .medFeilutbetaltBeløp(BigDecimal.valueOf(1000))
+                    .build())
+                .medFakta(HendelseType.SVP_ANNET_TYPE, HendelseUnderType.FEIL_FERIEPENGER_4G)
+                .medVurderinger(HbVurderinger.builder()
+                    .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
+                    .medVilkårResultat(VilkårResultat.GOD_TRO)
+                    .medAktsomhetResultat(AnnenVurdering.GOD_TRO)
+                    .medBeløpIBehold(BigDecimal.ZERO)
+                    .build())
+                .medResultat(HbResultatTestBuilder.forTilbakekrevesBeløp(0))
+                .build()
+        );
+        HbVedtaksbrevFelles vedtaksbrevData = lagTestBuilder()
+            .medSak(HbSak.build()
+                .medYtelsetype(FagsakYtelseType.SVANGERSKAPSPENGER)
+                .medErFødsel(true)
+                .medAntallBarn(1)
+                .medDatoFagsakvedtak(LocalDate.of(2019, 3, 21))
+                .build())
+            .medVedtakResultat(HbTotalresultat.builder()
+                .medHovedresultat(VedtakResultatType.INGEN_TILBAKEBETALING)
+                .medTotaltTilbakekrevesBeløp(BigDecimal.ZERO)
+                .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.ZERO)
+                .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.ZERO)
+                .medTotaltRentebeløp(BigDecimal.ZERO)
+                .build())
+            .medLovhjemmelVedtak("Folketrygdloven § 22-15")
+            .medDatoer(HbVedtaksbrevDatoer.builder()
+                .medPerioder(perioder)
+                .build())
+            .medKonfigurasjon(HbKonfigurasjon.builder()
+                .medKlagefristUker(6)
+                .medFireRettsgebyr(BigDecimal.valueOf(4321))
+                .build())
+            .medVedtaksbrevType(VedtaksbrevType.ORDINÆR)
+            .medSkalFjerneTekstFeriepenger(true)
+            .build();
+
+        HbVedtaksbrevData data = new HbVedtaksbrevData(vedtaksbrevData, perioder);
+
+        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
+        String fasit = les("/vedtaksbrev/SVP_ingen_tilbakekreving_feil_feriepenger.txt");
+        assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
+    }
+
 
     @Test
     public void skal_generere_vedtaksbrev_for_revurdering_med_SVP_og_tvillinger_og_simpel_uaktsomhet() throws Exception {
@@ -753,4 +853,7 @@ public class TekstformatererVedtaksbrevTest {
         }
     }
 
+    private boolean skalFjerneTekstFeriepenger(List<HbVedtaksbrevPeriode> perioder) {
+        return perioder.stream().anyMatch(p-> HendelseUnderType.FEIL_FERIEPENGER_4G.equals(p.getFakta().getHendelseundertype()));
+    }
 }

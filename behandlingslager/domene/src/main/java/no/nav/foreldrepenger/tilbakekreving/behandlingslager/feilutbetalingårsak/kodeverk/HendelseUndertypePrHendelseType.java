@@ -46,7 +46,8 @@ public class HendelseUndertypePrHendelseType {
             HendelseUnderType.ES_BRUKER_RETT_FORELDREPENGER));
         h.put(HendelseType.FP_ANNET_HENDELSE_TYPE, Set.of(
             HendelseUnderType.ANNET_FRITEKST,
-            HendelseUnderType.REFUSJON_ARBEIDSGIVER));
+            HendelseUnderType.REFUSJON_ARBEIDSGIVER,
+            HendelseUnderType.FEIL_FERIEPENGER_4G));
         h.put(HendelseType.FP_KUN_RETT_TYPE, Set.of(
             HendelseUnderType.FEIL_I_ANTALL_DAGER));
         h.put(HendelseType.MEDLEMSKAP_TYPE, Set.of(
@@ -78,7 +79,8 @@ public class HendelseUndertypePrHendelseType {
             HendelseUnderType.OPPHOR_MOTTAKER_DOD));
         h.put(HendelseType.SVP_ANNET_TYPE, Set.of(
             HendelseUnderType.ANNET_FRITEKST,
-            HendelseUnderType.REFUSJON_ARBEIDSGIVER));
+            HendelseUnderType.REFUSJON_ARBEIDSGIVER,
+            HendelseUnderType.FEIL_FERIEPENGER_4G));
         h.put(HendelseType.SVP_ARBEIDSGIVERS_FORHOLD_TYPE, Set.of(
             HendelseUnderType.SVP_TILRETTELEGGING_DELVIS_MULIG,
             HendelseUnderType.SVP_TILRETTELEGGING_FULLT_MULIG));

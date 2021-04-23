@@ -98,7 +98,8 @@ public enum HendelseUnderType implements Kodeverdi {
     LEGACY_ØKONOMI_UTBETALT_FOR_MYE("ØKONOMI_UTBETALT_FOR_MYE", "Feil i økonomi - utbetalt for mye", 1),
     //FELLES
     REFUSJON_ARBEIDSGIVER("REFUSJON_ARBGIVER", "Refusjon til arbeidsgiver", 1),
-    ANNET_FRITEKST("ANNET_FRITEKST", "Annet - fritekst", 3),
+    ANNET_FRITEKST("ANNET_FRITEKST", "Annet - fritekst", 2),
+    FEIL_FERIEPENGER_4G("FEIL_FERIEPENGER_4G", "Feil i feriepenger - under 4G", 3),
     IKKE_SATT("-", null, 0),
     ;
 
