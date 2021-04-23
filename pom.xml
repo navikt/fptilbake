@@ -758,6 +758,12 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${surefire.version}</version>
+                    <configuration>
+                        <useFile>true</useFile>
+                        <argLine>-XX:+TieredCompilation -XX:TieredStopAtLevel=1 -Xms256m -Dfile.encoding=UTF-8
+                            -Dlog.level.no.nav=WARN --illegal-access=warn
+                        </argLine>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -920,12 +926,6 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <useFile>true</useFile>
-                            <argLine>-XX:+TieredCompilation -XX:TieredStopAtLevel=1 -Xms256m -Dfile.encoding=UTF-8
-                                -Dlog.level.no.nav=WARN --illegal-access=warn
-                            </argLine>
-                        </configuration>
                     </plugin>
 
                 </plugins>
