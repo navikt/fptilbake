@@ -79,7 +79,7 @@ jobs:
           docker push ${IMAGE_BASE_CR} --all-tags
 
       - name: Lukk gamle bygg-issues
-        uses: actions/github-script@v3
+        uses: actions/github-script@v4.0.2
         with:
             github-token: ${{ secrets.GITHUB_TOKEN }}
             script: |
