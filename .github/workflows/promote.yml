@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Acknowledge command
-        uses: actions/github-script@v3
+        uses: actions/github-script@v4
         with:
           script: |
             github.reactions.createForIssueComment({
