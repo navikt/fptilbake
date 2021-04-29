@@ -38,10 +38,11 @@ jobs:
         run: echo "${{ secrets.GH_ACCESS_TOKEN }}" | docker login --username "x-access-token" --password-stdin ghcr.io
 
       - name: Hent og start Oracle image
-        id: oracle
-        shell: bash
         run: |
-          .oracle/start-oracle.sh &
+          echo "Henter og starter Oracle image"
+          cd .oracle
+          docker-compose up --quiet-pull > nohup.out 2>&1 &
+          sh -c 'tail -n +0 -f nohup.out | { sed "/Disconnected/q" && kill $$; }' || true
 
       - name: Set build version
         run: |
@@ -52,11 +53,6 @@ jobs:
           echo "Building $BUILD_VERSION"
           export MAVEN_OPTS="-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
           mvn test-compile -P-migrer-db -T2 --batch-mode --settings ./.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION}
-
-      - name: Vent til oracle er oppe
-        id: vent-til-oracle-er-klar
-        run: |
-          .oracle/vent-til-oracle-er-klar.sh
 
       - name: Build (test)
         run: |
