@@ -11,7 +11,6 @@ import no.nav.vedtak.sikkerhet.abac.PdpRequest;
 import no.nav.vedtak.sikkerhet.pdp.XacmlRequestBuilderTjeneste;
 import no.nav.vedtak.sikkerhet.pdp.xacml.XacmlAttributeSet;
 import no.nav.vedtak.sikkerhet.pdp.xacml.XacmlRequestBuilder;
-import no.nav.vedtak.util.Tuple;
 
 @ApplicationScoped
 @K9tilbake
@@ -28,12 +27,12 @@ public class K9XacmlRequestBuilderTjeneste implements XacmlRequestBuilderTjenest
         actionAttributeSet.addAttribute(K9AbacAttributter.XACML_1_0_ACTION_ACTION_ID, pdpRequest.getString(K9AbacAttributter.XACML_1_0_ACTION_ACTION_ID));
         xacmlBuilder.addActionAttributeSet(actionAttributeSet);
 
-        List<Tuple<String, String>> identer = hentIdenter(pdpRequest, K9AbacAttributter.RESOURCE_FELLES_PERSON_FNR, K9AbacAttributter.RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE);
+        List<IdentKey> identer = hentIdenter(pdpRequest, K9AbacAttributter.RESOURCE_FELLES_PERSON_FNR, K9AbacAttributter.RESOURCE_FELLES_PERSON_AKTOERID_RESOURCE);
 
         if (identer.isEmpty()) {
             populerResources(xacmlBuilder, pdpRequest, null);
         } else {
-            for (Tuple<String, String> ident : identer) {
+            for (var ident : identer) {
                 populerResources(xacmlBuilder, pdpRequest, ident);
             }
         }
@@ -41,7 +40,7 @@ public class K9XacmlRequestBuilderTjeneste implements XacmlRequestBuilderTjenest
         return xacmlBuilder;
     }
 
-    private void populerResources(XacmlRequestBuilder xacmlBuilder, PdpRequest pdpRequest, Tuple<String, String> ident) {
+    private void populerResources(XacmlRequestBuilder xacmlBuilder, PdpRequest pdpRequest, IdentKey ident) {
         List<String> aksjonspunktTyper = pdpRequest.getListOfString(K9AbacAttributter.RESOURCE_K9_SAK_AKSJONSPUNKT_TYPE);
         if (aksjonspunktTyper.isEmpty()) {
             xacmlBuilder.addResourceAttributeSet(byggRessursAttributter(pdpRequest, ident, null));
@@ -52,7 +51,7 @@ public class K9XacmlRequestBuilderTjeneste implements XacmlRequestBuilderTjenest
         }
     }
 
-    private XacmlAttributeSet byggRessursAttributter(PdpRequest pdpRequest, Tuple<String, String> ident, String aksjonsounktType) {
+    private XacmlAttributeSet byggRessursAttributter(PdpRequest pdpRequest, IdentKey ident, String aksjonsounktType) {
         XacmlAttributeSet resourceAttributeSet = new XacmlAttributeSet();
         resourceAttributeSet.addAttribute(K9AbacAttributter.RESOURCE_FELLES_DOMENE, pdpRequest.getString(K9AbacAttributter.RESOURCE_FELLES_DOMENE));
         resourceAttributeSet.addAttribute(K9AbacAttributter.RESOURCE_FELLES_RESOURCE_TYPE, pdpRequest.getString(K9AbacAttributter.RESOURCE_FELLES_RESOURCE_TYPE));
@@ -61,7 +60,7 @@ public class K9XacmlRequestBuilderTjeneste implements XacmlRequestBuilderTjenest
         setOptionalValueinAttributeSet(resourceAttributeSet, pdpRequest, K9AbacAttributter.RESOURCE_K9_SAK_ANSVARLIG_SAKSBEHANDLER);
 
         if (ident != null) {
-            resourceAttributeSet.addAttribute(ident.getElement1(), ident.getElement2());
+            resourceAttributeSet.addAttribute(ident.key(), ident.ident());
         }
         if (aksjonsounktType != null) {
             resourceAttributeSet.addAttribute(K9AbacAttributter.RESOURCE_K9_SAK_AKSJONSPUNKT_TYPE, aksjonsounktType);
@@ -74,11 +73,13 @@ public class K9XacmlRequestBuilderTjeneste implements XacmlRequestBuilderTjenest
         pdpRequest.getOptional(key).ifPresent(s -> resourceAttributeSet.addAttribute(key, s));
     }
 
-    private List<Tuple<String, String>> hentIdenter(PdpRequest pdpRequest, String... identNøkler) {
-        List<Tuple<String, String>> identer = new ArrayList<>();
+    private List<IdentKey> hentIdenter(PdpRequest pdpRequest, String... identNøkler) {
+        List<IdentKey> identer = new ArrayList<>();
         for (String key : identNøkler) {
-            identer.addAll(pdpRequest.getListOfString(key).stream().map(it -> new Tuple<>(key, it)).collect(Collectors.toList()));
+            identer.addAll(pdpRequest.getListOfString(key).stream().map(it -> new IdentKey(key, it)).collect(Collectors.toList()));
         }
         return identer;
     }
+
+    private static record IdentKey(String key, String ident) {}
 }

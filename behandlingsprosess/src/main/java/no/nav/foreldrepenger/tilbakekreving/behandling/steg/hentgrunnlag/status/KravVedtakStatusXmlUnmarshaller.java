@@ -5,10 +5,10 @@ import javax.xml.stream.XMLStreamException;
 
 import org.xml.sax.SAXException;
 
+import no.nav.foreldrepenger.xmlutils.JaxbHelper;
 import no.nav.tilbakekreving.status.v1.EndringKravOgVedtakstatus;
 import no.nav.tilbakekreving.status.v1.KravOgVedtakstatus;
 import no.nav.vedtak.exception.TekniskException;
-import no.nav.foreldrepenger.xmlutils.JaxbHelper;
 
 public class KravVedtakStatusXmlUnmarshaller {
 
