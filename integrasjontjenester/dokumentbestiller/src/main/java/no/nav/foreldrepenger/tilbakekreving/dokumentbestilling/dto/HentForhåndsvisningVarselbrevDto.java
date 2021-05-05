@@ -8,12 +8,9 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.TilbakekrevingAbacAttributtType;
-import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
-import no.nav.vedtak.sikkerhet.abac.AbacDto;
 import no.nav.vedtak.util.InputValideringRegex;
 
-public class HentForhåndsvisningVarselbrevDto implements AbacDto {
+public class HentForhåndsvisningVarselbrevDto {
 
     @NotNull
     @Valid
@@ -49,10 +46,5 @@ public class HentForhåndsvisningVarselbrevDto implements AbacDto {
 
     public void setFagsakYtelseType(FagsakYtelseType fagsakYtelseType) {
         this.fagsakYtelseType = fagsakYtelseType;
-    }
-
-    @Override
-    public AbacDataAttributter abacAttributter() {
-        return AbacDataAttributter.opprett().leggTil(TilbakekrevingAbacAttributtType.YTELSEBEHANDLING_UUID, behandlingUuid);
     }
 }

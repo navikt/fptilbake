@@ -39,6 +39,7 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagValidator;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.TilbakekrevingsvedtakMarshaller;
 import no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste.TilbakekrevingsvedtakTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.BehandlingReferanseAbacAttributter;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.dto.HentKorrigertKravgrunnlagDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.dto.KobleBehandlingTilGrunnlagDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.dto.KorrigertHenvisningDto;
@@ -54,6 +55,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.log.util.LoggerUtils;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
+import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
 
 @Path("/forvaltningBehandling")
 @ApplicationScoped
@@ -106,7 +108,9 @@ public class ForvaltningBehandlingRestTjeneste {
             @ApiResponse(responseCode = "500", description = "Feilet pga ukjent feil.")
         })
     @BeskyttetRessurs(action = CREATE, property = AbacProperty.DRIFT)
-    public Response tvingHenleggelseBehandling(@QueryParam("behandlingId") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
+    public Response tvingHenleggelseBehandling(
+        @TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
+        @QueryParam("behandlingId") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
         Behandling behandling = hentBehandling(behandlingReferanse);
         if (behandling.erAvsluttet()) {
             return Response.status(Response.Status.BAD_REQUEST).build();
@@ -127,7 +131,9 @@ public class ForvaltningBehandlingRestTjeneste {
             @ApiResponse(responseCode = "500", description = "Feilet pga ukjent feil.")
         })
     @BeskyttetRessurs(action = CREATE, property = AbacProperty.DRIFT)
-    public Response tvingGjenopptaBehandling(@NotNull @QueryParam("behandlingId") @Valid BehandlingReferanse behandlingReferanse) {
+    public Response tvingGjenopptaBehandling(
+        @TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
+        @NotNull @QueryParam("behandlingId") @Valid BehandlingReferanse behandlingReferanse) {
         Behandling behandling = hentBehandling(behandlingReferanse);
         if (behandling.erAvsluttet() || !behandling.isBehandlingPåVent()) {
             return Response.status(Response.Status.BAD_REQUEST).build();
@@ -214,7 +220,8 @@ public class ForvaltningBehandlingRestTjeneste {
             @ApiResponse(responseCode = "500", description = "Ukjent feil!")
         })
     @BeskyttetRessurs(action = CREATE, property = AbacProperty.DRIFT)
-    public Response tilbakeførBehandlingTilFaktaSteg(@NotNull @QueryParam("behandlingId") @Valid BehandlingReferanse behandlingReferanse) {
+    public Response tilbakeførBehandlingTilFaktaSteg(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
+                                                         @NotNull @QueryParam("behandlingId") @Valid BehandlingReferanse behandlingReferanse) {
         Behandling behandling = hentBehandling(behandlingReferanse);
         if (behandling.erAvsluttet()) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Kan ikke flyttes, behandlingen er avsluttet!").build();
@@ -236,7 +243,8 @@ public class ForvaltningBehandlingRestTjeneste {
             @ApiResponse(responseCode = "400", description = "Behandling eksisterer ikke")
         })
     @BeskyttetRessurs(action = READ, property = AbacProperty.DRIFT)
-    public Response hentOkoXmlForFeiletIverksetting(@NotNull @QueryParam("behandlingId") @Valid BehandlingReferanse behandlingReferanse) {
+    public Response hentOkoXmlForFeiletIverksetting(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
+                                                        @NotNull @QueryParam("behandlingId") @Valid BehandlingReferanse behandlingReferanse) {
         String behandlingRef = behandlingReferanse.erInternBehandlingId()
             ? behandlingReferanse.getBehandlingId().toString()
             : behandlingReferanse.getBehandlingUuid().toString();

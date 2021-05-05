@@ -33,7 +33,7 @@
     "FPSAK_CHANNEL_QUEUEMANAGER": "mq://a01apvl063.adeo.no:1414/MPLSC02",
     "FPTILBAKE_KRAVGRUNNLAG_QUEUENAME": "QA.P_K9_TILBAKE.KRAVGRUNNLAG",
     "FPTILBAKE_KRAVGRUNNLAG_QUEUEMANAGER": "mq://a01apvl063.adeo.no:1414/MPLSC02",
-    "PDL_BASE_URL": "http://pdl-api.default/graphql",
+    "PDL_BASE_URL": "http://pdl-api.pdl/graphql",
     "PDL_TEMA": "OMS",
     "TILBAKEKREVING_V1_URL": "https://cics.adeo.no/oppdrag/K231CW80",
     "DOKUMENTPRODUKSJON_V2_URL": "https://dokprod.nais.adeo.no/dokprod/ws/dokumentproduksjon/v2",

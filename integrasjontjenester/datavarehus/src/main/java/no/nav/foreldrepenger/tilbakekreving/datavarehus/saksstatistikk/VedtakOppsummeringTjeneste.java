@@ -41,6 +41,7 @@ import no.nav.foreldrepenger.tilbakekreving.kontrakter.vedtak.SærligeGrunner;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.vedtak.UtvidetVilkårResultat;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.vedtak.VedtakOppsummering;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.vedtak.VedtakPeriode;
+import no.nav.vedtak.exception.TekniskException;
 
 @ApplicationScoped
 public class VedtakOppsummeringTjeneste {
@@ -82,7 +83,7 @@ public class VedtakOppsummeringTjeneste {
             .map(Optional::get);
 
         if (behandlingVedtak.isEmpty()) {
-            throw VedtakOppsummeringTjenesteFeil.FACTORY.fantIkkeBehandlingVedtak(behandlingId).toException();
+            throw new TekniskException("FPT-131275", String.format("Fant ikke vedtak for behandling med behandlingId=%s.Kan ikke sende data til DVH", behandlingId));
         }
         VedtakOppsummering vedtakOppsummering = new VedtakOppsummering();
         vedtakOppsummering.setBehandlingUuid(behandling.getUuid());

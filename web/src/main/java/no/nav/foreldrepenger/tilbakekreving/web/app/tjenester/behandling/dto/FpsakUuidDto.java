@@ -5,7 +5,7 @@ import java.util.UUID;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.TilbakekrevingAbacAttributtType;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.TilbakekrevingAbacAttributtType;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.AbacDto;
 

@@ -23,11 +23,7 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagValidator;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
-import no.nav.vedtak.feil.Feil;
-import no.nav.vedtak.feil.FeilFactory;
-import no.nav.vedtak.feil.LogLevel;
-import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
-import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
+import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 
@@ -72,7 +68,7 @@ public class KravVedtakStatusTjeneste {
         } else if (KravStatusKode.ENDRET.equals(kravVedtakStatus437.getKravStatusKode())) {
             håndteresEndretStatusMelding(behandlingId, kravVedtakStatus437.getKravStatusKode().getKode());
         } else {
-            throw KravVedtakStatusTjenesteFeil.FACTORY.ugyldigKravStatusKode(kravVedtakStatus437.getKravStatusKode().getKode(), behandlingId).toException();
+            throw new TekniskException("FPT-107928", String.format("Har fått ugyldig status kode %s fra økonomisystem, kan ikke akspetere for behandlingId '%s'", kravVedtakStatus437.getKravStatusKode().getKode(), behandlingId));
         }
         kravVedtakStatusRepository.lagre(behandlingId, kravVedtakStatus437);
     }
@@ -90,7 +86,7 @@ public class KravVedtakStatusTjeneste {
     private void håndteresEndretStatusMelding(Long behandlingId, String statusKode) {
         if (grunnlagRepository.harGrunnlagForBehandlingId(behandlingId)) {
             if (!grunnlagRepository.erKravgrunnlagSperret(behandlingId)) {
-                throw KravVedtakStatusTjenesteFeil.FACTORY.kanIkkeFinnesSperretGrunnlagForBehandling(statusKode, behandlingId).toException();
+                throw kanIkkeFinnesSperretGrunnlagForBehandling(statusKode, behandlingId);
             }
             Kravgrunnlag431 kravgrunnlag431 = grunnlagRepository.finnKravgrunnlag(behandlingId);
             KravgrunnlagValidator.validerGrunnlag(kravgrunnlag431);
@@ -98,7 +94,7 @@ public class KravVedtakStatusTjeneste {
             taBehandlingAvventOgFortsettBehandling(behandlingId);
             grunnlagRepository.opphevGrunnlag(behandlingId);
         } else {
-            throw KravVedtakStatusTjenesteFeil.FACTORY.kanIkkeFinnesSperretGrunnlagForBehandling(statusKode, behandlingId).toException();
+            throw kanIkkeFinnesSperretGrunnlagForBehandling(statusKode, behandlingId);
         }
     }
 
@@ -118,15 +114,9 @@ public class KravVedtakStatusTjeneste {
         prosessTaskRepository.lagre(taskData);
     }
 
-    public interface KravVedtakStatusTjenesteFeil extends DeklarerteFeil {
-
-        KravVedtakStatusTjeneste.KravVedtakStatusTjenesteFeil FACTORY = FeilFactory.create(KravVedtakStatusTjeneste.KravVedtakStatusTjenesteFeil.class);
-
-        @TekniskFeil(feilkode = "FPT-107928", feilmelding = "Har fått ugyldig status kode %s fra økonomisystem, kan ikke akspetere for behandlingId '%s'", logLevel = LogLevel.WARN)
-        Feil ugyldigKravStatusKode(String status, long behandlingId);
-
-        @TekniskFeil(feilkode = "FPT-107929", feilmelding = "Har fått ENDR status kode %s fra økonomisystem for behandlingId '%s', men ikke finnes sperret grunnlag", logLevel = LogLevel.WARN)
-        Feil kanIkkeFinnesSperretGrunnlagForBehandling(String status, long behandlingId);
+    static TekniskException kanIkkeFinnesSperretGrunnlagForBehandling(String status, long behandlingId) {
+        return new TekniskException("FPT-107929", String.format("Har fått ENDR status kode %s fra økonomisystem for behandlingId '%s', men ikke finnes sperret grunnlag", status, behandlingId));
     }
+
 
 }

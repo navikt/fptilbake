@@ -15,7 +15,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
 import org.apache.commons.lang3.StringUtils;
 
 import com.github.jknack.handlebars.internal.text.WordUtils;
@@ -48,6 +47,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelse
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselInfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselRepository;
@@ -200,7 +200,7 @@ public class VedtaksbrevTjeneste {
 
     private void validerFritekstOppsummering(VedtaksbrevType vedtaksbrevType, String oppsummeringFritekst) {
         if (oppsummeringFritekst != null && oppsummeringFritekst.length() >= VedtaksbrevFritekstOppsummering.maxFritekstLengde(vedtaksbrevType)) {
-            throw VedtaksbrevFritekstValidator.FritekstFeil.FACTORY.fritekstOppsumeringForLang().toException();
+            throw VedtaksbrevFritekstValidator.fritekstOppsumeringForLang();
         }
     }
 

@@ -22,14 +22,9 @@ public class HendelseReaderProducer {
     @Inject
     public HendelseReaderProducer(@KonfigVerdi(value = "app.name") String applikasjon, @Any Instance<HendelseReader> hendelseReaders) {
         switch (applikasjon) {
-            case "fptilbake":
-                hendelseReader = hendelseReaders.select(new Fptilbake.FptilbakeAnnotationLiteral()).get();
-                break;
-            case "k9-tilbake":
-                hendelseReader = hendelseReaders.select(new K9tilbake.K9tilbakeAnnotationLiteral()).get();
-                break;
-            default:
-                throw new IllegalStateException("app.name er satt til " + applikasjon + " som ikke er en støttet verdi");
+            case "fptilbake" -> hendelseReader = hendelseReaders.select(new Fptilbake.FptilbakeAnnotationLiteral()).get();
+            case "k9-tilbake" -> hendelseReader = hendelseReaders.select(new K9tilbake.K9tilbakeAnnotationLiteral()).get();
+            default -> throw new IllegalStateException("app.name er satt til " + applikasjon + " som ikke er en støttet verdi");
         }
     }
 

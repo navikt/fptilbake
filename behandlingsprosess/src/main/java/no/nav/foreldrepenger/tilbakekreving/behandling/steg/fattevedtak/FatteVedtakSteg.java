@@ -36,7 +36,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVe
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.IverksettingStatus;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
-import no.nav.vedtak.util.StringUtils;
 
 @BehandlingStegRef(kode = "FVEDSTEG")
 @BehandlingTypeRef
@@ -81,7 +80,7 @@ public class FatteVedtakSteg implements BehandlingSteg {
         } else {
             //TODO Velge mer fingranulert ved revurdering
             opprettBehandlingVedtak(behandling);
-            if(behandling.isAutomatiskSaksbehandlet()){
+            if (behandling.isAutomatiskSaksbehandlet()) {
                 behandling.setAnsvarligBeslutter("VL");
                 lagHistorikksinnslagForAutomatiskSaksbehandling(behandling);
             }
@@ -138,15 +137,15 @@ public class FatteVedtakSteg implements BehandlingSteg {
     }
 
     private static String finnSaksBehandler(Behandling behandling) {
-        if (!StringUtils.isBlank(behandling.getAnsvarligBeslutter())) {
+        if (behandling.getAnsvarligBeslutter() != null && !behandling.getAnsvarligBeslutter().isBlank()) {
             return behandling.getAnsvarligBeslutter();
-        } else if (!StringUtils.isBlank(behandling.getAnsvarligSaksbehandler())) {
+        } else if (behandling.getAnsvarligSaksbehandler() != null && !behandling.getAnsvarligSaksbehandler().isBlank()) {
             return behandling.getAnsvarligSaksbehandler();
         }
         return DEFAULT_ANSVARLIG_SAKSBEHANDLER;
     }
 
-    private void lagHistorikksinnslagForAutomatiskSaksbehandling(Behandling behandling){
+    private void lagHistorikksinnslagForAutomatiskSaksbehandling(Behandling behandling) {
         Historikkinnslag historikkinnslag = new Historikkinnslag();
         historikkinnslag.setType(HistorikkinnslagType.VEDTAK_FATTET_AUTOMATISK);
         historikkinnslag.setBehandling(behandling);

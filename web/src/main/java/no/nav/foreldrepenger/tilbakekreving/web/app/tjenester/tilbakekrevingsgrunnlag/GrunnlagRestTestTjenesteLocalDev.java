@@ -35,8 +35,10 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagValidator;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.BehandlingReferanseAbacAttributter;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
+import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
 import no.nav.vedtak.util.env.Environment;
 
 @Path(GrunnlagRestTestTjenesteLocalDev.PATH_FRAGMENT)
@@ -64,7 +66,8 @@ public class GrunnlagRestTestTjenesteLocalDev {
     @POST
     @Operation(tags = "kravgrunnlag", description = "Lagre tilbakekrevingsgrunnlag fra økonomi")
     @BeskyttetRessurs(action = UPDATE, property = AbacProperty.FAGSAK)
-    public Response lagreUtbetalinger(@NotNull @QueryParam("behandlingId") @Valid BehandlingReferanse idDto,
+    public Response lagreUtbetalinger(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
+                                          @NotNull @QueryParam("behandlingId") @Valid BehandlingReferanse idDto,
                                       @NotNull @Valid KravgrunnlagDto kravgrunnlagDto) {
 
         if (!Environment.current().isLocal()) {
@@ -146,7 +149,7 @@ public class GrunnlagRestTestTjenesteLocalDev {
             if (aktørId.isPresent()) {
                 return aktørId.get().getId();
             } else {
-                throw BehandlingFeil.FACTORY.fantIkkePersonIdentMedFnr().toException();
+                throw BehandlingFeil.fantIkkePersonIdentMedFnr();
             }
         }
     }

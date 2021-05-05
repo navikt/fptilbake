@@ -8,11 +8,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
-import no.nav.vedtak.sikkerhet.abac.AbacDto;
-import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
-
-public class FeilutbetalingPerioderDto implements AbacDto {
+public class FeilutbetalingPerioderDto {
 
     @NotNull
     @Min(value = 0)
@@ -40,8 +36,4 @@ public class FeilutbetalingPerioderDto implements AbacDto {
         this.perioder = perioder;
     }
 
-    @Override
-    public AbacDataAttributter abacAttributter() {
-        return AbacDataAttributter.opprett().leggTil(StandardAbacAttributtType.BEHANDLING_ID, behandlingId);
-    }
 }

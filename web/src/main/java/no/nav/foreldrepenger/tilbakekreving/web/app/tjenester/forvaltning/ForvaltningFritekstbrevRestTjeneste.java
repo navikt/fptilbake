@@ -230,30 +230,22 @@ public class ForvaltningFritekstbrevRestTjeneste {
     }
 
     static String getOverskriftFeilutesendtVarselbrev(FagsakYtelseType ytelseType) {
-        switch (ytelseType) {
-            case ENGANGSTØNAD:
-                return "Brev vedrørende feilutbetaling av engangsstønad";
-            case FORELDREPENGER:
-                return "Brev vedrørende feilutbetaling av foreldrepenger";
-            case SVANGERSKAPSPENGER:
-                return "Brev vedrørende feilutbetaling av svangerskapspenger";
-            default:
-                throw new IllegalArgumentException("Ikke-støttet ytelse-type: " + ytelseType);
-        }
+        return switch (ytelseType) {
+            case ENGANGSTØNAD -> "Brev vedrørende feilutbetaling av engangsstønad";
+            case FORELDREPENGER -> "Brev vedrørende feilutbetaling av foreldrepenger";
+            case SVANGERSKAPSPENGER -> "Brev vedrørende feilutbetaling av svangerskapspenger";
+            default -> throw new IllegalArgumentException("Ikke-støttet ytelse-type: " + ytelseType);
+        };
     }
 
     static String getInnholdFeilutsendtVarselbrev(FagsakYtelseType ytelseType) {
         String hilsen = "\n\nMed vennlig hilsen\nNAV Familie- og pensjonsytelser";
-        switch (ytelseType) {
-            case ENGANGSTØNAD:
-                return "Det har på grunn av en teknisk feil blitt sendt brev til deg om at NAV vurderer om du må betale tilbake engangsstønad. Vi ber deg se bort fra dette brevet, datert 5. november 2020. Vi beklager feilen og ulempen dette har medført for deg." + hilsen;
-            case FORELDREPENGER:
-                return "Det har på grunn av en teknisk feil blitt sendt brev til deg om at NAV vurderer om du må betale tilbake foreldrepenger. Vi ber deg se bort fra dette brevet, datert 5. november 2020. Vi beklager feilen og ulempen dette har medført for deg." + hilsen;
-            case SVANGERSKAPSPENGER:
-                return "Det har på grunn av en teknisk feil blitt sendt brev til deg om at NAV vurderer om du må betale tilbake svangerskapspenger. Vi ber deg se bort fra dette brevet, datert 5. november 2020. Vi beklager feilen og ulempen dette har medført for deg." + hilsen;
-            default:
-                throw new IllegalArgumentException("Ikke-støttet ytelse-type: " + ytelseType);
-        }
+        return switch (ytelseType) {
+            case ENGANGSTØNAD -> "Det har på grunn av en teknisk feil blitt sendt brev til deg om at NAV vurderer om du må betale tilbake engangsstønad. Vi ber deg se bort fra dette brevet, datert 5. november 2020. Vi beklager feilen og ulempen dette har medført for deg." + hilsen;
+            case FORELDREPENGER -> "Det har på grunn av en teknisk feil blitt sendt brev til deg om at NAV vurderer om du må betale tilbake foreldrepenger. Vi ber deg se bort fra dette brevet, datert 5. november 2020. Vi beklager feilen og ulempen dette har medført for deg." + hilsen;
+            case SVANGERSKAPSPENGER -> "Det har på grunn av en teknisk feil blitt sendt brev til deg om at NAV vurderer om du må betale tilbake svangerskapspenger. Vi ber deg se bort fra dette brevet, datert 5. november 2020. Vi beklager feilen og ulempen dette har medført for deg." + hilsen;
+            default -> throw new IllegalArgumentException("Ikke-støttet ytelse-type: " + ytelseType);
+        };
     }
 
     private static String base64encode(String input) {

@@ -16,10 +16,10 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.Tekstforma
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.CustomHelpers;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.FellesTekstformaterer;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.dto.OverskriftBrevData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.dto.BaseDokument;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.handlebars.dto.VarselbrevDokument;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.dto.OverskriftBrevData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.dto.periode.HbPeriode;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.handlebars.dto.VarselbrevDokument;
 
 public class TekstformatererVarselbrev extends FellesTekstformaterer {
 
@@ -43,7 +43,7 @@ public class TekstformatererVarselbrev extends FellesTekstformaterer {
 
             return applyTemplate(template, varselbrevDokument);
         } catch (IOException e) {
-            throw TekstformatererBrevFeil.FACTORY.feilVedTekstgenerering(e).toException();
+            throw TekstformatererBrevFeil.feilVedTekstgenerering(e);
         }
     }
 
@@ -54,7 +54,7 @@ public class TekstformatererVarselbrev extends FellesTekstformaterer {
 
             return template.apply(overskriftBrevData);
         } catch (IOException e) {
-            throw TekstformatererBrevFeil.FACTORY.feilVedTekstgenerering(e).toException();
+            throw TekstformatererBrevFeil.feilVedTekstgenerering(e);
         }
     }
 
@@ -67,7 +67,7 @@ public class TekstformatererVarselbrev extends FellesTekstformaterer {
 
             return applyTemplate(template, varselbrevDokument);
         } catch (IOException e) {
-            throw TekstformatererBrevFeil.FACTORY.feilVedTekstgenerering(e).toException();
+            throw TekstformatererBrevFeil.feilVedTekstgenerering(e);
         }
     }
 
@@ -79,7 +79,7 @@ public class TekstformatererVarselbrev extends FellesTekstformaterer {
 
             return template.apply(overskriftBrevData);
         } catch (IOException e) {
-            throw TekstformatererBrevFeil.FACTORY.feilVedTekstgenerering(e).toException();
+            throw TekstformatererBrevFeil.feilVedTekstgenerering(e);
         }
     }
 

@@ -32,6 +32,7 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.simulering.Feil
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.BehandlingResourceLinkDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.FpsakBehandlingInfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.simulering.FpoppdragRestKlient;
+import no.nav.vedtak.exception.IntegrasjonException;
 import no.nav.vedtak.felles.integrasjon.rest.OidcRestClient;
 import no.nav.vedtak.util.env.Environment;
 
@@ -81,7 +82,7 @@ public class FpsakKlient implements FagsystemKlient {
     @Override
     public SamletEksternBehandlingInfo hentBehandlingsinfo(UUID eksternUuid, Tillegsinformasjon... tillegsinformasjon) {
         return hentBehandlingsinfoOpt(eksternUuid, Arrays.asList(tillegsinformasjon))
-            .orElseThrow(() -> FpsakKlientFeil.FACTORY.fantIkkeYtelesbehandlingIFagsystemet(eksternUuid).toException());
+            .orElseThrow(() -> new IntegrasjonException("FPT-841932", String.format("Fant ikke behandling med behandingUuid %s i fpsak", eksternUuid)));
     }
 
     @Override
@@ -138,7 +139,7 @@ public class FpsakKlient implements FagsystemKlient {
     @Override
     public EksternBehandlingsinfoDto hentBehandling(UUID eksternUuid) {
         return hentBehandlingOptional(eksternUuid)
-            .orElseThrow(() -> FpsakKlientFeil.FACTORY.fantIkkeEksternBehandlingForUuid(eksternUuid.toString()).toException());
+            .orElseThrow(() -> new IntegrasjonException("FPT-7428496", String.format("Fant ingen ekstern behandling i Fpsak for Uuid %s", eksternUuid.toString())));
     }
 
     @Override
@@ -164,7 +165,7 @@ public class FpsakKlient implements FagsystemKlient {
     public FeilutbetaltePerioderDto hentFeilutbetaltePerioder(Henvisning henvisning) {
         long fpsakBehandlingId = henvisning.toLong();
         return fpoppdragKlient.hentFeilutbetaltePerioder(fpsakBehandlingId)
-            .orElseThrow(() -> FpsakKlientFeil.FACTORY.fantIkkeYtelesbehandlingISimuleringsapplikasjonen(fpsakBehandlingId).toException());
+            .orElseThrow(() -> new IntegrasjonException("FPT-748279", String.format("Fant ikke behandling med behandlingId %s fpoppdrag", fpsakBehandlingId)));
     }
 
     static class ListeAvFpsakBehandlingInfoDto extends ArrayList<FpsakBehandlingInfoDto> {

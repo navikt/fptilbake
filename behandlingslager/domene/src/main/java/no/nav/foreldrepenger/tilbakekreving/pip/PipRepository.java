@@ -60,16 +60,17 @@ public class PipRepository {
     }
 
     private Optional<BehandlingInfo> hentInternBehandlingData(long behandlingId) {
-        String sql = "select" +
-            " b.id as behandlingId" +
-            ", f.saksnummer as saksnummer" +
-            ", u.aktoer_id as aktørId" +
-            ", b.behandling_status as behandlingstatus" +
-            ", b.ansvarlig_saksbehandler as ansvarligSaksbehandler" +
-            " from behandling b" +
-            " left join fagsak f on f.id = b.fagsak_id" +
-            " left join bruker u on u.id = f.bruker_id" +
-            " where b.id = :behandlingId";
+        String sql = """
+            select b.id as behandlingId
+            , f.saksnummer as saksnummer
+            , u.aktoer_id as aktørId
+            , b.behandling_status as behandlingstatus
+            , b.ansvarlig_saksbehandler as ansvarligSaksbehandler
+             from behandling b
+             left join fagsak f on f.id = b.fagsak_id
+             left join bruker u on u.id = f.bruker_id
+             where b.id = :behandlingId
+             """;
 
         // PipBehandlingInfo-mappingen er definert i Behandling entiteten
         Query query = entityManager.createNativeQuery(sql, "PipBehandlingInfo");
@@ -87,16 +88,17 @@ public class PipRepository {
     }
 
     private Optional<BehandlingInfo> hentInternBehandlingData(UUID behandlingUuid) {
-        String sql = "select" +
-            " b.id as behandlingId" +
-            ", f.saksnummer as saksnummer" +
-            ", u.aktoer_id as aktørId" +
-            ", b.behandling_status as behandlingstatus" +
-            ", b.ansvarlig_saksbehandler as ansvarligSaksbehandler" +
-            " from behandling b" +
-            " left join fagsak f on f.id = b.fagsak_id" +
-            " left join bruker u on u.id = f.bruker_id" +
-            " where b.uuid = :behandlingUuid";
+        String sql = """
+            select b.id as behandlingId
+            , f.saksnummer as saksnummer
+            , u.aktoer_id as aktørId
+            , b.behandling_status as behandlingstatus
+            , b.ansvarlig_saksbehandler as ansvarligSaksbehandler
+             from behandling b
+             left join fagsak f on f.id = b.fagsak_id
+             left join bruker u on u.id = f.bruker_id
+             where b.uuid = :behandlingUuid
+             """;
 
         // PipBehandlingInfo-mappingen er definert i Behandling entiteten
         Query query = entityManager.createNativeQuery(sql, "PipBehandlingInfo");

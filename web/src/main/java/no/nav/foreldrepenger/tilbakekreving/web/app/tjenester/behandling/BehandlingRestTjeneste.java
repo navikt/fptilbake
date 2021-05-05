@@ -73,11 +73,13 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.Sak
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.SettBehandlingPåVentDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.UtvidetBehandlingDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.UuidDto;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.BehandlingReferanseAbacAttributter;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.SaksnummerDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.SøkestrengDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.VergeBehandlingsmenyEnum;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
+import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
 import no.nav.vedtak.sikkerhet.context.SubjectHandler;
 import no.nav.vedtak.util.env.Environment;
 
@@ -206,7 +208,8 @@ public class BehandlingRestTjeneste {
         tags = "behandlinger",
         description = "Sjekk om revurdering kan opprettes")
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
-    public Response kanOpprettesRevurdering(@NotNull @QueryParam("behandlingId") @Parameter(description = "Intern behandlingId eller behandlingUuid for behandling") @Valid BehandlingReferanse idDto) {
+    public Response kanOpprettesRevurdering(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
+                                                @NotNull @QueryParam("behandlingId") @Parameter(description = "Intern behandlingId eller behandlingUuid for behandling") @Valid BehandlingReferanse idDto) {
         return vurderOmRevurderingKanOpprettes(idDto);
     }
 
@@ -216,7 +219,8 @@ public class BehandlingRestTjeneste {
         tags = "behandlinger",
         description = "Sjekk om revurdering kan opprettes")
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
-    public Response kanRevurderingOpprettes(@NotNull @QueryParam("uuid") @Parameter(description = "Intern behandlingId eller behandlingUuid for behandling") @Valid BehandlingReferanse idDto) {
+    public Response kanRevurderingOpprettes(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
+                                                @NotNull @QueryParam("uuid") @Parameter(description = "Intern behandlingId eller behandlingUuid for behandling") @Valid BehandlingReferanse idDto) {
         return vurderOmRevurderingKanOpprettes(idDto);
     }
 
@@ -329,7 +333,7 @@ public class BehandlingRestTjeneste {
         })
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public Response hentBehandling(@NotNull @Valid BehandlingReferanse idDto) throws URISyntaxException {
+    public Response hentBehandling(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class) @NotNull @Valid BehandlingReferanse idDto) throws URISyntaxException {
         // sender alltid til poll status slik at vi får sjekket på utestående prosess tasks også.
         Behandling behandling = getBehandling(idDto);
         return Redirect.tilBehandlingPollStatus(behandling.getUuid(), Optional.empty());
@@ -348,7 +352,7 @@ public class BehandlingRestTjeneste {
         })
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public Response hentBehandlingMidlertidigStatus(@NotNull @QueryParam("uuid") @Valid BehandlingReferanse idDto,
+    public Response hentBehandlingMidlertidigStatus(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class) @NotNull @QueryParam("uuid") @Valid BehandlingReferanse idDto,
                                                     @QueryParam("gruppe") @Valid ProsessTaskGruppeIdDto gruppeDto)
         throws URISyntaxException {
         Behandling behandling = getBehandling(idDto);
@@ -367,7 +371,8 @@ public class BehandlingRestTjeneste {
         })
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public Response hentBehandlingResultat(@NotNull @QueryParam("uuid") @Valid BehandlingReferanse idDto) {
+    public Response hentBehandlingResultat(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
+                                               @NotNull @QueryParam("uuid") @Valid BehandlingReferanse idDto) {
         var behandling = getBehandling(idDto);
 
         AsyncPollingStatus taskStatus = behandlingsprosessTjeneste.sjekkProsessTaskPågårForBehandling(behandling, null).orElse(null);
@@ -414,7 +419,7 @@ public class BehandlingRestTjeneste {
         Long behandlingId = behandling.getId();
         Optional<BehandlingVedtak> behandlingVedtak = behandlingTjeneste.hentBehandlingvedtakForBehandlingId(behandlingId);
         if (!behandling.erAvsluttet() || behandlingVedtak.isEmpty()) {
-            throw BehandlingFeil.FACTORY.fantIkkeBehandlingsVedtakInfo(behandlingId).toException();
+            throw BehandlingFeil.fantIkkeBehandlingsVedtakInfo(behandlingId);
         }
         KlageTilbakekrevingDto klageTilbakekrevingDto = new KlageTilbakekrevingDto(behandlingId, behandlingVedtak.get().getVedtaksdato(), behandling.getType().getKode());
         return Response.ok().entity(klageTilbakekrevingDto).build();
@@ -445,8 +450,8 @@ public class BehandlingRestTjeneste {
         description = "Henter rettigheter for lovlige behandlingsoperasjoner")
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public BehandlingRettigheterDto hentBehandlingOperasjonRettigheter(
-        @NotNull @QueryParam("uuid") @Valid BehandlingReferanse behandlingReferanse
+    public BehandlingRettigheterDto hentBehandlingOperasjonRettigheter(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
+                                                                           @NotNull @QueryParam("uuid") @Valid BehandlingReferanse behandlingReferanse
     ) {
         Boolean harSoknad = true;
         //TODO (TOR) Denne skal etterkvart returnere rettighetene knytta til behandlingsmeny i frontend

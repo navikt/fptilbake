@@ -24,7 +24,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermle
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
-import no.nav.vedtak.feil.Feil;
+import no.nav.vedtak.exception.TekniskException;
+import no.nav.vedtak.exception.VLException;
 
 public class HistorikkInnslagTekstBuilder {
 
@@ -394,18 +395,18 @@ public class HistorikkInnslagTekstBuilder {
      * @param historikkinnslagType
      */
     private void verify(HistorikkinnslagType historikkinnslagType) {
-        List<Feil> verificationResults = new ArrayList<>();
+        List<VLException> verificationResults = new ArrayList<>();
         historikkinnslagDeler.forEach(del -> {
-            Optional<Feil> exception = verify(historikkinnslagType, del);
+            Optional<VLException> exception = verify(historikkinnslagType, del);
             exception.ifPresent(verificationResults::add);
         });
         // kast exception dersom alle deler feiler valideringen
         if (verificationResults.size() == historikkinnslagDeler.size()) {
-            throw verificationResults.get(0).toException();
+            throw verificationResults.get(0);
         }
     }
 
-    private Optional<Feil> verify(HistorikkinnslagType historikkinnslagType, HistorikkinnslagDel historikkinnslagDel) {
+    private Optional<VLException> verify(HistorikkinnslagType historikkinnslagType, HistorikkinnslagDel historikkinnslagDel) {
         String type = historikkinnslagType.getMal();
 
         if (HistorikkInnslagMal.MAL_TYPE_1.equals(type)) {
@@ -433,10 +434,10 @@ public class HistorikkInnslagTekstBuilder {
         if (HistorikkInnslagMal.MAL_TYPE_9.equals(type)) {
             return checkFieldsPresent(type, historikkinnslagDel, HistorikkinnslagFeltType.HENDELSE, HistorikkinnslagFeltType.ENDRET_FELT);
         }
-        throw HistorikkInnsalgFeil.FACTORY.ukjentHistorikkinnslagType(type).toException();
+        throw new TekniskException("FPT-876692", String.format("Ukjent historikkinnslagstype: %s", type));
     }
 
-    private Optional<Feil> checkFieldsPresent(String type, HistorikkinnslagDel del, HistorikkinnslagFeltType... fields) {
+    private Optional<VLException> checkFieldsPresent(String type, HistorikkinnslagDel del, HistorikkinnslagFeltType... fields) {
         List<HistorikkinnslagFeltType> fieldList = Arrays.asList(fields);
         Set<HistorikkinnslagFeltType> harFelt = findFields(del, fieldList).collect(Collectors.toCollection(LinkedHashSet::new));
 
@@ -445,11 +446,11 @@ public class HistorikkInnslagTekstBuilder {
             return Optional.empty();
         } else {
             List<String> feltKoder = fieldList.stream().map(HistorikkinnslagFeltType::getKode).collect(Collectors.toList());
-            return Optional.of(HistorikkInnsalgFeil.FACTORY.manglerFeltForHistorikkInnslag(type, feltKoder));
+            return Optional.of(new TekniskException("FPT-876694", String.format("For type %s, mangler felter %s for historikkinnslag.", type, feltKoder)));
         }
     }
 
-    private Optional<Feil> checkAtLeastOnePresent(String type, HistorikkinnslagDel del, HistorikkinnslagFeltType... fields) {
+    private Optional<VLException> checkAtLeastOnePresent(String type, HistorikkinnslagDel del, HistorikkinnslagFeltType... fields) {
         List<HistorikkinnslagFeltType> fieldList = Arrays.asList(fields);
         Optional<HistorikkinnslagFeltType> opt = findFields(del, fieldList).findAny();
 
@@ -457,7 +458,7 @@ public class HistorikkInnslagTekstBuilder {
             return Optional.empty();
         } else {
             List<String> feltKoder = fieldList.stream().map(HistorikkinnslagFeltType::getKode).collect(Collectors.toList());
-            return Optional.of(HistorikkInnsalgFeil.FACTORY.manglerMinstEtFeltForHistorikkinnslag(type, feltKoder));
+            return Optional.of(new TekniskException("FPT-876693", String.format("For type %s, forventer minst et felt av type %s", type, feltKoder)));
         }
     }
 

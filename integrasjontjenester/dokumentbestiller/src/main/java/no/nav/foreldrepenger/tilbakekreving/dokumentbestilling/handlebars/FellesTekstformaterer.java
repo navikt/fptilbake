@@ -57,7 +57,7 @@ public abstract class FellesTekstformaterer {
                 .build();
             return template.apply(context).stripLeading().stripTrailing();
         } catch (IOException e) {
-            throw TekstformatererBrevFeil.FACTORY.feilVedTekstgenerering(e).toException();
+            throw TekstformatererBrevFeil.feilVedTekstgenerering(e);
         }
     }
 

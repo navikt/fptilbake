@@ -22,8 +22,10 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.impl.vilkårsvurdering.Vi
 import no.nav.foreldrepenger.tilbakekreving.felles.Rettsgebyr;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.DetaljerteFeilutbetalingsperioderDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.VilkårsvurderteDto;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.BehandlingReferanseAbacAttributter;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
+import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
 
 @Path(VilkårsvurderingRestTjeneste.PATH_FRAGMENT)
 @Produces(APPLICATION_JSON)
@@ -52,7 +54,9 @@ public class VilkårsvurderingRestTjeneste {
     @Path("/perioder")
     @Operation(tags = "vilkårsvurdering", description = "Henter perioder som skal vurderes for vilkårsvurdering")
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
-    public DetaljerteFeilutbetalingsperioderDto hentDetailjertFeilutbetalingPerioder(@QueryParam("uuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
+    public DetaljerteFeilutbetalingsperioderDto hentDetailjertFeilutbetalingPerioder(
+        @TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
+        @QueryParam("uuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
         DetaljerteFeilutbetalingsperioderDto perioderDto = new DetaljerteFeilutbetalingsperioderDto();
         perioderDto.setPerioder(vilkårsvurderingTjeneste.hentDetaljertFeilutbetalingPerioder(hentBehandlingId(behandlingReferanse)));
         perioderDto.setRettsgebyr(rettsgebyr);
@@ -63,7 +67,8 @@ public class VilkårsvurderingRestTjeneste {
     @Path("/vurdert")
     @Operation(tags = "vilkårsvurdering", description = "Henter allerede vurdert vilkårsvurdering")
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
-    public VilkårsvurderteDto hentVurdertPerioder(@QueryParam("uuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
+    public VilkårsvurderteDto hentVurdertPerioder(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
+                                                      @QueryParam("uuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
         VilkårsvurderteDto vilkårsvurderteDto = new VilkårsvurderteDto();
         vilkårsvurderteDto.setVilkarsVurdertePerioder(vilkårsvurderingTjeneste.hentVilkårsvurdering(hentBehandlingId(behandlingReferanse)));
         return vilkårsvurderteDto;

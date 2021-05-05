@@ -6,6 +6,7 @@ import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.READ;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -28,8 +29,13 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurdertForeldelseTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.BehandlingReferanseAbacAttributter;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
+import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
+import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
+import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
+
 @Path(ForeldelseRestTjeneste.PATH_FRAGMENT)
 @Produces(APPLICATION_JSON)
 @Consumes(APPLICATION_JSON)
@@ -58,7 +64,8 @@ public class ForeldelseRestTjeneste {
     @GET
     @Operation(tags = "foreldelse", description = "Henter perioder som skal vurderes for foreldelse")
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
-    public FeilutbetalingPerioderDto hentLogiskePerioder(@QueryParam("uuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
+    public FeilutbetalingPerioderDto hentLogiskePerioder(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
+                                                             @QueryParam("uuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
         return vurdertForeldelseTjeneste.hentFaktaPerioder(hentBehandlingId(behandlingReferanse));
     }
 
@@ -66,7 +73,8 @@ public class ForeldelseRestTjeneste {
     @Operation(tags = "foreldelse", description = "Hente allerede vurdert foreldelse perioder")
     @Path("/vurdert")
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
-    public FeilutbetalingPerioderDto hentVurdertPerioder(@QueryParam("uuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
+    public FeilutbetalingPerioderDto hentVurdertPerioder(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
+                                                             @QueryParam("uuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
         return vurdertForeldelseTjeneste.henteVurdertForeldelse(hentBehandlingId(behandlingReferanse));
     }
 
@@ -74,7 +82,7 @@ public class ForeldelseRestTjeneste {
     @Operation(tags = "foreldelse", description = "Beregn feilutbetalingsbeløp for oppgitte perioder")
     @Path("/belop")
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
-    public FeilutbetalingPerioderDto beregnBeløp(@NotNull @Valid FeilutbetalingPerioderDto perioderDto) {
+    public FeilutbetalingPerioderDto beregnBeløp(@TilpassetAbacAttributt (supplierClass = AbacDataPerioder.class) @NotNull @Valid FeilutbetalingPerioderDto perioderDto) {
         List<Periode> perioderFraDto = perioderDto.getPerioder().stream().map(ForeldelsePeriodeMedBeløpDto::tilPeriode).collect(Collectors.toList());
         Map<Periode, BigDecimal> feilutbetalinger = kravgrunnlagBeregningTjeneste.beregnFeilutbetaltBeløp(perioderDto.getBehandlingId(), perioderFraDto);
         for (ForeldelsePeriodeMedBeløpDto dto : perioderDto.getPerioder()) {
@@ -87,5 +95,14 @@ public class ForeldelseRestTjeneste {
         return behandlingReferanse.erInternBehandlingId()
             ? behandlingReferanse.getBehandlingId()
             : behandlingTjeneste.hentBehandlingId(behandlingReferanse.getBehandlingUuid());
+    }
+
+    public static class AbacDataPerioder implements Function<Object, AbacDataAttributter> {
+
+        @Override
+        public AbacDataAttributter apply(Object obj) {
+            var req = (FeilutbetalingPerioderDto) obj;
+            return AbacDataAttributter.opprett().leggTil(StandardAbacAttributtType.BEHANDLING_ID, req.getBehandlingId());
+        }
     }
 }

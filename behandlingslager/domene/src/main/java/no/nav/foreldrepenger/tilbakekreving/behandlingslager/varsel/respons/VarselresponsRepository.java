@@ -1,7 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons;
 
-import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons.VarselresponsRepositoryFeil.FACTORY;
-
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -11,6 +9,8 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
 import javax.persistence.TypedQuery;
+
+import no.nav.vedtak.exception.TekniskException;
 
 @ApplicationScoped
 public class VarselresponsRepository {
@@ -38,9 +38,9 @@ public class VarselresponsRepository {
             entityManager.flush();
         } catch (PersistenceException e) {
             if (e.getCause().getCause().getMessage().contains("ORA-02291")) {
-                throw VarselresponsRepositoryFeil.FACTORY.fantIngenBehandlingMedId(varselrespons.getBehandlingId()).toException();
+                throw new TekniskException("FPT-754532", String.format("Det finnes ingen behandlinger med id [ %s ]", varselrespons.getBehandlingId()));
             }
-            throw VarselresponsRepositoryFeil.FACTORY.constraintFeilVedLagring(e).toException();
+            throw new TekniskException("FPT-523523", "Det oppstod en databasefeil ved lagring av responsen", e);
         }
     }
 
@@ -50,7 +50,7 @@ public class VarselresponsRepository {
         List<Varselrespons> resultat = query.getResultList();
 
         if (resultat.size() > 1) {
-            throw FACTORY.flereResponserEnnForventet(resultat.size(), behandlingId).toException();
+            throw new TekniskException("FPT-352363", String.format("Fant flere ( %s ) responser enn forventet (1). behandlingId [ %s ]", resultat.size(), behandlingId));
         }
         return !resultat.isEmpty() ? Optional.of(resultat.get(0)) : Optional.empty();
     }

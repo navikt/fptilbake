@@ -23,6 +23,7 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBe
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.simulering.FeilutbetaltePerioderDto;
 import no.nav.foreldrepenger.tilbakekreving.organisasjon.Virksomhet;
 import no.nav.foreldrepenger.tilbakekreving.organisasjon.VirksomhetTjeneste;
+import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.konfig.KonfigVerdi;
 
 @ApplicationScoped
@@ -60,7 +61,7 @@ public class EksternDataForBrevTjeneste {
 
     public Personinfo hentPerson(String aktørId) {
         return tpsTjeneste.hentBrukerForAktør(new AktørId(aktørId))
-            .orElseThrow(() -> EksternDataForBrevFeil.FACTORY.fantIkkePersoniTPS(aktørId).toException());
+            .orElseThrow(() -> new TekniskException("FPT-089912", String.format("Fant ikke person med aktørId %s i tps", aktørId)));
     }
 
     public Adresseinfo hentAdresse(Personinfo personinfo) {

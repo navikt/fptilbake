@@ -13,6 +13,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.BehandlingReferanseAbacAttributter;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.AbacDto;
 
@@ -74,7 +75,7 @@ public class BekreftedeAksjonspunkterDto implements AbacDto {
     @Override
     public AbacDataAttributter abacAttributter() {
         AbacDataAttributter abac = AbacDataAttributter.opprett()
-            .leggTil(behandlingReferanse.abacAttributter());
+            .leggTil(BehandlingReferanseAbacAttributter.fraBehandlingReferanse(behandlingReferanse));
         bekreftedeAksjonspunktDtoer.forEach(apDto -> abac.leggTil(apDto.abacAttributter()));
         return abac;
     }

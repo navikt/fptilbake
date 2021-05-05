@@ -25,7 +25,7 @@ public class TekstformatererHeader extends FellesTekstformaterer {
             Template template = opprettHandlebarsTemplate("header", data.getSpråkkode());
             return applyTemplate(template, data);
         } catch (IOException e) {
-            throw TekstformatererBrevFeil.FACTORY.feilVedTekstgenerering(e).toException();
+            throw TekstformatererBrevFeil.feilVedTekstgenerering(e);
         }
     }
 

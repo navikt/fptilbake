@@ -1,51 +1,53 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling;
 
-import static no.nav.vedtak.feil.LogLevel.WARN;
-
 import java.util.UUID;
 
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
-import no.nav.vedtak.feil.Feil;
-import no.nav.vedtak.feil.FeilFactory;
-import no.nav.vedtak.feil.LogLevel;
-import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
-import no.nav.vedtak.feil.deklarasjon.FunksjonellFeil;
-import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
+import no.nav.vedtak.exception.FunksjonellException;
+import no.nav.vedtak.exception.TekniskException;
 
-public interface BehandlingFeil extends DeklarerteFeil {
-    BehandlingFeil FACTORY = FeilFactory.create(BehandlingFeil.class);
+public class BehandlingFeil  {
 
-    @TekniskFeil(feilkode = "FPT-7428492", feilmelding = "Fant ikke person med aktørId", logLevel = LogLevel.WARN)
-    Feil fantIkkePersonMedAktørId();
 
-    @FunksjonellFeil(feilkode = "FPT-185316", feilmelding = "Oppgitt saksnummer {%s} er allerede knyttet til en annen bruker", løsningsforslag = "Sjekk at saksnummer og fødselsnummer er riktig", logLevel = LogLevel.WARN)
-    Feil saksnummerKnyttetTilAnnenBruker(Saksnummer saksnummer);
 
-    @FunksjonellFeil(feilkode = "FPT-128935", feilmelding = "Behandlingen er endret av en annen saksbehandler, eller har blitt oppdatert med ny informasjon av systemet.", løsningsforslag = "Last inn behandlingen på nytt.", logLevel = LogLevel.WARN)
-    Feil endringerHarForekommetPåSøknaden();
+    public static FunksjonellException saksnummerKnyttetTilAnnenBruker(Saksnummer saksnummer) {
+        return new FunksjonellException("FPT-185316", String.format("Oppgitt saksnummer {%s} er allerede knyttet til en annen bruker", saksnummer), "Sjekk at saksnummer og fødselsnummer er riktig");
+    }
 
-    @TekniskFeil(feilkode = "FPT-7428494", feilmelding = "Fant ikke person med fnr", logLevel = LogLevel.WARN)
-    Feil fantIkkePersonIdentMedFnr();
+    public static FunksjonellException  endringerHarForekommetPåSøknaden() {
+        return new FunksjonellException("FPT-128935", "Behandlingen er endret av en annen saksbehandler, eller har blitt oppdatert med ny informasjon av systemet.", "Last inn behandlingen på nytt.");
+    }
 
-    @TekniskFeil(feilkode = "FPT-7428495", feilmelding = "Fant ikke behandling med behandlingId %s and henvisning %s", logLevel = LogLevel.WARN)
-    Feil fantIkkeBehandlingMedHenvisning(long behandlingId, Henvisning henvisning);
+    public static TekniskException fantIkkePersonIdentMedFnr() {
+        return new TekniskException("FPT-7428494", "Fant ikke person med fnr");
+    }
 
-    @FunksjonellFeil(feilkode = "FPT-992332", feilmelding = "BehandlingId %s er ikke satt på vent, og ventefrist kan derfor ikke oppdateres", løsningsforslag = "Forsett saksbehandlingen", logLevel = WARN)
-    Feil kanIkkeEndreVentefristForBehandlingIkkePaVent(Long behandlingId);
+    public static TekniskException fantIkkeBehandlingMedHenvisning(long behandlingId, Henvisning henvisning) {
+        return new TekniskException("FPT-7428495", String.format("Fant ikke behandling med behandlingId %s and henvisning %s", behandlingId, henvisning));
+    }
 
-    @FunksjonellFeil(feilkode = "FPT-663486", feilmelding = "saksnummer %s oppfyller ikke kravene for tilbakekreving", løsningsforslag = "", logLevel = LogLevel.WARN)
-    Feil kanIkkeOppretteTilbakekrevingBehandling(Saksnummer saksnummer);
+    public static FunksjonellException  kanIkkeEndreVentefristForBehandlingIkkePaVent(Long behandlingId) {
+        return new FunksjonellException("FPT-992332", String.format("BehandlingId %s er ikke satt på vent, og ventefrist kan derfor ikke oppdateres", behandlingId), "Forsett saksbehandlingen");
+    }
 
-    @FunksjonellFeil(feilkode = "FPT-663488", feilmelding = "tilbakekreving finnes allerede for eksternUuid %s ", løsningsforslag = "", logLevel = LogLevel.WARN)
-    Feil kanIkkeOppretteTilbakekrevingBehandling(UUID eksternUuid);
+    public static FunksjonellException  kanIkkeOppretteTilbakekrevingBehandling(Saksnummer saksnummer) {
+        return new FunksjonellException("FPT-663486", String.format("saksnummer %s oppfyller ikke kravene for tilbakekreving", saksnummer), "");
+    }
 
-    @FunksjonellFeil(feilkode = "FPT-663490", feilmelding = "Fant ingen tilbakekreving behandling for saksnummer %s ", løsningsforslag = "", logLevel = LogLevel.WARN)
-    Feil fantIngenTilbakekrevingBehandlingForSaksnummer(Saksnummer saksnummer);
+    public static FunksjonellException  kanIkkeOppretteTilbakekrevingBehandling(UUID eksternUuid) {
+        return new FunksjonellException("FPT-663488", String.format("tilbakekreving finnes allerede for eksternUuid %s ", eksternUuid), "");
+    }
 
-    @FunksjonellFeil(feilkode = "FPT-663491", feilmelding = "Det foreligger et feilutbetalt beløp eller opprettet automatisk før bestemte dager, kan ikke henlegges behandling %s", løsningsforslag = "", logLevel = LogLevel.WARN)
-    Feil kanIkkeHenleggeBehandling(Long behandlingId);
+    public static FunksjonellException  fantIngenTilbakekrevingBehandlingForSaksnummer(Saksnummer saksnummer) {
+        return new FunksjonellException("FPT-663490", String.format("Fant ingen tilbakekreving behandling for saksnummer %s ", saksnummer), "");
+    }
 
-    @TekniskFeil(feilkode = "FPT-763492", feilmelding = "Behandling er ikke fattet ennå, kan ikke finne vedtak info %s", logLevel = LogLevel.WARN)
-    Feil fantIkkeBehandlingsVedtakInfo(Long behandlingId);
+    public static FunksjonellException  kanIkkeHenleggeBehandling(Long behandlingId) {
+        return new FunksjonellException("FPT-663491", String.format("Det foreligger et feilutbetalt beløp eller opprettet automatisk før bestemte dager, kan ikke henlegges behandling %s", behandlingId), "");
+    }
+
+    public static TekniskException fantIkkeBehandlingsVedtakInfo(Long behandlingId) {
+        return new TekniskException("FPT-763492", String.format("Behandling er ikke fattet ennå, kan ikke finne vedtak info %s", behandlingId));
+    }
 }

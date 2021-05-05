@@ -10,11 +10,6 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonParseException;
 
 import no.nav.vedtak.exception.TekniskException;
-import no.nav.vedtak.feil.Feil;
-import no.nav.vedtak.feil.FeilFactory;
-import no.nav.vedtak.feil.LogLevel;
-import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
-import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
 
 public class JsonParseExceptionMapper implements ExceptionMapper<JsonParseException> {
 

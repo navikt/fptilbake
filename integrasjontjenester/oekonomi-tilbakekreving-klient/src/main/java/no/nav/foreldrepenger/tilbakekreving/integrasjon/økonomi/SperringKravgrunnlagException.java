@@ -1,10 +1,13 @@
 package no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi;
 
 import no.nav.vedtak.exception.IntegrasjonException;
-import no.nav.vedtak.feil.Feil;
 
 public class SperringKravgrunnlagException extends IntegrasjonException {
-    public SperringKravgrunnlagException(Feil feil) {
-        super(feil);
+    public SperringKravgrunnlagException(String kode, String msg) {
+        this(kode, msg, (Throwable)null);
+    }
+
+    public SperringKravgrunnlagException(String kode, String msg, Throwable cause) {
+        super(kode, msg, cause);
     }
 }

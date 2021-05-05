@@ -20,8 +20,10 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FaktaFeilutbetalingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BehandlingFeilutbetalingFakta;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BehandlingFeilutbetalingFaktaDto;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.BehandlingReferanseAbacAttributter;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
+import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
 
 @Path(BehandlingFaktaRestTjeneste.PATH_FRAGMENT)
 @Produces(APPLICATION_JSON)
@@ -52,7 +54,8 @@ public class BehandlingFaktaRestTjeneste {
     )
     @Path("/hent-fakta/feilutbetaling")
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
-    public BehandlingFeilutbetalingFaktaDto hentFeilutbetalingFakta(@QueryParam(value = "uuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
+    public BehandlingFeilutbetalingFaktaDto hentFeilutbetalingFakta(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
+                                                                        @QueryParam(value = "uuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
         BehandlingFeilutbetalingFakta fakta = faktaFeilutbetalingTjeneste.hentBehandlingFeilutbetalingFakta(hentBehandlingId(behandlingReferanse));
         BehandlingFeilutbetalingFaktaDto dto = new BehandlingFeilutbetalingFaktaDto();
         dto.setBehandlingFakta(fakta);

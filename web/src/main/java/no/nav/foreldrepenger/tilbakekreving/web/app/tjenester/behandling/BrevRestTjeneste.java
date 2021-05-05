@@ -29,8 +29,10 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.dokumentbestiller.D
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.brevmaler.DokumentBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.BrevmalDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.BestillBrevDto;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.BehandlingReferanseAbacAttributter;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
+import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
 
 @Path(BrevRestTjeneste.PATH_FRAGMENT)
 @Produces(APPLICATION_JSON)
@@ -63,7 +65,8 @@ public class BrevRestTjeneste {
     @Operation(tags = "brev", description = "Henter liste over tilgjengelige brevtyper")
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK, sporingslogg = false)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public List<BrevmalDto> hentMaler(@Valid @QueryParam("uuid") BehandlingReferanse behandlingReferanse) {
+    public List<BrevmalDto> hentMaler(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
+                                          @Valid @QueryParam("uuid") BehandlingReferanse behandlingReferanse) {
         long behandlingId = hentBehandlingId(behandlingReferanse);
         return dokumentBehandlingTjeneste.hentBrevmalerFor(behandlingId);
     }

@@ -15,10 +15,10 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakStatus;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.TilbakekrevingAbacAttributtType;
 import no.nav.foreldrepenger.tilbakekreving.pip.PipBehandlingData;
 import no.nav.foreldrepenger.tilbakekreving.pip.PipRepository;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.CommonAttributter;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.TilbakekrevingAbacAttributtType;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.fp.AbacBehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.fp.AbacFagsakStatus;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.fp.FPPdpRequestBuilder;
@@ -29,6 +29,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.sikkerhet.abac.AbacAttributtSamling;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
+import no.nav.vedtak.sikkerhet.abac.AbacIdToken;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt;
 import no.nav.vedtak.sikkerhet.abac.PdpRequest;
 import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
@@ -181,7 +182,7 @@ public class FPPdpRequestBuilderTest {
     }
 
     private AbacAttributtSamling byggAbacAttributtsamling() {
-        AbacAttributtSamling attributtSamling = AbacAttributtSamling.medJwtToken(DUMMY_ID_TOKEN);
+        AbacAttributtSamling attributtSamling = AbacAttributtSamling.medJwtToken(DUMMY_ID_TOKEN, AbacIdToken.TokenType.OIDC);
         attributtSamling.setActionType(BeskyttetRessursActionAttributt.READ);
         attributtSamling.setResource(AbacProperty.FAGSAK);
         return attributtSamling;

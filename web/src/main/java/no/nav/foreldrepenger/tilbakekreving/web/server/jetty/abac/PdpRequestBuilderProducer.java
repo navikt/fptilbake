@@ -28,16 +28,15 @@ public class PdpRequestBuilderProducer {
     public PdpRequestBuilderProducer(@KonfigVerdi(value = "app.name") String applikasjon,
                                      @Any Instance<PdpRequestBuilder> pdpRequestBuilders) {
         switch (applikasjon) {
-            case "fptilbake":
+            case "fptilbake" -> {
                 logger.info("Bruker PdpRequestBuilder for fptilbake");
                 pdpRequestBuilder = pdpRequestBuilders.select(new Fptilbake.FptilbakeAnnotationLiteral()).get();
-                break;
-            case "k9-tilbake":
+            }
+            case "k9-tilbake" -> {
                 logger.info("Bruker PdpRequestBuilder for k9");
                 pdpRequestBuilder = pdpRequestBuilders.select(new K9tilbake.K9tilbakeAnnotationLiteral()).get();
-                break;
-            default:
-                throw new IllegalStateException("app.name er satt til " + applikasjon + " som ikke er en støttet verdi");
+            }
+            default -> throw new IllegalStateException("app.name er satt til " + applikasjon + " som ikke er en støttet verdi");
         }
     }
 

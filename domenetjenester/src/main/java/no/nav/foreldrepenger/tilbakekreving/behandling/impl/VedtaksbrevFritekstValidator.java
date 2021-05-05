@@ -1,7 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstOppsummering.maxFritekstLengde;
-import static no.nav.vedtak.feil.LogLevel.WARN;
 
 import java.time.LocalDate;
 import java.util.Comparator;
@@ -27,11 +26,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurd
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.SærligGrunn;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
-import no.nav.vedtak.feil.Feil;
-import no.nav.vedtak.feil.FeilFactory;
-import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
-import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
-import no.nav.vedtak.util.StringUtils;
+import no.nav.vedtak.exception.TekniskException;
 
 @ApplicationScoped
 public class VedtaksbrevFritekstValidator {
@@ -72,7 +67,7 @@ public class VedtaksbrevFritekstValidator {
         if (vedtaksbrevFritekstOppsummering != null
             && vedtaksbrevFritekstOppsummering.getOppsummeringFritekst() != null
             && vedtaksbrevFritekstOppsummering.getOppsummeringFritekst().length() >= maxFritekstLengde(brevType)) {
-            throw FritekstFeil.FACTORY.fritekstOppsumeringForLang().toException();
+            throw fritekstOppsumeringForLang();
         }
     }
 
@@ -81,8 +76,8 @@ public class VedtaksbrevFritekstValidator {
         boolean erRevurderingEtterKlage = behandling.getBehandlingÅrsaker().stream()
             .anyMatch(ba -> ba.getBehandlingÅrsakType() == BehandlingÅrsakType.RE_KLAGE_KA || ba.getBehandlingÅrsakType() == BehandlingÅrsakType.RE_KLAGE_NFP);
         if (BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandling.getType()) && !erRevurderingEtterKlage &&
-            (vedtaksbrevFritekstOppsummering == null || StringUtils.nullOrEmpty(vedtaksbrevFritekstOppsummering.getOppsummeringFritekst()))) {
-            throw FritekstFeil.FACTORY.manglerPåkrevetOppsumering().toException();
+            (vedtaksbrevFritekstOppsummering == null || vedtaksbrevFritekstOppsummering.getOppsummeringFritekst() == null || vedtaksbrevFritekstOppsummering.getOppsummeringFritekst().isEmpty())) {
+            throw manglerPåkrevetOppsumering();
         }
     }
 
@@ -107,22 +102,22 @@ public class VedtaksbrevFritekstValidator {
     private static void validerFritekstSatt(List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder, Periode periodeSomMåHaFritekst, String hva, VedtaksbrevFritekstType fritekstType) {
         List<Periode> perioder = finnFritekstPerioder(vedtaksbrevFritekstPerioder, periodeSomMåHaFritekst, fritekstType);
         if (perioder.isEmpty()) {
-            throw FritekstFeil.FACTORY.manglerFritekst(hva, periodeSomMåHaFritekst, fritekstType.getKode()).toException();
+            throw manglerFritekst(hva, periodeSomMåHaFritekst, fritekstType.getKode());
         }
         Periode førstePeriode = perioder.get(0);
         if (!periodeSomMåHaFritekst.getFom().equals(førstePeriode.getFom())) {
-            throw FritekstFeil.FACTORY.manglerFritekst(hva, Periode.of(periodeSomMåHaFritekst.getFom(), førstePeriode.getFom().minusDays(1)), fritekstType.getKode()).toException();
+            throw manglerFritekst(hva, Periode.of(periodeSomMåHaFritekst.getFom(), førstePeriode.getFom().minusDays(1)), fritekstType.getKode());
         }
         for (int i = 1; i < perioder.size(); i++) {
             LocalDate forrigeSlutt = perioder.get(i - 1).getTom();
             LocalDate start = perioder.get(i).getFom();
             if (!forrigeSlutt.plusDays(1).equals(start)) {
-                throw FritekstFeil.FACTORY.manglerFritekst(hva, Periode.of(forrigeSlutt.plusDays(1), start.minusDays(1)), fritekstType.getKode()).toException();
+                throw manglerFritekst(hva, Periode.of(forrigeSlutt.plusDays(1), start.minusDays(1)), fritekstType.getKode());
             }
         }
         Periode sistePeriode = perioder.get(perioder.size() - 1);
         if (!periodeSomMåHaFritekst.getTom().equals(sistePeriode.getTom())) {
-            throw FritekstFeil.FACTORY.manglerFritekst(hva, Periode.of(sistePeriode.getTom().plusDays(1), periodeSomMåHaFritekst.getTom()), fritekstType.getKode()).toException();
+            throw manglerFritekst(hva, Periode.of(sistePeriode.getTom().plusDays(1), periodeSomMåHaFritekst.getTom()), fritekstType.getKode());
         }
     }
 
@@ -136,17 +131,17 @@ public class VedtaksbrevFritekstValidator {
             .collect(Collectors.toList());
     }
 
-    public interface FritekstFeil extends DeklarerteFeil {
 
-        FritekstFeil FACTORY = FeilFactory.create(FritekstFeil.class);
 
-        @TekniskFeil(feilkode = "FPT-022180", feilmelding = "Ugyldig input: Når '%s' er valgt er fritekst påkrevet. Mangler for periode %s og avsnitt %s", logLevel = WARN)
-        Feil manglerFritekst(String hendelseUnderType, Periode periode, String fritekstType);
-
-        @TekniskFeil(feilkode = "FPT-063091", feilmelding = "Ugyldig input: Når det er revurdering, så er oppsummering fritekst påkrevet.", logLevel = WARN)
-        Feil manglerPåkrevetOppsumering();
-
-        @TekniskFeil(feilkode = "FPT-063092", feilmelding = "Ugyldig input: Oppsummeringstekst er for lang.", logLevel = WARN)
-        Feil fritekstOppsumeringForLang();
+    static TekniskException manglerFritekst(String hendelseUnderType, Periode periode, String fritekstType) {
+        return new TekniskException("FPT-022180", String.format("Ugyldig input: Når '%s' er valgt er fritekst påkrevet. Mangler for periode %s og avsnitt %s",  hendelseUnderType, periode, fritekstType));
     }
+
+    static TekniskException manglerPåkrevetOppsumering() {
+        return new TekniskException("FPT-063091", "Ugyldig input: Når det er revurdering, så er oppsummering fritekst påkrevet.");
+    }
+    public static TekniskException fritekstOppsumeringForLang() {
+        return new TekniskException("FPT-063092", "Ugyldig input: Oppsummeringstekst er for lang.");
+    }
+
 }

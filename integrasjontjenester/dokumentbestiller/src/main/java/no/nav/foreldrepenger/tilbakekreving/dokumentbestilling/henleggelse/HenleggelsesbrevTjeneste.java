@@ -30,7 +30,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.Brev
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.FritekstbrevData;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
-import no.nav.vedtak.util.StringUtils;
+import no.nav.vedtak.exception.FunksjonellException;
 
 @ApplicationScoped
 public class HenleggelsesbrevTjeneste {
@@ -109,9 +109,10 @@ public class HenleggelsesbrevTjeneste {
         Optional<BrevSporing> brevSporing = brevSporingRepository.hentSistSendtVarselbrev(behandlingId);
         BehandlingType behandlingType = behandling.getType();
         if (BehandlingType.TILBAKEKREVING.equals(behandlingType) && brevSporing.isEmpty()) {
-            throw HenleggelsesbrevFeil.FACTORY.kanIkkeSendeEllerForhåndsviseHenleggelsesBrev(behandlingId).toException();
-        } else if (BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandlingType) && StringUtils.nullOrEmpty(fritekst)) {
-            throw HenleggelsesbrevFeil.FACTORY.kanIkkeSendeEllerForhåndsviseRevurderingHenleggelsesBrev(behandlingId).toException();
+            throw new FunksjonellException("FPT-110801", String.format("Varselbrev er ikke sendt. Kan ikke forhåndsvise/sende henleggelsesbrev for behandlingId=%s.", behandlingId), "");
+        } else if (BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandlingType) && (fritekst == null || fritekst.isEmpty())) {
+            throw new FunksjonellException("FPT-110802",
+                String.format("Kan ikke forhåndsvise/sende henleggelsesbrev uten fritekst for Tilbakekreving Revurdering med behandlingId=%s.", behandlingId), "");
         }
         FagsakYtelseType fagsakYtelseType = behandling.getFagsak().getFagsakYtelseType();
         Språkkode språkkode = hentSpråkkode(behandlingId);

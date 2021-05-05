@@ -41,6 +41,7 @@ import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlReposi
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlag;
 import no.nav.tilbakekreving.status.v1.KravOgVedtakstatus;
+import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
@@ -185,7 +186,8 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
                 EksternBehandling eksternBehandling = new EksternBehandling(behandling, eksternBehandlingDto.getHenvisning(), eksternBehandlingDto.getUuid());
                 eksternBehandlingRepository.lagre(eksternBehandling);
             } else {
-                throw FinnGrunnlagTaskFeil.FACTORY.grunnlagHarFeilReferanse(behandling.getId(), saksnummer).toException();
+                throw new TekniskException("FPT-783524",
+                    String.format("Grunnlag fra Økonomi har mottatt med feil referanse for behandlingId=%s. Den finnes ikke i fpsak for saksnummer=%s", behandling.getId(), saksnummer));
             }
         }
     }

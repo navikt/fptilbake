@@ -163,7 +163,7 @@ public class HåndterGamleKravgrunnlagTaskTest {
     @Test
     public void skal_kjøre_tasken_for_å_prosessere_gammel_kravgrunnlag_når_grunnlaget_ikke_finnes_i_økonomi() {
         when(økonomiConsumerMock.hentKravgrunnlag(any(), any(HentKravgrunnlagDetaljDto.class)))
-            .thenThrow(ØkonomiConsumerFeil.FACTORY.fikkFeilkodeVedHentingAvKravgrunnlagNårKravgrunnlagIkkeFinnes(behandling.getId(), 100000001L, "kravgrunnlag ikke finnes").toException());
+            .thenThrow(ØkonomiConsumerFeil.fikkFeilkodeVedHentingAvKravgrunnlagNårKravgrunnlagIkkeFinnes(behandling.getId(), 100000001L, "kravgrunnlag ikke finnes"));
         håndterGamleKravgrunnlagTask.doTask(lagProsessTaskData());
         assertThat(mottattXmlRepository.finnArkivertMottattXml(mottattXmlId)).isNotNull();
         assertThat(mottattXmlRepository.finnMottattXml(mottattXmlId)).isNull();
@@ -173,7 +173,7 @@ public class HåndterGamleKravgrunnlagTaskTest {
     @Test
     public void skal_kjøre_tasken_for_å_prosessere_gammel_kravgrunnlag_når_økonomi_svarer_ukjent_feil() {
         when(økonomiConsumerMock.hentKravgrunnlag(any(), any(HentKravgrunnlagDetaljDto.class)))
-            .thenThrow(ØkonomiConsumerFeil.FACTORY.fikkUkjentFeilkodeVedHentingAvKravgrunnlag(behandling.getId(), 100000001L, "ukjent feil").toException());
+            .thenThrow(ØkonomiConsumerFeil.fikkUkjentFeilkodeVedHentingAvKravgrunnlag(behandling.getId(), 100000001L, "ukjent feil"));
         håndterGamleKravgrunnlagTask.doTask(lagProsessTaskData());
         assertThat(mottattXmlRepository.finnArkivertMottattXml(mottattXmlId)).isNull();
         assertThat(mottattXmlRepository.finnMottattXml(mottattXmlId)).isNotNull();
@@ -183,7 +183,7 @@ public class HåndterGamleKravgrunnlagTaskTest {
     @Test
     public void skal_kjøre_tasken_for_å_prosessere_gammel_kravgrunnlag_når_grunnlaget_er_sperret() {
         when(økonomiConsumerMock.hentKravgrunnlag(any(), any(HentKravgrunnlagDetaljDto.class)))
-            .thenThrow(ØkonomiConsumerFeil.FACTORY.fikkFeilkodeVedHentingAvKravgrunnlagNårKravgrunnlagErSperret(behandling.getId(), 100000001L, "sperret").toException());
+            .thenThrow(ØkonomiConsumerFeil.fikkFeilkodeVedHentingAvKravgrunnlagNårKravgrunnlagErSperret(behandling.getId(), 100000001L, "sperret"));
         håndterGamleKravgrunnlagTask.doTask(lagProsessTaskData());
         assertThat(mottattXmlRepository.finnArkivertMottattXml(mottattXmlId)).isNull();
         ØkonomiXmlMottatt økonomiXmlMottatt = mottattXmlRepository.finnMottattXml(mottattXmlId);
@@ -260,7 +260,7 @@ public class HåndterGamleKravgrunnlagTaskTest {
         BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(behandling);
         behandlingRepository.lagre(behandling, behandlingLås);
         when(økonomiConsumerMock.hentKravgrunnlag(any(), any(HentKravgrunnlagDetaljDto.class)))
-            .thenThrow(ØkonomiConsumerFeil.FACTORY.fikkFeilkodeVedHentingAvKravgrunnlagNårKravgrunnlagErSperret(behandling.getId(), 100000001L, "sperret").toException());
+            .thenThrow(ØkonomiConsumerFeil.fikkFeilkodeVedHentingAvKravgrunnlagNårKravgrunnlagErSperret(behandling.getId(), 100000001L, "sperret"));
 
         håndterGamleKravgrunnlagTask.doTask(lagProsessTaskData());
         assertThat(mottattXmlRepository.finnArkivertMottattXml(mottattXmlId)).isNull();

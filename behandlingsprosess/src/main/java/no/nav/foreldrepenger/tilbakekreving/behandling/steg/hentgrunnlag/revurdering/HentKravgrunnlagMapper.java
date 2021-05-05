@@ -24,7 +24,7 @@ import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagBelopDt
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagDto;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagPeriodeDto;
 import no.nav.tilbakekreving.typer.v1.TypeKlasseDto;
-import no.nav.vedtak.xmlutils.DateUtil;
+import no.nav.foreldrepenger.xmlutils.DateUtil;
 
 @ApplicationScoped
 public class HentKravgrunnlagMapper {

@@ -45,22 +45,13 @@ public class AutomatiskFaktaFastsettelseTjeneste {
         FagsakYtelseType fagsakYtelseType = behandling.getFagsak().getFagsakYtelseType();
         HendelseTypeMedUndertypeDto hendelseTypeMedUndertypeDto;
         HendelseUnderType hendelseUnderType = HendelseUnderType.ANNET_FRITEKST;
-        switch (fagsakYtelseType) {
-            case FORELDREPENGER:
-                hendelseTypeMedUndertypeDto = new HendelseTypeMedUndertypeDto(HendelseType.FP_ANNET_HENDELSE_TYPE, hendelseUnderType);
-                break;
-            case SVANGERSKAPSPENGER:
-                hendelseTypeMedUndertypeDto = new HendelseTypeMedUndertypeDto(HendelseType.SVP_ANNET_TYPE, hendelseUnderType);
-                break;
-            case ENGANGSTØNAD:
-                hendelseTypeMedUndertypeDto = new HendelseTypeMedUndertypeDto(HendelseType.ES_ANNET_TYPE, hendelseUnderType);
-                break;
-            case FRISINN:
-                hendelseTypeMedUndertypeDto = new HendelseTypeMedUndertypeDto(HendelseType.FRISINN_ANNET_TYPE, hendelseUnderType);
-                break;
-            default:
-                throw new IllegalArgumentException("Ikke-støttet fagsak ytelse type: " + fagsakYtelseType);
-        }
+        hendelseTypeMedUndertypeDto = switch (fagsakYtelseType) {
+            case FORELDREPENGER -> new HendelseTypeMedUndertypeDto(HendelseType.FP_ANNET_HENDELSE_TYPE, hendelseUnderType);
+            case SVANGERSKAPSPENGER -> new HendelseTypeMedUndertypeDto(HendelseType.SVP_ANNET_TYPE, hendelseUnderType);
+            case ENGANGSTØNAD -> new HendelseTypeMedUndertypeDto(HendelseType.ES_ANNET_TYPE, hendelseUnderType);
+            case FRISINN -> new HendelseTypeMedUndertypeDto(HendelseType.FRISINN_ANNET_TYPE, hendelseUnderType);
+            default -> throw new IllegalArgumentException("Ikke-støttet fagsak ytelse type: " + fagsakYtelseType);
+        };
         return hendelseTypeMedUndertypeDto;
     }
 }

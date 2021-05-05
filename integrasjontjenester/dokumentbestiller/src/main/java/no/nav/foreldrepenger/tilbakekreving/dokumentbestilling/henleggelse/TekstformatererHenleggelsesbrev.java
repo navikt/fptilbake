@@ -28,7 +28,7 @@ class TekstformatererHenleggelsesbrev extends FellesTekstformaterer {
 
             return applyTemplate(template, henleggelsesbrevDokument);
         } catch (IOException e) {
-            throw TekstformatererBrevFeil.FACTORY.feilVedTekstgenerering(e).toException();
+            throw TekstformatererBrevFeil.feilVedTekstgenerering(e);
         }
     }
 
@@ -40,7 +40,7 @@ class TekstformatererHenleggelsesbrev extends FellesTekstformaterer {
 
             return template.apply(overskriftBrevData);
         } catch (IOException e) {
-            throw TekstformatererBrevFeil.FACTORY.feilVedTekstgenerering(e).toException();
+            throw TekstformatererBrevFeil.feilVedTekstgenerering(e);
         }
     }
 
@@ -53,7 +53,7 @@ class TekstformatererHenleggelsesbrev extends FellesTekstformaterer {
 
             return applyTemplate(template, henleggelsesbrevDokument);
         } catch (IOException e) {
-            throw TekstformatererBrevFeil.FACTORY.feilVedTekstgenerering(e).toException();
+            throw TekstformatererBrevFeil.feilVedTekstgenerering(e);
         }
     }
 
@@ -65,7 +65,7 @@ class TekstformatererHenleggelsesbrev extends FellesTekstformaterer {
 
             return template.apply(overskriftBrevData);
         } catch (IOException e) {
-            throw TekstformatererBrevFeil.FACTORY.feilVedTekstgenerering(e).toException();
+            throw TekstformatererBrevFeil.feilVedTekstgenerering(e);
         }
     }
 

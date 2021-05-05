@@ -111,15 +111,12 @@ public class Adresse {
                 throw new IllegalArgumentException("Land må være To-bokstavers landkode ihht iso3166-1 alfa-2, men var " + land.length() + " tegn");
             }
             switch (adresseType) {
-                case NORSK:
+                case NORSK -> {
                     Objects.requireNonNull(postnummer, "Postnummer må være satt");
                     Objects.requireNonNull(poststed, "Poststed må være satt");
-                    break;
-                case UTENLANDSK:
-                    Objects.requireNonNull(adresselinje1, "Adresselinje1 må være satt");
-                    break;
-                default:
-                    throw new IllegalArgumentException("Ikke-støttet adressetype: " + adresseType);
+                }
+                case UTENLANDSK -> Objects.requireNonNull(adresselinje1, "Adresselinje1 må være satt");
+                default -> throw new IllegalArgumentException("Ikke-støttet adressetype: " + adresseType);
             }
 
             Adresse adresse = new Adresse();

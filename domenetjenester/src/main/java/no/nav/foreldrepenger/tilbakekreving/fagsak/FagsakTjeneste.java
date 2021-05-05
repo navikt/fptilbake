@@ -21,6 +21,7 @@ import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
+import no.nav.vedtak.exception.TekniskException;
 
 @ApplicationScoped
 public class FagsakTjeneste {
@@ -59,13 +60,13 @@ public class FagsakTjeneste {
         PersonIdent personIdent = new PersonIdent(fnr);
         Optional<AktørId> aktørId = tpsTjeneste.hentAktørForFnr(personIdent);
         if(aktørId.isEmpty()){
-            throw BehandlingFeil.FACTORY.fantIkkePersonIdentMedFnr().toException();
+            throw BehandlingFeil.fantIkkePersonIdentMedFnr();
         }
         return aktørId.get();
     }
 
     public String hentNavnForAktør(AktørId aktørId){
-        return tpsTjeneste.hentBrukerForAktør(aktørId).map(Personinfo::getNavn).orElseThrow(() -> BehandlingFeil.FACTORY.fantIkkePersonMedAktørId().toException());
+        return tpsTjeneste.hentBrukerForAktør(aktørId).map(Personinfo::getNavn).orElseThrow(() -> new TekniskException("FPT-7428492", "Fant ikke person med aktørId"));
     }
 
     private NavBruker hentNavBruker(AktørId aktørId, Språkkode språkkode) {
@@ -77,7 +78,7 @@ public class FagsakTjeneste {
             fagsakRepository.lagre(fagsak);
         } catch (PersistenceException e) { // NOSONAR
             if (e.getCause() instanceof ConstraintViolationException) {
-                throw BehandlingFeil.FACTORY.saksnummerKnyttetTilAnnenBruker(saksnummer).toException();
+                throw BehandlingFeil.saksnummerKnyttetTilAnnenBruker(saksnummer);
             } else {
                 throw e;
             }

@@ -93,19 +93,19 @@ public class ØkonomiConsumerImpl implements ØkonomiConsumer {
 
     private void validerKvitteringForHentGrunnlag(Long behandlingId, Long kravgrunnlagId, MmelDto mmel) {
         if (!ØkonomiKvitteringTolk.erKvitteringOK(mmel)) {
-            throw ØkonomiConsumerFeil.FACTORY.fikkFeilkodeVedHentingAvKravgrunnlag(behandlingId, ØkonomiConsumerFeil.formaterKvittering(mmel)).toException();
+            throw ØkonomiConsumerFeil.fikkFeilkodeVedHentingAvKravgrunnlag(behandlingId, ØkonomiConsumerFeil.formaterKvittering(mmel));
         } else if (ØkonomiKvitteringTolk.erKravgrunnlagetIkkeFinnes(mmel)) {
-            throw ØkonomiConsumerFeil.FACTORY.fikkFeilkodeVedHentingAvKravgrunnlagNårKravgrunnlagIkkeFinnes(behandlingId, kravgrunnlagId, ØkonomiConsumerFeil.formaterKvittering(mmel)).toException();
+            throw ØkonomiConsumerFeil.fikkFeilkodeVedHentingAvKravgrunnlagNårKravgrunnlagIkkeFinnes(behandlingId, kravgrunnlagId, ØkonomiConsumerFeil.formaterKvittering(mmel));
         } else if (ØkonomiKvitteringTolk.erKravgrunnlagetSperret(mmel)) {
-            throw ØkonomiConsumerFeil.FACTORY.fikkFeilkodeVedHentingAvKravgrunnlagNårKravgrunnlagErSperret(behandlingId, kravgrunnlagId, ØkonomiConsumerFeil.formaterKvittering(mmel)).toException();
+            throw ØkonomiConsumerFeil.fikkFeilkodeVedHentingAvKravgrunnlagNårKravgrunnlagErSperret(behandlingId, kravgrunnlagId, ØkonomiConsumerFeil.formaterKvittering(mmel));
         } else if (ØkonomiKvitteringTolk.harKravgrunnlagNoeUkjentFeil(mmel)) {
-            throw ØkonomiConsumerFeil.FACTORY.fikkUkjentFeilkodeVedHentingAvKravgrunnlag(behandlingId, kravgrunnlagId, ØkonomiConsumerFeil.formaterKvittering(mmel)).toException();
+            throw ØkonomiConsumerFeil.fikkUkjentFeilkodeVedHentingAvKravgrunnlag(behandlingId, kravgrunnlagId, ØkonomiConsumerFeil.formaterKvittering(mmel));
         }
     }
 
     private void validerKvitteringForAnnulereGrunnlag(Long behandlingId, MmelDto mmel) {
         if (!ØkonomiKvitteringTolk.erKvitteringOK(mmel)) {
-            throw ØkonomiConsumerFeil.FACTORY.fikkFeilkodeVedAnnulereKravgrunnlag(behandlingId, ØkonomiConsumerFeil.formaterKvittering(mmel)).toException();
+            throw ØkonomiConsumerFeil.fikkFeilkodeVedAnnulereKravgrunnlag(behandlingId, ØkonomiConsumerFeil.formaterKvittering(mmel));
         }
     }
 

@@ -52,14 +52,11 @@ public class VedtaksbrevFritekstOppsummering extends BaseEntitet {
     }
 
     public static int maxFritekstLengde(VedtaksbrevType brevType) {
-        switch (brevType) {
-            case FRITEKST_FEILUTBETALING_BORTFALT:
-                return 10000;
-            case ORDINÆR:
-                return 4000;
-            default:
-                throw new IllegalArgumentException("Utviklerfeil: ustøttet VedtaksbrevType(" + brevType + ") i VedtaksbrevFritekstOppsummering");
-        }
+        return switch (brevType) {
+            case FRITEKST_FEILUTBETALING_BORTFALT -> 10000;
+            case ORDINÆR -> 4000;
+            default -> throw new IllegalArgumentException("Utviklerfeil: ustøttet VedtaksbrevType(" + brevType + ") i VedtaksbrevFritekstOppsummering");
+        };
     }
 
     public static class Builder {

@@ -33,14 +33,11 @@ public class VurderingspunktDefinisjon extends KodeverkTabell {
         }
 
         public static Type getType(String kode) {
-            switch (kode) {
-                case "INN": //$NON-NLS-1$
-                    return INNGANG;
-                case "UT": //$NON-NLS-1$
-                    return UTGANG;
-                default:
-                    throw new IllegalArgumentException("Ukjent kode: " + kode); //$NON-NLS-1$
-            }
+            return switch (kode) {
+                case "INN" -> INNGANG;
+                case "UT" -> UTGANG;
+                default -> throw new IllegalArgumentException("Ukjent kode: " + kode); //$NON-NLS-1$
+            };
         }
     }
 

@@ -28,7 +28,7 @@ public class ProsessTaskRepositoryMock implements ProsessTaskRepository {
     public String lagre(ProsessTaskGruppe prosessTaskGruppe) {
         String gruppe = Integer.toString(gruppeTeller++);
         for (ProsessTaskGruppe.Entry entry : prosessTaskGruppe.getTasks()) {
-            lagre(entry.getTask(), gruppe);
+            lagre(entry.task(), gruppe);
         }
         return gruppe;
     }

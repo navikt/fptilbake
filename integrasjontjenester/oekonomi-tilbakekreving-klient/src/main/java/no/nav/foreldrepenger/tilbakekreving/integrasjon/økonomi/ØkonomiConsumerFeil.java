@@ -1,34 +1,31 @@
 package no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi;
 
 import no.nav.tilbakekreving.typer.v1.MmelDto;
-import no.nav.vedtak.feil.Feil;
-import no.nav.vedtak.feil.FeilFactory;
-import no.nav.vedtak.feil.LogLevel;
-import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
-import no.nav.vedtak.feil.deklarasjon.IntegrasjonFeil;
+import no.nav.vedtak.exception.IntegrasjonException;
 
-public interface ØkonomiConsumerFeil extends DeklarerteFeil {
-    ØkonomiConsumerFeil FACTORY = FeilFactory.create(ØkonomiConsumerFeil.class);
+public class ØkonomiConsumerFeil  {
 
-    @IntegrasjonFeil(feilkode = "FPT-539078", feilmelding = "Fikk feil fra OS ved henting av kravgrunnlag for behandlingId=%s.%s", logLevel = LogLevel.WARN)
-    Feil fikkFeilkodeVedHentingAvKravgrunnlag(Long behandlingId, String infoFraKvittering);
+    public static IntegrasjonException fikkFeilkodeVedHentingAvKravgrunnlag(Long behandlingId, String infoFraKvittering) {
+        return new IntegrasjonException("FPT-539078", String.format("Fikk feil fra OS ved henting av kravgrunnlag for behandlingId=%s.%s", behandlingId, infoFraKvittering));
+    }
 
-    @IntegrasjonFeil(feilkode = "FPT-539079", feilmelding = "Fikk feil fra OS ved annulere kravgrunnlag for behandlingId=%s.%s", logLevel = LogLevel.WARN)
-    Feil fikkFeilkodeVedAnnulereKravgrunnlag(Long behandlingId, String infoFraKvittering);
+    public static IntegrasjonException fikkFeilkodeVedAnnulereKravgrunnlag(Long behandlingId, String infoFraKvittering) {
+        return new IntegrasjonException("FPT-539079", String.format("Fikk feil fra OS ved annulere kravgrunnlag for behandlingId=%s.%s", behandlingId, infoFraKvittering));
+    }
 
-    @IntegrasjonFeil(feilkode = "FPT-539080", feilmelding = "Fikk feil fra OS ved henting av kravgrunnlag for behandlingId=%s og kravgrunnlagId=%s.%s",
-        logLevel = LogLevel.WARN, exceptionClass = ManglendeKravgrunnlagException.class)
-    Feil fikkFeilkodeVedHentingAvKravgrunnlagNårKravgrunnlagIkkeFinnes(Long behandlingId, Long kravgrunnlagId, String infoFraKvittering);
+    public static IntegrasjonException fikkFeilkodeVedHentingAvKravgrunnlagNårKravgrunnlagIkkeFinnes(Long behandlingId, Long kravgrunnlagId, String infoFraKvittering) {
+        return new ManglendeKravgrunnlagException("FPT-539080", String.format("Fikk feil fra OS ved henting av kravgrunnlag for behandlingId=%s og kravgrunnlagId=%s.%s", behandlingId, kravgrunnlagId, infoFraKvittering));
+    }
 
-    @IntegrasjonFeil(feilkode = "FPT-539081", feilmelding = "Fikk feil fra OS ved henting av kravgrunnlag for behandlingId=%s og kravgrunnlagId=%s.%s",
-        logLevel = LogLevel.WARN, exceptionClass = SperringKravgrunnlagException.class)
-    Feil fikkFeilkodeVedHentingAvKravgrunnlagNårKravgrunnlagErSperret(Long behandlingId, Long kravgrunnlagId, String infoFraKvittering);
+    public static IntegrasjonException fikkFeilkodeVedHentingAvKravgrunnlagNårKravgrunnlagErSperret(Long behandlingId, Long kravgrunnlagId, String infoFraKvittering) {
+        return new SperringKravgrunnlagException("FPT-539081", String.format("Fikk feil fra OS ved henting av kravgrunnlag for behandlingId=%s og kravgrunnlagId=%s.%s", behandlingId, kravgrunnlagId, infoFraKvittering));
+    }
 
-    @IntegrasjonFeil(feilkode = "FPT-539085", feilmelding = "Fikk ukjent feil fra OS ved henting av kravgrunnlag for behandlingId=%s og kravgrunnlagId=%s.%s",
-        logLevel = LogLevel.WARN, exceptionClass = UkjentOppdragssystemException.class)
-    Feil fikkUkjentFeilkodeVedHentingAvKravgrunnlag(Long behandlingId, Long kravgrunnlagId, String infoFraKvittering);
+    public static IntegrasjonException fikkUkjentFeilkodeVedHentingAvKravgrunnlag(Long behandlingId, Long kravgrunnlagId, String infoFraKvittering) {
+        return new UkjentOppdragssystemException("FPT-539085", String.format("Fikk ukjent feil fra OS ved henting av kravgrunnlag for behandlingId=%s og kravgrunnlagId=%s.%s", behandlingId, kravgrunnlagId, infoFraKvittering));
+    }
 
-    static String formaterKvittering(MmelDto kvittering) {
+    public static String formaterKvittering(MmelDto kvittering) {
         //HAXX ikke bruk dette som mal ved oppsett av deklarative feil
         //.... brukes her siden det er veldig mange parametre som skal logges
         //.... reduserer sjangsen for at parametre stokkes feil ved fremtidig endring

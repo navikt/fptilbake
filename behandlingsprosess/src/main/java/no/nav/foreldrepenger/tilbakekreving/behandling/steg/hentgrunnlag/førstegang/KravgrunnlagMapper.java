@@ -21,7 +21,7 @@ import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlag;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagBelop;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagPeriode;
 import no.nav.tilbakekreving.typer.v1.TypeKlasse;
-import no.nav.vedtak.xmlutils.DateUtil;
+import no.nav.foreldrepenger.xmlutils.DateUtil;
 
 @ApplicationScoped
 public class KravgrunnlagMapper {

@@ -41,8 +41,10 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjons
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.BekreftedeAksjonspunkterDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.BekreftetAksjonspunktDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.Redirect;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.BehandlingReferanseAbacAttributter;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
+import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
 
 @Path("/behandling/aksjonspunkt")
 @RequestScoped
@@ -81,7 +83,8 @@ public class AksjonspunktRestTjeneste {
         })
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public Response getAksjonspunkter(@NotNull @QueryParam("uuid") @Valid BehandlingReferanse behandlingReferanse) { // NOSONAR
+    public Response getAksjonspunkter(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
+                                          @NotNull @QueryParam("uuid") @Valid BehandlingReferanse behandlingReferanse) { // NOSONAR
         Behandling behandling = hentBehandling(behandlingReferanse);
         Collection<Totrinnsvurdering> totrinnsvurderinger = totrinnRepository.hentTotrinnsvurderinger(behandling);
         Set<AksjonspunktDto> dto = AksjonspunktDtoMapper.lagAksjonspunktDto(behandling, totrinnsvurderinger);

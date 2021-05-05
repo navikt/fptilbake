@@ -12,16 +12,15 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.dokumentbestiller.DokumentMalType;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.BrevmalDto;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.innhentdokumentasjon.InnhentDokumentasjonbrevFeil;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.innhentdokumentasjon.InnhentDokumentasjonbrevTask;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.innhentdokumentasjon.InnhentDokumentasjonbrevTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.manuelt.ManueltVarselBrevFeil;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.manuelt.ManueltVarselBrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.manuelt.SendManueltVarselbrevTask;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.manuelt.TaskProperty;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.task.SendBeskjedUtsendtVarselTilSelvbetjeningTask;
+import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
@@ -118,7 +117,7 @@ public class DokumentBehandlingTjeneste {
     private void håndteresManueltSendVarsel(Behandling behandling, DokumentMalType malType, String fritekst) {
         Long behandlingId = behandling.getId();
         if (!grunnlagRepository.harGrunnlagForBehandlingId(behandlingId)) {
-            throw ManueltVarselBrevFeil.FACTORY.kanIkkeSendeVarselForGrunnlagFinnesIkke(behandlingId).toException();
+            throw new TekniskException("FPT-612900", String.format("Kravgrunnlag finnes ikke for behandling=%s, kan ikke sende varsel", behandlingId));
         }
 
         ProsessTaskData sendVarselbrev = new ProsessTaskData(SendManueltVarselbrevTask.TASKTYPE);
@@ -137,7 +136,7 @@ public class DokumentBehandlingTjeneste {
     private void håndteresInnhentDokumentasjon(Behandling behandling, DokumentMalType malType, String fritekst) {
         Long behandlingId = behandling.getId();
         if (!grunnlagRepository.harGrunnlagForBehandlingId(behandlingId)) {
-            throw InnhentDokumentasjonbrevFeil.FACTORY.kanIkkeSendeBrevForGrunnlagFinnesIkke(behandlingId).toException();
+            throw new TekniskException("FPT-612901", String.format("Kravgrunnlag finnes ikke for behandling=%s, kan ikke sende innhent-dokumentasjonbrev", behandlingId));
         }
 
         ProsessTaskData sendInnhentDokumentasjonBrev = new ProsessTaskData(InnhentDokumentasjonbrevTask.TASKTYPE);

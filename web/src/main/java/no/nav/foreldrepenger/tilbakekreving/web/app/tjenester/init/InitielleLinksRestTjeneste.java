@@ -39,14 +39,9 @@ public class InitielleLinksRestTjeneste {
     @Inject
     public InitielleLinksRestTjeneste(@KonfigVerdi(value = "app.name") String applikasjon) {
         switch (applikasjon) {
-            case "fptilbake":
-                kontekstPath = "/fptilbake";
-                break;
-            case "k9-tilbake":
-                kontekstPath = "/k9/tilbake";
-                break;
-            default:
-                throw new IllegalStateException("app.name er satt til " + applikasjon + " som ikke er en støttet verdi");
+            case "fptilbake" -> kontekstPath = "/fptilbake";
+            case "k9-tilbake" -> kontekstPath = "/k9/tilbake";
+            default -> throw new IllegalStateException("app.name er satt til " + applikasjon + " som ikke er en støttet verdi");
         }
     }
 

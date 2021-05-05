@@ -54,7 +54,6 @@ import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagT
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.konfig.KonfigVerdi;
-import no.nav.vedtak.util.StringUtils;
 
 @ApplicationScoped
 @Transactional
@@ -116,7 +115,7 @@ public class BehandlingTjeneste {
     public void endreBehandlingPåVent(Long behandlingId, LocalDate frist, Venteårsak venteårsak) {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
         if (!behandling.isBehandlingPåVent()) {
-            throw BehandlingFeil.FACTORY.kanIkkeEndreVentefristForBehandlingIkkePaVent(behandlingId).toException();
+            throw BehandlingFeil.kanIkkeEndreVentefristForBehandlingIkkePaVent(behandlingId);
         }
         AksjonspunktDefinisjon aksjonspunktDefinisjon = behandling.getBehandlingPåVentAksjonspunktDefinisjon();
         doSetBehandlingPåVent(behandlingId, aksjonspunktDefinisjon, frist, venteårsak);
@@ -155,7 +154,7 @@ public class BehandlingTjeneste {
     public void kanEndreBehandling(Long behandlingId, Long versjon) {
         Boolean kanEndreBehandling = behandlingRepository.erVersjonUendret(behandlingId, versjon);
         if (!kanEndreBehandling) {
-            throw BehandlingFeil.FACTORY.endringerHarForekommetPåSøknaden().toException();
+            throw BehandlingFeil.endringerHarForekommetPåSøknaden();
         }
     }
 
@@ -171,7 +170,7 @@ public class BehandlingTjeneste {
     public void oppdaterBehandlingMedEksternReferanse(Saksnummer saksnummer, Henvisning henvisning, UUID eksternUuid) {
         List<Behandling> behandlinger = behandlingRepository.hentAlleBehandlingerForSaksnummer(saksnummer);
         if (behandlinger.isEmpty()) {
-            throw BehandlingFeil.FACTORY.fantIngenTilbakekrevingBehandlingForSaksnummer(saksnummer).toException();
+            throw BehandlingFeil.fantIngenTilbakekrevingBehandlingForSaksnummer(saksnummer);
         }
         Optional<Behandling> åpenTilbakekrevingBehandling = behandlinger.stream()
             .filter(behandling -> !behandling.erAvsluttet())
@@ -245,10 +244,10 @@ public class BehandlingTjeneste {
 
     private void validateHarIkkeÅpenTilbakekrevingBehandling(Saksnummer saksnummer, UUID eksternUuid) {
         if (harÅpenBehandling(saksnummer)) {
-            throw BehandlingFeil.FACTORY.kanIkkeOppretteTilbakekrevingBehandling(saksnummer).toException();
+            throw BehandlingFeil.kanIkkeOppretteTilbakekrevingBehandling(saksnummer);
         }
         if (finnesTilbakekrevingsbehandlingForYtelsesbehandlingen(eksternUuid)) {
-            throw BehandlingFeil.FACTORY.kanIkkeOppretteTilbakekrevingBehandling(eksternUuid).toException();
+            throw BehandlingFeil.kanIkkeOppretteTilbakekrevingBehandling(eksternUuid);
         }
     }
 
@@ -307,11 +306,11 @@ public class BehandlingTjeneste {
                 .medGyldigPeriode(vergeDto.getGyldigFom(), vergeDto.getGyldigTom())
                 .medNavn(vergeDto.getNavn())
                 .medBegrunnelse("");
-            if (!StringUtils.nullOrEmpty(vergeDto.getOrganisasjonsnummer())) {
+            if (vergeDto.getOrganisasjonsnummer() != null && !vergeDto.getOrganisasjonsnummer().isEmpty()) {
                 builder.medOrganisasjonnummer(vergeDto.getOrganisasjonsnummer());
-            } else if (!StringUtils.nullOrEmpty(vergeDto.getFnr())) {
+            } else if (vergeDto.getFnr() != null && !vergeDto.getFnr().isEmpty()) {
                 builder.medVergeAktørId(fagsakTjeneste.hentAktørForFnr(vergeDto.getFnr()));
-            } else if (!StringUtils.nullOrEmpty(vergeDto.getAktoerId())) {
+            } else if (vergeDto.getAktoerId() != null && !vergeDto.getAktoerId().isEmpty()) {
                 var aktørId = new AktørId(vergeDto.getAktoerId());
                 builder.medVergeAktørId(aktørId);
                 builder.medNavn(fagsakTjeneste.hentNavnForAktør(aktørId));

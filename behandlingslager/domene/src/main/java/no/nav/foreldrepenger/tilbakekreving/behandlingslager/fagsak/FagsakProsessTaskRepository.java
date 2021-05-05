@@ -135,7 +135,7 @@ public class FagsakProsessTaskRepository {
             // hvis noen er FEILET så oppretter vi ikke ny
             Optional<ProsessTaskData> feilet = matchedTasks.stream().filter(t -> t.getStatus().equals(ProsessTaskStatus.FEILET)).findFirst();
 
-            Set<String> nyeTaskTyper = nyeTasks.stream().map(t -> t.getTask().getTaskType()).collect(Collectors.toSet());
+            Set<String> nyeTaskTyper = nyeTasks.stream().map(t -> t.task().getTaskType()).collect(Collectors.toSet());
             Set<String> eksisterendeTaskTyper = eksisterendeTasks.stream().map(ProsessTaskData::getTaskType).collect(Collectors.toSet());
 
             if (feilet.isEmpty()) {

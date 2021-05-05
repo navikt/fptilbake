@@ -32,21 +32,12 @@ public interface BehandlingSteg {
     default void vedTransisjon(BehandlingskontrollKontekst kontekst, Behandling behandling, BehandlingStegModell modell,
                                TransisjonType transisjonType, BehandlingStegType førsteSteg, BehandlingStegType sisteSteg, TransisjonType inngangUtgang) {
         switch (transisjonType) {
-            case FØR_INNGANG:
-                vedInngang(kontekst, behandling, modell);
-                break;
-            case ETTER_UTGANG:
-                vedUtgang(kontekst, behandling, modell);
-                break;
-            case HOPP_OVER_BAKOVER:
-                vedHoppOverBakover(kontekst, behandling, modell, førsteSteg, sisteSteg);
-                break;
-            case HOPP_OVER_FRAMOVER:
-                vedHoppOverFramover(kontekst, behandling, modell);
-                break;
-            default:
-                throw new IllegalArgumentException("Uhåndtert transisjonType: " + transisjonType //$NON-NLS-1$
-                        + " i steg: " + modell.getBehandlingStegType()); //$NON-NLS-1$
+            case FØR_INNGANG -> vedInngang(kontekst, behandling, modell);
+            case ETTER_UTGANG -> vedUtgang(kontekst, behandling, modell);
+            case HOPP_OVER_BAKOVER -> vedHoppOverBakover(kontekst, behandling, modell, førsteSteg, sisteSteg);
+            case HOPP_OVER_FRAMOVER -> vedHoppOverFramover(kontekst, behandling, modell);
+            default -> throw new IllegalArgumentException("Uhåndtert transisjonType: " + transisjonType //$NON-NLS-1$
+                + " i steg: " + modell.getBehandlingStegType()); //$NON-NLS-1$
         }
     }
 

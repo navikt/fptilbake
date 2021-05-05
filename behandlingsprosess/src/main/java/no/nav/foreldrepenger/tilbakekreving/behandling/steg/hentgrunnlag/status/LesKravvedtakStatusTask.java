@@ -19,11 +19,7 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatus437;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.tilbakekreving.status.v1.KravOgVedtakstatus;
-import no.nav.vedtak.feil.Feil;
-import no.nav.vedtak.feil.FeilFactory;
-import no.nav.vedtak.feil.LogLevel;
-import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
-import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
+import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
@@ -90,30 +86,17 @@ public class LesKravvedtakStatusTask extends FellesTask implements ProsessTaskHa
 
     private void validerHenvisning(Henvisning henvisning) {
         if (!Henvisning.erGyldig(henvisning)) {
-            throw LesKravvedtakStatusTaskFeil.FACTORY.ugyldigHenvisning(henvisning).toException();
+            throw new TekniskException("FPT-675364",
+                String.format("Mottok et kravOgVedtakStatus fra Økonomi med henvisning i ikke-støttet format, henvisning=%s. KravOgVedtakStatus skulle kanskje til et annet system. Si i fra til Økonomi!",
+                henvisning));
         }
     }
 
     private void validerBehandlingsEksistens(Henvisning henvisning, String saksnummer) {
         if (!finnesYtelsesbehandling(saksnummer, henvisning)) {
-            throw LesKravvedtakStatusTaskFeil.FACTORY.behandlingFinnesIkkeIFpsak(henvisning).toException();
+            throw new TekniskException("FPT-587196",
+                String.format("Mottok et kravOgVedtakStatus fra Økonomi for en behandling som ikke finnes i fpsak. henvisning=%s. Kravgrunnlaget skulle kanskje til et annet system. Si i fra til Økonomi!", henvisning));
         }
-    }
-
-    public interface LesKravvedtakStatusTaskFeil extends DeklarerteFeil {
-
-        LesKravvedtakStatusTask.LesKravvedtakStatusTaskFeil FACTORY = FeilFactory.create(LesKravvedtakStatusTask.LesKravvedtakStatusTaskFeil.class);
-
-        @TekniskFeil(feilkode = "FPT-587196",
-            feilmelding = "Mottok et kravOgVedtakStatus fra Økonomi for en behandling som ikke finnes i fpsak. henvisning=%s. Kravgrunnlaget skulle kanskje til et annet system. Si i fra til Økonomi!",
-            logLevel = LogLevel.WARN)
-        Feil behandlingFinnesIkkeIFpsak(Henvisning henvisning);
-
-        @TekniskFeil(feilkode = "FPT-675364",
-            feilmelding = "Mottok et kravOgVedtakStatus fra Økonomi med henvisning i ikke-støttet format, henvisning=%s. KravOgVedtakStatus skulle kanskje til et annet system. Si i fra til Økonomi!",
-            logLevel = LogLevel.WARN)
-        Feil ugyldigHenvisning(Henvisning henvisning);
-
     }
 
 

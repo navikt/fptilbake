@@ -1,10 +1,13 @@
 package no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi;
 
 import no.nav.vedtak.exception.IntegrasjonException;
-import no.nav.vedtak.feil.Feil;
 
 public class UkjentOppdragssystemException extends IntegrasjonException {
-    public UkjentOppdragssystemException(Feil feil) {
-        super(feil);
+    public UkjentOppdragssystemException(String kode, String msg) {
+        this(kode, msg, (Throwable)null);
+    }
+
+    public UkjentOppdragssystemException(String kode, String msg, Throwable cause) {
+        super(kode, msg, cause);
     }
 }
