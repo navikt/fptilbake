@@ -14,6 +14,7 @@ import javax.persistence.TypedQuery;
 
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
+import no.nav.vedtak.exception.TekniskException;
 
 @ApplicationScoped
 public class FagsakRepository {
@@ -63,7 +64,7 @@ public class FagsakRepository {
 
         List<Fagsak> fagsaker = query.getResultList();
         if (fagsaker.size() > 1) {
-            throw FagsakFeil.FACTORY.flereEnnEnFagsakForSaksnummer(saksnummer).toException();
+            throw new TekniskException("FPT-429883", String.format("Det var flere enn en Fagsak for saksnummer: %s", saksnummer));
         }
 
         return fagsaker.isEmpty() ? Optional.empty() : Optional.of(fagsaker.get(0));
@@ -72,7 +73,7 @@ public class FagsakRepository {
     public Fagsak hentEksaktFagsakForGittSaksnummer(Saksnummer saksnummer) {
         Optional<Fagsak> fagsak = hentSakGittSaksnummer(saksnummer);
         if (fagsak.isEmpty()) {
-            throw FagsakFeil.FACTORY.fantIkkeFagsakForSaksnummer(saksnummer).toException();
+            throw new TekniskException("FPT-429884", String.format("Fant ikke fagsak med saksnummer: %s", saksnummer));
         }
         return fagsak.get();
     }

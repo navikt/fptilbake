@@ -21,14 +21,9 @@ public class FagsystemKlientProducer {
     @Inject
     public FagsystemKlientProducer(@KonfigVerdi(value = "app.name") String applikasjon, @Any Instance<FagsystemKlient> fagsystemklienter) {
         switch (applikasjon) {
-            case "fptilbake":
-                fagsystemKlient = fagsystemklienter.select(new Fptilbake.FptilbakeAnnotationLiteral()).get();
-                break;
-            case "k9-tilbake":
-                fagsystemKlient = fagsystemklienter.select(new K9tilbake.K9tilbakeAnnotationLiteral()).get();
-                break;
-            default:
-                throw new IllegalStateException("app.name er satt til " + applikasjon + " som ikke er en støttet verdi");
+            case "fptilbake" -> fagsystemKlient = fagsystemklienter.select(new Fptilbake.FptilbakeAnnotationLiteral()).get();
+            case "k9-tilbake" -> fagsystemKlient = fagsystemklienter.select(new K9tilbake.K9tilbakeAnnotationLiteral()).get();
+            default -> throw new IllegalStateException("app.name er satt til " + applikasjon + " som ikke er en støttet verdi");
         }
     }
 

@@ -77,7 +77,7 @@ public class FagsakLåsRepository {
             .getSingleResult();
 
         if (versjon == null) {
-            throw BehandlingRepositoryFeil.FACTORY.fantIkkeEntitetForLåsing(Fagsak.class.getSimpleName(), id).toException();
+            throw BehandlingRepositoryFeil.fantIkkeEntitetForLåsing(Fagsak.class.getSimpleName(), id);
         } else {
             int updated = entityManager.createNativeQuery("update FAGSAK set versjon=versjon+1 where id=:fagsakId and versjon=:versjon")
                 .setParameter("fagsakId", id)

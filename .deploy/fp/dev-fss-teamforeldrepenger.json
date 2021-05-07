@@ -14,7 +14,7 @@
   ],
   "env": {
     "LOADBALANCER_FQDN": "app-q1.adeo.no",
-    "ABAC_PDP_ENDPOINT_URL": "https://wasapp-q1.adeo.no/asm-pdp/authorize",
+    "ABAC_PDP_ENDPOINT_URL": "http://abac-foreldrepenger.teamabac/application/authorize",
     "SECURITYTOKENSERVICE_URL": "https://sts-q1.preprod.local/SecurityTokenServiceProvider/",
     "OIDC_STS_ISSUER_URL": "https://security-token-service.nais.preprod.local",
     "OIDC_STS_JWKS_URL": "http://security-token-service.default/rest/v1/sts/jwks",
@@ -34,7 +34,7 @@
     "FPSAK_CHANNEL_QUEUEMANAGER": "mq://b27apvl176.preprod.local:1413/MQ1LSC02",
     "FPTILBAKE_KRAVGRUNNLAG_QUEUENAME": "QA.Q1_FPTILBAKE.KRAVGRUNNLAG",
     "FPTILBAKE_KRAVGRUNNLAG_QUEUEMANAGER": "mq://b27apvl176.preprod.local:1413/MQ1LSC02",
-    "PDL_BASE_URL": "http://pdl-api.default/graphql",
+    "PDL_BASE_URL": "http://pdl-api.pdl/graphql",
     "TILBAKEKREVING_V1_URL": "https://cics-q1.adeo.no/oppdrag/K231CW80",
     "DOKUMENTPRODUKSJON_V2_URL": "https://dokprod-q1.nais.preprod.local/dokprod/ws/dokumentproduksjon/v2",
     "BOOTSTRAP_SERVERS": "b27apvl00045.preprod.local:8443,b27apvl00046.preprod.local:8443,b27apvl00047.preprod.local:8443",

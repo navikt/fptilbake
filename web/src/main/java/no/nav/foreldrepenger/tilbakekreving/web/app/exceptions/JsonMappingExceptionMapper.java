@@ -9,12 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 
-import no.nav.vedtak.feil.Feil;
-import no.nav.vedtak.feil.FeilFactory;
-import no.nav.vedtak.feil.LogLevel;
-import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
-import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
-
 public class JsonMappingExceptionMapper implements ExceptionMapper<JsonMappingException> {
 
     private static final Logger LOG = LoggerFactory.getLogger(JsonMappingExceptionMapper.class);

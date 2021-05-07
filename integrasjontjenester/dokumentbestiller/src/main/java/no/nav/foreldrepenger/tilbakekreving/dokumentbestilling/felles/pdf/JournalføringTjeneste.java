@@ -37,11 +37,7 @@ import no.nav.journalpostapi.dto.opprett.OpprettJournalpostRequest;
 import no.nav.journalpostapi.dto.opprett.OpprettJournalpostResponse;
 import no.nav.journalpostapi.dto.sak.FagsakSystem;
 import no.nav.journalpostapi.dto.sak.Sak;
-import no.nav.vedtak.feil.Feil;
-import no.nav.vedtak.feil.FeilFactory;
-import no.nav.vedtak.feil.LogLevel;
-import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
-import no.nav.vedtak.feil.deklarasjon.IntegrasjonFeil;
+import no.nav.vedtak.exception.IntegrasjonException;
 import no.nav.vedtak.konfig.KonfigVerdi;
 
 @ApplicationScoped
@@ -98,7 +94,7 @@ public class JournalføringTjeneste {
         OpprettJournalpostResponse response = journalpostApiKlient.opprettJournalpost(request, forsøkFerdigstill);
         JournalpostId journalpostId = new JournalpostId(response.getJournalpostId());
         if (response.getDokumenter().size() != 1) {
-            throw JournalføringTjenesteFeil.FACTORY.uforventetAntallDokumenterIRespons(response.getDokumenter().size()).toException();
+            throw uforventetAntallDokumenterIRespons(response.getDokumenter().size());
         }
         logger.info("Journalførte vedlegg for vedtaksbrev for behandlingId={} med journalpostid={}", behandlingId, journalpostId.getVerdi());
         return new JournalpostIdOgDokumentId(journalpostId, response.getDokumenter().get(0).getDokumentInfoId());
@@ -106,17 +102,14 @@ public class JournalføringTjeneste {
 
     private AvsenderMottaker lagMottaker(Long behandlingId, BrevMottaker mottaker, BrevMetadata brevMetadata) {
         Adresseinfo adresseinfo = brevMetadata.getMottakerAdresse();
-        switch (mottaker) {
-            case BRUKER:
-                return AvsenderMottaker.builder()
-                    .medId(SenderMottakerIdType.NorskIdent, adresseinfo.getPersonIdent().getIdent())
-                    .medNavn(adresseinfo.getMottakerNavn())
-                    .build();
-            case VERGE:
-                return lagMottakerVerge(behandlingId);
-            default:
-                throw new IllegalArgumentException("Ikke-støttet mottaker: " + mottaker);
-        }
+        return switch (mottaker) {
+            case BRUKER -> AvsenderMottaker.builder()
+                .medId(SenderMottakerIdType.NorskIdent, adresseinfo.getPersonIdent().getIdent())
+                .medNavn(adresseinfo.getMottakerNavn())
+                .build();
+            case VERGE -> lagMottakerVerge(behandlingId);
+            default -> throw new IllegalArgumentException("Ikke-støttet mottaker: " + mottaker);
+        };
     }
 
     private AvsenderMottaker lagMottakerVerge(Long behandlingId) {
@@ -165,49 +158,34 @@ public class JournalføringTjeneste {
         OpprettJournalpostResponse response = journalpostApiKlient.opprettJournalpost(request, forsøkFerdigstill);
         JournalpostId journalpostId = new JournalpostId(response.getJournalpostId());
         if (response.getDokumenter().size() != 1) {
-            throw JournalføringTjenesteFeil.FACTORY.uforventetAntallDokumenterIRespons(response.getDokumenter().size()).toException();
+            throw uforventetAntallDokumenterIRespons(response.getDokumenter().size());
         }
         logger.info("Journalførte utgående {} til {} for behandlingId={} med journalpostid={}", dokumentkategori, brevMottaker, behandlingId, journalpostId.getVerdi());
         return new JournalpostIdOgDokumentId(journalpostId, response.getDokumenter().get(0).getDokumentInfoId());
     }
 
     private static Tema utledTema(FagsakYtelseType fagsakYtelseType) {
-        switch (fagsakYtelseType) {
-
-            case ENGANGSTØNAD:
-            case FORELDREPENGER:
-            case SVANGERSKAPSPENGER:
-                return Tema.FORELDREPENGER_SVANGERSKAPSPENGER;
-            case FRISINN:
-                return Tema.FRISINN;
-            case PLEIEPENGER_SYKT_BARN:
-            case PLEIEPENGER_NÆRSTÅENDE:
-            case OMSORGSPENGER:
-            case OPPLÆRINGSPENGER:
-                return Tema.OMSORGSPENGER_PLEIEPENGER_OPPLÆRINGSPENGER;
-            default:
-                throw new IllegalArgumentException("Ikke-støttet ytelseType: " + fagsakYtelseType);
-        }
+        return switch (fagsakYtelseType) {
+            case ENGANGSTØNAD, FORELDREPENGER, SVANGERSKAPSPENGER -> Tema.FORELDREPENGER_SVANGERSKAPSPENGER;
+            case FRISINN -> Tema.FRISINN;
+            case PLEIEPENGER_SYKT_BARN, PLEIEPENGER_NÆRSTÅENDE, OMSORGSPENGER, OPPLÆRINGSPENGER -> Tema.OMSORGSPENGER_PLEIEPENGER_OPPLÆRINGSPENGER;
+            default -> throw new IllegalArgumentException("Ikke-støttet ytelseType: " + fagsakYtelseType);
+        };
     }
 
     private Sak lagSaksreferanse(Fagsak fagsak) {
-        switch (appName) {
-            case "fptilbake":
-                return new Sak(fagsak.getSaksnummer().getVerdi(), FagsakSystem.FORELDREPENGELØSNINGEN);
-            case "k9-tilbake":
-                return new Sak(fagsak.getSaksnummer().getVerdi(), FagsakSystem.K9SAK);
-            default:
-                throw new IllegalArgumentException("Ikke-støttet app.name: " + appName);
-        }
+        return switch (appName) {
+            case "fptilbake" -> new Sak(fagsak.getSaksnummer().getVerdi(), FagsakSystem.FORELDREPENGELØSNINGEN);
+            case "k9-tilbake" -> new Sak(fagsak.getSaksnummer().getVerdi(), FagsakSystem.K9SAK);
+            default -> throw new IllegalArgumentException("Ikke-støttet app.name: " + appName);
+        };
     }
 
-    interface JournalføringTjenesteFeil extends DeklarerteFeil {
 
-        JournalføringTjenesteFeil FACTORY = FeilFactory.create(JournalføringTjenesteFeil.class);
-
-        @IntegrasjonFeil(feilkode = "FPT-496149", feilmelding = "Forsøkte å journalføre 1 dokument (vedlegg til vedtaksbrev), fikk %s dokumenter i respons fra dokarkiv", logLevel = LogLevel.WARN)
-        Feil uforventetAntallDokumenterIRespons(Integer antallDokumenter);
-
+    private static IntegrasjonException uforventetAntallDokumenterIRespons(Integer antallDokumenter) {
+        return new IntegrasjonException("FPT-496149", String.format("Forsøkte å journalføre 1 dokument (vedlegg til vedtaksbrev), fikk %s dokumenter i respons fra dokarkiv", antallDokumenter));
     }
+
+
 
 }

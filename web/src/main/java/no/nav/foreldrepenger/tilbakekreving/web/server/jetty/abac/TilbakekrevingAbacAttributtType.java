@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.domene.typer;
+package no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac;
 
 import no.nav.vedtak.sikkerhet.abac.AbacAttributtType;
 
@@ -17,8 +17,4 @@ public enum TilbakekrevingAbacAttributtType implements AbacAttributtType {
         return false;
     }
 
-    @Override
-    public String getSporingsloggKode() {
-        return sporingsloggEksternKode;
-    }
 }

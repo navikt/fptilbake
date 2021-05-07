@@ -10,11 +10,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
-import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
-import no.nav.vedtak.sikkerhet.abac.AbacDto;
 import no.nav.vedtak.util.InputValideringRegex;
 
-public class HentForhåndsvisningHenleggelseslbrevDto implements AbacDto {
+public class HentForhåndsvisningHenleggelseslbrevDto {
 
     @Valid
     @NotNull
@@ -54,9 +52,4 @@ public class HentForhåndsvisningHenleggelseslbrevDto implements AbacDto {
         this.behandlingReferanse = behandlingReferanse;
     }
 
-
-    @Override
-    public AbacDataAttributter abacAttributter() {
-        return AbacDataAttributter.opprett().leggTil(behandlingReferanse.abacAttributter());
-    }
 }

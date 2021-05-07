@@ -90,14 +90,11 @@ public class PdfGenerator {
     }
 
     private String lagBodyStartTag(DokumentVariant dokumentVariant) {
-        switch (dokumentVariant) {
-            case ENDELIG:
-                return "<body>";
-            case UTKAST:
-                return "<body class=\"utkast\">";
-            default:
-                throw new IllegalArgumentException("Ikke-støttet dokumentvariant: " + dokumentVariant);
-        }
+        return switch (dokumentVariant) {
+            case ENDELIG -> "<body>";
+            case UTKAST -> "<body class=\"utkast\">";
+            default -> throw new IllegalArgumentException("Ikke-støttet dokumentvariant: " + dokumentVariant);
+        };
     }
 
     private FSSupplier<InputStream> fontSupplier(String fontName) {

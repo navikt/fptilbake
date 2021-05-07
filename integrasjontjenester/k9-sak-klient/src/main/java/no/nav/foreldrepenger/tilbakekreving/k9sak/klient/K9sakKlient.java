@@ -30,6 +30,7 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.VarseltekstDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.simulering.FeilutbetaltePerioderDto;
 import no.nav.foreldrepenger.tilbakekreving.k9sak.klient.dto.BehandlingResourceLinkDto;
 import no.nav.foreldrepenger.tilbakekreving.k9sak.klient.dto.K9sakBehandlingInfoDto;
+import no.nav.vedtak.exception.IntegrasjonException;
 import no.nav.vedtak.felles.integrasjon.rest.OidcRestClient;
 import no.nav.vedtak.util.env.Environment;
 
@@ -73,7 +74,7 @@ public class K9sakKlient implements FagsystemKlient {
     @Override
     public SamletEksternBehandlingInfo hentBehandlingsinfo(UUID eksternUuid, Tillegsinformasjon... tilleggsinformasjon) {
         return hentBehandlingsinfoOpt(eksternUuid, Arrays.asList(tilleggsinformasjon))
-            .orElseThrow(() -> K9sakKlientFeil.FACTORY.fantIkkeYtelesbehandlingIFagsystemet(eksternUuid).toException());
+            .orElseThrow(() -> new IntegrasjonException("FPT-841933", String.format("Fant ikke behandling med behandingUuid %s i k9-sak", eksternUuid)));
     }
 
     @Override
@@ -89,7 +90,7 @@ public class K9sakKlient implements FagsystemKlient {
     @Override
     public EksternBehandlingsinfoDto hentBehandling(UUID eksternUuid) {
         return hentK9akBehandlingOptional(eksternUuid)
-            .orElseThrow(() -> K9sakKlientFeil.FACTORY.fantIkkeEksternBehandlingForUuid(eksternUuid.toString()).toException());
+            .orElseThrow(() ->new IntegrasjonException("FPT-7428497", String.format("Fant ingen ekstern behandling i K9sak for Uuid %s", eksternUuid.toString())));
     }
 
     @Override
@@ -116,7 +117,7 @@ public class K9sakKlient implements FagsystemKlient {
         URI hentFeilutbetalingerUri = URI.create(getK9OoppdragBaseUri() + K9_OPPDRAG_HENT_FEILUTBETALINGER);
         return restClient
             .postReturnsOptional(hentFeilutbetalingerUri, uuid, FeilutbetaltePerioderDto.class)
-            .orElseThrow(() -> K9sakKlientFeil.FACTORY.fantIkkeYtelesbehandlingISimuleringsapplikasjonen(uuid).toException());
+            .orElseThrow(() -> new IntegrasjonException("FPT-748280", String.format("Fant ikke behandling med behandlingUuid %s k9-oppdrag", uuid)));
     }
 
     static class ListeAvK9sakBehandlingInfoDto extends ArrayList<K9sakBehandlingInfoDto>{}

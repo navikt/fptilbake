@@ -17,7 +17,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDat
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
-import no.nav.vedtak.util.StringUtils;
 
 @ApplicationScoped
 @ProsessTask(AutomatiskSaksbehandlingProsessTask.TASKTYPE)
@@ -52,7 +51,7 @@ public class AutomatiskSaksbehandlingProsessTask implements ProsessTaskHandler {
             logger.warn("Behandling={} er på vent, kan ikke saksbehandle automatisk",behandlingId);
         }else if(behandling.erAvsluttet()){
             logger.warn("Behandling={} er allerede avsluttet, kan ikke saksbehandle automatisk",behandlingId);
-        }else if(!StringUtils.nullOrEmpty(behandling.getAnsvarligSaksbehandler())){
+        }else if(behandling.getAnsvarligSaksbehandler() != null && !behandling.getAnsvarligSaksbehandler().isEmpty()){
             logger.warn("Behandling={} er allerede saksbehandlet, kan ikke saksbehandle automatisk",behandlingId);
         }else {
             skruPåAutomatiskSaksbehandling(behandling);

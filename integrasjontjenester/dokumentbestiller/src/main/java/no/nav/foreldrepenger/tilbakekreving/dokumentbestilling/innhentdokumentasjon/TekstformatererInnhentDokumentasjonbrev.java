@@ -26,7 +26,7 @@ class TekstformatererInnhentDokumentasjonbrev extends FellesTekstformaterer {
 
             return applyTemplate(template, innhentDokumentasjonBrevDokument);
         } catch (IOException e) {
-            throw TekstformatererBrevFeil.FACTORY.feilVedTekstgenerering(e).toException();
+            throw TekstformatererBrevFeil.feilVedTekstgenerering(e);
         }
     }
 
@@ -38,7 +38,7 @@ class TekstformatererInnhentDokumentasjonbrev extends FellesTekstformaterer {
 
             return template.apply(overskriftBrevData);
         } catch (IOException e) {
-            throw TekstformatererBrevFeil.FACTORY.feilVedTekstgenerering(e).toException();
+            throw TekstformatererBrevFeil.feilVedTekstgenerering(e);
         }
     }
 

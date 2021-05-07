@@ -9,11 +9,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakRequest;
-import no.nav.vedtak.feil.Feil;
-import no.nav.vedtak.feil.FeilFactory;
-import no.nav.vedtak.feil.LogLevel;
-import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
-import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
+import no.nav.vedtak.exception.TekniskException;
 
 public class TilbakekrevingsvedtakMarshaller {
 
@@ -35,7 +31,7 @@ public class TilbakekrevingsvedtakMarshaller {
             marshaller.marshal(request, stringWriter);
             return stringWriter.toString();
         } catch (JAXBException e) {
-            throw TilbakekrevingsvedtakMarshallerFeil.FACTORY.kunneIkkeMarshalleVedtakXml(behandlingId, e).toException();
+            throw new TekniskException("FPT-113616", String.format("Kunne ikke marshalle vedtak for behandlingId=%s", behandlingId), e);
         }
     }
 
@@ -44,7 +40,7 @@ public class TilbakekrevingsvedtakMarshaller {
             Unmarshaller unmarshaller = getContext().createUnmarshaller();
             return (TilbakekrevingsvedtakRequest) unmarshaller.unmarshal(new StringReader(xml));
         } catch (JAXBException e) {
-            throw TilbakekrevingsvedtakMarshallerFeil.FACTORY.kunneIkkeUnmarshalleVedtakXml(xmlId, behandlingId, e).toException();
+            throw new TekniskException("FPT-511823", String.format("Kunne ikke unmarshalle vedtak for behandlingId=%s xmlId=%s", xmlId, behandlingId), e);
         }
     }
 
@@ -55,15 +51,5 @@ public class TilbakekrevingsvedtakMarshaller {
         return context;
     }
 
-    interface TilbakekrevingsvedtakMarshallerFeil extends DeklarerteFeil {
 
-        TilbakekrevingsvedtakMarshallerFeil FACTORY = FeilFactory.create(TilbakekrevingsvedtakMarshallerFeil.class);
-
-        @TekniskFeil(feilkode = "FPT-113616", feilmelding = "Kunne ikke marshalle vedtak for behandlingId=%s", logLevel = LogLevel.WARN)
-        Feil kunneIkkeMarshalleVedtakXml(Long behandlingId, JAXBException e);
-
-        @TekniskFeil(feilkode = "FPT-511823", feilmelding = "Kunne ikke unmarshalle vedtak for behandlingId=%s xmlId=%s", logLevel = LogLevel.WARN)
-        Feil kunneIkkeUnmarshalleVedtakXml(Long behandlingId, Long xmlId, JAXBException e);
-
-    }
 }

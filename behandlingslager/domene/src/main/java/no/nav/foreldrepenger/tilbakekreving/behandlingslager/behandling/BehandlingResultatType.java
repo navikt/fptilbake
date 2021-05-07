@@ -83,16 +83,12 @@ public enum BehandlingResultatType implements Kodeverdi {
     }
 
     public static BehandlingResultatType fraVedtakResultatType(VedtakResultatType vedtakResultatType){
-        switch (vedtakResultatType) {
-            case INGEN_TILBAKEBETALING:
-                return BehandlingResultatType.INGEN_TILBAKEBETALING;
-            case FULL_TILBAKEBETALING:
-                return BehandlingResultatType.FULL_TILBAKEBETALING;
-            case DELVIS_TILBAKEBETALING:
-                return BehandlingResultatType.DELVIS_TILBAKEBETALING;
-            default:
-                throw new IllegalArgumentException("Ukjent vedtakResultatType :" + vedtakResultatType);
-        }
+        return switch (vedtakResultatType) {
+            case INGEN_TILBAKEBETALING -> BehandlingResultatType.INGEN_TILBAKEBETALING;
+            case FULL_TILBAKEBETALING -> BehandlingResultatType.FULL_TILBAKEBETALING;
+            case DELVIS_TILBAKEBETALING -> BehandlingResultatType.DELVIS_TILBAKEBETALING;
+            default -> throw new IllegalArgumentException("Ukjent vedtakResultatType :" + vedtakResultatType);
+        };
     }
 
     @JsonProperty

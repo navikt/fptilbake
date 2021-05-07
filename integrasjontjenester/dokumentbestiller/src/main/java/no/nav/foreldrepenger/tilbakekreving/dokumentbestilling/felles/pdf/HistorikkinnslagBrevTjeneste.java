@@ -46,48 +46,33 @@ public class HistorikkinnslagBrevTjeneste {
         if (detaljertBrevType == DetaljertBrevType.FRITEKST) {
             return Objects.requireNonNull(tittel);
         }
-        switch (brevMottaker) {
-            case BRUKER:
-                return finnHistorikkinnslagTittelBrevTilBruker(detaljertBrevType);
-            case VERGE:
-                return finnHistorikkinnslagTittelBrevTilVerge(detaljertBrevType);
-            default:
-                throw new IllegalArgumentException("Ikke-støttet mottaker: " + brevMottaker);
-        }
+        return switch (brevMottaker) {
+            case BRUKER -> finnHistorikkinnslagTittelBrevTilBruker(detaljertBrevType);
+            case VERGE -> finnHistorikkinnslagTittelBrevTilVerge(detaljertBrevType);
+            default -> throw new IllegalArgumentException("Ikke-støttet mottaker: " + brevMottaker);
+        };
     }
 
     private String finnHistorikkinnslagTittelBrevTilBruker(DetaljertBrevType detaljertBrevType) {
-        switch (detaljertBrevType) {
-            case VARSEL:
-                return "Varselbrev Tilbakekreving";
-            case KORRIGERT_VARSEL:
-                return "Korrigert Varselbrev Tilbakekreving";
-            case VEDTAK:
-                return "Vedtaksbrev Tilbakekreving";
-            case HENLEGGELSE:
-                return "Henleggelsesbrev tilbakekreving";
-            case INNHENT_DOKUMETASJON:
-                return "Innhent dokumentasjon Tilbakekreving";
-            default:
-                throw new IllegalArgumentException("Ikke-støttet detaljertBrevType: " + detaljertBrevType);
-        }
+        return switch (detaljertBrevType) {
+            case VARSEL -> "Varselbrev Tilbakekreving";
+            case KORRIGERT_VARSEL -> "Korrigert Varselbrev Tilbakekreving";
+            case VEDTAK -> "Vedtaksbrev Tilbakekreving";
+            case HENLEGGELSE -> "Henleggelsesbrev tilbakekreving";
+            case INNHENT_DOKUMETASJON -> "Innhent dokumentasjon Tilbakekreving";
+            default -> throw new IllegalArgumentException("Ikke-støttet detaljertBrevType: " + detaljertBrevType);
+        };
     }
 
     private String finnHistorikkinnslagTittelBrevTilVerge(DetaljertBrevType detaljertBrevType) {
-        switch (detaljertBrevType) {
-            case VARSEL:
-                return "Varselbrev Tilbakekreving til Verge";
-            case KORRIGERT_VARSEL:
-                return "Korrigert Varselbrev Tilbakekreving til verge";
-            case VEDTAK:
-                return "Vedtaksbrev Tilbakekreving til verge";
-            case HENLEGGELSE:
-                return "Henleggelsesbrev tilbakekreving til verge";
-            case INNHENT_DOKUMETASJON:
-                return "Innhent dokumentasjon Tilbakekreving til verge";
-            default:
-                throw new IllegalArgumentException("Ikke-støttet detaljertBrevType: " + detaljertBrevType);
-        }
+        return switch (detaljertBrevType) {
+            case VARSEL -> "Varselbrev Tilbakekreving til Verge";
+            case KORRIGERT_VARSEL -> "Korrigert Varselbrev Tilbakekreving til verge";
+            case VEDTAK -> "Vedtaksbrev Tilbakekreving til verge";
+            case HENLEGGELSE -> "Henleggelsesbrev tilbakekreving til verge";
+            case INNHENT_DOKUMETASJON -> "Innhent dokumentasjon Tilbakekreving til verge";
+            default -> throw new IllegalArgumentException("Ikke-støttet detaljertBrevType: " + detaljertBrevType);
+        };
     }
 
 }

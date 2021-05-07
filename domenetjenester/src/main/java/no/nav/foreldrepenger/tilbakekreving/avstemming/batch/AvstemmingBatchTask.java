@@ -16,11 +16,7 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
 
 import no.nav.foreldrepenger.tilbakekreving.avstemming.AvstemmingTjeneste;
-import no.nav.vedtak.feil.Feil;
-import no.nav.vedtak.feil.FeilFactory;
-import no.nav.vedtak.feil.LogLevel;
-import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
-import no.nav.vedtak.feil.deklarasjon.IntegrasjonFeil;
+import no.nav.vedtak.exception.IntegrasjonException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
@@ -76,15 +72,8 @@ public class AvstemmingBatchTask implements ProsessTaskHandler {
                 sftpBatchTjeneste.put(resultat.get(), filnavn);
                 logger.info("Filen {} er overført til avstemming sftp", filnavn);
             } catch (JSchException | SftpException e ) {
-                throw SftpFeilmelding.FEILFACTORY.overføringFeilet(filnavn, e).toException();
+                throw new IntegrasjonException("FPT-614386", String.format("Overføring av fil [%s] til avstemming feilet.", filnavn), e);
             }
         }
-    }
-
-    interface SftpFeilmelding extends DeklarerteFeil {
-        SftpFeilmelding FEILFACTORY = FeilFactory.create(SftpFeilmelding.class);
-
-        @IntegrasjonFeil(feilkode = "FPT-614386", feilmelding = "Overføring av fil [%s] til avstemming feilet.", logLevel = LogLevel.WARN)
-        Feil overføringFeilet(String filnavn, Exception e);
     }
 }

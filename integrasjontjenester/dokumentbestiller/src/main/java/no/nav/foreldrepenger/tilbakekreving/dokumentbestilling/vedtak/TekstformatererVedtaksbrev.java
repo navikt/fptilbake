@@ -26,12 +26,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevFelles;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevPeriodeOgFelles;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode.HbVedtaksbrevPeriode;
-import no.nav.vedtak.feil.Feil;
-import no.nav.vedtak.feil.FeilFactory;
-import no.nav.vedtak.feil.LogLevel;
-import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
-import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
-import no.nav.vedtak.util.StringUtils;
+import no.nav.vedtak.exception.TekniskException;
 
 class TekstformatererVedtaksbrev extends FellesTekstformaterer {
     private static Map<String, Template> TEMPLATE_CACHE = new HashMap<>();
@@ -63,14 +58,11 @@ class TekstformatererVedtaksbrev extends FellesTekstformaterer {
     }
 
     public static String lagVedtakStart(HbVedtaksbrevFelles vedtaksbrevFelles) {
-        switch (vedtaksbrevFelles.getVedtaksbrevType()) {
-            case FRITEKST_FEILUTBETALING_BORTFALT:
-                return konverterMedPartialTemplate("vedtak/fritekstFeilutbetalingBortfalt/fritekstFeilutbetalingBortfalt_start", vedtaksbrevFelles);
-            case ORDINÆR:
-                return konverterMedPartialTemplate("vedtak/vedtak_start", vedtaksbrevFelles);
-            default:
-                throw new IllegalArgumentException("Utviklerfeil: ustøttet VedtaksbrevType(" + vedtaksbrevFelles.getVedtaksbrevType() + ") i VedtaksbrevFormatterer");
-        }
+        return switch (vedtaksbrevFelles.getVedtaksbrevType()) {
+            case FRITEKST_FEILUTBETALING_BORTFALT -> konverterMedPartialTemplate("vedtak/fritekstFeilutbetalingBortfalt/fritekstFeilutbetalingBortfalt_start", vedtaksbrevFelles);
+            case ORDINÆR -> konverterMedPartialTemplate("vedtak/vedtak_start", vedtaksbrevFelles);
+            default -> throw new IllegalArgumentException("Utviklerfeil: ustøttet VedtaksbrevType(" + vedtaksbrevFelles.getVedtaksbrevType() + ") i VedtaksbrevFormatterer");
+        };
     }
 
     static List<Avsnitt> lagPerioderAvsnitt(HbVedtaksbrevData vedtaksbrevData) {
@@ -98,7 +90,7 @@ class TekstformatererVedtaksbrev extends FellesTekstformaterer {
         Avsnitt.Builder avsnittBuilder = new Avsnitt.Builder()
             .medAvsnittstype(Avsnitt.Avsnittstype.PERIODE)
             .medPeriode(data.getPeriode().getPeriode());
-        if (!StringUtils.nullOrEmpty(overskrift)) {
+        if (overskrift != null && !overskrift.isEmpty()) {
             avsnittBuilder.medOverskrift(fjernOverskriftFormattering(overskrift));
         }
 
@@ -252,14 +244,11 @@ class TekstformatererVedtaksbrev extends FellesTekstformaterer {
     }
 
     static String lagVedtaksbrevFritekst(HbVedtaksbrevData vedtaksbrevData) {
-        switch (vedtaksbrevData.getFelles().getVedtaksbrevType()) {
-            case FRITEKST_FEILUTBETALING_BORTFALT:
-                return lagVedtaksbrev("vedtak/fritekstFeilutbetalingBortfalt/fritekstFeilutbetalingBortfalt", vedtaksbrevData);
-            case ORDINÆR:
-                return lagVedtaksbrev("vedtak/vedtak", vedtaksbrevData);
-            default:
-                throw new IllegalArgumentException("Utviklerfeil: ustøttet VedtaksbrevType(" + vedtaksbrevData.getFelles().getVedtaksbrevType() + ") i VedtaksbrevFormatterer");
-        }
+        return switch (vedtaksbrevData.getFelles().getVedtaksbrevType()) {
+            case FRITEKST_FEILUTBETALING_BORTFALT -> lagVedtaksbrev("vedtak/fritekstFeilutbetalingBortfalt/fritekstFeilutbetalingBortfalt", vedtaksbrevData);
+            case ORDINÆR -> lagVedtaksbrev("vedtak/vedtak", vedtaksbrevData);
+            default -> throw new IllegalArgumentException("Utviklerfeil: ustøttet VedtaksbrevType(" + vedtaksbrevData.getFelles().getVedtaksbrevType() + ") i VedtaksbrevFormatterer");
+        };
     }
 
     private static String lagVedtaksbrev(String mal, HbVedtaksbrevData vedtaksbrevData) {
@@ -321,7 +310,7 @@ class TekstformatererVedtaksbrev extends FellesTekstformaterer {
                 .build();
             return template.apply(context).stripLeading().stripTrailing();
         } catch (IOException e) {
-            throw TekstformatererBrevFeil.FACTORY.feilVedTekstgenerering(e).toException();
+            throw TekstformatererBrevFeil.feilVedTekstgenerering(e);
         }
     }
 
@@ -359,7 +348,7 @@ class TekstformatererVedtaksbrev extends FellesTekstformaterer {
         try {
             return handlebars.compileInline(builder.toString());
         } catch (IOException e) {
-            throw TekstformatterFeil.FACTORY.klarteIkkeKompilerePartialTemplate(partials, e).toException();
+            throw klarteIkkeKompilerePartialTemplate(partials, e);
         }
     }
 
@@ -369,7 +358,7 @@ class TekstformatererVedtaksbrev extends FellesTekstformaterer {
         try {
             return handlebars.compile(filsti);
         } catch (IOException e) {
-            throw TekstformatterFeil.FACTORY.klarteIkkeKompilereTemplate(filsti, e).toException();
+            throw new TekniskException("FTP-531549", String.format("Klarte ikke å kompiler template %s", filsti), e);
         }
     }
 
@@ -383,15 +372,8 @@ class TekstformatererVedtaksbrev extends FellesTekstformaterer {
         return handlebars;
     }
 
-    interface TekstformatterFeil extends DeklarerteFeil {
-        TekstformatterFeil FACTORY = FeilFactory.create(TekstformatterFeil.class);
 
-        @TekniskFeil(feilkode = "FTP-531549", feilmelding = "Klarte ikke å kompiler template %s", logLevel = LogLevel.ERROR)
-        Feil klarteIkkeKompilereTemplate(String template, IOException cause);
-
-        @TekniskFeil(feilkode = "FTP-814712", feilmelding = "Klarte ikke å kompiler partial template %s", logLevel = LogLevel.ERROR)
-        Feil klarteIkkeKompilerePartialTemplate(String[] template, IOException cause);
-
+    private static TekniskException klarteIkkeKompilerePartialTemplate(String[] template, IOException cause) {
+        return new TekniskException("FTP-814712", String.format("Klarte ikke å kompiler partial template %s", template), cause);
     }
-
 }

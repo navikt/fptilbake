@@ -45,7 +45,7 @@ public class AvsluttBehandlingTjeneste {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
 
         BehandlingVedtak vedtak = behandlingVedtakRepository.hentBehandlingvedtakForBehandlingId(behandling.getId())
-            .orElseThrow(() -> BehandlingRepositoryFeil.FACTORY.fantIkkeBehandlingVedtak(behandlingId).toException());
+            .orElseThrow(() -> BehandlingRepositoryFeil.fantIkkeBehandlingVedtak(behandlingId));
         vedtak.setIverksettingStatus(IverksettingStatus.IVERKSATT);
 
         behandlingVedtakRepository.lagre(vedtak);

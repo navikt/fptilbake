@@ -24,14 +24,9 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.dto.SelvbetjeningMelding;
-import no.nav.vedtak.feil.Feil;
-import no.nav.vedtak.feil.FeilFactory;
-import no.nav.vedtak.feil.LogLevel;
-import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
-import no.nav.vedtak.feil.deklarasjon.ManglerTilgangFeil;
-import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
+import no.nav.vedtak.exception.ManglerTilgangException;
+import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.konfig.KonfigVerdi;
-import no.nav.vedtak.util.StringUtils;
 
 @ApplicationScoped
 public class SelvbetjeningMeldingProducer {
@@ -72,7 +67,8 @@ public class SelvbetjeningMeldingProducer {
     }
 
     void setUsernameAndPassword(String username, String password, Properties properties) {
-        if (!StringUtils.nullOrEmpty(username) && !StringUtils.nullOrEmpty(password)) {
+        if ((username != null && !username.isEmpty())
+            && (password != null && !password.isEmpty())) {
             String jaasTemplate = "org.apache.kafka.common.security.scram.ScramLoginModule required username=\"%s\" password=\"%s\";";
             String jaasCfg = String.format(jaasTemplate, username, password);
             properties.setProperty("sasl.jaas.config", jaasCfg);
@@ -86,7 +82,7 @@ public class SelvbetjeningMeldingProducer {
     }
 
     void setSecurity(String username, Properties properties) {
-        if (!StringUtils.nullOrEmpty(username)) {
+        if (username != null && !username.isEmpty()) {
             properties.setProperty("security.protocol", "SASL_SSL");
             properties.setProperty("sasl.mechanism", "PLAIN");
         }
@@ -115,34 +111,32 @@ public class SelvbetjeningMeldingProducer {
             var recordMetadata = producer.send(record).get(); // NOSONAR
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw SendVarselhendelseFeil.FACTORY.uventetFeilKafka(topic, e).toException();
+            throw uventetFeilKafka(topic, e);
         } catch (ExecutionException e) {
-            throw SendVarselhendelseFeil.FACTORY.uventetFeilKafka(topic, e).toException();
+            throw uventetFeilKafka(topic, e);
         } catch (AuthenticationException | AuthorizationException e) {
-            throw SendVarselhendelseFeil.FACTORY.påloggingsfeilKafka(topic, e).toException();
+            throw påloggingsfeilKafka(topic, e);
         } catch (RetriableException e) {
-            throw SendVarselhendelseFeil.FACTORY.midlertidigFeilKafka(topic, e).toException();
+            throw midlertidigFeilKafka(topic, e);
         } catch (KafkaException e) {
-            throw SendVarselhendelseFeil.FACTORY.feilMedKafka(topic, e).toException();
+            throw feilMedKafka(topic, e);
         }
     }
 
-    interface SendVarselhendelseFeil extends DeklarerteFeil {
+     private static TekniskException uventetFeilKafka(String topic, Exception cause) {
+         return new TekniskException("FPT-151561", String.format("Uventet feil ved sending til Kafka for topic %s", topic), cause);
+     }
 
-        SendVarselhendelseFeil FACTORY = FeilFactory.create(SendVarselhendelseFeil.class);
+    private static ManglerTilgangException påloggingsfeilKafka(String topic, Exception cause) {
+        return new ManglerTilgangException("FPT-732111", String.format("Feil med pålogging mot Kafka for topic %s", topic), cause);
+    }
 
-        @TekniskFeil(feilkode = "FPT-151561", feilmelding = "Uventet feil ved sending til Kafka for topic %s", logLevel = LogLevel.WARN)
-        Feil uventetFeilKafka(String topic, Exception cause);
+    private static TekniskException midlertidigFeilKafka(String topic, Exception cause) {
+        return new TekniskException("FPT-682119", String.format("Midlertidig feil ved sending til Kafka, vil prøve igjen. Gjelder topic %s", topic), cause);
+    }
 
-        @ManglerTilgangFeil(feilkode = "FPT-732111", feilmelding = "Feil med pålogging mot Kafka for topic %s", logLevel = LogLevel.WARN)
-        Feil påloggingsfeilKafka(String topic, Exception cause);
-
-        @TekniskFeil(feilkode = "FPT-682119", feilmelding = "Midlertidig feil ved sending til Kafka, vil prøve igjen. Gjelder topic %s", logLevel = LogLevel.WARN)
-        Feil midlertidigFeilKafka(String topic, Exception cause);
-
-        @TekniskFeil(feilkode = "FPT-981074", feilmelding = "Uventet feil ved sending til Kafka for topic %s", logLevel = LogLevel.WARN)
-        Feil feilMedKafka(String topic, Exception cause);
-
+    private static TekniskException feilMedKafka(String topic, Exception cause) {
+        return new TekniskException("FPT-981074", String.format("Uventet feil ved sending til Kafka for topic %s", topic), cause);
     }
 
 }

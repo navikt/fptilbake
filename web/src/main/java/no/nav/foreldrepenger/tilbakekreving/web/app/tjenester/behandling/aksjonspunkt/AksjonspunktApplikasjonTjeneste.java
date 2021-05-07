@@ -1,7 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt;
 
 import static java.util.stream.Collectors.toList;
-import static no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.AksjonspunktApplikasjonFeil.FACTORY;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,6 +27,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjons
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.BekreftetAksjonspunktDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.FatteVedtakDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.oppdaterer.AksjonspunktOppdaterer;
+import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.sikkerhet.context.SubjectHandler;
 
 @ApplicationScoped
@@ -99,7 +99,7 @@ public class AksjonspunktApplikasjonTjeneste {
         Instance<Object> instance = finnAksjonspunktOppdaterer(dto.getClass());
 
         if (instance.isUnsatisfied()) {
-            throw FACTORY.kanIkkeFinneAksjonspunktUtleder(dto.getKode()).toException();
+            throw new TekniskException("FPT-770743", String.format("Finner ikke håndtering for aksjonspunkt med kode: %s", dto.getKode()));
         } else {
             Object minInstans = instance.get();
             if (minInstans.getClass().isAnnotationPresent(Dependent.class)) {

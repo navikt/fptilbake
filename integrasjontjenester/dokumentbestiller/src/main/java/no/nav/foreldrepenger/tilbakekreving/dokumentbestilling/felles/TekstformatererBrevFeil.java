@@ -1,14 +1,10 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles;
 
-import no.nav.vedtak.feil.Feil;
-import no.nav.vedtak.feil.FeilFactory;
-import no.nav.vedtak.feil.LogLevel;
-import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
-import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
+import no.nav.vedtak.exception.TekniskException;
 
-public interface TekstformatererBrevFeil extends DeklarerteFeil {
-    TekstformatererBrevFeil FACTORY = FeilFactory.create(TekstformatererBrevFeil.class);
+public class TekstformatererBrevFeil {
 
-    @TekniskFeil(feilkode = "FPT-110800", feilmelding = "Feilet ved tekstgenerering til brev", logLevel = LogLevel.WARN)
-    Feil feilVedTekstgenerering(Exception e);
+    public static TekniskException feilVedTekstgenerering(Exception e) {
+        return new TekniskException("FPT-110800", "Feilet ved tekstgenerering til brev");
+    }
 }

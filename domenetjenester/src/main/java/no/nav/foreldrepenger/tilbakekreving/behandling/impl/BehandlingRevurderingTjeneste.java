@@ -30,12 +30,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
-import no.nav.vedtak.feil.Feil;
-import no.nav.vedtak.feil.FeilFactory;
-import no.nav.vedtak.feil.LogLevel;
-import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
-import no.nav.vedtak.feil.deklarasjon.FunksjonellFeil;
-import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
+import no.nav.vedtak.exception.FunksjonellException;
+import no.nav.vedtak.exception.TekniskException;
 
 @ApplicationScoped
 public class BehandlingRevurderingTjeneste {
@@ -91,7 +87,7 @@ public class BehandlingRevurderingTjeneste {
 
     private Behandling opprettManuellRevurdering(Fagsak fagsak, BehandlingÅrsakType behandlingÅrsakType, UUID eksternUuid) {
         EksternBehandling eksternBehandlingForSisteTbkBehandling = eksternBehandlingRepository.finnForSisteAvsluttetTbkBehandling(eksternUuid)
-            .orElseThrow(() -> RevurderingFeil.FACTORY.tjenesteFinnerIkkeBehandlingForRevurdering(fagsak.getId()).toException());
+            .orElseThrow(() -> tjenesteFinnerIkkeBehandlingForRevurdering(fagsak.getId()));
 
         Behandling origBehandling = behandlingRepository.hentBehandling(eksternBehandlingForSisteTbkBehandling.getInternId());
 
@@ -128,7 +124,7 @@ public class BehandlingRevurderingTjeneste {
 
     private void validerHarIkkeÅpenBehandling(Saksnummer saksnummer, UUID eksternUuid) {
         if (!kanOppretteRevurdering(eksternUuid)) {
-            throw RevurderingFeil.FACTORY.kanIkkeOppretteRevurdering(saksnummer).toException();
+            throw kanIkkeOppretteRevurdering(saksnummer);
         }
     }
 
@@ -164,14 +160,15 @@ public class BehandlingRevurderingTjeneste {
         repositoryProvider.getHistorikkRepository().lagre(revurderingsInnslag);
     }
 
-    interface RevurderingFeil extends DeklarerteFeil {
-        RevurderingFeil FACTORY = FeilFactory.create(RevurderingFeil.class);
 
-        @FunksjonellFeil(feilkode = "FPT-663487", feilmelding = "saksnummer %s oppfyller ikke kravene for revurdering", løsningsforslag = "", logLevel = LogLevel.WARN)
-        Feil kanIkkeOppretteRevurdering(Saksnummer saksnummer);
 
-        @TekniskFeil(feilkode = "FPT-317517", feilmelding = "finner ingen behandling som kan revurderes for fagsak: %s", logLevel = LogLevel.WARN)
-        Feil tjenesteFinnerIkkeBehandlingForRevurdering(Long fagsakId);
-
+    private static FunksjonellException kanIkkeOppretteRevurdering(Saksnummer saksnummer) {
+        return new FunksjonellException("FPT-663487", String.format("saksnummer %s oppfyller ikke kravene for revurdering", saksnummer), "");
     }
+
+    private static TekniskException tjenesteFinnerIkkeBehandlingForRevurdering(Long fagsakId) {
+        return new TekniskException("FPT-317517", String.format("finner ingen behandling som kan revurderes for fagsak: %s", fagsakId));
+    }
+
+
 }

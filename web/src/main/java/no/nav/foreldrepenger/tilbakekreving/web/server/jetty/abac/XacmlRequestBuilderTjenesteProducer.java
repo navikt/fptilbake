@@ -28,16 +28,15 @@ public class XacmlRequestBuilderTjenesteProducer {
     public XacmlRequestBuilderTjenesteProducer(@KonfigVerdi(value = "app.name") String applikasjon,
                                                @Any Instance<XacmlRequestBuilderTjeneste> xacmlRequestBuilderTjenester) {
         switch (applikasjon) {
-            case "fptilbake":
+            case "fptilbake" -> {
                 logger.info("Bruker XacmlRequestBuilderTjeneste for fptilbake");
                 xacmlRequestBuilderTjeneste = xacmlRequestBuilderTjenester.select(new Fptilbake.FptilbakeAnnotationLiteral()).get();
-                break;
-            case "k9-tilbake":
+            }
+            case "k9-tilbake" -> {
                 logger.info("Bruker XacmlRequestBuilderTjeneste for k9");
                 xacmlRequestBuilderTjeneste = xacmlRequestBuilderTjenester.select(new K9tilbake.K9tilbakeAnnotationLiteral()).get();
-                break;
-            default:
-                throw new IllegalStateException("app.name er satt til " + applikasjon + " som ikke er en støttet verdi");
+            }
+            default -> throw new IllegalStateException("app.name er satt til " + applikasjon + " som ikke er en støttet verdi");
         }
     }
 

@@ -228,37 +228,25 @@ public class DokumentasjonGeneratorPeriodeVilkår {
     }
 
     private String hentVilkårresultatOverskriftDel(VilkårResultat resultat) {
-        switch (resultat) {
-            case UDEFINERT:
-                return "Foreldelse";
-            case FORSTO_BURDE_FORSTÅTT:
-                return "Forsto/Burde forstått";
-            case FEIL_OPPLYSNINGER_FRA_BRUKER:
-                return "Feilaktive opplysninger";
-            case MANGELFULLE_OPPLYSNINGER_FRA_BRUKER:
-                return "Mangelfull opplysninger";
-            case GOD_TRO:
-                return "God tro";
-            default:
-                throw new IllegalArgumentException("VilkårResultat ikke støttet. Resultat: " + resultat);
-        }
+        return switch (resultat) {
+            case UDEFINERT -> "Foreldelse";
+            case FORSTO_BURDE_FORSTÅTT -> "Forsto/Burde forstått";
+            case FEIL_OPPLYSNINGER_FRA_BRUKER -> "Feilaktive opplysninger";
+            case MANGELFULLE_OPPLYSNINGER_FRA_BRUKER -> "Mangelfull opplysninger";
+            case GOD_TRO -> "God tro";
+            default -> throw new IllegalArgumentException("VilkårResultat ikke støttet. Resultat: " + resultat);
+        };
     }
 
     private String hentVIlkårsvurderingOverskriftDel(ForeldelseVurderingType foreldelsevurdering) {
-        switch (foreldelsevurdering) {
-            case UDEFINERT:
-                return "";
-            case IKKE_VURDERT:
-                return " - automatisk vurdert";
-            case IKKE_FORELDET:
-                return " - ikke foreldet";
-            case FORELDET:
-                return " - foreldet";
-            case TILLEGGSFRIST:
-                return " - med tilleggsfrist";
-            default:
-                throw new IllegalArgumentException("ForeldelseVurderingType ikke støttet. Type: " + foreldelsevurdering);
-        }
+        return switch (foreldelsevurdering) {
+            case UDEFINERT -> "";
+            case IKKE_VURDERT -> " - automatisk vurdert";
+            case IKKE_FORELDET -> " - ikke foreldet";
+            case FORELDET -> " - foreldet";
+            case TILLEGGSFRIST -> " - med tilleggsfrist";
+            default -> throw new IllegalArgumentException("ForeldelseVurderingType ikke støttet. Type: " + foreldelsevurdering);
+        };
     }
 
     private String prettyprint(String vilkårTekst, String overskrift) {

@@ -53,7 +53,7 @@ public class IverksetteVedtakSteg implements BehandlingSteg {
 
         Optional<BehandlingVedtak> fantVedtak = behandlingVedtakRepository.hentBehandlingvedtakForBehandlingId(behandlingId);
         if (fantVedtak.isEmpty()) {
-            throw BehandlingRepositoryFeil.FACTORY.fantIkkeBehandlingVedtak(behandlingId).toException();
+            throw BehandlingRepositoryFeil.fantIkkeBehandlingVedtak(behandlingId);
         }
         BehandlingVedtak vedtak = fantVedtak.get();
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);

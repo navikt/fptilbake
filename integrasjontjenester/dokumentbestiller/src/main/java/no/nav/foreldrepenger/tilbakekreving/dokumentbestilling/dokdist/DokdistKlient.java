@@ -54,26 +54,20 @@ public class DokdistKlient {
     }
 
     private FagsakSystem getBestillendeFagsystem() {
-        switch (applicationName) {
-            case "fptilbake":
-                return FagsakSystem.FORELDREPENGELØSNINGEN;
-            case "k9-tilbake":
-                return FagsakSystem.K9SAK;
-            default:
-                throw new IllegalArgumentException("Ikke-støttet app.name: " + applicationName);
-        }
+        return switch (applicationName) {
+            case "fptilbake" -> FagsakSystem.FORELDREPENGELØSNINGEN;
+            case "k9-tilbake" -> FagsakSystem.K9SAK;
+            default -> throw new IllegalArgumentException("Ikke-støttet app.name: " + applicationName);
+        };
     }
 
     private String getDokumentProdAppKode() {
         /* koder avtalt med team som eier dokdist */
-        switch (applicationName) {
-            case "fptilbake":
-                return "FPTILBAKE";
-            case "k9-tilbake":
-                return "K9_TILBAKE";
-            default:
-                throw new IllegalArgumentException("Ikke-støttet app.name: " + applicationName);
-        }
+        return switch (applicationName) {
+            case "fptilbake" -> "FPTILBAKE";
+            case "k9-tilbake" -> "K9_TILBAKE";
+            default -> throw new IllegalArgumentException("Ikke-støttet app.name: " + applicationName);
+        };
     }
 
 }

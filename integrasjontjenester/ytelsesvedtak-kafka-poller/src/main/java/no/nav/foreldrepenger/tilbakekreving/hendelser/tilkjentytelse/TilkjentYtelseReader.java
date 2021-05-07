@@ -68,7 +68,7 @@ public class TilkjentYtelseReader implements HendelseReader {
         try {
             meldingConsumer.manualCommitSync();
         } catch (CommitFailedException e) {
-            throw KafkaConsumerFeil.FACTORY.kunneIkkeCommitOffset(e).toException();
+            throw KafkaConsumerFeil.kunneIkkeCommitOffset(e);
         }
     }
 

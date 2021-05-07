@@ -12,17 +12,13 @@ import javax.inject.Inject;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakStatus;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.TilbakekrevingAbacAttributtType;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.Fptilbake;
 import no.nav.foreldrepenger.tilbakekreving.pip.PipBehandlingData;
 import no.nav.foreldrepenger.tilbakekreving.pip.PipRepository;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.AppAbacAttributtType;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.CommonAttributter;
-import no.nav.vedtak.feil.Feil;
-import no.nav.vedtak.feil.FeilFactory;
-import no.nav.vedtak.feil.LogLevel;
-import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
-import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.TilbakekrevingAbacAttributtType;
+import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.log.mdc.MdcExtendedLogContext;
 import no.nav.vedtak.sikkerhet.abac.AbacAttributtSamling;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
@@ -65,13 +61,13 @@ public class FPPdpRequestBuilder implements PdpRequestBuilder {
         Optional<UUID> behandlingUuid = utledBehandlingUuId(attributter);
         Optional<UUID> fpsakBehandlingId = utledYtelsebehandlingUuid(attributter);
         if (behandlingId.isPresent() && fpsakBehandlingId.isPresent()) {
-            throw PdpRequestBuilderFeil.FACTORY.ugyldigInputFlereBehandlinger(behandlingId.get(), fpsakBehandlingId.get()).toException();
+            throw ugyldigInputFlereBehandlinger(behandlingId.get(), fpsakBehandlingId.get());
         }
         if (behandlingUuid.isPresent() && fpsakBehandlingId.isPresent()) {
-            throw PdpRequestBuilderFeil.FACTORY.ugyldigInputFlereBehandlinger(behandlingUuid.get(), fpsakBehandlingId.get()).toException();
+            throw ugyldigInputFlereBehandlinger(behandlingUuid.get(), fpsakBehandlingId.get());
         }
         if (behandlingId.isPresent() && behandlingUuid.isPresent()) {
-            throw PdpRequestBuilderFeil.FACTORY.ugyldigInputFlereBehandlinger(behandlingId.get(), behandlingUuid.get()).toException();
+            throw ugyldigInputFlereBehandlinger(behandlingId.get(), behandlingUuid.get());
         }
 
         PipBehandlingData behandlingData = null;
@@ -114,7 +110,7 @@ public class FPPdpRequestBuilder implements PdpRequestBuilder {
         if (behandlingDataOpt.isPresent()) {
             return behandlingDataOpt.get();
         } else {
-            throw PdpRequestBuilderFeil.FACTORY.fantIkkeBehandling(behandlingId).toException();
+            throw fantIkkeBehandling(behandlingId);
         }
     }
 
@@ -124,7 +120,7 @@ public class FPPdpRequestBuilder implements PdpRequestBuilder {
         if (behandlingDataOpt.isPresent()) {
             return behandlingDataOpt.get();
         } else {
-            throw PdpRequestBuilderFeil.FACTORY.fantIkkeBehandling(behandlingUuid).toException();
+            throw fantIkkeBehandling(behandlingUuid);
         }
     }
 
@@ -181,7 +177,7 @@ public class FPPdpRequestBuilder implements PdpRequestBuilder {
         } else if (behandlingIder.size() == 1) {
             return Optional.of(behandlingIder.iterator().next());
         }
-        throw PdpRequestBuilderFeil.FACTORY.ugyldigInputFlereBehandlingIder(behandlingIder).toException();
+        throw ugyldigInputFlereBehandlingIder(behandlingIder);
     }
 
     private Optional<UUID> utledBehandlingUuId(AbacAttributtSamling attributter) {
@@ -191,7 +187,7 @@ public class FPPdpRequestBuilder implements PdpRequestBuilder {
         } else if (behandlingUuider.size() == 1) {
             return Optional.of(behandlingUuider.iterator().next());
         }
-        throw PdpRequestBuilderFeil.FACTORY.ugyldigInputFlereBehandlingUuider(behandlingUuider).toException();
+        throw ugyldigInputFlereBehandlingUuider(behandlingUuider);
     }
 
     private Optional<UUID> utledYtelsebehandlingUuid(AbacAttributtSamling attributter) {
@@ -201,7 +197,7 @@ public class FPPdpRequestBuilder implements PdpRequestBuilder {
         } else if (behandlingUuider.size() == 1) {
             return Optional.of(behandlingUuider.iterator().next());
         }
-        throw PdpRequestBuilderFeil.FACTORY.ugyldigInputFlereBehandlingUuid(behandlingUuider).toException();
+        throw ugyldigInputFlereBehandlingUuid(behandlingUuider);
     }
 
     private Set<String> utledAktørIder(AbacAttributtSamling attributter, PipBehandlingData behandlingData) {
@@ -215,37 +211,43 @@ public class FPPdpRequestBuilder implements PdpRequestBuilder {
             resultat.addAll(fpsakPipKlient.hentAktørIderSomString(new Saksnummer(saksnumre.iterator().next())));
         }
         if (saksnumre.size() > 1) {
-            throw PdpRequestBuilderFeil.FACTORY.ugyldigInputFlereSaksnumre(saksnumre).toException();
+            throw ugyldigInputFlereSaksnumre(saksnumre);
         }
         return resultat;
     }
 
-    public interface PdpRequestBuilderFeil extends DeklarerteFeil {
-        PdpRequestBuilderFeil FACTORY = FeilFactory.create(PdpRequestBuilderFeil.class);
 
-        @TekniskFeil(feilkode = "FPT-898315", feilmelding = "Ugyldig input. Støtter bare 0 eller 1 sak, men har %s", logLevel = LogLevel.WARN)
-        Feil ugyldigInputFlereSaksnumre(Collection<String> saksnumre);
-
-        @TekniskFeil(feilkode = "FPT-426124", feilmelding = "Ugyldig input. Støtter bare 0 eller 1 behandling, men har %s", logLevel = LogLevel.WARN)
-        Feil ugyldigInputFlereBehandlingIder(Collection<Long> behandlingId);
-
-        @TekniskFeil(feilkode = "FPT-426125", feilmelding = "Ugyldig input. Støtter bare 0 eller 1 behandling, men har %s", logLevel = LogLevel.WARN)
-        Feil ugyldigInputFlereBehandlingUuider(Collection<UUID> behandlingUuid);
-
-        @TekniskFeil(feilkode = "FPT-651672", feilmelding = "Ugyldig input. Støtter bare 0 eller 1 behandling, men har %s", logLevel = LogLevel.WARN)
-        Feil ugyldigInputFlereBehandlingUuid(Collection<UUID> behandlingId);
-
-        @TekniskFeil(feilkode = "FPT-317633", feilmelding = "Ugyldig input. Støtter bare 0 eller 1 behandling, men har %s og %s", logLevel = LogLevel.WARN)
-        Feil ugyldigInputFlereBehandlinger(Long behandlingId, UUID fpsakUuid);
-
-        @TekniskFeil(feilkode = "FPT-317634", feilmelding = "Ugyldig input. Støtter bare 0 eller 1 behandling, men har %s og %s", logLevel = LogLevel.WARN)
-        Feil ugyldigInputFlereBehandlinger(UUID behandlingUuid, UUID fpsakUuid);
-
-        @TekniskFeil(feilkode = "FPT-426125", feilmelding = "Ugyldig input. Fant ikke behandlingId %s", logLevel = LogLevel.WARN)
-        Feil fantIkkeBehandling(Long behandlingId);
-
-        @TekniskFeil(feilkode = "FPT-426126", feilmelding = "Ugyldig input. Fant ikke behandlingId %s", logLevel = LogLevel.WARN)
-        Feil fantIkkeBehandling(UUID behandlingUuid);
+    private static TekniskException ugyldigInputFlereSaksnumre(Collection<String> saksnumre) {
+        return new TekniskException("FPT-898315", String.format("Ugyldig input. Støtter bare 0 eller 1 sak, men har %s", saksnumre));
     }
+
+    private static TekniskException ugyldigInputFlereBehandlingIder(Collection<Long> behandlingId) {
+        return new TekniskException("FPT-426124", String.format("Ugyldig input. Støtter bare 0 eller 1 behandling, men har %s", behandlingId));
+    }
+
+    private static TekniskException ugyldigInputFlereBehandlingUuider(Collection<UUID> behandlingUuid) {
+        return new TekniskException("FPT-426125", String.format("Ugyldig input. Støtter bare 0 eller 1 behandling, men har %s", behandlingUuid));
+    }
+
+    private static TekniskException ugyldigInputFlereBehandlingUuid(Collection<UUID> behandlingId) {
+        return new TekniskException("FPT-651672", String.format("Ugyldig input. Støtter bare 0 eller 1 behandling, men har %s", behandlingId));
+    }
+
+    private static TekniskException ugyldigInputFlereBehandlinger(Long behandlingId, UUID fpsakUuid) {
+        return new TekniskException("FPT-317633", String.format("Ugyldig input. Støtter bare 0 eller 1 behandling, men har %s og %s", behandlingId, fpsakUuid));
+    }
+
+    private static TekniskException ugyldigInputFlereBehandlinger(UUID behandlingUuid, UUID fpsakUuid) {
+        return new TekniskException("FPT-317634", String.format("Ugyldig input. Støtter bare 0 eller 1 behandling, men har %s og %s", behandlingUuid, fpsakUuid));
+    }
+
+    private static TekniskException fantIkkeBehandling(Long behandlingId) {
+        return new TekniskException("FPT-426125", String.format("Ugyldig input. Fant ikke behandlingId %s", behandlingId));
+    }
+
+    private static TekniskException fantIkkeBehandling(UUID behandlingUuid) {
+        return new TekniskException("FPT-426126", String.format("Ugyldig input. Fant ikke behandlingId %s", behandlingUuid));
+    }
+
 
 }

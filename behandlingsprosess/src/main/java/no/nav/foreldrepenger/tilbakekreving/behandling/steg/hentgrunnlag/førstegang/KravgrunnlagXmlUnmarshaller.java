@@ -5,10 +5,10 @@ import javax.xml.stream.XMLStreamException;
 
 import org.xml.sax.SAXException;
 
+import no.nav.foreldrepenger.xmlutils.JaxbHelper;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlag;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlagMelding;
 import no.nav.vedtak.exception.TekniskException;
-import no.nav.vedtak.xmlutils.JaxbHelper;
 
 public class KravgrunnlagXmlUnmarshaller {
 

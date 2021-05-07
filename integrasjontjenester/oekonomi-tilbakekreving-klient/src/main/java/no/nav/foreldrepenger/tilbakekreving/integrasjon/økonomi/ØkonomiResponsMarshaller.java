@@ -9,6 +9,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakResponse;
+import no.nav.vedtak.exception.TekniskException;
 
 public class ØkonomiResponsMarshaller {
 
@@ -30,7 +31,7 @@ public class ØkonomiResponsMarshaller {
             marshaller.marshal(respons, stringWriter);
             return stringWriter.toString();
         } catch (JAXBException e) {
-            throw ØkonomiResponsFeil.FACTORY.kunneIkkeMarshalleØkonomiResponsXml(behandlingId, e).toException();
+            throw new TekniskException("FPT-113618", String.format("Kunne ikke marshalle respons fra økonomi for behandlingId=%s", behandlingId), e);
         }
     }
 
@@ -39,7 +40,7 @@ public class ØkonomiResponsMarshaller {
             Unmarshaller unmarshaller = getContext().createUnmarshaller();
             return (TilbakekrevingsvedtakResponse) unmarshaller.unmarshal(new StringReader(xml));
         } catch (JAXBException e) {
-            throw ØkonomiResponsFeil.FACTORY.kunneIkkeUnmarshalleØkonomiResponsXml(behandlingId, xmlId, e).toException();
+            throw new TekniskException("FPT-176103", String.format("Kunne ikke unmarshalle respons fra økonomi for behandlingId=%s xmlId=%s", behandlingId, xmlId), e);
         }
     }
 

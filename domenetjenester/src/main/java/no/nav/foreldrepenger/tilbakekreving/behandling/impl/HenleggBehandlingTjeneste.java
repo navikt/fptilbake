@@ -79,7 +79,7 @@ public class HenleggBehandlingTjeneste {
         if (BehandlingType.TILBAKEKREVING.equals(behandling.getType()) &&
             (grunnlagRepository.harGrunnlagForBehandlingId(behandling.getId()) &&
             !erBehandlingOpprettetAutomatiskFørBestemteDager(behandling))) {
-            throw BehandlingFeil.FACTORY.kanIkkeHenleggeBehandling(behandlingId).toException();
+            throw BehandlingFeil.kanIkkeHenleggeBehandling(behandlingId);
         }
         doHenleggBehandling(behandlingId, årsakKode, begrunnelse, fritekst);
     }

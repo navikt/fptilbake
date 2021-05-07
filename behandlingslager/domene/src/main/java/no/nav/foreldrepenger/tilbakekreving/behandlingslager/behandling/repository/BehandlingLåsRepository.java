@@ -60,7 +60,7 @@ public class BehandlingLåsRepository {
         LockModeType lockMode = LockModeType.PESSIMISTIC_FORCE_INCREMENT;
         Object entity = entityManager.find(Behandling.class, id);
         if (entity == null) {
-            throw BehandlingRepositoryFeil.FACTORY.fantIkkeEntitetForLåsing(Behandling.class.getSimpleName(), id).toException();
+            throw BehandlingRepositoryFeil.fantIkkeEntitetForLåsing(Behandling.class.getSimpleName(), id);
         } else {
             entityManager.lock(entity, lockMode);
         }

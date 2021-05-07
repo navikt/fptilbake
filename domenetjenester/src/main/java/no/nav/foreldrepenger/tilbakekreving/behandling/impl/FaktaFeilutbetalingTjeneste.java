@@ -112,7 +112,7 @@ public class FaktaFeilutbetalingTjeneste {
             Henvisning henvisning = kravgrunnlag431.getReferanse();
             eksternBehandling = eksternBehandlingRepository.hentEksisterendeDeaktivert(behandlingId, henvisning);
             if(eksternBehandling.isEmpty()){ // Teknisk Feil: referansen til grunnlaget må finne i EksternBehandling
-                throw BehandlingFeil.FACTORY.fantIkkeBehandlingMedHenvisning(behandlingId, henvisning).toException();
+                throw BehandlingFeil.fantIkkeBehandlingMedHenvisning(behandlingId, henvisning);
             }
             eksternUuid = eksternBehandling.get().getEksternUuid();
         }

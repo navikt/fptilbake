@@ -27,8 +27,10 @@ import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.Gjenop
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.ResponsKanal;
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.BehandlingReferanseAbacAttributter;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
+import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
 
 @Path(value = "/varsel/respons")
 @Produces(value = MediaType.APPLICATION_JSON)
@@ -59,7 +61,8 @@ public class VarselresponsRestTjeneste {
         })
     @Path(value = "/hent-respons")
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
-    public Response finnRespons(@Valid @NotNull @QueryParam("behandlingId") BehandlingReferanse behandlingReferanse) {
+    public Response finnRespons(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
+                                    @Valid @NotNull @QueryParam("behandlingId") BehandlingReferanse behandlingReferanse) {
         Optional<VarselresponsDto> responsDto = responsTjeneste.hentRespons(behandlingReferanse.getBehandlingId()).map(VarselresponsDto::fraDomene);
         if (responsDto.isPresent()) {
             return Response.ok(responsDto.get()).build();

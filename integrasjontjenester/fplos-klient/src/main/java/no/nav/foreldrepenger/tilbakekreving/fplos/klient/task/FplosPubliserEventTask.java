@@ -80,16 +80,15 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
         this.fplosKafkaProducer = fplosKafkaProducer;
 
         switch (applikasjonNavn) {
-            case APPLIKASJON_NAVN_FPTILBAKE:
+            case APPLIKASJON_NAVN_FPTILBAKE -> {
                 fagsystem = Fagsystem.FPTILBAKE.getKode();
                 defaultHRef = FP_DEFAULT_HREF;
-                break;
-            case APPLIKASJON_NAVN_K9_TILBAKE:
+            }
+            case APPLIKASJON_NAVN_K9_TILBAKE -> {
                 fagsystem = Fagsystem.K9TILBAKE.getKode();
                 defaultHRef = K9_DEFAULT_HREF;
-                break;
-            default:
-                throw new IllegalStateException("app.name er satt til " + applikasjonNavn + " som ikke er en støttet verdi");
+            }
+            default -> throw new IllegalStateException("app.name er satt til " + applikasjonNavn + " som ikke er en støttet verdi");
         }
     }
 

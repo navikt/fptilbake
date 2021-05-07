@@ -17,16 +17,12 @@ public enum  ResponsKanal {
     }
 
     public static ResponsKanal getResponsKanal(String kode) {
-        switch (kode) {
-            case "MANU": //$NON-NLS-1$
-                return MANUELL;
-            case "JOUR": //$NON-NLS-1$
-                return JOURNAL;
-            case "SLVB": //$NON-NLS-1$
-                return SELVBETJENING;
-            default:
-                throw new IllegalArgumentException("Ukjent kode: " + kode); //$NON-NLS-1$
-        }
+        return switch (kode) {
+            case "MANU" -> MANUELL;
+            case "JOUR" -> JOURNAL;
+            case "SLVB" -> SELVBETJENING;
+            default -> throw new IllegalArgumentException("Ukjent kode: " + kode); //$NON-NLS-1$
+        };
     }
 
 }

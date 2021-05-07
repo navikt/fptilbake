@@ -68,7 +68,7 @@ public class AvklartVergeTjeneste {
     private AktørId hentAktørId(String fnr) {
         Optional<AktørId> aktørId = tpsTjeneste.hentAktørForFnr(new PersonIdent(fnr));
         if (aktørId.isEmpty()) {
-            throw BehandlingFeil.FACTORY.fantIkkePersonIdentMedFnr().toException();
+            throw BehandlingFeil.fantIkkePersonIdentMedFnr();
         }
         return aktørId.get();
     }

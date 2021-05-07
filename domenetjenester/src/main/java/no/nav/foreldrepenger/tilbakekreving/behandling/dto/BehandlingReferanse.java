@@ -17,10 +17,6 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 
-import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
-import no.nav.vedtak.sikkerhet.abac.AbacDto;
-import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
-
 /**
  * Referanse til en behandling.
  * Enten {@link #id} eller {@link #behandlingUuid} vil være satt.
@@ -29,7 +25,7 @@ import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.PUBLIC_ONLY, fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @JsonInclude(Include.NON_NULL)
-public class BehandlingReferanse implements AbacDto {
+public class BehandlingReferanse {
 
     private static final String NUM_REGEXP = "\\d{1,19}"; // Long
 
@@ -124,12 +120,4 @@ public class BehandlingReferanse implements AbacDto {
         return isLong();
     }
 
-    @Override
-    public AbacDataAttributter abacAttributter() {
-        if (isLong()) {
-            return AbacDataAttributter.opprett().leggTil(StandardAbacAttributtType.BEHANDLING_ID, getBehandlingId());
-        } else {
-            return AbacDataAttributter.opprett().leggTil(StandardAbacAttributtType.BEHANDLING_UUID, getBehandlingUuid());
-        }
-    }
 }

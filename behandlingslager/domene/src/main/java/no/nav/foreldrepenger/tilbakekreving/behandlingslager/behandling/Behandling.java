@@ -47,7 +47,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.Ved
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.BehandlingInfo;
-import no.nav.vedtak.feil.FeilFactory;
+import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
 
 // mapping for BehandlingInfo klassen
@@ -371,7 +371,7 @@ public class Behandling extends BaseEntitet {
         return getAksjonspunkterStream()
             .filter(a -> a.getAksjonspunktDefinisjon().equals(definisjon))
             .findFirst()
-            .orElseThrow(() -> FeilFactory.create(BehandlingFeil.class).aksjonspunktIkkeFunnet(definisjon.getKode()).toException());
+            .orElseThrow(() -> new TekniskException("FPT-473718", String.format("Behandling har ikke aksjonspunkt for definisjon [%s].", definisjon.getKode())));
     }
 
     public List<Aksjonspunkt> getÅpneAksjonspunkter() {
@@ -524,7 +524,7 @@ public class Behandling extends BaseEntitet {
 
     public List<BehandlingÅrsak> getBehandlingÅrsaker() {
         if (this.behandlingÅrsaker.size() > 1) {
-            throw BehandlingFeil.FEILFACTORY.merEnnEnBehandlingsÅrsakFinnes(this.getId()).toException();
+            throw new TekniskException("FPT-473718", String.format("Behandling %s kan ha bare en behandlingsårsak", this.getId()));
         }
         return new ArrayList<>(this.behandlingÅrsaker);
     }

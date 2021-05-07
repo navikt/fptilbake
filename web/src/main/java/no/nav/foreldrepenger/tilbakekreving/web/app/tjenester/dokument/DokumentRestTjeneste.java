@@ -3,6 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.dokument;
 import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.READ;
 
 import java.util.List;
+import java.util.function.Function;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -30,8 +31,12 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.HentForhåndv
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.henleggelse.HenleggelsesbrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.VarselbrevTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.VedtaksbrevTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.BehandlingReferanseAbacAttributter;
+import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.TilbakekrevingAbacAttributtType;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
+import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
+import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
 
 @Path("/dokument")
 @ApplicationScoped
@@ -67,7 +72,7 @@ public class DokumentRestTjeneste {
     @Operation(tags = "dokument", description = "Returnerer en pdf som er en forhåndsvisning av varselbrevet")
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public Response hentForhåndsvisningVarselbrev(
+    public Response hentForhåndsvisningVarselbrev(@TilpassetAbacAttributt(supplierClass = ForhåndsvisningVarselbrev.class)
         @Parameter(description = "Inneholder kode til brevmal og data som skal flettes inn i brevet") @Valid HentForhåndsvisningVarselbrevDto hentForhåndsvisningVarselbrevDto) { // NOSONAR
         byte[] dokument = varselbrevTjeneste.hentForhåndsvisningVarselbrev(hentForhåndsvisningVarselbrevDto);
         Response.ResponseBuilder responseBuilder = lagRespons(dokument);
@@ -81,7 +86,8 @@ public class DokumentRestTjeneste {
     @Operation(tags = "dokument", description = "Returnerer forhåndsvisning av vedtaksbrevet som tekst, slik at det kan vises i GUI for redigering")
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public ForhåndvisningVedtaksbrevTekstDto hentVedtaksbrevForRedigering(@NotNull @QueryParam ("uuid") @Valid BehandlingReferanse behandlingReferanse) { // NOSONAR
+    public ForhåndvisningVedtaksbrevTekstDto hentVedtaksbrevForRedigering(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
+                                                                              @NotNull @QueryParam ("uuid") @Valid BehandlingReferanse behandlingReferanse) { // NOSONAR
         Long behandlingId = hentBehandlingId(behandlingReferanse);
         List<Avsnitt> avsnittene = vedtaksbrevTjeneste.hentForhåndsvisningVedtaksbrevSomTekst(behandlingId);
         return new ForhåndvisningVedtaksbrevTekstDto(avsnittene);
@@ -100,7 +106,7 @@ public class DokumentRestTjeneste {
     @Operation(tags = "dokument", description = "Returnerer en pdf som er en forhåndsvisning av vedtaksbrevet")
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public Response hentForhåndsvisningVedtaksbrev(@Valid @NotNull HentForhåndvisningVedtaksbrevPdfDto vedtaksbrevPdfDto) { // NOSONAR
+    public Response hentForhåndsvisningVedtaksbrev(@TilpassetAbacAttributt(supplierClass = ForhåndvisningVedtaksbrevPdf.class) @Valid @NotNull HentForhåndvisningVedtaksbrevPdfDto vedtaksbrevPdfDto) { // NOSONAR
         byte[] dokument = vedtaksbrevTjeneste.hentForhåndsvisningVedtaksbrevMedVedleggSomPdf(vedtaksbrevPdfDto);
         Response.ResponseBuilder responseBuilder = lagRespons(dokument);
         return responseBuilder.build();
@@ -113,7 +119,7 @@ public class DokumentRestTjeneste {
     @Operation(tags = "dokument", description = "Returnerer en pdf som er en forhåndsvisning av henleggelsesbrevet")
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public Response hentForhåndsvisningHenleggelsesbrev(@Valid @NotNull HentForhåndsvisningHenleggelseslbrevDto henleggelseslbrevDto) { // NOSONAR
+    public Response hentForhåndsvisningHenleggelsesbrev(@TilpassetAbacAttributt(supplierClass = ForhåndsvisningHenleggelseslbrev.class) @Valid @NotNull HentForhåndsvisningHenleggelseslbrevDto henleggelseslbrevDto) { // NOSONAR
         byte[] dokument;
         BehandlingReferanse behandlingReferanse = henleggelseslbrevDto.getBehandlingReferanse();
         String fritekst = henleggelseslbrevDto.getFritekst();
@@ -132,5 +138,34 @@ public class DokumentRestTjeneste {
         responseBuilder.header(CONTENT_DISPOSITION, FILENAME_DOKUMENT_PDF);
         return responseBuilder;
     }
+
+    public static class ForhåndsvisningVarselbrev implements Function<Object, AbacDataAttributter> {
+
+        @Override
+        public AbacDataAttributter apply(Object obj) {
+            var req = (HentForhåndsvisningVarselbrevDto) obj;
+            return AbacDataAttributter.opprett().leggTil(TilbakekrevingAbacAttributtType.YTELSEBEHANDLING_UUID, req.getBehandlingUuid());
+        }
+    }
+
+    public static class ForhåndsvisningHenleggelseslbrev implements Function<Object, AbacDataAttributter> {
+
+        @Override
+        public AbacDataAttributter apply(Object obj) {
+            var req = (HentForhåndsvisningHenleggelseslbrevDto) obj;
+            return BehandlingReferanseAbacAttributter.fraBehandlingReferanse(req.getBehandlingReferanse());
+        }
+    }
+
+    public static class ForhåndvisningVedtaksbrevPdf implements Function<Object, AbacDataAttributter> {
+
+        @Override
+        public AbacDataAttributter apply(Object obj) {
+            var req = (HentForhåndvisningVedtaksbrevPdfDto) obj;
+            return BehandlingReferanseAbacAttributter.fraBehandlingReferanse(req.getBehandlingReferanse());
+        }
+    }
+
+
 
 }

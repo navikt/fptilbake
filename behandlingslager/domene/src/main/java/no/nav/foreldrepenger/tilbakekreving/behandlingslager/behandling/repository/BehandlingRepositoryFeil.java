@@ -1,18 +1,16 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository;
 
-import no.nav.vedtak.feil.Feil;
-import no.nav.vedtak.feil.FeilFactory;
-import no.nav.vedtak.feil.LogLevel;
-import no.nav.vedtak.feil.deklarasjon.DeklarerteFeil;
-import no.nav.vedtak.feil.deklarasjon.TekniskFeil;
+import no.nav.vedtak.exception.TekniskException;
 
-public interface BehandlingRepositoryFeil extends DeklarerteFeil {
-    BehandlingRepositoryFeil FACTORY = FeilFactory.create(BehandlingRepositoryFeil.class);
+public class BehandlingRepositoryFeil  {
 
-    @TekniskFeil(feilkode = "FPT-131239", feilmelding = "Fant ikke entitet for låsing [%s], id=%s.", logLevel = LogLevel.ERROR)
-    Feil fantIkkeEntitetForLåsing(String entityClassName, long id);
 
-    @TekniskFeil(feilkode = "FPT-131240", feilmelding = "Fant ikke BehandlingVedtak, behandlingId=%s.", logLevel = LogLevel.ERROR)
-    Feil fantIkkeBehandlingVedtak(long behandlingId);
+    public static TekniskException fantIkkeEntitetForLåsing(String entityClassName, long id) {
+        return new TekniskException("FPT-131239", String.format("Fant ikke entitet for låsing [%s], id=%s.", entityClassName, id));
+    }
+
+    public static TekniskException fantIkkeBehandlingVedtak(long behandlingId) {
+        return new TekniskException("FPT-131240", String.format("Fant ikke BehandlingVedtak, behandlingId=%s.", behandlingId));
+    }
 
 }

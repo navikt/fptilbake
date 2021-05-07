@@ -12,11 +12,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
-import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
-import no.nav.vedtak.sikkerhet.abac.AbacDto;
 import no.nav.vedtak.util.InputValideringRegex;
 
-public class HentForhåndvisningVedtaksbrevPdfDto implements AbacDto {
+public class HentForhåndvisningVedtaksbrevPdfDto {
 
     @Valid
     @NotNull
@@ -69,8 +67,4 @@ public class HentForhåndvisningVedtaksbrevPdfDto implements AbacDto {
         this.perioderMedTekst = perioderMedTekst;
     }
 
-    @Override
-    public AbacDataAttributter abacAttributter() {
-        return AbacDataAttributter.opprett().leggTil(behandlingReferanse.abacAttributter());
-    }
 }

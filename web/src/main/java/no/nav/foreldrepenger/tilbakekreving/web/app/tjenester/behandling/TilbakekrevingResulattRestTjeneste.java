@@ -18,8 +18,10 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingB
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BeregningResultat;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.BehandlingReferanseAbacAttributter;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
+import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
 
 @Path(TilbakekrevingResulattRestTjeneste.PATH_FRAGMENT)
 @Produces(APPLICATION_JSON)
@@ -46,7 +48,7 @@ public class TilbakekrevingResulattRestTjeneste {
     @Path("/resultat")
     @Operation(tags = "beregning", description = "Henter beregningsresultat for tilbakekreving")
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
-    public BeregningResultat hentBeregningResultat(@QueryParam("uuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
+    public BeregningResultat hentBeregningResultat(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class) @QueryParam("uuid") @NotNull @Valid BehandlingReferanse behandlingReferanse) {
         return tilbakekrevingBeregningTjeneste.beregn(hentBehandlingId(behandlingReferanse));
     }
 
