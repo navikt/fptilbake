@@ -136,7 +136,7 @@ jobs:
 
       - name: Trigg deploy av k9-tilbake til dev-fss/default
         if: success()
-        uses: peter-evans/create-or-update-comment@v1
+        uses: peter-evans/create-or-update-comment@v1.4.5
         with:
           token: ${{ steps.get-token.outputs.token }}
           issue-number: ${{ steps.createdeployissue.outputs.number }}
