@@ -115,7 +115,7 @@ jobs:
             <tr><td>promote</td><td>k9</td><td>prod-fss</td><td>default</td></tr>
             </table>
 
-      - uses: navikt/github-app-token-generator@v1
+      - uses: navikt/github-app-token-generator@v1.1
         id: get-token
         with:
           private-key: ${{ secrets.FP_PRIVATE_KEY }}
