@@ -24,9 +24,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Sjekk ut kode
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2.3.4
 
-      - uses: actions/cache@v2
+      - uses: actions/cache@v2.1.5
         with:
           path: ~/.m2/repository
           key: v2-${{ runner.os }}-maven-${{ hashFiles('pom.xml') }}
@@ -76,7 +76,7 @@ jobs:
           docker push ${IMAGE_BASE_CR} --all-tags
 
       - name: Lukk gamle bygg-issues
-        uses: actions/github-script@v4
+        uses: actions/github-script@v4.0.2
         with:
             github-token: ${{ secrets.GITHUB_TOKEN }}
             script: |
@@ -115,7 +115,7 @@ jobs:
             <tr><td>promote</td><td>k9</td><td>prod-fss</td><td>default</td></tr>
             </table>
 
-      - uses: navikt/github-app-token-generator@v1
+      - uses: navikt/github-app-token-generator@v1.1
         id: get-token
         with:
           private-key: ${{ secrets.FP_PRIVATE_KEY }}
@@ -136,7 +136,7 @@ jobs:
 
       - name: Trigg deploy av k9-tilbake til dev-fss/default
         if: success()
-        uses: peter-evans/create-or-update-comment@v1
+        uses: peter-evans/create-or-update-comment@v1.4.5
         with:
           token: ${{ steps.get-token.outputs.token }}
           issue-number: ${{ steps.createdeployissue.outputs.number }}
