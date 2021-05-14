@@ -37,17 +37,15 @@
             RELEASE-avhengighet UNNTAK: feature-brancher og lokalt -->
         <felles.version>3.2.41</felles.version>
         <prosesstask.version>2.5.18</prosesstask.version>
-        <vl-fpsak-tidsserie.version>2.5.6</vl-fpsak-tidsserie.version>
-        <!-- Kontrakter -->
-        <fpkontrakter.version>5.1-20201118182725-764a023</fpkontrakter.version>
+        <fp-tidsserie.version>2.5.7</fp-tidsserie.version>
+        <fpkontrakter.version>5.2.5</fpkontrakter.version>
+        <fp-jms.version>2.0.21</fp-jms.version>
 
         <surefire.version>2.22.2</surefire.version>
         <metrics.version>4.1.21</metrics.version>
         <prometheus.version>0.10.0</prometheus.version>
         <geronimo.jaspi.version>2.0.0</geronimo.jaspi.version>
         <geronimo.osgi.version>1.1</geronimo.osgi.version>
-        <hamcrest.version>1.3</hamcrest.version>
-        <junit.version>5.7.1</junit.version>
         <logstash.version>6.6</logstash.version>
         <resteasy.version>4.6.0.Final</resteasy.version>
         <ojdbc.version>19.3.0.0</ojdbc.version>
@@ -75,6 +73,10 @@
             <artifactId>jakarta.activation-api</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.sun.activation</groupId>
+            <artifactId>jakarta.activation</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
             <scope>test</scope>
@@ -87,12 +89,6 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
-        </dependency>
-
-        <dependency>
-            <!-- sikrer en bestemt versjon, felles klarte ikke å bestemme seg -->
-            <groupId>com.sun.activation</groupId>
-            <artifactId>jakarta.activation</artifactId>
         </dependency>
     </dependencies>
 
@@ -298,22 +294,9 @@
 
             <!-- Felles biblioteker og sikkerhet -->
             <dependency>
-                <groupId>no.nav.vedtak.felles</groupId>
+                <groupId>no.nav.vedtak.felles.familie-jms-integrasjon</groupId>
                 <artifactId>jms-integrasjon</artifactId>
-                <version>2.0.0</version>
-
-                <exclusions>
-                    <exclusion>
-                        <!-- denne drar inn en versjon som ikke fungerer i prod p.t. -->
-                        <groupId>com.ibm.mq</groupId>
-                        <artifactId>com.ibm.mq.allclient</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>com.ibm.mq</groupId>
-                <artifactId>com.ibm.mq.allclient</artifactId>
-                <version>9.2.2.0</version>
+                <version>${fp-jms.version}</version>
             </dependency>
             <dependency>
                 <groupId>no.nav.foreldrepenger.felles</groupId>
@@ -343,7 +326,7 @@
             <dependency>
                 <groupId>no.nav.fpsak.tidsserie</groupId>
                 <artifactId>fpsak-tidsserie</artifactId>
-                <version>2.0_20180831125757_006dad2</version>
+                <version>${fp-tidsserie.version}</version>
             </dependency>
 
             <!-- felles kontrakter -->
@@ -550,23 +533,6 @@
                 <artifactId>geronimo-osgi-locator</artifactId>
                 <version>${geronimo.osgi.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.junit.jupiter</groupId>
-                <artifactId>junit-jupiter-api</artifactId>
-                <version>${junit.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.junit.jupiter</groupId>
-                <artifactId>junit-jupiter-params</artifactId>
-                <version>${junit.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-core</artifactId>
-                <version>3.9.0</version>
-            </dependency>
 
             <!-- 3dje parts biblioteker -->
 
@@ -632,15 +598,10 @@
             <dependency>
                 <groupId>com.sun.xml.bind</groupId>
                 <artifactId>jaxb-core</artifactId>
-                <version>3.0.0</version>
+                <version>3.0.1</version>
             </dependency>
 
             <!-- logging -->
-            <dependency>
-                <groupId>ch.qos.logback</groupId>
-                <artifactId>logback-classic</artifactId>
-                <version>1.2.3</version>
-            </dependency>
             <dependency>
                 <groupId>com.papertrailapp</groupId>
                 <artifactId>logback-syslog4j</artifactId>
@@ -651,12 +612,6 @@
                 <artifactId>logstash-logback-encoder</artifactId>
                 <version>${logstash.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>jul-to-slf4j</artifactId>
-                <version>1.7.30</version>
-            </dependency>
-
             <dependency>
                 <groupId>org.hibernate.validator</groupId>
                 <artifactId>hibernate-validator</artifactId>
@@ -761,8 +716,7 @@
                     <configuration>
                         <useFile>true</useFile>
                         <argLine>-XX:+TieredCompilation -XX:TieredStopAtLevel=1 -Xms256m -Dfile.encoding=UTF-8
-                            -Dlog.level.no.nav=WARN --illegal-access=warn
-                        </argLine>
+                            -Dlog.level.no.nav=WARN --illegal-access=permit</argLine>
                     </configuration>
                 </plugin>
                 <plugin>

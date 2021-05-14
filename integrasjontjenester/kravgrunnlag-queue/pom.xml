@@ -18,12 +18,8 @@
             <artifactId>felles-bom</artifactId>
         </dependency>
         <dependency>
-            <groupId>no.nav.vedtak.felles</groupId>
+            <groupId>no.nav.vedtak.felles.familie-jms-integrasjon</groupId>
             <artifactId>jms-integrasjon</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.ibm.mq</groupId>
-            <artifactId>com.ibm.mq.allclient</artifactId>
         </dependency>
 
     </dependencies>
