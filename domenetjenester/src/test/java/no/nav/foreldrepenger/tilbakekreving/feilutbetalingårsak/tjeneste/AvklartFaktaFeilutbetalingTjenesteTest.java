@@ -46,7 +46,7 @@ public class AvklartFaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
         scenario.leggTilAksjonspunkt(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING, BehandlingStegType.FAKTA_FEILUTBETALING);
         nyBehandling = scenario.lagre(repoProvider);
         var historikkInnslagKonverter = new HistorikkInnslagKonverter(
-            repoProvider.getAksjonspunktRepository());
+            repoProvider.getAksjonspunktRepository(), behandlingRepository);
         historikkTjenesteAdapter = new HistorikkTjenesteAdapter(historikkRepository, historikkInnslagKonverter);
         avklartFaktaFeilutbetalingTjeneste = new AvklartFaktaFeilutbetalingTjeneste(faktaFeilutbetalingRepository, historikkTjenesteAdapter);
     }

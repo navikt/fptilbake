@@ -47,6 +47,11 @@ public class HentForhåndvisningVedtaksbrevPdfDto {
 
     @JsonSetter("uuid")
     @JsonProperty(value = "behandlingReferanse")
+    public void setUuid(BehandlingReferanse behandlingReferanse) {
+        this.behandlingReferanse = behandlingReferanse;
+    }
+
+    @JsonSetter("behandlingUuid")
     public void setBehandlingUuid(BehandlingReferanse behandlingReferanse) {
         this.behandlingReferanse = behandlingReferanse;
     }

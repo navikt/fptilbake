@@ -81,7 +81,6 @@ import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
 import no.nav.vedtak.sikkerhet.context.SubjectHandler;
-import no.nav.vedtak.util.env.Environment;
 
 @Path(BehandlingRestTjeneste.PATH_FRAGMENT)
 @Produces(APPLICATION_JSON)
@@ -170,21 +169,13 @@ public class BehandlingRestTjeneste {
             Behandling behandling = behandlingTjeneste.hentBehandling(behandlingId);
             return Redirect.tilBehandlingPollStatus(behandling.getUuid(), Optional.empty());
         } else if (BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandlingType)) {
-//            validerAktivertFunksjonalitetForRevurdering(opprettBehandlingDto);
-            Long tbkBehandlingId = opprettBehandlingDto.getBehandlingId();
+            Long tbkBehandlingId = opprettBehandlingDto.getBehandlingId() == null ? behandlingTjeneste.hentBehandlingId(opprettBehandlingDto.getBehandlingUuid())
+                : opprettBehandlingDto.getBehandlingId();
             Behandling revurdering = revurderingTjeneste.opprettRevurdering(tbkBehandlingId, opprettBehandlingDto.getBehandlingArsakType());
             String gruppe = behandlingskontrollAsynkTjeneste.asynkProsesserBehandling(revurdering);
             return Redirect.tilBehandlingPollStatus(revurdering.getUuid(), Optional.of(gruppe));
         }
         return Response.ok().build();
-    }
-
-    static void validerAktivertFunksjonalitetForRevurdering(OpprettBehandlingDto dto) {
-        if (Environment.current().isProd()
-            && dto.getBehandlingType() == BehandlingType.REVURDERING_TILBAKEKREVING
-            && dto.getBehandlingArsakType() == BehandlingÅrsakType.RE_FEILUTBETALT_BELØP_HELT_ELLER_DELVIS_BORTFALT) {
-            throw new IllegalArgumentException("Behandlingsårsaken 'Feilutbetalt beløp helt eller delvis bortfalt' er ikke lansert enda. Forvent at funksjonaliteten kan tas i bruk i løpet av uke 45 i 2020.");
-        }
     }
 
     @GET
@@ -268,7 +259,8 @@ public class BehandlingRestTjeneste {
         description = "Henlegger behandling")
     @BeskyttetRessurs(action = UPDATE, property = AbacProperty.FAGSAK)
     public void henleggBehandling(@Parameter(description = "Henleggelse årsak") @Valid HenleggBehandlingDto dto) {
-        Long behandlingId = dto.getBehandlingId();
+        Long behandlingId = dto.getBehandlingId() == null ? behandlingTjeneste.hentBehandlingId(dto.getBehandlingUuid())
+            : dto.getBehandlingId();
         behandlingTjeneste.kanEndreBehandling(behandlingId, dto.getBehandlingVersjon());
         BehandlingResultatType årsakKode = tilHenleggBehandlingResultatType(dto.getÅrsakKode());
         henleggBehandlingTjeneste.henleggBehandlingManuelt(behandlingId, årsakKode, dto.getBegrunnelse(), dto.getFritekst());
@@ -289,8 +281,10 @@ public class BehandlingRestTjeneste {
     @BeskyttetRessurs(action = UPDATE, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public void settBehandlingPaVent(@Parameter(description = "Frist for behandling på vent") @Valid SettBehandlingPåVentDto dto) {
-        behandlingTjeneste.kanEndreBehandling(dto.getBehandlingId(), dto.getBehandlingVersjon());
-        behandlingTjeneste.settBehandlingPaVent(dto.getBehandlingId(), dto.getFrist(), dto.getVentearsak());
+        var behandlingId = dto.getBehandlingId() == null ? behandlingTjeneste.hentBehandlingId(dto.getBehandlingUuid())
+            : dto.getBehandlingId();
+        behandlingTjeneste.kanEndreBehandling(behandlingId, dto.getBehandlingVersjon());
+        behandlingTjeneste.settBehandlingPaVent(behandlingId, dto.getFrist(), dto.getVentearsak());
     }
 
 
@@ -302,9 +296,10 @@ public class BehandlingRestTjeneste {
         description = "Endrer ventefrist for behandling på vent")
     @BeskyttetRessurs(action = UPDATE, property = AbacProperty.VENTEFRIST)
     public void endreBehandlingPåVent(@Parameter(description = "Frist for behandling på vent") @Valid SettBehandlingPåVentDto dto) {
+        var behandling = dto.getBehandlingUuid() == null ? behandlingTjeneste.hentBehandling(dto.getBehandlingId())
+            : behandlingTjeneste.hentBehandling(dto.getBehandlingUuid());
         behandlingTjeneste.kanEndreBehandling(dto.getBehandlingId(), dto.getBehandlingVersjon());
-        behandlingTjeneste.endreBehandlingPåVent(dto.getBehandlingId(), dto.getFrist(), dto.getVentearsak());
-        Behandling behandling = behandlingTjeneste.hentBehandling(dto.getBehandlingId());
+        behandlingTjeneste.endreBehandlingPåVent(behandling, dto.getFrist(), dto.getVentearsak());
         fristenEndretEventPubliserer.fireEvent(behandling, LocalDateTime.of(dto.getFrist(), LocalDateTime.now().toLocalTime()));
     }
 
@@ -434,7 +429,8 @@ public class BehandlingRestTjeneste {
     @BeskyttetRessurs(action = UPDATE, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
     public void byttBehandlendeEnhet(@Parameter(description = "Ny enhet som skal byttes") @Valid ByttBehandlendeEnhetDto dto) {
-        Long behandlingId = dto.getBehandlingId();
+        Long behandlingId = dto.getBehandlingId() == null ? behandlingTjeneste.hentBehandlingId(dto.getBehandlingUuid())
+            : dto.getBehandlingId();
         Long behandlingVersjon = dto.getBehandlingVersjon();
         behandlingTjeneste.kanEndreBehandling(behandlingId, behandlingVersjon);
 

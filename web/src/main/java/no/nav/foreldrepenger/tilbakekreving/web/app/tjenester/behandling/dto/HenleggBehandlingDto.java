@@ -1,5 +1,8 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto;
 
+import java.util.UUID;
+
+import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -12,10 +15,13 @@ import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
 import no.nav.vedtak.util.InputValideringRegex;
 
 public class HenleggBehandlingDto implements AbacDto {
-    @NotNull
+
     @Min(0)
     @Max(Long.MAX_VALUE)
     private Long behandlingId;
+
+    @Valid
+    private UUID behandlingUuid;
 
     @NotNull
     @Size(min = 1, max = 100)
@@ -40,6 +46,14 @@ public class HenleggBehandlingDto implements AbacDto {
 
     public void setBehandlingId(Long behandlingId) {
         this.behandlingId = behandlingId;
+    }
+
+    public UUID getBehandlingUuid() {
+        return behandlingUuid;
+    }
+
+    public void setBehandlingUuid(UUID behandlingUuid) {
+        this.behandlingUuid = behandlingUuid;
     }
 
     public String getÅrsakKode() {
@@ -76,7 +90,14 @@ public class HenleggBehandlingDto implements AbacDto {
 
     @Override
     public AbacDataAttributter abacAttributter() {
-        return AbacDataAttributter.opprett().leggTil(StandardAbacAttributtType.BEHANDLING_ID, behandlingId);
+        var attributter = AbacDataAttributter.opprett();
+        if (behandlingId != null) {
+            attributter.leggTil(StandardAbacAttributtType.BEHANDLING_ID, behandlingId);
+        }
+        if (behandlingUuid != null) {
+            attributter.leggTil(StandardAbacAttributtType.BEHANDLING_UUID, behandlingUuid);
+        }
+        return attributter;
     }
 
 }

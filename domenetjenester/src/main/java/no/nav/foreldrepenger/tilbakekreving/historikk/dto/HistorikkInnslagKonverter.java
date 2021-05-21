@@ -7,6 +7,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagDokumentLink;
 
@@ -14,18 +15,24 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 public class HistorikkInnslagKonverter {
 
     private AksjonspunktRepository aksjonspunktRepository;
+    private BehandlingRepository behandlingRepository;
+
+    @Inject
+    public HistorikkInnslagKonverter(AksjonspunktRepository aksjonspunktRepository,
+                                     BehandlingRepository behandlingRepository) {
+        this.aksjonspunktRepository = aksjonspunktRepository;
+        this.behandlingRepository = behandlingRepository;
+    }
 
     public HistorikkInnslagKonverter() {// NOSONAR
     }
 
-    @Inject
-    public HistorikkInnslagKonverter(AksjonspunktRepository aksjonspunktRepository) {
-        this.aksjonspunktRepository = aksjonspunktRepository;
-    }
-
     public HistorikkinnslagDto mapFra(Historikkinnslag historikkinnslag) {
         HistorikkinnslagDto dto = new HistorikkinnslagDto();
-        dto.setBehandlingId(historikkinnslag.getBehandlingId());
+        if (historikkinnslag.getBehandlingId() != null) {
+            dto.setBehandlingId(historikkinnslag.getBehandlingId());
+            dto.setBehandlingUuid(behandlingRepository.hentBehandling(historikkinnslag.getBehandlingId()).getUuid());
+        }
         List<HistorikkinnslagDelDto> historikkinnslagDeler = HistorikkinnslagDelDto.mapFra(historikkinnslag.getHistorikkinnslagDeler(), aksjonspunktRepository);
         dto.setHistorikkinnslagDeler(historikkinnslagDeler);
         List<HistorikkInnslagDokumentLinkDto> dokumentLinks = mapLenker(historikkinnslag.getDokumentLinker());

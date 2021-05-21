@@ -112,13 +112,12 @@ public class BehandlingTjeneste {
         doSetBehandlingPåVent(behandlingsId, aksjonspunktDefinisjon, frist, venteårsak);
     }
 
-    public void endreBehandlingPåVent(Long behandlingId, LocalDate frist, Venteårsak venteårsak) {
-        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
+    public void endreBehandlingPåVent(Behandling behandling, LocalDate frist, Venteårsak venteårsak) {
         if (!behandling.isBehandlingPåVent()) {
-            throw BehandlingFeil.kanIkkeEndreVentefristForBehandlingIkkePaVent(behandlingId);
+            throw BehandlingFeil.kanIkkeEndreVentefristForBehandlingIkkePaVent(behandling.getId());
         }
         AksjonspunktDefinisjon aksjonspunktDefinisjon = behandling.getBehandlingPåVentAksjonspunktDefinisjon();
-        doSetBehandlingPåVent(behandlingId, aksjonspunktDefinisjon, frist, venteårsak);
+        doSetBehandlingPåVent(behandling.getId(), aksjonspunktDefinisjon, frist, venteårsak);
     }
 
     public Behandling hentBehandling(Long behandlingId) {

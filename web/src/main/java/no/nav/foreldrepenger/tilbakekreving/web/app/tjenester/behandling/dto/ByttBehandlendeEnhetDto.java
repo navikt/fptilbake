@@ -1,5 +1,8 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto;
 
+import java.util.UUID;
+
+import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -12,11 +15,12 @@ import no.nav.vedtak.sikkerhet.abac.AbacDto;
 import no.nav.vedtak.util.InputValideringRegex;
 
 public class ByttBehandlendeEnhetDto implements AbacDto {
-    @NotNull
     @Min(0)
     @Max(Long.MAX_VALUE)
-    // TODO (BehandlingIdDto): bør kunne støtte behandlingUuid også?
     private Long behandlingId;
+
+    @Valid
+    private UUID behandlingUuid;
 
     @Size(min = 1, max = 256)
     @Pattern(regexp = InputValideringRegex.FRITEKST)
@@ -36,6 +40,14 @@ public class ByttBehandlendeEnhetDto implements AbacDto {
 
     public void setBehandlingId(Long behandlingId) {
         this.behandlingId = behandlingId;
+    }
+
+    public UUID getBehandlingUuid() {
+        return behandlingUuid;
+    }
+
+    public void setBehandlingUuid(UUID behandlingUuid) {
+        this.behandlingUuid = behandlingUuid;
     }
 
     public String getEnhetId() {
@@ -60,6 +72,13 @@ public class ByttBehandlendeEnhetDto implements AbacDto {
 
     @Override
     public AbacDataAttributter abacAttributter() {
-        return AbacDataAttributter.opprett().leggTil(AppAbacAttributtType.BEHANDLING_ID, behandlingId);
+        var attributter = AbacDataAttributter.opprett();
+        if (behandlingId != null) {
+            attributter.leggTil(AppAbacAttributtType.BEHANDLING_ID, behandlingId);
+        }
+        if (behandlingUuid != null) {
+            attributter.leggTil(AppAbacAttributtType.BEHANDLING_UUID, behandlingUuid);
+        }
+        return attributter;
     }
 }

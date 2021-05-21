@@ -30,6 +30,7 @@ public class BehandlingReferanse {
     private static final String NUM_REGEXP = "\\d{1,19}"; // Long
 
     public static final String NAME = "behandlingId";
+    public static final String ALTERNATIVE_NAME = "behandlingUuid";
 
     /**
      * Behandling Id - legacy Long, ny UUID.
@@ -95,6 +96,11 @@ public class BehandlingReferanse {
     public void setBehandlingId(String behandlingId) {
         this.id = Objects.requireNonNull(behandlingId, NAME);
         validerLongEllerUuid();
+    }
+
+    @JsonSetter(ALTERNATIVE_NAME)
+    public void setBehandlingUuid(String behandlingUuid) {
+        setBehandlingId(behandlingUuid);
     }
 
     @Override
