@@ -40,6 +40,10 @@ public class OpprettBehandlingDto implements AbacDto {
     @Max(Long.MAX_VALUE)
     private Long behandlingId;
 
+    //Gjelder kun for Tilbakekrevingsrevurdering
+    @Valid
+    private UUID behandlingUuid;
+
     public OpprettBehandlingDto() {
         // For CDI
     }
@@ -92,6 +96,14 @@ public class OpprettBehandlingDto implements AbacDto {
         this.behandlingId = behandlingId;
     }
 
+    public UUID getBehandlingUuid() {
+        return behandlingUuid;
+    }
+
+    public void setBehandlingUuid(UUID behandlingUuid) {
+        this.behandlingUuid = behandlingUuid;
+    }
+
     @Override
     public AbacDataAttributter abacAttributter() {
         if (getBehandlingType().equals(BehandlingType.TILBAKEKREVING)) {
@@ -99,8 +111,14 @@ public class OpprettBehandlingDto implements AbacDto {
                 .leggTil(saksnummer.abacAttributter())
                 .leggTil(TilbakekrevingAbacAttributtType.YTELSEBEHANDLING_UUID, eksternUuid);
         } else if (getBehandlingType().equals(BehandlingType.REVURDERING_TILBAKEKREVING)) {
-            return AbacDataAttributter.opprett()
-                .leggTil(StandardAbacAttributtType.BEHANDLING_ID, getBehandlingId());
+            var attributter = AbacDataAttributter.opprett();
+            if (behandlingId != null) {
+                attributter.leggTil(StandardAbacAttributtType.BEHANDLING_ID, behandlingId);
+            }
+            if (behandlingUuid != null) {
+                attributter.leggTil(StandardAbacAttributtType.BEHANDLING_UUID, behandlingUuid);
+            }
+            return attributter;
         }
         return AbacDataAttributter.opprett();
     }

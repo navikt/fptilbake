@@ -56,6 +56,12 @@ public class BekreftedeAksjonspunkterDto implements AbacDto {
 
     @JsonSetter("uuid")
     @JsonProperty(value = "behandlingReferanse")
+    public void setUuid(BehandlingReferanse behandlingReferanse) {
+        this.behandlingReferanse = behandlingReferanse;
+    }
+
+    @JsonSetter("behandlingUuid")
+    @JsonProperty(value = "behandlingReferanse")
     public void setBehandlingUuid(BehandlingReferanse behandlingReferanse) {
         this.behandlingReferanse = behandlingReferanse;
     }

@@ -162,7 +162,8 @@ public abstract class FellesTestOppsett {
         prosessTaskRepository = new ProsessTaskRepositoryImpl(entityManager, null, null);
         kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repoProvider, gjenopptaBehandlingTjeneste, behandlingskontrollTjeneste, mockSlettGrunnlagEventPubliserer);
         kravgrunnlagBeregningTjeneste = new KravgrunnlagBeregningTjeneste(grunnlagRepository);
-        historikkInnslagKonverter = new HistorikkInnslagKonverter(repoProvider.getAksjonspunktRepository());
+        historikkInnslagKonverter = new HistorikkInnslagKonverter(repoProvider.getAksjonspunktRepository(),
+                behandlingRepository);
         historikkTjenesteAdapter = new HistorikkTjenesteAdapter(historikkRepository, historikkInnslagKonverter);
         vurdertForeldelseTjeneste = new VurdertForeldelseTjeneste(repoProvider, historikkTjenesteAdapter, kravgrunnlagBeregningTjeneste);
         vilkårsvurderingHistorikkInnslagTjeneste = new VilkårsvurderingHistorikkInnslagTjeneste(historikkTjenesteAdapter, repoProvider);

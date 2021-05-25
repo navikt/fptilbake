@@ -134,7 +134,8 @@ public class AutomatiskSaksbehandlingProsessTaskTest {
         BehandlingKandidaterRepository behandlingKandidaterRepository = new BehandlingKandidaterRepository(
             fellesQueriesForBehandlingRepositories);
         InternalManipulerBehandling manipulerBehandling = new InternalManipulerBehandling(repositoryProvider);
-        HistorikkInnslagKonverter historikkInnslagKonverter = new HistorikkInnslagKonverter(aksjonspunktRepository);
+        HistorikkInnslagKonverter historikkInnslagKonverter = new HistorikkInnslagKonverter(aksjonspunktRepository,
+                behandlingRepository);
         historikkTjenesteAdapter = new HistorikkTjenesteAdapter(repositoryProvider.getHistorikkRepository(),
             historikkInnslagKonverter);
         AvklartFaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste = new AvklartFaktaFeilutbetalingTjeneste(

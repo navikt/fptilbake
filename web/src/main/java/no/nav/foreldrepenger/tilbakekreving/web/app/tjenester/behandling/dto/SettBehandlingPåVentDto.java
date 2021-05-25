@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
@@ -13,10 +14,12 @@ import no.nav.vedtak.sikkerhet.abac.AbacDto;
 import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
 
 public class SettBehandlingPåVentDto implements AbacDto {
-    @NotNull
     @Min(0)
     @Max(Long.MAX_VALUE)
     private Long behandlingId;
+
+    @Valid
+    private UUID behandlingUuid;
 
     @NotNull
     @Min(0)
@@ -34,6 +37,14 @@ public class SettBehandlingPåVentDto implements AbacDto {
 
     public void setBehandlingId(Long behandlingId) {
         this.behandlingId = behandlingId;
+    }
+
+    public UUID getBehandlingUuid() {
+        return behandlingUuid;
+    }
+
+    public void setBehandlingUuid(UUID behandlingUuid) {
+        this.behandlingUuid = behandlingUuid;
     }
 
     public Long getBehandlingVersjon() {
@@ -62,7 +73,14 @@ public class SettBehandlingPåVentDto implements AbacDto {
 
     @Override
     public AbacDataAttributter abacAttributter() {
-        return AbacDataAttributter.opprett().leggTil(StandardAbacAttributtType.BEHANDLING_ID, behandlingId);
+        var attributter = AbacDataAttributter.opprett();
+        if (behandlingId != null) {
+            attributter.leggTil(StandardAbacAttributtType.BEHANDLING_ID, behandlingId);
+        }
+        if (behandlingUuid != null) {
+            attributter.leggTil(StandardAbacAttributtType.BEHANDLING_UUID, behandlingUuid);
+        }
+        return attributter;
     }
 
 }
