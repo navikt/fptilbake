@@ -22,6 +22,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingFeil;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
@@ -52,15 +53,19 @@ public class GrunnlagRestTestTjenesteLocalDev {
 
     private PersoninfoAdapter tpsTjeneste;
     private KravgrunnlagTjeneste kravgrunnlagTjeneste;
+    private BehandlingRepository behandlingRepository;
+
+    @Inject
+    public GrunnlagRestTestTjenesteLocalDev(PersoninfoAdapter tpsTjeneste,
+                                            KravgrunnlagTjeneste kravgrunnlagTjeneste,
+                                            BehandlingRepository behandlingRepository) {
+        this.tpsTjeneste = tpsTjeneste;
+        this.kravgrunnlagTjeneste = kravgrunnlagTjeneste;
+        this.behandlingRepository = behandlingRepository;
+    }
 
     public GrunnlagRestTestTjenesteLocalDev() {
         //for CDI proxy
-    }
-
-    @Inject
-    public GrunnlagRestTestTjenesteLocalDev(PersoninfoAdapter tpsTjeneste, KravgrunnlagTjeneste kravgrunnlagTjeneste) {
-        this.tpsTjeneste = tpsTjeneste;
-        this.kravgrunnlagTjeneste = kravgrunnlagTjeneste;
     }
 
     @POST
@@ -97,7 +102,7 @@ public class GrunnlagRestTestTjenesteLocalDev {
     private Kravgrunnlag431 lagKravgrunnlag431(DetaljertKravgrunnlagDto kravgrunnlagDto) {
         return Kravgrunnlag431.builder()
             .medEksternKravgrunnlagId(kravgrunnlagDto.getKravgrunnlagId().toString())
-            .medVedtakId(kravgrunnlagDto.getVedtakId())
+            .medVedtakId(vedtakId(kravgrunnlagDto))
             .medKravStatusKode(KravStatusKode.fraKode(kravgrunnlagDto.getKravStatusKode()))
             .medFagomraadeKode(FagOmrådeKode.fraKode(kravgrunnlagDto.getFagOmrådeKode()))
             .medFagSystemId(kravgrunnlagDto.getFagSystemId())
@@ -116,6 +121,11 @@ public class GrunnlagRestTestTjenesteLocalDev {
             .medSaksBehId(kravgrunnlagDto.getSaksBehId())
             .medReferanse(new Henvisning(kravgrunnlagDto.getReferanse()))
             .build();
+    }
+
+    private Long vedtakId(DetaljertKravgrunnlagDto kravgrunnlagDto) {
+        return kravgrunnlagDto.getVedtakUuid() != null ? behandlingRepository.hentBehandling(kravgrunnlagDto.getVedtakUuid()).getId()
+            : kravgrunnlagDto.getVedtakId();
     }
 
     private KravgrunnlagPeriode432 lagKravgrunnlagPeriode432(Kravgrunnlag431 kravgrunnlag431, DetaljertKravgrunnlagPeriodeDto periodeDto) {

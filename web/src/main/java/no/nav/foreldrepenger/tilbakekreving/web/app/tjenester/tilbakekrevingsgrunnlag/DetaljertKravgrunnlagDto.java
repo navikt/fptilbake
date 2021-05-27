@@ -3,6 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.tilbakekrevingsgr
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
@@ -17,11 +18,12 @@ import no.nav.vedtak.util.InputValideringRegex;
 
 public class DetaljertKravgrunnlagDto implements AbacDto {
 
-
-    @NotNull
     @Min(1)
     @Max(Long.MAX_VALUE)
     private Long vedtakId;
+
+    @Valid
+    private UUID vedtakUuid;
 
     @NotNull
     @Min(0)
@@ -112,6 +114,10 @@ public class DetaljertKravgrunnlagDto implements AbacDto {
 
     public Long getVedtakId() {
         return vedtakId;
+    }
+
+    public UUID getVedtakUuid() {
+        return vedtakUuid;
     }
 
     public void setVedtakId(Long vedtakId) {
