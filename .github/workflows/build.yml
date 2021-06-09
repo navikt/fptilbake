@@ -1,4 +1,4 @@
-name: Bygg og deploy Fptilbake
+name: Bygg og deploy
 
 on:
   push:
