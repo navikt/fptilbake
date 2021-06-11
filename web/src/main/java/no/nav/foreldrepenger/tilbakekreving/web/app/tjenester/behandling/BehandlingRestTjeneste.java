@@ -298,7 +298,7 @@ public class BehandlingRestTjeneste {
     public void endreBehandlingPåVent(@Parameter(description = "Frist for behandling på vent") @Valid SettBehandlingPåVentDto dto) {
         var behandling = dto.getBehandlingUuid() == null ? behandlingTjeneste.hentBehandling(dto.getBehandlingId())
             : behandlingTjeneste.hentBehandling(dto.getBehandlingUuid());
-        behandlingTjeneste.kanEndreBehandling(dto.getBehandlingId(), dto.getBehandlingVersjon());
+        behandlingTjeneste.kanEndreBehandling(behandling.getId(), dto.getBehandlingVersjon());
         behandlingTjeneste.endreBehandlingPåVent(behandling, dto.getFrist(), dto.getVentearsak());
         fristenEndretEventPubliserer.fireEvent(behandling, LocalDateTime.of(dto.getFrist(), LocalDateTime.now().toLocalTime()));
     }
