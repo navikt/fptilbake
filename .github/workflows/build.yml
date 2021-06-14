@@ -13,8 +13,7 @@ on:
       - 'web-dev/**'
 
 env:
-  IMAGE_BASE: docker.pkg.github.com/${{ github.repository }}/fptilbake
-  IMAGE_BASE_CR: ghcr.io/${{ github.repository }}
+  IMAGE_BASE: ghcr.io/${{ github.repository }}
   GITHUB_USERNAME: x-access-token
   GITHUB_PASSWORD: ${{ secrets.GH_ACCESS_TOKEN }} # NB: må ha PAT pga avhengighet mot private repo: familie-jms-integrasjon
   TZ: "Europe/Oslo"
@@ -73,11 +72,9 @@ jobs:
           echo "TAG=$(mvn help:evaluate --batch-mode --settings ./.m2/settings.xml --file .flattened -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
 
       - name: Bygg og push docker-image for distribuering
-        run: | # Fjern publisering av image til docker.pkg.github.com når avhengighetene er fjernet!
-          docker build --pull --tag ${IMAGE_BASE}:${TAG} --tag ${IMAGE_BASE}:latest --tag ${IMAGE_BASE_CR}:${TAG} --tag ${IMAGE_BASE_CR}:latest . | awk '{ print strftime("[%Y-%m-%d %H:%M:%S]"), $0 }'
-          echo "$GITHUB_PASSWORD" | docker login --username "$GITHUB_USERNAME" --password-stdin https://docker.pkg.github.com
+        run: |
+          docker build --pull --tag ${IMAGE_BASE}:${TAG} --tag ${IMAGE_BASE}:latest . | awk '{ print strftime("[%Y-%m-%d %H:%M:%S]"), $0 }'
           docker push ${IMAGE_BASE} --all-tags
-          docker push ${IMAGE_BASE_CR} --all-tags
 
       - name: Lukk gamle bygg-issues
         uses: actions/github-script@v4.0.2
