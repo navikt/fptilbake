@@ -1,7 +1,7 @@
 name: Bygg pull request
 
 on:
-  pull_request_target:
+  pull_request:
     paths-ignore:
       - '.gitignore'
       - '**.editorconfig'
@@ -11,7 +11,7 @@ on:
 
 env:
   GITHUB_USERNAME: x-access-token
-  GITHUB_PASSWORD: ${{ secrets.GH_ACCESS_TOKEN }} # Cannot use GITHUB_TOKEN: https://github.community/t/github-token-cannot-access-private-packages/16621#M2148
+  GITHUB_PASSWORD: ${{ secrets.GITHUB_TOKEN }} # Cannot use GITHUB_TOKEN: https://github.community/t/github-token-cannot-access-private-packages/16621#M2148
   TZ: "Europe/Oslo"
 
 jobs:
@@ -19,8 +19,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-        with:
-          ref: ${{github.event.pull_request.head.ref}}
       - uses: actions/cache@v2.1.6
         with:
           path: ~/.m2/repository
