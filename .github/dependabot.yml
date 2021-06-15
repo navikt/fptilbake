@@ -17,10 +17,8 @@ updates:
     ignore:
       - dependency-name: "no.nav.vedtak.prosesstask:*"
         versions: ["x", "x.x"]
-    ignore:
       - dependency-name: "no.nav.foreldrepenger.felles:*"
         versions: ["x", "x.x"]
-    ignore:
       - dependency-name: "no.nav.foreldrepenger.kontrakter:*"
         versions: ["x", "x.x"]
 
