@@ -1,7 +1,7 @@
 name: Bygg pull request
 
 on:
-  pull_request:
+  pull_request_target:
     paths-ignore:
       - '.gitignore'
       - '**.editorconfig'
@@ -19,6 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: ${{github.event.pull_request.head.ref}}
       - uses: actions/cache@v2.1.6
         with:
           path: ~/.m2/repository
