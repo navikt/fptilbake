@@ -224,7 +224,7 @@ public class BehandlingTjeneste {
 
         Behandling behandling = Behandling.nyBehandlingFor(fagsak, behandlingType)
             .medManueltOpprettet(manueltOpprettet).build();
-        OrganisasjonsEnhet organisasjonsEnhet = new OrganisasjonsEnhet(eksternBehandlingsinfoDto.getBehandlendeEnhetId(), eksternBehandlingsinfoDto.getBehandlendeEnhetNavn());
+        OrganisasjonsEnhet organisasjonsEnhet = hentEnhetFraEksternBehandling(eksternBehandlingsinfoDto);
         behandling.setBehandlendeOrganisasjonsEnhet(organisasjonsEnhet);
 
         BehandlingLås lås = behandlingRepository.taSkriveLås(behandling);
@@ -238,6 +238,14 @@ public class BehandlingTjeneste {
         hentVergeInformasjonFraFpsak(behandling.getId());
 
         return behandling;
+    }
+
+    public OrganisasjonsEnhet hentEnhetForEksternBehandling(UUID eksternUuid) {
+        return hentEnhetFraEksternBehandling(fagsystemKlient.hentBehandling(eksternUuid));
+    }
+
+    private OrganisasjonsEnhet hentEnhetFraEksternBehandling(EksternBehandlingsinfoDto eksternBehandlingsinfoDto) {
+        return new OrganisasjonsEnhet(eksternBehandlingsinfoDto.getBehandlendeEnhetId(), eksternBehandlingsinfoDto.getBehandlendeEnhetNavn());
     }
 
 
