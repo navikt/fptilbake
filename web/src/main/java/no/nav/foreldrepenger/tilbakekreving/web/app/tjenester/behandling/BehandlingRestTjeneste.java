@@ -49,7 +49,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
@@ -171,7 +170,8 @@ public class BehandlingRestTjeneste {
         } else if (BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandlingType)) {
             Long tbkBehandlingId = opprettBehandlingDto.getBehandlingId() == null ? behandlingTjeneste.hentBehandlingId(opprettBehandlingDto.getBehandlingUuid())
                 : opprettBehandlingDto.getBehandlingId();
-            Behandling revurdering = revurderingTjeneste.opprettRevurdering(tbkBehandlingId, opprettBehandlingDto.getBehandlingArsakType());
+            var enhet = behandlingTjeneste.hentEnhetForEksternBehandling(opprettBehandlingDto.getEksternUuid());
+            Behandling revurdering = revurderingTjeneste.opprettRevurdering(tbkBehandlingId, opprettBehandlingDto.getBehandlingArsakType(), enhet);
             String gruppe = behandlingskontrollAsynkTjeneste.asynkProsesserBehandling(revurdering);
             return Redirect.tilBehandlingPollStatus(revurdering.getUuid(), Optional.of(gruppe));
         }
