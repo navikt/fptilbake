@@ -2,6 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebar
 
 import java.time.LocalDate;
 import java.util.Objects;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -71,11 +72,18 @@ public class HbSak {
             Objects.requireNonNull(kladd.ytelsetype, "Ytelse type er ikke satt");
             if (!FagsakYtelseType.FRISINN.equals(kladd.ytelsetype)) {
                 Objects.requireNonNull(kladd.antallBarn, "antallBarn er ikke satt");
+            }
+            if (trengerSkilleFødselOgAdopsjon(kladd.ytelsetype)) {
                 if (kladd.erAdopsjon == kladd.erFødsel) {
                     throw new IllegalArgumentException("En og bare en av fødsel og adopsjon skal være satt");
                 }
             }
             return kladd;
         }
+    }
+
+    private static boolean trengerSkilleFødselOgAdopsjon(FagsakYtelseType fagsakYtelseType) {
+        return Set.of(FagsakYtelseType.FORELDREPENGER, FagsakYtelseType.SVANGERSKAPSPENGER, FagsakYtelseType.ENGANGSTØNAD)
+            .contains(fagsakYtelseType);
     }
 }

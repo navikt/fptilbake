@@ -1,5 +1,5 @@
 {{~#* inline "ytelsen" ~}}
-    {{lookup-map sak.ytelsetype FP="foreldrepengane" SVP="svangerskapspengane" ES="eingongsstønaden" FRISINN="kompensasjonsytelse for selvstendig næringsdrivende og frilansere"}}
+    {{lookup-map sak.ytelsetype FP="foreldrepengane" SVP="svangerskapspengane" ES="eingongsstønaden" FRISINN="kompensasjonsytelse for selvstendig næringsdrivende og frilansere" OMP="omsorgspengane" PSB="pleiepengane"}}
 {{~/inline~}}
 {{~#* inline "evt-renter-utsagn" ~}}{{#if totalresultat.totalt-rentebeløp}} Dette beløpet er med renter.{{/if}}{{~/inline~}}
 {{#if behandling.er-revurdering}}

@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -33,7 +34,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 public class VedtakHendelseReader implements HendelseReader {
 
     private static final Logger logger = LoggerFactory.getLogger(VedtakHendelseReader.class);
-    public static final LocalDateTime BESTEMT_VEDTAK_DATO = LocalDateTime.of(LocalDate.of(2020,10,12), LocalTime.MIDNIGHT);
+    public static final LocalDateTime BESTEMT_VEDTAK_DATO = LocalDateTime.of(LocalDate.of(2020, 10, 12), LocalTime.MIDNIGHT);
 
     private VedtakHendelseMeldingConsumer meldingConsumer;
     private ProsessTaskRepository prosessTaskRepository;
@@ -81,11 +82,12 @@ public class VedtakHendelseReader implements HendelseReader {
     }
 
     private void lagHåndterHendelseProsessTask(VedtakHendelse melding) {
+        Set<FagsakYtelseType> støttedeFagsakYtelseTyper = Set.of(FagsakYtelseType.FRISINN, FagsakYtelseType.OMSORGSPENGER, FagsakYtelseType.PLEIEPENGER_SYKT_BARN);
         validereMelding(melding);
-        if(kanHåndtereMelding(melding)){
+        if (støttedeFagsakYtelseTyper.contains(melding.getFagsakYtelseType())) {
             prosessTaskRepository.lagre(lagProsessTaskData(melding));
-        }else {
-            logger.info("Melding om vedtak for {} for behandling={} for {} med vedtakstidspunkt {} ble ignorert etter regler for ytelsetype og vedtaktidspunkt",
+        } else {
+            logger.info("Melding om vedtak for {} for behandling={} for {} med vedtakstidspunkt {} ble ignorert pga ikke-støttet ytelsetype",
                 melding.getFagsakYtelseType(), melding.getBehandlingId(), melding.getFagsakYtelseType(), melding.getVedtattTidspunkt());
         }
     }
@@ -98,12 +100,7 @@ public class VedtakHendelseReader implements HendelseReader {
         Objects.requireNonNull(melding.getVedtattTidspunkt());
     }
 
-    private boolean kanHåndtereMelding(VedtakHendelse melding){
-        return melding.getVedtattTidspunkt().isAfter(BESTEMT_VEDTAK_DATO) &&
-            FagsakYtelseType.FRISINN.equals(melding.getFagsakYtelseType()); //midlertidig kode , fjernes når k9tilbake kan lese meldinger for alle K9Ytelsene.
-    }
-
-    private ProsessTaskData lagProsessTaskData(VedtakHendelse melding){
+    private ProsessTaskData lagProsessTaskData(VedtakHendelse melding) {
         Henvisning henvisning = K9HenvisningKonverterer.uuidTilHenvisning(melding.getBehandlingId());
         ProsessTaskData td = new ProsessTaskData(HåndterHendelseTask.TASKTYPE);
         td.setAktørId(melding.getAktør().getId());

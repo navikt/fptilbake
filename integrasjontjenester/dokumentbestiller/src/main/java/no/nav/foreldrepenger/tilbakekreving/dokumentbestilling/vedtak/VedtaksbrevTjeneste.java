@@ -338,12 +338,17 @@ public class VedtaksbrevTjeneste {
             .medYtelsetype(behandling.getFagsak().getFagsakYtelseType())
             .medDatoFagsakvedtak(fagsystemBehandling.getGrunninformasjon().getVedtakDato())
             .medAntallBarn(fagsystemBehandling.getAntallBarnSøktFor());
-        if (erIkkeFrisinn(behandling)) {
+        if (trengerSkilleFødselOgAdopsjon(behandling)) {
             hbSakBuilder
                 .medErFødsel(SøknadType.FØDSEL == fagsystemBehandling.getSøknadType())
                 .medErAdopsjon(SøknadType.ADOPSJON == fagsystemBehandling.getSøknadType());
         }
         return hbSakBuilder.build();
+    }
+
+    private boolean trengerSkilleFødselOgAdopsjon(Behandling b){
+        Set<FagsakYtelseType> fagsaktyper = Set.of(FagsakYtelseType.FORELDREPENGER, FagsakYtelseType.SVANGERSKAPSPENGER, FagsakYtelseType.ENGANGSTØNAD);
+        return fagsaktyper.contains(b.getFagsak().getFagsakYtelseType());
     }
 
     private List<HbVedtaksbrevPeriode> lagHbVedtaksbrevPerioder(Long behandlingId, List<PeriodeMedTekstDto> perioderFritekst, List<BeregningResultatPeriode> resulatPerioder, List<VilkårVurderingPeriodeEntitet> vilkårPerioder, VurdertForeldelse foreldelse, VedtaksbrevType vedtaksbrevType) {
@@ -395,9 +400,8 @@ public class VedtaksbrevTjeneste {
         List<Tillegsinformasjon> tillegsinformasjons = new ArrayList<>();
         tillegsinformasjons.add(Tillegsinformasjon.PERSONOPPLYSNINGER);
 
-        // Kan ikke hente søknadsinformasjon for FRISINN-behandlinger. Er ikke nødvendigvis en 1-til-1-mapping mellom behandling
-        // og søknad for FRISINN i k9-sak. Kan risikere exception i k9-sak og/eller exception i k9-tilbake
-        if (erIkkeFrisinn(behandling)) {
+        if (trengerSkilleFødselOgAdopsjon(behandling)) {
+            //henter informasjon for å skille mellom fødsel og adopsjon
             tillegsinformasjons.add(Tillegsinformasjon.SØKNAD);
         }
         return tillegsinformasjons.toArray(Tillegsinformasjon[]::new);
