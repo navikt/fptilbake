@@ -1,8 +1,8 @@
 {{~#* inline "ytelse-navn" ~}}
-{{lookup-map sak.ytelsetype FP="foreldrepengar" SVP="svangerskapspengar" ES="eingongsstønad" FRISINN="kompensasjon" OMP="omsorgspengar"}}
+{{lookup-map sak.ytelsetype FP="foreldrepengar" SVP="svangerskapspengar" ES="eingongsstønad" FRISINN="kompensasjon" OMP="omsorgspengar" PSB="pleiepengar"}}
 {{~/inline~}}
 {{~#* inline "ytelse-produkt" ~}}
-{{lookup-map sak.ytelsetype FP="foreldrepengane" SVP="svangerskapspengane" ES="eingongsstønaden" FRISINN="kompensasjonen" OMP="omsorgspengane"}}
+{{lookup-map sak.ytelsetype FP="foreldrepengane" SVP="svangerskapspengane" ES="eingongsstønaden" FRISINN="kompensasjonen" OMP="omsorgspengane" PSB="pleiepengane"}}
 {{~/inline~}}
 {{~#* inline "din-dine" ~}}
 {{#if (or (eq sak.ytelsetype "ES") (eq sak.ytelsetype "FRISINN")) }}din{{else}}dine{{/if}}
