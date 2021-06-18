@@ -17,4 +17,15 @@ public class KravgrunnlagJmsConsumerKonfig extends BaseJmsKonfig {
     public KravgrunnlagJmsConsumerKonfig() {
         super(INN_QUEUE_PREFIX);
     }
+
+    @Override
+    public String getQueueManagerUsername() {
+        return "srvappserver"; // TODO - hent fra konfig når ny MQ-konfig innføres i august/september
+    }
+
+    @Override
+    public String getQueueManagerPassword() {
+        return null; // TODO - hent fra vault e.l. når ny MQ-konfig innføres i august/september
+    }
+
 }
