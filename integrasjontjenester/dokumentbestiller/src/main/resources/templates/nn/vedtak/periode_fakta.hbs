@@ -5,10 +5,10 @@
 {{~#* inline "det-samme-barnet" ~}}{{eq sak.antall-barn 1 yes="det same barnet" no="dei same barna"}}{{~/inline~}}
 {{#switch sak.ytelsetype}}
 {{#case "FRISINN"}}
-    {{#switch fakta.hendelseundertype}}
-        {{#case "ANNET_FRITEKST"}}
-        {{/case}}
-    {{/switch}}
+{{> nn/vedtak/periode-fakta/periode_fakta_annet}}
+{{/case}}
+{{#case "OMP"}}
+{{> nn/vedtak/periode-fakta/periode_fakta_annet}}
 {{/case}}
 {{#case "ES"}}
 
