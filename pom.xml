@@ -421,7 +421,7 @@
             <dependency>
                 <groupId>no.nav.tjenestespesifikasjoner</groupId>
                 <artifactId>nav-fim-kodeverk-v2-tjenestespesifikasjon</artifactId>
-                <version>1.2020.10.07-08.40-90b3ab7bad15</version>
+                <version>1.2021.02.22-10.45-4201aaea72fb</version>
             </dependency>
             <!-- Eksterne -->
             <dependency>
