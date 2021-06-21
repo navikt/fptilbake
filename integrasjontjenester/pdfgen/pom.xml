@@ -71,11 +71,23 @@
             <groupId>com.openhtmltopdf</groupId>
             <artifactId>openhtmltopdf-svg-support</artifactId>
             <exclusions>
+                <!-- denne drar inn to ulike versjoner av org.apache.xmlgraphics.xml-graphics-commons  -->
+                <exclusion>
+                    <groupId>org.apache.xmlgraphics</groupId>
+                    <artifactId>xmlgraphics-commons</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <!-- velger en av de to versjonene som openhtmltopdf-svg-support drar inn -->
+            <groupId>org.apache.xmlgraphics</groupId>
+            <artifactId>xmlgraphics-commons</artifactId>
+            <version>2.6</version>
+            <exclusions>
                 <exclusion>
                     <groupId>commons-logging</groupId>
                     <artifactId>commons-logging</artifactId>
                 </exclusion>
-                <!-- denne drar inn en annen versjon enn hva som brukes i openhtmltopdf-pdfbox -->
             </exclusions>
         </dependency>
 

@@ -48,70 +48,79 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.In
 
 public class InntektskategoriKlassekodeMapper {
 
-    private static final Map<KlasseKode, Inntektskategori> KLASSEKODE_INNTEKTSKATEGORI_MAP_ENGANGSSTØNAD;
-    private static final Map<KlasseKode, Inntektskategori> KLASSEKODE_INNTEKTSKATEGORI_MAP_FØDSEL;
-    private static final Map<KlasseKode, Inntektskategori> KLASSEKODE_INNTEKTSKATEGORI_MAP_ADOPSJON;
-    private static final Map<KlasseKode, Inntektskategori> KLASSEKODE_INNTEKTSKATEGORI_MAP_SVANGERSKAPPENGER;
-    private static final Map<KlasseKode, Inntektskategori> KLASSEKODE_INNTEKTSKATEGORI_MAP_FRISINN;
+    private static final Map<KlasseKode, Inntektskategori> KLASSEKODE_INNTEKTSKATEGORI_MAP_ENGANGSSTØNAD = Map.of(
+        FPENFOD_OP, FØDSEL_ES,
+        FPENAD_OP, ADOPSJON_ES
+    );
+
+    private static final Map<KlasseKode, Inntektskategori> KLASSEKODE_INNTEKTSKATEGORI_MAP_FØDSEL = Map.of(
+        FPADATORD, ARBEIDSTAKER,
+        FPATFRI, FRILANSER,
+        FPADSND_OP, SELVSTENDIG_NÆRINGSDRIVENDE,
+        FPADATAL, ARBEIDSLEDIG,
+        FPADATSJO, SJØMANN,
+        FPADSNDDM_OP, DAGMAMMA,
+        FPADSNDJB_OP, JORDBRUKER,
+        FPADSNDFI, FISKER,
+        FPATFER, FERIEPENGER_ARBEIDSTAKER
+    );
+
+    private static final Map<KlasseKode, Inntektskategori> KLASSEKODE_INNTEKTSKATEGORI_MAP_ADOPSJON = Map.of(
+        FPATORD, ARBEIDSTAKER,
+        FPATFRI, FRILANSER,
+        FPSND_OP, SELVSTENDIG_NÆRINGSDRIVENDE,
+        FPATAL, ARBEIDSLEDIG,
+        FPATSJO, SJØMANN,
+        FPSNDDM_OP, DAGMAMMA,
+        FPSNDJB_OP, JORDBRUKER,
+        FPSNDFI, FISKER,
+        FPATFER, FERIEPENGER_ARBEIDSTAKER
+    );
+
+    private static final Map<KlasseKode, Inntektskategori> KLASSEKODE_INNTEKTSKATEGORI_MAP_SVANGERSKAPPENGER = Map.of(
+        FPSVATORD, ARBEIDSTAKER,
+        FPSVATFRI, FRILANSER,
+        FPSVSND_OP, SELVSTENDIG_NÆRINGSDRIVENDE,
+        FPSVATAL, ARBEIDSLEDIG,
+        FPSVATSJO, SJØMANN,
+        FPSVSNDDM_OP, DAGMAMMA,
+        FPSVSNDJB_OP, JORDBRUKER,
+        FPSVSNDFI, FISKER,
+        FPATFER, FERIEPENGER_ARBEIDSTAKER
+    );
+
+    private static final Map<KlasseKode, Inntektskategori> KLASSEKODE_INNTEKTSKATEGORI_MAP_OMSORGSPENGER = Map.of(
+        KlasseKode.OMATORD, ARBEIDSTAKER,
+        KlasseKode.OMATFRI, FRILANSER,
+        KlasseKode.OMSND_OP, SELVSTENDIG_NÆRINGSDRIVENDE,
+        KlasseKode.OMATAL, ARBEIDSLEDIG,
+        KlasseKode.OMATSJO, SJØMANN,
+        KlasseKode.OMSNDDM_OP, DAGMAMMA,
+        KlasseKode.OMSNDJB_OP, JORDBRUKER,
+        KlasseKode.OMSNDFI, FISKER,
+        KlasseKode.SPATFER, FERIEPENGER_ARBEIDSTAKER
+    );
+
+    private static final Map<KlasseKode, Inntektskategori> KLASSEKODE_INNTEKTSKATEGORI_MAP_PLEIEPENGER_SYKT_BARN = Map.of(
+        KlasseKode.PNBSATORD, ARBEIDSTAKER,
+        KlasseKode.PNBSATFRI, FRILANSER,
+        KlasseKode.PNBSSND_OP, SELVSTENDIG_NÆRINGSDRIVENDE,
+        KlasseKode.PNBSATAL, ARBEIDSLEDIG,
+        KlasseKode.PNBSATSJO, SJØMANN,
+        KlasseKode.PNBSSNDDM_OP, DAGMAMMA,
+        KlasseKode.PNBSSNDJB_OP, JORDBRUKER,
+        KlasseKode.PNBSSNDFI, FISKER,
+        KlasseKode.SPATFER, FERIEPENGER_ARBEIDSTAKER
+    );
+
+    private static final Map<KlasseKode, Inntektskategori> KLASSEKODE_INNTEKTSKATEGORI_MAP_FRISINN = Map.of(
+        FRISINN_FRILANS, FRILANSER,
+        FRISINN_SELVST_OP, SELVSTENDIG_NÆRINGSDRIVENDE
+    );
 
     private InntektskategoriKlassekodeMapper() {
     }
 
-    static {
-        KLASSEKODE_INNTEKTSKATEGORI_MAP_ENGANGSSTØNAD = Map.of(
-            FPENFOD_OP, FØDSEL_ES,
-            FPENAD_OP, ADOPSJON_ES
-        );
-    }
-
-    static {
-        KLASSEKODE_INNTEKTSKATEGORI_MAP_FØDSEL = Map.of(
-            FPADATORD, ARBEIDSTAKER,
-            FPATFRI, FRILANSER,
-            FPADSND_OP, SELVSTENDIG_NÆRINGSDRIVENDE,
-            FPADATAL, ARBEIDSLEDIG,
-            FPADATSJO, SJØMANN,
-            FPADSNDDM_OP, DAGMAMMA,
-            FPADSNDJB_OP, JORDBRUKER,
-            FPADSNDFI, FISKER,
-            FPATFER, FERIEPENGER_ARBEIDSTAKER
-        );
-    }
-
-    static {
-        KLASSEKODE_INNTEKTSKATEGORI_MAP_ADOPSJON = Map.of(
-            FPATORD, ARBEIDSTAKER,
-            FPATFRI, FRILANSER,
-            FPSND_OP, SELVSTENDIG_NÆRINGSDRIVENDE,
-            FPATAL, ARBEIDSLEDIG,
-            FPATSJO, SJØMANN,
-            FPSNDDM_OP, DAGMAMMA,
-            FPSNDJB_OP, JORDBRUKER,
-            FPSNDFI, FISKER,
-            FPATFER, FERIEPENGER_ARBEIDSTAKER
-        );
-    }
-
-    static {
-        KLASSEKODE_INNTEKTSKATEGORI_MAP_SVANGERSKAPPENGER = Map.of(
-            FPSVATORD, ARBEIDSTAKER,
-            FPSVATFRI, FRILANSER,
-            FPSVSND_OP, SELVSTENDIG_NÆRINGSDRIVENDE,
-            FPSVATAL, ARBEIDSLEDIG,
-            FPSVATSJO, SJØMANN,
-            FPSVSNDDM_OP, DAGMAMMA,
-            FPSVSNDJB_OP, JORDBRUKER,
-            FPSVSNDFI, FISKER,
-            FPATFER, FERIEPENGER_ARBEIDSTAKER
-        );
-    }
-
-    static {
-        KLASSEKODE_INNTEKTSKATEGORI_MAP_FRISINN = Map.of(
-            FRISINN_FRILANS, FRILANSER,
-            FRISINN_SELVST_OP, SELVSTENDIG_NÆRINGSDRIVENDE
-        );
-    }
 
     public static Inntektskategori finnInntekstkategoriMedKlasseKode(KlasseKode klasseKode) {
         if (KLASSEKODE_INNTEKTSKATEGORI_MAP_ENGANGSSTØNAD.containsKey(klasseKode)) {
@@ -122,9 +131,13 @@ public class InntektskategoriKlassekodeMapper {
             return KLASSEKODE_INNTEKTSKATEGORI_MAP_ADOPSJON.get(klasseKode);
         } else if (KLASSEKODE_INNTEKTSKATEGORI_MAP_SVANGERSKAPPENGER.containsKey(klasseKode)) {
             return KLASSEKODE_INNTEKTSKATEGORI_MAP_SVANGERSKAPPENGER.get(klasseKode);
+        } else if (KLASSEKODE_INNTEKTSKATEGORI_MAP_OMSORGSPENGER.containsKey(klasseKode)) {
+            return KLASSEKODE_INNTEKTSKATEGORI_MAP_OMSORGSPENGER.get(klasseKode);
+        } else if (KLASSEKODE_INNTEKTSKATEGORI_MAP_PLEIEPENGER_SYKT_BARN.containsKey(klasseKode)) {
+            return KLASSEKODE_INNTEKTSKATEGORI_MAP_PLEIEPENGER_SYKT_BARN.get(klasseKode);
         } else if (KLASSEKODE_INNTEKTSKATEGORI_MAP_FRISINN.containsKey(klasseKode)) {
             return KLASSEKODE_INNTEKTSKATEGORI_MAP_FRISINN.get(klasseKode);
-        }else {
+        } else {
             throw new IllegalStateException("Utvikler feil: Mangler mapping for klasseKode=" + klasseKode);
         }
     }
