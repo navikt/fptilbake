@@ -2,8 +2,8 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
@@ -22,14 +22,13 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.dto.pe
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.handlebars.dto.VarselbrevDokument;
 
 public class TekstformatererVarselbrev extends FellesTekstformaterer {
-
-    private static List<FagsakYtelseType> støttetTyper = new ArrayList<>();
-    static {
-        støttetTyper.add(FagsakYtelseType.FORELDREPENGER);
-        støttetTyper.add(FagsakYtelseType.ENGANGSTØNAD);
-        støttetTyper.add(FagsakYtelseType.SVANGERSKAPSPENGER);
-        støttetTyper.add(FagsakYtelseType.FRISINN);
-    }
+    private static Set<FagsakYtelseType> støttetTyper = Set.of(
+        FagsakYtelseType.FORELDREPENGER,
+        FagsakYtelseType.ENGANGSTØNAD,
+        FagsakYtelseType.SVANGERSKAPSPENGER,
+        FagsakYtelseType.OMSORGSPENGER,
+        FagsakYtelseType.PLEIEPENGER_SYKT_BARN,
+        FagsakYtelseType.FRISINN);
 
     private TekstformatererVarselbrev() {
         // for static access
