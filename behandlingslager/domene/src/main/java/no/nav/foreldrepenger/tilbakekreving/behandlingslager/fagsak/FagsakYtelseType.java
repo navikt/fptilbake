@@ -29,9 +29,9 @@ public enum FagsakYtelseType implements Kodeverdi {
 
     //K9
     FRISINN("FRISINN", "Kompensasjonsytelse for selvstendig næringsdrivende og frilansere","Kompensasjonsytelse for selvstendig næringsdrivende og frilansere"),
-    PLEIEPENGER_SYKT_BARN("PSB", "Pleiepenger sykt barn",""),
+    PLEIEPENGER_SYKT_BARN("PSB", "Pleiepenger","Pleiepengar"), //TODO: Heter egentlig Pleiepenger sykt barn, men brukes direkte i varselbrev - og der skal det stå "Pleiepenger"
     PLEIEPENGER_NÆRSTÅENDE("PPN", "Pleiepenger nærstående",""),
-    OMSORGSPENGER("OMP", "Omsorgspenger",""),
+    OMSORGSPENGER("OMP", "Omsorgspenger","Omsorgspengar"),
     OPPLÆRINGSPENGER("OLP", "Opplæringspenger",""),
 
     //K9-rammevedtak (kan ignoreres for tilbakekreving, men må være i listen for at VedtakHendelse skal parse alle vedtak)
