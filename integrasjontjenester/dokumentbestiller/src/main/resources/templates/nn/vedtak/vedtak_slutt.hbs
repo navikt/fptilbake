@@ -33,7 +33,17 @@ _Du har rett til innsyn
 På nav.no/dittnav kan du sjå dokumenta i saka di.
 {{/if}}
 _Har du spørsmål?
-Du finner nyttig informasjon på nav.no/familie.{{#if (eq sak.ytelsetype "FRISINN")}} Du kan også kontakte oss på telefon 55553333.{{/if}}
+{{#switch sak.ytelsetype}}
+    {{#case "FP" "SVP" "ES"}}
+Du finn nyttig informasjon på nav.no/familie.
+    {{/case}}
+    {{#case "PSB" "OMP"}}
+Du finn nyttig informasjon på nav.no
+    {{/case}}
+    {{#case "FRISINN"}}
+Du finn nyttig informasjon på nav.no. Du kan også kontakte oss på telefon 55553333.
+    {{/case}}
+{{/switch}}
 
 Med vennleg helsing
 {{#switch sak.ytelsetype}}

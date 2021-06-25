@@ -895,7 +895,7 @@ public class TekstformatererVedtaksbrevTest {
             _Du har rett til innsyn
             På nav.no/dittnav kan du se dokumentene i saken din.
             _Har du spørsmål?
-            Du finner nyttig informasjon på nav.no/familie.
+            Du finner nyttig informasjon på nav.no
 
             Med vennlig hilsen
             NAV Arbeid og ytelser
