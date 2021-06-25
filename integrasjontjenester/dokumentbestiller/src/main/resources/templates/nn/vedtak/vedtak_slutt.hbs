@@ -36,7 +36,14 @@ _Har du spørsmål?
 Du finner nyttig informasjon på nav.no/familie.{{#if (eq sak.ytelsetype "FRISINN")}} Du kan også kontakte oss på telefon 55553333.{{/if}}
 
 Med vennleg helsing
+{{#switch sak.ytelsetype}}
+    {{#case "FP" "SVP" "ES" "FRISINN"}}
 NAV Familie- og pensjonsytelsar
+    {{/case}}
+    {{#case "PSB" "OMP"}}
+NAV Arbeid og ytelser
+    {{/case}}
+{{/switch}}
 {{#if finnesVerge}}
 
 Brev med likt innhald er sendt til {{annenMottakerNavn}}

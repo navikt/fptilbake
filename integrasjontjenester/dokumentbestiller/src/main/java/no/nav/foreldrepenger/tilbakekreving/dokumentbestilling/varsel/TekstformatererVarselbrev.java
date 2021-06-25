@@ -14,7 +14,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselInfo;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottakerUtil;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.TekstformatererBrevFeil;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.CustomHelpers;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.FellesTekstformaterer;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.dto.BaseDokument;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.dto.OverskriftBrevData;
@@ -84,8 +83,6 @@ public class TekstformatererVarselbrev extends FellesTekstformaterer {
 
     private static Template opprettHandlebarsTemplate(String filsti, Språkkode språkkode) throws IOException {
         Handlebars handlebars = opprettHandlebarsKonfigurasjon();
-        handlebars.registerHelper("lookup-map", new CustomHelpers.MapLookupHelper());
-        handlebars.registerHelper("kroner", new CustomHelpers.KroneFormattererMedTusenskille());
         return handlebars.compile(lagSpråkstøttetFilsti(filsti, språkkode));
     }
 

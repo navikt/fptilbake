@@ -69,7 +69,7 @@ public class TekstformatererVedtaksbrevTest {
         assertThat(generertBrev).isEqualToNormalizingNewlines(fasit);
     }
 
-    private HbVedtaksbrevData getVedtaksbrevDataTvilling(FagsakYtelseType ytelseType, HendelseType hendelseType, Språkkode språkkode) throws Exception {
+    private HbVedtaksbrevData getVedtaksbrevDataTvilling(FagsakYtelseType ytelseType, HendelseType hendelseType, Språkkode språkkode) {
         HbVedtaksbrevFelles.Builder vedtaksBrevBuilder = lagTestBuilder()
             .medSak(HbSak.build()
                 .medYtelsetype(ytelseType)
@@ -131,6 +131,61 @@ public class TekstformatererVedtaksbrevTest {
                     .medSærligeGrunner(Arrays.asList(SærligGrunn.HELT_ELLER_DELVIS_NAVS_FEIL, SærligGrunn.STØRRELSE_BELØP), null, null)
                     .build())
                 .medResultat(HbResultatTestBuilder.forTilbakekrevesBeløp(3000))
+                .build()
+        );
+        HbVedtaksbrevFelles vedtaksbrevData = vedtaksBrevBuilder.build();
+        return new HbVedtaksbrevData(vedtaksbrevData, perioder);
+    }
+
+    private HbVedtaksbrevData getVedtaksbrevDataOmp() {
+        HbVedtaksbrevFelles.Builder vedtaksBrevBuilder = lagTestBuilder()
+            .medSak(HbSak.build()
+                .medYtelsetype(FagsakYtelseType.OMSORGSPENGER)
+                .medAntallBarn(1)
+                .build())
+            .medVedtakResultat(HbTotalresultat.builder()
+                .medHovedresultat(VedtakResultatType.DELVIS_TILBAKEBETALING)
+                .medTotaltTilbakekrevesBeløp(BigDecimal.valueOf(3000))
+                .medTotaltTilbakekrevesBeløpMedRenter(BigDecimal.valueOf(3000))
+                .medTotaltRentebeløp(BigDecimal.ZERO)
+                .medTotaltTilbakekrevesBeløpMedRenterUtenSkatt(BigDecimal.valueOf(2000))
+                .build());
+        vedtaksBrevBuilder
+            .medLovhjemmelVedtak("Folketrygdloven § 22-15")
+            .medVarsel(HbVarsel.builder()
+                .medVarsletBeløp(BigDecimal.valueOf(3000))
+                .medVarsletDato(LocalDate.of(2020, 4, 4))
+                .build())
+            .medKonfigurasjon(HbKonfigurasjon.builder()
+                .medKlagefristUker(6)
+                .build())
+            .medSpråkkode(Språkkode.nb)
+            .medVedtaksbrevType(VedtaksbrevType.ORDINÆR)
+            .build();
+        List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
+            HbVedtaksbrevPeriode.builder()
+                .medPeriode(Periode.of(LocalDate.of(2021, 4, 5), LocalDate.of(2021, 4, 6)))
+                .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(2000)))
+                .medFakta(HendelseType.OMP_ANNET_TYPE, HendelseUnderType.ANNET_FRITEKST)
+                .medVurderinger(HbVurderinger.builder()
+                    .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
+                    .medVilkårResultat(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER)
+                    .medAktsomhetResultat(Aktsomhet.SIMPEL_UAKTSOM)
+                    .medFritekstVilkår("Du er heldig som slapp å betale alt!")
+                    .medSærligeGrunner(Arrays.asList(SærligGrunn.TID_FRA_UTBETALING, SærligGrunn.STØRRELSE_BELØP), null, null)
+                    .build())
+                .medResultat(HbResultatTestBuilder.forTilbakekrevesBeløp(2000))
+                .build(),
+            HbVedtaksbrevPeriode.builder()
+                .medPeriode(Periode.of(LocalDate.of(2021, 4, 12), LocalDate.of(2021, 4, 12)))
+                .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(1000)))
+                .medFakta(HendelseType.OMP_ANNET_TYPE, HendelseUnderType.ANNET_FRITEKST)
+                .medVurderinger(HbVurderinger.builder()
+                    .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
+                    .medVilkårResultat(VilkårResultat.FORSTO_BURDE_FORSTÅTT)
+                    .medAktsomhetResultat(Aktsomhet.SIMPEL_UAKTSOM)
+                    .build())
+                .medResultat(HbResultatTestBuilder.forTilbakekrevesBeløp(1000))
                 .build()
         );
         HbVedtaksbrevFelles vedtaksbrevData = vedtaksBrevBuilder.build();
@@ -764,7 +819,7 @@ public class TekstformatererVedtaksbrevTest {
     }
 
     @Test
-    public void skal_generere_fritekst_og_uten_perioder_vedtaksbrev_for_FP_med_full_tilbakebetaling() throws IOException{
+    public void skal_generere_fritekst_og_uten_perioder_vedtaksbrev_for_FP_med_full_tilbakebetaling() throws IOException {
         HbVedtaksbrevData fritekstVedtaksbrevData = lagFritekstVedtaksbrevData(FagsakYtelseType.FORELDREPENGER, VedtakResultatType.FULL_TILBAKEBETALING, Språkkode.nb);
         String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(fritekstVedtaksbrevData);
         assertThat(generertBrev).isNotEmpty();
@@ -773,7 +828,7 @@ public class TekstformatererVedtaksbrevTest {
     }
 
     @Test
-    public void skal_generere_fritekst_og_uten_perioder_vedtaksbrev_for_ES_med_ingen_tilbakebetaling() throws IOException{
+    public void skal_generere_fritekst_og_uten_perioder_vedtaksbrev_for_ES_med_ingen_tilbakebetaling() throws IOException {
         HbVedtaksbrevData fritekstVedtaksbrevData = lagFritekstVedtaksbrevData(FagsakYtelseType.ENGANGSTØNAD, VedtakResultatType.INGEN_TILBAKEBETALING, Språkkode.nb);
         String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(fritekstVedtaksbrevData);
         assertThat(generertBrev).isNotEmpty();
@@ -802,6 +857,51 @@ public class TekstformatererVedtaksbrevTest {
             .medSpråkkode(språkkode != null ? språkkode : Språkkode.nb)
             .build();
         return new HbVedtaksbrevData(vedtaksbrevFelles, Collections.emptyList());
+    }
+
+    @Test
+    public void skal_generere_vedtaksbrev_for_OMS() {
+        HbVedtaksbrevData data = getVedtaksbrevDataOmp();
+
+        String generertBrev = TekstformatererVedtaksbrev.lagVedtaksbrevFritekst(data);
+        assertThat(generertBrev).isEqualToNormalizingNewlines("""
+            Vi varslet deg 4. april 2020 om at du har fått 3 000 kroner for mye.
+
+            Beløpet du skylder før skatt er 3 000 kroner, som er deler av det feilutbetalte beløpet. Beløpet du skal betale tilbake etter skatten er trukket fra er 2 000 kroner.
+            _Gjelder perioden fra og med 5. april 2021 til og med 6. april 2021
+            _Hvordan har vi kommet fram til at du må betale tilbake?
+            Du har fått vite om du har rett til omsorgspenger og hvor mye du har rett til. Etter vår vurdering burde du forstått at du ikke ga oss alle opplysningene vi trengte tidsnok for å sikre at du fikk riktig utbetaling. Derfor kan vi kreve pengene tilbake.
+
+            Du er heldig som slapp å betale alt!
+            _Er det særlige grunner til å redusere beløpet?
+            Vi har vurdert om det er grunner til å redusere beløpet. Vi har lagt vekt på at du ikke har gitt oss alle nødvendige opplysninger tidsnok til at vi kunne unngå feilutbetalingen. Det er også kort tid siden utbetalingen skjedde og beløpet er høyt. Derfor må du betale tilbake hele beløpet.
+            _Gjelder perioden fra og med 12. april 2021 til og med 12. april 2021
+            _Hvordan har vi kommet fram til at du må betale tilbake?
+            Du har fått vite om du har rett til omsorgspenger og hvor mye du har rett til. Selv hvis du har meldt fra til oss, kan vi kreve tilbake det du har fått for mye dersom du burde forstått at beløpet var feil.
+
+            Ut fra informasjonen du har fått, burde du etter vår vurdering forstått at du fikk for mye utbetalt. Derfor kan vi kreve tilbake.
+            _Lovhjemmelen vi har brukt
+            Vedtaket er gjort etter Folketrygdloven § 22-15.
+            _Skatt
+            Beløpet du skal betale tilbake etter skatt er trukket fra, er beregnet etter ditt gjennomsnittlige skattetrekk per måned. Det betyr at beløpet du skal betale tilbake etter skatt, ikke alltid er likt med det beløpet du mottok på konto.
+
+            NAV gir opplysninger til Skattetaten om skattebeløpet og om beløpet du skal betale tilbake før skatt er trukket fra. Skatteetaten vil vurdere om det er grunnlag for å endre skatteoppgjør.
+            _Hvordan betale tilbake pengene du skylder
+            Du vil motta krav fra NAV Innkreving på det beløpet du skal betale tilbake. Du finner mer informasjon på nav.no/innkreving.
+            _Du har rett til å klage
+            Du kan klage innen 6 uker fra den datoen du mottok vedtaket. Du finner skjema og informasjon på nav.no/klage.
+
+            Du må som hovedregel begynne å betale beløpet tilbake, selv om du klager på dette vedtaket. Dette følger av forvaltningsloven § 42. Hvis du får vedtak om at du ikke trengte å betale tilbake hele eller deler av beløpet du skyldte, betaler vi pengene tilbake til deg.
+            _Du har rett til innsyn
+            På nav.no/dittnav kan du se dokumentene i saken din.
+            _Har du spørsmål?
+            Du finner nyttig informasjon på nav.no/familie.
+
+            Med vennlig hilsen
+            NAV Arbeid og ytelser
+
+
+            Vedlegg: Resultatet av tilbakebetalingssaken""");
     }
 
     private HbVedtaksbrevData lagFritekstVedtaksbrevData(FagsakYtelseType ytelsetype,
@@ -854,6 +954,6 @@ public class TekstformatererVedtaksbrevTest {
     }
 
     private boolean skalFjerneTekstFeriepenger(List<HbVedtaksbrevPeriode> perioder) {
-        return perioder.stream().anyMatch(p-> HendelseUnderType.FEIL_FERIEPENGER_4G.equals(p.getFakta().getHendelseundertype()));
+        return perioder.stream().anyMatch(p -> HendelseUnderType.FEIL_FERIEPENGER_4G.equals(p.getFakta().getHendelseundertype()));
     }
 }

@@ -21,6 +21,7 @@ public class TekstformatererInnhentDokumentasjonbrevTest {
     @Test
     public void skal_generere_innhentdokumentasjonbrev() throws Exception {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
+            .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
             .medFagsaktypenavnPåSpråk("foreldrepenger")
             .medSprakkode(Språkkode.nb)
             .medMottakerAdresse(lagStandardNorskAdresse())
@@ -62,6 +63,7 @@ public class TekstformatererInnhentDokumentasjonbrevTest {
     @Test
     public void skal_generere_innhentdokumentasjonbrev_for_verge() throws Exception {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
+            .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
             .medFagsaktypenavnPåSpråk("foreldrepenger")
             .medSprakkode(Språkkode.nb)
             .medMottakerAdresse(lagStandardNorskAdresse())
@@ -87,6 +89,7 @@ public class TekstformatererInnhentDokumentasjonbrevTest {
         Adresseinfo orgAdresse = new Adresseinfo.Builder(new PersonIdent("12345678901"), "Semba AS c/o John Doe")
             .build();
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
+            .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
             .medFagsaktypenavnPåSpråk("foreldrepenger")
             .medSprakkode(Språkkode.nb)
             .medMottakerAdresse(orgAdresse)
@@ -110,6 +113,7 @@ public class TekstformatererInnhentDokumentasjonbrevTest {
     @Test
     public void skal_generere_innhentdokumentasjonbrev_nynorsk() throws Exception {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
+            .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
             .medFagsaktypenavnPåSpråk("foreldrepenger")
             .medSprakkode(Språkkode.nn)
             .medMottakerAdresse(lagStandardNorskAdresse())
@@ -130,6 +134,7 @@ public class TekstformatererInnhentDokumentasjonbrevTest {
     @Test
     public void skal_generere_innhentdokumentasjonbrev_overskrift() {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
+            .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
             .medFagsaktypenavnPåSpråk("foreldrepenger")
             .medSprakkode(Språkkode.nb)
             .build();
@@ -145,6 +150,7 @@ public class TekstformatererInnhentDokumentasjonbrevTest {
     @Test
     public void skal_generere_innhentdokumentasjonbrev_overskrift_nynorsk() {
         BrevMetadata brevMetadata = new BrevMetadata.Builder()
+            .medFagsaktype(FagsakYtelseType.FORELDREPENGER)
             .medFagsaktypenavnPåSpråk("foreldrepenger")
             .medSprakkode(Språkkode.nn)
             .build();
