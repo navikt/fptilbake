@@ -35,10 +35,10 @@
 
         <!-- Felles avhengigheter i prosjektet Disse skal ALLTID være en
             RELEASE-avhengighet UNNTAK: feature-brancher og lokalt -->
-        <felles.version>3.2.41</felles.version>
-        <prosesstask.version>2.5.34</prosesstask.version>
+        <felles.version>0.0.0-SNAPSHOT</felles.version>
+        <prosesstask.version>2.6.3</prosesstask.version>
         <fp-tidsserie.version>2.5.7</fp-tidsserie.version>
-        <fpkontrakter.version>5.2.5</fpkontrakter.version>
+        <fpkontrakter.version>6.0.1</fpkontrakter.version>
         <fp-jms.version>2.0.22</fp-jms.version>
 
         <surefire.version>2.22.2</surefire.version>
@@ -96,13 +96,6 @@
         <dependencies>
             <!-- Felles biblioteker - Importerte avhengigheter -->
             <dependency>
-                <groupId>no.nav.foreldrepenger.felles</groupId>
-                <artifactId>felles-root</artifactId>
-                <version>${felles.version}</version>
-                <scope>import</scope>
-                <type>pom</type>
-            </dependency>
-            <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
                 <version>1.15</version>
@@ -142,6 +135,7 @@
                 <artifactId>byte-buddy</artifactId>
                 <version>1.11.5</version>
             </dependency>
+
             <!-- moduler i dette prosjektet -->
             <dependency>
                 <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
@@ -300,28 +294,39 @@
             </dependency>
             <dependency>
                 <groupId>no.nav.foreldrepenger.felles</groupId>
+                <artifactId>felles-root</artifactId>
+                <version>${felles.version}</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.foreldrepenger.felles</groupId>
                 <artifactId>felles</artifactId>
                 <version>${felles.version}</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
             <dependency>
+                <groupId>no.nav.foreldrepenger.felles.integrasjon</groupId>
+                <artifactId>felles-integrasjon-pom</artifactId>
+                <version>${felles.version}</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.foreldrepenger.felles.integrasjon</groupId>
+                <artifactId>felles-integrasjon-bom</artifactId>
+                <version>${felles.version}</version>
+            </dependency>
+            <dependency>
+                <!-- Importeres etter felles-root og felles for å sikre samme avhengighet av felles gjennom hele! -->
                 <groupId>no.nav.vedtak.prosesstask</groupId>
                 <artifactId>prosesstask-root</artifactId>
                 <version>${prosesstask.version}</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
-            <dependency>
-                <groupId>no.nav.vedtak.prosesstask</groupId>
-                <artifactId>prosesstask</artifactId>
-                <version>${prosesstask.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.foreldrepenger.felles</groupId>
-                <artifactId>felles-util</artifactId>
-                <version>${felles.version}</version>
-            </dependency>
+
 
             <dependency>
                 <groupId>no.nav.fpsak.tidsserie</groupId>
@@ -346,19 +351,7 @@
                 <version>${fpkontrakter.version}</version>
             </dependency>
 
-            <!-- Felles integrasjon biblioteker -->
-            <dependency>
-                <groupId>no.nav.foreldrepenger.felles.integrasjon</groupId>
-                <artifactId>felles-integrasjon-pom</artifactId>
-                <version>${felles.version}</version>
-                <scope>import</scope>
-                <type>pom</type>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.foreldrepenger.felles.integrasjon</groupId>
-                <artifactId>felles-integrasjon-bom</artifactId>
-                <version>${felles.version}</version>
-            </dependency>
+
 
 
             <!-- tidligere fra fp-felles -->
@@ -429,7 +422,11 @@
                 <artifactId>ojdbc8</artifactId>
                 <version>${ojdbc.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>io.micrometer</groupId>
+                <artifactId>micrometer-core</artifactId>
+                <version>1.7.1</version>
+            </dependency>
 
             <dependency>
                 <!-- velger en transitiv avhengighet - felles ikke enig med seg selv, velger den som blir brukt i prod-scope i felles -->
@@ -513,7 +510,7 @@
             <dependency>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-rt-transports-http-jetty</artifactId>
-                <version>3.4.3</version>
+                <version>3.4.4</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.ws.xmlschema</groupId>
