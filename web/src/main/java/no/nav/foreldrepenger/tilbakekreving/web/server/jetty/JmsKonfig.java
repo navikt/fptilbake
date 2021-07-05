@@ -44,16 +44,9 @@ class JmsKonfig {
             connectionFactory.setChannel(channel);
         }
         connectionFactory.setQueueManager(queueManagerName);
+
         connectionFactory.setTransportType(JMSC.MQJMS_TP_CLIENT_MQ_TCPIP);
         connectionFactory.setBooleanProperty(JmsConstants.USER_AUTHENTICATION_MQCSP, true);
-
-        if (!ENV.isProd()) { // TODO sjekk om den fortsatt trenges - ble avviklet i fpsak - den brukes nok ikke til noe
-            connectionFactory.setSSLCipherSuite("TLS_RSA_WITH_AES_128_CBC_SHA");
-
-            // Denne trengs for at IBM MQ libs skal bruke/gjenkjenne samme ciphersuite navn som Oracle JRE:
-            // (Uten denne vil ikke IBM MQ libs gjenkjenne "TLS_RSA_WITH_AES_128_CBC_SHA")
-            System.setProperty("com.ibm.mq.cfg.useIBMCipherMappings", "false");
-        }
 
         return connectionFactory;
     }

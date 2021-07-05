@@ -89,11 +89,6 @@ public class JettyServer extends AbstractJettyServer {
             LOG.info("Trickser med OIDC_OPENAM_PASSWORD");
             System.setProperty("OpenIdConnect.password", System.getenv("OIDC_OPENAM_PASSWORD"));
         }
-        // FIXME: PFP-1176 Skriv om i BaseJmsKonfig når Jboss dør
-        if (System.getenv("FPSAK_CHANNEL_NAME") != null) {
-            LOG.info("Trickser med FPSAK_CHANNEL_NAME");
-            System.setProperty("mqGateway02.channel", System.getenv("FPSAK_CHANNEL_NAME"));
-        }
     }
 
     @Override
