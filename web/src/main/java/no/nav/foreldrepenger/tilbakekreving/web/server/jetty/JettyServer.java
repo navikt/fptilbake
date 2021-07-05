@@ -103,8 +103,8 @@ public class JettyServer extends AbstractJettyServer {
     }
 
     protected void konfigurerJms() throws JMSException, NamingException {
-        JmsKonfig.settOppJndiConnectionfactory("jms/ConnectionFactory", "mqGateway02", "fpsak_channel");
-        JmsKonfig.settOppJndiMessageQueue("jms/QueueFptilbakeKravgrunnlag", "fptilbake_kravgrunnlag");
+        JmsKonfig.settOppJndiConnectionfactory("jms/ConnectionFactory");
+        JmsKonfig.settOppJndiMessageQueue("jms/QueueFptilbakeKravgrunnlag", "fptilbake_kravgrunnlag.queueName");
     }
 
     @Override
