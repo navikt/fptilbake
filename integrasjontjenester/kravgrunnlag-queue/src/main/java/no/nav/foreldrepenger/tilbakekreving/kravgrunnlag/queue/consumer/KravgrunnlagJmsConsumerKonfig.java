@@ -13,10 +13,8 @@ import no.nav.vedtak.felles.integrasjon.jms.BaseJmsKonfig;
 public class KravgrunnlagJmsConsumerKonfig extends BaseJmsKonfig {
 
     public static final String JNDI_QUEUE = "jms/QueueFptilbakeKravgrunnlag";
-
     private static final String INN_QUEUE_PREFIX = "fptilbake_kravgrunnlag";
-
-    private static final Environment ENV = Environment.current();
+    private static final String FPTILBAKE = "fptilbake";
 
     private String mqBruker;
     private String mqPassord;
@@ -38,12 +36,12 @@ public class KravgrunnlagJmsConsumerKonfig extends BaseJmsKonfig {
 
     @Override
     public String getQueueManagerUsername() {
-        return (ENV.isDev() && "fptilbake".equals(appName)) ? mqBruker : "srvappserver";
+        return FPTILBAKE.equals(appName) ? mqBruker : "srvappserver";
     }
 
     @Override
     public String getQueueManagerPassword() {
-        return (ENV.isDev() && "fptilbake".equals(appName)) ? mqPassord : null;
+        return FPTILBAKE.equals(appName) ? mqPassord : null;
     }
 
 }
