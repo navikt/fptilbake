@@ -136,7 +136,7 @@ public class KravgrunnlagTestBuilder {
     }
 
     public Kravgrunnlag431 lagreKravgrunnlag(Long behandlingId, List<KgPeriode> perioder) {
-        Kravgrunnlag431 kg = lagKravgrunnlag();
+        Kravgrunnlag431 kg = lagKravgrunnlag(false);
         for (KgPeriode p : perioder) {
             KravgrunnlagPeriode432 kgPeriode = new KravgrunnlagPeriode432.Builder()
                 .medPeriode(p.getPeriode())
@@ -153,23 +153,23 @@ public class KravgrunnlagTestBuilder {
     }
 
     public Kravgrunnlag431 lagreKravgrunnlag(Long behandlingId, Map<Periode, List<KgBeløp>> beløp, Map<Periode, Integer> skattBeløpMnd) {
-        Kravgrunnlag431 kg = lagKravgrunnlag(beløp, skattBeløpMnd::get);
+        Kravgrunnlag431 kg = lagKravgrunnlag(beløp, skattBeløpMnd::get, false);
         kravgrunnlagRepository.lagre(behandlingId, kg);
         return kg;
     }
 
-    public Kravgrunnlag431 lagreKravgrunnlag(Long behandlingId, Map<Periode, List<KgBeløp>> beløp) {
-        return lagreKravgrunnlag(behandlingId, beløp, 0);
+    public Kravgrunnlag431 lagreKravgrunnlag(Long behandlingId, Map<Periode, List<KgBeløp>> beløp, final boolean forEngangsstønad) {
+        return lagreKravgrunnlag(behandlingId, beløp, 0, forEngangsstønad);
     }
 
-    public Kravgrunnlag431 lagreKravgrunnlag(Long behandlingId, Map<Periode, List<KgBeløp>> beløp, int skattBeløpMnd) {
-        Kravgrunnlag431 kg = lagKravgrunnlag(beløp, periode -> skattBeløpMnd);
+    public Kravgrunnlag431 lagreKravgrunnlag(Long behandlingId, Map<Periode, List<KgBeløp>> beløp, int skattBeløpMnd, final boolean forEngangsstønad) {
+        Kravgrunnlag431 kg = lagKravgrunnlag(beløp, periode -> skattBeløpMnd, forEngangsstønad);
         kravgrunnlagRepository.lagre(behandlingId, kg);
         return kg;
     }
 
-    private static Kravgrunnlag431 lagKravgrunnlag(Map<Periode, List<KgBeløp>> beløp, Function<Periode, Integer> skattBeløpMnd) {
-        Kravgrunnlag431 kg = lagKravgrunnlag();
+    private static Kravgrunnlag431 lagKravgrunnlag(Map<Periode, List<KgBeløp>> beløp, Function<Periode, Integer> skattBeløpMnd, final boolean forEngangsstønad) {
+        Kravgrunnlag431 kg = lagKravgrunnlag(forEngangsstønad);
         for (Map.Entry<Periode, List<KgBeløp>> entry : beløp.entrySet()) {
             KravgrunnlagPeriode432 kgPeriode = new KravgrunnlagPeriode432.Builder()
                 .medPeriode(entry.getKey())
@@ -184,12 +184,12 @@ public class KravgrunnlagTestBuilder {
         return kg;
     }
 
-    private static Kravgrunnlag431 lagKravgrunnlag() {
+    private static Kravgrunnlag431 lagKravgrunnlag(final boolean forEngangsstønad) {
         Long eksternBehandlingId = 1000000L;
         return new Kravgrunnlag431.Builder()
             .medEksternKravgrunnlagId("12341")
             .medFagSystemId("GSAKNR-12312")
-            .medFagomraadeKode(FagOmrådeKode.FORELDREPENGER)
+            .medFagomraadeKode(forEngangsstønad ? FagOmrådeKode.ENGANGSSTØNAD : FagOmrådeKode.FORELDREPENGER)
             .medKravStatusKode(KravStatusKode.NYTT)
             .medVedtakId(1412L)
             .medAnsvarligEnhet("8020")

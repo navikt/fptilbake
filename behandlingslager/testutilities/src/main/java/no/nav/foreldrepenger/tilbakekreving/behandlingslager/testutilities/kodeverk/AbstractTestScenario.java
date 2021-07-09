@@ -340,7 +340,7 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
         behandlingRepo.lagre(behandling, lås);
 
         if (kravgrunnlag != null) {
-            KravgrunnlagTestBuilder.medRepo(repositoryProvider.getGrunnlagRepository()).lagreKravgrunnlag(behandling.getId(), kravgrunnlag);
+            KravgrunnlagTestBuilder.medRepo(repositoryProvider.getGrunnlagRepository()).lagreKravgrunnlag(behandling.getId(), kravgrunnlag, false);
         }
         if (vilkårsvurdering != null) {
             repositoryProvider.getVilkårsvurderingRepository().lagre(behandling.getId(), vilkårsvurdering);
