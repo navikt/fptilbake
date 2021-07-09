@@ -15,7 +15,7 @@
     <name>FPTILBAKE :: Web :: Applikasjon</name>
 
     <properties>
-        <swagger-ui.version>3.51.0</swagger-ui.version>
+        <swagger-ui.version>3.51.1</swagger-ui.version>
     </properties>
 
     <build>
