@@ -61,7 +61,7 @@ public class TilbakekrevingVedtakPeriodeBeregner {
 
         List<TilbakekrevingPeriode> resultat = new ArrayList<>();
         for (BeregningResultatPeriode bgPeriode : brPerioder) {
-            List<TilbakekrevingPeriode> bgResultatPerioder = lagTilbakekrevingPerioder(bgPeriode, kgPerioder, kgTidligereBehandledeVirkedager);
+            List<TilbakekrevingPeriode> bgResultatPerioder = lagTilbakekrevingPerioder(bgPeriode, kgPerioder, kgTidligereBehandledeVirkedager, kravgrunnlag.gjelderEngangsstønad());
             justerAvrunding(bgPeriode, bgResultatPerioder);
             oppdaterGjenståendeSkattetrekk(bgResultatPerioder, kgGjenståendeMuligSkattetrekk);
             justerAvrundingSkatt(bgPeriode, bgResultatPerioder, kgGjenståendeMuligSkattetrekk);
@@ -74,7 +74,10 @@ public class TilbakekrevingVedtakPeriodeBeregner {
         return resultat;
     }
 
-    private List<TilbakekrevingPeriode> lagTilbakekrevingPerioder(BeregningResultatPeriode bgPeriode, List<KravgrunnlagPeriode432> kgPerioder, Map<Periode, Integer> kgTidligereBehandledeVirkedager) {
+    private List<TilbakekrevingPeriode> lagTilbakekrevingPerioder(BeregningResultatPeriode bgPeriode,
+                                                                  List<KravgrunnlagPeriode432> kgPerioder,
+                                                                  Map<Periode, Integer> kgTidligereBehandledeVirkedager,
+                                                                  boolean gjelderEngangsstønad) {
         Skalering andelSkalering = Skalering.opprett(bgPeriode.getTilbakekrevingBeløpUtenRenter(), bgPeriode.getFeilutbetaltBeløp());
         List<TilbakekrevingPeriode> resultat = new ArrayList<>();
         for (KravgrunnlagPeriode432 kgPeriode : kgPerioder) {
@@ -84,8 +87,8 @@ public class TilbakekrevingVedtakPeriodeBeregner {
                 logger.warn("Ignorerte periode {} ved iverksetting, siden hadde ingen postering med klasseType=FEIL", kgPeriode.getPeriode());
                 continue;
             }
-            if (virkedagerOverlapp(kgPeriode.getPeriode(), bgPeriode.getPeriode()) > 0) {
-                resultat.add(lagTilbakekrevingsperiode(bgPeriode, kgTidligereBehandledeVirkedager, andelSkalering, kgPeriode));
+            if (virkedagerOverlapp(kgPeriode.getPeriode(), bgPeriode.getPeriode(), gjelderEngangsstønad) > 0) {
+                resultat.add(lagTilbakekrevingsperiode(bgPeriode, kgTidligereBehandledeVirkedager, andelSkalering, kgPeriode, gjelderEngangsstønad));
             }
         }
         return resultat;
@@ -96,11 +99,15 @@ public class TilbakekrevingVedtakPeriodeBeregner {
             .noneMatch(kgb -> KlasseType.FEIL.equals(kgb.getKlasseType()));
     }
 
-    private TilbakekrevingPeriode lagTilbakekrevingsperiode(BeregningResultatPeriode bgPeriode, Map<Periode, Integer> kgTidligereBehandledeVirkedager, Skalering andelSkalering, KravgrunnlagPeriode432 kgPeriode) {
+    private TilbakekrevingPeriode lagTilbakekrevingsperiode(BeregningResultatPeriode bgPeriode,
+                                                            Map<Periode, Integer> kgTidligereBehandledeVirkedager,
+                                                            Skalering andelSkalering,
+                                                            KravgrunnlagPeriode432 kgPeriode,
+                                                            boolean gjelderEngangsstønad) {
         Periode kPeriode = kgPeriode.getPeriode();
-        int virkedagerOverlapp = virkedagerOverlapp(kPeriode, bgPeriode.getPeriode());
+        int virkedagerOverlapp = virkedagerOverlapp(kPeriode, bgPeriode.getPeriode(), gjelderEngangsstønad);
         int kgBehandledeVirkedager = kgTidligereBehandledeVirkedager.get(kPeriode);
-        int kgPeriodeVirkedager = Ukedager.beregnAntallVirkedager(kPeriode);
+        int kgPeriodeVirkedager = gjelderEngangsstønad ? 1 : Ukedager.beregnAntallVirkedager(kPeriode);
         Skalering kgTidligereSkalering = Skalering.opprett(kgBehandledeVirkedager, kgPeriodeVirkedager);
         Skalering kgKumulativSkalering = Skalering.opprett(kgBehandledeVirkedager + virkedagerOverlapp, kgPeriodeVirkedager);
         kgTidligereBehandledeVirkedager.put(kPeriode, kgBehandledeVirkedager + virkedagerOverlapp);
@@ -304,7 +311,8 @@ public class TilbakekrevingVedtakPeriodeBeregner {
         return kgBehandledeVirkedager;
     }
 
-    private static int virkedagerOverlapp(Periode a, Periode b) {
+    private static int virkedagerOverlapp(Periode a, Periode b, boolean gjelderEngangsstønad) {
+        if (gjelderEngangsstønad) return 1;
         return a.overlap(b)
             .map(Ukedager::beregnAntallVirkedager)
             .orElse(0);

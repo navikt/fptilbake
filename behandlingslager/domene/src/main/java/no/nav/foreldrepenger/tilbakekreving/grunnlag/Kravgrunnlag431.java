@@ -193,6 +193,10 @@ public class Kravgrunnlag431 extends BaseEntitet {
         perioder.add(periode432);
     }
 
+    public boolean gjelderEngangsstønad() {
+        return FagOmrådeKode.ENGANGSSTØNAD.equals(this.fagOmrådeKode);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

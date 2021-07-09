@@ -45,4 +45,19 @@ public class BeregnBeløpUtilTest {
 
         Assertions.assertThat(resultat).isEqualByComparingTo(BigDecimal.valueOf(100000));
     }
+
+    @Test
+    public void skal_telle_engangstønad_selv_om_den_er_på_søndag() {
+        BeregnBeløpUtil beløpUtil = BeregnBeløpUtil.forFagområde(FagOmrådeKode.ENGANGSSTØNAD);
+
+        LocalDate fom = LocalDate.of(2020, 11, 8);
+
+        Periode kravgrunnlagPeriode = Periode.of(fom, fom);
+        Periode vilkårPeriode = Periode.of(fom, fom);
+
+        BigDecimal feilPerDag = BigDecimal.valueOf(100000);
+        BigDecimal resultat = beløpUtil.beregnBeløp(kravgrunnlagPeriode, vilkårPeriode, feilPerDag);
+
+        Assertions.assertThat(resultat).isEqualByComparingTo(BigDecimal.valueOf(100000));
+    }
 }

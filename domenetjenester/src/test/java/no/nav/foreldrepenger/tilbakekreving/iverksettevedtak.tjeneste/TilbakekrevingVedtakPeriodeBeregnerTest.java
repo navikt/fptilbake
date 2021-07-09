@@ -72,8 +72,8 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
                 KgBeløp.feil(9000),
                 KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(11000).medTilbakekrevBeløp(9000),
                 KgBeløp.trekk(2000))
-            )
-        );
+            ),
+            false);
         VilkårsvurderingTestBuilder.medRepo(vilkårsvurderingRepository).lagre(behandlingId, Map.of(
             uke1, VilkårsvurderingTestBuilder.VVurdering.forsett()
         ));
@@ -96,8 +96,8 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
                 KgBeløp.feil(9000),
                 KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(11000).medTilbakekrevBeløp(9000),
                 KgBeløp.trekk(2000))
-            )
-        );
+            ),
+            false);
 
         VurdertForeldelse foreldelse = new VurdertForeldelse();
         foreldelse.leggTilVurderForeldelsePerioder(VurdertForeldelsePeriode.builder()
@@ -130,8 +130,8 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
             uke2, Arrays.asList(
                 KgBeløp.feil(2000),
                 KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(2000).medTilbakekrevBeløp(2000))
-            )
-        );
+            ),
+            false);
 
         VilkårsvurderingTestBuilder.medRepo(vilkårsvurderingRepository).lagre(behandlingId, Map.of(
             uke1og2, VilkårsvurderingTestBuilder.VVurdering.forsett()
@@ -162,7 +162,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
             uke1til3, Arrays.asList(
                 KgBeløp.feil(3000),
                 KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(3000).medTilbakekrevBeløp(3000).medSkattProsent(0))
-        ));
+        ), false);
 
         VilkårsvurderingTestBuilder.medRepo(vilkårsvurderingRepository).lagre(behandlingId, Map.of(
             uke1og2, VilkårsvurderingTestBuilder.VVurdering.forsett(),
@@ -193,7 +193,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
                 KgBeløp.feil(2500),
                 KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medSkattProsent(25),
                 KgBeløp.ytelse(KlasseKode.FPSNDFI).medUtbetBeløp(1500).medTilbakekrevBeløp(1500).medSkattProsent(0))
-        ));
+        ), false);
 
         VilkårsvurderingTestBuilder.medRepo(vilkårsvurderingRepository).lagre(behandlingId, Map.of(
             uke1, VilkårsvurderingTestBuilder.VVurdering.forsett()
@@ -228,7 +228,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
                 KgBeløp.feil(1000),
                 KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medSkattProsent(0)
             )
-        ));
+        ), false);
 
         VilkårsvurderingTestBuilder.medRepo(vilkårsvurderingRepository).lagre(behandlingId, Map.of(
             Periode.omsluttende(uke1, uke3), VilkårsvurderingTestBuilder.VVurdering.godTro().setManueltBeløp(1000)
@@ -265,7 +265,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
                 KgBeløp.feil(1000),
                 KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000)
             )
-        ));
+        ), false);
 
         VilkårsvurderingTestBuilder.medRepo(vilkårsvurderingRepository).lagre(behandlingId, Map.of(
             uke1, VilkårsvurderingTestBuilder.VVurdering.godTro().setManueltBeløp(333),
@@ -304,7 +304,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
                 KgBeløp.feil(1000),
                 KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medSkattProsent(10)
             )
-        ), 100);
+        ), 100, false);
 
         VilkårsvurderingTestBuilder.medRepo(vilkårsvurderingRepository).lagre(behandlingId, Map.of(
             uke1, VilkårsvurderingTestBuilder.VVurdering.simpelUaktsom()
@@ -335,7 +335,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
                 KgBeløp.feil(1000),
                 KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medSkattProsent(10)
             )
-        ), 100);
+        ), 100, false);
 
         VilkårsvurderingTestBuilder.medRepo(vilkårsvurderingRepository).lagre(behandlingId, Map.of(
             uke1, VilkårsvurderingTestBuilder.VVurdering.godTro()
@@ -366,7 +366,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
                 KgBeløp.feil(1000),
                 KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medSkattProsent(10)
             )
-        ), 100);
+        ), 100, false);
 
         VilkårsvurderingTestBuilder.medRepo(vilkårsvurderingRepository).lagre(behandlingId, Map.of(
             uke1, VilkårsvurderingTestBuilder.VVurdering.godTro().setManueltBeløp(500)
@@ -400,7 +400,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
                 KgBeløp.feil(3180).medSkattProsent(BigDecimal.valueOf(9.5041)),
                 KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(6380).medTilbakekrevBeløp(3180).medNyttBeløp(3200).medSkattProsent(BigDecimal.valueOf(9.5041))
             )
-        ), 302);
+        ), 302, false);
 
         VilkårsvurderingTestBuilder.medRepo(vilkårsvurderingRepository).lagre(behandlingId, Map.of(
             uke1, VilkårsvurderingTestBuilder.VVurdering.simpelUaktsom(),
@@ -567,7 +567,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
             uke1og2, Arrays.asList(
                 KgBeløp.feil(2500),
                 KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000))
-        ));
+        ), false);
 
         VilkårsvurderingTestBuilder.medRepo(vilkårsvurderingRepository).lagre(behandlingId, Map.of(
             uke1, VilkårsvurderingTestBuilder.VVurdering.forsett()
@@ -591,7 +591,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
             uke1, Arrays.asList(
                 KgBeløp.feil(2500),
                 KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000))
-        ));
+        ), false);
 
         VilkårsvurderingTestBuilder.medRepo(vilkårsvurderingRepository).lagre(behandlingId, Map.of(
             uke1og2, VilkårsvurderingTestBuilder.VVurdering.forsett()
@@ -604,6 +604,31 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         assertThatThrownBy(() -> beregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag))
             .isInstanceOf(TekniskException.class)
             .hasMessageContaining("har 10 virkedager, forventer en-til-en, men ovelapper mot kravgrunnlag med 5 dager");
+    }
+
+    @Test
+    public void skal_beregne_riktig_beløp_for_engangsstønad_i_helgen() {
+        Behandling behandling = simple.lagre(behandlingRepositoryProvider);
+        Long behandlingId = behandling.getId();
+        var dag = LocalDate.of(2020, 11, 8);
+        var dagsPeriodeHelg = Periode.of(dag, dag);
+
+        Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
+            dagsPeriodeHelg, Arrays.asList(
+                KgBeløp.feil(84720),
+                KgBeløp.ytelse(KlasseKode.FPENFOD_OP).medUtbetBeløp(84720).medTilbakekrevBeløp(84720))
+            ),
+            true);
+        VilkårsvurderingTestBuilder.medRepo(vilkårsvurderingRepository).lagre(behandlingId, Map.of(
+            dagsPeriodeHelg, VilkårsvurderingTestBuilder.VVurdering.forsett()
+        ));
+
+        flushAndClear();
+
+        List<TilbakekrevingPeriode> resultat = beregner.lagTilbakekrevingsPerioder(behandlingId, kravgrunnlag);
+        assertThat(resultat).containsOnly(TilbakekrevingPeriode.med(dagsPeriodeHelg).medRenter(8472)
+            .medBeløp(TbkBeløp.feil(84720))
+            .medBeløp(TbkBeløp.ytelse(KlasseKode.FPENFOD_OP).medNyttBeløp(0).medUtbetBeløp(84720).medTilbakekrevBeløp(84720).medUinnkrevdBeløp(0).medSkattBeløp(0)));
     }
 
     private static BigDecimal finSumAv(Collection<TilbakekrevingPeriode> perioder, Function<TilbakekrevingBeløp, BigDecimal> hva, KlasseType klasseType) {

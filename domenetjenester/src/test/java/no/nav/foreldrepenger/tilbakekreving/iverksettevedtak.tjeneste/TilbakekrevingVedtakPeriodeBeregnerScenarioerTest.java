@@ -62,7 +62,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerScenarioerTest {
             PP2018.periode("1/5-26/5"), Arrays.asList(
                 KgBeløp.feil(19000),
                 KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(19000).medTilbakekrevBeløp(19000))
-        ));
+        ), false);
 
         VilkårsvurderingTestBuilder.medRepo(vilkårsvurderingRepository).lagre(behandlingId, Map.of(
             PP2018.periode("16/3-3/4"), VilkårsvurderingTestBuilder.VVurdering.godTro().setManueltBeløp(0),
@@ -107,7 +107,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerScenarioerTest {
             PP2018.periode("6/5-20/5"), Arrays.asList(
                 KgBeløp.feil(10000),
                 KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(10000).medTilbakekrevBeløp(10000))
-        ));
+        ), false);
 
         VilkårsvurderingTestBuilder.medRepo(vilkårsvurderingRepository).lagre(behandlingId, Map.of(
             PP2018.periode("10/4-20/5"), VilkårsvurderingTestBuilder.VVurdering.simpelUaktsom().setProsenterTilbakekreves(BigDecimal.valueOf(100))

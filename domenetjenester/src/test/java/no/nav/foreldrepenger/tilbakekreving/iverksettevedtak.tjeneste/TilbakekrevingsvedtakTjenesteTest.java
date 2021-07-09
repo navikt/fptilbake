@@ -52,8 +52,8 @@ public class TilbakekrevingsvedtakTjenesteTest {
                 KravgrunnlagTestBuilder.KgBeløp.feil(9000),
                 KravgrunnlagTestBuilder.KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(11000).medTilbakekrevBeløp(9000),
                 KravgrunnlagTestBuilder.KgBeløp.trekk(2000))
-            )
-        );
+            ),
+                false);
         VilkårsvurderingTestBuilder.medRepo(vilkårsvurderingRepository).lagre(behandlingId, Map.of(
             uke, VilkårsvurderingTestBuilder.VVurdering.forsett()
         ));
