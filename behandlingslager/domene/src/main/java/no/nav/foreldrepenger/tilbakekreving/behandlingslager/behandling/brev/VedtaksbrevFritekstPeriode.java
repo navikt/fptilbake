@@ -119,7 +119,7 @@ public class VedtaksbrevFritekstPeriode extends BaseEntitet {
             Objects.requireNonNull(vedtaksbrevFritekstPeriode.periode);
             Objects.requireNonNull(vedtaksbrevFritekstPeriode.fritekstType);
             if (vedtaksbrevFritekstPeriode.fritekst == null || vedtaksbrevFritekstPeriode.fritekst.isBlank()) {
-                throw new IllegalArgumentException("Mangler fritekst");
+                throw new IllegalArgumentException("Mangler fritekst for " + vedtaksbrevFritekstPeriode.fritekstType + " og " + vedtaksbrevFritekstPeriode.periode);
             }
             return vedtaksbrevFritekstPeriode;
         }
