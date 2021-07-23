@@ -67,7 +67,7 @@ public class ForeslåVedtakOppdaterer implements AksjonspunktOppdaterer<Foreslå
 
     private Optional<VedtaksbrevFritekstPeriode> lagFritekstPeriode(Long behandlingId, PeriodeMedTekstDto dto, Function<PeriodeMedTekstDto, String> stringSupplier, VedtaksbrevFritekstType fritekstType) {
         String fritekst = stringSupplier.apply(dto);
-        if (fritekst == null) {
+        if (fritekst == null || fritekst.isBlank()) {
             return Optional.empty();
         }
         return Optional.of(lagFritekstPeriode(behandlingId, fritekstType, dto.getPeriode(), fritekst));
