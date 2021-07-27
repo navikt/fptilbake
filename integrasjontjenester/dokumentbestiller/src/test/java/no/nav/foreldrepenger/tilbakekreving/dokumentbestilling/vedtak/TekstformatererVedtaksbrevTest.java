@@ -894,8 +894,8 @@ public class TekstformatererVedtaksbrevTest {
             Du må som hovedregel begynne å betale beløpet tilbake, selv om du klager på dette vedtaket. Dette følger av forvaltningsloven § 42. Hvis du får vedtak om at du ikke trengte å betale tilbake hele eller deler av beløpet du skyldte, betaler vi pengene tilbake til deg.
             _Du har rett til innsyn
             På nav.no/dittnav kan du se dokumentene i saken din.
-            _Har du spørsmål?
-            Du finner nyttig informasjon på nav.no
+            _Trenger du mer informasjon?
+            Du finner informasjon som kan være nyttig for deg på nav.no/omsorgspenger.
 
             Med vennlig hilsen
             NAV Arbeid og ytelser
