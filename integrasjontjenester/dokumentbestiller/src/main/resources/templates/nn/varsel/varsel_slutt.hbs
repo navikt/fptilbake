@@ -36,25 +36,7 @@ Du har rett til å uttale deg og komme med ein tilbakemelding på dette varselet
 _Du har rett til innsyn
 På nav.no/dittnav kan du sjå dokumenta i saka di.
 {{/if}}
-_Har du spørsmål?
-{{#switch ytelsetype}}
-    {{#case "FP" "SVP" "ES"}}
-Du finn nyttig informasjon på nav.no/familie.
-    {{/case}}
-    {{#case "OMP"}}
-_Treng du meir informasjon?
-Du finn informasjon som kan være nyttig for deg på nav.no/omsorgspenger.
-    {{/case}}
-    {{#case "PSB"}}
-_Treng du meir informasjon?
-Du finn informasjon som kan være nyttig for deg på nav.no/pleiepenger.
-
-Du kan også̊ kontakte oss på telefon 55 55 33 33.
-    {{/case}}
-    {{#case "FRISINN"}}
-Du finn nyttig informasjon på nav.no. Du kan også kontakte oss på telefon 55553333.
-    {{/case}}
-{{/switch}}
+{{> nn/felles/har_du_spørsmål}}
 
 Med vennleg helsing
 {{#switch ytelsetype}}
