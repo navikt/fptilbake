@@ -32,15 +32,9 @@ Du må som hovedregel begynne å betale beløpet tilbake, selv om du klager på 
 _Du har rett til innsyn
 På nav.no/dittnav kan du se dokumentene i saken din.
 {{/if}}
-_Har du spørsmål?
-Du finner nyttig informasjon på nav.no{{#if (eq sak.ytelsetype "FRISINN")}}. Du kan også kontakte oss på telefon 55553333.{{else}}/familie.{{/if}}
+{{> nb/felles/har_du_spørsmål ytelsetype=sak.ytelsetype}}
 
-Med vennlig hilsen
-NAV Familie- og pensjonsytelser
-{{#if finnesVerge}}
-
-Brev med likt innhold er sendt til {{annenMottakerNavn}}
-{{/if}}
+{{> nb/felles/hilsen_og_verge ytelsetype=sak.ytelsetype}}
 {{#if har-vedlegg}}
 
 

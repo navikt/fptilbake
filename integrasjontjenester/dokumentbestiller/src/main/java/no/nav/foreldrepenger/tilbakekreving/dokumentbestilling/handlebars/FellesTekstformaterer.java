@@ -41,7 +41,11 @@ public abstract class FellesTekstformaterer {
         handlebars.setInfiniteLoops(false);
         handlebars.setPrettyPrint(true);
         handlebars.registerHelpers(ConditionalHelpers.class);
-
+        handlebars.registerHelper("switch", new CustomHelpers.SwitchHelper());
+        handlebars.registerHelper("case", new CustomHelpers.CaseHelper());
+        handlebars.registerHelper("var", new CustomHelpers.VariableHelper());
+        handlebars.registerHelper("lookup-map", new CustomHelpers.MapLookupHelper());
+        handlebars.registerHelper("kroner", new CustomHelpers.KroneFormattererMedTusenskille());
         return handlebars;
     }
 

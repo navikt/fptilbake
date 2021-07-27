@@ -4,14 +4,11 @@
 {{~#* inline "sitt-barn" ~}}{{eq sak.antall-barn 1 yes="sitt barn" no="sine barn"}}{{~/inline~}}
 {{~#* inline "det-samme-barnet" ~}}{{eq sak.antall-barn 1 yes="det samme barnet" no="de samme barna"}}{{~/inline~}}
 {{#switch sak.ytelsetype}}
-{{#case "FRISINN"}}
-{{> nb/vedtak/periode-fakta/periode_fakta_annet}}
-{{/case}}
-{{#case "OMP"}}
-{{> nb/vedtak/periode-fakta/periode_fakta_annet}}
-{{/case}}
-{{#case "PSB"}}
-{{> nb/vedtak/periode-fakta/periode_fakta_annet}}
+{{#case "OMP" "PSB" "FRISINN"}}
+    {{#switch fakta.hendelseundertype}}
+        {{#case "ANNET_FRITEKST"}}
+        {{/case}}
+    {{/switch}}
 {{/case}}
 {{#case "ES"}}
 

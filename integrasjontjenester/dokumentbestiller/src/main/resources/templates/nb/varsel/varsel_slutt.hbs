@@ -21,17 +21,21 @@ Hvis du må betale tilbake, og du har gitt oss feil eller mangelfull informasjon
 {{/if}}
 Dette går fram av folketrygdloven {{#if skal-vise-renteinformasjon}}§§ 22-15 og 22-17a{{else}}§ 22-15{{/if}}.
 _Slik uttaler du deg
-{{#if (eq ytelsetype "FRISINN") }}
-Du har rett til å uttale deg og komme med en tilbakemelding på dette varselet. For å uttale deg logger du deg inn på Ditt NAV, og bruker tjenesten "Skriv til oss". Under tema for hva slags beskjed du skal sende velger du "Jobbsøker".
-{{else}}
+{{#switch ytelsetype}}
+    {{#case "FP" "SVP" "ES"}}
 Du kan sende uttalelsen din ved å logge deg inn på foreldrepenger.nav.no. Du kan også sende uttalelsen din til oss i posten. Adressen finner du på nav.no/ettersendelser.
+    {{/case}}
+    {{#case "OMP" "PSB"}}
+Du kan sende uttalelsen din ved å logge deg inn på nav.no/person/kontakt-oss/skriv-til-oss. Du kan også sende uttalelsen din til oss i posten. Adressen finner du på nav.no/ettersendelser.
+    {{/case}}
+    {{#case "FRISINN"}}
+Du har rett til å uttale deg og komme med en tilbakemelding på dette varselet. For å uttale deg logger du deg inn på Ditt NAV, og bruker tjenesten "Skriv til oss". Under tema for hva slags beskjed du skal sende velger du "Jobbsøker".
+    {{/case}}
+{{/switch}}
+{{#if (neq ytelsetype "FRISINN") }}
 _Du har rett til innsyn
 På nav.no/dittnav kan du se dokumentene i saken din.
 {{/if}}
-_Har du spørsmål?
-Du finner nyttig informasjon på nav.no{{#if (eq ytelsetype "FRISINN")}}. Du kan også kontakte oss på telefon 55553333.{{else}}/familie.{{/if}}
+{{> nb/felles/har_du_spørsmål}}
 
-Med vennlig hilsen
-NAV Familie- og pensjonsytelser{{#if finnesVerge}}
-
-Brev med likt innhold er sendt til {{annenMottakerNavn}}{{/if}}
+{{> nb/felles/hilsen_og_verge}}

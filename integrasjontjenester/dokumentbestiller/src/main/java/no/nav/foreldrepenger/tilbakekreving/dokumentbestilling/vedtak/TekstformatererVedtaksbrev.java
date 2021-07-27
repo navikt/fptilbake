@@ -19,7 +19,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkko
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Avsnitt;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.Underavsnitt;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.TekstformatererBrevFeil;
-import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.CustomHelpers;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.FellesTekstformaterer;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars.HandlebarsData;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.HbVedtaksbrevData;
@@ -344,7 +343,7 @@ class TekstformatererVedtaksbrev extends FellesTekstformaterer {
                 .append("\n");
         }
 
-        Handlebars handlebars = opprettVedtakHandlebarsKonfigurasjon();
+        Handlebars handlebars = opprettHandlebarsKonfigurasjon();
         try {
             return handlebars.compileInline(builder.toString());
         } catch (IOException e) {
@@ -354,22 +353,12 @@ class TekstformatererVedtaksbrev extends FellesTekstformaterer {
 
 
     private static Template opprettHandlebarsTemplate(String filsti) {
-        Handlebars handlebars = opprettVedtakHandlebarsKonfigurasjon();
+        Handlebars handlebars = opprettHandlebarsKonfigurasjon();
         try {
             return handlebars.compile(filsti);
         } catch (IOException e) {
             throw new TekniskException("FTP-531549", String.format("Klarte ikke å kompiler template %s", filsti), e);
         }
-    }
-
-    protected static Handlebars opprettVedtakHandlebarsKonfigurasjon() {
-        Handlebars handlebars = opprettHandlebarsKonfigurasjon();
-        handlebars.registerHelper("switch", new CustomHelpers.SwitchHelper());
-        handlebars.registerHelper("case", new CustomHelpers.CaseHelper());
-        handlebars.registerHelper("var", new CustomHelpers.VariableHelper());
-        handlebars.registerHelper("lookup-map", new CustomHelpers.MapLookupHelper());
-        handlebars.registerHelper("kroner", new CustomHelpers.KroneFormattererMedTusenskille());
-        return handlebars;
     }
 
 

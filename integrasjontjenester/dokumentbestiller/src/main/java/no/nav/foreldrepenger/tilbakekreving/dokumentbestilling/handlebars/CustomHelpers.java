@@ -3,6 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -36,13 +37,26 @@ public interface CustomHelpers {
 
     class CaseHelper implements Helper<Object> {
         @Override
-        public Object apply(Object caseKonstant, Options options) throws IOException {
-            Object konstant = options.hash.isEmpty() ? caseKonstant : options.hash;
+        public Object apply(Object konstant, Options options) throws IOException {
+            List<Object> konstanter = new ArrayList<>();
+            if (options.hash.isEmpty()) {
+                konstanter.add(konstant);
+                konstanter.addAll(Arrays.asList(options.params));
+            } else {
+                konstanter.add(options.hash);
+            }
+
             Map<String, Object> model = (Map<String, Object>) options.context.model();
             Object condition_variable = model.get("__condition_variable");
-            if (konstant.equals(condition_variable)) {
-                Integer antall = (Integer) model.get("__condition_fulfilled");
-                model.put("__condition_fulfilled", ++antall);
+
+            int antallTreff = konstanter.stream()
+                .mapToInt(k -> k.equals(condition_variable) ? 1 : 0)
+                .reduce(Integer::sum)
+                .orElseThrow();
+
+            if (antallTreff > 0) {
+                Integer kumulativtAntallTreff = (Integer) model.get("__condition_fulfilled");
+                model.put("__condition_fulfilled", kumulativtAntallTreff += antallTreff);
                 return options.fn();
             }
             return options.inverse();
