@@ -2,14 +2,4 @@ Vi sende deg eit varsel {{varsletDato}} om at du hadde fått for mykje utbetalt 
 
 {{> nn/felles/har_du_spørsmål}}
 
-Med vennleg helsing
-{{#switch ytelsetype}}
-    {{#case "FP" "SVP" "ES" "FRISINN"}}
-NAV Familie- og pensjonsytelsar
-    {{/case}}
-    {{#case "PSB" "OMP"}}
-NAV Arbeid og ytelser
-    {{/case}}
-{{/switch}}{{#if finnesVerge}}
-
-Brev med likt innhald er sendt til {{annenMottakerNavn}}{{/if}}
+{{> nn/felles/hilsen_og_verge}}

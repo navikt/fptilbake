@@ -38,14 +38,4 @@ På nav.no/dittnav kan du se dokumentene i saken din.
 {{/if}}
 {{> nb/felles/har_du_spørsmål}}
 
-Med vennlig hilsen
-{{#switch ytelsetype}}
-    {{#case "FP" "SVP" "ES" "FRISINN"}}
-NAV Familie- og pensjonsytelser
-    {{/case}}
-    {{#case "PSB" "OMP"}}
-NAV Arbeid og ytelser
-    {{/case}}
-{{/switch}}{{#if finnesVerge}}
-
-Brev med likt innhold er sendt til {{annenMottakerNavn}}{{/if}}
+{{> nb/felles/hilsen_og_verge}}

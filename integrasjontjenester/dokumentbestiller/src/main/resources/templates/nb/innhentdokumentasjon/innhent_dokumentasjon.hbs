@@ -9,14 +9,4 @@ _Slik uttaler du deg
 Du kan sende uttalelsen din ved å logge deg inn på nav.no/beskjedtilnav og velge «Send beskjed til NAV». Du kan også sende uttalelsen din til oss i posten. Adressen finner du på nav.no/ettersendelser.
 {{> nb/felles/har_du_spørsmål}}
 
-Med vennlig hilsen
-{{#switch ytelsetype}}
-    {{#case "FP" "SVP" "ES" "FRISINN"}}
-NAV Familie- og pensjonsytelser
-    {{/case}}
-    {{#case "PSB" "OMP"}}
-NAV Arbeid og ytelser
-    {{/case}}
-{{/switch}}{{#if finnesVerge}}
-
-Brev med likt innhold er sendt til {{annenMottakerNavn}}{{/if}}
+{{> nb/felles/hilsen_og_verge}}

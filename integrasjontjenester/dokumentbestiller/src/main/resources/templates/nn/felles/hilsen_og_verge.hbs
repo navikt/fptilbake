@@ -1,0 +1,12 @@
+Med vennleg helsing
+{{#switch ytelsetype}}
+    {{#case "FP" "SVP" "ES" "FRISINN"}}
+NAV Familie- og pensjonsytelsar
+    {{/case}}
+    {{#case "PSB" "OMP"}}
+NAV Arbeid og ytelser
+    {{/case}}
+{{/switch}}{{#if finnesVerge}}
+
+Brev med likt innhald er sendt til {{annenMottakerNavn}}
+{{/if}}

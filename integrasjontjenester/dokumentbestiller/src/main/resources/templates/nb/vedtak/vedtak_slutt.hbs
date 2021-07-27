@@ -32,40 +32,9 @@ Du må som hovedregel begynne å betale beløpet tilbake, selv om du klager på 
 _Du har rett til innsyn
 På nav.no/dittnav kan du se dokumentene i saken din.
 {{/if}}
-{{#switch sak.ytelsetype}}
-    {{#case "FP" "SVP" "ES"}}
-_Har du spørsmål?
-Du finner nyttig informasjon på nav.no/familie.
-    {{/case}}
-    {{#case "OMP"}}
-_Trenger du mer informasjon?
-Du finner informasjon som kan være nyttig for deg på nav.no/omsorgspenger.
-    {{/case}}
-    {{#case "PSB"}}
-_Trenger du mer informasjon?
-Du finner informasjon som kan være nyttig for deg på nav.no/pleiepenger.
+{{> nb/felles/har_du_spørsmål ytelsetype=sak.ytelsetype}}
 
-Du kan også kontakte oss på telefon 55 55 33 33.
-    {{/case}}
-    {{#case "FRISINN"}}
-_Har du spørsmål?
-Du finner nyttig informasjon på nav.no. Du kan også kontakte oss på telefon 55553333.
-    {{/case}}
-{{/switch}}
-
-Med vennlig hilsen
-{{#switch sak.ytelsetype}}
-    {{#case "FP" "SVP" "ES" "FRISINN"}}
-NAV Familie- og pensjonsytelser
-    {{/case}}
-    {{#case "PSB" "OMP"}}
-NAV Arbeid og ytelser
-    {{/case}}
-{{/switch}}
-{{#if finnesVerge}}
-
-Brev med likt innhold er sendt til {{annenMottakerNavn}}
-{{/if}}
+{{> nb/felles/hilsen_og_verge ytelsetype=sak.ytelsetype}}
 {{#if har-vedlegg}}
 
 
