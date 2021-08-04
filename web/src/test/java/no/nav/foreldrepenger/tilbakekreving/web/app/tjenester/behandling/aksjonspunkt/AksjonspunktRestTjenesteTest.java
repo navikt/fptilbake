@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 
 import org.apache.http.HttpStatus;
@@ -116,7 +117,7 @@ public class AksjonspunktRestTjenesteTest {
         when(behandlingRepositoryMock.hentBehandling(anyLong())).thenReturn(behandlingSpy);
         when(behandlingRepositoryMock.erVersjonUendret(anyLong(), anyLong())).thenReturn(true);
 
-        aksjonspunktRestTjeneste.bekreft(dto);
+        aksjonspunktRestTjeneste.bekreft(mock(HttpServletRequest.class), dto);
 
         verify(aksjonspunktTjenesteMock, atLeastOnce()).bekreftAksjonspunkter(aksjonspunkterDtoer, behandlingId);
     }

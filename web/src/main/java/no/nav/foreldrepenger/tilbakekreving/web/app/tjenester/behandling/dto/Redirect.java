@@ -5,45 +5,50 @@ import java.net.URISyntaxException;
 import java.util.Optional;
 import java.util.UUID;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 
-import org.jboss.resteasy.spi.HttpRequest;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
+import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.BehandlingRestTjeneste;
 
 public final class Redirect {
+
+    private static final Logger LOG = LoggerFactory.getLogger(Redirect.class);
 
     private Redirect() {
         // no ctor
     }
 
-    public static Response tilBehandlingPollStatus(UUID uuid, Optional<String> gruppeOpt) throws URISyntaxException {
-        URI uri = new URI("/behandlinger/status?uuid=" + uuid + (gruppeOpt.isPresent() ? "&gruppe=" + gruppeOpt.get() : ""));
-        return Response.accepted().location(uri).build();
+    public static Response tilBehandlingPollStatus(HttpServletRequest request, UUID uuid, Optional<String> gruppeOpt) throws URISyntaxException {
+        var uriBuilder = getUriBuilder(request)
+            .path(BehandlingRestTjeneste.STATUS_PATH)
+            .queryParam("uuid", uuid);
+        gruppeOpt.ifPresent(s -> uriBuilder.queryParam("gruppe", s));
+        return Response.accepted().location(honorXForwardedProto(request, uriBuilder.build())).build();
     }
 
-    public static Response tilBehandlingPollStatus(UUID uuid) throws URISyntaxException {
-        return tilBehandlingPollStatus(uuid, Optional.empty());
+    public static Response tilBehandlingPollStatus(HttpServletRequest request, UUID uuid) throws URISyntaxException {
+        return tilBehandlingPollStatus(request, uuid, Optional.empty());
     }
 
-    public static Response tilBehandlingEllerPollStatus(UUID uuid, AsyncPollingStatus status) throws URISyntaxException {
-        String resultatUri = "/behandlinger/?uuid=" + uuid;
-        return buildResponse(status, resultatUri);
+    public static Response tilBehandlingEllerPollStatus(HttpServletRequest request, UUID uuid, AsyncPollingStatus status) throws URISyntaxException {
+        var uriBuilder = getUriBuilder(request)
+            .path(BehandlingRestTjeneste.PATH_FRAGMENT)
+            .queryParam("uuid", uuid);
+        return buildResponse(request, status, uriBuilder.build());
     }
 
-    public static Response tilFagsakPollStatus(Saksnummer saksnummer, Optional<String> gruppeOpt) throws URISyntaxException {
-        URI uri = new URI("/fagsak/status?saksnummer=" + saksnummer.getVerdi() + (gruppeOpt.isPresent() ? "&gruppe=" + gruppeOpt.get() : ""));
-        return Response.accepted().location(uri).build();
+    private static UriBuilder getUriBuilder(HttpServletRequest request) {
+        UriBuilder uriBuilder = request == null || request.getContextPath() == null ? UriBuilder.fromUri("") : UriBuilder.fromUri(URI.create(request.getContextPath()));
+        Optional.ofNullable(request).map(r -> r.getServletPath()).ifPresent(c -> uriBuilder.path(c));
+        return uriBuilder;
     }
 
-    public static Response tilFagsakEllerPollStatus(Saksnummer saksnummer, AsyncPollingStatus status) throws URISyntaxException {
-        String resultatUri = "/fagsak/?saksnummer=" + saksnummer.getVerdi();
-        return buildResponse(status, resultatUri);
-    }
-
-    private static Response buildResponse(AsyncPollingStatus status, String resultatUri) throws URISyntaxException {
-        URI uri = honorXForwardedProto(new URI(resultatUri));
+    private static Response buildResponse(HttpServletRequest request, AsyncPollingStatus status, URI resultatUri) throws URISyntaxException {
+        URI uri = honorXForwardedProto(request, resultatUri);
         if (status != null) {
             // sett alltid resultat-location i tilfelle timeout på klient
             status.setLocation(uri);
@@ -53,20 +58,21 @@ public final class Redirect {
         }
     }
 
-    private static URI honorXForwardedProto(URI location) {
+    private static URI honorXForwardedProto(HttpServletRequest request, URI location) throws URISyntaxException {
         URI newLocation = null;
         if (relativLocationAndRequestAvailable(location)) {
-            HttpRequest httpRequest = ResteasyProviderFactory.getInstance().getContextData(HttpRequest.class);
-            String xForwardedProto = getXForwardedProtoHeader(httpRequest);
+            String xForwardedProto = getXForwardedProtoHeader(request);
 
-            if (mismatchedScheme(xForwardedProto, httpRequest)) {
-                String path = location.getSchemeSpecificPart(); //NOSONAR
-                if (path.startsWith("/")) {
-                    path = path.substring(1);
+            if (mismatchedScheme(xForwardedProto, request)) {
+                String path = location.toString();
+                if (path.startsWith("/")) { // NOSONAR
+                    path = path.substring(1); // NOSONAR
                 }
-                URI baseUri = httpRequest.getUri().getBaseUri();
+                URI baseUri = new URI(request.getRequestURI());
                 try {
-                    URI rewritten = new URI(xForwardedProto, baseUri.getSchemeSpecificPart(), baseUri.getFragment()).resolve(path);
+                    URI rewritten = new URI(xForwardedProto, baseUri.getSchemeSpecificPart(), baseUri.getFragment())
+                        .resolve(path);
+                    LOG.info("Rewrote URI from '{}' to '{}'", location, rewritten);
                     newLocation = rewritten;
                 } catch (URISyntaxException e) {
                     throw new IllegalArgumentException(e.getMessage(), e);
@@ -77,25 +83,24 @@ public final class Redirect {
     }
 
     private static boolean relativLocationAndRequestAvailable(URI location) {
-        return location != null &&
-            !location.isAbsolute() &&
-            ResteasyProviderFactory.getInstance().getContextData(HttpRequest.class) != null;
+        return location != null && !location.isAbsolute();
     }
 
     /**
      * @return http, https or null
      */
-    private static String getXForwardedProtoHeader(HttpRequest httpRequest) {
-        String xForwardedProto = httpRequest.getHttpHeaders().getHeaderString("X-Forwarded-Proto");
-        if (xForwardedProto != null && ("https".equalsIgnoreCase(xForwardedProto) || "http".equalsIgnoreCase(xForwardedProto))) {
+    private static String getXForwardedProtoHeader(HttpServletRequest httpRequest) {
+        String xForwardedProto = httpRequest.getHeader("X-Forwarded-Proto");
+        if ("https".equalsIgnoreCase(xForwardedProto) ||
+            "http".equalsIgnoreCase(xForwardedProto)) {
             return xForwardedProto;
         }
         return null;
     }
 
-    private static boolean mismatchedScheme(String xForwardedProto, HttpRequest httpRequest) {
+    private static boolean mismatchedScheme(String xForwardedProto, HttpServletRequest httpRequest) {
         return xForwardedProto != null &&
-            !xForwardedProto.equalsIgnoreCase(httpRequest.getUri().getBaseUri().getScheme());
+            !xForwardedProto.equalsIgnoreCase(httpRequest.getScheme());
     }
 
     private static URI leggTilBaseUri(URI resultatUri) {

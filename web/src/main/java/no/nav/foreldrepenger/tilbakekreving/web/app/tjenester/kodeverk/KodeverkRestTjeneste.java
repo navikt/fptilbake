@@ -35,7 +35,7 @@ public class KodeverkRestTjeneste {
     private LRUCache<String, Map<String, Object>> kodelisteCache = new LRUCache<>(10, CACHE_ELEMENT_LIVE_TIME_MS);
 
     public KodeverkRestTjeneste() {
-        // for resteasy
+        // for CDI
     }
 
     @Inject

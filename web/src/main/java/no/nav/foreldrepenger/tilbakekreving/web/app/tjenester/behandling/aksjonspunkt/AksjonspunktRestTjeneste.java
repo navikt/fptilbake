@@ -9,6 +9,7 @@ import java.util.Set;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -19,6 +20,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.CacheControl;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -58,7 +60,7 @@ public class AksjonspunktRestTjeneste {
     private AksjonspunktApplikasjonTjeneste aksjonspunktApplikasjonTjeneste;
 
     public AksjonspunktRestTjeneste() {
-        // Bare for RESTeasy
+        // CDI
     }
 
     @Inject
@@ -111,13 +113,14 @@ public class AksjonspunktRestTjeneste {
         description = "Lagre endringer gitt av aksjonspunktene og rekjør behandling fra gjeldende steg")
     @BeskyttetRessurs(action = UPDATE, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public Response bekreft(@Parameter(description = "Liste over aksjonspunkt som skal bekreftes, inklusiv data som trengs for å løse de.") @Valid BekreftedeAksjonspunkterDto apDto) throws URISyntaxException { // NOSONAR
+    public Response bekreft(@Context HttpServletRequest request,
+                            @Parameter(description = "Liste over aksjonspunkt som skal bekreftes, inklusiv data som trengs for å løse de.") @Valid BekreftedeAksjonspunkterDto apDto) throws URISyntaxException { // NOSONAR
         BehandlingReferanse behandlingReferanse = apDto.getBehandlingReferanse();
         Behandling behandling = hentBehandling(behandlingReferanse);
         Collection<BekreftetAksjonspunktDto> bekreftedeAksjonspunktDtoer = apDto.getBekreftedeAksjonspunktDtoer();
         behandlingTjeneste.kanEndreBehandling(behandling.getId(), apDto.getBehandlingVersjon());
         aksjonspunktApplikasjonTjeneste.bekreftAksjonspunkter(bekreftedeAksjonspunktDtoer, behandling.getId());
-        return Redirect.tilBehandlingPollStatus(behandling.getUuid());
+        return Redirect.tilBehandlingPollStatus(request, behandling.getUuid());
     }
 
     private Behandling hentBehandling(BehandlingReferanse behandlingReferanse) {
