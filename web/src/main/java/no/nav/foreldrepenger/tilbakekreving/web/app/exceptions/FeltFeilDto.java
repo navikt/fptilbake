@@ -1,33 +1,9 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.exceptions;
 
-import java.io.Serializable;
-
-public class FeltFeilDto implements Serializable {
-
-    private String navn;
-    private String melding;
-    private String metainformasjon;
+public record FeltFeilDto(String navn, String melding, String metainformasjon) {
 
     public FeltFeilDto(String navn, String melding) {
-        this.navn = navn;
-        this.melding = melding;
-    }
-    
-    public FeltFeilDto(String navn, String melding, String metainformasjon) {
-        this.navn = navn;
-        this.melding = melding;
-        this.metainformasjon = metainformasjon;
+        this(navn, melding, null);
     }
 
-    public String getNavn() {
-        return navn;
-    }
-
-    public String getMelding() {
-        return melding;
-    }
-    
-    public String getMetainformasjon() {
-        return metainformasjon;
-    }
 }

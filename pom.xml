@@ -133,7 +133,7 @@
             <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>
-                <version>1.11.9</version>
+                <version>1.11.10</version>
             </dependency>
 
             <!-- moduler i dette prosjektet -->
@@ -554,7 +554,7 @@
             <dependency>
                 <groupId>com.sun.xml.bind</groupId>
                 <artifactId>jaxb-core</artifactId>
-                <version>3.0.1</version>
+                <version>3.0.2</version>
             </dependency>
 
             <!-- logging -->
@@ -599,7 +599,7 @@
             <dependency>
                 <groupId>io.github.classgraph</groupId>
                 <artifactId>classgraph</artifactId>
-                <version>4.8.110</version>
+                <version>4.8.111</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -16,7 +16,7 @@ public class JsonMappingExceptionMapperTest {
         JsonMappingExceptionMapper mapper = new JsonMappingExceptionMapper();
         Response resultat = mapper.toResponse(new InvalidTypeIdException(null, "Ukjent type-kode", null, "23525"));
         FeilDto dto = (FeilDto) resultat.getEntity();
-        assertThat(dto.getFeilmelding()).contains("JSON-mapping feil");
-        assertThat(dto.getFeltFeil()).isNull();
+        assertThat(dto.feilmelding()).contains("JSON-mapping feil");
+        assertThat(dto.feltFeil()).isEmpty();
     }
 }
