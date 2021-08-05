@@ -2,13 +2,17 @@ package no.nav.foreldrepenger.tilbakekreving.web.app;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.core.Application;
 
+import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.server.ServerProperties;
+
+import io.swagger.v3.jaxrs2.SwaggerSerializers;
 import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 import io.swagger.v3.oas.integration.OpenApiConfigurationException;
@@ -16,10 +20,8 @@ import io.swagger.v3.oas.integration.SwaggerConfiguration;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
-import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.ConstraintViolationMapper;
-import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.JsonMappingExceptionMapper;
-import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.JsonParseExceptionMapper;
-import no.nav.foreldrepenger.tilbakekreving.web.app.konfig.FellesKlasserForRest;
+import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.KnownExceptionMappers;
+import no.nav.foreldrepenger.tilbakekreving.web.app.jackson.JacksonJsonConfig;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.BehandlingFaktaRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.BehandlingRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.BrevRestTjeneste;
@@ -47,7 +49,7 @@ import no.nav.vedtak.util.env.Environment;
 
 
 @ApplicationPath(ApplicationConfig.API_URI)
-public class ApplicationConfig extends Application {
+public class ApplicationConfig extends ResourceConfig {
 
     private static final Environment ENV = Environment.current();
 
@@ -79,6 +81,17 @@ public class ApplicationConfig extends Application {
         } catch (OpenApiConfigurationException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
+
+        property(ServerProperties.BV_SEND_ERROR_IN_RESPONSE, true);
+        register(SwaggerSerializers.class);
+        register(OpenApiResource.class);
+        register(JacksonJsonConfig.class);
+
+        registerClasses(getApplicationClasses());
+
+        registerInstances(new LinkedHashSet<>(new KnownExceptionMappers().getExceptionMappers()));
+
+        property(ServerProperties.PROCESSING_RESPONSE_ERRORS_ENABLED, true);
     }
 
     private String getContextPath() {
@@ -90,17 +103,8 @@ public class ApplicationConfig extends Application {
         };
     }
 
-    @Override
-    public Set<Class<?>> getClasses() {
+    private static Set<Class<?>> getApplicationClasses() {
         Set<Class<?>> classes = new HashSet<>();
-
-        classes.add(OpenApiResource.class);
-
-        classes.add(ConstraintViolationMapper.class);
-        classes.add(JsonMappingExceptionMapper.class);
-        classes.add(JsonParseExceptionMapper.class);
-        classes.addAll(FellesKlasserForRest.getClasses());
-
         classes.add(ProsessTaskRestTjeneste.class);
 
         classes.add(InitielleLinksRestTjeneste.class);
@@ -129,7 +133,6 @@ public class ApplicationConfig extends Application {
         if (ENV.isLocal()) {
             classes.add(GrunnlagRestTestTjenesteLocalDev.class);
         }
-
         return Collections.unmodifiableSet(classes);
     }
 }
