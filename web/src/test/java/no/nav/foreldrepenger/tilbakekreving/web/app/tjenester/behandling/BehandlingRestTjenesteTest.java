@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 
 import org.apache.http.HttpStatus;
@@ -96,7 +97,7 @@ public class BehandlingRestTjenesteTest {
     public void test_opprett_behandling_skal_feile_med_ugyldig_saksnummer() {
         OpprettBehandlingDto dto = opprettBehandlingDto(UGYLDIG_SAKSNR, EKSTERN_BEHANDLING_UUID, FP_YTELSE_TYPE);
 
-        assertThatThrownBy(() -> behandlingRestTjeneste.opprettBehandling(dto)) // ved rest-kall vil jax validering slå inn og resultere i en FeltFeil
+        assertThatThrownBy(() -> behandlingRestTjeneste.opprettBehandling(mock(HttpServletRequest.class), dto)) // ved rest-kall vil jax validering slå inn og resultere i en FeltFeil
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("Ugyldig saksnummer");
     }
@@ -105,7 +106,7 @@ public class BehandlingRestTjenesteTest {
     public void test_skal_opprette_ny_behandling() throws URISyntaxException {
         when(behandlingTjenesteMock.hentBehandling(anyLong())).thenReturn(mockBehandling());
 
-        behandlingRestTjeneste.opprettBehandling(opprettBehandlingDto(GYLDIG_SAKSNR, EKSTERN_BEHANDLING_UUID, FP_YTELSE_TYPE));
+        behandlingRestTjeneste.opprettBehandling(mock(HttpServletRequest.class), opprettBehandlingDto(GYLDIG_SAKSNR, EKSTERN_BEHANDLING_UUID, FP_YTELSE_TYPE));
 
         verify(behandlingTjenesteMock).opprettBehandlingManuell(any(Saksnummer.class), any(UUID.class), any(FagsakYtelseType.class), any(BehandlingType.class));
     }
@@ -122,7 +123,7 @@ public class BehandlingRestTjenesteTest {
         opprettBehandlingDto.setBehandlingArsakType(BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR);
         opprettBehandlingDto.setBehandlingId(1L);
 
-        Response response = behandlingRestTjeneste.opprettBehandling(opprettBehandlingDto);
+        Response response = behandlingRestTjeneste.opprettBehandling(mock(HttpServletRequest.class), opprettBehandlingDto);
 
         verify(revurderingTjenesteMock, atLeastOnce()).opprettRevurdering(any(Long.class), any(BehandlingÅrsakType.class), any(OrganisasjonsEnhet.class));
         assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_ACCEPTED);

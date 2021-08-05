@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -17,6 +18,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -82,7 +84,8 @@ public class VergeRestTjeneste {
         })
     @BeskyttetRessurs(action = UPDATE, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public Response opprettVerge(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
+    public Response opprettVerge(@Context HttpServletRequest request,
+                                 @TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
                                      @Parameter(description = "Behandling som skal få verge/fullmektig") @Valid BehandlingReferanse dto) throws URISyntaxException {
         Behandling behandling = behandlingTjeneste.hentBehandling(dto.getBehandlingId());
         if (behandling.erSaksbehandlingAvsluttet() || behandling.isBehandlingPåVent()) {
@@ -92,7 +95,7 @@ public class VergeRestTjeneste {
             throw new TekniskException("FPT-185321", String.format("Behandling %s har allerede aksjonspunkt 5030 for verge/fullmektig", behandling.getId()));
         }
         vergeTjeneste.opprettVergeAksjonspunktOgHoppTilbakeTilFaktaHvisSenereSteg(behandling);
-        return Redirect.tilBehandlingPollStatus(behandling.getUuid());
+        return Redirect.tilBehandlingPollStatus(request, behandling.getUuid());
     }
 
     @POST
@@ -107,14 +110,15 @@ public class VergeRestTjeneste {
         })
     @BeskyttetRessurs(action = UPDATE, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public Response fjernVerge(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
+    public Response fjernVerge(@Context HttpServletRequest request,
+                               @TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
                                    @Parameter(description = "Behandling som skal få fjernet verge/fullmektig") @Valid BehandlingReferanse dto) throws URISyntaxException {
         Behandling behandling = behandlingTjeneste.hentBehandling(dto.getBehandlingId());
         if (behandling.erSaksbehandlingAvsluttet() || behandling.isBehandlingPåVent()) {
             throw new TekniskException("FPT-763494", String.format("Behandlingen er allerede avsluttet eller sett på vent, kan ikke fjerne verge for behandling %s", behandling.getId()));
         }
         vergeTjeneste.fjernVergeGrunnlagOgAksjonspunkt(behandling);
-        return Redirect.tilBehandlingPollStatus(behandling.getUuid());
+        return Redirect.tilBehandlingPollStatus(request, behandling.getUuid());
     }
 
     @GET

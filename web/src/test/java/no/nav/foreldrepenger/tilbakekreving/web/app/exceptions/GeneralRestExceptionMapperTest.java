@@ -2,9 +2,9 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.exceptions;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
-import org.jboss.resteasy.spi.ApplicationException;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 
@@ -29,7 +29,7 @@ public class GeneralRestExceptionMapperTest {
     public void skalMappeManglerTilgangFeil() {
         var manglerTilgangFeil = TestFeil.manglerTilgangFeil();
 
-        Response response = generalRestExceptionMapper.toResponse(new ApplicationException(manglerTilgangFeil));
+        Response response = generalRestExceptionMapper.toResponse(new WebApplicationException(manglerTilgangFeil));
 
         assertThat(response.getStatus()).isEqualTo(403);
         assertThat(response.getEntity()).isInstanceOf(FeilDto.class);
@@ -44,7 +44,7 @@ public class GeneralRestExceptionMapperTest {
     public void skalMappeFunksjonellFeil() {
         var funksjonellFeil = TestFeil.funksjonellFeil();
 
-        Response response = generalRestExceptionMapper.toResponse(new ApplicationException(funksjonellFeil));
+        Response response = generalRestExceptionMapper.toResponse(new WebApplicationException(funksjonellFeil));
 
         assertThat(response.getEntity()).isInstanceOf(FeilDto.class);
         FeilDto feilDto = (FeilDto) response.getEntity();
@@ -59,7 +59,7 @@ public class GeneralRestExceptionMapperTest {
     public void skalMappeVLException() {
         VLException vlException = TestFeil.tekniskFeil();
 
-        Response response = generalRestExceptionMapper.toResponse(new ApplicationException(vlException));
+        Response response = generalRestExceptionMapper.toResponse(new WebApplicationException(vlException));
 
         assertThat(response.getEntity()).isInstanceOf(FeilDto.class);
         FeilDto feilDto = (FeilDto) response.getEntity();
@@ -74,7 +74,7 @@ public class GeneralRestExceptionMapperTest {
         String feilmelding = "en helt generell feil";
         RuntimeException generellFeil = new RuntimeException(feilmelding);
 
-        Response response = generalRestExceptionMapper.toResponse(new ApplicationException(generellFeil));
+        Response response = generalRestExceptionMapper.toResponse(new WebApplicationException(generellFeil));
 
         assertThat(response.getStatus()).isEqualTo(500);
         assertThat(response.getEntity()).isInstanceOf(FeilDto.class);

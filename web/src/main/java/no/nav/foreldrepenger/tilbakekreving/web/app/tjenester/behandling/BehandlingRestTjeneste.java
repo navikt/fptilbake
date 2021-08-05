@@ -12,6 +12,7 @@ import java.util.UUID;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -21,6 +22,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -88,6 +90,8 @@ import no.nav.vedtak.sikkerhet.context.SubjectHandler;
 @Transactional
 public class BehandlingRestTjeneste {
     public static final String PATH_FRAGMENT = "/behandlinger";
+
+    public static final String STATUS_PATH = PATH_FRAGMENT + "/status";
 
     private static final String SAK_RETTIGHETER_PART_PATH = "/sak-rettigheter";
     public static final String SAK_RETTIGHETER_PATH = PATH_FRAGMENT + SAK_RETTIGHETER_PART_PATH;
@@ -159,21 +163,22 @@ public class BehandlingRestTjeneste {
         description = "Opprett ny behandling")
     @Path("/opprett")
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
-    public Response opprettBehandling(@Valid @NotNull OpprettBehandlingDto opprettBehandlingDto) throws URISyntaxException {
+    public Response opprettBehandling(@Context HttpServletRequest request,
+                                      @Valid @NotNull OpprettBehandlingDto opprettBehandlingDto) throws URISyntaxException {
         Saksnummer saksnummer = new Saksnummer(opprettBehandlingDto.getSaksnummer().getVerdi());
         UUID eksternUuid = opprettBehandlingDto.getEksternUuid();
         BehandlingType behandlingType = opprettBehandlingDto.getBehandlingType();
         if (BehandlingType.TILBAKEKREVING.equals(behandlingType)) {
             Long behandlingId = behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternUuid, opprettBehandlingDto.getFagsakYtelseType(), behandlingType);
             Behandling behandling = behandlingTjeneste.hentBehandling(behandlingId);
-            return Redirect.tilBehandlingPollStatus(behandling.getUuid(), Optional.empty());
+            return Redirect.tilBehandlingPollStatus(request, behandling.getUuid(), Optional.empty());
         } else if (BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandlingType)) {
             Long tbkBehandlingId = opprettBehandlingDto.getBehandlingId() == null ? behandlingTjeneste.hentBehandlingId(opprettBehandlingDto.getBehandlingUuid())
                 : opprettBehandlingDto.getBehandlingId();
             var enhet = behandlingTjeneste.hentEnhetForEksternBehandling(opprettBehandlingDto.getEksternUuid());
             Behandling revurdering = revurderingTjeneste.opprettRevurdering(tbkBehandlingId, opprettBehandlingDto.getBehandlingArsakType(), enhet);
             String gruppe = behandlingskontrollAsynkTjeneste.asynkProsesserBehandling(revurdering);
-            return Redirect.tilBehandlingPollStatus(revurdering.getUuid(), Optional.of(gruppe));
+            return Redirect.tilBehandlingPollStatus(request, revurdering.getUuid(), Optional.of(gruppe));
         }
         return Response.ok().build();
     }
@@ -238,7 +243,8 @@ public class BehandlingRestTjeneste {
         description = "Gjenopptar behandling som er satt på vent",
         responses = {@ApiResponse(responseCode = "200", description = "Gjenoppta behandling påstartet i bakgrunnen", headers = {@Header(name = "Location")})})
     @BeskyttetRessurs(action = UPDATE, property = AbacProperty.FAGSAK)
-    public Response gjenopptaBehandling(@Parameter(description = "BehandlingId for behandling som skal gjenopptas") @Valid GjenopptaBehandlingDto dto)
+    public Response gjenopptaBehandling(@Context HttpServletRequest request,
+                                        @Parameter(description = "BehandlingId for behandling som skal gjenopptas") @Valid GjenopptaBehandlingDto dto)
         throws URISyntaxException {
         Behandling behandling = getBehandling(dto.getBehandlingReferanse());
 
@@ -248,7 +254,7 @@ public class BehandlingRestTjeneste {
         // gjenoppta behandling
         Optional<String> gruppeOpt = gjenopptaBehandlingTjeneste.fortsettBehandlingManuelt(behandling.getId(), HistorikkAktør.SAKSBEHANDLER);
 
-        return Redirect.tilBehandlingPollStatus(behandling.getUuid(), gruppeOpt);
+        return Redirect.tilBehandlingPollStatus(request, behandling.getUuid(), gruppeOpt);
     }
 
     @POST
@@ -328,10 +334,11 @@ public class BehandlingRestTjeneste {
         })
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public Response hentBehandling(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class) @NotNull @Valid BehandlingReferanse idDto) throws URISyntaxException {
+    public Response hentBehandling(@Context HttpServletRequest request,
+                                   @TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class) @NotNull @Valid BehandlingReferanse idDto) throws URISyntaxException {
         // sender alltid til poll status slik at vi får sjekket på utestående prosess tasks også.
         Behandling behandling = getBehandling(idDto);
-        return Redirect.tilBehandlingPollStatus(behandling.getUuid(), Optional.empty());
+        return Redirect.tilBehandlingPollStatus(request, behandling.getUuid(), Optional.empty());
     }
 
     @GET
@@ -347,13 +354,14 @@ public class BehandlingRestTjeneste {
         })
     @BeskyttetRessurs(action = READ, property = AbacProperty.FAGSAK)
     @SuppressWarnings("findsecbugs:JAXRS_ENDPOINT")
-    public Response hentBehandlingMidlertidigStatus(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class) @NotNull @QueryParam("uuid") @Valid BehandlingReferanse idDto,
+    public Response hentBehandlingMidlertidigStatus(@Context HttpServletRequest request,
+                                                    @TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class) @NotNull @QueryParam("uuid") @Valid BehandlingReferanse idDto,
                                                     @QueryParam("gruppe") @Valid ProsessTaskGruppeIdDto gruppeDto)
         throws URISyntaxException {
         Behandling behandling = getBehandling(idDto);
         String gruppe = gruppeDto == null ? null : gruppeDto.getGruppe();
         Optional<AsyncPollingStatus> prosessTaskGruppePågår = behandlingsprosessTjeneste.sjekkProsessTaskPågårForBehandling(behandling, gruppe);
-        return Redirect.tilBehandlingEllerPollStatus(behandling.getUuid(), prosessTaskGruppePågår.orElse(null));
+        return Redirect.tilBehandlingEllerPollStatus(request, behandling.getUuid(), prosessTaskGruppePågår.orElse(null));
     }
 
     @GET

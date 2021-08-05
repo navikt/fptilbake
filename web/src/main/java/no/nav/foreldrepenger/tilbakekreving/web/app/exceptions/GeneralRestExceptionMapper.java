@@ -1,11 +1,11 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.exceptions;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
-import org.jboss.resteasy.spi.ApplicationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -19,12 +19,12 @@ import no.nav.vedtak.log.util.LoggerUtils;
 import no.nav.vedtak.sikkerhet.abac.PepNektetTilgangException;
 
 @Provider
-public class GeneralRestExceptionMapper implements ExceptionMapper<ApplicationException> {
+public class GeneralRestExceptionMapper implements ExceptionMapper<WebApplicationException> {
 
     private static final Logger LOG = LoggerFactory.getLogger(GeneralRestExceptionMapper.class);
 
     @Override
-    public Response toResponse(ApplicationException exception) {
+    public Response toResponse(WebApplicationException exception) {
         var cause = exception.getCause();
         if (cause instanceof TomtResultatException) {
             return handleTomtResultatFeil((TomtResultatException) cause);
