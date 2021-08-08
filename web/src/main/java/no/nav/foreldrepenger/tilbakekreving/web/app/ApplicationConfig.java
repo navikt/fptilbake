@@ -1,18 +1,18 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.ws.rs.ApplicationPath;
+import javax.ws.rs.core.Application;
 
-import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 
-import io.swagger.v3.jaxrs2.SwaggerSerializers;
 import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 import io.swagger.v3.oas.integration.OpenApiConfigurationException;
@@ -20,7 +20,10 @@ import io.swagger.v3.oas.integration.SwaggerConfiguration;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
-import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.KnownExceptionMappers;
+import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.ConstraintViolationMapper;
+import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.GeneralRestExceptionMapper;
+import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.JsonMappingExceptionMapper;
+import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.JsonParseExceptionMapper;
 import no.nav.foreldrepenger.tilbakekreving.web.app.jackson.JacksonJsonConfig;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.BehandlingFaktaRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.BehandlingRestTjeneste;
@@ -44,12 +47,13 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.saksbehandler.NavA
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.tilbakekrevingsgrunnlag.GrunnlagRestTestTjenesteLocalDev;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.varselrespons.VarselresponsRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.VergeRestTjeneste;
+import no.nav.vedtak.felles.integrasjon.rest.jersey.TimingFilter;
 import no.nav.vedtak.felles.prosesstask.rest.ProsessTaskRestTjeneste;
 import no.nav.vedtak.util.env.Environment;
 
 
 @ApplicationPath(ApplicationConfig.API_URI)
-public class ApplicationConfig extends ResourceConfig {
+public class ApplicationConfig extends Application {
 
     private static final Environment ENV = Environment.current();
 
@@ -81,32 +85,13 @@ public class ApplicationConfig extends ResourceConfig {
         } catch (OpenApiConfigurationException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-
-        property(ServerProperties.BV_SEND_ERROR_IN_RESPONSE, true);
-        register(SwaggerSerializers.class);
-        register(OpenApiResource.class);
-        register(JacksonJsonConfig.class);
-
-        registerClasses(getApplicationClasses());
-
-        registerInstances(new LinkedHashSet<>(new KnownExceptionMappers().getExceptionMappers()));
-
-        property(ServerProperties.PROCESSING_RESPONSE_ERRORS_ENABLED, true);
     }
 
-    private String getContextPath() {
-        String applikasjon= ENV.getProperty("app.name");
-        return switch (applikasjon) {
-            case APPLIKASJON_NAVN_FPTILBAKE -> "/fptilbake";
-            case APPLIKASJON_NAVN_K9_TILBAKE -> "/k9/tilbake";
-            default -> throw new IllegalStateException("app.name er satt til " + applikasjon + " som ikke er en støttet verdi");
-        };
-    }
-
-    private static Set<Class<?>> getApplicationClasses() {
+    @Override
+    public Set<Class<?>> getClasses() {
         Set<Class<?>> classes = new HashSet<>();
+        // eksponert grensesnitt
         classes.add(ProsessTaskRestTjeneste.class);
-
         classes.add(InitielleLinksRestTjeneste.class);
         classes.add(KodeverkRestTjeneste.class);
         classes.add(BehandlingRestTjeneste.class);
@@ -116,7 +101,6 @@ public class ApplicationConfig extends ResourceConfig {
         classes.add(HistorikkRestTjeneste.class);
         classes.add(DokumentRestTjeneste.class);
         classes.add(ForeldelseRestTjeneste.class);
-
         classes.add(VarselresponsRestTjeneste.class);
         classes.add(BehandlingFaktaRestTjeneste.class);
         classes.add(FeilutbetalingÅrsakRestTjeneste.class);
@@ -129,10 +113,43 @@ public class ApplicationConfig extends ResourceConfig {
         classes.add(ForvaltningFritekstbrevRestTjeneste.class);
         classes.add(MigrasjonRestTjeneste.class);
         classes.add(VergeRestTjeneste.class);
-
         if (ENV.isLocal()) {
             classes.add(GrunnlagRestTestTjenesteLocalDev.class);
         }
+
+        // swagger
+        classes.add(OpenApiResource.class);
+
+        // Applikasjonsoppsett
+        classes.add(TimingFilter.class);
+        classes.add(JacksonJsonConfig.class);
+
+        // ExceptionMappers pga de som finnes i Jackson+Jersey-media
+        classes.add(ConstraintViolationMapper.class);
+        classes.add(JsonMappingExceptionMapper.class);
+        classes.add(JsonParseExceptionMapper.class);
+
+        // Generell exceptionmapper m/logging for øvrige tilfelle
+        classes.add(GeneralRestExceptionMapper.class);
+
         return Collections.unmodifiableSet(classes);
+    }
+
+    @Override
+    public Map<String, Object> getProperties() {
+        Map<String, Object> properties = new HashMap<>();
+        // Ref Jersey doc
+        properties.put(ServerProperties.BV_SEND_ERROR_IN_RESPONSE, true);
+        properties.put(ServerProperties.PROCESSING_RESPONSE_ERRORS_ENABLED, true);
+        return properties;
+    }
+
+    private String getContextPath() {
+        String applikasjon= ENV.getProperty("app.name");
+        return switch (applikasjon) {
+            case APPLIKASJON_NAVN_FPTILBAKE -> "/fptilbake";
+            case APPLIKASJON_NAVN_K9_TILBAKE -> "/k9/tilbake";
+            default -> throw new IllegalStateException("app.name er satt til " + applikasjon + " som ikke er en støttet verdi");
+        };
     }
 }
