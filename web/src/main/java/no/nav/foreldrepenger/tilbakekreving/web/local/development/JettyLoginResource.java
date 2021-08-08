@@ -22,7 +22,7 @@ public class JettyLoginResource {
 
     @GET
     @Timed
-    @Path("")
+    // Re-enable dersom non-empty. jersey gir warning @Path("")
     @Operation(tags = "login", description = "brukes for å strømlinjeforme innlogging ved lokal testing", hidden = true)
     public Response login() {
         //  når vi har kommet hit, er brukeren innlogget og har fått ID-token. Kan da gjøre redirect til hovedsiden for VL
