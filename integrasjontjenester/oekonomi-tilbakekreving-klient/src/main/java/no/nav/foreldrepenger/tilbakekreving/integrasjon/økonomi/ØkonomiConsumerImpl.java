@@ -29,6 +29,10 @@ public class ØkonomiConsumerImpl implements ØkonomiConsumer {
 
     private TilbakekrevingPortType port;
 
+    private ØkonomiConsumerImpl() {
+        // CDI only
+    }
+
     public ØkonomiConsumerImpl(TilbakekrevingPortType port) {
         this.port = port;
     }
