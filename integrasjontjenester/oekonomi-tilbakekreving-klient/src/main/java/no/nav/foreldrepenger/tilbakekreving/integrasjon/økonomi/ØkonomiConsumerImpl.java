@@ -1,6 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi;
 
-import javax.enterprise.context.Dependent;
 import javax.xml.ws.WebServiceException;
 import javax.xml.ws.soap.SOAPFaultException;
 
@@ -20,8 +19,6 @@ import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.HentKravgrunnlagDetaljDto;
 import no.nav.tilbakekreving.typer.v1.MmelDto;
 import no.nav.vedtak.exception.IntegrasjonException;
 
-//TODO denne klassen bør ha deafult scope
-@Dependent
 public class ØkonomiConsumerImpl implements ØkonomiConsumer {
 
     private static final String SERVICE_IDENTIFIER = "TilbakekrevingServiceV1";
