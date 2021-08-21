@@ -94,7 +94,6 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SøknadType;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
-import no.nav.foreldrepenger.tilbakekreving.pdfgen.DokumentVariant;
 
 
 @ApplicationScoped
@@ -167,11 +166,6 @@ public class VedtaksbrevTjeneste {
             brevData.setVedleggHtml(TekstformatererVedtaksbrev.lagVedtaksbrevVedleggHtml(vedtaksbrevData.getVedtaksbrevData()));
         }
         pdfBrevTjeneste.sendBrev(behandlingId, DetaljertBrevType.VEDTAK, brevData.build());
-    }
-
-    private byte[] lagVedtaksbrevVedleggTabellPdf(VedtaksbrevData vedtaksbrevData, DokumentVariant dokumentVariant) {
-        VedtaksbrevVedleggTjeneste vedleggTjeneste = new VedtaksbrevVedleggTjeneste();
-        return vedleggTjeneste.lagVedlegg(vedtaksbrevData, dokumentVariant);
     }
 
     public byte[] hentForhåndsvisningVedtaksbrevMedVedleggSomPdf(HentForhåndvisningVedtaksbrevPdfDto dto) {
