@@ -1,3 +1,23 @@
+{{~#* inline "tabellrad" ~}}
+            <tr>
+                <td class="periode">{{periode.fom-kompakt}}{{#if (neq periode.fom-kompakt periode.tom-kompakt)}} – {{periode.tom-kompakt}}{{/if}}</td>
+                <td class="tall">{{kroner kravgrunnlag.feilutbetalt-beløp}}</td>
+                {{#if (not resultat.tilbakekreves-beløp)}}
+                    <td>Ingen tilbakebetaling</td>
+                {{else if (eq resultat.tilbakekreves-beløp kravgrunnlag.feilutbetalt-beløp)}}
+                    <td>Hele beløpet</td>
+                {{else}}
+                    <td>Deler av beløpet</td>
+                {{/if}}
+                {{#if totalresultat.totalt-rentebeløp}}
+                    <td class="tall">{{#if resultat.renter-beløp}}{{kroner resultat.renter-beløp}}{{/if}}</td>
+                {{/if}}
+                {{#if (not skal-ikke-vise-skatt)}}
+                    <td class="tall">{{kroner resultat.tilbakekreves-beløp-med-renter}}</td>
+                {{/if}}
+                <td class="tall sum">{{kroner resultat.tilbakekreves-beløp-uten-skatt-med-renter}}</td>
+            </tr>
+{{~/inline~}}
 <h4>Oversikt over resultatet av tilbakebetalingssaken</h4>
     <table>
         <thead>
@@ -20,44 +40,10 @@
     {{#each perioder }}
         {{#if delperioder}}
             {{#each delperioder}}
-                <tr>
-                    <td class="periode">{{periode.fom-kompakt}}{{#if (neq periode.fom-kompakt periode.tom-kompakt)}} – {{periode.tom-kompakt}}{{/if}}</td>
-                    <td class="tall">{{kroner kravgrunnlag.feilutbetalt-beløp}}</td>
-                    {{#if (not resultat.tilbakekreves-beløp)}}
-                        <td>Ingen tilbakebetaling</td>
-                    {{else if (eq resultat.tilbakekreves-beløp kravgrunnlag.feilutbetalt-beløp)}}
-                        <td>Hele beløpet</td>
-                    {{else}}
-                        <td>Deler av beløpet</td>
-                    {{/if}}
-                    {{#if totalresultat.totalt-rentebeløp}}
-                        <td class="tall">{{#if resultat.renter-beløp}}{{kroner resultat.renter-beløp}}{{/if}}</td>
-                    {{/if}}
-                    {{#if (not skal-ikke-vise-skatt)}}
-                        <td class="tall">{{kroner resultat.tilbakekreves-beløp-med-renter}}</td>
-                    {{/if}}
-                    <td class="tall sum">{{kroner resultat.tilbakekreves-beløp-uten-skatt-med-renter}}</td>
-                </tr>
+                {{> tabellrad}}
             {{/each}}
         {{else}}
-        <tr>
-            <td class="periode">{{periode.fom-kompakt}}{{#if (neq periode.fom-kompakt periode.tom-kompakt)}} – {{periode.tom-kompakt}}{{/if}}</td>
-            <td class="tall">{{kroner kravgrunnlag.feilutbetalt-beløp}}</td>
-            {{#if (not resultat.tilbakekreves-beløp)}}
-            <td>Ingen tilbakebetaling</td>
-            {{else if (eq resultat.tilbakekreves-beløp kravgrunnlag.feilutbetalt-beløp)}}
-            <td>Hele beløpet</td>
-            {{else}}
-            <td>Deler av beløpet</td>
-            {{/if}}
-            {{#if totalresultat.totalt-rentebeløp}}
-            <td class="tall">{{#if resultat.renter-beløp}}{{kroner resultat.renter-beløp}}{{/if}}</td>
-            {{/if}}
-            {{#if (not skal-ikke-vise-skatt)}}
-            <td class="tall">{{kroner resultat.tilbakekreves-beløp-med-renter}}</td>
-            {{/if}}
-            <td class="tall sum">{{kroner resultat.tilbakekreves-beløp-uten-skatt-med-renter}}</td>
-        </tr>
+            {{> tabellrad}}
         {{/if}}
     {{/each}}
         <tr>
