@@ -63,6 +63,22 @@ public class VilkårVurderingSærligGrunnEntitet extends BaseEntitet {
         return new Builder();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        VilkårVurderingSærligGrunnEntitet that = (VilkårVurderingSærligGrunnEntitet) o;
+        return grunn == that.grunn
+            && Objects.equals(begrunnelse, that.begrunnelse);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(grunn, begrunnelse);
+    }
+
     public static class Builder {
         private VilkårVurderingSærligGrunnEntitet kladd = new VilkårVurderingSærligGrunnEntitet();
 
