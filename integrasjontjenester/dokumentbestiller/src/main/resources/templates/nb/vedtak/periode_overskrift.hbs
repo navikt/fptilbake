@@ -8,7 +8,7 @@ _Gjelder perioden fra og med {{periode.fom}} til og med {{periode.tom}}
 {{#if delperioder}}
 _Gjelder {{formater-perioder delperioder}}
 {{else}}
-_Gjelder {{formater-periode periode}}
+_Gjelder {{#if (eq periode.fom periode.tom)}}{{periode.fom}}{{else}}perioden fra og med {{periode.fom}} til og med {{periode.tom}}{{/if}}
 {{/if}}
 {{/case}}
 {{/switch}}

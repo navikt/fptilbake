@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -368,16 +367,13 @@ public class VedtaksbrevTjeneste {
             .collect(Collectors.toList());
     }
 
-    private List<Periode> utledPerioder(List<BeregningResultatPeriode> beregningResultatPerioder, List<VilkårVurderingPeriodeEntitet> perioder, VurdertForeldelse foreldelse) {
+    private List<Periode> utledPerioder(List<BeregningResultatPeriode> beregningResultatPerioder, List<VilkårVurderingPeriodeEntitet> vilkårPerioder, VurdertForeldelse foreldelse) {
         if (!slåSammenPerioderMedLikVurdering) {
             return beregningResultatPerioder.stream().map(BeregningResultatPeriode::getPeriode).collect(Collectors.toList());
         }
 
-        //FIXME slår sammen alt - kun for testing
-        return List.of(Periode.of(
-            beregningResultatPerioder.stream().map(BeregningResultatPeriode::getPeriode).map(Periode::getFom).min(Comparator.naturalOrder()).orElseThrow(),
-            beregningResultatPerioder.stream().map(BeregningResultatPeriode::getPeriode).map(Periode::getTom).max(Comparator.naturalOrder()).orElseThrow()
-        ));
+        VedtaksbrevPeriodeSammenslåer sammenslåer = new VedtaksbrevPeriodeSammenslåer(vilkårPerioder, foreldelse);
+        return sammenslåer.utledPerioder(beregningResultatPerioder);
     }
 
     private VedtakHjemmel.EffektForBruker hentEffektForBruker(Behandling behandling, BigDecimal totaltTilbakekrevesMedRenter) {
