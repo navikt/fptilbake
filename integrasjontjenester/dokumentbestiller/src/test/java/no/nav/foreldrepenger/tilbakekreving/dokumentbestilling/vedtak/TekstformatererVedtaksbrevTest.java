@@ -875,7 +875,7 @@ public class TekstformatererVedtaksbrevTest {
             Du er heldig som slapp å betale alt!
             _Er det særlige grunner til å redusere beløpet?
             Vi har vurdert om det er grunner til å redusere beløpet. Vi har lagt vekt på at du ikke har gitt oss alle nødvendige opplysninger tidsnok til at vi kunne unngå feilutbetalingen. Det er også kort tid siden utbetalingen skjedde og beløpet er høyt. Derfor må du betale tilbake hele beløpet.
-            _Gjelder perioden fra og med 12. april 2021 til og med 12. april 2021
+            _Gjelder 12. april 2021
             _Hvordan har vi kommet fram til at du må betale tilbake?
             Du har fått vite om du har rett til omsorgspenger og hvor mye du har rett til. Selv hvis du har meldt fra til oss, kan vi kreve tilbake det du har fått for mye dersom du burde forstått at beløpet var feil.
 

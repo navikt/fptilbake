@@ -1,5 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak.handlebars.dto.periode;
 
+import java.util.List;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -13,6 +14,8 @@ public class HbVedtaksbrevPeriode {
 
     @JsonProperty("periode")
     private HbPeriode periode;
+    @JsonProperty("delperioder")
+    private List<HbVedtaksbrevPeriode> delperioder;
     @JsonProperty("kravgrunnlag")
     private HbKravgrunnlag kravgrunnlag;
     @JsonProperty("fakta")
@@ -21,6 +24,7 @@ public class HbVedtaksbrevPeriode {
     private HbVurderinger vurderinger;
     @JsonProperty("resultat")
     private HbResultat resultat;
+
 
     private HbVedtaksbrevPeriode() {
         //bruk builder
@@ -51,6 +55,11 @@ public class HbVedtaksbrevPeriode {
 
         public Builder medPeriode(Periode periode) {
             kladd.periode = HbPeriode.of(periode);
+            return this;
+        }
+
+        public Builder medDelperioder(List<HbVedtaksbrevPeriode> delperioder) {
+            kladd.delperioder = delperioder;
             return this;
         }
 
@@ -101,6 +110,5 @@ public class HbVedtaksbrevPeriode {
 
             return kladd;
         }
-
     }
 }

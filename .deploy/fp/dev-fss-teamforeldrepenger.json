@@ -45,6 +45,7 @@
     "JOURNALPOSTAPI_OVERRIDE_URL": "http://dokarkiv.q1",
     "DOKDIST_REST_DISTRIBUER_JOURNALPOST" : "https://dokdistfordeling-q1.nais.preprod.local/rest/v1/distribuerjournalpost",
     "KODEVERK_V2_URL": "https://kodeverk.nais.preprod.local/ws/kodeverk/v2",
-    "FORELDELSE_ANTALLMAANEDER" : "P1M"
+    "FORELDELSE_ANTALLMAANEDER" : "P1M",
+    "VEDTAKSBREV_JOIN_PERIODER" : "false"
   }
 }

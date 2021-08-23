@@ -1,3 +1,18 @@
-{{#if (neq sak.ytelsetype "ES")}}
+{{#switch sak.ytelsetype}}
+    {{#case "ES"}}
+    {{/case}}
+    {{#case "FP" "SVP"}}
 _Gjelder perioden fra og med {{periode.fom}} til og med {{periode.tom}}
-{{/if}}
+    {{/case}}
+    {{#case "OMP" "PSB" "FRISINN"}}
+        {{#if delperioder}}
+            {{#if (gt delperioder.length 2)}}
+_Gjelder deler av perioden fra og med {{periode.fom}} til og med {{periode.tom}}
+            {{else}}
+_Gjelder {{formater-perioder delperioder}}
+            {{/if}}
+        {{else}}
+_Gjelder {{#if (eq periode.fom periode.tom)}}{{periode.fom}}{{else}}perioden fra og med {{periode.fom}} til og med {{periode.tom}}{{/if}}
+        {{/if}}
+    {{/case}}
+{{/switch}}

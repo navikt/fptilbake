@@ -3,33 +3,28 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager.prosesstask;
 import java.util.List;
 import java.util.Optional;
 
-import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
+import javax.persistence.Query;
 
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskEntitet;
 
-@ApplicationScoped
+@Dependent
 public class UtvidetProsessTaskRepository {
 
     private EntityManager entityManager;
 
-    UtvidetProsessTaskRepository() {
-        // for CDI proxy
-    }
-
     @Inject
-    public UtvidetProsessTaskRepository( EntityManager entityManager) {
+    public UtvidetProsessTaskRepository(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 
     public Optional<ProsessTaskData> finnSisteProsessTaskForProsessTaskGruppe(String task, String gruppe) {
-        TypedQuery<ProsessTaskEntitet> query = entityManager.createQuery("from ProsessTaskEntitet pt where pt.taskType=:task and pt.gruppe=:gruppe order by pt.sekvens desc", ProsessTaskEntitet.class);
+        Query query = entityManager.createNativeQuery("select * from (select * from PROSESS_TASK where TASK_TYPE = :task and task_gruppe = :gruppe order by task_sekvens desc) where rownum = 1", ProsessTaskEntitet.class);
         query.setParameter("task", task);
         query.setParameter("gruppe", gruppe);
-        query.setMaxResults(1);
 
         List<ProsessTaskEntitet> alleTasker = query.getResultList();
 

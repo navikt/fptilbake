@@ -46,6 +46,8 @@ public abstract class FellesTekstformaterer {
         handlebars.registerHelper("var", new CustomHelpers.VariableHelper());
         handlebars.registerHelper("lookup-map", new CustomHelpers.MapLookupHelper());
         handlebars.registerHelper("kroner", new CustomHelpers.KroneFormattererMedTusenskille());
+        handlebars.registerHelper("formater-periode", new CustomHelpers.PeriodeFormatterer());
+        handlebars.registerHelper("formater-perioder", new CustomHelpers.PerioderFormatterer());
         return handlebars;
     }
 

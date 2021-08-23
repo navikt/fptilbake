@@ -3,8 +3,10 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.vedtak;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -16,9 +18,12 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.github.jknack.handlebars.internal.text.WordUtils;
 
+import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultatPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingBeregningTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
@@ -100,6 +105,8 @@ import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 @Transactional
 public class VedtaksbrevTjeneste {
 
+    private static final Logger logger = LoggerFactory.getLogger(VedtaksbrevTjeneste.class);
+
     private static final String TITTEL_VEDTAK_TILBAKEBETALING = "Vedtak tilbakebetaling ";
     private static final String TITTEL_VEDTAK_INGEN_TILBAKEBETALING = "Vedtak ingen tilbakebetaling ";
     private static final int KLAGEFRIST_UKER = 6;
@@ -121,12 +128,15 @@ public class VedtaksbrevTjeneste {
 
     private PdfBrevTjeneste pdfBrevTjeneste;
 
+    private boolean slåSammenPerioderMedLikVurdering;
+
     @Inject
     public VedtaksbrevTjeneste(BehandlingRepositoryProvider behandlingRepositoryProvider,
                                TilbakekrevingBeregningTjeneste tilbakekrevingBeregningTjeneste,
                                BehandlingTjeneste behandlingTjeneste,
                                EksternDataForBrevTjeneste eksternDataForBrevTjeneste,
-                               PdfBrevTjeneste pdfBrevTjeneste) {
+                               PdfBrevTjeneste pdfBrevTjeneste,
+                               @KonfigVerdi(value = "vedtaksbrev.join.perioder", required = false, defaultVerdi = "true") boolean slåSammenPerioderMedLikVurdering) {
         this.behandlingRepository = behandlingRepositoryProvider.getBehandlingRepository();
         this.behandlingVedtakRepository = behandlingRepositoryProvider.getBehandlingVedtakRepository();
         this.eksternBehandlingRepository = behandlingRepositoryProvider.getEksternBehandlingRepository();
@@ -142,6 +152,7 @@ public class VedtaksbrevTjeneste {
         this.tilbakekrevingBeregningTjeneste = tilbakekrevingBeregningTjeneste;
         this.eksternDataForBrevTjeneste = eksternDataForBrevTjeneste;
         this.pdfBrevTjeneste = pdfBrevTjeneste;
+        this.slåSammenPerioderMedLikVurdering = slåSammenPerioderMedLikVurdering;
     }
 
     VedtaksbrevTjeneste() {
@@ -294,8 +305,9 @@ public class VedtaksbrevTjeneste {
     }
 
     private boolean skalFjerneTekstFeriepenger(List<HbVedtaksbrevPeriode> perioder) {
-        return perioder.stream().anyMatch(p-> HendelseUnderType.FEIL_FERIEPENGER_4G.equals(p.getFakta().getHendelseundertype()));
+        return perioder.stream().anyMatch(p -> HendelseUnderType.FEIL_FERIEPENGER_4G.equals(p.getFakta().getHendelseundertype()));
     }
+
     private VedtakHjemmel.EffektForBruker utledEffektForBruker(Behandling behandling, HbVedtaksResultatBeløp hbVedtaksResultatBeløp) {
         boolean erRevurdering = BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandling.getType());
         return erRevurdering
@@ -340,18 +352,28 @@ public class VedtaksbrevTjeneste {
         return hbSakBuilder.build();
     }
 
-    private boolean trengerSkilleFødselOgAdopsjon(Behandling b){
+    private boolean trengerSkilleFødselOgAdopsjon(Behandling b) {
         Set<FagsakYtelseType> fagsaktyper = Set.of(FagsakYtelseType.FORELDREPENGER, FagsakYtelseType.SVANGERSKAPSPENGER, FagsakYtelseType.ENGANGSTØNAD);
         return fagsaktyper.contains(b.getFagsak().getFagsakYtelseType());
     }
 
     private List<HbVedtaksbrevPeriode> lagHbVedtaksbrevPerioder(Long behandlingId, List<PeriodeMedTekstDto> perioderFritekst, List<BeregningResultatPeriode> resulatPerioder, List<VilkårVurderingPeriodeEntitet> vilkårPerioder, VurdertForeldelse foreldelse, VedtaksbrevType vedtaksbrevType) {
+        List<Periode> perioder = utledPerioder(resulatPerioder, vilkårPerioder, foreldelse);
         FaktaFeilutbetaling fakta = faktaRepository.finnFaktaOmFeilutbetaling(behandlingId).orElseThrow();
         return vedtaksbrevType.equals(VedtaksbrevType.FRITEKST_FEILUTBETALING_BORTFALT)
             ? Collections.emptyList()
-            : resulatPerioder.stream()
-            .map(brp -> lagBrevdataPeriode(brp, fakta, vilkårPerioder, foreldelse, perioderFritekst))
+            : perioder.stream()
+            .map(periode -> lagBrevdataPeriode(periode, resulatPerioder, fakta, vilkårPerioder, foreldelse, perioderFritekst))
             .collect(Collectors.toList());
+    }
+
+    private List<Periode> utledPerioder(List<BeregningResultatPeriode> beregningResultatPerioder, List<VilkårVurderingPeriodeEntitet> vilkårPerioder, VurdertForeldelse foreldelse) {
+        if (!slåSammenPerioderMedLikVurdering) {
+            return beregningResultatPerioder.stream().map(BeregningResultatPeriode::getPeriode).collect(Collectors.toList());
+        }
+
+        VedtaksbrevPeriodeSammenslåer sammenslåer = new VedtaksbrevPeriodeSammenslåer(vilkårPerioder, foreldelse);
+        return sammenslåer.utledPerioder(beregningResultatPerioder);
     }
 
     private VedtakHjemmel.EffektForBruker hentEffektForBruker(Behandling behandling, BigDecimal totaltTilbakekrevesMedRenter) {
@@ -458,29 +480,43 @@ public class VedtaksbrevTjeneste {
             .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    private HbVedtaksbrevPeriode lagBrevdataPeriode(BeregningResultatPeriode resultatPeriode, FaktaFeilutbetaling fakta, List<VilkårVurderingPeriodeEntitet> vilkårPerioder, VurdertForeldelse foreldelse, List<PeriodeMedTekstDto> perioderFritekst) {
-        Periode periode = resultatPeriode.getPeriode();
+    private HbVedtaksbrevPeriode lagBrevdataPeriode(Periode periode, List<BeregningResultatPeriode> resultatPerioder, FaktaFeilutbetaling fakta, List<VilkårVurderingPeriodeEntitet> vilkårPerioder, VurdertForeldelse foreldelse, List<PeriodeMedTekstDto> perioderFritekst) {
         PeriodeMedTekstDto fritekster = finnPeriodeFritekster(periode, perioderFritekst);
+
+        List<Periode> delresultatPerioder = resultatPerioder.stream()
+            .map(BeregningResultatPeriode::getPeriode)
+            .filter(periode::omslutter)
+            .filter(drp -> !drp.equals(periode))
+            .collect(Collectors.toList());
+
+        List<HbVedtaksbrevPeriode> delperioder = delresultatPerioder.stream()
+            .map(drp -> lagBrevdataPeriode(drp, resultatPerioder, fakta, vilkårPerioder, foreldelse, perioderFritekst))
+            .collect(Collectors.toList());
 
         return HbVedtaksbrevPeriode.builder()
             .medPeriode(periode)
-            .medKravgrunnlag(utledKravgrunnlag(resultatPeriode))
+            .medDelperioder(delperioder)
+            .medKravgrunnlag(utledKravgrunnlag(periode, resultatPerioder))
             .medFakta(utledFakta(periode, fakta, fritekster))
             .medVurderinger(utledVurderinger(periode, vilkårPerioder, foreldelse, fritekster))
-            .medResultat(utledResultat(resultatPeriode, foreldelse)).build();
+            .medResultat(utledResultat(periode, resultatPerioder, foreldelse)).build();
     }
 
-    private HbKravgrunnlag utledKravgrunnlag(BeregningResultatPeriode resultatPeriode) {
+    private HbKravgrunnlag utledKravgrunnlag(Periode periode, Collection<BeregningResultatPeriode> resultatPerioder) {
         return HbKravgrunnlag.builder()
-            .medFeilutbetaltBeløp(resultatPeriode.getFeilutbetaltBeløp())
-            .medRiktigBeløp(resultatPeriode.getRiktigYtelseBeløp())
-            .medUtbetaltBeløp(resultatPeriode.getUtbetaltYtelseBeløp())
+            .medFeilutbetaltBeløp(summerForPeriode(periode, resultatPerioder, BeregningResultatPeriode::getFeilutbetaltBeløp))
+            .medRiktigBeløp(summerForPeriode(periode, resultatPerioder, BeregningResultatPeriode::getRiktigYtelseBeløp))
+            .medUtbetaltBeløp(summerForPeriode(periode, resultatPerioder, BeregningResultatPeriode::getUtbetaltYtelseBeløp))
             .build();
+    }
+
+    private static BigDecimal summerForPeriode(Periode periode, Collection<BeregningResultatPeriode> resultatPerioder, Function<BeregningResultatPeriode, BigDecimal> hva) {
+        return resultatPerioder.stream().filter(brp -> periode.omslutter(brp.getPeriode())).map(hva).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     private HbFakta utledFakta(Periode periode, FaktaFeilutbetaling fakta, PeriodeMedTekstDto fritekst) {
         for (FaktaFeilutbetalingPeriode faktaPeriode : fakta.getFeilutbetaltPerioder()) {
-            if (faktaPeriode.getPeriode().omslutter(periode)) {
+            if (faktaPeriode.getPeriode().overlapper(periode)) {
                 return HbFakta.builder()
                     .medHendelsetype(faktaPeriode.getHendelseType())
                     .medHendelseUndertype(faktaPeriode.getHendelseUndertype())
@@ -488,7 +524,7 @@ public class VedtaksbrevTjeneste {
                     .build();
             }
         }
-        throw new IllegalArgumentException("Fant ikke fakta-periode som omslutter periode " + periode);
+        throw new IllegalArgumentException("Fant ikke fakta-periode som overlapper periode " + periode);
     }
 
     private HbVurderinger utledVurderinger(Periode periode, List<VilkårVurderingPeriodeEntitet> vilkårPerioder, VurdertForeldelse foreldelse, PeriodeMedTekstDto fritekst) {
@@ -500,19 +536,25 @@ public class VedtaksbrevTjeneste {
 
     private void leggTilVilkårvurdering(HbVurderinger.Builder builder, Periode periode, List<VilkårVurderingPeriodeEntitet> vilkårPerioder, PeriodeMedTekstDto fritekst) {
         builder.medFritekstVilkår(fritekst != null ? fritekst.getVilkårAvsnitt() : null);
-        VilkårVurderingPeriodeEntitet vilkårvurdering = finnVilkårvurdering(periode, vilkårPerioder);
-        if (vilkårvurdering == null) {
-            return;
+        List<VilkårVurderingPeriodeEntitet> vilkårvurdering = finnVilkårvurdering(periode, vilkårPerioder);
+        if (vilkårvurdering.isEmpty()) {
+            return; //skjer hvis perioden er foreldet
         }
-        builder.medVilkårResultat(vilkårvurdering.getVilkårResultat());
-        VilkårVurderingAktsomhetEntitet aktsomhet = vilkårvurdering.getAktsomhet();
-        if (aktsomhet != null) {
-            boolean unntasInnkrevingPgaLavtBeløp = Boolean.FALSE.equals(aktsomhet.getTilbakekrevSmåBeløp());
+        builder.medVilkårResultat(hent(vilkårvurdering, VilkårVurderingPeriodeEntitet::getVilkårResultat));
+
+        List<VilkårVurderingAktsomhetEntitet> aktsomhetVurderinger = vilkårvurdering.stream()
+            .map(VilkårVurderingPeriodeEntitet::getAktsomhet)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
+
+        if (!aktsomhetVurderinger.isEmpty()) {
+            boolean unntasInnkrevingPgaLavtBeløp = Boolean.FALSE.equals(hent(aktsomhetVurderinger, VilkårVurderingAktsomhetEntitet::getTilbakekrevSmåBeløp));
             builder.medUnntasInnkrevingPgaLavtBeløp(unntasInnkrevingPgaLavtBeløp);
-            builder.medAktsomhetResultat(aktsomhet.getAktsomhet());
-            if (skalHaSærligeGrunner(aktsomhet.getAktsomhet(), unntasInnkrevingPgaLavtBeløp)) {
-                Set<SærligGrunn> særligeGrunner = aktsomhet
-                    .getSærligGrunner().stream()
+            Aktsomhet aktsomhetresultat = hent(aktsomhetVurderinger, VilkårVurderingAktsomhetEntitet::getAktsomhet);
+            builder.medAktsomhetResultat(aktsomhetresultat);
+            if (skalHaSærligeGrunner(aktsomhetresultat, unntasInnkrevingPgaLavtBeløp)) {
+                Set<SærligGrunn> særligeGrunner = hent(aktsomhetVurderinger, vv -> vv.getSærligGrunner())
+                    .stream()
                     .map(VilkårVurderingSærligGrunnEntitet::getGrunn)
                     .collect(Collectors.toSet());
                 String fritekstSærligeGrunner = fritekst != null ? fritekst.getSærligeGrunnerAvsnitt() : null;
@@ -520,11 +562,32 @@ public class VedtaksbrevTjeneste {
                 builder.medSærligeGrunner(særligeGrunner, fritekstSærligeGrunner, fritekstSærligGrunnAnnet);
             }
         }
-        VilkårVurderingGodTroEntitet godTro = vilkårvurdering.getGodTro();
-        if (godTro != null) {
+
+        List<VilkårVurderingGodTroEntitet> godTroVurderinger = vilkårvurdering.stream()
+            .map(VilkårVurderingPeriodeEntitet::getGodTro)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
+
+        if (!godTroVurderinger.isEmpty()) {
             builder.medAktsomhetResultat(AnnenVurdering.GOD_TRO);
-            builder.medBeløpIBehold(godTro.isBeløpErIBehold() ? godTro.getBeløpTilbakekreves() : BigDecimal.ZERO);
+            builder.medBeløpIBehold(godTroVurderinger.stream()
+                .map(godTro -> godTro.isBeløpErIBehold() ? godTro.getBeløpTilbakekreves() : BigDecimal.ZERO)
+                .reduce(BigDecimal.ZERO, BigDecimal::add));
         }
+    }
+
+    private static <T, U> U hent(List<T> vilkårsvurderinger, Function<T, U> funksjon) {
+        List<U> alternativer = vilkårsvurderinger.stream()
+            .map(funksjon)
+            .distinct()
+            .toList();
+        if (alternativer.isEmpty()) {
+            return null;
+        }
+        if (alternativer.size() != 1) {
+            logger.warn("Forventet eksakt 1 unik, men fikk {}", alternativer.size());
+        }
+        return alternativer.get(0);
     }
 
     private void leggTilForeldelseVurdering(HbVurderinger.Builder builder, Periode periode, VurdertForeldelse foreldelse, PeriodeMedTekstDto fritekst) {
@@ -542,16 +605,18 @@ public class VedtaksbrevTjeneste {
         }
     }
 
-    private HbResultat utledResultat(BeregningResultatPeriode resultatPeriode, VurdertForeldelse foreldelse) {
+    private HbResultat utledResultat(Periode periode, Collection<BeregningResultatPeriode> resultatPerioder, VurdertForeldelse foreldelse) {
         HbResultat.Builder builder = HbResultat.builder()
-            .medTilbakekrevesBeløp(resultatPeriode.getTilbakekrevingBeløpUtenRenter())
-            .medTilbakekrevesBeløpUtenSkatt(resultatPeriode.getTilbakekrevingBeløpEtterSkatt())
-            .medRenterBeløp(resultatPeriode.getRenteBeløp());
+            .medTilbakekrevesBeløp(summerForPeriode(periode, resultatPerioder, BeregningResultatPeriode::getTilbakekrevingBeløpUtenRenter))
+            .medTilbakekrevesBeløpUtenSkatt(summerForPeriode(periode, resultatPerioder, BeregningResultatPeriode::getTilbakekrevingBeløpEtterSkatt))
+            .medRenterBeløp(summerForPeriode(periode, resultatPerioder, BeregningResultatPeriode::getRenteBeløp));
 
-        VurdertForeldelsePeriode foreldelsePeriode = finnForeldelsePeriode(foreldelse, resultatPeriode.getPeriode());
+        VurdertForeldelsePeriode foreldelsePeriode = finnForeldelsePeriode(foreldelse, periode);
         boolean foreldetPeriode = foreldelsePeriode != null && foreldelsePeriode.erForeldet();
         if (foreldetPeriode) {
-            builder.medForeldetBeløp(resultatPeriode.getFeilutbetaltBeløp().subtract(resultatPeriode.getTilbakekrevingBeløp()));
+            BigDecimal feilutbetaltForPeriode = summerForPeriode(periode, resultatPerioder, BeregningResultatPeriode::getFeilutbetaltBeløp);
+            BigDecimal tilbakekreves = summerForPeriode(periode, resultatPerioder, BeregningResultatPeriode::getTilbakekrevingBeløp);
+            builder.medForeldetBeløp(feilutbetaltForPeriode.subtract(tilbakekreves));
         }
         return builder.build();
     }
@@ -580,13 +645,10 @@ public class VedtaksbrevTjeneste {
         return null;
     }
 
-    private VilkårVurderingPeriodeEntitet finnVilkårvurdering(Periode periode, List<VilkårVurderingPeriodeEntitet> vilkårPerioder) {
-        for (VilkårVurderingPeriodeEntitet vurdering : vilkårPerioder) {
-            if (vurdering.getPeriode().omslutter(periode)) {
-                return vurdering;
-            }
-        }
-        return null; //skjer ved foreldet periode
+    private List<VilkårVurderingPeriodeEntitet> finnVilkårvurdering(Periode periode, List<VilkårVurderingPeriodeEntitet> vilkårPerioder) {
+        return vilkårPerioder.stream()
+            .filter(vp -> vp.getPeriode().overlapper(periode))
+            .toList();
     }
 
     private List<PeriodeMedTekstDto> hentFriteksterTilPerioder(Long behandlingId) {
