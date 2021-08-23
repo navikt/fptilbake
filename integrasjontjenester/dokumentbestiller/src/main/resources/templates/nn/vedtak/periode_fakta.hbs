@@ -3,9 +3,11 @@
 {{~#* inline "barnet" ~}}{{eq sak.antall-barn 1 yes="barnet" no="barna"}}{{~/inline~}}
 {{~#* inline "sitt-barn" ~}}{{eq sak.antall-barn 1 yes="sitt barn" no="sine barn"}}{{~/inline~}}
 {{~#* inline "det-samme-barnet" ~}}{{eq sak.antall-barn 1 yes="det same barnet" no="dei same barna"}}{{~/inline~}}
-{{#if (gt delperioder.length 2)}}
+{{#if delperioder}}
+    {{#if (gt delperioder.length 2)}}
 Tabellen i slutten av brevet viser kva delar av perioden dette gjeld.
 
+    {{/if}}
 {{/if}}
 {{#switch sak.ytelsetype}}
 {{#case "OMP" "PSB" "FRISINN"}}
