@@ -1,14 +1,14 @@
 {{#switch sak.ytelsetype}}
-{{#case "ES"}}
-{{/case}}
-{{#case "FP" "SVP"}}
+    {{#case "ES"}}
+    {{/case}}
+    {{#case "FP" "SVP"}}
 _Gjelder perioden fra og med {{periode.fom}} til og med {{periode.tom}}
-{{/case}}
-{{#case "OMP" "PSB" "FRISINN"}}
-{{#if delperioder}}
+    {{/case}}
+    {{#case "OMP" "PSB" "FRISINN"}}
+        {{#if delperioder}}
 _Gjelder {{formater-perioder delperioder}}
-{{else}}
+        {{else}}
 _Gjelder {{#if (eq periode.fom periode.tom)}}{{periode.fom}}{{else}}perioden fra og med {{periode.fom}} til og med {{periode.tom}}{{/if}}
-{{/if}}
-{{/case}}
+        {{/if}}
+    {{/case}}
 {{/switch}}
