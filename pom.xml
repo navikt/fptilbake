@@ -36,7 +36,7 @@
         <!-- Felles avhengigheter i prosjektet Disse skal ALLTID være en
             RELEASE-avhengighet UNNTAK: feature-brancher og lokalt -->
         <felles.version>3.2.123</felles.version>
-        <prosesstask.version>2.6.5</prosesstask.version>
+        <prosesstask.version>2.6.6</prosesstask.version>
         <fp-tidsserie.version>2.5.7</fp-tidsserie.version>
         <fpkontrakter.version>6.0.4</fpkontrakter.version>
         <fp-jms.version>2.0.22</fp-jms.version>
