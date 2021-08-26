@@ -1,6 +1,6 @@
 {
   "cluster": "prod",
-  "namespace": "default",
+  "namespace": "k9saksbehandling",
   "oracleconfig": "oracle/data/prod/config/k9tilbake",
   "oraclek9tilbakesecret":"oracle/data/prod/creds/k9tilbake-user",
   "k9tilbakeserviceuser": "serviceuser/data/prod/srvk9-tilbake",
@@ -13,7 +13,7 @@
   ],
   "env": {
     "LOADBALANCER_FQDN": "app.adeo.no",
-    "ABAC_PDP_ENDPOINT_URL": "http://abac-k9/application/authorize",
+    "ABAC_PDP_ENDPOINT_URL": "http://abac-k9.teamabac/application/authorize",
     "SECURITYTOKENSERVICE_URL": "https://sts.adeo.no/SecurityTokenServiceProvider/",
     "OIDC_STS_ISSUER_URL": "https://security-token-service.nais.adeo.no",
     "OIDC_STS_JWKS_URL": "http://security-token-service.default/rest/v1/sts/jwks",
