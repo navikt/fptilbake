@@ -1,6 +1,6 @@
 {
   "cluster": "preprod",
-  "namespace": "default",
+  "namespace": "k9saksbehandling",
   "oracleconfig": "oracle/data/dev/config/k9tilbake_q1",
   "oraclek9tilbakesecret": "oracle/data/dev/creds/k9tilbake_q1-user",
   "k9tilbakeserviceuser": "serviceuser/data/dev/srvk9-tilbake",
@@ -13,7 +13,7 @@
   ],
   "env": {
     "LOADBALANCER_FQDN": "app-q1.adeo.no",
-    "ABAC_PDP_ENDPOINT_URL": "http://abac-k9/application/authorize",
+    "ABAC_PDP_ENDPOINT_URL": "http://abac-k9.default/application/authorize",
     "SECURITYTOKENSERVICE_URL": "https://sts-q1.preprod.local/SecurityTokenServiceProvider/",
     "OIDC_STS_ISSUER_URL": "https://security-token-service.nais.preprod.local",
     "OIDC_STS_JWKS_URL": "http://security-token-service.default/rest/v1/sts/jwks",
