@@ -554,10 +554,7 @@ public class VedtaksbrevTjeneste {
             Aktsomhet aktsomhetresultat = hent(aktsomhetVurderinger, VilkårVurderingAktsomhetEntitet::getAktsomhet, periode, "aktsomhet");
             builder.medAktsomhetResultat(aktsomhetresultat);
             if (skalHaSærligeGrunner(aktsomhetresultat, unntasInnkrevingPgaLavtBeløp)) {
-                Set<SærligGrunn> særligeGrunner = hent(aktsomhetVurderinger, VilkårVurderingAktsomhetEntitet::getSærligGrunner, periode, "særlige grunner")
-                    .stream()
-                    .map(VilkårVurderingSærligGrunnEntitet::getGrunn)
-                    .collect(Collectors.toSet());
+                Set<SærligGrunn> særligeGrunner = hent(aktsomhetVurderinger, a -> a.getSærligGrunner().stream().map(VilkårVurderingSærligGrunnEntitet::getGrunn).collect(Collectors.toSet()), periode, "særlige grunner");
                 String fritekstSærligeGrunner = fritekst != null ? fritekst.getSærligeGrunnerAvsnitt() : null;
                 String fritekstSærligGrunnAnnet = fritekst != null ? fritekst.getSærligeGrunnerAnnetAvsnitt() : null;
                 builder.medSærligeGrunner(særligeGrunner, fritekstSærligeGrunner, fritekstSærligGrunnAnnet);
@@ -592,17 +589,17 @@ public class VedtaksbrevTjeneste {
     }
 
     private void leggTilForeldelseVurdering(HbVurderinger.Builder builder, Periode periode, VurdertForeldelse foreldelse, PeriodeMedTekstDto fritekst) {
-        VurdertForeldelsePeriode foreldelsePeriode = finnForeldelsePeriode(foreldelse, periode);
-        if (foreldelsePeriode != null) {
-            if (foreldelsePeriode.erForeldet()) {
+        List<VurdertForeldelsePeriode> foreldelsePerioder = finnForeldelsePerioder(foreldelse, periode);
+        if (foreldelsePerioder.isEmpty()) {
+            builder.medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT);
+        } else {
+            if (hent(foreldelsePerioder, VurdertForeldelsePeriode::erForeldet, periode, "foreldet")) {
                 builder.medAktsomhetResultat(AnnenVurdering.FORELDET);
             }
-            builder.medForeldelsevurdering(foreldelsePeriode.getForeldelseVurderingType());
-            builder.medForeldelsesfrist(foreldelsePeriode.getForeldelsesfrist());
-            builder.medOppdagelsesDato(foreldelsePeriode.getOppdagelsesDato());
+            builder.medForeldelsevurdering(hent(foreldelsePerioder, VurdertForeldelsePeriode::getForeldelseVurderingType, periode, "foreldelsevurderingtype"));
+            builder.medForeldelsesfrist(hent(foreldelsePerioder, VurdertForeldelsePeriode::getForeldelsesfrist, periode, "foreldelsfrist"));
+            builder.medOppdagelsesDato(hent(foreldelsePerioder, VurdertForeldelsePeriode::getOppdagelsesDato, periode, "oppdagelsesdato"));
             builder.medFritekstForeldelse(fritekst != null ? fritekst.getForeldelseAvsnitt() : null);
-        } else {
-            builder.medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT);
         }
     }
 
@@ -612,8 +609,8 @@ public class VedtaksbrevTjeneste {
             .medTilbakekrevesBeløpUtenSkatt(summerForPeriode(periode, resultatPerioder, BeregningResultatPeriode::getTilbakekrevingBeløpEtterSkatt))
             .medRenterBeløp(summerForPeriode(periode, resultatPerioder, BeregningResultatPeriode::getRenteBeløp));
 
-        VurdertForeldelsePeriode foreldelsePeriode = finnForeldelsePeriode(foreldelse, periode);
-        boolean foreldetPeriode = foreldelsePeriode != null && foreldelsePeriode.erForeldet();
+        List<VurdertForeldelsePeriode> foreldelsePerioder = finnForeldelsePerioder(foreldelse, periode);
+        boolean foreldetPeriode = !foreldelsePerioder.isEmpty() && hent(foreldelsePerioder, VurdertForeldelsePeriode::erForeldet, periode, "foreldet");
         if (foreldetPeriode) {
             BigDecimal feilutbetaltForPeriode = summerForPeriode(periode, resultatPerioder, BeregningResultatPeriode::getFeilutbetaltBeløp);
             BigDecimal tilbakekreves = summerForPeriode(periode, resultatPerioder, BeregningResultatPeriode::getTilbakekrevingBeløp);
@@ -626,15 +623,14 @@ public class VedtaksbrevTjeneste {
         return Aktsomhet.GROVT_UAKTSOM.equals(aktsomhet) || Aktsomhet.SIMPEL_UAKTSOM.equals(aktsomhet) && !unntattPgaLavgBeløp;
     }
 
-    private VurdertForeldelsePeriode finnForeldelsePeriode(VurdertForeldelse foreldelse, Periode periode) {
+    private List<VurdertForeldelsePeriode> finnForeldelsePerioder(VurdertForeldelse foreldelse, Periode periode) {
         if (foreldelse == null) {
-            return null;
+            return Collections.emptyList();
         }
         return foreldelse.getVurdertForeldelsePerioder()
             .stream()
-            .filter(p -> p.getPeriode().omslutter(periode))
-            .findAny()
-            .orElseThrow(() -> new IllegalArgumentException("Fant ikke VurdertForeldelse-periode som omslutter periode " + periode));
+            .filter(p -> p.getPeriode().overlapper(periode))
+            .toList();
     }
 
     private PeriodeMedTekstDto finnPeriodeFritekster(Periode periode, List<PeriodeMedTekstDto> perioder) {
