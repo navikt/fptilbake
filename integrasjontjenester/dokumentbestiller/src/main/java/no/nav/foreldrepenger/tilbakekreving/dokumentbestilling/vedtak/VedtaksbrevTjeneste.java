@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.jknack.handlebars.internal.text.WordUtils;
 
+import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultatPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingBeregningTjeneste;
@@ -540,7 +541,7 @@ public class VedtaksbrevTjeneste {
         if (vilkårvurdering.isEmpty()) {
             return; //skjer hvis perioden er foreldet
         }
-        builder.medVilkårResultat(hent(vilkårvurdering, VilkårVurderingPeriodeEntitet::getVilkårResultat));
+        builder.medVilkårResultat(hent(vilkårvurdering, VilkårVurderingPeriodeEntitet::getVilkårResultat, periode, "vilkårsresulat"));
 
         List<VilkårVurderingAktsomhetEntitet> aktsomhetVurderinger = vilkårvurdering.stream()
             .map(VilkårVurderingPeriodeEntitet::getAktsomhet)
@@ -548,12 +549,12 @@ public class VedtaksbrevTjeneste {
             .collect(Collectors.toList());
 
         if (!aktsomhetVurderinger.isEmpty()) {
-            boolean unntasInnkrevingPgaLavtBeløp = Boolean.FALSE.equals(hent(aktsomhetVurderinger, VilkårVurderingAktsomhetEntitet::getTilbakekrevSmåBeløp));
+            boolean unntasInnkrevingPgaLavtBeløp = Boolean.FALSE.equals(hent(aktsomhetVurderinger, VilkårVurderingAktsomhetEntitet::getTilbakekrevSmåBeløp, periode, "småbeløp"));
             builder.medUnntasInnkrevingPgaLavtBeløp(unntasInnkrevingPgaLavtBeløp);
-            Aktsomhet aktsomhetresultat = hent(aktsomhetVurderinger, VilkårVurderingAktsomhetEntitet::getAktsomhet);
+            Aktsomhet aktsomhetresultat = hent(aktsomhetVurderinger, VilkårVurderingAktsomhetEntitet::getAktsomhet, periode, "aktsomhet");
             builder.medAktsomhetResultat(aktsomhetresultat);
             if (skalHaSærligeGrunner(aktsomhetresultat, unntasInnkrevingPgaLavtBeløp)) {
-                Set<SærligGrunn> særligeGrunner = hent(aktsomhetVurderinger, vv -> vv.getSærligGrunner())
+                Set<SærligGrunn> særligeGrunner = hent(aktsomhetVurderinger, VilkårVurderingAktsomhetEntitet::getSærligGrunner, periode, "særlige grunner")
                     .stream()
                     .map(VilkårVurderingSærligGrunnEntitet::getGrunn)
                     .collect(Collectors.toSet());
@@ -576,7 +577,7 @@ public class VedtaksbrevTjeneste {
         }
     }
 
-    private static <T, U> U hent(List<T> vilkårsvurderinger, Function<T, U> funksjon) {
+    private static <T, U> U hent(List<T> vilkårsvurderinger, Function<T, U> funksjon, Periode p, String hva) {
         List<U> alternativer = vilkårsvurderinger.stream()
             .map(funksjon)
             .distinct()
@@ -585,7 +586,7 @@ public class VedtaksbrevTjeneste {
             return null;
         }
         if (alternativer.size() != 1) {
-            logger.warn("Forventet eksakt 1 unik, men fikk {}", alternativer.size());
+            logger.warn("Forventet eksakt 1 unik, men fikk {} for {} for periode {}", Environment.current().isProd() ? alternativer.size() : alternativer, hva, p);
         }
         return alternativer.get(0);
     }
