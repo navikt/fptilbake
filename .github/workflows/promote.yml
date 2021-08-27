@@ -49,7 +49,7 @@ jobs:
         uses: nais/deploy/actions/deploy@v1
         env:
           PRINT_PAYLOAD: true
-          APIKEY: ${{ secrets.UL_NAIS_DEPLOY_APIKEY }}
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY_K9 }}
           CLUSTER: ${{ env.CLUSTER }}
           RESOURCE: .deploy/${{ env.OMRAADE }}/naiserator.yaml
           VARS: .deploy/${{ env.OMRAADE }}/${{ env.CLUSTER }}-${{ env.NAMESPACE }}.json
