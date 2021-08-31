@@ -5,6 +5,7 @@ import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.b
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.Dependent;
@@ -28,6 +29,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurd
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.SærligGrunn;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
+import no.nav.fpsak.tidsserie.LocalDateInterval;
 import no.nav.fpsak.tidsserie.LocalDateSegment;
 import no.nav.fpsak.tidsserie.LocalDateTimeline;
 import no.nav.vedtak.exception.TekniskException;
@@ -176,7 +178,8 @@ public class VedtaksbrevFritekstValidator {
         LocalDateTimeline<?> perioderSomHarFritekst = perioderSomHarFritekst(vedtaksbrevFritekstPerioder, VedtaksbrevFritekstType.FAKTA_AVSNITT);
         LocalDateTimeline<?> perioderSomManglerFritekst = perioderSomSkalHaFritekst.disjoint(perioderSomHarFritekst);
         if (!perioderSomManglerFritekst.isEmpty()) {
-            throw new IllegalArgumentException("Mangler påkrevet fritekst for fakta-perioder: " + perioderSomManglerFritekst.getLocalDateIntervals().stream().map(p -> "" + p.getFomDato() + "-" + p.getTomDato()).reduce("", (a, b) -> a + ", " + b));
+            Set<LocalDateInterval> periodene = perioderSomManglerFritekst.getLocalDateIntervals();
+            throw new IllegalArgumentException("Noen fakta-valg medfører påkrevet fritekst. Det mangler fritekst for " + String.join(", ", periodene.stream().map(p -> Periode.of(p.getFomDato(), p.getTomDato())).map(Periode::toString).toList()) + " i fakta-avsnittet");
         }
     }
 
@@ -189,7 +192,8 @@ public class VedtaksbrevFritekstValidator {
         LocalDateTimeline<?> perioderSomHarFritekst = perioderSomHarFritekst(vedtaksbrevFritekstPerioder, VedtaksbrevFritekstType.SAERLIGE_GRUNNER_ANNET_AVSNITT);
         LocalDateTimeline<?> perioderSomManglerFritekst = perioderSomSkalHaFritekst.disjoint(perioderSomHarFritekst);
         if (!perioderSomManglerFritekst.isEmpty()) {
-            throw new IllegalArgumentException("Mangler påkrevet fritekst for perioder hvor det finnes særlige grunner, og 'Annet' er valgt: " + perioderSomManglerFritekst.getLocalDateIntervals().stream().map(p -> "" + p.getFomDato() + "-" + p.getTomDato()).reduce("", (a, b) -> a + ", " + b));
+            Set<LocalDateInterval> periodene = perioderSomManglerFritekst.getLocalDateIntervals();
+            throw new IllegalArgumentException("Særlige grunner - Annet medfører påkrevet fritekst. Det mangler fritekst for " + String.join(", ", periodene.stream().map(p -> Periode.of(p.getFomDato(), p.getTomDato())).map(Periode::toString).toList()) + " i avsnittet om særlige grunner");
         }
     }
 

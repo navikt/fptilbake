@@ -84,7 +84,7 @@ public class VedtaksbrevFritekstValidatorTest {
         faktaFeilutbetalingRepository.lagre(behandlingId, fakta);
 
         assertThatThrownBy(() -> validator.validerAtPåkrevdeFriteksterErSatt(behandlingId, Collections.emptyList(), null, VedtaksbrevType.ORDINÆR))
-            .hasMessageContaining("Ugyldig input: Når 'ANNET_FRITEKST' er valgt er fritekst påkrevet. Mangler for periode 01.01.2019-24.01.2019 og avsnitt FAKTA_AVSNITT");
+            .hasMessageContaining("Noen fakta-valg medfører påkrevet fritekst. Det mangler fritekst for 01.01.2019-24.01.2019 i fakta-avsnittet");
     }
 
     @Test
@@ -104,7 +104,7 @@ public class VedtaksbrevFritekstValidatorTest {
         );
 
         assertThatThrownBy(() -> validator.validerAtPåkrevdeFriteksterErSatt(behandlingId, fritekstperioder, null, VedtaksbrevType.ORDINÆR))
-            .hasMessageContaining("Når 'ENDRING_GRUNNLAG' er valgt er fritekst påkrevet. Mangler for periode 04.01.2019-24.01.2019 og avsnitt FAKTA_AVSNITT");
+            .hasMessageContaining("Noen fakta-valg medfører påkrevet fritekst. Det mangler fritekst for 04.01.2019-24.01.2019 i fakta-avsnittet");
     }
 
     @Test
@@ -125,7 +125,7 @@ public class VedtaksbrevFritekstValidatorTest {
         );
 
         assertThatThrownBy(() -> validator.validerAtPåkrevdeFriteksterErSatt(behandlingId, fritekstperioder, null, VedtaksbrevType.ORDINÆR))
-            .hasMessageContaining("Når 'SVP_ENDRING_GRUNNLAG' er valgt er fritekst påkrevet. Mangler for periode 02.01.2019-02.01.2019 og avsnitt FAKTA_AVSNITT");
+            .hasMessageContaining("Noen fakta-valg medfører påkrevet fritekst. Det mangler fritekst for 02.01.2019-02.01.2019 i fakta-avsnittet");
     }
 
     @Test
