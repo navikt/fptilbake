@@ -121,7 +121,7 @@ public class VedtaksbrevFritekstTjenesteTest {
         List<VedtaksbrevFritekstPeriode> fritekstperioder = Collections.emptyList();
 
         assertThatThrownBy(() -> tjeneste.lagreFriteksterFraSaksbehandler(behandlingId, oppsummering, fritekstperioder,
-            VedtaksbrevType.ORDINÆR)).hasMessageContaining("Ugyldig input");
+            VedtaksbrevType.ORDINÆR)).hasMessageContaining("Det mangler fritekst");
     }
 
 

@@ -62,17 +62,13 @@ public class ForeslåVedtakOppdatererTest {
         vedtaksbrevFritekstRepository = new VedtaksbrevFritekstRepository(entityManager);
         TilbakekrevingBeregningTjeneste beregningTjenesteMock = mock(TilbakekrevingBeregningTjeneste.class);
         HistorikkTjenesteAdapter historikkTjenesteAdapterMock = mock(HistorikkTjenesteAdapter.class);
-        ForeslåVedtakTjeneste foreslåVedtakTjeneste = new ForeslåVedtakTjeneste(beregningTjenesteMock,
-            historikkTjenesteAdapterMock);
+        ForeslåVedtakTjeneste foreslåVedtakTjeneste = new ForeslåVedtakTjeneste(beregningTjenesteMock, historikkTjenesteAdapterMock);
         TotrinnTjeneste totrinnTjenesteMock = mock(TotrinnTjeneste.class);
         VilkårsvurderingRepository vilkårsvurderingRepository = mock(VilkårsvurderingRepository.class);
         FaktaFeilutbetalingRepository faktaFeilutbetalingRepository = mock(FaktaFeilutbetalingRepository.class);
-        VedtaksbrevFritekstValidator vedtaksbrevFritekstValidator = new VedtaksbrevFritekstValidator(
-            faktaFeilutbetalingRepository, vilkårsvurderingRepository, behandlingRepository);
-        VedtaksbrevFritekstTjeneste vedtaksbrevFritekstTjeneste = new VedtaksbrevFritekstTjeneste(
-            vedtaksbrevFritekstValidator, vedtaksbrevFritekstRepository);
-        foreslåVedtakOppdaterer = new ForeslåVedtakOppdaterer(foreslåVedtakTjeneste, totrinnTjenesteMock,
-            aksjonspunktRepository, vedtaksbrevFritekstTjeneste);
+        VedtaksbrevFritekstValidator vedtaksbrevFritekstValidator = new VedtaksbrevFritekstValidator(faktaFeilutbetalingRepository, vilkårsvurderingRepository, behandlingRepository, false);
+        VedtaksbrevFritekstTjeneste vedtaksbrevFritekstTjeneste = new VedtaksbrevFritekstTjeneste(vedtaksbrevFritekstValidator, vedtaksbrevFritekstRepository);
+        foreslåVedtakOppdaterer = new ForeslåVedtakOppdaterer(foreslåVedtakTjeneste, totrinnTjenesteMock, aksjonspunktRepository, vedtaksbrevFritekstTjeneste);
 
         when(historikkTjenesteAdapterMock.tekstBuilder()).thenReturn(new HistorikkInnslagTekstBuilder());
         when(beregningTjenesteMock.beregn(anyLong())).thenReturn(new BeregningResultat());
