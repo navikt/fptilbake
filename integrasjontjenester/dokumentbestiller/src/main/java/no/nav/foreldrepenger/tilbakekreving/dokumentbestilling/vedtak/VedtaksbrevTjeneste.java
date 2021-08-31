@@ -359,7 +359,7 @@ public class VedtaksbrevTjeneste {
     }
 
     private List<HbVedtaksbrevPeriode> lagHbVedtaksbrevPerioder(Long behandlingId, List<PeriodeMedTekstDto> perioderFritekst, List<BeregningResultatPeriode> resulatPerioder, List<VilkårVurderingPeriodeEntitet> vilkårPerioder, VurdertForeldelse foreldelse, VedtaksbrevType vedtaksbrevType) {
-        List<Periode> perioder = utledPerioder(resulatPerioder, vilkårPerioder, foreldelse);
+        List<Periode> perioder = utledPerioder(resulatPerioder, vilkårPerioder, foreldelse, perioderFritekst);
         FaktaFeilutbetaling fakta = faktaRepository.finnFaktaOmFeilutbetaling(behandlingId).orElseThrow();
         return vedtaksbrevType.equals(VedtaksbrevType.FRITEKST_FEILUTBETALING_BORTFALT)
             ? Collections.emptyList()
@@ -368,12 +368,12 @@ public class VedtaksbrevTjeneste {
             .collect(Collectors.toList());
     }
 
-    private List<Periode> utledPerioder(List<BeregningResultatPeriode> beregningResultatPerioder, List<VilkårVurderingPeriodeEntitet> vilkårPerioder, VurdertForeldelse foreldelse) {
+    private List<Periode> utledPerioder(List<BeregningResultatPeriode> beregningResultatPerioder, List<VilkårVurderingPeriodeEntitet> vilkårPerioder, VurdertForeldelse foreldelse, List<PeriodeMedTekstDto> perioderFritekst) {
         if (!slåSammenPerioderMedLikVurdering) {
             return beregningResultatPerioder.stream().map(BeregningResultatPeriode::getPeriode).collect(Collectors.toList());
         }
 
-        VedtaksbrevPeriodeSammenslåer sammenslåer = new VedtaksbrevPeriodeSammenslåer(vilkårPerioder, foreldelse);
+        VedtaksbrevPeriodeSammenslåer sammenslåer = new VedtaksbrevPeriodeSammenslåer(vilkårPerioder, foreldelse, perioderFritekst);
         return sammenslåer.utledPerioder(beregningResultatPerioder);
     }
 

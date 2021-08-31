@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.BeregningResultatPeriode;
@@ -15,16 +16,19 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurd
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.SærligGrunn;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelse;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelsePeriode;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.PeriodeMedTekstDto;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
 public class VedtaksbrevPeriodeSammenslåer {
 
     private final List<VilkårVurderingPeriodeEntitet> vilkårsvurderinger;
     private final VurdertForeldelse foreldelse;
+    private List<PeriodeMedTekstDto> perioderFritekst;
 
-    public VedtaksbrevPeriodeSammenslåer(List<VilkårVurderingPeriodeEntitet> vilkårsvurderinger, VurdertForeldelse foreldelse) {
+    public VedtaksbrevPeriodeSammenslåer(List<VilkårVurderingPeriodeEntitet> vilkårsvurderinger, VurdertForeldelse foreldelse, List<PeriodeMedTekstDto> perioderFritekst) {
         this.vilkårsvurderinger = vilkårsvurderinger;
         this.foreldelse = foreldelse;
+        this.perioderFritekst = perioderFritekst;
     }
 
     public List<Periode> utledPerioder(List<BeregningResultatPeriode> beregningResultatPerioder) {
@@ -33,7 +37,9 @@ public class VedtaksbrevPeriodeSammenslåer {
         BeregningResultatPeriode mal = beregningResultatPerioder.get(0);
         Periode periode = mal.getPeriode();
         for (BeregningResultatPeriode beregningResultatPeriode : beregningResultatPerioder) {
-            if (harLikVurdering(mal.getPeriode(), beregningResultatPeriode.getPeriode())) {
+            Periode malPeriode = mal.getPeriode();
+            Periode brPeriode = beregningResultatPeriode.getPeriode();
+            if (harLikVurdering(malPeriode, brPeriode) && harLikFritekst(malPeriode, beregningResultatPeriode.getPeriode())) {
                 periode = Periode.omsluttende(periode, beregningResultatPeriode.getPeriode());
             } else {
                 resultat.add(periode);
@@ -43,6 +49,18 @@ public class VedtaksbrevPeriodeSammenslåer {
         }
         resultat.add(periode);
         return resultat;
+    }
+
+    private boolean harLikFritekst(Periode periode1, Periode periode2) {
+        //denne sjekken er for å støtte tilfellet hvor saksbehandler har lagt inn fritekst før funksjonalitet
+        //for sammenslåing lanseres, og vedtaksbrev sendes ut etter at sammenslåing er lansert.
+        //dette vil da unngå sammenslåing i dette tilfellet, slik at brevet blir som saksbehandler forventer
+        //TODO denne funksjonen kan fjernes en stund etter lansering er gjort for alle ytelser som skal bruke sammenslåing
+        return sammeFritekst(periode1, periode2, PeriodeMedTekstDto::getFaktaAvsnitt, "fakta")
+            && sammeFritekst(periode1, periode2, PeriodeMedTekstDto::getForeldelseAvsnitt, "foreldelse")
+            && sammeFritekst(periode1, periode2, PeriodeMedTekstDto::getVilkårAvsnitt, "vilkår")
+            && sammeFritekst(periode1, periode2, PeriodeMedTekstDto::getSærligeGrunnerAvsnitt, "særlige grunner")
+            && sammeFritekst(periode1, periode2, PeriodeMedTekstDto::getSærligeGrunnerAnnetAvsnitt, "særlige grunner annet");
     }
 
     private boolean harLikVurdering(Periode periode1, Periode periode2) {
@@ -103,7 +121,7 @@ public class VedtaksbrevPeriodeSammenslåer {
     }
 
     private ForeldelseVurderingType finnForeldelseResultat(Periode periode1) {
-        if (foreldelse == null){
+        if (foreldelse == null) {
             return null;
         }
         return foreldelse.getVurdertForeldelsePerioder().stream()
@@ -111,5 +129,27 @@ public class VedtaksbrevPeriodeSammenslåer {
             .map(VurdertForeldelsePeriode::getForeldelseVurderingType)
             .findFirst()
             .orElse(ForeldelseVurderingType.UDEFINERT);
+    }
+
+    private boolean sammeFritekst(Periode periode1, Periode periode2, Function<PeriodeMedTekstDto, String> fritekstTypeFunksjon, String fritekstType) {
+        return Objects.equals(
+            finnFritekst(periode1, fritekstTypeFunksjon, fritekstType),
+            finnFritekst(periode2, fritekstTypeFunksjon, fritekstType)
+        );
+    }
+
+    private String finnFritekst(Periode periode, Function<PeriodeMedTekstDto, String> fritekstTypeFunksjon, String fritekstType) {
+        List<String> resultat = perioderFritekst.stream()
+            .filter(fritekst -> fritekst.getPeriode().overlapper(periode))
+            .map(fritekstTypeFunksjon)
+            .distinct()
+            .toList();
+        if (resultat.isEmpty()) {
+            return null;
+        }
+        if (resultat.size() == 1) {
+            return resultat.get(0);
+        }
+        throw new IllegalStateException("Fant " + resultat.size() + " ulike fritekster for " + periode + "og type " + fritekstType);
     }
 }
