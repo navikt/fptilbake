@@ -7,9 +7,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
+import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType;
@@ -22,29 +23,33 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsa
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingPeriodeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingSærligGrunnEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.SærligGrunn;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
+import no.nav.fpsak.tidsserie.LocalDateSegment;
+import no.nav.fpsak.tidsserie.LocalDateTimeline;
 import no.nav.vedtak.exception.TekniskException;
 
-@ApplicationScoped
+@Dependent
 public class VedtaksbrevFritekstValidator {
+
+    boolean støttSammenslåingAvVedtaksbrevperioder;
 
     private FaktaFeilutbetalingRepository faktaFeilutbetalingRepository;
     private VilkårsvurderingRepository vilkårsvurderingRepository;
     private BehandlingRepository behandlingRepository;
 
-    public VedtaksbrevFritekstValidator() {
-    }
-
     @Inject
     public VedtaksbrevFritekstValidator(FaktaFeilutbetalingRepository faktaFeilutbetalingRepository,
                                         VilkårsvurderingRepository vilkårsvurderingRepository,
-                                        BehandlingRepository behandlingRepository) {
+                                        BehandlingRepository behandlingRepository,
+                                        @KonfigVerdi(value = "vedtaksbrev.join.perioder", required = false, defaultVerdi = "true") boolean støttSammenslåingAvVedtaksbrevperioder) {
         this.faktaFeilutbetalingRepository = faktaFeilutbetalingRepository;
         this.vilkårsvurderingRepository = vilkårsvurderingRepository;
         this.behandlingRepository = behandlingRepository;
+        this.støttSammenslåingAvVedtaksbrevperioder = støttSammenslåingAvVedtaksbrevperioder;
     }
 
     public void validerAtPåkrevdeFriteksterErSatt(Long behandlingId,
@@ -81,13 +86,29 @@ public class VedtaksbrevFritekstValidator {
         }
     }
 
-    private static void validerSærligeGrunnerAnnet(VilkårVurderingEntitet vilkårVurdering, List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder) {
+    private void validerSærligeGrunnerAnnet(VilkårVurderingEntitet vilkårVurdering, List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder) {
+        if (støttSammenslåingAvVedtaksbrevperioder) {
+            validerSærligeGrunnerAnnetTimelineImpl(vilkårVurdering, vedtaksbrevFritekstPerioder);
+        } else {
+            validerSærligeGrunnerAnnetOneByOneImpl(vilkårVurdering, vedtaksbrevFritekstPerioder);
+        }
+    }
+
+    private static void validerSærligeGrunnerAnnetOneByOneImpl(VilkårVurderingEntitet vilkårVurdering, List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder) {
         vilkårVurdering.getPerioder().stream()
             .filter(p -> p.getAktsomhet() != null && p.getAktsomhet().getSærligGrunner().stream().map(VilkårVurderingSærligGrunnEntitet::getGrunn).anyMatch(SærligGrunn.ANNET::equals))
             .forEach(p -> validerFritekstSatt(vedtaksbrevFritekstPerioder, p.getPeriode(), "særlige grunner - annet", VedtaksbrevFritekstType.SAERLIGE_GRUNNER_ANNET_AVSNITT));
     }
 
-    private static void validerFritekstFakta(FaktaFeilutbetaling fakta, List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder) {
+    private void validerFritekstFakta(FaktaFeilutbetaling fakta, List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder) {
+        if (støttSammenslåingAvVedtaksbrevperioder) {
+            validerFritekstFaktaTimelineImpl(fakta, vedtaksbrevFritekstPerioder);
+        } else {
+            validerFritekstFaktaOneByOneImpl(fakta, vedtaksbrevFritekstPerioder);
+        }
+    }
+
+    private static void validerFritekstFaktaOneByOneImpl(FaktaFeilutbetaling fakta, List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder) {
         for (HendelseUnderType hendelseUnderType : VedtaksbrevFritekstKonfigurasjon.UNDERTYPER_MED_PÅKREVD_FRITEKST) {
             validerFritekstFakta(fakta, hendelseUnderType, vedtaksbrevFritekstPerioder);
         }
@@ -132,16 +153,56 @@ public class VedtaksbrevFritekstValidator {
     }
 
 
-
     static TekniskException manglerFritekst(String hendelseUnderType, Periode periode, String fritekstType) {
-        return new TekniskException("FPT-022180", String.format("Ugyldig input: Når '%s' er valgt er fritekst påkrevet. Mangler for periode %s og avsnitt %s",  hendelseUnderType, periode, fritekstType));
+        return new TekniskException("FPT-022180", String.format("Ugyldig input: Når '%s' er valgt er fritekst påkrevet. Mangler for periode %s og avsnitt %s", hendelseUnderType, periode, fritekstType));
     }
 
     static TekniskException manglerPåkrevetOppsumering() {
         return new TekniskException("FPT-063091", "Ugyldig input: Når det er revurdering, så er oppsummering fritekst påkrevet.");
     }
+
     public static TekniskException fritekstOppsumeringForLang() {
         return new TekniskException("FPT-063092", "Ugyldig input: Oppsummeringstekst er for lang.");
+    }
+
+
+    private static void validerFritekstFaktaTimelineImpl(FaktaFeilutbetaling fakta, List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder) {
+        LocalDateTimeline<HendelseUnderType> perioderSomSkalHaFritekst = new LocalDateTimeline<>(
+            fakta.getFeilutbetaltPerioder().stream()
+                .filter(f -> VedtaksbrevFritekstKonfigurasjon.UNDERTYPER_MED_PÅKREVD_FRITEKST.contains(f.getHendelseUndertype()))
+                .map(f -> new LocalDateSegment<HendelseUnderType>(f.getPeriode().getFom(), f.getPeriode().getTom(), f.getHendelseUndertype()))
+                .toList()
+        );
+        LocalDateTimeline<?> perioderSomHarFritekst = perioderSomHarFritekst(vedtaksbrevFritekstPerioder, VedtaksbrevFritekstType.FAKTA_AVSNITT);
+        LocalDateTimeline<?> perioderSomManglerFritekst = perioderSomSkalHaFritekst.disjoint(perioderSomHarFritekst);
+        if (!perioderSomManglerFritekst.isEmpty()) {
+            throw new IllegalArgumentException("Mangler påkrevet fritekst for fakta-perioder: " + perioderSomManglerFritekst.getLocalDateIntervals().stream().map(p -> "" + p.getFomDato() + "-" + p.getTomDato()).reduce("", (a, b) -> a + ", " + b));
+        }
+    }
+
+    private static void validerSærligeGrunnerAnnetTimelineImpl(VilkårVurderingEntitet vilkårVurdering, List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder) {
+        LocalDateTimeline<?> perioderSomSkalHaFritekst = new LocalDateTimeline<>(vilkårVurdering.getPerioder().stream()
+            .filter(p -> p.getAktsomhet() != null && p.getAktsomhet().getSærligGrunner().stream().map(VilkårVurderingSærligGrunnEntitet::getGrunn).anyMatch(SærligGrunn.ANNET::equals))
+            .map(VilkårVurderingPeriodeEntitet::getPeriode)
+            .map(VedtaksbrevFritekstValidator::toSegment)
+            .toList());
+        LocalDateTimeline<?> perioderSomHarFritekst = perioderSomHarFritekst(vedtaksbrevFritekstPerioder, VedtaksbrevFritekstType.SAERLIGE_GRUNNER_ANNET_AVSNITT);
+        LocalDateTimeline<?> perioderSomManglerFritekst = perioderSomSkalHaFritekst.disjoint(perioderSomHarFritekst);
+        if (!perioderSomManglerFritekst.isEmpty()) {
+            throw new IllegalArgumentException("Mangler påkrevet fritekst for perioder hvor det finnes særlige grunner, og 'Annet' er valgt: " + perioderSomManglerFritekst.getLocalDateIntervals().stream().map(p -> "" + p.getFomDato() + "-" + p.getTomDato()).reduce("", (a, b) -> a + ", " + b));
+        }
+    }
+
+    private static LocalDateTimeline<?> perioderSomHarFritekst(List<VedtaksbrevFritekstPeriode> vedtaksbrevFritekstPerioder, VedtaksbrevFritekstType fritekstType) {
+        return new LocalDateTimeline<>(vedtaksbrevFritekstPerioder.stream()
+            .filter(f -> f.getFritekstType() == fritekstType && f.getFritekst() != null && !f.getFritekst().isBlank())
+            .map(VedtaksbrevFritekstPeriode::getPeriode)
+            .map(VedtaksbrevFritekstValidator::toSegment)
+            .toList());
+    }
+
+    private static LocalDateSegment<Void> toSegment(Periode p) {
+        return new LocalDateSegment<>(p.getFom(), p.getTom(), null);
     }
 
 }
