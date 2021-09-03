@@ -45,6 +45,7 @@ public enum KlasseKode implements Kodeverdi {
     FPATSJO("FPATSJO"),
     FPADREFAG_IOP("FPADREFAG-IOP"),
     FPADREFAGFER_IOP("FPADREFAGFER-IOP"),
+    FPATFER_SSKT("FPATFER-SSKT"),
 
     //ES Klassekoder
     FPENAD_OP("FPENAD-OP"),

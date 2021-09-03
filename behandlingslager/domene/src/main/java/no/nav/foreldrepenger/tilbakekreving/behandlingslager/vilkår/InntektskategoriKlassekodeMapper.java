@@ -9,6 +9,7 @@ import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.K
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode.FPADSND_OP;
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode.FPATAL;
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode.FPATFER;
+import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode.FPATFER_SSKT;
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode.FPATFRI;
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode.FPATORD;
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode.FPATSJO;
@@ -62,7 +63,8 @@ public class InntektskategoriKlassekodeMapper {
         FPADSNDDM_OP, DAGMAMMA,
         FPADSNDJB_OP, JORDBRUKER,
         FPADSNDFI, FISKER,
-        FPATFER, FERIEPENGER_ARBEIDSTAKER
+        FPATFER, FERIEPENGER_ARBEIDSTAKER,
+        FPATFER_SSKT, FERIEPENGER_ARBEIDSTAKER
     );
 
     private static final Map<KlasseKode, Inntektskategori> KLASSEKODE_INNTEKTSKATEGORI_MAP_ADOPSJON = Map.of(
@@ -74,7 +76,8 @@ public class InntektskategoriKlassekodeMapper {
         FPSNDDM_OP, DAGMAMMA,
         FPSNDJB_OP, JORDBRUKER,
         FPSNDFI, FISKER,
-        FPATFER, FERIEPENGER_ARBEIDSTAKER
+        FPATFER, FERIEPENGER_ARBEIDSTAKER,
+        FPATFER_SSKT, FERIEPENGER_ARBEIDSTAKER
     );
 
     private static final Map<KlasseKode, Inntektskategori> KLASSEKODE_INNTEKTSKATEGORI_MAP_SVANGERSKAPPENGER = Map.of(
@@ -86,7 +89,8 @@ public class InntektskategoriKlassekodeMapper {
         FPSVSNDDM_OP, DAGMAMMA,
         FPSVSNDJB_OP, JORDBRUKER,
         FPSVSNDFI, FISKER,
-        FPATFER, FERIEPENGER_ARBEIDSTAKER
+        FPATFER, FERIEPENGER_ARBEIDSTAKER,
+        FPATFER_SSKT, FERIEPENGER_ARBEIDSTAKER
     );
 
     private static final Map<KlasseKode, Inntektskategori> KLASSEKODE_INNTEKTSKATEGORI_MAP_OMSORGSPENGER = Map.of(
