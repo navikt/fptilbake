@@ -36,12 +36,12 @@ public class KravgrunnlagJmsConsumerKonfig extends BaseJmsKonfig {
 
     @Override
     public String getQueueManagerUsername() {
-        return FPTILBAKE.equals(appName) ? mqBruker : "srvappserver";
+        return FPTILBAKE.equals(appName) || !Environment.current().isProd() ? mqBruker : "srvappserver";
     }
 
     @Override
     public String getQueueManagerPassword() {
-        return FPTILBAKE.equals(appName) ? mqPassord : null;
+        return FPTILBAKE.equals(appName) || !Environment.current().isProd() ? mqPassord : null;
     }
 
 }
