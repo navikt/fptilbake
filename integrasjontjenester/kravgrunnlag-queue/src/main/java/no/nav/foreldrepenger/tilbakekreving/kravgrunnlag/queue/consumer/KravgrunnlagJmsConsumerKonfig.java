@@ -4,7 +4,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.vedtak.felles.integrasjon.jms.BaseJmsKonfig;
 
@@ -14,11 +13,9 @@ public class KravgrunnlagJmsConsumerKonfig extends BaseJmsKonfig {
 
     public static final String JNDI_QUEUE = "jms/QueueFptilbakeKravgrunnlag";
     private static final String INN_QUEUE_PREFIX = "fptilbake_kravgrunnlag";
-    private static final String FPTILBAKE = "fptilbake";
 
     private String mqBruker;
     private String mqPassord;
-    private String appName;
 
     private KravgrunnlagJmsConsumerKonfig() {
         super(INN_QUEUE_PREFIX);
@@ -26,22 +23,20 @@ public class KravgrunnlagJmsConsumerKonfig extends BaseJmsKonfig {
 
     @Inject
     public KravgrunnlagJmsConsumerKonfig(@KonfigVerdi("systembruker.username") String bruker,
-                                         @KonfigVerdi("systembruker.password") String passord,
-                                         @KonfigVerdi("app.name") String appName) {
+                                         @KonfigVerdi("systembruker.password") String passord) {
         this();
         this.mqBruker = bruker;
         this.mqPassord = passord;
-        this.appName = appName;
     }
 
     @Override
     public String getQueueManagerUsername() {
-        return FPTILBAKE.equals(appName) || !Environment.current().isProd() ? mqBruker : "srvappserver";
+        return mqBruker;
     }
 
     @Override
     public String getQueueManagerPassword() {
-        return FPTILBAKE.equals(appName) || !Environment.current().isProd() ? mqPassord : null;
+        return mqPassord;
     }
 
 }
