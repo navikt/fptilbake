@@ -34,8 +34,10 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.Behandlings
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.spi.BehandlingskontrollServiceProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandlingsresultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.InternalManipulerBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
@@ -44,6 +46,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingVenterRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingresultatRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.felles.FellesQueriesForBehandlingRepositories;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
@@ -74,8 +78,10 @@ public class ForvaltningBehandlingRestTjenesteTest {
     private BehandlingRepositoryProvider repositoryProvider;
     private FagsakRepository fagsakRepository;
     private BehandlingRepository behandlingRepository;
+    private BehandlingresultatRepository behandlingresultatRepository;
     private HistorikkRepository historikkRepository;
     private ØkonomiMottattXmlRepository mottattXmlRepository;
+    private EksternBehandlingRepository eksternBehandlingRepository;
 
     private PersonOrganisasjonWrapper mockTpsAdapterWrapper;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
@@ -89,7 +95,9 @@ public class ForvaltningBehandlingRestTjenesteTest {
         repositoryProvider = new BehandlingRepositoryProvider(entityManager);
         fagsakRepository = repositoryProvider.getFagsakRepository();
         behandlingRepository = repositoryProvider.getBehandlingRepository();
+        behandlingresultatRepository = repositoryProvider.getBehandlingresultatRepository();
         historikkRepository = repositoryProvider.getHistorikkRepository();
+        eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
         mottattXmlRepository = new ØkonomiMottattXmlRepository(entityManager);
         FellesQueriesForBehandlingRepositories fellesQueriesForBehandlingRepositories = new FellesQueriesForBehandlingRepositories(
             entityManager);
@@ -111,8 +119,8 @@ public class ForvaltningBehandlingRestTjenesteTest {
         KravgrunnlagTjeneste kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repositoryProvider,
             gjenopptaBehandlingTjeneste, behandlingskontrollTjeneste, mockSlettGrunnlagEventPubliserer);
         forvaltningBehandlingRestTjeneste = new ForvaltningBehandlingRestTjeneste(repositoryProvider,
-            taskTjeneste, mottattXmlRepository, kravgrunnlagMapper, økonomiSendtXmlRepository,
-            tilbakekrevingsvedtakTjeneste, kravgrunnlagTjeneste);
+            taskTjeneste, behandlingresultatRepository, mottattXmlRepository, kravgrunnlagMapper, økonomiSendtXmlRepository,
+            tilbakekrevingsvedtakTjeneste, kravgrunnlagTjeneste, eksternBehandlingRepository);
 
         behandling = lagBehandling();
     }
@@ -204,6 +212,17 @@ public class ForvaltningBehandlingRestTjenesteTest {
         Response response = forvaltningBehandlingRestTjeneste.tvingkobleBehandlingTilGrunnlag(
             new KobleBehandlingTilGrunnlagDto(behandling.getId(), mottattXmlId));
         assertThat(response.getStatus()).isEqualTo(Response.Status.BAD_REQUEST.getStatusCode());
+    }
+
+    @Test
+    public void skal_kunne_tvinge_koble_grunnlag_når_mottattXml_er_koblet_til_en_henlagt_behandling() {
+        behandlingresultatRepository.lagre(Behandlingsresultat.builder().medBehandling(behandling).medBehandlingResultatType(BehandlingResultatType.HENLAGT_FEILOPPRETTET).build());
+
+        Long mottattXmlId = mottattXmlRepository.lagreMottattXml(getKravgrunnlagXml(true));
+        mottattXmlRepository.opprettTilkobling(mottattXmlId);
+
+        Response response = forvaltningBehandlingRestTjeneste.tvingkobleBehandlingTilGrunnlag(new KobleBehandlingTilGrunnlagDto(behandling.getId(), mottattXmlId));
+        assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
     }
 
     @Test
