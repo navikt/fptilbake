@@ -51,7 +51,7 @@
         <ojdbc.version>19.3.0.0</ojdbc.version>
         <abac-attribute-constants.version>3.3.13</abac-attribute-constants.version>
         <owaspencoder.version>1.2.3</owaspencoder.version>
-        <apache.ws.xmlschema.version>2.2.5</apache.ws.xmlschema.version>
+        <apache.ws.xmlschema.version>2.3.0</apache.ws.xmlschema.version>
         <javaslang.version>2.0.6</javaslang.version>
 
         <flyway.version>4.2.0</flyway.version>
