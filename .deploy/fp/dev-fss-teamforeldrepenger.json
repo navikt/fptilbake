@@ -10,10 +10,11 @@
   "ingresses": [
     "https://fptilbake-q1.nais.preprod.local/",
     "https://app-q1.adeo.no/fptilbake",
-    "https://fptilbake-q1.dev.adeo.no/"
+    "https://fptilbake-q1.dev.adeo.no/",
+    "https://fptilbake.dev.adeo.no/"
   ],
   "env": {
-    "LOADBALANCER_FQDN": "app-q1.adeo.no",
+    "LOADBALANCER_FQDN": "fptilbake.dev.adeo.no",
     "ABAC_PDP_ENDPOINT_URL": "http://abac-foreldrepenger.teamabac/application/authorize",
     "SECURITYTOKENSERVICE_URL": "https://sts-q1.preprod.local/SecurityTokenServiceProvider/",
     "OIDC_STS_ISSUER_URL": "https://security-token-service.nais.preprod.local",
