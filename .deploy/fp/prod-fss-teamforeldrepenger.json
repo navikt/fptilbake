@@ -9,10 +9,11 @@
   "maxReplicas": "3",
   "ingresses": [
     "https://fptilbake.nais.adeo.no",
-    "https://app.adeo.no/fptilbake"
+    "https://app.adeo.no/fptilbake",
+    "https://fptilbake.intern.nav.no"
   ],
   "env": {
-    "LOADBALANCER_FQDN": "fptilbake.nais.adeo.no",
+    "LOADBALANCER_FQDN": "fptilbake.intern.nav.no",
     "ABAC_PDP_ENDPOINT_URL": "http://abac-foreldrepenger.teamabac/application/authorize",
     "SECURITYTOKENSERVICE_URL": "https://sts.adeo.no/SecurityTokenServiceProvider/",
     "OIDC_STS_ISSUER_URL": "https://security-token-service.nais.adeo.no",
