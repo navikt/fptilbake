@@ -49,29 +49,6 @@ public class JettyServer extends AbstractJettyServer {
     @Override
     protected void konfigurerMiljø() throws Exception {
         dataSourceKonfig = new DataSourceKonfig();
-        hacks4Nais();
-    }
-
-    private void hacks4Nais() {
-        temporært();
-    }
-
-    private void temporært() {
-        // FIXME: PFP-1176 Skriv om i OpenAmIssoHealthCheck og AuthorizationRequestBuilder når Jboss dør
-        if (System.getenv("OIDC_OPENAM_HOSTURL") != null) {
-            LOG.info("Trickser med OIDC_OPENAM_HOSTURL");
-            System.setProperty("OpenIdConnect.issoHost", System.getenv("OIDC_OPENAM_HOSTURL"));
-        }
-        // FIXME: PFP-1176 Skriv om i AuthorizationRequestBuilder og IdTokenAndRefreshTokenProvider når Jboss dør
-        if (System.getenv("OIDC_OPENAM_AGENTNAME") != null) {
-            LOG.info("Trickser med OIDC_OPENAM_AGENTNAME");
-            System.setProperty("OpenIdConnect.username", System.getenv("OIDC_OPENAM_AGENTNAME"));
-        }
-        // FIXME: PFP-1176 Skriv om i IdTokenAndRefreshTokenProvider når Jboss dør
-        if (System.getenv("OIDC_OPENAM_PASSWORD") != null) {
-            LOG.info("Trickser med OIDC_OPENAM_PASSWORD");
-            System.setProperty("OpenIdConnect.password", System.getenv("OIDC_OPENAM_PASSWORD"));
-        }
     }
 
     @Override
