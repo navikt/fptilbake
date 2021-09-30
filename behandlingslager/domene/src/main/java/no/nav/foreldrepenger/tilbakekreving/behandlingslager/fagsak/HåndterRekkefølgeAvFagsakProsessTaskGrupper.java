@@ -111,7 +111,8 @@ public class HåndterRekkefølgeAvFagsakProsessTaskGrupper implements ProsessTas
         }
 
         private FagsakProsesstaskRekkefølge getFagsakProsesstaskRekkefølge() {
-            Class<?> clazz = (localBean instanceof TargetInstanceProxy<?> tip) ? tip.weld_getTargetInstance().getClass() : localBean.getClass();
+            Class<?> clazz = (localBean instanceof TargetInstanceProxy<?> tip && !localBean.getClass().isAnnotationPresent(FagsakProsesstaskRekkefølge.class)) ?
+                tip.weld_getTargetInstance().getClass() : localBean.getClass();
             if (clazz == null || !clazz.isAnnotationPresent(FagsakProsesstaskRekkefølge.class)) {
                 throw new UnsupportedOperationException(clazz != null ? clazz.getSimpleName() : "ukjent klasse" + " må være annotert med "
                     + FagsakProsesstaskRekkefølge.class.getSimpleName() + " for å kobles til en Fagsak");
