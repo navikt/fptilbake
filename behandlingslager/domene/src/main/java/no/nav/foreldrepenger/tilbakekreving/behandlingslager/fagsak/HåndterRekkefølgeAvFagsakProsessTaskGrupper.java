@@ -8,6 +8,7 @@ import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.spi.CDI;
 import javax.inject.Inject;
 
+import org.jboss.weld.interceptor.util.proxy.TargetInstanceProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,12 +84,7 @@ public class HåndterRekkefølgeAvFagsakProsessTaskGrupper implements ProsessTas
             }
 
             try (LocalProsessTaskHandlerRef handler = LocalProsessTaskHandlerRef.lookup(task.taskType())) {
-                if (!handler.getLocalBean().getClass().isAnnotationPresent(FagsakProsesstaskRekkefølge.class)) { //NOSONAR
-                    // error handling
-                    throw new UnsupportedOperationException(handler.getClass().getSimpleName() + " må være annotert med "
-                        + FagsakProsesstaskRekkefølge.class.getSimpleName() + " for å kobles til en Fagsak");
-                }
-                FagsakProsesstaskRekkefølge rekkefølge = handler.getLocalBean().getClass().getAnnotation(FagsakProsesstaskRekkefølge.class);
+                var rekkefølge = handler.getFagsakProsesstaskRekkefølge();
                 Long sekvensNr = rekkefølge.gruppeSekvens() ? gruppeSekvensNr : null;
                 Long behandlingId = ProsessTaskDataWrapper.wrap(task).getBehandlingId();
                 repository.lagre(new FagsakProsessTask(task.getFagsakId(), task.getId(), behandlingId, sekvensNr));
@@ -114,8 +110,13 @@ public class HåndterRekkefølgeAvFagsakProsessTaskGrupper implements ProsessTas
             this.localBean = bean;
         }
 
-        private ProsessTaskHandler getLocalBean() {
-            return localBean;
+        private FagsakProsesstaskRekkefølge getFagsakProsesstaskRekkefølge() {
+            Class<?> clazz = (localBean instanceof TargetInstanceProxy<?> tip) ? tip.weld_getTargetInstance().getClass() : localBean.getClass();
+            if (clazz == null || !clazz.isAnnotationPresent(FagsakProsesstaskRekkefølge.class)) {
+                throw new UnsupportedOperationException(clazz != null ? clazz.getSimpleName() : "ukjent klasse" + " må være annotert med "
+                    + FagsakProsesstaskRekkefølge.class.getSimpleName() + " for å kobles til en Fagsak");
+            }
+            return clazz.getAnnotation(FagsakProsesstaskRekkefølge.class);
         }
 
         public static LocalProsessTaskHandlerRef lookup(TaskType taskType) {
