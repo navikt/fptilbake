@@ -28,10 +28,9 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @ApplicationScoped
-@ProsessTask(SendØkonomiTibakekerevingsVedtakTask.TASKTYPE)
+@ProsessTask("iverksetteVedtak.sendØkonomiTilbakekrevingsvedtak")
 @FagsakProsesstaskRekkefølge(gruppeSekvens = true)
 public class SendØkonomiTibakekerevingsVedtakTask implements ProsessTaskHandler {
-    public static final String TASKTYPE = "iverksetteVedtak.sendØkonomiTilbakekrevingsvedtak";
 
     private static final Logger logger = LoggerFactory.getLogger(SendØkonomiTibakekerevingsVedtakTask.class);
 

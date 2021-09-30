@@ -16,6 +16,7 @@ import javax.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingFeil;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollAsynkTjeneste;
@@ -52,20 +53,20 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBe
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.VergeDto;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
-import no.nav.vedtak.konfig.KonfigVerdi;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
+import no.nav.vedtak.felles.prosesstask.api.TaskType;
 
 @ApplicationScoped
 @Transactional
 public class BehandlingTjeneste {
 
     private static final Logger logger = LoggerFactory.getLogger(BehandlingTjeneste.class);
-    public static final String FINN_KRAVGRUNNLAG_TASK = "kravgrunnlag.finn";
+    public static final TaskType FINN_KRAVGRUNNLAG_TASK = new TaskType("kravgrunnlag.finn");
 
     private BehandlingRepository behandlingRepository;
     private EksternBehandlingRepository eksternBehandlingRepository;
     private BehandlingresultatRepository behandlingresultatRepository;
-    private ProsessTaskRepository prosessTaskRepository;
+    private ProsessTaskTjeneste taskTjeneste;
     private BehandlingVedtakRepository behandlingVedtakRepository;
     private VergeRepository vergeRepository;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
@@ -82,7 +83,7 @@ public class BehandlingTjeneste {
 
     @Inject
     public BehandlingTjeneste(BehandlingRepositoryProvider behandlingRepositoryProvider,
-                              ProsessTaskRepository prosessTaskRepository,
+                              ProsessTaskTjeneste taskTjeneste,
                               BehandlingskontrollProvider behandlingskontrollProvider,
                               FagsakTjeneste fagsakTjeneste,
                               HistorikkinnslagTjeneste historikkinnslagTjeneste,
@@ -100,7 +101,7 @@ public class BehandlingTjeneste {
         this.behandlingresultatRepository = behandlingRepositoryProvider.getBehandlingresultatRepository();
         this.behandlingVedtakRepository = behandlingRepositoryProvider.getBehandlingVedtakRepository();
         this.vergeRepository = behandlingRepositoryProvider.getVergeRepository();
-        this.prosessTaskRepository = prosessTaskRepository;
+        this.taskTjeneste = taskTjeneste;
     }
 
     public List<Behandling> hentBehandlinger(Saksnummer saksnummer) {
@@ -146,7 +147,8 @@ public class BehandlingTjeneste {
                                             AktørId aktørId, FagsakYtelseType fagsakYtelseType,
                                             BehandlingType behandlingType) {
         Behandling behandling = opprettFørstegangsbehandling(saksnummer, eksternUuid, henvisning, aktørId, fagsakYtelseType, behandlingType);
-        behandlingskontrollAsynkTjeneste.asynkProsesserBehandling(behandling);
+        var gruppe = behandlingskontrollAsynkTjeneste.asynkProsesserBehandling(behandling);
+        // TODO (Michal) mangler det et kall her? opprettFinnGrunnlagTask(behandling, gruppe);
         return behandling.getId();
     }
 
@@ -287,11 +289,11 @@ public class BehandlingTjeneste {
     }
 
     private void opprettFinnGrunnlagTask(Behandling behandling, String fortsettBehandlingProsessTaskGruppe) {
-        ProsessTaskData prosessTaskData = new ProsessTaskData(FINN_KRAVGRUNNLAG_TASK);
+        ProsessTaskData prosessTaskData = ProsessTaskData.forTaskType(FINN_KRAVGRUNNLAG_TASK);
         prosessTaskData.setGruppe(fortsettBehandlingProsessTaskGruppe);
         prosessTaskData.setSekvens("2");
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
-        prosessTaskRepository.lagre(prosessTaskData);
+        taskTjeneste.lagre(prosessTaskData);
     }
 
     //TODO verge bør flyttes til egen tjeneste, aller helst i eget 'hent fra saksbehandlingssystemet-steg'

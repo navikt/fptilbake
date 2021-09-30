@@ -16,12 +16,13 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodev
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.AsyncPollingStatus;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
+import no.nav.vedtak.felles.prosesstask.api.TaskType;
 
 public class BehandlingsprosessApplikasjonTjenesteTest {
 
     private static final String GRUPPE_1 = "gruppe1";
 
-    private final ProsessTaskData taskData = new ProsessTaskData("taskType1");
+    private final ProsessTaskData taskData = ProsessTaskData.forTaskType(new TaskType("taskType1"));
     private final Behandling behandling;
 
     public BehandlingsprosessApplikasjonTjenesteTest() {

@@ -15,12 +15,11 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @ApplicationScoped
-@ProsessTask(HåndterGamleKravgrunnlagTask.TASKTYPE)
+@ProsessTask("kravgrunnlag.gammelt.håndter")
 @FagsakProsesstaskRekkefølge(gruppeSekvens = false)
 public class HåndterGamleKravgrunnlagTask implements ProsessTaskHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(HåndterGamleKravgrunnlagTask.class);
-    public static final String TASKTYPE = "kravgrunnlag.gammelt.håndter";
 
     private HåndterGamleKravgrunnlagTjeneste håndterGamleKravgrunnlagTjeneste;
 

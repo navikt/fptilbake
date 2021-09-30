@@ -9,19 +9,19 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.task.FortsettBehandlingTaskProperties;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.task.FortsettBehandlingTask;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsessTaskRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskStatusUtil;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
 @ApplicationScoped
 public class BehandlingskontrollAsynkTjeneste {
 
-    private ProsessTaskRepository prosessTaskRepository;
+    private ProsessTaskTjeneste taskTjeneste;
     private FagsakProsessTaskRepository fagsakProsessTaskRepository;
 
     BehandlingskontrollAsynkTjeneste() {
@@ -29,8 +29,8 @@ public class BehandlingskontrollAsynkTjeneste {
     }
 
     @Inject
-    public BehandlingskontrollAsynkTjeneste(ProsessTaskRepository prosessTaskRepository, FagsakProsessTaskRepository fagsakProsessTaskRepository) {
-        this.prosessTaskRepository = prosessTaskRepository;
+    public BehandlingskontrollAsynkTjeneste(ProsessTaskTjeneste taskTjeneste, FagsakProsessTaskRepository fagsakProsessTaskRepository) {
+        this.taskTjeneste = taskTjeneste;
         this.fagsakProsessTaskRepository = fagsakProsessTaskRepository;
     }
 
@@ -100,10 +100,10 @@ public class BehandlingskontrollAsynkTjeneste {
          * @return gruppe assignet til prosess task
          */
     public String asynkProsesserBehandling(Behandling behandling) {
-        ProsessTaskData taskData = new ProsessTaskData(FortsettBehandlingTaskProperties.TASKTYPE);
+        ProsessTaskData taskData = ProsessTaskData.forProsessTask(FortsettBehandlingTask.class);
         taskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         taskData.setCallIdFraEksisterende();
-        String gruppe = prosessTaskRepository.lagre(taskData);
+        String gruppe = taskTjeneste.lagre(taskData);
         return gruppe;
     }
 

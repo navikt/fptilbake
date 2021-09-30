@@ -16,7 +16,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtakRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.IverksettingStatus;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
 @ApplicationScoped
 public class AvsluttBehandlingTjeneste {
@@ -33,7 +33,7 @@ public class AvsluttBehandlingTjeneste {
 
     @Inject
     public AvsluttBehandlingTjeneste(BehandlingRepositoryProvider repositoryProvider,
-                                     BehandlingskontrollTjeneste behandlingskontrollTjeneste, ProsessTaskRepository prosessTaskRepository) {
+                                     BehandlingskontrollTjeneste behandlingskontrollTjeneste, ProsessTaskTjeneste taskTjeneste) {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
         this.behandlingVedtakRepository = repositoryProvider.getBehandlingVedtakRepository();

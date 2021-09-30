@@ -1,10 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.k9;
 
 import java.net.URI;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -13,10 +10,8 @@ import javax.ws.rs.core.UriBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
-import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
+import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.vedtak.felles.integrasjon.rest.SystemUserOidcRestClient;
-import no.nav.vedtak.util.env.Environment;
 
 @ApplicationScoped
 public class K9sakPipKlient {

@@ -15,12 +15,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import io.swagger.v3.oas.annotations.Operation;
+import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.web.app.rest.ResourceLink;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.BehandlingRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.historikk.HistorikkRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.kodeverk.KodeverkRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
-import no.nav.vedtak.konfig.KonfigVerdi;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 
 @Path("/init-fetch")

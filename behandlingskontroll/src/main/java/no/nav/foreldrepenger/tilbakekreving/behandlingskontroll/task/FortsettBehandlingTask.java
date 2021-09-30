@@ -27,9 +27,13 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
  * Kjører behandlingskontroll automatisk fra der prosessen står.
  */
 @ApplicationScoped
-@ProsessTask(FortsettBehandlingTaskProperties.TASKTYPE)
+@ProsessTask("behandlingskontroll.fortsettBehandling")
 @FagsakProsesstaskRekkefølge(gruppeSekvens = true)
 public class FortsettBehandlingTask implements ProsessTaskHandler {
+
+    public static final String MANUELL_FORTSETTELSE = "manuellFortsettelse";
+    public static final String UTFORT_AUTOPUNKT = "autopunktUtfort";
+    public static final String GJENOPPTA_STEG = "gjenopptaSteg";
 
     private BehandlingRepository behandlingRepository;
     private AksjonspunktRepository aksjonspunktRepository;
@@ -57,10 +61,10 @@ public class FortsettBehandlingTask implements ProsessTaskHandler {
             Long behandlingId = ProsessTaskDataWrapper.wrap(data).getBehandlingId();
             BehandlingskontrollKontekst kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandlingId);
             Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-            Boolean manuellFortsettelse = Optional.ofNullable(data.getPropertyValue(FortsettBehandlingTaskProperties.MANUELL_FORTSETTELSE))
+            Boolean manuellFortsettelse = Optional.ofNullable(data.getPropertyValue(FortsettBehandlingTask.MANUELL_FORTSETTELSE))
                 .map(Boolean::valueOf)
                 .orElse(Boolean.FALSE);
-            String gjenoppta = data.getPropertyValue(FortsettBehandlingTaskProperties.GJENOPPTA_STEG);
+            String gjenoppta = data.getPropertyValue(FortsettBehandlingTask.GJENOPPTA_STEG);
 
             BehandlingStegType stegtype = null;
             if (gjenoppta != null) {
@@ -110,7 +114,7 @@ public class FortsettBehandlingTask implements ProsessTaskHandler {
     }
 
     private void settAutopunktTilUtført(ProsessTaskData data, BehandlingskontrollKontekst kontekst, BehandlingskontrollTjeneste behandlingskontrollTjeneste) {
-        String utført = data.getPropertyValue(FortsettBehandlingTaskProperties.UTFORT_AUTOPUNKT);
+        String utført = data.getPropertyValue(FortsettBehandlingTask.UTFORT_AUTOPUNKT);
         if (utført != null) {
             AksjonspunktDefinisjon aksjonspunkt = aksjonspunktRepository.finnAksjonspunktDefinisjon(utført);
             behandlingskontrollTjeneste.settAutopunktTilUtført(aksjonspunkt, kontekst);

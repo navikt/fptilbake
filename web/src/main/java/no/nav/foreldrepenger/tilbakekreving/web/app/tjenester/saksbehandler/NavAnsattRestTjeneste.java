@@ -12,12 +12,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import io.swagger.v3.oas.annotations.Operation;
+import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.saksbehandler.dto.InnloggetNavAnsattDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.util.LdapUtil;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.felles.integrasjon.ldap.LdapBruker;
 import no.nav.vedtak.felles.integrasjon.ldap.LdapBrukeroppslag;
-import no.nav.vedtak.konfig.KonfigVerdi;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.context.SubjectHandler;
 

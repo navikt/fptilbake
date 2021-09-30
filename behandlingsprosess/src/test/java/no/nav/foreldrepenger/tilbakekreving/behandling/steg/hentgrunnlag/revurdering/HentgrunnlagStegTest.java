@@ -28,6 +28,6 @@ public class HentgrunnlagStegTest extends FellesTestOppsett {
     }
 
     private HentgrunnlagSteg steg() {
-        return new HentgrunnlagSteg(prosessTaskRepository, behandlingRepository);
+        return new HentgrunnlagSteg(taskTjeneste, behandlingRepository);
     }
 }

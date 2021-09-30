@@ -1,14 +1,13 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.status;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.HenleggBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.task.FortsettBehandlingTaskProperties;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.task.FortsettBehandlingTask;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
@@ -16,7 +15,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.prosesstask.UtvidetProsessTaskRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatus437;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatusRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
@@ -25,7 +23,7 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagValidator;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
 @ApplicationScoped
 public class KravVedtakStatusTjeneste {
@@ -33,8 +31,7 @@ public class KravVedtakStatusTjeneste {
     private KravVedtakStatusRepository kravVedtakStatusRepository;
     private BehandlingRepository behandlingRepository;
     private KravgrunnlagRepository grunnlagRepository;
-    private ProsessTaskRepository prosessTaskRepository;
-    private UtvidetProsessTaskRepository utvidetProsessTaskRepository;
+    private ProsessTaskTjeneste taskTjeneste;
 
     private HenleggBehandlingTjeneste henleggBehandlingTjeneste;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
@@ -45,14 +42,12 @@ public class KravVedtakStatusTjeneste {
 
     @Inject
     public KravVedtakStatusTjeneste(KravVedtakStatusRepository kravVedtakStatusRepository,
-                                    ProsessTaskRepository prosessTaskRepository,
-                                    UtvidetProsessTaskRepository utvidetProsessTaskRepository,
+                                    ProsessTaskTjeneste taskTjeneste,
                                     BehandlingRepositoryProvider repositoryProvider,
                                     HenleggBehandlingTjeneste henleggBehandlingTjeneste,
                                     BehandlingskontrollTjeneste behandlingskontrollTjeneste) {
         this.kravVedtakStatusRepository = kravVedtakStatusRepository;
-        this.prosessTaskRepository = prosessTaskRepository;
-        this.utvidetProsessTaskRepository = utvidetProsessTaskRepository;
+        this.taskTjeneste = taskTjeneste;
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.henleggBehandlingTjeneste = henleggBehandlingTjeneste;
@@ -99,19 +94,12 @@ public class KravVedtakStatusTjeneste {
     }
 
     private void taBehandlingAvventOgFortsettBehandling(long behandlingId) {
-        String gruppe = "endr-status-melding-" + behandlingId;
-        Optional<ProsessTaskData> eksisterendeProsessTask = utvidetProsessTaskRepository.finnSisteProsessTaskForProsessTaskGruppe(FortsettBehandlingTaskProperties.TASKTYPE, gruppe);
-        // Det kan finnes flere ENDR status meldinger for en behandling som kan opprette flere FortsettBehandlingTask.
-        // Derfor oppretter en sekvens for å kjøre flere prosesstasker i en rekkefølge
-        int sekvens = eksisterendeProsessTask.map(pt -> Integer.parseInt(pt.getSekvens()) + 1).orElse(1);
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-        ProsessTaskData taskData = new ProsessTaskData(FortsettBehandlingTaskProperties.TASKTYPE);
+        ProsessTaskData taskData = ProsessTaskData.forProsessTask(FortsettBehandlingTask.class);
         taskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         taskData.setCallIdFraEksisterende();
-        taskData.setProperty(FortsettBehandlingTaskProperties.GJENOPPTA_STEG, behandling.getAktivtBehandlingSteg().getKode());
-        taskData.setGruppe(gruppe);
-        taskData.setSekvens(String.valueOf(sekvens));
-        prosessTaskRepository.lagre(taskData);
+        taskData.setProperty(FortsettBehandlingTask.GJENOPPTA_STEG, behandling.getAktivtBehandlingSteg().getKode());
+        taskTjeneste.lagre(taskData);
     }
 
     static TekniskException kanIkkeFinnesSperretGrunnlagForBehandling(String status, long behandlingId) {

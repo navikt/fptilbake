@@ -11,11 +11,9 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @ApplicationScoped
-@ProsessTask(LagreVarselBrevSporingTask.TASKTYPE)
+@ProsessTask("brev.sporing.varsel")
 @FagsakProsesstaskRekkefølge(gruppeSekvens = true)
 public class LagreVarselBrevSporingTask implements ProsessTaskHandler {
-
-    public static final String TASKTYPE = "brev.sporing.varsel";
 
     private VarselRepository varselRepository;
 

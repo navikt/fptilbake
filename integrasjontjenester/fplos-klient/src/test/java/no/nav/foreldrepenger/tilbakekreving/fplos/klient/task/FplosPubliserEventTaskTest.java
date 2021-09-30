@@ -241,7 +241,7 @@ public class FplosPubliserEventTaskTest {
     }
 
     private ProsessTaskData lagProsessTaskData() {
-        prosessTaskData = new ProsessTaskData(FplosPubliserEventTask.TASKTYPE);
+        prosessTaskData = ProsessTaskData.forProsessTask(FplosPubliserEventTask.class);
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         prosessTaskData.setProperty(FplosPubliserEventTask.PROPERTY_EVENT_NAME, EventHendelse.AKSJONSPUNKT_OPPRETTET.name());
         return prosessTaskData;

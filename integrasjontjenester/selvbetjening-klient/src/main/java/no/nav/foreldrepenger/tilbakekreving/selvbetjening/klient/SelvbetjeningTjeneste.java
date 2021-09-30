@@ -9,6 +9,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporing;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporingRepository;
@@ -22,7 +23,6 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.dto.Hendelse;
 import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.dto.SelvbetjeningMelding;
 import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.producer.SelvbetjeningMeldingProducer;
-import no.nav.vedtak.util.env.Environment;
 
 @ApplicationScoped
 public class SelvbetjeningTjeneste {

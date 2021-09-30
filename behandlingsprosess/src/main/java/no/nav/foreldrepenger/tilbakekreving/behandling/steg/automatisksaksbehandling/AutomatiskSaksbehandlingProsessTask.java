@@ -19,12 +19,11 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @ApplicationScoped
-@ProsessTask(AutomatiskSaksbehandlingProsessTask.TASKTYPE)
+@ProsessTask("saksbehandling.automatisk")
 @FagsakProsesstaskRekkefølge(gruppeSekvens = false)
 public class AutomatiskSaksbehandlingProsessTask implements ProsessTaskHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(AutomatiskSaksbehandlingProsessTask.class);
-    public static final String TASKTYPE = "saksbehandling.automatisk";
 
 
     private BehandlingRepository behandlingRepository;

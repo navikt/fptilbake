@@ -8,10 +8,10 @@ import javax.inject.Inject;
 
 import org.apache.kafka.clients.producer.ProducerRecord;
 
+import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.felles.DvhKafkaProducer;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping.BehandlingTilstandMapper;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.BehandlingTilstand;
-import no.nav.vedtak.konfig.KonfigVerdi;
 
 @ApplicationScoped
 public class SakshendelserKafkaProducer {

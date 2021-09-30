@@ -21,11 +21,6 @@
 
         <dependency>
             <groupId>no.nav.foreldrepenger.felles</groupId>
-            <artifactId>felles-bom</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.foreldrepenger.felles</groupId>
             <artifactId>felles-testutilities</artifactId>
             <scope>test</scope>
         </dependency>

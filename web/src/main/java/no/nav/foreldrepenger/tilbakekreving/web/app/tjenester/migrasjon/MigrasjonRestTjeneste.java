@@ -42,7 +42,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt;
 
@@ -57,7 +57,7 @@ public class MigrasjonRestTjeneste {
     private BehandlingRepository behandlingRepository;
     private BehandlingVedtakRepository behandlingVedtakRepository;
     private BehandlingresultatRepository behandlingresultatRepository;
-    private ProsessTaskRepository taskRepository;
+    private ProsessTaskTjeneste taskTjeneste;
 
     public MigrasjonRestTjeneste() {
         // for CDI
@@ -66,12 +66,12 @@ public class MigrasjonRestTjeneste {
     @Inject
     public MigrasjonRestTjeneste(ØkonomiMottattXmlRepository økonomiMottattXmlRepository,
                                  BehandlingRepositoryProvider repositoryProvider,
-                                 ProsessTaskRepository taskRepository) {
+                                 ProsessTaskTjeneste taskTjeneste) {
         this.økonomiMottattXmlRepository = økonomiMottattXmlRepository;
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.behandlingVedtakRepository = repositoryProvider.getBehandlingVedtakRepository();
         this.behandlingresultatRepository = repositoryProvider.getBehandlingresultatRepository();
-        this.taskRepository = taskRepository;
+        this.taskTjeneste = taskTjeneste;
     }
 
     @POST
@@ -133,10 +133,10 @@ public class MigrasjonRestTjeneste {
     }
 
     private void opprettProsessTask(DvhEventHendelse eventHendelse, Long behandlingId) {
-        ProsessTaskData prosessTaskData = new ProsessTaskData(MigrerSakshendleserTilDvhTask.TASK_TYPE);
+        ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(MigrerSakshendleserTilDvhTask.class);
         prosessTaskData.setProperty("behandlingId", String.valueOf(behandlingId));
         prosessTaskData.setProperty("eventHendelse", eventHendelse.name());
-        taskRepository.lagre(prosessTaskData);
+        taskTjeneste.lagre(prosessTaskData);
     }
 
 }

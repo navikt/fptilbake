@@ -21,7 +21,7 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.util.StatusPrinter;
-import no.nav.vedtak.util.env.Environment;
+import no.nav.foreldrepenger.konfig.Environment;
 
 public class JettyFPDevServer extends JettyServer {
 

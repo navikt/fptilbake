@@ -32,11 +32,10 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @ApplicationScoped
-@ProsessTask(HentKorrigertKravgrunnlagTask.TASKTYPE)
+@ProsessTask("kravgrunnlag.korrigert.hent")
 @FagsakProsesstaskRekkefølge(gruppeSekvens = true)
 public class HentKorrigertKravgrunnlagTask implements ProsessTaskHandler {
 
-    public static final String TASKTYPE = "kravgrunnlag.korrigert.hent";
     public static final String KRAVGRUNNLAG_ID = "KRAVGRUNNLAG_ID";
     public static final String ANSVARLIG_ENHET_NØS = "8020";  // fast verdi
     public static final String OKO_SAKSBEH_ID = "K231B433";  //fast verdi

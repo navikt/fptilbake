@@ -10,9 +10,8 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @ApplicationScoped
-@ProsessTask(SendSakshendelserTilDvhTask.TASK_TYPE)
+@ProsessTask("dvh.send.sakshendelser")
 public class SendSakshendelserTilDvhTask implements ProsessTaskHandler {
-    public static final String TASK_TYPE = "dvh.send.sakshendelser";
 
     private SakshendelserKafkaProducer kafkaProducer;
 

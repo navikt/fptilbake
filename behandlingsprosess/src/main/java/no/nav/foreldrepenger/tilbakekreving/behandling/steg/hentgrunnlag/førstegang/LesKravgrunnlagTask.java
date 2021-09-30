@@ -30,12 +30,10 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @ApplicationScoped
-@ProsessTask(LesKravgrunnlagTask.TASKTYPE)
+@ProsessTask("kravgrunnlag.les")
 public class LesKravgrunnlagTask extends FellesTask implements ProsessTaskHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(LesKravgrunnlagTask.class);
-
-    public static final String TASKTYPE = "kravgrunnlag.les";
 
     private ØkonomiMottattXmlRepository økonomiMottattXmlRepository;
     private KravgrunnlagTjeneste kravgrunnlagTjeneste;

@@ -65,9 +65,11 @@ import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagT
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
+import no.nav.vedtak.felles.prosesstask.api.TaskType;
 import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskEventPubliserer;
 import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepositoryImpl;
+import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskTjenesteImpl;
 
 @ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public abstract class FellesTestOppsett {
@@ -91,7 +93,7 @@ public abstract class FellesTestOppsett {
     protected BehandlingRepository behandlingRepository;
     protected FagsakRepository fagsakRepository;
     protected KravgrunnlagRepository grunnlagRepository;
-    protected ProsessTaskRepository prosessTaskRepository;
+    protected ProsessTaskTjeneste taskTjeneste;
     protected ØkonomiMottattXmlRepository mottattXmlRepository;
     protected EksternBehandlingRepository eksternBehandlingRepository;
     protected BehandlingVenterRepository behandlingVenterRepository;
@@ -119,14 +121,14 @@ public abstract class FellesTestOppsett {
         behandlingRepository = repositoryProvider.getBehandlingRepository();
         fagsakRepository = repositoryProvider.getFagsakRepository();
         grunnlagRepository = repositoryProvider.getGrunnlagRepository();
-        prosessTaskRepository = new ProsessTaskRepositoryImpl(entityManager, null, eventPublisererMock);
+        taskTjeneste = new ProsessTaskTjenesteImpl(new ProsessTaskRepositoryImpl(entityManager, null, eventPublisererMock));
         mottattXmlRepository = new ØkonomiMottattXmlRepository(entityManager);
         eksternBehandlingRepository = new EksternBehandlingRepository(entityManager);
         FellesQueriesForBehandlingRepositories fellesQueriesForBehandlingRepositories = new FellesQueriesForBehandlingRepositories(
             entityManager);
         behandlingVenterRepository = new BehandlingVenterRepository(fellesQueriesForBehandlingRepositories);
         behandlingKandidaterRepository = new BehandlingKandidaterRepository(fellesQueriesForBehandlingRepositories);
-        gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjeneste(prosessTaskRepository,
+        gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjeneste(taskTjeneste,
             behandlingKandidaterRepository, behandlingVenterRepository, repositoryProvider, varselresponsTjenesteMock);
         historikkinnslagTjeneste = new HistorikkinnslagTjeneste(repositoryProvider.getHistorikkRepository(),
             personinfoAdapterMock);
@@ -172,8 +174,8 @@ public abstract class FellesTestOppsett {
         return behandlingRepository.hentBehandling(behandlingId);
     }
 
-    public ProsessTaskData lagProsessTaskData(Long mottattXmlId, String taskType) {
-        ProsessTaskData prosessTaskData = new ProsessTaskData(taskType);
+    public ProsessTaskData lagProsessTaskData(Long mottattXmlId, TaskType taskType) {
+        ProsessTaskData prosessTaskData = ProsessTaskData.forTaskType(taskType);
         prosessTaskData.setProperty(TaskProperty.PROPERTY_MOTTATT_XML_ID, String.valueOf(mottattXmlId));
         return prosessTaskData;
     }

@@ -41,7 +41,7 @@ public class SendManueltVarselbrevTaskTest extends DokumentBestillerTestOppsett 
 
     @Test
     public void skal_sende_manuelt_varselbrev_og_sett_behandling_på_vent() {
-        ProsessTaskData prosessTaskData = new ProsessTaskData(SendManueltVarselbrevTask.TASKTYPE);
+        ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(SendManueltVarselbrevTask.class);
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         prosessTaskData.setPayload("Sender manuelt varsel brev");
         prosessTaskData.setProperty(TaskProperty.MAL_TYPE, DokumentMalType.VARSEL_DOK.getKode());
@@ -53,7 +53,7 @@ public class SendManueltVarselbrevTaskTest extends DokumentBestillerTestOppsett 
 
     @Test
     public void skal_sende_korrigert_varselbrev_og_sett_behandling_på_vent() {
-        ProsessTaskData prosessTaskData = new ProsessTaskData(SendManueltVarselbrevTask.TASKTYPE);
+        ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(SendManueltVarselbrevTask.class);
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         prosessTaskData.setPayload("Sender korrigert varsel brev");
         prosessTaskData.setProperty(TaskProperty.MAL_TYPE, DokumentMalType.KORRIGERT_VARSEL_DOK.getKode());
@@ -65,7 +65,7 @@ public class SendManueltVarselbrevTaskTest extends DokumentBestillerTestOppsett 
 
     @Test
     public void skal_sende_manuelt_varselbrev_med_verge() {
-        ProsessTaskData prosessTaskData = new ProsessTaskData(SendManueltVarselbrevTask.TASKTYPE);
+        ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(SendManueltVarselbrevTask.class);
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         prosessTaskData.setPayload("Sender manuelt varsel brev");
         prosessTaskData.setProperty(TaskProperty.MAL_TYPE, DokumentMalType.VARSEL_DOK.getKode());

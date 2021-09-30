@@ -78,7 +78,7 @@ public class SendØkonomiTibakekerevingsVedtakTaskTest {
     }
 
     private ProsessTaskData lagProsessTaskKonfigurasjon(Behandling behandling) {
-        ProsessTaskData data = new ProsessTaskData(SendØkonomiTibakekerevingsVedtakTask.TASKTYPE);
+        ProsessTaskData data = ProsessTaskData.forProsessTask(SendØkonomiTibakekerevingsVedtakTask.class);
         data.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         return data;
     }

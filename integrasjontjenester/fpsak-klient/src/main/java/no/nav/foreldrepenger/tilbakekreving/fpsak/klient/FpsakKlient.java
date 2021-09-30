@@ -16,6 +16,7 @@ import javax.ws.rs.core.UriBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.Fptilbake;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
@@ -34,7 +35,6 @@ import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.dto.FpsakBehandlingInfo
 import no.nav.foreldrepenger.tilbakekreving.fpsak.klient.simulering.FpoppdragRestKlient;
 import no.nav.vedtak.exception.IntegrasjonException;
 import no.nav.vedtak.felles.integrasjon.rest.OidcRestClient;
-import no.nav.vedtak.util.env.Environment;
 
 @ApplicationScoped
 @Fptilbake

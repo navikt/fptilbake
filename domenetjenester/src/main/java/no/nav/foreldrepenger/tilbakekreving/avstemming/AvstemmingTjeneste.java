@@ -10,6 +10,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
@@ -26,7 +27,6 @@ import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiSendtXmlReposito
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlSendt;
 import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakRequest;
 import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakResponse;
-import no.nav.vedtak.konfig.KonfigVerdi;
 
 @ApplicationScoped
 public class AvstemmingTjeneste {

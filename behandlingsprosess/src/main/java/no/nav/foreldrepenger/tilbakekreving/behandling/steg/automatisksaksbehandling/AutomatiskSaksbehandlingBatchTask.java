@@ -11,47 +11,46 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.felles.Helligdager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.automatisksaksbehandling.AutomatiskSaksbehandlingRepository;
+import no.nav.foreldrepenger.tilbakekreving.felles.Helligdager;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
-import no.nav.vedtak.konfig.KonfigVerdi;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
 @ApplicationScoped
-@ProsessTask(AutomatiskSaksbehandlingBatchTask.BATCHNAVN)
+@ProsessTask(value = "batch.automatisk.saksbehandling", cronExpression = "0 30 7 ? * MON-FRI")
 public class AutomatiskSaksbehandlingBatchTask implements ProsessTaskHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(AutomatiskSaksbehandlingBatchTask.class);
-    static final String BATCHNAVN = "batch.automatisk.saksbehandling";
     private static final String EXECUTION_ID_SEPARATOR = "-";
 
-    private ProsessTaskRepository taskRepository;
+    private ProsessTaskTjeneste taskTjeneste;
     private AutomatiskSaksbehandlingRepository automatiskSaksbehandlingRepository;
     private Clock clock;
     private Period grunnlagAlder;
 
     @Inject
-    public AutomatiskSaksbehandlingBatchTask(ProsessTaskRepository taskRepository,
+    public AutomatiskSaksbehandlingBatchTask(ProsessTaskTjeneste taskTjeneste,
                                              AutomatiskSaksbehandlingRepository automatiskSaksbehandlingRepository,
                                              @KonfigVerdi(value = "automatisering.alder.kravgrunnlag") Period grunnlagAlder) {
-        this.taskRepository = taskRepository;
+        this.taskTjeneste = taskTjeneste;
         this.automatiskSaksbehandlingRepository = automatiskSaksbehandlingRepository;
         this.clock = Clock.systemDefaultZone();
         this.grunnlagAlder = grunnlagAlder;
     }
 
     // kun for testbruk
-    protected AutomatiskSaksbehandlingBatchTask(ProsessTaskRepository taskRepository,
+    protected AutomatiskSaksbehandlingBatchTask(ProsessTaskTjeneste taskTjeneste,
                                                 AutomatiskSaksbehandlingRepository automatiskSaksbehandlingRepository,
                                                 Clock clock,
                                                 @KonfigVerdi(value = "automatisering.alder.kravgrunnlag") Period grunnlagAlder) {
-        this.taskRepository = taskRepository;
+        this.taskTjeneste = taskTjeneste;
         this.automatiskSaksbehandlingRepository = automatiskSaksbehandlingRepository;
         this.clock = clock;
         this.grunnlagAlder = grunnlagAlder;
@@ -59,13 +58,13 @@ public class AutomatiskSaksbehandlingBatchTask implements ProsessTaskHandler {
 
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
-        String batchRun = BATCHNAVN + EXECUTION_ID_SEPARATOR + UUID.randomUUID();
+        String batchRun = this.getClass().getSimpleName() + EXECUTION_ID_SEPARATOR + UUID.randomUUID();
         LocalDate iDag = LocalDate.now(clock);
         DayOfWeek dagensUkedag = DayOfWeek.from(iDag);
 
         // Ingenting å kjøre i helger eller helligdager enn så lenge
         if (Helligdager.erHelligdagEllerHelg(iDag)) {
-            logger.info("Kjører ikke batch {} i helgen eller helligdag. Iverksetting i saksbehandling avhenger av oppdragsystemet, som sannsynligvis har nedetid", BATCHNAVN);
+            logger.info("Kjører ikke batch {} i helgen eller helligdag. Iverksetting i saksbehandling avhenger av oppdragsystemet, som sannsynligvis har nedetid", batchRun);
         } else {
             LocalDate bestemtDato = iDag.minus(grunnlagAlder);
             logger.info("Henter behandlinger som er eldre enn {} i batch {}", bestemtDato, batchRun);
@@ -77,12 +76,12 @@ public class AutomatiskSaksbehandlingBatchTask implements ProsessTaskHandler {
     }
 
     private void opprettAutomatiskSaksbehandlingProsessTask(String batchRun, Behandling behandling) {
-        ProsessTaskData prosessTaskData = new ProsessTaskData(AutomatiskSaksbehandlingProsessTask.TASKTYPE);
+        ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(AutomatiskSaksbehandlingProsessTask.class);
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         prosessTaskData.setCallIdFraEksisterende();
         prosessTaskData.setSekvens("10");
         prosessTaskData.setGruppe(getGruppeNavn(batchRun));
-        taskRepository.lagre(prosessTaskData);
+        taskTjeneste.lagre(prosessTaskData);
     }
 
     private String getGruppeNavn(String batchRun) {

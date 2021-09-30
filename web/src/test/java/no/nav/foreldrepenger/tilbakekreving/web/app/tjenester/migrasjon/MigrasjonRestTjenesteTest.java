@@ -28,15 +28,16 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.DvhEventHendelse;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepositoryImpl;
+import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskTjenesteImpl;
 
 @ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public class MigrasjonRestTjenesteTest {
 
     private ØkonomiMottattXmlRepository økonomiMottattXmlRepository;
-    private ProsessTaskRepository taskRepository;
+    private ProsessTaskTjeneste taskTjeneste;
     private MigrasjonRestTjeneste migrasjonRestTjeneste;
 
     private Behandling behandling;
@@ -51,8 +52,8 @@ public class MigrasjonRestTjenesteTest {
         EksternBehandlingRepository eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
         eksternBehandlingRepository.lagre(eksternBehandling);
         økonomiMottattXmlRepository = new ØkonomiMottattXmlRepository(entityManager);
-        taskRepository = new ProsessTaskRepositoryImpl(entityManager, null, null);
-        migrasjonRestTjeneste = new MigrasjonRestTjeneste(økonomiMottattXmlRepository, repositoryProvider, taskRepository);
+        taskTjeneste = new ProsessTaskTjenesteImpl(new ProsessTaskRepositoryImpl(entityManager, null, null));
+        migrasjonRestTjeneste = new MigrasjonRestTjeneste(økonomiMottattXmlRepository, repositoryProvider, taskTjeneste);
     }
 
     @Test
@@ -71,7 +72,7 @@ public class MigrasjonRestTjenesteTest {
         EventHendelseDto eventHendelseDto = new EventHendelseDto(DvhEventHendelse.AKSJONSPUNKT_OPPRETTET.name());
         Response response = migrasjonRestTjeneste.sendSakshendelserTilDvhForAlleEksisterendeBehandlinger(eventHendelseDto);
         assertThat(response.getStatus()).isEqualTo(200);
-        List<ProsessTaskData> prosesser = taskRepository.finnAlle(ProsessTaskStatus.KLAR);
+        List<ProsessTaskData> prosesser = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
         assertThat(prosesser.size()).isEqualTo(1);
         ProsessTaskData prosessTaskData = prosesser.get(0);
         assertThat(prosessTaskData.getPropertyValue("eventHendelse")).isEqualTo(DvhEventHendelse.AKSJONSPUNKT_OPPRETTET.name());
@@ -84,7 +85,7 @@ public class MigrasjonRestTjenesteTest {
         EventHendelseDto eventHendelseDto = new EventHendelseDto(DvhEventHendelse.AKSJONSPUNKT_AVBRUTT.name());
         Response response = migrasjonRestTjeneste.sendSakshendelserTilDvhForAlleEksisterendeBehandlinger(eventHendelseDto);
         assertThat(response.getStatus()).isEqualTo(200);
-        List<ProsessTaskData> prosesser = taskRepository.finnAlle(ProsessTaskStatus.KLAR);
+        List<ProsessTaskData> prosesser = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
         assertThat(prosesser.size()).isEqualTo(1);
         ProsessTaskData prosessTaskData = prosesser.get(0);
         assertThat(prosessTaskData.getPropertyValue("eventHendelse")).isEqualTo(DvhEventHendelse.AKSJONSPUNKT_AVBRUTT.name());

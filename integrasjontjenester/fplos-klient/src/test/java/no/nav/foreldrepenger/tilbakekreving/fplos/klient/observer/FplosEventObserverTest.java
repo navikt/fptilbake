@@ -34,21 +34,23 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.prosesstask.UtvidetProsessTaskRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
 import no.nav.foreldrepenger.tilbakekreving.fplos.klient.task.FplosPubliserEventTask;
 import no.nav.vedtak.felles.integrasjon.kafka.EventHendelse;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
+import no.nav.vedtak.felles.prosesstask.api.TaskType;
 import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepositoryImpl;
+import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskTjenesteImpl;
 
 @ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public class FplosEventObserverTest {
 
     private AksjonspunktRepository aksjonspunktRepository;
 
-    private ProsessTaskRepository prosessTaskRepository;
+    private ProsessTaskTjeneste taskTjeneste;
 
     private BehandlingModell mockBehandlingModell;
 
@@ -63,14 +65,13 @@ public class FplosEventObserverTest {
     public void setup(EntityManager entityManager) {
         BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(entityManager);
         aksjonspunktRepository = repositoryProvider.getAksjonspunktRepository();
-        UtvidetProsessTaskRepository utvidetProsessTaskRepository = new UtvidetProsessTaskRepository(entityManager);
-        prosessTaskRepository = new ProsessTaskRepositoryImpl(entityManager, null, null);
+        taskTjeneste = new ProsessTaskTjenesteImpl(new ProsessTaskRepositoryImpl(entityManager, null, null));
         BehandlingModellRepository mockBehandlingModellRepository = mock(BehandlingModellRepository.class);
         mockBehandlingModell = mock(BehandlingModell.class);
         BehandlingskontrollTjeneste behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(repositoryProvider,
             mockBehandlingModellRepository, mock(BehandlingskontrollEventPubliserer.class));
         fplosEventObserver = new FplosEventObserver(repositoryProvider.getBehandlingRepository(),
-            utvidetProsessTaskRepository, prosessTaskRepository, behandlingskontrollTjeneste);
+            taskTjeneste, behandlingskontrollTjeneste);
         internalManipulerBehandling = new InternalManipulerBehandling(repositoryProvider);
 
         behandling = ScenarioSimple.simple().lagre(repositoryProvider);
@@ -125,7 +126,7 @@ public class FplosEventObserverTest {
         internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VARSEL);
 
         fplosEventObserver.observerAksjonpunktFunnetEvent(aksjonspunkterFunnetEvent);
-        assertThat(prosessTaskRepository.finnIkkeStartet()).isEmpty();
+        assertThat(taskTjeneste.finnAlle(ProsessTaskStatus.KLAR)).isEmpty();
     }
 
     @Test
@@ -168,7 +169,7 @@ public class FplosEventObserverTest {
         when(mockBehandlingModell.erStegAFørStegB(BehandlingStegType.VARSEL, BehandlingStegType.FAKTA_FEILUTBETALING)).thenReturn(true);
 
         fplosEventObserver.observerAksjonpunktUtførtEvent(aksjonspunktUtførtEvent);
-        assertThat(prosessTaskRepository.finnIkkeStartet()).isEmpty();
+        assertThat(taskTjeneste.finnAlle(ProsessTaskStatus.KLAR)).isEmpty();
     }
 
     @Test
@@ -181,7 +182,7 @@ public class FplosEventObserverTest {
         when(mockBehandlingModell.erStegAFørStegB(BehandlingStegType.FAKTA_FEILUTBETALING, BehandlingStegType.FAKTA_FEILUTBETALING)).thenReturn(false);
 
         fplosEventObserver.observerAksjonpunktUtførtEvent(aksjonspunktUtførtEvent);
-        assertThat(prosessTaskRepository.finnIkkeStartet()).isEmpty();
+        assertThat(taskTjeneste.finnAlle(ProsessTaskStatus.KLAR)).isEmpty();
     }
 
     @Test
@@ -235,10 +236,10 @@ public class FplosEventObserverTest {
     }
 
     private ProsessTaskData fellesAssertProsessTask(EventHendelse eventHendelse) {
-        List<ProsessTaskData> prosessTasker = prosessTaskRepository.finnIkkeStartet();
+        List<ProsessTaskData> prosessTasker = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
         assertThat(prosessTasker.size()).isEqualTo(1);
         ProsessTaskData publisherEventProsessTask = prosessTasker.get(0);
-        assertThat(publisherEventProsessTask.getTaskType()).isEqualTo(FplosPubliserEventTask.TASKTYPE);
+        assertThat(publisherEventProsessTask.taskType()).isEqualTo(TaskType.forProsessTask(FplosPubliserEventTask.class));
         assertThat(publisherEventProsessTask.getPropertyValue(FplosPubliserEventTask.PROPERTY_EVENT_NAME)).isEqualTo(eventHendelse.name());
         return publisherEventProsessTask;
     }

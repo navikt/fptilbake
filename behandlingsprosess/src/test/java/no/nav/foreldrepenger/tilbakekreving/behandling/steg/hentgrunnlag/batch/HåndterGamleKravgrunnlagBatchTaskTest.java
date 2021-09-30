@@ -27,14 +27,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
+import no.nav.vedtak.felles.prosesstask.api.TaskType;
 import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepositoryImpl;
+import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskTjenesteImpl;
 
 @ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public class HåndterGamleKravgrunnlagBatchTaskTest {
 
-    private ProsessTaskRepository prosessTaskRepository;
+    private ProsessTaskTjeneste taskTjeneste;
     private ØkonomiMottattXmlRepository mottattXmlRepository;
     private final Clock clock = Clock.fixed(Instant.parse(getDateString()), ZoneId.systemDefault());
     private HåndterGamleKravgrunnlagBatchTask gamleKravgrunnlagBatchTjeneste;
@@ -45,36 +47,36 @@ public class HåndterGamleKravgrunnlagBatchTaskTest {
         entityManager.setFlushMode(FlushModeType.AUTO);
         mottattXmlRepository = new ØkonomiMottattXmlRepository(entityManager);
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML());
-        prosessTaskRepository = new ProsessTaskRepositoryImpl(entityManager, null, null);
+        taskTjeneste = new ProsessTaskTjenesteImpl(new ProsessTaskRepositoryImpl(entityManager, null, null));
         gamleKravgrunnlagBatchTjeneste = new HåndterGamleKravgrunnlagBatchTask(mottattXmlRepository,
-            prosessTaskRepository, clock, Period.ofWeeks(-1));
+            taskTjeneste, clock, Period.ofWeeks(-1));
     }
 
     @Test
     public void skal_ikke_kjøre_batch_i_helgen() {
         Clock clock = Clock.fixed(Instant.parse("2020-05-03T12:00:00.00Z"), ZoneId.systemDefault());
         HåndterGamleKravgrunnlagBatchTask gamleKravgrunnlagBatchTjeneste = new HåndterGamleKravgrunnlagBatchTask(mottattXmlRepository,
-            prosessTaskRepository, clock, Period.ofWeeks(-1));
+            taskTjeneste, clock, Period.ofWeeks(-1));
         gamleKravgrunnlagBatchTjeneste.doTask(lagProsessTaskData());
-        assertThat(prosessTaskRepository.finnAlle(ProsessTaskStatus.KLAR)).isEmpty();
+        assertThat(taskTjeneste.finnAlle(ProsessTaskStatus.KLAR)).isEmpty();
     }
 
     @Test
     public void skal_ikke_kjøre_batch_på_helligdager() {
         Clock clock = Clock.fixed(Instant.parse("2020-12-25T12:00:00.00Z"), ZoneId.systemDefault());
         HåndterGamleKravgrunnlagBatchTask gamleKravgrunnlagBatchTjeneste = new HåndterGamleKravgrunnlagBatchTask(mottattXmlRepository,
-            prosessTaskRepository, clock, Period.ofWeeks(-1));
+            taskTjeneste, clock, Period.ofWeeks(-1));
         gamleKravgrunnlagBatchTjeneste.doTask(lagProsessTaskData());
-        assertThat(prosessTaskRepository.finnAlle(ProsessTaskStatus.KLAR)).isEmpty();
+        assertThat(taskTjeneste.finnAlle(ProsessTaskStatus.KLAR)).isEmpty();
     }
 
     @Test
     public void skal_kjøre_batch_og_opprette_prosess_task_for_grunnlag(){
         gamleKravgrunnlagBatchTjeneste.doTask(lagProsessTaskData());
-        List<ProsessTaskData> prosessTasker = prosessTaskRepository.finnAlle(ProsessTaskStatus.KLAR);
+        List<ProsessTaskData> prosessTasker = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
         assertThat(prosessTasker).isNotEmpty().hasSize(1);
         ProsessTaskData prosessTaskData = prosessTasker.get(0);
-        assertThat(prosessTaskData.getTaskType()).isEqualTo(HåndterGamleKravgrunnlagTask.TASKTYPE);
+        assertThat(prosessTaskData.taskType()).isEqualTo(TaskType.forProsessTask(HåndterGamleKravgrunnlagTask.class));
         assertThat(prosessTaskData.getPropertyValue("mottattXmlId")).isEqualTo(String.valueOf(mottattXmlId));
         assertThat(prosessTaskData.getGruppe()).contains("gammel-kravgrunnlag");
     }
@@ -95,7 +97,7 @@ public class HåndterGamleKravgrunnlagBatchTaskTest {
     }
 
     private ProsessTaskData lagProsessTaskData() {
-        return new ProsessTaskData(HåndterGamleKravgrunnlagTask.TASKTYPE);
+        return ProsessTaskData.forProsessTask(HåndterGamleKravgrunnlagTask.class);
     }
 
 }

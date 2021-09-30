@@ -10,11 +10,11 @@ import javax.ws.rs.core.UriBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker;
 import no.nav.journalpostapi.dto.sak.FagsakSystem;
 import no.nav.vedtak.felles.integrasjon.rest.OidcRestClient;
-import no.nav.vedtak.konfig.KonfigVerdi;
 
 @ApplicationScoped
 public class DokdistKlient {

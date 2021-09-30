@@ -4,8 +4,11 @@ import java.time.Instant;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Dependent;
+import javax.enterprise.inject.spi.CDI;
 import javax.inject.Inject;
 
+import org.jboss.weld.interceptor.util.proxy.TargetInstanceProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,11 +16,12 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDat
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe.Entry;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskLifecycleObserver;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskVeto;
-import no.nav.vedtak.felles.prosesstask.impl.BasicCdiProsessTaskDispatcher;
-import no.nav.vedtak.felles.prosesstask.impl.BasicCdiProsessTaskDispatcher.ProsessTaskHandlerRef;
+import no.nav.vedtak.felles.prosesstask.api.TaskType;
+import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskHandlerRef;
 
 /**
  * Vetoer kjøring av prosesstasks som tilhører grupper som er senere enn tidligste prosesstaskgruppe for en fagsak.
@@ -29,16 +33,16 @@ import no.nav.vedtak.felles.prosesstask.impl.BasicCdiProsessTaskDispatcher.Prose
 public class HåndterRekkefølgeAvFagsakProsessTaskGrupper implements ProsessTaskLifecycleObserver {
     private static final Logger log = LoggerFactory.getLogger(HåndterRekkefølgeAvFagsakProsessTaskGrupper.class);
     private FagsakProsessTaskRepository repository;
-    private ProsessTaskRepository prosessTaskRepository;
+    private ProsessTaskTjeneste taskTjeneste;
 
     public HåndterRekkefølgeAvFagsakProsessTaskGrupper() {
         // for CDI proxy
     }
 
     @Inject
-    public HåndterRekkefølgeAvFagsakProsessTaskGrupper(FagsakProsessTaskRepository repository, ProsessTaskRepository prosessTaskRepository) {
+    public HåndterRekkefølgeAvFagsakProsessTaskGrupper(FagsakProsessTaskRepository repository, ProsessTaskTjeneste taskTjeneste) {
         this.repository = repository;
-        this.prosessTaskRepository = prosessTaskRepository;
+        this.taskTjeneste = taskTjeneste;
     }
 
     @Override
@@ -52,7 +56,7 @@ public class HåndterRekkefølgeAvFagsakProsessTaskGrupper implements ProsessTas
         // dersom blokkerende task er tom, vetoes ikke tasken
         boolean vetoed = blokkerendeTask.isPresent();
         if (vetoed) {
-            ProsessTaskData blokker = prosessTaskRepository.finn(blokkerendeTask.get().getProsessTaskId());
+            ProsessTaskData blokker = taskTjeneste.finn(blokkerendeTask.get().getProsessTaskId());
             log.info("Vetoer kjøring av prosesstask[{}] av type[{}] for fagsak [{}] , er blokkert av prosesstask[{}] av type[{}] for samme fagsak.",
                 ptData.getId(), ptData.getTaskType(), ptData.getFagsakId(), blokker.getId(), blokker.getTaskType());
 
@@ -71,8 +75,6 @@ public class HåndterRekkefølgeAvFagsakProsessTaskGrupper implements ProsessTas
 
         Long gruppeSekvensNr = getGruppeSekvensNr();
 
-        BasicCdiProsessTaskDispatcher cdiDispatcher = new BasicCdiProsessTaskDispatcher() {};
-
         for (Entry entry : gruppe.getTasks()) {
 
             ProsessTaskData task = entry.task();
@@ -81,13 +83,8 @@ public class HåndterRekkefølgeAvFagsakProsessTaskGrupper implements ProsessTas
                 continue;
             }
 
-            try (ProsessTaskHandlerRef handler = cdiDispatcher.findHandler(task)) {
-                if (!handler.getBean().getClass().isAnnotationPresent(FagsakProsesstaskRekkefølge.class)) { //NOSONAR
-                    // error handling
-                    throw new UnsupportedOperationException(handler.getClass().getSimpleName() + " må være annotert med "
-                        + FagsakProsesstaskRekkefølge.class.getSimpleName() + " for å kobles til en Fagsak");
-                }
-                FagsakProsesstaskRekkefølge rekkefølge = handler.getBean().getClass().getAnnotation(FagsakProsesstaskRekkefølge.class);
+            try (LocalProsessTaskHandlerRef handler = LocalProsessTaskHandlerRef.lookup(task.taskType())) {
+                var rekkefølge = handler.getFagsakProsesstaskRekkefølge();
                 Long sekvensNr = rekkefølge.gruppeSekvens() ? gruppeSekvensNr : null;
                 Long behandlingId = ProsessTaskDataWrapper.wrap(task).getBehandlingId();
                 repository.lagre(new FagsakProsessTask(task.getFagsakId(), task.getId(), behandlingId, sekvensNr));
@@ -105,4 +102,37 @@ public class HåndterRekkefølgeAvFagsakProsessTaskGrupper implements ProsessTas
         return gruppeSekvensNr;
     }
 
+    private static class LocalProsessTaskHandlerRef implements AutoCloseable {
+
+        private ProsessTaskHandler localBean;
+
+        private LocalProsessTaskHandlerRef(ProsessTaskHandler bean) {
+            this.localBean = bean;
+        }
+
+        private FagsakProsesstaskRekkefølge getFagsakProsesstaskRekkefølge() {
+            Class<?> clazz = (localBean instanceof TargetInstanceProxy<?> tip && !localBean.getClass().isAnnotationPresent(FagsakProsesstaskRekkefølge.class)) ?
+                tip.weld_getTargetInstance().getClass() : localBean.getClass();
+            if (clazz == null || !clazz.isAnnotationPresent(FagsakProsesstaskRekkefølge.class)) {
+                throw new UnsupportedOperationException(clazz != null ? clazz.getSimpleName() : "ukjent klasse" + " må være annotert med "
+                    + FagsakProsesstaskRekkefølge.class.getSimpleName() + " for å kobles til en Fagsak");
+            }
+            return clazz.getAnnotation(FagsakProsesstaskRekkefølge.class);
+        }
+
+        public static LocalProsessTaskHandlerRef lookup(TaskType taskType) {
+            ProsessTaskHandler bean = lookupHandler(taskType);
+            return new LocalProsessTaskHandlerRef(bean);
+        }
+
+        protected static ProsessTaskHandler lookupHandler(TaskType taskType) {
+            return CDI.current().select(ProsessTaskHandler.class, new ProsessTaskHandlerRef.ProsessTaskLiteral(taskType.value())).get();
+        }
+
+        public void close() {
+            if (this.localBean != null && this.localBean.getClass().isAnnotationPresent(Dependent.class)) {
+                CDI.current().destroy(this.localBean);
+            }
+        }
+    }
 }

@@ -6,6 +6,7 @@ import java.time.Period;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
+import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
@@ -19,14 +20,11 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottak
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
-import no.nav.vedtak.konfig.KonfigVerdi;
 
 @Dependent
-@ProsessTask(InnhentDokumentasjonbrevTask.TASKTYPE)
+@ProsessTask("brev.sendInnhentDokumentasjon")
 @FagsakProsesstaskRekkefølge(gruppeSekvens = false)
 public class InnhentDokumentasjonbrevTask implements ProsessTaskHandler {
-
-    public static final String TASKTYPE = "brev.sendInnhentDokumentasjon";
 
     private BehandlingRepository behandlingRepository;
     private VergeRepository vergeRepository;

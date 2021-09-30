@@ -1,6 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -10,7 +9,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.task.FortsettBehandlingTaskProperties;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.task.FortsettBehandlingTask;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
@@ -26,8 +25,7 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.ResponsKanal;
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
-import no.nav.vedtak.felles.prosesstask.api.TaskStatus;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.log.mdc.MDCOperations;
 
 @ApplicationScoped
@@ -35,7 +33,7 @@ public class GjenopptaBehandlingTjeneste {
 
     private static final Logger logger = LoggerFactory.getLogger(GjenopptaBehandlingTjeneste.class);
 
-    private ProsessTaskRepository prosessTaskRepository;
+    private ProsessTaskTjeneste taskTjeneste;
     private BehandlingKandidaterRepository behandlingKandidaterRepository;
     private BehandlingVenterRepository behandlingVenterRepository;
     private KravgrunnlagRepository grunnlagRepository;
@@ -47,12 +45,12 @@ public class GjenopptaBehandlingTjeneste {
     }
 
     @Inject
-    public GjenopptaBehandlingTjeneste(ProsessTaskRepository prosessTaskRepository,
+    public GjenopptaBehandlingTjeneste(ProsessTaskTjeneste taskTjeneste,
                                        BehandlingKandidaterRepository behandlingKandidaterRepository,
                                        BehandlingVenterRepository behandlingVenterRepository,
                                        BehandlingRepositoryProvider repositoryProvider,
                                        VarselresponsTjeneste varselresponsTjeneste) {
-        this.prosessTaskRepository = prosessTaskRepository;
+        this.taskTjeneste = taskTjeneste;
         this.behandlingKandidaterRepository = behandlingKandidaterRepository;
         this.behandlingVenterRepository = behandlingVenterRepository;
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
@@ -152,16 +150,6 @@ public class GjenopptaBehandlingTjeneste {
     }
 
     /**
-     * Henter status for prosesstaskgruppe
-     *
-     * @param gruppe
-     * @return
-     */
-    public List<TaskStatus> hentStatusForGjenopptaBehandlingGruppe(String gruppe) {
-        return prosessTaskRepository.finnStatusForTaskIGruppe(GjenopptaBehandlingTask.TASKTYPE, gruppe);
-    }
-
-    /**
      * Sjekk om behandling kan ta av vent
      *
      * @param behandlingId
@@ -197,17 +185,17 @@ public class GjenopptaBehandlingTjeneste {
     }
 
     private String opprettFortsettBehandlingTask(Behandling behandling, String callId) {
-        ProsessTaskData prosessTaskData = new ProsessTaskData(FortsettBehandlingTaskProperties.TASKTYPE);
+        ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(FortsettBehandlingTask.class);
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         prosessTaskData.setSekvens("1");
         prosessTaskData.setPrioritet(100);
-        prosessTaskData.setProperty(FortsettBehandlingTaskProperties.GJENOPPTA_STEG, behandling.getAktivtBehandlingSteg().getKode());
+        prosessTaskData.setProperty(FortsettBehandlingTask.GJENOPPTA_STEG, behandling.getAktivtBehandlingSteg().getKode());
 
         // unik per task da det gjelder ulike behandlinger, gjenbruker derfor ikke
         prosessTaskData.setCallId(callId);
 
         logger.info("Gjenopptar behandling av behandlingId={}, oppretter {}-prosesstask med callId={}", behandling.getId(), prosessTaskData.getTaskType(), callId);
-        return prosessTaskRepository.lagre(prosessTaskData);
+        return taskTjeneste.lagre(prosessTaskData);
     }
 
     private void opprettHistorikkInnslagForManueltGjenopptaBehandling(long behandlingId, HistorikkAktør historikkAktør) {

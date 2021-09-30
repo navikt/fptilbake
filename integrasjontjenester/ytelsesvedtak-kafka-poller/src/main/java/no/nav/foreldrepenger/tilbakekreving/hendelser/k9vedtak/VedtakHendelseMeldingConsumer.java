@@ -13,9 +13,9 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 
+import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.hendelser.felles.YtelsesvedtakHendelseConsumer;
 import no.nav.foreldrepenger.tilbakekreving.kafka.util.JsonDeserialiserer;
-import no.nav.vedtak.konfig.KonfigVerdi;
 
 @ApplicationScoped
 public class VedtakHendelseMeldingConsumer extends YtelsesvedtakHendelseConsumer {

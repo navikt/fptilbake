@@ -21,7 +21,8 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.selvbetjening.SelvbetjeningTilbakekrevingStøtte;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
+import no.nav.vedtak.felles.prosesstask.api.TaskType;
 
 @ApplicationScoped
 public class HenleggBehandlingTjeneste {
@@ -29,14 +30,15 @@ public class HenleggBehandlingTjeneste {
     private BehandlingRepository behandlingRepository;
     private KravgrunnlagRepository grunnlagRepository;
     private EksternBehandlingRepository eksternBehandlingRepository;
-    private ProsessTaskRepository prosessTaskRepository;
+    private ProsessTaskTjeneste taskTjeneste;
     private BrevSporingRepository brevSporingRepository;
 
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private HistorikkinnslagTjeneste historikkinnslagTjeneste;
 
-    private static final String HENLEGGELSESBREV_TASK_TYPE = "brev.sendhenleggelse";
-    private static final String SELVBETJENING_HENLAGT_TASKTYPE = "send.beskjed.tilbakekreving.henlagt.selvbetjening";
+    // TODO (rydde dependencies!!
+    static final TaskType HENLEGGELSESBREV_TASK_TYPE = new TaskType("brev.sendhenleggelse");
+    static final TaskType SELVBETJENING_HENLAGT_TASKTYPE = new TaskType("send.beskjed.tilbakekreving.henlagt.selvbetjening");
     private static final long OPPRETTELSE_DAGER_BEGRENSNING = 6L;
 
     HenleggBehandlingTjeneste() {
@@ -45,14 +47,14 @@ public class HenleggBehandlingTjeneste {
 
     @Inject
     public HenleggBehandlingTjeneste(BehandlingRepositoryProvider repositoryProvider,
-                                     ProsessTaskRepository prosessTaskRepository,
+                                     ProsessTaskTjeneste taskTjeneste,
                                      BehandlingskontrollTjeneste behandlingskontrollTjeneste,
                                      HistorikkinnslagTjeneste historikkinnslagTjeneste) {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
         this.brevSporingRepository = repositoryProvider.getBrevSporingRepository();
-        this.prosessTaskRepository = prosessTaskRepository;
+        this.taskTjeneste = taskTjeneste;
 
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
         this.historikkinnslagTjeneste = historikkinnslagTjeneste;
@@ -108,18 +110,18 @@ public class HenleggBehandlingTjeneste {
     }
 
     private void sendHenleggelsesbrev(Behandling behandling, String fritekst) {
-        ProsessTaskData henleggelseBrevTask = new ProsessTaskData(HENLEGGELSESBREV_TASK_TYPE);
+        ProsessTaskData henleggelseBrevTask = ProsessTaskData.forTaskType(HENLEGGELSESBREV_TASK_TYPE);
         henleggelseBrevTask.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         henleggelseBrevTask.setPayload(fritekst);
         henleggelseBrevTask.setCallIdFraEksisterende();
-        prosessTaskRepository.lagre(henleggelseBrevTask);
+        taskTjeneste.lagre(henleggelseBrevTask);
     }
 
     private void informerSelvbetjening(Behandling behandling) {
-        ProsessTaskData selvbetjeningTask = new ProsessTaskData(SELVBETJENING_HENLAGT_TASKTYPE);
+        ProsessTaskData selvbetjeningTask = ProsessTaskData.forTaskType(SELVBETJENING_HENLAGT_TASKTYPE);
         selvbetjeningTask.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         selvbetjeningTask.setCallIdFraEksisterende();
-        prosessTaskRepository.lagre(selvbetjeningTask);
+        taskTjeneste.lagre(selvbetjeningTask);
     }
 
     private boolean kanSendeHenleggeslsesBrev(Behandling behandling, BehandlingResultatType behandlingResultatType) {

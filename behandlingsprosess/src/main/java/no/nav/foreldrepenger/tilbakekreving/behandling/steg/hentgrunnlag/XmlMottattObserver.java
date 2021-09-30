@@ -17,7 +17,8 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.status.
 import no.nav.foreldrepenger.tilbakekreving.kravgrunnlag.queue.consumer.XmlMottattEvent;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
+import no.nav.vedtak.felles.prosesstask.api.TaskType;
 
 @ApplicationScoped
 @ActivateRequestContext
@@ -27,16 +28,16 @@ public class XmlMottattObserver {
     private static final Logger log = LoggerFactory.getLogger(XmlMottattObserver.class);
 
     private ØkonomiMottattXmlRepository økonomiMottattXmlRepository;
-    private ProsessTaskRepository prosessTaskRepository;
+    private ProsessTaskTjeneste taskTjeneste;
 
     XmlMottattObserver() {
         //for CDI proxy
     }
 
     @Inject
-    public XmlMottattObserver(ØkonomiMottattXmlRepository økonomiMottattXmlRepository, ProsessTaskRepository prosessTaskRepository) {
+    public XmlMottattObserver(ØkonomiMottattXmlRepository økonomiMottattXmlRepository, ProsessTaskTjeneste taskTjeneste) {
         this.økonomiMottattXmlRepository = økonomiMottattXmlRepository;
-        this.prosessTaskRepository = prosessTaskRepository;
+        this.taskTjeneste = taskTjeneste;
     }
 
     public void observer(@Observes XmlMottattEvent event) {
@@ -44,19 +45,19 @@ public class XmlMottattObserver {
         Long mottattXmlId = økonomiMottattXmlRepository.lagreMottattXml(innhold);
 
         if (innhold.contains(ROOT_ELEMENT_KRAVGRUNNLAG_XML)) {
-            lagreProsesTask(mottattXmlId, LesKravgrunnlagTask.TASKTYPE);
+            lagreProsesTask(mottattXmlId, TaskType.forProsessTask(LesKravgrunnlagTask.class));
         } else if (innhold.contains(ROOT_ELEMENT_KRAV_VEDTAK_STATUS_XML)) {
-            lagreProsesTask(mottattXmlId, LesKravvedtakStatusTask.TASKTYPE);
+            lagreProsesTask(mottattXmlId, TaskType.forProsessTask(LesKravvedtakStatusTask.class));
         } else {
             log.error("Mottok XML som ikke ble forstått, mottattXmlId={}", mottattXmlId);
         }
 
     }
 
-    private void lagreProsesTask(Long mottattXmlId, String taskType) {
-        ProsessTaskData lesXmlTask = new ProsessTaskData(taskType);
+    private void lagreProsesTask(Long mottattXmlId, TaskType taskType) {
+        ProsessTaskData lesXmlTask = ProsessTaskData.forTaskType(taskType);
         lesXmlTask.setProperty(TaskProperty.PROPERTY_MOTTATT_XML_ID, Long.toString(mottattXmlId));
-        prosessTaskRepository.lagre(lesXmlTask);
+        taskTjeneste.lagre(lesXmlTask);
     }
 
 }

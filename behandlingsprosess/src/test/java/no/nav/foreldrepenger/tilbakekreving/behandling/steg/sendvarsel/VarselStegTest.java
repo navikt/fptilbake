@@ -36,13 +36,13 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.VarselReposi
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
 @CdiDbAwareTest
 public class VarselStegTest {
 
     @Inject
-    private ProsessTaskRepository prosessTaskRepository;
+    private ProsessTaskTjeneste taskTjeneste;
     @Inject
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     @Inject
@@ -124,7 +124,7 @@ public class VarselStegTest {
             repositoryProvider,
             behandlingskontrollTjeneste,
             varselresponsTjeneste,
-            prosessTaskRepository,
+            taskTjeneste,
             Period.ofWeeks(4));
     }
 }

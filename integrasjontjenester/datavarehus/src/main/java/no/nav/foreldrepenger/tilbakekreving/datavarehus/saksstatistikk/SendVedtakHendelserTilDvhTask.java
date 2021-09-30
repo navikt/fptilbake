@@ -12,16 +12,14 @@ import no.nav.foreldrepenger.tilbakekreving.kontrakter.vedtak.VedtakOppsummering
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
 @ApplicationScoped
-@ProsessTask(SendVedtakHendelserTilDvhTask.TASKTYPE)
+@ProsessTask("dvh.send.vedtak")
 @FagsakProsesstaskRekkefølge(gruppeSekvens = true)
 public class SendVedtakHendelserTilDvhTask implements ProsessTaskHandler {
 
-    public static final String TASKTYPE = "dvh.send.vedtak";
-
-    private ProsessTaskRepository taskRepository;
+    private ProsessTaskTjeneste taskTjeneste;
     private VedtakOppsummeringTjeneste vedtakOppsummeringTjeneste;
     private VedtakOppsummeringKafkaProducer kafkaProducer;
 
@@ -32,10 +30,10 @@ public class SendVedtakHendelserTilDvhTask implements ProsessTaskHandler {
     }
 
     @Inject
-    public SendVedtakHendelserTilDvhTask(ProsessTaskRepository taskRepository,
+    public SendVedtakHendelserTilDvhTask(ProsessTaskTjeneste taskTjeneste,
                                          VedtakOppsummeringTjeneste vedtakOppsummeringTjeneste,
                                          VedtakOppsummeringKafkaProducer kafkaProducer) {
-        this.taskRepository = taskRepository;
+        this.taskTjeneste = taskTjeneste;
         this.vedtakOppsummeringTjeneste = vedtakOppsummeringTjeneste;
         this.kafkaProducer = kafkaProducer;
     }
@@ -47,7 +45,7 @@ public class SendVedtakHendelserTilDvhTask implements ProsessTaskHandler {
         validate(vedtakOppsummering);
         kafkaProducer.sendMelding(vedtakOppsummering);
         prosessTaskData.setPayload(VedtakOppsummeringMapper.tilJsonString(vedtakOppsummering));
-        taskRepository.lagre(prosessTaskData);
+        taskTjeneste.lagre(prosessTaskData);
     }
 
     private void validate(Object object) {

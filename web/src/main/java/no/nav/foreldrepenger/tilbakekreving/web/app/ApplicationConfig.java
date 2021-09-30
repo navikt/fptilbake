@@ -20,6 +20,7 @@ import io.swagger.v3.oas.integration.SwaggerConfiguration;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
+import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.ConstraintViolationMapper;
 import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.GeneralRestExceptionMapper;
 import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.JsonMappingExceptionMapper;
@@ -49,7 +50,6 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.varselrespons.Vars
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.VergeRestTjeneste;
 import no.nav.vedtak.felles.integrasjon.rest.jersey.TimingFilter;
 import no.nav.vedtak.felles.prosesstask.rest.ProsessTaskRestTjeneste;
-import no.nav.vedtak.util.env.Environment;
 
 
 @ApplicationPath(ApplicationConfig.API_URI)

@@ -44,16 +44,18 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.task.SendVedtakFattetTilSelvbetjeningTask;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
+import no.nav.vedtak.felles.prosesstask.api.TaskType;
 import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskEventPubliserer;
 import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepositoryImpl;
+import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskTjenesteImpl;
 
 @ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public class IverksetteVedtakStegTest {
 
     private BehandlingRepositoryProvider repoProvider;
-    private ProsessTaskRepository prosessTaskRepository;
+    private ProsessTaskTjeneste taskTjeneste;
     private BrevSporingRepository brevSporingRepository;
     private IverksetteVedtakSteg iverksetteVedtakSteg;
     private BehandlingVedtakRepository behandlingVedtakRepository;
@@ -69,9 +71,9 @@ public class IverksetteVedtakStegTest {
     public void setup(EntityManager entityManager) {
         this.entityManager = entityManager;
         repoProvider = new BehandlingRepositoryProvider(entityManager);
-        prosessTaskRepository = new ProsessTaskRepositoryImpl(entityManager, null, Mockito.mock(ProsessTaskEventPubliserer.class));
+        taskTjeneste = new ProsessTaskTjenesteImpl(new ProsessTaskRepositoryImpl(entityManager, null, Mockito.mock(ProsessTaskEventPubliserer.class)));
         brevSporingRepository = new BrevSporingRepository(entityManager);
-        var prosessTaskIverksett = new ProsessTaskIverksett(prosessTaskRepository,
+        var prosessTaskIverksett = new ProsessTaskIverksett(taskTjeneste,
             brevSporingRepository);
         iverksetteVedtakSteg = new IverksetteVedtakSteg(repoProvider, prosessTaskIverksett);
         behandlingVedtakRepository = repoProvider.getBehandlingVedtakRepository();
@@ -106,13 +108,13 @@ public class IverksetteVedtakStegTest {
         assertThat(stegResultat.getTransisjon()).isEqualTo(FellesTransisjoner.SETT_PÅ_VENT);
         assertBehandlingVedtak(behandling);
 
-        List<ProsessTaskData> tasker = prosessTaskRepository.finnAlle(ProsessTaskStatus.KLAR);
+        List<ProsessTaskData> tasker = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
         assertThat(tasker.size()).isEqualTo(5);
-        assertThat(tasker.get(0).getTaskType()).isEqualTo(SendØkonomiTibakekerevingsVedtakTask.TASKTYPE);
-        assertThat(tasker.get(1).getTaskType()).isEqualTo(SendVedtaksbrevTask.TASKTYPE);
-        assertThat(tasker.get(2).getTaskType()).isEqualTo(AvsluttBehandlingTask.TASKTYPE);
-        assertThat(tasker.get(3).getTaskType()).isEqualTo(SendVedtakFattetTilSelvbetjeningTask.TASKTYPE);
-        assertThat(tasker.get(4).getTaskType()).isEqualTo(SendVedtakHendelserTilDvhTask.TASKTYPE);
+        assertThat(tasker.get(0).taskType()).isEqualTo(TaskType.forProsessTask(SendØkonomiTibakekerevingsVedtakTask.class));
+        assertThat(tasker.get(1).taskType()).isEqualTo(TaskType.forProsessTask(SendVedtaksbrevTask.class));
+        assertThat(tasker.get(2).taskType()).isEqualTo(TaskType.forProsessTask(AvsluttBehandlingTask.class));
+        assertThat(tasker.get(3).taskType()).isEqualTo(TaskType.forProsessTask(SendVedtakFattetTilSelvbetjeningTask.class));
+        assertThat(tasker.get(4).taskType()).isEqualTo(TaskType.forProsessTask(SendVedtakHendelserTilDvhTask.class));
     }
 
     @Test
@@ -132,11 +134,11 @@ public class IverksetteVedtakStegTest {
         assertThat(stegResultat.getTransisjon()).isEqualTo(FellesTransisjoner.SETT_PÅ_VENT);
         assertBehandlingVedtak(revurdering);
 
-        List<ProsessTaskData> tasker = prosessTaskRepository.finnAlle(ProsessTaskStatus.KLAR);
+        List<ProsessTaskData> tasker = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
         assertThat(tasker.size()).isEqualTo(3);
-        assertThat(tasker.get(0).getTaskType()).isEqualTo(SendØkonomiTibakekerevingsVedtakTask.TASKTYPE);
-        assertThat(tasker.get(1).getTaskType()).isEqualTo(AvsluttBehandlingTask.TASKTYPE);
-        assertThat(tasker.get(2).getTaskType()).isEqualTo(SendVedtakHendelserTilDvhTask.TASKTYPE);
+        assertThat(tasker.get(0).taskType()).isEqualTo(TaskType.forProsessTask(SendØkonomiTibakekerevingsVedtakTask.class));
+        assertThat(tasker.get(1).taskType()).isEqualTo(TaskType.forProsessTask(AvsluttBehandlingTask.class));
+        assertThat(tasker.get(2).taskType()).isEqualTo(TaskType.forProsessTask(SendVedtakHendelserTilDvhTask.class));
     }
 
     @Test
@@ -155,12 +157,12 @@ public class IverksetteVedtakStegTest {
         assertThat(stegResultat.getTransisjon()).isEqualTo(FellesTransisjoner.SETT_PÅ_VENT);
         assertBehandlingVedtak(revurdering);
 
-        List<ProsessTaskData> tasker = prosessTaskRepository.finnAlle(ProsessTaskStatus.KLAR);
+        List<ProsessTaskData> tasker = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
         assertThat(tasker.size()).isEqualTo(4);
-        assertThat(tasker.get(0).getTaskType()).isEqualTo(SendØkonomiTibakekerevingsVedtakTask.TASKTYPE);
-        assertThat(tasker.get(1).getTaskType()).isEqualTo(SendVedtaksbrevTask.TASKTYPE);
-        assertThat(tasker.get(2).getTaskType()).isEqualTo(AvsluttBehandlingTask.TASKTYPE);
-        assertThat(tasker.get(3).getTaskType()).isEqualTo(SendVedtakHendelserTilDvhTask.TASKTYPE);
+        assertThat(tasker.get(0).taskType()).isEqualTo(TaskType.forProsessTask(SendØkonomiTibakekerevingsVedtakTask.class));
+        assertThat(tasker.get(1).taskType()).isEqualTo(TaskType.forProsessTask(SendVedtaksbrevTask.class));
+        assertThat(tasker.get(2).taskType()).isEqualTo(TaskType.forProsessTask(AvsluttBehandlingTask.class));
+        assertThat(tasker.get(3).taskType()).isEqualTo(TaskType.forProsessTask(SendVedtakHendelserTilDvhTask.class));
     }
 
     private void opprettBehandlingVedtak(Behandling behandling, IverksettingStatus iverksettingStatus) {

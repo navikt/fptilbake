@@ -92,9 +92,11 @@ import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkInnslagKonver
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
+import no.nav.vedtak.felles.prosesstask.api.TaskType;
 import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepositoryImpl;
+import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskTjenesteImpl;
 
 @ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public class AutomatiskSaksbehandlingProsessTaskTest {
@@ -102,7 +104,7 @@ public class AutomatiskSaksbehandlingProsessTaskTest {
     private BehandlingRepositoryProvider repositoryProvider;
     private BehandlingRepository behandlingRepository;
     private TotrinnRepository totrinnRepository;
-    private ProsessTaskRepository taskRepository;
+    private ProsessTaskTjeneste taskTjeneste;
     private HistorikkTjenesteAdapter historikkTjenesteAdapter;
     private GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste;
     private AutomatiskFaktaFastsettelseTjeneste faktaFastsettelseTjeneste;
@@ -126,7 +128,7 @@ public class AutomatiskSaksbehandlingProsessTaskTest {
         AksjonspunktRepository aksjonspunktRepository = repositoryProvider.getAksjonspunktRepository();
         totrinnRepository = new TotrinnRepository(entityManager);
         VarselresponsRepository varselresponsRepository = new VarselresponsRepository(entityManager);
-        taskRepository = new ProsessTaskRepositoryImpl(entityManager, null, null);
+        taskTjeneste = new ProsessTaskTjenesteImpl(new ProsessTaskRepositoryImpl(entityManager, null, null));
         FellesQueriesForBehandlingRepositories fellesQueriesForBehandlingRepositories = new FellesQueriesForBehandlingRepositories(
             entityManager);
         BehandlingVenterRepository behandlingVenterRepository = new BehandlingVenterRepository(
@@ -142,7 +144,7 @@ public class AutomatiskSaksbehandlingProsessTaskTest {
             repositoryProvider.getFaktaFeilutbetalingRepository(), historikkTjenesteAdapter);
 
         VarselresponsTjeneste varselresponsTjeneste = new VarselresponsTjeneste(varselresponsRepository);
-        gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjeneste(taskRepository, behandlingKandidaterRepository,
+        gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjeneste(taskTjeneste, behandlingKandidaterRepository,
             behandlingVenterRepository, repositoryProvider, varselresponsTjeneste);
 
         KravgrunnlagTjeneste kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repositoryProvider,
@@ -169,7 +171,7 @@ public class AutomatiskSaksbehandlingProsessTaskTest {
             aksjonspunktRepository);
         tilbakekrevingBeregningTjeneste = new TilbakekrevingBeregningTjeneste(repositoryProvider,
             kravgrunnlagBeregningTjeneste);
-        prosessTaskIverksett = new ProsessTaskIverksett(taskRepository, repositoryProvider.getBrevSporingRepository());
+        prosessTaskIverksett = new ProsessTaskIverksett(taskTjeneste, repositoryProvider.getBrevSporingRepository());
         BehandlingModellRepository behandlingModellRepositoryMock = Mockito.mock(BehandlingModellRepository.class);
         BehandlingskontrollEventPubliserer behandlingskontrollEventPublisererMock = mock(
             BehandlingskontrollEventPubliserer.class);
@@ -201,15 +203,15 @@ public class AutomatiskSaksbehandlingProsessTaskTest {
         assertThat(behandling.getAnsvarligBeslutter()).isEqualTo("VL");
         assertThat(behandling.getStatus()).isEqualByComparingTo(BehandlingStatus.IVERKSETTER_VEDTAK);
 
-        List<ProsessTaskData> prosessTasker = taskRepository.finnAlle(ProsessTaskStatus.KLAR);
+        List<ProsessTaskData> prosessTasker = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
         assertThat(prosessTasker.size()).isEqualTo(3);
-        List<String> prosessTaskNavn = prosessTasker.stream()
-            .map(ProsessTaskData::getTaskType)
+        List<TaskType> prosessTaskNavn = prosessTasker.stream()
+            .map(ProsessTaskData::taskType)
             .collect(Collectors.toList());
-        assertThat(prosessTaskNavn.contains(SendVedtaksbrevTask.TASKTYPE)).isFalse();
-        assertThat(prosessTaskNavn.contains(AvsluttBehandlingTask.TASKTYPE)).isTrue();
-        assertThat(prosessTaskNavn.contains(SendØkonomiTibakekerevingsVedtakTask.TASKTYPE)).isTrue();
-        assertThat(prosessTaskNavn.contains(SendVedtakHendelserTilDvhTask.TASKTYPE)).isTrue();
+        assertThat(prosessTaskNavn.contains(TaskType.forProsessTask(SendVedtaksbrevTask.class))).isFalse();
+        assertThat(prosessTaskNavn.contains(TaskType.forProsessTask(AvsluttBehandlingTask.class))).isTrue();
+        assertThat(prosessTaskNavn.contains(TaskType.forProsessTask(SendØkonomiTibakekerevingsVedtakTask.class))).isTrue();
+        assertThat(prosessTaskNavn.contains(TaskType.forProsessTask(SendVedtakHendelserTilDvhTask.class))).isTrue();
 
         Optional<FaktaFeilutbetaling> faktaFeilutbetalingData = repositoryProvider.getFaktaFeilutbetalingRepository()
             .finnFaktaOmFeilutbetaling(behandlingId);
@@ -303,7 +305,7 @@ public class AutomatiskSaksbehandlingProsessTaskTest {
     }
 
     private ProsessTaskData lagProsesTaskData() {
-        ProsessTaskData prosessTaskData = new ProsessTaskData(AutomatiskSaksbehandlingProsessTask.TASKTYPE);
+        ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(AutomatiskSaksbehandlingProsessTask.class);
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandlingId, behandling.getAktørId().getId());
         return prosessTaskData;
     }

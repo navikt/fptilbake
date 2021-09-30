@@ -1,7 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk;
 
-import java.util.Optional;
-
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
@@ -15,12 +13,11 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.AksjonspunkterFu
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingEnhetEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStatusEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollEvent;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.prosesstask.UtvidetProsessTaskRepository;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping.BehandlingTilstandMapper;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.BehandlingTilstand;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.DvhEventHendelse;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
 
 @ApplicationScoped
@@ -28,8 +25,7 @@ public class SakshendelserEventObserver {
 
     private static final Logger logger = LoggerFactory.getLogger(SakshendelserEventObserver.class);
 
-    private ProsessTaskRepository prosessTaskRepository;
-    private UtvidetProsessTaskRepository utvidetProsessTaskRepository;
+    private ProsessTaskTjeneste taskTjeneste;
     private BehandlingTilstandTjeneste behandlingTilstandTjeneste;
 
     SakshendelserEventObserver() {
@@ -37,11 +33,9 @@ public class SakshendelserEventObserver {
     }
 
     @Inject
-    public SakshendelserEventObserver(ProsessTaskRepository prosessTaskRepository,
-                                      UtvidetProsessTaskRepository utvidetProsessTaskRepository,
+    public SakshendelserEventObserver(ProsessTaskTjeneste taskTjeneste,
                                       BehandlingTilstandTjeneste behandlingTilstandTjeneste) {
-        this.prosessTaskRepository = prosessTaskRepository;
-        this.utvidetProsessTaskRepository = utvidetProsessTaskRepository;
+        this.taskTjeneste = taskTjeneste;
         this.behandlingTilstandTjeneste = behandlingTilstandTjeneste;
     }
 
@@ -75,21 +69,12 @@ public class SakshendelserEventObserver {
     }
 
     private void opprettProsessTask(long behandlingId, BehandlingTilstand behandlingTilstand, DvhEventHendelse eventHendelse) {
-        String gruppe = "dvh-sak-" + behandlingId;
-
-        ProsessTaskData taskData = new ProsessTaskData(SendSakshendelserTilDvhTask.TASK_TYPE);
+        ProsessTaskData taskData = ProsessTaskData.forProsessTask(SendSakshendelserTilDvhTask.class);
         taskData.setPayload(BehandlingTilstandMapper.tilJsonString(behandlingTilstand));
         taskData.setProperty("behandlingId", Long.toString(behandlingId));
-        taskData.setGruppe(gruppe);
-        taskData.setSekvens(String.format("%04d", finnNesteSekvensnummer(gruppe)));
         taskData.setProperty("eventHendlese", eventHendelse.name());
 
-        prosessTaskRepository.lagre(taskData);
-    }
-
-    private Integer finnNesteSekvensnummer(String gruppe) {
-        Optional<ProsessTaskData> eksisterendeProsessTask = utvidetProsessTaskRepository.finnSisteProsessTaskForProsessTaskGruppe(SendSakshendelserTilDvhTask.TASK_TYPE, gruppe);
-        return eksisterendeProsessTask.map(pt -> Integer.parseInt(pt.getSekvens()) + 1).orElse(1);
+        taskTjeneste.lagre(taskData);
     }
 
 

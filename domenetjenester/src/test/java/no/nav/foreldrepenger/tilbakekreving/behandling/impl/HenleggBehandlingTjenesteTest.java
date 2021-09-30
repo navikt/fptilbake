@@ -84,7 +84,7 @@ public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
         BehandlingskontrollTjeneste behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(repoProvider,
             mockBehandlingModellRepository, null);
         HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepository, null);
-        henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repoProvider, prosessTaskRepository,
+        henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repoProvider, taskTjeneste,
             behandlingskontrollTjeneste, historikkinnslagTjeneste);
     }
 
@@ -189,7 +189,7 @@ public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
     public void kan_ikke_sende_henleggelsesbrev_hvis_varselbrev_ikke_sendt() {
         henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), behandlingsresultat);
 
-        List<ProsessTaskData> prosessTaskData = prosessTaskRepository.finnAlle(ProsessTaskStatus.KLAR);
+        List<ProsessTaskData> prosessTaskData = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
         assertThat(prosessTaskData).isEmpty();
         assertHenleggelse(internBehandlingId);
     }
@@ -200,7 +200,7 @@ public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
         henleggBehandlingTjeneste.henleggBehandling(revuderingBehandlingId,
             BehandlingResultatType.HENLAGT_FEILOPPRETTET_UTEN_BREV);
 
-        List<ProsessTaskData> prosessTaskData = prosessTaskRepository.finnAlle(ProsessTaskStatus.KLAR);
+        List<ProsessTaskData> prosessTaskData = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
         assertThat(prosessTaskData).isEmpty();
         assertHenleggelse(revuderingBehandlingId);
     }
@@ -216,10 +216,10 @@ public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
         brevSporingRepository.lagre(henleggelsesBrevsporing);
 
         henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), behandlingsresultat);
-        List<ProsessTaskData> prosessTaskData = prosessTaskRepository.finnAlle(ProsessTaskStatus.KLAR);
+        List<ProsessTaskData> prosessTaskData = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
         assertThat(prosessTaskData).isNotEmpty();
-        assertThat(prosessTaskData.get(0).getTaskType()).isEqualTo("brev.sendhenleggelse");
-        assertThat(prosessTaskData.get(1).getTaskType()).isEqualTo("send.beskjed.tilbakekreving.henlagt.selvbetjening");
+        assertThat(prosessTaskData.get(0).taskType()).isEqualTo(HenleggBehandlingTjeneste.HENLEGGELSESBREV_TASK_TYPE);
+        assertThat(prosessTaskData.get(1).taskType()).isEqualTo(HenleggBehandlingTjeneste.SELVBETJENING_HENLAGT_TASKTYPE);
         assertHenleggelse(internBehandlingId);
     }
 
@@ -229,9 +229,9 @@ public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
         henleggBehandlingTjeneste.henleggBehandling(revuderingBehandlingId,
             BehandlingResultatType.HENLAGT_FEILOPPRETTET_MED_BREV);
 
-        List<ProsessTaskData> prosessTaskData = prosessTaskRepository.finnAlle(ProsessTaskStatus.KLAR);
+        List<ProsessTaskData> prosessTaskData = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
         assertThat(prosessTaskData).isNotEmpty();
-        assertThat(prosessTaskData.get(0).getTaskType()).isEqualTo("brev.sendhenleggelse");
+        assertThat(prosessTaskData.get(0).taskType()).isEqualTo(HenleggBehandlingTjeneste.HENLEGGELSESBREV_TASK_TYPE);
         assertHenleggelse(revuderingBehandlingId);
     }
 
@@ -248,10 +248,10 @@ public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
 
         henleggBehandlingTjeneste.henleggBehandling(revuderingBehandlingId,
             BehandlingResultatType.HENLAGT_FEILOPPRETTET_MED_BREV);
-        List<ProsessTaskData> prosessTaskData = prosessTaskRepository.finnAlle(ProsessTaskStatus.KLAR);
+        List<ProsessTaskData> prosessTaskData = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
         assertThat(prosessTaskData).isNotEmpty();
-        assertThat(prosessTaskData.get(0).getTaskType()).isEqualTo("brev.sendhenleggelse");
-        assertThat(prosessTaskData.get(1).getTaskType()).isEqualTo("send.beskjed.tilbakekreving.henlagt.selvbetjening");
+        assertThat(prosessTaskData.get(0).taskType()).isEqualTo(HenleggBehandlingTjeneste.HENLEGGELSESBREV_TASK_TYPE);
+        assertThat(prosessTaskData.get(1).taskType()).isEqualTo(HenleggBehandlingTjeneste.SELVBETJENING_HENLAGT_TASKTYPE);
         assertHenleggelse(revuderingBehandlingId);
     }
 

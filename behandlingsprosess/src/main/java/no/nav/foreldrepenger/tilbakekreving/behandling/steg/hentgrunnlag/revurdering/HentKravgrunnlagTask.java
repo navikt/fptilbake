@@ -40,7 +40,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @ApplicationScoped
-@ProsessTask(HentKravgrunnlagTask.TASKTYPE)
+@ProsessTask("kravgrunnlag.hent")
 @FagsakProsesstaskRekkefølge(gruppeSekvens = true)
 public class HentKravgrunnlagTask implements ProsessTaskHandler {
 
@@ -55,8 +55,6 @@ public class HentKravgrunnlagTask implements ProsessTaskHandler {
 
     private ØkonomiConsumer økonomiConsumer;
     private FagsystemKlient fagsystemKlient;
-
-    public static final String TASKTYPE = "kravgrunnlag.hent";
 
     HentKravgrunnlagTask() {
         // for CDI proxy

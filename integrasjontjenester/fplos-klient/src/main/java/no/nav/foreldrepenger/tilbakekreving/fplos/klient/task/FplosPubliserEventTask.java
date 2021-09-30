@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
+import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FaktaFeilutbetalingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
@@ -38,14 +39,12 @@ import no.nav.vedtak.felles.integrasjon.kafka.TilbakebetalingBehandlingProsessEv
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
-import no.nav.vedtak.konfig.KonfigVerdi;
 
 @ApplicationScoped
-@ProsessTask(FplosPubliserEventTask.TASKTYPE)
+@ProsessTask("fplos.oppgavebehandling.PubliserEvent")
 @FagsakProsesstaskRekkefølge(gruppeSekvens = false)
 public class FplosPubliserEventTask implements ProsessTaskHandler {
 
-    public static final String TASKTYPE = "fplos.oppgavebehandling.PubliserEvent";
     public static final String PROPERTY_EVENT_NAME = "eventName";
     public static final String PROPERTY_KRAVGRUNNLAG_MANGLER_FRIST_TID = "kravgrunnlagManglerFristTid";
     public static final String PROPERTY_KRAVGRUNNLAG_MANGLER_AKSJONSPUNKT_STATUS_KODE = "kravgrunnlagManglerAksjonspunktStatusKode";

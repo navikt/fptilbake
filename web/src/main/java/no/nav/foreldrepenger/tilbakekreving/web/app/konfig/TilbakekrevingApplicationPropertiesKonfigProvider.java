@@ -1,7 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.web.app.konfig;
 
 import static java.lang.System.getenv;
-import static no.nav.vedtak.konfig.StandardPropertySource.APP_PROPERTIES;
+import static no.nav.foreldrepenger.konfig.StandardPropertySource.APP_PROPERTIES;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -12,9 +12,9 @@ import javax.enterprise.context.Dependent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.vedtak.konfig.EnvPropertiesKonfigVerdiProvider;
-import no.nav.vedtak.konfig.PropertiesKonfigVerdiProvider;
-import no.nav.vedtak.util.env.Environment;
+import no.nav.foreldrepenger.konfig.EnvPropertiesKonfigVerdiProvider;
+import no.nav.foreldrepenger.konfig.Environment;
+import no.nav.foreldrepenger.konfig.PropertiesKonfigVerdiProvider;
 
 @Dependent
 /**

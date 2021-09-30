@@ -16,6 +16,7 @@ import javax.ws.rs.core.UriBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.K9tilbake;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
@@ -32,7 +33,6 @@ import no.nav.foreldrepenger.tilbakekreving.k9sak.klient.dto.BehandlingResourceL
 import no.nav.foreldrepenger.tilbakekreving.k9sak.klient.dto.K9sakBehandlingInfoDto;
 import no.nav.vedtak.exception.IntegrasjonException;
 import no.nav.vedtak.felles.integrasjon.rest.OidcRestClient;
-import no.nav.vedtak.util.env.Environment;
 
 @ApplicationScoped
 @K9tilbake

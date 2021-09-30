@@ -11,6 +11,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandleStegResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingSteg;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegRef;
@@ -30,8 +31,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.varsel.SendVarsel
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
-import no.nav.vedtak.konfig.KonfigVerdi;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
 
 @BehandlingStegRef(kode = "VARSELSTEG")
@@ -42,7 +42,7 @@ public class VarselSteg implements BehandlingSteg {
     private static final Logger log = LoggerFactory.getLogger(VarselSteg.class);
 
     private BehandlingRepository behandlingRepository;
-    private ProsessTaskRepository taskRepository;
+    private ProsessTaskTjeneste taskTjeneste;
     private VarselRepository varselRepository;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private VarselresponsTjeneste varselresponsTjeneste;
@@ -56,10 +56,10 @@ public class VarselSteg implements BehandlingSteg {
     public VarselSteg(BehandlingRepositoryProvider behandlingRepositoryProvider,
                       BehandlingskontrollTjeneste behandlingskontrollTjeneste,
                       VarselresponsTjeneste varselresponsTjeneste,
-                      ProsessTaskRepository taskRepository,
+                      ProsessTaskTjeneste taskTjeneste,
                       @KonfigVerdi(value = "behandling.venter.frist.lengde") Period ventefrist) {
         this.behandlingRepository = behandlingRepositoryProvider.getBehandlingRepository();
-        this.taskRepository = taskRepository;
+        this.taskTjeneste = taskTjeneste;
         this.varselRepository = behandlingRepositoryProvider.getVarselRepository();
 
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
@@ -104,11 +104,11 @@ public class VarselSteg implements BehandlingSteg {
 
         sendVarsel(behandling, taskGruppe);
 
-        taskRepository.lagre(taskGruppe);
+        taskTjeneste.lagre(taskGruppe);
     }
 
     private void sendVarsel(Behandling behandling, ProsessTaskGruppe taskGruppe) {
-        ProsessTaskData sendVarselbrev = new ProsessTaskData(SendVarselbrevTask.TASKTYPE);
+        ProsessTaskData sendVarselbrev = ProsessTaskData.forProsessTask(SendVarselbrevTask.class);
         sendVarselbrev.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         taskGruppe.addNesteSekvensiell(sendVarselbrev);
     }

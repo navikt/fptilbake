@@ -14,11 +14,10 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @ApplicationScoped
-@ProsessTask(AvsluttBehandlingTask.TASKTYPE)
+@ProsessTask("iverksetteVedtak.avsluttBehandling")
 @FagsakProsesstaskRekkefølge(gruppeSekvens = true)
 public class AvsluttBehandlingTask implements ProsessTaskHandler {
 
-    public static final String TASKTYPE = "iverksetteVedtak.avsluttBehandling";
     private static final Logger log = LoggerFactory.getLogger(AvsluttBehandlingTask.class);
     private AvsluttBehandlingTjeneste avsluttBehandlingTjeneste;
 

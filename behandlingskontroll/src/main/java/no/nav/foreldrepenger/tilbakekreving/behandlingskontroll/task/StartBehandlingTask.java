@@ -1,7 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.task;
 
-import static no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.task.StartBehandlingTask.TASKTYPE;
-
 import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.spi.CDI;
 import javax.inject.Inject;
@@ -16,12 +14,12 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 /**
  * Kjører behandlingskontroll automatisk fra start.
+ * TODO avklar om brukes ...
  */
 @Dependent
-@ProsessTask(TASKTYPE)
+@ProsessTask("behandlingskontroll.startBehandling")
 @FagsakProsesstaskRekkefølge(gruppeSekvens = true)
 public class StartBehandlingTask implements ProsessTaskHandler {
-    public static final String TASKTYPE = "behandlingskontroll.startBehandling";
 
     @Inject
     public StartBehandlingTask() {

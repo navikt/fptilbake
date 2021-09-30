@@ -6,6 +6,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
@@ -38,7 +39,6 @@ import no.nav.journalpostapi.dto.opprett.OpprettJournalpostResponse;
 import no.nav.journalpostapi.dto.sak.FagsakSystem;
 import no.nav.journalpostapi.dto.sak.Sak;
 import no.nav.vedtak.exception.IntegrasjonException;
-import no.nav.vedtak.konfig.KonfigVerdi;
 
 @ApplicationScoped
 public class JournalføringTjeneste {

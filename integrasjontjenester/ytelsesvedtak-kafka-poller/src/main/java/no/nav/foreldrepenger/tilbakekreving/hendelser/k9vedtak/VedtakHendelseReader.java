@@ -27,7 +27,7 @@ import no.nav.foreldrepenger.tilbakekreving.k9sak.klient.K9HenvisningKonverterer
 import no.nav.foreldrepenger.tilbakekreving.kafka.poller.PostTransactionHandler;
 import no.nav.foreldrepenger.tilbakekreving.kafka.util.KafkaConsumerFeil;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
 @ApplicationScoped
 @K9tilbake
@@ -37,7 +37,7 @@ public class VedtakHendelseReader implements HendelseReader {
     public static final LocalDateTime BESTEMT_VEDTAK_DATO = LocalDateTime.of(LocalDate.of(2020, 10, 12), LocalTime.MIDNIGHT);
 
     private VedtakHendelseMeldingConsumer meldingConsumer;
-    private ProsessTaskRepository prosessTaskRepository;
+    private ProsessTaskTjeneste taskTjeneste;
 
     VedtakHendelseReader() {
         // CDI
@@ -45,9 +45,9 @@ public class VedtakHendelseReader implements HendelseReader {
 
     @Inject
     public VedtakHendelseReader(VedtakHendelseMeldingConsumer meldingConsumer,
-                                ProsessTaskRepository prosessTaskRepository) {
+                                ProsessTaskTjeneste taskTjeneste) {
         this.meldingConsumer = meldingConsumer;
-        this.prosessTaskRepository = prosessTaskRepository;
+        this.taskTjeneste = taskTjeneste;
     }
 
     @Override
@@ -85,7 +85,7 @@ public class VedtakHendelseReader implements HendelseReader {
         Set<FagsakYtelseType> støttedeFagsakYtelseTyper = Set.of(FagsakYtelseType.FRISINN, FagsakYtelseType.OMSORGSPENGER, FagsakYtelseType.PLEIEPENGER_SYKT_BARN);
         validereMelding(melding);
         if (støttedeFagsakYtelseTyper.contains(melding.getFagsakYtelseType())) {
-            prosessTaskRepository.lagre(lagProsessTaskData(melding));
+            taskTjeneste.lagre(lagProsessTaskData(melding));
         } else {
             logger.info("Melding om vedtak for {} for behandling={} for {} med vedtakstidspunkt {} ble ignorert pga ikke-støttet ytelsetype",
                 melding.getFagsakYtelseType(), melding.getBehandlingId(), melding.getFagsakYtelseType(), melding.getVedtattTidspunkt());
@@ -102,7 +102,7 @@ public class VedtakHendelseReader implements HendelseReader {
 
     private ProsessTaskData lagProsessTaskData(VedtakHendelse melding) {
         Henvisning henvisning = K9HenvisningKonverterer.uuidTilHenvisning(melding.getBehandlingId());
-        ProsessTaskData td = new ProsessTaskData(HåndterHendelseTask.TASKTYPE);
+        ProsessTaskData td = ProsessTaskData.forProsessTask(HåndterHendelseTask.class);
         td.setAktørId(melding.getAktør().getId());
         td.setProperty(EKSTERN_BEHANDLING_UUID, melding.getBehandlingId().toString());
         td.setProperty(HENVISNING, henvisning.getVerdi());

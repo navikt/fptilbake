@@ -24,8 +24,9 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.BehandlingTilstand;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.DvhEventHendelse;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepositoryImpl;
+import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskTjenesteImpl;
 
 @ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public class MigrerSakshendleserTilDvhTaskTest {
@@ -41,19 +42,18 @@ public class MigrerSakshendleserTilDvhTaskTest {
         BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(
             entityManager);
         BehandlingRepository behandlingRepository = repositoryProvider.getBehandlingRepository();
-        ProsessTaskRepository taskRepository = new ProsessTaskRepositoryImpl(entityManager, null,
-            null);
+        ProsessTaskTjeneste taskTjeneste = new ProsessTaskTjenesteImpl(new ProsessTaskRepositoryImpl(entityManager, null, null));
         BehandlingTilstandTjeneste tilstandTjeneste = new BehandlingTilstandTjeneste(repositoryProvider);
         kafkaProducerMock = Mockito.mock(SakshendelserKafkaProducer.class);
         manueltSendSakshendleserTilDvhTask = new MigrerSakshendleserTilDvhTask(kafkaProducerMock, tilstandTjeneste,
-            behandlingRepository, taskRepository);
+            behandlingRepository, taskTjeneste);
 
         entityManager.setFlushMode(FlushModeType.AUTO);
         ScenarioSimple scenarioSimple = ScenarioSimple.simple();
         behandling = scenarioSimple.lagre(repositoryProvider);
         EksternBehandling eksternBehandling = new EksternBehandling(behandling, Henvisning.fraEksternBehandlingId(1l), UUID.randomUUID());
         repositoryProvider.getEksternBehandlingRepository().lagre(eksternBehandling);
-        prosessTaskData = new ProsessTaskData(MigrerSakshendleserTilDvhTask.TASK_TYPE);
+        prosessTaskData = ProsessTaskData.forProsessTask(MigrerSakshendleserTilDvhTask.class);
         prosessTaskData.setProperty("behandlingId",String.valueOf(behandling.getId()));
     }
 

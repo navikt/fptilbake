@@ -3,7 +3,6 @@ package no.nav.foreldrepenger.tilbakekreving.fplos.klient.observer;
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType.FAKTA_FEILUTBETALING;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
@@ -27,12 +26,11 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.prosesstask.UtvidetProsessTaskRepository;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.fplos.klient.task.FplosPubliserEventTask;
 import no.nav.vedtak.felles.integrasjon.kafka.EventHendelse;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
 
 @ApplicationScoped
@@ -41,8 +39,7 @@ public class FplosEventObserver {
     private static final Logger logger = LoggerFactory.getLogger(FplosEventObserver.class);
     private static final String LOGGER_OPPRETTER_PROSESS_TASK = "Oppretter prosess task for å publisere event={} til fplos for aksjonspunkt={}";
 
-    private UtvidetProsessTaskRepository utvidetProsessTaskRepository;
-    private ProsessTaskRepository prosessTaskRepository;
+    private ProsessTaskTjeneste taskTjeneste;
     private BehandlingRepository behandlingRepository;
 
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
@@ -53,12 +50,10 @@ public class FplosEventObserver {
 
     @Inject
     public FplosEventObserver(BehandlingRepository behandlingRepository,
-                              UtvidetProsessTaskRepository utvidetProsessTaskRepository,
-                              ProsessTaskRepository prosessTaskRepository,
+                              ProsessTaskTjeneste taskTjeneste,
                               BehandlingskontrollTjeneste behandlingskontrollTjeneste) {
         this.behandlingRepository = behandlingRepository;
-        this.utvidetProsessTaskRepository = utvidetProsessTaskRepository;
-        this.prosessTaskRepository = prosessTaskRepository;
+        this.taskTjeneste = taskTjeneste;
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
     }
 
@@ -117,7 +112,7 @@ public class FplosEventObserver {
 
     private void opprettProsessTask(long fagsakId, long behandlingId, AktørId aktørId, EventHendelse eventHendelse) {
         ProsessTaskData taskData = lagFellesProsessTaskData(fagsakId, behandlingId, aktørId, eventHendelse);
-        prosessTaskRepository.lagre(taskData);
+        taskTjeneste.lagre(taskData);
     }
 
     private void opprettProsessTask(long fagsakId, long behandlingId, AktørId aktørId, EventHendelse eventHendelse,
@@ -127,21 +122,15 @@ public class FplosEventObserver {
         taskData.setProperty(FplosPubliserEventTask.PROPERTY_KRAVGRUNNLAG_MANGLER_AKSJONSPUNKT_STATUS_KODE, aksjonspunktStatus.getKode());
         taskData.setProperty(FplosPubliserEventTask.PROPERTY_KRAVGRUNNLAG_MANGLER_FRIST_TID, fristTid.toString());
 
-        prosessTaskRepository.lagre(taskData);
+        taskTjeneste.lagre(taskData);
     }
 
     private ProsessTaskData lagFellesProsessTaskData(long fagsakId, long behandlingId, AktørId aktørId, EventHendelse eventHendelse) {
-        String gruppe = "los" + behandlingId;
-        Optional<ProsessTaskData> eksisterendeProsessTask = utvidetProsessTaskRepository.finnSisteProsessTaskForProsessTaskGruppe(FplosPubliserEventTask.TASKTYPE, gruppe);
-        long sekvens = eksisterendeProsessTask.isPresent() ? Long.valueOf(eksisterendeProsessTask.get().getSekvens()) + 1 : 1l;
-
-        ProsessTaskData taskData = new ProsessTaskData(FplosPubliserEventTask.TASKTYPE);
+        ProsessTaskData taskData = ProsessTaskData.forProsessTask(FplosPubliserEventTask.class);
         taskData.setCallIdFraEksisterende();
         taskData.setPrioritet(50);
         taskData.setProperty(FplosPubliserEventTask.PROPERTY_EVENT_NAME, eventHendelse.name());
         taskData.setBehandling(fagsakId, behandlingId, aktørId.getId());
-        taskData.setGruppe(gruppe);
-        taskData.setSekvens(String.format("%04d", sekvens));
         return taskData;
     }
 

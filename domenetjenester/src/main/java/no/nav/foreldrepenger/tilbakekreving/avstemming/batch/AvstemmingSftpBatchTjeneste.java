@@ -8,9 +8,9 @@ import javax.inject.Inject;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
 
+import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.avstemming.sftp.SftpKonfig;
 import no.nav.foreldrepenger.tilbakekreving.avstemming.sftp.SftpTjeneste;
-import no.nav.vedtak.konfig.KonfigVerdi;
 
 @ApplicationScoped
 class AvstemmingSftpBatchTjeneste extends SftpTjeneste {

@@ -19,7 +19,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.impl.HenleggBehandlingTje
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.status.KravVedtakStatusMapper;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.status.KravVedtakStatusTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.task.FortsettBehandlingTaskProperties;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.task.FortsettBehandlingTask;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandlingsresultat;
@@ -27,7 +27,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkTabellRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.prosesstask.UtvidetProsessTaskRepository;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatusRepository;
@@ -37,6 +36,7 @@ import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiXmlMottatt;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
+import no.nav.vedtak.felles.prosesstask.api.TaskType;
 
 public class FinnGrunnlagTaskTest extends FellesTestOppsett {
 
@@ -52,12 +52,10 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
     public void setup() {
         kravVedtakStatusRepository = new KravVedtakStatusRepository(entityManager);
         KodeverkTabellRepository kodeverkTabellRepository = new KodeverkTabellRepository(entityManager);
-        UtvidetProsessTaskRepository utvidetProsessTaskRepository = new UtvidetProsessTaskRepository(
-            entityManager);
         HenleggBehandlingTjeneste henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repositoryProvider,
-            prosessTaskRepository, behandlingskontrollTjeneste, historikkinnslagTjeneste);
+            taskTjeneste, behandlingskontrollTjeneste, historikkinnslagTjeneste);
         KravVedtakStatusTjeneste kravVedtakStatusTjeneste = new KravVedtakStatusTjeneste(kravVedtakStatusRepository,
-            prosessTaskRepository, utvidetProsessTaskRepository, repositoryProvider, henleggBehandlingTjeneste,
+            taskTjeneste, repositoryProvider, henleggBehandlingTjeneste,
             behandlingskontrollTjeneste);
         KravVedtakStatusMapper kravVedtakStatusMapper = new KravVedtakStatusMapper(tpsAdapterWrapper);
         finnGrunnlagTask = new FinnGrunnlagTask(repositoryProvider, mottattXmlRepository, kodeverkTabellRepository,
@@ -268,10 +266,10 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
         assertThat(grunnlagRepository.harGrunnlagForBehandlingId(behandling.getId())).isTrue();
         assertThat(grunnlagRepository.erKravgrunnlagSperret(behandling.getId())).isFalse();
 
-        List<ProsessTaskData> prosessTasker = prosessTaskRepository.finnAlle(ProsessTaskStatus.KLAR);
+        List<ProsessTaskData> prosessTasker = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
         assertThat(prosessTasker).isNotEmpty();
         assertThat(prosessTasker.size()).isEqualTo(1);
-        assertThat(prosessTasker.get(0).getTaskType()).isEqualTo(FortsettBehandlingTaskProperties.TASKTYPE);
+        assertThat(prosessTasker.get(0).taskType()).isEqualTo(TaskType.forProsessTask(FortsettBehandlingTask.class));
     }
 
     @Test
@@ -319,16 +317,14 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
         assertThat(grunnlagRepository.harGrunnlagForBehandlingId(behandling.getId())).isTrue();
         assertThat(grunnlagRepository.erKravgrunnlagSperret(behandling.getId())).isFalse();
 
-        List<ProsessTaskData> prosessTasker = prosessTaskRepository.finnAlle(ProsessTaskStatus.KLAR);
+        List<ProsessTaskData> prosessTasker = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
         assertThat(prosessTasker).isNotEmpty().hasSize(2);
-        assertThat(prosessTasker.get(0).getTaskType()).isEqualTo(FortsettBehandlingTaskProperties.TASKTYPE);
-        assertThat(prosessTasker.get(0).getSekvens()).isEqualTo("1");
-        assertThat(prosessTasker.get(1).getTaskType()).isEqualTo(FortsettBehandlingTaskProperties.TASKTYPE);
-        assertThat(prosessTasker.get(1).getSekvens()).isEqualTo("2");
+        assertThat(prosessTasker.get(0).taskType()).isEqualTo(TaskType.forProsessTask(FortsettBehandlingTask.class));
+        assertThat(prosessTasker.get(1).taskType()).isEqualTo(TaskType.forProsessTask(FortsettBehandlingTask.class));
     }
 
     private ProsessTaskData opprettFinngrunnlagProsessTask() {
-        ProsessTaskData prosessTaskData = new ProsessTaskData(FinnGrunnlagTask.TASKTYPE);
+        ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(FinnGrunnlagTask.class);
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         return prosessTaskData;
     }
