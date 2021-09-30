@@ -4,7 +4,7 @@ import java.util.Properties;
 
 import org.apache.kafka.common.serialization.StringDeserializer;
 
-import no.nav.vedtak.konfig.KonfigVerdi;
+import no.nav.foreldrepenger.konfig.KonfigVerdi;
 
 public class YtelsesvedtakHendelseConsumer {
 

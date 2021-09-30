@@ -52,7 +52,7 @@ import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakRequest;
 import no.nav.tilbakekreving.kravgrunnlag.detalj.v1.DetaljertKravgrunnlag;
 import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsvedtakDto;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.log.util.LoggerUtils;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
@@ -67,7 +67,7 @@ public class ForvaltningBehandlingRestTjeneste {
     private static final Logger logger = LoggerFactory.getLogger(ForvaltningBehandlingRestTjeneste.class);
 
     private BehandlingRepository behandlingRepository;
-    private ProsessTaskRepository prosessTaskRepository;
+    private ProsessTaskTjeneste taskTjeneste;
     private ØkonomiMottattXmlRepository mottattXmlRepository;
     private KravgrunnlagRepository grunnlagRepository;
     private KravgrunnlagMapper kravgrunnlagMapper;
@@ -81,14 +81,14 @@ public class ForvaltningBehandlingRestTjeneste {
 
     @Inject
     public ForvaltningBehandlingRestTjeneste(BehandlingRepositoryProvider repositoryProvider,
-                                             ProsessTaskRepository prosessTaskRepository,
+                                             ProsessTaskTjeneste taskTjeneste,
                                              ØkonomiMottattXmlRepository mottattXmlRepository,
                                              KravgrunnlagMapper kravgrunnlagMapper,
                                              ØkonomiSendtXmlRepository økonomiSendtXmlRepository,
                                              TilbakekrevingsvedtakTjeneste tilbakekrevingsvedtakTjeneste,
                                              KravgrunnlagTjeneste kravgrunnlagTjeneste) {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
-        this.prosessTaskRepository = prosessTaskRepository;
+        this.taskTjeneste = taskTjeneste;
         this.mottattXmlRepository = mottattXmlRepository;
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.kravgrunnlagMapper = kravgrunnlagMapper;
@@ -323,29 +323,29 @@ public class ForvaltningBehandlingRestTjeneste {
     }
 
     private void opprettGjenopptaBehandlingTask(Behandling behandling) {
-        ProsessTaskData prosessTaskData = new ProsessTaskData(GjenopptaBehandlingTask.TASKTYPE);
+        ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(GjenopptaBehandlingTask.class);
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
-        prosessTaskRepository.lagre(prosessTaskData);
+        taskTjeneste.lagre(prosessTaskData);
     }
 
     private void opprettHenleggBehandlingTask(Behandling behandling) {
-        ProsessTaskData prosessTaskData = new ProsessTaskData(TvingHenlegglBehandlingTask.TASKTYPE);
+        ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(TvingHenlegglBehandlingTask.class);
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
-        prosessTaskRepository.lagre(prosessTaskData);
+        taskTjeneste.lagre(prosessTaskData);
     }
 
     private void opprettHentKorrigertGrunnlagTask(Behandling behandling, String kravgrunnlagId) {
-        ProsessTaskData prosessTaskData = new ProsessTaskData(HentKorrigertKravgrunnlagTask.TASKTYPE);
+        ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(HentKorrigertKravgrunnlagTask.class);
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         prosessTaskData.setProperty("KRAVGRUNNLAG_ID", kravgrunnlagId);
-        prosessTaskRepository.lagre(prosessTaskData);
+        taskTjeneste.lagre(prosessTaskData);
     }
 
     private void opprettKorrigertHenvisningTask(Behandling behandling, UUID eksternBehandlingUuid) {
-        ProsessTaskData prosessTaskData = new ProsessTaskData(KorrigertHenvisningTask.TASKTYPE);
+        ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(KorrigertHenvisningTask.class);
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         prosessTaskData.setProperty("eksternUuid", eksternBehandlingUuid.toString());
-        prosessTaskRepository.lagre(prosessTaskData);
+        taskTjeneste.lagre(prosessTaskData);
     }
 
     private Behandling hentBehandling(BehandlingReferanse behandlingReferanse) {

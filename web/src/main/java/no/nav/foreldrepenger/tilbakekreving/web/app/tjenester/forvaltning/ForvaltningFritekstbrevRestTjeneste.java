@@ -36,7 +36,7 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekst.Fritekst
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekst.SendFritekstbrevTask;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.AbacDto;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
@@ -52,7 +52,7 @@ public class ForvaltningFritekstbrevRestTjeneste {
     private static final Logger logger = LoggerFactory.getLogger(ForvaltningFritekstbrevRestTjeneste.class);
 
     private FritekstbrevTjeneste fritekstbrevTjeneste;
-    private ProsessTaskRepository prosessTaskRepository;
+    private ProsessTaskTjeneste taskTjeneste;
     private BehandlingRepository behandlingRepository;
 
     public ForvaltningFritekstbrevRestTjeneste() {
@@ -60,9 +60,9 @@ public class ForvaltningFritekstbrevRestTjeneste {
     }
 
     @Inject
-    public ForvaltningFritekstbrevRestTjeneste(FritekstbrevTjeneste fritekstbrevTjeneste, ProsessTaskRepository prosessTaskRepository, BehandlingRepository behandlingRepository) {
+    public ForvaltningFritekstbrevRestTjeneste(FritekstbrevTjeneste fritekstbrevTjeneste, ProsessTaskTjeneste taskTjeneste, BehandlingRepository behandlingRepository) {
         this.fritekstbrevTjeneste = fritekstbrevTjeneste;
-        this.prosessTaskRepository = prosessTaskRepository;
+        this.taskTjeneste = taskTjeneste;
         this.behandlingRepository = behandlingRepository;
     }
 
@@ -178,13 +178,13 @@ public class ForvaltningFritekstbrevRestTjeneste {
     @Operation(tags = "FORVALTNING-brev", description = "Tjeneste for å sende et fritekstbrev.")
     @BeskyttetRessurs(action = BeskyttetRessursActionAttributt.CREATE, property = AbacProperty.DRIFT)
     public Response sendBrev(@Valid @NotNull FritekstbrevDto dto) {
-        ProsessTaskData task = new ProsessTaskData(SendFritekstbrevTask.TASKTYPE);
+        ProsessTaskData task = ProsessTaskData.forProsessTask(SendFritekstbrevTask.class);
         task.setPayload(dto.getFritekst());
         task.setProperty("behandlingId", Long.toString(dto.getBehandlingId()));
         task.setProperty("tittel", base64encode(dto.getTittel()));
         task.setProperty("overskrift", base64encode(dto.getOverskrift()));
         task.setProperty("mottaker", dto.getMottaker().name());
-        String taskId = prosessTaskRepository.lagre(task);
+        String taskId = taskTjeneste.lagre(task);
         logger.info("Opprettet task med id={} for utsending av fritekstbrev for behandlingId={}  til {}", taskId, dto.getBehandlingId(), dto.getMottaker());
         return Response.ok().build();
     }
@@ -214,13 +214,13 @@ public class ForvaltningFritekstbrevRestTjeneste {
         Behandling behandling = behandlingRepository.hentBehandling(dto.getBehandlingId());
         FagsakYtelseType ytelseType = behandling.getFagsak().getFagsakYtelseType();
 
-        ProsessTaskData task = new ProsessTaskData(SendFritekstbrevTask.TASKTYPE);
+        ProsessTaskData task = ProsessTaskData.forProsessTask(SendFritekstbrevTask.class);
         task.setPayload(getInnholdFeilutsendtVarselbrev(ytelseType));
         task.setProperty("behandlingId", Long.toString(dto.getBehandlingId()));
         task.setProperty("tittel", base64encode(getTittelFeilutesendtVarselbrev()));
         task.setProperty("overskrift", base64encode(getOverskriftFeilutesendtVarselbrev(ytelseType)));
         task.setProperty("mottaker", dto.getMottaker().name());
-        String taskId = prosessTaskRepository.lagre(task);
+        String taskId = taskTjeneste.lagre(task);
         logger.info("Opprettet task med id={} for utsending av fritekstbrev for behandlingId={}  til {}", taskId, dto.getBehandlingId(), dto.getMottaker());
         return Response.ok().build();
     }

@@ -12,11 +12,9 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @Dependent
-@ProsessTask(SendHenleggelsesbrevTask.TASKTYPE)
+@ProsessTask("brev.sendhenleggelse")
 @FagsakProsesstaskRekkefølge(gruppeSekvens = false)
 public class SendHenleggelsesbrevTask implements ProsessTaskHandler {
-
-    public static final String TASKTYPE = "brev.sendhenleggelse";
 
     private HenleggelsesbrevTjeneste henleggelsesbrevTjeneste;
     private VergeRepository vergeRepository;

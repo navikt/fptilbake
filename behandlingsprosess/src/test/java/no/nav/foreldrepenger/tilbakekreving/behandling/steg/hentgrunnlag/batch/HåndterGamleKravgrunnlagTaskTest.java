@@ -81,8 +81,9 @@ import no.nav.tilbakekreving.typer.v1.PeriodeDto;
 import no.nav.tilbakekreving.typer.v1.TypeGjelderDto;
 import no.nav.tilbakekreving.typer.v1.TypeKlasseDto;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepositoryImpl;
+import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskTjenesteImpl;
 import no.nav.vedtak.xmlutils.DateUtil;
 
 @ExtendWith(FptilbakeEntityManagerAwareExtension.class)
@@ -115,7 +116,7 @@ public class HåndterGamleKravgrunnlagTaskTest {
         behandlingRepository = repositoryProvider.getBehandlingRepository();
         mottattXmlRepository = new ØkonomiMottattXmlRepository(entityManager);
         grunnlagRepository = repositoryProvider.getGrunnlagRepository();
-        ProsessTaskRepository prosessTaskRepository = new ProsessTaskRepositoryImpl(entityManager, null, null);
+        ProsessTaskTjeneste taskTjeneste = new ProsessTaskTjenesteImpl(new ProsessTaskRepositoryImpl(entityManager, null, null));
         NavBrukerRepository navBrukerRepository = new NavBrukerRepository(entityManager);
         BehandlingskontrollTjeneste behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(repositoryProvider,
             behandlingModellRepositoryMock, behandlingskontrollEventPublisererMock);
@@ -126,7 +127,7 @@ public class HåndterGamleKravgrunnlagTaskTest {
         HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(
             repositoryProvider.getHistorikkRepository(), null);
         FagsakTjeneste fagsakTjeneste = new FagsakTjeneste(tpsTjenesteMock, fagsakRepository, navBrukerRepository);
-        behandlingTjeneste = new BehandlingTjeneste(repositoryProvider, prosessTaskRepository,
+        behandlingTjeneste = new BehandlingTjeneste(repositoryProvider, taskTjeneste,
             behandlingskontrollProvider, fagsakTjeneste, historikkinnslagTjeneste, fagsystemKlientMock, Period.ofWeeks(4));
         HåndterGamleKravgrunnlagTjeneste håndterGamleKravgrunnlagTjeneste = new HåndterGamleKravgrunnlagTjeneste(
             mottattXmlRepository, grunnlagRepository, hentKravgrunnlagMapper, lesKravgrunnlagMapper, behandlingTjeneste,
@@ -355,7 +356,7 @@ public class HåndterGamleKravgrunnlagTaskTest {
     }
 
     private ProsessTaskData lagProsessTaskData() {
-        ProsessTaskData prosessTaskData = new ProsessTaskData(HåndterGamleKravgrunnlagTask.TASKTYPE);
+        ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(HåndterGamleKravgrunnlagTask.class);
         prosessTaskData.setProperty("mottattXmlId", String.valueOf(mottattXmlId));
         prosessTaskData.setCallIdFraEksisterende();
         return prosessTaskData;

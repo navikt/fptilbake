@@ -1,5 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.hendelse;
 
+import no.nav.vedtak.felles.prosesstask.api.TaskType;
+
 public class TaskProperties {
 
     public static final String EKSTERN_BEHANDLING_UUID = "eksternBehandlingUuid";
@@ -8,7 +10,7 @@ public class TaskProperties {
     public static final String SAKSNUMMER = "saksnummer";
     public static final String FAGSAK_YTELSE_TYPE = "fagYtelseType";
     public static final String BEHANDLING_TYPE = "behandlingType";
-    public static final String OPPRETT_BEHANDLING_TASK_TYPE = "hendelser.opprettBehandling";
+    public static final TaskType OPPRETT_BEHANDLING_TASK_TYPE = new TaskType("hendelser.opprettBehandling"); // TODO refaktorer og kolokalisering med task så opprettes fra klasse
 
     private TaskProperties(){
 

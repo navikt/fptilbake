@@ -14,11 +14,9 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @Dependent
-@ProsessTask(SendVarselbrevTask.TASKTYPE)
+@ProsessTask(value = "brev.sendVarsel", maxFailedRuns = 5, firstDelay = 60)
 @FagsakProsesstaskRekkefølge(gruppeSekvens = true)
 public class SendVarselbrevTask implements ProsessTaskHandler {
-
-    public static final String TASKTYPE = "brev.sendVarsel";
 
     private VarselbrevTjeneste varselbrevTjeneste;
     private VergeRepository vergeRepository;

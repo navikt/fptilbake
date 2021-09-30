@@ -18,11 +18,9 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @ApplicationScoped
-@ProsessTask(OpprettBehandlingTask.TASKTYPE)
+@ProsessTask(value = "hendelser.opprettBehandling", maxFailedRuns = 5)
 @FagsakProsesstaskRekkefølge(gruppeSekvens = false)
 public class OpprettBehandlingTask implements ProsessTaskHandler {
-
-    public static final String TASKTYPE = "hendelser.opprettBehandling";
 
     BehandlingTjeneste behandlingTjeneste;
 

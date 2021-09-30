@@ -3,22 +3,16 @@ package no.nav.foreldrepenger.tilbakekreving.hendelser;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTypeInfo;
-import no.nav.vedtak.felles.prosesstask.api.TaskStatus;
-import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskEntitet;
-import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskType;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
-public class ProsessTaskRepositoryMock implements ProsessTaskRepository {
+public class ProsessTaskTjenesteMock implements ProsessTaskTjeneste {
 
     private List<ProsessTaskData> prosesstasker = new ArrayList<>();
     private int gruppeTeller;
@@ -64,46 +58,51 @@ public class ProsessTaskRepositoryMock implements ProsessTaskRepository {
     }
 
     @Override
-    public List<ProsessTaskData> finnIkkeStartet() {
-        return finnAlle(ProsessTaskStatus.KLAR, ProsessTaskStatus.VETO);
-    }
-
-    @Override
-    public List<ProsessTaskData> finnAlle(List<ProsessTaskStatus> statuser, LocalDateTime fom, LocalDateTime tom) {
-        return prosesstasker.stream()
-            .filter(pt -> statuser.contains(pt.getStatus()))
-            .filter(pt -> !pt.getOpprettetTid().isBefore(fom))
-            .filter(pt -> pt.getOpprettetTid().isBefore(tom))
-            .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<ProsessTaskData> finnUferdigeBatchTasks(String s) {
+    public int restartAlleFeiledeTasks() {
         throw new IllegalArgumentException("Ikke implementert");
     }
 
     @Override
-    public List<TaskStatus> finnStatusForTaskIGruppe(String s, String s1) {
+    public int slettÅrsgamleFerdige() {
         throw new IllegalArgumentException("Ikke implementert");
     }
 
     @Override
-    public Optional<ProsessTaskTypeInfo> finnProsessTaskType(String s) {
+    public int tømNestePartisjon() {
         throw new IllegalArgumentException("Ikke implementert");
     }
 
     @Override
-    public List<ProsessTaskData> finnAlleForAngittSøk(List<ProsessTaskStatus> list, String s, LocalDateTime localDateTime, LocalDateTime localDateTime1, String s1) {
+    public String lagreValidert(ProsessTaskGruppe var1) {
         throw new IllegalArgumentException("Ikke implementert");
     }
 
     @Override
-    public Map<ProsessTaskType, ProsessTaskEntitet> finnStatusForBatchTasks() {
+    public String lagreValidert(ProsessTaskData var1) {
+        throw new IllegalArgumentException("Ikke implementert");
+    }
+
+
+    @Override
+    public void flaggProsessTaskForRestart(Long var1, String var2) {
+        throw new IllegalArgumentException("Ikke implementert");
+    }
+    @Override
+    public List<Long> flaggAlleFeileteProsessTasksForRestart() {
         throw new IllegalArgumentException("Ikke implementert");
     }
 
     @Override
-    public boolean suspenderAlle(Collection<ProsessTaskData> collection) {
+    public void setProsessTaskFerdig(Long var1, ProsessTaskStatus var2) {
         throw new IllegalArgumentException("Ikke implementert");
     }
+    @Override
+    public void mottaHendelse(ProsessTaskData var1, String var2) {
+        throw new IllegalArgumentException("Ikke implementert");
+    }
+    @Override
+    public void mottaHendelse(ProsessTaskData var1, String var2, Properties var3) {
+        throw new IllegalArgumentException("Ikke implementert");
+    }
+
 }

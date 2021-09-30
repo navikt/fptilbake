@@ -9,9 +9,9 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.Fptilbake;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.K9tilbake;
-import no.nav.vedtak.konfig.KonfigVerdi;
 import no.nav.vedtak.sikkerhet.pdp.XacmlRequestBuilderTjeneste;
 
 @ApplicationScoped

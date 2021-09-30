@@ -42,7 +42,7 @@ public class HåndterHendelseTaskTest {
 
     private ProsessTaskData lagProsessTaskData(TilkjentYtelseMelding melding) {
         Henvisning henvisning = Henvisning.fraEksternBehandlingId(melding.getBehandlingId());
-        ProsessTaskData td = new ProsessTaskData(HåndterHendelseTask.TASKTYPE);
+        ProsessTaskData td = ProsessTaskData.forProsessTask(HåndterHendelseTask.class);
         td.setAktørId(melding.getAktørId().getId());
         td.setProperty(TaskProperties.EKSTERN_BEHANDLING_UUID, melding.getBehandlingUuid().toString());
         td.setProperty(TaskProperties.EKSTERN_BEHANDLING_ID, henvisning.getVerdi()); //TODO k9-tilbake fjern når transisjon til henvisning er ferdig

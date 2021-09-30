@@ -12,11 +12,10 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @ApplicationScoped
-@ProsessTask(PubliserJournalpostTask.TASKTYPE)
+@ProsessTask("publiser.journalpost.dokdist")
 @FagsakProsesstaskRekkefølge(gruppeSekvens = true)
 public class PubliserJournalpostTask implements ProsessTaskHandler {
 
-    public static final String TASKTYPE = "publiser.journalpost.dokdist";
 
     private DokdistKlient dokdistKlient;
 

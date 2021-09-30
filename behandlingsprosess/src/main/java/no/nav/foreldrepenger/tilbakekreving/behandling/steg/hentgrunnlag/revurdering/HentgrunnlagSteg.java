@@ -12,14 +12,14 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.Behandlingskontr
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
 @BehandlingStegRef(kode = "HENTGRUNNLAGSTEG")
 @BehandlingTypeRef
 @ApplicationScoped
 public class HentgrunnlagSteg implements BehandlingSteg {
 
-    private ProsessTaskRepository prosessTaskRepository;
+    private ProsessTaskTjeneste taskTjeneste;
     private BehandlingRepository behandlingRepository;
 
     public HentgrunnlagSteg() {
@@ -27,8 +27,8 @@ public class HentgrunnlagSteg implements BehandlingSteg {
     }
 
     @Inject
-    public HentgrunnlagSteg(ProsessTaskRepository prosessTaskRepository, BehandlingRepository behandlingRepository) {
-        this.prosessTaskRepository = prosessTaskRepository;
+    public HentgrunnlagSteg(ProsessTaskTjeneste taskTjeneste, BehandlingRepository behandlingRepository) {
+        this.taskTjeneste = taskTjeneste;
         this.behandlingRepository = behandlingRepository;
     }
 
@@ -39,10 +39,10 @@ public class HentgrunnlagSteg implements BehandlingSteg {
         Long origBehandlingId = behandling.getBehandlingÅrsaker().get(0).getOriginalBehandling().orElseThrow().getId();
 
         // opprett prosess task for å hente grunnlag
-        ProsessTaskData hentxmlTask = new ProsessTaskData(HentKravgrunnlagTask.TASKTYPE);
+        ProsessTaskData hentxmlTask = ProsessTaskData.forProsessTask(HentKravgrunnlagTask.class);
         hentxmlTask.setProperty(TaskProperty.PROPERTY_ORIGINAL_BEHANDLING_ID, String.valueOf(origBehandlingId));
         hentxmlTask.setBehandling(kontekst.getFagsakId(), kontekst.getBehandlingId(), kontekst.getAktørId().getId());
-        prosessTaskRepository.lagre(hentxmlTask);
+        taskTjeneste.lagre(hentxmlTask);
 
         return BehandleStegResultat.utførtUtenAksjonspunkter();
     }

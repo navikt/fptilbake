@@ -12,11 +12,9 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @ApplicationScoped
-@ProsessTask(SendBeskjedUtsendtVarselTilSelvbetjeningTask.TASKTYPE)
+@ProsessTask("send.beskjed.utsendt.varsel.selvbetjening")
 @FagsakProsesstaskRekkefølge(gruppeSekvens = true)
 public class SendBeskjedUtsendtVarselTilSelvbetjeningTask implements ProsessTaskHandler {
-
-    public static final String TASKTYPE = "send.beskjed.utsendt.varsel.selvbetjening";
 
     private SelvbetjeningTjeneste selvbetjeningTjeneste;
 

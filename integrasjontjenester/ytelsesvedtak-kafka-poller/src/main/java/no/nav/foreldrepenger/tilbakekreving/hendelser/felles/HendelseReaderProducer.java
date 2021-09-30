@@ -6,9 +6,9 @@ import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 
+import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.Fptilbake;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.K9tilbake;
-import no.nav.vedtak.konfig.KonfigVerdi;
 
 @ApplicationScoped
 public class HendelseReaderProducer {

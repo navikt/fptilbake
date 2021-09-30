@@ -13,11 +13,9 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 
 @ApplicationScoped
-@ProsessTask(SendVedtakFattetTilSelvbetjeningTask.TASKTYPE)
+@ProsessTask("send.beskjed.vedtak.fattet.selvbetjening")
 @FagsakProsesstaskRekkefølge(gruppeSekvens = true)
 public class SendVedtakFattetTilSelvbetjeningTask implements ProsessTaskHandler {
-
-    public static final String TASKTYPE = "send.beskjed.vedtak.fattet.selvbetjening";
 
     private SelvbetjeningTjeneste selvbetjeningTjeneste;
 

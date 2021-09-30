@@ -8,6 +8,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 
+import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
@@ -24,7 +25,6 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.simulering.Feil
 import no.nav.foreldrepenger.tilbakekreving.organisasjon.Virksomhet;
 import no.nav.foreldrepenger.tilbakekreving.organisasjon.VirksomhetTjeneste;
 import no.nav.vedtak.exception.TekniskException;
-import no.nav.vedtak.konfig.KonfigVerdi;
 
 @ApplicationScoped
 @Transactional

@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurdertForeldelseTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingModell;
@@ -36,7 +37,6 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.BehandlingÅrsa
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.web.app.rest.ResourceLink;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.BehandlingRestTjeneste;
-import no.nav.vedtak.konfig.KonfigVerdi;
 
 /**
  * Bygger BehandlingDto og UtvidetBehandlingDto

@@ -71,14 +71,16 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.dto.Ko
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiSendtXmlRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
+import no.nav.vedtak.felles.prosesstask.api.TaskType;
 import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepositoryImpl;
+import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskTjenesteImpl;
 
 @ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public class ForvaltningBehandlingRestTjenesteTest {
 
-    private ProsessTaskRepository prosessTaskRepository;
+    private ProsessTaskTjeneste taskTjeneste;
     private BehandlingRepositoryProvider repositoryProvider;
     private FagsakRepository fagsakRepository;
     private BehandlingRepository behandlingRepository;
@@ -95,7 +97,7 @@ public class ForvaltningBehandlingRestTjenesteTest {
 
     @BeforeEach
     public void setup(EntityManager entityManager) {
-        prosessTaskRepository = new ProsessTaskRepositoryImpl(entityManager, null, null);
+        taskTjeneste = new ProsessTaskTjenesteImpl(new ProsessTaskRepositoryImpl(entityManager, null, null));
         repositoryProvider = new BehandlingRepositoryProvider(entityManager);
         fagsakRepository = repositoryProvider.getFagsakRepository();
         behandlingRepository = repositoryProvider.getBehandlingRepository();
@@ -118,12 +120,12 @@ public class ForvaltningBehandlingRestTjenesteTest {
         SlettGrunnlagEventPubliserer mockSlettGrunnlagEventPubliserer = mock(SlettGrunnlagEventPubliserer.class);
         manipulerBehandling = new InternalManipulerBehandling(repositoryProvider);
         VarselresponsTjeneste varselresponsTjeneste = new VarselresponsTjeneste(varselresponsRepository);
-        GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjeneste(prosessTaskRepository,
+        GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjeneste(taskTjeneste,
             behandlingKandidaterRepository, behandlingVenterRepository, repositoryProvider, varselresponsTjeneste);
         KravgrunnlagTjeneste kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repositoryProvider,
             gjenopptaBehandlingTjeneste, behandlingskontrollTjeneste, mockSlettGrunnlagEventPubliserer);
         forvaltningBehandlingRestTjeneste = new ForvaltningBehandlingRestTjeneste(repositoryProvider,
-            prosessTaskRepository, mottattXmlRepository, kravgrunnlagMapper, økonomiSendtXmlRepository,
+            taskTjeneste, mottattXmlRepository, kravgrunnlagMapper, økonomiSendtXmlRepository,
             tilbakekrevingsvedtakTjeneste, kravgrunnlagTjeneste);
 
         behandling = lagBehandling();
@@ -143,7 +145,7 @@ public class ForvaltningBehandlingRestTjenesteTest {
         Response response = forvaltningBehandlingRestTjeneste.tvingHenleggelseBehandling(
             new BehandlingReferanse(behandling.getId()));
         assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
-        assertProsessTask(TvingHenlegglBehandlingTask.TASKTYPE);
+        assertProsessTask(TaskType.forProsessTask(TvingHenlegglBehandlingTask.class));
     }
 
     @Test
@@ -171,7 +173,7 @@ public class ForvaltningBehandlingRestTjenesteTest {
         Response response = forvaltningBehandlingRestTjeneste.tvingGjenopptaBehandling(
             new BehandlingReferanse(behandling.getId()));
         assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
-        assertProsessTask(GjenopptaBehandlingTask.TASKTYPE);
+        assertProsessTask(TaskType.forProsessTask(GjenopptaBehandlingTask.class));
     }
 
     @Test
@@ -258,7 +260,7 @@ public class ForvaltningBehandlingRestTjenesteTest {
             "");
         Response respons = forvaltningBehandlingRestTjeneste.hentKorrigertKravgrunnlag(hentKorrigertKravgrunnlagDto);
         assertThat(respons.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
-        assertProsessTask(HentKorrigertKravgrunnlagTask.TASKTYPE);
+        assertProsessTask(TaskType.forProsessTask(HentKorrigertKravgrunnlagTask.class));
     }
 
     @Test
@@ -277,7 +279,7 @@ public class ForvaltningBehandlingRestTjenesteTest {
 
         Response respons = forvaltningBehandlingRestTjeneste.korrigerHenvisning(korrigertHenvisningDto);
         assertThat(respons.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
-        ProsessTaskData korrigertHenvisningProsessTask = assertProsessTask(KorrigertHenvisningTask.TASKTYPE);
+        ProsessTaskData korrigertHenvisningProsessTask = assertProsessTask(TaskType.forProsessTask(KorrigertHenvisningTask.class));
         assertThat(korrigertHenvisningProsessTask.getBehandlingId()).isEqualTo(String.valueOf(behandling.getId()));
         assertThat(korrigertHenvisningProsessTask.getPropertyValue("eksternUuid")).isEqualTo(eksternUuid.toString());
     }
@@ -377,13 +379,13 @@ public class ForvaltningBehandlingRestTjenesteTest {
             + "    </urn:detaljertKravgrunnlag>\n" + "</urn:detaljertKravgrunnlagMelding>\n";
     }
 
-    private ProsessTaskData assertProsessTask(String tasktype) {
-        List<ProsessTaskData> prosessTasker = prosessTaskRepository.finnAlle(ProsessTaskStatus.FERDIG,
+    private ProsessTaskData assertProsessTask(TaskType taskType) {
+        List<ProsessTaskData> prosessTasker = taskTjeneste.finnAlle(ProsessTaskStatus.FERDIG,
             ProsessTaskStatus.KLAR);
         assertThat(prosessTasker).isNotEmpty();
         assertThat(prosessTasker.size()).isEqualTo(1);
         ProsessTaskData prosessTaskData = prosessTasker.get(0);
-        assertThat(prosessTasker.get(0).getTaskType()).isEqualTo(tasktype);
+        assertThat(prosessTasker.get(0).taskType()).isEqualTo(taskType);
         return prosessTaskData;
     }
 

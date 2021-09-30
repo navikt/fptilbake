@@ -20,10 +20,12 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.TilbakekrevingValgDto;
-import no.nav.foreldrepenger.tilbakekreving.hendelser.ProsessTaskRepositoryMock;
+import no.nav.foreldrepenger.tilbakekreving.hendelser.ProsessTaskTjenesteMock;
 import no.nav.foreldrepenger.tilbakekreving.hendelser.felles.task.HåndterHendelseTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
+import no.nav.vedtak.felles.prosesstask.api.TaskType;
 
 public class HendelseHåndtererTjenesteTest {
     private static final Saksnummer SAKSNUMMER = new Saksnummer("1234");
@@ -32,9 +34,9 @@ public class HendelseHåndtererTjenesteTest {
     private static final UUID EKSTERN_BEHANDLING_UUID = UUID.randomUUID();
 
     private FagsystemKlient restKlient = mock(FagsystemKlient.class);
-    private ProsessTaskRepository prosessTaskRepository = new ProsessTaskRepositoryMock();
+    private ProsessTaskTjeneste taskTjeneste = new ProsessTaskTjenesteMock();
     private HendelseTaskDataWrapper hendelseTaskDataWrapper = lagHendelseTask();
-    private HendelseHåndtererTjeneste hendelseHåndtererTjeneste = new HendelseHåndtererTjeneste(prosessTaskRepository, restKlient);
+    private HendelseHåndtererTjeneste hendelseHåndtererTjeneste = new HendelseHåndtererTjeneste(taskTjeneste, restKlient);
 
 
     @Test
@@ -45,9 +47,9 @@ public class HendelseHåndtererTjenesteTest {
 
         hendelseHåndtererTjeneste.håndterHendelse(hendelseTaskDataWrapper);
 
-        List<ProsessTaskData> prosesser = prosessTaskRepository.finnIkkeStartet();
+        List<ProsessTaskData> prosesser = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
         assertThat(prosesser).isNotEmpty();
-        assertThat(erTaskFinnes(OpprettBehandlingTask.TASKTYPE, prosesser)).isTrue();
+        assertThat(erTaskFinnes(TaskType.forProsessTask(OpprettBehandlingTask.class), prosesser)).isTrue();
     }
 
     @Test
@@ -58,9 +60,9 @@ public class HendelseHåndtererTjenesteTest {
 
         hendelseHåndtererTjeneste.håndterHendelse(hendelseTaskDataWrapper);
 
-        List<ProsessTaskData> prosesser = prosessTaskRepository.finnIkkeStartet();
+        List<ProsessTaskData> prosesser = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
         assertThat(prosesser).isNotEmpty();
-        assertThat(erTaskFinnes(OpprettBehandlingTask.TASKTYPE, prosesser)).isTrue();
+        assertThat(erTaskFinnes(TaskType.forProsessTask(OpprettBehandlingTask.class), prosesser)).isTrue();
     }
 
     @Test
@@ -71,17 +73,17 @@ public class HendelseHåndtererTjenesteTest {
 
         hendelseHåndtererTjeneste.håndterHendelse(hendelseTaskDataWrapper);
 
-        assertThat(prosessTaskRepository.finnIkkeStartet()).isEmpty();
+        assertThat(taskTjeneste.finnAlle(ProsessTaskStatus.KLAR)).isEmpty();
     }
 
-    private boolean erTaskFinnes(String taskType, List<ProsessTaskData> prosesser) {
+    private boolean erTaskFinnes(TaskType taskType, List<ProsessTaskData> prosesser) {
         return prosesser.stream()
-            .anyMatch(prosess -> taskType.equals(prosess.getTaskType()));
+            .anyMatch(prosess -> taskType.equals(prosess.taskType()));
     }
 
     private static HendelseTaskDataWrapper lagHendelseTask() {
 
-        ProsessTaskData prosessTaskData = new ProsessTaskData(HåndterHendelseTask.TASKTYPE);
+        ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(HåndterHendelseTask.class);
 
         prosessTaskData.setProperty(TaskProperties.EKSTERN_BEHANDLING_UUID, EKSTERN_BEHANDLING_UUID.toString());
         prosessTaskData.setProperty(TaskProperties.EKSTERN_BEHANDLING_ID, String.valueOf(EKSTERN_BEHANDLING_ID));

@@ -68,8 +68,9 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.SlettGrunnlagEventPublisere
 import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkInnslagKonverter;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepositoryImpl;
+import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskTjenesteImpl;
 
 /**
  * Opprettet for å forenkle unit-tester
@@ -111,7 +112,7 @@ public abstract class FellesTestOppsett {
     protected TotrinnRepository totrinnRepository;
     protected BehandlingRepository behandlingRepository;
     protected VarselRepository varselRepository;
-    protected ProsessTaskRepository prosessTaskRepository;
+    protected ProsessTaskTjeneste taskTjeneste;
     protected KravgrunnlagTjeneste kravgrunnlagTjeneste;
     protected KravgrunnlagBeregningTjeneste kravgrunnlagBeregningTjeneste;
 
@@ -159,7 +160,7 @@ public abstract class FellesTestOppsett {
         totrinnRepository = new TotrinnRepository(entityManager);
         behandlingRepository = repoProvider.getBehandlingRepository();
         varselRepository = repoProvider.getVarselRepository();
-        prosessTaskRepository = new ProsessTaskRepositoryImpl(entityManager, null, null);
+        taskTjeneste = new ProsessTaskTjenesteImpl(new ProsessTaskRepositoryImpl(entityManager, null, null));
         kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repoProvider, gjenopptaBehandlingTjeneste, behandlingskontrollTjeneste, mockSlettGrunnlagEventPubliserer);
         kravgrunnlagBeregningTjeneste = new KravgrunnlagBeregningTjeneste(grunnlagRepository);
         historikkInnslagKonverter = new HistorikkInnslagKonverter(repoProvider.getAksjonspunktRepository(),
@@ -171,7 +172,7 @@ public abstract class FellesTestOppsett {
         revurderingTjeneste = new BehandlingRevurderingTjeneste(repoProvider);
         faktaFeilutbetalingTjeneste = new FaktaFeilutbetalingTjeneste(repoProvider, kravgrunnlagTjeneste, mockFagsystemKlient);
         fagsakTjeneste = new FagsakTjeneste(mockTpsTjeneste, repoProvider.getFagsakRepository(), brukerRepository);
-        behandlingTjeneste = new BehandlingTjeneste(repoProvider, prosessTaskRepository, behandlingskontrollProvider,
+        behandlingTjeneste = new BehandlingTjeneste(repoProvider, taskTjeneste, behandlingskontrollProvider,
             fagsakTjeneste, mockHistorikkTjeneste, mockFagsystemKlient, defaultVentetid);
         testUtility = new TestUtility(behandlingTjeneste);
         aktørId = testUtility.genererAktørId();

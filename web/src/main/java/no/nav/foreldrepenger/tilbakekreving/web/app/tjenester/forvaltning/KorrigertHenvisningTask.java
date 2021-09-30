@@ -23,11 +23,10 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @ApplicationScoped
-@ProsessTask(KorrigertHenvisningTask.TASKTYPE)
+@ProsessTask("henvisning.korrigert")
 @FagsakProsesstaskRekkefølge(gruppeSekvens = true)
 public class KorrigertHenvisningTask implements ProsessTaskHandler {
 
-    public static final String TASKTYPE = "henvisning.korrigert";
     public static final String PROPERTY_EKSTERN_UUID = "eksternUuid";
     private BehandlingRepository behandlingRepository;
     private EksternBehandlingRepository eksternBehandlingRepository;

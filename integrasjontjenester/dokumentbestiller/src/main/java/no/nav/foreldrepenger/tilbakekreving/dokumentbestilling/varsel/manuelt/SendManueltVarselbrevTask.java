@@ -6,6 +6,7 @@ import java.time.Period;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
+import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
@@ -20,14 +21,11 @@ import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottak
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
-import no.nav.vedtak.konfig.KonfigVerdi;
 
 @Dependent
-@ProsessTask(SendManueltVarselbrevTask.TASKTYPE)
+@ProsessTask(value = "brev.sendManueltVarsel", maxFailedRuns = 5, firstDelay = 60)
 @FagsakProsesstaskRekkefølge(gruppeSekvens = true)
 public class SendManueltVarselbrevTask implements ProsessTaskHandler {
-
-    public static final String TASKTYPE = "brev.sendManueltVarsel";
 
     private BehandlingRepository behandlingRepository;
     private VergeRepository vergeRepository;
@@ -40,7 +38,7 @@ public class SendManueltVarselbrevTask implements ProsessTaskHandler {
     public SendManueltVarselbrevTask(BehandlingRepositoryProvider repositoryProvider,
                                      ManueltVarselBrevTjeneste manueltVarselBrevTjeneste,
                                      BehandlingskontrollTjeneste behandlingskontrollTjeneste,
-                                     @KonfigVerdi(value = "behandling.venter.frist.lengde") Period ventefrist) {
+                                     @KonfigVerdi(value = "behandling.venter.frist.lengde", defaultVerdi = "P3W") Period ventefrist) {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.vergeRepository = repositoryProvider.getVergeRepository();
         this.manueltVarselBrevTjeneste = manueltVarselBrevTjeneste;

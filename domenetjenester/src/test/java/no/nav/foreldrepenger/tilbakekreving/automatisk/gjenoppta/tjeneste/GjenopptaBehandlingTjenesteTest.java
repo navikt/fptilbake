@@ -2,16 +2,12 @@ package no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,9 +36,7 @@ import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
-import no.nav.vedtak.felles.prosesstask.api.TaskStatus;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
 @CdiDbAwareTest
 public class GjenopptaBehandlingTjenesteTest {
@@ -65,12 +59,12 @@ public class GjenopptaBehandlingTjenesteTest {
     private BehandlingRepositoryProvider repositoryProvider;
 
     private InternalAksjonspunktManipulator internalAksjonspunktManipulator = new InternalAksjonspunktManipulator();
-    private ProsessTaskRepository mockProsesstaskRepository = mock(ProsessTaskRepository.class);
+    private ProsessTaskTjeneste mockTaskTjeneste = mock(ProsessTaskTjeneste.class);
     private VarselresponsTjeneste mockVarselResponsTjeneste = mock(VarselresponsTjeneste.class);
 
     @BeforeEach
     public void setup() {
-        gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjeneste(mockProsesstaskRepository,
+        gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjeneste(mockTaskTjeneste,
             behandlingKandidaterRepository,
             behandlingVenterRepository,
             repositoryProvider,
@@ -106,7 +100,7 @@ public class GjenopptaBehandlingTjenesteTest {
         Behandling behandling = lagBehandling();
         final Long behandlingId = behandling.getId();
 
-        when(mockProsesstaskRepository.lagre(any(ProsessTaskData.class))).thenReturn("Call_123");
+        when(mockTaskTjeneste.lagre(any(ProsessTaskData.class))).thenReturn("Call_123");
 
         gjenopptaBehandlingTjeneste.fortsettBehandlingManuelt(behandlingId, HistorikkAktør.SAKSBEHANDLER);
         assertThat(behandling.isBehandlingPåVent()).isTrue();
@@ -182,25 +176,10 @@ public class GjenopptaBehandlingTjenesteTest {
     }
 
     @Test
-    public void skal_hente_statuser_for_gjenopptaBehandling_gruppe() {
-        // Arrange
-        final TaskStatus status1 = new TaskStatus(ProsessTaskStatus.FERDIG, new BigDecimal(1));
-        final TaskStatus status2 = new TaskStatus(ProsessTaskStatus.FEILET, new BigDecimal(2));
-        final List<TaskStatus> statusListFromRepo = Arrays.asList(status1, status2);
-        when(mockProsesstaskRepository.finnStatusForTaskIGruppe(same(GjenopptaBehandlingTask.TASKTYPE), anyString())).thenReturn(statusListFromRepo);
-
-        // Act
-        List<TaskStatus> statusListFromSvc = gjenopptaBehandlingTjeneste.hentStatusForGjenopptaBehandlingGruppe("gruppa");
-
-        // Assert
-        assertThat(statusListFromSvc).containsExactly(status1, status2);
-    }
-
-    @Test
     public void skal_ikke_fortsette_behandling_med_grunnlag_for_behandling_i_varsel_steg_og_fristen_ikke_gått_ut() {
         Behandling behandling = lagBehandling();
         internalAksjonspunktManipulator.forceFristForAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, LocalDateTime.now().plusDays(20));
-        when(mockProsesstaskRepository.lagre(any(ProsessTaskData.class))).thenReturn("Call_123");
+        when(mockTaskTjeneste.lagre(any(ProsessTaskData.class))).thenReturn("Call_123");
         Optional<String> callId = gjenopptaBehandlingTjeneste.fortsettBehandlingMedGrunnlag(behandling.getId());
         assertThat(callId).isEmpty();
     }
@@ -210,7 +189,7 @@ public class GjenopptaBehandlingTjenesteTest {
         Behandling behandling = lagBehandling();
         internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.TBKGSTEG, BehandlingStegStatus.VENTER);
         internalAksjonspunktManipulator.forceFristForAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, LocalDateTime.now().plusDays(20));
-        when(mockProsesstaskRepository.lagre(any(ProsessTaskData.class))).thenReturn("Call_123");
+        when(mockTaskTjeneste.lagre(any(ProsessTaskData.class))).thenReturn("Call_123");
         Optional<String> callId = gjenopptaBehandlingTjeneste.fortsettBehandlingMedGrunnlag(behandling.getId());
         assertThat(callId).isNotEmpty();
     }
@@ -220,7 +199,7 @@ public class GjenopptaBehandlingTjenesteTest {
         Behandling behandling = lagBehandling();
         internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.FAKTA_FEILUTBETALING, BehandlingStegStatus.VENTER);
         internalAksjonspunktManipulator.forceFristForAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, LocalDateTime.now().plusDays(20));
-        when(mockProsesstaskRepository.lagre(any(ProsessTaskData.class))).thenReturn("Call_123");
+        when(mockTaskTjeneste.lagre(any(ProsessTaskData.class))).thenReturn("Call_123");
         Optional<String> callId = gjenopptaBehandlingTjeneste.fortsettBehandlingMedGrunnlag(behandling.getId());
         assertThat(callId).isNotEmpty();
     }
@@ -245,6 +224,6 @@ public class GjenopptaBehandlingTjenesteTest {
             }
             faktiskeProsessTaskDataListe.add(data);
             return null;
-        }).when(mockProsesstaskRepository).lagre(any(ProsessTaskData.class));
+        }).when(mockTaskTjeneste).lagre(any(ProsessTaskData.class));
     }
 }

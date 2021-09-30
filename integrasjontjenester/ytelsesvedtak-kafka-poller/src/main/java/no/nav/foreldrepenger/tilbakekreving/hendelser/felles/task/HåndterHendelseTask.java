@@ -11,11 +11,9 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @ApplicationScoped
-@ProsessTask(HåndterHendelseTask.TASKTYPE)
+@ProsessTask(value = "hendelser.håndterHendelse", maxFailedRuns = 5)
 @FagsakProsesstaskRekkefølge(gruppeSekvens = false)
 public class HåndterHendelseTask implements ProsessTaskHandler {
-
-    public static final String TASKTYPE = "hendelser.håndterHendelse";
 
     private HendelseHåndtererTjeneste hendelseHåndterer;
 

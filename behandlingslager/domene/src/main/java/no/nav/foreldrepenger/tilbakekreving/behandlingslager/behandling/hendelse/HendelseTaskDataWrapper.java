@@ -17,6 +17,7 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
+import no.nav.vedtak.felles.prosesstask.api.TaskType;
 
 public class HendelseTaskDataWrapper {
 
@@ -108,8 +109,8 @@ public class HendelseTaskDataWrapper {
         return new HendelseTaskDataWrapper(td);
     }
 
-    private static ProsessTaskData lagProsessTaskDataMedFellesProperty(String taskType, AktørId aktørId, Henvisning henvisning, String behandlingUuid, Saksnummer saksnummer) {
-        ProsessTaskData td = new ProsessTaskData(taskType);
+    private static ProsessTaskData lagProsessTaskDataMedFellesProperty(TaskType taskType, AktørId aktørId, Henvisning henvisning, String behandlingUuid, Saksnummer saksnummer) {
+        ProsessTaskData td = ProsessTaskData.forTaskType(taskType);
         td.setAktørId(aktørId.getId());
         td.setProperty(EKSTERN_BEHANDLING_UUID, behandlingUuid);
         td.setProperty(EKSTERN_BEHANDLING_ID, henvisning.getVerdi()); //TODO k9-tilbake fjern når transisjon til henvisning er ferdig

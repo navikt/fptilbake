@@ -3,7 +3,7 @@ package no.nav.journalpostapi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.vedtak.util.env.Environment;
+import no.nav.foreldrepenger.konfig.Environment;
 
 class JournalpostApiPlassering {
 

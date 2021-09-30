@@ -18,11 +18,11 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelse
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
-import no.nav.foreldrepenger.tilbakekreving.hendelser.ProsessTaskRepositoryMock;
+import no.nav.foreldrepenger.tilbakekreving.hendelser.ProsessTaskTjenesteMock;
 import no.nav.foreldrepenger.tilbakekreving.kafka.poller.PostTransactionHandler;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
 public class TilkjentYtelseReaderTest {
     private static final Saksnummer SAKSNUMMER = new Saksnummer("1234");
@@ -32,8 +32,8 @@ public class TilkjentYtelseReaderTest {
     private static final Henvisning HENVISNING = Henvisning.fraEksternBehandlingId(EKSTERN_BEHANDLING_ID);
 
     private TilkjentYtelseMeldingConsumer meldingConsumer = mock(TilkjentYtelseMeldingConsumer.class);
-    private ProsessTaskRepository prosessTaskRepository = new ProsessTaskRepositoryMock();
-    private TilkjentYtelseReader tilkjentYtelseReader = new TilkjentYtelseReader(meldingConsumer, prosessTaskRepository);
+    private ProsessTaskTjeneste taskTjeneste = new ProsessTaskTjenesteMock();
+    private TilkjentYtelseReader tilkjentYtelseReader = new TilkjentYtelseReader(meldingConsumer, taskTjeneste);
 
     @Test
     public void skal_hente_og_behandle_meldinger() {
@@ -45,7 +45,7 @@ public class TilkjentYtelseReaderTest {
         tilkjentYtelseReader.hentOgBehandleMeldinger();
 
         //Assert
-        List<ProsessTaskData> prosessTaskDataList = prosessTaskRepository.finnAlle(ProsessTaskStatus.KLAR);
+        List<ProsessTaskData> prosessTaskDataList = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
         assertThat(prosessTaskDataList).hasSize(1);
         ProsessTaskData prosessTaskData = prosessTaskDataList.get(0);
 
@@ -78,7 +78,7 @@ public class TilkjentYtelseReaderTest {
         tilkjentYtelseReader.hentOgBehandleMeldinger();
 
         //Assert
-        List<ProsessTaskData> prosessTaskDataList = prosessTaskRepository.finnAlle(ProsessTaskStatus.KLAR);
+        List<ProsessTaskData> prosessTaskDataList = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
         assertThat(prosessTaskDataList).isEmpty();
         verify(meldingConsumer, never()).manualCommitSync();
     }

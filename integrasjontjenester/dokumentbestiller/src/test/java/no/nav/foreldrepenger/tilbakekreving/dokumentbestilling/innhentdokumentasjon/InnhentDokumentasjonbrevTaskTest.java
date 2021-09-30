@@ -41,7 +41,7 @@ public class InnhentDokumentasjonbrevTaskTest extends DokumentBestillerTestOppse
 
     @Test
     public void skal_sende_innhent_dokumentasjonbrev_og_sett_behandling_på_vent() {
-        ProsessTaskData prosessTaskData = new ProsessTaskData(InnhentDokumentasjonbrevTask.TASKTYPE);
+        ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(InnhentDokumentasjonbrevTask.class);
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         prosessTaskData.setPayload("Ber om flere opplysninger");
 
@@ -52,7 +52,7 @@ public class InnhentDokumentasjonbrevTaskTest extends DokumentBestillerTestOppse
 
     @Test
     public void skal_sende_innhent_dokumentasjonbrev_og_sett_behandling_på_vent_når_verge_finnes() {
-        ProsessTaskData prosessTaskData = new ProsessTaskData(InnhentDokumentasjonbrevTask.TASKTYPE);
+        ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(InnhentDokumentasjonbrevTask.class);
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         prosessTaskData.setPayload("Ber om flere opplysninger");
 

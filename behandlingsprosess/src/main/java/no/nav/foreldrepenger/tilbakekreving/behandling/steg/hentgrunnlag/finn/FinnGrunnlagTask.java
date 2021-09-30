@@ -47,12 +47,11 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @ApplicationScoped
-@ProsessTask(FinnGrunnlagTask.TASKTYPE)
+@ProsessTask("kravgrunnlag.finn")
 @FagsakProsesstaskRekkefølge(gruppeSekvens = false)
 public class FinnGrunnlagTask implements ProsessTaskHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(FinnGrunnlagTask.class);
-    public static final String TASKTYPE = "kravgrunnlag.finn";
 
     private KravgrunnlagRepository grunnlagRepository;
     private BehandlingRepository behandlingRepository;

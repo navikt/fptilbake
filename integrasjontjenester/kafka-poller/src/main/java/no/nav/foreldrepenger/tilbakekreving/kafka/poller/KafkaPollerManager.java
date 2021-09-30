@@ -20,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.vedtak.apptjeneste.AppServiceHandler;
-import no.nav.vedtak.util.Tuple;
 
 @ApplicationScoped
 public class KafkaPollerManager implements AppServiceHandler {
@@ -46,7 +45,7 @@ public class KafkaPollerManager implements AppServiceHandler {
     /**
      * Single scheduled thread handling polling.
      */
-    private Map<String, Tuple<KafkaPoller, ScheduledExecutorService>> pollingService;
+    private Map<String, PollerExecutor> pollingService;
 
     /**
      * Future for å kunne kansellere polling.
@@ -91,16 +90,16 @@ public class KafkaPollerManager implements AppServiceHandler {
             for (KafkaPoller kafkaPoller : feedPollers) {
                 String threadName = threadPoolNamePrefix + "-" + kafkaPoller.getName() + "-poller";
                 ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor(new PollerUtils.NamedThreadFactory(threadName));
-                Tuple<KafkaPoller, ScheduledExecutorService> tuple = new Tuple<>(kafkaPoller, scheduledExecutorService);
+                var tuple = new PollerExecutor(kafkaPoller, scheduledExecutorService);
                 pollingService.put(kafkaPoller.getName(), tuple);
                 log.info("Created thread for feed polling {}", threadName); // NOSONAR
             }
         }
         this.pollingServiceScheduledFuture = new ArrayList<>();
-        for (Map.Entry<String, Tuple<KafkaPoller, ScheduledExecutorService>> entry : pollingService.entrySet()) {
-            Tuple<KafkaPoller, ScheduledExecutorService> tuple = entry.getValue();
-            KafkaPoller kafkaPoller = tuple.getElement1();
-            ScheduledExecutorService service = tuple.getElement2();
+        for (Map.Entry<String, PollerExecutor> entry : pollingService.entrySet()) {
+            var tuple = entry.getValue();
+            KafkaPoller kafkaPoller = tuple.kafkaPoller();
+            ScheduledExecutorService service = tuple.scheduledExecutorService();
             Poller poller = new Poller(entityManager, kafkaPoller);
             ScheduledFuture<?> scheduledFuture = service.scheduleWithFixedDelay(poller, delayBetweenPollingMillis / 2, delayBetweenPollingMillis, TimeUnit.MILLISECONDS);// NOSONAR
             pollingServiceScheduledFuture.add(scheduledFuture);
@@ -111,9 +110,8 @@ public class KafkaPollerManager implements AppServiceHandler {
     private static long getSystemPropertyWithLowerBoundry(String key, long defaultValue, long lowerBoundry) {
         final String property = System.getProperty(key, String.valueOf(defaultValue));
         final long systemPropertyValue = Long.parseLong(property);
-        if (systemPropertyValue < lowerBoundry) {
-            return lowerBoundry;
-        }
-        return systemPropertyValue;
+        return Math.max(systemPropertyValue, lowerBoundry);
     }
+
+    private static record PollerExecutor(KafkaPoller kafkaPoller, ScheduledExecutorService scheduledExecutorService) {}
 }

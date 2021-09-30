@@ -13,10 +13,10 @@ import javax.ws.rs.core.UriBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.vedtak.felles.integrasjon.rest.SystemUserOidcRestClient;
-import no.nav.vedtak.util.env.Environment;
 
 @ApplicationScoped
 public class FpsakPipKlient {

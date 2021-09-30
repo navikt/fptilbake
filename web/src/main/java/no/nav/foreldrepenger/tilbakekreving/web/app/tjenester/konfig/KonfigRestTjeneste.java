@@ -14,8 +14,8 @@ import javax.ws.rs.Produces;
 import com.codahale.metrics.annotation.Timed;
 
 import io.swagger.v3.oas.annotations.Operation;
+import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
-import no.nav.vedtak.konfig.KonfigVerdi;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 
 @Path("/konfig")

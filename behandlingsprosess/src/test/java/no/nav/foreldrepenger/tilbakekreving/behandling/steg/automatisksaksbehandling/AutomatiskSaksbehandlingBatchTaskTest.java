@@ -43,9 +43,10 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepositoryImpl;
+import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskTjenesteImpl;
 
 @ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public class AutomatiskSaksbehandlingBatchTaskTest {
@@ -56,7 +57,7 @@ public class AutomatiskSaksbehandlingBatchTaskTest {
     private Behandling behandling;
 
     private BehandlingRepositoryProvider repositoryProvider;
-    private ProsessTaskRepository taskRepository;
+    private ProsessTaskTjeneste taskTjeneste;
     private AutomatiskSaksbehandlingRepository automatiskSaksbehandlingRepository;
     private final Clock clock = Clock.fixed(Instant.parse(getDateString()), ZoneId.systemDefault());
     private AutomatiskSaksbehandlingBatchTask automatiskSaksbehandlingBatchTask;
@@ -67,9 +68,9 @@ public class AutomatiskSaksbehandlingBatchTaskTest {
         scenarioSimple.leggTilAksjonspunkt(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING, BehandlingStegType.FAKTA_FEILUTBETALING);
         repositoryProvider = new BehandlingRepositoryProvider(entityManager);
         InternalManipulerBehandling manipulerBehandling = new InternalManipulerBehandling(repositoryProvider);
-        taskRepository = new ProsessTaskRepositoryImpl(entityManager, null, null);
+        taskTjeneste = new ProsessTaskTjenesteImpl(new ProsessTaskRepositoryImpl(entityManager, null, null));
         automatiskSaksbehandlingRepository = new AutomatiskSaksbehandlingRepository(entityManager);
-        automatiskSaksbehandlingBatchTask = new AutomatiskSaksbehandlingBatchTask(taskRepository, automatiskSaksbehandlingRepository, clock, Period.ofWeeks(-1));
+        automatiskSaksbehandlingBatchTask = new AutomatiskSaksbehandlingBatchTask(taskTjeneste, automatiskSaksbehandlingRepository, clock, Period.ofWeeks(-1));
         behandling = scenarioSimple.medBehandlingType(BehandlingType.TILBAKEKREVING).lagre(repositoryProvider);
         lagKravgrunnlag(behandling.getId(), BigDecimal.valueOf(500L), behandling.getFagsak().getSaksnummer().getVerdi(),
             123L);
@@ -79,7 +80,7 @@ public class AutomatiskSaksbehandlingBatchTaskTest {
     @Test
     public void skal_opprette_prosess_task_for_å_saksbehandle_behandling_automatisk() {
         automatiskSaksbehandlingBatchTask.doTask(lagProsessTaskData());
-        List<ProsessTaskData> prosessTasker = taskRepository.finnAlle(ProsessTaskStatus.KLAR);
+        List<ProsessTaskData> prosessTasker = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
         assertThat(prosessTasker.size()).isEqualTo(1);
         ProsessTaskData prosessTaskData = prosessTasker.get(0);
         assertThat(Long.valueOf(prosessTaskData.getBehandlingId())).isEqualTo(behandling.getId());
@@ -89,20 +90,20 @@ public class AutomatiskSaksbehandlingBatchTaskTest {
     @Test
     public void skal_ikke_kjøre_batch_i_helgen() {
         Clock helgeClock = Clock.fixed(Instant.parse("2020-05-03T12:00:00.00Z"), ZoneId.systemDefault());
-        AutomatiskSaksbehandlingBatchTask automatiskSaksbehandlingBatchTask = new AutomatiskSaksbehandlingBatchTask(taskRepository, automatiskSaksbehandlingRepository, helgeClock, Period.ofWeeks(-1));
+        AutomatiskSaksbehandlingBatchTask automatiskSaksbehandlingBatchTask = new AutomatiskSaksbehandlingBatchTask(taskTjeneste, automatiskSaksbehandlingRepository, helgeClock, Period.ofWeeks(-1));
 
         automatiskSaksbehandlingBatchTask.doTask(lagProsessTaskData());
-        List<ProsessTaskData> prosessTasker = taskRepository.finnAlle(ProsessTaskStatus.KLAR);
+        List<ProsessTaskData> prosessTasker = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
         assertThat(prosessTasker).isEmpty();
     }
 
     @Test
     public void skal_ikke_kjøre_batch_hvis_hellidag() {
         Clock helgeClock = Clock.fixed(Instant.parse("2021-05-17T12:00:00.00Z"), ZoneId.systemDefault());
-        AutomatiskSaksbehandlingBatchTask automatiskSaksbehandlingBatchTask = new AutomatiskSaksbehandlingBatchTask(taskRepository, automatiskSaksbehandlingRepository, helgeClock, Period.ofWeeks(-1));
+        AutomatiskSaksbehandlingBatchTask automatiskSaksbehandlingBatchTask = new AutomatiskSaksbehandlingBatchTask(taskTjeneste, automatiskSaksbehandlingRepository, helgeClock, Period.ofWeeks(-1));
 
         automatiskSaksbehandlingBatchTask.doTask(lagProsessTaskData());
-        List<ProsessTaskData> prosessTasker = taskRepository.finnAlle(ProsessTaskStatus.KLAR);
+        List<ProsessTaskData> prosessTasker = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
         assertThat(prosessTasker).isEmpty();
     }
 
@@ -111,7 +112,7 @@ public class AutomatiskSaksbehandlingBatchTaskTest {
         lagKravgrunnlag(behandling.getId(), BigDecimal.valueOf(1500L), behandling.getFagsak().getSaksnummer().getVerdi(), 123L);
 
         automatiskSaksbehandlingBatchTask.doTask(lagProsessTaskData());
-        List<ProsessTaskData> prosessTasker = taskRepository.finnAlle(ProsessTaskStatus.KLAR);
+        List<ProsessTaskData> prosessTasker = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
         assertThat(prosessTasker).isEmpty();
     }
 
@@ -120,7 +121,7 @@ public class AutomatiskSaksbehandlingBatchTaskTest {
         behandling.avsluttBehandling();
 
         automatiskSaksbehandlingBatchTask.doTask(lagProsessTaskData());
-        List<ProsessTaskData> prosessTasker = taskRepository.finnAlle(ProsessTaskStatus.KLAR);
+        List<ProsessTaskData> prosessTasker = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
         assertThat(prosessTasker).isEmpty();
     }
 
@@ -129,7 +130,7 @@ public class AutomatiskSaksbehandlingBatchTaskTest {
         behandling.setAnsvarligSaksbehandler("124");
 
         automatiskSaksbehandlingBatchTask.doTask(lagProsessTaskData());
-        List<ProsessTaskData> prosessTasker = taskRepository.finnAlle(ProsessTaskStatus.KLAR);
+        List<ProsessTaskData> prosessTasker = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
         assertThat(prosessTasker).isEmpty();
     }
 
@@ -138,7 +139,7 @@ public class AutomatiskSaksbehandlingBatchTaskTest {
         repositoryProvider.getAksjonspunktRepository().leggTilAksjonspunkt(behandling,AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG,BehandlingStegType.FAKTA_FEILUTBETALING);
 
         automatiskSaksbehandlingBatchTask.doTask(lagProsessTaskData());
-        List<ProsessTaskData> prosessTasker = taskRepository.finnAlle(ProsessTaskStatus.KLAR);
+        List<ProsessTaskData> prosessTasker = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
         assertThat(prosessTasker).isEmpty();
     }
 
@@ -153,7 +154,7 @@ public class AutomatiskSaksbehandlingBatchTaskTest {
         repositoryProvider.getBrevSporingRepository().lagre(brevSporing);
 
         automatiskSaksbehandlingBatchTask.doTask(lagProsessTaskData());
-        List<ProsessTaskData> prosessTasker = taskRepository.finnAlle(ProsessTaskStatus.KLAR);
+        List<ProsessTaskData> prosessTasker = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
         assertThat(prosessTasker).isEmpty();
     }
 
@@ -197,6 +198,6 @@ public class AutomatiskSaksbehandlingBatchTaskTest {
     }
 
     private ProsessTaskData lagProsessTaskData() {
-        return new ProsessTaskData(AutomatiskSaksbehandlingBatchTask.BATCHNAVN);
+        return ProsessTaskData.forProsessTask(AutomatiskSaksbehandlingBatchTask.class);
     }
 }

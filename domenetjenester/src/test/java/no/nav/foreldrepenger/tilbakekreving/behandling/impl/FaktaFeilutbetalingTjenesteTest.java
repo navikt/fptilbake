@@ -53,7 +53,7 @@ public class FaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
             .setTilbakekrevingvalg(new TilbakekrevingValgDto(VidereBehandling.TILBAKEKREV_I_INFOTRYGD))
             .build();
         when(mockFagsystemKlient.hentBehandlingsinfo(eksternBehandlingUuid, Tillegsinformasjon.TILBAKEKREVINGSVALG)).thenReturn(samletEksternBehandlingInfo);
-        henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repoProvider, prosessTaskRepository,
+        henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repoProvider, taskTjeneste,
             behandlingskontrollTjeneste, mockHistorikkTjeneste);
     }
 

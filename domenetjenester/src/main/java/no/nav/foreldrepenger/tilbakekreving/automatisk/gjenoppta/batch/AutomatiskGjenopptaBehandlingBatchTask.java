@@ -6,20 +6,19 @@ import java.time.LocalDate;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.felles.Helligdager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.felles.Helligdager;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @ApplicationScoped
-@ProsessTask(AutomatiskGjenopptaBehandlingBatchTask.BATCHNAVN)
+@ProsessTask(value = "batch.ta.behandling.av.vent", cronExpression = "0 0 7 ? * MON-FRI")
 public class AutomatiskGjenopptaBehandlingBatchTask implements ProsessTaskHandler {
 
-    public static final String BATCHNAVN = "batch.ta.behandling.av.vent";
     private static final Logger logger = LoggerFactory.getLogger(AutomatiskGjenopptaBehandlingBatchTask.class);
 
     private GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste;
@@ -46,7 +45,7 @@ public class AutomatiskGjenopptaBehandlingBatchTask implements ProsessTaskHandle
     public void doTask(ProsessTaskData prosessTaskData) {
         LocalDate iDag = LocalDate.now(clock);
         if (Helligdager.erHelligdagEllerHelg(iDag)) {
-            logger.info("I dag er helg/helligdag, kan ikke kjøre batch-en {}", BATCHNAVN);
+            logger.info("I dag er helg/helligdag, kan ikke kjøre batch-en {}", this.getClass().getSimpleName());
         }else {
             gjenopptaBehandlingTjeneste.automatiskGjenopptaBehandlinger();
         }

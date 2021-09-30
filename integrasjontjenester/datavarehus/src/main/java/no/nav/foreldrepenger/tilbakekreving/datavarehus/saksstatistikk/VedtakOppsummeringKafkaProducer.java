@@ -5,10 +5,10 @@ import javax.inject.Inject;
 
 import org.apache.kafka.clients.producer.ProducerRecord;
 
+import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.felles.DvhKafkaProducer;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping.VedtakOppsummeringMapper;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.vedtak.VedtakOppsummering;
-import no.nav.vedtak.konfig.KonfigVerdi;
 
 @ApplicationScoped
 public class VedtakOppsummeringKafkaProducer {

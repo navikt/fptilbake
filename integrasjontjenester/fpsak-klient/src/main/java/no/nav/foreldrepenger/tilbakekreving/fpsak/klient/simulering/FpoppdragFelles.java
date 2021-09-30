@@ -3,7 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.fpsak.klient.simulering;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.vedtak.util.env.Environment;
+import no.nav.foreldrepenger.konfig.Environment;
 
 class FpoppdragFelles {
 

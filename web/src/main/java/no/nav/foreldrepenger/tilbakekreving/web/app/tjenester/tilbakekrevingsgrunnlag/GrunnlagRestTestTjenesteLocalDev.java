@@ -19,6 +19,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import io.swagger.v3.oas.annotations.Operation;
+import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.foreldrepenger.tilbakekreving.behandling.BehandlingFeil;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
@@ -39,7 +40,6 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.Behandl
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
-import no.nav.vedtak.util.env.Environment;
 
 @Path(GrunnlagRestTestTjenesteLocalDev.PATH_FRAGMENT)
 @Produces(APPLICATION_JSON)

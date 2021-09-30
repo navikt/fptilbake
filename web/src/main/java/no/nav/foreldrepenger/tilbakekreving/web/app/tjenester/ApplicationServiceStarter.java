@@ -10,12 +10,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.prometheus.client.hotspot.DefaultExports;
+import no.nav.foreldrepenger.konfig.Environment;
 import no.nav.foreldrepenger.tilbakekreving.kafka.poller.KafkaPollerManager;
 import no.nav.vedtak.apptjeneste.AppServiceHandler;
 import no.nav.vedtak.felles.integrasjon.jms.QueueConsumerManager;
 import no.nav.vedtak.felles.prosesstask.impl.BatchTaskScheduler;
 import no.nav.vedtak.felles.prosesstask.impl.TaskManager;
-import no.nav.vedtak.util.env.Environment;
 
 @ApplicationScoped
 public class ApplicationServiceStarter {

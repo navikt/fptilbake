@@ -112,7 +112,7 @@ public class LesKravgrunnlagTaskTest extends FellesTestOppsett {
     }
 
     private ProsessTaskData lagProsessTaskData() {
-        ProsessTaskData prosessTaskData = new ProsessTaskData(LesKravgrunnlagTask.TASKTYPE);
+        ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(LesKravgrunnlagTask.class);
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         prosessTaskData.setProperty(TaskProperty.PROPERTY_MOTTATT_XML_ID, String.valueOf(kravgrunnlagId));
         return prosessTaskData;

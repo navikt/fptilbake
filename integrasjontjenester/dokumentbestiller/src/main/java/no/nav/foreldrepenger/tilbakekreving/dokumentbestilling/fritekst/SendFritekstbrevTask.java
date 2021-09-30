@@ -17,10 +17,9 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @Dependent
-@ProsessTask(SendFritekstbrevTask.TASKTYPE)
+@ProsessTask("brev.fritekstbrev")
 public class SendFritekstbrevTask implements ProsessTaskHandler {
 
-    public static final String TASKTYPE = "brev.fritekstbrev";
     private static final Logger logger = LoggerFactory.getLogger(SendFritekstbrevTask.class);
 
     private FritekstbrevTjeneste fritekstbrevTjeneste;

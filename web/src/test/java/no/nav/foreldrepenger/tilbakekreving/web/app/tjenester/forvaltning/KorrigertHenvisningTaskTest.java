@@ -82,7 +82,7 @@ class KorrigertHenvisningTaskTest {
     }
 
     private ProsessTaskData lagProsessTaskData(){
-        ProsessTaskData prosessTaskData = new ProsessTaskData(KorrigertHenvisningTask.TASKTYPE);
+        ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(KorrigertHenvisningTask.class);
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         prosessTaskData.setProperty(KorrigertHenvisningTask.PROPERTY_EKSTERN_UUID, uuid.toString());
         return prosessTaskData;

@@ -1,6 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.web.server.jetty;
 
-import no.nav.vedtak.util.env.Environment;
+import no.nav.foreldrepenger.konfig.Environment;
 
 public class JettyWebKonfigurasjon implements AppKonfigurasjon {
     private static final Environment ENV = Environment.current();

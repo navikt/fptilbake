@@ -23,7 +23,7 @@ import no.nav.foreldrepenger.tilbakekreving.hendelser.felles.task.HåndterHendel
 import no.nav.foreldrepenger.tilbakekreving.kafka.poller.PostTransactionHandler;
 import no.nav.foreldrepenger.tilbakekreving.kafka.util.KafkaConsumerFeil;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
 @ApplicationScoped
 @Fptilbake
@@ -32,7 +32,7 @@ public class TilkjentYtelseReader implements HendelseReader {
     private static final Logger logger = LoggerFactory.getLogger(TilkjentYtelseReader.class);
 
     private TilkjentYtelseMeldingConsumer meldingConsumer;
-    private ProsessTaskRepository prosessTaskRepository;
+    private ProsessTaskTjeneste taskTjeneste;
 
     TilkjentYtelseReader() {
         // CDI
@@ -40,9 +40,9 @@ public class TilkjentYtelseReader implements HendelseReader {
 
     @Inject
     public TilkjentYtelseReader(TilkjentYtelseMeldingConsumer meldingConsumer,
-                                ProsessTaskRepository prosessTaskRepository) {
+                                ProsessTaskTjeneste taskTjeneste) {
         this.meldingConsumer = meldingConsumer;
-        this.prosessTaskRepository = prosessTaskRepository;
+        this.taskTjeneste = taskTjeneste;
     }
 
     @Override
@@ -78,7 +78,7 @@ public class TilkjentYtelseReader implements HendelseReader {
 
     private void lagHåndterHendelseProsessTask(TilkjentYtelseMelding melding) {
         validereMelding(melding);
-        prosessTaskRepository.lagre(lagProsessTaskData(melding));
+        taskTjeneste.lagre(lagProsessTaskData(melding));
     }
 
     private void validereMelding(TilkjentYtelseMelding melding) {
@@ -91,7 +91,7 @@ public class TilkjentYtelseReader implements HendelseReader {
 
     private ProsessTaskData lagProsessTaskData(TilkjentYtelseMelding melding){
         Henvisning henvisning = Henvisning.fraEksternBehandlingId(melding.getBehandlingId());
-        ProsessTaskData td = new ProsessTaskData(HåndterHendelseTask.TASKTYPE);
+        ProsessTaskData td = ProsessTaskData.forProsessTask(HåndterHendelseTask.class);
         td.setAktørId(melding.getAktørId().getId());
         td.setProperty(EKSTERN_BEHANDLING_UUID, melding.getBehandlingUuid().toString());
         td.setProperty(EKSTERN_BEHANDLING_ID, henvisning.getVerdi()); //TODO k9-tilbake fjern når transisjon til henvisning er ferdig

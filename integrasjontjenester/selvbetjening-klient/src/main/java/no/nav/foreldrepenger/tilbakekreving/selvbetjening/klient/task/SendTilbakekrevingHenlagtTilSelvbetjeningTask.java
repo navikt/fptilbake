@@ -13,11 +13,9 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 
 @ApplicationScoped
-@ProsessTask(SendTilbakekrevingHenlagtTilSelvbetjeningTask.TASKTYPE)
+@ProsessTask("send.beskjed.tilbakekreving.henlagt.selvbetjening")
 @FagsakProsesstaskRekkefølge(gruppeSekvens = true)
 public class SendTilbakekrevingHenlagtTilSelvbetjeningTask implements ProsessTaskHandler {
-
-    public static final String TASKTYPE = "send.beskjed.tilbakekreving.henlagt.selvbetjening";
 
     private SelvbetjeningTjeneste selvbetjeningTjeneste;
 

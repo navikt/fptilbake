@@ -15,30 +15,29 @@ import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.DvhEventHend
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
 @ApplicationScoped
-@ProsessTask(MigrerSakshendleserTilDvhTask.TASK_TYPE)
+@ProsessTask("dvh.migrer.sakshendelser")
 public class MigrerSakshendleserTilDvhTask implements ProsessTaskHandler {
     // Den prosess tasken bruker vi for å sende opprettelse og avsluttelse sakshendelser av alle behandlinger til Dvh i PROD.
     // Det brukes kun en gang i PROD så dvh kan motta alle dataene inntil nå. Denne prosess tasken kan gjøres kun manuelt
     // Denne kan utvides for alle andre sakshendler senere ved behov
-    public static final String TASK_TYPE = "dvh.migrer.sakshendelser";
 
     private SakshendelserKafkaProducer kafkaProducer;
     private BehandlingTilstandTjeneste behandlingTilstandTjeneste;
     private BehandlingRepository behandlingRepository;
-    private ProsessTaskRepository taskRepository;
+    private ProsessTaskTjeneste taskTjeneste;
 
     @Inject
     public MigrerSakshendleserTilDvhTask(SakshendelserKafkaProducer kafkaProducer,
                                          BehandlingTilstandTjeneste behandlingTilstandTjeneste,
                                          BehandlingRepository behandlingRepository,
-                                         ProsessTaskRepository taskRepository) {
+                                         ProsessTaskTjeneste taskTjeneste) {
         this.kafkaProducer = kafkaProducer;
         this.behandlingTilstandTjeneste = behandlingTilstandTjeneste;
         this.behandlingRepository = behandlingRepository;
-        this.taskRepository = taskRepository;
+        this.taskTjeneste = taskTjeneste;
     }
 
     @Override
@@ -57,7 +56,7 @@ public class MigrerSakshendleserTilDvhTask implements ProsessTaskHandler {
             behandlingTilstand.setFunksjonellTid(behandling.getAvsluttetDato().atZone(ZoneId.of("UTC")).toOffsetDateTime());
         }
         prosessTaskData.setPayload(BehandlingTilstandMapper.tilJsonString(behandlingTilstand));
-        taskRepository.lagre(prosessTaskData);
+        taskTjeneste.lagre(prosessTaskData);
         kafkaProducer.sendMelding(behandlingTilstand);
     }
 }

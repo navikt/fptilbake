@@ -15,20 +15,19 @@ import org.slf4j.LoggerFactory;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
 
+import no.nav.foreldrepenger.konfig.Environment;
+import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.avstemming.AvstemmingTjeneste;
 import no.nav.vedtak.exception.IntegrasjonException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
-import no.nav.vedtak.konfig.KonfigVerdi;
-import no.nav.vedtak.util.env.Environment;
 
 @ApplicationScoped
-@ProsessTask(AvstemmingBatchTask.BATCHNAVN)
+@ProsessTask(value = "batch.avstemming", cronExpression = "0 55 6 ? * * ")
 public class AvstemmingBatchTask implements ProsessTaskHandler {
 
     private Logger logger = LoggerFactory.getLogger(AvstemmingBatchTask.class);
-    public static final String BATCHNAVN = "batch.avstemming";
 
     private static final DateTimeFormatter DATO_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
     private static final DateTimeFormatter DATO_TIDSPUNKT_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmm");
@@ -58,7 +57,7 @@ public class AvstemmingBatchTask implements ProsessTaskHandler {
 
     @Override
     public void doTask(ProsessTaskData prosessTaskData) {
-        String batchRun = BATCHNAVN + "-" + UUID.randomUUID();
+        String batchRun = this.getClass().getSimpleName() + "-" + UUID.randomUUID();
         LocalDate dato = LocalDate.now().minusDays(1);
         logger.info("Kjører avstemming for {} i batch {}", dato, batchRun);
 

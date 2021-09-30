@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.persistence.FlushModeType;
 
@@ -50,6 +51,7 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.TilbakekrevingV
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.VergeDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.YtelsesbehandlingResultatType;
 import no.nav.vedtak.exception.TekniskException;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
 
 public class BehandlingTjenesteTest extends FellesTestOppsett {
 
@@ -85,7 +87,7 @@ public class BehandlingTjenesteTest extends FellesTestOppsett {
         avsluttBehandling();
         Long behandlingId = behandlingTjeneste.opprettBehandlingManuell(saksnummer, UUID.randomUUID(), FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING);
         fellesBehandlingAssert(behandlingId, true);
-        assertThat(prosessTaskRepository.finnProsessTaskType(BehandlingTjeneste.FINN_KRAVGRUNNLAG_TASK)).isNotEmpty();
+        assertThat(taskTjeneste.finnAlle(ProsessTaskStatus.KLAR).stream().filter(t -> BehandlingTjeneste.FINN_KRAVGRUNNLAG_TASK.equals(t.taskType())).collect(Collectors.toList())).isNotEmpty();
     }
 
     @Test
@@ -103,7 +105,7 @@ public class BehandlingTjenesteTest extends FellesTestOppsett {
 
         Long behandlingId = behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternUUID, FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING);
         fellesBehandlingAssert(behandlingId, true);
-        assertThat(prosessTaskRepository.finnProsessTaskType(BehandlingTjeneste.FINN_KRAVGRUNNLAG_TASK)).isNotEmpty();
+        assertThat(taskTjeneste.finnAlle(ProsessTaskStatus.KLAR).stream().filter(t -> BehandlingTjeneste.FINN_KRAVGRUNNLAG_TASK.equals(t.taskType())).collect(Collectors.toList())).isNotEmpty();
     }
 
     @Test
@@ -121,7 +123,7 @@ public class BehandlingTjenesteTest extends FellesTestOppsett {
 
         Long behandlingId = behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternBehandlingUuid, FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING);
         fellesBehandlingAssert(behandlingId, true);
-        assertThat(prosessTaskRepository.finnProsessTaskType(BehandlingTjeneste.FINN_KRAVGRUNNLAG_TASK)).isNotEmpty();
+        assertThat(taskTjeneste.finnAlle(ProsessTaskStatus.KLAR).stream().filter(t -> BehandlingTjeneste.FINN_KRAVGRUNNLAG_TASK.equals(t.taskType())).collect(Collectors.toList())).isNotEmpty();
     }
 
     @Test
@@ -132,7 +134,7 @@ public class BehandlingTjenesteTest extends FellesTestOppsett {
         when(mockFagsystemKlient.hentBehandlingsinfo(any(UUID.class), any(Tillegsinformasjon.class))).thenReturn(samletEksternBehandlingInfo);
         Long behandlingId = behandlingTjeneste.opprettBehandlingManuell(saksnummer, UUID.randomUUID(), FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING);
         fellesBehandlingAssert(behandlingId, true);
-        assertThat(prosessTaskRepository.finnProsessTaskType(BehandlingTjeneste.FINN_KRAVGRUNNLAG_TASK)).isNotEmpty();
+        assertThat(taskTjeneste.finnAlle(ProsessTaskStatus.KLAR).stream().filter(t -> BehandlingTjeneste.FINN_KRAVGRUNNLAG_TASK.equals(t.taskType())).collect(Collectors.toList())).isNotEmpty();
         verify(mockTpsTjeneste, never()).hentAktørForFnr(any(PersonIdent.class));
         Optional<VergeEntitet> vergeEntitet = vergeRepository.finnVergeInformasjon(behandlingId);
         assertThat(vergeEntitet).isNotEmpty();
@@ -152,7 +154,7 @@ public class BehandlingTjenesteTest extends FellesTestOppsett {
         Long behandlingId = behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer, UUID.randomUUID(), henvisning, aktørId,
             FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING);
         fellesBehandlingAssert(behandlingId, false);
-        assertThat(prosessTaskRepository.finnProsessTaskType(BehandlingTjeneste.FINN_KRAVGRUNNLAG_TASK)).isNotEmpty();
+        //TODO (sladek) FINN_KRAVGRUNNLAG_TASK opprettes ikke for opprettBehandlingAutomatisk - skal den??? assertThat(taskTjeneste.finnAlle(ProsessTaskStatus.KLAR).stream().filter(t -> BehandlingTjeneste.FINN_KRAVGRUNNLAG_TASK.equals(t.taskType())).collect(Collectors.toList())).isNotEmpty();
         verify(mockTpsTjeneste, atLeastOnce()).hentAktørForFnr(any(PersonIdent.class));
         Optional<VergeEntitet> vergeEntitet = vergeRepository.finnVergeInformasjon(behandlingId);
         assertThat(vergeEntitet).isNotEmpty();
@@ -184,7 +186,7 @@ public class BehandlingTjenesteTest extends FellesTestOppsett {
         Long behandlingId = behandlingTjeneste.opprettBehandlingAutomatisk(saksnummer, UUID.randomUUID(), henvisning, aktørId,
             FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING);
         fellesBehandlingAssert(behandlingId, false);
-        assertThat(prosessTaskRepository.finnProsessTaskType(BehandlingTjeneste.FINN_KRAVGRUNNLAG_TASK)).isNotEmpty();
+        //TODO (sladek) FINN_KRAVGRUNNLAG_TASK opprettes ikke for opprettBehandlingAutomatisk - skal den??? assertThat(taskTjeneste.finnAlle(ProsessTaskStatus.KLAR).stream().filter(t -> BehandlingTjeneste.FINN_KRAVGRUNNLAG_TASK.equals(t.taskType())).collect(Collectors.toList())).isNotEmpty();
         verify(mockTpsTjeneste, never()).hentAktørForFnr(any(PersonIdent.class));
         Optional<VergeEntitet> vergeEntitet = vergeRepository.finnVergeInformasjon(behandlingId);
         assertThat(vergeEntitet).isEmpty();

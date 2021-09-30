@@ -20,11 +20,9 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @ApplicationScoped
-@ProsessTask(TvingHenlegglBehandlingTask.TASKTYPE)
+@ProsessTask("behandlingskontroll.tvingHenleggBehandling")
 @FagsakProsesstaskRekkefølge(gruppeSekvens = true)
 public class TvingHenlegglBehandlingTask implements ProsessTaskHandler {
-
-    public static final String TASKTYPE = "behandlingskontroll.tvingHenleggBehandling";
 
     private BehandlingRepository behandlingRepository;
     private EksternBehandlingRepository eksternBehandlingRepository;

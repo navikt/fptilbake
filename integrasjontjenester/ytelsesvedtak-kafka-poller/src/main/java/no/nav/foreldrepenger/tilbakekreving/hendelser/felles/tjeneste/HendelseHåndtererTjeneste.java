@@ -15,14 +15,14 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.tilbakekrevingsvalg
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.TilbakekrevingValgDto;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskRepository;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
 @ApplicationScoped
 public class HendelseHåndtererTjeneste {
 
     private static final Logger logger = LoggerFactory.getLogger(HendelseHåndtererTjeneste.class);
 
-    private ProsessTaskRepository taskRepository;
+    private ProsessTaskTjeneste taskTjeneste;
     private FagsystemKlient fagsystemKlient;
 
     HendelseHåndtererTjeneste() {
@@ -30,8 +30,8 @@ public class HendelseHåndtererTjeneste {
     }
 
     @Inject
-    public HendelseHåndtererTjeneste(ProsessTaskRepository taskRepository, FagsystemKlient fagsystemKlient) {
-        this.taskRepository = taskRepository;
+    public HendelseHåndtererTjeneste(ProsessTaskTjeneste taskTjeneste, FagsystemKlient fagsystemKlient) {
+        this.taskTjeneste = taskTjeneste;
         this.fagsystemKlient = fagsystemKlient;
     }
 
@@ -69,6 +69,6 @@ public class HendelseHåndtererTjeneste {
         taskData.setFagsakYtelseType(hendelseTaskDataWrapper.getFagsakYtelseType());
         taskData.setBehandlingType(BehandlingType.TILBAKEKREVING);
 
-        taskRepository.lagre(taskData.getProsessTaskData());
+        taskTjeneste.lagre(taskData.getProsessTaskData());
     }
 }
