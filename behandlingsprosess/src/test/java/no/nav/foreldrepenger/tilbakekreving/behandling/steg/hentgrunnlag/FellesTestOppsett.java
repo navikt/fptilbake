@@ -22,6 +22,7 @@ import javax.persistence.FlushModeType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 
 import com.google.common.collect.Lists;
 
@@ -68,8 +69,6 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.TaskType;
 import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskEventPubliserer;
-import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepositoryImpl;
-import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskTjenesteImpl;
 
 @ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public abstract class FellesTestOppsett {
@@ -121,7 +120,7 @@ public abstract class FellesTestOppsett {
         behandlingRepository = repositoryProvider.getBehandlingRepository();
         fagsakRepository = repositoryProvider.getFagsakRepository();
         grunnlagRepository = repositoryProvider.getGrunnlagRepository();
-        taskTjeneste = new ProsessTaskTjenesteImpl(new ProsessTaskRepositoryImpl(entityManager, null, eventPublisererMock));
+        taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
         mottattXmlRepository = new ØkonomiMottattXmlRepository(entityManager);
         eksternBehandlingRepository = new EksternBehandlingRepository(entityManager);
         FellesQueriesForBehandlingRepositories fellesQueriesForBehandlingRepositories = new FellesQueriesForBehandlingRepositories(

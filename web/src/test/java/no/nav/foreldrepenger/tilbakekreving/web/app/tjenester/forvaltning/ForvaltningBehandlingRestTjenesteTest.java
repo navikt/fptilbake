@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
@@ -21,6 +23,8 @@ import javax.ws.rs.core.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 
 import com.google.common.collect.Lists;
 
@@ -71,11 +75,8 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.dto.Ko
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiSendtXmlRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.TaskType;
-import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepositoryImpl;
-import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskTjenesteImpl;
 
 @ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public class ForvaltningBehandlingRestTjenesteTest {
@@ -97,7 +98,7 @@ public class ForvaltningBehandlingRestTjenesteTest {
 
     @BeforeEach
     public void setup(EntityManager entityManager) {
-        taskTjeneste = new ProsessTaskTjenesteImpl(new ProsessTaskRepositoryImpl(entityManager, null, null));
+        taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
         repositoryProvider = new BehandlingRepositoryProvider(entityManager);
         fagsakRepository = repositoryProvider.getFagsakRepository();
         behandlingRepository = repositoryProvider.getBehandlingRepository();
@@ -380,12 +381,10 @@ public class ForvaltningBehandlingRestTjenesteTest {
     }
 
     private ProsessTaskData assertProsessTask(TaskType taskType) {
-        List<ProsessTaskData> prosessTasker = taskTjeneste.finnAlle(ProsessTaskStatus.FERDIG,
-            ProsessTaskStatus.KLAR);
-        assertThat(prosessTasker).isNotEmpty();
-        assertThat(prosessTasker.size()).isEqualTo(1);
-        ProsessTaskData prosessTaskData = prosessTasker.get(0);
-        assertThat(prosessTasker.get(0).taskType()).isEqualTo(taskType);
+        var captor = ArgumentCaptor.forClass(ProsessTaskData.class);
+        verify(taskTjeneste, times(1)).lagre(captor.capture());
+        var prosessTaskData = captor.getValue();
+        assertThat(prosessTaskData.taskType()).isEqualTo(taskType);
         return prosessTaskData;
     }
 

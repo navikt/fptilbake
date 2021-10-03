@@ -25,8 +25,6 @@ import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.BehandlingTi
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.DvhEventHendelse;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
-import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepositoryImpl;
-import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskTjenesteImpl;
 
 @ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public class MigrerSakshendleserTilDvhTaskTest {
@@ -42,7 +40,7 @@ public class MigrerSakshendleserTilDvhTaskTest {
         BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(
             entityManager);
         BehandlingRepository behandlingRepository = repositoryProvider.getBehandlingRepository();
-        ProsessTaskTjeneste taskTjeneste = new ProsessTaskTjenesteImpl(new ProsessTaskRepositoryImpl(entityManager, null, null));
+        ProsessTaskTjeneste taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
         BehandlingTilstandTjeneste tilstandTjeneste = new BehandlingTilstandTjeneste(repositoryProvider);
         kafkaProducerMock = Mockito.mock(SakshendelserKafkaProducer.class);
         manueltSendSakshendleserTilDvhTask = new MigrerSakshendleserTilDvhTask(kafkaProducerMock, tilstandTjeneste,

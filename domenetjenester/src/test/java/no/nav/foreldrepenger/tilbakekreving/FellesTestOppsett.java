@@ -14,6 +14,7 @@ import java.util.UUID;
 import javax.persistence.EntityManager;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.mockito.Mockito;
 
 import com.google.common.collect.Lists;
 
@@ -69,8 +70,6 @@ import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkInnslagKonver
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
-import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepositoryImpl;
-import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskTjenesteImpl;
 
 /**
  * Opprettet for å forenkle unit-tester
@@ -160,7 +159,7 @@ public abstract class FellesTestOppsett {
         totrinnRepository = new TotrinnRepository(entityManager);
         behandlingRepository = repoProvider.getBehandlingRepository();
         varselRepository = repoProvider.getVarselRepository();
-        taskTjeneste = new ProsessTaskTjenesteImpl(new ProsessTaskRepositoryImpl(entityManager, null, null));
+        taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
         kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repoProvider, gjenopptaBehandlingTjeneste, behandlingskontrollTjeneste, mockSlettGrunnlagEventPubliserer);
         kravgrunnlagBeregningTjeneste = new KravgrunnlagBeregningTjeneste(grunnlagRepository);
         historikkInnslagKonverter = new HistorikkInnslagKonverter(repoProvider.getAksjonspunktRepository(),

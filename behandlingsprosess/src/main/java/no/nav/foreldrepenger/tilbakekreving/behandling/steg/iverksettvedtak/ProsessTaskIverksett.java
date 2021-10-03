@@ -38,20 +38,19 @@ public class ProsessTaskIverksett {
         taskGruppe.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         taskGruppe.setCallIdFraEksisterende();
 
-        taskTjeneste.lagre(taskGruppe);
-
         if (SelvbetjeningTilbakekrevingStøtte.harStøtteFor(behandling) && brevSporingRepository.harVarselBrevSendtForBehandlingId(behandling.getId())) {
             ProsessTaskData selvbetjeningTask = ProsessTaskData.forProsessTask(SendVedtakFattetTilSelvbetjeningTask.class);
             selvbetjeningTask.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
-            taskTjeneste.lagre(selvbetjeningTask);
+            taskGruppe.addNesteSekvensiell(selvbetjeningTask);
         }
-        opprettDvhProsessTask(behandling);
+        opprettDvhProsessTask(behandling, taskGruppe);
+        taskTjeneste.lagre(taskGruppe);
     }
 
-    private void opprettDvhProsessTask(Behandling behandling) {
+    private void opprettDvhProsessTask(Behandling behandling, ProsessTaskGruppe taskGruppe) {
         ProsessTaskData dvhProsessTaskData = ProsessTaskData.forProsessTask(SendVedtakHendelserTilDvhTask.class);
         dvhProsessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
-        taskTjeneste.lagre(dvhProsessTaskData);
+        taskGruppe.addNesteSekvensiell(dvhProsessTaskData);
     }
 
 }

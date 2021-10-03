@@ -2,6 +2,8 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.steg.iverksettvedtak;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -14,6 +16,7 @@ import javax.persistence.FlushModeType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandleStegResultat;
@@ -43,13 +46,9 @@ import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwar
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.task.SendVedtakFattetTilSelvbetjeningTask;
 import no.nav.vedtak.exception.TekniskException;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.TaskType;
-import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskEventPubliserer;
-import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepositoryImpl;
-import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskTjenesteImpl;
 
 @ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public class IverksetteVedtakStegTest {
@@ -71,7 +70,7 @@ public class IverksetteVedtakStegTest {
     public void setup(EntityManager entityManager) {
         this.entityManager = entityManager;
         repoProvider = new BehandlingRepositoryProvider(entityManager);
-        taskTjeneste = new ProsessTaskTjenesteImpl(new ProsessTaskRepositoryImpl(entityManager, null, Mockito.mock(ProsessTaskEventPubliserer.class)));
+        taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
         brevSporingRepository = new BrevSporingRepository(entityManager);
         var prosessTaskIverksett = new ProsessTaskIverksett(taskTjeneste,
             brevSporingRepository);
@@ -108,8 +107,9 @@ public class IverksetteVedtakStegTest {
         assertThat(stegResultat.getTransisjon()).isEqualTo(FellesTransisjoner.SETT_PÅ_VENT);
         assertBehandlingVedtak(behandling);
 
-        List<ProsessTaskData> tasker = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
-        assertThat(tasker.size()).isEqualTo(5);
+        var captor = ArgumentCaptor.forClass(ProsessTaskGruppe.class);
+        verify(taskTjeneste, times(1)).lagre(captor.capture());
+        var tasker = captor.getValue().getTasks().stream().map(ProsessTaskGruppe.Entry::task).toList();
         assertThat(tasker.get(0).taskType()).isEqualTo(TaskType.forProsessTask(SendØkonomiTibakekerevingsVedtakTask.class));
         assertThat(tasker.get(1).taskType()).isEqualTo(TaskType.forProsessTask(SendVedtaksbrevTask.class));
         assertThat(tasker.get(2).taskType()).isEqualTo(TaskType.forProsessTask(AvsluttBehandlingTask.class));
@@ -134,7 +134,9 @@ public class IverksetteVedtakStegTest {
         assertThat(stegResultat.getTransisjon()).isEqualTo(FellesTransisjoner.SETT_PÅ_VENT);
         assertBehandlingVedtak(revurdering);
 
-        List<ProsessTaskData> tasker = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
+        var captor = ArgumentCaptor.forClass(ProsessTaskGruppe.class);
+        verify(taskTjeneste, times(1)).lagre(captor.capture());
+        var tasker = captor.getValue().getTasks().stream().map(ProsessTaskGruppe.Entry::task).toList();
         assertThat(tasker.size()).isEqualTo(3);
         assertThat(tasker.get(0).taskType()).isEqualTo(TaskType.forProsessTask(SendØkonomiTibakekerevingsVedtakTask.class));
         assertThat(tasker.get(1).taskType()).isEqualTo(TaskType.forProsessTask(AvsluttBehandlingTask.class));
@@ -157,7 +159,9 @@ public class IverksetteVedtakStegTest {
         assertThat(stegResultat.getTransisjon()).isEqualTo(FellesTransisjoner.SETT_PÅ_VENT);
         assertBehandlingVedtak(revurdering);
 
-        List<ProsessTaskData> tasker = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
+        var captor = ArgumentCaptor.forClass(ProsessTaskGruppe.class);
+        verify(taskTjeneste, times(1)).lagre(captor.capture());
+        var tasker = captor.getValue().getTasks().stream().map(ProsessTaskGruppe.Entry::task).toList();
         assertThat(tasker.size()).isEqualTo(4);
         assertThat(tasker.get(0).taskType()).isEqualTo(TaskType.forProsessTask(SendØkonomiTibakekerevingsVedtakTask.class));
         assertThat(tasker.get(1).taskType()).isEqualTo(TaskType.forProsessTask(SendVedtaksbrevTask.class));

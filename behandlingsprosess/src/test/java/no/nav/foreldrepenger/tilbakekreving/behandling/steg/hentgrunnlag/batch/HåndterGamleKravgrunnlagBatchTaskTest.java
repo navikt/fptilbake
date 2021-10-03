@@ -1,6 +1,9 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.batch;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -14,7 +17,6 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 import java.util.Objects;
 
 import javax.persistence.EntityManager;
@@ -23,15 +25,14 @@ import javax.persistence.FlushModeType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.TaskType;
-import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepositoryImpl;
-import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskTjenesteImpl;
 
 @ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public class HåndterGamleKravgrunnlagBatchTaskTest {
@@ -47,7 +48,7 @@ public class HåndterGamleKravgrunnlagBatchTaskTest {
         entityManager.setFlushMode(FlushModeType.AUTO);
         mottattXmlRepository = new ØkonomiMottattXmlRepository(entityManager);
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML());
-        taskTjeneste = new ProsessTaskTjenesteImpl(new ProsessTaskRepositoryImpl(entityManager, null, null));
+        taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
         gamleKravgrunnlagBatchTjeneste = new HåndterGamleKravgrunnlagBatchTask(mottattXmlRepository,
             taskTjeneste, clock, Period.ofWeeks(-1));
     }
@@ -58,7 +59,7 @@ public class HåndterGamleKravgrunnlagBatchTaskTest {
         HåndterGamleKravgrunnlagBatchTask gamleKravgrunnlagBatchTjeneste = new HåndterGamleKravgrunnlagBatchTask(mottattXmlRepository,
             taskTjeneste, clock, Period.ofWeeks(-1));
         gamleKravgrunnlagBatchTjeneste.doTask(lagProsessTaskData());
-        assertThat(taskTjeneste.finnAlle(ProsessTaskStatus.KLAR)).isEmpty();
+        verifyNoInteractions(taskTjeneste);
     }
 
     @Test
@@ -67,13 +68,15 @@ public class HåndterGamleKravgrunnlagBatchTaskTest {
         HåndterGamleKravgrunnlagBatchTask gamleKravgrunnlagBatchTjeneste = new HåndterGamleKravgrunnlagBatchTask(mottattXmlRepository,
             taskTjeneste, clock, Period.ofWeeks(-1));
         gamleKravgrunnlagBatchTjeneste.doTask(lagProsessTaskData());
-        assertThat(taskTjeneste.finnAlle(ProsessTaskStatus.KLAR)).isEmpty();
+        verifyNoInteractions(taskTjeneste);
     }
 
     @Test
     public void skal_kjøre_batch_og_opprette_prosess_task_for_grunnlag(){
         gamleKravgrunnlagBatchTjeneste.doTask(lagProsessTaskData());
-        List<ProsessTaskData> prosessTasker = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
+        var captor = ArgumentCaptor.forClass(ProsessTaskData.class);
+        verify(taskTjeneste, times(1)).lagre(captor.capture());
+        var prosessTasker = captor.getAllValues();
         assertThat(prosessTasker).isNotEmpty().hasSize(1);
         ProsessTaskData prosessTaskData = prosessTasker.get(0);
         assertThat(prosessTaskData.taskType()).isEqualTo(TaskType.forProsessTask(HåndterGamleKravgrunnlagTask.class));

@@ -6,17 +6,20 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 import javax.persistence.FlushModeType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 import com.google.common.collect.Lists;
 
@@ -50,7 +53,6 @@ import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagT
 import no.nav.vedtak.exception.FunksjonellException;
 import no.nav.vedtak.exception.TekniskException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
 
 
 public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
@@ -189,8 +191,7 @@ public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
     public void kan_ikke_sende_henleggelsesbrev_hvis_varselbrev_ikke_sendt() {
         henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), behandlingsresultat);
 
-        List<ProsessTaskData> prosessTaskData = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
-        assertThat(prosessTaskData).isEmpty();
+        verifyNoInteractions(taskTjeneste);
         assertHenleggelse(internBehandlingId);
     }
 
@@ -200,8 +201,7 @@ public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
         henleggBehandlingTjeneste.henleggBehandling(revuderingBehandlingId,
             BehandlingResultatType.HENLAGT_FEILOPPRETTET_UTEN_BREV);
 
-        List<ProsessTaskData> prosessTaskData = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
-        assertThat(prosessTaskData).isEmpty();
+        verifyNoInteractions(taskTjeneste);
         assertHenleggelse(revuderingBehandlingId);
     }
 
@@ -216,7 +216,9 @@ public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
         brevSporingRepository.lagre(henleggelsesBrevsporing);
 
         henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), behandlingsresultat);
-        List<ProsessTaskData> prosessTaskData = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
+        var captor = ArgumentCaptor.forClass(ProsessTaskData.class);
+        verify(taskTjeneste, times(2)).lagre(captor.capture());
+        var prosessTaskData = captor.getAllValues();
         assertThat(prosessTaskData).isNotEmpty();
         assertThat(prosessTaskData.get(0).taskType()).isEqualTo(HenleggBehandlingTjeneste.HENLEGGELSESBREV_TASK_TYPE);
         assertThat(prosessTaskData.get(1).taskType()).isEqualTo(HenleggBehandlingTjeneste.SELVBETJENING_HENLAGT_TASKTYPE);
@@ -229,7 +231,9 @@ public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
         henleggBehandlingTjeneste.henleggBehandling(revuderingBehandlingId,
             BehandlingResultatType.HENLAGT_FEILOPPRETTET_MED_BREV);
 
-        List<ProsessTaskData> prosessTaskData = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
+        var captor = ArgumentCaptor.forClass(ProsessTaskData.class);
+        verify(taskTjeneste, times(1)).lagre(captor.capture());
+        var prosessTaskData = captor.getAllValues();
         assertThat(prosessTaskData).isNotEmpty();
         assertThat(prosessTaskData.get(0).taskType()).isEqualTo(HenleggBehandlingTjeneste.HENLEGGELSESBREV_TASK_TYPE);
         assertHenleggelse(revuderingBehandlingId);
@@ -248,7 +252,9 @@ public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
 
         henleggBehandlingTjeneste.henleggBehandling(revuderingBehandlingId,
             BehandlingResultatType.HENLAGT_FEILOPPRETTET_MED_BREV);
-        List<ProsessTaskData> prosessTaskData = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
+        var captor = ArgumentCaptor.forClass(ProsessTaskData.class);
+        verify(taskTjeneste, times(2)).lagre(captor.capture());
+        var prosessTaskData = captor.getAllValues();
         assertThat(prosessTaskData).isNotEmpty();
         assertThat(prosessTaskData.get(0).taskType()).isEqualTo(HenleggBehandlingTjeneste.HENLEGGELSESBREV_TASK_TYPE);
         assertThat(prosessTaskData.get(1).taskType()).isEqualTo(HenleggBehandlingTjeneste.SELVBETJENING_HENLAGT_TASKTYPE);

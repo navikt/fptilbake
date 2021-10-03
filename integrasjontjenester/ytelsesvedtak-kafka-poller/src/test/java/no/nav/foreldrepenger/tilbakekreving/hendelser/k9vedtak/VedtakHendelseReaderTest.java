@@ -3,25 +3,26 @@ package no.nav.foreldrepenger.tilbakekreving.hendelser.k9vedtak;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 import com.google.common.collect.Lists;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.hendelse.TaskProperties;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
-import no.nav.foreldrepenger.tilbakekreving.hendelser.ProsessTaskTjenesteMock;
 import no.nav.foreldrepenger.tilbakekreving.hendelser.felles.task.HåndterHendelseTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.TaskType;
 
@@ -32,7 +33,7 @@ public class VedtakHendelseReaderTest {
     private static final UUID BEHANDLING_UUID = UUID.randomUUID();
 
     private VedtakHendelseMeldingConsumer meldingConsumerMock = mock(VedtakHendelseMeldingConsumer.class);
-    private ProsessTaskTjeneste taskTjeneste = new ProsessTaskTjenesteMock();
+    private ProsessTaskTjeneste taskTjeneste = mock(ProsessTaskTjeneste.class);
 
     private VedtakHendelseReader vedtakHendelseReader = new VedtakHendelseReader(meldingConsumerMock, taskTjeneste);
 
@@ -40,9 +41,9 @@ public class VedtakHendelseReaderTest {
     public void skal_lese_og_håndtere_k9_vedtak_hendelser() {
         when(meldingConsumerMock.lesMeldinger()).thenReturn(Lists.newArrayList(lagVedtakHendelse()));
         vedtakHendelseReader.hentOgBehandleMeldinger();
-        List<ProsessTaskData> tasker = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
-        assertThat(tasker).isNotEmpty().hasSize(1);
-        ProsessTaskData taskData = tasker.get(0);
+        var captor = ArgumentCaptor.forClass(ProsessTaskData.class);
+        verify(taskTjeneste, times(1)).lagre(captor.capture());
+        var taskData = captor.getValue();
         assertThat(taskData.taskType()).isEqualTo(TaskType.forProsessTask(HåndterHendelseTask.class));
         assertThat(taskData.getAktørId()).isEqualTo(AKTØR_ID);
         assertThat(taskData.getSaksnummer()).isEqualTo(SAKSNUMMER);
@@ -64,8 +65,7 @@ public class VedtakHendelseReaderTest {
         VedtakHendelse vedtakHendelse = lagVedtakHendelse();
         vedtakHendelse.setFagsakYtelseType(FagsakYtelseType.OMSORGSPENGER);
         when(meldingConsumerMock.lesMeldinger()).thenReturn(Lists.newArrayList(vedtakHendelse));
-        List<ProsessTaskData> tasker = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
-        assertThat(tasker).isEmpty();
+        verifyNoInteractions(taskTjeneste);
     }
 
     @Test
@@ -73,8 +73,7 @@ public class VedtakHendelseReaderTest {
         VedtakHendelse vedtakHendelse = lagVedtakHendelse();
         vedtakHendelse.setVedtattTidspunkt(LocalDateTime.of(LocalDate.of(2020, 10, 5), LocalTime.MIDNIGHT));
         when(meldingConsumerMock.lesMeldinger()).thenReturn(Lists.newArrayList(vedtakHendelse));
-        List<ProsessTaskData> tasker = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
-        assertThat(tasker).isEmpty();
+        verifyNoInteractions(taskTjeneste);
     }
 
     public VedtakHendelse lagVedtakHendelse() {

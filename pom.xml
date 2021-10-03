@@ -35,14 +35,14 @@
 
         <!-- Felles avhengigheter i prosjektet Disse skal ALLTID være en
             RELEASE-avhengighet UNNTAK: feature-brancher og lokalt -->
-        <felles.version>4.0.9</felles.version>
-        <prosesstask.version>3.0.4</prosesstask.version>
+        <felles.version>4.0.10</felles.version>
+        <prosesstask.version>3.0.6</prosesstask.version>
         <fp-tidsserie.version>2.5.7</fp-tidsserie.version>
         <fpkontrakter.version>6.0.4</fpkontrakter.version>
         <fp-jms.version>2.0.22</fp-jms.version>
 
         <surefire.version>2.22.2</surefire.version>
-        <metrics.version>4.2.3</metrics.version>
+        <metrics.version>4.2.4</metrics.version>
         <prometheus.version>0.12.0</prometheus.version>
         <geronimo.jaspi.version>2.0.0</geronimo.jaspi.version>
         <geronimo.osgi.version>1.1</geronimo.osgi.version>
@@ -100,6 +100,7 @@
                 <artifactId>commons-codec</artifactId>
                 <version>1.15</version>
             </dependency>
+            <!-- Mens man venter på jetty10.0.7 - eta 11/10-21 -->
             <dependency>
                 <groupId>org.ow2.asm</groupId>
                 <artifactId>asm</artifactId>
@@ -591,16 +592,6 @@
                 <artifactId>jakarta.el</artifactId>
                 <version>3.0.3</version>
             </dependency>
-            <dependency>
-                <groupId>org.jboss</groupId>
-                <artifactId>jandex</artifactId>
-                <version>2.4.0.Final</version>
-            </dependency>
-            <dependency>
-                <groupId>io.github.classgraph</groupId>
-                <artifactId>classgraph</artifactId>
-                <version>4.8.117</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -628,6 +619,7 @@
                         <compilerArgs>
                             <arg>-parameters</arg>
                         </compilerArgs>
+                        <release>${java.version}</release>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -771,7 +763,7 @@
             <plugin>
                 <groupId>org.jboss.jandex</groupId>
                 <artifactId>jandex-maven-plugin</artifactId>
-                <version>1.2.0</version>
+                <version>1.1.1</version>
                 <executions>
                     <execution>
                         <id>make-index</id>

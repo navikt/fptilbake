@@ -3,6 +3,8 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.steg.automatisksaksbehan
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
@@ -20,6 +22,7 @@ import javax.persistence.FlushModeType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import com.google.common.collect.Lists;
@@ -92,11 +95,9 @@ import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkInnslagKonver
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
 import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.TaskType;
-import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepositoryImpl;
-import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskTjenesteImpl;
 
 @ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public class AutomatiskSaksbehandlingProsessTaskTest {
@@ -128,7 +129,7 @@ public class AutomatiskSaksbehandlingProsessTaskTest {
         AksjonspunktRepository aksjonspunktRepository = repositoryProvider.getAksjonspunktRepository();
         totrinnRepository = new TotrinnRepository(entityManager);
         VarselresponsRepository varselresponsRepository = new VarselresponsRepository(entityManager);
-        taskTjeneste = new ProsessTaskTjenesteImpl(new ProsessTaskRepositoryImpl(entityManager, null, null));
+        taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
         FellesQueriesForBehandlingRepositories fellesQueriesForBehandlingRepositories = new FellesQueriesForBehandlingRepositories(
             entityManager);
         BehandlingVenterRepository behandlingVenterRepository = new BehandlingVenterRepository(
@@ -203,7 +204,9 @@ public class AutomatiskSaksbehandlingProsessTaskTest {
         assertThat(behandling.getAnsvarligBeslutter()).isEqualTo("VL");
         assertThat(behandling.getStatus()).isEqualByComparingTo(BehandlingStatus.IVERKSETTER_VEDTAK);
 
-        List<ProsessTaskData> prosessTasker = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
+        var captor = ArgumentCaptor.forClass(ProsessTaskGruppe.class);
+        verify(taskTjeneste, times(1)).lagre(captor.capture());
+        var prosessTasker = captor.getValue().getTasks().stream().map(ProsessTaskGruppe.Entry::task).toList();
         assertThat(prosessTasker.size()).isEqualTo(3);
         List<TaskType> prosessTaskNavn = prosessTasker.stream()
             .map(ProsessTaskData::taskType)

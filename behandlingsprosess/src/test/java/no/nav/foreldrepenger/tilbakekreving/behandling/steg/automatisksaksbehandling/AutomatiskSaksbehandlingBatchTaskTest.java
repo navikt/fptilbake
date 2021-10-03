@@ -1,6 +1,9 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.automatisksaksbehandling;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import java.math.BigDecimal;
 import java.time.Clock;
@@ -10,7 +13,6 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.FlushModeType;
@@ -18,6 +20,8 @@ import javax.persistence.FlushModeType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegStatus;
@@ -43,10 +47,7 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
-import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepositoryImpl;
-import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskTjenesteImpl;
 
 @ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public class AutomatiskSaksbehandlingBatchTaskTest {
@@ -68,7 +69,7 @@ public class AutomatiskSaksbehandlingBatchTaskTest {
         scenarioSimple.leggTilAksjonspunkt(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING, BehandlingStegType.FAKTA_FEILUTBETALING);
         repositoryProvider = new BehandlingRepositoryProvider(entityManager);
         InternalManipulerBehandling manipulerBehandling = new InternalManipulerBehandling(repositoryProvider);
-        taskTjeneste = new ProsessTaskTjenesteImpl(new ProsessTaskRepositoryImpl(entityManager, null, null));
+        taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
         automatiskSaksbehandlingRepository = new AutomatiskSaksbehandlingRepository(entityManager);
         automatiskSaksbehandlingBatchTask = new AutomatiskSaksbehandlingBatchTask(taskTjeneste, automatiskSaksbehandlingRepository, clock, Period.ofWeeks(-1));
         behandling = scenarioSimple.medBehandlingType(BehandlingType.TILBAKEKREVING).lagre(repositoryProvider);
@@ -80,7 +81,9 @@ public class AutomatiskSaksbehandlingBatchTaskTest {
     @Test
     public void skal_opprette_prosess_task_for_å_saksbehandle_behandling_automatisk() {
         automatiskSaksbehandlingBatchTask.doTask(lagProsessTaskData());
-        List<ProsessTaskData> prosessTasker = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
+        var captor = ArgumentCaptor.forClass(ProsessTaskData.class);
+        verify(taskTjeneste, times(1)).lagre(captor.capture());
+        var prosessTasker = captor.getAllValues();
         assertThat(prosessTasker.size()).isEqualTo(1);
         ProsessTaskData prosessTaskData = prosessTasker.get(0);
         assertThat(Long.valueOf(prosessTaskData.getBehandlingId())).isEqualTo(behandling.getId());
@@ -93,8 +96,7 @@ public class AutomatiskSaksbehandlingBatchTaskTest {
         AutomatiskSaksbehandlingBatchTask automatiskSaksbehandlingBatchTask = new AutomatiskSaksbehandlingBatchTask(taskTjeneste, automatiskSaksbehandlingRepository, helgeClock, Period.ofWeeks(-1));
 
         automatiskSaksbehandlingBatchTask.doTask(lagProsessTaskData());
-        List<ProsessTaskData> prosessTasker = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
-        assertThat(prosessTasker).isEmpty();
+        verifyNoInteractions(taskTjeneste);
     }
 
     @Test
@@ -103,8 +105,7 @@ public class AutomatiskSaksbehandlingBatchTaskTest {
         AutomatiskSaksbehandlingBatchTask automatiskSaksbehandlingBatchTask = new AutomatiskSaksbehandlingBatchTask(taskTjeneste, automatiskSaksbehandlingRepository, helgeClock, Period.ofWeeks(-1));
 
         automatiskSaksbehandlingBatchTask.doTask(lagProsessTaskData());
-        List<ProsessTaskData> prosessTasker = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
-        assertThat(prosessTasker).isEmpty();
+        verifyNoInteractions(taskTjeneste);
     }
 
     @Test
@@ -112,8 +113,7 @@ public class AutomatiskSaksbehandlingBatchTaskTest {
         lagKravgrunnlag(behandling.getId(), BigDecimal.valueOf(1500L), behandling.getFagsak().getSaksnummer().getVerdi(), 123L);
 
         automatiskSaksbehandlingBatchTask.doTask(lagProsessTaskData());
-        List<ProsessTaskData> prosessTasker = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
-        assertThat(prosessTasker).isEmpty();
+        verifyNoInteractions(taskTjeneste);
     }
 
     @Test
@@ -121,8 +121,7 @@ public class AutomatiskSaksbehandlingBatchTaskTest {
         behandling.avsluttBehandling();
 
         automatiskSaksbehandlingBatchTask.doTask(lagProsessTaskData());
-        List<ProsessTaskData> prosessTasker = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
-        assertThat(prosessTasker).isEmpty();
+        verifyNoInteractions(taskTjeneste);
     }
 
     @Test
@@ -130,8 +129,7 @@ public class AutomatiskSaksbehandlingBatchTaskTest {
         behandling.setAnsvarligSaksbehandler("124");
 
         automatiskSaksbehandlingBatchTask.doTask(lagProsessTaskData());
-        List<ProsessTaskData> prosessTasker = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
-        assertThat(prosessTasker).isEmpty();
+        verifyNoInteractions(taskTjeneste);
     }
 
     @Test
@@ -139,8 +137,7 @@ public class AutomatiskSaksbehandlingBatchTaskTest {
         repositoryProvider.getAksjonspunktRepository().leggTilAksjonspunkt(behandling,AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG,BehandlingStegType.FAKTA_FEILUTBETALING);
 
         automatiskSaksbehandlingBatchTask.doTask(lagProsessTaskData());
-        List<ProsessTaskData> prosessTasker = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
-        assertThat(prosessTasker).isEmpty();
+        verifyNoInteractions(taskTjeneste);
     }
 
     @Test
@@ -154,8 +151,7 @@ public class AutomatiskSaksbehandlingBatchTaskTest {
         repositoryProvider.getBrevSporingRepository().lagre(brevSporing);
 
         automatiskSaksbehandlingBatchTask.doTask(lagProsessTaskData());
-        List<ProsessTaskData> prosessTasker = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
-        assertThat(prosessTasker).isEmpty();
+        verifyNoInteractions(taskTjeneste);
     }
 
     private String getDateString() {
