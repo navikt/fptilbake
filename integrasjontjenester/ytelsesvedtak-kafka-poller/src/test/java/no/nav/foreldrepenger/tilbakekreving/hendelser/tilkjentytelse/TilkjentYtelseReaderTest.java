@@ -5,23 +5,22 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.hendelse.HendelseTaskDataWrapper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
-import no.nav.foreldrepenger.tilbakekreving.hendelser.ProsessTaskTjenesteMock;
 import no.nav.foreldrepenger.tilbakekreving.kafka.poller.PostTransactionHandler;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
 public class TilkjentYtelseReaderTest {
@@ -32,7 +31,7 @@ public class TilkjentYtelseReaderTest {
     private static final Henvisning HENVISNING = Henvisning.fraEksternBehandlingId(EKSTERN_BEHANDLING_ID);
 
     private TilkjentYtelseMeldingConsumer meldingConsumer = mock(TilkjentYtelseMeldingConsumer.class);
-    private ProsessTaskTjeneste taskTjeneste = new ProsessTaskTjenesteMock();
+    private ProsessTaskTjeneste taskTjeneste = mock(ProsessTaskTjeneste.class);
     private TilkjentYtelseReader tilkjentYtelseReader = new TilkjentYtelseReader(meldingConsumer, taskTjeneste);
 
     @Test
@@ -45,9 +44,9 @@ public class TilkjentYtelseReaderTest {
         tilkjentYtelseReader.hentOgBehandleMeldinger();
 
         //Assert
-        List<ProsessTaskData> prosessTaskDataList = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
-        assertThat(prosessTaskDataList).hasSize(1);
-        ProsessTaskData prosessTaskData = prosessTaskDataList.get(0);
+        var captor = ArgumentCaptor.forClass(ProsessTaskData.class);
+        verify(taskTjeneste, times(1)).lagre(captor.capture());
+        var prosessTaskData = captor.getValue();
 
         HendelseTaskDataWrapper taskDataWrapper = new HendelseTaskDataWrapper(prosessTaskData);
         assertThat(taskDataWrapper.getHenvisning()).isEqualTo(HENVISNING);
@@ -78,8 +77,7 @@ public class TilkjentYtelseReaderTest {
         tilkjentYtelseReader.hentOgBehandleMeldinger();
 
         //Assert
-        List<ProsessTaskData> prosessTaskDataList = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
-        assertThat(prosessTaskDataList).isEmpty();
+        verifyNoInteractions(taskTjeneste);
         verify(meldingConsumer, never()).manualCommitSync();
     }
 

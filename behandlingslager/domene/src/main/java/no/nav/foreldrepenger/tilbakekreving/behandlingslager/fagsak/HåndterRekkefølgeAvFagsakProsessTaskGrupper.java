@@ -4,11 +4,8 @@ import java.time.Instant;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.Dependent;
-import javax.enterprise.inject.spi.CDI;
 import javax.inject.Inject;
 
-import org.jboss.weld.interceptor.util.proxy.TargetInstanceProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,19 +99,16 @@ public class HåndterRekkefølgeAvFagsakProsessTaskGrupper implements ProsessTas
         return gruppeSekvensNr;
     }
 
-    private static class LocalProsessTaskHandlerRef implements AutoCloseable {
-
-        private ProsessTaskHandler localBean;
+    private static class LocalProsessTaskHandlerRef extends ProsessTaskHandlerRef {
 
         private LocalProsessTaskHandlerRef(ProsessTaskHandler bean) {
-            this.localBean = bean;
+            super(bean);
         }
 
         private FagsakProsesstaskRekkefølge getFagsakProsesstaskRekkefølge() {
-            Class<?> clazz = (localBean instanceof TargetInstanceProxy<?> tip && !localBean.getClass().isAnnotationPresent(FagsakProsesstaskRekkefølge.class)) ?
-                tip.weld_getTargetInstance().getClass() : localBean.getClass();
-            if (clazz == null || !clazz.isAnnotationPresent(FagsakProsesstaskRekkefølge.class)) {
-                throw new UnsupportedOperationException(clazz != null ? clazz.getSimpleName() : "ukjent klasse" + " må være annotert med "
+            Class<?> clazz = getTargetClassExpectingAnnotation(FagsakProsesstaskRekkefølge.class);
+            if (!clazz.isAnnotationPresent(FagsakProsesstaskRekkefølge.class)) {
+                throw new UnsupportedOperationException(clazz.getSimpleName() + " må være annotert med "
                     + FagsakProsesstaskRekkefølge.class.getSimpleName() + " for å kobles til en Fagsak");
             }
             return clazz.getAnnotation(FagsakProsesstaskRekkefølge.class);
@@ -125,14 +119,5 @@ public class HåndterRekkefølgeAvFagsakProsessTaskGrupper implements ProsessTas
             return new LocalProsessTaskHandlerRef(bean);
         }
 
-        protected static ProsessTaskHandler lookupHandler(TaskType taskType) {
-            return CDI.current().select(ProsessTaskHandler.class, new ProsessTaskHandlerRef.ProsessTaskLiteral(taskType.value())).get();
-        }
-
-        public void close() {
-            if (this.localBean != null && this.localBean.getClass().isAnnotationPresent(Dependent.class)) {
-                CDI.current().destroy(this.localBean);
-            }
-        }
     }
 }

@@ -3,6 +3,8 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -12,6 +14,8 @@ import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporing;
@@ -35,11 +39,10 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.GjelderType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.TaskType;
-import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepositoryImpl;
-import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskTjenesteImpl;
 
 public class DokumentBehandlingTjenesteTest extends DokumentBestillerTestOppsett {
 
@@ -52,7 +55,7 @@ public class DokumentBehandlingTjenesteTest extends DokumentBestillerTestOppsett
 
     @BeforeEach
     public void setup() {
-        taskTjeneste = new ProsessTaskTjenesteImpl(new ProsessTaskRepositoryImpl(entityManager, null, null));
+        taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
         HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepository, null);
         dokumentBehandlingTjeneste = new DokumentBehandlingTjeneste(repositoryProvider, taskTjeneste, historikkinnslagTjeneste,
             mockManueltVarselBrevTjeneste, mockInnhentDokumentasjonbrevTjeneste);
@@ -107,7 +110,10 @@ public class DokumentBehandlingTjenesteTest extends DokumentBestillerTestOppsett
 
         dokumentBehandlingTjeneste.bestillBrev(behandlingId, DokumentMalType.VARSEL_DOK, "Bestilt varselbrev");
 
-        assertThat(taskTjeneste.finnAlle(ProsessTaskStatus.KLAR).stream().filter(t -> TaskType.forProsessTask(SendManueltVarselbrevTask.class).equals(t.taskType())).collect(Collectors.toList())).isNotEmpty();
+        var captor = ArgumentCaptor.forClass(ProsessTaskGruppe.class);
+        verify(taskTjeneste, times(1)).lagre(captor.capture());
+        var prosesser = captor.getValue();
+        assertThat(prosesser.getTasks().stream().map(ProsessTaskGruppe.Entry::task).filter(t -> TaskType.forProsessTask(SendManueltVarselbrevTask.class).equals(t.taskType())).collect(Collectors.toList())).isNotEmpty();
         // TODO avklar - denne opprettes ikke i kallet .... se TODO i bestillBrev() assertThat(taskTjeneste.finnAlle(ProsessTaskStatus.KLAR).stream().filter(t -> TaskType.forProsessTask(SendBeskjedUtsendtVarselTilSelvbetjeningTask.class).equals(t.taskType())).collect(Collectors.toList())).isNotEmpty();
         List<Historikkinnslag> historikkinnslager = repositoryProvider.getHistorikkRepository().hentHistorikk(behandlingId);
         assertThat(historikkinnslager.size()).isEqualTo(1);
@@ -128,7 +134,10 @@ public class DokumentBehandlingTjenesteTest extends DokumentBestillerTestOppsett
 
         dokumentBehandlingTjeneste.bestillBrev(behandlingId, DokumentMalType.INNHENT_DOK, "Bestilt innhent dokumentasjon");
 
-        assertThat(taskTjeneste.finnAlle(ProsessTaskStatus.KLAR).stream().filter(t -> TaskType.forProsessTask(InnhentDokumentasjonbrevTask.class).equals(t.taskType())).collect(Collectors.toList())).isNotEmpty();
+        var captor = ArgumentCaptor.forClass(ProsessTaskData.class);
+        verify(taskTjeneste, times(1)).lagre(captor.capture());
+        var prosesser = captor.getAllValues();
+        assertThat(prosesser.stream().filter(t -> TaskType.forProsessTask(InnhentDokumentasjonbrevTask.class).equals(t.taskType())).collect(Collectors.toList())).isNotEmpty();
         List<Historikkinnslag> historikkinnslager = repositoryProvider.getHistorikkRepository().hentHistorikk(behandlingId);
         assertThat(historikkinnslager.size()).isEqualTo(1);
         Historikkinnslag historikkinnslag = historikkinnslager.get(0);

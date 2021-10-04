@@ -26,6 +26,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 
 import com.google.common.collect.Lists;
 
@@ -82,8 +83,6 @@ import no.nav.tilbakekreving.typer.v1.TypeGjelderDto;
 import no.nav.tilbakekreving.typer.v1.TypeKlasseDto;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
-import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepositoryImpl;
-import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskTjenesteImpl;
 import no.nav.vedtak.xmlutils.DateUtil;
 
 @ExtendWith(FptilbakeEntityManagerAwareExtension.class)
@@ -116,7 +115,7 @@ public class HåndterGamleKravgrunnlagTaskTest {
         behandlingRepository = repositoryProvider.getBehandlingRepository();
         mottattXmlRepository = new ØkonomiMottattXmlRepository(entityManager);
         grunnlagRepository = repositoryProvider.getGrunnlagRepository();
-        ProsessTaskTjeneste taskTjeneste = new ProsessTaskTjenesteImpl(new ProsessTaskRepositoryImpl(entityManager, null, null));
+        ProsessTaskTjeneste taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
         NavBrukerRepository navBrukerRepository = new NavBrukerRepository(entityManager);
         BehandlingskontrollTjeneste behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(repositoryProvider,
             behandlingModellRepositoryMock, behandlingskontrollEventPublisererMock);

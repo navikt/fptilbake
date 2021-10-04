@@ -3,6 +3,9 @@ package no.nav.foreldrepenger.tilbakekreving.hendelser.felles.tjeneste;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -10,6 +13,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.task.OpprettBehandlingTask;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.hendelse.HendelseTaskDataWrapper;
@@ -20,10 +24,8 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.TilbakekrevingValgDto;
-import no.nav.foreldrepenger.tilbakekreving.hendelser.ProsessTaskTjenesteMock;
 import no.nav.foreldrepenger.tilbakekreving.hendelser.felles.task.HåndterHendelseTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.TaskType;
 
@@ -34,7 +36,7 @@ public class HendelseHåndtererTjenesteTest {
     private static final UUID EKSTERN_BEHANDLING_UUID = UUID.randomUUID();
 
     private FagsystemKlient restKlient = mock(FagsystemKlient.class);
-    private ProsessTaskTjeneste taskTjeneste = new ProsessTaskTjenesteMock();
+    private ProsessTaskTjeneste taskTjeneste = mock(ProsessTaskTjeneste.class);
     private HendelseTaskDataWrapper hendelseTaskDataWrapper = lagHendelseTask();
     private HendelseHåndtererTjeneste hendelseHåndtererTjeneste = new HendelseHåndtererTjeneste(taskTjeneste, restKlient);
 
@@ -47,8 +49,9 @@ public class HendelseHåndtererTjenesteTest {
 
         hendelseHåndtererTjeneste.håndterHendelse(hendelseTaskDataWrapper);
 
-        List<ProsessTaskData> prosesser = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
-        assertThat(prosesser).isNotEmpty();
+        var captor = ArgumentCaptor.forClass(ProsessTaskData.class);
+        verify(taskTjeneste, times(1)).lagre(captor.capture());
+        var prosesser = captor.getAllValues();
         assertThat(erTaskFinnes(TaskType.forProsessTask(OpprettBehandlingTask.class), prosesser)).isTrue();
     }
 
@@ -60,8 +63,9 @@ public class HendelseHåndtererTjenesteTest {
 
         hendelseHåndtererTjeneste.håndterHendelse(hendelseTaskDataWrapper);
 
-        List<ProsessTaskData> prosesser = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
-        assertThat(prosesser).isNotEmpty();
+        var captor = ArgumentCaptor.forClass(ProsessTaskData.class);
+        verify(taskTjeneste, times(1)).lagre(captor.capture());
+        var prosesser = captor.getAllValues();
         assertThat(erTaskFinnes(TaskType.forProsessTask(OpprettBehandlingTask.class), prosesser)).isTrue();
     }
 
@@ -73,7 +77,7 @@ public class HendelseHåndtererTjenesteTest {
 
         hendelseHåndtererTjeneste.håndterHendelse(hendelseTaskDataWrapper);
 
-        assertThat(taskTjeneste.finnAlle(ProsessTaskStatus.KLAR)).isEmpty();
+        verifyNoInteractions(taskTjeneste);
     }
 
     private boolean erTaskFinnes(TaskType taskType, List<ProsessTaskData> prosesser) {

@@ -92,12 +92,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
-            <!--- bibliotek som brukes for å finne alle instanser av interface med deklarerte exception -->
-            <groupId>io.github.classgraph</groupId>
-            <artifactId>classgraph</artifactId>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
 </project>

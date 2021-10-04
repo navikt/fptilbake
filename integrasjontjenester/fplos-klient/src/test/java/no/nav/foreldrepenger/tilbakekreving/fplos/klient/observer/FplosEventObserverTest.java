@@ -2,16 +2,20 @@ package no.nav.foreldrepenger.tilbakekreving.fplos.klient.observer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import javax.persistence.EntityManager;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.AksjonspunktTilbakeførtEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.AksjonspunktUtførtEvent;
@@ -39,11 +43,8 @@ import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwar
 import no.nav.foreldrepenger.tilbakekreving.fplos.klient.task.FplosPubliserEventTask;
 import no.nav.vedtak.felles.integrasjon.kafka.EventHendelse;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.TaskType;
-import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskRepositoryImpl;
-import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskTjenesteImpl;
 
 @ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public class FplosEventObserverTest {
@@ -65,7 +66,7 @@ public class FplosEventObserverTest {
     public void setup(EntityManager entityManager) {
         BehandlingRepositoryProvider repositoryProvider = new BehandlingRepositoryProvider(entityManager);
         aksjonspunktRepository = repositoryProvider.getAksjonspunktRepository();
-        taskTjeneste = new ProsessTaskTjenesteImpl(new ProsessTaskRepositoryImpl(entityManager, null, null));
+        taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
         BehandlingModellRepository mockBehandlingModellRepository = mock(BehandlingModellRepository.class);
         mockBehandlingModell = mock(BehandlingModell.class);
         BehandlingskontrollTjeneste behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(repositoryProvider,
@@ -126,7 +127,7 @@ public class FplosEventObserverTest {
         internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VARSEL);
 
         fplosEventObserver.observerAksjonpunktFunnetEvent(aksjonspunkterFunnetEvent);
-        assertThat(taskTjeneste.finnAlle(ProsessTaskStatus.KLAR)).isEmpty();
+        verifyNoInteractions(taskTjeneste);
     }
 
     @Test
@@ -169,7 +170,7 @@ public class FplosEventObserverTest {
         when(mockBehandlingModell.erStegAFørStegB(BehandlingStegType.VARSEL, BehandlingStegType.FAKTA_FEILUTBETALING)).thenReturn(true);
 
         fplosEventObserver.observerAksjonpunktUtførtEvent(aksjonspunktUtførtEvent);
-        assertThat(taskTjeneste.finnAlle(ProsessTaskStatus.KLAR)).isEmpty();
+        verifyNoInteractions(taskTjeneste);
     }
 
     @Test
@@ -182,7 +183,7 @@ public class FplosEventObserverTest {
         when(mockBehandlingModell.erStegAFørStegB(BehandlingStegType.FAKTA_FEILUTBETALING, BehandlingStegType.FAKTA_FEILUTBETALING)).thenReturn(false);
 
         fplosEventObserver.observerAksjonpunktUtførtEvent(aksjonspunktUtførtEvent);
-        assertThat(taskTjeneste.finnAlle(ProsessTaskStatus.KLAR)).isEmpty();
+        verifyNoInteractions(taskTjeneste);
     }
 
     @Test
@@ -236,9 +237,9 @@ public class FplosEventObserverTest {
     }
 
     private ProsessTaskData fellesAssertProsessTask(EventHendelse eventHendelse) {
-        List<ProsessTaskData> prosessTasker = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
-        assertThat(prosessTasker.size()).isEqualTo(1);
-        ProsessTaskData publisherEventProsessTask = prosessTasker.get(0);
+        var captor = ArgumentCaptor.forClass(ProsessTaskData.class);
+        verify(taskTjeneste, times(1)).lagre(captor.capture());
+        var publisherEventProsessTask = captor.getValue();
         assertThat(publisherEventProsessTask.taskType()).isEqualTo(TaskType.forProsessTask(FplosPubliserEventTask.class));
         assertThat(publisherEventProsessTask.getPropertyValue(FplosPubliserEventTask.PROPERTY_EVENT_NAME)).isEqualTo(eventHendelse.name());
         return publisherEventProsessTask;
