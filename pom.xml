@@ -50,7 +50,7 @@
         <apache.ws.xmlschema.version>2.2.5</apache.ws.xmlschema.version>
         <javaslang.version>2.0.6</javaslang.version>
 
-        <flyway.version>4.2.0</flyway.version>
+        <flyway.version>8.0.1</flyway.version>
     </properties>
     <dependencies>
 
