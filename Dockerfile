@@ -1,4 +1,4 @@
-FROM navikt/java:16-appdynamics
+FROM navikt/java:17-appdynamics
 ENV APPD_ENABLED=true
 ENV TZ=Europe/Oslo
 
@@ -17,5 +17,4 @@ COPY web/target/app.jar /app/
 
 ENV JAVA_OPTS="-XX:MaxRAMPercentage=75.0 \
                 -Djava.security.egd=file:/dev/./urandom \
-                -Duser.timezone=Europe/Oslo \
-                --illegal-access=permit"
+                -Duser.timezone=Europe/Oslo"

@@ -27,7 +27,7 @@
         <revision>1.0</revision>
         <sha1/>
         <changelist>-SNAPSHOT</changelist>
-        <java.version>16</java.version>
+        <java.version>17</java.version>
 
         <!-- Felles avhengigheter i prosjektet Disse skal ALLTID være en
             RELEASE-avhengighet UNNTAK: feature-brancher og lokalt -->
@@ -43,7 +43,7 @@
         <geronimo.jaspi.version>2.0.0</geronimo.jaspi.version>
         <geronimo.osgi.version>1.1</geronimo.osgi.version>
         <logstash.version>6.6</logstash.version>
-        <jersey.version>2.34</jersey.version>
+        <jersey.version>2.35</jersey.version>
         <ojdbc.version>19.3.0.0</ojdbc.version>
         <abac-attribute-constants.version>3.3.13</abac-attribute-constants.version>
         <owaspencoder.version>1.2.3</owaspencoder.version>
@@ -124,7 +124,7 @@
             <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>
-                <version>1.11.17</version>
+                <version>1.11.21</version>
             </dependency>
 
             <!-- moduler i dette prosjektet -->
@@ -375,7 +375,7 @@
             <dependency>
                 <groupId>io.micrometer</groupId>
                 <artifactId>micrometer-core</artifactId>
-                <version>1.7.3</version>
+                <version>1.7.5</version>
             </dependency>
 
             <dependency>
@@ -486,12 +486,12 @@
             <dependency>
                 <groupId>com.github.jknack</groupId>
                 <artifactId>handlebars</artifactId>
-                <version>4.2.0</version>
+                <version>4.3.0</version>
             </dependency>
             <dependency>
                 <groupId>com.github.jknack</groupId>
                 <artifactId>handlebars-jackson2</artifactId>
-                <version>4.2.0</version>
+                <version>4.3.0</version>
             </dependency>
             <dependency>
                 <groupId>com.openhtmltopdf</groupId>
@@ -654,7 +654,7 @@
                     <configuration>
                         <useFile>true</useFile>
                         <argLine>-XX:+TieredCompilation -XX:TieredStopAtLevel=1 -Xms256m -Dfile.encoding=UTF-8
-                            -Dlog.level.no.nav=WARN --illegal-access=permit</argLine>
+                            -Dlog.level.no.nav=WARN</argLine>
                     </configuration>
                 </plugin>
                 <plugin>
