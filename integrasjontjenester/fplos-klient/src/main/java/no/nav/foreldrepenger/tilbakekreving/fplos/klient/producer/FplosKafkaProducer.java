@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.konfig.KonfigVerdi;
+import no.nav.vedtak.exception.IntegrasjonException;
 import no.nav.vedtak.log.mdc.MDCOperations;
 
 @ApplicationScoped
@@ -28,8 +29,8 @@ public class FplosKafkaProducer {
     private static final Logger log = LoggerFactory.getLogger(FplosKafkaProducer.class);
     private static final String CALLID_NAME = "Nav-Tbk-CallId";
 
-    Producer<String, String> producer;
-    String topic;
+    private Producer<String, String> producer;
+    private String topic;
 
 
     FplosKafkaProducer() {
@@ -57,25 +58,27 @@ public class FplosKafkaProducer {
 
     }
 
-    void runProducerWithSingleJson(ProducerRecord<String, String> record) {
+    public void sendJsonMedNøkkel(String nøkkel, String json) {
+        String callId = MDCOperations.getCallId() != null ? MDCOperations.getCallId() : MDCOperations.generateCallId();
+        runProducerWithSingleJson(new ProducerRecord<>(topic, null, nøkkel, json, new RecordHeaders().add(CALLID_NAME, callId.getBytes())));
+    }
+
+    private void runProducerWithSingleJson(ProducerRecord<String, String> record) {
         try {
             producer.send(record).get();
-            producer.flush(); //påkrevd for å sikre at prosesstask feiler hvis sending til kafka feiler
         } catch (InterruptedException e) {
-            log.warn("Uventet feil ved sending til Kafka, topic:" + topic, e);
-            Thread.currentThread().interrupt(); // reinterrupt
-        } catch (ExecutionException e) {
-            log.warn("Uventet feil ved sending til Kafka, topic:" + topic, e);
-        } catch (AuthenticationException | AuthorizationException e) {
-            log.error("Feil i pålogging mot Kafka, topic:" + topic, e);
-        } catch (RetriableException e) {
-            log.warn("Fikk transient feil mot Kafka, kan prøve igjen, topic:" + topic, e);
-        } catch (KafkaException e) {
-            log.warn("Fikk feil mot Kafka, topic:" + topic, e);
+            Thread.currentThread().interrupt();
+            throw kafkaPubliseringException(e);
+        } catch (Exception e) {
+            throw kafkaPubliseringException(e);
         }
     }
 
-    void setUsernameAndPassword(String username, String password, Properties properties) {
+    private IntegrasjonException kafkaPubliseringException(Exception e) {
+        return new IntegrasjonException("FP-HENDELSE-925476", "Uventet feil ved sending til Kafka, topic " + topic, e);
+    }
+
+    private void setUsernameAndPassword(String username, String password, Properties properties) {
         if ((username != null && !username.isEmpty()) && (password != null && !password.isEmpty())) {
             String jaasTemplate = "org.apache.kafka.common.security.scram.ScramLoginModule required username=\"%s\" password=\"%s\";";
             String jaasCfg = String.format(jaasTemplate, username, password);
@@ -83,21 +86,16 @@ public class FplosKafkaProducer {
         }
     }
 
-    Producer<String, String> createProducer(Properties properties) {
+    private Producer<String, String> createProducer(Properties properties) {
         properties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         return new KafkaProducer<>(properties);
     }
 
-    void setSecurity(String username, Properties properties) {
+    private void setSecurity(String username, Properties properties) {
         if (username != null && !username.isEmpty()) {
             properties.setProperty("security.protocol", "SASL_SSL");
             properties.setProperty("sasl.mechanism", "PLAIN");
         }
-    }
-
-    public void sendJsonMedNøkkel(String nøkkel, String json) {
-        String callId = MDCOperations.getCallId() != null ? MDCOperations.getCallId() : MDCOperations.generateCallId();
-        runProducerWithSingleJson(new ProducerRecord<>(topic, null, nøkkel, json, new RecordHeaders().add(CALLID_NAME, callId.getBytes())));
     }
 }
