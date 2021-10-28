@@ -66,32 +66,6 @@ public class SelvbetjeningMeldingProducer {
         this.topic = topic;
     }
 
-    void setUsernameAndPassword(String username, String password, Properties properties) {
-        if ((username != null && !username.isEmpty())
-            && (password != null && !password.isEmpty())) {
-            String jaasTemplate = "org.apache.kafka.common.security.scram.ScramLoginModule required username=\"%s\" password=\"%s\";";
-            String jaasCfg = String.format(jaasTemplate, username, password);
-            properties.setProperty("sasl.jaas.config", jaasCfg);
-        }
-    }
-
-    Producer<String, String> createProducer(Properties properties) {
-        properties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-        properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-        return new KafkaProducer<>(properties);
-    }
-
-    void setSecurity(String username, Properties properties) {
-        if (username != null && !username.isEmpty()) {
-            properties.setProperty("security.protocol", "SASL_SSL");
-            properties.setProperty("sasl.mechanism", "PLAIN");
-        }
-    }
-
-    public void flush() {
-        producer.flush();
-    }
-
     public void sendMelding(SelvbetjeningMelding hendelse) {
         try {
             String verdiSomJson = OM.writeValueAsString(hendelse);
@@ -101,14 +75,35 @@ public class SelvbetjeningMeldingProducer {
         }
     }
 
+    private void setUsernameAndPassword(String username, String password, Properties properties) {
+        if ((username != null && !username.isEmpty())
+            && (password != null && !password.isEmpty())) {
+            String jaasTemplate = "org.apache.kafka.common.security.scram.ScramLoginModule required username=\"%s\" password=\"%s\";";
+            String jaasCfg = String.format(jaasTemplate, username, password);
+            properties.setProperty("sasl.jaas.config", jaasCfg);
+        }
+    }
+
+    private Producer<String, String> createProducer(Properties properties) {
+        properties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+        properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+        return new KafkaProducer<>(properties);
+    }
+
+    private void setSecurity(String username, Properties properties) {
+        if (username != null && !username.isEmpty()) {
+            properties.setProperty("security.protocol", "SASL_SSL");
+            properties.setProperty("sasl.mechanism", "PLAIN");
+        }
+    }
+
     private void sendJsonMedNøkkel(String nøkkel, String json) {
         runProducerWithSingleJson(new ProducerRecord<>(topic, nøkkel, json));
     }
 
-    void runProducerWithSingleJson(ProducerRecord<String, String> record) {
+    private void runProducerWithSingleJson(ProducerRecord<String, String> record) {
         try {
-            @SuppressWarnings("unused")
-            var recordMetadata = producer.send(record).get(); // NOSONAR
+            producer.send(record).get();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw uventetFeilKafka(topic, e);
