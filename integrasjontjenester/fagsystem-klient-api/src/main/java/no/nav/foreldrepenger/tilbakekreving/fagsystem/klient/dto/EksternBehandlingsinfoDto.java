@@ -23,7 +23,6 @@ public class EksternBehandlingsinfoDto {
     @JsonProperty("originalVedtaksDato")
     private LocalDate vedtakDato;
     private BehandlingsresultatDto behandlingsresultat;
-    @JsonProperty("behandlingArsaker")
     private List<EksternBehandlingÅrsakDto> behandlingÅrsaker = new ArrayList<>();
 
     public Henvisning getHenvisning() {
