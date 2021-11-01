@@ -8,35 +8,29 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DatabaseScript {
-    private static final Logger log = LoggerFactory.getLogger(DatabaseScript.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DatabaseScript.class);
+    private static final String FLYWAY_SCHEMA_TABLE = "schema_version";
 
     private final DataSource dataSource;
-    private final boolean cleanOnException;
     private final String locations;
 
-    public DatabaseScript(DataSource dataSource, boolean cleanOnException, String locations) {
+    public DatabaseScript(DataSource dataSource, String locations) {
         this.dataSource = dataSource;
-        this.cleanOnException = cleanOnException;
         this.locations = locations;
     }
 
     public void migrate() {
-        Flyway flyway = new Flyway();
-        flyway.setDataSource(dataSource);
-        flyway.setLocations(locations);
-        flyway.setBaselineOnMigrate(true);
+        Flyway flyway = new Flyway(Flyway.configure()
+            .dataSource(dataSource)
+            .locations(locations)
+            .table(FLYWAY_SCHEMA_TABLE)
+            .baselineOnMigrate(true));
 
         try {
             flyway.migrate();
         } catch (FlywayException e) {  // NOSONAR
-            // prøv en gang til
-            if(cleanOnException) {
-                log.warn("Failed migration. Cleaning and retrying", e);
-                flyway.clean();
-                flyway.migrate();
-            } else {
-                throw e;
-            }
+            LOG.error("Feil under migrering av databasen.");
+            throw e;
         }
 
     }
