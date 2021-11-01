@@ -14,6 +14,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingRevurderingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.spi.BehandlingskontrollServiceProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.OrganisasjonsEnhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -53,7 +56,8 @@ public class HenleggelsesbrevTjenesteTest extends DokumentBestillerTestOppsett {
         HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepository, null);
 
         henleggelsesbrevTjeneste = new HenleggelsesbrevTjeneste(repositoryProvider, mockEksternDataForBrevTjeneste, historikkinnslagTjeneste, mockPdfBrevTjeneste);
-        behandlingRevurderingTjeneste = new BehandlingRevurderingTjeneste(repositoryProvider);
+        var kontroll = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(entityManager, new BehandlingModellRepository(), null));
+        behandlingRevurderingTjeneste = new BehandlingRevurderingTjeneste(repositoryProvider, kontroll);
 
         behandlingId = behandling.getId();
         EksternBehandling eksternBehandling = new EksternBehandling(behandling, Henvisning.fraEksternBehandlingId(FPSAK_BEHANDLING_ID), FPSAK_BEHANDLING_UUID);

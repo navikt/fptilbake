@@ -14,10 +14,11 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegRe
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingTypeRef;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 
-@BehandlingStegRef(kode = "FAKTAVERGESTEG")
+@BehandlingStegRef(kode = BehandlingStegKode.FAKTA_VERGE)
 @BehandlingTypeRef
 @ApplicationScoped
 public class FaktaVergeSteg implements BehandlingSteg {

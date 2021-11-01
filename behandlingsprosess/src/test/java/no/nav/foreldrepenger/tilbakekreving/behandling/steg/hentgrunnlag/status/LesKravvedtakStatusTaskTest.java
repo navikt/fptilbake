@@ -81,8 +81,7 @@ public class LesKravvedtakStatusTaskTest extends FellesTestOppsett {
 
         behandling = lagBehandling();
         lagEksternBehandling(behandling);
-        InternalManipulerBehandling manipulerInternBehandling = new InternalManipulerBehandling(repositoryProvider);
-        manipulerInternBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.TBKGSTEG);
+        InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.TBKGSTEG);
         when(fagsystemKlientMock.hentBehandlingForSaksnummer("139015144")).thenReturn(lagResponsFraFagsystemKlient());
 
         mottattXmlId = mottattXmlRepository.lagreMottattXml(getInputXML("xml/kravgrunnlag_periode_FEIL_samme_referanse.xml"));

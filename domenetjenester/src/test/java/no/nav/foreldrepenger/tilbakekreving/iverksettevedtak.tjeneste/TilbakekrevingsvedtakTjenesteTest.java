@@ -3,7 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
-import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -48,7 +48,7 @@ public class TilbakekrevingsvedtakTjenesteTest {
         Long behandlingId = behandling.getId();
 
         Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
-            uke, Arrays.asList(
+            uke, List.of(
                 KravgrunnlagTestBuilder.KgBeløp.feil(9000),
                 KravgrunnlagTestBuilder.KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(11000).medTilbakekrevBeløp(9000),
                 KravgrunnlagTestBuilder.KgBeløp.trekk(2000))

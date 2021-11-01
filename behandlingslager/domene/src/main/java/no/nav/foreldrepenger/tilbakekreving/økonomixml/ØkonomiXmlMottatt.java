@@ -10,7 +10,7 @@ import javax.persistence.Lob;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkBaseEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
 
@@ -23,7 +23,7 @@ import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
  */
 @Entity(name = "ØkonomiXmlMottatt")
 @Table(name = "OKO_XML_MOTTATT")
-public class ØkonomiXmlMottatt extends KodeverkBaseEntitet {
+public class ØkonomiXmlMottatt extends BaseEntitet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_OKO_XML_MOTTATT")

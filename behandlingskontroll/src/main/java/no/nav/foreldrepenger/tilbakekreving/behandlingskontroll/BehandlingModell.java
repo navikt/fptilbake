@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingskontroll;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -20,41 +21,35 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 public interface BehandlingModell {
 
     /** Gjelder kun steg ETTER angitt steg (eksklusv angitt steg). */
-    Set<String> finnAksjonspunktDefinisjonerEtter(BehandlingStegType steg);
+    Set<AksjonspunktDefinisjon> finnAksjonspunktDefinisjonerEtter(BehandlingStegType steg);
 
     /**
      * Gjelder kun steg ETTER angitt steg (inklusiv angitt steg). Dersom medInngangOgså tas også aksjonspunt som skal
      * være løst også ved Inngang med, ellers kun ved Utgang av steget
      */
-    Set<String> finnAksjonspunktDefinisjonerFraOgMed(BehandlingStegType steg, boolean medInngangOgså);
+    Set<AksjonspunktDefinisjon> finnAksjonspunktDefinisjonerFraOgMed(BehandlingStegType steg, boolean medInngangOgså);
 
-    Set<String> finnAksjonspunktDefinisjoner(BehandlingStegType stegType);
+    Set<AksjonspunktDefinisjon> finnAksjonspunktDefinisjoner(BehandlingStegType stegType);
 
-    Set<String> finnAksjonspunktDefinisjonerInngang(BehandlingStegType steg);
+    Set<AksjonspunktDefinisjon> finnAksjonspunktDefinisjonerInngang(BehandlingStegType steg);
 
-    Set<String> finnAksjonspunktDefinisjonerUtgang(BehandlingStegType steg);
+    Set<AksjonspunktDefinisjon> finnAksjonspunktDefinisjonerUtgang(BehandlingStegType steg);
 
     BehandlingStegModell finnForrigeSteg(BehandlingStegType stegType);
-
-    BehandlingStegModell finnForrigeSteg(String stegKode);
 
     BehandlingStegModell finnFørsteSteg(BehandlingStegType... behandlingStegTyper);
 
     BehandlingStegModell finnNesteSteg(BehandlingStegType stegType);
 
-    BehandlingStegModell finnNesteSteg(String stegKode);
-
     BehandlingStegModell finnSteg(BehandlingStegType stegType);
 
-    BehandlingStegModell finnSteg(String stegKode);
-
-    Optional<BehandlingStegStatus> finnStegStatusFor(BehandlingStegType stegType, Collection<String> aksjonspunktKoder);
+    Optional<BehandlingStegStatus> finnStegStatusFor(BehandlingStegType stegType, Collection<AksjonspunktDefinisjon> aksjonspunktDefinisjoner);
 
     BehandlingStegModell finnTidligsteStegFor(Collection<AksjonspunktDefinisjon> aksjonspunkter);
 
     BehandlingStegModell finnTidligsteStegFor(AksjonspunktDefinisjon aksjonspunkt);
 
-    BehandlingStegModell finnTidligsteStegForAksjonspunktDefinisjon(Collection<String> aksjonspunktDefinisjoner);
+    BehandlingStegModell finnTidligsteStegForAksjonspunktDefinisjon(Collection<AksjonspunktDefinisjon> aksjonspunktDefinisjoner);
 
     /** Behandling type modellen gjelder for. */
     BehandlingType getBehandlingType();
@@ -88,5 +83,7 @@ public interface BehandlingModell {
     BehandlingStegUtfall prosesserFra(BehandlingStegType startFraBehandlingStegType, BehandlingModellVisitor visitor);
 
     StegTransisjon finnTransisjon(TransisjonIdentifikator transisjonIdentifikator);
+
+    List<BehandlingStegType> getAlleBehandlingStegTyper();
 
 }

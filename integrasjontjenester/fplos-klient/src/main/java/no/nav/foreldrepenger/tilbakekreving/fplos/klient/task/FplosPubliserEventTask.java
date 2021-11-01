@@ -22,7 +22,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FaktaFeilutbetalingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktKodeDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
@@ -120,7 +120,7 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
 
         Map<String, String> aksjonspunktKoderMedStatusListe = new HashMap<>();
         if (kravgrunnlagManglerFristTid != null) {
-            aksjonspunktKoderMedStatusListe.put(AksjonspunktDefinisjon.VURDER_HENLEGGELSE_MANGLER_KRAVGRUNNLAG.getKode(), kravgrunnlagManglerAksjonspunktStatusKode);
+            aksjonspunktKoderMedStatusListe.put(AksjonspunktKodeDefinisjon.VURDER_HENLEGGELSE_MANGLER_KRAVGRUNNLAG, kravgrunnlagManglerAksjonspunktStatusKode);
         } else {
             behandling.getAksjonspunkter().forEach(aksjonspunkt ->
                 aksjonspunktKoderMedStatusListe.put(aksjonspunkt.getAksjonspunktDefinisjon().getKode(), aksjonspunkt.getStatus().getKode()));

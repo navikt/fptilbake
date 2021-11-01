@@ -10,6 +10,9 @@ import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.VedtakAksjonspunktData;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.spi.BehandlingskontrollServiceProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.VurderÅrsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.Totrinnsvurdering;
@@ -22,13 +25,15 @@ public class FatteVedtakTjenesteTest extends FellesTestOppsett {
 
     @BeforeEach
     void setUp() {
+        behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(entityManager, new BehandlingModellRepository(), null));
         totrinnTjeneste = new TotrinnTjeneste(totrinnRepository, repoProvider);
-        fatteVedtakTjeneste = new FatteVedtakTjeneste(repoProvider, totrinnTjeneste);
+        fatteVedtakTjeneste = new FatteVedtakTjeneste(repoProvider, behandlingskontrollTjeneste, totrinnTjeneste);
     }
 
     @Test
     public void opprettTotrinnsVurdering_nårAksjonspunktErGodkjent() {
-        repoProvider.getAksjonspunktRepository().leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING);
+        var kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandling);
+        behandlingskontrollTjeneste.lagreAksjonspunkterFunnet(kontekst, List.of(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING));
         VedtakAksjonspunktData vedtakAksjonspunktData = new VedtakAksjonspunktData(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING, true, null, null);
         fatteVedtakTjeneste.opprettTotrinnsVurdering(behandling, Collections.singletonList(vedtakAksjonspunktData));
 
@@ -47,7 +52,8 @@ public class FatteVedtakTjenesteTest extends FellesTestOppsett {
 
     @Test
     public void opprettTotrinnsVurdering_nårAksjonspunktErIkkeGodkjent() {
-        repoProvider.getAksjonspunktRepository().leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING);
+        var kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandling);
+        behandlingskontrollTjeneste.lagreAksjonspunkterFunnet(kontekst, List.of(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING));
         VedtakAksjonspunktData vedtakAksjonspunktData = new VedtakAksjonspunktData(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING, false,
                 "feil fakta", Collections.singleton(VurderÅrsak.FEIL_FAKTA.getKode()));
         fatteVedtakTjeneste.opprettTotrinnsVurdering(behandling, Collections.singletonList(vedtakAksjonspunktData));

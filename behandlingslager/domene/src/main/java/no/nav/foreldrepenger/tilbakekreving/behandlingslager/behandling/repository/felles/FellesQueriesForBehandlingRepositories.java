@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -16,8 +15,6 @@ import org.hibernate.jpa.QueryHints;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktStatus;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.ReaktiveringStatus;
 
 @ApplicationScoped
 public class FellesQueriesForBehandlingRepositories {
@@ -37,14 +34,13 @@ public class FellesQueriesForBehandlingRepositories {
      * Henter behandlinger på vent med autopunkter for gitte aksjonspunktdefinisjoner
      */
     public Collection<Behandling> finnVentendeBehandlingerMedAktivtAksjonspunkt(AksjonspunktDefinisjon... aksjonspunktDefinisjoner) {
-        TypedQuery<Behandling> query = entityManager.createQuery(
-            "select distinct b" +
-                " from Aksjonspunkt ap" +
-                " inner join ap.behandling b on ap.behandling.id = b.id" +
-                " where ap.status = :åpneAksjonspunktKoder" +
-                " and ap.reaktiveringStatus = :reaktiveringStatus" +
-                " and ap.aksjonspunktDefinisjon.aksjonspunktType = :autopunktkode" +
-                " and ap.aksjonspunktDefinisjon.kode in (:køetKode)",
+        TypedQuery<Behandling> query = entityManager.createQuery("""
+            select distinct b
+              from Aksjonspunkt ap
+              inner join ap.behandling b on ap.behandling.id = b.id
+              where ap.status = :åpneAksjonspunktKoder
+              and ap.aksjonspunktDefinisjon in (:aksjonspunkt)
+            """,
             Behandling.class);
 
         setParametre(query, aksjonspunktDefinisjoner);
@@ -55,17 +51,15 @@ public class FellesQueriesForBehandlingRepositories {
      * Henter behandling, gitt at den er på vent med autopunkter for gitte aksjonspunktdefinisjoner
      */
     public Optional<Behandling> finnVentendeBehandlingMedAktivtAksjonspunkt(Long behandingId, AksjonspunktDefinisjon... aksjonspunktDefinisjoner) {
-        TypedQuery<Behandling> query = entityManager.createQuery(
-            "select b" +
-                " from Behandling b" +
-                " where b.id = :behandlingId " +
-                " and exists (select 1 from Aksjonspunkt ap " +
-                "             where ap.behandling = b " +
-                "             and ap.status = :åpneAksjonspunktKoder" +
-                "             and ap.reaktiveringStatus = :reaktiveringStatus" +
-                "             and ap.aksjonspunktDefinisjon.aksjonspunktType = :autopunktkode" +
-                "             and ap.aksjonspunktDefinisjon.kode in (:køetKode)" +
-                "            )",
+        TypedQuery<Behandling> query = entityManager.createQuery("""
+            select b
+              from Behandling b
+              where b.id = :behandlingId
+              and exists (select 1 from Aksjonspunkt ap
+                          where ap.behandling = b
+                          and ap.status = :åpneAksjonspunktKoder
+                          and ap.aksjonspunktDefinisjon in (:aksjonspunkt) )
+            """,
             Behandling.class);
 
         setParametre(query, aksjonspunktDefinisjoner);
@@ -82,9 +76,7 @@ public class FellesQueriesForBehandlingRepositories {
     private void setParametre(TypedQuery<Behandling> query, AksjonspunktDefinisjon[] aksjonspunktDefinisjoner) {
         query.setHint(QueryHints.HINT_READONLY, "true");
         query.setParameter("åpneAksjonspunktKoder", AksjonspunktStatus.getÅpneAksjonspunktStatuser());
-        query.setParameter("autopunktkode", AksjonspunktType.AUTOPUNKT);
-        query.setParameter("reaktiveringStatus", ReaktiveringStatus.AKTIV);
-        query.setParameter("køetKode", Arrays.stream(aksjonspunktDefinisjoner).map(AksjonspunktDefinisjon::getKode).collect(Collectors.toList()));
+        query.setParameter("aksjonspunkt", Arrays.asList(aksjonspunktDefinisjoner));
     }
 
 }

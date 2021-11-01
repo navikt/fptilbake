@@ -1,7 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.web.server.jetty;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -119,7 +118,7 @@ public class JettyServer extends AbstractJettyServer {
 
     private void updateMetaData(MetaData metaData) {
         // Find path to class-files while starting jetty from development environment.
-        List<Class<?>> appClasses = Arrays.asList(ApplicationConfig.class, IssoApplication.class);
+        List<Class<?>> appClasses = List.of(ApplicationConfig.class, IssoApplication.class);
 
         List<Resource> resources = appClasses.stream()
             .map(c -> Resource.newResource(c.getProtectionDomain().getCodeSource().getLocation()))

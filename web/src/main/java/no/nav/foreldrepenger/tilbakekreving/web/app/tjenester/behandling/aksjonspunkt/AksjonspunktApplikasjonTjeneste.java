@@ -20,7 +20,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.Behandlings
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjonspunkt.dto.AksjonspunktKode;
@@ -35,7 +34,6 @@ public class AksjonspunktApplikasjonTjeneste {
 
     private BehandlingRepository behandlingRepository;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
-    private AksjonspunktRepository aksjonspunktRepository;
     private BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste;
 
     AksjonspunktApplikasjonTjeneste() {
@@ -46,7 +44,6 @@ public class AksjonspunktApplikasjonTjeneste {
     public AksjonspunktApplikasjonTjeneste(BehandlingRepositoryProvider repositoryProvider,
                                            BehandlingskontrollProvider behandlingskontrollProvider) {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
-        this.aksjonspunktRepository = repositoryProvider.getAksjonspunktRepository();
         this.behandlingskontrollTjeneste = behandlingskontrollProvider.getBehandlingskontrollTjeneste();
         this.behandlingskontrollAsynkTjeneste = behandlingskontrollProvider.getBehandlingskontrollAsynkTjeneste();
     }
@@ -57,7 +54,7 @@ public class AksjonspunktApplikasjonTjeneste {
         BehandlingskontrollKontekst kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandlingId);
         setAnsvarligSaksbehandler(bekreftedeAksjonspunktDtoer, behandling);
 
-        spolTilbakeTilTidligsteAksjonspunkt(bekreftedeAksjonspunktDtoer, kontekst, false);
+        spolTilbakeTilTidligsteAksjonspunkt(bekreftedeAksjonspunktDtoer, kontekst);
 
         bekreftAksjonspunkter(kontekst, bekreftedeAksjonspunktDtoer, behandling);
 
@@ -69,15 +66,14 @@ public class AksjonspunktApplikasjonTjeneste {
     }
 
     private void spolTilbakeTilTidligsteAksjonspunkt(Collection<? extends AksjonspunktKode> aksjonspunktDtoer,
-                                                     BehandlingskontrollKontekst kontekst,
-                                                     boolean erOverstyring) {
+                                                     BehandlingskontrollKontekst kontekst) {
         // Her sikres at behandlingskontroll hopper tilbake til aksjonspunktenes tidligste "løsesteg" dersom aktivt
         // behandlingssteg er lenger fremme i sekvensen
-        List<String> bekreftedeApKoder = aksjonspunktDtoer.stream()
-                .map(AksjonspunktKode :: getKode)
+        List<AksjonspunktDefinisjon> bekreftedeApKoder = aksjonspunktDtoer.stream()
+                .map(AksjonspunktKode::getAksjonspunktDefinisjon)
                 .collect(toList());
 
-        behandlingskontrollTjeneste.behandlingTilbakeføringTilTidligsteAksjonspunkt(kontekst, bekreftedeApKoder, erOverstyring);
+        behandlingskontrollTjeneste.behandlingTilbakeføringTilTidligsteAksjonspunkt(kontekst, bekreftedeApKoder);
     }
 
     private void bekreftAksjonspunkter(BehandlingskontrollKontekst kontekst,
@@ -89,17 +85,17 @@ public class AksjonspunktApplikasjonTjeneste {
 
         behandlingskontrollTjeneste.oppdaterBehandling(behandling, kontekst);
 
-        behandlingskontrollTjeneste.aksjonspunkterUtført(kontekst, utførteAksjonspunkter, behandling.getAktivtBehandlingSteg());
+        behandlingskontrollTjeneste.lagreAksjonspunkterUtført(kontekst, behandling.getAktivtBehandlingSteg(), utførteAksjonspunkter);
     }
 
     private void bekreftAksjonspunkt(Behandling behandling, List<Aksjonspunkt> utførteAksjonspunkter, BekreftetAksjonspunktDto dto) {
-        AksjonspunktDefinisjon aksjonspunktDefinisjon = aksjonspunktRepository.finnAksjonspunktDefinisjon(dto.getKode());
+        AksjonspunktDefinisjon aksjonspunktDefinisjon = dto.getAksjonspunktDefinisjon();
         Aksjonspunkt aksjonspunkt = behandling.getAksjonspunktFor(aksjonspunktDefinisjon);
 
         Instance<Object> instance = finnAksjonspunktOppdaterer(dto.getClass());
 
         if (instance.isUnsatisfied()) {
-            throw new TekniskException("FPT-770743", String.format("Finner ikke håndtering for aksjonspunkt med kode: %s", dto.getKode()));
+            throw new TekniskException("FPT-770743", String.format("Finner ikke håndtering for aksjonspunkt med kode: %s", dto.getAksjonspunktDefinisjon().getKode()));
         } else {
             Object minInstans = instance.get();
             if (minInstans.getClass().isAnnotationPresent(Dependent.class)) {
@@ -112,7 +108,7 @@ public class AksjonspunktApplikasjonTjeneste {
             oppdaterer.oppdater(dto, behandling);
         }
 
-        if (!aksjonspunkt.erBehandletAksjonspunkt() && !aksjonspunkt.erAvbrutt() && aksjonspunktRepository.setTilUtført(aksjonspunkt)) {
+        if (!aksjonspunkt.erBehandletAksjonspunkt() && !aksjonspunkt.erAvbrutt()) {
                 utførteAksjonspunkter.add(aksjonspunkt);
         }
     }

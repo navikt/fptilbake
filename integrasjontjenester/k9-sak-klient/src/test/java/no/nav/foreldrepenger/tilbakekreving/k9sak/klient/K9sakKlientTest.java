@@ -6,7 +6,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.net.URI;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -145,6 +144,6 @@ public class K9sakKlientTest {
         BehandlingResourceLinkDto varselTekstRessursLink = new BehandlingResourceLinkDto();
         varselTekstRessursLink.setHref("/k9/sak/api/behandling/tilbakekreving/varseltekst?behandlingUuid=" + BEHANDLING_UUID.toString());
         varselTekstRessursLink.setRel("tilbakekrevingsvarsel-fritekst");
-        return Arrays.asList(personOpplysningerRessursLink, tilbakekrevingvalgRessursLink, varselTekstRessursLink);
+        return List.of(personOpplysningerRessursLink, tilbakekrevingvalgRessursLink, varselTekstRessursLink);
     }
 }

@@ -7,7 +7,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.net.URI;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -132,7 +131,7 @@ public class FpsakKlientTest {
         BehandlingResourceLinkDto varselTekstRessursLink = new BehandlingResourceLinkDto();
         varselTekstRessursLink.setHref("/fpsak/api/behandling/tilbakekreving/varseltekst?uuid=" + BEHANDLING_UUID.toString());
         varselTekstRessursLink.setRel("tilbakekrevingsvarsel-fritekst");
-        return Arrays.asList(personOpplysningerRessursLink, tilbakekrevingvalgRessursLink, varselTekstRessursLink);
+        return List.of(personOpplysningerRessursLink, tilbakekrevingvalgRessursLink, varselTekstRessursLink);
     }
 
 }

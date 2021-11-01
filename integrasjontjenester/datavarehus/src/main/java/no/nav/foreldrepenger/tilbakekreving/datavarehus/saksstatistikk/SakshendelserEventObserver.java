@@ -7,12 +7,11 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.AksjonspunktTilbakeførtEvent;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.AksjonspunktUtførtEvent;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.AksjonspunkterFunnetEvent;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingEnhetEvent;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStatusEvent;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollEvent;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.AksjonspunktStatusEvent;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingEnhetEvent;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingStatusEvent;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingskontrollEvent;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktStatus;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.mapping.BehandlingTilstandMapper;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.BehandlingTilstand;
 import no.nav.foreldrepenger.tilbakekreving.kontrakter.sakshendelse.DvhEventHendelse;
@@ -39,16 +38,18 @@ public class SakshendelserEventObserver {
         this.behandlingTilstandTjeneste = behandlingTilstandTjeneste;
     }
 
-    public void observerAksjonpunktFunnetEvent(@Observes AksjonspunkterFunnetEvent event) {
-        klargjørSendingAvBehandlingensTilstand(event.getBehandlingId(), DvhEventHendelse.AKSJONSPUNKT_OPPRETTET);
-    }
-
-    public void observerAksjonpunktUtførtEvent(@Observes AksjonspunktUtførtEvent event) {
-        klargjørSendingAvBehandlingensTilstand(event.getBehandlingId(), DvhEventHendelse.AKSJONSPUNKT_UTFØRT);
-    }
-
-    public void observerAksjonpunktTilbakeførtEvent(@Observes AksjonspunktTilbakeførtEvent event) {
-        klargjørSendingAvBehandlingensTilstand(event.getBehandlingId(), DvhEventHendelse.AKSJONSPUNKT_TILBAKEFØR);
+    public void observerAksjonpunktStatusEvent(@Observes AksjonspunktStatusEvent event) {
+        DvhEventHendelse hendelse;
+        if (event.getAksjonspunkter().stream().anyMatch(a -> AksjonspunktStatus.OPPRETTET.equals(a.getStatus()))) {
+            hendelse = DvhEventHendelse.AKSJONSPUNKT_OPPRETTET;
+        } else if (event.getAksjonspunkter().stream().anyMatch(a -> AksjonspunktStatus.UTFØRT.equals(a.getStatus()))) {
+            hendelse = DvhEventHendelse.AKSJONSPUNKT_UTFØRT;
+        } else if (event.getAksjonspunkter().stream().anyMatch(a -> AksjonspunktStatus.AVBRUTT.equals(a.getStatus()))) {
+            hendelse = DvhEventHendelse.AKSJONSPUNKT_AVBRUTT;
+        } else {
+            hendelse = DvhEventHendelse.AKSJONSPUNKT_OPPRETTET;
+        }
+        klargjørSendingAvBehandlingensTilstand(event.getBehandlingId(), hendelse);
     }
 
     public void observerBehandlingAvsluttetEvent(@Observes BehandlingStatusEvent.BehandlingAvsluttetEvent event) {

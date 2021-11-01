@@ -5,8 +5,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.diff.IndexKey;
 public interface Kodeverdi extends IndexKey {
     String getKode();
 
-    String getOffisiellKode();
-
     String getKodeverk();
 
     String getNavn();

@@ -61,7 +61,7 @@ import no.nav.vedtak.felles.prosesstask.api.TaskType;
 public class BehandlingTjeneste {
 
     private static final Logger logger = LoggerFactory.getLogger(BehandlingTjeneste.class);
-    public static final TaskType FINN_KRAVGRUNNLAG_TASK = new TaskType("kravgrunnlag.finn");
+    public static final TaskType FINN_KRAVGRUNNLAG_TASK = new TaskType("kravgrunnlag.finn"); // TODO refaktorer og kolokaliser med task
 
     private BehandlingRepository behandlingRepository;
     private EksternBehandlingRepository eksternBehandlingRepository;

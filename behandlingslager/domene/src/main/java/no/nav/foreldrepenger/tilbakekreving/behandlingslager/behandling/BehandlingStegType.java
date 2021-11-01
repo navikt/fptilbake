@@ -1,119 +1,141 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Map;
 
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.validation.Valid;
-import javax.validation.constraints.Size;
+import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
+
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.VurderingspunktDefinisjon;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkTabell;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.VurderingspunktType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE, fieldVisibility = JsonAutoDetect.Visibility.ANY)
+public enum BehandlingStegType implements Kodeverdi {
 
-@Entity(name = "BehandlingStegType")
-@Table(name = "BEHANDLING_STEG_TYPE")
-public class BehandlingStegType extends KodeverkTabell {
+    // Tilbakekreving
+    INOPPSTEG(BehandlingStegKode.INNOPP, "Innhent opplysninger", BehandlingStatus.UTREDES),
+    VARSEL(BehandlingStegKode.VARSEL, "Varsel om tilbakekreving", BehandlingStatus.UTREDES),
+    TBKGSTEG(BehandlingStegKode.TBKGSTEG, "Motatt kravgrunnlag fra økonomi", BehandlingStatus.UTREDES),
 
-    public static final BehandlingStegType VARSEL = new BehandlingStegType("VARSELSTEG"); //$NON-NLS-1$
-    public static final BehandlingStegType FORESLÅ_VEDTAK = new BehandlingStegType("FORVEDSTEG"); //$NON-NLS-1$
-    public static final BehandlingStegType FATTE_VEDTAK = new BehandlingStegType("FVEDSTEG"); //$NON-NLS-1$
-    public static final BehandlingStegType IVERKSETT_VEDTAK = new BehandlingStegType("IVEDSTEG"); //$NON-NLS-1$
-    public static final BehandlingStegType TBKGSTEG = new BehandlingStegType("TBKGSTEG"); //$NON-NLS-1$
-    public static final BehandlingStegType FORELDELSEVURDERINGSTEG = new BehandlingStegType("VFORELDETSTEG"); //$NON-NLS-1$
-    public static final BehandlingStegType FAKTA_FEILUTBETALING = new BehandlingStegType("FAKTFEILUTSTEG"); //$NON-NLS-1$
-    public static final BehandlingStegType FAKTA_VERGE = new BehandlingStegType("FAKTAVERGESTEG"); //$NON-NLS-1$
-    public static final BehandlingStegType VTILBSTEG = new BehandlingStegType("VTILBSTEG");
+    // Tilbakekreving - revurdering
+    HENTGRUNNLAGSTEG(BehandlingStegKode.HENT_GRUNNLAG, "Hent grunnlag fra økonomi", BehandlingStatus.UTREDES),
 
-    @Valid
-    @Size(max = 10)
-    @OneToMany(mappedBy = "behandlingSteg")
-    protected List<VurderingspunktDefinisjon> vurderingspunkter = new ArrayList<>();
+    // Felles for behandlingene
+    FAKTA_VERGE(BehandlingStegKode.FAKTA_VERGE, "Fakta om verge", BehandlingStatus.UTREDES),
+    FAKTA_FEILUTBETALING(BehandlingStegKode.FAKTA_FEILUTBETALING, "Fakta om Feilutbetaling", BehandlingStatus.UTREDES),
+    FORELDELSEVURDERINGSTEG(BehandlingStegKode.FORELDELSEVURDERINGSTEG, "Vurder foreldelse", BehandlingStatus.UTREDES),
+    VTILBSTEG(BehandlingStegKode.VTILBSTEG, "Vurder tilbakekreving", BehandlingStatus.UTREDES),
+    FORESLÅ_VEDTAK(BehandlingStegKode.FORESLÅ_VEDTAK, "Foreslå vedtak", BehandlingStatus.UTREDES),
+    FATTE_VEDTAK(BehandlingStegKode.FATTE_VEDTAK, "Fatte Vedtak", BehandlingStatus.FATTER_VEDTAK),
+    IVERKSETT_VEDTAK(BehandlingStegKode.IVERKSETT_VEDTAK, "Iverksett Vedtak", BehandlingStatus.IVERKSETTER_VEDTAK);
+
+    static final String KODEVERK = "BEHANDLING_STEG_TYPE";
+
+    private static final Map<String, BehandlingStegType> KODER = new LinkedHashMap<>();
+
+    static {
+        for (var v : values()) {
+            if (KODER.putIfAbsent(v.kode, v) != null) {
+                throw new IllegalArgumentException("Duplikat : " + v.kode);
+            }
+        }
+    }
 
     /**
      * Definisjon av hvilken status behandlingen skal rapporteres som når dette steget er aktivt.
      */
-    @Valid
-    @Convert(converter = BehandlingStatus.KodeverdiConverter.class)
-    @Column(name = "behandling_status_def", nullable = false)
+    @JsonIgnore
     private BehandlingStatus definertBehandlingStatus;
 
-    protected BehandlingStegType() {
-        // Hibernate trenger denne
+    @JsonIgnore
+    private String navn;
+
+    private String kode;
+
+    private BehandlingStegType(String kode) {
+        this.kode = kode;
     }
 
-    protected BehandlingStegType(String kode) {
-        super(kode);
-    }
-
-    // har brukt bare for å teste behandling med steg og status
-    protected BehandlingStegType(String kode, BehandlingStatus behandlingStatus) {
-        super(kode);
-        this.definertBehandlingStatus = behandlingStatus;
+    private BehandlingStegType(String kode, String navn, BehandlingStatus definertBehandlingStatus) {
+        this.kode = kode;
+        this.navn = navn;
+        this.definertBehandlingStatus = definertBehandlingStatus;
     }
 
     public BehandlingStatus getDefinertBehandlingStatus() {
-        validerBehandlingStatusHentet();
         return definertBehandlingStatus;
     }
 
-    private void validerBehandlingStatusHentet() {
-        if (definertBehandlingStatus == null) {
-            throw new IllegalArgumentException(
-                    "Denne koden er ikke hentet fra databasen, kan ikke brukes til å konfigurere steg (kun skriving):" + this); //$NON-NLS-1$
-        }
-    }
-
-    public List<VurderingspunktDefinisjon> getVurderingspunkter() {
-        return Collections.unmodifiableList(vurderingspunkter);
-    }
-
-    public Optional<VurderingspunktDefinisjon> getVurderingspunktInngang() {
-        return Optional.ofNullable(finnVurderingspunkt(VurderingspunktDefinisjon.Type.INNGANG));
-    }
-
     public List<AksjonspunktDefinisjon> getAksjonspunktDefinisjonerInngang() {
-        Optional<VurderingspunktDefinisjon> vurd = getVurderingspunktInngang();
-        if (!vurd.isPresent()) {
-            return Collections.emptyList();
-        } else {
-            return vurd.get().getAksjonspunktDefinisjoner();
-        }
-    }
-
-    public Optional<VurderingspunktDefinisjon> getVurderingspunktUtgang() {
-        return Optional.ofNullable(finnVurderingspunkt(VurderingspunktDefinisjon.Type.UTGANG));
+        return AksjonspunktDefinisjon.finnAksjonspunktDefinisjoner(this, VurderingspunktType.INN);
     }
 
     public List<AksjonspunktDefinisjon> getAksjonspunktDefinisjonerUtgang() {
-        Optional<VurderingspunktDefinisjon> vurd = getVurderingspunktUtgang();
-        if (!vurd.isPresent()) {
-            return Collections.emptyList();
-        } else {
-            return vurd.get().getAksjonspunktDefinisjoner();
-        }
+        return AksjonspunktDefinisjon.finnAksjonspunktDefinisjoner(this, VurderingspunktType.UT);
     }
 
-    private VurderingspunktDefinisjon finnVurderingspunkt(VurderingspunktDefinisjon.Type type) {
-        List<VurderingspunktDefinisjon> list = vurderingspunkter.stream()
-                .filter(v -> Objects.equals(type, v.getType()))
-                .collect(Collectors.toList());
-        if (list.isEmpty()) {
+    public List<AksjonspunktDefinisjon> getAksjonspunktDefinisjoner(VurderingspunktType type) {
+        return AksjonspunktDefinisjon.finnAksjonspunktDefinisjoner(this, type);
+    }
+
+    @JsonProperty
+    @Override
+    public String getKode() {
+        return kode;
+    }
+
+    @Override
+    public String getNavn() {
+        return navn;
+    }
+
+    @JsonProperty
+    @Override
+    public String getKodeverk() {
+        return KODEVERK;
+    }
+
+    @JsonCreator
+    public static BehandlingStegType fraKode(@JsonProperty("kode") String kode) {
+        if (kode == null) {
             return null;
-        } else if (list.size() == 1) {
-            return list.get(0);
-        } else {
-            throw new IllegalStateException("Mer enn en definisjon matcher type : " + type.getDbKode() + ": " + list); //$NON-NLS-1$ //$NON-NLS-2$
         }
+        var ad = KODER.get(kode);
+        if (ad == null) {
+            throw new IllegalArgumentException("Ukjent BehandlingStegType: " + kode);
+        }
+        return ad;
     }
 
+    @Override
+    public String toString() {
+        return super.toString() + "('" + getKode() + "')";
+    }
+
+    public static Map<String, BehandlingStegType> kodeMap() {
+        return Collections.unmodifiableMap(KODER);
+    }
+
+    @Converter(autoApply = true)
+    public static class KodeverdiConverter implements AttributeConverter<BehandlingStegType, String> {
+        @Override
+        public String convertToDatabaseColumn(BehandlingStegType attribute) {
+            return attribute == null ? null : attribute.getKode();
+        }
+
+        @Override
+        public BehandlingStegType convertToEntityAttribute(String dbData) {
+            return dbData == null ? null : BehandlingStegType.fraKode(dbData);
+        }
+    }
 }

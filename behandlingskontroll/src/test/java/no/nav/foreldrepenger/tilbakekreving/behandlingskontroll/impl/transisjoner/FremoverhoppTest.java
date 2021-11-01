@@ -1,14 +1,13 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.transisjoner;
 
-import static no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.transisjoner.FellesTransisjoner.FREMHOPP_TIL_FORESLÅ_VEDTAK;
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktStatus.AVBRUTT;
 import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktStatus.UTFØRT;
-import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.VurderingspunktDefinisjon.Type.INNGANG;
-import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.VurderingspunktDefinisjon.Type.UTGANG;
+import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.VurderingspunktType.INN;
+import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.VurderingspunktType.UT;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import javax.persistence.EntityManager;
 
@@ -21,13 +20,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandleStegResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingSteg;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegModell;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegRef;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingTransisjonEvent;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingTypeRef;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingTransisjonEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.TestBehandlingStegType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.observer.BehandlingskontrollFremoverhoppTransisjonEventObserver;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.observer.StegTransisjon;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.spi.BehandlingskontrollServiceProvider;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.transisjoner.FellesTransisjoner;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegTilstand;
@@ -35,110 +34,93 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktStatus;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.VurderingspunktDefinisjon;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.VurderingspunktType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
 
 @ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public class FremoverhoppTest {
 
-    public static final BehandlingStegType STEG_1 = TestBehandlingStegType.STEG_1;
-    public static final BehandlingStegType STEG_2 = TestBehandlingStegType.STEG_2;
-    public static final BehandlingStegType STEG_3 = TestBehandlingStegType.STEG_3;
+    private final List<StegTransisjon> transisjoner = new ArrayList<>();
 
-    static List<no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.observer.StegTransisjon> transisjoner = new ArrayList<>();
-
-    private EntityManager em;
-    private AksjonspunktRepository aksjonspunktRepository;
-    private BehandlingRepositoryProvider repositoryProvider;
     private BehandlingRepository behandlingRepository;
+    private final BehandlingModellRepository behandlingModellRepository = new BehandlingModellRepository();
 
+    private BehandlingskontrollServiceProvider serviceProvider;
+    private BehandlingRepositoryProvider repositoryProvider;
+
+    private BehandlingStegType steg1;
+    private BehandlingStegType steg2;
+    private BehandlingStegType steg3;
     private BehandlingskontrollFremoverhoppTransisjonEventObserver observer;
 
     private Behandling behandling;
     private BehandlingLås behandlingLås;
 
     @BeforeEach
-    public void opprettStatiskModell(EntityManager entityManager) {
-        this.em = entityManager;
-        aksjonspunktRepository = new AksjonspunktRepository(em);
-        repositoryProvider = new BehandlingRepositoryProvider(em);
-        behandlingRepository = repositoryProvider.getBehandlingRepository();
-        BehandlingModellRepository behandlingModellRepository = new BehandlingModellRepository(em);
-        observer = new BehandlingskontrollFremoverhoppTransisjonEventObserver(repositoryProvider,
-            behandlingModellRepository);
+    void setUp(EntityManager entityManager) {
+        serviceProvider = new BehandlingskontrollServiceProvider(entityManager, behandlingModellRepository, null);
+        repositoryProvider = new BehandlingRepositoryProvider(entityManager);
+        behandlingRepository = serviceProvider.getBehandlingRepository();
+        observer = new BehandlingskontrollFremoverhoppTransisjonEventObserver(serviceProvider) {
+            @Override
+            protected void hoppFramover(BehandlingStegModell stegModell, BehandlingTransisjonEvent transisjonEvent, BehandlingStegType sisteSteg,
+                                        BehandlingStegType finalFørsteSteg) {
+                transisjoner.add(new StegTransisjon(BehandlingSteg.TransisjonType.HOPP_OVER_FRAMOVER,
+                    stegModell.getBehandlingStegType()));
+            }
+        };
 
-        sql("INSERT INTO BEHANDLING_STEG_TYPE (KODE, NAVN, BEHANDLING_STATUS_DEF, BESKRIVELSE) VALUES ('STEG-1', 'test-steg-1', 'UTRED', 'test')");
-        sql("INSERT INTO BEHANDLING_STEG_TYPE (KODE, NAVN, BEHANDLING_STATUS_DEF, BESKRIVELSE) VALUES ('STEG-2', 'test-steg-2', 'UTRED', 'test')");
-        sql("INSERT INTO BEHANDLING_STEG_TYPE (KODE, NAVN, BEHANDLING_STATUS_DEF, BESKRIVELSE) VALUES ('STEG-3', 'test-steg-3', 'UTRED', 'test')");
-
-        sql("INSERT INTO BEHANDLING_TYPE_STEG_SEKV (ID, BEHANDLING_TYPE, BEHANDLING_STEG_TYPE, SEKVENS_NR) VALUES (SEQ_BEHANDLING_TYPE_STEG_SEKV.nextval, 'BT-009', 'STEG-1', 1)");
-        sql("INSERT INTO BEHANDLING_TYPE_STEG_SEKV (ID, BEHANDLING_TYPE, BEHANDLING_STEG_TYPE, SEKVENS_NR) VALUES (SEQ_BEHANDLING_TYPE_STEG_SEKV.nextval, 'BT-009', 'STEG-2', 2)");
-        sql("INSERT INTO BEHANDLING_TYPE_STEG_SEKV (ID, BEHANDLING_TYPE, BEHANDLING_STEG_TYPE, SEKVENS_NR) VALUES (SEQ_BEHANDLING_TYPE_STEG_SEKV.nextval, 'BT-009', 'STEG-3', 3)");
-
-        sql("INSERT INTO VURDERINGSPUNKT_DEF (KODE, BEHANDLING_STEG, VURDERINGSPUNKT_TYPE, NAVN) VALUES ('STEG-1.INN', 'STEG-1', 'INN', 'STEG-1.INN')");
-        sql("INSERT INTO VURDERINGSPUNKT_DEF (KODE, BEHANDLING_STEG, VURDERINGSPUNKT_TYPE, NAVN) VALUES ('STEG-2.INN', 'STEG-2', 'INN', 'STEG-2.INN')");
-        sql("INSERT INTO VURDERINGSPUNKT_DEF (KODE, BEHANDLING_STEG, VURDERINGSPUNKT_TYPE, NAVN) VALUES ('STEG-3.INN', 'STEG-3', 'INN', 'STEG-3.INN')");
-        sql("INSERT INTO VURDERINGSPUNKT_DEF (KODE, BEHANDLING_STEG, VURDERINGSPUNKT_TYPE, NAVN) VALUES ('STEG-1.UT', 'STEG-1', 'UT', 'STEG-1.UT')");
-        sql("INSERT INTO VURDERINGSPUNKT_DEF (KODE, BEHANDLING_STEG, VURDERINGSPUNKT_TYPE, NAVN) VALUES ('STEG-2.UT', 'STEG-2', 'UT', 'STEG-2.UT')");
-        sql("INSERT INTO VURDERINGSPUNKT_DEF (KODE, BEHANDLING_STEG, VURDERINGSPUNKT_TYPE, NAVN) VALUES ('STEG-3.UT', 'STEG-3', 'UT', 'STEG-3.UT')");
-
-        sql("INSERT INTO AKSJONSPUNKT_DEF (KODE, NAVN, VURDERINGSPUNKT, TOTRINN_BEHANDLING_DEFAULT, VILKAR_TYPE, SKJERMLENKE_TYPE) VALUES ('STEG-1-INN', 'STEG-1-INN', 'STEG-1.INN', 'N', '-', '-')");
-        sql("INSERT INTO AKSJONSPUNKT_DEF (KODE, NAVN, VURDERINGSPUNKT, TOTRINN_BEHANDLING_DEFAULT, VILKAR_TYPE, SKJERMLENKE_TYPE) VALUES ('STEG-2-INN', 'STEG-2-INN', 'STEG-2.INN', 'N', '-', '-')");
-        sql("INSERT INTO AKSJONSPUNKT_DEF (KODE, NAVN, VURDERINGSPUNKT, TOTRINN_BEHANDLING_DEFAULT, VILKAR_TYPE, SKJERMLENKE_TYPE) VALUES ('STEG-3-INN', 'STEG-3-INN', 'STEG-3.INN', 'N', '-', '-')");
-        sql("INSERT INTO AKSJONSPUNKT_DEF (KODE, NAVN, VURDERINGSPUNKT, TOTRINN_BEHANDLING_DEFAULT, VILKAR_TYPE, SKJERMLENKE_TYPE) VALUES ('STEG-1-UT', 'STEG-1-UT', 'STEG-1.UT', 'N', '-', '-')");
-        sql("INSERT INTO AKSJONSPUNKT_DEF (KODE, NAVN, VURDERINGSPUNKT, TOTRINN_BEHANDLING_DEFAULT, VILKAR_TYPE, SKJERMLENKE_TYPE) VALUES ('STEG-2-UT', 'STEG-2-UT', 'STEG-2.UT', 'N', '-', '-')");
-        sql("INSERT INTO AKSJONSPUNKT_DEF (KODE, NAVN, VURDERINGSPUNKT, TOTRINN_BEHANDLING_DEFAULT, VILKAR_TYPE, SKJERMLENKE_TYPE) VALUES ('STEG-3-UT', 'STEG-3-UT', 'STEG-3.UT', 'N', '-', '-')");
-
-        em.flush();
+        var modell = behandlingModellRepository.getModell(BehandlingType.TILBAKEKREVING);
+        steg1 = BehandlingStegType.FORELDELSEVURDERINGSTEG;
+        steg2 = modell.finnNesteSteg(steg1).getBehandlingStegType();
+        steg3 = modell.finnNesteSteg(steg2).getBehandlingStegType();
     }
 
     @Test
     public void skal_avbryte_aksjonspunkt_som_skulle_vært_håndtert_i_mellomliggende_steg() {
-        assertAPAvbrytesVedFremoverhopp(fra(STEG_1, UTGANG), til(STEG_3), medAP(identifisertI(STEG_1), løsesI(STEG_2, INNGANG)));
-        assertAPAvbrytesVedFremoverhopp(fra(STEG_1, UTGANG), til(STEG_3), medAP(identifisertI(STEG_1), løsesI(STEG_2, UTGANG)));
+        assertAPAvbrytesVedFremoverhopp(fra(steg1, UT), til(steg3), medAP(steg1, UT));
+        assertAPAvbrytesVedFremoverhopp(fra(steg1, UT), til(steg3), medAP(steg1, UT));
     }
 
     @Test
     public void skal_ikke_gjøre_noe_med_aksjonspunkt_som_oppsto_og_løstes_før_steget_det_hoppes_fra() {
-        assertAPUendretVedFremoverhopp(fra(STEG_2, UTGANG), til(STEG_3), medAP(identifisertI(STEG_1), løsesI(STEG_1, UTGANG), medStatus(UTFØRT)));
+        assertAPUendretVedFremoverhopp(fra(steg2, UT), til(steg3), medAP(steg1, UT));
     }
 
     @Test
     public void skal_ikke_gjøre_noe_med_aksjonspunkt_som_løstes_ved_inngang_til_steget_når_det_hoppes_fra_utgang_av_steget() {
-        assertAPUendretVedFremoverhopp(fra(STEG_2, UTGANG), til(STEG_3), medAP(identifisertI(STEG_1), løsesI(STEG_2, INNGANG), medStatus(UTFØRT)));
+        assertAPUendretVedFremoverhopp(fra(steg2, UT), til(steg3), medAP(steg1, UT));
     }
 
     @Test
     public void skal_avbryte_aksjonspunkt_i_utgang_av_frasteget_når_frasteget_ikke_er_ferdig() {
-        assertAPAvbrytesVedFremoverhopp(fra(STEG_2, INNGANG), til(STEG_3), medAP(identifisertI(STEG_1), løsesI(STEG_2, UTGANG)));
-        assertAPAvbrytesVedFremoverhopp(fra(STEG_2, UTGANG), til(STEG_3), medAP(identifisertI(STEG_1), løsesI(STEG_2, UTGANG)));
+        assertAPAvbrytesVedFremoverhopp(fra(steg2, INN), til(steg3), medAP(steg2, UT));
+        assertAPAvbrytesVedFremoverhopp(fra(steg2, UT), til(steg3), medAP(steg2, UT));
     }
 
     @Test
     public void skal_ikke_gjøre_noe_med_aksjonspunkt_som_skal_løses_i_steget_det_hoppes_til() {
-        assertAPUendretVedFremoverhopp(fra(STEG_2, UTGANG), til(STEG_3), medAP(identifisertI(STEG_1), løsesI(STEG_3, INNGANG)));
-        assertAPUendretVedFremoverhopp(fra(STEG_2, UTGANG), til(STEG_3), medAP(identifisertI(STEG_1), løsesI(STEG_3, UTGANG)));
-        assertAPUendretVedFremoverhopp(fra(STEG_2, UTGANG), til(STEG_3), medAP(identifisertI(STEG_2), løsesI(STEG_3, UTGANG)));
-        assertAPUendretVedFremoverhopp(fra(STEG_2, UTGANG), til(STEG_3), medAP(identifisertI(STEG_2), løsesI(STEG_3, UTGANG)));
+        assertAPUendretVedFremoverhopp(fra(steg2, UT), til(steg3), medAP(steg1, UT));
+        assertAPUendretVedFremoverhopp(fra(steg2, UT), til(steg3), medAP(steg1, UT));
+        assertAPUendretVedFremoverhopp(fra(steg2, UT), til(steg3), medAP(steg3, UT));
+        assertAPUendretVedFremoverhopp(fra(steg2, UT), til(steg3), medAP(steg3, UT));
     }
 
     @Test
-    public void skal_kalle_transisjoner_på_steg_det_hoppes_over() {
-        Assertions.assertThat(transisjonerVedFremoverhopp(fra(STEG_1, INNGANG), til(STEG_3))).containsOnly(no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.observer.StegTransisjon.hoppFremoverOver(STEG_1), no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.observer.StegTransisjon.hoppFremoverOver(STEG_2));
-        Assertions.assertThat(transisjonerVedFremoverhopp(fra(STEG_1, UTGANG), til(STEG_3))).containsOnly(no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.observer.StegTransisjon.hoppFremoverOver(STEG_2));
-        Assertions.assertThat(transisjonerVedFremoverhopp(fra(STEG_2, INNGANG), til(STEG_3))).containsOnly(no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.observer.StegTransisjon.hoppFremoverOver(STEG_2));
-        Assertions.assertThat(transisjonerVedFremoverhopp(fra(STEG_2, UTGANG), til(STEG_3))).isEmpty();
-    }
-
-    private void sql(String sql) {
-        em.createNativeQuery(sql).executeUpdate();
+    public void skal_kalle_transisjoner_på_steg_det_hoppes_over() throws Exception {
+        assertThat(transisjonerVedFremoverhopp(fra(steg1, INN), til(steg3))).contains(
+            StegTransisjon.hoppFremoverOver(steg1),
+            StegTransisjon.hoppFremoverOver(steg2));
+        assertThat(transisjonerVedFremoverhopp(fra(steg1, UT), til(steg3)))
+            .contains(StegTransisjon.hoppFremoverOver(steg2));
+        assertThat(transisjonerVedFremoverhopp(fra(steg2, INN), til(steg3)))
+            .contains(StegTransisjon.hoppFremoverOver(steg2));
+        assertThat(transisjonerVedFremoverhopp(fra(steg2, UT), til(steg3))).isEmpty();
     }
 
     private void assertAPAvbrytesVedFremoverhopp(StegPort fra, BehandlingStegType til, Aksjonspunkt ap) {
@@ -146,13 +128,13 @@ public class FremoverhoppTest {
     }
 
     private void assertAPUendretVedFremoverhopp(StegPort fra, BehandlingStegType til, Aksjonspunkt ap) {
-        AksjonspunktStatus orginalStatus = ap.getStatus();
+        var orginalStatus = ap.getStatus();
         assertAPStatusEtterHopp(fra, til, ap).isEqualTo(orginalStatus);
     }
 
-    private List<no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.observer.StegTransisjon> transisjonerVedFremoverhopp(StegPort fra, BehandlingStegType til) {
-        //skal ikke spille noen rolle for transisjoner hvilke aksjonspunkter som finnes
-        Aksjonspunkt ap = medAP(identifisertI(STEG_1), løsesI(STEG_2, INNGANG));
+    private List<StegTransisjon> transisjonerVedFremoverhopp(StegPort fra, BehandlingStegType til) {
+        // skal ikke spille noen rolle for transisjoner hvilke aksjonspunkter som finnes
+        var ap = medAP(steg1, UT);
 
         transisjoner.clear();
         utførFremoverhoppReturnerAksjonspunkt(fra, til, ap);
@@ -160,74 +142,71 @@ public class FremoverhoppTest {
     }
 
     private AbstractComparableAssert<?, AksjonspunktStatus> assertAPStatusEtterHopp(StegPort fra, BehandlingStegType til, Aksjonspunkt ap) {
-        Aksjonspunkt aksjonspunkt = utførFremoverhoppReturnerAksjonspunkt(fra, til, ap);
+        var aksjonspunkt = utførFremoverhoppReturnerAksjonspunkt(fra, til, ap);
         return Assertions.assertThat(aksjonspunkt.getStatus());
     }
 
     private Aksjonspunkt utførFremoverhoppReturnerAksjonspunkt(StegPort fra, BehandlingStegType til, Aksjonspunkt ap) {
 
-
         BehandlingStegStatus fraStatus;
-        String fraPort = fra.getPort().getDbKode();
-        if (fraPort.equals(INNGANG.getDbKode())) {
+        var fraPort = fra.port().getDbKode();
+        if (fraPort.equals(VurderingspunktType.INN.getDbKode())) {
             fraStatus = BehandlingStegStatus.INNGANG;
-        } else if (fraPort.equals(UTGANG.getDbKode())) {
+        } else if (fraPort.equals(VurderingspunktType.UT.getDbKode())) {
             fraStatus = BehandlingStegStatus.UTGANG;
         } else {
             throw new IllegalStateException("BehandlingStegStatus " + fraPort + " ikke støttet i testen");
         }
 
-        BehandlingStegTilstand fraTilstand = new BehandlingStegTilstand(behandling, fra.getSteg(), fraStatus);
-        //BehandlingStegTilstand tilTilstand = new BehandlingStegTilstand(behandling, til, BehandlingStegStatus.VENTER);
-        Fagsak fagsak = behandling.getFagsak();
-        BehandlingskontrollKontekst kontekst = new BehandlingskontrollKontekst(fagsak.getId(), fagsak.getAktørId(), behandlingLås);
-        /*BehandlingStegOvergangEvent.BehandlingStegOverhoppEvent behandlingEvent =
-            new BehandlingStegOvergangEvent.BehandlingStegOverhoppEvent(kontekst, Optional.of(fraTilstand), Optional.of(tilTilstand));*/
-        BehandlingTransisjonEvent transisjonEvent = new BehandlingTransisjonEvent(kontekst, FREMHOPP_TIL_FORESLÅ_VEDTAK, Optional.of(fraTilstand), til, true);
+        var fraTilstand = new BehandlingStegTilstand(behandling, fra.steg(), fraStatus);
+        // BehandlingStegTilstand tilTilstand = new BehandlingStegTilstand(behandling,
+        // til, BehandlingStegStatus.VENTER);
+        var fagsak = behandling.getFagsak();
+        var kontekst = new BehandlingskontrollKontekst(fagsak.getId(), fagsak.getAktørId(), behandlingLås);
+        /*
+         * BehandlingStegOvergangEvent.BehandlingStegOverhoppEvent behandlingEvent = new
+         * BehandlingStegOvergangEvent.BehandlingStegOverhoppEvent(kontekst,
+         * Optional.of(fraTilstand), Optional.of(tilTilstand));
+         */
+        var transisjonEvent = new BehandlingTransisjonEvent(kontekst, FellesTransisjoner.FREMHOPP_TIL_FORESLÅ_VEDTAK, fraTilstand,
+            til, true);
 
-
-        //act
+        // act
         observer.observerBehandlingSteg(transisjonEvent);
 
         return ap;
     }
 
-
-    private Aksjonspunkt medAP(BehandlingStegType identifisertI, StegPort port) {
-        return medAP(identifisertI, port, AksjonspunktStatus.OPPRETTET);
+    private Aksjonspunkt medAP(BehandlingStegType identifisertI, VurderingspunktType type) {
+        return medAP(identifisertI, AksjonspunktStatus.OPPRETTET, identifisertI.getAksjonspunktDefinisjoner(type).get(0));
     }
 
-    private Aksjonspunkt medAP(BehandlingStegType identifisertI, StegPort port, AksjonspunktStatus status) {
-        String apKode = port.getSteg().getKode() + "-" + port.getPort().getDbKode();
+    private Aksjonspunkt medAP(BehandlingStegType identifisertI, AksjonspunktStatus status, AksjonspunktDefinisjon ad) {
 
-        AksjonspunktDefinisjon ad = aksjonspunktRepository.finnAksjonspunktDefinisjon(apKode);
-        BehandlingStegType idSteg = behandlingRepository.finnBehandlingStegType(identifisertI.getKode());
-
-        Behandling ytelseBehandling = ScenarioSimple.simple().lagre(repositoryProvider);
-        behandling = Behandling.nyBehandlingFor(ytelseBehandling.getFagsak(), BehandlingType.REVURDERING_TILBAKEKREVING).build();
+        var ytelseBehandling = ScenarioSimple.simple().lagre(repositoryProvider);
+        behandling = Behandling.nyBehandlingFor(ytelseBehandling.getFagsak(), BehandlingType.TILBAKEKREVING).build();
         behandlingLås = behandlingRepository.taSkriveLås(behandling);
         behandlingRepository.lagre(behandling, behandlingLås);
-        Aksjonspunkt ap = aksjonspunktRepository.leggTilAksjonspunkt(behandling, ad, idSteg);
+        var ap = serviceProvider.getAksjonspunktKontrollRepository().leggTilAksjonspunkt(behandling, ad, identifisertI);
 
         if (status.getKode().equals(UTFØRT.getKode())) {
-            aksjonspunktRepository.setTilUtført(ap);
+            serviceProvider.getAksjonspunktKontrollRepository().setTilUtført(ap);
         } else if (status.getKode().equals(AksjonspunktStatus.OPPRETTET.getKode())) {
-            //dette er default-status ved opprettelse
+            // dette er default-status ved opprettelse
         } else {
             throw new IllegalArgumentException("Testen støtter ikke status " + status + " du må evt. utvide testen");
         }
-
 
         behandlingRepository.lagre(behandling, behandlingLås);
 
         return ap;
     }
 
-    static abstract class AbstractTestSteg implements BehandlingSteg {
+    class TestSteg implements BehandlingSteg {
 
         private final BehandlingStegType behandlingStegType;
 
-        protected AbstractTestSteg(BehandlingStegType behandlingStegType) {
+        protected TestSteg(BehandlingStegType behandlingStegType) {
             this.behandlingStegType = behandlingStegType;
         }
 
@@ -237,34 +216,9 @@ public class FremoverhoppTest {
         }
 
         @Override
-        public void vedTransisjon(BehandlingskontrollKontekst kontekst, Behandling behandling, BehandlingStegModell modell, TransisjonType transisjonType, BehandlingStegType førsteSteg, BehandlingStegType sisteSteg, TransisjonType inngangUtgang) {
-            transisjoner.add(new StegTransisjon(transisjonType, behandlingStegType));
-        }
-
-    }
-
-    @BehandlingStegRef(kode = "STEG-1")
-    @BehandlingTypeRef("BT-009")
-    public static class TestSteg1 extends AbstractTestSteg {
-        public TestSteg1() {
-            super(STEG_1);
-        }
-    }
-
-    @BehandlingStegRef(kode = "STEG-2")
-    @BehandlingTypeRef("BT-009")
-    public static class TestSteg2 extends AbstractTestSteg {
-        public TestSteg2() {
-            super(STEG_2);
-        }
-
-    }
-
-    @BehandlingStegRef(kode = "STEG-3")
-    @BehandlingTypeRef("BT-009")
-    public static class TestSteg3 extends AbstractTestSteg {
-        public TestSteg3() {
-            super(STEG_3);
+        public void vedHoppOverFramover(BehandlingskontrollKontekst kontekst, BehandlingStegModell modell, BehandlingStegType fraSteg,
+                                        BehandlingStegType tilSteg) {
+            transisjoner.add(new StegTransisjon(TransisjonType.HOPP_OVER_FRAMOVER, behandlingStegType));
         }
 
     }
@@ -273,43 +227,12 @@ public class FremoverhoppTest {
         return steg;
     }
 
-    private StegPort fra(BehandlingStegType steg, VurderingspunktDefinisjon.Type port) {
+    private StegPort fra(BehandlingStegType steg, VurderingspunktType port) {
         return new StegPort(steg, port);
 
     }
 
-    private StegPort løsesI(BehandlingStegType steg, VurderingspunktDefinisjon.Type port) {
-        return new StegPort(steg, port);
+    private static record StegPort(BehandlingStegType steg, VurderingspunktType port) {
     }
 
-    private BehandlingStegType identifisertI(BehandlingStegType steg) {
-        return steg;
-
-    }
-
-    private AksjonspunktStatus medStatus(AksjonspunktStatus status) {
-        return status;
-    }
-
-    static class StegPort {
-
-
-        private final BehandlingStegType steg;
-
-        private final VurderingspunktDefinisjon.Type port;
-
-        public StegPort(BehandlingStegType steg, VurderingspunktDefinisjon.Type port) {
-            this.steg = steg;
-            this.port = port;
-        }
-
-        public BehandlingStegType getSteg() {
-            return steg;
-        }
-
-        public VurderingspunktDefinisjon.Type getPort() {
-            return port;
-        }
-
-    }
 }

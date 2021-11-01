@@ -13,7 +13,7 @@ import com.google.common.collect.Lists;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandleStegResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingManglerKravgrunnlagFristenUtløptEventPubliserer;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.observer.BehandlingManglerKravgrunnlagFristenUtløptEventPubliserer;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.transisjoner.FellesTransisjoner;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;

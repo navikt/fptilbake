@@ -64,11 +64,6 @@ public enum VedtakResultatType implements Kodeverdi { //Kun brukes for å sende 
         return kode;
     }
 
-    @Override
-    public String getOffisiellKode() {
-        return getKode();
-    }
-
     @JsonProperty
     @Override
     public String getKodeverk() {

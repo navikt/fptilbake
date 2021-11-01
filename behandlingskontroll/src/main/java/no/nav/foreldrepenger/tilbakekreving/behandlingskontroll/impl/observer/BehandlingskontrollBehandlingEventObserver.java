@@ -1,7 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.observer;
 
 import java.util.Objects;
-import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
@@ -10,17 +9,17 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegOvergangEvent;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingStegOvergangEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollEventPubliserer;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.spi.BehandlingskontrollServiceProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegTilstand;
 
 /**
  * Observerer og propagerer / håndterer events internt i Behandlingskontroll
  */
 @ApplicationScoped
 public class BehandlingskontrollBehandlingEventObserver {
-    private static final Logger log = LoggerFactory.getLogger(BehandlingskontrollBehandlingEventObserver.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BehandlingskontrollBehandlingEventObserver.class);
 
     private BehandlingskontrollEventPubliserer eventPubliserer;
 
@@ -28,16 +27,15 @@ public class BehandlingskontrollBehandlingEventObserver {
     }
 
     @Inject
-    public BehandlingskontrollBehandlingEventObserver(BehandlingskontrollEventPubliserer eventPubliserer) {
-        this.eventPubliserer = eventPubliserer;
+    public BehandlingskontrollBehandlingEventObserver(BehandlingskontrollServiceProvider serviceProvider) {
+        this.eventPubliserer = serviceProvider.getEventPubliserer();
     }
 
     /**
      * Intern event propagering i Behandlingskontroll.
-     * 
-     * Observer {@link BehandlingStegOvergangEvent} og propagerer events for {@link BehandlingStegStatusEvent} og
-     * {@link BehandlingStatusEvent}
-     * endringer
+     * <p>
+     * Observer {@link BehandlingStegOvergangEvent} og propagerer events for
+     * {@link BehandlingStegStatusEvent} og {@link BehandlingStatusEvent} endringer
      */
     public void propagerBehandlingStatusEventVedStegOvergang(@Observes BehandlingStegOvergangEvent event) {
 
@@ -46,25 +44,25 @@ public class BehandlingskontrollBehandlingEventObserver {
             return;
         }
 
-        Optional<BehandlingStegTilstand> fraTilstand = event.getFraTilstand();
-        Optional<BehandlingStegTilstand> tilTilstand = event.getTilTilstand();
+        var fraTilstand = event.getFraTilstand();
+        var tilTilstand = event.getTilTilstand();
 
-        if ((!fraTilstand.isPresent() && !tilTilstand.isPresent())
-                || (fraTilstand.isPresent() && tilTilstand.isPresent() && Objects.equals(fraTilstand.get(), tilTilstand.get()))) {
+        if ((fraTilstand.isEmpty() && tilTilstand.isEmpty())
+            || (fraTilstand.isPresent() && tilTilstand.isPresent() && Objects.equals(fraTilstand.get(), tilTilstand.get()))) {
             // gjør ingenting - ingen endring i steg
             return;
         }
-        
-        log.info("transisjon fra {} til {}", fraTilstand, tilTilstand);
+
+        LOG.info("transisjon fra {} til {}", fraTilstand, tilTilstand);
 
         // fyr behandling status event
         BehandlingStatus gammelStatus = null;
         if (fraTilstand.isPresent()) {
-            gammelStatus = fraTilstand.get().getBehandling().getStatus();
+            gammelStatus = fraTilstand.get().getSteg().getDefinertBehandlingStatus();
         }
         BehandlingStatus nyStatus = null;
         if (tilTilstand.isPresent()) {
-            nyStatus = tilTilstand.get().getBehandling().getStatus();
+            nyStatus = tilTilstand.get().getSteg().getDefinertBehandlingStatus();
         }
 
         // fyr behandling status event

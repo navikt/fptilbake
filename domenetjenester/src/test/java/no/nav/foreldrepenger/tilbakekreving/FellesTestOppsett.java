@@ -162,13 +162,12 @@ public abstract class FellesTestOppsett {
         taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
         kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repoProvider, gjenopptaBehandlingTjeneste, behandlingskontrollTjeneste, mockSlettGrunnlagEventPubliserer);
         kravgrunnlagBeregningTjeneste = new KravgrunnlagBeregningTjeneste(grunnlagRepository);
-        historikkInnslagKonverter = new HistorikkInnslagKonverter(repoProvider.getAksjonspunktRepository(),
-                behandlingRepository);
+        historikkInnslagKonverter = new HistorikkInnslagKonverter(behandlingRepository);
         historikkTjenesteAdapter = new HistorikkTjenesteAdapter(historikkRepository, historikkInnslagKonverter);
         vurdertForeldelseTjeneste = new VurdertForeldelseTjeneste(repoProvider, historikkTjenesteAdapter, kravgrunnlagBeregningTjeneste);
         vilkårsvurderingHistorikkInnslagTjeneste = new VilkårsvurderingHistorikkInnslagTjeneste(historikkTjenesteAdapter, repoProvider);
         vilkårsvurderingTjeneste = new VilkårsvurderingTjeneste(vurdertForeldelseTjeneste, repoProvider, vilkårsvurderingHistorikkInnslagTjeneste, kravgrunnlagBeregningTjeneste);
-        revurderingTjeneste = new BehandlingRevurderingTjeneste(repoProvider);
+        revurderingTjeneste = new BehandlingRevurderingTjeneste(repoProvider, behandlingskontrollTjeneste);
         faktaFeilutbetalingTjeneste = new FaktaFeilutbetalingTjeneste(repoProvider, kravgrunnlagTjeneste, mockFagsystemKlient);
         fagsakTjeneste = new FagsakTjeneste(mockTpsTjeneste, repoProvider.getFagsakRepository(), brukerRepository);
         behandlingTjeneste = new BehandlingTjeneste(repoProvider, taskTjeneste, behandlingskontrollProvider,

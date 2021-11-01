@@ -2,7 +2,6 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling;
 
 import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -29,7 +28,7 @@ public enum AdresseType implements Kodeverdi {
 
     public static final String KODEVERK = "ADRESSE_TYPE";
     public static final List<AdresseType> kjentePostadressetyper = Collections.unmodifiableList(
-        Arrays.asList(
+        List.of(
             AdresseType.BOSTEDSADRESSE,
             AdresseType.POSTADRESSE,
             AdresseType.POSTADRESSE_UTLAND,
@@ -73,11 +72,6 @@ public enum AdresseType implements Kodeverdi {
     @Override
     public String getKode() {
         return kode;
-    }
-
-    @Override
-    public String getOffisiellKode() {
-        return getKode();
     }
 
     @JsonProperty

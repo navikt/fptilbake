@@ -68,11 +68,6 @@ public enum Språkkode implements Kodeverdi {
         return kode;
     }
 
-    @Override
-    public String getOffisiellKode() {
-        return null;
-    }
-
     @JsonProperty
     @Override
     public String getKodeverk() {

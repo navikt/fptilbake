@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -25,13 +26,15 @@ import com.google.common.collect.Lists;
 import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FaktaFeilutbetalingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.spi.BehandlingskontrollServiceProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.InternalManipulerBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktKodeDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
@@ -66,23 +69,21 @@ public class FplosPubliserEventTaskTest {
     private static final UUID FPSAK_BEHANDLING_UUID = UUID.randomUUID();
 
     private BehandlingRepositoryProvider repositoryProvider;
-    private AksjonspunktRepository aksjonspunktRepository;
 
     private FplosKafkaProducer mockKafkaProducer;
-
-    private InternalManipulerBehandling internalManipulerBehandling;
 
     private FplosPubliserEventTask fplosPubliserEventTask;
 
     private Behandling behandling;
     private ProsessTaskData prosessTaskData;
+    private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
 
     @BeforeEach
     public void setup(EntityManager entityManager) {
         repositoryProvider = new BehandlingRepositoryProvider(entityManager);
-        aksjonspunktRepository = repositoryProvider.getAksjonspunktRepository();
         GjenopptaBehandlingTjeneste mockGjenopptaBehandlingTjeneste = mock(GjenopptaBehandlingTjeneste.class);
         BehandlingskontrollTjeneste mockBehandlingskontrollTjeneste = mock(BehandlingskontrollTjeneste.class);
+        behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(entityManager, new BehandlingModellRepository(), null));
         SlettGrunnlagEventPubliserer mockEventPubliserer = mock(SlettGrunnlagEventPubliserer.class);
         FagsystemKlient mockFagsystemKlient = mock(FagsystemKlient.class);
         mockKafkaProducer = mock(FplosKafkaProducer.class);
@@ -90,7 +91,6 @@ public class FplosPubliserEventTaskTest {
             mockGjenopptaBehandlingTjeneste, mockBehandlingskontrollTjeneste, mockEventPubliserer);
         FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste = new FaktaFeilutbetalingTjeneste(repositoryProvider,
             kravgrunnlagTjeneste, mockFagsystemKlient);
-        internalManipulerBehandling = new InternalManipulerBehandling(repositoryProvider);
         fplosPubliserEventTask = new FplosPubliserEventTask(repositoryProvider, faktaFeilutbetalingTjeneste, mockKafkaProducer, "fptilbake");
 
         behandling = ScenarioSimple.simple().lagre(repositoryProvider);
@@ -110,9 +110,9 @@ public class FplosPubliserEventTaskTest {
 
     @Test
     public void skal_publisere_fplos_data_til_kafka() {
-        aksjonspunktRepository.leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING, BehandlingStegType.FAKTA_FEILUTBETALING);
-        aksjonspunktRepository.leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, BehandlingStegType.VARSEL);
-        internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.FAKTA_FEILUTBETALING);
+        var kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandling);
+        behandlingskontrollTjeneste.lagreAksjonspunkterFunnet(kontekst, List.of(AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING));
+        InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.FAKTA_FEILUTBETALING);
         Kravgrunnlag431 kravgrunnlag431 = lagkravgrunnlag();
 
         fplosPubliserEventTask.doTask(prosessTaskData);
@@ -142,8 +142,9 @@ public class FplosPubliserEventTaskTest {
 
     @Test
     public void skal_publisere_fplos_data_til_kafka_for_henleggelse_når_kravgrunnlag_ikke_finnes() {
-        aksjonspunktRepository.leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, BehandlingStegType.VARSEL);
-        internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VARSEL);
+        var kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandling);
+        behandlingskontrollTjeneste.lagreAksjonspunkterFunnet(kontekst, BehandlingStegType.VARSEL, List.of(AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING));
+        InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VARSEL);
 
         fplosPubliserEventTask.doTask(prosessTaskData);
         verify(mockKafkaProducer, atLeastOnce()).sendJsonMedNøkkel(anyString(), anyString());
@@ -169,8 +170,9 @@ public class FplosPubliserEventTaskTest {
 
     @Test
     public void skal_publisere_fplos_data_til_kafka_når_behandling_venter_på_kravgrunnlag_og_fristen_går_ut() {
-        aksjonspunktRepository.leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, BehandlingStegType.TBKGSTEG);
-        internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.TBKGSTEG);
+        var kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandling);
+        behandlingskontrollTjeneste.lagreAksjonspunkterFunnet(kontekst, BehandlingStegType.TBKGSTEG, List.of(AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG));
+        InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.TBKGSTEG);
         LocalDateTime fristTid = LocalDateTime.now();
         ProsessTaskData prosessTaskData = lagProsessTaskData();
         prosessTaskData.setProperty(FplosPubliserEventTask.PROPERTY_KRAVGRUNNLAG_MANGLER_FRIST_TID, fristTid.toString());
@@ -185,7 +187,7 @@ public class FplosPubliserEventTaskTest {
 
         Map<String, String> aksjonpunkterMap = event.getAksjonspunktKoderMedStatusListe();
         assertThat(aksjonpunkterMap).isNotEmpty()
-            .containsEntry(AksjonspunktDefinisjon.VURDER_HENLEGGELSE_MANGLER_KRAVGRUNNLAG.getKode(), AksjonspunktStatus.OPPRETTET.getKode());
+            .containsEntry(AksjonspunktKodeDefinisjon.VURDER_HENLEGGELSE_MANGLER_KRAVGRUNNLAG, AksjonspunktStatus.OPPRETTET.getKode());
 
         assertThat(event.getEksternId()).isEqualByComparingTo(behandling.getUuid());
         assertThat(event.getFagsystem()).isEqualTo(Fagsystem.FPTILBAKE.getKode());
@@ -199,8 +201,9 @@ public class FplosPubliserEventTaskTest {
 
     @Test
     public void skal_publisere_fplos_data_til_kafka_når_behandling_venter_på_kravgrunnlag_og_fristen_er_endret() {
-        aksjonspunktRepository.leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, BehandlingStegType.TBKGSTEG);
-        internalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.TBKGSTEG);
+        var kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandling);
+        behandlingskontrollTjeneste.lagreAksjonspunkterFunnet(kontekst, BehandlingStegType.TBKGSTEG, List.of(AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG));
+        InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.TBKGSTEG);
         LocalDateTime fristTid = LocalDateTime.now();
         ProsessTaskData prosessTaskData = lagProsessTaskData();
         prosessTaskData.setProperty(FplosPubliserEventTask.PROPERTY_KRAVGRUNNLAG_MANGLER_FRIST_TID, fristTid.toString());
@@ -215,7 +218,7 @@ public class FplosPubliserEventTaskTest {
 
         Map<String, String> aksjonpunkterMap = event.getAksjonspunktKoderMedStatusListe();
         assertThat(aksjonpunkterMap).isNotEmpty()
-            .containsEntry(AksjonspunktDefinisjon.VURDER_HENLEGGELSE_MANGLER_KRAVGRUNNLAG.getKode(), AksjonspunktStatus.AVBRUTT.getKode());
+            .containsEntry(AksjonspunktKodeDefinisjon.VURDER_HENLEGGELSE_MANGLER_KRAVGRUNNLAG, AksjonspunktStatus.AVBRUTT.getKode());
 
         assertThat(event.getEksternId()).isEqualByComparingTo(behandling.getUuid());
         assertThat(event.getFagsystem()).isEqualTo(Fagsystem.FPTILBAKE.getKode());

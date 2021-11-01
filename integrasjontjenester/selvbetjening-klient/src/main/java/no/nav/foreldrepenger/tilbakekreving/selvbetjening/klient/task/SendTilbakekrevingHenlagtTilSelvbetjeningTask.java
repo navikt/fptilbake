@@ -13,7 +13,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 
 @ApplicationScoped
-@ProsessTask("send.beskjed.tilbakekreving.henlagt.selvbetjening")
+@ProsessTask("send.beskjed.tilbakekreving.henlagt.selvbetjening") // OBS opprettes i HenleggBehandlingTjeneste
 @FagsakProsesstaskRekkefølge(gruppeSekvens = true)
 public class SendTilbakekrevingHenlagtTilSelvbetjeningTask implements ProsessTaskHandler {
 

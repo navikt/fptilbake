@@ -1,6 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.web.server.jetty;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
@@ -19,7 +18,7 @@ class DataSourceKonfig {
 
     DataSourceKonfig() {
         defaultDatasource = new DBConnProp(createDatasource("defaultDS"), location + "defaultDS");
-        dataSources = Arrays.asList(defaultDatasource);
+        dataSources = List.of(defaultDatasource);
     }
 
     private DataSource createDatasource(String dataSourceName) {

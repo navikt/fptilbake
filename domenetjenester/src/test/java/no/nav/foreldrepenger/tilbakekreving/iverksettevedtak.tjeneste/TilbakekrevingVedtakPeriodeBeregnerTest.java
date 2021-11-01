@@ -68,7 +68,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         Long behandlingId = behandling.getId();
 
         Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
-            uke1, Arrays.asList(
+            uke1, List.of(
                 KgBeløp.feil(9000),
                 KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(11000).medTilbakekrevBeløp(9000),
                 KgBeløp.trekk(2000))
@@ -92,7 +92,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         Long behandlingId = behandling.getId();
 
         Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
-            uke1, Arrays.asList(
+            uke1, List.of(
                 KgBeløp.feil(9000),
                 KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(11000).medTilbakekrevBeløp(9000),
                 KgBeløp.trekk(2000))
@@ -123,11 +123,11 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         Long behandlingId = behandling.getId();
 
         Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
-            uke1, Arrays.asList(
+            uke1, List.of(
                 KgBeløp.feil(1000),
                 KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000))
             ,
-            uke2, Arrays.asList(
+            uke2, List.of(
                 KgBeløp.feil(2000),
                 KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(2000).medTilbakekrevBeløp(2000))
             ),
@@ -159,7 +159,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         Periode uke1til3 = Periode.omsluttende(uke1, uke3);
 
         Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
-            uke1til3, Arrays.asList(
+            uke1til3, List.of(
                 KgBeløp.feil(3000),
                 KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(3000).medTilbakekrevBeløp(3000).medSkattProsent(0))
         ), false);
@@ -189,7 +189,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         Long behandlingId = behandling.getId();
 
         Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
-            uke1, Arrays.asList(
+            uke1, List.of(
                 KgBeløp.feil(2500),
                 KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medSkattProsent(25),
                 KgBeløp.ytelse(KlasseKode.FPSNDFI).medUtbetBeløp(1500).medTilbakekrevBeløp(1500).medSkattProsent(0))
@@ -216,15 +216,15 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         Long behandlingId = behandling.getId();
 
         Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
-            uke1, Arrays.asList(
+            uke1, List.of(
                 KgBeløp.feil(1000),
                 KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medSkattProsent(0)
             ),
-            uke2, Arrays.asList(
+            uke2, List.of(
                 KgBeløp.feil(1000),
                 KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medSkattProsent(0)
             ),
-            uke3, Arrays.asList(
+            uke3, List.of(
                 KgBeløp.feil(1000),
                 KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medSkattProsent(0)
             )
@@ -261,7 +261,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         Long behandlingId = behandling.getId();
 
         Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
-            Periode.omsluttende(uke1, uke3), Arrays.asList(
+            Periode.omsluttende(uke1, uke3), List.of(
                 KgBeløp.feil(1000),
                 KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000)
             )
@@ -300,7 +300,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         Long behandlingId = behandling.getId();
 
         Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
-            uke1, Arrays.asList(
+            uke1, List.of(
                 KgBeløp.feil(1000),
                 KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medSkattProsent(10)
             )
@@ -331,7 +331,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         Long behandlingId = behandling.getId();
 
         Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
-            uke1, Arrays.asList(
+            uke1, List.of(
                 KgBeløp.feil(1000),
                 KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medSkattProsent(10)
             )
@@ -362,7 +362,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         Long behandlingId = behandling.getId();
 
         Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
-            uke1, Arrays.asList(
+            uke1, List.of(
                 KgBeløp.feil(1000),
                 KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000).medSkattProsent(10)
             )
@@ -396,7 +396,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         Periode uke3 = Periode.of(LocalDate.of(2019, 8, 24), LocalDate.of(2019, 8, 31));
 
         Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
-            Periode.omsluttende(uke1, uke2, uke3), Arrays.asList(
+            Periode.omsluttende(uke1, uke2, uke3), List.of(
                 KgBeløp.feil(3180).medSkattProsent(BigDecimal.valueOf(9.5041)),
                 KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(6380).medTilbakekrevBeløp(3180).medNyttBeløp(3200).medSkattProsent(BigDecimal.valueOf(9.5041))
             )
@@ -438,19 +438,19 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         Periode mars = Periode.of(LocalDate.of(2019, 3, 1), LocalDate.of(2019, 3, 31));
 
         Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
-            janDel1, Arrays.asList(
+            janDel1, List.of(
                 KgBeløp.feil(2).medSkattProsent(BigDecimal.valueOf(50)),
                 KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(2).medTilbakekrevBeløp(2).medNyttBeløp(0).medSkattProsent(BigDecimal.valueOf(50))
             ),
-            janDel2, Arrays.asList(
+            janDel2, List.of(
                 KgBeløp.feil(2).medSkattProsent(BigDecimal.valueOf(50)),
                 KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(2).medTilbakekrevBeløp(2).medNyttBeløp(0).medSkattProsent(BigDecimal.valueOf(50))
             ),
-            feb, Arrays.asList(
+            feb, List.of(
                 KgBeløp.feil(1).medSkattProsent(BigDecimal.valueOf(50)),
                 KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1).medTilbakekrevBeløp(1).medNyttBeløp(0).medSkattProsent(BigDecimal.valueOf(50))
             ),
-            mars, Arrays.asList(
+            mars, List.of(
                 KgBeløp.feil(1).medSkattProsent(BigDecimal.valueOf(50)),
                 KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1).medTilbakekrevBeløp(1).medNyttBeløp(0).medSkattProsent(BigDecimal.valueOf(50))
             )),
@@ -490,7 +490,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
 
     static KravgrunnlagTestBuilder.KgPeriode grunnlagPeriode(String periodeTekst, int utbetalt, int nytt, int tilbakekreves, String skatteprosent, int maxSkattMnd) {
         Periode periode = parsePeriode(periodeTekst);
-        List<KgBeløp> kgBeløp = Arrays.asList(
+        List<KgBeløp> kgBeløp = List.of(
             KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(utbetalt).medNyttBeløp(nytt).medTilbakekrevBeløp(tilbakekreves).medSkattProsent(new BigDecimal(skatteprosent)),
             KgBeløp.feil(tilbakekreves).medSkattProsent(new BigDecimal(skatteprosent)));
         return new KravgrunnlagTestBuilder.KgPeriode(periode, kgBeløp, BigDecimal.valueOf(maxSkattMnd));
@@ -564,7 +564,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         Long behandlingId = behandling.getId();
 
         Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
-            uke1og2, Arrays.asList(
+            uke1og2, List.of(
                 KgBeløp.feil(2500),
                 KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000))
         ), false);
@@ -588,7 +588,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         Long behandlingId = behandling.getId();
 
         Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
-            uke1, Arrays.asList(
+            uke1, List.of(
                 KgBeløp.feil(2500),
                 KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(1000).medTilbakekrevBeløp(1000))
         ), false);
@@ -614,7 +614,7 @@ public class TilbakekrevingVedtakPeriodeBeregnerTest {
         var dagsPeriodeHelg = Periode.of(dag, dag);
 
         Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
-            dagsPeriodeHelg, Arrays.asList(
+            dagsPeriodeHelg, List.of(
                 KgBeløp.feil(84720),
                 KgBeløp.ytelse(KlasseKode.FPENFOD_OP).medUtbetBeløp(84720).medTilbakekrevBeløp(84720))
             ),

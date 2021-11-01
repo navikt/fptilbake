@@ -11,11 +11,11 @@ import javax.inject.Inject;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.ForeslåVedtakTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VedtaksbrevFritekstTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.totrinn.TotrinnTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstOppsummering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstType;
@@ -31,14 +31,14 @@ public class ForeslåVedtakOppdaterer implements AksjonspunktOppdaterer<Foreslå
 
     private ForeslåVedtakTjeneste foreslåVedtakTjeneste;
     private TotrinnTjeneste totrinnTjeneste;
-    private AksjonspunktRepository aksjonspunktRepository;
+    private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private VedtaksbrevFritekstTjeneste vedtaksbrevFritekstTjeneste;
 
     @Inject
-    public ForeslåVedtakOppdaterer(ForeslåVedtakTjeneste foreslåVedtakTjeneste, TotrinnTjeneste totrinnTjeneste, AksjonspunktRepository aksjonspunktRepository, VedtaksbrevFritekstTjeneste vedtaksbrevFritekstTjeneste) {
+    public ForeslåVedtakOppdaterer(ForeslåVedtakTjeneste foreslåVedtakTjeneste, TotrinnTjeneste totrinnTjeneste, BehandlingskontrollTjeneste behandlingskontrollTjeneste, VedtaksbrevFritekstTjeneste vedtaksbrevFritekstTjeneste) {
         this.foreslåVedtakTjeneste = foreslåVedtakTjeneste;
         this.totrinnTjeneste = totrinnTjeneste;
-        this.aksjonspunktRepository = aksjonspunktRepository;
+        this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
         this.vedtaksbrevFritekstTjeneste = vedtaksbrevFritekstTjeneste;
     }
 
@@ -93,11 +93,12 @@ public class ForeslåVedtakOppdaterer implements AksjonspunktOppdaterer<Foreslå
     }
 
     private void opprettEllerReåpne(Behandling behandling, AksjonspunktDefinisjon aksjonspunktDefinisjon) {
+        var kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandling);
         Optional<Aksjonspunkt> aksjonspunkt = behandling.getAksjonspunktMedDefinisjonOptional(aksjonspunktDefinisjon);
         if (aksjonspunkt.isPresent()) {
-            aksjonspunktRepository.setReåpnet(aksjonspunkt.get());
+            behandlingskontrollTjeneste.lagreAksjonspunkterReåpnet(kontekst, List.of(aksjonspunkt.get()), true, false);
         } else {
-            aksjonspunktRepository.leggTilAksjonspunkt(behandling, aksjonspunktDefinisjon, BehandlingStegType.FORESLÅ_VEDTAK);
+            behandlingskontrollTjeneste.lagreAksjonspunkterFunnet(kontekst, BehandlingStegType.FORESLÅ_VEDTAK, List.of(aksjonspunktDefinisjon));
         }
     }
 }

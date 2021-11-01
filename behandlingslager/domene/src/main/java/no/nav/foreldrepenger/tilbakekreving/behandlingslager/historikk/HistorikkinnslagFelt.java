@@ -16,7 +16,6 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.diff.IndexKey;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
 @Entity(name = "HistorikkinnslagFelt")
@@ -170,12 +169,6 @@ public class HistorikkinnslagFelt extends BaseEntitet implements IndexKey {
             return this;
         }
 
-        public Builder medNavn(Kodeliste kodeliste) {
-            kladd.navn = kodeliste.getKode();
-            kladd.klNavn = kodeliste.getKodeverk();
-            return this;
-        }
-
         public Builder medNavn(Kodeverdi kodeverdi) {
             kladd.navn = kodeverdi.getKode();
             kladd.klNavn = kodeverdi.getKodeverk();
@@ -184,16 +177,6 @@ public class HistorikkinnslagFelt extends BaseEntitet implements IndexKey {
 
         public Builder medFraVerdi(String fraVerdi) {
             kladd.fraVerdi = fraVerdi;
-            return this;
-        }
-
-        public Builder medFraVerdi(Kodeliste fraVerdi) {
-            if (fraVerdi != null) {
-                kladd.fraVerdiKode = fraVerdi.getKode();
-                kladd.klFraVerdi = fraVerdi.getKodeverk();
-            } else {
-                kladd.fraVerdiKode = null;
-            }
             return this;
         }
 
@@ -209,14 +192,6 @@ public class HistorikkinnslagFelt extends BaseEntitet implements IndexKey {
 
         public Builder medTilVerdi(String tilVerdi) {
             kladd.tilVerdi = tilVerdi;
-            return this;
-        }
-
-        public <K extends Kodeliste> Builder medTilVerdi(K tilVerdi) {
-            if (tilVerdi != null) {
-                kladd.tilVerdiKode = tilVerdi.getKode();
-                kladd.klTilVerdi = tilVerdi.getKodeverk();
-            }
             return this;
         }
 

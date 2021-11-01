@@ -10,6 +10,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingSteg;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegRef;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingTypeRef;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
@@ -18,7 +19,7 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.Tillegsinformasjon;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
 
-@BehandlingStegRef(kode = "INOPPSTEG")
+@BehandlingStegRef(kode = BehandlingStegKode.INNOPP)
 @BehandlingTypeRef
 @ApplicationScoped
 public class InnhentOpplysningSteg implements BehandlingSteg {

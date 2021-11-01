@@ -2,7 +2,6 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling;
 
 import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -51,9 +50,9 @@ public enum BehandlingStegStatus implements Kodeverdi {
     public static final String KODEVERK = "BEHANDLING_STEG_STATUS";
     private static final Map<String, BehandlingStegStatus> KODER = new LinkedHashMap<>();
 
-    private static final Set<BehandlingStegStatus> KAN_UTFØRE_STEG = new HashSet<>(Arrays.asList(STARTET, VENTER));
-    private static final Set<BehandlingStegStatus> KAN_FORTSETTE_NESTE = new HashSet<>(Arrays.asList(UTFØRT, FREMOVERFØRT));
-    private static final Set<BehandlingStegStatus> SLUTT_STATUSER = new HashSet<>(Arrays.asList(AVBRUTT, UTFØRT, TILBAKEFØRT));
+    private static final Set<BehandlingStegStatus> KAN_UTFØRE_STEG = new HashSet<>(Set.of(STARTET, VENTER));
+    private static final Set<BehandlingStegStatus> KAN_FORTSETTE_NESTE = new HashSet<>(Set.of(UTFØRT, FREMOVERFØRT));
+    private static final Set<BehandlingStegStatus> SLUTT_STATUSER = new HashSet<>(Set.of(AVBRUTT, UTFØRT, TILBAKEFØRT));
 
     private String kode;
 
@@ -110,11 +109,6 @@ public enum BehandlingStegStatus implements Kodeverdi {
     @Override
     public String getKode() {
         return kode;
-    }
-
-    @Override
-    public String getOffisiellKode() {
-        return getKode();
     }
 
     @JsonProperty

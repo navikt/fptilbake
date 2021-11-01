@@ -29,7 +29,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkTabellRepository;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravVedtakStatusRepository;
@@ -53,20 +52,19 @@ public class FinnGrunnlagTaskTest extends FellesTestOppsett {
     @BeforeEach
     public void setup() {
         kravVedtakStatusRepository = new KravVedtakStatusRepository(entityManager);
-        KodeverkTabellRepository kodeverkTabellRepository = new KodeverkTabellRepository(entityManager);
         HenleggBehandlingTjeneste henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repositoryProvider,
             taskTjeneste, behandlingskontrollTjeneste, historikkinnslagTjeneste);
         KravVedtakStatusTjeneste kravVedtakStatusTjeneste = new KravVedtakStatusTjeneste(kravVedtakStatusRepository,
             taskTjeneste, repositoryProvider, henleggBehandlingTjeneste,
             behandlingskontrollTjeneste);
         KravVedtakStatusMapper kravVedtakStatusMapper = new KravVedtakStatusMapper(tpsAdapterWrapper);
-        finnGrunnlagTask = new FinnGrunnlagTask(repositoryProvider, mottattXmlRepository, kodeverkTabellRepository,
+        finnGrunnlagTask = new FinnGrunnlagTask(repositoryProvider, mottattXmlRepository,
             kravVedtakStatusTjeneste, behandlingskontrollTjeneste, kravVedtakStatusMapper, kravgrunnlagMapper, fagsystemKlientMock);
 
         EksternBehandling eksternBehandling = new EksternBehandling(behandling, HENVISNING, FPSAK_BEHANDLING_UUID);
         eksternBehandlingRepository.lagre(eksternBehandling);
         saksnummer = behandling.getFagsak().getSaksnummer().getVerdi();
-        behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, BehandlingStegType.TBKGSTEG,
+        behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, BehandlingStegType.HENTGRUNNLAGSTEG,
             LocalDateTime.now().plusDays(10), Venteårsak.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG);
     }
 

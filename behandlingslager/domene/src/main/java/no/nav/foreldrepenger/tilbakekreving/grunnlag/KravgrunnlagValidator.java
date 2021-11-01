@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.YearMonth;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +19,7 @@ import no.nav.vedtak.exception.IntegrasjonException;
 
 public class KravgrunnlagValidator {
 
-    private static final List<Consumer<Kravgrunnlag431>> VALIDATORER = Arrays.asList(
+    private static final List<Consumer<Kravgrunnlag431>> VALIDATORER = List.of(
         KravgrunnlagValidator::validerPeriodeInnenforMåned,
         KravgrunnlagValidator::validerOverlappendePerioder,
         KravgrunnlagValidator::validerSkatt,

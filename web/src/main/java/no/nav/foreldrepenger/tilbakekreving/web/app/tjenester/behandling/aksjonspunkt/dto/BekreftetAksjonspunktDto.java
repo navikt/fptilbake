@@ -2,7 +2,9 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.aksjon
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.sikkerhet.abac.AbacDto;
 import no.nav.vedtak.sikkerhet.abac.StandardAbacAttributtType;
@@ -19,6 +21,15 @@ public abstract class BekreftetAksjonspunktDto implements AksjonspunktKode, Abac
 
     @Override
     public AbacDataAttributter abacAttributter() {
-        return AbacDataAttributter.opprett().leggTil(StandardAbacAttributtType.AKSJONSPUNKT_KODE, getKode());
+        return AbacDataAttributter.opprett().leggTil(StandardAbacAttributtType.AKSJONSPUNKT_KODE, getAksjonspunktDefinisjon());
+    }
+
+    @Override
+    public AksjonspunktDefinisjon getAksjonspunktDefinisjon() {
+        if (this.getClass().isAnnotationPresent(JsonTypeName.class)) {
+            var kode = this.getClass().getDeclaredAnnotation(JsonTypeName.class).value();
+            return AksjonspunktDefinisjon.fraKode(kode);
+        }
+        throw new IllegalStateException("Utvikler-feil:" + this.getClass().getSimpleName() + " er uten JsonTypeName annotation.");
     }
 }

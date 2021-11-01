@@ -18,19 +18,14 @@ import com.google.common.collect.Lists;
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BehandlingFeilutbetalingFakta;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.EksternBehandlingÅrsakType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KonsekvensForYtelsen;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.geografisk.Språkkode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.tilbakekrevingsvalg.VidereBehandling;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.Tillegsinformasjon;
-import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.BehandlingsresultatDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingsinfoDto;
-import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingÅrsakDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.TilbakekrevingValgDto;
-import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.YtelsesbehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMock;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagMockUtil;
@@ -200,9 +195,6 @@ public class FaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
         assertThat(fakta.getPerioder()).isNotEmpty();
         assertThat(fakta.getDatoForRevurderingsvedtak()).isEqualTo(NOW);
         assertThat(fakta.getTilbakekrevingValg().getVidereBehandling()).isEqualToComparingFieldByField(VidereBehandling.TILBAKEKREV_I_INFOTRYGD);
-        assertThat(fakta.getBehandlingsresultat().getType()).isEqualByComparingTo(YtelsesbehandlingResultatType.OPPHØR);
-        assertThat(fakta.getBehandlingsresultat().getKonsekvenserForYtelsen()).contains(KonsekvensForYtelsen.ENDRING_I_BEREGNING);
-        assertThat(fakta.getBehandlingÅrsaker().size()).isEqualTo(1);
     }
 
     private EksternBehandlingsinfoDto lagEksternBehandlingsInfo() {
@@ -211,14 +203,6 @@ public class FaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
         eksternBehandlingsinfo.setUuid(eksternBehandlingUuid);
         eksternBehandlingsinfo.setVedtakDato(NOW);
 
-        BehandlingsresultatDto behandlingsresultatDto = new BehandlingsresultatDto();
-        behandlingsresultatDto.setType(YtelsesbehandlingResultatType.OPPHØR);
-        behandlingsresultatDto.setKonsekvenserForYtelsen(Lists.newArrayList(KonsekvensForYtelsen.ENDRING_I_BEREGNING, KonsekvensForYtelsen.FORELDREPENGER_OPPHØRER));
-        eksternBehandlingsinfo.setBehandlingsresultat(behandlingsresultatDto);
-
-        EksternBehandlingÅrsakDto eksternBehandlingÅrsakDto = new EksternBehandlingÅrsakDto();
-        eksternBehandlingÅrsakDto.setBehandlingÅrsakType(EksternBehandlingÅrsakType.UDEFINERT);
-        eksternBehandlingsinfo.setBehandlingÅrsaker(Lists.newArrayList(eksternBehandlingÅrsakDto));
         return eksternBehandlingsinfo;
     }
 

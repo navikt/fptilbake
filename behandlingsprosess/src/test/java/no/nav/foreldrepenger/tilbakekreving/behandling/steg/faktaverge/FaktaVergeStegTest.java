@@ -10,6 +10,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandleStegResu
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.transisjoner.FellesTransisjoner;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktTestSupport;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 
 public class FaktaVergeStegTest extends FellesTestOppsett {
@@ -24,7 +25,7 @@ public class FaktaVergeStegTest extends FellesTestOppsett {
     @Test
     public void skal_utføre_steg_hvis_verge_aksjonspunkt_finnes() {
         BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(behandling);
-        repositoryProvider.getAksjonspunktRepository().leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.AVKLAR_VERGE);
+        AksjonspunktTestSupport.leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.AVKLAR_VERGE);
         BehandlingskontrollKontekst kontekst = new BehandlingskontrollKontekst(behandling.getFagsakId(),behandling.getAktørId(),behandlingLås);
         BehandleStegResultat stegResultat = faktaVergeSteg.utførSteg(kontekst);
         assertThat(stegResultat.getAksjonspunktListe()).isNotEmpty();

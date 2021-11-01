@@ -11,12 +11,12 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkBaseEntitet;
 
 @Entity(name = "BrevSporing")
 @Table(name = "BREV_SPORING")
-public class BrevSporing extends KodeverkBaseEntitet {
+public class BrevSporing extends BaseEntitet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_BREV_SPORING")

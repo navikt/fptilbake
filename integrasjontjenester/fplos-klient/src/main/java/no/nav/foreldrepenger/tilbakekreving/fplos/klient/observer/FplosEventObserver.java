@@ -11,19 +11,17 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.AksjonspunktTilbakeførtEvent;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.AksjonspunktUtførtEvent;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.AksjonspunkterFunnetEvent;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingEnhetEvent;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingManglerKravgrunnlagFristenEndretEvent;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingManglerKravgrunnlagFristenUtløptEvent;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStatusEvent;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollEvent;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.AksjonspunktStatusEvent;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingEnhetEvent;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingManglerKravgrunnlagFristenEndretEvent;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingManglerKravgrunnlagFristenUtløptEvent;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingStatusEvent;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingskontrollEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktKodeDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
@@ -57,29 +55,18 @@ public class FplosEventObserver {
         this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
     }
 
-    public void observerAksjonpunktFunnetEvent(@Observes AksjonspunkterFunnetEvent event) {
+    public void observerAksjonpunktStatusEvent(@Observes AksjonspunktStatusEvent event) {
         Long behandlingId = event.getBehandlingId();
         for (Aksjonspunkt aksjonspunkt : event.getAksjonspunkter()) {
-            if (aksjonspunkt.erManuell() || erBehandlingIFaktaEllerSenereSteg(behandlingId)) {
+            if (AksjonspunktStatus.OPPRETTET.equals(aksjonspunkt.getStatus()) && (aksjonspunkt.erManuell() || erBehandlingIFaktaEllerSenereSteg(behandlingId))) {
                 logger.info(LOGGER_OPPRETTER_PROSESS_TASK, EventHendelse.AKSJONSPUNKT_OPPRETTET, aksjonspunkt.getAksjonspunktDefinisjon().getKode());
                 opprettProsessTask(event.getFagsakId(), behandlingId, event.getAktørId(), EventHendelse.AKSJONSPUNKT_OPPRETTET);
             }
-        }
-    }
-
-    public void observerAksjonpunktUtførtEvent(@Observes AksjonspunktUtførtEvent event) {
-        Long behandlingId = event.getBehandlingId();
-        for (Aksjonspunkt aksjonspunkt : event.getAksjonspunkter()) {
-            if (aksjonspunkt.erAutopunkt() && erBehandlingIFaktaEllerSenereSteg(behandlingId)) {
+            if (!AksjonspunktStatus.OPPRETTET.equals(aksjonspunkt.getStatus()) && aksjonspunkt.erAutopunkt() && erBehandlingIFaktaEllerSenereSteg(behandlingId)) {
                 logger.info(LOGGER_OPPRETTER_PROSESS_TASK, EventHendelse.AKSJONSPUNKT_UTFØRT, aksjonspunkt.getAksjonspunktDefinisjon().getKode());
                 opprettProsessTask(event.getFagsakId(), behandlingId, event.getAktørId(), EventHendelse.AKSJONSPUNKT_UTFØRT);
             }
         }
-    }
-
-    public void observerAksjonpunktTilbakeførtEvent(@Observes AksjonspunktTilbakeførtEvent event) {
-        logger.info(LOGGER_OPPRETTER_PROSESS_TASK, EventHendelse.AKSJONSPUNKT_TILBAKEFØR, event.getAksjonspunkter().get(0).getAksjonspunktDefinisjon().getKode());
-        opprettProsessTask(event.getFagsakId(), event.getBehandlingId(), event.getAktørId(), EventHendelse.AKSJONSPUNKT_TILBAKEFØR);
     }
 
     public void observerBehandlingAvsluttetEvent(@Observes BehandlingStatusEvent.BehandlingAvsluttetEvent event) {
@@ -98,14 +85,14 @@ public class FplosEventObserver {
 
     public void observerBehandlingFristenUtløptEvent(@Observes BehandlingManglerKravgrunnlagFristenUtløptEvent utløptEvent) {
         logger.info(LOGGER_OPPRETTER_PROSESS_TASK, EventHendelse.AKSJONSPUNKT_OPPRETTET,
-            AksjonspunktDefinisjon.VURDER_HENLEGGELSE_MANGLER_KRAVGRUNNLAG.getKode());
+            AksjonspunktKodeDefinisjon.VURDER_HENLEGGELSE_MANGLER_KRAVGRUNNLAG);
         opprettProsessTask(utløptEvent.getFagsakId(), utløptEvent.getBehandlingId(), utløptEvent.getAktørId(),
             EventHendelse.AKSJONSPUNKT_OPPRETTET, AksjonspunktStatus.OPPRETTET, utløptEvent.getFristDato());
     }
 
     public void observerBehandlingFristenEndretEvent(@Observes BehandlingManglerKravgrunnlagFristenEndretEvent fristenEndretEvent) {
         logger.info(LOGGER_OPPRETTER_PROSESS_TASK, EventHendelse.AKSJONSPUNKT_AVBRUTT,
-            AksjonspunktDefinisjon.VURDER_HENLEGGELSE_MANGLER_KRAVGRUNNLAG.getKode());
+            AksjonspunktKodeDefinisjon.VURDER_HENLEGGELSE_MANGLER_KRAVGRUNNLAG);
         opprettProsessTask(fristenEndretEvent.getFagsakId(), fristenEndretEvent.getBehandlingId(), fristenEndretEvent.getAktørId(),
             EventHendelse.AKSJONSPUNKT_AVBRUTT, AksjonspunktStatus.AVBRUTT, fristenEndretEvent.getFristDato());
     }

@@ -103,7 +103,7 @@ public class RestApiAbacTest {
         if (annotation.property().isEmpty()) {
             fail(klasse.getSimpleName() + "." + metode.getName() + " Tom property @" + annotation.getClass().getSimpleName());
         }
-        List<String> godkjenteProperties = Arrays.asList(
+        List<String> godkjenteProperties = List.of(
             AbacProperty.APPLIKASJON,
             AbacProperty.BATCH,
             AbacProperty.DRIFT,

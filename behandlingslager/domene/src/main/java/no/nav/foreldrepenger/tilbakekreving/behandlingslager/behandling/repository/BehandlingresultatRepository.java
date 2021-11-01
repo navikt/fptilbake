@@ -10,6 +10,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandlingsresultat;
 
 @ApplicationScoped
@@ -29,6 +30,14 @@ public class BehandlingresultatRepository {
     public Long lagre(Behandlingsresultat behandlingsresultat) {
         entityManager.persist(behandlingsresultat);
         return behandlingsresultat.getId();
+    }
+
+    public void henlegg(Behandling behandling, BehandlingResultatType behandlingResultatType) {
+        var builder = hent(behandling)
+            .map(Behandlingsresultat::builderEndreEksisterende)
+            .orElseGet(() -> Behandlingsresultat.builder().medBehandling(behandling))
+            .medBehandlingResultatType(behandlingResultatType);
+        lagre(builder.build());
     }
 
     public Optional<Behandlingsresultat> hent(Behandling behandling) {

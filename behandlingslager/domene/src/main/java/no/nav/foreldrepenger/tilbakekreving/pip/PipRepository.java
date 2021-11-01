@@ -1,8 +1,9 @@
 package no.nav.foreldrepenger.tilbakekreving.pip;
 
-import java.util.Collections;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -13,6 +14,7 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakStatus;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.BehandlingInfo;
@@ -121,17 +123,11 @@ public class PipRepository {
         AksjonspunktType.OVERSTYRING, "Overstyring",
         AksjonspunktType.SAKSBEHANDLEROVERSTYRING, "Saksbehandleroverstyring");
 
-    public Set<String> hentAksjonspunkttypeForAksjonspunktkoder(Set<String> aksjonspunktkoder) {
-        if (aksjonspunktkoder.isEmpty()) {
-            return Collections.emptySet();
-        }
-        String sql = "select distinct def.AKSJONSPUNKT_TYPE from aksjonspunkt_def def where def.kode in (:aksjonspunktkoder)";
-        Query query = entityManager.createNativeQuery(sql);
-        query.setParameter("aksjonspunktkoder", aksjonspunktkoder);
-        List<String> aksjonspunktTyper = query.getResultList();
-        return aksjonspunktTyper.stream()
-            .map(AksjonspunktType::fraKode)
+    public Set<String> hentAksjonspunktTypeForAksjonspunktKoder(Collection<AksjonspunktDefinisjon> aksjonspunktKoder) {
+        return aksjonspunktKoder.stream()
+            .map(ak -> ak.getAksjonspunktType())
             .map(AKSJONSPUNKT_TYPE_TIL_ABAC_KODE::get)
+            .filter(Objects::nonNull)
             .collect(Collectors.toSet());
     }
 

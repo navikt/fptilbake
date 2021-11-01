@@ -25,8 +25,8 @@ public class BehandlingStegTilstand extends BaseEntitet implements IndexKey {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_BEHANDLING_STEG_TILSTAND")
     private Long id;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "behandling_steg", nullable = false, updatable = false)
+    @Convert(converter = BehandlingStegType.KodeverdiConverter.class)
+    @Column(name = "behandling_steg", nullable = false, updatable = false)
     private BehandlingStegType behandlingSteg;
 
     @ManyToOne(optional = false)

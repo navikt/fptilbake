@@ -2,15 +2,15 @@ package no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.kodeverk;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KonsekvensForYtelsen;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.kodeverk.app.HentKodeverkTjeneste;
 
@@ -24,14 +24,14 @@ public class KodeverkRestTjenesteTest {
         KodeverkRestTjeneste tjeneste = new KodeverkRestTjeneste(hentKodeverkTjeneste);
         Map<String, Object> gruppertKodeliste = tjeneste.hentGruppertKodeliste();
 
-        assertThat(gruppertKodeliste.keySet()).containsOnly(KonsekvensForYtelsen.class.getSimpleName());
-        assertThat(gruppertKodeliste.get(KonsekvensForYtelsen.class.getSimpleName()))
-                .isEqualTo(Arrays.asList(KonsekvensForYtelsen.ENDRING_I_BEREGNING, KonsekvensForYtelsen.ENDRING_I_UTTAK));
+        assertThat(gruppertKodeliste.keySet()).containsOnly(Fagsystem.class.getSimpleName());
+        assertThat(gruppertKodeliste.get(Fagsystem.class.getSimpleName()))
+                .isEqualTo(List.of(Fagsystem.FPSAK, Fagsystem.K9SAK));
     }
 
     private static Map<String, Collection<? extends Kodeverdi>> getGruppertKodeliste() {
         Map<String, Collection<? extends Kodeverdi>> map = new HashMap<>();
-        map.put(KonsekvensForYtelsen.class.getSimpleName(), Arrays.asList(KonsekvensForYtelsen.ENDRING_I_BEREGNING, KonsekvensForYtelsen.ENDRING_I_UTTAK));
+        map.put(Fagsystem.class.getSimpleName(), List.of(Fagsystem.FPSAK, Fagsystem.K9SAK));
         return map;
     }
 }

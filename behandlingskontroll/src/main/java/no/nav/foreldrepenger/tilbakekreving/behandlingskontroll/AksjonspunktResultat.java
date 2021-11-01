@@ -2,80 +2,94 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingskontroll;
 
 import static java.util.Collections.singletonList;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.Objects;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 
 
 /**
  * Knytter {@link AksjonspunktDefinisjon} med en callback for å modifisere aksjonpunktet som blir opprettet.
  */
 public class AksjonspunktResultat {
-    public static final Consumer<Aksjonspunkt> DUMMY_CONSUMER = new Consumer<Aksjonspunkt>() {
-
-        @Override
-        public void accept(Aksjonspunkt t) {
-            // dummy
-        }};
 
     private AksjonspunktDefinisjon aksjonspunktDefinisjon;
-    private Consumer<Aksjonspunkt> aksjonspunktModifiserer;
+    private Venteårsak venteårsak;
+    private LocalDateTime frist;
+
+    private AksjonspunktResultat(AksjonspunktDefinisjon aksjonspunktDefinisjon) {
+        this.aksjonspunktDefinisjon = aksjonspunktDefinisjon;
+    }
 
     private AksjonspunktResultat(AksjonspunktDefinisjon aksjonspunktDefinisjon,
-            Consumer<Aksjonspunkt> aksjonspunktModifiserer) {
+                                 Venteårsak venteårsak,
+                                 LocalDateTime ventefrist) {
         this.aksjonspunktDefinisjon = aksjonspunktDefinisjon;
-        this.aksjonspunktModifiserer = aksjonspunktModifiserer;
+        this.venteårsak = venteårsak;
+        this.frist = ventefrist;
     }
 
     /**
-     * Factory-metode direkte basert på {@link AksjonspunktDefinisjon}. Ingen callback for consumer.
+     * Factory-metode direkte basert på {@link AksjonspunktDefinisjon}. Ingen frist
+     * eller årsak.
      */
     public static AksjonspunktResultat opprettForAksjonspunkt(AksjonspunktDefinisjon aksjonspunktDefinisjon) {
-        return new AksjonspunktResultat(aksjonspunktDefinisjon, DUMMY_CONSUMER);
+        return new AksjonspunktResultat(aksjonspunktDefinisjon);
     }
 
     /**
-     * Factory-metode direkte basert på {@link AksjonspunktDefinisjon}, returnerer liste. Ingen callback for consumer.
+     * Factory-metode direkte basert på {@link AksjonspunktDefinisjon}, returnerer
+     * liste. Ingen frist og årsak.
      */
     public static List<AksjonspunktResultat> opprettListeForAksjonspunkt(AksjonspunktDefinisjon aksjonspunktDefinisjon) {
-        return singletonList(new AksjonspunktResultat(aksjonspunktDefinisjon, DUMMY_CONSUMER));
+        return singletonList(new AksjonspunktResultat(aksjonspunktDefinisjon));
     }
 
     /**
-     * Factory-metode som linker {@link AksjonspunktDefinisjon} sammen med callback for consumer-operasjon.
+     * Factory-metode som linker {@link AksjonspunktDefinisjon} sammen med
+     * ventefrist og årsak.
      */
-    public static AksjonspunktResultat opprettForAksjonspunktMedCallback(AksjonspunktDefinisjon aksjonspunktDefinisjon,
-            Consumer<Aksjonspunkt> consumer) {
-        return new AksjonspunktResultat(aksjonspunktDefinisjon, consumer);
+    public static AksjonspunktResultat opprettForAksjonspunktMedFrist(AksjonspunktDefinisjon aksjonspunktDefinisjon, Venteårsak venteårsak,
+                                                                      LocalDateTime ventefrist) {
+        return new AksjonspunktResultat(aksjonspunktDefinisjon, venteårsak, ventefrist);
     }
 
     public AksjonspunktDefinisjon getAksjonspunktDefinisjon() {
         return aksjonspunktDefinisjon;
     }
 
-    public Consumer<Aksjonspunkt> getAksjonspunktModifiserer() {
-        return aksjonspunktModifiserer;
+    public Venteårsak getVenteårsak() {
+        return venteårsak;
+    }
+
+    public LocalDateTime getFrist() {
+        return frist;
     }
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "<" + aksjonspunktDefinisjon.getKode() + ", modifiserer=" + getAksjonspunktModifiserer() + ">";
+        return getClass().getSimpleName() + "<" + aksjonspunktDefinisjon.getKode() + ":" + aksjonspunktDefinisjon.getNavn()
+            + ", frist=" + getFrist() + ", venteårsak=" + getVenteårsak() + ">";
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof AksjonspunktResultat)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof AksjonspunktResultat)) {
+            return false;
+        }
 
-        AksjonspunktResultat that = (AksjonspunktResultat) o;
+        var that = (AksjonspunktResultat) o;
 
         return aksjonspunktDefinisjon.getKode().equals(that.aksjonspunktDefinisjon.getKode());
     }
 
     @Override
     public int hashCode() {
-        return aksjonspunktDefinisjon.getKode().hashCode();
+        return Objects.hash(aksjonspunktDefinisjon.getKode());
     }
 }

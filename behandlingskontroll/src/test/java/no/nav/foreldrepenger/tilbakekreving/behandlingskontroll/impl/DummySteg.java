@@ -12,7 +12,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.AksjonspunktResu
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandleStegResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingSteg;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellImpl.TriFunction;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 
@@ -57,7 +56,7 @@ class DummySteg implements BehandlingSteg {
         return sisteUtførStegResultat.get();
     }
 
-    public static TriFunction<BehandlingStegType, BehandlingType, BehandlingSteg> map(List<TestStegKonfig> input) {
+    public static BehandlingModellImpl.BiFunction<BehandlingStegType, BehandlingType, BehandlingSteg> map(List<TestStegKonfig> input) {
 
         Map<List<?>, BehandlingSteg> resolver = new HashMap<>();
 
@@ -66,8 +65,7 @@ class DummySteg implements BehandlingSteg {
             resolver.put(key, konfig.getSteg());
         }
 
-        TriFunction<BehandlingStegType, BehandlingType, BehandlingSteg> func = (t, u) -> resolver.get(Arrays.asList(t, u));
-        return func;
+        return (t, u) -> resolver.get(Arrays.asList(t, u));
     }
 
 }

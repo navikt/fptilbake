@@ -2,6 +2,7 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.transisjon
 
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegModell;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.transisjoner.FellesTransisjoner;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.transisjoner.StegTransisjon;
 
@@ -15,6 +16,11 @@ class TilbakeføringTransisjon implements StegTransisjon {
     @Override
     public BehandlingStegModell nesteSteg(BehandlingStegModell nåværendeSteg) {
         throw new IllegalArgumentException("Utvikler-feil: skal ikke kalle nesteSteg på " + getId());
+    }
+
+    @Override
+    public BehandlingStegResultat getRetningForHopp() {
+        return BehandlingStegResultat.TILBAKEFØRT;
     }
 
     @Override

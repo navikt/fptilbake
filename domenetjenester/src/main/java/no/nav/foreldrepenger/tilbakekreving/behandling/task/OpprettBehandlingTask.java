@@ -18,7 +18,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @ApplicationScoped
-@ProsessTask(value = "hendelser.opprettBehandling", maxFailedRuns = 5)
+@ProsessTask(value = "hendelser.opprettBehandling", maxFailedRuns = 5) // OBSOBS opprettes fra HendelseHåndtererTjeneste
 @FagsakProsesstaskRekkefølge(gruppeSekvens = false)
 public class OpprettBehandlingTask implements ProsessTaskHandler {
 

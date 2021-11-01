@@ -1,121 +1,167 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt;
 
+import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktKodeDefinisjon.ENTRINN;
+import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktKodeDefinisjon.FORBLI;
+import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktKodeDefinisjon.TOTRINN;
+
 import java.time.Period;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.stream.Collectors;
 
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkTabell;
-import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
 /**
  * Definerer mulige Aksjonspunkter inkludert hvilket Vurderingspunkt de må løses i.
  * Inkluderer også konstanter for å enklere kunne referere til dem i eksisterende logikk.
  */
-@Entity(name = "AksjonspunktDef")
-@Table(name = "AKSJONSPUNKT_DEF")
-public class AksjonspunktDefinisjon extends KodeverkTabell {
+public enum AksjonspunktDefinisjon implements Kodeverdi {
 
-    /**
-     * NB: Kun kodeverdi skal defineres på konstanter, ingen ekstra felter som skal ligge i databasen som frist eller
-     * annet. Disse brukes kun til skriving.
-     */
-    public static final AksjonspunktDefinisjon SEND_VARSEL = new AksjonspunktDefinisjon("5001");
-    public static final AksjonspunktDefinisjon VURDER_TILBAKEKREVING = new AksjonspunktDefinisjon("5002");
-    public static final AksjonspunktDefinisjon VURDER_FORELDELSE = new AksjonspunktDefinisjon("5003");
-    public static final AksjonspunktDefinisjon FORESLÅ_VEDTAK = new AksjonspunktDefinisjon("5004");
-    public static final AksjonspunktDefinisjon FATTE_VEDTAK = new AksjonspunktDefinisjon("5005");
-    public static final AksjonspunktDefinisjon VENT_PÅ_BRUKERTILBAKEMELDING = new AksjonspunktDefinisjon("7001");
-    public static final AksjonspunktDefinisjon VENT_PÅ_TILBAKEKREVINGSGRUNNLAG = new AksjonspunktDefinisjon("7002");
-    public static final AksjonspunktDefinisjon AVKLART_FAKTA_FEILUTBETALING = new AksjonspunktDefinisjon("7003");
-    public static final AksjonspunktDefinisjon AVKLAR_VERGE = new AksjonspunktDefinisjon("5030");
-    // kun brukes for å sende data til fplos når behandling venter på grunnlaget etter fristen
-    public static final AksjonspunktDefinisjon VURDER_HENLEGGELSE_MANGLER_KRAVGRUNNLAG = new AksjonspunktDefinisjon("8001");
+    // Manuelle
 
-    @Convert(converter = AksjonspunktType.KodeverdiConverter.class)
-    @Column(name = "aksjonspunkt_type", nullable = false)
+    VURDER_TILBAKEKREVING(AksjonspunktKodeDefinisjon.VURDER_TILBAKEKREVING, AksjonspunktType.MANUELL,
+        "Vurder tilbakekreving.",BehandlingStegType.VTILBSTEG, VurderingspunktType.UT, TOTRINN),
+    VURDER_FORELDELSE(AksjonspunktKodeDefinisjon.VURDER_FORELDELSE, AksjonspunktType.MANUELL,
+        "Vurder foreldelse", BehandlingStegType.FORELDELSEVURDERINGSTEG, VurderingspunktType.UT, TOTRINN),
+    FORESLÅ_VEDTAK(AksjonspunktKodeDefinisjon.FORESLÅ_VEDTAK, AksjonspunktType.MANUELL,
+        "Foreslå vedtak", BehandlingStegType.FORESLÅ_VEDTAK, VurderingspunktType.UT, TOTRINN),
+    FATTE_VEDTAK(AksjonspunktKodeDefinisjon.FATTE_VEDTAK, AksjonspunktType.MANUELL,
+        "Fatte vedtak", BehandlingStegType.FATTE_VEDTAK, VurderingspunktType.INN, ENTRINN),
+    AVKLAR_VERGE(AksjonspunktKodeDefinisjon.AVKLAR_VERGE, AksjonspunktType.MANUELL,
+        "Avklar verge", BehandlingStegType.FAKTA_VERGE, VurderingspunktType.UT, ENTRINN),
+    AVKLART_FAKTA_FEILUTBETALING(AksjonspunktKodeDefinisjon.AVKLART_FAKTA_FEILUTBETALING, AksjonspunktType.MANUELL,
+        "Avklart fakta for feilutbetaling", BehandlingStegType.FAKTA_FEILUTBETALING, VurderingspunktType.UT, TOTRINN),
+
+    // Autopunkter
+
+    VENT_PÅ_BRUKERTILBAKEMELDING(AksjonspunktKodeDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, AksjonspunktType.AUTOPUNKT,
+            "Venter på tilbakemelding fra bruker", BehandlingStegType.VARSEL, VurderingspunktType.UT, ENTRINN,
+                                 FORBLI, "P4W"),
+    VENT_PÅ_TILBAKEKREVINGSGRUNNLAG(AksjonspunktKodeDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG, AksjonspunktType.AUTOPUNKT,
+            "Venter på tilbakekrevingsgrunnlag fra økonomi", BehandlingStegType.TBKGSTEG, VurderingspunktType.UT, ENTRINN,
+                                    FORBLI, "P4W"),
+
+
+    UNDEFINED,
+
+
+    ;
+
+    static final String KODEVERK = "AKSJONSPUNKT_DEF";
+
+    private static final Map<String, AksjonspunktDefinisjon> KODER = new LinkedHashMap<>();
+
+    static {
+        for (var v : values()) {
+            if (KODER.putIfAbsent(v.kode, v) != null) {
+                throw new IllegalArgumentException("Duplikat : " + v.kode);
+            }
+        }
+    }
+
+    @JsonIgnore
     private AksjonspunktType aksjonspunktType = AksjonspunktType.UDEFINERT;
 
     /**
      * Definerer hvorvidt Aksjonspunktet default krever totrinnsbehandling. Dvs. Beslutter må godkjenne hva
      * Saksbehandler har utført.
      */
-    @Convert(converter = BooleanToStringConverter.class)
-    @Column(name = "TOTRINN_BEHANDLING_DEFAULT", nullable = false)
+    @JsonIgnore
     private boolean defaultTotrinnBehandling = false;
-
-    /**
-     * Definerer hvorvidt Aksjonspunktet skal lage historikk.
-     */
-    @Convert(converter = BooleanToStringConverter.class)
-    @Column(name = "LAG_UTEN_HISTORIKK", nullable = false)
-    private boolean lagUtenHistorikk = false;
 
     /**
      * Hvorvidt aksjonspunktet har en frist før det må være løst. Brukes i forbindelse med når Behandling er lagt til
      * Vent.
      */
-    @Column(name = "frist_periode")
+    @JsonIgnore
     private String fristPeriode;
 
-    @Convert(converter = SkjermlenkeType.KodeverdiConverter.class)
-    @Column(name = "skjermlenke_type",nullable = false)
-    private SkjermlenkeType skjermlenkeType = SkjermlenkeType.UDEFINERT;
-
-    @ManyToOne
-    @JoinColumn(name = "vurderingspunkt", nullable = false)
-    private VurderingspunktDefinisjon vurderingspunktDefinisjon;
-
-    @Convert(converter = BooleanToStringConverter.class)
-    @Column(name = "TILBAKEHOPP_VED_GJENOPPTAKELSE", nullable = false)
+    @JsonIgnore
     private boolean tilbakehoppVedGjenopptakelse;
 
-    @ManyToMany
-    @JoinTable(name = "AKSJONSPUNKT_UTELUKKENDE",
-        joinColumns = {@JoinColumn(name = "ap1")},
-        inverseJoinColumns = {@JoinColumn(name = "ap2")})
-    Set<AksjonspunktDefinisjon> utelukkendeUt = new HashSet<>();
+    @JsonIgnore
+    private BehandlingStegType behandlingStegType;
 
-    @ManyToMany
-    @JoinTable(name = "AKSJONSPUNKT_UTELUKKENDE",
-            joinColumns = {@JoinColumn(name = "ap2")},
-            inverseJoinColumns = {@JoinColumn(name = "ap1")})
-    Set<AksjonspunktDefinisjon> utelukkendeInn = new HashSet<>();
+    @JsonIgnore
+    private String navn;
+
+    @JsonIgnore
+    private VurderingspunktType vurderingspunktType;
+
+    @JsonIgnore
+    private boolean erUtgått = false;
+
+    private String kode;
 
     AksjonspunktDefinisjon() {
-        // for hibernate
+        // for CDI
     }
 
-    protected AksjonspunktDefinisjon(final String kode) {
-        super(kode);
+    /** Brukes for utgåtte aksjonspunkt. Disse skal ikke kunne gjenoppstå. */
+    private AksjonspunktDefinisjon(String kode, AksjonspunktType type, String navn) {
+        this.kode = kode;
+        this.aksjonspunktType = type;
+        this.navn = navn;
+        erUtgått = true;
     }
 
+    // Bruk for ordinære aksjonspunkt og overstyring
+    private AksjonspunktDefinisjon(String kode,
+                         AksjonspunktType aksjonspunktType,
+                         String navn,
+                         BehandlingStegType behandlingStegType,
+                         VurderingspunktType vurderingspunktType,
+                         boolean defaultTotrinnBehandling) {
+        this.kode = Objects.requireNonNull(kode);
+        this.navn = navn;
+        this.aksjonspunktType = aksjonspunktType;
+        this.behandlingStegType = behandlingStegType;
+        this.vurderingspunktType = vurderingspunktType;
+        this.defaultTotrinnBehandling = defaultTotrinnBehandling;
+        this.tilbakehoppVedGjenopptakelse = false;
+        this.fristPeriode = null;
+    }
 
-    public SkjermlenkeType getSkjermlenkeType() {
-        return skjermlenkeType;
+    // Bruk for autopunkt i 7nnn serien
+    private AksjonspunktDefinisjon(String kode,
+                         AksjonspunktType aksjonspunktType,
+                         String navn,
+                         BehandlingStegType behandlingStegType,
+                         VurderingspunktType vurderingspunktType,
+                         boolean defaultTotrinnBehandling,
+                         boolean tilbakehoppVedGjenopptakelse,
+                         String fristPeriode) {
+        this.kode = Objects.requireNonNull(kode);
+        this.navn = navn;
+        this.aksjonspunktType = aksjonspunktType;
+        this.behandlingStegType = behandlingStegType;
+        this.vurderingspunktType = vurderingspunktType;
+        this.defaultTotrinnBehandling = defaultTotrinnBehandling;
+        this.tilbakehoppVedGjenopptakelse = tilbakehoppVedGjenopptakelse;
+        this.fristPeriode = fristPeriode;
     }
 
     public AksjonspunktType getAksjonspunktType() {
         return Objects.equals(AksjonspunktType.UDEFINERT, aksjonspunktType) ? null : aksjonspunktType;
     }
 
-    public boolean getDefaultTotrinnBehandling() {
-        return defaultTotrinnBehandling;
+    public boolean erAutopunkt() {
+        return AksjonspunktType.AUTOPUNKT.equals(getAksjonspunktType());
     }
 
-    public boolean getLagUtenHistorikk() {
-        return lagUtenHistorikk;
+    public boolean getDefaultTotrinnBehandling() {
+        return defaultTotrinnBehandling;
     }
 
     public String getFristPeriode() {
@@ -123,21 +169,80 @@ public class AksjonspunktDefinisjon extends KodeverkTabell {
     }
 
     public Period getFristPeriod() {
-        return fristPeriode == null ? null : Period.parse(fristPeriode);
-    }
-
-    public VurderingspunktDefinisjon getVurderingspunktDefinisjon() {
-        return vurderingspunktDefinisjon;
+        return (fristPeriode == null ? null : Period.parse(fristPeriode));
     }
 
     public boolean tilbakehoppVedGjenopptakelse() {
         return tilbakehoppVedGjenopptakelse;
     }
 
-    public Set<AksjonspunktDefinisjon> getUtelukkendeApdef() {
-        Set<AksjonspunktDefinisjon> utelukkendeApdef = new HashSet<>();
-        utelukkendeApdef.addAll(utelukkendeInn);
-        utelukkendeApdef.addAll(utelukkendeUt);
-        return Collections.unmodifiableSet(utelukkendeApdef);
+    @Override
+    public String getNavn() {
+        return navn;
+    }
+
+    @JsonProperty
+    @Override
+    public String getKode() {
+        return kode;
+    }
+
+    public BehandlingStegType getBehandlingSteg() {
+        return behandlingStegType;
+    }
+
+    public VurderingspunktType getVurderingspunktType() {
+        return vurderingspunktType;
+    }
+
+    @JsonProperty
+    @Override
+    public String getKodeverk() {
+        return KODEVERK;
+    }
+
+    /** Aksjonspunkt tidligere brukt, nå utgått (kan ikke gjenoppstå). */
+    public boolean erUtgått() {
+        return erUtgått;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + "('" + getKode() + "')";
+    }
+
+    @JsonCreator
+    public static AksjonspunktDefinisjon fraKode(@JsonProperty("kode") String kode) {
+        if (kode == null) {
+            return null;
+        }
+        var ad = KODER.get(kode);
+        if (ad == null) {
+            throw new IllegalArgumentException("Ukjent AksjonspunktDefinisjon: " + kode);
+        }
+        return ad;
+    }
+
+    public static Map<String, AksjonspunktDefinisjon> kodeMap() {
+        return Collections.unmodifiableMap(KODER);
+    }
+
+    public static List<AksjonspunktDefinisjon> finnAksjonspunktDefinisjoner(BehandlingStegType behandlingStegType, VurderingspunktType vurderingspunktType) {
+        return KODER.values().stream()
+            .filter(ad -> Objects.equals(ad.getBehandlingSteg(), behandlingStegType) && Objects.equals(ad.getVurderingspunktType(), vurderingspunktType))
+            .collect(Collectors.toList());
+    }
+
+    @Converter(autoApply = true)
+    public static class KodeverdiConverter implements AttributeConverter<AksjonspunktDefinisjon, String> {
+        @Override
+        public String convertToDatabaseColumn(AksjonspunktDefinisjon attribute) {
+            return attribute == null ? null : attribute.getKode();
+        }
+
+        @Override
+        public AksjonspunktDefinisjon convertToEntityAttribute(String dbData) {
+            return dbData == null ? null : AksjonspunktDefinisjon.fraKode(dbData);
+        }
     }
 }

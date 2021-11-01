@@ -11,10 +11,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import javax.persistence.EntityManager;
@@ -26,24 +23,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
-import com.google.common.collect.Lists;
-
 import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTask;
 import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.faktafeilutbetaling.FaktaFeilutbetalingSteg;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.PersonOrganisasjonWrapper;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.KravgrunnlagMapper;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.MottattGrunnlagSteg;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.iverksettvedtak.IverksetteVedtakSteg;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingModell;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingSteg;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegKonfigurasjon;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollEventPubliserer;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.spi.BehandlingskontrollServiceProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
@@ -89,9 +78,7 @@ public class ForvaltningBehandlingRestTjenesteTest {
     private ØkonomiMottattXmlRepository mottattXmlRepository;
 
     private PersonOrganisasjonWrapper mockTpsAdapterWrapper;
-    private BehandlingModellRepository mockBehandlingModellRepository;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
-    private InternalManipulerBehandling manipulerBehandling;
     private ForvaltningBehandlingRestTjeneste forvaltningBehandlingRestTjeneste;
 
     private Behandling behandling;
@@ -113,13 +100,11 @@ public class ForvaltningBehandlingRestTjenesteTest {
         VarselresponsRepository varselresponsRepository = new VarselresponsRepository(entityManager);
         mockTpsAdapterWrapper = mock(PersonOrganisasjonWrapper.class);
         KravgrunnlagMapper kravgrunnlagMapper = new KravgrunnlagMapper(mockTpsAdapterWrapper);
-        mockBehandlingModellRepository = mock(BehandlingModellRepository.class);
-        behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(repositoryProvider,
-            mockBehandlingModellRepository, mock(BehandlingskontrollEventPubliserer.class));
+        behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(entityManager,
+            new BehandlingModellRepository(), mock(BehandlingskontrollEventPubliserer.class)));
         ØkonomiSendtXmlRepository økonomiSendtXmlRepository = new ØkonomiSendtXmlRepository(entityManager);
         TilbakekrevingsvedtakTjeneste tilbakekrevingsvedtakTjeneste = mock(TilbakekrevingsvedtakTjeneste.class);
         SlettGrunnlagEventPubliserer mockSlettGrunnlagEventPubliserer = mock(SlettGrunnlagEventPubliserer.class);
-        manipulerBehandling = new InternalManipulerBehandling(repositoryProvider);
         VarselresponsTjeneste varselresponsTjeneste = new VarselresponsTjeneste(varselresponsRepository);
         GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjeneste(taskTjeneste,
             behandlingKandidaterRepository, behandlingVenterRepository, repositoryProvider, varselresponsTjeneste);
@@ -286,12 +271,8 @@ public class ForvaltningBehandlingRestTjenesteTest {
     }
 
     @Test
-    public void skal_flytte_behandling_til_fakta_steg_når_behandling_er_i_iverksettelse_steg() {
-        when(mockBehandlingModellRepository.getBehandlingStegKonfigurasjon()).thenReturn(
-            BehandlingStegKonfigurasjon.lagDummy());
-        when(mockBehandlingModellRepository.getModell(any(BehandlingType.class))).thenReturn(
-            lagDummyBehandlingsModell());
-        manipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.IVERKSETT_VEDTAK);
+    public void skal_flytte_behandling_til_fakta_steg_når_behandling_er_i_foreslå_steg() {
+        InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.FORESLÅ_VEDTAK);
 
         forvaltningBehandlingRestTjeneste.tilbakeførBehandlingTilFaktaSteg(new BehandlingReferanse(behandling.getId()));
         assertEquals(BehandlingStegType.FAKTA_FEILUTBETALING, behandling.getAktivtBehandlingSteg());
@@ -386,32 +367,6 @@ public class ForvaltningBehandlingRestTjenesteTest {
         var prosessTaskData = captor.getValue();
         assertThat(prosessTaskData.taskType()).isEqualTo(taskType);
         return prosessTaskData;
-    }
-
-    private BehandlingModell lagDummyBehandlingsModell() {
-        List<TestStegKonfig> steg = Lists.newArrayList(
-            new TestStegKonfig(BehandlingStegType.TBKGSTEG, BehandlingType.TILBAKEKREVING, new MottattGrunnlagSteg()),
-            new TestStegKonfig(BehandlingStegType.FAKTA_FEILUTBETALING, BehandlingType.TILBAKEKREVING,
-                new FaktaFeilutbetalingSteg(behandlingRepository, null)),
-            new TestStegKonfig(BehandlingStegType.IVERKSETT_VEDTAK, BehandlingType.TILBAKEKREVING,
-                new IverksetteVedtakSteg(repositoryProvider, null)));
-
-        BehandlingModellImpl.TriFunction<BehandlingStegType, BehandlingType, BehandlingSteg> finnSteg = map(steg);
-        BehandlingModellImpl modell = new BehandlingModellImpl(BehandlingType.TILBAKEKREVING, finnSteg);
-
-        steg.forEach(konfig -> modell.leggTil(konfig.getBehandlingStegType(), konfig.getBehandlingType()));
-        return modell;
-    }
-
-    private static BehandlingModellImpl.TriFunction<BehandlingStegType, BehandlingType, BehandlingSteg> map(List<TestStegKonfig> input) {
-        Map<List<?>, BehandlingSteg> resolver = new HashMap<>();
-        for (TestStegKonfig konfig : input) {
-            List<?> key = Arrays.asList(konfig.getBehandlingStegType(), konfig.getBehandlingType());
-            resolver.put(key, konfig.getSteg());
-        }
-        BehandlingModellImpl.TriFunction<BehandlingStegType, BehandlingType, BehandlingSteg> func = (t, u) -> resolver.get(
-            Arrays.asList(t, u));
-        return func;
     }
 
 }

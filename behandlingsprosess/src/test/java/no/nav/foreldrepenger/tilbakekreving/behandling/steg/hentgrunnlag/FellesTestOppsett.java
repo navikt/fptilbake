@@ -10,10 +10,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -24,22 +20,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 
-import com.google.common.collect.Lists;
-
 import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.faktafeilutbetaling.FaktaFeilutbetalingSteg;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.KravgrunnlagMapper;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.LesKravgrunnlagTask;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.MottattGrunnlagSteg;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.iverksettvedtak.IverksetteVedtakSteg;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingModell;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingSteg;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegKonfigurasjon;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollEventPubliserer;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.spi.BehandlingskontrollServiceProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
@@ -68,7 +56,6 @@ import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlReposi
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.TaskType;
-import no.nav.vedtak.felles.prosesstask.impl.ProsessTaskEventPubliserer;
 
 @ExtendWith(FptilbakeEntityManagerAwareExtension.class)
 public abstract class FellesTestOppsett {
@@ -77,13 +64,11 @@ public abstract class FellesTestOppsett {
     protected static final Henvisning HENVISNING = Henvisning.fraEksternBehandlingId(FPSAK_BEHANDLING_ID);
     protected static final UUID FPSAK_BEHANDLING_UUID = UUID.randomUUID();
 
-    private final ProsessTaskEventPubliserer eventPublisererMock = mock(ProsessTaskEventPubliserer.class);
     private final BehandlingskontrollEventPubliserer behandlingskontrollEventPublisererMock = mock(
         BehandlingskontrollEventPubliserer.class);
     protected PersoninfoAdapter personinfoAdapterMock = mock(PersoninfoAdapter.class);
     protected final FagsystemKlient fagsystemKlientMock = mock(FagsystemKlient.class);
     protected final PersonOrganisasjonWrapper tpsAdapterWrapper = new PersonOrganisasjonWrapper(personinfoAdapterMock);
-    private final BehandlingModellRepository behandlingModellRepositoryMock = mock(BehandlingModellRepository.class);
     private final VarselresponsTjeneste varselresponsTjenesteMock = mock(VarselresponsTjeneste.class);
     private final SlettGrunnlagEventPubliserer mockSlettGrunnlagEventPubliserer = mock(
         SlettGrunnlagEventPubliserer.class);
@@ -131,9 +116,8 @@ public abstract class FellesTestOppsett {
             behandlingKandidaterRepository, behandlingVenterRepository, repositoryProvider, varselresponsTjenesteMock);
         historikkinnslagTjeneste = new HistorikkinnslagTjeneste(repositoryProvider.getHistorikkRepository(),
             personinfoAdapterMock);
-        behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(repositoryProvider,
-            behandlingModellRepositoryMock, behandlingskontrollEventPublisererMock);
-        InternalManipulerBehandling manipulerInternBehandling = new InternalManipulerBehandling(repositoryProvider);
+        behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(entityManager,
+            new BehandlingModellRepository(), behandlingskontrollEventPublisererMock));
         kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repositoryProvider, gjenopptaBehandlingTjeneste,
             behandlingskontrollTjeneste, mockSlettGrunnlagEventPubliserer);
         kravgrunnlagMapper = new KravgrunnlagMapper(tpsAdapterWrapper);
@@ -144,14 +128,10 @@ public abstract class FellesTestOppsett {
         fagsak = TestFagsakUtil.opprettFagsak();
         fagsakRepository.lagre(fagsak);
         behandling = lagBehandling(null);
-        manipulerInternBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.TBKGSTEG);
+        InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.HENTGRUNNLAGSTEG);
 
         when(personinfoAdapterMock.hentAktørForFnr(any(PersonIdent.class))).thenReturn(
             Optional.of(fagsak.getAktørId()));
-        when(behandlingModellRepositoryMock.getBehandlingStegKonfigurasjon()).thenReturn(
-            BehandlingStegKonfigurasjon.lagDummy());
-        when(behandlingModellRepositoryMock.getModell(any(BehandlingType.class))).thenReturn(
-            lagDummyBehandlingsModell());
 
     }
 
@@ -177,31 +157,5 @@ public abstract class FellesTestOppsett {
         ProsessTaskData prosessTaskData = ProsessTaskData.forTaskType(taskType);
         prosessTaskData.setProperty(TaskProperty.PROPERTY_MOTTATT_XML_ID, String.valueOf(mottattXmlId));
         return prosessTaskData;
-    }
-
-    private BehandlingModell lagDummyBehandlingsModell() {
-        List<TestStegKonfig> steg = Lists.newArrayList(
-            new TestStegKonfig(BehandlingStegType.TBKGSTEG, BehandlingType.TILBAKEKREVING, new MottattGrunnlagSteg()),
-            new TestStegKonfig(BehandlingStegType.FAKTA_FEILUTBETALING, BehandlingType.TILBAKEKREVING,
-                new FaktaFeilutbetalingSteg(behandlingRepository, null)),
-            new TestStegKonfig(BehandlingStegType.IVERKSETT_VEDTAK, BehandlingType.TILBAKEKREVING,
-                new IverksetteVedtakSteg(repositoryProvider, null)));
-
-        BehandlingModellImpl.TriFunction<BehandlingStegType, BehandlingType, BehandlingSteg> finnSteg = map(steg);
-        BehandlingModellImpl modell = new BehandlingModellImpl(BehandlingType.TILBAKEKREVING, finnSteg);
-
-        steg.forEach(konfig -> modell.leggTil(konfig.getBehandlingStegType(), konfig.getBehandlingType()));
-        return modell;
-    }
-
-    private static BehandlingModellImpl.TriFunction<BehandlingStegType, BehandlingType, BehandlingSteg> map(List<TestStegKonfig> input) {
-        Map<List<?>, BehandlingSteg> resolver = new HashMap<>();
-        for (TestStegKonfig konfig : input) {
-            List<?> key = Arrays.asList(konfig.getBehandlingStegType(), konfig.getBehandlingType());
-            resolver.put(key, konfig.getSteg());
-        }
-        BehandlingModellImpl.TriFunction<BehandlingStegType, BehandlingType, BehandlingSteg> func = (t, u) -> resolver.get(
-            Arrays.asList(t, u));
-        return func;
     }
 }

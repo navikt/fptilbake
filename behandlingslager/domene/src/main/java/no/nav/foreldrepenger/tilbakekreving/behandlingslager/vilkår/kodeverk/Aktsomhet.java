@@ -66,11 +66,6 @@ public enum Aktsomhet implements Vurdering {
         return kode;
     }
 
-    @Override
-    public String getOffisiellKode() {
-        return getKode();
-    }
-
     @JsonProperty
     @Override
     public String getKodeverk() {

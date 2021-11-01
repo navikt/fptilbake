@@ -10,7 +10,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.ReaktiveringStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.Totrinnsvurdering;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.VurderÅrsakTotrinnsvurdering;
 
@@ -22,7 +21,6 @@ public class AksjonspunktDtoMapper {
     public static Set<AksjonspunktDto> lagAksjonspunktDto(Behandling behandling, Collection<Totrinnsvurdering> ttVurderinger) {
         return behandling.getAlleAksjonspunkterInklInaktive().stream()
                 .filter(aksjonspunkt -> !aksjonspunkt.erAvbrutt())
-                .filter(aksjonspunkt -> !aksjonspunkt.getReaktiveringStatus().equals(ReaktiveringStatus.SLETTET))
                 .map(aksjonspunkt -> mapFra(aksjonspunkt, behandling, ttVurderinger))
                 .collect(Collectors.toSet());
     }
@@ -46,7 +44,7 @@ public class AksjonspunktDtoMapper {
 
         dto.setAksjonspunktType(aksjonspunktDefinisjon.getAksjonspunktType());
         dto.setKanLoses(kanLøses(aksjonspunktDefinisjon, behandling));
-        dto.setErAktivt(aksjonspunkt.erAktivt());
+        dto.setErAktivt(true);
         return dto;
     }
 

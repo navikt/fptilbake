@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkInnslagTekstBuilder;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagDel;
@@ -25,15 +24,15 @@ public class HistorikkinnslagDelDto {
     private List<HistorikkinnslagEndretFeltDto> endredeFelter;
     private List<HistorikkinnslagTotrinnsVurderingDto> aksjonspunkter;
 
-    static List<HistorikkinnslagDelDto> mapFra(List<HistorikkinnslagDel> historikkinnslagDelList, AksjonspunktRepository aksjonspunktRepository) {
+    static List<HistorikkinnslagDelDto> mapFra(List<HistorikkinnslagDel> historikkinnslagDelList) {
         List<HistorikkinnslagDelDto> historikkinnslagDelDtoList = new ArrayList<>();
         for (HistorikkinnslagDel historikkinnslagDel : historikkinnslagDelList) {
-            historikkinnslagDelDtoList.add(mapFra(historikkinnslagDel, aksjonspunktRepository));
+            historikkinnslagDelDtoList.add(mapFra(historikkinnslagDel));
         }
         return historikkinnslagDelDtoList;
     }
 
-    private static HistorikkinnslagDelDto mapFra(HistorikkinnslagDel historikkinnslagDel, AksjonspunktRepository aksjonspunktRepository) {
+    private static HistorikkinnslagDelDto mapFra(HistorikkinnslagDel historikkinnslagDel) {
         HistorikkinnslagDelDto dto = new HistorikkinnslagDelDto();
         historikkinnslagDel.getBegrunnelseFelt().ifPresent(begrunnelse -> dto.setBegrunnelse(finnÅrsakKodeListe(begrunnelse).orElse(null)));
         if (dto.getBegrunnelse() == null) {
@@ -57,8 +56,8 @@ public class HistorikkinnslagDelDto {
             SkjermlenkeType type = SkjermlenkeType.fraKode(skjermlenke);
             dto.setSkjermlenke(type);
         });
-        if (!historikkinnslagDel.getTotrinnsvurderinger(aksjonspunktRepository).isEmpty()) {
-            dto.setAksjonspunkter(HistorikkinnslagTotrinnsVurderingDto.mapFra(historikkinnslagDel.getTotrinnsvurderinger(aksjonspunktRepository)));
+        if (!historikkinnslagDel.getTotrinnsvurderinger().isEmpty()) {
+            dto.setAksjonspunkter(HistorikkinnslagTotrinnsVurderingDto.mapFra(historikkinnslagDel.getTotrinnsvurderinger()));
         }
         if (!historikkinnslagDel.getOpplysninger().isEmpty()) {
             dto.setOpplysninger(HistorikkinnslagOpplysningDto.mapFra(historikkinnslagDel.getOpplysninger()));

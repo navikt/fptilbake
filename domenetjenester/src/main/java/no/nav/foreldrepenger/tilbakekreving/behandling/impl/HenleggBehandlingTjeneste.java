@@ -37,8 +37,8 @@ public class HenleggBehandlingTjeneste {
     private HistorikkinnslagTjeneste historikkinnslagTjeneste;
 
     // TODO (rydde dependencies!!
-    static final TaskType HENLEGGELSESBREV_TASK_TYPE = new TaskType("brev.sendhenleggelse");
-    static final TaskType SELVBETJENING_HENLAGT_TASKTYPE = new TaskType("send.beskjed.tilbakekreving.henlagt.selvbetjening");
+    static final TaskType HENLEGGELSESBREV_TASK_TYPE = new TaskType("brev.sendhenleggelse"); // TODO kolokaliser
+    static final TaskType SELVBETJENING_HENLAGT_TASKTYPE = new TaskType("send.beskjed.tilbakekreving.henlagt.selvbetjening"); // TODO kolokaliser
     private static final long OPPRETTELSE_DAGER_BEGRENSNING = 6L;
 
     HenleggBehandlingTjeneste() {
@@ -95,7 +95,7 @@ public class HenleggBehandlingTjeneste {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
 
         if (behandling.isBehandlingPåVent()) {
-            behandlingskontrollTjeneste.taBehandlingAvVent(behandling, kontekst);
+            behandlingskontrollTjeneste.taBehandlingAvVentSetAlleAutopunktUtførtForHenleggelse(behandling, kontekst);
         }
         behandlingskontrollTjeneste.henleggBehandling(kontekst, årsakKode);
 

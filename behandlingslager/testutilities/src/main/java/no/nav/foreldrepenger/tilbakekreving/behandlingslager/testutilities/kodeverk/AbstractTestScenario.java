@@ -7,7 +7,6 @@ import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +15,6 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker;
@@ -28,7 +26,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.InternalManipulerBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktTestSupport;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
@@ -111,7 +109,7 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
 
     public S medDefaultKravgrunnlag() {
         Periode april2019 = Periode.of(LocalDate.of(2019, 4, 1), LocalDate.of(2019, 4, 30));
-        return medKravgrunnlag(Map.of(april2019, Arrays.asList(
+        return medKravgrunnlag(Map.of(april2019, List.of(
             KravgrunnlagTestBuilder.KgBeløp.feil(23000),
             KravgrunnlagTestBuilder.KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(23000).medTilbakekrevBeløp(23000)
         )));
@@ -195,28 +193,9 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
 
         when(repositoryProvider.getBehandlingRepository()).thenReturn(behandlingRepository);
 
-        AksjonspunktRepository aksjonspunktRepository = Mockito.spy(new AksjonspunktRepository(null));
-
-        // støtter ikke denne, da behandling mulig ikke har aksjonspunkt
-        Mockito.doAnswer(new Answer<AksjonspunktDefinisjon>() {
-            private List<AksjonspunktDefinisjon> defs;
-
-            @Override
-            public AksjonspunktDefinisjon answer(InvocationOnMock invocation) {
-                String kode = invocation.getArgument(0);
-                if (defs == null) {
-                    defs = new KodeverkFraJson().lesKodeverkFraFil(AksjonspunktDefinisjon.class);
-                }
-                return defs.stream().filter(a -> a.getKode().equals(kode))
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalArgumentException("Ukjent AksjonspunktDefinisjon kode=" + kode));
-            }
-        }).when(aksjonspunktRepository).finnAksjonspunktDefinisjon(Mockito.any());
-
         FagsakRepository mockFagsakRepository = mockFagsakRepository();
         when(repositoryProvider.getBehandlingRepository()).thenReturn(behandlingRepository);
         when(repositoryProvider.getFagsakRepository()).thenReturn(mockFagsakRepository);
-        when(repositoryProvider.getAksjonspunktRepository()).thenReturn(aksjonspunktRepository);
 
         return behandlingRepository;
     }
@@ -332,7 +311,7 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
         this.behandling = behandlingBuilder.build();
 
         if (startSteg != null) {
-            new InternalManipulerBehandling(repositoryProvider).forceOppdaterBehandlingSteg(behandling, startSteg);
+            InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, startSteg);
         }
         leggTilAksjonspunkter(behandling, repositoryProvider);
 
@@ -399,9 +378,9 @@ public abstract class AbstractTestScenario<S extends AbstractTestScenario<S>> {
         aksjonspunktDefinisjoner.forEach(
             (apDef, stegType) -> {
                 if (stegType != null) {
-                    repositoryProvider.getAksjonspunktRepository().leggTilAksjonspunkt(behandling, apDef, stegType);
+                    AksjonspunktTestSupport.leggTilAksjonspunkt(behandling, apDef, stegType);
                 } else {
-                    repositoryProvider.getAksjonspunktRepository().leggTilAksjonspunkt(behandling, apDef);
+                    AksjonspunktTestSupport.leggTilAksjonspunkt(behandling, apDef);
                 }
             });
     }

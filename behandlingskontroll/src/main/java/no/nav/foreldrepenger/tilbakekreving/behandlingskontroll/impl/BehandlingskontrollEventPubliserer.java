@@ -2,27 +2,22 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl;
 
 import java.lang.annotation.Annotation;
 import java.util.Objects;
-import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.AksjonspunktAvbruttEvent;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.AksjonspunktTilbakeførtEvent;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.AksjonspunktUtførtEvent;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.AksjonspunkterFunnetEvent;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStatusEvent;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegOvergangEvent;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegStatusEvent;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegTilstandEndringEvent;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingTransisjonEvent;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.AksjonspunktStatusEvent;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingStatusEvent;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingStegOvergangEvent;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingStegStatusEvent;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingStegTilstandEndringEvent;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingTransisjonEvent;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingskontrollEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegStatus;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegTilstand;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 
 
@@ -46,8 +41,8 @@ public class BehandlingskontrollEventPubliserer {
     }
 
     public void fireEvent(BehandlingStegOvergangEvent event) {
-        Optional<BehandlingStegTilstand> fraTilstand = event.getFraTilstand();
-        Optional<BehandlingStegTilstand> nyTilstand = event.getTilTilstand();
+        var fraTilstand = event.getFraTilstand();
+        var nyTilstand = event.getTilTilstand();
         if ((!fraTilstand.isPresent() && !nyTilstand.isPresent())
                 || (fraTilstand.isPresent() && nyTilstand.isPresent() && Objects.equals(fraTilstand.get(), nyTilstand.get()))) {
             // ikke fyr duplikate events
@@ -82,19 +77,7 @@ public class BehandlingskontrollEventPubliserer {
         doFireEvent(event);
     }
 
-    public void fireEvent(AksjonspunktUtførtEvent event) {
-        doFireEvent(event);
-    }
-
-    public void fireEvent(AksjonspunktAvbruttEvent event) {
-        doFireEvent(event);
-    }
-
-    public void fireEvent(AksjonspunkterFunnetEvent event) {
-        doFireEvent(event);
-    }
-
-    public void fireEvent(AksjonspunktTilbakeførtEvent event) {
+    public void fireEvent(AksjonspunktStatusEvent event) {
         doFireEvent(event);
     }
 

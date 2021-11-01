@@ -16,7 +16,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktKontrollRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.felles.FellesQueriesForBehandlingRepositories;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
@@ -32,7 +32,7 @@ public class BehandlingVenterRepositoryTest {
 
     private BehandlingVenterRepository repository;
 
-    private AksjonspunktRepository aksjonspunktRepository;
+    private AksjonspunktKontrollRepository aksjonspunktRepository;
     private BehandlingRepository behandlingRepository;
     private FagsakRepository fagsakRepository;
 
@@ -41,7 +41,7 @@ public class BehandlingVenterRepositoryTest {
         var fellesQueriesForBehandlingRepositories = new FellesQueriesForBehandlingRepositories(entityManager);
         repository = new BehandlingVenterRepository(fellesQueriesForBehandlingRepositories);
         var repositoryProvider = new BehandlingRepositoryProvider(entityManager);
-        aksjonspunktRepository = repositoryProvider.getAksjonspunktRepository();
+        aksjonspunktRepository = new AksjonspunktKontrollRepository();
         behandlingRepository = repositoryProvider.getBehandlingRepository();
         fagsakRepository = repositoryProvider.getFagsakRepository();
     }

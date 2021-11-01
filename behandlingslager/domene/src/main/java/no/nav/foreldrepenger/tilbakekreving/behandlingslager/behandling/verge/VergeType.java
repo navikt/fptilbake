@@ -70,11 +70,6 @@ public enum VergeType implements Kodeverdi {
         return kode;
     }
 
-    @Override
-    public String getOffisiellKode() {
-        return getKode();
-    }
-
     @JsonProperty
     @Override
     public String getKodeverk() {

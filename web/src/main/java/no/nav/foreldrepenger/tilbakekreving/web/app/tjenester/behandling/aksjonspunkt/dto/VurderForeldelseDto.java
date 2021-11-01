@@ -9,11 +9,10 @@ import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.ForeldelsePeriodeDto;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktKodeDefinisjon;
 
-@JsonTypeName(VurderForeldelseDto.AKSJONSPUNKT_KODE)
+@JsonTypeName(AksjonspunktKodeDefinisjon.VURDER_FORELDELSE)
 public class VurderForeldelseDto extends BekreftetAksjonspunktDto {
-
-    static final String AKSJONSPUNKT_KODE = "5003";
 
     @Valid
     @Size(min = 1)
@@ -23,10 +22,6 @@ public class VurderForeldelseDto extends BekreftetAksjonspunktDto {
         super();
     }
 
-    @Override
-    public String getKode() {
-        return AKSJONSPUNKT_KODE;
-    }
 
     public List<ForeldelsePeriodeDto> getForeldelsePerioder() {
         return foreldelsePerioder;

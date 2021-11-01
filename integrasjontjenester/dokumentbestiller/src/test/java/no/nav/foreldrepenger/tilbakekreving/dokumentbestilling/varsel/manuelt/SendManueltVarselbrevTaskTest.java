@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.spi.BehandlingskontrollServiceProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.dokumentbestiller.DokumentMalType;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.DokumentBestillerTestOppsett;
@@ -24,14 +25,13 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 public class SendManueltVarselbrevTaskTest extends DokumentBestillerTestOppsett {
 
     private ManueltVarselBrevTjeneste mockManueltVarselBrevTjeneste = mock(ManueltVarselBrevTjeneste.class);
-    private BehandlingModellRepository mockBehandlingModellRepository = mock(BehandlingModellRepository.class);
 
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private SendManueltVarselbrevTask varselbrevTask;
 
     @BeforeEach
     public void setup() {
-        behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(repositoryProvider, mockBehandlingModellRepository, null);
+        behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(entityManager, new BehandlingModellRepository(), null));
 
         varselbrevTask = new SendManueltVarselbrevTask(repositoryProvider,
             mockManueltVarselBrevTjeneste,

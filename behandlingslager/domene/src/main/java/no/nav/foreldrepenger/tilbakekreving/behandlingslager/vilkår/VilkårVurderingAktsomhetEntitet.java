@@ -18,14 +18,14 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkBaseEntitet;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
 import no.nav.vedtak.felles.jpa.converters.BooleanToStringConverter;
 
 @Entity(name = "VilkårVurderingAktsomhet")
 @Table(name = "VILKAAR_AKTSOMHET")
-public class VilkårVurderingAktsomhetEntitet extends KodeverkBaseEntitet {
+public class VilkårVurderingAktsomhetEntitet extends BaseEntitet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_VILKAAR_AKTSOMHET")

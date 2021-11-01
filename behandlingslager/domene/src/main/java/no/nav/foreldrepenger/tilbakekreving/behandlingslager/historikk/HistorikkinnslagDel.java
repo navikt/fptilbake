@@ -1,7 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -22,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepository;
 
 @Entity(name = "HistorikkinnslagDel")
 @Table(name = "HISTORIKKINNSLAG_DEL")
@@ -125,8 +123,8 @@ public class HistorikkinnslagDel extends BaseEntitet {
         return finnFeltListe(HistorikkinnslagFeltType.OPPLYSNINGER);
     }
 
-    public List<HistorikkinnslagTotrinnsvurdering> getTotrinnsvurderinger(AksjonspunktRepository aksjonspunktRepository) {
-        List<HistorikkinnslagFeltType> aksjonspunktFeltTypeKoder = Arrays.asList(HistorikkinnslagFeltType.AKSJONSPUNKT_BEGRUNNELSE,
+    public List<HistorikkinnslagTotrinnsvurdering> getTotrinnsvurderinger() {
+        List<HistorikkinnslagFeltType> aksjonspunktFeltTypeKoder = List.of(HistorikkinnslagFeltType.AKSJONSPUNKT_BEGRUNNELSE,
                 HistorikkinnslagFeltType.AKSJONSPUNKT_GODKJENT,
                 HistorikkinnslagFeltType.AKSJONSPUNKT_KODE);
 
@@ -138,13 +136,13 @@ public class HistorikkinnslagDel extends BaseEntitet {
                 .collect(Collectors.groupingBy(HistorikkinnslagFelt::getSekvensNr))
                 .entrySet()
                 .stream()
-                .map(entry -> lagHistorikkinnslagAksjonspunkt(entry.getKey(), entry.getValue(), aksjonspunktRepository))
+                .map(entry -> lagHistorikkinnslagAksjonspunkt(entry.getKey(), entry.getValue()))
                 .sorted(Comparator.comparing(HistorikkinnslagTotrinnsvurdering::getSekvensNr))
                 .collect(Collectors.toList());
         return totrinnsvurderinger;
     }
 
-    private HistorikkinnslagTotrinnsvurdering lagHistorikkinnslagAksjonspunkt(Integer sekvensNr, List<HistorikkinnslagFelt> aksjonspunktFeltListe, AksjonspunktRepository aksjonspunktRepository) {
+    private HistorikkinnslagTotrinnsvurdering lagHistorikkinnslagAksjonspunkt(Integer sekvensNr, List<HistorikkinnslagFelt> aksjonspunktFeltListe) {
         HistorikkinnslagTotrinnsvurdering aksjonspunkt = new HistorikkinnslagTotrinnsvurdering(sekvensNr);
         aksjonspunktFeltListe.forEach(felt -> {
             if (HistorikkinnslagFeltType.AKSJONSPUNKT_BEGRUNNELSE.equals(felt.getFeltType())) {
@@ -152,7 +150,7 @@ public class HistorikkinnslagDel extends BaseEntitet {
             } else if (HistorikkinnslagFeltType.AKSJONSPUNKT_GODKJENT.equals(felt.getFeltType())) {
                 aksjonspunkt.setGodkjent(Boolean.parseBoolean(felt.getTilVerdi()));
             } else if (HistorikkinnslagFeltType.AKSJONSPUNKT_KODE.equals(felt.getFeltType())) {
-                AksjonspunktDefinisjon aksjonspunktDefinisjon = aksjonspunktRepository.finnAksjonspunktDefinisjon(felt.getTilVerdi());
+                var aksjonspunktDefinisjon = AksjonspunktDefinisjon.fraKode(felt.getTilVerdi());
                 aksjonspunkt.setAksjonspunktDefinisjon(aksjonspunktDefinisjon);
             } else {
                 throw new IllegalStateException("Uventet feltnavn " + felt.getFeltType().getKode());

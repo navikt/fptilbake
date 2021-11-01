@@ -3,6 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.transisjon
 import java.util.Optional;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegModell;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.transisjoner.StegTransisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 
@@ -19,7 +20,7 @@ class FremoverhoppTransisjon implements StegTransisjon {
 
     @Override
     public BehandlingStegModell nesteSteg(BehandlingStegModell nåværendeSteg) {
-        Optional<BehandlingStegModell> funnetMålsteg = nåværendeSteg.getBehandlingModell().hvertStegEtter(nåværendeSteg.getBehandlingStegType())
+        var funnetMålsteg = nåværendeSteg.getBehandlingModell().hvertStegEtter(nåværendeSteg.getBehandlingStegType())
             .filter(s -> s.getBehandlingStegType().equals(målsteg))
             .findFirst();
         if (funnetMålsteg.isPresent()) {
@@ -34,12 +35,13 @@ class FremoverhoppTransisjon implements StegTransisjon {
     }
 
     @Override
-    public boolean erFremoverhopp() {
-        return true;
+    public Optional<BehandlingStegType> getMålstegHvisHopp() {
+        return Optional.of(målsteg);
     }
 
-    public BehandlingStegType getMålsteg() {
-        return målsteg;
+    @Override
+    public BehandlingStegResultat getRetningForHopp() {
+        return BehandlingStegResultat.FREMOVERFØRT;
     }
 
     @Override

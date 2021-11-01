@@ -8,8 +8,7 @@ public class BehandlingStegMockUtil {
     }
 
     public static void nyBehandlingSteg(Behandling behandling, BehandlingStegType behandlingStegType, BehandlingStatus behandlingStatus) {
-        behandlingStegType = new BehandlingStegType(behandlingStegType.getKode(),behandlingStatus);
         BehandlingStegTilstand behandlingStegTilstand = new BehandlingStegTilstand(behandling, behandlingStegType, BehandlingStegStatus.UTGANG);
-        behandling.oppdaterBehandlingStegOgStatus(behandlingStegTilstand, BehandlingStegStatus.UTFØRT);
+        behandling.oppdaterBehandlingStegOgStatus(behandlingStegTilstand);
     }
 }

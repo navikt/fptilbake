@@ -70,11 +70,6 @@ public enum HistorikkAktør implements Kodeverdi {
         return kode;
     }
 
-    @Override
-    public java.lang.String getOffisiellKode() {
-        return getKode();
-    }
-
     @JsonProperty
     @Override
     public java.lang.String getKodeverk() {
