@@ -14,6 +14,7 @@ import javax.sql.DataSource;
 import org.eclipse.jetty.plus.jndi.EnvEntry;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.FlywayException;
+import org.flywaydb.core.api.configuration.FluentConfiguration;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
@@ -28,6 +29,7 @@ import com.zaxxer.hikari.HikariDataSource;
 
 public class JettyDevDbKonfigurasjon {
     private static final ObjectMapper OM;
+    private static final String FLYWAY_SCHEMA_TABLE = "schema_version";
 
     static {
         OM = new ObjectMapper();
@@ -103,17 +105,6 @@ public class JettyDevDbKonfigurasjon {
 
         class FlywayKonfig {
 
-            Properties lesFlywayPlaceholders() {
-                Properties placeholders = new Properties();
-                for (String prop : System.getProperties().stringPropertyNames()) {
-                    if (prop.startsWith("flyway.placeholders.")) {
-                        placeholders.setProperty(prop, System.getProperty(prop));
-                    }
-                }
-                return placeholders;
-            }
-
-
             String getMigrationScriptLocation(JettyDevDbKonfigurasjon connectionProperties) {
                 String relativePath = connectionProperties.getMigrationScriptsFilesystemRoot() + connectionProperties.getDatasource();
                 File baseDir = new File(".").getAbsoluteFile();
@@ -129,23 +120,24 @@ public class JettyDevDbKonfigurasjon {
                 return "filesystem:" + location.getPath();
             }
         }
-        Flyway flyway = new Flyway();
-        flyway.setBaselineOnMigrate(true);
-        flyway.setDataSource(dataSource);
+        var flywayConfiguration = Flyway.configure()
+            .dataSource(dataSource)
+            .table(FLYWAY_SCHEMA_TABLE)
+            .baselineOnMigrate(true);
 
         FlywayKonfig flywayKonfig = new FlywayKonfig();
         final String scriptLocation = flywayKonfig.getMigrationScriptLocation(connectionProperties);
         if (scriptLocation != null) {
-            flyway.setLocations(scriptLocation);
+            flywayConfiguration.locations(scriptLocation);
         } else {
             /**
              * Default leter flyway etter classpath:db/migration.
              * Her vet vi at vi ikke skal lete i classpath
              */
-            flyway.setLocations("denne/stien/finnes/ikke");
+            flywayConfiguration.locations("denne/stien/finnes/ikke");
         }
-        flyway.configure(flywayKonfig.lesFlywayPlaceholders());
 
+        var flyway = new Flyway(flywayConfiguration);
         try {
             flyway.migrate();
         } catch (FlywayException e) {

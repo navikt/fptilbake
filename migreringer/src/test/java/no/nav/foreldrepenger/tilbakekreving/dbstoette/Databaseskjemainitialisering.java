@@ -20,6 +20,7 @@ public final class Databaseskjemainitialisering {
 
     private static final Logger LOG = LoggerFactory.getLogger(Databaseskjemainitialisering.class);
     private static final Environment ENV = Environment.current();
+    private static final String FLYWAY_SCHEMA_TABLE = "schema_version";
 
     public static final List<DBProperties> UNIT_TEST = List.of(cfg("fptilbake.default"));
 
@@ -56,12 +57,14 @@ public final class Databaseskjemainitialisering {
 
     private static void migrer(DataSource ds, DBProperties props) {
         LOG.info("Migrerer {}", props.getSchema());
-        Flyway flyway = new Flyway();
-        flyway.setBaselineOnMigrate(true);
-        flyway.setDataSource(ds);
-        flyway.setTable("schema_version");
-        flyway.setLocations(scriptLocation(props));
-        flyway.setCleanOnValidationError(true);
+        var flyway = new Flyway(Flyway.configure()
+            .dataSource(ds)
+            .locations(scriptLocation(props))
+            .table(FLYWAY_SCHEMA_TABLE)
+            .baselineOnMigrate(true)
+            .cleanOnValidationError(true)
+        );
+
         if (!ENV.isLocal()) {
             throw new IllegalStateException("Forventer at denne migreringen bare kjøres lokalt");
         }
@@ -72,7 +75,7 @@ public final class Databaseskjemainitialisering {
         String schema = ENV.getRequiredProperty(prefix + ".schema");
         return new DBProperties.Builder()
                 .user(schema)
-                .versjonstabell("schema_version")
+                .versjonstabell(FLYWAY_SCHEMA_TABLE)
                 .password(schema)
                 .datasource(ENV.getRequiredProperty(prefix + ".datasource"))
                 .schema(schema)
