@@ -382,7 +382,7 @@
                 <!-- velger en transitiv avhengighet - felles ikke enig med seg selv, velger den som blir brukt i prod-scope i felles -->
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
-                <version>3.18.1</version>
+                <version>3.19.0</version>
             </dependency>
 
             <dependency>
