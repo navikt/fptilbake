@@ -170,7 +170,7 @@ public abstract class FellesTestOppsett {
         revurderingTjeneste = new BehandlingRevurderingTjeneste(repoProvider, behandlingskontrollTjeneste);
         faktaFeilutbetalingTjeneste = new FaktaFeilutbetalingTjeneste(repoProvider, kravgrunnlagTjeneste, mockFagsystemKlient);
         fagsakTjeneste = new FagsakTjeneste(mockTpsTjeneste, repoProvider.getFagsakRepository(), brukerRepository);
-        behandlingTjeneste = new BehandlingTjeneste(repoProvider, taskTjeneste, behandlingskontrollProvider,
+        behandlingTjeneste = new BehandlingTjeneste(repoProvider, behandlingskontrollProvider,
             fagsakTjeneste, mockHistorikkTjeneste, mockFagsystemKlient, defaultVentetid);
         testUtility = new TestUtility(behandlingTjeneste);
         aktørId = testUtility.genererAktørId();

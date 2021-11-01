@@ -73,7 +73,6 @@ public class AksjonspunktRestTjenesteTest {
         when(repositoryProviderMock.getBehandlingRepository()).thenReturn(behandlingRepositoryMock);
 
         BehandlingTjeneste behandlingTjeneste = new BehandlingTjeneste(repositoryProviderMock,
-                taskTjenesteMock,
                 behandlingskontrollProvider,
                 mock(FagsakTjeneste.class),
                 mock(HistorikkinnslagTjeneste.class),

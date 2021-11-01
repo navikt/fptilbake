@@ -45,7 +45,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @ApplicationScoped
-@ProsessTask("kravgrunnlag.finn") // OBSOBSOBS opprettes fra BehandlingTjeneste - task bør flyttes vekk herfra
+@ProsessTask("kravgrunnlag.finn")
 @FagsakProsesstaskRekkefølge(gruppeSekvens = false)
 public class FinnGrunnlagTask implements ProsessTaskHandler {
 

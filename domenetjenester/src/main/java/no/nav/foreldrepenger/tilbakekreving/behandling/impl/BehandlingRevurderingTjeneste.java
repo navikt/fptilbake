@@ -106,11 +106,11 @@ public class BehandlingRevurderingTjeneste {
         BehandlingLås lås = behandlingRepository.taSkriveLås(revurdering);
         behandlingRepository.lagre(revurdering, lås);
 
+        opprettRelasjonMedEksternBehandling(henvisning, revurdering, eksternUuid);
+
         // revurdering skal starte med Fakta om feilutbetaling
         var kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(revurdering);
         behandlingskontrollTjeneste.lagreAksjonspunkterFunnet(kontekst, BehandlingStegType.FAKTA_FEILUTBETALING, List.of(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING));
-
-        opprettRelasjonMedEksternBehandling(henvisning, revurdering, eksternUuid);
 
         kopierVergeInformasjon(origBehandling.getId(), revurdering.getId());
 

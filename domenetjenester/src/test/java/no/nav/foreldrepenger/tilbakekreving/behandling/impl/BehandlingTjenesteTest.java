@@ -6,20 +6,17 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import javax.persistence.FlushModeType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -46,7 +43,6 @@ import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBe
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.TilbakekrevingValgDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.VergeDto;
 import no.nav.vedtak.exception.TekniskException;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 
 public class BehandlingTjenesteTest extends FellesTestOppsett {
 
@@ -80,17 +76,13 @@ public class BehandlingTjenesteTest extends FellesTestOppsett {
     @Test
     public void skal_opprette_behandling_manuell() {
         avsluttBehandling();
-        Long behandlingId = behandlingTjeneste.opprettBehandlingManuell(saksnummer, UUID.randomUUID(), FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING);
+        Long behandlingId = behandlingTjeneste.opprettKunBehandlingManuell(saksnummer, UUID.randomUUID(), FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING).getId();
         fellesBehandlingAssert(behandlingId, true);
-        var captor = ArgumentCaptor.forClass(ProsessTaskData.class);
-        verify(taskTjeneste, times(1)).lagre(captor.capture());
-        var prosessTaskData = captor.getAllValues();
-        assertThat(prosessTaskData.stream().filter(t -> BehandlingTjeneste.FINN_KRAVGRUNNLAG_TASK.equals(t.taskType())).collect(Collectors.toList())).isNotEmpty();
     }
 
     @Test
     public void skal_opprette_behandling_manuell_med_allerede_åpen_behandling() {
-        assertThatThrownBy(() -> behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternBehandlingUuid,
+        assertThatThrownBy(() -> behandlingTjeneste.opprettKunBehandlingManuell(saksnummer, eksternBehandlingUuid,
             FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING))
             .hasMessageContaining("FPT-663486");
     }
@@ -101,18 +93,14 @@ public class BehandlingTjenesteTest extends FellesTestOppsett {
         avsluttBehandling();
         revurderingTjeneste.opprettRevurdering(behandling.getId(), BehandlingÅrsakType.RE_OPPLYSNINGER_OM_VILKÅR);
 
-        Long behandlingId = behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternUUID, FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING);
+        Long behandlingId = behandlingTjeneste.opprettKunBehandlingManuell(saksnummer, eksternUUID, FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING).getId();
         fellesBehandlingAssert(behandlingId, true);
-        var captor = ArgumentCaptor.forClass(ProsessTaskData.class);
-        verify(taskTjeneste, times(1)).lagre(captor.capture());
-        var prosessTaskData = captor.getAllValues();
-        assertThat(prosessTaskData.stream().filter(t -> BehandlingTjeneste.FINN_KRAVGRUNNLAG_TASK.equals(t.taskType())).collect(Collectors.toList())).isNotEmpty();
     }
 
     @Test
     public void skal_opprette_behandling_manuell_med_allerede_avsluttet_behandling_med_samme_fpsak_revurdering() {
         avsluttBehandling();
-        assertThatThrownBy(() -> behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternBehandlingUuid,
+        assertThatThrownBy(() -> behandlingTjeneste.opprettKunBehandlingManuell(saksnummer, eksternBehandlingUuid,
             FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING))
             .hasMessageContaining("FPT-663488");
     }
@@ -122,12 +110,8 @@ public class BehandlingTjenesteTest extends FellesTestOppsett {
         lagBehandlingsResulatat();
         avsluttBehandling();
 
-        Long behandlingId = behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternBehandlingUuid, FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING);
+        Long behandlingId = behandlingTjeneste.opprettKunBehandlingManuell(saksnummer, eksternBehandlingUuid, FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING).getId();
         fellesBehandlingAssert(behandlingId, true);
-        var captor = ArgumentCaptor.forClass(ProsessTaskData.class);
-        verify(taskTjeneste, times(1)).lagre(captor.capture());
-        var prosessTaskData = captor.getAllValues();
-        assertThat(prosessTaskData.stream().filter(t -> BehandlingTjeneste.FINN_KRAVGRUNNLAG_TASK.equals(t.taskType())).collect(Collectors.toList())).isNotEmpty();
     }
 
     @Test
@@ -136,12 +120,8 @@ public class BehandlingTjenesteTest extends FellesTestOppsett {
         SamletEksternBehandlingInfo samletEksternBehandlingInfo = lagSamletEksternBehandlingInfo(VergeType.ADVOKAT);
         VergeDto vergeDto = samletEksternBehandlingInfo.getVerge();
         when(mockFagsystemKlient.hentBehandlingsinfo(any(UUID.class), any(Tillegsinformasjon.class))).thenReturn(samletEksternBehandlingInfo);
-        Long behandlingId = behandlingTjeneste.opprettBehandlingManuell(saksnummer, UUID.randomUUID(), FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING);
+        Long behandlingId = behandlingTjeneste.opprettKunBehandlingManuell(saksnummer, UUID.randomUUID(), FagsakYtelseType.FORELDREPENGER, BehandlingType.TILBAKEKREVING).getId();
         fellesBehandlingAssert(behandlingId, true);
-        var captor = ArgumentCaptor.forClass(ProsessTaskData.class);
-        verify(taskTjeneste, times(1)).lagre(captor.capture());
-        var prosessTaskData = captor.getAllValues();
-        assertThat(prosessTaskData.stream().filter(t -> BehandlingTjeneste.FINN_KRAVGRUNNLAG_TASK.equals(t.taskType())).collect(Collectors.toList())).isNotEmpty();
         verify(mockTpsTjeneste, never()).hentAktørForFnr(any(PersonIdent.class));
         Optional<VergeEntitet> vergeEntitet = vergeRepository.finnVergeInformasjon(behandlingId);
         assertThat(vergeEntitet).isNotEmpty();

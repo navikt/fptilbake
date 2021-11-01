@@ -1,8 +1,8 @@
 package no.nav.foreldrepenger.tilbakekreving.hendelser.k9vedtak;
 
-import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.hendelse.TaskProperties.EKSTERN_BEHANDLING_UUID;
-import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.hendelse.TaskProperties.FAGSAK_YTELSE_TYPE;
-import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.hendelse.TaskProperties.HENVISNING;
+import static no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties.EKSTERN_BEHANDLING_UUID;
+import static no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties.FAGSAK_YTELSE_TYPE;
+import static no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties.HENVISNING;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

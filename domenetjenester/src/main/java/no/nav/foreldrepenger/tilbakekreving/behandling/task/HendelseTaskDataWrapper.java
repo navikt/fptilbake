@@ -1,13 +1,12 @@
-package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.hendelse;
+package no.nav.foreldrepenger.tilbakekreving.behandling.task;
 
 
-import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.hendelse.TaskProperties.BEHANDLING_TYPE;
-import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.hendelse.TaskProperties.EKSTERN_BEHANDLING_ID;
-import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.hendelse.TaskProperties.EKSTERN_BEHANDLING_UUID;
-import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.hendelse.TaskProperties.FAGSAK_YTELSE_TYPE;
-import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.hendelse.TaskProperties.HENVISNING;
-import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.hendelse.TaskProperties.OPPRETT_BEHANDLING_TASK_TYPE;
-import static no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.hendelse.TaskProperties.SAKSNUMMER;
+import static no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties.BEHANDLING_TYPE;
+import static no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties.EKSTERN_BEHANDLING_ID;
+import static no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties.EKSTERN_BEHANDLING_UUID;
+import static no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties.FAGSAK_YTELSE_TYPE;
+import static no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties.HENVISNING;
+import static no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties.SAKSNUMMER;
 
 import java.util.Objects;
 
@@ -17,7 +16,6 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.TaskType;
 
 public class HendelseTaskDataWrapper {
 
@@ -104,18 +102,12 @@ public class HendelseTaskDataWrapper {
     }
 
     public static HendelseTaskDataWrapper lagWrapperForOpprettBehandling(String behandlingUuid, Henvisning henvisning, AktørId aktørId, Saksnummer saksnummer) {
-        ProsessTaskData td = lagProsessTaskDataMedFellesProperty(OPPRETT_BEHANDLING_TASK_TYPE, aktørId, henvisning,
-            behandlingUuid, saksnummer);
-        return new HendelseTaskDataWrapper(td);
-    }
-
-    private static ProsessTaskData lagProsessTaskDataMedFellesProperty(TaskType taskType, AktørId aktørId, Henvisning henvisning, String behandlingUuid, Saksnummer saksnummer) {
-        ProsessTaskData td = ProsessTaskData.forTaskType(taskType);
+        ProsessTaskData td = ProsessTaskData.forProsessTask(OpprettBehandlingTask.class);
         td.setAktørId(aktørId.getId());
         td.setProperty(EKSTERN_BEHANDLING_UUID, behandlingUuid);
         td.setProperty(EKSTERN_BEHANDLING_ID, henvisning.getVerdi()); //TODO k9-tilbake fjern når transisjon til henvisning er ferdig
         td.setProperty(HENVISNING, henvisning.getVerdi());
         td.setProperty(SAKSNUMMER, saksnummer.getVerdi());
-        return td;
+        return new HendelseTaskDataWrapper(td);
     }
 }

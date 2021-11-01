@@ -7,14 +7,12 @@ import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.Gjenop
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlendeEnhetTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingRevurderingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.impl.HenleggBehandlingTjeneste;
 
 @ApplicationScoped
 public class BehandlingsTjenesteProvider {
 
     private BehandlingTjeneste behandlingTjeneste;
     private GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste;
-    private HenleggBehandlingTjeneste henleggBehandlingTjeneste;
     private BehandlingRevurderingTjeneste revurderingTjeneste;
     private BehandlendeEnhetTjeneste enhetTjeneste;
 
@@ -24,11 +22,10 @@ public class BehandlingsTjenesteProvider {
 
     @Inject
     public BehandlingsTjenesteProvider(BehandlingTjeneste behandlingTjeneste, GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste,
-                                       HenleggBehandlingTjeneste henleggBehandlingTjeneste, BehandlingRevurderingTjeneste revurderingTjeneste,
+                                       BehandlingRevurderingTjeneste revurderingTjeneste,
                                        BehandlendeEnhetTjeneste enhetTjeneste) {
         this.behandlingTjeneste = behandlingTjeneste;
         this.gjenopptaBehandlingTjeneste = gjenopptaBehandlingTjeneste;
-        this.henleggBehandlingTjeneste = henleggBehandlingTjeneste;
         this.revurderingTjeneste = revurderingTjeneste;
         this.enhetTjeneste = enhetTjeneste;
     }
@@ -39,10 +36,6 @@ public class BehandlingsTjenesteProvider {
 
     public GjenopptaBehandlingTjeneste getGjenopptaBehandlingTjeneste() {
         return gjenopptaBehandlingTjeneste;
-    }
-
-    public HenleggBehandlingTjeneste getHenleggBehandlingTjeneste() {
-        return henleggBehandlingTjeneste;
     }
 
     public BehandlingRevurderingTjeneste getRevurderingTjeneste() {

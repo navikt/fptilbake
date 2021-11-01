@@ -7,7 +7,6 @@ import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.hendelse.HendelseTaskDataWrapper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
@@ -18,7 +17,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @ApplicationScoped
-@ProsessTask(value = "hendelser.opprettBehandling", maxFailedRuns = 5) // OBSOBS opprettes fra HendelseHåndtererTjeneste
+@ProsessTask(value = "hendelser.opprettBehandling", maxFailedRuns = 5)
 @FagsakProsesstaskRekkefølge(gruppeSekvens = false)
 public class OpprettBehandlingTask implements ProsessTaskHandler {
 
