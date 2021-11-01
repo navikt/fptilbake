@@ -29,9 +29,9 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlendeEnhetTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingRevurderingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.impl.HenleggBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.totrinn.TotrinnTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.verge.VergeTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.henleggelse.HenleggBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollAsynkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.observer.BehandlingManglerKravgrunnlagFristenEndretEventPubliserer;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker;
@@ -63,6 +63,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.Uui
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.SaksnummerDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.VergeBehandlingsmenyEnum;
 import no.nav.vedtak.exception.TekniskException;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
 public class BehandlingRestTjenesteTest {
 
@@ -72,6 +73,7 @@ public class BehandlingRestTjenesteTest {
     public static final String EKSTERN_BEHANDLING_UUID = UUID.randomUUID().toString();
     private static final FagsakYtelseType FP_YTELSE_TYPE = FagsakYtelseType.FORELDREPENGER;
 
+    private ProsessTaskTjeneste taskTjeneste = mock(ProsessTaskTjeneste.class);
     private BehandlingTjeneste behandlingTjenesteMock = mock(BehandlingTjeneste.class);
     private GjenopptaBehandlingTjeneste gjenopptaBehandlingTjenesteMock = mock(GjenopptaBehandlingTjeneste.class);
     private BehandlingDtoTjeneste behandlingDtoTjenesteMock = mock(BehandlingDtoTjeneste.class);
@@ -81,12 +83,12 @@ public class BehandlingRestTjenesteTest {
     private BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjenesteMock = mock(BehandlingskontrollAsynkTjeneste.class);
     private BehandlendeEnhetTjeneste behandlendeEnhetTjenesteMock = mock(BehandlendeEnhetTjeneste.class);
     private BehandlingsTjenesteProvider behandlingsTjenesteProvider = new BehandlingsTjenesteProvider(behandlingTjenesteMock, gjenopptaBehandlingTjenesteMock,
-        henleggBehandlingTjenesteMock, revurderingTjenesteMock, behandlendeEnhetTjenesteMock);
+        revurderingTjenesteMock, behandlendeEnhetTjenesteMock);
     private BehandlingManglerKravgrunnlagFristenEndretEventPubliserer fristenEndretEventPubliserer = mock(BehandlingManglerKravgrunnlagFristenEndretEventPubliserer.class);
     private VergeTjeneste vergeTjenesteMock = mock(VergeTjeneste.class);
 
-    private BehandlingRestTjeneste behandlingRestTjeneste = new BehandlingRestTjeneste(behandlingsTjenesteProvider, behandlingDtoTjenesteMock, vergeTjenesteMock,
-        mock(TotrinnTjeneste.class), behandlingsprosessTjeneste, behandlingskontrollAsynkTjenesteMock,fristenEndretEventPubliserer);
+    private BehandlingRestTjeneste behandlingRestTjeneste = new BehandlingRestTjeneste(behandlingsTjenesteProvider, behandlingDtoTjenesteMock, taskTjeneste, vergeTjenesteMock,
+        mock(TotrinnTjeneste.class), henleggBehandlingTjenesteMock, behandlingsprosessTjeneste, behandlingskontrollAsynkTjenesteMock,fristenEndretEventPubliserer);
 
     private static SaksnummerDto saksnummerDto = new SaksnummerDto(GYLDIG_SAKSNR);
     private static FpsakUuidDto fpsakUuidDto = new FpsakUuidDto(EKSTERN_BEHANDLING_UUID);
@@ -104,11 +106,13 @@ public class BehandlingRestTjenesteTest {
 
     @Test
     public void test_skal_opprette_ny_behandling() throws URISyntaxException {
-        when(behandlingTjenesteMock.hentBehandling(anyLong())).thenReturn(mockBehandling());
+        var behandling = mockBehandling();
+        when(behandlingTjenesteMock.hentBehandling(anyLong())).thenReturn(behandling);
+        when(behandlingTjenesteMock.opprettKunBehandlingManuell(any(), any(), any(), any())).thenReturn(behandling);
 
         behandlingRestTjeneste.opprettBehandling(mock(HttpServletRequest.class), opprettBehandlingDto(GYLDIG_SAKSNR, EKSTERN_BEHANDLING_UUID, FP_YTELSE_TYPE));
 
-        verify(behandlingTjenesteMock).opprettBehandlingManuell(any(Saksnummer.class), any(UUID.class), any(FagsakYtelseType.class), any(BehandlingType.class));
+        verify(behandlingTjenesteMock).opprettKunBehandlingManuell(any(Saksnummer.class), any(UUID.class), any(FagsakYtelseType.class), any(BehandlingType.class));
     }
 
     @Test
@@ -289,9 +293,11 @@ public class BehandlingRestTjenesteTest {
     }
 
     private Behandling mockBehandling() {
-        return Behandling.nyBehandlingFor(
-            Fagsak.opprettNy(new Saksnummer(GYLDIG_SAKSNR), NavBruker.opprettNy(new AktørId(GYLDIG_AKTØR_ID), Språkkode.nb)),
-            BehandlingType.REVURDERING_TILBAKEKREVING).build();
+        var sak = Fagsak.opprettNy(new Saksnummer(GYLDIG_SAKSNR), NavBruker.opprettNy(new AktørId(GYLDIG_AKTØR_ID), Språkkode.nb));
+        sak.setId(10L);
+        var behandling = Behandling.nyBehandlingFor(sak, BehandlingType.REVURDERING_TILBAKEKREVING).build();
+        behandling.setId(20L);
+        return behandling;
     }
 
     private Optional<EksternBehandling> opprettEksternBehandling() {

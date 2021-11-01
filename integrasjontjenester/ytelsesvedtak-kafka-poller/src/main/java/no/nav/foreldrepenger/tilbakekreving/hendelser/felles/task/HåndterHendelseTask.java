@@ -3,7 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.hendelser.felles.task;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.hendelse.HendelseTaskDataWrapper;
+import no.nav.foreldrepenger.tilbakekreving.behandling.task.HendelseTaskDataWrapper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.foreldrepenger.tilbakekreving.hendelser.felles.tjeneste.HendelseHåndtererTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;

@@ -41,17 +41,20 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlendeEnhetTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingRevurderingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.impl.HenleggBehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.totrinn.TotrinnTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.verge.VergeTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.henleggelse.HenleggBehandlingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.finn.FinnGrunnlagTask;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollAsynkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.observer.BehandlingManglerKravgrunnlagFristenEndretEventPubliserer;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.task.FortsettBehandlingTask;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.OrganisasjonsEnhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtak;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
@@ -79,6 +82,9 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.Saksnum
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.SøkestrengDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.verge.VergeBehandlingsmenyEnum;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.felles.AbacProperty;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.sikkerhet.abac.BeskyttetRessurs;
 import no.nav.vedtak.sikkerhet.abac.TilpassetAbacAttributt;
 import no.nav.vedtak.sikkerhet.context.SubjectHandler;
@@ -106,7 +112,7 @@ public class BehandlingRestTjeneste {
     private static final String REVURDERING_KAN_OPPRETTES_PART_PATH = "/kan-revurdering-opprettes-v2";
     public static final String REVURDERING_KAN_OPPRETTES_PATH = PATH_FRAGMENT + REVURDERING_KAN_OPPRETTES_PART_PATH;
 
-
+    private ProsessTaskTjeneste taskTjeneste;
     private BehandlingTjeneste behandlingTjeneste;
     private GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste;
     private BehandlingDtoTjeneste behandlingDtoTjeneste;
@@ -126,8 +132,10 @@ public class BehandlingRestTjeneste {
     @Inject
     public BehandlingRestTjeneste(BehandlingsTjenesteProvider behandlingsTjenesteProvider,
                                   BehandlingDtoTjeneste behandlingDtoTjeneste,
+                                  ProsessTaskTjeneste taskTjeneste,
                                   VergeTjeneste vergeTjeneste,
                                   TotrinnTjeneste totrinnTjeneste,
+                                  HenleggBehandlingTjeneste henleggBehandlingTjeneste,
                                   BehandlingsprosessApplikasjonTjeneste behandlingsprosessTjeneste,
                                   BehandlingskontrollAsynkTjeneste behandlingskontrollAsynkTjeneste,
                                   BehandlingManglerKravgrunnlagFristenEndretEventPubliserer fristenEndretEventPubliserer) {
@@ -136,12 +144,12 @@ public class BehandlingRestTjeneste {
         this.behandlingDtoTjeneste = behandlingDtoTjeneste;
         this.vergeTjeneste = vergeTjeneste;
         this.behandlingsprosessTjeneste = behandlingsprosessTjeneste;
-        this.henleggBehandlingTjeneste = behandlingsTjenesteProvider.getHenleggBehandlingTjeneste();
+        this.henleggBehandlingTjeneste = henleggBehandlingTjeneste;
         this.revurderingTjeneste = behandlingsTjenesteProvider.getRevurderingTjeneste();
         this.behandlingskontrollAsynkTjeneste = behandlingskontrollAsynkTjeneste;
         this.behandlendeEnhetTjeneste = behandlingsTjenesteProvider.getEnhetTjeneste();
         this.fristenEndretEventPubliserer = fristenEndretEventPubliserer;
-        this.vergeTjeneste = vergeTjeneste;
+        this.taskTjeneste = taskTjeneste;
         this.totrinnTjeneste = totrinnTjeneste;
     }
 
@@ -169,7 +177,7 @@ public class BehandlingRestTjeneste {
         UUID eksternUuid = opprettBehandlingDto.getEksternUuid();
         BehandlingType behandlingType = opprettBehandlingDto.getBehandlingType();
         if (BehandlingType.TILBAKEKREVING.equals(behandlingType)) {
-            Long behandlingId = behandlingTjeneste.opprettBehandlingManuell(saksnummer, eksternUuid, opprettBehandlingDto.getFagsakYtelseType(), behandlingType);
+            Long behandlingId = doOpprettBehandling(saksnummer, eksternUuid, opprettBehandlingDto.getFagsakYtelseType(), behandlingType);
             Behandling behandling = behandlingTjeneste.hentBehandling(behandlingId);
             return Redirect.tilBehandlingPollStatus(request, behandling.getUuid(), Optional.empty());
         } else if (BehandlingType.REVURDERING_TILBAKEKREVING.equals(behandlingType)) {
@@ -181,6 +189,20 @@ public class BehandlingRestTjeneste {
             return Redirect.tilBehandlingPollStatus(request, revurdering.getUuid(), Optional.of(gruppe));
         }
         return Response.ok().build();
+    }
+
+    Long doOpprettBehandling(Saksnummer saksnummer, UUID eksternUuid, FagsakYtelseType fagsakYtelseType, BehandlingType behandlingType) {
+        var behandling = behandlingTjeneste.opprettKunBehandlingManuell(saksnummer, eksternUuid, fagsakYtelseType, behandlingType);
+        var taskGruppe = new ProsessTaskGruppe();
+        ProsessTaskData taskDataFortsett = ProsessTaskData.forProsessTask(FortsettBehandlingTask.class);
+        taskDataFortsett.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
+        taskGruppe.addNesteSekvensiell(taskDataFortsett);
+        ProsessTaskData taskDataFinn = ProsessTaskData.forProsessTask(FinnGrunnlagTask.class);
+        taskDataFinn.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
+        taskGruppe.addNesteSekvensiell(taskDataFinn);
+        taskGruppe.setCallIdFraEksisterende();
+        taskTjeneste.lagre(taskGruppe);
+        return behandling.getId();
     }
 
     @GET

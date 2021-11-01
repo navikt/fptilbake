@@ -126,8 +126,8 @@ public class HåndterGamleKravgrunnlagTaskTest {
         HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(
             repositoryProvider.getHistorikkRepository(), null);
         FagsakTjeneste fagsakTjeneste = new FagsakTjeneste(tpsTjenesteMock, fagsakRepository, navBrukerRepository);
-        behandlingTjeneste = new BehandlingTjeneste(repositoryProvider, taskTjeneste,
-            behandlingskontrollProvider, fagsakTjeneste, historikkinnslagTjeneste, fagsystemKlientMock, Period.ofWeeks(4));
+        behandlingTjeneste = new BehandlingTjeneste(repositoryProvider,
+                behandlingskontrollProvider, fagsakTjeneste, historikkinnslagTjeneste, fagsystemKlientMock, Period.ofWeeks(4));
         HåndterGamleKravgrunnlagTjeneste håndterGamleKravgrunnlagTjeneste = new HåndterGamleKravgrunnlagTjeneste(
             mottattXmlRepository, grunnlagRepository, hentKravgrunnlagMapper, lesKravgrunnlagMapper, behandlingTjeneste,
             økonomiConsumerMock, fagsystemKlientMock);

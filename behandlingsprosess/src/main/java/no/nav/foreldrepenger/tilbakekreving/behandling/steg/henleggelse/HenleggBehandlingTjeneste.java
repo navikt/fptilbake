@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
+package no.nav.foreldrepenger.tilbakekreving.behandling.steg.henleggelse;
 
 import java.time.LocalDate;
 
@@ -17,9 +17,11 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkinnslagType;
+import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.henleggelse.SendHenleggelsesbrevTask;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkinnslagTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.selvbetjening.SelvbetjeningTilbakekrevingStøtte;
+import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.task.SendTilbakekrevingHenlagtTilSelvbetjeningTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.TaskType;
@@ -36,9 +38,8 @@ public class HenleggBehandlingTjeneste {
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private HistorikkinnslagTjeneste historikkinnslagTjeneste;
 
-    // TODO (rydde dependencies!!
-    static final TaskType HENLEGGELSESBREV_TASK_TYPE = new TaskType("brev.sendhenleggelse"); // TODO kolokaliser
-    static final TaskType SELVBETJENING_HENLAGT_TASKTYPE = new TaskType("send.beskjed.tilbakekreving.henlagt.selvbetjening"); // TODO kolokaliser
+    static final TaskType HENLEGGELSESBREV_TASK_TYPE = TaskType.forProsessTask(SendHenleggelsesbrevTask.class);
+    static final TaskType SELVBETJENING_HENLAGT_TASKTYPE = TaskType.forProsessTask(SendTilbakekrevingHenlagtTilSelvbetjeningTask.class);
     private static final long OPPRETTELSE_DAGER_BEGRENSNING = 6L;
 
     HenleggBehandlingTjeneste() {

@@ -17,6 +17,11 @@ import com.google.common.collect.Lists;
 
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandling.modell.BehandlingFeilutbetalingFakta;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.spi.BehandlingskontrollServiceProvider;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagOmrådeKode;
@@ -37,7 +42,6 @@ import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KravStatusKode;
 public class FaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
 
     private static final LocalDate NOW = LocalDate.now();
-    private HenleggBehandlingTjeneste henleggBehandlingTjeneste;
 
     @BeforeEach
     public void setup() {
@@ -48,8 +52,7 @@ public class FaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
             .setTilbakekrevingvalg(new TilbakekrevingValgDto(VidereBehandling.TILBAKEKREV_I_INFOTRYGD))
             .build();
         when(mockFagsystemKlient.hentBehandlingsinfo(eksternBehandlingUuid, Tillegsinformasjon.TILBAKEKREVINGSVALG)).thenReturn(samletEksternBehandlingInfo);
-        henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repoProvider, taskTjeneste,
-            behandlingskontrollTjeneste, mockHistorikkTjeneste);
+        behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(entityManager, new BehandlingModellRepository(), null));
     }
 
     @Test
@@ -114,7 +117,7 @@ public class FaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
         grunnlagRepository.lagre(internBehandlingId, kravgrunnlag431);
         varselRepository.lagre(internBehandlingId, "hello", 23000l);
 
-        henleggBehandlingTjeneste.henleggBehandling(internBehandlingId, BehandlingResultatType.HENLAGT_FEILOPPRETTET);
+        doHenleggBehandling(internBehandlingId, BehandlingResultatType.HENLAGT_FEILOPPRETTET);
         Optional<EksternBehandling> eksternBehandling = repoProvider.getEksternBehandlingRepository().hentEksisterendeDeaktivert(behandling.getId(),henvisning);
         assertThat(eksternBehandling).isPresent();
         assertThat(eksternBehandling.get().getAktiv()).isFalse();
@@ -126,6 +129,18 @@ public class FaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
         assertThat(fakta.getTidligereVarseltBeløp()).isEqualByComparingTo(23000l);
         assertThat(fakta.getPerioder().get(0).getFom()).isEqualTo(FOM);
         assertThat(fakta.getPerioder().get(0).getTom()).isEqualTo(TOM);
+    }
+
+    private void doHenleggBehandling(long behandlingId, BehandlingResultatType årsakKode) {
+        BehandlingskontrollKontekst kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandlingId);
+        Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
+
+        if (behandling.isBehandlingPåVent()) {
+            behandlingskontrollTjeneste.taBehandlingAvVentSetAlleAutopunktUtførtForHenleggelse(behandling, kontekst);
+        }
+        behandlingskontrollTjeneste.henleggBehandling(kontekst, årsakKode);
+
+        repoProvider.getEksternBehandlingRepository().deaktivateTilkobling(behandlingId);
     }
 
     @Test
