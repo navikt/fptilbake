@@ -51,6 +51,8 @@
         <javaslang.version>2.0.6</javaslang.version>
 
         <flyway.version>8.0.3</flyway.version>
+        <maven.compiler.source>{java.version}</maven.compiler.source>
+        <maven.compiler.target>{java.version}</maven.compiler.target>
     </properties>
     <dependencies>
 
