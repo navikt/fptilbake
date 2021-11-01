@@ -8,13 +8,12 @@ import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktKodeDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.dto.PeriodeMedTekstDto;
 import no.nav.vedtak.util.InputValideringRegex;
 
-@JsonTypeName(ForeslåVedtakDto.AKSJONSPUNKT_KODE)
+@JsonTypeName(AksjonspunktKodeDefinisjon.FORESLÅ_VEDTAK)
 public class ForeslåVedtakDto extends BekreftetAksjonspunktDto {
-
-    static final String AKSJONSPUNKT_KODE = "5004";
 
     @Valid
     @Size(max = 100)
@@ -26,11 +25,6 @@ public class ForeslåVedtakDto extends BekreftetAksjonspunktDto {
 
     public ForeslåVedtakDto() {
         super();
-    }
-
-    @Override
-    public String getKode() {
-        return AKSJONSPUNKT_KODE;
     }
 
     public List<PeriodeMedTekstDto> getPerioderMedTekst() {

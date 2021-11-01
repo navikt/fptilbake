@@ -94,8 +94,6 @@ public class FaktaFeilutbetalingTjeneste {
             .medTidligereVarsletBeløp(tidligereVarseltBeløp)
             .medTotalPeriode(omkringliggendePeriode(logiskePerioder))
             .medDatoForRevurderingsvedtak(eksternBehandlingsinfoDto.getVedtakDato())
-            .medBehandlingsResultat(eksternBehandlingsinfoDto.getBehandlingsresultat())
-            .medBehandlingÅrsaker(eksternBehandlingsinfoDto.getBehandlingÅrsaker())
             .medTilbakekrevingValg(tilbakekrevingValg)
             .medBegrunnelse(begrunnelse)
             .build();

@@ -8,6 +8,7 @@ import java.util.UUID;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.OrganisasjonsEnhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
@@ -40,17 +41,20 @@ public class BehandlingRevurderingTjeneste {
     private BehandlingRepository behandlingRepository;
     private EksternBehandlingRepository eksternBehandlingRepository;
     private VergeRepository vergeRepository;
+    private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
 
     BehandlingRevurderingTjeneste() {
         // for CDI
     }
 
     @Inject
-    public BehandlingRevurderingTjeneste(BehandlingRepositoryProvider repositoryProvider) {
+    public BehandlingRevurderingTjeneste(BehandlingRepositoryProvider repositoryProvider,
+                                         BehandlingskontrollTjeneste behandlingskontrollTjeneste) {
         this.repositoryProvider = repositoryProvider;
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
         this.vergeRepository = repositoryProvider.getVergeRepository();
+        this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
     }
 
     public Behandling opprettRevurdering(Long tilbakekrevingBehandlingId, BehandlingÅrsakType behandlingÅrsakType) {
@@ -103,8 +107,8 @@ public class BehandlingRevurderingTjeneste {
         behandlingRepository.lagre(revurdering, lås);
 
         // revurdering skal starte med Fakta om feilutbetaling
-        repositoryProvider.getAksjonspunktRepository().leggTilAksjonspunkt(revurdering, AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING,
-            BehandlingStegType.FAKTA_FEILUTBETALING);
+        var kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(revurdering);
+        behandlingskontrollTjeneste.lagreAksjonspunkterFunnet(kontekst, BehandlingStegType.FAKTA_FEILUTBETALING, List.of(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING));
 
         opprettRelasjonMedEksternBehandling(henvisning, revurdering, eksternUuid);
 

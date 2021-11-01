@@ -15,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
@@ -74,7 +75,7 @@ public class PipRepositoryTest {
 
     @Test
     public void skal_hentAksjonspunkttypeForAksjonspunktkoder_medGyldigAkskonspunktKode() {
-        Set<String> aksjonspunktTyper = pipRepository.hentAksjonspunkttypeForAksjonspunktkoder(Set.of("5001", "7001"));
+        Set<String> aksjonspunktTyper = pipRepository.hentAksjonspunktTypeForAksjonspunktKoder(Set.of(AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING, AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING));
         assertThat(aksjonspunktTyper).isNotEmpty();
         assertThat(aksjonspunktTyper).contains("Manuell");
         assertThat(aksjonspunktTyper).contains("Auto");
@@ -82,7 +83,7 @@ public class PipRepositoryTest {
 
     @Test
     public void skal_hentAksjonspunkttypeForAksjonspunktkoder_medTomAkskonspunktKode() {
-        Set<String> aksjonspunktTyper = pipRepository.hentAksjonspunkttypeForAksjonspunktkoder(Collections.emptySet());
+        Set<String> aksjonspunktTyper = pipRepository.hentAksjonspunktTypeForAksjonspunktKoder(Collections.emptySet());
         assertThat(aksjonspunktTyper).isEmpty();
     }
 }

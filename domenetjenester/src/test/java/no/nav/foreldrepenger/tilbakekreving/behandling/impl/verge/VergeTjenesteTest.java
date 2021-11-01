@@ -17,10 +17,12 @@ import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollEventPubliserer;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.spi.BehandlingskontrollServiceProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.InternalManipulerBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktTestSupport;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.VergeRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.KildeType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
@@ -32,23 +34,20 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 public class VergeTjenesteTest extends FellesTestOppsett {
 
     private VergeTjeneste vergeTjeneste;
-    private InternalManipulerBehandling manipulerBehandling;
     private VergeRepository vergeRepository;
 
     @BeforeEach
     void setUp() {
-        var behandlingModellRepository = new BehandlingModellRepository(entityManager);
         var eventPublisererMock = mock(BehandlingskontrollEventPubliserer.class);
-        var behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(repoProvider, behandlingModellRepository,
-            eventPublisererMock);
+        var svcProvider = new BehandlingskontrollServiceProvider(entityManager, new BehandlingModellRepository(), eventPublisererMock);
+        var behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(svcProvider);
         vergeTjeneste = new VergeTjeneste(behandlingskontrollTjeneste, behandlingskontrollAsynkTjeneste, repoProvider);
-        manipulerBehandling = new InternalManipulerBehandling(repoProvider);
         vergeRepository = repoProvider.getVergeRepository();
     }
 
     @Test
     public void skal_opprette_verge_når_behandling_er_i_fakta_steg() {
-        manipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.FAKTA_FEILUTBETALING);
+        InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.FAKTA_FEILUTBETALING);
         vergeTjeneste.opprettVergeAksjonspunktOgHoppTilbakeTilFaktaHvisSenereSteg(behandling);
         assertThat(behandling.getAktivtBehandlingSteg()).isEqualTo(BehandlingStegType.FAKTA_VERGE);
         assertThat(
@@ -57,7 +56,7 @@ public class VergeTjenesteTest extends FellesTestOppsett {
 
     @Test
     public void skal_opprette_verge_når_behandling_er_etter_fakta_steg() {
-        manipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VTILBSTEG);
+        InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VTILBSTEG);
         vergeTjeneste.opprettVergeAksjonspunktOgHoppTilbakeTilFaktaHvisSenereSteg(behandling);
         assertThat(behandling.getAktivtBehandlingSteg()).isEqualTo(BehandlingStegType.FAKTA_VERGE);
         assertThat(
@@ -76,8 +75,7 @@ public class VergeTjenesteTest extends FellesTestOppsett {
             .medBegrunnelse("begunnlese")
             .build();
         vergeRepository.lagreVergeInformasjon(internBehandlingId, vergeEntitet);
-        repoProvider.getAksjonspunktRepository()
-            .leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.AVKLAR_VERGE, BehandlingStegType.FAKTA_VERGE);
+        AksjonspunktTestSupport.leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.AVKLAR_VERGE, BehandlingStegType.FAKTA_VERGE);
         assertThat(vergeRepository.finnVergeInformasjon(internBehandlingId)).isNotEmpty();
         assertThat(
             behandling.getÅpneAksjonspunkter(Lists.newArrayList(AksjonspunktDefinisjon.AVKLAR_VERGE))).isNotEmpty();

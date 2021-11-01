@@ -2,7 +2,6 @@ package no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -53,13 +52,13 @@ public class TilbakekrevingVedtakPeriodeBeregnerScenarioerTest {
         Long behandlingId = behandling.getId();
 
         Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
-            PP2018.periode("16/3-31/3"), Arrays.asList(
+            PP2018.periode("16/3-31/3"), List.of(
                 KgBeløp.feil(11000),
                 KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(11000).medTilbakekrevBeløp(11000)),
-            PP2018.periode("1/4-30/4"), Arrays.asList(
+            PP2018.periode("1/4-30/4"), List.of(
                 KgBeløp.feil(21000),
                 KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(21000).medTilbakekrevBeløp(21000)),
-            PP2018.periode("1/5-26/5"), Arrays.asList(
+            PP2018.periode("1/5-26/5"), List.of(
                 KgBeløp.feil(19000),
                 KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(19000).medTilbakekrevBeløp(19000))
         ), false);
@@ -98,13 +97,13 @@ public class TilbakekrevingVedtakPeriodeBeregnerScenarioerTest {
         Long behandlingId = behandling.getId();
 
         Kravgrunnlag431 kravgrunnlag = KravgrunnlagTestBuilder.medRepo(kravgrunnlagRepository).lagreKravgrunnlag(behandlingId, Map.of(
-            PP2018.periode("10/4-30/4"), Arrays.asList(
+            PP2018.periode("10/4-30/4"), List.of(
                 KgBeløp.feil(7500),
                 KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(15000).medNyttBeløp(7500).medTilbakekrevBeløp(7500)),
-            PP2018.periode("1/5-5/5"), Arrays.asList(
+            PP2018.periode("1/5-5/5"), List.of(
                 KgBeløp.feil(2000),
                 KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(4000).medNyttBeløp(2000).medTilbakekrevBeløp(2000)),
-            PP2018.periode("6/5-20/5"), Arrays.asList(
+            PP2018.periode("6/5-20/5"), List.of(
                 KgBeløp.feil(10000),
                 KgBeløp.ytelse(KlasseKode.FPATORD).medUtbetBeløp(10000).medTilbakekrevBeløp(10000))
         ), false);

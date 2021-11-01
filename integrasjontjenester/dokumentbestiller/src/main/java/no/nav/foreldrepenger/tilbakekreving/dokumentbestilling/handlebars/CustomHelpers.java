@@ -3,7 +3,6 @@ package no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.handlebars;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -44,7 +43,7 @@ public interface CustomHelpers {
             List<Object> konstanter = new ArrayList<>();
             if (options.hash.isEmpty()) {
                 konstanter.add(konstant);
-                konstanter.addAll(Arrays.asList(options.params));
+                konstanter.addAll(List.of(options.params));
             } else {
                 konstanter.add(options.hash);
             }

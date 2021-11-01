@@ -6,18 +6,15 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.spi.CDI;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegTilstand;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkTabellRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDataWrapper;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -36,18 +33,14 @@ public class FortsettBehandlingTask implements ProsessTaskHandler {
     public static final String GJENOPPTA_STEG = "gjenopptaSteg";
 
     private BehandlingRepository behandlingRepository;
-    private AksjonspunktRepository aksjonspunktRepository;
-    private KodeverkTabellRepository kodeverkTabellRepository;
 
     FortsettBehandlingTask() {
         // For CDI proxy
     }
 
     @Inject
-    public FortsettBehandlingTask(BehandlingRepositoryProvider repositoryProvider, KodeverkTabellRepository kodeverkTabellRepository) {
+    public FortsettBehandlingTask(BehandlingRepositoryProvider repositoryProvider) {
         behandlingRepository = repositoryProvider.getBehandlingRepository();
-        aksjonspunktRepository = repositoryProvider.getAksjonspunktRepository();
-        this.kodeverkTabellRepository = kodeverkTabellRepository;
     }
 
     @Override
@@ -59,21 +52,24 @@ public class FortsettBehandlingTask implements ProsessTaskHandler {
 
         try {
             Long behandlingId = ProsessTaskDataWrapper.wrap(data).getBehandlingId();
-            BehandlingskontrollKontekst kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandlingId);
-            Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
-            Boolean manuellFortsettelse = Optional.ofNullable(data.getPropertyValue(FortsettBehandlingTask.MANUELL_FORTSETTELSE))
+            var kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandlingId);
+            var behandling = behandlingRepository.hentBehandling(behandlingId);
+            var manuellFortsettelse = Optional.ofNullable(data.getPropertyValue(MANUELL_FORTSETTELSE))
                 .map(Boolean::valueOf)
                 .orElse(Boolean.FALSE);
-            String gjenoppta = data.getPropertyValue(FortsettBehandlingTask.GJENOPPTA_STEG);
+            var gjenoppta = data.getPropertyValue(GJENOPPTA_STEG);
 
-            BehandlingStegType stegtype = null;
-            if (gjenoppta != null) {
-                stegtype = finnBehandlingStegType(gjenoppta);
-            }
+            var stegtype = getBehandlingStegType(gjenoppta);
             if (gjenoppta != null || manuellFortsettelse) {
-                taBehandlingAvVentSettAlleAutopunkterUtført(behandling, kontekst, behandlingskontrollTjeneste);
+                if (behandling.isBehandlingPåVent()) { // Autopunkt
+                    behandlingskontrollTjeneste.taBehandlingAvVentSetAlleAutopunktUtført(behandling, kontekst);
+                }
             } else {
-                settAutopunktTilUtført(data, kontekst, behandlingskontrollTjeneste);
+                var utført = data.getPropertyValue(FortsettBehandlingTask.UTFORT_AUTOPUNKT);
+                if (utført != null) {
+                    var aksjonspunkt = AksjonspunktDefinisjon.fraKode(utført);
+                    behandlingskontrollTjeneste.settAutopunktTilUtført(behandling, aksjonspunkt, kontekst);
+                }
             }
             // Ingen åpne autopunkt her, takk
             validerBehandlingIkkeErSattPåVent(behandling);
@@ -98,26 +94,15 @@ public class FortsettBehandlingTask implements ProsessTaskHandler {
         }
     }
 
-    private BehandlingStegType finnBehandlingStegType(String gjenoppta) {
-        BehandlingStegType stegtype = kodeverkTabellRepository.finnBehandlingStegType(gjenoppta);
+    private BehandlingStegType getBehandlingStegType(String gjenopptaSteg) {
+        if (gjenopptaSteg == null) {
+            return null;
+        }
+        var stegtype = BehandlingStegType.fraKode(gjenopptaSteg);
         if (stegtype == null) {
-            throw new IllegalStateException("Utviklerfeil: ukjent steg " + gjenoppta);
+            throw new IllegalStateException("Utviklerfeil: ukjent steg " + gjenopptaSteg);
         }
         return stegtype;
     }
 
-    private void taBehandlingAvVentSettAlleAutopunkterUtført(Behandling behandling, BehandlingskontrollKontekst kontekst,
-                                                             BehandlingskontrollTjeneste behandlingskontrollTjeneste) {
-        if (behandling.isBehandlingPåVent()) { // Autopunkt
-            behandlingskontrollTjeneste.taBehandlingAvVentSetAlleAutopunktUtført(behandling, kontekst);
-        }
-    }
-
-    private void settAutopunktTilUtført(ProsessTaskData data, BehandlingskontrollKontekst kontekst, BehandlingskontrollTjeneste behandlingskontrollTjeneste) {
-        String utført = data.getPropertyValue(FortsettBehandlingTask.UTFORT_AUTOPUNKT);
-        if (utført != null) {
-            AksjonspunktDefinisjon aksjonspunkt = aksjonspunktRepository.finnAksjonspunktDefinisjon(utført);
-            behandlingskontrollTjeneste.settAutopunktTilUtført(aksjonspunkt, kontekst);
-        }
-    }
 }

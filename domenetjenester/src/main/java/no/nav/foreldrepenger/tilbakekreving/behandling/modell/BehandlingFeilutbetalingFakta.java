@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.BehandlingsresultatDto;
-import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingÅrsakDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.TilbakekrevingValgDto;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 
@@ -17,8 +15,6 @@ public class BehandlingFeilutbetalingFakta {
     private LocalDate totalPeriodeFom;
     private LocalDate totalPeriodeTom;
     private List<LogiskPeriodeMedFaktaDto> perioder;
-    private BehandlingsresultatDto behandlingsresultat;
-    private List<EksternBehandlingÅrsakDto> behandlingÅrsaker;
     private TilbakekrevingValgDto tilbakekrevingValg;
     private String begrunnelse;
 
@@ -48,14 +44,6 @@ public class BehandlingFeilutbetalingFakta {
 
     public List<LogiskPeriodeMedFaktaDto> getPerioder() {
         return perioder;
-    }
-
-    public BehandlingsresultatDto getBehandlingsresultat() {
-        return behandlingsresultat;
-    }
-
-    public List<EksternBehandlingÅrsakDto> getBehandlingÅrsaker() {
-        return behandlingÅrsaker;
     }
 
     public TilbakekrevingValgDto getTilbakekrevingValg() {
@@ -111,16 +99,6 @@ public class BehandlingFeilutbetalingFakta {
 
         public Builder medPerioder(List<LogiskPeriodeMedFaktaDto> perioder) {
             this.behandlingFeilutbetalingFakta.perioder = perioder;
-            return this;
-        }
-
-        public Builder medBehandlingsResultat(BehandlingsresultatDto behandlingsresultat) {
-            this.behandlingFeilutbetalingFakta.behandlingsresultat = behandlingsresultat;
-            return this;
-        }
-
-        public Builder medBehandlingÅrsaker(List<EksternBehandlingÅrsakDto> behandlingÅrsaker) {
-            this.behandlingFeilutbetalingFakta.behandlingÅrsaker = behandlingÅrsaker;
             return this;
         }
 

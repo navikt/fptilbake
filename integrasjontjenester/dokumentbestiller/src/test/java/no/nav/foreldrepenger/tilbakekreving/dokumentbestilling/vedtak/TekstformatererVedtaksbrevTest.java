@@ -102,7 +102,7 @@ public class TekstformatererVedtaksbrevTest {
             .medSpråkkode(språkkode != null ? språkkode : Språkkode.nb)
             .medVedtaksbrevType(VedtaksbrevType.ORDINÆR)
             .build();
-        List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
+        List<HbVedtaksbrevPeriode> perioder = List.of(
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(januar)
                 .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(30001)))
@@ -112,7 +112,7 @@ public class TekstformatererVedtaksbrevTest {
                     .medVilkårResultat(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER)
                     .medAktsomhetResultat(Aktsomhet.SIMPEL_UAKTSOM)
                     .medFritekstVilkår("Du er heldig som slapp å betale alt!")
-                    .medSærligeGrunner(Arrays.asList(SærligGrunn.TID_FRA_UTBETALING, SærligGrunn.STØRRELSE_BELØP), null, null)
+                    .medSærligeGrunner(List.of(SærligGrunn.TID_FRA_UTBETALING, SærligGrunn.STØRRELSE_BELØP), null, null)
                     .build())
                 .medResultat(HbResultatTestBuilder.forTilbakekrevesBeløp(20002))
                 .build(),
@@ -128,7 +128,7 @@ public class TekstformatererVedtaksbrevTest {
                     .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
                     .medVilkårResultat(VilkårResultat.FORSTO_BURDE_FORSTÅTT)
                     .medAktsomhetResultat(Aktsomhet.SIMPEL_UAKTSOM)
-                    .medSærligeGrunner(Arrays.asList(SærligGrunn.HELT_ELLER_DELVIS_NAVS_FEIL, SærligGrunn.STØRRELSE_BELØP), null, null)
+                    .medSærligeGrunner(List.of(SærligGrunn.HELT_ELLER_DELVIS_NAVS_FEIL, SærligGrunn.STØRRELSE_BELØP), null, null)
                     .build())
                 .medResultat(HbResultatTestBuilder.forTilbakekrevesBeløp(3000))
                 .build()
@@ -162,7 +162,7 @@ public class TekstformatererVedtaksbrevTest {
             .medSpråkkode(Språkkode.nb)
             .medVedtaksbrevType(VedtaksbrevType.ORDINÆR)
             .build();
-        List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
+        List<HbVedtaksbrevPeriode> perioder = List.of(
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(Periode.of(LocalDate.of(2021, 4, 5), LocalDate.of(2021, 4, 6)))
                 .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(2000)))
@@ -172,7 +172,7 @@ public class TekstformatererVedtaksbrevTest {
                     .medVilkårResultat(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER)
                     .medAktsomhetResultat(Aktsomhet.SIMPEL_UAKTSOM)
                     .medFritekstVilkår("Du er heldig som slapp å betale alt!")
-                    .medSærligeGrunner(Arrays.asList(SærligGrunn.TID_FRA_UTBETALING, SærligGrunn.STØRRELSE_BELØP), null, null)
+                    .medSærligeGrunner(List.of(SærligGrunn.TID_FRA_UTBETALING, SærligGrunn.STØRRELSE_BELØP), null, null)
                     .build())
                 .medResultat(HbResultatTestBuilder.forTilbakekrevesBeløp(2000))
                 .build(),
@@ -194,7 +194,7 @@ public class TekstformatererVedtaksbrevTest {
 
     @Test
     public void skal_generere_vedtaksbrev_for_FP_og_god_tro_uten_tilbakekreving_uten_varsel() throws Exception {
-        List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
+        List<HbVedtaksbrevPeriode> perioder = List.of(
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(januar)
                 .medKravgrunnlag(HbKravgrunnlag.builder()
@@ -239,7 +239,7 @@ public class TekstformatererVedtaksbrevTest {
 
     @Test
     public void skal_generere_vedtaksbrev_for_FP_uten_tilbakekreving_med_tekst_feil_feriepenger() throws Exception {
-        List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
+        List<HbVedtaksbrevPeriode> perioder = List.of(
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(januar)
                 .medKravgrunnlag(HbKravgrunnlag.builder()
@@ -286,7 +286,7 @@ public class TekstformatererVedtaksbrevTest {
 
     @Test
     public void skal_generere_vedtaksbrev_SVP_ingenTilbakebetaling_feilFeriepenger() throws Exception {
-        List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
+        List<HbVedtaksbrevPeriode> perioder = List.of(
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(mai)
                 .medKravgrunnlag(HbKravgrunnlag.builder()
@@ -382,7 +382,7 @@ public class TekstformatererVedtaksbrevTest {
             .medVedtaksbrevType(VedtaksbrevType.ORDINÆR)
             .build();
 
-        List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
+        List<HbVedtaksbrevPeriode> perioder = List.of(
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(januar)
                 .medKravgrunnlag(HbKravgrunnlag.builder()
@@ -394,7 +394,7 @@ public class TekstformatererVedtaksbrevTest {
                     .medVilkårResultat(VilkårResultat.FORSTO_BURDE_FORSTÅTT)
                     .medAktsomhetResultat(Aktsomhet.GROVT_UAKTSOM)
                     .medFritekstVilkår("Det er helt utrolig om du ikke har oppdaget dette!")
-                    .medSærligeGrunner(Arrays.asList(SærligGrunn.HELT_ELLER_DELVIS_NAVS_FEIL, SærligGrunn.STØRRELSE_BELØP, SærligGrunn.TID_FRA_UTBETALING, SærligGrunn.ANNET), "Gratulerer, du fikk norgesrekord i feilutbetalt beløp! Du skal slippe å betale renter, for det har du ikke råd til uansett!", "at du jobber med foreldrepenger og dermed vet hvordan dette fungerer!")
+                    .medSærligeGrunner(List.of(SærligGrunn.HELT_ELLER_DELVIS_NAVS_FEIL, SærligGrunn.STØRRELSE_BELØP, SærligGrunn.TID_FRA_UTBETALING, SærligGrunn.ANNET), "Gratulerer, du fikk norgesrekord i feilutbetalt beløp! Du skal slippe å betale renter, for det har du ikke råd til uansett!", "at du jobber med foreldrepenger og dermed vet hvordan dette fungerer!")
                     .build())
                 .medResultat(HbResultatTestBuilder.forTilbakekrevesBeløp(1234567890))
                 .build(),
@@ -481,7 +481,7 @@ public class TekstformatererVedtaksbrevTest {
                 .build())
             .medVedtaksbrevType(VedtaksbrevType.ORDINÆR)
             .build();
-        List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
+        List<HbVedtaksbrevPeriode> perioder = List.of(
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(januar)
                 .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(10000)))
@@ -525,7 +525,7 @@ public class TekstformatererVedtaksbrevTest {
                 .build())
             .medVedtaksbrevType(VedtaksbrevType.ORDINÆR)
             .build();
-        List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
+        List<HbVedtaksbrevPeriode> perioder = List.of(
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(januar)
                 .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(10000)))
@@ -573,7 +573,7 @@ public class TekstformatererVedtaksbrevTest {
             .medVedtaksbrevType(VedtaksbrevType.ORDINÆR)
             .build();
 
-        List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
+        List<HbVedtaksbrevPeriode> perioder = List.of(
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(førsteNyttårsdag)
                 .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(10000)))

@@ -13,9 +13,9 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.VedtakAksjonspunktData;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.VurderÅrsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
@@ -32,7 +32,7 @@ import no.nav.vedtak.sikkerhet.context.SubjectHandler;
 @ApplicationScoped
 public class FatteVedtakTjeneste {
 
-    private AksjonspunktRepository aksjonspunktRepository;
+    private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private TotrinnTjeneste totrinnTjeneste;
     private HistorikkRepository historikkRepository;
 
@@ -41,22 +41,25 @@ public class FatteVedtakTjeneste {
     }
 
     @Inject
-    public FatteVedtakTjeneste(BehandlingRepositoryProvider repositoryProvider, TotrinnTjeneste totrinnTjeneste) {
-        this.aksjonspunktRepository = repositoryProvider.getAksjonspunktRepository();
+    public FatteVedtakTjeneste(BehandlingRepositoryProvider repositoryProvider,
+                               BehandlingskontrollTjeneste behandlingskontrollTjeneste,
+                               TotrinnTjeneste totrinnTjeneste) {
         this.historikkRepository = repositoryProvider.getHistorikkRepository();
+        this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
         this.totrinnTjeneste = totrinnTjeneste;
     }
 
     public void opprettTotrinnsVurdering(Behandling behandling, Collection<VedtakAksjonspunktData> aksjonspunkter) {
+        var kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandling);
         behandling.setAnsvarligBeslutter(SubjectHandler.getSubjectHandler().getUid());
 
         List<Totrinnsvurdering> totrinnsvurderinger = new ArrayList<>();
+        List<Aksjonspunkt> skalReåpnes = new ArrayList<>();
 
         for (VedtakAksjonspunktData aks : aksjonspunkter) {
             Aksjonspunkt aksjonspunkt = behandling.getAksjonspunktFor(aks.getAksjonspunktDefinisjon());
             if (!aks.isGodkjent()) {
-                aksjonspunktRepository.setReåpnet(aksjonspunkt);
-                aksjonspunktRepository.setToTrinnsBehandlingKreves(aksjonspunkt);
+                skalReåpnes.add(aksjonspunkt);
             }
             Set<VurderÅrsak> vurderÅrsaker = aks.getVurderÅrsakskoder().stream().map(VurderÅrsak::fraKode).collect(Collectors.toSet());
 
@@ -70,6 +73,10 @@ public class FatteVedtakTjeneste {
         }
         totrinnTjeneste.settNyeTotrinnaksjonspunktvurderinger(behandling, totrinnsvurderinger);
         lagHistorikkinnslagFattVedtak(behandling);
+        // Noe spesialhåndtering ifm totrinn og tilbakeføring fra FVED
+        if (!skalReåpnes.isEmpty()) {
+            behandlingskontrollTjeneste.lagreAksjonspunkterReåpnet(kontekst, skalReåpnes, false, true);
+        }
     }
 
     public void lagHistorikkinnslagFattVedtak(Behandling behandling) {

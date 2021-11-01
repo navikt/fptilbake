@@ -1,7 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingskontroll;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegStatus;
@@ -12,7 +12,7 @@ public class BehandlingStegKonfigurasjon {
 
     private List<BehandlingStegStatus> statuser;
 
-    public BehandlingStegKonfigurasjon(List<BehandlingStegStatus> list) {
+    public BehandlingStegKonfigurasjon(Collection<BehandlingStegStatus> list) {
         this.statuser = new ArrayList<>(list);
     }
 
@@ -45,20 +45,12 @@ public class BehandlingStegKonfigurasjon {
     }
 
     public BehandlingStegStatus mapTilStatus(BehandlingStegResultat stegResultat) {
-        BehandlingStegStatus status = BehandlingStegResultat.mapTilStatus(stegResultat);
+        var status = BehandlingStegResultat.mapTilStatus(stegResultat);
         return mapTilStatusEntitet(status);
     }
 
     private BehandlingStegStatus mapTilStatusEntitet(BehandlingStegStatus status) {
         return statuser.get(statuser.indexOf(status));
-    }
-
-    /** Kun for test. Lager en dummy av alle tilgjengelige statuser. */
-    public static BehandlingStegKonfigurasjon lagDummy() {
-        List<BehandlingStegStatus> statuser = Arrays.asList(BehandlingStegStatus.AVBRUTT, BehandlingStegStatus.STARTET, BehandlingStegStatus.INNGANG,
-                BehandlingStegStatus.VENTER, BehandlingStegStatus.UTGANG, BehandlingStegStatus.UTFØRT,
-                BehandlingStegStatus.TILBAKEFØRT);
-        return new BehandlingStegKonfigurasjon(statuser);
     }
 
 }

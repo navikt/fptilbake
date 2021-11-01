@@ -124,7 +124,7 @@ public class KravgrunnlagTjeneste {
         if (erForbiFaktaSteg) {
             logger.info("Hopper tilbake til {} pga endret kravgrunnlag for behandlingId={}", FAKTA_FEILUTBETALING.getKode(), behandlingId);
             BehandlingskontrollKontekst kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandling);
-            behandlingskontrollTjeneste.settAutopunkterTilUtført(kontekst, false);
+            behandlingskontrollTjeneste.taBehandlingAvVentSetAlleAutopunktUtført(behandling, kontekst);
             behandlingskontrollTjeneste.behandlingTilbakeføringTilTidligereBehandlingSteg(kontekst, FAKTA_FEILUTBETALING);
             opprettHistorikkinnslagForBehandlingStartetForfra(behandling);
         }

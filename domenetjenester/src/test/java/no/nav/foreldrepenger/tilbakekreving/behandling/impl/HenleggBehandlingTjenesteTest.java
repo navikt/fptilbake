@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -14,6 +13,7 @@ import static org.mockito.Mockito.when;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import javax.persistence.FlushModeType;
 
@@ -24,10 +24,9 @@ import org.mockito.ArgumentCaptor;
 import com.google.common.collect.Lists;
 
 import no.nav.foreldrepenger.tilbakekreving.FellesTestOppsett;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingModell;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegKonfigurasjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.spi.BehandlingskontrollServiceProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingResultatType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
@@ -36,9 +35,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.InternalManipulerBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporing;
@@ -58,13 +55,6 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
 
 
-    private final BehandlingModellRepository mockBehandlingModellRepository = mock(BehandlingModellRepository.class);
-    private final BehandlingModell modell = mock(BehandlingModell.class);
-
-    private AksjonspunktRepository aksjonspunktRepository;
-
-    private InternalManipulerBehandling manipulerInternBehandling;
-
     private BrevSporingRepository brevSporingRepository;
 
     private HenleggBehandlingTjeneste henleggBehandlingTjeneste;
@@ -74,17 +64,10 @@ public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
     @BeforeEach
     public void setUp() {
         entityManager.setFlushMode(FlushModeType.AUTO);
-        when(mockBehandlingModellRepository.getBehandlingStegKonfigurasjon()).thenReturn(
-            BehandlingStegKonfigurasjon.lagDummy());
-        when(mockBehandlingModellRepository.getModell(any())).thenReturn(modell);
-        when(modell.erStegAFørStegB(any(), any())).thenReturn(true);
 
-        aksjonspunktRepository = repoProvider.getAksjonspunktRepository();
         brevSporingRepository = repoProvider.getBrevSporingRepository();
 
-        manipulerInternBehandling = new InternalManipulerBehandling(repoProvider);
-        BehandlingskontrollTjeneste behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(repoProvider,
-            mockBehandlingModellRepository, null);
+        behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(entityManager, new BehandlingModellRepository(), null));
         HistorikkinnslagTjeneste historikkinnslagTjeneste = new HistorikkinnslagTjeneste(historikkRepository, null);
         henleggBehandlingTjeneste = new HenleggBehandlingTjeneste(repoProvider, taskTjeneste,
             behandlingskontrollTjeneste, historikkinnslagTjeneste);
@@ -99,8 +82,8 @@ public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
 
     @Test
     public void skal_henlegge_behandling_med_aksjonspunkt() {
-        Aksjonspunkt aksjonspunkt = aksjonspunktRepository.leggTilAksjonspunkt(behandling,
-            AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING);
+        var kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandling);
+        var aksjonspunkt = behandlingskontrollTjeneste.lagreAksjonspunkterFunnet(kontekst, List.of(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING)).get(0);
         assertThat(aksjonspunkt.getStatus()).isEqualTo(AksjonspunktStatus.OPPRETTET);
 
         henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), behandlingsresultat);
@@ -149,11 +132,9 @@ public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
 
     @Test
     public void kan_henlegge_behandling_som_er_satt_på_vent() {
-        AksjonspunktDefinisjon def = AksjonspunktDefinisjon.VENT_PÅ_BRUKERTILBAKEMELDING;
-        Aksjonspunkt aksjonspunkt = aksjonspunktRepository.leggTilAksjonspunkt(behandling, def);
-        aksjonspunktRepository.setFrist(aksjonspunkt, LocalDateTime.now(), Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING);
-
-        manipulerInternBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VARSEL);
+        InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.VARSEL);
+        behandlingskontrollTjeneste.settBehandlingPåVent(behandling, AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING,
+            BehandlingStegType.VARSEL, LocalDateTime.now(), Venteårsak.VENT_PÅ_BRUKERTILBAKEMELDING);
 
         henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), behandlingsresultat);
         assertHenleggelse(internBehandlingId);
@@ -161,7 +142,7 @@ public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
 
     @Test
     public void kan_henlegge_behandling_der_vedtak_er_foreslått() {
-        manipulerInternBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.FORESLÅ_VEDTAK);
+        InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.FORESLÅ_VEDTAK);
         henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), behandlingsresultat);
 
         assertHenleggelse(internBehandlingId);
@@ -169,7 +150,7 @@ public class HenleggBehandlingTjenesteTest extends FellesTestOppsett {
 
     @Test
     public void kan_ikke_henlegge_behandling_der_vedtak_er_fattet() {
-        manipulerInternBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.IVERKSETT_VEDTAK);
+        InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.IVERKSETT_VEDTAK);
 
         assertThatThrownBy(
             () -> henleggBehandlingTjeneste.henleggBehandling(behandling.getId(), behandlingsresultat))

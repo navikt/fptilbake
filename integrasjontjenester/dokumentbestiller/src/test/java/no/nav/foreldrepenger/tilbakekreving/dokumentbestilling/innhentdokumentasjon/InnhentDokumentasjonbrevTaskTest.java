@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.spi.BehandlingskontrollServiceProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.DokumentBestillerTestOppsett;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker;
@@ -23,7 +24,6 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 public class InnhentDokumentasjonbrevTaskTest extends DokumentBestillerTestOppsett {
 
     private InnhentDokumentasjonbrevTjeneste mockInnhentDokumentasjonbrevTjeneste;
-    private BehandlingModellRepository mockBehandlingModellRepository = mock(BehandlingModellRepository.class);
 
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private InnhentDokumentasjonbrevTask innhentDokumentasjonBrevTask;
@@ -31,7 +31,7 @@ public class InnhentDokumentasjonbrevTaskTest extends DokumentBestillerTestOppse
     @BeforeEach
     public void setup() {
         mockInnhentDokumentasjonbrevTjeneste = mock(InnhentDokumentasjonbrevTjeneste.class);
-        behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(repositoryProvider, mockBehandlingModellRepository, null);
+        behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(entityManager, new BehandlingModellRepository(), null));
 
         innhentDokumentasjonBrevTask = new InnhentDokumentasjonbrevTask(repositoryProvider,
             mockInnhentDokumentasjonbrevTjeneste,

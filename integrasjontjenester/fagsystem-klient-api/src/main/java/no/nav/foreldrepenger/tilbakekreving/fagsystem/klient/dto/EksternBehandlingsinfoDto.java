@@ -1,8 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -22,8 +20,6 @@ public class EksternBehandlingsinfoDto {
     private Språkkode sprakkode;
     @JsonProperty("originalVedtaksDato")
     private LocalDate vedtakDato;
-    private BehandlingsresultatDto behandlingsresultat;
-    private List<EksternBehandlingÅrsakDto> behandlingÅrsaker = new ArrayList<>();
 
     public Henvisning getHenvisning() {
         return henvisning;
@@ -77,21 +73,5 @@ public class EksternBehandlingsinfoDto {
 
     public void setVedtakDato(LocalDate vedtakDato) {
         this.vedtakDato = vedtakDato;
-    }
-
-    public BehandlingsresultatDto getBehandlingsresultat() {
-        return behandlingsresultat;
-    }
-
-    public void setBehandlingsresultat(BehandlingsresultatDto behandlingsresultat) {
-        this.behandlingsresultat = behandlingsresultat;
-    }
-
-    public List<EksternBehandlingÅrsakDto> getBehandlingÅrsaker() {
-        return behandlingÅrsaker;
-    }
-
-    public void setBehandlingÅrsaker(List<EksternBehandlingÅrsakDto> behandlingÅrsaker) {
-        this.behandlingÅrsaker = behandlingÅrsaker;
     }
 }

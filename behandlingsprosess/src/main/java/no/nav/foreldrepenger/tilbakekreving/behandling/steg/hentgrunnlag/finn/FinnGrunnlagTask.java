@@ -22,13 +22,11 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.status.
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkTabellRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDataWrapper;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
@@ -47,7 +45,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @ApplicationScoped
-@ProsessTask("kravgrunnlag.finn")
+@ProsessTask("kravgrunnlag.finn") // OBSOBSOBS opprettes fra BehandlingTjeneste - task bør flyttes vekk herfra
 @FagsakProsesstaskRekkefølge(gruppeSekvens = false)
 public class FinnGrunnlagTask implements ProsessTaskHandler {
 
@@ -56,7 +54,6 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
     private KravgrunnlagRepository grunnlagRepository;
     private BehandlingRepository behandlingRepository;
     private ØkonomiMottattXmlRepository mottattXmlRepository;
-    private KodeverkTabellRepository kodeverkTabellRepository;
     private EksternBehandlingRepository eksternBehandlingRepository;
     private KravVedtakStatusTjeneste kravVedtakStatusTjeneste;
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
@@ -71,7 +68,6 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
     @Inject
     public FinnGrunnlagTask(BehandlingRepositoryProvider repositoryProvider,
                             ØkonomiMottattXmlRepository mottattXmlRepository,
-                            KodeverkTabellRepository kodeverkTabellRepository,
                             KravVedtakStatusTjeneste kravVedtakStatusTjeneste,
                             BehandlingskontrollTjeneste behandlingskontrollTjeneste,
                             KravVedtakStatusMapper kravVedtakStatusMapper,
@@ -80,7 +76,6 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.mottattXmlRepository = mottattXmlRepository;
-        this.kodeverkTabellRepository = kodeverkTabellRepository;
         this.eksternBehandlingRepository = repositoryProvider.getEksternBehandlingRepository();
 
         this.kravVedtakStatusTjeneste = kravVedtakStatusTjeneste;
@@ -157,16 +152,8 @@ public class FinnGrunnlagTask implements ProsessTaskHandler {
         if (behandling.isBehandlingPåVent() && !grunnlagRepository.erKravgrunnlagSperret(behandlingId)) {
             BehandlingskontrollKontekst kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandlingId);
             behandlingskontrollTjeneste.taBehandlingAvVentSetAlleAutopunktUtført(behandling, kontekst);
-            behandlingskontrollTjeneste.prosesserBehandlingGjenopptaHvisStegVenter(kontekst, finnBehandlingStegType(behandling.getAktivtBehandlingSteg().getKode()));
+            behandlingskontrollTjeneste.prosesserBehandlingGjenopptaHvisStegVenter(kontekst, behandling.getAktivtBehandlingSteg());
         }
-    }
-
-    private BehandlingStegType finnBehandlingStegType(String gjenoppta) {
-        BehandlingStegType stegtype = kodeverkTabellRepository.finnBehandlingStegType(gjenoppta);
-        if (stegtype == null) {
-            throw new IllegalStateException("Utviklerfeil: ukjent steg " + gjenoppta);
-        }
-        return stegtype;
     }
 
     private boolean erReferanseRiktig(Henvisning grunnlagReferanse, EksternBehandling eksternBehandling) {

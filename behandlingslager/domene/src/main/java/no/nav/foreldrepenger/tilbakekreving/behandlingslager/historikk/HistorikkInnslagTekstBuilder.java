@@ -21,7 +21,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 import no.nav.vedtak.exception.TekniskException;
@@ -123,14 +122,6 @@ public class HistorikkInnslagTekstBuilder {
         return this;
     }
 
-    public HistorikkInnslagTekstBuilder medResultat(Kodeliste resultat) {
-        HistorikkinnslagFelt.builder()
-            .medFeltType(HistorikkinnslagFeltType.RESULTAT)
-            .medTilVerdi(resultat)
-            .build(historikkinnslagDelBuilder);
-        return this;
-    }
-
     public HistorikkInnslagTekstBuilder medResultat(Kodeverdi resultat) {
         HistorikkinnslagFelt.builder()
             .medFeltType(HistorikkinnslagFeltType.RESULTAT)
@@ -147,10 +138,6 @@ public class HistorikkInnslagTekstBuilder {
         return medBegrunnelse(formatString(begrunnelse), true);
     }
 
-    public HistorikkInnslagTekstBuilder medBegrunnelse(Kodeliste begrunnelse) {
-        return medBegrunnelse(begrunnelse, true);
-    }
-
     public HistorikkInnslagTekstBuilder medBegrunnelse(Kodeverdi begrunnelse) {
         return medBegrunnelse(begrunnelse, true);
     }
@@ -161,15 +148,6 @@ public class HistorikkInnslagTekstBuilder {
     }
 
     public HistorikkInnslagTekstBuilder medBegrunnelse(String begrunnelse, boolean erBegrunnelseEndret) {
-        HistorikkinnslagFelt.builder()
-            .medFeltType(HistorikkinnslagFeltType.BEGRUNNELSE)
-            .medTilVerdi(begrunnelse)
-            .build(historikkinnslagDelBuilder);
-        this.begrunnelseEndret = erBegrunnelseEndret;
-        return this;
-    }
-
-    public <K extends Kodeliste> HistorikkInnslagTekstBuilder medBegrunnelse(K begrunnelse, boolean erBegrunnelseEndret) {
         HistorikkinnslagFelt.builder()
             .medFeltType(HistorikkinnslagFeltType.BEGRUNNELSE)
             .medTilVerdi(begrunnelse)
@@ -202,17 +180,6 @@ public class HistorikkInnslagTekstBuilder {
         return this;
     }
 
-    public <K extends Kodeliste> HistorikkInnslagTekstBuilder medEndretFelt(HistorikkEndretFeltType historikkEndretFeltType, K fraVerdi, K tilVerdi) {
-        HistorikkinnslagFelt.builder()
-            .medFeltType(HistorikkinnslagFeltType.ENDRET_FELT)
-            .medNavn(historikkEndretFeltType)
-            .medFraVerdi(fraVerdi)
-            .medTilVerdi(tilVerdi)
-            .medSekvensNr(getNesteEndredeFeltSekvensNr())
-            .build(historikkinnslagDelBuilder);
-        return this;
-    }
-
     public <K extends Kodeverdi> HistorikkInnslagTekstBuilder medEndretFelt(HistorikkEndretFeltType historikkEndretFeltType, K fraVerdi, K tilVerdi) {
         HistorikkinnslagFelt.builder()
             .medFeltType(HistorikkinnslagFeltType.ENDRET_FELT)
@@ -224,24 +191,8 @@ public class HistorikkInnslagTekstBuilder {
         return this;
     }
 
-    public <K extends Kodeliste> HistorikkInnslagTekstBuilder medEndretFelt(HistorikkEndretFeltType historikkEndretFeltType, String navnVerdi, K fraVerdi, K tilVerdi) {
-        HistorikkinnslagFelt.builder()
-            .medFeltType(HistorikkinnslagFeltType.ENDRET_FELT)
-            .medNavn(historikkEndretFeltType)
-            .medNavnVerdi(navnVerdi)
-            .medFraVerdi(fraVerdi)
-            .medTilVerdi(tilVerdi)
-            .medSekvensNr(getNesteEndredeFeltSekvensNr())
-            .build(historikkinnslagDelBuilder);
-        return this;
-    }
-
     public <T> HistorikkInnslagTekstBuilder medEndretFelt(HistorikkEndretFeltType historikkEndretFeltType, T fraVerdi, T tilVerdi) {
-        if (fraVerdi instanceof Kodeliste || tilVerdi instanceof Kodeliste) {
-            Kodeliste fraVerdiKl = (Kodeliste) fraVerdi;
-            Kodeliste tilVerdiKl = (Kodeliste) tilVerdi;
-            return medEndretFelt(historikkEndretFeltType, fraVerdiKl, tilVerdiKl);
-        }else if (fraVerdi instanceof Kodeverdi || tilVerdi instanceof Kodeverdi) {
+        if (fraVerdi instanceof Kodeverdi || tilVerdi instanceof Kodeverdi) {
             Kodeverdi fraVerdiKl = (Kodeverdi) fraVerdi;
             Kodeverdi tilVerdiKl = (Kodeverdi) tilVerdi;
             return medEndretFelt(historikkEndretFeltType, fraVerdiKl, tilVerdiKl);

@@ -204,24 +204,17 @@ public class Behandling extends BaseEntitet {
     /**
      * Oppdater behandlingssteg og tilhørende status.
      * <p>
-     * NB::NB::NB Dette skal normalt kun gjøres fra Behandlingskontroll slik at bokføring og events blir riktig.
-     * Er ikke en del av offentlig API.
+     * NB::NB::NB Dette skal normalt kun gjøres fra Behandlingskontroll slik at
+     * bokføring og events blir riktig. Er ikke en del av offentlig API.
      *
-     * @param oppdatertTilstand              - tilstand for steg behandlingen er i
-     * @param sluttStatusForEksisterendeSteg - avslutt eksisterende åpne steg og sett til denne statusen.
+     * @param stegTilstand - tilstand for steg behandlingen er i
      */
-    void oppdaterBehandlingStegOgStatus(BehandlingStegTilstand oppdatertTilstand,
-                                        BehandlingStegStatus sluttStatusForEksisterendeSteg) {
-        Objects.requireNonNull(oppdatertTilstand, "behandlingStegTilstand"); //$NON-NLS-1$
-
-        this.behandlingStegTilstander.remove(oppdatertTilstand);
-
-        // lukk andre steg
-        lukkBehandlingStegStatuser(this.behandlingStegTilstander, sluttStatusForEksisterendeSteg);
+    void oppdaterBehandlingStegOgStatus(BehandlingStegTilstand stegTilstand) {
+        Objects.requireNonNull(stegTilstand, "behandlingStegTilstand"); //$NON-NLS-1$
 
         // legg til ny
-        this.behandlingStegTilstander.add(oppdatertTilstand);
-        BehandlingStegType behandlingSteg = oppdatertTilstand.getBehandlingSteg();
+        this.behandlingStegTilstander.add(stegTilstand);
+        var behandlingSteg = stegTilstand.getBehandlingSteg();
         this.status = behandlingSteg.getDefinertBehandlingStatus();
     }
 
@@ -437,8 +430,7 @@ public class Behandling extends BaseEntitet {
 
 
     private Stream<Aksjonspunkt> getAksjonspunkterStream() {
-        return aksjonspunkter.stream()
-            .filter(Aksjonspunkt::erAktivt);
+        return aksjonspunkter.stream();
     }
 
     private Stream<Aksjonspunkt> getÅpneAksjonspunkterStream() {

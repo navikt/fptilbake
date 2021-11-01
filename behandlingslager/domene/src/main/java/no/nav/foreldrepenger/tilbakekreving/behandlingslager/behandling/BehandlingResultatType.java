@@ -2,10 +2,10 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling;
 
 import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -45,7 +45,7 @@ public enum BehandlingResultatType implements Kodeverdi {
     public static final String KODEVERK = "BEHANDLING_RESULTAT_TYPE";
     private static final Map<String, BehandlingResultatType> KODER = new LinkedHashMap<>();
     private static final Set<BehandlingResultatType> ALLE_HENLEGGELSESKODER = Collections.unmodifiableSet(new LinkedHashSet<>(
-        Arrays.asList(HENLAGT_KRAVGRUNNLAG_NULLSTILT, HENLAGT_FEILOPPRETTET, HENLAGT_FEILOPPRETTET_MED_BREV,
+        List.of(HENLAGT_KRAVGRUNNLAG_NULLSTILT, HENLAGT_FEILOPPRETTET, HENLAGT_FEILOPPRETTET_MED_BREV,
             HENLAGT_FEILOPPRETTET_UTEN_BREV, HENLAGT_TEKNISK_VEDLIKEHOLD)));
 
     static {
@@ -95,11 +95,6 @@ public enum BehandlingResultatType implements Kodeverdi {
     @Override
     public String getKode() {
         return kode;
-    }
-
-    @Override
-    public String getOffisiellKode() {
-        return getKode();
     }
 
     @JsonProperty

@@ -12,7 +12,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @Dependent
-@ProsessTask("brev.sendhenleggelse")
+@ProsessTask("brev.sendhenleggelse") // OBS opprettes i HenleggBehandlingTjeneste
 @FagsakProsesstaskRekkefølge(gruppeSekvens = false)
 public class SendHenleggelsesbrevTask implements ProsessTaskHandler {
 

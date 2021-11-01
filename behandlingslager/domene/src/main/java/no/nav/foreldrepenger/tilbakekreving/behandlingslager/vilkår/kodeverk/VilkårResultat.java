@@ -69,12 +69,6 @@ public enum VilkårResultat implements Kodeverdi {
         return kode;
     }
 
-    @JsonProperty
-    @Override
-    public String getOffisiellKode() {
-        return getKode();
-    }
-
     @Override
     public String getKodeverk() {
         return KODEVERK;

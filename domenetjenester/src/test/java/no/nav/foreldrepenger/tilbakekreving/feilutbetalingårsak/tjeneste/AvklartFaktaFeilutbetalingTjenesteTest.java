@@ -45,8 +45,7 @@ public class AvklartFaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
         scenario.medBehandlingType(BehandlingType.TILBAKEKREVING);
         scenario.leggTilAksjonspunkt(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING, BehandlingStegType.FAKTA_FEILUTBETALING);
         nyBehandling = scenario.lagre(repoProvider);
-        var historikkInnslagKonverter = new HistorikkInnslagKonverter(
-            repoProvider.getAksjonspunktRepository(), behandlingRepository);
+        var historikkInnslagKonverter = new HistorikkInnslagKonverter(behandlingRepository);
         historikkTjenesteAdapter = new HistorikkTjenesteAdapter(historikkRepository, historikkInnslagKonverter);
         avklartFaktaFeilutbetalingTjeneste = new AvklartFaktaFeilutbetalingTjeneste(faktaFeilutbetalingRepository, historikkTjenesteAdapter);
     }
@@ -55,7 +54,7 @@ public class AvklartFaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
     public void lagreÅrsakForFeilutbetalingPeriode_medUnderÅrsak() {
         FaktaFeilutbetalingDto faktaFeilutbetalingDto = formFaktaFeilutbetaling();
 
-        avklartFaktaFeilutbetalingTjeneste.lagreÅrsakForFeilutbetalingPeriode(nyBehandling, Arrays.asList(faktaFeilutbetalingDto), BEGRUNNELSE);
+        avklartFaktaFeilutbetalingTjeneste.lagreÅrsakForFeilutbetalingPeriode(nyBehandling, List.of(faktaFeilutbetalingDto), BEGRUNNELSE);
 
         Optional<FaktaFeilutbetaling> feilutbetalingAggregate = faktaFeilutbetalingRepository.finnFaktaOmFeilutbetaling(nyBehandling.getId());
         assertThat(feilutbetalingAggregate).isNotEmpty();
@@ -80,7 +79,7 @@ public class AvklartFaktaFeilutbetalingTjenesteTest extends FellesTestOppsett {
         HendelseTypeMedUndertypeDto feilutbetalingÅrsakDto = new HendelseTypeMedUndertypeDto(HENDELSE_TYPE, HENDELSE_UNDERTYPE);
 
         avklartFaktaFeilutbetalingTjeneste.lagreÅrsakForFeilutbetalingPeriode(nyBehandling,
-            Arrays.asList(faktaFeilutbetalingDto,
+            List.of(faktaFeilutbetalingDto,
                 new FaktaFeilutbetalingDto(TOM, sisteDagIPeriode, feilutbetalingÅrsakDto)), BEGRUNNELSE);
 
         Optional<FaktaFeilutbetaling> feilutbetalingAggregate = faktaFeilutbetalingRepository.finnFaktaOmFeilutbetaling(nyBehandling.getId());

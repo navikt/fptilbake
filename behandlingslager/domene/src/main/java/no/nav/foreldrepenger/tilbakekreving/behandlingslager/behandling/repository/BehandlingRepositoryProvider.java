@@ -6,7 +6,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.VedtaksbrevFritekstRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakLåsRepository;
@@ -27,7 +26,6 @@ public class BehandlingRepositoryProvider {
 
     private EntityManager entityManager;
     private FagsakRepository fagsakRepository;
-    private AksjonspunktRepository aksjonspunktRepository;
     private BehandlingRepository behandlingRepository;
     private BehandlingresultatRepository behandlingresultatRepository;
     private HistorikkRepository historikkRepository;
@@ -57,7 +55,6 @@ public class BehandlingRepositoryProvider {
         this.behandlingRepository = new BehandlingRepository(entityManager);
         this.behandlingresultatRepository = new BehandlingresultatRepository(entityManager);
         this.fagsakRepository = new FagsakRepository(entityManager);
-        this.aksjonspunktRepository = new AksjonspunktRepository(entityManager);
         this.historikkRepository = new HistorikkRepository(entityManager);
         this.behandlingLåsRepository = new BehandlingLåsRepository(entityManager);
         this.fagsakLåsRepository = new FagsakLåsRepository(entityManager);
@@ -83,10 +80,6 @@ public class BehandlingRepositoryProvider {
 
     public BehandlingresultatRepository getBehandlingresultatRepository() {
         return behandlingresultatRepository;
-    }
-
-    public AksjonspunktRepository getAksjonspunktRepository() {
-        return aksjonspunktRepository;
     }
 
     public FagsakRepository getFagsakRepository() {

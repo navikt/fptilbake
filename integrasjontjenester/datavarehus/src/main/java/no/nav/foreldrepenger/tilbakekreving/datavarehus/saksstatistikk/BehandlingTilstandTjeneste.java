@@ -49,8 +49,8 @@ public class BehandlingTilstandTjeneste {
             .map(Behandlingsresultat::getBehandlingResultatType)
             .orElse(BehandlingResultatType.IKKE_FASTSATT);
 
-        boolean venterPåBruker = behandling.getÅpneAksjonspunkter().stream().anyMatch(aksjonspunkt -> aksjonspunkt.erAktivt() && Venteårsak.venterPåBruker(aksjonspunkt.getVenteårsak()));
-        boolean venterPåØkonomi = behandling.getÅpneAksjonspunkter().stream().anyMatch(aksjonspunkt -> aksjonspunkt.erAktivt() && Venteårsak.venterPåØkonomi(aksjonspunkt.getVenteårsak()));
+        boolean venterPåBruker = behandling.getÅpneAksjonspunkter().stream().anyMatch(aksjonspunkt -> Venteårsak.venterPåBruker(aksjonspunkt.getVenteårsak()));
+        boolean venterPåØkonomi = behandling.getÅpneAksjonspunkter().stream().anyMatch(aksjonspunkt -> Venteårsak.venterPåØkonomi(aksjonspunkt.getVenteårsak()));
 
         Optional<BehandlingÅrsak> behandlingsårsak = behandling.getBehandlingÅrsaker().stream().findFirst();
         Optional<Behandling> forrigeBehandling = behandlingsårsak

@@ -38,6 +38,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandlingsresultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktTestSupport;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
@@ -95,7 +96,7 @@ public class BehandlingDtoTjenesteTest {
         faktaFeilutbetalingRepository = repositoryProvider.getFaktaFeilutbetalingRepository();
         vilkårsvurderingRepository = repositoryProvider.getVilkårsvurderingRepository();
         grunnlagRepository = repositoryProvider.getGrunnlagRepository();
-        BehandlingModellRepository behandlingModellRepository = new BehandlingModellRepository(entityManager);
+        BehandlingModellRepository behandlingModellRepository = new BehandlingModellRepository();
         behandlingDtoTjeneste = new BehandlingDtoTjeneste(behandlingTjeneste, foreldelseTjeneste, repositoryProvider,
             behandlingModellRepository, "fptilbake");
 
@@ -278,7 +279,7 @@ public class BehandlingDtoTjenesteTest {
     public void skal_hentUtvidetBehandlingResultat_medVergeAksjonspunkt() {
         Behandling behandling = lagBehandling(BehandlingStegType.FAKTA_FEILUTBETALING, BehandlingStatus.UTREDES);
         when(behandlingTjeneste.hentBehandling(anyLong())).thenReturn(behandling);
-        repositoryProvider.getAksjonspunktRepository().leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.AVKLAR_VERGE);
+        AksjonspunktTestSupport.leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.AVKLAR_VERGE);
 
         UtvidetBehandlingDto utvidetBehandlingDto = behandlingDtoTjeneste.hentUtvidetBehandlingResultat(1L, null);
         assertUtvidetBehandlingDto(utvidetBehandlingDto);

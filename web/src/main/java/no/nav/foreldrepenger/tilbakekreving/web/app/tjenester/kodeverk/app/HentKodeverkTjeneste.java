@@ -13,7 +13,6 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsakType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KonsekvensForYtelsen;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.VurderÅrsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.skjermlenke.SkjermlenkeType;
@@ -40,7 +39,6 @@ public class HentKodeverkTjeneste {
 
     static {
         Map<String, Collection<? extends Kodeverdi>> map = new LinkedHashMap<>();
-        map.put(KonsekvensForYtelsen.class.getSimpleName(), KonsekvensForYtelsen.kodeMap().values());
         map.put(Fagsystem.class.getSimpleName(), Fagsystem.kodeMap().values());
         map.put(Venteårsak.class.getSimpleName(), Venteårsak.kodeMap().values());
         map.put(Aktsomhet.class.getSimpleName(), Aktsomhet.kodeMap().values());

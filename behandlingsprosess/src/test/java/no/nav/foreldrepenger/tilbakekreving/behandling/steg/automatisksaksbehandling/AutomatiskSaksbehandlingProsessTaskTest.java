@@ -1,62 +1,27 @@
 package no.nav.foreldrepenger.tilbakekreving.behandling.steg.automatisksaksbehandling;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
-import java.time.Period;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.FlushModeType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 
-import com.google.common.collect.Lists;
-
-import no.nav.foreldrepenger.tilbakekreving.automatisk.gjenoppta.tjeneste.GjenopptaBehandlingTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.beregning.TilbakekrevingBeregningTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.impl.AutomatiskVurdertForeldelseTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagBeregningTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.impl.KravgrunnlagTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurderForeldelseAksjonspunktUtleder;
-import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurdertForeldelseTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.impl.vilkårsvurdering.AutomatiskVurdertVilkårTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.impl.vilkårsvurdering.VilkårsvurderingHistorikkInnslagTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.impl.vilkårsvurdering.VilkårsvurderingTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.faktafeilutbetaling.FaktaFeilutbetalingSteg;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.faktaverge.FaktaVergeSteg;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.fattevedtak.FatteVedtakSteg;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.foreslåvedtak.ForeslåVedtakSteg;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TestStegKonfig;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.MottattGrunnlagSteg;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.iverksettvedtak.AvsluttBehandlingTask;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.iverksettvedtak.IverksetteVedtakSteg;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.iverksettvedtak.ProsessTaskIverksett;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.iverksettvedtak.SendVedtaksbrevTask;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.iverksettvedtak.SendØkonomiTibakekerevingsVedtakTask;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.vurderforeldelse.VurderForeldelseSteg;
-import no.nav.foreldrepenger.tilbakekreving.behandling.steg.vurdervilkår.VurderTilbakekrevingSteg;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingModell;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingSteg;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegKonfigurasjon;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellImpl;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingModellRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollEventPubliserer;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.spi.BehandlingskontrollServiceProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStatus;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegStatus;
@@ -65,14 +30,10 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ForeldelseVurderingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.InternalManipulerBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingKandidaterRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingVenterRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.felles.FellesQueriesForBehandlingRepositories;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.kodeverk.HendelseUnderType;
@@ -80,40 +41,26 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikk
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.Historikkinnslag;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.testutilities.kodeverk.ScenarioSimple;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.TotrinnRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.varsel.respons.VarselresponsRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårVurderingPeriodeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vurdertforeldelse.VurdertForeldelse;
 import no.nav.foreldrepenger.tilbakekreving.datavarehus.saksstatistikk.SendVedtakHendelserTilDvhTask;
-import no.nav.foreldrepenger.tilbakekreving.dbstoette.FptilbakeEntityManagerAwareExtension;
-import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.tjeneste.AutomatiskFaktaFastsettelseTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.feilutbetalingårsak.tjeneste.AvklartFaktaFeilutbetalingTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
-import no.nav.foreldrepenger.tilbakekreving.historikk.dto.HistorikkInnslagKonverter;
-import no.nav.foreldrepenger.tilbakekreving.historikk.tjeneste.HistorikkTjenesteAdapter;
-import no.nav.foreldrepenger.tilbakekreving.varselrespons.VarselresponsTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
-import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskStatus;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.TaskType;
 
-@ExtendWith(FptilbakeEntityManagerAwareExtension.class)
+@CdiDbAwareTest
 public class AutomatiskSaksbehandlingProsessTaskTest {
 
     private BehandlingRepositoryProvider repositoryProvider;
     private BehandlingRepository behandlingRepository;
     private TotrinnRepository totrinnRepository;
+    @Inject
     private ProsessTaskTjeneste taskTjeneste;
-    private HistorikkTjenesteAdapter historikkTjenesteAdapter;
-    private GjenopptaBehandlingTjeneste gjenopptaBehandlingTjeneste;
-    private AutomatiskFaktaFastsettelseTjeneste faktaFastsettelseTjeneste;
-    private VurderForeldelseAksjonspunktUtleder vurderForeldelseAksjonspunktUtleder;
-    private AutomatiskVurdertForeldelseTjeneste automatiskVurdertForeldelseTjeneste;
-    private AutomatiskVurdertVilkårTjeneste automatiskVurdertVilkårTjeneste;
-    private TilbakekrevingBeregningTjeneste tilbakekrevingBeregningTjeneste;
-    private ProsessTaskIverksett prosessTaskIverksett;
 
     private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
     private AutomatiskSaksbehandlingProsessTask automatiskSaksbehandlingProsessTask;
@@ -125,59 +72,12 @@ public class AutomatiskSaksbehandlingProsessTaskTest {
     public void setup(EntityManager entityManager) {
         repositoryProvider = new BehandlingRepositoryProvider(entityManager);
         behandlingRepository = repositoryProvider.getBehandlingRepository();
-        KravgrunnlagRepository kravgrunnlagRepository = repositoryProvider.getGrunnlagRepository();
-        AksjonspunktRepository aksjonspunktRepository = repositoryProvider.getAksjonspunktRepository();
         totrinnRepository = new TotrinnRepository(entityManager);
-        VarselresponsRepository varselresponsRepository = new VarselresponsRepository(entityManager);
-        taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
-        FellesQueriesForBehandlingRepositories fellesQueriesForBehandlingRepositories = new FellesQueriesForBehandlingRepositories(
-            entityManager);
-        BehandlingVenterRepository behandlingVenterRepository = new BehandlingVenterRepository(
-            fellesQueriesForBehandlingRepositories);
-        BehandlingKandidaterRepository behandlingKandidaterRepository = new BehandlingKandidaterRepository(
-            fellesQueriesForBehandlingRepositories);
-        InternalManipulerBehandling manipulerBehandling = new InternalManipulerBehandling(repositoryProvider);
-        HistorikkInnslagKonverter historikkInnslagKonverter = new HistorikkInnslagKonverter(aksjonspunktRepository,
-                behandlingRepository);
-        historikkTjenesteAdapter = new HistorikkTjenesteAdapter(repositoryProvider.getHistorikkRepository(),
-            historikkInnslagKonverter);
-        AvklartFaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste = new AvklartFaktaFeilutbetalingTjeneste(
-            repositoryProvider.getFaktaFeilutbetalingRepository(), historikkTjenesteAdapter);
 
-        VarselresponsTjeneste varselresponsTjeneste = new VarselresponsTjeneste(varselresponsRepository);
-        gjenopptaBehandlingTjeneste = new GjenopptaBehandlingTjeneste(taskTjeneste, behandlingKandidaterRepository,
-            behandlingVenterRepository, repositoryProvider, varselresponsTjeneste);
 
-        KravgrunnlagTjeneste kravgrunnlagTjeneste = new KravgrunnlagTjeneste(repositoryProvider,
-            gjenopptaBehandlingTjeneste, null, null);
-
-        faktaFastsettelseTjeneste = new AutomatiskFaktaFastsettelseTjeneste(faktaFeilutbetalingTjeneste,
-            kravgrunnlagTjeneste);
-        vurderForeldelseAksjonspunktUtleder = new VurderForeldelseAksjonspunktUtleder(Period.ofWeeks(-1),
-            kravgrunnlagRepository, behandlingRepository);
-
-        KravgrunnlagBeregningTjeneste kravgrunnlagBeregningTjeneste = new KravgrunnlagBeregningTjeneste(
-            kravgrunnlagRepository);
-        VurdertForeldelseTjeneste vurdertForeldelseTjeneste = new VurdertForeldelseTjeneste(repositoryProvider,
-            historikkTjenesteAdapter, kravgrunnlagBeregningTjeneste);
-        automatiskVurdertForeldelseTjeneste = new AutomatiskVurdertForeldelseTjeneste(
-            vurderForeldelseAksjonspunktUtleder, vurdertForeldelseTjeneste);
-        VilkårsvurderingHistorikkInnslagTjeneste vilkårsvurderingHistorikkInnslagTjeneste = new VilkårsvurderingHistorikkInnslagTjeneste(
-            historikkTjenesteAdapter, repositoryProvider);
-
-        VilkårsvurderingTjeneste vilkårsvurderingTjeneste = new VilkårsvurderingTjeneste(vurdertForeldelseTjeneste,
-            repositoryProvider, vilkårsvurderingHistorikkInnslagTjeneste, kravgrunnlagBeregningTjeneste);
-
-        automatiskVurdertVilkårTjeneste = new AutomatiskVurdertVilkårTjeneste(vilkårsvurderingTjeneste,
-            aksjonspunktRepository);
-        tilbakekrevingBeregningTjeneste = new TilbakekrevingBeregningTjeneste(repositoryProvider,
-            kravgrunnlagBeregningTjeneste);
-        prosessTaskIverksett = new ProsessTaskIverksett(taskTjeneste, repositoryProvider.getBrevSporingRepository());
-        BehandlingModellRepository behandlingModellRepositoryMock = Mockito.mock(BehandlingModellRepository.class);
-        BehandlingskontrollEventPubliserer behandlingskontrollEventPublisererMock = mock(
-            BehandlingskontrollEventPubliserer.class);
-        behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(repositoryProvider,
-            behandlingModellRepositoryMock, behandlingskontrollEventPublisererMock);
+        BehandlingskontrollEventPubliserer behandlingskontrollEventPublisererMock = mock(BehandlingskontrollEventPubliserer.class);
+        behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(entityManager,
+            new BehandlingModellRepository(), behandlingskontrollEventPublisererMock));
 
         automatiskSaksbehandlingProsessTask = new AutomatiskSaksbehandlingProsessTask(behandlingRepository,
             behandlingskontrollTjeneste);
@@ -186,13 +86,9 @@ public class AutomatiskSaksbehandlingProsessTaskTest {
             .medDefaultKravgrunnlag()
             .lagre(repositoryProvider);
         behandlingId = behandling.getId();
-        manipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.FAKTA_FEILUTBETALING,
-            BehandlingStegStatus.UTGANG);
+        InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.FAKTA_FEILUTBETALING,
+            BehandlingStegStatus.UTGANG, BehandlingStegStatus.UTGANG);
 
-        when(behandlingModellRepositoryMock.getBehandlingStegKonfigurasjon()).thenReturn(
-            BehandlingStegKonfigurasjon.lagDummy());
-        when(behandlingModellRepositoryMock.getModell(any(BehandlingType.class))).thenReturn(
-            lagDummyBehandlingsModell());
     }
 
     @Test
@@ -204,9 +100,7 @@ public class AutomatiskSaksbehandlingProsessTaskTest {
         assertThat(behandling.getAnsvarligBeslutter()).isEqualTo("VL");
         assertThat(behandling.getStatus()).isEqualByComparingTo(BehandlingStatus.IVERKSETTER_VEDTAK);
 
-        var captor = ArgumentCaptor.forClass(ProsessTaskGruppe.class);
-        verify(taskTjeneste, times(1)).lagre(captor.capture());
-        var prosessTasker = captor.getValue().getTasks().stream().map(ProsessTaskGruppe.Entry::task).toList();
+        var prosessTasker = taskTjeneste.finnAlle(ProsessTaskStatus.KLAR);
         assertThat(prosessTasker.size()).isEqualTo(3);
         List<TaskType> prosessTaskNavn = prosessTasker.stream()
             .map(ProsessTaskData::taskType)
@@ -311,44 +205,6 @@ public class AutomatiskSaksbehandlingProsessTaskTest {
         ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(AutomatiskSaksbehandlingProsessTask.class);
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandlingId, behandling.getAktørId().getId());
         return prosessTaskData;
-    }
-
-    private BehandlingModell lagDummyBehandlingsModell() {
-        List<TestStegKonfig> steg = Lists.newArrayList(
-            new TestStegKonfig(BehandlingStegType.FAKTA_VERGE, BehandlingType.TILBAKEKREVING,
-                new FaktaVergeSteg(behandlingRepository)),
-            new TestStegKonfig(BehandlingStegType.TBKGSTEG, BehandlingType.TILBAKEKREVING,
-                new MottattGrunnlagSteg(behandlingRepository, behandlingskontrollTjeneste, gjenopptaBehandlingTjeneste,
-                    null, Period.ofWeeks(-1))),
-            new TestStegKonfig(BehandlingStegType.FAKTA_FEILUTBETALING, BehandlingType.TILBAKEKREVING,
-                new FaktaFeilutbetalingSteg(behandlingRepository, faktaFastsettelseTjeneste)),
-            new TestStegKonfig(BehandlingStegType.FORELDELSEVURDERINGSTEG, BehandlingType.TILBAKEKREVING,
-                new VurderForeldelseSteg(repositoryProvider, vurderForeldelseAksjonspunktUtleder,
-                    automatiskVurdertForeldelseTjeneste)),
-            new TestStegKonfig(BehandlingStegType.VTILBSTEG, BehandlingType.TILBAKEKREVING,
-                new VurderTilbakekrevingSteg(repositoryProvider, automatiskVurdertVilkårTjeneste)),
-            new TestStegKonfig(BehandlingStegType.FORESLÅ_VEDTAK, BehandlingType.TILBAKEKREVING,
-                new ForeslåVedtakSteg(behandlingRepository)),
-            new TestStegKonfig(BehandlingStegType.FATTE_VEDTAK, BehandlingType.TILBAKEKREVING,
-                new FatteVedtakSteg(repositoryProvider, totrinnRepository, tilbakekrevingBeregningTjeneste,
-                    historikkTjenesteAdapter)),
-            new TestStegKonfig(BehandlingStegType.IVERKSETT_VEDTAK, BehandlingType.TILBAKEKREVING,
-                new IverksetteVedtakSteg(repositoryProvider, prosessTaskIverksett)));
-
-        BehandlingModellImpl.TriFunction<BehandlingStegType, BehandlingType, BehandlingSteg> finnSteg = map(steg);
-        BehandlingModellImpl modell = new BehandlingModellImpl(BehandlingType.TILBAKEKREVING, finnSteg);
-
-        steg.forEach(konfig -> modell.leggTil(konfig.getBehandlingStegType(), konfig.getBehandlingType()));
-        return modell;
-    }
-
-    private static BehandlingModellImpl.TriFunction<BehandlingStegType, BehandlingType, BehandlingSteg> map(List<TestStegKonfig> input) {
-        Map<List<?>, BehandlingSteg> resolver = new HashMap<>();
-        for (TestStegKonfig konfig : input) {
-            List<?> key = Arrays.asList(konfig.getBehandlingStegType(), konfig.getBehandlingType());
-            resolver.put(key, konfig.getSteg());
-        }
-        return (t, u) -> resolver.get(Arrays.asList(t, u));
     }
 
 }

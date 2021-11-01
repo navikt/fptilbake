@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -69,7 +68,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
                 .build())
             .medVedtaksbrevType(VedtaksbrevType.ORDINÆR)
             .build();
-        List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
+        List<HbVedtaksbrevPeriode> perioder = List.of(
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(januar)
                 .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(30001)))
@@ -79,7 +78,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
                     .medVilkårResultat(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER)
                     .medAktsomhetResultat(Aktsomhet.SIMPEL_UAKTSOM)
                     .medFritekstVilkår("Du er heldig som slapp å betale alt!")
-                    .medSærligeGrunner(Arrays.asList(SærligGrunn.TID_FRA_UTBETALING, SærligGrunn.STØRRELSE_BELØP), null, null)
+                    .medSærligeGrunner(List.of(SærligGrunn.TID_FRA_UTBETALING, SærligGrunn.STØRRELSE_BELØP), null, null)
                     .build())
                 .medResultat(HbResultatTestBuilder.forTilbakekrevesBeløp(20002))
                 .build(),
@@ -89,7 +88,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
                     .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
                     .medVilkårResultat(VilkårResultat.FORSTO_BURDE_FORSTÅTT)
                     .medAktsomhetResultat(Aktsomhet.SIMPEL_UAKTSOM)
-                    .medSærligeGrunner(Arrays.asList(SærligGrunn.HELT_ELLER_DELVIS_NAVS_FEIL, SærligGrunn.STØRRELSE_BELØP), null, null)
+                    .medSærligeGrunner(List.of(SærligGrunn.HELT_ELLER_DELVIS_NAVS_FEIL, SærligGrunn.STØRRELSE_BELØP), null, null)
                     .build())
                 .medFakta(HendelseType.ØKONOMI_FEIL, HendelseUnderType.DOBBELTUTBETALING)
                 .medKravgrunnlag(HbKravgrunnlag.builder()
@@ -135,7 +134,7 @@ public class TekstformatererVedtaksbrevIBiterTest {
                 .medForeldelsevurdering(ForeldelseVurderingType.IKKE_VURDERT)
                 .medVilkårResultat(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER)
                 .medAktsomhetResultat(Aktsomhet.SIMPEL_UAKTSOM)
-                .medSærligeGrunner(Arrays.asList(SærligGrunn.TID_FRA_UTBETALING, SærligGrunn.STØRRELSE_BELØP), null, null)
+                .medSærligeGrunner(List.of(SærligGrunn.TID_FRA_UTBETALING, SærligGrunn.STØRRELSE_BELØP), null, null)
                 .build())
             .medResultat(HbResultatTestBuilder.forTilbakekrevesBeløp(20002))
             .build();

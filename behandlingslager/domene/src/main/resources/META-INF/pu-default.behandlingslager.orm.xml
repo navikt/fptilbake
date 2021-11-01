@@ -28,15 +28,11 @@
 
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegTilstand"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingTypeStegSekvens"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingÅrsak"/>
 
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt"/>
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.VurderPåNyttÅrsak"/>
-    <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.VurderingspunktDefinisjon"/>
 
 
     <entity class="no.nav.foreldrepenger.tilbakekreving.behandlingslager.totrinn.Totrinnsvurdering"/>

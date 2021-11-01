@@ -3,7 +3,6 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjons
 import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -30,8 +29,8 @@ public enum AksjonspunktStatus implements Kodeverdi {
     AVBRUTT("AVBR", "Avbrutt");
 
     public static final String KODEVERK = "AKSJONSPUNKT_STATUS";
-    private static final List<AksjonspunktStatus> ÅPNE_AKSJONSPUNKT_STATUSER = Arrays.asList(OPPRETTET);
-    private static final List<AksjonspunktStatus> BEHANDLEDE_AKSJONSPUNKT_KODER = Arrays.asList(UTFØRT);
+    private static final List<AksjonspunktStatus> ÅPNE_AKSJONSPUNKT_STATUSER = List.of(OPPRETTET);
+    private static final List<AksjonspunktStatus> BEHANDLEDE_AKSJONSPUNKT_KODER = List.of(UTFØRT);
     private static final Map<String, AksjonspunktStatus> KODER = new LinkedHashMap<>();
 
     private String kode;
@@ -83,11 +82,6 @@ public enum AksjonspunktStatus implements Kodeverdi {
     @Override
     public String getKode() {
         return kode;
-    }
-
-    @Override
-    public String getOffisiellKode() {
-        return getKode();
     }
 
     @JsonProperty

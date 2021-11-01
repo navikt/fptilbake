@@ -79,11 +79,6 @@ public enum KlasseType implements Kodeverdi {
     }
 
     @Override
-    public String getOffisiellKode() {
-        return getKode();
-    }
-
-    @Override
     public String getKodeverk() {
         return KODEVERK;
     }

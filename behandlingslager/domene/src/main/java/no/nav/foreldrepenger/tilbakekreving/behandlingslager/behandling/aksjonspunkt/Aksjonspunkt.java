@@ -12,7 +12,6 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -21,8 +20,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Version;
-
-import org.hibernate.annotations.BatchSize;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.BaseEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
@@ -41,13 +38,12 @@ public class Aksjonspunkt extends BaseEntitet {
     @Column(name = "frist_tid")
     private LocalDateTime fristTid;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @BatchSize(size = 10)
-    @JoinColumn(name = "aksjonspunkt_def", nullable = false, updatable = false)
+    @Convert(converter = AksjonspunktDefinisjon.KodeverdiConverter.class)
+    @Column(name = "aksjonspunkt_def", nullable = false, updatable = false)
     private AksjonspunktDefinisjon aksjonspunktDefinisjon;
 
-    @ManyToOne()
-    @JoinColumn(name = "behandling_steg_funnet")
+    @Convert(converter = BehandlingStegType.KodeverdiConverter.class)
+    @Column(name = "behandling_steg_funnet")
     private BehandlingStegType behandlingSteg;
 
     @ManyToOne(optional = false)
@@ -73,22 +69,6 @@ public class Aksjonspunkt extends BaseEntitet {
     @Convert(converter = BooleanToStringConverter.class)
     @Column(name = "TOTRINN_BEHANDLING", nullable = false)
     private boolean toTrinnsBehandling;
-
-    /**
-     * Angir om aksjonspunktet er aktivt. NB: Ikke samme som status.
-     * Inaktive aksjonspunkter er historiske som ble kopiert når en revurdering ble opprettet. De eksisterer for å kunne vise den opprinnelige begrunnelsen, uten at saksbehandler må ta stilling til det på nytt..
-     */
-    @Convert(converter = ReaktiveringStatus.KodeverdiConverter.class)
-    @Column(name = "REAKTIVERING_STATUS", nullable = false)
-    private ReaktiveringStatus reaktiveringStatus = ReaktiveringStatus.AKTIV;
-
-    @Convert(converter = BooleanToStringConverter.class)
-    @Column(name = "MANUELT_OPPRETTET", nullable = false)
-    private boolean manueltOpprettet;
-
-    @Convert(converter = BooleanToStringConverter.class)
-    @Column(name = "REVURDERING", nullable = false)
-    private boolean revurdering = false;
 
     Aksjonspunkt() {
         // for hibernate
@@ -132,28 +112,8 @@ public class Aksjonspunkt extends BaseEntitet {
         return getAksjonspunktDefinisjon() != null && AksjonspunktType.AUTOPUNKT.equals(getAksjonspunktDefinisjon().getAksjonspunktType());
     }
 
-    public boolean erAktivt() {
-        return reaktiveringStatus.equals(ReaktiveringStatus.AKTIV);
-    }
-
-    public ReaktiveringStatus getReaktiveringStatus() {
-        return reaktiveringStatus;
-    }
-
     public boolean erManueltOpprettet() {
-        return manueltOpprettet;
-    }
-
-    void setManueltOpprettet(boolean manueltOpprettet) {
-        this.manueltOpprettet = manueltOpprettet;
-    }
-
-    public boolean erRevurdering() {
-        return revurdering;
-    }
-
-    void setRevurdering(boolean revurdering) {
-        this.revurdering = revurdering;
+        return this.aksjonspunktDefinisjon.getAksjonspunktType() != null && this.aksjonspunktDefinisjon.getAksjonspunktType().erOverstyringpunkt();
     }
 
     void setBehandlingsresultat(Behandling behandling) {
@@ -297,7 +257,7 @@ public class Aksjonspunkt extends BaseEntitet {
     }
 
     /**
-     * Intern Builder. Bruk {@link AksjonspunktRepository} til å legge til og endre {@link Aksjonspunkt}.
+     * Intern Builder. Bruk BehandlingskontrollTjeneste til å legge til og endre {@link Aksjonspunkt}.
      */
     static class Builder {
         private Aksjonspunkt opprinneligAp;
@@ -330,7 +290,6 @@ public class Aksjonspunkt extends BaseEntitet {
                 // Oppdater eksisterende. Aktiver dersom ikke allerede aktivt.
                 Aksjonspunkt eksisterendeAksjonspunkt = eksisterende.get();
                 kopierBasisfelter(ap, eksisterendeAksjonspunkt);
-                reaktiverAksjonspunkt(eksisterendeAksjonspunkt);
                 return eksisterendeAksjonspunkt;
             } else {
                 // Opprett ny og knytt til behandlingsresultat
@@ -351,14 +310,6 @@ public class Aksjonspunkt extends BaseEntitet {
                 }
             }
             til.setBehandlingSteg(fra.getBehandlingStegFunnet());
-            til.setManueltOpprettet(fra.erManueltOpprettet());
-        }
-
-        // Der
-        private void reaktiverAksjonspunkt(Aksjonspunkt eksisterendeAksjonspunkt) {
-            if (!eksisterendeAksjonspunkt.erAktivt()) {
-                eksisterendeAksjonspunkt.setAktivStatus(ReaktiveringStatus.AKTIV);
-            }
         }
 
         private void kopierBasisfelter(Aksjonspunkt fra, Aksjonspunkt til) {
@@ -382,21 +333,6 @@ public class Aksjonspunkt extends BaseEntitet {
             return this;
         }
 
-        Aksjonspunkt.Builder medReaktiveringsstatus(ReaktiveringStatus reaktiveringStatus) {
-            aksjonspunkt.setAktivStatus(reaktiveringStatus);
-            return this;
-        }
-
-        Aksjonspunkt.Builder manueltOpprettet() {
-            aksjonspunkt.setManueltOpprettet(true);
-            return this;
-        }
-
-        Aksjonspunkt.Builder medRevurdering() {
-            aksjonspunkt.setRevurdering(true);
-            return this;
-        }
-
         Aksjonspunkt.Builder medTotrinnskontroll(boolean toTrinnsbehandling) {
             aksjonspunkt.setToTrinnsBehandling(toTrinnsbehandling);
             return this;
@@ -417,14 +353,11 @@ public class Aksjonspunkt extends BaseEntitet {
                 "id=" + id +
                 ", aksjonspunktDefinisjon=" + getAksjonspunktDefinisjon() +
                 ", status=" + status +
-                ", reaktiveringStatus=" + reaktiveringStatus +
-                ", manueltOpprettet=" + manueltOpprettet +
                 ", behandlingStegFunnet=" + getBehandlingStegFunnet() +
                 ", versjon=" + versjon +
                 ", vurderPåNyttÅrsaker=" + vurderPåNyttÅrsaker +
                 ", toTrinnsBehandling=" + isToTrinnsBehandling() +
                 ", fristTid=" + getFristTid() +
-                ", revurdering=" + revurdering +
                 '}';
     }
 
@@ -436,7 +369,4 @@ public class Aksjonspunkt extends BaseEntitet {
         this.toTrinnsBehandling = toTrinnsBehandling;
     }
 
-    void setAktivStatus(ReaktiveringStatus reaktiveringStatus) {
-        this.reaktiveringStatus = reaktiveringStatus;
-    }
 }

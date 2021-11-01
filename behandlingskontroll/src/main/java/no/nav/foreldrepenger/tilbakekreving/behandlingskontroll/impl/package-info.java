@@ -3,7 +3,6 @@
  * <h1>Beskrivelse</h1>
  * Det er tilstandsmaskinen som prosesserer en behandling riktig framover gjennom et eller flere
  * {@link no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingSteg} og stopper på angitte
- * {@link no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.VurderingspunktDefinisjon} avhengig av hvilke
  * {@link no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt} som oppdages.
  * <p>
  * Hvilke {@link no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingSteg} som skal prosesseres er avhengig av

@@ -1,8 +1,8 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegProsesseringResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.StegProsesseringResultat;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.spi.BehandlingskontrollServiceProvider;
 
 /**
  * Tekniske oppsett ved kjøring av et steg:<br>
@@ -15,16 +15,14 @@ public class TekniskBehandlingStegVenterVisitor extends TekniskBehandlingStegVis
 
     private boolean gjenoppta = true;
 
-    public TekniskBehandlingStegVenterVisitor(BehandlingRepositoryProvider repositoryProvider,
-                                              BehandlingskontrollTjeneste behandlingskontrollTjeneste,
-                                              BehandlingskontrollKontekst kontekst,
-                                              BehandlingskontrollEventPubliserer eventPubliserer) {
-        super(repositoryProvider, behandlingskontrollTjeneste, kontekst, eventPubliserer);
+    public TekniskBehandlingStegVenterVisitor(BehandlingskontrollServiceProvider repositoryProvider,
+                                              BehandlingskontrollKontekst kontekst) {
+        super(repositoryProvider, kontekst);
     }
 
     @Override
-    protected BehandlingStegProsesseringResultat prosesserSteg(BehandlingStegVisitor stegVisitor) {
-        BehandlingStegProsesseringResultat resultat = gjenoppta ? stegVisitor.gjenoppta() : stegVisitor.prosesser();
+    protected StegProsesseringResultat prosesserSteg(BehandlingStegVisitor stegVisitor) {
+        var resultat = gjenoppta ? stegVisitor.gjenoppta() : stegVisitor.prosesser();
         gjenoppta = false;
         return resultat;
     }

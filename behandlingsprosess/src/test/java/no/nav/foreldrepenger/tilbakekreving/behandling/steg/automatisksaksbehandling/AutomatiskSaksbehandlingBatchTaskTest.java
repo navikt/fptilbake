@@ -30,6 +30,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.InternalManipulerBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.KlasseKode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktTestSupport;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.automatisksaksbehandling.AutomatiskSaksbehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevSporing;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.brev.BrevType;
@@ -68,14 +69,13 @@ public class AutomatiskSaksbehandlingBatchTaskTest {
         entityManager.setFlushMode(FlushModeType.AUTO);
         scenarioSimple.leggTilAksjonspunkt(AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING, BehandlingStegType.FAKTA_FEILUTBETALING);
         repositoryProvider = new BehandlingRepositoryProvider(entityManager);
-        InternalManipulerBehandling manipulerBehandling = new InternalManipulerBehandling(repositoryProvider);
         taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
         automatiskSaksbehandlingRepository = new AutomatiskSaksbehandlingRepository(entityManager);
         automatiskSaksbehandlingBatchTask = new AutomatiskSaksbehandlingBatchTask(taskTjeneste, automatiskSaksbehandlingRepository, clock, Period.ofWeeks(-1));
         behandling = scenarioSimple.medBehandlingType(BehandlingType.TILBAKEKREVING).lagre(repositoryProvider);
         lagKravgrunnlag(behandling.getId(), BigDecimal.valueOf(500L), behandling.getFagsak().getSaksnummer().getVerdi(),
             123L);
-        manipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.FAKTA_FEILUTBETALING, BehandlingStegStatus.UTGANG);
+        InternalManipulerBehandling.forceOppdaterBehandlingSteg(behandling, BehandlingStegType.FAKTA_FEILUTBETALING, BehandlingStegStatus.UTGANG,BehandlingStegStatus.UTGANG);
     }
 
     @Test
@@ -134,7 +134,7 @@ public class AutomatiskSaksbehandlingBatchTaskTest {
 
     @Test
     public void skal_ikke_opprette_prosess_tasker_når_behandling_er_sett_på_vent() {
-        repositoryProvider.getAksjonspunktRepository().leggTilAksjonspunkt(behandling,AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG,BehandlingStegType.FAKTA_FEILUTBETALING);
+        AksjonspunktTestSupport.leggTilAksjonspunkt(behandling,AksjonspunktDefinisjon.VENT_PÅ_TILBAKEKREVINGSGRUNNLAG,BehandlingStegType.FAKTA_FEILUTBETALING);
 
         automatiskSaksbehandlingBatchTask.doTask(lagProsessTaskData());
         verifyNoInteractions(taskTjeneste);

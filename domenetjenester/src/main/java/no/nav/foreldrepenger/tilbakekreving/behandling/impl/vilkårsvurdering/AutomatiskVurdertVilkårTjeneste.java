@@ -11,10 +11,10 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.dto.vilkår.VilkårResult
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.vilkår.VilkårResultatAnnetDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.vilkår.VilkårResultatInfoDto;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.vilkår.VilkårsvurderingPerioderDto;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollKontekst;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.Aktsomhet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.kodeverk.VilkårResultat;
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
@@ -23,7 +23,7 @@ import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
 public class AutomatiskVurdertVilkårTjeneste {
 
     private VilkårsvurderingTjeneste vilkårsvurderingTjeneste;
-    private AksjonspunktRepository aksjonspunktRepository;
+    private BehandlingskontrollTjeneste behandlingskontrollTjeneste;
 
     AutomatiskVurdertVilkårTjeneste() {
         // for CDI
@@ -31,12 +31,13 @@ public class AutomatiskVurdertVilkårTjeneste {
 
     @Inject
     public AutomatiskVurdertVilkårTjeneste(VilkårsvurderingTjeneste vilkårsvurderingTjeneste,
-                                           AksjonspunktRepository aksjonspunktRepository) {
+                                           BehandlingskontrollTjeneste behandlingskontrollTjeneste) {
         this.vilkårsvurderingTjeneste = vilkårsvurderingTjeneste;
-        this.aksjonspunktRepository = aksjonspunktRepository;
+        this.behandlingskontrollTjeneste = behandlingskontrollTjeneste;
     }
 
     public void automatiskVurdertVilkår(Behandling behandling, String begrunnelse) {
+        var kontekst = behandlingskontrollTjeneste.initBehandlingskontroll(behandling);
         long behandlingId = behandling.getId();
         List<DetaljertFeilutbetalingPeriodeDto> feilutbetaltePerioder = vilkårsvurderingTjeneste.hentDetaljertFeilutbetalingPerioder(behandlingId);
         List<VilkårsvurderingPerioderDto> vilkårsvurdertePerioder = feilutbetaltePerioder.stream().filter(periode -> !periode.isForeldet())
@@ -44,7 +45,7 @@ public class AutomatiskVurdertVilkårTjeneste {
             .collect(Collectors.toList());
         vilkårsvurderingTjeneste.lagreVilkårsvurdering(behandlingId, vilkårsvurdertePerioder);
         //Aksjonpunkt oppretter ikke automatisk for automatisk saksbehandling. Det opprettes manuelt for å vise vilkår data i frontend.
-        lagUtførtAksjonspunkt(behandling);
+        lagUtførtAksjonspunkt(kontekst, behandling);
     }
 
     private VilkårsvurderingPerioderDto lagVilkårsvurderingPeriode(Periode periode, String begrunnelse) {
@@ -60,8 +61,7 @@ public class AutomatiskVurdertVilkårTjeneste {
         return vilkårsvurderingPeriode;
     }
 
-    private void lagUtførtAksjonspunkt(Behandling behandling){
-        Aksjonspunkt aksjonspunkt = aksjonspunktRepository.leggTilAksjonspunkt(behandling, AksjonspunktDefinisjon.VURDER_TILBAKEKREVING);
-        aksjonspunktRepository.setTilUtført(aksjonspunkt);
+    private void lagUtførtAksjonspunkt(BehandlingskontrollKontekst kontekst, Behandling behandling){
+        behandlingskontrollTjeneste.lagreAksjonspunktOpprettetUtførtUtenEvent(kontekst, behandling.getAktivtBehandlingSteg(), AksjonspunktDefinisjon.VURDER_TILBAKEKREVING);
     }
 }

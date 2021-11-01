@@ -58,8 +58,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.IgnoreKodeverk;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.KodeverkTabell;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.ValidKodeverk;
 import no.nav.foreldrepenger.tilbakekreving.dbstoette.CdiDbAwareTest;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
@@ -157,7 +156,7 @@ public class RestApiInputValideringDtoTest extends RestApiTester {
     }
 
     private static boolean erKodeverk(Type... args) {
-        return Kodeliste.class.isAssignableFrom((Class<?>) args[0]) || KodeverkTabell.class.isAssignableFrom((Class<?>) args[0]);
+        return Kodeverdi.class.isAssignableFrom((Class<?>) args[0]);
     }
 
     private static Set<Class<?>> finnAlleDtoTyper() {
@@ -250,7 +249,7 @@ public class RestApiInputValideringDtoTest extends RestApiTester {
     }
 
     private static boolean erKodeverk(Class<?> klasse) {
-        return Kodeliste.class.isAssignableFrom(klasse) || KodeverkTabell.class.isAssignableFrom(klasse);
+        return Kodeverdi.class.isAssignableFrom(klasse);
     }
 
     private static void validerHarValidAnnotering(Field field) {

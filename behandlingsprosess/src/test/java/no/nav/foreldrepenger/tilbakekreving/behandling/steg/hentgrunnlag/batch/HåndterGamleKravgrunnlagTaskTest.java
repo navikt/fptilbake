@@ -39,6 +39,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingM
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollAsynkTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollEventPubliserer;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.BehandlingskontrollTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.spi.BehandlingskontrollServiceProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBruker;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.NavBrukerRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Personinfo;
@@ -91,7 +92,6 @@ public class HåndterGamleKravgrunnlagTaskTest {
     private final PersoninfoAdapter tpsTjenesteMock = mock(PersoninfoAdapter.class);
     private final PersonOrganisasjonWrapper tpsAdapterWrapper = new PersonOrganisasjonWrapper(tpsTjenesteMock);
     private final ØkonomiConsumer økonomiConsumerMock = mock(ØkonomiConsumer.class);
-    private final BehandlingModellRepository behandlingModellRepositoryMock = mock(BehandlingModellRepository.class);
     private final BehandlingskontrollEventPubliserer behandlingskontrollEventPublisererMock = mock(BehandlingskontrollEventPubliserer.class);
     private final FagsystemKlient fagsystemKlientMock = mock(FagsystemKlient.class);
 
@@ -117,8 +117,8 @@ public class HåndterGamleKravgrunnlagTaskTest {
         grunnlagRepository = repositoryProvider.getGrunnlagRepository();
         ProsessTaskTjeneste taskTjeneste = Mockito.mock(ProsessTaskTjeneste.class);
         NavBrukerRepository navBrukerRepository = new NavBrukerRepository(entityManager);
-        BehandlingskontrollTjeneste behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(repositoryProvider,
-            behandlingModellRepositoryMock, behandlingskontrollEventPublisererMock);
+        BehandlingskontrollTjeneste behandlingskontrollTjeneste = new BehandlingskontrollTjeneste(new BehandlingskontrollServiceProvider(
+            entityManager, new BehandlingModellRepository(), behandlingskontrollEventPublisererMock));
         hentKravgrunnlagMapper = new HentKravgrunnlagMapper(tpsAdapterWrapper);
         KravgrunnlagMapper lesKravgrunnlagMapper = new KravgrunnlagMapper(tpsAdapterWrapper);
         BehandlingskontrollProvider behandlingskontrollProvider = new BehandlingskontrollProvider(

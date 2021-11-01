@@ -3,6 +3,7 @@ package no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.impl.transisjon
 import java.util.Optional;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegModell;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegResultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.transisjoner.FellesTransisjoner;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.transisjoner.StegTransisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
@@ -17,7 +18,7 @@ class HenleggelseTransisjon implements StegTransisjon {
 
     @Override
     public BehandlingStegModell nesteSteg(BehandlingStegModell nåværendeSteg) {
-        Optional<BehandlingStegModell> funnetMålsteg = nåværendeSteg.getBehandlingModell().hvertStegEtter(nåværendeSteg.getBehandlingStegType())
+        var funnetMålsteg = nåværendeSteg.getBehandlingModell().hvertStegEtter(nåværendeSteg.getBehandlingStegType())
             .filter(s -> s.getBehandlingStegType().equals(BehandlingStegType.IVERKSETT_VEDTAK))
             .findFirst();
         if (funnetMålsteg.isPresent()) {
@@ -27,8 +28,13 @@ class HenleggelseTransisjon implements StegTransisjon {
     }
 
     @Override
-    public boolean erFremoverhopp() {
-        return true;
+    public Optional<BehandlingStegType> getMålstegHvisHopp() {
+        return Optional.of(BehandlingStegType.IVERKSETT_VEDTAK);
+    }
+
+    @Override
+    public BehandlingStegResultat getRetningForHopp() {
+        return BehandlingStegResultat.FREMOVERFØRT;
     }
 
     @Override

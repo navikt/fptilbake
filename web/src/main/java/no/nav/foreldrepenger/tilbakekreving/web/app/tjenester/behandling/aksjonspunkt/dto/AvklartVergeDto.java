@@ -11,15 +11,14 @@ import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktKodeDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeType;
 import no.nav.foreldrepenger.tilbakekreving.web.server.jetty.abac.AppAbacAttributtType;
 import no.nav.vedtak.sikkerhet.abac.AbacDataAttributter;
 import no.nav.vedtak.util.InputValideringRegex;
 
-@JsonTypeName(AvklartVergeDto.AKSJONSPUNKT_KODE)
+@JsonTypeName(AksjonspunktKodeDefinisjon.AVKLAR_VERGE)
 public class AvklartVergeDto extends BekreftetAksjonspunktDto {
-
-    static final String AKSJONSPUNKT_KODE = "5030";
 
     @JsonProperty("gyldigFom")
     @NotNull
@@ -53,11 +52,6 @@ public class AvklartVergeDto extends BekreftetAksjonspunktDto {
     @Size(max = 4000)
     @Pattern(regexp = InputValideringRegex.FRITEKST)
     private String begrunnelse;
-
-    @Override
-    public String getKode() {
-        return AKSJONSPUNKT_KODE;
-    }
 
     public LocalDate getFom() {
         return fom;

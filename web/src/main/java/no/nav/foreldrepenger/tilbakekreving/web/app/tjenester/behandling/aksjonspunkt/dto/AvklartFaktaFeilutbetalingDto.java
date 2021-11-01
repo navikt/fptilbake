@@ -10,12 +10,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.FaktaFeilutbetalingDto;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktKodeDefinisjon;
 import no.nav.vedtak.util.InputValideringRegex;
 
-@JsonTypeName(AvklartFaktaFeilutbetalingDto.AKSJONSPUNKT_KODE)
+@JsonTypeName(AksjonspunktKodeDefinisjon.AVKLART_FAKTA_FEILUTBETALING)
 public class AvklartFaktaFeilutbetalingDto extends BekreftetAksjonspunktDto {
-
-    static final String AKSJONSPUNKT_KODE = "7003";
 
     @JsonProperty("begrunnelse")
     @Size(max = 4000)
@@ -29,11 +28,6 @@ public class AvklartFaktaFeilutbetalingDto extends BekreftetAksjonspunktDto {
 
     public AvklartFaktaFeilutbetalingDto() {
         super();
-    }
-
-    @Override
-    public String getKode() {
-        return AKSJONSPUNKT_KODE;
     }
 
     public String getBegrunnelse() {

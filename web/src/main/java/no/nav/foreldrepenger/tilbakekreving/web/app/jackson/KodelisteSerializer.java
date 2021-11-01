@@ -6,20 +6,20 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeliste;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
 
 /**
  * Enkel serialisering av KodeverkTabell klasser, uten at disse trenger @JsonIgnore eller lignende. Deserialisering går
  * av seg selv normalt (får null for andre felter).
  */
-public class KodelisteSerializer extends StdSerializer<Kodeliste> {
+public class KodelisteSerializer extends StdSerializer<Kodeverdi> {
 
     public KodelisteSerializer() {
-        super(Kodeliste.class);
+        super(Kodeverdi.class);
     }
 
     @Override
-    public void serialize(Kodeliste value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
+    public void serialize(Kodeverdi value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
 
         jgen.writeStartObject();
 

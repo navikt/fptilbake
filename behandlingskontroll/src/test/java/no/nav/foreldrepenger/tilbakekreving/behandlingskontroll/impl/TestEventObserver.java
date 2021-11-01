@@ -13,14 +13,13 @@ import javax.enterprise.event.Observes;
 
 import org.assertj.core.api.Assertions;
 
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.AksjonspunktEvent;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.AksjonspunkterFunnetEvent;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStatusEvent;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegOvergangEvent;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegStatusEvent;
-import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingskontrollEvent;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingStegTilstandSnapshot;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.AksjonspunktStatusEvent;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingStatusEvent;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingStegOvergangEvent;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingStegStatusEvent;
+import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.events.BehandlingskontrollEvent;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingEvent;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegTilstand;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Aksjonspunkt;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.kodeverk.Kodeverdi;
@@ -56,7 +55,7 @@ public class TestEventObserver {
         addEvent(event);
     }
 
-    public void observer(@Observes AksjonspunkterFunnetEvent event) {
+    public void observer(@Observes AksjonspunktStatusEvent event) {
         addEvent(event);
     }
 
@@ -69,7 +68,7 @@ public class TestEventObserver {
     }
 
     public static void containsExactly(AksjonspunktDefinisjon[]... ads) {
-        List<AksjonspunktEvent> aksjonspunkterEvents = getEvents(AksjonspunktEvent.class);
+        List<AksjonspunktStatusEvent>  aksjonspunkterEvents = getEvents(AksjonspunktStatusEvent.class);
         Assertions.assertThat(aksjonspunkterEvents).hasSize(ads.length);
         for (int i = 0; i < ads.length; i++) {
             List<Aksjonspunkt> aps = aksjonspunkterEvents.get(i).getAksjonspunkter();
@@ -121,9 +120,9 @@ public class TestEventObserver {
         }
     }
 
-    private static String hentKode(Optional<BehandlingStegTilstand> behandlingStegTilstand) {
+    private static String hentKode(Optional<BehandlingStegTilstandSnapshot> behandlingStegTilstand) {
         return behandlingStegTilstand
-            .map(BehandlingStegTilstand::getBehandlingStegStatus)
+            .map(BehandlingStegTilstandSnapshot::getStatus)
             .map(Kodeverdi::getKode)
             .orElse("");
     }

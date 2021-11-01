@@ -3,7 +3,6 @@ package no.nav.foreldrepenger.tilbakekreving.behandling.impl;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -119,7 +118,7 @@ public class VedtaksbrevFritekstValidatorTest {
             .build());
         faktaFeilutbetalingRepository.lagre(behandlingId, fakta);
 
-        List<VedtaksbrevFritekstPeriode> fritekstperioder = Arrays.asList(
+        List<VedtaksbrevFritekstPeriode> fritekstperioder = List.of(
             new VedtaksbrevFritekstPeriode.Builder().medBehandlingId(behandlingId).medFritekst("foo").medFritekstType(VedtaksbrevFritekstType.FAKTA_AVSNITT).medPeriode(Periode.of(jan1, jan1)).build(),
             new VedtaksbrevFritekstPeriode.Builder().medBehandlingId(behandlingId).medFritekst("foo").medFritekstType(VedtaksbrevFritekstType.FAKTA_AVSNITT).medPeriode(Periode.of(jan3, jan24)).build()
         );

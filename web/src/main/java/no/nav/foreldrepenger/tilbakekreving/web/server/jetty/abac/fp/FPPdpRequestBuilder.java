@@ -80,7 +80,7 @@ public class FPPdpRequestBuilder implements PdpRequestBuilder {
         }
 
         Set<String> aktørIder = utledAktørIder(attributter, behandlingData);
-        Set<String> aksjonspunkttype = pipRepository.hentAksjonspunkttypeForAksjonspunktkoder(attributter.getVerdier(AppAbacAttributtType.AKSJONSPUNKT_KODE));
+        Set<String> aksjonspunkttype = pipRepository.hentAksjonspunktTypeForAksjonspunktKoder(attributter.getVerdier(AppAbacAttributtType.AKSJONSPUNKT_KODE));
 
         //legger til utledede attributter til AbacAttributtSamling, slik at de kan bli logget til sporingslogg
         AbacDataAttributter utlededeAttributter = AbacDataAttributter.opprett();

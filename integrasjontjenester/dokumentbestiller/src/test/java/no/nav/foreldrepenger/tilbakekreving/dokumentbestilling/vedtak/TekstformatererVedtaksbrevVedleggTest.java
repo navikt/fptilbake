@@ -93,7 +93,7 @@ public class TekstformatererVedtaksbrevVedleggTest {
                 .build())
             .medSpråkkode(språkkode != null ? språkkode : Språkkode.nb)
             .build();
-        List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
+        List<HbVedtaksbrevPeriode> perioder = List.of(
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(januar)
                 .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(feilutbetalt)))
@@ -103,7 +103,7 @@ public class TekstformatererVedtaksbrevVedleggTest {
                     .medVilkårResultat(VilkårResultat.MANGELFULLE_OPPLYSNINGER_FRA_BRUKER)
                     .medAktsomhetResultat(Aktsomhet.SIMPEL_UAKTSOM)
                     .medFritekstVilkår("Du er heldig som slapp å betale alt!")
-                    .medSærligeGrunner(Arrays.asList(SærligGrunn.TID_FRA_UTBETALING, SærligGrunn.STØRRELSE_BELØP), null, null)
+                    .medSærligeGrunner(List.of(SærligGrunn.TID_FRA_UTBETALING, SærligGrunn.STØRRELSE_BELØP), null, null)
                     .build())
                 .medResultat(HbResultat.builder()
                     .medTilbakekrevesBeløpUtenSkatt(BigDecimal.valueOf(tilbakekreves - skatt))
@@ -136,7 +136,7 @@ public class TekstformatererVedtaksbrevVedleggTest {
                 .medVarsletDato(LocalDate.of(2020, 4, 4))
                 .build())
             .build();
-        List<HbVedtaksbrevPeriode> perioder = Arrays.asList(
+        List<HbVedtaksbrevPeriode> perioder = List.of(
             HbVedtaksbrevPeriode.builder()
                 .medPeriode(januar)
                 .medKravgrunnlag(HbKravgrunnlag.forFeilutbetaltBeløp(BigDecimal.valueOf(30001)))

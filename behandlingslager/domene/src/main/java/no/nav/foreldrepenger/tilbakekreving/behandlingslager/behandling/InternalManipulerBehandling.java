@@ -1,56 +1,33 @@
 package no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
-
-
-@ApplicationScoped
-public class InternalManipulerBehandling {
-    private BehandlingRepository behandlingRepository;
-
-    public InternalManipulerBehandling() {
-        // For CDI proxy
+public final class InternalManipulerBehandling {
+    private InternalManipulerBehandling() {
     }
 
-    @Inject
-    public InternalManipulerBehandling(BehandlingRepositoryProvider repositoryProvider) {
-        this.behandlingRepository = repositoryProvider.getBehandlingRepository();
+    public static void forceOppdaterBehandlingSteg(Behandling behandling, BehandlingStegType stegType) {
+        forceOppdaterBehandlingSteg(behandling, stegType, BehandlingStegStatus.UDEFINERT, BehandlingStegStatus.UTFØRT);
     }
 
-    /**
-     * Sett til angitt steg, default steg status, default slutt status for andre åpne steg.
-     */
-    public void forceOppdaterBehandlingSteg(Behandling behandling, BehandlingStegType stegType) {
-        forceOppdaterBehandlingSteg(behandling, stegType, BehandlingStegStatus.UDEFINERT);
-    }
-
-    /**
-     * Sett Behandling til angitt steg, angitt steg status, defalt slutt status for andre åpne steg.
-     */
-    public void forceOppdaterBehandlingSteg(Behandling behandling, BehandlingStegType stegType, BehandlingStegStatus stegStatus) {
-        forceOppdaterBehandlingSteg(behandling, stegType, stegStatus, BehandlingStegStatus.UTFØRT);
-    }
-
-    /**
-     * Sett Behandling til angitt steg, angitt steg status, angitt slutt status for andre åpne steg.
-     */
-    public void forceOppdaterBehandlingSteg(Behandling behandling, BehandlingStegType stegType, BehandlingStegStatus nesteStegStatus,
-                                            BehandlingStegStatus sluttStatusForEksisterendeSteg) {
+    public static void forceOppdaterBehandlingSteg(Behandling behandling,
+                                                   BehandlingStegType stegType,
+                                                   BehandlingStegStatus nesteStegStatus,
+                                                   BehandlingStegStatus ikkeFerdigStegStatus) {
 
         // finn riktig mapping av kodeverk slik at vi får med dette når Behandling brukes videre.
-        BehandlingStegStatus sluttStatus = sluttStatusForEksisterendeSteg == null ? BehandlingStegStatus.UTFØRT : sluttStatusForEksisterendeSteg;
-        BehandlingStegType canonStegType = canonicalize(stegType);
-
-        // Oppdater behandling til den nye stegtilstanden
-        BehandlingStegTilstand stegTilstand = new BehandlingStegTilstand(behandling, canonStegType);
-        stegTilstand.setBehandlingStegStatus(nesteStegStatus);
-        behandling.oppdaterBehandlingStegOgStatus(stegTilstand, sluttStatus);
+        var eksisterendeTilstand = behandling.getSisteBehandlingStegTilstand();
+        if (eksisterendeTilstand.isEmpty() || erUlikeSteg(stegType, eksisterendeTilstand.orElseThrow())) {
+            if (eksisterendeTilstand.isPresent() && !BehandlingStegStatus.erSluttStatus(eksisterendeTilstand.get().getBehandlingStegStatus())) {
+                eksisterendeTilstand.ifPresent(it -> it.setBehandlingStegStatus(ikkeFerdigStegStatus));
+            }
+            var tilstand = new BehandlingStegTilstand(behandling, stegType);
+            tilstand.setBehandlingStegStatus(nesteStegStatus);
+            behandling.oppdaterBehandlingStegOgStatus(tilstand);
+        } else {
+            eksisterendeTilstand.ifPresent(it -> it.setBehandlingStegStatus(nesteStegStatus));
+        }
     }
 
-    private BehandlingStegType canonicalize(BehandlingStegType stegType) {
-        return stegType == null ? null : behandlingRepository.finnBehandlingStegType(stegType.getKode());
+    private static boolean erUlikeSteg(BehandlingStegType stegType, BehandlingStegTilstand eksisterendeTilstand) {
+        return !eksisterendeTilstand.getBehandlingSteg().equals(stegType);
     }
 }

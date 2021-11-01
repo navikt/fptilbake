@@ -50,8 +50,7 @@ public class TvingHenlegglBehandlingTask implements ProsessTaskHandler {
         Behandling behandling = behandlingRepository.hentBehandling(behandlingId);
 
         if (behandling.isBehandlingPåVent()) {
-            behandlingskontrollTjeneste.taBehandlingAvVent(behandling, kontekst);
-            behandlingskontrollTjeneste.settAutopunkterTilUtført(kontekst, true);
+            behandlingskontrollTjeneste.taBehandlingAvVentSetAlleAutopunktUtført(behandling, kontekst);
         }
         behandlingskontrollTjeneste.henleggBehandling(kontekst, BehandlingResultatType.HENLAGT_TEKNISK_VEDLIKEHOLD);
         opprettHistorikkinnslagForTvingHenleggelse(behandling);
