@@ -40,13 +40,18 @@ public class AutomatiskSaksbehandlingRepository {
             inner join Kravgrunnlag431 kravgrunnlag on grunn.grunnlagØkonomi.id = kravgrunnlag.id
             inner join KravgrunnlagPeriode432 periode on kravgrunnlag.id = periode.kravgrunnlag431.id
             inner join KravgrunnlagBelop433 beløp on periode.id = beløp.kravgrunnlagPeriode432.id
-            where ap.aksjonspunktDefinisjon=:aksjonspunktDefinisjon and ap.status=:aksjonspunktStatus
-            and b.ansvarligSaksbehandler is null and b.status=:behandlingStatus
-            and b.behandlingType=:behandlingType and grunn.aktiv='J'
+            where
+            ap.aksjonspunktDefinisjon=:aksjonspunktDefinisjon
+            and ap.status=:aksjonspunktStatus
+            and b.ansvarligSaksbehandler is null
+            and b.status=:behandlingStatus
+            and b.behandlingType in (:behandlingTyper)
+            and grunn.aktiv='J'
             and NOT EXISTS (select id from BrevSporing brev where brev.behandlingId = b.id)
             and to_timestamp(kravgrunnlag.kontrollFelt,'YYYY-MM-DD-HH24.mi.ss.ff') < to_timestamp(:bestemtDato)
             and beløp.klasseType=:klasseType
-            group by b.id,f.fagsakYtelseType having
+            group by b.id,f.fagsakYtelseType
+            having
             sum(beløp.nyBelop) <= case f.fagsakYtelseType
             when 'FP' then :maksFpFeilutbetaltBeløp
             when 'SVP' then :maksSvpFeilutbetaltBeløp
@@ -57,7 +62,7 @@ public class AutomatiskSaksbehandlingRepository {
         query.setParameter("aksjonspunktDefinisjon", AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING);
         query.setParameter("aksjonspunktStatus", AksjonspunktStatus.OPPRETTET);
         query.setParameter("behandlingStatus", BehandlingStatus.UTREDES);
-        query.setParameter("behandlingType", BehandlingType.TILBAKEKREVING);
+        query.setParameter("behandlingTyper", List.of(BehandlingType.TILBAKEKREVING, BehandlingType.REVURDERING_TILBAKEKREVING));
         query.setParameter("bestemtDato", bestemtDato.atStartOfDay());
         query.setParameter("klasseType", KlasseType.FEIL);
         query.setParameter("maksFpFeilutbetaltBeløp", MaksFeilutbetaltBeløpPerYtelseType.getMaksFeilutbetaltBeløp(FagsakYtelseType.FORELDREPENGER));
