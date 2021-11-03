@@ -10,8 +10,7 @@ on:
       - 'docs/**'
 
 env:
-  GITHUB_USERNAME: x-access-token
-  GITHUB_PASSWORD: ${{ secrets.GH_ACCESS_TOKEN }} # NB: må ha PAT pga avhengighet mot private repo: familie-jms-integrasjon
+  GITHUB_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }} # NB: må ha PAT pga avhengighet mot private repo: familie-jms-integrasjon
   TZ: "Europe/Oslo"
 
 jobs:
@@ -21,6 +20,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           ref: ${{github.event.pull_request.head.ref}}
+          repository: ${{github.event.pull_request.head.repo.full_name}}
 
       - uses: actions/setup-java@v2
         with:
@@ -50,10 +50,10 @@ jobs:
         run: |
           echo "Building $BUILD_VERSION"
           export MAVEN_OPTS="-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
-          mvn test-compile -P-migrer-db -T2 --batch-mode --settings ./.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION}
+          mvn test-compile -P-migrer-db -T2 --batch-mode --settings .github/.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION}
 
       - name: Build (test)
         run: |
           echo "Building $BUILD_VERSION"
           export MAVEN_OPTS="-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
-          mvn package -T2 --batch-mode --settings ./.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION}
+          mvn package -T2 --batch-mode --settings .github/.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION}

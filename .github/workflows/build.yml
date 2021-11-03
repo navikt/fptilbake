@@ -14,17 +14,14 @@ on:
 
 env:
   IMAGE_BASE: ghcr.io/${{ github.repository }}
-  GITHUB_USERNAME: x-access-token
-  GITHUB_PASSWORD: ${{ secrets.GH_ACCESS_TOKEN }} # NB: må ha PAT pga avhengighet mot private repo: familie-jms-integrasjon
+  GITHUB_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }} # NB: må ha PAT pga avhengighet mot private repo: familie-jms-integrasjon
   TZ: "Europe/Oslo"
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Sjekk ut kode
-        uses: actions/checkout@v2.3.5
-
+      - uses: actions/checkout@v2.3.5
       - uses: actions/setup-java@v2
         with:
           distribution: 'adopt'
@@ -52,19 +49,19 @@ jobs:
       - name: Build (kompiler)
         run: |
           echo "Building $BUILD_VERSION"
-          mvn test-compile -P-migrer-db --batch-mode --settings ./.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION}
+          mvn test-compile -P-migrer-db --batch-mode --settings .github/.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION}
 
       - name: Migrer database
         run: |
           echo "Migrerer database"
-          mvn exec:java -pl migreringer --batch-mode --settings ./.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION}
+          mvn exec:java -pl migreringer --batch-mode --settings .github/.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION}
 
       - name: Build artifacts & deploy (inkl test)
         run: |
           echo "Building artifacts $BUILD_VERSION"
-          mvn install -e --batch-mode --settings ./.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION} -Dfile.encoding=UTF-8 -Pgithub
+          mvn install -e --batch-mode --settings .github/.m2/settings.xml -Dchangelist= -Dsha1=-${BUILD_VERSION} -Dfile.encoding=UTF-8 -Pgithub
           echo "Build artifacts"
-          echo "TAG=$(mvn help:evaluate --batch-mode --settings ./.m2/settings.xml --file .flattened -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
+          echo "TAG=$(mvn help:evaluate --batch-mode --settings .github/.m2/settings.xml --file .flattened -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
 
       - name: Bygg og push docker-image for distribuering
         run: |
