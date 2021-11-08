@@ -94,7 +94,7 @@ jobs:
          if: success()
          uses: actions/github-script@v5
          with:
-           github-token: ${{secrets.GITHUB_TOKEN}}
+           github-token: ${{ secrets.GITHUB_TOKEN }}
            script: |
              github.rest.issues.create( {
                owner: context.issue.owner,
@@ -110,22 +110,34 @@ jobs:
          if: success()
          uses: actions/github-script@v5
          with:
-           github-token: ${{secrets.GITHUB_TOKEN}}
+           github-token: ${{ secrets.GITHUB_TOKEN }}
            script: |
-             github.rest.issues.create( {
+             github.rest.issues.createComment( {
                owner: context.issue.owner,
                repo: context.issue.repo,
-               issue_number: ${{ steps.createdeployissue.outputs.number }},
-               body: 'Kommenter med <b>/promote område env namespace</b>, hvor <b>område</b> er fp eller k9, <b>env</b> er et gyldig clusternavn og <b>namespace</b> et eksisterende namespace i det clusteret.
-
-                <table>
-                <tr><th>kommando</th><th>Cluster</th><th>Namespace</th></tr>
-                <tr><td>promote</td><td>dev-fss</td><td>teamforeldrepenger</td></tr>
-                <tr><td>promote</td><td>prod-fss</td><td>teamforeldrepenger</td></tr>
-                <tr><td>promote</td><td>dev-fss</td><td>k9saksbehandling</td></tr>
-                <tr><td>promote</td><td>prod-fss</td><td>k9saksbehandling</td></tr>
+               issue_number: 1,
+               body: 'Kommenter med <b>/promote område env namespace</b>, hvor <b>område</b> er fp eller k9, <b>env</b> er et gyldig clusternavn og <b>namespace</b> et eksisterende namespace i det clusteret.\n\
+                <table>\n\
+                <tr><th>kommando</th><th>Cluster</th><th>Namespace</th></tr>\n\
+                <tr><td>promote</td><td>dev-fss</td><td>teamforeldrepenger</td></tr>\n\
+                <tr><td>promote</td><td>prod-fss</td><td>teamforeldrepenger</td></tr>\n\
+                <tr><td>promote</td><td>dev-fss</td><td>k9saksbehandling</td></tr>\n\
+                <tr><td>promote</td><td>prod-fss</td><td>k9saksbehandling</td></tr>\n\
                 </table>'
               })
+
+      - name: Trigg deploy av k9-tilbake til dev-fss/k9saksbehandling
+        if: success()
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+           github.rest.issues.create( {
+             owner: context.issue.owner,
+             repo: context.issue.repo,
+             issue_number: ${{ steps.createdeployissue.outputs.number }},
+             body: '/promote k9 dev-fss k9saksbehandling'
+            })
 
 
       - uses: navikt/github-app-token-generator@v1.1
@@ -146,29 +158,6 @@ jobs:
                       "version": "${{ env.TAG }}",
                       "issue_number": "${{ steps.createdeployissue.outputs.number }}"
                   }}'
-
-
-      - name: Trigg deploy av k9-tilbake til dev-fss/k9saksbehandling
-        if: success()
-        uses: actions/github-script@v5
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-           github.rest.issues.create( {
-             owner: context.issue.owner,
-             repo: context.issue.repo,
-             issue_number: ${{ steps.createdeployissue.outputs.number }},
-             body: '/promote k9 dev-fss k9saksbehandling'
-            })
-
-
-      - name: Trigg deploy av k9-tilbake til dev-fss/k9saksbehandling
-        if: success()
-        uses: peter-evans/create-or-update-comment@v1.4.5
-        with:
-          token: ${{ steps.get-token.outputs.token }}
-          issue-number: ${{ steps.createdeployissue.outputs.number }}
-          body: /promote k9 dev-fss k9saksbehandling
 
       - name: Rydd genererte artefakter fra cache før den lagres
         shell: bash
