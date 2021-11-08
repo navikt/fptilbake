@@ -136,7 +136,7 @@ jobs:
              owner: context.issue.owner,
              repo: context.issue.repo,
              issue_number: ${{ steps.createdeployissue.outputs.number }},
-             body: '/promote k9 dev-fss k9saksbehandling'
+             body: '/promote dev-fss k9saksbehandling'
             })
 
 
