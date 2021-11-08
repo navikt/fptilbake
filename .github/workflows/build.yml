@@ -126,20 +126,6 @@ jobs:
                 </table>'
               })
 
-      - name: Trigg deploy av k9-tilbake til dev-fss/k9saksbehandling
-        if: success()
-        uses: actions/github-script@v5
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-           github.rest.issues.createComment( {
-             owner: context.issue.owner,
-             repo: context.issue.repo,
-             issue_number: ${{ steps.createdeployissue.outputs.number }},
-             body: '/promote dev-fss k9saksbehandling'
-            })
-
-
       - uses: navikt/github-app-token-generator@v1.1
         id: get-token
         with:
@@ -158,6 +144,19 @@ jobs:
                       "version": "${{ env.TAG }}",
                       "issue_number": "${{ steps.createdeployissue.outputs.number }}"
                   }}'
+                
+      - name: Trigg deploy av k9-tilbake til dev-fss/k9saksbehandling
+        if: success()
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{ steps.get-token.outputs.token }}
+          script: |
+           github.rest.issues.createComment( {
+             owner: context.issue.owner,
+             repo: context.issue.repo,
+             issue_number: ${{ steps.createdeployissue.outputs.number }},
+             body: '/promote dev-fss k9saksbehandling'
+            })
 
       - name: Rydd genererte artefakter fra cache før den lagres
         shell: bash
