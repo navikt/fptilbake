@@ -115,7 +115,7 @@ jobs:
              github.rest.issues.createComment( {
                owner: context.issue.owner,
                repo: context.issue.repo,
-               issue_number: 1,
+               issue_number: ${{ steps.createdeployissue.outputs.number }},
                body: 'Kommenter med <b>/promote område env namespace</b>, hvor <b>område</b> er fp eller k9, <b>env</b> er et gyldig clusternavn og <b>namespace</b> et eksisterende namespace i det clusteret.\n\
                 <table>\n\
                 <tr><th>kommando</th><th>Cluster</th><th>Namespace</th></tr>\n\
