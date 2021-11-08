@@ -13,8 +13,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktStatus;
-import no.nav.foreldrepenger.tilbakekreving.felles.HalvRettsgebyr;
-import no.nav.foreldrepenger.tilbakekreving.felles.Rettsgebyr;
+import no.nav.foreldrepenger.tilbakekreving.felles.Satser;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 
 @ApplicationScoped
@@ -22,7 +21,7 @@ public class AutomatiskSaksbehandlingRepository {
 
     private EntityManager entityManager;
 
-    AutomatiskSaksbehandlingRepository(){
+    AutomatiskSaksbehandlingRepository() {
         // for CDI
     }
 
@@ -70,8 +69,8 @@ public class AutomatiskSaksbehandlingRepository {
         query.setParameter("behandlingTyper", List.of(BehandlingType.TILBAKEKREVING, BehandlingType.REVURDERING_TILBAKEKREVING));
         query.setParameter("bestemtDato", bestemtDato.atStartOfDay());
         query.setParameter("klasseType", KlasseType.FEIL);
-        query.setParameter("heltRettsgebyr", Rettsgebyr.getGebyr());
-        query.setParameter("halvtRettsgebyr", HalvRettsgebyr.getGebyr());
+        query.setParameter("heltRettsgebyr", Satser.rettsgebyr());
+        query.setParameter("halvtRettsgebyr", Satser.halvtRettsgebyr());
         return query.getResultList();
     }
 }

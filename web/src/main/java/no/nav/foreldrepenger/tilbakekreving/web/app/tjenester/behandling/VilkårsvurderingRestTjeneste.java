@@ -19,7 +19,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import no.nav.foreldrepenger.tilbakekreving.behandling.dto.BehandlingReferanse;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.vilkårsvurdering.VilkårsvurderingTjeneste;
-import no.nav.foreldrepenger.tilbakekreving.felles.Rettsgebyr;
+import no.nav.foreldrepenger.tilbakekreving.felles.Satser;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.DetaljerteFeilutbetalingsperioderDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.dto.VilkårsvurderteDto;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.felles.dto.BehandlingReferanseAbacAttributter;
@@ -47,7 +47,7 @@ public class VilkårsvurderingRestTjeneste {
                                         BehandlingTjeneste behandlingTjeneste) {
         this.vilkårsvurderingTjeneste = vilkårsvurderingTjeneste;
         this.behandlingTjeneste = behandlingTjeneste;
-        this.rettsgebyr = Rettsgebyr.getGebyr();
+        this.rettsgebyr = Satser.rettsgebyr();
     }
 
     @GET
