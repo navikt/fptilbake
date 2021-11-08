@@ -132,7 +132,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-           github.rest.issues.create( {
+           github.rest.issues.createComment( {
              owner: context.issue.owner,
              repo: context.issue.repo,
              issue_number: ${{ steps.createdeployissue.outputs.number }},
