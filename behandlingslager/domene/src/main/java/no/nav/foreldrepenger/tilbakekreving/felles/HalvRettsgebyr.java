@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 public class HalvRettsgebyr {
 
-    private  static final BigDecimal GEBYR = new BigDecimal(600);
+    private  static final BigDecimal GEBYR = new BigDecimal(599);
 
     private HalvRettsgebyr(){
         // sonar
