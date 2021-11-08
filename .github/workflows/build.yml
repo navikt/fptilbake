@@ -107,7 +107,6 @@ jobs:
               });
 
       -  name: Opprett deployment issue
-         id: createdeployissue
          if: success()
          uses: actions/github-script@v5
          with:
