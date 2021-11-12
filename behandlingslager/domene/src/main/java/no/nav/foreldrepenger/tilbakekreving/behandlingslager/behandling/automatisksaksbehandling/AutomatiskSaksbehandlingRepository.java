@@ -13,7 +13,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktStatus;
-import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
+import no.nav.foreldrepenger.tilbakekreving.felles.Satser;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 
 @ApplicationScoped
@@ -21,7 +21,7 @@ public class AutomatiskSaksbehandlingRepository {
 
     private EntityManager entityManager;
 
-    AutomatiskSaksbehandlingRepository(){
+    AutomatiskSaksbehandlingRepository() {
         // for CDI
     }
 
@@ -53,10 +53,14 @@ public class AutomatiskSaksbehandlingRepository {
             group by b.id,f.fagsakYtelseType
             having
             sum(beløp.nyBelop) <= case f.fagsakYtelseType
-            when 'FP' then :maksFpFeilutbetaltBeløp
-            when 'SVP' then :maksSvpFeilutbetaltBeløp
-            when 'ES' then :maksEsFeilutbetaltBeløp
-            when 'FRISINN' then :maksFrisinnFeilutbetaltBeløp else -1 end )
+            when 'FP' then :halvtRettsgebyr
+            when 'SVP' then :halvtRettsgebyr
+            when 'ES' then :halvtRettsgebyr
+            when 'PSB' then :halvtRettsgebyr
+            when 'OMP' then :halvtRettsgebyr
+            when 'FRISINN' then :heltRettsgebyr
+            else -1
+            end )
             """, Behandling.class);
 
         query.setParameter("aksjonspunktDefinisjon", AksjonspunktDefinisjon.AVKLART_FAKTA_FEILUTBETALING);
@@ -65,10 +69,8 @@ public class AutomatiskSaksbehandlingRepository {
         query.setParameter("behandlingTyper", List.of(BehandlingType.TILBAKEKREVING, BehandlingType.REVURDERING_TILBAKEKREVING));
         query.setParameter("bestemtDato", bestemtDato.atStartOfDay());
         query.setParameter("klasseType", KlasseType.FEIL);
-        query.setParameter("maksFpFeilutbetaltBeløp", MaksFeilutbetaltBeløpPerYtelseType.getMaksFeilutbetaltBeløp(FagsakYtelseType.FORELDREPENGER));
-        query.setParameter("maksSvpFeilutbetaltBeløp", MaksFeilutbetaltBeløpPerYtelseType.getMaksFeilutbetaltBeløp(FagsakYtelseType.SVANGERSKAPSPENGER));
-        query.setParameter("maksEsFeilutbetaltBeløp", MaksFeilutbetaltBeløpPerYtelseType.getMaksFeilutbetaltBeløp(FagsakYtelseType.ENGANGSTØNAD));
-        query.setParameter("maksFrisinnFeilutbetaltBeløp", MaksFeilutbetaltBeløpPerYtelseType.getMaksFeilutbetaltBeløp(FagsakYtelseType.FRISINN));
+        query.setParameter("heltRettsgebyr", Satser.rettsgebyr());
+        query.setParameter("halvtRettsgebyr", Satser.halvtRettsgebyr());
         return query.getResultList();
     }
 }
