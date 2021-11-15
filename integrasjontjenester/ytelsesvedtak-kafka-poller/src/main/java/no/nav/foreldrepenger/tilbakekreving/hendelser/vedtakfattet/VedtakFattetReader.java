@@ -52,10 +52,9 @@ public class VedtakFattetReader implements HendelseReader {
         YtelseType.PLEIEPENGER_NÆRSTÅENDE, FagsakYtelseType.PLEIEPENGER_NÆRSTÅENDE
     );
 
-    private static final Set<YtelseType> ABONNERTE_YTELSER = STØTTET_YTELSE_TYPER.getOrDefault(ApplicationName.hvilkenTilbake(), Set.of());
-
     private VedtakFattetMeldingConsumer meldingConsumer;
     private ProsessTaskTjeneste taskTjeneste;
+    private Set<YtelseType> abonnerteYtelser;
 
 
     VedtakFattetReader() {
@@ -67,6 +66,16 @@ public class VedtakFattetReader implements HendelseReader {
                               ProsessTaskTjeneste taskTjeneste) {
         this.meldingConsumer = meldingConsumer;
         this.taskTjeneste = taskTjeneste;
+        this.abonnerteYtelser = STØTTET_YTELSE_TYPER.getOrDefault(ApplicationName.hvilkenTilbake(), Set.of());
+
+    }
+
+    public VedtakFattetReader(VedtakFattetMeldingConsumer meldingConsumer,
+                              ProsessTaskTjeneste taskTjeneste,
+                              Fagsystem applikasjon) {
+        this.meldingConsumer = meldingConsumer;
+        this.taskTjeneste = taskTjeneste;
+        this.abonnerteYtelser = STØTTET_YTELSE_TYPER.getOrDefault(applikasjon, Set.of());;
     }
 
     @Override
@@ -105,7 +114,7 @@ public class VedtakFattetReader implements HendelseReader {
     private void lagHåndterHendelseProsessTask(YtelseV1 melding) {
 
         validereMelding(melding);
-        if (ABONNERTE_YTELSER.contains(melding.getType())) {
+        if (abonnerteYtelser.contains(melding.getType())) {
             taskTjeneste.lagre(lagProsessTaskData(melding));
         } else {
             logger.warn("Melding om vedtak for {} for sak={} behandling={} med vedtakstidspunkt {} ble ignorert pga ikke-støttet ytelsetype",
