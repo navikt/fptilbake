@@ -15,7 +15,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import io.swagger.v3.oas.annotations.Operation;
-import no.nav.foreldrepenger.konfig.KonfigVerdi;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.web.app.rest.ResourceLink;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.behandling.BehandlingRestTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.historikk.HistorikkRestTjeneste;
@@ -33,16 +33,14 @@ public class InitielleLinksRestTjeneste {
 
     private String kontekstPath;
 
-    public InitielleLinksRestTjeneste() {
-    }
-
     @Inject
-    public InitielleLinksRestTjeneste(@KonfigVerdi(value = "app.name") String applikasjon) {
-        switch (applikasjon) {
-            case "fptilbake" -> kontekstPath = "/fptilbake";
-            case "k9-tilbake" -> kontekstPath = "/k9/tilbake";
+    public InitielleLinksRestTjeneste() {
+        var applikasjon = ApplicationName.hvilkenTilbake();
+        kontekstPath = switch (applikasjon) {
+            case FPTILBAKE -> "/fptilbake";
+            case K9TILBAKE -> "/k9/tilbake";
             default -> throw new IllegalStateException("app.name er satt til " + applikasjon + " som ikke er en støttet verdi");
-        }
+        };
     }
 
     @GET

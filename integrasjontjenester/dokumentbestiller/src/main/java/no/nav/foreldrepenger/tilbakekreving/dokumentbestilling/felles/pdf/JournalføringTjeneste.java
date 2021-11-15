@@ -6,7 +6,6 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.aktør.Adresseinfo;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
@@ -14,12 +13,14 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.verge.VergeEntitet;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.BrevMetadata;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.fritekstbrev.JournalpostIdOgDokumentId;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.journalpostapi.JournalpostApiKlient;
 import no.nav.journalpostapi.dto.AvsenderMottaker;
 import no.nav.journalpostapi.dto.BehandlingTema;
@@ -44,24 +45,24 @@ import no.nav.vedtak.exception.IntegrasjonException;
 public class JournalføringTjeneste {
 
     private static final Logger logger = LoggerFactory.getLogger(JournalføringTjeneste.class);
+    private static final Fagsystem appName = ApplicationName.hvilkenTilbake();
 
     private BehandlingRepository behandlingRepository;
     private VergeRepository vergeRepository;
     private JournalpostApiKlient journalpostApiKlient;
     private PersoninfoAdapter aktørConsumer;
-    private String appName;
+
 
     JournalføringTjeneste() {
         //for CDI proxy
     }
 
     @Inject
-    public JournalføringTjeneste(BehandlingRepository behandlingRepository, VergeRepository vergeRepository, JournalpostApiKlient journalpostApiKlient, PersoninfoAdapter aktørConsumer, @KonfigVerdi(value = "app.name") String appName) {
+    public JournalføringTjeneste(BehandlingRepository behandlingRepository, VergeRepository vergeRepository, JournalpostApiKlient journalpostApiKlient, PersoninfoAdapter aktørConsumer) {
         this.behandlingRepository = behandlingRepository;
         this.vergeRepository = vergeRepository;
         this.journalpostApiKlient = journalpostApiKlient;
         this.aktørConsumer = aktørConsumer;
-        this.appName = appName;
     }
 
     public JournalpostIdOgDokumentId journalførVedlegg(Long behandlingId, byte[] vedleggPdf) {
@@ -175,8 +176,8 @@ public class JournalføringTjeneste {
 
     private Sak lagSaksreferanse(Fagsak fagsak) {
         return switch (appName) {
-            case "fptilbake" -> new Sak(fagsak.getSaksnummer().getVerdi(), FagsakSystem.FORELDREPENGELØSNINGEN);
-            case "k9-tilbake" -> new Sak(fagsak.getSaksnummer().getVerdi(), FagsakSystem.K9SAK);
+            case FPTILBAKE -> new Sak(fagsak.getSaksnummer().getVerdi(), FagsakSystem.FORELDREPENGELØSNINGEN);
+            case K9TILBAKE -> new Sak(fagsak.getSaksnummer().getVerdi(), FagsakSystem.K9SAK);
             default -> throw new IllegalArgumentException("Ikke-støttet app.name: " + appName);
         };
     }

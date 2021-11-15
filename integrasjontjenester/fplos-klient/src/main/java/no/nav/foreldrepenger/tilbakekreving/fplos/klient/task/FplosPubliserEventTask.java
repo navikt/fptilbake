@@ -19,7 +19,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.FaktaFeilutbetalingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktKodeDefinisjon;
@@ -29,6 +28,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakProsesstaskRekkefølge;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.task.ProsessTaskDataWrapper;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.fplos.klient.producer.FplosKafkaProducer;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagPeriode432;
@@ -50,8 +50,6 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
     public static final String PROPERTY_KRAVGRUNNLAG_MANGLER_AKSJONSPUNKT_STATUS_KODE = "kravgrunnlagManglerAksjonspunktStatusKode";
     public static final String FP_DEFAULT_HREF = "/fpsak/fagsak/%s/behandling/%s/?punkt=default&fakta=default";
     public static final String K9_DEFAULT_HREF = "/k9/web/fagsak/%s/behandling/%s/?punkt=default&fakta=default";
-    private static final String APPLIKASJON_NAVN_K9_TILBAKE = "k9-tilbake";
-    private static final String APPLIKASJON_NAVN_FPTILBAKE = "fptilbake";
     private String fagsystem;
     private String defaultHRef;
 
@@ -71,19 +69,25 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
     @Inject
     public FplosPubliserEventTask(BehandlingRepositoryProvider repositoryProvider,
                                   FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste,
+                                  FplosKafkaProducer fplosKafkaProducer) {
+        this(repositoryProvider, faktaFeilutbetalingTjeneste, fplosKafkaProducer, ApplicationName.hvilkenTilbake());
+    }
+
+    public FplosPubliserEventTask(BehandlingRepositoryProvider repositoryProvider,
+                                  FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste,
                                   FplosKafkaProducer fplosKafkaProducer,
-                                  @KonfigVerdi("app.name") String applikasjonNavn) {
+                                  Fagsystem applikasjonNavn) {
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
         this.faktaFeilutbetalingTjeneste = faktaFeilutbetalingTjeneste;
         this.fplosKafkaProducer = fplosKafkaProducer;
 
         switch (applikasjonNavn) {
-            case APPLIKASJON_NAVN_FPTILBAKE -> {
+            case FPTILBAKE -> {
                 fagsystem = Fagsystem.FPTILBAKE.getKode();
                 defaultHRef = FP_DEFAULT_HREF;
             }
-            case APPLIKASJON_NAVN_K9_TILBAKE -> {
+            case K9TILBAKE -> {
                 fagsystem = Fagsystem.K9TILBAKE.getKode();
                 defaultHRef = K9_DEFAULT_HREF;
             }

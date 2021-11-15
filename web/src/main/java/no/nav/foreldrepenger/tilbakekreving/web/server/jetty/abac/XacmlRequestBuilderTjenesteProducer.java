@@ -9,7 +9,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.foreldrepenger.konfig.KonfigVerdi;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.Fptilbake;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.K9tilbake;
 import no.nav.vedtak.sikkerhet.pdp.XacmlRequestBuilderTjeneste;
@@ -25,14 +25,14 @@ public class XacmlRequestBuilderTjenesteProducer {
     }
 
     @Inject
-    public XacmlRequestBuilderTjenesteProducer(@KonfigVerdi(value = "app.name") String applikasjon,
-                                               @Any Instance<XacmlRequestBuilderTjeneste> xacmlRequestBuilderTjenester) {
+    public XacmlRequestBuilderTjenesteProducer(@Any Instance<XacmlRequestBuilderTjeneste> xacmlRequestBuilderTjenester) {
+        var applikasjon = ApplicationName.hvilkenTilbake();
         switch (applikasjon) {
-            case "fptilbake" -> {
+            case FPTILBAKE -> {
                 logger.info("Bruker XacmlRequestBuilderTjeneste for fptilbake");
                 xacmlRequestBuilderTjeneste = xacmlRequestBuilderTjenester.select(new Fptilbake.FptilbakeAnnotationLiteral()).get();
             }
-            case "k9-tilbake" -> {
+            case K9TILBAKE -> {
                 logger.info("Bruker XacmlRequestBuilderTjeneste for k9");
                 xacmlRequestBuilderTjeneste = xacmlRequestBuilderTjenester.select(new K9tilbake.K9tilbakeAnnotationLiteral()).get();
             }

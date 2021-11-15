@@ -6,7 +6,7 @@ import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.konfig.KonfigVerdi;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.Fptilbake;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.K9tilbake;
 
@@ -20,12 +20,13 @@ public class HendelseReaderProducer {
     }
 
     @Inject
-    public HendelseReaderProducer(@KonfigVerdi(value = "app.name") String applikasjon, @Any Instance<HendelseReader> hendelseReaders) {
-        switch (applikasjon) {
-            case "fptilbake" -> hendelseReader = hendelseReaders.select(new Fptilbake.FptilbakeAnnotationLiteral()).get();
-            case "k9-tilbake" -> hendelseReader = hendelseReaders.select(new K9tilbake.K9tilbakeAnnotationLiteral()).get();
+    public HendelseReaderProducer(@Any Instance<HendelseReader> hendelseReaders) {
+        var applikasjon = ApplicationName.hvilkenTilbake();
+        hendelseReader = switch (applikasjon) {
+            case FPTILBAKE -> hendelseReaders.select(new Fptilbake.FptilbakeAnnotationLiteral()).get();
+            case K9TILBAKE -> hendelseReaders.select(new K9tilbake.K9tilbakeAnnotationLiteral()).get();
             default -> throw new IllegalStateException("app.name er satt til " + applikasjon + " som ikke er en støttet verdi");
-        }
+        };
     }
 
     @Produces

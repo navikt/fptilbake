@@ -86,6 +86,13 @@ public class HendelseTaskDataWrapper {
         Objects.requireNonNull(prosessTaskData.getPropertyValue(FAGSAK_YTELSE_TYPE));
     }
 
+    public void validerTaskDataHåndterVedtakFattet() {
+        Objects.requireNonNull(prosessTaskData.getAktørId());
+        Objects.requireNonNull(prosessTaskData.getPropertyValue(EKSTERN_BEHANDLING_UUID));
+        Objects.requireNonNull(prosessTaskData.getPropertyValue(SAKSNUMMER));
+        Objects.requireNonNull(prosessTaskData.getPropertyValue(FAGSAK_YTELSE_TYPE));
+    }
+
     public void validerTaskDataOpprettBehandling() {
         validerTaskDataHåndterHendelse();
         Objects.requireNonNull(getSaksnummer());

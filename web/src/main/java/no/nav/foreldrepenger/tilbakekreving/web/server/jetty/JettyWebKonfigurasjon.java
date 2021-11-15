@@ -1,6 +1,7 @@
 package no.nav.foreldrepenger.tilbakekreving.web.server.jetty;
 
 import no.nav.foreldrepenger.konfig.Environment;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 
 public class JettyWebKonfigurasjon implements AppKonfigurasjon {
     private static final Environment ENV = Environment.current();
@@ -23,10 +24,10 @@ public class JettyWebKonfigurasjon implements AppKonfigurasjon {
 
     @Override
     public String getContextPath() {
-        String appname = ENV.getProperty("app.name");
+        var appname = ApplicationName.hvilkenTilbake();
         return switch (appname) {
-            case "fptilbake" -> "/fptilbake";
-            case "k9-tilbake" -> "/k9/tilbake";
+            case FPTILBAKE -> "/fptilbake";
+            case K9TILBAKE -> "/k9/tilbake";
             default -> throw new IllegalArgumentException("Ikke-støttet applikasjonsnavn: " + appname);
         };
     }

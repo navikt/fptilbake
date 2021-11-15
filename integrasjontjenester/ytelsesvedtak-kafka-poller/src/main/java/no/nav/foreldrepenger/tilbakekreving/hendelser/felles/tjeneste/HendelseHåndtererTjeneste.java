@@ -1,6 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.hendelser.felles.tjeneste;
 
-import java.util.Optional;
 import java.util.UUID;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -11,9 +10,11 @@ import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.tilbakekreving.behandling.task.HendelseTaskDataWrapper;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.tilbakekrevingsvalg.VidereBehandling;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.EksternBehandlingsinfoDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.TilbakekrevingValgDto;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
@@ -24,31 +25,42 @@ public class HendelseHåndtererTjeneste {
 
     private ProsessTaskTjeneste taskTjeneste;
     private FagsystemKlient fagsystemKlient;
+    private EksternBehandlingRepository eksternBehandlingRepository;
 
     HendelseHåndtererTjeneste() {
         // CDI
     }
 
     @Inject
-    public HendelseHåndtererTjeneste(ProsessTaskTjeneste taskTjeneste, FagsystemKlient fagsystemKlient) {
+    public HendelseHåndtererTjeneste(ProsessTaskTjeneste taskTjeneste,
+                                     FagsystemKlient fagsystemKlient,
+                                     EksternBehandlingRepository eksternBehandlingRepository) {
         this.taskTjeneste = taskTjeneste;
         this.fagsystemKlient = fagsystemKlient;
+        this.eksternBehandlingRepository = eksternBehandlingRepository;
     }
 
-    public void håndterHendelse(HendelseTaskDataWrapper hendelseTaskDataWrapper) {
-        Henvisning henvisning = hendelseTaskDataWrapper.getHenvisning();
-        Optional<TilbakekrevingValgDto> tbkDataOpt = fagsystemKlient.hentTilbakekrevingValg(UUID.fromString(hendelseTaskDataWrapper.getBehandlingUuid()));
+    public void håndterHendelse(HendelseTaskDataWrapper hendelseTaskDataWrapper, Henvisning henvisning) {
+        fagsystemKlient.hentTilbakekrevingValg(UUID.fromString(hendelseTaskDataWrapper.getBehandlingUuid()))
+            .ifPresent(tbkData -> {
+                if (erRelevantHendelseForOpprettTilbakekreving(tbkData)) {
+                    if (eksternBehandlingRepository.hentFraHenvisning(henvisning).isPresent()) {
+                        logger.info("Hendelse={} allerede opprettet tilbakekreving for henvisning={}", tbkData.getVidereBehandling(), henvisning);
+                    } else {
+                        logger.info("Hendelse={} er relevant for tilbakekreving opprett for henvisning={}", tbkData.getVidereBehandling(), henvisning);
+                        lagOpprettBehandlingTask(hendelseTaskDataWrapper, henvisning);
+                    }
+                } else if (erRelevantHendelseForOppdatereTilbakekreving(tbkData)) {
+                    logger.info("Hendelse={} for henvisning={} var tidligere relevant for å oppdatere behandling. Nå ignoreres den",
+                        tbkData.getVidereBehandling(), henvisning);
+                }
+            });
+    }
 
-        if (tbkDataOpt.isPresent()) {
-            TilbakekrevingValgDto tbkData = tbkDataOpt.get();
-            if (erRelevantHendelseForOpprettTilbakekreving(tbkData)) {
-                logger.info("Hendelse={} er relevant for tilbakekreving opprett for henvisning={}", tbkData.getVidereBehandling(), henvisning);
-                lagOpprettBehandlingTask(hendelseTaskDataWrapper);
-            } else if (erRelevantHendelseForOppdatereTilbakekreving(tbkData)) {
-                logger.info("Hendelse={} for henvisning={} var tidligere relevant for å oppdatere behandling. Nå ignoreres den",
-                    tbkData.getVidereBehandling(), henvisning);
-            }
-        }
+    public Henvisning hentHenvisning(UUID behandling) {
+        return fagsystemKlient.hentBehandlingOptional(behandling)
+            .map(EksternBehandlingsinfoDto::getHenvisning)
+            .orElseThrow(() -> new NullPointerException("Henvisning fra saksbehandlingsklienten var null for behandling " + behandling.toString()));
     }
 
     private boolean erRelevantHendelseForOpprettTilbakekreving(TilbakekrevingValgDto tbkData) {
@@ -60,9 +72,9 @@ public class HendelseHåndtererTjeneste {
         return VidereBehandling.TILBAKEKR_OPPDATER.equals(tbkData.getVidereBehandling());
     }
 
-    private void lagOpprettBehandlingTask(HendelseTaskDataWrapper hendelseTaskDataWrapper) {
+    private void lagOpprettBehandlingTask(HendelseTaskDataWrapper hendelseTaskDataWrapper, Henvisning henvisning) {
         HendelseTaskDataWrapper taskData = HendelseTaskDataWrapper.lagWrapperForOpprettBehandling(hendelseTaskDataWrapper.getBehandlingUuid(),
-            hendelseTaskDataWrapper.getHenvisning(),
+            henvisning,
             hendelseTaskDataWrapper.getAktørId(),
             hendelseTaskDataWrapper.getSaksnummer());
 

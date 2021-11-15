@@ -11,8 +11,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.konfig.KonfigVerdi;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.JournalpostId;
 import no.nav.foreldrepenger.tilbakekreving.dokumentbestilling.felles.BrevMottaker;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.journalpostapi.dto.sak.FagsakSystem;
 import no.nav.vedtak.felles.integrasjon.rest.OidcRestClient;
 
@@ -23,17 +25,17 @@ public class DokdistKlient {
 
     private OidcRestClient oidcRestClient;
     private URI dokdistUri;
-    private String applicationName;
+    private Fagsystem application;
 
     DokdistKlient() {
         //for CDI proxy
     }
 
     @Inject
-    public DokdistKlient(OidcRestClient oidcRestClient, @KonfigVerdi(value = "dokdist.rest.distribuer.journalpost") String dokdistUrl, @KonfigVerdi("app.name") String applicationName) {
+    public DokdistKlient(OidcRestClient oidcRestClient, @KonfigVerdi(value = "dokdist.rest.distribuer.journalpost") String dokdistUrl) {
         this.oidcRestClient = oidcRestClient;
         this.dokdistUri = UriBuilder.fromUri(dokdistUrl).build();
-        this.applicationName = applicationName;
+        this.application = ApplicationName.hvilkenTilbake();
     }
 
     /**
@@ -54,19 +56,19 @@ public class DokdistKlient {
     }
 
     private FagsakSystem getBestillendeFagsystem() {
-        return switch (applicationName) {
-            case "fptilbake" -> FagsakSystem.FORELDREPENGELØSNINGEN;
-            case "k9-tilbake" -> FagsakSystem.K9SAK;
-            default -> throw new IllegalArgumentException("Ikke-støttet app.name: " + applicationName);
+        return switch (application) {
+            case FPTILBAKE -> FagsakSystem.FORELDREPENGELØSNINGEN;
+            case K9TILBAKE -> FagsakSystem.K9SAK;
+            default -> throw new IllegalArgumentException("Ikke-støttet applikasjon: " + application);
         };
     }
 
     private String getDokumentProdAppKode() {
         /* koder avtalt med team som eier dokdist */
-        return switch (applicationName) {
-            case "fptilbake" -> "FPTILBAKE";
-            case "k9-tilbake" -> "K9_TILBAKE";
-            default -> throw new IllegalArgumentException("Ikke-støttet app.name: " + applicationName);
+        return switch (application) {
+            case FPTILBAKE -> "FPTILBAKE";
+            case K9TILBAKE -> "K9_TILBAKE";
+            default -> throw new IllegalArgumentException("Ikke-støttet applikasjon: " + application);
         };
     }
 

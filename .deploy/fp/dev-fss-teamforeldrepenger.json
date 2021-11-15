@@ -32,6 +32,7 @@
     "TILBAKEKREVING_V1_URL": "https://cics-q1.adeo.no/oppdrag/K231CW80",
     "DOKUMENTPRODUKSJON_V2_URL": "https://dokprod-q1.nais.preprod.local/dokprod/ws/dokumentproduksjon/v2",
     "BOOTSTRAP_SERVERS": "b27apvl00045.preprod.local:8443,b27apvl00046.preprod.local:8443,b27apvl00047.preprod.local:8443",
+    "KAFKA_VEDTAKFATTET_TOPIC": "privat-familie-vedtakFattet-v1-q1",
     "FAGSYSTEM_FATTEDE_VEDTAK_TOPIC_URL": "privat-foreldrepenger-tilkjentytelse-v1-q1",
     "TILBAKEKREVING_BRUKERDIALOG_HENDELSE_V1_TOPIC_URL": "privat-tilbakekreving-brukerdialog-q1",
     "KAFKA_FPLOS_TOPIC": "privat-tilbakekreving-fploshendelse-v1-q1",
