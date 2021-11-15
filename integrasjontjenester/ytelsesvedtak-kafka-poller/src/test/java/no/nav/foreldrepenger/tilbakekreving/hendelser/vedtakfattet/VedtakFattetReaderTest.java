@@ -43,12 +43,12 @@ public class VedtakFattetReaderTest {
     private ProsessTaskTjeneste taskTjeneste = mock(ProsessTaskTjeneste.class);
 
     private VedtakFattetMeldingConsumer meldingConsumer = mock(VedtakFattetMeldingConsumer.class);
-    private VedtakFattetReader reader = new VedtakFattetReader(meldingConsumer, taskTjeneste);
 
 
     @Test
     public void skal_hente_og_behandle_meldinger() {
         //Arrange
+        var reader = new VedtakFattetReader(meldingConsumer, taskTjeneste, no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem.FPTILBAKE);
         var melding = opprettYtelseMelding(Fagsystem.FPSAK, YtelseType.FORELDREPENGER, SAKSNUMMER_FP);
         when(meldingConsumer.lesMeldinger()).thenReturn(Collections.singletonList(melding));
 
@@ -70,6 +70,7 @@ public class VedtakFattetReaderTest {
 
     @Test
     public void skal_vente_med_commit_sync_til_transaksjonen_er_ferdig() {
+        var reader = new VedtakFattetReader(meldingConsumer, taskTjeneste, no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem.FPTILBAKE);
         var melding = opprettYtelseMelding(Fagsystem.FPSAK, YtelseType.FORELDREPENGER, SAKSNUMMER_FP);
         when(meldingConsumer.lesMeldinger()).thenReturn(Collections.singletonList(melding));
         PostTransactionHandler postTransactionHandler = reader.hentOgBehandleMeldinger();
@@ -83,6 +84,7 @@ public class VedtakFattetReaderTest {
     @Test
     public void skal_ikke_opprette_prosess_task_når_det_ikke_finnes_meldinger_lest() {
         //Arrange
+        var reader = new VedtakFattetReader(meldingConsumer, taskTjeneste, no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem.FPTILBAKE);
         when(meldingConsumer.lesMeldinger()).thenReturn(Collections.emptyList());
 
         //Act
@@ -96,6 +98,7 @@ public class VedtakFattetReaderTest {
 
     @Test
     public void skal_lese_og_håndtere_k9_vedtak_hendelser() {
+        var reader = new VedtakFattetReader(meldingConsumer, taskTjeneste, no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem.K9TILBAKE);
         when(meldingConsumer.lesMeldinger()).thenReturn(Lists.newArrayList(opprettYtelseMelding(Fagsystem.K9SAK, YtelseType.PLEIEPENGER_SYKT_BARN, SAKSNUMMER_K9)));
         reader.hentOgBehandleMeldinger();
         var captor = ArgumentCaptor.forClass(ProsessTaskData.class);
@@ -106,13 +109,6 @@ public class VedtakFattetReaderTest {
         assertThat(taskData.getSaksnummer()).isEqualTo(SAKSNUMMER_K9);
         assertThat(taskData.getPropertyValue(TaskProperties.FAGSAK_YTELSE_TYPE)).isEqualTo(FagsakYtelseType.PLEIEPENGER_SYKT_BARN.getKode());
         assertThat(taskData.getPropertyValue(TaskProperties.EKSTERN_BEHANDLING_UUID)).isEqualTo(BEHANDLING_UUID.toString());
-    }
-
-    @Test
-    public void skal_lese_men_ikke_håndtere_k9_vedtak_hendelser_for_omsorgspenger() {
-        var melding = opprettYtelseMelding(Fagsystem.K9SAK, YtelseType.OMSORGSPENGER, SAKSNUMMER_K9);
-        when(meldingConsumer.lesMeldinger()).thenReturn(Lists.newArrayList(melding));
-        verifyNoInteractions(taskTjeneste);
     }
 
     private static YtelseV1 opprettYtelseMelding(Fagsystem system, YtelseType ytelseType, String saksnummer) {
