@@ -27,9 +27,6 @@ public class JettyFPDevServer extends JettyServer {
 
     private static final Environment ENV = Environment.current();
 
-    /**
-     * @see https://docs.oracle.com/en/java/javase/11/security/java-secure-socket-extension-jsse-reference-guide.html
-     */
     private static final String TRUSTSTORE_PASSW_PROP = "javax.net.ssl.trustStorePassword";
     private static final String TRUSTSTORE_PATH_PROP = "javax.net.ssl.trustStore";
 
@@ -50,16 +47,16 @@ public class JettyFPDevServer extends JettyServer {
             }
         }
 
-        JettyFPDevServer devServer = new JettyFPDevServer();
-        devServer.bootStrap();
+        new JettyFPDevServer(new JettyWebKonfigurasjon(8030)).bootStrap();
     }
 
-    public JettyFPDevServer() {
-        super(new JettyDevKonfigurasjon());
+    public JettyFPDevServer(JettyWebKonfigurasjon webKonfigurasjon) {
+        super(webKonfigurasjon);
     }
 
     @Override
     protected void konfigurer() throws Exception {
+        System.setProperty("conf", "../web/src/main/resources/jetty/");
         konfigurerLogback();
         super.konfigurer();
     }
@@ -93,31 +90,27 @@ public class JettyFPDevServer extends JettyServer {
 
     @Override
     protected void konfigurerSikkerhet() {
-        System.setProperty("conf", "../web/src/main/resources/jetty/");
+        initCryptoStoreConfig();
         super.konfigurerSikkerhet();
-
-        // truststore avgjør hva vi stoler på av sertifikater når vi gjør utadgående TLS kall
-        initCryptoStoreConfig("truststore", TRUSTSTORE_PATH_PROP, TRUSTSTORE_PASSW_PROP, "changeit");
     }
 
-    private static String initCryptoStoreConfig(String storeName, String storeProperty, String storePasswordProperty, String defaultPassword) {
-        String defaultLocation = ENV.getProperty("user.home", ".") + "/.modig/" + storeName + ".jks";
+    private static void initCryptoStoreConfig() {
+        String defaultLocation = ENV.getProperty("user.home", ".") + "/.modig/truststore.jks";
 
-        String storePath = ENV.getProperty(storeProperty, defaultLocation);
+        String storePath = ENV.getProperty(JettyFPDevServer.TRUSTSTORE_PATH_PROP, defaultLocation);
         File storeFile = new File(storePath);
         if (!storeFile.exists()) {
-            throw new IllegalStateException("Finner ikke " + storeName + " i " + storePath
-                + "\n\tKonfigurer enten som System property \'" + storeProperty + "\' eller environment variabel \'"
-                + storeProperty.toUpperCase().replace('.', '_') + "\'");
+            throw new IllegalStateException("Finner ikke truststore i " + storePath
+                + "\n\tKonfigurer enten som System property \'" + JettyFPDevServer.TRUSTSTORE_PATH_PROP + "\' eller environment variabel \'"
+                + JettyFPDevServer.TRUSTSTORE_PATH_PROP.toUpperCase().replace('.', '_') + "\'");
         }
-        String password = ENV.getProperty(storePasswordProperty, defaultPassword);
+        String password = ENV.getProperty(JettyFPDevServer.TRUSTSTORE_PASSW_PROP, "changeit");
         if (password == null) {
-            throw new IllegalStateException("Passord for å aksessere store " + storeName + " i " + storePath + " er null");
+            throw new IllegalStateException("Passord for å aksessere store truststore i " + storePath + " er null");
         }
 
-        System.setProperty(storeProperty, storeFile.getAbsolutePath());
-        System.setProperty(storePasswordProperty, password);
-        return storePath;
+        System.setProperty(JettyFPDevServer.TRUSTSTORE_PATH_PROP, storeFile.getAbsolutePath());
+        System.setProperty(JettyFPDevServer.TRUSTSTORE_PASSW_PROP, password);
     }
 
     @Override

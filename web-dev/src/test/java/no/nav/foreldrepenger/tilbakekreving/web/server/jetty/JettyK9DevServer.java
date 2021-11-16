@@ -21,16 +21,14 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.util.StatusPrinter;
+import no.nav.foreldrepenger.konfig.Environment;
 
 public class JettyK9DevServer extends JettyServer {
 
-    /**
-     * @see https://docs.oracle.com/en/java/javase/11/security/java-secure-socket-extension-jsse-reference-guide.html
-     */
+    private static final Environment ENV = Environment.current();
+
     private static final String TRUSTSTORE_PASSW_PROP = "javax.net.ssl.trustStorePassword";
     private static final String TRUSTSTORE_PATH_PROP = "javax.net.ssl.trustStore";
-    private static final String KEYSTORE_PASSW_PROP = "no.nav.modig.security.appcert.password";
-    private static final String KEYSTORE_PATH_PROP = "no.nav.modig.security.appcert.keystore";
     private static final String CONTEXT_PATH = "/k9/tilbake";
 
 
@@ -51,16 +49,16 @@ public class JettyK9DevServer extends JettyServer {
             }
         }
 
-        JettyK9DevServer devServer = new JettyK9DevServer();
-        devServer.bootStrap();
+        new JettyK9DevServer(new JettyWebKonfigurasjon(8030)).bootStrap();
     }
 
-    public JettyK9DevServer() {
-        super(new JettyDevKonfigurasjon());
+    public JettyK9DevServer(JettyWebKonfigurasjon webKonfigurasjon) {
+        super(webKonfigurasjon);
     }
 
     @Override
     protected void konfigurer() throws Exception {
+        System.setProperty("conf", "src/main/resources/jetty/");
         konfigurerLogback();
         super.konfigurer();
     }
@@ -94,45 +92,27 @@ public class JettyK9DevServer extends JettyServer {
 
     @Override
     protected void konfigurerSikkerhet() {
-        System.setProperty("conf", "src/main/resources/jetty/");
+        initCryptoStoreConfig();
         super.konfigurerSikkerhet();
-
-        // truststore avgjør hva vi stoler på av sertifikater når vi gjør utadgående TLS kall
-        initCryptoStoreConfig("truststore", TRUSTSTORE_PATH_PROP, TRUSTSTORE_PASSW_PROP, "changeit");
-
-        // keystore genererer sertifikat og TLS for innkommende kall. Bruker standard prop hvis definert, ellers faller tilbake på modig props
-        var keystoreProp = System.getProperty("javax.net.ssl.keyStore") != null ? "javax.net.ssl.keyStore" : KEYSTORE_PATH_PROP;
-        var keystorePasswProp = System.getProperty("javax.net.ssl.keyStorePassword") != null ? "javax.net.ssl.keyStorePassword" : KEYSTORE_PASSW_PROP;
-        initCryptoStoreConfig("keystore", keystoreProp, keystorePasswProp, "changeit");
     }
 
-    private static String initCryptoStoreConfig(String storeName, String storeProperty, String storePasswordProperty, String defaultPassword) {
-        String defaultLocation = getProperty("user.home", ".") + "/.modig/" + storeName + ".jks";
+    private static void initCryptoStoreConfig() {
+        String defaultLocation = ENV.getProperty("user.home", ".") + "/.modig/truststore.jks";
 
-        String storePath = getProperty(storeProperty, defaultLocation);
+        String storePath = ENV.getProperty(JettyK9DevServer.TRUSTSTORE_PATH_PROP, defaultLocation);
         File storeFile = new File(storePath);
         if (!storeFile.exists()) {
-            throw new IllegalStateException("Finner ikke " + storeName + " i " + storePath
-                + "\n\tKonfigurer enten som System property \'" + storeProperty + "\' eller environment variabel \'"
-                + storeProperty.toUpperCase().replace('.', '_') + "\'");
+            throw new IllegalStateException("Finner ikke truststore i " + storePath
+                + "\n\tKonfigurer enten som System property \'" + JettyK9DevServer.TRUSTSTORE_PATH_PROP + "\' eller environment variabel \'"
+                + JettyK9DevServer.TRUSTSTORE_PATH_PROP.toUpperCase().replace('.', '_') + "\'");
         }
-        String password = getProperty(storePasswordProperty, defaultPassword);
+        String password = ENV.getProperty(JettyK9DevServer.TRUSTSTORE_PASSW_PROP, "changeit");
         if (password == null) {
-            throw new IllegalStateException("Passord for å aksessere store " + storeName + " i " + storePath + " er null");
+            throw new IllegalStateException("Passord for å aksessere store truststore i " + storePath + " er null");
         }
 
-        System.setProperty(storeProperty, storeFile.getAbsolutePath());
-        System.setProperty(storePasswordProperty, password);
-        return storePath;
-    }
-
-    private static String getProperty(String key, String defaultValue) {
-        String val = System.getProperty(key, defaultValue);
-        if (val == null) {
-            val = System.getenv(key.toUpperCase().replace('.', '_'));
-            val = val == null ? defaultValue : val;
-        }
-        return val;
+        System.setProperty(JettyK9DevServer.TRUSTSTORE_PATH_PROP, storeFile.getAbsolutePath());
+        System.setProperty(JettyK9DevServer.TRUSTSTORE_PASSW_PROP, password);
     }
 
     @Override
