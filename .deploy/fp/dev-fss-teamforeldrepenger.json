@@ -15,7 +15,6 @@
     "https://fptilbake.dev.intern.nav.no/"
   ],
   "env": {
-    "ABAC_PDP_ENDPOINT_URL": "http://abac-foreldrepenger.teamabac/application/authorize",
     "SECURITYTOKENSERVICE_URL": "https://sts-q1.preprod.local/SecurityTokenServiceProvider/",
     "OIDC_STS_ISSUER_URL": "https://security-token-service.nais.preprod.local",
     "OIDC_STS_JWKS_URL": "http://security-token-service.default/rest/v1/sts/jwks",
