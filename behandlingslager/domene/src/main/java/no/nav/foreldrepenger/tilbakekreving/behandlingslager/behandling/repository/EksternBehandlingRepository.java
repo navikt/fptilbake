@@ -114,6 +114,7 @@ public class EksternBehandlingRepository {
         EksternBehandling eksternBehandling = hentFraInternId(internId);
         eksternBehandling.deaktiver();
         entityManager.persist(eksternBehandling);
+        entityManager.flush();
     }
 
     /**

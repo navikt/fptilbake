@@ -345,6 +345,7 @@ public class ForvaltningBehandlingRestTjeneste {
     private void fjernKobling(ØkonomiXmlMottatt mottattXml) {
         EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraHenvisning(mottattXml.getHenvisning()).orElseThrow();
         eksternBehandlingRepository.deaktivateTilkobling(eksternBehandling.getInternId());
+        mottattXmlRepository.fjernTilkobling(mottattXml.getId());
         logger.info("Deaktiverer kobling mellom behandlingId {} og mottattXmlId {} for {}", eksternBehandling.getInternId(), mottattXml.getId(), mottattXml.getSaksnummer());
     }
 
