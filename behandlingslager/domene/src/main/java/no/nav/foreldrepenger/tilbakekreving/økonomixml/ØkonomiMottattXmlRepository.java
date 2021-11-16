@@ -73,6 +73,14 @@ public class ØkonomiMottattXmlRepository {
         ØkonomiXmlMottatt entity = finnMottattXml(mottattXmlId);
         entity.lagTilkobling();
         entityManager.persist(entity);
+        entityManager.flush();
+    }
+
+    public void fjernTilkobling(Long mottattXmlId) {
+        ØkonomiXmlMottatt entity = finnMottattXml(mottattXmlId);
+        entity.fjernKobling();
+        entityManager.persist(entity);
+        entityManager.flush();
     }
 
     public boolean erMottattXmlTilkoblet(Long mottattXmlId) {

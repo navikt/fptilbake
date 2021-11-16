@@ -4,6 +4,7 @@ import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.CREAT
 import static no.nav.vedtak.sikkerhet.abac.BeskyttetRessursActionAttributt.READ;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -31,9 +32,13 @@ import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.TaskPro
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.KravgrunnlagMapper;
 import no.nav.foreldrepenger.tilbakekreving.behandling.steg.hentgrunnlag.førstegang.KravgrunnlagXmlUnmarshaller;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandlingsresultat;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.ekstern.EksternBehandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingresultatRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagValidator;
@@ -67,6 +72,7 @@ public class ForvaltningBehandlingRestTjeneste {
     private static final Logger logger = LoggerFactory.getLogger(ForvaltningBehandlingRestTjeneste.class);
 
     private BehandlingRepository behandlingRepository;
+    private BehandlingresultatRepository behandlingresultatRepository;
     private ProsessTaskTjeneste taskTjeneste;
     private ØkonomiMottattXmlRepository mottattXmlRepository;
     private KravgrunnlagRepository grunnlagRepository;
@@ -74,6 +80,7 @@ public class ForvaltningBehandlingRestTjeneste {
     private ØkonomiSendtXmlRepository økonomiSendtXmlRepository;
     private TilbakekrevingsvedtakTjeneste tilbakekrevingsvedtakTjeneste;
     private KravgrunnlagTjeneste kravgrunnlagTjeneste;
+    private EksternBehandlingRepository eksternBehandlingRepository;
 
     public ForvaltningBehandlingRestTjeneste() {
         // for CDI
@@ -82,12 +89,15 @@ public class ForvaltningBehandlingRestTjeneste {
     @Inject
     public ForvaltningBehandlingRestTjeneste(BehandlingRepositoryProvider repositoryProvider,
                                              ProsessTaskTjeneste taskTjeneste,
+                                             BehandlingresultatRepository behandlingresultatRepository,
                                              ØkonomiMottattXmlRepository mottattXmlRepository,
                                              KravgrunnlagMapper kravgrunnlagMapper,
                                              ØkonomiSendtXmlRepository økonomiSendtXmlRepository,
                                              TilbakekrevingsvedtakTjeneste tilbakekrevingsvedtakTjeneste,
-                                             KravgrunnlagTjeneste kravgrunnlagTjeneste) {
+                                             KravgrunnlagTjeneste kravgrunnlagTjeneste,
+                                             EksternBehandlingRepository eksternBehandlingRepository) {
         this.behandlingRepository = repositoryProvider.getBehandlingRepository();
+        this.behandlingresultatRepository = behandlingresultatRepository;
         this.taskTjeneste = taskTjeneste;
         this.mottattXmlRepository = mottattXmlRepository;
         this.grunnlagRepository = repositoryProvider.getGrunnlagRepository();
@@ -95,6 +105,7 @@ public class ForvaltningBehandlingRestTjeneste {
         this.økonomiSendtXmlRepository = økonomiSendtXmlRepository;
         this.tilbakekrevingsvedtakTjeneste = tilbakekrevingsvedtakTjeneste;
         this.kravgrunnlagTjeneste = kravgrunnlagTjeneste;
+        this.eksternBehandlingRepository = eksternBehandlingRepository;
     }
 
     @POST
@@ -221,7 +232,7 @@ public class ForvaltningBehandlingRestTjeneste {
         })
     @BeskyttetRessurs(action = CREATE, property = AbacProperty.DRIFT)
     public Response tilbakeførBehandlingTilFaktaSteg(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
-                                                         @NotNull @QueryParam("behandlingId") @Valid BehandlingReferanse behandlingReferanse) {
+                                                     @NotNull @QueryParam("behandlingId") @Valid BehandlingReferanse behandlingReferanse) {
         Behandling behandling = hentBehandling(behandlingReferanse);
         if (behandling.erAvsluttet()) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Kan ikke flyttes, behandlingen er avsluttet!").build();
@@ -244,7 +255,7 @@ public class ForvaltningBehandlingRestTjeneste {
         })
     @BeskyttetRessurs(action = READ, property = AbacProperty.DRIFT)
     public Response hentOkoXmlForFeiletIverksetting(@TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
-                                                        @NotNull @QueryParam("behandlingId") @Valid BehandlingReferanse behandlingReferanse) {
+                                                    @NotNull @QueryParam("behandlingId") @Valid BehandlingReferanse behandlingReferanse) {
         String behandlingRef = behandlingReferanse.erInternBehandlingId()
             ? behandlingReferanse.getBehandlingId().toString()
             : behandlingReferanse.getBehandlingUuid().toString();
@@ -302,8 +313,12 @@ public class ForvaltningBehandlingRestTjeneste {
         if (mottattXml.getMottattXml().contains(TaskProperty.ROOT_ELEMENT_KRAV_VEDTAK_STATUS_XML)) {
             throw new UgyldigTvingKoblingForespørselException("MottattXmlId=" + mottattXmlId + " peker ikke på et kravgrunnlag, men på en status-melding");
         }
+
+        if (mottattXmlRepository.erMottattXmlTilkoblet(mottattXmlId) && erKobletTilHenlagtBehandling(mottattXml)) {
+            fjernKobling(mottattXml);
+        }
         if (mottattXmlRepository.erMottattXmlTilkoblet(mottattXmlId)) {
-            throw new UgyldigTvingKoblingForespørselException("Kravgrunnlaget med mottattXmlId=" + mottattXmlId + " er allerede koblet til en behandling");
+            throw new UgyldigTvingKoblingForespørselException("Kravgrunnlaget med mottattXmlId=" + mottattXmlId + " er allerede koblet til en ikke-henlagt behandling");
         }
         if (mottattXml.getSaksnummer() != null && !behandling.getFagsak().getSaksnummer().getVerdi().equals(mottattXml.getSaksnummer())) {
             throw new UgyldigTvingKoblingForespørselException("Kan ikke koble behandling med behandlingId=" + behandlingId + " til kravgrunnlag med mottattXmlId=" + mottattXml + ". Kravgrunnlaget tilhører annen fagsak");
@@ -314,6 +329,24 @@ public class ForvaltningBehandlingRestTjeneste {
         grunnlagRepository.lagre(behandlingId, kravgrunnlag);
         mottattXmlRepository.opprettTilkobling(mottattXmlId);
         logger.info("Behandling med behandlingId={} ble tvunget koblet til kravgrunnlag med mottattXmlId={}", behandlingId, mottattXmlId);
+    }
+
+    private boolean erKobletTilHenlagtBehandling(ØkonomiXmlMottatt mottattXml) {
+        Optional<EksternBehandling> eksternBehandling = eksternBehandlingRepository.hentFraHenvisning(mottattXml.getHenvisning());
+        if (eksternBehandling.isPresent()) {
+            Long kobletBehandlingId = eksternBehandling.get().getInternId();
+            Behandling behandling = behandlingRepository.hentBehandling(kobletBehandlingId);
+            Optional<Behandlingsresultat> resultat = behandlingresultatRepository.hent(behandling);
+            return resultat.isPresent() && resultat.get().erBehandlingHenlagt();
+        }
+        return false;
+    }
+
+    private void fjernKobling(ØkonomiXmlMottatt mottattXml) {
+        EksternBehandling eksternBehandling = eksternBehandlingRepository.hentFraHenvisning(mottattXml.getHenvisning()).orElseThrow();
+        eksternBehandlingRepository.deaktivateTilkobling(eksternBehandling.getInternId());
+        mottattXmlRepository.fjernTilkobling(mottattXml.getId());
+        logger.info("Deaktiverer kobling mellom behandlingId {} og mottattXmlId {} for {}", eksternBehandling.getInternId(), mottattXml.getId(), mottattXml.getSaksnummer());
     }
 
     static class UgyldigTvingKoblingForespørselException extends IllegalArgumentException {

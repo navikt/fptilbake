@@ -86,6 +86,10 @@ public class ØkonomiXmlMottatt extends BaseEntitet {
         this.tilkoblet = true;
     }
 
+    public void fjernKobling() {
+        this.tilkoblet = false;
+    }
+
     public String getSaksnummer() {
         return saksnummer;
     }

@@ -29,6 +29,7 @@ public class BehandlingresultatRepository {
 
     public Long lagre(Behandlingsresultat behandlingsresultat) {
         entityManager.persist(behandlingsresultat);
+        entityManager.flush();
         return behandlingsresultat.getId();
     }
 
