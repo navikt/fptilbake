@@ -32,6 +32,6 @@ public class HåndterHendelseTask implements ProsessTaskHandler {
         dataWrapper.validerTaskDataHåndterHendelse();
 
         var henvisning = dataWrapper.getHenvisning();
-        hendelseHåndterer.håndterHendelse(dataWrapper, henvisning);
+        hendelseHåndterer.håndterHendelse(dataWrapper, henvisning, "HåndterHendelseTask");
     }
 }

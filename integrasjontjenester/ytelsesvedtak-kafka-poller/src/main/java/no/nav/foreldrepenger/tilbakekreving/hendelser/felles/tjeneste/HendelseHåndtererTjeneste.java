@@ -41,13 +41,17 @@ public class HendelseHåndtererTjeneste {
     }
 
     public void håndterHendelse(HendelseTaskDataWrapper hendelseTaskDataWrapper, Henvisning henvisning) {
+        håndterHendelse(hendelseTaskDataWrapper, henvisning, "test");
+    }
+
+    public void håndterHendelse(HendelseTaskDataWrapper hendelseTaskDataWrapper, Henvisning henvisning, String kaller) {
         fagsystemKlient.hentTilbakekrevingValg(UUID.fromString(hendelseTaskDataWrapper.getBehandlingUuid()))
             .ifPresent(tbkData -> {
                 if (erRelevantHendelseForOpprettTilbakekreving(tbkData)) {
-                    if (eksternBehandlingRepository.hentFraHenvisning(henvisning).isPresent()) {
-                        logger.info("Hendelse={} allerede opprettet tilbakekreving for henvisning={}", tbkData.getVidereBehandling(), henvisning);
+                    if (eksternBehandlingRepository.hentAlleForHenvisning(henvisning).size() > 0) {
+                        logger.info("Hendelse={} allerede opprettet tilbakekreving for henvisning={} fra {}", tbkData.getVidereBehandling(), henvisning, kaller);
                     } else {
-                        logger.info("Hendelse={} er relevant for tilbakekreving opprett for henvisning={}", tbkData.getVidereBehandling(), henvisning);
+                        logger.info("Hendelse={} er relevant for tilbakekreving opprett for henvisning={} fra {}", tbkData.getVidereBehandling(), henvisning, kaller);
                         lagOpprettBehandlingTask(hendelseTaskDataWrapper, henvisning);
                     }
                 } else if (erRelevantHendelseForOppdatereTilbakekreving(tbkData)) {

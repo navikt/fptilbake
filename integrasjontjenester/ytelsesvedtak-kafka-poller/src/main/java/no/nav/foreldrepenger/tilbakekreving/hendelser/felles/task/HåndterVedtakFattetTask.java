@@ -34,6 +34,6 @@ public class HåndterVedtakFattetTask implements ProsessTaskHandler {
         dataWrapper.validerTaskDataHåndterVedtakFattet();
 
         var henvisning = hendelseHåndterer.hentHenvisning(UUID.fromString(dataWrapper.getBehandlingUuid()));
-        hendelseHåndterer.håndterHendelse(dataWrapper, henvisning);
+        hendelseHåndterer.håndterHendelse(dataWrapper, henvisning, "HåndterVedtakFattetTask");
     }
 }
