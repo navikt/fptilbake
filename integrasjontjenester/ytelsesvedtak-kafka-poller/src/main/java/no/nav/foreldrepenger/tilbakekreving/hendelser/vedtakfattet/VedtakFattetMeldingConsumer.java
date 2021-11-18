@@ -22,8 +22,6 @@ import no.nav.foreldrepenger.tilbakekreving.kafka.util.JsonDeserialiserer;
 @ApplicationScoped
 public class VedtakFattetMeldingConsumer extends YtelsesvedtakHendelseConsumer {
 
-    private static final String APPNAME = ApplicationName.hvilkenTilbakeAppName();
-
     private KafkaConsumer<String, String> kafkaConsumer;
     private String topic;
 
@@ -36,7 +34,7 @@ public class VedtakFattetMeldingConsumer extends YtelsesvedtakHendelseConsumer {
                                        @KonfigVerdi(BOOTSTRAP_SERVERS) String bootstrapServers,
                                        @KonfigVerdi("systembruker.username") String username,
                                        @KonfigVerdi("systembruker.password") String password) {
-        Properties properties = lagFellesProperty(bootstrapServers, APPNAME);
+        Properties properties = lagFellesProperty(bootstrapServers, ApplicationName.hvilkenTilbakeAppName());
         this.setSecurity(username, properties);
         this.addUserToProperties(username, password, properties);
         this.kafkaConsumer = new KafkaConsumer<>(properties);

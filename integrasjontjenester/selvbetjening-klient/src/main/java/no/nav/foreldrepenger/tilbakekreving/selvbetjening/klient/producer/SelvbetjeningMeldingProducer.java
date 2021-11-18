@@ -32,8 +32,6 @@ import no.nav.vedtak.exception.TekniskException;
 @ApplicationScoped
 public class SelvbetjeningMeldingProducer {
 
-    private static final String APPNAME = ApplicationName.hvilkenTilbakeAppName();
-
     private static final ObjectMapper OM;
 
     static {
@@ -59,7 +57,7 @@ public class SelvbetjeningMeldingProducer {
         Properties properties = new Properties();
 
         properties.setProperty("bootstrap.servers", bootstrapServers);
-        properties.setProperty("client.id", APPNAME);
+        properties.setProperty("client.id", ApplicationName.hvilkenTilbakeAppName());
 
         setSecurity(username, properties);
         setUsernameAndPassword(username, password, properties);

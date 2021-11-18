@@ -32,7 +32,6 @@ import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakResponse;
 public class AvstemmingTjeneste {
 
     private static final Logger logger = LoggerFactory.getLogger(AvstemmingTjeneste.class);
-    private static final String AVSENDER = ApplicationName.hvilkenTilbakeAppName();
 
     private BehandlingRepository behandlingRepository;
     private BehandlingVedtakRepository behandlingVedtakRepository;
@@ -49,7 +48,7 @@ public class AvstemmingTjeneste {
     public AvstemmingTjeneste(ØkonomiSendtXmlRepository sendtXmlRepository,
                               BehandlingRepositoryProvider behandlingRepositoryProvider,
                               PersoninfoAdapter aktørConsumer) {
-        this(AVSENDER, sendtXmlRepository, behandlingRepositoryProvider, aktørConsumer);
+        this(ApplicationName.hvilkenTilbakeAppName(), sendtXmlRepository, behandlingRepositoryProvider, aktørConsumer);
     }
 
     public AvstemmingTjeneste(String applikasjon,

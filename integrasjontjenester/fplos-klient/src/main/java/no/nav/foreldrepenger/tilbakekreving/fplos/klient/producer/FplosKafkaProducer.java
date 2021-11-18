@@ -25,8 +25,6 @@ public class FplosKafkaProducer {
     private static final Logger log = LoggerFactory.getLogger(FplosKafkaProducer.class);
     private static final String CALLID_NAME = "Nav-Tbk-CallId";
 
-    private static final String APPNAME = ApplicationName.hvilkenTilbakeAppName();
-
     private Producer<String, String> producer;
     private String topic;
 
@@ -43,7 +41,7 @@ public class FplosKafkaProducer {
         Properties properties = new Properties();
 
         properties.setProperty("bootstrap.servers", bootstrapServers);
-        properties.setProperty("client.id", APPNAME);
+        properties.setProperty("client.id", ApplicationName.hvilkenTilbakeAppName());
         properties.setProperty("max.in.flight.requests.per.connection", "1"); //påkrevet for å garantere rekkefølge sammen med retries
         properties.setProperty("acks", "all"); //mindre sjangse for å miste melding
 
