@@ -37,7 +37,7 @@
             <host>audit.nais</host>
             <!-- remote port to log to -->
             <port>6514</port>
-            <ident>${app.name}</ident>
+            <ident>${NAIS_APP_NAME}</ident>
             <!-- max log message length in bytes -->
             <maxMessageLength>128000</maxMessageLength>
         </syslogConfig>
