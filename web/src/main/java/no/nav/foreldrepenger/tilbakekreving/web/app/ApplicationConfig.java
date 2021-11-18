@@ -149,7 +149,7 @@ public class ApplicationConfig extends Application {
         return switch (app) {
             case FPTILBAKE -> "/fptilbake";
             case K9TILBAKE -> "/k9/tilbake";
-            default -> throw new IllegalStateException("app.name er satt til " + app + " som ikke er en støttet verdi");
+            default -> throw new IllegalStateException("applikasjonsnavn er satt til " + app + " som ikke er en støttet verdi");
         };
     }
 }

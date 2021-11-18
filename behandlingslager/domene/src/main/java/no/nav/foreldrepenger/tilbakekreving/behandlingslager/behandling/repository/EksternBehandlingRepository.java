@@ -145,15 +145,10 @@ public class EksternBehandlingRepository {
     /*
      * For idempotens-sjekk
      */
-    public List<EksternBehandling> hentAlleForHenvisning(Henvisning henvisning) {
-        return entityManager.createQuery("from EksternBehandling where henvisning=:henvisning", EksternBehandling.class)
-            .setParameter(HENVISNING, henvisning)
-            .getResultList();
-    }
-
-    public List<EksternBehandling> hentAlleForEksternUuid(UUID eksternUuid) {
+    public boolean harEksternBehandlingForEksternUuid(UUID eksternUuid) {
         return entityManager.createQuery("from EksternBehandling where eksternUuid=:eksternUuid", EksternBehandling.class)
             .setParameter(EKSTERN_UUID, eksternUuid)
-            .getResultList();
+            .getResultList()
+            .size() > 0;
     }
 }

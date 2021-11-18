@@ -178,7 +178,7 @@ public class JournalføringTjeneste {
         return switch (appName) {
             case FPTILBAKE -> new Sak(fagsak.getSaksnummer().getVerdi(), FagsakSystem.FORELDREPENGELØSNINGEN);
             case K9TILBAKE -> new Sak(fagsak.getSaksnummer().getVerdi(), FagsakSystem.K9SAK);
-            default -> throw new IllegalArgumentException("Ikke-støttet app.name: " + appName);
+            default -> throw new IllegalArgumentException("Ikke-støttet applikasjonsnavn: " + appName);
         };
     }
 

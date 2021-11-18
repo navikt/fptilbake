@@ -24,12 +24,15 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import no.nav.foreldrepenger.konfig.KonfigVerdi;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.selvbetjening.klient.dto.SelvbetjeningMelding;
 import no.nav.vedtak.exception.ManglerTilgangException;
 import no.nav.vedtak.exception.TekniskException;
 
 @ApplicationScoped
 public class SelvbetjeningMeldingProducer {
+
+    private static final String APPNAME = ApplicationName.hvilkenTilbakeAppName();
 
     private static final ObjectMapper OM;
 
@@ -51,13 +54,12 @@ public class SelvbetjeningMeldingProducer {
     @Inject
     SelvbetjeningMeldingProducer(@KonfigVerdi("tilbakekreving.brukerdialog.hendelse.v1.topic.url") String topic,
                                  @KonfigVerdi("bootstrap.servers") String bootstrapServers,
-                                 @KonfigVerdi("app.name") String clientId,
                                  @KonfigVerdi("systembruker.username") String username,
                                  @KonfigVerdi("systembruker.password") String password) {
         Properties properties = new Properties();
 
         properties.setProperty("bootstrap.servers", bootstrapServers);
-        properties.setProperty("client.id", clientId);
+        properties.setProperty("client.id", APPNAME);
 
         setSecurity(username, properties);
         setUsernameAndPassword(username, password, properties);

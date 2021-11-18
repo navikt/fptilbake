@@ -15,11 +15,14 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 
 import no.nav.abakus.vedtak.ytelse.Ytelse;
 import no.nav.foreldrepenger.konfig.KonfigVerdi;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.hendelser.felles.YtelsesvedtakHendelseConsumer;
 import no.nav.foreldrepenger.tilbakekreving.kafka.util.JsonDeserialiserer;
 
 @ApplicationScoped
 public class VedtakFattetMeldingConsumer extends YtelsesvedtakHendelseConsumer {
+
+    private static final String APPNAME = ApplicationName.hvilkenTilbakeAppName();
 
     private KafkaConsumer<String, String> kafkaConsumer;
     private String topic;
@@ -31,10 +34,9 @@ public class VedtakFattetMeldingConsumer extends YtelsesvedtakHendelseConsumer {
     @Inject
     public VedtakFattetMeldingConsumer(@KonfigVerdi(VEDTAKFATTET_TOPIC) String topic,
                                        @KonfigVerdi(BOOTSTRAP_SERVERS) String bootstrapServers,
-                                       @KonfigVerdi("app.name") String applikasjonNavn,
                                        @KonfigVerdi("systembruker.username") String username,
                                        @KonfigVerdi("systembruker.password") String password) {
-        Properties properties = lagFellesProperty(bootstrapServers, applikasjonNavn);
+        Properties properties = lagFellesProperty(bootstrapServers, APPNAME);
         this.setSecurity(username, properties);
         this.addUserToProperties(username, password, properties);
         this.kafkaConsumer = new KafkaConsumer<>(properties);

@@ -9,24 +9,33 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 public final class ApplicationName extends Application {
 
     private static final Environment ENV = Environment.current();
-    private static Fagsystem CURRENT;
 
     private static final String APPLIKASJON_NAVN_K9_TILBAKE = "k9-tilbake";
     private static final String APPLIKASJON_NAVN_FPTILBAKE = "fptilbake";
 
+    private static Fagsystem CURRENT;
+    private static String CURRENT_APPLIKASJON_NAVN;
+
     public static Fagsystem hvilkenTilbake() {
         if (CURRENT == null) {
-            CURRENT = getCurrentApp();
+            CURRENT = setCurrentApp();
         }
         return CURRENT;
     }
 
-    private static Fagsystem getCurrentApp() {
-        String applikasjon= ENV.getProperty("app.name");
-        return switch (applikasjon) {
+    public static String hvilkenTilbakeAppName() {
+        if (CURRENT == null) {
+            CURRENT = setCurrentApp();
+        }
+        return CURRENT_APPLIKASJON_NAVN;
+    }
+
+    private static Fagsystem setCurrentApp() {
+        CURRENT_APPLIKASJON_NAVN = ENV.getProperty("app.name");
+        return switch (CURRENT_APPLIKASJON_NAVN) {
             case APPLIKASJON_NAVN_FPTILBAKE -> Fagsystem.FPTILBAKE;
             case APPLIKASJON_NAVN_K9_TILBAKE -> Fagsystem.K9TILBAKE;
-            default -> throw new IllegalStateException("app.name er satt til " + applikasjon + " som ikke er en støttet verdi");
+            default -> throw new IllegalStateException("applikasjonsnavn er satt til " + CURRENT_APPLIKASJON_NAVN + " som ikke er en støttet verdi");
         };
     }
 }

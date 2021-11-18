@@ -35,7 +35,7 @@ public class OpprettBehandlingTaskTest {
 
     @Test
     public void test_skal_kalle_opprettBehandlingAutomatisk() {
-        HendelseTaskDataWrapper taskDataWrapper = HendelseTaskDataWrapper.lagWrapperForOpprettBehandling(EKSTERN_BEHANDLING_UUID.toString(), HENVISNING,
+        HendelseTaskDataWrapper taskDataWrapper = HendelseTaskDataWrapper.lagWrapperForOpprettBehandling(EKSTERN_BEHANDLING_UUID, HENVISNING,
             AKTØR_ID, SAKSNUMMER);
         taskDataWrapper.setFagsakYtelseType(FAGSAK_YTELSE_TYPE);
         taskDataWrapper.setBehandlingType(BehandlingType.TILBAKEKREVING);
@@ -50,7 +50,7 @@ public class OpprettBehandlingTaskTest {
 
     @Test
     public void test_skal_feile_på_manglende_task_property() {
-        HendelseTaskDataWrapper taskDataWrapper = HendelseTaskDataWrapper.lagWrapperForOpprettBehandling(EKSTERN_BEHANDLING_UUID.toString(), HENVISNING,
+        HendelseTaskDataWrapper taskDataWrapper = HendelseTaskDataWrapper.lagWrapperForOpprettBehandling(EKSTERN_BEHANDLING_UUID, HENVISNING,
             AKTØR_ID, SAKSNUMMER);
 
         // act

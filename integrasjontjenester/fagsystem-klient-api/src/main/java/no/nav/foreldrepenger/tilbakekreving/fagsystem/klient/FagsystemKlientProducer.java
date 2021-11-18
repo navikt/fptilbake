@@ -24,7 +24,7 @@ public class FagsystemKlientProducer {
         fagsystemKlient = switch (applikasjon) {
             case FPTILBAKE -> fagsystemklienter.select(new Fptilbake.FptilbakeAnnotationLiteral()).get();
             case K9TILBAKE -> fagsystemklienter.select(new K9tilbake.K9tilbakeAnnotationLiteral()).get();
-            default -> throw new IllegalStateException("app.name er satt til " + applikasjon + " som ikke er en støttet verdi");
+            default -> throw new IllegalStateException("applikasjonsnavn er satt til " + applikasjon + " som ikke er en støttet verdi");
         };
     }
 

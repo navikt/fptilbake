@@ -51,7 +51,7 @@ public class TilkjentYtelseReaderTest {
         HendelseTaskDataWrapper taskDataWrapper = new HendelseTaskDataWrapper(prosessTaskData);
         assertThat(taskDataWrapper.getHenvisning()).isEqualTo(HENVISNING);
         assertThat(taskDataWrapper.getAktørId()).isEqualTo(AKTØR_ID);
-        assertThat(taskDataWrapper.getBehandlingUuid()).isEqualTo(EKSTERN_BEHANDLING_UUID.toString());
+        assertThat(taskDataWrapper.getBehandlingUuid()).isEqualTo(EKSTERN_BEHANDLING_UUID);
         assertThat(taskDataWrapper.getFagsakYtelseType()).isEqualByComparingTo(FagsakYtelseType.FORELDREPENGER);
         assertThat(taskDataWrapper.getSaksnummer()).isEqualTo(SAKSNUMMER);
     }

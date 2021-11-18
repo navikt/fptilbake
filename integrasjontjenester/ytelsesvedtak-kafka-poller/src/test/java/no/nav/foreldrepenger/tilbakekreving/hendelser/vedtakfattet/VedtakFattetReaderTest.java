@@ -63,7 +63,7 @@ public class VedtakFattetReaderTest {
         HendelseTaskDataWrapper taskDataWrapper = new HendelseTaskDataWrapper(prosessTaskData);
         assertThat(prosessTaskData.taskType()).isEqualTo(TaskType.forProsessTask(HåndterVedtakFattetTask.class));
         assertThat(taskDataWrapper.getAktørId().getId()).isEqualTo(AKTØR_ID);
-        assertThat(taskDataWrapper.getBehandlingUuid()).isEqualTo(BEHANDLING_UUID.toString());
+        assertThat(taskDataWrapper.getBehandlingUuid()).isEqualTo(BEHANDLING_UUID);
         assertThat(taskDataWrapper.getFagsakYtelseType()).isEqualByComparingTo(FagsakYtelseType.FORELDREPENGER);
         assertThat(taskDataWrapper.getSaksnummer().getVerdi()).isEqualTo(SAKSNUMMER_FP);
     }

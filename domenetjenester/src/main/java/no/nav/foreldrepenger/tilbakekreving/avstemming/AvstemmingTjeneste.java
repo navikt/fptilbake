@@ -10,7 +10,6 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
@@ -19,6 +18,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVe
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vedtak.BehandlingVedtakRepository;
 import no.nav.foreldrepenger.tilbakekreving.domene.person.PersoninfoAdapter;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.PersonIdent;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.TilbakekrevingsvedtakMarshaller;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiKvitteringTolk;
 import no.nav.foreldrepenger.tilbakekreving.integrasjon.økonomi.ØkonomiResponsMarshaller;
@@ -31,7 +31,8 @@ import no.nav.okonomi.tilbakekrevingservice.TilbakekrevingsvedtakResponse;
 @ApplicationScoped
 public class AvstemmingTjeneste {
 
-    private Logger logger = LoggerFactory.getLogger(AvstemmingTjeneste.class);
+    private static final Logger logger = LoggerFactory.getLogger(AvstemmingTjeneste.class);
+    private static final String AVSENDER = ApplicationName.hvilkenTilbakeAppName();
 
     private BehandlingRepository behandlingRepository;
     private BehandlingVedtakRepository behandlingVedtakRepository;
@@ -45,7 +46,13 @@ public class AvstemmingTjeneste {
     }
 
     @Inject
-    public AvstemmingTjeneste(@KonfigVerdi(value = "app.name") String applikasjon,
+    public AvstemmingTjeneste(ØkonomiSendtXmlRepository sendtXmlRepository,
+                              BehandlingRepositoryProvider behandlingRepositoryProvider,
+                              PersoninfoAdapter aktørConsumer) {
+        this(AVSENDER, sendtXmlRepository, behandlingRepositoryProvider, aktørConsumer);
+    }
+
+    public AvstemmingTjeneste(String applikasjon,
                               ØkonomiSendtXmlRepository sendtXmlRepository,
                               BehandlingRepositoryProvider behandlingRepositoryProvider,
                               PersoninfoAdapter aktørConsumer) {

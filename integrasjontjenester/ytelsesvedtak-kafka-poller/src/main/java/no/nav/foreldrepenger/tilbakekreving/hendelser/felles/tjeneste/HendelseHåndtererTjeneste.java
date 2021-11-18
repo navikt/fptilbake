@@ -45,10 +45,11 @@ public class HendelseHåndtererTjeneste {
     }
 
     public void håndterHendelse(HendelseTaskDataWrapper hendelseTaskDataWrapper, Henvisning henvisning, String kaller) {
-        fagsystemKlient.hentTilbakekrevingValg(UUID.fromString(hendelseTaskDataWrapper.getBehandlingUuid()))
+        var eksternBehandlingUuid = hendelseTaskDataWrapper.getBehandlingUuid();
+        fagsystemKlient.hentTilbakekrevingValg(eksternBehandlingUuid)
             .ifPresent(tbkData -> {
                 if (erRelevantHendelseForOpprettTilbakekreving(tbkData)) {
-                    if (eksternBehandlingRepository.hentAlleForHenvisning(henvisning).size() > 0) {
+                    if (eksternBehandlingRepository.harEksternBehandlingForEksternUuid(eksternBehandlingUuid)) {
                         logger.info("Hendelse={} allerede opprettet tilbakekreving for henvisning={} fra {}", tbkData.getVidereBehandling(), henvisning, kaller);
                     } else {
                         logger.info("Hendelse={} er relevant for tilbakekreving opprett for henvisning={} fra {}", tbkData.getVidereBehandling(), henvisning, kaller);

@@ -91,7 +91,7 @@ public class FplosPubliserEventTask implements ProsessTaskHandler {
                 fagsystem = Fagsystem.K9TILBAKE.getKode();
                 defaultHRef = K9_DEFAULT_HREF;
             }
-            default -> throw new IllegalStateException("app.name er satt til " + applikasjonNavn + " som ikke er en støttet verdi");
+            default -> throw new IllegalStateException("applikasjonsnavn er satt til " + applikasjonNavn + " som ikke er en støttet verdi");
         }
     }
 

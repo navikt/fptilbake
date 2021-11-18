@@ -16,8 +16,8 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
 
 import no.nav.foreldrepenger.konfig.Environment;
-import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.avstemming.AvstemmingTjeneste;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.vedtak.exception.IntegrasjonException;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTask;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -27,14 +27,14 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 @ProsessTask(value = "batch.avstemming", cronExpression = "0 55 6 ? * * ")
 public class AvstemmingBatchTask implements ProsessTaskHandler {
 
-    private Logger logger = LoggerFactory.getLogger(AvstemmingBatchTask.class);
+    private static final Logger logger = LoggerFactory.getLogger(AvstemmingBatchTask.class);
 
+    private static final String APPNAME = ApplicationName.hvilkenTilbakeAppName();
     private static final DateTimeFormatter DATO_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
     private static final DateTimeFormatter DATO_TIDSPUNKT_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmm");
 
     private static final String FILNAVN_MAL = "%s-%s-%s-%s.csv";
 
-    private String applikasjon;
     private AvstemmingTjeneste avstemmingTjeneste;
     private AvstemmingSftpBatchTjeneste sftpBatchTjeneste;
 
@@ -45,10 +45,8 @@ public class AvstemmingBatchTask implements ProsessTaskHandler {
     }
 
     @Inject
-    public AvstemmingBatchTask(@KonfigVerdi(value = "app.name") String applikasjon,
-                               AvstemmingTjeneste avstemmingTjeneste,
+    public AvstemmingBatchTask(AvstemmingTjeneste avstemmingTjeneste,
                                AvstemmingSftpBatchTjeneste sftpBatchTjeneste) {
-        this.applikasjon = applikasjon;
         this.avstemmingTjeneste = avstemmingTjeneste;
         this.sftpBatchTjeneste = sftpBatchTjeneste;
 
@@ -66,7 +64,7 @@ public class AvstemmingBatchTask implements ProsessTaskHandler {
         if (resultat.isPresent()) {
             String forDato = dato.format(DATO_FORMATTER);
             String kjøreTidspunkt = LocalDateTime.now().format(DATO_TIDSPUNKT_FORMATTER);
-            String filnavn = String.format(FILNAVN_MAL, applikasjon, miljø, forDato, kjøreTidspunkt);
+            String filnavn = String.format(FILNAVN_MAL, APPNAME, miljø, forDato, kjøreTidspunkt);
             try {
                 sftpBatchTjeneste.put(resultat.get(), filnavn);
                 logger.info("Filen {} er overført til avstemming sftp", filnavn);

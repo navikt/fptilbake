@@ -1,7 +1,5 @@
 package no.nav.foreldrepenger.tilbakekreving.hendelser.felles.task;
 
-import java.util.UUID;
-
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -33,7 +31,7 @@ public class HåndterVedtakFattetTask implements ProsessTaskHandler {
         HendelseTaskDataWrapper dataWrapper = new HendelseTaskDataWrapper(taskData);
         dataWrapper.validerTaskDataHåndterVedtakFattet();
 
-        var henvisning = hendelseHåndterer.hentHenvisning(UUID.fromString(dataWrapper.getBehandlingUuid()));
+        var henvisning = hendelseHåndterer.hentHenvisning(dataWrapper.getBehandlingUuid());
         hendelseHåndterer.håndterHendelse(dataWrapper, henvisning, "HåndterVedtakFattetTask");
     }
 }

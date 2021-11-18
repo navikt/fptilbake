@@ -25,7 +25,7 @@ public class HendelseReaderProducer {
         hendelseReader = switch (applikasjon) {
             case FPTILBAKE -> hendelseReaders.select(new Fptilbake.FptilbakeAnnotationLiteral()).get();
             case K9TILBAKE -> hendelseReaders.select(new K9tilbake.K9tilbakeAnnotationLiteral()).get();
-            default -> throw new IllegalStateException("app.name er satt til " + applikasjon + " som ikke er en støttet verdi");
+            default -> throw new IllegalStateException("applikasjonsnavn er satt til " + applikasjon + " som ikke er en støttet verdi");
         };
     }
 
