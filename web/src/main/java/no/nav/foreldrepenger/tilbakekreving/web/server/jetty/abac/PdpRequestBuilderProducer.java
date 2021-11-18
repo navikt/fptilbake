@@ -9,7 +9,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import no.nav.foreldrepenger.konfig.KonfigVerdi;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.Fptilbake;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.K9tilbake;
 import no.nav.vedtak.sikkerhet.abac.PdpRequestBuilder;
@@ -25,18 +25,18 @@ public class PdpRequestBuilderProducer {
     }
 
     @Inject
-    public PdpRequestBuilderProducer(@KonfigVerdi(value = "app.name") String applikasjon,
-                                     @Any Instance<PdpRequestBuilder> pdpRequestBuilders) {
+    public PdpRequestBuilderProducer(@Any Instance<PdpRequestBuilder> pdpRequestBuilders) {
+        var applikasjon = ApplicationName.hvilkenTilbake();
         switch (applikasjon) {
-            case "fptilbake" -> {
+            case FPTILBAKE -> {
                 logger.info("Bruker PdpRequestBuilder for fptilbake");
                 pdpRequestBuilder = pdpRequestBuilders.select(new Fptilbake.FptilbakeAnnotationLiteral()).get();
             }
-            case "k9-tilbake" -> {
+            case K9TILBAKE -> {
                 logger.info("Bruker PdpRequestBuilder for k9");
                 pdpRequestBuilder = pdpRequestBuilders.select(new K9tilbake.K9tilbakeAnnotationLiteral()).get();
             }
-            default -> throw new IllegalStateException("app.name er satt til " + applikasjon + " som ikke er en støttet verdi");
+            default -> throw new IllegalStateException("applikasjonsnavn er satt til " + applikasjon + " som ikke er en støttet verdi");
         }
     }
 

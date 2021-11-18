@@ -21,6 +21,8 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
 import no.nav.foreldrepenger.konfig.Environment;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.ConstraintViolationMapper;
 import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.GeneralRestExceptionMapper;
 import no.nav.foreldrepenger.tilbakekreving.web.app.exceptions.JsonMappingExceptionMapper;
@@ -58,8 +60,6 @@ public class ApplicationConfig extends Application {
     private static final Environment ENV = Environment.current();
 
     public static final String API_URI = "/api";
-    private static final String APPLIKASJON_NAVN_K9_TILBAKE = "k9-tilbake";
-    private static final String APPLIKASJON_NAVN_FPTILBAKE = "fptilbake";
 
     public ApplicationConfig() {
         OpenAPI oas = new OpenAPI();
@@ -144,12 +144,12 @@ public class ApplicationConfig extends Application {
         return properties;
     }
 
-    private String getContextPath() {
-        String applikasjon= ENV.getProperty("app.name");
-        return switch (applikasjon) {
-            case APPLIKASJON_NAVN_FPTILBAKE -> "/fptilbake";
-            case APPLIKASJON_NAVN_K9_TILBAKE -> "/k9/tilbake";
-            default -> throw new IllegalStateException("app.name er satt til " + applikasjon + " som ikke er en støttet verdi");
+    private static String getContextPath() {
+        Fagsystem app = ApplicationName.hvilkenTilbake();
+        return switch (app) {
+            case FPTILBAKE -> "/fptilbake";
+            case K9TILBAKE -> "/k9/tilbake";
+            default -> throw new IllegalStateException("applikasjonsnavn er satt til " + app + " som ikke er en støttet verdi");
         };
     }
 }

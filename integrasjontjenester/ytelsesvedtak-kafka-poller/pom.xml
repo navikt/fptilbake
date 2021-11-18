@@ -40,6 +40,10 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>no.nav.foreldrepenger.abakus</groupId>
+            <artifactId>abakus-kontrakt</artifactId>
+        </dependency>
+        <dependency>
             <groupId>io.dropwizard.metrics</groupId>
             <artifactId>metrics-annotation</artifactId>
         </dependency>

@@ -9,6 +9,7 @@ import static no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskPropertie
 import static no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties.SAKSNUMMER;
 
 import java.util.Objects;
+import java.util.UUID;
 
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
@@ -59,8 +60,8 @@ public class HendelseTaskDataWrapper {
         return BehandlingType.fraKode(kode);
     }
 
-    public String getBehandlingUuid() {
-        return prosessTaskData.getPropertyValue(EKSTERN_BEHANDLING_UUID);
+    public UUID getBehandlingUuid() {
+        return UUID.fromString(prosessTaskData.getPropertyValue(EKSTERN_BEHANDLING_UUID));
     }
 
     public void setFagsakYtelseType(FagsakYtelseType fagsakYtelseType) {
@@ -86,6 +87,13 @@ public class HendelseTaskDataWrapper {
         Objects.requireNonNull(prosessTaskData.getPropertyValue(FAGSAK_YTELSE_TYPE));
     }
 
+    public void validerTaskDataHåndterVedtakFattet() {
+        Objects.requireNonNull(prosessTaskData.getAktørId());
+        Objects.requireNonNull(prosessTaskData.getPropertyValue(EKSTERN_BEHANDLING_UUID));
+        Objects.requireNonNull(prosessTaskData.getPropertyValue(SAKSNUMMER));
+        Objects.requireNonNull(prosessTaskData.getPropertyValue(FAGSAK_YTELSE_TYPE));
+    }
+
     public void validerTaskDataOpprettBehandling() {
         validerTaskDataHåndterHendelse();
         Objects.requireNonNull(getSaksnummer());
@@ -101,10 +109,10 @@ public class HendelseTaskDataWrapper {
         Objects.requireNonNull(prosessTaskData.getPropertyValue(SAKSNUMMER));
     }
 
-    public static HendelseTaskDataWrapper lagWrapperForOpprettBehandling(String behandlingUuid, Henvisning henvisning, AktørId aktørId, Saksnummer saksnummer) {
+    public static HendelseTaskDataWrapper lagWrapperForOpprettBehandling(UUID behandlingUuid, Henvisning henvisning, AktørId aktørId, Saksnummer saksnummer) {
         ProsessTaskData td = ProsessTaskData.forProsessTask(OpprettBehandlingTask.class);
         td.setAktørId(aktørId.getId());
-        td.setProperty(EKSTERN_BEHANDLING_UUID, behandlingUuid);
+        td.setProperty(EKSTERN_BEHANDLING_UUID, behandlingUuid.toString());
         td.setProperty(EKSTERN_BEHANDLING_ID, henvisning.getVerdi()); //TODO k9-tilbake fjern når transisjon til henvisning er ferdig
         td.setProperty(HENVISNING, henvisning.getVerdi());
         td.setProperty(SAKSNUMMER, saksnummer.getVerdi());

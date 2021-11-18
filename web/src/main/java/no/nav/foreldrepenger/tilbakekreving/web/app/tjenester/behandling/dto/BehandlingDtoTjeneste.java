@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.BehandlingTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandling.impl.VurdertForeldelseTjeneste;
 import no.nav.foreldrepenger.tilbakekreving.behandlingskontroll.BehandlingModell;
@@ -30,9 +29,11 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonsp
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingresultatRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.VergeRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.vilkår.VilkårsvurderingRepository;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.BehandlingÅrsakDto;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.KravgrunnlagRepository;
 import no.nav.foreldrepenger.tilbakekreving.web.app.rest.ResourceLink;
@@ -71,8 +72,15 @@ public class BehandlingDtoTjeneste {
     public BehandlingDtoTjeneste(BehandlingTjeneste behandlingTjeneste,
                                  VurdertForeldelseTjeneste vurdertForeldelseTjeneste,
                                  BehandlingRepositoryProvider repositoryProvider,
+                                 BehandlingModellRepository behandlingModellRepository) {
+        this(behandlingTjeneste, vurdertForeldelseTjeneste, repositoryProvider, behandlingModellRepository, ApplicationName.hvilkenTilbake());
+    }
+
+    public BehandlingDtoTjeneste(BehandlingTjeneste behandlingTjeneste,
+                                 VurdertForeldelseTjeneste vurdertForeldelseTjeneste,
+                                 BehandlingRepositoryProvider repositoryProvider,
                                  BehandlingModellRepository behandlingModellRepository,
-                                 @KonfigVerdi(value = "app.name") String applikasjon) {
+                                 Fagsystem applikasjon) {
         this.behandlingTjeneste = behandlingTjeneste;
         this.vurdertForeldelseTjeneste = vurdertForeldelseTjeneste;
         this.faktaFeilutbetalingRepository = repositoryProvider.getFaktaFeilutbetalingRepository();
@@ -82,11 +90,11 @@ public class BehandlingDtoTjeneste {
         this.behandlingresultatRepository = repositoryProvider.getBehandlingresultatRepository();
         this.behandlingModellRepository = behandlingModellRepository;
 
-        switch (applikasjon) {
-            case "fptilbake" -> kontekstPath = "/fptilbake";
-            case "k9-tilbake" -> kontekstPath = "/k9/tilbake";
-            default -> throw new IllegalStateException("app.name er satt til " + applikasjon + " som ikke er en støttet verdi");
-        }
+        kontekstPath = switch (applikasjon) {
+            case FPTILBAKE -> "/fptilbake";
+            case K9TILBAKE -> "/k9/tilbake";
+            default -> throw new IllegalStateException("applikasjonsnavn er satt til " + applikasjon + " som ikke er en støttet verdi");
+        };
     }
 
     public List<BehandlingDto> hentAlleBehandlinger(Saksnummer saksnummer) {

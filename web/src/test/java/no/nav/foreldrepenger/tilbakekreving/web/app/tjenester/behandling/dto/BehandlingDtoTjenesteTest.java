@@ -44,6 +44,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.reposito
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsak;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakRepository;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetaling;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingPeriode;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.feilutbetalingårsak.FaktaFeilutbetalingRepository;
@@ -98,7 +99,7 @@ public class BehandlingDtoTjenesteTest {
         grunnlagRepository = repositoryProvider.getGrunnlagRepository();
         BehandlingModellRepository behandlingModellRepository = new BehandlingModellRepository();
         behandlingDtoTjeneste = new BehandlingDtoTjeneste(behandlingTjeneste, foreldelseTjeneste, repositoryProvider,
-            behandlingModellRepository, "fptilbake");
+            behandlingModellRepository, Fagsystem.FPTILBAKE);
 
         entityManager.setFlushMode(FlushModeType.AUTO);
     }

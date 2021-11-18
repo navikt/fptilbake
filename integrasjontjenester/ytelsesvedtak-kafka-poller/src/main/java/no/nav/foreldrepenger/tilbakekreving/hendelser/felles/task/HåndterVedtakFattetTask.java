@@ -11,27 +11,27 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskHandler;
 
 @ApplicationScoped
-@ProsessTask(value = "hendelser.håndterHendelse", maxFailedRuns = 5)
+@ProsessTask(value = "hendelser.håndterVedtakFattet", maxFailedRuns = 5)
 @FagsakProsesstaskRekkefølge(gruppeSekvens = false)
-public class HåndterHendelseTask implements ProsessTaskHandler {
+public class HåndterVedtakFattetTask implements ProsessTaskHandler {
 
     private HendelseHåndtererTjeneste hendelseHåndterer;
 
-    HåndterHendelseTask() {
+    HåndterVedtakFattetTask() {
         // CDI
     }
 
     @Inject
-    public HåndterHendelseTask(HendelseHåndtererTjeneste hendelseHåndterer) {
+    public HåndterVedtakFattetTask(HendelseHåndtererTjeneste hendelseHåndterer) {
         this.hendelseHåndterer = hendelseHåndterer;
     }
 
     @Override
     public void doTask(ProsessTaskData taskData) {
         HendelseTaskDataWrapper dataWrapper = new HendelseTaskDataWrapper(taskData);
-        dataWrapper.validerTaskDataHåndterHendelse();
+        dataWrapper.validerTaskDataHåndterVedtakFattet();
 
-        var henvisning = dataWrapper.getHenvisning();
-        hendelseHåndterer.håndterHendelse(dataWrapper, henvisning, "HåndterHendelseTask");
+        var henvisning = hendelseHåndterer.hentHenvisning(dataWrapper.getBehandlingUuid());
+        hendelseHåndterer.håndterHendelse(dataWrapper, henvisning, "HåndterVedtakFattetTask");
     }
 }

@@ -11,6 +11,7 @@ public class YtelsesvedtakHendelseConsumer {
     protected static final int TIMEOUT = 1000;
     protected static final String BOOTSTRAP_SERVERS = "bootstrap.servers";
     protected static final String FEED_URL = "fagsystem.fattede.vedtak_topic.url";
+    protected static final String VEDTAKFATTET_TOPIC = "kafka.vedtakfattet.topic";
 
     protected Properties lagFellesProperty(String bootstrapServers, String applikasjonNavn){
         Properties properties = new Properties();

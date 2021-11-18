@@ -18,13 +18,16 @@ import org.mockito.ArgumentCaptor;
 import no.nav.foreldrepenger.tilbakekreving.behandling.task.HendelseTaskDataWrapper;
 import no.nav.foreldrepenger.tilbakekreving.behandling.task.OpprettBehandlingTask;
 import no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.EksternBehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.tilbakekrevingsvalg.VidereBehandling;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.AktørId;
+import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.TilbakekrevingValgDto;
 import no.nav.foreldrepenger.tilbakekreving.hendelser.felles.task.HåndterHendelseTask;
+import no.nav.foreldrepenger.tilbakekreving.k9sak.klient.K9HenvisningKonverterer;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.TaskType;
@@ -34,11 +37,12 @@ public class HendelseHåndtererTjenesteTest {
     private static final AktørId AKTØR_ID = new AktørId("1234567898765");
     private static final Long EKSTERN_BEHANDLING_ID = 123L;
     private static final UUID EKSTERN_BEHANDLING_UUID = UUID.randomUUID();
+    private static final Henvisning HENVISNING = K9HenvisningKonverterer.uuidTilHenvisning(EKSTERN_BEHANDLING_UUID);
 
     private FagsystemKlient restKlient = mock(FagsystemKlient.class);
     private ProsessTaskTjeneste taskTjeneste = mock(ProsessTaskTjeneste.class);
     private HendelseTaskDataWrapper hendelseTaskDataWrapper = lagHendelseTask();
-    private HendelseHåndtererTjeneste hendelseHåndtererTjeneste = new HendelseHåndtererTjeneste(taskTjeneste, restKlient);
+    private HendelseHåndtererTjeneste hendelseHåndtererTjeneste = new HendelseHåndtererTjeneste(taskTjeneste, restKlient, mock(EksternBehandlingRepository.class));
 
 
     @Test
@@ -47,7 +51,7 @@ public class HendelseHåndtererTjenesteTest {
         TilbakekrevingValgDto tbkDataDto = new TilbakekrevingValgDto(videreBehandling);
         when(restKlient.hentTilbakekrevingValg(any(UUID.class))).thenReturn(Optional.of(tbkDataDto));
 
-        hendelseHåndtererTjeneste.håndterHendelse(hendelseTaskDataWrapper);
+        hendelseHåndtererTjeneste.håndterHendelse(hendelseTaskDataWrapper, HENVISNING);
 
         var captor = ArgumentCaptor.forClass(ProsessTaskData.class);
         verify(taskTjeneste, times(1)).lagre(captor.capture());
@@ -61,7 +65,7 @@ public class HendelseHåndtererTjenesteTest {
         TilbakekrevingValgDto tbkDataDto = new TilbakekrevingValgDto(videreBehandling);
         when(restKlient.hentTilbakekrevingValg(any(UUID.class))).thenReturn(Optional.of(tbkDataDto));
 
-        hendelseHåndtererTjeneste.håndterHendelse(hendelseTaskDataWrapper);
+        hendelseHåndtererTjeneste.håndterHendelse(hendelseTaskDataWrapper, HENVISNING);
 
         var captor = ArgumentCaptor.forClass(ProsessTaskData.class);
         verify(taskTjeneste, times(1)).lagre(captor.capture());
@@ -75,7 +79,7 @@ public class HendelseHåndtererTjenesteTest {
         TilbakekrevingValgDto tbkDataDto = new TilbakekrevingValgDto(videreBehandling);
         when(restKlient.hentTilbakekrevingValg(any(UUID.class))).thenReturn(Optional.of(tbkDataDto));
 
-        hendelseHåndtererTjeneste.håndterHendelse(hendelseTaskDataWrapper);
+        hendelseHåndtererTjeneste.håndterHendelse(hendelseTaskDataWrapper, HENVISNING);
 
         verifyNoInteractions(taskTjeneste);
     }

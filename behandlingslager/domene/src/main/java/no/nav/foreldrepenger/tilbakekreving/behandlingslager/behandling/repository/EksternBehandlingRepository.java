@@ -141,4 +141,14 @@ public class EksternBehandlingRepository {
 
         return hentUniktResultat(query);
     }
+
+    /*
+     * For idempotens-sjekk
+     */
+    public boolean harEksternBehandlingForEksternUuid(UUID eksternUuid) {
+        return entityManager.createQuery("from EksternBehandling where eksternUuid=:eksternUuid", EksternBehandling.class)
+            .setParameter(EKSTERN_UUID, eksternUuid)
+            .getResultList()
+            .size() > 0;
+    }
 }

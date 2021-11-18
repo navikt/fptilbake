@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.konfig.KonfigVerdi;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 
 @ApplicationScoped
 public class DvhKafkaProducer {
@@ -33,13 +34,12 @@ public class DvhKafkaProducer {
 
     @Inject
     public DvhKafkaProducer(@KonfigVerdi("bootstrap.servers") String bootstrapServers,
-                            @KonfigVerdi("app.name") String clientId,
                             @KonfigVerdi("systembruker.username") String username,
                             @KonfigVerdi("systembruker.password") String password) {
 
         Properties properties = new Properties();
         properties.setProperty("bootstrap.servers", bootstrapServers);
-        properties.setProperty("client.id", clientId);
+        properties.setProperty("client.id", ApplicationName.hvilkenTilbakeAppName());
         properties.setProperty("max.in.flight.requests.per.connection", "1"); //påkrevet for å garantere rekkefølge sammen med retries
         properties.setProperty("acks", "all"); //mindre sjangse for å miste melding
 

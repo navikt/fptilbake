@@ -91,7 +91,7 @@ public class FplosPubliserEventTaskTest {
             mockGjenopptaBehandlingTjeneste, mockBehandlingskontrollTjeneste, mockEventPubliserer);
         FaktaFeilutbetalingTjeneste faktaFeilutbetalingTjeneste = new FaktaFeilutbetalingTjeneste(repositoryProvider,
             kravgrunnlagTjeneste, mockFagsystemKlient);
-        fplosPubliserEventTask = new FplosPubliserEventTask(repositoryProvider, faktaFeilutbetalingTjeneste, mockKafkaProducer, "fptilbake");
+        fplosPubliserEventTask = new FplosPubliserEventTask(repositoryProvider, faktaFeilutbetalingTjeneste, mockKafkaProducer, Fagsystem.FPTILBAKE);
 
         behandling = ScenarioSimple.simple().lagre(repositoryProvider);
         behandling.setAnsvarligSaksbehandler("1234");

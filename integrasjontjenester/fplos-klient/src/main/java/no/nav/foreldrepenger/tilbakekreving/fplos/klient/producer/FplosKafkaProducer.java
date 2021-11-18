@@ -1,7 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.fplos.klient.producer;
 
 import java.util.Properties;
-import java.util.concurrent.ExecutionException;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -10,16 +9,13 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.common.KafkaException;
-import org.apache.kafka.common.errors.AuthenticationException;
-import org.apache.kafka.common.errors.AuthorizationException;
-import org.apache.kafka.common.errors.RetriableException;
 import org.apache.kafka.common.header.internals.RecordHeaders;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import no.nav.foreldrepenger.konfig.KonfigVerdi;
+import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
 import no.nav.vedtak.exception.IntegrasjonException;
 import no.nav.vedtak.log.mdc.MDCOperations;
 
@@ -40,13 +36,12 @@ public class FplosKafkaProducer {
     @Inject
     public FplosKafkaProducer(@KonfigVerdi("kafka.fplos.topic") String topic,
                               @KonfigVerdi("bootstrap.servers") String bootstrapServers,
-                              @KonfigVerdi("app.name") String clientId,
                               @KonfigVerdi("systembruker.username") String username,
                               @KonfigVerdi("systembruker.password") String password) {
         Properties properties = new Properties();
 
         properties.setProperty("bootstrap.servers", bootstrapServers);
-        properties.setProperty("client.id", clientId);
+        properties.setProperty("client.id", ApplicationName.hvilkenTilbakeAppName());
         properties.setProperty("max.in.flight.requests.per.connection", "1"); //påkrevet for å garantere rekkefølge sammen med retries
         properties.setProperty("acks", "all"); //mindre sjangse for å miste melding
 
