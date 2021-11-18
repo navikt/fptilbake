@@ -65,4 +65,8 @@ public class VedtakFattetMeldingConsumer extends YtelsesvedtakHendelseConsumer {
     private void subscribe() {
         this.kafkaConsumer.subscribe(Collections.singletonList(this.topic));
     }
+
+    public String getTopic() {
+        return topic;
+    }
 }
