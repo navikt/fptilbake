@@ -13,26 +13,26 @@ public final class ApplicationName extends Application {
     private static final String APPLIKASJON_NAVN_K9_TILBAKE = "k9-tilbake";
     private static final String APPLIKASJON_NAVN_FPTILBAKE = "fptilbake";
 
-    private static Fagsystem CURRENT;
+    private static Fagsystem CURRENT_APPLIKASJON;
     private static String CURRENT_APPLIKASJON_NAVN;
 
     public static Fagsystem hvilkenTilbake() {
-        if (CURRENT == null) {
-            CURRENT = setCurrentApp();
+        if (CURRENT_APPLIKASJON == null) {
+            setCurrentApp();
         }
-        return CURRENT;
+        return CURRENT_APPLIKASJON;
     }
 
     public static String hvilkenTilbakeAppName() {
-        if (CURRENT == null) {
-            CURRENT = setCurrentApp();
+        if (CURRENT_APPLIKASJON == null) {
+            setCurrentApp();
         }
         return CURRENT_APPLIKASJON_NAVN;
     }
 
-    private static Fagsystem setCurrentApp() {
+    private static void setCurrentApp() {
         CURRENT_APPLIKASJON_NAVN = ENV.getProperty("app.name");
-        return switch (CURRENT_APPLIKASJON_NAVN) {
+        CURRENT_APPLIKASJON = switch (CURRENT_APPLIKASJON_NAVN) {
             case APPLIKASJON_NAVN_FPTILBAKE -> Fagsystem.FPTILBAKE;
             case APPLIKASJON_NAVN_K9_TILBAKE -> Fagsystem.K9TILBAKE;
             default -> throw new IllegalStateException("applikasjonsnavn er satt til " + CURRENT_APPLIKASJON_NAVN + " som ikke er en støttet verdi");
