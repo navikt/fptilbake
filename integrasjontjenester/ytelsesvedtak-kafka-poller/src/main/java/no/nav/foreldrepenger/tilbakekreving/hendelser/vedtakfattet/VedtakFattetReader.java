@@ -22,8 +22,6 @@ import no.nav.abakus.vedtak.ytelse.v1.YtelseV1;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
-import no.nav.foreldrepenger.tilbakekreving.fagsystem.K9tilbake;
-import no.nav.foreldrepenger.tilbakekreving.hendelser.felles.HendelseReader;
 import no.nav.foreldrepenger.tilbakekreving.hendelser.felles.task.HåndterVedtakFattetTask;
 import no.nav.foreldrepenger.tilbakekreving.kafka.poller.PostTransactionHandler;
 import no.nav.foreldrepenger.tilbakekreving.kafka.util.KafkaConsumerFeil;
@@ -31,8 +29,7 @@ import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 
 @ApplicationScoped
-@K9tilbake
-public class VedtakFattetReader implements HendelseReader {
+public class VedtakFattetReader {
 
     private static final Logger logger = LoggerFactory.getLogger(VedtakFattetReader.class);
 
@@ -78,7 +75,6 @@ public class VedtakFattetReader implements HendelseReader {
         this.abonnerteYtelser = STØTTET_YTELSE_TYPER.getOrDefault(applikasjon, Set.of());;
     }
 
-    @Override
     public PostTransactionHandler hentOgBehandleMeldinger() {
         List<Ytelse> meldinger = meldingConsumer.lesMeldinger();
         if (meldinger.isEmpty()) {
@@ -86,7 +82,7 @@ public class VedtakFattetReader implements HendelseReader {
             }; //trenger ikke å gjøre commit, siden ingen nye meldinger er lest
         }
 
-        logger.info("Leste {} meldinger fra privat-k9-vedtakhendelse-topic", meldinger.size());
+        logger.info("Leste {} meldinger fra topic {}", meldinger.size(), meldingConsumer.getTopic());
         behandleMeldinger(meldinger);
         return this::commitMeldinger;
     }
