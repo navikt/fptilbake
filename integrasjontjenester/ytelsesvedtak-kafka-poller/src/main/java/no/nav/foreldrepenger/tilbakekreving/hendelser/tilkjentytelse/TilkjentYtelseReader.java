@@ -6,6 +6,7 @@ import static no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskPropertie
 import static no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties.HENVISNING;
 import static no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties.SAKSNUMMER;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -98,6 +99,7 @@ public class TilkjentYtelseReader implements HendelseReader {
         td.setProperty(HENVISNING, henvisning.getVerdi());
         td.setProperty(SAKSNUMMER, melding.getSaksnummer().getVerdi());
         td.setProperty(FAGSAK_YTELSE_TYPE, melding.getFagsakYtelseType());
+        td.setNesteKjøringEtter(LocalDateTime.now().plusMinutes(10));
         return td;
     }
 

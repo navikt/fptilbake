@@ -133,8 +133,6 @@ public class VedtakFattetReader {
         td.setProperty(EKSTERN_BEHANDLING_UUID, melding.getVedtakReferanse());
         td.setSaksnummer(melding.getSaksnummer());
         td.setProperty(FAGSAK_YTELSE_TYPE, YTELSE_TYPE_MAP.get(melding.getType()).getKode());
-        // Begynner med å kjøre denne senere enn gamle topics - neste steg er å bytte på etter det er gjort catchup.
-        td.setNesteKjøringEtter(LocalDateTime.now().plusMinutes(10));
         return td;
     }
 

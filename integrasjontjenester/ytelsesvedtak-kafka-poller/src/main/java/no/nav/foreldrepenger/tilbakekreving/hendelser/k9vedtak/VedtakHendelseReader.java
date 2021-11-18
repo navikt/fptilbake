@@ -108,6 +108,7 @@ public class VedtakHendelseReader implements HendelseReader {
         td.setProperty(HENVISNING, henvisning.getVerdi());
         td.setSaksnummer(melding.getSaksnummer());
         td.setProperty(FAGSAK_YTELSE_TYPE, melding.getFagsakYtelseType().getKode());
+        td.setNesteKjøringEtter(LocalDateTime.now().plusMinutes(10));
         return td;
     }
 
