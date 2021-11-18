@@ -37,7 +37,7 @@ public class HåndterHendelseTaskTest {
         håndterHendelseTask.doTask(prosessTaskData);
 
         // verify
-        verify(hendelseHåndterer, atLeastOnce()).håndterHendelse(any(HendelseTaskDataWrapper.class), any(Henvisning.class));
+        verify(hendelseHåndterer, atLeastOnce()).håndterHendelse(any(HendelseTaskDataWrapper.class), any(Henvisning.class), any(String.class));
     }
 
     private ProsessTaskData lagProsessTaskData(TilkjentYtelseMelding melding) {
