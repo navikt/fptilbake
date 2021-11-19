@@ -1,11 +1,10 @@
-package no.nav.foreldrepenger.tilbakekreving.hendelser.felles;
+package no.nav.foreldrepenger.tilbakekreving.hendelser;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import com.codahale.metrics.annotation.Timed;
 
-import no.nav.foreldrepenger.tilbakekreving.hendelser.vedtakfattet.VedtakFattetReader;
 import no.nav.foreldrepenger.tilbakekreving.kafka.poller.KafkaPoller;
 import no.nav.foreldrepenger.tilbakekreving.kafka.poller.PostTransactionHandler;
 

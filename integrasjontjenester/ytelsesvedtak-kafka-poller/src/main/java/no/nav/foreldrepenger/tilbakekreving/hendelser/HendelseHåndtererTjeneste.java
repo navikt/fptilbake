@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.hendelser.felles.tjeneste;
+package no.nav.foreldrepenger.tilbakekreving.hendelser;
 
 import java.util.UUID;
 

@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.hendelser.vedtakfattet;
+package no.nav.foreldrepenger.tilbakekreving.hendelser;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -12,15 +12,20 @@ import javax.inject.Inject;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.serialization.StringDeserializer;
 
 import no.nav.abakus.vedtak.ytelse.Ytelse;
 import no.nav.foreldrepenger.konfig.KonfigVerdi;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
-import no.nav.foreldrepenger.tilbakekreving.hendelser.felles.YtelsesvedtakHendelseConsumer;
 import no.nav.foreldrepenger.tilbakekreving.kafka.util.JsonDeserialiserer;
 
 @ApplicationScoped
-public class VedtakFattetMeldingConsumer extends YtelsesvedtakHendelseConsumer {
+public class VedtakFattetMeldingConsumer {
+
+    protected static final int TIMEOUT = 1000;
+    protected static final String BOOTSTRAP_SERVERS = "bootstrap.servers";
+    protected static final String VEDTAKFATTET_TOPIC = "kafka.fattevedtak.topic";
+
 
     private KafkaConsumer<String, String> kafkaConsumer;
     private String topic;
@@ -68,5 +73,37 @@ public class VedtakFattetMeldingConsumer extends YtelsesvedtakHendelseConsumer {
 
     public String getTopic() {
         return topic;
+    }
+
+    private Properties lagFellesProperty(String bootstrapServers, String applikasjonNavn){
+        Properties properties = new Properties();
+        properties.setProperty("key.deserializer", StringDeserializer.class.getName());
+        properties.setProperty("value.deserializer", StringDeserializer.class.getName());
+        properties.setProperty(BOOTSTRAP_SERVERS, bootstrapServers);
+        properties.setProperty("group.id", applikasjonNavn);
+        properties.setProperty("client.id", applikasjonNavn);
+        properties.setProperty("enable.auto.commit", "false");
+        properties.setProperty("max.poll.records", "20");
+        properties.setProperty("auto.offset.reset", "latest");
+        return properties;
+    }
+
+    private void setSecurity(String username, Properties properties) {
+        if (username != null && !username.isEmpty()) {
+            properties.setProperty("security.protocol", "SASL_SSL");
+            properties.setProperty("sasl.mechanism", "PLAIN");
+        }
+    }
+
+    private void addUserToProperties(@KonfigVerdi("kafka.username") String username, @KonfigVerdi("kafka.password") String password, Properties properties) {
+        if (notNullNotEmpty(username) && notNullNotEmpty(password)) {
+            String jaasTemplate = "org.apache.kafka.common.security.scram.ScramLoginModule required username=\"%s\" password=\"%s\";";
+            String jaasCfg = String.format(jaasTemplate, username, password);
+            properties.setProperty("sasl.jaas.config", jaasCfg);
+        }
+    }
+
+    private boolean notNullNotEmpty(String str) {
+        return (str != null && !str.isEmpty());
     }
 }

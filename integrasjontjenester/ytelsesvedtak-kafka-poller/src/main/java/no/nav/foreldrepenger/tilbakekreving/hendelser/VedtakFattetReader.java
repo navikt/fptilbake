@@ -1,9 +1,8 @@
-package no.nav.foreldrepenger.tilbakekreving.hendelser.vedtakfattet;
+package no.nav.foreldrepenger.tilbakekreving.hendelser;
 
 import static no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties.EKSTERN_BEHANDLING_UUID;
 import static no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties.FAGSAK_YTELSE_TYPE;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -22,7 +21,6 @@ import no.nav.abakus.vedtak.ytelse.v1.YtelseV1;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.Fagsystem;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.ApplicationName;
-import no.nav.foreldrepenger.tilbakekreving.hendelser.felles.task.HåndterVedtakFattetTask;
 import no.nav.foreldrepenger.tilbakekreving.kafka.poller.PostTransactionHandler;
 import no.nav.foreldrepenger.tilbakekreving.kafka.util.KafkaConsumerFeil;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
@@ -112,7 +110,7 @@ public class VedtakFattetReader {
         validereMelding(melding);
         if (abonnerteYtelser.contains(melding.getType())) {
             taskTjeneste.lagre(lagProsessTaskData(melding));
-        } else {
+        } else if (YTELSE_TYPE_MAP.get(melding.getType()) == null) {
             logger.warn("Melding om vedtak for {} for sak={} behandling={} med vedtakstidspunkt {} ble ignorert pga ikke-støttet ytelsetype",
                 melding.getType(), melding.getSaksnummer(), melding.getVedtakReferanse(), melding.getVedtattTidspunkt());
         }

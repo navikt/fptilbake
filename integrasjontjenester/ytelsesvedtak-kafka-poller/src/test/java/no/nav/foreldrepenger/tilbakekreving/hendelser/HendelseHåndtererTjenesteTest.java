@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.hendelser.felles.tjeneste;
+package no.nav.foreldrepenger.tilbakekreving.hendelser;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -26,7 +26,6 @@ import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Saksnummer;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.FagsystemKlient;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.TilbakekrevingValgDto;
-import no.nav.foreldrepenger.tilbakekreving.hendelser.felles.task.HåndterHendelseTask;
 import no.nav.foreldrepenger.tilbakekreving.k9sak.klient.K9HenvisningKonverterer;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
