@@ -26,10 +26,6 @@
             <artifactId>kafka-poller</artifactId>
         </dependency>
         <dependency>
-            <groupId>no.nav.foreldrepenger.kontrakter</groupId>
-            <artifactId>fp-tilkjent-ytelse-v1</artifactId>
-        </dependency>
-        <dependency>
             <groupId>no.nav.foreldrepenger.tilbakekreving</groupId>
             <artifactId>k9-sak-klient</artifactId>
             <exclusions>

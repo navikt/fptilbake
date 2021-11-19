@@ -1,4 +1,4 @@
-package no.nav.foreldrepenger.tilbakekreving.hendelser.vedtakfattet;
+package no.nav.foreldrepenger.tilbakekreving.hendelser;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -27,7 +27,6 @@ import no.nav.abakus.vedtak.ytelse.v1.YtelseV1;
 import no.nav.foreldrepenger.tilbakekreving.behandling.task.HendelseTaskDataWrapper;
 import no.nav.foreldrepenger.tilbakekreving.behandling.task.TaskProperties;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.fagsak.FagsakYtelseType;
-import no.nav.foreldrepenger.tilbakekreving.hendelser.felles.task.HåndterVedtakFattetTask;
 import no.nav.foreldrepenger.tilbakekreving.kafka.poller.PostTransactionHandler;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
