@@ -36,6 +36,11 @@ public class VedtakFattetReader {
         Fagsystem.K9TILBAKE,  Set.of(YtelseType.FRISINN, YtelseType.OMSORGSPENGER, YtelseType.PLEIEPENGER_SYKT_BARN)
     );
 
+    private static final Map<Fagsystem, Set<YtelseType>> REST_YTELSE_TYPER = Map.of(
+        Fagsystem.FPTILBAKE, Set.of(),
+        Fagsystem.K9TILBAKE,  Set.of(YtelseType.OPPLÆRINGSPENGER, YtelseType.PLEIEPENGER_NÆRSTÅENDE)
+    );
+
     private static final Map<YtelseType, FagsakYtelseType> YTELSE_TYPE_MAP = Map.of(
         YtelseType.ENGANGSTØNAD, FagsakYtelseType.ENGANGSTØNAD,
         YtelseType.FORELDREPENGER, FagsakYtelseType.FORELDREPENGER,
@@ -43,13 +48,14 @@ public class VedtakFattetReader {
         YtelseType.FRISINN, FagsakYtelseType.FRISINN,
         YtelseType.OMSORGSPENGER, FagsakYtelseType.OMSORGSPENGER,
         YtelseType.OPPLÆRINGSPENGER, FagsakYtelseType.OPPLÆRINGSPENGER,
-        YtelseType.PLEIEPENGER_SYKT_BARN, FagsakYtelseType.PLEIEPENGER_SYKT_BARN,
-        YtelseType.PLEIEPENGER_NÆRSTÅENDE, FagsakYtelseType.PLEIEPENGER_NÆRSTÅENDE
+        YtelseType.PLEIEPENGER_NÆRSTÅENDE, FagsakYtelseType.PLEIEPENGER_NÆRSTÅENDE,
+        YtelseType.PLEIEPENGER_SYKT_BARN, FagsakYtelseType.PLEIEPENGER_SYKT_BARN
     );
 
     private VedtakFattetMeldingConsumer meldingConsumer;
     private ProsessTaskTjeneste taskTjeneste;
     private Set<YtelseType> abonnerteYtelser;
+    private Set<YtelseType> resterendeYtelser;
 
 
     VedtakFattetReader() {
@@ -62,7 +68,7 @@ public class VedtakFattetReader {
         this.meldingConsumer = meldingConsumer;
         this.taskTjeneste = taskTjeneste;
         this.abonnerteYtelser = STØTTET_YTELSE_TYPER.getOrDefault(ApplicationName.hvilkenTilbake(), Set.of());
-
+        this.resterendeYtelser = REST_YTELSE_TYPER.getOrDefault(ApplicationName.hvilkenTilbake(), Set.of());
     }
 
     public VedtakFattetReader(VedtakFattetMeldingConsumer meldingConsumer,
@@ -70,7 +76,8 @@ public class VedtakFattetReader {
                               Fagsystem applikasjon) {
         this.meldingConsumer = meldingConsumer;
         this.taskTjeneste = taskTjeneste;
-        this.abonnerteYtelser = STØTTET_YTELSE_TYPER.getOrDefault(applikasjon, Set.of());;
+        this.abonnerteYtelser = STØTTET_YTELSE_TYPER.getOrDefault(applikasjon, Set.of());
+        this.resterendeYtelser = REST_YTELSE_TYPER.getOrDefault(applikasjon, Set.of());
     }
 
     public PostTransactionHandler hentOgBehandleMeldinger() {
@@ -110,7 +117,7 @@ public class VedtakFattetReader {
         validereMelding(melding);
         if (abonnerteYtelser.contains(melding.getType())) {
             taskTjeneste.lagre(lagProsessTaskData(melding));
-        } else if (YTELSE_TYPE_MAP.get(melding.getType()) == null) {
+        } else if (YTELSE_TYPE_MAP.get(melding.getType()) == null || resterendeYtelser.contains(melding.getType())) {
             logger.warn("Melding om vedtak for {} for sak={} behandling={} med vedtakstidspunkt {} ble ignorert pga ikke-støttet ytelsetype",
                 melding.getType(), melding.getSaksnummer(), melding.getVedtakReferanse(), melding.getVedtattTidspunkt());
         }
