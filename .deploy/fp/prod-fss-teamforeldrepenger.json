@@ -31,7 +31,6 @@
     "DOKUMENTPRODUKSJON_V2_URL": "https://dokprod.nais.adeo.no/dokprod/ws/dokumentproduksjon/v2",
     "BOOTSTRAP_SERVERS": "a01apvl00145.adeo.no:8443,a01apvl00146.adeo.no:8443,a01apvl00147.adeo.no:8443,a01apvl00148.adeo.no:8443,a01apvl00149.adeo.no:8443,a01apvl00150.adeo.no:8443",
     "KAFKA_FATTEVEDTAK_TOPIC": "privat-familie-vedtakFattet-v1",
-    "FAGSYSTEM_FATTEDE_VEDTAK_TOPIC_URL": "privat-foreldrepenger-tilkjentytelse-v1-p",
     "TILBAKEKREVING_BRUKERDIALOG_HENDELSE_V1_TOPIC_URL": "privat-tilbakekreving-brukerdialog-p",
     "KAFKA_FPLOS_TOPIC": "privat-tilbakekreving-fploshendelse-v1-p",
     "KAFKA_DVH_VEDTAK_TOPIC": "privat-tilbakekreving-dvh-vedtak-v1",
