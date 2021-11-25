@@ -39,13 +39,13 @@ public class TilbakekrevingsvedtakTjeneste {
     }
 
     private void validerSkattBeløp(final List<TilbakekrevingPeriode> tilbakekrevingPerioder) {
-        var summSkattPåIkkeSkattepliktigeYtelser = tilbakekrevingPerioder.stream()
+        var sumSkattPåIkkeSkattepliktigeYtelser = tilbakekrevingPerioder.stream()
             .flatMap(periode -> periode.getBeløp().stream())
             .filter(TilbakekrevingBeløp::erIkkeSkattepliktig)
             .map(TilbakekrevingBeløp::getSkattBeløp)
             .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        if (summSkattPåIkkeSkattepliktigeYtelser.compareTo(BigDecimal.ZERO) != 0) {
+        if (sumSkattPåIkkeSkattepliktigeYtelser.compareTo(BigDecimal.ZERO) != 0) {
             throw new IllegalStateException("Skattebeløp for ikke skattepliktige ytelser skal være 0, men var ikke dette!");
         }
     }
