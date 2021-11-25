@@ -135,7 +135,7 @@ public class KravgrunnlagTjeneste {
     }
 
     private void slettVLAnsvarlingSaksbehandler(Behandling behandling) {
-        if (behandling.isAutomatiskSaksbehandlet()) {
+        if (behandling.isAutomatiskSaksbehandlet() && "VL".equals(behandling.getAnsvarligSaksbehandler())) {
             BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(behandling);
             behandling.setAnsvarligSaksbehandler(null);
             behandlingRepository.lagre(behandling, behandlingLås);
