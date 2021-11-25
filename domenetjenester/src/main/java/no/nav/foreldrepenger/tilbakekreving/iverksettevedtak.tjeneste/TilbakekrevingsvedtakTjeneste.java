@@ -1,5 +1,6 @@
 package no.nav.foreldrepenger.tilbakekreving.iverksettevedtak.tjeneste;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -33,6 +34,19 @@ public class TilbakekrevingsvedtakTjeneste {
         Kravgrunnlag431 kravgrunnlag = kravgrunnlagRepository.finnKravgrunnlag(behandlingId);
         BeregningResultat beregningResultat = beregningTjeneste.beregn(behandlingId);
         List<TilbakekrevingPeriode> tilbakekrevingPerioder = vedtakPeriodeBeregner.lagTilbakekrevingsPerioder(kravgrunnlag, beregningResultat);
+        validerSkattBeløp(tilbakekrevingPerioder);
         return TilbakekrevingsvedtakMapper.tilDto(kravgrunnlag, tilbakekrevingPerioder);
+    }
+
+    private void validerSkattBeløp(final List<TilbakekrevingPeriode> tilbakekrevingPerioder) {
+        var summSkattPåIkkeSkattepliktigeYtelser = tilbakekrevingPerioder.stream()
+            .flatMap(periode -> periode.getBeløp().stream())
+            .filter(TilbakekrevingBeløp::erIkkeSkattepliktig)
+            .map(TilbakekrevingBeløp::getSkattBeløp)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        if (summSkattPåIkkeSkattepliktigeYtelser.compareTo(BigDecimal.ZERO) != 0) {
+            throw new IllegalStateException("Skattebeløp for ikke skattepliktige ytelser skal være 0, men var ikke dette!");
+        }
     }
 }
