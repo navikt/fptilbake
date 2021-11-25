@@ -202,7 +202,7 @@ public class TilbakekrevingVedtakPeriodeBeregner {
         for (TilbakekrevingPeriode kandidatPeriode : perioder) {
             Periode periode = kandidatPeriode.getPeriode();
             for (TilbakekrevingBeløp kandidat : kandidatPeriode.getBeløp()) {
-                if (!kandidat.getKlasseType().equals(KlasseType.YTEL)) {
+                if (!kandidat.getKlasseType().equals(KlasseType.YTEL) || kandidat.erIkkeSkattepliktig()) {
                     continue;
                 }
                 boolean justerSkattOpp = diff.signum() == -1 && harGjenståendeMuligSkattetrekk(periode, kgGjenståendeMuligSkattetrekk);

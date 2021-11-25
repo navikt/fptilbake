@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import no.nav.foreldrepenger.tilbakekreving.felles.Periode;
+import no.nav.foreldrepenger.tilbakekreving.grunnlag.KodeAksjon;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.Kravgrunnlag431;
 import no.nav.foreldrepenger.tilbakekreving.grunnlag.kodeverk.KlasseType;
 import no.nav.tilbakekreving.tilbakekrevingsvedtak.vedtak.v1.TilbakekrevingsbelopDto;
@@ -30,7 +31,7 @@ public class TilbakekrevingsvedtakMapper {
 
     private static TilbakekrevingsvedtakDto tilDto(Kravgrunnlag431 kravgrunnlag) {
         TilbakekrevingsvedtakDto tilbakekrevingsvedtak = new TilbakekrevingsvedtakDto();
-        tilbakekrevingsvedtak.setKodeAksjon("8"); // fast verdi, Fatte Vedtak(8)
+        tilbakekrevingsvedtak.setKodeAksjon(KodeAksjon.FATTE_VEDTAK.getKode()); // fast verdi, Fatte Vedtak(8)
         tilbakekrevingsvedtak.setVedtakId(BigInteger.valueOf(kravgrunnlag.getVedtakId()));
         LocalDate vedtakFagsystemDato = kravgrunnlag.getVedtakFagSystemDato();
         if (vedtakFagsystemDato == null) {
