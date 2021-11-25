@@ -22,6 +22,7 @@ import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.Behandli
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.BehandlingStegType;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.AksjonspunktDefinisjon;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.aksjonspunkt.Venteårsak;
+import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingLås;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepository;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.behandling.repository.BehandlingRepositoryProvider;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.historikk.HistorikkAktør;
@@ -128,8 +129,17 @@ public class KravgrunnlagTjeneste {
             behandlingskontrollTjeneste.behandlingTilbakeføringTilTidligereBehandlingSteg(kontekst, FAKTA_FEILUTBETALING);
             opprettHistorikkinnslagForBehandlingStartetForfra(behandling);
         }
+        slettVLAnsvarlingSaksbehandler(behandling); // Hvis AS er ikke null vil den aldri bli plukket opp av automatisk sakbehandling igjen.
         fyrKravgrunnlagEndretEvent(behandlingId);
         gjenopptaBehandlingTjeneste.fortsettBehandlingMedGrunnlag(behandlingId);
+    }
+
+    private void slettVLAnsvarlingSaksbehandler(Behandling behandling) {
+        if (behandling.isAutomatiskSaksbehandlet()) {
+            BehandlingLås behandlingLås = behandlingRepository.taSkriveLås(behandling);
+            behandling.setAnsvarligSaksbehandler(null);
+            behandlingRepository.lagre(behandling, behandlingLås);
+        }
     }
 
     private void fyrKravgrunnlagEndretEvent(Long behandlingId) {
