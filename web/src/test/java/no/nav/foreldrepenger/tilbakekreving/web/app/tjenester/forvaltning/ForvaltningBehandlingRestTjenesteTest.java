@@ -72,6 +72,7 @@ import no.nav.foreldrepenger.tilbakekreving.web.app.tjenester.forvaltning.dto.Ko
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiMottattXmlRepository;
 import no.nav.foreldrepenger.tilbakekreving.økonomixml.ØkonomiSendtXmlRepository;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskData;
+import no.nav.vedtak.felles.prosesstask.api.ProsessTaskGruppe;
 import no.nav.vedtak.felles.prosesstask.api.ProsessTaskTjeneste;
 import no.nav.vedtak.felles.prosesstask.api.TaskType;
 
@@ -171,7 +172,11 @@ public class ForvaltningBehandlingRestTjenesteTest {
         Response response = forvaltningBehandlingRestTjeneste.tvingGjenopptaBehandling(
             new BehandlingReferanse(behandling.getId()));
         assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
-        assertProsessTask(TaskType.forProsessTask(GjenopptaBehandlingTask.class));
+
+        var captor = ArgumentCaptor.forClass(ProsessTaskGruppe.class);
+        verify(taskTjeneste, times(1)).lagre(captor.capture());
+        var prosessTaskData = captor.getValue();
+        assertThat(prosessTaskData.getTasks().size()).isEqualTo(2);
     }
 
     @Test
