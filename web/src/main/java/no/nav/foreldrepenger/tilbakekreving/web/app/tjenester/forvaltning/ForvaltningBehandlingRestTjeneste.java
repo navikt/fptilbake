@@ -158,6 +158,30 @@ public class ForvaltningBehandlingRestTjeneste {
     }
 
     @POST
+    @Path("/fortsett-behandling")
+    @Operation(
+        tags = "FORVALTNING-behandling",
+        description = "Tjenesten for å fortsett en behandling som står i limbo tilstand (unten aksjonspunkter i status venter). NB! Må ikke brukes uten grund!",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Fortsett behandling ok"),
+            @ApiResponse(responseCode = "400", description = "Behandlingen er avsluttet eller behandlingen er fortsatt på vent"),
+            @ApiResponse(responseCode = "500", description = "Feilet pga ukjent feil.")
+        })
+    @BeskyttetRessurs(action = CREATE, property = AbacProperty.DRIFT)
+    public Response fortsettBehandling(
+        @TilpassetAbacAttributt(supplierClass = BehandlingReferanseAbacAttributter.AbacDataBehandlingReferanse.class)
+        @NotNull @QueryParam("behandlingId") @Valid BehandlingReferanse behandlingReferanse) {
+        Behandling behandling = hentBehandling(behandlingReferanse);
+        if (behandling.erAvsluttet() || behandling.isBehandlingPåVent()) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        logger.info("Fortsett behandling. Oppretter task for å fortsettelse av behandlingId={}", behandlingReferanse.getBehandlingId());
+        var prosessTaskData = opprettFortsettBehandlingTask(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
+        taskTjeneste.lagre(prosessTaskData);
+        return Response.ok().build();
+    }
+
+    @POST
     @Path("/tving-koble-grunnlag")
     @Operation(
         tags = "FORVALTNING-behandling",
@@ -361,11 +385,17 @@ public class ForvaltningBehandlingRestTjeneste {
         ProsessTaskGruppe gruppe = new ProsessTaskGruppe();
         ProsessTaskData prosessTaskData = ProsessTaskData.forProsessTask(GjenopptaBehandlingTask.class);
         prosessTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
-        var fortsettTaskData = ProsessTaskData.forProsessTask(FortsettBehandlingTask.class);
-        fortsettTaskData.setBehandling(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
+        var fortsettTaskData =
+            opprettFortsettBehandlingTask(behandling.getFagsakId(), behandling.getId(), behandling.getAktørId().getId());
         gruppe.addNesteSekvensiell(prosessTaskData);
         gruppe.addNesteSekvensiell(fortsettTaskData);
         taskTjeneste.lagre(gruppe);
+    }
+
+    private ProsessTaskData opprettFortsettBehandlingTask(long fagsakId, long behandlingId, String aktørId) {
+        var fortsettTaskData = ProsessTaskData.forProsessTask(FortsettBehandlingTask.class);
+        fortsettTaskData.setBehandling(fagsakId, behandlingId, aktørId);
+        return fortsettTaskData;
     }
 
     private void opprettHenleggBehandlingTask(Behandling behandling) {
