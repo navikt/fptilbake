@@ -14,6 +14,8 @@ Kontaktinformasjon (Foreldrepenger):
 Kontaktinformasjon (Omsorgspenger, Pleiepenger, Opplæringspenger, Frisinn):
 * slack-kanal: `#sykdom-i-familien`
 
+Pluss slack-kanal: `#po-familie-tilbake`
+
 # Lenker
 
 * [Dokumentasjon fra Produktteam Foreldrepenger](https://confluence.adeo.no/pages/viewpage.action?pageId=358580006) Denne inneholder bl.a. funksjonell beskrivelse og driftsdokumentasjon
