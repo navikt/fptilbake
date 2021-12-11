@@ -42,8 +42,7 @@ public class BehandlingRepository {
     EntityManager getEntityManager() {
         return entityManager;
     }
-
-
+    
     /**
      * Hent Behandling med angitt id.
      */
