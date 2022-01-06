@@ -242,12 +242,12 @@ public class TilbakekrevingVedtakPeriodeBeregner {
     private void oppdaterGjenståendeSkattetrekk(List<TilbakekrevingPeriode> perioder, Map<YearMonth, BigDecimal> kgGjenståendeMuligSkattetrekk) {
         //juster gjenstående skattetrekk
         for (TilbakekrevingPeriode tilbakekrevingPeriode : perioder) {
-            YearMonth måned = fraPeriode(tilbakekrevingPeriode.getPeriode());
             Optional<BigDecimal> skattBeløp = tilbakekrevingPeriode.getBeløp().stream()
                 .filter(b -> KlasseType.YTEL.equals(b.getKlasseType()))
                 .map(TilbakekrevingBeløp::getSkattBeløp)
                 .reduce(BigDecimal::add);
             if (skattBeløp.isPresent()) {
+                YearMonth måned = fraPeriode(tilbakekrevingPeriode.getPeriode());
                 BigDecimal gjenstående = kgGjenståendeMuligSkattetrekk.get(måned).subtract(skattBeløp.get());
                 kgGjenståendeMuligSkattetrekk.put(måned, gjenstående);
             }
