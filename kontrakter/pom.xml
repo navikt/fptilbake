@@ -67,46 +67,26 @@
                     <skip>false</skip>
                 </configuration>
             </plugin>
+            <!-- Plugin required to build java classes from XSD using XJC -->
             <plugin>
-                <!-- Plugin required to build java classes from XSD using XJC -->
-                <groupId>org.jvnet.jaxb2.maven2</groupId>
-                <artifactId>maven-jaxb2-plugin</artifactId>
-                <version>0.14.0</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.glassfish.jaxb</groupId>
-                        <artifactId>jaxb-runtime</artifactId>
-                        <version>2.3.4</version>
-                    </dependency>
-                </dependencies>
-                <configuration>
-                    <enableIntrospection>true</enableIntrospection>
-                    <plugins>
-                        <plugin>
-                            <groupId>org.jvnet.jaxb2_commons</groupId>
-                            <artifactId>jaxb2-basics</artifactId>
-                            <version>1.11.1</version>
-                        </plugin>
-                        <plugin>
-                            <groupId>org.jvnet.jaxb2_commons</groupId>
-                            <artifactId>jaxb2-basics-annotate</artifactId>
-                            <version>1.1.0</version>
-                        </plugin>
-                    </plugins>
-                </configuration>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jaxb2-maven-plugin</artifactId>
+                <version>2.5.0</version>
                 <executions>
                     <execution>
-                        <id>kravgrunnlag</id>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
                         <configuration>
-                            <schemaDirectory>${basedir}/src/main/resources/xsd/</schemaDirectory>
-                            <schemaIncludes>
-                                <include>**/*.xsd</include>
-                            </schemaIncludes>
-                            <generateDirectory>${project.build.directory}/generated-sources/kravgrunnlag</generateDirectory>
+                            <sources>
+                                <source>src/main/resources/xsd/</source>
+                            </sources>
+                            <xjbSources>
+                                <xjbSource>src/main/resources/xjb/</xjbSource>
+                            </xjbSources>
+                            <packageName/>
+                            <encoding>${project.build.sourceEncoding}</encoding>
                         </configuration>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
