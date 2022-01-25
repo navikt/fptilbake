@@ -34,8 +34,8 @@
         <felles.version>4.0.10</felles.version>
         <prosesstask.version>3.0.6</prosesstask.version>
         <fp-tidsserie.version>2.5.7</fp-tidsserie.version>
-        <fpkontrakter.version>6.0.6</fpkontrakter.version>
-        <abakus-kontrakt.version>1.3.25</abakus-kontrakt.version>
+        <fpkontrakter.version>6.1.4</fpkontrakter.version>
+        <abakus-kontrakt.version>1.3.26</abakus-kontrakt.version>
         <fp-jms.version>2.0.22</fp-jms.version>
 
         <surefire.version>2.22.2</surefire.version>
@@ -51,7 +51,7 @@
         <apache.ws.xmlschema.version>2.2.5</apache.ws.xmlschema.version>
         <javaslang.version>2.0.6</javaslang.version>
 
-        <flyway.version>8.4.0</flyway.version>
+        <flyway.version>8.4.2</flyway.version>
         <maven.compiler.source>{java.version}</maven.compiler.source>
         <maven.compiler.target>{java.version}</maven.compiler.target>
         <openhtmltopdf.version>1.0.10</openhtmltopdf.version>
@@ -362,7 +362,7 @@
             <dependency>
                 <groupId>com.fasterxml.woodstox</groupId>
                 <artifactId>woodstox-core</artifactId>
-                <version>6.2.7</version>
+                <version>6.2.8</version>
             </dependency>
 
             <!-- NAV -->
@@ -380,14 +380,14 @@
             <dependency>
                 <groupId>io.micrometer</groupId>
                 <artifactId>micrometer-core</artifactId>
-                <version>1.8.1</version>
+                <version>1.8.2</version>
             </dependency>
 
             <dependency>
                 <!-- velger en transitiv avhengighet - felles ikke enig med seg selv, velger den som blir brukt i prod-scope i felles -->
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
-                <version>3.21.0</version>
+                <version>3.21.1</version>
             </dependency>
 
             <dependency>
@@ -398,7 +398,7 @@
             <dependency>
                 <groupId>org.apache.kafka</groupId>
                 <artifactId>kafka-clients</artifactId>
-                <version>3.0.0</version>
+                <version>3.1.0</version>
             </dependency>
             <dependency>
                 <groupId>io.javaslang</groupId>
@@ -534,24 +534,6 @@
                 <version>0.1.55</version>
             </dependency>
 
-            <!-- Transitive avh. versjoner for å sikre unikhet (enforcer
-                dependencyConvergence). Skal ikke benyttes direkte av vår egen kode. -->
-            <dependency>
-                <groupId>org.jasypt</groupId>
-                <artifactId>jasypt</artifactId>
-                <version>1.9.3</version>
-            </dependency>
-            <!--Java10 -->
-            <dependency>
-                <groupId>jakarta.xml.bind</groupId>
-                <artifactId>jakarta.xml.bind-api</artifactId>
-                <version>2.3.3</version>
-            </dependency>
-            <dependency>
-                <groupId>com.sun.xml.bind</groupId>
-                <artifactId>jaxb-core</artifactId>
-                <version>3.0.2</version>
-            </dependency>
 
             <!-- logging -->
             <dependency>
@@ -580,7 +562,7 @@
             <dependency>
                 <groupId>com.zaxxer</groupId>
                 <artifactId>HikariCP</artifactId>
-                <version>4.0.3</version>
+                <version>5.0.1</version>
             </dependency>
             <dependency>
                 <groupId>org.glassfish</groupId>
@@ -630,7 +612,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>3.0.0-M3</version>
+                    <version>3.0.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -640,7 +622,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>3.2.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -712,6 +694,7 @@
                 </executions>
             </plugin>
 
+            <!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
@@ -732,13 +715,11 @@
                                 <dependencyConvergence/>
                                 <requireSameVersions>
                                     <dependencies>
-                                        <!-- sørger for at org.apache.cxf.cxf-rt-transports-http-jetty holdes i sync med cxf fra fp-felles  -->
                                         <dependency>org.apache.cxf:*</dependency>
                                     </dependencies>
                                 </requireSameVersions>
                                 <requireSameVersions>
                                     <dependencies>
-                                        <!-- sørger for at alle jersey-bibliotekene har samme versjon  -->
                                         <dependency>org.glassfish.jersey:*</dependency>
                                     </dependencies>
                                 </requireSameVersions>
@@ -747,6 +728,7 @@
                     </execution>
                 </executions>
             </plugin>
+            -->
 
             <plugin>
                 <artifactId>maven-deploy-plugin</artifactId>

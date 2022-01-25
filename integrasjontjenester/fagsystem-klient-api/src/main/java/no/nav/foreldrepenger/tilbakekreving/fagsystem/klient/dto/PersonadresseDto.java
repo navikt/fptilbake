@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PersonadresseDto {
-    private KodeDto adresseType;
     private String mottakerNavn;
     private String adresselinje1;
     private String adresselinje2;
@@ -14,14 +13,6 @@ public class PersonadresseDto {
     private String postnummer;
     private String poststed;
     private String land;
-
-    public KodeDto getAdresseType() {
-        return adresseType;
-    }
-
-    public void setAdresseType(KodeDto adresseType) {
-        this.adresseType = adresseType;
-    }
 
     public String getMottakerNavn() {
         return mottakerNavn;
@@ -82,8 +73,7 @@ public class PersonadresseDto {
     @Override
     public String toString() {
         return "PersonadresseDto{" +
-                "adresseType=" + adresseType +
-                ", mottakerNavn='" + mottakerNavn + '\'' +
+                "mottakerNavn='" + mottakerNavn + '\'' +
                 ", adresselinje1='" + adresselinje1 + '\'' +
                 ", adresselinje2='" + adresselinje2 + '\'' +
                 ", adresselinje3='" + adresselinje3 + '\'' +
