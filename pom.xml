@@ -31,7 +31,7 @@
 
         <!-- Felles avhengigheter i prosjektet Disse skal ALLTID være en
             RELEASE-avhengighet UNNTAK: feature-brancher og lokalt -->
-        <felles.version>4.0.10</felles.version>
+        <felles.version>4.1.14</felles.version>
         <prosesstask.version>3.0.6</prosesstask.version>
         <fp-tidsserie.version>2.5.8</fp-tidsserie.version>
         <fpkontrakter.version>6.1.4</fpkontrakter.version>
@@ -97,6 +97,16 @@
     <dependencyManagement>
         <dependencies>
             <!-- Felles biblioteker - Importerte avhengigheter -->
+            <dependency>
+                <groupId>org.ehcache</groupId>
+                <artifactId>ehcache</artifactId>
+                <version>3.9.6</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.neethi</groupId>
+                <artifactId>neethi</artifactId>
+                <version>3.1.1</version>
+            </dependency>
             <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
@@ -464,7 +474,7 @@
             <dependency>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-rt-transports-http-jetty</artifactId>
-                <version>3.4.4</version>
+                <version>3.5.0</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.ws.xmlschema</groupId>
