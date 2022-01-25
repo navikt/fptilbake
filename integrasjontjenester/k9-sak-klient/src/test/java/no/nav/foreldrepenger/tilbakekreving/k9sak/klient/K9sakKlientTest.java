@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Test;
 import no.nav.foreldrepenger.tilbakekreving.behandlingslager.tilbakekrevingsvalg.VidereBehandling;
 import no.nav.foreldrepenger.tilbakekreving.domene.typer.Henvisning;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.Tillegsinformasjon;
-import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.KodeDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.PersonadresseDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.PersonopplysningDto;
 import no.nav.foreldrepenger.tilbakekreving.fagsystem.klient.dto.SamletEksternBehandlingInfo;
@@ -126,7 +125,6 @@ public class K9sakKlientTest {
         dto.setAdresselinje1("adrl1");
         dto.setAdresselinje2("adrl2");
         dto.setAdresselinje3("adrl3");
-        dto.setAdresseType(new KodeDto("adresser", "kode", "navn"));
         dto.setPostnummer("0001");
         dto.setPoststed("sted");
         return Collections.singletonList(dto);
