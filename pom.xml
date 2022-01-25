@@ -534,29 +534,6 @@
                 <version>0.1.55</version>
             </dependency>
 
-            <!-- Transitive avh. versjoner for å sikre unikhet (enforcer
-                dependencyConvergence). Skal ikke benyttes direkte av vår egen kode. -->
-            <dependency>
-                <groupId>org.jasypt</groupId>
-                <artifactId>jasypt</artifactId>
-                <version>1.9.3</version>
-            </dependency>
-            <!--Java10 -->
-            <dependency>
-                <groupId>jakarta.xml.bind</groupId>
-                <artifactId>jakarta.xml.bind-api</artifactId>
-                <version>2.3.3</version>
-            </dependency>
-            <dependency>
-                <groupId>com.sun.xml.bind</groupId>
-                <artifactId>jaxb-core</artifactId>
-                <version>3.0.2</version>
-            </dependency>
-            <dependency>
-                <groupId>org.osgi</groupId>
-                <artifactId>org.osgi.core</artifactId>
-                <version>6.0.0</version>
-            </dependency>
 
             <!-- logging -->
             <dependency>
@@ -717,6 +694,7 @@
                 </executions>
             </plugin>
 
+            <!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
@@ -737,13 +715,11 @@
                                 <dependencyConvergence/>
                                 <requireSameVersions>
                                     <dependencies>
-                                        <!-- sørger for at org.apache.cxf.cxf-rt-transports-http-jetty holdes i sync med cxf fra fp-felles  -->
                                         <dependency>org.apache.cxf:*</dependency>
                                     </dependencies>
                                 </requireSameVersions>
                                 <requireSameVersions>
                                     <dependencies>
-                                        <!-- sørger for at alle jersey-bibliotekene har samme versjon  -->
                                         <dependency>org.glassfish.jersey:*</dependency>
                                     </dependencies>
                                 </requireSameVersions>
@@ -752,6 +728,7 @@
                     </execution>
                 </executions>
             </plugin>
+            -->
 
             <plugin>
                 <artifactId>maven-deploy-plugin</artifactId>
