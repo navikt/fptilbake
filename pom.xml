@@ -557,12 +557,6 @@
                 <artifactId>org.osgi.core</artifactId>
                 <version>6.0.0</version>
             </dependency>
-            <dependency>
-                <groupId>jakarta.servlet</groupId>
-                <artifactId>jakarta.servlet-api</artifactId>
-                <scope>test</scope>
-                <version>4.0.4</version>
-            </dependency>
 
             <!-- logging -->
             <dependency>
